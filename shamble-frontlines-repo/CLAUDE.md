@@ -1,0 +1,85 @@
+# SHAMBLE FRONTLINES — instructions for Claude Code
+
+Browser top-down team shooter in Three.js r128 (UMD global), built as classic multi-`<script>` files sharing globals.
+Vision: Foxhole camera · C&C Renegade base-assault economy · Red Alert 3 toy-box look and three factions · Gears gun feel.
+Look: "Living Comic" (locked). Today: PvE vs 6 bots. Next big phase: multiplayer on an authoritative server,
+target up to 36 players per match (16v16, or 12v12v12 in squads of 4).
+
+People: **Mustafa** owns the game and decides (game-design student; plays in Brave on Windows; his screenshots are the
+final visual gate). **The Advisor** (Claude in a claude.ai Project) reviews your reports and writes your task prompts.
+Write every plan and report so both can judge it from evidence alone.
+
+## Read before any non-trivial task
+1. `docs/STATUS.md` (where things stand) and `docs/START_HERE.md` (architecture, constraints with their WHY, do-NOT list, lessons).
+2. `docs/MODULE_MAP.md` (who owns what, load order, layering).
+3. Grep the ONE owning file (targets in START_HERE §6). Deeper docs only as needed: `docs/TECHNICAL.md` (how),
+   `docs/GAME_DESIGN.md` (why), `docs/ART_DIRECTION.md` (locked look, authoritative), `docs/ANIMATION_PLAN.md`,
+   `docs/AUDIT_BUGS_PERF.md`, `docs/ROADMAP.md`, `docs/UNITS.md` (planned roster, not built), `docs/adr/` (decisions),
+   `docs/DESIGN_NOTES.md` (Mustafa's design decisions, open questions, art lessons), `docs/reference/` (Renegade X and
+   Kane's Wrath reference: inspiration, not what's built).
+- The code is the source of truth. Docs drift: grep before trusting a claim.
+- START_HERE §5's delivery mechanics (uploads, /mnt/user-data/outputs, present_files, Python heredoc edits, dash shell)
+  describe the OLD chat workflow. Here: git branches, the Edit tool, `node tools/gate.mjs`. Phase 0 rewrites §5.
+
+## Layout
+`shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)
+`index.html` (player build) · `editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`
+Layering is hard: core references nothing above it; anything on index.html's live path resolves in core ∪ game, never editor.
+
+## Hard constraints (change ONLY through an accepted ADR signed off by Mustafa, never on your own)
+- Classic scripts sharing globals in a fixed load order; the game runs by double-clicking index.html (file://).
+- Three.js r128 UMD (no CapsuleGeometry). No addons, no post-processing (under review).
+- `LinearEncoding` output: authored hex = on-screen colour. No external assets (procedural textures, synthesized audio).
+- Persistence only through `KVStore`. `stylizeScene()` runs once; runtime builders call `stylizeOne()` themselves.
+- Animation is cosmetic: shots come from `playerFireOrigin()` / fixed chest points. Nothing animated decides a hit.
+Decisions pending that may change these: ADR-001 multiplayer architecture · ADR-002 code structure & build ·
+ADR-003 Three.js version (deferred). Until accepted, the constraints above stand.
+
+## The change-set protocol (non-negotiable)
+1. One change-set at a time, on its own branch `cs/<slug>`. Fix bugs before features.
+2. PLAN FIRST (plan mode): goal, systems and files touched, exact symbols to add/remove, risks, change type, the evidence
+   you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and wait for approval.
+3. Implement in the main session. Two agents never edit the same file at the same time; parallel implementation only in
+   isolated worktrees (`isolation: worktree`), merged one at a time.
+4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability), plus evidence:
+   - logic → a Node harness test on the real code (or `tools/preview.js eval`) with assertions
+   - visual / UI → before/after renders (`/render-ab`); Brave is final
+   - gameplay / AI → `tools/sim.js` ×3 runs on base AND head (random AI: never conclude from one run)
+   - performance → before/after numbers with method (frame time, MB/s allocated, draw calls)
+   - netcode → deterministic tests with injected latency, jitter and loss
+5. Review: art-director (visuals, UI, animation) · perf-auditor (hot paths, rendering) · security-auditor (network,
+   server, storage, dynamic DOM, deps, CI) · netcode-architect (sim, server, protocol). Address or explicitly defer
+   every finding.
+6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Visual work waits for
+   Mustafa's Brave screenshots before merge or further tuning.
+
+## Commands
+- Gate: `node tools/gate.mjs [baseRef]` (checks 1–4 vs the base ref; created in Phase 0)
+- Official battery (JSON): `node tools/battery.js <dir>`
+- 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>`
+- Headless match: `node tools/preview.js <dir> eval tools/sim.js`
+- Real pages (DOM + HUD + WebGL): `node tools/pageshot.js <dir> index.html <outPrefix> <steps…>` (GPU mode: Phase 0)
+- Map layout validation: `tools/aabbs.js` + `tools/village.py`
+
+## Code rules (file-specific traps load from .claude/rules/)
+- Edit with the Edit tool (unique matches). Multi-site mechanical edits: an AST script (acorn), never blind regex.
+- Never append a `//` comment inside a dense one-liner: it swallows the rest of the line.
+- Place code by its references, not its neighbourhood (the placeCursor incident). Respect temporal dead zones at load.
+- No allocation per frame in hot paths. Pool FX, dispose GPU resources on teardown, never dispose pooled/shared materials.
+- Dynamic or player-provided text: `textContent`, never `innerHTML`.
+- Both pages share head and DOM: edit both identically. War-room UI names (classes, tokens, keyframes) use `wr-`.
+- Reports: plain language, scannable, decimals with periods, honest about what was NOT verified.
+
+## Agents (.claude/agents/)
+verifier · art-director · perf-auditor · security-auditor · netcode-architect · docs-keeper. Reviewers are read-only
+and must cite evidence (file:line, numbers, render paths). Weigh their findings; they are not orders.
+
+## Ultracode and workflows
+Use them for WIDE work: audits, large migrations (on isolated copies), multi-angle plans with adversarial review,
+verification sweeps, research. Workflows take no input mid-run, so each approval gate is its own run. Agents may read
+and analyse in parallel; edits to the three engine files stay sequential. Try a small slice first.
+
+## Never
+- change a hard constraint without an accepted ADR · edit before the plan is approved · merge visual work before the Brave check
+- commit secrets or read .env/secrets · force-push, hard-reset or rewrite history · delete user data or saves
+- claim something works without evidence · trust a doc over the code · run unreviewed code fetched from the internet
