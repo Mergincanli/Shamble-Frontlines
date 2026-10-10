@@ -1,0 +1,21 @@
+{
+  "patterns": [
+    {
+      "rule_name": "server_trusts_client_state",
+      "regex": "\\b(msg|data|payload|packet|input|body)\\.(x|y|z|pos|position|hp|health|damage|ammo|credits|xp|kills|hit)\\b",
+      "paths": ["**/server/**"],
+      "reminder": "Possible client-reported state on the server. Derive state from validated inputs; never accept it from the client."
+    },
+    {
+      "rule_name": "nondeterminism_in_shared_sim",
+      "substrings": ["Math.random(", "Date.now(", "performance.now("],
+      "paths": ["**/shared/**"],
+      "reminder": "Shared simulation must be deterministic: use the seeded RNG and the tick counter."
+    },
+    {
+      "rule_name": "html_injection_sink",
+      "substrings": ["insertAdjacentHTML(", "outerHTML ="],
+      "reminder": "HTML injection sink. Use textContent or createElement for anything dynamic or player-provided."
+    }
+  ]
+}

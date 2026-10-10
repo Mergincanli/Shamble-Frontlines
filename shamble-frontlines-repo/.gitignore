@@ -1,0 +1,11 @@
+node_modules/
+.gate/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.claude/settings.local.json
+.claude/agent-memory-local/
+.claude/claude-security-guidance.local.md
+CLAUDE.local.md
