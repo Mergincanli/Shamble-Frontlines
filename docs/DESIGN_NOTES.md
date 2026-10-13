@@ -23,7 +23,8 @@ account changes what a tier even is.
 - **The Spy**, a hybrid of the TF2 Spy and the Red Alert 3 Allied Spy: looks like the enemy, can backstab, and can
   reach the enemy terminal to steal their tech points, so a team can lose Tech. This creates mid-game twists and gives
   teams a reason to contest the Tech Box objectives.
-- **Multiplayer scale:** up to 16v16, or 12v12v12 in squads of 4 (one team per faction).
+- **Multiplayer scale:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16,
+  possibly larger). Design for 48+ players; bots fill empty slots. (Changed 2026-10-13: was up to 16v16 or 12v12v12.)
 
 ### Advisor suggestions (not decided)
 - A comeback valve from day one: extra bounty for killing an expensive unit, and a CS/MOBA-style economic catch-up.

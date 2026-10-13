@@ -15,8 +15,9 @@ Next: Phase 1 decisions (ADR-001, ADR-002), then the foundation refactor and the
 | Phase 0 setup | cs/phase-0 | plan pending | CS-1 merge, Mustafa's approval of the Phase 0 plan |
 
 ## Targets
-- **Multiplayer:** up to 36 players per match: 16v16 (4 squads of 4 per team) or 12v12v12 (3 squads of 4; one team per
-  faction). Bots fill empty slots. Milestones: 2–8 players → 16 → full scale, with load tests at each step.
+- **Multiplayer:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly
+  larger): design for 48+ players. Bots fill empty slots. Milestones: 2–8 players → 16 → full scale, with load tests at
+  each step.
 
 ## Decisions pending
 - **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started
