@@ -1,4 +1,4 @@
-// Headless 90 s match: xvfb-run -a node preview.js <buildDir> eval sim.js  -> bot stall %, stalls near village pieces, harvesters.
+// Headless 90 s match: node tools/preview.js . eval tools/sim.js (Linux: prefix xvfb-run -a) -> bot stall %, stalls near village pieces, harvesters.
 // Bot behaviour is random: compare 3+ runs per build, not single runs.
 (function(){
   deploy();

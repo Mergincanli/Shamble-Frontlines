@@ -1,0 +1,20 @@
+{
+  "name": "shamble-frontlines-tools",
+  "private": true,
+  "description": "Verification toolkit for SHAMBLE FRONTLINES (gate, battery, headless renders, match sim). Never shipped.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "acorn": "8.18.0",
+    "acorn-walk": "8.3.5",
+    "pngjs": "7.0.0",
+    "three": "0.128.0"
+  },
+  "optionalDependencies": {
+    "@napi-rs/canvas": "1.0.9",
+    "gl": "8.1.6",
+    "playwright": "1.56.1"
+  }
+}

@@ -1,14 +1,22 @@
-# Needs: /home/claude/sf (build) and /tmp/aabbs.json (from preview.js eval aabbs.js). Writes /tmp/village.json; paste into DM_Cabana.
+# Usage: python tools/village.py [core.js] [aabbs.json] [out.json]
+#   defaults: <repo>/shamble-core.js, <tmp>/aabbs.json (from: node tools/preview.js . eval tools/aabbs.js > <tmp>/aabbs.json),
+#   <tmp>/village.json (<tmp> = the OS temp folder). Paste the output into DM_Cabana.
 # Cabana Republic village pass: design the LEFT half, mirror to the right (team symmetry), validate every piece.
 # Output: JSON with houses/trees/props/covers in the exact shapes buildMap consumes.
-import json, math, sys
+import json, math, os, sys, tempfile
 
-GRID = [l.strip('",') for l in open('/home/claude/sf/shamble-core.js', encoding='utf-8').read()
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_ARGS = sys.argv[1:] + [None] * 3
+CORE_JS = _ARGS[0] or os.path.join(_REPO, 'shamble-core.js')
+AABBS_JSON = _ARGS[1] or os.path.join(tempfile.gettempdir(), 'aabbs.json')
+OUT_JSON = _ARGS[2] or os.path.join(tempfile.gettempdir(), 'village.json')
+
+GRID = [l.strip('",') for l in open(CORE_JS, encoding='utf-8').read()
         .split('const cabanaRepublicMap = [')[1].split('];')[0].strip().split('\n')]
 H, W = len(GRID), len(GRID[0]); CX, CZ = (W - 1) / 2, (H - 1) / 2
 cell = lambda r, c: ((c - CX) * 10.0, (r - CZ) * 10.0)
 PATHS = [cell(r, c) for r in range(H) for c in range(W) if GRID[r][c] == '#']
-aab = json.load(open('/tmp/aabbs.json'))
+aab = json.load(open(AABBS_JSON, encoding='utf-8-sig'))
 BOXES = [(b[1], b[2], b[3], b[4]) for b in aab['boxes']]                       # existing colliders (minx,minz,maxx,maxz)
 Z = aab['zones']
 OBJ = [(s['x'], s['z']) for s in Z['silos']] + [(t['x'], t['z']) for t in Z['tech']] + [(Z['field']['x'], Z['field']['z'])]
@@ -136,4 +144,5 @@ out = {'houses': [dict(bt=i['kind'], x=i['x'], z=i['z'], rot=round(i['rot'], 4))
        'covers': [dict(type=i['kind'], x=i['x'], z=i['z'], len=i['len'], rot=round(i['rot'], 4)) for i in keep if i['cat'] == 'cover']}
 print(json.dumps({k: len(v) for k, v in out.items()}), '| rejected:', len(report), file=sys.stderr)
 for it, bad in report: print(f"  REJECT {it['cat']}:{it['kind']} @({it['x']},{it['z']}) -> {'; '.join(bad)}", file=sys.stderr)
-json.dump(out, open('/tmp/village.json', 'w'))
+json.dump(out, open(OUT_JSON, 'w', encoding='utf-8'))
+print('wrote', OUT_JSON, file=sys.stderr)
