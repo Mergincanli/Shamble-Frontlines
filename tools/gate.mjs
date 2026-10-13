@@ -96,7 +96,7 @@ function nodeCheck(parts) {
     while (k + 1 < starts.length && starts[k + 1] <= L) k++;
     out[0] = `${parts[k].label} line ${L - starts[k] + 1 + (parts[k].lineOffset || 0)}`;
   }
-  return out.filter(l => l.trim() && !l.startsWith('Node.js v')).slice(0, 5).join('\n      ');
+  return out.filter(l => l.trim() && !l.startsWith('Node.js v') && !/^\s+at /.test(l)).slice(0, 4).join('\n      ');
 }
 
 function pageScripts(page, html) {
@@ -160,7 +160,7 @@ if (H && B) {
   const added = [...hw.keys()].filter(n => !bw.has(n)).sort();
   const droppedAll = [...bw.keys()].filter(n => !hw.has(n)).sort();
   const dropped = droppedAll.filter(n => !allowDrop.has(n)), allowed = droppedAll.filter(n => allowDrop.has(n));
-  const moved = [...hw.keys()].filter(n => bw.has(n) && hw.get(n).join() !== bw.get(n).join()).sort();
+  const moved = [...hw.keys()].filter(n => bw.has(n) && hw.get(n).length === 1 && hw.get(n).join() !== bw.get(n).join()).sort();
   const cross = [...hw.entries()].filter(([, f]) => new Set(f).size > 1).map(([n, f]) => `${n} (${[...new Set(f)].join(', ')})`);
   const intra = KEYS.flatMap(k => (H.intraDupes[k] || []).map(n => `${n} (twice in ${k})`));
   const counts = KEYS.map(k => `${k} ${H.symbols[k].length}`).join(' / ');
