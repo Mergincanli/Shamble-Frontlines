@@ -14,7 +14,11 @@ const fs = require('fs'), path = require('path');
 const acorn = require('acorn');
 const walk = require('acorn-walk');
 
-const inlineOf = html => { const m = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)]; return m[m.length - 1][1]; };
+// every inline classic <script> of a page (no src; no type, or a JavaScript type), joined in page order
+const inlineOf = html => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter(m => !/\bsrc\s*=/i.test(m[1]) && (!/\btype\s*=/i.test(m[1]) || /\btype\s*=\s*["']?(text|application)\/javascript\b/i.test(m[1])))
+  .map(m => m[2]).join('\n');
+const unentity = s => s.replace(/&quot;/g, '"').replace(/&#0*39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 function readBuild(dir) {
   const rd = f => fs.readFileSync(path.join(dir, f), 'utf8');
   return { core: rd('shamble-core.js'), game: rd('shamble-game.js'), editor: rd('shamble-editor.js'),
@@ -133,8 +137,9 @@ function analyze(build) {
   const visitNames = names => { for (const n of names) if (declByName.has(n) && !reachable.has(n)) { reachable.add(n); queue.push(n); } };
   for (const k of PLAYER) for (const st of ast[k].body) if (st.type !== 'FunctionDeclaration' && st.type !== 'ClassDeclaration') visitNames(refsIn(st));
   const domHandlers = [];
-  for (const m of indexHtml.matchAll(/\son[a-z]+\s*=\s*"([^"]*)"/g)) {
-    try { const names = refsIn(acorn.parse(m[1], { ecmaVersion: 'latest' })); visitNames(names); for (const n of names) if (editorOnly.has(n)) domHandlers.push({ handler: m[1].slice(0, 80), editorOnlyRef: n }); } catch (e) { domHandlers.push({ handler: m[1].slice(0, 80), parseError: String(e.message) }); }
+  for (const m of indexHtml.matchAll(/\son[a-z]+\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {   // inline DOM handlers, either quote style
+    const h = unentity(m[1] ?? m[2]);
+    try { const names = refsIn(acorn.parse(h, { ecmaVersion: 'latest' })); visitNames(names); for (const n of names) if (editorOnly.has(n)) domHandlers.push({ handler: h.slice(0, 80), editorOnlyRef: n }); } catch (e) { domHandlers.push({ handler: h.slice(0, 80), parseError: String(e.message) }); }
   }
   while (queue.length) { const n = queue.shift(); for (const d of declByName.get(n)) visitNames(refsIn(d.node)); }
 

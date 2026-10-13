@@ -85,7 +85,7 @@ function nodeCheck(parts) {
     if (i) { code += '\n;\n'; line += 2; }
     starts.push(line); code += p.code; line += p.code.split('\n').length - 1;
   }
-  const file = join(tmp, `${++nTmp}.cjs`);
+  const file = join(tmp, `${++nTmp}.${parts.length === 1 && parts[0].module ? 'mjs' : 'cjs'}`);
   writeFileSync(file, code);
   const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
   if (r.status === 0) return null;
@@ -95,17 +95,21 @@ function nodeCheck(parts) {
     const L = +m[1]; let k = 0;
     while (k + 1 < starts.length && starts[k + 1] <= L) k++;
     out[0] = `${parts[k].label} line ${L - starts[k] + 1 + (parts[k].lineOffset || 0)}`;
-  }
+  } else out[0] = `${parts.map(p => p.label).join(' + ')}: ${out[0]}`;
   return out.filter(l => l.trim() && !l.startsWith('Node.js v') && !/^\s+at /.test(l)).slice(0, 4).join('\n      ');
 }
 
+// A page's scripts in order: { src } for <script src>, { label, code, module } for inline JavaScript.
+// Inline scripts of another type (JSON data, templates) are not JavaScript and are skipped, as the syntax hook does.
 function pageScripts(page, html) {
   const out = []; let n = 0;
   for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     const src = (m[1].match(/\bsrc\s*=\s*["']([^"']+)["']/i) || [])[1];
+    const type = (m[1].match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
+    if (type && !/^(module|text\/javascript|application\/javascript)$/i.test(type)) continue;
     const startLine = html.slice(0, m.index + m[0].indexOf('>') + 1).split('\n').length;
-    if (src) out.push({ src });
-    else if (m[2].trim()) out.push({ label: `${page} inline#${++n}`, code: m[2], lineOffset: startLine - 1 });
+    if (src) out.push({ src, module: /^module$/i.test(type || '') });
+    else if (m[2].trim()) out.push({ label: `${page} inline#${++n}`, code: m[2], lineOffset: startLine - 1, module: /^module$/i.test(type || '') });
   }
   return out;
 }
@@ -125,7 +129,7 @@ const add = (id, name, pass, summary, details = []) => checks.push({ id, name, p
   ];
   const errs = units.map(u => [u.label, nodeCheck([u])]).filter(([, e]) => e);
   add(1, 'syntax', !errs.length, `${units.length - errs.length}/${units.length} sources parse (${units.map(u => u.label).join(', ')})`,
-      errs.map(([l, e]) => `${l}: ${e}`));
+      errs.map(([, e]) => e));
 }
 
 // [2] load-order concatenation per page
@@ -135,6 +139,7 @@ const add = (id, name, pass, summary, details = []) => checks.push({ id, name, p
   for (const [page, html] of [['index.html', head.indexHtml], ['editor.html', head.editorHtml]]) {
     const parts = [];
     for (const s of pageScripts(page, html)) {
+      if (s.module) continue;   // module scripts get their own scope: not part of the classic-script concatenation
       if (s.code) { parts.push(s); continue; }
       if (/^([a-z]+:)?\/\//i.test(s.src)) { external.add(s.src.split('/').pop()); continue; }
       const name = s.src.replace(/^\.\//, '');
@@ -168,6 +173,8 @@ if (H && B) {
   if (added.length) details.push('+ added: ' + added.join(', '));
   if (dropped.length) details.push('- DROPPED: ' + dropped.join(', '));
   if (allowed.length) details.push('- dropped (allowed by --allow-drop): ' + allowed.join(', '));
+  const unusedAllow = [...allowDrop].filter(n => !droppedAll.includes(n));
+  if (unusedAllow.length) details.push('note: --allow-drop names that were not dropped: ' + unusedAllow.join(', '));
   if (moved.length) details.push('~ moved: ' + moved.map(n => `${n} (${bw.get(n).join(',')} -> ${hw.get(n).join(',')})`).join(', '));
   if (cross.length) details.push('! CROSS-FILE DUPLICATES: ' + cross.join(', '));
   if (intra.length) details.push('! DUPLICATES WITHIN A FILE: ' + intra.join(', '));
