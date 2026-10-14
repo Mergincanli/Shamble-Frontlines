@@ -4,17 +4,28 @@
 //   [2] concatenation  node --check on each page's scripts joined in load order (read from its <script src> tags)
 //   [3] symbols        top-level symbols (tools/battery.js), base vs head: nothing dropped, no duplicates; prints +added / -dropped
 //   [4] player build   battery.js check 4: no reachable, unguarded reference from index.html's build to an editor-only symbol
-// Usage (from anywhere): node tools/gate.mjs [baseRef] [--allow-drop name1,name2] [--json]
-//   baseRef      default: the merge-base of HEAD with main (origin/main when there is no local main)
+//   [5a] smoke         tools/smoke.mjs: the real pages run in headless Chromium (menu, deploy, play, pause; editor, Maps); any
+//                      page error or console error FAILS
+//   [5b] names         eslint-scope over each page's scripts and inline DOM handlers: every reference resolves to a local, a
+//                      top-level declaration of that page's build, an ECMAScript built-in or tools/gate-globals.json
+//                      (typeof operands exempt; index.html's refs to editor-only symbols are check 4's)
+//   [5c] layering      shamble-core.js references no game, editor or inline-script top-level symbol, guarded or not
+//   [5d] script order  each page loads exactly: three r128 (cdnjs) -> core -> game [-> editor, editor.html] -> one inline script
+// Usage (from anywhere): node tools/gate.mjs [baseRef] [--allow-drop name1,name2] [--no-smoke | --smoke-only] [--json]
+//   baseRef      default: the merge-base of HEAD with main or origin/main, whichever is newer
 //   --allow-drop symbols the approved plan removes on purpose (anything else dropped FAILS)
+//   --no-smoke   skip 5a (quick local runs; CI runs it as its own job). The result says so.
+//   --smoke-only run only 5a (the CI smoke job)
 //   --json       machine-readable result on stdout
-// Exit code: 0 PASS, 1 FAIL, 2 usage or setup error. Needs Node 22, git and tools/node_modules (cd tools && npm ci).
+// Exit code: 0 PASS, 1 FAIL, 2 usage or setup error. Needs Node 22, git and tools/node_modules (cd tools && npm ci);
+// 5a also needs Playwright's Chromium (npx --no -- playwright install chromium, inside tools/).
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, sep } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 
 const TOOLS = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(TOOLS, '..');
@@ -22,14 +33,17 @@ const FILES = ['shamble-core.js', 'shamble-game.js', 'shamble-editor.js', 'index
 const OLD_PREFIX = 'shamble-frontlines-repo/';   // where the files lived before CS-1 moved them to the root
 
 const die = msg => { console.error('gate: ' + msg); process.exit(2); };
-const USAGE = 'usage: node tools/gate.mjs [baseRef] [--allow-drop name1,name2] [--json]';
+const firstLine = s => String(s).split('\n')[0];
+const USAGE = 'usage: node tools/gate.mjs [baseRef] [--allow-drop name1,name2] [--no-smoke | --smoke-only] [--json]';
 
 // ---------- arguments ----------
-let baseArg = null, asJson = false, allowDrop = new Set();
+let baseArg = null, asJson = false, allowDrop = new Set(), noSmoke = false, smokeOnly = false;
 const argv = process.argv.slice(2);
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === '--json') asJson = true;
+  else if (a === '--no-smoke') noSmoke = true;
+  else if (a === '--smoke-only') smokeOnly = true;
   else if (a === '--allow-drop' || a.startsWith('--allow-drop=')) {
     const v = a.includes('=') ? a.slice(a.indexOf('=') + 1) : argv[++i];
     if (!v) die('--allow-drop needs a comma-separated list\n' + USAGE);
@@ -39,10 +53,13 @@ for (let i = 0; i < argv.length; i++) {
   else if (baseArg === null) baseArg = a;
   else die('only one baseRef\n' + USAGE);
 }
+if (noSmoke && smokeOnly) die('--no-smoke and --smoke-only exclude each other\n' + USAGE);
+if (smokeOnly && (baseArg !== null || allowDrop.size)) die('--smoke-only takes no baseRef or --allow-drop\n' + USAGE);
 
 const require = createRequire(import.meta.url);
-let battery;
-try { battery = require('./battery.js'); } catch (e) { die('cannot load tools/battery.js (did you run: cd tools && npm ci?)\n' + e.message); }
+let battery, acorn, walk, escope;
+try { battery = require('./battery.js'); acorn = require('acorn'); walk = require('acorn-walk'); escope = require('eslint-scope'); }
+catch (e) { die('cannot load the gate\'s dependencies (did you run: cd tools && npm ci?)\n' + e.message); }
 
 // ---------- git ----------
 const tryGit = (...a) => {
@@ -55,10 +72,18 @@ function resolveBase(arg) {
     if (!sha) die(`base ref not found: ${arg}`);
     return { ref: arg, sha: sha.trim() };
   }
-  for (const m of ['main', 'origin/main']) {
-    const sha = tryGit('merge-base', 'HEAD', m);
-    if (sha) return { ref: `merge-base(HEAD, ${m})`, sha: sha.trim() };
+  // The newer of the two merge-bases: a stale local main must not silently give an older base.
+  const mb = {};
+  for (const m of ['main', 'origin/main']) { const sha = tryGit('merge-base', 'HEAD', m); if (sha) mb[m] = sha.trim(); }
+  const L = mb['main'], O = mb['origin/main'];
+  const pick = (m, note) => ({ ref: `merge-base(HEAD, ${m})`, sha: mb[m], note });
+  if (L && O && L !== O) {
+    if (tryGit('merge-base', '--is-ancestor', L, O) !== null) return pick('origin/main', 'local main is behind origin/main, so origin/main is used (update it: git fetch origin main:main)');
+    if (tryGit('merge-base', '--is-ancestor', O, L) !== null) return pick('main', 'local main is ahead of origin/main, so local main is used');
+    return pick('origin/main', 'local main and origin/main have diverged; origin/main is used');
   }
+  if (L) return pick('main');
+  if (O) return pick('origin/main');
   die('no baseRef given and no merge-base with main or origin/main (a shallow clone needs full history)');
 }
 const lf = s => s.replace(/\r\n/g, '\n');
@@ -114,11 +139,75 @@ function pageScripts(page, html) {
   return out;
 }
 
+// A page's classic scripts in load order as [{ label, code, lineOffset }]: local <script src> files read from the working tree,
+// inline scripts as they are. External and module scripts are left out; broken srcs go to errs (check 2 reports them).
+function classicParts(page, html, errs = [], external = new Set()) {
+  const parts = [];
+  for (const s of pageScripts(page, html)) {
+    if (s.module) continue;   // module scripts get their own scope: not part of the classic-script build
+    if (s.code) { parts.push(s); continue; }
+    if (/^([a-z]+:)?\/\//i.test(s.src)) { external.add(s.src.split('/').pop()); continue; }
+    const name = s.src.replace(/^\.\//, ''), abs = resolve(ROOT, name);
+    if (!abs.startsWith(ROOT + sep)) { errs.push(`${page}: <script src="${s.src}"> points outside the repo`); continue; }
+    const code = LOCAL[name] ?? (existsSync(abs) ? headFile(name) : null);
+    if (code === null) { errs.push(`${page}: <script src="${s.src}"> does not exist`); continue; }
+    parts.push({ label: name, code });
+  }
+  return parts;
+}
+
+// ---------- scope analysis for 5b and 5c (eslint-scope) ----------
+// One classic script (or a DOM handler wrapped in a function): its top-level names and its free references, i.e. every
+// reference not resolved inside it. A free reference is fine when some script of the same page declares it at top level.
+function scopeOf(code) {
+  const ast = acorn.parse(code, { ecmaVersion: 'latest', sourceType: 'script', ranges: true, locations: true });
+  const typeofOps = new Set();
+  walk.simple(ast, { UnaryExpression(n) { if (n.operator === 'typeof' && n.argument.type === 'Identifier') typeofOps.add(n.argument); } });
+  const g = escope.analyze(ast, { ecmaVersion: 2025, sourceType: 'script' }).globalScope;
+  return { top: new Set(g.variables.map(v => v.name)),
+           free: g.through.map(r => ({ name: r.identifier.name, line: r.identifier.loc.start.line, typeofOp: typeofOps.has(r.identifier),
+                                       write: r.isWrite() && !r.isRead() })) };
+}
+const scopeCache = new Map();   // core and game are analysed once for both pages
+const scoped = code => { if (!scopeCache.has(code)) scopeCache.set(code, scopeOf(code)); return scopeCache.get(code); };
+
+// ---------- 5a smoke, and the result ----------
+async function smokeCheck() {
+  try {
+    const { runSmoke } = await import('./smoke.mjs');
+    const r = await runSmoke({ root: ROOT });
+    add('5a', 'smoke', r.pass, r.summary, r.details, { pages: r.pages });
+  } catch (e) { add('5a', 'smoke', false, 'tools/smoke.mjs could not run', [firstLine(e.message)]); }
+}
+const ORDER = ['1', '2', '3', '4', '5a', '5b', '5c', '5d'];
+function finish() {
+  checks.sort((a, b) => ORDER.indexOf(String(a.id)) - ORDER.indexOf(String(b.id)));
+  const pass = checks.every(c => c.pass);
+  const scope = smokeOnly ? 'smoke only' : noSmoke ? 'smoke skipped' : 'full';
+  const tail = smokeOnly ? ' (smoke only: checks 1-4 and 5b-5d not run)' : noSmoke ? ' (5a smoke skipped: --no-smoke)' : '';
+  if (asJson) {
+    console.log(JSON.stringify({ pass, scope, base: base && { ref: base.ref, sha: base.sha, note: base.note }, head: 'working tree', checks }, null, 1));
+  } else {
+    console.log(base ? `SHAMBLE FRONTLINES gate | base ${base.ref} = ${base.sha.slice(0, 7)} | head = working tree`
+                     : 'SHAMBLE FRONTLINES gate | smoke only | head = working tree');
+    if (base && base.note) console.log('note: ' + base.note);
+    for (const c of checks) {
+      console.log(`${`[${c.id}]`.padEnd(4)} ${c.name.padEnd(14)} ${c.skipped ? 'SKIP' : c.pass ? 'PASS' : 'FAIL'}  ${c.summary}`);
+      for (const d of c.details) console.log('      ' + d);
+    }
+    console.log((pass ? 'GATE PASS' : 'GATE FAIL') + tail);
+  }
+  process.exit(pass ? 0 : 1);
+}
+
 // ---------- run ----------
-const base = resolveBase(baseArg);
-const head = toBuild(headFile);
 const checks = [];
-const add = (id, name, pass, summary, details = []) => checks.push({ id, name, pass, summary, details });
+const add = (id, name, pass, summary, details = [], extra = {}) => checks.push({ id, name, pass, summary, details, ...extra });
+const base = smokeOnly ? null : resolveBase(baseArg);
+if (smokeOnly) { await smokeCheck(); finish(); }
+const head = toBuild(headFile);
+const LOCAL = { 'shamble-core.js': head.core, 'shamble-game.js': head.game, 'shamble-editor.js': head.editor };
+const PAGES = [['index.html', head.indexHtml], ['editor.html', head.editorHtml]];
 
 // [1] syntax
 {
@@ -134,20 +223,9 @@ const add = (id, name, pass, summary, details = []) => checks.push({ id, name, p
 
 // [2] load-order concatenation per page
 {
-  const local = { 'shamble-core.js': head.core, 'shamble-game.js': head.game, 'shamble-editor.js': head.editor };
   const summ = [], errs = [], external = new Set();
-  for (const [page, html] of [['index.html', head.indexHtml], ['editor.html', head.editorHtml]]) {
-    const parts = [];
-    for (const s of pageScripts(page, html)) {
-      if (s.module) continue;   // module scripts get their own scope: not part of the classic-script concatenation
-      if (s.code) { parts.push(s); continue; }
-      if (/^([a-z]+:)?\/\//i.test(s.src)) { external.add(s.src.split('/').pop()); continue; }
-      const name = s.src.replace(/^\.\//, ''), abs = resolve(ROOT, name);
-      if (!abs.startsWith(ROOT + sep)) { errs.push(`${page}: <script src="${s.src}"> points outside the repo`); continue; }
-      const code = local[name] ?? (existsSync(abs) ? headFile(name) : null);
-      if (code === null) { errs.push(`${page}: <script src="${s.src}"> does not exist`); continue; }
-      parts.push({ label: name, code });
-    }
+  for (const [page, html] of PAGES) {
+    const parts = classicParts(page, html, errs, external);
     summ.push(`${page}: ${parts.map(p => p.label.replace(/^.*? (inline#\d+)$/, '$1')).join(' + ')}`);
     const e = nodeCheck(parts);
     if (e) errs.push(`${page} concatenation: ${e}`);
@@ -191,16 +269,79 @@ if (H) {
        ...dom.map(d => d.parseError ? `index.html handler does not parse: "${d.handler}"` : `index.html handler uses editor-only ${d.editorOnlyRef}: "${d.handler}"`)]);
 } else if (!checks.some(c => c.id === 4)) add(4, 'player build', false, 'not run: battery.js could not analyse the working tree');
 
-checks.sort((a, b) => a.id - b.id);
-const pass = checks.every(c => c.pass);
-if (asJson) {
-  console.log(JSON.stringify({ pass, base: { ref: base.ref, sha: base.sha }, head: 'working tree', checks }, null, 1));
-} else {
-  console.log(`SHAMBLE FRONTLINES gate | base ${base.ref} = ${base.sha.slice(0, 7)} | head = working tree`);
-  for (const c of checks) {
-    console.log(`[${c.id}] ${c.name.padEnd(14)} ${c.pass ? 'PASS' : 'FAIL'}  ${c.summary}`);
-    for (const d of c.details) console.log('      ' + d);
+// [5b] names: every free reference of each page's scripts and inline DOM handlers resolves
+const BUILTINS = new Set(Object.getOwnPropertyNames(vm.runInNewContext('globalThis')));   // pristine V8: ECMAScript only
+let LISTED;
+try { const j = JSON.parse(readFileSync(join(TOOLS, 'gate-globals.json'), 'utf8')); LISTED = new Set([...(j.browser || []), ...(j.library || [])]); }
+catch (e) { die('cannot read tools/gate-globals.json: ' + e.message); }
+{
+  const problems = [], summ = [];
+  // index.html's references to editor-only symbols are check 4's job (it proves each one is guarded): same set as battery.js
+  const indexTop = new Set(), editorOnly = new Set();
+  try {
+    for (const p of classicParts('index.html', head.indexHtml)) scoped(p.code).top.forEach(n => indexTop.add(n));
+    for (const n of scoped(head.editor).top) if (!indexTop.has(n)) editorOnly.add(n);
+  } catch { /* a syntax error: check 1 reports it, and the loop below names the file */ }
+  for (const [page, html] of PAGES) {
+    const units = [], declared = new Set(), bad = new Map();
+    for (const p of classicParts(page, html)) {
+      try { const r = scoped(p.code); units.push([p, r]); r.top.forEach(n => declared.add(n)); }
+      catch (e) { problems.push(`${p.label}: cannot analyse (${firstLine(e.message)}; see check 1)`); }
+    }
+    const exempt = page === 'index.html' ? editorOnly : new Set();
+    const ok = f => f.typeofOp || declared.has(f.name) || BUILTINS.has(f.name) || LISTED.has(f.name) || exempt.has(f.name);
+    const note = (f, where) => { if (!bad.has(f.name)) bad.set(f.name, []); bad.get(f.name).push(where + (f.write ? ' (an assignment: it would create an implicit global)' : '')); };
+    for (const [p, r] of units) for (const f of r.free) if (!ok(f)) note(f, `${p.label} line ${f.line + (p.lineOffset || 0)}`);
+    const handlers = battery.handlersOf(html);
+    for (const h of handlers) {
+      let r;
+      try { r = scopeOf(`(function (event) {\n${h.code}\n});`); }
+      catch (e) { problems.push(`${page} line ${h.line}: the ${h.attr} handler does not parse: "${h.code.slice(0, 60)}"`); continue; }
+      for (const f of r.free) if (!ok(f)) note(f, `${page} line ${h.line}, ${h.attr}="${h.code.slice(0, 40)}"`);
+    }
+    for (const [name, where] of bad) problems.push(`${page}: ${name} is not defined (${where[0]}${where.length > 1 ? `; +${where.length - 1} more` : ''})`);
+    summ.push(`${page}: ${units.length} scripts + ${handlers.length} DOM handlers, ${bad.size} unresolved`);
   }
-  console.log(pass ? 'GATE PASS' : 'GATE FAIL');
+  add('5b', 'names', !problems.length, summ.join(' | ') + ` | allowed globals: ${BUILTINS.size} built-ins + ${LISTED.size} in gate-globals.json`, problems);
 }
-process.exit(pass ? 0 : 1);
+
+// [5c] layering: shamble-core.js stands alone (no reference into game, editor or inline-script symbols, typeof included)
+try {
+  const core = scoped(head.core), upper = new Map();
+  const above = [['shamble-game.js', head.game], ['shamble-editor.js', head.editor],
+                 ...PAGES.flatMap(([page, html]) => classicParts(page, html).filter(p => !LOCAL[p.label]).map(p => [p.label, p.code]))];
+  for (const [label, code] of above) { try { for (const n of scoped(code).top) if (!core.top.has(n) && !upper.has(n)) upper.set(n, label); } catch { /* check 1 */ } }
+  const hits = core.free.filter(f => upper.has(f.name)), outside = new Set(core.free.filter(f => !core.top.has(f.name)).map(f => f.name));
+  add('5c', 'layering', !hits.length, `shamble-core.js uses ${outside.size} names it does not declare; ${hits.length} references into game/editor/inline symbols`,
+      hits.map(f => `shamble-core.js line ${f.line}: ${f.typeofOp ? 'typeof ' : ''}${f.name} (declared in ${upper.get(f.name)})`));
+} catch (e) { add('5c', 'layering', false, 'cannot analyse shamble-core.js (see check 1)', [firstLine(e.message)]); }
+
+// [5d] script order: exactly the expected <script> tags, in order, with no attribute that changes when they run
+{
+  const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  const WANT = { 'index.html': [THREE_URL, 'shamble-core.js', 'shamble-game.js', 'inline'],
+                 'editor.html': [THREE_URL, 'shamble-core.js', 'shamble-game.js', 'shamble-editor.js', 'inline'] };
+  const short = s => s === THREE_URL ? 'three r128 (cdnjs)' : s;
+  const problems = [], summ = [];
+  for (const [page, html] of PAGES) {
+    const got = [];
+    for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+      const attrs = m[1], names = attrs.replace(/(["'])[\s\S]*?\1/g, '""');   // attribute names only, for the flag test
+      const src = (attrs.match(/\bsrc\s*=\s*["']([^"']+)["']/i) || [])[1];
+      const type = (attrs.match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
+      if (type && !/^(module|text\/javascript|application\/javascript)$/i.test(type)) continue;   // data blocks never run
+      if (!src && !m[2].trim()) continue;                                                         // an empty inline script runs nothing
+      const flags = [/^module$/i.test(type || '') ? 'type=module' : '', ...['async', 'defer', 'nomodule'].filter(f => new RegExp(`\\b${f}\\b`, 'i').test(names))].filter(Boolean);
+      got.push((src ? src.replace(/^\.\//, '') : 'inline') + (flags.length ? ` [${flags.join(' ')}]` : ''));
+    }
+    const want = WANT[page], same = got.length === want.length && got.every((g, i) => g === want[i]);
+    if (!same) problems.push(`${page}: expected ${want.map(short).join(' -> ')}; found ${got.map(short).join(' -> ') || 'no scripts'}`);
+    summ.push(`${page}: ${got.map(short).join(' -> ')}`);
+  }
+  add('5d', 'script order', !problems.length, summ.join(' | '), problems);
+}
+
+// [5a] smoke (slowest, so last)
+if (noSmoke) add('5a', 'smoke', true, 'skipped (--no-smoke): the full gate or CI\'s smoke job runs it', [], { skipped: true });
+else await smokeCheck();
+finish();

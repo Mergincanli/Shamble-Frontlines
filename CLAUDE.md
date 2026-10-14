@@ -41,7 +41,8 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
    you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and wait for approval.
 3. Implement in the main session. Two agents never edit the same file at the same time; parallel implementation only in
    isolated worktrees (`isolation: worktree`), merged one at a time.
-4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability), plus evidence:
+4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check 5: smoke,
+   names, layering, script order), plus evidence:
    - logic → a Node harness test on the real code (or `tools/preview.js eval`) with assertions
    - visual / UI → before/after renders (`/render-ab`); Brave is final
    - gameplay / AI → `tools/sim.js` ×3 runs on base AND head (random AI: never conclude from one run)
@@ -61,7 +62,8 @@ Mustafa tells you to after the APPROVE.
 
 ## Commands
 - Setup (once per machine, Node 22): `cd tools && npm ci`; for pageshot also, inside tools/: `npx --no -- playwright install chromium`
-- Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b]` (checks 1–4 vs the base ref, default: merge-base with main; CI runs it)
+- Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke]` (checks 1–4 and 5a–5d vs the base ref, default:
+  merge-base with main or origin/main, whichever is newer; CI runs it)
 - Official battery (JSON): `node tools/battery.js <dir>`
 - 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>` (Linux: prefix `xvfb-run -a`)
 - Headless match: `node tools/preview.js <dir> eval tools/sim.js`

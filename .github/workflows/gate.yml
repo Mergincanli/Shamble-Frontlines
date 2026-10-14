@@ -1,6 +1,8 @@
-# The SHAMBLE FRONTLINES gate (tools/gate.mjs, checks 1-4) on every push and pull request.
-# Pull requests compare against their base branch; pushes against the previous tip of the branch (or main for a new branch).
-# The gate only needs acorn: optional packages (gl, canvas, playwright) and browsers are skipped.
+# The SHAMBLE FRONTLINES gate (tools/gate.mjs) on every push and pull request, as two jobs:
+#   gate   checks 1-4 and 5b-5d. Pull requests compare against their base branch; pushes against the previous tip of the
+#          branch (or main for a new branch). Needs only the required packages (acorn, eslint-scope): optional ones are skipped.
+#   smoke  check 5a: the real pages in headless Chromium. Playwright's Chromium is cached, keyed by the lockfile's version.
+# No install scripts run in either job (--ignore-scripts), so gl never builds.
 name: gate
 
 on:
@@ -28,7 +30,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install the gate's dependencies (acorn only)
+      - name: Install the gate's dependencies (required packages only)
         run: npm ci --prefix tools --omit=optional --ignore-scripts --no-audit --no-fund
 
       - name: Gate
@@ -45,4 +47,43 @@ jobs:
             BASE="$(git merge-base HEAD origin/main)"
           fi
           echo "gate base: $BASE"
-          node tools/gate.mjs "$BASE"
+          node tools/gate.mjs "$BASE" --no-smoke
+
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install the smoke test's dependencies (Playwright included, no install scripts)
+        run: npm ci --prefix tools --ignore-scripts --no-audit --no-fund
+
+      - name: Read the Playwright version from the lockfile
+        id: pw
+        run: echo "version=$(node -p "require('./tools/package-lock.json').packages['node_modules/playwright-core'].version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright's Chromium
+        id: pw-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Chromium and its system libraries
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        working-directory: tools
+        run: npx --no -- playwright install --with-deps chromium
+
+      - name: Install Chromium's system libraries (browser restored from the cache)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        working-directory: tools
+        run: npx --no -- playwright install-deps chromium
+
+      - name: Smoke (check 5a)
+        run: node tools/gate.mjs --smoke-only

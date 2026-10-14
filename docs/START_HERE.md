@@ -76,14 +76,25 @@ AST script, never a blind regex. The syntax hook (`.claude/hooks/syntax-gate.mjs
 HTML file the moment it is written. Commit on the branch: git is the backup and the delivery (no uploads).
 
 **The gate**, after every edit to the engine files or pages and before every commit, report or merge:
-`node tools/gate.mjs [baseRef]` (default base: the merge-base with `main`; `/gate` runs it; `--allow-drop a,b` for
-removals the plan names; exit 0 PASS, 1 FAIL). CI (`.github/workflows/gate.yml`) runs it on every push and pull request.
+`node tools/gate.mjs [baseRef]` (default base: the merge-base with `main` or `origin/main`, whichever is newer; `/gate`
+runs it; `--allow-drop a,b` for removals the plan names; `--no-smoke` skips 5a for a quick run; exit 0 PASS, 1 FAIL).
+CI (`.github/workflows/gate.yml`) runs it on every push and pull request: job `gate` (all but 5a) and job `smoke` (5a).
 1. `node --check` on each engine file and on each page's inline `<script>`.
 2. Concatenation `node --check` in load order for both pages, read from their `<script src>` tags (catches cross-file `const`/`let` collisions).
 3. Symbol conservation vs the base ref: no drops, no cross-file or within-file duplicates; prints +added / −dropped / moved, and the diff must equal the plan (`battery.js`).
 4. Player-build resolvability: every unguarded reference on `index.html`'s live paths resolves in core ∪ game (`battery.js`; mutation-tested against the `placeCursor` incident).
+5. Check 5 (gate-check-5), what checks 1–4 could not see:
+   - **5a smoke** (`tools/smoke.mjs`): both pages run in headless Chromium with real clicks and keys (index: Deploy,
+     ~5 s of play, pause, menu; editor: Map editor, Maps, menu). Any page error or console error FAILS.
+   - **5b names**: every bare name in each page's scripts and inline `on…="…"` handlers resolves (eslint-scope) to a
+     local, a top-level declaration of that page's build, an ECMAScript built-in or `tools/gate-globals.json`.
+   - **5c layering**: `shamble-core.js` references no game, editor or inline-script symbol, guarded or not.
+   - **5d script order**: three r128 → core → game [→ editor] → one inline script, no `async`/`defer`/module.
 Proven to bite (Phase 0): a deleted function, an unguarded call into the editor, a syntax error and a cross-file
-duplicate each FAIL on the right check. Not covered: layering (core referencing game): review that by hand.
+duplicate each FAIL on the right check. Proven for check 5 (gate-check-5): a function hidden inside another (the
+editor-prefab-list bug), a TDZ at load, swapped script tags, core calling game and a throw in `deploy()`.
+Not covered: logic and gameplay (that's `sim.js` and targeted tests), visuals (Brave), and anything the smoke script
+doesn't click.
 Brace counts are a delta check only (GLSL inside JS strings gives a standing false imbalance).
 
 **Targeted tests** on the real code (harness snippets run through `node tools/preview.js . eval <snippet.js>`): animation metrics (hands on sockets < 1 cm, planted-foot drift, boots ≥ 0 cm above ground, IK stretch ≤ 0.98), fuzz (every class/ability, grenade, bow, Juggernaut, death/respawn — expect 0 errors), 3-minute soak (heap flat after GC), `sim.js` stall % (**random AI: compare ≥ 3 runs per build**), V8 sampling heap profiler for allocation rate, draw-call counts at fixed views.
