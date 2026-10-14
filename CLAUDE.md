@@ -53,6 +53,12 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
 6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Visual work waits for
    Mustafa's Brave screenshots before merge or further tuning.
 
+Standing permission (Mustafa, 2026-10-14): create `cs/<slug>` branches, commit, push them and open pull requests
+without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask Mustafa or
+the Advisor whenever a decision is needed. Still required: an approved plan before edits, the Advisor's APPROVE before
+anything merges to main, and Mustafa's Brave screenshots for visual work. Never merge a pull request yourself unless
+Mustafa tells you to after the APPROVE.
+
 ## Commands
 - Setup (once per machine, Node 22): `cd tools && npm ci`; for pageshot also, inside tools/: `npx --no -- playwright install chromium`
 - Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b]` (checks 1–4 vs the base ref, default: merge-base with main; CI runs it)
