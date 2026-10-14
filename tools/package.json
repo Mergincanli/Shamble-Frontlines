@@ -9,6 +9,7 @@
   "dependencies": {
     "acorn": "8.18.0",
     "acorn-walk": "8.3.5",
+    "eslint-scope": "9.1.2",
     "pngjs": "7.0.0",
     "three": "0.128.0"
   },
