@@ -1,20 +1,22 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-14, editor-prefab-list on cs/editor-prefab-list._
+_Last updated: 2026-10-14, gate-check-5 on cs/gate-check-5._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
-gate, headed RTX renders, headless-gl, hook); Windows-only fixes become a small follow-up change-set.
-**In flight (Advisor's order):** kit-v1-1 and editor-prefab-list (stacked on it). **Next:** gate-check-5 →
-bot-poplar-wedge → Prompt 1 (scale test) → Prompt 2 (build spike) → Prompt 3 (ADRs).
+gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
+change-set. Once gate-check-5 merges, that machine needs a fresh `npm ci` (eslint-scope) and Node 22.13+.
+**In flight:** editor-prefab-list (PR #4) and gate-check-5 (PR #5, stacked on #4). **Next:** bot-poplar-wedge →
+Prompt 1 (scale test) → Prompt 2 (build spike) → Prompt 3 (ADRs). kit-v1-1 is done (merged).
 
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
-| kit-v1-1 (settings.json applied exactly + standing-permission paragraph in CLAUDE.md; proposed amendment: 19 deny rules) | cs/kit-v1-1, PR open | gate PASS, no code touched; deny rules verified live | Advisor OK on the amendment; after merge Mustafa runs `/permissions` locally |
-| editor-prefab-list (3 editor functions hoisted out of `bootEditor()`) | cs/editor-prefab-list, PR open, stacked on PR #3 | gate PASS (+3 editor symbols), verifier PASS, all 3 ReferenceErrors gone in a headless run | Advisor's APPROVE; Mustafa's Brave check in editor.html; PR #3 merging first |
+| kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
+| editor-prefab-list (3 editor functions hoisted out of `bootEditor()`) | cs/editor-prefab-list, PR #4, head 9c54d07, based on main | gate PASS vs 5858864 (+3 −0), Advisor APPROVE | Mustafa's 4-step Brave check of editor.html on that branch, then his go to merge. He said both pages "seem to work" but did not check thoroughly and probably tested the pre-fix editor |
+| gate-check-5 (5a smoke, 5b names, 5c layering, 5d script order; default base = newer of main / origin/main; CI now 2 jobs) | cs/gate-check-5, PR #5, head 684a022 + docs commit, stacked on #4 | plan APPROVED (4 additions, done); 22/22 mutation proofs, 5/5 clean full-gate runs, CI green on both jobs; 28 review findings, in-scope ones fixed; report docs/reports/2026-10-14-gate-check-5.md | Advisor APPROVE; #4 merging first |
 | Phase 0 setup | merged (2d30e4a) | PARTIAL | Mustafa's Windows run |
 
 ## Targets
@@ -35,16 +37,17 @@ bot-poplar-wedge → Prompt 1 (scale test) → Prompt 2 (build spike) → Prompt
 
 ## Open bugs and risks
 - First-deploy tutorial lists controls that no longer exist (V melee, B shield, 1–5 switch): every new player sees it
-- Editor three-bug entry (prefab list, Maps list, Save as prefab): fixed on cs/editor-prefab-list (pending merge +
-  Brave check); see the in-flight row
-- The gate's default base is the local `main` even when it is behind `origin/main`: a stale local main silently gives an
-  older base. Proposed fix: prefer the newer of the two, in gate-check-5
+- Editor three-bug entry (prefab list, Maps list, Save as prefab): fix on PR #4, pending Mustafa's Brave check
+- The gate's default base was the local `main` even when behind `origin/main`: fixed on cs/gate-check-5 (newer of the
+  two), pending merge
+- Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (for ADR-001); the kit allow rule
+  `npx --no -- playwright *` is broader than needed (later kit change)
 - GitHub branch protection on `main` is the real guard against pushes to main (deny rules are fragile by design);
   recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos)
 - The 3D scene renders every frame behind the opaque main menu (wasted GPU)
 - One bot wedged by the poplar row near (-79, -83) in 1 of 8 headless matches (pre-existing nav behaviour)
-- The gate checks syntax and names, not execution: script load order, TDZ at load, undefined identifiers and layering
-  (core → game) pass it; a check-5 load smoke test is proposed
+- The gate did not check execution (load order, TDZ at load, undefined identifiers, layering): addressed by check 5 on
+  cs/gate-check-5 (smoke, names, layering, script order), pending merge
 
 ## Health (latest measurements)
 | Metric | Value | When | Source |
@@ -53,5 +56,5 @@ bot-poplar-wedge → Prompt 1 (scale test) → Prompt 2 (build spike) → Prompt
 | Village draw calls | 202 (was 398) | 2026-09-26 | audit CS12 |
 | Headless match stall % (4 runs each) | base 7.6 / 4.5 / 10.7 / 10.8 · UI-step-1 20.5 / 4.8 / 8.0 / 7.2 | 2026-10-10 | sim.js |
 | Headless match stall % (3 runs, Linux container) | 20.5 / 9.8 / 8.9 (run 1 = the known poplar wedge at −79,−83) | 2026-10-13 | sim.js |
-| Gate | PASS; core 134 / game 691 / editor 349 symbols (+3 −0 vs 2d30e4a), 44 editor refs all guarded, 0 flagged | 2026-10-14 | gate.mjs |
+| Gate | PASS on cs/gate-check-5 684a022, all 8 checks (1-4, 5a-5d), core 134 / game 691 / editor 349, 44 editor refs all guarded, smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |
