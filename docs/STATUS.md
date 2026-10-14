@@ -1,16 +1,18 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-10 (seeded by the Advisor before Phase 0)._
+_Last updated: 2026-10-13 (CS-1: project moved to the repo root)._
 
 ## Phase
 **Phase 0: environment + green baseline** (git repo, Claude Code kit, portable toolkit, gate.mjs, CI).
+Done: git repo + Claude Code kit on GitHub (826b896); project at the repo root (CS-1). Still to do: the rest of Prompt 0.
 Next: Phase 1 decisions (ADR-001, ADR-002), then the foundation refactor and the netcode MVP.
 
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
-| Phase 0 setup | cs/phase-0 | not started | first Claude Code session |
+| Repo root move (CS-1): the web upload had nested the project in `shamble-frontlines-repo/` | claude/intelligent-brahmagupta-9oq3yb | gate PASS (main-session + subagent stand-ins), pure renames | Advisor OK, merge with a merge commit |
+| Phase 0 setup | cs/phase-0 | plan pending | CS-1 merge, Mustafa's approval of the Phase 0 plan |
 
 ## Targets
 - **Multiplayer:** up to 36 players per match: 16v16 (4 squads of 4 per team) or 12v12v12 (3 squads of 4; one team per

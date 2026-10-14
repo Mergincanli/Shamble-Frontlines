@@ -64,6 +64,8 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Repo root move (CS-1) [2026-10-13]**: the GitHub web upload had nested the project in `shamble-frontlines-repo/` and dropped every dot-file (the `.claude/` kit, `.gitignore`, `.gitattributes`); Mustafa pushed those from the zip (826b896). CS-1 moves all 52 files to the root as pure renames (tree identical) and removes GitHub's placeholder README, so Claude Code loads CLAUDE.md and the kit from the repo root.
+
 **UI theme, step 1 [2026-10-02]** — main menu + pause transplanted from `ui_theme_mockup.html`: the menu is the dossier (folder, typed brief, rubber stamps, pen-mark tabs: Deploy / Service record / Field manual, + Map editor on the authoring build); pause is the clipboard; Field manual opens the clipboard from the menu (Aim / Audio reachable before deploying). CSS namespaced `wr-*` in both pages; behaviour in game (`wrBoot` / `wrDeploy` / `wrType`). Fixed the mockup's pen-mark flecks; fits 1280×720. Awaiting Brave.
 
 **Audit phase 2 [2026-09-26]** — every open audit item handled (`AUDIT_BUGS_PERF.md` §7): pooled FX + damage numbers, stable object shapes, dead code removed (javelin path + 11 functions), rotated obstacles block shots/LOS exactly (`rayStatic`), inline occlusion test (GC −39 % overall), static kit pieces merged by material (village 398 → 202 draw calls), bot pathfinding (grid A*, `navSteer`), two UI families (paper menus / dark in-game overlays).
