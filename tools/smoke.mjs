@@ -25,7 +25,7 @@ const frame = stack => { const l = String(stack || '').split('\n').find(x => /^\
 
 // ---------- the two scripted sessions ----------
 // step(name, fn): fn gets the page; a throw or timeout fails that step and ends the page's session.
-const until = (page, fn, what) => page.waitForFunction(fn, null, { timeout: STEP_TIMEOUT, polling: 50 })
+const until = (page, fn, what, arg = null) => page.waitForFunction(fn, arg, { timeout: STEP_TIMEOUT, polling: 50 })
   .catch(() => { throw new Error('timed out waiting for ' + what); });
 const SESSIONS = {
   'index.html': async (step, page, info) => {
@@ -45,10 +45,17 @@ const SESSIONS = {
     const snap = () => page.evaluate(() => ({ x: player.position.x, z: player.position.z, clicks: window.__smokeClicks }));
     let before = null;
     await step('hold W for 1 s', async () => {
-      await page.evaluate(() => { window.__smokeClicks = 0; renderer.domElement.addEventListener('mousedown', () => { window.__smokeClicks++; }); });
+      await page.evaluate(() => {   // probes only: count canvas clicks and rendered frames
+        window.__smokeClicks = 0; renderer.domElement.addEventListener('mousedown', () => { window.__smokeClicks++; });
+        window.__smokeFrames = 0; (function tick() { window.__smokeFrames++; requestAnimationFrame(tick); })();
+      });
       before = await snap();
       await page.mouse.move(640, 300);
-      await page.keyboard.down('KeyW'); await page.waitForTimeout(1000); await page.keyboard.up('KeyW');
+      await page.keyboard.down('KeyW');
+      const f0 = await page.evaluate(() => window.__smokeFrames);
+      await page.waitForTimeout(1000);   // and at least 3 frames: SwiftShader can run the scene at ~2 fps
+      await until(page, f => window.__smokeFrames >= f + 3, '3 frames with W held', f0);
+      await page.keyboard.up('KeyW');
     });
     await step('fire two shots', async () => {
       for (let i = 0; i < 2; i++) { await page.mouse.down(); await page.waitForTimeout(80); await page.mouse.up(); await page.waitForTimeout(450); }
