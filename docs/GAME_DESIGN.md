@@ -66,6 +66,10 @@ A custom **non-photorealistic (NPR) cel-shaded** look — flat, saturated, comic
 
 ## 5. The core gameplay loop
 
+> **Superseded as the design target by [`LOOP_V2.md`](LOOP_V2.md) §1–4 and §8 (October 2026: three teams, harvest
+> money, uplink tech, points race).** This section still describes the build as it plays today, until the greybox
+> prototype (LOOP_V2 §11) replaces it.
+
 ```
 Spawn at your barracks
    → pick a unit class at the Armory terminal
@@ -82,6 +86,9 @@ It's a **continuous skirmish** (currently PvE vs an AI enemy team of 6), not a w
 ---
 
 ## 6. Economy (two currencies)
+
+> **Superseded as the design target by [`LOOP_V2.md`](LOOP_V2.md) §3–4 (money from harvesters, tech from uplinks;
+> silos and tech boxes are replaced).** This section still describes today's build.
 
 - **Pay** — *personal* credits the player earns from kills; spent on consumables (frag grenades, resupply).
 - **Tech** — *shared, per-team* resource that advances the team's **era** (T1 → T4), gating higher-tier kit (planned). Earned per kill/headshot and from **capturable silos** and **tech boxes** on the map.
