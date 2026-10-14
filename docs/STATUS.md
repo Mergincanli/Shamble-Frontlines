@@ -1,16 +1,18 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-14, editor-undo-ground on cs/editor-undo-ground._
+_Last updated: 2026-10-14, editor-undo-ground on cs/editor-undo-ground (main merged in after PR #7)._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
-**Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367), kit-v1-2 (PR #6, ef019e0).
-**In flight:** bot-poplar-wedge (PR #7, in review) and editor-undo-ground (PR to be opened, in review).
-**Queue (Advisor, updated 2026-10-14; one change-set at a time):** kit-v1-2 (merged) → bot-poplar-wedge (in review) →
-editor-undo-ground (in review) → map-dedupe-on-load → tutorial-field-manual → ui-step-2 → scale-test → ui-step-3 →
+**Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367), kit-v1-2 (PR #6, ef019e0),
+bot-poplar-wedge (PR #7, 159bec4).
+**In flight:** editor-undo-ground (PR #8: Advisor APPROVE; Mustafa's Ctrl+Z check in Brave passed; merge on Mustafa's
+go) and map-dedupe-on-load (plan APPROVED as revised, built on #8).
+**Queue (Advisor, updated 2026-10-14; one change-set at a time):** kit-v1-2 (merged) → bot-poplar-wedge (merged) →
+editor-undo-ground (approved, merge on Mustafa's go) → map-dedupe-on-load (building) → tutorial-field-manual → ui-step-2 → scale-test → ui-step-3 →
 house-textures-seeded (new, low priority; seeded house textures also make before/after renders exact) → build-spike →
 ADR run. Why: visual and UI work lives in the client and survives the multiplayer refactor; gameplay systems
 (progression, new units, Spy, squads, three teams) wait for the foundation refactor so they are built once in the shared
@@ -23,8 +25,9 @@ dedupe-on-load as its own change-set right after: drop exact duplicates only, sa
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
 | kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
 | kit-v1-2 (narrowed the playwright allow rule) | merged: PR #6, ef019e0, 2026-10-14, Advisor APPROVE | done | none |
-| bot-poplar-wedge (`shamble-game.js` only: navBuild clearance 0.7 m + half a cell, navPath start from nearest open cell, 3-call warm-up at end of bootGame; symbols +0 -0) | cs/bot-poplar-wedge, head 8cad2dc; [PR #7](https://github.com/Mergincanli/Shamble-Frontlines/pull/7), CI green | plan APPROVED with two additions (exact geometric assertion, reachability spawn to every bot goal), both done; perf-auditor and regression hunter PASS WITH NOTES; report `docs/reports/2026-10-14-bot-poplar-wedge.md` | Advisor APPROVE (no Brave check needed; optional gameplay look in the report) |
-| editor-undo-ground (`shamble-game.js` only: `addBox`, `addPath`, `makeBuilding`, `makeBarracks` and the `buildMap` terminal now call `stylizeOne()`; `clearMap` now clears `trees[]` and `props[]`; symbols +0 -0) | cs/editor-undo-ground, head a4d7289; PR to be opened | gate PASS (all 8 checks); art-director and perf-auditor PASS WITH NOTES; report `docs/reports/2026-10-14-editor-undo-ground.md` | Advisor APPROVE + Mustafa's Brave screenshots of editor.html (visual change; checklist in the report) |
+| bot-poplar-wedge (`shamble-game.js` only: navBuild clearance 0.7 m + half a cell, navPath start from nearest open cell, 3-call warm-up at end of bootGame; symbols +0 -0) | merged: [PR #7](https://github.com/Mergincanli/Shamble-Frontlines/pull/7), 159bec4, 2026-10-14, Advisor APPROVE | done; report `docs/reports/2026-10-14-bot-poplar-wedge.md` | none |
+| editor-undo-ground (`shamble-game.js` only: `addBox`, `addPath`, `makeBuilding`, `makeBarracks` and the `buildMap` terminal now call `stylizeOne()`; `clearMap` now clears `trees[]` and `props[]`; symbols +0 -0) | cs/editor-undo-ground; [PR #8](https://github.com/Mergincanli/Shamble-Frontlines/pull/8), main merged in after #7 | gate PASS (all 8 checks); art-director and perf-auditor PASS WITH NOTES; Advisor APPROVE; Mustafa's Brave check: Ctrl+Z works (screenshots 2026-10-14); report `docs/reports/2026-10-14-editor-undo-ground.md` | Mustafa's go to merge |
+| map-dedupe-on-load (drop exact duplicate trees / props when a saved map loads; status-bar note; no auto-save) | cs/map-dedupe-on-load, built on cs/editor-undo-ground | plan APPROVED as revised (after a read-only adversarial plan review) | implementation, evidence, reviews |
 | Diagnosis (read-only): poplar wedge + editor Ctrl+Z re-rolls ground textures | n/a | done, both plans approved (wedge: bot-poplar-wedge; Ctrl+Z: editor-undo-ground) | none |
 | editor-prefab-list | merged: PR #4, c458fe7, 2026-10-14 | done: Mustafa's Brave check of editor.html passed (no problems), Advisor APPROVE | none |
 | gate-check-5 (5a smoke, 5b names, 5c layering, 5d script order; CI jobs gate + smoke) | merged: PR #5, 8675367, 2026-10-14 | done: Advisor APPROVE after his own full-gate run (PASS, 26 s) and mutations that failed correctly | none |
@@ -39,7 +42,7 @@ dedupe-on-load as its own change-set right after: drop exact duplicates only, sa
 - Taken by the Advisor 2026-10-14: gl advisories accepted for now (drop gl for Playwright-only renders if it won't
   install natively on Windows); hook path (`$CLAUDE_PROJECT_DIR`) waits for the Windows run; check 5 is its own
   change-set after the prefab fix; standing permissions granted (see CLAUDE.md)
-- **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started
+- **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started. Inputs logged so far: the 11 wall-clock reads (performance.now / Date.now) that make same-seed matches differ; no SRI/CSP on the three.js CDN tag
 - **ADR-002 Code structure & build** (modules, bundler, TypeScript, double-click build): under discussion with Mustafa;
   evidence first via the build spike
 - **ADR-003 Three.js version** (stay on r128 vs upgrade): deferred until after ADR-002
@@ -48,9 +51,9 @@ dedupe-on-load as its own change-set right after: drop exact duplicates only, sa
 
 ## Open bugs and risks
 - First-deploy tutorial lists controls that no longer exist (V melee, B shield, 1–5 switch): every new player sees it
-- Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed on cs/editor-undo-ground, pending merge. Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
+- Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed on cs/editor-undo-ground (PR #8, approved; Mustafa confirmed Ctrl+Z in Brave), pending merge. Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
 - Maps saved on older builds after an undo may still contain duplicate trees and props; the next change-set, map-dedupe-on-load, drops exact duplicates on load
-- Deferred, low (PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
+- Deferred, low (editor-undo-ground PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
 - Editor three-bug entry (prefab list, Maps list, Save as prefab): fixed and merged (PR #4, c458fe7), Brave check passed
 - Gate default base (stale local `main`): fixed and merged (PR #5, 8675367)
@@ -59,11 +62,11 @@ dedupe-on-load as its own change-set right after: drop exact duplicates only, sa
 - GitHub branch protection on `main` is the real guard against pushes to main (deny rules are fragile by design);
   recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos)
 - The 3D scene renders every frame behind the opaque main menu (wasted GPU)
-- Bot wedge at the poplar row near (-79, -83): fixed on cs/bot-poplar-wedge, pending merge
-- Bot nav, editor-made layouts: rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check
-- Bot nav, navSteer "replan storm" (old): a bot whose straight line flickers clear/blocked replans every few frames; the head hits it more on Romania (budget-limited frames 0.9% -> 1.8%); own small change-set later
+- Bot wedge at the poplar row near (-79, -83): fixed and merged (PR #7, 159bec4)
+- Bot nav, editor-made layouts (R1, tracked per the Advisor): rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check; new maps keep walkable gaps at least 6 m wide
+- Bot nav, navSteer "replan storm" (old; bot-poplar-wedge PERF-2): a bot whose straight line flickers clear/blocked replans every few frames; the wedge fix hits it more on Romania (budget-limited frames 0.9% -> 1.8%). Advisor: its own change-set in the greybox phase (bot-replan-storm)
 - Bot nav, A* gives up after 8000 nodes (old): a few far-corner routes fail and fall back to a straight line
-- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run: relevant to the deterministic shared simulation (ADR-001)
+- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run. Tracked as an input for ADR-001 (deterministic shared simulation)
 - The gate did not check execution (load order, TDZ at load, undefined identifiers, layering): addressed by check 5,
   merged (PR #5, 8675367), live in CI
 

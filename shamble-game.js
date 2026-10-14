@@ -2366,8 +2366,10 @@ function _sd(el,v){ if(el&&el.style.display!==v) el.style.display=v; }
 function _so(el,v){ if(!el) return; const s=''+v; if(el.style.opacity!==s) el.style.opacity=s; }
 function _st(el,v){ if(!el) return; const s=''+v; if(el.textContent!==s) el.textContent=s; }
 // ============================ NAV — bot pathfinding ============================
-// A 2 m grid over the arena, built at deploy by testing each cell centre with the SAME movement collision the bots use
-// (resolveObstacles, bot radius), so the grid can't disagree with how bots collide. A* (8-neighbour, octile, no corner
+// A 2 m grid over the arena, built at deploy with the SAME movement collision the bots use (resolveObstacles). A cell is
+// blocked when any part of its square is solid for a bot: its centre is tested at the bot radius plus half a cell (exact for
+// axis-aligned colliders, whose collision is square). Testing the centre at the bot radius alone left up to half a metre of
+// tree inside "free" cells, and bots routed through it pinned themselves on the trunk (bot-poplar-wedge). A* (8-neighbour, octile, no corner
 // cutting) on preallocated typed arrays with a search stamp: zero allocation per search. Paths are string-pulled with grid
 // line-of-sight. Bots walk straight whenever the way is clear (open-field behaviour unchanged) and follow waypoints only
 // when it isn't; stuck detection forces a new route. At most NAV.budget searches per frame across all bots.
@@ -2377,7 +2379,8 @@ function navBuild(){ const cs=NAV.cs, lx=T.arenaX-1, lz=T.arenaZ-1, nx=Math.ceil
   NAV.nx=nx; NAV.nz=nz; NAV.x0=-lx; NAV.z0=-lz;
   if(!NAV.blk||NAV.blk.length!==n){ NAV.blk=new Uint8Array(n); NAV.g=new Float32Array(n); NAV.f=new Float32Array(n); NAV.came=new Int32Array(n);
     NAV.stamp=new Uint32Array(n); NAV.closed=new Uint32Array(n); NAV.heap=new Int32Array(n*2); NAV.tmp=new Int32Array(n); }
-  for(let iz=0;iz<nz;iz++) for(let ix=0;ix<nx;ix++){ const x=NAV.x0+(ix+0.5)*cs, z=NAV.z0+(iz+0.5)*cs; _navP.set(x,0,z); resolveObstacles(_navP,0.75);
+  const r=0.7+cs*0.5;   // 0.7 = the bots' collision radius (update(): resolveObstacles(en.group.position,0.7)), + half a cell
+  for(let iz=0;iz<nz;iz++) for(let ix=0;ix<nx;ix++){ const x=NAV.x0+(ix+0.5)*cs, z=NAV.z0+(iz+0.5)*cs; _navP.set(x,0,z); resolveObstacles(_navP,r);
     NAV.blk[iz*nx+ix]=(Math.abs(_navP.x-x)>1e-4||Math.abs(_navP.z-z)>1e-4)?1:0; }
   NAV.ok=true; }
 function _navCell(x,z){ const ix=Math.floor((x-NAV.x0)/NAV.cs), iz=Math.floor((z-NAV.z0)/NAV.cs); return (ix<0||iz<0||ix>=NAV.nx||iz>=NAV.nz)?-1:iz*NAV.nx+ix; }
@@ -2391,7 +2394,9 @@ function _navNearestFree(t){ const nx=NAV.nx, nz=NAV.nz, tx=t%nx, tz=(t/nx)|0;
     if(x>=0&&z>=0&&x<nx&&z<nz&&!NAV.blk[z*nx+x]) return z*nx+x; } return -1; }
 // A* from (sx,sz) to (gx,gz): writes string-pulled waypoints (x,z pairs) into out; returns their count (0 = no route)
 function navPath(sx,sz,gx,gz,out){ const nx=NAV.nx, blk=NAV.blk, G=NAV.g, F=NAV.f, C=NAV.came, ST=NAV.stamp, CL=NAV.closed, cs=NAV.cs;
-  const s=_navCell(sx,sz); let t=_navCell(gx,gz); if(s<0||t<0) return 0; if(blk[t]){ t=_navNearestFree(t); if(t<0) return 0; }
+  const s0=_navCell(sx,sz); let s=s0, t=_navCell(gx,gz); if(s<0||t<0) return 0; if(blk[t]){ t=_navNearestFree(t); if(t<0) return 0; }
+  { const x=s%nx, z=(s/nx)|0;   // a bot pressed against a wall can stand in a blocked cell, or a boxed-in one: start from the nearest open cell
+    if(blk[s]||!((x>0&&!blk[s-1])||(x<nx-1&&!blk[s+1])||(z>0&&!blk[s-nx])||(z<NAV.nz-1&&!blk[s+nx]))){ const f=_navNearestFree(s); if(f>=0) s=f; } }
   const sid=++NAV.sid, tx=t%nx, tz=(t/nx)|0; NAV.hn=0; ST[s]=sid; G[s]=0; C[s]=-1;
   { const dx=Math.abs(s%nx-tx), dz=Math.abs(((s/nx)|0)-tz); F[s]=dx+dz-0.5858*Math.min(dx,dz); } _navPush(s);
   let found=false, it=0;
@@ -2404,6 +2409,7 @@ function navPath(sx,sz,gx,gz,out){ const nx=NAV.nx, blk=NAV.blk, G=NAV.g, F=NAV.
   if(!found) return 0;
   let L=0; for(let c=t;c!==-1&&L<NAV.tmp.length;c=C[c]) NAV.tmp[L++]=c;              // reversed: tmp[L-1] = start
   let n=0, ax=sx, az=sz, i=L-1;
+  if(s!==s0){ ax=NAV.x0+(s%nx+0.5)*cs; az=NAV.z0+(((s/nx)|0)+0.5)*cs; out[0]=ax; out[1]=az; n=1; }   // first get to the open start cell
   while(i>0&&n<(out.length>>1)){ let j=i-1; for(let k=i-1;k>=Math.max(0,i-24);k--){ const c=NAV.tmp[k]; if(navClear(ax,az,NAV.x0+(c%nx+0.5)*cs,NAV.z0+(((c/nx)|0)+0.5)*cs)) j=k; else break; }
     const c=NAV.tmp[j]; ax=NAV.x0+(c%nx+0.5)*cs; az=NAV.z0+(((c/nx)|0)+0.5)*cs; out[n*2]=ax; out[n*2+1]=az; n++; i=j; }
   return n; }
@@ -3110,6 +3116,9 @@ applyEnv(_env,{regen:false}); // env + ground cel-cap now that the ground materi
 
 /* helpers */
   navBuild();   // warm the pathfinding grid while loading (deploy then rebuilds it warm, ~40 ms)
+  // Warm navPath's branches before V8 optimises it (a start in a blocked cell: the poplar; a goal in a blocked cell: the
+  // refinery; an open route round the poplar row), or the first real use of each branch deopts it (measured: up to 54 per match).
+  { const w=new Float32Array(128); navPath(-80,-81,0,30,w); navPath(0,30,-100,80,w); navPath(-79,-90,-79,-70,w); }
 }
 
 // V8 'const tracking let': a top-level let assigned only once is treated as a constant and baked into optimized code;
