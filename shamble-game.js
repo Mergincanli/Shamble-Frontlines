@@ -632,6 +632,18 @@ function buildMap(def){
   _env=envMerge(def.env); applyEnv(_env,{regen:true});
   _rules=rulesMerge(def.rules); if(_rulesReady)applyRules(_rules);
 }
+// Maps saved before editor-undo-ground can hold stacked copies of trees and props: clearMap never cleared them, so every
+// Load, Reset, undo and redo added another copy. The editor's Maps > Load drops EXACT duplicates only: the whole entry must
+// match (props' rot read as rot||0, as buildMap does), first copy kept, order kept. Entries without a seed are kept (addTree /
+// addProp would roll them a random one), other kinds are never touched, and the input object is never mutated.
+function dedupeMapDef(def){ if(!def||typeof def!=='object'||Array.isArray(def)) return {def, droppedTrees:0, droppedProps:0};
+  const out={...def}; let droppedTrees=0, droppedProps=0;
+  for(const k of ['trees','props']){ const a=def[k]; if(!Array.isArray(a)) continue; const seen=new Set(), keep=[];
+    for(const e of a){ if(!e||typeof e!=='object'||e.seed==null){ keep.push(e); continue; }
+      const key=JSON.stringify(k==='props'?{...e,rot:e.rot||0}:e);
+      if(seen.has(key)){ if(k==='trees')droppedTrees++; else droppedProps++; continue; } seen.add(key); keep.push(e); }
+    out[k]=keep; }
+  return {def:out, droppedTrees, droppedProps}; }
 function serializeMap(){ return {
   name:'DM_Romania',
   spawn:{x:+mapSpawn.x.toFixed(1),z:+mapSpawn.z.toFixed(1)},

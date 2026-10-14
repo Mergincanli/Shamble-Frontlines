@@ -956,13 +956,22 @@ function edLeaveToMenu(){
 
 /* Called from top-level code (enterEditor, openMaps, the inspector's Save-as-prefab button), so they must live at the
    top level: declared inside bootEditor() they were invisible there and every call threw a ReferenceError. */
+/* Status-bar note (Maps > Load reports the duplicates dedupeMapDef dropped). The hint slot is static markup, so its text is
+   read once. Every call first cancels a pending restore, so a clean Load clears a stale note at once; a note lasts 8 s. */
+function edFlashHint(msg){ const h=document.getElementById('edStatHint'); if(!h)return; if(h._orig==null)h._orig=h.textContent;
+  clearTimeout(h._t); h._t=0; h.textContent=msg||h._orig; if(msg)h._t=setTimeout(()=>{ h.textContent=h._orig; h._t=0; },8000); }
 async function refreshMapList(){ const names=await MapStore.list(); edMapList.innerHTML='';
   if(!names.length){ const e=document.createElement('div'); e.className='edEmpty'; e.textContent='No saved maps yet.'; edMapList.appendChild(e); return; }
   names.forEach(name=>{ const row=document.createElement('div'); row.className='edMapRow';
     const nm=document.createElement('span'); nm.className='edMapName'; nm.textContent=name;
     const load=document.createElement('div'); load.className='edBtn edBtnSm'; load.textContent='Load';
     const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';
-    load.onclick=async()=>{ const def=await MapStore.load(name); if(def){ buildMap(def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none'; } };
+    load.onclick=async()=>{ const saved=await MapStore.load(name); if(!saved)return;
+      const dd=dedupeMapDef(saved), parts=[];
+      if(dd.droppedTrees)parts.push(dd.droppedTrees+' duplicate tree'+(dd.droppedTrees===1?'':'s'));
+      if(dd.droppedProps)parts.push(dd.droppedProps+' duplicate prop'+(dd.droppedProps===1?'':'s'));
+      buildMap(dd.def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none';
+      edFlashHint(parts.length?'Removed '+parts.join(' and ')+' (exact '+(dd.droppedTrees+dd.droppedProps===1?'copy':'copies')+'). Save to keep this.':''); };
     let armed=false, tmr=null;
     del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };
     row.append(nm,load,del); edMapList.appendChild(row);
