@@ -54,7 +54,7 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
    Mustafa's Brave screenshots before merge or further tuning.
 
 ## Commands
-- Setup (once per machine, Node 22): `cd tools && npm ci`, plus `npx playwright install chromium` for pageshot
+- Setup (once per machine, Node 22): `cd tools && npm ci`; for pageshot also, inside tools/: `npx --no -- playwright install chromium`
 - Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b]` (checks 1–4 vs the base ref, default: merge-base with main; CI runs it)
 - Official battery (JSON): `node tools/battery.js <dir>`
 - 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>` (Linux: prefix `xvfb-run -a`)

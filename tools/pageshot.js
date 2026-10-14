@@ -1,7 +1,7 @@
 // pageshot.js — render the REAL pages (DOM + CSS + HUD + WebGL) in Chromium. Toolkit file; never shipped.
 // Fills the gap preview.js leaves: preview.js draws only the 3D scene; this draws everything the player sees.
 //
-// SETUP: cd tools && npm ci && npx playwright install chromium   (three r128 is served from tools/node_modules, so no CDN needed)
+// SETUP: cd tools && npm ci && npx --no -- playwright install chromium   (three r128 is served from tools/node_modules, so no CDN needed)
 // USAGE (from the repo root): node tools/pageshot.js <buildDir> <index.html|editor.html> <outPrefix> [--headed] [steps...]
 //   wait:<ms>  shot:<name>  eval:<js expr | Promise>  click:<css>  hover:<css>  key:<Key>  mouse:<x>,<y>
 //   size:<w>x<h> (default 1600x900)   motion:reduce

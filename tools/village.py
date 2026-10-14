@@ -1,15 +1,16 @@
 # Usage: python tools/village.py [core.js] [aabbs.json] [out.json]
-#   defaults: <repo>/shamble-core.js, <tmp>/aabbs.json (from: node tools/preview.js . eval tools/aabbs.js > <tmp>/aabbs.json),
-#   <tmp>/village.json (<tmp> = the OS temp folder). Paste the output into DM_Cabana.
+#   defaults: <repo>/shamble-core.js, <repo>/.gate/aabbs.json (from: node tools/preview.js . eval tools/aabbs.js > .gate/aabbs.json),
+#   <repo>/.gate/village.json (.gate/ is gitignored scratch). Paste the output into DM_Cabana.
 # Cabana Republic village pass: design the LEFT half, mirror to the right (team symmetry), validate every piece.
 # Output: JSON with houses/trees/props/covers in the exact shapes buildMap consumes.
-import json, math, os, sys, tempfile
+import json, math, os, sys
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ARGS = sys.argv[1:] + [None] * 3
 CORE_JS = _ARGS[0] or os.path.join(_REPO, 'shamble-core.js')
-AABBS_JSON = _ARGS[1] or os.path.join(tempfile.gettempdir(), 'aabbs.json')
-OUT_JSON = _ARGS[2] or os.path.join(tempfile.gettempdir(), 'village.json')
+AABBS_JSON = _ARGS[1] or os.path.join(_REPO, '.gate', 'aabbs.json')
+OUT_JSON = _ARGS[2] or os.path.join(_REPO, '.gate', 'village.json')
+os.makedirs(os.path.dirname(os.path.abspath(OUT_JSON)), exist_ok=True)
 
 GRID = [l.strip('",') for l in open(CORE_JS, encoding='utf-8').read()
         .split('const cabanaRepublicMap = [')[1].split('];')[0].strip().split('\n')]

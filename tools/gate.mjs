@@ -12,7 +12,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve, dirname } from 'node:path';
+import { join, resolve, dirname, sep } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
@@ -142,8 +142,9 @@ const add = (id, name, pass, summary, details = []) => checks.push({ id, name, p
       if (s.module) continue;   // module scripts get their own scope: not part of the classic-script concatenation
       if (s.code) { parts.push(s); continue; }
       if (/^([a-z]+:)?\/\//i.test(s.src)) { external.add(s.src.split('/').pop()); continue; }
-      const name = s.src.replace(/^\.\//, '');
-      const code = local[name] ?? (existsSync(join(ROOT, name)) ? headFile(name) : null);
+      const name = s.src.replace(/^\.\//, ''), abs = resolve(ROOT, name);
+      if (!abs.startsWith(ROOT + sep)) { errs.push(`${page}: <script src="${s.src}"> points outside the repo`); continue; }
+      const code = local[name] ?? (existsSync(abs) ? headFile(name) : null);
       if (code === null) { errs.push(`${page}: <script src="${s.src}"> does not exist`); continue; }
       parts.push({ label: name, code });
     }

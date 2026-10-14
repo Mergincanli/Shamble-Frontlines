@@ -90,8 +90,9 @@ Brace counts are a delta check only (GLSL inside JS strings gives a standing fal
 
 **Toolkit** (`tools/`, never shipped; full notes in `tools/README.md`). Once per machine, with Node 22:
 ```
-cd tools && npm ci                 # the pinned versions in tools/package-lock.json
-npx playwright install chromium    # only needed for pageshot.js
+cd tools
+npm ci                                    # the pinned versions in tools/package-lock.json
+npx --no -- playwright install chromium   # only needed for pageshot.js; --no never downloads another playwright
 ```
 Run every tool from the repo root. On Linux, prefix `preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`;
 Windows needs no prefix. Scratch output goes under `.gate/` (gitignored).
