@@ -1,29 +1,30 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-14, kit-v1-2 on cs/kit-v1-2._
+_Last updated: 2026-10-14, bot-poplar-wedge on cs/bot-poplar-wedge._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
-**Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367). **In flight:** kit-v1-2
-(narrows one allow rule), plus read-only diagnosis of the poplar wedge and the editor Ctrl+Z bug.
-**Queue (Advisor, 2026-10-14; one change-set at a time):** 1. kit-v1-2 → 2. bot-poplar-wedge → 3. tutorial-field-manual
-(the first-deploy tutorial becomes the clipboard's field-manual mode: one controls list, no dead V / B / 1–5 keys) →
-4. ui-step-2 (service record + end of round, war-room paper family) → 5. scale-test (Prompt 1) → 6. ui-step-3 (armory +
-scoreboard, dark field-kit crate) → 7. build-spike (Prompt 2), then the ADR run (Prompt 3, docs only). Why: visual and UI
-work lives in the client and survives the multiplayer refactor; gameplay systems (progression, new units, Spy, squads,
-three teams) wait for the foundation refactor so they are built once in the shared simulation. Not yet slotted: the
-editor Ctrl+Z ground-texture bug (plan coming with the wedge plan).
+**Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367), kit-v1-2 (PR #6, ef019e0).
+**In flight:** bot-poplar-wedge (in review, waits on the Advisor's APPROVE).
+**Queue (Advisor, updated 2026-10-14; one change-set at a time):** kit-v1-2 (merged) → bot-poplar-wedge (in review) →
+editor-undo-ground → map-dedupe-on-load → tutorial-field-manual → ui-step-2 → scale-test → ui-step-3 →
+house-textures-seeded (new, low priority; seeded house textures also make before/after renders exact) → build-spike →
+ADR run. Why: visual and UI work lives in the client and survives the multiplayer refactor; gameplay systems
+(progression, new units, Spy, squads, three teams) wait for the foundation refactor so they are built once in the shared
+simulation. editor-undo-ground's plan is APPROVED with two additions (report draw calls after 1 and 2 rebuilds vs boot;
+dedupe-on-load as its own change-set right after: drop exact duplicates only, same kind, position, rotation and seed).
 
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
 | kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
-| kit-v1-2 (allow rule `Bash(npx --no -- playwright *)` → `Bash(npx --no -- playwright install chromium)`; one stale START_HERE line fixed) | cs/kit-v1-2, PR to be opened | gate PASS; Advisor's fix for the finding deferred from gate-check-5 | Advisor APPROVE, then Mustafa's go to merge |
-| Diagnosis (read-only): bot-poplar-wedge + editor Ctrl+Z re-rolls ground textures | none yet | plans to follow | approval of each plan |
+| kit-v1-2 (narrowed the playwright allow rule) | merged: PR #6, ef019e0, 2026-10-14, Advisor APPROVE | done | none |
+| bot-poplar-wedge (`shamble-game.js` only: navBuild clearance 0.7 m + half a cell, navPath start from nearest open cell, 3-call warm-up at end of bootGame; symbols +0 -0) | cs/bot-poplar-wedge, head 4d8acfd + docs commit; PR to be opened | plan APPROVED with two additions (exact geometric assertion, reachability spawn to every bot goal), both done; perf-auditor and regression hunter PASS WITH NOTES; report `docs/reports/2026-10-14-bot-poplar-wedge.md` | Advisor APPROVE (no Brave check needed; optional gameplay look in the report) |
+| Diagnosis (read-only): poplar wedge + editor Ctrl+Z re-rolls ground textures | n/a | done, both plans approved (wedge: bot-poplar-wedge; Ctrl+Z: editor-undo-ground) | none |
 | editor-prefab-list | merged: PR #4, c458fe7, 2026-10-14 | done: Mustafa's Brave check of editor.html passed (no problems), Advisor APPROVE | none |
 | gate-check-5 (5a smoke, 5b names, 5c layering, 5d script order; CI jobs gate + smoke) | merged: PR #5, 8675367, 2026-10-14 | done: Advisor APPROVE after his own full-gate run (PASS, 26 s) and mutations that failed correctly | none |
 | Phase 0 setup | merged (2d30e4a) | PARTIAL | Mustafa's Windows run |
@@ -46,16 +47,19 @@ editor Ctrl+Z ground-texture bug (plan coming with the wedge plan).
 
 ## Open bugs and risks
 - First-deploy tutorial lists controls that no longer exist (V melee, B shield, 1–5 switch): every new player sees it
-- Editor: Ctrl+Z (undo) changes / re-rolls the ground textures (old, reported by Mustafa): being diagnosed, plan to follow
+- Editor: Ctrl+Z (undo) changes / re-rolls the ground textures (old, reported by Mustafa): next change-set after the wedge fix (editor-undo-ground, plan approved)
 - Editor three-bug entry (prefab list, Maps list, Save as prefab): fixed and merged (PR #4, c458fe7), Brave check passed
 - Gate default base (stale local `main`): fixed and merged (PR #5, 8675367)
-- The kit allow rule `npx --no -- playwright *` was too broad: fixed on cs/kit-v1-2 (now only `install chromium`; other
-  playwright commands ask), pending merge
+- The kit allow rule `npx --no -- playwright *` was too broad: fixed and merged (PR #6, ef019e0; now only `install chromium`)
 - Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)
 - GitHub branch protection on `main` is the real guard against pushes to main (deny rules are fragile by design);
   recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos)
 - The 3D scene renders every frame behind the opaque main menu (wasted GPU)
-- One bot wedged by the poplar row near (-79, -83) in 1 of 8 headless matches (pre-existing nav behaviour); diagnosis under way, fix is the next change-set
+- Bot wedge at the poplar row near (-79, -83): fixed on cs/bot-poplar-wedge, pending merge
+- Bot nav, editor-made layouts: rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check
+- Bot nav, navSteer "replan storm" (old): a bot whose straight line flickers clear/blocked replans every few frames; the head hits it more on Romania (budget-limited frames 0.9% -> 1.8%); own small change-set later
+- Bot nav, A* gives up after 8000 nodes (old): a few far-corner routes fail and fall back to a straight line
+- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run: relevant to the deterministic shared simulation (ADR-001)
 - The gate did not check execution (load order, TDZ at load, undefined identifiers, layering): addressed by check 5,
   merged (PR #5, 8675367), live in CI
 
@@ -64,7 +68,7 @@ editor Ctrl+Z ground-texture bug (plan coming with the wedge plan).
 |---|---|---|---|
 | Combat allocation (GC churn) | ~4.9 MB/s | 2026-09-26 | audit CS11 |
 | Village draw calls | 202 (was 398) | 2026-09-26 | audit CS12 |
-| Headless match stall % (4 runs each) | base 7.6 / 4.5 / 10.7 / 10.8 · UI-step-1 20.5 / 4.8 / 8.0 / 7.2 | 2026-10-10 | sim.js |
-| Headless match stall % (3 runs, Linux container) | 20.5 / 9.8 / 8.9 (run 1 = the known poplar wedge at −79,−83) | 2026-10-13 | sim.js |
+| Headless match stall % (tools/sim.js, 40 unseeded runs each) | base mean 8.82 / median 7.5 · bot-poplar-wedge mean 7.73 / median 6.5 | 2026-10-14 | sim.js |
+| Seeded match pairs (240) | tree-face stall windows 1885 -> 0; mean stall 9.12% -> 8.50% | 2026-10-14 | scratch harness (report) |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |
