@@ -37,13 +37,13 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 - **Architecture:** timber house, thatched cottage, brick-and-flint farmhouse, Norman manor (round tower + conical roof); trees (apple/poplar/oak), props (8 kinds), covers (hedge/drystone/fence).
 - **Art direction:** "Lush Comic" → relocked as **"Living Comic"** (2026-07-08, ART_DIRECTION §9 steps 1–5: 2-band ramps, differential dark ink, Living Comic env, brightened primaries, Empire elite villain, halftone default-off).
 - **Structure:** file split (2026-07-12) — single ~4,680-line HTML → core/game/editor + two pages; player menu is Play + Career only.
-- **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~6 MB/s residual GC churn (measured — `AUDIT_BUGS_PERF.md`).
+- **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~6 MB/s residual GC churn (measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
 ## Current state (verified against the build, 2026-09-25)
 - **Look:** Living Comic with **colour-true output** (authored hex = on-screen), option-C lighting on buildings/characters, a **nature gain** keeping grass/foliage/hedges/sea lush, and **contact ink** (every object inked where it meets the ground). Confirmed by Mustafa in Brave.
 - **Map:** Cabana Republic carries the village (11 houses, 70 trees, 36 props, 10 hedges/fences); the centre stays open as the main combat space.
 - **Persistence:** `KVStore` — rank, tutorial flag, maps, prefabs survive reloads under `file://`. Confirmed in Brave.
-- **Tooling:** headless previewer + battery + match simulator (Project Knowledge; see START_HERE §5).
+- **Tooling:** headless previewer + battery + match simulator + `gate.mjs`, all in `tools/`, with GitHub Actions CI (see START_HERE §5, `tools/README.md`).
 - **Animation:** ANIM v2 — weapon-first IK holds, planted feet with ankles, per-gun reloads (see Recent work). Katana + shield moved onto the IK system (awaiting Brave check).
 - **Performance:** kill-vignette hitch fixed (GPU capture); GC churn ~6 MB/s after the audit; details in `AUDIT_BUGS_PERF.md`.
 
@@ -63,6 +63,8 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**Phase 0: agentic environment + green baseline [2026-10-13]** — portable toolkit (`tools/package.json` + lockfile, Node 22) and `tools/gate.mjs` (checks 1–4 vs a base ref), proven to fail on four injected breakages; GitHub Actions CI; syntax hook; `pageshot.js --headed`; START_HERE §1/§5 rewritten, multiplayer target updated. No game files touched. Verifier PASS WITH NOTES (two holes fixed). Pending: Windows acceptance run (Prompt 0b) and merge after CS-1. Gate does not check load order or layering; a load smoke test is proposed.
 
 **Repo root move (CS-1) [2026-10-13]**: the GitHub web upload had nested the project in `shamble-frontlines-repo/` and dropped every dot-file (the `.claude/` kit, `.gitignore`, `.gitattributes`); Mustafa pushed those from the zip (826b896). CS-1 moves all 52 files to the root as pure renames (tree identical) and removes GitHub's placeholder README, so Claude Code loads CLAUDE.md and the kit from the repo root.
 
@@ -85,5 +87,3 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **Storage fix [2026-09-25]** — `KVStore` adapter (window.storage → localStorage → memory); stores no longer silently in-memory under `file://`; the tutorial no longer re-opens on every deploy.
 
 **Headless toolkit [2026-09-25]** — `preview.js` renders the real build (WebGL1); `battery.js` implements checks 3–4 on an AST (mutation-tested against the `placeCursor` incident); `sim.js` runs a headless 90 s match.
-
-**Kill-vignette hitch attempt** — the three synchronous GPU readbacks moved off the kill frame (`_vigQueue` drained by `vigStep()` across the hit-stop). Did **not** remove the hitch (Mustafa, 2026-09-25) — root cause still open.
