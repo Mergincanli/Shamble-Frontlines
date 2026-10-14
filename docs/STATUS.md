@@ -8,8 +8,14 @@ after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a 
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
 **Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367). **In flight:** kit-v1-2
-(narrows one allow rule), plus read-only diagnosis of the poplar wedge and the editor Ctrl+Z bug. **Next:** bot-poplar-wedge →
-Prompt 1 (scale test) → Prompt 2 (build spike) → Prompt 3 (ADRs); the editor undo plan comes alongside the wedge plan.
+(narrows one allow rule), plus read-only diagnosis of the poplar wedge and the editor Ctrl+Z bug.
+**Queue (Advisor, 2026-10-14; one change-set at a time):** 1. kit-v1-2 → 2. bot-poplar-wedge → 3. tutorial-field-manual
+(the first-deploy tutorial becomes the clipboard's field-manual mode: one controls list, no dead V / B / 1–5 keys) →
+4. ui-step-2 (service record + end of round, war-room paper family) → 5. scale-test (Prompt 1) → 6. ui-step-3 (armory +
+scoreboard, dark field-kit crate) → 7. build-spike (Prompt 2), then the ADR run (Prompt 3, docs only). Why: visual and UI
+work lives in the client and survives the multiplayer refactor; gameplay systems (progression, new units, Spy, squads,
+three teams) wait for the foundation refactor so they are built once in the shared simulation. Not yet slotted: the
+editor Ctrl+Z ground-texture bug (plan coming with the wedge plan).
 
 ## In flight
 | Work | Branch | State | Waiting on |

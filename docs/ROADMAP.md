@@ -50,6 +50,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 - **Performance:** kill-vignette hitch fixed (GPU capture); GC churn ~6 MB/s after the audit; details in `AUDIT_BUGS_PERF.md`.
 
 ## Next / open
+- **Queue (Advisor, 2026-10-14):** kit-v1-2 → bot-poplar-wedge → tutorial-field-manual → ui-step-2 (service record + end of round) → scale-test (Prompt 1) → ui-step-3 (armory + scoreboard) → build-spike (Prompt 2) → ADR run (Prompt 3). Client-side visual/UI work first (it survives the multiplayer refactor); gameplay systems (progression, new units, Spy, squads, three teams) wait for the foundation refactor.
 - **Graphics — rest of Upgrade A:** comic cast shadows (fold the sun's shadow into the 2-band ramp) → painted ground (macro colour patches, baked contact shadows, dirt roads instead of grey tiles). Then **Upgrade B "Comic Impact"**: bright hit flash, hit-stop on every kill, weighted shake, cel explosions, comic muzzle stars, impact frames.
 - **Constraints review with Mustafa:** no-addons and no-post-processing date from the artifact era — decide keep / amend.
 - **Architecture:** real base buildings (HQ / barracks / refinery / power plant are still placeholder boxes); fix the candy-stripe brick farmhouse; more region presets.
