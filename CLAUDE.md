@@ -2,8 +2,9 @@
 
 Browser top-down team shooter in Three.js r128 (UMD global), built as classic multi-`<script>` files sharing globals.
 Vision: Foxhole camera · C&C Renegade base-assault economy · Red Alert 3 toy-box look and three factions · Gears gun feel.
-Look: "Living Comic" (locked). Today: PvE vs 6 bots. Next big phase: multiplayer on an authoritative server,
-target up to 36 players per match (16v16, or 12v12v12 in squads of 4).
+Look: "Living Comic" (locked). Today: PvE vs 6 bots. Next big phase: multiplayer on an authoritative server:
+three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly larger). Design for
+48+ players; bots fill empty slots.
 
 People: **Mustafa** owns the game and decides (game-design student; plays in Brave on Windows; his screenshots are the
 final visual gate). **The Advisor** (Claude in a claude.ai Project) reviews your reports and writes your task prompts.
@@ -18,8 +19,7 @@ Write every plan and report so both can judge it from evidence alone.
    `docs/DESIGN_NOTES.md` (Mustafa's design decisions, open questions, art lessons), `docs/reference/` (Renegade X and
    Kane's Wrath reference: inspiration, not what's built).
 - The code is the source of truth. Docs drift: grep before trusting a claim.
-- START_HERE §5's delivery mechanics (uploads, /mnt/user-data/outputs, present_files, Python heredoc edits, dash shell)
-  describe the OLD chat workflow. Here: git branches, the Edit tool, `node tools/gate.mjs`. Phase 0 rewrites §5.
+- Workflow: git branches, the Edit tool, `node tools/gate.mjs` (START_HERE §1 and §5; toolkit setup in `tools/README.md`).
 
 ## Layout
 `shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)
@@ -54,11 +54,12 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
    Mustafa's Brave screenshots before merge or further tuning.
 
 ## Commands
-- Gate: `node tools/gate.mjs [baseRef]` (checks 1–4 vs the base ref; created in Phase 0)
+- Setup (once per machine, Node 22): `cd tools && npm ci`; for pageshot also, inside tools/: `npx --no -- playwright install chromium`
+- Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b]` (checks 1–4 vs the base ref, default: merge-base with main; CI runs it)
 - Official battery (JSON): `node tools/battery.js <dir>`
-- 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>`
+- 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>` (Linux: prefix `xvfb-run -a`)
 - Headless match: `node tools/preview.js <dir> eval tools/sim.js`
-- Real pages (DOM + HUD + WebGL): `node tools/pageshot.js <dir> index.html <outPrefix> <steps…>` (GPU mode: Phase 0)
+- Real pages (DOM + HUD + WebGL): `node tools/pageshot.js <dir> index.html <outPrefix> [--headed] <steps…>` (`--headed`: real GPU; every shot prints its WebGL renderer)
 - Map layout validation: `tools/aabbs.js` + `tools/village.py`
 
 ## Code rules (file-specific traps load from .claude/rules/)

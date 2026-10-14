@@ -1,4 +1,4 @@
-// Collision boxes + objective zones from the live SIM: xvfb-run -a node preview.js <buildDir> eval aabbs.js > /tmp/aabbs.json (input for village.py).
+// Collision boxes + objective zones from the live SIM: node tools/preview.js . eval tools/aabbs.js > .gate/aabbs.json (Linux: prefix xvfb-run -a; input for village.py).
 (function(){
   if(typeof syncSimWorld==='function') syncSimWorld();
   const st=(SIM&&SIM.statics)||[]; const s0=st[0]||{};

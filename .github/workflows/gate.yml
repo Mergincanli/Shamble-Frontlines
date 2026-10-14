@@ -1,0 +1,48 @@
+# The SHAMBLE FRONTLINES gate (tools/gate.mjs, checks 1-4) on every push and pull request.
+# Pull requests compare against their base branch; pushes against the previous tip of the branch (or main for a new branch).
+# The gate only needs acorn: optional packages (gl, canvas, playwright) and browsers are skipped.
+name: gate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install the gate's dependencies (acorn only)
+        run: npm ci --prefix tools --omit=optional --ignore-scripts --no-audit --no-fund
+
+      - name: Gate
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            BASE="origin/$BASE_REF"
+          elif [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            BASE="$BEFORE"
+          else
+            BASE="$(git merge-base HEAD origin/main)"
+          fi
+          echo "gate base: $BASE"
+          node tools/gate.mjs "$BASE"

@@ -1,23 +1,20 @@
-// SETUP (fresh container):  mkdir -p /home/claude/tools && cd /home/claude/tools &&
-//   npm i three@0.128.0 gl @napi-rs/canvas pngjs acorn@8 acorn-walk@8
-// RUN under a virtual display:  xvfb-run -a -s "-screen 0 1280x1024x24" node preview.js <buildDir> <cmd> ...
-//   cmds: list | measure | time | shot <out.png> <x> <z> [fov=15] [W] [H]
+// SETUP: cd tools && npm ci   (three, pngjs, and the optional native gl + @napi-rs/canvas resolve from tools/node_modules)
+// RUN from the repo root. Windows: node tools/preview.js . <cmd> ...   Linux: xvfb-run -a node tools/preview.js . <cmd> ...
+//   cmds: list | measure | time | menu <out.png> | top <out.png> [x] [z] [span] | shot <out.png> <x> <z> [fov=15] [W] [H]
+//         eval <snippet.js> | evalshot <snippet.js> <out.png>
 // Headless preview of the REAL build: three r128 + shamble-core.js + shamble-game.js, bootGame(), gameplay camera.
-// usage: xvfb-run -a node preview.js <buildDir> list
-//        xvfb-run -a node preview.js <buildDir> shot <out.png> <x> <z> [fov=15] [W=1280] [H=720]
 // Limits: WebGL1 (ANGLE) not WebGL2; no DOM/CSS layers (HUD, halftone overlay); canvas text uses Skia fonts.
 const fs = require('fs'), vm = require('vm');
-const TOOLS = '/home/claude/tools/node_modules/';
-const createGL = require(TOOLS + 'gl');
-const { createCanvas } = require(TOOLS + '@napi-rs/canvas');
-const { PNG } = require(TOOLS + 'pngjs');
-const THREE = require(TOOLS + 'three');
+const createGL = require('gl');
+const { createCanvas } = require('@napi-rs/canvas');
+const { PNG } = require('pngjs');
+const THREE = require('three');
 
 const [dir, cmd, outFile, xArg, zArg, fovArg, wArg, hArg] = process.argv.slice(2);
 const W = +(wArg || 1280), H = +(hArg || 720), SS = 2;           // render at 2x, box-downsample -> smooth lines
 const BW = W * SS, BH = H * SS;
 const gl = createGL(BW, BH, { preserveDrawingBuffer: true, antialias: false });
-if (!gl) throw new Error('headless-gl context failed');
+if (!gl) throw new Error('headless-gl context failed' + (process.platform === 'linux' && !process.env.DISPLAY ? ': no display; run under xvfb-run -a' : ''));
 
 // ---------- DOM / window stubs ----------
 function makeCanvasEl() {

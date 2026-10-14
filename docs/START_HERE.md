@@ -17,15 +17,17 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
 
 ## 1. Onboarding sequence (do this in order)
 
-1. **This file**, then **`MODULE_MAP.md`** (who owns what, load order).
-2. Ask for the **five code files** if they aren't uploaded: `shamble-core.js`, `shamble-game.js`, `shamble-editor.js`,
-   `index.html`, `editor.html` (uploads may carry numeric prefixes — work and deliver under the canonical names).
-3. Set up the **toolkit** (§5) — the battery needs every file on disk.
+1. **`STATUS.md`** (where things stand), then **this file**, then **`MODULE_MAP.md`** (who owns what, load order).
+2. **Work in the git repo.** The five code files sit at the repo root: `shamble-core.js`, `shamble-game.js`,
+   `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from an up-to-date
+   `main` (`CLAUDE.md`, `/changeset`).
+3. Set up the **toolkit** once per machine (§5): `cd tools && npm ci`.
 4. **Grep the one owning file** for the task (§6). Pull deep references only as needed:
    `TECHNICAL.md` (how) · `GAME_DESIGN.md` (why) · `ART_DIRECTION.md` (the locked look) · `ANIMATION_PLAN.md`
    (animation system) · `AUDIT_BUGS_PERF.md` (what was measured/fixed, and what was kept on purpose) ·
    `ROADMAP.md` (history + plan) · `UNITS.md` (planned roster, not what's built) · `ui_theme_mockup.html` (UI look).
-5. **Play back** your understanding of the relevant systems and your plan; **wait for Mustafa to confirm** before coding.
+5. **Plan first** (plan mode): your understanding of the relevant systems and your plan; **wait for Mustafa's
+   approval** before editing.
 
 ## 2. Architecture (compact — full map in `MODULE_MAP.md`)  **[verified]**
 
@@ -69,27 +71,34 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
 
 ## 5. Edit → verify workflow (the standing gate)  **[verified]**
 
-**Edit:** `cp` a `/tmp` backup → Python heredoc with `assert s.count(old)==1` then `str.replace` (or an acorn AST range edit) → deliver **all affected files plus both HTML pages** to `/mnt/user-data/outputs/` via `present_files`.
+**Edit:** on the change-set's branch, with the Edit tool (unique matches); multi-site mechanical edits through an acorn
+AST script, never a blind regex. The syntax hook (`.claude/hooks/syntax-gate.mjs`) runs `node --check` on every JS and
+HTML file the moment it is written. Commit on the branch: git is the backup and the delivery (no uploads).
 
-**Four-check battery** after every multi-file edit:
-1. `node --check` on each `.js` file and on each page's inline `<script>`.
-2. Concatenation `node --check` in load order for both pages (catches cross-file `const`/`let` collisions).
-3. Symbol conservation vs the pre-edit baseline — no drops, no cross-file duplicates; the diff must equal the intended change (`battery.js`).
-4. Player-build resolvability — every unconditional reference on `index.html`'s live paths resolves in core ∪ game (`battery.js`; mutation-tested against the `placeCursor` incident).
+**The gate**, after every edit to the engine files or pages and before every commit, report or merge:
+`node tools/gate.mjs [baseRef]` (default base: the merge-base with `main`; `/gate` runs it; `--allow-drop a,b` for
+removals the plan names; exit 0 PASS, 1 FAIL). CI (`.github/workflows/gate.yml`) runs it on every push and pull request.
+1. `node --check` on each engine file and on each page's inline `<script>`.
+2. Concatenation `node --check` in load order for both pages, read from their `<script src>` tags (catches cross-file `const`/`let` collisions).
+3. Symbol conservation vs the base ref: no drops, no cross-file or within-file duplicates; prints +added / −dropped / moved, and the diff must equal the plan (`battery.js`).
+4. Player-build resolvability: every unguarded reference on `index.html`'s live paths resolves in core ∪ game (`battery.js`; mutation-tested against the `placeCursor` incident).
+Proven to bite (Phase 0): a deleted function, an unguarded call into the editor, a syntax error and a cross-file
+duplicate each FAIL on the right check. Not covered: layering (core referencing game): review that by hand.
 Brace counts are a delta check only (GLSL inside JS strings gives a standing false imbalance).
 
-**Targeted tests** on the real code (harness snippets run through `preview.js eval`): animation metrics (hands on sockets < 1 cm, planted-foot drift, boots ≥ 0 cm above ground, IK stretch ≤ 0.98), fuzz (every class/ability, grenade, bow, Juggernaut, death/respawn — expect 0 errors), 3-minute soak (heap flat after GC), `sim.js` stall % (**random AI: compare ≥ 3 runs per build**), V8 sampling heap profiler for allocation rate, draw-call counts at fixed views.
+**Targeted tests** on the real code (harness snippets run through `node tools/preview.js . eval <snippet.js>`): animation metrics (hands on sockets < 1 cm, planted-foot drift, boots ≥ 0 cm above ground, IK stretch ≤ 0.98), fuzz (every class/ability, grenade, bow, Juggernaut, death/respawn — expect 0 errors), 3-minute soak (heap flat after GC), `sim.js` stall % (**random AI: compare ≥ 3 runs per build**), V8 sampling heap profiler for allocation rate, draw-call counts at fixed views.
 
-**Toolkit** (keep these in Project Knowledge; never shipped). Fresh container:
+**Toolkit** (`tools/`, never shipped; full notes in `tools/README.md`). Once per machine, with Node 22:
 ```
-mkdir -p /home/claude/tools && cd /home/claude/tools
-npm i three@0.128.0 gl @napi-rs/canvas pngjs acorn@8 acorn-walk@8
-# copy preview.js, battery.js, sim.js, aabbs.js, village.py (+ pageshot.js) into this folder
-xvfb-run -a -s "-screen 0 1280x1024x24" node preview.js <buildDir> <cmd>
+cd tools
+npm ci                                    # the pinned versions in tools/package-lock.json
+npx --no -- playwright install chromium   # only needed for pageshot.js; --no never downloads another playwright
 ```
-- **`preview.js <dir> <cmd>`** — renders the real **3D scene** headless (WebGL1): `shot`, `menu`, `top`, `eval <snippet>`, `evalshot <snippet> <out.png>`, `measure`, `time`. It **cannot draw the HUD/DOM/CSS**.
-- **`pageshot.js`** — Playwright + Chromium: renders the **real pages including DOM, HUD and CSS** (use it for UI work; the container lacks Arial Black / Courier New / Segoe Print, so fonts differ from Brave). Setup notes at the top of the file.
-- **`battery.js <dir>`** — checks 3–4 as JSON. **`sim.js`** — headless 90 s match (`preview.js <dir> eval sim.js`). **`aabbs.js` + `village.py`** — map layout export + validation.
+Run every tool from the repo root. On Linux, prefix `preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`;
+Windows needs no prefix. Scratch output goes under `.gate/` (gitignored).
+- **`node tools/preview.js . <cmd>`**: renders the real **3D scene** headless (WebGL1): `shot`, `menu`, `top`, `eval <snippet>`, `evalshot <snippet> <out.png>`, `measure`, `time`. It **cannot draw the HUD/DOM/CSS**. Needs the optional native `gl` package.
+- **`node tools/pageshot.js . index.html <prefix> [--headed] <steps…>`**: Playwright + Chromium renders the **real pages including DOM, HUD and CSS** (use it for UI work). Headless = SwiftShader (CPU); `--headed` = the real GPU. Every shot prints the WebGL renderer it came from. The Linux container lacks Arial Black / Courier New / Segoe Print, so fonts differ from Brave there.
+- **`node tools/battery.js .`**: checks 3–4 as JSON (`gate.mjs` wraps it). **`sim.js`**: headless 90 s match (`node tools/preview.js . eval tools/sim.js`). **`aabbs.js` + `village.py`**: map layout export + validation (`python tools/village.py`, paths in its header).
 - Node flags that paid off: `--expose-gc` (soak), `--allow-natives-syntax` (`%GetOptimizationStatus`), `--trace-deopt` / `--trace-compilation-dependencies` (why a function won't stay optimized).
 
 **Final gate: Mustafa's Brave screenshots** — the only real view of the HUD/DOM and of WebGL2. Perf claims about the browser need his DEV-panel FPS readout.
@@ -138,7 +147,7 @@ xvfb-run -a -s "-screen 0 1280x1024x24" node preview.js <buildDir> <cmd>
 - **One change-set at a time, verified before the next. Fix bugs before features.** Root-cause by reading and measuring, not guessing.
 - **Think with him on design:** propose, justify, push back with reasons; be honest about limits and trade-offs. He dislikes X-or-Y questions — recommend, then let him veto.
 - **Answers:** digestible, scannable, plain language; **decimals use periods**.
-- **Delivery:** all affected files + both HTML pages via `present_files`; terse `ROADMAP.md` entries when meaningful work lands (hygiene rules at the top of ROADMAP).
+- **Delivery:** commits on the change-set branch, an advisor report in `docs/reports/` (`/advisor-report`); terse `ROADMAP.md` entries when meaningful work lands (hygiene rules at the top of ROADMAP).
 
 ### Provenance
-Rewritten 2026-10-02 from the live build (end of the animation + audit chat) after the original went missing from Project Knowledge. §2–§5 and §7 are verified against the code and this session's measurements; §8's UI-chat items are as reported by that chat.
+Rewritten 2026-10-02 from the live build (end of the animation + audit chat) after the original went missing from Project Knowledge. §2–§5 and §7 are verified against the code and this session's measurements; §8's UI-chat items are as reported by that chat. §1 and §5 rewritten 2026-10-13 (Phase 0) for the git + Claude Code workflow; §5's commands were run in the Linux container that day.

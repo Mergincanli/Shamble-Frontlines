@@ -116,7 +116,7 @@ the menu; nothing auto-starts a match or the editor.
 
 ## Tools (not part of the build)
 
-`preview.js`, `battery.js`, `sim.js`, `aabbs.js`, `village.py` live in Project Knowledge and are
+`gate.mjs`, `battery.js`, `preview.js`, `pageshot.js`, `sim.js`, `aabbs.js`, `village.py` live in `tools/` and are
 **never loaded by either page**. They load the real `shamble-core.js` + `shamble-game.js` into
 Node (headless WebGL) to render frames, run the verify battery's checks 3–4, simulate a match,
 and generate/validate map layouts. Setup + commands: `START_HERE.md` §5.

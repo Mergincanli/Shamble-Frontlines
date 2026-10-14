@@ -5,7 +5,8 @@ toy-box look and three factions (Soviets, Allies, Empire), and Gears of War's we
 in the locked "Living Comic" style: flat two-band cel shading with bold ink outlines.
 
 **Today:** PvE against 6 bots: four classes, a two-currency economy, the Juggernaut walker, destroy the enemy HQ to win.
-**Next:** multiplayer on an authoritative server, up to 16v16 or 12v12v12 (squads of 4).
+**Next:** multiplayer on an authoritative server: three teams, one per faction, of 12–16 players each in squads of 4
+(12v12v12 to 16v16v16, designed for 48+ players); bots fill empty slots.
 
 ## Play
 - Double-click `index.html`. It needs an internet connection for now: three.js loads from a CDN.
