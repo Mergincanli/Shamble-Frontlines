@@ -3113,6 +3113,9 @@ applyEnv(_env,{regen:false}); // env + ground cel-cap now that the ground materi
 
 /* helpers */
   navBuild();   // warm the pathfinding grid while loading (deploy then rebuilds it warm, ~40 ms)
+  // Warm navPath's branches before V8 optimises it (a start in a blocked cell: the poplar; a goal in a blocked cell: the
+  // refinery; an open route round the poplar row), or the first real use of each branch deopts it (measured: up to 54 per match).
+  { const w=new Float32Array(128); navPath(-80,-81,0,30,w); navPath(0,30,-100,80,w); navPath(-79,-90,-79,-70,w); }
 }
 
 // V8 'const tracking let': a top-level let assigned only once is treated as a constant and baked into optimized code;
