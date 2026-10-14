@@ -75,7 +75,7 @@ the menu; nothing auto-starts a match or the editor.
 | Economy & match rules (`applyRules`/`RULES_*`), progression (`Prog`) | **game** |
 | HUD, combat reticle/hitmarker/reload-ring (`placeCursor`), FX (`addImpact`/`addExplosion`), audio (`SFX`) | **game** |
 | Movement collision (`resolveObstacles`), per-frame `update(dt)` | **game** |
-| World-registry arrays + map build/serialize (`buildMap`/`clearMap`/`serializeMap`) | **game** |
+| World-registry arrays + map build/serialize (`buildMap`/`clearMap`/`serializeMap`/`dedupeMapDef`) | **game** |
 | **Shared dispatch** — `loop`, `backToMenu`, `deploy`, `setMenuCam`, input listeners, `bootGame` | **game** |
 | NPR/cel pipeline (`toonify`/`makeOutlineMat`/`addHull`/`stylizeScene`/`INK`) | **core** |
 | Materials, character builder (`buildEntity`/`assembleChar`), faction system (`applyFaction`/`FACTION_PALETTES`) | **core** |

@@ -249,7 +249,7 @@ Grep the file that owns the system (per `MODULE_MAP.md`). Targets grouped by fil
 - Vehicles / movement: `function buildJuggernaut` · `function resolveObstacles`
 - Economy/rules/progression: `function applyRules` · `RULES_` · `const Prog`
 - HUD & reticle: `function placeCursor` (combat reticle/hitmarker/reload-ring)
-- Map build: `function buildMap` · `function clearMap` · `function serializeMap`
+- Map build: `function buildMap` · `function clearMap` · `function serializeMap` · `function dedupeMapDef`
 - World-registry arrays: `let obstacles` · `let buildings` · `let enemies` (etc.)
 - **Shared dispatch/boot:** `function loop()` · `function update(dt)` · `function backToMenu` · `function deploy` · `function setMenuCam` · `function bootGame`
 
