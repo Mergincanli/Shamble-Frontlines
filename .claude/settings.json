@@ -8,7 +8,7 @@
       "Bash(node tools/preview.js *)",
       "Bash(node tools/pageshot.js *)",
       "Bash(node --check *)",
-      "Bash(npx --no -- playwright *)",
+      "Bash(npx --no -- playwright install chromium)",
       "Bash(python tools/village.py *)",
       "Bash(python3 tools/village.py *)",
       "Bash(git status)",
