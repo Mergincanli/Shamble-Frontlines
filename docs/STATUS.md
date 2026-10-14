@@ -4,8 +4,9 @@ _Last updated: 2026-10-13, Phase 0 on cs/phase-0._
 
 ## Phase
 **Phase 0: environment + green baseline**: built and proven in the Linux container (portable toolkit, tools/gate.mjs
-proven to bite, CI, START_HERE §1/§5 rewrite, new multiplayer target). Remaining: Mustafa's Windows acceptance run
-(Prompt 0b: npm ci, gate, headed RTX renders, headless-gl, hook) and the merge.
+proven to bite, CI, START_HERE §1/§5 rewrite, new multiplayer target), PR #2. The project sits at the repo root since
+CS-1 (PR #1, merged as 0d756ed on 2026-10-14). Remaining: Mustafa's Windows acceptance run ("Check a new machine" in
+tools/README.md: npm ci, gate, headed RTX renders, headless-gl, hook) and the merge.
 Next: Phase 1 decisions (ADR-001, ADR-002), then the foundation refactor and the netcode MVP. FIRST_PROMPTS order:
 Prompt 1 (scale test) and Prompt 2 (build spike) come before Prompt 3 (the ADRs).
 
@@ -13,8 +14,7 @@ Prompt 1 (scale test) and Prompt 2 (build spike) come before Prompt 3 (the ADRs)
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
-| Repo root move (CS-1): the web upload had nested the project in `shamble-frontlines-repo/` | claude/intelligent-brahmagupta-9oq3yb | gate PASS (main-session + subagent stand-ins), pure renames | Advisor OK, merge with a merge commit |
-| Phase 0 setup | cs/phase-0 (stacked on CS-1) | gate PASS, verifier PASS WITH NOTES (2 holes fixed), CI added | Prompt 0b on Mustafa's PC, Advisor OK, merge after CS-1 |
+| Phase 0 setup | cs/phase-0, PR #2 | gate PASS (local + CI), verifier PASS WITH NOTES (2 holes fixed), security: no blockers | "Check a new machine" on Mustafa's PC (tools/README.md), Advisor OK, merge |
 
 ## Targets
 - **Multiplayer:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly
