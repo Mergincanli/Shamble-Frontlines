@@ -1,20 +1,20 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-13, Phase 0 on cs/phase-0._
+_Last updated: 2026-10-14, kit-v1-1 on cs/kit-v1-1._
 
 ## Phase
-**Phase 0: environment + green baseline**: built and proven in the Linux container (portable toolkit, tools/gate.mjs
-proven to bite, CI, START_HERE §1/§5 rewrite, new multiplayer target), PR #2. The project sits at the repo root since
-CS-1 (PR #1, merged as 0d756ed on 2026-10-14). Remaining: Mustafa's Windows acceptance run ("Check a new machine" in
-tools/README.md: npm ci, gate, headed RTX renders, headless-gl, hook) and the merge.
-Next: Phase 1 decisions (ADR-001, ADR-002), then the foundation refactor and the netcode MVP. FIRST_PROMPTS order:
-Prompt 1 (scale test) and Prompt 2 (build spike) come before Prompt 3 (the ADRs).
+**Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
+after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
+gate, headed RTX renders, headless-gl, hook); Windows-only fixes become a small follow-up change-set.
+**Next, in the Advisor's order:** kit-v1-1 → editor-prefab-list → gate-check-5 → bot-poplar-wedge → Prompt 1 (scale
+test) → Prompt 2 (build spike) → Prompt 3 (ADRs).
 
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
-| Phase 0 setup | cs/phase-0, PR #2 | gate PASS (local + CI), verifier PASS WITH NOTES (2 holes fixed), security: no blockers | "Check a new machine" on Mustafa's PC (tools/README.md), Advisor OK, merge |
+| kit-v1-1 (settings.json applied exactly + standing-permission paragraph in CLAUDE.md; proposed amendment: 19 deny rules) | cs/kit-v1-1, PR open | gate PASS, no code touched; deny rules verified live | Advisor OK on the amendment; after merge Mustafa runs `/permissions` locally |
+| Phase 0 setup | merged (2d30e4a) | PARTIAL | Mustafa's Windows run |
 
 ## Targets
 - **Multiplayer:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly
@@ -22,6 +22,9 @@ Prompt 1 (scale test) and Prompt 2 (build spike) come before Prompt 3 (the ADRs)
   each step.
 
 ## Decisions pending
+- Taken by the Advisor 2026-10-14: gl advisories accepted for now (drop gl for Playwright-only renders if it won't
+  install natively on Windows); hook path (`$CLAUDE_PROJECT_DIR`) waits for the Windows run; check 5 is its own
+  change-set after the prefab fix; standing permissions granted (see CLAUDE.md)
 - **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started
 - **ADR-002 Code structure & build** (modules, bundler, TypeScript, double-click build): under discussion with Mustafa;
   evidence first via the build spike
@@ -31,7 +34,12 @@ Prompt 1 (scale test) and Prompt 2 (build spike) come before Prompt 3 (the ADRs)
 
 ## Open bugs and risks
 - First-deploy tutorial lists controls that no longer exist (V melee, B shield, 1–5 switch): every new player sees it
-- Editor: `refreshPrefabList` declared inside `bootEditor()`, called by `enterEditor` → ReferenceError on every entry
+- Editor: three bugs, one cause. `refreshPrefabList` (every editor entry), `refreshMapList` (opening Maps) and
+  `edSavePrefab` ("Save as prefab" in the inspector) are declared inside `bootEditor()` in shamble-editor.js but called
+  from top-level `enterEditor`, `openMaps`, `edBuildInspector` → ReferenceError each time [verified by code scan;
+  runtime check pending]
+- GitHub branch protection on `main` is the real guard against pushes to main (deny rules are fragile by design);
+  recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos)
 - The 3D scene renders every frame behind the opaque main menu (wasted GPU)
 - One bot wedged by the poplar row near (-79, -83) in 1 of 8 headless matches (pre-existing nav behaviour)
 - The gate checks syntax and names, not execution: script load order, TDZ at load, undefined identifiers and layering
