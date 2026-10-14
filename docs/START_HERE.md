@@ -105,7 +105,7 @@ Brace counts are a delta check only (GLSL inside JS strings gives a standing fal
 ```
 cd tools
 npm ci                                    # the pinned versions in tools/package-lock.json
-npx --no -- playwright install chromium   # only needed for pageshot.js; --no never downloads another playwright
+npx --no -- playwright install chromium   # for the gate's smoke test (5a) and pageshot.js; --no never downloads another playwright
 ```
 Run every tool from the repo root. On Linux, prefix `preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`;
 Windows needs no prefix. Scratch output goes under `.gate/` (gitignored).
