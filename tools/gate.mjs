@@ -8,7 +8,8 @@
 //                      page error or console error FAILS
 //   [5b] names         eslint-scope over each page's scripts and inline DOM handlers: every reference resolves to a local, a
 //                      top-level declaration of that page's build, an ECMAScript built-in or tools/gate-globals.json
-//                      (typeof operands exempt; index.html's refs to editor-only symbols are check 4's)
+//                      (typeof operands exempt; index.html's refs to editor-only symbols are check 4's); no assignment to a
+//                      const; every THREE.<member> exists in three r128
 //   [5c] layering      shamble-core.js references no game, editor or inline-script top-level symbol, guarded or not
 //   [5d] script order  each page loads exactly: three r128 (cdnjs) -> core -> game [-> editor, editor.html] -> one inline script
 // Usage (from anywhere): node tools/gate.mjs [baseRef] [--allow-drop name1,name2] [--no-smoke | --smoke-only] [--json]
@@ -17,10 +18,11 @@
 //   --no-smoke   skip 5a (quick local runs; CI runs it as its own job). The result says so.
 //   --smoke-only run only 5a (the CI smoke job)
 //   --json       machine-readable result on stdout
-// Exit code: 0 PASS, 1 FAIL, 2 usage or setup error. Needs Node 22, git and tools/node_modules (cd tools && npm ci);
+// Exit code: 0 PASS, 1 FAIL, 2 usage or setup error (incl. 5a without Playwright/Chromium when nothing else failed).
+// Needs Node 22, git and tools/node_modules (cd tools && npm ci);
 // 5a also needs Playwright's Chromium (npx --no -- playwright install chromium, inside tools/).
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync, realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, sep } from 'node:path';
 import { createRequire } from 'node:module';
@@ -100,7 +102,7 @@ const toBuild = get => ({ core: get('shamble-core.js'), game: get('shamble-game.
                           indexHtml: get('index.html'), editorHtml: get('editor.html') });
 
 // ---------- node --check on a temp copy ----------
-const tmp = mkdtempSync(join(tmpdir(), 'shamble-gate-'));
+const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'shamble-gate-')));   // realpath: node --check reports real paths (macOS /var -> /private/var)
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }));
 let nTmp = 0;
 // parts: [{ label, code }]. Returns null on success, else the first error lines with the line mapped back to its part.
@@ -128,13 +130,11 @@ function nodeCheck(parts) {
 // Inline scripts of another type (JSON data, templates) are not JavaScript and are skipped, as the syntax hook does.
 function pageScripts(page, html) {
   const out = []; let n = 0;
-  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-    const src = (m[1].match(/\bsrc\s*=\s*["']([^"']+)["']/i) || [])[1];
-    const type = (m[1].match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
-    if (type && !/^(module|text\/javascript|application\/javascript)$/i.test(type)) continue;
-    const startLine = html.slice(0, m.index + m[0].indexOf('>') + 1).split('\n').length;
-    if (src) out.push({ src, module: /^module$/i.test(type || '') });
-    else if (m[2].trim()) out.push({ label: `${page} inline#${++n}`, code: m[2], lineOffset: startLine - 1, module: /^module$/i.test(type || '') });
+  for (const s of battery.scanHtml(html).scripts) {   // the browser's view: commented-out tags don't count, any attribute quoting
+    const a = battery.attrsOf(s.attrs), kind = battery.scriptKind(a), module = kind === 'module';
+    if (kind === 'data') continue;
+    if (Object.hasOwn(a, 'src')) out.push({ src: a.src, module });
+    else if (s.body.trim()) out.push({ label: `${page} inline#${++n}`, code: s.body, lineOffset: html.slice(0, s.bodyStart).split('\n').length - 1, module });
   }
   return out;
 }
@@ -157,16 +157,28 @@ function classicParts(page, html, errs = [], external = new Set()) {
 }
 
 // ---------- scope analysis for 5b and 5c (eslint-scope) ----------
-// One classic script (or a DOM handler wrapped in a function): its top-level names and its free references, i.e. every
-// reference not resolved inside it. A free reference is fine when some script of the same page declares it at top level.
+// One classic script (or a DOM handler wrapped in a function): its top-level names (and which are const), its free
+// references (every reference not resolved inside it; fine when some script of the same page declares the name at top level),
+// assignments to its own constants, and the THREE.<member> names it uses.
 function scopeOf(code) {
   const ast = acorn.parse(code, { ecmaVersion: 'latest', sourceType: 'script', ranges: true, locations: true });
-  const typeofOps = new Set();
-  walk.simple(ast, { UnaryExpression(n) { if (n.operator === 'typeof' && n.argument.type === 'Identifier') typeofOps.add(n.argument); } });
-  const g = escope.analyze(ast, { ecmaVersion: 2025, sourceType: 'script' }).globalScope;
-  return { top: new Set(g.variables.map(v => v.name)),
+  const typeofOps = new Set(), members = [], threeSet = new Set();
+  const isThree = n => n.type === 'MemberExpression' && !n.computed && n.object.type === 'Identifier' && n.object.name === 'THREE' && n.property.type === 'Identifier';
+  walk.simple(ast, {
+    UnaryExpression(n) { if (n.operator === 'typeof') typeofOps.add(n.argument); },
+    MemberExpression(n) { if (isThree(n)) members.push(n); },
+    AssignmentExpression(n) { if (isThree(n.left)) threeSet.add(n.left.property.name); },
+  });
+  const sm = escope.analyze(ast, { ecmaVersion: 2025, sourceType: 'script' }), g = sm.globalScope;
+  const isConst = v => v.defs.some(d => d.type === 'Variable' && d.parent.kind === 'const');
+  const constWrites = sm.scopes.flatMap(sc => sc.references.filter(r => r.resolved && r.isWrite() && !r.init && isConst(r.resolved)))
+    .map(r => ({ name: r.identifier.name, line: r.identifier.loc.start.line }));
+  const freeThree = new Set(g.through.filter(r => r.identifier.name === 'THREE').map(r => r.identifier));
+  return { top: new Set(g.variables.map(v => v.name)), topConst: new Set(g.variables.filter(isConst).map(v => v.name)), constWrites,
            free: g.through.map(r => ({ name: r.identifier.name, line: r.identifier.loc.start.line, typeofOp: typeofOps.has(r.identifier),
-                                       write: r.isWrite() && !r.isRead() })) };
+                                       write: r.isWrite() && !r.isRead(), assign: r.isWrite() })),
+           three: members.filter(n => freeThree.has(n.object) && !typeofOps.has(n)).map(n => ({ name: n.property.name, line: n.property.loc.start.line })),
+           threeSet };
 }
 const scopeCache = new Map();   // core and game are analysed once for both pages
 const scoped = code => { if (!scopeCache.has(code)) scopeCache.set(code, scopeOf(code)); return scopeCache.get(code); };
@@ -176,7 +188,7 @@ async function smokeCheck() {
   try {
     const { runSmoke } = await import('./smoke.mjs');
     const r = await runSmoke({ root: ROOT });
-    add('5a', 'smoke', r.pass, r.summary, r.details, { pages: r.pages });
+    add('5a', 'smoke', r.pass, r.summary, r.details, { pages: r.pages, setup: r.setup });
   } catch (e) { add('5a', 'smoke', false, 'tools/smoke.mjs could not run', [firstLine(e.message)]); }
 }
 const ORDER = ['1', '2', '3', '4', '5a', '5b', '5c', '5d'];
@@ -197,7 +209,8 @@ function finish() {
     }
     console.log((pass ? 'GATE PASS' : 'GATE FAIL') + tail);
   }
-  process.exit(pass ? 0 : 1);
+  // exit 2 when the only failure is a missing smoke setup (Playwright or Chromium): the code was not judged
+  process.exit(pass ? 0 : checks.every(c => c.pass || c.setup) ? 2 : 1);
 }
 
 // ---------- run ----------
@@ -269,11 +282,14 @@ if (H) {
        ...dom.map(d => d.parseError ? `index.html handler does not parse: "${d.handler}"` : `index.html handler uses editor-only ${d.editorOnlyRef}: "${d.handler}"`)]);
 } else if (!checks.some(c => c.id === 4)) add(4, 'player build', false, 'not run: battery.js could not analyse the working tree');
 
-// [5b] names: every free reference of each page's scripts and inline DOM handlers resolves
+// [5b] names: every free reference of each page's scripts and inline DOM handlers resolves, nothing assigns to a const,
+// and every THREE.<member> exists in three r128 (tools/node_modules/three: the same build the pages load)
 const BUILTINS = new Set(Object.getOwnPropertyNames(vm.runInNewContext('globalThis')));   // pristine V8: ECMAScript only
-let LISTED;
-try { const j = JSON.parse(readFileSync(join(TOOLS, 'gate-globals.json'), 'utf8')); LISTED = new Set([...(j.browser || []), ...(j.library || [])]); }
+let LISTED, THREE_EXTRA, R128;
+try { const j = JSON.parse(readFileSync(join(TOOLS, 'gate-globals.json'), 'utf8')); LISTED = new Set([...(j.browser || []), ...(j.library || [])]); THREE_EXTRA = j.three || []; }
 catch (e) { die('cannot read tools/gate-globals.json: ' + e.message); }
+try { const T = require('three'); if (String(T.REVISION) !== '128') throw new Error('found r' + T.REVISION); R128 = Object.keys(T); }
+catch (e) { die('cannot load three r128 from tools/node_modules (cd tools && npm ci): ' + firstLine(e.message)); }
 {
   const problems = [], summ = [];
   // index.html's references to editor-only symbols are check 4's job (it proves each one is guarded): same set as battery.js
@@ -282,27 +298,41 @@ catch (e) { die('cannot read tools/gate-globals.json: ' + e.message); }
     for (const p of classicParts('index.html', head.indexHtml)) scoped(p.code).top.forEach(n => indexTop.add(n));
     for (const n of scoped(head.editor).top) if (!indexTop.has(n)) editorOnly.add(n);
   } catch { /* a syntax error: check 1 reports it, and the loop below names the file */ }
+  let anyUndefined = false;
   for (const [page, html] of PAGES) {
-    const units = [], declared = new Set(), bad = new Map();
+    const units = [], broken = [], declared = new Set(), consts = new Set(), three = new Set([...R128, ...THREE_EXTRA]);
     for (const p of classicParts(page, html)) {
-      try { const r = scoped(p.code); units.push([p, r]); r.top.forEach(n => declared.add(n)); }
-      catch (e) { problems.push(`${p.label}: cannot analyse (${firstLine(e.message)}; see check 1)`); }
+      try { const r = scoped(p.code); units.push([p.label, p.lineOffset || 0, r]); r.top.forEach(n => declared.add(n)); r.topConst.forEach(n => consts.add(n)); r.threeSet.forEach(n => three.add(n)); }
+      catch (e) { broken.push(p.label); problems.push(`${p.label}: cannot analyse (${firstLine(e.message)}; see check 1)`); }
+    }
+    const handlers = battery.handlersOf(html);
+    for (const h of handlers) {
+      try { units.push([`${page} ${h.attr}="${h.code.slice(0, 40)}"`, h.line - 2, scopeOf(`(function (event) {\n${h.code}\n});`), true]); }
+      catch (e) { problems.push(`${page} line ${h.line}: the ${h.attr} handler does not parse: "${h.code.slice(0, 60)}"`); }
     }
     const exempt = page === 'index.html' ? editorOnly : new Set();
     const ok = f => f.typeofOp || declared.has(f.name) || BUILTINS.has(f.name) || LISTED.has(f.name) || exempt.has(f.name);
-    const note = (f, where) => { if (!bad.has(f.name)) bad.set(f.name, []); bad.get(f.name).push(where + (f.write ? ' (an assignment: it would create an implicit global)' : '')); };
-    for (const [p, r] of units) for (const f of r.free) if (!ok(f)) note(f, `${p.label} line ${f.line + (p.lineOffset || 0)}`);
-    const handlers = battery.handlersOf(html);
-    for (const h of handlers) {
-      let r;
-      try { r = scopeOf(`(function (event) {\n${h.code}\n});`); }
-      catch (e) { problems.push(`${page} line ${h.line}: the ${h.attr} handler does not parse: "${h.code.slice(0, 60)}"`); continue; }
-      for (const f of r.free) if (!ok(f)) note(f, `${page} line ${h.line}, ${h.attr}="${h.code.slice(0, 40)}"`);
+    const found = { undef: new Map(), constw: new Map(), three: new Map() };
+    const note = (kind, name, where) => { const m = found[kind]; if (!m.has(name)) m.set(name, []); m.get(name).push(where); };
+    for (const [label, off, r, isHandler] of units) {
+      const at = line => `${label} line ${line + off}`;
+      for (const f of r.free) {
+        if (!ok(f)) note('undef', f.name, at(f.line) + (!f.write ? '' : isHandler ? ' (handler code sees the page globals only: write this.x or document.x)' : ' (an assignment: it would create an implicit global)'));
+        else if (f.assign && consts.has(f.name)) note('constw', f.name, at(f.line));
+      }
+      for (const w of r.constWrites) note('constw', w.name, at(w.line));
+      for (const m of r.three) if (!three.has(m.name)) note('three', m.name, at(m.line));
     }
-    for (const [name, where] of bad) problems.push(`${page}: ${name} is not defined (${where[0]}${where.length > 1 ? `; +${where.length - 1} more` : ''})`);
-    summ.push(`${page}: ${units.length} scripts + ${handlers.length} DOM handlers, ${bad.size} unresolved`);
+    const list = (m, say) => { for (const [name, where] of m) problems.push(`${page}: ${say(name)} (${where[0]}${where.length > 1 ? `; +${where.length - 1} more` : ''})`); };
+    if (broken.length) problems.push(`${page}: unresolved names not listed, because ${broken.join(', ')} could not be analysed (its declarations are unknown)`);
+    else { list(found.undef, n => `${n} is not defined`); anyUndefined ||= found.undef.size > 0; }
+    list(found.constw, n => `assignment to const ${n}: throws when it runs`);
+    list(found.three, n => `THREE.${n} does not exist in three r128`);
+    summ.push(`${page}: ${units.length - handlers.length} scripts + ${handlers.length} DOM handlers, ${found.undef.size + found.constw.size + found.three.size} problems`);
   }
-  add('5b', 'names', !problems.length, summ.join(' | ') + ` | allowed globals: ${BUILTINS.size} built-ins + ${LISTED.size} in gate-globals.json`, problems);
+  if (anyUndefined) problems.push('a browser API the code really needs: add its name to tools/gate-globals.json (reviewed data, not a gate-tool change)');
+  add('5b', 'names', !problems.length, summ.join(' | ') +
+      ` | allowed: ${BUILTINS.size} built-ins (Node ${process.version}) + ${LISTED.size} in gate-globals.json + ${R128.length} THREE members (r128)`, problems);
 }
 
 // [5c] layering: shamble-core.js stands alone (no reference into game, editor or inline-script symbols, typeof included)
@@ -325,14 +355,12 @@ try {
   const problems = [], summ = [];
   for (const [page, html] of PAGES) {
     const got = [];
-    for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-      const attrs = m[1], names = attrs.replace(/(["'])[\s\S]*?\1/g, '""');   // attribute names only, for the flag test
-      const src = (attrs.match(/\bsrc\s*=\s*["']([^"']+)["']/i) || [])[1];
-      const type = (attrs.match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
-      if (type && !/^(module|text\/javascript|application\/javascript)$/i.test(type)) continue;   // data blocks never run
-      if (!src && !m[2].trim()) continue;                                                         // an empty inline script runs nothing
-      const flags = [/^module$/i.test(type || '') ? 'type=module' : '', ...['async', 'defer', 'nomodule'].filter(f => new RegExp(`\\b${f}\\b`, 'i').test(names))].filter(Boolean);
-      got.push((src ? src.replace(/^\.\//, '') : 'inline') + (flags.length ? ` [${flags.join(' ')}]` : ''));
+    for (const sc of battery.scanHtml(html).scripts) {   // commented-out tags don't count; attributes in any quoting
+      const a = battery.attrsOf(sc.attrs), kind = battery.scriptKind(a);
+      if (kind === 'data') continue;                     // a data block (type="application/json" etc.) never runs
+      if (!Object.hasOwn(a, 'src') && !sc.body.trim()) continue;      // an empty inline script runs nothing
+      const flags = [kind === 'module' ? 'type=module' : '', ...['async', 'defer', 'nomodule'].filter(f => Object.hasOwn(a, f))].filter(Boolean);
+      got.push((Object.hasOwn(a, 'src') ? a.src.replace(/^\.\//, '') : 'inline') + (flags.length ? ` [${flags.join(' ')}]` : ''));
     }
     const want = WANT[page], same = got.length === want.length && got.every((g, i) => g === want[i]);
     if (!same) problems.push(`${page}: expected ${want.map(short).join(' -> ')}; found ${got.map(short).join(' -> ') || 'no scripts'}`);

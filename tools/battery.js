@@ -1,6 +1,7 @@
 // battery.js: AST analysis of the five-file build. The authority for gate checks 3-4 (tools/gate.mjs wraps it).
 // CLI: node tools/battery.js <dirWithAllFiveFiles>  ->  prints JSON { symbols, intraDupes, check4 }.
-// Module: const { analyze, readBuild, handlersOf } = require('./battery.js'); analyze({ core, game, editor, indexHtml, editorHtml }).
+// Module: const { analyze, readBuild, handlersOf, scanHtml, attrsOf, scriptKind } = require('./battery.js');
+//         analyze({ core, game, editor, indexHtml, editorHtml }).
 // Setup: cd tools && npm ci (acorn + acorn-walk resolve from tools/node_modules).
 // Check 3 input: top-level declared symbols per file (the shared-global surface).
 // Check 4: every reference in the PLAYER build (core + game + index inline + index DOM handlers)
@@ -14,14 +15,52 @@ const fs = require('fs'), path = require('path');
 const acorn = require('acorn');
 const walk = require('acorn-walk');
 
-// every inline classic <script> of a page (no src; no type, or a JavaScript type), joined in page order
-const inlineOf = html => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
-  .filter(m => !/\bsrc\s*=/i.test(m[1]) && (!/\btype\s*=/i.test(m[1]) || /\btype\s*=\s*["']?(text|application)\/javascript\b/i.test(m[1])))
-  .map(m => m[2]).join('\n');
-const unentity = s => s.replace(/&quot;/g, '"').replace(/&#0*39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-// a page's inline DOM handlers (on…="…", either quote style), entities decoded: [{ attr, code, line }]. Also used by gate check 5b.
-const handlersOf = html => [...html.matchAll(/\s(on[a-z]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)]
-  .map(m => ({ attr: m[1].toLowerCase(), code: unentity(m[2] ?? m[3]), line: html.slice(0, m.index + 1).split('\n').length }));
+const unentity = s => s.replace(/&quot;/g, '"').replace(/&#0*39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16))).replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d)).replace(/&amp;/g, '&');
+// One pass over a page the way a browser splits it: comments, <script> and <style> bodies are not markup. Returns the
+// scripts in order ({ attrs, body, bodyStart }) and the markup with comments and script/style bodies blanked (same length
+// and newlines, so offsets and line numbers still hold). Shared with gate.mjs (checks 1, 2, 5b, 5d).
+function scanHtml(html) {
+  const scripts = [], blank = s => s.replace(/[^\n]/g, ' '), re = /<!--|<(script|style)\b/gi;
+  let markup = '', i = 0;
+  for (let m; (re.lastIndex = i, m = re.exec(html));) {
+    markup += html.slice(i, m.index);
+    if (m[0] === '<!--') { const e = html.indexOf('-->', m.index + 4), stop = e < 0 ? html.length : e + 3; markup += blank(html.slice(m.index, stop)); i = stop; continue; }
+    const open = html.indexOf('>', m.index);
+    if (open < 0) { i = m.index; break; }
+    const close = new RegExp(`</${m[1]}\\s*>`, 'ig'); close.lastIndex = open + 1;
+    const c = close.exec(html), end = c ? c.index : html.length, stop = c ? end + c[0].length : html.length;
+    if (m[1].toLowerCase() === 'script') scripts.push({ attrs: html.slice(m.index + 7, open), body: html.slice(open + 1, end), bodyStart: open + 1 });
+    markup += html.slice(m.index, open + 1) + blank(html.slice(open + 1, end)) + html.slice(end, stop);
+    i = stop;
+  }
+  return { scripts, markup: markup + html.slice(i) };
+}
+// attributes of a start tag: name -> value ('' when bare), quoted or unquoted, entities decoded
+const attrsOf = s => Object.fromEntries([...s.matchAll(/([^\s"'>\/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g)]
+  .map(m => [m[1].toLowerCase(), unentity(m[2] ?? m[3] ?? m[4] ?? '')]));
+// what a <script> is, by its type (HTML spec): 'classic' (no type, or one of the JavaScript MIME types), 'module', or 'data' (never runs)
+const JS_MIME = /^(?:(?:application|text)\/(?:x-)?(?:ecma|java)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/;
+const scriptKind = a => { const t = (a.type ?? '').split(';')[0].trim().toLowerCase(); return !t || JS_MIME.test(t) ? 'classic' : t === 'module' ? 'module' : 'data'; };
+// every inline classic <script> of a page (no src), joined in page order
+const inlineOf = html => scanHtml(html).scripts.filter(s => { const a = attrsOf(s.attrs); return !Object.hasOwn(a, 'src') && scriptKind(a) === 'classic'; })
+  .map(s => s.body).join('\n');
+// a page's inline DOM handlers (on…= in a start tag, any quoting), entities decoded: [{ attr, code, line }]. Also used by gate check 5b.
+function handlersOf(html) {
+  const out = [], { markup } = scanHtml(html), attr = /([^\s"'>\/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/y;
+  for (const t of markup.matchAll(/<[a-z][^\s>\/]*/gi)) {   // each start tag: read its attributes up to the closing '>'
+    let p = t.index + t[0].length;
+    while (p < markup.length && markup[p] !== '>') {
+      if (/[\s\/]/.test(markup[p])) { p++; continue; }
+      attr.lastIndex = p; const m = attr.exec(markup);
+      if (!m) { p++; continue; }
+      const v = m[2] ?? m[3] ?? m[4];
+      if (v !== undefined && /^on[a-z]+$/i.test(m[1])) out.push({ attr: m[1].toLowerCase(), code: unentity(v), line: markup.slice(0, p).split('\n').length });
+      p = attr.lastIndex;
+    }
+  }
+  return out;
+}
 function readBuild(dir) {
   const rd = f => fs.readFileSync(path.join(dir, f), 'utf8');
   return { core: rd('shamble-core.js'), game: rd('shamble-game.js'), editor: rd('shamble-editor.js'),
@@ -166,7 +205,7 @@ function analyze(build) {
   };
 }
 
-module.exports = { analyze, readBuild, handlersOf };
+module.exports = { analyze, readBuild, handlersOf, scanHtml, attrsOf, scriptKind };
 
 if (require.main === module) {
   const dir = process.argv[2];

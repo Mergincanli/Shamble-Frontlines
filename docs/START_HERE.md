@@ -85,9 +85,11 @@ CI (`.github/workflows/gate.yml`) runs it on every push and pull request: job `g
 4. Player-build resolvability: every unguarded reference on `index.html`'s live paths resolves in core ∪ game (`battery.js`; mutation-tested against the `placeCursor` incident).
 5. Check 5 (gate-check-5), what checks 1–4 could not see:
    - **5a smoke** (`tools/smoke.mjs`): both pages run in headless Chromium with real clicks and keys (index: Deploy,
-     ~5 s of play, pause, menu; editor: Map editor, Maps, menu). Any page error or console error FAILS.
+     W moves the player, two shots reach the canvas, ~5 s of play, pause, menu; editor: Map editor, Maps, menu). Any page
+     error, console error or network request FAILS.
    - **5b names**: every bare name in each page's scripts and inline `on…="…"` handlers resolves (eslint-scope) to a
-     local, a top-level declaration of that page's build, an ECMAScript built-in or `tools/gate-globals.json`.
+     local, a top-level declaration of that page's build, an ECMAScript built-in or `tools/gate-globals.json`; no
+     assignment to a `const`; every `THREE.<member>` exists in r128.
    - **5c layering**: `shamble-core.js` references no game, editor or inline-script symbol, guarded or not.
    - **5d script order**: three r128 → core → game [→ editor] → one inline script, no `async`/`defer`/module.
 Proven to bite (Phase 0): a deleted function, an unguarded call into the editor, a syntax error and a cross-file

@@ -1,5 +1,5 @@
 {
-  "_why": "Gate check 5b: the browser and library globals the code may use by bare name. ECMAScript built-ins (Math, JSON, Map, console, ...) come from a pristine V8 context and are not listed. Kept explicit on purpose: a typo that happens to be a window property (name, status, event, top, parent) must not pass silently. A new browser API is one line here, visible in review.",
+  "_why": "Gate check 5b: the browser and library globals the code may use by bare name. ECMAScript built-ins (Math, JSON, Map, console, ...) come from a pristine V8 context and are not listed. Kept explicit on purpose: a typo that happens to be a window property (name, status, event, top, parent) must not pass silently. A new browser API is one line here, visible in review. This file is reviewed data: adding a name the code really needs is not 'editing the gate to make a check pass'. Optional key \"three\": extra THREE.<member> names to allow beyond three r128's own exports (none today).",
   "browser": [
     "addEventListener",
     "clearTimeout",

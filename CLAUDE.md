@@ -61,7 +61,8 @@ anything merges to main, and Mustafa's Brave screenshots for visual work. Never 
 Mustafa tells you to after the APPROVE.
 
 ## Commands
-- Setup (once per machine, Node 22): `cd tools && npm ci`; for pageshot also, inside tools/: `npx --no -- playwright install chromium`
+- Setup (once per machine, Node 22.13+): `cd tools && npm ci`, then inside tools/: `npx --no -- playwright install chromium`
+  (the gate's smoke test 5a and pageshot need it)
 - Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke]` (checks 1–4 and 5a–5d vs the base ref, default:
   merge-base with main or origin/main, whichever is newer; CI runs it)
 - Official battery (JSON): `node tools/battery.js <dir>`

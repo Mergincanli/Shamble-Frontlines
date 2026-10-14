@@ -16,8 +16,8 @@ smoke FAILS with this setup command (it never skips silently); `--no-smoke` runs
 ## Commands
 | Command | What it does | Needs |
 |---|---|---|
-| `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke \| --smoke-only] [--json]` | **The gate**: checks 1–4 and 5a–5d on the working tree vs a base ref (default: merge-base with `main` or `origin/main`, whichever is newer). About 30 s with the smoke test, 2 s with `--no-smoke`. Exit 0 PASS, 1 FAIL, 2 setup error. CI runs it on every push and pull request (two jobs: `gate` with `--no-smoke`, `smoke` with `--smoke-only`). | acorn, eslint-scope; 5a: playwright + Chromium |
-| `node tools/smoke.mjs [--json]` | Check 5a alone: the real pages in headless Chromium (index: menu → Deploy → tutorial → W + two shots, ~5 s of play → Esc → Menu; editor: Map editor → Maps → close → Menu). FAILS on any page error, console error or request that leaves the repo; warnings are listed only. | playwright + Chromium, three |
+| `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke \| --smoke-only] [--json]` | **The gate**: checks 1–4 and 5a–5d on the working tree vs a base ref (default: merge-base with `main` or `origin/main`, whichever is newer). About 30 s with the smoke test, 2 s with `--no-smoke`. Exit 0 PASS, 1 FAIL, 2 usage or setup error (2 also when the only failure is 5a missing Playwright or Chromium). CI runs it on every push and pull request (two jobs: `gate` with `--no-smoke`, `smoke` with `--smoke-only`). | acorn, eslint-scope; 5a: playwright + Chromium |
+| `node tools/smoke.mjs [--json]` | Check 5a alone: the real pages in headless Chromium (index: menu → Deploy → tutorial → W + two shots, ~5 s of play → Esc → Menu; editor: Map editor → Maps → close → Menu). Each step checks it did its job (the player moved, both clicks reached the canvas, the lists filled). FAILS on any page error, console error, network request, WebSocket or file read outside the repo; warnings are listed only. Not seen: errors more than ~1 s after the last step, and code it never reaches. | playwright + Chromium, three |
 | `node tools/battery.js .` | Checks 3–4 as raw JSON (symbols per file, duplicates, editor references). | acorn |
 | `node tools/preview.js . menu <out.png>` | Renders the real 3D scene headless (WebGL1). Also `shot <out.png> <x> <z>`, `top`, `eval <snippet.js>`, `evalshot`, `measure`, `time`, `list`. No HUD/DOM/CSS. | gl, @napi-rs/canvas, three, pngjs |
 | `node tools/preview.js . eval tools/sim.js` | Headless 90 s match: bot stall %, harvesters. Random AI: compare 3+ runs. | as preview.js |
@@ -27,14 +27,20 @@ smoke FAILS with this setup command (it never skips silently); `--no-smoke` runs
 **Check 5 in short** (the gate's own header has the details):
 - **5a smoke**: the pages actually run (load-time crashes, TDZ, a missing script, an error in deploy or the editor).
 - **5b names**: every bare name resolves (eslint-scope over each page's scripts and inline `on…="…"` handlers) to a
-  local, a top-level declaration of that page's build, an ECMAScript built-in, or `tools/gate-globals.json`. A new
-  browser API means one line in that list. `typeof x` operands are exempt; index.html's references to editor-only
-  symbols are check 4's (it proves they are guarded). Handlers resolve against the page's globals only: write
-  `document.body`, not `body`.
+  local, a top-level declaration of that page's build, an ECMAScript built-in, or `tools/gate-globals.json`. Also: no
+  assignment to a `const`, and every `THREE.<member>` exists in three r128 (so no `CapsuleGeometry`).
+  - A browser API the code really needs is one line in `gate-globals.json`. That file is reviewed data, not a gate tool.
+  - `typeof x` operands are exempt. index.html's references to editor-only symbols are check 4's (it proves they are
+    guarded); a page-specific hook called from shared code behind `typeof` therefore belongs in `shamble-editor.js`.
+  - Handlers resolve against the page's globals only: write `document.body` or `this.value`, not `body` or `value`.
+  - Strict on purpose, so a few valid patterns FAIL: sloppy-mode functions declared inside a block (Annex B), direct
+    `eval`, and names that exist only as `window` properties. The built-ins come from the Node that runs the gate, so
+    use Node 22 like CI (the 5b line prints the version).
 - **5c layering**: `shamble-core.js` references nothing declared in game, editor or the inline scripts, not even
   behind `typeof`.
 - **5d script order**: each page loads exactly three r128 (cdnjs) → core → game [→ editor] → one inline script, with no
-  `async`, `defer`, `nomodule` or `type="module"`.
+  `async`, `defer`, `nomodule` or `type="module"`. The pages are read the way the browser reads them (commented-out tags
+  don't count, any attribute quoting, every JavaScript MIME type counts as a script).
 
 **pageshot.js renderer:** headless runs on SwiftShader (CPU). `--headed` opens a real window on the GPU. Every run
 prints the WebGL renderer string, and every `shot` line repeats it, so you can tell an RTX render from a SwiftShader one.

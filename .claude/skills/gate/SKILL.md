@@ -1,7 +1,7 @@
 ---
 name: gate
 description: 'The SHAMBLE FRONTLINES verification gate: syntax of every file and inline script, load-order concatenation for both pages, symbol conservation against a base ref, player-build resolvability, and check 5 (a headless smoke run of both pages, undefined names, core layering, script order). Use after ANY edit to shamble-*.js or the HTML pages, and before every commit, report or merge.'
-argument-hint: '[baseRef, default: merge-base with main]'
+argument-hint: '[baseRef, default: merge-base with main or origin/main, whichever is newer]'
 ---
 Run `node tools/gate.mjs $ARGUMENTS` and read the whole output.
 
