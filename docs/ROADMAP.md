@@ -36,6 +36,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 - **Map editor (sandbox):** grid/angle snap, gizmos + resize handles, path decals, marquee + group ops, Tab playtest, dockable World panel, undo/redo, numeric inspector, mirror/array/prefab stamps, analysis overlays, verticality; **dark-token UI overhaul**; **Building Maker** (`BK` kit-of-parts: footprint/roof/skins/dormers + seeded `BK.roll`; one region preset so far: `normandy`).
 - **Architecture:** timber house, thatched cottage, brick-and-flint farmhouse, Norman manor (round tower + conical roof); trees (apple/poplar/oak), props (8 kinds), covers (hedge/drystone/fence).
 - **Art direction:** "Lush Comic" → relocked as **"Living Comic"** (2026-07-08, ART_DIRECTION §9 steps 1–5: 2-band ramps, differential dark ink, Living Comic env, brightened primaries, Empire elite villain, halftone default-off).
+- **Storage (2026-09-25):** `KVStore` adapter (window.storage → localStorage → memory); stores no longer silently in-memory under `file://`; the tutorial no longer re-opens on every deploy.
 - **Structure:** file split (2026-07-12) — single ~4,680-line HTML → core/game/editor + two pages; player menu is Play + Career only.
 - **Headless toolkit (2026-09-25):** `preview.js` renders the real build (WebGL1); `battery.js` implements checks 3–4 on an AST (mutation-tested against the `placeCursor` incident); `sim.js` runs a headless 90 s match.
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~6 MB/s residual GC churn (measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -54,7 +55,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 - **Architecture:** real base buildings (HQ / barracks / refinery / power plant are still placeholder boxes); fix the candy-stripe brick farmhouse; more region presets.
 - **AI:** bots route around obstacles (grid A*, `navSteer`); richer behaviours (shield / molotov / officer) still to design.
 - **Performance (open):** static kit pieces merged by material (village 398 → 202 draw calls); FX pooling with Comic Impact; pre-declare runtime-added object fields; skip the 3D render while the opaque menu covers the screen (it renders every frame behind it today). See `AUDIT_BUGS_PERF.md` §6.
-- **Editor bugs (pre-existing, three):** `refreshPrefabList`, `refreshMapList` and `edSavePrefab` are declared inside `bootEditor()` but called from top-level `enterEditor` / `openMaps` / `edBuildInspector` → ReferenceError each time. Fix: hoist them (change-set editor-prefab-list). [verified by code scan; runtime check pending]
+- **Editor bugs (three ReferenceErrors):** fixed on cs/editor-prefab-list (functions hoisted out of `bootEditor()`), awaiting merge (after PR #3) and Mustafa's Brave check.
 - **Animation:** actions (flinch, deaths, weapon draw, throws, bayonet thrust), katana + shield on IK, and the Anim Lab (Character Lab tab) — built, awaiting Brave check. Reference + next steps: `ANIMATION_PLAN.md`. DEV: after Unlock All, mouse wheel / 2 cycle every gun.
 - **UI theme (approved mockup):** "war-room dossier" drawn in the Living Comic style — inked sheets with halftone cel shadows, stencil headings, rubber-stamp juice, ease-in-out pen marks (4 variants); paper for menu screens, dark field-kit crate for in-game overlays. Source of truth: `ui_theme_mockup.html` (keep in Project Knowledge). Menu + pause done (awaiting Brave); next: service record + end of round → armory + scoreboard, each gated on Mustafa's screenshots; then the first-deploy tutorial — it lists dead controls (V / B / 1–5), so make it the clipboard's field manual (one controls list).
 - **Character rework (later):** move from the blocky look to Foxhole-like human proportions; the service-record portrait in the mockup is the style target.
@@ -64,6 +65,8 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**Editor: three ReferenceErrors fixed [2026-10-14]** — editor-prefab-list (cs/editor-prefab-list, PR open, stacked on PR #3): `refreshPrefabList`, `refreshMapList` and `edSavePrefab` hoisted unchanged out of `bootEditor()` to top level in `shamble-editor.js`; the prefab list fills on entry, Maps lists saved maps, "Save as prefab" works. Gate PASS (+3 editor symbols), verifier PASS; headless before/after: 4 ReferenceErrors → none. Awaiting Advisor APPROVE and Brave check. Found: the gate's default base can use a stale local `main` (fix proposed in gate-check-5).
 
 **Kit v1.1 + Phase 0 merged [2026-10-14]** — Phase 0 merged (PR #2, 2d30e4a, Advisor APPROVE; CS-1 / PR #1 approved after the fact); stays PARTIAL until Mustafa's Windows run. kit-v1-1 (cs/kit-v1-1, PR open): Advisor's `.claude/settings.json` applied exactly + standing-permission paragraph in CLAUDE.md; proposed amendment of 19 deny rules (push-to-main by refspec, force forms, `--mirror`/`--delete`, `--upload-pack`/`ext::`, `--output`) awaits the Advisor's OK. No code touched. Scan found the editor bug is three bugs. Branch protection on `main` recommended. Order: editor-prefab-list → gate-check-5 → bot-poplar-wedge → Prompts 1–3.
 
@@ -86,5 +89,3 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **Colour pass [2026-09-25]** — `LinearEncoding` output (sRGB output had brightened every authored colour twice → washed-out look, grey shadows). Option-C lights (sun 0.8, hemi 0.32, amb 0.12); `ENV.nature.gain` 1.56 keeps the environment lush; World panel "Nature brightness" slider.
 
 **Ink: contact lines [2026-09-25]** — outline hulls use smoothed + mitred directions (`ensureOutlineNormals`), world-space thickness and a ground clamp → continuous ink where objects meet the ground; weights unchanged (measured).
-
-**Storage fix [2026-09-25]** — `KVStore` adapter (window.storage → localStorage → memory); stores no longer silently in-memory under `file://`; the tutorial no longer re-opens on every deploy.

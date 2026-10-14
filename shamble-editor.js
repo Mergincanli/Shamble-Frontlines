@@ -954,6 +954,38 @@ function edLeaveToMenu(){
   edSetSel([]); if(edGhost)edGhost.visible=false; edPreview=false; edPvBanner.style.display='none'; edPalette.style.opacity='';
 }
 
+/* Called from top-level code (enterEditor, openMaps, the inspector's Save-as-prefab button), so they must live at the
+   top level: declared inside bootEditor() they were invisible there and every call threw a ReferenceError. */
+async function refreshMapList(){ const names=await MapStore.list(); edMapList.innerHTML='';
+  if(!names.length){ const e=document.createElement('div'); e.className='edEmpty'; e.textContent='No saved maps yet.'; edMapList.appendChild(e); return; }
+  names.forEach(name=>{ const row=document.createElement('div'); row.className='edMapRow';
+    const nm=document.createElement('span'); nm.className='edMapName'; nm.textContent=name;
+    const load=document.createElement('div'); load.className='edBtn edBtnSm'; load.textContent='Load';
+    const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';
+    load.onclick=async()=>{ const def=await MapStore.load(name); if(def){ buildMap(def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none'; } };
+    let armed=false, tmr=null;
+    del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };
+    row.append(nm,load,del); edMapList.appendChild(row);
+  });
+}
+async function edSavePrefab(){ const items=edMulti.map(edDescribe).filter(Boolean); if(!items.length)return null;
+  let sx=0,sz=0,n=0; for(const s of edMulti){ const a=edAnchor(s); if(a){ sx+=a.x; sz+=a.z; n++; } } if(!n)return null; const cx=sx/n, cz=sz/n;
+  items.forEach(d=>{ d.rx=(d.ax||0)-cx; d.rz=(d.az||0)-cz; });
+  const names=await PrefabStore.list(); let i=names.length+1, name='Prefab '+i; while(names.indexOf(name)>=0){ i++; name='Prefab '+i; }
+  await PrefabStore.save(name,{items}); await refreshPrefabList(); return name;
+}
+async function refreshPrefabList(){ const list=document.getElementById('edPrefabList'); if(!list)return; const names=await PrefabStore.list(); list.innerHTML='';
+  if(!names.length){ const e=document.createElement('div'); e.className='edPrefabEmpty'; e.textContent='No prefabs saved yet.'; list.appendChild(e); return; }
+  names.forEach(name=>{ const row=document.createElement('div'); row.className='edPrefab'; row.dataset.prefab=name;
+    const nm=document.createElement('span'); nm.className='edPrefabNm'; nm.textContent=name;
+    const del=document.createElement('span'); del.className='edPrefabX'; del.textContent='✕'; del.title='Delete prefab';
+    row.append(nm,del); list.appendChild(row);
+    row.addEventListener('click',async(ev)=>{ if(ev.target===del)return; const data=await PrefabStore.load(name); if(data&&data.items&&data.items.length)edSelectPrefab(name,data.items,row); });
+    let armed=false,tmr=null;
+    del.addEventListener('click',async(ev)=>{ ev.stopPropagation(); if(!armed){ armed=true; del.textContent='✓?'; clearTimeout(tmr); tmr=setTimeout(()=>{ armed=false; del.textContent='✕'; },2000); return; } await PrefabStore.del(name); if(edTool==='prefab')setEdTool('select'); refreshPrefabList(); });
+  });
+}
+
 function bootEditor(){
 document.getElementById('mEditor').addEventListener('click',enterEditor);
 addEventListener('keydown',e=>{ if(mode==='charlab' && e.altKey && (e.key==='z'||e.key==='Z')){ e.preventDefault(); clUndoPop(); } });
@@ -1039,40 +1071,11 @@ document.querySelectorAll('#edPalette .edTool').forEach(el=>el.addEventListener(
 document.querySelectorAll('#edPalette .edToggle').forEach(el=>el.addEventListener('click',()=>ovToggle(el.dataset.ov)));
 
 /* ---- map save/load (persistent storage if available, else in-session) ---- */
-async function refreshMapList(){ const names=await MapStore.list(); edMapList.innerHTML='';
-  if(!names.length){ const e=document.createElement('div'); e.className='edEmpty'; e.textContent='No saved maps yet.'; edMapList.appendChild(e); return; }
-  names.forEach(name=>{ const row=document.createElement('div'); row.className='edMapRow';
-    const nm=document.createElement('span'); nm.className='edMapName'; nm.textContent=name;
-    const load=document.createElement('div'); load.className='edBtn edBtnSm'; load.textContent='Load';
-    const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';
-    load.onclick=async()=>{ const def=await MapStore.load(name); if(def){ buildMap(def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none'; } };
-    let armed=false, tmr=null;
-    del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };
-    row.append(nm,load,del); edMapList.appendChild(row);
-  });
-}
 document.getElementById('edMaps').addEventListener('click',openMaps);
 document.getElementById('edMapsClose').addEventListener('click',()=>edMapsModal.style.display='none');
 document.getElementById('edSaveBtn').addEventListener('click',async()=>{ const n=document.getElementById('edSaveName').value.trim(); if(!n)return; await MapStore.save(n,serializeMap()); document.getElementById('edMapName').textContent=n; const b=document.getElementById('edSaveBtn'); b.textContent='Saved!'; setTimeout(()=>b.textContent='Save current',1200); refreshMapList(); });
 
 /* ============ PREFAB STAMPS (editor) ============ */
-async function edSavePrefab(){ const items=edMulti.map(edDescribe).filter(Boolean); if(!items.length)return null;
-  let sx=0,sz=0,n=0; for(const s of edMulti){ const a=edAnchor(s); if(a){ sx+=a.x; sz+=a.z; n++; } } if(!n)return null; const cx=sx/n, cz=sz/n;
-  items.forEach(d=>{ d.rx=(d.ax||0)-cx; d.rz=(d.az||0)-cz; });
-  const names=await PrefabStore.list(); let i=names.length+1, name='Prefab '+i; while(names.indexOf(name)>=0){ i++; name='Prefab '+i; }
-  await PrefabStore.save(name,{items}); await refreshPrefabList(); return name;
-}
-async function refreshPrefabList(){ const list=document.getElementById('edPrefabList'); if(!list)return; const names=await PrefabStore.list(); list.innerHTML='';
-  if(!names.length){ const e=document.createElement('div'); e.className='edPrefabEmpty'; e.textContent='No prefabs saved yet.'; list.appendChild(e); return; }
-  names.forEach(name=>{ const row=document.createElement('div'); row.className='edPrefab'; row.dataset.prefab=name;
-    const nm=document.createElement('span'); nm.className='edPrefabNm'; nm.textContent=name;
-    const del=document.createElement('span'); del.className='edPrefabX'; del.textContent='✕'; del.title='Delete prefab';
-    row.append(nm,del); list.appendChild(row);
-    row.addEventListener('click',async(ev)=>{ if(ev.target===del)return; const data=await PrefabStore.load(name); if(data&&data.items&&data.items.length)edSelectPrefab(name,data.items,row); });
-    let armed=false,tmr=null;
-    del.addEventListener('click',async(ev)=>{ ev.stopPropagation(); if(!armed){ armed=true; del.textContent='✓?'; clearTimeout(tmr); tmr=setTimeout(()=>{ armed=false; del.textContent='✕'; },2000); return; } await PrefabStore.del(name); if(edTool==='prefab')setEdTool('select'); refreshPrefabList(); });
-  });
-}
 /* ============ WORLD / ENVIRONMENT PANEL + UNDO/REDO (editor) ============ */
 edBuildWorld();
 document.getElementById('edWorldBtn').addEventListener('click',edToggleWorld);
