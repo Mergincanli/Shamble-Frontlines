@@ -640,7 +640,7 @@ function dedupeMapDef(def){ if(!def||typeof def!=='object'||Array.isArray(def)) 
   const out={...def}; let droppedTrees=0, droppedProps=0;
   for(const k of ['trees','props']){ const a=def[k]; if(!Array.isArray(a)) continue; const seen=new Set(), keep=[];
     for(const e of a){ if(!e||typeof e!=='object'||e.seed==null){ keep.push(e); continue; }
-      const key=JSON.stringify(k==='props'?{...e,rot:e.rot||0}:e);
+      let key; try{ key=JSON.stringify(k==='props'?{...e,rot:e.rot||0}:e); }catch(_){ keep.push(e); continue; }   // fail open: keep it
       if(seen.has(key)){ if(k==='trees')droppedTrees++; else droppedProps++; continue; } seen.add(key); keep.push(e); }
     out[k]=keep; }
   return {def:out, droppedTrees, droppedProps}; }

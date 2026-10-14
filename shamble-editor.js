@@ -968,10 +968,10 @@ async function refreshMapList(){ const names=await MapStore.list(); edMapList.in
     const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';
     load.onclick=async()=>{ const saved=await MapStore.load(name); if(!saved)return;
       const dd=dedupeMapDef(saved), parts=[];
-      if(dd.droppedTrees)parts.push(dd.droppedTrees+' duplicate tree'+(dd.droppedTrees===1?'':'s'));
-      if(dd.droppedProps)parts.push(dd.droppedProps+' duplicate prop'+(dd.droppedProps===1?'':'s'));
+      if(dd.droppedTrees)parts.push(dd.droppedTrees+' tree'+(dd.droppedTrees===1?'':'s'));
+      if(dd.droppedProps)parts.push(dd.droppedProps+' prop'+(dd.droppedProps===1?'':'s'));
       buildMap(dd.def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none';
-      edFlashHint(parts.length?'Removed '+parts.join(' and ')+' (exact '+(dd.droppedTrees+dd.droppedProps===1?'copy':'copies')+'). Save to keep this.':''); };
+      edFlashHint(parts.length?'Removed exact duplicates: '+parts.join(', ')+'. Save to keep.':''); };
     let armed=false, tmr=null;
     del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };
     row.append(nm,load,del); edMapList.appendChild(row);
