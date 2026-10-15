@@ -6,7 +6,9 @@
 - Headless sims see live positions.
 - Four small bugs fixed: bar width, enemy armory, scoreboard churn, map names.
 
-This is step 0 of the approved three-teams plan (bugs before features).
+This is step 0 of the approved three-teams plan (bugs before features). PR:
+[#11](https://github.com/Mergincanli/Shamble-Frontlines/pull/11). The B labels are the three-teams plan's, not the
+2026-09-26 B1–B3 in `AUDIT_BUGS_PERF.md`.
 
 ## Outcome
 - **All six fixes are done**, and each has its own before/after measurement (table below).
