@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-14, docs-loop-v2 on cs/docs-loop-v2._
+_Last updated: 2026-10-15, docs-loop-v2 on cs/docs-loop-v2 (main merged in after PR #8)._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
@@ -9,13 +9,15 @@ gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Window
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
 **Merged today:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367), kit-v1-2 (PR #6, ef019e0),
 bot-poplar-wedge (PR #7, 159bec4).
-**In flight:** editor-undo-ground (PR #8: Advisor APPROVE; Mustafa's Ctrl+Z check in Brave passed; merge on Mustafa's
-go), map-dedupe-on-load (plan APPROVED as revised, built on #8) and docs-loop-v2 (docs only, pre-approved).
+**Merged 2026-10-15:** editor-undo-ground (PR #8, b5f4ecf). **In flight:** map-dedupe-on-load (PR #10, Advisor APPROVE,
+waits on Mustafa's Brave check), docs-loop-v2 (PR #9, Advisor APPROVE), team-prep-fixes (three-teams plan APPROVED with
+D1–D16; starting), and a read-only diagnosis of three editor bugs (tree delete, rotation slider, lag).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
 flags any [OPEN] item it needs decided; all numbers live in one tunable data table; [LATER] items are not built.
-**Queue (Advisor, 2026-10-14, late; one change-set at a time):** editor-undo-ground (approved, merge on Mustafa's go) →
-map-dedupe-on-load (building, on #8) → docs-loop-v2 → greybox phase: 1. three-teams → 2. octopon-3-greybox →
+**Queue (Advisor, 2026-10-15; one change-set at a time):** map-dedupe-on-load (approved, Brave check) → docs-loop-v2
+(approved) → greybox phase: 1. three-teams, split by the approved plan into 0. team-prep-fixes → 3a three-teams-core →
+3b three-teams-hud → 3c spawn-and-buy → 2. octopon-3-greybox →
 3. harvest-economy → 4. bot-replan-storm (the navSteer replan storm, bot-poplar-wedge PERF-2) → 5. uplinks →
 6. win-and-scoring → then the scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). **Paused until the greybox loop
 is playable:** tutorial-field-manual, ui-step-2, ui-step-3, build-spike and the ADR run (Prompt 3). house-textures-seeded
@@ -29,9 +31,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 | kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
 | kit-v1-2 (narrowed the playwright allow rule) | merged: PR #6, ef019e0, 2026-10-14, Advisor APPROVE | done | none |
 | bot-poplar-wedge (`shamble-game.js` only: navBuild clearance 0.7 m + half a cell, navPath start from nearest open cell, 3-call warm-up at end of bootGame; symbols +0 -0) | merged: [PR #7](https://github.com/Mergincanli/Shamble-Frontlines/pull/7), 159bec4, 2026-10-14, Advisor APPROVE | done; report `docs/reports/2026-10-14-bot-poplar-wedge.md` | none |
-| editor-undo-ground (`shamble-game.js` only: `addBox`, `addPath`, `makeBuilding`, `makeBarracks` and the `buildMap` terminal now call `stylizeOne()`; `clearMap` now clears `trees[]` and `props[]`; symbols +0 -0) | cs/editor-undo-ground; [PR #8](https://github.com/Mergincanli/Shamble-Frontlines/pull/8), main merged in after #7 | gate PASS (all 8 checks); art-director and perf-auditor PASS WITH NOTES; Advisor APPROVE; Mustafa's Brave check: Ctrl+Z works (screenshots 2026-10-14); report `docs/reports/2026-10-14-editor-undo-ground.md` | Mustafa's go to merge |
+| editor-undo-ground (`shamble-game.js` only: `addBox`, `addPath`, `makeBuilding`, `makeBarracks` and the `buildMap` terminal now call `stylizeOne()`; `clearMap` now clears `trees[]` and `props[]`; symbols +0 -0) | merged: [PR #8](https://github.com/Mergincanli/Shamble-Frontlines/pull/8), b5f4ecf, 2026-10-15, Advisor APPROVE | done: Mustafa's Brave check passed; report `docs/reports/2026-10-14-editor-undo-ground.md` | none |
 | docs-loop-v2 (docs only: docs/LOOP_V2.md added; pointers in GAME_DESIGN §5–6, DESIGN_NOTES (death tax → Recruit, Spy target → harvester building, Momentum largely answered, three-team question partly answered) and START_HERE's doc list; STATUS / ROADMAP queue) | cs/docs-loop-v2 | pre-approved (docs only) | Advisor APPROVE to merge |
-| map-dedupe-on-load (drop exact duplicate trees / props when a saved map loads; status-bar note; no auto-save) | cs/map-dedupe-on-load, built on cs/editor-undo-ground | plan APPROVED as revised (after a read-only adversarial plan review) | implementation, evidence, reviews |
+| map-dedupe-on-load (drop exact duplicate trees / props when a saved map loads; status-bar note; no auto-save) | cs/map-dedupe-on-load; [PR #10](https://github.com/Mergincanli/Shamble-Frontlines/pull/10), now based on main | built; gate PASS; 29 harness checks; security-auditor and art-director PASS WITH NOTES; Advisor APPROVE | Mustafa's Brave check, then merge |
 | Diagnosis (read-only): poplar wedge + editor Ctrl+Z re-rolls ground textures | n/a | done, both plans approved (wedge: bot-poplar-wedge; Ctrl+Z: editor-undo-ground) | none |
 | editor-prefab-list | merged: PR #4, c458fe7, 2026-10-14 | done: Mustafa's Brave check of editor.html passed (no problems), Advisor APPROVE | none |
 | gate-check-5 (5a smoke, 5b names, 5c layering, 5d script order; CI jobs gate + smoke) | merged: PR #5, 8675367, 2026-10-14 | done: Advisor APPROVE after his own full-gate run (PASS, 26 s) and mutations that failed correctly | none |
@@ -57,8 +59,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 
 ## Open bugs and risks
 - First-deploy tutorial lists controls that no longer exist (V melee, B shield, 1–5 switch): every new player sees it (fix paused with tutorial-field-manual until the greybox loop is playable)
-- Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed on cs/editor-undo-ground (PR #8, approved; Mustafa confirmed Ctrl+Z in Brave), pending merge. Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
-- Maps saved on older builds after an undo may still contain duplicate trees and props; the next change-set, map-dedupe-on-load, drops exact duplicates on load
+- Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed and merged (PR #8, b5f4ecf; Mustafa confirmed Ctrl+Z in Brave). Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
+- Maps saved on older builds after an undo may still contain duplicate trees and props; map-dedupe-on-load (PR #10, approved) drops exact duplicates on load
+- New editor bugs reported by Mustafa (2026-10-15, editor.html on main): placed trees can't be deleted; rotation does nothing when the slider changes; the editor lags after a few placements. Read-only diagnosis under way; a hotfix plan follows if the fix is small
 - Deferred, low (editor-undo-ground PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
 - Editor three-bug entry (prefab list, Maps list, Save as prefab): fixed and merged (PR #4, c458fe7), Brave check passed

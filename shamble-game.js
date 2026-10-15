@@ -81,7 +81,7 @@ const trees=[]; // point-placed vegetation (apple / poplar / oak) -- single AABB
 const props=[]; // farmyard dressing (haystack / cart / well / ...) -- rotatable, per-prop AABB collider + serialize
 const crateMat=new THREE.MeshStandardMaterial({color:0x2c3a3b,roughness:0.85});
 const crateMatWarm=new THREE.MeshStandardMaterial({color:0x3a3330,roughness:0.85});
-function addBox(x,z,w,h,d,mat,isCrate){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat||crateMat);m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);const o={mesh:m,box:new THREE.Box3().setFromObject(m),w,h,d,warm:mat===crateMatWarm,crate:isCrate!==false};m.userData.editSel={kind:o.crate?'crate':'wall',ref:o};obstacles.push(o);return o;}
+function addBox(x,z,w,h,d,mat,isCrate){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat||crateMat);m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);if(typeof stylizeOne==='function')stylizeOne(m);const o={mesh:m,box:new THREE.Box3().setFromObject(m),w,h,d,warm:mat===crateMatWarm,crate:isCrate!==false};m.userData.editSel={kind:o.crate?'crate':'wall',ref:o};obstacles.push(o);return o;}
 // ---- Phase 5: walkable elevated platforms (solid box from ground to top; sides are cliffs, top is a walkable surface) ----
 const platMat=new THREE.MeshStandardMaterial({color:0x6f7358,roughness:0.96});
 const platforms=[];
@@ -94,7 +94,7 @@ function rampGeometry(w,d,h0,h1){ const hw=w/2, hd=d/2;
 const ramps=[];
 function makeRamp(x,z,w,d,h0,h1,rot){ const m=new THREE.Mesh(rampGeometry(w,d,h0||0,h1), platMat); m.position.set(x,0,z); m.rotation.y=rot||0; m.castShadow=true; m.receiveShadow=true; scene.add(m); if(typeof stylizeOne==='function')stylizeOne(m); const o={mesh:m,box:new THREE.Box3().setFromObject(m),w,d,h0:h0||0,h1,rot:rot||0,x,z}; m.userData.editSel={kind:'ramp',ref:o}; ramps.push(o); return o; }
 function rampHeightAt(o,x,z){ const dx=x-o.x, dz=z-o.z, c=Math.cos(o.rot), s=Math.sin(o.rot); const lx=c*dx - s*dz, lz=s*dx + c*dz; if(lx< -o.w/2 || lx> o.w/2 || lz< -o.d/2 || lz> o.d/2) return null; const t=(lx + o.w/2)/o.w; return o.h0 + (o.h1-o.h0)*t; }
-function addPath(cx,cz,w,d,rotY){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.06,d), new THREE.MeshStandardMaterial({color:0x8f8c86,roughness:1.0})); m.position.set(cx,0.03,cz); if(rotY)m.rotation.y=rotY; m.receiveShadow=true; scene.add(m); const o={mesh:m,w,d}; m.userData.editSel={kind:'path',ref:o}; paths.push(o); return o; }
+function addPath(cx,cz,w,d,rotY){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.06,d), new THREE.MeshStandardMaterial({color:0x8f8c86,roughness:1.0})); m.position.set(cx,0.03,cz); if(rotY)m.rotation.y=rotY; m.receiveShadow=true; scene.add(m); if(typeof stylizeOne==='function')stylizeOne(m); const o={mesh:m,w,d}; m.userData.editSel={kind:'path',ref:o}; paths.push(o); return o; }
 /* crates, buildings, barracks, spawn + resupply are now data-driven — see DM_Romania + buildMap() below */
 
 /* labels */
@@ -496,7 +496,7 @@ function makeBuilding(team,type,x,z){
   const m=new THREE.Mesh(new THREE.BoxGeometry(dims[0],dims[1],dims[2]),new THREE.MeshStandardMaterial({color:base,roughness:0.85,metalness:0.2}));
   m.position.set(x,dims[1]/2,z); m.castShadow=true; m.receiveShadow=true; scene.add(m);
   const trim=new THREE.Mesh(new THREE.BoxGeometry(dims[0]+0.12,0.55,dims[2]+0.12),new THREE.MeshStandardMaterial({color:accent,emissive:accent,emissiveIntensity:0.65,roughness:0.4}));
-  trim.position.set(x,dims[1]-0.7,z); noRay(trim); scene.add(trim);
+  trim.position.set(x,dims[1]-0.7,z); noRay(trim); scene.add(trim); if(typeof stylizeOne==='function'){ stylizeOne(m); stylizeOne(trim); }
   const label=makeLabel(type.toUpperCase(),isF?'#7af0d2':'#ff8a8a'); label.position.set(x,dims[1]+1.5,z); scene.add(label);
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(dims[0]*0.9,0.4),new THREE.MeshBasicMaterial({color:0x101616})); noRay(bg);
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(dims[0]*0.9,0.4),new THREE.MeshBasicMaterial({color:accent})); fg.position.z=0.01; noRay(fg);
@@ -532,6 +532,7 @@ function makeBarracks(cx,cz,team){
   panel.add(frame,screen); panel.position.set(cx,1.55,cz-D/2+t/2+0.12); panel.traverse(o=>noRay(o)); scene.add(panel);
   const plabel=makeLabel('ARMORY',txtCol); plabel.position.set(cx,2.62,cz-D/2+t/2+0.2); plabel.scale.set(2.6,0.7,1); scene.add(plabel);
   const panelPos=new THREE.Vector3(cx,0,cz-D/2+1.0);
+  if(typeof stylizeOne==='function'){ stylizeOne(lintel); stylizeOne(floor); stylizeOne(roof); stylizeOne(panel); }   // runtime builder: stylizeScene only ran at boot
   const ent={cx,cz,team:team||'neutral',iw:W/2-t,id:D/2-t,walls,roof,roofM,label,lintel,floor,panel,plabel,panelPos,op:1};
   walls.forEach(w=>{ w.mesh.userData.editSel={kind:'barracks',ref:ent}; }); // click a wall to select the barracks
   barracksList.push(ent); return ent;
@@ -554,6 +555,8 @@ function clearMap(){ NAV.ok=false;
   ramps.forEach(r=>{ scene.remove(r.mesh); _disposeObj3D(r.mesh,seen); }); ramps.length=0;
   houses.forEach(h=>{ scene.remove(h.grp); _disposeObj3D(h.grp,seen); }); houses.length=0;
   covers.forEach(o=>{ scene.remove(o.grp); _disposeObj3D(o.grp,seen); }); covers.length=0;
+  trees.forEach(o=>{ scene.remove(o.grp); _disposeObj3D(o.grp,seen); }); trees.length=0;   // were never cleared: every rebuild (undo, redo,
+  props.forEach(o=>{ scene.remove(o.grp); _disposeObj3D(o.grp,seen); }); props.length=0;   // reset, load) stacked another copy of them all
   enemySpawns.forEach(sp=>{ enemySpawnLayer.remove(sp.grp); _disposeObj3D(sp.grp,seen); }); enemySpawns.length=0;
   if(termMesh){ scene.remove(termMesh); _disposeObj3D(termMesh,seen); termMesh=null; } if(resupplyLabel){ scene.remove(resupplyLabel); _disposeObj3D(resupplyLabel,seen); resupplyLabel=null; }
 }
@@ -621,7 +624,7 @@ function buildMap(def){
   (def.barracks||[]).forEach(b=>{ const e=makeBarracks(b.x,b.z,b.team); if(b.s&&b.s!==1)_scaleBarracks(e,b.s); if(b.rot)_rotateBarracksBy(e,b.rot); });
   const rs=def.resupply||{x:0,z:34}; terminalPos.set(rs.x,0,rs.z);
   termMesh=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.6,1),new THREE.MeshStandardMaterial({color:0x183a36,emissive:0x0e2a26,emissiveIntensity:0.5,roughness:0.5}));
-  termMesh.position.set(rs.x,0.8,rs.z); termMesh.castShadow=true; termMesh.userData.editSel={kind:'resupply'}; scene.add(termMesh);
+  termMesh.position.set(rs.x,0.8,rs.z); termMesh.castShadow=true; termMesh.userData.editSel={kind:'resupply'}; scene.add(termMesh); if(typeof stylizeOne==='function')stylizeOne(termMesh);
   if(rs.rot)termMesh.rotation.y=rs.rot; if(rs.w||rs.h||rs.d){ const rw=rs.w||1.4,rh=rs.h||1.6,rd=rs.d||1; termMesh.scale.set(rw/1.4,rh/1.6,rd); termMesh.position.y=rh/2; }
   resupplyLabel=makeLabel('RESUPPLY','#7af0d2'); resupplyLabel.position.set(rs.x,2.6,rs.z); resupplyLabel.scale.set(4,1,1); scene.add(resupplyLabel);
   const sp=def.spawn||{x:0,z:30}; mapSpawn.set(sp.x,0,sp.z);
