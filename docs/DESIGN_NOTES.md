@@ -4,6 +4,9 @@ Game-design context that the other docs don't hold yet: Mustafa's decisions from
 2026), the questions they leave open, and lessons about the look. **Decisions here are Mustafa's.** Suggestions are
 marked as the Advisor's and are NOT decisions. When a question is settled, docs-keeper moves it to "Decided".
 
+> **The core loop now lives in [`LOOP_V2.md`](LOOP_V2.md)** (October 2026, Mustafa and the Advisor). Where it supersedes
+> a note below, the note is marked with a pointer (LOOP_V2 §12); the original text stays for the history.
+
 ## Progression: the highest-priority open design question
 Gun tiers T1→T4 stay on hold until progression is settled: whether power is gated in the match (era) or by the
 account changes what a tier even is.
@@ -13,16 +16,21 @@ account changes what a tier even is.
   lives in the selection layer; aim and positioning decide the actual gunfight.
 - **Momentum:** progression within a match, fed by kills and objectives (the current idea: roguelike "pick one of
   three" upgrades). Resets every match.
+  → *LOOP_V2 §4 largely answers this: in-match progression is the team's tech tiers, which unlock abilities, units and
+  vehicles.*
 - **Mastery:** account XP unlocks breadth (more classes, more options), never raw power.
 
 ### Decided by Mustafa
 - **Death tax.** Momentum persists until the end of the match: you keep your money. Dying costs the unit you bought:
   you respawn as a Conscript and must buy again. Buying and dying with higher-tier units should have a consequence.
+  → *LOOP_V2 §5: you now respawn as a **Recruit** (free, Luger pistol), not a Conscript.*
 - **Tiers are sophistication, not damage.** Higher tiers feel noticeably but subtly stronger, mainly by unlocking more
   sophisticated units with new capabilities, not through bigger damage numbers.
 - **The Spy**, a hybrid of the TF2 Spy and the Red Alert 3 Allied Spy: looks like the enemy, can backstab, and can
   reach the enemy terminal to steal their tech points, so a team can lose Tech. This creates mid-game twists and gives
   teams a reason to contest the Tech Box objectives.
+  → *LOOP_V2 §5: the hack target is now the enemy **harvester building** (refinery), not the terminal; Tech Boxes are
+  replaced by uplinks (§4). The Spy is `[LATER]`; its cost and rules are `[OPEN]` there.*
 - **Multiplayer scale:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16,
   possibly larger). Design for 48+ players; bots fill empty slots. (Changed 2026-10-13: was up to 16v16 or 12v12v12.)
 
@@ -39,11 +47,13 @@ account changes what a tier even is.
   payoff arrives with multiplayer (bots make poor spy-checkers).
 
 ### Open questions (decide before building the content)
-1. How Momentum is earned, and what the first small upgrade pool looks like.
+1. How Momentum is earned, and what the first small upgrade pool looks like. → *Largely answered by LOOP_V2 §4 (tech
+   tiers).*
 2. Snowball control within a match, given that Momentum survives death.
 3. Spy rules: steal or deny; what breaks the disguise; cloak or not; how lethal the backstab is.
 4. Three-team matches: a three-way map (today's map mirrors two bases), win conditions when a team falls, and
-   counters to two teams ganging up on one.
+   counters to two teams ganging up on one. → *LOOP_V2 §8–9 propose the map (Octopon-3) and a points race in which an
+   HQ kill is a points swing, not an elimination (`[DEFAULT]`); ganging-up counters are still open.*
 5. Squads of 4: squad spawning, roles, pings, and how squads read from the overhead camera.
 
 ## The look: lessons learned
