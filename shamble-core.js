@@ -1478,7 +1478,8 @@ function rayStatic(ox,oy,oz,dx,dy,dz,s,out){
   return t; }
 // All statics in one loop, the slab test inlined (B7): a call per static boxed its float arguments and result, about 80 B
 // each, so hasLOS and resolveShot allocated 18-26 KB per call. Returns the index of the nearest static hit with t < maxT
-// (the first one found when anyHit), or -1; writes the hit normal to out[0..2] and t to out[3]. Same results as rayStatic.
+// (the first one found when anyHit), or -1; writes the hit normal to out[0..2] and t to out[3]. Same results as rayStatic
+// for finite inputs (a NaN ray counts as blocked).
 function rayStatics(S,ox,oy,oz,dx,dy,dz,maxT,anyHit,out){
   let best=-1, bestT=maxT, bnx=0, bny=0, bnz=0;
   for(let i=0;i<S.length;i++){ const s=S[i]; if(s.alive===false)continue;

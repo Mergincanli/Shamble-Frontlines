@@ -1324,11 +1324,14 @@ function syncSimWorld(force){
     const th=o.mesh.rotation.y; if(Math.abs(Math.sin(2*th))>1e-3&&o.w>0&&o.d>0){ s.rot=true; s.cx=o.mesh.position.x; s.cz=o.mesh.position.z; s.rc=Math.cos(th); s.rs=Math.sin(th); s.hw=o.w*0.5; s.hd=o.d*0.5; } n++; }   // oriented box for 45° pieces
   for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i]; if(!hv.alive)continue; const hp=hv.group.position; let s=S[n]||(S[n]={}); s.kind='harvester'; s.id=i; s.alive=true; s.minx=hp.x-hv.hx;s.miny=0;s.minz=hp.z-hv.hz;s.maxx=hp.x+hv.hx;s.maxy=hv.hy;s.maxz=hp.z+hv.hz; n++; }
   for(let i=0;i<platforms.length;i++){ const bx=platforms[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
+  const rampLo=n;   // ramp slots: their boxes stand in for slopes, so bot fire skips them (main's losMeshes never held ramps)
   for(let i=0;i<ramps.length;i++){ const bx=ramps[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
+  const rampHi=n;
   for(let i=0;i<houses.length;i++){ const bs=houses[i].boxes||[houses[i].box]; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<covers.length;i++){ if(!covers[i].los||!covers[i].boxes)continue; const bs=covers[i].boxes; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<trees.length;i++){ if(!trees[i].los||!trees[i].box)continue; const bx=trees[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }for(let i=0;i<props.length;i++){ if(!props[i].los||!props[i].box)continue; const bx=props[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   S.length=n;
+  const B=_botFireWorld.statics; let m=0; for(let i=0;i<n;i++){ if(i<rampLo||i>=rampHi) B[m++]=S[i]; } B.length=m;
 }
 
 function fireOnce(){
@@ -1394,24 +1397,24 @@ function enemyClimbSteer(en, mv){ const eh=en.group.position.y; if(player.positi
 
 /* enemy fire */
 const eM=new THREE.Vector3(), _eF=new THREE.Vector3(), _eT=new THREE.Vector3(), _eEnd=new THREE.Vector3(), _zAxis=new THREE.Vector3(0,0,1);   // enemy-fire scratch + siege impact normal (B2a)
-const _eHitN=new THREE.Vector3(), _botFireWorld={ players:[null], statics:null, groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view
+const _eHitN=new THREE.Vector3(), _botFireWorld={ players:[null], statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view
 function enemyFire(en){
   en._aimT=1.4;   // raise the gun to the aim stance while shooting (cosmetic)
   const eu=unitOf(en.unit);
-  const ep=en.group.position, pp=player.position;
-  _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(pp.x,pp.y+1.45,pp.z);   // chest to chest, following both heights
+  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[0];   // aim at the same player snapshot the hit test uses
+  _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(P0.x,P0.y+1.45,P0.z);   // chest to chest, following both heights
   const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
   // B1: resolved in the SIM hit world the player's bullets use (capsules + 220 statics), never the animated player meshes.
   // Bots still only target the player, so their world holds the player alone (other bots don't block them, as before).
-  syncSimWorld(); const W=_botFireWorld; W.statics=SIM.statics; W.groundY=SIM.groundY; W.players[0]=SIM.players[0];
+  const W=_botFireWorld; W.groundY=SIM.groundY; W.players[0]=P0;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
   const r=resolveShot(W,-1,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange); let end;
   if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}
   else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
-  addTracer(eM,end,0xff5a3a);
+  addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
 function siegeFire(en,b){
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
