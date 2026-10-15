@@ -1445,7 +1445,7 @@ function rayAabb(ox,oy,oz,dx,dy,dz,minx,miny,minz,maxx,maxy,maxz,outN){ let tmin
 // PURE hitscan query — reads world, never mutates it (so the server can run it
 // against a rewound snapshot for lag compensation, then apply damage live).
 function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range){
-  const res=world._res||(world._res={}), nrm=world._nrm||(world._nrm=[0,0,0]);
+  const res=world._res||(world._res={}), nrm=world._nrm||(world._nrm=[0,0,0,0]);
   let bestT=range,kind='none',id=-1,part='',nx=-dx,ny=-dy,nz=-dz;
   const P=world.players;
   for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.alive||p.id===shooterId)continue; const baseY=p.y||0, drop=p.stance?BODY.crouchDrop:0;
@@ -1456,8 +1456,8 @@ function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range){
     t=rayCapsule(ox,oy,oz,dx,dy,dz,p.x,baseY+BODY.legBotY-drop,p.z,p.x,baseY+BODY.legTopY-drop,p.z,BODY.legR);
     if(t>=0&&t<bestT){ bestT=t;kind='enemy';id=p.id;part='legs'; nx=ox+dx*t-p.x;ny=0;nz=oz+dz*t-p.z; }
   }
-  const Sx=world.statics;
-  for(let i=0;i<Sx.length;i++){ const s=Sx[i]; if(s.alive===false)continue; const t=rayStatic(ox,oy,oz,dx,dy,dz,s,nrm); if(t>=0&&t<bestT){ bestT=t;kind=s.kind;id=s.id;part=''; nx=nrm[0];ny=nrm[1];nz=nrm[2]; } }
+  const Sx=world.statics, si=rayStatics(Sx,ox,oy,oz,dx,dy,dz,bestT,false,nrm);
+  if(si>=0){ const s=Sx[si]; bestT=nrm[3]; kind=s.kind;id=s.id;part=''; nx=nrm[0];ny=nrm[1];nz=nrm[2]; }
   if(dy<0){ const tg=(world.groundY-oy)/dy; if(tg>=0&&tg<bestT){ bestT=tg;kind='block';id=-1;part='';nx=0;ny=1;nz=0; } }
   const nl=hyp3(nx,ny,nz)||1;
   res.t=bestT; res.px=ox+dx*bestT; res.py=oy+dy*bestT; res.pz=oz+dz*bestT; res.nx=nx/nl; res.ny=ny/nl; res.nz=nz/nl; res.kind=kind; res.id=id; res.part=part; res.mult=part==='head'?PART.head:part==='legs'?PART.legs:PART.body; return res;
@@ -1467,7 +1467,7 @@ function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range){
  * Refreshes a persistent, pooled world snapshot from the live scene once per
  * shot, then castShot runs the pure resolveShot above. In Stage 2 this `SIM`
  * object is exactly what the server owns and the client predicts/reconciles. */
-const SIM={ players:[], statics:[], groundY:0, _res:{}, _nrm:[0,0,0] };
+const SIM={ players:[], statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // _nrm: hit normal xyz + t (rayStatics)
 // Ray vs one SIM static: its world AABB, or — when s.rot — an oriented box rotated about Y (editor 45° pieces): the ray is
 // taken into the box's frame (rotation keeps t), the hit normal rotated back to world. Same transform as resolveObstacles.
 function rayStatic(ox,oy,oz,dx,dy,dz,s,out){
@@ -1476,4 +1476,22 @@ function rayStatic(ox,oy,oz,dx,dy,dz,s,out){
   const t=rayAabb(c*px-sn*pz,oy,sn*px+c*pz, c*dx-sn*dz,dy,sn*dx+c*dz, -s.hw,s.miny,-s.hd, s.hw,s.maxy,s.hd, out);
   if(t>=0&&out){ const nx=out[0], nz=out[2]; out[0]=c*nx+sn*nz; out[2]=-sn*nx+c*nz; }
   return t; }
-function hasLOS(a,b){ let dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z; const dist=hyp3(dx,dy,dz); if(dist<1e-4)return true; dx/=dist;dy/=dist;dz/=dist; const S=SIM.statics; for(let i=0;i<S.length;i++){const s=S[i]; if(s.alive===false)continue; const t=rayStatic(a.x,a.y,a.z,dx,dy,dz,s,null); if(t>=0&&t<dist-0.5)return false;} return true; }
+// All statics in one loop, the slab test inlined (B7): a call per static boxed its float arguments and result, about 80 B
+// each, so hasLOS and resolveShot allocated 18-26 KB per call. Returns the index of the nearest static hit with t < maxT
+// (the first one found when anyHit), or -1; writes the hit normal to out[0..2] and t to out[3]. Same results as rayStatic.
+function rayStatics(S,ox,oy,oz,dx,dy,dz,maxT,anyHit,out){
+  let best=-1, bestT=maxT, bnx=0, bny=0, bnz=0;
+  for(let i=0;i<S.length;i++){ const s=S[i]; if(s.alive===false)continue;
+    let px=ox, pz=oz, rx=dx, rz=dz, minx=s.minx, minz=s.minz, maxx=s.maxx, maxz=s.maxz; const rot=s.rot===true;
+    if(rot){ const c=s.rc, sn=s.rs, qx=ox-s.cx, qz=oz-s.cz; px=c*qx-sn*qz; pz=sn*qx+c*qz; rx=c*dx-sn*dz; rz=sn*dx+c*dz; minx=-s.hw; minz=-s.hd; maxx=s.hw; maxz=s.hd; }
+    let tmin=-Infinity, tmax=Infinity, nx=0, ny=0, nz=0, t1=0, t2=0, tt=0, sg=0;
+    if(Math.abs(rx)<1e-9){ if(px<minx||px>maxx)continue; } else { const inv=1/rx; t1=(minx-px)*inv; t2=(maxx-px)*inv; sg=-1; if(t1>t2){tt=t1;t1=t2;t2=tt;sg=1;} if(t1>tmin){tmin=t1;nx=sg;ny=0;nz=0;} if(t2<tmax)tmax=t2; if(tmin>tmax)continue; }
+    if(Math.abs(dy)<1e-9){ if(oy<s.miny||oy>s.maxy)continue; } else { const inv=1/dy; t1=(s.miny-oy)*inv; t2=(s.maxy-oy)*inv; sg=-1; if(t1>t2){tt=t1;t1=t2;t2=tt;sg=1;} if(t1>tmin){tmin=t1;nx=0;ny=sg;nz=0;} if(t2<tmax)tmax=t2; if(tmin>tmax)continue; }
+    if(Math.abs(rz)<1e-9){ if(pz<minz||pz>maxz)continue; } else { const inv=1/rz; t1=(minz-pz)*inv; t2=(maxz-pz)*inv; sg=-1; if(t1>t2){tt=t1;t1=t2;t2=tt;sg=1;} if(t1>tmin){tmin=t1;nx=0;ny=0;nz=sg;} if(t2<tmax)tmax=t2; if(tmin>tmax)continue; }
+    let t=tmin; if(t<0){ t=tmax; if(t<0)continue; }
+    if(t>=bestT)continue;
+    if(rot){ const c=s.rc, sn=s.rs, wx=c*nx+sn*nz; nz=-sn*nx+c*nz; nx=wx; }
+    best=i; bestT=t; bnx=nx; bny=ny; bnz=nz; if(anyHit)break; }
+  if(best>=0&&out){ out[0]=bnx; out[1]=bny; out[2]=bnz; out[3]=bestT; }
+  return best; }
+function hasLOS(a,b){ let dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z; const dist=hyp3(dx,dy,dz); if(dist<1e-4)return true; dx/=dist;dy/=dist;dz/=dist; return rayStatics(SIM.statics,a.x,a.y,a.z,dx,dy,dz,dist-0.5,true,null)<0; }
