@@ -23,7 +23,8 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
    `main` (`CLAUDE.md`, `/changeset`).
 3. Set up the **toolkit** once per machine (§5): `cd tools && npm ci`.
 4. **Grep the one owning file** for the task (§6). Pull deep references only as needed:
-   `TECHNICAL.md` (how) · `GAME_DESIGN.md` (why) · `ART_DIRECTION.md` (the locked look) · `ANIMATION_PLAN.md`
+   `TECHNICAL.md` (how) · `GAME_DESIGN.md` (why) · `LOOP_V2.md` (the core loop spec; supersedes GAME_DESIGN §5–6) ·
+   `ART_DIRECTION.md` (the locked look) · `ANIMATION_PLAN.md`
    (animation system) · `AUDIT_BUGS_PERF.md` (what was measured/fixed, and what was kept on purpose) ·
    `ROADMAP.md` (history + plan) · `UNITS.md` (planned roster, not what's built) · `ui_theme_mockup.html` (UI look).
 5. **Plan first** (plan mode): your understanding of the relevant systems and your plan; **wait for Mustafa's
