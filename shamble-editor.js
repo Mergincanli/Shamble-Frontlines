@@ -69,7 +69,7 @@ function findEditSel(obj){ let o=obj; while(o){ if(o.userData&&o.userData.editSe
 function edSelTarget(sel){ if(!sel)return null; if(sel.kind==='crate'||sel.kind==='wall'||sel.kind==='building'||sel.kind==='path'||sel.kind==='platform'||sel.kind==='ramp')return sel.ref.mesh; if(sel.kind==='barracks')return sel.ref.roof; if(sel.kind==='house')return sel.ref.grp; if(sel.kind==='cover')return sel.ref.grp; if(sel.kind==='tree')return sel.ref.grp; if(sel.kind==='prop')return sel.ref.grp; if(sel.kind==='enemyspawn')return sel.ref.grp; if(sel.kind==='spawn')return player; if(sel.kind==='resupply')return termMesh; return null; }
 function edAnchor(sel){ if(!sel)return null; if(sel.kind==='barracks')return{x:sel.ref.cx,z:sel.ref.cz}; if(sel.kind==='spawn')return{x:mapSpawn.x,z:mapSpawn.z}; if(sel.kind==='resupply')return{x:terminalPos.x,z:terminalPos.z}; const m=edSelTarget(sel); return m?{x:m.position.x,z:m.position.z}:null; }
 function _selEq(a,b){ return a.ref?(a.ref===b.ref):(a.kind===b.kind); }
-function edClearBoxes(){ for(const b of edSelBoxes){ scene.remove(b); if(b.geometry)b.geometry.dispose(); } edSelBoxes.length=0; }
+function edClearBoxes(){ for(const b of edSelBoxes){ scene.remove(b); if(b.geometry)b.geometry.dispose(); if(b.material)b.material.dispose(); } edSelBoxes.length=0; }
 function edSetSel(arr){ edClearBoxes(); edMulti=(arr||[]).filter(s=>s); edSel=edMulti[0]||null;
   const col=edMulti.length>1?0x6ad0ff:0xffd23f;
   for(const s of edMulti){ const m=edSelTarget(s); if(m){ const bx=new THREE.BoxHelper(m,col); noRay(bx); scene.add(bx); edSelBoxes.push(bx); } } edUpdateHandles(); edUpdateGizmo(); edUpdateRing(); edSyncInspector(); }
@@ -77,7 +77,7 @@ function edRefreshBoxes(){ for(let i=0;i<edSelBoxes.length;i++){ const m=edSelTa
 let edGizmoMode='move', edRotDrag=false, _edRotMoved=false, _edRotPrev=null, _edRing=null;
 let _edHandles=null; const _edHBox=new THREE.Box3();
 function _edEnsureHandles(){ if(_edHandles)return _edHandles; _edHandles=new THREE.Group(); const mat=new THREE.MeshBasicMaterial({color:0xffe27a,depthTest:false,transparent:true,opacity:0.95}); for(let i=0;i<8;i++){ const c=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),mat); c.renderOrder=998; c.userData.edHandle=true; _edHandles.add(c); } _edHandles.visible=false; scene.add(_edHandles); return _edHandles; }
-function edUpdateHandles(){ const h=_edEnsureHandles(); const m=(edGizmoMode==='scale'&&edMulti.length===1&&edSel)?edSelTarget(edSel):null; if(!m){ h.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ h.visible=false; return; } h.visible=true; const mn=_edHBox.min, mx=_edHBox.max, sz=Math.max(0.45,Math.min(1.4,Math.min(mx.x-mn.x,mx.z-mn.z)*0.12)); let i=0; for(let xi=0;xi<2;xi++)for(let yi=0;yi<2;yi++)for(let zi=0;zi<2;zi++){ const c=h.children[i++]; c.position.set(xi?mx.x:mn.x, yi?mx.y:mn.y, zi?mx.z:mn.z); c.scale.setScalar(sz); } h.updateMatrixWorld(); }
+function edUpdateHandles(){ const h=_edEnsureHandles(); const m=(edTool==='select'&&edGizmoMode==='scale'&&edMulti.length===1&&edSel)?edSelTarget(edSel):null; if(!m){ h.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ h.visible=false; return; } h.visible=true; const mn=_edHBox.min, mx=_edHBox.max, sz=Math.max(0.45,Math.min(1.4,Math.min(mx.x-mn.x,mx.z-mn.z)*0.12)); let i=0; for(let xi=0;xi<2;xi++)for(let yi=0;yi<2;yi++)for(let zi=0;zi<2;zi++){ const c=h.children[i++]; c.position.set(xi?mx.x:mn.x, yi?mx.y:mn.y, zi?mx.z:mn.z); c.scale.setScalar(sz); } h.updateMatrixWorld(); }
 
 /* ---- transform gizmo (UE-style 3-axis translate) + functional resize handles ---- */
 let _edGizmo=null, edAxisDrag=null, edResizeDrag=false, _edGizmoMoved=false, _edResizeMoved=false, _edAxisPrev=0, _edRzS0=1, _edRzStartDist=1;
@@ -91,7 +91,7 @@ function _edEnsureGizmo(){ if(_edGizmo)return _edGizmo; _edGizmo=new THREE.Group
     g.traverse(o=>{o.renderOrder=999;}); _edGizmo.add(g); });
   _edGizmo.visible=false; scene.add(_edGizmo); return _edGizmo;
 }
-function edUpdateGizmo(){ const gz=_edEnsureGizmo(); const m=(edGizmoMode==='move'&&edMulti.length===1&&edSel)?edSelTarget(edSel):null; if(!m){ gz.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ gz.visible=false; return; } gz.visible=true; _edHBox.getCenter(_edGZC); gz.position.copy(_edGZC); const span=Math.max(_edHBox.max.x-_edHBox.min.x,_edHBox.max.z-_edHBox.min.z); gz.scale.setScalar(Math.max(0.55,Math.min(2.2,span*0.14))); gz.updateMatrixWorld(); }
+function edUpdateGizmo(){ const gz=_edEnsureGizmo(); const m=(edTool==='select'&&edGizmoMode==='move'&&edMulti.length===1&&edSel)?edSelTarget(edSel):null; if(!m){ gz.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ gz.visible=false; return; } gz.visible=true; _edHBox.getCenter(_edGZC); gz.position.copy(_edGZC); const span=Math.max(_edHBox.max.x-_edHBox.min.x,_edHBox.max.z-_edHBox.min.z); gz.scale.setScalar(Math.max(0.55,Math.min(2.2,span*0.14))); gz.updateMatrixWorld(); }
 function _edAxisRef(axis){ const m=edSel?edSelTarget(edSel):null; if(!m)return null; _edHBox.setFromObject(m); _edHBox.getCenter(_edGZC); raycaster.setFromCamera(mouseNDC,edCam());
   if(axis==='y'){ _v.set(edCam().position.x-_edGZC.x,0,edCam().position.z-_edGZC.z); if(_v.lengthSq()<1e-6)_v.set(0,0,1); _v.normalize(); _edPlane.setFromNormalAndCoplanarPoint(_v,_edGZC); return raycaster.ray.intersectPlane(_edPlane,_p1)?_p1.y:null; }
   _edPlane.set(_UP,-_edGZC.y); if(!raycaster.ray.intersectPlane(_edPlane,_p1))return null; return axis==='x'?_p1.x:_p1.z;
@@ -116,11 +116,11 @@ function _edEnsureRing(){ if(_edRing)return _edRing; _edRing=new THREE.Group();
   const mat=new THREE.MeshBasicMaterial({color:0xffe27a,depthTest:false,transparent:true,opacity:0.85});
   const torus=new THREE.Mesh(new THREE.TorusGeometry(5,0.16,10,64),mat); torus.rotation.x=Math.PI/2; torus.renderOrder=999; torus.userData.edRing=true;
   _edRing.add(torus); _edRing.visible=false; scene.add(_edRing); return _edRing; }
-function edUpdateRing(){ const rg=_edEnsureRing(); const m=(edGizmoMode==='rotate'&&edMulti.length===1&&edSel)?edSelTarget(edSel):null; if(!m){ rg.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ rg.visible=false; return; } rg.visible=true; _edHBox.getCenter(_edGZC); rg.position.copy(_edGZC); const span=Math.max(_edHBox.max.x-_edHBox.min.x,_edHBox.max.z-_edHBox.min.z); rg.scale.setScalar(Math.max(0.5,Math.min(2.6,span*0.15))); rg.updateMatrixWorld(); }
+function edUpdateRing(){ const rg=_edEnsureRing(); const m=(edTool==='select'&&edGizmoMode==='rotate'&&edMulti.length===1&&_edCanRot(edSel))?edSelTarget(edSel):null; if(!m){ rg.visible=false; return; } _edHBox.setFromObject(m); if(_edHBox.isEmpty()){ rg.visible=false; return; } rg.visible=true; _edHBox.getCenter(_edGZC); rg.position.copy(_edGZC); const span=Math.max(_edHBox.max.x-_edHBox.min.x,_edHBox.max.z-_edHBox.min.z); rg.scale.setScalar(Math.max(0.5,Math.min(2.6,span*0.15))); rg.updateMatrixWorld(); }
 function _edRingPick(){ const rg=_edEnsureRing(); if(!rg.visible)return false; raycaster.setFromCamera(mouseNDC,edCam()); return raycaster.intersectObject(rg,true).length>0; }
 function _edGroundAngle(){ raycaster.setFromCamera(mouseNDC,edCam()); _edPlane.set(_UP,-_edGZC.y); if(!raycaster.ray.intersectPlane(_edPlane,_p1))return null; return Math.atan2(_p1.z-_edGZC.z,_p1.x-_edGZC.x); }
 function _edStartResize(){ edResizeDrag=true; _edResizeMoved=false; const m=edSel?edSelTarget(edSel):null; if(m){ _edHBox.setFromObject(m); _edHBox.getCenter(_edGZC); _edRzS0=(edSel&&edSel.ref&&edSel.ref.scl)||1; raycaster.setFromCamera(mouseNDC,edCam()); _edPlane.set(_UP,-_edGZC.y); if(raycaster.ray.intersectPlane(_edPlane,_p1))_edRzStartDist=Math.max(0.5,Math.hypot(_p1.x-_edGZC.x,_p1.z-_edGZC.z)); } }
-function _edStartRotate(){ edRotDrag=true; _edRotMoved=false; const m=edSel?edSelTarget(edSel):null; if(m){ _edHBox.setFromObject(m); _edHBox.getCenter(_edGZC); } _edRotPrev=_edGroundAngle(); }
+function _edStartRotate(){ if(!edMulti.some(_edCanRot))return; edRotDrag=true; _edRotMoved=false; const m=edSel?edSelTarget(edSel):null; if(m){ _edHBox.setFromObject(m); _edHBox.getCenter(_edGZC); } _edRotPrev=_edGroundAngle(); }
 function edSetGizmoModeKey(m){ edGizmoMode=m; if(typeof setEdTool==='function')setEdTool('select'); const rl=document.getElementById('edRail'); if(rl)rl.querySelectorAll('.edRailBtn[data-group="tool"]').forEach(b=>b.classList.toggle('on',b.dataset.mode===m)); if(typeof edUpdateGizmo==='function'){edUpdateGizmo();edUpdateHandles();edUpdateRing();} }
 function _edHandlePick(){ const hd=_edEnsureHandles(); if(!hd.visible)return false; raycaster.setFromCamera(mouseNDC,edCam()); return raycaster.intersectObject(hd,true).length>0; }
 
@@ -155,7 +155,7 @@ function edRotateOne(sel,da){
   else if(sel.kind==='barracks'){ _rotateBarracksBy(sel.ref,da); }
   else if(sel.kind==='resupply'){ if(termMesh)termMesh.rotation.y+=da; }
 }
-function edRotateSel(dir,fine){ if(!edMulti.length)return; edPushUndo('rot'); const da=dir*(fine?5:edRotStep)*Math.PI/180; for(const s of edMulti)edRotateOne(s,da); edRefreshBoxes(); edSyncInspector(); }
+function edRotateSel(dir,fine){ if(!edMulti.some(_edCanRot))return; edPushUndo('rot'); const da=dir*(fine?5:edRotStep)*Math.PI/180; for(const s of edMulti)edRotateOne(s,da); edRefreshBoxes(); edSyncInspector(); }
 // --- composite-structure transforms (buildings + enterable barracks): uniform scale (layout-safe) + complete rotation ---
 function edScaleSel(sel,target){ target=Math.max(0.3,Math.min(4,target)); edPushUndo('insp'); if(sel.kind==='building')_scaleBuilding(sel.ref,target); else if(sel.kind==='barracks')_scaleBarracks(sel.ref,target); edRefreshBoxes(); rebuildLOS(); }
 // ---- Mirror (Tier 2): visible Off/X/Z toggle; live-mirrors placements + M mirrors the selection, swapping friend/hostile ----
@@ -454,7 +454,7 @@ function editorPlay(){ if(typeof _bkCloseMaker==='function')_bkCloseMaker(); if(
   mode='game'; started=true; paused=false;
   resetRound(); hudEl.style.display='';
 }
-function setEdTool(t){ edTool=t; edPrefabActive=null; edSetSel([]); edPathStart=null; if(typeof measReset==='function')measReset(); if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} document.querySelectorAll('#edPalette .edTool').forEach(el=>el.classList.toggle('active',el.dataset.tool===t)); document.querySelectorAll('#edPalette .edPrefab.active').forEach(el=>el.classList.remove('active')); if(typeof _bkSyncPlaceBtn==='function')_bkSyncPlaceBtn(); if(typeof edStatusSync==='function')edStatusSync(); if(t&&t!=='select'&&t!=='measure'&&typeof _edRecent!=='undefined'){ _edRecent=_edRecent.filter(function(x){return x!==t;}); _edRecent.unshift(t); if(_edRecent.length>8)_edRecent.length=8; } }
+function setEdTool(t){ edTool=t; edPrefabActive=null; if(t==='select'){ edUpdateHandles(); edUpdateGizmo(); edUpdateRing(); } else edSetSel([]); edPathStart=null; if(typeof measReset==='function')measReset(); if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} document.querySelectorAll('#edPalette .edTool').forEach(el=>el.classList.toggle('active',el.dataset.tool===t)); document.querySelectorAll('#edPalette .edPrefab.active').forEach(el=>el.classList.remove('active')); if(typeof _bkSyncPlaceBtn==='function')_bkSyncPlaceBtn(); if(typeof edStatusSync==='function')edStatusSync(); if(t&&t!=='select'&&t!=='measure'&&typeof _edRecent!=='undefined'){ _edRecent=_edRecent.filter(function(x){return x!==t;}); _edRecent.unshift(t); if(_edRecent.length>8)_edRecent.length=8; } }
 function edToggleSnap(){ edSnapIdx=(edSnapIdx+1)%EDSNAPS.length; edSnap=EDSNAPS[edSnapIdx]; edUpdateSnapBtn(); }
 // ============ EDITOR ANALYSIS OVERLAYS ============
 const ovGroup=new THREE.Group(); ovGroup.visible=false; noRay(ovGroup); scene.add(ovGroup);
@@ -574,6 +574,8 @@ function edUpdateSnapBtn(){ const b=document.getElementById('edSnapBtn'); if(b){
 function edCycleRot(){ edRotIdx=(edRotIdx+1)%EDROTS.length; edRotStep=EDROTS[edRotIdx]; edUpdateRotBtn(); }
 function edUpdateRotBtn(){ const b=document.getElementById('edRotBtn'); if(b){const l=b.querySelector('.edBtnLab'); if(l)l.textContent='Snap '+edRotStep+'°';} }
 function edGround(){ raycaster.setFromCamera(mouseNDC,edCam()); if(!raycaster.ray.intersectPlane(groundPlane,_v))return null; const s=edSnap; if(!s) return {x:Math.round(_v.x*10)/10, z:Math.round(_v.z*10)/10}; return {x:Math.round(_v.x/s)*s, z:Math.round(_v.z/s)*s}; }
+function _edToolKind(t){ if(/^crate/.test(t))return 'crate'; if(/^tree/.test(t))return 'tree'; if(/^prop/.test(t))return 'prop'; if(/^espawn/.test(t))return 'enemyspawn';
+  if(t==='house'||t==='cottage'||t==='farmhouse'||t==='manor')return 'house'; if(/^(hq|ref|bar|pow)[FH]$/.test(t))return 'building'; return t; }   // the editSel kind a placement tool creates
 function edPlaceAt(p){ let sel=null;
   if(edTool==='crateS') sel=addBox(p.x,p.z,2,1.5,2,crateMat,true).mesh.userData.editSel;
   else if(edTool==='crateM') sel=addBox(p.x,p.z,3,2.5,3,crateMatWarm,true).mesh.userData.editSel;
@@ -625,7 +627,7 @@ function edRemoveOne(sel){
   else if(sel.kind==='prop'){ scene.remove(sel.ref.grp); const i=props.indexOf(sel.ref); if(i>=0)props.splice(i,1); }
   else if(sel.kind==='enemyspawn'){ enemySpawnLayer.remove(sel.ref.grp); const i=enemySpawns.indexOf(sel.ref); if(i>=0)enemySpawns.splice(i,1); }
 }
-function edDeleteSel(){ if(!edMulti.length)return; edPushUndo(); for(const sel of edMulti)edRemoveOne(sel); edSetSel([]); rebuildLOS(); }
+function edDeleteSel(){ const del=edMulti.filter(s=>s.kind!=='spawn'&&s.kind!=='resupply'); if(!del.length)return; edPushUndo(); for(const sel of del)edRemoveOne(sel); edSetSel([]); rebuildLOS(); }
 function edSetTeam(team){ const toSet=edMulti.filter(s=>{ const d=edDescribe(s); return d&&(d.t==='building'||d.t==='barracks')&&d.team!==team; }); if(!toSet.length)return;
   const descs=toSet.map(edDescribe); const keep=edMulti.filter(s=>toSet.indexOf(s)<0); edPushUndo('team');
   for(const s of toSet)edRemoveOne(s); const news=[]; for(const d of descs){ d.team=team; const sel=edSpawnDesc(d,d.ax,d.az); if(sel)news.push(sel); }
@@ -666,7 +668,7 @@ function updateEditor(dt){
   if(edPreview){ if(_edGizmo)_edGizmo.visible=false; if(_edHandles)_edHandles.visible=false; if(_edRing)_edRing.visible=false; edPreviewUpdate(dt); return; }
   const pan=edCamH*0.9*dt; let dx=0,dz=0;
   if(keys['KeyW'])dz-=1; if(keys['KeyS'])dz+=1; if(keys['KeyA'])dx-=1; if(keys['KeyD'])dx+=1;
-  if(!edMulti.length){ if(keys['ArrowUp'])dz-=1; if(keys['ArrowDown'])dz+=1; if(keys['ArrowLeft'])dx-=1; if(keys['ArrowRight'])dx+=1; }
+  if(!edMulti.length||edTool!=='select'){ if(keys['ArrowUp'])dz-=1; if(keys['ArrowDown'])dz+=1; if(keys['ArrowLeft'])dx-=1; if(keys['ArrowRight'])dx+=1; }
   if(dx||dz){ const l=Math.hypot(dx,dz); edCamX+=dx/l*pan; edCamZ+=dz/l*pan; }
   const _ecl=Math.min(230,Math.max(90,Math.max(T.arenaX,T.arenaZ)+30)); edCamX=Math.max(-_ecl,Math.min(_ecl,edCamX)); edCamZ=Math.max(-_ecl,Math.min(_ecl,edCamZ));
   if(camera.fov!==52){camera.fov=52;camera.updateProjectionMatrix();} camera.up.set(0,1,0); camera.position.set(edCamX,edCamH,edCamZ+edCamH*0.18); camera.lookAt(edCamX,0,edCamZ);
@@ -837,7 +839,11 @@ function _edApplySnap(str){ const def=JSON.parse(str); buildMap(def); player.pos
 function edUndoDo(){ if(!edUndoStack.length)return; edRedoStack.push(JSON.stringify(serializeMap())); _edApplySnap(edUndoStack.pop()); _edLastTag=null; edUpdateUndoBtns(); }
 function edRedoDo(){ if(!edRedoStack.length)return; edUndoStack.push(JSON.stringify(serializeMap())); _edApplySnap(edRedoStack.pop()); _edLastTag=null; edUpdateUndoBtns(); }
 function edStatusSync(){ const se=document.getElementById('edStatSel'); if(se)se.textContent=String((typeof edMulti!=='undefined'&&edMulti)?edMulti.length:0);
-  const te=document.getElementById('edStatTool'); if(te){ const nm={select:'Select',bmaker:'Building Maker',measure:'Measure'}; te.textContent=nm[edTool]||(edTool?('Place \u00b7 '+edTool):'Select'); } }
+  const te=document.getElementById('edStatTool'); if(te){ const nm={select:'Select',bmaker:'Building Maker',measure:'Measure'}; te.textContent=nm[edTool]||(edTool?('Place \u00b7 '+edTool):'Select'); }
+  const he=document.getElementById('edStatHint'); if(he){ if(he.dataset.def==null)he.dataset.def=he.textContent; let ht=he.dataset.def;
+    if(edTool&&edTool!=='select'&&edTool!=='measure'){ let card=null; for(const el of document.querySelectorAll('#edPalette .edTool')){ if(el.dataset.tool===edTool){ card=el; break; } } const lbl=(card&&card.textContent.trim())||({bmaker:'Building Maker',prefab:'a prefab'})[edTool]||edTool;
+      const drag=edTool==='path'||edTool==='orchard'||edTool==='poprow'||_bkIsCover(edTool); ht='Placing '+lbl+' \u2014 '+(drag?'drag':'click')+' to place \u00b7 Del deletes it \u00b7 Esc / Q: stop placing'; }
+    if(he.textContent!==ht)he.textContent=ht; } }
 function edSetLibMode(m){ const gen=(m==='gen'); _edLibMode=m;
   ['edLibTabs','edLibSearch','edPalette'].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display=gen?'none':''; });
   const g=document.getElementById('edGenerators'); if(g)g.style.display=gen?'flex':'none';
@@ -848,12 +854,14 @@ function edBuildRecent(){ const wrap=document.getElementById('edRecentCards'), e
 const edInsp=document.getElementById('edInsp'), edInspBody=edInsp.querySelector('.edIBody'), edInspKind=document.getElementById('edIKind');
 let _edInspRef=undefined, _edInspHidden=false, _edLibCollapsed=false, _edLibMode='place'; const _SIZEABLE={crate:1,wall:1,path:1,platform:1}, _SCALEABLE={building:1,barracks:1};
 function edKindLabel(s){ switch(s.kind){ case 'crate':return 'Crate'; case 'wall':return 'Wall'; case 'path':return 'Path / Road'; case 'building':return ((s.ref&&s.ref.team==='friend')?'Friendly ':'Hostile ')+((s.ref&&s.ref.type)||'building'); case 'barracks':return 'Barracks'; case 'platform':return 'Platform'; case 'ramp':return 'Ramp'; case 'cover':return (s.ref&&BK.COVER[s.ref.type]?BK.COVER[s.ref.type].label:'Cover'); case 'tree':return (s.ref&&BK.TREES[s.ref.kind]?BK.TREES[s.ref.kind].label:'Tree'); case 'prop':return (s.ref&&BK.PROPS[s.ref.kind]?BK.PROPS[s.ref.kind].label:'Prop'); case 'spawn':return 'Player Spawn'; case 'resupply':return 'Resupply'; } return s.kind; }
-function _edRotCur(s){ if(!s||s.kind==='spawn'||s.kind==='platform'||s.kind==='enemyspawn')return null; if(s.kind==='barracks')return s.ref.rot||0; const m=edSelTarget(s); return m?m.rotation.y:null; }
+function _edCanRot(s){ return !!s&&s.kind!=='spawn'&&s.kind!=='platform'&&s.kind!=='enemyspawn'&&s.kind!=='tree'; }   // exactly the kinds edRotateOne turns
+function _edRotCur(s){ if(!_edCanRot(s))return null; if(s.kind==='barracks')return s.ref.rot||0; const m=edSelTarget(s); return m?m.rotation.y:null; }
 function _edRow(label){ const r=document.createElement('div'); r.className='edIRow'; const l=document.createElement('span'); l.className='edILab'; l.textContent=label; r.appendChild(l); return r; }
-function _edNum(val,step){ const i=document.createElement('input'); i.type='number'; i.className='edIInp'; i.step=step||0.5; i.value=String(Math.round(val*100)/100); return i; }
-function edMoveSelBy(dx,dz){ if(!dx&&!dz)return; edPushUndo('insp'); for(const s of edMulti)edMoveBy(s,dx,dz); edRefreshBoxes(); }
-function edRotateSelTo(deg){ const cur=_edRotCur(edSel); if(cur===null)return; const d=deg-cur*180/Math.PI; if(Math.abs(d)<1e-4)return; const da=d*Math.PI/180; edPushUndo('insp'); for(const s of edMulti)edRotateOne(s,da); edRefreshBoxes(); }
-function edRotateSnap(){ const cur=_edRotCur(edSel); if(cur===null)return; const snapped=Math.round((cur*180/Math.PI)/edRotStep)*edRotStep; edRotateSelTo(snapped); edSyncInspector(); }
+function _edNum(val,step){ const i=document.createElement('input'); i.type='number'; i.className='edIInp'; i.step=step||0.5; i.value=String(Math.round(val*100)/100);
+  let v0=i.value; i.addEventListener('focus',()=>{ v0=i.value; }); i.addEventListener('keydown',e=>{ if(e.key==='Enter')i.blur(); else if(e.key==='Escape'){ i.value=v0; i.blur(); } }); return i; }
+function edMoveSelBy(dx,dz,sels){ sels=sels||edMulti; if(!dx&&!dz)return; edPushUndo('insp'); for(const s of sels)edMoveBy(s,dx,dz); edRefreshBoxes(); }
+function edRotateSelTo(deg,sels){ sels=sels||edMulti; const cur=_edRotCur(sels.find(_edCanRot)); if(cur===null)return; const d=deg-cur*180/Math.PI; if(Math.abs(d)<1e-4)return; const da=d*Math.PI/180; edPushUndo('insp'); for(const s of sels)edRotateOne(s,da); edRefreshBoxes(); }
+function edRotateSnap(){ const cur=_edRotCur(edMulti.find(_edCanRot)); if(cur===null)return; const snapped=Math.round((cur*180/Math.PI)/edRotStep)*edRotStep; edRotateSelTo(snapped); edSyncInspector(); }
 function edSetHP(sel,hp){ if(!sel||sel.kind!=='building'||!sel.ref)return; hp=Math.max(1,Math.round(hp)); const b=sel.ref; if(b.maxHealth===hp&&b.health===hp)return; edPushUndo('insp'); b.maxHealth=hp; b.health=hp; if(b.bar&&b.bar.fg){ b.bar.fg.scale.x=1; b.bar.fg.position.x=0; } }
 function edResize(sel,w,h,d){ const o=sel.ref, isPath=(sel.kind==='path'); w=Math.max(0.2,w); d=Math.max(0.2,d); if(!isPath)h=Math.max(0.2,h); edPushUndo('insp');
   const ng=isPath?new THREE.BoxGeometry(w,0.06,d):new THREE.BoxGeometry(w,h,d), old=o.mesh.geometry;
@@ -867,14 +875,20 @@ function edReshapeRamp(sel,w,d,h0,h1){ const o=sel.ref; w=Math.max(0.5,w); d=Mat
 }
 function edBuildInspector(s){
   edInspBody.innerHTML=''; edInspKind.textContent=(edMulti.length>1?(edMulti.length+' selected'):edKindLabel(s));
+  const insSel=edMulti.slice();   // the fields act on the selection they were built for, even if a click changes it before 'change' fires
+  { let bd=document.getElementById('edIDel'); if(!bd){ bd=document.createElement('div'); bd.id='edIDel'; bd.className='edBtn edBtnSm edBtnDel'; bd.style.margin='-6px 0 -6px auto'; bd.title='Delete selection (Del)'; bd.addEventListener('click',edDeleteSel); edInspKind.parentNode.appendChild(bd); }
+    const nd=edMulti.filter(x=>x.kind!=='spawn'&&x.kind!=='resupply').length; bd.textContent=nd>1?('Delete '+nd):'Delete'; bd.style.display=nd?'':'none'; }
   const a=edAnchor(s)||{x:0,z:0};
   const rx=_edRow('X'), ix=_edNum(a.x,0.5); rx.appendChild(ix); edInspBody.appendChild(rx);
   const rz=_edRow('Z'), iz=_edNum(a.z,0.5); rz.appendChild(iz); edInspBody.appendChild(rz);
-  ix.addEventListener('change',()=>{ const v=ix.valueAsNumber; if(!isFinite(v))return; const a2=edAnchor(edSel); if(a2)edMoveSelBy(v-a2.x,0); });
-  iz.addEventListener('change',()=>{ const v=iz.valueAsNumber; if(!isFinite(v))return; const a2=edAnchor(edSel); if(a2)edMoveSelBy(0,v-a2.z); });
-  const rc=_edRotCur(s);
+  const mvX=()=>{ const v=ix.valueAsNumber; if(!isFinite(v))return; const a2=edAnchor(insSel[0]); if(a2)edMoveSelBy(v-a2.x,0,insSel); };
+  ix.addEventListener('change',mvX); ix.addEventListener('input',()=>{ if(document.activeElement!==ix)mvX(); });
+  const mvZ=()=>{ const v=iz.valueAsNumber; if(!isFinite(v))return; const a2=edAnchor(insSel[0]); if(a2)edMoveSelBy(0,v-a2.z,insSel); };
+  iz.addEventListener('change',mvZ); iz.addEventListener('input',()=>{ if(document.activeElement!==iz)mvZ(); });
+  const rc=_edRotCur(insSel.find(_edCanRot));
   if(rc!==null){ const rr=_edRow('Rotation°'), ir=_edNum(rc*180/Math.PI,1); rr.appendChild(ir); edInspBody.appendChild(rr);
-    ir.addEventListener('change',()=>{ const v=ir.valueAsNumber; if(!isFinite(v))return; edRotateSelTo(v); });
+    const rotTo=()=>{ const v=ir.valueAsNumber; if(isFinite(v))edRotateSelTo(v,insSel); };
+    ir.addEventListener('change',rotTo); ir.addEventListener('input',()=>{ if(document.activeElement!==ir)rotTo(); });
     const rsnap=_edRow(''); rsnap.classList.add('snaprow'); const grp=document.createElement('div'); grp.className='edIBtnRow';
     const mkR=(txt,tip,fn)=>{ const b=document.createElement('div'); b.className='edBtn edBtnSm edIStep'; b.textContent=txt; b.title=tip; b.addEventListener('click',fn); grp.appendChild(b); };
     mkR('−'+edRotStep+'°','Rotate −'+edRotStep+'° (snap step)',()=>{ edRotateSel(-1); });
@@ -939,7 +953,7 @@ function edBuildInspector(s){
 function edSyncInspector(){ if(typeof edStatusSync==='function')edStatusSync();
   if(_edInspHidden){ edInsp.style.display='none'; return; }
   const _empty=document.getElementById('edIEmpty');
-  if(!edMulti.length){ edInsp.style.display='flex'; edInspBody.style.display='none'; if(_empty)_empty.style.display='flex'; edInspKind.textContent='World & Match Rules'; _edInspRef=undefined; if(typeof edSyncWorldPanel==='function')edSyncWorldPanel(); return; }
+  if(!edMulti.length){ { const bd=document.getElementById('edIDel'); if(bd)bd.style.display='none'; } edInsp.style.display='flex'; edInspBody.style.display='none'; if(_empty)_empty.style.display='flex'; edInspKind.textContent='World & Match Rules'; _edInspRef=undefined; if(typeof edSyncWorldPanel==='function')edSyncWorldPanel(); return; }
   const s=edSel, ref=s.ref||s.kind;
   if(document.activeElement&&edInsp.contains(document.activeElement)&&ref===_edInspRef) return;
   edInsp.style.display='flex'; edInspBody.style.display=''; if(_empty)_empty.style.display='none'; _edInspRef=ref; edBuildInspector(s);
@@ -1033,7 +1047,9 @@ renderer.domElement.addEventListener('mousedown',e=>{
   } else if(edTool==='path'||_bkIsCover(edTool)||edTool==='orchard'||edTool==='poprow'){ edPathStart=g; }
   else if(edTool==='measure'){ measClick(g); }
   else if(edTool==='prefab'&&edPrefabActive){ edPushUndo(); const placed=edStampPrefab(edPrefabActive,g.x,g.z); if(edMirror){ for(const s of placed) edMirrorOne(s); } rebuildLOS(); if(placed.length)edSetSel(placed); }
-  else { edPushUndo(); const sel=edPlaceAt(g); if(edMirror&&sel){ edMirrorOne(sel); rebuildLOS(); } }
+  else { const k=_edToolKind(edTool); raycaster.setFromCamera(mouseNDC,edCam()); const hits=raycaster.intersectObjects(edTargets(),true); let ex=null; for(const h of hits){ const s=findEditSel(h.object); if(s){ ex=s; break; } }
+    if(ex&&ex.kind===k){ const m=edSelTarget(ex); if(m){ _edHBox.setFromObject(m); if(g.x>=_edHBox.min.x-0.5&&g.x<=_edHBox.max.x+0.5&&g.z>=_edHBox.min.z-0.5&&g.z<=_edHBox.max.z+0.5){ edSetSel([ex]); return; } } }   // E1b: no stacked copy
+    edPushUndo(); const sel=edPlaceAt(g); let tw=null; if(edMirror&&sel){ tw=edMirrorOne(sel); rebuildLOS(); } if(sel)edSetSel(tw?[sel,tw]:[sel]); }
 });
 renderer.domElement.addEventListener('mousemove',()=>{
   if(mode!=='editor'||edPreview)return;
@@ -1052,10 +1068,10 @@ addEventListener('mouseup',e=>{
   edAxisDrag=null; edResizeDrag=false; _edGizmoMoved=false; _edResizeMoved=false; edRotDrag=false; _edRotMoved=false;
   edDragging=false; edGrab=null; _edDragSnapped=false; if(!(e.target&&e.target.closest&&e.target.closest('#edInsp'))) edSyncInspector();
   if(edMarquee){ const moved=Math.abs(mx-edMarquee.x0)>4||Math.abs(my-edMarquee.y0)>4; if(moved)edSetSel(edMarqueePick(edMarquee.x0,edMarquee.y0,mx,my)); else edSetSel([]); edMarquee=null; edMarqueeEl.style.display='none'; }
-  if(edTool==='path'&&edPathStart){ const g=edGround(); if(g){ let w=Math.abs(g.x-edPathStart.x), d=Math.abs(g.z-edPathStart.z), cx=(g.x+edPathStart.x)/2, cz=(g.z+edPathStart.z)/2; if(w<1&&d<1){ w=6;d=6;cx=edPathStart.x;cz=edPathStart.z; } edPushUndo(); addPath(cx,cz,Math.max(1,w),Math.max(1,d),0); } edPathStart=null; if(edGhost)edGhost.visible=false; }
-  else if(_bkIsCover(edTool)&&edPathStart){ const g=edGround(); if(g){ const dx=g.x-edPathStart.x, dz=g.z-edPathStart.z; let len=Math.hypot(dx,dz), rot=Math.atan2(-dz,dx), cx=(g.x+edPathStart.x)/2, cz=(g.z+edPathStart.z)/2; if(len<1){ len=4; rot=0; cx=edPathStart.x; cz=edPathStart.z; } edPushUndo(); addCover(edTool,cx,cz,len,rot); } edPathStart=null; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
-  else if(edTool==='orchard'&&edPathStart){ const g=edGround(); if(g){ const x0=Math.min(edPathStart.x,g.x),x1=Math.max(edPathStart.x,g.x),z0=Math.min(edPathStart.z,g.z),z1=Math.max(edPathStart.z,g.z); const cells=_orchardCells(x0,z0,x1,z1); if(cells.length){ edPushUndo(); for(const c of cells)addTree('apple',c.x,c.z,c.sd); rebuildLOS(); } } edPathStart=null; if(edOrchardGhost)edOrchardGhost.visible=false; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
-  else if(edTool==='poprow'&&edPathStart){ const g=edGround(); if(g){ const cells=_rowCells(edPathStart.x,edPathStart.z,g.x,g.z); if(cells.length){ edPushUndo(); for(const c of cells)addTree('poplar',c.x,c.z,c.sd); rebuildLOS(); } } edPathStart=null; if(edOrchardGhost)edOrchardGhost.visible=false; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
+  if(edTool==='path'&&edPathStart){ const g=edGround(); if(g){ let w=Math.abs(g.x-edPathStart.x), d=Math.abs(g.z-edPathStart.z), cx=(g.x+edPathStart.x)/2, cz=(g.z+edPathStart.z)/2; if(w<1&&d<1){ w=6;d=6;cx=edPathStart.x;cz=edPathStart.z; } edPushUndo(); const po=addPath(cx,cz,Math.max(1,w),Math.max(1,d),0); if(po&&po.mesh)edSetSel([po.mesh.userData.editSel]); } edPathStart=null; if(edGhost)edGhost.visible=false; }
+  else if(_bkIsCover(edTool)&&edPathStart){ const g=edGround(); if(g){ const dx=g.x-edPathStart.x, dz=g.z-edPathStart.z; let len=Math.hypot(dx,dz), rot=Math.atan2(-dz,dx), cx=(g.x+edPathStart.x)/2, cz=(g.z+edPathStart.z)/2; if(len<1){ len=4; rot=0; cx=edPathStart.x; cz=edPathStart.z; } edPushUndo(); const co=addCover(edTool,cx,cz,len,rot); if(co&&co.grp)edSetSel([co.grp.userData.editSel]); } edPathStart=null; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
+  else if(edTool==='orchard'&&edPathStart){ const g=edGround(); if(g){ const x0=Math.min(edPathStart.x,g.x),x1=Math.max(edPathStart.x,g.x),z0=Math.min(edPathStart.z,g.z),z1=Math.max(edPathStart.z,g.z); const cells=_orchardCells(x0,z0,x1,z1); if(cells.length){ edPushUndo(); const ts=[]; for(const c of cells)ts.push(addTree('apple',c.x,c.z,c.sd).grp.userData.editSel); rebuildLOS(); edSetSel(ts); } } edPathStart=null; if(edOrchardGhost)edOrchardGhost.visible=false; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
+  else if(edTool==='poprow'&&edPathStart){ const g=edGround(); if(g){ const cells=_rowCells(edPathStart.x,edPathStart.z,g.x,g.z); if(cells.length){ edPushUndo(); const ts=[]; for(const c of cells)ts.push(addTree('poplar',c.x,c.z,c.sd).grp.userData.editSel); rebuildLOS(); edSetSel(ts); } } edPathStart=null; if(edOrchardGhost)edOrchardGhost.visible=false; if(edGhost){edGhost.visible=false; edGhost.rotation.y=0;} }
 });
 document.getElementById('edSnapBtn').addEventListener('click',edToggleSnap);
 document.getElementById('edRotBtn').addEventListener('click',edCycleRot); edUpdateRotBtn();
