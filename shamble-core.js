@@ -91,6 +91,20 @@ const T = {
   shockRadius:7.5, dustLife:1.05, scorchRadius:2.4, scorchLife:4.0,
   camKickRange:34, camKickImpulse:24, camKickStiffness:110, camKickDamping:12, concussionStrength:0.85,
 };
+// Three teams, one per faction (LOOP_V2 §2). Order matters: soviets is the first enemy team of the player's (allies).
+const TEAMS = [
+  { id:'allies',  faction:'Allies',  name:'Allies',  short:'ALL' },
+  { id:'soviets', faction:'Soviets', name:'Soviets', short:'SOV' },
+  { id:'empire',  faction:'Empire',  name:'Empire',  short:'EMP' },
+];
+// The one tunable table for team play (three-teams plan, item 1). Bot sight range stays T.enemyDetect (read directly).
+const TUNE = {
+  teams: { size:4 },          // soldiers per team, the player included
+  ff: false,                  // friendly fire (D5): off = bullets and blasts pass teammates
+  ai: { retargetS:0.25, losPerS:480, losRecheckS:0.1, losCapS:0.1, roles:['push','objective','hunt'] },
+  spawn: { doorOut:4, lateral:2 },   // bot spawn point outside the own barracks door (D13), metres
+  fx: { botCullR:50, botSfxR:90 },   // bot-shot FX and sound culled beyond these camera distances (item 13)
+};
 const WEAPONS = [
   // 0 — AMK Rifle I (Conscript primary): accurate semi-auto mid-range rifle. The kiting generalist.
   { id:'amk', name:'AMK Rifle I', short:'AMK', era:1, minLevel:1, cost:0, auto:false, fireInterval:0.2, mag:1, reserve:999, pellets:1, spreadHip:0.022, spreadADS:0.006, spreadPerShot:0.0, spreadMax:0.05, spreadDecay:0.3, damage:34, range:300, recoil:2.0, reload:3.5, tracer:0xfff0c0 },
