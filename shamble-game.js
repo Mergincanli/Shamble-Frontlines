@@ -642,6 +642,7 @@ function buildMap(def){
   rebuildLOS();
   _env=envMerge(def.env); applyEnv(_env,{regen:true});
   _rules=rulesMerge(def.rules); if(_rulesReady)applyRules(_rules);
+  buildTeamIndex();
 }
 function serializeMap(){ return {
   name:curMap.name,
@@ -688,6 +689,28 @@ const TBOX={ points:DM_Cabana.techPoints, activeTime:120, captureTime:7, range:5
 // Team colours: allies teal, both enemy teams today's red until 3b's colour pass (D4); friend/hostile stay as aliases.
 const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d, allies:0x38e1b0, soviets:0xff4d4d, empire:0xff4d4d };
 const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a', allies:'#7af0d2', soviets:'#ff8a8a', empire:'#ff8a8a' };
+// Per-team building index (three-teams item 7): per-frame code reads these fields instead of searching buildings[] with
+// a closure (findB). Rebuilt by buildTeamIndex() at the end of buildMap, at the start of resetRound and once at boot after
+// the trucks exist; the editor adds and removes buildings without buildMap, and its Play button runs resetRound.
+const TEAM_INDEX={ firstEnemy:null, rosterVer:0 };
+for(let i=0;i<TEAMS.length;i++) TEAM_INDEX[TEAMS[i].id]={ hqs:[], refinery:null, power:null, barracksB:null, barracksE:null, markers:[], harv:null, dockX:0, dockZ:0, laneX:0, laneZ:0 };
+function buildTeamIndex(){
+  for(let i=0;i<TEAMS.length;i++){ const e=TEAM_INDEX[TEAMS[i].id]; e.hqs.length=0; e.refinery=null; e.power=null; e.barracksB=null; e.barracksE=null; e.markers.length=0; e.harv=null; }
+  for(let i=0;i<buildings.length;i++){ const b=buildings[i], id=teamOf(b.team); if(!id)continue; const e=TEAM_INDEX[id];   // first of each type wins, as findB did
+    if(b.type==='hq')e.hqs.push(b); else if(b.type==='refinery'){ if(!e.refinery)e.refinery=b; } else if(b.type==='power'){ if(!e.power)e.power=b; } else if(b.type==='barracks'){ if(!e.barracksB)e.barracksB=b; } }
+  for(let i=0;i<barracksList.length;i++){ const bk=barracksList[i], id=teamOf(bk.team); if(id&&!TEAM_INDEX[id].barracksE)TEAM_INDEX[id].barracksE=bk; }
+  for(let i=0;i<enemySpawns.length;i++){ const sp=enemySpawns[i], id=teamOf(sp.faction); if(id)TEAM_INDEX[id].markers.push(sp); }
+  for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], id=teamOf(hv.team); if(id&&!TEAM_INDEX[id].harv)TEAM_INDEX[id].harv=hv; }
+  TEAM_INDEX.firstEnemy=null;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id], r=e.refinery;
+    if(TEAM_INDEX.firstEnemy===null&&id!==PLAYER_TEAM)TEAM_INDEX.firstEnemy=id;
+    // dock and field lane: today's two-team numbers for allies (dock -z, lane -4) and soviets (+z, +4); any other team
+    // docks 7 m from its refinery toward the field. Map data (harvLanes) replaces these in a later step.
+    if(id==='allies'||id==='soviets'){ const sg=(id==='allies')?-1:1;
+      e.dockX=r?r.mesh.position.x:0; e.dockZ=r?r.mesh.position.z+7*sg:-35*sg; e.laneX=HARV.fieldX+4*sg; e.laneZ=HARV.fieldZ; }
+    else { const rx=r?r.mesh.position.x:0, rz=r?r.mesh.position.z:0, dx=HARV.fieldX-rx, dz=HARV.fieldZ-rz, d=Math.sqrt(dx*dx+dz*dz)||1;
+      e.dockX=rx+dx/d*7; e.dockZ=rz+dz/d*7; e.laneX=HARV.fieldX; e.laneZ=HARV.fieldZ; } }
+}
 // ─── Phase 4: economy-as-weapon — power plant down throttles tech (×0.5) and doubles prices ───
 function powerDead(team){ for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(b.type==='power'&&sameTeam(b.team,team)) return !b.alive; } return false; }
 function priceMult(team=PLAYER_TEAM){ return powerDead(team) ? 2 : 1; }
@@ -736,7 +759,7 @@ function makeSupplyField(){
   [[0,0,1.0],[1.1,0.5,0.8],[-0.9,-0.6,0.8],[0.3,-1.1,0.7],[-0.6,0.9,0.7]].forEach(([dx,dz,s])=>{ const c=new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cmat); c.position.set(x+dx,s/2,z+dz); c.castShadow=true; noRay(c); scene.add(c); });
   const lbl=makeLabel('SUPPLY CACHE','#cdb24a'); lbl.position.set(x,3.4,z); scene.add(lbl);
 }
-function harvDock(team){ const r=findB(team,'refinery'); const isF=team==='friend'; return r?{x:r.mesh.position.x,z:r.mesh.position.z+(isF?-7:7)}:{x:0,z:isF?35:-35}; }
+function harvDock(team){ const e=TEAM_INDEX[teamOf(team)]; return e?{x:e.dockX,z:e.dockZ}:{x:0,z:0}; }
 function updateHarvBar(hv){ const f=Math.max(0,hv.health/hv.maxHealth); hv.bar.fg.scale.x=f; hv.bar.fg.position.x=-(hv.bar.w*(1-f))/2; }
 function harvesterPayout(hv){ if(hv.team==='friend'){ credits+=ECO.payHarvester; updateCreditHUD(); showLevelToast('Supply Dock','+'+ECO.payHarvester+' cr  ·  +'+ECO.techHarvester+' tech'); } addTech(hv.team, ECO.techHarvester); }
 function damageHarvester(hv,d){ if(!hv.alive)return; hv.health-=d; hv.hitFlash=0.1; if(hv.health<=0) destroyHarvester(hv,false); else { updateHarvBar(hv); updateBaseHUD(); } }
@@ -747,15 +770,15 @@ function siegeFireHarvester(en,hv){ _eF.copy(en.group.position);_eF.y=1.45; _eT.
 function updateHarvesters(dt){
   if(gameOver)return;
   for(const hv of harvesters){
-    const ref=findB(hv.team,'refinery');
+    const ix=TEAM_INDEX[teamOf(hv.team)], ref=ix?ix.refinery:null;
     if(hv.alive && (!ref || !ref.alive)){ destroyHarvester(hv,true); continue; }     // refinery dead → self-destruct, no respawn
     if(!hv.alive){ if(ref && ref.alive && !hv.refDead){ hv.respawnT-=dt; if(hv.respawnT<=0) respawnHarvester(hv); } continue; }
     if(hv.hitFlash>0) hv.hitFlash-=dt;
     const p=hv.group.position;
     if(hv.state==='toField' || hv.state==='toBase'){
-      const isF=hv.team==='friend'; let destX,destZ;
-      if(hv.state==='toField'){ destX=HARV.fieldX+(isF?-4:4); destZ=HARV.fieldZ; }
-      else { destX=ref?ref.mesh.position.x:0; destZ=ref?ref.mesh.position.z+(isF?-7:7):(isF?35:-35); }
+      let destX,destZ;
+      if(hv.state==='toField'){ destX=ix.laneX; destZ=ix.laneZ; }
+      else { destX=ix.dockX; destZ=ix.dockZ; }
       _hvDir.set(destX-p.x,0,destZ-p.z); const d=_hvDir.length();
       if(d>1.2){ _hvDir.multiplyScalar(1/d); p.x+=_hvDir.x*HARV.speed*dt; p.z+=_hvDir.z*HARV.speed*dt; hv.group.rotation.y=Math.atan2(_hvDir.x,_hvDir.z); }
       else if(hv.state==='toField'){ hv.state='loading'; hv.t=HARV.loadTime; }
@@ -1616,9 +1639,10 @@ function playerDie(){{ const _la=ps.lastAttacker&&ps.lastAttacker.group; deathSt
 function playerRespawn(){ps.dead=false;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
 
 /* end / reset */
-function checkEnd(){const eHQ=findB('hostile','hq'),fHQ=findB('friend','hq');if(!gameOver&&eHQ&&!eHQ.alive)endGame(true);if(!gameOver&&fHQ&&!fHQ.alive)endGame(false);}
+function checkEnd(){const eHQ=TEAM_INDEX.soviets.hqs[0],fHQ=TEAM_INDEX[PLAYER_TEAM].hqs[0];if(!gameOver&&eHQ&&!eHQ.alive)endGame(true);if(!gameOver&&fHQ&&!fHQ.alive)endGame(false);}
 function endGame(win){gameOver=true;mouseDown=false;endEl.className=win?'win':'lose';endEl.style.display='flex';document.getElementById('endTitle').textContent=win?'VICTORY':'DEFEAT';document.getElementById('endSub').textContent=win?'enemy HQ destroyed':'your HQ has fallen';}
 function resetRound(){
+  buildTeamIndex();   // the editor edits buildings without buildMap
   gameOver=false; endEl.style.display='none'; document.getElementById('deathScreen').style.display='none';
   buildings.forEach(b=>{b.alive=true;b.health=b.maxHealth;b.sink=0;b.mesh.position.y=b.mesh.geometry.parameters.height/2;b.mesh.visible=true;b.trim.visible=true;b.trim.material.emissiveIntensity=0.65;b.trim.position.y=b.mesh.geometry.parameters.height-0.7;b.label.visible=true;b.bar.grp.visible=true;b.box.setFromObject(b.mesh);});
   enemies.forEach(en=>{en.alive=true;en.frags=0;en.downs=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.elite?T.eliteHealth:unitOf(en.unit).maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
@@ -2269,9 +2293,9 @@ function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')retu
   { const w=(_frac*100)+'%'; if(_sbR.mXp.style.width!==w)_sbR.mXp.style.width=w; } _st(_sbR.mXn,Prog.level>=100?'MAX RANK':Prog.xp+' / '+_need+' XP');
   _st(_sbR.mK,kills); _st(_sbR.mD,roundDeaths); _st(_sbR.mA,roundAssists); }
 function sbShow(on){ if(!scoreboardEl)return; if(on&&_sbBuilt!==enemies.length)sbBuildRosters(); scoreboardEl.style.display=on?'flex':'none'; if(on)sbSync(); }
-function updateBaseHUD(){document.querySelectorAll('.pip').forEach(p=>{const[t,ty]=p.dataset.b.split('-');const team=t==='f'?'friend':'hostile';
-  if(ty==='harv'){ const hv=harvesters.find(h=>h.team===team); if(!hv)return; p.classList.toggle('dead',!hv.alive); p.querySelector('i').style.width=(hv.alive?Math.max(0,hv.health/hv.maxHealth)*100:0)+'%'; return; }
-  const b=findB(team,ty);if(!b)return;p.classList.toggle('dead',!b.alive);p.querySelector('i').style.width=(Math.max(0,b.health/b.maxHealth)*100)+'%';});}
+function updateBaseHUD(){document.querySelectorAll('.pip').forEach(p=>{const[t,ty]=p.dataset.b.split('-');const ix=TEAM_INDEX[t==='f'?PLAYER_TEAM:TEAM_INDEX.firstEnemy]; if(!ix)return;
+  if(ty==='harv'){ const hv=ix.harv; if(!hv)return; p.classList.toggle('dead',!hv.alive); p.querySelector('i').style.width=(hv.alive?Math.max(0,hv.health/hv.maxHealth)*100:0)+'%'; return; }
+  const b=ty==='hq'?ix.hqs[0]:ty==='refinery'?ix.refinery:ty==='power'?ix.power:ty==='barracks'?ix.barracksB:null;if(!b)return;p.classList.toggle('dead',!b.alive);p.querySelector('i').style.width=(Math.max(0,b.health/b.maxHealth)*100)+'%';});}
 let hitmarkT=0;
 function showHitmarker(kill,head){hitmarkT=0.2;hitmarkEl.style.display='block';hitmarkEl.style.opacity='1';hitmarkEl.querySelectorAll('span').forEach(s=>{s.classList.toggle('kill',!!kill&&!head);s.classList.toggle('head',!!head);}); if(!kill&&!head)sfxTick();
   const s0=kill?2.1:head?1.75:1.5; if(hitmarkEl.animate) hitmarkEl.animate([{transform:'translate(-50%,-50%) rotate(45deg) scale('+s0+')'},{transform:'translate(-50%,-50%) rotate(45deg) scale(1)'}],{duration:190,easing:'cubic-bezier(.2,.8,.3,1)'}); }
@@ -2471,8 +2495,8 @@ function update(dt){ NAV.budget=2;
   if(ps.fireCd>0)ps.fireCd-=dt;
 
   if(!gameOver){
-    const fRef=findB('friend','refinery');
-    credits+=((fRef&&fRef.alive?ECO.payTrickle:ECO.payTrickleDead)+ECO.paySilo*teamEco.friend.silos)*dt; updateCreditHUD();
+    const fRef=TEAM_INDEX[PLAYER_TEAM].refinery;
+    credits+=((fRef&&fRef.alive?ECO.payTrickle:ECO.payTrickleDead)+ECO.paySilo*teamEco[PLAYER_TEAM].silos)*dt; updateCreditHUD();
     updateHarvesters(dt);   // both teams' tech now comes from their harvester docks (+ combat slice)
   }
   updateTechBox(dt);
@@ -2668,7 +2692,7 @@ function update(dt){ NAV.budget=2;
   
   // enemies
   const pPos=player.position;
-  const eBar=findB('hostile','barracks'), eRef=findB('hostile','refinery');
+  const eBar=TEAM_INDEX.soviets.barracksB, eRef=TEAM_INDEX.soviets.refinery;   // the Soviets are the only bot team until the slot table (step 6)
   enemies.forEach((en,ei)=>{
     if(en.alive){
       const epx=en.group.position.x, epz=en.group.position.z;
@@ -2997,7 +3021,7 @@ for(let i=0;i<T.enemyCount;i++){
  * Destructible & contestable (shoot the enemy truck to deny their tech). Respawns while the
  * refinery lives; self-destructs (no respawn) if the refinery dies. Movement is straight-line
  * waypoints (open top-down map, no pathfinding). Hot path is allocation-free. */
-makeHarvester('friend'); makeHarvester('hostile'); makeSupplyField();
+makeHarvester('friend'); makeHarvester('hostile'); makeSupplyField(); buildTeamIndex();
 
 /* ============ TECH BOXES (Phase 3) ============
  * One box at a time, rotating among 3 capture points. Hold E inside the ring with no enemies
