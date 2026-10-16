@@ -24,6 +24,7 @@
  * SIDE-EFFECTS ON LOAD: none — declarations only; the page calls bootGame().
  * ========================================================================== */
 const PLAYER_FACTION='Allies';   // the player's faction: uniform + vehicle livery
+const PLAYER_TEAM=(TEAMS.find(t=>t.faction===PLAYER_FACTION)||TEAMS[0]).id;   // the player's team id (D3: allies); TEAMS loads with core, so no TDZ
 let unitOwned=UNIT_TYPES.map((u,i)=>i===0);  // you start as Conscript; the others unlock in the armory (free T1, Officer 1250 @ T2)
 // ── VEHICLES: enterable, bought separately from infantry. Registry only for now; the model + enter/drive logic lands in a later pass (spawnVehicle stub below). Stats are placeholders. ──
 function updateSunFollow(){ const snap=(2*SUN_SD)/2048; const cx=Math.round(player.position.x/snap)*snap, cz=Math.round(player.position.z/snap)*snap; sun.position.set(cx+_sunDir.x*SUN_R, _sunDir.y*SUN_R, cz+_sunDir.z*SUN_R); sun.target.position.set(cx,0,cz); sun.target.updateMatrixWorld(); }
@@ -507,6 +508,15 @@ function makeBuilding(team,type,x,z){
 }
 /* buildings created by buildMap() */
 function findB(team,type){return buildings.find(b=>b.team===team&&b.type===type);}
+// Team identity, one choke point (three-teams item 2): canonical ids from TEAMS; legacy 'friend' / 'hostile' and faction
+// names map to them; 'neutral', empty and unknown values mean no team (null). Explicit comparisons only: no `in` test or
+// object lookup, so prototype keys such as 'toString' can never pass.
+function teamOf(x){ if(x==null||x===''||x==='neutral')return null;
+  for(let i=0;i<TEAMS.length;i++){ const t=TEAMS[i]; if(x===t.id||x===t.faction)return t.id; }
+  if(x==='friend')return 'allies'; if(x==='hostile')return 'soviets';
+  if(DEV.enabled)console.error('teamOf: unknown team',x); return null; }
+function sameTeam(a,b){ const ta=teamOf(a); return ta!==null&&ta===teamOf(b); }   // both have a team and it is the same one
+function teamFilter(team){ return TUNE.ff?null:team; }   // resolveShot's shooterTeam: teammates are skipped unless friendly fire is on
 
 let terminalPos=new THREE.Vector3(0,0,34), mapSpawn=new THREE.Vector3(0,0,30), termMesh=null, resupplyLabel=null;
 
