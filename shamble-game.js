@@ -679,16 +679,18 @@ const ECO={
   eraNames:['T1','T2','T3','T4'],
   eraCost:[60,90,120], // tech to advance T1→T2, T2→T3, T3→T4
 };
-const teamEco={ friend:{era:1,tech:0,silos:0}, hostile:{era:1,tech:0,silos:0} };
+const teamEco={}; for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id]={era:1,tech:0,silos:0};
+teamEco.friend=teamEco.allies; teamEco.hostile=teamEco.soviets;   // legacy aliases are the SAME objects until 3b: iterate TEAMS, never Object.keys(teamEco)
 // ─── Phase 2: harvester / supply convoy (tunable) ───
 const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z };
 // ─── Phase 3: Tech Boxes (tunable) ───
 const TBOX={ points:DM_Cabana.techPoints, activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };
-const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d };
-const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a' };
+// Team colours: allies teal, both enemy teams today's red until 3b's colour pass (D4); friend/hostile stay as aliases.
+const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d, allies:0x38e1b0, soviets:0xff4d4d, empire:0xff4d4d };
+const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a', allies:'#7af0d2', soviets:'#ff8a8a', empire:'#ff8a8a' };
 // ─── Phase 4: economy-as-weapon — power plant down throttles tech (×0.5) and doubles prices ───
-function powerDead(team){ const b=findB(team,'power'); return b ? !b.alive : false; }
-function priceMult(){ return powerDead('friend') ? 2 : 1; }
+function powerDead(team){ for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(b.type==='power'&&sameTeam(b.team,team)) return !b.alive; } return false; }
+function priceMult(team=PLAYER_TEAM){ return powerDead(team) ? 2 : 1; }
 let credits=0, grenadeCount=0, meleeCd=0, kills=0, roundDeaths=0, roundAssists=0, gameOver=false;
 let nearPanel=false, shopOpen=false;
 // DEV/admin tools — set DEV.enabled=false (or wire to a real auth check) to hide entirely from players.
@@ -786,7 +788,7 @@ function makeTechBoxMesh(){
 const tbox={ active:false, idx:-1, owner:'neutral', prog:0, progTeam:null, timer:0, gap:TBOX.firstDelay, nextIdx:Math.floor(Math.random()*TBOX.points.length) };
 const tboxHudEl=document.getElementById('tboxHud'), tbNameEl=document.getElementById('tbName'), tbTimerEl=document.getElementById('tbTimer'), tbBarWrap=document.getElementById('tbBar'), tbBarFill=tbBarWrap?tbBarWrap.querySelector('i'):null;
 let _tbSec=-1;
-function tbRGB(team){ return team==='friend'?'56,225,176':team==='hostile'?'255,77,77':'181,166,66'; }
+function tbRGB(team){ const t=teamOf(team); return t===null?'181,166,66':(t===PLAYER_TEAM?'56,225,176':'255,77,77'); }
 function dressTechPoints(){
   techPts.forEach((tp,i)=>{
     let col=0x6b6038, emi=0.3, op=0.5;
@@ -869,8 +871,8 @@ function makeSilo(pt){
 }
 function dressSilo(s){ const c=TEAM_COL[s.owner]; s.band.material.color.setHex(c); s.band.material.emissive.setHex(c); s.ring.material.color.setHex(c); s.ring.material.opacity=s.owner==='neutral'?0.45:0.8; }
 function updateSiloHUD(){ silos.forEach((s,i)=>{ const d=document.querySelector('.silo-dot[data-s="'+i+'"]'); if(d) d.style.background='rgba('+tbRGB(s.owner)+',.95)'; }); if(siloRateEl) siloRateEl.textContent='+'+(ECO.paySilo*teamEco.friend.silos)+' cr/s'; }
-function recountSilos(){ let f=0,hh=0; for(const s of silos){ if(s.owner==='friend')f++; else if(s.owner==='hostile')hh++; } teamEco.friend.silos=f; teamEco.hostile.silos=hh; updateSiloHUD(); }
-function resetSilos(){ for(const s of silos){ s.owner='neutral'; s.prog=0; s.progTeam=null; s.bar.grp.visible=false; dressSilo(s); } teamEco.friend.silos=0; teamEco.hostile.silos=0; updateSiloHUD(); }
+function recountSilos(){ for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].silos=0; for(const s of silos){ const id=teamOf(s.owner); if(id)teamEco[id].silos++; } updateSiloHUD(); }
+function resetSilos(){ for(const s of silos){ s.owner='neutral'; s.prog=0; s.progTeam=null; s.bar.grp.visible=false; dressSilo(s); } for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].silos=0; updateSiloHUD(); }
 function updateSilos(dt){
   if(gameOver)return;
   for(const s of silos){
@@ -1622,7 +1624,7 @@ function resetRound(){
   enemies.forEach(en=>{en.alive=true;en.frags=0;en.downs=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.elite?T.eliteHealth:unitOf(en.unit).maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
   ps.health=T.playerHealth;ps.dead=false;ps.lastHitT=99;ps.lastAttacker=null;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
   loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;l.reserve=WEAPONS[i].reserve;l.owned=(i===0);});
-  teamEco.friend.era=1;teamEco.hostile.era=1;teamEco.friend.tech=0;teamEco.hostile.tech=0;teamEco.friend.silos=0;teamEco.hostile.silos=0;
+  for(let i=0;i<TEAMS.length;i++){ const e=teamEco[TEAMS[i].id]; e.era=1; e.tech=0; e.silos=0; }
   credits=T.startCredits;grenadeCount=0;kills=0;roundDeaths=0;roundAssists=0;ps.curWeapon=0;ps.spread=curW().spreadHip;ps.reloading=false;ps.fireCd=0;ps.ads=false;ps.shieldOwned=false;ps.shieldOn=false;ps.swinging=false;ps.shieldFlash=0;document.getElementById('reloadBar').style.opacity='0';unitOwned=UNIT_TYPES.map((u,i)=>i===0);ps.unit=0;applyUnit(0);ps.health=ps.maxHealth;
   clearBolts(); shopOpen=false; document.getElementById('shopModal').style.display='none'; updateHeldModel(); updateRank();
   vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';
@@ -2206,12 +2208,13 @@ function updateEraHUD(){
   else { eraHudEl.classList.remove('max'); const need=ECO.eraCost[f.era-1]; eraFillUsEl.style.width=Math.min(100,tf/need*100).toFixed(1)+'%'; eraNumUsEl.textContent=tf+' / '+need; }
 }
 function onEraUp(team){
-  if(team==='friend'){ const got=grantFreeWeapons(true); showLevelToast('Tech Advanced', ECO.eraNames[teamEco.friend.era-1]+(got?' · '+got+' issued':' online')); if(shopOpen) renderShop(); }
-  else showLevelToast('Enemy Tech','Hostiles reached '+ECO.eraNames[teamEco.hostile.era-1]);
+  if(sameTeam(team,PLAYER_TEAM)){ const got=grantFreeWeapons(true); showLevelToast('Tech Advanced', ECO.eraNames[teamEco[PLAYER_TEAM].era-1]+(got?' · '+got+' issued':' online')); if(shopOpen) renderShop(); }
+  else { const e=teamEco[teamOf(team)]; if(e) showLevelToast('Enemy Tech','Hostiles reached '+ECO.eraNames[e.era-1]); }
 }
 function addTech(team,amt){
-  amt = amt * (powerDead(team)?0.5:1);   // power plant down -> tech income halved
-  const e=teamEco[team];
+  const id=teamOf(team); if(!id)return;
+  amt = amt * (powerDead(id)?0.5:1);   // power plant down -> tech income halved
+  team=id; const e=teamEco[id];
   if(e.era<ECO.eraNames.length){
     e.tech+=amt;
     let need=ECO.eraCost[e.era-1];
