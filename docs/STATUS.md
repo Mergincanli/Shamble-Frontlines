@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-16, 3a three-teams-core built on cs/three-teams-core (head 15b1971, PR to be opened). PRs #10, #11, #13 merged; PR #14 open._
+_Last updated: 2026-10-16, 3a three-teams-core built on cs/three-teams-core ([PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15) open). PRs #10, #11, #13 merged; PR #14 open. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
@@ -11,14 +11,14 @@ change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` 
 bot-poplar-wedge (PR #7, 159bec4).
 **Merged 2026-10-15/16:** editor-undo-ground (PR #8, b5f4ecf), docs-loop-v2 (PR #9, 67cf55b), map-dedupe-on-load
 (PR #10), team-prep-fixes (PR #11, 513f2fc), docs-editor-v2 (PR #12, fec5e67), editor-hotfix (PR #13, 8f4c3b6), map-dedupe-on-load merged as 7ca2cc4. **In flight:**
-**3a three-teams-core** (cs/three-teams-core: steps 1-16 plus review fixes built, PR to be opened; waits on the
+**3a three-teams-core** (cs/three-teams-core: steps 1-16 plus review fixes built, [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15); waits on the
 Advisor's APPROVE and Mustafa's Brave check) and PR #14 (kit-v1-3, reporting rule; open, waits on the Advisor's APPROVE).
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
 flags any [OPEN] item it needs decided; all numbers live in one tunable data table; [LATER] items are not built.
 **Queue (Advisor, 2026-10-15; one change-set at a time):** greybox phase: 1. three-teams, split by the approved plan into
-0. team-prep-fixes (merged) → **3a three-teams-core (built, PR to be opened)** → N1 (editor Play never rebuilds the nav
+0. team-prep-fixes (merged) → **3a three-teams-core (built, PR #15)** → N1 (editor Play never rebuilds the nav
 grid, a one-line change-set) → 3b three-teams-hud → 3c spawn-and-buy → "ramps as slopes in SIM" (lets `_botFireWorld` go) →
 2. octopon-3-greybox (NC-7 blast reach by line of sight comes before its playtests) →
 3. harvest-economy → 4. bot-replan-storm (the navSteer replan storm, bot-poplar-wedge PERF-2) → 5. uplinks →
