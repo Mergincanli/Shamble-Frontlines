@@ -609,8 +609,9 @@ function makeEnemySpawn(x,z,faction){
   const rec={grp,x,z,faction}; grp.userData.editSel={kind:'enemyspawn',ref:rec};
   enemySpawns.push(rec); enemySpawnLayer.add(grp); return rec;
 }
+const curMap={ name:'Cabana Republic' };   // B6: the built map's name, so saves, exports and undo snapshots keep it
 function buildMap(def){
-  clearMap();
+  clearMap(); curMap.name=(typeof def.name==='string'&&def.name)?def.name.slice(0,80):'Untitled map';
   (def.obstacles||[]).forEach(o=>{ const ob=addBox(o.x,o.z,o.w,o.h,o.d,o.warm?crateMatWarm:crateMat,true); if(o.rot){ ob.mesh.rotation.y=o.rot; ob.box.setFromObject(ob.mesh); } if(o.y!=null){ ob.mesh.position.y=o.y; ob.box.setFromObject(ob.mesh); } });
   (def.paths||[]).forEach(pp=>addPath(pp.x,pp.z,pp.w,pp.d,pp.rot||0));
   (def.buildings||[]).forEach(b=>{ const e=makeBuilding(b.team,b.type,b.x,b.z); if(b.hp){ e.maxHealth=b.hp; e.health=b.hp; } if(b.s&&b.s!==1)_scaleBuilding(e,b.s); if(b.rot){ e.mesh.rotation.y=b.rot; if(e.trim)e.trim.rotation.y=b.rot; e.box.setFromObject(e.mesh); } if(b.y!=null){ const rdy=b.y-e.mesh.position.y; [e.mesh,e.trim,e.label,e.bar&&e.bar.grp].forEach(o=>{if(o)o.position.y+=rdy;}); e.box.setFromObject(e.mesh); } });
@@ -633,7 +634,7 @@ function buildMap(def){
   _rules=rulesMerge(def.rules); if(_rulesReady)applyRules(_rules);
 }
 function serializeMap(){ return {
-  name:'DM_Romania',
+  name:curMap.name,
   spawn:{x:+mapSpawn.x.toFixed(1),z:+mapSpawn.z.toFixed(1)},
   resupply:{x:+terminalPos.x.toFixed(1),z:+terminalPos.z.toFixed(1),rot:+((termMesh?termMesh.rotation.y:0)).toFixed(3),w:+((termMesh?termMesh.scale.x*1.4:1.4)).toFixed(2),h:+((termMesh?termMesh.scale.y*1.6:1.6)).toFixed(2),d:+((termMesh?termMesh.scale.z:1)).toFixed(2)},
   obstacles:obstacles.filter(o=>o.crate).map(o=>({x:+o.mesh.position.x.toFixed(1),z:+o.mesh.position.z.toFixed(1),w:o.w,h:o.h,d:o.d,warm:o.warm,rot:+(o.mesh.rotation.y).toFixed(3),y:+o.mesh.position.y.toFixed(2)})),
@@ -994,11 +995,11 @@ function updateAim(){
   if(raycaster.ray.intersectPlane(groundPlane,_v)) aimGround.copy(_v);
   // hit resolution through the HEADLESS math core — no per-frame array/raycast allocation
   syncSimWorld();
-  const r=resolveShot(SIM,-1, o.x,o.y,o.z, d.x,d.y,d.z, 400);
+  const r=resolveShot(SIM,SIM_PLAYER, o.x,o.y,o.z, d.x,d.y,d.z, 400);
   aimHoverEnemy=false; aimPart=null; aimTarget=false; aimBlocked=false;
   if(r.kind==='none'){ aimPoint.copy(aimGround); }
   else { aimPoint.set(r.px,r.py,r.pz);
-    if(r.kind==='enemy'&&enemies[r.id]&&enemies[r.id].alive){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; }
+    if(r.kind==='enemy'&&enemies[r.id-1]&&enemies[r.id-1].alive){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; }
     else if(r.kind==='building'&&buildings[r.id]&&buildings[r.id].alive&&buildings[r.id].team==='hostile'){ aimTarget=true; }
     else if(r.kind==='harvester'&&harvesters[r.id]&&harvesters[r.id].alive&&harvesters[r.id].team==='hostile'){ aimTarget=true; }
     else if(r.kind==='building'||r.kind==='block'||r.kind==='harvester'){ aimBlocked=true; } }
@@ -1177,10 +1178,10 @@ function _jugFirePilot(jug, idx){
   _jugV2.normalize();
   if(typeof syncSimWorld==='function' && typeof resolveShot==='function'){
     syncSimWorld();
-    const r=resolveShot(SIM,-1,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range);
+    const r=resolveShot(SIM,SIM_PLAYER,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range);
     _jugV3.set(r.px,r.py,r.pz);
     if(typeof addTracer==='function') addTracer(_jugV,_jugV3,JUG_CANNON.tracer);
-    if(r.kind==='enemy'){ const en=enemies[r.id]; if(en&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
+    if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
     else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&b.team==='hostile'&&typeof damageBuilding==='function') damageBuilding(b,JUG_CANNON.damage); }
     if(typeof addExplosion==='function') addExplosion(_jugV3);
   }
@@ -1309,23 +1310,28 @@ function pitchWeapon(s,target){
  * (Stage 1: decouple simulation from the view layer. Tick = 60 Hz authoritative.)
  * ========================================================================== */
 let _frameId=0, _simFrame=-1;   // once-per-frame guard for syncSimWorld (F1): all in-frame callers capture identical positions
+const SIM_PLAYER=0;   // the player's SIM id; bot ids are their enemies index + 1 (every player-side shot passes it, so it never self-hits)
 const _hpV=new THREE.Vector3(), _hnV=new THREE.Vector3(), _dmgPt=new THREE.Vector3();
 function syncSimWorld(force){
   if(!force && _simFrame===_frameId) return;   // F1: already synced this frame; positions dont change between in-frame callers
   _simFrame=_frameId;
-  const P=SIM.players; P.length=enemies.length;
-  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; let e=P[i]||(P[i]={}); const pos=en.group.position; e.id=i; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=en.alive; e.stance=0; }
+  const P=SIM.players; P.length=enemies.length+1;   // P[0] is the player (id SIM_PLAYER), P[i+1] is enemies[i] (id i+1)
+  { let e=P[0]||(P[0]={}); const pos=player.position; e.id=SIM_PLAYER; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=!ps.dead; e.stance=0; }
+  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; let e=P[i+1]||(P[i+1]={}); const pos=en.group.position; e.id=i+1; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=en.alive; e.stance=0; }
   const S=SIM.statics; let n=0; for(let i=0;i<S.length;i++) S[i].rot=false;   // slots are reused: only oriented obstacles set rot below
   for(let i=0;i<buildings.length;i++){ const b=buildings[i],bx=b.box; let s=S[n]||(S[n]={}); s.kind='building'; s.id=i; s.alive=b.alive; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   for(let i=0;i<obstacles.length;i++){ const o=obstacles[i],bx=o.box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z;
     const th=o.mesh.rotation.y; if(Math.abs(Math.sin(2*th))>1e-3&&o.w>0&&o.d>0){ s.rot=true; s.cx=o.mesh.position.x; s.cz=o.mesh.position.z; s.rc=Math.cos(th); s.rs=Math.sin(th); s.hw=o.w*0.5; s.hd=o.d*0.5; } n++; }   // oriented box for 45° pieces
   for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i]; if(!hv.alive)continue; const hp=hv.group.position; let s=S[n]||(S[n]={}); s.kind='harvester'; s.id=i; s.alive=true; s.minx=hp.x-hv.hx;s.miny=0;s.minz=hp.z-hv.hz;s.maxx=hp.x+hv.hx;s.maxy=hv.hy;s.maxz=hp.z+hv.hz; n++; }
   for(let i=0;i<platforms.length;i++){ const bx=platforms[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
+  const rampLo=n;   // ramp slots: their boxes stand in for slopes, so bot fire skips them (main's losMeshes never held ramps)
   for(let i=0;i<ramps.length;i++){ const bx=ramps[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
+  const rampHi=n;
   for(let i=0;i<houses.length;i++){ const bs=houses[i].boxes||[houses[i].box]; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<covers.length;i++){ if(!covers[i].los||!covers[i].boxes)continue; const bs=covers[i].boxes; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<trees.length;i++){ if(!trees[i].los||!trees[i].box)continue; const bx=trees[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }for(let i=0;i<props.length;i++){ if(!props[i].los||!props[i].box)continue; const bx=props[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   S.length=n;
+  const B=_botFireWorld.statics; let m=0; for(let i=0;i<n;i++){ if(i<rampLo||i>=rampHi) B[m++]=S[i]; } B.length=m;
 }
 
 function fireOnce(){
@@ -1352,11 +1358,11 @@ function castShot(origin,dir,w,vis){
   // Hit detection now runs through the HEADLESS pure-math core (resolveShot),
   // NOT THREE.Raycaster. The raycaster remains only for the cosmetic aim dot.
   syncSimWorld();
-  const r=resolveShot(SIM,-1, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range);
+  const r=resolveShot(SIM,SIM_PLAYER, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range);
   _hpV.set(r.px,r.py,r.pz); _hnV.set(r.nx,r.ny,r.nz);
   const dmg=w.damage*falloffMult(w,origin.distanceTo(_hpV));
   addTracer(vis||origin,_hpV,w.tracer);
-  if(r.kind==='enemy'){ const en=enemies[r.id]; if(en&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
+  if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
   else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&b.team==='hostile'){ damageBuilding(b,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&hv.team==='hostile'){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else addImpact(_hpV,_hnV,'dirt');
@@ -1369,7 +1375,7 @@ function damageEnemy(en,dmg,part,point,flat,hsMult){
   const killed=en.health<=0&&en.alive;
   spawnDamageNumber(pt, Math.round(final), part==='head', killed);
   showHitmarker(killed, part==='head');
-  animHit(en.group,player.position.x,player.position.z,dmg/40);if(killed){en.alive=false;en.topple=0;deathStart(en.group,player.position.x,player.position.z);en.respawnT=T.enemyRespawn;kills++;en.downs=(en.downs||0)+1;credits+=T.killReward;addTech('friend',part==='head'?ECO.techPerHeadshot:ECO.techPerKill);onKill(curW().id,part==='head');if(part==='head')onHeadshotKill();else sfxKill();if(part==='head'||curW().melee)triggerVignette(en,curW().melee?'melee':'headshot');updateHostileCount();updateCreditHUD();comicKill(en.group.position.clone().setY(1.8));}
+  animHit(en.group,player.position.x,player.position.z,dmg/40);if(killed){en.alive=false;{ const sp=SIM.players[enemies.indexOf(en)+1]; if(sp)sp.alive=false; }en.topple=0;deathStart(en.group,player.position.x,player.position.z);en.respawnT=T.enemyRespawn;kills++;en.downs=(en.downs||0)+1;credits+=T.killReward;addTech('friend',part==='head'?ECO.techPerHeadshot:ECO.techPerKill);onKill(curW().id,part==='head');if(part==='head')onHeadshotKill();else sfxKill();if(part==='head'||curW().melee)triggerVignette(en,curW().melee?'melee':'headshot');updateHostileCount();updateCreditHUD();comicKill(en.group.position.clone().setY(1.8));}
 }
 
 /* buildings dmg */
@@ -1391,21 +1397,24 @@ function enemyClimbSteer(en, mv){ const eh=en.group.position.y; if(player.positi
 
 /* enemy fire */
 const eM=new THREE.Vector3(), _eF=new THREE.Vector3(), _eT=new THREE.Vector3(), _eEnd=new THREE.Vector3(), _zAxis=new THREE.Vector3(0,0,1);   // enemy-fire scratch + siege impact normal (B2a)
+const _eHitN=new THREE.Vector3(), _botFireWorld={ players:[null], statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view
 function enemyFire(en){
   en._aimT=1.4;   // raise the gun to the aim stance while shooting (cosmetic)
   const eu=unitOf(en.unit);
-  _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(player.position);_eT.y=1.45;
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);
+  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[0];   // aim at the same player snapshot the hit test uses
+  _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(P0.x,P0.y+1.45,P0.z);   // chest to chest, following both heights
+  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
-  losRay.set(eM,sdv);losRay.far=eu.enemyRange;
-  const pH=losRay.intersectObject(player,true), oH=losRay.intersectObjects(losMeshes,false);
-  const pD=pH.length?pH[0].distance:Infinity, oD=oH.length?oH[0].distance:Infinity; let end;
-  if(pD<oD&&pD<eu.enemyRange){end=_eEnd.copy(pH[0].point);damagePlayer(eu.enemyDmg,en.group.position,false,en);addImpact(end,_aup,'flesh');}
-  else if(oD<eu.enemyRange){end=_eEnd.copy(oH[0].point);addImpact(end,oH[0].face?oH[0].face.normal:_aup,'dirt');}
+  // B1: resolved in the SIM hit world the player's bullets use (capsules + 220 statics), never the animated player meshes.
+  // Bots still only target the player, so their world holds the player alone (other bots don't block them, as before).
+  const W=_botFireWorld; W.groundY=SIM.groundY; W.players[0]=P0;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
+  const r=resolveShot(W,-1,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange); let end;
+  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}
+  else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
-  addTracer(eM,end,0xff5a3a);
+  addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
 function siegeFire(en,b){
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
@@ -1591,7 +1600,7 @@ function damagePlayer(amount,fromPos,ignoreShield,srcEnemy){
   const ang=Math.atan2(toA.x,toA.z)-Math.atan2(cf.x,cf.z); wedgeEl.style.transform=`rotate(${-ang}rad)`; dmgDirEl.style.opacity='1'; dmgDirT=0.8; if(toA.lengthSq()>1e-4){ _od.copy(toA).normalize(); camKickVel.addScaledVector(_od,-Math.min(7,amount*0.5)); camKickVel.y+=1.2; }
   updateHealthHUD(); if(ps.health<=0)playerDie();
 }
-function playerDie(){{ const _la=ps.lastAttacker&&ps.lastAttacker.group; deathStart(player,_la?_la.position.x:player.position.x+Math.random()-0.5,_la?_la.position.z:player.position.z+Math.random()-0.5); }ps.dead=true;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();if(ps.lastAttacker){ps.lastAttacker.frags=(ps.lastAttacker.frags||0)+1;ps.lastAttacker=null;}document.getElementById('deathScreen').style.display='flex';}
+function playerDie(){{ const _la=ps.lastAttacker&&ps.lastAttacker.group; deathStart(player,_la?_la.position.x:player.position.x+Math.random()-0.5,_la?_la.position.z:player.position.z+Math.random()-0.5); }ps.dead=true;if(SIM.players[0])SIM.players[0].alive=false;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();if(ps.lastAttacker){ps.lastAttacker.frags=(ps.lastAttacker.frags||0)+1;ps.lastAttacker=null;}document.getElementById('deathScreen').style.display='flex';}
 function playerRespawn(){ps.dead=false;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
 
 /* end / reset */
@@ -2234,18 +2243,18 @@ function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')retu
   const lvlChanged=(Prog.level!==_sbLvl);
   let aK=0,aD=0,aA=0,aAlive=0;
   for(const r of _sbRowsA){ let k,d,a,alive; if(r.src==='you'){ k=kills; d=roundDeaths; a=roundAssists; alive=!ps.dead; if(lvlChanged)r.rank.innerHTML=rankInsigniaSVG(Prog.level,22); } else { k=r.src.k||0; d=r.src.d||0; a=r.src.a||0; alive=r.src.alive!==false; }
-    r.k.textContent=k; r.d.textContent=d; r.a.textContent=a; r.root.classList.toggle('down',!alive); aK+=k; aD+=d; aA+=a; if(alive)aAlive++; }
+    _st(r.k,k); _st(r.d,d); _st(r.a,a); r.root.classList.toggle('down',!alive); aK+=k; aD+=d; aA+=a; if(alive)aAlive++; }
   let bK=0,bD=0,bAlive=0;
-  for(const r of _sbRowsB){ const en=r.src, k=en.frags||0, d=en.downs||0; r.k.textContent=k; r.d.textContent=d; r.a.textContent='—'; r.root.classList.toggle('down',!en.alive); bK+=k; bD+=d; if(en.alive)bAlive++; }
-  _sbR.aK.textContent=aK; _sbR.bK.textContent=bK; _sbR.aAlive.textContent=aAlive; _sbR.bAlive.textContent=bAlive;
-  _sbR.aTier.textContent=ECO.eraNames[teamEco.friend.era-1]; _sbR.bTier.textContent=ECO.eraNames[teamEco.hostile.era-1];
-  _sbR.atK.textContent=aK; _sbR.atD.textContent=aD; _sbR.atA.textContent=aA; _sbR.btK.textContent=bK; _sbR.btD.textContent=bD; _sbR.btA.textContent='—';
+  for(const r of _sbRowsB){ const en=r.src, k=en.frags||0, d=en.downs||0; _st(r.k,k); _st(r.d,d); _st(r.a,'—'); r.root.classList.toggle('down',!en.alive); bK+=k; bD+=d; if(en.alive)bAlive++; }
+  _st(_sbR.aK,aK); _st(_sbR.bK,bK); _st(_sbR.aAlive,aAlive); _st(_sbR.bAlive,bAlive);   // B5: write only on change
+  _st(_sbR.aTier,ECO.eraNames[teamEco.friend.era-1]); _st(_sbR.bTier,ECO.eraNames[teamEco.hostile.era-1]);
+  _st(_sbR.atK,aK); _st(_sbR.atD,aD); _st(_sbR.atA,aA); _st(_sbR.btK,bK); _st(_sbR.btD,bD); _st(_sbR.btA,'—');
   if(lvlChanged){ _sbR.mIns.innerHTML=rankInsigniaSVG(Prog.level,40); _sbR.mRank.textContent=rankForLevel(Prog.level).name; _sbLvl=Prog.level; }
-  _sbR.mLvl.textContent='Level '+Prog.level;
-  if(Prog.prestige>0){ _sbR.mPrest.style.display=''; _sbR.mPrest.textContent='✦'+Prog.prestige; } else _sbR.mPrest.style.display='none';
+  _st(_sbR.mLvl,'Level '+Prog.level);
+  if(Prog.prestige>0){ _sd(_sbR.mPrest,''); _st(_sbR.mPrest,'✦'+Prog.prestige); } else _sd(_sbR.mPrest,'none');
   const _need=xpForLevel(Prog.level), _frac=Prog.level>=100?1:Math.max(0,Math.min(1,Prog.xp/_need));
-  _sbR.mXp.style.width=(_frac*100)+'%'; _sbR.mXn.textContent=Prog.level>=100?'MAX RANK':Prog.xp+' / '+_need+' XP';
-  _sbR.mK.textContent=kills; _sbR.mD.textContent=roundDeaths; _sbR.mA.textContent=roundAssists; }
+  { const w=(_frac*100)+'%'; if(_sbR.mXp.style.width!==w)_sbR.mXp.style.width=w; } _st(_sbR.mXn,Prog.level>=100?'MAX RANK':Prog.xp+' / '+_need+' XP');
+  _st(_sbR.mK,kills); _st(_sbR.mD,roundDeaths); _st(_sbR.mA,roundAssists); }
 function sbShow(on){ if(!scoreboardEl)return; if(on&&_sbBuilt!==enemies.length)sbBuildRosters(); scoreboardEl.style.display=on?'flex':'none'; if(on)sbSync(); }
 function updateBaseHUD(){document.querySelectorAll('.pip').forEach(p=>{const[t,ty]=p.dataset.b.split('-');const team=t==='f'?'friend':'hostile';
   if(ty==='harv'){ const hv=harvesters.find(h=>h.team===team); if(!hv)return; p.classList.toggle('dead',!hv.alive); p.querySelector('i').style.width=(hv.alive?Math.max(0,hv.health/hv.maxHealth)*100:0)+'%'; return; }
@@ -2428,6 +2437,7 @@ function navSteer(en,gx,gz,out,dt){ const p=en.group.position, dx=gx-p.x, dz=gz-
   if(el<1.0&&N.i<N.n-1){ N.i++; ex=N.pts[N.i*2]-p.x; ez=N.pts[N.i*2+1]-p.z; el=Math.sqrt(ex*ex+ez*ez); }
   return el>1e-4?out.set(ex/el,0,ez/el):out.set(dx/d,0,dz/d); }
 function update(dt){ NAV.budget=2;
+  _frameId++;   // a new sim step: syncSimWorld re-syncs once per update(), so headless runs (tools/sim.js) see live positions
   const w=curW(),l=curL();
   const _animClock=performance.now()*0.001;
   if(meleeCd>0)meleeCd-=dt;
@@ -2548,7 +2558,7 @@ function update(dt){ NAV.budget=2;
   // vehicle enter/exit prompt (priority over terminal)
   nearJugObj=null; if(!pilotJug&&!ps.dead&&!gameOver){ let _jbd=JUG_ENTER_R*JUG_ENTER_R; for(const jug of juggernauts){ if(!jug.alive)continue; const dx=jug.group.position.x-player.position.x, dz=jug.group.position.z-player.position.z; const d=dx*dx+dz*dz; if(d<_jbd){_jbd=d;nearJugObj=jug;} } }
   // terminal prompt
-  nearPanel=false; for(const bk of barracksList){ if(bk.panelPos && player.position.distanceTo(bk.panelPos)<2.6){ nearPanel=true; break; } }
+  nearPanel=false; for(const bk of barracksList){ if(bk.panelPos && bk.team==='friend' && player.position.distanceTo(bk.panelPos)<2.6){ nearPanel=true; break; } }
   nearPanel = nearPanel && !ps.dead && !gameOver;
   const nearTerm = !nearPanel && !nearJugObj && !pilotJug && player.position.distanceTo(terminalPos)<6 && !ps.dead && !gameOver;
   _so(termPrompt,(pilotJug||nearJugObj||nearPanel||nearTerm)?'1':'0');
@@ -2624,9 +2634,9 @@ function update(dt){ NAV.budget=2;
       const segLen=_bSeg.copy(b.mesh.position).sub(b.prev).length();
       if(segLen>1e-4){
         _bDir.copy(_bSeg).multiplyScalar(1/segLen); b.mesh.quaternion.setFromUnitVectors(_aup,_bDir);
-        const r=resolveShot(SIM,-1, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
+        const r=resolveShot(SIM,SIM_PLAYER, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
         if(r.kind!=='none'){
-          const en=(r.kind==='enemy')?enemies[r.id]:null; _bHit.set(r.px,r.py,r.pz);
+          const en=(r.kind==='enemy')?enemies[r.id-1]:null; _bHit.set(r.px,r.py,r.pz);
           b.state='armed'; b.t=0; addImpact(_bHit,_aup,!!en); b.mesh.position.copy(_bHit);
           if(en&&en.alive){ b.stuckTo=en; b.stuckOff.copy(_bHit).sub(en.group.position); } else b.stuckTo=null; // stick to the body, ride it until the fuse blows
           continue;
@@ -2688,7 +2698,7 @@ function update(dt){ NAV.budget=2;
       let _ejump=false; if(en.grounded){ const _jx=en.group.position.x-epx, _jz=en.group.position.z-epz, _jl=hyp2(_jx,_jz); if(_jl>1e-3){ const _f=en.group.position.y, _ah=surfaceHeightAt(en.group.position.x+_jx/_jl*1.5, en.group.position.z+_jz/_jl*1.5); if(_ah>_f+T.stepUp && _ah<=_f+EJUMP_REACH) _ejump=true; } }
       resolveObstacles(en.group.position,0.7); tickVertical(en.group.position, en, dt, _ejump, 0.7);
       { const _fOn=en.hitFlash>0; if(_fOn)en.hitFlash-=dt; if(_fOn!==en._fOn){ en._fOn=_fOn; const _hx=_fOn?0x661010:0x000000; en.group.traverse(o=>{if(o.isMesh&&o.material&&o.material.emissive)o.material.emissive.setHex(_hx);}); } }
-      const bar=en.group.userData.bar;bar.grp.visible=true;bar.grp.lookAt(camera.position);const h=Math.max(0,en.health/T.enemyHealth);bar.fg.scale.x=h;bar.fg.position.x=-(1-h)*0.7;
+      const bar=en.group.userData.bar;bar.grp.visible=true;bar.grp.lookAt(camera.position);const h=Math.max(0,Math.min(1,en.health/(en.elite?T.eliteHealth:unitOf(en.unit).maxHealth)));bar.fg.scale.x=h;bar.fg.position.x=-(1-h)*0.7;
       _animSt.aimYaw=en.group.rotation.y;_animSt.t=_animClock;_animSt.kick=0;_animSt.dip=0;_animSt.rel=-1;_animSt.throwC=-1;_animSt.lean=0;_animSt.grounded=en.grounded;en._aimT=Math.max(0,(en._aimT||0)-dt);_animSt.ads=en._aimT>0?1:0;_animSt.swap=0; updateSoldierAnim(en.group,_animSt,dt);
     } else {
       en.topple+=dt;if(en._tx===undefined){en._tx=(Math.random()<0.5?-1:1);en._tz=(Math.random()*2-1)*0.55;}animDeath(en.group,dt);en.group.userData.bar.grp.visible=false;
