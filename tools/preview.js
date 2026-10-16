@@ -10,7 +10,9 @@ const { createCanvas } = require('@napi-rs/canvas');
 const { PNG } = require('pngjs');
 const THREE = require('three');
 
-const [dir, cmd, outFile, xArg, zArg, fovArg, wArg, hArg] = process.argv.slice(2);
+// --map=<id> (anywhere on the line) boots that map the way index.html?map=<id> does, e.g. --map=tri for DM_Tri
+const MAP_ARG = (process.argv.find(a => a.startsWith('--map=')) || '').slice(6);
+const [dir, cmd, outFile, xArg, zArg, fovArg, wArg, hArg] = process.argv.slice(2).filter(a => !a.startsWith('--map='));
 const W = +(wArg || 1280), H = +(hArg || 720), SS = 2;           // render at 2x, box-downsample -> smooth lines
 const BW = W * SS, BH = H * SS;
 const gl = createGL(BW, BH, { preserveDrawingBuffer: true, antialias: false });
@@ -61,6 +63,7 @@ function makeEl(tag) {
 }
 const byId = new Map();
 globalThis.window = globalThis; globalThis.self = globalThis;
+globalThis.location = { search: MAP_ARG ? '?map=' + encodeURIComponent(MAP_ARG) : '' };   // bootGame reads window.location.search (?map=tri)
 globalThis.innerWidth = BW; globalThis.innerHeight = BH; globalThis.devicePixelRatio = 1;
 globalThis.addEventListener = () => {}; globalThis.removeEventListener = () => {};
 globalThis.requestAnimationFrame = () => 0; globalThis.cancelAnimationFrame = () => {};

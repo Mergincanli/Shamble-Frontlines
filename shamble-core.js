@@ -950,6 +950,38 @@ const DM_Romania = {
   ],
   barracks:[ {x:-18,z:22,team:'friend'}, {x:-18,z:-22,team:'hostile'} ]
 };
+// DM_Tri (three-teams 3a, D13/D14): a greybox arena for three teams, one per faction. Bases sit 120 degrees apart, 92 m
+// from (0,-23), the supply field; enterable barracks keep rot 0 on even-integer centres so the doorway stays open on the
+// nav grid (they are the one part that is not rotated with its base). Tech points sit between bases, silos farther out.
+// Generated and checked (6 m gaps, arena bounds, truck legs clear of every box) by the 3a layout script; open with ?map=tri.
+const DM_Tri = {
+  name:'DM_Tri', version:1,
+  spawn:{x:-8,z:72}, resupply:{x:-7,z:64},
+  obstacles:[
+    {x:35.84,z:6.93,w:2.6,h:1.5,d:2.6,warm:true},{x:43.84,z:-6.93,w:2.6,h:1.5,d:2.6,warm:false},{x:32.04,z:-4.5,w:2.6,h:1.5,d:2.6,warm:true},{x:47.63,z:4.5,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:8,z:-69,w:2.6,h:1.5,d:2.6,warm:true},{x:-8,z:-69,w:2.6,h:1.5,d:2.6,warm:false},{x:0,z:-60,w:2.6,h:1.5,d:2.6,warm:true},{x:0,z:-78,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:-43.84,z:-6.93,w:2.6,h:1.5,d:2.6,warm:true},{x:-35.84,z:6.93,w:2.6,h:1.5,d:2.6,warm:false},{x:-32.04,z:-4.5,w:2.6,h:1.5,d:2.6,warm:true},{x:-47.63,z:4.5,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:11.26,z:-16.5,w:2.6,h:1.5,d:2.6,warm:true},{x:0,z:-36,w:2.6,h:1.5,d:2.6,warm:false},{x:-11.26,z:-16.5,w:2.6,h:1.5,d:2.6,warm:true},{x:-3,z:35,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:12,z:35,w:2.6,h:1.5,d:2.6,warm:true},{x:51.73,z:-49.4,w:2.6,h:1.5,d:2.6,warm:false},{x:44.23,z:-62.39,w:2.6,h:1.5,d:2.6,warm:true},{x:-48.73,z:-54.6,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:-56.23,z:-41.61,w:2.6,h:1.5,d:2.6,warm:true}
+  ],
+  buildings:[
+    {team:'allies',type:'hq',x:0,z:83},{team:'allies',type:'refinery',x:-20,z:67},{team:'allies',type:'power',x:18,z:83},{team:'allies',type:'barracks',x:18,z:65},
+    {team:'soviets',type:'hq',x:91.8,z:-76},{team:'soviets',type:'refinery',x:87.94,z:-50.68},{team:'soviets',type:'power',x:82.8,z:-91.59},{team:'soviets',type:'barracks',x:67.21,z:-82.59},
+    {team:'empire',type:'hq',x:-91.8,z:-76},{team:'empire',type:'refinery',x:-67.94,z:-85.32},{team:'empire',type:'power',x:-100.8,z:-60.41},{team:'empire',type:'barracks',x:-85.21,z:-51.41}
+  ],
+  barracks:[ {x:0,z:56,team:'allies'},{x:68,z:-62,team:'soviets'},{x:-68,z:-62,team:'empire'} ],
+  enemySpawns:[ {x:0,z:69,faction:'Allies'},{x:79.67,z:-69,faction:'Soviets'},{x:-79.67,z:-69,faction:'Empire'} ],   // one marker per base: bots spawn here (teamSpawnPoint)
+  harvField:{x:0,z:-23},
+  harvLanes:{
+    allies:{dock:{x:-18.48,z:60.17},lane:{x:0,z:-18}},
+    soviets:{dock:{x:81.26,z:-48.58},lane:{x:4.33,z:-25.5}},
+    empire:{dock:{x:-62.78,z:-80.59},lane:{x:-4.33,z:-25.5}}
+  },
+  techPoints:[ {name:'Alpha',x:39.84,z:0},{name:'Bravo',x:0,z:-69},{name:'Charlie',x:-39.84,z:0} ],
+  silos:[ {x:76.21,z:21},{x:0,z:-111},{x:-76.21,z:21} ],
+  env:{ fog:{near:260,far:760} }
+};
 // C1: dispose the OLD map's GPU resources on rebuild (clearMap ran on init, Reset, map-load, and every editor undo/redo -- previously leaked geo/mat/label-textures each time).
 // SHARED material templates are skipped; a `seen` set prevents double-dispose (outline hulls share the parent geometry); only .map (per-instance label CanvasTextures) is disposed, never .gradientMap (shared toon ramps).
 function genTimberTex(){

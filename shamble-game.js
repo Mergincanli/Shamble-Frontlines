@@ -674,6 +674,7 @@ function serializeMap(){ return {
   buildings:buildings.map(b=>({team:b.team,type:b.type,x:+b.mesh.position.x.toFixed(1),z:+b.mesh.position.z.toFixed(1),rot:+(b.mesh.rotation.y).toFixed(3),s:+(b.scl||1).toFixed(3),hp:Math.round(b.maxHealth),y:+b.mesh.position.y.toFixed(2)})),
   barracks:barracksList.map(b=>({x:+(b.cx).toFixed(1),z:+(b.cz).toFixed(1),team:b.team,rot:+(b.rot||0).toFixed(3),s:+(b.scl||1).toFixed(3)})),
   harvField:{x:+HARV.fieldX.toFixed(1),z:+HARV.fieldZ.toFixed(1)},
+  harvLanes:HARV.lanes?Object.keys(HARV.lanes).reduce((o,k)=>{ const l=HARV.lanes[k]; o[k]={dock:{x:+l.dock.x.toFixed(1),z:+l.dock.z.toFixed(1)},lane:{x:+l.lane.x.toFixed(1),z:+l.lane.z.toFixed(1)}}; return o; },{}):undefined,
   techPoints:TBOX.points.map(p=>({name:p.name,x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
   silos:SILO.points.map(p=>({x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
   env:currentEnvJSON(),
@@ -700,7 +701,7 @@ const ECO={
 const teamEco={}; for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id]={era:1,tech:0,silos:0};
 teamEco.friend=teamEco.allies; teamEco.hostile=teamEco.soviets;   // legacy aliases are the SAME objects until 3b: iterate TEAMS, never Object.keys(teamEco)
 // ─── Phase 2: harvester / supply convoy (tunable) ───
-const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z, fieldGrp:null };
+const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z, fieldGrp:null, lanes:null };   // lanes: the map's per-team truck {dock,lane}, validated by placeObjectives
 // ─── Phase 3: Tech Boxes (tunable) ───
 const TBOX={ points:[], pool:[], names:['Alpha','Bravo','Charlie'], activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };   // points: the map's tech points (own objects from pool, names fixed by index; placeObjectives)
 for(let i=0;i<3;i++){ const c=DM_Cabana.techPoints[i]; TBOX.pool.push({name:TBOX.names[i], x:c?c.x:0, z:c?c.z:0}); if(c)TBOX.points.push(TBOX.pool[i]); }
@@ -723,9 +724,11 @@ function buildTeamIndex(){
   TEAM_INDEX.firstEnemy=null;
   for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id], r=e.refinery;
     if(TEAM_INDEX.firstEnemy===null&&id!==PLAYER_TEAM)TEAM_INDEX.firstEnemy=id;
-    // dock and field lane: today's two-team numbers for allies (dock -z, lane -4) and soviets (+z, +4); any other team
-    // docks 7 m from its refinery toward the field. Map data (harvLanes) replaces these in a later step.
-    if(id==='allies'||id==='soviets'){ const sg=(id==='allies')?-1:1;
+    // dock and field lane: the map's harvLanes when it has them (DM_Tri); else today's two-team numbers for allies (dock -z,
+    // lane -4) and soviets (+z, +4); any other team docks 7 m from its refinery toward the field.
+    const ln=HARV.lanes?HARV.lanes[id]:null;
+    if(ln){ e.dockX=ln.dock.x; e.dockZ=ln.dock.z; e.laneX=ln.lane.x; e.laneZ=ln.lane.z; }
+    else if(id==='allies'||id==='soviets'){ const sg=(id==='allies')?-1:1;
       e.dockX=r?r.mesh.position.x:0; e.dockZ=r?r.mesh.position.z+7*sg:-35*sg; e.laneX=HARV.fieldX+4*sg; e.laneZ=HARV.fieldZ; }
     else { const rx=r?r.mesh.position.x:0, rz=r?r.mesh.position.z:0, dx=HARV.fieldX-rx, dz=HARV.fieldZ-rz, d=Math.sqrt(dx*dx+dz*dz)||1;
       e.dockX=rx+dx/d*7; e.dockZ=rz+dz/d*7; e.laneX=HARV.fieldX; e.laneZ=HARV.fieldZ; } }
@@ -739,6 +742,11 @@ function placeObjectives(def){
   const AX=T.arenaX-4, AZ=T.arenaZ-4, cx=v=>Math.max(-AX,Math.min(AX,v)), cz=v=>Math.max(-AZ,Math.min(AZ,v));
   const pick=(a,fb,cap)=>{ const src=Array.isArray(a)?a.filter(ok).slice(0,cap):[]; return src.length?src:fb.slice(0,cap); };
   const hf=(def&&ok(def.harvField))?def.harvField:DM_Cabana.harvField; HARV.fieldX=cx(hf.x); HARV.fieldZ=cz(hf.z);
+  const hl=def?def.harvLanes:null; HARV.lanes=null;   // per-team {dock,lane}, known team ids only; a team without a valid entry keeps the defaults
+  if(hl!==null&&typeof hl==='object'){ const L={}; let n=0;
+    for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, o=Object.prototype.hasOwnProperty.call(hl,id)?hl[id]:null;
+      if(o!==null&&typeof o==='object'&&ok(o.dock)&&ok(o.lane)){ L[id]={dock:{x:cx(o.dock.x),z:cz(o.dock.z)},lane:{x:cx(o.lane.x),z:cz(o.lane.z)}}; n++; } }
+    if(n) HARV.lanes=L; }
   const tp=pick(def&&def.techPoints,DM_Cabana.techPoints,TBOX.pool.length), sp=pick(def&&def.silos,DM_Cabana.silos,SILO.pool.length);
   const tv=tp.map(o=>[cx(o.x),cz(o.z)]), sv=sp.map(o=>[cx(o.x),cz(o.z)]);   // read every value before writing: tp may hold the pool's own objects
   TBOX.points.length=0; for(let i=0;i<tv.length;i++){ const o=TBOX.pool[i]; o.name=TBOX.names[i]; o.x=tv[i][0]; o.z=tv[i][1]; TBOX.points.push(o); }
@@ -3172,7 +3180,7 @@ BK.buildProp=function(kind, seed){
   if(typeof stylizeOne==='function') stylizeOne(g);
   return { group:g, solid:!!K.solid, los:!!K.los, height:colH };
 };
-buildMap(DM_Cabana);
+{ let def=DM_Cabana; try{ const s=(window.location&&typeof window.location.search==='string')?window.location.search:''; if(/^\?(?:[^#]*&)?map=tri(?:&|$)/.test(s)) def=DM_Tri; }catch(e){} buildMap(def); }   // ?map=tri opens the three-team arena
 
 /* player */
 player.userData.sword=makeSword(); player.userData.joints.handR.add(player.userData.sword); player.userData.sword.position.set(0,-0.05,0.05);
@@ -3218,7 +3226,7 @@ for(let i=0;i<TEAMS.length;i++) makeHarvester(TEAMS[i].id); makeSupplyField(); b
  * ~half the bots contest the box they don't hold; the rest keep sieging buildings/harvester. */
 for(let i=0;i<TBOX.pool.length;i++) techPts.push(makeTechPoint(TBOX.pool[i])); makeTechBoxMesh();   // fixed pools of 3 (techPts[i] stays index-aligned with TBOX.points[i])
 for(let i=0;i<SILO.pool.length;i++) silos.push(makeSilo(SILO.pool[i]));
-placeObjectives({harvField:{x:HARV.fieldX,z:HARV.fieldZ}, techPoints:TBOX.points.slice(), silos:SILO.points.slice()});   // pools exist now: show only the map's
+placeObjectives({harvField:{x:HARV.fieldX,z:HARV.fieldZ}, harvLanes:HARV.lanes, techPoints:TBOX.points.slice(), silos:SILO.points.slice()});   // pools exist now: show only the map's
 _rulesReady=true; applyRules(_rules);
 FXPool._def('casing',()=>{ const m=new THREE.Mesh(new THREE.BoxGeometry(0.055,0.055,0.14),new THREE.MeshStandardMaterial({color:0xd6a23a,roughness:0.5,metalness:0.6,emissive:0x3a2a08,emissiveIntensity:0.25,transparent:true,opacity:1})); noRay(m); m.userData.noOutline=true; stylizeOne(m); m.visible=false; scene.add(m); return {mesh:m,vel:new THREE.Vector3(),av:new THREE.Vector3()}; });
 FXPool._def('flash',()=>{ const m=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0.95})); noRay(m); m.visible=false; scene.add(m); return {mesh:m}; });
