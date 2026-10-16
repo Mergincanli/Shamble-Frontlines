@@ -11,8 +11,10 @@ const { PNG } = require('pngjs');
 const THREE = require('three');
 
 // --map=<id> (anywhere on the line) boots that map the way index.html?map=<id> does, e.g. --map=tri for DM_Tri
+// --pre=<file.js> runs that file after the engine scripts load and before bootGame() (e.g. TUNE.teams.size=8 for tools/perfbots.js)
 const MAP_ARG = (process.argv.find(a => a.startsWith('--map=')) || '').slice(6);
-const [dir, cmd, outFile, xArg, zArg, fovArg, wArg, hArg] = process.argv.slice(2).filter(a => !a.startsWith('--map='));
+const PRE_ARG = (process.argv.find(a => a.startsWith('--pre=')) || '').slice(6);
+const [dir, cmd, outFile, xArg, zArg, fovArg, wArg, hArg] = process.argv.slice(2).filter(a => !a.startsWith('--map=') && !a.startsWith('--pre='));
 const W = +(wArg || 1280), H = +(hArg || 720), SS = 2;           // render at 2x, box-downsample -> smooth lines
 const BW = W * SS, BH = H * SS;
 const gl = createGL(BW, BH, { preserveDrawingBuffer: true, antialias: false });
@@ -90,6 +92,7 @@ const warn = console.warn; console.warn = (...a) => { const s = String(a[0] || '
 const run = (code, name) => vm.runInThisContext(code, { filename: name || 'inline' });
 run(fs.readFileSync(dir + '/shamble-core.js', 'utf8'), 'shamble-core.js');
 run(fs.readFileSync(dir + '/shamble-game.js', 'utf8'), 'shamble-game.js');
+if (PRE_ARG) run(fs.readFileSync(PRE_ARG, 'utf8'), 'pre');
 const _t0 = process.hrtime.bigint(); run('bootGame();', 'boot'); if (cmd === 'time') { const ms = Number(process.hrtime.bigint() - _t0) / 1e6; const t1 = process.hrtime.bigint(); run(`for(let i=0;i<24;i++){ const g=buildSoldier?buildSoldier('Soviets','conscript'):null; }`, 'rebuilds'); console.log('bootGame ms', ms.toFixed(0), '| 24 soldier rebuilds ms', (Number(process.hrtime.bigint() - t1) / 1e6).toFixed(0)); process.exit(0); }
 
 if (cmd === 'evalshot') {   // evalshot <snippet.js> <out.png>: the snippet renders (e.g. a multi-viewport contact sheet); we read back + save
