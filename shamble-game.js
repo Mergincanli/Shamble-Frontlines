@@ -491,7 +491,7 @@ function applyRifleHold(group, pose){
 /* buildings */
 const buildings=[];
 function makeBuilding(team,type,x,z){
-  const isF=team==='friend'; const accent=isF?0x38e1b0:0xff4d4d;
+  team=teamOf(team); const isF=team!==null&&team===PLAYER_TEAM; const accent=isF?0x38e1b0:0xff4d4d;   // canonical id; teamless stays red (N3)
   const dims=type==='hq'?[8,9,8]:type==='refinery'?[10,4,6]:type==='power'?[6,8,5]:[7,5,7];
   const base=isF?0x1f3633:0x361f1f;
   const m=new THREE.Mesh(new THREE.BoxGeometry(dims[0],dims[1],dims[2]),new THREE.MeshStandardMaterial({color:base,roughness:0.85,metalness:0.2}));
@@ -527,8 +527,9 @@ const bFloorMat=new THREE.MeshStandardMaterial({color:0x1b2523,roughness:1});
 const barracksList=[];
 function makeBarracks(cx,cz,team){
   const W=11,D=11,H=5,t=0.6,dw=3.4,seg=(W-dw)/2;
-  const accent=team==='hostile'?0xff4d4d:team==='friend'?0x38e1b0:0x9fb0ad;
-  const txtCol=team==='hostile'?'#ff8a8a':team==='friend'?'#7af0d2':'#cfe6e2';
+  team=teamOf(team); const rel=team===null?0:team===PLAYER_TEAM?1:2;   // canonical id or null; teamless stays grey
+  const accent=rel===2?0xff4d4d:rel===1?0x38e1b0:0x9fb0ad;
+  const txtCol=rel===2?'#ff8a8a':rel===1?'#7af0d2':'#cfe6e2';
   const walls=[ addBox(cx,cz-D/2,W,H,t,wallMat,false), addBox(cx+W/2,cz,t,H,D,wallMat,false), addBox(cx-W/2,cz,t,H,D,wallMat,false), addBox(cx-(dw/2+seg/2),cz+D/2,seg,H,t,wallMat,false), addBox(cx+(dw/2+seg/2),cz+D/2,seg,H,t,wallMat,false) ];
   const lintel=new THREE.Mesh(new THREE.BoxGeometry(dw,1.1,t),wallMat); lintel.position.set(cx,H-0.55,cz+D/2); lintel.castShadow=true; noRay(lintel); scene.add(lintel);
   const floor=new THREE.Mesh(new THREE.BoxGeometry(W-t,0.08,D-t),bFloorMat); floor.position.set(cx,0.04,cz); floor.receiveShadow=true; noRay(floor); scene.add(floor);
@@ -543,7 +544,7 @@ function makeBarracks(cx,cz,team){
   const plabel=makeLabel('ARMORY',txtCol); plabel.position.set(cx,2.62,cz-D/2+t/2+0.2); plabel.scale.set(2.6,0.7,1); scene.add(plabel);
   const panelPos=new THREE.Vector3(cx,0,cz-D/2+1.0);
   if(typeof stylizeOne==='function'){ stylizeOne(lintel); stylizeOne(floor); stylizeOne(roof); stylizeOne(panel); }   // runtime builder: stylizeScene only ran at boot
-  const ent={cx,cz,team:team||'neutral',iw:W/2-t,id:D/2-t,walls,roof,roofM,label,lintel,floor,panel,plabel,panelPos,op:1};
+  const ent={cx,cz,team,iw:W/2-t,id:D/2-t,walls,roof,roofM,label,lintel,floor,panel,plabel,panelPos,op:1};
   walls.forEach(w=>{ w.mesh.userData.editSel={kind:'barracks',ref:ent}; }); // click a wall to select the barracks
   barracksList.push(ent); return ent;
 }
@@ -610,7 +611,7 @@ const enemySpawns=[];
 const enemySpawnLayer=new THREE.Group(); scene.add(enemySpawnLayer);
 const _spawnFacCol={Soviets:0xE11020, Allies:0x1F6FF0, Empire:0x7B2FD6};
 function makeEnemySpawn(x,z,faction){
-  faction=(faction in _spawnFacCol)?faction:'Soviets'; const col=_spawnFacCol[faction];
+  faction=Object.prototype.hasOwnProperty.call(_spawnFacCol,faction)?faction:'Soviets'; const col=_spawnFacCol[faction];
   const grp=new THREE.Group(); grp.position.set(x,0,z);
   const ring=new THREE.Mesh(new THREE.RingGeometry(1.5,1.95,30), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.85,side:THREE.DoubleSide,depthWrite:false})); ring.rotation.x=-Math.PI/2; ring.position.y=0.06; grp.add(ring);
   const disc=new THREE.Mesh(new THREE.CircleGeometry(1.45,30), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,side:THREE.DoubleSide,depthWrite:false})); disc.rotation.x=-Math.PI/2; disc.position.y=0.05; grp.add(disc);
@@ -738,7 +739,7 @@ function respawnPos(en){ if(enemySpawns.length){ const fac=en&&en.faction; const
 function setEnemyType(en, idx){ en.unit=idx; setHeldGun(en.group, WEAPONS[unitOf(idx).wpn].id); if(en.elite)return; const u=unitOf(idx); const hm=en.group.userData.head; if(hm&&hm.material&&hm.material.color) hm.material.color.set(u.accent); }
 const harvesters=[]; const _hvDir=new THREE.Vector3();
 function makeHarvester(team){
-  const isF=team==='friend'; const accent=isF?0x38e1b0:0xff4d4d;
+  team=teamOf(team); const isF=team!==null&&team===PLAYER_TEAM; const accent=isF?0x38e1b0:0xff4d4d;
   const g=new THREE.Group();
   const body=new THREE.Mesh(new THREE.BoxGeometry(3.0,1.5,2.0), new THREE.MeshStandardMaterial({color:isF?0x32423c:0x42322f,roughness:0.82,metalness:0.3})); body.position.set(-0.3,1.05,0); body.castShadow=true; g.add(body);
   const cab=new THREE.Mesh(new THREE.BoxGeometry(1.3,1.35,1.85), new THREE.MeshStandardMaterial({color:isF?0x283732:0x352826,roughness:0.82,metalness:0.3})); cab.position.set(1.55,0.95,0); cab.castShadow=true; g.add(cab);
@@ -3022,7 +3023,7 @@ for(let i=0;i<T.enemyCount;i++){
  * Destructible & contestable (shoot the enemy truck to deny their tech). Respawns while the
  * refinery lives; self-destructs (no respawn) if the refinery dies. Movement is straight-line
  * waypoints (open top-down map, no pathfinding). Hot path is allocation-free. */
-makeHarvester('friend'); makeHarvester('hostile'); makeSupplyField(); buildTeamIndex();
+makeHarvester('allies'); makeHarvester('soviets'); makeSupplyField(); buildTeamIndex();
 
 /* ============ TECH BOXES (Phase 3) ============
  * One box at a time, rotating among 3 capture points. Hold E inside the ring with no enemies
