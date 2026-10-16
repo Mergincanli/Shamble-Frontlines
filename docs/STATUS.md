@@ -30,7 +30,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **3a three-teams-core** (teams as data, 12-slot soldier table, team-filtered shots, two-layer damage, per-team objectives, bot targeting with a LOS budget, DM_Tri arena at `?map=tri`, interim end rule; symbols +22 -0 vs main) | cs/three-teams-core (head 15b1971, 25 commits on main 7ca2cc4) | built, steps 1-16 plus review fixes; each commit message carries its evidence; PR to be opened | Advisor's APPROVE, then Mustafa's Brave check |
+| **3a three-teams-core** (teams as data, 12-slot soldier table, team-filtered shots, two-layer damage, per-team objectives, bot targeting with a LOS budget, DM_Tri arena at `?map=tri`, interim end rule; symbols +22 -0 vs main) | cs/three-teams-core (head 15b1971, 25 commits on main 7ca2cc4) | built, steps 1-16 plus review fixes; each commit message carries its evidence; [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15) open, CI green | Advisor's APPROVE, then Mustafa's Brave check |
 | kit-v1-3 (reporting rule) | PR #14 | open | Advisor's APPROVE |
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
 | kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
