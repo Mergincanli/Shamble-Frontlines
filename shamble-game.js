@@ -514,7 +514,7 @@ function findB(team,type){return buildings.find(b=>b.team===team&&b.type===type)
 function teamOf(x){ if(x==null||x===''||x==='neutral')return null;
   for(let i=0;i<TEAMS.length;i++){ const t=TEAMS[i]; if(x===t.id||x===t.faction)return t.id; }
   if(x==='friend')return 'allies'; if(x==='hostile')return 'soviets';
-  if(DEV.enabled)console.error('teamOf: unknown team',x); return null; }
+  if(DEV.enabled)console.error('teamOf: unknown team',typeof x==='string'?x.slice(0,40):typeof x); return null; }   // map data: log a capped string, never the raw value
 function sameTeam(a,b){ const ta=teamOf(a); return ta!==null&&ta===teamOf(b); }   // both have a team and it is the same one
 function teamFilter(team){ return TUNE.ff?null:team; }   // resolveShot's shooterTeam: teammates are skipped unless friendly fire is on
 
