@@ -1052,11 +1052,11 @@ function updateAim(){
   if(raycaster.ray.intersectPlane(groundPlane,_v)) aimGround.copy(_v);
   // hit resolution through the HEADLESS math core — no per-frame array/raycast allocation
   syncSimWorld();
-  const r=resolveShot(SIM,SIM_PLAYER, o.x,o.y,o.z, d.x,d.y,d.z, 400);
+  const r=resolveShot(SIM,SIM_PLAYER, o.x,o.y,o.z, d.x,d.y,d.z, 400, teamFilter(PLAYER_TEAM));
   aimHoverEnemy=false; aimPart=null; aimTarget=false; aimBlocked=false;
   if(r.kind==='none'){ aimPoint.copy(aimGround); }
   else { aimPoint.set(r.px,r.py,r.pz);
-    if(r.kind==='enemy'&&enemies[r.id-1]&&enemies[r.id-1].alive){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; }
+    if(r.kind==='enemy'){ const so=SOLDIERS[r.id]; if(so&&so!==ps&&so.alive&&!sameTeam(so.team,PLAYER_TEAM)){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; } }   // with friendly fire on, an ally can be hit but never reads as a target
     else if(r.kind==='building'&&buildings[r.id]&&buildings[r.id].alive&&teamOf(buildings[r.id].team)!==null&&!sameTeam(buildings[r.id].team,PLAYER_TEAM)){ aimTarget=true; }
     else if(r.kind==='harvester'&&harvesters[r.id]&&harvesters[r.id].alive&&teamOf(harvesters[r.id].team)!==null&&!sameTeam(harvesters[r.id].team,PLAYER_TEAM)){ aimTarget=true; }
     else if(r.kind==='building'||r.kind==='block'||r.kind==='harvester'){ aimBlocked=true; } }
@@ -1235,10 +1235,10 @@ function _jugFirePilot(jug, idx){
   _jugV2.normalize();
   if(typeof syncSimWorld==='function' && typeof resolveShot==='function'){
     syncSimWorld();
-    const r=resolveShot(SIM,SIM_PLAYER,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range);
+    const r=resolveShot(SIM,SIM_PLAYER,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range,teamFilter(PLAYER_TEAM));
     _jugV3.set(r.px,r.py,r.pz);
     if(typeof addTracer==='function') addTracer(_jugV,_jugV3,JUG_CANNON.tracer);
-    if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
+    if(r.kind==='enemy'){ const en=SOLDIERS[r.id]; if(en&&en!==ps&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
     else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&teamOf(b.team)!==null&&!sameTeam(b.team,PLAYER_TEAM)&&typeof damageBuilding==='function') damageBuilding(b,JUG_CANNON.damage); }
     if(typeof addExplosion==='function') addExplosion(_jugV3);
   }
@@ -1415,11 +1415,11 @@ function castShot(origin,dir,w,vis){
   // Hit detection now runs through the HEADLESS pure-math core (resolveShot),
   // NOT THREE.Raycaster. The raycaster remains only for the cosmetic aim dot.
   syncSimWorld();
-  const r=resolveShot(SIM,SIM_PLAYER, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range);
+  const r=resolveShot(SIM,SIM_PLAYER, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range, teamFilter(PLAYER_TEAM));
   _hpV.set(r.px,r.py,r.pz); _hnV.set(r.nx,r.ny,r.nz);
   const dmg=w.damage*falloffMult(w,origin.distanceTo(_hpV));
   addTracer(vis||origin,_hpV,w.tracer);
-  if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
+  if(r.kind==='enemy'){ const en=SOLDIERS[r.id]; if(en&&en!==ps&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
   else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&teamOf(b.team)!==null&&!sameTeam(b.team,PLAYER_TEAM)){ damageBuilding(b,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&teamOf(hv.team)!==null&&!sameTeam(hv.team,PLAYER_TEAM)){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else addImpact(_hpV,_hnV,'dirt');
@@ -1454,7 +1454,7 @@ function enemyClimbSteer(en, mv){ const eh=en.group.position.y; if(player.positi
 
 /* enemy fire */
 const eM=new THREE.Vector3(), _eF=new THREE.Vector3(), _eT=new THREE.Vector3(), _eEnd=new THREE.Vector3(), _zAxis=new THREE.Vector3(0,0,1);   // enemy-fire scratch + siege impact normal (B2a)
-const _eHitN=new THREE.Vector3(), _botFireWorld={ players:[null], statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view
+const _eHitN=new THREE.Vector3(), _botFireWorld={ players:SIM.players, statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view: the same soldiers, statics without ramps (K1)
 function enemyFire(en){
   en._aimT=1.4;   // raise the gun to the aim stance while shooting (cosmetic)
   const eu=unitOf(en.unit);
@@ -1464,11 +1464,12 @@ function enemyFire(en){
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
-  // B1: resolved in the SIM hit world the player's bullets use (capsules + 220 statics), never the animated player meshes.
-  // Bots still only target the player, so their world holds the player alone (other bots don't block them, as before).
-  const W=_botFireWorld; W.groundY=SIM.groundY; W.players[0]=P0;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
-  const r=resolveShot(W,-1,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange); let end;
-  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}
+  // B1: resolved in the SIM hit world the player's bullets use (the same soldier capsules), never the animated meshes.
+  // K1: the soldiers are SIM.players, minus the bot itself and its own team; the statics leave out ramp slots, whose boxes
+  // stand in for slopes. One hit world for every shooter is a multiplayer invariant (ADR-001).
+  const W=_botFireWorld; W.groundY=SIM.groundY;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
+  const r=resolveShot(W,en.id,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange,teamFilter(en.team)); let end;
+  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);if(r.id===SIM_PLAYER)damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}   // a bot hit by a bot takes no damage until applyDamage (step 8)
   else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
   addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
@@ -2693,9 +2694,9 @@ function update(dt){ NAV.budget=2;
       const segLen=_bSeg.copy(b.mesh.position).sub(b.prev).length();
       if(segLen>1e-4){
         _bDir.copy(_bSeg).multiplyScalar(1/segLen); b.mesh.quaternion.setFromUnitVectors(_aup,_bDir);
-        const r=resolveShot(SIM,SIM_PLAYER, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
+        const r=resolveShot(SIM,SIM_PLAYER, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05, teamFilter(PLAYER_TEAM)); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
         if(r.kind!=='none'){
-          const en=(r.kind==='enemy')?enemies[r.id-1]:null; _bHit.set(r.px,r.py,r.pz);
+          const en=(r.kind==='enemy'&&SOLDIERS[r.id]!==ps)?SOLDIERS[r.id]:null; _bHit.set(r.px,r.py,r.pz);
           b.state='armed'; b.t=0; addImpact(_bHit,_aup,!!en); b.mesh.position.copy(_bHit);
           if(en&&en.alive){ b.stuckTo=en; b.stuckOff.copy(_bHit).sub(en.group.position); } else b.stuckTo=null; // stick to the body, ride it until the fuse blows
           continue;

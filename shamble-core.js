@@ -1458,11 +1458,11 @@ function rayAabb(ox,oy,oz,dx,dy,dz,minx,miny,minz,maxx,maxy,maxz,outN){ let tmin
   let t=tmin; if(t<0){ t=tmax; if(t<0)return -1; } if(outN){outN[0]=nx;outN[1]=ny;outN[2]=nz;} return t; }
 // PURE hitscan query — reads world, never mutates it (so the server can run it
 // against a rewound snapshot for lag compensation, then apply damage live).
-function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range){
+function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range,shooterTeam){   // shooterTeam: soldiers of that team are skipped (null = hit everyone but the shooter)
   const res=world._res||(world._res={}), nrm=world._nrm||(world._nrm=[0,0,0,0]);
   let bestT=range,kind='none',id=-1,part='',nx=-dx,ny=-dy,nz=-dz;
   const P=world.players;
-  for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.alive||p.id===shooterId)continue; const baseY=p.y||0, drop=p.stance?BODY.crouchDrop:0;
+  for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.alive||p.id===shooterId)continue; if(shooterTeam!=null&&p.team===shooterTeam)continue; const baseY=p.y||0, drop=p.stance?BODY.crouchDrop:0;
     let t=raySphere(ox,oy,oz,dx,dy,dz,p.x,baseY+BODY.headY-drop,p.z,BODY.headR);
     if(t>=0&&t<bestT){ bestT=t;kind='enemy';id=p.id;part='head'; nx=ox+dx*t-p.x;ny=oy+dy*t-(baseY+BODY.headY-drop);nz=oz+dz*t-p.z; }
     t=rayCapsule(ox,oy,oz,dx,dy,dz,p.x,baseY+BODY.torsoBotY-drop,p.z,p.x,baseY+BODY.torsoTopY-drop,p.z,BODY.torsoR);
