@@ -762,7 +762,7 @@ function activateRoster(){
     const ally=sameTeam(en.team,PLAYER_TEAM), bar=g.userData.bar; bar.fg.material.color.setHex(ally?0x38e1b0:0xff4d4d); bar.bg.material.color.setHex(ally?0x08302a:0x300808);   // health bar by relation to you
     // A parked slot leaves the scene graph: r128 updates the matrices of hidden objects too. Back in the scene it goes
     // through stylizeOne, which skips meshes that are already toon and styles a slot that was parked when stylizeScene ran.
-    if(on){ if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } if(!g.userData.anim||!g.userData.anim.v2)_animInit(g); g.visible=mode!=='editor'; }   // anim state now: a kill before its first animated frame still falls (deathStart)
+    if(on){ teamSpawnPoint(en.team,en.id,g.position); if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } if(!g.userData.anim||!g.userData.anim.v2)_animInit(g); g.visible=mode!=='editor'; }   // anim state now: a kill before its first animated frame still falls (deathStart)
     else { en.alive=false; en.respawnT=0; g.visible=false; g.userData.bar.grp.visible=false; if(g.parent)g.parent.remove(g); } }
   for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], ix=TEAM_INDEX[teamOf(hv.team)]; hv.parked=!(ix&&ix.active);
     if(hv.parked){ hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; } }
@@ -790,7 +790,23 @@ function spawnEnemyMesh(faction,elite){
   const grp=new THREE.Group(); grp.add(bg,fg); grp.position.y=2.9; e.add(grp); e.userData.bar={grp,fg,bg}; return e;
 }
 function randSpawn(){return new THREE.Vector3((Math.random()*2-1)*(T.arenaX-8),0,-T.arenaZ+10+Math.random()*22);}
-function respawnPos(en){ if(enemySpawns.length){ const fac=en&&en.faction; const mine=fac?enemySpawns.filter(sp=>sp.faction===fac):null; const pool=(mine&&mine.length)?mine:enemySpawns; const m=pool[(Math.random()*pool.length)|0]; const a=Math.random()*6.283, r=Math.random()*5; return new THREE.Vector3(m.x+Math.cos(a)*r,0,m.z+Math.sin(a)*r); } return randSpawn(); }
+// Per-team bot spawn (three-teams item 9, D13), written into out, deterministic by slot (no Math.random, no allocation):
+// the team's own markers round-robin by slot; else TUNE.spawn.doorOut m outside its enterable barracks door; else beside
+// its first HQ, toward the map centre; else mapSpawn (your team only); else the legacy north band. Never another team's
+// marker. Slots sit TUNE.spawn.lateral m apart, side by side.
+function teamSpawnPoint(team,slotId,out){
+  const id=teamOf(team), e=id?TEAM_INDEX[id]:null, n=TUNE.teams.size, k=slotId%n, lat=(k-(n-1)/2)*TUNE.spawn.lateral;
+  if(e&&e.markers.length){ const m=e.markers[k%e.markers.length]; out.set(m.x+lat,0,m.z); return out; }
+  const b=e?e.barracksE:null;
+  if(b){ const r=b.rot||0, c=Math.cos(r), s=Math.sin(r), d=5.5*(b.scl||1)+TUNE.spawn.doorOut;   // 5.5 m: makeBarracks' D/2; the door faces local +z, rotated as _rotAround does
+    out.set(b.cx-s*d+c*lat,0,b.cz+c*d+s*lat); return out; }
+  const h=(e&&e.hqs.length)?e.hqs[0]:null;
+  if(h){ const p=h.mesh.position, bx=h.box, L=hyp2(p.x,p.z), ux=L>1e-6?-p.x/L:0, uz=L>1e-6?-p.z/L:1, d=Math.max(bx.max.x-bx.min.x,bx.max.z-bx.min.z)/2+TUNE.spawn.doorOut;
+    out.set(p.x+ux*d-uz*lat,0,p.z+uz*d+ux*lat); return out; }
+  if(id===PLAYER_TEAM){ out.set(mapSpawn.x+lat,0,mapSpawn.z); return out; }
+  out.set((((slotId*0.618034)%1)*2-1)*(T.arenaX-8),0,-T.arenaZ+10+((slotId*0.381966)%1)*22); return out;
+}
+function respawnPos(en){ return teamSpawnPoint(en.team,en.id,new THREE.Vector3()); }
 function setEnemyType(en, idx){ en.unit=idx; en.maxHealth=en.elite?T.eliteHealth:unitOf(idx).maxHealth; setHeldGun(en.group, WEAPONS[unitOf(idx).wpn].id); if(en.elite)return; const u=unitOf(idx); const hm=en.group.userData.head; if(hm&&hm.material&&hm.material.color) hm.material.color.set(u.accent); }
 const harvesters=[]; const _hvDir=new THREE.Vector3();
 function makeHarvester(team){
@@ -1788,7 +1804,7 @@ function resetRound(){
   buildTeamIndex(); activateRoster();   // the editor edits buildings without buildMap
   gameOver=false; endEl.style.display='none'; document.getElementById('deathScreen').style.display='none';
   buildings.forEach(b=>{b.alive=true;b.health=b.maxHealth;b.sink=0;b.mesh.position.y=b.mesh.geometry.parameters.height/2;b.mesh.visible=true;b.trim.visible=true;b.trim.material.emissiveIntensity=0.65;b.trim.position.y=b.mesh.geometry.parameters.height-0.7;b.label.visible=true;b.bar.grp.visible=true;b.box.setFromObject(b.mesh);});
-  enemies.forEach(en=>{if(!en.active)return;en.alive=true;en.frags=0;en.downs=0;en.lastAttackerId=-1;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
+  enemies.forEach(en=>{if(!en.active)return;en.alive=true;en.frags=0;en.downs=0;en.lastAttackerId=-1;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;teamSpawnPoint(en.team,en.id,en.group.position);en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
   ps.health=T.playerHealth;ps.dead=false;ps.alive=true;ps.lastHitT=99;ps.lastAttacker=null;ps.lastAttackerId=-1;ps.frags=0;ps.downs=0;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
   loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;l.reserve=WEAPONS[i].reserve;l.owned=(i===0);});
   for(let i=0;i<TEAMS.length;i++){ const e=teamEco[TEAMS[i].id]; e.era=1; e.tech=0; e.silos=0; }
@@ -2881,7 +2897,7 @@ function update(dt){ NAV.budget=2;
       _animSt.aimYaw=en.group.rotation.y;_animSt.t=_animClock;_animSt.kick=0;_animSt.dip=0;_animSt.rel=-1;_animSt.throwC=-1;_animSt.lean=0;_animSt.grounded=en.grounded;en._aimT=Math.max(0,(en._aimT||0)-dt);_animSt.ads=en._aimT>0?1:0;_animSt.swap=0; updateSoldierAnim(en.group,_animSt,dt);
     } else {
       en.topple+=dt;if(en._tx===undefined){en._tx=(Math.random()<0.5?-1:1);en._tz=(Math.random()*2-1)*0.55;}animDeath(en.group,dt);en.group.userData.bar.grp.visible=false;
-      if(!gameOver){const eRef=TEAM_INDEX[en.team].refinery;en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;AI_STATE.rotatePush(en);en.targetId=-1;en.targetVis=false;en.scanCursor=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
+      if(!gameOver){const eRef=TEAM_INDEX[en.team].refinery;en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;AI_STATE.rotatePush(en);en.targetId=-1;en.targetVis=false;en.scanCursor=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;teamSpawnPoint(en.team,en.id,en.group.position);en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
     }
   }
 
@@ -3157,7 +3173,7 @@ for(let k=0;k<TEAMS.length;k++){ const tm=TEAMS[k];
   const en={group:g,elite:false,faction:_fac,health:T.enemyHealth,alive:true,topple:0,respawnT:0,hitFlash:0,state:'patrol',wander:Math.random()*6.28,wanderT:0,fireCd:Math.random()*2,burstLeft:0,strafeDir:Math.random()<.5?1:-1,strafeT:0,unit:0,lungeCd:0,frags:0,downs:0,vy:0,grounded:true,_aimT:0,_tx:undefined,_tz:0,_fOn:false,_nav:null,
     id:SOLDIERS.length,team:tm.id,maxHealth:T.enemyHealth,active:false,lastAttackerId:-1,targetId:-1,retargetT:0,scanCursor:0,role:null,credits:0,px:undefined,pz:undefined,   // px/pz stay undefined until tickVertical's first step (it tests !==undefined)
     losT:0,targetVis:false,scanBestId:-1,scanBestD2:0,pushTeam:null};
-  setEnemyType(en, j%3); en.health=en.maxHealth; g.position.copy(respawnPos(en));
+  setEnemyType(en, j%3); en.health=en.maxHealth;   // activateRoster() places the active slots (teamSpawnPoint)
   g.traverse(o=>{ if(o.isMesh) o.userData.enemyRef=en; }); // for aim hover detection
   enemies.push(en); SOLDIERS.push(en);
 } }
