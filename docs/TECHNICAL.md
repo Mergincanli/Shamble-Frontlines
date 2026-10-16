@@ -69,8 +69,8 @@ Split across three files now (§1a); each is comment-sectioned. The list below i
    - Scene / camera / renderer / lights; base materials; the **toon pipeline** (`_toonGrad`/`toonify`/`makeOutlineMat`/Fresnel/`stylizeScene`).
    - **The character system** (see §5): `FACTION_PALETTES`, `assembleChar`, `applyFaction`, `buildEntity`, `buildCharacter`, `CHAR_DEFAULT`/`CHAR_MALE`/`CHAR_FEMALE`, `CPARTS`, `poseArms`, `animateSoldier`, plus `makeSword`/`makeAxe`/`makeShield`.
    - **Object factories**: `addBox` (crates/walls → `obstacles[]`), `addPath` (flat decals → `paths[]`), `makeBuilding` (→ `buildings[]`), `makeBarracks` (→ `barracksList[]`), `makeLabel`.
-   - **Map data** `DM_Romania` + `buildMap`/`clearMap`/`serializeMap`.
-   - **The SIM core** (headless pure-math hit/LOS/collision) — see §4.
+   - **Map data** `DM_Romania` + `buildMap`/`clearMap`/`serializeMap` (`curMap` holds the built map's name).
+   - **The SIM core** (headless pure-math hit/LOS; movement collision is game-side `resolveObstacles`) — see §4.
    - **Combat**: `fireOnce`, `castShot`, `damageEnemy`, `damagePlayer`, abilities (banzai/bayonet/shield/molotov), grenades/charge system, **FX** (`addImpact`/`addMuzzle`/`addExplosion`/`addCasing` + the single `fx[]` update loop) and **WebAudio** (`SFX`, `sfxShot`/`sfxKill`/`sfxStep`/`sfxClank`/`sfxThunk`).
    - **Player state `ps`**, input handlers (`keydown`/`wheel`/`mouse`), the main **`update(dt)`**, the camera-framing block.
    - **HUD** updates, **progression** (`Prog`, rank tiers, career chip), **shop**, **tutorial**.
@@ -84,11 +84,14 @@ Split across three files now (§1a); each is comment-sectioned. The list below i
 
 ## 4. The SIM core (source of truth for combat)
 
-- **Hit detection, line-of-sight, and movement collision run through a headless, pure-math core**, *not* `THREE.Raycaster`. Key pieces: `resolveShot(...)`, `SIM.statics` (mirrored colliders), `rayAabb(...)`, `hasLOS(...)`, `resolveBoxes(pos, r)`.
-- `syncSimWorld()` mirrors the THREE scene's colliders into `SIM` before resolving a shot.
+- **Hit detection and line-of-sight run through a headless, pure-math core**, *not* `THREE.Raycaster`. Key pieces: `resolveShot(...)`, `SIM.statics` (mirrored colliders), `rayAabb(...)`, `rayStatic(...)`, `rayStatics(S,ox,oy,oz,dx,dy,dz,maxT,anyHit,out)`, `hasLOS(...)`. Movement collision is game-side `resolveObstacles(pos, r)`. [verified 2026-10-15]
+  - `rayStatics` tests all statics in one loop with the slab test inlined; returns the index of the nearest static hit with t < maxT (the first one found when `anyHit`, as `hasLOS` uses it), or -1; when `out` is given, writes the hit normal to `out[0..2]` and t to `out[3]`; skips statics with `alive===false`. `hasLOS` and `resolveShot` use it (no per-static float boxing).
+  - SIM id scheme: `SIM.players[0]` is the player (id `SIM_PLAYER`=0, declared in `shamble-game.js`); `SIM.players[i+1]` mirrors `enemies[i]` (id i+1). Player-side shots pass `SIM_PLAYER` as the shooter; readers map a hit back with `enemies[r.id-1]`; a death sets the victim's SIM entry `alive=false` at once. [verified]
+  - `_botFireWorld` (game): the bot-fire view of SIM (only the player plus every static except ramp slots), used by `enemyFire` until 3a's team filter replaces it. [verified]
+- `syncSimWorld()` mirrors the THREE scene's colliders into `SIM` before resolving a shot. Sync guard: at most once per `update()` (unless called with `force`, as the editor's cover-map overlay (`ovBuildCover`) does; `update()` does `_frameId++` at its top; `loop()` also increments it), so headless runs see live positions. [verified]
 - The `THREE.Raycaster` is used **only** for cosmetic things: the aim dot and **editor object-picking**. So editor-only props (e.g. `paths[]`) never affect gameplay shots even though they're raycastable.
 - `FIXED_DT = 1/60`; there's an embedded input-command structure. **This was built as Stage-1 multiplayer prep** (deterministic simulation). Networking itself is not implemented yet.
-- `resolveBoxes(pos, r)` (AABB push-out) is the player-movement collision — and is **reused by the editor's Tab playtest**.
+- `resolveObstacles(pos, r)` (box push-out, oriented boxes for rotated pieces) is the game-side movement collision — and is **reused by the editor's Tab playtest**. [verified]
 
 ---
 
@@ -149,9 +152,9 @@ Features (all live):
 - **Path/Road decals** — `addPath()` makes a thin grey box just above the grass with **no collision** (`paths[]`, not `obstacles[]`); the `path` tool is **drag-to-draw**.
 - **Marquee select** — drag empty ground → `edMarqueePick()` projects each object's world anchor to screen space and tests the box (deduped by object reference).
 - **Group duplicate** — `Ctrl + D` → `edDuplicate()` clones the whole selection offset and keeps it selected.
-- **Tab playtest** — `edEnterPreview`/`edPreviewUpdate` drops the player at the camera target with a low over-the-shoulder cam, WASD + mouse-look + Shift-run, real `resolveBoxes` collision; `Tab`/`Esc` returns.
+- **Tab playtest** — `edEnterPreview`/`edPreviewUpdate` drops the player at the camera target with a low over-the-shoulder cam, WASD + mouse-look + Shift-run, real `resolveObstacles` collision; `Tab`/`Esc` returns.
 - **Mousedown pick priority:** gizmo > handle > object > marquee. Gizmo/handles hidden in preview/editorPlay/backToMenu.
-- **Persistence**: `serializeMap`/`buildMap` round-trip obstacles (with rotation + Y), **paths**, buildings, barracks, spawn, resupply, and the kit pieces — `houses` (legacy makers by `bt`, or `{k:'kit', spec}`), `trees`, `props`, `covers`. Save/Load via `MapStore` (`vmap:<name>`), prefabs via `PrefabStore` (`vprefab:<name>`), both through `KVStore`; Export dumps JSON. **Reset** rebuilds `DM_Cabana`, which now carries the village.
+- **Persistence**: `serializeMap`/`buildMap` round-trip obstacles (with rotation + Y), **paths**, buildings, barracks, spawn, resupply, and the kit pieces — `houses` (legacy makers by `bt`, or `{k:'kit', spec}`), `trees`, `props`, `covers`. Save/Load via `MapStore` (`vmap:<name>`), prefabs via `PrefabStore` (`vprefab:<name>`), both through `KVStore`; Export dumps JSON. `buildMap` stores the built map's name in `curMap.name` and `serializeMap` writes it back (the editor Save handler also stamps the save name). [verified] **Reset** rebuilds `DM_Cabana`, which now carries the village.
 - **World panel** drives `applyEnv` live, incl. **Nature brightness** (`nature.gain`).
 
 ---
@@ -239,7 +242,7 @@ Grep the file that owns the system (per `MODULE_MAP.md`). Targets grouped by fil
 - Rig / weapon props: `function poseArms` · `makeSword` · `makeShield` · `makeAxe` · `makeAMKRifle`
 - Building kit: `const BK` · `function makeTimberHouse` · `function makeThatchCottage` · `function makeBrickFlintFarmhouse` · `function makeManorHouse` · `_bkWorldBoxes`
 - Map schema: `function parseGridToMapDef` · `cabanaRepublicMap` · `DM_Cabana` (+ `.houses`/`.trees`/`.props`/`.covers`) · `DM_Romania` · `BK.buildCover`
-- SIM math (fenced at bottom): `function resolveShot` · `function hasLOS` · `function rayAabb` · `const SIM` · `FIXED_DT`
+- SIM math (fenced at bottom): `function resolveShot` · `function hasLOS` · `function rayAabb` · `function rayStatic` · `function rayStatics` · `const SIM` · `FIXED_DT`
 
 **`shamble-game.js`** (gameplay + shared dispatch):
 - Combat/abilities: `function fireOnce` · `function castShot` · `function damagePlayer` · `function damageEnemy` · `equipPrimary`/`equipSpecial` · `startCharge`/`releaseCharge`
@@ -249,7 +252,8 @@ Grep the file that owns the system (per `MODULE_MAP.md`). Targets grouped by fil
 - Vehicles / movement: `function buildJuggernaut` · `function resolveObstacles`
 - Economy/rules/progression: `function applyRules` · `RULES_` · `const Prog`
 - HUD & reticle: `function placeCursor` (combat reticle/hitmarker/reload-ring)
-- Map build: `function buildMap` · `function clearMap` · `function serializeMap`
+- Map build: `function buildMap` · `function clearMap` · `function serializeMap` · `const curMap`
+- SIM bridge: `function syncSimWorld` · `const SIM_PLAYER` · `_botFireWorld` · `_eHitN`
 - World-registry arrays: `let obstacles` · `let buildings` · `let enemies` (etc.)
 - **Shared dispatch/boot:** `function loop()` · `function update(dt)` · `function backToMenu` · `function deploy` · `function setMenuCam` · `function bootGame`
 

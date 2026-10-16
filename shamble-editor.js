@@ -1073,7 +1073,7 @@ document.querySelectorAll('#edPalette .edToggle').forEach(el=>el.addEventListene
 /* ---- map save/load (persistent storage if available, else in-session) ---- */
 document.getElementById('edMaps').addEventListener('click',openMaps);
 document.getElementById('edMapsClose').addEventListener('click',()=>edMapsModal.style.display='none');
-document.getElementById('edSaveBtn').addEventListener('click',async()=>{ const n=document.getElementById('edSaveName').value.trim(); if(!n)return; await MapStore.save(n,serializeMap()); document.getElementById('edMapName').textContent=n; const b=document.getElementById('edSaveBtn'); b.textContent='Saved!'; setTimeout(()=>b.textContent='Save current',1200); refreshMapList(); });
+document.getElementById('edSaveBtn').addEventListener('click',async()=>{ const n=document.getElementById('edSaveName').value.trim(); if(!n)return; const def=serializeMap(); def.name=n.slice(0,80); curMap.name=def.name; await MapStore.save(n,def); document.getElementById('edMapName').textContent=n; const b=document.getElementById('edSaveBtn'); b.textContent='Saved!'; setTimeout(()=>b.textContent='Save current',1200); refreshMapList(); });
 
 /* ============ PREFAB STAMPS (editor) ============ */
 /* ============ WORLD / ENVIRONMENT PANEL + UNDO/REDO (editor) ============ */
