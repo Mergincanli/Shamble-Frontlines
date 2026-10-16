@@ -12,7 +12,7 @@
   let _ad=null;
   if(has3){ _ad=applyDamage; applyDamage=function(a,v,amount){ const A=SOLDIERS[a], V=SOLDIERS[v]; const r=_ad.apply(this,arguments);
     if(A&&V&&A!==V&&A.team===V.team){ ffAttempts++; if(r>0) ffApplied++; }
-    if(A&&V&&_dmgEv.killed&&_dmgEv.v===v&&km[A.team]) km[A.team][V.team]++;
+    if(r>0&&A&&V&&A!==V&&_dmgEv.killed&&_dmgEv.v===v&&km[A.team]) km[A.team][V.team]++;   // r>0: a guarded call leaves the previous event in _dmgEv
     return r; }; }
   deploy();
   // a wrapper snippet may set globalThis.__simSecs for a longer run

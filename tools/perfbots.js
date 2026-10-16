@@ -6,7 +6,11 @@
 //   march   from the spawn points (bots walk out; the first fights start near the middle)
 //   combat  every active bot placed on a 26 m ring around the supply field, slot by slot, so all teams engage at once
 // Reports mean / p50 / p95 / max ms per step, LOS checks per second from AI_STATE (three-teams builds), and heapUsed growth
-// per second across the measured window (rough: a GC inside the window lowers it; for allocation rates use --heap-prof).
+// per second across the measured window (rough: a GC inside the window lowers it). For allocation rates use an inspector
+// sampling profile with includeObjectsCollectedByMajorGC/MinorGC: node --heap-prof counts only objects alive at exit.
+// fairness (three-teams builds, untimed): per team, completed target scans per bot per second and the share of bot-frames
+// with a target, on the combat ring. render: one pass on the ring (bots mostly off screen) and one with every bot clustered
+// within 9 m of you (every soldier on screen: the worst case for draw calls).
 // Headless CPU timing is pessimistic and noisy: compare builds on the same machine, never against Brave numbers.
 (function(){
   const now=()=>Number(process.hrtime.bigint())/1e6, gc=(typeof globalThis.gc==='function')?globalThis.gc:null;
@@ -23,9 +27,21 @@
     return {mean:+mean.toFixed(3), p50:+q(s,0.5).toFixed(3), p95:+q(s,0.95).toFixed(3), max:+s[M-1].toFixed(3), losPerSec:c0===null?null:+((c1-c0)/(M/60)).toFixed(0), heapMBs:+(((h1-h0)/1e6)/(M/60)).toFixed(3)}; };
   const out={map:(typeof curMap!=='undefined'?curMap.name:null), soldiers:soldiers().length, teamsSize:(typeof TUNE!=='undefined')?TUNE.teams.size:null, gc:!!gc, march:[], combat:[]};
   for(let r=0;r<3;r++){ out.march.push(run(()=>{})); out.combat.push(run(ring)); }
-  // one render pass in combat: draw calls, triangles, shader programs
+  // fairness: wrap acquireTarget (untimed pass) and count completed scans per team; share of bot-frames with a target
+  if(typeof AI_STATE!=='undefined'&&typeof acquireTarget==='function'){ const sc={}, tg={}, nb={}; const _aq=acquireTarget;
+    acquireTarget=function(en,dt){ const s0=AI_STATE.scans; _aq(en,dt); if(AI_STATE.scans>s0) sc[en.team]=(sc[en.team]||0)+1; };
+    deploy(); DEV.god=true; ring(); for(let f=0;f<600;f++){ _frameId++; update(1/60); }
+    for(const k in sc) sc[k]=0;
+    const F=1200; for(let f=0;f<F;f++){ _frameId++; update(1/60); for(const e of enemies){ if(e.active===false||!e.alive) continue; nb[e.team]=(nb[e.team]||0)+1; if(e.targetId>=0) tg[e.team]=(tg[e.team]||0)+1; } }
+    acquireTarget=_aq; const perTeam={};
+    for(const t of TEAMS){ const bots=enemies.filter(e=>e.active!==false&&e.team===t.id).length; if(!bots) continue; perTeam[t.id]={bots, scansPerBotPerSec:+((sc[t.id]||0)/bots/(F/60)).toFixed(2), targetShare:+((tg[t.id]||0)/Math.max(1,nb[t.id]||0)).toFixed(3)}; }
+    out.fairness=perTeam; }
+  // render passes: draw calls, triangles, shader programs
+  const pass=()=>{ renderer.info.autoReset=true; renderer.render(scene,camera); return {calls:renderer.info.render.calls, triangles:renderer.info.render.triangles, programs:(renderer.info.programs||[]).length, geometries:renderer.info.memory.geometries, textures:renderer.info.memory.textures}; };
   deploy(); ring(); for(let f=0;f<120;f++){ if(typeof _frameId==='number')_frameId++; update(1/60); }
-  renderer.info.autoReset=true; renderer.render(scene,camera);
-  out.render={calls:renderer.info.render.calls, triangles:renderer.info.render.triangles, programs:(renderer.info.programs||[]).length, geometries:renderer.info.memory.geometries, textures:renderer.info.memory.textures};
+  out.render=pass();
+  { const L=enemies.filter(e=>e.active!==false), px=player.position.x, pz=player.position.z; DEV.freezeAI=true;
+    L.forEach((e,i)=>{ const a=i/L.length*6.2832, r=3+(i%3)*3; e.group.position.set(px+r*Math.sin(a),0,pz+r*Math.cos(a)); e.alive=true; e.group.visible=true; });
+    for(let f=0;f<90;f++){ if(typeof _frameId==='number')_frameId++; update(1/60); } out.renderClustered=pass(); DEV.freezeAI=false; }
   DEV.god=false; return out;
 })()

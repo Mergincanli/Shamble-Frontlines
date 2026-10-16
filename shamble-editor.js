@@ -498,13 +498,22 @@ function ovObjectives(){ const list=[];
   (TBOX&&TBOX.points?TBOX.points:[]).forEach(p=>list.push({x:p.x,z:p.z,name:(p.name||'TECH'),kind:'tech'}));
   if(HARV&&isFinite(HARV.fieldX))list.push({x:HARV.fieldX,z:HARV.fieldZ,name:'HARVESTER',kind:'harv'});
   return list; }
+// Where the first playing other team's bots spawn (three-teams step 11: teamSpawnPoint, its first slot), for the fairness
+// distances. Rebuilds the team index from the map as edited; the band only when that team has no marker, barracks or HQ.
+function ovHostileSpawn(){ buildTeamIndex(); let ht=null;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id!==PLAYER_TEAM&&TEAM_INDEX[id].hqs.length){ ht=id; break; } }
+  if(!ht) ht='soviets';   // N2: no other team has an HQ
+  let slot=0; for(let k=1;k<SOLDIERS.length;k++) if(SOLDIERS[k].team===ht){ slot=SOLDIERS[k].id; break; }
+  const v=teamSpawnPoint(ht,slot,new THREE.Vector3()), e=TEAM_INDEX[ht];
+  return {x:v.x, z:v.z, team:ht, how:e.markers.length?'at its marker':e.barracksE?'outside its barracks door':e.hqs.length?'beside its HQ':'random across band'}; }
 function ovBuildSpawn(){ ovClearGroup(ovSpawnG); ovClearLabels('spawn'); if(!ovSpawnOn)return;
-  const F={x:mapSpawn.x,z:mapSpawn.z}, H={x:0,z:21-T.arenaZ}, objs=ovObjectives();
+  const F={x:mapSpawn.x,z:mapSpawn.z}, Hs=ovHostileSpawn(), H={x:Hs.x,z:Hs.z}, objs=ovObjectives();
   const fm=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.3,22), new THREE.MeshBasicMaterial({color:0x38e1b0,transparent:true,opacity:0.5})); fm.position.set(F.x,0.2,F.z); noRay(fm); ovSpawnG.add(fm);
   const zx0=-(T.arenaX-8), zx1=(T.arenaX-8), zz0=-T.arenaZ+10, zz1=-T.arenaZ+32;
-  const hz=new THREE.Mesh(new THREE.BoxGeometry(zx1-zx0,0.3,zz1-zz0), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.15})); hz.position.set((zx0+zx1)/2,0.18,(zz0+zz1)/2); noRay(hz); ovSpawnG.add(hz);
+  if(Hs.how==='random across band'){ const hz=new THREE.Mesh(new THREE.BoxGeometry(zx1-zx0,0.3,zz1-zz0), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.15})); hz.position.set((zx0+zx1)/2,0.18,(zz0+zz1)/2); noRay(hz); ovSpawnG.add(hz); }
+  else { const hm=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.3,22), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.5})); hm.position.set(H.x,0.2,H.z); noRay(hm); ovSpawnG.add(hm); }
   ovLabel('spawn','<b>SPAWN</b>',F.x,3.2,F.z);
-  ovLabel('spawn','<b>HOSTILE SPAWN</b><span class="ovSub">random across band</span>',H.x,3.2,H.z);
+  ovLabel('spawn','<b>HOSTILE SPAWN</b><span class="ovSub">'+(Hs.team==='empire'?'Empire':'Soviets')+' '+Hs.how+'</span>',H.x,3.2,H.z);   // fixed strings only (no map text)
   for(let i=0;i<objs.length;i++){ const o=objs[i], df=Math.hypot(o.x-F.x,o.z-F.z), dh=Math.hypot(o.x-H.x,o.z-H.z);
     const sf=ovMakeSeg(ovSpawnG,0x38e1b0,0.32); ovPlaceSeg(sf,F.x,F.z,o.x,o.z,0.22); sf.material.opacity=0.45;
     const sh=ovMakeSeg(ovSpawnG,0xff5a5a,0.32); ovPlaceSeg(sh,H.x,H.z,o.x,o.z,0.24); sh.material.opacity=0.45;
@@ -512,7 +521,7 @@ function ovBuildSpawn(){ ovClearGroup(ovSpawnG); ovClearLabels('spawn'); if(!ovS
     let html='<b>'+o.name+'</b><span class="ovSub">F '+df.toFixed(0)+'m · H '+dh.toFixed(0)+'m';
     if(warn)html+=' · '+(df<dh?'F':'H')+' +'+Math.abs(df-dh).toFixed(0)+'m'; html+='</span>';
     ovLabel('spawn',html,o.x,3.4,o.z, warn?'warn':undefined); } }
-function ovSpawnTick(){ if(!ovSpawnOn)return; const objs=ovObjectives(); let sig=mapSpawn.x.toFixed(1)+','+mapSpawn.z.toFixed(1)+'|'+T.arenaX.toFixed(1)+','+T.arenaZ.toFixed(1)+'|'; for(let i=0;i<objs.length;i++)sig+=objs[i].x.toFixed(1)+','+objs[i].z.toFixed(1)+';'; if(sig!==_ovSpawnSig){ _ovSpawnSig=sig; ovBuildSpawn(); } }
+function ovSpawnTick(){ if(!ovSpawnOn)return; const objs=ovObjectives(), Hs=ovHostileSpawn(); let sig=mapSpawn.x.toFixed(1)+','+mapSpawn.z.toFixed(1)+'|'+Hs.x.toFixed(1)+','+Hs.z.toFixed(1)+'|'+T.arenaX.toFixed(1)+','+T.arenaZ.toFixed(1)+'|'; for(let i=0;i<objs.length;i++)sig+=objs[i].x.toFixed(1)+','+objs[i].z.toFixed(1)+';'; if(sig!==_ovSpawnSig){ _ovSpawnSig=sig; ovBuildSpawn(); } }
 function toggleSpawnDist(){ ovSpawnOn=!ovSpawnOn; _ovSpawnSig=''; if(ovSpawnOn){ ovSpawnTick(); } else { ovClearGroup(ovSpawnG); ovClearLabels('spawn'); } const b=document.getElementById('ovSpawnBtn'); if(b){ b.classList.toggle('on',ovSpawnOn); const t=b.querySelector('.tg'); if(t)t.textContent=ovSpawnOn?'ON':'OFF'; } }
 function ovResetAll(){ if(ovSpawnOn)toggleSpawnDist(); if(ovSymAxis)toggleSymmetry(); if(typeof toggleCover==='function'&&ovCoverOn)toggleCover(); }
 function ovToggle(name){ if(name==='spawn')toggleSpawnDist(); else if(name==='sym'&&typeof toggleSymmetry==='function')toggleSymmetry(); else if(name==='cover'&&typeof toggleCover==='function')toggleCover(); }

@@ -632,8 +632,8 @@ function buildMap(def){
   (def.covers||[]).forEach(o=>{ addCover(o.type, o.x, o.z, o.len, o.rot||0); });
   (def.trees||[]).forEach(t=>addTree(t.kind, t.x, t.z, t.seed));
   (def.props||[]).forEach(pp=>addProp(pp.kind, pp.x, pp.z, pp.seed, pp.rot||0));
-  (def.enemySpawns||[]).forEach(sp=>makeEnemySpawn(sp.x,sp.z,sp.faction));
-  (def.barracks||[]).forEach(b=>{ const e=makeBarracks(b.x,b.z,b.team); if(b.s&&b.s!==1)_scaleBarracks(e,b.s); if(b.rot)_rotateBarracksBy(e,b.rot); });
+  (def.enemySpawns||[]).forEach(sp=>{ if(sp&&Number.isFinite(sp.x)&&Number.isFinite(sp.z)) makeEnemySpawn(sp.x,sp.z,sp.faction); });
+  (def.barracks||[]).forEach(b=>{ const e=makeBarracks(b.x,b.z,b.team); if(Number.isFinite(b.s)&&b.s>0&&b.s!==1)_scaleBarracks(e,b.s); if(Number.isFinite(b.rot)&&b.rot)_rotateBarracksBy(e,b.rot); });
   const rs=def.resupply||{x:0,z:34}; terminalPos.set(rs.x,0,rs.z);
   termMesh=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.6,1),new THREE.MeshStandardMaterial({color:0x183a36,emissive:0x0e2a26,emissiveIntensity:0.5,roughness:0.5}));
   termMesh.position.set(rs.x,0.8,rs.z); termMesh.castShadow=true; termMesh.userData.editSel={kind:'resupply'}; scene.add(termMesh); if(typeof stylizeOne==='function')stylizeOne(termMesh);
@@ -757,12 +757,13 @@ function placeObjectives(def){
   if(tboxMesh) resetTechBox(); if(silos.length) resetSilos();
 }
 // Roster activation (three-teams item 4): a team plays when it has an HQ; the player's team always does; a map where no
-// other team has an HQ gets the Soviets on the legacy north band (N2). Slots of a team that doesn't play are parked:
+// other team has an HQ gets the Soviets (N2; they spawn through teamSpawnPoint). Slots of a team that doesn't play are parked:
 // active=false, alive=false, hidden, and an alive=false SIM entry. Called after buildTeamIndex (buildMap, resetRound, boot).
 function activateRoster(){
   let other=false;
   for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id]; e.active=(id===PLAYER_TEAM)||e.hqs.length>0; if(e.active&&id!==PLAYER_TEAM)other=true; }
   if(!other) TEAM_INDEX.soviets.active=true;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id!==PLAYER_TEAM&&TEAM_INDEX[id].active){ TEAM_INDEX.firstEnemy=id; break; } }   // HUD's "them": a team that plays (review BUGS-2)
   for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s], g=en.group;
     const on=TEAM_INDEX[en.team].active;
     en.active=on; en.targetId=-1; en.targetVis=false; en.losT=0; en.scanCursor=0; en.scanBestId=-1; en.retargetT=(en.id%SOLDIERS.length)*TUNE.ai.retargetS/SOLDIERS.length;   // staggered scans
@@ -804,14 +805,15 @@ function randSpawn(){return new THREE.Vector3((Math.random()*2-1)*(T.arenaX-8),0
 // marker. Slots sit TUNE.spawn.lateral m apart, side by side.
 function teamSpawnPoint(team,slotId,out){
   const id=teamOf(team), e=id?TEAM_INDEX[id]:null, n=TUNE.teams.size, k=slotId%n, lat=(k-(n-1)/2)*TUNE.spawn.lateral;
-  if(e&&e.markers.length){ const m=e.markers[k%e.markers.length]; out.set(m.x+lat,0,m.z); return out; }
+  // each option is checked for finite numbers: a bad map value falls through to the next option
+  if(e&&e.markers.length){ const m=e.markers[k%e.markers.length]; out.set(m.x+lat,0,m.z); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
   const b=e?e.barracksE:null;
   if(b){ const r=b.rot||0, c=Math.cos(r), s=Math.sin(r), d=5.5*(b.scl||1)+TUNE.spawn.doorOut;   // 5.5 m: makeBarracks' D/2; the door faces local +z, rotated as _rotAround does
-    out.set(b.cx-s*d+c*lat,0,b.cz+c*d+s*lat); return out; }
+    out.set(b.cx-s*d+c*lat,0,b.cz+c*d+s*lat); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
   const h=(e&&e.hqs.length)?e.hqs[0]:null;
   if(h){ const p=h.mesh.position, bx=h.box, L=hyp2(p.x,p.z), ux=L>1e-6?-p.x/L:0, uz=L>1e-6?-p.z/L:1, d=Math.max(bx.max.x-bx.min.x,bx.max.z-bx.min.z)/2+TUNE.spawn.doorOut;
-    out.set(p.x+ux*d-uz*lat,0,p.z+uz*d+ux*lat); return out; }
-  if(id===PLAYER_TEAM){ out.set(mapSpawn.x+lat,0,mapSpawn.z); return out; }
+    out.set(p.x+ux*d-uz*lat,0,p.z+uz*d+ux*lat); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
+  if(id===PLAYER_TEAM){ out.set(mapSpawn.x+lat,0,mapSpawn.z); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
   out.set((((slotId*0.618034)%1)*2-1)*(T.arenaX-8),0,-T.arenaZ+10+((slotId*0.381966)%1)*22); return out;
 }
 function respawnPos(en){ return teamSpawnPoint(en.team,en.id,new THREE.Vector3()); }
@@ -1493,7 +1495,8 @@ function castShot(origin,dir,w,vis){
   else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&teamOf(hv.team)!==null&&!sameTeam(hv.team,PLAYER_TEAM)){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else addImpact(_hpV,_hnV,'dirt');
 }
-// Two-layer damage (three-teams item 6). applyDamage changes state only and returns the amount applied (0 when guarded
+// Two-layer damage (three-teams item 6). applyDamage changes the state (incl. addTech, whose HUD writes and era toasts are
+// economy-side, ADR-001 debt) and returns the amount applied (0 when guarded
 // or dropped); onDamageEvent presents it. a and v are SIM ids (SOLDIERS slots); a=-1 means no known attacker. The caller
 // computes the final amount; kind ('bullet' | 'blast' | 'melee') only skips the shield (blast) and is reported. The event
 // record is reused, so it is consumed synchronously. kills, roundDeaths and credits stay the local player's globals,
@@ -1575,14 +1578,14 @@ const EJUMP_REACH = T.jumpV*T.jumpV/(2*T.gravity) + T.stepUp;   // ~3.07m: highe
 // (staggered by slot) for the nearest visible soldier of another team within T.enemyDetect: a min-scan over SIM.players
 // in slot order (ties to the lower id) that resumes from scanCursor when the budget runs out; the current target's
 // sight is re-checked every losRecheckS from the same budget. Eye and aim points follow both heights (NC-1).
-const AI_STATE={ budget:0, checks:0, scans:0,
+const AI_STATE={ budget:0, checks:0, scans:0, step:0,   // step: update() count; the bot loop starts one slot later each step, so no slot is always served first
   rotatePush(en){ const n=TEAMS.length; let k=0; for(let i=0;i<n;i++) if(TEAMS[i].id===en.pushTeam) k=i+1;   // the next active other team after the current one
     for(let j=0;j<n;j++){ const id=TEAMS[(k+j)%n].id; if(id!==en.team&&TEAM_INDEX[id].active){ en.pushTeam=id; return; } } en.pushTeam=null; } };
 function acquireTarget(en,dt){
   const P=SIM.players, me=P[en.id], A=AI_STATE, det2=T.enemyDetect*T.enemyDetect, ai=TUNE.ai;
   if(en.targetId>=0){ const t=P[en.targetId], dx=t.x-me.x, dz=t.z-me.z;
     if(!t.alive||t.team===en.team||dx*dx+dz*dz>=det2){ en.targetId=-1; en.targetVis=false; }
-    else { en.losT+=dt; if(en.losT>=ai.losRecheckS&&A.budget>=1){ en.losT=0; A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(t.x,t.y+1.45,t.z); en.targetVis=hasLOS(_eEyes,_ePc); } } }
+    else { en.losT+=dt; if(en.losT>=ai.losRecheckS&&A.budget>=1){ en.losT-=ai.losRecheckS; if(en.losT>=ai.losRecheckS)en.losT=0; A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(t.x,t.y+1.45,t.z); en.targetVis=hasLOS(_eEyes,_ePc); } } }
   en.retargetT-=dt;
   if(en.retargetT>0&&en.scanCursor===0) return;
   if(en.scanCursor===0){ en.scanBestId=-1; en.scanBestD2=det2; }
@@ -1591,7 +1594,7 @@ function acquireTarget(en,dt){
     if(A.budget<1) break;   // out of budget: resume from here next frame
     A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(p.x,p.y+1.45,p.z); if(hasLOS(_eEyes,_ePc)){ en.scanBestId=s; en.scanBestD2=d2; } }
   if(s<P.length){ en.scanCursor=s; return; }
-  en.scanCursor=0; A.scans++; en.retargetT=ai.retargetS;
+  en.scanCursor=0; A.scans++; en.retargetT=Math.max(0,en.retargetT+ai.retargetS);   // carry the overshoot: one scan per retargetS at any frame rate
   en.targetId=en.scanBestId; en.targetVis=en.scanBestId>=0; en.losT=0;
 }
 function rampLowEnd(o){ const c=Math.cos(o.rot), s=Math.sin(o.rot), lx=-o.w/2; return {x:o.x+c*lx, z:o.z-s*lx}; }   // world XZ of a ramp's low edge
@@ -2463,7 +2466,7 @@ function _sbMakeRow(team){ const row=document.createElement('div'); row.classNam
   return {root:row,rank:rank,name:name,k:k,d:d,a:a,src:null}; }
 function sbBuildRosters(){ const listA=document.getElementById('sbListA'), listB=document.getElementById('sbListB'); if(!listA||!listB)return;
   listA.innerHTML=''; _sbRowsA=[]; const you=_sbMakeRow('a'); you.root.classList.add('you'); you.src='you'; you.rank.innerHTML=rankInsigniaSVG(Prog.level,22); you.name.textContent='You'; listA.appendChild(you.root); _sbRowsA.push(you);
-  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||!sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('a'); r.src=en; r.name.textContent='Ally '+String(_sbRowsA.length).padStart(2,'0'); listA.appendChild(r.root); _sbRowsA.push(r); }   // column A: you, then active ally bots in slot order
+  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||!sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('a'); r.rank.classList.add('a-rank'); r.src=en; r.name.textContent='Ally '+String(_sbRowsA.length).padStart(2,'0'); listA.appendChild(r.root); _sbRowsA.push(r); }   // column A: you, then active ally bots in slot order
   listB.innerHTML=''; _sbRowsB=[]; for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('h'); r.src=en; r.name.textContent='Hostile '+String(_sbRowsB.length+1).padStart(2,'0'); listB.appendChild(r.root); _sbRowsB.push(r); }
   _sbBuilt=TEAM_INDEX.rosterVer; _sbLvl=-1; }
 function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')return; if(mode!=='game'){ el.style.display='none'; return; }
@@ -2883,8 +2886,11 @@ function update(dt){ NAV.budget=2;
 
   
   // enemies
-  { const ai=TUNE.ai; AI_STATE.budget=Math.min(ai.losPerS*ai.losCapS, AI_STATE.budget+ai.losPerS*dt); }   // refill the sight budget (game time)
-  for(let ei=0;ei<enemies.length;ei++){ const en=enemies[ei];
+  { const ai=TUNE.ai; AI_STATE.budget=Math.min(ai.losPerS*ai.losCapS, AI_STATE.budget+ai.losPerS*dt); AI_STATE.step++; }   // refill the sight budget (game time)
+  // Fair turn order (review PERF-1 / NETCODE-1): the sight budget and NAV's route budget go to whoever asks first, so the
+  // loop starts one slot later every step instead of always at slot 1 (team-major slots would starve the last team).
+  const botN=enemies.length, botO=botN?AI_STATE.step%botN:0;
+  for(let bk=0;bk<botN;bk++){ const en=enemies[(bk+botO)%botN];
     if(!en.active)continue;   // parked slot: its team doesn't play on this map
     if(en.alive){
       const epx=en.group.position.x, epz=en.group.position.z;
@@ -3223,7 +3229,7 @@ for(let i=0;i<TEAMS.length;i++) makeHarvester(TEAMS[i].id); makeSupplyField(); b
  * present for captureTime to claim it; an enemy on the ring contests (freezes/decays progress) —
  * clear them to capture or steal. Channeling blocks your weapons (you're vulnerable). At expiry
  * the holding team banks ECO.techBox tech; a new box then spawns at a different point after a gap.
- * ~half the bots contest the box they don't hold; the rest keep sieging buildings/harvester. */
+ * Bots in the objective role (one per team on Cabana) contest a box their team doesn't hold; the rest push or hunt. */
 for(let i=0;i<TBOX.pool.length;i++) techPts.push(makeTechPoint(TBOX.pool[i])); makeTechBoxMesh();   // fixed pools of 3 (techPts[i] stays index-aligned with TBOX.points[i])
 for(let i=0;i<SILO.pool.length;i++) silos.push(makeSilo(SILO.pool[i]));
 placeObjectives({harvField:{x:HARV.fieldX,z:HARV.fieldZ}, harvLanes:HARV.lanes, techPoints:TBOX.points.slice(), silos:SILO.points.slice()});   // pools exist now: show only the map's
