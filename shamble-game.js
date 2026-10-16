@@ -1798,7 +1798,13 @@ function playerDie(){ deathStart(player,_dmgEv.srcX,_dmgEv.srcZ);   // fall away
 function playerRespawn(){ps.dead=false;ps.alive=true;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
 
 /* end / reset */
-function checkEnd(){const eHQ=TEAM_INDEX.soviets.hqs[0],fHQ=TEAM_INDEX[PLAYER_TEAM].hqs[0];if(!gameOver&&eHQ&&!eHQ.alive)endGame(true);if(!gameOver&&fHQ&&!fHQ.alive)endGame(false);}
+// Interim end rule (three-teams item 11, D11): you win when at least one other active team has HQs and every such team
+// has lost all of them; you lose when your team has HQs and all of them are down. A win is checked first, as before.
+function checkEnd(){ if(gameOver)return; let foes=0, foesUp=0, mineDown=false;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id], h=e.hqs; if(!h.length)continue;
+    let up=false; for(let j=0;j<h.length;j++) if(h[j].alive){ up=true; break; }
+    if(id===PLAYER_TEAM) mineDown=!up; else if(e.active){ foes++; if(up)foesUp++; } }
+  if(foes>0&&foesUp===0) endGame(true); else if(mineDown) endGame(false); }
 function endGame(win){gameOver=true;mouseDown=false;endEl.className=win?'win':'lose';endEl.style.display='flex';document.getElementById('endTitle').textContent=win?'VICTORY':'DEFEAT';document.getElementById('endSub').textContent=win?'enemy HQ destroyed':'your HQ has fallen';}
 function resetRound(){
   buildTeamIndex(); activateRoster();   // the editor edits buildings without buildMap
