@@ -839,7 +839,11 @@ function damageHarvester(hv,d){ if(!hv.alive)return; hv.health-=d; hv.hitFlash=0
 function destroyHarvester(hv,refDead){ if(!hv.alive)return; hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; addExplosion(hv.group.position.clone().setY(1.0)); camShake=Math.min(1.3,camShake+0.5); hv.refDead=!!refDead; hv.respawnT=HARV.respawn; if(sameTeam(hv.team,PLAYER_TEAM)) showLevelToast('Supply Truck Lost', refDead?'Refinery down — no resupply':'Respawning in '+HARV.respawn+'s'); updateBaseHUD(); }
 function respawnHarvester(hv){ if(hv.parked)return; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); updateBaseHUD(); }
 function resetHarvesters(){ for(const hv of harvesters){ if(hv.parked)continue; hv.docks=0; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); } updateBaseHUD(); }
-function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); const al=sameTeam(en.team,PLAYER_TEAM); addMuzzle(eM,al?0xffd27a:0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
+function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); const al=sameTeam(en.team,PLAYER_TEAM);
+  const d2=_botShotD2(_eF.x,_eF.z,_eT.x,_eT.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;   // FX cull, as in enemyFire
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2<=cR*cR){ addMuzzle(eM,al?0xffd27a:0xff6a4a); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); }
+  damageHarvester(hv,T.enemySiegeDamage); }
 function updateHarvesters(dt){
   if(gameOver)return;
   for(const hv of harvesters){
@@ -1599,7 +1603,7 @@ function enemyFire(en){
   const ep=en.group.position; syncSimWorld(); const P0=SIM.players[en.targetId>=0?en.targetId:SIM_PLAYER];   // aim at the target's SIM snapshot, the one the hit test uses
   _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(P0.x,P0.y+1.45,P0.z);   // chest to chest, following both heights
   const ally=sameTeam(en.team,PLAYER_TEAM);   // tracer and muzzle colour by relation to you
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,ally?0xffd27a:0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
+  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);   // muzzle point: looks only (the FX come after the hit, below)
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
@@ -1608,15 +1612,29 @@ function enemyFire(en){
   // stand in for slopes. One hit world for every shooter is a multiplayer invariant (ADR-001).
   const W=_botFireWorld; W.groundY=SIM.groundY;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
   const r=resolveShot(W,en.id,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange,teamFilter(en.team)); let end;
-  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);applyDamage(en.id,r.id,eu.enemyDmg,r.part,'bullet',ep.x,ep.z);addImpact(end,_aup,'flesh');}   // flat bot damage (D7) on whoever the ray hit: you, or another team's soldier in the way
-  else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
+  const rk=r.kind, rid=r.id, near=r.t<0.9;   // r is W's shared result object: read it before applyDamage runs other code
+  if(rk==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);applyDamage(en.id,rid,eu.enemyDmg,r.part,'bullet',ep.x,ep.z);}   // flat bot damage (D7) on whoever the ray hit: you, or another team's soldier in the way
+  else if(rk!=='none'){end=_eEnd.set(r.px,r.py,r.pz);_eHitN.set(r.nx,r.ny,r.nz);}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
-  addTracer(r.t<0.9?_eF:eM,end,ally?0x7af0d2:0xff5a3a);   // a hit closer than the muzzle draws from the chest
+  // FX cull (three-teams item 13, N7): the hit and damage above always run; the looks are skipped when the shot passes
+  // farther than TUNE.fx.botCullR from camLookAt (sound: botSfxR), never for a shot at you or one that hits you
+  const d2=(en.targetId===SIM_PLAYER||(rk==='enemy'&&rid===SIM_PLAYER))?0:_botShotD2(_eF.x,_eF.z,end.x,end.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2>cR*cR) return;
+  addMuzzle(eM,ally?0xffd27a:0xff6a4a);
+  if(rk==='enemy') addImpact(end,_aup,'flesh'); else if(rk!=='none') addImpact(end,_eHitN,'dirt');
+  addTracer(near?_eF:eM,end,ally?0x7af0d2:0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
+// XZ distance squared from camLookAt to the shot segment a->b (the bot-shot FX cull)
+function _botShotD2(ax,az,bx,bz){ const dx=bx-ax, dz=bz-az, L=dx*dx+dz*dz, px=camLookAt.x-ax, pz=camLookAt.z-az;
+  let t=L>1e-9?(px*dx+pz*dz)/L:0; t=t<0?0:t>1?1:t; const ex=px-dx*t, ez=pz-dz*t; return ex*ex+ez*ez; }
 function siegeFire(en,b){ if(teamOf(b.team)===null||sameTeam(b.team,en.team))return;   // structures of its own team or none: never
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
-  const al=sameTeam(en.team,PLAYER_TEAM), dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,al?0xffd27a:0xff6a4a); sfxEnemyShot(eM);
-  addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageBuilding(b,T.enemySiegeDamage);
+  const al=sameTeam(en.team,PLAYER_TEAM), dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);
+  const d2=_botShotD2(_eF.x,_eF.z,_eT.x,_eT.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;   // FX cull, as in enemyFire
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2<=cR*cR){ addMuzzle(eM,al?0xffd27a:0xff6a4a); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); }
+  damageBuilding(b,T.enemySiegeDamage);
 }
 
 /* grenades + melee */
