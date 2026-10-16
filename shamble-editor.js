@@ -841,7 +841,8 @@ function edRedoDo(){ if(!edRedoStack.length)return; edUndoStack.push(JSON.string
 function edStatusSync(){ const se=document.getElementById('edStatSel'); if(se)se.textContent=String((typeof edMulti!=='undefined'&&edMulti)?edMulti.length:0);
   const te=document.getElementById('edStatTool'); if(te){ const nm={select:'Select',bmaker:'Building Maker',measure:'Measure'}; te.textContent=nm[edTool]||(edTool?('Place \u00b7 '+edTool):'Select'); }
   const he=document.getElementById('edStatHint'); if(he){ if(he.dataset.def==null)he.dataset.def=he.textContent; let ht=he.dataset.def;
-    if(edTool&&edTool!=='select'&&edTool!=='measure'){ const card=document.querySelector('#edPalette .edTool[data-tool=\x22'+edTool+'\x22]'); const lbl=(card&&card.textContent.trim())||({bmaker:'Building Maker',prefab:'a prefab'})[edTool]||edTool; ht='Placing '+lbl+' \u00b7 click to place \u00b7 Del deletes it \u00b7 Esc / Q: stop placing'; }
+    if(edTool&&edTool!=='select'&&edTool!=='measure'){ let card=null; for(const el of document.querySelectorAll('#edPalette .edTool')){ if(el.dataset.tool===edTool){ card=el; break; } } const lbl=(card&&card.textContent.trim())||({bmaker:'Building Maker',prefab:'a prefab'})[edTool]||edTool;
+      const drag=edTool==='path'||edTool==='orchard'||edTool==='poprow'||_bkIsCover(edTool); ht='Placing '+lbl+' \u2014 '+(drag?'drag':'click')+' to place \u00b7 Del deletes it \u00b7 Esc / Q: stop placing'; }
     if(he.textContent!==ht)he.textContent=ht; } }
 function edSetLibMode(m){ const gen=(m==='gen'); _edLibMode=m;
   ['edLibTabs','edLibSearch','edPalette'].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display=gen?'none':''; });
@@ -875,7 +876,7 @@ function edReshapeRamp(sel,w,d,h0,h1){ const o=sel.ref; w=Math.max(0.5,w); d=Mat
 function edBuildInspector(s){
   edInspBody.innerHTML=''; edInspKind.textContent=(edMulti.length>1?(edMulti.length+' selected'):edKindLabel(s));
   const insSel=edMulti.slice();   // the fields act on the selection they were built for, even if a click changes it before 'change' fires
-  { let bd=document.getElementById('edIDel'); if(!bd){ bd=document.createElement('div'); bd.id='edIDel'; bd.className='edBtn edBtnSm'; bd.style.marginLeft='auto'; bd.title='Delete selection (Del)'; bd.addEventListener('click',edDeleteSel); edInspKind.parentNode.appendChild(bd); }
+  { let bd=document.getElementById('edIDel'); if(!bd){ bd=document.createElement('div'); bd.id='edIDel'; bd.className='edBtn edBtnSm edBtnDel'; bd.style.margin='-6px 0 -6px auto'; bd.title='Delete selection (Del)'; bd.addEventListener('click',edDeleteSel); edInspKind.parentNode.appendChild(bd); }
     const nd=edMulti.filter(x=>x.kind!=='spawn'&&x.kind!=='resupply').length; bd.textContent=nd>1?('Delete '+nd):'Delete'; bd.style.display=nd?'':'none'; }
   const a=edAnchor(s)||{x:0,z:0};
   const rx=_edRow('X'), ix=_edNum(a.x,0.5); rx.appendChild(ix); edInspBody.appendChild(rx);
