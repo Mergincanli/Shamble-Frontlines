@@ -12,7 +12,9 @@ This change-set is docs only.
 - `docs/EDITOR_V2.md`: the Advisor's draft, byte-identical to the attachment.
 - `docs/EDITOR_V1_INVENTORY.md`: 107 features in 15 groups.
   - Each row gives what the feature does, how to use it, where it is (file:line), its state and a v2 note, followed by
-    an empty **Mark** column.
+    a **Mark (recommended)** column: Claude's recommended keep / drop / improve with a one-line reason (32 keep,
+    68 improve, 7 drop), so Mustafa only reviews it. Two skeptic rounds checked every mark against EDITOR_V2, LOOP_V2,
+    the approved hotfix and the code.
   - Each state is tagged [S] (real input in headless Chromium), [C] (code reading) or [D0] (from the bug diagnosis).
   - A list of ten hidden, legacy and dead-code items follows the tables.
 - This report.
@@ -66,7 +68,8 @@ This change-set is docs only.
 - The rows tagged [C] (listed at the end of the inventory).
 
 ## For Mustafa
-1. **Inventory:** mark each row in `docs/EDITOR_V1_INVENTORY.md` keep, drop or improve. This is v2's parity list.
+1. **Inventory:** review the recommended marks in `docs/EDITOR_V1_INVENTORY.md` and change any you disagree with. The
+   7 drops are worth a look first (A10, A11, H1, H2, N2, N3, O5). This is v2's parity list.
 2. **Hotfix:** approve the core fixes H1–H7, and decide E1–E5. The plan file is in the session.
 3. **Checkout:** check that your checkout is current (main 67cf55b or newer). After PR #10 merges, load and re-save each
    old map once.
