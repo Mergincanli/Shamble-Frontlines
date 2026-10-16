@@ -726,7 +726,7 @@ function activateRoster(){
     en.active=on;
     // A parked slot leaves the scene graph: r128 updates the matrices of hidden objects too. Back in the scene it goes
     // through stylizeOne, which skips meshes that are already toon and styles a slot that was parked when stylizeScene ran.
-    if(on){ if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } g.visible=mode!=='editor'; }
+    if(on){ if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } if(!g.userData.anim||!g.userData.anim.v2)_animInit(g); g.visible=mode!=='editor'; }   // anim state now: a kill before its first animated frame still falls (deathStart)
     else { en.alive=false; en.respawnT=0; g.visible=false; g.userData.bar.grp.visible=false; if(g.parent)g.parent.remove(g); } }
   for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], ix=TEAM_INDEX[teamOf(hv.team)]; hv.parked=!(ix&&ix.active);
     if(hv.parked){ hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; } }
@@ -1297,7 +1297,7 @@ function spawnVehicle(id){ const v=VEHICLE_TYPES.find(x=>x.id===id); if(!v)retur
     const pal=FACTION_PALETTES[PLAYER_FACTION]||FACTION_PALETTES.Allies; const g=buildJuggernaut(pal.FactionPrimary, pal.HighlightTrim);
     const ry=player.rotation.y, bx=player.position.x-Math.sin(ry)*7, bz=player.position.z-Math.cos(ry)*7;
     g.position.set(bx,0,bz); g.rotation.y=ry; scene.add(g);
-    juggernauts.push({ group:g, alive:true, health:v.maxHealth||1500, target:null, fireCd:1.2, rippleActive:false, rippleIdx:0, rippleT:0 });
+    juggernauts.push({ group:g, alive:true, health:v.maxHealth||1500, target:null, fireCd:1.2, rippleActive:false, rippleIdx:0, rippleT:0, team:PLAYER_TEAM });   // the cannon's attacker is its pilot
     showLevelToast('Juggernaut deployed', 'Heavy artillery online');
   } else { showLevelToast('Deploying', v.name+' \u2014 coming soon'); } }
 function useAbility(){
@@ -1335,7 +1335,7 @@ function throwMolotov(){ animThrow(player);
   getMuzzle(player,_p2); throwVelocity(_thrV,_p2,'nade');
   const m=new THREE.Mesh(new THREE.SphereGeometry(0.24,10,8), new THREE.MeshStandardMaterial({ color:0x5a2f16, roughness:0.5, emissive:0xff5a1a, emissiveIntensity:0.6 }));
   m.position.copy(_p2); m.castShadow=true; noRay(m); stylizeOne(m,0.035); scene.add(m);
-  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.4, molotov:true });
+  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.4, molotov:true, ownerId:SIM_PLAYER, team:PLAYER_TEAM });
   camRecoil+=0.6; camShake+=0.1;
 }
 function startReload(){const w=curW(),l=curL();if(ps.reloading||l.ammo===w.mag||l.reserve<=0||ps.dead)return;ps.reloading=true;ps.reloadT=0;sfxReload(0);document.getElementById('reloadBar').style.opacity='1';}
@@ -1424,15 +1424,62 @@ function castShot(origin,dir,w,vis){
   else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&teamOf(hv.team)!==null&&!sameTeam(hv.team,PLAYER_TEAM)){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else addImpact(_hpV,_hnV,'dirt');
 }
+// Two-layer damage (three-teams item 6). applyDamage changes state only and returns the amount applied (0 when guarded
+// or dropped); onDamageEvent presents it. a and v are SIM ids (SOLDIERS slots); a=-1 means no known attacker. The caller
+// computes the final amount; kind ('bullet' | 'blast' | 'melee') only skips the shield (blast) and is reported. The event
+// record is reused, so it is consumed synchronously. kills, roundDeaths and credits stay the local player's globals,
+// written only on the player's branch. A caller with a=SIM_PLAYER sets _dmgPt (the damage-number anchor) first.
+const _dmgEv={ a:-1, v:-1, amount:0, part:'body', kind:'bullet', srcX:0, srcZ:0, killed:false, shielded:false,
+  _fwd:new THREE.Vector3(), _to:new THREE.Vector3(), _cf:new THREE.Vector3(), _from:new THREE.Vector3(), _bt:new THREE.Vector3() };   // scratch vectors ride on the record: no per-hit allocation
+function applyDamage(a,v,amount,part,kind,srcX,srcZ){
+  const V=SOLDIERS[v]; if(!V||gameOver) return 0;   // gameOver guards every victim (R15): nothing pays out after VICTORY / DEFEAT
+  const isP=(v===SIM_PLAYER);
+  if(isP){ if(ps.dead||pilotJug||DEV.god) return 0; }   // piloting: the mech takes the hits, not the soldier
+  else if(!V.active||!V.alive) return 0;
+  const A=(a>=0)?(SOLDIERS[a]||null):null, other=!!A&&a!==v;
+  if(other&&!TUNE.ff&&sameTeam(A.team,V.team)) return 0;   // teammates: dropped (rays and blasts already skip them upstream)
+  const E=_dmgEv; E.shielded=false;
+  if(isP&&ps.shieldOn&&kind!=='blast'){ const fw=E._fwd.set(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y)), to=E._to.set(srcX-player.position.x,0,srcZ-player.position.z);
+    if(to.lengthSq()>1e-4){ to.normalize(); if(to.dot(fw)>T.shieldArcCos){ amount*=(1-T.shieldBlock); E.shielded=true; } } }
+  let killed=false;
+  if(isP){ ps.health-=amount; ps.lastHitT=0; if(other)ps.lastAttackerId=a;
+    if(ps.health<=0){ killed=true; ps.dead=true; ps.alive=false; const sp=SIM.players[SIM_PLAYER]; if(sp)sp.alive=false; ps.deadT=T.respawnDelay; ps.downs++; } }
+  else { V.health-=amount; V.hitFlash=0.12; V.state='engage'; if(other)V.lastAttackerId=a;
+    if(V.health<=0){ killed=true; V.alive=false; const sp=SIM.players[v]; if(sp)sp.alive=false; V.topple=0; V.respawnT=T.enemyRespawn; V.downs++; } }
+  // credit: a kill by a soldier of another team (a suicide or, with ff on, a teamkill credits nobody)
+  if(killed&&other&&!sameTeam(A.team,V.team)){ A.frags++; if(a===SIM_PLAYER){ kills++; credits+=T.killReward; } addTech(A.team, part==='head'?ECO.techPerHeadshot:ECO.techPerKill); }
+  E.a=a; E.v=v; E.amount=amount; E.part=part; E.kind=kind; E.srcX=srcX; E.srcZ=srcZ; E.killed=killed;
+  onDamageEvent(E); return amount;
+}
+// Presentation in two tiers (K3): the victim's body reacts and falls for every event, wherever it is; local feedback
+// (numbers, marker, XP, SFX, vignette, comics, HUD, camera) only when the local player is the attacker or the victim.
+function onDamageEvent(E){
+  const isP=(E.v===SIM_PLAYER), V=SOLDIERS[E.v], head=(E.part==='head');
+  if(isP) animHit(player,E.srcX,E.srcZ,E.amount/40);
+  else { animHit(V.group,E.srcX,E.srcZ,E.amount/40); if(E.killed) deathStart(V.group,E.srcX,E.srcZ); }
+  if(E.a===SIM_PLAYER&&!isP){
+    spawnDamageNumber(_dmgPt, Math.round(E.amount), head, E.killed);
+    showHitmarker(E.killed, head);
+    if(E.killed){ onKill(curW().id,head); if(head)onHeadshotKill(); else sfxKill(); if(head||curW().melee)triggerVignette(V,curW().melee?'melee':'headshot'); updateHostileCount(); updateCreditHUD(); comicKill(E._bt.copy(V.group.position).setY(1.8)); }
+  }
+  if(isP){
+    if(E.shielded){ ps.shieldFlash=1; camShake+=0.08; }
+    camShake+=0.4;
+    const inten=Math.min(1,E.amount/14+(1-ps.health/ps.maxHealth)*0.5);
+    vignette.style.boxShadow=`inset 0 0 160px rgba(255,40,40,${0.22+inten*0.35})`;
+    setTimeout(()=>{vignette.style.boxShadow=ps.health<30?'inset 0 0 160px rgba(255,40,40,0.16)':'inset 0 0 160px rgba(255,40,40,0)';},120);
+    const toA=_v.set(E.srcX-player.position.x,0,E.srcZ-player.position.z), cf=E._cf; camera.getWorldDirection(cf); cf.y=0; cf.normalize();
+    const ang=Math.atan2(toA.x,toA.z)-Math.atan2(cf.x,cf.z); wedgeEl.style.transform=`rotate(${-ang}rad)`; dmgDirEl.style.opacity='1'; dmgDirT=0.8; if(toA.lengthSq()>1e-4){ _od.copy(toA).normalize(); camKickVel.addScaledVector(_od,-Math.min(7,E.amount*0.5)); camKickVel.y+=1.2; }
+    updateHealthHUD(); if(E.killed) playerDie();
+  }
+}
+// The player's weapons on a soldier: multipliers here, state in applyDamage (attacker SIM_PLAYER, source = you).
 function damageEnemy(en,dmg,part,point,flat,hsMult){
   part=part||'body';
   const mult=part==='head'?(hsMult||T.headMult):part==='legs'?T.legMult:T.bodyMult;
-  const final=flat?dmg:dmg*mult; en.health-=final; en.hitFlash=0.12; en.state='engage';
-  const pt=point?_dmgPt.copy(point):_dmgPt.copy(en.group.position).setY(1.6);
-  const killed=en.health<=0&&en.alive;
-  spawnDamageNumber(pt, Math.round(final), part==='head', killed);
-  showHitmarker(killed, part==='head');
-  animHit(en.group,player.position.x,player.position.z,dmg/40);if(killed){en.alive=false;{ const sp=SIM.players[en.id]; if(sp)sp.alive=false; }en.topple=0;deathStart(en.group,player.position.x,player.position.z);en.respawnT=T.enemyRespawn;kills++;en.downs=(en.downs||0)+1;credits+=T.killReward;addTech(PLAYER_TEAM,part==='head'?ECO.techPerHeadshot:ECO.techPerKill);onKill(curW().id,part==='head');if(part==='head')onHeadshotKill();else sfxKill();if(part==='head'||curW().melee)triggerVignette(en,curW().melee?'melee':'headshot');updateHostileCount();updateCreditHUD();comicKill(en.group.position.clone().setY(1.8));}
+  const final=flat?dmg:dmg*mult;
+  if(point)_dmgPt.copy(point); else _dmgPt.copy(en.group.position).setY(1.6);
+  return applyDamage(SIM_PLAYER,en.id,final,part,flat?'melee':'bullet',player.position.x,player.position.z);
 }
 
 /* buildings dmg */
@@ -1469,7 +1516,7 @@ function enemyFire(en){
   // stand in for slopes. One hit world for every shooter is a multiplayer invariant (ADR-001).
   const W=_botFireWorld; W.groundY=SIM.groundY;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
   const r=resolveShot(W,en.id,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange,teamFilter(en.team)); let end;
-  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);if(r.id===SIM_PLAYER)damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}   // a bot hit by a bot takes no damage until applyDamage (step 8)
+  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);applyDamage(en.id,r.id,eu.enemyDmg,r.part,'bullet',ep.x,ep.z);addImpact(end,_aup,'flesh');}   // flat bot damage (D7) on whoever the ray hit: you, or another team's soldier in the way
   else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
   addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
@@ -1502,7 +1549,7 @@ const _melTo=new THREE.Vector3();
 function meleeHitCheck(w){
   const fwd=new THREE.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
   const cosArc=Math.cos(w.arcDeg*0.5*Math.PI/180); let hitAny=false;
-  enemies.forEach(en=>{ if(!en.alive)return;
+  enemies.forEach(en=>{ if(!en.alive||(!TUNE.ff&&sameTeam(en.team,PLAYER_TEAM)))return;   // teammates: no hit, no shake
     _melTo.copy(en.group.position).sub(player.position); _melTo.y=0; const d=_melTo.length();
     if(d>w.range||d<0.001)return; _melTo.multiplyScalar(1/d);
     if(_melTo.dot(fwd)<cosArc)return;
@@ -1592,16 +1639,25 @@ function throwGrenadeCharged(){ animThrow(player);
   getMuzzle(player,_p2); throwVelocity(_thrV,_p2,'nade');
   const m=new THREE.Mesh(new THREE.SphereGeometry(0.26,10,8), new THREE.MeshStandardMaterial({ color:0x39482f, roughness:0.6, emissive:0x223315, emissiveIntensity:0.3 }));
   m.position.copy(_p2); m.castShadow=true; noRay(m); stylizeOne(m,0.035); scene.add(m);
-  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.5 });
+  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.5, molotov:false, ownerId:SIM_PLAYER, team:PLAYER_TEAM });
 }
-function explodeAt(p,bMult){
+function explodeAt(p,bMult,ownerId,ownerTeam){   // owner: the thrower's slot and team (every blast is yours today)
+  if(ownerId==null){ ownerId=SIM_PLAYER; ownerTeam=PLAYER_TEAM; }
   grenadeBlast(p);
   if(COMIC)spawnComic('BOOM!',p.clone(),3.0,'#FF7B00');
-  const from=p.clone(); from.y=Math.max(p.y,0.5);
-  enemies.forEach(en=>{if(!en.alive)return;const d=en.group.position.distanceTo(p);if(d<T.grenadeRadius&&blastReaches(from,en.group.position.clone().setY(1.1),null))damageEnemy(en,T.grenadeDamage*(1-d/T.grenadeRadius),'body',en.group.position.clone().setY(1.4));});
-  buildings.forEach(b=>{if(!b.alive||teamOf(b.team)===null||sameTeam(b.team,PLAYER_TEAM))return;const d=b.mesh.position.distanceTo(p);if(d<T.grenadeRadius+4&&blastReaches(from,b.mesh.position.clone().setY(Math.min(3,b.mesh.geometry.parameters.height*0.5)),b.mesh))damageBuilding(b,T.grenadeBuildingDamage*(bMult||1)*(1-d/(T.grenadeRadius+4)));});
-  harvesters.forEach(hv=>{if(!hv.alive||teamOf(hv.team)===null||sameTeam(hv.team,PLAYER_TEAM))return;const d=hv.group.position.distanceTo(p);if(d<T.grenadeRadius+3&&blastReaches(from,hv.group.position.clone().setY(1.2),null))damageHarvester(hv,T.grenadeBuildingDamage*0.6*(1-d/(T.grenadeRadius+3)));});
-  const dp=player.position.distanceTo(p); if(dp<T.grenadeRadius&&!ps.dead&&blastReaches(from,player.position.clone().setY(1.1),null))damagePlayer(T.grenadeDamage*0.5*(1-dp/T.grenadeRadius),p,true);
+  const from=_dmgEv._from.copy(p); from.y=Math.max(p.y,0.5); const bt=_dmgEv._bt, R=T.grenadeRadius;
+  // soldiers in slot order, then structures, then you (today's order): the owner takes 0.5x, its teammates are spared
+  // unless friendly fire is on (D5), everyone else takes the falloff. Reach stays blastReaches (K2: NC-7 is its own change-set).
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s]; if(!en.active||!en.alive)continue;
+    if(s!==ownerId&&!TUNE.ff&&ownerTeam!=null&&sameTeam(en.team,ownerTeam))continue;
+    const d=en.group.position.distanceTo(p); if(d>=R||!blastReaches(from,bt.copy(en.group.position).setY(1.1),null))continue;
+    _dmgPt.copy(en.group.position).setY(1.4); applyDamage(ownerId,s,T.grenadeDamage*(s===ownerId?0.5:1)*(1-d/R),'body','blast',p.x,p.z); }
+  for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(!b.alive||teamOf(b.team)===null||sameTeam(b.team,ownerTeam))continue;
+    const d=b.mesh.position.distanceTo(p); if(d<R+4&&blastReaches(from,bt.copy(b.mesh.position).setY(Math.min(3,b.mesh.geometry.parameters.height*0.5)),b.mesh))damageBuilding(b,T.grenadeBuildingDamage*(bMult||1)*(1-d/(R+4))); }
+  for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i]; if(!hv.alive||teamOf(hv.team)===null||sameTeam(hv.team,ownerTeam))continue;
+    const d=hv.group.position.distanceTo(p); if(d<R+3&&blastReaches(from,bt.copy(hv.group.position).setY(1.2),null))damageHarvester(hv,T.grenadeBuildingDamage*0.6*(1-d/(R+3))); }
+  if(!ps.dead&&(ownerId===SIM_PLAYER||TUNE.ff||ownerTeam==null||!sameTeam(PLAYER_TEAM,ownerTeam))){ const dp=player.position.distanceTo(p);
+    if(dp<R&&blastReaches(from,bt.copy(player.position).setY(1.1),null))applyDamage(ownerId,SIM_PLAYER,T.grenadeDamage*(ownerId===SIM_PLAYER?0.5:1)*(1-dp/R),'body','blast',p.x,p.z); }
 }
 
 // ===== TORQUE BOW (Gears-style) — charge LMB to scale launch velocity; the kind-agnostic arc
@@ -1622,7 +1678,7 @@ function fireBolt(){
   const armed = true;                 // bolts ALWAYS explode/stick now (Mustafa) -- charge only scales speed/range (dud path removed)
   playerFireOrigin(muzzleW); throwVelocity(_thrV,muzzleW,'bow'); _bDir.copy(_thrV).normalize();
   const m=makeBolt(armed); m.position.copy(muzzleW); m.quaternion.setFromUnitVectors(_aup,_bDir); scene.add(m);
-  bolts.push({ mesh:m, vel:_thrV.clone(), prev:muzzleW.clone(), armed, state:'fly', t:0, life:0, stuckTo:null, stuckOff:new THREE.Vector3() });
+  bolts.push({ mesh:m, vel:_thrV.clone(), prev:muzzleW.clone(), armed, state:'fly', t:0, life:0, stuckTo:null, stuckOff:new THREE.Vector3(), ownerId:SIM_PLAYER, team:PLAYER_TEAM });
   l.ammo--; ps.fireCd=w.fireInterval; ps.fireKick=Math.min(1.1,ps.fireKick+0.5+w.recoil*0.05);
   camRecoil+=w.recoil; camShake+=w.recoil*0.12; const _fk=fovBase/52; fovKick=Math.min(7*_fk,fovKick+(1.2+w.recoil*0.5)*_fk);
   addMuzzle(muzzleW,0xffb060); updateWeaponHUD(); if(l.ammo<=0){ if(l.reserve>0) startReload(); else equipPrimary(); }
@@ -1642,23 +1698,11 @@ function tryResupply(){
 /* damage to player */
 const vignette=document.getElementById('vignette'),dmgDirEl=document.getElementById('dmgDir'),wedgeEl=dmgDirEl.querySelector('.wedge'); let dmgDirT=0;
 function damagePlayer(amount,fromPos,ignoreShield,srcEnemy){
-  if(ps.dead||gameOver)return;
-  if(pilotJug)return;   // piloting a vehicle: the mech takes the hits, not the soldier
-  if(DEV.god)return;
-  if(ps.shieldOn&&fromPos&&!ignoreShield){
-    const fwd=new THREE.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
-    const to=new THREE.Vector3(fromPos.x-player.position.x,0,fromPos.z-player.position.z);
-    if(to.lengthSq()>1e-4){ to.normalize(); if(to.dot(fwd)>T.shieldArcCos){ amount*=(1-T.shieldBlock); ps.shieldFlash=1; camShake+=0.08; } }
-  }
-  ps.health-=amount; ps.lastHitT=0; camShake+=0.4; if(srcEnemy)ps.lastAttacker=srcEnemy; if(fromPos) animHit(player,fromPos.x,fromPos.z,amount/40);
-  const inten=Math.min(1,amount/14+(1-ps.health/ps.maxHealth)*0.5);
-  vignette.style.boxShadow=`inset 0 0 160px rgba(255,40,40,${0.22+inten*0.35})`;
-  setTimeout(()=>{vignette.style.boxShadow=ps.health<30?'inset 0 0 160px rgba(255,40,40,0.16)':'inset 0 0 160px rgba(255,40,40,0)';},120);
-  const toA=_v.copy(fromPos).sub(player.position);toA.y=0;const cf=new THREE.Vector3();camera.getWorldDirection(cf);cf.y=0;cf.normalize();
-  const ang=Math.atan2(toA.x,toA.z)-Math.atan2(cf.x,cf.z); wedgeEl.style.transform=`rotate(${-ang}rad)`; dmgDirEl.style.opacity='1'; dmgDirT=0.8; if(toA.lengthSq()>1e-4){ _od.copy(toA).normalize(); camKickVel.addScaledVector(_od,-Math.min(7,amount*0.5)); camKickVel.y+=1.2; }
-  updateHealthHUD(); if(ps.health<=0)playerDie();
+  const sx=fromPos?fromPos.x:player.position.x, sz=fromPos?fromPos.z:player.position.z;
+  return applyDamage(srcEnemy?srcEnemy.id:-1,SIM_PLAYER,amount,'body',(ignoreShield||!fromPos)?'blast':'bullet',sx,sz);
 }
-function playerDie(){{ const _la=ps.lastAttacker&&ps.lastAttacker.group; deathStart(player,_la?_la.position.x:player.position.x+Math.random()-0.5,_la?_la.position.z:player.position.z+Math.random()-0.5); }ps.dead=true;ps.alive=false;if(SIM.players[0])SIM.players[0].alive=false;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();if(ps.lastAttacker){ps.lastAttacker.frags=(ps.lastAttacker.frags||0)+1;ps.lastAttacker=null;}document.getElementById('deathScreen').style.display='flex';}
+function playerDie(){ deathStart(player,_dmgEv.srcX,_dmgEv.srcZ);   // fall away from the killing blow; the killer was credited in applyDamage
+  ps.dead=true;ps.alive=false;if(SIM.players[0])SIM.players[0].alive=false;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();document.getElementById('deathScreen').style.display='flex';}
 function playerRespawn(){ps.dead=false;ps.alive=true;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
 
 /* end / reset */
@@ -1668,8 +1712,8 @@ function resetRound(){
   buildTeamIndex(); activateRoster();   // the editor edits buildings without buildMap
   gameOver=false; endEl.style.display='none'; document.getElementById('deathScreen').style.display='none';
   buildings.forEach(b=>{b.alive=true;b.health=b.maxHealth;b.sink=0;b.mesh.position.y=b.mesh.geometry.parameters.height/2;b.mesh.visible=true;b.trim.visible=true;b.trim.material.emissiveIntensity=0.65;b.trim.position.y=b.mesh.geometry.parameters.height-0.7;b.label.visible=true;b.bar.grp.visible=true;b.box.setFromObject(b.mesh);});
-  enemies.forEach(en=>{if(!en.active)return;en.alive=true;en.frags=0;en.downs=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
-  ps.health=T.playerHealth;ps.dead=false;ps.alive=true;ps.lastHitT=99;ps.lastAttacker=null;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
+  enemies.forEach(en=>{if(!en.active)return;en.alive=true;en.frags=0;en.downs=0;en.lastAttackerId=-1;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
+  ps.health=T.playerHealth;ps.dead=false;ps.alive=true;ps.lastHitT=99;ps.lastAttacker=null;ps.lastAttackerId=-1;ps.frags=0;ps.downs=0;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
   loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;l.reserve=WEAPONS[i].reserve;l.owned=(i===0);});
   for(let i=0;i<TEAMS.length;i++){ const e=teamEco[TEAMS[i].id]; e.era=1; e.tech=0; e.silos=0; }
   credits=T.startCredits;grenadeCount=0;kills=0;roundDeaths=0;roundAssists=0;ps.curWeapon=0;ps.spread=curW().spreadHip;ps.reloading=false;ps.fireCd=0;ps.ads=false;ps.shieldOwned=false;ps.shieldOn=false;ps.swinging=false;ps.shieldFlash=0;document.getElementById('reloadBar').style.opacity='0';unitOwned=UNIT_TYPES.map((u,i)=>i===0);ps.unit=0;applyUnit(0);ps.health=ps.maxHealth;
@@ -2586,7 +2630,7 @@ function update(dt){ NAV.budget=2;
       if(bd.lengthSq()>1e-4){ bd.normalize(); ps.vel.copy(bd).multiplyScalar(cs); player.rotation.y=Math.atan2(bd.x,bd.z); }
       else ps.vel.multiplyScalar(0.5);
       player.position.addScaledVector(ps.vel,dt);
-      if(ps._bayHit) enemies.forEach(en=>{ if(en.alive && !ps._bayHit.has(en) && en.group.position.distanceTo(player.position)<2.4){ ps._bayHit.add(en); damageEnemy(en,9999,'body',en.group.position.clone().setY(1.5),true); camShake+=0.16; if(typeof spawnComic==='function')spawnComic('IMPALE!',en.group.position.clone().setY(1.9),2.4,'#FF7B00'); } });
+      if(ps._bayHit) enemies.forEach(en=>{ if(en.alive && (TUNE.ff||!sameTeam(en.team,PLAYER_TEAM)) && !ps._bayHit.has(en) && en.group.position.distanceTo(player.position)<2.4){ ps._bayHit.add(en); damageEnemy(en,9999,'body',en.group.position.clone().setY(1.5),true); camShake+=0.16; if(typeof spawnComic==='function')spawnComic('IMPALE!',en.group.position.clone().setY(1.9),2.4,'#FF7B00'); } });
     } else {
     const wish=_wish.set(0,0,0);
     if(keys['KeyW']){wish.x+=fwdX;wish.z+=fwdZ;}
@@ -2684,7 +2728,7 @@ function update(dt){ NAV.budget=2;
   // grenades
   for(let i=grenades.length-1;i>=0;i--){const g=grenades[i];g.vel.y-=20*dt;g.mesh.position.addScaledVector(g.vel,dt);g.fuse-=dt;
     if(g.mesh.position.y<=0.26){g.mesh.position.y=0.26;g.vel.y*=-0.4;g.vel.x*=0.6;g.vel.z*=0.6;}
-    if(g.fuse<=0){explodeAt(g.mesh.position.clone(), g.molotov?1.8:1);scene.remove(g.mesh);g.mesh.geometry.dispose();g.mesh.material.dispose();grenades.splice(i,1);}}
+    if(g.fuse<=0){explodeAt(g.mesh.position.clone(), g.molotov?1.8:1, g.ownerId, g.team);scene.remove(g.mesh);g.mesh.geometry.dispose();g.mesh.material.dispose();grenades.splice(i,1);}}
 
   // torque-bow bolts: fly under gravity -> stick; armed bolts arm a short fuse then blast
   syncSimWorld(); // refresh SIM hitboxes so bolts hit the same head/torso/leg boxes as bullets
@@ -2694,9 +2738,9 @@ function update(dt){ NAV.budget=2;
       const segLen=_bSeg.copy(b.mesh.position).sub(b.prev).length();
       if(segLen>1e-4){
         _bDir.copy(_bSeg).multiplyScalar(1/segLen); b.mesh.quaternion.setFromUnitVectors(_aup,_bDir);
-        const r=resolveShot(SIM,SIM_PLAYER, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05, teamFilter(PLAYER_TEAM)); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
+        const r=resolveShot(SIM,b.ownerId, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05, teamFilter(b.team)); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
         if(r.kind!=='none'){
-          const en=(r.kind==='enemy'&&SOLDIERS[r.id]!==ps)?SOLDIERS[r.id]:null; _bHit.set(r.px,r.py,r.pz);
+          const en=(r.kind==='enemy'&&r.id!==SIM_PLAYER)?SOLDIERS[r.id]:null; _bHit.set(r.px,r.py,r.pz);
           b.state='armed'; b.t=0; addImpact(_bHit,_aup,!!en); b.mesh.position.copy(_bHit);
           if(en&&en.alive){ b.stuckTo=en; b.stuckOff.copy(_bHit).sub(en.group.position); } else b.stuckTo=null; // stick to the body, ride it until the fuse blows
           continue;
@@ -2706,9 +2750,9 @@ function update(dt){ NAV.budget=2;
       if(b.mesh.position.y<=0.05){ b.mesh.position.y=0.05; b.state='armed'; b.t=0; b.stuckTo=null; continue; }
       if(b.life>5){ removeBolt(b,i); continue; }
     } else if(b.state==='armed'){
-      if(b.stuckTo){ if(b.stuckTo.alive){ b.mesh.position.copy(b.stuckTo.group.position).add(b.stuckOff); } else { explodeAt(b.mesh.position.clone(), 1.5); removeBolt(b,i); continue; } }
+      if(b.stuckTo){ if(b.stuckTo.alive){ b.mesh.position.copy(b.stuckTo.group.position).add(b.stuckOff); } else { explodeAt(b.mesh.position.clone(), 1.5, b.ownerId, b.team); removeBolt(b,i); continue; } }
       b.t+=dt; const tm=b.mesh.userData.tipMat; if(tm) tm.emissiveIntensity=0.55+Math.abs(Math.sin(b.t*38))*0.6;
-      if(b.t>=BOLT_FUSE){ explodeAt(b.mesh.position.clone(), 1.5); removeBolt(b,i); continue; }
+      if(b.t>=BOLT_FUSE){ explodeAt(b.mesh.position.clone(), 1.5, b.ownerId, b.team); removeBolt(b,i); continue; }
     }
   }
 
@@ -2732,7 +2776,7 @@ function update(dt){ NAV.budget=2;
         _eStr.set(-_eDir.z,0,_eDir.x).multiplyScalar(en.strafeDir*0.8); _eMv.add(_eStr);
         if(_eMv.lengthSq()>0)_eMv.normalize(); enemyClimbSteer(en,_eMv); en.group.position.addScaledVector(_eMv,dt*T.enemyMoveSpeed*eu.speedMult);
         if(en.lungeCd>0)en.lungeCd-=dt;
-        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; damagePlayer(eu.lunge,en.group.position,false,en); camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); }
+        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; applyDamage(en.id,SIM_PLAYER,eu.lunge,'body','melee',en.group.position.x,en.group.position.z); camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); }
         en.fireCd-=dt;
         if(en.fireCd<=0){if(en.burstLeft<=0)en.burstLeft=eu.burst;enemyFire(en);en.burstLeft--;en.fireCd=en.burstLeft>0?eu.fireInterval:T.enemyBurstPause+Math.random()*0.6;}
       } else if(!gameOver && !DEV.freezeAI){
@@ -3173,7 +3217,7 @@ updateCareerChip();
   $('dvMax').onclick=()=>devSetLevel(100);
   $('dvPrest').onclick=devPrestige;
   $('dvReset').onclick=devReset;
-  $('dvKill').onclick=()=>{ if(mode!=='game')return; enemies.forEach(en=>{ if(en.alive) damageEnemy(en,T.enemyHealth+999,'body',en.group.position.clone().setY(1.4),true); }); };
+  $('dvKill').onclick=()=>{ if(mode!=='game')return; enemies.forEach(en=>{ if(en.alive&&!sameTeam(en.team,PLAYER_TEAM)) damageEnemy(en,T.enemyHealth+999,'body',en.group.position.clone().setY(1.4),true); }); };
   $('dvWin').onclick=()=>{ if(mode==='game')endGame(true); };
   $('dvLose').onclick=()=>{ if(mode==='game')endGame(false); };
 })();
