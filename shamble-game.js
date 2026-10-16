@@ -720,13 +720,17 @@ function activateRoster(){
   let other=false;
   for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id]; e.active=(id===PLAYER_TEAM)||e.hqs.length>0; if(e.active&&id!==PLAYER_TEAM)other=true; }
   if(!other) TEAM_INDEX.soviets.active=true;
-  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s];
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s], g=en.group;
     // INTERIM (3a steps 6-9): the player's own team's bots stay parked until bots target across teams (step 10 deletes this)
     const on=TEAM_INDEX[en.team].active&&en.team!==PLAYER_TEAM;
-    en.active=on; if(!on){ en.alive=false; en.respawnT=0; } en.group.visible=on&&mode!=='editor'; if(!on)en.group.userData.bar.grp.visible=false; }
+    en.active=on;
+    // A parked slot leaves the scene graph: r128 updates the matrices of hidden objects too. Back in the scene it goes
+    // through stylizeOne, which skips meshes that are already toon and styles a slot that was parked when stylizeScene ran.
+    if(on){ if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } g.visible=mode!=='editor'; }
+    else { en.alive=false; en.respawnT=0; g.visible=false; g.userData.bar.grp.visible=false; if(g.parent)g.parent.remove(g); } }
   for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], ix=TEAM_INDEX[teamOf(hv.team)]; hv.parked=!(ix&&ix.active);
     if(hv.parked){ hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; } }
-  TEAM_INDEX.rosterVer++;
+  TEAM_INDEX.rosterVer++; _simFrame=-1;   // re-sync SIM on its next call, even within this frame, so a slot parked now is dead there now
 }
 // ─── Phase 4: economy-as-weapon — power plant down throttles tech (×0.5) and doubles prices ───
 function powerDead(team){ for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(b.type==='power'&&sameTeam(b.team,team)) return !b.alive; } return false; }
@@ -3024,7 +3028,8 @@ player.userData.shield=makeShield(0x38e1b0); player.userData.joints.handL.add(pl
   heightLine=new THREE.Mesh(hlg,new THREE.MeshBasicMaterial({color:0xffd23f,transparent:true,opacity:0.92,depthTest:false}));
   heightLine.renderOrder=995; heightLine.visible=false; noRay(heightLine); scene.add(heightLine); }
 // Fixed slot table (three-teams item 4): TUNE.teams.size slots per team, team-major in TEAMS order. Slot 0 is you, so
-// with size 4: 1-3 allies, 4-7 soviets, 8-11 empire. activateRoster() parks the slots of teams that don't play.
+// with size 4: 1-3 allies, 4-7 soviets, 8-11 empire (the player's team, TEAMS[0] today, gets size-1 bot slots).
+// activateRoster() parks the slots of teams that don't play.
 SOLDIERS[0]=ps;
 for(let k=0;k<TEAMS.length;k++){ const tm=TEAMS[k];
   for(let j=(tm.id===PLAYER_TEAM?1:0);j<TUNE.teams.size;j++){
