@@ -643,7 +643,7 @@ function buildMap(def){
   rebuildLOS();
   _env=envMerge(def.env); applyEnv(_env,{regen:true});
   _rules=rulesMerge(def.rules); if(_rulesReady)applyRules(_rules);
-  buildTeamIndex(); activateRoster();
+  placeObjectives(def); buildTeamIndex(); activateRoster();   // objectives first: the truck lanes read the field
 }
 // Maps saved before editor-undo-ground can hold stacked copies of trees and props: clearMap never cleared them, so every
 // Load, Reset, undo and redo added another copy. The editor's Maps > Load drops EXACT duplicates only: the whole entry must
@@ -658,6 +658,7 @@ function dedupeMapDef(def){ if(!def||typeof def!=='object'||Array.isArray(def)) 
     out[k]=keep; }
   return {def:out, droppedTrees, droppedProps}; }
 function serializeMap(){ return {
+  version:1,   // map format: 1 = canonical team ids and objectives in the map (3a); older saves have no field
   name:curMap.name,
   spawn:{x:+mapSpawn.x.toFixed(1),z:+mapSpawn.z.toFixed(1)},
   resupply:{x:+terminalPos.x.toFixed(1),z:+terminalPos.z.toFixed(1),rot:+((termMesh?termMesh.rotation.y:0)).toFixed(3),w:+((termMesh?termMesh.scale.x*1.4:1.4)).toFixed(2),h:+((termMesh?termMesh.scale.y*1.6:1.6)).toFixed(2),d:+((termMesh?termMesh.scale.z:1)).toFixed(2)},
@@ -672,6 +673,9 @@ function serializeMap(){ return {
   enemySpawns:enemySpawns.map(sp=>({x:+sp.x.toFixed(1),z:+sp.z.toFixed(1),faction:sp.faction})),
   buildings:buildings.map(b=>({team:b.team,type:b.type,x:+b.mesh.position.x.toFixed(1),z:+b.mesh.position.z.toFixed(1),rot:+(b.mesh.rotation.y).toFixed(3),s:+(b.scl||1).toFixed(3),hp:Math.round(b.maxHealth),y:+b.mesh.position.y.toFixed(2)})),
   barracks:barracksList.map(b=>({x:+(b.cx).toFixed(1),z:+(b.cz).toFixed(1),team:b.team,rot:+(b.rot||0).toFixed(3),s:+(b.scl||1).toFixed(3)})),
+  harvField:{x:+HARV.fieldX.toFixed(1),z:+HARV.fieldZ.toFixed(1)},
+  techPoints:TBOX.points.map(p=>({name:p.name,x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
+  silos:SILO.points.map(p=>({x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
   env:currentEnvJSON(),
   rules:currentRulesJSON()
 };}
@@ -696,17 +700,18 @@ const ECO={
 const teamEco={}; for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id]={era:1,tech:0,silos:0};
 teamEco.friend=teamEco.allies; teamEco.hostile=teamEco.soviets;   // legacy aliases are the SAME objects until 3b: iterate TEAMS, never Object.keys(teamEco)
 // ─── Phase 2: harvester / supply convoy (tunable) ───
-const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z };
+const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z, fieldGrp:null };
 // ─── Phase 3: Tech Boxes (tunable) ───
-const TBOX={ points:DM_Cabana.techPoints, activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };
+const TBOX={ points:[], pool:[], names:['Alpha','Bravo','Charlie'], activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };   // points: the map's tech points (own objects from pool, names fixed by index; placeObjectives)
+for(let i=0;i<3;i++){ const c=DM_Cabana.techPoints[i]; TBOX.pool.push({name:TBOX.names[i], x:c?c.x:0, z:c?c.z:0}); if(c)TBOX.points.push(TBOX.pool[i]); }
 // Team colours: allies teal, both enemy teams today's red until 3b's colour pass (D4); friend/hostile stay as aliases.
 const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d, allies:0x38e1b0, soviets:0xff4d4d, empire:0xff4d4d };
 const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a', allies:'#7af0d2', soviets:'#ff8a8a', empire:'#ff8a8a' };
 // Per-team building index (three-teams item 7): per-frame code reads these fields instead of searching buildings[] with
 // a closure (findB). Rebuilt by buildTeamIndex() at the end of buildMap, at the start of resetRound and once at boot after
 // the trucks exist; the editor adds and removes buildings without buildMap, and its Play button runs resetRound.
-const TEAM_INDEX={ firstEnemy:null, rosterVer:0 };
-for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; TEAM_INDEX[id]={ active:false, blds:[], hqs:[], refinery:null, power:null, barracksB:null, barracksE:null, markers:[], harv:null, dockX:0, dockZ:0, laneX:0, laneZ:0 };
+const TEAM_INDEX={ firstEnemy:null, rosterVer:0, presence:new Int32Array(TEAMS.length) };   // presence: per-team head count at one objective (tech box, silo)
+for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; TEAM_INDEX[id]={ idx:i, active:false, blds:[], hqs:[], refinery:null, power:null, barracksB:null, barracksE:null, markers:[], harv:null, dockX:0, dockZ:0, laneX:0, laneZ:0 };
   if(TEAM_INDEX.firstEnemy===null&&id!==PLAYER_TEAM)TEAM_INDEX.firstEnemy=id; }   // set here too: HUD code may read it before the first buildMap
 function buildTeamIndex(){
   for(let i=0;i<TEAMS.length;i++){ const e=TEAM_INDEX[TEAMS[i].id]; e.blds.length=0; e.hqs.length=0; e.refinery=null; e.power=null; e.barracksB=null; e.barracksE=null; e.markers.length=0; e.harv=null; }
@@ -724,6 +729,24 @@ function buildTeamIndex(){
       e.dockX=r?r.mesh.position.x:0; e.dockZ=r?r.mesh.position.z+7*sg:-35*sg; e.laneX=HARV.fieldX+4*sg; e.laneZ=HARV.fieldZ; }
     else { const rx=r?r.mesh.position.x:0, rz=r?r.mesh.position.z:0, dx=HARV.fieldX-rx, dz=HARV.fieldZ-rz, d=Math.sqrt(dx*dx+dz*dz)||1;
       e.dockX=rx+dx/d*7; e.dockZ=rz+dz/d*7; e.laneX=HARV.fieldX; e.laneZ=HARV.fieldZ; } }
+}
+// Objectives from map data (three-teams item 3 / D14). Validated: arrays only, at most 3 tech points and 3 silos (the
+// pools), finite numbers clamped to the arena, names fixed by pool index (no map text reaches a label). A missing or
+// unusable key falls back to DM_Cabana's values. Writes into TBOX / SILO's own pooled objects, moves the pooled meshes
+// once boot has built them (hidden when the map has fewer), and resets the box and silos.
+function placeObjectives(def){
+  const ok=o=>o!==null&&typeof o==='object'&&Number.isFinite(o.x)&&Number.isFinite(o.z);
+  const AX=T.arenaX-4, AZ=T.arenaZ-4, cx=v=>Math.max(-AX,Math.min(AX,v)), cz=v=>Math.max(-AZ,Math.min(AZ,v));
+  const pick=(a,fb,cap)=>{ const src=Array.isArray(a)?a.filter(ok).slice(0,cap):[]; return src.length?src:fb.slice(0,cap); };
+  const hf=(def&&ok(def.harvField))?def.harvField:DM_Cabana.harvField; HARV.fieldX=cx(hf.x); HARV.fieldZ=cz(hf.z);
+  const tp=pick(def&&def.techPoints,DM_Cabana.techPoints,TBOX.pool.length), sp=pick(def&&def.silos,DM_Cabana.silos,SILO.pool.length);
+  const tv=tp.map(o=>[cx(o.x),cz(o.z)]), sv=sp.map(o=>[cx(o.x),cz(o.z)]);   // read every value before writing: tp may hold the pool's own objects
+  TBOX.points.length=0; for(let i=0;i<tv.length;i++){ const o=TBOX.pool[i]; o.name=TBOX.names[i]; o.x=tv[i][0]; o.z=tv[i][1]; TBOX.points.push(o); }
+  SILO.points.length=0; for(let i=0;i<sv.length;i++){ const o=SILO.pool[i]; o.x=sv[i][0]; o.z=sv[i][1]; SILO.points.push(o); }
+  for(let i=0;i<techPts.length;i++){ const t=techPts[i], on=i<TBOX.points.length; t.group.visible=on; t.group.position.set(TBOX.pool[i].x,0,TBOX.pool[i].z); }
+  for(let i=0;i<silos.length;i++){ const sl=silos[i], on=i<SILO.points.length; sl.on=on; sl.group.visible=on; sl.group.position.set(SILO.pool[i].x,0,SILO.pool[i].z); sl.bar.grp.position.set(SILO.pool[i].x,4.0,SILO.pool[i].z); if(!on)sl.bar.grp.visible=false; }
+  if(HARV.fieldGrp) HARV.fieldGrp.position.set(HARV.fieldX,0,HARV.fieldZ);
+  if(tboxMesh) resetTechBox(); if(silos.length) resetSilos();
 }
 // Roster activation (three-teams item 4): a team plays when it has an HQ; the player's team always does; a map where no
 // other team has an HQ gets the Soviets on the legacy north band (N2). Slots of a team that doesn't play are parked:
@@ -784,13 +807,13 @@ function makeHarvester(team){
   const hv={ team, group:g, accent, health:HARV.hp, maxHealth:HARV.hp, alive:true, refDead:false, state:'toField', t:0, hitFlash:0, respawnT:0, bar:{grp:bar,fg,w:3.4}, hx:1.7, hy:2.0, hz:1.1, parked:false, docks:0 };
   harvesters.push(hv); return hv;
 }
-function makeSupplyField(){
-  const x=HARV.fieldX, z=HARV.fieldZ;
-  const pad=new THREE.Mesh(new THREE.CircleGeometry(4.2,40), new THREE.MeshStandardMaterial({color:0x3a3826,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.set(x,0.02,z); pad.receiveShadow=true; noRay(pad); scene.add(pad);
-  const ring=new THREE.Mesh(new THREE.RingGeometry(4.2,4.9,44), new THREE.MeshBasicMaterial({color:0xb5a642,transparent:true,opacity:0.4,side:THREE.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(x,0.03,z); noRay(ring); scene.add(ring);
+function makeSupplyField(){   // one group at the field (HARV.fieldGrp), children at local offsets, so placeObjectives can move it
+  const x=0, z=0, fg=new THREE.Group(); fg.position.set(HARV.fieldX,0,HARV.fieldZ); scene.add(fg); HARV.fieldGrp=fg;
+  const pad=new THREE.Mesh(new THREE.CircleGeometry(4.2,40), new THREE.MeshStandardMaterial({color:0x3a3826,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.set(x,0.02,z); pad.receiveShadow=true; noRay(pad); fg.add(pad);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(4.2,4.9,44), new THREE.MeshBasicMaterial({color:0xb5a642,transparent:true,opacity:0.4,side:THREE.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(x,0.03,z); noRay(ring); fg.add(ring);
   const cmat=new THREE.MeshStandardMaterial({color:0x6b5a36,roughness:0.85,metalness:0.1});
-  [[0,0,1.0],[1.1,0.5,0.8],[-0.9,-0.6,0.8],[0.3,-1.1,0.7],[-0.6,0.9,0.7]].forEach(([dx,dz,s])=>{ const c=new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cmat); c.position.set(x+dx,s/2,z+dz); c.castShadow=true; noRay(c); scene.add(c); });
-  const lbl=makeLabel('SUPPLY CACHE','#cdb24a'); lbl.position.set(x,3.4,z); scene.add(lbl);
+  [[0,0,1.0],[1.1,0.5,0.8],[-0.9,-0.6,0.8],[0.3,-1.1,0.7],[-0.6,0.9,0.7]].forEach(([dx,dz,s])=>{ const c=new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cmat); c.position.set(x+dx,s/2,z+dz); c.castShadow=true; noRay(c); fg.add(c); });
+  const lbl=makeLabel('SUPPLY CACHE','#cdb24a'); lbl.position.set(x,3.4,z); fg.add(lbl);
 }
 function harvDock(team){ const e=TEAM_INDEX[teamOf(team)]; return e?{x:e.dockX,z:e.dockZ}:{x:0,z:0}; }
 function updateHarvBar(hv){ const f=Math.max(0,hv.health/hv.maxHealth); hv.bar.fg.scale.x=f; hv.bar.fg.position.x=-(hv.bar.w*(1-f))/2; }
@@ -799,7 +822,7 @@ function damageHarvester(hv,d){ if(!hv.alive)return; hv.health-=d; hv.hitFlash=0
 function destroyHarvester(hv,refDead){ if(!hv.alive)return; hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; addExplosion(hv.group.position.clone().setY(1.0)); camShake=Math.min(1.3,camShake+0.5); hv.refDead=!!refDead; hv.respawnT=HARV.respawn; if(sameTeam(hv.team,PLAYER_TEAM)) showLevelToast('Supply Truck Lost', refDead?'Refinery down — no resupply':'Respawning in '+HARV.respawn+'s'); updateBaseHUD(); }
 function respawnHarvester(hv){ if(hv.parked)return; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); updateBaseHUD(); }
 function resetHarvesters(){ for(const hv of harvesters){ if(hv.parked)continue; hv.docks=0; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); } updateBaseHUD(); }
-function siegeFireHarvester(en,hv){ _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
+function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
 function updateHarvesters(dt){
   if(gameOver)return;
   for(const hv of harvesters){
@@ -867,7 +890,7 @@ function cashOutTechBox(){
 }
 function resetTechBox(){ tbox.active=false; tbox.idx=-1; tbox.owner='neutral'; tbox.prog=0; tbox.progTeam=null; tbox.timer=0; tbox.gap=TBOX.firstDelay; tbox.nextIdx=Math.floor(Math.random()*TBOX.points.length); if(tboxMesh)tboxMesh.visible=false; if(tboxBar)tboxBar.grp.visible=false; ps.channeling=false; dressTechPoints(); _tbSec=-1; updateTboxHUD(); }
 function updateTboxHUD(){
-  if(!tboxHudEl)return;
+  if(!tboxHudEl||!TBOX.points.length)return;
   if(tbox.active){ tboxHudEl.style.borderColor='rgba('+tbRGB(tbox.owner)+',.5)'; if(tbNameEl){ tbNameEl.textContent=TBOX.points[tbox.idx].name; tbNameEl.style.color=TEAM_HEX[tbox.owner]; } }
   else { tboxHudEl.style.borderColor='rgba(181,166,66,.25)'; if(tbNameEl){ tbNameEl.textContent='Next · '+TBOX.points[tbox.nextIdx].name; tbNameEl.style.color='#cdb24a'; } }
 }
@@ -878,18 +901,23 @@ function updateTboxHUDTick(){
     if(tbBarWrap){ if(tbox.prog>0){ tbBarWrap.style.display='block'; if(tbBarFill){ tbBarFill.style.width=(tbox.prog*100).toFixed(0)+'%'; tbBarFill.style.background='rgba('+tbRGB(tbox.progTeam)+',.95)'; } } else tbBarWrap.style.display='none'; }
   } else { const g=Math.max(0,Math.ceil(tbox.gap)); if(g!==_tbSec){ _tbSec=g; if(tbTimerEl) tbTimerEl.textContent='in '+g+'s'; } if(tbBarWrap) tbBarWrap.style.display='none'; }
 }
+// Presence (three-teams item 7): count every team inside an objective's radius: you (when you qualify) for your team, every
+// active live bot for its own. Exactly one team present returns its id; none or two or more (contested) returns null.
+function presentTeam(x,z,r,youIn){ const P=TEAM_INDEX.presence, r2=r*r; P.fill(0);
+  if(youIn) P[TEAM_INDEX[PLAYER_TEAM].idx]++;
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s]; if(!en.active||!en.alive)continue; const dx=en.group.position.x-x, dz=en.group.position.z-z; if(dx*dx+dz*dz<=r2) P[TEAM_INDEX[en.team].idx]++; }
+  let team=null; for(let i=0;i<P.length;i++){ if(P[i]>0){ if(team!==null) return null; team=TEAMS[i].id; } } return team; }
 function updateTechBox(dt){
   if(gameOver){ ps.channeling=false; return; }
+  if(!TBOX.points.length) return;
   if(!tbox.active){ tbox.gap-=dt; if(tbox.gap<=0) spawnTechBox(tbox.nextIdx); updateTboxHUDTick(); return; }
   tbox.timer-=dt;
   const p=TBOX.points[tbox.idx];
   const pdx=player.position.x-p.x, pdz=player.position.z-p.z; const pIn=(pdx*pdx+pdz*pdz)<=TBOX.range*TBOX.range;
   const playerCh = pIn && !ps.dead && keys['KeyE'];
-  let enemyCh=false; for(const en of enemies){ if(!en.alive)continue; const ex=en.group.position.x-p.x, ez=en.group.position.z-p.z; if(ex*ex+ez*ez<=TBOX.range*TBOX.range){ enemyCh=true; break; } }
-  ps.channeling = playerCh && tbox.owner!=='friend';
+  ps.channeling = playerCh && !sameTeam(tbox.owner,PLAYER_TEAM);
   if(ps.channeling && charge.active) endCharge();
-  let chTeam=null;
-  if(playerCh && !enemyCh) chTeam='friend'; else if(enemyCh && !playerCh) chTeam='hostile';
+  const chTeam=presentTeam(p.x,p.z,TBOX.range,playerCh);   // you count only while channelling E; bots by standing in the ring
   if(chTeam && tbox.owner!==chTeam){
     if(tbox.progTeam!==chTeam){ tbox.prog=0; tbox.progTeam=chTeam; }
     tbox.prog += dt/TBOX.captureTime;
@@ -910,7 +938,8 @@ function updateTechBox(dt){
  * Each silo a team holds adds ECO.paySilo cr/sec to that team's trickle (the player's cash). An
  * enemy on the pad contests (freezes/decays); clear them to flip it. Bots capture incidentally as
  * the front line crosses the pads. teamEco.<team>.silos (recounted on every flip) drives income. */
-const SILO={ points:DM_Cabana.silos, range:5, captureTime:3.5 };
+const SILO={ points:[], pool:[], range:5, captureTime:3.5 };   // points: the map's silos (own objects from pool; placeObjectives)
+for(let i=0;i<3;i++){ const c=DM_Cabana.silos[i]; SILO.pool.push({x:c?c.x:0, z:c?c.z:0}); if(c)SILO.points.push(SILO.pool[i]); }
 const silos=[]; const siloRateEl=document.getElementById('siloRate');
 function makeSilo(pt){
   const g=new THREE.Group(); g.position.set(pt.x,0,pt.z);
@@ -924,7 +953,7 @@ function makeSilo(pt){
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.22), new THREE.MeshBasicMaterial({color:0x101010,transparent:true,opacity:0.85})); noRay(bg);
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.22), new THREE.MeshBasicMaterial({color:TEAM_COL[PLAYER_TEAM]})); fg.position.z=0.01; noRay(fg);
   const bar=new THREE.Group(); bar.add(bg,fg); bar.position.set(pt.x,4.0,pt.z); bar.visible=false; scene.add(bar);
-  return {pt, group:g, ring, band, owner:'neutral', prog:0, progTeam:null, bar:{grp:bar,fg,w:1.8}};
+  return {pt, group:g, ring, band, owner:'neutral', prog:0, progTeam:null, on:true, bar:{grp:bar,fg,w:1.8}};
 }
 function dressSilo(s){ const c=TEAM_COL[s.owner]; s.band.material.color.setHex(c); s.band.material.emissive.setHex(c); s.ring.material.color.setHex(c); s.ring.material.opacity=s.owner==='neutral'?0.45:0.8; }
 function updateSiloHUD(){ silos.forEach((s,i)=>{ const d=document.querySelector('.silo-dot[data-s="'+i+'"]'); if(d) d.style.background='rgba('+tbRGB(s.owner)+',.95)'; }); if(siloRateEl) siloRateEl.textContent='+'+(ECO.paySilo*teamEco[PLAYER_TEAM].silos)+' cr/s'; }
@@ -932,11 +961,10 @@ function recountSilos(){ for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].si
 function resetSilos(){ for(const s of silos){ s.owner='neutral'; s.prog=0; s.progTeam=null; s.bar.grp.visible=false; dressSilo(s); } for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].silos=0; updateSiloHUD(); }
 function updateSilos(dt){
   if(gameOver)return;
-  for(const s of silos){
+  for(const s of silos){ if(!s.on)continue;   // pooled silo the map doesn't use
     const p=s.pt;
     const pdx=player.position.x-p.x, pdz=player.position.z-p.z; const fIn=(pdx*pdx+pdz*pdz)<=SILO.range*SILO.range && !ps.dead;
-    let hIn=false; for(const en of enemies){ if(!en.alive)continue; const ex=en.group.position.x-p.x, ez=en.group.position.z-p.z; if(ex*ex+ez*ez<=SILO.range*SILO.range){ hIn=true; break; } }
-    let chTeam=null; if(fIn && !hIn) chTeam='friend'; else if(hIn && !fIn) chTeam='hostile';
+    const chTeam=presentTeam(p.x,p.z,SILO.range,fIn);
     if(chTeam && s.owner!==chTeam){
       if(s.progTeam!==chTeam){ s.prog=0; s.progTeam=chTeam; }
       s.prog += dt/SILO.captureTime;
@@ -1500,6 +1528,13 @@ function damageBuilding(b,d){
   if(b.health<=0){b.alive=false;b.sink=0;addExplosion(b.mesh.position.clone().setY(b.mesh.geometry.parameters.height/2));camShake+=0.6;b.trim.material.emissiveIntensity=0;b.label.visible=false;b.bar.grp.visible=false;updateBaseHUD();checkEnd();}
   else updateBaseHUD();
 }
+// Siege target (three-teams item 7): the nearest live structure of another active team, by XZ distance; a truck wins when
+// it is nearer than that building and within 42 m (today's opportunistic rule). Indexed loops, no allocation.
+function nearestEnemyStructure(en){ const p=en.group.position; let bb=null,bd=1e18,hb=null,hd=1e18;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id===en.team)continue; const e=TEAM_INDEX[id]; if(!e.active)continue;
+    const bl=e.blds; for(let k=0;k<bl.length;k++){ const b=bl[k]; if(!b.alive)continue; const dx=b.mesh.position.x-p.x, dz=b.mesh.position.z-p.z, d=dx*dx+dz*dz; if(d<bd){bd=d;bb=b;} } }
+  for(let i=0;i<harvesters.length;i++){ const h=harvesters[i]; if(!h.alive||h.parked||teamOf(h.team)===null||sameTeam(h.team,en.team))continue; const dx=h.group.position.x-p.x, dz=h.group.position.z-p.z, d=dx*dx+dz*dz; if(d<hd){hd=d;hb=h;} }
+  return (hb&&hd<bd&&hd<42*42)?hb:bb; }
 function nearestFriendlyBuilding(p){const bl=TEAM_INDEX[PLAYER_TEAM].blds;let best=null,bd=1e9;for(let i=0;i<bl.length;i++){const b=bl[i];if(b.alive){const d=b.mesh.position.distanceTo(p);if(d<bd){bd=d;best=b;}}}return best;}
 // ---- Phase 5A: enemy verticality helpers ----
 const EJUMP_REACH = T.jumpV*T.jumpV/(2*T.gravity) + T.stepUp;   // ~3.07m: highest surface an agent can gain by jumping
@@ -1533,7 +1568,7 @@ function enemyFire(en){
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
   addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
-function siegeFire(en,b){
+function siegeFire(en,b){ if(teamOf(b.team)===null||sameTeam(b.team,en.team))return;   // structures of its own team or none: never
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
   const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);
   addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageBuilding(b,T.enemySiegeDamage);
@@ -2792,14 +2827,12 @@ function update(dt){ NAV.budget=2;
         en.fireCd-=dt;
         if(en.fireCd<=0){if(en.burstLeft<=0)en.burstLeft=eu.burst;enemyFire(en);en.burstLeft--;en.fireCd=en.burstLeft>0?eu.fireInterval:T.enemyBurstPause+Math.random()*0.6;}
       } else if(!gameOver && !DEV.freezeAI){
-        if(ei%2===0 && tbox.active && tbox.owner!=='hostile'){   // ~half the bots contest an active Tech Box they don't hold
+        if(ei%2===0 && tbox.active && tbox.owner!==en.team){   // ~half the bots contest an active Tech Box their team doesn't hold (roles: step 10)
           const bp=TBOX.points[tbox.idx]; const to=_v.set(bp.x-en.group.position.x,0,bp.z-en.group.position.z); const d=to.length(); en.group.rotation.y=Math.atan2(to.x,to.z); en.group.userData.wpn.rotation.x*=0.9;
           if(d>TBOX.range-1.2){ en.group.position.addScaledVector(navSteer(en,bp.x,bp.z,_navDir,dt),dt*T.enemyMoveSpeed); }
         } else {
-        const fb=nearestFriendlyBuilding(en.group.position);
-        let fh=null,fhD=1e9; for(const h of harvesters){ if(sameTeam(h.team,PLAYER_TEAM)&&h.alive){ const dd=h.group.position.distanceTo(en.group.position); if(dd<fhD){fhD=dd;fh=h;} } }
-        const fbD=fb?fb.mesh.position.distanceTo(en.group.position):1e9;
-        if(fh && fhD<fbD && fhD<42){ const to=_v.copy(fh.group.position).sub(en.group.position);to.y=0;const d=to.length();to.normalize();en.group.rotation.y=Math.atan2(to.x,to.z);
+        const tg=nearestEnemyStructure(en), fh=(tg&&!tg.mesh)?tg:null, fb=(tg&&tg.mesh)?tg:null;
+        if(fh){ const to=_v.copy(fh.group.position).sub(en.group.position);to.y=0;const d=to.length();to.normalize();en.group.rotation.y=Math.atan2(to.x,to.z);
           _p2.copy(fh.group.position); _p2.y=1.4; pitchWeapon(en.group,_p2);
           if(d>13)en.group.position.addScaledVector(navSteer(en,fh.group.position.x,fh.group.position.z,_navDir,dt),dt*T.enemyMoveSpeed);
           else{en.fireCd-=dt;if(en.fireCd<=0){siegeFireHarvester(en,fh);en.fireCd=T.enemyFireInterval*1.6+Math.random()*0.4;}} }
@@ -3112,8 +3145,9 @@ for(let i=0;i<TEAMS.length;i++) makeHarvester(TEAMS[i].id); makeSupplyField(); b
  * clear them to capture or steal. Channeling blocks your weapons (you're vulnerable). At expiry
  * the holding team banks ECO.techBox tech; a new box then spawns at a different point after a gap.
  * ~half the bots contest the box they don't hold; the rest keep sieging buildings/harvester. */
-TBOX.points.forEach(pt=>techPts.push(makeTechPoint(pt))); makeTechBoxMesh();
-SILO.points.forEach(pt=>silos.push(makeSilo(pt)));
+for(let i=0;i<TBOX.pool.length;i++) techPts.push(makeTechPoint(TBOX.pool[i])); makeTechBoxMesh();   // fixed pools of 3 (techPts[i] stays index-aligned with TBOX.points[i])
+for(let i=0;i<SILO.pool.length;i++) silos.push(makeSilo(SILO.pool[i]));
+placeObjectives({harvField:{x:HARV.fieldX,z:HARV.fieldZ}, techPoints:TBOX.points.slice(), silos:SILO.points.slice()});   // pools exist now: show only the map's
 _rulesReady=true; applyRules(_rules);
 FXPool._def('casing',()=>{ const m=new THREE.Mesh(new THREE.BoxGeometry(0.055,0.055,0.14),new THREE.MeshStandardMaterial({color:0xd6a23a,roughness:0.5,metalness:0.6,emissive:0x3a2a08,emissiveIntensity:0.25,transparent:true,opacity:1})); noRay(m); m.userData.noOutline=true; stylizeOne(m); m.visible=false; scene.add(m); return {mesh:m,vel:new THREE.Vector3(),av:new THREE.Vector3()}; });
 FXPool._def('flash',()=>{ const m=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0.95})); noRay(m); m.visible=false; scene.add(m); return {mesh:m}; });
