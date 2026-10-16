@@ -2425,7 +2425,7 @@ function updateAbilityHUD(){
 function updateGrenadeHUD(){ updateAbilityHUD(); updateFragHUD(); }
 function updateFragHUD(){ const el=document.getElementById('fragVal'); if(el) el.textContent=grenadeCount; }
 function buyGrenade(){ const cost=50*priceMult(); if(grenadeCount>=T.grenadeMax||credits<cost) return; credits-=cost; grenadeCount++; updateCreditHUD(); updateGrenadeHUD(); }
-function updateHostileCount(){const el=document.getElementById('hostileCount'); if(el)el.textContent=String(enemies.filter(e=>e.alive).length).padStart(2,'0');}
+function updateHostileCount(){const el=document.getElementById('hostileCount'); if(!el)return; let n=0; for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(en.active&&en.alive&&!sameTeam(en.team,PLAYER_TEAM))n++; } el.textContent=String(n).padStart(2,'0');}   // active, live bots of other teams
 let _sbLvl=-1, _sbBuilt=-1, _sbRowsA=[], _sbRowsB=[], _sbR=null;
 function _sbMakeRow(team){ const row=document.createElement('div'); row.className='sb-prow';
   const rank=document.createElement('span'); rank.className=team==='h'?'sb-rank h-rank':'sb-rank';
@@ -2437,6 +2437,7 @@ function _sbMakeRow(team){ const row=document.createElement('div'); row.classNam
   return {root:row,rank:rank,name:name,k:k,d:d,a:a,src:null}; }
 function sbBuildRosters(){ const listA=document.getElementById('sbListA'), listB=document.getElementById('sbListB'); if(!listA||!listB)return;
   listA.innerHTML=''; _sbRowsA=[]; const you=_sbMakeRow('a'); you.root.classList.add('you'); you.src='you'; you.rank.innerHTML=rankInsigniaSVG(Prog.level,22); you.name.textContent='You'; listA.appendChild(you.root); _sbRowsA.push(you);
+  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||!sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('a'); r.src=en; r.name.textContent='Ally '+String(_sbRowsA.length).padStart(2,'0'); listA.appendChild(r.root); _sbRowsA.push(r); }   // column A: you, then active ally bots in slot order
   listB.innerHTML=''; _sbRowsB=[]; for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('h'); r.src=en; r.name.textContent='Hostile '+String(_sbRowsB.length+1).padStart(2,'0'); listB.appendChild(r.root); _sbRowsB.push(r); }
   _sbBuilt=TEAM_INDEX.rosterVer; _sbLvl=-1; }
 function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')return; if(mode!=='game'){ el.style.display='none'; return; }
@@ -2444,8 +2445,8 @@ function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')retu
   if(!_sbR){ const g=id=>document.getElementById(id); _sbR={aK:g('sbAKills'),bK:g('sbBKills'),aAlive:g('sbAAlive'),bAlive:g('sbBAlive'),aTier:g('sbATier'),bTier:g('sbBTier'),atK:g('sbATotK'),atD:g('sbATotD'),atA:g('sbATotA'),btK:g('sbBTotK'),btD:g('sbBTotD'),btA:g('sbBTotA'),mIns:g('sbMeIns'),mRank:g('sbMeRank'),mLvl:g('sbMeLvl'),mPrest:g('sbMePrest'),mXp:g('sbMeXp'),mXn:g('sbMeXpTxt'),mK:g('sbMeK'),mD:g('sbMeD'),mA:g('sbMeA')}; }
   const lvlChanged=(Prog.level!==_sbLvl);
   let aK=0,aD=0,aA=0,aAlive=0;
-  for(const r of _sbRowsA){ let k,d,a,alive; if(r.src==='you'){ k=kills; d=roundDeaths; a=roundAssists; alive=!ps.dead; if(lvlChanged)r.rank.innerHTML=rankInsigniaSVG(Prog.level,22); } else { k=r.src.k||0; d=r.src.d||0; a=r.src.a||0; alive=r.src.alive!==false; }
-    _st(r.k,k); _st(r.d,d); _st(r.a,a); r.root.classList.toggle('down',!alive); aK+=k; aD+=d; aA+=a; if(alive)aAlive++; }
+  for(const r of _sbRowsA){ let k,d,a,alive; if(r.src==='you'){ k=kills; d=roundDeaths; a=roundAssists; alive=!ps.dead; if(lvlChanged)r.rank.innerHTML=rankInsigniaSVG(Prog.level,22); } else { k=r.src.frags||0; d=r.src.downs||0; a='—'; alive=r.src.alive; }
+    _st(r.k,k); _st(r.d,d); _st(r.a,a); r.root.classList.toggle('down',!alive); aK+=k; aD+=d; if(r.src==='you')aA+=a; if(alive)aAlive++; }
   let bK=0,bD=0,bAlive=0;
   for(const r of _sbRowsB){ const en=r.src, k=en.frags||0, d=en.downs||0; _st(r.k,k); _st(r.d,d); _st(r.a,'—'); r.root.classList.toggle('down',!en.alive); bK+=k; bD+=d; if(en.alive)bAlive++; }
   _st(_sbR.aK,aK); _st(_sbR.bK,bK); _st(_sbR.aAlive,aAlive); _st(_sbR.bAlive,bAlive);   // B5: write only on change
