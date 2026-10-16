@@ -75,13 +75,14 @@ the menu; nothing auto-starts a match or the editor.
 | Economy & match rules (`applyRules`/`RULES_*`), progression (`Prog`) | **game** |
 | HUD, combat reticle/hitmarker/reload-ring (`placeCursor`), FX (`addImpact`/`addExplosion`), audio (`SFX`) | **game** |
 | Movement collision (`resolveObstacles`), per-frame `update(dt)` | **game** |
-| World-registry arrays + map build/serialize (`buildMap`/`clearMap`/`serializeMap`/`dedupeMapDef`) | **game** |
+| World-registry arrays + map build/serialize (`buildMap`/`clearMap`/`serializeMap`/`dedupeMapDef`; `curMap` holds the built map's name for `serializeMap`) | **game** [verified] |
 | **Shared dispatch** — `loop`, `backToMenu`, `deploy`, `setMenuCam`, input listeners, `bootGame` | **game** |
 | NPR/cel pipeline (`toonify`/`makeOutlineMat`/`addHull`/`stylizeScene`/`INK`) | **core** |
 | Materials, character builder (`buildEntity`/`assembleChar`), faction system (`applyFaction`/`FACTION_PALETTES`) | **core** |
 | Building kit (`BK` + `makeTimberHouse`…`makeManorHouse`), map schema (`parseGridToMapDef`/`DM_*`) | **core** |
 | Config/tuning (`T`), arsenal (`WEAPONS`/`UNIT_TYPES`/`VEHICLE_TYPES`), env (`applyEnv`/`ENV_DEFAULT`) | **core** |
-| The SIM math (`rayAabb`/`resolveShot`/`hasLOS`/`SIM`/`FIXED_DT`) | **core** (fenced) |
+| The SIM math (`rayAabb`/`rayStatic`/`rayStatics`/`resolveShot`/`hasLOS`/`SIM`/`FIXED_DT`) | **core** (fenced) [verified] |
+| SIM bridge: `syncSimWorld`, `SIM_PLAYER`, `_botFireWorld`, `_eHitN` (bot-fire hit world + impact normal) | **game** [verified] |
 | Persistence (`KVStore`: window.storage → localStorage → memory) | **core** |
 | Ink hull directions (`ensureOutlineNormals`), colour output + nature gain (`_natureGain`) | **core** |
 | Map data incl. the village (`DM_Cabana.houses`/`.trees`/`.props`/`.covers`) | **core** |
@@ -106,11 +107,16 @@ the menu; nothing auto-starts a match or the editor.
   `javelins` / `enemySpawns` are **game** globals; their lifecycle is owned by
   `buildMap` / `clearMap` (build populates, clear disposes). The editor reads/writes them
   through game functions.
-- **SIM math — core, fenced.** `rayAabb` / `raySphere` / `rayCapsule` / `resolveShot` /
+- **SIM math — core, fenced.** `rayAabb` / `rayStatic` / `rayStatics` / `raySphere` / `rayCapsule` / `resolveShot` /
   `hasLOS` / `SIM` / `FIXED_DT` / `BODY` / `PART` sit contiguously at the bottom of core for a
   future headless lift-out (Phase 6). **Core is NOT headless-runnable today** — it owns the
   render globals; only the fenced block is pure. Lifting it out is future work, not a claim
   about today.
+- **SIM ids — game.** `SIM.players[0]` is the player (id `SIM_PLAYER`=0, declared in `shamble-game.js`);
+  `SIM.players[i+1]` mirrors `enemies[i]` (id i+1). Player-side shots pass `SIM_PLAYER`; readers map a hit back with
+  `enemies[r.id-1]`; a death sets the victim's entry `alive=false` at once. [verified]
+- **SIM sync guard — game.** `syncSimWorld` re-syncs at most once per `update()` (unless called with `force`, as the editor's cover-map overlay (`ovBuildCover`) does): `update()` does `_frameId++` at its top
+  and `loop()` also increments it, so headless runs see live positions. [verified]
 
 ---
 
