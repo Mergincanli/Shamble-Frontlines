@@ -60,6 +60,17 @@ the Advisor whenever a decision is needed. Still required: an approved plan befo
 anything merges to main, and Mustafa's Brave screenshots for visual work. Never merge a pull request yourself unless
 Mustafa tells you to after the APPROVE.
 
+## Reporting to Mustafa
+- Story first, asks last. Every chat update and every report ends with two sections, in
+  this order:
+  1. **Decisions needed:** one entry per decision, fully self-contained: a short code, the
+     question in plain words, why it matters (one line), the options, and your
+     recommendation. Never use a code (D1, K2, NC-4…) that isn't explained right there.
+  2. **For Mustafa:** his actions as a numbered list (Brave checks with their steps,
+     merges to approve), or "nothing".
+- Plain words first; internal names (functions, review ids) only in brackets after them.
+- Keep the top short: what happened, in a few lines.
+
 ## Commands
 - Setup (once per machine, Node 22.13+): `cd tools && npm ci`, then inside tools/: `npx --no -- playwright install chromium`
   (the gate's smoke test 5a and pageshot need it)
