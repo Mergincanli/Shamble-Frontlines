@@ -98,10 +98,10 @@ All five: **PASS WITH NOTES**. 38 findings: 4 major, 15 minor, 19 nits.
    soldiers in combat each bot scans 2.3 times a second instead of 4.
 3. Allocation and draw calls grow fast past 24 soldiers (5,843 draw calls with 48 on screen). Keep team size 4 until
    the animation split and draw-call work land.
-6. Seven more shader programs than main when all three uniforms are on screen. Each compiles once, so there may be a
-   one-time hitch the first time a faction appears (Brave check 8).
 4. On DM_Tri the HUD is still two-team (two team rows, two silo dots, "Cabana Republic" header) until 3b.
 5. Allies' teal may be hard to read on grass. Brave decides.
+6. Seven more shader programs than main when all three uniforms are on screen. Each compiles once, so there may be a
+   one-time hitch the first time a faction appears (Brave check 8).
 
 ## Proposed next step
 N1: editor Play never rebuilds the nav grid. A one-line change-set, as the Advisor queued it.
