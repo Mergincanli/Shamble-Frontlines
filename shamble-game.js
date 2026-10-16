@@ -756,9 +756,10 @@ function activateRoster(){
   for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id]; e.active=(id===PLAYER_TEAM)||e.hqs.length>0; if(e.active&&id!==PLAYER_TEAM)other=true; }
   if(!other) TEAM_INDEX.soviets.active=true;
   for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s], g=en.group;
-    // INTERIM (3a steps 6-9): the player's own team's bots stay parked until bots target across teams (step 10 deletes this)
-    const on=TEAM_INDEX[en.team].active&&en.team!==PLAYER_TEAM;
-    en.active=on;
+    const on=TEAM_INDEX[en.team].active;
+    en.active=on; en.targetId=-1; en.targetVis=false; en.losT=0; en.scanCursor=0; en.scanBestId=-1; en.retargetT=(en.id%SOLDIERS.length)*TUNE.ai.retargetS/SOLDIERS.length;   // staggered scans
+    let ts=0; for(let k=0;k<s;k++) if(SOLDIERS[k].team===en.team) ts++; en.role=TUNE.ai.roles[ts%TUNE.ai.roles.length]; AI_STATE.rotatePush(en);   // roles cycle per team slot (R28)
+    const ally=sameTeam(en.team,PLAYER_TEAM), bar=g.userData.bar; bar.fg.material.color.setHex(ally?0x38e1b0:0xff4d4d); bar.bg.material.color.setHex(ally?0x08302a:0x300808);   // health bar by relation to you
     // A parked slot leaves the scene graph: r128 updates the matrices of hidden objects too. Back in the scene it goes
     // through stylizeOne, which skips meshes that are already toon and styles a slot that was parked when stylizeScene ran.
     if(on){ if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } if(!g.userData.anim||!g.userData.anim.v2)_animInit(g); g.visible=mode!=='editor'; }   // anim state now: a kill before its first animated frame still falls (deathStart)
@@ -786,7 +787,7 @@ function spawnEnemyMesh(faction,elite){
   const e=elite?buildSoldier('Empire','m',ELITE_KIT):buildSoldier(faction||'Soviets');
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.16),new THREE.MeshBasicMaterial({color:0x300808})); noRay(bg);
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.16),new THREE.MeshBasicMaterial({color:0xff4d4d})); fg.position.z=0.001; noRay(fg);
-  const grp=new THREE.Group(); grp.add(bg,fg); grp.position.y=2.9; e.add(grp); e.userData.bar={grp,fg}; return e;
+  const grp=new THREE.Group(); grp.add(bg,fg); grp.position.y=2.9; e.add(grp); e.userData.bar={grp,fg,bg}; return e;
 }
 function randSpawn(){return new THREE.Vector3((Math.random()*2-1)*(T.arenaX-8),0,-T.arenaZ+10+Math.random()*22);}
 function respawnPos(en){ if(enemySpawns.length){ const fac=en&&en.faction; const mine=fac?enemySpawns.filter(sp=>sp.faction===fac):null; const pool=(mine&&mine.length)?mine:enemySpawns; const m=pool[(Math.random()*pool.length)|0]; const a=Math.random()*6.283, r=Math.random()*5; return new THREE.Vector3(m.x+Math.cos(a)*r,0,m.z+Math.sin(a)*r); } return randSpawn(); }
@@ -822,7 +823,7 @@ function damageHarvester(hv,d){ if(!hv.alive)return; hv.health-=d; hv.hitFlash=0
 function destroyHarvester(hv,refDead){ if(!hv.alive)return; hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; addExplosion(hv.group.position.clone().setY(1.0)); camShake=Math.min(1.3,camShake+0.5); hv.refDead=!!refDead; hv.respawnT=HARV.respawn; if(sameTeam(hv.team,PLAYER_TEAM)) showLevelToast('Supply Truck Lost', refDead?'Refinery down — no resupply':'Respawning in '+HARV.respawn+'s'); updateBaseHUD(); }
 function respawnHarvester(hv){ if(hv.parked)return; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); updateBaseHUD(); }
 function resetHarvesters(){ for(const hv of harvesters){ if(hv.parked)continue; hv.docks=0; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); } updateBaseHUD(); }
-function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
+function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); const al=sameTeam(en.team,PLAYER_TEAM); addMuzzle(eM,al?0xffd27a:0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
 function updateHarvesters(dt){
   if(gameOver)return;
   for(const hv of harvesters){
@@ -1469,7 +1470,7 @@ function castShot(origin,dir,w,vis){
 // computes the final amount; kind ('bullet' | 'blast' | 'melee') only skips the shield (blast) and is reported. The event
 // record is reused, so it is consumed synchronously. kills, roundDeaths and credits stay the local player's globals,
 // written only on the player's branch. A caller with a=SIM_PLAYER sets _dmgPt (the damage-number anchor) first.
-const _dmgEv={ a:-1, v:-1, amount:0, part:'body', kind:'bullet', srcX:0, srcZ:0, killed:false, shielded:false,
+const _dmgEv={ a:-1, v:-1, amount:0, part:'body', kind:'bullet', srcX:0, srcZ:0, killed:false, credited:false, shielded:false,
   _fwd:new THREE.Vector3(), _to:new THREE.Vector3(), _cf:new THREE.Vector3(), _from:new THREE.Vector3(), _bt:new THREE.Vector3() };   // scratch vectors ride on the record: no per-hit allocation
 function applyDamage(a,v,amount,part,kind,srcX,srcZ){
   const V=SOLDIERS[v]; if(!V||gameOver) return 0;   // gameOver guards every victim (R15): nothing pays out after VICTORY / DEFEAT
@@ -1487,7 +1488,8 @@ function applyDamage(a,v,amount,part,kind,srcX,srcZ){
   else { V.health-=amount; V.hitFlash=0.12; V.state='engage'; if(other)V.lastAttackerId=a;
     if(V.health<=0){ killed=true; V.alive=false; const sp=SIM.players[v]; if(sp)sp.alive=false; V.topple=0; V.respawnT=T.enemyRespawn; V.downs++; } }
   // credit: a kill by a soldier of another team (a suicide or, with ff on, a teamkill credits nobody)
-  if(killed&&other&&!sameTeam(A.team,V.team)){ A.frags++; if(a===SIM_PLAYER){ kills++; credits+=T.killReward; } addTech(A.team, part==='head'?ECO.techPerHeadshot:ECO.techPerKill); }
+  const credited=killed&&other&&!sameTeam(A.team,V.team); E.credited=credited;
+  if(credited){ A.frags++; if(a===SIM_PLAYER){ kills++; credits+=T.killReward; } addTech(A.team, part==='head'?ECO.techPerHeadshot:ECO.techPerKill); }
   E.a=a; E.v=v; E.amount=amount; E.part=part; E.kind=kind; E.srcX=srcX; E.srcZ=srcZ; E.killed=killed;
   onDamageEvent(E); return amount;
 }
@@ -1500,7 +1502,7 @@ function onDamageEvent(E){
   if(E.a===SIM_PLAYER&&!isP){
     spawnDamageNumber(_dmgPt, Math.round(E.amount), head, E.killed);
     showHitmarker(E.killed, head);
-    if(E.killed){ onKill(curW().id,head); if(head)onHeadshotKill(); else sfxKill(); if(head||curW().melee)triggerVignette(V,curW().melee?'melee':'headshot'); updateHostileCount(); updateCreditHUD(); comicKill(E._bt.copy(V.group.position).setY(1.8)); }
+    if(E.killed&&E.credited){ onKill(curW().id,head); if(head)onHeadshotKill(); else sfxKill(); if(head||curW().melee)triggerVignette(V,curW().melee?'melee':'headshot'); updateHostileCount(); updateCreditHUD(); comicKill(E._bt.copy(V.group.position).setY(1.8)); }
   }
   if(isP){
     if(E.shielded){ ps.shieldFlash=1; camShake+=0.08; }
@@ -1531,19 +1533,45 @@ function damageBuilding(b,d){
 // Siege target (three-teams item 7): the nearest live structure of another active team, by XZ distance; a truck wins when
 // it is nearer than that building and within 42 m (today's opportunistic rule). Indexed loops, no allocation.
 function nearestEnemyStructure(en){ const p=en.group.position; let bb=null,bd=1e18,hb=null,hd=1e18;
-  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id===en.team)continue; const e=TEAM_INDEX[id]; if(!e.active)continue;
+  const pt=(en.pushTeam&&TEAM_INDEX[en.pushTeam]&&TEAM_INDEX[en.pushTeam].active&&en.pushTeam!==en.team)?en.pushTeam:null;   // push: that team's base first (alternates per respawn)
+  for(let pass=0;pass<2&&!bb;pass++) for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id===en.team||(pass===0&&pt&&id!==pt))continue; const e=TEAM_INDEX[id]; if(!e.active)continue;
     const bl=e.blds; for(let k=0;k<bl.length;k++){ const b=bl[k]; if(!b.alive)continue; const dx=b.mesh.position.x-p.x, dz=b.mesh.position.z-p.z, d=dx*dx+dz*dz; if(d<bd){bd=d;bb=b;} } }
   for(let i=0;i<harvesters.length;i++){ const h=harvesters[i]; if(!h.alive||h.parked||teamOf(h.team)===null||sameTeam(h.team,en.team))continue; const dx=h.group.position.x-p.x, dz=h.group.position.z-p.z, d=dx*dx+dz*dz; if(d<hd){hd=d;hb=h;} }
+  if(en.role==='hunt'&&hb) return hb;   // hunt: other teams' trucks first
   return (hb&&hd<bd&&hd<42*42)?hb:bb; }
 function nearestFriendlyBuilding(p){const bl=TEAM_INDEX[PLAYER_TEAM].blds;let best=null,bd=1e9;for(let i=0;i<bl.length;i++){const b=bl[i];if(b.alive){const d=b.mesh.position.distanceTo(p);if(d<bd){bd=d;best=b;}}}return best;}
 // ---- Phase 5A: enemy verticality helpers ----
 const EJUMP_REACH = T.jumpV*T.jumpV/(2*T.gravity) + T.stepUp;   // ~3.07m: highest surface an agent can gain by jumping
+// Bot targeting (three-teams item 8). AI_STATE holds the line-of-sight budget (TUNE.ai.losPerS checks per game second, banked
+// up to losCapS worth), so the work per game second is the same at 60 and 144 fps. acquireTarget re-scans every retargetS
+// (staggered by slot) for the nearest visible soldier of another team within T.enemyDetect: a min-scan over SIM.players
+// in slot order (ties to the lower id) that resumes from scanCursor when the budget runs out; the current target's
+// sight is re-checked every losRecheckS from the same budget. Eye and aim points follow both heights (NC-1).
+const AI_STATE={ budget:0, checks:0, scans:0,
+  rotatePush(en){ const n=TEAMS.length; let k=0; for(let i=0;i<n;i++) if(TEAMS[i].id===en.pushTeam) k=i+1;   // the next active other team after the current one
+    for(let j=0;j<n;j++){ const id=TEAMS[(k+j)%n].id; if(id!==en.team&&TEAM_INDEX[id].active){ en.pushTeam=id; return; } } en.pushTeam=null; } };
+function acquireTarget(en,dt){
+  const P=SIM.players, me=P[en.id], A=AI_STATE, det2=T.enemyDetect*T.enemyDetect, ai=TUNE.ai;
+  if(en.targetId>=0){ const t=P[en.targetId], dx=t.x-me.x, dz=t.z-me.z;
+    if(!t.alive||t.team===en.team||dx*dx+dz*dz>=det2){ en.targetId=-1; en.targetVis=false; }
+    else { en.losT+=dt; if(en.losT>=ai.losRecheckS&&A.budget>=1){ en.losT=0; A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(t.x,t.y+1.45,t.z); en.targetVis=hasLOS(_eEyes,_ePc); } } }
+  en.retargetT-=dt;
+  if(en.retargetT>0&&en.scanCursor===0) return;
+  if(en.scanCursor===0){ en.scanBestId=-1; en.scanBestD2=det2; }
+  let s=en.scanCursor;
+  for(;s<P.length;s++){ const p=P[s]; if(s===en.id||!p.alive||p.team===en.team)continue; const dx=p.x-me.x, dz=p.z-me.z, d2=dx*dx+dz*dz; if(d2>=en.scanBestD2)continue;
+    if(A.budget<1) break;   // out of budget: resume from here next frame
+    A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(p.x,p.y+1.45,p.z); if(hasLOS(_eEyes,_ePc)){ en.scanBestId=s; en.scanBestD2=d2; } }
+  if(s<P.length){ en.scanCursor=s; return; }
+  en.scanCursor=0; A.scans++; en.retargetT=ai.retargetS;
+  en.targetId=en.scanBestId; en.targetVis=en.scanBestId>=0; en.losT=0;
+}
 function rampLowEnd(o){ const c=Math.cos(o.rot), s=Math.sin(o.rot), lx=-o.w/2; return {x:o.x+c*lx, z:o.z-s*lx}; }   // world XZ of a ramp's low edge
 // When the player is higher than an enemy can jump to, steer it toward the nearest ramp's base until it starts climbing; returns true if redirected.
-function enemyClimbSteer(en, mv){ const eh=en.group.position.y; if(player.position.y<=eh+EJUMP_REACH) return false;
+function enemyClimbSteer(en, mv, ty){ const eh=en.group.position.y; if(ty<=eh+EJUMP_REACH) return false;   // ty: the target's feet height
   let best=null,bd=1e9; for(let i=0;i<ramps.length;i++){ const r=ramps[i], dx=r.x-en.group.position.x, dz=r.z-en.group.position.z, d=dx*dx+dz*dz; if(d<bd){bd=d;best=r;} }
-  if(!best) return false; const le=rampLowEnd(best), dLE=hyp2(le.x-en.group.position.x, le.z-en.group.position.z);
-  if(dLE>3.5 && eh<0.8){ mv.set(le.x-en.group.position.x,0,le.z-en.group.position.z); if(mv.lengthSq()>0)mv.normalize(); return true; }
+  if(!best) return false; const rc=Math.cos(best.rot), rs=Math.sin(best.rot), lex=best.x-rc*best.w/2, lez=best.z+rs*best.w/2, dLE=hyp2(lex-en.group.position.x, lez-en.group.position.z);   // rampLowEnd inlined: no object per call
+  if(dLE>3.5 && eh<0.8){ mv.set(lex-en.group.position.x,0,lez-en.group.position.z); if(mv.lengthSq()>0)mv.normalize(); return true; }
   return false; }
 
 /* enemy fire */
@@ -1552,9 +1580,10 @@ const _eHitN=new THREE.Vector3(), _botFireWorld={ players:SIM.players, statics:[
 function enemyFire(en){
   en._aimT=1.4;   // raise the gun to the aim stance while shooting (cosmetic)
   const eu=unitOf(en.unit);
-  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[0];   // aim at the same player snapshot the hit test uses
+  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[en.targetId>=0?en.targetId:SIM_PLAYER];   // aim at the target's SIM snapshot, the one the hit test uses
   _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(P0.x,P0.y+1.45,P0.z);   // chest to chest, following both heights
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
+  const ally=sameTeam(en.team,PLAYER_TEAM);   // tracer and muzzle colour by relation to you
+  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,ally?0xffd27a:0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
@@ -1566,12 +1595,12 @@ function enemyFire(en){
   if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);applyDamage(en.id,r.id,eu.enemyDmg,r.part,'bullet',ep.x,ep.z);addImpact(end,_aup,'flesh');}   // flat bot damage (D7) on whoever the ray hit: you, or another team's soldier in the way
   else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
-  addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
+  addTracer(r.t<0.9?_eF:eM,end,ally?0x7af0d2:0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
 function siegeFire(en,b){ if(teamOf(b.team)===null||sameTeam(b.team,en.team))return;   // structures of its own team or none: never
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);
-  addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageBuilding(b,T.enemySiegeDamage);
+  const al=sameTeam(en.team,PLAYER_TEAM), dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,al?0xffd27a:0xff6a4a); sfxEnemyShot(eM);
+  addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageBuilding(b,T.enemySiegeDamage);
 }
 
 /* grenades + melee */
@@ -2778,7 +2807,7 @@ function update(dt){ NAV.budget=2;
     if(g.fuse<=0){explodeAt(g.mesh.position.clone(), g.molotov?1.8:1, g.ownerId, g.team);scene.remove(g.mesh);g.mesh.geometry.dispose();g.mesh.material.dispose();grenades.splice(i,1);}}
 
   // torque-bow bolts: fly under gravity -> stick; armed bolts arm a short fuse then blast
-  syncSimWorld(); // refresh SIM hitboxes so bolts hit the same head/torso/leg boxes as bullets
+  syncSimWorld(true); // K4: re-sync after you moved (bots and bolts see where you are now); the frame's first sync is in updateAim
   for(let i=bolts.length-1;i>=0;i--){ const b=bolts[i];
     if(b.state==='fly'){
       b.prev.copy(b.mesh.position); b.vel.y-=T_CHARGE.bow.grav*dt; b.mesh.position.addScaledVector(b.vel,dt);
@@ -2805,29 +2834,30 @@ function update(dt){ NAV.budget=2;
 
   
   // enemies
-  const pPos=player.position;
-  enemies.forEach((en,ei)=>{
-    if(!en.active)return;   // parked slot: its team doesn't play on this map
+  { const ai=TUNE.ai; AI_STATE.budget=Math.min(ai.losPerS*ai.losCapS, AI_STATE.budget+ai.losPerS*dt); }   // refill the sight budget (game time)
+  for(let ei=0;ei<enemies.length;ei++){ const en=enemies[ei];
+    if(!en.active)continue;   // parked slot: its team doesn't play on this map
     if(en.alive){
       const epx=en.group.position.x, epz=en.group.position.z;
-      const ddx=pPos.x-epx, ddz=pPos.z-epz; const distP=hyp2(ddx,ddz);
-      _eEyes.set(epx,1.45,epz); _ePc.set(pPos.x,1.45,pPos.z);
-      const canSee=!ps.dead && !gameOver && !DEV.freezeAI && distP<T.enemyDetect && hasLOS(_eEyes,_ePc);
+      if(!gameOver && !DEV.freezeAI) acquireTarget(en,dt);
+      const tg=(en.targetId>=0)?SIM.players[en.targetId]:null;
+      const canSee=!!tg && tg.alive && en.targetVis && !gameOver && !DEV.freezeAI;
+      const ddx=tg?tg.x-epx:0, ddz=tg?tg.z-epz:0; const distP=hyp2(ddx,ddz);
       if(canSee){
         en.group.rotation.y=Math.atan2(ddx,ddz);
-        _p2.set(pPos.x,1.4,pPos.z); pitchWeapon(en.group,_p2);
+        _p2.set(tg.x,tg.y+1.4,tg.z); pitchWeapon(en.group,_p2);
         en.strafeT-=dt;if(en.strafeT<=0){en.strafeDir*=-1;en.strafeT=1+Math.random()*1.5;}
         const eu=unitOf(en.unit); const pr=eu.preferRange;
         const inv=distP>1e-4?1/distP:0; _eDir.set(ddx*inv,0,ddz*inv); _eMv.set(0,0,0);
-        if(distP>pr+3)_eMv.add(navSteer(en,pPos.x,pPos.z,_navDir,dt));else if(distP<pr-3)_eMv.sub(_eDir);
+        if(distP>pr+3)_eMv.add(navSteer(en,tg.x,tg.z,_navDir,dt));else if(distP<pr-3)_eMv.sub(_eDir);
         _eStr.set(-_eDir.z,0,_eDir.x).multiplyScalar(en.strafeDir*0.8); _eMv.add(_eStr);
-        if(_eMv.lengthSq()>0)_eMv.normalize(); enemyClimbSteer(en,_eMv); en.group.position.addScaledVector(_eMv,dt*T.enemyMoveSpeed*eu.speedMult);
+        if(_eMv.lengthSq()>0)_eMv.normalize(); enemyClimbSteer(en,_eMv,tg.y); en.group.position.addScaledVector(_eMv,dt*T.enemyMoveSpeed*eu.speedMult);
         if(en.lungeCd>0)en.lungeCd-=dt;
-        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; applyDamage(en.id,SIM_PLAYER,eu.lunge,'body','melee',en.group.position.x,en.group.position.z); camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); }
+        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; applyDamage(en.id,en.targetId,eu.lunge,'body','melee',en.group.position.x,en.group.position.z); if(en.targetId===SIM_PLAYER){ camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); } }
         en.fireCd-=dt;
         if(en.fireCd<=0){if(en.burstLeft<=0)en.burstLeft=eu.burst;enemyFire(en);en.burstLeft--;en.fireCd=en.burstLeft>0?eu.fireInterval:T.enemyBurstPause+Math.random()*0.6;}
       } else if(!gameOver && !DEV.freezeAI){
-        if(ei%2===0 && tbox.active && tbox.owner!==en.team){   // ~half the bots contest an active Tech Box their team doesn't hold (roles: step 10)
+        if(en.role==='objective' && tbox.active && tbox.owner!==en.team){   // objective role: a box its team doesn't hold; otherwise it pushes (R28)
           const bp=TBOX.points[tbox.idx]; const to=_v.set(bp.x-en.group.position.x,0,bp.z-en.group.position.z); const d=to.length(); en.group.rotation.y=Math.atan2(to.x,to.z); en.group.userData.wpn.rotation.x*=0.9;
           if(d>TBOX.range-1.2){ en.group.position.addScaledVector(navSteer(en,bp.x,bp.z,_navDir,dt),dt*T.enemyMoveSpeed); }
         } else {
@@ -2851,9 +2881,9 @@ function update(dt){ NAV.budget=2;
       _animSt.aimYaw=en.group.rotation.y;_animSt.t=_animClock;_animSt.kick=0;_animSt.dip=0;_animSt.rel=-1;_animSt.throwC=-1;_animSt.lean=0;_animSt.grounded=en.grounded;en._aimT=Math.max(0,(en._aimT||0)-dt);_animSt.ads=en._aimT>0?1:0;_animSt.swap=0; updateSoldierAnim(en.group,_animSt,dt);
     } else {
       en.topple+=dt;if(en._tx===undefined){en._tx=(Math.random()<0.5?-1:1);en._tz=(Math.random()*2-1)*0.55;}animDeath(en.group,dt);en.group.userData.bar.grp.visible=false;
-      if(!gameOver){const eRef=TEAM_INDEX[en.team].refinery;en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
+      if(!gameOver){const eRef=TEAM_INDEX[en.team].refinery;en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;AI_STATE.rotatePush(en);en.targetId=-1;en.targetVis=false;en.scanCursor=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
     }
-  });
+  }
 
   // building sink animation
   buildings.forEach(b=>{if(!b.alive&&b.sink<1){b.sink=Math.min(1,b.sink+dt*0.7);b.mesh.position.y=b.mesh.geometry.parameters.height/2 - b.sink*b.mesh.geometry.parameters.height*0.85;b.trim.position.y=b.mesh.position.y+b.mesh.geometry.parameters.height/2-0.7;}});
