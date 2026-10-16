@@ -69,7 +69,7 @@ This is the headline feature: **bold world ink, thin character ink, same colour.
 
 **How the hull is drawn (2026-09-25).** The hull shader offsets each vertex in **world units** along a **smoothed, mitred outline direction** (`ensureOutlineNormals`) — so line weight ignores object/part scale and hard corners close — and **clamps the shell just above the ground** (`OUTLINE_GROUND_Y` 0.02). The clamped bottom face becomes an ink rim around every footprint: the **contact line**. Before this, inverted hulls dipped below the grass and objects had no line where they met the ground, which made them look pasted on. Line weights were measured unchanged by the switch.
 
-**Decided — character outline colour:** characters use the shared **dark** ink (`applyFaction` leaves outlines at `INK`); allegiance reads from the uniform, not the line. The one exception is the Empire elite (§7).
+**Decided — character outline colour:** characters use the shared **dark** ink (`applyFaction` leaves outlines at `INK`); allegiance reads from the uniform, not the line. The one exception is the Empire villain look (§7), which no bot wears since 3a (reserved for a future hero unit).
 
 ---
 
@@ -145,7 +145,9 @@ Building geometry cues to keep the world "asserting itself": generous wall thick
 
 ## 7. Empire villain material (Wolfenstein menace)
 
-**Implemented** (`applyVillain`, spawned via `ELITE_KIT` as a **separate elite enemy unit**, 200 HP — normal Empire troops keep the purple uniform): **near-black lacquered armour + a single bright specular cel band + a glowing visor.** Reads as sinister against the bright world.
+**Implemented in code, not spawned (D6, three-teams 3a, 2026-10-16):** the 200 HP Empire elite no longer spawns; regular Empire bots wear the standard soldier in the Empire palette. The villain look (`applyVillain`, `ELITE_KIT`) stays in the code, reserved for a future hero unit or Tier 3 unit; the Character Lab's 'EmpireElite' preview still uses it. [verified: shamble-game.js:3211-3212, 125, 3364; shamble-editor.js:288]
+
+The look itself (values unchanged, still locked): **near-black lacquered armour + a single bright specular cel band + a glowing visor.** Reads as sinister against the bright world.
 
 - **Lacquer:** near-black blue-violet albedo; ramp `_lacquerGrad` = `18,18,26, 30,30,42, 120,120,140, 235,235,245` (mostly dark, one sharp wet-lacquer glint band), selected by `matKind:'lacquer'`.
 - **Visor:** emissive **violet `0xc24bff`** (the original spec said red; violet was chosen to match the Empire palette). `toonify` preserves emissive, so it survives the cel conversion. No bloom — an additive sprite behind the visor is the upgrade path if it needs more punch [dial].
@@ -176,7 +178,7 @@ BaseGear (Soviet `0x432818`, Allies `0x00296B`, Empire `0x240046`) and Highlight
 1. **Base look transform** (2-band ramps, `ENV_DEFAULT`, ground greens, `INK`) — **done**.
 2. **Differential outlines** (`WORLD_OUTLINE` / `CHAR_OUTLINE`) — **done**.
 3. **Faction primary brightening + dark character ink** — **done** (Soviet later retuned to `0xD41414`).
-4. **Empire villain material** — **done** as a separate elite unit.
+4. **Empire villain material** — **done** in code (`applyVillain`); the elite unit no longer spawns since 3a (D6), the look is reserved for a future hero unit.
 5. **Halftone plumbing**, default off — **done**.
 6. **Architecture** (§6) — **in progress**: four house types + the kit are placed in the village; base buildings still placeholder.
 7. **Contact ink** (smoothed + mitred, world-space, ground-clamped hulls) — **done** 2026-09-25.
@@ -189,7 +191,7 @@ BaseGear (Soviet `0x432818`, Allies `0x00296B`, Empire `0x240046`) and Highlight
 
 ## 10. Decisions (all resolved)
 
-1. **Empire villain → a separate elite unit type** (normal Empire troops keep the purple uniform). Implemented.
-2. **Character outline colour → shared dark ink**, with the purple exception for the elite. Implemented.
+1. **Empire villain → a separate elite unit type** (normal Empire troops keep the purple uniform). Built; no longer spawned since 3a (D6), kept for a possible hero unit.
+2. **Character outline colour → shared dark ink**, with the purple exception for the villain look. Implemented in code (no bot wears it since 3a).
 3. **Faction primaries → brightened**; Soviet later retuned to `0xD41414`. Implemented.
 4. **Colour balance (2026-09-25) → option C for buildings + characters, the bright look for the environment** via the nature gain. Implemented.
