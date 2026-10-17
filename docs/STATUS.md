@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-17, 3a three-teams-core merged (PR #15, 5ffe679) with kit-v1-3 to kit-v1-6 (PRs #14, #17, #18, #19). Next: N1. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-17, docs-after-3a (PR #20, df1e6d3) and kit-v2-0 (PR #21, 04c086c) merged; kit-v2-1 (automated merging) built, PR pending. Next game work: N1. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
@@ -13,8 +13,9 @@ bot-poplar-wedge (PR #7, 159bec4).
 (PR #10), team-prep-fixes (PR #11, 513f2fc), docs-editor-v2 (PR #12, fec5e67), editor-hotfix (PR #13, 8f4c3b6), map-dedupe-on-load merged as 7ca2cc4.
 **Merged 2026-10-17** (each with the Advisor's APPROVE and Mustafa's go): kit-v1-3 (PR #14, 9614ecf; reporting rule),
 kit-v1-4 (PR #17, bd27eeb; CLAUDE.md "Night shift" section), kit-v1-5 (PR #18, 2303073; `.claude/NIGHT_SHIFT.md`),
-kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679).
-**In flight:** none; next is N1 from the Night queue.
+kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679),
+docs-after-3a (PR #20, df1e6d3; docs only), kit-v2-0 (PR #21, 04c086c; the `advisor` agent).
+**In flight:** kit-v2-1 (automated merging; no game code; PR pending); next game work is N1 from the Night queue.
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
@@ -33,6 +34,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **kit-v2-1** (automated merging: the PR Advisor routine merges approved PRs with green checks at once when they need no human check; `needs-mustafa` PRs merge after Mustafa's go for the current head, in his own words in chat or a PR comment by his account without the Claude Code footer; a later push needs a new review and a new go. "Major change worth a second opinion" (new system or mechanic, large engine-file refactor, accepted measured regression, open security finding, unresolved doubt; when unsure: needs-mustafa) also makes a PR `needs-mustafa`. The gate's own files (`tools/gate.mjs`, `smoke.mjs`, `battery.js`, `gate-globals.json`, `tools/package.json`, `tools/package-lock.json`) and `.github/` join the rules category (always need Mustafa's go). Implementer sessions merge only on Mustafa's own go for the head the advisor approved, checks green. Advisor run as a subagent without GitHub tools returns its comment / labels / action for the routine to carry out. NIGHT_SHIFT rule 7 gains a REVISE path. CLAUDE.md Agents line lists `advisor`; protocol step 2 covers sessions without the agent. No game code, symbols +0 -0) | `claude/confident-ritchie-vanvog` (cloud stand-in for cs/kit-v2-1); PR pending | built; not merged | the advisor's APPROVE on the final head, then Mustafa's go already given in chat ("I want it to be automated, you can merge it. If a major change or something that is worthy of needing a 2nd opinion arises: then ask me to reconfirm the merge") |
+| kit-v2-0 (new `.claude/agents/advisor.md`: plan reviews, PR reviews, merges by the PR Advisor routine; CLAUDE.md protocol steps 2 and 6 and the standing permission route plans and PRs through the advisor; NIGHT_SHIFT rule 7: NEEDS PLAN items get a plan reviewed by the advisor agent; labels `ready-to-merge`, `needs-mustafa`, `changes-requested`) | merged: PR #21, 04c086c, 2026-10-17, PR Advisor APPROVE, merged on Mustafa's go in chat | done; no game code | none |
+| docs-after-3a (docs only: STATUS + ROADMAP caught up with the 2026-10-17 merges and the Advisor's R19-ORDER / LOS-SIZE / K4-MEASURE verdicts) | merged: PR #20, df1e6d3, 2026-10-17, PR Advisor APPROVE, merged on Mustafa's go in chat | done | none |
 | **3a three-teams-core** (teams as data, 12-slot soldier table, team-filtered shots, two-layer damage, per-team objectives, bot targeting with a LOS budget, DM_Tri arena at `?map=tri`, interim end rule; symbols +22 -0 vs main) | merged: [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15), 5ffe679, 2026-10-17, Advisor APPROVE, merged on Mustafa's go | done; gate PASS on the merged main (symbols +22 -0, smoke 8/8 + 5/5). Mustafa's first Brave check ran the main build by mistake (Tab showed You alone + Hostile 01-06); renders showed the PR #15 build lists You + Ally 01-03 vs Hostile 01-04 | none (3b is next in the greybox queue, after N1 and R19) |
 | kit-v1-3 (reporting rule: "Reporting to Mustafa" in CLAUDE.md + advisor-report template) | merged: PR #14, 9614ecf, 2026-10-17, Advisor APPROVE | done | none |
 | kit-v1-4 (CLAUDE.md "Night shift": approved unattended work goes into the Night queue, issue #16, the day it is approved; anything needing Mustafa never does) | merged: PR #17, bd27eeb, 2026-10-17, Advisor APPROVE | done | none |
