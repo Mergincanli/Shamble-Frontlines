@@ -71,6 +71,12 @@ Mustafa tells you to after the APPROVE.
 - Plain words first; internal names (functions, review ids) only in brackets after them.
 - Keep the top short: what happened, in a few lines.
 
+## Night shift
+- Approved work that can run unattended goes into the Night queue (issue #16) the day it
+  is approved, with a link to its plan or verdict.
+- Anything that needs Mustafa (Brave checks, merges, decisions) never goes in the queue:
+  it goes in "For Mustafa".
+
 ## Commands
 - Setup (once per machine, Node 22.13+): `cd tools && npm ci`, then inside tools/: `npx --no -- playwright install chromium`
   (the gate's smoke test 5a and pageshot need it)
