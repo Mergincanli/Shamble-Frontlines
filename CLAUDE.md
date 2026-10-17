@@ -65,11 +65,12 @@ Standing permission (Mustafa, 2026-10-14): create `cs/<slug>` branches, commit, 
 without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask the `advisor`
 agent whenever a decision is needed; it escalates to Mustafa what it may not decide. Still required: an approved plan
 before edits, the advisor's APPROVE before anything merges to main, and Mustafa's Brave check for anything a player
-sees, hears or feels. A session merges only on Mustafa's own go in its chat, about that PR, for the head the advisor
-approved (its verdict in this session, or its PR review comment posted by the `Mergincanli` account and naming that
-full SHA), with the gate and smoke checks green, and passes that SHA as the merge's expected head (the night shift
-never merges); every other merge is the PR Advisor's. Sessions post on GitHub as Mustafa's account, so a "merge"
-written on GitHub never counts as his go; every comment they write ends with the Claude Code footer.
+sees, hears or feels. A session merges only on Mustafa's own go in its chat, about that PR, given after the advisor
+approved its current head (its verdict in this session, or its PR review comment posted by the `Mergincanli` account and
+naming that full SHA), with the gate and smoke checks green, and passes that SHA as the merge's expected head (the night
+shift never merges); a later push needs the advisor's review first, then his go again; every other merge is the PR
+Advisor's. Sessions post on GitHub as Mustafa's account, so a "merge" written on GitHub never counts as his go; every
+comment they write ends with the Claude Code footer.
 
 ## Reporting to Mustafa
 - Story first, asks last. Every chat update and every report ends with two sections, in
