@@ -11,6 +11,9 @@ START CHECKS (in this order; "stop silently" = no comment, no notification)
    45 minutes, that run was cut off by a limit. Read its "Working on" and "Next" lines, check
    out its branch, check the last commit and run the gate, and continue from there. If its
    state is unclear, restart that item cleanly on the same branch and say so in the report.
+   If the newest status comment is from an earlier night and still says "running", that run
+   was cut off too: add a short "Cut off" note to that night's report from its lines, then
+   continue its item the same way.
 5. Nothing to do: if no unchecked items are left, stop silently when tonight's report
    already exists; otherwise comment "Nothing queued tonight. Night shift done." and stop.
 
@@ -28,7 +31,8 @@ WHILE WORKING
    if the gate fails and you can't fix it properly, stop that item and report it.
 
 FINISH (start no new item after 08:15; finish by 08:30, or earlier when the queue is empty)
-9. Keep ONE report comment per night (create it, or extend tonight's), ending with
+9. Keep ONE report comment per night and update it after every finished item, not only at
+   the end, so a cut-off still leaves a report. When the night's work is done, end it with
    "Night shift done":
    - TL;DR: at most 5 lines, plain words: what got done tonight, all runs together.
    - Details (optional reading): one short paragraph per item, with PR links.
