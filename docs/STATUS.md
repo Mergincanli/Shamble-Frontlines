@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-16, 3a three-teams-core built on cs/three-teams-core ([PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15) open). PRs #10, #11, #13 merged; PR #14 open. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-17, 3a three-teams-core merged (PR #15, 5ffe679) with kit-v1-3 to kit-v1-6 (PRs #14, #17, #18, #19). Next: N1. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
@@ -10,16 +10,19 @@ change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` 
 **Merged 2026-10-14:** editor-prefab-list (PR #4, c458fe7), gate-check-5 (PR #5, 8675367), kit-v1-2 (PR #6, ef019e0),
 bot-poplar-wedge (PR #7, 159bec4).
 **Merged 2026-10-15/16:** editor-undo-ground (PR #8, b5f4ecf), docs-loop-v2 (PR #9, 67cf55b), map-dedupe-on-load
-(PR #10), team-prep-fixes (PR #11, 513f2fc), docs-editor-v2 (PR #12, fec5e67), editor-hotfix (PR #13, 8f4c3b6), map-dedupe-on-load merged as 7ca2cc4. **In flight:**
-**3a three-teams-core** (cs/three-teams-core: steps 1-16 plus review fixes built, [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15); waits on the
-Advisor's APPROVE and Mustafa's Brave check) and PR #14 (kit-v1-3, reporting rule; open, waits on the Advisor's APPROVE).
+(PR #10), team-prep-fixes (PR #11, 513f2fc), docs-editor-v2 (PR #12, fec5e67), editor-hotfix (PR #13, 8f4c3b6), map-dedupe-on-load merged as 7ca2cc4.
+**Merged 2026-10-17** (each with the Advisor's APPROVE and Mustafa's go): kit-v1-3 (PR #14, 9614ecf; reporting rule),
+kit-v1-4 (PR #17, bd27eeb; CLAUDE.md "Night shift" section), kit-v1-5 (PR #18, 2303073; `.claude/NIGHT_SHIFT.md`),
+kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679).
+**In flight:** none; next is N1 from the Night queue.
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
 flags any [OPEN] item it needs decided; all numbers live in one tunable data table; [LATER] items are not built.
 **Queue (Advisor, 2026-10-15; one change-set at a time):** greybox phase: 1. three-teams, split by the approved plan into
-0. team-prep-fixes (merged) → **3a three-teams-core (built, PR #15)** → N1 (editor Play never rebuilds the nav
-grid, a one-line change-set) → 3b three-teams-hud → 3c spawn-and-buy → "ramps as slopes in SIM" (lets `_botFireWorld` go) →
+0. team-prep-fixes (merged) → 3a three-teams-core (merged, PR #15) → **N1** (next; editor Play never rebuilds the nav
+grid, a one-line change-set; Night queue item 1, APPROVED) → R19 (navBuild building-cell fix; Night queue item 2, NEEDS PLAN;
+Advisor 2026-10-17: right after N1, before 3b) → 3b three-teams-hud → 3c spawn-and-buy → "ramps as slopes in SIM" (lets `_botFireWorld` go) →
 2. octopon-3-greybox (NC-7 blast reach by line of sight comes before its playtests) →
 3. harvest-economy → 4. bot-replan-storm (the navSteer replan storm, bot-poplar-wedge PERF-2) → 5. uplinks →
 6. win-and-scoring → then the scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). **Paused until the greybox loop
@@ -30,8 +33,11 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **3a three-teams-core** (teams as data, 12-slot soldier table, team-filtered shots, two-layer damage, per-team objectives, bot targeting with a LOS budget, DM_Tri arena at `?map=tri`, interim end rule; symbols +22 -0 vs main) | cs/three-teams-core (head 15b1971, 25 commits on main 7ca2cc4) | built, steps 1-16 plus review fixes; each commit message carries its evidence; [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15) open, CI green | Advisor's APPROVE, then Mustafa's Brave check |
-| kit-v1-3 (reporting rule) | PR #14 | open | Advisor's APPROVE |
+| **3a three-teams-core** (teams as data, 12-slot soldier table, team-filtered shots, two-layer damage, per-team objectives, bot targeting with a LOS budget, DM_Tri arena at `?map=tri`, interim end rule; symbols +22 -0 vs main) | merged: [PR #15](https://github.com/Mergincanli/Shamble-Frontlines/pull/15), 5ffe679, 2026-10-17, Advisor APPROVE, merged on Mustafa's go | done; gate PASS on the merged main (symbols +22 -0, smoke 8/8 + 5/5). Mustafa's first Brave check ran the main build by mistake (Tab showed You alone + Hostile 01-06); renders showed the PR #15 build lists You + Ally 01-03 vs Hostile 01-04 | none (3b is next in the greybox queue, after N1 and R19) |
+| kit-v1-3 (reporting rule: "Reporting to Mustafa" in CLAUDE.md + advisor-report template) | merged: PR #14, 9614ecf, 2026-10-17, Advisor APPROVE | done | none |
+| kit-v1-4 (CLAUDE.md "Night shift": approved unattended work goes into the Night queue, issue #16, the day it is approved; anything needing Mustafa never does) | merged: PR #17, bd27eeb, 2026-10-17, Advisor APPROVE | done | none |
+| kit-v1-5 (`.claude/NIGHT_SHIFT.md`: the night shift's rules; the three routines read it from main) | merged: PR #18, 2303073, 2026-10-17, Advisor APPROVE | done | none |
+| kit-v1-6 (NIGHT_SHIFT.md: an earlier night's cut-off run is picked up; report comment updated after every finished item) | merged: PR #19, cbd79e5, 2026-10-17, Advisor APPROVE | done | none |
 | UI theme transplant, step 1 (menu → dossier, pause → clipboard, field manual) | main (baseline) | delivered, battery PASS | Mustafa's Brave check incl. DEV-panel FPS on the menu |
 | kit-v1-1 (settings + 19 deny rules) | merged: PR #3, 5858864, 2026-10-14, Advisor APPROVE | done | Mustafa runs `/permissions` locally (Windows check) |
 | kit-v1-2 (narrowed the playwright allow rule) | merged: PR #6, ef019e0, 2026-10-14, Advisor APPROVE | done | none |
@@ -69,7 +75,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 
 ## Open bugs and risks
 - **3a, ranked (all from the change-set's evidence; not re-measured by docs-keeper):**
-  1. Cabana: buildings are not NAV cells, so 27.5 % of objective routes and 25 % of siege legs cross a building roof bots can't climb (`tools/reach.js`; R19: the `navBuild` building-cell fix with bot replanning)
+  1. Cabana: buildings are not NAV cells, so 27.5 % of objective routes and 25 % of siege legs cross a building roof bots can't climb (`tools/reach.js`; R19: the `navBuild` building-cell fix with bot replanning; queued as Night queue item 2, NEEDS PLAN, right after N1 and before 3b)
   2. Allocation grows with team fights (garbage-included inspector profile, MB per game second inside update(), seeded): default Cabana natural match head 4.6-4.8 vs main 2.4-3.1 (head's ally and Soviet bots fight, main's bots don't), Cabana ring combat head 1.72-2.09 vs main 1.94-1.98; DM_Tri 12 soldiers 2.9-3.0 and 48 soldiers 7.2-8.2 after the review fixes (main Cabana at 48: 6.2-6.3). Driver: `updateSoldierAnim` hit/death states (the CS11 anim split); `syncSimWorld` runs twice per step since K4 (0.39-0.43 after the house-array fix, was 0.56-0.65; main 0.16 for its one call)
   3. Draw calls: about 120 per on-screen soldier (pre-existing). Merge per-material parts, prune shadow casters, add LOD before team size rises
   4. DM_Tri: Soviet and Empire enterable barracks doors face south (rot 0 for the nav grid); the HUD shows two teams, two silo dots and "Cabana Republic" (3b)
@@ -83,7 +89,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - Deferred (map-dedupe-on-load): prefabs saved by marquee over a stacked area can stamp exact stacks again. Exposure is small: prefabs could only be saved since dbe24f8 (2026-10-14). The next map Save and Load drops them. Follow-up: dedupe on prefab load or stamp with the same key
 - Deferred, info, older (SEC-MDL-2): `envMerge` / `rulesMerge` use `Object.assign`, so a stored `__proto__` key swaps the prototype of that local env/rules sub-object (`Object.prototype` stays clean). Belongs with the server-side map-def validation (ADR-001)
 - Editor bugs reported by Mustafa (2026-10-15, editor.html on main): placed trees can't be deleted; rotation does nothing when the slider changes; the editor lags after a few placements. Fixed by editor-hotfix (PR #13, 8f4c3b6, merged after Mustafa's Brave check): delete, rotation, inspector selection capture; the lag needed no code fix, PR #8 and PR #10 removed its causes
-- N1 (found in 3a): the editor's Play never rebuilds the nav grid; a one-line change-set, queued right after 3a (Advisor, 2026-10-16) [verified: `editorPlay` sets mode='game' itself and never calls `deploy()`, where `navBuild()` runs]
+- N1 (found in 3a): the editor's Play never rebuilds the nav grid; a one-line change-set, Night queue item 1 (APPROVED), next after the 3a merge [verified: `editorPlay` sets mode='game' itself and never calls `deploy()`, where `navBuild()` runs]
 - Deferred, low (editor-undo-ground PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
 - Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)
