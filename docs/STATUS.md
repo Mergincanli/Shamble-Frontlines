@@ -15,7 +15,7 @@ bot-poplar-wedge (PR #7, 159bec4).
 kit-v1-4 (PR #17, bd27eeb; CLAUDE.md "Night shift" section), kit-v1-5 (PR #18, 2303073; `.claude/NIGHT_SHIFT.md`),
 kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679),
 docs-after-3a (PR #20, df1e6d3; docs only), kit-v2-0 (PR #21, 04c086c; the `advisor` agent), kit-v2-1 (PR #22, 211ddcb; automated merging).
-**In flight:** kit-v2-2 ([PR #23](https://github.com/Mergincanli/Shamble-Frontlines/pull/23), draft; rules, needs Mustafa's go); next game work is N1 from the Night queue.
+**In flight:** kit-v2-2 ([PR #23](https://github.com/Mergincanli/Shamble-Frontlines/pull/23), ready for review; rules, needs Mustafa's go); next game work is N1 from the Night queue.
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
