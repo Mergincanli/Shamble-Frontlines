@@ -24,6 +24,7 @@
  * SIDE-EFFECTS ON LOAD: none — declarations only; the page calls bootGame().
  * ========================================================================== */
 const PLAYER_FACTION='Allies';   // the player's faction: uniform + vehicle livery
+const PLAYER_TEAM=(TEAMS.find(t=>t.faction===PLAYER_FACTION)||TEAMS[0]).id;   // the player's team id (D3: allies); TEAMS loads with core, so no TDZ
 let unitOwned=UNIT_TYPES.map((u,i)=>i===0);  // you start as Conscript; the others unlock in the armory (free T1, Officer 1250 @ T2)
 // ── VEHICLES: enterable, bought separately from infantry. Registry only for now; the model + enter/drive logic lands in a later pass (spawnVehicle stub below). Stats are placeholders. ──
 function updateSunFollow(){ const snap=(2*SUN_SD)/2048; const cx=Math.round(player.position.x/snap)*snap, cz=Math.round(player.position.z/snap)*snap; sun.position.set(cx+_sunDir.x*SUN_R, _sunDir.y*SUN_R, cz+_sunDir.z*SUN_R); sun.target.position.set(cx,0,cz); sun.target.updateMatrixWorld(); }
@@ -490,7 +491,7 @@ function applyRifleHold(group, pose){
 /* buildings */
 const buildings=[];
 function makeBuilding(team,type,x,z){
-  const isF=team==='friend'; const accent=isF?0x38e1b0:0xff4d4d;
+  team=teamOf(team); const isF=team!==null&&team===PLAYER_TEAM; const accent=isF?0x38e1b0:0xff4d4d;   // canonical id; teamless stays red (N3)
   const dims=type==='hq'?[8,9,8]:type==='refinery'?[10,4,6]:type==='power'?[6,8,5]:[7,5,7];
   const base=isF?0x1f3633:0x361f1f;
   const m=new THREE.Mesh(new THREE.BoxGeometry(dims[0],dims[1],dims[2]),new THREE.MeshStandardMaterial({color:base,roughness:0.85,metalness:0.2}));
@@ -507,6 +508,15 @@ function makeBuilding(team,type,x,z){
 }
 /* buildings created by buildMap() */
 function findB(team,type){return buildings.find(b=>b.team===team&&b.type===type);}
+// Team identity, one choke point (three-teams item 2): canonical ids from TEAMS; legacy 'friend' / 'hostile' and faction
+// names map to them; 'neutral', empty and unknown values mean no team (null). Explicit comparisons only: no `in` test or
+// object lookup, so prototype keys such as 'toString' can never pass.
+function teamOf(x){ if(x==null||x===''||x==='neutral')return null;
+  for(let i=0;i<TEAMS.length;i++){ const t=TEAMS[i]; if(x===t.id||x===t.faction)return t.id; }
+  if(x==='friend')return 'allies'; if(x==='hostile')return 'soviets';
+  if(DEV.enabled)console.error('teamOf: unknown team',typeof x==='string'?x.slice(0,40):typeof x); return null; }   // map data: log a capped string, never the raw value
+function sameTeam(a,b){ const ta=teamOf(a); return ta!==null&&ta===teamOf(b); }   // both have a team and it is the same one
+function teamFilter(team){ return TUNE.ff?null:team; }   // resolveShot's shooterTeam: teammates are skipped unless friendly fire is on
 
 let terminalPos=new THREE.Vector3(0,0,34), mapSpawn=new THREE.Vector3(0,0,30), termMesh=null, resupplyLabel=null;
 
@@ -517,8 +527,9 @@ const bFloorMat=new THREE.MeshStandardMaterial({color:0x1b2523,roughness:1});
 const barracksList=[];
 function makeBarracks(cx,cz,team){
   const W=11,D=11,H=5,t=0.6,dw=3.4,seg=(W-dw)/2;
-  const accent=team==='hostile'?0xff4d4d:team==='friend'?0x38e1b0:0x9fb0ad;
-  const txtCol=team==='hostile'?'#ff8a8a':team==='friend'?'#7af0d2':'#cfe6e2';
+  team=teamOf(team); const rel=team===null?0:team===PLAYER_TEAM?1:2;   // canonical id or null; teamless stays grey
+  const accent=rel===2?0xff4d4d:rel===1?0x38e1b0:0x9fb0ad;
+  const txtCol=rel===2?'#ff8a8a':rel===1?'#7af0d2':'#cfe6e2';
   const walls=[ addBox(cx,cz-D/2,W,H,t,wallMat,false), addBox(cx+W/2,cz,t,H,D,wallMat,false), addBox(cx-W/2,cz,t,H,D,wallMat,false), addBox(cx-(dw/2+seg/2),cz+D/2,seg,H,t,wallMat,false), addBox(cx+(dw/2+seg/2),cz+D/2,seg,H,t,wallMat,false) ];
   const lintel=new THREE.Mesh(new THREE.BoxGeometry(dw,1.1,t),wallMat); lintel.position.set(cx,H-0.55,cz+D/2); lintel.castShadow=true; noRay(lintel); scene.add(lintel);
   const floor=new THREE.Mesh(new THREE.BoxGeometry(W-t,0.08,D-t),bFloorMat); floor.position.set(cx,0.04,cz); floor.receiveShadow=true; noRay(floor); scene.add(floor);
@@ -533,7 +544,7 @@ function makeBarracks(cx,cz,team){
   const plabel=makeLabel('ARMORY',txtCol); plabel.position.set(cx,2.62,cz-D/2+t/2+0.2); plabel.scale.set(2.6,0.7,1); scene.add(plabel);
   const panelPos=new THREE.Vector3(cx,0,cz-D/2+1.0);
   if(typeof stylizeOne==='function'){ stylizeOne(lintel); stylizeOne(floor); stylizeOne(roof); stylizeOne(panel); }   // runtime builder: stylizeScene only ran at boot
-  const ent={cx,cz,team:team||'neutral',iw:W/2-t,id:D/2-t,walls,roof,roofM,label,lintel,floor,panel,plabel,panelPos,op:1};
+  const ent={cx,cz,team,iw:W/2-t,id:D/2-t,walls,roof,roofM,label,lintel,floor,panel,plabel,panelPos,op:1};
   walls.forEach(w=>{ w.mesh.userData.editSel={kind:'barracks',ref:ent}; }); // click a wall to select the barracks
   barracksList.push(ent); return ent;
 }
@@ -600,7 +611,7 @@ const enemySpawns=[];
 const enemySpawnLayer=new THREE.Group(); scene.add(enemySpawnLayer);
 const _spawnFacCol={Soviets:0xE11020, Allies:0x1F6FF0, Empire:0x7B2FD6};
 function makeEnemySpawn(x,z,faction){
-  faction=(faction in _spawnFacCol)?faction:'Soviets'; const col=_spawnFacCol[faction];
+  faction=Object.prototype.hasOwnProperty.call(_spawnFacCol,faction)?faction:'Soviets'; const col=_spawnFacCol[faction];
   const grp=new THREE.Group(); grp.position.set(x,0,z);
   const ring=new THREE.Mesh(new THREE.RingGeometry(1.5,1.95,30), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.85,side:THREE.DoubleSide,depthWrite:false})); ring.rotation.x=-Math.PI/2; ring.position.y=0.06; grp.add(ring);
   const disc=new THREE.Mesh(new THREE.CircleGeometry(1.45,30), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,side:THREE.DoubleSide,depthWrite:false})); disc.rotation.x=-Math.PI/2; disc.position.y=0.05; grp.add(disc);
@@ -621,8 +632,8 @@ function buildMap(def){
   (def.covers||[]).forEach(o=>{ addCover(o.type, o.x, o.z, o.len, o.rot||0); });
   (def.trees||[]).forEach(t=>addTree(t.kind, t.x, t.z, t.seed));
   (def.props||[]).forEach(pp=>addProp(pp.kind, pp.x, pp.z, pp.seed, pp.rot||0));
-  (def.enemySpawns||[]).forEach(sp=>makeEnemySpawn(sp.x,sp.z,sp.faction));
-  (def.barracks||[]).forEach(b=>{ const e=makeBarracks(b.x,b.z,b.team); if(b.s&&b.s!==1)_scaleBarracks(e,b.s); if(b.rot)_rotateBarracksBy(e,b.rot); });
+  (def.enemySpawns||[]).forEach(sp=>{ if(sp&&Number.isFinite(sp.x)&&Number.isFinite(sp.z)) makeEnemySpawn(sp.x,sp.z,sp.faction); });
+  (def.barracks||[]).forEach(b=>{ const e=makeBarracks(b.x,b.z,b.team); if(Number.isFinite(b.s)&&b.s>0&&b.s!==1)_scaleBarracks(e,b.s); if(Number.isFinite(b.rot)&&b.rot)_rotateBarracksBy(e,b.rot); });
   const rs=def.resupply||{x:0,z:34}; terminalPos.set(rs.x,0,rs.z);
   termMesh=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.6,1),new THREE.MeshStandardMaterial({color:0x183a36,emissive:0x0e2a26,emissiveIntensity:0.5,roughness:0.5}));
   termMesh.position.set(rs.x,0.8,rs.z); termMesh.castShadow=true; termMesh.userData.editSel={kind:'resupply'}; scene.add(termMesh); if(typeof stylizeOne==='function')stylizeOne(termMesh);
@@ -632,6 +643,7 @@ function buildMap(def){
   rebuildLOS();
   _env=envMerge(def.env); applyEnv(_env,{regen:true});
   _rules=rulesMerge(def.rules); if(_rulesReady)applyRules(_rules);
+  placeObjectives(def); buildTeamIndex(); activateRoster();   // objectives first: the truck lanes read the field
 }
 // Maps saved before editor-undo-ground can hold stacked copies of trees and props: clearMap never cleared them, so every
 // Load, Reset, undo and redo added another copy. The editor's Maps > Load drops EXACT duplicates only: the whole entry must
@@ -646,6 +658,7 @@ function dedupeMapDef(def){ if(!def||typeof def!=='object'||Array.isArray(def)) 
     out[k]=keep; }
   return {def:out, droppedTrees, droppedProps}; }
 function serializeMap(){ return {
+  version:1,   // map format: 1 = canonical team ids and objectives in the map (3a); older saves have no field
   name:curMap.name,
   spawn:{x:+mapSpawn.x.toFixed(1),z:+mapSpawn.z.toFixed(1)},
   resupply:{x:+terminalPos.x.toFixed(1),z:+terminalPos.z.toFixed(1),rot:+((termMesh?termMesh.rotation.y:0)).toFixed(3),w:+((termMesh?termMesh.scale.x*1.4:1.4)).toFixed(2),h:+((termMesh?termMesh.scale.y*1.6:1.6)).toFixed(2),d:+((termMesh?termMesh.scale.z:1)).toFixed(2)},
@@ -660,12 +673,16 @@ function serializeMap(){ return {
   enemySpawns:enemySpawns.map(sp=>({x:+sp.x.toFixed(1),z:+sp.z.toFixed(1),faction:sp.faction})),
   buildings:buildings.map(b=>({team:b.team,type:b.type,x:+b.mesh.position.x.toFixed(1),z:+b.mesh.position.z.toFixed(1),rot:+(b.mesh.rotation.y).toFixed(3),s:+(b.scl||1).toFixed(3),hp:Math.round(b.maxHealth),y:+b.mesh.position.y.toFixed(2)})),
   barracks:barracksList.map(b=>({x:+(b.cx).toFixed(1),z:+(b.cz).toFixed(1),team:b.team,rot:+(b.rot||0).toFixed(3),s:+(b.scl||1).toFixed(3)})),
+  harvField:{x:+HARV.fieldX.toFixed(1),z:+HARV.fieldZ.toFixed(1)},
+  harvLanes:HARV.lanes?Object.keys(HARV.lanes).reduce((o,k)=>{ const l=HARV.lanes[k]; o[k]={dock:{x:+l.dock.x.toFixed(1),z:+l.dock.z.toFixed(1)},lane:{x:+l.lane.x.toFixed(1),z:+l.lane.z.toFixed(1)}}; return o; },{}):undefined,
+  techPoints:TBOX.points.map(p=>({name:p.name,x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
+  silos:SILO.points.map(p=>({x:+p.x.toFixed(1),z:+p.z.toFixed(1)})),
   env:currentEnvJSON(),
   rules:currentRulesJSON()
 };}
 const player=buildSoldier(PLAYER_FACTION); player.position.set(0,0,30); scene.add(player);
 // --- melee + shield held models (player only; built once, hidden by default) ---
-const ps={vel:new THREE.Vector3(),health:T.playerHealth,lastHitT:99,dead:false,deadT:0,curWeapon:0,spread:WEAPONS[0].spreadHip,fireCd:0,reloading:false,reloadT:0,ads:false,shieldOwned:false,shieldOn:false,shieldFlash:0,swinging:false,swingT:0,swingDur:0,swingImpact:0,swingHit:false,swingMesh:null,swingW:null,stamina:1,staminaLock:false,wpnSwap:0,wpnReloadDip:0,channeling:false,unit:0,maxHealth:100,molotovMode:false,swapCd:0,banzai:false,banzaiT:0,banzaiCd:0,burstLeft:0,bayonet:false,bayonetT:0,bayonetCd:0,_bayHit:null,fireKick:0,toppleT:0,vy:0,grounded:true,lastAttacker:null,_tx:-1,_tz:0,_stepT:0};
+const ps={vel:new THREE.Vector3(),health:T.playerHealth,lastHitT:99,dead:false,deadT:0,curWeapon:0,spread:WEAPONS[0].spreadHip,fireCd:0,reloading:false,reloadT:0,ads:false,shieldOwned:false,shieldOn:false,shieldFlash:0,swinging:false,swingT:0,swingDur:0,swingImpact:0,swingHit:false,swingMesh:null,swingW:null,stamina:1,staminaLock:false,wpnSwap:0,wpnReloadDip:0,channeling:false,unit:0,maxHealth:100,molotovMode:false,swapCd:0,banzai:false,banzaiT:0,banzaiCd:0,burstLeft:0,bayonet:false,bayonetT:0,bayonetCd:0,_bayHit:null,fireKick:0,toppleT:0,vy:0,grounded:true,lastAttacker:null,_tx:-1,_tz:0,_stepT:0,id:0,team:PLAYER_TEAM,alive:true,group:player,active:true,frags:0,downs:0,lastAttackerId:-1,targetId:-1,retargetT:0,scanCursor:0,role:null};   // id 0 = SIM_PLAYER = SOLDIERS[0]
 const loadout=WEAPONS.map((w)=>({ammo:w.mag,reserve:w.reserve,owned:true}));
 const curW=()=>WEAPONS[ps.curWeapon], curL=()=>loadout[ps.curWeapon];
 // ─── Phase 0: two-pool economy. Pay = personal cash (buys gear); Tech = shared team meter (advances era T1→T4). All values tunable. ───
@@ -681,16 +698,88 @@ const ECO={
   eraNames:['T1','T2','T3','T4'],
   eraCost:[60,90,120], // tech to advance T1→T2, T2→T3, T3→T4
 };
-const teamEco={ friend:{era:1,tech:0,silos:0}, hostile:{era:1,tech:0,silos:0} };
+const teamEco={}; for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id]={era:1,tech:0,silos:0};
+teamEco.friend=teamEco.allies; teamEco.hostile=teamEco.soviets;   // legacy aliases are the SAME objects until 3b: iterate TEAMS, never Object.keys(teamEco)
 // ─── Phase 2: harvester / supply convoy (tunable) ───
-const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z };
+const HARV={ speed:7, loadTime:3.5, dockTime:3.0, hp:900, respawn:12, fieldX:DM_Cabana.harvField.x, fieldZ:DM_Cabana.harvField.z, fieldGrp:null, lanes:null };   // lanes: the map's per-team truck {dock,lane}, validated by placeObjectives
 // ─── Phase 3: Tech Boxes (tunable) ───
-const TBOX={ points:DM_Cabana.techPoints, activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };
-const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d };
-const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a' };
+const TBOX={ points:[], pool:[], names:['Alpha','Bravo','Charlie'], activeTime:120, captureTime:7, range:5.5, gap:6, firstDelay:8 };   // points: the map's tech points (own objects from pool, names fixed by index; placeObjectives)
+for(let i=0;i<3;i++){ const c=DM_Cabana.techPoints[i]; TBOX.pool.push({name:TBOX.names[i], x:c?c.x:0, z:c?c.z:0}); if(c)TBOX.points.push(TBOX.pool[i]); }
+// Team colours: allies teal, both enemy teams today's red until 3b's colour pass (D4); friend/hostile stay as aliases.
+const TEAM_COL={ neutral:0xb5a642, friend:0x38e1b0, hostile:0xff4d4d, allies:0x38e1b0, soviets:0xff4d4d, empire:0xff4d4d };
+const TEAM_HEX={ neutral:'#cdb24a', friend:'#7af0d2', hostile:'#ff8a8a', allies:'#7af0d2', soviets:'#ff8a8a', empire:'#ff8a8a' };
+// Per-team building index (three-teams item 7): per-frame code reads these fields instead of searching buildings[] with
+// a closure (findB). Rebuilt by buildTeamIndex() at the end of buildMap, at the start of resetRound and once at boot after
+// the trucks exist; the editor adds and removes buildings without buildMap, and its Play button runs resetRound.
+const TEAM_INDEX={ firstEnemy:null, rosterVer:0, presence:new Int32Array(TEAMS.length) };   // presence: per-team head count at one objective (tech box, silo)
+for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; TEAM_INDEX[id]={ idx:i, active:false, blds:[], hqs:[], refinery:null, power:null, barracksB:null, barracksE:null, markers:[], harv:null, dockX:0, dockZ:0, laneX:0, laneZ:0 };
+  if(TEAM_INDEX.firstEnemy===null&&id!==PLAYER_TEAM)TEAM_INDEX.firstEnemy=id; }   // set here too: HUD code may read it before the first buildMap
+function buildTeamIndex(){
+  for(let i=0;i<TEAMS.length;i++){ const e=TEAM_INDEX[TEAMS[i].id]; e.blds.length=0; e.hqs.length=0; e.refinery=null; e.power=null; e.barracksB=null; e.barracksE=null; e.markers.length=0; e.harv=null; }
+  for(let i=0;i<buildings.length;i++){ const b=buildings[i], id=teamOf(b.team); if(!id)continue; const e=TEAM_INDEX[id]; e.blds.push(b);   // first of each type wins, as findB did
+    if(b.type==='hq')e.hqs.push(b); else if(b.type==='refinery'){ if(!e.refinery)e.refinery=b; } else if(b.type==='power'){ if(!e.power)e.power=b; } else if(b.type==='barracks'){ if(!e.barracksB)e.barracksB=b; } }
+  for(let i=0;i<barracksList.length;i++){ const bk=barracksList[i], id=teamOf(bk.team); if(id&&!TEAM_INDEX[id].barracksE)TEAM_INDEX[id].barracksE=bk; }
+  for(let i=0;i<enemySpawns.length;i++){ const sp=enemySpawns[i], id=teamOf(sp.faction); if(id)TEAM_INDEX[id].markers.push(sp); }
+  for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], id=teamOf(hv.team); if(id&&!TEAM_INDEX[id].harv)TEAM_INDEX[id].harv=hv; }
+  TEAM_INDEX.firstEnemy=null;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id], r=e.refinery;
+    if(TEAM_INDEX.firstEnemy===null&&id!==PLAYER_TEAM)TEAM_INDEX.firstEnemy=id;
+    // dock and field lane: the map's harvLanes when it has them (DM_Tri); else today's two-team numbers for allies (dock -z,
+    // lane -4) and soviets (+z, +4); any other team docks 7 m from its refinery toward the field.
+    const ln=HARV.lanes?HARV.lanes[id]:null;
+    if(ln){ e.dockX=ln.dock.x; e.dockZ=ln.dock.z; e.laneX=ln.lane.x; e.laneZ=ln.lane.z; }
+    else if(id==='allies'||id==='soviets'){ const sg=(id==='allies')?-1:1;
+      e.dockX=r?r.mesh.position.x:0; e.dockZ=r?r.mesh.position.z+7*sg:-35*sg; e.laneX=HARV.fieldX+4*sg; e.laneZ=HARV.fieldZ; }
+    else { const rx=r?r.mesh.position.x:0, rz=r?r.mesh.position.z:0, dx=HARV.fieldX-rx, dz=HARV.fieldZ-rz, d=Math.sqrt(dx*dx+dz*dz)||1;
+      e.dockX=rx+dx/d*7; e.dockZ=rz+dz/d*7; e.laneX=HARV.fieldX; e.laneZ=HARV.fieldZ; } }
+}
+// Objectives from map data (three-teams item 3 / D14). Validated: arrays only, at most 3 tech points and 3 silos (the
+// pools), finite numbers clamped to the arena, names fixed by pool index (no map text reaches a label). A missing or
+// unusable key falls back to DM_Cabana's values. Writes into TBOX / SILO's own pooled objects, moves the pooled meshes
+// once boot has built them (hidden when the map has fewer), and resets the box and silos.
+function placeObjectives(def){
+  const ok=o=>o!==null&&typeof o==='object'&&Number.isFinite(o.x)&&Number.isFinite(o.z);
+  const AX=T.arenaX-4, AZ=T.arenaZ-4, cx=v=>Math.max(-AX,Math.min(AX,v)), cz=v=>Math.max(-AZ,Math.min(AZ,v));
+  const pick=(a,fb,cap)=>{ const src=Array.isArray(a)?a.filter(ok).slice(0,cap):[]; return src.length?src:fb.slice(0,cap); };
+  const hf=(def&&ok(def.harvField))?def.harvField:DM_Cabana.harvField; HARV.fieldX=cx(hf.x); HARV.fieldZ=cz(hf.z);
+  const hl=def?def.harvLanes:null; HARV.lanes=null;   // per-team {dock,lane}, known team ids only; a team without a valid entry keeps the defaults
+  if(hl!==null&&typeof hl==='object'){ const L={}; let n=0;
+    for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, o=Object.prototype.hasOwnProperty.call(hl,id)?hl[id]:null;
+      if(o!==null&&typeof o==='object'&&ok(o.dock)&&ok(o.lane)){ L[id]={dock:{x:cx(o.dock.x),z:cz(o.dock.z)},lane:{x:cx(o.lane.x),z:cz(o.lane.z)}}; n++; } }
+    if(n) HARV.lanes=L; }
+  const tp=pick(def&&def.techPoints,DM_Cabana.techPoints,TBOX.pool.length), sp=pick(def&&def.silos,DM_Cabana.silos,SILO.pool.length);
+  const tv=tp.map(o=>[cx(o.x),cz(o.z)]), sv=sp.map(o=>[cx(o.x),cz(o.z)]);   // read every value before writing: tp may hold the pool's own objects
+  TBOX.points.length=0; for(let i=0;i<tv.length;i++){ const o=TBOX.pool[i]; o.name=TBOX.names[i]; o.x=tv[i][0]; o.z=tv[i][1]; TBOX.points.push(o); }
+  SILO.points.length=0; for(let i=0;i<sv.length;i++){ const o=SILO.pool[i]; o.x=sv[i][0]; o.z=sv[i][1]; SILO.points.push(o); }
+  for(let i=0;i<techPts.length;i++){ const t=techPts[i], on=i<TBOX.points.length; t.group.visible=on; t.group.position.set(TBOX.pool[i].x,0,TBOX.pool[i].z); }
+  for(let i=0;i<silos.length;i++){ const sl=silos[i], on=i<SILO.points.length; sl.on=on; sl.group.visible=on; sl.group.position.set(SILO.pool[i].x,0,SILO.pool[i].z); sl.bar.grp.position.set(SILO.pool[i].x,4.0,SILO.pool[i].z); if(!on)sl.bar.grp.visible=false; }
+  if(HARV.fieldGrp) HARV.fieldGrp.position.set(HARV.fieldX,0,HARV.fieldZ);
+  if(tboxMesh) resetTechBox(); if(silos.length) resetSilos();
+}
+// Roster activation (three-teams item 4): a team plays when it has an HQ; the player's team always does; a map where no
+// other team has an HQ gets the Soviets (N2; they spawn through teamSpawnPoint). Slots of a team that doesn't play are parked:
+// active=false, alive=false, hidden, and an alive=false SIM entry. Called after buildTeamIndex (buildMap, resetRound, boot).
+function activateRoster(){
+  let other=false;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id]; e.active=(id===PLAYER_TEAM)||e.hqs.length>0; if(e.active&&id!==PLAYER_TEAM)other=true; }
+  if(!other) TEAM_INDEX.soviets.active=true;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id!==PLAYER_TEAM&&TEAM_INDEX[id].active){ TEAM_INDEX.firstEnemy=id; break; } }   // HUD's "them": a team that plays (review BUGS-2)
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s], g=en.group;
+    const on=TEAM_INDEX[en.team].active;
+    en.active=on; en.targetId=-1; en.targetVis=false; en.losT=0; en.scanCursor=0; en.scanBestId=-1; en.retargetT=(en.id%SOLDIERS.length)*TUNE.ai.retargetS/SOLDIERS.length;   // staggered scans
+    let ts=0; for(let k=0;k<s;k++) if(SOLDIERS[k].team===en.team) ts++; en.role=TUNE.ai.roles[ts%TUNE.ai.roles.length]; AI_STATE.rotatePush(en);   // roles cycle per team slot (R28)
+    const ally=sameTeam(en.team,PLAYER_TEAM), bar=g.userData.bar; bar.fg.material.color.setHex(ally?0x38e1b0:0xff4d4d); bar.bg.material.color.setHex(ally?0x08302a:0x300808);   // health bar by relation to you
+    // A parked slot leaves the scene graph: r128 updates the matrices of hidden objects too. Back in the scene it goes
+    // through stylizeOne, which skips meshes that are already toon and styles a slot that was parked when stylizeScene ran.
+    if(on){ teamSpawnPoint(en.team,en.id,g.position); if(!g.parent){ scene.add(g); if(typeof stylizeOne==='function')stylizeOne(g); } if(!g.userData.anim||!g.userData.anim.v2)_animInit(g); g.visible=mode!=='editor'; }   // anim state now: a kill before its first animated frame still falls (deathStart)
+    else { en.alive=false; en.respawnT=0; g.visible=false; g.userData.bar.grp.visible=false; if(g.parent)g.parent.remove(g); } }
+  for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i], ix=TEAM_INDEX[teamOf(hv.team)]; hv.parked=!(ix&&ix.active);
+    if(hv.parked){ hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; } }
+  TEAM_INDEX.rosterVer++; _simFrame=-1;   // re-sync SIM on its next call, even within this frame, so a slot parked now is dead there now
+}
 // ─── Phase 4: economy-as-weapon — power plant down throttles tech (×0.5) and doubles prices ───
-function powerDead(team){ const b=findB(team,'power'); return b ? !b.alive : false; }
-function priceMult(){ return powerDead('friend') ? 2 : 1; }
+function powerDead(team){ for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(b.type==='power'&&sameTeam(b.team,team)) return !b.alive; } return false; }
+function priceMult(team=PLAYER_TEAM){ return powerDead(team) ? 2 : 1; }
 let credits=0, grenadeCount=0, meleeCd=0, kills=0, roundDeaths=0, roundAssists=0, gameOver=false;
 let nearPanel=false, shopOpen=false;
 // DEV/admin tools — set DEV.enabled=false (or wire to a real auth check) to hide entirely from players.
@@ -702,19 +791,36 @@ const advanceAt=L=>tierBase(L)+RIFLE_TIERS[L-1].span;                           
 
 /* enemies */
 const enemies=[];
-function spawnEnemyMesh(faction){
-  const elite=(faction==='Empire');
+const SOLDIERS=[];   // fixed slot table: SOLDIERS[0] is ps (the player), SOLDIERS[s] is enemies[s-1]; en.id===s is its SIM id
+function spawnEnemyMesh(faction,elite){
   const e=elite?buildSoldier('Empire','m',ELITE_KIT):buildSoldier(faction||'Soviets');
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.16),new THREE.MeshBasicMaterial({color:0x300808})); noRay(bg);
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.16),new THREE.MeshBasicMaterial({color:0xff4d4d})); fg.position.z=0.001; noRay(fg);
-  const grp=new THREE.Group(); grp.add(bg,fg); grp.position.y=2.9; e.add(grp); e.userData.bar={grp,fg}; return e;
+  const grp=new THREE.Group(); grp.add(bg,fg); grp.position.y=2.9; e.add(grp); e.userData.bar={grp,fg,bg}; return e;
 }
 function randSpawn(){return new THREE.Vector3((Math.random()*2-1)*(T.arenaX-8),0,-T.arenaZ+10+Math.random()*22);}
-function respawnPos(en){ if(enemySpawns.length){ const fac=en&&en.faction; const mine=fac?enemySpawns.filter(sp=>sp.faction===fac):null; const pool=(mine&&mine.length)?mine:enemySpawns; const m=pool[(Math.random()*pool.length)|0]; const a=Math.random()*6.283, r=Math.random()*5; return new THREE.Vector3(m.x+Math.cos(a)*r,0,m.z+Math.sin(a)*r); } return randSpawn(); }
-function setEnemyType(en, idx){ en.unit=idx; setHeldGun(en.group, WEAPONS[unitOf(idx).wpn].id); if(en.elite)return; const u=unitOf(idx); const hm=en.group.userData.head; if(hm&&hm.material&&hm.material.color) hm.material.color.set(u.accent); }
+// Per-team bot spawn (three-teams item 9, D13), written into out, deterministic by slot (no Math.random, no allocation):
+// the team's own markers round-robin by slot; else TUNE.spawn.doorOut m outside its enterable barracks door; else beside
+// its first HQ, toward the map centre; else mapSpawn (your team only); else the legacy north band. Never another team's
+// marker. Slots sit TUNE.spawn.lateral m apart, side by side.
+function teamSpawnPoint(team,slotId,out){
+  const id=teamOf(team), e=id?TEAM_INDEX[id]:null, n=TUNE.teams.size, k=slotId%n, lat=(k-(n-1)/2)*TUNE.spawn.lateral;
+  // each option is checked for finite numbers: a bad map value falls through to the next option
+  if(e&&e.markers.length){ const m=e.markers[k%e.markers.length]; out.set(m.x+lat,0,m.z); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
+  const b=e?e.barracksE:null;
+  if(b){ const r=b.rot||0, c=Math.cos(r), s=Math.sin(r), d=5.5*(b.scl||1)+TUNE.spawn.doorOut;   // 5.5 m: makeBarracks' D/2; the door faces local +z, rotated as _rotAround does
+    out.set(b.cx-s*d+c*lat,0,b.cz+c*d+s*lat); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
+  const h=(e&&e.hqs.length)?e.hqs[0]:null;
+  if(h){ const p=h.mesh.position, bx=h.box, L=hyp2(p.x,p.z), ux=L>1e-6?-p.x/L:0, uz=L>1e-6?-p.z/L:1, d=Math.max(bx.max.x-bx.min.x,bx.max.z-bx.min.z)/2+TUNE.spawn.doorOut;
+    out.set(p.x+ux*d-uz*lat,0,p.z+uz*d+ux*lat); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
+  if(id===PLAYER_TEAM){ out.set(mapSpawn.x+lat,0,mapSpawn.z); if(Number.isFinite(out.x)&&Number.isFinite(out.z)) return out; }
+  out.set((((slotId*0.618034)%1)*2-1)*(T.arenaX-8),0,-T.arenaZ+10+((slotId*0.381966)%1)*22); return out;
+}
+function respawnPos(en){ return teamSpawnPoint(en.team,en.id,new THREE.Vector3()); }
+function setEnemyType(en, idx){ en.unit=idx; en.maxHealth=en.elite?T.eliteHealth:unitOf(idx).maxHealth; setHeldGun(en.group, WEAPONS[unitOf(idx).wpn].id); if(en.elite)return; const u=unitOf(idx); const hm=en.group.userData.head; if(hm&&hm.material&&hm.material.color) hm.material.color.set(u.accent); }
 const harvesters=[]; const _hvDir=new THREE.Vector3();
 function makeHarvester(team){
-  const isF=team==='friend'; const accent=isF?0x38e1b0:0xff4d4d;
+  team=teamOf(team); const isF=team!==null&&team===PLAYER_TEAM; const accent=isF?0x38e1b0:0xff4d4d;
   const g=new THREE.Group();
   const body=new THREE.Mesh(new THREE.BoxGeometry(3.0,1.5,2.0), new THREE.MeshStandardMaterial({color:isF?0x32423c:0x42322f,roughness:0.82,metalness:0.3})); body.position.set(-0.3,1.05,0); body.castShadow=true; g.add(body);
   const cab=new THREE.Mesh(new THREE.BoxGeometry(1.3,1.35,1.85), new THREE.MeshStandardMaterial({color:isF?0x283732:0x352826,roughness:0.82,metalness:0.3})); cab.position.set(1.55,0.95,0); cab.castShadow=true; g.add(cab);
@@ -725,37 +831,42 @@ function makeHarvester(team){
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.34), new THREE.MeshBasicMaterial({color:0x101010,transparent:true,opacity:0.85})); noRay(bg);
   const fg=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.34), new THREE.MeshBasicMaterial({color:accent})); fg.position.z=0.01; noRay(fg);
   const bar=new THREE.Group(); bar.add(bg,fg); bar.visible=false; scene.add(bar);
-  const hv={ team, group:g, accent, health:HARV.hp, maxHealth:HARV.hp, alive:true, refDead:false, state:'toField', t:0, hitFlash:0, respawnT:0, bar:{grp:bar,fg,w:3.4}, hx:1.7, hy:2.0, hz:1.1 };
+  const hv={ team, group:g, accent, health:HARV.hp, maxHealth:HARV.hp, alive:true, refDead:false, state:'toField', t:0, hitFlash:0, respawnT:0, bar:{grp:bar,fg,w:3.4}, hx:1.7, hy:2.0, hz:1.1, parked:false, docks:0 };
   harvesters.push(hv); return hv;
 }
-function makeSupplyField(){
-  const x=HARV.fieldX, z=HARV.fieldZ;
-  const pad=new THREE.Mesh(new THREE.CircleGeometry(4.2,40), new THREE.MeshStandardMaterial({color:0x3a3826,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.set(x,0.02,z); pad.receiveShadow=true; noRay(pad); scene.add(pad);
-  const ring=new THREE.Mesh(new THREE.RingGeometry(4.2,4.9,44), new THREE.MeshBasicMaterial({color:0xb5a642,transparent:true,opacity:0.4,side:THREE.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(x,0.03,z); noRay(ring); scene.add(ring);
+function makeSupplyField(){   // one group at the field (HARV.fieldGrp), children at local offsets, so placeObjectives can move it
+  const x=0, z=0, fg=new THREE.Group(); fg.position.set(HARV.fieldX,0,HARV.fieldZ); scene.add(fg); HARV.fieldGrp=fg;
+  const pad=new THREE.Mesh(new THREE.CircleGeometry(4.2,40), new THREE.MeshStandardMaterial({color:0x3a3826,roughness:0.95})); pad.rotation.x=-Math.PI/2; pad.position.set(x,0.02,z); pad.receiveShadow=true; noRay(pad); fg.add(pad);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(4.2,4.9,44), new THREE.MeshBasicMaterial({color:0xb5a642,transparent:true,opacity:0.4,side:THREE.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.set(x,0.03,z); noRay(ring); fg.add(ring);
   const cmat=new THREE.MeshStandardMaterial({color:0x6b5a36,roughness:0.85,metalness:0.1});
-  [[0,0,1.0],[1.1,0.5,0.8],[-0.9,-0.6,0.8],[0.3,-1.1,0.7],[-0.6,0.9,0.7]].forEach(([dx,dz,s])=>{ const c=new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cmat); c.position.set(x+dx,s/2,z+dz); c.castShadow=true; noRay(c); scene.add(c); });
-  const lbl=makeLabel('SUPPLY CACHE','#cdb24a'); lbl.position.set(x,3.4,z); scene.add(lbl);
+  [[0,0,1.0],[1.1,0.5,0.8],[-0.9,-0.6,0.8],[0.3,-1.1,0.7],[-0.6,0.9,0.7]].forEach(([dx,dz,s])=>{ const c=new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cmat); c.position.set(x+dx,s/2,z+dz); c.castShadow=true; noRay(c); fg.add(c); });
+  const lbl=makeLabel('SUPPLY CACHE','#cdb24a'); lbl.position.set(x,3.4,z); fg.add(lbl);
 }
-function harvDock(team){ const r=findB(team,'refinery'); const isF=team==='friend'; return r?{x:r.mesh.position.x,z:r.mesh.position.z+(isF?-7:7)}:{x:0,z:isF?35:-35}; }
+function harvDock(team){ const e=TEAM_INDEX[teamOf(team)]; return e?{x:e.dockX,z:e.dockZ}:{x:0,z:0}; }
 function updateHarvBar(hv){ const f=Math.max(0,hv.health/hv.maxHealth); hv.bar.fg.scale.x=f; hv.bar.fg.position.x=-(hv.bar.w*(1-f))/2; }
-function harvesterPayout(hv){ if(hv.team==='friend'){ credits+=ECO.payHarvester; updateCreditHUD(); showLevelToast('Supply Dock','+'+ECO.payHarvester+' cr  ·  +'+ECO.techHarvester+' tech'); } addTech(hv.team, ECO.techHarvester); }
+function harvesterPayout(hv){ hv.docks++; if(sameTeam(hv.team,PLAYER_TEAM)){ credits+=ECO.payHarvester; updateCreditHUD(); showLevelToast('Supply Dock','+'+ECO.payHarvester+' cr  ·  +'+ECO.techHarvester+' tech'); } addTech(hv.team, ECO.techHarvester); }
 function damageHarvester(hv,d){ if(!hv.alive)return; hv.health-=d; hv.hitFlash=0.1; if(hv.health<=0) destroyHarvester(hv,false); else { updateHarvBar(hv); updateBaseHUD(); } }
-function destroyHarvester(hv,refDead){ if(!hv.alive)return; hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; addExplosion(hv.group.position.clone().setY(1.0)); camShake=Math.min(1.3,camShake+0.5); hv.refDead=!!refDead; hv.respawnT=HARV.respawn; if(hv.team==='friend') showLevelToast('Supply Truck Lost', refDead?'Refinery down — no resupply':'Respawning in '+HARV.respawn+'s'); updateBaseHUD(); }
-function respawnHarvester(hv){ const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); updateBaseHUD(); }
-function resetHarvesters(){ for(const hv of harvesters){ const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); } updateBaseHUD(); }
-function siegeFireHarvester(en,hv){ _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM); addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageHarvester(hv,T.enemySiegeDamage); }
+function destroyHarvester(hv,refDead){ if(!hv.alive)return; hv.alive=false; hv.group.visible=false; hv.bar.grp.visible=false; addExplosion(hv.group.position.clone().setY(1.0)); camShake=Math.min(1.3,camShake+0.5); hv.refDead=!!refDead; hv.respawnT=HARV.respawn; if(sameTeam(hv.team,PLAYER_TEAM)) showLevelToast('Supply Truck Lost', refDead?'Refinery down — no resupply':'Respawning in '+HARV.respawn+'s'); updateBaseHUD(); }
+function respawnHarvester(hv){ if(hv.parked)return; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); updateBaseHUD(); }
+function resetHarvesters(){ for(const hv of harvesters){ if(hv.parked)continue; hv.docks=0; const dk=harvDock(hv.team); hv.group.position.set(dk.x,0,dk.z); hv.group.rotation.y=0; hv.health=hv.maxHealth; hv.alive=true; hv.refDead=false; hv.state='toField'; hv.t=0; hv.hitFlash=0; hv.group.visible=true; hv.bar.grp.visible=true; updateHarvBar(hv); } updateBaseHUD(); }
+function siegeFireHarvester(en,hv){ if(teamOf(hv.team)===null||sameTeam(hv.team,en.team))return; _eF.copy(en.group.position);_eF.y=1.45; _eT.copy(hv.group.position);_eT.y=1.4; const dir=_v.copy(_eT).sub(_eF).normalize(); eM.copy(_eF).addScaledVector(dir,0.9); const al=sameTeam(en.team,PLAYER_TEAM);
+  const d2=_botShotD2(_eF.x,_eF.z,_eT.x,_eT.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;   // FX cull, as in enemyFire
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2<=cR*cR){ addMuzzle(eM,al?0xffd27a:0xff6a4a); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); }
+  damageHarvester(hv,T.enemySiegeDamage); }
 function updateHarvesters(dt){
   if(gameOver)return;
   for(const hv of harvesters){
-    const ref=findB(hv.team,'refinery');
+    if(hv.parked)continue;   // its team doesn't play on this map
+    const ix=TEAM_INDEX[teamOf(hv.team)], ref=ix?ix.refinery:null;
     if(hv.alive && (!ref || !ref.alive)){ destroyHarvester(hv,true); continue; }     // refinery dead → self-destruct, no respawn
     if(!hv.alive){ if(ref && ref.alive && !hv.refDead){ hv.respawnT-=dt; if(hv.respawnT<=0) respawnHarvester(hv); } continue; }
     if(hv.hitFlash>0) hv.hitFlash-=dt;
     const p=hv.group.position;
     if(hv.state==='toField' || hv.state==='toBase'){
-      const isF=hv.team==='friend'; let destX,destZ;
-      if(hv.state==='toField'){ destX=HARV.fieldX+(isF?-4:4); destZ=HARV.fieldZ; }
-      else { destX=ref?ref.mesh.position.x:0; destZ=ref?ref.mesh.position.z+(isF?-7:7):(isF?35:-35); }
+      let destX,destZ;
+      if(hv.state==='toField'){ destX=ix.laneX; destZ=ix.laneZ; }
+      else { destX=ix.dockX; destZ=ix.dockZ; }
       _hvDir.set(destX-p.x,0,destZ-p.z); const d=_hvDir.length();
       if(d>1.2){ _hvDir.multiplyScalar(1/d); p.x+=_hvDir.x*HARV.speed*dt; p.z+=_hvDir.z*HARV.speed*dt; hv.group.rotation.y=Math.atan2(_hvDir.x,_hvDir.z); }
       else if(hv.state==='toField'){ hv.state='loading'; hv.t=HARV.loadTime; }
@@ -781,14 +892,14 @@ function makeTechBoxMesh(){
   const band=new THREE.Mesh(new THREE.BoxGeometry(1.64,0.34,1.64), new THREE.MeshStandardMaterial({color:0x2a2718,roughness:0.55,metalness:0.4})); g.add(band);
   g.userData.crate=crate; noRay(g); g.visible=false; scene.add(g);
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(2.0,0.26), new THREE.MeshBasicMaterial({color:0x101010,transparent:true,opacity:0.85})); noRay(bg);
-  const fg=new THREE.Mesh(new THREE.PlaneGeometry(2.0,0.26), new THREE.MeshBasicMaterial({color:TEAM_COL.friend})); fg.position.z=0.01; noRay(fg);
+  const fg=new THREE.Mesh(new THREE.PlaneGeometry(2.0,0.26), new THREE.MeshBasicMaterial({color:TEAM_COL[PLAYER_TEAM]})); fg.position.z=0.01; noRay(fg);
   const bar=new THREE.Group(); bar.add(bg,fg); bar.visible=false; scene.add(bar);
   tboxMesh=g; tboxBar={grp:bar,fg,w:2.0};
 }
 const tbox={ active:false, idx:-1, owner:'neutral', prog:0, progTeam:null, timer:0, gap:TBOX.firstDelay, nextIdx:Math.floor(Math.random()*TBOX.points.length) };
 const tboxHudEl=document.getElementById('tboxHud'), tbNameEl=document.getElementById('tbName'), tbTimerEl=document.getElementById('tbTimer'), tbBarWrap=document.getElementById('tbBar'), tbBarFill=tbBarWrap?tbBarWrap.querySelector('i'):null;
 let _tbSec=-1;
-function tbRGB(team){ return team==='friend'?'56,225,176':team==='hostile'?'255,77,77':'181,166,66'; }
+function tbRGB(team){ const t=teamOf(team); return t===null?'181,166,66':(t===PLAYER_TEAM?'56,225,176':'255,77,77'); }
 function dressTechPoints(){
   techPts.forEach((tp,i)=>{
     let col=0x6b6038, emi=0.3, op=0.5;
@@ -799,10 +910,10 @@ function dressTechPoints(){
   });
 }
 function spawnTechBox(idx){ tbox.active=true; tbox.idx=idx; tbox.owner='neutral'; tbox.prog=0; tbox.progTeam=null; tbox.timer=TBOX.activeTime; const p=TBOX.points[idx]; tboxMesh.position.set(p.x,1.5,p.z); tboxMesh.userData.crate.material.color.setHex(TEAM_COL.neutral); tboxMesh.userData.crate.material.emissive.setHex(TEAM_COL.neutral); tboxMesh.visible=true; tboxBar.grp.visible=false; dressTechPoints(); _tbSec=-1; updateTboxHUD(); showLevelToast('Tech Box Live', p.name+' — capture it'); }
-function onTechCapture(team){ const nm=TBOX.points[tbox.idx].name; showLevelToast(team==='friend'?'Tech Box Captured':'Tech Box Taken', team==='friend'?nm+' — defend it':'Hostiles took '+nm); dressTechPoints(); updateTboxHUD(); }
+function onTechCapture(team){ const nm=TBOX.points[tbox.idx].name; const mine=sameTeam(team,PLAYER_TEAM); showLevelToast(mine?'Tech Box Captured':'Tech Box Taken', mine?nm+' — defend it':'Hostiles took '+nm); dressTechPoints(); updateTboxHUD(); }
 function cashOutTechBox(){
   const nm=TBOX.points[tbox.idx].name;
-  if(tbox.owner!=='neutral'){ addTech(tbox.owner, ECO.techBox); showLevelToast(tbox.owner==='friend'?'Tech Box Secured':'Tech Box Lost', tbox.owner==='friend'?'+'+ECO.techBox+' tech banked':'Hostiles banked +'+ECO.techBox+' tech'); }
+  if(tbox.owner!=='neutral'){ addTech(tbox.owner, ECO.techBox); const mine=sameTeam(tbox.owner,PLAYER_TEAM); showLevelToast(mine?'Tech Box Secured':'Tech Box Lost', mine?'+'+ECO.techBox+' tech banked':'Hostiles banked +'+ECO.techBox+' tech'); }
   else showLevelToast('Tech Box Expired', nm+' uncaptured');
   tbox.active=false; tboxMesh.visible=false; tboxBar.grp.visible=false; tbox.owner='neutral'; tbox.prog=0; tbox.progTeam=null; ps.channeling=false;
   let n=tbox.idx; if(TBOX.points.length>1){ while(n===tbox.idx) n=Math.floor(Math.random()*TBOX.points.length); } tbox.nextIdx=n; tbox.gap=TBOX.gap;
@@ -810,7 +921,7 @@ function cashOutTechBox(){
 }
 function resetTechBox(){ tbox.active=false; tbox.idx=-1; tbox.owner='neutral'; tbox.prog=0; tbox.progTeam=null; tbox.timer=0; tbox.gap=TBOX.firstDelay; tbox.nextIdx=Math.floor(Math.random()*TBOX.points.length); if(tboxMesh)tboxMesh.visible=false; if(tboxBar)tboxBar.grp.visible=false; ps.channeling=false; dressTechPoints(); _tbSec=-1; updateTboxHUD(); }
 function updateTboxHUD(){
-  if(!tboxHudEl)return;
+  if(!tboxHudEl||!TBOX.points.length)return;
   if(tbox.active){ tboxHudEl.style.borderColor='rgba('+tbRGB(tbox.owner)+',.5)'; if(tbNameEl){ tbNameEl.textContent=TBOX.points[tbox.idx].name; tbNameEl.style.color=TEAM_HEX[tbox.owner]; } }
   else { tboxHudEl.style.borderColor='rgba(181,166,66,.25)'; if(tbNameEl){ tbNameEl.textContent='Next · '+TBOX.points[tbox.nextIdx].name; tbNameEl.style.color='#cdb24a'; } }
 }
@@ -821,18 +932,23 @@ function updateTboxHUDTick(){
     if(tbBarWrap){ if(tbox.prog>0){ tbBarWrap.style.display='block'; if(tbBarFill){ tbBarFill.style.width=(tbox.prog*100).toFixed(0)+'%'; tbBarFill.style.background='rgba('+tbRGB(tbox.progTeam)+',.95)'; } } else tbBarWrap.style.display='none'; }
   } else { const g=Math.max(0,Math.ceil(tbox.gap)); if(g!==_tbSec){ _tbSec=g; if(tbTimerEl) tbTimerEl.textContent='in '+g+'s'; } if(tbBarWrap) tbBarWrap.style.display='none'; }
 }
+// Presence (three-teams item 7): count every team inside an objective's radius: you (when you qualify) for your team, every
+// active live bot for its own. Exactly one team present returns its id; none or two or more (contested) returns null.
+function presentTeam(x,z,r,youIn){ const P=TEAM_INDEX.presence, r2=r*r; P.fill(0);
+  if(youIn) P[TEAM_INDEX[PLAYER_TEAM].idx]++;
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s]; if(!en.active||!en.alive)continue; const dx=en.group.position.x-x, dz=en.group.position.z-z; if(dx*dx+dz*dz<=r2) P[TEAM_INDEX[en.team].idx]++; }
+  let team=null; for(let i=0;i<P.length;i++){ if(P[i]>0){ if(team!==null) return null; team=TEAMS[i].id; } } return team; }
 function updateTechBox(dt){
   if(gameOver){ ps.channeling=false; return; }
+  if(!TBOX.points.length) return;
   if(!tbox.active){ tbox.gap-=dt; if(tbox.gap<=0) spawnTechBox(tbox.nextIdx); updateTboxHUDTick(); return; }
   tbox.timer-=dt;
   const p=TBOX.points[tbox.idx];
   const pdx=player.position.x-p.x, pdz=player.position.z-p.z; const pIn=(pdx*pdx+pdz*pdz)<=TBOX.range*TBOX.range;
   const playerCh = pIn && !ps.dead && keys['KeyE'];
-  let enemyCh=false; for(const en of enemies){ if(!en.alive)continue; const ex=en.group.position.x-p.x, ez=en.group.position.z-p.z; if(ex*ex+ez*ez<=TBOX.range*TBOX.range){ enemyCh=true; break; } }
-  ps.channeling = playerCh && tbox.owner!=='friend';
+  ps.channeling = playerCh && !sameTeam(tbox.owner,PLAYER_TEAM);
   if(ps.channeling && charge.active) endCharge();
-  let chTeam=null;
-  if(playerCh && !enemyCh) chTeam='friend'; else if(enemyCh && !playerCh) chTeam='hostile';
+  const chTeam=presentTeam(p.x,p.z,TBOX.range,playerCh);   // you count only while channelling E; bots by standing in the ring
   if(chTeam && tbox.owner!==chTeam){
     if(tbox.progTeam!==chTeam){ tbox.prog=0; tbox.progTeam=chTeam; }
     tbox.prog += dt/TBOX.captureTime;
@@ -853,7 +969,8 @@ function updateTechBox(dt){
  * Each silo a team holds adds ECO.paySilo cr/sec to that team's trickle (the player's cash). An
  * enemy on the pad contests (freezes/decays); clear them to flip it. Bots capture incidentally as
  * the front line crosses the pads. teamEco.<team>.silos (recounted on every flip) drives income. */
-const SILO={ points:DM_Cabana.silos, range:5, captureTime:3.5 };
+const SILO={ points:[], pool:[], range:5, captureTime:3.5 };   // points: the map's silos (own objects from pool; placeObjectives)
+for(let i=0;i<3;i++){ const c=DM_Cabana.silos[i]; SILO.pool.push({x:c?c.x:0, z:c?c.z:0}); if(c)SILO.points.push(SILO.pool[i]); }
 const silos=[]; const siloRateEl=document.getElementById('siloRate');
 function makeSilo(pt){
   const g=new THREE.Group(); g.position.set(pt.x,0,pt.z);
@@ -865,25 +982,24 @@ function makeSilo(pt){
   const lbl=makeLabel('SILO','#cdb24a'); lbl.position.y=4.6; g.add(lbl);
   scene.add(g);
   const bg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.22), new THREE.MeshBasicMaterial({color:0x101010,transparent:true,opacity:0.85})); noRay(bg);
-  const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.22), new THREE.MeshBasicMaterial({color:TEAM_COL.friend})); fg.position.z=0.01; noRay(fg);
+  const fg=new THREE.Mesh(new THREE.PlaneGeometry(1.8,0.22), new THREE.MeshBasicMaterial({color:TEAM_COL[PLAYER_TEAM]})); fg.position.z=0.01; noRay(fg);
   const bar=new THREE.Group(); bar.add(bg,fg); bar.position.set(pt.x,4.0,pt.z); bar.visible=false; scene.add(bar);
-  return {pt, group:g, ring, band, owner:'neutral', prog:0, progTeam:null, bar:{grp:bar,fg,w:1.8}};
+  return {pt, group:g, ring, band, owner:'neutral', prog:0, progTeam:null, on:true, bar:{grp:bar,fg,w:1.8}};
 }
 function dressSilo(s){ const c=TEAM_COL[s.owner]; s.band.material.color.setHex(c); s.band.material.emissive.setHex(c); s.ring.material.color.setHex(c); s.ring.material.opacity=s.owner==='neutral'?0.45:0.8; }
-function updateSiloHUD(){ silos.forEach((s,i)=>{ const d=document.querySelector('.silo-dot[data-s="'+i+'"]'); if(d) d.style.background='rgba('+tbRGB(s.owner)+',.95)'; }); if(siloRateEl) siloRateEl.textContent='+'+(ECO.paySilo*teamEco.friend.silos)+' cr/s'; }
-function recountSilos(){ let f=0,hh=0; for(const s of silos){ if(s.owner==='friend')f++; else if(s.owner==='hostile')hh++; } teamEco.friend.silos=f; teamEco.hostile.silos=hh; updateSiloHUD(); }
-function resetSilos(){ for(const s of silos){ s.owner='neutral'; s.prog=0; s.progTeam=null; s.bar.grp.visible=false; dressSilo(s); } teamEco.friend.silos=0; teamEco.hostile.silos=0; updateSiloHUD(); }
+function updateSiloHUD(){ silos.forEach((s,i)=>{ const d=document.querySelector('.silo-dot[data-s="'+i+'"]'); if(d) d.style.background='rgba('+tbRGB(s.owner)+',.95)'; }); if(siloRateEl) siloRateEl.textContent='+'+(ECO.paySilo*teamEco[PLAYER_TEAM].silos)+' cr/s'; }
+function recountSilos(){ for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].silos=0; for(const s of silos){ const id=teamOf(s.owner); if(id)teamEco[id].silos++; } updateSiloHUD(); }
+function resetSilos(){ for(const s of silos){ s.owner='neutral'; s.prog=0; s.progTeam=null; s.bar.grp.visible=false; dressSilo(s); } for(let i=0;i<TEAMS.length;i++) teamEco[TEAMS[i].id].silos=0; updateSiloHUD(); }
 function updateSilos(dt){
   if(gameOver)return;
-  for(const s of silos){
+  for(const s of silos){ if(!s.on)continue;   // pooled silo the map doesn't use
     const p=s.pt;
     const pdx=player.position.x-p.x, pdz=player.position.z-p.z; const fIn=(pdx*pdx+pdz*pdz)<=SILO.range*SILO.range && !ps.dead;
-    let hIn=false; for(const en of enemies){ if(!en.alive)continue; const ex=en.group.position.x-p.x, ez=en.group.position.z-p.z; if(ex*ex+ez*ez<=SILO.range*SILO.range){ hIn=true; break; } }
-    let chTeam=null; if(fIn && !hIn) chTeam='friend'; else if(hIn && !fIn) chTeam='hostile';
+    const chTeam=presentTeam(p.x,p.z,SILO.range,fIn);
     if(chTeam && s.owner!==chTeam){
       if(s.progTeam!==chTeam){ s.prog=0; s.progTeam=chTeam; }
       s.prog += dt/SILO.captureTime;
-      if(s.prog>=1){ s.owner=chTeam; s.prog=0; s.progTeam=null; dressSilo(s); recountSilos(); if(chTeam==='friend') showLevelToast('Silo Captured','+'+ECO.paySilo+' cr/s'); }
+      if(s.prog>=1){ s.owner=chTeam; s.prog=0; s.progTeam=null; dressSilo(s); recountSilos(); if(sameTeam(chTeam,PLAYER_TEAM)) showLevelToast('Silo Captured','+'+ECO.paySilo+' cr/s'); }
     } else if(s.prog>0){ s.prog=Math.max(0,s.prog-dt/SILO.captureTime); if(s.prog<=0) s.progTeam=null; }
     if(s.prog>0 && s.progTeam){ s.bar.grp.visible=true; const f=s.prog; s.bar.fg.scale.x=f; s.bar.fg.position.x=-(s.bar.w*(1-f))/2; s.bar.fg.material.color.setHex(TEAM_COL[s.progTeam]); }
     else s.bar.grp.visible=false;
@@ -1007,13 +1123,13 @@ function updateAim(){
   if(raycaster.ray.intersectPlane(groundPlane,_v)) aimGround.copy(_v);
   // hit resolution through the HEADLESS math core — no per-frame array/raycast allocation
   syncSimWorld();
-  const r=resolveShot(SIM,SIM_PLAYER, o.x,o.y,o.z, d.x,d.y,d.z, 400);
+  const r=resolveShot(SIM,SIM_PLAYER, o.x,o.y,o.z, d.x,d.y,d.z, 400, teamFilter(PLAYER_TEAM));
   aimHoverEnemy=false; aimPart=null; aimTarget=false; aimBlocked=false;
   if(r.kind==='none'){ aimPoint.copy(aimGround); }
   else { aimPoint.set(r.px,r.py,r.pz);
-    if(r.kind==='enemy'&&enemies[r.id-1]&&enemies[r.id-1].alive){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; }
-    else if(r.kind==='building'&&buildings[r.id]&&buildings[r.id].alive&&buildings[r.id].team==='hostile'){ aimTarget=true; }
-    else if(r.kind==='harvester'&&harvesters[r.id]&&harvesters[r.id].alive&&harvesters[r.id].team==='hostile'){ aimTarget=true; }
+    if(r.kind==='enemy'){ const so=SOLDIERS[r.id]; if(so&&so!==ps&&so.alive&&!sameTeam(so.team,PLAYER_TEAM)){ aimHoverEnemy=true; aimPart=r.part; aimTarget=true; } }   // with friendly fire on, an ally can be hit but never reads as a target
+    else if(r.kind==='building'&&buildings[r.id]&&buildings[r.id].alive&&teamOf(buildings[r.id].team)!==null&&!sameTeam(buildings[r.id].team,PLAYER_TEAM)){ aimTarget=true; }
+    else if(r.kind==='harvester'&&harvesters[r.id]&&harvesters[r.id].alive&&teamOf(harvesters[r.id].team)!==null&&!sameTeam(harvesters[r.id].team,PLAYER_TEAM)){ aimTarget=true; }
     else if(r.kind==='building'||r.kind==='block'||r.kind==='harvester'){ aimBlocked=true; } }
 }
 const _ms=new THREE.Vector3(),_adir=new THREE.Vector3(),_aq=new THREE.Quaternion(),_aup=new THREE.Vector3(0,1,0);
@@ -1059,7 +1175,7 @@ function equipSpecial(){ const si=WEAPONS.findIndex(w=>w.special); if(si<0)retur
 function unitStatus(i){ const u=UNIT_TYPES[i]; if(!u) return {state:'era'};
   if(ps.unit===i) return {state:'active'};
   if(unitOwned[i]) return {state:'equip'};
-  if((u.tier||1) > teamEco.friend.era) return {state:'era'};
+  if((u.tier||1) > teamEco[PLAYER_TEAM].era) return {state:'era'};
   if((u.cost||0)>0 && credits < u.cost*priceMult()) return {state:'poor'};
   return {state:(u.cost||0)>0 ? 'buy' : 'equip'}; }
 function pickClass(i){ const u=UNIT_TYPES[i]; const st=unitStatus(i);
@@ -1190,11 +1306,11 @@ function _jugFirePilot(jug, idx){
   _jugV2.normalize();
   if(typeof syncSimWorld==='function' && typeof resolveShot==='function'){
     syncSimWorld();
-    const r=resolveShot(SIM,SIM_PLAYER,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range);
+    const r=resolveShot(SIM,SIM_PLAYER,_jugV.x,_jugV.y,_jugV.z,_jugV2.x,_jugV2.y,_jugV2.z,JUG_CANNON.range,teamFilter(PLAYER_TEAM));
     _jugV3.set(r.px,r.py,r.pz);
     if(typeof addTracer==='function') addTracer(_jugV,_jugV3,JUG_CANNON.tracer);
-    if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
-    else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&b.team==='hostile'&&typeof damageBuilding==='function') damageBuilding(b,JUG_CANNON.damage); }
+    if(r.kind==='enemy'){ const en=SOLDIERS[r.id]; if(en&&en!==ps&&en.alive) damageEnemy(en,JUG_CANNON.damage,r.part,_jugV3,true); }
+    else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&teamOf(b.team)!==null&&!sameTeam(b.team,PLAYER_TEAM)&&typeof damageBuilding==='function') damageBuilding(b,JUG_CANNON.damage); }
     if(typeof addExplosion==='function') addExplosion(_jugV3);
   }
 }
@@ -1239,7 +1355,7 @@ function tickJuggernauts(dt, tt){
   }
 }
 function vehicleStatus(id){ const v=VEHICLE_TYPES.find(x=>x.id===id); if(!v) return {state:'na'};
-  if((v.tier||1) > teamEco.friend.era) return {state:'era'};
+  if((v.tier||1) > teamEco[PLAYER_TEAM].era) return {state:'era'};
   if((v.cost||0)>0 && credits < v.cost*priceMult()) return {state:'poor'};
   return {state:'buy'}; }
 function buyVehicle(id){ const v=VEHICLE_TYPES.find(x=>x.id===id); if(!v) return; if(vehicleStatus(id).state!=='buy') return;
@@ -1252,7 +1368,7 @@ function spawnVehicle(id){ const v=VEHICLE_TYPES.find(x=>x.id===id); if(!v)retur
     const pal=FACTION_PALETTES[PLAYER_FACTION]||FACTION_PALETTES.Allies; const g=buildJuggernaut(pal.FactionPrimary, pal.HighlightTrim);
     const ry=player.rotation.y, bx=player.position.x-Math.sin(ry)*7, bz=player.position.z-Math.cos(ry)*7;
     g.position.set(bx,0,bz); g.rotation.y=ry; scene.add(g);
-    juggernauts.push({ group:g, alive:true, health:v.maxHealth||1500, target:null, fireCd:1.2, rippleActive:false, rippleIdx:0, rippleT:0 });
+    juggernauts.push({ group:g, alive:true, health:v.maxHealth||1500, target:null, fireCd:1.2, rippleActive:false, rippleIdx:0, rippleT:0, team:PLAYER_TEAM });   // the cannon's attacker is its pilot
     showLevelToast('Juggernaut deployed', 'Heavy artillery online');
   } else { showLevelToast('Deploying', v.name+' \u2014 coming soon'); } }
 function useAbility(){
@@ -1290,7 +1406,7 @@ function throwMolotov(){ animThrow(player);
   getMuzzle(player,_p2); throwVelocity(_thrV,_p2,'nade');
   const m=new THREE.Mesh(new THREE.SphereGeometry(0.24,10,8), new THREE.MeshStandardMaterial({ color:0x5a2f16, roughness:0.5, emissive:0xff5a1a, emissiveIntensity:0.6 }));
   m.position.copy(_p2); m.castShadow=true; noRay(m); stylizeOne(m,0.035); scene.add(m);
-  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.4, molotov:true });
+  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.4, molotov:true, ownerId:SIM_PLAYER, team:PLAYER_TEAM });
   camRecoil+=0.6; camShake+=0.1;
 }
 function startReload(){const w=curW(),l=curL();if(ps.reloading||l.ammo===w.mag||l.reserve<=0||ps.dead)return;ps.reloading=true;ps.reloadT=0;sfxReload(0);document.getElementById('reloadBar').style.opacity='1';}
@@ -1322,14 +1438,14 @@ function pitchWeapon(s,target){
  * (Stage 1: decouple simulation from the view layer. Tick = 60 Hz authoritative.)
  * ========================================================================== */
 let _frameId=0, _simFrame=-1;   // once-per-frame guard for syncSimWorld (F1): all in-frame callers capture identical positions
-const SIM_PLAYER=0;   // the player's SIM id; bot ids are their enemies index + 1 (every player-side shot passes it, so it never self-hits)
+const SIM_PLAYER=0;   // the player's SIM id and SOLDIERS slot; a bot's SIM id is its slot en.id (= enemies index + 1); every player-side shot passes it, so it never self-hits
 const _hpV=new THREE.Vector3(), _hnV=new THREE.Vector3(), _dmgPt=new THREE.Vector3();
 function syncSimWorld(force){
   if(!force && _simFrame===_frameId) return;   // F1: already synced this frame; positions dont change between in-frame callers
   _simFrame=_frameId;
-  const P=SIM.players; P.length=enemies.length+1;   // P[0] is the player (id SIM_PLAYER), P[i+1] is enemies[i] (id i+1)
-  { let e=P[0]||(P[0]={}); const pos=player.position; e.id=SIM_PLAYER; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=!ps.dead; e.stance=0; }
-  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; let e=P[i+1]||(P[i+1]={}); const pos=en.group.position; e.id=i+1; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=en.alive; e.stance=0; }
+  const P=SIM.players; P.length=SOLDIERS.length;   // one entry per slot: P[s] is SOLDIERS[s] (P[0] the player, id SIM_PLAYER); parked slots are alive=false
+  { let e=P[0]||(P[0]={id:0,x:0,y:0,z:0,alive:false,stance:0,team:null}); const pos=player.position; e.id=SIM_PLAYER; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=!ps.dead; e.stance=0; e.team=PLAYER_TEAM; }
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s]; let e=P[s]||(P[s]={id:0,x:0,y:0,z:0,alive:false,stance:0,team:null}); const pos=en.group.position; e.id=en.id; e.x=pos.x; e.y=pos.y; e.z=pos.z; e.alive=en.active&&en.alive; e.stance=0; e.team=en.team; }
   const S=SIM.statics; let n=0; for(let i=0;i<S.length;i++) S[i].rot=false;   // slots are reused: only oriented obstacles set rot below
   for(let i=0;i<buildings.length;i++){ const b=buildings[i],bx=b.box; let s=S[n]||(S[n]={}); s.kind='building'; s.id=i; s.alive=b.alive; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   for(let i=0;i<obstacles.length;i++){ const o=obstacles[i],bx=o.box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z;
@@ -1339,7 +1455,7 @@ function syncSimWorld(force){
   const rampLo=n;   // ramp slots: their boxes stand in for slopes, so bot fire skips them (main's losMeshes never held ramps)
   for(let i=0;i<ramps.length;i++){ const bx=ramps[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   const rampHi=n;
-  for(let i=0;i<houses.length;i++){ const bs=houses[i].boxes||[houses[i].box]; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
+  for(let i=0;i<houses.length;i++){ const hb=houses[i].boxes, nb=hb?hb.length:1; for(let k=0;k<nb;k++){ const bx=hb?hb[k]:houses[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<covers.length;i++){ if(!covers[i].los||!covers[i].boxes)continue; const bs=covers[i].boxes; for(let k=0;k<bs.length;k++){ const bx=bs[k]; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; } }
   for(let i=0;i<trees.length;i++){ if(!trees[i].los||!trees[i].box)continue; const bx=trees[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }for(let i=0;i<props.length;i++){ if(!props[i].los||!props[i].box)continue; const bx=props[i].box; let s=S[n]||(S[n]={}); s.kind='block'; s.id=-1; s.alive=true; s.minx=bx.min.x;s.miny=bx.min.y;s.minz=bx.min.z;s.maxx=bx.max.x;s.maxy=bx.max.y;s.maxz=bx.max.z; n++; }
   S.length=n;
@@ -1370,24 +1486,73 @@ function castShot(origin,dir,w,vis){
   // Hit detection now runs through the HEADLESS pure-math core (resolveShot),
   // NOT THREE.Raycaster. The raycaster remains only for the cosmetic aim dot.
   syncSimWorld();
-  const r=resolveShot(SIM,SIM_PLAYER, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range);
+  const r=resolveShot(SIM,SIM_PLAYER, origin.x,origin.y,origin.z, dir.x,dir.y,dir.z, w.range, teamFilter(PLAYER_TEAM));
   _hpV.set(r.px,r.py,r.pz); _hnV.set(r.nx,r.ny,r.nz);
   const dmg=w.damage*falloffMult(w,origin.distanceTo(_hpV));
   addTracer(vis||origin,_hpV,w.tracer);
-  if(r.kind==='enemy'){ const en=enemies[r.id-1]; if(en&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
-  else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&b.team==='hostile'){ damageBuilding(b,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
-  else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&hv.team==='hostile'){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
+  if(r.kind==='enemy'){ const en=SOLDIERS[r.id]; if(en&&en!==ps&&en.alive){ damageEnemy(en,dmg,r.part,_hpV,false,w.headMult); addImpact(_hpV,_hnV,'flesh'); } else addImpact(_hpV,_hnV,'dirt'); }
+  else if(r.kind==='building'){ const b=buildings[r.id]; if(b&&b.alive&&teamOf(b.team)!==null&&!sameTeam(b.team,PLAYER_TEAM)){ damageBuilding(b,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
+  else if(r.kind==='harvester'){ const hv=harvesters[r.id]; if(hv&&hv.alive&&teamOf(hv.team)!==null&&!sameTeam(hv.team,PLAYER_TEAM)){ damageHarvester(hv,dmg); showHitmarker(false,false); } addImpact(_hpV,_hnV,'metal'); }
   else addImpact(_hpV,_hnV,'dirt');
 }
+// Two-layer damage (three-teams item 6). applyDamage changes the state (incl. addTech, whose HUD writes and era toasts are
+// economy-side, ADR-001 debt) and returns the amount applied (0 when guarded
+// or dropped); onDamageEvent presents it. a and v are SIM ids (SOLDIERS slots); a=-1 means no known attacker. The caller
+// computes the final amount; kind ('bullet' | 'blast' | 'melee') only skips the shield (blast) and is reported. The event
+// record is reused, so it is consumed synchronously. kills, roundDeaths and credits stay the local player's globals,
+// written only on the player's branch. A caller with a=SIM_PLAYER sets _dmgPt (the damage-number anchor) first.
+const _dmgEv={ a:-1, v:-1, amount:0, part:'body', kind:'bullet', srcX:0, srcZ:0, killed:false, credited:false, shielded:false,
+  _fwd:new THREE.Vector3(), _to:new THREE.Vector3(), _cf:new THREE.Vector3(), _from:new THREE.Vector3(), _bt:new THREE.Vector3() };   // scratch vectors ride on the record: no per-hit allocation
+function applyDamage(a,v,amount,part,kind,srcX,srcZ){
+  const V=SOLDIERS[v]; if(!V||gameOver) return 0;   // gameOver guards every victim (R15): nothing pays out after VICTORY / DEFEAT
+  const isP=(v===SIM_PLAYER);
+  if(isP){ if(ps.dead||pilotJug||DEV.god) return 0; }   // piloting: the mech takes the hits, not the soldier
+  else if(!V.active||!V.alive) return 0;
+  const A=(a>=0)?(SOLDIERS[a]||null):null, other=!!A&&a!==v;
+  if(other&&!TUNE.ff&&sameTeam(A.team,V.team)) return 0;   // teammates: dropped (rays and blasts already skip them upstream)
+  const E=_dmgEv; E.shielded=false;
+  if(isP&&ps.shieldOn&&kind!=='blast'){ const fw=E._fwd.set(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y)), to=E._to.set(srcX-player.position.x,0,srcZ-player.position.z);
+    if(to.lengthSq()>1e-4){ to.normalize(); if(to.dot(fw)>T.shieldArcCos){ amount*=(1-T.shieldBlock); E.shielded=true; } } }
+  let killed=false;
+  if(isP){ ps.health-=amount; ps.lastHitT=0; if(other)ps.lastAttackerId=a;
+    if(ps.health<=0){ killed=true; ps.dead=true; ps.alive=false; const sp=SIM.players[SIM_PLAYER]; if(sp)sp.alive=false; ps.deadT=T.respawnDelay; ps.downs++; } }
+  else { V.health-=amount; V.hitFlash=0.12; V.state='engage'; if(other)V.lastAttackerId=a;
+    if(V.health<=0){ killed=true; V.alive=false; const sp=SIM.players[v]; if(sp)sp.alive=false; V.topple=0; V.respawnT=T.enemyRespawn; V.downs++; } }
+  // credit: a kill by a soldier of another team (a suicide or, with ff on, a teamkill credits nobody)
+  const credited=killed&&other&&!sameTeam(A.team,V.team); E.credited=credited;
+  if(credited){ A.frags++; if(a===SIM_PLAYER){ kills++; credits+=T.killReward; } addTech(A.team, part==='head'?ECO.techPerHeadshot:ECO.techPerKill); }
+  E.a=a; E.v=v; E.amount=amount; E.part=part; E.kind=kind; E.srcX=srcX; E.srcZ=srcZ; E.killed=killed;
+  onDamageEvent(E); return amount;
+}
+// Presentation in two tiers (K3): the victim's body reacts and falls for every event, wherever it is; local feedback
+// (numbers, marker, XP, SFX, vignette, comics, HUD, camera) only when the local player is the attacker or the victim.
+function onDamageEvent(E){
+  const isP=(E.v===SIM_PLAYER), V=SOLDIERS[E.v], head=(E.part==='head');
+  if(isP) animHit(player,E.srcX,E.srcZ,E.amount/40);
+  else { animHit(V.group,E.srcX,E.srcZ,E.amount/40); if(E.killed) deathStart(V.group,E.srcX,E.srcZ); }
+  if(E.a===SIM_PLAYER&&!isP){
+    spawnDamageNumber(_dmgPt, Math.round(E.amount), head, E.killed);
+    showHitmarker(E.killed, head);
+    if(E.killed&&E.credited){ onKill(curW().id,head); if(head)onHeadshotKill(); else sfxKill(); if(head||curW().melee)triggerVignette(V,curW().melee?'melee':'headshot'); updateHostileCount(); updateCreditHUD(); comicKill(E._bt.copy(V.group.position).setY(1.8)); }
+  }
+  if(isP){
+    if(E.shielded){ ps.shieldFlash=1; camShake+=0.08; }
+    camShake+=0.4;
+    const inten=Math.min(1,E.amount/14+(1-ps.health/ps.maxHealth)*0.5);
+    vignette.style.boxShadow=`inset 0 0 160px rgba(255,40,40,${0.22+inten*0.35})`;
+    setTimeout(()=>{vignette.style.boxShadow=ps.health<30?'inset 0 0 160px rgba(255,40,40,0.16)':'inset 0 0 160px rgba(255,40,40,0)';},120);
+    const toA=_v.set(E.srcX-player.position.x,0,E.srcZ-player.position.z), cf=E._cf; camera.getWorldDirection(cf); cf.y=0; cf.normalize();
+    const ang=Math.atan2(toA.x,toA.z)-Math.atan2(cf.x,cf.z); wedgeEl.style.transform=`rotate(${-ang}rad)`; dmgDirEl.style.opacity='1'; dmgDirT=0.8; if(toA.lengthSq()>1e-4){ _od.copy(toA).normalize(); camKickVel.addScaledVector(_od,-Math.min(7,E.amount*0.5)); camKickVel.y+=1.2; }
+    updateHealthHUD(); if(E.killed) playerDie();
+  }
+}
+// The player's weapons on a soldier: multipliers here, state in applyDamage (attacker SIM_PLAYER, source = you).
 function damageEnemy(en,dmg,part,point,flat,hsMult){
   part=part||'body';
   const mult=part==='head'?(hsMult||T.headMult):part==='legs'?T.legMult:T.bodyMult;
-  const final=flat?dmg:dmg*mult; en.health-=final; en.hitFlash=0.12; en.state='engage';
-  const pt=point?_dmgPt.copy(point):_dmgPt.copy(en.group.position).setY(1.6);
-  const killed=en.health<=0&&en.alive;
-  spawnDamageNumber(pt, Math.round(final), part==='head', killed);
-  showHitmarker(killed, part==='head');
-  animHit(en.group,player.position.x,player.position.z,dmg/40);if(killed){en.alive=false;{ const sp=SIM.players[enemies.indexOf(en)+1]; if(sp)sp.alive=false; }en.topple=0;deathStart(en.group,player.position.x,player.position.z);en.respawnT=T.enemyRespawn;kills++;en.downs=(en.downs||0)+1;credits+=T.killReward;addTech('friend',part==='head'?ECO.techPerHeadshot:ECO.techPerKill);onKill(curW().id,part==='head');if(part==='head')onHeadshotKill();else sfxKill();if(part==='head'||curW().melee)triggerVignette(en,curW().melee?'melee':'headshot');updateHostileCount();updateCreditHUD();comicKill(en.group.position.clone().setY(1.8));}
+  const final=flat?dmg:dmg*mult;
+  if(point)_dmgPt.copy(point); else _dmgPt.copy(en.group.position).setY(1.6);
+  return applyDamage(SIM_PLAYER,en.id,final,part,flat?'melee':'bullet',player.position.x,player.position.z);
 }
 
 /* buildings dmg */
@@ -1396,42 +1561,91 @@ function damageBuilding(b,d){
   if(b.health<=0){b.alive=false;b.sink=0;addExplosion(b.mesh.position.clone().setY(b.mesh.geometry.parameters.height/2));camShake+=0.6;b.trim.material.emissiveIntensity=0;b.label.visible=false;b.bar.grp.visible=false;updateBaseHUD();checkEnd();}
   else updateBaseHUD();
 }
-function nearestFriendlyBuilding(p){let best=null,bd=1e9;buildings.forEach(b=>{if(b.team==='friend'&&b.alive){const d=b.mesh.position.distanceTo(p);if(d<bd){bd=d;best=b;}}});return best;}
+// Siege target (three-teams item 7): the nearest live structure of another active team, by XZ distance; a truck wins when
+// it is nearer than that building and within 42 m (today's opportunistic rule). Indexed loops, no allocation.
+function nearestEnemyStructure(en){ const p=en.group.position; let bb=null,bd=1e18,hb=null,hd=1e18;
+  const pt=(en.pushTeam&&TEAM_INDEX[en.pushTeam]&&TEAM_INDEX[en.pushTeam].active&&en.pushTeam!==en.team)?en.pushTeam:null;   // push: that team's base first (alternates per respawn)
+  for(let pass=0;pass<2&&!bb;pass++) for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id===en.team||(pass===0&&pt&&id!==pt))continue; const e=TEAM_INDEX[id]; if(!e.active)continue;
+    const bl=e.blds; for(let k=0;k<bl.length;k++){ const b=bl[k]; if(!b.alive)continue; const dx=b.mesh.position.x-p.x, dz=b.mesh.position.z-p.z, d=dx*dx+dz*dz; if(d<bd){bd=d;bb=b;} } }
+  for(let i=0;i<harvesters.length;i++){ const h=harvesters[i]; if(!h.alive||h.parked||teamOf(h.team)===null||sameTeam(h.team,en.team))continue; const dx=h.group.position.x-p.x, dz=h.group.position.z-p.z, d=dx*dx+dz*dz; if(d<hd){hd=d;hb=h;} }
+  if(en.role==='hunt'&&hb) return hb;   // hunt: other teams' trucks first
+  return (hb&&hd<bd&&hd<42*42)?hb:bb; }
+function nearestFriendlyBuilding(p){const bl=TEAM_INDEX[PLAYER_TEAM].blds;let best=null,bd=1e9;for(let i=0;i<bl.length;i++){const b=bl[i];if(b.alive){const d=b.mesh.position.distanceTo(p);if(d<bd){bd=d;best=b;}}}return best;}
 // ---- Phase 5A: enemy verticality helpers ----
 const EJUMP_REACH = T.jumpV*T.jumpV/(2*T.gravity) + T.stepUp;   // ~3.07m: highest surface an agent can gain by jumping
+// Bot targeting (three-teams item 8). AI_STATE holds the line-of-sight budget (TUNE.ai.losPerS checks per game second, banked
+// up to losCapS worth), so the work per game second is the same at 60 and 144 fps. acquireTarget re-scans every retargetS
+// (staggered by slot) for the nearest visible soldier of another team within T.enemyDetect: a min-scan over SIM.players
+// in slot order (ties to the lower id) that resumes from scanCursor when the budget runs out; the current target's
+// sight is re-checked every losRecheckS from the same budget. Eye and aim points follow both heights (NC-1).
+const AI_STATE={ budget:0, checks:0, scans:0, step:0,   // step: update() count; the bot loop starts one slot later each step, so no slot is always served first
+  rotatePush(en){ const n=TEAMS.length; let k=0; for(let i=0;i<n;i++) if(TEAMS[i].id===en.pushTeam) k=i+1;   // the next active other team after the current one
+    for(let j=0;j<n;j++){ const id=TEAMS[(k+j)%n].id; if(id!==en.team&&TEAM_INDEX[id].active){ en.pushTeam=id; return; } } en.pushTeam=null; } };
+function acquireTarget(en,dt){
+  const P=SIM.players, me=P[en.id], A=AI_STATE, det2=T.enemyDetect*T.enemyDetect, ai=TUNE.ai;
+  if(en.targetId>=0){ const t=P[en.targetId], dx=t.x-me.x, dz=t.z-me.z;
+    if(!t.alive||t.team===en.team||dx*dx+dz*dz>=det2){ en.targetId=-1; en.targetVis=false; }
+    else { en.losT+=dt; if(en.losT>=ai.losRecheckS&&A.budget>=1){ en.losT-=ai.losRecheckS; if(en.losT>=ai.losRecheckS)en.losT=0; A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(t.x,t.y+1.45,t.z); en.targetVis=hasLOS(_eEyes,_ePc); } } }
+  en.retargetT-=dt;
+  if(en.retargetT>0&&en.scanCursor===0) return;
+  if(en.scanCursor===0){ en.scanBestId=-1; en.scanBestD2=det2; }
+  let s=en.scanCursor;
+  for(;s<P.length;s++){ const p=P[s]; if(s===en.id||!p.alive||p.team===en.team)continue; const dx=p.x-me.x, dz=p.z-me.z, d2=dx*dx+dz*dz; if(d2>=en.scanBestD2)continue;
+    if(A.budget<1) break;   // out of budget: resume from here next frame
+    A.budget--; A.checks++; _eEyes.set(me.x,me.y+1.45,me.z); _ePc.set(p.x,p.y+1.45,p.z); if(hasLOS(_eEyes,_ePc)){ en.scanBestId=s; en.scanBestD2=d2; } }
+  if(s<P.length){ en.scanCursor=s; return; }
+  en.scanCursor=0; A.scans++; en.retargetT=Math.max(0,en.retargetT+ai.retargetS);   // carry the overshoot: one scan per retargetS at any frame rate
+  en.targetId=en.scanBestId; en.targetVis=en.scanBestId>=0; en.losT=0;
+}
 function rampLowEnd(o){ const c=Math.cos(o.rot), s=Math.sin(o.rot), lx=-o.w/2; return {x:o.x+c*lx, z:o.z-s*lx}; }   // world XZ of a ramp's low edge
 // When the player is higher than an enemy can jump to, steer it toward the nearest ramp's base until it starts climbing; returns true if redirected.
-function enemyClimbSteer(en, mv){ const eh=en.group.position.y; if(player.position.y<=eh+EJUMP_REACH) return false;
+function enemyClimbSteer(en, mv, ty){ const eh=en.group.position.y; if(ty<=eh+EJUMP_REACH) return false;   // ty: the target's feet height
   let best=null,bd=1e9; for(let i=0;i<ramps.length;i++){ const r=ramps[i], dx=r.x-en.group.position.x, dz=r.z-en.group.position.z, d=dx*dx+dz*dz; if(d<bd){bd=d;best=r;} }
-  if(!best) return false; const le=rampLowEnd(best), dLE=hyp2(le.x-en.group.position.x, le.z-en.group.position.z);
-  if(dLE>3.5 && eh<0.8){ mv.set(le.x-en.group.position.x,0,le.z-en.group.position.z); if(mv.lengthSq()>0)mv.normalize(); return true; }
+  if(!best) return false; const rc=Math.cos(best.rot), rs=Math.sin(best.rot), lex=best.x-rc*best.w/2, lez=best.z+rs*best.w/2, dLE=hyp2(lex-en.group.position.x, lez-en.group.position.z);   // rampLowEnd inlined: no object per call
+  if(dLE>3.5 && eh<0.8){ mv.set(lex-en.group.position.x,0,lez-en.group.position.z); if(mv.lengthSq()>0)mv.normalize(); return true; }
   return false; }
 
 /* enemy fire */
 const eM=new THREE.Vector3(), _eF=new THREE.Vector3(), _eT=new THREE.Vector3(), _eEnd=new THREE.Vector3(), _zAxis=new THREE.Vector3(0,0,1);   // enemy-fire scratch + siege impact normal (B2a)
-const _eHitN=new THREE.Vector3(), _botFireWorld={ players:[null], statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view
+const _eHitN=new THREE.Vector3(), _botFireWorld={ players:SIM.players, statics:[], groundY:0, _res:{}, _nrm:[0,0,0,0] };   // bot-fire impact normal + its SIM view: the same soldiers, statics without ramps (K1)
 function enemyFire(en){
   en._aimT=1.4;   // raise the gun to the aim stance while shooting (cosmetic)
   const eu=unitOf(en.unit);
-  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[0];   // aim at the same player snapshot the hit test uses
+  const ep=en.group.position; syncSimWorld(); const P0=SIM.players[en.targetId>=0?en.targetId:SIM_PLAYER];   // aim at the target's SIM snapshot, the one the hit test uses
   _eF.set(ep.x,ep.y+1.45,ep.z);_eT.set(P0.x,P0.y+1.45,P0.z);   // chest to chest, following both heights
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);   // muzzle: looks only
+  const ally=sameTeam(en.team,PLAYER_TEAM);   // tracer and muzzle colour by relation to you
+  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);   // muzzle point: looks only (the FX come after the hit, below)
   _sRight.crossVectors(dir,_aup).normalize();_sUpv.crossVectors(_sRight,dir).normalize();
   const ax=(Math.random()*2-1)*T.enemySpread,ay=(Math.random()*2-1)*T.enemySpread;
   const sdv=_sDir.copy(dir).addScaledVector(_sRight,Math.tan(ax)).addScaledVector(_sUpv,Math.tan(ay)).normalize();
-  // B1: resolved in the SIM hit world the player's bullets use (capsules + 220 statics), never the animated player meshes.
-  // Bots still only target the player, so their world holds the player alone (other bots don't block them, as before).
-  const W=_botFireWorld; W.groundY=SIM.groundY; W.players[0]=P0;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
-  const r=resolveShot(W,-1,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange); let end;
-  if(r.kind==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);damagePlayer(eu.enemyDmg,ep,false,en);addImpact(end,_aup,'flesh');}
-  else if(r.kind!=='none'){end=_eEnd.set(r.px,r.py,r.pz);addImpact(end,_eHitN.set(r.nx,r.ny,r.nz),'dirt');}
+  // B1: resolved in the SIM hit world the player's bullets use (the same soldier capsules), never the animated meshes.
+  // K1: the soldiers are SIM.players, minus the bot itself and its own team; the statics leave out ramp slots, whose boxes
+  // stand in for slopes. One hit world for every shooter is a multiplayer invariant (ADR-001).
+  const W=_botFireWorld; W.groundY=SIM.groundY;   // W.statics: SIM.statics minus ramps, filled by syncSimWorld
+  const r=resolveShot(W,en.id,_eF.x,_eF.y,_eF.z,sdv.x,sdv.y,sdv.z,eu.enemyRange,teamFilter(en.team)); let end;
+  const rk=r.kind, rid=r.id, near=r.t<0.9;   // r is W's shared result object: read it before applyDamage runs other code
+  if(rk==='enemy'){end=_eEnd.set(r.px,r.py,r.pz);applyDamage(en.id,rid,eu.enemyDmg,r.part,'bullet',ep.x,ep.z);}   // flat bot damage (D7) on whoever the ray hit: you, or another team's soldier in the way
+  else if(rk!=='none'){end=_eEnd.set(r.px,r.py,r.pz);_eHitN.set(r.nx,r.ny,r.nz);}
   else end=_eEnd.copy(eM).addScaledVector(sdv,T.enemyRange);
-  addTracer(r.t<0.9?_eF:eM,end,0xff5a3a);   // a hit closer than the muzzle draws from the chest
+  // FX cull (three-teams item 13, N7): the hit and damage above always run; the looks are skipped when the shot passes
+  // farther than TUNE.fx.botCullR from camLookAt (sound: botSfxR), never for a shot at you or one that hits you
+  const d2=(en.targetId===SIM_PLAYER||(rk==='enemy'&&rid===SIM_PLAYER))?0:_botShotD2(_eF.x,_eF.z,end.x,end.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2>cR*cR) return;
+  addMuzzle(eM,ally?0xffd27a:0xff6a4a);
+  if(rk==='enemy') addImpact(end,_aup,'flesh'); else if(rk!=='none') addImpact(end,_eHitN,'dirt');
+  addTracer(near?_eF:eM,end,ally?0x7af0d2:0xff5a3a);   // a hit closer than the muzzle draws from the chest
 }
-function siegeFire(en,b){
+// XZ distance squared from camLookAt to the shot segment a->b (the bot-shot FX cull)
+function _botShotD2(ax,az,bx,bz){ const dx=bx-ax, dz=bz-az, L=dx*dx+dz*dz, px=camLookAt.x-ax, pz=camLookAt.z-az;
+  let t=L>1e-9?(px*dx+pz*dz)/L:0; t=t<0?0:t>1?1:t; const ex=px-dx*t, ez=pz-dz*t; return ex*ex+ez*ez; }
+function siegeFire(en,b){ if(teamOf(b.team)===null||sameTeam(b.team,en.team))return;   // structures of its own team or none: never
   _eF.copy(en.group.position);_eF.y=1.45;_eT.copy(b.mesh.position);_eT.y=Math.min(3,b.mesh.geometry.parameters.height*0.5);
-  const dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);addMuzzle(eM,0xff6a4a); sfxEnemyShot(eM);
-  addTracer(eM,_eT,0xff5a3a); addImpact(_eT,_zAxis,'metal'); damageBuilding(b,T.enemySiegeDamage);
+  const al=sameTeam(en.team,PLAYER_TEAM), dir=_v.copy(_eT).sub(_eF).normalize();eM.copy(_eF).addScaledVector(dir,0.9);
+  const d2=_botShotD2(_eF.x,_eF.z,_eT.x,_eT.z), sR=TUNE.fx.botSfxR, cR=TUNE.fx.botCullR;   // FX cull, as in enemyFire
+  if(d2<=sR*sR) sfxEnemyShot(eM);
+  if(d2<=cR*cR){ addMuzzle(eM,al?0xffd27a:0xff6a4a); addTracer(eM,_eT,al?0x7af0d2:0xff5a3a); addImpact(_eT,_zAxis,'metal'); }
+  damageBuilding(b,T.enemySiegeDamage);
 }
 
 /* grenades + melee */
@@ -1456,7 +1670,7 @@ const _melTo=new THREE.Vector3();
 function meleeHitCheck(w){
   const fwd=new THREE.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
   const cosArc=Math.cos(w.arcDeg*0.5*Math.PI/180); let hitAny=false;
-  enemies.forEach(en=>{ if(!en.alive)return;
+  enemies.forEach(en=>{ if(!en.alive||(!TUNE.ff&&sameTeam(en.team,PLAYER_TEAM)))return;   // teammates: no hit, no shake
     _melTo.copy(en.group.position).sub(player.position); _melTo.y=0; const d=_melTo.length();
     if(d>w.range||d<0.001)return; _melTo.multiplyScalar(1/d);
     if(_melTo.dot(fwd)<cosArc)return;
@@ -1546,16 +1760,25 @@ function throwGrenadeCharged(){ animThrow(player);
   getMuzzle(player,_p2); throwVelocity(_thrV,_p2,'nade');
   const m=new THREE.Mesh(new THREE.SphereGeometry(0.26,10,8), new THREE.MeshStandardMaterial({ color:0x39482f, roughness:0.6, emissive:0x223315, emissiveIntensity:0.3 }));
   m.position.copy(_p2); m.castShadow=true; noRay(m); stylizeOne(m,0.035); scene.add(m);
-  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.5 });
+  grenades.push({ mesh:m, vel:_thrV.clone(), fuse:1.5, molotov:false, ownerId:SIM_PLAYER, team:PLAYER_TEAM });
 }
-function explodeAt(p,bMult){
+function explodeAt(p,bMult,ownerId,ownerTeam){   // owner: the thrower's slot and team (every blast is yours today)
+  if(ownerId==null){ ownerId=SIM_PLAYER; ownerTeam=PLAYER_TEAM; }
   grenadeBlast(p);
   if(COMIC)spawnComic('BOOM!',p.clone(),3.0,'#FF7B00');
-  const from=p.clone(); from.y=Math.max(p.y,0.5);
-  enemies.forEach(en=>{if(!en.alive)return;const d=en.group.position.distanceTo(p);if(d<T.grenadeRadius&&blastReaches(from,en.group.position.clone().setY(1.1),null))damageEnemy(en,T.grenadeDamage*(1-d/T.grenadeRadius),'body',en.group.position.clone().setY(1.4));});
-  buildings.forEach(b=>{if(!b.alive||b.team!=='hostile')return;const d=b.mesh.position.distanceTo(p);if(d<T.grenadeRadius+4&&blastReaches(from,b.mesh.position.clone().setY(Math.min(3,b.mesh.geometry.parameters.height*0.5)),b.mesh))damageBuilding(b,T.grenadeBuildingDamage*(bMult||1)*(1-d/(T.grenadeRadius+4)));});
-  harvesters.forEach(hv=>{if(!hv.alive||hv.team!=='hostile')return;const d=hv.group.position.distanceTo(p);if(d<T.grenadeRadius+3&&blastReaches(from,hv.group.position.clone().setY(1.2),null))damageHarvester(hv,T.grenadeBuildingDamage*0.6*(1-d/(T.grenadeRadius+3)));});
-  const dp=player.position.distanceTo(p); if(dp<T.grenadeRadius&&!ps.dead&&blastReaches(from,player.position.clone().setY(1.1),null))damagePlayer(T.grenadeDamage*0.5*(1-dp/T.grenadeRadius),p,true);
+  const from=_dmgEv._from.copy(p); from.y=Math.max(p.y,0.5); const bt=_dmgEv._bt, R=T.grenadeRadius;
+  // soldiers in slot order, then structures, then you (today's order): the owner takes 0.5x, its teammates are spared
+  // unless friendly fire is on (D5), everyone else takes the falloff. Reach stays blastReaches (K2: NC-7 is its own change-set).
+  for(let s=1;s<SOLDIERS.length;s++){ const en=SOLDIERS[s]; if(!en.active||!en.alive)continue;
+    if(s!==ownerId&&!TUNE.ff&&ownerTeam!=null&&sameTeam(en.team,ownerTeam))continue;
+    const d=en.group.position.distanceTo(p); if(d>=R||!blastReaches(from,bt.copy(en.group.position).setY(1.1),null))continue;
+    _dmgPt.copy(en.group.position).setY(1.4); applyDamage(ownerId,s,T.grenadeDamage*(s===ownerId?0.5:1)*(1-d/R),'body','blast',p.x,p.z); }
+  for(let i=0;i<buildings.length;i++){ const b=buildings[i]; if(!b.alive||teamOf(b.team)===null||sameTeam(b.team,ownerTeam))continue;
+    const d=b.mesh.position.distanceTo(p); if(d<R+4&&blastReaches(from,bt.copy(b.mesh.position).setY(Math.min(3,b.mesh.geometry.parameters.height*0.5)),b.mesh))damageBuilding(b,T.grenadeBuildingDamage*(bMult||1)*(1-d/(R+4))); }
+  for(let i=0;i<harvesters.length;i++){ const hv=harvesters[i]; if(!hv.alive||teamOf(hv.team)===null||sameTeam(hv.team,ownerTeam))continue;
+    const d=hv.group.position.distanceTo(p); if(d<R+3&&blastReaches(from,bt.copy(hv.group.position).setY(1.2),null))damageHarvester(hv,T.grenadeBuildingDamage*0.6*(1-d/(R+3))); }
+  if(!ps.dead&&(ownerId===SIM_PLAYER||TUNE.ff||ownerTeam==null||!sameTeam(PLAYER_TEAM,ownerTeam))){ const dp=player.position.distanceTo(p);
+    if(dp<R&&blastReaches(from,bt.copy(player.position).setY(1.1),null))applyDamage(ownerId,SIM_PLAYER,T.grenadeDamage*(ownerId===SIM_PLAYER?0.5:1)*(1-dp/R),'body','blast',p.x,p.z); }
 }
 
 // ===== TORQUE BOW (Gears-style) — charge LMB to scale launch velocity; the kind-agnostic arc
@@ -1576,7 +1799,7 @@ function fireBolt(){
   const armed = true;                 // bolts ALWAYS explode/stick now (Mustafa) -- charge only scales speed/range (dud path removed)
   playerFireOrigin(muzzleW); throwVelocity(_thrV,muzzleW,'bow'); _bDir.copy(_thrV).normalize();
   const m=makeBolt(armed); m.position.copy(muzzleW); m.quaternion.setFromUnitVectors(_aup,_bDir); scene.add(m);
-  bolts.push({ mesh:m, vel:_thrV.clone(), prev:muzzleW.clone(), armed, state:'fly', t:0, life:0, stuckTo:null, stuckOff:new THREE.Vector3() });
+  bolts.push({ mesh:m, vel:_thrV.clone(), prev:muzzleW.clone(), armed, state:'fly', t:0, life:0, stuckTo:null, stuckOff:new THREE.Vector3(), ownerId:SIM_PLAYER, team:PLAYER_TEAM });
   l.ammo--; ps.fireCd=w.fireInterval; ps.fireKick=Math.min(1.1,ps.fireKick+0.5+w.recoil*0.05);
   camRecoil+=w.recoil; camShake+=w.recoil*0.12; const _fk=fovBase/52; fovKick=Math.min(7*_fk,fovKick+(1.2+w.recoil*0.5)*_fk);
   addMuzzle(muzzleW,0xffb060); updateWeaponHUD(); if(l.ammo<=0){ if(l.reserve>0) startReload(); else equipPrimary(); }
@@ -1596,35 +1819,30 @@ function tryResupply(){
 /* damage to player */
 const vignette=document.getElementById('vignette'),dmgDirEl=document.getElementById('dmgDir'),wedgeEl=dmgDirEl.querySelector('.wedge'); let dmgDirT=0;
 function damagePlayer(amount,fromPos,ignoreShield,srcEnemy){
-  if(ps.dead||gameOver)return;
-  if(pilotJug)return;   // piloting a vehicle: the mech takes the hits, not the soldier
-  if(DEV.god)return;
-  if(ps.shieldOn&&fromPos&&!ignoreShield){
-    const fwd=new THREE.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
-    const to=new THREE.Vector3(fromPos.x-player.position.x,0,fromPos.z-player.position.z);
-    if(to.lengthSq()>1e-4){ to.normalize(); if(to.dot(fwd)>T.shieldArcCos){ amount*=(1-T.shieldBlock); ps.shieldFlash=1; camShake+=0.08; } }
-  }
-  ps.health-=amount; ps.lastHitT=0; camShake+=0.4; if(srcEnemy)ps.lastAttacker=srcEnemy; if(fromPos) animHit(player,fromPos.x,fromPos.z,amount/40);
-  const inten=Math.min(1,amount/14+(1-ps.health/ps.maxHealth)*0.5);
-  vignette.style.boxShadow=`inset 0 0 160px rgba(255,40,40,${0.22+inten*0.35})`;
-  setTimeout(()=>{vignette.style.boxShadow=ps.health<30?'inset 0 0 160px rgba(255,40,40,0.16)':'inset 0 0 160px rgba(255,40,40,0)';},120);
-  const toA=_v.copy(fromPos).sub(player.position);toA.y=0;const cf=new THREE.Vector3();camera.getWorldDirection(cf);cf.y=0;cf.normalize();
-  const ang=Math.atan2(toA.x,toA.z)-Math.atan2(cf.x,cf.z); wedgeEl.style.transform=`rotate(${-ang}rad)`; dmgDirEl.style.opacity='1'; dmgDirT=0.8; if(toA.lengthSq()>1e-4){ _od.copy(toA).normalize(); camKickVel.addScaledVector(_od,-Math.min(7,amount*0.5)); camKickVel.y+=1.2; }
-  updateHealthHUD(); if(ps.health<=0)playerDie();
+  const sx=fromPos?fromPos.x:player.position.x, sz=fromPos?fromPos.z:player.position.z;
+  return applyDamage(srcEnemy?srcEnemy.id:-1,SIM_PLAYER,amount,'body',(ignoreShield||!fromPos)?'blast':'bullet',sx,sz);
 }
-function playerDie(){{ const _la=ps.lastAttacker&&ps.lastAttacker.group; deathStart(player,_la?_la.position.x:player.position.x+Math.random()-0.5,_la?_la.position.z:player.position.z+Math.random()-0.5); }ps.dead=true;if(SIM.players[0])SIM.players[0].alive=false;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();if(ps.lastAttacker){ps.lastAttacker.frags=(ps.lastAttacker.frags||0)+1;ps.lastAttacker=null;}document.getElementById('deathScreen').style.display='flex';}
-function playerRespawn(){ps.dead=false;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
+function playerDie(){ deathStart(player,_dmgEv.srcX,_dmgEv.srcZ);   // fall away from the killing blow; the killer was credited in applyDamage
+  ps.dead=true;ps.alive=false;if(SIM.players[0])SIM.players[0].alive=false;ps.deadT=T.respawnDelay;ps.toppleT=0;ps._tx=(Math.random()<0.5?-1:1);ps._tz=(Math.random()*2-1)*0.55;mouseDown=false;endCharge();onDeath();document.getElementById('deathScreen').style.display='flex';}
+function playerRespawn(){ps.dead=false;ps.alive=true;ps.lastAttacker=null;player.rotation.x=0;player.rotation.z=0;ps.toppleT=0;ps.fireKick=0;applyUnit(ps.unit);ps.health=ps.maxHealth;ps.lastHitT=99;player.position.set(mapSpawn.x+(Math.random()*2-1)*4,0,mapSpawn.z);ps.vel.set(0,0,0);ps.reloading=false;ps.fireCd=0;ps.swinging=false;loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;});document.getElementById('reloadBar').style.opacity='0';document.getElementById('deathScreen').style.display='none';vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';updateHeldModel();updateHealthHUD();updateWeaponHUD();}
 
 /* end / reset */
-function checkEnd(){const eHQ=findB('hostile','hq'),fHQ=findB('friend','hq');if(!gameOver&&eHQ&&!eHQ.alive)endGame(true);if(!gameOver&&fHQ&&!fHQ.alive)endGame(false);}
+// Interim end rule (three-teams item 11, D11): you win when at least one other active team has HQs and every such team
+// has lost all of them; you lose when your team has HQs and all of them are down. A win is checked first, as before.
+function checkEnd(){ if(gameOver)return; let foes=0, foesUp=0, mineDown=false;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id, e=TEAM_INDEX[id], h=e.hqs; if(!h.length)continue;
+    let up=false; for(let j=0;j<h.length;j++) if(h[j].alive){ up=true; break; }
+    if(id===PLAYER_TEAM) mineDown=!up; else if(e.active){ foes++; if(up)foesUp++; } }
+  if(foes>0&&foesUp===0) endGame(true); else if(mineDown) endGame(false); }
 function endGame(win){gameOver=true;mouseDown=false;endEl.className=win?'win':'lose';endEl.style.display='flex';document.getElementById('endTitle').textContent=win?'VICTORY':'DEFEAT';document.getElementById('endSub').textContent=win?'enemy HQ destroyed':'your HQ has fallen';}
 function resetRound(){
+  buildTeamIndex(); activateRoster();   // the editor edits buildings without buildMap
   gameOver=false; endEl.style.display='none'; document.getElementById('deathScreen').style.display='none';
   buildings.forEach(b=>{b.alive=true;b.health=b.maxHealth;b.sink=0;b.mesh.position.y=b.mesh.geometry.parameters.height/2;b.mesh.visible=true;b.trim.visible=true;b.trim.material.emissiveIntensity=0.65;b.trim.position.y=b.mesh.geometry.parameters.height-0.7;b.label.visible=true;b.bar.grp.visible=true;b.box.setFromObject(b.mesh);});
-  enemies.forEach(en=>{en.alive=true;en.frags=0;en.downs=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.elite?T.eliteHealth:unitOf(en.unit).maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
-  ps.health=T.playerHealth;ps.dead=false;ps.lastHitT=99;ps.lastAttacker=null;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
+  enemies.forEach(en=>{if(!en.active)return;en.alive=true;en.frags=0;en.downs=0;en.lastAttackerId=-1;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;teamSpawnPoint(en.team,en.id,en.group.position);en.group.visible=true;en.fireCd=1+Math.random();en.group.userData.bar.grp.visible=true;en.group.userData.wpn.rotation.x=0;});
+  ps.health=T.playerHealth;ps.dead=false;ps.alive=true;ps.lastHitT=99;ps.lastAttacker=null;ps.lastAttackerId=-1;ps.frags=0;ps.downs=0;player.position.set(mapSpawn.x,0,mapSpawn.z);ps.vel.set(0,0,0); startAmbient();
   loadout.forEach((l,i)=>{l.ammo=WEAPONS[i].mag;l.reserve=WEAPONS[i].reserve;l.owned=(i===0);});
-  teamEco.friend.era=1;teamEco.hostile.era=1;teamEco.friend.tech=0;teamEco.hostile.tech=0;teamEco.friend.silos=0;teamEco.hostile.silos=0;
+  for(let i=0;i<TEAMS.length;i++){ const e=teamEco[TEAMS[i].id]; e.era=1; e.tech=0; e.silos=0; }
   credits=T.startCredits;grenadeCount=0;kills=0;roundDeaths=0;roundAssists=0;ps.curWeapon=0;ps.spread=curW().spreadHip;ps.reloading=false;ps.fireCd=0;ps.ads=false;ps.shieldOwned=false;ps.shieldOn=false;ps.swinging=false;ps.shieldFlash=0;document.getElementById('reloadBar').style.opacity='0';unitOwned=UNIT_TYPES.map((u,i)=>i===0);ps.unit=0;applyUnit(0);ps.health=ps.maxHealth;
   clearBolts(); shopOpen=false; document.getElementById('shopModal').style.display='none'; updateHeldModel(); updateRank();
   vignette.style.boxShadow='inset 0 0 160px rgba(255,40,40,0)';
@@ -1655,7 +1873,7 @@ const TIER_MODE='cumulative';   // 'cumulative' = past-tier weapons stay buyable
 function weaponStatus(i){
   const w=WEAPONS[i];
   if(loadout[i].owned) return {state:'owned'};
-  const eraOk = TIER_MODE==='cumulative' ? w.era<=teamEco.friend.era : w.era===teamEco.friend.era;
+  const eraOk = TIER_MODE==='cumulative' ? w.era<=teamEco[PLAYER_TEAM].era : w.era===teamEco[PLAYER_TEAM].era;
   if(!eraOk) return {state:'era'};
   if(Prog.level < w.minLevel) return {state:'level'};
   if(w.cost>0 && credits<w.cost*priceMult()) return {state:'poor'};
@@ -1665,7 +1883,7 @@ function grantFreeWeapons(silent){   // auto-issue each tier's free standard (co
   const names=[];
   WEAPONS.forEach((w,i)=>{
     if(w.cost===0 && !loadout[i].owned){
-      const eraOk = TIER_MODE==='cumulative' ? w.era<=teamEco.friend.era : w.era===teamEco.friend.era;
+      const eraOk = TIER_MODE==='cumulative' ? w.era<=teamEco[PLAYER_TEAM].era : w.era===teamEco[PLAYER_TEAM].era;
       if(eraOk && Prog.level>=w.minLevel){ loadout[i].owned=true; loadout[i].ammo=w.mag; loadout[i].reserve=w.reserve; names.push(w.name); }
     }
   });
@@ -1675,7 +1893,7 @@ function grantFreeWeapons(silent){   // auto-issue each tier's free standard (co
 function buyWeapon(i){ const w=WEAPONS[i]; if(weaponStatus(i).state!=='buy')return; credits-=w.cost*priceMult(); loadout[i].owned=true; loadout[i].ammo=w.mag; loadout[i].reserve=w.reserve; updateCreditHUD(); showLevelToast('Purchased',w.name); switchWeapon(i); renderShop(); }
 function renderShop(){
   shopCreditsEl.textContent=Math.floor(credits); shopListEl.innerHTML='';
-  if(powerDead('friend')){ const warn=document.createElement('div'); warn.className='shopWarn'; warn.textContent='⚠ Power plant offline — prices doubled'; shopListEl.appendChild(warn); }
+  if(powerDead(PLAYER_TEAM)){ const warn=document.createElement('div'); warn.className='shopWarn'; warn.textContent='⚠ Power plant offline — prices doubled'; shopListEl.appendChild(warn); }
   { const note=document.createElement('div'); note.className='shopWarn'; note.style.opacity='0.85'; note.textContent='Pick your class below. Keys: 1 class weapon, 3 special, F ability, G frag'; shopListEl.appendChild(note); }
   // --- SQUAD (spawn Conscript; others free to equip; no instant 1-4 switch) ---
   { const h=document.createElement('div'); h.className='shopTierHead'; h.textContent='Squad'; shopListEl.appendChild(h);
@@ -2200,7 +2418,7 @@ function updateCreditHUD(){ const v=Math.floor(credits); if(v!==_lastCred){ _las
 const eraUsEl=document.getElementById('eraUs'), eraFillUsEl=document.getElementById('eraFillUs'), eraNumUsEl=document.getElementById('eraNumUs'), eraThemEl=document.getElementById('eraThem'), eraHudEl=document.getElementById('eraHud');
 let _eraF=-1,_eraTF=-1,_eraH=-1;
 function updateEraHUD(){
-  const f=teamEco.friend,h=teamEco.hostile,maxE=ECO.eraNames.length,tf=Math.floor(f.tech);
+  const f=teamEco[PLAYER_TEAM],h=teamEco[TEAM_INDEX.firstEnemy],maxE=ECO.eraNames.length,tf=Math.floor(f.tech);
   if(f.era===_eraF&&tf===_eraTF&&h.era===_eraH) return;            // change-detected: allocation-free when idle
   _eraF=f.era;_eraTF=tf;_eraH=h.era;
   eraUsEl.textContent=ECO.eraNames[f.era-1]; eraThemEl.textContent=ECO.eraNames[h.era-1];
@@ -2208,12 +2426,13 @@ function updateEraHUD(){
   else { eraHudEl.classList.remove('max'); const need=ECO.eraCost[f.era-1]; eraFillUsEl.style.width=Math.min(100,tf/need*100).toFixed(1)+'%'; eraNumUsEl.textContent=tf+' / '+need; }
 }
 function onEraUp(team){
-  if(team==='friend'){ const got=grantFreeWeapons(true); showLevelToast('Tech Advanced', ECO.eraNames[teamEco.friend.era-1]+(got?' · '+got+' issued':' online')); if(shopOpen) renderShop(); }
-  else showLevelToast('Enemy Tech','Hostiles reached '+ECO.eraNames[teamEco.hostile.era-1]);
+  if(sameTeam(team,PLAYER_TEAM)){ const got=grantFreeWeapons(true); showLevelToast('Tech Advanced', ECO.eraNames[teamEco[PLAYER_TEAM].era-1]+(got?' · '+got+' issued':' online')); if(shopOpen) renderShop(); }
+  else { const e=teamEco[teamOf(team)]; if(e) showLevelToast('Enemy Tech','Hostiles reached '+ECO.eraNames[e.era-1]); }
 }
 function addTech(team,amt){
-  amt = amt * (powerDead(team)?0.5:1);   // power plant down -> tech income halved
-  const e=teamEco[team];
+  const id=teamOf(team); if(!id)return;
+  amt = amt * (powerDead(id)?0.5:1);   // power plant down -> tech income halved
+  team=id; const e=teamEco[id];
   if(e.era<ECO.eraNames.length){
     e.tech+=amt;
     let need=ECO.eraCost[e.era-1];
@@ -2235,7 +2454,7 @@ function updateAbilityHUD(){
 function updateGrenadeHUD(){ updateAbilityHUD(); updateFragHUD(); }
 function updateFragHUD(){ const el=document.getElementById('fragVal'); if(el) el.textContent=grenadeCount; }
 function buyGrenade(){ const cost=50*priceMult(); if(grenadeCount>=T.grenadeMax||credits<cost) return; credits-=cost; grenadeCount++; updateCreditHUD(); updateGrenadeHUD(); }
-function updateHostileCount(){const el=document.getElementById('hostileCount'); if(el)el.textContent=String(enemies.filter(e=>e.alive).length).padStart(2,'0');}
+function updateHostileCount(){const el=document.getElementById('hostileCount'); if(!el)return; let n=0; for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(en.active&&en.alive&&!sameTeam(en.team,PLAYER_TEAM))n++; } el.textContent=String(n).padStart(2,'0');}   // active, live bots of other teams
 let _sbLvl=-1, _sbBuilt=-1, _sbRowsA=[], _sbRowsB=[], _sbR=null;
 function _sbMakeRow(team){ const row=document.createElement('div'); row.className='sb-prow';
   const rank=document.createElement('span'); rank.className=team==='h'?'sb-rank h-rank':'sb-rank';
@@ -2247,19 +2466,20 @@ function _sbMakeRow(team){ const row=document.createElement('div'); row.classNam
   return {root:row,rank:rank,name:name,k:k,d:d,a:a,src:null}; }
 function sbBuildRosters(){ const listA=document.getElementById('sbListA'), listB=document.getElementById('sbListB'); if(!listA||!listB)return;
   listA.innerHTML=''; _sbRowsA=[]; const you=_sbMakeRow('a'); you.root.classList.add('you'); you.src='you'; you.rank.innerHTML=rankInsigniaSVG(Prog.level,22); you.name.textContent='You'; listA.appendChild(you.root); _sbRowsA.push(you);
-  listB.innerHTML=''; _sbRowsB=[]; for(let i=0;i<enemies.length;i++){ const r=_sbMakeRow('h'); r.src=enemies[i]; r.name.textContent='Hostile '+String(i+1).padStart(2,'0'); listB.appendChild(r.root); _sbRowsB.push(r); }
-  _sbBuilt=enemies.length; _sbLvl=-1; }
+  for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||!sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('a'); r.rank.classList.add('a-rank'); r.src=en; r.name.textContent='Ally '+String(_sbRowsA.length).padStart(2,'0'); listA.appendChild(r.root); _sbRowsA.push(r); }   // column A: you, then active ally bots in slot order
+  listB.innerHTML=''; _sbRowsB=[]; for(let i=0;i<enemies.length;i++){ const en=enemies[i]; if(!en.active||sameTeam(en.team,PLAYER_TEAM))continue; const r=_sbMakeRow('h'); r.src=en; r.name.textContent='Hostile '+String(_sbRowsB.length+1).padStart(2,'0'); listB.appendChild(r.root); _sbRowsB.push(r); }
+  _sbBuilt=TEAM_INDEX.rosterVer; _sbLvl=-1; }
 function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')return; if(mode!=='game'){ el.style.display='none'; return; }
-  if(_sbBuilt!==enemies.length) sbBuildRosters();
+  if(_sbBuilt!==TEAM_INDEX.rosterVer) sbBuildRosters();
   if(!_sbR){ const g=id=>document.getElementById(id); _sbR={aK:g('sbAKills'),bK:g('sbBKills'),aAlive:g('sbAAlive'),bAlive:g('sbBAlive'),aTier:g('sbATier'),bTier:g('sbBTier'),atK:g('sbATotK'),atD:g('sbATotD'),atA:g('sbATotA'),btK:g('sbBTotK'),btD:g('sbBTotD'),btA:g('sbBTotA'),mIns:g('sbMeIns'),mRank:g('sbMeRank'),mLvl:g('sbMeLvl'),mPrest:g('sbMePrest'),mXp:g('sbMeXp'),mXn:g('sbMeXpTxt'),mK:g('sbMeK'),mD:g('sbMeD'),mA:g('sbMeA')}; }
   const lvlChanged=(Prog.level!==_sbLvl);
   let aK=0,aD=0,aA=0,aAlive=0;
-  for(const r of _sbRowsA){ let k,d,a,alive; if(r.src==='you'){ k=kills; d=roundDeaths; a=roundAssists; alive=!ps.dead; if(lvlChanged)r.rank.innerHTML=rankInsigniaSVG(Prog.level,22); } else { k=r.src.k||0; d=r.src.d||0; a=r.src.a||0; alive=r.src.alive!==false; }
-    _st(r.k,k); _st(r.d,d); _st(r.a,a); r.root.classList.toggle('down',!alive); aK+=k; aD+=d; aA+=a; if(alive)aAlive++; }
+  for(const r of _sbRowsA){ let k,d,a,alive; if(r.src==='you'){ k=kills; d=roundDeaths; a=roundAssists; alive=!ps.dead; if(lvlChanged)r.rank.innerHTML=rankInsigniaSVG(Prog.level,22); } else { k=r.src.frags||0; d=r.src.downs||0; a='—'; alive=r.src.alive; }
+    _st(r.k,k); _st(r.d,d); _st(r.a,a); r.root.classList.toggle('down',!alive); aK+=k; aD+=d; if(r.src==='you')aA+=a; if(alive)aAlive++; }
   let bK=0,bD=0,bAlive=0;
   for(const r of _sbRowsB){ const en=r.src, k=en.frags||0, d=en.downs||0; _st(r.k,k); _st(r.d,d); _st(r.a,'—'); r.root.classList.toggle('down',!en.alive); bK+=k; bD+=d; if(en.alive)bAlive++; }
   _st(_sbR.aK,aK); _st(_sbR.bK,bK); _st(_sbR.aAlive,aAlive); _st(_sbR.bAlive,bAlive);   // B5: write only on change
-  _st(_sbR.aTier,ECO.eraNames[teamEco.friend.era-1]); _st(_sbR.bTier,ECO.eraNames[teamEco.hostile.era-1]);
+  _st(_sbR.aTier,ECO.eraNames[teamEco[PLAYER_TEAM].era-1]); _st(_sbR.bTier,ECO.eraNames[teamEco[TEAM_INDEX.firstEnemy].era-1]);
   _st(_sbR.atK,aK); _st(_sbR.atD,aD); _st(_sbR.atA,aA); _st(_sbR.btK,bK); _st(_sbR.btD,bD); _st(_sbR.btA,'—');
   if(lvlChanged){ _sbR.mIns.innerHTML=rankInsigniaSVG(Prog.level,40); _sbR.mRank.textContent=rankForLevel(Prog.level).name; _sbLvl=Prog.level; }
   _st(_sbR.mLvl,'Level '+Prog.level);
@@ -2267,10 +2487,10 @@ function sbSync(){ const el=scoreboardEl; if(!el||el.style.display!=='flex')retu
   const _need=xpForLevel(Prog.level), _frac=Prog.level>=100?1:Math.max(0,Math.min(1,Prog.xp/_need));
   { const w=(_frac*100)+'%'; if(_sbR.mXp.style.width!==w)_sbR.mXp.style.width=w; } _st(_sbR.mXn,Prog.level>=100?'MAX RANK':Prog.xp+' / '+_need+' XP');
   _st(_sbR.mK,kills); _st(_sbR.mD,roundDeaths); _st(_sbR.mA,roundAssists); }
-function sbShow(on){ if(!scoreboardEl)return; if(on&&_sbBuilt!==enemies.length)sbBuildRosters(); scoreboardEl.style.display=on?'flex':'none'; if(on)sbSync(); }
-function updateBaseHUD(){document.querySelectorAll('.pip').forEach(p=>{const[t,ty]=p.dataset.b.split('-');const team=t==='f'?'friend':'hostile';
-  if(ty==='harv'){ const hv=harvesters.find(h=>h.team===team); if(!hv)return; p.classList.toggle('dead',!hv.alive); p.querySelector('i').style.width=(hv.alive?Math.max(0,hv.health/hv.maxHealth)*100:0)+'%'; return; }
-  const b=findB(team,ty);if(!b)return;p.classList.toggle('dead',!b.alive);p.querySelector('i').style.width=(Math.max(0,b.health/b.maxHealth)*100)+'%';});}
+function sbShow(on){ if(!scoreboardEl)return; if(on&&_sbBuilt!==TEAM_INDEX.rosterVer)sbBuildRosters(); scoreboardEl.style.display=on?'flex':'none'; if(on)sbSync(); }
+function updateBaseHUD(){document.querySelectorAll('.pip').forEach(p=>{const[t,ty]=p.dataset.b.split('-');const ix=TEAM_INDEX[t==='f'?PLAYER_TEAM:TEAM_INDEX.firstEnemy]; if(!ix)return;
+  if(ty==='harv'){ const hv=ix.harv; if(!hv)return; p.classList.toggle('dead',!hv.alive); p.querySelector('i').style.width=(hv.alive?Math.max(0,hv.health/hv.maxHealth)*100:0)+'%'; return; }
+  const b=ty==='hq'?ix.hqs[0]:ty==='refinery'?ix.refinery:ty==='power'?ix.power:ty==='barracks'?ix.barracksB:null;if(!b)return;p.classList.toggle('dead',!b.alive);p.querySelector('i').style.width=(Math.max(0,b.health/b.maxHealth)*100)+'%';});}
 let hitmarkT=0;
 function showHitmarker(kill,head){hitmarkT=0.2;hitmarkEl.style.display='block';hitmarkEl.style.opacity='1';hitmarkEl.querySelectorAll('span').forEach(s=>{s.classList.toggle('kill',!!kill&&!head);s.classList.toggle('head',!!head);}); if(!kill&&!head)sfxTick();
   const s0=kill?2.1:head?1.75:1.5; if(hitmarkEl.animate) hitmarkEl.animate([{transform:'translate(-50%,-50%) rotate(45deg) scale('+s0+')'},{transform:'translate(-50%,-50%) rotate(45deg) scale(1)'}],{duration:190,easing:'cubic-bezier(.2,.8,.3,1)'}); }
@@ -2470,8 +2690,8 @@ function update(dt){ NAV.budget=2;
   if(ps.fireCd>0)ps.fireCd-=dt;
 
   if(!gameOver){
-    const fRef=findB('friend','refinery');
-    credits+=((fRef&&fRef.alive?ECO.payTrickle:ECO.payTrickleDead)+ECO.paySilo*teamEco.friend.silos)*dt; updateCreditHUD();
+    const fRef=TEAM_INDEX[PLAYER_TEAM].refinery;
+    credits+=((fRef&&fRef.alive?ECO.payTrickle:ECO.payTrickleDead)+ECO.paySilo*teamEco[PLAYER_TEAM].silos)*dt; updateCreditHUD();
     updateHarvesters(dt);   // both teams' tech now comes from their harvester docks (+ combat slice)
   }
   updateTechBox(dt);
@@ -2538,7 +2758,7 @@ function update(dt){ NAV.budget=2;
       if(bd.lengthSq()>1e-4){ bd.normalize(); ps.vel.copy(bd).multiplyScalar(cs); player.rotation.y=Math.atan2(bd.x,bd.z); }
       else ps.vel.multiplyScalar(0.5);
       player.position.addScaledVector(ps.vel,dt);
-      if(ps._bayHit) enemies.forEach(en=>{ if(en.alive && !ps._bayHit.has(en) && en.group.position.distanceTo(player.position)<2.4){ ps._bayHit.add(en); damageEnemy(en,9999,'body',en.group.position.clone().setY(1.5),true); camShake+=0.16; if(typeof spawnComic==='function')spawnComic('IMPALE!',en.group.position.clone().setY(1.9),2.4,'#FF7B00'); } });
+      if(ps._bayHit) enemies.forEach(en=>{ if(en.alive && (TUNE.ff||!sameTeam(en.team,PLAYER_TEAM)) && !ps._bayHit.has(en) && en.group.position.distanceTo(player.position)<2.4){ ps._bayHit.add(en); damageEnemy(en,9999,'body',en.group.position.clone().setY(1.5),true); camShake+=0.16; if(typeof spawnComic==='function')spawnComic('IMPALE!',en.group.position.clone().setY(1.9),2.4,'#FF7B00'); } });
     } else {
     const wish=_wish.set(0,0,0);
     if(keys['KeyW']){wish.x+=fwdX;wish.z+=fwdZ;}
@@ -2570,7 +2790,7 @@ function update(dt){ NAV.budget=2;
   // vehicle enter/exit prompt (priority over terminal)
   nearJugObj=null; if(!pilotJug&&!ps.dead&&!gameOver){ let _jbd=JUG_ENTER_R*JUG_ENTER_R; for(const jug of juggernauts){ if(!jug.alive)continue; const dx=jug.group.position.x-player.position.x, dz=jug.group.position.z-player.position.z; const d=dx*dx+dz*dz; if(d<_jbd){_jbd=d;nearJugObj=jug;} } }
   // terminal prompt
-  nearPanel=false; for(const bk of barracksList){ if(bk.panelPos && bk.team==='friend' && player.position.distanceTo(bk.panelPos)<2.6){ nearPanel=true; break; } }
+  nearPanel=false; for(const bk of barracksList){ if(bk.panelPos && sameTeam(bk.team,PLAYER_TEAM) && player.position.distanceTo(bk.panelPos)<2.6){ nearPanel=true; break; } }
   nearPanel = nearPanel && !ps.dead && !gameOver;
   const nearTerm = !nearPanel && !nearJugObj && !pilotJug && player.position.distanceTo(terminalPos)<6 && !ps.dead && !gameOver;
   _so(termPrompt,(pilotJug||nearJugObj||nearPanel||nearTerm)?'1':'0');
@@ -2636,19 +2856,19 @@ function update(dt){ NAV.budget=2;
   // grenades
   for(let i=grenades.length-1;i>=0;i--){const g=grenades[i];g.vel.y-=20*dt;g.mesh.position.addScaledVector(g.vel,dt);g.fuse-=dt;
     if(g.mesh.position.y<=0.26){g.mesh.position.y=0.26;g.vel.y*=-0.4;g.vel.x*=0.6;g.vel.z*=0.6;}
-    if(g.fuse<=0){explodeAt(g.mesh.position.clone(), g.molotov?1.8:1);scene.remove(g.mesh);g.mesh.geometry.dispose();g.mesh.material.dispose();grenades.splice(i,1);}}
+    if(g.fuse<=0){explodeAt(g.mesh.position.clone(), g.molotov?1.8:1, g.ownerId, g.team);scene.remove(g.mesh);g.mesh.geometry.dispose();g.mesh.material.dispose();grenades.splice(i,1);}}
 
   // torque-bow bolts: fly under gravity -> stick; armed bolts arm a short fuse then blast
-  syncSimWorld(); // refresh SIM hitboxes so bolts hit the same head/torso/leg boxes as bullets
+  syncSimWorld(true); // K4: re-sync after you moved (bots and bolts see where you are now); the frame's first sync is in updateAim
   for(let i=bolts.length-1;i>=0;i--){ const b=bolts[i];
     if(b.state==='fly'){
       b.prev.copy(b.mesh.position); b.vel.y-=T_CHARGE.bow.grav*dt; b.mesh.position.addScaledVector(b.vel,dt);
       const segLen=_bSeg.copy(b.mesh.position).sub(b.prev).length();
       if(segLen>1e-4){
         _bDir.copy(_bSeg).multiplyScalar(1/segLen); b.mesh.quaternion.setFromUnitVectors(_aup,_bDir);
-        const r=resolveShot(SIM,SIM_PLAYER, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
+        const r=resolveShot(SIM,b.ownerId, b.prev.x,b.prev.y,b.prev.z, _bDir.x,_bDir.y,_bDir.z, segLen+0.05, teamFilter(b.team)); // SIM head/torso/leg boxes -> a head-high bolt connects; no per-frame alloc
         if(r.kind!=='none'){
-          const en=(r.kind==='enemy')?enemies[r.id-1]:null; _bHit.set(r.px,r.py,r.pz);
+          const en=(r.kind==='enemy'&&r.id!==SIM_PLAYER)?SOLDIERS[r.id]:null; _bHit.set(r.px,r.py,r.pz);
           b.state='armed'; b.t=0; addImpact(_bHit,_aup,!!en); b.mesh.position.copy(_bHit);
           if(en&&en.alive){ b.stuckTo=en; b.stuckOff.copy(_bHit).sub(en.group.position); } else b.stuckTo=null; // stick to the body, ride it until the fuse blows
           continue;
@@ -2658,44 +2878,46 @@ function update(dt){ NAV.budget=2;
       if(b.mesh.position.y<=0.05){ b.mesh.position.y=0.05; b.state='armed'; b.t=0; b.stuckTo=null; continue; }
       if(b.life>5){ removeBolt(b,i); continue; }
     } else if(b.state==='armed'){
-      if(b.stuckTo){ if(b.stuckTo.alive){ b.mesh.position.copy(b.stuckTo.group.position).add(b.stuckOff); } else { explodeAt(b.mesh.position.clone(), 1.5); removeBolt(b,i); continue; } }
+      if(b.stuckTo){ if(b.stuckTo.alive){ b.mesh.position.copy(b.stuckTo.group.position).add(b.stuckOff); } else { explodeAt(b.mesh.position.clone(), 1.5, b.ownerId, b.team); removeBolt(b,i); continue; } }
       b.t+=dt; const tm=b.mesh.userData.tipMat; if(tm) tm.emissiveIntensity=0.55+Math.abs(Math.sin(b.t*38))*0.6;
-      if(b.t>=BOLT_FUSE){ explodeAt(b.mesh.position.clone(), 1.5); removeBolt(b,i); continue; }
+      if(b.t>=BOLT_FUSE){ explodeAt(b.mesh.position.clone(), 1.5, b.ownerId, b.team); removeBolt(b,i); continue; }
     }
   }
 
   
   // enemies
-  const pPos=player.position;
-  const eBar=findB('hostile','barracks'), eRef=findB('hostile','refinery');
-  enemies.forEach((en,ei)=>{
+  { const ai=TUNE.ai; AI_STATE.budget=Math.min(ai.losPerS*ai.losCapS, AI_STATE.budget+ai.losPerS*dt); AI_STATE.step++; }   // refill the sight budget (game time)
+  // Fair turn order (review PERF-1 / NETCODE-1): the sight budget and NAV's route budget go to whoever asks first, so the
+  // loop starts one slot later every step instead of always at slot 1 (team-major slots would starve the last team).
+  const botN=enemies.length, botO=botN?AI_STATE.step%botN:0;
+  for(let bk=0;bk<botN;bk++){ const en=enemies[(bk+botO)%botN];
+    if(!en.active)continue;   // parked slot: its team doesn't play on this map
     if(en.alive){
       const epx=en.group.position.x, epz=en.group.position.z;
-      const ddx=pPos.x-epx, ddz=pPos.z-epz; const distP=hyp2(ddx,ddz);
-      _eEyes.set(epx,1.45,epz); _ePc.set(pPos.x,1.45,pPos.z);
-      const canSee=!ps.dead && !gameOver && !DEV.freezeAI && distP<T.enemyDetect && hasLOS(_eEyes,_ePc);
+      if(!gameOver && !DEV.freezeAI) acquireTarget(en,dt);
+      const tg=(en.targetId>=0)?SIM.players[en.targetId]:null;
+      const canSee=!!tg && tg.alive && en.targetVis && !gameOver && !DEV.freezeAI;
+      const ddx=tg?tg.x-epx:0, ddz=tg?tg.z-epz:0; const distP=hyp2(ddx,ddz);
       if(canSee){
         en.group.rotation.y=Math.atan2(ddx,ddz);
-        _p2.set(pPos.x,1.4,pPos.z); pitchWeapon(en.group,_p2);
+        _p2.set(tg.x,tg.y+1.4,tg.z); pitchWeapon(en.group,_p2);
         en.strafeT-=dt;if(en.strafeT<=0){en.strafeDir*=-1;en.strafeT=1+Math.random()*1.5;}
         const eu=unitOf(en.unit); const pr=eu.preferRange;
         const inv=distP>1e-4?1/distP:0; _eDir.set(ddx*inv,0,ddz*inv); _eMv.set(0,0,0);
-        if(distP>pr+3)_eMv.add(navSteer(en,pPos.x,pPos.z,_navDir,dt));else if(distP<pr-3)_eMv.sub(_eDir);
+        if(distP>pr+3)_eMv.add(navSteer(en,tg.x,tg.z,_navDir,dt));else if(distP<pr-3)_eMv.sub(_eDir);
         _eStr.set(-_eDir.z,0,_eDir.x).multiplyScalar(en.strafeDir*0.8); _eMv.add(_eStr);
-        if(_eMv.lengthSq()>0)_eMv.normalize(); enemyClimbSteer(en,_eMv); en.group.position.addScaledVector(_eMv,dt*T.enemyMoveSpeed*eu.speedMult);
+        if(_eMv.lengthSq()>0)_eMv.normalize(); enemyClimbSteer(en,_eMv,tg.y); en.group.position.addScaledVector(_eMv,dt*T.enemyMoveSpeed*eu.speedMult);
         if(en.lungeCd>0)en.lungeCd-=dt;
-        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; damagePlayer(eu.lunge,en.group.position,false,en); camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); }
+        if(eu.lunge&&distP<3.2&&en.lungeCd<=0){ en.lungeCd=2.5; applyDamage(en.id,en.targetId,eu.lunge,'body','melee',en.group.position.x,en.group.position.z); if(en.targetId===SIM_PLAYER){ camShake+=0.25; if(typeof spawnComic==='function')spawnComic('SLASH!',player.position.clone().setY(1.9),2.2,'#FF7B00'); } }
         en.fireCd-=dt;
         if(en.fireCd<=0){if(en.burstLeft<=0)en.burstLeft=eu.burst;enemyFire(en);en.burstLeft--;en.fireCd=en.burstLeft>0?eu.fireInterval:T.enemyBurstPause+Math.random()*0.6;}
       } else if(!gameOver && !DEV.freezeAI){
-        if(ei%2===0 && tbox.active && tbox.owner!=='hostile'){   // ~half the bots contest an active Tech Box they don't hold
+        if(en.role==='objective' && tbox.active && tbox.owner!==en.team){   // objective role: a box its team doesn't hold; otherwise it pushes (R28)
           const bp=TBOX.points[tbox.idx]; const to=_v.set(bp.x-en.group.position.x,0,bp.z-en.group.position.z); const d=to.length(); en.group.rotation.y=Math.atan2(to.x,to.z); en.group.userData.wpn.rotation.x*=0.9;
           if(d>TBOX.range-1.2){ en.group.position.addScaledVector(navSteer(en,bp.x,bp.z,_navDir,dt),dt*T.enemyMoveSpeed); }
         } else {
-        const fb=nearestFriendlyBuilding(en.group.position);
-        let fh=null,fhD=1e9; for(const h of harvesters){ if(h.team==='friend'&&h.alive){ const dd=h.group.position.distanceTo(en.group.position); if(dd<fhD){fhD=dd;fh=h;} } }
-        const fbD=fb?fb.mesh.position.distanceTo(en.group.position):1e9;
-        if(fh && fhD<fbD && fhD<42){ const to=_v.copy(fh.group.position).sub(en.group.position);to.y=0;const d=to.length();to.normalize();en.group.rotation.y=Math.atan2(to.x,to.z);
+        const tg=nearestEnemyStructure(en), fh=(tg&&!tg.mesh)?tg:null, fb=(tg&&tg.mesh)?tg:null;
+        if(fh){ const to=_v.copy(fh.group.position).sub(en.group.position);to.y=0;const d=to.length();to.normalize();en.group.rotation.y=Math.atan2(to.x,to.z);
           _p2.copy(fh.group.position); _p2.y=1.4; pitchWeapon(en.group,_p2);
           if(d>13)en.group.position.addScaledVector(navSteer(en,fh.group.position.x,fh.group.position.z,_navDir,dt),dt*T.enemyMoveSpeed);
           else{en.fireCd-=dt;if(en.fireCd<=0){siegeFireHarvester(en,fh);en.fireCd=T.enemyFireInterval*1.6+Math.random()*0.4;}} }
@@ -2710,13 +2932,13 @@ function update(dt){ NAV.budget=2;
       let _ejump=false; if(en.grounded){ const _jx=en.group.position.x-epx, _jz=en.group.position.z-epz, _jl=hyp2(_jx,_jz); if(_jl>1e-3){ const _f=en.group.position.y, _ah=surfaceHeightAt(en.group.position.x+_jx/_jl*1.5, en.group.position.z+_jz/_jl*1.5); if(_ah>_f+T.stepUp && _ah<=_f+EJUMP_REACH) _ejump=true; } }
       resolveObstacles(en.group.position,0.7); tickVertical(en.group.position, en, dt, _ejump, 0.7);
       { const _fOn=en.hitFlash>0; if(_fOn)en.hitFlash-=dt; if(_fOn!==en._fOn){ en._fOn=_fOn; const _hx=_fOn?0x661010:0x000000; en.group.traverse(o=>{if(o.isMesh&&o.material&&o.material.emissive)o.material.emissive.setHex(_hx);}); } }
-      const bar=en.group.userData.bar;bar.grp.visible=true;bar.grp.lookAt(camera.position);const h=Math.max(0,Math.min(1,en.health/(en.elite?T.eliteHealth:unitOf(en.unit).maxHealth)));bar.fg.scale.x=h;bar.fg.position.x=-(1-h)*0.7;
+      const bar=en.group.userData.bar;bar.grp.visible=true;bar.grp.lookAt(camera.position);const h=Math.max(0,Math.min(1,en.health/en.maxHealth));bar.fg.scale.x=h;bar.fg.position.x=-(1-h)*0.7;
       _animSt.aimYaw=en.group.rotation.y;_animSt.t=_animClock;_animSt.kick=0;_animSt.dip=0;_animSt.rel=-1;_animSt.throwC=-1;_animSt.lean=0;_animSt.grounded=en.grounded;en._aimT=Math.max(0,(en._aimT||0)-dt);_animSt.ads=en._aimT>0?1:0;_animSt.swap=0; updateSoldierAnim(en.group,_animSt,dt);
     } else {
       en.topple+=dt;if(en._tx===undefined){en._tx=(Math.random()<0.5?-1:1);en._tz=(Math.random()*2-1)*0.55;}animDeath(en.group,dt);en.group.userData.bar.grp.visible=false;
-      if(!gameOver&&eBar&&eBar.alive){en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.elite?T.eliteHealth:unitOf(en.unit).maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;en.group.position.copy(respawnPos(en));en.group.position.y=0;en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
+      if(!gameOver){const eRef=TEAM_INDEX[en.team].refinery;en.respawnT-=dt*(eRef&&eRef.alive?1.4:1);if(en.respawnT<=0){en.alive=true;AI_STATE.rotatePush(en);en.targetId=-1;en.targetVis=false;en.scanCursor=0;setEnemyType(en,en.elite?2:(Math.random()*3)|0);en.health=en.maxHealth;en.lungeCd=0;en.topple=0;en._tx=undefined;en.state='patrol';en.group.rotation.x=0;en.group.rotation.z=0;teamSpawnPoint(en.team,en.id,en.group.position);en.fireCd=1+Math.random();en.group.userData.wpn.rotation.x=0;updateHostileCount();}}
     }
-  });
+  }
 
   // building sink animation
   buildings.forEach(b=>{if(!b.alive&&b.sink<1){b.sink=Math.min(1,b.sink+dt*0.7);b.mesh.position.y=b.mesh.geometry.parameters.height/2 - b.sink*b.mesh.geometry.parameters.height*0.85;b.trim.position.y=b.mesh.position.y+b.mesh.geometry.parameters.height/2-0.7;}});
@@ -2762,7 +2984,7 @@ function backToMenu(){
   mode='menu'; started=false; paused=false;
   if(typeof edLeaveToMenu==='function') edLeaveToMenu();
   pauseMenuEl.style.display='none'; pauseMenuEl.classList.remove('wr-manual');
-  enemies.forEach(en=>{en.group.visible=true;});
+  enemies.forEach(en=>{en.group.visible=en.active;});
   hudEl.style.display='none'; renderer.domElement.style.cursor='default';
   titleEl.style.display='flex'; titleEl.style.opacity='1'; wrMenuShow();
   setMenuCam();
@@ -2964,7 +3186,7 @@ BK.buildProp=function(kind, seed){
   if(typeof stylizeOne==='function') stylizeOne(g);
   return { group:g, solid:!!K.solid, los:!!K.los, height:colH };
 };
-buildMap(DM_Cabana);
+{ let def=DM_Cabana; try{ const s=(window.location&&typeof window.location.search==='string')?window.location.search:''; if(/^\?(?:[^#]*&)?map=tri(?:&|$)/.test(s)) def=DM_Tri; }catch(e){} buildMap(def); }   // ?map=tri opens the three-team arena
 
 /* player */
 player.userData.sword=makeSword(); player.userData.joints.handR.add(player.userData.sword); player.userData.sword.position.set(0,-0.05,0.05);
@@ -2980,32 +3202,37 @@ player.userData.shield=makeShield(0x38e1b0); player.userData.joints.handL.add(pl
   const hlg=new THREE.CylinderGeometry(0.055,0.055,1,6); hlg.translate(0,0.5,0);
   heightLine=new THREE.Mesh(hlg,new THREE.MeshBasicMaterial({color:0xffd23f,transparent:true,opacity:0.92,depthTest:false}));
   heightLine.renderOrder=995; heightLine.visible=false; noRay(heightLine); scene.add(heightLine); }
-for(let i=0;i<T.enemyCount;i++){
-  let _fac, _pos;
-  if(enemySpawns.length){ const m=enemySpawns[i%enemySpawns.length]; _fac=m.faction; const a=Math.random()*6.283, r=Math.random()*5; _pos=new THREE.Vector3(m.x+Math.cos(a)*r,0,m.z+Math.sin(a)*r); }
-  else { _fac=(i<T.eliteCount)?'Empire':'Soviets'; _pos=randSpawn(); }
-  const _elite=(_fac==='Empire'); const g=spawnEnemyMesh(_fac); g.position.copy(_pos); scene.add(g);
-  const en={group:g,elite:_elite,faction:_fac,health:T.enemyHealth,alive:true,topple:0,respawnT:0,hitFlash:0,state:'patrol',wander:Math.random()*6.28,wanderT:0,fireCd:Math.random()*2,burstLeft:0,strafeDir:Math.random()<.5?1:-1,strafeT:0,unit:0,lungeCd:0,frags:0,downs:0,vy:0,grounded:true,_aimT:0,_tx:undefined,_tz:0,_fOn:false,_nav:null};
-  setEnemyType(en, _elite?2:(i%3)); en.health=_elite?T.eliteHealth:unitOf(en.unit).maxHealth;
+// Fixed slot table (three-teams item 4): TUNE.teams.size slots per team, team-major in TEAMS order. Slot 0 is you, so
+// with size 4: 1-3 allies, 4-7 soviets, 8-11 empire (the player's team, TEAMS[0] today, gets size-1 bot slots).
+// activateRoster() parks the slots of teams that don't play.
+SOLDIERS[0]=ps;
+for(let k=0;k<TEAMS.length;k++){ const tm=TEAMS[k];
+  for(let j=(tm.id===PLAYER_TEAM?1:0);j<TUNE.teams.size;j++){
+  const _fac=tm.faction; const g=spawnEnemyMesh(_fac,false); scene.add(g);   // no elite (D6): Empire bots wear the standard soldier
+  const en={group:g,elite:false,faction:_fac,health:T.enemyHealth,alive:true,topple:0,respawnT:0,hitFlash:0,state:'patrol',wander:Math.random()*6.28,wanderT:0,fireCd:Math.random()*2,burstLeft:0,strafeDir:Math.random()<.5?1:-1,strafeT:0,unit:0,lungeCd:0,frags:0,downs:0,vy:0,grounded:true,_aimT:0,_tx:undefined,_tz:0,_fOn:false,_nav:null,
+    id:SOLDIERS.length,team:tm.id,maxHealth:T.enemyHealth,active:false,lastAttackerId:-1,targetId:-1,retargetT:0,scanCursor:0,role:null,credits:0,px:undefined,pz:undefined,   // px/pz stay undefined until tickVertical's first step (it tests !==undefined)
+    losT:0,targetVis:false,scanBestId:-1,scanBestD2:0,pushTeam:null};
+  setEnemyType(en, j%3); en.health=en.maxHealth;   // activateRoster() places the active slots (teamSpawnPoint)
   g.traverse(o=>{ if(o.isMesh) o.userData.enemyRef=en; }); // for aim hover detection
-  enemies.push(en);
-}
+  enemies.push(en); SOLDIERS.push(en);
+} }
 
 /* ============ HARVESTERS / SUPPLY CONVOY (Phase 2) ============
  * One AI supply truck per team: refinery dock → supply cache → load → return → dock = cash + tech.
  * Destructible & contestable (shoot the enemy truck to deny their tech). Respawns while the
  * refinery lives; self-destructs (no respawn) if the refinery dies. Movement is straight-line
  * waypoints (open top-down map, no pathfinding). Hot path is allocation-free. */
-makeHarvester('friend'); makeHarvester('hostile'); makeSupplyField();
+for(let i=0;i<TEAMS.length;i++) makeHarvester(TEAMS[i].id); makeSupplyField(); buildTeamIndex(); activateRoster();
 
 /* ============ TECH BOXES (Phase 3) ============
  * One box at a time, rotating among 3 capture points. Hold E inside the ring with no enemies
  * present for captureTime to claim it; an enemy on the ring contests (freezes/decays progress) —
  * clear them to capture or steal. Channeling blocks your weapons (you're vulnerable). At expiry
  * the holding team banks ECO.techBox tech; a new box then spawns at a different point after a gap.
- * ~half the bots contest the box they don't hold; the rest keep sieging buildings/harvester. */
-TBOX.points.forEach(pt=>techPts.push(makeTechPoint(pt))); makeTechBoxMesh();
-SILO.points.forEach(pt=>silos.push(makeSilo(pt)));
+ * Bots in the objective role (one per team on Cabana) contest a box their team doesn't hold; the rest push or hunt. */
+for(let i=0;i<TBOX.pool.length;i++) techPts.push(makeTechPoint(TBOX.pool[i])); makeTechBoxMesh();   // fixed pools of 3 (techPts[i] stays index-aligned with TBOX.points[i])
+for(let i=0;i<SILO.pool.length;i++) silos.push(makeSilo(SILO.pool[i]));
+placeObjectives({harvField:{x:HARV.fieldX,z:HARV.fieldZ}, harvLanes:HARV.lanes, techPoints:TBOX.points.slice(), silos:SILO.points.slice()});   // pools exist now: show only the map's
 _rulesReady=true; applyRules(_rules);
 FXPool._def('casing',()=>{ const m=new THREE.Mesh(new THREE.BoxGeometry(0.055,0.055,0.14),new THREE.MeshStandardMaterial({color:0xd6a23a,roughness:0.5,metalness:0.6,emissive:0x3a2a08,emissiveIntensity:0.25,transparent:true,opacity:1})); noRay(m); m.userData.noOutline=true; stylizeOne(m); m.visible=false; scene.add(m); return {mesh:m,vel:new THREE.Vector3(),av:new THREE.Vector3()}; });
 FXPool._def('flash',()=>{ const m=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0.95})); noRay(m); m.visible=false; scene.add(m); return {mesh:m}; });
@@ -3107,14 +3334,14 @@ updateCareerChip();
   $('dvCamReset').onclick=()=>{ applyCamStyle(CAM_STYLES[3]); };
   $('dvPitch').oninput=()=>{ const p=parseFloat($('dvPitch').value); camPitchOverride=p; $('dvPitchV').textContent=p.toFixed(0)+'°'; };
   { const mp=$('dvMap'); if(mp) mp.oninput=()=>{ setMapSize(+mp.value); $('dvMapV').textContent=T.arenaX; }; }
-  $('dvHeal').onclick=()=>{ ps.health=ps.maxHealth; ps.dead=false; updateHealthHUD(); };
+  $('dvHeal').onclick=()=>{ ps.health=ps.maxHealth; ps.dead=false; ps.alive=true; updateHealthHUD(); };
   $('dvCred').onclick=()=>{ credits+=1000; updateCreditHUD(); };
-  $('dvHarv').onclick=()=>{ credits+=ECO.payHarvester; updateCreditHUD(); addTech('friend',ECO.techHarvester); showLevelToast('Harvester','+'+ECO.payHarvester+' cr · +'+ECO.techHarvester+' tech'); };
-  $('dvBox').onclick=()=>{ addTech('friend',ECO.techBox); showLevelToast('Tech Box','+'+ECO.techBox+' tech (captured)'); };
-  $('dvTechUs').onclick=()=>addTech('friend',20);
-  $('dvTechEn').onclick=()=>addTech('hostile',20);
-  $('dvSilo').onclick=()=>{ teamEco.friend.silos++; showLevelToast('Silo','+'+ECO.paySilo+'/s · total '+teamEco.friend.silos); };
-  $('dvEra').onclick=()=>{ const f=teamEco.friend; if(f.era<ECO.eraNames.length) addTech('friend', ECO.eraCost[f.era-1]-f.tech); };
+  $('dvHarv').onclick=()=>{ credits+=ECO.payHarvester; updateCreditHUD(); addTech(PLAYER_TEAM,ECO.techHarvester); showLevelToast('Harvester','+'+ECO.payHarvester+' cr · +'+ECO.techHarvester+' tech'); };
+  $('dvBox').onclick=()=>{ addTech(PLAYER_TEAM,ECO.techBox); showLevelToast('Tech Box','+'+ECO.techBox+' tech (captured)'); };
+  $('dvTechUs').onclick=()=>addTech(PLAYER_TEAM,20);
+  $('dvTechEn').onclick=()=>addTech(TEAM_INDEX.firstEnemy,20);
+  $('dvSilo').onclick=()=>{ teamEco[PLAYER_TEAM].silos++; showLevelToast('Silo','+'+ECO.paySilo+'/s · total '+teamEco[PLAYER_TEAM].silos); };
+  $('dvEra').onclick=()=>{ const f=teamEco[PLAYER_TEAM]; if(f.era<ECO.eraNames.length) addTech(PLAYER_TEAM, ECO.eraCost[f.era-1]-f.tech); };
   $('dvUnlock').onclick=()=>{ loadout.forEach((l,i)=>{ l.owned=true; const w=WEAPONS[i]; if(!(l.ammo>0)) l.ammo=w.mag||0; if(!(l.reserve>0)) l.reserve=w.reserve||0; }); ps.shieldOwned=true; DEV.allGuns=true;
     updateHeldModel(); updateWeaponHUD(); showLevelToast('Dev','All weapons unlocked \u2014 mouse wheel or 2 cycles every gun'); };
   $('dvXp').onclick=()=>addXP(1000);
@@ -3122,7 +3349,7 @@ updateCareerChip();
   $('dvMax').onclick=()=>devSetLevel(100);
   $('dvPrest').onclick=devPrestige;
   $('dvReset').onclick=devReset;
-  $('dvKill').onclick=()=>{ if(mode!=='game')return; enemies.forEach(en=>{ if(en.alive) damageEnemy(en,T.enemyHealth+999,'body',en.group.position.clone().setY(1.4),true); }); };
+  $('dvKill').onclick=()=>{ if(mode!=='game')return; enemies.forEach(en=>{ if(en.alive&&!sameTeam(en.team,PLAYER_TEAM)) damageEnemy(en,T.enemyHealth+999,'body',en.group.position.clone().setY(1.4),true); }); };
   $('dvWin').onclick=()=>{ if(mode==='game')endGame(true); };
   $('dvLose').onclick=()=>{ if(mode==='game')endGame(false); };
 })();

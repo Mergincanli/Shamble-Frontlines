@@ -84,7 +84,8 @@ Mustafa tells you to after the APPROVE.
   merge-base with main or origin/main, whichever is newer; CI runs it)
 - Official battery (JSON): `node tools/battery.js <dir>`
 - 3D render: `node tools/preview.js <dir> shot <out.png> <x> <z>` · `menu <out.png>` · `eval <snippet.js>` (Linux: prefix `xvfb-run -a`)
-- Headless match: `node tools/preview.js <dir> eval tools/sim.js`
+- Headless match: `node tools/preview.js <dir> eval tools/sim.js [--map=tri]` · reachability: `eval tools/reach.js [--map=tri]` ·
+  bot scaling: `node --expose-gc tools/preview.js <dir> eval tools/perfbots.js --map=tri --pre=<file.js>` (`--map=tri`: the three-team arena)
 - Real pages (DOM + HUD + WebGL): `node tools/pageshot.js <dir> index.html <outPrefix> [--headed] <steps…>` (`--headed`: real GPU; every shot prints its WebGL renderer)
 - Map layout validation: `tools/aabbs.js` + `tools/village.py`
 

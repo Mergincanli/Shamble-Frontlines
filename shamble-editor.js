@@ -162,7 +162,7 @@ function edScaleSel(sel,target){ target=Math.max(0.3,Math.min(4,target)); edPush
 let edMirror=null;
 function edCycleMirror(){ edMirror=(edMirror===null)?'X':(edMirror==='X')?'Z':null; edUpdateMirrorBtn(); }
 function edUpdateMirrorBtn(){ const b=document.getElementById('edMirrorBtn'); if(b){ {const l=b.querySelector('.edBtnLab'); if(l)l.textContent=edMirror?('Mirror '+edMirror):'Mirror Off';} b.classList.toggle('on',!!edMirror); } }
-function _mirrorDesc(d){ const m=Object.assign({},d); if(edMirror==='X') m.ax=-d.ax; else m.az=-d.az; m.rot=-(d.rot||0); if(m.team==='friend')m.team='hostile'; else if(m.team==='hostile')m.team='friend'; return m; }
+function _mirrorDesc(d){ const m=Object.assign({},d); if(edMirror==='X') m.ax=-d.ax; else m.az=-d.az; m.rot=-(d.rot||0); const tm=teamOf(m.team); if(tm==='allies')m.team='soviets'; else if(tm==='soviets')m.team='allies'; if(m.faction==='Allies')m.faction='Soviets'; else if(m.faction==='Soviets')m.faction='Allies'; return m; }
 function edMirrorOne(sel){ if(!edMirror)return null; const d=edDescribe(sel); if(!d)return null; const m=_mirrorDesc(d); return edSpawnDesc(m, m.ax, m.az); }
 function edMirrorSel(){ if(!edMirror||!edMulti.length)return; edPushUndo(); const clones=[]; for(const s of edMulti){ const c=edMirrorOne(s); if(c)clones.push(c); } rebuildLOS(); if(clones.length)edSetSel(clones); }
 function edArraySel(n,gap,axis){ if(!edMulti.length||!isFinite(gap))return; n=Math.max(2,Math.min(50,Math.round(n)));
@@ -498,13 +498,22 @@ function ovObjectives(){ const list=[];
   (TBOX&&TBOX.points?TBOX.points:[]).forEach(p=>list.push({x:p.x,z:p.z,name:(p.name||'TECH'),kind:'tech'}));
   if(HARV&&isFinite(HARV.fieldX))list.push({x:HARV.fieldX,z:HARV.fieldZ,name:'HARVESTER',kind:'harv'});
   return list; }
+// Where the first playing other team's bots spawn (three-teams step 11: teamSpawnPoint, its first slot), for the fairness
+// distances. Rebuilds the team index from the map as edited; the band only when that team has no marker, barracks or HQ.
+function ovHostileSpawn(){ buildTeamIndex(); let ht=null;
+  for(let i=0;i<TEAMS.length;i++){ const id=TEAMS[i].id; if(id!==PLAYER_TEAM&&TEAM_INDEX[id].hqs.length){ ht=id; break; } }
+  if(!ht) ht='soviets';   // N2: no other team has an HQ
+  let slot=0; for(let k=1;k<SOLDIERS.length;k++) if(SOLDIERS[k].team===ht){ slot=SOLDIERS[k].id; break; }
+  const v=teamSpawnPoint(ht,slot,new THREE.Vector3()), e=TEAM_INDEX[ht];
+  return {x:v.x, z:v.z, team:ht, how:e.markers.length?'at its marker':e.barracksE?'outside its barracks door':e.hqs.length?'beside its HQ':'random across band'}; }
 function ovBuildSpawn(){ ovClearGroup(ovSpawnG); ovClearLabels('spawn'); if(!ovSpawnOn)return;
-  const F={x:mapSpawn.x,z:mapSpawn.z}, H={x:0,z:21-T.arenaZ}, objs=ovObjectives();
+  const F={x:mapSpawn.x,z:mapSpawn.z}, Hs=ovHostileSpawn(), H={x:Hs.x,z:Hs.z}, objs=ovObjectives();
   const fm=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.3,22), new THREE.MeshBasicMaterial({color:0x38e1b0,transparent:true,opacity:0.5})); fm.position.set(F.x,0.2,F.z); noRay(fm); ovSpawnG.add(fm);
   const zx0=-(T.arenaX-8), zx1=(T.arenaX-8), zz0=-T.arenaZ+10, zz1=-T.arenaZ+32;
-  const hz=new THREE.Mesh(new THREE.BoxGeometry(zx1-zx0,0.3,zz1-zz0), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.15})); hz.position.set((zx0+zx1)/2,0.18,(zz0+zz1)/2); noRay(hz); ovSpawnG.add(hz);
-  ovLabel('spawn','<b>SPAWN</b>',F.x,3.2,F.z,'friend');
-  ovLabel('spawn','<b>HOSTILE SPAWN</b><span class="ovSub">random across band</span>',H.x,3.2,H.z,'hostile');
+  if(Hs.how==='random across band'){ const hz=new THREE.Mesh(new THREE.BoxGeometry(zx1-zx0,0.3,zz1-zz0), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.15})); hz.position.set((zx0+zx1)/2,0.18,(zz0+zz1)/2); noRay(hz); ovSpawnG.add(hz); }
+  else { const hm=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,0.3,22), new THREE.MeshBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.5})); hm.position.set(H.x,0.2,H.z); noRay(hm); ovSpawnG.add(hm); }
+  ovLabel('spawn','<b>SPAWN</b>',F.x,3.2,F.z);
+  ovLabel('spawn','<b>HOSTILE SPAWN</b><span class="ovSub">'+(Hs.team==='empire'?'Empire':'Soviets')+' '+Hs.how+'</span>',H.x,3.2,H.z);   // fixed strings only (no map text)
   for(let i=0;i<objs.length;i++){ const o=objs[i], df=Math.hypot(o.x-F.x,o.z-F.z), dh=Math.hypot(o.x-H.x,o.z-H.z);
     const sf=ovMakeSeg(ovSpawnG,0x38e1b0,0.32); ovPlaceSeg(sf,F.x,F.z,o.x,o.z,0.22); sf.material.opacity=0.45;
     const sh=ovMakeSeg(ovSpawnG,0xff5a5a,0.32); ovPlaceSeg(sh,H.x,H.z,o.x,o.z,0.24); sh.material.opacity=0.45;
@@ -512,7 +521,7 @@ function ovBuildSpawn(){ ovClearGroup(ovSpawnG); ovClearLabels('spawn'); if(!ovS
     let html='<b>'+o.name+'</b><span class="ovSub">F '+df.toFixed(0)+'m · H '+dh.toFixed(0)+'m';
     if(warn)html+=' · '+(df<dh?'F':'H')+' +'+Math.abs(df-dh).toFixed(0)+'m'; html+='</span>';
     ovLabel('spawn',html,o.x,3.4,o.z, warn?'warn':undefined); } }
-function ovSpawnTick(){ if(!ovSpawnOn)return; const objs=ovObjectives(); let sig=mapSpawn.x.toFixed(1)+','+mapSpawn.z.toFixed(1)+'|'+T.arenaX.toFixed(1)+','+T.arenaZ.toFixed(1)+'|'; for(let i=0;i<objs.length;i++)sig+=objs[i].x.toFixed(1)+','+objs[i].z.toFixed(1)+';'; if(sig!==_ovSpawnSig){ _ovSpawnSig=sig; ovBuildSpawn(); } }
+function ovSpawnTick(){ if(!ovSpawnOn)return; const objs=ovObjectives(), Hs=ovHostileSpawn(); let sig=mapSpawn.x.toFixed(1)+','+mapSpawn.z.toFixed(1)+'|'+Hs.x.toFixed(1)+','+Hs.z.toFixed(1)+'|'+T.arenaX.toFixed(1)+','+T.arenaZ.toFixed(1)+'|'; for(let i=0;i<objs.length;i++)sig+=objs[i].x.toFixed(1)+','+objs[i].z.toFixed(1)+';'; if(sig!==_ovSpawnSig){ _ovSpawnSig=sig; ovBuildSpawn(); } }
 function toggleSpawnDist(){ ovSpawnOn=!ovSpawnOn; _ovSpawnSig=''; if(ovSpawnOn){ ovSpawnTick(); } else { ovClearGroup(ovSpawnG); ovClearLabels('spawn'); } const b=document.getElementById('ovSpawnBtn'); if(b){ b.classList.toggle('on',ovSpawnOn); const t=b.querySelector('.tg'); if(t)t.textContent=ovSpawnOn?'ON':'OFF'; } }
 function ovResetAll(){ if(ovSpawnOn)toggleSpawnDist(); if(ovSymAxis)toggleSymmetry(); if(typeof toggleCover==='function'&&ovCoverOn)toggleCover(); }
 function ovToggle(name){ if(name==='spawn')toggleSpawnDist(); else if(name==='sym'&&typeof toggleSymmetry==='function')toggleSymmetry(); else if(name==='cover'&&typeof toggleCover==='function')toggleCover(); }
@@ -535,8 +544,8 @@ function ovBuildSym(){ ovClearGroup(ovSymG); ovClearLabels('sym'); if(ovSymAxis=
   const items=ovStructures(), axis=ovSymAxis, tol=3.0; let matched=0, unmatched=0;
   for(let i=0;i<items.length;i++){ const O=items[i], coord=(axis==='x'?O.x:O.z); let isM;
     if(Math.abs(coord)<tol && O.team==null){ isM=true; }
-    else { const M=ovMirror(O.x,O.z,axis), expTeam=(axis==='z'&&O.team)?(O.team==='friend'?'hostile':'friend'):O.team; isM=false;
-      for(let j=0;j<items.length;j++){ if(j===i)continue; const P=items[j]; if(P.cat===O.cat && (P.type||'')===(O.type||'') && Math.abs(P.x-M.x)<tol && Math.abs(P.z-M.z)<tol && (expTeam==null||P.team===expTeam)){ isM=true; break; } } }
+    else { const M=ovMirror(O.x,O.z,axis), tO=teamOf(O.team), expTeam=(axis==='z'&&tO)?(tO==='allies'?'soviets':tO==='soviets'?'allies':tO):tO; isM=false;
+      for(let j=0;j<items.length;j++){ if(j===i)continue; const P=items[j]; if(P.cat===O.cat && (P.type||'')===(O.type||'') && Math.abs(P.x-M.x)<tol && Math.abs(P.z-M.z)<tol && (expTeam==null||teamOf(P.team)===expTeam)){ isM=true; break; } } }
     if(isM)matched++; else unmatched++;
     ovWireBox(ovSymG,O.cx,O.cy,O.cz,O.sx+0.4,O.sy+0.4,O.sz+0.4, isM?0x38e1b0:0xff5a5a); }
   ovLabel('sym','<b>SYMMETRY '+(axis==='z'?'N–S':'E–W')+'</b><span class="ovSub">'+matched+' mirrored · '+unmatched+' unmatched</span>', 0, 12, 0, unmatched?'warn':undefined); }
@@ -587,14 +596,14 @@ function edPlaceAt(p){ let sel=null;
   else if(edTool==='farmhouse') sel=placeLegacyHouse(makeBrickFlintFarmhouse(p.x,p.z)).grp.userData.editSel;
   else if(edTool==='manor') sel=placeLegacyHouse(makeManorHouse(p.x,p.z), true).grp.userData.editSel;
   else if(edTool==='bmaker'&&typeof _bkPlaceAt==='function') sel=_bkPlaceAt(p.x,p.z);
-  else if(edTool==='hqF') sel=makeBuilding('friend','hq',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='refF') sel=makeBuilding('friend','refinery',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='barF') sel=makeBuilding('friend','barracks',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='hqH') sel=makeBuilding('hostile','hq',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='refH') sel=makeBuilding('hostile','refinery',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='barH') sel=makeBuilding('hostile','barracks',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='powF') sel=makeBuilding('friend','power',p.x,p.z).mesh.userData.editSel;
-  else if(edTool==='powH') sel=makeBuilding('hostile','power',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='hqF') sel=makeBuilding('allies','hq',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='refF') sel=makeBuilding('allies','refinery',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='barF') sel=makeBuilding('allies','barracks',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='hqH') sel=makeBuilding('soviets','hq',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='refH') sel=makeBuilding('soviets','refinery',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='barH') sel=makeBuilding('soviets','barracks',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='powF') sel=makeBuilding('allies','power',p.x,p.z).mesh.userData.editSel;
+  else if(edTool==='powH') sel=makeBuilding('soviets','power',p.x,p.z).mesh.userData.editSel;
   else if(edTool==='espawnSov') sel=makeEnemySpawn(p.x,p.z,'Soviets').grp.userData.editSel;
   else if(edTool==='espawnAll') sel=makeEnemySpawn(p.x,p.z,'Allies').grp.userData.editSel;
   else if(edTool==='espawnEmp') sel=makeEnemySpawn(p.x,p.z,'Empire').grp.userData.editSel;
@@ -853,7 +862,7 @@ function edSetLibMode(m){ const gen=(m==='gen'); _edLibMode=m;
 function edBuildRecent(){ const wrap=document.getElementById('edRecentCards'), empty=document.getElementById('edRecentEmpty'); if(!wrap)return; wrap.innerHTML=''; if(!_edRecent.length){ if(empty)empty.style.display='block'; return; } if(empty)empty.style.display='none'; _edRecent.forEach(function(id){ const orig=document.querySelector('#edPalette .edTabPanel:not([data-cat="recent"]) .edTool[data-tool="'+id+'"]'); if(!orig)return; const c=orig.cloneNode(true); c.classList.remove('active'); c.addEventListener('click',function(){ setEdTool(c.dataset.tool); }); wrap.appendChild(c); }); }
 const edInsp=document.getElementById('edInsp'), edInspBody=edInsp.querySelector('.edIBody'), edInspKind=document.getElementById('edIKind');
 let _edInspRef=undefined, _edInspHidden=false, _edLibCollapsed=false, _edLibMode='place'; const _SIZEABLE={crate:1,wall:1,path:1,platform:1}, _SCALEABLE={building:1,barracks:1};
-function edKindLabel(s){ switch(s.kind){ case 'crate':return 'Crate'; case 'wall':return 'Wall'; case 'path':return 'Path / Road'; case 'building':return ((s.ref&&s.ref.team==='friend')?'Friendly ':'Hostile ')+((s.ref&&s.ref.type)||'building'); case 'barracks':return 'Barracks'; case 'platform':return 'Platform'; case 'ramp':return 'Ramp'; case 'cover':return (s.ref&&BK.COVER[s.ref.type]?BK.COVER[s.ref.type].label:'Cover'); case 'tree':return (s.ref&&BK.TREES[s.ref.kind]?BK.TREES[s.ref.kind].label:'Tree'); case 'prop':return (s.ref&&BK.PROPS[s.ref.kind]?BK.PROPS[s.ref.kind].label:'Prop'); case 'spawn':return 'Player Spawn'; case 'resupply':return 'Resupply'; } return s.kind; }
+function edKindLabel(s){ switch(s.kind){ case 'crate':return 'Crate'; case 'wall':return 'Wall'; case 'path':return 'Path / Road'; case 'building':{ const t=s.ref?teamOf(s.ref.team):null; return (t!==null&&t===PLAYER_TEAM?'Friendly ':t==='empire'?'Empire ':'Hostile ')+((s.ref&&s.ref.type)||'building'); } case 'barracks':return 'Barracks'; case 'platform':return 'Platform'; case 'ramp':return 'Ramp'; case 'cover':return (s.ref&&BK.COVER[s.ref.type]?BK.COVER[s.ref.type].label:'Cover'); case 'tree':return (s.ref&&BK.TREES[s.ref.kind]?BK.TREES[s.ref.kind].label:'Tree'); case 'prop':return (s.ref&&BK.PROPS[s.ref.kind]?BK.PROPS[s.ref.kind].label:'Prop'); case 'spawn':return 'Player Spawn'; case 'resupply':return 'Resupply'; } return s.kind; }
 function _edCanRot(s){ return !!s&&s.kind!=='spawn'&&s.kind!=='platform'&&s.kind!=='enemyspawn'&&s.kind!=='tree'; }   // exactly the kinds edRotateOne turns
 function _edRotCur(s){ if(!_edCanRot(s))return null; if(s.kind==='barracks')return s.ref.rot||0; const m=edSelTarget(s); return m?m.rotation.y:null; }
 function _edRow(label){ const r=document.createElement('div'); r.className='edIRow'; const l=document.createElement('span'); l.className='edILab'; l.textContent=label; r.appendChild(l); return r; }
@@ -927,8 +936,9 @@ function edBuildInspector(s){
     rp.appendChild(grp); edInspBody.appendChild(rp);
   }
   if(edMulti.length===1 && (s.kind==='building'||s.kind==='barracks')){ const rt=_edRow('Team'); const seg=document.createElement('div'); seg.className='edIBtnRow';
-    const mkT=(label,team)=>{ const b=document.createElement('div'); b.className='edBtn edBtnSm edIStep edITeam team_'+team+(s.ref.team===team?' on':''); b.textContent=label; b.title='Set faction to '+label; b.addEventListener('click',()=>{ if(s.ref.team!==team)edSetTeam(team); }); seg.appendChild(b); };
-    mkT('Friendly','friend'); mkT('Hostile','hostile'); rt.appendChild(seg); edInspBody.appendChild(rt); }
+    // team is the canonical id; cls keeps the page CSS class tokens team_friend / team_hostile
+    const mkT=(label,team,cls)=>{ const b=document.createElement('div'); b.className='edBtn edBtnSm edIStep edITeam team_'+cls+(teamOf(s.ref.team)===team?' on':''); b.textContent=label; b.title='Set faction to '+label; b.addEventListener('click',()=>{ if(teamOf(s.ref.team)!==team)edSetTeam(team); }); seg.appendChild(b); };
+    mkT('Friendly','allies','friend'); mkT('Hostile','soviets','hostile'); rt.appendChild(seg); edInspBody.appendChild(rt); }
   if(edMulti.length===1 && _SCALEABLE[s.kind]){ const cur=(s.ref.scl||1);
     const rsc=_edRow('Scale ×'), isc=_edNum(cur,0.05); isc.title='Uniform scale'; rsc.appendChild(isc);
     const mkS=(txt,delta)=>{ const b=document.createElement('div'); b.className='edBtn edBtnSm edIStep edIStepSq'; b.textContent=txt; b.title=(delta>0?'+':'')+delta+' scale'; b.addEventListener('click',()=>{ edScaleSel(s,(s.ref.scl||1)+delta); edSyncInspector(); }); return b; };
@@ -1219,7 +1229,7 @@ edUpdateUndoBtns();
   edStatusSync();
 })();
 /* ---- editor tooltips: fill label-less card tips + one floating tooltip for all [data-tip] ---- */
-(function(){ const CT={hqF:'Headquarters — the base you must destroy to win.',hqH:'Enemy headquarters — destroy it to win the round.',refF:'Refinery — turns harvested ore into credits.',refH:'Enemy refinery — turns ore into credits.',barF:'Barracks — troop & armory building.',barH:'Enemy barracks — troop & armory building.',powF:'Power plant — powers the base.',powH:'Enemy power plant — powers the base.',crateS:'Small crate — low cover.',crateM:'Medium crate — waist-high cover.',crateL:'Large crate — full standing cover.',spawn:'Player spawn point.',resupply:'Resupply terminal — heal & refill ammo.',espawnSov:'Soviet enemy spawn point.',espawnAll:'Allies enemy spawn point.',espawnEmp:'Empire elite enemy spawn point.'};
+(function(){ const CT={hqF:'Headquarters — the base you must destroy to win.',hqH:'Enemy headquarters — destroy it to win the round.',refF:'Refinery — turns harvested ore into credits.',refH:'Enemy refinery — turns ore into credits.',barF:'Barracks — troop & armory building.',barH:'Enemy barracks — troop & armory building.',powF:'Power plant — powers the base.',powH:'Enemy power plant — powers the base.',crateS:'Small crate — low cover.',crateM:'Medium crate — waist-high cover.',crateL:'Large crate — full standing cover.',spawn:'Player spawn point.',resupply:'Resupply terminal — heal & refill ammo.',espawnSov:'Soviet spawn point.',espawnAll:'Allies spawn point.',espawnEmp:'Empire spawn point.'};
   document.querySelectorAll('#edPalette .edTool').forEach(el=>{ const t=el.dataset.tool; if(t&&CT[t]&&!el.getAttribute('data-tip'))el.setAttribute('data-tip',CT[t]); });
   const root=document.getElementById('editor'); if(!root)return;
   const tip=document.createElement('div'); tip.id='edTipEl'; root.appendChild(tip);

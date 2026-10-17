@@ -167,6 +167,7 @@
   #scoreboard .sb-rank{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center}
   #scoreboard .sb-rank svg{width:22px;height:22px;display:block}
   #scoreboard .sb-rank.h-rank::before{content:'';width:11px;height:11px;border:2px solid #e06a6a;transform:rotate(45deg);border-radius:2px}
+  #scoreboard .sb-rank.a-rank::before{content:'';width:11px;height:11px;border:2px solid #38e1b0;transform:rotate(45deg);border-radius:2px}
   #scoreboard .sb-pname{flex:1;min-width:0;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #scoreboard .sb-prow.you .sb-pname{font-weight:700;color:#cfe4ff}
   #scoreboard .sb-pk,#scoreboard .sb-pd,#scoreboard .sb-pa{width:34px;text-align:center;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -1194,7 +1195,7 @@
       <div class="edCards">
         <div class="edTool" data-tool="espawnSov" data-ic="flag"><i class="edCardChip" style="background:#e2483a"></i>Soviet Spawn</div>
         <div class="edTool" data-tool="espawnAll" data-ic="flag"><i class="edCardChip" style="background:#3d7dff"></i>Allies Spawn</div>
-        <div class="edTool" data-tool="espawnEmp" data-ic="flag"><i class="edCardChip" style="background:#9a5cff"></i>Empire &middot; Elite</div>
+        <div class="edTool" data-tool="espawnEmp" data-ic="flag"><i class="edCardChip" style="background:#9a5cff"></i>Empire Spawn</div>
       </div>
       <div class="edGroup">Analysis</div>
     <div class="edToggle" data-ov="spawn" id="ovSpawnBtn" data-tip="Straight-line distance from both spawns to every objective (silo / tech / harvester). Flags any objective that favours one side by 15%+ — a fairness / rush-timing check.">Spawn Distances <span class="tg">OFF</span></div>

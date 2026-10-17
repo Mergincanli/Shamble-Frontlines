@@ -82,7 +82,17 @@ the menu; nothing auto-starts a match or the editor.
 | Building kit (`BK` + `makeTimberHouse`…`makeManorHouse`), map schema (`parseGridToMapDef`/`DM_*`) | **core** |
 | Config/tuning (`T`), arsenal (`WEAPONS`/`UNIT_TYPES`/`VEHICLE_TYPES`), env (`applyEnv`/`ENV_DEFAULT`) | **core** |
 | The SIM math (`rayAabb`/`rayStatic`/`rayStatics`/`resolveShot`/`hasLOS`/`SIM`/`FIXED_DT`) | **core** (fenced) [verified] |
-| SIM bridge: `syncSimWorld`, `SIM_PLAYER`, `_botFireWorld`, `_eHitN` (bot-fire hit world + impact normal) | **game** [verified] |
+| SIM bridge: `syncSimWorld`, `SIM_PLAYER`, `_botFireWorld` (kept, K1: `players` = `SIM.players`, statics without ramp slots), `_eHitN` (bot-fire impact normal) | **game** [verified] |
+| Teams as data (`TEAMS`) and the team-play tuning table (`TUNE`) | **core** [verified] |
+| Three-team arena map data (`DM_Tri`, opened by `index.html?map=tri`) | **core** [verified] |
+| Team identity: `PLAYER_TEAM`, `teamOf` (the only reader of team strings), `sameTeam`, `teamFilter` | **game** [verified] |
+| Per-team building / marker / truck index: `TEAM_INDEX`, `buildTeamIndex` | **game** [verified] |
+| Soldier slot table `SOLDIERS` (slot 0 = you; `en.id` = SIM id) + parking `activateRoster` | **game** [verified] |
+| Damage: `applyDamage` (state), `onDamageEvent` (presentation), `_dmgEv` (reused record) | **game** [verified] |
+| Objectives: `presentTeam` (head count at a tech box / silo), `placeObjectives` (map keys `harvField`, `harvLanes`, `techPoints`, `silos`) | **game** [verified] |
+| Bot targeting and siege: `AI_STATE`, `acquireTarget`, `nearestEnemyStructure`; bot-shot FX cull helper `_botShotD2` | **game** [verified] |
+| Team spawns (`teamSpawnPoint`), interim end rule (`checkEnd`) | **game** [verified] |
+| Editor fairness overlay's first-enemy spawn (`ovHostileSpawn`, calls `buildTeamIndex`) | **editor** [verified] |
 | Persistence (`KVStore`: window.storage → localStorage → memory) | **core** |
 | Ink hull directions (`ensureOutlineNormals`), colour output + nature gain (`_natureGain`) | **core** |
 | Map data incl. the village (`DM_Cabana.houses`/`.trees`/`.props`/`.covers`) | **core** |
@@ -113,16 +123,18 @@ the menu; nothing auto-starts a match or the editor.
   render globals; only the fenced block is pure. Lifting it out is future work, not a claim
   about today.
 - **SIM ids — game.** `SIM.players[0]` is the player (id `SIM_PLAYER`=0, declared in `shamble-game.js`);
-  `SIM.players[i+1]` mirrors `enemies[i]` (id i+1). Player-side shots pass `SIM_PLAYER`; readers map a hit back with
-  `enemies[r.id-1]`; a death sets the victim's entry `alive=false` at once. [verified]
-- **SIM sync guard — game.** `syncSimWorld` re-syncs at most once per `update()` (unless called with `force`, as the editor's cover-map overlay (`ovBuildCover`) does): `update()` does `_frameId++` at its top
-  and `loop()` also increments it, so headless runs see live positions. [verified]
+  `SIM.players[s]` mirrors `SOLDIERS[s]` (= `enemies[s-1]`; `en.id` = s). Every shooter passes its own id (and `teamFilter(team)`);
+  readers map a hit back with `SOLDIERS[r.id]`; a death sets the victim's entry `alive=false` at once. [verified]
+- **SIM sync guard — game.** `syncSimWorld` re-syncs at most once per sim step (unless called with `force`, as the editor's cover-map overlay (`ovBuildCover`) does): `update()` does `_frameId++` at its top
+  and `loop()` also increments it, so headless runs see live positions. `update()` forces one re-sync after your movement
+  (`syncSimWorld(true)` before the bolts, K4), and `activateRoster` sets `_simFrame=-1` so the next call re-syncs. The real
+  `update()` order is in TECHNICAL §4a. [verified]
 
 ---
 
 ## Tools (not part of the build)
 
-`gate.mjs`, `battery.js`, `preview.js`, `pageshot.js`, `sim.js`, `aabbs.js`, `village.py` live in `tools/` and are
+`gate.mjs`, `battery.js`, `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `aabbs.js`, `village.py` (and `smoke.mjs`) live in `tools/` and are
 **never loaded by either page**. They load the real `shamble-core.js` + `shamble-game.js` into
 Node (headless WebGL) to render frames, run the verify battery's checks 3–4, simulate a match,
 and generate/validate map layouts. Setup + commands: `START_HERE.md` §5.

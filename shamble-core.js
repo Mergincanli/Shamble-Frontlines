@@ -91,6 +91,20 @@ const T = {
   shockRadius:7.5, dustLife:1.05, scorchRadius:2.4, scorchLife:4.0,
   camKickRange:34, camKickImpulse:24, camKickStiffness:110, camKickDamping:12, concussionStrength:0.85,
 };
+// Three teams, one per faction (LOOP_V2 §2). Order matters: soviets is the first enemy team of the player's (allies).
+const TEAMS = [
+  { id:'allies',  faction:'Allies',  name:'Allies',  short:'ALL' },
+  { id:'soviets', faction:'Soviets', name:'Soviets', short:'SOV' },
+  { id:'empire',  faction:'Empire',  name:'Empire',  short:'EMP' },
+];
+// The one tunable table for team play (three-teams plan, item 1). Bot sight range stays T.enemyDetect (read directly).
+const TUNE = {
+  teams: { size:4 },          // soldiers per team, the player included
+  ff: false,                  // friendly fire (D5): off = bullets and blasts pass teammates
+  ai: { retargetS:0.25, losPerS:480, losRecheckS:0.1, losCapS:0.1, roles:['push','objective','hunt'] },
+  spawn: { doorOut:4, lateral:2 },   // bot spawn point outside the own barracks door (D13), metres
+  fx: { botCullR:50, botSfxR:90 },   // bot-shot FX and sound culled beyond these camera distances (item 13)
+};
 const WEAPONS = [
   // 0 — AMK Rifle I (Conscript primary): accurate semi-auto mid-range rifle. The kiting generalist.
   { id:'amk', name:'AMK Rifle I', short:'AMK', era:1, minLevel:1, cost:0, auto:false, fireInterval:0.2, mag:1, reserve:999, pellets:1, spreadHip:0.022, spreadADS:0.006, spreadPerShot:0.0, spreadMax:0.05, spreadDecay:0.3, damage:34, range:300, recoil:2.0, reload:3.5, tracer:0xfff0c0 },
@@ -936,6 +950,38 @@ const DM_Romania = {
   ],
   barracks:[ {x:-18,z:22,team:'friend'}, {x:-18,z:-22,team:'hostile'} ]
 };
+// DM_Tri (three-teams 3a, D13/D14): a greybox arena for three teams, one per faction. Bases sit 120 degrees apart, 92 m
+// from (0,-23), the supply field; enterable barracks keep rot 0 on even-integer centres so the doorway stays open on the
+// nav grid (they are the one part that is not rotated with its base). Tech points sit between bases, silos farther out.
+// Generated and checked (6 m gaps, arena bounds, truck legs clear of every box) by the 3a layout script; open with ?map=tri.
+const DM_Tri = {
+  name:'DM_Tri', version:1,
+  spawn:{x:-8,z:72}, resupply:{x:-7,z:64},
+  obstacles:[
+    {x:35.84,z:6.93,w:2.6,h:1.5,d:2.6,warm:true},{x:43.84,z:-6.93,w:2.6,h:1.5,d:2.6,warm:false},{x:32.04,z:-4.5,w:2.6,h:1.5,d:2.6,warm:true},{x:47.63,z:4.5,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:8,z:-69,w:2.6,h:1.5,d:2.6,warm:true},{x:-8,z:-69,w:2.6,h:1.5,d:2.6,warm:false},{x:0,z:-60,w:2.6,h:1.5,d:2.6,warm:true},{x:0,z:-78,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:-43.84,z:-6.93,w:2.6,h:1.5,d:2.6,warm:true},{x:-35.84,z:6.93,w:2.6,h:1.5,d:2.6,warm:false},{x:-32.04,z:-4.5,w:2.6,h:1.5,d:2.6,warm:true},{x:-47.63,z:4.5,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:11.26,z:-16.5,w:2.6,h:1.5,d:2.6,warm:true},{x:0,z:-36,w:2.6,h:1.5,d:2.6,warm:false},{x:-11.26,z:-16.5,w:2.6,h:1.5,d:2.6,warm:true},{x:-3,z:35,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:12,z:35,w:2.6,h:1.5,d:2.6,warm:true},{x:51.73,z:-49.4,w:2.6,h:1.5,d:2.6,warm:false},{x:44.23,z:-62.39,w:2.6,h:1.5,d:2.6,warm:true},{x:-48.73,z:-54.6,w:2.6,h:1.5,d:2.6,warm:false},
+    {x:-56.23,z:-41.61,w:2.6,h:1.5,d:2.6,warm:true}
+  ],
+  buildings:[
+    {team:'allies',type:'hq',x:0,z:83},{team:'allies',type:'refinery',x:-20,z:67},{team:'allies',type:'power',x:18,z:83},{team:'allies',type:'barracks',x:18,z:65},
+    {team:'soviets',type:'hq',x:91.8,z:-76},{team:'soviets',type:'refinery',x:87.94,z:-50.68},{team:'soviets',type:'power',x:82.8,z:-91.59},{team:'soviets',type:'barracks',x:67.21,z:-82.59},
+    {team:'empire',type:'hq',x:-91.8,z:-76},{team:'empire',type:'refinery',x:-67.94,z:-85.32},{team:'empire',type:'power',x:-100.8,z:-60.41},{team:'empire',type:'barracks',x:-85.21,z:-51.41}
+  ],
+  barracks:[ {x:0,z:56,team:'allies'},{x:68,z:-62,team:'soviets'},{x:-68,z:-62,team:'empire'} ],
+  enemySpawns:[ {x:0,z:69,faction:'Allies'},{x:79.67,z:-69,faction:'Soviets'},{x:-79.67,z:-69,faction:'Empire'} ],   // one marker per base: bots spawn here (teamSpawnPoint)
+  harvField:{x:0,z:-23},
+  harvLanes:{
+    allies:{dock:{x:-18.48,z:60.17},lane:{x:0,z:-18}},
+    soviets:{dock:{x:81.26,z:-48.58},lane:{x:4.33,z:-25.5}},
+    empire:{dock:{x:-62.78,z:-80.59},lane:{x:-4.33,z:-25.5}}
+  },
+  techPoints:[ {name:'Alpha',x:39.84,z:0},{name:'Bravo',x:0,z:-69},{name:'Charlie',x:-39.84,z:0} ],
+  silos:[ {x:76.21,z:21},{x:0,z:-111},{x:-76.21,z:21} ],
+  env:{ fog:{near:260,far:760} }
+};
 // C1: dispose the OLD map's GPU resources on rebuild (clearMap ran on init, Reset, map-load, and every editor undo/redo -- previously leaked geo/mat/label-textures each time).
 // SHARED material templates are skipped; a `seen` set prevents double-dispose (outline hulls share the parent geometry); only .map (per-instance label CanvasTextures) is disposed, never .gradientMap (shared toon ramps).
 function genTimberTex(){
@@ -1444,11 +1490,11 @@ function rayAabb(ox,oy,oz,dx,dy,dz,minx,miny,minz,maxx,maxy,maxz,outN){ let tmin
   let t=tmin; if(t<0){ t=tmax; if(t<0)return -1; } if(outN){outN[0]=nx;outN[1]=ny;outN[2]=nz;} return t; }
 // PURE hitscan query — reads world, never mutates it (so the server can run it
 // against a rewound snapshot for lag compensation, then apply damage live).
-function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range){
+function resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range,shooterTeam){   // shooterTeam: soldiers of that team are skipped (null = hit everyone but the shooter)
   const res=world._res||(world._res={}), nrm=world._nrm||(world._nrm=[0,0,0,0]);
   let bestT=range,kind='none',id=-1,part='',nx=-dx,ny=-dy,nz=-dz;
   const P=world.players;
-  for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.alive||p.id===shooterId)continue; const baseY=p.y||0, drop=p.stance?BODY.crouchDrop:0;
+  for(let i=0;i<P.length;i++){ const p=P[i]; if(!p.alive||p.id===shooterId)continue; if(shooterTeam!=null&&p.team===shooterTeam)continue; const baseY=p.y||0, drop=p.stance?BODY.crouchDrop:0;
     let t=raySphere(ox,oy,oz,dx,dy,dz,p.x,baseY+BODY.headY-drop,p.z,BODY.headR);
     if(t>=0&&t<bestT){ bestT=t;kind='enemy';id=p.id;part='head'; nx=ox+dx*t-p.x;ny=oy+dy*t-(baseY+BODY.headY-drop);nz=oz+dz*t-p.z; }
     t=rayCapsule(ox,oy,oz,dx,dy,dz,p.x,baseY+BODY.torsoBotY-drop,p.z,p.x,baseY+BODY.torsoTopY-drop,p.z,BODY.torsoR);
