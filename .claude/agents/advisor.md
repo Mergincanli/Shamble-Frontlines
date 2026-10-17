@@ -34,9 +34,9 @@ The code beats the docs. When they disagree, check the code and flag the doc.
 1. **Human QA:** anything a player sees, hears or feels: visuals, UI, animation, audio, game feel, balance, controls.
 2. **Design decisions the docs don't settle:** new rules, units or mechanics, economy changes beyond tuning, art direction.
 3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), CI
-   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs` or `.github/workflows/` load
-   (today `tools/gate.mjs`, `tools/smoke.mjs`, `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`,
-   `tools/package-lock.json`) and any `.npmrc`.
+   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs` or `.github/workflows/` run as
+   code or read as settings, not the game files they check (today `tools/gate.mjs`, `tools/smoke.mjs`,
+   `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`) and any `.npmrc`.
 4. **Anything irreversible:** deleting data or saves, rewriting history.
 
 ## Plan review (an implementer asks before editing)

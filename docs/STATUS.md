@@ -98,7 +98,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
 - Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)
 - GitHub branch protection on `main` is the real guard against pushes to main (deny rules are fragile by design);
-  recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos)
+  recommend Mustafa enables it (GitHub Pro via the Student Developer Pack if the free plan lacks it for private repos).
+  Today GitHub protects nothing on main (advisor, read-only GitHub API, 2026-10-17): "Shamble Ruleset 1" targets no branch (empty target list), main has no rules and no classic protection, and the repo is public. Decision PROTECT-MAIN: point the ruleset at main and require the `gate` and `smoke` checks (recommended (a); Mustafa's call; asked in PR #22)
+- Deferred, low (kit-v2-1): `tools/gate.mjs:333` and `tools/README.md:34` still call `gate-globals.json` "reviewed data, not a gate tool", which contradicts kit-v2-1's category 3 (gate files need Mustafa's go). It errs on the safe side; fix the wording when gate.mjs is next touched
+- Open, for a later security review (kit-v2-1): night-shift rules 3-4 (`.claude/NIGHT_SHIFT.md`) trust any "Night shift running" comment on the public issue #16, whoever wrote it, so an outside comment could make a night run stop silently or take over a "cut-off" item
 - The 3D scene renders every frame behind the opaque main menu (wasted GPU)
 - Bot nav, editor-made layouts (R1, tracked per the Advisor): rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check; new maps keep walkable gaps at least 6 m wide
 - Bot nav, navSteer "replan storm" (old; bot-poplar-wedge PERF-2): a bot whose straight line flickers clear/blocked replans every few frames; the wedge fix hits it more on Romania (budget-limited frames 0.9% -> 1.8%). Advisor: its own change-set in the greybox phase (bot-replan-storm)
