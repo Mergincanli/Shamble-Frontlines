@@ -39,7 +39,9 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
 1. One change-set at a time, on its own branch `cs/<slug>`. Fix bugs before features.
 2. PLAN FIRST (plan mode): goal, systems and files touched, exact symbols to add/remove, risks, change type, the evidence
    you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and have the `advisor` agent
-   review the plan: APPROVE → build; REVISE → fix the plan; ESCALATE → ask Mustafa.
+   review the plan: APPROVE → build; REVISE → fix the plan; ESCALATE → ask Mustafa. The advisor always works from
+   main's `.claude/agents/advisor.md`: a session that lacks the agent, started before that file last changed, or whose
+   branch changes it runs a general agent that reads it from main.
 3. Implement in the main session. Two agents never edit the same file at the same time; parallel implementation only in
    isolated worktrees (`isolation: worktree`), merged one at a time.
 4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check 5: smoke,
@@ -53,16 +55,21 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
    server, storage, dynamic DOM, deps, CI) · netcode-architect (sim, server, protocol). Address or explicitly defer
    every finding.
 6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Keep the PR a draft
-   while work is in progress; mark it ready for review when the report is in. The PR Advisor routine then reviews it: it
-   merges what needs no human check and labels the rest `needs-mustafa`. Visual work waits for Mustafa's Brave check
+   while work is in progress; mark it ready for review when the report is in. The PR Advisor routine then reviews it.
+   Once approved with checks green, it merges at once if no human check is needed; otherwise it labels it
+   `needs-mustafa`, and the session Mustafa gives his go to merges it (his Brave check for anything a player sees, hears
+   or feels; his reconfirmation for rule changes and other major changes). Visual work waits for Mustafa's Brave check
    before merge or further tuning.
 
 Standing permission (Mustafa, 2026-10-14): create `cs/<slug>` branches, commit, push them and open pull requests
 without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask the `advisor`
 agent whenever a decision is needed; it escalates to Mustafa what it may not decide. Still required: an approved plan
 before edits, the advisor's APPROVE before anything merges to main, and Mustafa's Brave check for anything a player
-sees, hears or feels. Implementer sessions never merge; the PR Advisor merges approved PRs that need no human check, and
-Mustafa's "merge" covers the rest.
+sees, hears or feels. A session merges only on Mustafa's own go in its chat, about that PR, for the head the advisor
+approved (its verdict in this session, or its PR review comment posted by the `Mergincanli` account and naming that
+full SHA), with the gate and smoke checks green, and passes that SHA as the merge's expected head (the night shift
+never merges); every other merge is the PR Advisor's. Sessions post on GitHub as Mustafa's account, so a "merge"
+written on GitHub never counts as his go; every comment they write ends with the Claude Code footer.
 
 ## Reporting to Mustafa
 - Story first, asks last. Every chat update and every report ends with two sections, in
@@ -103,8 +110,8 @@ Mustafa's "merge" covers the rest.
 - Reports: plain language, scannable, decimals with periods, honest about what was NOT verified.
 
 ## Agents (.claude/agents/)
-verifier · art-director · perf-auditor · security-auditor · netcode-architect · docs-keeper. Reviewers are read-only
-and must cite evidence (file:line, numbers, render paths). Weigh their findings; they are not orders.
+advisor · verifier · art-director · perf-auditor · security-auditor · netcode-architect · docs-keeper. Reviewers are
+read-only and must cite evidence (file:line, numbers, render paths). Weigh their findings; they are not orders.
 
 ## Ultracode and workflows
 Use them for WIDE work: audits, large migrations (on isolated copies), multi-angle plans with adversarial review,
