@@ -38,7 +38,8 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
 ## The change-set protocol (non-negotiable)
 1. One change-set at a time, on its own branch `cs/<slug>`. Fix bugs before features.
 2. PLAN FIRST (plan mode): goal, systems and files touched, exact symbols to add/remove, risks, change type, the evidence
-   you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and wait for approval.
+   you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and have the `advisor` agent
+   review the plan: APPROVE → build; REVISE → fix the plan; ESCALATE → ask Mustafa.
 3. Implement in the main session. Two agents never edit the same file at the same time; parallel implementation only in
    isolated worktrees (`isolation: worktree`), merged one at a time.
 4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check 5: smoke,
@@ -51,14 +52,17 @@ ADR-003 Three.js version (deferred). Until accepted, the constraints above stand
 5. Review: art-director (visuals, UI, animation) · perf-auditor (hot paths, rendering) · security-auditor (network,
    server, storage, dynamic DOM, deps, CI) · netcode-architect (sim, server, protocol). Address or explicitly defer
    every finding.
-6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Visual work waits for
-   Mustafa's Brave screenshots before merge or further tuning.
+6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Keep the PR a draft
+   while work is in progress; mark it ready for review when the report is in. The PR Advisor routine then reviews it: it
+   merges what needs no human check and labels the rest `needs-mustafa`. Visual work waits for Mustafa's Brave check
+   before merge or further tuning.
 
 Standing permission (Mustafa, 2026-10-14): create `cs/<slug>` branches, commit, push them and open pull requests
-without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask Mustafa or
-the Advisor whenever a decision is needed. Still required: an approved plan before edits, the Advisor's APPROVE before
-anything merges to main, and Mustafa's Brave screenshots for visual work. Never merge a pull request yourself unless
-Mustafa tells you to after the APPROVE.
+without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask the `advisor`
+agent whenever a decision is needed; it escalates to Mustafa what it may not decide. Still required: an approved plan
+before edits, the advisor's APPROVE before anything merges to main, and Mustafa's Brave check for anything a player
+sees, hears or feels. Implementer sessions never merge; the PR Advisor merges approved PRs that need no human check, and
+Mustafa's "merge" covers the rest.
 
 ## Reporting to Mustafa
 - Story first, asks last. Every chat update and every report ends with two sections, in

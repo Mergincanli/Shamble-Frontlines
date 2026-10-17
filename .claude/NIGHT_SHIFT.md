@@ -24,8 +24,9 @@ WHILE WORKING
    it is the handoff if a limit cuts you off.
 7. Work the unchecked items from top to bottom, each on its own cs/<slug> branch. Commit and
    push small steps often, so a cut-off loses little. Only approved work runs: an item marked
-   NEEDS PLAN gets a written plan under Decisions needed; then move on. Never guess a
-   decision the plan doesn't cover.
+   NEEDS PLAN gets a written plan, reviewed by the `advisor` agent: if it approves, build it; if
+   it escalates, list it under Decisions needed and move on. Never guess a decision the plan
+   doesn't cover.
 8. Absolute rules (there are no approval prompts tonight): never merge a pull request; never
    push to main; never change .claude/ or CLAUDE.md; never delete branches, saves or data;
    if the gate fails and you can't fix it properly, stop that item and report it.
