@@ -1,0 +1,11 @@
+final-sweep-B (kit-v3-0, lens agents/tools) started
+unit 1: read brief, plan, verdicts (18 conditions + trace). next: CLAUDE.md diff vs main
+unit 2: CLAUDE.md read; hard constraints+standing permission byte-identical (diff shows no change there). candidates: line 197-199 reviewer/docs write scope vs engine-architect/game-designer docs writes (check agents); routines effort default vs 'always stated'. next: CHECKPOINTS.md
+unit 3: CHECKPOINTS.md read. candidates: §1 l9 'review of a large diff' keeps checkpoint on its branch vs §5 l92 reviewers/PR Advisor never push notes; §5 l83 run_in_background default timeout 30min vs --for 110 (no timeout stated). next: NIGHT_SHIFT
+unit 4: NIGHT_SHIFT read; rules mostly fine. candidate low: routine session effort default (medium) vs high-by-default. next: settings.json, scripts
+unit 5: settings.json, checkpoint.mjs, repo-map-check (runs OK 89/89), REPO_MAP read; no new issue beyond saver timeout. next: agents
+unit 6: advisor.md: step 6 + Never unchanged (diff confirms). candidates: ART_DIRECTION 'the locked look' l22 (low); notes rule ok. next: verifier, docs-keeper
+unit 7: verifier, docs-keeper, art-director, perf-auditor, security-auditor, netcode-architect read. candidates: CLAUDE.md:197-199 vs netcode-architect:10 (writes docs/adr, docs/design) ; perf-auditor:29 'ADR-001' stale; netcode:23 LEGACY_INVENTORY.md not yet existing; CLAUDE.md:6-8 scale vs VISION_V2 §3 l43-44 (cond 5 sweep); docs-keeper description 'Edits only docs/'. next: new agents
+unit 8: new agents read; frontmatter all model opus + effort. candidates: CLAUDE.md:197-199 scope vs engine-architect:13-14/netcode:10/game-designer:12; forward refs LEGACY_INVENTORY/LEGACY_TUNING (R7 outputs not on main) low. next: skills
+unit 9: skills read. candidates: changeset step1 checkpoint before plan approval vs CLAUDE Never 'edit before plan approved' (low); gate/render-ab 'Phase 0' ambiguous now (low). next: research README, adr template, security guidance
+unit 10: research README + adr template read. candidate: netcode-architect:56-57 'Mustafa accepts...no spike before that' vs adr template:39-40 (spike before acceptance, after draft approval). next: greps for Unit Forge/sonnet/Node/read-only
