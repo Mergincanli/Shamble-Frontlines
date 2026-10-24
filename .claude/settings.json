@@ -34,7 +34,12 @@
       "Bash(gh pr create *)",
       "Bash(gh pr view *)",
       "Bash(gh pr list *)",
-      "Bash(gh pr checks *)"
+      "Bash(gh pr checks *)",
+      "Bash(node .claude/scripts/checkpoint.mjs *)",
+      "Bash(node --test .claude/scripts/checkpoint.test.mjs)",
+      "Bash(node .claude/scripts/repo-map-check.mjs)",
+      "WebSearch",
+      "WebFetch"
     ],
     "ask": [
       "Bash(git switch -f *)",
