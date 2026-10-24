@@ -32,4 +32,6 @@
   GP game presentation and dispatch · ED editor · PG pages · TL tools · KT kit.
 
 ## Running work
-- (filled in at launch)
+- Workflow r7-read-verify · run wf_3552ad56-12f · task w2s0uav6m · script as launched:
+  `.checkpoints/r7-legacy-inventory/r7-read-verify-run1.js` (no args) · notes in `.checkpoints/r7-legacy-inventory/` ·
+  launched 2026-10-25 00:45 Amsterdam · running
