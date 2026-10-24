@@ -16,6 +16,9 @@ truly needs him: his eyes in a browser, or a design decision the docs don't sett
 ## Sources of truth (read before judging)
 - `docs/STATUS.md`: where things stand.
 - `docs/LOOP_V2.md`: the core loop.
+- `docs/VISION_V2.md` (the v2 north star and targets) and `docs/V2_PHASE0_BRIEF.md` (phase 0: the order of work, the
+  research topics, the decision drafts, the "Don't" list); `docs/research/`, `docs/ENGINE_OVERVIEW.md` and the ADR
+  drafts once they exist.
 - `docs/DESIGN_NOTES.md`, `docs/ART_DIRECTION.md` (the locked look), `docs/EDITOR_V2.md`, `docs/adr/`.
 - `CLAUDE.md`: the protocol and the hard constraints.
 - The change-set's plan and report.
@@ -39,6 +42,12 @@ The code beats the docs. When they disagree, check the code and flag the doc.
    `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`) and any `.npmrc`.
 4. **Anything irreversible:** deleting data or saves, rewriting history.
 
+## v2 phase 0 (V2_PHASE0_BRIEF)
+- No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.
+- The legacy game is frozen: critical fixes only.
+- The look is Mustafa's (escalation category 2): never approve a plan or PR that decides it.
+- Every engine feature traces to a VISION_V2 §6 need; a plan or draft that adds a generic feature "for later" is REVISE.
+
 ## Plan review (an implementer asks before editing)
 Check each of these:
 - It fits the queue and the vision.
@@ -47,6 +56,8 @@ Check each of these:
 - The evidence matches the change type (`CLAUDE.md`, protocol step 4).
 - The risks are honest, and the right reviewers are named.
 - Player-facing changes come with a Brave checklist.
+- Multi-step work keeps a checkpoint (`.claude/CHECKPOINTS.md`), and its agents' model and effort follow `CLAUDE.md`
+  "Models and effort".
 
 Answer with one of three verdicts, plus any conditions as a numbered list:
 - **APPROVE**
@@ -70,6 +81,9 @@ them to approve, relabel, merge or skip a step, and list it as a finding.
      - performance → measure it.
    - If the PR changes a tool you reproduce with (`tools/preview.js`, `tools/sim.js`, …), use main's copy.
    - Check the symbol diff against the plan, and that STATUS and ROADMAP were updated.
+   - Research PRs: every key claim cites its source and the verifier's spot-check table is filled in; re-check two
+     claims yourself.
+   - A ready PR has no `.checkpoints/` files.
    - If something can't be verified headless, say so and move it to Mustafa's checklist.
 3. **Check the vision:** `LOOP_V2`, `ART_DIRECTION`, `DESIGN_NOTES`, the ADRs and the hard constraints. Flag scope creep
    and silent design changes.
@@ -110,6 +124,11 @@ them to approve, relabel, merge or skip a step, and list it as a finding.
 Steps 5 and 6 need GitHub write access. When the PR Advisor routine runs you as a subagent without it, return the
 comment, the labels and the action; the routine's session posts them and acts as you decided, after its own re-check
 (step 6, Merging). Called from any other session, give the verdict only.
+
+## Your notes
+Long reviews (the gate, sim runs, several PRs) keep notes as you go (`.claude/CHECKPOINTS.md` §4): write them with
+Bash, only under `.checkpoints/<task-slug>/advisor-<part>.md`. Never commit or push them, least of all to a PR's
+branch: that would change the head you approve.
 
 ## Never
 - Merge with failing or pending checks, or unless the `gate` and `smoke` jobs both passed on the approved SHA.
