@@ -1,0 +1,6 @@
+TASK: advisor plan review kit-v3-0 (.checkpoints/kit-v3-0/plan.md)
+step0: started
+step1: read advisor.md, plan, brief, NIGHT_SHIFT, settings, agents, kit-v2-2 report; VISION cmp equal (sha 22664025...ab3ab)
+step2: verified ruleset requires gate+smoke; PR#25 ready, 0 reviews since 10-17; issue16 item1 unchecked APPROVED (dup-work risk with R7 tonight); NIGHT_SHIFT rule4 'restart cleanly' conflicts brief rule4; CLAUDE.md:114 reviewers read-only; kit-v2-2 tightened go-after-approve. next: write verdict
+step3: verdict APPROVE with 18 conditions: (1) issue16 item1 plain bullet before 00:00 (dup with R7); (2) merge ruling: advance go settles who clicks, not the go; reconfirm after APPROVE of final head; (3) stop Unit Forge, build from brief rules; (4) no '(the legacy game)' on hard constraints; (5) Look line; (6) reviewers read-only line + advisor notes via Bash; (7) no autosave on ready PR; (8) checkpoint.mjs hardening; (9) NIGHT_SHIFT rule4 restart sentence; (10) prove pin or use opus; effort for routines/workflows; (11) verifier description; (12) parallel isolated copies; (13) web tools line; (14) REPO_MAP check location; (15) keep brief copy; (16) no R7 files, R7 local-only risk; (17) PR25 unreviewed -> routine check; deferred findings; merge text byte-identical; (18) plan+verdict folded into report.
+DONE

@@ -2,14 +2,17 @@
 - **Goal:** v2 phase 0, step 1 (brief §2): model policy, checkpoints, efficiency rules, night shift v2, crew v2. Plan:
   `.checkpoints/kit-v3-0/plan.md`.
 - **Branch:** claude/bold-faraday-i49gug (stand-in for cs/kit-v3-0) · **Base:** main 48ffb51
-- **Last update:** 2026-10-24 23:50 Amsterdam
+- **Last update:** 2026-10-25 00:15 Amsterdam
 
 ## Steps done
 1. docs/VISION_V2.md added, byte-identical to the attachment (SHA-256 22664025…3ab). Commit: this checkpoint's commit.
 2. Plan written (`.checkpoints/kit-v3-0/plan.md`).
 
 ## Current step
-3. Plan review: advisor (general agent reading main's advisor.md) plus a brief-trace critic.
+3. Plan review (workflow wf_f1150920-4af): advisor kit-v3-0 APPROVE with 18 conditions, advisor R7 APPROVE with
+   conditions (notes: `.checkpoints/kit-v3-0/advisor-plan-*.md`); the brief-trace critic still running.
+   Drafts of the script, its test (8/8 pass), CHECKPOINTS.md, six new agents and the research README are in the
+   session scratchpad (`draft/`), not yet in the repository.
 
 ## Next steps
 4. Apply the verdict; commit the brief copy if approved.
