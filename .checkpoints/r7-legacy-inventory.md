@@ -4,7 +4,7 @@
   `.checkpoints/r7-legacy-inventory/plan.md` (APPROVE with 11 conditions).
 - **Branch:** claude/bold-faraday-i49gug (draft PR #27), restarted from main f2ccc13 after kit-v3-0 merged (PR #26) ·
   **Base:** main f2ccc13 (the engine files are unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds).
-- **Last update:** 2026-10-25 22:50 Amsterdam
+- **Last update:** 2026-10-25 22:42 Amsterdam
 
 ## Steps done
 1. Plan approved with 11 conditions (plan.md, plan-verdict.json). Night queue #16 item 1 made a plain bullet "in
@@ -67,7 +67,7 @@
 
 ## Running work
 - Workflow r7-apply-final-review · run wf_4df6005c-5a6 · task w8q4s3j0y · script as launched:
-  `.checkpoints/r7-legacy-inventory/r7-apply-final-review-run1.js` · launched 2026-10-25 22:47 Amsterdam · running.
+  `.checkpoints/r7-legacy-inventory/r7-apply-final-review-run1.js` · launched 2026-10-25 22:38 Amsterdam · running.
 - Workflow write-guard-audit (kit-v3-1 research, side work) · run wf_e24159e7-346 · task wql15grun · notes in the
   scratchpad kit-v3-1/ · running.
 - Done: r7-final-review (wf_4e8e0798-666), r7-apply-fixes2, r7-edit-verify, r7-read-verify.
