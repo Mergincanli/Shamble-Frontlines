@@ -2,7 +2,7 @@
 - **Goal:** v2 phase 0, step 1 (brief §2): model policy, checkpoints, efficiency rules, night shift v2, crew v2. Plan:
   `.checkpoints/kit-v3-0/plan.md`.
 - **Branch:** claude/bold-faraday-i49gug (stand-in for cs/kit-v3-0) · **Base:** main 48ffb51
-- **Last update:** 2026-10-25 00:15 Amsterdam (earlier entries had guessed times; corrected to the clock)
+- **Last update:** 2026-10-25 11:25 Amsterdam (CET since the clock change)
 
 ## Steps done
 1. docs/VISION_V2.md added, byte-identical to the attachment (SHA-256 22664025…3ab) · 4afb714.
@@ -23,8 +23,10 @@
    pinned Playwright 1.56.1 installed into the scratchpad, PLAYWRIGHT_BROWSERS_PATH).
 
 ## Current step
-9. Final-diff review workflow wf_29950217-697 (task w02pm8fph): requirement trace, contradiction sweeps A and B with a
-   skeptic per finding, security-auditor. Background saver running (task bg5pdx912).
+9. Final-diff review workflow wf_29950217-697: requirement trace, contradiction sweeps A and B with a skeptic per
+   finding, security-auditor. Cut off at about 01:00 by the org's monthly spend limit (reset 02:20 UTC): 17 of 30
+   agents done, skeptics B4-B16 failed. Resumed 11:25 with resumeFromRunId (task wov1cm37a). The R7 workflow was cut
+   off the same way and resumed (task wllinx1zp).
 
 ## Next steps
 10. Fix what the review confirms; gate again.
