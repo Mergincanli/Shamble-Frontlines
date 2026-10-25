@@ -1,7 +1,8 @@
 # Security guidance: SHAMBLE FRONTLINES
 
-Context: a static browser client (Three.js, classic scripts) plus a planned authoritative Node game server over
-WebSockets. Assume every client is hostile and modified.
+Context: a static browser client (Three.js, classic scripts) today; v2 plans an authoritative Rust game server over
+WebTransport with a WebSocket fallback, sharing its simulation with the browser as WebAssembly. Assume every client is
+hostile and modified.
 
 - Server code must never accept client-reported state (position, hit, damage, health, ammo, cooldown, credits, XP,
   match results). It derives state from validated inputs only.

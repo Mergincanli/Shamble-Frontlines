@@ -5,12 +5,17 @@ argument-hint: '[change-set slug]'
 ---
 Write `docs/reports/<YYYY-MM-DD>-<slug>.md` and print it. At most ~60 lines. Plain language, decimals with periods.
 Facts only: every claim points to evidence. Say clearly what was NOT verified.
+Fold the task's checkpoint in (`.checkpoints/<slug>.md` and its notes: the steps with their SHAs, the key numbers, the
+decisions, the open findings), and the plan's approval with its conditions. The last commit before the PR is marked
+ready deletes `.checkpoints/<slug>*` (`.claude/CHECKPOINTS.md` §9).
 
 # Advisor report: <slug> (<date>, branch cs/<slug>, base <ref>)
 ## Goal
 One or two lines: what and why (player-facing).
 ## Outcome
 DONE / PARTIAL / BLOCKED, plus one sentence.
+## Plan and approval
+The plan in a few lines; the advisor's verdict with its conditions, and how each was met.
 ## What changed
 Files with one line each. Symbols added / removed (from the gate) and whether that matches the approved plan.
 ## Evidence

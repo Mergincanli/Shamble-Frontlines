@@ -5,7 +5,8 @@ argument-hint: '[baseRef, default: merge-base with main or origin/main, whicheve
 ---
 Run `node tools/gate.mjs $ARGUMENTS` and read the whole output.
 
-If tools/gate.mjs does not exist yet (before Phase 0 lands), run the manual battery instead:
+If tools/gate.mjs is missing (it has existed since the legacy toolkit's Phase 0, 2026-10-14), run the manual
+battery instead:
 1. `node --check` each shamble-*.js, and each page's inline script extracted to a temp file.
 2. Concatenate in load order and `node --check`: core+game+index-inline, and core+game+editor+editor-inline.
 3. `node tools/battery.js <dir>` on a worktree of the base ref and on the working tree; diff the `symbols` lists
