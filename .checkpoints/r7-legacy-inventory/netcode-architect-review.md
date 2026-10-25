@@ -30,3 +30,14 @@ Engine files unchanged since 48ffb51 (git diff --stat empty). core wc 1543 lines
 - GP2: FINDING should: listeners call actions at event time (3264-3269, 3273 releaseCharge->throwGrenadeCharged, 3284-3285 bow fireBolt / ads), not only keys map.
 - GP14: FINDING should: wall-clock/RNG coupling mechanism (sfxShot 2227-2231 before spread 1477; sfxImpact 2253 throttle; sfxEnemyShot 2256; FX 1029-1088; camShake 2846; breath anim t at 363 moves muzzle -> throw origin) + player-first order (fire 2722-2731 before bots 2893; dead bots can't fire).
 - CD8: FINDING should: weaponPitchMax called "aim pitch limit" but only clamps held-gun visual pitch (pitchWeapon 1431).
+## Probes on the real code (xvfb-run -a node tools/preview.js . eval <scratch>, default map, read-only)
+- firerate-real.js: Shabzon held 10 game s via update(1/hz): 10.00 / 12.00 / 13.10 shots/s at 30/60/144 Hz (design 13.89).
+- jump-real.js: player jump apex rise 2.250 / 2.430 / 2.483 m at 20/60/144 Hz; EJUMP_REACH 3.071 (formula apex 2.521 + 0.55).
+- aimheight.js: resolveShot from above stops at platform tops 1.20/2.50/4.00 m; ramp box top 2.50 (slope 1.25 at centre), 4.00 (slope 2.00).
+## Other checks
+- GC12 nit: hit check gated on sword/axe mesh (ps.swingMesh 1666, 2739); arc facing = player.rotation.y (1671).
+- GC15 nit: bolt flight integrates frame dt (2865), stuck position follows target mesh (2880); swept segment test per step worth keeping.
+- GN8 nit: evidence omits "effects stubbed".
+- GN12 nit: G/F Float32Array with f64 math, heap ties <=/>= -> Rust parity needs same rounding.
+- no for..in / Object.keys over sim state (comment game:702) -> no hash-order hazard in legacy sim.
+- DEV god/freezeAI authority covered by GP5.
