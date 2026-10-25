@@ -254,3 +254,26 @@ test('a trailer with a newline is refused, and nothing runs through a shell', (t
   assert.match(sh(repo, 'log', '-1', '--format=%s'), /\$\(touch pwned\) `touch pwned2`; touch pwned3/);
   for (const f of ['pwned', 'pwned2', 'pwned3']) assert.equal(spawnSync('test', ['-e', join(repo, f)]).status, 1);
 });
+
+test('a note whose name git would quote is still scanned, and an unreadable note is refused', (t) => {
+  const { repo, origin } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  const head = sh(repo, 'rev-parse', 'HEAD');
+  note(repo, 'ü "odd" name.md', 'ghp_' + 'Z9y8X7w6V5'.repeat(4) + '\n');
+  const r = run(repo, 'save', 'test', '-m', 'odd name');
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stdout, /NOT committed/);
+  assert.equal(sh(repo, 'rev-parse', 'HEAD'), head);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), head);
+});
+
+test('the commit holds exactly the scanned notes and leaves the index in step with HEAD', (t) => {
+  const { repo } = fixture(t);
+  note(repo, 'test.md', 'one\n');
+  note(repo, 'a.md', 'alpha\n');
+  assert.equal(run(repo, 'save', 'test', '-m', 'two notes').status, 0);
+  assert.equal(sh(repo, 'show', 'HEAD:.checkpoints/a.md'), 'alpha');
+  assert.equal(sh(repo, 'status', '--porcelain', '--', '.checkpoints/'), '');
+  assert.equal(sh(repo, 'diff', '--cached', '--name-only'), '');
+});

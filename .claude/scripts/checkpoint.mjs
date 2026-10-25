@@ -17,7 +17,8 @@
 // Run from the repository root. Node 22, no dependencies.
 // Exit codes: 0 saved or nothing to save · 1 a git step failed or a secret was found · 2 usage error or refused by a guard.
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const DIR = '.checkpoints/';
 const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
@@ -35,14 +36,15 @@ const SECRETS = [
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (msg) => process.stdout.write(`${new Date().toISOString()} checkpoint: ${msg}\n`);
 const fail = (code, msg) => { process.stderr.write(`checkpoint: ${msg}\n`); process.exit(code); };
-const git = (...args) => {
+const run = (env, args) => {
   try {
-    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false, maxBuffer: 64 << 20 });
+    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false, maxBuffer: 64 << 20, env });
     return { ok: true, out: out.trim(), err: '' };
   } catch (e) {
     return { ok: false, out: String(e.stdout || '').trim(), err: String(e.stderr || e.message || '').trim() };
   }
 };
+const git = (...args) => run(process.env, args);
 const currentBranch = () => git('symbolic-ref', '--quiet', '--short', 'HEAD');
 
 function parse(argv) {
@@ -94,13 +96,15 @@ function onlyCheckpointsAhead(branch) {
   return true;
 }
 
-// The staged notes that look like a secret: [path, kind] pairs. The secret itself is never printed.
-function stagedSecrets() {
+// The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
+// quoted); a note that can't be read counts as a hit. The secret itself is never printed.
+function stagedSecrets(ig, head) {
   const hits = [];
-  const names = git('diff', '--cached', '--name-only', '--diff-filter=AM', '--', DIR).out.split('\n').filter(Boolean);
-  for (const f of names) {
-    const blob = git('show', `:${f}`);
-    if (!blob.ok) continue;
+  const names = ig('diff', '--cached', '-z', '--name-only', '--no-renames', '--diff-filter=d', head, '--', DIR);
+  if (!names.ok) return [[DIR, 'list that could not be read']];
+  for (const f of names.out.split('\0').filter(Boolean)) {
+    const blob = ig('show', `:${f}`);
+    if (!blob.ok) { hits.push([f, 'note that could not be read']); continue; }
     for (const [kind, re] of SECRETS) if (re.test(blob.out)) hits.push([f, kind]);
   }
   return hits;
@@ -130,23 +134,41 @@ async function push(branch) {
   }
 }
 
+// Commits exactly what was scanned: the notes are staged in a private index (HEAD + .checkpoints/), scanned there, and
+// that index's tree becomes the commit. The session's own index is never staged into; only its .checkpoints/ entries
+// are synced to the new HEAD afterwards, so anything else it staged stays staged.
 async function save(o, branch, subject, background) {
   if (!existsSync(checkpointFile(o))) { log(`not saved: ${checkpointFile(o)} is gone`); return 2; }
-  const add = await withLockRetry(() => git('add', '-A', '--', DIR));
-  if (!add.ok) { log(`git add failed: ${add.err}`); return 1; }
-  if (git('diff', '--cached', '--quiet', '--', DIR).ok) { log('nothing to save'); return 0; }
-  const secrets = stagedSecrets();
-  if (secrets.length) {
-    git('reset', '--quiet', '--', DIR);
-    for (const [f, kind] of secrets) log(`NOT committed: ${f} looks like it holds a ${kind}; remove it, then save again`);
-    return 1;
+  const head = git('rev-parse', 'HEAD');
+  if (!head.ok) { log(`no HEAD: ${head.err}`); return 1; }
+  const tmpIndex = resolve(git('rev-parse', '--git-dir').out, `checkpoint-index-${process.pid}`);
+  const ig = (...args) => run({ ...process.env, GIT_INDEX_FILE: tmpIndex }, args);
+  let commit, codeAhead;
+  try {
+    if (!ig('read-tree', head.out).ok) { log('could not read HEAD into a private index'); return 1; }
+    const add = ig('add', '-A', '--', DIR);
+    if (!add.ok) { log(`git add failed: ${add.err}`); return 1; }
+    if (ig('diff', '--cached', '--quiet', head.out, '--', DIR).ok) { log('nothing to save'); return 0; }
+    const secrets = stagedSecrets(ig, head.out);
+    if (secrets.length) {
+      for (const [f, kind] of secrets) log(`NOT committed: ${f} looks like a ${kind}; remove or fix it, then save again`);
+      return 1;
+    }
+    const tree = ig('write-tree');
+    if (!tree.ok) { log(`git write-tree failed: ${tree.err}`); return 1; }
+    codeAhead = !onlyCheckpointsAhead(branch);
+    const msg = ['-m', `checkpoint(${o.slug}): ${subject}${codeAhead ? '' : ' [skip ci]'}`];
+    if (o.trailers.length) msg.push('-m', o.trailers.join('\n'));
+    commit = git('commit-tree', tree.out, '-p', head.out, ...msg);
+    if (!commit.ok) { log(`git commit-tree failed: ${commit.err}`); return 1; }
+    const moved = await withLockRetry(() => git('update-ref', '-m', `checkpoint(${o.slug})`, `refs/heads/${branch}`, commit.out, head.out));
+    if (!moved.ok) { log(`not saved: ${branch} moved while saving (${moved.err.split('\n').pop()})`); return 1; }
+  } finally {
+    rmSync(tmpIndex, { force: true });
   }
-  const codeAhead = !onlyCheckpointsAhead(branch);
-  const msg = ['-m', `checkpoint(${o.slug}): ${subject}${codeAhead ? '' : ' [skip ci]'}`];
-  if (o.trailers.length) msg.push('-m', o.trailers.join('\n'));
-  const commit = await withLockRetry(() => git('commit', '--quiet', '--only', ...msg, '--', DIR));
-  if (!commit.ok) { log(`git commit failed: ${commit.err}`); return 1; }
-  const sha = git('rev-parse', '--short', 'HEAD').out;
+  const sync = await withLockRetry(() => git('reset', '--quiet', 'HEAD', '--', DIR));
+  if (!sync.ok) log(`WARNING: the index's ${DIR} entries are behind HEAD; run: git reset -q HEAD -- ${DIR}`);
+  const sha = commit.out.slice(0, 7);
   if (background && codeAhead) {
     log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
     return 0;
