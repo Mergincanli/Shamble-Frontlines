@@ -25,14 +25,20 @@ const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
 const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
 const SECRETS = [
-  ['GitHub token', /\b(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})/],
-  ['Anthropic key', /\bsk-ant-[A-Za-z0-9_-]{20,}/],
-  ['API key', /\bsk-[A-Za-z0-9]{32,}/],
+  ['GitHub token', /(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})/],
+  ['Anthropic key', /sk-ant-[A-Za-z0-9_-]{20,}/],
+  ['API key', /\bsk-(proj-|svcacct-)?[A-Za-z0-9_-]{32,}/],
+  ['JWT', /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/],
+  ['npm token', /npm_[A-Za-z0-9]{36}/],
+  ['Google key', /AIza[0-9A-Za-z_-]{35}/],
   ['AWS key', /\b(AKIA|ASIA)[0-9A-Z]{16}\b/],
   ['private key', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
   ['Slack token', /\bxox[abprs]-[A-Za-z0-9-]{10,}/],
   ['credentials in a URL', /[a-z][a-z0-9+.-]*:\/\/[^\s/:@]+:[^\s/@]+@/i],
 ];
+// The values of this process's secret-looking environment variables, matched exactly (names only are ever printed).
+const ENV_SECRETS = Object.entries(process.env).filter(([k, v]) => /TOKEN|SECRET|PASSW|API_?KEY|AUTH|CREDENTIAL/i.test(k) &&
+  v && v.length >= 16 && !v.startsWith('/') && !/^[a-z]+:\/\/[^@\s]*$/i.test(v));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (msg) => process.stdout.write(`${new Date().toISOString()} checkpoint: ${msg}\n`);
 const fail = (code, msg) => { process.stderr.write(`checkpoint: ${msg}\n`); process.exit(code); };
@@ -83,17 +89,12 @@ function branchOrRefuse(o) {
   return b.out;
 }
 
-// Every commit the push would send touches only .checkpoints/ (so CI may be skipped for it).
-function onlyCheckpointsAhead(branch) {
+// Pushing `rev` changes only .checkpoints/ against the remote branch (compared tree to tree, so merges count too).
+function onlyCheckpointsAhead(branch, rev) {
   const remote = git('rev-parse', '--verify', '--quiet', `refs/remotes/origin/${branch}`);
   if (!remote.ok) return false;
-  const ahead = git('rev-list', `${remote.out}..HEAD`);
-  if (!ahead.ok) return false;
-  for (const c of ahead.out.split('\n').filter(Boolean)) {
-    const files = git('diff-tree', '--no-commit-id', '--name-only', '-r', '--root', c);
-    if (!files.ok || files.out.split('\n').some((f) => f && !f.startsWith(DIR))) return false;
-  }
-  return true;
+  const d = git('diff', '--name-only', remote.out, rev);
+  return d.ok && d.out.split('\n').filter(Boolean).every((f) => f.startsWith(DIR));
 }
 
 // The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
@@ -106,6 +107,7 @@ function stagedSecrets(ig, head) {
     const blob = ig('show', `:${f}`);
     if (!blob.ok) { hits.push([f, 'note that could not be read']); continue; }
     for (const [kind, re] of SECRETS) if (re.test(blob.out)) hits.push([f, kind]);
+    for (const [k, v] of ENV_SECRETS) if (blob.out.includes(v)) hits.push([f, `value of $${k}`]);
   }
   return hits;
 }
@@ -118,12 +120,12 @@ async function withLockRetry(fn) {
   }
 }
 
-async function push(branch) {
+async function push(branch, sha) {
   const waits = [2, 4, 8, 16];
   for (let i = 0; ; i++) {
     const now = currentBranch();
     if (now.out !== branch || !branchAllowed(now.out)) { log(`push skipped: the branch changed (${now.out || 'detached'})`); return false; }
-    const r = git('push', 'origin', `HEAD:refs/heads/${branch}`);
+    const r = git('push', 'origin', `${sha}:refs/heads/${branch}`);
     if (r.ok) return true;
     if (/rejected|non-fast-forward|fetch first|protected/i.test(r.err)) {
       log(`push refused, left alone (never forced): ${r.err.split('\n').pop()}`);
@@ -143,20 +145,22 @@ async function save(o, branch, subject, background) {
   if (!head.ok) { log(`no HEAD: ${head.err}`); return 1; }
   const tmpIndex = resolve(git('rev-parse', '--git-dir').out, `checkpoint-index-${process.pid}`);
   const ig = (...args) => run({ ...process.env, GIT_INDEX_FILE: tmpIndex }, args);
-  let commit, codeAhead;
+  let commit, codeAhead, withheld = false;
   try {
     if (!ig('read-tree', head.out).ok) { log('could not read HEAD into a private index'); return 1; }
     const add = ig('add', '-A', '--', DIR);
     if (!add.ok) { log(`git add failed: ${add.err}`); return 1; }
     if (ig('diff', '--cached', '--quiet', head.out, '--', DIR).ok) { log('nothing to save'); return 0; }
     const secrets = stagedSecrets(ig, head.out);
-    if (secrets.length) {
-      for (const [f, kind] of secrets) log(`NOT committed: ${f} looks like a ${kind}; remove or fix it, then save again`);
-      return 1;
+    for (const [f, kind] of secrets) {
+      log(`NOT committed: ${f} looks like a ${kind}; remove or fix it, then save again`);
+      if (f === DIR || !ig('reset', '--quiet', head.out, '--', f).ok) { log('nothing saved: a flagged note could not be left out'); return 1; }
     }
+    if (secrets.length) withheld = true;
+    if (ig('diff', '--cached', '--quiet', head.out, '--', DIR).ok) { log('nothing else to save'); return 1; }
     const tree = ig('write-tree');
     if (!tree.ok) { log(`git write-tree failed: ${tree.err}`); return 1; }
-    codeAhead = !onlyCheckpointsAhead(branch);
+    codeAhead = !onlyCheckpointsAhead(branch, head.out);
     const msg = ['-m', `checkpoint(${o.slug}): ${subject}${codeAhead ? '' : ' [skip ci]'}`];
     if (o.trailers.length) msg.push('-m', o.trailers.join('\n'));
     commit = git('commit-tree', tree.out, '-p', head.out, ...msg);
@@ -173,9 +177,9 @@ async function save(o, branch, subject, background) {
     log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
     return 0;
   }
-  const pushed = await push(branch);
-  log(`${pushed ? 'saved and pushed' : 'saved locally, NOT pushed'} ${sha} on ${branch}`);
-  return pushed ? 0 : 1;
+  const pushed = await push(branch, commit.out);
+  log(`${pushed ? 'saved and pushed' : 'saved locally, NOT pushed'} ${sha} on ${branch}${withheld ? ' (flagged notes left out)' : ''}`);
+  return pushed && !withheld ? 0 : 1;
 }
 
 async function watch(o, branch) {

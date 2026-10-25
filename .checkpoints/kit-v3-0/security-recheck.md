@@ -12,3 +12,13 @@
 - F6: header fixed (:2-3); watch skips push when code ahead (:150-153). TOCTOU: push sends HEAD, not the saved sha.
 - F7: bounds (:67).
 - next: probes in scratch repo (rename, URL-encoded token, false positive blocks whole batch, race).
+## probes (scratch repos in $TMPDIR, drivers in the session scratchpad recheck/)
+- 1c259ce: renamed note + token PUBLISHED exit 0; quoted/non-ASCII name + token PUBLISHED exit 0 (git show fails, skipped).
+- 612cc5a (HEAD, private index, -z, --no-renames, unreadable = hit): both refused. 19/19 tests. No rename test.
+- Both: `%3Dghp_...` committed (\b); JWT, npm_, AIza, sk-proj- committed; session's own CLAUDE_CODE_MESSAGING_TOKEN
+  (32 hex) not matched by any pattern (names-only check, no values printed).
+- Both: one false-positive file (postgres://app:<example password removed>@...) blocks all notes, exit 1.
+- Both: watch published a code commit made during push retry (push sends HEAD, line 126); evil merge published with [skip ci].
+- Docs (code.claude.com permissions + permission-modes): domain: exact host; Edit rules cover Write; .claude is a
+  protected path (agent-memory .md exempt); explicit ask rules prompt even in auto and bypass, denied in dontAsk.
+- WRITE-GUARD deferral written in docs/reports/2026-10-24-kit-v3-0.md (untracked draft). Accept, with corrections.

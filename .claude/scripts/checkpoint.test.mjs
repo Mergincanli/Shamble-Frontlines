@@ -16,6 +16,7 @@ const sh = (cwd, ...args) => {
   return r.stdout.trim();
 };
 const run = (cwd, ...args) => spawnSync(process.execPath, [SCRIPT, ...args], { cwd, encoding: 'utf8' });
+const runEnv = (cwd, env, ...args) => spawnSync(process.execPath, [SCRIPT, ...args], { cwd, encoding: 'utf8', env: { ...process.env, ...env } });
 const note = (repo, name = 'test.md', text = 'notes\n') => {
   mkdirSync(join(repo, '.checkpoints'), { recursive: true });
   writeFileSync(join(repo, '.checkpoints', name), text);
@@ -276,4 +277,82 @@ test('the commit holds exactly the scanned notes and leaves the index in step wi
   assert.equal(sh(repo, 'show', 'HEAD:.checkpoints/a.md'), 'alpha');
   assert.equal(sh(repo, 'status', '--porcelain', '--', '.checkpoints/'), '');
   assert.equal(sh(repo, 'diff', '--cached', '--name-only'), '');
+});
+
+test('the value of a secret environment variable is refused, and only its name is printed', (t) => {
+  const { repo } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  const head = sh(repo, 'rev-parse', 'HEAD');
+  const value = '0123456789abcdef0123456789abcdef';
+  note(repo, 'env.md', `pasted: ${value}\n`);
+  const r = runEnv(repo, { FAKE_TOKEN: value }, 'save', 'test', '-m', 'env paste');
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stdout, /value of \$FAKE_TOKEN/);
+  assert.doesNotMatch(r.stdout + r.stderr, new RegExp(value));
+  assert.equal(sh(repo, 'rev-parse', 'HEAD'), head);
+});
+
+test('more token shapes are refused: URL-encoded GitHub, JWT, npm, Google', (t) => {
+  const { repo } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  const head = sh(repo, 'rev-parse', 'HEAD');
+  const samples = [
+    'x=a%3Dghp_' + 'Q'.repeat(36),
+    'eyJ' + 'a'.repeat(20) + '.eyJ' + 'b'.repeat(20) + '.' + 'c'.repeat(20),
+    'npm_' + 'N'.repeat(36),
+    'AIza' + 'G'.repeat(35),
+  ];
+  for (const [i, text] of samples.entries()) {
+    note(repo, `s${i}.md`, text + '\n');
+    assert.equal(run(repo, 'save', 'test', '-m', 'sample').status, 1, text.slice(0, 12));
+    assert.equal(sh(repo, 'rev-parse', 'HEAD'), head);
+    rmSync(join(repo, '.checkpoints', `s${i}.md`));
+  }
+});
+
+test('a flagged note is left out, the clean notes are still saved', (t) => {
+  const { repo, origin } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  note(repo, 'test.md', 'step 2 done\n');
+  note(repo, 'example.md', 'postgres://app:changeme@localhost/db\n');
+  const r = run(repo, 'save', 'test', '-m', 'step 2');
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stdout, /flagged notes left out/);
+  assert.equal(sh(repo, 'show', 'HEAD:.checkpoints/test.md'), 'step 2 done');
+  assert.throws(() => sh(repo, 'show', 'HEAD:.checkpoints/example.md'));
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
+});
+
+test('a renamed note with a token added is refused', (t) => {
+  const { repo, origin } = fixture(t);
+  note(repo);
+  const body = Array.from({ length: 30 }, (_, i) => `line ${i}: a long enough clean note for rename detection`).join('\n') + '\n';
+  note(repo, 'a.md', body);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  rmSync(join(repo, '.checkpoints', 'a.md'));
+  note(repo, 'b.md', body + 'ghp_' + 'R'.repeat(36) + '\n');
+  assert.equal(run(repo, 'save', 'test', '-m', 'rename').status, 1);
+  assert.throws(() => sh(repo, 'show', 'HEAD:.checkpoints/b.md'));
+  assert.throws(() => sh(origin, 'show', 'refs/heads/cs/test:.checkpoints/b.md'));
+});
+
+test('code added in a merge commit is never marked [skip ci]', (t) => {
+  const { repo } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  sh(repo, 'switch', '--quiet', '-c', 'side');
+  note(repo, 'side.md', 'side\n');
+  sh(repo, 'add', '.checkpoints/side.md');
+  sh(repo, 'commit', '--quiet', '-m', 'side: notes only');
+  sh(repo, 'switch', '--quiet', 'cs/test');
+  sh(repo, 'merge', '--quiet', '--no-ff', '--no-commit', 'side');
+  writeFileSync(join(repo, 'evil.js'), 'evil();\n');
+  sh(repo, 'add', 'evil.js');
+  sh(repo, 'commit', '--quiet', '-m', 'merge side');
+  note(repo, 'test.md', 'after the merge\n');
+  assert.equal(run(repo, 'save', 'test', '-m', 'after merge').status, 0);
+  assert.doesNotMatch(sh(repo, 'log', '-1', '--format=%s'), /skip ci/);
 });

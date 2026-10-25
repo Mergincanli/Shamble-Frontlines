@@ -11,7 +11,9 @@ rules 1–5, and §2c). CLAUDE.md "Checkpoints" points here.
   branch's slug (`cs/kit-v3-0` → `kit-v3-0`); a cloud session on a `claude/…` branch uses the task's name.
 - **Subagents keep notes** in `.checkpoints/<task-slug>/<agent>-<part>.md`, one file per agent and part (for example
   `.checkpoints/r3-rendering/graphics-engineer-outlines.md`).
-- The repository is public: no secrets, tokens, credentials or raw network payloads in a checkpoint or a note.
+- The repository is public: no secrets, tokens, credentials or raw network payloads in a checkpoint or a note. Write
+  example credentials without the password (`scheme://user@host`); the saver leaves out any note that looks like a
+  secret, and says so in its log.
 
 ## 2. The checkpoint file (brief 2b rule 1)
 Copy this template. Keep it short: it is a handoff, not a log.
