@@ -9,9 +9,9 @@
  {
   "id": "GE14",
   "field": "where",
-  "op": "append",
-  "find": "",
-  "text": "; E/Escape close :3260; Tab blocked :3254; power-offline banner :1896; re-render after a purchase :1184 (pickClass), :1934 (buyWeapon), :1947 (buyGrenade); closes after a vehicle buy :1363 and after equipping a special :1933"
+  "op": "replace",
+  "find": "re-render :2112 and :2429)",
+  "text": "re-render :2112 and :2429); E/Escape close :3260; Tab blocked :3254; power-offline banner :1896; re-render after a purchase :1184 (pickClass), :1934 (buyWeapon), :1947 (buyGrenade); closes after a vehicle buy :1363 and after equipping a special :1933"
  },
  {
   "id": "GE15",
@@ -44,9 +44,9 @@
  {
   "id": "GE16",
   "field": "where",
-  "op": "append",
-  "find": "",
-  "text": "; insignia reused by the scoreboard :2468, :2477, :2484"
+  "op": "replace",
+  "find": "timers :2327-2328",
+  "text": "timers :2327-2328; insignia reused by the scoreboard :2468, :2477, :2484"
  },
  {
   "id": "GE17",

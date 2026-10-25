@@ -1,0 +1,79 @@
+[
+ {
+  "id": "ED2",
+  "field": "what",
+  "op": "replace",
+  "find": "mirroring (off, N-S, E-W)",
+  "text": "mirroring (Off / X / Z: X negates the x position, Z negates z; placements and stamps are mirrored live and M mirrors the selection, swapping friend and hostile)"
+ },
+ {
+  "id": "ED3",
+  "field": "what",
+  "op": "replace",
+  "find": "Duplicate, copy/paste and prefabs all use this.",
+  "text": "Duplicate, copy/paste, prefab save and stamp, live mirror, array duplication, re-teaming and the inspector's array and prefab rows all use this."
+ },
+ {
+  "id": "ED6",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Superseded by the Anim Lab hold sliders (AL_HOLD over ANIM.hold, row ED7). Nothing in v2 should depend on ANIM.aim.",
+  "text": "Superseded by the Anim Lab hold sliders (AL_HOLD over ANIM.hold, row ED7). Only ANIM.aim.carry / ANIM.aim.ads and applyRifleHold are tool-only. ANIM.aim.adsK (the ADS blend spring stiffness, 45) is still read every frame by updateSoldierAnim (shamble-game.js:290), so carry it into the ported hold data (with ANIM.hold) before dropping the rest of ANIM.aim."
+ },
+ {
+  "id": "ED6",
+  "field": "evidence",
+  "op": "append",
+  "find": "",
+  "text": "ANIM.aim at shamble-game.js:187-191; adsK read at :290 inside updateSoldierAnim (:271)."
+ },
+ {
+  "id": "ED7",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Keep the treadmill technique, the action list and the per-gun hold sliders.",
+  "text": "Keep the treadmill technique, the action list and the hold sliders, which edit one hold style and stance at a time (ANIM.hold[GUN_KIT[gun].hold][stance], so guns that share a style share the values)."
+ },
+ {
+  "id": "ED13",
+  "field": "evidence",
+  "op": "replace",
+  "find": "O2 (Export + Copy works [S], 1436 chars reached the clipboard; the name is always 'DM_Romania'; improve: export the versioned v2 document) and O4 (Reset works [S], tooltip wrong; improve: Reset is one undoable command).",
+  "text": "O2 (Export + Copy works [S], 1436 chars reached the clipboard; improve: export the versioned v2 document) and O4 (Reset works [S], tooltip wrong; improve: Reset is one undoable command). O2's \"the name is always DM_Romania\" was true at 67cf55b but is stale at 48ffb51: serializeMap writes name:curMap.name (shamble-game.js:662), which buildMap sets (:623-625) and Maps Save sets (shamble-editor.js:1111). curMap came in with team-prep-fixes (ea1ebb8)."
+ },
+ {
+  "id": "ED14",
+  "field": "where",
+  "op": "replace",
+  "find": "orphan comment :1249-1251 describing a cursor-following pass with no code after it",
+  "text": "stray comment :1249-1251 that describes placeCursor, whose code lives at shamble-game.js:3044-3047"
+ },
+ {
+  "id": "ED14",
+  "field": "evidence",
+  "op": "replace",
+  "find": "is followed only by bootEditor's closing brace :1252: dead text.",
+  "text": "is followed only by bootEditor's closing brace :1252. It describes placeCursor (shamble-game.js:3044-3047: dirty-checked _curX/_curY, translate3d reticle), which the comment was left behind from, so it is misplaced text, not a missing feature."
+ },
+ {
+  "id": "ED14",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "and the orphan comment at :1249-1251",
+  "text": "and the stray placeCursor comment at :1249-1251"
+ },
+ {
+  "id": "ED16",
+  "field": "what",
+  "op": "replace",
+  "find": "and the rotation step (15, 45 or 90 degrees, default 45) used by Shift+Wheel rotation. Buttons show the current value.",
+  "text": "and the rotation step (15, 45 or 90 degrees, default 45) used by Shift+Wheel rotation (Alt gives a fine 5° step) and by the inspector's −step / +step / snap buttons. The Grid button or the G key cycles the snap; the rotation button cycles the step; both buttons show the current value. Arrow-key nudge also moves by the grid size."
+ },
+ {
+  "id": "ED16",
+  "field": "where",
+  "op": "replace",
+  "find": "bootEditor :1095 edSnapBtn click",
+  "text": "bootEditor :1095 edSnapBtn click; :873 edRotateSnap, :903-905 inspector step buttons; :1096 edRotBtn click; shamble-game.js:3255 G key -> edToggleSnap, :3293 Shift+Wheel -> edRotateSel (shamble-editor.js:158); shamble-editor.js:222 edNudge uses edSnap"
+ }
+]

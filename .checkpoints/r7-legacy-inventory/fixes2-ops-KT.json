@@ -1,0 +1,51 @@
+[
+ {
+  "id": "KT20",
+  "field": "what",
+  "op": "replace",
+  "find": "Each memory agent is told to check its memory first and, except the advisor and netcode-architect, to save to it afterwards.",
+  "text": "The art-director, netcode-architect, perf-auditor and security-auditor are told to check their memory first; the art-director, perf-auditor and security-auditor are also told to save to it afterwards. The advisor's file sets the field but gives no memory instruction."
+ },
+ {
+  "id": "KT20",
+  "field": "where",
+  "op": "replace",
+  "find": ".claude/agents/advisor.md:8;",
+  "text": ".claude/agents/advisor.md:8 (memory only; no instruction);"
+ },
+ {
+  "id": "KT20",
+  "field": "where",
+  "op": "replace",
+  "find": "netcode-architect.md:7, :11;",
+  "text": "netcode-architect.md:7, :11 (check first; Write in its tools line :4);"
+ },
+ {
+  "id": "KT20",
+  "field": "evidence",
+  "op": "set",
+  "find": "",
+  "text": "No memory folder is committed at 48ffb51 or at HEAD (git ls-tree -r: 0 paths containing agent-memory). docs/reports/2026-10-14-editor-undo-ground.md:57: 'Calibration notes and baselines were not saved to agent memory (reviewers are read-only).' Baselines live in STATUS.md's health table instead (STATUS.md:113-117, KT16). kit-v3-0 report :180-181 recommends ask rules for named .claude/ folders but 'never the blanket .claude/** (agent memory lives there)'. At HEAD (after kit-v3-0) eleven agent files set memory: project, and all of them except the advisor have Write in their tools line (advisor.md:4)."
+ },
+ {
+  "id": "KT20",
+  "field": "v2_note",
+  "op": "set",
+  "find": "",
+  "text": "Learn: at 48ffb51 the memory was configured but never written. The 2026-10-14 report puts this down to read-only reviewers (four of the five memory agents had no Write tool); the netcode-architect had Write but no save instruction and saved nothing either. Whether Claude Code would have let them write memory without Write in their tools line was not checked. If v2 relies on agent memory for baselines and threat models, check after the first reviews that it is written and committed; otherwise keep baselines in the STATUS health table, which names source, date and method. Changed by kit-v3-0 (agents: eleven with memory, Write added to every memory agent except the advisor)."
+ },
+ {
+  "id": "KT21",
+  "field": "evidence",
+  "op": "replace",
+  "find": "START_HERE.md:3-5 'Written 2026-10-02 from the live build'; §5 is tagged [verified] (:73).",
+  "text": "START_HERE.md:3-5 'Read this first in every chat. Written 2026-10-02 from the live build'. §1 and §5 are newer than that: git log -- docs/START_HERE.md shows ab3bcaf (2026-10-13, 'git + Claude Code workflow (START_HERE §1, §5)'), 80dab4c (2026-10-14, gate check 5) and last 870f623 (2026-10-16). §5 is tagged [verified] (:73)."
+ },
+ {
+  "id": "KT21",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "The legacy file moves to legacy/ in phase 1 with the frozen code.",
+  "text": "Where this page goes in phase 1 is not stated: only the legacy game's five files are named as moving to legacy/ (CLAUDE.md:19, V2_PHASE0_BRIEF.md:10)."
+ }
+]
