@@ -4,7 +4,7 @@
   `.checkpoints/r7-legacy-inventory/plan.md` (APPROVE with 11 conditions).
 - **Branch:** claude/bold-faraday-i49gug (draft PR #27), restarted from main f2ccc13 after kit-v3-0 merged (PR #26) ·
   **Base:** main f2ccc13 (the engine files are unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds).
-- **Last update:** 2026-10-25 21:51 Amsterdam
+- **Last update:** 2026-10-25 22:50 Amsterdam
 
 ## Steps done
 1. Plan approved with 11 conditions (plan.md, plan-verdict.json). Night queue #16 item 1 made a plain bullet "in
@@ -27,15 +27,19 @@
    [C] 143, [M] 106); coverage after all passes: core 138/138, game 586 named + 92 in range / 714 (36 neither),
    editor 233 + 64 / 353 (56 neither); repo map 93/93; gate PASS, symbols +0 -0 · 0c6e2b9.
 ## Current step
-9. Final review and verification workflow (r7-final-review): verifier spot-checks of every [M] claim and sampled
-   rows; marks lenses (engine-architect, netcode-architect, graphics-engineer, game-designer); a coverage closer for
-   the 92 unplaced declarations. Each returns fix ops; the session applies them with apply-ops.py.
+10. Final review (r7-final-review, run wf_4e8e0798-666) done: 10/10 agents, 115 findings (13 blocking, 73 should, 29
+    nit), result final-review-result.json. Session items (final-review-session-items.json): coverage regex bug (fixed:
+    game neither 36 -> 8, editor 56 -> 2), [M] definition widened in the header, kit rows stay at 48ffb51 (condition 8,
+    header says so), duplicates CM14 -> into CC12 and CC7 -> into CL5 (session ops fixes4-session-<area>.json, after the
+    workflow). Workflow r7-apply-final-review: per area an applier verifies each finding and writes fixes3-ops-<area>.json,
+    a checker checks (applier3-*, checker3-*).
 
 ## Next steps
-1. Count what came back; verify and apply the fix ops (fixes3-ops-<area>.json, then re-run apply-ops on them); rebuild
-   the page; gate.
-2. The report docs/reports/2026-10-25-r7-legacy-inventory.md (fold in this checkpoint, the plan verdict and how each
-   condition was met, the R7-PUSH note, the STATUS/ROADMAP deferral: PR #25 edits both).
+1. Count what came back (15 areas); apply the checkers' fix ops; write fixes4-session ops for the duplicates (CM14
+   remove; CC12 where + MELEE_IDLE swing reads game:1658, :2743; CC7 remove; CL5 merges CC7's reasoning, mark drop with
+   both views); re-run apply-ops for all areas; coverage; fill inventory-meta fr_* (sampled 28, findings 115, accepted,
+   rejected, session 4, check fixes); build; read the page; gate; commit.
+2. The report docs/reports/2026-10-25-r7-legacy-inventory.md.
 3. Stop the saver; delete .checkpoints/r7-legacy-inventory* in the last commit; mark PR #27 ready; advisor review.
 
 ## Open findings
@@ -62,9 +66,9 @@
   wf_e24159e7-346 (notes in the scratchpad kit-v3-1/). The stuck PR Advisor run waits on `npm ci` (ask rule).
 
 ## Running work
-- Workflow r7-final-review · run wf_4e8e0798-666 · task ws35vt5h9 · script as launched:
-  `.checkpoints/r7-legacy-inventory/r7-final-review-run1.js` (no args; sample in final-review-sample.json) · 10 agents
-  (5 verifiers, engine-architect, netcode-architect, graphics-engineer, game-designer, coverage closer) · notes
-  verifier-<group>.md, <agent>-review.md, coverage-closer.md · launched 2026-10-25 21:53 Amsterdam · running.
-- Done: r7-apply-fixes2 (wf_df83f4d1-1f2), r7-edit-verify (wf_5e9f70f7-c89), r7-read-verify (wf_3552ad56-12f).
+- Workflow r7-apply-final-review · run wf_4df6005c-5a6 · task w8q4s3j0y · script as launched:
+  `.checkpoints/r7-legacy-inventory/r7-apply-final-review-run1.js` · launched 2026-10-25 22:47 Amsterdam · running.
+- Workflow write-guard-audit (kit-v3-1 research, side work) · run wf_e24159e7-346 · task wql15grun · notes in the
+  scratchpad kit-v3-1/ · running.
+- Done: r7-final-review (wf_4e8e0798-666), r7-apply-fixes2, r7-edit-verify, r7-read-verify.
 - Background saver: task bstocjk8x, started 21:42 Amsterdam, stops 23:32.

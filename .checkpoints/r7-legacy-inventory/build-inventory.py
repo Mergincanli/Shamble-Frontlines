@@ -77,6 +77,9 @@ rc = json.load(open(f'{D}/rows-and-checks.json'))
 first = sum(len(v['rows']) for v in rc.values())
 v1 = collections.Counter(x['verdict'] for v in rc.values() for x in v['checks'])
 cov = json.load(open(f'{D}/coverage-final.json')) if os.path.exists(f'{D}/coverage-final.json') else None
+merged = {}  # duplicate rows removed by apply-ops.py (remove ops), with the reason
+for c in CODES:
+    if os.path.exists(f'{D}/removed-{c}.json'): merged.update(json.load(open(f'{D}/removed-{c}.json')))
 meta = json.load(open(f'{D}/inventory-meta.json'))  # numbers from the edit pass, filled in by the session
 
 L = ['# Legacy inventory: every system of the legacy build', '',
@@ -101,14 +104,17 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      f'**Tally of recommended marks ({len(all_rows)} rows):** ' + ' · '.join(f'{m} {tally[m]}' for m in MARKS)
      + f'. Look brief pending on {look} rows. Per area: the table under "Tally by area" at the end.', '',
      '**Date:** 2026-10-25. **Code:** main at f2ccc13. The engine files (`shamble-core.js`, `shamble-game.js`,',
-     '`shamble-editor.js`) and both pages are byte-identical to 48ffb51, where the reading started, so every line number',
-     'holds on both. In the Where column, `core`, `game` and `editor` mean those three files.', '',
+     '`shamble-editor.js`), both pages and `tools/` are byte-identical to 48ffb51, where the reading started, so their line',
+     'numbers hold on both. Kit rows (KT, and the TL rows on `.claude/` files) describe the kit at 48ffb51, as plan condition',
+     '8 asks: kit-v3-0 (PR #26) rewrote those files since, so their line numbers are 48ffb51\'s (`git show 48ffb51:<file>`) and',
+     'each row that kit-v3-0 changed says so. In the Where column, `core`, `game` and `editor` mean the three engine files.', '',
      '**How each state was checked:**',
      f'- **[C]** ({states["C"]} rows): code read at main; every Where re-opened by a second reader.',
-     f'- **[M]** ({states["M"]} rows): the row also cites a measurement, in a report under `docs/reports/` or by a harness in'
-     ' `tools/`, and names it.'] + ([f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.']
+     f'- **[M]** ({states["M"]} rows): the row also cites a measurement recorded in the repository and names it: a report under',
+     ' `docs/reports/`, the STATUS health table, `docs/AUDIT_BUGS_PERF.md`, the `docs/ANIMATION_PLAN.md` §6 metrics, or a harness',
+     ' in `tools/`. The measurements were not re-run, except where a row says so; the final review re-read each at its source.'] + ([f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.']
      if states['D'] else ['- No row rests on a doc claim alone ([D]): every row was read in the code.']) + ['',
-     '**How this file was made.** Five passes, each by Opus agents at effort high, with notes on checkpoints:',
+     '**How this file was made.** Six passes, each by Opus agents at effort high (xhigh for the engine and netcode reviews), with notes on checkpoints:',
      f'1. Read: one reader per area (15) wrote {first} rows, each citing file:line.',
      f'2. Verify: one skeptic per area re-opened every Where and every number and tried to refute it: {v1["confirmed"]}',
      f'   confirmed, {v1["corrected"]} corrected, {v1.get("refuted", 0)} refuted. They also listed {meta["missing"]} systems no row covered.',
@@ -120,7 +126,12 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      f'   {meta["v2_corrected"]} corrected, {meta["v2_refuted"]} refuted).',
      f'5. Apply and check: one applier per area turned the {meta["v2_corrected"]} corrections into exact edits, a script applied them,',
      f'   and one checker per area compared every change with its correction and the code ({meta["check_fixes"]} more fixes, applied).',
-     f'   One session edit: KT14 records the night-shift routine set up on 2026-10-25.']
+     f'   One session edit: KT14 records the night-shift routine set up on 2026-10-25.',
+     f'6. Final review: five verifiers re-read every [M] row\'s measurement at its source and {meta["fr_sampled"]} sampled code-read rows;',
+     f'   the engine-architect, netcode-architect, graphics-engineer and game-designer reviewed the marks and notes of their areas;',
+     f'   a coverage closer placed the declarations no row covered. {meta["fr_findings"]} findings: {meta["fr_accepted"]} fixed, {meta["fr_rejected"]} rejected with',
+     f'   evidence (kit line numbers stay at 48ffb51, see above), {meta["fr_session"]} handled by the session; one checker per area then',
+     f'   checked every fix and rejection ({meta["fr_check_fixes"]} more fixes).']
 if cov:
     L += [f'   Coverage after these passes (top-level declarations named in some row\'s Where, mechanical match): ' +
           ', '.join(f'{f} {cov[f]["named"]}/{cov[f]["total"]}' for f in ('core', 'game', 'editor')) + '.']
@@ -160,6 +171,7 @@ if cov:
                  f' cites (scratch vectors, DOM handles, small helpers of that row\'s system). {len(un)} are neither named nor'
                  ' inside a cited range' + (': ' + ', '.join(f'`{d["n"]}` ({f}:{d["l"]})' for d in un) + '.' if un else '.'))
 L += ([f'- **[D] rows** ({states["D"]}): doc claims, not re-checked; each names its doc.'] if states['D'] else []) + [
+      ] + ([f'- **Merged duplicates** ({len(merged)}): ' + '; '.join(f'{k}: {cell(v)}' for k, v in sorted(merged.items())) + '.'] if merged else []) + [
       '- **Marks** are recommendations; none is a decision until Mustafa confirms it.',
       '- **The look**: no row decides it; the look pipeline row says "redesign (look brief pending)" and nothing more.', '']
 open('docs/LEGACY_INVENTORY.md', 'w').write('\n'.join(L))

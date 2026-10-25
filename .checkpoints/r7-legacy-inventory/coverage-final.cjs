@@ -40,11 +40,12 @@ for (const f of ['core', 'game', 'editor']) {
   }
   decls[f] = L;
 }
-// line ranges a Where cites: "shamble-game.js:10-20, 31" or "game:10-20"; bare numbers belong to the last file named
+// line ranges a Where cites (a bare ":12-20" after a file counts too; the final review found an earlier version
+// that skipped them): "shamble-game.js:10-20, 31" or "game:10-20"; bare numbers belong to the last file named
 for (const r of rows) {
   r.refs = [];
   let cur = null;
-  const re = /\b(?:shamble-)?(core|game|editor)(?:\.js)? ?:(\d{1,4})(?:\s*[-–]\s*(\d{1,4}))?|(index\.html|editor\.html|tools\/[\w./-]+|[\w-]+\.(?:md|mjs|json|py|yml))|(?<![\w.#x/:])(\d{1,4})(?:\s*[-–]\s*(\d{1,4}))?(?![\w.%]|\.\d)/g;
+  const re = /\b(?:shamble-)?(core|game|editor)(?:\.js)? ?:(\d{1,4})(?:\s*[-–]\s*(\d{1,4}))?|(index\.html|editor\.html|tools\/[\w./-]+|[\w-]+\.(?:md|mjs|json|py|yml))|(?<![\w.#x/])(\d{1,4})(?:\s*[-–]\s*(\d{1,4}))?(?![\w.%]|\.\d)/g;
   let m;
   while ((m = re.exec(r.where))) {
     if (m[1]) { cur = m[1]; r.refs.push({ f: cur, a: +m[2], b: m[3] ? +m[3] : +m[2] }); continue; }

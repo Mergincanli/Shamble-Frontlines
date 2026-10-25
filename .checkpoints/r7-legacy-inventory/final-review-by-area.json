@@ -1,0 +1,1142 @@
+{
+ "CL": [
+  {
+   "ref": "verifier-core#0",
+   "reviewer": "verifier-core",
+   "id": "CL8",
+   "field": "evidence",
+   "severity": "blocking",
+   "problem": "False causal claim. The row says full-map draw calls went from 1992 / 2406 / 3502 to 1992 constant, and heap from 119.5 to 44.5 MB, 'once rebuilt pieces called stylizeOne'. That report also fixed clearMap, which never cleared trees and props, so every rebuild stacked another 70 trees and 36 props. That stacking caused the growth. Leaving out stylizeOne had the opposite effect: rebuilt pieces lost their ink hulls, so draw calls went down.",
+   "evidence": "docs/reports/2026-10-14-editor-undo-ground.md:12-15 (root cause: rebuilt pieces lost toon + ink), :18 (clearMap now clears trees[] and props[]), :26 (trees/props 70/36 -> 140/72 -> 280/144 on base), :29 (gameplay-view draw calls 187/135/127 -> 171/134/127 '(ink lost)' on base, 187/135/127 throughout on head), :27 (full-map 1992/2406/3502 vs 1992 constant). STATUS.md:124 heap 119.5 -> 44.5 MB is the same clearMap leak.",
+   "fix_op": "{\"id\": \"CL8\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"reports/2026-10-14-editor-undo-ground.md:27: full-map draw calls at boot / 1 / 2 editor rebuilds went from 1992 / 2406 / 3502 to 1992 / 1992 / 1992 once rebuilt pieces called stylizeOne (STATUS.md:124 also has heap 119.5 MB to 44.5 MB after 10 rebuilds).\", \"text\": \"reports/2026-10-14-editor-undo-ground.md:12-15 and :29: rebuilt roads, crates, buildings, barracks and the terminal lost toon + ink until their builders called stylizeOne (gameplay-view draw calls 187/135/127 fell to 171/134/127 with the ink lost on base; head stays at 187/135/127). The full-map draw calls 1992 / 2406 / 3502 -> 1992 constant (:27) and the heap 119.5 MB -> 44.5 MB after 10 rebuilds (STATUS.md:124) come from the same change-set's clearMap fix (trees and props stacked on every rebuild, :18, :26), not from stylizeOne.\"}"
+  },
+  {
+   "ref": "verifier-core#1",
+   "reviewer": "verifier-core",
+   "id": "CL8",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Misleading: it calls the 3a parked-bot case a second 'real bug'. The report says the reviewer's fix, as first written, would have left the bots parked at boot unstyled. Review caught it before it shipped, so it was a near-miss, not a shipped bug.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core-steps-1-6.md:89-92: 'The reviewer's fix as written would have left the 7 bots parked at boot unstyled: stylizeScene runs after the boot activation'; fixed in 5695e56 via stylizeOne on activation.",
+   "fix_op": "{\"id\": \"CL8\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"two real bugs (editor Ctrl+Z losing ink, PR #8; parked bots left unstyled in 3a)\", \"text\": \"one real bug (editor Ctrl+Z losing ink, PR #8) and one near-miss (in 3a, the parking fix as first written would have left the bots parked at boot unstyled; review caught it, steps-1-6 report:89-92)\"}"
+  },
+  {
+   "ref": "verifier-core#2",
+   "reviewer": "verifier-core",
+   "id": "CL12",
+   "field": "where",
+   "severity": "should",
+   "problem": "The callers list leaves out two spawnComic call sites, the bayonet 'IMPALE!' and the bot lunge 'SLASH!'. So the list of what triggers comic words is incomplete.",
+   "evidence": "grep -n 'spawnComic(' shamble-game.js: :2761 spawnComic('IMPALE!', en.group.position...) inside the bayonet hit (ps._bayHit); :2911 spawnComic('SLASH!', player.position...) after a bot lunge (eu.lunge).",
+   "fix_op": "{\"id\": \"CL12\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1388, :1394 (ability shouts)\", \"text\": \":1388, :1394 (ability shouts), :2761 (bayonet IMPALE!), :2911 (bot lunge SLASH!)\"}"
+  },
+  {
+   "ref": "graphics-engineer#3",
+   "reviewer": "graphics-engineer",
+   "id": "CL10",
+   "field": "what",
+   "severity": "should",
+   "problem": "The row says CHAR_MALE and CHAR_FEMALE are the bodies every in-game soldier is assembled from. In fact every in-game soldier is male: buildSoldier defaults to sex 'm', and neither caller passes 'f'. CHAR_FEMALE is used only by the Character Lab. CC5 states this correctly. The difference matters for v2 crowd budgets, because the game has one body variant.",
+   "evidence": "shamble-game.js:127 `assembleChar(Object.assign({sex:sex||'m'}, ...))`. The callers are :683 buildSoldier(PLAYER_FACTION) and :796 buildSoldier('Empire','m',ELITE_KIT) / buildSoldier(faction||'Soviets'). shamble-core.js:629 picks CHAR_FEMALE only when sel.sex==='f'.",
+   "fix_op": "{\"id\": \"CL10\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"CHAR_MALE and CHAR_FEMALE are the base bodies every in-game soldier is assembled from\", \"text\": \"CHAR_MALE is the base body every in-game soldier is assembled from (buildSoldier defaults to sex 'm' and no caller passes 'f'), and CHAR_FEMALE is used only by the Character Lab\"}"
+  }
+ ],
+ "CC": [
+  {
+   "ref": "verifier-core#3",
+   "reviewer": "verifier-core",
+   "id": "CC4",
+   "field": "v2_note",
+   "severity": "blocking",
+   "problem": "Wrong line number: the steps-1-6 note that arm and crest colours come from the unit, not the faction, is at line 59, not 58. Line 58 is the Empire coat palette sentence.",
+   "evidence": "grep -n crest docs/reports/2026-10-16-three-teams-core-steps-1-6.md -> 59: '- Note: arm and crest colours come from the unit, not the faction.'; line 58: 'It is an existing palette value, offered to 3b's colour review.'",
+   "fix_op": "{\"id\": \"CC4\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"steps-1-6 report:58\", \"text\": \"steps-1-6 report:59\"}"
+  },
+  {
+   "ref": "graphics-engineer#0",
+   "reviewer": "graphics-engineer",
+   "id": "CC4",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The v2 advice 'merge parts per material' cannot be done the way legacy merges static pieces. A soldier's parts move independently every frame (IK, foot planting, the coat panels), so mergeStaticGroup's approach of baking transforms (core:360-387) would freeze them. To merge an animated soldier, each part has to be skinned rigidly to its joint (a SkinnedMesh with one bone per part) or drawn through BatchedMesh with a transform per part. No row gives the per-soldier render breakdown, which R3 needs as its baseline. Each soldier is 105 meshes: 56 rigid parts plus 49 ink hulls (steps-1-6 report:94). After toonify every part has its own material. The three engine files contain no SkinnedMesh, InstancedMesh, BatchedMesh or LOD at all (grep: 0 hits).",
+   "evidence": "shamble-core.js:654-703 buildEntity creates one Mesh per part and gives each castShadow=true. Then core:414 (stylizeOne) and core:403 (stylizeScene) give each mesh a new toonify material, and core:393 adds one hull per mesh. docs/reports/2026-10-16-three-teams-core-steps-1-6.md:94: '105 meshes, 49 outlines'. Same report :92-93: scene.updateMatrixWorld takes 0.61-0.74 ms for about 2,190 nodes (headless). grep -n 'SkinnedMesh|InstancedMesh|BatchedMesh|THREE.LOD' over the three engine files: no match.",
+   "fix_op": "{\"id\": \"CC4\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"At the 48+ target, merge parts per material, prune shadow casters and add LOD or instancing (STATUS:84); 5,843 draw calls at 48 is the known wall.\", \"text\": \"At the 48+ target, cut the per-soldier draw calls, prune shadow casters and add LOD or instancing (STATUS:84); 5,843 draw calls at 48 is the known wall. Baseline: a soldier is 105 meshes (56 rigid primitive parts, each with its own material after toonify, plus 49 ink hulls; three-teams-core-steps-1-6.md:94), and every part casts a shadow. The legacy code has no SkinnedMesh, InstancedMesh, BatchedMesh or LOD. The parts animate independently, so the static merge (mergeStaticGroup) cannot apply. Merging per material needs rigid skinning (one bone per part) or BatchedMesh with a transform per part; a spike measures draw calls and GPU time for each option at 48 soldiers on real hardware.\"}"
+  },
+  {
+   "ref": "graphics-engineer#2",
+   "reviewer": "graphics-engineer",
+   "id": "CC3",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "'Avoid compiling one program per faction variant' implies the legacy game compiles a shader program per faction. In r128 a material's colour is a uniform (diffuse), and applyFaction and buildEntity change only .color, so recolouring for a faction adds no program by itself. The report this row cites measured 16 programs against 9 but did not establish the cause.",
+   "evidence": "shamble-core.js:648-650 (applyFaction sets o.material.color only) and :657-669 (the palette goes in through the color parameter). docs/reports/2026-10-16-three-teams-core.md:50 gives the counts 16 vs 9 with only '(more uniforms; ...)'; :103-104 says each compiles once.",
+   "fix_op": "{\"id\": \"CC3\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Avoid compiling one program per faction variant: v2 can pass palette colours as uniforms or instance attributes.\", \"text\": \"In r128 a material colour is a uniform, so the faction recolour by itself adds no shader program; what made 16 programs against 9 is not established (a spike can count programs per material parameter set). In v2, palette colours passed as uniforms or instance attributes keep one material for every faction, which also allows instancing.\"}"
+  }
+ ],
+ "CS": [
+  {
+   "ref": "verifier-core#4",
+   "reviewer": "verifier-core",
+   "id": "CS10",
+   "field": "where",
+   "severity": "blocking",
+   "problem": "Wrong number: the editor has 10 Math.hypot calls (on 9 lines), not 9. Line 517 has two.",
+   "evidence": "grep -o 'Math.hypot' shamble-editor.js | wc -l -> 10; lines 39, 122, 473, 483, 517 (x2: Math.hypot(o.x-F.x,o.z-F.z) and Math.hypot(o.x-H.x,o.z-H.z)), 681, 1076, 1081, 1091.",
+   "fix_op": "{\"id\": \"CS10\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"still has 9 Math.hypot calls\", \"text\": \"still has 10 Math.hypot calls on 9 lines\"}"
+  },
+  {
+   "ref": "verifier-core#5",
+   "reviewer": "verifier-core",
+   "id": "CS6",
+   "field": "what",
+   "severity": "nit",
+   "problem": "The NaN statement only holds for an all-NaN direction. A ray with one NaN component can still hit through the other slabs when maxT is finite.",
+   "evidence": "Node eval of the real core:1529-1543: rayStatics(S,0,1,-5,NaN,0,1,10,true) -> 0 (hit); rayStatics(S,0,1,-5,NaN,NaN,NaN,10,true) -> -1; same with maxT NaN -> 0; with no statics -> -1.",
+   "fix_op": "{\"id\": \"CS6\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"with a finite maxT, a NaN ray misses everything\", \"text\": \"with a finite maxT, an all-NaN direction misses everything (a ray with only one NaN component can still hit through the other slabs)\"}"
+  },
+  {
+   "ref": "engine-architect#3",
+   "reviewer": "engine-architect",
+   "id": "CS8",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The boundary fact R1 needs most is only stated in general terms ('the scene is the truth'). The row never says where the authoritative state actually lives. Soldier positions, the player's facing, grenade positions, crate orientation and collider bounds are all fields of three.js objects that sim code mutates or reads in place. Every 'rewrite in Rust' row depends on lifting this state out of the scene graph.",
+   "evidence": "game:2780 resolveObstacles(player.position,0.7); tickVertical(player.position,...); game:2933 the same on en.group.position. game:2710 player.rotation.y=Math.atan2(fd.x,fd.z) from aimPoint, read by the shield block at game:1514 (Math.sin(player.rotation.y)) and by playerFireOrigin at game:1420. game:2857 g.mesh.position.addScaledVector(g.vel,dt). game:1452 and 2526 th=o.mesh.rotation.y. game:85 box:new THREE.Box3().setFromObject(m); core:1430 _bkWorldBoxes via matrixWorld.",
+   "fix_op": "{\"id\": \"CS8\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Boundary fact for R1: today the authoritative state lives on three.js objects, so the port must lift it out of the scene graph. Soldier positions are scene-node positions moved in place (player.position and en.group.position, by resolveObstacles and tickVertical at game:2780 and :2933). The player's facing is the group's rotation.y, set from the cursor's aim point (game:2710) and read by the Riot Shield block (game:1514) and playerFireOrigin (game:1420). A grenade's position is its mesh's position (game:2857). A crate's orientation is its mesh's rotation.y (game:1452, :2526). Crate, prop, building and house colliders are THREE.Box3 objects filled from meshes (Box3.setFromObject at game:85; _bkWorldBoxes through matrixWorld, core:1430).\"}"
+  },
+  {
+   "ref": "engine-architect#8",
+   "reviewer": "engine-architect",
+   "id": "CS8",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "A stale number is presented as current. The row cites STATUS.md:118 for syncSimWorld at 561 B per call 'the houses fallback array'. That array was removed, and GW16 says so: STATUS is stale.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core.md:31: '`syncSimWorld` no longer builds an array per house per call.' game:1458: const hb=houses[i].boxes, nb=hb?hb.length:1; ... const bx=hb?hb[k]:houses[i].box (no array).",
+   "fix_op": "{\"id\": \"CS8\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"STATUS.md:118: syncSimWorld 561 B per call (the houses fallback array).\", \"text\": \"STATUS.md:118 still lists syncSimWorld at 561 B per call (the houses fallback array), but that array was removed (reports/2026-10-16-three-teams-core.md:31; game:1458 builds none), so the figure is stale (see GW16).\"}"
+  },
+  {
+   "ref": "engine-architect#12",
+   "reviewer": "engine-architect",
+   "id": "CS8",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The note says the SIM mirrors the scene 'once per shot', which contradicts the row's own 'what' field and GW16. The code syncs once per frame through the _frameId guard, plus forced re-syncs. Only the stale core comment at core:1513 says 'once per shot'.",
+   "evidence": "game:1444 if(!force && _simFrame===_frameId) return; game:2672 _frameId++ per update(); forced re-syncs at game:778 (invalidation), 2862 and editor:564.",
+   "fix_op": "{\"id\": \"CS8\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"In legacy the scene is the truth and SIM mirrors it once per shot.\", \"text\": \"In legacy the scene is the truth and SIM mirrors it once per frame (plus the forced re-syncs listed above).\"}"
+  },
+  {
+   "ref": "engine-architect#15",
+   "reviewer": "engine-architect",
+   "id": "CS5",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'And maybe full 3D rotation' floats a feature no need asks for (check c). EDITOR_V2 §3 needs any rotation about Y (120° three-team symmetry, 15° snaps), which the oriented-box test already handles. VISION_V2 §6.2 needs slopes, not tilted static boxes.",
+   "evidence": "EDITOR_V2.md §3: 'Snapping to the grid and to 15° / 45° / 90°'; 'mirrored live to the other two at 120°'. core:1519-1524 rayStatic handles any Y rotation.",
+   "fix_op": "{\"id\": \"CS5\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"will need slopes, and maybe full 3D rotation.\", \"text\": \"will need slopes and any rotation about Y (EDITOR_V2 §3: 120° three-team symmetry, 15° snaps); no VISION_V2 §6 need asks for full 3D rotation of static boxes.\"}"
+  },
+  {
+   "ref": "engine-architect#16",
+   "reviewer": "engine-architect",
+   "id": "CS1",
+   "field": "where",
+   "severity": "nit",
+   "problem": "'A repo-wide grep finds no reader of FIXED_DT, BTN or makeInputCommand' is not quite true: R7's own tools/tuning-dump.js names BTN to dump it. It is not a gameplay reader, so the conclusion (dead code) stands.",
+   "evidence": "grep -rn 'FIXED_DT|makeInputCommand|BTN' (no node_modules): tools/tuning-dump.js:12 lists 'BTN' among the dumped globals.",
+   "fix_op": "{\"id\": \"CS1\", \"field\": \"where\", \"op\": \"append\", \"text\": \" Exception: tools/tuning-dump.js:12 (added by R7) names BTN, only to dump it as data.\"}"
+  },
+  {
+   "ref": "netcode-architect#17",
+   "reviewer": "netcode-architect",
+   "id": "CS2",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'The model is fitted to it' decides how art and hit shapes relate, which is a look and content-pipeline choice. The authority point holds on its own: the sim owns the hit shape as per-unit data.",
+   "evidence": "Task rule: no row may decide the look; V2_PHASE0_BRIEF lists content data as its own decision draft.",
+   "fix_op": "{\"id\": \"CS2\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"so the sim owns the hit shape and the model is fitted to it\", \"text\": \"so the sim owns the hit shape as per-unit data; how the models and the hit shapes are kept in agreement is left to the look brief and the content-data decision draft\"}"
+  }
+ ],
+ "GW": [
+  {
+   "ref": "verifier-game1#0",
+   "reviewer": "verifier-game1",
+   "id": "GW16",
+   "field": "evidence",
+   "severity": "blocking",
+   "problem": "Wrong file:line. The row says the code at :1457 builds no per-house array. Line :1457 is `const rampHi=n;`. The houses loop that reads `houses[i].boxes` / `houses[i].box` without allocating is at :1458. The claim itself (no array built, so STATUS:118's 561 B figure is stale) is correct.",
+   "evidence": "sed -n 1457,1458p shamble-game.js: 1457 `const rampHi=n;`; 1458 `for(let i=0;i<houses.length;i++){ const hb=houses[i].boxes, nb=hb?hb.length:1; ... const bx=hb?hb[k]:houses[i].box; ...`. three-teams-core.md:31 and STATUS.md:118 are as quoted.",
+   "fix_op": "{\"id\": \"GW16\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"and the code at :1457 builds none\", \"text\": \"and the houses loop at :1458 builds none\"}"
+  },
+  {
+   "ref": "verifier-game1#1",
+   "reviewer": "verifier-game1",
+   "id": "GW13",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "Misleading paraphrase. AUDIT CS10 says the shipped map had no 45-degree (off-grid) pieces. The row drops that qualifier and says '0/11 rotated houses'. Today's Cabana has 8 of its 11 houses at +-90 degrees, and those go through resolveObstacles' rotated-house path (th != 0).",
+   "evidence": "AUDIT_BUGS_PERF.md:110: \"syncSimWorld gives 45° obstacles their box. The shipped map has none (0/24 obstacles, 0/11 houses)\". shamble-core.js:890-893 DM_Cabana.houses: manor and two brickFarm at rot 0; thatch x2, timber x4 and brickFarm x2 at rot +-1.5708. game:2526 takes the oriented branch for any house whose |rotation.y| >= 1e-3.",
+   "fix_op": "{\"id\": \"GW13\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"the shipped map had 0/24 rotated obstacles and 0/11 rotated houses\", \"text\": \"the map shipped then had no off-grid (45°) pieces (0/24 obstacles, 0/11 houses); today's Cabana has 8 of its 11 houses at ±90° (shamble-core.js:890-893), which take the rotated-house path\"}"
+  },
+  {
+   "ref": "verifier-game1#2",
+   "reviewer": "verifier-game1",
+   "id": "GW6",
+   "field": "state",
+   "severity": "should",
+   "problem": "The row is marked M but cites no measurement. editor-undo-ground.md:15-16 lists which builders now call stylizeOne (a code-change description), and STATUS.md:91 gives the root cause. Neither contains a number or a harness result.",
+   "evidence": "docs/reports/2026-10-14-editor-undo-ground.md:15-16: \"`addBox`, `addPath`, `makeBuilding` (body + trim), `makeBarracks` (lintel, floor, roof, panel), the `buildMap` terminal: now call `stylizeOne()` themselves...\". STATUS.md:91 is a root-cause narrative.",
+   "fix_op": "{\"id\": \"GW6\", \"field\": \"state\", \"op\": \"set\", \"text\": \"C\"}"
+  },
+  {
+   "ref": "verifier-game1#5",
+   "reviewer": "verifier-game1",
+   "id": "GW18",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "Partly wrong line. Report line :24 covers tree-face stalls only. The poplar stalls are on :25.",
+   "evidence": "bot-poplar-wedge.md:24 'runs with tree-face stalls / stall windows | 39 / 1,885 | 0 / 0'; :25 'runs with poplar stalls / runs ≥ 18% stall | 4 / 11 | 0 / 4'.",
+   "fix_op": "{\"id\": \"GW18\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"reports/2026-10-14-bot-poplar-wedge.md:24: poplar and tree stalls fixed on the nav side.\", \"text\": \"reports/2026-10-14-bot-poplar-wedge.md:24-25: runs with tree-face stalls 39 → 0 and with poplar stalls 4 → 0 (seeded 90 s matches, 240 pairs), fixed on the nav side.\"}"
+  },
+  {
+   "ref": "engine-architect#0",
+   "reviewer": "engine-architect",
+   "id": "GW16",
+   "field": "evidence",
+   "severity": "blocking",
+   "problem": "Wrong line. The row says the houses fallback array is gone because 'the code at :1457 builds none', but game:1457 is `const rampHi=n;`. The houses loop, which builds no array, is at game:1458.",
+   "evidence": "sed -n 1455,1462p shamble-game.js: 1455 const rampLo=n; 1456 ramps loop; 1457 const rampHi=n; 1458 for(let i=0;i<houses.length;i++){ const hb=houses[i].boxes, nb=hb?hb.length:1; ... CM13 cites the same loop correctly as game:1458.",
+   "fix_op": "{\"id\": \"GW16\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"the code at :1457 builds none\", \"text\": \"the code at :1458 builds none\"}"
+  },
+  {
+   "ref": "engine-architect#2",
+   "reviewer": "engine-architect",
+   "id": "GW15",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "A render-to-gameplay coupling is missing (check d). Destroyed buildings stay in losMeshes, and their meshes sink as a cosmetic animation. blastReaches raycasts those meshes through matrixWorld, which renderer.render refreshes. So the sink animation and the render loop decide whether a blast reaches a target behind a ruin, while bullets and bot sight ignore dead buildings. R1 and R4 need this as a concrete case of 'never raycast render meshes for gameplay'.",
+   "evidence": "game:552 rebuildLOS adds buildings.map(b=>b.mesh) with no alive filter; no rebuildLOS call on building death (callers game:584, 598, 643, editor only). game:2944: if(!b.alive&&b.sink<1){b.sink=Math.min(1,b.sink+dt*0.7); b.mesh.position.y=h/2-b.sink*h*0.85}, so about 1.43 s down to 15 % of the height. game:2543 blastReaches uses losRay.intersectObjects(losMeshes,false). three r128 Mesh.raycast reads this.matrixWorld (tools/node_modules/three/build/three.js:8290-8305), refreshed by scene.updateMatrixWorld() in render (:17867). game:1450 SIM building s.alive=b.alive; rayStatics skips alive===false (core:1532).",
+   "fix_op": "{\"id\": \"GW15\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Code read: losMeshes keeps destroyed buildings (rebuildLOS at :552 adds every building mesh, alive or not, and nothing rebuilds it when a building dies), and a destroyed building's mesh sinks over about 1.4 s until 15 % of its height stands (:2944, sink += dt*0.7, drop 0.85 of the height). blastReaches raycasts that mesh through its matrixWorld, which three.js refreshes in renderer.render (r128 Mesh.raycast, tools/node_modules/three/build/three.js:8290-8305; render :17867). So a cosmetic sink animation and the render loop decide whether a blast reaches a target behind a ruin, while bullets and bot sight ignore dead buildings (syncSimWorld sets alive=b.alive, :1450).\"}"
+  },
+  {
+   "ref": "engine-architect#4",
+   "reviewer": "engine-architect",
+   "id": "GW13",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The row does not say that movement collision reads render state (check d, R4). Each crate or wall's orientation and centre come from its render mesh, and its bounds from a THREE.Box3 filled from the mesh. The function corrects the scene node's position in place. The Rust port needs these as map-document collider data, and the row should say so.",
+   "evidence": "game:2526 resolveObstacles: const o=obstacles[i], b=o.box, ..., th=o.mesh.rotation.y; ... const cx=o.mesh.position.x, cz=o.mesh.position.z, hw=o.w*0.5 ... game:85 addBox: box:new THREE.Box3().setFromObject(m). Callers pass player.position (game:2780) and en.group.position (game:2933).",
+   "fix_op": "{\"id\": \"GW13\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Code read: the collider data is render state. Each crate or wall's orientation and centre come from its mesh (o.mesh.rotation.y, o.mesh.position, :2526) and its bounds from a THREE.Box3 (o.box, Box3.setFromObject in addBox, :85). The position it corrects is the scene node itself (player.position at :2780, en.group.position at :2933), moved in place. In the Rust port these become collider data from the map document and positions in sim state, not mesh transforms.\"}"
+  },
+  {
+   "ref": "netcode-architect#9",
+   "reviewer": "netcode-architect",
+   "id": "GW14",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap, frame-rate dependence in movement: gravity is applied once per frame using the frame time, so how high a soldier can jump depends on the frame rate. It is measurably below what the formula predicts, which also means below EJUMP_REACH, the reach the bots' jump and climb decisions assume. The same ledge can be reachable at 144 Hz and unreachable at 60 Hz. Map reachability checks for v2 must use the reach the fixed tick actually gives, not the formula.",
+   "evidence": "tickVertical: jump at shamble-game.js:2537, `st.vy-=T.gravity*dt; pos.y+=st.vy*dt` at :2538. EJUMP_REACH = jumpV^2/(2g) + stepUp = 3.071 at :1575, used by the bot jump test at :2932 and enemyClimbSteer at :1603. Measured on the real update() (tools/preview.js eval, player jump on the default map): apex rise 2.250 / 2.430 / 2.483 m at 20 / 60 / 144 Hz, against 2.521 from the formula.",
+   "fix_op": "{\"id\": \"GW14\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Measured on the real update() (tools/preview.js eval): the jump apex depends on the frame rate, because tickVertical integrates gravity with the frame dt (2537-2538): 2.25 / 2.43 / 2.48 m at 20 / 60 / 144 Hz, against 2.52 m from the formula. So the highest ledge a soldier can gain (apex + T.stepUp 0.55) is about 2.98 m at 60 Hz, while EJUMP_REACH assumes 3.07 m (1575; the bots' jump test at 2932 and enemyClimbSteer, GN10). In v2 the reach follows from the fixed tick, and map validation (EDITOR_V2 reachability, the LOOP_V2 §9 reachability check) must use the integrated value, not the formula.\"}"
+  },
+  {
+   "ref": "netcode-architect#10",
+   "reviewer": "netcode-architect",
+   "id": "GW16",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap, shots and movement use different shapes for the same house. The SIM copy gives houses loose axis-aligned boxes, while movement collision uses their tight rotated boxes. So for a kit house rotated off the 90-degree grid, shots and line of sight see a bigger box than movement does. The CS10 audit fixed this for crates and walls only. The rows recommend one shape for shots and movement (CS5) without saying that today they disagree here.",
+   "evidence": "_bkWorldBoxes (shamble-core.js:1429-1431) turns each local box into a loose world box (Box3.applyMatrix4), and syncSimWorld copies those boxes for houses (shamble-game.js:1458). resolveObstacles uses oriented local colliders for rotated houses (:2526). Houses can be rotated: spawnKitBuilding's rot at :578-579, and the editor's house rotation at shamble-editor.js:151. AUDIT_BUGS_PERF.md:110 (CS10) changed obstacles only, and the shipped map has 0/11 rotated houses.",
+   "fix_op": "{\"id\": \"GW16\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Found in code: houses are mirrored as world AABBs (_bkWorldBoxes, shamble-core.js:1429-1431, which applies matrixWorld to each local box; syncSimWorld 1458), while resolveObstacles pushes movement out of their oriented local boxes (2526). So a kit house rotated off the 90° grid (spawnKitBuilding's rot, 578-579; the editor rotates houses at shamble-editor.js:151) is a looser box for shots and line of sight than for movement: the CS10 audit fix (AUDIT_BUGS_PERF.md:110) covered obstacles only. The shipped map has 0/11 rotated houses.\"}"
+  },
+  {
+   "ref": "netcode-architect#11",
+   "reviewer": "netcode-architect",
+   "id": "GW14",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'Shared by the player and bots' is not quite true: only the player can stand on top of cover; bots cannot. v2 needs one rule for every soldier, since humans take over bot slots.",
+   "evidence": "shamble-game.js:2780 tickVertical(..., 0.7, true) for the player; :2933 tickVertical(..., 0.7) for bots, so standOnCover is undefined; surfaceHeightAt checks cover tops only when withCover is set (:2528).",
+   "fix_op": "{\"id\": \"GW14\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Not fully shared: only the player passes standOnCover (2780, true); bots omit it (2933), so only the player can stand on cover tops. v2 needs one rule for every soldier, since humans take over bot slots.\"}"
+  },
+  {
+   "ref": "graphics-engineer#7",
+   "reviewer": "graphics-engineer",
+   "id": "GW17",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "'A dither or stencil cutaway would fit WebGPU better and keeps merged meshes possible' has no source, and dithering is a visible style choice, which leans on the look. The real technique point is this. Toggling material.transparent on WebGPURenderer changes the blend state, so a different render pipeline is selected and may be compiled on first use; in r128 WebGL it only moves the mesh between render lists. A cutaway works on merged meshes only if the shader computes it from a world-space region, not per mesh.",
+   "evidence": "shamble-game.js:2574-2575 (_occRecFor sets material.transparent=true) and :2577-2582 (_occApply writes opacity and depthWrite, and resets transparent=false). In WebGPU the blend state is part of the render pipeline (GPURenderPipelineDescriptor fragment targets' blend), per the WebGPU specification; confidence medium-high, and a spike should measure first-toggle hitches.",
+   "fix_op": "{\"id\": \"GW17\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Avoid toggling material.transparent per mesh; a dither or stencil cutaway would fit WebGPU better and keeps merged meshes possible.\", \"text\": \"Avoid toggling material.transparent per mesh: on WebGPURenderer a blend-state change selects a different render pipeline, which may compile on first use (a spike measures the hitch). A cutaway computed in the shader from a world-space region between camera and player works on merged meshes. Which fade style (translucent, dithered or cut) is for the look brief.\"}"
+  },
+  {
+   "ref": "graphics-engineer#8",
+   "reviewer": "graphics-engineer",
+   "id": "GW17",
+   "field": "what",
+   "severity": "nit",
+   "problem": "The outline is not faded with the structure. The hulls are hidden (visible=false) once opacity drops below 0.9, while the fill fades to 24 %.",
+   "evidence": "shamble-game.js:2578 `ov=rec.op>0.9` and :2580 `rec.outlines[i].visible=ov`.",
+   "fix_op": "{\"id\": \"GW17\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"fades to 24 % opacity, ink outline included\", \"text\": \"fades to 24 % opacity, and its ink outline is hidden while the opacity is below 90 %\"}"
+  },
+  {
+   "ref": "game-designer#6",
+   "reviewer": "game-designer",
+   "id": "GW2",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "GW2 and GE1 are the same system (RULES_DEFAULT, rulesMerge, applyRules, currentRulesJSON at the same lines). It is counted twice in the 249-row tally, and the two rows could drift apart.",
+   "evidence": "GE1 where 'shamble-game.js:40 RULES_DEFAULT, :41 rulesMerge, :42 _rules/_rulesReady, :43 applyRules, :44 currentRulesJSON'; GW2 where 'shamble-game.js:40 RULES_DEFAULT ... :41 rulesMerge; :42 _rules, _rulesReady; :43 applyRules; :44 currentRulesJSON'. Both are marked redesign with the same reasoning.",
+   "fix_op": "{\"id\": \"GW2\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" Same system as GE1 (shamble-game.js:40-44): count it once in the tally and keep one row as the owner (GE1 for the economy view, or merge the two).\"}"
+  },
+  {
+   "ref": "coverage-closer#11",
+   "reviewer": "coverage-closer",
+   "id": "GW17",
+   "field": "where",
+   "severity": "should",
+   "problem": "The occlusion state is cited only as ':2556-2558 state'. Its sets, maps and silhouette sample tables are not named.",
+   "evidence": "shamble-game.js:2556 'const _occHit=new Set(), _occRec=new Map(), _occBox=new THREE.Box3();'; :2557 '_occSX=[0,0,0,0,0], _occSY=[1.1,1.95,0.35,1.1,1.1], _occSZ=[0,0,0,0,0]; // silhouette samples: torso, head, feet, L, R' (read :2563, :2586)",
+   "fix_op": "{\"id\": \"GW17\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":2556-2558 state;\", \"text\": \":2556-2558 state (:2556 _occHit/_occRec/_occBox, :2557 silhouette samples _occSX/_occSY/_occSZ: torso, head, feet, left, right);\"}"
+  }
+ ],
+ "GA": [
+  {
+   "ref": "verifier-game1#3",
+   "reviewer": "verifier-game1",
+   "id": "GA15",
+   "field": "where",
+   "severity": "should",
+   "problem": "Incomplete. The aim-pitch side channel has a second bot writer that the row does not list: an objective-role bot heading to a tech box also decays the gun pitch with rotation.x*=0.9. Only :2928 is listed.",
+   "evidence": "grep -n 'rotation.x\\*=0.9' shamble-game.js finds :2916 and :2928. :2915-2916: `if(en.role==='objective' && tbox.active && tbox.owner!==en.team){ ... en.group.userData.wpn.rotation.x*=0.9;`",
+   "fix_op": "{\"id\": \"GA15\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"extra side-channel writer 2928 (bot idle decay)\", \"text\": \"extra side-channel writers 2916 (objective-role bot heading to a tech box) and 2928 (bot idle decay)\"}"
+  },
+  {
+   "ref": "graphics-engineer#1",
+   "reviewer": "graphics-engineer",
+   "id": "GA15",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The note says the IK work 'could move to a worker or GPU skinning'. That is technically wrong. GPU skinning applies bone matrices to vertices; it does not solve IK. The two-bone and ankle solves still run on the CPU, in a worker, or in a compute pass. Legacy soldiers are hierarchies of rigid Object3D parts with no skinning, so what skinning would remove is the per-part draw calls and matrix updates, not the IK cost.",
+   "evidence": "shamble-game.js:210-223 solveArmIK sets Object3D quaternions on part nodes. The engine files contain no SkinnedMesh (grep: 0 hits). Steps-1-6 report :92-93: scene.updateMatrixWorld takes 0.61-0.74 ms for the scene's nodes.",
+   "fix_op": "{\"id\": \"GA15\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"The 2-bone/ankle work could move to a worker or GPU skinning.\", \"text\": \"The 2-bone/ankle solves stay CPU work (main thread, a worker, or a compute pass); GPU skinning would not solve IK, but rigid skinning of the parts would cut the per-part draw calls and Object3D matrix updates that the rig costs today.\"}"
+  }
+ ],
+ "GC": [
+  {
+   "ref": "verifier-game1#6",
+   "reviewer": "verifier-game1",
+   "id": "GC18",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "'roundAssists appears only at :783, :1846, :2477, :2489' misses :3379. That line is CS2's load-time reassignment of top-level lets, which adds 1 and then restores the value. meleeCd appears there too. The conclusion (never really incremented or read for gameplay) still holds.",
+   "evidence": "sed -n 3379p shamble-game.js: '... if(typeof roundAssists==='number'){ _w.v=roundAssists; roundAssists=roundAssists+1; roundAssists=_w.v; ...'. meleeCd appears 13 times on that line.",
+   "fix_op": "{\"id\": \"GC18\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"roundAssists appears only at :783, :1846, :2477, :2489.\", \"text\": \"roundAssists appears only at :783, :1846, :2477, :2489, plus the CS2 load-time let reassignment at :3379 (adds 1, then restores the value; meleeCd is there too).\"}"
+  },
+  {
+   "ref": "netcode-architect#0",
+   "reviewer": "netcode-architect",
+   "id": "GC3",
+   "field": "v2_note",
+   "severity": "blocking",
+   "problem": "False claim: the row says the cursor aim falls back to the ground so that 'open ground and ledges are aimed at height 0'. In fact platforms, ramps and buildings are SIM statics, so the camera ray stops on their tops and the aim point sits at ledge height. Only open ground is aimed at y=0, through the ground plane inside resolveShot. Throws and the Juggernaut cannon are the only aims that still use the y=0 ground point. This matters for the LOOP_V2 §9 [OPEN] aiming-at-height item and for what the v2 input command has to carry.",
+   "evidence": "updateAim shamble-game.js:1125-1129 sets aimPoint to the resolveShot hit whenever kind!='none'. syncSimWorld adds platforms (:1454) and ramps (:1456) as statics. The ground plane is inside resolveShot (shamble-core.js:1507). Probe on the real build (xvfb-run -a node tools/preview.js . eval, default map): a downward ray through SIM stops at y 1.20, 2.50 and 4.00 on the three platforms, and at 2.50 on a ramp whose slope at that point is 1.25 (rampHeightAt). throwVelocity takes its heading from aimGround (:1711). The cannon aims at aimGround+0.6 (:1304).",
+   "fix_op": "{\"id\": \"GC3\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"so open ground and ledges are aimed at height 0\", \"text\": \"so open ground is aimed at height 0 (the ground plane inside resolveShot, shamble-core.js:1507), but platform and building tops are aimed at their own height and ramps at the top of their bounding box, above the slope (probe through tools/preview.js eval on the default map: the SIM ray stops at 1.20, 2.50 and 4.00 m on the three platforms, and at 2.50 m on a ramp whose slope there is 1.25 m); only throws (heading to aimGround, 1711) and the Juggernaut cannon (aimGround + 0.6 m, 1304) still aim at the y=0 ground point, so LOOP_V2 §9's 'today the cursor aims at the ground' holds for those two only\"}"
+  },
+  {
+   "ref": "netcode-architect#2",
+   "reviewer": "netcode-architect",
+   "id": "GC3",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Misleading for the command design: the note says 'the client sends an aim direction'. The legacy game aims at a point in the world, not along a direction. Each shot's direction is rebuilt from the fire origin to aimPoint, and aimPoint comes from the camera ray hitting the world as the client sees it. If v2 sends only a direction, any server correction of the fire origin moves the shot off target, and the server would lose the view time it needs to rewind for lag compensation.",
+   "evidence": "shamble-game.js:1473: aimDir.copy(aimPoint).sub(_fireO). aimPoint is set from the SIM hit of the camera ray at :1126-1129, against soldier positions as the client sees them.",
+   "fix_op": "{\"id\": \"GC3\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"The client sends an aim direction; the server re-resolves the shot.\", \"text\": \"Legacy aims at a world point, not a direction: each pellet's direction is aimPoint minus playerFireOrigin (1473), and aimPoint is the camera ray's hit in the SIM as the client sees it (1126-1129). So the v2 command should carry the quantised aim point (or the camera ray) with the client's view time; the server rebuilds the direction from its own fire origin and re-resolves the shot against the world rewound to that time. A bare direction would shift the shot by any correction of the fire origin.\"}"
+  },
+  {
+   "ref": "netcode-architect#3",
+   "reviewer": "netcode-architect",
+   "id": "GC5",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap, frame-rate dependence of a sim outcome: when a weapon fires, its cooldown is reset to the full interval and any leftover time from the frame is thrown away. So fire intervals round up to whole frames, and damage per second depends on the frame rate. Bots use the same pattern. No row records this. The legacy weapon table values do not match how the legacy game actually played, and the v2 tick rate choice (R2) changes effective fire rates unless cooldowns keep their remainder.",
+   "evidence": "ps.fireCd=w.fireInterval at shamble-game.js:1471, after `if(ps.fireCd>0)ps.fireCd-=dt` at :2690. Bots reset en.fireCd the same way at :2913. acquireTarget does keep the remainder for its scan timer (:1597). Measured on the real update() (tools/preview.js eval, Shabzon, 0.072 s interval, held for 10 game seconds): 10.00 / 12.00 / 13.10 shots per second at 30 / 60 / 144 Hz, against 13.89 from the table.",
+   "fix_op": "{\"id\": \"GC5\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Found in code and measured: fire cooldowns are reset, not carried (ps.fireCd=interval at 1471 after the decrement at 2690; bots the same at 2913), so every fire interval rounds up to whole frames. Probe on the real update() (tools/preview.js eval, Shabzon held for 10 game seconds): 10.0 / 12.0 / 13.1 shots per second at 30 / 60 / 144 Hz, against 13.9 from its table value (0.072 s). The legacy feel was tuned at whatever frame rate the tester had; on a fixed v2 tick the table values only hold if cooldowns carry their remainder, as acquireTarget already does for scans (1597). The tick-rate choice (R2) must account for it.\"}"
+  },
+  {
+   "ref": "netcode-architect#4",
+   "reviewer": "netcode-architect",
+   "id": "GC7",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "Misleading evidence: the row says FX cull on vs off gives identical damage logs, with no conditions. The report measured that only with Math.random seeded and the effects stubbed out. In the live game the effects draw from the same Math.random as the sim, so turning the cull on or off changes later spread and timers. As written, a reader would conclude that damage does not depend on presentation, which is false in the live game.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core.md:39: 'Seeded random, effects stubbed, cull off vs on: identical damage logs'. Same report :77: 'Camera-dependent random sequence from the FX cull ... ADR-001 debt'. The FX functions draw Math.random at shamble-game.js:1029-1088.",
+   "fix_op": "{\"id\": \"GC7\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"three-teams-core.md: FX cull on vs off gives identical damage logs\", \"text\": \"three-teams-core.md:39, with Math.random seeded and the effects stubbed (in the live game the effects and sounds draw from the same Math.random as the sim, so the cull shifts later spread and timers, three-teams-core.md:77): FX cull on vs off gives identical damage logs\"}"
+  },
+  {
+   "ref": "netcode-architect#5",
+   "reviewer": "netcode-architect",
+   "id": "GC17",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap, animation and the wall clock decide where a shot starts: the Juggernaut cannon fires from muzzle points on its animated model. Those points move with the walk bob and sway, with the recoil, and with the turret's frame-smoothed turn. While the mech stands still they also move with an idle bob driven by performance.now. This is the one wall-clock read in the game that changes a sim outcome directly. It breaks 'nothing animated decides a hit', and the row lists many other Juggernaut bugs but not this one.",
+   "evidence": "_jugFirePilot: mz.getWorldPosition at shamble-game.js:1301. The muzzles are added to cannonGroup at :1232, and cannonGroup is a child of the body (:1207). animateJuggernaut moves the body: idle bob 0.012*sin(t*1.6) at :1290, sway :1291-1292, recoil :1293-1294 (raised by each shell at :1303). Turret yaw is smoothed per frame at :1340-1341. t is performance.now()*0.001, passed from :2781 into animateJuggernaut at :1343.",
+   "fix_op": "{\"id\": \"GC17\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Found in code: the cannon shell starts at an animated node, against 'nothing animated decides a hit'. _jugFirePilot reads mz.getWorldPosition (1301); the muzzles sit in cannonGroup (1232), a child of the bobbing body (1207). The origin moves with the gait bob and sway (1290-1292), the recoil kick (1293-1294, raised by each shell at 1303), the frame-smoothed turret yaw (1340-1341) and, while the mech stands still, an idle bob driven by performance.now (tt from 2781 into animateJuggernaut at 1343, used at 1290). That is the one wall-clock read in the game that reaches a sim outcome directly. In v2 the cannon fires from fixed mount points in sim data.\"}"
+  },
+  {
+   "ref": "netcode-architect#15",
+   "reviewer": "netcode-architect",
+   "id": "GC12",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "A render object decides a hit: melee hits are only checked when the sword or axe model exists, and the swing arc uses the facing stored on the player's model.",
+   "evidence": "ps.swingMesh is set from player.userData.sword/axe (shamble-game.js:1666). The impact check runs inside `if(ps.swinging&&ps.swingMesh)` (:2739). The arc forward vector comes from player.rotation.y (:1671).",
+   "fix_op": "{\"id\": \"GC12\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Found in code: the hit check runs inside the swing-animation block and only when a sword or axe mesh exists (ps.swingMesh, 1666 and 2739), and the arc uses the mesh's facing, player.rotation.y (1671). In v2 the impact timing and facing come from sim state, never from a render object.\"}"
+  },
+  {
+   "ref": "netcode-architect#16",
+   "reviewer": "netcode-architect",
+   "id": "GC15",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The note does not mention that bolt flight is integrated with the variable frame time, so where a bolt lands shifts with the frame rate, nor that a stuck bolt follows the victim's on-screen model. It also misses a technique worth keeping: each step tests the whole path segment, so fast bolts never pass through targets.",
+   "evidence": "shamble-game.js:2865 (vel and position updated with the frame dt), :2866-2869 (segment from prev to the new position tested with resolveShot), :2873 and :2881 (the stuck offset follows stuckTo.group.position).",
+   "fix_op": "{\"id\": \"GC15\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Keep the swept test: each step rays the segment from the previous to the new position through resolveShot (2866-2869), so fast bolts never tunnel. Known: the flight integrates with the frame dt (2865), so the landing point shifts with the frame rate, and a stuck bolt follows the victim's mesh position (2873, 2881).\"}"
+  },
+  {
+   "ref": "game-designer#3",
+   "reviewer": "game-designer",
+   "id": "GC2",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The row says three teams always play, so the logic that leaves some teams out goes away. VISION_V2 §3 [DECIDED] keeps two-team modes (2-8 players) and makes team count and each team's faction mode data. Legacy already runs both (Cabana with 2 of the 3 teams, DM_Tri with 3), so choosing which teams play stays. Only the source changes: the mode, not 'has an HQ'.",
+   "evidence": "docs/VISION_V2.md §3 ('two teams with 2-8 players, and three teams with 6-18'; team count, size and faction as data [DEFAULT]) and §6.1; shamble-game.js:764-765 (active = player team or has an HQ; else soviets) and :776-777 (harvesters of teams that don't play are left out).",
+   "fix_op": "{\"id\": \"GC2\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"LOOP_V2 §2 has three teams always playing and data-driven team size, so the 'needs an HQ, else Soviets' fallback goes away.\", \"text\": \"LOOP_V2 §2 has three teams with data-driven team size, and VISION_V2 §3 [DECIDED] also keeps two-team modes (2-8 players), with team count and each team's faction as mode data (§3 [DEFAULT], §6.1): keep parking the teams a mode does not use, but decide it from the mode definition instead of 'has an HQ', and drop the 'else Soviets' fallback.\"}"
+  },
+  {
+   "ref": "coverage-closer#2",
+   "reviewer": "coverage-closer",
+   "id": "GC3",
+   "field": "where",
+   "severity": "should",
+   "problem": "The shared scratch vectors _v, _p1 and _p2 are declared inside GC3's cited aim-state line but are not named. Several other systems also reuse them, which a v2 port should know.",
+   "evidence": "shamble-game.js:1110 'const groundPlane=..., _v=new THREE.Vector3(), _p1=..., _p2=...'; reused at :1406 throwMolotov, :1429 pitchWeapon, :1617 enemyFire, :2501 spawnDamageNumber, :2543 blastReaches",
+   "fix_op": "{\"id\": \"GC3\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1109-1111 aim ray state (raycaster, groundPlane,\", \"text\": \":1109-1111 aim ray state (raycaster, groundPlane, the shared scratch vectors _v/_p1/_p2 at :1110 (also reused outside aiming, e.g. pitchWeapon :1429, throwMolotov :1406, enemyFire :1617, spawnDamageNumber :2501, blastReaches :2543),\"}"
+  },
+  {
+   "ref": "coverage-closer#3",
+   "reviewer": "coverage-closer",
+   "id": "GC10",
+   "field": "where",
+   "severity": "should",
+   "problem": "_devWheelT, the throttle for the DEV mouse-wheel gun cycle, is not named. The row's range ':1168-1172 devCycleGun' also puts devCycleGun one line early: it starts at :1169.",
+   "evidence": "shamble-game.js:1168 'let _devWheelT=0;'; :1169 function devCycleGun; :3294 wheel listener 'if(_n-_devWheelT>160){ _devWheelT=_n; devCycleGun(...) }'",
+   "fix_op": "{\"id\": \"GC10\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1168-1172 devCycleGun\", \"text\": \":1168 _devWheelT (160 ms throttle for the DEV mouse-wheel gun cycle, wheel listener :3294); :1169-1172 devCycleGun\"}"
+  },
+  {
+   "ref": "coverage-closer#4",
+   "reviewer": "coverage-closer",
+   "id": "GC5",
+   "field": "where",
+   "severity": "should",
+   "problem": "The shot-spread basis vectors and the fire-origin scratch are cited only by line, not by name. The spread basis is also shared with bot fire.",
+   "evidence": "shamble-game.js:1414 'const _sRight=...,_sUpv=...,_sDir=...' (also used by enemyFire :1618-1620); :1419 'const FIRE_H=1.9, FIRE_R=0.3, FIRE_F=0.35, _fireO=new THREE.Vector3();' (used :1472-1479)",
+   "fix_op": "{\"id\": \"GC5\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1414 spread basis; :1419 FIRE_H 1.9 / FIRE_R 0.3 / FIRE_F 0.35;\", \"text\": \":1414 spread basis _sRight/_sUpv/_sDir (also used by enemyFire :1618); :1419 FIRE_H 1.9 / FIRE_R 0.3 / FIRE_F 0.35 and the _fireO scratch;\"}"
+  },
+  {
+   "ref": "coverage-closer#5",
+   "reviewer": "coverage-closer",
+   "id": "GC12",
+   "field": "where",
+   "severity": "should",
+   "problem": "_melTo is not named. The range ':1669-1681 meleeHitCheck' also starts one line early: line 1669 is _melTo, and meleeHitCheck starts at :1670.",
+   "evidence": "shamble-game.js:1669 'const _melTo=new THREE.Vector3();' (used :1674-1676); :1670 'function meleeHitCheck(w){'",
+   "fix_op": "{\"id\": \"GC12\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1669-1681 meleeHitCheck\", \"text\": \":1669 _melTo scratch; :1670-1681 meleeHitCheck\"}"
+  },
+  {
+   "ref": "coverage-closer#6",
+   "reviewer": "coverage-closer",
+   "id": "GC13",
+   "field": "where",
+   "severity": "should",
+   "problem": "The arc preview meshes are cited only as ':1702-1705 arc meshes' and are not named.",
+   "evidence": "shamble-game.js:1702 _arcGeo, :1703 _arcDots (Points), :1704 _arcRing, :1705 _arcHub",
+   "fix_op": "{\"id\": \"GC13\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1702-1705 arc meshes\", \"text\": \":1702-1705 arc meshes (_arcGeo, _arcDots, _arcRing, _arcHub)\"}"
+  }
+ ],
+ "GE": [
+  {
+   "ref": "verifier-game2#0",
+   "reviewer": "verifier-game2",
+   "id": "GE12",
+   "field": "where",
+   "severity": "should",
+   "problem": "The row labels :1375 as a 'fire' guard. Line 1375 is inside useAbility (the function starts at 1374), not the fire path. Only :1466 (fireOnce) is a fire guard.",
+   "evidence": "awk on shamble-game.js: the function enclosing line 1375 is 'function useAbility(){' at 1374, and the one enclosing 1466 is 'function fireOnce(){' at 1465. Line 1375 reads: if(ps.dead||gameOver||!started||ps.channeling) return; const u=unitOf(ps.unit);",
+   "fix_op": "{\"id\": \"GE12\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"fire :1375/:1466\", \"text\": \"ability use :1375 (useAbility), fire :1466 (fireOnce)\"}"
+  },
+  {
+   "ref": "verifier-game2#6",
+   "reviewer": "verifier-game2",
+   "id": "GE14",
+   "field": "what",
+   "severity": "nit",
+   "problem": "Not every shop row shows tier, HP and price. Special Weapons rows show ammo and price (or OWNED), and the grenade row shows price and the held count.",
+   "evidence": "shamble-game.js:1931 (special: 'SPECIAL · mag/reserve AMMO · price'), 1943 (grenade: 'THROWABLE (G) · cost cr · n/max held'); HP appears only in the Squad (1903) and Vehicle (1918) rows.",
+   "fix_op": "{\"id\": \"GE14\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"each row with tier, HP, price\", \"text\": \"each row with its stats and price (tier and HP for classes and vehicles, ammo for special weapons, held count for grenades)\"}"
+  },
+  {
+   "ref": "verifier-game2#7",
+   "reviewer": "verifier-game2",
+   "id": "GE17",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The WEAPONS table is shamble-core.js:108-122, not 108-125. Lines 123-125 are a blank line, the UNIT TYPES header comment and the triangle comment. The claim itself holds: no weapon has a tier field.",
+   "evidence": "grep -n '^const WEAPONS\\|^];' shamble-core.js: 108 const WEAPONS, 122 ]; 126 const UNIT_TYPES.",
+   "fix_op": "{\"id\": \"GE17\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"WEAPONS (core:108-125)\", \"text\": \"WEAPONS (core:108-122)\"}"
+  },
+  {
+   "ref": "engine-architect#6",
+   "reviewer": "engine-architect",
+   "id": "GE5",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Condition 3 is broken in part. The Rust mark is right for the price rise, which LOOP_V2 §3 keeps. But the row also describes the tech-income halving, and the v2 note keeps it silently. That rule modifies legacy tech sources that LOOP_V2 §4 replaces with uplinks, and §3 keeps only 'a destroyed power plant raises that team's prices'.",
+   "evidence": "game:2434 amt = amt * (powerDead(id)?0.5:1); // power plant down -> tech income halved. LOOP_V2.md §3: '[DEFAULT] Power-plant pricing stays: a destroyed power plant raises that team's prices.' §4: uplinks are the one tech source.",
+   "fix_op": "{\"id\": \"GE5\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" The tech half of the rule does not carry over: the tech-income cut (:2434, addTech halves tech while the plant is down) modifies legacy tech sources that LOOP_V2 §4 replaces with uplinks, and §3 keeps only the price rise. Whether a dead plant should also slow tech is a LOOP_V2 question, not a legacy rule to port.\"}"
+  },
+  {
+   "ref": "engine-architect#7",
+   "reviewer": "engine-architect",
+   "id": "GE8",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The note overstates what LOOP_V2 keeps. LOOP_V2 §4 keeps 'steal by holding E for a few seconds'. It says nothing about presence contests. The rule that a contested zone gives no progress, and the progress reset when the team switches, belong to the silo and tech-box objectives that §4 replaces. A Rust row should not carry them as kept rules without saying so (condition 3).",
+   "evidence": "game:937 presentTeam returns null when several teams are present; progress logic in updateTechBox game:951-956 and updateSilos game:1000-1003. LOOP_V2.md §4 step 4: 'Enemies steal the uplink by holding E for a few seconds. The countdown keeps running, now for the new owner.' Nothing there on contests.",
+   "fix_op": "{\"id\": \"GE8\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" LOOP_V2 §4 says only that a steal takes holding E for a few seconds; it does not say whether a contested uplink pauses or blocks a steal. So the contested-means-no-progress rule and the progress reset on a team switch are legacy rules carried forward, pending a LOOP_V2 decision, not rules LOOP_V2 keeps.\"}"
+  },
+  {
+   "ref": "game-designer#2",
+   "reviewer": "game-designer",
+   "id": "GE4",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The row that owns eras does not give the mapping between legacy eras and LOOP_V2 tiers (legacy 'T1' is the start era, LOOP_V2 'Tech 1' is the first unlock). That is how the CD13 and GN2 errors happened. It also leaves out the tech-pace data the legacy sims already give, which is the starting point for tuning the minute-5 Tech 1 floor.",
+   "evidence": "shamble-game.js:697-698 eraNames T1-T4, eraCost 60/90/120; :701 era:1; :1178/:1358 tier gates; docs/reports/2026-10-16-three-teams-core.md:44 (DM_Tri 3 x 300 s: 10 deliveries per team per run, kills 3-8 per team); ECO techHarvester 5, techBox 10, techPerKill 1 (legacy-tuning.json ECO); TBOX first 8 s, active 120 s, gap 6 s means cash-outs at 128 s and 254 s.",
+   "fix_op": "{\"id\": \"GE4\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" Tier mapping: legacy era n is LOOP_V2 Tech n-1 (eras start at 1, :701), and a legacy tier-t unit or vehicle is buyable at era t (:1178, :1358), so legacy T2 items (Officer, Juggernaut) unlock after one era-up, where LOOP_V2 §4 needs two and spends Tech 1 on class abilities, which legacy never gates. Pace (from the three-teams-core sims, 3 runs, not a balance study): on DM_Tri a team earns about 50 tech per 300 s from trucks (10 deliveries x 5), plus at most 20 from the two tech-box cash-outs at 128 s and 254 s, plus 3-16 from kills, so the first era-up (60 tech) lands between about minute 4 and 6, close to the LOOP_V2 §4 minute-5 Tech 1 floor that legacy does not have.\"}"
+  },
+  {
+   "ref": "game-designer#4",
+   "reviewer": "game-designer",
+   "id": "GE5",
+   "field": "reason",
+   "severity": "should",
+   "problem": "The row is marked rewrite in Rust as a rule LOOP_V2 §3 keeps, but its 'what' also covers the x0.5 tech cut when a power plant dies. LOOP_V2 does not keep that cut (§3 keeps only the pricing; §4 takes tech from uplinks only), and GE4 itself sends it to Mustafa. Condition 3 allows rewrite in Rust only for mechanics LOOP_V2 keeps.",
+   "evidence": "shamble-game.js:2434 `amt = amt * (powerDead(id)?0.5:1)`; LOOP_V2.md:37 ('Power-plant pricing stays: a destroyed power plant raises that team's prices') and :47; GE4 v2_note ('The x0.5 power-plant tech cut is not in LOOP_V2: decide whether it stays').",
+   "fix_op": "{\"id\": \"GE5\", \"field\": \"reason\", \"op\": \"replace\", \"find\": \"A price rule the authoritative sim decides that LOOP_V2 §3 keeps.\", \"text\": \"A price rule the authoritative sim decides that LOOP_V2 §3 keeps; the x0.5 tech cut (:2434) is not in LOOP_V2 and is not covered by this mark (a question for Mustafa, see GE4).\"}"
+  },
+  {
+   "ref": "game-designer#8",
+   "reviewer": "game-designer",
+   "id": "GE15",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Several rule numbers these rows state are hard-coded in the logic and are not in docs/legacy-tuning.json or LEGACY_TUNING.md, which only dump named tables. A v2 content table built from the dump would miss them. This breaks the LOOP_V2 header rule 'every number in one data table'. Progression is the clearest case: kill XP 50, chain XP 150, the 5 s chain window, the XP curve 500/110/5 and the level cap 100 all live only in code. Others: price multiplier x2 (:782), tech cut x0.5 (:2434), grenade price 50 (:2456, :1942), bot respawn x1.4 while the refinery stands (:2939), siege cadence x1.6 + 0.4 s (:2923, :2927), bayonet x1.3 speed and 2.4 m (:2756, :2761), banzai x1.3 speed (:2774), terminal 6 m (:1811), armory panel 2.6 m (:2793).",
+   "evidence": "shamble-game.js:1957 xpForLevel, :2099-2100 (xp=150 / xp=50, chainTimer=5), :2106 (level 100); no xp, chain or price key in docs/legacy-tuning.json (grep); LEGACY_TUNING.md:22 lists RANK_TIERS/PRESTIGE only for progression.",
+   "fix_op": "{\"id\": \"GE15\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" Its numbers are code literals, not table data, so they are missing from docs/legacy-tuning.json: kill XP 50 and chain XP 150 with a 5 s window (:2099-2100), the curve 500 + 110(n-1) + 5(n-1)^2 (:1957) and the cap 100 (:2106). Reaching level 100 takes 2,175,855 XP, about 43,500 single kills.\"}"
+  },
+  {
+   "ref": "game-designer#10",
+   "reviewer": "game-designer",
+   "id": "GE13",
+   "field": "what",
+   "severity": "nit",
+   "problem": "'only the Torque Bow, Officer and Juggernaut cost anything' leaves out the frag grenade (50, sold in the same shop and named in the row title). Its price is hard-coded, not in the tables.",
+   "evidence": "shamble-game.js:2456 buyGrenade `const cost=50*priceMult()`; :1942 shop row.",
+   "fix_op": "{\"id\": \"GE13\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"only the Torque Bow (500), Officer (1250, T2) and Juggernaut (2500, T2) cost anything.\", \"text\": \"only the Torque Bow (500), Officer (1250, T2) and Juggernaut (2500, T2) cost anything, plus the frag grenade at 50, hard-coded at :2456 rather than in the tables.\"}"
+  },
+  {
+   "ref": "coverage-closer#0",
+   "reviewer": "coverage-closer",
+   "id": "GE6",
+   "field": "where",
+   "severity": "should",
+   "problem": "The harvester row's Where does not name _hvDir, damageHarvester or respawnHarvester. It only covers them with the vague range ':848-851 damage/destroy/respawn/reset'.",
+   "evidence": "shamble-game.js:821 'const harvesters=[]; const _hvDir=new THREE.Vector3();' (used :870-871); :848 function damageHarvester; :849 destroyHarvester; :850 function respawnHarvester; :851 resetHarvesters",
+   "fix_op": "{\"id\": \"GE6\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":821 harvesters, :845 harvDock, :847 harvesterPayout, :848-851 damage/destroy/respawn/reset\", \"text\": \":821 harvesters and _hvDir (heading scratch, used :870-871), :845 harvDock, :847 harvesterPayout, :848 damageHarvester, :849 destroyHarvester, :850 respawnHarvester, :851 resetHarvesters\"}"
+  },
+  {
+   "ref": "coverage-closer#1",
+   "reviewer": "coverage-closer",
+   "id": "GE10",
+   "field": "where",
+   "severity": "should",
+   "problem": "siloRateEl, the silo income readout handle, is not named in the silo row.",
+   "evidence": "shamble-game.js:974 'const silos=[]; const siloRateEl=document.getElementById('siloRate');', written in updateSiloHUD :990",
+   "fix_op": "{\"id\": \"GE10\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":974 silos,\", \"text\": \":974 silos and siloRateEl (#siloRate income readout, written in updateSiloHUD :990),\"}"
+  },
+  {
+   "ref": "coverage-closer#7",
+   "reviewer": "coverage-closer",
+   "id": "GE17",
+   "field": "where",
+   "severity": "should",
+   "problem": "The pips array, declared on the dead rank-pip line, is not named.",
+   "evidence": "shamble-game.js:1863 'const pips=[]; function buildPips(n){...pips.length=0;...pips.push(pp);}} buildPips(RIFLE_TIERS[0].span);' (pips is never read anywhere else)",
+   "fix_op": "{\"id\": \"GE17\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"rankLabel/pipWrap/buildPips/updateRank\", \"text\": \"rankLabel/pipWrap/pips/buildPips/updateRank\"}"
+  },
+  {
+   "ref": "coverage-closer#8",
+   "reviewer": "coverage-closer",
+   "id": "GE15",
+   "field": "where",
+   "severity": "should",
+   "problem": "_progSaveTO, the debounce timer behind career saves, is not named.",
+   "evidence": "shamble-game.js:1955 'let _progSaveTO=0; function saveProg(){ clearTimeout(_progSaveTO); _progSaveTO=setTimeout(()=>ProgStore.save(),400); }'",
+   "fix_op": "{\"id\": \"GE15\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":1955 saveProg,\", \"text\": \":1955 saveProg and _progSaveTO (400 ms save debounce),\"}"
+  },
+  {
+   "ref": "coverage-closer#9",
+   "reviewer": "coverage-closer",
+   "id": "GE16",
+   "field": "where",
+   "severity": "should",
+   "problem": "The career-chip handles are cited by their DOM ids (ccIcon, ccLvl, ...) rather than their variable names, so the declarations are not named.",
+   "evidence": "shamble-game.js:2124 'const ccIconEl=..., ccLvlEl=..., ccPrestEl=..., ccXpEl=..., ccPopEl=...'; written in updateCareerChip :2127-2131",
+   "fix_op": "{\"id\": \"GE16\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"(ccIcon/ccLvl/ccPrest/ccXp,\", \"text\": \"(ccIconEl/ccLvlEl/ccPrestEl/ccXpEl,\"}"
+  },
+  {
+   "ref": "coverage-closer#10",
+   "reviewer": "coverage-closer",
+   "id": "GE4",
+   "field": "where",
+   "severity": "should",
+   "problem": "The era HUD's element handles and the change-detection caches behind 'updateEraHUD (change-detected)' are neither cited nor named.",
+   "evidence": "shamble-game.js:2418 'const eraUsEl=..., eraFillUsEl=..., eraNumUsEl=..., eraThemEl=..., eraHudEl=...'; :2419 'let _eraF=-1,_eraTF=-1,_eraH=-1;' (read :2422-2423); eraHudEl written :2425",
+   "fix_op": "{\"id\": \"GE4\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":2420 updateEraHUD (change-detected)\", \"text\": \":2418 eraUsEl/eraFillUsEl/eraNumUsEl/eraThemEl/eraHudEl (era HUD handles), :2419 _eraF/_eraTF/_eraH (change-detection caches), :2420 updateEraHUD (change-detected)\"}"
+  }
+ ],
+ "GP": [
+  {
+   "ref": "verifier-game2#1",
+   "reviewer": "verifier-game2",
+   "id": "GP1",
+   "field": "what",
+   "severity": "should",
+   "problem": "The 'what' field says every effect comes from per-kind pools. The grenade flash does not: each blast builds a new SphereGeometry and MeshBasicMaterial. The row's own v2_note says so, which contradicts 'what'.",
+   "evidence": "shamble-game.js:1082 in grenadeBlast: const fl=new THREE.Mesh(new THREE.SphereGeometry(0.55,10,8),new THREE.MeshBasicMaterial({...})); ... scene.add(fl). Line 2960 disposes that mesh's geometry and material through the non-pooled branch.",
+   "fix_op": "{\"id\": \"GP1\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"Every effect is drawn from per-kind pools of meshes that are built once\", \"text\": \"Every effect except the grenade flash sphere (a new mesh per blast, 1082) is drawn from per-kind pools of meshes that are built once\"}"
+  },
+  {
+   "ref": "verifier-game2#2",
+   "reviewer": "verifier-game2",
+   "id": "GP3",
+   "field": "where",
+   "severity": "should",
+   "problem": "Where lists T.sprintMult 1.4286 as locomotion tuning. No code reads T.sprintMult: sprint uses the per-unit sprintMult. A reader would take a dead value for a live one. The CD row already records that it is never read.",
+   "evidence": "grep -n 'sprintMult' shamble-*.js finds only core:67 (the definition), the four UNIT_TYPES entries, and the uses at shamble-game.js:2756 (unitOf(2).sprintMult) and 2774 (unitOf(ps.unit).sprintMult). Nothing reads T.sprintMult.",
+   "fix_op": "{\"id\": \"GP3\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"T.sprintMult 1.4286, \", \"text\": \"T.sprintMult 1.4286 (never read: sprint uses the per-unit value), \"}"
+  },
+  {
+   "ref": "engine-architect#5",
+   "reviewer": "engine-architect",
+   "id": "GP14",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Misleading. The note says 'Port the order' but then lists an order the legacy code does not have. In the legacy step, the economy and objectives run first, and the player shoots before moving. It also keeps 're-sync' as a v2 phase, while GW16 drops that bridge. R1 and R2 need the true legacy order, because the order decides outcomes (for example, the player's shots use positions from before this step's movement, and each bot steers, fires and only then collides).",
+   "evidence": "update() order at 48ffb51: timers 2675-2690; economy and objectives 2692-2698 (credits, updateHarvesters, updateTechBox, updateSilos); regen 2700; aim 2707; player firing 2722-2731; movement 2748-2780; grenades 2856-2859; syncSimWorld(true) 2862; bolts 2863-2885; bots 2893-2941 (steer 2902-2909, fire 2912-2913, clamp, jump and collide 2931-2933); building sink 2944; Juggernauts 2947; FX 2948-2960. GW16 reason: 'v2's Rust sim is the source of truth' (the bridge goes).",
+   "fix_op": "{\"id\": \"GP14\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Port the order as explicit phases of the Rust tick: snapshot, player commands, movement, projectiles, re-sync, bots in fair order, objectives.\", \"text\": \"Make the order explicit phases of the Rust tick, and change the legacy order only on purpose. The legacy order is: timers and cooldowns (2675-2690); the economy and objectives (2692-2698); regen (2700); the player's aim (2707) and shots (2722-2731), on positions from before this step's movement; the player's movement (2748-2780); grenades; a forced re-sync (2862) that exists only because the scene is the truth and goes away in v2 (GW16); bolts; bots in fair order, each one steering, then firing, then colliding (2893-2941); building sink; Juggernauts; FX.\"}"
+  },
+  {
+   "ref": "engine-architect#10",
+   "reviewer": "engine-architect",
+   "id": "GP2",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "A generic feature that no VISION_V2 §6 need asks for (check c). 'Add rebinding' proposes key rebinding. The real need is one binding table, so that the controls list cannot drift (GP8).",
+   "evidence": "VISION_V2.md §6 items 1-10: none asks for input rebinding. GP8 v2_note: 'v2 should generate the controls list from the input map (GP2) so it cannot drift.' CLAUDE.md: 'Every engine feature traces to a VISION_V2.md §6 need'.",
+   "fix_op": "{\"id\": \"GP2\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Add rebinding: the key codes are raw literals scattered through keydown.\", \"text\": \"Keep the bindings in one table (today the key codes are raw literals scattered through keydown), so the controls list (GP8) is generated from it. Rebinding is not proposed: no VISION_V2 §6 need asks for it.\"}"
+  },
+  {
+   "ref": "netcode-architect#6",
+   "reviewer": "netcode-architect",
+   "id": "GP2",
+   "field": "what",
+   "severity": "should",
+   "problem": "Misleading: the row says the listeners only write a keys map, mouse position and button flags. In fact most one-shot actions run straight inside the browser's input event handlers, at the moment of the key or click, outside update(): reload, ability, grenade charge and throw, bow release (which fires the bolt), entering and leaving the vehicle, shop, resupply, weapon switch and aim-down-sights. This is the input-to-sim seam v2 has to replace. Each such action must become a press edge in the per-tick input command, and a press must survive the repeated-input redundancy as an edge, not as a held state. The v2_note should say this too: a second op beyond this one.",
+   "evidence": "shamble-game.js:3264 (startReload or resetRound), :3265 useAbility, :3266 startCharge, :3267 enterJug/exitJug/openShop/tryResupply, :3268-3269 equipPrimary/equipSpecial, :3273 keyup releaseCharge -> throwGrenadeCharged, :3284 mousedown startCharge('bow') and ps.ads, :3285 mouseup releaseCharge -> fireBolt and ps.ads. update() only samples keys, mouseDown and semiQueued (:2722-2731, :2763-2778, :2780).",
+   "fix_op": "{\"id\": \"GP2\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"Keyboard and mouse listeners write a keys{} map plus mouse NDC and button flags.\", \"text\": \"Keyboard and mouse listeners write a keys{} map plus mouse NDC and button flags, and they also run game actions directly at event time, outside update(): R startReload or resetRound (3264), F useAbility (3265), G startCharge (3266) and its keyup releaseCharge, which throws the grenade (3273), E enterJug, exitJug, openShop or tryResupply (3267), 1 and 3 equipPrimary and equipSpecial (3268-3269), the left button's bow charge and the mouseup release that fires the bolt (3284-3285), and the right button's ADS state (3284-3285). Only movement, sprint, jump, held or queued fire and the cursor aim are sampled inside update().\"}"
+  },
+  {
+   "ref": "netcode-architect#7",
+   "reviewer": "netcode-architect",
+   "id": "GP14",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap in how legacy non-determinism works. STATUS says 11 wall-clock reads make same-seed matches differ, but no row explains how. Two wall-clock reads reach outcomes through animation: the Juggernaut muzzles, and soldier breathing, which moves the muzzle that grenades launch from. All the others act through the one shared Math.random, which sound, effects and camera shake draw from inside the game step. Whether those draws happen depends on whether audio is on, on the audio device's sample rate, on a wall-clock sound throttle and on the camera distance. A legacy-parity test (R5) has to seed Math.random and stub out audio and effects, and v2 needs separate random streams for the sim and for cosmetics.",
+   "evidence": "fireOnce calls sfxShot at shamble-game.js:1473, before the pellet spread draws at :1477. sfxShot (:2227-2231) fills a buffer with floor(sampleRate*0.07-0.2) Math.random values, but only when SFX.ctx exists and audio is not muted. sfxAMK does the same at :2286-2290. sfxImpact is wall-clock throttled at :2253. sfxEnemyShot draws at :2255-2256. FX draw at :1029-1088. Camera shake draws inside update() at :2846. _animClock=performance.now() at :2674 feeds the breathing (:363), which rotates the chest. The weapon hangs off the chest (shamble-core.js:453), and grenades launch from that animated muzzle (:1760). The 11 reads: grep finds 10 performance.now() and 1 Date.now() in shamble-game.js.",
+   "fix_op": "{\"id\": \"GP14\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Found in code: of the 11 wall-clock reads, two reach sim outcomes, both through animation: tickPilot's tt (2781) bobs the Juggernaut's cannon muzzles (GC17), and _animClock (2674) drives the soldiers' breathing (363), which rotates the chest that carries the weapon (shamble-core.js:453) and so moves the animated muzzle grenades and Molotovs launch from (GC13). The rest change results through the one shared Math.random, which sound and FX draw from inside the step under conditions the sim must not depend on: fireOnce calls sfxShot (1473) before the pellets' spread draws (1477), and sfxShot fills a noise buffer with floor(sampleRate x 0.07-0.2 s) Math.random values only when audio is unlocked and not muted (2227-2231; sfxAMK its own, 2286-2290), so the spread depends on mute and on the device's sample rate; sfxImpact is throttled by the wall clock (2253); sfxEnemyShot (2255-2256) and the FX (1029-1088) are culled by camera distance (GN8); camera shake draws inside update() (2846). A legacy-parity harness must seed Math.random and stub audio and FX, as three-teams-core.md:39 did; v2 gives the sim its own seeded stream and the client separate cosmetic streams.\"}"
+  },
+  {
+   "ref": "netcode-architect#8",
+   "reviewer": "netcode-architect",
+   "id": "GP14",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Gap in update order: the row lists the order of the game step but not what it causes. The player always acts before every bot in a step. Its shots, movement and bolts resolve first, so a bot it kills that step never fires back, and bots aim at where the player has already moved. That is a single-player advantage. With many humans on one tick, v2 needs one defined order for every soldier's input, or every shot in a tick resolved against the same state from before the tick, so who wins a trade never depends on slot order.",
+   "evidence": "shamble-game.js: player fire :2722-2731, movement :2748-2780, re-sync :2862, bolts :2863-2885, then the bot loop :2893. A bot killed earlier in the step takes the dead branch at :2937 and cannot reach enemyFire (:2913). applyDamage sets V.alive=false immediately (:1520).",
+   "fix_op": "{\"id\": \"GP14\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" Order found in code: the player always acts first in a step. Its shots, melee and movement (2722-2780) and its bolts (2863-2885) resolve before any bot (2893), so a bot the player kills this step cannot fire back (it takes the dead branch, 2937), and bots then aim at the player's post-move position (re-sync at 2862). With many humans under server authority, the tick needs one defined order for every soldier's command, or all shots of a tick resolved against the same pre-tick state, so that trades never depend on slot order.\"}"
+  },
+  {
+   "ref": "graphics-engineer#4",
+   "reviewer": "graphics-engineer",
+   "id": "GP9",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The note breaks look rule (b). 'Keep the three-shot comic framing' recommends keeping a comic presentation in v2, which is a look decision. The technique lesson in the same sentence (never read GPU pixels back on a kill frame) is fine.",
+   "evidence": "after-GP.json GP9 v2_note. The plan's condition 4 says a mark is about code technique only, never appearance. The capture technique is at shamble-game.js:2367-2376 (corner render plus drawImage, with the readback kept as a fallback).",
+   "fix_op": "{\"id\": \"GP9\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Keep the three-shot comic framing and the lesson to never read GPU pixels back on a kill frame\", \"text\": \"Whether a kill vignette exists, and how it is framed, is for the look brief. Keep the lesson to never read GPU pixels back on a kill frame\"}"
+  },
+  {
+   "ref": "graphics-engineer#9",
+   "reviewer": "graphics-engineer",
+   "id": "GP6",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The spatial-audio gap for the 48+ player scale is not recorded. Legacy has no voice limit and no occlusion. Apart from the 55 ms impact throttle and the 90 m bot-shot cull, every sound creates new nodes, and panning is a StereoPannerNode (no PannerNode or listener). v2 needs a voice cap with priorities, and R3 has to research a distance and occlusion model.",
+   "evidence": "shamble-game.js:2246-2249 sfxBus: gain 1/(1+dist/22) from player.position, with a StereoPanner against the camera's right axis. :2253 sfxImpact throttles to 55 ms. grep 'createPanner|AudioListener|PositionalAudio' in shamble-game.js finds only the createStereoPanner use. TUNE.fx.botSfxR 90 is at shamble-core.js:106.",
+   "fix_op": "{\"id\": \"GP6\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" No voice limit and no occlusion exist: apart from the 55 ms impact throttle (2253) and the 90 m bot-shot cull (TUNE.fx.botSfxR), every sound builds new nodes, and panning is a StereoPannerNode, not a PannerNode with a listener. At 48+ players v2 needs a voice cap with priorities and a distance and occlusion model (a spike counts concurrent voices in a 48-bot fight).\"}"
+  },
+  {
+   "ref": "game-designer#7",
+   "reviewer": "game-designer",
+   "id": "GP3",
+   "field": "where",
+   "severity": "should",
+   "problem": "Wrong live number: the row gives T.arenaX/arenaZ as 60. That is only the literal. The core overwrites it at load, before boot, so the walk clamp uses 186 x 126, which is also what legacy-tuning.json records.",
+   "evidence": "shamble-core.js:67 arenaX:60, arenaZ:60; :224 GROUND_W=372, GROUND_D=252; :225 `T.arenaX=GROUND_W/2; T.arenaZ=GROUND_D/2`; docs/legacy-tuning.json T.arenaX 186, arenaZ 126; CD4 already says the arena is overwritten at :225.",
+   "fix_op": "{\"id\": \"GP3\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"T.arenaX/arenaZ 60 shamble-core.js:67\", \"text\": \"T.arenaX/arenaZ (literal 60 at shamble-core.js:67, set at load to 186 x 126 by :225 from GROUND_W/GROUND_D; legacy-tuning.json T.arenaX 186, arenaZ 126)\"}"
+  },
+  {
+   "ref": "game-designer#9",
+   "reviewer": "game-designer",
+   "id": "GP11",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The v2 note sizes the scoreboard for three teams only. VISION_V2 §3 [DECIDED] keeps two-team modes too.",
+   "evidence": "docs/VISION_V2.md §3; GP11 v2_note 'v2 has three teams (LOOP_V2 §11 item 1)'.",
+   "fix_op": "{\"id\": \"GP11\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" Two-team modes stay too (VISION_V2 §3 [DECIDED]), so the board takes 2 or 3 team columns from the mode data.\"}"
+  }
+ ],
+ "GN": [
+  {
+   "ref": "verifier-game2#3",
+   "reviewer": "verifier-game2",
+   "id": "GN4",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The row puts the 'about 1,100/s demand' figure under risk 2. Risk 2 states only 2.3 scans per second against 4. The 1,100/s figure comes from the LOS-SIZE decision.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core.md:97-98 (risk 2: '2.3 times a second instead of 4'); :118-119 (LOS-SIZE: 'At 48 it caps a fight's demand of about 1,100 per second').",
+   "fix_op": "{\"id\": \"GN4\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"risk 2: 480/s caps a demand of about 1,100/s at 48, so each bot scans 2.3 times/s instead of 4 (LOS-SIZE)\", \"text\": \"risk 2: at 48 each bot scans 2.3 times/s instead of 4; decision LOS-SIZE: 480/s caps a demand of about 1,100/s at 48\"}"
+  },
+  {
+   "ref": "verifier-game2#4",
+   "reviewer": "verifier-game2",
+   "id": "GN7",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'three views of one world' is unclear. In code, shots and sight use two static sets: SIM.statics, which includes ramps and serves player shots and hasLOS, and _botFireWorld.statics, which leaves ramps out. A third view only exists if you count movement collision, and the row doesn't say so.",
+   "evidence": "shamble-game.js:1455-1457 (rampLo/rampHi), 1462 (_botFireWorld.statics copied without ramp slots); core:1544 hasLOS uses SIM.statics.",
+   "fix_op": "{\"id\": \"GN7\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"three views of one world today\", \"text\": \"two static sets for shots and sight today (SIM.statics with ramp boxes, _botFireWorld without), besides the movement collision\"}"
+  },
+  {
+   "ref": "verifier-game2#5",
+   "reviewer": "verifier-game2",
+   "id": "GN12",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The 134-to-1 deopt cut is from one map and seed (Cabana seed 4). Romania seed 6 went from 6 to 2, and other seeds stayed at 1-3. The row reads as a general result.",
+   "evidence": "docs/reports/2026-10-14-bot-poplar-wedge.md:43: 'The warm-up cut deopts per match from 134 to 1 (Cabana seed 4) and from 6 to 2 (Romania seed 6); others stay at 1–3.'",
+   "fix_op": "{\"id\": \"GN12\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"warm-up cut deopts per match 134 to 1\", \"text\": \"warm-up cut deopts per match 134 to 1 (Cabana seed 4; Romania seed 6: 6 to 2)\"}"
+  },
+  {
+   "ref": "engine-architect#14",
+   "reviewer": "engine-architect",
+   "id": "GN5",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The note justifies the fixed tick and the seeded RNG by 'deterministic replays', which are a VISION_V2 §6.8 [LATER] feature. The current need is that the Wasm client and the native server compute the same results (prediction and authority).",
+   "evidence": "VISION_V2.md §6.8: '[LATER] These feed kill-cams, replays and highlights.' V2_PHASE0_BRIEF.md R1: 'identical results between Wasm and native'.",
+   "fix_op": "{\"id\": \"GN5\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"v2 needs the fixed tick and a seeded RNG for deterministic replays.\", \"text\": \"v2 needs the fixed tick and a seeded sim RNG so the Wasm client and the native server compute the same results (replays are VISION_V2 §6.8 [LATER]).\"}"
+  },
+  {
+   "ref": "netcode-architect#12",
+   "reviewer": "netcode-architect",
+   "id": "GN10",
+   "field": "what",
+   "severity": "nit",
+   "problem": "'Than it can jump (about 3.07 m)' overstates the reach. 3.07 m is EJUMP_REACH, computed from a formula. The jump a bot can actually make is lower and depends on the frame rate: about 2.98 m at 60 Hz (see the GW14 finding).",
+   "evidence": "EJUMP_REACH at shamble-game.js:1575. Measured apex rise 2.430 m at 60 Hz + stepUp 0.55 = 2.98 m (tools/preview.js eval).",
+   "fix_op": "{\"id\": \"GN10\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"than it can jump (about 3.07 m)\", \"text\": \"than EJUMP_REACH (3.07 m from the formula; the integrated reach is lower and frame-rate dependent, about 2.98 m at 60 Hz, GW14)\"}"
+  },
+  {
+   "ref": "netcode-architect#13",
+   "reviewer": "netcode-architect",
+   "id": "GN8",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The evidence leaves out that the identical damage logs were measured with the effects stubbed out, not only with Math.random seeded. The row then says, correctly, that in the live game the cull makes the random sequence depend on the camera.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core.md:39: 'Seeded random, effects stubbed, cull off vs on'.",
+   "fix_op": "{\"id\": \"GN8\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"cull off vs on, seeded, identical damage logs\", \"text\": \"cull off vs on, with Math.random seeded and the effects stubbed (three-teams-core.md:39), identical damage logs\"}"
+  },
+  {
+   "ref": "netcode-architect#14",
+   "reviewer": "netcode-architect",
+   "id": "GN12",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'The algorithm ports directly' leaves out one determinism detail. Path costs are worked out in 64-bit floats but stored in 32-bit slots, and ties in the priority queue are broken by <= and >=. A Rust port only finds the same routes as legacy (golden tests against legacy, R5) if it rounds the same way.",
+   "evidence": "NAV.g and NAV.f are Float32Array (shamble-game.js:2621). The 64-bit cost math is stored into them at :2648-2649. Heap comparisons at :2630-2632.",
+   "fix_op": "{\"id\": \"GN12\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" For parity tests against legacy: G and F are Float32Array slots (2621) filled from f64 arithmetic (2648-2649), and heap ties break on <= and >= (2630-2632), so a Rust port reproduces legacy routes only if it rounds the same way (compute in f64, store in f32).\"}"
+  },
+  {
+   "ref": "game-designer#1",
+   "reviewer": "game-designer",
+   "id": "GN2",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "Same tier off-by-one: the row says LOOP_V2 'keeps the Officer at Tier 2, where legacy already has it'. Legacy unlocks it after the first era-up; LOOP_V2 unlocks it at Tech 2.",
+   "evidence": "shamble-game.js:1178 (u.tier > era), :701 (era starts at 1); LOOP_V2.md:59 (Tech 2: Officer, Javelin) and :73 (Officer moves to Tier 2).",
+   "fix_op": "{\"id\": \"GN2\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"and keeps the Officer at Tier 2, where legacy already has it (UNIT_TYPES officer tier:2, cost 1250, shamble-core.js:136)\", \"text\": \"and puts the Officer at Tier 2, unlocked at Tech 2; legacy labels it tier:2 (cost 1250, shamble-core.js:136) but unlocks it at era 2, after the first era-up (shamble-game.js:1178), one tier-up earlier than LOOP_V2\"}"
+  }
+ ],
+ "PG": [
+  {
+   "ref": "verifier-edpg#0",
+   "reviewer": "verifier-edpg",
+   "id": "PG3",
+   "field": "where",
+   "severity": "should",
+   "problem": "The list of places that write the opacity of the dead #reloadBar leaves out shamble-game.js:1153, where switchWeapon sets it to 0. There are 7 writes, and the row lists 6.",
+   "evidence": "grep -n reloadBar shamble-game.js finds 7 lines: 1153 (switchWeapon, opacity='0'), 1162, 1379, 1387, 1412 (startReload, opacity='1'), 1827 and 1846. The row lists '1162, 1379, 1387, 1412, 1827, 1846'.",
+   "fix_op": "{\"id\": \"PG3\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"reloadBar opacity writes at 1162,\", \"text\": \"reloadBar opacity writes at 1153 (switchWeapon), 1162,\"}"
+  },
+  {
+   "ref": "verifier-edpg#1",
+   "reviewer": "verifier-edpg",
+   "id": "PG10",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "The row calls CS1 'done, awaiting Brave'. That is out of date: the same audit file records that Mustafa confirmed CS1 in Brave.",
+   "evidence": "docs/AUDIT_BUGS_PERF.md:62 has 'CS1 Kill frame — done (awaiting Brave)', but AUDIT_BUGS_PERF.md:80 has 'CS1 + CS2 confirmed in Brave by Mustafa (2026-09-26).' The other numbers check out: B1 at :22 (readRenderTargetPixels, getImageData, forced layout) and about 43 ms per shot at :67-68.",
+   "fix_op": "{\"id\": \"PG10\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"done, awaiting Brave.\", \"text\": \"done; confirmed in Brave by Mustafa on 2026-09-26 (AUDIT:80).\"}"
+  },
+  {
+   "ref": "verifier-edpg#4",
+   "reviewer": "verifier-edpg",
+   "id": "PG5",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The citation for 'UI transplant step 3 (armory and scoreboard)' is wrong. ROADMAP:71 lists armory and scoreboard as next but gives no step number. The numbered step 3 is in START_HERE.md:146, and STATUS.md:30 lists it as paused (ui-step-3).",
+   "evidence": "docs/START_HERE.md:146: 'Next: step 2 service record + end of round, step 3 armory + scoreboard (dark crate family).' docs/STATUS.md:30: 'Paused until the greybox loop is playable: ... ui-step-2, ui-step-3'. docs/ROADMAP.md:71: 'next: service record + end of round → armory + scoreboard'.",
+   "fix_op": "{\"id\": \"PG5\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"(armory and scoreboard, ROADMAP:71)\", \"text\": \"(armory and scoreboard, START_HERE.md:146; paused as ui-step-3, STATUS.md:30)\"}"
+  },
+  {
+   "ref": "verifier-edpg#5",
+   "reviewer": "verifier-edpg",
+   "id": "PG2",
+   "field": "where",
+   "severity": "nit",
+   "problem": "The mockup's :root block also lacks --wr-desk-bg, so 'minus --wr-faded' is incomplete. The mockup writes the desk gradient directly in its .desk rule instead.",
+   "evidence": "docs/ui_theme_mockup.html:8-17 :root has no faded or desk-bg token; the gradient is in the .desk rule at :25-32. index.html:228-237 defines --wr-faded and --wr-desk-bg.",
+   "fix_op": "{\"id\": \"PG2\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"minus --wr-faded)\", \"text\": \"minus --wr-faded and --wr-desk-bg, whose gradient the mockup writes in its .desk rule at :25-32)\"}"
+  },
+  {
+   "ref": "graphics-engineer#10",
+   "reviewer": "graphics-engineer",
+   "id": "PG7",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "'Keep: a pure DOM/CSS menu with no WebGL' decides in advance how the menu is presented: a 3D menu backdrop would be a look-brief choice. The technique lesson worth keeping is to stop rendering the 3D scene behind an opaque menu, and the row already says that.",
+   "evidence": "after-PG.json PG7 v2_note. STATUS.md:107 (the scene renders behind the opaque menu).",
+   "fix_op": "{\"id\": \"PG7\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Keep: a pure DOM/CSS menu with no WebGL,\", \"text\": \"Keep: a DOM/CSS menu flow (whether it shows any 3D is for the look brief),\"}"
+  }
+ ],
+ "ED": [
+  {
+   "ref": "verifier-edpg#2",
+   "reviewer": "verifier-edpg",
+   "id": "ED2",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The row credits the BUG-2 rotation fix to H1 and H2 only. The hotfix report also fixes rotation with H3 (live updates while dragging the Rotation field) and H6 (Shift+wheel turns both ways).",
+   "evidence": "docs/reports/2026-10-16-editor-hotfix.md:29-34 (H1, H2, H3, H6 rows) and :48-54 (rotation before/after checks, including the held drag on Rotation).",
+   "fix_op": "{\"id\": \"ED2\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"fixed with H1 _edCanRot and H2 inspector selection capture\", \"text\": \"fixed by H1 _edCanRot, H2 inspector selection capture, H3 live Rotation drag and H6 Shift+wheel both ways\"}"
+  },
+  {
+   "ref": "verifier-edpg#3",
+   "reviewer": "verifier-edpg",
+   "id": "ED15",
+   "field": "evidence",
+   "severity": "nit",
+   "problem": "The row says the two <body> sections differ only by the mEditor menu button. That holds for the markup only: editor.html's body also adds the shamble-editor.js script tag and the bootEditor() call.",
+   "evidence": "diff of the <body> sections of index.html and editor.html: +mEditor button (editor.html:1046), +<script src=\"shamble-editor.js\"> (editor.html:1259), +bootEditor(); (editor.html:1262).",
+   "fix_op": "{\"id\": \"ED15\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"differ only by the mEditor menu button, editor.html:1046)\", \"text\": \"differ in markup only by the mEditor menu button, editor.html:1046; editor.html also adds the shamble-editor.js tag :1259 and bootEditor() :1262)\"}"
+  },
+  {
+   "ref": "coverage-closer#12",
+   "reviewer": "coverage-closer",
+   "id": "ED16",
+   "field": "where",
+   "severity": "should",
+   "problem": "The row says ':59 preview scratch vectors' without naming them, and one of them is also used outside the preview.",
+   "evidence": "shamble-editor.js:59 'const _pv1=..., _pv2=..., _pvAim=...'; used in edPreviewUpdate :663-673 and by edMarqueePick :180 (_pv1 projects the anchors)",
+   "fix_op": "{\"id\": \"ED16\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":59 preview scratch vectors;\", \"text\": \":59 preview scratch vectors _pv1/_pv2/_pvAim (Tab playtest camera and movement in edPreviewUpdate :663-673; _pv1 also projects anchors in edMarqueePick :180);\"}"
+  },
+  {
+   "ref": "coverage-closer#13",
+   "reviewer": "coverage-closer",
+   "id": "ED2",
+   "field": "where",
+   "severity": "should",
+   "problem": "Twenty-four gizmo, rotation-ring, resize and mirror declarations are covered only by summary ranges (':77-84 gizmo/drag state', ':115-123 rotation ring', ':162-167 edMirror..edMirrorSel') and none is named. One of them, _edStartResize at :122, sits inside the 'rotation ring' range even though it starts a resize drag.",
+   "evidence": "shamble-editor.js:77 'let edGizmoMode='move', edRotDrag=false, _edRotMoved=false, _edRotPrev=null, _edRing=null;'; :78 _edHandles/_edHBox; :83 _edGizmo...._edRzStartDist; :115 _edEnsureRing; :119 edUpdateRing; :120 _edRingPick; :121 _edGroundAngle; :122 _edStartResize; :163 edCycleMirror; :164 edUpdateMirrorBtn; :165 _mirrorDesc; :166 edMirrorOne",
+   "fix_op": "{\"id\": \"ED2\", \"field\": \"where\", \"op\": \"append\", \"find\": \"\", \"text\": \"; declarations by name: shamble-editor.js:77 edGizmoMode/edRotDrag/_edRotMoved/_edRotPrev/_edRing, :78 _edHandles/_edHBox, :83 _edGizmo/edAxisDrag/edResizeDrag/_edGizmoMoved/_edResizeMoved/_edAxisPrev/_edRzS0/_edRzStartDist; rotation ring :115 _edEnsureRing, :119 edUpdateRing, :120 _edRingPick, :121 _edGroundAngle; :122 _edStartResize (resize-handle drag start); mirror :163 edCycleMirror, :164 edUpdateMirrorBtn, :165 _mirrorDesc (mirrors position, rotation, team and faction), :166 edMirrorOne\"}"
+  },
+  {
+   "ref": "coverage-closer#14",
+   "reviewer": "coverage-closer",
+   "id": "ED5",
+   "field": "where",
+   "severity": "should",
+   "problem": "clUndoPush, the push into the Character Lab's 50-step undo, is not named.",
+   "evidence": "shamble-editor.js:298 'function clUndoPush(fn){ clUndo.push(fn); if(clUndo.length>50)clUndo.shift(); }' (callers :308, :405)",
+   "fix_op": "{\"id\": \"ED5\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":297-299 clUndo (50 steps)\", \"text\": \":297-299 clUndo and clUndoPush :298 (50 steps)\"}"
+  },
+  {
+   "ref": "coverage-closer#15",
+   "reviewer": "coverage-closer",
+   "id": "ED8",
+   "field": "where",
+   "severity": "should",
+   "problem": "The state of the measure, spawn-distance and symmetry overlays is cited only as 'measure state', 'spawn state' and 'symmetry state'. Fifteen declarations are not named, among them measReset and ovHostileSpawn.",
+   "evidence": "shamble-editor.js:476 'let edMeasA=null, edMeasB=null, _measSeg=null, _measDotA=null, _measDotB=null, _measLabel=null;'; :491 measReset; :495 ovSpawnOn/_ovSpawnSig; :503 ovHostileSpawn (callers :510, :524); :530 ovSymAxis/_ovSymSig; :531 _ovTmpC/_ovTmpS/_ovTmpB",
+   "fix_op": "{\"id\": \"ED8\", \"field\": \"where\", \"op\": \"append\", \"find\": \"\", \"text\": \"; declarations by name: shamble-editor.js:476 edMeasA/edMeasB/_measSeg/_measDotA/_measDotB/_measLabel (measure state), :491 measReset, :495 ovSpawnOn/_ovSpawnSig, :503 ovHostileSpawn, :530 ovSymAxis/_ovSymSig, :531 _ovTmpC/_ovTmpS/_ovTmpB (symmetry scratch)\"}"
+  },
+  {
+   "ref": "coverage-closer#16",
+   "reviewer": "coverage-closer",
+   "id": "ED4",
+   "field": "where",
+   "severity": "should",
+   "problem": "The ortho-camera toggle is summarised as 'edEnsureOrtho..edUpdateOrthoBtn'. edCam, edSyncOrtho, edToggleOrtho and the _edOrthoH/_edOrthoA caches are not named, although edCam is the camera picker that every editor raycast uses.",
+   "evidence": "shamble-editor.js:646 'let edOrtho=false, edOrthoCam=null, _edOrthoH=-1, _edOrthoA=-1;'; :648 'function edCam(){ return (edOrtho&&!edPreview&&edOrthoCam)?edOrthoCam:camera; }'; :649 edSyncOrtho; :652 edToggleOrtho; :653 edUpdateOrthoBtn",
+   "fix_op": "{\"id\": \"ED4\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":646 edOrtho/edOrthoCam state, :647-653 edEnsureOrtho..edUpdateOrthoBtn\", \"text\": \":646 edOrtho/edOrthoCam/_edOrthoH/_edOrthoA state, :647-653 edEnsureOrtho, edCam :648 (returns the ortho camera when on and not in playtest, else the game camera), edSyncOrtho :649, edToggleOrtho :652, edUpdateOrthoBtn :653\"}"
+  },
+  {
+   "ref": "coverage-closer#17",
+   "reviewer": "coverage-closer",
+   "id": "ED9",
+   "field": "where",
+   "severity": "should",
+   "problem": "The Match Rules panel's control map _edRulesCtl and its value formatter _rulesFmt are not named.",
+   "evidence": "shamble-editor.js:769 '... const _edRulesCtl={};' (filled :798, read by edSyncRulesPanel :799); :787 'function _rulesFmt(it,v){ return (it.int?Math.round(v):v)+(it.unit?(' '+it.unit):''); }'",
+   "fix_op": "{\"id\": \"ED9\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":769 edRulesPanel/edRulesBody, :770 RULES_SCHEMA, :785 _rulesGet, :788 edBuildRules\", \"text\": \":769 edRulesPanel/edRulesBody/_edRulesCtl (key-to-control map read by edSyncRulesPanel :799), :770 RULES_SCHEMA, :785 _rulesGet, :787 _rulesFmt (value plus unit label), :788 edBuildRules\"}"
+  },
+  {
+   "ref": "coverage-closer#18",
+   "reviewer": "coverage-closer",
+   "id": "ED12",
+   "field": "where",
+   "severity": "should",
+   "problem": "The inspector handles and state are cited as 'edInsp handles' and 'inspector state' without naming edInspBody, edInspKind, _edInspRef or _edInspHidden.",
+   "evidence": "shamble-editor.js:863 'const edInsp=..., edInspBody=edInsp.querySelector('.edIBody'), edInspKind=document.getElementById('edIKind');'; :864 'let _edInspRef=undefined, _edInspHidden=false, ...' (_edInspHidden read :964, :971)",
+   "fix_op": "{\"id\": \"ED12\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":863 edInsp handles, :864 inspector state and _SIZEABLE/_SCALEABLE\", \"text\": \":863 edInsp/edInspBody/edInspKind handles, :864 inspector state _edInspRef/_edInspHidden and _SIZEABLE/_SCALEABLE\"}"
+  },
+  {
+   "ref": "coverage-closer#19",
+   "reviewer": "coverage-closer",
+   "id": "ED1",
+   "field": "where",
+   "severity": "should",
+   "problem": "The library panel's state, _edLibMode and _edLibCollapsed, is declared on the inspector line :864 but belongs to the placement library. It is named in no row.",
+   "evidence": "shamble-editor.js:864 '... _edLibCollapsed=false, _edLibMode='place';'; set by edSetLibMode :856; read by edApplyGridCols :971 and the rail toggle in bootEditor :1209",
+   "fix_op": "{\"id\": \"ED1\", \"field\": \"where\", \"op\": \"replace\", \"find\": \":856 edSetLibMode\", \"text\": \":856 edSetLibMode (sets _edLibMode; _edLibMode and the library-collapse flag _edLibCollapsed are declared at :864, read by edApplyGridCols :971 and the rail toggle :1209)\"}"
+  }
+ ],
+ "TL": [
+  {
+   "ref": "verifier-tlkt#0",
+   "reviewer": "verifier-tlkt",
+   "id": "TL10",
+   "field": "where",
+   "severity": "blocking",
+   "problem": "Wrong file:line for the hook wiring. .claude/settings.json:101 is now a WebFetch allow rule ('WebFetch(domain:opentelemetry.io)'). kit-v3-0 (30ff4a4 and 1c259ce, 2026-10-24/25) moved the PostToolUse block. Line 101 was right only at 48ffb51.",
+   "evidence": "grep -n 'syntax-gate\\|PostToolUse' .claude/settings.json gives :163 PostToolUse and :167 the 'node .claude/hooks/syntax-gate.mjs' command (block :162-169). git show 48ffb51:.claude/settings.json gives :97 and :101.",
+   "fix_op": "{\"id\": \"TL10\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"wired at .claude/settings.json:101\", \"text\": \"wired at .claude/settings.json:162-169 (command :167)\"}"
+  },
+  {
+   "ref": "verifier-tlkt#5",
+   "reviewer": "verifier-tlkt",
+   "id": "TL16",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "The note cites EDITOR_V2 ':37-39' for the validation panel and for the 120-degree symmetry tool. The symmetry tool is at EDITOR_V2:35-36 and the validation panel at :39-40. Lines 37-38 cover 'Objectives as data'.",
+   "evidence": "grep -n 'Three-team symmetry\\|Validation panel' docs/EDITOR_V2.md gives :35 and :39.",
+   "fix_op": "{\"id\": \"TL16\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"(:37-39, built live at 120 degrees for three teams)\", \"text\": \"(validation panel :39-40; symmetry :35-36, built live at 120 degrees for three teams)\"}"
+  },
+  {
+   "ref": "verifier-tlkt#6",
+   "reviewer": "verifier-tlkt",
+   "id": "TL3",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "The quoted counts (core 134 / game 691 / editor 349, STATUS.md:125) are a 2026-10-14 measurement on main 8675367, but the row does not date them. A reader could take them as the current surface. On today's engine files (unchanged since 48ffb51), the battery gives different counts.",
+   "evidence": "node tools/battery.js . gives core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0. STATUS.md:125 says 'on main 8675367 ... core 134 / game 691 / editor 349', dated 2026-10-14.",
+   "fix_op": "{\"id\": \"TL3\", \"field\": \"evidence\", \"op\": \"append\", \"find\": \"\", \"text\": \"; at 48ffb51 (today's engine files) node tools/battery.js . gives core 138 / game 714 / editor 353 (STATUS:125 is the 2026-10-14 count on 8675367)\"}"
+  },
+  {
+   "ref": "verifier-tlkt#7",
+   "reviewer": "verifier-tlkt",
+   "id": "TL4",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "'44 editor references, all guarded, 0 flagged' (STATUS.md:125-126) is the 2026-10-14 measurement. The current build has 51 references to editor-only symbols, all guarded, 0 flagged. The row does not date the figure.",
+   "evidence": "node tools/battery.js . gives check4 refsToEditorOnly 51, guarded 51, flagged 0.",
+   "fix_op": "{\"id\": \"TL4\", \"field\": \"evidence\", \"op\": \"append\", \"find\": \"\", \"text\": \"; at 48ffb51 node tools/battery.js . gives 51 editor references, 51 guarded, 0 flagged (STATUS's 44 is from 2026-10-14)\"}"
+  },
+  {
+   "ref": "verifier-tlkt#8",
+   "reviewer": "verifier-tlkt",
+   "id": "TL4",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The quotation is altered: EDITOR_V2:51 reads 'The player build (index.html) must never load editor code.' The row drops '(index.html)' inside the quotation marks.",
+   "evidence": "sed -n '51p' docs/EDITOR_V2.md",
+   "fix_op": "{\"id\": \"TL4\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"'The player build must never load editor code'\", \"text\": \"'The player build (index.html) must never load editor code'\"}"
+  }
+ ],
+ "KT": [
+  {
+   "ref": "verifier-tlkt#1",
+   "reviewer": "verifier-tlkt",
+   "id": "KT9",
+   "field": "where",
+   "severity": "blocking",
+   "problem": "Wrong file:line. In the current .claude/settings.json, lines 96-105 are WebFetch allow rules and the start of the ask list. The hook registration is at :162-169. The cited range matches the file as it was at 48ffb51, before kit-v3-0. The hook file's own ranges (:12-19, :21-41, :42-46) are correct.",
+   "evidence": "sed -n '90,115p' .claude/settings.json shows WebFetch domains and then \"ask\": [ at :105. sed -n '160,175p' shows hooks/PostToolUse/matcher Edit|Write/command at :162-169.",
+   "fix_op": "{\"id\": \"KT9\", \"field\": \"where\", \"op\": \"replace\", \"find\": \".claude/settings.json:96-105\", \"text\": \".claude/settings.json:162-169\"}"
+  },
+  {
+   "ref": "verifier-tlkt#2",
+   "reviewer": "verifier-tlkt",
+   "id": "KT2",
+   "field": "where",
+   "severity": "blocking",
+   "problem": "The CLAUDE.md and skill line numbers are from 48ffb51. kit-v3-0 rewrote CLAUDE.md: the protocol is now at :55-85, the evidence types at :65-72 (which now include research at :71-72) and the reviewers at :73-78. The changeset skill's steps now run :9-30. disable-model-invocation is still at :5.",
+   "evidence": "grep -n '' CLAUDE.md: ':55 ## The change-set protocol', ':66 - logic', ':71 - research', ':73 5. Review, once', ':79-85 step 6'. git show 48ffb51:CLAUDE.md has the protocol at :38-62. cat -n .claude/skills/changeset/SKILL.md has 30 lines, with steps 1-8 at :11-30.",
+   "fix_op": "{\"id\": \"KT2\", \"field\": \"where\", \"op\": \"replace\", \"find\": \"CLAUDE.md:38-62 (steps 1-6; evidence types :48-53; reviewers :54-56); .claude/skills/changeset/SKILL.md:9-26\", \"text\": \"CLAUDE.md:55-85 (steps 1-6; evidence types :65-72; reviewers :73-78); .claude/skills/changeset/SKILL.md:9-30\"}"
+  },
+  {
+   "ref": "verifier-tlkt#3",
+   "reviewer": "verifier-tlkt",
+   "id": "KT2",
+   "field": "v2_note",
+   "severity": "blocking",
+   "problem": "There are two problems. First, the claim 'the skill was last changed in b23a133 (the repo-root move), so kit-v2-0 did not update it' is false now: kit-v3-0 commit e644c2a (2026-10-24) changed the skill, adding the checkpoint lines and the Opus effort line. Second, the line references are stale: 'Wait for explicit approval' is at SKILL.md:21, not :20, and CLAUDE.md routes plan approval to the advisor at :57-59, not :41-42. The underlying point still holds: the skill still does not name who approves, and START_HERE.md:30-31 still says Mustafa.",
+   "evidence": "git log --format='%h %ad %s' -- .claude/skills/changeset/SKILL.md gives e644c2a 2026-10-24 kit-v3-0, then b23a133. cat -n SKILL.md: ':21 Wait for explicit approval.' and ':12 Start the checkpoint'. CLAUDE.md:57-59 says 'Then STOP and have the `advisor` agent review the plan'.",
+   "fix_op": "{\"id\": \"KT2\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"changeset SKILL.md:20 says 'Wait for explicit approval' without naming who, while CLAUDE.md:41-42 routes plan approval to the advisor agent; the skill was last changed in b23a133 (the repo-root move), so kit-v2-0 did not update it,\", \"text\": \"changeset SKILL.md:21 says 'Wait for explicit approval' without naming who, while CLAUDE.md:57-59 routes plan approval to the advisor agent; kit-v3-0 (e644c2a) edited the skill (checkpoints, effort) but kept that line,\"}"
+  },
+  {
+   "ref": "verifier-tlkt#4",
+   "reviewer": "verifier-tlkt",
+   "id": "KT7",
+   "field": "where",
+   "severity": "blocking",
+   "problem": "The line ranges are off by one. Commit 1c259ce (kit-v3-0) reworded the fallback sentence onto two lines, so the skill now runs to :18. The manual battery is at :8-14 and the report at :16-18. The cited ranges match 48ffb51.",
+   "evidence": "cat -n .claude/skills/gate/SKILL.md shows :8-9 'If tools/gate.mjs is missing ... battery instead:', items 1-4 at :10-14, Report at :16, and 'Never \"fix\" a failure' at :18. git log on the file gives 1c259ce 2026-10-25.",
+   "fix_op": "{\"id\": \"KT7\", \"field\": \"where\", \"op\": \"replace\", \"find\": \".claude/skills/gate/SKILL.md:6-17 (manual battery :8-13, report :15-17)\", \"text\": \".claude/skills/gate/SKILL.md:6-18 (manual battery :8-14, report :16-18)\"}"
+  }
+ ],
+ "CM": [
+  {
+   "ref": "engine-architect#9",
+   "reviewer": "engine-architect",
+   "id": "CM13",
+   "field": "evidence",
+   "severity": "should",
+   "problem": "The same stale figure: 561 B per call for the houses fallback array, cited as current. CM13 itself points to game:1458, which builds no array.",
+   "evidence": "docs/reports/2026-10-16-three-teams-core.md:31; game:1458 (no array allocation); GW16 evidence calls STATUS stale.",
+   "fix_op": "{\"id\": \"CM13\", \"field\": \"evidence\", \"op\": \"replace\", \"find\": \"STATUS health (STATUS.md:118): syncSimWorld 561 B per call from the houses fallback array (team-prep-fixes PERF-4, :101).\", \"text\": \"STATUS health (STATUS.md:118) still lists syncSimWorld at 561 B per call from the houses fallback array (team-prep-fixes PERF-4, :101); that array has since been removed (reports/2026-10-16-three-teams-core.md:31; game:1458 builds none), so the figure is stale.\"}"
+  }
+ ],
+ "CD": [
+  {
+   "ref": "engine-architect#11",
+   "reviewer": "engine-architect",
+   "id": "CD5",
+   "field": "look_brief_pending",
+   "severity": "should",
+   "problem": "The rule 'every row whose output a player sees' is applied inconsistently to the same camera. CD5 holds the camera's framing numbers and the PerspectiveCamera, and has look_brief_pending false. GP4, the rig that uses them, has it true with the reason 'The camera angle and FOV shape what the player sees, so the look brief may retune them.'",
+   "evidence": "after-GP.json GP4: look_brief_pending true; final-CD.json CD5: false. core:68 (camHeight 40, camBack 56.6, fov 15), core:161 PerspectiveCamera(T.fov,...).",
+   "fix_op": "{\"id\": \"CD5\", \"field\": \"look_brief_pending\", \"op\": \"set\", \"text\": \"true\"}"
+  },
+  {
+   "ref": "engine-architect#13",
+   "reviewer": "engine-architect",
+   "id": "CD11",
+   "field": "v2_note",
+   "severity": "nit",
+   "problem": "The row is marked Rust, but TUNE.ai.roles (push, objective, hunt) is a bot rule that LOOP_V2 §10 replaces. GN9 says so; CD11 keeps it silently.",
+   "evidence": "core:104 ai:{..., roles:['push','objective','hunt']}; LOOP_V2.md §10: role mix per team (for example 40 % centre, 30 % uplinks, 30 % harvesters); GN9 reason cites §10.",
+   "fix_op": "{\"id\": \"CD11\", \"field\": \"v2_note\", \"op\": \"append\", \"text\": \" TUNE.ai.roles (push, objective, hunt) does not carry over as a rule: LOOP_V2 §10 replaces it with a role mix per team (GN9).\"}"
+  },
+  {
+   "ref": "netcode-architect#1",
+   "reviewer": "netcode-architect",
+   "id": "CD8",
+   "field": "what",
+   "severity": "blocking",
+   "problem": "False claim: weaponPitchMax is called 'the aim pitch limit' in a row marked rewrite in Rust. It does not limit aim. It only clamps how far the held gun model pitches on screen (cosmetic). Shots aim straight at aimPoint with no clamp. Porting it into the sim as an aim limit would add a rule the legacy game never had.",
+   "evidence": "The only reader is pitchWeapon at shamble-game.js:1431, which sets wpn.rotation.x, a cosmetic node. fireOnce aims with aimDir = aimPoint - fire origin (shamble-game.js:1473), with no pitch clamp. grep weaponPitchMax finds only core:88 and game:1431.",
+   "fix_op": "{\"id\": \"CD8\", \"field\": \"what\", \"op\": \"replace\", \"find\": \"and the aim pitch limit 0.85.\", \"text\": \"and weaponPitchMax 0.85, which only clamps the held gun model's visual pitch (pitchWeapon, shamble-game.js:1431), not the shot direction (fireOnce aims at aimPoint, shamble-game.js:1473), so it belongs with the client's animation data.\"}"
+  },
+  {
+   "ref": "graphics-engineer#5",
+   "reviewer": "graphics-engineer",
+   "id": "CD5",
+   "field": "look_brief_pending",
+   "severity": "should",
+   "problem": "Look rule (a): the camera framing values (fov 15, height 40, boom 56.6, yaw 45 degrees) decide what the player sees. GP4, the camera rig that uses these same values, is flagged look brief pending ('the look brief may retune them'), but CD5 is not. The two rows contradict each other.",
+   "evidence": "after-CD.json CD5 look_brief_pending false; after-GP.json GP4 look_brief_pending true, v2_note 'The camera angle and FOV shape what the player sees, so the look brief may retune them.' shamble-core.js:68, :161.",
+   "fix_op": "{\"id\": \"CD5\", \"field\": \"look_brief_pending\", \"op\": \"set\", \"text\": \"true\"}"
+  },
+  {
+   "ref": "graphics-engineer#6",
+   "reviewer": "graphics-engineer",
+   "id": "CD15",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "'Keep the pixel-ratio cap (2)' is an unmeasured budget recommendation that conflicts with the VISION_V2 §4 minimum (integrated graphics, largest mode, 30+ fps on Low). On a HiDPI laptop a ratio of 2 shades 4x the pixels of a ratio of 1, on top of MSAA (antialias:true) and the overdraw from inverted hulls. The cap should be set per quality tier and measured.",
+   "evidence": "shamble-core.js:147 `new THREE.WebGLRenderer({antialias:true})`; :156 `setPixelRatio(Math.min(devicePixelRatio,2))`. docs/VISION_V2.md:52 gives the minimum target. No row or report measures the effect of the pixel ratio.",
+   "fix_op": "{\"id\": \"CD15\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Keep the pixel-ratio cap (2)\", \"text\": \"Keep a pixel-ratio cap, but set it per quality tier (legacy caps at 2 with MSAA on; at ratio 2 a HiDPI laptop shades 4x the pixels of ratio 1, unmeasured against the VISION_V2 §4 Low target: a spike measures GPU frame time at ratio 1 and 2 on integrated graphics)\"}"
+  },
+  {
+   "ref": "game-designer#0",
+   "reviewer": "game-designer",
+   "id": "CD13",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "'Officer at tier 2 (already so)' says legacy already matches LOOP_V2, but the gate is one tier-up earlier in legacy. Legacy eras start at 1, and a unit of tier t can be bought once era >= t. So the Officer (and the Juggernaut) unlock after the FIRST era-up. LOOP_V2 §4 unlocks T2 units at Tech 2, which is the SECOND tier-up, because Tech 1 is spent on class abilities.",
+   "evidence": "shamble-game.js:701 teamEco era:1; :1178 unitStatus `(u.tier||1) > teamEco[PLAYER_TEAM].era` -> 'era'; :1358 the same for vehicles; LOOP_V2.md:53-60 tier table (Tech 0 T1 units, Tech 1 abilities, Tech 2 Officer/Javelin/Juggernaut).",
+   "fix_op": "{\"id\": \"CD13\", \"field\": \"v2_note\", \"op\": \"replace\", \"find\": \"Officer at tier 2 (already so)\", \"text\": \"Officer at tier 2 (legacy labels it tier 2 but unlocks it one tier-up earlier: eras start at 1 and a tier-t unit is buyable at era t, shamble-game.js:701 and :1178, so legacy's Officer and Juggernaut arrive at what LOOP_V2 calls Tech 1, not Tech 2)\"}"
+  },
+  {
+   "ref": "game-designer#5",
+   "reviewer": "game-designer",
+   "id": "CD13",
+   "field": "v2_note",
+   "severity": "should",
+   "problem": "'Keep the counter triangle' reads as if the legacy numbers already produce it. Nothing measured it: no sim or harness tests class against class. Bots also use a separate weapon model that is about 1.5 to 40 times weaker than the player's weapon for the same class (the ratio depends on the class). So no legacy number shows balance between equal soldiers, and in v2 bots fill slots alongside humans. From the player numbers, the Peacekeeper-beats-Warrior side leans on the Riot Shield, which LOOP_V2 §4 locks until Tech 1.",
+   "evidence": "Bot fire shamble-game.js:2913 (burst of eu.burst at eu.fireInterval, then T.enemyBurstPause 4.5 + up to 0.6 s) and :1627 (flat eu.enemyDmg). Bot DPS if every shot hits = burst x enemyDmg / ((burst-1) x interval + 4.8): Conscript 32/5.19 = 6.2, Warrior 30/5.25 = 5.7, Peacekeeper 6/4.8 = 1.25. Player sustained DPS (WEAPONS): AMK 34/3.5 = 9.7; Bagpipe 2 x 8 x 11 / (0.85 + 2.6) = 51; Shabzon 36 x 8 / (35 x 0.072 + 1.9) = 65. TTK with body hits and no abilities: Warrior on Conscript 13 hits = 0.86 s, Conscript on Warrior 4 shots and 3 reloads = 10.5 s; Peacekeeper on Warrior 11 of 16 pellets = 0.85 s, otherwise 3.45 s, against Warrior on Peacekeeper 19 hits = 1.30 s; Conscript beats Peacekeeper only beyond Bagpipe range 34 m. HP 100/150/120 (UNIT_TYPES).",
+   "fix_op": "{\"id\": \"CD13\", \"field\": \"v2_note\", \"op\": \"append\", \"find\": \"\", \"text\": \" Not measured in legacy: no sim or harness tests class against class, and bots fire a separate, weaker model (enemyDmg in bursts, then a 4.5-5.1 s pause, shamble-game.js:2913 and :1627): about 6.2 DPS for a bot Conscript, 5.7 for a Warrior and 1.25 for a Peacekeeper if every shot hits, against player sustained DPS of about 9.7 (AMK), 51 (Bagpipe, all pellets) and 65 (Shabzon). From the player numbers (body hits, no abilities): a Warrior kills a Conscript in 0.86 s against 10.5 s the other way; a Conscript beats a Peacekeeper only beyond the Bagpipe's 34 m; a Peacekeeper kills a Warrior in 0.85 s only if 11 of its 16 pellets land (else 3.45 s, against the Warrior's 1.30 s), so that side leans on the Riot Shield, which LOOP_V2 §4 locks until Tech 1. v2 needs one weapon model for bots and humans and sims of each matchup (3+ runs) before keeping these values.\"}"
+  }
+ ]
+}

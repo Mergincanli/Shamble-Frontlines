@@ -1,0 +1,42 @@
+[
+ {
+  "ref": "verifier-core#6",
+  "reviewer": "verifier-core",
+  "id": "CM14",
+  "field": "system",
+  "severity": "should",
+  "problem": "Duplicate row: CM14 and CC12 describe the same system (makeSword, makeAxe, makeShield, MELEE_IDLE at core:1434-1472), and both appear in docs/LEGACY_INVENTORY.md. That breaks 'one row per system'. CC12 is the fuller row: it has the broken block flash confirmed by eval, the hard-coded teal and the call sites. CM14's Where also leaves out game:1666 (swing mesh pick) and game:2746 (block flash).",
+  "evidence": "docs/LEGACY_INVENTORY.md:128 (CC12) and :149 (CM14); both Where fields cite core:1434-1472. Plan.md:19 'one row per system'. I re-ran the CC12 claim with xvfb-run node tools/preview.js . eval: NPR true, userData.boss MeshStandardMaterial, bossRendered false, all 7 shield meshes MeshToonMaterial.",
+  "fix_op": ""
+ },
+ {
+  "ref": "verifier-core#7",
+  "reviewer": "verifier-core",
+  "id": "CL5",
+  "field": "v2_note",
+  "severity": "should",
+  "problem": "Duplicate row. The note says 'The CC area also lists applyVillain: keep one row when assembling', but the assembled inventory still has both CL5 and CC7 (Empire villain look, applyVillain). Either merge them or remove the stale note.",
+  "evidence": "docs/LEGACY_INVENTORY.md:100 (CL5) and :123 (CC7 'Empire villain look (applyVillain)'); after-CC.json CC7 where cites applyVillain.",
+  "fix_op": ""
+ },
+ {
+  "ref": "verifier-game1#4",
+  "reviewer": "verifier-game1",
+  "id": "GA2",
+  "field": "state",
+  "severity": "should",
+  "problem": "Systemic, at the header level. LEGACY_INVENTORY.md:31 defines [M] as citing a measurement 'in a report under docs/reports/ or by a harness in tools/'. Many M rows in this group cite only docs/ANIMATION_PLAN.md §6 (headless snippets not checked into tools/: 'rebuild them from this list if lost') or docs/AUDIT_BUGS_PERF.md, neither of which is in docs/reports/ or tools/. Affected rows: GA2, GA4, GA5, GA6, GA8, GA9, GA11 (ANIMATION_PLAN only); GW3, GW8, GW17, GW19, GC3, GC6, GC8, GC10 (AUDIT plus docs only). Every number these rows cite was confirmed against its source, so only the definition is off.",
+  "evidence": "docs/LEGACY_INVENTORY.md:31; docs/ANIMATION_PLAN.md:63 '## 6. Verification targets (headless snippets; rebuild them from this list if lost)'; ls tools/ has no animation-metrics harness; AUDIT_BUGS_PERF.md sits at docs/, not docs/reports/.",
+  "fix_op": ""
+ },
+ {
+  "ref": "engine-architect#1",
+  "reviewer": "engine-architect",
+  "id": "LEGACY_INVENTORY.md",
+  "field": "section 'Not covered and not verified' (game and editor lists)",
+  "severity": "blocking",
+  "problem": "Wrong numbers. The page says 36 game and 56 editor declarations are 'neither named nor inside a cited range'. Most of them sit inside ranges that rows cite. The coverage script misses every bare ':NNN' reference that follows the first file:line in a Where field, because its lookbehind (?<![\\w.#x/:]) excludes a digit after ':'. Examples: _fireO (game:1419) is in GC5's ':1419'; damageHarvester (game:848) is in GE6's ':848-851'; _occHit (game:2556) is in GW17's ':2556-2558'; _arcGeo (game:1702) is in GC13's ':1702-1705'. This is outside the engine-architect lens, but it is a false count on the page.",
+  "evidence": ".checkpoints/r7-legacy-inventory/coverage-final.cjs:47 (the regex). coverage-final.json lists _fireO:1419, damageHarvester:848, _occHit:2556, _arcGeo:1702 and _v:1110 as unnamed. game:1419 is `const FIRE_H=1.9, FIRE_R=0.3, FIRE_F=0.35, _fireO=new THREE.Vector3();`. I recounted with ':' allowed before a bare number (cur file kept, reset on any .md/.html/tools ref). Game drops from 36 to 8 (eraUsEl, eraFillUsEl, eraNumUsEl, eraThemEl, eraHudEl at game:2418; _eraF, _eraTF, _eraH at game:2419). Editor drops from 56 to 2 (ovHostileSpawn editor:503, _rulesFmt editor:787).",
+  "fix_op": ""
+ }
+]
