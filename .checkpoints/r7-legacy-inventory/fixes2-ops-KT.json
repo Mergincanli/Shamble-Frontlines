@@ -60,7 +60,7 @@
   "field": "v2_note",
   "op": "append",
   "find": "",
-  "text": "Since 2026-10-25 (session edit, after kit-v3-0): one routine, 'Night shift' (trig_019LtRqmAdzddyk6K3e3kDJz, CRON_TZ=Europe/Amsterdam 10 0-7 * * *), wakes one dedicated session that has the repository attached, hourly from 00:10 to 07:10 Amsterdam; the three routines above stay disabled. kit-v3-0's NIGHT_SHIFT.md rule 2 counts only comments by the Mergincanli account, which closes the outsider part of the STATUS.md:105 gap."
+  "text": "Since 2026-10-25 (session edits, after kit-v3-0): one routine, 'Night shift' (trig_019LtRqmAdzddyk6K3e3kDJz, CRON_TZ=Europe/Amsterdam 10 0-8 * * *), wakes one dedicated session that has the repository attached, hourly from 00:10 to 08:10 Amsterdam (08:10 finish-only, Advisor decision NS-1). The three routines above are disabled and are to be deleted (Advisor decision NS-2; they were created in the web app, so only Mustafa can delete them). kit-v3-0's NIGHT_SHIFT.md rule 2 counts only comments by the Mergincanli account, which closes the outsider part of the STATUS.md:105 gap."
  },
  {
   "id": "KT14",

@@ -55,7 +55,11 @@
 - Side work, not R7 (Mustafa asked, 2026-10-25 17:10): the Night shift routine trig_019LtRqmAdzddyk6K3e3kDJz wakes
   the dedicated session session_01PgUuEsdxACFrGDZL6SfcqD (repo attached, Opus 5.5, auto) at
   `CRON_TZ=Europe/Amsterdam 10 0-7 * * *`; setup check passed; the old repo-less trig_01Rp6QUaUTjj943CibAD5W6p is
-  deleted. Open: NS-1 (add an 08:10 finish-only wake-up?) and NS-2 (delete the three old disabled routines?).
+  deleted. Advisor 2026-10-25: NS-1 (b) done (cron now `10 0-8`, the night session told); NS-2 (a): the API refused
+  (web-app routines), so Mustafa deletes trig_01T8Gjr1xk1gG1Jf3beYV1xq, trig_01KEaCB725bRjEaHD9fn2QKq,
+  trig_012NWfZ7skzEapaohx12Zteu. PR #25: Mustafa said "merge #25" before any advisor review existed; the advisor
+  review of head 05202be runs (notes advisor-pr25.md). WRITE-GUARD audit for kit-v3-1 runs as workflow
+  wf_e24159e7-346 (notes in the scratchpad kit-v3-1/). The stuck PR Advisor run waits on `npm ci` (ask rule).
 
 ## Running work
 - Workflow r7-final-review · run wf_4e8e0798-666 · task ws35vt5h9 · script as launched:

@@ -21,3 +21,7 @@ F11 should GP14 v2_note 'Port the order...' lists an order that is not legacy (l
 F12 should CD5 lbp False while GP4 (same camera) True.
 F13 should page 'Not covered' list: coverage-final.cjs regex lookbehind (?<![\w.#x/:]) skips ':848-851' style refs -> e.g. damageHarvester (GE6 :848-851), _fireO (GC5 :1419), _occHit (GW17 :2556-2558), _arcGeo (GC13 :1702-1705) wrongly listed as 'neither'.
 F14 nit CS1 'repo-wide grep finds no reader' - tools/tuning-dump.js:12 lists BTN (dump only).
+Verified extra: CS4 primitives run on real code (node, scratchpad prim.js): inside torso -1, inside head 0, vertical 2.98 - row correct. Coverage recount with ':' refs: game 36->8 (era HUD handles 2418-2419), editor 56->2 (ovHostileSpawn 503, _rulesFmt 787).
+F15 nit CD11: TUNE.ai.roles replaced by LOOP_V2 §10 (GN9) not said.
+Findings on: CD5 CD11 CS1 CS5 CS8(x3) CM13 GW13 GW15 GW16 GE5 GE8 GN5 GP2 GP14 + page Not-covered list. All other 93 checked rows confirmed.
+DONE
