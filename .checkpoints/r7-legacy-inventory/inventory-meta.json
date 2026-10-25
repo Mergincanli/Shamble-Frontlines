@@ -1,0 +1,20 @@
+{
+ "missing": 68,
+ "added": 9,
+ "widened": 45,
+ "rejected": 73,
+ "v2_confirmed": 13,
+ "v2_corrected": 41,
+ "v2_refuted": 0,
+ "added_ids": [
+  "CL14",
+  "CS11",
+  "GW20",
+  "GW21",
+  "GC19",
+  "ED16",
+  "KT19",
+  "KT20",
+  "KT21"
+ ]
+}
