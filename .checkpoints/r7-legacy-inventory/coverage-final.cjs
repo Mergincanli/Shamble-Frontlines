@@ -12,7 +12,8 @@ const rows = [];
 const first = JSON.parse(fs.readFileSync(`${D}/rows-and-checks.json`, 'utf8'));
 for (const c of CODES) {
   // R7_FIRST=1: the readers' first-pass rows, to compare with the coverage critic's count
-  const j = process.env.R7_FIRST ? first[c].rows : JSON.parse(fs.readFileSync(`${D}/final-${c}.json`, 'utf8'));
+  const file = fs.existsSync(`${D}/after-${c}.json`) ? `${D}/after-${c}.json` : `${D}/final-${c}.json`;
+  const j = process.env.R7_FIRST ? first[c].rows : JSON.parse(fs.readFileSync(file, 'utf8'));
   for (const r of (Array.isArray(j) ? j : j.rows)) {
     const f = fixes[r.id];
     if (f && f._remove) continue;

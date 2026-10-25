@@ -32,8 +32,8 @@ MARKS = ['rewrite in Rust', 'port to TypeScript', 'redesign', 'drop']
 FIELDS = ['id', 'system', 'what', 'where', 'evidence', 'state', 'v2_note', 'mark', 'reason', 'look_brief_pending']
 
 rows = {}
-for c in CODES:
-    r = json.load(open(f'{D}/final-{c}.json'))
+for c in CODES:  # after-<area>.json: the second skeptics' corrections applied by apply-ops.py
+    r = json.load(open(f'{D}/after-{c}.json' if os.path.exists(f'{D}/after-{c}.json') else f'{D}/final-{c}.json'))
     rows[c] = r['rows'] if isinstance(r, dict) else r
 fixes = json.load(open(f'{D}/fixes2.json')) if os.path.exists(f'{D}/fixes2.json') else {}
 used, removed = set(), {}
