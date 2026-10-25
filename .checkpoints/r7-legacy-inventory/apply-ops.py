@@ -1,6 +1,6 @@
 # R7: applies the second skeptics' corrections, written as edit operations, to an area's final rows.
 # Run from the repo root: python3 -I .checkpoints/r7-legacy-inventory/apply-ops.py <AREA>
-# Reads final-<AREA>.json and fixes2-ops-<AREA>.json; writes after-<AREA>.json; prints every touched field before and
+# Reads final-<AREA>.json, fixes2-ops-<AREA>.json and fixes3-ops-<AREA>.json if present; writes after-<AREA>.json; prints every touched field before and
 # after. An op is {"id", "field", "op": "set"|"replace"|"append", "find", "text"}:
 #   set: the field becomes text (look_brief_pending: "true" or "false");
 #   replace: find must occur exactly once in the field, and is replaced by text;
@@ -13,8 +13,11 @@ a = sys.argv[1]
 FIELDS = ['system', 'what', 'where', 'evidence', 'state', 'v2_note', 'mark', 'reason', 'look_brief_pending']
 rows = json.load(open(f'{D}/final-{a}.json'))
 rows = rows['rows'] if isinstance(rows, dict) else rows
-ops = json.load(open(f'{D}/fixes2-ops-{a}.json'))
-ops = ops['ops'] if isinstance(ops, dict) else ops
+ops = []
+for name in (f'fixes2-ops-{a}.json', f'fixes3-ops-{a}.json'):  # fixes3: the final review's fixes, applied after
+    try: o = json.load(open(f'{D}/{name}'))
+    except FileNotFoundError: continue
+    ops += o['ops'] if isinstance(o, dict) else o
 by_id = {r['id']: r for r in rows}
 before = {}
 for i, o in enumerate(ops):

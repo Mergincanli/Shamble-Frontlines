@@ -75,5 +75,12 @@
   "op": "replace",
   "find": "bootEditor :1095 edSnapBtn click",
   "text": "bootEditor :1095 edSnapBtn click; :873 edRotateSnap, :903-905 inspector step buttons; :1096 edRotBtn click; shamble-game.js:3255 G key -> edToggleSnap, :3293 Shift+Wheel -> edRotateSel (shamble-editor.js:158); shamble-editor.js:222 edNudge uses edSnap"
+ },
+ {
+  "id": "ED2",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "The N-S/E-W mirror becomes live three-team symmetry at 120°",
+  "text": "The two-axis mirror (Off / X / Z) becomes live three-team symmetry at 120°"
  }
 ]

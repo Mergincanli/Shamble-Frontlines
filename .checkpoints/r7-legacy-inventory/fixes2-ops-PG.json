@@ -19,5 +19,12 @@
   "op": "set",
   "find": "",
   "text": "Keep: the DOM HUD over a WebGL canvas, writes only on change, pooled damage numbers, and the cursor-following reticle (the Foxhole camera in the CLAUDE.md vision line). LOOP_V2 §7 feel kit (hit marker, kill confirm) and split feedback (hit feedback arrives when the hit is confirmed) change when the marker fires. The active reload (LOOP_V2 §7) needs a timing window on the reload bar or ring. Weapon slots, if v2 shows them, must be built from loadout data (legacy builds none). The credits readout becomes the personal $ readout (LOOP_V2 §3). The tier label is the remnant of the gun-game rank display (its pips are dead, PG17)."
+ },
+ {
+  "id": "PG3",
+  "field": "where",
+  "op": "replace",
+  "find": "(.slot rules :80-85 match no element)",
+  "text": "(.slot rules :81-85 match no element; :80 is the live #slots flex rule)"
  }
 ]

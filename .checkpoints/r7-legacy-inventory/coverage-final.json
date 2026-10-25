@@ -1,0 +1,390 @@
+{
+ "core": {
+  "total": 138,
+  "named": 138,
+  "in_range": 0,
+  "unnamed": []
+ },
+ "game": {
+  "total": 714,
+  "named": 586,
+  "in_range": 92,
+  "unnamed": [
+   {
+    "n": "_hvDir",
+    "l": 821
+   },
+   {
+    "n": "damageHarvester",
+    "l": 848
+   },
+   {
+    "n": "respawnHarvester",
+    "l": 850
+   },
+   {
+    "n": "siloRateEl",
+    "l": 974
+   },
+   {
+    "n": "_v",
+    "l": 1110
+   },
+   {
+    "n": "_p1",
+    "l": 1110
+   },
+   {
+    "n": "_p2",
+    "l": 1110
+   },
+   {
+    "n": "_devWheelT",
+    "l": 1168
+   },
+   {
+    "n": "_sRight",
+    "l": 1414
+   },
+   {
+    "n": "_sUpv",
+    "l": 1414
+   },
+   {
+    "n": "_sDir",
+    "l": 1414
+   },
+   {
+    "n": "_fireO",
+    "l": 1419
+   },
+   {
+    "n": "_melTo",
+    "l": 1669
+   },
+   {
+    "n": "_arcGeo",
+    "l": 1702
+   },
+   {
+    "n": "_arcDots",
+    "l": 1703
+   },
+   {
+    "n": "_arcRing",
+    "l": 1704
+   },
+   {
+    "n": "pips",
+    "l": 1863
+   },
+   {
+    "n": "_progSaveTO",
+    "l": 1955
+   },
+   {
+    "n": "ccIconEl",
+    "l": 2124
+   },
+   {
+    "n": "ccLvlEl",
+    "l": 2124
+   },
+   {
+    "n": "ccPrestEl",
+    "l": 2124
+   },
+   {
+    "n": "ccXpEl",
+    "l": 2124
+   },
+   {
+    "n": "eraUsEl",
+    "l": 2418
+   },
+   {
+    "n": "eraFillUsEl",
+    "l": 2418
+   },
+   {
+    "n": "eraNumUsEl",
+    "l": 2418
+   },
+   {
+    "n": "eraThemEl",
+    "l": 2418
+   },
+   {
+    "n": "eraHudEl",
+    "l": 2418
+   },
+   {
+    "n": "_eraF",
+    "l": 2419
+   },
+   {
+    "n": "_eraTF",
+    "l": 2419
+   },
+   {
+    "n": "_eraH",
+    "l": 2419
+   },
+   {
+    "n": "_occHit",
+    "l": 2556
+   },
+   {
+    "n": "_occRec",
+    "l": 2556
+   },
+   {
+    "n": "_occBox",
+    "l": 2556
+   },
+   {
+    "n": "_occSX",
+    "l": 2557
+   },
+   {
+    "n": "_occSY",
+    "l": 2557
+   },
+   {
+    "n": "_occSZ",
+    "l": 2557
+   }
+  ]
+ },
+ "editor": {
+  "total": 353,
+  "named": 233,
+  "in_range": 64,
+  "unnamed": [
+   {
+    "n": "_pv1",
+    "l": 59
+   },
+   {
+    "n": "_pv2",
+    "l": 59
+   },
+   {
+    "n": "_pvAim",
+    "l": 59
+   },
+   {
+    "n": "edGizmoMode",
+    "l": 77
+   },
+   {
+    "n": "edRotDrag",
+    "l": 77
+   },
+   {
+    "n": "_edRotMoved",
+    "l": 77
+   },
+   {
+    "n": "_edRotPrev",
+    "l": 77
+   },
+   {
+    "n": "_edRing",
+    "l": 77
+   },
+   {
+    "n": "_edHandles",
+    "l": 78
+   },
+   {
+    "n": "_edHBox",
+    "l": 78
+   },
+   {
+    "n": "_edGizmo",
+    "l": 83
+   },
+   {
+    "n": "edAxisDrag",
+    "l": 83
+   },
+   {
+    "n": "edResizeDrag",
+    "l": 83
+   },
+   {
+    "n": "_edGizmoMoved",
+    "l": 83
+   },
+   {
+    "n": "_edResizeMoved",
+    "l": 83
+   },
+   {
+    "n": "_edAxisPrev",
+    "l": 83
+   },
+   {
+    "n": "_edRzS0",
+    "l": 83
+   },
+   {
+    "n": "_edRzStartDist",
+    "l": 83
+   },
+   {
+    "n": "_edEnsureRing",
+    "l": 115
+   },
+   {
+    "n": "edUpdateRing",
+    "l": 119
+   },
+   {
+    "n": "_edRingPick",
+    "l": 120
+   },
+   {
+    "n": "_edGroundAngle",
+    "l": 121
+   },
+   {
+    "n": "_edStartResize",
+    "l": 122
+   },
+   {
+    "n": "edCycleMirror",
+    "l": 163
+   },
+   {
+    "n": "edUpdateMirrorBtn",
+    "l": 164
+   },
+   {
+    "n": "_mirrorDesc",
+    "l": 165
+   },
+   {
+    "n": "edMirrorOne",
+    "l": 166
+   },
+   {
+    "n": "clUndoPush",
+    "l": 298
+   },
+   {
+    "n": "edMeasA",
+    "l": 476
+   },
+   {
+    "n": "edMeasB",
+    "l": 476
+   },
+   {
+    "n": "_measSeg",
+    "l": 476
+   },
+   {
+    "n": "_measDotA",
+    "l": 476
+   },
+   {
+    "n": "_measDotB",
+    "l": 476
+   },
+   {
+    "n": "_measLabel",
+    "l": 476
+   },
+   {
+    "n": "measReset",
+    "l": 491
+   },
+   {
+    "n": "ovSpawnOn",
+    "l": 495
+   },
+   {
+    "n": "_ovSpawnSig",
+    "l": 495
+   },
+   {
+    "n": "ovHostileSpawn",
+    "l": 503
+   },
+   {
+    "n": "ovSymAxis",
+    "l": 530
+   },
+   {
+    "n": "_ovSymSig",
+    "l": 530
+   },
+   {
+    "n": "_ovTmpC",
+    "l": 531
+   },
+   {
+    "n": "_ovTmpS",
+    "l": 531
+   },
+   {
+    "n": "_ovTmpB",
+    "l": 531
+   },
+   {
+    "n": "_edOrthoH",
+    "l": 646
+   },
+   {
+    "n": "_edOrthoA",
+    "l": 646
+   },
+   {
+    "n": "edCam",
+    "l": 648
+   },
+   {
+    "n": "edSyncOrtho",
+    "l": 649
+   },
+   {
+    "n": "edToggleOrtho",
+    "l": 652
+   },
+   {
+    "n": "_edRulesCtl",
+    "l": 769
+   },
+   {
+    "n": "_rulesFmt",
+    "l": 787
+   },
+   {
+    "n": "edInspBody",
+    "l": 863
+   },
+   {
+    "n": "edInspKind",
+    "l": 863
+   },
+   {
+    "n": "_edInspRef",
+    "l": 864
+   },
+   {
+    "n": "_edInspHidden",
+    "l": 864
+   },
+   {
+    "n": "_edLibCollapsed",
+    "l": 864
+   },
+   {
+    "n": "_edLibMode",
+    "l": 864
+   }
+  ]
+ }
+}

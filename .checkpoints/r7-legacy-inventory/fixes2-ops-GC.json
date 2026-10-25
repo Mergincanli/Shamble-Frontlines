@@ -201,5 +201,19 @@
   "op": "set",
   "find": "",
   "text": "Health is authoritative sim state and regen decides who survives the next fight, if v2 keeps it: LOOP_V2 is silent, so keeping it is Mustafa's decision."
+ },
+ {
+  "id": "GC3",
+  "field": "what",
+  "op": "replace",
+  "find": "syncSimWorld (:1124).",
+  "text": "syncSimWorld (:1125)."
+ },
+ {
+  "id": "GC13",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "grenades and Molotovs both preview and launch from the animated muzzle (getMuzzle, 1760 and 1406), so animation picks the throw origin",
+  "text": "grenades preview and launch from the animated muzzle (getMuzzle, 1733 and 1760) and Molotovs launch from it with no preview (getMuzzle, 1406; thrown on fire, 1469), so animation picks the throw origin"
  }
 ]

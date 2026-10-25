@@ -105,9 +105,10 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      'holds on both. In the Where column, `core`, `game` and `editor` mean those three files.', '',
      '**How each state was checked:**',
      f'- **[C]** ({states["C"]} rows): code read at main; every Where re-opened by a second reader.',
-     f'- **[M]** ({states["M"]} rows): measured, in a report under `docs/reports/` or by a harness in `tools/`; the row names it.',
-     f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.', '',
-     '**How this file was made.** Four passes, each by Opus agents at effort high, with notes on checkpoints:',
+     f'- **[M]** ({states["M"]} rows): the row also cites a measurement, in a report under `docs/reports/` or by a harness in'
+     ' `tools/`, and names it.'] + ([f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.']
+     if states['D'] else ['- No row rests on a doc claim alone ([D]): every row was read in the code.']) + ['',
+     '**How this file was made.** Five passes, each by Opus agents at effort high, with notes on checkpoints:',
      f'1. Read: one reader per area (15) wrote {first} rows, each citing file:line.',
      f'2. Verify: one skeptic per area re-opened every Where and every number and tried to refute it: {v1["confirmed"]}',
      f'   confirmed, {v1["corrected"]} corrected, {v1.get("refuted", 0)} refuted. They also listed {meta["missing"]} systems no row covered.',
@@ -116,9 +117,12 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      f'4. Edit and re-verify: one editor per area applied every correction, added or widened rows for the missing systems',
      f'   and the critic\'s suggestions ({meta["added"]} rows added, {meta["widened"]} widened, {meta["rejected"]} suggestions not taken,',
      f'   each with a reason), and a second skeptic checked every added or widened row ({meta["v2_confirmed"]} confirmed,',
-     f'   {meta["v2_corrected"]} corrected, {meta["v2_refuted"]} refuted; corrections applied, refuted rows removed or fixed).']
+     f'   {meta["v2_corrected"]} corrected, {meta["v2_refuted"]} refuted).',
+     f'5. Apply and check: one applier per area turned the {meta["v2_corrected"]} corrections into exact edits, a script applied them,',
+     f'   and one checker per area compared every change with its correction and the code ({meta["check_fixes"]} more fixes, applied).',
+     f'   One session edit: KT14 records the night-shift routine set up on 2026-10-25.']
 if cov:
-    L += [f'   Coverage after the edit pass (top-level declarations named in some row\'s Where, mechanical match): ' +
+    L += [f'   Coverage after these passes (top-level declarations named in some row\'s Where, mechanical match): ' +
           ', '.join(f'{f} {cov[f]["named"]}/{cov[f]["total"]}' for f in ('core', 'game', 'editor')) + '.']
 L += ['', 'The notes of every pass are in the history of the R7 branch (`.checkpoints/r7-legacy-inventory/`, removed in',
       'the last commit before review, as `.claude/CHECKPOINTS.md` §9 requires).', '']
@@ -155,7 +159,7 @@ if cov:
         L.append(f'- **{f}**: {cov[f]["in_range"]} top-level declarations are not named but sit inside a line range a row'
                  f' cites (scratch vectors, DOM handles, small helpers of that row\'s system). {len(un)} are neither named nor'
                  ' inside a cited range' + (': ' + ', '.join(f'`{d["n"]}` ({f}:{d["l"]})' for d in un) + '.' if un else '.'))
-L += [f'- **[D] rows** ({states["D"]}): doc claims, not re-checked; each names its doc.',
+L += ([f'- **[D] rows** ({states["D"]}): doc claims, not re-checked; each names its doc.'] if states['D'] else []) + [
       '- **Marks** are recommendations; none is a decision until Mustafa confirms it.',
       '- **The look**: no row decides it; the look pipeline row says "redesign (look brief pending)" and nothing more.', '']
 open('docs/LEGACY_INVENTORY.md', 'w').write('\n'.join(L))

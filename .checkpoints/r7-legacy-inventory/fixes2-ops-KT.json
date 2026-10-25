@@ -47,5 +47,26 @@
   "op": "replace",
   "find": "The legacy file moves to legacy/ in phase 1 with the frozen code.",
   "text": "Where this page goes in phase 1 is not stated: only the legacy game's five files are named as moving to legacy/ (CLAUDE.md:19, V2_PHASE0_BRIEF.md:10)."
+ },
+ {
+  "id": "KT20",
+  "field": "evidence",
+  "op": "replace",
+  "find": "(STATUS.md:113-117, KT16)",
+  "text": "(STATUS.md:113-126, KT16)"
+ },
+ {
+  "id": "KT14",
+  "field": "v2_note",
+  "op": "append",
+  "find": "",
+  "text": "Since 2026-10-25 (session edit, after kit-v3-0): one routine, 'Night shift' (trig_019LtRqmAdzddyk6K3e3kDJz, CRON_TZ=Europe/Amsterdam 10 0-7 * * *), wakes one dedicated session that has the repository attached, hourly from 00:10 to 07:10 Amsterdam; the three routines above stay disabled. kit-v3-0's NIGHT_SHIFT.md rule 2 counts only comments by the Mergincanli account, which closes the outsider part of the STATUS.md:105 gap."
+ },
+ {
+  "id": "KT14",
+  "field": "reason",
+  "op": "set",
+  "find": "",
+  "text": "kit-v3-0 rewrote the window, the checkpoints and the comment rule (only Mergincanli comments count); what remains is that a status comment cannot prove which run wrote it, since every session posts as Mergincanli."
  }
 ]

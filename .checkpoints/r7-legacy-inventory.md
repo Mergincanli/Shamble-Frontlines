@@ -4,7 +4,7 @@
   `.checkpoints/r7-legacy-inventory/plan.md` (APPROVE with 11 conditions).
 - **Branch:** claude/bold-faraday-i49gug (draft PR #27), restarted from main f2ccc13 after kit-v3-0 merged (PR #26) ·
   **Base:** main f2ccc13 (the engine files are unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds).
-- **Last update:** 2026-10-25 21:44 Amsterdam
+- **Last update:** 2026-10-25 21:51 Amsterdam
 
 ## Steps done
 1. Plan approved with 11 conditions (plan.md, plan-verdict.json). Night queue #16 item 1 made a plain bullet "in
@@ -20,21 +20,23 @@
    73 suggestions not taken, each with a reason; second skeptics on every added or widened row: 13 confirmed,
    41 corrected, 0 refuted. Result: edit-verify-result.json · 70e31f4.
 
+7. Workflow r7-apply-fixes2 (run wf_df83f4d1-1f2, resumed once after the spend limit): 26 agents, 13/13 areas;
+   41 rows corrected by script-applied ops; checkers found 6 more problems (CL14, GC3, GC13, ED2, PG3, KT20), all
+   verified by grep and applied. Session edit: KT14 records the new night-shift routine. Results apply-result.json.
+8. docs/LEGACY_INVENTORY.md built (249 rows: Rust 45, TypeScript 76, redesign 96, drop 32; look brief pending 119;
+   [C] 143, [M] 106); coverage after all passes: core 138/138, game 586 named + 92 in range / 714 (36 neither),
+   editor 233 + 64 / 353 (56 neither); repo map 93/93; gate PASS, symbols +0 -0 · 0c6e2b9.
 ## Current step
-7. Workflow r7-apply-fixes2: per area an applier turns the second skeptic's corrections into edit operations
-   (fixes2-ops-<area>.json), apply-ops.py applies them exactly (after-<area>.json), and a checker compares every change
-   with its correction and the code (applier-<area>.md, checker-<area>.md).
+9. Final review and verification workflow (r7-final-review): verifier spot-checks of every [M] claim and sampled
+   rows; marks lenses (engine-architect, netcode-architect, graphics-engineer, game-designer); a coverage closer for
+   the 92 unplaced declarations. Each returns fix ops; the session applies them with apply-ops.py.
 
 ## Next steps
-1. Count what came back (13 areas: CL CC CM CS GW GA GC GN GE GP ED PG KT; a null → run that area alone); apply the
-   checkers' fix ops; re-run apply-ops.py for every area; save the result as apply-result.json.
-2. Run coverage-final.cjs, then build-inventory.py (needs inventory-meta.json: missing 68, added, widened, rejected 73,
-   second checks 13 confirmed / 41 corrected / 0 refuted) → docs/LEGACY_INVENTORY.md; read it whole.
-3. Add docs/LEGACY_INVENTORY.md to docs/REPO_MAP.md; repo-map-check; gate (symbols +0 −0).
-4. Verifier spot-check of key claims (a workflow); the report docs/reports/2026-10-25-r7-legacy-inventory.md (fold in
-   this checkpoint, the plan verdict, the R7-PUSH note, the STATUS/ROADMAP deferral: PR #25 edits both).
-5. Stop the saver; delete .checkpoints/r7-legacy-inventory* in the last commit; mark PR #27 ready; advisor review;
-   edit #16 item 1 to point to the PR.
+1. Count what came back; verify and apply the fix ops (fixes3-ops-<area>.json, then re-run apply-ops on them); rebuild
+   the page; gate.
+2. The report docs/reports/2026-10-25-r7-legacy-inventory.md (fold in this checkpoint, the plan verdict and how each
+   condition was met, the R7-PUSH note, the STATUS/ROADMAP deferral: PR #25 edits both).
+3. Stop the saver; delete .checkpoints/r7-legacy-inventory* in the last commit; mark PR #27 ready; advisor review.
 
 ## Open findings
 - Coverage (critic): core 138/138, game 584/714, editor 204/353 top-level declarations named by some row; the editor
