@@ -196,8 +196,9 @@ The full rules are in `.claude/CHECKPOINTS.md`. In short:
   (worktrees), merged one at a time.
 - Web pages load without a prompt only from the documentation domains `.claude/settings.json` lists; any other fetch
   asks first (and is refused at night: note the source and move on).
-- Agents never edit source; they write only their notes under `.checkpoints/<task-slug>/`, scratch under `.gate/`, and
-  the docs their own agent file names (research topics, ADR drafts, design docs, docs-keeper's docs). They must cite
+- Agents never edit source, except build work the main session assigns them in an isolated worktree; they write only
+  their notes under `.checkpoints/<task-slug>/`, scratch under `.gate/`, and the docs their own agent file names
+  (research topics, ADR drafts, design docs, docs-keeper's docs). They must cite
   evidence (file:line, numbers, render paths, sources). Weigh their findings; they are not orders.
 
 ## Ultracode and workflows

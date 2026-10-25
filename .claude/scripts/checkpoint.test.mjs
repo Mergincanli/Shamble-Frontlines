@@ -356,3 +356,19 @@ test('code added in a merge commit is never marked [skip ci]', (t) => {
   assert.equal(run(repo, 'save', 'test', '-m', 'after merge').status, 0);
   assert.doesNotMatch(sh(repo, 'log', '-1', '--format=%s'), /skip ci/);
 });
+
+test('URL-encoded JWTs and sk- keys are refused; long kebab-case words are not', (t) => {
+  const { repo } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  const head = sh(repo, 'rev-parse', 'HEAD');
+  const jwt = 'eyJ' + 'a'.repeat(20) + '.eyJ' + 'b'.repeat(20) + '.' + 'c'.repeat(20);
+  for (const [i, text] of [`token%3D${jwt}`, `key%3Dsk-proj-${'K'.repeat(40)}`].entries()) {
+    note(repo, `u${i}.md`, text + '\n');
+    assert.equal(run(repo, 'save', 'test', '-m', 'encoded').status, 1, text.slice(0, 16));
+    assert.equal(sh(repo, 'rev-parse', 'HEAD'), head);
+    rmSync(join(repo, '.checkpoints', `u${i}.md`));
+  }
+  note(repo, 'slug.md', 'branch cs/task-legacy-inventory-and-tuning-tables-for-v2-research\n');
+  assert.equal(run(repo, 'save', 'test', '-m', 'kebab').status, 0);
+});

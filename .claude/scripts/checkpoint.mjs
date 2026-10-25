@@ -27,8 +27,8 @@ const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*ski
 const SECRETS = [
   ['GitHub token', /(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})/],
   ['Anthropic key', /sk-ant-[A-Za-z0-9_-]{20,}/],
-  ['API key', /\bsk-(proj-|svcacct-)?[A-Za-z0-9_-]{32,}/],
-  ['JWT', /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/],
+  ['API key', /(?:^|[^A-Za-z0-9-]|%3[Dd])sk-(proj-|svcacct-)?[A-Za-z0-9_-]{32,}/],
+  ['JWT', /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/],
   ['npm token', /npm_[A-Za-z0-9]{36}/],
   ['Google key', /AIza[0-9A-Za-z_-]{35}/],
   ['AWS key', /\b(AKIA|ASIA)[0-9A-Z]{16}\b/],
