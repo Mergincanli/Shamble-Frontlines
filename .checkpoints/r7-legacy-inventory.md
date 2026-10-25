@@ -47,6 +47,10 @@
   GP game presentation and dispatch · ED editor · PG pages · TL tools · KT kit.
 - R7-PUSH was not raised: kit-v3-0 merged (PR #26) and the R7 commits were pushed to the session branch on 2026-10-25
   at 12:20 UTC; until then they were local only, as plan condition 5 recorded.
+- Side work, not R7 (Mustafa asked, 2026-10-25 17:10): the Night shift routine trig_019LtRqmAdzddyk6K3e3kDJz wakes
+  the dedicated session session_01PgUuEsdxACFrGDZL6SfcqD (repo attached, Opus 5.5, auto) at
+  `CRON_TZ=Europe/Amsterdam 10 0-7 * * *`; setup check passed; the old repo-less trig_01Rp6QUaUTjj943CibAD5W6p is
+  deleted. Open: NS-1 (add an 08:10 finish-only wake-up?) and NS-2 (delete the three old disabled routines?).
 
 ## Running work
 - Workflow r7-edit-verify · run wf_5e9f70f7-c89 · task wkfrj4u3x · script as launched:
