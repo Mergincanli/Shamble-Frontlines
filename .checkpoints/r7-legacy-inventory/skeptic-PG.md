@@ -20,3 +20,13 @@ PG7 DOM ok; aria = aria-current/aria-pressed/aria-hidden/nav aria-label (no per-
 PG9 ok; also load-time IIFEs editor:1133 (Maker docked into generators) and :1246 (World/Rules into #edIEmpty).
 PG10 DOM ok.
 PG11: shop lists Squad classes (1899), Vehicles (1914), Special Weapons (1927), frag (1940); rows' info built by innerHTML string concat at 1903,1918,1931 -> 'textContent' claim wrong.
+PG12: LOOP_V2 §8 keeps career rank as account level (gate 1); adds Service points + 3-gate unlocks; prestige absent -> reason 'replaces XP' wrong.
+PG13: no v2 doc plans the dev panel; §7 Feel Lab only -> reason corrected, mark ok.
+PG14: game:290 reads ANIM.aim.adsK; ANIMATION_PLAN:79 says hold pose legacy. enterCharLab 432.
+PG15: START_HERE §8 :149 (not §7); ROADMAP:71 ok; LOOP_V2 :166 pause ok. keys also [ (3271), Tab 3254, Esc/P 3261.
+PG18/19: editor.html CDN tag at :1256, inline 1260-1267.
+PG20 ok (s-menu 219, s-pause 240, s-record 266, s-armory 321, s-win 336, s-lose 344, script 354, thud 360, tick 365). Mockup has NO scoreboard screen (PG5 note wrong).
+PG7 ok except 'aria labels' wording. PG4, PG6, PG10, PG20 confirmed.
+Missing: #halftone layer (html:30, core:148-150); #credits readout (html:795, game:2415); gun-game rank label/pips (html:540-545, game:1861-1865,3309).
+Verdicts: confirmed PG4 PG6 PG10 PG20; corrected the rest.
+DONE

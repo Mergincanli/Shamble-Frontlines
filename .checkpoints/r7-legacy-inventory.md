@@ -6,7 +6,7 @@
   were cherry-picked onto it and pushed 2026-10-25 12:20 (4ab639a…6d278c4) · **Base:** main f2ccc13 (engine files
   unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds). The running workflow still writes its notes
   into the old worktree; they are copied over when it ends.
-- **Last update:** 2026-10-25 12:25 Amsterdam
+- **Last update:** 2026-10-25 16:56 Amsterdam
 
 ## Steps done
 1. Plan approved with conditions (verdict in plan.md and plan-verdict.json). Night queue #16 item 1 turned into a
@@ -44,6 +44,7 @@
 ## Running work
 - Workflow r7-read-verify · run wf_3552ad56-12f · task w2s0uav6m · script as launched:
   `.checkpoints/r7-legacy-inventory/r7-read-verify-run1.js` (no args) · notes in `.checkpoints/r7-legacy-inventory/` ·
-  launched about 2026-10-25 00:00 Amsterdam · cut off at about 01:00 by the org's monthly spend limit
+  launched about 2026-10-25 00:00 Amsterdam · second cut-off: the coverage critic failed on the org's spend limit
+  (reset 15:20 UTC); 30 of 31 agents done (15 readers, 15 skeptics) · resumed again 16:57 for the critic only · earlier: cut off at about 01:00 by the org's monthly spend limit
   (11 of 27 agents done: 11 readers; failed: readers ED, PG, TL, KT, all 15 skeptics, the coverage critic) · resumed
   2026-10-25 11:25 with resumeFromRunId (task wllinx1zp) · running
