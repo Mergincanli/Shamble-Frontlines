@@ -1,27 +1,43 @@
 #!/usr/bin/env node
-// Checkpoint saver (.claude/CHECKPOINTS.md): commits and pushes ONLY .checkpoints/, on the current cs/ or claude/ branch.
+// Checkpoint saver (.claude/CHECKPOINTS.md): commits ONLY .checkpoints/ on the current cs/ or claude/ branch and pushes
+// that branch (every local commit on it; never main, never forced).
 //   node .claude/scripts/checkpoint.mjs save  <slug> -m <subject> [--trailer <line>]...
 //   node .claude/scripts/checkpoint.mjs watch <slug> [--every <minutes>] [--for <minutes>] [--trailer <line>]...
 // save:  stage .checkpoints/, commit only that path (anything else already staged stays staged), push the branch.
-// watch: for long agent runs, run in the background: every N minutes (default 10) save if .checkpoints/ changed;
-//        stops after --for minutes (default 110), when the branch changes, or on SIGINT/SIGTERM (after a last save).
-//        Minutes may be fractions (the tests use 0.01). Stop it before the pull request is marked ready.
-// Guards: only ^(cs|claude)/... branches (never main, never a detached head); git runs without a shell; the branch is
-// re-read right before each push; never a force push; a refused push is reported and left alone.
-// A commit gets "[skip ci]" only when every commit it pushes touches .checkpoints/ alone; the final commit of a
-// change-set (which deletes the checkpoint) always runs CI. Run from the repository root. Node 22, no dependencies.
-// Exit codes: 0 saved or nothing to save · 1 a git step failed (commit or push) · 2 usage error or refused by a guard.
+// watch: for long agent runs, run in the background with the Bash timeout at its maximum: every N minutes (default 10,
+//        at least 0.01) save if .checkpoints/ changed; stops after --for minutes (default 110, at most 115), when the
+//        branch changes, when the checkpoint file is gone, or on SIGINT/SIGTERM (after a last save). watch never
+//        publishes code: when the branch holds unpushed commits outside .checkpoints/, it commits locally and skips
+//        the push.
+// Guards: only ^(cs|claude)/... branches (never main, never a detached head); .checkpoints/<slug>.md must exist (a
+// finished task's last commit, which deletes it, is made by hand so CI runs); git runs without a shell; the branch is
+// re-read right before each push; never a force push; a refused push is reported and left alone; staged notes that
+// look like a secret (tokens, keys, credentials in URLs) are not committed. The script alone decides "[skip ci]": only
+// when every commit it pushes touches .checkpoints/ alone; skip markers from the caller are refused.
+// Run from the repository root. Node 22, no dependencies.
+// Exit codes: 0 saved or nothing to save · 1 a git step failed or a secret was found · 2 usage error or refused by a guard.
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 
 const DIR = '.checkpoints/';
 const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
 const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
+const SECRETS = [
+  ['GitHub token', /\b(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})/],
+  ['Anthropic key', /\bsk-ant-[A-Za-z0-9_-]{20,}/],
+  ['API key', /\bsk-[A-Za-z0-9]{32,}/],
+  ['AWS key', /\b(AKIA|ASIA)[0-9A-Z]{16}\b/],
+  ['private key', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
+  ['Slack token', /\bxox[abprs]-[A-Za-z0-9-]{10,}/],
+  ['credentials in a URL', /[a-z][a-z0-9+.-]*:\/\/[^\s/:@]+:[^\s/@]+@/i],
+];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (msg) => process.stdout.write(`${new Date().toISOString()} checkpoint: ${msg}\n`);
 const fail = (code, msg) => { process.stderr.write(`checkpoint: ${msg}\n`); process.exit(code); };
 const git = (...args) => {
   try {
-    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false });
+    const out = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false, maxBuffer: 64 << 20 });
     return { ok: true, out: out.trim(), err: '' };
   } catch (e) {
     return { ok: false, out: String(e.stdout || '').trim(), err: String(e.stderr || e.message || '').trim() };
@@ -44,19 +60,24 @@ function parse(argv) {
   if (cmd !== 'save' && cmd !== 'watch') fail(2, 'usage: checkpoint.mjs save|watch <slug> [options] (see the header)');
   if (!SLUG_OK.test(slug || '')) fail(2, `bad slug "${slug}": lowercase letters, digits and dashes`);
   if (cmd === 'save' && !o.subject) fail(2, 'save needs -m <subject>');
-  for (const t of [o.subject || '', ...o.trailers]) if (/[\r\n]/.test(t)) fail(2, 'subject and trailers are one line each');
-  if (!(o.every > 0) || !(o.for > 0)) fail(2, '--every and --for take a positive number of minutes');
+  for (const t of [o.subject || '', ...o.trailers]) {
+    if (/[\r\n]/.test(t)) fail(2, 'subject and trailers are one line each');
+    if (SKIP_MARK.test(t)) fail(2, 'refused: the script alone decides [skip ci]; drop the skip marker');
+  }
+  if (!(o.every >= 0.01) || !(o.for > 0 && o.for <= 115)) fail(2, '--every is at least 0.01 minutes; --for is above 0 and at most 115');
   return o;
 }
 
 const branchAllowed = (b) => BRANCH_OK.test(b) && !b.includes('..');
+const checkpointFile = (o) => `${DIR}${o.slug}.md`;
 
-function branchOrRefuse() {
+function branchOrRefuse(o) {
   if (git('rev-parse', '--is-inside-work-tree').out !== 'true') fail(2, 'not inside a git working tree');
   if (git('rev-parse', '--show-prefix').out !== '') fail(2, 'run from the repository root');
   const b = currentBranch();
   if (!b.ok) fail(2, 'refused: detached HEAD');
   if (!branchAllowed(b.out)) fail(2, `refused: branch "${b.out}" is not a cs/ or claude/ branch`);
+  if (!existsSync(checkpointFile(o))) fail(2, `refused: ${checkpointFile(o)} does not exist (task finished or not started; make a finished task's last commit by hand so CI runs)`);
   return b.out;
 }
 
@@ -71,6 +92,18 @@ function onlyCheckpointsAhead(branch) {
     if (!files.ok || files.out.split('\n').some((f) => f && !f.startsWith(DIR))) return false;
   }
   return true;
+}
+
+// The staged notes that look like a secret: [path, kind] pairs. The secret itself is never printed.
+function stagedSecrets() {
+  const hits = [];
+  const names = git('diff', '--cached', '--name-only', '--diff-filter=AM', '--', DIR).out.split('\n').filter(Boolean);
+  for (const f of names) {
+    const blob = git('show', `:${f}`);
+    if (!blob.ok) continue;
+    for (const [kind, re] of SECRETS) if (re.test(blob.out)) hits.push([f, kind]);
+  }
+  return hits;
 }
 
 async function withLockRetry(fn) {
@@ -97,16 +130,27 @@ async function push(branch) {
   }
 }
 
-async function save(o, branch, subject) {
+async function save(o, branch, subject, background) {
+  if (!existsSync(checkpointFile(o))) { log(`not saved: ${checkpointFile(o)} is gone`); return 2; }
   const add = await withLockRetry(() => git('add', '-A', '--', DIR));
   if (!add.ok) { log(`git add failed: ${add.err}`); return 1; }
   if (git('diff', '--cached', '--quiet', '--', DIR).ok) { log('nothing to save'); return 0; }
-  const skip = onlyCheckpointsAhead(branch);
-  const msg = ['-m', `checkpoint(${o.slug}): ${subject}${skip ? ' [skip ci]' : ''}`];
+  const secrets = stagedSecrets();
+  if (secrets.length) {
+    git('reset', '--quiet', '--', DIR);
+    for (const [f, kind] of secrets) log(`NOT committed: ${f} looks like it holds a ${kind}; remove it, then save again`);
+    return 1;
+  }
+  const codeAhead = !onlyCheckpointsAhead(branch);
+  const msg = ['-m', `checkpoint(${o.slug}): ${subject}${codeAhead ? '' : ' [skip ci]'}`];
   if (o.trailers.length) msg.push('-m', o.trailers.join('\n'));
   const commit = await withLockRetry(() => git('commit', '--quiet', '--only', ...msg, '--', DIR));
   if (!commit.ok) { log(`git commit failed: ${commit.err}`); return 1; }
   const sha = git('rev-parse', '--short', 'HEAD').out;
+  if (background && codeAhead) {
+    log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
+    return 0;
+  }
   const pushed = await push(branch);
   log(`${pushed ? 'saved and pushed' : 'saved locally, NOT pushed'} ${sha} on ${branch}`);
   return pushed ? 0 : 1;
@@ -118,7 +162,7 @@ async function watch(o, branch) {
   const last = async (why) => {
     if (stopping) return;
     stopping = true;
-    if (currentBranch().out === branch) await save(o, branch, `autosave (${why})`);
+    if (currentBranch().out === branch && existsSync(checkpointFile(o))) await save(o, branch, `autosave (${why})`, true);
     log(`watch stopped: ${why}`);
     process.exit(0);
   };
@@ -130,12 +174,13 @@ async function watch(o, branch) {
     if (stopping) return;
     const now = currentBranch();
     if (now.out !== branch) { stopping = true; log(`watch stopped: the branch changed (${now.out || 'detached'})`); process.exit(0); }
-    if (git('status', '--porcelain', '--', DIR).out) await save(o, branch, 'autosave');
+    if (!existsSync(checkpointFile(o))) { stopping = true; log(`watch stopped: ${checkpointFile(o)} is gone (task finished)`); process.exit(0); }
+    if (git('status', '--porcelain', '--', DIR).out) await save(o, branch, 'autosave', true);
     if (Date.now() >= end) await last('time is up');
   }
 }
 
 const o = parse(process.argv.slice(2));
-const branch = branchOrRefuse();
-if (o.cmd === 'save') process.exit(await save(o, branch, o.subject));
+const branch = branchOrRefuse(o);
+if (o.cmd === 'save') process.exit(await save(o, branch, o.subject, false));
 else await watch(o, branch);

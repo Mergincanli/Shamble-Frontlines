@@ -6,7 +6,8 @@ rules 1–5, and §2c). CLAUDE.md "Checkpoints" points here.
 
 ## 1. Who keeps one, and where (brief 2b rule 1)
 - **Every task of more than one step** keeps a checkpoint on its own branch: `.checkpoints/<task-slug>.md`. A task is a
-  change-set, a research topic, a night-shift item, a review of a large diff, or any workflow run. The slug is the
+  change-set, a research topic, a night-shift item, or any workflow run on the task's own branch. A review of someone
+  else's pull request keeps notes (§4) but never commits or pushes them to the branch under review. The slug is the
   branch's slug (`cs/kit-v3-0` → `kit-v3-0`); a cloud session on a `claude/…` branch uses the task's name.
 - **Subagents keep notes** in `.checkpoints/<task-slug>/<agent>-<part>.md`, one file per agent and part (for example
   `.checkpoints/r3-rendering/graphics-engineer-outlines.md`).
@@ -81,13 +82,17 @@ Copy this template. Keep it short: it is a handoff, not a log.
 
 ## 5. The background saver (brief 2b rules 1 and 2)
 During a workflow or any agent run longer than a few minutes, start the saver in the background (Bash
-`run_in_background`), so the agents' notes reach the remote even if the whole session is cut off:
+`run_in_background`, with the Bash `timeout` at its maximum, 7200000 ms; the default would stop it after 30 minutes), so
+the agents' notes reach the remote even if the whole session is cut off:
 `node .claude/scripts/checkpoint.mjs watch <task-slug> --trailer "<attribution line>"`
 - Every 10 minutes (`--every`) it commits and pushes `.checkpoints/` if anything changed. It stops after 110 minutes
   (`--for`, under the 2-hour limit of a background command), when the branch changes, or when it is stopped, after a
   last save. Start it again for a longer run.
-- It refuses `main`, a detached head and any branch outside `cs/` and `claude/`; it never forces a push; a refused push
-  is reported and left alone. A commit that pushes only checkpoint files carries `[skip ci]`.
+- It refuses `main`, a detached head, any branch outside `cs/` and `claude/`, and a task whose `.checkpoints/<slug>.md`
+  is gone (so the finished task's last commit is made by hand and runs CI); it never forces a push; a refused push is
+  reported and left alone; notes that look like a secret (a token, a key, credentials in a URL) are not committed. A
+  commit that pushes only checkpoint files carries `[skip ci]`, decided by the script alone. In the background it never
+  publishes code: with unpushed commits outside `.checkpoints/` on the branch it commits locally and skips the push.
 - **Before a PR is marked ready:** stop the saver and make the last checkpoint commit. After that, nothing pushes to the
   PR's branch except a fix that goes back to review. Reviewer agents and the PR Advisor routine never push their notes
   to a PR's branch: that would change the head the advisor approved.
@@ -110,7 +115,8 @@ During a workflow or any agent run longer than a few minutes, start the saver in
 - **Never re-run an agent that finished.** Its result is in the workflow journal and in its notes.
 
 ## 8. Resuming (brief 2b rule 4)
-1. Read the checkpoint on the task's branch. It is the authority; a status comment or a message only points to it.
+1. Read the checkpoint on the task's branch. It is the authority on where the work stands; the approved plan or verdict
+   is the authority on what may be done. A status comment or a message only points to it.
 2. Check the branch matches it: `git log --oneline -5` shows the last SHA it records (or a later checkpoint commit).
    For code, run the gate.
 3. Continue from "Next steps". Never restart a task from scratch when a checkpoint exists.
@@ -122,6 +128,7 @@ During a workflow or any agent run longer than a few minutes, start the saver in
    the decisions and the open findings.
 2. Delete `.checkpoints/<task-slug>.md` and `.checkpoints/<task-slug>/` in the last commit before the PR is marked ready
    for review. That commit runs CI (no `[skip ci]`). Deleting them is not deleting data: the history keeps them.
-3. A ready PR has no `.checkpoints/` files; the verifier and the advisor check it.
+3. A ready PR has no `.checkpoints/` files in its head (`git ls-tree -r --name-only HEAD -- .checkpoints` prints
+   nothing; untracked notes don't count): the session checks it before marking the PR ready, and the advisor on review.
 4. A review fix that takes more than one step turns the PR back into a draft, starts a new checkpoint, and deletes it
    again in its last commit before the PR is marked ready once more.

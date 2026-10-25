@@ -9,7 +9,7 @@ Views requested: $ARGUMENTS
 2. For each view, render base and head with identical commands and settings:
    - 3D gameplay view: `node tools/preview.js <dir> shot <out.png> <x> <z>`; menu camera: `... menu <out.png>`.
    - Pages / UI: `node tools/pageshot.js <dir> index.html <prefix> <steps…>` at 1600x900 and 1280x720; use headed GPU
-     mode for anything lighting- or performance-sensitive once Phase 0 adds it.
+     mode (`--headed`) for anything lighting- or performance-sensitive.
    - Default views when none are given: centre (0,0), west hamlet (-140,-20), manor (0,-104), a base (-150,90), menu.
 3. Save as `.gate/renders/<branch>/<view>_base.png` and `<view>_head.png`; add a side-by-side sheet if you can.
 4. Look at every pair yourself. One line each: what visibly changed and whether that was intended.

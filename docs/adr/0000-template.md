@@ -37,7 +37,8 @@ Why the chosen option wins, and the strongest argument against it.
 
 ## What a spike must prove
 The measurable pass marks a throwaway spike must meet before this decision is accepted (for example: 48 simulated
-players at a 30 Hz server tick within X ms). No spike starts before Mustafa and the Advisor have approved the draft.
+players at a 30 Hz server tick within X ms). No spike starts before Mustafa and the Advisor have reviewed and approved
+the draft; the spike's results then go into this record, and Mustafa accepts or rejects it.
 
 ## Migration plan
 Phases with verifiable milestones (what proves each phase done). The game must stay playable at every step.

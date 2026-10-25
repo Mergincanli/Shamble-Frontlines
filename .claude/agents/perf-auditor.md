@@ -26,7 +26,7 @@ baked it in (the warm-up block exists for this); fields added at runtime change 
 
 Budgets (defaults until an ADR changes them): 60 fps with headroom on mid-range hardware (frame ≤ 16.6 ms, game update
 well under 2 ms); per-soldier animation < 60 µs; combat allocation trending toward < 2 MB/s; village draw calls ≈ 200;
-later, server tick ≤ 4 ms at the target player count and a per-client bandwidth budget set in ADR-001.
+later, server tick ≤ 4 ms at the target player count and a per-client bandwidth budget set in the netcode ADR (0001).
 
 Methods: Node `--expose-gc` soak (heap flat after GC), `--allow-natives-syntax` (`%GetOptimizationStatus`),
 `--trace-deopt`, the V8 sampling heap profiler for MB/s by allocator, `renderer.info` draw calls/triangles at fixed
