@@ -1,0 +1,191 @@
+{
+ "core": {
+  "areas": [
+   "CD",
+   "CL",
+   "CC",
+   "CM",
+   "CS"
+  ],
+  "measured": [
+   "CL4",
+   "CL6",
+   "CL7",
+   "CL8",
+   "CL9",
+   "CL12",
+   "CC3",
+   "CC4",
+   "CC8",
+   "CC9",
+   "CC11",
+   "CM2",
+   "CM3",
+   "CM4",
+   "CM5",
+   "CM7",
+   "CM8",
+   "CS5",
+   "CS6",
+   "CS7",
+   "CS9",
+   "CS10"
+  ],
+  "sampled": [
+   "CD14",
+   "CD13",
+   "CL5",
+   "CL2",
+   "CC10",
+   "CC12",
+   "CM14",
+   "CM1",
+   "CS4",
+   "CS3"
+  ]
+ },
+ "game1": {
+  "areas": [
+   "GW",
+   "GA",
+   "GC"
+  ],
+  "measured": [
+   "GW3",
+   "GW6",
+   "GW7",
+   "GW8",
+   "GW11",
+   "GW12",
+   "GW13",
+   "GW16",
+   "GW17",
+   "GW18",
+   "GW19",
+   "GA2",
+   "GA4",
+   "GA5",
+   "GA6",
+   "GA8",
+   "GA9",
+   "GA11",
+   "GA14",
+   "GA15",
+   "GC1",
+   "GC2",
+   "GC3",
+   "GC5",
+   "GC6",
+   "GC7",
+   "GC8",
+   "GC10",
+   "GC13",
+   "GC14"
+  ],
+  "sampled": [
+   "GW4",
+   "GW21",
+   "GA1",
+   "GA7",
+   "GC18",
+   "GC17"
+  ]
+ },
+ "game2": {
+  "areas": [
+   "GN",
+   "GE",
+   "GP"
+  ],
+  "measured": [
+   "GN3",
+   "GN4",
+   "GN6",
+   "GN7",
+   "GN8",
+   "GN9",
+   "GN11",
+   "GN12",
+   "GN13",
+   "GE6",
+   "GE9",
+   "GE11",
+   "GE12",
+   "GP1",
+   "GP7",
+   "GP9",
+   "GP10",
+   "GP11",
+   "GP16"
+  ],
+  "sampled": [
+   "GN1",
+   "GN5",
+   "GE14",
+   "GE17",
+   "GP3",
+   "GP13"
+  ]
+ },
+ "edpg": {
+  "areas": [
+   "ED",
+   "PG"
+  ],
+  "measured": [
+   "ED1",
+   "ED2",
+   "ED3",
+   "ED4",
+   "ED8",
+   "ED9",
+   "ED10",
+   "ED11",
+   "ED12",
+   "ED13",
+   "ED15",
+   "PG3",
+   "PG5",
+   "PG10",
+   "PG18"
+  ],
+  "sampled": [
+   "ED16",
+   "ED5",
+   "PG2",
+   "PG20"
+  ]
+ },
+ "tlkt": {
+  "areas": [
+   "TL",
+   "KT"
+  ],
+  "measured": [
+   "TL1",
+   "TL2",
+   "TL3",
+   "TL4",
+   "TL5",
+   "TL6",
+   "TL7",
+   "TL8",
+   "TL9",
+   "TL10",
+   "TL11",
+   "TL12",
+   "TL13",
+   "TL14",
+   "TL15",
+   "TL16",
+   "TL17",
+   "KT7",
+   "KT8",
+   "KT9"
+  ],
+  "sampled": [
+   "KT2",
+   "KT12"
+  ]
+ }
+}

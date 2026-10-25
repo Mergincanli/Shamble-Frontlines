@@ -58,10 +58,9 @@
   deleted. Open: NS-1 (add an 08:10 finish-only wake-up?) and NS-2 (delete the three old disabled routines?).
 
 ## Running work
-- Workflow r7-apply-fixes2 · run wf_df83f4d1-1f2 · script as launched:
-  `.checkpoints/r7-legacy-inventory/r7-apply-fixes2-run1.js` (no args) · launched 2026-10-25 17:44 Amsterdam (task
-  w4744pjn9) · cut off by the org's monthly spend limit (reset 20:40 UTC): 16 of 26 agents done (13 appliers, checkers
-  CL CC CS; CL found one problem in CL14.where, fix op in apply-result-run1.json); failed: checkers CM GA GN GC GE GP ED
-  PG KT GW · resumed 2026-10-25 21:43 Amsterdam with resumeFromRunId (task w97w68lbm) · running.
-- Done: r7-edit-verify (wf_5e9f70f7-c89), r7-read-verify (wf_3552ad56-12f).
-- Background saver: restarted 21:44 Amsterdam (the first one stopped at 18:47 when its time was up).
+- Workflow r7-final-review · run wf_4e8e0798-666 · task ws35vt5h9 · script as launched:
+  `.checkpoints/r7-legacy-inventory/r7-final-review-run1.js` (no args; sample in final-review-sample.json) · 10 agents
+  (5 verifiers, engine-architect, netcode-architect, graphics-engineer, game-designer, coverage closer) · notes
+  verifier-<group>.md, <agent>-review.md, coverage-closer.md · launched 2026-10-25 21:53 Amsterdam · running.
+- Done: r7-apply-fixes2 (wf_df83f4d1-1f2), r7-edit-verify (wf_5e9f70f7-c89), r7-read-verify (wf_3552ad56-12f).
+- Background saver: task bstocjk8x, started 21:42 Amsterdam, stops 23:32.
