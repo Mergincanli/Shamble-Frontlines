@@ -1,0 +1,4 @@
+Task: R7 legacy inventory - engine-architect review of module and Rust <-> TypeScript split (rows CD CS GW GN GC GP + every 'rewrite in Rust' row)
+CD1-CD21: read in full; spot-checked T/TEAMS/TUNE literals core:66-107 (sed). No issue yet for CD (pending cross-checks).
+CS1-CS11: read in full; checked SIM block core:1474-1544 and syncSimWorld game:1440-1462; NaN claim CS6 verified by reasoning. Note: syncSimWorld reads o.mesh.rotation.y/position (render transforms -> collision). loop game:3053: hitStop/paused/shopOpen/tutorialOpen gate update(dt) - check GW covers.
+GW1-GW21: read in full; checked resolveObstacles/surfaceHeightAt/tickVertical/blastReaches game:2526-2543. Candidate finding: GW13 resolveObstacles reads o.mesh.rotation.y and o.mesh.position (render transform -> collision), not flagged as hidden coupling; GW16 covers syncSimWorld similarly (reads o.mesh.rotation.y at :1452) - check wording.
