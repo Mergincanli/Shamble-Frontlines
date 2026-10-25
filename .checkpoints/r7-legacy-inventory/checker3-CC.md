@@ -1,0 +1,6 @@
+checker3-CC: R7 legacy harvest, checker for area CC (fixes3)
+- run apply-ops: 7 ops OK (CC12 from fixes2; CC4 x2, CC3 x1 from fixes3)
+- verifier-core#3 (CC4 v2_note): accepted, fixed correctly. grep -n crest steps-1-6 report -> 59; 58 is the coat sentence. No problem.
+- graphics-engineer#0 (CC4 v2_note): accepted, substance right. Re-measured headless (preview.js eval, default and --map=tri): styled bots 122/138/140 meshes, 66-77 parts, 56-64 hulls, player 154, distinct mats = parts; 0 hits for SkinnedMesh/InstancedMesh/BatchedMesh/THREE.LOD; core:686 castShadow; STATUS unchanged since 48ffb51. Problems: (a) '105 meshes, 49 outlines' is on report line 95 (bullet 94-95), not 94; (b) mergeStaticGroup spans core:360-388 (388 = 'grp.userData._merged=true; return saved; }'), not 360-387; (c) 2 of each bot's parts are unlit MeshBasicMaterial health-bar planes (game:797-798), not toon. Ops written in answer.
+- graphics-engineer#2 (CC3 v2_note): accepted, substance right (r128 colour is a uniform; toonify bakes no colour into shader; skin rim uses customProgramCacheKey 'skinRim' core:265; applyFaction 643-653 sets .color only; report core.md:50 16 vs 9 with no cause). Problem: buildEntity materials (657-669) also set roughness/metalness/flatShading, so 'set only .color' is literally wrong for buildEntity; the faction changes only .color. Op in answer.
+DONE
