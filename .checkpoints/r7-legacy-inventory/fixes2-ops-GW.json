@@ -1,0 +1,5 @@
+[
+ {"id": "GW20", "field": "where", "op": "replace", "find": "editor placement shamble-editor.js:599-606, :621", "text": "editor placement shamble-editor.js:599-606, :621 (barracks), :622-623 (map spawn, resupply terminal)"},
+ {"id": "GW20", "field": "what", "op": "replace", "find": "whose panelPos is where the player opens the shop (nearPanel, 2.6 m)", "text": "whose panelPos is where the player opens the shop (nearPanel: within 2.6 m of an own-team barracks panel only, sameTeam check at :2793; elsewhere E falls back to the map terminal within 6 m, :2795)"},
+ {"id": "GW20", "field": "v2_note", "op": "replace", "find": "§9 marks other enterable structures [LATER]", "text": "§9 marks structures players can enter [LATER] and §11 leaves enterable structures out of greybox v0, while §2 already spawns everyone inside their barracks"}
+]
