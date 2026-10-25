@@ -1,0 +1,18 @@
+ok   T.moveSpeed = 6.3 · literal 6.3 at shamble-core.js:67
+ok   T.playerHealth = 100 · literal 100 at shamble-core.js:77
+ok   T.gravity = 24 · literal 24 at shamble-core.js:82
+ok   TUNE.teams.size = 4 · literal 4 at shamble-core.js:102
+ok   SUN_R = 65.8 · literal 65.8 at shamble-core.js:167
+ok   GROUND_W = 372 · literal 372 at shamble-core.js:224
+ok   WORLD_OUTLINE = 0.09 · literal 0.09 at shamble-core.js:241
+ok   OUTLINE_GROUND_Y = 0.02 · literal 0.02 at shamble-core.js:294
+ok   GRID_SIZE = 10 · literal 10.0 at shamble-core.js:850
+ok   RULES_DEFAULT.silo.capture = 3.5 · literal 3.5 at shamble-game.js:40
+ok   RULES_DEFAULT.tbox.active = 120 · literal 120 at shamble-game.js:40
+ok   ARM_L1 = 0.46 · literal 0.46 at shamble-game.js:209
+ok   FIRE_H = 1.9 · literal 1.9 at shamble-game.js:1419
+ok   AIM_ARC_N = 48 · literal 48 at shamble-game.js:1701
+ok   VIG_W = 300 · literal 300 at shamble-game.js:2347
+ok   OCC_FADE = 0.24 · literal 0.24 at shamble-game.js:2555
+ok   WR_DEPLOY_MS = 280 · literal 280 at shamble-game.js:2999
+17 pass, 0 fail
