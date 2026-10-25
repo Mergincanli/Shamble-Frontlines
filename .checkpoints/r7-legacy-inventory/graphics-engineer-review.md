@@ -12,3 +12,10 @@ GP1-GP16: read after-GP.json; awk game 1049-1050 (swallowed-comment scuff bug co
  FINDING GP9 (should, look rule b): v2_note 'Keep the three-shot comic framing' recommends keeping a comic presentation (look decision). Technique lesson (no GPU readback on kill frame, render targets) is fine.
 PG1-PG20: read after-PG.json; checked index 1255/editor 1256 CDN tag, perf overlay renderer.info, vignette paths. lbp flags ok (PG1/9/17/18/19 false: shell, editor chrome per EDITOR_V2, dead, load order, CDN). PG2/PG20 'redesign (look brief pending)'-style, ok. No findings.
 ED5 ED6 ED7 (+ED9 ED10 lbp): read; EDITOR_V2:4 confirms labs stay; editor 277-281. No findings.
+Other lbp-true rows (CD9 CD15-17 CD19-21, GW3-8 GW10-11 GW17-20, GC3 GC6 GC8 GC11-16, GN1 GN2 GN8, GE3 GE4 GE7 GE9 GE10 GE12 GE14 GE16, KT5) + CD5: read in full. Checked core 146-167, 224-231; game 2246-2257 (StereoPanner only, no voice cap), 2571-2602 (occlusion: outlines visible=false <=0.9, not faded), 2934, 795-800.
+ FINDING CD5 (should, rule a): camera framing values lbp false while GP4 (same camera) is lbp true 'look brief may retune them'.
+ FINDING CD15 (should): 'Keep the pixel-ratio cap (2)' unmeasured vs VISION_V2 §4 Low on integrated GPU; should be per tier.
+ FINDING GW17 (nit): 'ink outline included' - outlines are hidden (visible=false below 0.9), not faded (game:2580). (should): 'dither or stencil ... fit WebGPU better' unsourced, dither is a visible style; merged-mesh cutaway needs a shader world-space region.
+ FINDING PG7 (nit, rule b): 'a pure DOM/CSS menu with no WebGL' pre-decides menu presentation.
+ FINDING GP6 (should, audio): no voice limit/occlusion noted; only impact 55 ms throttle and 90 m bot cull.
+All fix finds verified unique with python count. DONE

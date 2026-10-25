@@ -41,3 +41,10 @@ Engine files unchanged since 48ffb51 (git diff --stat empty). core wc 1543 lines
 - GN12 nit: G/F Float32Array with f64 math, heap ties <=/>= -> Rust parity needs same rounding.
 - no for..in / Object.keys over sim state (comment game:702) -> no hash-order hazard in legacy sim.
 - DEV god/freezeAI authority covered by GP5.
+## Final findings (fix ops drafted; finds verified unique by python count)
+blocking: GC3 (ledges aimed at 0 false), CD8 (weaponPitchMax is not an aim limit; pitchWeapon 1431)
+should: GC3 (aim point not direction), GC5 (frame-quantised fire, measured), GC7 (evidence qualifiers), GC17 (animated cannon origin + wall clock 1290), GP2 (actions in listeners), GP14 x2 (RNG/wall-clock coupling incl. breath 363 -> chest-mounted wpn core:453; player-first order), GW14 (jump apex measured), GW16 (rotated houses loose AABB; editor rotates houses editor:151)
+nit: GW14 (standOnCover), GN10, GN8, GN12, GC12, GC15, CS2 (model fitted to hit shape decides pipeline)
+Confirmed in full: all other scoped rows.
+Most important gap: frame-quantised timing (fire cooldowns reset, jump apex) + RNG coupling with audio/FX; no row tells R2 how legacy numbers depend on frame rate.
+DONE
