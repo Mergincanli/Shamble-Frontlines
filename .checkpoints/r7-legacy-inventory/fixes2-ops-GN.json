@@ -1,0 +1,6 @@
+[
+ {"id":"GN2","field":"v2_note","op":"replace","find":"§5 adds the free Recruit fallback and moves the Officer to Tier 2.","text":"§5 adds the free Recruit fallback and keeps the Officer at Tier 2, where legacy already has it (UNIT_TYPES officer tier:2, cost 1250, shamble-core.js:136)."},
+ {"id":"GN2","field":"evidence","op":"replace","find":"three-teams-core report h6 roster harness PASS. No other numbers recorded.","text":"Roster harness (step 6) PASS, per three-teams-core-steps-1-6.md:40: 12 slots with ids and teams, Cabana 4 active Soviets and 7 parked, a respawn takes 172 frames with the refinery up and 241 with it down; h6 still PASS on the final head (three-teams-core.md:37). No other numbers recorded."},
+ {"id":"GN4","field":"where","op":"replace","find":"shamble-game.js:1576-1583 AI_STATE (budget, checks, scans, step)","text":"shamble-game.js:1576-1580 header comment, 1581-1583 AI_STATE (budget, checks, scans, step; its rotatePush method at 1582-1583 belongs to GN9)"},
+ {"id":"GN4","field":"evidence","op":"append","find":"","text":"perfbots after the fix: 12 soldiers 4.0 scans per bot per second for every team, target share 0.99-1.00; at 48 soldiers 2.55 / 2.54 / 2.47 (three-teams-core.md:49)."}
+]
