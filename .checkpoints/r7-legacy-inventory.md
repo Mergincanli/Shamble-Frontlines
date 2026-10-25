@@ -4,7 +4,7 @@
   `.checkpoints/r7-legacy-inventory/plan.md` (APPROVE with 11 conditions).
 - **Branch:** claude/bold-faraday-i49gug (draft PR #27), restarted from main f2ccc13 after kit-v3-0 merged (PR #26) ·
   **Base:** main f2ccc13 (the engine files are unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds).
-- **Last update:** 2026-10-25 17:45 Amsterdam
+- **Last update:** 2026-10-25 21:44 Amsterdam
 
 ## Steps done
 1. Plan approved with 11 conditions (plan.md, plan-verdict.json). Night queue #16 item 1 made a plain bullet "in
@@ -56,7 +56,10 @@
   deleted. Open: NS-1 (add an 08:10 finish-only wake-up?) and NS-2 (delete the three old disabled routines?).
 
 ## Running work
-- Workflow r7-apply-fixes2 · run wf_df83f4d1-1f2 · task w4744pjn9 · script as launched:
-  `.checkpoints/r7-legacy-inventory/r7-apply-fixes2-run1.js` (no args) · launched 2026-10-25 17:44 Amsterdam · running.
+- Workflow r7-apply-fixes2 · run wf_df83f4d1-1f2 · script as launched:
+  `.checkpoints/r7-legacy-inventory/r7-apply-fixes2-run1.js` (no args) · launched 2026-10-25 17:44 Amsterdam (task
+  w4744pjn9) · cut off by the org's monthly spend limit (reset 20:40 UTC): 16 of 26 agents done (13 appliers, checkers
+  CL CC CS; CL found one problem in CL14.where, fix op in apply-result-run1.json); failed: checkers CM GA GN GC GE GP ED
+  PG KT GW · resumed 2026-10-25 21:43 Amsterdam with resumeFromRunId (task w97w68lbm) · running.
 - Done: r7-edit-verify (wf_5e9f70f7-c89), r7-read-verify (wf_3552ad56-12f).
-- Background saver: `checkpoint.mjs watch r7-legacy-inventory` (task baz4w07oe), started 16:57, stops 18:47.
+- Background saver: restarted 21:44 Amsterdam (the first one stopped at 18:47 when its time was up).
