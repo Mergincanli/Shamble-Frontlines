@@ -36,6 +36,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/LOOP_V2.md` | The v2 core loop (living spec; status tags DECIDED / DEFAULT / OPEN / LATER) |
 | `docs/EDITOR_V2.md` | The map editor rebuild (draft spec) |
 | `docs/EDITOR_V1_INVENTORY.md` | Every legacy map-editor feature with a keep / drop / improve mark |
+| `docs/LEGACY_INVENTORY.md` | Every legacy system: what, where, evidence, and a port / rewrite / redesign / drop mark (R7) |
 | `docs/LEGACY_TUNING.md` | Every legacy tuning table and constant, rendered from `legacy-tuning.json` (R7) |
 | `docs/legacy-tuning.json` | The legacy tuning numbers as data, dumped from the live build: v2's starting values |
 | `docs/GAME_DESIGN.md` | Legacy game design and vision (§5–6 superseded by LOOP_V2) |
