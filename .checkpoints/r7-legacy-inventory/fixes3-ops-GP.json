@@ -1,0 +1,82 @@
+[
+ {
+  "id": "GP1",
+  "field": "what",
+  "op": "replace",
+  "find": "Every effect is drawn from per-kind pools of meshes that are built once",
+  "text": "Every effect except the grenade flash sphere (a new mesh per blast, 1082) is drawn from per-kind pools of meshes that are built once"
+ },
+ {
+  "id": "GP2",
+  "field": "what",
+  "op": "replace",
+  "find": "Keyboard and mouse listeners write a keys{} map plus mouse NDC and button flags.",
+  "text": "Keyboard and mouse listeners write a keys{} map plus mouse NDC and button flags, and they also run game actions directly at event time, outside update(): R startReload or resetRound (3264), F useAbility (3265), G startCharge (3266) and its keyup releaseCharge, which throws the grenade (3273), E enterJug, exitJug, openShop or tryResupply (3267), 1 and 3 equipPrimary and equipSpecial (3268-3269), the left button's bow charge and the mouseup release that fires the bolt (3284-3285, releaseCharge 1724), and the right button's ADS state (3284-3285). Only movement, sprint, jump, held or queued fire and the cursor aim are sampled inside update()."
+ },
+ {
+  "id": "GP2",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "with movement already turned into world axes.",
+  "text": "with movement already turned into world axes. The actions legacy runs at event time (reload, ability, grenade throw, bow release, E, weapon switch, ADS) become press and release edges in that command, carried so that a press is neither lost nor doubled when inputs are resent for redundancy."
+ },
+ {
+  "id": "GP2",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Add rebinding: the key codes are raw literals scattered through keydown.",
+  "text": "Keep the bindings in one table (today the key codes are raw literals scattered through keydown), so the controls list (GP8) is generated from it. Rebinding is not proposed: no VISION_V2 §6 need asks for it."
+ },
+ {
+  "id": "GP3",
+  "field": "where",
+  "op": "replace",
+  "find": "T.sprintMult 1.4286, ",
+  "text": "T.sprintMult 1.4286 (never read: sprint uses the per-unit value), "
+ },
+ {
+  "id": "GP3",
+  "field": "where",
+  "op": "replace",
+  "find": "T.arenaX/arenaZ 60 shamble-core.js:67",
+  "text": "T.arenaX/arenaZ (literal 60 at shamble-core.js:67, set at load to 186 x 126 by :225 from GROUND_W/GROUND_D; legacy-tuning.json T.arenaX 186, arenaZ 126)"
+ },
+ {
+  "id": "GP6",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Found in code: there is no voice limit and no occlusion. Apart from the 55 ms impact throttle (2253) and the 90 m bot-shot sound cull (TUNE.fx.botSfxR, shamble-core.js:106), every sound builds new nodes, and panning is a StereoPannerNode (2248), not a PannerNode with a listener. At 48+ players (VISION_V2 §3) v2 needs a voice cap with priorities; R3's spatial-audio topic (V2_PHASE0_BRIEF §4) researches the distance model and whether occlusion is worth its cost, with a spike that counts concurrent voices in a 48-bot fight."
+ },
+ {
+  "id": "GP9",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Keep the three-shot comic framing and the lesson to never read GPU pixels back on a kill frame",
+  "text": "Whether a kill vignette exists, and how it is framed, is for the look brief. Keep the lesson to never read GPU pixels back on a kill frame"
+ },
+ {
+  "id": "GP11",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Two-team modes stay too (VISION_V2 §3 [DECIDED]; §6 item 1, modes as data), so the board takes 2 or 3 team columns from the mode data."
+ },
+ {
+  "id": "GP14",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Port the order as explicit phases of the Rust tick: snapshot, player commands, movement, projectiles, re-sync, bots in fair order, objectives.",
+  "text": "Make the order explicit phases of the Rust tick, and change the legacy order only on purpose, because the order decides outcomes. The legacy order is: timers, cooldowns, reload and respawn (2675-2690); the economy and objectives (2692-2698); regen (2700); the player's aim (2707), shots (2722-2731) and melee impact (2738-2743), all on positions from before this step's movement; the player's movement (2748-2780); grenades (2856-2859); a forced re-sync (2862) that exists only because the scene is the truth and goes away in v2 (GW16); bolts (2863-2885); bots in fair order, each one steering, then firing, then colliding (2893-2941); building sink (2944); Juggernauts (2947); FX (2948-2960)."
+ },
+ {
+  "id": "GP14",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Found in code: STATUS's 11 wall-clock reads are 10 calls plus one in a comment (2169). Two reach sim outcomes, both through animation: tickPilot's clock (2781) bobs the piloted Juggernaut's cannon muzzles (GC17; tickJuggernauts' clock, 2947, only animates idle mechs that do not fire), and _animClock (2674) drives the soldiers' breathing (363), which rotates the chest that carries the weapon (shamble-core.js:453) and so moves the animated muzzle grenades and Molotovs launch from (GC13). The rest change results through the one shared Math.random, which sound and FX draw from inside the step under conditions the sim must not depend on: fireOnce calls sfxShot (1473) before the pellets' spread draws (1477), and sfxShot fills a noise buffer with floor(sampleRate x 0.07-0.2 s; the AMK returns early to sfxAMK) Math.random values only when audio is unlocked and not muted (2227-2231; sfxAMK its own, 2286-2290), so the spread depends on mute and on the device's sample rate; sfxImpact is throttled by the wall clock (2253); sfxEnemyShot (2255-2256) and the FX (1029-1088) are culled by camera distance (GN8); camera shake draws inside update() (2846). A legacy-parity harness must seed Math.random and stub audio and FX, as docs/reports/2026-10-16-three-teams-core.md:39 did; v2 gives the sim its own seeded stream and the client separate cosmetic streams."
+ },
+ {
+  "id": "GP14",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Order found in code: the player always acts first. Its shots, melee, movement and bolts resolve before any bot, so a bot the player kills this step cannot fire back (applyDamage sets it dead at once, 1520, and it takes the dead branch, 2937), and bots aim at the player's position after its move (re-sync, 2862). With many humans under server authority, the tick needs one defined order for every soldier's command, or all shots of a tick resolved against the same pre-tick state, so that a trade never depends on slot order."
+ }
+]

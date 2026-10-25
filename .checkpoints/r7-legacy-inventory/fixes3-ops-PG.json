@@ -1,0 +1,7 @@
+[
+ {"id": "PG3", "field": "where", "op": "replace", "find": "reloadBar opacity writes at 1162,", "text": "reloadBar opacity writes at 1153 (switchWeapon), 1162,"},
+ {"id": "PG10", "field": "evidence", "op": "replace", "find": "done, awaiting Brave.", "text": "done; confirmed in Brave by Mustafa on 2026-09-26 (AUDIT:80)."},
+ {"id": "PG5", "field": "v2_note", "op": "replace", "find": "(armory and scoreboard, ROADMAP:71)", "text": "(armory and scoreboard, START_HERE.md:146; paused as ui-step-3, STATUS.md:30)"},
+ {"id": "PG2", "field": "where", "op": "replace", "find": "minus --wr-faded)", "text": "minus --wr-faded and --wr-desk-bg, whose gradient the mockup writes in its .desk rule at :25-32)"},
+ {"id": "PG7", "field": "v2_note", "op": "replace", "find": "Keep: a pure DOM/CSS menu with no WebGL,", "text": "Keep: a DOM/CSS menu flow (whether it shows any 3D is for the look brief),"}
+]

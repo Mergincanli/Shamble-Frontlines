@@ -1,0 +1,44 @@
+[
+ {
+  "id": "TL10",
+  "field": "where",
+  "op": "replace",
+  "find": ".claude/hooks/syntax-gate.mjs:12-46 (nodeCheck :16, HTML regex scan :29-33); wired at .claude/settings.json:101",
+  "text": "at 48ffb51: .claude/hooks/syntax-gate.mjs:12-46 (nodeCheck :16, HTML regex scan :29-33; the file is unchanged since); wired at .claude/settings.json:101, inside the PostToolUse block :97-104"
+ },
+ {
+  "id": "TL10",
+  "field": "v2_note",
+  "op": "append",
+  "find": "",
+  "text": "Changed by kit-v3-0 (settings.json gained allow rules for the checkpoint scripts, WebSearch and documentation-domain WebFetch, which moved the PostToolUse block further down the file; the hook file syntax-gate.mjs and its Edit|Write wiring are unchanged)."
+ },
+ {
+  "id": "TL16",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "(:37-39, built live at 120 degrees for three teams)",
+  "text": "(validation panel :39-40; symmetry :35-36, built live at 120 degrees for three teams)"
+ },
+ {
+  "id": "TL3",
+  "field": "evidence",
+  "op": "replace",
+  "find": "STATUS.md:125 (core 134 / game 691 / editor 349 symbols)",
+  "text": "STATUS.md:125 (core 134 / game 691 / editor 349 symbols, measured 2026-10-14 on main 8675367; on today's engine files, unchanged since 48ffb51, node tools/battery.js . gives core 138 / game 714 / editor 353)"
+ },
+ {
+  "id": "TL4",
+  "field": "evidence",
+  "op": "replace",
+  "find": "STATUS.md:125-126 (44 editor references, all guarded, 0 flagged)",
+  "text": "STATUS.md:125-126 (44 editor references, all guarded, 0 flagged, measured 2026-10-10 and 2026-10-14; on today's engine files, unchanged since 48ffb51, node tools/battery.js . gives 51 editor references, 51 guarded, 0 flagged)"
+ },
+ {
+  "id": "TL4",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "'The player build must never load editor code'",
+  "text": "'The player build (index.html) must never load editor code'"
+ }
+]

@@ -1,0 +1,4 @@
+[
+ {"id": "GA15", "field": "where", "op": "replace", "find": "extra side-channel writer 2928 (bot idle decay)", "text": "extra side-channel writers 2916 (objective-role bot heading to a tech box) and 2928 (bot idle decay)"},
+ {"id": "GA15", "field": "v2_note", "op": "replace", "find": "The 2-bone/ankle work could move to a worker or GPU skinning.", "text": "The 2-bone/ankle solves stay CPU work (main thread, a worker, or a compute pass); GPU skinning would not solve IK, but rigid skinning of the parts would cut the per-part draw calls and Object3D matrix updates that the rig costs today."}
+]

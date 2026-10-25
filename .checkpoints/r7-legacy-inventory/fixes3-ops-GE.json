@@ -1,0 +1,111 @@
+[
+ {
+  "id": "GE4",
+  "field": "where",
+  "op": "replace",
+  "find": ":2420 updateEraHUD (change-detected)",
+  "text": ":2418 eraUsEl/eraFillUsEl/eraNumUsEl/eraThemEl/eraHudEl (era HUD handles), :2419 _eraF/_eraTF/_eraH (change-detection caches), :2420 updateEraHUD (change-detected)"
+ },
+ {
+  "id": "GE4",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Tier mapping: legacy era n is LOOP_V2 Tech n-1 (eras start at 1, :701), and a legacy tier-t unit or vehicle is buyable at era t (:1178, :1358), so the legacy T2 items (the Officer class and the Juggernaut vehicle) unlock after one era-up, where LOOP_V2 §4 puts them at Tech 2, two steps up, and spends Tech 1 on class abilities, which legacy never gates (useAbility :1374-1375 checks no era). Pace, an estimate from run totals rather than a measured era-up time (docs/reports/2026-10-16-three-teams-core.md:44, DM_Tri 3 x 300 s): a team earns about 50 tech per 300 s from trucks (10 deliveries x 5), at most 20 from the two tech-box cash-outs at 128 s and 254 s (first 8 s plus active 120 s, gap 6 s), and 3 to 16 from kills (3-8 kills per team per run, 1 tech per kill, 2 per headshot, :1523), so the first era-up (60 tech, :699) lands at roughly minute 4 to 6, close to the LOOP_V2 §4 minute-5 Tech 1 floor, which legacy does not have."
+ },
+ {
+  "id": "GE5",
+  "field": "v2_note",
+  "op": "append",
+  "text": "The tech half of the rule does not carry over as a kept rule: the x0.5 tech cut (:2434, in addTech) modifies legacy tech sources (trucks, tech boxes, kills) that LOOP_V2 §4 replaces with uplinks, and §3 keeps only the price rise. Whether a dead plant should also slow tech is a LOOP_V2 question for Mustafa (see GE4), not a legacy rule to port."
+ },
+ {
+  "id": "GE5",
+  "field": "reason",
+  "op": "replace",
+  "find": "A price rule the authoritative sim decides that LOOP_V2 §3 keeps.",
+  "text": "A price rule the authoritative sim decides that LOOP_V2 §3 keeps; the x0.5 tech cut (:2434) is not in LOOP_V2 and is not covered by this mark (a question for Mustafa, see GE4)."
+ },
+ {
+  "id": "GE6",
+  "field": "where",
+  "op": "replace",
+  "find": ":821 harvesters, :845 harvDock, :847 harvesterPayout, :848-851 damage/destroy/respawn/reset",
+  "text": ":821 harvesters and _hvDir (heading scratch, used :870-871), :845 harvDock, :847 harvesterPayout, :848 damageHarvester, :849 destroyHarvester, :850 respawnHarvester, :851 resetHarvesters"
+ },
+ {
+  "id": "GE8",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Keep the allocation-free count and the contested-means-no-progress rule; progress switching team resets to 0.",
+  "text": "Keep the allocation-free count. The rule that a contested zone gains no progress (its progress decays) and the reset of progress to 0 when another team starts capturing belong to the tech-box and silo objectives that LOOP_V2 §4 replaces (:951-956, :1000-1003); §4 step 4 says only that a steal takes holding E for a few seconds, not whether a contested uplink pauses or blocks a steal, so these are legacy rules carried forward pending a LOOP_V2 decision, not rules LOOP_V2 keeps."
+ },
+ {
+  "id": "GE8",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Uplink steal is 'hold E for a few seconds' (LOOP_V2 §4 step 4), so the primitive maps onto steal and defend.",
+  "text": "The count itself maps onto uplink steal and defend."
+ },
+ {
+  "id": "GE10",
+  "field": "where",
+  "op": "replace",
+  "find": ":974 silos,",
+  "text": ":974 silos and siloRateEl (#siloRate income readout, written in updateSiloHUD :990),"
+ },
+ {
+  "id": "GE12",
+  "field": "where",
+  "op": "replace",
+  "find": "fire :1375/:1466",
+  "text": "ability use :1375 (useAbility), fire :1466 (fireOnce)"
+ },
+ {
+  "id": "GE13",
+  "field": "what",
+  "op": "replace",
+  "find": "only the Torque Bow (500), Officer (1250, T2) and Juggernaut (2500, T2) cost anything.",
+  "text": "only the Torque Bow (500), Officer (1250, T2) and Juggernaut (2500, T2) cost anything, plus the frag grenade at 50, hard-coded at :2456 rather than in the tables."
+ },
+ {
+  "id": "GE14",
+  "field": "what",
+  "op": "replace",
+  "find": "each row with tier, HP, price (with a power-down warning and an 'offline, prices doubled' banner)",
+  "text": "each row with its stats and price (tier and HP for classes and vehicles, ammo for special weapons, the held count for the grenade; a power-down warning on prices, and an 'offline, prices doubled' banner)"
+ },
+ {
+  "id": "GE15",
+  "field": "where",
+  "op": "replace",
+  "find": ":1955 saveProg,",
+  "text": ":1955 saveProg and _progSaveTO (400 ms save debounce),"
+ },
+ {
+  "id": "GE15",
+  "field": "v2_note",
+  "op": "append",
+  "text": "The progression numbers are code literals, not table data, so they are missing from docs/legacy-tuning.json (its progression tables are only RANK_TIERS, PRESTIGE and ROMAN, docs/LEGACY_TUNING.md:22): kill XP 50 and chain XP 150 with a 5 s window (:2099-2100), the curve 500 + 110(n-1) + 5(n-1)^2 (:1957) and the cap 100 (:2106). Reaching level 100 takes 2,175,855 XP, about 43,500 single kills (kills are the only XP source besides the DEV button, :2102, :3347)."
+ },
+ {
+  "id": "GE16",
+  "field": "where",
+  "op": "replace",
+  "find": "(ccIcon/ccLvl/ccPrest/ccXp,",
+  "text": "(ccIconEl/ccLvlEl/ccPrestEl/ccXpEl,"
+ },
+ {
+  "id": "GE17",
+  "field": "where",
+  "op": "replace",
+  "find": "rankLabel/pipWrap/buildPips/updateRank",
+  "text": "rankLabel/pipWrap/pips/buildPips/updateRank"
+ },
+ {
+  "id": "GE17",
+  "field": "evidence",
+  "op": "replace",
+  "find": "WEAPONS (core:108-125)",
+  "text": "WEAPONS (core:108-122)"
+ }
+]
