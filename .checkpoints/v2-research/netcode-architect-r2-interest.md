@@ -120,3 +120,91 @@ Verbatim status of S1-S5:
   per-second". Baseline-advance on ack: paraphrase -> inferred.
 Next: Q2 PHS verbatim re-quote (optional), Source SDK 2013 ShouldTransmit (TF2), Chrome devtools Wasm memory
 inspection, SourceTV delay (Valve wiki blocked -> search GitHub sdk for tv_delay), gdcvault Halo Reach / Overwatch.
+S7 Source SDK 2013 (Valve), src/game/server/baseentity.cpp, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/baseentity.cpp
+   ("Copyright Valve Corporation, All rights reserved."; master; read 2026-10-27, chars 0-200000 of 273620). Tier:
+   shipped game (Source engine SDK). Verbatim: CBaseEntity::ShouldTransmit: `int fFlags = DispatchUpdateTransmitState();`
+   `if ( fFlags & FL_EDICT_PVSCHECK ) return FL_EDICT_PVSCHECK;` `else if ( fFlags & FL_EDICT_ALWAYS ) return
+   FL_EDICT_ALWAYS;` `if ( pRecipientPlayer->GetTeam()->ShouldTransmitToPlayer( pRecipientPlayer, this ))`
+   `// by default do a PVS check` `return FL_EDICT_PVSCHECK;`. UpdateTransmitState: EF_NODRAW without move child ->
+   FL_EDICT_DONTSEND; `// Always send the world`; `// by default cull against PVS` -> FL_EDICT_PVSCHECK.
+   SetTransmit: `// HLTV/Replay need to know if this entity is culled by PVS limits`; move-parents force children
+   ("// Force our aiment and move parent to be sent."). The PVS test itself is in the (closed) engine.
+   Sure: confirmed in the source (verbatim lines). -> Source's model: per entity, per recipient: always / PVS /
+   never / custom, with a team hook to force sending to teammates; parent-child: sending a child forces its parent.
+S8 Source SDK 2013, src/game/server/team.cpp, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/team.cpp
+   (master; read 2026-10-27). Tier: shipped game. Verbatim: "// Purpose: Teams are always transmitted to clients"
+   `return SetTransmitState( FL_EDICT_ALWAYS );`; CTeam::ShouldTransmitToPlayer: "// Always transmit the observer
+   target to players" `if ( pRecipient && pRecipient->IsObserver() && pRecipient->GetObserverTarget() == pEntity )`
+   `return true;` else false. Sure: confirmed in the source (verbatim). -> In Source the team entity (team score
+   etc.) goes to EVERY client: anything on it is public. Spectator: observer target always sent.
+S9 Source SDK 2013 (TF2 game code), src/game/shared/tf/tf_player_shared.cpp, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/shared/tf/tf_player_shared.cpp
+   (master; read 2026-10-27, chars 0-100000 of 451076). Tier: shipped game (TF2). Verbatim send-table lines inside
+   `BEGIN_SEND_TABLE_NOBASE( CTFPlayerShared, DT_TFPlayerShared )`: `SendPropInt( SENDINFO( m_nDisguiseTeam ), 3,
+   SPROP_UNSIGNED ),` `SendPropInt( SENDINFO( m_nDisguiseClass ), 4, SPROP_UNSIGNED ),` `SendPropEHandle( SENDINFO(
+   m_hDisguiseTarget ) ),` `SendPropInt( SENDINFO( m_iDisguiseHealth ), -1, SPROP_VARINT ),`. A separate
+   "tfsharedlocaldata" table goes only to the owner via SendProxy_SendLocalDataTable (that it is owner-only: WebFetch
+   paraphrase -> inferred). Sure: the disguise lines in the all-clients table: confirmed (verbatim); local-only proxy
+   semantics: inferred. -> TF2 sends a disguised spy's disguise fields to every client (so enemy clients hold both
+   the disguise and, by the base entity's team field, the truth: the true-team part NOT read -> unverified).
+S10 Source SDK 2013, src/game/server/sendproxy.cpp, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/sendproxy.cpp
+   (master; read 2026-10-27). Tier: shipped game. Verbatim: "// Purpose: Proxy that only sends data to team members"
+   `void* SendProxy_OnlyToTeam( ... CSendProxyRecipients *pRecipients, int objectID )` ...
+   `pRecipients->ClearAllRecipients();` `for ( int i=0; i < pTeam->GetNumPlayers(); i++ )`
+   `pRecipients->SetRecipient( pTeam->GetPlayer( i )->GetClientIndex() );`. Sure: confirmed (verbatim).
+   -> Per-field team-only replication exists in a shipped engine: precedent for team-private economy fields.
+S11 Chrome DevTools, "Inspect JavaScript ArrayBuffer with the Memory inspector", https://developer.chrome.com/docs/devtools/memory-inspector
+   (page last updated 2024-09-06; read 2026-10-27). Tier: official (browser vendor docs). Verbatim: "Use the Memory
+   inspector to inspect ArrayBuffer, TypedArray, and DataView memory in JavaScript"; "The Memory Inspector panel lets
+   you inspect such objects in Wasm applications written in C++."; "Use the Memory inspector while you debug your web
+   app for an efficient workflow." Sure: confirmed (verbatim). -> any player can read the client's JS/Wasm memory
+   with the browser's built-in tools; data sent to the client is data the player can see.
+- NOT READ: https://www.gdcvault.com/play/1014345/I-Shot-You-First-Networking (Aldridge, Bungie, GDC 2011, Halo:
+  Reach networking): 302 redirect to https://gdconf.com/gdc-vault-maintenance/ (outside the allow list); the talk is
+  a video in any case. Expect the same for Overwatch GDC 2017 (Tim Ford) -> list as "not read: video only / vault
+  in maintenance".
+- NOT READ: https://technology.riotgames.com/node/108 "Demolishing Wallhacks with VALORANT's Fog of War" (Riot,
+  Paul Chamberlain): outside the allow list. (Search snippet only = lead, not a source; nothing rests on it.)
+  Also https://www.riotgames.com/en/news/demolishing-wallhacks-valorants-fog-war: outside the allow list.
+S12 Quake III Arena source, code/game/g_utils.c, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_utils.c
+   (GPL, Id Software 1999-2005; master; read 2026-10-27). Tier: shipped game. Verbatim G_TempEntity header: "Spawns
+   an event entity that will be auto-removed" / "The origin will be snapped to save net bandwidth"; body:
+   `e->s.eType = ET_EVENTS + event;` `SnapVector( snapped );		// save network bandwidth` `// find cluster for
+   PVS` `trap_LinkEntity( e );`. G_Sound: `te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );`.
+   G_AddEvent: "// clients need to add the event in playerState_t instead of entityState_t". Sure: confirmed
+   (verbatim). -> Q3 events (sounds, impacts) are short-lived entities that pass the same per-client PVS/area test as
+   everything else; origin snapped (quantized) to save bandwidth.
+S13 Quake III Arena source, code/game/g_combat.c, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_combat.c
+   (GPL; master; read 2026-10-27). Tier: shipped game. Verbatim, player_die: `// broadcast the death event to
+   everyone` `ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );` `ent->r.svFlags = SVF_BROADCAST;	// send
+   to everyone`. ScorePlum: `// only send this temp entity to a single client` `plum->r.svFlags |=
+   SVF_SINGLECLIENT;`. Sure: confirmed (verbatim). -> kill feed = broadcast event; personal score popups =
+   single-client event. Note: the obituary carries the victim's origin -> broadcast reveals death positions.
+   (that the obituary's position is used by clients: not read -> don't claim.)
+Time 21:3x UTC. Next: Unreal docs search (not read list), then check hysteresis/relevancy source? then write draft.
+- NOT READ (outside the allow list): Unreal Engine docs https://dev.epicgames.com/documentation/unreal-engine/actor-priority-in-unreal-engine,
+  https://dev.epicgames.com/documentation/unreal-engine/API/Plugins/ReplicationGraph/UBasicReplicationGraph,
+  https://docs.unrealengine.com/4.27/en-US/API/Plugins/ReplicationGraph/UBasicReplicationGraph/index.html;
+  https://cedric-neukirchen.net/docs/multiplayer-compendium/actor-relevancy-and-priority (also third-party).
+  Search snippets are leads only: nothing rests on them (NetCullDistanceSquared, NetPriority ratio, grid node).
+S14 Source SDK 2013, src/game/server/hltvdirector.cpp, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/hltvdirector.cpp
+   (master; read 2026-10-27). Tier: shipped game. Verbatim: `static ConVar tv_delay( "tv_delay", "30", 0, "SourceTV
+   broadcast delay in seconds", true, 0, true, HLTV_MAX_DELAY );` `// broadcast time is current time - delay time`
+   `newBroadcastTick -= TIME_TO_TICKS( m_fDelay );` `// instant broadcast, no delay`. Director uses the delay to pick
+   shots from events already happened. Sure: confirmed (verbatim). Purpose "against ghosting": NOT stated -> inferred.
+
+## Analysis notes (for the draft)
+- Pairs needing a visibility test (enemy pairs only; teammates always relevant): 24v24: 24*24=576 unordered;
+  16v16v16: 3*16*16=768; 12v12v12: 3*144=432; 48 all-vs-all 1,128 (upper bound).
+- Legacy JS hasLOS 2.7-5.7 us (220 statics, linear) -> 768 rays = 2.1-4.4 ms per full pass, single sample point;
+  x samples (e.g. 3) -> 6-13 ms. At 20 Hz passes: 4-9 % (1 pt) of one core. Rust+BVH unmeasured -> spike.
+- Bandwidth: uniform spread, relevance circle r=40 m (28 footprint + 12 margin) = 5,027 m2 / 93,744 = 5.4 % -> ~2.5 of
+  47 others; worst case (all at centre) = all 47. Interest cuts the average ~an order of magnitude, not the peak.
+  Peak is bounded only by priority/rate accumulator + per-client byte budget. Illustrative record 12-25 B (snapshot
+  unit owns sizes): 60 entities x 12 B = 720 B, x 25 B = 1,500 B per snapshot.
+- Margin: m >= v_max*(t_interp + RTT/2 + t_snapshot) ~ 10.2 m/s * (0.1+0.1+0.05) = 2.6 m for infantry at 200 ms RTT;
+  camera pan (ADS pan 16 m in style 5) and yaw rotation matter more -> circle around the look point + aim offset.
+- Camera model question: (1) camera vision (what the overhead camera could show: roofs hide interiors, hidden floors)
+  vs (2) character LOS fog. Design/look choice -> OQ for Mustafa (game-designer). Tech supports both; enclosure
+  (area/portal) test needed in both; rays only in (2) or for windows/doors.
+Next: write the draft (time ~21:42 UTC).
+- 21:45 UTC: writing draft now (all sources S1-S14 summarized above; analysis notes done).

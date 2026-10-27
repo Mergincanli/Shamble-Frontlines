@@ -10,3 +10,15 @@ advisor review of v2-research amendments and docs-after-r7
 - A: APPROVE with conditions; wave 1 continues, no stop, no re-brief.
 - B: REVISE (branch cs/docs-after-r7; sections; codes explained; kit-v3-1 wording; ROADMAP Next/open; #16 text). Decision KIT31-STATE to Mustafa.
 DONE
+## Re-review: docs-after-r7 plan revision 2
+- Worktree on cs/docs-after-r7 at 07ab240, clean except .checkpoints. B.1-B.8 each applied.
+- Checked decision meanings against kit-v3-0 report (main, docs/reports/2026-10-24-kit-v3-0.md:160-188) and request-and-decisions.md:106-112.
+  - KV3-MERGE (a) wrong in plan ("merge kit-v3-0"): it is "session merges on Mustafa's fresh merge #n after APPROVE, not his advance go".
+  - DOMAINS-ACCEPT (a) too broad ("web allow list accepted"): it is six publish-anyone hosts kept on the no-prompt list, risk recorded, only once WRITE-GUARD merged.
+  - WRITE-GUARD (a) missing: enforced in settings (ask rules / deny if routines allow silently) + secret-pattern fix.
+  - SPEND-1, ROUTINE-EFFORT, SPIKE-SCOPE, BRANCH-2 wording OK.
+- tools/node_modules in main checkout: 12 entries, no playwright (optional dep, --omit=optional) -> local smoke 5a can't run.
+- .gitignore `node_modules/` (trailing slash) does not match a symlink -> worktree link would show as untracked.
+- Repo is public (#16 comment quoting MANAGED fact: acceptable, STATUS carries it anyway).
+- Verdict: APPROVE with 6 conditions.
+DONE

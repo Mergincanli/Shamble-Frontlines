@@ -46,3 +46,53 @@ S6. https://docs.rs/crate/bevy_alchemy/latest/source/README.md (bevy_alchemy 0.6
 - Valve developer wiki (developer.valvesoftware.com): /wiki/Prediction and /wiki/Dota_2_Workshop_Tools/Scripting/Abilities_Data_Driven both HTTP 403 via WebFetch: NOT READ (403). (Bash may not curl: rule 1.)
 - GDC Vault: https://gdcvault.com/play/1024041/Networking-Scripted-Weapons-and-Abilities (Dan Reed, Blizzard, GDC 2017, Overwatch Statescript, per search result only) and www. variant: 302 redirect to gdconf.com/gdc-vault-maintenance/ (outside allow list): NOT READ (vault in maintenance; redirect outside allow list; talk is video). Same for https://gdcvault.com/play/1024001/-Overwatch-Gameplay-Architecture-and (not tried; same host in maintenance).
   Next: verbatim re-quotes from GASDocumentation for the claims recs rest on; Rust std HashMap/BTreeMap docs; maybe github open-source ability systems (e.g. GASShooter weapon ammo), serde enum representations (shape only).
+
+## V-quotes (verbatim, as returned by WebFetch when asked for exact quotes; status "confirmed in the source (verbatim quote via WebFetch)")
+Q1 (S1 §4.5 table) Instant: "For immediate permanent changes to `Attribute's` `BaseValue`. `GameplayTags` will not be applied, not even for a frame."
+Q2 (S1 §4.5 table) Duration: "For temporary changes to `Attribute's` `CurrentValue` and to apply `GameplayTags`" (row continues)
+Q3 (S1 §4.5 table) Infinite: "These will never expire on their own and must be manually removed by an ability or the `ASC`."
+Q4 (S1 §4.5) "`Periodic Effects` that apply its `Modifiers` and `Executions` every `X` seconds as defined by its `Period`." / "`Periodic Effects` cannot be [predicted](#concepts-p)."
+Q5 (S1 §4.5.4) "The formula for how `Modifiers` are aggregated is defined as follows" `((InlineBaseValue + Additive) * Multiplicitive) / Division` / "By default, all `Multiply` and `Divide` `Modifiers` are added together before multiplying or dividing"
+Q6 (S1 §4.5.5) "Stacking only works for `Duration` and `Infinite` `GameplayEffects`." / by Source: "There is a separate instance of stacks per Source `ASC` on the Target. Each Source can apply X amount of stacks." / by Target: "There is only one instance of stacks on the Target regardless of Source."
+Q7 (S1 §4.2) "`FGameplayTags` are hierarchical names in the form of `Parent.Child.Grandchild...`" / "`GameplayTags` stored in `FGameplayTagCountContainer` have a `TagMap` that stores the number of instances"
+Q8 (S1 §4.3.2) "An `Attribute` is composed of two values - a `BaseValue` and a `CurrentValue`." / "The `BaseValue` is the permanent value of the `Attribute` whereas the `CurrentValue` is the `BaseValue`" ... "plus temporary modifications from `GameplayEffects`."
+Q9 (S1 §4.5.12) "The downside to this power and flexibility is that they can not be predicted and they must be implemented in C++."
+Q10 (S1 §4.5.14) "This `Cost GE` should be an `Instant` `GameplayEffect`"
+Q11 (S1 §4.5.15) "This `Cooldown GE` should be a `Duration` `GameplayEffect` with no `Modifiers`" / "The `GA` actually checks for the presence of the `Cooldown Tag` instead of the presence of the `Cooldown GE`."
+Q12 (S1 §4.6.8) "`Local Predicted` `GameplayAbilities` activate first on the owning client and then on the server."
+Q13 (S1 §4.6.9) Activation Required Tags: "This `GameplayAbility` can only be activated if the owner has **all** of these `GameplayTags`." / Activation Blocked Tags: "This `GameplayAbility` cannot be activated if the owner has **any** of these `GameplayTags`." / Cancel Abilities with Tag: "Other `GameplayAbilities` that have these `GameplayTags` in their `Ability Tags` will be canceled" (continues "when this `GameplayAbility` is activated.")
+Q14 (S1 §4.8.1) "`GameplayCues` (`GC`) execute non-gameplay related things like sound effects, particle effects, camera shakes, etc."
+Q15 (S1 §4.10) predicted: "Ability activation" / "Triggered Events" / "GameplayEffect application:" / "Attribute modification (EXCEPTIONS: Executions do not currently predict, only attribute modifiers)" / "GameplayTag modification" / "Gameplay Cue events (both from within predictive gameplay effect and on their own)" / "Montages" / "Movement (built into UE's UCharacterMovement)". Not predicted: "GameplayEffect removal" / "GameplayEffect periodic effects (dots ticking)"
+Q16 (S1 §4.10) "For example, Paragon and Fortnite do not predict damage." / "We still feel player prediction is best kept to a minimum" / "predict the minimum amount of stuff you can get away with" (attributed to Dave Ratti)
+Q17 (S1 §4.10) "Client sends this prediction key to the server with CallServerTryActivateAbility()." / "Client removes all GameplayEffects that it created with the now stale replicated prediction key." / "Any GameplayEffects that the client added and didn't receive a matching replicated version from the server were mispredicted."
+Q18 (S1 §4.8) "GameplayCues in general should be considered unreliable and thus unsuited for anything that directly affects gameplay."
+Q19 (S1 §5.5) "is an int16 guaranteed to be synchronized and available in both the client and server"
+Q20 (S1 §5.7) "Slow effects in Paragon did not stack." / "but only the greatest magnitude slow effect actually affected the Character"
+Q21 (S1 §5.1) "the GameplayAbilities are given the stun GameplayTag in their Activation Blocked Tags GameplayTagContainer"
+Q22 (S1 Q&A #7) "Fortnite does its own bookkeeping for weapon firing rates: it does not use GEs for cooldowns on weapons." (attribution to be checked)
+Q23 (S1 §4.5.6) "`GameplayEffects` can grant new [`GameplayAbilities`](#concepts-ga) to `ASCs`." / "Only `Duration` and `Infinite` `GameplayEffects` can grant abilities." / removal policy options: "Cancel Ability Immediately" / "Remove Ability on End" / "Do Nothing"
+Q24 (S1 §4.5.7) Granted Tags: "Tags that live on the `GameplayEffect` but are also given to the `ASC` that the `GameplayEffect` is applied to." / Ongoing Tag Requirements: "Once applied, these tags determine whether the `GameplayEffect` is on or off."
+Q25 (S1 §4.5.5) "Stacks also have policies for expiration, duration refresh, and period reset." / they "have helpful hover tooltips in the `GameplayEffect` Blueprint."
+  Next: check Q22 attribution (Q&A section author), then Quake 3 bg_pmove.c PM_Weapon, std HashMap.
+Q22 context (S1 §11.1.1 "Community Questions 1"): question #7 begins "Is there a way to stop the Server from overwriting the cooldown duration of locally predicted abilities" (summary: asks whether high-latency players get slower re-activation; Paragon basic attacks). Answer contains verbatim "Fortnite does its own bookkeeping for weapon firing rates: it does not use GEs for cooldowns on weapons." Attribution to Epic's Dave Ratti and "recommends this approach where latency problem is critical" = summary only -> inferred.
+  Next: Quake 3 bg_pmove.c PM_Weapon (github id-Software/Quake-III-Arena).
+S7. https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/bg_pmove.c (id Software, Quake III Arena GPL source release, master branch; tier shipped game; read 2026-10-27; no page date). Verbatim:
+Q26 header: "// bg_pmove.c -- both games player movement code" / "// takes a playerstate and a usercmd as input and returns a modifed playerstate"
+Q27 PM_Weapon: "if ( pm->ps->weaponTime > 0 ) {" "pm->ps->weaponTime -= pml.msec;" "}" ... "if ( pm->ps->weaponTime > 0 ) {" "return;" "}" / "// check for fire" "if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {" "pm->ps->weaponTime = 0;" "pm->ps->weaponstate = WEAPON_READY;" "return;" "}"
+Q28 ammo: "if ( ! pm->ps->ammo[ pm->ps->weapon ] ) {" / "if ( pm->ps->ammo[ pm->ps->weapon ] != -1 ) {" / "pm->ps->ammo[ pm->ps->weapon ]--;" ; event: "PM_AddEvent( EV_FIRE_WEAPON );" ; per weapon: "case WP_MACHINEGUN:" "addTime = 100;" ; "pm->ps->weaponTime += addTime;"
+  What it tells us: shared ("both games") code turns playerstate+usercmd into playerstate; weapon cooldown is a per-player integer ms counter that carries its overshoot while the trigger is held (+= addTime after decrement may go below 0), reset to 0 when released; fire is an event for presentation; weapon timing is per-weapon code constants in a switch (not data). Inference: remainder-carrying (GC5 fix) is the shipped pattern.
+  Next: std HashMap docs verbatim; then draft.
+S8. https://doc.rust-lang.org/std/collections/struct.HashMap.html (Rust std docs, page shows 1.99.1 (58cf8f9c3 2026-10-13); official; read 2026-10-27). Verbatim:
+Q29 "By default, `HashMap` uses a hashing algorithm selected to provide resistance against HashDoS attacks. The algorithm is randomly seeded, and a reasonable best-effort is made to generate this seed from a high quality, secure source of randomness provided by the host without blocking the program."
+Q30 iter(): "An iterator visiting all key-value pairs in arbitrary order."
+  Plan for draft (21:40 UTC): Options A1 full GAS / A2 reduced subset + closed Rust ops (rec) / A3 scripting / A4 hard-coded per ability / A5 Bevy crates; B weapons own bookkeeping; C integer time with carry; D prediction scope local-own only; E definition shapes. RECs 1-6, OQs ~10. Next: verbatim leafwing limitations, then write draft.
+Q31 (S3 leafwing_abilities 0.13.0, verbatim) "A convenient, well-tested ability management suite. Built for the Bevy game engine." / features: "track and automatically tick cooldowns" / "store multiple charges of abilities" / Planned: "resource management (health, mana, energy etc)" / "damage" / "cast times" / "range checking"
+Q32 (S4, verbatim signature) `pub fn tick(&mut self, delta_time: Duration, charges: Option<&mut Charges>)`; `pub fn from_secs(max_time: f32) -> Cooldown`
+  Sources phase DONE at 21:42 UTC. Writing draft next.
+
+## Draft written (2026-10-27 21:32 UTC)
+- /home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-r1-abilities-draft.md written whole: 26 findings (F1-F26; F20, F24, F25 inferred background; recs rest only on verbatim-quoted findings), 6 recs, 10 OQs, 8 sources read, 9 not-read rows (10 URLs).
+- REC1 reduced GAS subset as data over closed Rust ops; REC2 weapons own bookkeeping + shared damage pipeline; REC3 integer time with carried remainder, stable order, no HashMap iteration; REC4 predict only local player's own abilities/weapons, never damage, key = command seq, cues deduped; REC5 one table per kind with validated ids; REC6 proposed cost budget (48 soldiers x 8 effects <= 1 ms/tick, 0 heap alloc).
+- Blocked: official UE docs (allow list), UE source (404 private), Valve wiki (403), GDC Vault (maintenance redirect, video).
+- Line before the end: the session (not me) commits. Never commit or push.
+DONE

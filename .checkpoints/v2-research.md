@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 22:30 Amsterdam
+- **Last update:** 2026-10-27 22:35 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -58,7 +58,7 @@
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 0/6 | no | pending | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 0/5 | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R2 | netcode-architect | 5 | 1/5 (rooms) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
