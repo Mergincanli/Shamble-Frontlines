@@ -1,3 +1,0 @@
-[
- {"id": "CM13", "field": "evidence", "op": "replace", "find": "STATUS health (STATUS.md:118): syncSimWorld 561 B per call from the houses fallback array (team-prep-fixes PERF-4, :101).", "text": "STATUS health (STATUS.md:118) still lists syncSimWorld at 561 B per call from the houses fallback array (team-prep-fixes PERF-4, :101), but that figure is stale: the per-house array was removed later (docs/reports/2026-10-16-three-teams-core.md:31, fixes 9a4a757 and 15b1971), and the houses loop at game:1458 now reads each box in place without building one."}
-]

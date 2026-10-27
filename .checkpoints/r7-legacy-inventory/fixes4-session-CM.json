@@ -1,9 +1,0 @@
-[
- {
-  "id": "CM14",
-  "field": "row",
-  "op": "remove",
-  "find": "",
-  "text": "duplicate of CC12 (the same MELEE_IDLE, makeSword, makeAxe and makeShield, core:1434-1472); its extra call sites (game:1658, :2743) and its cosmetic-only note were folded into CC12 on 2026-10-27"
- }
-]
