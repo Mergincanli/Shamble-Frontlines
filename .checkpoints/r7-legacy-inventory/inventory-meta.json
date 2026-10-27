@@ -17,5 +17,11 @@
   "KT20",
   "KT21"
  ],
- "check_fixes": 6
+ "check_fixes": 6,
+ "fr_sampled": 28,
+ "fr_findings": 115,
+ "fr_accepted": 110,
+ "fr_rejected": 1,
+ "fr_session": 4,
+ "fr_check_fixes": 13
 }

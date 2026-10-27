@@ -1,0 +1,16 @@
+[
+ {
+  "id": "TL1",
+  "field": "evidence",
+  "op": "replace",
+  "find": "STATUS.md:102 (GitHub protects nothing on main; PROTECT-MAIN decision open)",
+  "text": "STATUS.md:102 at f2ccc13 (GitHub protects nothing on main; PROTECT-MAIN open), stale since 2026-10-17: branch protection requires the gate and smoke checks, as PR #25 records (STATUS.md:102 at 4c24d07)"
+ },
+ {
+  "id": "TL1",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "Avoid: the gate is only a real guard once branch protection requires it (STATUS:102).",
+  "text": "Keep: the gate is a real guard because branch protection requires it (since 2026-10-17; STATUS.md:102 at 4c24d07)."
+ }
+]

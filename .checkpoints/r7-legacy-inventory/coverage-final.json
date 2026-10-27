@@ -7,56 +7,14 @@
  },
  "game": {
   "total": 714,
-  "named": 586,
-  "in_range": 120,
-  "unnamed": [
-   {
-    "n": "eraUsEl",
-    "l": 2418
-   },
-   {
-    "n": "eraFillUsEl",
-    "l": 2418
-   },
-   {
-    "n": "eraNumUsEl",
-    "l": 2418
-   },
-   {
-    "n": "eraThemEl",
-    "l": 2418
-   },
-   {
-    "n": "eraHudEl",
-    "l": 2418
-   },
-   {
-    "n": "_eraF",
-    "l": 2419
-   },
-   {
-    "n": "_eraTF",
-    "l": 2419
-   },
-   {
-    "n": "_eraH",
-    "l": 2419
-   }
-  ]
+  "named": 625,
+  "in_range": 89,
+  "unnamed": []
  },
  "editor": {
   "total": 353,
-  "named": 233,
-  "in_range": 118,
-  "unnamed": [
-   {
-    "n": "ovHostileSpawn",
-    "l": 503
-   },
-   {
-    "n": "_rulesFmt",
-    "l": 787
-   }
-  ]
+  "named": 293,
+  "in_range": 60,
+  "unnamed": []
  }
 }

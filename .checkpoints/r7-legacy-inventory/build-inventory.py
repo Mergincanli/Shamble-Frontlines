@@ -103,16 +103,20 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      '  write the look brief).', '',
      f'**Tally of recommended marks ({len(all_rows)} rows):** ' + ' · '.join(f'{m} {tally[m]}' for m in MARKS)
      + f'. Look brief pending on {look} rows. Per area: the table under "Tally by area" at the end.', '',
-     '**Date:** 2026-10-25. **Code:** main at f2ccc13. The engine files (`shamble-core.js`, `shamble-game.js`,',
+     '**Date:** 2026-10-27 (read from 2026-10-24). **Code:** main at f2ccc13. The engine files (`shamble-core.js`, `shamble-game.js`,',
      '`shamble-editor.js`), both pages and `tools/` are byte-identical to 48ffb51, where the reading started, so their line',
      'numbers hold on both. Kit rows (KT, and the TL rows on `.claude/` files) describe the kit at 48ffb51, as plan condition',
      '8 asks: kit-v3-0 (PR #26) rewrote those files since, so their line numbers are 48ffb51\'s (`git show 48ffb51:<file>`) and',
-     'each row that kit-v3-0 changed says so. In the Where column, `core`, `game` and `editor` mean the three engine files.', '',
+     'each row that kit-v3-0 changed says so. In the Where column, `core`, `game` and `editor` mean the three engine files.',
+     'Doc citations (STATUS, ROADMAP, the reports and the other docs) are to main at f2ccc13 too. PR #25 (merged on',
+     '2026-10-27 as 4c24d07) has since changed STATUS.md and ROADMAP.md: STATUS lines from 37 on are 0 to 2 higher today,',
+     'ROADMAP lines from 49 on 1 to 3 higher; `git show f2ccc13:docs/STATUS.md` shows the text as cited. Rows whose fact',
+     'that PR changed (main\'s branch protection) say so.', '',
      '**How each state was checked:**',
      f'- **[C]** ({states["C"]} rows): code read at main; every Where re-opened by a second reader.',
      f'- **[M]** ({states["M"]} rows): the row also cites a measurement recorded in the repository and names it: a report under',
-     ' `docs/reports/`, the STATUS health table, `docs/AUDIT_BUGS_PERF.md`, the `docs/ANIMATION_PLAN.md` §6 metrics, or a harness',
-     ' in `tools/`. The measurements were not re-run, except where a row says so; the final review re-read each at its source.'] + ([f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.']
+     '  `docs/reports/`, the STATUS health table, `docs/AUDIT_BUGS_PERF.md`, the `docs/ANIMATION_PLAN.md` §6 metrics, or a',
+     '  harness in `tools/`. The measurements were not re-run, except where a row says so; the final review re-read each at its source.'] + ([f'- **[D]** ({states["D"]} rows): a claim from a doc, not re-checked here; the row names the doc.']
      if states['D'] else ['- No row rests on a doc claim alone ([D]): every row was read in the code.']) + ['',
      '**How this file was made.** Six passes, each by Opus agents at effort high (xhigh for the engine and netcode reviews), with notes on checkpoints:',
      f'1. Read: one reader per area (15) wrote {first} rows, each citing file:line.',
@@ -129,12 +133,14 @@ L = ['# Legacy inventory: every system of the legacy build', '',
      f'   One session edit: KT14 records the night-shift routine set up on 2026-10-25.',
      f'6. Final review: five verifiers re-read every [M] row\'s measurement at its source and {meta["fr_sampled"]} sampled code-read rows;',
      f'   the engine-architect, netcode-architect, graphics-engineer and game-designer reviewed the marks and notes of their areas;',
-     f'   a coverage closer placed the declarations no row covered. {meta["fr_findings"]} findings: {meta["fr_accepted"]} fixed, {meta["fr_rejected"]} rejected with',
-     f'   evidence (kit line numbers stay at 48ffb51, see above), {meta["fr_session"]} handled by the session; one checker per area then',
-     f'   checked every fix and rejection ({meta["fr_check_fixes"]} more fixes).']
+     f'   a coverage closer placed the declarations no row covered. {meta["fr_findings"]} findings: {meta["fr_accepted"]} fixed (3 only in part, and',
+     f'   {meta["fr_rejected"]} rejected, because kit line numbers stay at 48ffb51, see above), {meta["fr_session"]} handled by the session (the',
+     f'   coverage count, the [M] definition, two duplicate rows merged); one checker per area then checked every fix and',
+     f'   rejection ({meta["fr_check_fixes"]} more fixes). The rounds stopped there, at the Advisor\'s word (2026-10-27).']
 if cov:
     L += [f'   Coverage after these passes (top-level declarations named in some row\'s Where, mechanical match): ' +
-          ', '.join(f'{f} {cov[f]["named"]}/{cov[f]["total"]}' for f in ('core', 'game', 'editor')) + '.']
+          ', '.join(f'{f} {cov[f]["named"]}/{cov[f]["total"]}' for f in ('core', 'game', 'editor')) +
+          '; every other one sits inside a line range a row cites (see "Not covered and not verified").']
 L += ['', 'The notes of every pass are in the history of the R7 branch (`.checkpoints/r7-legacy-inventory/`, removed in',
       'the last commit before review, as `.claude/CHECKPOINTS.md` §9 requires).', '']
 
@@ -164,14 +170,23 @@ L += ['']
 L += ['## Not covered and not verified', '']
 if cov:
     for f in ('core', 'game', 'editor'):
-        un = cov[f]['unnamed']
-        if not un:
-            L.append(f'- **{f}**: every top-level declaration is named in some row.'); continue
-        L.append(f'- **{f}**: {cov[f]["in_range"]} top-level declarations are not named but sit inside a line range a row'
-                 f' cites (scratch vectors, DOM handles, small helpers of that row\'s system). {len(un)} are neither named nor'
-                 ' inside a cited range' + (': ' + ', '.join(f'`{d["n"]}` ({f}:{d["l"]})' for d in un) + '.' if un else '.'))
+        c = cov[f]; un = c['unnamed']
+        msg = f'- **{f}** ({c["total"]} top-level declarations): {c["named"]} are named in some row\'s Where'
+        if c['in_range']:
+            msg += (f'; the other {c["in_range"]} sit inside a line range a row cites (mostly scratch vectors, DOM handles and'
+                    ' small helpers of that row\'s system). A range hit is mechanical: it shows a row covers the lines, not'
+                    ' that the row describes each name')
+        msg += ('; none is left uncovered.' if not un else
+                f'; {len(un)} are neither: ' + ', '.join(f'`{d["n"]}` ({f}:{d["l"]})' for d in un) + '.')
+        L.append(msg)
 L += ([f'- **[D] rows** ({states["D"]}): doc claims, not re-checked; each names its doc.'] if states['D'] else []) + [
       ] + ([f'- **Merged duplicates** ({len(merged)}): ' + '; '.join(f'{k}: {cell(v)}' for k, v in sorted(merged.items())) + '.'] if merged else []) + [
+      '- **Measurements** ([M] rows) were read at their source, not re-run, except where a row says so (for example the',
+      '  headless evals in CC4 and CC12). Some `docs/ANIMATION_PLAN.md` §6 metrics come from headless snippets that are not',
+      '  checked into `tools/`, so they cannot be re-run as they are.',
+      '- **The map editor** has summary rows here (ED); its features are listed row by row in `docs/EDITOR_V1_INVENTORY.md`.',
+      '- **Routines** (KT rows) are as the routines API showed them; settings that only the claude.ai web app shows were not',
+      '  read.',
       '- **Marks** are recommendations; none is a decision until Mustafa confirms it.',
       '- **The look**: no row decides it; the look pipeline row says "redesign (look brief pending)" and nothing more.', '']
 open('docs/LEGACY_INVENTORY.md', 'w').write('\n'.join(L))
