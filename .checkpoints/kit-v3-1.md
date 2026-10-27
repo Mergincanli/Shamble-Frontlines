@@ -34,11 +34,20 @@
    300 tests pass, 37 mutants caught, a condition-6 message test. Day sessions unchanged. F7 a documented residual.
    Verdict: `.checkpoints/kit-v3-1/advisor-verdict-3.md`. Plan L2 updated (condition 8).
 
+5c. (8f96128) Step 1e: globs + option abbreviations closed (security review 4th pass I1-I3). 329 tests, 44 mutants.
+6. (769fcaf) Step 2: the static settings layer — ask emptied, allows added, denies extended, guard registered on the
+   three events (onFailure block, ${CLAUDE_PROJECT_DIR} path), syntax-gate path fix, effortLevel high. settings.test.mjs
+   82 tests pass. Gate PASS.
+
 ## Current step
-6. Build step 2: settings.json (allows, denies, the empty ask list, `effortLevel`, the hook registration) and its test.
-   Step-3 note: drop `gh pr ready` from the night procedure (routine gh is read-only now) — mark ready via the GitHub
-   MCP `update_pull_request` (draft:false); replace `pkill -f checkpoint.mjs` with the TaskStop tool in NIGHT_SHIFT.md
-   and CHECKPOINTS.md (verdict-3 condition 6).
+7. Build step 3: the procedure docs. advisor.md (PR step 0 role check; the new gate bar), NIGHT_SHIFT.md (start check 0;
+   00:10->08:10; stop saver via TaskStop not pkill; mark-ready via MCP not `gh pr ready`), CHECKPOINTS.md (TaskStop),
+   CLAUDE.md (web-fetch sentence), and the proposal's other procedure changes (playwright cli.js, no git -C, named
+   branch on push, explicit git add paths, git rm for checkpoint deletion, MCP-only GitHub writes, agent memory local).
+   Then step 4 (builder.md, effortLevel already set, memory local, Models-and-effort sentence) and step 5 (checkpoint.mjs
+   percent-escape fix + test, text fixes).
+   Note (verdict-3 condition 6): routine gh is read-only, so the night marks its PR ready via the GitHub MCP
+   update_pull_request(draft:false), not `gh pr ready`; the saver stops via the TaskStop tool, not pkill.
 
 ## Next steps
 1. Build in this worktree, in the plan's order: settings.json, the procedure texts, builder.md, checkpoint.mjs's
@@ -78,6 +87,22 @@
       that is the project root or an ancestor of .github/.git/.claude/tools (coversProtected).
     - G4 MEDIUM sort/xxd/tree write options: fixed by dropping sort, xxd, tree (and jq, od, etc.) from the read list;
       the list is now a small, obviously-safe core plus find (the one kept tool with options, a closed set refused).
+  - **Third review pass of 1dafe0f (4 findings), 2026-10-27, all fixed in step 1d (dca6a1a):**
+    - H1 HIGH `--` end-of-options / bundled values skipped: fixed — the read token scan checks every operand after `--`
+      and extracts bundled/`=`-attached file values.
+    - H2 HIGH bare-word credential not checked (`cat .netrc`): fixed — readOperandDeny credential-checks every operand,
+      bare names included, and treats the whole `.git/` directory as sensitive.
+    - H3 MEDIUM `--recursive`/`--archive` abbreviations: fixed — abbrevOf catches `cp --recur`.
+    - H4 MEDIUM cp/mv/rm directory clobber: fixed robustly — bash mv is off (git mv / Edit), bash rm is allowed only on
+      untracked paths (tracked go through git rm), recursive cp/rm refused, coversProtected backstop kept.
+    322 tests, 41 mutants. Probed: credentials/outside-project/recursive/mv/tracked-rm deny; legit reads + untracked rm pass.
+  - **Fourth review pass of dca6a1a (3 findings), 2026-10-27, all fixed in step 1e (8f96128):**
+    - I1 HIGH cp/rm long-option abbreviation (`cp --recur`) + globs in write paths: fixed — long options off cp/rm
+      (short flags only), and a glob in any write path refused.
+    - I2 HIGH glob in a read path expands past the guard: fixed — globs refused in read paths (find keeps -name
+      patterns via globOk).
+    - I3 MEDIUM grep pattern-option by abbreviation (`--regex=`): fixed — abbreviations detected, and the grep pattern
+      is always credential-checked (scope check skipped). 329 tests, 44 mutants.
   - F7 MEDIUM comment-ownership (shared Mergincanli identity: can't tell a routine's comment from Mustafa's by the
     API): a genuine residual. The API shows the same author for both. Mitigation already in place: night edits only
     #16 and its own PRs, PR Advisor only its review comments on PRs, never #16. Note it in the report as a known
