@@ -24,12 +24,12 @@ recommendation rests on them.
 ### State-sync model
 
 **R2-SYNC-F1.** In peer-to-peer deterministic lockstep, every player gets the latency of the most-lagged player.
-· Source: https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (section "Peer-to-Peer
-Lockstep"; page dated 2010-02-24) · Tier: other · Read 2026-10-27 · Confirmed in the source: "This means that each player
+· Source: https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (the part on
+peer-to-peer lockstep; page dated 2010-02-24) · Tier: other · Read 2026-10-27 · Confirmed in the source: "This means that each player
 in the game has latency equal to the most lagged player."
 
 **R2-SYNC-F2.** Joining a lockstep game in progress is rare, because it needs a complete deterministic starting state.
-· Source: same page, same section · Tier: other · Read 2026-10-27 · Confirmed in the source: "this is not common due to
+· Source: same page, same part · Tier: other · Read 2026-10-27 · Confirmed in the source: "this is not common due to
 the difficulty of capturing and transmitting a completely deterministic starting point".
 
 **R2-SYNC-F3.** Lockstep needs results that match to the bit, and floating-point behaviour differs between compilers,
@@ -52,7 +52,8 @@ player counts then you need a different technique." and "snapshot interpolation 
 side at all!"
 
 **R2-SYNC-F6.** State synchronisation (both sides simulate, the sender sends input and state) is approximate, and its
-cost is time spent hunting divergence and pops. It works only if both sides quantise the state the same way.
+cost is time spent hunting divergence and pops. Fiedler's fix for the two sides drifting apart is to quantise the
+state on both sides.
 · Source: https://gafferongames.com/post/state_synchronization/ (page dated 2015-01-05) · Tier: other · Read 2026-10-27 ·
 Confirmed in the source: "we don't just send input, we send both input and state."; "State synchronization is an
 approximate and lossy synchronization strategy."; "In practice, this means you'll spend a lot of time tracking down
@@ -114,8 +115,8 @@ transport unit's to confirm (inferred here).
 **R2-SYNC-F12.** Client-side prediction keeps a circular buffer of the local player's past states and inputs. When a
 correction arrives, the client rewinds to it and replays the newer inputs. What the player's own input did not cause
 (being hit by a rocket) cannot be predicted.
-· Source: https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (section
-"Client-Side Prediction") · Tier: other · Read 2026-10-27 · Confirmed in the source: "keep a circular buffer of past
+· Source: https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (the part on
+client-side prediction) · Tier: other · Read 2026-10-27 · Confirmed in the source: "keep a circular buffer of past
 character state and input for the local player on the client"; "In effect the client invisibly "rewinds and replays"
 the last n frames of local player character movement"; "Only in the rare case, such as a player getting hit by a
 rocket". Also: "As Tim Sweeney writes in The Unreal Networking Architecture: "The Server Is The Man"."
@@ -206,7 +207,7 @@ artefacts that linear interpolation showed at 10 packets per second.
 rigid bodies because their motion is non-linear and unpredictable."; "I can no longer see any artifacts."
 
 **R2-SYNC-F23.** Quake III steers its clock to approach, but not pass, the newest snapshot, and draws players between
-the previous and the newest snapshot (so under one snapshot interval of delay). It resets the clock when the error
+the previous and the newest snapshot (so under one snapshot interval of delay; inferred from the clock rule and F25). It resets the clock when the error
 exceeds 500 ms, halves an error over 100 ms, and otherwise drifts 1–2 ms per frame. It extrapolates when the newest
 snapshot is late, and a user setting nudges the delay by up to ±30 ms.
 · Source: https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/client/cl_cgame.c (CL_AdjustTimeDelta,
@@ -320,6 +321,9 @@ G_BounceMissile, G_RunMissile) and .../code/game/bg_misc.c (BG_EvaluateTrajector
 `BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );`; "// ignore interactions with the missile owner"
 `trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask );`; in bg_misc.c
 TR_GRAVITY `result[2] -= 0.5 * DEFAULT_GRAVITY * deltaTime * deltaTime;`. The client calls the same function (F25).
+The record, from https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/q_shared.h: `trajectory_t`
+{ `trType_t trType;` `int trTime;` `int trDuration; // if non 0, trTime + trDuration = stop time` `vec3_t trBase;`
+`vec3_t trDelta; // velocity, etc` }.
 
 ---
 
@@ -354,7 +358,7 @@ TR_GRAVITY `result[2] -= 0.5 * DEFAULT_GRAVITY * deltaTime * deltaTime;`. The cl
 
 | Option | How it works | Fit and costs | Risk |
 |---|---|---|---|
-| A. Deterministic lockstep (inputs only) | Every peer runs the whole sim from everyone's inputs. | Lowest bandwidth. But latency is the worst player's (F1), it stalls on a missing input (F4), late join is hard (F2), and it needs bit-exact results on every client (F3). §6.1 rooms and late joining suffer; 48 browsers must all agree. | High: one divergent client breaks the match; a wallhack sees everything. |
+| A. Deterministic lockstep (inputs only) | Every peer runs the whole sim from everyone's inputs. | Lowest bandwidth. But latency is the worst player's (F1), it stalls on a missing input (F4), late join is hard (F2), and it needs bit-exact results on every client (F3). §6.1 rooms and late joining suffer; 48 browsers must all agree. | High: one divergent client breaks the match; every client holds the whole state, so a wallhack sees everything (inferred). |
 | B. Predict-everything with rollback (inputs, the server re-simulates) | Clients run the full sim ahead and roll back on corrections. | I read no source on this in this run (the Overwatch talk, a likely example, is video only). The client cost grows with the entity count at 48+. | Unassessed here. |
 | C. State synchronisation (input + state, both sides simulate) | Fiedler's priority accumulator plus extrapolation. | Low bandwidth, but "approximate and lossy" with divergence and pops (F6). Built for physics objects, not for authority over many players. | Medium. |
 | D. Full snapshots, no delta | The server sends the whole visible state every snapshot. | Simplest; robust to loss. Bandwidth scales with entities × rate (bandwidth unit). | Bandwidth at 48+. |
@@ -408,7 +412,7 @@ or the shooter's latency up to the cap. That is open (OQ6).
 
 | Option | Bits per command (proposed precision) | Fit |
 |---|---|---|
-| A. Direction: yaw + pitch, 16 bits each (as Quake III's angles, F19) | 32 | Compact. A small error in the predicted fire origin turns into a miss at long range (AMK 300 m). |
+| A. Direction: yaw + pitch, 16 bits each (as Quake III's angles, F19) | 32 | Compact. An error in the predicted fire origin shifts the whole ray, so it misses the clicked point by that error. |
 | B. World aim point, quantised (positions to 1 cm as in the default principles) | About 60–75, depending on map bounds (the bandwidth unit sizes it) | Keeps the point the player clicked at any height (GC3), whatever the origin error. The server rebuilds the ray from its own fire origin to that point. Easy to check (range, LOS). |
 
 ---
@@ -435,12 +439,13 @@ interval.
   that acknowledged one: unchanged entities cost no bytes; new entities go from per-entity-type defaults; removals are
   explicit.
 - When there is no usable baseline (never acknowledged, acknowledged too long ago, or dropped from the ring), the server
-  encodes against the per-entity defaults instead of the whole raw state, as Quake III and Fiedler do. The ring length
-  is data: proposed 32 snapshots, as Quake III.
+  encodes against the per-entity defaults instead of the whole raw state, as Fiedler does (F7). Quake III does the same
+  through its "new entity from its baseline" path (F8; that a full snapshot takes that path is inferred from the code
+  quoted). The ring length is data: proposed 32 snapshots, as Quake III.
 - Snapshots go as unreliable datagrams, each sized to fit one QUIC packet (F11). Reliable events go on streams
   (transport unit).
-- Reason: it is the only option that tolerates loss and reordering without stalls, needs no bit-exact agreement between
-  48 browsers for correctness, supports joining and rejoining mid-match (§6.1 rooms and private matches; humans taking
+- Reason: of the options with sources read, it is the one that tolerates loss and reordering without stalls at less
+  bandwidth than full snapshots, needs no bit-exact agreement between 48 browsers for correctness, supports joining and rejoining mid-match (§6.1 rooms and private matches; humans taking
   over bot slots), and keeps the server the only authority. A shipped game (Quake III) and Fiedler both document it.
 - Rests on: F1, F2, F3, F4, F5, F6, F7, F8, F9, F11.
 - Serves: VISION_V2 §6.1 (modes as data, rooms and private matches), §6.2 (positions in 3D), §6.4, §6.5 (economy and
@@ -471,7 +476,7 @@ interval.
 - Rests on: F4, F16, F18, F19, F20, F28, F33.
 - Serves: §4 (fairness), §6.2 (aiming at height), §6.3 (abilities as input edges).
 - Spike pass marks (proposed):
-  1. Under P3 with 5 % random loss, at least 99.9 % of commands reach the server before their tick runs.
+  1. Under P3 (5 % random loss), at least 99.9 % of commands reach the server before their tick runs.
   2. 10,000 scripted presses under P3 with reordering: 0 lost and 0 doubled.
   3. Forged commands (a tick in the future, an aim beyond weapon range, more commands than the cap) are rejected and
      counted, with 0 effect on the sim.
@@ -501,7 +506,8 @@ C); replay from the authoritative state; linear error decay (option 3.3 B), plus
 - Rests on: F5, F6, F12, F13, F14, F15, F16, F17, F20, F24.
 - Serves: §4 (fairness), LOOP_V2 §7 (split feedback: the shot feels instant, the hit is confirmed), §6.4 (vehicles).
 - Spike pass marks (proposed):
-  1. Under P0–P4 on a scripted course with no other players: 0 corrections larger than 1 mm.
+  1. Under P0–P4 on a scripted course with no other players: 0 corrections larger than 1 mm whenever every command
+     arrived in time; every other correction is counted and traced to a late or lost command.
   2. Under P3 in a 48-player brawl: corrections larger than 5 cm in fewer than 1 % of snapshots, and the visible
      correction never moves the player more than 5 cm in one frame below the snap threshold.
   3. Input-to-screen latency for own movement and muzzle flash is the same at P0 and P4, within one tick.
@@ -537,8 +543,8 @@ sim-owned hit volumes, capped (option 3.5 B).**
   stance, alive, Riot Shield up), vehicles and big units (position, hull and turret transforms, alive per part), and
   harvesters.
   - Animation is cosmetic, so unlike Source no animation layers are stored (F29 against CS2).
-  - Its length is the cap plus a margin. The default principles' ~1 s, also Source's default (F28), costs about 0.1 MB at 60 Hz for
-    60 movers (inferred), but nothing in §6 uses more than the cap.
+  - Its length is the cap plus a margin. The default principles' ~1 s, also Source's default (F28), costs about
+    0.1 MB at 60 Hz for 60 movers (inferred), but nothing in §6 uses more than the cap.
 - The shot. The server builds the ray from its own authoritative fire origin at the command's tick (the
   `playerFireOrigin` rule, GC5) toward the command's aim (REC8). It resolves the ray against the movers' recorded state
   at the view time, and against the static world at present. Movers are not moved back and restored: `resolveShot`
@@ -546,12 +552,12 @@ sim-owned hit volumes, capped (option 3.5 B).**
 - View time. The command's view time is accepted if it lies within 200 ms of the server's estimate (RTT plus that
   client's interpolation delay); otherwise the estimate is used (F28).
 - The cap. The rewind is capped at a data value, proposed 250 ms. Reading "about 100 ms of ping" as RTT, a 100 ms player
-  with a 100–150 ms delay needs 200–250 ms (F28's formula; inferred). The default principles' ~200 ms covers only the low end.
-  Beyond the cap, shooters lead by the excess.
+  with a 100–150 ms delay needs 200–250 ms (F28's formula; inferred). The default principles' ~200 ms covers only the
+  low end. Beyond the cap, shooters lead by the excess.
 - Filters (Source's, F32):
   - targets the shooter could hit (team filter, friendly fire from mode data);
   - targets sent to and acknowledged by the shooter (interest management);
-  - targets within reach of the ray.
+  - targets within reach of the ray (our form of Source's distance and cone tests).
   - A target that died or teleported between the view time and now stops at that record (F30).
 - Bots. Shots by bots use present state, with no rewind (F31).
 - Feedback. Hit confirmation goes back as a reliable event with the tick (LOOP_V2 §7).
@@ -597,7 +603,8 @@ owner shows an immediate cosmetic copy (option 3.6 B).**
 **R2-SYNC-REC7. Vehicles and big multi-part units: the pilot predicts the vehicle through its own command stream; parts
 are sim data in snapshots and history.**
 - The pilot. The piloting player predicts the vehicle exactly as REC3 predicts the soldier. The pilot's command drives
-  the vehicle, and the snapshot carries the vehicle's state as the pilot's predicted state.
+  the vehicle, and the pilot's snapshot carries the vehicle's state at full precision, like the local player's own
+  state (REC3).
 - Everyone else interpolates it (REC4).
 - Parts. Each part (hull, turret, legs as needed) is a hit volume with its own transform and health in sim data. Part
   transforms are compact state (yaw, pitch); animation stays cosmetic (GC16, GC17).
@@ -607,7 +614,7 @@ are sim data in snapshots and history.**
 - Reason: it follows from the shipped prediction model (F12, F13) applied to whatever the player controls. Multi-part
   history is the same table as REC5.
 - Rests on: F12, F13, F15, F28, F29.
-- Serves: VISION_V2 §6.4 (vehicles as first-class, big and multi-part), §6.9 (spectacle).
+- Serves: VISION_V2 §6.4 (vehicles as first-class, big and multi-part).
 - Spike pass marks (proposed):
   1. A piloted Juggernaut under P2 and P3 meets REC3's correction marks.
   2. Hits on each part meet REC5's registration marks.
@@ -764,7 +771,7 @@ client sees, not with the match size.**
 
 - **Tick rate and bandwidth.**
   - REC4's delay and REC5's cap are in snapshot intervals and need the chosen rates (OQ1).
-  - Quake III's defaults (F10) are a historical floor only.
+  - Quake III's defaults (F10) are listed for reference.
   - GC5's cooldown rounding (fire timers reset instead of carrying the remainder) must be fixed in any tick choice.
   - The full-snapshot or baseline-relative cost after a long loss (REC1) and the aim point's bit cost (REC8) belong in
     the budget.
@@ -775,9 +782,9 @@ client sees, not with the match size.**
   - The snapshot's entity cap and priority order feed REC1 and REC9.
 - **WebTransport stack.**
   - Snapshots go as datagrams, each fitting one QUIC packet (F11; OQ4).
-  - Reliable hit-confirm and trajectory-change events go on streams.
-  - The WebSocket fallback has no unreliable channel, so stale snapshots queue behind lost ones. REC1's "deltas against
-    the acknowledged snapshot" still works, but the delay grows. That unit should measure it.
+  - Hit confirmations go as reliable events (REC5).
+  - The WebSocket fallback: how its delivery affects snapshot delay under loss is that unit's to establish and measure.
+    REC1 is meant to work over either transport.
 - **Rooms and private matches.** Late join and rejoin start from per-entity defaults (REC1). A human taking over a bot
   slot keeps the entity id (GC2, STATUS.md:68).
 - **R1 (simulation core).**
