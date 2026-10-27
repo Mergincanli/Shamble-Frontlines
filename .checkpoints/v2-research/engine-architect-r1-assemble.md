@@ -19,3 +19,11 @@ Task: assemble docs/research/r1-simulation-core.md from the six R1 unit drafts (
 - Notes files: all six end DONE; drafts complete. Sources extracted (scratchpad sources.json): read entries 170 -> 161 unique URLs (8 URLs shared: HashMap x3, BTreeMap, what_every_programmer, bg_pmove.c, Performance/now, Chrome throttling, features.json, wasm32 page). Not read: 54 entries -> 49 rows (gdcvault 1024001 x4, edgegap x2, Source_Multiplayer x2 merged); 1 row is BND "none found" (not a source) -> 48 not-read entries.
 - Tiers (unique): official 138, shipped game 8, other 14, plus 1 split (what_every_programmer: TICK other / DET shipped game).
 - Plan for the file: build by script (scratchpad/build.py) copying draft sections verbatim with headings demoted; hand-written parts in scratchpad/*.md (header, TL;DR, unit intros, XU OQs, pointers, hinge list); sources tables generated with a fix-up map. Next: write hand parts.
+- part_header.md and part_xu.md written (XU-OQ1..12, quotes checked against drafts). Next: pointers + hinge parts.
+- part_pointers.md and part_hinge.md written and checked (hinge: 12 rows). Next: build.py (sections verbatim + sources tables).
+- build.py run: r1.md built in scratchpad (298 KB, 2956 lines); ids 284 defs (180F/37REC/55OQ + 12 XU), all draft lines copied verbatim (0 missing). Next: review intros, sources tables, then copy to docs/research.
+- r1-simulation-core.md written to docs/research (copied from scratchpad build). git status: only my notes, another agent's R2 notes, and the topic file. Next: final checks, DONE.
+- Final checks: 284 id definitions (180 F, 37 REC, 55 OQ, 12 XU-OQ), every draft line of findings/legacy/options/recs/OQs present verbatim, tables consistent, no TODO. Sources: 161 read (official 138, shipped 8, other 14, split 1), 48 not read (+1 "none found" note); per-unit tier table matches drafts. Hinge list: 12 rows.
+- Conflicts -> R1-XU-OQ1..9 + OQ12; gaps -> XU-OQ10 (tick constant on hot reload), XU-OQ11 (exact dt). Missing in drafts: DET skips TICK-OQ1's exact-dt question; DATA skips tick-constant reload; ABL-REC6 rests on no finding; ABL's GAS facts all from one community write-up; DATA's MDN pages have no dates.
+- Build tooling kept in scratchpad only (build.py, part_*.md). Nothing committed or pushed.
+DONE
