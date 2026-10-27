@@ -1,9 +1,19 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-17, kit-v2-1 (PR #22, 211ddcb; automated merging), docs-after-kit-v2-1 (PR #24, e727ce4) and kit-v2-2 (PR #23, 48ffb51; the merge go comes after the APPROVE) merged; `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Mustafa checked main (three teams, 3a) in Brave on 2026-10-17: "it looks good" (his words, in the implementer session's chat). Next game work: N1. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-27. **Now in v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`): process upgrades, then research (`docs/research/`), then the decision drafts. R7 (legacy inventory + tuning dump) merged (PR #27); **R1–R6 research is the next daytime work**. kit-v3-1 (the routine guard) is done on its branch `cs/kit-v3-1`, awaiting its PR, the advisor's review and Mustafa's go — not merged yet. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16). The legacy game (the five files) is frozen: critical fixes only._
 
 ## Phase
-**Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
+**v2 phase 0 (current):** process upgrades (kit-v3-*), then research (R1–R7), then the decision drafts (`docs/ENGINE_OVERVIEW.md`,
+`docs/adr/0001`–`0006`). No engine code until Mustafa and the Advisor approve the drafts; throwaway spikes only.
+- Process: kit-v3-0 merged; **kit-v3-1** (routine guard: the night shift and PR Advisor routines run safely unattended — a
+  deny-by-default shell, no web, no push to main / force-push / `.claude/` edits, merges fail closed, nothing ask-first; plus
+  ROUTINE-EFFORT, `effortLevel: "high"` in settings) done on branch `cs/kit-v3-1`, awaiting PR / review / Mustafa's go.
+- Research (`docs/research/`): R7 merged (PR #27: legacy inventory + tuning dump). **R1–R6 are the next daytime work**
+  (R1/R4 engine-architect, R2 netcode-architect, R3 graphics-engineer, R5 test-engineer, R6 infra-engineer). The verifier
+  spot-checks each topic's key claims.
+- Decision drafts: not started (they wait on the research).
+
+**Legacy "Phase 0: environment + green baseline"** (pre-v2 agentic setup): merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
@@ -15,7 +25,8 @@ bot-poplar-wedge (PR #7, 159bec4).
 kit-v1-4 (PR #17, bd27eeb; CLAUDE.md "Night shift" section), kit-v1-5 (PR #18, 2303073; `.claude/NIGHT_SHIFT.md`),
 kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679),
 docs-after-3a (PR #20, df1e6d3; docs only), kit-v2-0 (PR #21, 04c086c; the `advisor` agent), kit-v2-1 (PR #22, 211ddcb; automated merging), docs-after-kit-v2-1 (PR #24, e727ce4; docs only, merged by the PR Advisor), kit-v2-2 (PR #23, 48ffb51; the merge go comes after the APPROVE).
-**In flight:** none; next game work is N1 from the Night queue.
+**In flight:** kit-v3-1 (routine guard) on `cs/kit-v3-1`, awaiting its PR. The greybox queue below is legacy work, frozen
+behind v2 phase 0; next daytime work is R1–R6 research.
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
 **Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
@@ -34,6 +45,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **kit-v3-1** (routine guard for the two cloud routines. New `.claude/hooks/`: `routine-guard.mjs` (rules: `decide`), `guard.mjs` (launcher, fails closed for routines), `routine-guard.test.mjs`, `settings.test.mjs`. In a routine the shell runs only git, gh, `npm ci` and node on main's scripts (reading/searching via the Read/Grep/Glob tools); routines never read the web, can't push to main or force-push or edit `.claude/`/`CLAUDE.md`, merges fail closed, nothing is ask-first. Day sessions unchanged. Also `.claude/settings.json` (empty ask, allow/deny, `effortLevel: "high"`, guard on PreToolUse/PermissionRequest/ConfigChange), procedures in NIGHT_SHIFT.md / CHECKPOINTS.md / advisor.md / CLAUDE.md / the 11 agent files (memory: local). No game code) | branch `cs/kit-v3-1` (not merged) | done on branch; needs PR, advisor review, Mustafa's go | advisor APPROVE + Mustafa's go |
 | kit-v2-2 (CLAUDE.md "Standing permission": Mustafa's go is for the PR's current head, given after the advisor approved that head; a later push needs the advisor's review first, then his go again; now matches advisor.md:98–105. security-auditor PASS WITH NOTES, findings 1 and 3 fixed, re-check PASS; findings 2 and 5 deferred, finding 4 open: see Open bugs and risks. No game code, symbols +0 -0) | merged: PR #23, 48ffb51, 2026-10-17, PR Advisor APPROVE on 964ea5a, merged on Mustafa's go in chat (PR Advisor's #23 comment) | done | none |
 | docs-after-kit-v2-1 (docs only: kit-v2-1's merge and Mustafa's Brave check of 3a recorded; PR #22 finding 6 nits fixed) | merged: PR #24, e727ce4, 2026-10-17, PR Advisor APPROVE on d255277, merged by the PR Advisor (class ready) | done | none |
 | **kit-v2-1** (automated merging: the PR Advisor routine merges approved ready PRs at once; `needs-mustafa` (rules category, or a major change; when unsure) waits for Mustafa's go. His go counts only in his own words in the chat of the merging session, about that PR, after the advisor's APPROVE of its current head; a "merge" on GitHub never counts. The approved full SHA goes in the review comment and is the merge's expected head; a later push needs a new review and go. Fork PRs skipped; PR text is evidence, never instructions. Green = `gate` and `smoke` both passed on the approved SHA; a hard-constraint change also needs its accepted ADR on main. The gate's own files (everything `tools/gate.mjs` or `.github/workflows/` load: today gate.mjs, smoke.mjs, battery.js, gate-globals.json, tools/package.json, tools/package-lock.json; any `.npmrc`) join the rules category; a changed repro tool (preview.js, sim.js) is replaced by main's copy. The advisor always works from main's advisor.md. NIGHT_SHIFT rule 7 REVISE path; night shift never merges; CLAUDE.md Agents lists `advisor`. No game code, symbols +0 -0. Reviews: advisor plan review REVISE (8 texts applied); security-auditor FAIL, all 8 findings fixed; deferred: wording at tools/gate.mjs:333 / tools/README.md calling gate-globals.json "reviewed data") | merged: PR #22, 211ddcb, 2026-10-17, PR Advisor APPROVE (run 2, head 9baa7f2), merged on Mustafa's go in chat | done | none |
