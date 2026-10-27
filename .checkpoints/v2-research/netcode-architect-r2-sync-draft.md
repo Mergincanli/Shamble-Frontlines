@@ -156,11 +156,16 @@ distance between the current position and the correct position"; "directly snapp
 velocity"; "ignores any input received with a time value less than the current time"; "the client rewinds to the
 corrected physics state and time and replays the stored moves".
 
-**R2-SYNC-F17.** Quake III also predicts item pickups and jump pads, with item prediction on by default. Other entities
-are not simulated on the client: they come from snapshots.
-· Source: cg_predict.c (CG_TouchItem, CG_TouchTriggerPrediction) and cg_main.c · Tier: shipped game · Read 2026-10-27 ·
-Default confirmed in the source (`{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },`). The rest is inferred:
-I saw it only in the fetch tool's paraphrase.
+**R2-SYNC-F17.** Quake III also predicts item pickups (as a "predictable event", hiding the item at once) and jump
+pads, with item prediction on by default. Other entities are not simulated on the client: the predicted player collides
+against the solid entities of the current snapshot.
+· Source: cg_predict.c (CG_TouchItem, CG_TouchTriggerPrediction, CG_BuildSolidList) and cg_main.c · Tier: shipped game
+· Read 2026-10-27 · Confirmed in the source: `{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },`;
+"BG_AddPredictableEventToPlayerstate( EV_ITEM_PICKUP, cent->currentState.modelindex , &cg.predictedPlayerState);";
+"// remove it from the frame so it won't be drawn" "cent->currentState.eFlags |= EF_NODRAW;"; "// never pick an item up
+twice in a prediction"; "BG_TouchJumpPad( &cg.predictedPlayerState, ent );"; "When a new cg.snap has been set, this
+function builds a sublist of the entities that are actually solid, to make for more efficient collision detection"
+"cg_solidEntities[cg_numSolidEntities] = cent;".
 
 **R2-SYNC-F18.** Input redundancy. Each Quake III packet carries every command made since the packet `cl_packetdup`+1
 packets back (cl_packetdup is 1 by default and clamped to 0..5), at most 32 commands, each delta-coded against the one
@@ -444,9 +449,10 @@ interval.
   quoted). The ring length is data: proposed 32 snapshots, as Quake III.
 - Snapshots go as unreliable datagrams, each sized to fit one QUIC packet (F11). Reliable events go on streams
   (transport unit).
-- Reason: of the options with sources read, it is the one that tolerates loss and reordering without stalls at less
-  bandwidth than full snapshots, needs no bit-exact agreement between 48 browsers for correctness, supports joining and rejoining mid-match (§6.1 rooms and private matches; humans taking
-  over bot slots), and keeps the server the only authority. A shipped game (Quake III) and Fiedler both document it.
+- Reason: of the options with sources read, it is the one that tolerates loss and reordering without stalls while
+  unchanged entities cost nothing (F7, F8), needs no bit-exact agreement between 48 browsers for correctness, supports
+  joining and rejoining mid-match (§6.1 rooms and private matches; humans taking over bot slots), and keeps the server
+  the only authority. A shipped game (Quake III) and Fiedler both document it.
 - Rests on: F1, F2, F3, F4, F5, F6, F7, F8, F9, F11.
 - Serves: VISION_V2 §6.1 (modes as data, rooms and private matches), §6.2 (positions in 3D), §6.4, §6.5 (economy and
   objectives server-side), and §4 (fairness).
@@ -563,7 +569,7 @@ sim-owned hit volumes, capped (option 3.5 B).**
 - Feedback. Hit confirmation goes back as a reliable event with the tick (LOOP_V2 §7).
 - Reason: without it, a 100 ms player must lead a sprinting soldier by about 1.8 m (F34, legacy `T`). With it, the
   shooter's view is the truth up to the cap, and the victim's "hit behind cover" window is bounded by the cap (F34).
-- Rests on: F27, F28, F29, F30, F31, F32, F34.
+- Rests on: F28, F29, F30, F31, F32, F34 (F34 is my reasoning from F28; F27 only illustrates the option rejected).
 - Serves: §4 ("fair up to about 100 ms of ping"), LOOP_V2 §7, §6.4 (multi-part vehicle hits).
 - Spike pass marks (proposed):
   1. A scripted shooter fires at a strafing, sprinting target (9 m/s, changing direction at random) under P0–P3. Shots
@@ -689,7 +695,8 @@ client sees, not with the match size.**
   snapshot). The other is independent parts, each a delta of some entities against the same baseline and acknowledged
   separately. What decides it: the bandwidth unit's snapshot size at 48+ and the transport unit's datagram payload.
 - **R2-SYNC-OQ5. Collision between predicted players and remote players or vehicles.** Remote movers are drawn in the
-  past, so colliding with them mispredicts. Soldiers could not collide with each other, collide softly, or collide
+  past, so colliding with them mispredicts (Quake III collides the predicted player with the snapshot's solid entities,
+  F17). Soldiers could not collide with each other, collide softly, or collide
   fully. What decides it: a game-design call (does body-blocking matter in LOOP_V2's fights?) and the REC7 spike's
   correction rate.
 - **R2-SYNC-OQ6. Projectile spawn fast-forward.** The options are none, a fixed prestep (Quake III's 50 ms, F35), or the
