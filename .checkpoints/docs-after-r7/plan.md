@@ -114,3 +114,24 @@ full SHA as the expected head, with `gate` and `smoke` green on it.
 ## For Mustafa
 Nothing to check in Brave. Switch the PR Advisor routine off; answer KIT31-STATE; say "merge #<n>" once the advisor
 approves.
+
+## Conditions (advisor APPROVE of revision 2, 2026-10-27 21:26 UTC; verbatim in `advisor-verdicts.md`)
+1. KV3-MERGE reads: "KV3-MERGE (a): the session merged kit-v3-0 on Mustafa's own 'merge #26', given after the advisor
+   approved its final head, not on his earlier advance go."
+2. DOMAINS-ACCEPT reads: "DOMAINS-ACCEPT (a): six documentation hosts where anyone can publish (github.com,
+   raw.githubusercontent.com, docs.rs, crates.io, developer.valvesoftware.com, datatracker.ietf.org) stay on the list of
+   sites fetched without a prompt, with the risk recorded. This holds only once WRITE-GUARD is merged; until then
+   research runs in the daytime only."
+3. WRITE-GUARD reads: "WRITE-GUARD (a): write limits for kit and gate files, enforced in settings (rules that ask
+   first, or deny rules if routines let ask-first rules pass silently), plus the secret-pattern fix; kit changes by day."
+4. The gate claim is honest. The advisor's premise (no Playwright, so no local smoke) does not hold on this machine:
+   `tools/smoke.mjs:121` loads `require('playwright')`, which resolves to the pre-installed Playwright 1.63.0
+   (`/opt/node-tools/node_modules/playwright`) with its Chromium build 1243 (`/opt/pw-browsers`), and the local gate ran
+   5a and passed (index 8/8, editor 5/5). This environment says not to install another Playwright version (it would not
+   find this machine's browser), so 1.56.1 is not installed. The PR body says: the local smoke ran on the pre-installed
+   1.63.0; CI's `smoke` check runs the pinned 1.56.1. The advisor is told before its PR review.
+5. No symlink: the worktree has its own `tools/node_modules`, a real folder from `npm ci --omit=optional`, matched by
+   `node_modules/` in `.gitignore`. Before each commit and push, `git status --porcelain` shows only `docs/STATUS.md`,
+   `docs/ROADMAP.md` and `.checkpoints/`; the final head has no `.checkpoints/` files.
+6. STATUS names the session: "the v2 day session (session_0173vVo5q59ameR6cnN9BENg)", never "this session" or "the day
+   session".
