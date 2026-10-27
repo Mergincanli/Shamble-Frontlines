@@ -46,6 +46,27 @@
   project and the scratchpad, and environment settings on a command limited to a short list. Day sessions unchanged.
   Not built: it widens the approved plan, so it waits for the advisor's answer.
 - Design addition beyond the plan's letter, for the final review: the launcher (guard.mjs) split from the rules.
+- **Automated security review of 3f43a7a (security-guidance plugin), 7 findings on routine-guard.mjs, 2026-10-27 17:05.**
+  It converges with the scope question above (sent to the advisor as verdict-3). Disposition:
+  - F1 HIGH program-name deny-list evasion (unknown program → null): the scope question itself. Fix = routine Bash
+    deny-by-default, an explicit program allow-list. Held for the advisor's verdict-3; then build.
+  - F3 HIGH guard self-modification (WRITERS can't name every writer): same root as F1; the allow-list closes it
+    (every non-option arg of any allowed program checked against protectedRel). Held with F1.
+  - F6 MEDIUM gh deny-by-default (an unlisted gh subcommand → null): the gh analogue of F1; allow only the named
+    read-only gh forms and api GET. Held with F1.
+  - F2 HIGH heredoc parser differential (quoted delimiter; `<<-` tab-strip; unterminated skips to end): fold in
+    regardless of the verdict — for a role, an unterminated heredoc is refused; `<<-` strips tabs, `<<` does not;
+    a quoted delimiter is matched literally.
+  - F4 MEDIUM fail-open ordering (scratchpad checked before protected): reorder — protected/scope first, scratchpad
+    only for paths inside it and outside the project. (realOf already blocks a scratchpad symlink into the project;
+    defense in depth.) Fold in regardless.
+  - F5 MEDIUM credential-read bypass (Read path matched on the raw string): realpath the Read path before matching;
+    extend the credential denylist to routine Bash args and redirects; refuse printenv and bare env in routines.
+    The allow-list (F1) makes the Bash half automatic; the Read realpath is folded in regardless.
+  - F7 MEDIUM comment-ownership (shared Mergincanli identity: can't tell a routine's comment from Mustafa's by the
+    API): a genuine residual. The API shows the same author for both. Mitigation already in place: night edits only
+    #16 and its own PRs, PR Advisor only its review comments on PRs, never #16. Note it in the report as a known
+    residual; a stronger check (a marker line in the routine's own comments) is a later kit item, not this one.
 
 ## Key numbers
 - Ask rules on main today: 16, every one a stall in a routine. Allow rules proposed: 21; deny: 22.
