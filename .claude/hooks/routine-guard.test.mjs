@@ -342,7 +342,7 @@ export const CASES = [
   ['night: cat a credential file', NIGHT, sh('cat ~/.git-credentials'), true],
   ['night: grep /proc', NIGHT, sh('grep x /proc/1/environ'), true],
   ['night: a variable in a read path', NIGHT, sh('cat $HOME/.netrc'), true],
-  ['night: read-redirect a credential', NIGHT, sh('cat < ~/.git-credentials'), true],
+  ['night: read-redirect a credential', NIGHT, sh('cat < .git/config'), true],
   ['night: read-redirect a doc', NIGHT, sh('wc -l < docs/a.md'), false],
   ['night: cat .git/config', NIGHT, sh('cat .git/config'), true],
   // --- deny-by-default: find (the one read tool kept that has write/exec options; verdict-3 condition 1) ---
@@ -370,14 +370,25 @@ export const CASES = [
   ['night: a bare credential filename', NIGHT, sh('cat .netrc'), true],
   ['night: read .git internals', NIGHT, sh('cat .git/HEAD'), true],
   ['night: end-of-options then a credential', NIGHT, sh('grep foo -- /proc/1/environ'), true],
-  // --- deny-by-default: globs in read/write paths, and grep pattern-supplying options (I1/I2/I3) ---
+  // --- deny-by-default: shell expansion (unquoted globs, braces, ~) is refused at the command level (I1/I2/J1/J3) ---
+  ['night: an unquoted wildcard', NIGHT, sh('cat *'), true],
   ['night: a glob in a read path', NIGHT, sh('cat docs/*.md'), true],
   ['night: a dotglob read', NIGHT, sh('cat .*'), true],
   ['night: a glob in a rm path', NIGHT, sh('rm build-*.tmp'), true],
   ['night: a glob in a redirect', NIGHT, sh('echo x > out-*.log'), true],
+  ['night: a question-mark glob', NIGHT, sh('cat file?.txt'), true],
+  ['night: a tilde read', NIGHT, sh('cat ~/.bashrc'), true],
+  ['night: a tilde rm', NIGHT, sh('rm ~/x'), true],
+  ['night: a quoted glob is a literal pattern', NIGHT, sh('grep "a*b" docs/a.md'), false],
+  ['night: a quoted glob in a write path', NIGHT, sh('rm "x*.tmp"'), true],
+  ['night: a brace expansion in a read path', NIGHT, sh('cat {a,b}.txt'), true],
+  ['night: a brace expansion in a redirect', NIGHT, sh('echo x > {a,b}.log'), true],
+  ['night: a bracket class in a read path', NIGHT, sh('cat [ab].txt'), true],
+  ['night: cp -a is recursive (bundled)', NIGHT, sh('cp -pa a b'), true],
   ['night: grep --regex supplies the pattern', NIGHT, sh('grep --regex=foo /etc/passwd'), true],
   ['night: a grep pattern that resolves to a credential', NIGHT, sh('grep .netrc docs/a.md'), true],
   ['night: find -name keeps its glob pattern', NIGHT, sh('find . -name "*.md" -type f'), false],
+  ['night: a test builtin with brackets', NIGHT, sh('[ -f docs/a.md ]'), false],
   // --- deny-by-default: recursive cp/rm and directory clobber (G3); mv is off; rm only untracked (H4) ---
   ['night: rm -rf the project root', NIGHT, sh('rm -rf .'), true],
   ['night: rm -r a directory', NIGHT, sh('rm -r docs'), true],
@@ -435,6 +446,13 @@ for (const [name, role, input, refused, opts] of CASES) {
     assert.equal(!!d, refused, `${name}: ${JSON.stringify(d)}`);
   });
 }
+
+test('a merge whose check cannot complete fails closed, even for a day session (K1)', async () => {
+  const io = fakeIo({ role: '' });
+  io.gh = () => ({ code: 1, out: '' }); // every gh api fails, so ghJson throws inside mergeCheck
+  const d = await decide(merge(), io);
+  assert.ok(d && /could not complete|refused/i.test(d.deny), `expected a closed failure, got ${JSON.stringify(d)}`);
+});
 
 test('a refusal names what to use instead (verdict-3 condition 6)', async () => {
   const msg = async (command) => (await decide(sh(command), fakeIo({ role: NIGHT })))?.deny ?? '';
@@ -556,10 +574,12 @@ const MUTANTS = [
   // 'no substitutions in routines' (if (role && subs)) is now backstopped: a $(...) always leaves a $() token that the
   // git/gh, read-operand and write-path $ checks catch downstream, so it carries no behavioural mutant (its clearer
   // early message is the point). The case 'night: command substitution' still proves substitutions are denied.
-  ['a glob in a read path (I2)', 'if (!globOk && /[*?[]/.test(p)) return deny(', 'if (false) return deny('],
-  ['a glob in a write path (I1)', 'if (/[*?[]/.test(p)) return deny(`routine (${role}): a glob in a write path', 'if (false) return deny(`routine (${role}): a glob in a write path'],
+  ['unquoted expansion at the command level (J1)', 'if (role && c.expand) return deny(', 'if (false) return deny('],
+  ['brace/bracket in a read path (J3)', 'if (/[[{]/.test(p)) return deny(`routine (${role}): a brace or bracket', 'if (false) return deny(`routine (${role}): a brace or bracket'],
+  ['glob/brace in a write path (I1/J3)', 'if (/[*?[{]/.test(p)) return deny(`routine (${role}): a glob or brace', 'if (false) return deny(`routine (${role}): a glob or brace'],
   ['long options off cp/rm (I1)', 'if (longOpt) return deny(', 'if (false) return deny('],
   ['grep pattern-option abbreviations (I3)', "abbrevOf(a, 'regexp') || abbrevOf(a, 'file')", 'false || false'],
+  ['cp -a is recursive, bundled (J4)', "(prog === 'cp' ? /^-[^-]*[rRa]/ : /^-[^-]*[rR]/)", "(prog === 'cp' ? /^-[^-]*[rR]/ : /^-[^-]*[rR]/)"],
   ['shell keywords', "'!', '{', '}', 'if', 'then', 'else',", "'!', 'else',"],
   ['parentheses separate commands', "if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }", "if (c === ';') { endCmd(); i++; continue; }"],
   ['no merge at night', "if (role === 'night-shift') return deny('routine (night-shift): the night shift never merges');", ''],

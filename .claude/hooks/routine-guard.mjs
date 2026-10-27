@@ -71,15 +71,17 @@ export function parseShell(src) {
   const cmds = [];
   let subs = false, unterminated = false;
   const walk = (s) => {
-    let argv = [], redirects = [], reads = [], word = null, i = 0, pendingRedirect = false;
+    let argv = [], redirects = [], reads = [], word = null, i = 0, pendingRedirect = false, wordExpand = false, cmdExpand = false;
     const heredocs = [];
     const endWord = () => {
-      if (word === null) return;
+      if (word === null) { wordExpand = false; return; }
+      if (wordExpand) cmdExpand = true; // an unquoted glob/~ in this word: the shell would expand it before the program runs (J1/J2/J3)
+      wordExpand = false;
       if (pendingRedirect === 'read') { reads.push(word); pendingRedirect = false; } // a < reads this file (F5: still credential-checked)
       else if (pendingRedirect) { redirects.push(word); pendingRedirect = false; } else argv.push(word);
       word = null;
     };
-    const endCmd = () => { endWord(); if (argv.length || redirects.length || reads.length) cmds.push({ argv, redirects, reads }); argv = []; redirects = []; reads = []; };
+    const endCmd = () => { endWord(); if (argv.length || redirects.length || reads.length) cmds.push({ argv, redirects, reads, expand: cmdExpand }); argv = []; redirects = []; reads = []; cmdExpand = false; };
     const sub = (open, close) => { // returns index after the matching close
       let depth = 1, j = i + open.length, q = null;
       for (; j < s.length; j++) {
@@ -150,6 +152,7 @@ export function parseShell(src) {
         } else { i++; pendingRedirect = 'read'; }
         continue;
       }
+      if (c === '*' || c === '?' || (c === '~' && word === null)) wordExpand = true; // unquoted; the shell expands it
       word = (word ?? '') + c; i++;
     }
     endCmd();
@@ -406,7 +409,7 @@ function unwrapRole(argv, role) {
 // path is normalised (resolved against the command's folder and realpath'd) before every match, so `..` and symlinks
 // can't dodge it.
 function readOperandDeny(p, vcwd, role, io, scratch, opts = {}) {
-  const { globOk = false, credOnly = false } = opts;
+  const { credOnly = false } = opts;
   if (p === '' || p === '-') return null;
   const looksPath = p.includes('/') || /^~/.test(p);
   const exRaw = p.replace(/^~(?=\/|$)/, io.home);
@@ -415,11 +418,10 @@ function readOperandDeny(p, vcwd, role, io, scratch, opts = {}) {
   // internals, ssh, gh and the dot-files. This check runs even for the grep pattern (credOnly).
   const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git(\/|$)/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
   if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
-  if (credOnly) return null; // a grep pattern: credential-checked above, but not a path to scope-check
+  if (credOnly) return null; // a grep pattern: credential-checked above, but not a path to scope-check (unquoted glob patterns are caught at the command level)
   if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
-  if (!globOk && /[*?[]/.test(p)) return deny(`routine (${role}): a glob in a file path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I2)
+  if (/[[{]/.test(p)) return deny(`routine (${role}): a brace or bracket expansion in a file path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (J3); * and ? are caught at the command level
   if (!looksPath) return null; // a bare word that isn't a path (a flag value)
-  if (/[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
   const inProject = projectRel(p, vcwd, io) !== null;
   const inScratch = scratch && insideDir(p, scratch, vcwd, io);
   const inBrowsers = abs === '/opt/pw-browsers' || abs.startsWith('/opt/pw-browsers/') || abs === '/dev/null';
@@ -430,7 +432,7 @@ function readOperandDeny(p, vcwd, role, io, scratch, opts = {}) {
 // (verdict-3 condition 3, F4). Protected and project-scope decide before the scratchpad; a symlink is followed first.
 function writeTarget(what, p, vcwd, role, io, input) {
   if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a write path (${p})`);
-  if (/[*?[]/.test(p)) return deny(`routine (${role}): a glob in a write path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I1)
+  if (/[*?[{]/.test(p)) return deny(`routine (${role}): a glob or brace expansion in a write path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I1/J3)
   if (p === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d+)$/.test(p)) return null;
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {
@@ -496,6 +498,7 @@ async function bash(command, cwd, role, io, input) {
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd;
   for (const c of cmds) {
+    if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
     if (role) { const u = unwrapRole(c.argv, role); if (u.deny) return deny(u.deny); argv = u.argv; }
     else argv = unwrap(c.argv);
@@ -546,7 +549,6 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
     // credential- and scope-check every path the tool reads: operands and the file value of an option (-fFILE,
     // --file=FILE). After `--` everything is an operand (H1). For grep the first bare operand is the pattern, not a
     // file, unless -e/-f supplied the pattern.
-    const isFind = prog === 'find';
     // grep has an inline pattern operand only if no pattern-supplying option is present (abbreviations included, I3).
     const patternOpt = (a) => /^(-e|-f)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a) || abbrevOf(a, 'regexp') || abbrevOf(a, 'file');
     const skipPattern = GREPS.has(prog) && !args.some(patternOpt);
@@ -564,7 +566,7 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
         if (skipPattern && !seenPattern) { seenPattern = true; isPattern = true; } // the grep pattern: credential-checked, not scope-checked
         cands = [tok];
       }
-      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir, { globOk: isFind, credOnly: isPattern }); if (d) return d; }
+      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir, { credOnly: isPattern }); if (d) return d; }
     }
     return null;
   }
@@ -576,7 +578,7 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
     // cp/rm take only short flags here: a long option could be an abbreviation of --recursive/--archive and isn't needed (I1).
     const longOpt = (prog === 'cp' || prog === 'rm') && args.find((a) => a !== '--' && /^--[a-z]/.test(a));
     if (longOpt) return deny(`routine (${role}): ${prog} ${longOpt}: long options aren't allowed here; use short flags, or git rm`);
-    if ((prog === 'cp' || prog === 'rm') && args.some((a) => /^-[^-]*[rR]/.test(a) || (prog === 'cp' && a === '-a'))) {
+    if ((prog === 'cp' || prog === 'rm') && args.some((a) => (prog === 'cp' ? /^-[^-]*[rRa]/ : /^-[^-]*[rR]/).test(a))) { // cp -a implies recursive, bundled too (J4)
       return deny(`routine (${role}): recursive ${prog} isn't allowed; name the files, or use git rm for the checkpoint`);
     }
     if (prog === 'cp') {
@@ -744,7 +746,8 @@ async function mcp(tool, ti, role, io) {
   const server = m?.[1] ?? '', name = m?.[2] ?? '';
   if (server === 'github') {
     if (name === 'enable_pr_auto_merge') return deny('auto-merge skips the expected-head check; merge with the MCP merge tool instead');
-    if (name === 'merge_pull_request') return mergeCheck(ti, role, io);
+    // merge fails closed for every session (K1): if the check can't complete, refuse rather than let it through
+    if (name === 'merge_pull_request') { try { return await mergeCheck(ti, role, io); } catch (e) { return deny(`merge: the check could not complete (${String(e?.message ?? e).slice(0, 80)}); refused`); } }
     if (!role || GITHUB_READ.test(name)) return null;
     if (`${ti.owner}/${ti.repo}`.toLowerCase() !== REPO.toLowerCase()) return deny(`routine (${role}): GitHub writes only on ${REPO}`);
     return githubWrite(name, ti, role, io);
