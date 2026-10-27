@@ -207,4 +207,11 @@ S14 Source SDK 2013, src/game/server/hltvdirector.cpp, https://raw.githubusercon
   vs (2) character LOS fog. Design/look choice -> OQ for Mustafa (game-designer). Tech supports both; enclosure
   (area/portal) test needed in both; rays only in (2) or for windows/doors.
 Next: write the draft (time ~21:42 UTC).
-- 21:45 UTC: writing draft now (all sources S1-S14 summarized above; analysis notes done).
+- ~21:28 UTC: writing draft now (all sources S1-S14 summarized above; analysis notes done).
+- Correction (draft F18): footprint half-widths computed properly along the frustum planes (not ray length): near
+  width 27.4 m (half 13.68), far width 39.9 m (half 19.94), depth 32.75 m, area ~1,100 m2, farthest corner 27.8 m.
+- 21:33 UTC: draft written whole: .checkpoints/v2-research/netcode-architect-r2-interest-draft.md
+  Counts: 20 findings (F1-F20; F18-F20 inferred arithmetic), 7 RECs, 8 OQs, 14 sources read, 11 not read.
+  Source URLs added inline per finding. Verbatim quotes in every finding a REC rests on; paraphrase-only parts
+  marked inferred (F2 "no priority", F5 PHS, F12 all-clients/local table, F13 purpose, F15 baseline advance).
+DONE

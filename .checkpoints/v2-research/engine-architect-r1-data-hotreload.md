@@ -56,3 +56,4 @@ S13 re-fetched 21:31 UTC for verbatim: range "Sets the `minimum`/`maximum` prope
 Draft written whole: .checkpoints/v2-research/engine-architect-r1-data-hotreload-draft.md (29 findings, 8 recs, 11 OQs, 35 sources read, 5 not read). Verified editor applyRules at shamble-editor.js:796, RULES_SCHEMA :770, rulesMerge game:41, envMerge core:180, version:1 game:661.
 Next: self-check draft (claims vs findings, every number sourced or marked proposed), then return.
 S13 third fetch (verbatim): "Validator and Garde allow setting `#[validate(...)]`/`#[garde(...)]` attributes to restrict valid values of particular fields, many of which will be used by Schemars to generate more accurate schemas." "These can also be overridden by `#[schemars(...)]` attributes." Forms: "`#[validate(range(min = 1, max = 10))]` / `#[garde(range(min = 1, max = 10))]` / `#[schemars(range(min = 1, max = 10))]`". F17 updated in draft.
+Draft self-check done; counts verified. DONE

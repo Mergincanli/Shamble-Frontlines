@@ -53,3 +53,5 @@ Task: R1 unit ecs (ECS or plain data: bevy_ecs, hecs, custom), engine-architect,
 - Sources phase done. Writing draft now (21:51 UTC).
 - S30 https://doc.rust-lang.org/std/primitive.slice.html (Rust 1.99.1), method iter. Verbatim: "Returns an iterator over the slice." / "The iterator yields all items from start to end." Official. Confirmed in the source. => plain Vec/array tables iterate in index order we control.
 - 21:58 UTC: writing draft. Plan: ~33 findings, 4 recs (REC1 plain-data custom; REC2 determinism rules for collections/order; REC3 sim-owned entity ids; REC4 physics state inside the snapshot), ~7 OQs.
+- 22:10 UTC: draft written whole at .checkpoints/v2-research/engine-architect-r1-ecs-draft.md: 34 findings, 4 recs (REC1 custom plain data; REC2 determinism rules; REC3 sim-defined ids; REC4 Rapier state inside snapshots), 7 OQs, 31 sources read (26 official, 5 other, 0 shipped game), 10 not read. Every finding carries its verbatim quote; summary-only points marked inferred.
+DONE

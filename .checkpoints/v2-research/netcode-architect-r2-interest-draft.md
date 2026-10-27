@@ -25,14 +25,14 @@ checked. Sources S1–S14 are listed in section 6.
   frame->ps.clientNum))` (SVF_CLIENTMASK) · `if ( ent->r.svFlags & SVF_BROADCAST ) {` with the comment "broadcast
   entities are always sent" · `if ( !CM_AreasConnected( clientarea, svEnt->areanum ) ) {` with "blocked by a door" ·
   `clientpvs = CM_ClusterPVS (clientcluster);` and `if ( bitvector[l >> 3] & (1 << (l&7) ) ) {`.
-  Source: S1 (`code/server/sv_snapshot.c`, `SV_AddEntitiesVisibleFromPoint`). Tier: shipped game. Read 2026-10-27.
+  Source: S1, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/server/sv_snapshot.c (`code/server/sv_snapshot.c`, `SV_AddEntitiesVisibleFromPoint`). Tier: shipped game. Read 2026-10-27.
   How sure: confirmed in the source.
 - **R2-INT-F2.** Quake III caps a snapshot at 1,024 entities and silently drops any beyond that; it has no
   per-entity priority. Instead it paces each client's whole snapshot stream by that client's byte rate.
   Verbatim: `#define	MAX_SNAPSHOT_ENTITIES	1024`; in `SV_AddEntToSnapshot` the comment "if we are full, silently
   discard entities"; in `SV_RateMsec`: `if ( messageSize > 1500 ) {` and `rateMsec = ( messageSize +
   HEADER_RATE_BYTES ) * 1000 / rate;`; then `client->nextSnapshotTime = svs.time + rateMsec;`.
-  Source: S1 (`SV_AddEntToSnapshot`, `SV_RateMsec`, `SV_SendMessageToClient`). Tier: shipped game. Read 2026-10-27.
+  Source: S1, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/server/sv_snapshot.c (`SV_AddEntToSnapshot`, `SV_RateMsec`, `SV_SendMessageToClient`). Tier: shipped game. Read 2026-10-27.
   How sure: the cap, the discard and the rate pacing are confirmed in the source. "No per-entity priority" is
   inferred: nothing in the fetched file ranks entities (absence, not a quoted statement).
 - **R2-INT-F3.** In Quake III, an entity that enters a client's snapshot, having been absent from the frame it is
@@ -41,21 +41,21 @@ checked. Sources S1–S14 are listed in section 6.
   Verbatim (`SV_EmitPacketEntities`): `// this is a new entity, send it from the baseline` followed by
   `MSG_WriteDeltaEntity (msg, &sv.svEntities[newnum].baseline, newent, qtrue );`; an unchanged entity "will not
   result in any bytes being emited if the entity has not changed at all".
-  Source: S1. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S1, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/server/sv_snapshot.c. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F4.** Quake III answers "are these two areas connected?" in constant time. It compares flood numbers that
   are precomputed by a flood fill through open portals. A door changes a reference-counted portal and triggers a
   fresh flood of the whole map.
   Verbatim (`cm_test.c`): `if (cm.areas[area1].floodnum == cm.areas[area2].floodnum) {` · in
   `CM_AdjustAreaPortalState`: `cm.areaPortals[ area1 * cm.numAreas + area2 ]++;` (open) and `--;` (close), then
   `CM_FloodAreaConnections ();`.
-  Source: S2. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S2, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/qcommon/cm_test.c. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F5.** Quake II routes a positioned message to every client (MULTICAST_ALL), to the clients that could
   hear it (MULTICAST_PHS), or to the clients that could see it (MULTICAST_PVS), and skips clients behind closed
   areas. A sound that does not fade with distance goes to everyone, and reliable sounds take the reliable stream.
   Verbatim (`sv_send.c`): "MULTICAST_ALL	same as broadcast (origin can be NULL)" · `if (!CM_AreasConnected (area1,
   area2))` · in `SV_StartSound`: "// if the sound doesn't attenuate,send it to everyone", `if (attenuation ==
   ATTN_NONE)`, `use_phs = false;` · `if (channel & CHAN_RELIABLE)`.
-  Source: S3 (`SV_Multicast`, `SV_StartSound`). Tier: shipped game. Read 2026-10-27. How sure: the broadcast, area,
+  Source: S3, https://raw.githubusercontent.com/id-Software/Quake-2/master/server/sv_send.c (`SV_Multicast`, `SV_StartSound`). Tier: shipped game. Read 2026-10-27. How sure: the broadcast, area,
   no-attenuation and reliable lines are confirmed in the source. That PHS means "the origin cluster's potentially
   hearable set, tested per client cluster" is inferred (WebFetch paraphrase only).
 - **R2-INT-F6.** In Quake III, sound and other events are short-lived entities. They are linked into the PVS like any
@@ -63,13 +63,13 @@ checked. Sources S1–S14 are listed in section 6.
   Verbatim (`g_utils.c`, `G_TempEntity`): "Spawns an event entity that will be auto-removed" · "The origin will be
   snapped to save net bandwidth" · `SnapVector( snapped );		// save network bandwidth` · `// find cluster for PVS` ·
   `trap_LinkEntity( e );`; `G_Sound`: `te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );`.
-  Source: S12. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S12, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_utils.c. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F7.** Quake III broadcasts the death event (the kill feed) to every client, but sends a score pop-up to
   one client only.
   Verbatim (`g_combat.c`): `// broadcast the death event to everyone` · `ent = G_TempEntity( self->r.currentOrigin,
   EV_OBITUARY );` · `ent->r.svFlags = SVF_BROADCAST;	// send to everyone` · `// only send this temp entity to a
   single client` · `plum->r.svFlags |= SVF_SINGLECLIENT;`.
-  Source: S13 (`player_die`, `ScorePlum`). Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S13, https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_combat.c (`player_die`, `ScorePlum`). Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
   The death event carries the victim's origin (`self->r.currentOrigin`), so in Q3 a broadcast death also reveals
   where it happened (inferred from that line).
 - **R2-INT-F8.** In the Source engine every entity, for each recipient, is sent always, culled by the PVS (the
@@ -78,38 +78,38 @@ checked. Sources S1–S14 are listed in section 6.
   FL_EDICT_PVSCHECK;` · `else if ( fFlags & FL_EDICT_ALWAYS ) return FL_EDICT_ALWAYS;` · `if (
   pRecipientPlayer->GetTeam()->ShouldTransmitToPlayer( pRecipientPlayer, this ))` · `// by default do a PVS check`;
   `UpdateTransmitState`: `// by default cull against PVS` → `return SetTransmitState( FL_EDICT_PVSCHECK );`.
-  Source: S7. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source. The PVS test itself is in the
+  Source: S7, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/baseentity.cpp. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source. The PVS test itself is in the
   closed engine and was not read.
 - **R2-INT-F9.** In Source, sending a child entity forces its parent to be sent as well, so attached parts arrive
   together.
   Verbatim (`CBaseEntity::SetTransmit`): "// Force our aiment and move parent to be sent." · "// in HLTV/Replay mode
   always transmit entitys with move-parents".
-  Source: S7. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S7, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/baseentity.cpp. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F10.** In Source the team entity, which carries team-wide state, goes to every client. A spectator always
   receives the player it is watching.
   Verbatim (`team.cpp`): "// Purpose: Teams are always transmitted to clients" · `return SetTransmitState(
   FL_EDICT_ALWAYS );` · "// Always transmit the observer target to players" · `if ( pRecipient &&
   pRecipient->IsObserver() && pRecipient->GetObserverTarget() == pEntity )`.
-  Source: S8. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S8, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/team.cpp. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F11.** Source can limit a single network field to one team's players.
   Verbatim (`sendproxy.cpp`): "// Purpose: Proxy that only sends data to team members" ·
   `pRecipients->ClearAllRecipients();` · `for ( int i=0; i < pTeam->GetNumPlayers(); i++ )` ·
   `pRecipients->SetRecipient( pTeam->GetPlayer( i )->GetClientIndex() );`.
-  Source: S10 (`SendProxy_OnlyToTeam`). Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
+  Source: S10, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/sendproxy.cpp (`SendProxy_OnlyToTeam`). Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source.
 - **R2-INT-F12.** TF2 puts a disguised spy's disguise team, class, target and health in its shared player table,
   not in the owner-only local table, so they appear to reach every client.
   Verbatim (`tf_player_shared.cpp`, inside `BEGIN_SEND_TABLE_NOBASE( CTFPlayerShared, DT_TFPlayerShared )`):
   `SendPropInt( SENDINFO( m_nDisguiseTeam ), 3, SPROP_UNSIGNED ),` · `SendPropInt( SENDINFO( m_nDisguiseClass ), 4,
   SPROP_UNSIGNED ),` · `SendPropEHandle( SENDINFO( m_hDisguiseTarget ) ),` · `SendPropInt( SENDINFO(
   m_iDisguiseHealth ), -1, SPROP_VARINT ),`.
-  Source: S9. Tier: shipped game. Read 2026-10-27. How sure: the lines and their table are confirmed in the source.
+  Source: S9, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/shared/tf/tf_player_shared.cpp. Tier: shipped game. Read 2026-10-27. How sure: the lines and their table are confirmed in the source.
   That this table reaches all clients, and that a separate "tfsharedlocaldata" table reaches only the owner, are
   inferred (WebFetch paraphrase). Whether the spy's true team is also sent was not read: unverified.
 - **R2-INT-F13.** Source's spectator broadcast (SourceTV) runs 30 s behind the live game by default.
   Verbatim (`hltvdirector.cpp`): `static ConVar tv_delay( "tv_delay", "30", 0, "SourceTV broadcast delay in seconds",
   true, 0, true, HLTV_MAX_DELAY );` · `// broadcast time is current time - delay time` · `newBroadcastTick -=
   TIME_TO_TICKS( m_fDelay );`.
-  Source: S14. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source. The file does not give the
+  Source: S14, https://raw.githubusercontent.com/ValveSoftware/source-sdk-2013/master/src/game/server/hltvdirector.cpp. Tier: shipped game. Read 2026-10-27. How sure: confirmed in the source. The file does not give the
   delay's purpose as anti-cheat ("ghosting"); that reading is inferred.
 - **R2-INT-F14.** Fiedler's priority accumulator works like this. Each object gets a priority every frame, which is
   added to an accumulator the object keeps. Objects are sent in accumulator order until the packet's byte budget is
@@ -119,13 +119,13 @@ checked. Sources S1–S14 are listed in section 6.
   priority accumulator to zero for objects that fit." · "leave the priority accumulator value alone for objects
   that didn't." · "I give them a higher priority of 100 while at rest objects have priority of 1." · budget example
   "256kbit/sec" · "a maximum of 64 state updates per-packet".
-  Source: S4 ("State Synchronization", section "Priority accumulator"). Tier: other (practitioner article). Read
+  Source: S4, https://gafferongames.com/post/state_synchronization/ ("State Synchronization", section "Priority accumulator"). Tier: other (practitioner article). Read
   2026-10-27. How sure: confirmed in the source. The player's priority "1000000" is also quoted there.
 - **R2-INT-F15.** With delta compression against an acknowledged baseline, an object that has not changed costs one
   bit.
   Verbatim: "Cube n in snapshot 110 is the same as the baseline. One bit: Not changed!"; a stationary scene costs
   "around 15 kilobits per-second".
-  Source: S5 ("Snapshot Compression"). Tier: other. Read 2026-10-27. How sure: confirmed in the source. That the
+  Source: S5, https://gafferongames.com/post/snapshot_compression/ ("Snapshot Compression"). Tier: other. Read 2026-10-27. How sure: confirmed in the source. That the
   baseline advances to the newest acked snapshot (about one round trip old) is inferred (paraphrase).
 
 **The browser and the camera**
@@ -135,7 +135,7 @@ checked. Sources S1–S14 are listed in section 6.
   Verbatim: "Use the Memory inspector to inspect ArrayBuffer, TypedArray, and DataView memory in JavaScript" ·
   "The Memory Inspector panel lets you inspect such objects in Wasm applications written in C++." · "Use the Memory
   inspector while you debug your web app for an efficient workflow."
-  Source: S11. Tier: official. Read 2026-10-27 (page updated 2024-09-06). How sure: confirmed in the source.
+  Source: S11, https://developer.chrome.com/docs/devtools/memory-inspector. Tier: official. Read 2026-10-27 (page updated 2024-09-06). How sure: confirmed in the source.
   Consequence (inferred): every byte the server sends to a browser client can be read by that player with tools
   already in the browser, so client-side hiding protects nothing. The robust anti-wallhack measure is never to send
   what the player must not see.
@@ -143,7 +143,7 @@ checked. Sources S1–S14 are listed in section 6.
   the 2D bounds of its view rectangle at a given distance.
   Verbatim: "The vertical field of view, from bottom to top of view, in degrees." · `getViewBounds()`: "Computes the
   2D bounds of the camera's viewable rectangle at a given distance along the viewing direction."
-  Source: S6 (three.js `src/cameras/PerspectiveCamera.js`, dev branch). Tier: official. Read 2026-10-27. How sure:
+  Source: S6, https://raw.githubusercontent.com/mrdoob/three.js/dev/src/cameras/PerspectiveCamera.js (three.js `src/cameras/PerspectiveCamera.js`, dev branch). Tier: official. Read 2026-10-27. How sure:
   confirmed in the source.
 
 **Arithmetic on legacy numbers (inferred)**

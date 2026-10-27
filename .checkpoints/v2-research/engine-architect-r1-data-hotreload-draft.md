@@ -75,16 +75,17 @@ Author: engine-architect (R1 unit). Date: 2026-10-27. Status: draft, not verifie
   Verbatim: "RON is not designed to be a fully self-describing format (unlike JSON)"; "While RON offers a best-effort
   implementation for `#[serde(flatten)]`, it may be unsupported in further cases"; "RON does not yet make any
   guarantees about roundtrips through `ron::Value`." · Sources: https://github.com/ron-rs/ron (README);
-  https://docs.rs/ron/latest/ron/ (0.12.2, page 2026-09-13) · official (project) · read 2026-10-27 · confirmed in the
-  source. The README lists one JavaScript implementation ("ron-js") and no TypeScript one; its maturity was not read
-  (unverified).
+  https://docs.rs/ron/latest/ron/ (0.12.2, page 2026-09-13) · official (project) · read 2026-10-27 · the three quoted
+  limits confirmed in the source; the feature list (comments, trailing commas, enums) and the README's one JavaScript
+  implementation ("ron-js", no TypeScript one) come from WebFetch's summary: inferred; ron-js's maturity: unverified.
 - **R1-DATA-F13.** TOML is a configuration format with comments and no null value; the toml crate targets spec 1.1.0.
   Verbatim (spec text): "TOML aims to be a minimal configuration file format that's easy to read due to obvious
   semantics." "A hash symbol marks the rest of the line as a comment, except when inside a string." · Sources:
   https://raw.githubusercontent.com/toml-lang/toml/main/toml.md (main branch, no version on the page);
   https://docs.rs/toml/latest/toml/ (toml 1.1.8+spec-1.1.0, page 2026-10-09: its `Value` has String, Integer, Float,
-  Boolean, Datetime, Array, Table, no null) · official · read 2026-10-27 · confirmed in the source (that the main-branch
-  text is exactly spec 1.1.0 is unverified).
+  Boolean, Datetime, Array, Table) · official · read 2026-10-27 · the two quotes confirmed in the source; "no null"
+  comes from the `Value` variants as WebFetch listed them and the spec's value list (verbatim: "Unspecified values are
+  invalid."): inferred; that the main-branch text is exactly spec 1.1.0: unverified.
 - **R1-DATA-F14.** The serde YAML crate is archived and unmaintained. Verbatim: "This repository was archived by the
   owner on Mar 25, 2024. It is now read-only." "(This project is no longer maintained.)" · Source:
   https://github.com/dtolnay/serde-yaml (last version line `serde_yaml = "0.9"`) · official (author) · read 2026-10-27
@@ -96,7 +97,8 @@ Author: engine-architect (R1 unit). Date: 2026-10-27. Status: draft, not verifie
   number, representing an inclusive lower limit for a numeric instance."; deprecated: "applications SHOULD refrain from
   usage of the declared property" · Source: https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-01
   §6.1, §6.2, §6.5.3, §9 (Internet-Draft, 2020-12 dialect, published 2022-06-10, Informational, expired) · official
-  (specification) · read 2026-10-27 · confirmed in the source.
+  (specification) · read 2026-10-27 · the quoted keyword definitions confirmed in the source; "meant for UI and
+  documentation" is WebFetch's summary of §9.1: inferred.
 - **R1-DATA-F16.** schemars 1.2.3 derives JSON Schema 2020-12 from Rust types and follows their serde attributes.
   Verbatim: default settings "currently conform to JSON Schema 2020-12"; "Any generated schema _should_ match how
   serde_json would serialize/deserialize to/from JSON." · Source: https://docs.rs/schemars/latest/schemars/ (1.2.3, page
@@ -114,8 +116,9 @@ Author: engine-architect (R1 unit). Date: 2026-10-27. Status: draft, not verifie
   values, custom), can take a context value, and reports errors with field paths. Verbatim: "garde will generate an
   implementation of the `Validate` trait for you, allowing you to call the `validate` method."; "The context may be any
   type without generic parameters. By default, the context is `()`."; error example "username[0]: length is lower than
-  3" · Source: https://docs.rs/garde/latest/garde/ (0.23.0, page 2026-10-03) · official · read 2026-10-27 · confirmed in
-  the source. Using the context for cross-reference checks (a table of known ids) is inferred. Wasm support is not
+  3" · Source: https://docs.rs/garde/latest/garde/ (0.23.0, page 2026-10-03) · official · read 2026-10-27 · the quotes
+  confirmed in the source; the full rule list is WebFetch's summary (inferred), but the range rule's form
+  `#[garde(range(min = 1, max = 10))]` is quoted verbatim in F17's source. Using the context for cross-reference checks (a table of known ids) is inferred. Wasm support is not
   documented on the page (unverified).
 - **R1-DATA-F19.** Ajv validates JSON Schema 2020-12 in JavaScript. Verbatim: "Ajv implements JSON Schema
   draft-06/07/2019-09/2020-12 standards (draft-04 is supported in v6):" · Source: https://github.com/ajv-validator/ajv
@@ -353,7 +356,7 @@ YAML is not an option: the serde YAML crate is archived (F14).
   *Serves:* §6.3, §6.5 ("tunable"), §6.6 (tune on evidence).
   *A spike must prove (proposed):* (1) a saved change to a weapon's damage applies on the dev server within 1 s of the
   save; (2) the client's Wasm simulation applies it at the same tick as the server, with 0 extra mispredictions beyond
-  the change itself, under 100 ms injected latency with jitter; (3) 50 random valid tuning edits in a 5-minute bot match
+  the change itself, under 100 ms injected latency with jitter (VISION_V2 §4: matches feel fair up to about 100 ms of ping); (3) 50 random valid tuning edits in a 5-minute bot match
   give 0 crashes and 0 desyncs; (4) a malformed save leaves the match running on the old numbers and shows the error
   within 1 s.
 

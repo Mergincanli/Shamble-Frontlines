@@ -93,3 +93,14 @@ Next: sources. Order: Valve wiki (Source MP networking, lag comp paper, networki
   §7.2 "Endpoints SHOULD use an initial congestion window of ten times the maximum datagram size" "limiting the window to the larger of 14,720 bytes or twice the maximum datagram size"; minimum window "The RECOMMENDED value is 2 * max_datagram_size." §7.7 "A sender SHOULD pace sending of all in-flight packets based on input from the congestion controller."
   => at start ~12 x 1200 B in flight; after persistent congestion cwnd can drop to 2 datagrams -> RFC 9221 §5.4 then delays or drops our snapshots: budget must adapt (estimatedSendRate S10, own acks).
 - (22:00 UTC) Sources done enough. Next: compute the bandwidth estimate (arithmetic), then write the draft whole.
+## Estimate (arithmetic, done; all assumptions marked in draft)
+- Datagram overhead IPv4 57 B = IP 20 + UDP 8 (S6) + QUIC flags 1 + DCID 8 (assumption) + PN 2 (assumption) + AEAD 16 (S11) + DATAGRAM type 1 (S7) + QSID 1 (S8/S9); IPv6 77 B. Game header 8 B (assumption) -> 65 B/snapshot.
+- Max app payload in a 1200 B UDP payload: 1200-29 = 1171 B (DCID 8, PN 2); worst 1157 B (DCID 20, PN 4) -> design target <= 1150 B.
+- Records: soldier full 90 bits (x16 z16 y12 at 1 cm; yaw16; pitch10; health8; flags8; weapon4); soldier delta moving ~60 bits = 7.5 B; vehicle delta 9.4 B, full ~150 bits incl seats; projectile spawn 11 B; structures 7 B/snap; local 16 B; team 2 B.
+- Per-second events: 15.8 B/s per player (shots 6P, reliable 5P, projectile spawns 4.8P).
+- Downstream 30 Hz: P8 V4 44.2 kbps; P18 V7 70.3; P36 V12 116.2; P48 V15 146.1; P64 V18 183.7. 48 @20 Hz 99.4; @60 Hz 286.1; 48 no-delta 30 Hz ~251; raw floats ~534; illustrative interest-managed 16 vis ~61.9.
+- Snapshot bytes 48 delta ~609 B (fits); full join snapshot ~1021 B + 32 projectiles 352 B = 1373 B > 1171 -> split by entity groups.
+- Upstream: 60 Hz x4 inputs 8 B: 93 B -> 44.6 kbps; 60 Hz delta-redundant 75 B -> 36 kbps; 30 Hz 4 inputs 22.3 kbps; IPv6 +9.6/+4.8.
+- Fairness: Fiedler interp 3 intervals: 20 Hz 150 (+jitter ~200), 30 Hz 100 (150 w/ jitter), 60 Hz 50 (85). Source rewind = outgoing latency + lerp, cap 1 s; at 100 ms RTT: 30 Hz -> 150-200 ms (fits brief cap 200), 20 Hz -> 200-250 (breaks cap).
+- Fire-interval quantization: shabzon 0.072 s = 2.16 ticks @30 Hz (15 or 10 shots/s), 4.32 @60 (15 or 12/s): need fractional carry.
+Next: write the draft whole.
