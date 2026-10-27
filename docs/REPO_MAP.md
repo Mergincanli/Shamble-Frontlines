@@ -36,6 +36,9 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/LOOP_V2.md` | The v2 core loop (living spec; status tags DECIDED / DEFAULT / OPEN / LATER) |
 | `docs/EDITOR_V2.md` | The map editor rebuild (draft spec) |
 | `docs/EDITOR_V1_INVENTORY.md` | Every legacy map-editor feature with a keep / drop / improve mark |
+| `docs/LEGACY_INVENTORY.md` | Every legacy system: what, where, evidence, and a port / rewrite / redesign / drop mark (R7) |
+| `docs/LEGACY_TUNING.md` | Every legacy tuning table and constant, rendered from `legacy-tuning.json` (R7) |
+| `docs/legacy-tuning.json` | The legacy tuning numbers as data, dumped from the live build: v2's starting values |
 | `docs/GAME_DESIGN.md` | Legacy game design and vision (§5–6 superseded by LOOP_V2) |
 | `docs/DESIGN_NOTES.md` | Mustafa's design decisions, open questions, art lessons |
 | `docs/ART_DIRECTION.md` | The locked "Living Comic" look of the legacy build |
@@ -103,6 +106,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `tools/sim.js` | Headless 90 s match (random AI: 3+ runs) |
 | `tools/reach.js` | Spawn-to-goal reachability on the bot nav grid |
 | `tools/perfbots.js` | Bot scaling cost at 12 / 24 / 48 soldiers |
+| `tools/tuning-dump.js` | Dumps every tuning table as JSON through `preview.js eval` (read-only) |
 | `tools/aabbs.js` | Map layout export |
 | `tools/village.py` | Map layout design and validation |
 | `tools/package.json` | The toolkit's pinned dependencies |
