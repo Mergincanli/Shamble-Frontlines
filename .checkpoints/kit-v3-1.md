@@ -69,6 +69,15 @@
   - F4 MEDIUM fail-open ordering: **fixed** — writePath and writeTarget check protected/scope before the scratchpad.
   - F5 MEDIUM credential-read bypass: **fixed** — the Read path is realpathed before matching; read operands and `<`
     redirects are credential-checked; bare env/printenv refused.
+  - **Second review pass of 0e93ac4 (4 findings), 2026-10-27, all fixed in step 1c:**
+    - G1 HIGH fd's -x/-X/--exec: fixed by dropping fd from the read list.
+    - G2 HIGH credential path not normalized: fixed — readOperandDeny now realpaths the operand (resolved against the
+      command's folder), credential-checks it, and confines reads to the project, the scratchpad and /opt/pw-browsers;
+      option-attached file values (-fFILE, --file=FILE) are checked too.
+    - G3 HIGH cp/mv/rm directory clobber (rm -r .): fixed — recursive cp/mv/rm refused; writeTarget refuses a target
+      that is the project root or an ancestor of .github/.git/.claude/tools (coversProtected).
+    - G4 MEDIUM sort/xxd/tree write options: fixed by dropping sort, xxd, tree (and jq, od, etc.) from the read list;
+      the list is now a small, obviously-safe core plus find (the one kept tool with options, a closed set refused).
   - F7 MEDIUM comment-ownership (shared Mergincanli identity: can't tell a routine's comment from Mustafa's by the
     API): a genuine residual. The API shows the same author for both. Mitigation already in place: night edits only
     #16 and its own PRs, PR Advisor only its review comments on PRs, never #16. Note it in the report as a known
