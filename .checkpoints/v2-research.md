@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 22:35 Amsterdam
+- **Last update:** 2026-10-27 22:45 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -57,8 +57,8 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 4/6 (abilities, ecs, data-hotreload, boundary-worker) | no | pending | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 2/5 (rooms, interest) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R1 | engine-architect | 6 | 6/6 | assembling (since 22:37 Amsterdam) | pending | `prompts/engine-architect-r1-*.txt` (6) |
+| R2 | netcode-architect | 5 | 4/5 (rooms, interest, transport, budgets) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -84,6 +84,12 @@ key (condition A1).
   the security baseline: the Advisor, 2026-10-27, this session (`plan-amendments.md`).
 - Amendments approved with 8 conditions: the advisor agent, 2026-10-27 18:22 UTC (`advisor-amendments-verdict.md`).
 - PR #27 (R7) merged by the R7 session at 17:36 UTC on Mustafa's go (merge 07ab240).
+
+- KIT31-STATE (b) and SRC-ACCESS (a): the Advisor, relayed by Mustafa about 21:36 UTC: the R7 session finishes kit-v3-1
+  on Opus 5.5 and its PR goes to Mustafa ("shelved" meant "not in this session"); unread sources stay open questions
+  for now, the full list comes with the wave-1 tally, and the Advisor looks for another copy of any source a
+  recommendation hinges on. The assembler prompts list those recommendations (rule 5 added before launch).
+- PR Advisor routine: off (Mustafa, 21:35 UTC; get_trigger reads enabled false).
 
 ## Running work
 - Wave 1 units: 11 background agents, launched 19:18, cut off 19:25 (spend limit), resumed 22:24 Amsterdam.

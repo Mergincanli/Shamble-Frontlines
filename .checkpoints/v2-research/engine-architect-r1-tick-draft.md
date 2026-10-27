@@ -254,9 +254,9 @@ Arithmetic in this table (periods, per-tick distances, replay counts) is inferre
 
 | Option | Shipped or official precedent (read) | Fit for SHAMBLE (VISION_V2 §4, §6) | Cost and risk |
 |---|---|---|---|
-| 20 Hz (50 ms) | Quake III world frame (F9), but its player movement ran per command (F12) | Shots and movement quantised to 50 ms; legacy's jump at 20 Hz lost 11 % of its apex (GW14) | Cheapest; coarse input timing; would need movement or shots off the tick (Q3 style), which is the frame-rate dependence legacy and Q3 both fought (F12, GW14) |
-| 30 Hz (33.3 ms) | None read for a shooter | Every legacy weapon fits (at most one shot per tick, F-legacy tuning); up to 33 ms extra input wait and up to one tick of render-interpolation lag | Half the CPU of 60 Hz per simulated second; half the replay steps per correction (F24); legacy parity harness would run at a rate legacy never measured |
-| 60 Hz (16.7 ms) | Rapier's default `dt` (F8); legacy `FIXED_DT` and every legacy measurement (CS1, TL13, TL15, GW14) | Finest of the practical options; renders one new tick per frame on 60 Hz displays (F17); Rapier step equals the tick | Twice the CPU of 30 Hz; may beat against a 60 Hz display when steps are paced by frames (F6); 1/60 is not exact in binary floats (F6) |
+| 20 Hz (50 ms) | Quake III world frame (F9); its player movement was integrated per user command, not per world frame (F12; the command rate is inferred) | Shots and movement quantised to 50 ms; legacy's jump at 20 Hz lost 11 % of its apex (GW14) | Cheapest; coarse input timing; would need movement or shots off the tick (Q3 style), which is the frame-rate dependence legacy and Q3 both fought (F12, GW14) |
+| 30 Hz (33.3 ms) | None read for a shooter | Every legacy weapon fits (at most one shot per tick: tuning arithmetic in §3); up to 33 ms extra input wait and up to one tick of render-interpolation lag | Half the CPU of 60 Hz per simulated second; half the replay steps per correction (F24); legacy parity harness would run at a rate legacy never measured |
+| 60 Hz (16.7 ms) | Rapier's default `dt` (F8); legacy `FIXED_DT` and every legacy measurement (CS1, TL13, TL15, GW14) | Finest of the practical options; one new tick per frame on the most common display rate, 60 Hz (F17; inferred); Rapier step equals the tick | Twice the CPU of 30 Hz; may beat against a 60 Hz display when steps are paced by frames (F6); 1/60 is not exact in binary floats (F6) |
 | 64 Hz (15.625 ms) | Bevy's default fixed step, chosen against the 60 Hz beat and for an exact float `dt` (F6) | As 60 Hz; every legacy number shifts slightly when converted to ticks | As 60 Hz plus about 7 % more steps; no legacy measurement at this rate |
 | 66 Hz (15 ms) | Counter-Strike on Source (F13) | Closest precedent for a competitive shooter | As 64 Hz; no Rust or web precedent read |
 | Variable-duration commands (movement per input, world on a slower frame) | Quake III (F12) | Lets a slow world tick keep fine movement | Frame-rate dependent unless chopped (F12); exactly the legacy defect (GW14, GC15); no clean tick to replay or rewind |
@@ -308,8 +308,10 @@ A spike must prove (proposed pass marks):
 
 **R1-TICK-REC2. Start the spike at 60 Hz, measure 30 Hz beside it on the same scene, and choose by the pass marks.**
 60 Hz is the starting candidate: it is Rapier's default step (F8), legacy's declared step and the rate of every legacy
-measurement (CS1, TL13, TL15, GW14), and it keeps player movement and shots finer than the 20 Hz world frame that even
-Quake III bypassed for movement (F12). Shipped shooters read span 20 Hz (F9) to 66 Hz (F13). 30 Hz halves the CPU per
+measurement (CS1, TL13, TL15, GW14), and it keeps player movement and shots on a fine fixed step. Quake III did not
+integrate movement on its 20 Hz world frame but per user command, and still had to chop long moves "to prevent
+framerate dependent behavior" and add an optional fixed 8 ms movement step (F12); a single fine tick avoids both
+problems. Shipped shooters read span 20 Hz (F9) to 66 Hz (F13). 30 Hz halves the CPU per
 simulated second (F8) and the replay work per correction (F24), and every legacy weapon still fits one shot per tick
 (tuning arithmetic), so it is the measured fallback. 64 Hz stays an open question (OQ1).
 Rests on: F6, F8, F9, F12, F13, F24; legacy CS1, GW14, TL13, TL15, `WEAPONS`, `T`.
@@ -363,8 +365,8 @@ pattern, F15); `Atomics.wait` (W3, F22) is the measured alternative if W2 fails 
 is the render clock only, never the tick clock, because its rate follows the display and it stops in background tabs
 (F17). The main thread draws every frame from the two newest ticks with `alpha` (F4), read from shared memory (boundary
 unit). After a long gap (hidden tab, sleep: F18, F21) the client does not simulate the gap: offline it pauses, as
-Bevy's paused clock stops its fixed schedule (F7, F16 "a pause"); online it resyncs from the server's state (F16
-"recover the game state ... from the server"), with catch-up per frame bounded as in REC4. Pause, shop, tutorial and
+Bevy's paused clock stops its fixed schedule (F7, F16 "a pause"); online it resyncs from the server's state (F16:
+"You can recover the game state from a peer or the server."), with catch-up per frame bounded as in REC4. Pause, shop, tutorial and
 hit-stop never stop the shared tick in multiplayer; hit-stop is presentation-time only (GP9, GP13).
 Rests on: F2, F4, F7, F15, F16, F17, F18, F20, F21, F22; legacy GP9, GP13.
 Serves: VISION_V2 §4 (30+ fps on the minimum laptop, 60 fps recommended, on Chrome, Edge, Firefox and Safari), §6.9

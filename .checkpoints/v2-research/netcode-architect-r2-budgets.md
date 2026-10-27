@@ -106,3 +106,6 @@ Next: sources. Order: Valve wiki (Source MP networking, lag comp paper, networki
 Next: write the draft whole.
 - Legacy check: player speed = T.moveSpeed * sp, sp = sprintMult (max 1.62) then banzai max(sp,1)*1.3, shield *0.72 (game:2774-2775) -> player max ~6.3*1.62*1.3 = 13.3 m/s. (UNIT speedMult 1.5 not in this line; bots path not checked.)
 - (21:40 UTC) writing draft now.
+- (21:55 UTC) draft written whole + 10 fixes applied (Edit tool absent; python exact replace). Next: final skim, then DONE + return.
+- (22:00 UTC) final fixes applied. Draft complete: 35 findings, 6 RECs, 11 OQs, 26 sources read, 6 not read. Blockers: Valve wiki 403; GDC Vault redirect (outside allow list); Edit tool absent (used python exact replace on own draft).
+DONE
