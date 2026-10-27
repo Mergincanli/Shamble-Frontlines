@@ -104,3 +104,5 @@ Next: sources. Order: Valve wiki (Source MP networking, lag comp paper, networki
 - Fairness: Fiedler interp 3 intervals: 20 Hz 150 (+jitter ~200), 30 Hz 100 (150 w/ jitter), 60 Hz 50 (85). Source rewind = outgoing latency + lerp, cap 1 s; at 100 ms RTT: 30 Hz -> 150-200 ms (fits brief cap 200), 20 Hz -> 200-250 (breaks cap).
 - Fire-interval quantization: shabzon 0.072 s = 2.16 ticks @30 Hz (15 or 10 shots/s), 4.32 @60 (15 or 12/s): need fractional carry.
 Next: write the draft whole.
+- Legacy check: player speed = T.moveSpeed * sp, sp = sprintMult (max 1.62) then banzai max(sp,1)*1.3, shield *0.72 (game:2774-2775) -> player max ~6.3*1.62*1.3 = 13.3 m/s. (UNIT speedMult 1.5 not in this line; bots path not checked.)
+- (21:40 UTC) writing draft now.
