@@ -89,8 +89,8 @@ the agents' notes reach the remote even if the whole session is cut off:
 `node .claude/scripts/checkpoint.mjs watch <task-slug> --trailer "<attribution line>"`
 - Every 10 minutes (`--every`) it commits and pushes `.checkpoints/` if anything changed. It stops after 110 minutes
   (`--for`, under the 2-hour limit of a background command), when the branch changes, or when it is stopped, after a
-  last save. Start it again for a longer run. To stop it, stop its background task, or send SIGTERM to the `node`
-  process itself (not the shell around it), so its last save runs.
+  last save. Start it again for a longer run. To stop it, stop its background task with the TaskStop tool, so its last
+  save runs. (A routine has no `kill`/`pkill`; the guard refuses them — stop the task the harness way.)
 - It refuses `main`, a detached head, any branch outside `cs/` and `claude/`, and a task whose `.checkpoints/<slug>.md`
   is gone (so the finished task's last commit is made by hand and runs CI); it never forces a push; a refused push is
   reported and left alone; notes that look like a secret (a token, a key, credentials in a URL) are not committed. A

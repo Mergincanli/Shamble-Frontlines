@@ -366,7 +366,9 @@ function credentialDeny(p, vcwd, role, io) {
 // A path a routine writes (a shell redirect): the scratchpad, or inside the project and not protected. A `$`/backtick is
 // refused; an unquoted glob is already refused at the command level.
 function writeTarget(what, p, vcwd, role, io, input) {
-  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a write path (${p})`);
+  // a shell redirect target: refuse anything the shell would expand ($, `, glob, brace, a leading ~), so the literal
+  // path the guard checks is the path that gets written (projectRel resolves it but doesn't expand ~).
+  if (/[$`*?[{]/.test(p) || /^~/.test(p)) return deny(`routine (${role}): no variable, glob, brace or ~ in a write path (${p})`);
   if (p === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d+)$/.test(p)) return null;
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {

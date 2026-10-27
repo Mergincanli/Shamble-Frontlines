@@ -1,9 +1,18 @@
 # Night shift
 Follow CLAUDE.md in full, and `.claude/CHECKPOINTS.md` for every item. One routine, "Night shift", starts a run at
-least hourly from 00:10 to 07:40 Amsterdam time. Only one run may work at a time; a later run continues where an
-earlier one stopped. This file and CLAUDE.md are all a run needs: the routine's prompt only says to read them.
+least hourly from 00:10 to 08:10 Amsterdam time; the 08:10 run only finishes work in hand, it starts nothing new. Only
+one run may work at a time; a later run continues where an earlier one stopped. This file and CLAUDE.md are all a run
+needs: the routine's prompt only says to read them. The run is governed by the routine guard (`.claude/hooks/guard.mjs`),
+so there are no approval prompts: a command the night may not run is refused, not queued for a human. When a refusal
+names what to use instead, use that; when it blocks a step the item needs, stop the item under Decisions needed.
+The shell runs only git, gh, `npm ci` and node on main's scripts (plus `date`): **read and search the tree with the Read,
+Grep and Glob tools, and edit with Edit/Write** — there are no shell file tools (cat, find, grep, cp, mv, rm). The night
+**never reads the web**: WebFetch and WebSearch are refused. Web research (R1–R6 and the like) is a daytime task and
+never runs at night; a research queue item is left for the day.
 
 START CHECKS (in this order; "stop silently" = no comment, no notification)
+0. Role: this run must carry `SHAMBLE_ROLE=night-shift` (the routine-only environment sets it). If it is unset or
+   anything else, stop and report "night shift started outside its environment" — do not do any item's work.
 1. Window: check `TZ=Europe/Amsterdam date`. Outside 00:10–08:30, stop silently. The schedule runs on Amsterdam time,
    so a clock change needs nothing more: a double start in the repeated hour stops at the busy check (rule 3). From
    07:45, start no new item: resume or finish only what is in hand, then go to FINISH.
@@ -37,14 +46,15 @@ WHILE WORKING
    under Decisions needed and move on. Never guess a decision the plan doesn't cover. No v2 spike runs until Mustafa
    and the Advisor have approved the decision drafts (V2_PHASE0_BRIEF §4).
    Focused agents per item type (model and effort: CLAUDE.md "Models and effort"):
-   - research → the topic's domain agent researches (CLAUDE.md "Agents"), then the verifier checks its claims;
+   - research → NOT at night: web research is a daytime task (the guard refuses the web). Leave a research item for the day.
    - build → the main session builds, then the matching reviewers check the final diff;
    - docs → docs-keeper.
 8. Absolute rules (there are no approval prompts tonight): never merge a pull request; never push to main; never
    change .claude/ or CLAUDE.md; never delete branches, saves or data (deleting a finished item's checkpoint files in
    its last commit is not deleting data: the history keeps them); if the gate fails and you can't fix it properly, stop
-   that item and report it. Before a pull request is marked ready, stop the background saver and make the last
-   checkpoint commit; after that, push nothing to its branch except a fix that goes back to review. Reviewer agents
+   that item and report it. A PR is marked ready with the GitHub MCP tool (update_pull_request, draft false), not `gh pr
+   ready`. Before a pull request is marked ready, stop the background saver (the TaskStop tool, not `pkill`) and make the
+   last checkpoint commit; after that, push nothing to its branch except a fix that goes back to review. Reviewer agents
    never push their notes to a pull request's branch: that would change the head the advisor approved.
 
 FINISH (start no new item after 07:45; have the report done by 08:20; stop by 08:30, or earlier when the queue is empty)

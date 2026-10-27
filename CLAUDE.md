@@ -127,8 +127,11 @@ never counts as his go; every comment they write ends with the Claude Code foote
   takes the session's effort).
 - **Sonnet 5.5 only for purely mechanical chores, and only when genuinely necessary:** file moves, formatting, link
   checks, summarizing logs. Opus remains the preference even there. No other model.
-- **Routines** run Opus 5.5, set on each routine. A routine has a model setting but no effort setting, so its session
-  runs at the model's default; the agents it starts follow the rules above.
+- **Routines** run Opus 5.5, set on each routine, at `effortLevel: "high"` (set in `.claude/settings.json`, read at
+  session start); the agents they start follow the rules above. A routine runs under the routine guard
+  (`.claude/hooks/guard.mjs`): its shell is limited to git, gh, `npm ci` and node on main's scripts (reading and
+  searching go through the Read/Grep/Glob tools), it never reads the web, it can't push to main or force-push or edit
+  `.claude/`/`CLAUDE.md`, and nothing it meets is ask-first.
 
 ## Checkpoints (never lose work to a usage limit)
 The full rules are in `.claude/CHECKPOINTS.md`. In short:
@@ -194,8 +197,9 @@ The full rules are in `.claude/CHECKPOINTS.md`. In short:
   spot-checks every topic's key claims.
 - They review and research; the main session builds. When work runs in parallel, agents build in isolated copies
   (worktrees), merged one at a time.
-- Web pages load without a prompt only from the documentation domains `.claude/settings.json` lists; any other fetch
-  asks first (and is refused at night: note the source and move on).
+- Web pages load without a prompt only from the documentation domains `.claude/settings.json` lists; in a day session
+  any other fetch goes through the classifier or a prompt. Routines never read the web at all (the guard refuses
+  WebFetch and WebSearch): web research is a daytime task.
 - Agents never edit source, except build work the main session assigns them in an isolated worktree; they write only
   their notes under `.checkpoints/<task-slug>/`, scratch under `.gate/`, and the docs their own agent file names
   (research topics, ADR drafts, design docs, docs-keeper's docs). They must cite
