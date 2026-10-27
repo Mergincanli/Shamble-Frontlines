@@ -5,15 +5,22 @@
   instructions in this session; advisor check: `advisor-amendments-verdict.md` once in)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 19:12 Amsterdam
+- **Last update:** 2026-10-27 19:20 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
    with 14 conditions at 11:36 UTC; final plan written at 11:41 UTC with the conditions applied.
-2. Branch created from origin/main 07ab240 after PR #27 merged (17:36 UTC); R7's three files present.
+2. Branch created from origin/main 07ab240 after PR #27 merged (17:36 UTC); R7's three files present · 8ff1c74
+   (first push of cs/v2-research: the proxy accepts cs/ pushes).
 
 ## Current step
-3. Wave 1 (R1 6 units, R2 5 units) launching; advisor check of the amendments and of the docs-after-r7 plan running.
+3. Wave 1 units running since 19:18 Amsterdam, 11 background agents (model opus, effort xhigh), one per unit:
+   engine-architect r1-ecs, r1-tick, r1-determinism, r1-boundary-worker, r1-abilities, r1-data-hotreload;
+   netcode-architect r2-sync, r2-budgets, r2-interest, r2-transport, r2-rooms. Notes `<agent>-<topic>-<unit>.md`,
+   drafts `…-draft.md`, all in `.checkpoints/v2-research/`. Each prompt carries the plan's rules (no spikes, allow
+   list, no recommendation on unread sources, proposed pass marks, no look decision, write only notes and draft).
+   Advisor check of the amendments and of the docs-after-r7 plan running (notes `advisor-amendments-review.md`).
+   Saver running (background, 110 minutes from 19:18).
 
 ## Next steps
 1. Count the 11 unit results; restart any unit that came back empty with the same prompt.
@@ -52,4 +59,10 @@
 - PR #27 (R7) merged by the R7 session at 17:36 UTC on Mustafa's go (merge 07ab240).
 
 ## Running work
-- none yet
+- Wave 1 units: 11 background agents launched 2026-10-27 19:18 Amsterdam (list under "Current step"); a cut-off one
+  is restarted with the same prompt and goes on from its notes.
+- Advisor (amendments + docs-after-r7 plan): background agent, launched 19:18.
+- Saver: `checkpoint.mjs watch v2-research`, background, started 19:18, stops after 110 minutes; restart it if agents
+  still run.
+- Day-window check: send_later trig_01Veu82e8opzfVF7b6ZKAHwp at 22:50 UTC (23:50 Amsterdam): stop anything still
+  running before 00:10 and schedule the 08:35 resume.
