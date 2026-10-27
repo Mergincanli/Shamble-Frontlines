@@ -341,14 +341,21 @@ const CODE_RUNNERS = new Set(['eval', 'source', '.', 'trap', 'alias', 'command',
 // Only these may be set on a routine's command line (prefix, or via env); others can change what an allowed program
 // runs (PATH, NODE_OPTIONS, BASH_ENV, LD_*, GIT_*, PYTHON*, npm_config_*). Verdict-3 condition 4.
 const ROLE_ENV_OK = new Set(['TZ', 'LC_ALL', 'LANG', 'LANGUAGE', 'NO_COLOR']);
-// Read-only and inspection programs routines may run. None of these writes a file or runs a program, except through an
-// option refused by readToolBadOpt (verdict-3 condition 1). Their file operands are credential-checked.
-const ROLE_READ = new Set(['date', 'ls', 'cat', 'head', 'tail', 'wc', 'grep', 'egrep', 'fgrep', 'rg', 'pwd', 'echo',
-  'printf', 'test', '[', 'true', 'false', 'basename', 'dirname', 'realpath', 'readlink', 'stat', 'file', 'sort', 'cut',
-  'tr', 'comm', 'cmp', 'diff', 'rev', 'nl', 'od', 'xxd', 'column', 'fold', 'seq', 'tree', 'jq', 'which', 'hostname',
-  'uname', 'sha256sum', 'md5sum', 'cksum', 'find', 'fd']);
-// File tools routines may run; every path they write is checked (verdict-3 condition 3).
+// Read-only and inspection programs routines may run. The set is kept small and obviously safe: tools with a rich
+// write/exec option surface (sort, xxd, tree, fd, jq, awk, sed) are left off on purpose, so there is no bundled-option
+// corner to get wrong (security review, second pass). `date` and `find` are the only ones with a write/exec option,
+// each a small closed set refused by readToolBadOpt. Every path operand is credential- and scope-checked.
+const ROLE_READ = new Set(['date', 'ls', 'cat', 'head', 'tail', 'wc', 'grep', 'egrep', 'fgrep', 'pwd', 'echo',
+  'printf', 'test', '[', 'true', 'false', 'basename', 'dirname', 'realpath', 'readlink', 'cut', 'tr', 'comm', 'diff',
+  'cmp', 'nl', 'rev', 'uname', 'hostname', 'which', 'sha256sum', 'find']);
+const GREPS = new Set(['grep', 'egrep', 'fgrep']); // the first bare operand is a pattern, not a file (unless -e/-f given)
+// File tools routines may run; every path they write is checked (verdict-3 condition 3). Recursive cp/mv/rm is refused.
 const ROLE_WRITE = new Set(['mkdir', 'rm', 'rmdir', 'cp', 'mv', 'touch', 'tee']);
+// A directory whose removal or overwrite would reach a protected file (its ancestor or the project root).
+function coversProtected(rel) {
+  if (rel === '.' || rel === '') return true;
+  return ['.github', '.git', '.claude', 'tools'].some((d) => d === rel || d.startsWith(rel + '/'));
+}
 
 // For a routine, strip the leading wrappers of a command (like unwrap) but validate the environment it sets: only
 // ROLE_ENV_OK variables may be set (prefix or env), and command/exec/time/env-with-options are refused (verdict-3
@@ -387,15 +394,24 @@ function unwrapRole(argv, role) {
   }
   return { argv: a };
 }
-// A file a routine reads (operand or < redirect): refuse credential paths, a variable in a path, and a glob that could
-// reach outside the project (verdict-3 condition 5, F5).
-function readOperandDeny(p, vcwd, role, io) {
+// A file a routine reads (an operand, an option's file value, or a < redirect): refuse a variable in a path, a glob
+// that could reach outside the project, a credential path, and any read that resolves outside the project, the
+// scratchpad or the pre-installed browser directory (verdict-3 condition 5; F5; security review second pass G2). The
+// path is normalised (resolved against the command's folder and realpath'd) before every match, so `..` and symlinks
+// can't dodge it.
+function readOperandDeny(p, vcwd, role, io, scratch) {
   const looksPath = p.includes('/') || /^~/.test(p);
-  if (looksPath && /[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
-  const ex = p.replace(/^~(?=\/|$)/, io.home);
-  const cred = /^\/proc(\/|$)/.test(ex) || /(^|\/)\.git\/config$/.test(ex) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(ex) || ex.includes('/.config/gh/');
+  if (!looksPath) return null; // a bare word (e.g. a grep pattern or a flag value) is not a file path
+  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
+  const exRaw = p.replace(/^~(?=\/|$)/, io.home);
+  if (/[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
+  const abs = realOf(isAbsolute(exRaw) ? exRaw : resolve(vcwd, exRaw), io);
+  const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git\/config$/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
   if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
-  if (looksPath && /[*?]/.test(p) && (isAbsolute(ex) || /(^|\/)\.\.(\/|$)/.test(ex))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
+  const inProject = projectRel(p, vcwd, io) !== null;
+  const inScratch = scratch && insideDir(p, scratch, vcwd, io);
+  const inBrowsers = abs === '/opt/pw-browsers' || abs.startsWith('/opt/pw-browsers/') || abs === '/dev/null';
+  if (!inProject && !inScratch && !inBrowsers) return deny(`routine (${role}): reading outside the project (${p}); only the project, the scratchpad and /opt/pw-browsers`);
   return null;
 }
 // A path a routine writes (redirect, or a file tool's target): the scratchpad, or inside the project and not protected
@@ -406,6 +422,7 @@ function writeTarget(what, p, vcwd, role, io, input) {
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {
     if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed`);
+    if (coversProtected(rel)) return deny(`routine (${role}): ${what} on ${rel || '.'} would reach a rules, CI or gate file (G3)`);
     if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)) return deny(`routine (pr-advisor): ${what} on ${rel}; the PR Advisor writes only its notes (.checkpoints/, .gate/)`);
     return null;
   }
@@ -440,14 +457,12 @@ function cpMvTargets(args) {
   if (!bare.length) return { dests: [], sources: [] };
   return { dests: [bare[bare.length - 1]], sources: bare.slice(0, -1) };
 }
-// A read tool with an option that writes a file or runs a program: refuse it (verdict-3 condition 1).
+// The only two read tools with a write/exec option, each a small closed set (verdict-3 condition 1). Everything else
+// with a rich option surface was left off ROLE_READ, so there is nothing else to enumerate.
 function readToolBadOpt(prog, args) {
   const has = (re) => args.some((a) => re.test(a));
-  if (prog === 'sort' && has(/^(-o|--output(=|$))/)) return '-o writes a file';
-  if (prog === 'rg' && has(/^--pre(=|-glob|$)/)) return '--pre runs a program';
-  if (prog === 'xxd' && has(/^-[a-wyz]*r/)) return '-r can write a file';
   if (prog === 'date' && has(/^(-s|--set(=|$))/)) return '-s sets the clock';
-  if ((prog === 'find' || prog === 'fd') && has(/^-(exec|execdir|ok|okdir|delete|fprint|fprintf|fprint0|fls)$|^--(exec|delete)(=|$)/)) return '-exec/-delete/-fprint run or write';
+  if (prog === 'find' && has(/^-(exec|execdir|ok|okdir|delete|fprint|fprintf|fprint0|fls)$|^--(exec|delete)(=|$)/)) return '-exec/-delete/-fprint run or write';
   return null;
 }
 function npmCheck(argv, vcwd, role, io) {
@@ -484,7 +499,7 @@ async function bash(command, cwd, role, io, input) {
     }
     if (role) {
       for (const r of c.redirects) { const d = writeTarget('a redirect', r, vcwd, role, io, input); if (d) return d; }
-      for (const r of c.reads) { const d = readOperandDeny(r, vcwd, role, io); if (d) return d; }
+      for (const r of c.reads) { const d = readOperandDeny(r, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
       if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name, not by a path (${rawProg})`); // condition 2
       if ((prog === 'git' || prog === 'gh') && argv.some((t) => t.includes('$') || t.includes('`'))) {
         return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
@@ -515,13 +530,30 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
   if (ROLE_READ.has(prog)) {
     const bad = readToolBadOpt(prog, args);
     if (bad) return deny(`routine (${role}): ${prog} ${bad}; not allowed here`);
-    for (const op of operands(args)) { const d = readOperandDeny(op, vcwd, role, io); if (d) return d; }
+    // credential- and scope-check every path the tool reads: operands and the file value of an option (-fFILE,
+    // --file=FILE). For grep the first bare operand is the pattern, not a file, unless -e/-f supplied the pattern.
+    const skipPattern = GREPS.has(prog) && !args.some((a) => /^(-e|-f|--regexp|--file)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a));
+    let seenPattern = false;
+    for (const tok of args) {
+      let v;
+      const eq = /^--[a-z][a-z-]*=(.*)$/.exec(tok);
+      if (eq) v = eq[1];
+      else if (/^-[A-Za-z].+$/.test(tok) && !tok.startsWith('--')) v = tok.slice(2); // -fFILE (best effort)
+      else if (tok.startsWith('-') && tok !== '-') continue; // a bare flag; its separate value is its own token
+      else if (skipPattern && !seenPattern) { seenPattern = true; continue; } // the grep pattern
+      else v = tok;
+      const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir);
+      if (d) return d;
+    }
     return null;
   }
   if (ROLE_WRITE.has(prog)) {
+    if ((prog === 'cp' || prog === 'mv' || prog === 'rm') && args.some((a) => /^(-R|--recursive(=|$))/.test(a) || /^-[A-Za-z]*[rR]/.test(a) || (prog === 'cp' && /^(-a|--archive(=|$))/.test(a)))) {
+      return deny(`routine (${role}): recursive ${prog} isn't allowed; name the files, or use git rm for the checkpoint`);
+    }
     if (prog === 'cp') {
       const { dests, sources } = cpMvTargets(args);
-      for (const s of sources) { const d = readOperandDeny(s, vcwd, role, io); if (d) return d; }
+      for (const s of sources) { const d = readOperandDeny(s, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
       for (const t of dests) { const d = writeTarget('cp', t, vcwd, role, io, input); if (d) return d; }
       return null;
     }
