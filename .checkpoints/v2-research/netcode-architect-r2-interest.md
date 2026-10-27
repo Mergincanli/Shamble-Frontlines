@@ -91,3 +91,32 @@ S5 Glenn Fiedler, "Snapshot Compression", Gaffer On Games, 2015-01-04, https://g
    bits; 1-bit not-changed for 901 cubes at 60 Hz costs ~54 kbit/s; stationary steady state ~15 kbit/s, mostly
    headers. Mostly the snapshots unit's; for me: an entity's absence from the baseline means its first appearance
    costs a full (or initial-state-relative) record -> churn at the relevance edge costs bytes. Sure: confirmed.
+S6 three.js src/cameras/PerspectiveCamera.js (dev branch), https://raw.githubusercontent.com/mrdoob/three.js/dev/src/cameras/PerspectiveCamera.js
+   (read 2026-10-27; branch dev, no revision number shown in the file excerpt). Tier: official (library source).
+   Verbatim: fov property "The vertical field of view, from bottom to top of view, in degrees." getViewBounds():
+   "Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction."
+   Sure: confirmed in the source (verbatim). -> legacy fov 15 is vertical; footprint arithmetic uses vertical fov.
+   (threejs.org/docs/#api/en/cameras/PerspectiveCamera: hash-routed, fetch returned only the nav index: not usable.)
+
+## RESUME 2026-10-27 21:24 UTC (coordinator message)
+New rule: each finding a REC rests on carries the exact sentence(s) verbatim in notes and finding; claims seen only
+as WebFetch paraphrase = "inferred", not "confirmed in the source". Window ends 23:10 UTC.
+Verbatim status of S1-S5:
+- S1: verbatim code lines recorded (SVF_BROADCAST "broadcast entities are always sent"; `if ( !CM_AreasConnected(
+  clientarea, svEnt->areanum ) ) {` "blocked by a door"; `// this is a new entity, send it from the baseline`;
+  `#define MAX_SNAPSHOT_ENTITIES 1024`; "if we are full, silently discard entities"; `if (~ent->r.singleClient &
+  (1 << frame->ps.clientNum))` for SVF_CLIENTMASK; `if ( messageSize > 1500 ) {`; `rateMsec = ( messageSize +
+  HEADER_RATE_BYTES ) * 1000 / rate;`) -> confirmed.
+- S2: verbatim `if (cm.areas[area1].floodnum == cm.areas[area2].floodnum) {`; `cm.areaPortals[ area1 * cm.numAreas +
+  area2 ]++;` / `--;`; then `CM_FloodAreaConnections ();` -> confirmed (constant-time compare; re-flood on change).
+- S3: verbatim "MULTICAST_ALL	same as broadcast (origin can be NULL)"; "if (!CM_AreasConnected (area1, area2))";
+  "// if the sound doesn't attenuate,send it to everyone"; "if (attenuation == ATTN_NONE)" "use_phs = false;";
+  "if (channel & CHAN_RELIABLE)". PHS-mask test itself: paraphrase only -> inferred unless re-quoted.
+- S4: verbatim "The first n objects in this sorted list are the objects you should send that frame."; "reset the
+  priority accumulator to zero for objects that fit."; "leave the priority accumulator value alone for objects that
+  didn't."; "I give them a higher priority of 100 while at rest objects have priority of 1."; "256kbit/sec";
+  "a maximum of 64 state updates per-packet" -> confirmed.
+- S5: verbatim "Cube n in snapshot 110 is the same as the baseline. One bit: Not changed!"; "around 15 kilobits
+  per-second". Baseline-advance on ack: paraphrase -> inferred.
+Next: Q2 PHS verbatim re-quote (optional), Source SDK 2013 ShouldTransmit (TF2), Chrome devtools Wasm memory
+inspection, SourceTV delay (Valve wiki blocked -> search GitHub sdk for tv_delay), gdcvault Halo Reach / Overwatch.
