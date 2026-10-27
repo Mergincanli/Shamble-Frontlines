@@ -40,7 +40,10 @@
    82 tests pass. Gate PASS.
 
 ## Current step
-7. Build step 3: the procedure docs. advisor.md (PR step 0 role check; the new gate bar), NIGHT_SHIFT.md (start check 0;
+7. Build step 3 (in progress): NIGHT_SHIFT.md role check (check 0) + 08:10 window + guard/no-prompts note DONE. Still to
+   do: NIGHT_SHIFT saver-stop via TaskStop, mark-ready via MCP; advisor.md (PR step 0 role check; the new gate bar); CHECKPOINTS.md
+   (saver stop via TaskStop); CLAUDE.md (web-fetch sentence, playwright cli.js line); START_HERE/tools README (playwright line).
+   advisor.md (PR step 0 role check; the new gate bar), NIGHT_SHIFT.md (start check 0;
    00:10->08:10; stop saver via TaskStop not pkill; mark-ready via MCP not `gh pr ready`), CHECKPOINTS.md (TaskStop),
    CLAUDE.md (web-fetch sentence), and the proposal's other procedure changes (playwright cli.js, no git -C, named
    branch on push, explicit git add paths, git rm for checkpoint deletion, MCP-only GitHub writes, agent memory local).
@@ -103,6 +106,20 @@
       patterns via globOk).
     - I3 MEDIUM grep pattern-option by abbreviation (`--regex=`): fixed — abbreviations detected, and the grep pattern
       is always credential-checked (scope check skipped). 329 tests, 44 mutants.
+  - **Fifth review pass of 769fcaf/dca6a1a (7 findings across guard + settings), 2026-10-27, all fixed in step 1f (3ada4b5):**
+    - J1-J3 (glob/brace/~ expansion differentials): fixed with the right abstraction — parseShell records whether a
+      word's glob/~ was quoted; a routine command with an unquoted `* ? ~` is refused at the command level (the shell
+      would expand it past the guard). Quoted globs are literals and pass (`find -name "*.md"`, `grep "a*b"`). Brace/
+      bracket in a file path refused in readOperandDeny/writeTarget. This subsumes the per-operand glob checks.
+    - J4 (cp -a bundled): fixed — cp's recursive check is `/^-[^-]*[rRa]/`.
+    - K1 (merge fail-open): fixed — merge_pull_request off the allow list, and mergeCheck fails closed for every
+      session (a check that can't complete refuses).
+    - K2 (npm audit): narrowed to two read-only forms + deny `npm audit *fix*`.
+    - K3 (node .gate/*): narrowed to .gate/*.mjs and .gate/*.js.
+    341 guard + 82 settings tests, 46 mutants. The suite caught a real bug (the recursive check had lost its cp/rm
+    guard and would have denied `touch -r`).
+  - **Guard status:** substantially complete after 5 automated passes. The final security-auditor review (step 5) is
+    the human gate; the automated passes are converging (HIGH->HIGH->HIGH->MED->MED).
   - F7 MEDIUM comment-ownership (shared Mergincanli identity: can't tell a routine's comment from Mustafa's by the
     API): a genuine residual. The API shows the same author for both. Mitigation already in place: night edits only
     #16 and its own PRs, PR Advisor only its review comments on PRs, never #16. Note it in the report as a known
