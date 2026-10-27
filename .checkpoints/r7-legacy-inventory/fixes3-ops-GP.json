@@ -78,5 +78,19 @@
   "field": "v2_note",
   "op": "append",
   "text": "Order found in code: the player always acts first. Its shots, melee, movement and bolts resolve before any bot, so a bot the player kills this step cannot fire back (applyDamage sets it dead at once, 1520, and it takes the dead branch, 2937), and bots aim at the player's position after its move (re-sync, 2862). With many humans under server authority, the tick needs one defined order for every soldier's command, or all shots of a tick resolved against the same pre-tick state, so that a trade never depends on slot order."
+ },
+ {
+  "id": "GP2",
+  "field": "what",
+  "op": "replace",
+  "find": "Only movement, sprint, jump, held or queued fire and the cursor aim are sampled inside update().",
+  "text": "Only movement, sprint, jump, held or queued fire, holding E to channel the tech box (keys['KeyE'] read by updateTechBox at 948, called at 2697) and the cursor aim are sampled inside update()."
+ },
+ {
+  "id": "GP14",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "the player's movement (2748-2780); grenades (2856-2859)",
+  "text": "the player's movement (2748-2780); the piloted Juggernaut's drive and cannon fire (tickPilot, 2781); grenades (2856-2859)"
  }
 ]

@@ -1,11 +1,70 @@
 [
- {"id": "CS10", "field": "where", "op": "replace", "find": "still has 9 Math.hypot calls", "text": "still has 10 Math.hypot calls on 9 lines (two on shamble-editor.js:517)"},
- {"id": "CS6", "field": "what", "op": "replace", "find": "with a finite maxT, a NaN ray misses everything", "text": "with a finite maxT, an all-NaN direction misses everything (a ray with only one NaN component can still hit through the other slabs)"},
- {"id": "CS8", "field": "v2_note", "op": "replace", "find": "In legacy the scene is the truth and SIM mirrors it once per shot.", "text": "In legacy the scene is the truth and SIM mirrors it once per frame, plus the forced re-syncs listed under what (the core comment at core:1513-1514 still says 'once per shot')."},
- {"id": "CS8", "field": "v2_note", "op": "replace", "find": "the per-shot rebuild from scene objects", "text": "the per-frame rebuild from scene objects"},
- {"id": "CS8", "field": "v2_note", "op": "append", "text": "Boundary fact for R1: today the authoritative state lives on three.js objects, so the port must lift it out of the scene graph. Soldier positions are scene-node positions moved in place (player.position and en.group.position, by resolveObstacles and tickVertical at game:2780 and :2933). The player's facing is the group's rotation.y, set from the cursor's aim point (game:2710) and read by the Riot Shield block (game:1514) and playerFireOrigin (game:1420). A grenade's position is its mesh's position (game:2857). A crate's orientation is its mesh's rotation.y (game:1452, :2526). Crate, building and house colliders are THREE.Box3 objects filled from meshes (Box3.setFromObject at game:85 and :506, core:1044; _bkWorldBoxes through matrixWorld, core:1430)."},
- {"id": "CS8", "field": "evidence", "op": "replace", "find": "STATUS.md:118: syncSimWorld 561 B per call (the houses fallback array).", "text": "STATUS.md:118 still lists syncSimWorld at 561 B per call (the houses fallback array), but that array was removed (reports/2026-10-16-three-teams-core.md:31; game:1458 builds none), so the figure is stale (see GW16)."},
- {"id": "CS5", "field": "v2_note", "op": "replace", "find": "will need slopes, and maybe full 3D rotation.", "text": "will need slopes and any rotation about Y (EDITOR_V2 §3: 120° three-team symmetry, 15° snaps; the oriented-box test already covers it); no VISION_V2 §6 need asks for full 3D rotation of static boxes."},
- {"id": "CS1", "field": "where", "op": "append", "text": "Exception: tools/tuning-dump.js:12 (added by R7) names BTN and FIXED_DT, only to dump them as data; the header comment at core:19 also names them."},
- {"id": "CS2", "field": "v2_note", "op": "replace", "find": "so the sim owns the hit shape and the model is fitted to it", "text": "so the sim owns the hit shape as per-unit data; how the models and the hit shapes are kept in agreement is left to the look brief and the content-data decision draft"}
+ {
+  "id": "CS10",
+  "field": "where",
+  "op": "replace",
+  "find": "still has 9 Math.hypot calls",
+  "text": "still has 10 Math.hypot calls on 9 lines (two on shamble-editor.js:517)"
+ },
+ {
+  "id": "CS6",
+  "field": "what",
+  "op": "replace",
+  "find": "with a finite maxT, a NaN ray misses everything",
+  "text": "with a finite maxT, an all-NaN direction misses everything (a ray with only one NaN component can still hit through the other slabs)"
+ },
+ {
+  "id": "CS8",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "In legacy the scene is the truth and SIM mirrors it once per shot.",
+  "text": "In legacy the scene is the truth and SIM mirrors it once per frame, plus the forced re-syncs listed under what (the core comment at core:1513-1514 still says 'once per shot')."
+ },
+ {
+  "id": "CS8",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "the per-shot rebuild from scene objects",
+  "text": "the per-frame rebuild from scene objects"
+ },
+ {
+  "id": "CS8",
+  "field": "v2_note",
+  "op": "append",
+  "text": "Boundary fact for R1: today the authoritative state lives on three.js objects, so the port must lift it out of the scene graph. Soldier positions are scene-node positions moved in place (player.position and en.group.position, by resolveObstacles and tickVertical at game:2780 and :2933). The player's facing is the group's rotation.y, set from the cursor's aim point (game:2710) and read by the Riot Shield block (game:1514) and playerFireOrigin (game:1420). A grenade's position is its mesh's position (game:2857). A crate's orientation is its mesh's rotation.y (game:1452, :2526). Crate, building and house colliders are THREE.Box3 objects filled from meshes (Box3.setFromObject at game:85 and :506, core:1044; _bkWorldBoxes through matrixWorld, core:1430)."
+ },
+ {
+  "id": "CS8",
+  "field": "evidence",
+  "op": "replace",
+  "find": "STATUS.md:118: syncSimWorld 561 B per call (the houses fallback array).",
+  "text": "STATUS.md:118 still lists syncSimWorld at 561 B per call (the houses fallback array), but that array was removed (reports/2026-10-16-three-teams-core.md:31; game:1458 builds none), so the figure is stale (see GW16)."
+ },
+ {
+  "id": "CS5",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "will need slopes, and maybe full 3D rotation.",
+  "text": "will need slopes and any rotation about Y (EDITOR_V2 §3: 120° three-team symmetry, 15° snaps; the oriented-box test already covers it); no VISION_V2 §6 need asks for full 3D rotation of static boxes."
+ },
+ {
+  "id": "CS1",
+  "field": "where",
+  "op": "append",
+  "text": "Exception: tools/tuning-dump.js:12 (added by R7) names BTN and FIXED_DT, only to dump them as data; the header comment at core:19 also names them."
+ },
+ {
+  "id": "CS2",
+  "field": "v2_note",
+  "op": "replace",
+  "find": "so the sim owns the hit shape and the model is fitted to it",
+  "text": "so the sim owns the hit shape as per-unit data; how the models and the hit shapes are kept in agreement is left to the look brief and the content-data decision draft"
+ },
+ {
+  "id": "CS6",
+  "field": "what",
+  "op": "replace",
+  "find": "(a ray with only one NaN component can still hit through the other slabs)",
+  "text": "(a ray with one or two NaN components can still hit through the slabs that are left)"
+ }
 ]
