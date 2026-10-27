@@ -1,130 +1,162 @@
-# Plan: kit-v3-1 (WRITE-GUARD, ROUTINE-EFFORT, no stalls in routines)
+# Plan: kit-v3-1 (WRITE-GUARD, ROUTINE-EFFORT, no stalls in routines), revision 2
 
-Approved work (issue #16 comment 6396928581, the Advisor, 2026-10-25): ROUTINE-EFFORT (b) extended (code changes at
-night run through a high-effort agent; the night's main session only orchestrates; an Opus builder agent with edit
-rights; a default effort of high if settings support one); WRITE-GUARD (a) with the secret-pattern fix (use deny where
-routines can't answer a prompt; kit changes daytime only); DOMAINS-ACCEPT (a), the risk recorded, effective once
-WRITE-GUARD is merged. The Advisor's lesson (2026-10-27): every command the night shift and the PR Advisor need is
-allowed, everything they must never do is denied, nothing they hit is ask-first; audit both paths. NS-1 (b): runs to
-08:10. Branch `cs/kit-v3-1` (BRANCH-2 (a)), in its own worktree. Daytime only. A rules change: escalation category 3,
-so it merges on Mustafa's go after the advisor approves its head. No game code (symbols +0 −0).
+Approved work (issue #16 comment 6396928581, the Advisor, 2026-10-25): ROUTINE-EFFORT (b) extended; WRITE-GUARD (a)
+with the secret-pattern fix (deny where routines can't answer; kit changes daytime only); DOMAINS-ACCEPT (a), the risk
+recorded, effective once WRITE-GUARD is in force. The Advisor's lesson (2026-10-27): every command the night shift and
+the PR Advisor need is allowed, everything they must never do is denied, nothing they hit is ask-first. NS-1 (b): runs
+to 08:10. BRANCH-2 (a): `cs/kit-v3-1`, in its own worktree; it lands first if it collides with cs/v2-research.
+SPEND-1 (b). Daytime only. A rules change (escalation category 3): it merges on Mustafa's go after the advisor approves
+its head. No game code (symbols +0 −0). Plan review round 1: REVISE (`advisor-verdict-1.md`); this revision applies
+R1–R6, the decisions the advisor took and conditions C1–C8.
 
-## Evidence already gathered (the audit, `.checkpoints/kit-v3-1/` once the branch exists)
-- Four traces: night-shift path (56 commands), PR Advisor path (43), past runs (18 permission decisions mined), the
-  permission docs (8 answers with quotes).
-- A proposal (allow, deny, the 16 ask rules, a role guard, 13 procedure changes, 12 open items).
-- A security-auditor attack on it: **FAIL**, 2 critical, 4 high, 4 medium, 2 low. This plan adopts its fixes:
-  1. (critical) A PR-event run starts from the PR head, so the PR's own `.claude/`, hooks, `CLAUDE.md` and
-     `.mcp.json` are live before the advisor reads anything.
-  2. (critical) Code the session runs (`tools/preview.js` runs the tree's game code; a PR's own `gate.mjs`) has the
-     session's GitHub access, and no permission rule sees it.
-  3. (high) Git accepts abbreviated long options and bundled short ones: on throwaway repos, abbreviated forms of branch
-     delete, amend, hard reset and `--upload-pack` got past the deny rules. Allowed rules skip the classifier.
-  4. (high) The guard can fail open (relative hook path, no `onFailure: block`, `disableAllHooks`).
-  5. (high) Every session posts as Mergincanli, so a hijacked PR Advisor could write to the night queue.
-  6. (high) A merge check on "a 40-hex `expectedHeadSha`" proves nothing about approval.
+## Evidence already gathered (this folder)
+Four traces (night path 56 commands, PR Advisor path 43, past runs 18 decisions, permission docs 8 answers), the
+proposal, and the security-auditor's attack on it: FAIL, 2 critical, 4 high, 4 medium, 2 low (`audit-result.json`,
+`security-auditor.md`). The ledger below maps every finding.
 
-## Threat model (short)
-Routines run unattended with Mustafa's GitHub identity. Outsiders control PR content (the head tree, `.claude/`
-included), PR text, comments on the public issue #16 and fetched pages. Static rules match spellings, not intent; they
-stop accidents and the common forms, not a determined bypass. The real backstops are: no outsider PR ever starts a
-session (L0), no PR code runs where merge rights are (L3), the guard parses commands (L2), and the GitHub ruleset on main
-(pull requests only, `gate` and `smoke` required, no force push, no deletion).
+## Threat model
+- Routines run unattended with Mustafa's GitHub identity (every session posts as Mergincanli). Outsiders control PR
+  content (the head tree, `.claude/` and `.mcp.json` included), PR text, comments on the public issue #16 and fetched
+  pages.
+- **A PR's own rules govern its review run** unless something outside the repository changes that: a PR-event run
+  starts from the PR head. The author filter keeps outsiders out, but **one of our own sessions, tricked by a page or a
+  comment, can open a PR that changes the rules (the guard included), and its review run would then start under the rules
+  that PR wrote.** PR-HOME (L0) closes this; if it doesn't work and managed settings aren't available, RESIDUAL goes to
+  Mustafa.
+- **Programs a session runs hold its GitHub access**, and no permission rule or hook sees what they do. In phase 0
+  routines run no program that didn't come from main (R2).
+- Static rules match spellings, not intent: they stop accidents and the common forms.
+- **The GitHub ruleset on main (25069670) is no backstop against a bad merge**: it requires a pull request and blocks
+  force pushes and deletion, but it needs 0 approvals, and its `gate` and `smoke` checks come from the PR's own
+  `.github/workflows/gate.yml`, so a PR that edits that file can turn them green.
 
 ## Design
-**L0, outside the repository (Mustafa's settings; the plan lists them, the session can't set them):**
-- PR Advisor trigger filters: author is Mergincanli, and not a draft. Fork and outsider PRs then never start a session.
-- Two routine-only cloud environments with one variable each, `SHAMBLE_ROLE=night-shift` / `pr-advisor`
-  (ROLE-SIGNAL); the routines move to them; the night routine gets a new bound session.
-- Managed settings, if Mustafa's plan offers them: the only layer a repository can't override (MANAGED).
-- An environment setup script that installs the toolkit from main's lockfile, outside the repository (SETUP), so no
-  routine runs `npm` at all. Until then, one exact `npm ci` form from main's lockfile, guarded (L2).
-**L1, static settings (all sessions), `.claude/settings.json`:** the proposal's allows, narrowed per the attack: no
-`git grep *` or `git ls-remote *` wildcards (exact forms; the Grep tool for searching), `git fetch` narrowed to the
-forms the paths use, no `node .gate/*`, no `ln -s` rule; its denies (history rewrites, branch delete and move, leading
-`git -*` options, `gh pr merge`, `gh api` writes, `npx`, `npm run`/`test`, shell wrappers, MCP file writes), plus Read
-denies for `.git/config`, `~/.gitconfig` and `/proc/**`. **The ask list ends empty.** `effortLevel: "high"`.
-**L2, the role guard, `.claude/hooks/routine-guard.mjs`** (PreToolUse on every tool, plus PermissionRequest and
-ConfigChange), registered as `node "${CLAUDE_PROJECT_DIR}/.claude/hooks/routine-guard.mjs"` with `onFailure: "block"`;
-the syntax-gate hook gets the same path fix. With a role set it fails closed. It:
-- parses argv for git, gh and npm, treating any unambiguous abbreviation or bundled short flag of a dangerous option as
-  that option;
-- holds per-role allowlists for the GitHub MCP tools (any `mcp__github__*` not listed is denied): the PR Advisor
-  comments and labels on PRs only, and edits only its own review comment; the night shift comments only on #16 and on
-  its own PRs;
-- refuses a merge when there is no `expectedHeadSha`, when the head repository isn't the base repository, when the
-  `gate` and `smoke` check runs on that SHA aren't success, or when the diff touches `.claude/`, `CLAUDE.md`,
-  `.github/` or the gate's files (Mustafa merges those through a day session);
-- denies the night shift any merge, and the PR Advisor any commit, push, checkpoint save or PR edit;
-- denies routines Edit and Write on protected paths (`CLAUDE.md`, `.claude/**`, `.github/**`, the gate's files, any
-  `.npmrc`) and Bash writes to them (best effort; the commit and push checks back it up);
-- limits routine WebFetch to the allow-listed hosts, and on `github.com`, `raw.githubusercontent.com`, `docs.rs` and
-  `crates.io` to this repository and named upstream repositories and crates;
-- denies routines `AskUserQuestion`, plan mode, routine and session tools, and connector tools whose org policy is ask;
-- PermissionRequest: with a role set, every prompt becomes deny plus interrupt, with a line for "Decisions needed";
-- ConfigChange: with a role set, blocks changes to project and local settings.
-**L3, procedures (`advisor.md`, `NIGHT_SHIFT.md`, `CHECKPOINTS.md`, `CLAUDE.md`):**
-- **The PR Advisor never runs PR-tree code.** It relies on the CI `gate` and `smoke` results on the head. A PR that
-  needs a sim, a render or a measurement is needs-mustafa ("verify in a day session"). The proposal's P-1
-  (`git switch --detach origin/main`) stays as a guard against honest mistakes, written down as no boundary.
-- The night shift runs a queue item or a handoff only if it links an advisor APPROVE naming a full SHA it can check.
-- The rest of the proposal's procedure changes: playwright without `npx`, no `git -C`, name the branch on every push,
-  explicit `git add` paths, `git rm` for checkpoint deletion, the saver stop forms, MCP-only GitHub writes, labels
-  exist, agent memory `local` (AGENT-MEMORY), and the text fixes (NIGHT_SHIFT 00:10 to 08:10, "no approval prompts
-  tonight", the web-fetch sentence in CLAUDE.md).
-**L4, ROUTINE-EFFORT:** a `builder` agent (`.claude/agents/builder.md`, model opus, effort high, with Edit and Write) that
-does every code and docs change at night in an isolated worktree; `NIGHT_SHIFT.md`: the night's main session only
-orchestrates (plans, starts agents, commits, posts); `effortLevel: "high"` (L1).
-**L5, the rest:** the secret-pattern fix in `.claude/scripts/checkpoint.mjs` (percent-escapes such as `%73k-` before
-the token patterns) with a test; the DOMAINS-ACCEPT risk written into `CLAUDE.md`'s web-domains rule.
+**L0, outside the repository (Mustafa's settings; the session can't set them):**
+- PR Advisor trigger filters: author is Mergincanli, and not a draft (now).
+- ROLE-SIGNAL (advisor: (a)): two routine-only cloud environments, `SHAMBLE_ROLE=night-shift` / `pr-advisor`; the
+  routines move there (the night routine gets a new bound session) only as C5 allows.
+- **PR-HOME:** the PR Advisor environment's setup script puts the checkout on `origin/main` before Claude Code starts,
+  so main's settings, hooks, agents and CLAUDE.md govern every review; the PR is read only through git and the GitHub
+  tools. The TEST-RUN proves the script runs after the clone. P-1 (`git switch --detach origin/main`) stays as backup.
+- MANAGED: server-managed settings, if Mustafa's plan has them (his question).
+**L1, static settings (all sessions), `.claude/settings.json`:** the proposal's allows narrowed per the attack (exact
+forms; no `git grep *` or `git ls-remote *` wildcards; `git fetch` narrowed; no `node .gate/*`, no `ln -s`, no `npm
+rebuild gl`); its universal denies **except `git merge` and `mcp__github__update_pull_request_branch`**, which move to
+the guard (R5); Read denies for `.git/config`, `~/.gitconfig`, `/proc/**`. **The ask list ends empty.** `effortLevel:
+"high"`. Deny messages say what to run instead.
+**L2, the guard, `.claude/hooks/routine-guard.mjs`:** PreToolUse on every tool, plus PermissionRequest and ConfigChange,
+registered as `node "${CLAUDE_PROJECT_DIR}/.claude/hooks/routine-guard.mjs"` with `onFailure: "block"` (the syntax-gate
+hook gets the same path fix). Rules, with their scope:
+- **Every session:** the git and gh argument checks (R3a): a long option not spelled in full is denied; bundled short
+  flags that include a dangerous one are denied; leading global options are parsed. The merge check (R3b):
+  `expectedHeadSha` present, head repository = base repository, `gate` and `smoke` success on that SHA. On an internal
+  error (R3c): allow when no role is set, so a guard bug never locks a day session out of fixing it.
+- **Both routines** (role set; internal error → deny): no `git merge`, no `update_pull_request_branch` (R5);
+  interpreters run only a tracked file whose working copy equals `origin/main` (the gate, `checkpoint.mjs`,
+  `repo-map-check.mjs`, the kit's tests); denied: `tools/preview.js`, `tools/pageshot.js`, `node .gate/*`, `node -e`, and
+  `--pre`, `eval`, `evalshot` snippets (R2, ROUTINE-CODE-EXEC: no in phase 0); npm refused when any `.npmrc` exists in the
+  tree, in `tools/` or in home; per-role allowlists for the GitHub MCP tools (any `mcp__github__*` not listed is denied;
+  `update_pull_request` may not change a base); WebFetch only to allow-listed hosts, with `github.com`,
+  `raw.githubusercontent.com`, `docs.rs` and `crates.io` limited to this repository and named repositories and crates
+  that start from the sources cited in `docs/research/` (C8); Edit, Write and Bash writes on protected paths denied
+  (`CLAUDE.md`, `.claude/**`, `.github/**`, `.mcp.json`, the gate's files, any `.npmrc`; R4); no `AskUserQuestion`, plan
+  mode, routine or session tools, or connector tools whose org policy is ask; PermissionRequest → deny plus interrupt,
+  with a line for "Decisions needed"; ConfigChange → block project and local settings changes.
+- **Night shift only:** no merge; commits and pushes refused if they touch a protected path; push only the current
+  branch; `npm` only as the exact `npm ci --prefix tools --ignore-scripts --no-audit --no-fund` from main's lockfile
+  (SETUP); `gh pr ready` only for its own PR; comments only on #16 and its own PRs.
+- **PR Advisor only:** no interpreter at all, no install (PR-CODE (a), SETUP); no commit, push, checkpoint save or PR
+  edit; comments and labels on PRs only, editing only its own review comment; merges refused when the diff touches a
+  protected path (R3b, R4).
+**L3, procedures:** `advisor.md` PR-review step 0 and NIGHT_SHIFT.md start check 0: if `SHAMBLE_ROLE` isn't the
+expected value, stop and report (C1). `advisor.md`'s "Never: approve without running the gate yourself" becomes: the
+gate and smoke green on the approved SHA, run by the advisor in a day session, or by CI when the PR touches neither
+`.github/` nor the gate's files; a PR that changes `shamble-*.js` or the pages, or needs a sim, render or measurement,
+is needs-mustafa ("verify in a day session") unless the TEST-RUN shows the PR Advisor can read the CI gate log (C2).
+The night shift runs a queue item or a handoff only if it links an advisor APPROVE naming a full SHA. The proposal's
+other procedure changes: playwright without `npx`, no `git -C`, the branch named on every push, explicit `git add`
+paths, `git rm` for checkpoint deletion, the saver stop forms, MCP-only GitHub writes, the labels exist, agent memory
+`local`, and the text fixes (NIGHT_SHIFT 00:10 to 08:10, "no approval prompts tonight", CLAUDE.md's web-fetch sentence).
+**L4, ROUTINE-EFFORT:** `.claude/agents/builder.md` (Opus, effort high; it lists its tools, works only in its worktree,
+never commits, pushes or posts; C7) does every change at night; the night's main session only orchestrates;
+`effortLevel: "high"`; CLAUDE.md "Models and effort" says routines now start at high through the project settings.
+**L5:** the percent-escape secret fix in `checkpoint.mjs` with a test; the DOMAINS-ACCEPT risk written into CLAUDE.md's
+web-domains rule.
+
+## Findings ledger (the attack's 12, and its "must change" bullets)
+| Finding | Where it lands |
+|---|---|
+| C1 PR head governs its review | L0 trigger filters + PR-HOME + MANAGED question; threat model; RESIDUAL if PR-HOME fails; P-1 as backup |
+| C2 programs hold GitHub access | R2: routines run only main's tracked files; PR Advisor no interpreter; ROUTINE-CODE-EXEC no; OS sandbox deferred to phase 1 |
+| H1 git abbreviations | L1 exact forms, no grep/ls-remote wildcards, narrow fetch; L2 parser for every session (R3a); C3b real-git cases |
+| H2 guard fails open | `${CLAUDE_PROJECT_DIR}` path, `onFailure: block`, ConfigChange block, deny plus interrupt. **sha256 pin: deferred**: with the hook registered in the repository, a program that could rewrite the guard already holds the GitHub access, so the pin buys little; it moves with the registration if MANAGED is (a) |
+| H3 the Mergincanli channel | per-role comment allowlists; queue items need an advisor APPROVE naming a SHA; as strong as C1's fix for the PR Advisor |
+| H4 merge check | R3b: every session SHA + same repo + checks; PR Advisor protected paths; `gh pr merge` denied (MERGE-ROUTE (a)) |
+| M1 npm supply chain | night: exact `npm ci`, main's lockfile, `.npmrc` refusal; PR Advisor installs nothing; no `gl` in routines; setup-script install later |
+| M2 wildcard allows | dropped: `node .gate/*`, `ln -s`, `git grep *`, `git ls-remote *`; preview.js denied to routines (R2) |
+| M3 WebFetch on open hosts | routine host + path limits (C8) |
+| M4 secret reads | Read denies for `.git/config`, `~/.gitconfig`, `/proc/**`; `git config` only with exact read keys |
+| L1 other allows | `gh pr ready` own PR only; gh api write flags parsed by the guard; `pkill` form replaced by TaskStop |
+| L2 prompts left | PermissionRequest deny plus interrupt; TEST-RUN rows for connector, protected-path write, repeated blocks |
 
 ## Files
-`.claude/settings.json` · `.claude/hooks/routine-guard.mjs` (new) and `routine-guard.test.mjs` (new) ·
-`.claude/hooks/syntax-gate.mjs` registration · `.claude/agents/builder.md` (new) · the 11 agents with `memory:
-project` · `.claude/agents/advisor.md` · `.claude/NIGHT_SHIFT.md` · `.claude/CHECKPOINTS.md` · `CLAUDE.md` ·
-`.claude/scripts/checkpoint.mjs` and its test · `tools/README.md` and `docs/START_HERE.md` (the `npx` lines; not gate
-files) · `docs/REPO_MAP.md` · the report. Not touched: the gate's own files (the PR Advisor stops running them on PR
-trees instead of changing them).
+`.claude/settings.json` · `.claude/hooks/routine-guard.mjs` (new), `routine-guard.test.mjs` (new),
+`settings.test.mjs` (new) · `syntax-gate.mjs` registration · `.claude/agents/builder.md` (new) · the 11 agents with
+`memory: project` · `advisor.md` · `NIGHT_SHIFT.md` · `CHECKPOINTS.md` · `CLAUDE.md` · `checkpoint.mjs` and its test ·
+`tools/README.md`, `docs/START_HERE.md` (the `npx` lines; not gate files) · `docs/REPO_MAP.md` · STATUS and ROADMAP
+(docs-keeper: the v2 pivot, kit-v3-0, R7, kit-v3-1, and C5's switch-on rule) · the report. The gate's own files stay
+untouched.
 
-## Evidence (kit change type)
-- The guard's test table: role × tool × input → expected decision. Every needed command of the four traces passes;
-  every "never" is denied, including the abbreviated git forms the attack found. Mutation runs: each guard rule removed
-  makes its own test fail (as kit-v3-0 did for checkpoint.mjs).
-- `checkpoint.mjs` tests, with the percent-escape case.
-- TEST-RUN before the first unattended night: in a day session in the new night environment, the test table live,
-  one example of each needed command, one protected-path write, one connector call and one repeated-block case (each
-  must end in deny plus interrupt, never a wait); then one PR Advisor run on a docs-only test PR.
+## Build order (C6: one commit, gate run and checkpoint save per step)
+1. The guard and its tests. 2. The settings and the settings test. 3. The procedures, and every doc instruction that
+would now hit a deny. 4. The builder agent, `effortLevel`, memory local, the "Models and effort" sentence. 5. The
+percent-escape fix and its test. Then reviews once on the final diff, the TEST-RUN part A, the report, and the PR.
+
+## Evidence
+- The guard's test table (role × tool × input → decision): every needed command of the four traces passes; every never
+  is denied, including the abbreviated git forms; mutation runs (each rule removed makes its own test fail).
+- The settings test (C3a): the ask list is empty; every needed command form matches an allow rule and no deny rule;
+  every never is denied by a static rule or by the guard. Labelled an emulation of the documented matching.
+- Real-git option cases (C3b), the builder worktree rows (C3c), the error-mode rows (C3d).
+- `checkpoint.mjs` tests with the percent-escape case.
+- **TEST-RUN (C4), a table of expected against observed.** Part A, in a day session in the night environment on
+  cs/kit-v3-1, before the PR is marked ready: U-1, U-3 to U-6; PR-HOME (in the PR Advisor environment); the role
+  variable reaching hooks and subagents; one builder spawn in a worktree; a connector call, a protected-path write and a
+  repeated-block case, each ending in deny plus interrupt (never a wait) with the stop reported in the session's final
+  message and the run's status comment; the session's effort; a read-only check whether a child process holds the
+  GitHub identity; whether the PR Advisor can read the CI gate log; the role-missing stop. Results go in the report.
+  Part B, after merge: one PR Advisor run on a docs-only test PR, before it reviews anything else.
 - Gate PASS (symbols +0 −0), repo map check.
 
+## Switching on (C5)
+Neither routine does real work until its part of the TEST-RUN passes. The PR Advisor stays off (Mustafa turns it off
+now); the night routine moves to its new bound session only after part A. DOMAINS-ACCEPT takes effect once this PR is
+merged and part A has passed. STATUS records this.
+
 ## Reviewers
-security-auditor (the final diff, adversarial, the same threat model) · test-engineer (is it proven) · infra-engineer
-(environments, setup script) · advisor (this plan; the PR). Review rounds stop once findings are only nits.
+security-auditor (required; the final diff, the parser included, with the R1 and R2 leftovers) · test-engineer · 
+infra-engineer (environments, setup scripts, PR-HOME) · advisor (the plan; the PR). Rounds stop at nits.
 
 ## Risks
-1. Rules that bind day sessions too (DAY-COST): no `git -C`, `git checkout`, `git restore`, local branch deletion,
-   `git merge`, `rebase`, `--amend`, `gh pr merge`, `npx`, `npm run`/`test`, `bash -c`. Each has a replacement.
-2. Behaviour the docs leave open (the audit's U-1, U-3 to U-6): whether settings reload mid-session, case-sensitive
-   matching, git writes going to the classifier anyway, auto mode dropping interpreter rules, hooks in routines. The
-   TEST-RUN settles them before anything relies on them.
-3. Without L0, a PR still governs its own review run. The trigger filter is the cheap, immediate fix.
-4. `gl`'s install script downloads a prebuilt binary that the lockfile doesn't pin (U-11); the setup script, plus a
-   hash check of the binary, contains it.
-5. A larger kit change-set: the guard is new code; its test table and the security review carry the proof.
+1. PR-HOME may not work (the setup script may run before the clone): then RESIDUAL.
+2. Behaviour the docs leave open (U-1, U-3 to U-6): the TEST-RUN settles it before anything relies on it.
+3. Day-session cost (DAY-COST (a)): no `git -C`, `git checkout`, `git restore`, local branch deletion, `rebase`,
+   `--amend`, `gh pr merge`, `npx`, `npm run`/`test`, `bash -c`; each has a replacement; `git merge` stays for day
+   sessions (R5).
+4. The guard is new code that every tool call passes through: its test table, mutation runs, the settings test, the
+   TEST-RUN and the security review carry the proof; R3c keeps a broken guard from locking out a day session.
+5. Routines lose headless sims and renders in phase 0 (R2): acceptable, as nothing at night needs them now; revisit with
+   the OS sandbox in phase 1.
 
-## Decisions needed (through the advisor; the settings ones are Mustafa's)
-- **PR-TRIGGER:** set the PR Advisor's filters now (author Mergincanli, not draft). Cheap, closes critical 1 for
-  outsiders. Mustafa's UI.
-- **ROLE-SIGNAL:** (a) routine-only environments with `SHAMBLE_ROLE` (recommended); (b) a role file the routine prompt
-  arms; (c) no guard.
-- **MANAGED:** does Mustafa's plan offer managed settings? If yes, the guard's registration and the denies go there.
-- **SETUP:** an environment setup script that installs the toolkit from main's lockfile (recommended), or the guarded
-  exact `npm ci`.
-- **PR-CODE:** the PR Advisor never runs PR-tree code; sims, renders and measurements go to needs-mustafa (recommended),
-  or it runs them and accepts critical 2.
-- **MERGE-ROUTE:** the MCP merge with `expectedHeadSha` only (recommended).
-- **AGENT-MEMORY:** `memory: local` for the 11 agents (recommended).
-- **DAY-COST:** accept the universal denies for day sessions (recommended).
-- **TEST-RUN:** prove it in a day session before the first unattended night (recommended).
+## Decisions needed (Mustafa)
+- **MANAGED:** does his Claude plan include server-managed settings? (a) yes: the guard's registration and the universal
+  denies go there too; (b) no: rely on PR-HOME. Check the plan page; on a personal plan the answer is (b).
+- **RESIDUAL** (only if PR-HOME fails and MANAGED is (b)): (a) the PR Advisor keeps merging "ready" PRs, risk recorded;
+  (b) it reviews and labels only, and Mustafa says "merge #n" for every PR. Recommended (b).
 
 ## For Mustafa
-Nothing in Brave. The settings in L0, once decided.
+1. Turn the PR Advisor routine off until the TEST-RUN passes (the session can do it on his word).
+2. Add its two filters: author is Mergincanli, and not a draft.
+3. When the session sends the steps: create the two routine-only environments and the PR-HOME setup script.
+4. Answer MANAGED.
+5. Later: reconfirm the merge of this PR ("merge #<n>") once the advisor has approved its head.

@@ -4,7 +4,7 @@
 - **Branch:** cs/kit-v3-1 (BRANCH-2 (a)), worked in its own worktree
   (/tmp/claude-0/-home-user-Shamble-Frontlines/dbb5e494-b49f-5970-85a2-528a1e15b24b/scratchpad/wt-kit-v3-1) · **Base:**
   main 4c24d07.
-- **Last update:** 2026-10-27 13:05 Amsterdam
+- **Last update:** 2026-10-27 13:25 Amsterdam
 
 ## Steps done
 1. Audit, workflow write-guard-audit (run wf_e24159e7-346, cut off once by the spend limit and resumed): 6 agents.
@@ -13,9 +13,13 @@
    (security-auditor.md; all of it in audit-result.json). The docs agent (claude-code-guide) has no Write tool, so
    its answers are only in audit-result.json (traces[3]).
 2. Plan written (plan.md), adopting the attack's fixes; sent to the advisor (xhigh) for its plan review.
+3. Advisor plan review round 1: REVISE (advisor-verdict-1.md, verbatim): R1–R6, decisions taken (ROLE-SIGNAL (a),
+   SETUP, PR-CODE (a) enforced, MERGE-ROUTE (a), AGENT-MEMORY (a), DAY-COST (a) except R5, TEST-RUN (a),
+   ROUTINE-CODE-EXEC no), conditions C1–C8; escalations MANAGED and RESIDUAL (conditional). Plan revision 2 applies
+   them all (plan.md).
 
 ## Current step
-3. The advisor's plan review of plan.md (notes: advisor-plan-review.md, copied here as it stood at 13:05).
+4. The advisor's short re-review of revision 2's changed parts.
 
 ## Next steps
 1. Apply the advisor's verdict to plan.md (APPROVE with conditions → build; REVISE → fix; ESCALATE → Mustafa).
@@ -25,7 +29,7 @@
    delete this checkpoint; PR ready; advisor review; Mustafa's go.
 
 ## Open findings
-- The stuck PR Advisor run session_01FPXGo8GioEMFrCm8FhivMU (npm ci prompt) is Mustafa's to stop.
+- The stuck PR Advisor run session_01FPXGo8GioEMFrCm8FhivMU now shows ABANDONED (checked 2026-10-27 13:20).
 - PR-TRIGGER (filters: author Mergincanli, not draft) closes the attack's critical 1 for outsiders: Mustafa's UI.
 
 ## Key numbers
