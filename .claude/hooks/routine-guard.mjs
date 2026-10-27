@@ -356,10 +356,11 @@ function coversProtected(rel) {
   if (rel === '.' || rel === '') return true;
   return ['.github', '.git', '.claude', 'tools'].some((d) => d === rel || d.startsWith(rel + '/'));
 }
-// A GNU long option that is an unambiguous abbreviation of `full` (`--rec`, `--recur` for --recursive): 3+ letters (H3).
+// A GNU long option that could be an abbreviation of `full` (any non-empty prefix, I1/I3). Used only where
+// over-detection is the safe direction (recognising a grep pattern-supplying option), so even `--r` counts.
 function abbrevOf(tok, full) {
-  const m = /^--([a-z][a-z-]*)$/.exec(tok);
-  return !!m && m[1].length >= 3 && full.startsWith(m[1]);
+  const m = /^--([a-z][a-z-]*)(=|$)/.exec(tok);
+  return !!m && full.startsWith(m[1]);
 }
 
 // For a routine, strip the leading wrappers of a command (like unwrap) but validate the environment it sets: only
@@ -404,17 +405,21 @@ function unwrapRole(argv, role) {
 // scratchpad or the pre-installed browser directory (verdict-3 condition 5; F5; security review second pass G2). The
 // path is normalised (resolved against the command's folder and realpath'd) before every match, so `..` and symlinks
 // can't dodge it.
-function readOperandDeny(p, vcwd, role, io, scratch) {
+function readOperandDeny(p, vcwd, role, io, scratch, opts = {}) {
+  const { globOk = false, credOnly = false } = opts;
   if (p === '' || p === '-') return null;
   const looksPath = p.includes('/') || /^~/.test(p);
-  if (looksPath && /[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
   const exRaw = p.replace(/^~(?=\/|$)/, io.home);
-  if (looksPath && /[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
   const abs = realOf(isAbsolute(exRaw) ? exRaw : resolve(vcwd, exRaw), io);
-  // credential paths are refused wherever they resolve, even a bare filename (H2): .git internals, ssh, gh and the dot-files
+  // credential paths are refused wherever they resolve, even a bare filename or a grep pattern (H2, I3): .git
+  // internals, ssh, gh and the dot-files. This check runs even for the grep pattern (credOnly).
   const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git(\/|$)/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
   if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
-  if (!looksPath) return null; // a bare word that isn't a path (a grep pattern, a flag value)
+  if (credOnly) return null; // a grep pattern: credential-checked above, but not a path to scope-check
+  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
+  if (!globOk && /[*?[]/.test(p)) return deny(`routine (${role}): a glob in a file path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I2)
+  if (!looksPath) return null; // a bare word that isn't a path (a flag value)
+  if (/[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
   const inProject = projectRel(p, vcwd, io) !== null;
   const inScratch = scratch && insideDir(p, scratch, vcwd, io);
   const inBrowsers = abs === '/opt/pw-browsers' || abs.startsWith('/opt/pw-browsers/') || abs === '/dev/null';
@@ -425,6 +430,7 @@ function readOperandDeny(p, vcwd, role, io, scratch) {
 // (verdict-3 condition 3, F4). Protected and project-scope decide before the scratchpad; a symlink is followed first.
 function writeTarget(what, p, vcwd, role, io, input) {
   if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a write path (${p})`);
+  if (/[*?[]/.test(p)) return deny(`routine (${role}): a glob in a write path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I1)
   if (p === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d+)$/.test(p)) return null;
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {
@@ -540,21 +546,25 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
     // credential- and scope-check every path the tool reads: operands and the file value of an option (-fFILE,
     // --file=FILE). After `--` everything is an operand (H1). For grep the first bare operand is the pattern, not a
     // file, unless -e/-f supplied the pattern.
-    const skipPattern = GREPS.has(prog) && !args.some((a) => /^(-e|-f|--regexp|--file)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a));
+    const isFind = prog === 'find';
+    // grep has an inline pattern operand only if no pattern-supplying option is present (abbreviations included, I3).
+    const patternOpt = (a) => /^(-e|-f)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a) || abbrevOf(a, 'regexp') || abbrevOf(a, 'file');
+    const skipPattern = GREPS.has(prog) && !args.some(patternOpt);
     let seenPattern = false, endOpts = false;
     for (const tok of args) {
-      const cands = [];
       if (!endOpts && tok === '--') { endOpts = true; continue; }
-      if (endOpts || !tok.startsWith('-') || tok === '-') {
-        if (!endOpts && skipPattern && !seenPattern) { seenPattern = true; continue; } // the grep pattern
-        cands.push(tok);
-      } else {
+      let cands, isPattern = false;
+      if (!endOpts && tok.startsWith('-') && tok !== '-') {
+        cands = [];
         const eq = /^--[a-z][a-z-]*=(.*)$/.exec(tok);
         if (eq) cands.push(eq[1]);
         else if (/^-[A-Za-z].+$/.test(tok) && !tok.startsWith('--')) cands.push(tok.slice(2)); // -fFILE (best effort)
         // a bare flag's separate value is a later token, checked as an operand
+      } else {
+        if (skipPattern && !seenPattern) { seenPattern = true; isPattern = true; } // the grep pattern: credential-checked, not scope-checked
+        cands = [tok];
       }
-      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
+      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir, { globOk: isFind, credOnly: isPattern }); if (d) return d; }
     }
     return null;
   }
@@ -563,7 +573,10 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
     // off (H4). rm is allowed only on untracked paths (tracked files go through git rm, so a protected file can't be
     // removed by name or by a directory that holds it).
     if (prog === 'mv') return deny(`routine (${role}): mv isn't allowed; use git mv, or Write the new file and git rm the old`);
-    if ((prog === 'cp' || prog === 'rm') && args.some((a) => /^-[^-]*[rR]/.test(a) || abbrevOf(a, 'recursive') || (prog === 'cp' && (a === '-a' || abbrevOf(a, 'archive'))))) {
+    // cp/rm take only short flags here: a long option could be an abbreviation of --recursive/--archive and isn't needed (I1).
+    const longOpt = (prog === 'cp' || prog === 'rm') && args.find((a) => a !== '--' && /^--[a-z]/.test(a));
+    if (longOpt) return deny(`routine (${role}): ${prog} ${longOpt}: long options aren't allowed here; use short flags, or git rm`);
+    if ((prog === 'cp' || prog === 'rm') && args.some((a) => /^-[^-]*[rR]/.test(a) || (prog === 'cp' && a === '-a'))) {
       return deny(`routine (${role}): recursive ${prog} isn't allowed; name the files, or use git rm for the checkpoint`);
     }
     if (prog === 'cp') {

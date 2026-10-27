@@ -370,6 +370,14 @@ export const CASES = [
   ['night: a bare credential filename', NIGHT, sh('cat .netrc'), true],
   ['night: read .git internals', NIGHT, sh('cat .git/HEAD'), true],
   ['night: end-of-options then a credential', NIGHT, sh('grep foo -- /proc/1/environ'), true],
+  // --- deny-by-default: globs in read/write paths, and grep pattern-supplying options (I1/I2/I3) ---
+  ['night: a glob in a read path', NIGHT, sh('cat docs/*.md'), true],
+  ['night: a dotglob read', NIGHT, sh('cat .*'), true],
+  ['night: a glob in a rm path', NIGHT, sh('rm build-*.tmp'), true],
+  ['night: a glob in a redirect', NIGHT, sh('echo x > out-*.log'), true],
+  ['night: grep --regex supplies the pattern', NIGHT, sh('grep --regex=foo /etc/passwd'), true],
+  ['night: a grep pattern that resolves to a credential', NIGHT, sh('grep .netrc docs/a.md'), true],
+  ['night: find -name keeps its glob pattern', NIGHT, sh('find . -name "*.md" -type f'), false],
   // --- deny-by-default: recursive cp/rm and directory clobber (G3); mv is off; rm only untracked (H4) ---
   ['night: rm -rf the project root', NIGHT, sh('rm -rf .'), true],
   ['night: rm -r a directory', NIGHT, sh('rm -r docs'), true],
@@ -545,7 +553,13 @@ const MUTANTS = [
   ['PermissionRequest', "return role ? deny(`routine (${rawRole}): this would have waited", "return false ? deny(`routine (${rawRole}): this would have waited"],
   ['ConfigChange', "return role && ['project_settings', 'local_settings', 'skills', 'user_settings'].includes(input.source)", 'return false'],
   ['the web allow list', "if (!ok) return deny(", 'if (false) return deny('],
-  ['no substitutions in routines', 'if (role && subs) return deny(', 'if (false) return deny('],
+  // 'no substitutions in routines' (if (role && subs)) is now backstopped: a $(...) always leaves a $() token that the
+  // git/gh, read-operand and write-path $ checks catch downstream, so it carries no behavioural mutant (its clearer
+  // early message is the point). The case 'night: command substitution' still proves substitutions are denied.
+  ['a glob in a read path (I2)', 'if (!globOk && /[*?[]/.test(p)) return deny(', 'if (false) return deny('],
+  ['a glob in a write path (I1)', 'if (/[*?[]/.test(p)) return deny(`routine (${role}): a glob in a write path', 'if (false) return deny(`routine (${role}): a glob in a write path'],
+  ['long options off cp/rm (I1)', 'if (longOpt) return deny(', 'if (false) return deny('],
+  ['grep pattern-option abbreviations (I3)', "abbrevOf(a, 'regexp') || abbrevOf(a, 'file')", 'false || false'],
   ['shell keywords', "'!', '{', '}', 'if', 'then', 'else',", "'!', 'else',"],
   ['parentheses separate commands', "if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }", "if (c === ';') { endCmd(); i++; continue; }"],
   ['no merge at night', "if (role === 'night-shift') return deny('routine (night-shift): the night shift never merges');", ''],
