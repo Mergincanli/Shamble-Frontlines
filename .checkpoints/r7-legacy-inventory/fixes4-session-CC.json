@@ -1,0 +1,23 @@
+[
+ {
+  "id": "CC12",
+  "field": "where",
+  "op": "replace",
+  "find": "Selection and visibility: game:1666",
+  "text": "MELEE_IDLE is the swing's rest pose (game:1658 swing curve, game:2743 reset after a swing). Selection and visibility: game:1666"
+ },
+ {
+  "id": "CC12",
+  "field": "v2_note",
+  "op": "append",
+  "find": "",
+  "text": "Keep it cosmetic: no hit decision comes from these meshes (all noRay). Merged from CM14 on 2026-10-27, which listed the same builders from the CM line range."
+ },
+ {
+  "id": "CC7",
+  "field": "row",
+  "op": "remove",
+  "find": "",
+  "text": "duplicate of CL5 (the same applyVillain, core:268-277); its lesson, its evidence and its 'drop' view were folded into CL5 on 2026-10-27"
+ }
+]

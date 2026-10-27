@@ -154,17 +154,5 @@
   "mark": "rewrite in Rust",
   "reason": "Static collision volumes belong to the authoritative v2 simulation.",
   "look_brief_pending": false
- },
- {
-  "id": "CM14",
-  "system": "Melee weapon props (sword, axe, shield)",
-  "what": "Builds the sword, axe and round shield models that hang from the player's hands (and the editor's preview puppet), hidden by default, and the shared idle pose MELEE_IDLE. The Beam Katana (the only melee weapon in the arsenal) shows the sword. No weapon has the id 'axe', so the axe is built but never shown. The shield takes an accent colour parameter, but both callers pass a fixed teal 0x38e1b0, and it shows while the shield ability is on (game:1690).",
-  "where": "shamble-core.js:1434 MELEE_IDLE · 1435 makeSword · 1448 makeAxe · 1460-1472 makeShield(accent). Used at shamble-game.js:1658, 1685-1689, 2743, 3192-3194 and shamble-editor.js:372-373.",
-  "evidence": "none recorded",
-  "state": "C",
-  "v2_note": "Purely cosmetic, and it must stay so: no hit decision comes from these meshes. LOOP_V2 §5 keeps blade and shield ideas as abilities (Banzai blade, Riot Shield), so the models may be reused as props. Every mesh is excluded from raycasts (noRay). Avoid new materials per model. Appearance waits for the look brief. This sits in CM's line range but belongs with the character and weapon-prop area (core header lines 14-15 list them as weapon-prop makers next to the gun kit). makeAxe has no weapon that shows it: drop it unless a v2 unit needs an axe.",
-  "mark": "port to TypeScript",
-  "reason": "Client cosmetic builders.",
-  "look_brief_pending": true
  }
 ]
