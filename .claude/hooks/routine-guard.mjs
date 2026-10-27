@@ -21,12 +21,6 @@ export const ROLES = new Set(['night-shift', 'pr-advisor']);
 const GATE_FILES = new Set(['tools/gate.mjs', 'tools/smoke.mjs', 'tools/battery.js', 'tools/gate-globals.json',
   'tools/package.json', 'tools/package-lock.json']);
 const NIGHT_NPM = 'npm ci --prefix tools --ignore-scripts --no-audit --no-fund';
-// Upstream sources routines may fetch from open-publish hosts (plan C8): the repositories and crates brief §4 names.
-// Adding one is a daytime kit change.
-const GITHUB_REPOS = new Set([REPO.toLowerCase(), 'mrdoob/three.js', 'dimforge/rapier', 'rustwasm/wasm-bindgen',
-  'wasm-bindgen/wasm-bindgen', 'bevyengine/bevy', 'ralith/hecs', 'w3c/webtransport', 'gpuweb/gpuweb']);
-const CRATES = new Set(['bevy_ecs', 'hecs', 'rapier3d', 'rapier2d', 'parry3d', 'wasm-bindgen', 'js-sys', 'web-sys',
-  'serde', 'tokio', 'quinn', 'wtransport', 'h3', 'tokio-tungstenite', 'glam']);
 
 // ---------- paths ----------
 // A path routines may not write: the rules, CI, the gate's own files, agent instructions anywhere, git internals.
@@ -75,7 +69,7 @@ export function parseShell(src) {
     const heredocs = [];
     const endWord = () => {
       if (word === null) { wordExpand = false; return; }
-      if (wordExpand) cmdExpand = true; // an unquoted glob/~ in this word: the shell would expand it before the program runs (J1/J2/J3)
+      if (wordExpand) cmdExpand = true; // an unquoted * or ? in this word: the shell would expand it (e.g. `git add *`)
       wordExpand = false;
       if (pendingRedirect === 'read') { reads.push(word); pendingRedirect = false; } // a < reads this file (F5: still credential-checked)
       else if (pendingRedirect) { redirects.push(word); pendingRedirect = false; } else argv.push(word);
@@ -152,7 +146,7 @@ export function parseShell(src) {
         } else { i++; pendingRedirect = 'read'; }
         continue;
       }
-      if (c === '*' || c === '?' || (c === '~' && word === null)) wordExpand = true; // unquoted; the shell expands it
+      if (c === '*' || c === '?') wordExpand = true; // unquoted; the shell would expand it
       word = (word ?? '') + c; i++;
     }
     endCmd();
@@ -283,14 +277,10 @@ export async function decide(input, io) {
   if (['Edit', 'Write', 'NotebookEdit', 'MultiEdit'].includes(tool)) {
     return writePath(ti.file_path ?? ti.notebook_path ?? '', cwd, role, io, input);
   }
-  if (tool === 'Read') {
-    const raw = String(ti.file_path ?? '');
-    const p = realOf(isAbsolute(raw) ? raw : resolve(cwd, raw), io); // follow symlinks before matching (F5)
-    if (/^\/proc(\/|$)/.test(p) || /(^|\/)\.git\/config$/.test(p) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(p) ||
-      p.includes('/.config/gh/') || raw.includes('$')) return deny(`routine (${role}): ${raw} may hold credentials`);
-    return null;
-  }
-  if (tool === 'WebFetch') return webFetch(String(ti.url ?? ''), role, io);
+  // reading and searching files is how routines look at the tree (the shell has no file tools); refuse only credentials
+  if (tool === 'Read') return credentialDeny(String(ti.file_path ?? ''), cwd, role, io);
+  if (tool === 'Grep' || tool === 'Glob') return credentialDeny(String(ti.path ?? ''), cwd, role, io);
+  if (tool === 'WebFetch' || tool === 'WebSearch') return deny(`routine (${role}): routines don't read the web — research is a daytime task`);
   return null;
 }
 
@@ -308,31 +298,12 @@ function writePath(p, cwd, role, io, input) {
   return deny(`routine (${role}): ${p} is outside the project`);
 }
 
-function webFetch(url, role, io) {
-  let u;
-  try { u = new URL(url); } catch { return deny(`routine (${role}): not a URL: ${url}`); }
-  const host = u.hostname.toLowerCase();
-  let allowed = [];
-  try {
-    const s = JSON.parse(io.readFile(join(io.projectDir, '.claude/settings.json')));
-    allowed = (s.permissions?.allow ?? []).map((r) => /^WebFetch\(domain:(.+)\)$/.exec(r)?.[1]).filter(Boolean);
-  } catch { return deny(`routine (${role}): can't read the allow list`); }
-  const ok = allowed.some((d) => d.startsWith('*.') ? host.endsWith(d.slice(1)) : host === d);
-  if (!ok) return deny(`routine (${role}): ${host} is not on the documentation allow list; note the source as not read`);
-  const seg = u.pathname.split('/').filter(Boolean);
-  if (host === 'github.com' || host === 'raw.githubusercontent.com') {
-    if (!GITHUB_REPOS.has(`${seg[0] ?? ''}/${seg[1] ?? ''}`.toLowerCase())) return deny(`routine (${role}): github.com/${seg.slice(0, 2).join('/')} is not on the named list (a daytime kit change adds it)`);
-  }
-  if (host === 'docs.rs' || host === 'crates.io') {
-    const crate = host === 'docs.rs' ? seg[0] : seg[0] === 'crates' ? seg[1] : seg[0] === 'api' ? seg[3] : undefined;
-    if (!crate || !CRATES.has(crate.toLowerCase())) return deny(`routine (${role}): crate "${crate ?? ''}" is not on the named list (a daytime kit change adds it)`);
-  }
-  return null;
-}
 
 // ---------- Bash ----------
-// Routines run only the programs named here (deny-by-default: advisor verdict-3; security review F1/F3/F6). git, gh,
-// node, python, python3 and npm have their own handlers below; a program that is on no list is refused. Day sessions
+// In a routine the shell runs ONLY git, gh, `npm ci` (one exact form), node/python on tracked scripts from main, and
+// date (the clock). Reading and searching files goes through the built-in Read, Grep and Glob tools, so there are no
+// shell file tools (cat, ls, find, grep, sort, cp, mv, rm, sed, awk, ...) to allow — a finite, fixed set with no
+// option-surface corners (Advisor's WRITE-GUARD scope reset, 2026-10-27). Everything else is refused. Day sessions
 // (no role) are unchanged: only git and gh are checked.
 const NET = new Set(['curl', 'wget', 'nc', 'ncat', 'netcat', 'socat', 'ssh', 'scp', 'sftp', 'rsync', 'telnet', 'ftp']);
 const INSTALLERS = new Set(['npx', 'yarn', 'pnpm', 'pip', 'pip3', 'pipx', 'apt', 'apt-get', 'brew', 'gem', 'cargo',
@@ -342,29 +313,8 @@ const DENIED_SCRIPTS = new Set(['tools/preview.js', 'tools/pageshot.js']);
 const CODE_RUNNERS = new Set(['eval', 'source', '.', 'trap', 'alias', 'command', 'builtin', 'exec', 'env', 'printenv',
   'export', 'set', 'declare', 'hash', 'enable', 'shopt', 'xargs', 'time']);
 // Only these may be set on a routine's command line (prefix, or via env); others can change what an allowed program
-// runs (PATH, NODE_OPTIONS, BASH_ENV, LD_*, GIT_*, PYTHON*, npm_config_*). Verdict-3 condition 4.
+// runs (PATH, NODE_OPTIONS, BASH_ENV, LD_*, GIT_*, PYTHON*, npm_config_*).
 const ROLE_ENV_OK = new Set(['TZ', 'LC_ALL', 'LANG', 'LANGUAGE', 'NO_COLOR']);
-// Read-only and inspection programs routines may run. The set is kept small and obviously safe: tools with a rich
-// write/exec option surface (sort, xxd, tree, fd, jq, awk, sed) are left off on purpose, so there is no bundled-option
-// corner to get wrong (security review, second pass). `date` and `find` are the only ones with a write/exec option,
-// each a small closed set refused by readToolBadOpt. Every path operand is credential- and scope-checked.
-const ROLE_READ = new Set(['date', 'ls', 'cat', 'head', 'tail', 'wc', 'grep', 'egrep', 'fgrep', 'pwd', 'echo',
-  'printf', 'test', '[', 'true', 'false', 'basename', 'dirname', 'realpath', 'readlink', 'cut', 'tr', 'comm', 'diff',
-  'cmp', 'nl', 'rev', 'uname', 'hostname', 'which', 'sha256sum', 'find']);
-const GREPS = new Set(['grep', 'egrep', 'fgrep']); // the first bare operand is a pattern, not a file (unless -e/-f given)
-// File tools routines may run; every path they write is checked (verdict-3 condition 3). Recursive cp/mv/rm is refused.
-const ROLE_WRITE = new Set(['mkdir', 'rm', 'rmdir', 'cp', 'mv', 'touch', 'tee']);
-// A directory whose removal or overwrite would reach a protected file (its ancestor or the project root).
-function coversProtected(rel) {
-  if (rel === '.' || rel === '') return true;
-  return ['.github', '.git', '.claude', 'tools'].some((d) => d === rel || d.startsWith(rel + '/'));
-}
-// A GNU long option that could be an abbreviation of `full` (any non-empty prefix, I1/I3). Used only where
-// over-detection is the safe direction (recognising a grep pattern-supplying option), so even `--r` counts.
-function abbrevOf(tok, full) {
-  const m = /^--([a-z][a-z-]*)(=|$)/.exec(tok);
-  return !!m && full.startsWith(m[1]);
-}
 
 // For a routine, strip the leading wrappers of a command (like unwrap) but validate the environment it sets: only
 // ROLE_ENV_OK variables may be set (prefix or env), and command/exec/time/env-with-options are refused (verdict-3
@@ -403,81 +353,36 @@ function unwrapRole(argv, role) {
   }
   return { argv: a };
 }
-// A file a routine reads (an operand, an option's file value, or a < redirect): refuse a variable in a path, a glob
-// that could reach outside the project, a credential path, and any read that resolves outside the project, the
-// scratchpad or the pre-installed browser directory (verdict-3 condition 5; F5; security review second pass G2). The
-// path is normalised (resolved against the command's folder and realpath'd) before every match, so `..` and symlinks
-// can't dodge it.
-function readOperandDeny(p, vcwd, role, io, scratch, opts = {}) {
-  const { credOnly = false } = opts;
-  if (p === '' || p === '-') return null;
-  const looksPath = p.includes('/') || /^~/.test(p);
+// A credential file a routine may not read, through the Read/Grep/Glob tools or a `<` redirect. The path is
+// normalised (resolved against the folder and realpath'd) before matching, so `..` and symlinks can't dodge it.
+function credentialDeny(p, vcwd, role, io) {
+  if (!p || p === '-') return null;
   const exRaw = p.replace(/^~(?=\/|$)/, io.home);
   const abs = realOf(isAbsolute(exRaw) ? exRaw : resolve(vcwd, exRaw), io);
-  // credential paths are refused wherever they resolve, even a bare filename or a grep pattern (H2, I3): .git
-  // internals, ssh, gh and the dot-files. This check runs even for the grep pattern (credOnly).
-  const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git(\/|$)/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
-  if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
-  if (credOnly) return null; // a grep pattern: credential-checked above, but not a path to scope-check (unquoted glob patterns are caught at the command level)
-  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
-  if (/[[{]/.test(p)) return deny(`routine (${role}): a brace or bracket expansion in a file path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (J3); * and ? are caught at the command level
-  if (!looksPath) return null; // a bare word that isn't a path (a flag value)
-  const inProject = projectRel(p, vcwd, io) !== null;
-  const inScratch = scratch && insideDir(p, scratch, vcwd, io);
-  const inBrowsers = abs === '/opt/pw-browsers' || abs.startsWith('/opt/pw-browsers/') || abs === '/dev/null';
-  if (!inProject && !inScratch && !inBrowsers) return deny(`routine (${role}): reading outside the project (${p}); only the project, the scratchpad and /opt/pw-browsers`);
-  return null;
+  const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git(\/|$)/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs)
+    || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs) || /(^|\/)\.env(\.|$)/.test(abs) || /\.(pem|key)$/.test(abs) || /(^|\/)secrets(\/|$)/.test(abs);
+  return cred ? deny(`routine (${role}): ${p} may hold credentials; read project files with the Read/Grep/Glob tools`) : null;
 }
-// A path a routine writes (redirect, or a file tool's target): the scratchpad, or inside the project and not protected
-// (verdict-3 condition 3, F4). Protected and project-scope decide before the scratchpad; a symlink is followed first.
+// A path a routine writes (a shell redirect): the scratchpad, or inside the project and not protected. A `$`/backtick is
+// refused; an unquoted glob is already refused at the command level.
 function writeTarget(what, p, vcwd, role, io, input) {
   if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a write path (${p})`);
-  if (/[*?[{]/.test(p)) return deny(`routine (${role}): a glob or brace expansion in a write path isn't allowed; name the file (${p})`); // the shell would expand it past the guard (I1/J3)
   if (p === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d+)$/.test(p)) return null;
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {
     if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed`);
-    if (coversProtected(rel)) return deny(`routine (${role}): ${what} on ${rel || '.'} would reach a rules, CI or gate file (G3)`);
     if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)) return deny(`routine (pr-advisor): ${what} on ${rel}; the PR Advisor writes only its notes (.checkpoints/, .gate/)`);
     return null;
   }
   if (insideDir(p, input.scratchpad_dir, vcwd, io)) return null;
   return deny(`routine (${role}): ${what} must write inside the project or the scratchpad (${p})`);
 }
-// The non-option operands of a command (skipping the value of a value-taking option named by valRe).
-function operands(args, valRe) {
-  const out = [];
-  for (let i = 0; i < args.length; i++) {
-    const a = args[i];
-    if (a === '--') { for (const x of args.slice(i + 1)) out.push(x); break; }
-    if (a.startsWith('-') && a !== '-') { if (valRe && valRe.test(a)) i++; continue; }
-    out.push(a);
+// date reads the clock only: no -s (set), no file (-f / -r), no operand. `date`, `date -u`, `date +FORMAT` pass.
+function dateCheck(args, role) {
+  for (const a of args) {
+    if (a === '-u' || a === '--utc' || a === '--universal' || a === '-R' || a === '--rfc-email' || a.startsWith('+')) continue;
+    return deny(`routine (${role}): date reads the clock only (date, date -u, date +FORMAT)`);
   }
-  return out;
-}
-// cp/mv: which operands are written (dest, and for mv the sources too) and which are only read (cp sources).
-function cpMvTargets(args) {
-  const bare = [];
-  let tdir = null;
-  for (let i = 0; i < args.length; i++) {
-    const a = args[i];
-    if (a === '--') { for (const x of args.slice(i + 1)) bare.push(x); break; }
-    if (a === '-t' || a === '--target-directory') { tdir = args[++i]; continue; }
-    const m = /^(?:--target-directory=|-t)(.+)$/.exec(a);
-    if (m) { tdir = m[1]; continue; }
-    if (a.startsWith('-') && a !== '-') { if (/^(-S|--suffix)$/.test(a)) i++; continue; }
-    bare.push(a);
-  }
-  if (tdir !== null) return { dests: [tdir], sources: bare };
-  if (!bare.length) return { dests: [], sources: [] };
-  return { dests: [bare[bare.length - 1]], sources: bare.slice(0, -1) };
-}
-// The only two read tools with a write/exec option, each a small closed set (verdict-3 condition 1). Everything else
-// with a rich option surface was left off ROLE_READ, so there is nothing else to enumerate.
-function readToolBadOpt(prog, args) {
-  const has = (re) => args.some((a) => re.test(a));
-  if (prog === 'date' && has(/^(-s|--set(=|$))/)) return '-s sets the clock';
-  if (prog === 'find' && has(/^-(exec|execdir|ok|okdir|delete|fprint|fprintf|fprint0|fls)$|^--(exec|delete)(=|$)/)) return '-exec/-delete/-fprint run or write';
   return null;
 }
 function npmCheck(argv, vcwd, role, io) {
@@ -515,8 +420,8 @@ async function bash(command, cwd, role, io, input) {
     }
     if (role) {
       for (const r of c.redirects) { const d = writeTarget('a redirect', r, vcwd, role, io, input); if (d) return d; }
-      for (const r of c.reads) { const d = readOperandDeny(r, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
-      if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name, not by a path (${rawProg})`); // condition 2
+      for (const r of c.reads) { const d = credentialDeny(r, vcwd, role, io); if (d) return d; }
+      if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name, not by a path (${rawProg})`);
       if ((prog === 'git' || prog === 'gh') && argv.some((t) => t.includes('$') || t.includes('`'))) {
         return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
       }
@@ -524,81 +429,26 @@ async function bash(command, cwd, role, io, input) {
     let r = null;
     if (prog === 'git') r = await git(argv, vcwd, role, io);
     else if (prog === 'gh') r = await gh(argv, role, io);
-    else if (role) r = await routineProgram(prog, argv, vcwd, role, io, input);
+    else if (role) r = await routineProgram(prog, argv, vcwd, role, io);
     if (r) return r;
   }
   return null;
 }
 
-// Deny-by-default: a routine runs only the programs on the lists (verdict-3). Everything else is refused, the common
-// cases with a message naming what to use instead.
-async function routineProgram(prog, argv, vcwd, role, io, input) {
-  const args = argv.slice(1);
-  if (prog === 'sudo' || prog === 'su' || prog === 'doas') return deny(`routine (${role}): no ${prog}`);
-  if (prog === 'kill' || prog === 'pkill' || prog === 'killall') return deny(`routine (${role}): stop the background saver with the TaskStop tool, not ${prog}`);
-  if (prog === 'sed' || prog === 'awk' || prog === 'gawk') return deny(`routine (${role}): ${prog} can write files and run code; read with Read/head/tail/grep, edit with Edit`);
-  if (CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} can run or hide other commands; run the program directly`);
-  if (SHELLS.has(prog)) return deny(`routine (${role}): ${prog} runs arbitrary commands; run the program directly`);
-  if (NET.has(prog)) return deny(`routine (${role}): ${prog} reaches the network; use WebFetch for the documented docs hosts`);
+// The routine shell is a FIXED set: git, gh, `npm ci`, node/python on main's scripts, and date (the clock). Everything
+// else — file tools, shells, installers, the network — is refused; reading and searching go through Read/Grep/Glob
+// (Advisor's scope reset). The common denials name what to use instead.
+async function routineProgram(prog, argv, vcwd, role, io) {
   if (prog === 'npm') return npmCheck(argv, vcwd, role, io);
   if (prog === 'node' || prog === 'nodejs' || prog === 'python' || prog === 'python3') return interpreter(prog, argv, vcwd, role, io);
-  if (INSTALLERS.has(prog)) return deny(`routine (${role}): ${prog} installs or runs downloaded code`);
-  if (ROLE_READ.has(prog)) {
-    const bad = readToolBadOpt(prog, args);
-    if (bad) return deny(`routine (${role}): ${prog} ${bad}; not allowed here`);
-    // credential- and scope-check every path the tool reads: operands and the file value of an option (-fFILE,
-    // --file=FILE). After `--` everything is an operand (H1). For grep the first bare operand is the pattern, not a
-    // file, unless -e/-f supplied the pattern.
-    // grep has an inline pattern operand only if no pattern-supplying option is present (abbreviations included, I3).
-    const patternOpt = (a) => /^(-e|-f)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a) || abbrevOf(a, 'regexp') || abbrevOf(a, 'file');
-    const skipPattern = GREPS.has(prog) && !args.some(patternOpt);
-    let seenPattern = false, endOpts = false;
-    for (const tok of args) {
-      if (!endOpts && tok === '--') { endOpts = true; continue; }
-      let cands, isPattern = false;
-      if (!endOpts && tok.startsWith('-') && tok !== '-') {
-        cands = [];
-        const eq = /^--[a-z][a-z-]*=(.*)$/.exec(tok);
-        if (eq) cands.push(eq[1]);
-        else if (/^-[A-Za-z].+$/.test(tok) && !tok.startsWith('--')) cands.push(tok.slice(2)); // -fFILE (best effort)
-        // a bare flag's separate value is a later token, checked as an operand
-      } else {
-        if (skipPattern && !seenPattern) { seenPattern = true; isPattern = true; } // the grep pattern: credential-checked, not scope-checked
-        cands = [tok];
-      }
-      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir, { credOnly: isPattern }); if (d) return d; }
-    }
-    return null;
-  }
-  if (ROLE_WRITE.has(prog)) {
-    // mv moves tracked files and whole directories with no flag; routines move files with git mv / Edit, so bash mv is
-    // off (H4). rm is allowed only on untracked paths (tracked files go through git rm, so a protected file can't be
-    // removed by name or by a directory that holds it).
-    if (prog === 'mv') return deny(`routine (${role}): mv isn't allowed; use git mv, or Write the new file and git rm the old`);
-    // cp/rm take only short flags here: a long option could be an abbreviation of --recursive/--archive and isn't needed (I1).
-    const longOpt = (prog === 'cp' || prog === 'rm') && args.find((a) => a !== '--' && /^--[a-z]/.test(a));
-    if (longOpt) return deny(`routine (${role}): ${prog} ${longOpt}: long options aren't allowed here; use short flags, or git rm`);
-    if ((prog === 'cp' || prog === 'rm') && args.some((a) => (prog === 'cp' ? /^-[^-]*[rRa]/ : /^-[^-]*[rR]/).test(a))) { // cp -a implies recursive, bundled too (J4)
-      return deny(`routine (${role}): recursive ${prog} isn't allowed; name the files, or use git rm for the checkpoint`);
-    }
-    if (prog === 'cp') {
-      const { dests, sources } = cpMvTargets(args);
-      for (const s of sources) { const d = readOperandDeny(s, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
-      for (const t of dests) { const d = writeTarget('cp', t, vcwd, role, io, input); if (d) return d; }
-      return null;
-    }
-    if (prog === 'rm') {
-      for (const t of operands(args)) {
-        if (io.git(['ls-files', '--error-unmatch', '--', t], vcwd).code === 0) return deny(`routine (${role}): rm ${t} is tracked; remove it with git rm, or edit it with Edit`);
-        const d = writeTarget('rm', t, vcwd, role, io, input); if (d) return d;
-      }
-      return null;
-    }
-    const valRe = prog === 'mkdir' ? /^(-m|--mode)$/ : prog === 'touch' ? /^(-d|--date|-r|--reference|-t)$/ : null;
-    for (const t of operands(args, valRe)) { const d = writeTarget(prog, t, vcwd, role, io, input); if (d) return d; }
-    return null;
-  }
-  return deny(`routine (${role}): ${prog} is not one of the routines' programs (git, gh, node, python, npm, and read-only tools); a daytime kit change adds one if a run needs it`);
+  if (prog === 'date') return dateCheck(argv.slice(1), role);
+  if (prog === 'sudo' || prog === 'su' || prog === 'doas') return deny(`routine (${role}): no ${prog}`);
+  if (prog === 'kill' || prog === 'pkill' || prog === 'killall') return deny(`routine (${role}): stop the background saver with the TaskStop tool, not ${prog}`);
+  if (NET.has(prog)) return deny(`routine (${role}): ${prog} reaches the network; routines never read the web — research is a daytime task`);
+  if (INSTALLERS.has(prog)) return deny(`routine (${role}): ${prog} installs or runs downloaded code; the only install is "${NIGHT_NPM}"`);
+  if (SHELLS.has(prog) || CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} can run other commands; a routine runs only git, gh, npm ci and node on main's scripts`);
+  // every other program, the file tools included (cat, ls, find, grep, sort, cp, mv, rm, sed, awk, mkdir, ...):
+  return deny(`routine (${role}): the shell runs only git, gh, npm ci, node (main's scripts) and date; read and search files with the Read, Grep and Glob tools, and edit with Edit/Write`);
 }
 
 // Routines run only a tracked script whose working copy equals main's (R2); the PR Advisor runs none.
@@ -824,7 +674,8 @@ async function mergeCheck(ti, role, io) {
 export function realIo() {
   const cache = new Map();
   const run = (cmd, args, cwd) => {
-    const r = spawnSync(cmd, args, { cwd, encoding: 'utf8', timeout: 20000, maxBuffer: 32 * 1024 * 1024 });
+    // GIT_LITERAL_PATHSPECS: the guard's own git calls treat every path argument literally, never as a pathspec glob (L2).
+    const r = spawnSync(cmd, args, { cwd, encoding: 'utf8', timeout: 20000, maxBuffer: 32 * 1024 * 1024, env: { ...process.env, GIT_LITERAL_PATHSPECS: '1' } });
     return { code: r.status ?? 1, out: r.stdout ?? '' };
   };
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
