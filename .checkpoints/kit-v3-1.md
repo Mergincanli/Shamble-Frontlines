@@ -1,10 +1,10 @@
 # Checkpoint: kit-v3-1
 - **Goal:** WRITE-GUARD, ROUTINE-EFFORT and no stalls in routines (the Advisor's verdicts of 2026-10-25 and 2026-10-27)
-  · plan: `.checkpoints/kit-v3-1/plan.md` (advisor plan review running).
+  · plan: `.checkpoints/kit-v3-1/plan.md` APPROVE (round 2, advisor-verdict-2.md).
 - **Branch:** cs/kit-v3-1 (BRANCH-2 (a)), worked in its own worktree
   (/tmp/claude-0/-home-user-Shamble-Frontlines/dbb5e494-b49f-5970-85a2-528a1e15b24b/scratchpad/wt-kit-v3-1) · **Base:**
   main 4c24d07.
-- **Last update:** 2026-10-27 13:25 Amsterdam
+- **Last update:** 2026-10-27 13:40 Amsterdam
 
 ## Steps done
 1. Audit, workflow write-guard-audit (run wf_e24159e7-346, cut off once by the spend limit and resumed): 6 agents.
@@ -18,14 +18,16 @@
    ROUTINE-CODE-EXEC no), conditions C1–C8; escalations MANAGED and RESIDUAL (conditional). Plan revision 2 applies
    them all (plan.md).
 
+4. Advisor re-review, round 2: APPROVE with two conditions (two part-B rows: the trigger fires on a ready event; a real
+   PR run starts with HEAD = origin/main) and three nits; all applied to plan.md (advisor-verdict-2.md).
+
 ## Current step
-4. The advisor's short re-review of revision 2's changed parts.
+5. Build step 1: the guard (`.claude/hooks/routine-guard.mjs`) and its test table.
 
 ## Next steps
-1. Apply the advisor's verdict to plan.md (APPROVE with conditions → build; REVISE → fix; ESCALATE → Mustafa).
-2. Build in this worktree: settings.json, routine-guard.mjs and its test table, the procedure texts, builder.md,
+1. Build in this worktree, in the plan's order: settings.json, routine-guard.mjs and its test table, the procedure texts, builder.md,
    checkpoint.mjs's secret-pattern fix, the text fixes; gate after every step.
-3. Reviews on the final diff: security-auditor, test-engineer, infra-engineer; TEST-RUN per the decision; report;
+2. Reviews on the final diff: security-auditor, test-engineer, infra-engineer; TEST-RUN per the decision; report;
    delete this checkpoint; PR ready; advisor review; Mustafa's go.
 
 ## Open findings

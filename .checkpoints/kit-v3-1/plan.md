@@ -5,7 +5,7 @@ with the secret-pattern fix (deny where routines can't answer; kit changes dayti
 recorded, effective once WRITE-GUARD is in force. The Advisor's lesson (2026-10-27): every command the night shift and
 the PR Advisor need is allowed, everything they must never do is denied, nothing they hit is ask-first. NS-1 (b): runs
 to 08:10. BRANCH-2 (a): `cs/kit-v3-1`, in its own worktree; it lands first if it collides with cs/v2-research.
-SPEND-1 (b). Daytime only. A rules change (escalation category 3): it merges on Mustafa's go after the advisor approves
+SPEND-1 (b). Plan review round 2: APPROVE with two conditions (`advisor-verdict-2.md`), applied below. Daytime only. A rules change (escalation category 3): it merges on Mustafa's go after the advisor approves
 its head. No game code (symbols +0 −0). Plan review round 1: REVISE (`advisor-verdict-1.md`); this revision applies
 R1–R6, the decisions the advisor took and conditions C1–C8.
 
@@ -117,15 +117,22 @@ percent-escape fix and its test. Then reviews once on the final diff, the TEST-R
   is denied, including the abbreviated git forms; mutation runs (each rule removed makes its own test fail).
 - The settings test (C3a): the ask list is empty; every needed command form matches an allow rule and no deny rule;
   every never is denied by a static rule or by the guard. Labelled an emulation of the documented matching.
-- Real-git option cases (C3b), the builder worktree rows (C3c), the error-mode rows (C3d).
+- Real-git option cases (C3b): the option table comes from the container's real git, and a sample of its cases is run
+  on throwaway repositories (no network), as the auditor did. The builder worktree rows (C3c), the error-mode rows (C3d).
 - `checkpoint.mjs` tests with the percent-escape case.
 - **TEST-RUN (C4), a table of expected against observed.** Part A, in a day session in the night environment on
   cs/kit-v3-1, before the PR is marked ready: U-1, U-3 to U-6; PR-HOME (in the PR Advisor environment); the role
   variable reaching hooks and subagents; one builder spawn in a worktree; a connector call, a protected-path write and a
-  repeated-block case, each ending in deny plus interrupt (never a wait) with the stop reported in the session's final
-  message and the run's status comment; the session's effort; a read-only check whether a child process holds the
+  repeated-block case, each ending in deny plus interrupt (never a wait), with where the stop is reported: the
+  session's final message and the run's status comment if it can still post, else the fallback (night shift: the next
+  run's "Cut off" note, NIGHT_SHIFT rule 4; PR Advisor: a ready PR with no review comment is the signal), written into
+  the procedures before switching on; the session's effort; a read-only check whether a child process holds the
   GitHub identity; whether the PR Advisor can read the CI gate log; the role-missing stop. Results go in the report.
-  Part B, after merge: one PR Advisor run on a docs-only test PR, before it reviews anything else.
+  Part B, after merge: one PR Advisor run on a docs-only test PR, before it reviews anything else, with two more rows
+  (round-2 conditions): **the trigger fires on the test PR's ready event** (it did not fire when PR #27 was marked
+  ready; if it doesn't, the infra-engineer finds out why before switching on), and **the run's first command shows HEAD =
+  `origin/main`**, not the test PR's head (a day session in that environment starts on main anyway, so only a real PR
+  run proves PR-HOME; if it shows the PR head, RESIDUAL goes to Mustafa before the PR Advisor is switched on).
 - Gate PASS (symbols +0 −0), repo map check.
 
 ## Switching on (C5)
@@ -149,10 +156,13 @@ infra-engineer (environments, setup scripts, PR-HOME) · advisor (the plan; the 
    the OS sandbox in phase 1.
 
 ## Decisions needed (Mustafa)
-- **MANAGED:** does his Claude plan include server-managed settings? (a) yes: the guard's registration and the universal
-  denies go there too; (b) no: rely on PR-HOME. Check the plan page; on a personal plan the answer is (b).
-- **RESIDUAL** (only if PR-HOME fails and MANAGED is (b)): (a) the PR Advisor keeps merging "ready" PRs, risk recorded;
-  (b) it reviews and labels only, and Mustafa says "merge #n" for every PR. Recommended (b).
+- **MANAGED:** does his Claude plan include server-managed settings? Why it matters: it is the only place rules can
+  live that a pull request can't change. (a) yes: the guard's registration and the universal denies go there too;
+  (b) no: rely on PR-HOME. Check the plan page; on a personal plan the answer is (b).
+- **RESIDUAL** (only if PR-HOME fails and MANAGED is (b)): should the PR Advisor keep merging the PRs it approves? Why it
+  matters: it would review each PR under that PR's own rules, so one session tricked by a web page could open a PR that
+  changes the rules and get it merged with no human. (a) keep merging "ready" PRs, risk recorded; (b) review and label
+  only, and Mustafa says "merge #n" for every PR. Recommended (b), until a layer the PR can't change exists.
 
 ## For Mustafa
 1. Turn the PR Advisor routine off until the TEST-RUN passes (the session can do it on his word).
