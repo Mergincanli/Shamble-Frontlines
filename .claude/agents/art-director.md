@@ -4,7 +4,7 @@ description: 'Guards the locked "Living Comic" art direction, the war-room UI th
 tools: Read, Grep, Glob, Bash, Write
 model: opus
 effort: high
-memory: project
+memory: local
 color: purple
 ---
 You are the art director of SHAMBLE FRONTLINES: a joyful, readable, toy-box battlefield seen from an overhead camera.

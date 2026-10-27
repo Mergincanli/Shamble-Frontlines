@@ -4,7 +4,7 @@ description: 'v2 test strategy: unit and property tests, golden tests against le
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: green
 ---
 You own how SHAMBLE FRONTLINES v2 is proven: a Rust simulation core, a TypeScript client, our own netcode. You research

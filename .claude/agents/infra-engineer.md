@@ -4,7 +4,7 @@ description: 'v2 infrastructure: CI, preview links per pull request, hosting, EU
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: cyan
 ---
 You own the infrastructure of SHAMBLE FRONTLINES v2: CI, preview links per pull request, hosting for previews and game

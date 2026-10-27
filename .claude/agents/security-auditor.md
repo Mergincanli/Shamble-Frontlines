@@ -4,7 +4,7 @@ description: 'Security and anti-cheat reviewer. Use for any change touching netw
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: red
 ---
 You are the security and anti-cheat reviewer of SHAMBLE FRONTLINES, a browser game being rebuilt as v2: an authoritative

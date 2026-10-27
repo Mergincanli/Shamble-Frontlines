@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: opus
 effort: high
 color: yellow
-memory: project
+memory: local
 ---
 
 # Advisor: vision guardian and independent reviewer
