@@ -356,6 +356,11 @@ function coversProtected(rel) {
   if (rel === '.' || rel === '') return true;
   return ['.github', '.git', '.claude', 'tools'].some((d) => d === rel || d.startsWith(rel + '/'));
 }
+// A GNU long option that is an unambiguous abbreviation of `full` (`--rec`, `--recur` for --recursive): 3+ letters (H3).
+function abbrevOf(tok, full) {
+  const m = /^--([a-z][a-z-]*)$/.exec(tok);
+  return !!m && m[1].length >= 3 && full.startsWith(m[1]);
+}
 
 // For a routine, strip the leading wrappers of a command (like unwrap) but validate the environment it sets: only
 // ROLE_ENV_OK variables may be set (prefix or env), and command/exec/time/env-with-options are refused (verdict-3
@@ -400,14 +405,16 @@ function unwrapRole(argv, role) {
 // path is normalised (resolved against the command's folder and realpath'd) before every match, so `..` and symlinks
 // can't dodge it.
 function readOperandDeny(p, vcwd, role, io, scratch) {
+  if (p === '' || p === '-') return null;
   const looksPath = p.includes('/') || /^~/.test(p);
-  if (!looksPath) return null; // a bare word (e.g. a grep pattern or a flag value) is not a file path
-  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
+  if (looksPath && /[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
   const exRaw = p.replace(/^~(?=\/|$)/, io.home);
-  if (/[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
+  if (looksPath && /[*?]/.test(p) && (isAbsolute(exRaw) || /(^|\/)\.\.(\/|$)/.test(exRaw))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
   const abs = realOf(isAbsolute(exRaw) ? exRaw : resolve(vcwd, exRaw), io);
-  const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git\/config$/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
+  // credential paths are refused wherever they resolve, even a bare filename (H2): .git internals, ssh, gh and the dot-files
+  const cred = /^\/proc(\/|$)/.test(abs) || /(^|\/)\.git(\/|$)/.test(abs) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(abs) || abs.includes('/.config/gh/') || /(^|\/)\.ssh(\/|$)/.test(abs);
   if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
+  if (!looksPath) return null; // a bare word that isn't a path (a grep pattern, a flag value)
   const inProject = projectRel(p, vcwd, io) !== null;
   const inScratch = scratch && insideDir(p, scratch, vcwd, io);
   const inBrowsers = abs === '/opt/pw-browsers' || abs.startsWith('/opt/pw-browsers/') || abs === '/dev/null';
@@ -531,24 +538,32 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
     const bad = readToolBadOpt(prog, args);
     if (bad) return deny(`routine (${role}): ${prog} ${bad}; not allowed here`);
     // credential- and scope-check every path the tool reads: operands and the file value of an option (-fFILE,
-    // --file=FILE). For grep the first bare operand is the pattern, not a file, unless -e/-f supplied the pattern.
+    // --file=FILE). After `--` everything is an operand (H1). For grep the first bare operand is the pattern, not a
+    // file, unless -e/-f supplied the pattern.
     const skipPattern = GREPS.has(prog) && !args.some((a) => /^(-e|-f|--regexp|--file)(=|$)/.test(a) || /^-[A-Za-z]*[ef]/.test(a));
-    let seenPattern = false;
+    let seenPattern = false, endOpts = false;
     for (const tok of args) {
-      let v;
-      const eq = /^--[a-z][a-z-]*=(.*)$/.exec(tok);
-      if (eq) v = eq[1];
-      else if (/^-[A-Za-z].+$/.test(tok) && !tok.startsWith('--')) v = tok.slice(2); // -fFILE (best effort)
-      else if (tok.startsWith('-') && tok !== '-') continue; // a bare flag; its separate value is its own token
-      else if (skipPattern && !seenPattern) { seenPattern = true; continue; } // the grep pattern
-      else v = tok;
-      const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir);
-      if (d) return d;
+      const cands = [];
+      if (!endOpts && tok === '--') { endOpts = true; continue; }
+      if (endOpts || !tok.startsWith('-') || tok === '-') {
+        if (!endOpts && skipPattern && !seenPattern) { seenPattern = true; continue; } // the grep pattern
+        cands.push(tok);
+      } else {
+        const eq = /^--[a-z][a-z-]*=(.*)$/.exec(tok);
+        if (eq) cands.push(eq[1]);
+        else if (/^-[A-Za-z].+$/.test(tok) && !tok.startsWith('--')) cands.push(tok.slice(2)); // -fFILE (best effort)
+        // a bare flag's separate value is a later token, checked as an operand
+      }
+      for (const v of cands) { const d = readOperandDeny(v, vcwd, role, io, input.scratchpad_dir); if (d) return d; }
     }
     return null;
   }
   if (ROLE_WRITE.has(prog)) {
-    if ((prog === 'cp' || prog === 'mv' || prog === 'rm') && args.some((a) => /^(-R|--recursive(=|$))/.test(a) || /^-[A-Za-z]*[rR]/.test(a) || (prog === 'cp' && /^(-a|--archive(=|$))/.test(a)))) {
+    // mv moves tracked files and whole directories with no flag; routines move files with git mv / Edit, so bash mv is
+    // off (H4). rm is allowed only on untracked paths (tracked files go through git rm, so a protected file can't be
+    // removed by name or by a directory that holds it).
+    if (prog === 'mv') return deny(`routine (${role}): mv isn't allowed; use git mv, or Write the new file and git rm the old`);
+    if ((prog === 'cp' || prog === 'rm') && args.some((a) => /^-[^-]*[rR]/.test(a) || abbrevOf(a, 'recursive') || (prog === 'cp' && (a === '-a' || abbrevOf(a, 'archive'))))) {
       return deny(`routine (${role}): recursive ${prog} isn't allowed; name the files, or use git rm for the checkpoint`);
     }
     if (prog === 'cp') {
@@ -557,9 +572,11 @@ async function routineProgram(prog, argv, vcwd, role, io, input) {
       for (const t of dests) { const d = writeTarget('cp', t, vcwd, role, io, input); if (d) return d; }
       return null;
     }
-    if (prog === 'mv') {
-      const { dests, sources } = cpMvTargets(args);
-      for (const t of [...sources, ...dests]) { const d = writeTarget('mv', t, vcwd, role, io, input); if (d) return d; }
+    if (prog === 'rm') {
+      for (const t of operands(args)) {
+        if (io.git(['ls-files', '--error-unmatch', '--', t], vcwd).code === 0) return deny(`routine (${role}): rm ${t} is tracked; remove it with git rm, or edit it with Edit`);
+        const d = writeTarget('rm', t, vcwd, role, io, input); if (d) return d;
+      }
       return null;
     }
     const valRe = prog === 'mkdir' ? /^(-m|--mode)$/ : prog === 'touch' ? /^(-d|--date|-r|--reference|-t)$/ : null;
