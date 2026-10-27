@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 22:45 Amsterdam
+- **Last update:** 2026-10-27 22:50 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -58,7 +58,7 @@
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 6/6 | assembling (since 22:37 Amsterdam) | pending | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 4/5 (rooms, interest, transport, budgets) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R2 | netcode-architect | 5 | 5/5 | assembling: workflow wf_bce24fc0-5c6 (assemble, then verifier + security-auditor) | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -67,11 +67,11 @@ Agent ids are internal to this session and are not written here; the saved promp
 key (condition A1).
 
 ## Open findings
-- KIT31-STATE (for Mustafa): the Advisor's word in this session (about 17:37 UTC) is "kit-v3-1 is shelved"; the R7
-  session was still committing to `cs/kit-v3-1` at 18:01 UTC on an earlier Advisor message (17:32 UTC: finish it there
-  on Opus 4.8 with a smaller scope and open its PR). This session does not touch that branch.
-- The PR Advisor routine (trig_01YPyWAsQmsaQoydhMGG3CkJ) could not be switched off by an agent (created via the
-  HTTP API); Mustafa switches it off at its routine page.
+- Unread sources (SRC-ACCESS (a)): Valve's developer wiki answers HTTP 403 to the fetcher; GDC Vault redirects to a
+  maintenance page off the allow list (and the Overwatch talks are video only); Unreal's docs are outside the allow
+  list. The units used other copies where they could (Valve's SDK code on GitHub, a community GAS write-up). The
+  assemblers list every recommendation that hinges on an unread source; the full list goes to the Advisor with the
+  wave-1 tally.
 - Spend: the org's spend limit cut all 11 units at once about 7 minutes after launch; reset at 21:20 UTC.
 
 ## Key numbers
@@ -92,7 +92,11 @@ key (condition A1).
 - PR Advisor routine: off (Mustafa, 21:35 UTC; get_trigger reads enabled false).
 
 ## Running work
-- Wave 1 units: 11 background agents, launched 19:18, cut off 19:25 (spend limit), resumed 22:24 Amsterdam.
+- R1 assembly: background agent (engine-architect, xhigh), launched 22:37 Amsterdam, prompt `prompts/engine-architect-r1-assemble.txt`.
+- R2 chain: workflow run wf_bce24fc0-5c6 (task wnmgq5o4d), launched 22:47 Amsterdam, script as launched
+  `.checkpoints/v2-research/v2-research-r2-chain-run1.js` (prompts embedded from `prompts/`): assemble, then verifier-r2
+  and security-auditor-r2. Resume: Workflow({scriptPath, resumeFromRunId: "wf_bce24fc0-5c6"}).
+- Next launch: verifier-r1 once R1 is assembled; rust-reviewer-r1-r2 once both are (prompts saved).
 - Saver: `checkpoint.mjs watch v2-research`, background, restarted 22:24 Amsterdam; stops after 110 minutes.
 - Day-window check: send_later trig_01Veu82e8opzfVF7b6ZKAHwp at 22:50 UTC (23:50 Amsterdam): stop anything still
   running before 00:10 and schedule the 08:35 resume.

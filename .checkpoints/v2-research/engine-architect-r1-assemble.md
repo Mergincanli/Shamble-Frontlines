@@ -16,3 +16,6 @@ Task: assemble docs/research/r1-simulation-core.md from the six R1 unit drafts (
 - Missing: DATA silent on whether the tick constant may change on hot reload (TICK cross-note). DET silent on exact dt (TICK-OQ1).
 - Hinge add: DATA-REC5 (Valve Developer_Console_Control + ConVar 403, DATA-OQ3); DATA-REC1 (postcard/bincode docs not read, no URL, DATA-OQ2).
 - All six drafts read. Next: check tails of notes files for late corrections, then extract sources via script, then write the topic file.
+- Notes files: all six end DONE; drafts complete. Sources extracted (scratchpad sources.json): read entries 170 -> 161 unique URLs (8 URLs shared: HashMap x3, BTreeMap, what_every_programmer, bg_pmove.c, Performance/now, Chrome throttling, features.json, wasm32 page). Not read: 54 entries -> 49 rows (gdcvault 1024001 x4, edgegap x2, Source_Multiplayer x2 merged); 1 row is BND "none found" (not a source) -> 48 not-read entries.
+- Tiers (unique): official 138, shipped game 8, other 14, plus 1 split (what_every_programmer: TICK other / DET shipped game).
+- Plan for the file: build by script (scratchpad/build.py) copying draft sections verbatim with headings demoted; hand-written parts in scratchpad/*.md (header, TL;DR, unit intros, XU OQs, pointers, hinge list); sources tables generated with a fix-up map. Next: write hand parts.
