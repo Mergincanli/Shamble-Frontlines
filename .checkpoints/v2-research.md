@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 22:50 Amsterdam
+- **Last update:** 2026-10-27 23:00 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -57,7 +57,7 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 6/6 | assembling (since 22:37 Amsterdam) | pending | `prompts/engine-architect-r1-*.txt` (6) |
+| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe (180 F, 37 REC, 67 OQ; 161 read, 48 not read) | pending: six verifiers prepared (workflow `v2-research-r1-verify-run1.js`), launch 07:35 | `prompts/engine-architect-r1-*.txt` (6) |
 | R2 | netcode-architect | 5 | 5/5 | assembling: workflow wf_bce24fc0-5c6 (assemble, then verifier + security-auditor) | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
@@ -91,12 +91,21 @@ key (condition A1).
   recommendation hinges on. The assembler prompts list those recommendations (rule 5 added before launch).
 - PR Advisor routine: off (Mustafa, 21:35 UTC; get_trigger reads enabled false).
 
+- Night window (Mustafa, 2026-10-27 about 23:00 Amsterdam): "go back to the old schedule" and the night shift ends at
+  07:30 instead of 08:30. Done: the Night shift routine's cron is back to `CRON_TZ=Europe/Amsterdam 10 0-7 * * *`
+  (starts 00:10 to 07:10). So research's day window is now 07:30 to 00:10 (plan condition 2, amended). The
+  NIGHT_SHIFT.md window text (stop by 08:30, no new item after 07:45) still needs its rules PR (decision WINDOW-0730).
+- R1 verification split into six verifiers, one per brief question (CHECKPOINTS §6; the same rule, smaller units);
+  prompts `prompts/verifier-r1-<unit>.txt`. Not launched tonight: Mustafa warned the usage limit is near.
+- PR #29 (docs-after-r7) merged on Mustafa's "Merg #29" after the advisor's APPROVE of d973b3f (main e9f11be).
+
 ## Running work
-- R1 assembly: background agent (engine-architect, xhigh), launched 22:37 Amsterdam, prompt `prompts/engine-architect-r1-assemble.txt`.
 - R2 chain: workflow run wf_bce24fc0-5c6 (task wnmgq5o4d), launched 22:47 Amsterdam, script as launched
   `.checkpoints/v2-research/v2-research-r2-chain-run1.js` (prompts embedded from `prompts/`): assemble, then verifier-r2
   and security-auditor-r2. Resume: Workflow({scriptPath, resumeFromRunId: "wf_bce24fc0-5c6"}).
-- Next launch: verifier-r1 once R1 is assembled; rust-reviewer-r1-r2 once both are (prompts saved).
+- R1 verify: workflow script `.checkpoints/v2-research/v2-research-r1-verify-run1.js` (six verifiers, high), NOT launched.
+- rust-reviewer-r1-r2: prompt saved, launch once both topic files exist.
 - Saver: `checkpoint.mjs watch v2-research`, background, restarted 22:24 Amsterdam; stops after 110 minutes.
-- Day-window check: send_later trig_01Veu82e8opzfVF7b6ZKAHwp at 22:50 UTC (23:50 Amsterdam): stop anything still
-  running before 00:10 and schedule the 08:35 resume.
+- 23:50 Amsterdam stop check: send_later trig_01Veu82e8opzfVF7b6ZKAHwp (stop anything running before 00:10).
+- 07:35 Amsterdam resume: send_later trig_0183GKkBx4Fw3MTExPtQfMRj (resume R2 chain, launch R1 verify, then
+  rust-reviewer, report).
