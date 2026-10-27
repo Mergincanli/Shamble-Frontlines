@@ -8,3 +8,9 @@ docs-keeper: docs edits of change-set docs-after-r7 (STATUS.md + ROADMAP.md only
 - Next: edit STATUS.
 - STATUS: header line 3, Phase (v2 para + legacy relabel + superseded markers), In flight rows done. Next: Decisions pending, Routines, Open risks.
 - STATUS: Decisions pending (KIT31 open, 10-27, 10-27 R7 session, 10-25 with link, ADR-001..003 line), Routines, Open risks done. advisor.md:71 confirms routine skips drafts. Next: ROADMAP.
+- ROADMAP done: Next/open :65 superseded marker; Recent work :84-92 five new entries (12 kept); five oldest (Kit v1.3, 3a, map dedupe, team prep, loop v2) folded into Build history :50-52.
+- repo-map-check OK (93/93). git status: only docs/STATUS.md, docs/ROADMAP.md (+ .checkpoints). No "this session"/"the day session" left.
+- Note: LEGACY_INVENTORY.md KT16 cites STATUS/ROADMAP line numbers at f2ccc13; these drift further (not in scope).
+DONE
+- Follow-up task (2026-10-27 ~21:36 UTC): KIT31-STATE (b), SRC-ACCESS (a), PR Advisor off. Starting.
+- Follow-up applied: STATUS :46 row, :80 open item removed, :83 MANAGED, :86-92 KIT31 (b)/shelved/SRC-ACCESS, 'is merged' wording, Routines PR Advisor, risk line removed; ROADMAP :84 wording. DONE
