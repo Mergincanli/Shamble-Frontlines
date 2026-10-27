@@ -57,8 +57,8 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 3/6 (abilities, ecs, data-hotreload) | no | pending | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 1/5 (rooms) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R1 | engine-architect | 6 | 4/6 (abilities, ecs, data-hotreload, boundary-worker) | no | pending | `prompts/engine-architect-r1-*.txt` (6) |
+| R2 | netcode-architect | 5 | 2/5 (rooms, interest) | no | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
