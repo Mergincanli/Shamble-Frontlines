@@ -4,7 +4,7 @@
   `.checkpoints/r7-legacy-inventory/plan.md` (APPROVE with 11 conditions).
 - **Branch:** claude/bold-faraday-i49gug (draft PR #27), restarted from main f2ccc13 after kit-v3-0 merged (PR #26) ·
   **Base:** main f2ccc13 (the engine files are unchanged since 48ffb51, so every file:line cited at 48ffb51 still holds).
-- **Last update:** 2026-10-25 22:42 Amsterdam
+- **Last update:** 2026-10-27 12:35 Amsterdam
 
 ## Steps done
 1. Plan approved with 11 conditions (plan.md, plan-verdict.json). Night queue #16 item 1 made a plain bullet "in
@@ -51,6 +51,12 @@
 - Skeptics: 97 confirmed, 143 corrected, 0 refuted; 68 missing systems reported; 15 coverage suggestions.
 
 ## Decisions taken
+- Advisor, relayed by Mustafa 2026-10-27: "after the current R7 fix pass, R7 is done: no further review rounds. Merge
+  it, then start R1–R6 in the daytime." So: finish r7-apply-final-review (its checkers' fixes and the session's
+  duplicate merges), build, gate, report, ready, the advisor's PR review of the final head (the merge gate, not a
+  review round), merge on Mustafa's go or by the PR Advisor routine.
+- PR #25 merged 2026-10-27 on Mustafa's go after the advisor's APPROVE of 05202be (main 4c24d07); it touched only
+  STATUS and ROADMAP, so R7 is unaffected.
 - Areas: CD core data · CL core look · CC core characters and guns · CM core maps and buildings · CS core SIM ·
   GW game world · GA game animation · GC game combat · GN game bots and nav · GE game economy and objectives ·
   GP game presentation and dispatch · ED editor · PG pages · TL tools · KT kit.
@@ -66,9 +72,11 @@
   wf_e24159e7-346 (notes in the scratchpad kit-v3-1/). The stuck PR Advisor run waits on `npm ci` (ask rule).
 
 ## Running work
-- Workflow r7-apply-final-review · run wf_4df6005c-5a6 · task w8q4s3j0y · script as launched:
-  `.checkpoints/r7-legacy-inventory/r7-apply-final-review-run1.js` · launched 2026-10-25 22:38 Amsterdam · running.
-- Workflow write-guard-audit (kit-v3-1 research, side work) · run wf_e24159e7-346 · task wql15grun · notes in the
-  scratchpad kit-v3-1/ · running.
-- Done: r7-final-review (wf_4e8e0798-666), r7-apply-fixes2, r7-edit-verify, r7-read-verify.
-- Background saver: task bstocjk8x, started 21:42 Amsterdam, stops 23:32.
+- Workflow r7-apply-final-review · run wf_4df6005c-5a6 · script as launched:
+  `.checkpoints/r7-legacy-inventory/r7-apply-final-review-run1.js` · launched 2026-10-25 22:38 Amsterdam (task
+  w8q4s3j0y) · cut off by the org's spend limit (reset 2026-10-26 01:40 UTC): 21 of 30 agents done (15 appliers,
+  checkers CD CL CC CM CS GA); failed: checkers GN GC GE ED GP GW PG TL KT · resumed 2026-10-27 12:24 Amsterdam with
+  resumeFromRunId (task wg25ki0x2) · running.
+- Side work: write-guard-audit (kit-v3-1 research) run wf_e24159e7-346 resumed 12:24 (task ww79xjdll; propose and
+  attack were cut off); R1–R6 plan in the scratchpad v2-research/plan.md, advisor plan review running.
+- Background saver: task bsbjxsl2r, started 2026-10-27 12:24 Amsterdam.
