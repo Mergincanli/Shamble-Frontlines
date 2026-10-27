@@ -323,6 +323,75 @@ export const CASES = [
   ['advisor: merge a rules PR', PRA, merge(), true, { prFiles: 'docs/a.md\n.claude/settings.json\n' }],
   ['advisor: merge a .mcp.json PR', PRA, merge(), true, { prFiles: '.mcp.json\n' }],
   ['advisor: merge a CI PR', PRA, merge(), true, { prFiles: '.github/workflows/gate.yml\n' }],
+  // --- deny-by-default: a routine runs only the listed programs (verdict-3; security review F1/F3) ---
+  ['night: a read tool', NIGHT, sh('cat docs/a.md'), false],
+  ['night: ls a path', NIGHT, sh('ls docs'), false],
+  ['night: ls /opt/pw-browsers', NIGHT, sh('ls /opt/pw-browsers'), false],
+  ['night: grep a doc', NIGHT, sh('grep -n foo docs/a.md'), false],
+  ['night: head a doc', NIGHT, sh('head -5 docs/a.md'), false],
+  ['night: an unlisted program (perl)', NIGHT, sh('perl x.pl'), true],
+  ['night: make', NIGHT, sh('make -f Makefile'), true],
+  ['night: an arbitrary tool', NIGHT, sh('zip -r a.zip b'), true],
+  ['night: a program by a relative path', NIGHT, sh('./.gate/x.sh'), true],
+  ['night: a program by an absolute path', NIGHT, sh('/usr/bin/node tools/gate.mjs'), true],
+  ['night: tar', NIGHT, sh('tar -czf a.tgz docs'), true],
+  ['night: ln', NIGHT, sh('ln -s a b'), true],
+  ['night: chmod', NIGHT, sh('chmod +x x'), true],
+  ['night: dd', NIGHT, sh('dd if=a of=b'), true],
+  // --- deny-by-default: credential reads (F5) ---
+  ['night: cat a credential file', NIGHT, sh('cat ~/.git-credentials'), true],
+  ['night: grep /proc', NIGHT, sh('grep x /proc/1/environ'), true],
+  ['night: a variable in a read path', NIGHT, sh('cat $HOME/.netrc'), true],
+  ['night: read-redirect a credential', NIGHT, sh('cat < ~/.git-credentials'), true],
+  ['night: read-redirect a doc', NIGHT, sh('wc -l < docs/a.md'), false],
+  ['night: cat .git/config', NIGHT, sh('cat .git/config'), true],
+  // --- deny-by-default: read tools with a write or exec option (verdict-3 condition 1) ---
+  ['night: sort -o writes a file', NIGHT, sh('sort -o CLAUDE.md x'), true],
+  ['night: find -delete', NIGHT, sh('find . -name x -delete'), true],
+  ['night: find -fprintf', NIGHT, sh('find . -fprintf out.txt %p'), true],
+  ['night: date -s', NIGHT, sh('date -s "2020-01-01"'), true],
+  ['night: find read-only', NIGHT, sh('find . -name "*.md"'), false],
+  ['night: rg a doc', NIGHT, sh('rg foo docs'), false],
+  ['night: rg --pre', NIGHT, sh('rg --pre ./x foo'), true],
+  // --- deny-by-default: environment on a command (verdict-3 condition 4) ---
+  ['night: a bad env prefix (PATH)', NIGHT, sh('PATH=.gate node tools/gate.mjs'), true],
+  ['night: a bad env prefix (NODE_OPTIONS)', NIGHT, sh('NODE_OPTIONS=--require=./x node tools/gate.mjs'), true],
+  ['night: env with a bad var', NIGHT, sh('env NODE_OPTIONS=--require=./x node tools/gate.mjs'), true],
+  ['night: env -S', NIGHT, sh('env -S "node -e 1"'), true],
+  ['night: bare env prints the environment', NIGHT, sh('env'), true],
+  ['night: printenv', NIGHT, sh('printenv'), true],
+  ['night: TZ prefix is allowed', NIGHT, sh('TZ=Europe/Amsterdam date'), false],
+  ['night: env TZ is allowed', NIGHT, sh('env TZ=UTC date'), false],
+  // --- deny-by-default: re-exec wrappers and shells (verdict-3 condition 1) ---
+  ['night: command wrapper', NIGHT, sh('command git push -f origin cs/x'), true],
+  ['night: exec wrapper', NIGHT, sh('exec node x'), true],
+  ['night: time wrapper', NIGHT, sh('time node tools/gate.mjs'), true],
+  ['night: xargs', NIGHT, sh('echo x | xargs rm'), true],
+  // --- deny-by-default: file tools, operand checks (verdict-3 condition 3) ---
+  ['night: cp reads a protected file into notes', NIGHT, sh('cp CLAUDE.md .gate/x'), false],
+  ['night: cp writes a protected file', NIGHT, sh('cp a CLAUDE.md'), true],
+  ['night: cp -t a protected dir', NIGHT, sh('cp -t .github a b'), true],
+  ['night: mv removes a protected file', NIGHT, sh('mv CLAUDE.md x'), true],
+  ['night: mv a doc', NIGHT, sh('mv docs/a.md docs/b.md'), false],
+  ['night: rm a doc', NIGHT, sh('rm docs/a.md'), false],
+  ['night: touch -r a reference', NIGHT, sh('touch -r docs/a.md docs/b.md'), false],
+  ['night: a redirect outside the project', NIGHT, sh('echo x > /etc/foo'), true],
+  ['night: a redirect to the scratchpad', NIGHT, sh(`echo x > ${SCRATCH}/n`), false],
+  ['night: a variable in a redirect', NIGHT, sh('echo x > $HOME/y'), true],
+  // --- deny-by-default: gh (F6) ---
+  ['night: gh browse', NIGHT, sh('gh browse'), true],
+  ['night: gh gist', NIGHT, sh('gh gist create x'), true],
+  ['advisor: gh search', PRA, sh('gh search prs x'), true],
+  ['advisor: gh pr view', PRA, sh('gh pr view 27'), false],
+  // --- heredocs (F2) ---
+  ['night: an unterminated here-document', NIGHT, sh("cat <<'EOF'\ngit push -f origin cs/x"), true],
+  ['night: a dash-heredoc closed by a tab-indented terminator', NIGHT, sh('cat <<-EOF\n\tbody\n\tEOF\nls'), false],
+  ['night: a plain heredoc is not closed by a tab-indented terminator', NIGHT, sh('cat <<EOF\nbody\n\tEOF'), true],
+  // --- the PR Advisor's read tools (verdict-3 condition 3: not refused as writes) ---
+  ['advisor: head a doc', PRA, sh('head -5 docs/a.md'), false],
+  ['advisor: cp into its notes', PRA, sh('cp CLAUDE.md .gate/x'), false],
+  ['advisor: sed is off the list', PRA, sh('sed -n 1,5p docs/a.md'), true],
+  ['advisor: cp outside its notes', PRA, sh('cp a docs/x'), true],
   // --- an unknown role is refused outright ---
   ['unknown role', 'nightshift', sh('git status'), true],
 ];
@@ -333,6 +402,16 @@ for (const [name, role, input, refused, opts] of CASES) {
     assert.equal(!!d, refused, `${name}: ${JSON.stringify(d)}`);
   });
 }
+
+test('a refusal names what to use instead (verdict-3 condition 6)', async () => {
+  const msg = async (command) => (await decide(sh(command), fakeIo({ role: NIGHT })))?.deny ?? '';
+  assert.match(await msg('curl https://example.com'), /WebFetch/);
+  assert.match(await msg('kill -TERM 123'), /TaskStop/);
+  assert.match(await msg('pkill -f checkpoint.mjs'), /TaskStop/);
+  assert.match(await msg('sed -i s/a/b/ docs/a.md'), /Edit/);
+  assert.match(await msg('git -C /tmp status'), /without -C/);
+  assert.match(await msg('git checkout main'), /git switch/);
+});
 
 test('PermissionRequest in a routine denies and interrupts', async () => {
   const d = await decide({ hook_event_name: 'PermissionRequest', tool_name: 'Bash', tool_input: {} }, fakeIo({ role: NIGHT }));
@@ -414,12 +493,26 @@ const MUTANTS = [
   ['reset only unstages', "if (!(before.length === 0 || (before.length === 1 && before[0] === 'HEAD'))) {", 'if (false) {'],
   ['the merge SHA', "if (!/^[0-9a-f]{40}$/.test(sha)) return deny(", 'if (false) return deny('],
   ['the merge checks', "if (rs.some((r) => !['success', 'skipped', 'neutral'].includes(r.conclusion)) || !rs.some((r) => r.conclusion === 'success')) return deny(", 'if (false) return deny('],
-  ['protected writes', 'if (protectedRel(rel)) return deny(', 'if (false) return deny('],
+  ['protected writes (Edit/Write tool)', 'if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change', 'if (false) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change'],
+  ['protected writes (Bash file tool)', 'if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed', 'if (false) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed'],
+  ['the program allow list (deny-by-default)', "return deny(`routine (${role}): ${prog} is not one of the routines' programs", "return null && deny(`routine (${role}): ${prog} is not one of the routines' programs"],
+  ['a program by a path', 'if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name', 'if (false) return deny(`routine (${role}): run ${prog} by name'],
+  ['environment set on a command', 'if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): only ${okList} may be set', 'if (false) return { deny: `routine (${role}): only ${okList} may be set'],
+  ['re-exec wrappers', "if (b === 'command' || b === 'builtin' || b === 'exec' || b === 'time' || b === 'nohup') return { deny:", 'if (false) return { deny:'],
+  ['credential read operands', 'if (cred) return deny(`routine (${role}): ${p} may hold credentials', 'if (false) return deny(`routine (${role}): ${p} may hold credentials'],
+  ['read-redirect targets are checked', 'for (const r of c.reads) {', 'for (const r of []) {'],
+  ['a write outside the project', 'return deny(`routine (${role}): ${what} must write inside the project or the scratchpad', 'return null && deny(`routine (${role}): ${what} must write inside the project or the scratchpad'],
+  ['read-tool write options (sort -o)', "if (prog === 'sort' && has(/^(-o|--output(=|$))/)) return '-o writes a file';", "if (false) return '-o writes a file';"],
+  ['read-tool exec options (find -delete)', "if ((prog === 'find' || prog === 'fd') && has(/^-(exec|execdir|ok|okdir|delete|fprint|fprintf|fprint0|fls)$|^--(exec|delete)(=|$)/)) return '-exec/-delete/-fprint run or write';", 'if (false) return "x";'],
+  ['an unterminated here-document', 'if (role && unterminated) return deny(', 'if (false) return deny('],
+  ['gh deny-by-default', "if ((sub === 'pr' || sub === 'issue') && /^(view|list|status|diff|checks)$/.test(sub2)) return null;\n    return deny(`routine (${role}): gh", "if (true) return null;\n    return deny(`routine (${role}): gh"],
   ["the PR Advisor's notes-only writes", "if (role === 'pr-advisor' && !/^(\\.checkpoints|\\.gate|\\.claude\\/agent-memory-local)(\\/|$)/.test(rel)) {", 'if (false) {'],
   ['tracked scripts only', "if (io.git(['ls-files', '--error-unmatch', '--', rel], root).code !== 0) return deny(", 'if (false) return deny('],
   ["main's copy only", "if (io.git(['diff', '--quiet', 'origin/main', '--', rel], root).code !== 0) return deny(", 'if (false) return deny('],
   ['the exact npm form', "if (role === 'night-shift' && argv.join(' ') === NIGHT_NPM) {", "if (role === 'night-shift') {"],
-  ['network tools', 'if (NET.has(prog)) return deny(', 'if (false) return deny('],
+  // NET, SHELLS, sudo, kill, sed/awk and INSTALLERS are message-only now: the allow-list catch-all already denies them
+  // (verdict-3 condition 6 keeps them for a message naming what to use instead). Their messages, not their behaviour,
+  // are the point, so they carry no behavioural mutant; the catch-all mutant above covers the deny.
   ['PermissionRequest', "return role ? deny(`routine (${rawRole}): this would have waited", "return false ? deny(`routine (${rawRole}): this would have waited"],
   ['ConfigChange', "return role && ['project_settings', 'local_settings', 'skills', 'user_settings'].includes(input.source)", 'return false'],
   ['the web allow list', "if (!ok) return deny(", 'if (false) return deny('],

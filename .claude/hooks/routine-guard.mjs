@@ -69,17 +69,17 @@ function insideDir(p, dir, cwd, io) {
 // (subs: true marks a line that had them). A here-document's body is skipped.
 export function parseShell(src) {
   const cmds = [];
-  let subs = false;
+  let subs = false, unterminated = false;
   const walk = (s) => {
-    let argv = [], redirects = [], word = null, i = 0, pendingRedirect = false;
+    let argv = [], redirects = [], reads = [], word = null, i = 0, pendingRedirect = false;
     const heredocs = [];
     const endWord = () => {
       if (word === null) return;
-      if (pendingRedirect === 'read') pendingRedirect = false; // the file a < reads from is not a write target
+      if (pendingRedirect === 'read') { reads.push(word); pendingRedirect = false; } // a < reads this file (F5: still credential-checked)
       else if (pendingRedirect) { redirects.push(word); pendingRedirect = false; } else argv.push(word);
       word = null;
     };
-    const endCmd = () => { endWord(); if (argv.length || redirects.length) cmds.push({ argv, redirects }); argv = []; redirects = []; };
+    const endCmd = () => { endWord(); if (argv.length || redirects.length || reads.length) cmds.push({ argv, redirects, reads }); argv = []; redirects = []; reads = []; };
     const sub = (open, close) => { // returns index after the matching close
       let depth = 1, j = i + open.length, q = null;
       for (; j < s.length; j++) {
@@ -99,10 +99,11 @@ export function parseShell(src) {
         endCmd();
         i++;
         while (heredocs.length) { // skip each here-document body up to its delimiter line
-          const delim = heredocs.shift();
+          const { delim, strip } = heredocs.shift();
           const lines = s.slice(i).split('\n');
           let k = 0;
-          for (; k < lines.length; k++) if (lines[k].replace(/^\t+/, '') === delim) break;
+          for (; k < lines.length; k++) if ((strip ? lines[k].replace(/^\t+/, '') : lines[k]) === delim) break; // only <<- strips tabs (F2)
+          if (k === lines.length) unterminated = true; // the delimiter never came (F2): the body swallows the rest
           i += lines.slice(0, Math.min(k + 1, lines.length)).reduce((n, l) => n + l.length + 1, 0);
         }
         continue;
@@ -125,11 +126,12 @@ export function parseShell(src) {
       if ((c === '<' || c === '>') && s[i + 1] === '(') { i = sub(c + '(', ')'); word = (word ?? '') + '<()'; continue; }
       if (s.startsWith('<<', i) && !s.startsWith('<<<', i)) {
         endWord();
-        i += s[i + 2] === '-' ? 3 : 2;
+        const dash = s[i + 2] === '-';
+        i += dash ? 3 : 2;
         while (s[i] === ' ') i++;
         let d = '';
         while (i < s.length && !/[\s;&|<>]/.test(s[i])) { if (s[i] !== "'" && s[i] !== '"' && s[i] !== '\\') d += s[i]; i++; }
-        heredocs.push(d);
+        heredocs.push({ delim: d, strip: dash });
         continue;
       }
       if (c === '&' && s[i + 1] === '&') { endCmd(); i += 2; continue; }
@@ -153,7 +155,7 @@ export function parseShell(src) {
     endCmd();
   };
   walk(src);
-  return { cmds, subs };
+  return { cmds, subs, unterminated };
 }
 // Leading VAR=value words, wrappers that run the rest (timeout, nice, env, xvfb-run, ...): stripped before matching.
 // Shell keywords in front of a command ({ ... }, if/then/do ..., !) are stripped too.
@@ -279,9 +281,10 @@ export async function decide(input, io) {
     return writePath(ti.file_path ?? ti.notebook_path ?? '', cwd, role, io, input);
   }
   if (tool === 'Read') {
-    const p = String(ti.file_path ?? '');
-    if (/^\/proc\//.test(p) || /(^|\/)\.git\/config$/.test(p) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(p) ||
-      p.includes('/.config/gh/')) return deny(`routine (${role}): ${p} may hold credentials`);
+    const raw = String(ti.file_path ?? '');
+    const p = realOf(isAbsolute(raw) ? raw : resolve(cwd, raw), io); // follow symlinks before matching (F5)
+    if (/^\/proc(\/|$)/.test(p) || /(^|\/)\.git\/config$/.test(p) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(p) ||
+      p.includes('/.config/gh/') || raw.includes('$')) return deny(`routine (${role}): ${raw} may hold credentials`);
     return null;
   }
   if (tool === 'WebFetch') return webFetch(String(ti.url ?? ''), role, io);
@@ -290,14 +293,16 @@ export async function decide(input, io) {
 
 function writePath(p, cwd, role, io, input) {
   if (!p) return deny(`routine (${role}): a write needs a path`);
-  if (insideDir(p, input.scratchpad_dir, cwd, io)) return null;
-  const rel = projectRel(p, cwd, io);
-  if (rel === null) return deny(`routine (${role}): ${p} is outside the project`);
-  if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate|\.claude\/agent-memory-local)(\/|$)/.test(rel)) {
-    return deny('routine (pr-advisor): the PR Advisor writes only its notes (.checkpoints/, .gate/)');
+  const rel = projectRel(p, cwd, io); // follows symlinks, so a link into the project resolves here (F4)
+  if (rel !== null) {
+    if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change only in a daytime kit change-set`);
+    if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate|\.claude\/agent-memory-local)(\/|$)/.test(rel)) {
+      return deny('routine (pr-advisor): the PR Advisor writes only its notes (.checkpoints/, .gate/)');
+    }
+    return null;
   }
-  if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change only in a daytime kit change-set`);
-  return null;
+  if (insideDir(p, input.scratchpad_dir, cwd, io)) return null;
+  return deny(`routine (${role}): ${p} is outside the project`);
 }
 
 function webFetch(url, role, io) {
@@ -323,24 +328,152 @@ function webFetch(url, role, io) {
 }
 
 // ---------- Bash ----------
+// Routines run only the programs named here (deny-by-default: advisor verdict-3; security review F1/F3/F6). git, gh,
+// node, python, python3 and npm have their own handlers below; a program that is on no list is refused. Day sessions
+// (no role) are unchanged: only git and gh are checked.
 const NET = new Set(['curl', 'wget', 'nc', 'ncat', 'netcat', 'socat', 'ssh', 'scp', 'sftp', 'rsync', 'telnet', 'ftp']);
 const INSTALLERS = new Set(['npx', 'yarn', 'pnpm', 'pip', 'pip3', 'pipx', 'apt', 'apt-get', 'brew', 'gem', 'cargo',
   'go', 'bun', 'deno']);
-const INTERPRETERS = new Set(['node', 'nodejs', 'python', 'python3', 'perl', 'ruby', 'php', 'lua', 'Rscript', 'sh', 'bash',
-  'zsh', 'dash', 'ksh', 'fish', 'pwsh', 'osascript', 'awk', 'gawk', 'tclsh', 'jshell']);
-const WRITERS = new Set(['cp', 'mv', 'ln', 'rm', 'rmdir', 'tee', 'truncate', 'touch', 'install', 'chmod', 'chown',
-  'mkdir', 'unlink', 'dd', 'sed', 'patch', 'shred']);
+const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh', 'fish', 'pwsh']);
 const DENIED_SCRIPTS = new Set(['tools/preview.js', 'tools/pageshot.js']);
-const CODE_RUNNERS = new Set(['eval', 'source', '.', 'trap', 'alias']);
+const CODE_RUNNERS = new Set(['eval', 'source', '.', 'trap', 'alias', 'command', 'builtin', 'exec', 'env', 'printenv',
+  'export', 'set', 'declare', 'hash', 'enable', 'shopt', 'xargs', 'time']);
+// Only these may be set on a routine's command line (prefix, or via env); others can change what an allowed program
+// runs (PATH, NODE_OPTIONS, BASH_ENV, LD_*, GIT_*, PYTHON*, npm_config_*). Verdict-3 condition 4.
+const ROLE_ENV_OK = new Set(['TZ', 'LC_ALL', 'LANG', 'LANGUAGE', 'NO_COLOR']);
+// Read-only and inspection programs routines may run. None of these writes a file or runs a program, except through an
+// option refused by readToolBadOpt (verdict-3 condition 1). Their file operands are credential-checked.
+const ROLE_READ = new Set(['date', 'ls', 'cat', 'head', 'tail', 'wc', 'grep', 'egrep', 'fgrep', 'rg', 'pwd', 'echo',
+  'printf', 'test', '[', 'true', 'false', 'basename', 'dirname', 'realpath', 'readlink', 'stat', 'file', 'sort', 'cut',
+  'tr', 'comm', 'cmp', 'diff', 'rev', 'nl', 'od', 'xxd', 'column', 'fold', 'seq', 'tree', 'jq', 'which', 'hostname',
+  'uname', 'sha256sum', 'md5sum', 'cksum', 'find', 'fd']);
+// File tools routines may run; every path they write is checked (verdict-3 condition 3).
+const ROLE_WRITE = new Set(['mkdir', 'rm', 'rmdir', 'cp', 'mv', 'touch', 'tee']);
+
+// For a routine, strip the leading wrappers of a command (like unwrap) but validate the environment it sets: only
+// ROLE_ENV_OK variables may be set (prefix or env), and command/exec/time/env-with-options are refused (verdict-3
+// conditions 4, and 1 for the re-exec wrappers). Returns { deny } or { argv: the real command }.
+function unwrapRole(argv, role) {
+  let a = argv.slice();
+  const okList = [...ROLE_ENV_OK].join(', ');
+  for (let g = 0; g < 30 && a.length; g++) {
+    const t = a[0], b = basename(t);
+    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(t)) {
+      const name = t.slice(0, t.indexOf('='));
+      if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): only ${okList} may be set on a command; ${name}= can change what an allowed program runs` };
+      a = a.slice(1); continue;
+    }
+    if (b === 'env') {
+      a = a.slice(1);
+      while (a.length) {
+        if (a[0].startsWith('-')) return { deny: `routine (${role}): env options can change what runs; set ${okList} as a plain prefix instead` };
+        if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) {
+          const name = a[0].slice(0, a[0].indexOf('='));
+          if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): env ${name}=... can change what runs; only ${okList} are allowed` };
+          a = a.slice(1); continue;
+        }
+        break;
+      }
+      if (!a.length) return { deny: `routine (${role}): bare env prints the environment; it is not allowed` };
+      continue;
+    }
+    if (b === 'command' || b === 'builtin' || b === 'exec' || b === 'time' || b === 'nohup') return { deny: `routine (${role}): ${b} can hide or re-exec a command; run the program directly` };
+    if (WRAPPERS.has(t) || WRAPPERS.has(b)) { a = a.slice(1); continue; }
+    if (b === 'timeout') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(/^(-s|-k|--signal|--kill-after)$/.test(a[0]) ? 2 : 1); a = a.slice(1); continue; }
+    if (b === 'nice') { a = a.slice(1); if (a[0] === '-n') a = a.slice(2); else if (/^-n?\d+$|^--adjustment/.test(a[0] ?? '')) a = a.slice(1); continue; }
+    if (b === 'stdbuf') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(1); continue; }
+    if (b === 'xvfb-run') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(/^-(n|s|e|f|p|w)$|^--(server-num|server-args|error-file|auth-file|xauth-protocol|wait)$/.test(a[0]) ? 2 : 1); continue; }
+    break;
+  }
+  return { argv: a };
+}
+// A file a routine reads (operand or < redirect): refuse credential paths, a variable in a path, and a glob that could
+// reach outside the project (verdict-3 condition 5, F5).
+function readOperandDeny(p, vcwd, role, io) {
+  const looksPath = p.includes('/') || /^~/.test(p);
+  if (looksPath && /[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a file path (${p})`);
+  const ex = p.replace(/^~(?=\/|$)/, io.home);
+  const cred = /^\/proc(\/|$)/.test(ex) || /(^|\/)\.git\/config$/.test(ex) || /(^|\/)\.(gitconfig|git-credentials|netrc|npmrc)$/.test(ex) || ex.includes('/.config/gh/');
+  if (cred) return deny(`routine (${role}): ${p} may hold credentials`);
+  if (looksPath && /[*?]/.test(p) && (isAbsolute(ex) || /(^|\/)\.\.(\/|$)/.test(ex))) return deny(`routine (${role}): a glob that could read outside the project (${p})`);
+  return null;
+}
+// A path a routine writes (redirect, or a file tool's target): the scratchpad, or inside the project and not protected
+// (verdict-3 condition 3, F4). Protected and project-scope decide before the scratchpad; a symlink is followed first.
+function writeTarget(what, p, vcwd, role, io, input) {
+  if (/[$`]/.test(p)) return deny(`routine (${role}): no variable or substitution in a write path (${p})`);
+  if (p === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d+)$/.test(p)) return null;
+  const rel = projectRel(p, vcwd, io);
+  if (rel !== null) {
+    if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed`);
+    if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)) return deny(`routine (pr-advisor): ${what} on ${rel}; the PR Advisor writes only its notes (.checkpoints/, .gate/)`);
+    return null;
+  }
+  if (insideDir(p, input.scratchpad_dir, vcwd, io)) return null;
+  return deny(`routine (${role}): ${what} must write inside the project or the scratchpad (${p})`);
+}
+// The non-option operands of a command (skipping the value of a value-taking option named by valRe).
+function operands(args, valRe) {
+  const out = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--') { for (const x of args.slice(i + 1)) out.push(x); break; }
+    if (a.startsWith('-') && a !== '-') { if (valRe && valRe.test(a)) i++; continue; }
+    out.push(a);
+  }
+  return out;
+}
+// cp/mv: which operands are written (dest, and for mv the sources too) and which are only read (cp sources).
+function cpMvTargets(args) {
+  const bare = [];
+  let tdir = null;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--') { for (const x of args.slice(i + 1)) bare.push(x); break; }
+    if (a === '-t' || a === '--target-directory') { tdir = args[++i]; continue; }
+    const m = /^(?:--target-directory=|-t)(.+)$/.exec(a);
+    if (m) { tdir = m[1]; continue; }
+    if (a.startsWith('-') && a !== '-') { if (/^(-S|--suffix)$/.test(a)) i++; continue; }
+    bare.push(a);
+  }
+  if (tdir !== null) return { dests: [tdir], sources: bare };
+  if (!bare.length) return { dests: [], sources: [] };
+  return { dests: [bare[bare.length - 1]], sources: bare.slice(0, -1) };
+}
+// A read tool with an option that writes a file or runs a program: refuse it (verdict-3 condition 1).
+function readToolBadOpt(prog, args) {
+  const has = (re) => args.some((a) => re.test(a));
+  if (prog === 'sort' && has(/^(-o|--output(=|$))/)) return '-o writes a file';
+  if (prog === 'rg' && has(/^--pre(=|-glob|$)/)) return '--pre runs a program';
+  if (prog === 'xxd' && has(/^-[a-wyz]*r/)) return '-r can write a file';
+  if (prog === 'date' && has(/^(-s|--set(=|$))/)) return '-s sets the clock';
+  if ((prog === 'find' || prog === 'fd') && has(/^-(exec|execdir|ok|okdir|delete|fprint|fprintf|fprint0|fls)$|^--(exec|delete)(=|$)/)) return '-exec/-delete/-fprint run or write';
+  return null;
+}
+function npmCheck(argv, vcwd, role, io) {
+  if (role === 'night-shift' && argv.join(' ') === NIGHT_NPM) {
+    if (projectRel(vcwd, vcwd, io) !== '.') return deny('routine (night-shift): run the toolkit install from the project folder, not after a cd');
+    for (const d of [io.projectDir, join(io.projectDir, 'tools'), io.home]) {
+      if (io.exists(join(d, '.npmrc'))) return deny(`routine (night-shift): ${join(d, '.npmrc')} exists; npm config can change what installs`);
+    }
+    const same = io.git(['diff', '--quiet', 'origin/main', '--', 'tools/package.json', 'tools/package-lock.json'], io.projectDir);
+    return same.code === 0 ? null : deny("routine (night-shift): the toolkit's manifest differs from main's; install only main's lockfile");
+  }
+  return deny(`routine (${role}): npm only as "${NIGHT_NPM}" (night shift; the PR Advisor installs nothing)`);
+}
 
 async function bash(command, cwd, role, io, input) {
-  const { cmds, subs } = parseShell(command);
+  const { cmds, subs, unterminated } = parseShell(command);
   if (role && subs) return deny(`routine (${role}): no command substitution ($(...), backticks); run the commands one by one`);
+  if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd;
   for (const c of cmds) {
-    const argv = unwrap(c.argv);
+    let argv;
+    if (role) { const u = unwrapRole(c.argv, role); if (u.deny) return deny(u.deny); argv = u.argv; }
+    else argv = unwrap(c.argv);
     if (!argv.length) continue;
-    const prog = basename(argv[0]);
+    const rawProg = argv[0];
+    const prog = basename(rawProg);
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run
       const target = argv[1] && argv[1] !== '-' ? resolve(vcwd, argv[1].replace(/^~(?=\/|$)/, io.home)) : io.home;
       if (role && projectRel(target, vcwd, io) === null && !insideDir(target, input.scratchpad_dir, vcwd, io)) {
@@ -350,16 +483,12 @@ async function bash(command, cwd, role, io, input) {
       continue;
     }
     if (role) {
-      for (const r of c.redirects) {
-        if (r === '/dev/null' || /^\/dev\/(stdout|stderr|fd\/\d)$/.test(r)) continue;
-        const rel = projectRel(r, vcwd, io);
-        if (rel !== null && (protectedRel(rel) || (role === 'pr-advisor' && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)))) {
-          return deny(`routine (${role}): writing ${rel} is not allowed here`);
-        }
+      for (const r of c.redirects) { const d = writeTarget('a redirect', r, vcwd, role, io, input); if (d) return d; }
+      for (const r of c.reads) { const d = readOperandDeny(r, vcwd, role, io); if (d) return d; }
+      if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name, not by a path (${rawProg})`); // condition 2
+      if ((prog === 'git' || prog === 'gh') && argv.some((t) => t.includes('$') || t.includes('`'))) {
+        return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
       }
-    }
-    if (role && (prog === 'git' || prog === 'gh') && argv.some((t) => t.includes('$') || t.includes('`'))) {
-      return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
     }
     let r = null;
     if (prog === 'git') r = await git(argv, vcwd, role, io);
@@ -370,38 +499,42 @@ async function bash(command, cwd, role, io, input) {
   return null;
 }
 
+// Deny-by-default: a routine runs only the programs on the lists (verdict-3). Everything else is refused, the common
+// cases with a message naming what to use instead.
 async function routineProgram(prog, argv, vcwd, role, io, input) {
+  const args = argv.slice(1);
   if (prog === 'sudo' || prog === 'su' || prog === 'doas') return deny(`routine (${role}): no ${prog}`);
-  if (CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} runs commands the guard can't see`);
-  if ((prog === 'find' || prog === 'fd') && argv.some((t) => /^-(exec|execdir|ok|okdir|delete|x|X)$|^--exec/.test(t))) {
-    return deny(`routine (${role}): ${prog} with -exec or -delete runs commands the guard can't see`);
-  }
-  if (NET.has(prog)) return deny(`routine (${role}): ${prog} reaches the network outside the documented tools; use WebFetch`);
-  if (prog === 'npm') {
-    if (role === 'night-shift' && argv.join(' ') === NIGHT_NPM) {
-      if (projectRel(vcwd, vcwd, io) !== '.') return deny('routine (night-shift): run the toolkit install from the project folder, not after a cd');
-      for (const d of [io.projectDir, join(io.projectDir, 'tools'), io.home]) {
-        if (io.exists(join(d, '.npmrc'))) return deny(`routine (night-shift): ${join(d, '.npmrc')} exists; npm config can change what installs`);
-      }
-      const same = io.git(['diff', '--quiet', 'origin/main', '--', 'tools/package.json', 'tools/package-lock.json'], io.projectDir);
-      return same.code === 0 ? null : deny("routine (night-shift): the toolkit's manifest differs from main's; install only main's lockfile");
-    }
-    return deny(`routine (${role}): npm only as "${NIGHT_NPM}" (night shift; the PR Advisor installs nothing)`);
-  }
+  if (prog === 'kill' || prog === 'pkill' || prog === 'killall') return deny(`routine (${role}): stop the background saver with the TaskStop tool, not ${prog}`);
+  if (prog === 'sed' || prog === 'awk' || prog === 'gawk') return deny(`routine (${role}): ${prog} can write files and run code; read with Read/head/tail/grep, edit with Edit`);
+  if (CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} can run or hide other commands; run the program directly`);
+  if (SHELLS.has(prog)) return deny(`routine (${role}): ${prog} runs arbitrary commands; run the program directly`);
+  if (NET.has(prog)) return deny(`routine (${role}): ${prog} reaches the network; use WebFetch for the documented docs hosts`);
+  if (prog === 'npm') return npmCheck(argv, vcwd, role, io);
+  if (prog === 'node' || prog === 'nodejs' || prog === 'python' || prog === 'python3') return interpreter(prog, argv, vcwd, role, io);
   if (INSTALLERS.has(prog)) return deny(`routine (${role}): ${prog} installs or runs downloaded code`);
-  if (INTERPRETERS.has(prog)) return interpreter(prog, argv, vcwd, role, io);
-  if (WRITERS.has(prog)) {
-    if (prog === 'patch') return deny(`routine (${role}): patch writes files it names inside the patch; use Edit`);
-    for (const a of argv.slice(1)) {
-      const v = prog === 'dd' ? (/^of=(.*)$/.exec(a)?.[1]) : a.startsWith('-') ? null : a;
-      if (!v) continue;
-      if (insideDir(v, input.scratchpad_dir, vcwd, io)) continue;
-      const rel = projectRel(v, vcwd, io);
-      if (rel !== null && protectedRel(rel)) return deny(`routine (${role}): ${prog} on ${rel} (a rules, CI or gate file)`);
-      if (role === 'pr-advisor' && rel !== null && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)) return deny(`routine (pr-advisor): ${prog} on ${rel}; the PR Advisor writes only its notes`);
-    }
+  if (ROLE_READ.has(prog)) {
+    const bad = readToolBadOpt(prog, args);
+    if (bad) return deny(`routine (${role}): ${prog} ${bad}; not allowed here`);
+    for (const op of operands(args)) { const d = readOperandDeny(op, vcwd, role, io); if (d) return d; }
+    return null;
   }
-  return null;
+  if (ROLE_WRITE.has(prog)) {
+    if (prog === 'cp') {
+      const { dests, sources } = cpMvTargets(args);
+      for (const s of sources) { const d = readOperandDeny(s, vcwd, role, io); if (d) return d; }
+      for (const t of dests) { const d = writeTarget('cp', t, vcwd, role, io, input); if (d) return d; }
+      return null;
+    }
+    if (prog === 'mv') {
+      const { dests, sources } = cpMvTargets(args);
+      for (const t of [...sources, ...dests]) { const d = writeTarget('mv', t, vcwd, role, io, input); if (d) return d; }
+      return null;
+    }
+    const valRe = prog === 'mkdir' ? /^(-m|--mode)$/ : prog === 'touch' ? /^(-d|--date|-r|--reference|-t)$/ : null;
+    for (const t of operands(args, valRe)) { const d = writeTarget(prog, t, vcwd, role, io, input); if (d) return d; }
+    return null;
+  }
+  return deny(`routine (${role}): ${prog} is not one of the routines' programs (git, gh, node, python, npm, and read-only tools); a daytime kit change adds one if a run needs it`);
 }
 
 // Routines run only a tracked script whose working copy equals main's (R2); the PR Advisor runs none.
@@ -533,9 +666,9 @@ async function gh(argv, role, io) {
     if (role && endpoint && !new RegExp(`^/?(repos/${REPO.replace('/', '\\/')}(/|$)|rate_limit$)`, 'i').test(endpoint)) return deny(`routine (${role}): gh api only on ${REPO}`);
     return null;
   }
-  if (role) {
-    if (sub === 'run' || sub === 'workflow' || sub === 'release' || sub === 'cache' || sub === 'label') return deny(`routine (${role}): gh ${sub} is not allowed in routines`);
-    if ((sub === 'pr' || sub === 'issue') && !/^(view|list|status|diff|checks)$/.test(sub2)) return deny(`routine (${role}): gh ${sub} ${sub2}: GitHub writes go through the GitHub MCP tools`);
+  if (role) { // deny-by-default (F6): only the named read-only forms; gh api (read) returned above
+    if ((sub === 'pr' || sub === 'issue') && /^(view|list|status|diff|checks)$/.test(sub2)) return null;
+    return deny(`routine (${role}): gh ${sub}${sub2 ? ' ' + sub2 : ''}: routines use only gh api (read), gh pr/issue view|list|status|diff|checks, and the GitHub MCP tools`);
   }
   return null;
 }
