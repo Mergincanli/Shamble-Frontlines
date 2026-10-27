@@ -51,7 +51,13 @@ hook gets the same path fix). Rules, with their scope:
   flags that include a dangerous one are denied; leading global options are parsed. The merge check (R3b):
   `expectedHeadSha` present, head repository = base repository, `gate` and `smoke` success on that SHA. On an internal
   error (R3c): allow when no role is set, so a guard bug never locks a day session out of fixing it.
-- **Both routines** (role set; internal error → deny): no `git merge`, no `update_pull_request_branch` (R5);
+- **Both routines** (role set; internal error → deny): routine Bash is an **allow list of programs** (deny-by-default:
+  advisor verdict-3, `.checkpoints/kit-v3-1/advisor-verdict-3.md`, and the security review's F1/F3/F6 of 3b5e569's step 1).
+  Only git, gh, node, python, npm and the read-only / file tools run; a program on no list is refused. A program named
+  by a path is refused; only TZ/LC_ALL/LANG/NO_COLOR may be set on a command; read tools' file operands and `<`
+  redirects are credential-checked; file tools' write targets stay inside the project (minus protected paths) or the
+  scratchpad. Each refusal names what to use instead (kill→TaskStop, curl→WebFetch, sed→Edit/Read). Then: no `git
+  merge`, no `update_pull_request_branch` (R5);
   interpreters run only a tracked file whose working copy equals `origin/main` (the gate, `checkpoint.mjs`,
   `repo-map-check.mjs`, the kit's tests); denied: `tools/preview.js`, `tools/pageshot.js`, `node .gate/*`, `node -e`, and
   `--pre`, `eval`, `evalshot` snippets (R2, ROUTINE-CODE-EXEC: no in phase 0); npm refused when any `.npmrc` exists in the

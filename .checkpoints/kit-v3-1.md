@@ -27,8 +27,18 @@
    `git config` in routines reads only user.name and user.email (plan M4). Gate PASS (with main's tools/node_modules
    linked in for the run, then removed). Not registered yet.
 
+5b. (0e93ac4) Routine Bash/gh redesigned to **deny-by-default** (advisor verdict-3 APPROVE, inside the plan; security
+   review F1/F3/F6). Allow list of programs; bare names only; TZ/LC_ALL/LANG/NO_COLOR only on a command; read operands
+   and `<` redirects credential-checked; read-tool write/exec options refused; file tools' targets inside project or
+   scratchpad; gh read-only; unterminated here-doc refused (F2); writePath/Read reordered + realpathed (F4/F5).
+   300 tests pass, 37 mutants caught, a condition-6 message test. Day sessions unchanged. F7 a documented residual.
+   Verdict: `.checkpoints/kit-v3-1/advisor-verdict-3.md`. Plan L2 updated (condition 8).
+
 ## Current step
 6. Build step 2: settings.json (allows, denies, the empty ask list, `effortLevel`, the hook registration) and its test.
+   Step-3 note: drop `gh pr ready` from the night procedure (routine gh is read-only now) — mark ready via the GitHub
+   MCP `update_pull_request` (draft:false); replace `pkill -f checkpoint.mjs` with the TaskStop tool in NIGHT_SHIFT.md
+   and CHECKPOINTS.md (verdict-3 condition 6).
 
 ## Next steps
 1. Build in this worktree, in the plan's order: settings.json, the procedure texts, builder.md, checkpoint.mjs's
@@ -48,21 +58,17 @@
 - Design addition beyond the plan's letter, for the final review: the launcher (guard.mjs) split from the rules.
 - **Automated security review of 3f43a7a (security-guidance plugin), 7 findings on routine-guard.mjs, 2026-10-27 17:05.**
   It converges with the scope question above (sent to the advisor as verdict-3). Disposition:
-  - F1 HIGH program-name deny-list evasion (unknown program → null): the scope question itself. Fix = routine Bash
-    deny-by-default, an explicit program allow-list. Held for the advisor's verdict-3; then build.
-  - F3 HIGH guard self-modification (WRITERS can't name every writer): same root as F1; the allow-list closes it
-    (every non-option arg of any allowed program checked against protectedRel). Held with F1.
-  - F6 MEDIUM gh deny-by-default (an unlisted gh subcommand → null): the gh analogue of F1; allow only the named
-    read-only gh forms and api GET. Held with F1.
-  - F2 HIGH heredoc parser differential (quoted delimiter; `<<-` tab-strip; unterminated skips to end): fold in
-    regardless of the verdict — for a role, an unterminated heredoc is refused; `<<-` strips tabs, `<<` does not;
-    a quoted delimiter is matched literally.
-  - F4 MEDIUM fail-open ordering (scratchpad checked before protected): reorder — protected/scope first, scratchpad
-    only for paths inside it and outside the project. (realOf already blocks a scratchpad symlink into the project;
-    defense in depth.) Fold in regardless.
-  - F5 MEDIUM credential-read bypass (Read path matched on the raw string): realpath the Read path before matching;
-    extend the credential denylist to routine Bash args and redirects; refuse printenv and bare env in routines.
-    The allow-list (F1) makes the Bash half automatic; the Read realpath is folded in regardless.
+  - F1 HIGH program-name deny-list evasion (unknown program → null): **fixed** in 0e93ac4 — routine Bash is a program
+    allow list (git, gh, node, python, npm, named read/file tools); everything else refused. Advisor verdict-3 APPROVE.
+  - F3 HIGH guard self-modification (WRITERS can't name every writer): **fixed** — file tools check every path they
+    write against protectedRel; non-listed writers (ln, dd, chmod, sed, patch, install, shred) are off the list.
+  - F6 MEDIUM gh deny-by-default (an unlisted gh subcommand → null): **fixed** — routine gh allows only api (read) and
+    pr/issue view|list|status|diff|checks.
+  - F2 HIGH heredoc parser differential: **fixed** — an unterminated here-doc is refused for a role; `<<-` strips tabs,
+    `<<` does not; a quoted delimiter is matched literally.
+  - F4 MEDIUM fail-open ordering: **fixed** — writePath and writeTarget check protected/scope before the scratchpad.
+  - F5 MEDIUM credential-read bypass: **fixed** — the Read path is realpathed before matching; read operands and `<`
+    redirects are credential-checked; bare env/printenv refused.
   - F7 MEDIUM comment-ownership (shared Mergincanli identity: can't tell a routine's comment from Mustafa's by the
     API): a genuine residual. The API shows the same author for both. Mitigation already in place: night edits only
     #16 and its own PRs, PR Advisor only its review comments on PRs, never #16. Note it in the report as a known
