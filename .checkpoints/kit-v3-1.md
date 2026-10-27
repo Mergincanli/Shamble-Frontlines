@@ -39,6 +39,26 @@
    three events (onFailure block, ${CLAUDE_PROJECT_DIR} path), syntax-gate path fix, effortLevel high. settings.test.mjs
    82 tests pass. Gate PASS.
 
+## SCOPE RESET (Advisor + Mustafa, 2026-10-27, authoritative — supersedes the allow-list design above)
+The security-review plugin kept finding option-surface gaps because the guard allow-listed shell file tools. The Advisor
+reset the scope: **finite, fixed, test-what's-allowed, no more hardening rounds.** Done in ee2a384:
+- Routine shell = git, gh, `npm ci` (exact), node/python on main's tracked scripts, date (clock). Everything else denied.
+- Reading/searching via the Read/Grep/Glob tools (credentials refused); editing via Edit/Write (protected refused).
+- Routines never read the web (WebFetch/WebSearch denied). Research is daytime-only (night shift stops doing R1-R6 web work).
+- Pushes to main / force / edits to .claude/ or CLAUDE.md denied; merges fail closed; nothing ask-first. PR-HOME kept.
+- Removed ~60 lines (ROLE_READ/ROLE_WRITE and all file-tool helpers, the web allow-list). Test suite: 190 (was 340+),
+  40 mutants, gate green. Day sessions unchanged.
+- **Residual risk (for the report):** a routine could still misuse an allowed program within its scope (e.g. a clever
+  git invocation), or read a project file that holds a secret the project shouldn't track. The platform's walls carry
+  the rest: isolated cloud machine, branch-scoped pushes, protected main, reviewed PRs. No further hardening rounds.
+- Model: kit-v3-1 (security-heavy) finishes on Opus 4.8; game/engine work moves to a new Opus 5.5 session.
+
+## Decisions taken by Mustafa/Advisor (2026-10-27, this session's chat)
+- **#27 MERGED** (merge commit 07ab240); R7 is on main; R1-R6 unblocked. Unsubscribed from #27.
+- R7-MARKS (a); MANAGED (b) → RESIDUAL (guard lives in the repo, acceptable; Mustafa isn't a plan admin).
+- PR Advisor routine: switch off until the test run passes. **The API refused me (http_api-created routine); Mustafa
+  must do it** at https://claude.ai/code/routines/trig_01YPyWAsQmsaQoydhMGG3CkJ.
+
 ## Current step
 7. Build step 3 (in progress): NIGHT_SHIFT.md role check (check 0) + 08:10 window + guard/no-prompts note DONE. Still to
    do: NIGHT_SHIFT saver-stop via TaskStop, mark-ready via MCP; advisor.md (PR step 0 role check; the new gate bar); CHECKPOINTS.md
