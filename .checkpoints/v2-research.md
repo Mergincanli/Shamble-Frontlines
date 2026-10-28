@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 15:55 Amsterdam
+- **Last update:** 2026-10-28 16:15 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -57,8 +57,8 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe (180 F, 37 REC, 67 OQ; 161 read, 48 not read) | pending: six verifiers prepared (workflow `v2-research-r1-verify-run1.js`), launch 07:35 | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 5/5 | not yet: run wf_bce24fc0-5c6 cut off by the spend limit mid-assembly (notes + scratchpad r2asm/ kept) | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer running; fix next | `prompts/verifier-r1-*.txt` |
+| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c | verifier-r2 + security-auditor running (run wf_bce24fc0-5c6); rust-reviewer running | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -104,10 +104,13 @@ key (condition A1).
   the Advisor, relayed by Mustafa, 2026-10-28 about 15:50 Amsterdam.
 
 ## Running work
-- Resumed 2026-10-28 15:50 Amsterdam (the 07:35 wake reached the session only at 15:49; Mustafa: "Try again").
-- R2 chain: run wf_bce24fc0-5c6 resumed (task wqyaqsrsi), same script `v2-research-r2-chain-run1.js`: assemble (from the
-  assembler's notes and scratchpad `r2asm/`), then verifier-r2 + security-auditor-r2. At most 2 agents at once.
-- R1 verify: run wf_3fe63170-264 (task wbg2rrlcu), script `v2-research-r1-verify-run1.js`: six verifiers (high), one per
-  R1 question, at most 2 at once. Resume: Workflow({scriptPath, resumeFromRunId: "wf_3fe63170-264"}).
-- rust-reviewer-r1-r2: prompt saved; launch once `docs/research/r2-netcode.md` exists (then 5 agents at most at once).
+- R2 chain: run wf_bce24fc0-5c6 (task wqyaqsrsi): assembly done (r2-netcode.md, 7907f5c); verifier-r2 and
+  security-auditor-r2 running.
+- Rust review: run wf_38e94d0f-403 (task wjewm59xi), script `v2-research-rust-review-run1.js`: rust-reviewer (xhigh) on
+  R1 and R2's server stack.
+- R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
+  `verifier-r1-<unit>.md`.
+- Next: R1 fixer (engine-architect, xhigh) once the rust-reviewer is back; R2 fixer (netcode-architect, xhigh) once
+  verifier-r2, security-auditor and rust-reviewer are back; second verifier pass only where a fix changed a
+  recommendation, a number or a source. At most 4–5 agents at once (the Advisor, 2026-10-28).
 - Saver: restarted 15:50 Amsterdam (task b407vq1jx), stops after 110 minutes.

@@ -92,3 +92,24 @@ S-Q3-SNAP Q3 sv_snapshot.c (read 2026-10-28): `if ( !CM_AreasConnected( clientar
 S-SRC-TV hltvdirector.cpp (read 2026-10-28): `static ConVar tv_delay( "tv_delay", "30", 0, "SourceTV broadcast delay in seconds", true, 0, true, HLTV_MAX_DELAY );` / "// broadcast time is current time - delay time" `newBroadcastTick -= TIME_TO_TICKS( m_fDelay );` -> C24 CONFIRMED.
 S-TF2-SHARED tf_player_shared.cpp (read 2026-10-28, first 100k of 451k): `BEGIN_SEND_TABLE_NOBASE( CTFPlayerShared, DT_TFPlayerSharedLocal )` / `BEGIN_SEND_TABLE_NOBASE( CTFPlayerShared, DT_TFPlayerShared )` / `SendPropInt( SENDINFO( m_nDisguiseTeam ), 3, SPROP_UNSIGNED ),` / `SendPropInt( SENDINFO( m_nDisguiseClass ), 4, SPROP_UNSIGNED ),` / `SendPropDataTable( "tfsharedlocaldata", 0, &REFERENCE_SEND_TABLE( DT_TFPlayerSharedLocal ), SendProxy_SendLocalDataTable ),` -> INT-F12 lines CONFIRMED; reach-all-clients still inferred (as R2 says).
 S-PLAYFAB-LOGIN learn.microsoft.com PlayFab login best practices (ms.date 2025-02-20, updated_at 2025-10-31; read 2026-10-28): "They require *zero* input from the player, so there's no friction to the first time user experience" / "If the player loses or breaks their device, the account is lost" / "Your game should use an *anonymous* login for creating a new account and linking new devices to an existing account." / "you must generate your custom IDs with care. If they're too simple, you risk hackers stealing the accounts of others." / "rather than relying on a user's custom ID remaining a shared secret." -> C14 CONFIRMED (italics in source). Supports: the guest secret is a bearer credential; where it is stored matters (F-GUEST-STORE).
+S-GL-PS GameLift API_PlayerSession (read 2026-10-28): "**RESERVED** -- The player session request has been received, but the player has not yet connected to the server process and/or been validated." / "**TIMEDOUT** -- A player session request was received, but the player did not connect and/or was not validated within the timeout limit (60 seconds)." / PlayerData "Length Constraints: Minimum length of 1. Maximum length of 2048." -> C26 CONFIRMED.
+
+## Working list of gaps (drafted 2026-10-28, before WS crate check)
+G1 BACKTRACK: +-200 ms tolerance + client-chosen interp delay + inflatable RTT -> low-ping cheat always gets full cap (High).
+G2 SPREAD seed open (OQ11) -> must be server-only (High if shared).
+G3 No network limits: per-connection datagram/message rate, inbound datagram size, reliable message size, streams per session, conns per IP, pre-auth deadline, idle timeout (High).
+G4 WS fallback weaker: no Origin check, no wss rule, no frame/message size cap, app-level RTT only (Medium-High).
+G5 WT Origin check found (F36) but in no recommendation; absent-Origin case (Medium).
+G6 Command validation list incomplete: move magnitude, press-counter jumps, cooldown/ammo on fire edges, aim bounds, ack validity, sequence monotonic/wrap (Medium-High).
+G7 Lag-switch / burst catch-up (OQ3 open) (Medium).
+G8 Unbounded per-client reliable event queue "until acked" (Medium).
+G9 Projectile/tracer/shot-event origins leak hidden shooters (Medium).
+G10 Guest secret in localStorage vs OWASP (Medium).
+G11 Room-code brute force: per-client limit only, guests free -> Sybil (Medium).
+G12 Token scheme: shared key vs asymmetric, alg pinning, replay cache bound and order (Medium).
+G13 Panic from decoder kills room; no fuzz mark (Medium).
+G14 No detection telemetry in protocol (Medium/Low).
+G15 Client-side aim assist shapes the aim point -> indistinguishable from aimbot (Low).
+G16 Follow-mode spectator of enemies live = ghosting (Medium/Low).
+G17 Relevance circle exceeds view (radar for behind/off-screen) (Low, accepted trade-off).
+G18 Logs: guest secret & raw payloads not covered; constant-time compares (Low).
