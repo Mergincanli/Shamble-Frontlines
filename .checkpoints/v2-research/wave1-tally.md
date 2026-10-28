@@ -20,7 +20,11 @@ Task: wave 1 step 5 (tally: shape, share unsupported, what went unread) and the 
   from the recommendations (R1: 7 open questions R1-RR-OQ1–OQ7; R2: version floors, panic policy, bounded queues).
 - Every wrong or unsupported claim a recommendation rested on was re-sourced or turned into an open question
   (R1: 2 re-sourced, 1 open question, 3 fixed in place; R2: 2 re-sourced, 1 open question).
-- Second pass: see `verifier-r1-second-pass.md` and `verifier-r2-second-pass.md` (counts added when they return).
+- Second pass (only what the fix changed; reports `verifier-r{1,2}-second-pass-result.md`): R1 42 confirmed, 2 wrong,
+  1 unsupported (an absence), 11 label only; R2 17 confirmed, 2 wrong, 2 unsupported, 25 label only. Every wrong or
+  unsupported item was new text written at the fix step (a re-sourced finding's extra clause, a rewritten reason or
+  caveat), none was a first-pass claim. Lesson for wave 2's fix step: a fix that rewrites a reason or adds a caveat
+  needs the same exact-quote discipline as research, and the check after it.
 
 ## What went unread
 - R1: 48 sources not read (of the 53 entries the units listed); R2: 26.

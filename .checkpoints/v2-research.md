@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 17:20 Amsterdam
+- **Last update:** 2026-10-28 21:05 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -73,7 +73,9 @@ key (condition A1).
   list. The units used other copies where they could (Valve's SDK code on GitHub, a community GAS write-up). The
   assemblers list every recommendation that hinges on an unread source; the full list goes to the Advisor with the
   wave-1 tally.
-- Spend: the org's spend limit cut all 11 units at once about 7 minutes after launch; reset at 21:20 UTC.
+- Spend: the org's spend limit cut all 11 units at once about 7 minutes after launch (2026-10-27; reset 21:20 UTC),
+  and cut 5 agents again on 2026-10-28 at about 16:26 UTC (R3, R4, R6 owners; the second pass had just finished),
+  reset 20:00 UTC. Now 4 agents at once.
 
 ## Key numbers
 - Wave 1 agents planned: 11 units + 2 assemblers + 4 checkers + 2 fixers + up to 2 second passes (about 21).
@@ -122,15 +124,27 @@ key (condition A1).
   `-r2.md`): R1 5 new findings, 9 basis claims without a first-pass verifier "confirmed" (incl. ECS-F7, F19, F20,
   BND-F32 added to Rests-on lists at the fix), 46 changed basis findings, 29 changed recs; R2 5 new, 1 (TRN-F36), 32
   changed, 27 changed recs. Prompts `prompts/verifier-r{1,2}-second-pass.txt` (WebFetch only, no curl, pending
-  VERIFY-FETCH); script `v2-research-second-pass-run1.js`; verifier R1 high, R2 xhigh, 2 agents. Launched 17:09
-  Amsterdam: run wf_64d0bbcd-730 (task w1wa82dkw); notes `verifier-r{1,2}-second-pass.md`.
+  VERIFY-FETCH); script `v2-research-second-pass-run1.js`; verifier R1 high, R2 xhigh, 2 agents. Run wf_64d0bbcd-730
+  DONE (2/2, 17:24 Amsterdam), reports verbatim in `verifier-r{1,2}-second-pass-result.md`. Both PASS WITH NOTES:
+  R1 42 confirmed, 2 wrong (DET-F34's stream note, so DET-REC4 and options Q4; DATA-REC6's file:// clause), 1
+  unsupported (ECS-F34, an absence), 11 label only; R2 17 confirmed, 2 wrong (SYNC-F36's "200 ms of movement" clause;
+  ROOM-REC3's "no header option": the W3C spec has `headers`), 2 unsupported (TRN-REC3 "Safari only" HTTP/2; "no
+  transport RTT" on WebSocket), 25 label only; minor unmarked reasoning in several recs.
+- Fix 2 + final check: run wf_0ad9f0c0-59d (task w0uq5j48e), launched 21:03 Amsterdam, script
+  `v2-research-fix2-run1.js`: pipeline per topic, the owner's second fix (xhigh; prompts `prompts/*-r{1,2}-fix2.txt`,
+  notes `*-fix2.md`), then a final check of only what it changed (verifier R1 high, R2 xhigh; prompts
+  `prompts/verifier-r{1,2}-final-check.txt`, notes `verifier-r{1,2}-final-check.md`).
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
-- Wave 2 owners R3, R4, R6: background agents launched 16:16 UTC (17:16 Amsterdam); notes `graphics-engineer-r3.md`,
-  `engine-architect-r4.md`, `infra-engineer-r6.md`; question drafts `<agent>-r<n>-<prefix>-draft.md`.
+- Wave 2 owners R3, R4, R6: background agents launched 16:16 UTC (17:16 Amsterdam); all three cut off by the org
+  spend limit at about 16:26 UTC (HTTP 429, "resets 8pm (UTC)"), notes saved: R3 Q1 drafted
+  (`graphics-engineer-r3-r3-wgpu-draft.md`), R6 Q1 drafted (`infra-engineer-r6-r6-host-draft.md`), R4 none yet.
+  Resumed by message at 20:03 UTC: R3 and R4. R6 waits for a slot (4 agents at once after this second cut-off); then
+  the R5 owner and its CI helper.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).
 - Night stop (condition A2): at 23:50 Amsterdam, stop every research agent still running and list it; restart after
   07:30 with its saved prompt plus "resume from your notes at <path>" (a send_later reminder is set for 23:50).
-- Saver: restarted 17:17 Amsterdam (task byo52kkev), stops after 110 minutes (about 19:07).
+- Saver: restarted 21:03 Amsterdam (task blnt2hgiq; the 17:17 one ended with the worker restart), stops after 110
+  minutes (about 22:53).
