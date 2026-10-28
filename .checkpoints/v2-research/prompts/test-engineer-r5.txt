@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: R5 owner: toolchain and quality
 # subagent_type: test-engineer · model: opus · effort: high
-# launched: not yet
+# launched: 2026-10-28T20:28:58Z as a background agent; launch message: "Your task is written, word for word, in /home/user/Shamble-Frontlines/.checkpoints/v2-research/prompts/test-engineer-r5.txt. It was saved before launch; the lines above "**Task:**" are the session's launch record. Read the whole file first, then follow it exactly as your task. It names your notes file: look there first, as it says."
 
 **Task:** research topic R5 (toolchain and quality) of SHAMBLE FRONTLINES v2 phase 0, as the approved plan says (/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md, wave 2: one owner agent per topic, covering all of the topic's brief questions). You are the owner: you write the topic file /home/user/Shamble-Frontlines/docs/research/r5-toolchain-quality.md. The brief's questions for this topic (quoted, docs/V2_PHASE0_BRIEF.md §4, row R5): "Repository layout (a Cargo workspace plus TypeScript with Vite); strict TypeScript and lint rules; clippy and rustfmt; tests (cargo test, property tests, Vitest, Playwright, golden tests against legacy); CI with Rust caching; **preview links per PR**; the gate v2 that replaces today's gate" Questions 5 and 6 (CI with Rust caching; preview links per PR) are drafted by an infra-engineer helper; you research the other five.
 

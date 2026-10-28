@@ -61,7 +61,7 @@
 | R1 | engine-architect | 6 | 6/6 | yes, a6a97fe; fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
 | R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read); fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer (high) | 1 owner, 7 question drafts | 7/7 (DONE 21:21) | yes, 605c09d (92 F, 25 REC, 33 OQ; 62 read: 61 official, 1 other; 22 not read) | spot-check pending (`prompts/verifier-r3.txt`) | `prompts/graphics-engineer-r3.txt` |
-| R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | running since 17:16 | no | pending | `prompts/engine-architect-r4.txt` |
+| R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | 5/5 (DONE 21:30) | yes, abdf477 (62 F, 18 REC, 23 OQ; 46 read: 36 official, 8 shipped game, 2 other; 32 not read) | spot-check pending (`prompts/verifier-r4.txt`; workflow `v2-research-r4-check-fix-run1.js` prepared) | `prompts/engine-architect-r4.txt` |
 | R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | not launched (waits for 2 slots) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
 | R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | running since 17:16 | no | pending | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
 Agent ids are internal to this session and are not written here; the saved prompt plus the notes path is the restart
@@ -147,7 +147,10 @@ key (condition A1).
   at 20:22 UTC. R3 spot-check then R3 fix: workflow run wf_1f477dcb-7cb (task wytqhqr2s, script
   `v2-research-r3-check-fix-run1.js`, prompts `prompts/verifier-r3.txt`, `prompts/graphics-engineer-r3-fix.txt`),
   launched 20:27 UTC. R5 CI helper: background agent launched 20:27 UTC (`prompts/infra-engineer-r5-ci.txt`, notes
-  `infra-engineer-r5-ci.md`). The R5 owner starts when R4 or R6 finishes (4 agents at once after this second cut-off).
+  `infra-engineer-r5-ci.md`). R4 DONE at 20:30 UTC (file abdf477; it departs from R1's Rapier assumption openly:
+  R4-PHYS-REC1 recommends parry3d plus own kinematic movement and lists the R1 recommendations it changes, a
+  consistency-critic item). R5 owner: background agent launched 20:31 UTC (`prompts/test-engineer-r5.txt`, notes
+  `test-engineer-r5.md`). Next slot: the R4 spot-check then fix (`v2-research-r4-check-fix-run1.js`). 4 agents at once.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).
