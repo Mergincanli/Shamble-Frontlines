@@ -124,7 +124,7 @@ only if it wins at 48 soldiers on screen.**
 Reason: separate parts are the measured legacy problem (CL6, TL15) and the inventory already points to rigid skinning
 (GA15); C-B uses only documented three.js features on both backends (F1, F3). Per-instance compute skinning is WebGPU
 only in three's example (F9), and the fallback lacks real compute (R3-GL2-F2), so it cannot be the only path.
-Rests on: R3-CHAR-F1, F2, F3, F8, F9; R3-GL2-F2, F3; legacy CL6, CL10, GA15, TL15.
+Rests on: R3-CHAR-F1, F2, F3, F4, F6, F8, F9; R3-GL2-F2, F3; legacy CL6, CL10, GA15, TL15.
 Serves: VISION_V2 §3 (48+ players, bots fill slots), §4, §6.7 (faction uniforms and variants as data: per-instance
 colour, F4, F6).
 Spike must prove (proposed): with 48 soldiers on screen in the benchmark scene, C-B uses at most 4 draw calls per

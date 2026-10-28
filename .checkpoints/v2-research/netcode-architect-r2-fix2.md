@@ -42,3 +42,18 @@ Batch F (part 7, header, TL;DR), applied:
 - nit · part 7: "awaiting the second verifier pass" line -> checked; one reading wrong (F36) (verifier ranked 2); intro sentence
 - nit · header status -> "verified (every recommendation claim)" + one line on the second pass; totals unchanged sentence; how-to-read markers; TL;DR "Reviewed and re-checked"
 Next: whole-diff review against backup, TL;DR line count, then DONE.
+- nit · reflowed 5 overlong paragraphs I touched (TRN-F40, SYNC-REC3, SYNC-REC5 view time, TRN-REC3 HTTP/2, part 7 new-findings line); table column counts checked
+- nit · first-round part 7 row R2-ROOM-F12: final state notes the second-pass correction
+Whole-diff review done: no stale "await" notes; header totals unchanged; TL;DR 5 lines.
+
+## Tally (by type, from the log above)
+- recommendation: 5 (BUD-REC1 lead sentence; BUD-REC1 pass mark; TRN-REC1 Origin reason; TRN-REC3 HTTP/2 reason; ROOM-REC3 reason)
+- number: 0
+- source: 0 (no page read by me; SYNC-F36, TRN-F36, TRN-F40, ROOM-F12 take the verifier's quotes from sources already listed or in verifier notes)
+- nit: 24
+## Became open questions: none. Re-sourced: none.
+## Not applied: 2V-§6 (BUD-REC4, BUD-REC5, TRN-REC6 name no VISION_V2 §6 item) -> left to the Advisor (R2-XU-OQ18), as in round 1. No verifier finding disputed.
+## Flag for the session: ROOM-REC3's reworded reason (verifier asked for a short re-check); BUD-REC1's pass mark changed.
+## Final header status: verified (every recommendation claim)
+Backup of the pre-round file: scratchpad r2fix2/r2-netcode.before-fix2.md. Nothing committed or pushed.
+DONE

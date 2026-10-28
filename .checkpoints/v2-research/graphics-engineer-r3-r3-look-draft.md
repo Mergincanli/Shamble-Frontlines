@@ -98,7 +98,7 @@ tool's count of `updateBefore`).
 
 ### Shared costs
 **R3-LOOK-F14.** Memory per full-screen half-float RGBA target is width × height × 8 bytes: 16.6 MB at 1920 × 1080,
-33.2 MB at 2560 × 1440 (the renderer's own output buffer is half float by default, R3-WGPU-F14); each MRT output
+29.5 MB at 2560 × 1440 (the renderer's own output buffer is half float by default, R3-WGPU-F14); each MRT output
 (normals, emissive) adds one such attachment, and 4 × MSAA (R3-WGPU-F15) multiplies the multisampled attachments by
 four. *Look brief pending.*
 · Source: R3-WGPU-F14, F15 · inferred (arithmetic; actual formats per attachment unmeasured).
