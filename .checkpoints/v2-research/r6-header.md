@@ -31,6 +31,8 @@ plus `docs/LOOP_V2.md` as a project input, not counted), 17 sources not read.
 - Wave 1's findings and recommendations are cited by id (R1-…, R2-…), never copied as R6 findings. Legacy ids (CD2,
   TL13, …) are rows of `docs/LEGACY_INVENTORY.md`; the inventory's marks are working recommendations (the Advisor's
   R7-MARKS (a)).
+- Inside a question's section (and its pointers), a bare id (F12, REC3, OQ2) is that question's id: in R6-OBS's
+  text, F8 means R6-OBS-F8.
 - Assumptions are numbered A-1 to A-11 across the questions and listed under each question's options.
 - Prices are research, not a commitment: no account was created and no service configured. EUR and USD stay apart (no
   exchange rate was read). Every price excludes VAT unless the source says otherwise.

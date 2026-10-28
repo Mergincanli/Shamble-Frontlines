@@ -67,3 +67,5 @@
 - Next: write TEL draft.
 - R6-TEL draft written: infra-engineer-r6-r6-tel-draft.md (F1-F2, REC1-3, OQ1-5, A-10, A-11). DONE for Q4. Next: R6-SEC (OQ1 only, no research) then assemble topic file docs/research/r6-infrastructure.md.
 - R6-SEC draft written: infra-engineer-r6-r6-sec-draft.md (OQ1 with R2 items by id). DONE for Q5. Next: assemble docs/research/r6-infrastructure.md via script from drafts.
+- Topic file assembled: docs/research/r6-infrastructure.md (1010 lines) from the five drafts via scratchpad assemble.py, with header fragment .checkpoints/v2-research/r6-header.md and sources fragment r6-sources.md. Totals: 43 findings, 13 recs, 23 OQs, 42 sources read (41 official, 1 other, 0 shipped game), 17 not read.
+DONE
