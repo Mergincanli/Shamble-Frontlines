@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: R1 second fix round
-# subagent_type: engine-architect · model: opus · effort: xhigh
+# subagent_type: engine-architect · model: opus · effort: xhigh · launched in workflow v2-research-fix2-run1.js
 # launched: not yet
 
 **Task:** the second fix round of wave 1 step 4 in the approved plan (/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md) for topic R1 (simulation core): you are the owner of /home/user/Shamble-Frontlines/docs/research/r1-simulation-core.md. Apply the second verifier pass's results to it. Edit that file in place.
