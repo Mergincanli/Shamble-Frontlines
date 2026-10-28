@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 21:50 Amsterdam
+- **Last update:** 2026-10-28 21:28 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -146,7 +146,7 @@ key (condition A1).
   Resumed by message at 20:03 UTC: R3 and R4; R3 DONE at 20:21 UTC (file committed 605c09d); R6 resumed by message
   at 20:22 UTC. R3 spot-check then R3 fix: workflow run wf_1f477dcb-7cb (task wytqhqr2s, script
   `v2-research-r3-check-fix-run1.js`, prompts `prompts/verifier-r3.txt`, `prompts/graphics-engineer-r3-fix.txt`),
-  launched 20:47 UTC. R5 CI helper: background agent launched 20:47 UTC (`prompts/infra-engineer-r5-ci.txt`, notes
+  launched 20:27 UTC. R5 CI helper: background agent launched 20:27 UTC (`prompts/infra-engineer-r5-ci.txt`, notes
   `infra-engineer-r5-ci.md`). The R5 owner starts when R4 or R6 finishes (4 agents at once after this second cut-off).
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
