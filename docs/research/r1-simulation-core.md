@@ -6,10 +6,11 @@
   (wave 1, step 2 "Assemble": nothing new is claimed; where units disagree, both findings stay and the conflict is an
   open question).
 - **Date:** 2026-10-27 (every source the units cite was read that day); fix step 2026-10-28 (the findings added or
-  re-read then carry that date).
-- **Status:** verified (every recommendation claim; 5 re-sourced claims await the second pass). Fix step 2026-10-28
-  (engine-architect, wave 1 step 4): the verifier's six reports and rust-reviewer's R1 review are applied; part 7 holds
-  their merged table.
+  re-read then carry that date); second verifier pass and second fix round the same day.
+- **Status:** verified (every recommendation claim). Fix step 2026-10-28 (engine-architect, wave 1 step 4): the
+  verifier's six reports and rust-reviewer's R1 review are applied; part 7 holds their merged table. Second verifier
+  pass and second fix round, 2026-10-28: its 2 wrong claims and 1 unsupported claim are fixed, none re-sourced (part 7,
+  "Second verifier pass (2026-10-28)"); the final check of that round found nits only (part 7, "Final check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R1):** "ECS or plain data
   (bevy_ecs, hecs, custom); a fixed tick rate; **identical results between Wasm and native** (floats, Rapier's
   determinism options); the Rust ↔ TypeScript boundary (shared memory, wasm-bindgen, generated TypeScript types);
@@ -23,18 +24,18 @@ in the brief's order. The boundary and the Web Worker were researched by one uni
 |---|---|---|---|
 | 1 | ECS or plain data (bevy_ecs, hecs, custom) | `ecs` | R1-ECS-F1–F35, REC1–REC4, OQ1–OQ7 |
 | 2 | a fixed tick rate | `tick` | R1-TICK-F1–F26, REC1–REC6, OQ1–OQ9 |
-| 3 | identical results between Wasm and native | `determinism` | R1-DET-F1–F34, REC1–REC7, OQ1–OQ10 |
+| 3 | identical results between Wasm and native | `determinism` | R1-DET-F1–F34, REC1–REC7, OQ1–OQ11 |
 | 4 | the Rust ↔ TypeScript boundary; running the simulation in a Web Worker | `boundary-worker` | R1-BND-F1–F35, REC1–REC6, OQ1–OQ9 |
 | 5 | a data-driven ability and effect system | `abilities` | R1-ABL-F1–F26, REC1–REC6, OQ1–OQ10 |
 | 6 | data formats and hot reload of tuning | `data-hotreload` | R1-DATA-F1–F29, REC1–REC8, OQ1–OQ12 |
 | – | conflicts and gaps between the units (added at assembly) | – | R1-XU-OQ1–OQ12 |
 | – | Rust risks the rust-reviewer found (added at the fix step) | – | R1-RR-OQ1–OQ7 |
 
-Totals: 185 findings (5 added at the fix step: R1-ECS-F35, R1-DET-F33, F34, R1-BND-F34, F35), 37 recommendations, 76
-open questions (55 from the units, 12 added at assembly, 9 at the fix step: R1-BND-OQ9, R1-DATA-OQ12, R1-RR-OQ1–OQ7;
-3 settled at the fix step: R1-ECS-OQ2, R1-XU-OQ5, R1-XU-OQ6), 161 sources read by the units (170 reads across the
-units; 9 were the same page read by a second or third unit) plus 10 reads at the fix step (3 new pages), 48 sources
-not read.
+Totals: 185 findings (5 added at the fix step: R1-ECS-F35, R1-DET-F33, F34, R1-BND-F34, F35), 37 recommendations, 77
+open questions (55 from the units, 12 added at assembly, 9 at the fix step: R1-BND-OQ9, R1-DATA-OQ12, R1-RR-OQ1–OQ7, 1
+at the second fix round: R1-DET-OQ11; 3 settled at the fix step: R1-ECS-OQ2, R1-XU-OQ5, R1-XU-OQ6), 161 sources read by
+the units (170 reads across the units; 9 were the same page read by a second or third unit) plus 10 reads at the fix
+step (3 new pages), 48 sources not read.
 
 **Reading rules (taken from the unit drafts).**
 - Sureness: "confirmed in the source" means the quoted words came back verbatim from the page (the fetch tool caps a
@@ -56,10 +57,9 @@ not read.
 ## TL;DR
 - Found: neither ECS crate orders its queries or clones its world; std trig, NaN bits and relaxed SIMD differ by
   platform and `HashMap` order by instance; Rapier matches across machines only with `enhanced-determinism`.
-- Recommended: one plain-data sim struct with sim-owned ids; one integer tick, spiked at 60 Hz beside 30 Hz; `libm`,
-  ChaCha8 and per-tick state hashes, no lockstep; one Worker handing the page one transferred block per tick; a reduced
-  GAS subset as data; JSON through one Rust content crate, hot reload in development only. All marks proposed; 12
-  conflicts and gaps between the units stay open (R1-XU-OQ1–OQ12).
+- Recommended (marks proposed): one plain-data sim struct, sim-owned ids; one integer tick, 60 Hz spiked beside 30 Hz;
+  `libm`, ChaCha8, per-tick state hashes, no lockstep; one Worker handing the page one transferred block per tick; a
+  reduced GAS subset as data; JSON through one Rust content crate, hot reload in development only; R1-XU-OQ1–OQ12 open.
 
 ## Findings
 
@@ -261,11 +261,13 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
   repository says "This repository was archived by the owner on Aug 25, 2025.", verifier 2026-10-28). Read 2026-10-27.
   Sure: confirmed in the source (short quotes).
 - **R1-ECS-F34.** No source read in this run gives a Wasm size or a compile time for bevy_ecs, hecs or a plain-data
-  core. Sure: confirmed (an absence across every source listed below), so all size and compile-time marks below are
-  proposed and must be measured.
+  core, so all size and compile-time marks below are proposed and must be measured. Sure: an absence across every source
+  listed below, which no quote can confirm (first verifier pass: not checkable; second pass, 2026-10-28: unsupported,
+  and harmless); so no recommendation rests on it (R1-ECS-REC1 cites it only to say why mark 5 measures; the label read
+  "confirmed" until the second fix round).
 
 #### Clone and clone_from (added at the fix step, 2026-10-28)
-- **R1-ECS-F35.** `#[derive(Clone)]` writes only `clone`, the default `clone_from` is a plain clone, and Rapier's
+- **R1-ECS-F35.** `#[derive(Clone)]` clones field by field, the default `clone_from` is a plain clone, and Rapier's
   `RigidBodySet` keeps that default. Quotes (std): "The `derive`d implementation of `Clone` calls `clone` on each
   field."; "`a.clone_from(&b)` is equivalent to `a = b.clone()` in functionality, but can be overridden to reuse the
   resources of `a` to avoid unnecessary allocations." RigidBodySet's `clone_from`: "Performs copy-assignment from
@@ -273,8 +275,10 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
   https://doc.rust-lang.org/std/clone/trait.Clone.html (std 1.99.1) and
   https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html (rapier3d 0.36.1, Trait
   Implementations). Tier: official. Read 2026-10-28 (fix step: rust-reviewer's risk 5 and the verifier's ECS finding 3
-  named the gap; settles R1-ECS-OQ2). Sure: confirmed in the source (the quotes and the source link); that a derived or
-  default `clone_from` therefore builds new buffers, so a Rapier set clone allocates, is inferred.
+  named the gap; settles R1-ECS-OQ2). Sure: confirmed in the source (the quotes and the source link); that derive
+  leaves `clone_from` at the default is our reading (the page says only that the derived Clone "calls clone on each
+  field"; the fix step's "writes only `clone`" was corrected at the second fix round), and that a derived or default
+  `clone_from` therefore builds new buffers, so a Rapier set clone allocates, is inferred.
 
 #### Legacy facts used (unit `ecs`)
 
@@ -805,15 +809,17 @@ conclusion drawn from confirmed parts.
   58cf8f9c3 2026-10-13) · official · read 2026-10-28 (fix step; replaces the "per process" part of F25, which both
   reviewers found wrong; agrees with R1-ECS-F23) · confirmed in the source. That two maps built in one process can
   therefore iterate the same keys in different orders is inferred (arbitrary order, F25, plus a seed per instance).
-- **R1-DET-F34.** rand_pcg's Pcg32 suits 32-bit and 64-bit CPUs, takes a stream number in its constructor and can
-  jump ahead. Quotes: "Pcg32 aka Lcg64Xsh32, officially known as pcg32, a general purpose RNG."; "This is a good choice
-  on both 32-bit and 64-bit CPUs (for 32-bit output)." (crate root); `pub fn new(state: u64, stream: u64) -> Self`:
-  "Construct an instance compatible with PCG seed and stream."; `advance`: "Multi-step advance functions (jump-ahead,
-  jump-back)" (Lcg64Xsh32) · Sources: https://docs.rs/rand_pcg/latest/rand_pcg/ and
+- **R1-DET-F34.** rand_pcg's Pcg32 suits 32-bit and 64-bit CPUs and can jump ahead; it takes a stream number in its
+  constructor, but its docs warn that generators on different streams may be closely correlated. Quotes: "Pcg32 aka
+  Lcg64Xsh32, officially known as pcg32, a general purpose RNG."; "This is a good choice on both 32-bit and 64-bit CPUs
+  (for 32-bit output)." (crate root); `pub fn new(state: u64, stream: u64) -> Self`: "Construct an instance compatible
+  with PCG seed and stream."; "Note that two generators with different stream parameters may be closely correlated."
+  (`new`; the struct docs say it again); `advance`: "Multi-step advance functions (jump-ahead, jump-back)"
+  (Lcg64Xsh32) · Sources: https://docs.rs/rand_pcg/latest/rand_pcg/ and
   https://docs.rs/rand_pcg/latest/rand_pcg/struct.Lcg64Xsh32.html (rand_pcg 0.10.2) · official · read 2026-10-28 (fix
-  step; the verifier found REC4's Pcg32 fallback unbacked, since F28 quotes only Pcg64Mcg) · confirmed in the source.
-  That one stream number per purpose gives streams as independent as ChaCha's is inferred (the pages say nothing on
-  how streams relate).
+  step; the verifier found REC4's Pcg32 fallback unbacked, since F28 quotes only Pcg64Mcg) · confirmed in the source
+  (the correlation warning by the second verifier pass, 2026-10-28). Corrected at the second fix round: the fix step
+  had closed with "the pages say nothing on how streams relate", which that pass found wrong.
 
 #### Legacy facts used (unit `determinism`)
 
@@ -1120,11 +1126,12 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
 - **R1-BND-F35.** A Wasm memory's buffer is created with a detach key that names the Wasm memory. Quote: "Set
   buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"." (the algorithm "create a fixed length memory buffer", step
   5) · Source: https://webassembly.github.io/spec/js-api/ §5.3 "Memories" (WebAssembly JavaScript Interface, Editor's
-  Draft, 27 October 2026) · official · read 2026-10-28 (fix step; the verifier's boundary finding 1: REC2's one copy
-  per tick depends on the sim's memory not being handed over) · confirmed in the source for the step. That a transfer
-  of this buffer therefore throws is inferred: the rule that a keyed buffer cannot be detached by a transfer is in
-  ECMA-262 and the HTML standard, both outside the allow list. Either way, transferring the sim's memory would take it
-  from the worker (F15).
+  Draft dated 27 October 2026 when the fix step read it; the second verifier pass, the same day, found it dated 28
+  October 2026, the step unchanged) · official · read 2026-10-28 (fix step; the verifier's boundary finding 1: REC2's
+  one copy per tick depends on the sim's memory not being handed over) · confirmed in the source for the step. That a
+  transfer of this buffer therefore throws is inferred: the rule that a keyed buffer cannot be detached by a transfer
+  is in ECMA-262 and the HTML standard, both outside the allow list. Either way, transferring the sim's memory would
+  take it from the worker (F15).
 
 #### Legacy facts used (unit `boundary-worker`)
 
@@ -1611,7 +1618,7 @@ rests on official documentation and specifications, plus the legacy facts in §2
 |---|---|---|---|
 | **Shape** | A World of archetype tables (F3), systems in schedules, single- or multi-threaded executor (F7). | An archetype World with no scheduler; plain functions query it (F16, F17). | One sim-state struct: a fixed-slot soldier table sized by the mode, generational pools for vehicles, projectiles and effects (F28 shows the key scheme), per-team tables, static colliders with ids, the RNG state, the tick counter, the tick's event list; phases are plain functions called in a fixed order. |
 | **Deterministic order** | Not guaranteed (F4, F12); needs a sort in every outcome-deciding system, redone each run (F5); order ambiguities ignored by default (F6). Achievable, but every system has to opt in. | Arbitrary (F17); needs our own ordering (an index or a sort) on every outcome loop. | Storage order is iteration order (F25), and we control it. Still needs a rule against default-hasher HashMap iteration (F23); BTreeMap where a map is needed (F24). |
-| **Whole-state snapshot / restore** | The World is not Clone (F8). The proven route (bevy_ggrs) registers each type, keeps per-frame maps keyed by a rollback id and reconciles entities on load (F10). Unregistered state silently desyncs (F13), and change detection fires after every restore (F14). | The World is not Clone (F18). We would write a snapshot by hand, per component type, or serialize (F20); the freelist makes re-created ids match (F19). | Derive or write Clone over the whole struct; a hand-written clone_from into a preallocated copy reuses buffers (F26, F27; the derived and default clone_from do not, F35). Nothing lives outside the struct, so nothing can be "unregistered" (inferred: it holds only if the sim keeps no globals or statics, which is a code rule). |
+| **Whole-state snapshot / restore** | The World is not Clone (F8). The proven route (bevy_ggrs) registers each type, keeps per-frame maps keyed by a rollback id and reconciles entities on load (F10). Unregistered state silently desyncs (F13), and change detection fires after every restore (F14). | The World is not Clone (F18). We would write a snapshot by hand, per component type, or serialize (F20); the freelist makes re-created ids match (F19). | Derive or write Clone over the whole struct; a hand-written clone_from into a preallocated copy reuses buffers (F26, F27; that a derived or default clone_from does not is inferred from F35). Nothing lives outside the struct, so nothing can be "unregistered" (inferred: it holds only if the sim keeps no globals or statics, which is a code rule). |
 | **Ids across server and client** | Entity must not be lined up between instances (F9): a separate network id plus MapEntities mapping, as bevy_ggrs does (F10). | Ids can be aligned through the freelist (F19), but only while the live sets match exactly. | The sim defines the id (kind, index, generation, F28), and the same id is used on the wire, in events and in the TS client. |
 | **Serialization for snapshots** | An optional serialize feature (F7); Entity's serialized form has no format guarantee (F9). | Context-based serialization with a compact column format (F20). | serde on our own types, the route Rapier (F30) and slotmap (F28, inferred) use; the wire format and deltas are R2's. |
 | **Physics (if R4 picks Rapier)** | Rapier keeps its own sets either way (F29); the ECS holds handles and syncs transforms. | Same. | The Rapier sets are fields of the state struct, Clone and Serialize (F29, F30), so they join the same snapshot. |
@@ -1696,7 +1703,7 @@ ticks (F4).
 |---|---|
 | `StdRng` / thread RNG | "Non-portable", may change algorithm (F27): excluded |
 | `rand_chacha` ChaCha8Rng | portable, reference-tested (F28); 2^64 streams per seed and a settable position, so the RNG state is small and can be saved in a snapshot (inferred); speed not measured |
-| `rand_pcg` Pcg32 | portable, reference-tested (F28); a stream number in its constructor and a jump-ahead `advance`, and "a good choice on both 32-bit and 64-bit CPUs" (F34); `Pcg64Mcg` slow on 32-bit CPUs (F28; whether wasm32 counts is not stated) |
+| `rand_pcg` Pcg32 | portable, reference-tested (F28); a jump-ahead `advance` and "a good choice on both 32-bit and 64-bit CPUs" (F34); a stream number in its constructor, but "two generators with different stream parameters may be closely correlated" (F34), so stream numbers alone may not keep purposes apart (R1-DET-OQ11); `Pcg64Mcg` slow on 32-bit CPUs (F28; whether wasm32 counts is not stated) |
 | Port the legacy `_mulberry32` | tiny, but no source read on its quality; legacy uses it only for the editor (CM9) |
 
 #### Q5. Iteration order
@@ -1756,8 +1763,8 @@ command neither loses nor doubles a press (GP2).
 #### Q6. Cross-origin isolation
 - **G1 Not isolated:** B2 and C1 work everywhere; no header or embed constraints; timers at 100 µs (F30).
 - **G2 Isolated in production:** enables B3/C2; COOP `same-origin` + COEP `require-corp` (Safari, F22); every
-  cross-origin resource needs CORP or CORS and frames must be isolated too (F21); cross-origin popups lose their
-  opener (F23).
+  cross-origin resource loaded in `no-cors` mode needs CORP and frames must be isolated too (F21; CORS as another route
+  is our reading, not in F21's quotes: second fix round); cross-origin popups lose their opener (F23).
 - **G3 Isolated in development and previews only,** for 5 µs timers and the memory API in profiling (F20, F30),
   while production runs G1. The boundary code is the same either way if B2/C1 is chosen.
 
@@ -1875,12 +1882,13 @@ its "Rests on:" list and the VISION_V2 items it serves.
     plain Vecs (F21).
   - Both ECS crates leave iteration order unspecified (F4, F17), so determinism would need sorting or our own ordering
     in every outcome loop anyway (F5, F12). Plain tables iterate in the order we store (F25).
-  - The client's replay needs a cheap whole-state snapshot and restore. Neither World is Clone (F8, F18). The bevy
-    route (bevy_ggrs, a third-party rollback library, not bevy_ecs itself) is per-type registration with silent-desync
-    and change-detection traps (F10, F13, F14). A plain struct can be cloned into a preallocated copy that reuses its
-    buffers if its clone_from is written by hand: Vec's clone_from reuses its buffer (F26), while the derived and the
-    default clone_from do not (F27, F35). hecs narrows the gap (its ids can be made to match, F19, and it has a column
-    serializer, F20), but its World is not Clone either (F18).
+  - The client's replay needs a cheap whole-state snapshot and restore. Neither World is Clone (F8, F18). The bevy route
+    (bevy_ggrs, a third-party rollback library, not bevy_ecs itself) is per-type registration with silent-desync and
+    change-detection traps (F10, F13, F14). A plain struct can be cloned into a preallocated copy that reuses its
+    buffers if its clone_from is written by hand: Vec's clone_from reuses its buffer (F26), while the default clone_from
+    is "equivalent to `a = b.clone()`" (F27, F35), so a derived or default one does not reuse buffers (inferred from
+    F35; stated flatly until the second fix round). hecs narrows the gap (its ids can be made to match, F19, and it has
+    a column serializer, F20), but its World is not Clone either (F18).
   - Server and client need one shared id, which bevy's Entity is documented not to be (F9). The sim owning generational
     ids (F28) also gives static colliders the stable ids legacy lacked (CS7).
   - Rapier's sets are Clone and Serialize and slot straight into the struct (F29, F30).
@@ -1889,8 +1897,8 @@ its "Rests on:" list and the VISION_V2 items it serves.
     API is inferred (F1).
 
   Rests on: F1, F4, F5, F8, F9, F10, F12, F13, F14, F17, F18, F19, F20, F21, F25, F26, F27, F28, F29, F30, F32, F35
-  (plus F7, F33 and F34 for the size marks); the legacy facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4
-  for mark 3.
+  (plus F7 and F33 for the size marks; F34, an absence no quote can confirm, only says why mark 5 measures); the legacy
+  facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4 for mark 3.
   Serves VISION_V2 §6.1, §6.2, §6.3, §6.4, §6.5, §6.6 and §6.8, and §4 ("matches feel fair up to about 100 ms of
   ping", which needs reproducible replay).
 
@@ -1913,8 +1921,8 @@ its "Rests on:" list and the VISION_V2 items it serves.
      hash each tick) to an uninterrupted run over a 10-minute bot match, and serialize → deserialize → serialize is
      byte-identical.
   5. **Size and build.** The sim .wasm, with and without Rapier, after wasm-opt and gzip, is recorded and is smaller
-     than a stub of the same tick on bevy_ecs 0.20 with default features off (one build each, F33, F34). An
-     incremental native rebuild after a one-line change to a phase takes ≤ 10 s on the dev machine.
+     than a stub of the same tick on bevy_ecs 0.20 with default features off (one build each, F33; F34 found no figure
+     to cite). An incremental native rebuild after a one-line change to a phase takes ≤ 10 s on the dev machine.
 
 - **R1-ECS-REC2. Determinism rules for the layout, whatever option the ADR picks.**
   Every outcome-deciding loop iterates in a defined order: slot or pool index order, or a sort by a stable key. The
@@ -1998,8 +2006,9 @@ Hz roughly halves the CPU per simulated second (inferred: F8 gives only the dire
 cost per tick, which REC3's cadences change) and the replay work per correction (F24), and every legacy weapon still
 fits one shot per tick (tuning arithmetic), so it is the measured fallback. 64 Hz stays an open question (OQ1).
 Rests on: F3, F6, F8, F9, F12, F13, F24; legacy CS1, GN4, GW14, TL13, TL15, `WEAPONS`, `T`.
-Serves: VISION_V2 §4 (fair up to about 100 ms ping; 30+ fps minimum, 60 fps recommended), §6.1 (modes up to 48+ with
-bots), §6.2 (aiming and jumping at height), §6.4 (big vehicles: physics steps with the tick).
+Serves: VISION_V2 §4 (fair up to about 100 ms ping; 30+ fps minimum, 60 fps recommended), §3 (up to 24v24, with bots
+filling empty slots; the unit had glossed §6.1 this way, corrected at the second fix round: §6.1 is modes as data), §6.2
+(aiming and jumping at height), §6.4 (big vehicles: physics steps with the tick).
 A spike must prove (proposed pass marks; reference hardware proposed, to be named with R3, R5 and R6):
 - P1 server, native: N = 12 / 24 / 36 / 48 / 64 soldiers (bots with full AI, worst case: all in one combat cluster),
   plus 4 big vehicles and 200 live projectiles, on a DM_Tri-sized greybox, 36,000 ticks per run, 3 runs. At 60 Hz: p99
@@ -2130,8 +2139,10 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   decisions, ability procs); the RNG state (seed, stream, position) is part of the sim state and its hash. Presentation
   (effects, sound, camera shake, animation variety) uses its own client-side generator and never the sim's. The sim
   reads no clock: time is the tick counter times the fixed step; animation never moves a launch point or a hitbox. Pcg32
-  is the fallback if ChaCha8's cost shows up in the profile (portable, a stream number per generator, "a good choice on
-  both 32-bit and 64-bit CPUs": F34; whether its streams are as independent as ChaCha's is for the spike).
+  is a candidate fallback if ChaCha8's cost shows up in the profile (portable, "a good choice on both 32-bit and 64-bit
+  CPUs": F34), but not with one stream number per purpose: its docs warn that "two generators with different stream
+  parameters may be closely correlated" (F34). How a Pcg32 fallback would keep purposes apart is open (R1-DET-OQ11;
+  the second fix round removed the stream number as a merit and the "for the spike" deferral).
   Reason: `StdRng` is non-portable (F27); ChaCha8Rng is portable, reference-tested, with streams and a settable position
   (F28), so a snapshot can carry the RNG exactly (inferred); the legacy's shared `Math.random` and wall-clock reads are
   exactly what made same-seed matches differ (STATUS.md:70, GP14, GN6, GN8, GC5), and JS `Math.random` has no seed
@@ -2149,8 +2160,10 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   "per process", corrected at the fix step); `BTreeMap` order is the key order (F26); Rapier
   requires the same insertion order (F20) and parry's flag pulls an ordered map for the same reason (F23, inferred).
   Rests on: R1-DET-F20, F23, F25, F26, F33; legacy GP14. Serves: §3 (fair processing of 48+ players and bots), §6.5.
-  A spike must prove (proposed): REC1 (a) passes; because every std `HashMap` instance takes its own seed (F33), any two
-  runs, in one process or in two, also catch any order that leaks from a hash map.
+  A spike must prove (proposed): REC1 (a) passes; because every std `HashMap` instance takes its own seed (F33), two
+  runs, in one process or in two, can iterate a hash map in different orders and so can catch an order that leaks from
+  one (inferred, not certain: F33 gives each map its own seed, not a different order every time; REC6's injected
+  `HashMap` iteration tests the catch itself; the second fix round softened "any two runs … also catch any order").
 - **R1-DET-REC6. Prove it with recorded matches and per-tick state hashes.** A determinism suite that every sim change
   runs: (1) a recorded match is the seed, the map and mode data, the content data's hash and the per-tick input stream;
   (2) after each tick the sim writes a canonical serialization of its whole state (fixed field order, floats by
@@ -2160,10 +2173,11 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   field-level diff of the two states; (5) unit vectors for `libm` and the RNG streams (REC2, REC4) run on the same
   targets.
   Reason: no source read gives a verification method (F24), so we define one; every `HashMap` instance takes its own
-  seed (F33), so the two native runs expose hash-map order (they would even in one process; the unit had tied this to
-  separate processes, corrected at the fix step); NaN and relaxed-SIMD effects differ by engine and hardware (F2, F4),
-  so the browsers themselves must be in the matrix; the legacy already showed that event logs on seeded runs expose
-  divergence (GN8).
+  seed (F33), so the two native runs can expose hash-map order, as two runs in one process could (inferred, not certain:
+  a seed per map does not promise a different order every run; the unit had tied this to separate processes, corrected
+  at the fix step, and the second fix round softened "expose" to "can expose"); NaN and relaxed-SIMD effects differ by
+  engine and hardware (F2, F4), so the browsers themselves must be in the matrix; the legacy already showed that event
+  logs on seeded runs expose divergence (GN8).
   Rests on: R1-DET-F2, F3, F4, F24, F25, F33; legacy GN8. Serves: §6.6 (balance telemetry: the numbers it records come
   from runs that can be re-run), §3 (the scale test at 48).
   A spike must prove (proposed): the suite runs REC1's matches and reports 0 mismatches on all targets; a deliberately
@@ -2238,9 +2252,11 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   outside the isolated game page (isolation needs COOP `same-origin`, F20, which severs cross-origin popups, F23;
   whether `same-origin-allow-popups` could keep a login popup on an isolated page is R1-BND-OQ9). Reason: isolation buys
   B3/C2, finer timers and the memory-measurement API (F20, F30), and it costs, on every browser: the page and its worker
-  scripts must carry the headers (F20, F24), every cross-origin resource needs CORP or CORS and frames must be isolated
-  too (F21), and cross-origin popups lose their opener (F23). Rests on: F12, F20, F21, F22, F23, F24, F26, F30. Serves:
-  §4 (four browsers including Safari), §5 (guest play first, login later). Spike must prove (proposed): if isolation is
+  scripts must carry the headers (F20, F24), every cross-origin resource loaded in `no-cors` mode needs CORP and frames
+  must be isolated too (F21; the unit's "or CORS" is not in F21's quotes and was cut at the second fix round), and
+  cross-origin popups lose their opener (F23). Rests on: F12, F20, F21, F22, F23, F24, F26, F30. Serves: §4 (four
+  browsers including Safari), §5 (guest play first, login later); no VISION_V2 §6 item names isolation, which matters
+  only through REC2's B2-against-B3 test (stated at the second fix round). Spike must prove (proposed): if isolation is
   adopted, `crossOriginIsolated` is true in all four browsers on a preview link, and the report-only run of a full match
   shows zero COEP violations.
 - **R1-BND-REC6. The worker owns the network connection in multiplayer and runs the same sim locally when offline
@@ -2473,11 +2489,11 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 - **R1-DATA-REC6. Content reaches the browser as a hashed, cached bundle, and every match records its content hash.**
   The build writes the validated content set as one bundle whose file name holds its hash, served as immutable (F27);
   at join the server names the hash the match uses; the worker checks the bundle against it (SHA-256 is available in
-  workers, but only in secure contexts, F29, so file:// and plain-HTTP LAN development need another path: OQ11) before
-  the simulation starts. Small or per-match data (private-match overrides, dev reloads) comes over
-  the game connection. Content is not embedded in the Wasm binary (F28), so tuning ships without a code release. Every
-  match record (§6.6 telemetry) stores the content hash and the mode id, so pick and win rates are grouped by tuning
-  version.
+  workers, but only in secure contexts, F29, so plain-HTTP LAN development needs another path; the second fix round
+  cut "file://" from this clause, see OQ11) before the simulation starts. Small or per-match data (private-match
+  overrides, dev reloads) comes over the game connection. Content is not embedded in the Wasm binary (F28), so tuning
+  ships without a code release. Every match record (§6.6 telemetry) stores the content hash and the mode id, so pick
+  and win rates are grouped by tuning version.
   *Reason:* client and server must run the same numbers for prediction; telemetry must know which numbers a match used.
   *Rests on:* F27, F28, F29.
   *Serves:* §6.1, §6.6, §6.7.
@@ -2609,6 +2625,11 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
 - **R1-DET-OQ10.** Does Wasm's `sqrt` instruction (what Rust's `sqrt` compiles to on wasm32, F17's `arch` list) match
   IEEE `squareRoot` exactly? F1 says Wasm follows IEEE 754, but the `sqrt` definition was not quoted in this run.
   Decided by REC2's unit vectors (and a re-read of the spec's `fsqrt` definition).
+- **R1-DET-OQ11.** (added at the second fix round) If ChaCha8's cost shows up in REC4's profile, how would a Pcg32
+  fallback keep the RNG's purposes apart? Its docs warn that "two generators with different stream parameters may be
+  closely correlated" (F34), so REC4's one stream per purpose does not carry over as is, and no source read in this
+  run says how to keep Pcg32 generators independent. Decided only if the profile asks for a fallback: by a source on
+  PCG stream and seed independence, read then; until then ChaCha8 alone (REC4).
 
 ### 4. The Rust ↔ TypeScript boundary, and the simulation in a Web Worker (unit `boundary-worker`)
 
@@ -2626,8 +2647,8 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
 - **R1-BND-OQ4. Which tsify line, if any, is maintained?** Two forks exist (F8). Only matters if ts-rs proves short.
   Decides: reading both repositories' activity (github.com, allowed) in the synthesis.
 - **R1-BND-OQ5. Will the game page ever need third-party embeds** (video, ads, analytics, social or payment widgets)
-  **or cross-origin popups?** Each would need CORP or CORS under isolation, or a separate page (F21, F23). Decides:
-  Mustafa (VISION_V2 §5) with R6.
+  **or cross-origin popups?** Each would need CORP under isolation (CORS as another route is our reading, not in
+  F21's quotes), or a separate page (F21, F23). Decides: Mustafa (VISION_V2 §5) with R6.
 - **R1-BND-OQ6. How big is one output block for the largest mode, and is the layout per entity or per field?** It
   depends on the entity caps (soldiers, multi-part vehicles, projectiles, events), on R2's snapshot contents and on
   R3's instancing needs. It decides whether the one copy per tick matters. Decides: the spike measures bytes per
@@ -2709,8 +2730,11 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
   (VISION_V2 §3 private matches, LOOP_V2). Decides it: the game-designer and Mustafa.
 - **R1-DATA-OQ11. The editor's double-click rule and Wasm.** EDITOR_V2 §5 keeps editor.html runnable by double-click;
   whether the Wasm validator loads from `file://` was not researched. Decides it: ADR-0002 (code structure and build)
-  and R5's build research. The same question covers REC6's hash check, since SHA-256 in the browser needs a secure
-  context (F29).
+  and R5's build research. REC6's hash check needs a secure context (F29); whether a `file://` page is one was not in
+  this unit's reading. The second verifier pass (2026-10-28) reports that MDN's Secure contexts page (last modified
+  2026-09-14) lists "`file:///path/to/resource.html` ✅ Secure (`file` URL)", so the fix step's link from the
+  secure-context rule to file:// was withdrawn at the second fix round; whether the worker and the Wasm load from
+  `file://` stays this question.
 - **R1-DATA-OQ12. Mid-match reload of simulation numbers in development.** (added at the fix step) REC5 swaps sim
   numbers inside a running match, on the server and the client at one tick; no VISION_V2 §6 item names live reload
   (§6.3 asks for tuning without code changes; LOOP_V2 §7's live Feel Lab covers client feel data). Is a swap at the
@@ -2980,9 +3004,12 @@ shortened; "—" means the reviewer had no row for that claim.
   same claims as the verifier's R1-DET-F25b and R1-BND-F2b): 2 re-sourced (R1-DET-F25b → R1-DET-F33, R1-BND-F15b →
   R1-BND-F34), 1 now an open question (R1-BND-F23c → R1-BND-OQ9), 3 fixed in place (R1-BND-F2b, whose wrong part no
   recommendation rested on; R1-ABL-C1 and C2, recommendation reasons rewritten to the source's words). Three more
-  claims were re-sourced to close gaps the reviewers named (R1-ECS-F35, R1-DET-F34, R1-BND-F35). No recommendation
-  rests on a claim whose final verdict is wrong or unsupported. The five re-sourced claims, and the recommendations
-  whose text, basis or pass marks changed, await the second verifier pass.
+  claims were re-sourced to close gaps the reviewers named (R1-ECS-F35, R1-DET-F34, R1-BND-F35). The five re-sourced
+  claims, and the recommendations whose text, basis or pass marks changed, then went to a second verifier pass
+  ("Second verifier pass (2026-10-28)", below): it found 2 more claims wrong and 1 unsupported, all fixed at the second
+  fix round. No recommendation rests on a claim whose final verdict is wrong or unsupported.
+- Rows: the unit tables' 243 rows from the fix step, plus 8 added at the second fix round (R1-ECS-F35, R1-DET-F33,
+  F34a, F34b, R1-BND-F32, F34, F35, and R1-DATA-REC6's file:// clause), each giving the second pass's verdict.
 
 ### 1. ECS or plain data (unit `ecs`)
 
@@ -3021,7 +3048,8 @@ shortened; "—" means the reviewer had no row for that claim.
 | R1-ECS-F31 | with enhanced determinism, the bytes are identical across machines | same page | verifier: confirmed with a note; rust-reviewer: confirmed | "If the `enhanced-determinism` feature of Rapier is enabled"…"the exact same byte vectors". The doc leaves out the condition "if your platform fulfill… | fixed: the platform condition added |
 | R1-ECS-F32 | Rapier 0.30.1 skipped part of its broad-phase state when serializing; fixed in 0.33 | github.com/dimforge/rapier/issues/910 | verifier: confirmed; rust-reviewer: confirmed | "Rapier version: 0.30.1"; "BvhWorkspace is not serialized"; "the BvhWorkspace::rebuild_frame_index value is actually important"; "It appears this woul… | confirmed; REC1 now cites it for Rapier's 0.x pace |
 | R1-ECS-F33 | generic code grows Wasm size; always measure; wasm-opt saves 15–20 % | rustwasm.github.io/book/reference/code-size.html | verifier: confirmed, but the "official" label is dated; rust-reviewer: confirmed | "…create a new copy of the function for each `T` type…"; "these copies add up quickly in terms of code size."; "Always measure!"; "can often get anoth… | fixed: tier marked archived (2025-08-25) |
-| R1-ECS-F34 | no source gives a Wasm size or compile time | a claim of absence | verifier: not checkable against a quote; none of the sources I re-read gives such a figure; rust-reviewer: — | — | not checkable (an absence); unchanged; REC1 mark 5 measures it |
+| R1-ECS-F34 | no source gives a Wasm size or compile time | a claim of absence | verifier: not checkable against a quote; none of the sources I re-read gives such a figure; rust-reviewer: — | — | not checkable (an absence); REC1 mark 5 measures it. Second pass: unsupported (harmless). Fixed at the second fix round: its "Sure" now says it is an absence no quote can confirm, and REC1 no longer lists it in "Rests on" |
+| R1-ECS-F35 (added at the fix step) | derive and default clone_from; RigidBodySet keeps the default | std Clone 1.99.1; docs.rs rapier3d 0.36.1 RigidBodySet | verifier: — (no first-pass row); second pass: confirmed; rust-reviewer: — (its risk 5 named the gap) | "The `derive`d implementation of Clone calls clone on each field."; RigidBodySet clone_from: "Performs copy-assignment from `source`.", source link to core's clone.rs | confirmed. Fixed at the second fix round: the head says "clones field by field" (the fix step's "writes only `clone`" was a reading), and REC1's "does not reuse buffers" is marked inferred |
 | GC2 | the legacy step at 48 soldiers took 0.80–1.00 ms mean | docs/reports/2026-10-16-three-teams-core.md:48 | verifier: confirmed; rust-reviewer: — | "48 soldiers (head): combat 0.80–1.00, p95 0.97–1.54" | confirmed; added to REC1's Rests on (mark 1) |
 | CS7 | every static collider has id −1 | docs/LEGACY_INVENTORY.md:175 | verifier: confirmed; rust-reviewer: — | "today every block is id -1" | confirmed; added to REC1's and REC3's Rests on |
 | GP14 | the step order decides outcomes; the sim shares Math.random with sound and FX | docs/LEGACY_INVENTORY.md:324 | verifier: confirmed; rust-reviewer: — | "because the order decides outcomes"; "the one shared Math.random, which sound and FX draw from" | confirmed; added to REC2's Rests on |
@@ -3103,11 +3131,14 @@ shortened; "—" means the reviewer had no row for that claim.
 | R1-DET-F25b | HashMap is "randomly seeded per process" | std HashMap | verifier: wrong; rust-reviewer: wrong (per instance) | const/static section: "each `HashMap` instance uses a different seed" | re-sourced: R1-DET-F33 (std HashMap: "each `HashMap` instance uses a different seed"); F25, REC5, REC6 and options Q5 corrected |
 | R1-DET-F26 | BTreeMap iterates in key order | std BTreeMap | verifier: confirmed; rust-reviewer: confirmed | "…stores its entries in key order."; iter: "…sorted by key." | confirmed; no change |
 | R1-DET-F27 | StdRng is not portable | docs.rs rand 0.10.3, StdRng | verifier: confirmed; rust-reviewer: confirmed | "Non-portable: any future library version may replace the algorithm…"; "…even with a fixed seed, output is not portable." | confirmed; no change |
-| R1-DET-F28 | rand_chacha and rand_pcg are portable; ChaCha has 2^64 streams and a settable position; Pcg64Mcg is slow on 32… | docs.rs rand_chacha 0.10.0, ChaCha8Rng, rand_pcg 0.10.2 | verifier: confirmed; rust-reviewer: confirmed | "These generators are all deterministic and portable … with testing against reference vectors."; set_stream: "…2^64 unique streams…" (the page shows "… | confirmed; REC4's Pcg32 fallback re-sourced: R1-DET-F34 |
+| R1-DET-F28 | rand_chacha and rand_pcg are portable; ChaCha has 2^64 streams and a settable position; Pcg64Mcg is slow on 32… | docs.rs rand_chacha 0.10.0, ChaCha8Rng, rand_pcg 0.10.2 | verifier: confirmed; rust-reviewer: confirmed | "These generators are all deterministic and portable … with testing against reference vectors."; set_stream: "…2^64 unique streams…" (the page shows "… | confirmed; REC4's Pcg32 fallback re-sourced: R1-DET-F34 (its stream note corrected at the second fix round: R1-DET-F34b, R1-DET-OQ11) |
 | R1-DET-F29 | The fixed crate has no trigonometry | docs.rs fixed 1.31.0 | verifier: confirmed; rust-reviewer: confirmed | "This crate does _not_ provide general analytic functions."; "No trigonometric functions are provided…" | confirmed; no change |
 | R1-DET-F30 | JavaScript Math differs between browsers and machines; Math.random takes no seed | MDN Math; MDN Math/random (not cited by the doc) | verifier: confirmed; rust-reviewer: — | "Many `Math` functions have a precision that's implementation-dependent."; Math/random: "…it cannot be chosen or reset by the user." | fixed: "no seed" confirmed on MDN Math.random (verifier's read) |
 | R1-DET-F31 | Lockstep needs bit-identical results; shipped PC games held them with IEEE floats; transcendental results diff… | gafferongames "Floating Point Determinism" (2010-02-24) | verifier: confirmed; rust-reviewer: — | Ken Miller (Pandemic): "absolutely identical results … least-significant bit of the mantissa", "…slightly different results for trancendental function… | fixed: tier relabelled "other" (R1-XU-OQ6 settled) |
 | R1-DET-F32 | Prediction gets corrected; lockstep desyncs | gafferongames "What Every Programmer Needs To Know About Game Networking" | verifier: confirmed; rust-reviewer: — | "running a subset of the game code for your player character…"; "invisibly 'rewinds and replays'…"; "…seldom corrected."; "one tiny difference results… | fixed: tier relabelled "other" (R1-XU-OQ6 settled) |
+| R1-DET-F33 (added at the fix step) | the HashMap seed is per instance | std HashMap 1.99.1, "Usage in `const` and `static`" | verifier: — (no first-pass row); second pass: confirmed; rust-reviewer: — | "each `HashMap` instance uses a different seed"; no sentence ties the seed to "process" | confirmed. REC5's mark and REC6's reason now say two runs "can" expose an order, marked inferred (second fix round) |
+| R1-DET-F34a (added at the fix step) | Pcg32 suits 32- and 64-bit CPUs, takes a stream in its constructor, can jump ahead | docs.rs rand_pcg 0.10.2, crate root and Lcg64Xsh32 | verifier: — (no first-pass row); second pass: confirmed; rust-reviewer: — | "This is a good choice on both 32-bit and 64-bit CPUs (for 32-bit output)."; `pub fn new(state: u64, stream: u64) -> Self`; "Multi-step advance functions (jump-ahead, jump-back)" | confirmed; no change |
+| R1-DET-F34b (added at the fix step) | "the pages say nothing on how streams relate" | Lcg64Xsh32 page | verifier: — (no first-pass row); second pass: wrong; rust-reviewer: — | `new`: "Note that two generators with different stream parameters may be closely correlated." (the struct docs say it again) | fixed: F34 quotes the warning; REC4's fallback and options Q4 no longer count the stream number as a merit; now an open question: R1-DET-OQ11 |
 | R1-DET-V3 | The goal is 12v12v12 or 24v24 (36 or 48 players) | docs/VISION_V2.md §3 | verifier: confirmed; rust-reviewer: — | "The goal: 12v12v12 or 24v24." | confirmed; no change |
 | R1-DET-V4 | Fair up to about 100 ms of ping | docs/VISION_V2.md §4 | verifier: confirmed; rust-reviewer: — | "[DEFAULT] Matches feel fair up to about 100 ms of ping." | confirmed; no change |
 | R1-DET-L1 | 11 wall-clock reads; shared Math.random; effects need their own RNG stream | docs/STATUS.md:70 | verifier: confirmed; rust-reviewer: — | ADR-001 inputs | confirmed; added to REC1's Rests on |
@@ -3116,7 +3147,7 @@ shortened; "—" means the reviewer had no row for that claim.
 | R1-DET-L4 | GN8: cull on and off give identical logs (69 and 207 events) | docs/LEGACY_INVENTORY.md:273 | verifier: confirmed; rust-reviewer: — | GN8 row | confirmed; added to REC6's Rests on |
 | R1-DET-L5 | GC5: 10.0, 12.0 and 13.1 shots per second against 13.9 | docs/LEGACY_INVENTORY.md:244 | verifier: confirmed; rust-reviewer: — | GC5 row | confirmed; no change |
 | R1-DET-L6 | TL13: at least 3 runs, N = 12/24/36/48, seeded bot matches on the native server | docs/LEGACY_INVENTORY.md:398 | verifier: confirmed; rust-reviewer: — | TL13 row | confirmed; added to REC1's Rests on |
-| REC4 fallback | Pcg32 as the fallback RNG | rand_pcg | verifier: not backed by F28, which quotes only Pcg64Mcg (finding 6) | crate root: Pcg32 "is a good choice on both 32-bit and 64-bit CPUs" | re-sourced: R1-DET-F34 |
+| REC4 fallback | Pcg32 as the fallback RNG | rand_pcg | verifier: not backed by F28, which quotes only Pcg64Mcg (finding 6) | crate root: Pcg32 "is a good choice on both 32-bit and 64-bit CPUs" | re-sourced: R1-DET-F34. Second pass: F34's closing note on streams wrong; fixed, and how a Pcg32 fallback keeps purposes apart is now an open question: R1-DET-OQ11 |
 
 ### 4. The boundary and the Web Worker (unit `boundary-worker`)
 
@@ -3158,7 +3189,10 @@ shortened; "—" means the reviewer had no row for that claim.
 | R1-BND-F28 | wasm-bindgen supports all four browsers | guide browser-support.md | verifier: confirmed; rust-reviewer: confirmed | "Firefox, Chrome, Safari, and Edge browsers are all supported by `wasm-bindgen`." | confirmed; no change |
 | R1-BND-F29 | WebTransport and WebSocket both work in workers | MDN WebTransport and WebSocket | verifier: confirmed; rust-reviewer: — | "This feature is available in Web Workers."; "Since March 2026, this feature works across the latest devices and browser versions." | confirmed; no change |
 | R1-BND-F30 | timers are 5 µs isolated and 100 µs not; a worker has its own time origin | MDN Performance.now | verifier: confirmed; rust-reviewer: — | "Security requirements"; intro, "the time when the worker is run in Worker and ServiceWorker contexts" | confirmed; added to REC2's Rests on |
+| R1-BND-F32 | `hardwareConcurrency` is not a hardware fact | MDN Navigator.hardwareConcurrency (last modified 2024-10-16) | verifier: — (no first-pass row); second pass: confirmed; rust-reviewer: — | "The browser may, however, choose to report a lower number of logical cores … so don't treat this as an absolute measurement of the number of cores in the user's system." | confirmed; no change (row added at the second fix round: R1-BND-REC1 rests on it) |
 | R1-BND-F33 | Vite bundles workers and Wasm and can set dev-server headers | vite.dev features and server-options (v8.3.4) | verifier: confirmed; rust-reviewer: — | Web Workers, "Import with Constructors"; WebAssembly, "Manual Initialization"; `server.headers` | confirmed; no change |
+| R1-BND-F34 (added at the fix step) | postMessage copies through structured clone | MDN Structured clone algorithm (2025-06-29) | verifier: — (no first-pass row); second pass: confirmed; rust-reviewer: — | first paragraph: "…to transfer data between Workers via postMessage()…"; no sentence on transferables, as the finding says | confirmed; no change |
+| R1-BND-F35 (added at the fix step) | a Wasm memory's buffer has a detach key | WebAssembly JS API §5.3 | verifier: — (no first-pass row); second pass: confirmed for the step; rust-reviewer: — | "create a fixed length memory buffer", step 5: "Set buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"." (the draft now dated 28 October 2026) | confirmed; the draft's date noted in F35 and in the fix-step sources table (second fix round); throw-on-transfer stays inferred |
 | CS1 | fixed step, button bitmask and input command declared but never wired | shamble-core.js:1479-1481 and the legacy inventory | verifier: confirmed; rust-reviewer: — | code | confirmed; no change |
 | GP2 | actions run at event time; press and release edges in v2 | legacy inventory, row GP2 | verifier: confirmed; rust-reviewer: — | row | confirmed; no change |
 | GP13 | rAF loop with variable dt clamped to 0.05 s; the world freezes for pause, shop, tutorial and hit-stop | shamble-game.js:3053 | verifier: confirmed; rust-reviewer: — | `loop()` | confirmed; no change |
@@ -3252,10 +3286,11 @@ shortened; "—" means the reviewer had no row for that claim.
 | R1-DATA-F26 | JSON.parse numbers lose precision | MDN JSON.parse | verifier: confirmed; rust-reviewer: — | Description > The reviver parameter: "may lose precision in the process." | confirmed; no change |
 | R1-DATA-F27 | immutable plus hashed URLs | MDN Cache-Control | verifier: confirmed; rust-reviewer: — | Response Directives > immutable: both sentences verbatim | confirmed; no change |
 | R1-DATA-F28 | include_bytes | doc.rust-lang.org (1.99.1) | verifier: confirmed; rust-reviewer: — | "Includes a file as a reference to a byte array." | confirmed; no change |
-| R1-DATA-F29 | SHA-256 in Web Workers, secure contexts only | MDN SubtleCrypto.digest | verifier: confirmed; rust-reviewer: — | "This feature is available in Web Workers."; "available only in secure contexts (HTTPS)" | confirmed; REC6 now carries its secure-context caveat |
+| R1-DATA-F29 | SHA-256 in Web Workers, secure contexts only | MDN SubtleCrypto.digest | verifier: confirmed; rust-reviewer: — | "This feature is available in Web Workers."; "available only in secure contexts (HTTPS)" | confirmed; REC6 now carries its secure-context caveat (its "file://" part, wrong per the second pass, cut at the second fix round) |
 | Legacy facts | legacy row Legacy facts | repo | verifier: confirmed; rust-reviewer: — | shamble-game.js:41 rulesMerge Object.assign; shamble-core.js:180 envMerge; shamble-game.js:661 version:1, read nowhere in shamble-*.js; shamble-editor… | confirmed; no change |
 | VISION_V2 §4, 100 ms | docs/VISION_V2.md:54 | VISION_V2 §4, 100 ms | verifier: confirmed; rust-reviewer: — | "`[DEFAULT]` Matches feel fair up to about 100 ms of ping." | confirmed; no change |
 | Design references | legacy row Design references | repo | verifier: confirmed; rust-reviewer: — | LOOP_V2.md:8 "one data table"; LOOP_V2 §7 Feel Lab `[DECIDED]`; EDITOR_V2 §2 rule 1, §3 validation panel ("the 6 m gap rule"), §4, §5; STATUS.md:96 SE… | confirmed; EDITOR_V2 §2 rule 1 and §3 added to REC1's and REC7's Rests on |
+| REC6 file:// (added at the fix step) | "file:// and plain-HTTP LAN development need another path" (a secure context is needed) | MDN Secure contexts (last modified 2026-09-14) | verifier: — (no first-pass row); second pass: wrong for file://; rust-reviewer: — | its table of top-level documents: "`file:///path/to/resource.html` ✅ Secure (`file` URL)"; the plain-HTTP LAN part follows from F29 | fixed: "file://" cut from REC6 (plain-HTTP LAN kept, F29); R1-DATA-OQ11's matching sentence corrected |
 
 ### Other reviewer findings and what the fix step did
 - **Rests-on lists completed** (verifier, every unit): R1-ECS-REC1 (F7, F19, F20, F32, F35, the legacy kinds, CS7, GC2,
@@ -3294,6 +3329,106 @@ shortened; "—" means the reviewer had no row for that claim.
   depend on a fixed processing order (our inference).
 - **The GAS facts still come from one community write-up** (verifier abilities finding 9): Epic's documentation is
   outside the allow list; R1-ABL-OQ1 stands.
+
+### Second verifier pass (2026-10-28)
+The verifier re-checked everything the fix step changed: the five findings it added (A), the claims recommendations
+rest on that had no first-pass "confirmed" (B), the findings whose text changed (C), one new claim inside a
+recommendation (D), the change log's number lines (E) and this part's counts (F). Scope list:
+`.checkpoints/v2-research/second-pass-scope-r1.md`; report: `verifier-r1-second-pass-result.md`, every quote in full in
+`verifier-r1-second-pass.md`. Verdict: PASS WITH NOTES. Each verdict below is as the verifier gave it; "Final state" is
+after the second fix round (engine-architect, 2026-10-28).
+
+| Scope | Claim id | Claim | Source | Verdict (second pass) | Location or exact words | Final state |
+|---|---|---|---|---|---|---|
+| A | R1-DET-F33 | the HashMap seed is per instance | std HashMap 1.99.1 | confirmed | "Usage in `const` and `static`": "As explained above, `HashMap` is randomly seeded: each `HashMap` instance uses a different seed, which means that `HashMap::new` normally cannot be used in a `const` or `static` initializer."; no sentence ties the seed to "process" | confirmed; no change |
+| A | R1-BND-F34 | postMessage copies through structured clone | MDN Structured clone algorithm (last modified 2025-06-29) | confirmed | first paragraph: "The structured clone algorithm copies complex JavaScript objects. It is used internally when invoking structuredClone(), to transfer data between Workers via postMessage(), …"; the page has no sentence on transferables, as the finding says | confirmed; no change |
+| A | R1-BND-F35 | a Wasm memory's buffer has a detach key | WebAssembly JS API §5.3 | confirmed for the step | "create a fixed length memory buffer", step 5: "Set buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"."; the draft now reads "Editor's Draft, 28 October 2026" (the file said 27 October; date only) | fixed: the date noted in F35 and in the fix-step sources table, row F3 |
+| A | R1-ECS-F35 | derive and default clone_from; RigidBodySet keeps the default | std Clone 1.99.1; docs.rs rapier3d 0.36.1 | confirmed | "The `derive`d implementation of Clone calls clone on each field."; "`a.clone_from(&b)` is equivalent to `a = b.clone()` in functionality, but can be overridden to reuse the resources of `a` to avoid unnecessary allocations."; RigidBodySet clone_from: "Performs copy-assignment from `source`.", source link `https://doc.rust-lang.org/nightly/src/core/clone.rs.html#245-247` | confirmed; fixed (minor point on REC1): the head says "clones field by field" and "derive leaves clone_from at the default" is marked our reading |
+| A | R1-DET-F34a | Pcg32 suits 32- and 64-bit CPUs, takes a stream in its constructor, can jump ahead | docs.rs rand_pcg 0.10.2 (crate root and Lcg64Xsh32) | confirmed | "This is a good choice on both 32-bit and 64-bit CPUs (for 32-bit output)."; `pub fn new(state: u64, stream: u64) -> Self` "Construct an instance compatible with PCG seed and stream."; "Multi-step advance functions (jump-ahead, jump-back)" | confirmed; no change |
+| A | R1-DET-F34b | "the pages say nothing on how streams relate" | Lcg64Xsh32 page | **wrong** | `new` docs: "Note that two generators with different stream parameters may be closely correlated." (the struct docs say it again) | fixed: F34 quotes the warning; R1-DET-REC4's fallback and options Q4 no longer count the stream number as a merit; now an open question: R1-DET-OQ11 |
+| B | R1-BND-F15 | a transfer moves the buffer and the sender loses it; typed arrays; WebTransport streams | MDN Transferable objects | confirmed (first-pass quotes, text unchanged) | the unsupported F15b clause is gone; R1-BND-REC3 now rests on F34 | confirmed; no change |
+| B | R1-BND-F2 | version match since 0.2.128; 0.2.123 breaking; dates; year from the asset timestamps | GitHub releases list | confirmed | "This rejects the invalid widening but is a breaking change for callers that relied on widening `&mut` references."; "10 Apr" … "25 Sep"; asset timestamp "2026-09-25T07:11:34Z"; the 0.2.122 notes have no "breaking" | confirmed; no change |
+| B | R1-BND-F23 | `same-origin` severs popups; `same-origin-allow-popups` is for OAuth and payments | MDN COOP (last modified 2026-07-12) | confirmed | "A document with `same-origin` will always open a document with `unsafe-none` in a new BCG."; "…For example, when using a cross-origin service for OAuth or payments."; F23c survives only as the correction note and R1-BND-OQ9, and R1-BND-REC5 does not use it | confirmed; no change |
+| B | R1-BND-F32 | hardwareConcurrency is not a hardware fact | MDN (last modified 2024-10-16) | confirmed | "The browser may, however, choose to report a lower number of logical cores … so don't treat this as an absolute measurement of the number of cores in the user's system." | confirmed; row added to the boundary table |
+| B | R1-DET-F25 | random seed, arbitrary order, hasher per map | std HashMap | confirmed | "The algorithm is randomly seeded, and a reasonable best-effort is made…"; "per-`HashMap` basis"; "per process" is gone from F25, R1-DET-REC5 and R1-DET-REC6 | confirmed; no change |
+| B | R1-ECS-F19 | hecs freelist and its condition | docs.rs hecs 0.11.2 World | confirmed | "Entity handles will be allocated deterministically between different worlds (e.g. across serialization)"; "May only be called when the set of live entity IDs exactly matches those that were live" | confirmed; no change |
+| B | R1-ECS-F20 | World has no Serialize; column format | hecs serialize and column pages | confirmed | "Components are not necessarily serializable, so we cannot directly implement serde::Serialize for World."; "Available on crate feature `column-serialize` only." | confirmed; no change |
+| B | R1-ECS-F34 | no source gives a Wasm size or compile time | a claim of absence | unsupported (an absence cannot be quoted; harmless, since it only makes the size marks proposed) | — | fixed: its "Sure" says it is an absence no quote can confirm; R1-ECS-REC1 no longer lists it in "Rests on" (a note says why mark 5 measures) |
+| B | R1-ECS-F7 | single-threaded executor; multi_threaded off by default | docs.rs bevy_ecs 0.20.0 | confirmed | "Runs the schedule using a single thread."; the four defaults are async_executor, backtrace, bevy_reflect and std | confirmed; no change |
+| C | R1-ABL-F2, F3, F14, F16; R1-BND-F33; R1-DATA-F15; R1-DET-F8, F31, F32; R1-TICK-F1, F3 (11) | a label, location, date or tier changed | — | label only | — | no change |
+| C | R1-ABL-F4, F5, F15, F18; R1-BND-F24, F27; R1-DATA-F5; R1-DET-F5, F30; R1-ECS-F30, F31, F33; R1-TICK-F12, F16 (14) | changed words | the first-pass notes | confirmed from the first-pass notes, no fetch | abilities notes l.8, l.50, l.19, l.22; boundary l.35, l.43; data l.6; determinism l.12, l.51; ecs l.36, l.37, l.42; tick l.33, l.22 | confirmed; no change |
+| C | R1-ABL-F17 | high-latency players re-activate on a cooldown the server still holds | GAS README §11.1.1, question 7 | confirmed at the source | question: "In scenarios of high latency, this would let the Owning Client "try" to activate the ability again when its local cooldown expires" + "but it is still on cooldown on the Server."; answer: "The short answer there is not a way to prevent this and Paragon definitely had the problem." / "Higher latency connections would have a lower ROF with basic attacks." | confirmed; no change |
+| C | R1-BND-F8 | tsify's `js` feature | docs.rs tsify | confirmed at the source | "`js` enables serialization through serde-wasm-bindgen and generates the appropriate types for it." | confirmed; no change |
+| C | R1-BND-F9 | ts-rs's minimum Rust version | docs.rs ts-rs | confirmed at the source | "The Minimum Supported Rust Version for this crate is 1.88.0" | confirmed; no change |
+| C | R1-BND-F17 | a shared memory import must be declared shared | threads proposal Overview.md | confirmed at the source | "It is a validation error to attempt to import shared linear memory" "if the module's memory import doesn't specify that it allows shared memory." | confirmed; no change |
+| C | R1-BND-F19 | wasm32-unknown-unknown builds with panic=abort | rustc book | confirmed at the source | "By default the `wasm32-unknown-unknown` target is compiled with `-Cpanic=abort`." | confirmed; no change |
+| C | R1-DATA-F12 | ron's version | docs.rs ron | confirmed at the source | "ron 0.12.3", dated "28 October 2026" | confirmed; no change |
+| C | R1-DET-F9 | std `tan` is libc's `tanf` | std f32 | confirmed at the source | "This function currently corresponds to the `tanf` from libc on Unix and Windows." | confirmed; no change |
+| C | R1-DET-F11 | `algebraic_add`'s release | std f32 | confirmed at the source | marked "1.98.0 (const: 1.98.0)" | confirmed; no change |
+| C | R1-DET-F12 | NaN behaviour is non-deterministic on Wasm | RFC 3514 | confirmed at the source | "Also note that in some cases even the underlying target behavior is non-deterministic, namely on wasm." | confirmed; no change |
+| C | R1-DET-F14 | `clamp` panics | std f32 | confirmed at the source | "Panics if `min > max`, `min` is NaN, or `max` is NaN." | confirmed; no change |
+| C | R1-DET-F21 | `simd8` is its own determinism domain | Rapier determinism page | confirmed at the source | "…which changes the SIMD lane width and is therefore its own determinism domain." | confirmed; no change |
+| C | R1-DET-F23 | Rapier's workspace pins and its fast-math comment | Rapier workspace Cargo.toml | confirmed at the source | pins 0.36.1, parry3d 0.31.1, nalgebra 0.35, simba 0.10.2 and glamx 0.3.1; fast-math "re-enables FMA contraction in glam's sse2 backend (a cross-platform determinism hazard)." | confirmed; no change |
+| C | R1-ECS-F28 | slotmap's indirections and serde feature | docs.rs slotmap 1.1.1 | confirmed at the source | "It uses two indirections per random access…"; "If you wish to use these features you must enable the `serde` feature flag…" | confirmed; no change |
+| C | R1-ECS-F29 | RigidBodySet does not override clone_from | docs.rs rapier3d 0.36.1 | confirmed at the source | the same check as R1-ECS-F35 | confirmed; no change |
+| C | R1-TICK-F18 | Chrome 88's conditions for intensive throttling | Chrome 88 post | confirmed at the source | "The page has been hidden for more than 5 minutes." / "The chain count is 5 or greater." / "The page has been silent for at least 30 seconds." / "WebRTC is not in use." | confirmed; no change |
+| D | R1-DATA-REC6 | "file:// and plain-HTTP LAN development need another path" (a secure context is needed) | MDN Secure contexts (last modified 2026-09-14) | **wrong for file://** | its table of top-level documents: "`file:///path/to/resource.html` ✅ Secure (`file` URL)"; the plain-HTTP LAN part follows from R1-DATA-F29 | fixed: "file://" cut from REC6 (plain-HTTP LAN kept, F29); R1-DATA-OQ11's matching sentence corrected |
+
+**Recommendations the pass read** (its "Changed recommendations"), and what the second fix round did:
+
+| Recommendation | Second pass | Final state |
+|---|---|---|
+| R1-DET-REC4 (and options Q4) | problem: the Pcg32 fallback lists "a stream number per generator" as a strength and leaves stream independence "for the spike"; the source warns that streams "may be closely correlated" | fixed: Pcg32 is a candidate fallback without the stream number as a merit; how it would keep purposes apart is now an open question: R1-DET-OQ11; options Q4 corrected |
+| R1-DATA-REC6 | problem: the file:// clause is wrong (row D) | fixed: the clause cut; plain-HTTP LAN kept (F29); R1-DATA-OQ11 corrected |
+| R1-ECS-REC1 | OK, one minor point: it states flatly that derived and default clone_from do not reuse buffers, which R1-ECS-F35 marks as inferred; F35's "derive writes only `clone`" is also a reading; R1-ECS-F34 is the absence row (harmless) | fixed: marked inferred in REC1 and in the options table; F35's head and "Sure" reworded; F34 out of "Rests on" |
+| R1-DET-REC5, R1-DET-REC6 | OK, one minor point: "any two runs … also catch any order that leaks" claims more than F33 allows; F33's own inference says the maps "can" iterate differently | fixed: REC5's mark says two runs "can catch" and REC6's reason "can expose", both marked inferred |
+| R1-TICK-REC2 | OK on numbers (TL13 and TL15 at 1/60, GW14 at 20, 60 and 144 Hz, GN4 at 60 and 144 fps; 0.2 s × 60 = 12 ticks and 0.2 s × 30 = 6); Serves glosses §6.1 as "(modes up to 48+ with bots)", which reads §3 into §6.1 | fixed: Serves names §3 (up to 24v24, bots fill empty slots) |
+| R1-BND-REC5 | OK, minor points: "CORP or CORS", while R1-BND-F21 quotes only CORP; its Serves line names §4 and §5 and does not say it serves no §6 item | fixed: "or CORS" cut; Serves says no §6 item names isolation |
+| R1-ECS-REC2, REC3, REC4; R1-TICK-REC3, REC4, REC5; R1-DET-REC1, REC2; R1-BND-REC1, REC2, REC3, REC6; R1-ABL-REC1–REC6; R1-DATA-REC1, REC2, REC5, REC7 | OK (checked: GC15; 0.25 s × 60 = 15 ticks; STATUS.md:70; LOOP_V2.md:85-86; 1 − 10.0/13.9 = 28.1 %; V2_PHASE0_BRIEF.md:138-139; EDITOR_V2.md:39) | no change |
+
+**The change log and this part (E, F).** The fix step's four number lines check out (0.2.122 dropped from R1-BND-F2;
+R1-BND-OQ7's "at least twice"; the header totals of 185 findings, 37 recommendations, 76 open questions and 10
+fix-step reads, 3 of them new; source tiers 138 + 16 + 7 = 161). Part 7's 243 rows and its totals add up. Missing were
+rows for R1-BND-F32 and the five new findings (added at the second fix round), and the sentence "No recommendation
+rests on a claim whose final verdict is wrong or unsupported" did not hold until R1-DET-F34/REC4 and R1-DATA-REC6 were
+fixed (now fixed).
+
+**Other findings, ranked, and what was done.**
+1. R1-DET-F34b, R1-DET-REC4 and options Q4: fixed (above).
+2. R1-DATA-REC6's file:// clause: fixed (above).
+3. Part 7's missing rows and this pass's verdicts: 8 rows added to the unit tables; this subsection.
+4. The minor points in R1-ECS-REC1, R1-DET-REC5 and REC6, R1-TICK-REC2's Serves line and R1-BND-REC5: fixed (above).
+5. Process: fix-step read F10 used the verifier's downloaded copy of the GAS README, not the page; the verifier opened
+   the page and the quotes match. Noted in the fix-step sources table, row F10.
+6. R1-BND-F35 and fix-step row F3 gave the draft's date as 27 October; the page now says 28 October: noted in both.
+
+Not verified by the pass: that a transfer of the Wasm memory's buffer throws (ECMA-262 and the HTML standard are outside
+the allow list; R1-BND-F35 keeps it inferred); the R1-ECS-F34 absence, which no quote can prove.
+
+**Counts.**
+- Second pass: 56 claims: 42 confirmed, 2 wrong (R1-DET-F34b; R1-DATA-REC6's file:// clause), 1 unsupported
+  (R1-ECS-F34), 11 label only. The five claims re-sourced at the fix step: 4 confirmed whole, R1-DET-F34 confirmed in
+  its quotes and wrong in its closing note.
+- After the second fix round: the 2 wrong claims fixed (R1-DET-F34b in place, its recommendation clause now an open
+  question: R1-DET-OQ11; R1-DATA-REC6's clause cut); the 1 unsupported claim fixed (R1-ECS-F34 out of "Rests on");
+  0 re-sourced; 2 confirmed claims reworded (R1-BND-F35's date; R1-ECS-F35's reading marked); 7 recommendations
+  changed (R1-DET-REC4, R1-DATA-REC6, R1-ECS-REC1, R1-DET-REC5, REC6, R1-TICK-REC2, R1-BND-REC5), no pass-mark number
+  changed. Every verifier finding was applied. No recommendation rests on a claim whose final verdict is wrong or
+  unsupported.
+
+### Final check (2026-10-28)
+
+The verifier checked only what the second fix round changed (report:
+`.checkpoints/v2-research/verifier-r1-final-check-result.md`, notes `verifier-r1-final-check.md`). Verdict: PASS WITH
+NOTES, nits only.
+- Every item the second pass found wrong or unsupported, and every problem it named in a recommendation: closed.
+- Claims the round changed, checked at the source: 7 confirmed, 0 wrong, 0 unsupported (R1-DET-F34's correlation
+  warning and its re-laid quotes; MDN Secure contexts for R1-DATA-OQ11 and R1-DATA-REC6; R1-BND-F35's draft date;
+  MDN COEP for R1-BND-REC5; std Clone for R1-ECS-REC1 and F35).
+- Nits left as they are: options G2 and R1-BND-OQ5 call CORS "our reading", where F21's own source (MDN COEP) also says
+  `cors`-mode requests "must still be permitted by CORS"; the labels understate the evidence and REC5's CORP-only rule
+  is stricter, not wrong. Applied by the main session: the URL of MDN's Secure contexts page under "Sources read at the
+  fix step".
 
 ## Sources
 
@@ -3489,18 +3624,20 @@ pages are new to this file; the rest are re-reads of pages listed above.
 |---|---|---|---|---|---|---|
 | F1 | https://doc.rust-lang.org/std/collections/struct.HashMap.html | Rust std `HashMap` (re-read; #21 above) | std 1.99.1 (2026-10-13) | official | R1-DET-F33 | 2026-10-28 |
 | F2 | https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm | MDN, The structured clone algorithm (new) | last modified 2025-06-29 | official | R1-BND-F34 | 2026-10-28 |
-| F3 | https://webassembly.github.io/spec/js-api/ | WebAssembly JavaScript Interface, §5.3 Memories (new) | Editor's Draft, 27 October 2026 | official | R1-BND-F35 | 2026-10-28 |
+| F3 | https://webassembly.github.io/spec/js-api/ | WebAssembly JavaScript Interface, §5.3 Memories (new) | Editor's Draft, 27 October 2026 (dated 28 October 2026 when the second verifier pass read it; the step unchanged) | official | R1-BND-F35 | 2026-10-28 |
 | F4 | https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Opener-Policy | MDN, `Cross-Origin-Opener-Policy` (re-read; #108) | last modified 2026-07-12 | official | R1-BND-F23, R1-BND-OQ9 | 2026-10-28 |
 | F5 | https://doc.rust-lang.org/std/clone/trait.Clone.html | Rust std `Clone` (re-read; #24) | std 1.99.1 | official | R1-ECS-F35 | 2026-10-28 |
 | F6 | https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html | rapier3d `RigidBodySet`, Trait Implementations (re-read; #27) | rapier3d 0.36.1 | official | R1-ECS-F35 | 2026-10-28 |
 | F7 | https://docs.rs/rand_pcg/latest/rand_pcg/ | rand_pcg crate docs (re-read; #79) | 0.10.2 | official | R1-DET-F34 | 2026-10-28 |
 | F8 | https://docs.rs/rand_pcg/latest/rand_pcg/struct.Lcg64Xsh32.html | rand_pcg `Lcg64Xsh32` (new) | 0.10.2 | official | R1-DET-F34 | 2026-10-28 |
 | F9 | https://raw.githubusercontent.com/WebAssembly/threads/main/proposals/threads/Overview.md | Wasm threads proposal overview (re-read; #117) | main | official | R1-BND-F17 (quote corrected) | 2026-10-28 |
-| F10 | https://raw.githubusercontent.com/tranek/GASDocumentation/master/README.md | GASDocumentation README (re-read in the verifier's downloaded copy; #122) | UE 5.3 | other | R1-ABL-F4, F5, F15, F17, F18 (quotes checked) | 2026-10-28 |
+| F10 | https://raw.githubusercontent.com/tranek/GASDocumentation/master/README.md | GASDocumentation README (re-read in the verifier's downloaded copy; #122; the second verifier pass matched the quotes on the page itself) | UE 5.3 | other | R1-ABL-F4, F5, F15, F17, F18 (quotes checked) | 2026-10-28 |
 
 Pages the reviewers read that this file now cites (read by the verifier on 2026-10-28, not by the fix step):
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random (R1-DET-F30) and
-https://github.com/rustwasm/book (the archive notice, R1-ECS-F33). rust-reviewer's own sources (RustSec, wide, simba,
+https://github.com/rustwasm/book (the archive notice, R1-ECS-F33); and, read by the second verifier pass on the same
+day, MDN's Secure contexts page, https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts (last modified
+2026-09-14; R1-DATA-REC6's correction and R1-DATA-OQ11; the URL from the final check). rust-reviewer's own sources (RustSec, wide, simba,
 glam, Cargo profiles) are listed in its notes and feed only the open questions R1-RR-OQ1–OQ7.
 
 ### Sources not read (48)

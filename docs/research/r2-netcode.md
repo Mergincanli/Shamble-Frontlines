@@ -5,10 +5,11 @@
   each): `sync`, `budgets`, `interest`, `transport`, `rooms`. Assembly: netcode-architect (wave 1, step 2 "Assemble":
   nothing new is claimed; where units disagree, both findings stay and the conflict is an open question).
 - **Date:** 2026-10-27 (every source below was read that day).
-- **Status:** verified (every recommendation claim; 5 re-sourced claims await the second pass: R2-SYNC-F36,
-  R2-TRN-F40, R2-TRN-F41, R2-TRN-F42 and R2-ROOM-F19, added in the fix pass with exact quotes). The verifier,
-  security-auditor and rust-reviewer passes ran on 2026-10-28, and their findings were applied in the fix pass the same
-  day (part 7).
+- **Status:** verified (every recommendation claim). The verifier, security-auditor and rust-reviewer passes ran on
+  2026-10-28, and their findings were applied in the fix pass the same day. A second verifier pass checked the fix that
+  day (PASS WITH NOTES: 2 claims wrong, 2 unsupported), and the second fix pass corrected all four without re-sourcing
+  (part 7). A final check of the second fix pass, the same day, re-checked ROOM-REC3's reworded reason and the other
+  changes and found nits only, applied by the session (part 7, "Final check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R2):** "Snapshots, client
   prediction, interpolation and lag compensation for 48+ players; tick rate and bandwidth budgets; interest management
   for a top-down camera; the WebTransport server stack in Rust plus the WebSocket fallback; rooms and private matches;
@@ -28,6 +29,7 @@ Totals: 147 findings, 36 recommendations, 70 open questions (52 from the units, 
 read (131 entries across the units; 18 were a source another unit had also read), 26 sources not read. After the fix
 pass (2026-10-28): 152 findings (5 added: R2-SYNC-F36, R2-TRN-F40, R2-TRN-F41, R2-TRN-F42, R2-ROOM-F19), 36
 recommendations, 72 open questions (2 added: R2-SYNC-OQ15, R2-ROOM-OQ11), 116 sources read (3 added), 26 not read.
+The second fix pass (2026-10-28) changed none of these totals.
 
 **How to read this file.**
 - The findings, options, recommendations and open questions are copied from the unit drafts unchanged, ids included.
@@ -37,8 +39,8 @@ recommendations, 72 open questions (2 added: R2-SYNC-OQ15, R2-ROOM-OQ11), 116 so
   "[Assembler's note: …]".
 - The fix pass (2026-10-28) applied the verifier's, security-auditor's and rust-reviewer's findings in place. Each change
   is marked where it was made ("fix pass", "Verifier, 2026-10-28", "Rust review", "added in the fix pass"); new
-  findings and open questions say "(Added in the fix pass, 2026-10-28.)". Part 7 lists every change with its reviewer
-  finding.
+  findings and open questions say "(Added in the fix pass, 2026-10-28.)". The second round's changes say "second fix
+  pass" or "Second verifier pass". Part 7 lists every change with its reviewer finding.
 - Inside a unit's section, a bare id (F12, REC3, OQ2) is that unit's id: in the sync unit's text, F12 means R2-SYNC-F12.
 - Option labels are local to each unit. Two of them clash: the sync unit's network profiles P0–P4 and B1 (defined just
   before its recommendations) are not the budgets unit's packet-size options P1–P4, and the transport unit's option
@@ -66,7 +68,7 @@ recommendations, 72 open questions (2 added: R2-SYNC-OQ15, R2-ROOM-OQ11), 116 so
   Overwatch's talks (video only), Valve's wiki (HTTP 403) and off-list pages went unread; 7 recommendations touch them.
 - Recommended (marks proposed): 30 Hz delta snapshots as datagrams, a 60 Hz tick if R1's CPU mark holds, own
   prediction, a capped rewind, camera-based relevance, quinn plus WebSocket, one process per room, signed join tokens.
-- Open: 18 cross-unit conflicts (R2-XU-OQ1–OQ18), such as the rewind cap. Reviewed 2026-10-28; fixes in part 7.
+- Open: 18 cross-unit conflicts (R2-XU-OQ1–OQ18), such as the rewind cap. Reviewed and re-checked 2026-10-28; fixes in part 7.
 
 ## Findings
 
@@ -412,15 +414,23 @@ The record, from https://raw.githubusercontent.com/id-Software/Quake-III-Arena/m
 { `trType_t trType;` `int trTime;` `int trDuration; // if non 0, trTime + trDuration = stop time` `vec3_t trBase;`
 `vec3_t trDelta; // velocity, etc` }.
 
-**R2-SYNC-F36.** (Added in the fix pass, 2026-10-28.) The Quake III server, not the client, enforces the command time. It
-clamps a command's time to at most 200 ms ahead of and 1,000 ms behind the server's own time, and runs at most 200 ms of
-movement from one command.
+**R2-SYNC-F36.** (Added in the fix pass, 2026-10-28; corrected in the second fix pass, the same day.) The Quake III
+server, not the client, enforces the command time. It clamps a command's time to at most 200 ms ahead of and 1,000 ms
+behind the server's own time. It also caps at 200 ms the elapsed time (`msec`) it passes to the timer actions; the
+movement itself runs through `Pmove` on the clamped command, not on that capped value (second verifier pass, below).
 · Source: https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_active.c (ClientThink_real,
 lines 772-789) · Tier: shipped game · Read 2026-10-28 (found by the security review, C27 and M2) · Confirmed in the
 source: "// sanity check the command time to prevent speedup cheating"; `if ( ucmd->serverTime > level.time + 200 ) {`
 `ucmd->serverTime = level.time + 200;`; `if ( ucmd->serverTime < level.time - 1000 ) {`
 `ucmd->serverTime = level.time - 1000;`; `msec = ucmd->serverTime - client->ps.commandTime;`; `if ( msec > 200 ) {`
 `msec = 200;`.
+[Second verifier pass, 2026-10-28: the fix pass's third clause, "runs at most 200 ms of movement from one command", is
+wrong. In the same function the clamped `msec` is used only in "ClientTimerActions( ent, msec );", and movement runs
+through "pm.cmd = *ucmd;" and "Pmove (&pm);". In `bg_pmove.c` (read by the verifier; not a source of this file),
+Pmove's own cap is 1,000 ms: "if ( finalTime > pmove->ps->commandTime + 1000 ) {"
+"pmove->ps->commandTime = finalTime - 1000;", run in 66 ms slices without `pmove_fixed` ("if ( msec > 66 ) {"; with it,
+"if ( msec > pmove->pmove_msec ) {", final check 2026-10-28). The clause is corrected
+above. No recommendation used it: SYNC-REC2 uses only the clamp.]
 
 #### Legacy facts used (sync unit)
 
@@ -1262,9 +1272,12 @@ source.
   should answer 403 otherwise.
 - §8: "Implementations SHOULD track the use of WebTransport features", and an endpoint "MAY treat activity that is suspicious as
   a connection error of type H3_EXCESSIVE_LOAD".
+- §3.2 requires an Origin only from browsers: "If the WebTransport session is coming from a browser client, an `Origin` header
+  [RFC6454] MUST be provided within the request." "Otherwise, the header is OPTIONAL." (Added in the second fix pass, from the second
+  verifier pass's reading of the same draft, 2026-10-28; TRN-REC1 uses it.)
 
 Source: https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3 (-16). Tier: official. Read 2026-10-27. How sure: confirmed in
-the source (quoted fragments).
+the source (quoted fragments). [Second verifier pass, 2026-10-28: confirmed, §3.2 and §8.]
 
 **R2-TRN-F37.** Sessions can be drained before they close. Draft -16 §6 defines WT_CLOSE_SESSION (0x2843) and WT_DRAIN_SESSION
 (0x78ae): "either endpoint can send a WT_DRAIN_SESSION (0x78ae) capsule". The W3C `draining` promise exists in Firefox 155 and
@@ -1285,8 +1298,11 @@ Source: https://www.rfc-editor.org/rfc/rfc9000.html. Tier: official. Read 2026-1
 fragments.
 
 **R2-TRN-F40.** (Added in the fix pass, 2026-10-28.) quinn's protocol crate, quinn-proto, had eight security advisories
-in 2026. By their titles and the descriptions read, each concerns a panic or unbounded memory use, and the newest are
-patched only from 0.11.18. The TLS, crypto and runtime crates under the stack have their own patched floors.
+in 2026. By their titles and the descriptions read, each concerns a panic or unbounded memory use; three of the six
+newest (October 12) are patched only from 0.11.18. [Second verifier pass, 2026-10-28: the other three of October 12
+(RUSTSEC-2026-0339, -0341, -0342) are patched from ">=0.11.17" and RUSTSEC-2026-0185 from ">=0.11.15", so the 0.11.18
+floor covers all ten (pages read by the verifier, not sources of this file); reworded in the second fix pass.] The TLS,
+crypto and runtime crates under the stack have their own patched floors.
 - quinn-proto's RustSec page lists ten advisories: two in 2023 and 2024, and eight in 2026 (RUSTSEC-2026-0037 on March 9,
   RUSTSEC-2026-0185 on June 22, RUSTSEC-2026-0338 to -0343 on October 12).
 - RUSTSEC-2026-0037 (CVSS 8.7 HIGH, "Patched >=0.11.14"): "Receiving QUIC transport parameters containing invalid values
@@ -1471,14 +1487,22 @@ or a claim seen only as a WebFetch paraphrase.
   there is a negligible probability that the same value will be accidentally assigned to a different data object" ·
   https://www.rfc-editor.org/rfc/rfc7519.html §4.1.3, §4.1.4, §4.1.7 (May 2015) · official · read 2026-10-27 · confirmed
   in the source.
-- **R2-ROOM-F12.** Neither browser transport lets the page set an HTTP auth header: the WebSocket constructor takes only
-  a URL and sub-protocols, and the WebTransport constructor's options are `allowPooling`, `congestionControl`,
-  `protocols`, `requireUnreliable` and `serverCertificateHashes`; a WebTransport URL must be https with an explicit port.
+- **R2-ROOM-F12.** The WebSocket constructor takes only a URL and sub-protocols, so the page cannot set an HTTP auth
+  header on it. MDN lists the WebTransport constructor's options as `allowPooling`, `congestionControl`, `protocols`,
+  `requireUnreliable` and `serverCertificateHashes`, but the W3C spec also defines a `headers` option for the session's
+  request headers, and whether any browser ships it is not known (corrected in the second fix pass, below). A
+  WebTransport URL must be https with an explicit port.
   Verbatim: "`new WebSocket(url)` `new WebSocket(url, protocols)`"; "The scheme must be HTTPS, and the port number needs
   to be explicitly specified." · https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket (modified
   2026-06-22) and https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport (modified 2026-10-12) ·
-  official · read 2026-10-27 · confirmed in the source for the signatures and option list; "no auth header" is inferred
-  (neither page says it in words).
+  official · read 2026-10-27 · confirmed in the source for the signatures and MDN's option list; "no auth header" on
+  WebSocket is inferred (the page does not say it in words).
+  [Second verifier pass, 2026-10-28: the unit's "Neither browser transport lets the page set an HTTP auth header" is
+  contradicted at the spec for WebTransport. The W3C Candidate Recommendation Snapshot of 30 July 2026
+  (https://www.w3.org/TR/webtransport/ §6.9, source row 10) has "HeadersInit headers = {};" in WebTransportOptions:
+  "Optionally, a Headers object, an object literal, or an array of two-item arrays" "to set the request header list to
+  use when establishing a WebTransport session." MDN's five-option list is incomplete. The browser-compat data (source
+  row 21) has no `headers` key, so whether any browser ships the option is not known.]
 - **R2-ROOM-F13.** A WebTransport session is an extended CONNECT whose `:authority` and `:path` name the server
   resource, so one endpoint can tell sessions apart by path; servers should rate-limit new sessions. Verbatim: "In order
   to create a new WebTransport session, a WebTransport client sends an HTTP extended CONNECT request."; "Both the
@@ -1561,7 +1585,7 @@ or a claim seen only as a WebFetch paraphrase.
 | GP13, PG8 | Pause, shop and tutorial stop `update()`; "Restart round" is a player button. | A room never pauses for one player; restart and end belong to the room (or the private-room host). |
 | CS1 | A 1/60 s fixed step and an input-command record (seq, tick, move, aim, buttons) exist but nothing reads them. | Bots and humans can share one input-command path into the sim. |
 | GC1 | One team choke point; the server must repeat the team allow-list. | The room validates every team id in joins and host commands. |
-| CD2, GE15 | Career lives in localStorage (KVStore), loaded with no validation. | Client storage keeps only the guest credential and settings; progression is server-side (VISION §5, §6.10 LATER). [Fix pass: not the guest secret, which goes in an HttpOnly cookie (REC8, F19).] |
+| CD2, GE15 | Career lives in localStorage (KVStore), loaded with no validation. | Client storage keeps only the guest id and settings; the guest secret goes in an HttpOnly cookie (REC8, F19); progression is server-side (VISION §5, §6.10 LATER). [Fix pass; reworded in the second fix pass, after the verifier.] |
 
 ### Brief question 6: learn from shipped games (all units)
 
@@ -1620,8 +1644,8 @@ Per brief question, as each unit set them out (option labels are local to the un
 
 | Option | Behaviour | Fit |
 |---|---|---|
-| A. None (Quake III) | Shooters lead by RTT + interpolation (F27, F34). | At 100 ms and 9 m/s that is about 1.8 m of lead: unfair for §4 (arithmetic; F34 is unsupported, fix pass). |
-| B. Server rewind to the shooter's view time, capped (Source) | History of hit volumes; the shot resolves against the targets as the shooter saw them (F28–F32). | Fair for the shooter up to the cap; the victim's "hit behind cover" window grows with it (F34: unsupported; now OQ15). |
+| A. None (Quake III) | Shooters must lead their targets (F27), by about the round trip plus the interpolation delay (our reading of F28's formula; F34, which stated it, is unsupported: OQ15; marked in the second fix pass). | At 100 ms and 9 m/s that is about 1.8 m of lead on that reading: unfair for §4 (arithmetic). |
+| B. Server rewind to the shooter's view time, capped (Source) | History of hit volumes; the shot resolves against the targets as the shooter saw them (F28–F32). | Fair for the shooter up to the cap. Whether the victim's "hit behind cover" window grows with it is open (OQ15; F34, which stated it, is unsupported; reworded in the second fix pass). |
 | C. Client-side hit detection, server trusts it | The client says what it hit. | An authority leak (trivially cheatable); rejected by the default principles ("never client state"). |
 
 #### 3.6 Projectiles (frags, Molotovs, bolts, later Javelin rockets)
@@ -1883,7 +1907,8 @@ All four run on quinn (0.11.12, F28; its 2026 security advisories: F40, added in
 | B. netcode.io-style encrypted token (F9, F10) | As A, but the private part is AEAD-encrypted with a key shared by lobby and servers. | Hides the contents and can carry per-connection keys; every server holds a key that can mint tokens. |
 | C. Opaque ticket validated by a call back to the lobby (GameLift `AcceptPlayerSession`, F2) | Room asks the lobby "is ticket X valid for room R?" | Simplest crypto; adds a round trip and makes the lobby a live dependency of every join. |
 
-Token carriage: neither browser API sets an auth header (F12). The token can go in the URL (leaks into logs and
+Token carriage: the WebSocket API cannot set an auth header (inferred, F12); the WebTransport spec defines a `headers` option, but
+whether any browser ships it is not known (F12, corrected in the second fix pass). The token can go in the URL (leaks into logs and
 history, F14), in the sub-protocol list, or in the first message on a reliable stream; the last keeps it out of URLs
 and access logs (inferred from F12 and F14).
 
@@ -2003,7 +2028,8 @@ interval.
   repeats one earlier packet's worth by default and allows up to 32 commands (F18).
 - The server drops commands older than the last one it ran (F16), and caps how many commands per client it runs per
   tick (the speed-hack guard, F33; Source's default allows 24 ticks). [Fix pass, security review M3: a client that holds
-  its inputs and then sends them in one burst (a "lag switch") would jump on everyone else's screen. So the catch-up cap
+  its inputs and then sends them in one burst (a "lag switch") would jump on everyone else's screen (the review's
+  reasoning). So the catch-up cap
   is data, proposed no larger than the redundancy cap above (8 commands). When the server runs commands, as they arrive
   or one per tick from a buffer, stays OQ3.]
 - Server checks on every command (fix pass, security review M2; every limit is data, proposed):
@@ -2047,8 +2073,8 @@ C); replay from the authoritative state; linear error decay (option 3.3 B), plus
 - Shot feedback (fix pass, security review H2). Muzzle flash and tracer are drawn at once from a cosmetic spread on the
   client, not from a seed it shares with the server. The authoritative spread comes from a server-only random stream,
   and the hit event corrects the tracer. A seed the client knows would let a cheat cancel the spread through the aim
-  point it sends (REC8); Source's server-only seed is "independent of the client" (F20). Sharing the seed after all, for
-  matching tracers, is OQ11, Mustafa's call.
+  point it sends (REC8; the security review's reasoning); Source's server-only seed is "independent of the client"
+  (F20). Sharing the seed after all, for matching tracers, is OQ11, Mustafa's call.
 - What the client does not predict:
   - damage, deaths and hits on others (F12: what your own input did not cause);
   - the uplink countdown and steals (LOOP_V2 §4): the client shows the server's tick-stamped state.
@@ -2107,12 +2133,13 @@ sim-owned hit volumes, capped (option 3.5 B).**
   already is a pure query built for this (CS7).
 - View time. The command's view time is accepted if it lies within a tolerance of the server's own estimate (RTT plus
   that client's interpolation delay); otherwise the estimate is used (F28). [Fix pass, security review H1:] Source's
-  tolerance is 200 ms (F28). That wide, it lets a low-ping client claim far more rewind than it needs, so the tolerance
-  is data, proposed at most one snapshot interval. The RTT is the server's own measurement (quinn's `rtt()`,
-  R2-TRN-F25), never a figure the client reports. Over the WebSocket fallback, which has no transport RTT, it is the
-  lowest recent sample of the server's own pings (proposed), because a client can delay its replies (security review
-  H4). The client's interpolation delay is the one it announced, clamped to the mode's range (REC4: 2 to 5 intervals)
-  and allowed to change only slowly (proposed: at most one interval per second).
+  tolerance is 200 ms (F28). That wide, it would let a low-ping client claim far more rewind than it needs (the review's
+  reasoning), so the tolerance is data, proposed at most one snapshot interval. The RTT is the server's own measurement
+  (quinn's `rtt()`, R2-TRN-F25), never a figure the client reports. Over the WebSocket fallback, where no finding read
+  gives the server a transport RTT like quinn's (our reading; marked in the second fix pass), it is the lowest recent
+  sample of the server's own pings (proposed), because a client can delay its replies (security review H4). The client's
+  interpolation delay is the one it announced, clamped to the mode's range (REC4: 2 to 5 intervals) and allowed to
+  change only slowly (proposed: at most one interval per second).
 - The cap. The cap bounds the final rewind (the server's present minus the accepted view time), whichever path chose
   the view time. Source's own clamp bounds only its estimate, so a trusted client tick can land up to 0.2 s beyond it
   (F28, verifier's note); without a final cap, a 250 ms cap plus a 200 ms tolerance would allow about 450 ms (fix pass,
@@ -2208,8 +2235,8 @@ against its rendered world.**
 - On the client. The cursor ray is cast into the world as the client draws it: interpolated remote entities and the
   static world, using the same Rust ray query (GC3 already does this through the SIM). The client quantises the hit
   point to the command's precision. If "gentle aim help onto bodies" (LOOP_V2 §9 [OPEN]) is adopted, the server
-  applies it, not the client: aim help shaped on the client cannot be told apart from an aimbot (fix pass, security
-  review L1).
+  applies it, not the client: aim help shaped on the client cannot be told apart from an aimbot (fix pass; the security
+  review's reasoning, L1).
 - On the server. The server rebuilds the ray from its own fire origin at the command's tick toward that point, extends
   it to the weapon's range, and resolves it with REC5. Line of sight across floors is the server's own height-aware
   query (R4).
@@ -2256,19 +2283,25 @@ client sees, not with the match size.**
 
 - **R2-BUD-REC1. Rates: snapshots at 30 Hz; simulation tick 60 Hz if R1's tick spike meets its CPU mark, else 30 Hz;
   inputs sampled every tick and sent every tick with the 3 previous inputs repeated (U1, U2 once measured).**
-  Reason: of 20, 30 and 60 Hz, 30 Hz is the only snapshot rate that keeps both the 48-player downstream under the 256 kbps example budget
-  (146 kbps against 286 at 60 Hz) and the lag-compensation rewind inside the ~200 ms cap at 100 ms of ping (150–200 ms
-  against 200–250 at 20 Hz). [Fix pass, after the verifier: these rewind figures assume that Source's latency term is one
+  Reason: of 20, 30 and 60 Hz, 60 Hz breaks the 256 kbps example budget for the 48-player downstream (286 kbps against
+  146 at 30 Hz). Of 20 and 30 Hz, 30 Hz gives the shorter lag-compensation rewind at 100 ms of ping; it stays inside the
+  ~200 ms cap (150–200 ms against 200–250 at 20 Hz) only if Source's latency term is one way. [Second fix pass, after
+  the verifier: the lead sentence no longer calls 30 Hz "the only snapshot rate" that keeps both. On the round-trip
+  reading below, 30 Hz is preferred over 20 Hz only for a rewind 50 ms shorter, against a cap with no source; which
+  reading holds is R2-XU-OQ2.] [Fix pass, after the verifier: these rewind figures assume that Source's latency term is one
   way, which the code does not support (R2-SYNC-F28, R2-XU-OQ2). Read as the round trip, 30 Hz gives 200–250 ms and
   20 Hz 250–300 ms (arithmetic). Then 30 Hz breaks a 200 ms cap too, and its edge over 20 Hz is a rewind 50 ms shorter.
   The ~200 ms cap is the default principles' figure, not a sourced number (R2-XU-OQ1). The bandwidth half of the reason
   stands either way.] A 60 Hz tick halves input-timing and fire-interval quantization (Shabzon 4.32 ticks against
   2.16), matches legacy `FIXED_DT` and Source's 66.7 Hz, and does not change the snapshot budget. Weapon cooldowns carry
   the fractional tick remainder at either rate. Upstream at 60 Hz with 4 copies is under 50 kbps.
-  Rests on: R2-BUD-F26, F28, F29, F31, F32, F34, F35; legacy CS1 and `WEAPONS`; the worked estimate.
+  Rests on: R2-BUD-F26, F28, F29, F31, F32, F34, F35; legacy CS1 and `WEAPONS`; the worked estimate; R2-SYNC-F28 (the
+  round-trip reading; added in the second fix pass).
   Serves VISION_V2 §6.1 (modes of any size), §6.2 (aiming at height in the input), §4 (fair to about 100 ms).
   Spike must prove (proposed): at 48 players (simulated clients plus bots), 30 Hz snapshots, 100 ms RTT, ±10 ms jitter,
-  2 % loss: rewind ≤ 200 ms for 100 % of shots; server-side missing-input rate ≤ 0.1 % of player-ticks at 5 % random
+  2 % loss: rewind ≤ the cap (R2-XU-OQ1: 200 or 250 ms) for 100 % of shots, with the share of shots the cap clips
+  recorded (on the round-trip reading, R2-XU-OQ2, the rewind at this RTT is 200–250 ms, so a 200 ms cap clips some;
+  changed from "≤ 200 ms" in the second fix pass); server-side missing-input rate ≤ 0.1 % of player-ticks at 5 % random
   loss; upstream ≤ 48 kbps per client (IPv4, U1); mean delivered fire rate of the Shabzon within 1 % of 13.9 shots/s
   at the chosen tick.
 - **R2-BUD-REC2. Downstream encoding E3 with a budget: quantize (1 cm positions in 16/16/12 bits, 16-bit yaw, 10-bit
@@ -2329,8 +2362,10 @@ client sees, not with the match size.**
   set the outgoing maximum age to about one snapshot interval so stale snapshots expire instead of queueing; under
   pressure drop low-priority entities first, then fall back to 20 Hz snapshots, never above the cap.** [Fix pass, after
   the verifier: these three counters come only from `getStats()`, which Chrome and Edge lack and Firefox throws on
-  (R2-TRN-F9). On those browsers the client side relies on our own acks. Of the browser-side settings, only
-  `outgoingMaxAge` exists in all three engines (R2-TRN-F19). Where the maximum age applies is R2-XU-OQ11.] Reason:
+  (R2-TRN-F9). On those browsers the client side relies on our own acks. Of the standards-track sending settings, only
+  `outgoingMaxAge` exists in all three engines (final check, 2026-10-28: `outgoingHighWaterMark` is in all three too,
+  but deprecated and off the standards track); `incomingMaxAge`, on the receiving side, does too (R2-TRN-F19; reworded
+  in the second fix pass). Where the maximum age applies is R2-XU-OQ11.] Reason:
   datagrams are congestion-controlled and may be dropped by the sender; the window can fall to two datagrams; the
   browser's `congestionControl` option is a feature at risk, because no browser has a congestion control algorithm that
   optimizes for low latency (F14, confirmed by the verifier); Valve's library still sets its rate by hand.
@@ -2465,8 +2500,9 @@ client sees, not with the match size.**
   - Reason: precedent in Q2 and Q3 (F5, F6, F7) and in Source (F9); legacy already separates sound and visual radii
     (GN8).
   - Rests on: F5, F6, F7, F9 (plus legacy GN8, JUG).
-  - Serves: §6.4 (vehicles: big, multi-part, seats [OPEN]); §6.9 (spectacle); LOOP_V2 §7 (feel kit: muzzle flash
-    and sound as data).
+  - Serves: §6.4 (vehicles: big, multi-part, seats [OPEN]); LOOP_V2 §7 (feel kit: muzzle flash and sound as data).
+    [Second fix pass, after the verifier: §6.9 was removed here as from REC4. It is the renderer's spectacle budget,
+    not a network need.]
   - Spike must prove (proposed): 0 events delivered beyond their type's radius or into an unconnected area. Every
     shot aimed at the viewer is delivered (0 misses over the soak). At the centre-fight peak, event bytes stay inside
     the REC4 budget. A Juggernaut whose body overlaps the view is never missing (the REC1 (a) harness). A shot event
@@ -2497,15 +2533,17 @@ client sees, not with the match size.**
 web-transport-quinn 0.13.x, behind our own thin session interface. Rule out h3-webtransport and a hand-written handshake.**
 Reason:
 - Both candidates sit on the same long-lived, active QUIC stack, quinn (F28), and speak the same draft-02 and -07 settings
-  as QUICHE (F5, F6). [Fix pass, Rust review risk 1: quinn-proto had eight security advisories in 2026, the newest
-  patched only from 0.11.18 (F40). Both crates inherit them, so the stack's version floors are part of the choice.]
+  as QUICHE (F5, F6). [Fix pass, Rust review risk 1: quinn-proto had eight security advisories in 2026; three of
+  the newest are patched only from 0.11.18 (F40). Both crates inherit them, so the stack's version floors are part of the choice.]
 - Neither claims production readiness, and each has a different risk: wtransport says it is not production-ready (F29);
   web-transport-quinn moves fast in 0.x (F30). A thin interface keeps a later swap cheap.
 - h3 is "still very experimental" and h3-webtransport is idle (F31).
 - Option D is generic protocol work no VISION_V2 §6 item asks for.
 - The server checks every session's Origin against an allow-list of our own origins and answers 403 otherwise: the
-  draft requires the check (F36). A request without an Origin comes from a non-browser client and cannot be refused on
-  that ground alone, so it is tagged for detection. (Added in the fix pass, security review M1.)
+  draft requires the check (F36). The draft requires an Origin only from a browser client ("Otherwise, the header is
+  OPTIONAL", F36), so a request without one comes from a non-browser client. Our policy reading, not the draft's: such a
+  request is not refused on that ground alone, and is tagged for detection. (Added in the fix pass, security review M1;
+  the draft's passage added to F36 and the policy marked as ours in the second fix pass.)
 
 Rests on: F4, F5, F6, F25, F28, F29, F30, F31; F36, F40 and R2-ROOM-F13 (added in the fix pass).
 Serves: VISION_V2 §6.1 (rooms and private matches need a client-to-server link); §6.5 (economy server-side), §6.6 (telemetry
@@ -2566,10 +2604,11 @@ through axum; not both, since axum 0.8.9 depends on tokio-tungstenite ^0.29, F33
 it. Do not serve WebTransport over HTTP/2.**
 Reason:
 - Some networks don't support QUIC (F12). WebSocket is everywhere, including workers (F34), and its crates are mature (F33).
-- Safari's own HTTP/2 fallback would need a server-side implementation of a protocol that is still a draft (F3); it is
-  documented only for Safari, and it is reliable-only anyway (F12). [Fix pass, after the verifier: the unit also wrote that
-  "none of the crates read offers" it. No finding states that, so the claim is dropped here; whether any crate serves it
-  stays open as OQ2.]
+- Safari's own HTTP/2 fallback would need a server-side implementation of a protocol that is still a draft (F3). The W3C
+  constructor defines the HTTP/2 path (§6.2), but of the sources read only the WebKit post documents a browser shipping it, and such a
+  session is reliable-only anyway (F12; reworded in the second fix pass, after the verifier). [Fix pass, after the
+  verifier: the unit also wrote that "none of the crates read offers" it. No finding states that, so the claim is
+  dropped here; whether any crate serves it stays open as OQ2.]
 - `requireUnreliable` makes a WebTransport session fail cleanly, so our WebSocket path takes over (F12; Chrome ignores the
   option, F11).
 - Running TCP and UDP side by side hurts the UDP flow (F22).
@@ -2579,8 +2618,8 @@ Reason:
   risk 3): wss only (F41, §10.6); the same Origin allow-list, answered with 403 (F41, §10.2); explicit limits on frame
   size, message size (F41, §10.4; proposed: a few KiB per message) and the write buffer, never the library's defaults
   (F42: 64 MiB per message, 16 MiB per frame and an unlimited write buffer in tungstenite 0.30);
-  and REC1's rate, size and Join-deadline limits. Over WebSocket the server has no transport RTT, so lag compensation uses
-  its own pings (R2-SYNC-REC5).
+  and REC1's rate, size and Join-deadline limits. No finding read gives the server a transport RTT over WebSocket (our reading;
+  marked in the second fix pass), so lag compensation uses its own pings (R2-SYNC-REC5).
 
 Rests on: F3, F11, F12, F21, F22, F33, F34; F41, F42 (added in the fix pass).
 Serves: the §4 browser target (all four browsers, on all networks); §6.1.
@@ -2707,11 +2746,15 @@ What a spike must prove (proposed pass marks):
   message of a reliable stream, never in the URL. The room, not the client, assigns team and squad within the mode's
   rules (GW1, GC1).
   Reason: an offline check keeps the lobby off the hot join path; single use and the audience stop replay and
-  cross-room use (F9, F10, F11); neither browser constructor takes a header option (F12: WebSocket takes only a URL and
-  sub-protocols; WebTransport's options are exactly `allowPooling`, `congestionControl`, `protocols`,
-  `requireUnreliable` and `serverCertificateHashes`), so the token cannot ride in an auth header, and URLs leak (F14).
+  cross-room use (F9, F10, F11). The WebSocket constructor takes only a URL and sub-protocols (F12), so on the
+  fallback the token cannot ride in an auth header (inferred, as F12 marks it). The WebTransport spec defines a `headers` option, but whether any
+  browser ships it is not known (F12). URLs leak (F14). So the token goes in the first stream message: one join path
+  for both transports (our reading: a design choice, not a source's).
   [Fix pass: the unit's "browsers cannot send an auth header" is an inference the security review found unsupported
-  as worded (C12); the reason now rests on the confirmed option lists.]
+  as worded (C12). Second fix pass, after the verifier: the first fix's "neither browser constructor takes a header
+  option" and "WebTransport's options are exactly …" are wrong at the spec, whose WebTransportOptions has
+  "HeadersInit headers = {};" (F12, corrected). The design stands on WebSocket's constructor, URL leaks and one join
+  path.]
   Rests on: F9, F10, F11, F12, F14; F19 (added in the fix pass, for the logs). Serves VISION §6.1. Signature scheme and
   key handling: open (OQ2, which now carries the security review's answer).
   Spike must prove (proposed): (1) 1,000 generated bad tokens (expired, wrong room, replayed, altered byte, wrong key,
@@ -3027,7 +3070,8 @@ and resolve nothing. Each says what the drafts leave to decide it.
 
 - **R2-XU-OQ1. The rewind cap: 250 ms (sync) or 200 ms (budgets)?** R2-SYNC-REC5 proposes a cap of 250 ms and
   R2-SYNC-OQ2 asks "200 ms (the netcode default principles) or 250 ms (proposed here)?". R2-BUD-REC4 caps the rewind at
-  200 ms, R2-BUD-REC1's pass mark asks for "rewind ≤ 200 ms for 100 % of shots", and budgets option table A, row T4 (20
+  200 ms, R2-BUD-REC1's pass mark asked for "rewind ≤ 200 ms for 100 % of shots" (since the second fix pass it checks
+  this question's cap and records the share of shots the cap clips), and budgets option table A, row T4 (20
   Hz snapshots), reads "rewind 200–250 ms: breaks the 200 ms cap at 100 ms RTT". Decided by: R2-SYNC-OQ2's route (the
   REC5 spike at P2 and P3, then Mustafa and the Advisor in the Feel Lab), after R2-XU-OQ2. [Fix pass, 2026-10-28: the
   verifier notes that neither figure comes from a source: 200 ms is the default principles' and 250 ms the sync unit's
@@ -3302,7 +3346,8 @@ and why; it claims nothing about what the sources say.
 
 ## Verifier spot-check
 
-Three reviews ran on 2026-10-28, and the fix pass (netcode-architect, the same day) applied their findings.
+Three reviews ran on 2026-10-28, and the fix pass (netcode-architect, the same day) applied their findings. A second
+verifier pass then checked the fix, and a second fix pass applied it (the last subsection below).
 - **The verifier** checked every finding a recommendation's "Rests on:" list names (135), at its source, by exact text
   match. Verdict: PASS WITH NOTES. Notes: `.checkpoints/v2-research/verifier-r2.md`.
 - **The security-auditor** reviewed the protocol and checked 28 claims and one recommendation. Verdict: REVISE (4 High, 10
@@ -3459,7 +3504,7 @@ recommendation the security-auditor checked against its source).
 | R2-ROOM-F9 | Fiedler connect tokens | gaffer why_cant_i_send_udp | V: confirmed · S: C9 confirmed | V: token section · S: Fiedler 2017-02-26 | no change needed |
 | R2-ROOM-F10 | netcode 1.02 single-use tokens | netcode STANDARD.md | V: confirmed · S: C10 confirmed | V: server checks · S: STANDARD.md | no change needed |
 | R2-ROOM-F11 | JWT aud/exp/jti | RFC 7519 | V: confirmed · S: C11 confirmed | V: §4.1.3, §4.1.4, §4.1.7 · S: RFC 7519 §4.1.3, §4.1.4, §4.1.7 | no change needed |
-| R2-ROOM-F12 | constructor signatures and options | MDN ×2 | V: confirmed ("no auth header" stays inferred) · S: C12 signatures confirmed; "no auth header" unsupported as worded | V: Syntax, options · S: MDN constructors | fixed: ROOM-REC3's reason now rests on the confirmed option lists |
+| R2-ROOM-F12 | constructor signatures and options | MDN ×2 | V: confirmed ("no auth header" stays inferred) · S: C12 signatures confirmed; "no auth header" unsupported as worded | V: Syntax, options · S: MDN constructors | fixed: ROOM-REC3's reason now rests on the confirmed option lists (that reason was wrong at the spec, which has a `headers` option: corrected in the second fix pass, below) |
 | R2-ROOM-F13 | extended CONNECT; rate limiting | draft -16 | V: confirmed · S: C2 confirmed | V: §3.2, §5.2 · S: draft -16 §5.2 | no change (now also in TRN-REC1's Rests on) |
 | R2-ROOM-F14 | 64-bit entropy; URL leaks | OWASP session cheat sheet | V: confirmed · S: C13 confirmed | V: "Session ID Entropy" · S: OWASP Session Management | no change needed |
 | R2-ROOM-F15 | TF2 bot quota | tf_bot_manager.cpp | V: confirmed (fill is not the default) | :26-29, :432 | fixed: defaults noted; ROOM-REC6's reason corrected |
@@ -3469,12 +3514,13 @@ recommendation the security-auditor checked against its source).
 | R2-TRN-F36 | server MUST verify Origin; 403; H3_EXCESSIVE_LOAD | draft-ietf-webtrans-http3-16 | S: C1 confirmed | draft -16 §3.2, §8 | fixed: now in TRN-REC1 (Origin allow-list, M1) and its Rests on |
 | R2-ROOM-REC8 | guest secret kept in the KVStore successor (local storage) | OWASP Session Management | S: contradicted (M6) | "The localStorage API" | fixed: the secret moves to an HttpOnly cookie; re-sourced: R2-ROOM-F19; alternative R2-ROOM-OQ11 |
 
-**New findings from the fix pass, awaiting the second verifier pass.** Each was read on 2026-10-28 from an allow-listed
+**New findings from the fix pass (checked by the second verifier pass, below).** Each was read on 2026-10-28 from an allow-listed
 domain, and its quotes were matched by exact text search: R2-SYNC-F36 (Quake III `g_active.c`), R2-TRN-F40 (RustSec),
 R2-TRN-F41 (RFC 6455 §10), R2-TRN-F42 (docs.rs tungstenite 0.30.0) and R2-ROOM-F19 (OWASP Session Management Cheat
-Sheet). Quotes a reviewer had already checked at the source went into existing findings as bracketed notes: R2-SYNC-F20,
-F28, F32 and F33; R2-BUD-F29; R2-TRN-F13, F17 and F33; R2-ROOM-F15 and F17. The fix pass re-read two of them itself:
-R2-SYNC-F20's player.cpp line and R2-TRN-F17's quinn sentence.
+Sheet). The second verifier pass confirmed every quote, but not every reading: R2-SYNC-F36's movement clause went beyond
+its quotes (corrected in the second fix pass). Quotes a reviewer had already checked at the source went into existing
+findings as bracketed notes: R2-SYNC-F20, F28, F32 and F33; R2-BUD-F29; R2-TRN-F13, F17 and F33; R2-ROOM-F15 and F17.
+The fix pass re-read two of them itself: R2-SYNC-F20's player.cpp line and R2-TRN-F17's quinn sentence.
 
 **The reviewers' other findings, and where they went.** V = the verifier's ranked findings, S = the security-auditor's
 (H High, M Medium, L Low), R = the rust-reviewer's missed risks.
@@ -3534,6 +3580,90 @@ R2-SYNC-F20's player.cpp line and R2-TRN-F17's quinn sentence.
    enough is the Advisor's call (R2-XU-OQ18).
 No reviewer finding is disputed. The deferrals above follow decisions that already sit with Mustafa, the Advisor or R6.
 
+### Second verifier pass (2026-10-28)
+
+The verifier checked the fix pass's changes the same day (workflow run wf_64d0bbcd-730): the 5 new findings, 1 basis
+claim with no first-pass verdict, the 32 changed basis findings, the claims inside the 27 changed recommendations and
+the 3 number changes, each at its source with WebFetch on allow-listed domains. Verdict: PASS WITH NOTES. Report:
+`.checkpoints/v2-research/verifier-r2-second-pass-result.md`; notes with every quote:
+`.checkpoints/v2-research/verifier-r2-second-pass.md`. The second fix pass (netcode-architect, the same day) applied
+it; its change log is `.checkpoints/v2-research/netcode-architect-r2-fix2.md`. Changes it made are marked "second fix
+pass" or "Second verifier pass" where they were made.
+
+**Counts.**
+- The verifier's: confirmed 17 (R2-BUD-F14 and R2-TRN-F10 count as two) · wrong 2 · unsupported 2 · label only 25. The
+  3 number changes are all correct. Its scope and table: A new findings, B a basis claim with no first-pass verdict, C
+  changed findings, D claims inside changed recommendations, E number changes.
+- Final state after the second fix pass, over those 49 claims: 6 fixed (the 2 wrong, the 2 unsupported, 1 confirmed
+  claim whose passage was missing from its finding, and 1 confirmed finding reworded) · 43 no change needed (15
+  confirmed, 25 label only, 3 numbers) · 0 re-sourced · 0 now an open question.
+- No recommendation now rests on a claim whose final verdict is wrong or unsupported.
+
+| Scope | Claim id | Claim | Source | Verdict (as the verifier gave it) | Location and exact words | Final state after the second fix pass |
+|---|---|---|---|---|---|---|
+| A | R2-SYNC-F36, parts 1–2 | the server enforces the command time; clamp +200 / −1000 ms | Q3 g_active.c (raw.githubusercontent.com) | confirmed | ClientThink_real: "// sanity check the command time to prevent speedup cheating"; "ucmd->serverTime = level.time + 200;"; "ucmd->serverTime = level.time - 1000;" | no change needed |
+| A | R2-SYNC-F36, part 3 | "runs at most 200 ms of movement from one command" | g_active.c, bg_pmove.c | wrong | The clamped `msec` is used only in "ClientTimerActions( ent, msec );". Movement runs through "pm.cmd = *ucmd;" and "Pmove (&pm);". Pmove's own cap is 1,000 ms: "if ( finalTime > pmove->ps->commandTime + 1000 ) {" "pmove->ps->commandTime = finalTime - 1000;", run in 66 ms slices ("if ( msec > 66 ) {"). | fixed: the clause now says what g_active.c shows (the 200 ms cap is on the elapsed time passed to the timer actions; movement runs through `Pmove` on the clamped command), with the verifier's quotes in a note. No recommendation used it |
+| A | R2-TRN-F40 | ten quinn-proto advisories, eight in 2026, plus the patched floors | rustsec.org package page and 8 advisory pages | confirmed | 0037: "8.7 HIGH", ">=0.11.14". 0338, 0340, 0343: ">=0.11.18". rustls 0346/0348: ">=0.23.46". ring: ">=0.17.12". tokio: ">=1.54.1". Extra: 0339, 0341 and 0342 are patched from ">=0.11.17" and 0185 from ">=0.11.15", so the 0.11.18 floor covers all ten. | fixed (wording, from the verifier's notes: "the newest" is true of three of the six October advisories): "three of the six newest"; the other floors in a verifier note; TRN-REC1's reason follows |
+| A | R2-TRN-F41 | RFC 6455: Origin check with 403, size limits, wss | rfc-editor.org | confirmed | §10.2: "...SHOULD respond to the WebSocket handshake with a reply containing HTTP 403 Forbidden status code." §10.4: "Such an implementation SHOULD impose a limit on frame sizes" "and the total message size after reassembly from multiple frames." §10.6: "...over TLS (wss URIs)." | no change needed |
+| A | R2-TRN-F42 | tungstenite 0.30 defaults | docs.rs WebSocketConfig 0.30.0 | confirmed | "The default value is 64 MiB which should be reasonably big…"; "The default value is 16 MiB…"; "The default value is unlimited." | no change needed |
+| A | R2-ROOM-F19 | OWASP: no credential in local or session storage; HttpOnly; log a salted hash | OWASP Session Management Cheat Sheet | confirmed | all three quotes verbatim under "The localStorage API", "HttpOnly Attribute" and "Logging Sessions Life Cycle…" | no change needed |
+| B | R2-TRN-F36 | Origin MUST be verified, 403, H3_EXCESSIVE_LOAD | draft-ietf-webtrans-http3-16 | confirmed | §3.2: "the WebTransport server MUST verify the `Origin` header…" and "SHOULD reply with status code 403". §8: "Implementations SHOULD track the use of WebTransport features" and "An endpoint MAY treat activity that is suspicious as a connection error of type H3_EXCESSIVE_LOAD." | no change needed (the §3.2 passage of the TRN-REC1 row below was added to it) |
+| C | R2-SYNC-F20 | the server seed's purpose | source-sdk-2013 player.cpp | confirmed | "When enabled server will populate an additional random seed independent of the client" (default "1", FCVAR_CHEAT) | no change needed |
+| C | R2-TRN-F17 | quinn's minimum datagram size | docs.rs quinn 0.11.12 `Connection` | confirmed | "…if the peer’s limit is large this is guaranteed to be a little over a kilobyte at minimum." | no change needed |
+| C | R2-TRN-F33 | axum 0.8.9 depends on tokio-tungstenite ^0.29.0 | docs.rs/crate/axum/0.8.9 | confirmed | "tokio-tungstenite ^0.29.0 _normal_ _optional_". tokio-tungstenite 0.30.0 needs "tungstenite ^0.30.0"; 0.29.0 needs "tungstenite ^0.29.0". Cargo book: "0.2.3  :=  >=0.2.3, <0.3.0". This also confirms F42's inferred link. | no change needed |
+| C | R2-BUD-F14 and R2-TRN-F10 | the feature at risk is the `congestionControl` option itself | W3C TR §6.9 | confirmed | under member `congestionControl`: "This configuration option is considered a feature at risk due to the lack of implementation in browsers" "of a congestion control algorithm, at the time of writing, that optimizes for low latency." | no change needed |
+| C | R2-BUD-F35 | the jitter buffer is receive-side, for state packets | Gaffer "State Synchronization" | confirmed | "To handle this situation you need to implement a jitter buffer for your state update packets." | no change needed |
+| C | R2-ROOM-F15 | 'fill' is not TF2's default and counts the whole game | tf_bot_manager.cpp | confirmed | `tf_bot_quota( "tf_bot_quota", "0", …` and `"tf_bot_quota_mode", "normal"`; "keep N players in the game". | no change needed |
+| C | label only (25) | R2-BUD-F6, F8, F11, F13, F21, F29, F34; R2-ROOM-F7, F17; R2-SYNC-F19, F28, F32, F33, F34; R2-TRN-F3, F11, F12, F13, F19, F20, F28, F30, F32, F34, F38 | – | label only | The quotes are in the first-pass notes (`verifier-r2.md`; TRN-F13's in `security-auditor-r2-protocol.md:53`). | no change needed |
+| D | TRN-REC1 | quinn's retry and refusal calls | docs.rs quinn `Incoming` | confirmed | "Reject this incoming connection attempt"; "Respond with a retry packet, requiring the client to retry with address validation". | no change needed |
+| D | TRN-REC1 | wtransport has a `dangerous-configuration` feature | docs.rs wtransport 0.7.2 features page | confirmed | listed; the defaults are "ring" and "self-signed". | no change needed |
+| D | TRN-REC1 | a request without an Origin comes from a non-browser client | draft -16 §3.2 | confirmed at the source, but this passage is not in F36 | "If the WebTransport session is coming from a browser client, an `Origin` header MUST be provided within the request." "Otherwise, the header is OPTIONAL." | fixed: the passage added to R2-TRN-F36; TRN-REC1 cites it, and "not refused on that ground alone" is marked as our policy reading |
+| D | TRN-REC5 | web-transport-quinn lists rcgen only as a dev dependency | docs.rs/crate/web-transport-quinn/0.13.5 | confirmed | "rcgen ^0.14 _dev_". | no change needed |
+| D | ROOM-REC3 | "neither browser constructor takes a header option … WebTransport's options are exactly …" | W3C TR (Candidate Recommendation Snapshot, 30 July 2026) §6.9 | wrong at the spec | The WebIDL has "HeadersInit headers = {};": "Optionally, a Headers object, an object literal, or an array of two-item arrays" "to set the request header list to use when establishing a WebTransport session." MDN's five-option list is incomplete. The browser-compat data has no `headers` key, so whether any browser ships it is not known. | fixed: the reason now rests on WebSocket's URL-and-sub-protocols constructor, URL leaks (F14) and one join path for both transports (marked as our design choice); R2-ROOM-F12 and option 3.2's token-carriage line corrected to the spec's words. The design (the token in the first stream message) is unchanged |
+| D | TRN-REC3 | the HTTP/2 fallback "is documented only for Safari" | R2-TRN-F12 | unsupported | F12's own W3C part (§6.2) defines the HTTP/2 path for any browser. | fixed: reworded to F12 (the W3C constructor defines the path; only the WebKit post documents a browser shipping it) |
+| D | SYNC-REC5 and TRN-REC3 | "the WebSocket fallback has no transport RTT" | no finding | unsupported | not marked as inferred | fixed: marked as our reading in both ("no finding read gives the server a transport RTT over WebSocket"); the design (the server's own pings) is unchanged |
+| E | budgets table A, BUD-REC1's 30 Hz and 20 Hz figures, BUD-REC4's 200–250 ms | the round-trip reading's rewinds | arithmetic | all correct | each is 100 ms plus the interpolation delay (100–150, 50–85 or 150–200 ms) | no change needed |
+
+**The verifier's other findings, and where they went.** 2V-1 to 2V-6 are its ranked findings; 2V-notes and 2V-§6 are
+the notes in its per-recommendation list and its notes file.
+
+| Id | Finding (short) | Where it went |
+|---|---|---|
+| 2V-1 | ROOM-REC3 and R2-ROOM-F12: the spec's `headers` option contradicts "no header option" and "options are exactly …"; F12's inferred "Neither browser transport lets the page set an HTTP auth header" is contradicted for WebTransport | F12 corrected (WebSocket only; MDN's list incomplete; the spec's `headers` option, shipping not known), with the verifier's quotes; ROOM-REC3's reason and option 3.2's token-carriage line reworded; source rows 10 and 21 note the use |
+| 2V-2 | R2-SYNC-F36's "200 ms of movement" clause; part 7's "quotes were matched by exact text search" is true of the quotes, not of this reading | F36 corrected; the line now says the second pass found one reading wrong |
+| 2V-3 | BUD-REC1's lead sentence ("the only snapshot rate") and its pass mark ("rewind ≤ 200 ms for 100 % of shots") not in line with the round-trip reading | Lead reworded: 60 Hz fails the bandwidth budget; 30 Hz beats 20 Hz by a rewind 50 ms shorter, inside ~200 ms only on the one-way reading (R2-XU-OQ2). The mark now checks the cap of R2-XU-OQ1 and records the share of shots it clips |
+| 2V-4 | Leftovers: option 3.5 A ("Shooters lead by RTT + interpolation (F27, F34)") and B (the victim's window) still state F34's content; the legacy CD2 row opens with "keeps only the guest credential" | 3.5 A: the amount of lead is marked as our reading of F28's formula; 3.5 B: the victim's window is open (R2-SYNC-OQ15); CD2: the guest id and settings, the secret in an HttpOnly cookie. ROOM-F17's "owner alone", left only in its own note, needed no change |
+| 2V-5 | TRN-REC1: add the draft's §3.2 "OPTIONAL" passage to F36; "cannot be refused on that ground alone" is an unmarked policy reading | Both applied |
+| 2V-6 | TRN-REC3 and SYNC-REC5: "documented only for Safari" and "no transport RTT"; unmarked reasoning in SYNC-REC3 (a known seed cancels the spread), SYNC-REC5 (a low-ping client claims more rewind) and SYNC-REC8 (client-side aim help looks like an aimbot) | The two claims reworded or marked (table above); the three passages, and SYNC-REC2's lag-switch sentence (from the verifier's notes), are marked as the security review's reasoning |
+| 2V-notes | BUD-REC5's "only `outgoingMaxAge` exists in all three engines" (`incomingMaxAge` does too); INT-REC6 still cites §6.9, removed from INT-REC4; R2-TRN-F40's "the newest"; BUD-REC1's bracket cites R2-SYNC-F28 outside its Rests on | BUD-REC5: "of the sending settings", with `incomingMaxAge` named; INT-REC6: §6.9 removed, as from INT-REC4; F40 and TRN-REC1: "three of the newest"; BUD-REC1's Rests on now lists R2-SYNC-F28 |
+| 2V-§6 | BUD-REC4, BUD-REC5 and TRN-REC6 name no VISION_V2 §6 item | Not applied: left to the Advisor (R2-XU-OQ18), as in the first round |
+
+**Not applied, and why.** Only 2V-§6, as in the first round: whether the §4 fairness target is trace enough for those
+three recommendations is the Advisor's call (R2-XU-OQ18). No verifier finding is disputed.
+
+**Nothing was re-sourced.** Every correction uses the source's words as the verifier quoted them, from sources this
+file already lists (rows 10, 11, 21, 22, 114 and 115). Pages the verifier read that are not
+sources of this file (Quake III's `bg_pmove.c` and four more RustSec advisories) appear only in bracketed verifier
+notes, and no recommendation rests on them. Four recommendations' reasons changed (BUD-REC1, TRN-REC1, TRN-REC3,
+ROOM-REC3), and one pass mark (BUD-REC1); the final check below re-checked them, ROOM-REC3's reworded reason included.
+
+### Final check (2026-10-28)
+
+The verifier checked only what the second fix pass changed (workflow run wf_0ad9f0c0-59d; report:
+`.checkpoints/v2-research/verifier-r2-final-check-result.md`, notes `verifier-r2-final-check.md`). Verdict: PASS WITH
+NOTES, nits only.
+- The four items the second pass found wrong or unsupported (R2-SYNC-F36's movement clause, R2-ROOM-REC3's header
+  reason, R2-TRN-REC3's "documented only for Safari", the WebSocket "no transport RTT" claim) and R2-BUD-REC1's lead
+  and pass mark: closed. ROOM-REC3's reworded reason: re-checked, every part matches its source.
+- Claims the round changed, checked at the source: 14 confirmed, 1 wrong as worded, 0 unsupported. The wrong one,
+  R2-BUD-REC5's "of the browser-side sending settings, only `outgoingMaxAge` exists in all three engines"
+  (`outgoingHighWaterMark` is in all three too, deprecated and off the standards track), was load-bearing for nothing.
+- Applied by the session on 2026-10-28, in the verifier's words: BUD-REC5 now says "of the standards-track sending
+  settings"; R2-XU-OQ1 quotes BUD-REC1's old pass mark as the old one; this part's counts (32 changed basis findings,
+  rows 22 and 114, four reasons changed); TRN-F36's quote keeps "[RFC6454]"; the 66 ms slices are qualified by
+  `pmove_fixed`; TRN-REC3's "only" is "of the sources read"; ROOM-REC3 and option 3.2 mark WebSocket's "no auth header"
+  as inferred, as F12 does. None changes a recommendation's design, a number or a source, so no further pass runs.
+
 ## Sources
 
 ### Sources read
@@ -3553,7 +3683,7 @@ Every source the five units read, merged and de-duplicated: 113 rows from 131 un
 | 7 | https://w3c.github.io/webtransport/ | WebTransport (W3C Editor's Draft) | 2026-10-27 | 2026-10-27 | budgets (official) |
 | 8 | https://www.rfc-editor.org/rfc/rfc6455.html | RFC 6455, The WebSocket Protocol | December 2011 | 2026-10-27 | budgets (official) |
 | 9 | https://www.rfc-editor.org/rfc/rfc8446.html | RFC 8446, TLS 1.3 | August 2018 | 2026-10-27 | budgets (official) |
-| 10 | https://www.w3.org/TR/webtransport/ | WebTransport (W3C) | Candidate Recommendation Snapshot, 30 July 2026 (four fetches: status, §4.3, §5.1, §6.5, §6.9, §14, references) | 2026-10-27 | transport 1 (official) |
+| 10 | https://www.w3.org/TR/webtransport/ | WebTransport (W3C) | Candidate Recommendation Snapshot, 30 July 2026 (four fetches: status, §4.3, §5.1, §6.5, §6.9, §14, references) | 2026-10-27 | transport 1 (official); its §6.9 `headers` option, read by the second verifier pass on 2026-10-28, corrects R2-ROOM-F12 |
 | 11 | https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3 | WebTransport over HTTP/3 (text of -16) | draft -16, 2026-07-06 | 2026-10-27 | transport 3 (official) |
 | 12 | https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3-02 | WebTransport over HTTP/3, draft -02 | 2021-10-25 | 2026-10-27 | transport 4 (official) |
 | 13 | https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3-07 | WebTransport over HTTP/3, draft -07 | 2023-06-13 | 2026-10-27 | transport 5 (official) |
@@ -3569,7 +3699,7 @@ Every source the five units read, merged and de-duplicated: 113 rows from 131 un
 | 18 | https://developer.chrome.com/docs/devtools/memory-inspector | Chrome DevTools, "Inspect JavaScript ArrayBuffer with the Memory inspector" | page updated 2024-09-06 | 2026-10-27 | interest S11 (official) |
 | 19 | https://developer.mozilla.org/en-US/docs/Web/API/WebTransport_API | WebTransport API (MDN) | last modified 2026-10-21 | 2026-10-27 | transport 11 (official) |
 | 20 | https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport | WebTransport() constructor (MDN) | last modified 2026-10-12 | 2026-10-27 | transport 12 (official); rooms 16 (official) |
-| 21 | https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebTransport.json | MDN browser-compat-data: api/WebTransport.json | main | 2026-10-27 | transport 13 (official) |
+| 21 | https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebTransport.json | MDN browser-compat-data: api/WebTransport.json | main | 2026-10-27 | transport 13 (official); no `headers` key (second verifier pass, 2026-10-28; R2-ROOM-F12) |
 | 22 | https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebTransportDatagramDuplexStream.json | MDN browser-compat-data: api/WebTransportDatagramDuplexStream.json | main | 2026-10-27 | transport 14 (official) |
 | 23 | https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebSocket.json | MDN browser-compat-data: api/WebSocket.json | main | 2026-10-27 | transport 15 (official) |
 | 24 | https://raw.githubusercontent.com/mdn/browser-compat-data/main/browsers/chrome.json | MDN browser-compat-data: browsers/chrome.json, firefox.json and safari.json (release dates) | main | 2026-10-27 | transport 16 (official) |
