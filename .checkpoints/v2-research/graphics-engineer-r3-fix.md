@@ -41,3 +41,5 @@ Task: R3 wave 2 owner fix step (apply verifier-r3 spot-check to docs/research/r3
 - number · WGPU-OQ5: "two to five months" -> "55, 76 and 85 days apart (about two to three months)" (C9)
 - nit · C7: five new open questions instead of new options (no new claims allowed): GL2-OQ5 (no fallback), LOOK-OQ6 (anti-aliasing), CHAR-OQ6 (GPU culling, indirect), BUDGET-OQ6 (shadow technique), AUDIO-OQ6 (AudioWorklet)
 - next: part 7 table + critical-read list + counts
+- nit · part 7 written: verifier table (44 rows) + final-state column, critical-read table with actions, counts, not-verified list
+- disagreement (partial): C7 applied as five open questions, not option rows: the fix rule allows no new claims and an option row needs sourced findings. L5 note only (no change). C10 no action.
