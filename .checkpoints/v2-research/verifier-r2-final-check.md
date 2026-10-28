@@ -25,3 +25,12 @@ Task: verifier final check of wave 1, R2 netcode (second fix round only), r2-net
   STALE: R2-XU-OQ1 (:3070) still says "R2-BUD-REC1's pass mark asks for "rewind ≤ 200 ms for 100 % of shots"" -- the round changed that mark and did not update/annotate this cross-reference. Nit (open question text, no rec rests on it).
 - grep for old wordings: none left except inside verifier notes / part 7 tables (intended), and :3070 above.
 - Next: MDN WebSocket ctor (ROOM-REC3 basis), part 7 "rows 10, 11, 21 and 115" check (F40 rewording uses row 114).
+- SRC MDN WebSocket() (WebFetch): "new WebSocket(url)" "new WebSocket(url, protocols)"; params `url`, `protocols` Optional; only header sentence: "The allowed values are those that can be specified in the `Sec-WebSocket-Protocol` HTTP header." -> ROOM-REC3/3.2 WebSocket part CONFIRMED; "no auth header" stays inferred (F12 marks it; REC3 and 3.2 do not repeat the mark: nit).
+- local: CD2 :1586 matches ROOM-REC8 :2820-2822 ("the client may keep the guest id itself"). 3.5 B matches SYNC-OQ15 :2908. 3.5 A 1.8 m = (100 ms + 100 ms) x 9.0 m/s (legacy T row :452), marked our reading.
+- part 7 subsection checks: counts 17+2+2+25+3 = 49; 6 fixed + 43 (15+25+3) = 49; 22 table rows: all match. Nits: :3582 "33 changed basis findings" (scope has 32); :3640-3641 "rows 10, 11, 21 and 115" omits row 114 (F40 rewording) and row 22 (BUD-REC5 via TRN-F19); :3643 "One recommendation's reason changed (ROOM-REC3)" but the owner's log tallies 4 reasons (BUD-REC1 lead, TRN-REC1, TRN-REC3, ROOM-REC3) + 1 mark.
+- header :8-11: matches except last sentence ("awaits the short re-check"), done now.
+
+## Result
+VERDICT PASS WITH NOTES. Item 2 table: 15 claims: confirmed 14, wrong 1 (BUD-REC5 "only outgoingMaxAge" of sending settings: outgoingHighWaterMark also 97/114/26.4, deprecated), unsupported 0. Remaining: nits only (BUD-REC5 wording; XU-OQ1 :3070 stale mark quote; part 7 :3582/:3640/:3643; TRN-F36 quote drops "[RFC6454]"; bg_pmove note 66 ms unqualified; TRN-REC3 "only" = of sources read; REC3/3.2 WebSocket no-auth-header inference unmarked).
+Header label: now "verified (every recommendation claim; final check 2026-10-28: nits only, R2-BUD-REC5's sending-settings wording pending)"; after the nit fixes: "verified (every recommendation claim)".
+DONE
