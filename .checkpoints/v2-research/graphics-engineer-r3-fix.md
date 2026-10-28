@@ -32,3 +32,12 @@ Task: R3 wave 2 owner fix step (apply verifier-r3 spot-check to docs/research/r3
 - number · BUDGET-REC1: laptop CPU floor 4 cores / 8 threads (proposed, no source) (C1)
 - recommendation · BUDGET-REC2: arithmetic for the Low draw-call cap shown; cap holds only without a per-object outline pass; with hull at Low the brief's trade (L2); animation row tied to budget LOD and CHAR-REC1's 2.0 ms explained (C2); Rests on + LOOK-F5, CHAR-REC1/REC4 cited
 - number · BUDGET-REC2 Low draw calls: "≤ 800" -> "≤ 800 without a per-object outline pass; about ≤ 1,100 with one" (proposed, arithmetic) (L2)
+- nit · MEASURE-REC2 cites R1-DET-REC1, R1-DET-REC6 (text, Rests on, pointer) (C5)
+- nit · MEASURE-REC3 Serves: no §6 item note (C6)
+- recommendation · AUDIO-REC1: listener at player made conditional on a legacy-like camera (L4); Serves fixed: brief's R3 row, §3 = largest mode (C6)
+- recommendation · AUDIO-REC2 reason: cap needed because voices cost regardless of gain, not because curves never reach zero (C9)
+- nit · AUDIO-REC2, AUDIO-REC4 Serves: brief's R3 row + "no §6 item names audio" (C6)
+- nit · AUDIO-REC3 Serves: brief's R3 row; §6.2 is reused data, not served (C6)
+- number · WGPU-OQ5: "two to five months" -> "55, 76 and 85 days apart (about two to three months)" (C9)
+- nit · C7: five new open questions instead of new options (no new claims allowed): GL2-OQ5 (no fallback), LOOK-OQ6 (anti-aliasing), CHAR-OQ6 (GPU culling, indirect), BUDGET-OQ6 (shadow technique), AUDIO-OQ6 (AudioWorklet)
+- next: part 7 table + critical-read list + counts

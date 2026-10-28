@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: R6 verifier spot-check (wave 2)
 # subagent_type: verifier · model: opus · effort: high · launched in workflow v2-research-r6-check-fix-run1.js
-# launched: not yet
+# launched: 2026-10-28T20:43:39Z in workflow run wf_12f840d1-878
 
 **Task:** the wave 2 verifier spot-check of research topic R6 (infrastructure) of SHAMBLE FRONTLINES v2 phase 0, as the approved plan says (/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md, wave 2): "one verifier pass reads the whole file critically (recommendations that don't follow from the findings, missing options, features not traced to a §6 need, look choices in R3) and spot-checks at least one basis claim per recommendation and at least 10 claims in all, numbers first". The file: /home/user/Shamble-Frontlines/docs/research/r6-infrastructure.md (written by infra-engineer; status "draft: spot-check pending"). The owner's notes, with the quotes it recorded: /home/user/Shamble-Frontlines/.checkpoints/v2-research/infra-engineer-r6.md; its question drafts: `infra-engineer-r6-<prefix>-draft.md` beside it.
 

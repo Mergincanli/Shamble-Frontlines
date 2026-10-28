@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: R6 wave 2 fix step
 # subagent_type: infra-engineer · model: opus · effort: high · launched in workflow v2-research-r6-check-fix-run1.js
-# launched: not yet
+# launched: 2026-10-28T20:43:39Z in workflow run wf_12f840d1-878
 
 **Task:** the wave 2 fix step for research topic R6 (infrastructure) of SHAMBLE FRONTLINES v2 phase 0 (approved plan: /home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md, wave 2: "the owner fixes; no second pass unless the spot-check found more than nits"). You are the owner of /home/user/Shamble-Frontlines/docs/research/r6-infrastructure.md. Apply the verifier's spot-check to it. Edit that file in place.
 
