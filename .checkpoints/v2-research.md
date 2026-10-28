@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 16:15 Amsterdam
+- **Last update:** 2026-10-28 16:45 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -58,7 +58,7 @@
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer running; fix next | `prompts/verifier-r1-*.txt` |
-| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c | verifier-r2 + security-auditor running (run wf_bce24fc0-5c6); rust-reviewer running | `prompts/netcode-architect-r2-*.txt` |
+| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer running; fix next | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -103,9 +103,15 @@ key (condition A1).
   day only) · spend limit: run fewer agents at once (4–5), the same total work, so units finish before a cut-off:
   the Advisor, relayed by Mustafa, 2026-10-28 about 15:50 Amsterdam.
 
+- Method deviation found at the R2 tally: the verifiers (R1's six and R2's) fetched sources with curl and matched quotes
+  by exact text on the raw page, instead of WebFetch (prompt rule 2/3). Stronger evidence (exact text), but outside
+  the WebFetch permission layer. Audit of every agent transcript: 23 curl calls plus the R2 verifier's loop over
+  `scratchpad/r2v/bin/urls.txt` (111 URLs); every host is on the allow list except api.github.com, read once by the
+  advisor's #29 review on the session's own instruction. For the Advisor: VERIFY-FETCH.
+
 ## Running work
-- R2 chain: run wf_bce24fc0-5c6 (task wqyaqsrsi): assembly done (r2-netcode.md, 7907f5c); verifier-r2 and
-  security-auditor-r2 running.
+- R2 chain: run wf_bce24fc0-5c6 DONE (3/3): reports verbatim in `verifier-r2-result.md`,
+  `security-auditor-r2-protocol-result.md`, `netcode-architect-r2-assemble-result.md`.
 - Rust review: run wf_38e94d0f-403 (task wjewm59xi), script `v2-research-rust-review-run1.js`: rust-reviewer (xhigh) on
   R1 and R2's server stack.
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
