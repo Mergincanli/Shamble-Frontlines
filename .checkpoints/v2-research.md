@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 21:36 Amsterdam
+- **Last update:** 2026-10-28 21:45 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -62,8 +62,8 @@
 | R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read); fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer (high) | 1 owner, 7 question drafts | 7/7 (DONE 21:21) | yes, 605c09d (92 F, 25 REC, 33 OQ; 62 read: 61 official, 1 other; 22 not read) | spot-check pending (`prompts/verifier-r3.txt`) | `prompts/graphics-engineer-r3.txt` |
 | R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | 5/5 (DONE 21:28) | yes, abdf477 (62 F, 18 REC, 23 OQ; 46 read: 36 official, 8 shipped game, 2 other; 32 not read) | spot-check then fix running: run wf_d3f13cf7-77e (launched 21:33) | `prompts/engine-architect-r4.txt` |
-| R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | owner running since 21:29; helper DONE 21:35 (`infra-engineer-r5-ci-draft.md`: 44 F, 10 REC, 13 OQ; 46 read, 15 not read) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
-| R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | 5/5 (DONE 21:31) | yes, 9d5e78a (43 F, 13 REC, 23 OQ; 42 read: 41 official, 1 other; 17 not read) | spot-check then fix running: run wf_12f840d1-878 (launched 21:35) | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
+| R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | owner running since 21:29; helper DONE about 21:43 (`infra-engineer-r5-ci-draft.md`: 44 F, 10 REC, 13 OQ; 46 read, 15 not read) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
+| R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | 5/5 (DONE 21:31) | yes, 9d5e78a (43 F, 13 REC, 23 OQ; 42 read: 41 official, 1 other; 17 not read) | spot-check then fix running: run wf_12f840d1-878 (launched 21:43) | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
 Agent ids are internal to this session and are not written here; the saved prompt plus the notes path is the restart
 key (condition A1).
 
@@ -152,7 +152,7 @@ key (condition A1).
   consistency-critic item). R5 owner: background agent launched 20:29 UTC (`prompts/test-engineer-r5.txt`, notes
   `test-engineer-r5.md`). R6 DONE at about 20:31 UTC (file 9d5e78a; Hetzner's site showed every EU plan "unavailable",
   R6-HOST-OQ1). R4 spot-check then fix: run wf_d3f13cf7-77e (task wnbsqi9ru), launched 20:33 UTC. Next slot: the R6
-  spot-check then fix: run wf_12f840d1-878 (task w0ks9l4k4), launched 20:35 UTC. R5 CI helper DONE at 20:35 UTC.
+  spot-check then fix: run wf_12f840d1-878 (task w0ks9l4k4), launched 20:43 UTC. R5 CI helper DONE at about 20:43 UTC.
   Running: R3, R4 and R6 check-fix workflows (one agent each at a time) and the R5 owner: 4 agents.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
