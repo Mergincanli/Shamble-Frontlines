@@ -132,3 +132,174 @@ Next: QUICHE, wtransport, web-transport-proto, quinn docs, crates.io, moq README
 - TRN-F32 confirmed: datatracker QMux page: "draft-ietf-quic-qmux-02", 2026-07-06, "WG Document", "Proposed Standard"; abstract both fragments verbatim (state fields marked inferred are on the page).
 - TRN-F33 confirmed: crates.io tokio-tungstenite 0.30.0, 2026-07-11T12:58:44Z, created 2017-03-17; axum 0.8.9, 2026-04-14T07:55:20Z; docs.rs axum 0.8.9 extract::ws "Handle WebSocket connections." and "Available on crate feature ws only." (dependency ^0.29.0 not re-checked).
 Next: three.js, Chrome DevTools, AWS GameLift, PlayFab, Agones, OWASP, tokio, Rust std, Cargo, netcode STANDARD (INT-F16, F17; ROOM-F1-F8, F10, F14, F16-F18).
+- INT-F16 confirmed: developer.chrome.com memory-inspector ("Last updated 2024-09-06 UTC"): all three quotes verbatim.
+- INT-F17 confirmed: three.js PerspectiveCamera.js (dev):49-50 "The vertical field of view, from bottom to top of view, / in degrees." (spans two comment lines); :227 getViewBounds doc verbatim.
+- ROOM-F1 confirmed: GameLift gamelift-sdk-interactions: ProcessReady quote :71; placement steps :130-155 ("searches those fleets for an active server process that's not hosting a game session", status ACTIVATING, "Changes the server process's number of game sessions to 1.", ActivateGameSession sentence).
+- ROOM-F2 confirmed: same page RESERVED, AcceptPlayerSession sentences; API_PlayerSession Status: TIMEDOUT (60 seconds) and COMPLETED quotes verbatim.
+- ROOM-F3 confirmed: sdk-interactions ProcessEnding quote and "The server process must respond healthy or not healthy within one minute."; fleets-multiprocess "...unhealthy for three consecutive reports."; API_RuntimeConfiguration GameSessionActivationTimeoutSeconds "If the game session does not become active before the timeout, it is ended and the game session status is changed to TERMINATED." and "Valid Range: Minimum value of 1. Maximum value of 600."
+- ROOM-F4 confirmed: fleets-multiprocess intro and "Test different configurations..." quotes; RuntimeConfiguration "An Amazon GameLift Servers instance is limited to 50 processes running concurrently."
+- ROOM-F5 confirmed: PlayFab lifecycle (ms.date 2022-01-26, updated 2025-05-01): all four quotes verbatim.
+- ROOM-F6 confirmed: agones high-density-gameservers.md: three quotes verbatim; front matter 2021-08-31; Counters shown as `{{< beta title="Counters And Lists" gate="CountsAndLists" >}}`; "rooms" Counter present.
+- ROOM-F7 confirmed: docs.rs tokio 1.54.1 task module and spawn_blocking: all quotes verbatim; the thread::spawn link is verbatim too: "For workloads that run indefinitely or for extended periods (for example, background workers or persistent processing loops), prefer a dedicated thread created with thread::spawn." (finding marks it inferred).
+- ROOM-F8 confirmed: doc.rust-lang.org std::thread (1.99.1): three quotes verbatim; Cargo profiles "Terminate the process upon panic."
+- ROOM-F10 confirmed: netcode STANDARD.md ("# netcode 1.02"): four quotes verbatim; also "If the dedicated server public address is not in the list of server addresses in the private connect token, ignore the packet." (the "not addressed to it" part).
+- ROOM-F14 confirmed: OWASP Session Management Cheat Sheet: four quotes verbatim.
+- ROOM-F16 confirmed: PlayFab login basics (ms.date 2025-02-20, updated 2025-10-31): five quotes verbatim.
+- ROOM-F17 confirmed with note: create-a-lobby (updated 2026-03-24) and ownership-changes (updated 2025-09-10): all five quotes verbatim. Overreach: the source says the owner "has special permissions to update data on the lobby", not that the owner alone updates it (finding "owner alone"; ROOM-REC5 "sole write rights"). "configured during creation" is said of the four settings; "can't be changed" is said only of ownerMigrationPolicy ("This policy is configured when the lobby is created and can't be changed.").
+- ROOM-F18 confirmed: sdk-interactions introduction: "When joining a game session, the game client connects directly to a game session using the game session's unique IP address and port number."
+Next: inferred findings (SYNC-F34, INT-F18, F19, F20) arithmetic check; numbers in RECs and pass marks; ranked other findings.
+- SYNC-F34 unsupported (the unit's own inference; no source passage read: the Valve wiki pages that explain it returned 403). The reasoning is consistent with F28's code, but no source states the "hit behind cover" window.
+- INT-F18 confirmed (arithmetic re-done): pitch atan(40/56.6)=35.25°; near/far edge depression 42.75°/27.75° -> ground 43.27 m / 76.03 m from camera foot -> 13.33 m before and 19.43 m beyond the look point (depth 32.76 m); half-widths 0.2341 x axial depth 58.43 / 85.18 -> 27.36 m / 39.88 m wide; area 1,101 m²; far corner 27.8 m from the look point. Legacy inputs CD5 (height 40, boom 56.6, fov 15) match LEGACY_INVENTORY.md:86. Source part (vertical FOV) = INT-F17 confirmed.
+- INT-F19 confirmed (arithmetic): 372x252 = 93,744 m² (CD21, LEGACY_INVENTORY.md:102); r 28/40/50 -> 2.63/5.36/8.38 %; 47 x 5.36 % = 2.5; 47 x 12-25 B = 564-1,175 B; x 20/s x 8 = 90-188 kbit/s. Record sizes are illustrative (marked).
+- INT-F20 confirmed (arithmetic): pairs 576/768/432; 768 x 2.7-5.7 µs = 2.07-4.38 ms, x3 = 6.2-13.1 ms; x20/s = 4.1-8.8 % of a core. hasLOS 2.7-5.7 µs matches LEGACY_INVENTORY.md:174/:177.
+- Legacy numbers in recs checked against docs: T moveSpeed 6.3, sprintMult 1.4286 (LEGACY_TUNING.md:117, :137) -> 9.0 m/s, 1.8 m in 200 ms; WEAPONS shabzon fireInterval 0.072 (:175) -> 13.9/s, 2.16 / 4.32 ticks; 48 x 13.9 = 667 shots/s; CM4 0.80-1.00 ms (INVENTORY :152); GN8 50 m / 90 m (:273). Default principles (.claude/agents/netcode-architect.md:34-36): "about 100 ms behind (2–3 snapshots)", "~1 s of hitbox history", "capped (~200 ms)" match the file's quotes. LOOP_V2 "everyone is told where" (:41) and "about 20 min" (:100) match; VISION pillar quote "I sat in a building and kept harassing them" (VISION_V2.md:21) matches.
+- Extra source facts relevant to recs: (1) W3C ED §6.13: `required WebTransportDatagramStats datagrams;` is a member of WebTransportConnectionStats, so lostOutgoing/expiredOutgoing, like smoothedRtt/rttVariation/estimatedSendRate, come only from transport.getStats(), which BCD shows missing on Chrome/Edge and throwing on Firefox (TRN-F9). (2) quinn send_datagram: "Previously queued datagrams which are still unsent may be discarded to make space for this datagram, in order of oldest to newest."; send_datagram_wait "effectively prioritizes old datagrams over new datagrams" (supports TRN-REC6's non-waiting send).
+- VISION_V2 §6 trace checked (VISION_V2.md:61-80): BUD-REC3, BUD-REC4, BUD-REC5 and TRN-REC6 name no §6 item (as XU-OQ18 says). INT-REC7 (spectators) cites §6.1 and §6.8, neither of which names spectators (§6.8's kill-cams and replays are [LATER]). INT-REC4 cites §6.9, which is a renderer budget ("the renderer handles a few very large units"), not a network need.
+Next: write final table and ranked findings.
+
+- INT-F1 confirmed: q3 sv_snapshot.c SV_AddEntitiesVisibleFromPoint :309, :327-383 (all quoted lines verbatim; "broadcast entities are always sent" :358, "blocked by a door" :370).
+- INT-F2 confirmed: sv_snapshot.c :228, :269 "if we are full, silently discard entities", SV_RateMsec :532-544, :588.
+- INT-F3 confirmed: sv_snapshot.c :89-99.
+- INT-F4 confirmed: q3 cm_test.c :429 floodnum compare, CM_AdjustAreaPortalState :381-405 (++ / -- then CM_FloodAreaConnections).
+- INT-F5 confirmed: q2 server/sv_send.c :156-158 multicast comments, :230, SV_StartSound :358-363 (use_phs = false).
+- INT-F6 confirmed: q3 g_utils.c G_TempEntity :481-502, G_Sound :607.
+- INT-F7 confirmed: q3 g_combat.c player_die :499-504, ScorePlum :37-38.
+
+## Final table (claim id · claim, short · source · verdict · location)
+SYNC-F1 · lockstep: latency of most-lagged player · gaffer what_every_programmer · confirmed · "Peer-to-Peer Lockstep"
+SYNC-F2 · late join rare (deterministic start) · same · confirmed · same section
+SYNC-F3 · bit-exact; float differs by compiler/OS/ISA · gaffer deterministic_lockstep · confirmed · two quotes verbatim
+SYNC-F4 · lockstep waits for input; TCP RTT*2 stall · same · confirmed · para "Above you can see ... TCP" (quote truncated before "(actually...")
+SYNC-F5 · snapshot interp needs no determinism · gaffer snapshot_interpolation · confirmed · intro
+SYNC-F6 · state sync approximate; quantize both sides · gaffer state_synchronization · confirmed · intro + "Quantize Both Sides"
+SYNC-F7 · delta vs acked baseline; 1 bit unchanged · gaffer snapshot_compression · confirmed · delta section
+SYNC-F8 · Q3 ring 32, full snapshot rules, 1024 cap · q3 sv_snapshot.c, qcommon.h · confirmed · sv_snapshot.c:89-158,:228; qcommon.h:117-118
+SYNC-F9 · Q3 client sends last seq; asks no-delta · q3 cl_input.c · confirmed · :713-716, :748-750
+SYNC-F11 · QUIC datagrams not resent, reorder, drop, no fragment · RFC 9221 · confirmed · §5, §5.2, §5.3
+SYNC-F12 · client prediction ring, rewind/replay · gaffer what_every_programmer · confirmed · "Client-Side Prediction"
+SYNC-F13 · Q3 replays all unacked cmds; OPTIMIZE note · q3 cg_predict.c · confirmed · :398-406, :584
+SYNC-F14 · Q3 stops predicting past cmd buffer · cg_predict.c · confirmed · :466-474 ("freeze at the last good position")
+SYNC-F15 · Q3 error decay, 0.1 units, 100 ms · cg_predict.c, cg_main.c · confirmed · :410,:550-566; cg_main.c:252
+SYNC-F16 · Fiedler 2004: snap >2 m, 10 %, ignore old input · gaffer networked_physics_2004 · confirmed · six quotes verbatim
+SYNC-F17 · Q3 predicts item pickups, jump pads; solid list · cg_predict.c, cg_main.c · confirmed · :41,:72,:271,:303-306,:375; cg_main.c:266
+SYNC-F18 · Q3 packetdup redundancy, cap 32; Fiedler redundant inputs · cl_input.c, qcommon.h, cl_main.c, gaffer lockstep · confirmed · cl_input.c:731-770; qcommon.h:121
+SYNC-F19 · Q3 cmd serverTime, 16-bit angles · cl_input.c, q_shared.h · confirmed · cl_input.c:512-517; q_shared.h:1082,:1248-1254
+SYNC-F20 · Source cmd tick_count, random_seed · source usercmd.h · confirmed · :139-168
+SYNC-F21 · 3x send interval; 300/350/150/85 ms · gaffer snapshot_interpolation · confirmed · paras "My rule of thumb", "How can we reduce"
+SYNC-F22 · extrapolation poor; Hermite removed artifacts · same · confirmed · extrapolation para; Hermite @10pps para
+SYNC-F23 · Q3 clock rules 500/100/1-2 ms, extrapolate, ±30 nudge · cl_cgame.c, cg_snapshot.c · confirmed · cl_cgame.c:810-986; cg_snapshot.c:366
+SYNC-F24 · no interp across teleport/first snap · cg_snapshot.c · confirmed · :217, :68, :296-297
+SYNC-F25 · players lerped, missiles by trajectory · cg_ents.c · confirmed · :718, :741-762, :1004
+SYNC-F26 · Source cl_extrapolate default 1 · c_baseentity.cpp · confirmed · :80
+SYNC-F28 · Source rewind = tick - lerp; 200 ms trust; clamp 1 s · player_lagcompensation.cpp, inetchannelinfo.h · confirmed (notes: RTT reading rests on header comment while the call passes FLOW_OUTGOING; clamp is on the estimate, client-trusted path can exceed it by up to 0.2 s) · :34, :389-411; inetchannelinfo.h:56
+SYNC-F29 · Source 1 s history with anim layers · player_lagcompensation.cpp · confirmed · LagRecord :114-126; purge :258, :290
+SYNC-F30 · stop at dead record or >64-unit jump · same · confirmed · :473-482; :28
+SYNC-F31 · no lag comp for bots, SP, self · same · confirmed · :363-369, :425-426
+SYNC-F32 · rewind only enemies, acked, near, in 45° cone · source player.cpp · confirmed (code: near OR in cone) · :749-782
+SYNC-F33 · cap on replayed cmd ticks (speed hack) · player.cpp · confirmed (default "24", unread by unit) · :103, :3392-3413
+SYNC-F34 · "hit behind cover" window grows with latency · none (unit's inference; Valve wiki 403) · unsupported (no source passage) · –
+SYNC-F35 · Q3 projectile trajectories, bounce, sweep, 50 ms prestep · g_missile.c, bg_misc.c, q_shared.h · confirmed · g_missile.c:25-70,:466-585; bg_misc.c:1229; q_shared.h:1271-1275
+BUD-F1 · QUIC needs 1200-byte paths · RFC 9000 · confirmed · §14
+BUD-F2 · no IP fragmentation, DF bit · RFC 9000 · confirmed · §14
+BUD-F3 · 1280 IP minimum; 1232/1252 · RFC 9000 · confirmed · §14
+BUD-F4 · 1-RTT header fields · RFC 9000 · confirmed · §17.3.1 figure
+BUD-F5 · 16-byte AEAD tag · RFC 9001 · confirmed · §5.3
+BUD-F6 · DATAGRAM no fragment; 0x30/0x31 LEN bit · RFC 9221 · confirmed (LEN rule verbatim) · §5, §4
+BUD-F7 · datagrams delayed or dropped by CC · RFC 9221 · confirmed · §5.4
+BUD-F8 · not resent; transport ack != app processed · RFC 9221 · confirmed (app-ack sentence verbatim) · §5.2
+BUD-F9 · WT datagram = QSID varint + payload · RFC 9297, draft -16, RFC 9000 · confirmed · RFC 9297 §2.1; -16 §4.5; RFC 9000 §16 Table 4
+BUD-F10 · maxDatagramSize runtime, tied to PMTU · W3C ED 2026-10-27 · confirmed · §5.3, §5.1
+BUD-F11 · oversize write resolves undefined, not queued · W3C ED · confirmed (algorithm order shows it) · §4.3 writeDatagrams
+BUD-F12 · smoothedRtt, rttVariation, estimatedSendRate · W3C ED · confirmed · §6.13
+BUD-F13 · outgoingMaxAge; expired/lost counters · W3C ED · confirmed (ms units verbatim §5.1) · §6.14, §5.1
+BUD-F14 · low-latency option at risk, unimplemented · W3C ED · confirmed (verbatim, unit had no quote) · §6.9
+BUD-F15 · initial window 10x, min 2x, pacing · RFC 9002 · confirmed · §7.2, §7.7
+BUD-F18 · fragment loss 1-p^n; 1200, 1472 · gaffer packet_fragmentation · confirmed · MTU paras; "Two/Ten fragments" list
+BUD-F19 · 512/m, 50 bits per position · gaffer snapshot_compression · confirmed · position quantization para
+BUD-F20 · 29-bit smallest three; no velocity at 60 Hz · same · confirmed · orientation para; "Linear interpolation is good enough at 60HZ"
+BUD-F21 · 1 bit unchanged; 54 kbps; 5.5 / 26.1 bits · same · confirmed (averages verbatim) · "Incremental Improvements" onward
+BUD-F22 · 15 kbps header floor; 17.37 Mbit/s raw · same · confirmed · verbatim
+BUD-F23 · arithmetic coding beat bit-packing by 25 % · same · confirmed · verbatim
+BUD-F24 · Q3 per-field changed bits, 13-bit floats · q3 msg.c · confirmed · :800-807, :842-844, :915, :928
+BUD-F25 · PACKET_BACKUP 32; snapshot-entity ring · qcommon.h, sv_init.c · confirmed · qcommon.h:117; sv_init.c:227
+BUD-F26 · Q3 defaults sv_fps 20, snaps 20, rate 3000, maxpackets 30, packetdup 1 · sv_init.c, cl_main.c, qcommon.h · confirmed · sv_init.c:596; cl_main.c:2304-2349
+BUD-F27 · Q3 MAX_PACKETLEN 1400, own fragmenting · net_chan.c, qcommon.h · confirmed · net_chan.c:50-52; qcommon.h:169
+BUD-F28 · Source 15 ms tick; TF2/CS:S/DoD ignore -tickrate · const.h, gameinterface.cpp · confirmed · const.h:31; gameinterface.cpp:829-851
+BUD-F29 · rewind = outgoing latency + lerp, clamp 1 s; 0.2 check · player_lagcompensation.cpp · confirmed (0.2 meaning verbatim in comment :409) · :34, :389-411, :258
+BUD-F30 · GNS UDP payload 1300 · GNS internal.h, csteamnetworkingsockets.cpp · confirmed · internal.h:263-266; .cpp:87
+BUD-F31 · GNS send rate 256 KiB/s set by hand · steamnetworkingtypes.h, .cpp · confirmed · types.h:1235-1240; .cpp:84-85
+BUD-F32 · 3 intervals; 150 ms at 30, 85 at 60 · gaffer snapshot_interpolation · confirmed (150 = 3 intervals + jitter is the unit's reading) · as SYNC-F21
+BUD-F34 · priority accumulator; 256 kbit/s example · gaffer state_synchronization · confirmed (reset rule verbatim) · "Packet Structure", "Priority Accumulator"
+BUD-F35 · redundant inputs; jitter buffer 4-5 frames · same · confirmed (redundancy verbatim) · "Jitter Buffer"; packet structure para
+INT-F1 · Q3 per-client entity tests (flags, areas, PVS) · q3 sv_snapshot.c · confirmed · SV_AddEntitiesVisibleFromPoint
+INT-F2 · Q3 1024 cap, silent discard, rate pacing · sv_snapshot.c · confirmed · :228, :269, :532-544, :588
+INT-F3 · entering entity from baseline; unchanged free · sv_snapshot.c · confirmed · :89-99
+INT-F4 · Q3 O(1) area connectivity, reflood on door · q3 cm_test.c · confirmed · CM_AreasConnected, CM_AdjustAreaPortalState
+INT-F5 · Q2 multicast ALL/PHS/PVS; no-attenuation to all · q2 sv_send.c · confirmed · SV_Multicast, SV_StartSound
+INT-F6 · Q3 events as temp entities, snapped origin · q3 g_utils.c · confirmed · G_TempEntity, G_Sound
+INT-F7 · Q3 obituary broadcast, score plum single client · q3 g_combat.c · confirmed · player_die, ScorePlum
+INT-F8 · Source ALWAYS/PVSCHECK/DONTSEND, team hook · source baseentity.cpp · confirmed (quotes are brace-less forms of multi-line code) · :4024-4025, :4049-4096
+INT-F9 · child forces parent to be sent · baseentity.cpp · confirmed · :4118, :4133
+INT-F10 · team entity always sent; observer target sent · team.cpp · confirmed · :102-115
+INT-F11 · per-field team-only proxy · sendproxy.cpp · confirmed · :79-96
+INT-F12 · TF2 disguise fields in shared table · tf_player_shared.cpp · confirmed · :535, :577-582, :590
+INT-F13 · SourceTV tv_delay 30 s · hltvdirector.cpp · confirmed · :24, :215-216
+INT-F14 · accumulator mechanics, player priority, 64 per packet · gaffer state_synchronization · confirmed · "Priority Accumulator"
+INT-F15 · unchanged = 1 bit; 15 kbps stationary · gaffer snapshot_compression · confirmed · verbatim
+INT-F16 · DevTools memory inspector reads JS/Wasm memory · developer.chrome.com memory-inspector (2024-09-06) · confirmed · three quotes verbatim
+INT-F17 · fov vertical degrees; getViewBounds · three.js PerspectiveCamera.js (dev) · confirmed · :49-50, :227
+INT-F18 · footprint 27.4/39.9 x 32.75 m, r ≈ 28 m · arithmetic on CD5 + F17 · confirmed (recomputed) · –
+INT-F19 · 2.6/5.4/8.4 % of map; 90-188 kbit/s illustration · arithmetic on CD21 · confirmed (recomputed) · –
+INT-F20 · 576/768/432 pairs; 2.1-4.4 ms; 4-9 % core · arithmetic on CS6/CS9 · confirmed (recomputed) · –
+TRN-F3 · WT over HTTP/2 draft -15, WGLC · datatracker draft-ietf-webtrans-http2 · confirmed (fields on page) · document fields
+TRN-F4 · drafts not wire-compatible; codepoints · drafts -16, -07, -02 · confirmed · -16 §7.1, §9.2; -07 App. A.1, §8.2; -02 §8.2
+TRN-F5 · QUICHE has only draft-02/-07 settings · quiche http_constants.h · confirmed · :43-45
+TRN-F6 · wtransport and web-transport-proto same settings · settings.rs (both) · confirmed · wtransport-proto :247-248; web-transport-proto 0.6.3 lines 77-80
+TRN-F7 · all four browsers ship WT; versions, dates · BCD WebTransport.json + browsers/*.json; MDN API page · confirmed · JSON entries; MDN Baseline box
+TRN-F8 · datagram writer differs per browser · BCD DatagramDuplexStream.json · confirmed · writable / createWritable entries
+TRN-F9 · getStats missing Chrome/Edge, throws Firefox · BCD WebTransport.json · confirmed · getStats entry
+TRN-F10 · congestionControl hint weak · BCD, MDN ctor, W3C TR · confirmed · BCD option entry; MDN options; TR §6.9
+TRN-F11 · Chrome lacks requireUnreliable etc. · BCD WebTransport.json + browsers · confirmed (all rows in data) · option and method entries
+TRN-F12 · Safari HTTP/2 fallback; reliability; requireUnreliable · WebKit 17862, W3C TR, MDN ctor · confirmed; location wrong: [[Reliability]] steps are TR §6.2 Constructor, not §6.5 · WebKit WebTransport para; TR §6.2, §6.9
+TRN-F13 · pinning rules X.509v3, ≤2 weeks, P-256, no RSA, SHA-256 · W3C TR, MDN ctor · confirmed (SHA-256-only verbatim) · TR §6.9 custom certificate requirements
+TRN-F14 · pinning for non-public/ephemeral hosts · MDN ctor · confirmed · serverCertificateHashes option text
+TRN-F15 · wtransport self_signed P-256, 14 days · docs.rs wtransport 0.7.2 Identity; Cargo.toml · confirmed · Identity::self_signed; Cargo.toml:57
+TRN-F16 · datagrams unreliable, CC'd, unfragmented; WT prefix · RFC 9221; draft -16 · confirmed · RFC §2, §5-§5.4; -16 §4.1, §4.5
+TRN-F17 · 1200-byte floor; quinn initial_mtu 1200 · RFC 9000; docs.rs quinn TransportConfig · confirmed · §14; initial_mtu, min_mtu, mtu_discovery_config
+TRN-F18 · max datagram size varies; oversize vanishes · W3C TR · confirmed · §5.1, §4.3
+TRN-F19 · queues drop; maxAge support per browser · W3C TR; BCD · confirmed (BCD rows in data) · §5.1, §4.3; DatagramDuplexStream entries
+TRN-F20 · Fiedler oversize/fragments; 1200, 1024, 63.4 % · gaffer packet_fragmentation · confirmed (63.4 % verbatim) · MTU paras; "Sending Packet Fragments"
+TRN-F21 · WebSocket HOL; WT streams don't block · WebKit 17862 · confirmed · WebTransport paras
+TRN-F22 · Fiedler UDP only, don't mix TCP/UDP · gaffer udp_vs_tcp · confirmed · body and "Conclusion"
+TRN-F24 · NewReno, CUBIC, min window 2 · RFC 9002 · confirmed · §7, §7.2, §7.6, §7.7
+TRN-F25 · quinn controllers, send_datagram, rtt · docs.rs quinn 0.11.12 · confirmed · congestion module; Connection; TransportConfig
+TRN-F26 · sessions share CC and flow control · draft -16 · confirmed · §8
+TRN-F28 · quinn 0.11.12 mature · crates.io API · confirmed · newest_version, updated_at, created_at
+TRN-F29 · wtransport 0.7.2; not production-ready · crates.io, Cargo.toml, README, docs.rs · confirmed (stars/issues not checked: github.com 403) · README:31-32; Cargo.toml:13-65
+TRN-F30 · web-transport-quinn 0.13.5 family, fast releases · crates.io, moq README · confirmed (release list in registry) · README "Crates"
+TRN-F31 · h3 very experimental; h3-webtransport idle · h3 README; crates.io · confirmed · README:16; versions list
+TRN-F32 · QMux -02 WG Document, abstract · datatracker · confirmed (fields on page) · document page, abstract
+TRN-F33 · tokio-tungstenite, axum ws mature · crates.io; docs.rs axum 0.8.9 · confirmed (^0.29.0 dependency not re-checked) · extract::ws page
+TRN-F34 · WebSocket in all four, in workers · BCD WebSocket.json · confirmed (binaryType in data) · WebSocket, worker_support, binaryType
+TRN-F35 · WT in workers, HTTPS, explicit port · MDN WebTransport_API · confirmed · notes and constructor para
+TRN-F38 · protocols option carries app version · MDN ctor; BCD · confirmed (versions in data) · protocols option
+ROOM-F1 · GameLift ready/activate, one session per process · AWS gamelift-sdk-interactions · confirmed · "Initializing a game server process", "Creating a game session"
+ROOM-F2 · reserve slot, validate, 60 s timeout · same + API_PlayerSession · confirmed · "Adding a player"; Status
+ROOM-F3 · ProcessEnding, health 1 min, 3 strikes, 1-600 s activation · sdk-interactions, fleets-multiprocess, API_RuntimeConfiguration · confirmed · as cited; Valid Range
+ROOM-F4 · density by processes per instance; 50 cap; test · fleets-multiprocess, API_RuntimeConfiguration · confirmed · intro; "Choose the number..."; description
+ROOM-F5 · PlayFab StandingBy->Active, exit at end · learn.microsoft.com lifecycle · confirmed · "States of a game server", "Terminating..."
+ROOM-F6 · Agones multi-session cheaper, harder; rooms Counter Beta · agones high-density-gameservers.md · confirmed · body; beta shortcode
+ROOM-F7 · tokio cooperative; spawn_blocking finite; thread::spawn · docs.rs tokio 1.54.1 · confirmed (thread::spawn link verbatim) · task module; spawn_blocking
+ROOM-F8 · panic ends thread unless abort; 2 MiB stack · doc.rust-lang.org std::thread; Cargo profiles · confirmed · "Panics", "Stack size"; profiles "panic"
+ROOM-F9 · Fiedler connect tokens · gaffer why_cant_i_send_udp · confirmed · connect token section
+ROOM-F10 · netcode 1.02 single-use tokens · mas-bandwidth netcode STANDARD.md · confirmed · server-side checks list
+ROOM-F11 · JWT aud, exp leeway, jti · RFC 7519 · confirmed · §4.1.3, §4.1.4, §4.1.7
+ROOM-F12 · WS ctor url+protocols; WT options list · MDN WebSocket(), WebTransport() · confirmed ("no auth header" stays inferred) · Syntax; options
+ROOM-F13 · extended CONNECT, :authority/:path, rate-limit · draft -16 · confirmed · §3.2, §5.2
+ROOM-F14 · ≥64 bits entropy; URL IDs leak · OWASP Session Management · confirmed · "Session ID Entropy"; URL and logging passages
+ROOM-F15 · TF2 bot quota fill/match, auto vacate · tf_bot_manager.cpp · confirmed (note: default mode "normal", quota 0) · :26-29, :432
+ROOM-F16 · anonymous login first, recoverable later · PlayFab login basics · confirmed · five quotes verbatim
+ROOM-F17 · lobby settings at creation; owner rights; migration · PlayFab create-a-lobby, ownership-changes · confirmed except "owner alone" (source: "special permissions to update data") = unsupported part · create page settings list; ownership-changes Automatic row
+ROOM-F18 · client connects to session IP and port · AWS gamelift-sdk-interactions · confirmed · introduction
+Counts: 135 findings checked · confirmed 133 (one with a location error: TRN-F12) · wrong 0 · unsupported 2 (SYNC-F34 whole; ROOM-F17 the "owner alone" part).
+DONE
