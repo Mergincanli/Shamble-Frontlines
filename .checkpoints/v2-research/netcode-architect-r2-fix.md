@@ -70,3 +70,55 @@ Batch 7 (budgets recommendations), applied:
 - recommendation+number · BUD-REC4 "one-way" -> server's latency estimate (XU-OQ2); input buffer proposed, F35 corrected; getStats Safari only (TRN-F9 added to Rests on); reason gives both readings (200-250 ms RTT)
 - recommendation · BUD-REC5 counters only via getStats (TRN-F9, F19 added); F14 wording corrected
 Next: interest recommendations (INT-REC1 L2 note, INT-REC2 reader test M5, INT-REC4 Serves, INT-REC5 Spy wording, INT-REC6 M5, INT-REC7 M10 + conditional).
+Batch 8 (interest recommendations), applied:
+- nit · INT-REC1 accepted-risk note (L2)
+- recommendation · INT-REC2 reader-client mark (a) extended (M5)
+- nit · INT-REC4 Serves: §6.9 removed (verifier 4)
+- nit · INT-REC5 Spy wording: F12 reach inferred (security C23)
+- recommendation · INT-REC6 non-relevant shooter events clipped (M5) + mark
+- recommendation · INT-REC7 conditional on XU-OQ17; follow own team only live (M10) + mark; Serves note (verifier 4)
+Next: transport recommendations.
+Batch 9 (transport recommendations), applied:
+- recommendation · TRN-REC1 "mature" -> F40 floors; Origin allow-list (M1, F36); Rests on + F36, F40, ROOM-F13; marks 4 hostile input (H3) and 5 version floors (Rust risk 1); audit gate deferred to R6 baseline
+- recommendation · TRN-REC3 axum ^0.29 vs 0.30 (Rust risk 10); HTTP/2 claim dropped -> TRN-OQ2 (verifier 5); WS safeguards (H4, F41); Rests on + F41; mark 4
+- recommendation · TRN-REC4 bounded queues; decoders never panic (M9); Rests on + F34 (verifier 9); mark 4 fuzz
+- nit · TRN-REC5 rcgen dev-dependency (Rust review)
+- nit · TRN-REC6 F10 wording (C28)
+Next: rooms recommendations.
+Batch 10 (rooms recommendations), applied:
+- recommendation · ROOM-REC2 keep panic=unwind, isolate connections (M9, Rust risk 1) + mark 6
+- recommendation · ROOM-REC3 display-name rule (L4); reason rests on confirmed option lists (C12); Rests on + F19; mark 1 extended (M8), mark 3 extended (L3), mark 4 added (L4)
+- recommendation · ROOM-REC5 global + guest-creation limits (M7) + mark 5; reason F17 corrected (verifier, unsupported part removed)
+- recommendation · ROOM-REC6 reason: TF2 fill is opt-in, whole-game (verifier 7)
+- recommendation · ROOM-REC8 secret in HttpOnly cookie (M6, F19); Rests on + F19; mark 4; alternative -> ROOM-OQ11
+Next: open questions (SYNC-OQ2, OQ3, OQ11, OQ14, new OQ15; TRN-OQ2, OQ5; ROOM-OQ2, OQ10, new OQ11; INT? ; XU-OQ1, 2, 10, 14, 18; pointers; hinge table).
+Batch 11 (unit open questions), applied:
+- nit · SYNC-OQ2 F34 -> OQ15; security prefers 200 ms
+- nit · SYNC-OQ3 lag-switch note (M3)
+- nit · SYNC-OQ11 security answer recorded (H2); still Mustafa (SEC-SPREAD)
+- nit · SYNC-OQ14 403 again; F34 unsupported
+- recommendation · new R2-SYNC-OQ15 (F34's question; former REC5 mark 2)
+- nit · TRN-OQ2 note; TRN-OQ5 Rust review maintenance answer (reviewer numbers, no REC rests on them)
+- nit · ROOM-OQ2 security answer (M8); ROOM-OQ10 M7 options
+- recommendation · new R2-ROOM-OQ11 (guest secret storage alternative, SEC-GUEST)
+Next: XU-OQ1, OQ2, OQ10, OQ14, OQ18; pointers; hinge table; part 7; header; totals.
+Batch 12 (cross-unit OQs, pointers, hinge table), applied:
+- nit · XU-OQ1 verifier + security notes; XU-OQ2 verifier result, now decided by REC5 spike measurement; XU-OQ10 resolved by its own rule; XU-OQ14 verifier note; XU-OQ18 BUD-REC3 traced, INT-REC4/REC7 added, rest left to Advisor
+- nit · pointers: R1 spread stream + Wasm trap recovery (Rust risk 4); security-auditor/rust-reviewer done; R6 baseline waiting items
+- nit · hinge table SYNC-REC5 row updated; 403 again
+Next: part 7 merged table; header; totals; sources list rows for new sources.
+Batch 13, applied:
+- source · new R2-TRN-F42 (docs.rs tungstenite 0.30.0 WebSocketConfig defaults, read 2026-10-28); TRN-REC3 now cites F42, Rests on + F42
+- nit · sources: rows 114-116 + re-read note; not-read row 2 (403 again)
+- nit · header: status, id ranges, totals (152 findings, 72 OQs, 116 sources)
+Re-sourced/new findings now 5: SYNC-F36, TRN-F40, TRN-F41, TRN-F42, ROOM-F19.
+Next: part 7 merged table (build with a script from verifier result + security + rust tables), then review whole diff.
+Batch 14 (part 7), applied:
+- nit · part 7: pending line replaced by merged table (137 rows: 135 verifier + TRN-F36 + ROOM-REC8), counts, new findings list, other-findings table (V1-V11, S-H1..L4, C28, R-1..10), not-applied list with reasons
+Final-state counts: 98 no change, 36 fixed, 2 re-sourced (SYNC-F19->SYNC-F36, TRN-F28->TRN-F40), 1 now OQ (SYNC-F34->SYNC-OQ15); ROOM-REC8 fixed + re-sourced (ROOM-F19).
+Next: whole-file review (diff vs backup), TL;DR check, consistency, then DONE.
+Batch 15-16, applied:
+- nit · TRN-F40 wording (titles and descriptions read)
+- nit · how-to-read bullet on fix-pass markers; recommendations intro (XU-OQ18 scope); fix-pass markers on TRN-REC3 header, INT-REC5 Spy, option 3.5 A, transport Q1
+Next: TL;DR check, sanity greps (dangling refs, ids), DONE.
+- nit · TL;DR counts (152 findings, 116 sources) and review line
