@@ -43,3 +43,7 @@ Task: R3 wave 2 owner fix step (apply verifier-r3 spot-check to docs/research/r3
 - next: part 7 table + critical-read list + counts
 - nit · part 7 written: verifier table (44 rows) + final-state column, critical-read table with actions, counts, not-verified list
 - disagreement (partial): C7 applied as five open questions, not option rows: the fix rule allows no new claims and an option row needs sourced findings. L5 note only (no change). C10 no action.
+- nit · "How to read" wave-1 id list + R1-TICK-OQ6, R1-DET-REC1, R1-DET-REC6
+- check: 92 findings, 25 recs, 38 OQs counted in file; header matches. No re-sourcing, no fetches.
+- tally: nit 21 · recommendation 11 · number 5 · source 0
+DONE
