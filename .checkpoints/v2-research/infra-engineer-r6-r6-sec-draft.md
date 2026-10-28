@@ -9,7 +9,7 @@ security baseline waits until later."). No findings, options or recommendations.
   to the baseline (from `docs/research/r2-netcode.md`, by id):
   - **Dependency audits:** the audit that keeps R2-TRN-REC1's version floors current (R2-TRN-REC1 mark 5, R2-TRN-F40:
     quinn-proto ≥ 0.11.18, rustls ≥ 0.23.46, ring ≥ 0.17.12, tokio ≥ 1.54.1); the rust-reviewer's cargo-audit and
-    cargo-deny gates (R2's reviewer deferral 5, finding R-1); the maintenance check of R2-TRN-OQ5.
+    cargo-deny gates (R2's list of deferred reviewer findings, item 5: finding R-1).
   - **Content security policy:** the CSP that R2-ROOM-OQ11 weighs (where the guest secret lives: an HttpOnly cookie or
     local storage).
   - **Anti-cheat basics:** the cheat detection R2-SYNC-REC5's per-command view-time offset and aim log is kept for;
