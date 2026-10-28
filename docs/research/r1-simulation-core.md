@@ -5,8 +5,11 @@
   each): `ecs`, `tick`, `determinism`, `boundary-worker`, `abilities`, `data-hotreload`. Assembly: engine-architect
   (wave 1, step 2 "Assemble": nothing new is claimed; where units disagree, both findings stay and the conflict is an
   open question).
-- **Date:** 2026-10-27 (every source below was read that day).
-- **Status:** draft: verification pending.
+- **Date:** 2026-10-27 (every source the units cite was read that day); fix step 2026-10-28 (the findings added or
+  re-read then carry that date).
+- **Status:** verified (every recommendation claim; 5 re-sourced claims await the second pass). Fix step 2026-10-28
+  (engine-architect, wave 1 step 4): the verifier's six reports and rust-reviewer's R1 review are applied; part 7 holds
+  their merged table.
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R1):** "ECS or plain data
   (bevy_ecs, hecs, custom); a fixed tick rate; **identical results between Wasm and native** (floats, Rapier's
   determinism options); the Rust ↔ TypeScript boundary (shared memory, wasm-bindgen, generated TypeScript types);
@@ -18,16 +21,20 @@ in the brief's order. The boundary and the Web Worker were researched by one uni
 
 | # | Brief question | Unit | Ids |
 |---|---|---|---|
-| 1 | ECS or plain data (bevy_ecs, hecs, custom) | `ecs` | R1-ECS-F1–F34, REC1–REC4, OQ1–OQ7 |
+| 1 | ECS or plain data (bevy_ecs, hecs, custom) | `ecs` | R1-ECS-F1–F35, REC1–REC4, OQ1–OQ7 |
 | 2 | a fixed tick rate | `tick` | R1-TICK-F1–F26, REC1–REC6, OQ1–OQ9 |
-| 3 | identical results between Wasm and native | `determinism` | R1-DET-F1–F32, REC1–REC7, OQ1–OQ10 |
-| 4 | the Rust ↔ TypeScript boundary; running the simulation in a Web Worker | `boundary-worker` | R1-BND-F1–F33, REC1–REC6, OQ1–OQ8 |
+| 3 | identical results between Wasm and native | `determinism` | R1-DET-F1–F34, REC1–REC7, OQ1–OQ10 |
+| 4 | the Rust ↔ TypeScript boundary; running the simulation in a Web Worker | `boundary-worker` | R1-BND-F1–F35, REC1–REC6, OQ1–OQ9 |
 | 5 | a data-driven ability and effect system | `abilities` | R1-ABL-F1–F26, REC1–REC6, OQ1–OQ10 |
-| 6 | data formats and hot reload of tuning | `data-hotreload` | R1-DATA-F1–F29, REC1–REC8, OQ1–OQ11 |
+| 6 | data formats and hot reload of tuning | `data-hotreload` | R1-DATA-F1–F29, REC1–REC8, OQ1–OQ12 |
 | – | conflicts and gaps between the units (added at assembly) | – | R1-XU-OQ1–OQ12 |
+| – | Rust risks the rust-reviewer found (added at the fix step) | – | R1-RR-OQ1–OQ7 |
 
-Totals: 180 findings, 37 recommendations, 67 open questions (55 from the units, 12 added at assembly), 161 sources
-read (170 reads across the units; 9 were the same page read by a second or third unit), 48 sources not read.
+Totals: 185 findings (5 added at the fix step: R1-ECS-F35, R1-DET-F33, F34, R1-BND-F34, F35), 37 recommendations, 76
+open questions (55 from the units, 12 added at assembly, 9 at the fix step: R1-BND-OQ9, R1-DATA-OQ12, R1-RR-OQ1–OQ7;
+3 settled at the fix step: R1-ECS-OQ2, R1-XU-OQ5, R1-XU-OQ6), 161 sources read by the units (170 reads across the
+units; 9 were the same page read by a second or third unit) plus 10 reads at the fix step (3 new pages), 48 sources
+not read.
 
 **Reading rules (taken from the unit drafts).**
 - Sureness: "confirmed in the source" means the quoted words came back verbatim from the page (the fetch tool caps a
@@ -35,7 +42,7 @@ read (170 reads across the units; 9 were the same page read by a second or third
   unit's own reasoning or arithmetic on a source, or a point seen only in the fetch tool's summary; "unverified" means
   not checked. Each unit states its own wording of these labels in its section of the findings.
 - Tiers, as each unit labelled its sources: official (official docs and specifications), shipped game, other. One
-  source carries two labels (R1-XU-OQ6).
+  source carried two labels; the fix step settled it, and one more Fiedler article, as other (R1-XU-OQ6).
 - Ids: F = finding, REC = recommendation, OQ = open question, each prefixed by its unit. A short id inside a unit's
   text ("F12", "REC2", "OQ3") is that unit's. A section reference inside a unit's text ("§3", "section 7") points into
   that unit's draft; the same material sits in this file in that unit's section of the matching part.
@@ -48,7 +55,7 @@ read (170 reads across the units; 9 were the same page read by a second or third
 
 ## TL;DR
 - Found: neither ECS crate orders its queries or clones its world; std trig, NaN bits and relaxed SIMD differ by
-  platform and `HashMap` order by run; Rapier matches across machines only with `enhanced-determinism`.
+  platform and `HashMap` order by instance; Rapier matches across machines only with `enhanced-determinism`.
 - Recommended: one plain-data sim struct with sim-owned ids; one integer tick, spiked at 60 Hz beside 30 Hz; `libm`,
   ChaCha8 and per-tick state hashes, no lockstep; one Worker handing the page one transferred block per tick; a reduced
   GAS subset as data; JSON through one Rust content crate, hot reload in development only. All marks proposed; 12
@@ -143,16 +150,17 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
   subcrates work without the standard library. Quotes: "One of the hottest ECS features is finally here"; "bevy itself
   and a ton of our subcrates no longer rely on Rust's standard library". Source:
   https://raw.githubusercontent.com/bevyengine/bevy-website/main/content/news/2025-04-24-bevy-0.16/index.md
-  (2025-04-24). Tier: official. Read 2026-10-27. Sure: inferred (the fetch returned only summary-level text; the
-  relationships section was not read in detail).
+  (2025-04-24). Tier: official. Read 2026-10-27. Sure: confirmed in the source (upgraded from inferred at the fix step:
+  rust-reviewer got both quotes verbatim, 2026-10-28).
 
 #### hecs (0.11.2)
 - **R1-ECS-F16.** hecs is a library with no scheduler: gameplay code queries the world directly. Quotes: "It is a
-  library, not a framework."; "In place of an explicit "System" abstraction, a World's entities are easily queried
-  from regular code." The crate's stated goals, in order: fast traversals, a simple interface, a small dependency
-  closure, and leaving out what users can build themselves (paraphrase). Source: https://docs.rs/hecs/latest/hecs/
-  (crate docs), 0.11.2. Tier: official (the crate's own docs). Read 2026-10-27. Sure: confirmed in the source (the
-  quotes); the order of the goals is inferred.
+  library, not a framework."; "In place of an explicit "System" abstraction, a World's entities are easily queried from
+  regular code." The crate's stated goals, in order: fast traversals, a simple interface, a small dependency closure,
+  and leaving out what users can build themselves ("fast traversals", "a simple interface", "a small dependency
+  closure", "exclusion of externally-implementable functionality"). Source: https://docs.rs/hecs/latest/hecs/ (crate
+  docs), 0.11.2. Tier: official (the crate's own docs). Read 2026-10-27. Sure: confirmed in the source (the order of the
+  goals confirmed by rust-reviewer, 2026-10-28).
 - **R1-ECS-F17.** A hecs world is archetypal and yields entities in arbitrary order. Quotes: "An unordered collection
   of entities, each having any number of distinctly typed components"; "The components of entities who have the same
   set of component types are stored in contiguous runs"; query: "Entities are yielded in arbitrary order."; "When old
@@ -162,18 +170,19 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
 - **R1-ECS-F18.** A hecs `World` does not implement `Clone`. Its trait list has Default, Extend, FromIterator,
   IntoIterator, Send and Sync. Source: https://docs.rs/hecs/latest/hecs/struct.World.html (Trait Implementations),
   0.11.2. Tier: official. Read 2026-10-27. Sure: confirmed in the source (the impl list).
-- **R1-ECS-F19.** hecs can make its entity ids come out the same in two worlds, if both hold the same live entities
-  and the same freelist. Quote: freelist: "Entity handles will be allocated deterministically between different
-  worlds (e.g. across serialization)". set_freelist may be called only when the live ids match exactly (paraphrase).
-  Source: https://docs.rs/hecs/latest/hecs/struct.World.html (freelist, set_freelist), 0.11.2. Tier: official. Read
-  2026-10-27. Sure: confirmed in the source (the quote); the condition is inferred.
+- **R1-ECS-F19.** hecs can make its entity ids come out the same in two worlds, if both hold the same live entities and
+  the same freelist. Quote: freelist: "Entity handles will be allocated deterministically between different worlds (e.g.
+  across serialization)". set_freelist: "May only be called when the set of live entity IDs exactly matches". Source:
+  https://docs.rs/hecs/latest/hecs/struct.World.html (freelist, set_freelist), 0.11.2. Tier: official. Read 2026-10-27.
+  Sure: confirmed in the source (the condition confirmed by rust-reviewer, 2026-10-28).
 - **R1-ECS-F20.** hecs can't serialize a world on its own: the user writes a context that serializes each component
   type, and its compact format is column-major. Quotes: column format "Efficient, compact, and highly compressible,
   but difficult to read or edit by hand"; "Preferred for data that will be read/written programmatically"; "For some
   applications, a custom approach may be preferable." Sources: https://docs.rs/hecs/latest/hecs/serialize/index.html
   and https://docs.rs/hecs/latest/hecs/serialize/column/index.html, 0.11.2. Tier: official. Read 2026-10-27. Sure:
-  confirmed in the source (the quotes); that the World can't implement Serialize because components aren't always
-  serializable is paraphrase (inferred).
+  confirmed in the source, including why the World has no Serialize: "Components are not necessarily serializable, so
+  we cannot directly implement serde::Serialize for World." (rust-reviewer, 2026-10-28; the column format is "Available
+  on crate feature `column-serialize` only").
 - **R1-ECS-F21.** The hecs authors advise plain `Vec`s per entity type for games with few entity types. Quotes: "If
   your game will have few types of entities, consider a simpler architecture such as storing each type of entity in a
   separate plain Vec."; "ECS may be overkill for games that don't call for batch processing of entities." Source:
@@ -207,28 +216,32 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
   explicit and may or may not be expensive."; clone_from "can be overridden to reuse the resources of a to avoid
   unnecessary allocations." Source: https://doc.rust-lang.org/std/clone/trait.Clone.html, std 1.99.1. Tier:
   official. Read 2026-10-27. Sure: confirmed in the source.
-- **R1-ECS-F28.** Versioned (generational) keys keep a removed key invalid even when its slot is reused. Quote: "once
-  a key is removed, it stays removed, even if the physical storage inside the slotmap is reused for new elements."
-  The dense variant iterates "as fast as a normal Vec", at the cost of two indirections per random access
-  (paraphrase). The crate supports no_std: "This crate also supports no_std environments, but does require the alloc
-  crate to be available." Source: https://docs.rs/slotmap/latest/slotmap/, slotmap 1.1.1. Tier: official (the crate's
-  own docs). Read 2026-10-27. Sure: confirmed in the source (the quotes); the indirection cost and serde support are
-  inferred.
+- **R1-ECS-F28.** Versioned (generational) keys keep a removed key invalid even when its slot is reused. Quote: "once a
+  key is removed, it stays removed, even if the physical storage inside the slotmap is reused for new elements." The
+  dense variant iterates "as fast as a normal Vec", and "It uses two indirections per random access". Keys and maps
+  serialize through serde behind its `serde` feature: "Both keys and the slot maps have full (de)seralization support
+  through the serde library." The crate supports no_std: "This crate also supports no_std environments, but does require
+  the alloc crate to be available." Source: https://docs.rs/slotmap/latest/slotmap/, slotmap 1.1.1. Tier: official (the
+  crate's own docs). Read 2026-10-27. Sure: confirmed in the source (the indirection cost and serde support confirmed by
+  rust-reviewer, 2026-10-28).
 
 #### Physics state (Rapier 0.36)
-- **R1-ECS-F29.** Rapier keeps bodies in its own arena-backed set, which implements Clone, Serialize and Deserialize
-  and is addressed by index-plus-generation handles. Quote: "The collection that stores all rigid bodies in your
-  physics world."; handle: "This handle is lightweight (just an index + generation) and remains valid even if other
-  bodies are removed." The trait list includes Clone, Serialize and Deserialize. Source:
-  https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html, rapier3d 0.36.1. Tier: official. Read
-  2026-10-27. Sure: confirmed in the source.
-- **R1-ECS-F30.** Rapier's whole simulation state can be serialized, and its pipelines hold no state. Quotes: "most
-  data structures of Rapier become serializable using serde"; "The complete state of the simulation is serialized by
-  serializing its physics world as a whole."; "except for the PhysicsPipeline and the CollisionPipeline which don't
-  hold any useful state." Source: https://rapier.rs/docs/user_guides/rust/serialization (guide navigation shows "Rust
-  (0.36)"; no date). Tier: official. Read 2026-10-27. Sure: confirmed in the source.
-- **R1-ECS-F31.** With enhanced determinism, Rapier promises byte-identical serialized states across machines. Quote:
-  "running the exact same simulation on two different machine will result in the exact same byte vectors." Source:
+- **R1-ECS-F29.** Rapier keeps bodies in its own arena-backed set, which implements Clone, Serialize and Deserialize and
+  is addressed by index-plus-generation handles. Quote: "The collection that stores all rigid bodies in your physics
+  world."; handle: "This handle is lightweight (just an index + generation) and remains valid even if other bodies are
+  removed." The trait list includes Clone, Serialize and Deserialize; its `clone_from` is not overridden (R1-ECS-F35).
+  Source: https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html, rapier3d 0.36.1. Tier: official.
+  Read 2026-10-27. Sure: confirmed in the source.
+- **R1-ECS-F30.** Rapier's whole simulation state can be serialized, and its pipelines hold no state. Quotes: "When the
+  `serde-serialize` feature of Rapier is enabled, most data structures of Rapier become serializable using serde" (so
+  the feature is required; the unit had left it out, both reviewers, 2026-10-28); "The complete state of the simulation
+  is serialized by serializing its physics world as a whole."; "except for the PhysicsPipeline and the CollisionPipeline
+  which don't hold any useful state." Source: https://rapier.rs/docs/user_guides/rust/serialization (guide navigation
+  shows "Rust (0.36)"; no date). Tier: official. Read 2026-10-27. Sure: confirmed in the source.
+- **R1-ECS-F31.** With enhanced determinism, Rapier promises byte-identical serialized states across machines. Quotes:
+  "If the `enhanced-determinism` feature of Rapier is enabled" … "running the exact same simulation on two different
+  machine will result in the exact same byte vectors."; the passage also sets the condition "if your platform fulfills
+  the required determinism requirements" (verifier, 2026-10-28). Source:
   https://rapier.rs/docs/user_guides/rust/serialization. Tier: official. Read 2026-10-27. Sure: confirmed in the
   source. (Whether this holds between Wasm and native belongs to the determinism unit.)
 - **R1-ECS-F32.** A user reported that Rapier 0.30.1 skipped part of its broad-phase state when serializing, so worlds
@@ -241,14 +254,27 @@ reasoning from the source, or a point seen only in a fetch summary; "unverified"
 #### Wasm size
 - **R1-ECS-F33.** Generic code grows Wasm size, because the compiler makes one copy per type it is used with, and size
   has to be measured. Quotes: "rustc and LLVM will create a new copy of the function for each T type that the function
-  is used with."; "these copies add up quickly in terms of code size."; on opt-level "s" against "z": "Always
-  measure!"; wasm-opt "can often get another 15-20% savings on code size." Source:
+  is used with."; "these copies add up quickly in terms of code size."; on opt-level "s" against "z": "Always measure!";
+  wasm-opt "can often get another 15-20% savings on code size." Source:
   https://rustwasm.github.io/book/reference/code-size.html (the Rust and WebAssembly book; the page calls itself
-  "unpublished documentation"; no date). Tier: official (the Rust and WebAssembly working group's book). Read
-  2026-10-27. Sure: confirmed in the source (short quotes).
+  "unpublished documentation"; no date). Tier: official, dated (the Rust and WebAssembly working group's book; its
+  repository says "This repository was archived by the owner on Aug 25, 2025.", verifier 2026-10-28). Read 2026-10-27.
+  Sure: confirmed in the source (short quotes).
 - **R1-ECS-F34.** No source read in this run gives a Wasm size or a compile time for bevy_ecs, hecs or a plain-data
   core. Sure: confirmed (an absence across every source listed below), so all size and compile-time marks below are
   proposed and must be measured.
+
+#### Clone and clone_from (added at the fix step, 2026-10-28)
+- **R1-ECS-F35.** `#[derive(Clone)]` writes only `clone`, the default `clone_from` is a plain clone, and Rapier's
+  `RigidBodySet` keeps that default. Quotes (std): "The `derive`d implementation of `Clone` calls `clone` on each
+  field."; "`a.clone_from(&b)` is equivalent to `a = b.clone()` in functionality, but can be overridden to reuse the
+  resources of `a` to avoid unnecessary allocations." RigidBodySet's `clone_from`: "Performs copy-assignment from
+  `source`.", its source link pointing to core's `clone.rs`, not to Rapier's file. Sources:
+  https://doc.rust-lang.org/std/clone/trait.Clone.html (std 1.99.1) and
+  https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html (rapier3d 0.36.1, Trait
+  Implementations). Tier: official. Read 2026-10-28 (fix step: rust-reviewer's risk 5 and the verifier's ECS finding 3
+  named the gap; settles R1-ECS-OQ2). Sure: confirmed in the source (the quotes and the source link); that a derived or
+  default `clone_from` therefore builds new buffers, so a Rapier set clone allocates, is inferred.
 
 #### Legacy facts used (unit `ecs`)
 
@@ -297,11 +323,11 @@ WebFetch caps a verbatim quote at about 125 characters, so long passages are quo
 "Confirmed in the source" means the quoted words were returned verbatim; "inferred" means my reasoning or arithmetic
 on top of a source, or a claim seen only in WebFetch's own summary.
 
-**R1-TICK-F1.** A simulation stepped with a variable delta time behaves differently at different frame rates.
-Quote: "The problem is that the behavior of your physics simulation depends on the delta time you pass in."
-Source: https://gafferongames.com/post/fix_your_timestep/ (Glenn Fiedler, "Fix Your Timestep!", page dated 2004-06-10),
-opening section. Tier: other (practitioner article; the brief names Fiedler's articles as a reference). Read 2026-10-27.
-Sure: confirmed in the source.
+**R1-TICK-F1.** A simulation stepped with a variable delta time behaves differently at different frame rates. Quote:
+"The problem is that the behavior of your physics simulation depends on the delta time you pass in." Source:
+https://gafferongames.com/post/fix_your_timestep/ (Glenn Fiedler, "Fix Your Timestep!", page dated 2004-06-10), section
+"Variable delta time" (location corrected at the fix step, verifier 2026-10-28). Tier: other (practitioner article; the
+brief names Fiedler's articles as a reference). Read 2026-10-27. Sure: confirmed in the source.
 
 **R1-TICK-F2.** The standard fixed-step loop: the renderer produces real time, the simulation consumes it in fixed
 `dt` steps, and the leftover is carried in an accumulator. Quote (code): `accumulator += frameTime;` /
@@ -312,8 +338,9 @@ physics". Tier: other. Read 2026-10-27. Sure: confirmed in the source.
 less real time than the time it simulates, and the sample loop caps the time fed in per frame at 0.25 s. Quotes:
 "It’s what happens when your physics simulation can’t keep up with the steps it’s asked to take." / "You really need
 to ensure that it takes significantly less than X seconds of real time" "to update X seconds worth of physics
-simulation." / code `if ( frameTime > 0.25 ) frameTime = 0.25;`. Source: as F1, section "Free the physics" and the
-final loop. Tier: other. Read 2026-10-27. Sure: confirmed in the source.
+simulation." / code `if ( frameTime > 0.25 ) frameTime = 0.25;`. Source: as F1, section "Semi-fixed timestep" for the
+spiral and headroom quotes and "The final touch" for the clamp (locations corrected at the fix step, verifier
+2026-10-28). Tier: other. Read 2026-10-27. Sure: confirmed in the source.
 
 **R1-TICK-F4.** Rendering between fixed steps interpolates the previous and current state by the accumulator's
 remainder. Quotes: "One solution to this problem is to interpolate between the previous and current physics state"
@@ -377,8 +404,9 @@ Quotes: `msec = finalTime - pmove->ps->commandTime;` / "// chop the move up if i
 `{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO, 0, qfalse},` (g_main.c). Sources:
 https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/bg_pmove.c (`Pmove`) and
 https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_main.c (cvar table). Tier: shipped
-game. Read 2026-10-27. Sure: confirmed in the source. That movement therefore ran at the client's command rate, finer
-than the 20 Hz world frame, is inferred (the client input code was not read).
+game. Read 2026-10-27. Sure: confirmed in the source. That movement runs once per received command, outside the world
+frame, is confirmed by the verifier's extra read (sv_client.c:1424 `SV_ClientThink (cl, &cmds[ i ]);`, 2026-10-28); that
+the command rate was finer than the 20 Hz world frame stays inferred (the client input code was not read).
 
 **R1-TICK-F13.** In the Source engine the tick interval is a per-game constant: Counter-Strike's default is 66 ticks
 per second, and the `-tickrate` override is compiled out for TF2, Counter-Strike and Day of Defeat. Quotes:
@@ -411,7 +439,7 @@ gap 'a pause' and skip the time." / "You can simulate the gap to catch up." / "T
 and/or complex updates." / "You can recover the game state from a peer or the server." / "you should keep track of how
 large numTicks is. If it is large, then either your game was asleep, or the machine cannot keep up." Source: as F15.
 Tier: official. Read 2026-10-27. Sure: confirmed in the source. (MDN calls the pause option "problematic for most
-multiplayer games": seen in WebFetch's summary, so inferred.)
+multiplayer games": verbatim, confirmed by the verifier, 2026-10-28.)
 
 **R1-TICK-F17.** `requestAnimationFrame`, on the main thread or in a dedicated worker, runs at the display's refresh
 rate and is paused in background tabs in most browsers. Quotes: "The frequency of calls to the callback function will
@@ -422,16 +450,18 @@ https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/requ
 2025-09-25; Baseline "available across browsers since March 2023"). Tier: official. Read 2026-10-27. Sure: confirmed in
 the source.
 
-**R1-TICK-F18.** Browsers clamp and throttle timers: a 4 ms minimum after five nested `setTimeout` calls; minimum
-delays in inactive tabs (Firefox desktop: 1 s); Chrome's intensive throttling (from Chrome 88) checks timers once per
-minute after a page has been hidden for 5 minutes; and timers fire late when the thread is busy. Quotes: "As specified
-in the HTML standard, browsers will enforce a minimum timeout of 4 milliseconds once a nested call to setTimeout has
-been scheduled 5 times." / "To reduce the load (and associated battery usage) from background tabs, browsers will
-enforce a minimum timeout delay in inactive tabs." / "Firefox Desktop has a minimum timeout of 1 second for inactive
-tabs." / "Timers in this state are checked once per minute" / "The timeout can also fire later than expected if the
-page (or the OS/browser) is busy with other tasks." Source: https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout
-(last modified 2026-10-26), section "Reasons for delays longer than specified". Tier: official. Read 2026-10-27. Sure:
-confirmed in the source.
+**R1-TICK-F18.** Browsers clamp and throttle timers: a 4 ms minimum after five nested `setTimeout` calls; minimum delays
+in inactive tabs (Firefox desktop: 1 s); Chrome's intensive throttling (from Chrome 88) checks timers once per minute
+when a page has been hidden for more than 5 minutes and three more conditions hold (a timer chain of 5 or more, 30 s of
+silence, no WebRTC in use: R1-BND-F31, R1-TICK-F19; the unit had shortened this to "hidden for 5 minutes", verifier
+2026-10-28); and timers fire late when the thread is busy. Quotes: "As specified in the HTML standard, browsers will
+enforce a minimum timeout of 4 milliseconds once a nested call to setTimeout has been scheduled 5 times." / "To reduce
+the load (and associated battery usage) from background tabs, browsers will enforce a minimum timeout delay in inactive
+tabs." / "Firefox Desktop has a minimum timeout of 1 second for inactive tabs." / "Timers in this state are checked once
+per minute" / "The timeout can also fire later than expected if the page (or the OS/browser) is busy with other tasks."
+Source: https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout (last modified 2026-10-26), section "Reasons
+for longer delays than specified" (heading corrected at the fix step). Tier: official. Read 2026-10-27. Sure: confirmed
+in the source.
 
 **R1-TICK-F19.** Neither MDN's `setTimeout` page nor Chrome's throttling post says whether timers inside a dedicated
 worker are throttled when the tab is hidden. Sources: as F18, and https://developer.chrome.com/blog/timer-throttling-in-chrome-88
@@ -510,6 +540,9 @@ confirmed in the source (fragments).
 - **GN4** (:269): bot sight checks run on a budget per game second (`TUNE.ai.losPerS` 480, banked up to 0.1 s), bots
   retarget every 0.25 s and re-check sight every 0.1 s, staggered by slot; fairness was measured at 60 and 144 fps.
   Tells v2: slow systems already run on their own cadence, independent of the step rate.
+- **GN10** (:275, added at the fix step: R1-TICK-REC6 cites it): bots climb and jump against `EJUMP_REACH`, 3.07 m by
+  the formula, while the jump actually integrated reaches about 2.98 m at 60 Hz (GW14). Tells v2: bots and map
+  validation take reach from the same integrated value.
 - **GC15** (:254) and **GC14** (:253): bolts are swept from the previous to the new position each step, so they never
   tunnel, but flight integrates the frame `dt`, so the landing point moves with the frame rate. Tells v2: keep swept
   tests at any tick; fix the step.
@@ -576,8 +609,9 @@ conclusion drawn from confirmed parts.
 - **R1-DET-F5.** Relaxed SIMD ships in Chrome 114 and Firefox 145, sits behind a flag in Safari
   (`useWebAssemblyRelaxedSIMD`), and is in Node.js 21.0 and Wasmtime 15; fixed-width SIMD is in Chrome 91, Firefox 89,
   Safari 16.4 · Source: https://raw.githubusercontent.com/WebAssembly/website/main/features.json (the data behind
-  webassembly.org/features; main branch, no date) · official (WebAssembly CG website) · read 2026-10-27 · inferred
-  (read through the fetch tool's table of a JSON file, not verbatim).
+  webassembly.org/features; main branch, no date) · official (WebAssembly CG website) · read 2026-10-27 · confirmed in
+  the source (upgraded at the fix step: the verifier matched the values verbatim, 2026-10-28: `"relaxedSimd": "114"` /
+  `"145"` / `["flag", "Requires JavaScriptCore flag useWebAssemblyRelaxedSIMD"]` / `"21.0"` / `"15"`).
 - **R1-DET-F6.** Rust's `wasm32-unknown-unknown` target enables only some proposals by default: "As of the time of this
   writing the proposals that are enabled by default (the `generic` CPU in LLVM terminology) are:" multivalue,
   mutable-globals, reference-types, sign-ext, nontrapping-fptoint, bulk-memory; others are opted into with
@@ -593,14 +627,16 @@ conclusion drawn from confirmed parts.
   direction defined in IEEE 754-2008." · Source: https://doc.rust-lang.org/std/primitive.f32.html, type docs (std
   1.99.1, 58cf8f9c3 2026-10-13) · official · read 2026-10-27 · confirmed in the source.
 - **R1-DET-F8.** Rust does not make NaN bits portable: "Rust does not currently guarantee that the bit patterns of NaN
-  are preserved over arithmetic operations, and they are not guaranteed to be portable or even fully
-  deterministic!" · Source: same page, "NaN bit patterns" · official · read 2026-10-27 · confirmed in the source.
+  are preserved over arithmetic operations, and they are not guaranteed to be portable or even fully deterministic!" ·
+  Source: same page, "NaN bit patterns" (rust-reviewer places the sentence in the type-level NaN bullet) · official ·
+  read 2026-10-27 · confirmed in the source.
 - **R1-DET-F9.** Rust std's transcendental functions have no fixed precision: on `sin`, "The precision of this function
-  is non-deterministic. This means it varies by platform, Rust version, and can even differ within the same
-  execution from one invocation to the next." · Source: same page, `sin`, "Unspecified precision" · official · read
-  2026-10-27 · confirmed in the source for `sin`; that the same note sits on `cos`, `tan`, `asin`, `acos`, `atan`,
-  `atan2`, `exp`, `exp2`, `ln`, `log*`, `powf`, `powi`, `hypot`, `cbrt` and the hyperbolic functions is inferred (the
-  fetch tool's list, not quoted per method).
+  is non-deterministic. This means it varies by platform, Rust version, and can even differ within the same execution
+  from one invocation to the next." · Source: same page, `sin`, "Unspecified precision" · official · read 2026-10-27 ·
+  confirmed in the source for `sin`, and by the verifier (2026-10-28) for `cos`, `tan`, `atan2`, `powf`, `exp` and `ln`;
+  that the same note sits on `asin`, `acos`, `atan`, `exp2`, `log*`, `powi`, `hypot`, `cbrt` and the hyperbolic
+  functions is inferred (the fetch tool's list, not quoted per method). rust-reviewer (2026-10-28) also found on `tan`:
+  "This function currently corresponds to the `tanf` from libc on Unix and Windows."
 - **R1-DET-F10.** `sqrt` and `mul_add` are exactly specified and "guaranteed not to change"; rounding functions are
   exact: `sqrt`: "The result of this operation is guaranteed to be the rounded infinite-precision result. It is
   specified by IEEE 754 as `squareRoot` and guaranteed not to change." · `mul_add`: "with only one rounding error" and
@@ -613,20 +649,23 @@ conclusion drawn from confirmed parts.
   https://rust-lang.github.io/rfcs/3514-float-semantics.html (RFC 3514, start date 2023-10-14, in the RFC book) ·
   official · read 2026-10-27 · confirmed in the source. The opt-in exists: the `algebraic_*` methods mean "the results
   of elementary operations may have undefined precision" (f32 page, "algebraic operators"; confirmed); that they are
-  stable since 1.98.0 is inferred (fetch summary). That LLVM auto-vectorization therefore cannot reorder float sums in
-  our code is inferred from the strict-IEEE rule, not stated for vectorization in any source read.
+  stable since 1.98.0 is confirmed by rust-reviewer (`algebraic_add` "1.98.0 (const: 1.98.0)", 2026-10-28). That LLVM
+  auto-vectorization therefore cannot reorder float sums in our code is inferred from the strict-IEEE rule, not stated
+  for vectorization in any source read.
 - **R1-DET-F12.** The main 64-bit targets are fully IEEE-compliant in Rust; the exceptions are 32-bit x86 without SSE2
-  and 32-bit ARM NEON: "The most widely used targets (64bit x86 and 64bit ARM, and also the increasingly popular
-  RISC-V) are fully compliant." · "On 32bit x86 without SSE2 (i586 targets), x87 registers are used even more
-  pervasively" · semantics are "without abruptUnderflow/flush-to-zero" · Source: RFC 3514 · official · read
-  2026-10-27 · confirmed in the source. wasm32 appears in neither list.
+  and 32-bit ARM NEON: "The most widely used targets (64bit x86 and 64bit ARM, and also the increasingly popular RISC-V)
+  are fully compliant." · "On 32bit x86 without SSE2 (i586 targets), x87 registers are used even more pervasively" ·
+  semantics are "without abruptUnderflow/flush-to-zero" · Source: RFC 3514 · official · read 2026-10-27 · confirmed in
+  the source. wasm32 appears in neither list, but the RFC names wasm for NaN: "Also note that in some cases even the
+  underlying target behavior is non-deterministic, namely on wasm." (rust-reviewer, 2026-10-28).
 - **R1-DET-F13.** Compile-time float evaluation may choose different NaN bits than run time: "there is no guarantee that
   the choice made in const evaluation is consistent with the choice made at runtime." · Source: RFC 3514 · official ·
   read 2026-10-27 · confirmed in the source.
-- **R1-DET-F14.** `min` and `max` may return either zero for `+0.0` and `-0.0`: "If the inputs compare equal (such as for
-  the case of `+0.0` and `-0.0`), either input may be returned non-deterministically." `clamp` likewise: "either `0.0`
-  or `-0.0` is returned non-deterministically." · Source: f32 page, `min`, `max`, `clamp` · official · read 2026-10-27 ·
-  confirmed in the source.
+- **R1-DET-F14.** `min` and `max` may return either zero for `+0.0` and `-0.0`: "If the inputs compare equal (such as
+  for the case of `+0.0` and `-0.0`), either input may be returned non-deterministically." `clamp` likewise: "either
+  `0.0` or `-0.0` is returned non-deterministically." · Source: f32 page, `min`, `max`, `clamp` · official · read
+  2026-10-27 · confirmed in the source. rust-reviewer (2026-10-28) adds from the same page: `clamp` "Panics if `min >
+  max`, `min` is NaN, or `max` is NaN."
 - **R1-DET-F15.** Float-to-integer casts are fully defined on every target, but integer overflow depends on build flags:
   "Casting from a float to an integer will round the float towards zero" · "`NaN` will return `0`" · out-of-range
   values "will saturate" · "Integer operators will panic when they overflow when compiled in debug mode." · "The `-C
@@ -671,9 +710,10 @@ conclusion drawn from confirmed parts.
   functions being used originate from the `ComplexField` or `RealField` traits from `nalgebra`" · Source: same page ·
   official · read 2026-10-27 · confirmed in the source.
 - **R1-DET-F21.** `enhanced-determinism` excludes `simd8` but combines with `parallel`: "Note that the
-  `enhanced-determinism` feature cannot be enabled at the same time as the `simd8` feature," · "The `parallel`
-  feature, on the other hand, can be combined with it: the results of the parallel solver are identical" · Source:
-  same page · official · read 2026-10-27 · confirmed in the source.
+  `enhanced-determinism` feature cannot be enabled at the same time as the `simd8` feature," which goes on "which
+  changes the SIMD lane width and is therefore its own determinism domain." (rust-reviewer, 2026-10-28) · "The
+  `parallel` feature, on the other hand, can be combined with it: the results of the parallel solver are identical" ·
+  Source: same page · official · read 2026-10-27 · confirmed in the source.
 - **R1-DET-F22.** In rapier3d 0.36.1, `enhanced-determinism` forces the pure-Rust libm in simba and passes the flag to
   parry; the default solver runs a 4-lane SIMD path, which the flag does not switch off:
   `enhanced-determinism = ["simba/libm_force", "parry3d/enhanced-determinism"]` · `# Widens the solver's SIMD from 4 to
@@ -685,24 +725,26 @@ conclusion drawn from confirmed parts.
 - **R1-DET-F23.** In parry3d, `enhanced-determinism` also forces libm and scalar maths in glamx and pulls in indexmap:
   `enhanced-determinism = ["simba/libm_force", "indexmap", "glamx/libm", "glamx/scalar-math"]` · Source:
   https://raw.githubusercontent.com/dimforge/parry/master/crates/parry3d/Cargo.toml (master; Rapier's workspace pins
-  parry3d 0.31.1, nalgebra 0.35, simba 0.10.2, glamx 0.3.1: inferred, fetch summary of the workspace manifest) ·
-  official · read 2026-10-27 · confirmed in the source for the line; that indexmap is there for a stable iteration
-  order is inferred. The workspace manifest also notes (fetch summary, inferred) that glam's fast-math is left off to
-  avoid FMA contraction.
+  parry3d 0.31.1, nalgebra 0.35, simba 0.10.2, glamx 0.3.1: confirmed verbatim by the verifier and rust-reviewer,
+  2026-10-28) · official · read 2026-10-27 · confirmed in the source for the line; that indexmap is there for a stable
+  iteration order is inferred. The workspace manifest also notes why glam's fast-math stays off: it "re-enables FMA
+  contraction in" … "glam's sse2 backend (a cross-platform determinism hazard)." (confirmed by rust-reviewer,
+  2026-10-28).
 - **R1-DET-F24.** Rapier's determinism page gives no performance cost for `enhanced-determinism` and no method to check
   determinism · Source: the determinism page · official · read 2026-10-27 · inferred (an absence, as the fetch tool
   reported it).
 
 #### Collections, RNG, fixed point, JavaScript
 
-- **R1-DET-F25.** std `HashMap` is randomly seeded per process and iterates in arbitrary order; a fixed hasher is
-  possible but gives up HashDoS resistance: "The algorithm is randomly seeded, and a reasonable best-effort is made to
-  generate this seed from a high quality, secure source of randomness provided by the host without blocking the
-  program." · `iter`: "An iterator visiting all key-value pairs in arbitrary order." · "The hashing algorithm can be
-  replaced on a per-`HashMap` basis using the `default`, `with_hasher`, and `with_capacity_and_hasher` methods." ·
-  "Setting it manually using this function can expose a DoS attack vector." · Source:
-  https://doc.rust-lang.org/std/collections/struct.HashMap.html (std 1.99.1) · official · read 2026-10-27 · confirmed
-  in the source.
+- **R1-DET-F25.** std `HashMap` is randomly seeded and iterates in arbitrary order; a fixed hasher is possible but gives
+  up HashDoS resistance (the seed is per instance: R1-DET-F33): "The algorithm is randomly seeded, and a reasonable
+  best-effort is made to generate this seed from a high quality, secure source of randomness provided by the host
+  without blocking the program." · `iter`: "An iterator visiting all key-value pairs in arbitrary order." · "The hashing
+  algorithm can be replaced on a per-`HashMap` basis using the `default`, `with_hasher`, and `with_capacity_and_hasher`
+  methods." · "Setting it manually using this function can expose a DoS attack vector." · Source:
+  https://doc.rust-lang.org/std/collections/struct.HashMap.html (std 1.99.1) · official · read 2026-10-27 · confirmed in
+  the source. Corrected at the fix step: the unit had written "seeded per process", which the source contradicts (wrong,
+  verifier and rust-reviewer, 2026-10-28); re-sourced as R1-DET-F33.
 - **R1-DET-F26.** std `BTreeMap` iterates in key order: "Given a key type with a total order, an ordered map stores its
   entries in key order." · `iter`: "Gets an iterator over the entries of the map, sorted by key." · Source:
   https://doc.rust-lang.org/std/collections/struct.BTreeMap.html (std 1.99.1) · official · read 2026-10-27 · confirmed
@@ -729,27 +771,49 @@ conclusion drawn from confirmed parts.
   "Many `Math` functions have a precision that's _implementation-dependent_." · "This means that different browsers can
   give a different result. Even the same JavaScript engine on a different OS or architecture can give different
   results!" · Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math (MDN, last
-  modified 2025-07-10) · official (browser vendor docs) · read 2026-10-27 · confirmed in the source; "no seed API" is
-  inferred (the page describes none).
+  modified 2025-07-10) · official (browser vendor docs) · read 2026-10-27 · confirmed in the source; "no seed" is
+  confirmed by the verifier on MDN `Math.random()`
+  (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random, 2026-10-28): "it cannot
+  be chosen or reset by the user."
 
 #### Shipped games and what the netcode needs
 
 - **R1-DET-F31.** Lockstep games need bit-identical results; shipped PC games reached them with IEEE floats and strict
   control, and found transcendental functions differ between CPU vendors: Battlezone 2 required "absolutely identical
-  results on every client, down to the least-significant bit of the mantissa" · Gas Powered Games (Supreme
-  Commander): "Also, every tick we assert that these fpu settings are still set:" · "We have never had a problem with
-  the IEEE standard across any PC cpu AMD and Intel with this approach." · Pandemic: "we discovered that AMD and Intel
-  processors produced slightly different results for trancendental functions" · Source:
-  https://gafferongames.com/post/floating_point_determinism/ (Glenn Fiedler, 2010-02-24; quotes shipped-game
-  developers; C and C++ on x87 and SSE) · shipped game · read 2026-10-27 · confirmed in the source (as quoted by the
-  article).
+  results on every client, down to the least-significant bit of the mantissa" · Gas Powered Games (Supreme Commander):
+  "Also, every tick we assert that these fpu settings are still set:" · "We have never had a problem with the IEEE
+  standard across any PC cpu AMD and Intel with this approach." · Pandemic: "we discovered that AMD and Intel processors
+  produced slightly different results for trancendental functions" · Source:
+  https://gafferongames.com/post/floating_point_determinism/ (Glenn Fiedler, 2010-02-24; quotes shipped-game developers;
+  C and C++ on x87 and SSE) · other (an article that quotes shipped-game developers; relabelled from "shipped game" at
+  the fix step, per the three tiers of docs/research/README.md: R1-XU-OQ6) · read 2026-10-27 · confirmed in the source
+  (as quoted by the article).
 - **R1-DET-F32.** With server authority and client prediction, a client that disagrees with the server is corrected, not
   desynchronized; lockstep cannot absorb a difference: prediction means "running a subset of the game code for your
-  player character on the client machine." · on correction the client "invisibly 'rewinds and replays' the last n
-  frames of local player character movement while holding the rest of the world fixed." · "the client's position is
-  seldom corrected." · lockstep: "one tiny difference results in complete desynchronization over time." · Source:
-  https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (Glenn Fiedler,
-  2010-02-24) · shipped game (practitioner article) · read 2026-10-27 · confirmed in the source.
+  player character on the client machine." · on correction the client "invisibly 'rewinds and replays' the last n frames
+  of local player character movement while holding the rest of the world fixed." · "the client's position is seldom
+  corrected." · lockstep: "one tiny difference results in complete desynchronization over time." · Source:
+  https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (Glenn Fiedler, 2010-02-24)
+  · other (practitioner article; relabelled at the fix step: R1-XU-OQ6) · read 2026-10-27 · confirmed in the source.
+
+#### Added at the fix step (2026-10-28)
+
+- **R1-DET-F33.** std `HashMap` takes its own random seed for each instance, not one per process. Quote: "As
+  explained above, `HashMap` is randomly seeded: each `HashMap` instance uses a different seed, which means that
+  `HashMap::new` normally cannot be used in a `const` or `static` initializer." · Source:
+  https://doc.rust-lang.org/std/collections/struct.HashMap.html, section "Usage in `const` and `static`" (std 1.99.1,
+  58cf8f9c3 2026-10-13) · official · read 2026-10-28 (fix step; replaces the "per process" part of F25, which both
+  reviewers found wrong; agrees with R1-ECS-F23) · confirmed in the source. That two maps built in one process can
+  therefore iterate the same keys in different orders is inferred (arbitrary order, F25, plus a seed per instance).
+- **R1-DET-F34.** rand_pcg's Pcg32 suits 32-bit and 64-bit CPUs, takes a stream number in its constructor and can
+  jump ahead. Quotes: "Pcg32 aka Lcg64Xsh32, officially known as pcg32, a general purpose RNG."; "This is a good choice
+  on both 32-bit and 64-bit CPUs (for 32-bit output)." (crate root); `pub fn new(state: u64, stream: u64) -> Self`:
+  "Construct an instance compatible with PCG seed and stream."; `advance`: "Multi-step advance functions (jump-ahead,
+  jump-back)" (Lcg64Xsh32) · Sources: https://docs.rs/rand_pcg/latest/rand_pcg/ and
+  https://docs.rs/rand_pcg/latest/rand_pcg/struct.Lcg64Xsh32.html (rand_pcg 0.10.2) · official · read 2026-10-28 (fix
+  step; the verifier found REC4's Pcg32 fallback unbacked, since F28 quotes only Pcg64Mcg) · confirmed in the source.
+  That one stream number per purpose gives streams as independent as ChaCha's is inferred (the pages say nothing on
+  how streams relate).
 
 #### Legacy facts used (unit `determinism`)
 
@@ -802,17 +866,22 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
 **Tooling: wasm-bindgen and type generation**
 
 - **R1-BND-F1.** The Rust and WebAssembly working group's GitHub org was wound down: wasm-bindgen moved to a new
-  `wasm-bindgen` org with new maintainers, and every other rustwasm repository (wasm-pack, gloo, twiggy, walrus and
-  the rest) was archived in place. Quotes: "All other repositories in the rustwasm organization are going to be
-  archived in place." · "a critical mass of new maintainers has already been reached" · "Transferring wasm-bindgen
-  will occur in the weeks following this post." · Source: https://blog.rust-lang.org/inside-rust/2025/07/21/sunsetting-the-rustwasm-github-org/
-  (Inside Rust blog, 2025-07-21) · official · read 2026-10-27 · confirmed in the source.
-- **R1-BND-F2.** wasm-bindgen ships often and with breaking changes in 2026; since 0.2.128 the CLI and the library
-  must be the same version. Quote (0.2.128, "05 Sep"): "Requires matching `wasm-bindgen` and CLI versions (schema
-  bump)." The cadence (0.2.118 on 10 Apr to 0.2.129 on 25 Sep, breaking changes in 0.2.122, 0.2.123 and 0.2.128) is
-  from the release list's summary. · Sources: https://github.com/wasm-bindgen/wasm-bindgen/releases/tag/0.2.128 and
-  https://github.com/wasm-bindgen/wasm-bindgen/releases · official · read 2026-10-27 · version-match rule confirmed
-  in the source; cadence and the year 2026 inferred (the page shows no year; asset timestamps do).
+  `wasm-bindgen` org with new maintainers, and every other rustwasm repository (wasm-pack, gloo, twiggy, walrus and the
+  rest) was to be archived in place or handed to its existing maintainers. Quotes: "All other repositories in the
+  rustwasm organization are going to be archived in place", which goes on "or transferred to their existing maintainers
+  if they elect to do so," (rust-reviewer, 2026-10-28; the unit had left the second half out) · "a critical mass of new
+  maintainers has already been reached" · "Transferring wasm-bindgen will occur in the weeks following this post." ·
+  Source: https://blog.rust-lang.org/inside-rust/2025/07/21/sunsetting-the-rustwasm-github-org/ (Inside Rust blog,
+  2025-07-21) · official · read 2026-10-27 · confirmed in the source.
+- **R1-BND-F2.** wasm-bindgen ships often and with breaking changes in 2026; since 0.2.128 the CLI and the library must
+  be the same version. Quote (0.2.128, "05 Sep"): "Requires matching `wasm-bindgen` and CLI versions (schema bump)."
+  0.2.123 was "a breaking change for callers that relied on widening `&mut` references." (verifier, 2026-10-28). The
+  cadence runs from 0.2.118 on 10 Apr to 0.2.129 on 25 Sep. · Sources:
+  https://github.com/wasm-bindgen/wasm-bindgen/releases/tag/0.2.128 and
+  https://github.com/wasm-bindgen/wasm-bindgen/releases · official · read 2026-10-27 · version-match rule, the dates and
+  0.2.123's break confirmed in the source; the year 2026 comes from the release assets' timestamps ("2026-09-25T…",
+  rust-reviewer, 2026-10-28), not from the page text. Corrected at the fix step: the unit had also listed 0.2.122 as
+  breaking, which its release notes do not say (unsupported, both reviewers).
 - **R1-BND-F3.** wasm-bindgen writes a TypeScript declaration file by default. Quote: "Output a TypeScript
   declaration file for the generated JavaScript bindings. This is on by default." · Source:
   https://raw.githubusercontent.com/wasm-bindgen/wasm-bindgen/main/guide/src/reference/cli.md (guide source, main
@@ -844,18 +913,19 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   maintained") · official (archived) · read 2026-10-27 · confirmed in the source.
 - **R1-BND-F8.** tsify generates TypeScript definitions for Rust types used with wasm-bindgen. Quote: "Tsify is a
   library for generating TypeScript definitions from rust code." Version 0.5.8, repository madonoharu/tsify. Its
-  values cross through serde-wasm-bindgen (the `js` feature) and its `into_wasm_abi`/`from_wasm_abi` attributes are
-  deprecated in favour of a `Ts<T>` wrapper (summary). A second crate, tsify-next 0.5.6 (repository siefkenj/tsify,
+  values cross through serde-wasm-bindgen: "`js` enables serialization through serde-wasm-bindgen and generates the
+  appropriate types for it."; its `into_wasm_abi`/`from_wasm_abi` attributes are "Deprecated in favour of using
+  `Ts<T>`" (both confirmed by rust-reviewer, 2026-10-28). A second crate, tsify-next 0.5.6 (repository siefkenj/tsify,
   page date 2026-10-05), exists; neither page says which line is maintained. · Sources:
   https://docs.rs/tsify/latest/tsify/ and https://docs.rs/tsify-next/latest/tsify_next/ · official (crate docs) ·
-  read 2026-10-27 · description confirmed in the source; the serde route, the deprecation and tsify-next's status
-  inferred.
+  read 2026-10-27 · confirmed in the source (the serde route and the deprecation upgraded by rust-reviewer, 2026-10-28;
+  that neither page says which line is maintained is an absence both reviewers confirmed).
 - **R1-BND-F9.** ts-rs generates TypeScript declarations from Rust types at test time, with no runtime part. Quotes:
-  "Generate typescript type declarations from rust types." · bindings are written "when running `cargo test` or
-  `cargo test export_bindings`". Version 12.0.1 (MIT, repository Aleph-Alpha/ts-rs); output to `./bindings` or
+  "Generate typescript type declarations from rust types." · bindings are written "when running `cargo test` or `cargo
+  test export_bindings`". Version 12.0.1 (MIT, repository Aleph-Alpha/ts-rs); output to `./bindings` or
   `TS_RS_EXPORT_DIR`; the default `serde-compat` feature means "serde attributes are parsed for enums and structs".
-  MSRV 1.88.0 (summary). · Source: https://docs.rs/ts-rs/latest/ts_rs/ · official (crate docs) · read 2026-10-27 ·
-  confirmed in the source (MSRV inferred).
+  MSRV: "The Minimum Supported Rust Version for this crate is 1.88.0" (confirmed by rust-reviewer, 2026-10-28). ·
+  Source: https://docs.rs/ts-rs/latest/ts_rs/ · official (crate docs) · read 2026-10-27 · confirmed in the source.
 - **R1-BND-F10.** Only `#[repr(C)]` (or another explicit representation) gives a Rust struct a layout another
   language can read by offset. Quotes: default representation: "The only data layout guarantees made by this
   representation are those required for soundness" and "The ordering does not have to be the same as the order in
@@ -892,14 +962,16 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   unlike `Atomics.wait()`, can be used on the main thread." · Sources: the Atomics page above and
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/waitAsync (last modified
   2026-02-10) · official · read 2026-10-27 · confirmed in the source.
-- **R1-BND-F15.** Transferring an ArrayBuffer moves it without copying, and the sender loses it; without a transfer
-  list the data is copied. Quotes: "the memory resource that it points to is _literally_ moved between contexts in a
-  fast and efficient zero-copy operation" · "the original object is no longer usable ... and any attempt to read or
-  write the object will throw an exception." Typed arrays are not transferable, their buffers are; the list includes
-  `WebTransportReceiveStream` and `WebTransportSendStream` (summary). · Source:
-  https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects (last modified 2025-09-18) ·
-  official · read 2026-10-27 · zero-copy move and detachment confirmed in the source; the copy-by-default and the
-  list inferred.
+- **R1-BND-F15.** Transferring an ArrayBuffer moves it without copying, and the sender loses it (that data outside the
+  transfer list is copied is R1-BND-F34). Quotes: "the memory resource that it points to is _literally_ moved between
+  contexts in a fast and efficient zero-copy operation" · "the original object is no longer usable ... and any attempt
+  to read or write the object will throw an exception." Typed arrays are not transferable, their buffers are:
+  "…serializable, but not transferable. However their underlying buffer is an ArrayBuffer, which is a transferable
+  object."; the list includes `WebTransportReceiveStream` and `WebTransportSendStream` (both confirmed by the verifier,
+  2026-10-28). · Source: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects (last
+  modified 2025-09-18) · official · read 2026-10-27 · confirmed in the source. Corrected at the fix step: the unit's
+  "without a transfer list the data is copied" is not on this page (unsupported, verifier 2026-10-28); re-sourced as
+  R1-BND-F34.
 - **R1-BND-F16.** Growing a non-shared Wasm memory detaches every existing view of it; for shared memory the old
   buffer keeps its old length. Quotes: "Every call to `grow` will detach any references to the old `buffer`, even for
   `grow(0)`!" · "For a shared `Memory` instance, the initial `buffer` ... will not become detached, but rather its
@@ -908,13 +980,15 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   2026-05-14) · official · read 2026-10-27 · confirmed in the source.
 - **R1-BND-F17.** A Wasm memory is a SharedArrayBuffer only when created shared, a module must declare a shared memory
   to import one, and a shared memory must have a fixed maximum. Quotes: "When this flag is set to `true`, the
-  constructed `Memory` object can be shared between workers via `postMessage()`, just like `SharedArrayBuffer`, and
-  the backing `buffer` of the `Memory` object is a `SharedArrayBuffer`." (SharedArrayBuffer page) · "it is a
-  validation error to import non-shared memory if the module's memory import specifies it as being shared." · "Note
-  that shared linear memory without an explicit maximum size is not permitted." · Sources: the SharedArrayBuffer page
-  above and https://raw.githubusercontent.com/WebAssembly/threads/main/proposals/threads/Overview.md (threads
-  proposal overview, main) · official · read 2026-10-27 · confirmed in the source; the reverse rule (a module that
-  declares unshared memory cannot import a shared one) is inferred from a truncated quote.
+  constructed `Memory` object can be shared between workers via `postMessage()`, just like `SharedArrayBuffer`, and the
+  backing `buffer` of the `Memory` object is a `SharedArrayBuffer`." (SharedArrayBuffer page) · "It is a validation
+  error to attempt to import shared linear memory if the module's memory import" "doesn't specify that it allows shared
+  memory." · "Note that shared linear memory without an explicit maximum size is not permitted." · Sources: the
+  SharedArrayBuffer page above and
+  https://raw.githubusercontent.com/WebAssembly/threads/main/proposals/threads/Overview.md (threads proposal overview,
+  main) · official · read 2026-10-27 · confirmed in the source. Corrected at the fix step: the unit had quoted the
+  source's other rule ("Similarly, it is a validation error to import non-shared memory if the module's memory import
+  specifies it as being shared."); the rule the claim needs is quoted above (verifier, re-read 2026-10-28).
 - **R1-BND-F18.** Building Rust for Wasm threads needs nightly Rust, the atomics target feature and a rebuilt
   standard library, works only with the `web` or `no-modules` output, and keeps `std::thread` unusable. Quotes: "Note
   that this requires a nightly Rust toolchain." · `RUSTFLAGS='-C target-feature=+atomics'` with `-Z
@@ -924,12 +998,14 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   https://raw.githubusercontent.com/wasm-bindgen/wasm-bindgen/main/guide/src/examples/raytrace.md (guide source,
   main, undated) · official · read 2026-10-27 · confirmed in the source. That Rust emits a shared memory only in this
   atomics build is inferred (the page says threads need it; it does not say so of shared memory in those words).
-- **R1-BND-F19.** On the default Rust Wasm target, `std::thread::spawn` panics, and the default Wasm features
-  include bulk-memory and nontrapping-fptoint from Rust 1.87.0. Quote: "`std::thread::spawn` will panic. There is no
-  means by which this can be overridden." Default features listed: multivalue, mutable-globals, reference-types,
-  sign-ext, nontrapping-fptoint (Rust 1.87.0+, LLVM 20+), bulk-memory (Rust 1.87.0+, LLVM 20+). Target tier 2. ·
-  Source: https://doc.rust-lang.org/rustc/platform-support/wasm32-unknown-unknown.html (rustc book, current) ·
-  official · read 2026-10-27 · confirmed in the source.
+- **R1-BND-F19.** On the default Rust Wasm target, `std::thread::spawn` panics, and the default Wasm features include
+  bulk-memory and nontrapping-fptoint from Rust 1.87.0. Quote: "`std::thread::spawn` will panic. There is no means by
+  which this can be overridden." The same page: "By default the `wasm32-unknown-unknown` target is compiled with
+  `-Cpanic=abort`." (rust-reviewer, 2026-10-28; so a panic ends the sim's instance: R1-RR-OQ3). Default features listed:
+  multivalue, mutable-globals, reference-types, sign-ext, nontrapping-fptoint (Rust 1.87.0+, LLVM 20+), bulk-memory
+  (Rust 1.87.0+, LLVM 20+). Target tier 2. · Source:
+  https://doc.rust-lang.org/rustc/platform-support/wasm32-unknown-unknown.html (rustc book, current) · official · read
+  2026-10-27 · confirmed in the source.
 
 **Cross-origin isolation and its costs**
 
@@ -956,17 +1032,23 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   browsers" than Chrome and Edge is out of date. · Source:
   https://raw.githubusercontent.com/mdn/browser-compat-data/main/http/headers/Cross-Origin-Embedder-Policy.json (main
   branch) · official · read 2026-10-27 · confirmed in the source (data values).
-- **R1-BND-F23.** COOP `same-origin` cuts the link to popups that do not opt in, which is how OAuth and payment
-  popups usually work; the value meant for those popups does not give isolation. Quotes: "A document with
+- **R1-BND-F23.** COOP `same-origin` cuts the link to popups that do not opt in; MDN names OAuth and payment
+  services as the case for the relaxed value `same-origin-allow-popups`. Quotes: "A document with
   `same-origin` will always open a document with `unsafe-none` in a new BCG." · "When opened in a new BCG, any
   references between the new document and its opener are severed." · `same-origin-allow-popups` is for "when using a
   cross-origin service for OAuth or payments". · Source: the COOP page above · official · read 2026-10-27 ·
-  confirmed in the source; the consequence for a later login (VISION_V2 §5) inferred.
+  confirmed in the source; the consequence for a later login (VISION_V2 §5) inferred. Corrected at the fix step: the
+  unit had also said that `same-origin-allow-popups` "does not give isolation"; no source read says so (unsupported,
+  verifier 2026-10-28), and MDN's COOP page, re-read 2026-10-28, reads both ways: the value "is used to relax the
+  `same-origin` restriction for integrations where a document needs the benefits of cross-origin isolation but also
+  needs to open and retain a reference to trusted cross-origin documents", while its isolation section says "you will
+  need to set the COOP header to `same-origin`" (F20). Now an open question: R1-BND-OQ9.
 - **R1-BND-F24.** Rollout is testable before it is enforced, and the headers must cover worker scripts as well.
   Quote: with `Cross-Origin-Embedder-Policy-Report-Only` you "will receive reports without blocking embedded
-  content." That COEP must also be sent on worker scripts is from the page's summary. · Source:
+  content." The headers must also reach worker scripts: "Recursively apply this to all documents including the top-level
+  document, iframes and worker scripts." (confirmed by the verifier, 2026-10-28). · Source:
   https://web.dev/articles/coop-coep (published 2020-04-13, last updated 2022-06-21) · official, dated · read
-  2026-10-27 · report-only confirmed in the source; worker scripts inferred.
+  2026-10-27 · confirmed in the source (both).
 
 **Browser support (desktop Chrome, Edge, Firefox, Safari)**
 
@@ -984,10 +1066,10 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   above · official · read 2026-10-27 · confirmed in the source (data values).
 - **R1-BND-F27.** The Wasm features a default Rust build uses, and Wasm threads, are in all three engines: threads
   Chrome "74", Firefox "79", Safari "14.1"; bulk memory "75"/"79"/"15"; reference types "96"/"79"/"15"; non-trapping
-  float-to-int "75"/"64"/"15"; sign extension "74"/"62"/"14.1"; multi-value "85"/"78"/"13.1". Edge is not listed
-  (it is Chromium). · Source: https://raw.githubusercontent.com/WebAssembly/website/main/features.json (the
-  webassembly.org feature table, main) · official · read 2026-10-27 · confirmed in the source (data values); "Edge
-  follows Chrome" inferred.
+  float-to-int "75"/"64"/"15"; sign extension "74"/"62"/"14.1"; multi-value "85"/"78"/"13.1". Edge is not listed (it is
+  Chromium). `mutable-globals`, in Rust's default list (F19), is not among these figures (verifier, 2026-10-28). ·
+  Source: https://raw.githubusercontent.com/WebAssembly/website/main/features.json (the webassembly.org feature table,
+  main) · official · read 2026-10-27 · confirmed in the source (data values); "Edge follows Chrome" inferred.
 - **R1-BND-F28.** wasm-bindgen supports all four browsers. Quote: "Firefox, Chrome, Safari, and Edge browsers are
   all supported by `wasm-bindgen`." · Source:
   https://raw.githubusercontent.com/wasm-bindgen/wasm-bindgen/main/guide/src/reference/browser-support.md ·
@@ -1024,6 +1106,25 @@ means the claim rests on the sentence quoted; "inferred" means it rests on a sum
   control over when and how the module is instantiated, import it with `?init`." · `server.headers`: "Specify server
   response headers." · Sources: https://vite.dev/guide/features and https://vite.dev/config/server-options ·
   official · read 2026-10-27 · confirmed in the source.
+
+**Added at the fix step (2026-10-28)**
+
+- **R1-BND-F34.** `postMessage` hands data to a worker through the structured clone algorithm, which copies it; a
+  transferred buffer (F15) is the exception. Quote: "The structured clone algorithm copies complex JavaScript objects.
+  It is used internally when invoking structuredClone(), to transfer data between Workers via postMessage(), storing
+  objects with IndexedDB, or copying objects for other APIs." · Source:
+  https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm (last modified
+  2025-06-29) · official · read 2026-10-28 (fix step; re-sources F15's copy-by-default clause, which the verifier found
+  unsupported on F15's page) · confirmed in the source. The page does not contrast copying with transferring; that a
+  buffer named in the transfer list is moved instead is F15.
+- **R1-BND-F35.** A Wasm memory's buffer is created with a detach key that names the Wasm memory. Quote: "Set
+  buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"." (the algorithm "create a fixed length memory buffer", step
+  5) · Source: https://webassembly.github.io/spec/js-api/ §5.3 "Memories" (WebAssembly JavaScript Interface, Editor's
+  Draft, 27 October 2026) · official · read 2026-10-28 (fix step; the verifier's boundary finding 1: REC2's one copy
+  per tick depends on the sim's memory not being handed over) · confirmed in the source for the step. That a transfer
+  of this buffer therefore throws is inferred: the rule that a keyed buffer cannot be detached by a transfer is in
+  ECMA-262 and the HTML standard, both outside the allow list. Either way, transferring the sim's memory would take it
+  from the worker (F15).
 
 #### Legacy facts used (unit `boundary-worker`)
 
@@ -1081,27 +1182,29 @@ Source for F1–F20: tranek, "GASDocumentation", README.md, https://raw.githubus
   "An `Attribute` is composed of two values - a `BaseValue` and a `CurrentValue`." … "The `BaseValue` is the permanent
   value of the `Attribute` whereas the `CurrentValue` is the `BaseValue` plus temporary modifications from
   `GameplayEffects`.").
-- **R1-ABL-F2.** Gameplay effects have three duration types: Instant (a permanent BaseValue change that applies no tags),
-  Duration (temporary CurrentValue changes and tags, removed on expiry) and Infinite (never expires by itself). · §4.5
-  (duration table) · other · read 2026-10-27 · confirmed in the source (verbatim: Instant "For immediate permanent changes
-  to `Attribute's` `BaseValue`. `GameplayTags` will not be applied, not even for a frame."; Duration "For temporary
-  changes to `Attribute's` `CurrentValue` and to apply `GameplayTags`"; Infinite "These will never expire on their own and
-  must be manually removed by an ability or the `ASC`.").
-- **R1-ABL-F3.** Duration and Infinite effects can be periodic: they re-apply their modifiers and executions every Period
-  seconds, and periodic effects are not predicted. · §4.5, §4.10 · other · read 2026-10-27 · confirmed in the source
-  (verbatim: "`Periodic Effects` that apply its `Modifiers` and `Executions` every `X` seconds as defined by its
+- **R1-ABL-F2.** Gameplay effects have three duration types: Instant (a permanent BaseValue change that applies no
+  tags), Duration (temporary CurrentValue changes and tags, removed on expiry) and Infinite (never expires by itself). ·
+  §4.5.1 (duration table; the unit wrote §4.5) · other · read 2026-10-27 · confirmed in the source (verbatim: Instant
+  "For immediate permanent changes to `Attribute's` `BaseValue`. `GameplayTags` will not be applied, not even for a
+  frame."; Duration "For temporary changes to `Attribute's` `CurrentValue` and to apply `GameplayTags`"; Infinite "These
+  will never expire on their own and must be manually removed by an ability or the `ASC`.").
+- **R1-ABL-F3.** Duration and Infinite effects can be periodic: they re-apply their modifiers and executions every
+  Period seconds, and periodic effects are not predicted. · §4.5.1, §4.10 · other · read 2026-10-27 · confirmed in the
+  source (verbatim: "`Periodic Effects` that apply its `Modifiers` and `Executions` every `X` seconds as defined by its
   `Period`."; "`Periodic Effects` cannot be [predicted](#concepts-p)."; not-predicted list: "GameplayEffect periodic
   effects (dots ticking)").
 - **R1-ABL-F4.** Modifiers aggregate as ((base + sum of adds) × multiply) / divide, and by default all Multiply (and all
-  Divide) modifiers are summed before they are applied; an Override replaces the result. · §4.5.4 · other · read
-  2026-10-27 · confirmed in the source for the formula and the summing (verbatim: "The formula for how `Modifiers` are
-  aggregated is defined as follows" `((InlineBaseValue + Additive) * Multiplicitive) / Division`; "By default, all
-  `Multiply` and `Divide` `Modifiers` are added together before multiplying or dividing"); the Override rule ("last
-  applied wins") is inferred (summary only).
-- **R1-ABL-F5.** Stacking applies only to Duration and Infinite effects, aggregated either per source or per target, with
-  policies for expiration, duration refresh and period reset that the write-up says are explained only by editor
-  tooltips. · §4.5.5 · other · read 2026-10-27 · confirmed in the source (verbatim: "Stacking only works for `Duration`
-  and `Infinite` `GameplayEffects`."; "There is a separate instance of stacks per Source `ASC` on the Target. Each Source
+  Divide) modifiers are summed before they are applied; an Override replaces the result. · §4.5.4, §4.5.4.1 (the
+  summing) · other · read 2026-10-27 · confirmed in the source for the formula and the summing (verbatim: "The formula
+  for how `Modifiers` are aggregated is defined as follows" `((InlineBaseValue + Additive) * Multiplicitive) /
+  Division`; "By default, all `Multiply` and `Divide` `Modifiers` are added together before multiplying or dividing");
+  the Override rule is confirmed too (verbatim, verifier 2026-10-28): "Any `Override` `Modifiers` will override the
+  final value with the last applied `Modifier` taking precedence."
+- **R1-ABL-F5.** Stacking applies only to Duration and Infinite effects, aggregated either per source or per target,
+  with policies for expiration, duration refresh and period reset, for which the write-up points to the editor's hover
+  tooltips (the unit's "explained only by editor tooltips" overstated the source: unsupported, verifier 2026-10-28). ·
+  §4.5.5 · other · read 2026-10-27 · confirmed in the source (verbatim: "Stacking only works for `Duration` and
+  `Infinite` `GameplayEffects`."; "There is a separate instance of stacks per Source `ASC` on the Target. Each Source
   can apply X amount of stacks."; "There is only one instance of stacks on the Target regardless of Source."; "Stacks
   also have policies for expiration, duration refresh, and period reset."; they "have helpful hover tooltips in the
   `GameplayEffect` Blueprint.").
@@ -1144,30 +1247,37 @@ Source for F1–F20: tranek, "GASDocumentation", README.md, https://raw.githubus
   "GameplayEffect periodic effects (dots ticking)").
 - **R1-ABL-F14.** GAS ties predicted effects to server confirmation with a prediction key: the client sends the key with
   its activation request, and removes the effects it created under a key once that key comes back from the server;
-  predicted effects with no matching server version were mispredicted. · §4.10 · other · read 2026-10-27 · confirmed in
-  the source (verbatim: "Client sends this prediction key to the server with CallServerTryActivateAbility()."; "Client
-  removes all GameplayEffects that it created with the now stale replicated prediction key."; "Any GameplayEffects that
-  the client added and didn't receive a matching replicated version from the server were mispredicted.").
-- **R1-ABL-F15.** Paragon and Fortnite (both Epic's shipped games) do not predict damage, and Epic's stated guidance is to
-  keep prediction to a minimum. · §4.10 · other (second-hand report of shipped-game practice) · read 2026-10-27 ·
+  predicted effects with no matching server version were mispredicted. · §4.10.1 · other · read 2026-10-27 · confirmed
+  in the source (verbatim: "Client sends this prediction key to the server with CallServerTryActivateAbility().";
+  "Client removes all GameplayEffects that it created with the now stale replicated prediction key."; "Any
+  GameplayEffects that the client added and didn't receive a matching replicated version from the server were
+  mispredicted.").
+- **R1-ABL-F15.** Paragon and Fortnite (both Epic's shipped games) do not predict damage, and Epic's stated guidance is
+  to keep prediction to a minimum. · §4.10 · other (second-hand report of shipped-game practice) · read 2026-10-27 ·
   confirmed in the source (verbatim: "For example, Paragon and Fortnite do not predict damage."; "We still feel player
-  prediction is best kept to a minimum"; "predict the minimum amount of stuff you can get away with"). The attribution of
-  the last two to Epic's Dave Ratti is inferred (summary only).
-- **R1-ABL-F16.** Gameplay cues are for non-gameplay output (sound, particles, camera shake) and are unreliable, so unfit
-  for anything that affects gameplay. · §4.8, §4.8.1 · other · read 2026-10-27 · confirmed in the source (verbatim:
-  "`GameplayCues` (`GC`) execute non-gameplay related things like sound effects, particle effects, camera shakes,
-  etc."; "GameplayCues in general should be considered unreliable and thus unsuited for anything that directly affects
-  gameplay.").
-- **R1-ABL-F17.** Fortnite tracks weapon fire rates with its own bookkeeping instead of cooldown effects; the answer comes
-  in reply to a question about the server overwriting the cooldown of locally predicted abilities. · §11.1.1 "Community
-  Questions 1", question 7 · other · read 2026-10-27 · confirmed in the source (verbatim question start: "Is there a way
-  to stop the Server from overwriting the cooldown duration of locally predicted abilities"; answer: "Fortnite does its
-  own bookkeeping for weapon firing rates: it does not use GEs for cooldowns on weapons."). That the question is about
-  high-latency players re-activating later is inferred (summary only).
+  prediction is best kept to a minimum"; "predict the minimum amount of stuff you can get away with"). The source
+  attributes the last two to "Dave Ratti from Epic's comment from the new Network Prediction Plugin" (verbatim, verifier
+  2026-10-28).
+- **R1-ABL-F16.** Gameplay cues are for non-gameplay output (sound, particles, camera shake) and are unreliable, so
+  unfit for anything that affects gameplay. · §4.8.1, §4.8.9 (the reliability sentence) · other · read 2026-10-27 ·
+  confirmed in the source (verbatim: "`GameplayCues` (`GC`) execute non-gameplay related things like sound effects,
+  particle effects, camera shakes, etc."; "GameplayCues in general should be considered unreliable and thus unsuited for
+  anything that directly affects gameplay.").
+- **R1-ABL-F17.** Fortnite tracks weapon fire rates with its own bookkeeping instead of cooldown effects; the answer
+  comes in reply to a question about the server overwriting the cooldown of locally predicted abilities, which, the
+  answer says, gave Paragon's high-latency players a lower rate of fire. · §11.1.1 "Community Questions 1", question 7 ·
+  other · read 2026-10-27 · confirmed in the source (verbatim question start: "Is there a way to stop the Server from
+  overwriting the cooldown duration of locally predicted abilities"; answer: "Fortnite does its own bookkeeping for
+  weapon firing rates: it does not use GEs for cooldowns on weapons."). The latency context is verbatim too (verifier
+  2026-10-28; re-read at the fix step in the verifier's copy of the README): the question, "In scenarios of high
+  latency, this would let the Owning Client "try" to activate the ability again when its local cooldown expires but it
+  is still on cooldown on the Server."; the answer, "The short answer there is not a way to prevent this and Paragon
+  definitely had the problem. Higher latency connections would have a lower ROF with basic attacks."
 - **R1-ABL-F18.** The ability's activation prediction key is a 16-bit integer known to both client and server, which the
   write-up offers as a shared random seed. · §5.5 · other · read 2026-10-27 · confirmed in the source for the key
-  (verbatim: "is an int16 guaranteed to be synchronized and available in both the client and server"); that it restarts
-  at zero each game and that a seed sent by the client can be forged are inferred (summary only).
+  (verbatim: "is an int16 guaranteed to be synchronized and available in both the client and server"); that it "always
+  starts at zero each time the game starts" and that with a seed sent in an event payload "the client could easily hack
+  their game to only send the same seed value every time" are confirmed too (verifier 2026-10-28).
 - **R1-ABL-F19.** Paragon's slows did not stack: only the strongest slow applied. · §5.7 · other · read 2026-10-27 ·
   confirmed in the source (verbatim: "Slow effects in Paragon did not stack."; "but only the greatest magnitude slow
   effect actually affected the Character").
@@ -1201,22 +1311,27 @@ https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/b
 #### Rust ability crates (tier other)
 - **R1-ABL-F23.** leafwing_abilities 0.13.0 (released 2026-09-27 per its page) is built for Bevy and covers cooldowns,
   charges and resource pools; damage, cast times, range checking and resource management are listed as planned; its
-  cooldown ticks by a `Duration` and is built from `f32` seconds. · https://docs.rs/leafwing_abilities/latest/leafwing_abilities/
-  (crate root) and …/cooldown/struct.Cooldown.html · other · read 2026-10-27 · confirmed in the source (verbatim: "A
-  convenient, well-tested ability management suite. Built for the Bevy game engine."; "track and automatically tick
-  cooldowns"; "store multiple charges of abilities"; Planned: "resource management (health, mana, energy etc)",
-  "damage", "cast times", "range checking"; `pub fn tick(&mut self, delta_time: Duration, charges: Option<&mut
-  Charges>)`; `pub fn from_secs(max_time: f32) -> Cooldown`). Its dependency on Bevy ^0.19 and the page's silence on
-  attributes, effects, tags, fixed ticks and networking are inferred (summary only).
+  cooldown ticks by a `Duration` and is built from `f32` seconds. ·
+  https://docs.rs/leafwing_abilities/latest/leafwing_abilities/ (crate root) and …/cooldown/struct.Cooldown.html · other
+  · read 2026-10-27 · confirmed in the source (verbatim: "A convenient, well-tested ability management suite. Built for
+  the Bevy game engine."; "track and automatically tick cooldowns"; "store multiple charges of abilities"; Planned:
+  "resource management (health, mana, energy etc)", "damage", "cast times", "range checking"; `pub fn tick(&mut self,
+  delta_time: Duration, charges: Option<&mut Charges>)`; `pub fn from_secs(max_time: f32) -> Cooldown`). Its dependency
+  on Bevy "^0.19 (normal)" is confirmed by rust-reviewer (2026-10-28); the page's silence on attributes, effects, tags,
+  fixed ticks and networking is inferred (summary only).
 - **R1-ABL-F24.** bevy_gauge 0.5.1 (released 2026-07-06 per its page) is an attribute and stat system for Bevy:
   attributes are expressions over other attributes, with tagged modifiers that can be applied and removed as sets. ·
-  https://docs.rs/crate/bevy_gauge/latest · other · read 2026-10-27 · inferred (summary, with short quotes "A flexible
-  attribute and stat system for Bevy" and "Define attributes as expressions, not update systems"; no verbatim request
-  made). The page's silence on duration, stacking, determinism and fixed ticks is inferred.
+  https://docs.rs/crate/bevy_gauge/latest · other · read 2026-10-27 · confirmed in the source (upgraded by
+  rust-reviewer, 2026-10-28: "A flexible attribute and stat system for Bevy"; "Define attributes as expressions, not
+  update systems."; "Equipment and buffs are modifier sets that apply and remove cleanly:"). The page's silence on
+  duration, stacking, determinism and fixed ticks is inferred.
 - **R1-ABL-F25.** bevy_alchemy 0.6.0 models each status effect as its own entity linked to its target, with merge modes
   Stack, Insert and Merge, a Lifetime timer and a repeating Delay timer for periodic effects. ·
-  https://docs.rs/crate/bevy_alchemy/latest/source/README.md · other · read 2026-10-27 · inferred (summary, with the short
-  quote "An experimental, status effects-as-entities system for Bevy").
+  https://docs.rs/crate/bevy_alchemy/latest/source/README.md · other · read 2026-10-27 · confirmed in the source
+  (upgraded by rust-reviewer, 2026-10-28: "An experimental, status effects-as-entities system for Bevy."; Stack
+  "Multiple of the same effect can exist at once."; Insert "New applications will overwrite the existing one."; Merge
+  "New applications are merged with the existing one, using a configurable merge function."; Lifetime "A timer that
+  despawns the effect when the timer finishes."); the repeating Delay timer stays inferred.
 
 #### Rust standard library (official)
 - **R1-ABL-F26.** Rust's standard `HashMap` is randomly seeded by default and iterates in arbitrary order. ·
@@ -1283,7 +1398,8 @@ Every source read 2026-10-27.
   https://raw.githubusercontent.com/serde-rs/serde-rs.github.io/master/_src/field-attrs.md (serde.rs "Field
   attributes") · official · read 2026-10-27 · confirmed in the source.
 - **R1-DATA-F5.** Untagged enums give poor errors. Verbatim: "When no variant matches, `untagged` does not produce an
-  informative error" · Source: as F1 · official · read 2026-10-27 · confirmed in the source. Internally tagged enums
+  informative error", which goes on "but this can be improved by adding an expecting message." (verifier, 2026-10-28)
+  · Source: as F1 · official · read 2026-10-27 · confirmed in the source. Internally tagged enums
   (`#[serde(tag = "type")]`) exist as the alternative (same page, confirmed).
 
 #### serde_json (the JSON loader)
@@ -1320,14 +1436,15 @@ Every source read 2026-10-27.
   confirmed in the source.
 
 #### Other text formats
-- **R1-DATA-F12.** RON (ron 0.12.2) has comments, trailing commas and native enums, but is not fully self-describing,
-  supports `tag`, `untagged` and `flatten` only in part, and gives no round-trip guarantee through its `Value`.
-  Verbatim: "RON is not designed to be a fully self-describing format (unlike JSON)"; "While RON offers a best-effort
-  implementation for `#[serde(flatten)]`, it may be unsupported in further cases"; "RON does not yet make any
-  guarantees about roundtrips through `ron::Value`." · Sources: https://github.com/ron-rs/ron (README);
-  https://docs.rs/ron/latest/ron/ (0.12.2, page 2026-09-13) · official (project) · read 2026-10-27 · the three quoted
-  limits confirmed in the source; the feature list (comments, trailing commas, enums) and the README's one JavaScript
-  implementation ("ron-js", no TypeScript one) come from WebFetch's summary: inferred; ron-js's maturity: unverified.
+- **R1-DATA-F12.** RON (ron 0.12.2 at the read; docs.rs showed 0.12.3, dated 2026-10-28, a day later) has comments,
+  trailing commas and native enums, but is not fully self-describing, supports `tag`, `untagged` and `flatten` only in
+  part, and gives no round-trip guarantee through its `Value`. Verbatim: "RON is not designed to be a fully
+  self-describing format (unlike JSON)"; "While RON offers a best-effort implementation for `#[serde(flatten)]`, it may
+  be unsupported in further cases"; "RON does not yet make any guarantees about roundtrips through `ron::Value`." ·
+  Sources: https://github.com/ron-rs/ron (README); https://docs.rs/ron/latest/ron/ (0.12.2, page 2026-09-13) · official
+  (project) · read 2026-10-27 · the three quoted limits confirmed in the source; the feature list confirmed by the
+  verifier ("trailing commas allowed", "single- and multi-line comments", 2026-10-28); the README's one JavaScript
+  implementation ("ron-js", no TypeScript one) comes from WebFetch's summary: inferred; ron-js's maturity: unverified.
 - **R1-DATA-F13.** TOML is a configuration format with comments and no null value; the toml crate targets spec 1.1.0.
   Verbatim (spec text): "TOML aims to be a minimal configuration file format that's easy to read due to obvious
   semantics." "A hash symbol marks the rest of the line as a comment, except when inside a string." · Sources:
@@ -1342,12 +1459,12 @@ Every source read 2026-10-27.
   · confirmed in the source.
 
 #### Schemas and validation
-- **R1-DATA-F15.** JSON Schema 2020-12 has numeric bounds, enums, required properties, and annotations meant for UI
-  and documentation (title, description, default, deprecated, examples). Verbatim: "The value of "minimum" MUST be a
-  number, representing an inclusive lower limit for a numeric instance."; deprecated: "applications SHOULD refrain from
-  usage of the declared property" · Source: https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-01
-  §6.1, §6.2, §6.5.3, §9 (Internet-Draft, 2020-12 dialect, published 2022-06-10, Informational, expired) · official
-  (specification) · read 2026-10-27 · the quoted keyword definitions confirmed in the source; "meant for UI and
+- **R1-DATA-F15.** JSON Schema 2020-12 has numeric bounds, enums, required properties, and annotations meant for UI and
+  documentation (title, description, default, deprecated, examples). Verbatim: "The value of "minimum" MUST be a number,
+  representing an inclusive lower limit for a numeric instance."; deprecated: "applications SHOULD refrain from usage of
+  the declared property" · Source: https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-01 §6.1,
+  §6.2, §6.5.3, §9 (deprecated: §9.3) (Internet-Draft, 2020-12 dialect, published 2022-06-10, Informational, expired) ·
+  official (specification) · read 2026-10-27 · the quoted keyword definitions confirmed in the source; "meant for UI and
   documentation" is WebFetch's summary of §9.1: inferred.
 - **R1-DATA-F16.** schemars 1.2.3 derives JSON Schema 2020-12 from Rust types and follows their serde attributes.
   Verbatim: default settings "currently conform to JSON Schema 2020-12"; "Any generated schema _should_ match how
@@ -1494,7 +1611,7 @@ rests on official documentation and specifications, plus the legacy facts in §2
 |---|---|---|---|
 | **Shape** | A World of archetype tables (F3), systems in schedules, single- or multi-threaded executor (F7). | An archetype World with no scheduler; plain functions query it (F16, F17). | One sim-state struct: a fixed-slot soldier table sized by the mode, generational pools for vehicles, projectiles and effects (F28 shows the key scheme), per-team tables, static colliders with ids, the RNG state, the tick counter, the tick's event list; phases are plain functions called in a fixed order. |
 | **Deterministic order** | Not guaranteed (F4, F12); needs a sort in every outcome-deciding system, redone each run (F5); order ambiguities ignored by default (F6). Achievable, but every system has to opt in. | Arbitrary (F17); needs our own ordering (an index or a sort) on every outcome loop. | Storage order is iteration order (F25), and we control it. Still needs a rule against default-hasher HashMap iteration (F23); BTreeMap where a map is needed (F24). |
-| **Whole-state snapshot / restore** | The World is not Clone (F8). The proven route (bevy_ggrs) registers each type, keeps per-frame maps keyed by a rollback id and reconciles entities on load (F10). Unregistered state silently desyncs (F13), and change detection fires after every restore (F14). | The World is not Clone (F18). We would write a snapshot by hand, per component type, or serialize (F20); the freelist makes re-created ids match (F19). | Derive or write Clone over the whole struct; clone_from into a preallocated copy reuses buffers (F26, F27). Nothing lives outside the struct, so nothing can be "unregistered" (inferred: it holds only if the sim keeps no globals or statics, which is a code rule). |
+| **Whole-state snapshot / restore** | The World is not Clone (F8). The proven route (bevy_ggrs) registers each type, keeps per-frame maps keyed by a rollback id and reconciles entities on load (F10). Unregistered state silently desyncs (F13), and change detection fires after every restore (F14). | The World is not Clone (F18). We would write a snapshot by hand, per component type, or serialize (F20); the freelist makes re-created ids match (F19). | Derive or write Clone over the whole struct; a hand-written clone_from into a preallocated copy reuses buffers (F26, F27; the derived and default clone_from do not, F35). Nothing lives outside the struct, so nothing can be "unregistered" (inferred: it holds only if the sim keeps no globals or statics, which is a code rule). |
 | **Ids across server and client** | Entity must not be lined up between instances (F9): a separate network id plus MapEntities mapping, as bevy_ggrs does (F10). | Ids can be aligned through the freelist (F19), but only while the live sets match exactly. | The sim defines the id (kind, index, generation, F28), and the same id is used on the wire, in events and in the TS client. |
 | **Serialization for snapshots** | An optional serialize feature (F7); Entity's serialized form has no format guarantee (F9). | Context-based serialization with a compact column format (F20). | serde on our own types, the route Rapier (F30) and slotmap (F28, inferred) use; the wire format and deltas are R2's. |
 | **Physics (if R4 picks Rapier)** | Rapier keeps its own sets either way (F29); the ECS holds handles and syncs transforms. | Same. | The Rapier sets are fields of the state struct, Clone and Serialize (F29, F30), so they join the same snapshot. |
@@ -1514,8 +1631,8 @@ Arithmetic in this table (periods, per-tick distances, replay counts) is inferre
 | Option | Shipped or official precedent (read) | Fit for SHAMBLE (VISION_V2 §4, §6) | Cost and risk |
 |---|---|---|---|
 | 20 Hz (50 ms) | Quake III world frame (F9); its player movement was integrated per user command, not per world frame (F12; the command rate is inferred) | Shots and movement quantised to 50 ms; legacy's jump at 20 Hz lost 11 % of its apex (GW14) | Cheapest; coarse input timing; would need movement or shots off the tick (Q3 style), which is the frame-rate dependence legacy and Q3 both fought (F12, GW14) |
-| 30 Hz (33.3 ms) | None read for a shooter | Every legacy weapon fits (at most one shot per tick: tuning arithmetic in §3); up to 33 ms extra input wait and up to one tick of render-interpolation lag | Half the CPU of 60 Hz per simulated second; half the replay steps per correction (F24); legacy parity harness would run at a rate legacy never measured |
-| 60 Hz (16.7 ms) | Rapier's default `dt` (F8); legacy `FIXED_DT` and every legacy measurement (CS1, TL13, TL15, GW14) | Finest of the practical options; one new tick per frame on the most common display rate, 60 Hz (F17; inferred); Rapier step equals the tick | Twice the CPU of 30 Hz; may beat against a 60 Hz display when steps are paced by frames (F6); 1/60 is not exact in binary floats (F6) |
+| 30 Hz (33.3 ms) | None read for a shooter | Every legacy weapon fits (at most one shot per tick: tuning arithmetic in §3); up to 33 ms extra input wait and up to one tick of render-interpolation lag | About half the CPU of 60 Hz per simulated second (assumes a constant cost per tick); half the replay steps per correction (F24); legacy parity harness would run at a rate legacy never measured |
+| 60 Hz (16.7 ms) | Rapier's default `dt` (F8); legacy `FIXED_DT` (CS1) and the legacy harness measurements (TL13, TL15); GW14 was measured at 20, 60 and 144 Hz | Finest of the practical options; one new tick per frame on the most common display rate, 60 Hz (F17; inferred); Rapier step equals the tick | About twice the CPU of 30 Hz (same assumption); may beat against a 60 Hz display when steps are paced by frames (F6); 1/60 is not exact in binary floats (F6) |
 | 64 Hz (15.625 ms) | Bevy's default fixed step, chosen against the 60 Hz beat and for an exact float `dt` (F6) | As 60 Hz; every legacy number shifts slightly when converted to ticks | As 60 Hz plus about 7 % more steps; no legacy measurement at this rate |
 | 66 Hz (15 ms) | Counter-Strike on Source (F13) | Closest precedent for a competitive shooter | As 64 Hz; no Rust or web precedent read |
 | Variable-duration commands (movement per input, world on a slower frame) | Quake III (F12) | Lets a slow world tick keep fine movement | Frame-rate dependent unless chopped (F12); exactly the legacy defect (GW14, GC15); no clean tick to replay or rewind |
@@ -1579,14 +1696,14 @@ ticks (F4).
 |---|---|
 | `StdRng` / thread RNG | "Non-portable", may change algorithm (F27): excluded |
 | `rand_chacha` ChaCha8Rng | portable, reference-tested (F28); 2^64 streams per seed and a settable position, so the RNG state is small and can be saved in a snapshot (inferred); speed not measured |
-| `rand_pcg` Pcg32 | portable, reference-tested (F28); no stream or position API read in this run; `Pcg64Mcg` slow on 32-bit CPUs (F28; whether wasm32 counts is not stated) |
+| `rand_pcg` Pcg32 | portable, reference-tested (F28); a stream number in its constructor and a jump-ahead `advance`, and "a good choice on both 32-bit and 64-bit CPUs" (F34); `Pcg64Mcg` slow on 32-bit CPUs (F28; whether wasm32 counts is not stated) |
 | Port the legacy `_mulberry32` | tiny, but no source read on its quality; legacy uses it only for the editor (CM9) |
 
 #### Q5. Iteration order
 
 | Option | Trade-offs |
 |---|---|
-| std `HashMap` iterated | order arbitrary and per process (F25): excluded for anything that changes outcomes |
+| std `HashMap` iterated | order arbitrary (F25), with a seed per instance (F33): excluded for anything that changes outcomes |
 | `HashMap` with a fixed hasher | order repeatable for one build, but no source read says it is the same on 32-bit Wasm and 64-bit native; loses HashDoS resistance (F25), which matters for keys a client controls (inferred) |
 | `BTreeMap` | sorted order (F26); slower lookups than a hash map (not measured here) |
 | Dense arrays or slot maps by stable entity id | order is the id order; fits the ECS-or-plain-data unit's choice |
@@ -1759,15 +1876,21 @@ its "Rests on:" list and the VISION_V2 items it serves.
   - Both ECS crates leave iteration order unspecified (F4, F17), so determinism would need sorting or our own ordering
     in every outcome loop anyway (F5, F12). Plain tables iterate in the order we store (F25).
   - The client's replay needs a cheap whole-state snapshot and restore. Neither World is Clone (F8, F18). The bevy
-    route is per-type registration with silent-desync and change-detection traps (F10, F13, F14). A plain struct is
-    cloned into a preallocated copy that reuses its buffers (F26, F27).
+    route (bevy_ggrs, a third-party rollback library, not bevy_ecs itself) is per-type registration with silent-desync
+    and change-detection traps (F10, F13, F14). A plain struct can be cloned into a preallocated copy that reuses its
+    buffers if its clone_from is written by hand: Vec's clone_from reuses its buffer (F26), while the derived and the
+    default clone_from do not (F27, F35). hecs narrows the gap (its ids can be made to match, F19, and it has a column
+    serializer, F20), but its World is not Clone either (F18).
   - Server and client need one shared id, which bevy's Entity is documented not to be (F9). The sim owning generational
     ids (F28) also gives static colliders the stable ids legacy lacked (CS7).
   - Rapier's sets are Clone and Serialize and slot straight into the struct (F29, F30).
-  - It avoids a fast-moving 0.x dependency (F1) and features no §6 item needs (scheduler, observers, reflection).
+  - It avoids features no §6 item needs (scheduler, observers, reflection) and a second fast-moving 0.x dependency
+    beside Rapier, which is 0.x too (0.30.1 in January 2026, F32; 0.36.1 now, F29); that each bevy release breaks the
+    API is inferred (F1).
 
-  Rests on: F1, F4, F5, F8, F9, F10, F12, F13, F14, F17, F18, F21, F25, F26, F27, F28, F29, F30 (plus F33 and F34 for
-  the size marks).
+  Rests on: F1, F4, F5, F8, F9, F10, F12, F13, F14, F17, F18, F19, F20, F21, F25, F26, F27, F28, F29, F30, F32, F35
+  (plus F7, F33 and F34 for the size marks); the legacy facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4
+  for mark 3.
   Serves VISION_V2 §6.1, §6.2, §6.3, §6.4, §6.5, §6.6 and §6.8, and §4 ("matches feel fair up to about 100 ms of
   ping", which needs reproducible replay).
 
@@ -1777,8 +1900,12 @@ its "Rests on:" list and the VISION_V2 items it serves.
      8 vehicles, 300 live projectiles and 200 active effects, on a 3D greybox. The pass mark: a mean tick ≤ 2 ms and
      a p99 tick ≤ 4 ms native; Wasm in a Worker ≤ 2× native. For reference only, the legacy JS step at 48 soldiers
      measured 0.80–1.00 ms mean (GC2), without physics or a 3D world.
-  2. **Snapshot.** clone_from of the whole state, Rapier included, into a preallocated copy: 0 heap allocations after
-     warm-up (counted by a counting global allocator), ≤ 0.2 ms native and ≤ 0.5 ms Wasm at the stress load.
+  2. **Snapshot.** clone_from of the whole state into a preallocated copy, with a hand-written clone_from for our own
+     tables (F35): 0 heap allocations after warm-up in our tables (counted by a counting global allocator). Rapier's
+     sets keep the default clone_from (F35), so their allocations per snapshot are counted and reported separately,
+     and a workaround is measured if they matter. The whole snapshot takes ≤ 0.2 ms native and ≤ 0.5 ms Wasm at the
+     stress load. (The unit's "0 heap allocations, Rapier included" was not reachable as written: rust-reviewer risk 5,
+     verifier ECS finding 3; changed at the fix step.)
   3. **Restore and replay.** Restore, plus re-simulating k = ceil(0.15 s × tick rate) ticks (VISION_V2 §4's 100 ms,
      plus a proposed 50 ms margin; the tick rate is the tick unit's), fits in ≤ 8 ms in Wasm on the minimum laptop. If
      it doesn't, whole-world replay is ruled out and R2's partial prediction applies (R1-ECS-OQ3).
@@ -1798,7 +1925,7 @@ its "Rests on:" list and the VISION_V2 items it serves.
   defined orders (F24, F25); ECS queries don't (F4, F17); and the legacy step order decided outcomes while it shared
   its RNG with FX and audio (GP14).
 
-  Rests on: F4, F12, F17, F23, F24, F25.
+  Rests on: F4, F12, F17, F23, F24, F25; legacy GP14.
   Serves VISION_V2 §4 (fair to about 100 ms of ping: prediction and replay need reproducible ticks) and §6.6 and
   §6.8 (server-side telemetry and moments are computed from reproducible state).
 
@@ -1814,10 +1941,10 @@ its "Rests on:" list and the VISION_V2 items it serves.
   an ECS- or library-internal id on the wire.**
   The reason: bevy documents that its Entity must not be lined up across instances (F9), and rollback on bevy needs
   its own stable id (F10). Generational keys reject stale handles after a slot is reused (F28), and Rapier's handles
-  work the same way (F29). Legacy can't name the static a shot hit (CS7), and its bolts follow a victim by reference
+  work the same way (F29). Legacy can't name the static a shot hit (CS7), and its bolts follow a victim's mesh position
   (GC15).
 
-  Rests on: F9, F10, F28, F29.
+  Rests on: F9, F10, F28, F29; legacy CS7, GC15.
   Serves VISION_V2 §6.3 (effects name their source and target), §6.4 (vehicle parts and seats), §6.6 (telemetry names
   units) and §6.8 (moments name who did what).
 
@@ -1829,9 +1956,9 @@ its "Rests on:" list and the VISION_V2 items it serves.
 
 - **R1-ECS-REC4. If R4 picks Rapier, its sets are fields of the sim state and go into every snapshot and serialized
   state; the snapshot test covers the physics state byte for byte.**
-  The reason: Rapier's sets are Clone and Serialize (F29); its full state is serializable while its pipelines hold no
-  state (F30); and a reported case showed a library skipping internal state on serialize, which broke restored
-  worlds (F32).
+  The reason: Rapier's sets are Clone and Serialize (F29); its full state is serializable, with the `serde-serialize`
+  feature, while its pipelines hold no state (F30); and a reported case showed a library skipping internal state on
+  serialize, which broke restored worlds (F32).
 
   Rests on: F29, F30, F32 (F31 for the cross-machine part, which is the determinism unit's).
   Serves VISION_V2 §6.2 (a true 3D simulation) and §6.4 (big vehicles as physical bodies).
@@ -1862,14 +1989,15 @@ A spike must prove (proposed pass marks):
 - A CI check shows the sim crate's step reads no clock (no `std::time`, no host time import in the Wasm module).
 
 **R1-TICK-REC2. Start the spike at 60 Hz, measure 30 Hz beside it on the same scene, and choose by the pass marks.**
-60 Hz is the starting candidate: it is Rapier's default step (F8), legacy's declared step and the rate of every legacy
-measurement (CS1, TL13, TL15, GW14), and it keeps player movement and shots on a fine fixed step. Quake III did not
-integrate movement on its 20 Hz world frame but per user command, and still had to chop long moves "to prevent
-framerate dependent behavior" and add an optional fixed 8 ms movement step (F12); a single fine tick avoids both
-problems. Shipped shooters read span 20 Hz (F9) to 66 Hz (F13). 30 Hz halves the CPU per
-simulated second (F8) and the replay work per correction (F24), and every legacy weapon still fits one shot per tick
-(tuning arithmetic), so it is the measured fallback. 64 Hz stays an open question (OQ1).
-Rests on: F6, F8, F9, F12, F13, F24; legacy CS1, GW14, TL13, TL15, `WEAPONS`, `T`.
+60 Hz is the starting candidate: it is Rapier's default step (F8), legacy's declared step (CS1) and the rate of the
+legacy harness measurements (TL13, TL15; GW14 was measured at 20, 60 and 144 Hz and GN4 at 60 and 144 fps), and it keeps
+player movement and shots on a fine fixed step. Quake III did not integrate movement on its 20 Hz world frame but per
+user command, and still had to chop long moves "to prevent framerate dependent behavior" and add an optional fixed 8 ms
+movement step (F12); a single fine tick avoids both problems. Shipped shooters read span 20 Hz (F9) to 66 Hz (F13). 30
+Hz roughly halves the CPU per simulated second (inferred: F8 gives only the direction, and halving assumes a constant
+cost per tick, which REC3's cadences change) and the replay work per correction (F24), and every legacy weapon still
+fits one shot per tick (tuning arithmetic), so it is the measured fallback. 64 Hz stays an open question (OQ1).
+Rests on: F3, F6, F8, F9, F12, F13, F24; legacy CS1, GN4, GW14, TL13, TL15, `WEAPONS`, `T`.
 Serves: VISION_V2 §4 (fair up to about 100 ms ping; 30+ fps minimum, 60 fps recommended), §6.1 (modes up to 48+ with
 bots), §6.2 (aiming and jumping at height), §6.4 (big vehicles: physics steps with the tick).
 A spike must prove (proposed pass marks; reference hardware proposed, to be named with R3, R5 and R6):
@@ -1882,8 +2010,9 @@ A spike must prove (proposed pass marks; reference hardware proposed, to be name
 - P2 client, Wasm in a dedicated Worker on the proposed minimum laptop, offline at the largest mode (OQ7 decides N): p99
   tick time at most 40 % of the period (6.7 ms at 60 Hz, 13.3 ms at 30 Hz) while the main thread holds 30+ fps on Low
   for the whole run (VISION_V2 §4; R3 owns the render budget).
-- P3 prediction replay on the same laptop: re-simulating the local soldier, or the vehicle it drives, for 200 ms of
-  game time (12 ticks at 60 Hz, 6 at 30 Hz: 100 ms ping plus buffers, proposed) takes at most 1 ms p99.
+- P3 prediction replay on the same laptop: re-simulating the local soldier, or the vehicle it drives, for 200 ms of game
+  time (12 ticks at 60 Hz, 6 at 30 Hz; proposed, to cover VISION_V2 §4's 100 ms ping plus buffers; F24's own example is
+  a 200 ms round trip, 100 ms each way) takes at most 1 ms p99.
 - Decision rule: 60 Hz if P1–P3 pass at 60 Hz; otherwise 30 Hz if they pass at 30 Hz, with R2 weighing sub-tick input
   timestamps (OQ4); otherwise back to the drafts.
 
@@ -1894,7 +2023,7 @@ every k ticks (k from a cadence in seconds), with the work spread across ticks b
 Reason: the per-tick cost then grows with what must be fine-grained, not with all of AI; this is what keeps REC2's
 60 Hz candidate affordable (F8: cost grows per simulated second).
 Rests on: F8; legacy GN4, GP14, TL15.
-Serves: VISION_V2 §6.1 (bots fill empty slots), §6.5 (economy), §6.6 (balance telemetry).
+Serves: VISION_V2 §3 (bots fill empty slots; the unit had written §6.1), §6.5 (economy), §6.6 (balance telemetry).
 A spike must prove (proposed): at N = 48 in P1's scene, p99 tick time at most 2 × the mean tick time (no tick where all
 bots think at once); sight checks per game second per bot equal within 1 % at 30 Hz and 60 Hz.
 
@@ -1907,26 +2036,28 @@ the clamp in Fiedler's loop, F3; 15 ticks at 60 Hz); a longer stall drops time a
 dropped interval is a metric (R6 monitoring). Snapshots go out after the tick (as Q3 does, F10) at a send rate that is
 separate from the tick (Q3: per client, up to 30 per second, F11); R2 sets that rate.
 Rests on: F2, F3, F7, F10, F11, F23.
-Serves: VISION_V2 §6.5 (authoritative economy and objectives), §6.6 (the server records what matters, overruns
-included), §4 (one EU region, fair up to about 100 ms).
+Serves: VISION_V2 §6.5 (authoritative economy and objectives), §4 (one EU region, fair up to about 100 ms). The overrun
+and dropped-time counters are operations monitoring (R6's scope), which no §6 item names (the unit had filed them under
+§6.6, balance telemetry); they stay because this recommendation's own pass marks read them.
 A spike must prove (proposed): on the reference server (Linux), tick start jitter (actual minus scheduled) p99 at most
 2 ms over 36,000 ticks; after an injected 200 ms stall the loop is back on schedule within 1 s, never running more than
 15 ticks in one wake; overrun and dropped-time counters appear in the metrics output.
 
-**R1-TICK-REC5. In the browser, the Worker owns the tick; the main thread renders every frame and interpolates; a gap
-is a pause offline and a resync online.**
+**R1-TICK-REC5. In the browser, the Worker owns the tick; the main thread renders every frame and interpolates; a gap is
+a pause offline and a resync online.**
 The Worker paces the sim with a `performance.now()` accumulator (F2, F20) woken by `setTimeout` (W2, MDN's Worker
 pattern, F15); `Atomics.wait` (W3, F22) is the measured alternative if W2 fails the jitter mark. `requestAnimationFrame`
 is the render clock only, never the tick clock, because its rate follows the display and it stops in background tabs
 (F17). The main thread draws every frame from the two newest ticks with `alpha` (F4), read from shared memory (boundary
-unit). After a long gap (hidden tab, sleep: F18, F21) the client does not simulate the gap: offline it pauses, as
-Bevy's paused clock stops its fixed schedule (F7, F16 "a pause"); online it resyncs from the server's state (F16:
-"You can recover the game state from a peer or the server."), with catch-up per frame bounded as in REC4. Pause, shop, tutorial and
-hit-stop never stop the shared tick in multiplayer; hit-stop is presentation-time only (GP9, GP13).
+unit; R1-BND-REC2 recommends a transferred block instead: R1-XU-OQ3). After a long gap (hidden tab, sleep: F18, F21) the
+client does not simulate the gap: offline it pauses, as Bevy's paused clock stops its fixed schedule (F7, F16 "a
+pause"); online it resyncs from the server's state (F16: "You can recover the game state from a peer or the server."),
+with catch-up per frame bounded as in REC4. Pause, shop, tutorial and hit-stop never stop the shared tick in
+multiplayer; hit-stop is presentation-time only (GP9, GP13).
 Rests on: F2, F4, F7, F15, F16, F17, F18, F20, F21, F22; legacy GP9, GP13.
 Serves: VISION_V2 §4 (30+ fps on the minimum laptop, 60 fps recommended, on Chrome, Edge, Firefox and Safari), §6.9
-(spectacle budget: the render loop is never blocked by the sim), and the brief's principle that the client runs the
-same sim in a Worker for prediction and offline play.
+(spectacle budget: the render loop is never blocked by the sim), and the brief's principle that the client runs the same
+sim in a Worker for prediction and offline play.
 A spike must prove (proposed), on Chrome, Edge, Firefox and Safari:
 - Foreground Worker tick start jitter p99 at most 4 ms over 10 minutes.
 - A unit moving at constant speed shows a per-frame on-screen displacement whose standard deviation is at most 5 % of
@@ -1945,42 +2076,43 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 
 ### 3. Identical results between Wasm and native (unit `determinism`)
 
-- **R1-DET-REC1. Two levels, and what the netcode really needs.** Same-build reproducibility is required: the same
-  seed, data and input stream give the same state hash at every tick, on every run of the same binary. Identity
-  between Wasm and native is a target, tested on every change, but the netcode must not depend on it: the server is
-  the authority, and the client's prediction is corrected when it differs. Reject lockstep (Q1-E).
+- **R1-DET-REC1. Two levels, and what the netcode really needs.** Same-build reproducibility is required: the same seed,
+  data and input stream give the same state hash at every tick, on every run of the same binary. Identity between Wasm
+  and native is a target, tested on every change, but the netcode must not depend on it: the server is the authority,
+  and the client's prediction is corrected when it differs. Reject lockstep (Q1-E).
   Reason: with server authority a mismatch costs a correction (F32); lockstep turns "one tiny difference" into a desync
   (F32, F31). Same-build reproducibility fixes the legacy's testing debt (TL13, STATUS.md:70) at low cost. Cross-target
   identity keeps corrections rare when the client predicts with the same Rust code, and it is reachable on IEEE targets
   (F1, F7, F12, F20) if the rules of REC2 hold.
-  Rests on: R1-DET-F1, F7, F12, F19, F20, F31, F32. Serves: VISION_V2 §6.5 (server-side economy and objectives), §6.6
-  (balance telemetry from reproducible runs), §3 (48 players and bots).
-  A spike must prove (proposed): (a) a bots-only 24v24 match (48 players) and a 12v12v12 match (36 players), the two goals of
-  VISION_V2 §3, each run 10 minutes at the tick rate the tick-rate unit proposes, 3 seeds each: 0 mismatching per-tick state hashes between two
-  native runs in separate processes; (b) the same recorded matches compiled to Wasm: 0 mismatches against native (REC6
-  says where they run).
+  Rests on: R1-DET-F1, F7, F12, F19, F20, F31, F32; legacy TL13, STATUS.md:70. Serves: VISION_V2 §6.5 (server-side
+  economy and objectives), §6.6 (balance telemetry from reproducible runs), §3 (48 players and bots).
+  A spike must prove (proposed): (a) a bots-only 24v24 match (48 players) and a 12v12v12 match (36 players), the two
+  goals of VISION_V2 §3, each run 10 minutes at the tick rate the tick-rate unit proposes, 3 seeds each: 0 mismatching
+  per-tick state hashes between two native runs in separate processes; (b) the same recorded matches compiled to Wasm: 0
+  mismatches against native (REC6 says where they run).
 - **R1-DET-REC2. Float rules for the sim crate.** One float type for the whole sim (f32 or f64, see OQ3). Inside the
   sim: only `+ - * /`, `sqrt`, `floor`, `ceil`, `round`, `trunc`, explicit `mul_add` and `as` casts from core;
   transcendental maths only through the pure-Rust `libm` crate, pinned, the same on both targets (or nalgebra's
   `ComplexField` with simba's `libm_force`, the path Rapier uses); no std `sin`, `cos`, `atan2`, `powf`, `exp`; no
   `algebraic_*` methods, no fast-math, no `relaxed-simd` target feature; Wasm `simd128` off until OQ2 is settled. NaN
-  never enters sim state: every input and every data value is checked finite where it enters the sim, and debug and
-  test builds assert finite state each tick. No sim value is computed in TypeScript. Tests build both targets with the
-  same overflow setting, and tick counters and timers use explicit wrapping or checked integer operations.
+  never enters sim state: every input and every data value is checked finite where it enters the sim, and debug and test
+  builds assert finite state each tick. No sim value is computed in TypeScript. Tests build both targets with the same
+  overflow setting, and tick counters and timers use explicit wrapping or checked integer operations.
   Reason: basic operations, `sqrt` and `mul_add` are exactly specified everywhere (F1, F7, F10) and Rust never fuses on
   its own (F11); std's transcendental functions vary by platform and Rust version (F9) and come from different code on
   Wasm and Linux (F16), while `libm` is one pure-Rust implementation whose `arch` feature only touches exact operations
   (F17); NaN bits are non-deterministic in Wasm and Rust (F2, F8, F13); relaxed SIMD is hardware-dependent and ships in
   Chrome and Firefox (F4, F5); JS `Math` differs per browser (F30); overflow differs by build flag (F15). Signed zeros
   from `min`, `max`, `clamp` (F14) are caught by the hash test (REC6), which compares `to_bits`.
-  Rests on: R1-DET-F1, F2, F4, F6, F7, F8, F9, F10, F11, F13, F14, F15, F16, F17, F30 (F5, inferred, is context only:
-  the ban on relaxed SIMD rests on F4). Serves: §6.2 (a true 3D sim:
-  aiming at height and line of sight are trig and ray maths), §6.4 (vehicles), §6.3 (abilities as data, whose numbers
-  enter this maths).
+  Rests on: R1-DET-F1, F2, F3, F4, F6, F7, F8, F9, F10, F11, F13, F14, F15, F16, F17, F18, F20, F22, F30 (F5 is context
+  only: the ban on relaxed SIMD rests on F4; F3 is why the browsers' profile cannot be assumed; F18 leaves libm's
+  cross-target identity to the pass mark; F20 and F22 carry the nalgebra route and the `simd128` rule). Serves: §6.2 (a
+  true 3D sim: aiming at height and line of sight are trig and ray maths), §6.4 (vehicles), §6.3 (abilities as data,
+  whose numbers enter this maths).
   A spike must prove (proposed): a table of at least 10,000 fixed inputs per `libm` function the sim uses gives
-  bit-identical outputs on native x86-64, native AArch64 if R6 picks it, and Wasm in each browser engine of REC6; a
-  lint or build check (tool chosen by R5) fails the build on a std transcendental call, `algebraic_*`, or the
-  `relaxed-simd` feature in the sim crate; the cost of `libm` against std on native and Wasm is reported, with method.
+  bit-identical outputs on native x86-64, native AArch64 if R6 picks it, and Wasm in each browser engine of REC6; a lint
+  or build check (tool chosen by R5) fails the build on a std transcendental call, `algebraic_*`, or the `relaxed-simd`
+  feature in the sim crate; the cost of `libm` against std on native and Wasm is reported, with method.
 - **R1-DET-REC3. Rapier with `enhanced-determinism` on both targets.** Turn the feature on for server and client builds,
   never `simd8`; build bodies, colliders and joints from map data in a stable order of entity ids, and remove them in
   that order too; compute any trig that feeds Rapier through `ComplexField` / `libm`.
@@ -1997,14 +2129,15 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   (pinned), seeded by the server per match, one stream per purpose (for example match setup, weapon spread, bot
   decisions, ability procs); the RNG state (seed, stream, position) is part of the sim state and its hash. Presentation
   (effects, sound, camera shake, animation variety) uses its own client-side generator and never the sim's. The sim
-  reads no clock: time is the tick counter times the fixed step; animation never moves a launch point or a hitbox.
-  Pcg32 is the fallback if ChaCha8's cost shows up in the profile.
-  Reason: `StdRng` is non-portable (F27); ChaCha8Rng is portable, reference-tested, with streams and a settable
-  position (F28), so a snapshot can carry the RNG exactly (inferred); the legacy's shared `Math.random` and wall-clock
-  reads are exactly what made same-seed matches differ (STATUS.md:70, GP14, GN6, GN8, GC5), and JS `Math.random` has
-  no seed (F30).
-  Rests on: R1-DET-F27, F28, F30 (and the legacy rows above). Serves: §3 (bots fill empty slots), §6.3 (ability procs),
-  §6.5 (server-side outcomes), §6.6 (reproducible runs).
+  reads no clock: time is the tick counter times the fixed step; animation never moves a launch point or a hitbox. Pcg32
+  is the fallback if ChaCha8's cost shows up in the profile (portable, a stream number per generator, "a good choice on
+  both 32-bit and 64-bit CPUs": F34; whether its streams are as independent as ChaCha's is for the spike).
+  Reason: `StdRng` is non-portable (F27); ChaCha8Rng is portable, reference-tested, with streams and a settable position
+  (F28), so a snapshot can carry the RNG exactly (inferred); the legacy's shared `Math.random` and wall-clock reads are
+  exactly what made same-seed matches differ (STATUS.md:70, GP14, GN6, GN8, GC5), and JS `Math.random` has no seed
+  (F30).
+  Rests on: R1-DET-F27, F28, F30, F34 (and the legacy rows above). Serves: §3 (bots fill empty slots), §6.3 (ability
+  procs), §6.5 (server-side outcomes), §6.6 (reproducible runs).
   A spike must prove (proposed): the first 10,000 outputs of each stream are identical on native and Wasm; a stream's
   state saved mid-match and restored continues with identical outputs; muting sound, moving the camera or changing the
   display frame rate changes no state hash in a recorded match (the legacy's failure modes, GP14).
@@ -2012,11 +2145,12 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   is iterated in id order; systems run in a fixed order each tick (the legacy order in GP14 is the starting point);
   hash maps serve lookups only and are never iterated where the order can change an outcome; where an ordered map is
   needed, `BTreeMap`.
-  Reason: `HashMap` order is arbitrary and seeded per process (F25); `BTreeMap` order is the key order (F26); Rapier
+  Reason: `HashMap` order is arbitrary (F25) and every `HashMap` instance takes its own seed (F33; the unit had written
+  "per process", corrected at the fix step); `BTreeMap` order is the key order (F26); Rapier
   requires the same insertion order (F20) and parry's flag pulls an ordered map for the same reason (F23, inferred).
-  Rests on: R1-DET-F20, F23, F25, F26. Serves: §3 (fair processing of 48+ players and bots), §6.5.
-  A spike must prove (proposed): REC1 (a) passes; because std's `HashMap` seed differs per process (F25), two runs in
-  separate processes also catch any order that leaks from a hash map.
+  Rests on: R1-DET-F20, F23, F25, F26, F33; legacy GP14. Serves: §3 (fair processing of 48+ players and bots), §6.5.
+  A spike must prove (proposed): REC1 (a) passes; because every std `HashMap` instance takes its own seed (F33), any two
+  runs, in one process or in two, also catch any order that leaks from a hash map.
 - **R1-DET-REC6. Prove it with recorded matches and per-tick state hashes.** A determinism suite that every sim change
   runs: (1) a recorded match is the seed, the map and mode data, the content data's hash and the per-tick input stream;
   (2) after each tick the sim writes a canonical serialization of its whole state (fixed field order, floats by
@@ -2025,10 +2159,13 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   for Chrome and Edge, Firefox and Safari (R5 picks the tool); (4) the first mismatching tick is reported with a
   field-level diff of the two states; (5) unit vectors for `libm` and the RNG streams (REC2, REC4) run on the same
   targets.
-  Reason: no source read gives a verification method (F24), so we define one; separate processes catch hash-map order
-  (F25); NaN and relaxed-SIMD effects differ by engine and hardware (F2, F4), so the browsers themselves must be in the
-  matrix; the legacy already showed that event logs on seeded runs expose divergence (GN8).
-  Rests on: R1-DET-F2, F4, F24, F25. Serves: §6.6 (balance numbers you can replay), §3 (the scale test at 48).
+  Reason: no source read gives a verification method (F24), so we define one; every `HashMap` instance takes its own
+  seed (F33), so the two native runs expose hash-map order (they would even in one process; the unit had tied this to
+  separate processes, corrected at the fix step); NaN and relaxed-SIMD effects differ by engine and hardware (F2, F4),
+  so the browsers themselves must be in the matrix; the legacy already showed that event logs on seeded runs expose
+  divergence (GN8).
+  Rests on: R1-DET-F2, F3, F4, F24, F25, F33; legacy GN8. Serves: §6.6 (balance telemetry: the numbers it records come
+  from runs that can be re-run), §3 (the scale test at 48).
   A spike must prove (proposed): the suite runs REC1's matches and reports 0 mismatches on all targets; a deliberately
   injected divergence (one std `sin` call, one `HashMap` iteration, one presentation RNG draw inside the sim) is caught
   at the first tick it changes the state; hashing cost per tick is reported, with method.
@@ -2045,8 +2182,9 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 - **R1-BND-REC1. Run the client simulation in one dedicated module Web Worker, single-threaded, on stable Rust
   (A2 + E1).** The page keeps input listeners, the HUD and rendering and never instantiates the sim. Reason: the
   tick leaves the render thread, the worker form works in all four target browsers, and Wasm threads would bring
-  nightly Rust, a rebuilt std and isolation for no §6 need. Rests on: F12, F18, F19, F25, F27, F28, F33 (and legacy GP13,
-  GP14, GC2). Serves: VISION_V2 §6.2 (the 3D sim and its line-of-sight work run every tick off the render thread),
+  nightly Rust, a rebuilt std and isolation for no §6 need. Rests on: F12, F18, F19, F25, F27, F28, F32, F33 (and legacy
+  GP13, GP14, GC2). Serves: VISION_V2 §6.2 (a true 3D sim with line of sight across heights; keeping it off the render
+  thread is this recommendation's reason, not §6.2's words),
   §6.9 (the render thread keeps its frame budget), §4 (four browsers; minimum 30+ fps). Spike must prove (proposed):
   (1) on the proposed minimum reference machine, a laptop with integrated graphics per VISION_V2 §4 (model named in
   the ADR, its `hardwareConcurrency` recorded), at the LOOP_V2 §11 scale points N = 12, 24, 36, 48 soldiers, the
@@ -2054,32 +2192,34 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   page makes zero calls into Wasm, and the worker makes the same number of Wasm calls per tick at N = 12 and N = 48
   (at most 4); (3) the same build runs in the latest desktop Chrome, Edge, Firefox and Safari.
 - **R1-BND-REC2. One flat, versioned output block per tick, written by Rust into preallocated linear memory and handed
-  to the page as one transferred ArrayBuffer from a small pool (B2); do not share the sim's Wasm memory (not B4).**
-  The block holds a header (tick, layout hash, counts per entity kind), aligned sections per entity kind (soldiers,
-  vehicle parts, projectiles, structures) and an event section for the tick (hits, deaths, purchases, captures,
-  moments). The worker copies the block out once per tick; the page binds typed-array views (no copy) and keeps the
-  latest two blocks for interpolation, returning older ones to the pool. B3 (SharedArrayBuffer ring) is the
-  spike's measured alternative. Reason: this is the book's "pointers and overlays" rule with one bounded copy,
-  without isolation or nightly Rust; B4's zero copies cost the threads toolchain, isolation, a fixed memory maximum
-  and re-binding on growth. Rests on: F7, F10, F11, F12, F15, F16, F17, F18 (and legacy GA15, GP10, GC2). Serves:
-  §6.2, §6.4 (multi-part vehicles as records), §6.8 (moments arrive as events), §6.9. Spike must prove (proposed):
-  (1) per tick: at most one block copy in the worker, zero copies and zero per-entity calls on the page; (2) on the
-  page, no buffer or typed-array allocation per frame after warm-up, and boundary-caused heap growth under
-  0.1 MB/s over a 10-minute match (allocation sampling); (3) the time from the worker finishing tick T to T's block
-  being readable on the page is at most one display frame (16.7 ms at 60 Hz) at p95, measured on a shared clock
+  to the page as one transferred ArrayBuffer from a small pool (B2); do not share the sim's Wasm memory (not B4).** The
+  block holds a header (tick, layout hash, counts per entity kind), aligned sections per entity kind (soldiers, vehicle
+  parts, projectiles, structures) and an event section for the tick (hits, deaths, purchases, captures, moments). The
+  worker copies the block out once per tick; the page binds typed-array views (no copy) and keeps the latest two blocks
+  for interpolation, returning older ones to the pool. B3 (SharedArrayBuffer ring) is the spike's measured alternative.
+  Reason: this is the book's "pointers and overlays" rule with one bounded copy, without isolation or nightly Rust (the
+  copy is needed because the sim's own memory cannot be handed over: transferring it would take it from the worker, F15,
+  and its buffer carries the Wasm detach key, F35); B4's zero copies cost the threads toolchain, isolation, a fixed
+  memory maximum and re-binding on growth. Rests on: F7, F10, F11, F12, F15, F16, F17, F18, F30, F35 (and legacy GA15,
+  GP10, GC2). Serves: §6.2, §6.4 (multi-part vehicles as records), §6.8 (moments arrive as events), §6.9. Spike must
+  prove (proposed): (1) per tick: at most one block copy in the worker, zero copies and zero per-entity calls on the
+  page; (2) on the page, no buffer or typed-array allocation per frame after warm-up, and boundary-caused heap growth
+  under 0.1 MB/s over a 10-minute match (allocation sampling); (3) the time from the worker finishing tick T to T's
+  block being readable on the page is at most one display frame (16.7 ms at 60 Hz) at p95, measured on a shared clock
   (`performance.timeOrigin + performance.now()` on both sides, since a worker has its own time origin, F30); (4) zero
-  lost or reordered events over a 10-minute match with 48 soldiers; (5) B2 against B3 on the four browsers: if B3
-  saves at least 0.5 ms of page time per frame or one frame of latency at p95 on the minimum machine, the ADR weighs
-  isolation (REC5); otherwise B2 stands.
-- **R1-BND-REC3. Inputs enter as one command per tick, posted from the page to the worker (C1).** The command
-  carries seq, tick, move, aim (yaw and pitch, for aiming at height), the held-button bitmask and press and release
-  edge counters; the worker stamps the tick it applies it to. The exact fields are R2's. Reason: one small message
-  per tick is constant work and needs no isolation; edge counters fix the legacy event-time actions (GP2) and the
-  never-wired command (CS1). Rests on: F15 (small copied messages), F12 (C2 would need isolation) and legacy CS1,
-  GP2. Serves: §6.2 (aiming at height), §4 (fair up to about 100 ms of ping: commands carry ticks for R2's lag
-  compensation). Spike must prove (proposed): (1) in a test with injected delay, duplication and reordering of
-  commands, zero lost and zero doubled presses over 10,000 scripted presses; (2) offline, from the key event's
-  timestamp to the tick that applies it: at most one tick plus one frame at p95.
+  lost or reordered events over a 10-minute match with 48 soldiers; (5) B2 against B3 on the four browsers: if B3 saves
+  at least 0.5 ms of page time per frame or one frame of latency at p95 on the minimum machine, the ADR weighs isolation
+  (REC5); otherwise B2 stands.
+- **R1-BND-REC3. Inputs enter as one command per tick, posted from the page to the worker (C1).** The command carries
+  seq, tick, move, aim (yaw and pitch, for aiming at height), the held-button bitmask and press and release edge
+  counters; the worker stamps the tick it applies it to. The exact fields are R2's. Reason: one small message per tick
+  is constant work and needs no isolation; edge counters fix the legacy event-time actions (GP2) and the never-wired
+  command (CS1). Rests on: F34 (posted messages are copied by the structured clone algorithm; re-sourced at the fix
+  step), F15 (a transfer is the zero-copy exception), F12 (C2 would need isolation) and legacy CS1, GP2. Serves: §6.2
+  (aiming at height), §4 (fair up to about 100 ms of ping: commands carry ticks for R2's lag compensation). Spike must
+  prove (proposed): (1) in a test with injected delay, duplication and reordering of commands, zero lost and zero
+  doubled presses over 10,000 scripted presses; (2) offline, from the key event's timestamp to the tick that applies it:
+  at most one tick plus one frame at p95.
 - **R1-BND-REC4. Generate every type that crosses the boundary from Rust, from three sources: wasm-bindgen's default
   `.d.ts` for the small control API (D1); our own small generator for the output block's layout, with a layout hash
   checked at startup (D4); ts-rs for low-rate messages, protocol and content-schema types (D3). Not tsify for now.**
@@ -2091,22 +2231,27 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   committed output; (2) a deliberate Rust layout change without regenerating fails at build or startup (layout hash
   mismatch), proven by a test; (3) `tsc --strict` passes on the generated output; (4) CI fails when the wasm-bindgen
   CLI and library versions differ.
-- **R1-BND-REC5. Do not require cross-origin isolation for v2's start (G1); allow it in development and previews
-  for profiling (G3). Adopt it in production only if the spike's B2-against-B3 test passes REC2's threshold.** If
-  adopted: COOP `same-origin` with COEP `require-corp` (Safari has no `credentialless`), every asset same-origin or
-  served with CORP, rollout through the report-only header first, and the later login (VISION_V2 §5) on a page or
-  redirect flow outside the isolated game page. Reason: isolation buys only B3/C2 and finer timers, and it costs
-  constraints on hosting, embeds and popups on every browser. Rests on: F12, F20, F21, F22, F23, F24, F26, F30.
-  Serves: §4 (four browsers including Safari), §5 (guest play first, login later). Spike must prove (proposed): if
-  isolation is adopted, `crossOriginIsolated` is true in all four browsers on a preview link, and the report-only
-  run of a full match shows zero COEP violations.
+- **R1-BND-REC5. Do not require cross-origin isolation for v2's start (G1); allow it in development and previews for
+  profiling (G3). Adopt it in production only if the spike's B2-against-B3 test passes REC2's threshold.** If adopted:
+  COOP `same-origin` with COEP `require-corp` (Safari has no `credentialless`), every asset same-origin or served with
+  CORP, rollout through the report-only header first, and the later login (VISION_V2 §5) on a page or redirect flow
+  outside the isolated game page (isolation needs COOP `same-origin`, F20, which severs cross-origin popups, F23;
+  whether `same-origin-allow-popups` could keep a login popup on an isolated page is R1-BND-OQ9). Reason: isolation buys
+  B3/C2, finer timers and the memory-measurement API (F20, F30), and it costs, on every browser: the page and its worker
+  scripts must carry the headers (F20, F24), every cross-origin resource needs CORP or CORS and frames must be isolated
+  too (F21), and cross-origin popups lose their opener (F23). Rests on: F12, F20, F21, F22, F23, F24, F26, F30. Serves:
+  §4 (four browsers including Safari), §5 (guest play first, login later). Spike must prove (proposed): if isolation is
+  adopted, `crossOriginIsolated` is true in all four browsers on a preview link, and the report-only run of a full match
+  shows zero COEP violations.
 - **R1-BND-REC6. The worker owns the network connection in multiplayer and runs the same sim locally when offline
   (H2).** Online, server snapshots, prediction and reconciliation run in the worker, which then publishes the same
   output block to the page; offline, the same worker build runs the match itself, with bots filling the slots. The
   page code is the same in both. Reason: both planned transports exist in workers, so the page never handles a
   network packet, and one boundary serves prediction and offline play. Rests on: F29, F25 (and legacy GP13). Serves:
-  §6.1 (modes as data; rooms and private matches), VISION_V2 §3 ("Bots fill empty slots"), §4 (fair up to about
-  100 ms: prediction is not delayed by a busy frame). Spike must prove (proposed): (1) the page handles zero network
+  VISION_V2 §3 ("Bots fill empty slots"), §4 (fair up to about 100 ms: prediction is not delayed by a busy frame) and
+  the brief's starting principle that the client runs the same sim for prediction and offline play; offline play
+  itself traces to no §6 item (OQ1), and the unit's §6.1 link was dropped at the fix step (§6.1 is modes, rooms and
+  private matches, not who owns the connection). Spike must prove (proposed): (1) the page handles zero network
   messages (a counter); (2) a 100 ms busy loop injected on the page leaves no gap in the worker's processing of
   server snapshots (worker timestamps); (3) the offline match and the online client run the same Wasm file and the
   same page code, differing only in a mode flag. Offline play's status as a v2 need is OQ1.
@@ -2124,13 +2269,15 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 - Damage and similar outcome logic is a fixed pipeline of Rust stages parameterized by data (locational multiplier,
   range falloff, frontal-arc block, target-tag multiplier for counters such as "strong against vehicles", owner and team
   rules), the role GAS gives to execution code (F9), which GAS does not predict either.
-- Aggregation order is fixed and documented per attribute (F4 shows that the default GAS rule sums multipliers, which
-  is a rule the designers must know). Stacking is an explicit per-effect policy chosen from a short list (no stacking,
-  refresh duration, add a stack up to a limit, strongest only as in F19), never an implicit default (F5 says GAS's
-  own policies are only documented in tooltips).
+- Aggregation order is fixed and documented per attribute (F4 shows that the default GAS rule sums multipliers, which is
+  a rule the designers must know). Stacking is an explicit per-effect policy chosen from a short list (no stacking,
+  refresh duration, add a stack up to a limit, strongest only as in F19), never an implicit default (GAS has policies
+  for expiration, refresh and reset, for which the write-up points to the editor's tooltips, F5; Paragon kept only the
+  strongest slow, F19). The unit had said the policies are "only documented in tooltips"; the source has no "only"
+  (unsupported, verifier 2026-10-28), so the fix step rewrote the reason to the source's words.
 - Reason: §6.3 asks for GAS-like data; the subset covers every legacy ability and weapon (Legacy facts) and the
-  primitives §6.4 names (an effect bound to its source's life for leech, an effect that grants a tag for marking),
-  without generic-engine features.
+  primitives §6.4 names (an effect bound to its source's life for leech; for marking, an effect that grants a tag, which
+  is our reading, since §6.4 names marking without defining it), without generic-engine features.
 - Rests on: F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F16, F19.
 - Serves: VISION_V2 §6.3, §6.4, §6.5 (tech gates), §6.7.
 - A spike must prove (proposed pass marks):
@@ -2142,8 +2289,10 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
      a vehicle and the Banzai speed buff on a different class loads and behaves as its parts do, with zero Rust
      changes.
   3. The two §6.4 primitives work in a test fixture: an effect removed when its source dies (LOOP_V2 §6: "Stolen items
-     only last until the Hammer dies"), and an on-kill trigger that moves a granted ability from victim to source. The
-     item and marking rules themselves stay undesigned ([LATER], Mustafa's).
+     only last until the Hammer dies"), and a trigger on the last hit or tick that moves the victim's item to the source
+     (LOOP_V2 §6: the Hammer's leech "steals an enemy tank's item when it lands the last hit or tick"; modelling the
+     item as a granted ability is our inference; the unit had written "an on-kill trigger that moves a granted
+     ability"). The item and marking rules themselves stay undesigned ([LATER], Mustafa's).
   4. Changing one number in data (for example Shabzon damage 8 to 9) changes the next match with zero Rust changes
      (the hot-reload path is the data-formats unit's).
 
@@ -2155,10 +2304,13 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   state; each hit becomes an instant damage effect through REC1's pipeline. Abilities may grant or swap weapons (Banzai
   equips the Katana; Molotov is a thrown weapon) and apply effects to weapon attributes (active reload's short damage
   boost, LOOP_V2 §7).
-- Reason: F17 says Fortnite keeps weapon fire rates out of the effect system and F22 shows a shipped shooter's
-  per-player integer weapon timer; both keep the hottest path (13.9 shots per second for the Shabzon, CD12) out of
-  effect bookkeeping.
-- Rests on: F17, F22, F9.
+- Reason: F17 says Fortnite keeps weapon fire rates out of the effect system, and its source gives the reason as
+  latency: with cooldowns as effects that the server overwrites, "Higher latency connections would have a lower ROF
+  with basic attacks" (Paragon). F22 shows a shipped shooter's per-player integer weapon timer, inside the player code
+  both sides run (F21). That this also keeps the hottest path (13.9 shots per second for the Shabzon, CD12) out of
+  effect bookkeeping is our inference: neither source gives a performance reason (the unit had stated it as the
+  sources' reason: unsupported, verifier 2026-10-28; rewritten at the fix step).
+- Rests on: F17, F21, F22, F9.
 - Serves: VISION_V2 §6.3 (weapons built from data), §6.4 (vehicle weapons on mounts).
 - A spike must prove (proposed): for each of the seven legacy weapons and the Juggernaut cannon, per-shot results equal
   the legacy tables: damage per body part (head 2.6, body 1.0, legs 0.65; Bagpipe head 1.2), Shabzon falloff at 10, 15,
@@ -2175,7 +2327,7 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   simulation's seeded RNG, never from the activation key alone (F18 is a 16-bit key that both sides know).
 - Reason: GC5 measured the legacy reset-not-carry rule losing up to 28 % of the Shabzon's rate at 30 Hz
   (10.0 vs 13.9 shots per second); F22 shows the carry; F26 shows that `HashMap` order is not stable across runs.
-- Rests on: F22, F26, F3.
+- Rests on: F22, F26, F3, F18; legacy GC5.
 - Serves: VISION_V2 §6.3 (tuning that means the same thing everywhere), §6.6 (telemetry numbers comparable across
   matches).
 - A spike must prove (proposed): at the tick rate the fixed-tick unit recommends, the Shabzon's sustained rate is within
@@ -2189,12 +2341,16 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   prediction key is the input command's sequence number (the field CS1 already declared), echoed by the server with
   accept or reject; a rejected activation is rolled back. Cues are events keyed by (entity, ability or weapon,
   command sequence), so a re-simulated or confirmed activation does not play twice. Effect removal and periodic ticks
-  are not predicted (as in GAS, F13).
+  are not predicted (as in GAS, F13), so a predicted buff such as Banzai's speed ends on the client only when the
+  server's removal arrives (inferred). The GAS route's known failure (F17): when the server overwrites predicted
+  cooldowns, high-latency players fire and re-activate more slowly (Paragon); REC2 keeps weapon timers out of effects
+  for that reason, and whether ability cooldowns avoid it depends on R2's prediction model (OQ4). Both points were
+  added at the fix step (verifier, 2026-10-28).
 - Reason: F13 and F15 (Epic's shipped practice, second-hand), F14's key-and-confirm model, F16 (cues never decide
   gameplay), LOOP_V2 §7 (split feedback). Because the client runs the same Rust code in Wasm, prediction of the local
   player can be the netcode's re-simulation from the last confirmed state instead of per-effect keys: that is an
   inference, and R2 decides the prediction model (OQ4).
-- Rests on: F12, F13, F14, F15, F16, F21.
+- Rests on: F12, F13, F14, F15, F16, F17, F21.
 - Serves: VISION_V2 §6.3, §4 ("matches feel fair up to about 100 ms of ping").
 - A spike must prove (proposed): with 100 ms injected round trip (plus jitter and loss as R2 sets), the local player's
   ability press changes its own cooldown, cost and speed in the same client tick as the input; a rejected press (for
@@ -2211,7 +2367,8 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   data-formats unit's.
 - Reason: the legacy tables already have this shape (CD12–CD14) and their faults are mixing (bot and colour fields in
   unit data, CD13), duplication (multipliers in two places, CS3) and silent fallbacks (CC9).
-- Rests on: F6 (tags as the shared vocabulary between kinds), F8 (abilities granted by effects need referenceable ids).
+- Rests on: legacy CD12–CD14, CS3, CC9 (the case for one table per kind); F6 (tags as the shared vocabulary between
+  kinds), F8 (abilities granted by effects need referenceable ids), which show only that kinds share tags and ids.
 - Serves: VISION_V2 §6.3, §6.4, §6.7, §6.6 (telemetry keys pick and win rates by these ids).
 - A spike must prove (proposed): the legacy `WEAPONS`, `UNIT_TYPES`, `VEHICLE_TYPES` and the ability fields convert
   into these tables with every legacy number present once (a script lists any number with no home); a definition with
@@ -2225,37 +2382,42 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   with a counting allocator).
 - Reason: the brief's own example pass mark ("48 simulated players at a 30 Hz server tick within X ms"); this unit's
   share of X must be measured, not assumed.
-- Rests on: no finding (a budget to measure; every number in it is proposed).
-- Serves: VISION_V2 §3 (scale), §4 (minimum hardware).
+- Rests on: the brief's example pass mark ("48 simulated players at a 30 Hz server tick within X ms",
+  docs/V2_PHASE0_BRIEF.md §4) and VISION_V2 §3 (24v24, 48 players), both confirmed by the verifier (2026-10-28); no
+  external finding; every number in it is proposed.
+- Serves: VISION_V2 §3 (scale), §4 (minimum hardware); no §6 item, since it is a budget, not a feature.
 - A spike must prove: the numbers above, measured with the method R5 sets.
 
 ### 6. Data formats and hot reload of tuning (unit `data-hotreload`)
 
 - **R1-DATA-REC1. JSON is the one content format.** Every content and tuning file (maps, modes, factions, units,
-  vehicles, weapons, ability data, rule tables) is JSON, one definition per file, written by one canonical writer
-  (fixed key order, shortest round-trip number text, no lossy rounding). serde_json is built with `float_roundtrip`.
-  Content integers stay within the range a double holds exactly; ids are strings.
+  vehicles, weapons, ability data, rule tables) is JSON, one definition per file, written by one canonical writer (fixed
+  key order, shortest round-trip number text, no lossy rounding). serde_json is built with `float_roundtrip`. Content
+  integers stay within the range a double holds exactly; ids are strings.
   *Reason:* the editor already writes JSON (EDITOR_V2 rule 1), the browser parses it natively, the legacy values are
   JSON, and JSON Schema works on both sides; RON and TOML add a second format with gaps (F12, F13); YAML's crate is
   archived (F14); exact floats are needed for identical results on every side (legacy floats).
-  *Rests on:* F6, F12, F13, F14, F15, F16, F19, F26; legacy facts (floats, GW12).
+  *Rests on:* F6, F11 (fixed key order), F12, F13, F14, F15, F16, F19, F26; EDITOR_V2 §2 rule 1; legacy facts (floats,
+  GW12). The "shortest round-trip number text" from both writers has no finding: mark (1) tests it.
   *Serves:* §6.1, §6.3 ("tuning needs no code changes"), §6.5, §6.7; EDITOR_V2 §2 and §4.
-  *A spike must prove (proposed pass marks):* (1) every double in legacy-tuning.json, plus a generated corpus of
-  10,000 random doubles, parses to the same 64-bit pattern in native Rust, in Rust on Wasm and in `JSON.parse`, and is
-  written back as the same text: 100 % equal; (2) loading a content set the size of the imported legacy tables plus
-  two maps and two modes, on the native server, takes a time the spike reports, against a budget the ADR sets (no
-  number is sourced yet).
+  *A spike must prove (proposed pass marks):* (1) every double in legacy-tuning.json, plus a generated corpus of 10,000
+  random doubles, parses to the same 64-bit pattern in native Rust, in Rust on Wasm and in `JSON.parse`, and is written
+  back as the same text: 100 % equal; (2) loading a content set the size of the imported legacy tables plus two maps and
+  two modes, on the native server, takes a time the spike reports, against a budget the ADR sets (no number is sourced
+  yet).
 
-- **R1-DATA-REC2. One Rust content crate loads and validates, the same code everywhere.** Stages: byte-size cap →
-  JSON to tree with the default depth limit (F9) → read format and version, migrate (REC4) → typed load with
-  `deny_unknown_fields` (F1), checked newtypes (F3) and tagged kinds (F5; never `untagged`, never `flatten` where unknown
-  keys must fail, F2) → garde rules (F18) → whole-set checks (cross-references, every objective a mode needs is in the
-  map, no fallback map) → a frozen content set with its hash. Errors name file, line and column for syntax (F7) and the
-  field path for data (F8). The crate depends on nothing above it; the simulation, the server, the client's Wasm worker,
-  the editor (through Wasm) and the tools use it.
+- **R1-DATA-REC2. One Rust content crate loads and validates, the same code everywhere.** Stages: byte-size cap → JSON
+  to tree with the default depth limit (F9) → read format and version, migrate (REC4) → typed load with
+  `deny_unknown_fields` (F1), checked newtypes (F3) and tagged kinds (F5; never `untagged`, never `flatten` where
+  unknown keys must fail, F2) → garde rules (F18) → whole-set checks (cross-references, every objective a mode needs is
+  in the map, no fallback map) → a frozen content set with its hash. Errors name file, line and column for syntax (F7)
+  and the field path for data (F8). The crate depends on nothing above it; the simulation, the server, the client's Wasm
+  worker, the editor (through Wasm) and the tools use it.
   *Reason:* one verdict on every side; the legacy failures (unknown keys, no ranges at load, silent fallbacks, GW2,
   GE11, CM1) are each a stage here.
-  *Rests on:* F1, F2, F3, F5, F7, F8, F9, F18, F25; legacy facts GW2/GE1, GE11, CM1, dead keys.
+  *Rests on:* F1, F2, F3, F5, F7, F8, F9, F18, F25; legacy facts GW2/GE1, GE11, CM1, dead keys. It also depends on two
+  open points no source settles: garde building for wasm32 (OQ5) and the editor's double-click rule working with Wasm
+  (OQ11); mark (1) tests native and Wasm.
   *Serves:* §6.1, §6.3, §6.5, §6.7.
   *A spike must prove (proposed):* (1) a fuzz corpus of 10,000 mutated content files (unknown keys, `__proto__` keys,
   wrong types, out-of-range numbers, 10,000-deep nesting, 50 MB files, duplicate ids, dangling references) gives 0
@@ -2290,14 +2452,18 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   swapped in between two ticks and sent to the match's clients with the tick it applies from; an invalid set leaves the
   old one running and reports errors to the log and to connected dev tools. Browser, offline or local: a small Vite
   plugin pushes changed files (F22) to the page, which hands them to the Wasm worker; the worker validates and swaps at
-  its next tick (browsers cannot watch files: F21). Entities hold definition ids, not copies, so a changed number reaches
+  its next tick (that a browser cannot watch the files itself is our inference: F21 says only that Bevy's file watcher
+  is a desktop feature). Entities hold definition ids, not copies, so a changed number reaches
   live units on the next tick, while live state (current health, ammo) is left as it is. Client-only feel data (the Feel
   Lab, LOOP_V2 §7) reloads freely, since presentation decides nothing. Production: one content set per match; changes
   take effect at the next match.
   *Reason:* the iteration loop LOOP_V2 and §6.3 ask for, without letting a half-written file or a mid-match change
   break a match, and with the client predicting on the same numbers as the server.
   *Rests on:* F7, F8, F20, F21, F22; legacy fact GE1 (live `applyRules`); LOOP_V2 §7.
-  *Serves:* §6.3, §6.5 ("tunable"), §6.6 (tune on evidence).
+  *Serves:* §6.3, §6.5 ("tunable"), §6.6 (tune on evidence). The trace is partial (verifier, 2026-10-28): §6.3 asks for
+  tuning without code changes, not for live reload, and LOOP_V2 §7's live tuning covers the client's feel data;
+  swapping sim numbers inside a running match (marks 2 and 3) is a development convenience no §6 item names, so
+  whether to keep it is OQ12.
   *A spike must prove (proposed):* (1) a saved change to a weapon's damage applies on the dev server within 1 s of the
   save; (2) the client's Wasm simulation applies it at the same tick as the server, with 0 extra mispredictions beyond
   the change itself, under 100 ms injected latency with jitter (VISION_V2 §4: matches feel fair up to about 100 ms of ping); (3) 50 random valid tuning edits in a 5-minute bot match
@@ -2307,7 +2473,8 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 - **R1-DATA-REC6. Content reaches the browser as a hashed, cached bundle, and every match records its content hash.**
   The build writes the validated content set as one bundle whose file name holds its hash, served as immutable (F27);
   at join the server names the hash the match uses; the worker checks the bundle against it (SHA-256 is available in
-  workers, F29) before the simulation starts. Small or per-match data (private-match overrides, dev reloads) comes over
+  workers, but only in secure contexts, F29, so file:// and plain-HTTP LAN development need another path: OQ11) before
+  the simulation starts. Small or per-match data (private-match overrides, dev reloads) comes over
   the game connection. Content is not embedded in the Wasm binary (F28), so tuning ships without a code release. Every
   match record (§6.6 telemetry) stores the content hash and the mode id, so pick and win rates are grouped by tuning
   version.
@@ -2325,7 +2492,8 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   symmetry, budgets) on the server. On the TypeScript side, parsed JSON is never merged into plain objects with
   `Object.assign` or spread; untrusted keys go into `Map` (F24) or straight into the Wasm validator.
   *Reason:* client checks are bypassable (F25); the legacy merge is how `__proto__` got in (F23, GW2).
-  *Rests on:* F1, F9, F18, F23, F24, F25; legacy facts GW2/GE1, CD19, GE11.
+  *Rests on:* F1, F9, F18, F23, F24, F25; legacy facts GW2/GE1, CD19, GE11; EDITOR_V2 §3 (the validation panel:
+  reachability, the 6 m gap rule, symmetry, budgets).
   *Serves:* §6.1 (rooms and private matches), §6.5 ("all server-side"); STATUS SEC-MDL-2 and the map-check debt.
   *A spike must prove (proposed):* the REC2 fuzz corpus sent through the private-match and map-upload paths gives 0
   accepted invalid payloads and 0 server crashes; a payload with a `__proto__` key is refused; the editor's TypeScript
@@ -2350,10 +2518,11 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
 
 - **R1-ECS-OQ1. What do the options really cost in Wasm size and compile time?** No source read gives figures (F34).
   Decided by: REC1 mark 5's measurement; the budget itself is set in the ADR from the number, not before.
-- **R1-ECS-OQ2. Does `#[derive(Clone)]` give a field-wise `clone_from` that reuses each Vec's buffer?** The sources
-  read cover Vec's clone_from (F26) and the trait's default (F27), not what the derive generates. Decided by: reading
-  the derive's documentation, or REC1 mark 2's allocation count; if it doesn't, clone_from is written once for the
-  state struct.
+- **R1-ECS-OQ2. Does `#[derive(Clone)]` give a field-wise `clone_from` that reuses each Vec's buffer?** The sources read
+  cover Vec's clone_from (F26) and the trait's default (F27), not what the derive generates. Decided by: reading the
+  derive's documentation, or REC1 mark 2's allocation count; if it doesn't, clone_from is written once for the state
+  struct. Settled at the fix step: it does not. The derive calls `clone` on each field, and the default `clone_from` is
+  equivalent to `a = b.clone()` (F35; rust-reviewer risk 5), so clone_from is written by hand (REC1 mark 2).
 - **R1-ECS-OQ3. Does the client re-simulate the whole world, or only what it predicts (its own soldier, its vehicle,
   its projectiles)?** This sets how much state a snapshot and replay must cover, and so whether REC1 mark 3 can pass.
   Decided by: R2's prediction recommendation, checked against REC1 marks 1–3.
@@ -2415,7 +2584,8 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
   Decided by REC3's spike: step time with and without the flag at the largest mode.
 - **R1-DET-OQ2.** Is Rapier's default 4-lane SIMD path (simba `wide`, F22) bit-identical between wasm32 (with and
   without `simd128`) and x86-64 or AArch64? No source read says so. Decided by REC6's suite with `simd128` off and then
-  on; until then `simd128` stays off for the sim.
+  on; until then `simd128` stays off for the sim. rust-reviewer (2026-10-28) names a concrete hazard on this path:
+  R1-RR-OQ1.
 - **R1-DET-OQ3.** f32 or f64 for the sim (rapier3d or the f64 crates, F22)? It depends on the map size, which LOOP_V2 §9
   leaves [OPEN] (TL13, CS6 notes), and on precision at the far edge of the largest map. Decided by R4 with the map-size
   decision; the inventory's CS4 note asks for one choice, made once.
@@ -2424,11 +2594,14 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
 - **R1-DET-OQ5.** Are rand's distribution outputs (for example uniform ranges) stable across rand versions? The
   docs.rs pages read do not say, and rand's book is outside the allow list. Decided by reading the book (when allowed)
   or by writing the sim's few sampling functions on raw generator output; either way the version is pinned and REC6's
-  recorded matches catch a change.
+  recorded matches catch a change. rust-reviewer (2026-10-28, risk 9): rand's uniform floats "may equal `high`", and
+  the docs make no statement on value stability across versions; it advises the second route (map raw ChaCha8 output
+  in the sim) and pinning rand_chacha with test vectors.
 - **R1-DET-OQ6.** How much does the client predict: only the local player and the vehicle they drive, or more? R2
   decides. It sets how much cross-target identity buys (F32: corrections come only from what the client predicts).
 - **R1-DET-OQ7.** Which CPU architecture do the servers use (x86-64 or AArch64)? R6 decides. Both are "fully
-  compliant" (F12), but the chosen one must be in REC6's matrix.
+  compliant" (F12), but the chosen one must be in REC6's matrix; R1-RR-OQ1 gives a reason to test native AArch64
+  before R6 picks it.
 - **R1-DET-OQ8.** Is `libm`'s accuracy enough for aiming at height and line of sight (§6.2)? No accuracy bound is
   documented (F18). Decided by unit tests against reference values for the sim's functions.
 - **R1-DET-OQ9.** Which hash function, and should production servers and clients compare hashes now and then to measure
@@ -2460,10 +2633,17 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
   R3's instancing needs. It decides whether the one copy per tick matters. Decides: the spike measures bytes per
   tick and copy time at N = 48.
 - **R1-BND-OQ7. Is wasm-bindgen's new home healthy for a multi-year project?** It moved in 2025 and broke
-  compatibility three times in 2026 (F1, F2). Decides: reading the maintenance issue (#4533) and the guide's
+  compatibility at least twice in 2026, in 0.2.123 and 0.2.128 (F1, F2; the unit's "three times" counted 0.2.122,
+  which the fix step dropped). Decides: reading the maintenance issue (#4533) and the guide's
   governance page in the synthesis; pinning versions limits the risk meanwhile.
 - **R1-BND-OQ8. Does the server's snapshot reach the worker in the same layout as the page's block?** Reusing it
   would save a translation but couples the wire format to presentation. Decides: R2 (snapshot format) with ADR-0001.
+- **R1-BND-OQ9. Can `same-origin-allow-popups` give cross-origin isolation?** (added at the fix step) MDN's COOP
+  page says the value serves "integrations where a document needs the benefits of cross-origin isolation but also
+  needs to open and retain a reference to trusted cross-origin documents", while its isolation section asks for
+  `same-origin` (F20, F23). If it can, a login popup could stay on the isolated game page (REC5). Decides: the HTML
+  standard's isolation rules (html.spec.whatwg.org, outside the allow list) or a test in each of the four browsers
+  (`crossOriginIsolated` under that value).
 
 ### 5. A data-driven ability and effect system (unit `abilities`)
 
@@ -2529,7 +2709,13 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
   (VISION_V2 §3 private matches, LOOP_V2). Decides it: the game-designer and Mustafa.
 - **R1-DATA-OQ11. The editor's double-click rule and Wasm.** EDITOR_V2 §5 keeps editor.html runnable by double-click;
   whether the Wasm validator loads from `file://` was not researched. Decides it: ADR-0002 (code structure and build)
-  and R5's build research.
+  and R5's build research. The same question covers REC6's hash check, since SHA-256 in the browser needs a secure
+  context (F29).
+- **R1-DATA-OQ12. Mid-match reload of simulation numbers in development.** (added at the fix step) REC5 swaps sim
+  numbers inside a running match, on the server and the client at one tick; no VISION_V2 §6 item names live reload
+  (§6.3 asks for tuning without code changes; LOOP_V2 §7's live Feel Lab covers client feel data). Is a swap at the
+  next match enough for development? Decides it: Mustafa and the Advisor, weighing iteration speed against the cost
+  of REC5's marks 2 and 3.
 
 ### Conflicts and gaps between the units (added at assembly)
 Each entry names where two or more unit drafts disagree, or where one unit left a question to another unit that the
@@ -2569,11 +2755,16 @@ synthesis (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`) take them up.
   a different seed"; R1-DET-F25's summary says "randomly seeded per process", and R1-DET-REC5's pass mark relies on
   "std's `HashMap` seed differs per process". Both cite the same page
   (https://doc.rust-lang.org/std/collections/struct.HashMap.html). What decides it: the verifier, at the source.
+  Settled at the fix step: per instance (R1-DET-F33; verifier and rust-reviewer, 2026-10-28). R1-DET-F25, REC5 and
+  REC6 were corrected.
 - **R1-XU-OQ6. One source, two tiers.** Glenn Fiedler's "What Every Programmer Needs To Know About Game Networking"
   (https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/) is "other" in
   R1-TICK-F24 and "shipped game (practitioner article)" in R1-DET-F32. The tick unit labels all four of its Fiedler
   articles "other"; the determinism unit labels "Floating Point Determinism" "shipped game" because it quotes
   shipped-game developers (R1-DET-F31). What decides it: the verifier, against the tiers in `docs/research/README.md`.
+  Settled at the fix step: both are tier "other". docs/research/README.md:22–23 has three tiers (official docs, talks
+  and papers from shipped games, everything else), and blog articles are the third (verifier, 2026-10-28); R1-DET-F31
+  and F32 were relabelled, and F31 notes that it quotes shipped-game developers.
 - **R1-XU-OQ7. Fire rates: two time representations, two pass marks.** R1-TICK-REC1 converts durations "to ticks at
   load, with remainders carried" (fire intervals "keep their fractional remainder"); its mark: every legacy
   `fireInterval` and `burstInterval` gives the same shot count at 30 Hz and 60 Hz within 1 shot over 60 s, and within
@@ -2606,7 +2797,53 @@ synthesis (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`) take them up.
   - Offline play: R1-TICK-OQ7 asks whether the largest mode must run offline on the minimum laptop; R1-BND-OQ1 asks
     whether offline play is a v2 need at all (VISION_V2 §6 does not list it). Both name Mustafa (with the Advisor in
     R1-TICK-OQ7) as the decider.
-  What decides it: as each entry says; the synthesis states each question once.
+    What decides it: as each entry says; the synthesis states each question once.
+
+### Rust risks the rust-reviewer found (added at the fix step)
+rust-reviewer (2026-10-28; verdict REVISE for R1: the facts hold, Rust risks are missing) ranked risks the
+recommendations do not cover. The fix step adds no recommendation and no claim of its own (fix rule 6), so each risk
+is an open question here, with the evidence as the reviewer reported it (its notes:
+`.checkpoints/v2-research/rust-reviewer-r1-r2.md`; not re-checked by the verifier); the synthesis decides whether
+each joins a recommendation. Risk 5 (snapshot allocation) was a pass mark that could not pass and is fixed in place
+(R1-ECS-REC1 mark 2, R1-ECS-F35); risk 9 joined R1-DET-OQ5; risks 1 and 10 are R2's, apart from the tokio entry in
+R1-RR-OQ7.
+
+- **R1-RR-OQ1. FMA that differs by target in Rapier's default 4-lane SIMD path (risk 2).** The reviewer reports that
+  wide 1.7.1's `mul_add` fuses where the target has FMA (x86 built with `+fma`, AArch64 with NEON) and rounds twice
+  elsewhere, with no Wasm branch ("Platform-specific behavior (may change in the future)"); that simba 0.10.2's
+  `simd_mul_add` calls it and `libm_force` switches only sin and cos; that Rapier's manifest suggests
+  `-C target-cpu=native`; and that wide's `max` and `min` also differ at ±0 between SSE, NEON and the fallback. Not
+  established: that the solver reaches this code (the two solver files it checked do not call `mul_add`). Bears on
+  R1-DET-REC3, R1-DET-REC6's matrix, R1-DET-OQ2 and R1-DET-OQ7. The reviewer's proposal: build the server for
+  baseline x86-64 (no `+fma`, no `target-cpu=native`), add native AArch64 to the native-against-Wasm hash test
+  before R6 may pick ARM hosts, and use glam's `scalar-math` if the sim uses glam itself. Decides it: the synthesis
+  (ADR-0004), then R1-DET-REC6's suite.
+- **R1-RR-OQ2. Allocations a client or a content file controls (risk 3).** R1's content pipeline caps file bytes but
+  not array lengths (R1-DATA-REC2, REC7). The reviewer's proposal: length rules on collections (and, on R2's side,
+  bounded per-client queues and message caps). Decides it: the synthesis (ADR-0005) with the security review.
+- **R1-RR-OQ3. Panics reachable from content and input (risk 4).** wasm32 builds with `-Cpanic=abort` (R1-BND-F19),
+  so one panic ends the client sim's instance, and R1 plans no recovery; `f32::clamp` panics on bad bounds
+  (R1-DET-F14). The reviewer's proposal: the content loader and decoders return errors and are fuzzed with zero
+  panics as the pass mark, and the Worker restarts from the server's snapshot after a trap. Bears on R1-BND-REC1,
+  REC6, R1-DATA-REC2 and R1-DET-REC2. Decides it: the synthesis (ADR-0002, ADR-0004).
+- **R1-RR-OQ4. Overflow behaviour differs between build profiles (risk 6).** The reviewer reports Cargo's defaults as
+  `[profile.dev] overflow-checks = true` and `[profile.release] overflow-checks = false`, so a debug client and a
+  release server can diverge, or one of them panics. R1-DET-REC2 already asks for one overflow setting in tests and
+  explicit wrapping or checked arithmetic for counters; the reviewer adds overflow checks for the sim package only
+  and a lint. Decides it: ADR-0002 (build profiles) with R5.
+- **R1-RR-OQ5. No budget for Wasm size and speed (risk 7).** R1 records the size but sets no limit (R1-ECS-OQ1); the
+  content crate in the Worker brings serde_json, garde and regex; std `mul_add` has no hardware instruction on wasm32
+  and runs in software (the reviewer's inference), which matters because R1-DET-REC2 allows explicit `mul_add`. The
+  reviewer's proposal: measure wasm-opt, `opt-level` "s" against "z" and the panic strategy, before and after.
+  Decides it: the spike's measurements, then the ADR's budget.
+- **R1-RR-OQ6. Hashing state and writing the output block (risk 8).** `repr(C)` padding bytes are uninitialised, so a
+  state hash must read fields, never raw struct bytes (R1-DET-REC6 already serializes field by field), and writing
+  R1-BND-REC2's block safely needs a derive that rejects padding, or `unsafe` code with a written invariant and a
+  test. Decides it: rust-reviewer's crate pick in the synthesis.
+- **R1-RR-OQ7. Dependency floors and advisories (risk 1, the R1 part).** The reviewer reports RUSTSEC-2026-0384, a
+  race in `tokio::time::Interval` on Tokio 1.54.0, patched in 1.54.1 (the version R1-TICK-F23 read and R1-TICK-REC4's
+  loop would use); its wider list (quinn-proto, rustls, ring) is R2's. The reviewer's proposal: lockfile floors, and
+  cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis.
 
 ### Pointers between R1's units
 From the units' cross-unit notes; where a note shows a disagreement or a gap, it is an open question above (R1-XU-…).
@@ -2720,18 +2957,351 @@ those sources say.
 | R1-ABL-REC4 | https://developer.valvesoftware.com/wiki/Prediction and https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/Scripting/Abilities_Data_Driven | HTTP 403 | R1-ABL-OQ3 (REC4's cue rule) |
 | R1-DATA-REC5 | https://developer.valvesoftware.com/wiki/Developer_Console_Control and https://developer.valvesoftware.com/wiki/ConVar | HTTP 403 | R1-DATA-OQ3 ("no shipped-game source backs REC5's 'development only'") |
 | R1-DATA-REC1 | the docs of binary serde formats (postcard, bincode) and their RustSec entries (the draft records no URL) | not read in this run | R1-DATA-OQ2 (option D, a binary runtime format) |
+| R1-BND-REC5 (added at the fix step) | the HTML standard's COOP and cross-origin isolation rules (https://html.spec.whatwg.org) | outside the allow list | R1-BND-OQ9 (whether `same-origin-allow-popups` can give isolation) |
+| R1-BND-REC2 (added at the fix step) | ECMA-262's rule for detaching a buffer that has a detach key (tc39.es) | outside the allow list | R1-BND-F35 (that a transfer of the Wasm memory's buffer throws is inferred; the recommendation holds on F15 alone) |
 
 ## Verifier spot-check
 
-Pending: the verifier's table goes here.
+The verifier checked every claim the R1 recommendations rest on, one report per unit; rust-reviewer checked R1's Rust
+crate and determinism claims. Both ran on 2026-10-28 (reports: `.checkpoints/v2-research/verifier-r1-results.json`,
+`verifier-r1-<unit>.md` and `rust-reviewer-r1-r2-result.md`, with every quote in full in their notes). The tables below
+merge them: one row per claim, each verdict as the reviewer gave it, then the state after the fix step. Locations are
+shortened; "—" means the reviewer had no row for that claim.
+
+**Counts.**
+- Verifier: 226 claims (its own counts per unit: ecs 29, tick 37, determinism 41, boundary-worker 46, abilities 40,
+  data-hotreload 33; the tables below show 36 and 32 rows for tick and data-hotreload, as it grouped them): 219
+  confirmed, 1 wrong (R1-DET-F25b), 4 unsupported (R1-BND-F15b, R1-BND-F23c, R1-ABL-C1, R1-ABL-C2), 1 partly
+  confirmed (R1-BND-F2b, its 0.2.122 part unsupported), 1 not checkable (R1-ECS-F34, an absence). Verdicts: PASS WITH
+  NOTES for all six units.
+- rust-reviewer, R1 part: 101 claims: 99 confirmed, 1 wrong (R1-DET-F25), 1 partly confirmed (R1-BND-F2). Verdict:
+  REVISE (the facts hold; Rust risks are missing from the recommendations).
+- After the fix step, for the 6 claims found wrong, unsupported or partly confirmed (rust-reviewer's two are the
+  same claims as the verifier's R1-DET-F25b and R1-BND-F2b): 2 re-sourced (R1-DET-F25b → R1-DET-F33, R1-BND-F15b →
+  R1-BND-F34), 1 now an open question (R1-BND-F23c → R1-BND-OQ9), 3 fixed in place (R1-BND-F2b, whose wrong part no
+  recommendation rested on; R1-ABL-C1 and C2, recommendation reasons rewritten to the source's words). Three more
+  claims were re-sourced to close gaps the reviewers named (R1-ECS-F35, R1-DET-F34, R1-BND-F35). No recommendation
+  rests on a claim whose final verdict is wrong or unsupported. The five re-sourced claims, and the recommendations
+  whose text, basis or pass marks changed, await the second verifier pass.
+
+### 1. ECS or plain data (unit `ecs`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-ECS-F1 | bevy_ecs 0.20.0 is current; 0.16 to 0.20 shipped in under 18 months | github.com/bevyengine/bevy-website/tree/main/content/news and docs.rs/bevy_ecs | verifier: confirmed (that every 0.x release breaks the API is inferred, and the doc says so); rust-reviewer: confirmed | folders "2025-04-24-bevy-0.16" through "2026-10-08-bevy-0.20"; crate header "bevy_ecs 0.20.0" | confirmed; REC1 now marks the API churn inferred and weighs Rapier's own 0.x pace (fixed: REC1 reason) |
+| R1-ECS-F2 | standalone | docs.rs bevy_ecs | verifier: —; rust-reviewer: confirmed | "can easily be used as a standalone crate in other projects" | confirmed; no change |
+| R1-ECS-F3 | tables default, sparse opt-in | docs.rs bevy_ecs | verifier: —; rust-reviewer: confirmed | "This is the default storage type." | confirmed; no change |
+| R1-ECS-F4 | the order of query results is not guaranteed | docs.rs bevy_ecs Query | verifier: confirmed; rust-reviewer: confirmed | iter: "Iteration order is not guaranteed."; par_iter: "Iteration order and thread assignment is not guaranteed."; iter_many: "Items are returned in th… | confirmed; no change |
+| R1-ECS-F5 | the sort is not cached between runs | docs.rs QueryIter | verifier: confirmed; rust-reviewer: confirmed | sort: "Sorts all query items into a new iterator, using the query lens as a key." / "The sort is not cached across system runs." | confirmed; no change |
+| R1-ECS-F6 | ambiguity Ignore; shuffle_seed debug | ScheduleBuildSettings | verifier: —; rust-reviewer: confirmed | "Defaults to `LogLevel::Ignore`." / "crate feature `debug`" | confirmed; no change |
+| R1-ECS-F7 | single-thread exec; multi_threaded off | SingleThreadedExecutor; features | verifier: —; rust-reviewer: confirmed | "Runs the schedule using a single thread." | confirmed; no change |
+| R1-ECS-F8 | World does not implement Clone | docs.rs World, Trait Implementations (all three parts of the page read) | verifier: confirmed; rust-reviewer: confirmed | Debug, Default, Send, Sync are listed; no "impl Clone for World" anywhere | confirmed; no change |
+| R1-ECS-F9 | Entity is opaque and must not be lined up between worlds | docs.rs Entity | verifier: confirmed; rust-reviewer: confirmed | "should be treated as an opaque identifier."; "…ensure that `Entity` lines up between instances…"; to_bits: "Do not use for serialization between runs… | confirmed; no change |
+| R1-ECS-F10 | bevy_ggrs snapshots each registered type, keyed by a rollback id | gschup/bevy_ggrs README and docs/architecture.md | verifier: confirmed; rust-reviewer: confirmed | "snapshotting only the components and resources you register."; "a `HashMap<RollbackId, As>` mapping each rollback entity…"; "spawns a fresh entity wi… | confirmed; REC1 now says these traps are bevy_ggrs's, a third-party library (fixed: REC1 reason) |
+| R1-ECS-F11 | strategy cost notes, no benches | architecture.md | verifier: —; rust-reviewer: confirmed | "Heap-allocating clone each frame" | confirmed; no change |
+| R1-ECS-F12 | deterministic replay in bevy needs an explicit sort | bevy_ggrs docs/pitfalls.md | verifier: confirmed; rust-reviewer: confirmed | "Bevy does not guarantee a stable iteration order for queries."; "Always sort queries that mutate state:" | confirmed; no change |
+| R1-ECS-F13 | state that is not registered is silently not restored | pitfalls.md | verifier: confirmed; rust-reviewer: confirmed | "Any state stored elsewhere will not be restored on rollback, causing silent desyncs."; "`Local<T>` is per-system state that is not snapshotted." | confirmed; REC1 wording fixed as for F10 |
+| R1-ECS-F14 | a restore triggers change detection | pitfalls.md, "Change Detection" | verifier: confirmed; rust-reviewer: confirmed | "Every snapshot restore triggers change detection on all restored components."; "Systems that react to `Changed<T>` will fire after every rollback…" | confirmed; REC1 wording fixed as for F10 |
+| R1-ECS-F15 | 0.16 relationships, no_std | 0.16 post | verifier: —; rust-reviewer: confirmed (R1: inferred) | "One of the hottest ECS features is finally here" | fixed: label upgraded to confirmed |
+| R1-ECS-F16 | hecs library, goals | docs.rs hecs | verifier: —; rust-reviewer: confirmed (order now C) | "It is a library, not a framework." | fixed: the goals' order quoted, confirmed |
+| R1-ECS-F17 | a hecs world yields entities in arbitrary order and reuses ids | docs.rs hecs 0.11.2 World | verifier: confirmed; rust-reviewer: confirmed | "An unordered collection of entities…"; "…stored in contiguous runs…"; "Entities are yielded in arbitrary order."; "…their IDs will be reused on a fut… | confirmed; no change |
+| R1-ECS-F18 | hecs World does not implement Clone | same page, Trait Implementations | verifier: confirmed; rust-reviewer: confirmed | Default, Extend, FromIterator, IntoIterator (&World), Send, Sync; no Clone | confirmed; REC1 now weighs hecs's F19 and F20 against it |
+| R1-ECS-F19 | freelist deterministic ids | hecs World | verifier: —; rust-reviewer: confirmed (condition now C) | "May only be called when the set of live entity IDs exactly matches" | fixed: condition quoted; now in REC1's Rests on |
+| R1-ECS-F20 | user context; column format | hecs serialize/column | verifier: —; rust-reviewer: confirmed | "For some applications, a custom approach may be preferable." | fixed: the no-Serialize reason quoted; now in REC1's Rests on |
+| R1-ECS-F21 | for few entity kinds, use plain Vecs | github.com/Ralith/hecs README, "Why Not ECS?" | verifier: confirmed; rust-reviewer: confirmed | "If your game will have few types of entities, consider a simpler architecture such as storing each type of entity" + "…in a separate plain `Vec`."; "… | confirmed; no change |
+| R1-ECS-F22 | state in other structures | hecs README | verifier: —; rust-reviewer: confirmed | "Most games will store significant amounts of state in other structures." | confirmed; no change |
+| R1-ECS-F23 | HashMap is seeded per instance and iterates in arbitrary order | doc.rust-lang.org HashMap (1.99.1) | verifier: confirmed; rust-reviewer: confirmed | "`HashMap` is randomly seeded: each `HashMap` instance uses a different seed…"; iter: "An iterator visiting all key-value pairs in arbitrary order." | confirmed; no change |
+| R1-ECS-F24 | BTreeMap iterates in key order | std BTreeMap, struct docs | verifier: confirmed; rust-reviewer: confirmed | "…produce their items in key order, and take worst-case logarithmic and amortized constant time per item returned." | confirmed; no change |
+| R1-ECS-F25 | a slice iterates from start to end | std slice, method iter | verifier: confirmed; rust-reviewer: confirmed | "The iterator yields all items from start to end." | confirmed; no change |
+| R1-ECS-F26 | Vec::clone_from does not reallocate when it can avoid it | std Vec, impl Clone, clone_from | verifier: confirmed; rust-reviewer: confirmed | "…as it avoids reallocation if possible."; "…this will reuse the resources of `self`'s elements as well."; "assert_eq!(yp, y.as_ptr());" | confirmed; REC1 no longer reads more into it (fixed: REC1 reason and mark 2, with R1-ECS-F35) |
+| R1-ECS-F27 | Copy versus Clone; clone_from can reuse allocations | std Clone | verifier: confirmed; rust-reviewer: confirmed | "`Copy` is implicit and an inexpensive bit-wise copy, while `Clone` is always explicit and may or may not be expensive."; "…can be overridden to reuse… | confirmed; REC1 reason and mark 2 fixed; the derive and default clone_from re-sourced: R1-ECS-F35 |
+| R1-ECS-F28 | a removed slotmap key stays removed | docs.rs slotmap 1.1.1 | verifier: confirmed; rust-reviewer: confirmed (indirection, serde now C) | "once a key is removed, it stays removed"; "as fast as a normal Vec"; "It uses two indirections per random access"; "…supports no_std environments, bu… | fixed: indirection and serde quoted, confirmed |
+| R1-ECS-F29 | RigidBodySet implements Clone and Serialize; its handles are index plus generation | docs.rs rapier3d 0.36.1 RigidBodySet | verifier: confirmed; rust-reviewer: confirmed | "The collection that stores all rigid bodies in your physics world."; "This handle is lightweight (just an index + generation)…"; "impl Clone / Serial… | confirmed; its default clone_from now stated (R1-ECS-F35) |
+| R1-ECS-F30 | the whole physics state can be serialized; the pipelines hold no state | rapier.rs/docs/user_guides/rust/serialization | verifier: confirmed with a note; rust-reviewer: confirmed (needs `serde-serialize` feature) | "When the `serde-serialize` feature of Rapier is enabled, most data structures of Rapier become serializable using serde."; "The complete state of the… | fixed: the `serde-serialize` feature named (F30, REC4) |
+| R1-ECS-F31 | with enhanced determinism, the bytes are identical across machines | same page | verifier: confirmed with a note; rust-reviewer: confirmed | "If the `enhanced-determinism` feature of Rapier is enabled"…"the exact same byte vectors". The doc leaves out the condition "if your platform fulfill… | fixed: the platform condition added |
+| R1-ECS-F32 | Rapier 0.30.1 skipped part of its broad-phase state when serializing; fixed in 0.33 | github.com/dimforge/rapier/issues/910 | verifier: confirmed; rust-reviewer: confirmed | "Rapier version: 0.30.1"; "BvhWorkspace is not serialized"; "the BvhWorkspace::rebuild_frame_index value is actually important"; "It appears this woul… | confirmed; REC1 now cites it for Rapier's 0.x pace |
+| R1-ECS-F33 | generic code grows Wasm size; always measure; wasm-opt saves 15–20 % | rustwasm.github.io/book/reference/code-size.html | verifier: confirmed, but the "official" label is dated; rust-reviewer: confirmed | "…create a new copy of the function for each `T` type…"; "these copies add up quickly in terms of code size."; "Always measure!"; "can often get anoth… | fixed: tier marked archived (2025-08-25) |
+| R1-ECS-F34 | no source gives a Wasm size or compile time | a claim of absence | verifier: not checkable against a quote; none of the sources I re-read gives such a figure; rust-reviewer: — | — | not checkable (an absence); unchanged; REC1 mark 5 measures it |
+| GC2 | the legacy step at 48 soldiers took 0.80–1.00 ms mean | docs/reports/2026-10-16-three-teams-core.md:48 | verifier: confirmed; rust-reviewer: — | "48 soldiers (head): combat 0.80–1.00, p95 0.97–1.54" | confirmed; added to REC1's Rests on (mark 1) |
+| CS7 | every static collider has id −1 | docs/LEGACY_INVENTORY.md:175 | verifier: confirmed; rust-reviewer: — | "today every block is id -1" | confirmed; added to REC1's and REC3's Rests on |
+| GP14 | the step order decides outcomes; the sim shares Math.random with sound and FX | docs/LEGACY_INVENTORY.md:324 | verifier: confirmed; rust-reviewer: — | "because the order decides outcomes"; "the one shared Math.random, which sound and FX draw from" | confirmed; added to REC2's Rests on |
+| GC15 | a stuck bolt follows its victim | docs/LEGACY_INVENTORY.md:254 | verifier: confirmed; rust-reviewer: — | "a stuck bolt follows the victim's mesh position". The doc's "by reference" is a gloss. | confirmed; REC3's "by reference" gloss replaced and GC15 added to its Rests on |
+| VISION_V2 §4 | matches feel fair up to about 100 ms of ping | docs/VISION_V2.md:54 | verifier: confirmed; rust-reviewer: — | "`[DEFAULT]` Matches feel fair up to about 100 ms of ping." This is a default, not a decided target. | confirmed; added to REC1's Rests on (mark 3) |
+| REC1 mark 2 | "0 heap allocations after warm-up, Rapier included" | std Clone; RigidBodySet | verifier: goes further than F26 and F27 allow (finding 3); rust-reviewer: not reachable as written (risk 5) | std Clone: the default clone_from "is equivalent to `a = b.clone()`" | fixed: mark 2 rewritten; re-sourced: R1-ECS-F35 |
+
+### 2. A fixed tick rate (unit `tick`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-TICK-F1 | a variable step changes behaviour | gafferongames fix_your_timestep | verifier: confirmed; rust-reviewer: — | section "Variable delta time", not the "opening section" the doc names: "The problem is that the behavior of your physics simulation depends on the de… | fixed: location corrected |
+| R1-TICK-F2 | the accumulator loop | same page | verifier: confirmed; rust-reviewer: — | "Free the physics" code: `accumulator += frameTime;` … `accumulator -= dt;` | confirmed; no change |
+| R1-TICK-F3 | spiral of death, headroom, 0.25 s clamp | same page | verifier: confirmed; rust-reviewer: — | the spiral and "significantly less than X seconds" quotes are in "Semi-fixed timestep", not "Free the physics"; the clamp `if ( frameTime > 0.25 )` is… | fixed: locations corrected; added to REC2's Rests on |
+| R1-TICK-F4 | interpolation by `alpha` | same page | verifier: confirmed; rust-reviewer: — | "The final touch" | confirmed; no change |
+| R1-TICK-F5 | a fixed step is needed for reproducibility | same page | verifier: confirmed; rust-reviewer: — | "Free the physics", paragraphs 1 and 2 ("why is it necessary to have fully fixed delta time") | confirmed; no change |
+| R1-TICK-F6 | Bevy defaults to 64 Hz, and why | docs.rs bevy 0.20.0, Fixed | verifier: confirmed; rust-reviewer: confirmed | type docs: "The default timestep() is 64 hertz, or 15625 microseconds." | confirmed; no change |
+| R1-TICK-F7 | paused clock, capped catch-up | docs.rs bevy Fixed and Virtual | verifier: confirmed; rust-reviewer: confirmed | "If the virtual clock is paused, the FixedUpdate schedule will not run."; Virtual, paragraph on `set_max_delta` | confirmed; no change |
+| R1-TICK-F8 | Rapier step 1/60 s; a smaller step costs more CPU | docs.rs rapier3d 0.36.1, IntegrationParameters | verifier: confirmed; rust-reviewer: confirmed | fields `dt` and `max_ccd_substeps` | confirmed; REC2's "halves" now marked inferred |
+| R1-TICK-F9 | Quake III world runs at 20 fps | sv_init.c:596 | verifier: confirmed; rust-reviewer: — | `sv_fps = Cvar_Get ("sv_fps", "20", CVAR_TEMP );` | confirmed; no change |
+| R1-TICK-F10 | Quake III millisecond accumulator, messages sent after the loop | sv_main.c `SV_Frame` :775, :777, :832, :837, :848 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F11 | Quake III snapshot rate capped at 30, default 50 ms | sv_client.c `SV_UserinfoChanged` :1151–1161 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F12 | Quake III chops long moves; fixed movement step off by default, 8 ms | bg_pmove.c :2041–2054, g_main.c :178–179 | verifier: confirmed. An extra read also confirms the part the doc marks inferred: movement runs once per received command, outside the world frame (sv… | — | fixed: the per-command part upgraded to confirmed |
+| R1-TICK-F13 | Counter-Strike at 66 ticks; `-tickrate` compiled out | gameinterface.cpp :825–838 | verifier: confirmed. The 66 comes from a code comment only: "[Forrest] For Counter-Strike, set default tick rate of 66 …"; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F14 | Source rounds durations to whole ticks | shareddefs.h :17–18 and :407 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F15 | MDN loop; a timer in a Web Worker | MDN Games/Anatomy | verifier: confirmed; rust-reviewer: — | all quotes, plus "in need of technical review" | confirmed; no change |
+| R1-TICK-F16 | pause, simulate or recover; watch the tick count | same page, Summary list and a code comment | verifier: confirmed. The words "problematic for most multiplayer games" are verbatim, although the doc labels them inferred.; rust-reviewer: — | — | fixed: label upgraded to confirmed |
+| R1-TICK-F17 | `requestAnimationFrame` follows the refresh rate and pauses in background tabs | MDN DedicatedWorkerGlobalScope/requestAnimationFrame | verifier: confirmed. The main-thread half is also confirmed on MDN Window/requestAnimationFrame (a page the doc does not cite).; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F18 | timer clamping and throttling | MDN setTimeout | verifier: confirmed; rust-reviewer: — | the heading is "Reasons for longer delays than specified", not the doc's wording. Chrome's intensive throttling needs four conditions; the doc shorten… | fixed: heading and Chrome's four conditions corrected |
+| R1-TICK-F20 | `performance.now()` in workers, 100 µs / 5 µs | MDN Performance/now | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F21 | `performance.now()` keeps ticking during sleep only on Windows | same page, "Ticking during sleep" | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| R1-TICK-F22 | `Atomics.wait` rules | MDN Atomics/wait | verifier: confirmed; rust-reviewer: — | four quotes | confirmed; no change |
+| R1-TICK-F23 | Tokio timers are millisecond-granular; Burst is the default | docs.rs tokio 1.54.1, fn.sleep and enum.MissedTickBehavior | verifier: confirmed; rust-reviewer: confirmed | — | confirmed; tokio 1.54.0's advisory noted in R1-RR-OQ7 |
+| R1-TICK-F24 | prediction ring buffer and replay; the 200 ms example | gafferongames what_every_programmer… | verifier: confirmed; rust-reviewer: — | "if it takes 100ms from client to server and 100ms back … 200ms in the past" | confirmed; REC2 P3's explanation corrected (F24's 200 ms is a round trip) |
+| R1-TICK-F26 | explicit Euler error; semi-implicit Euler | gafferongames integration_basics | verifier: confirmed; rust-reviewer: — | "Most commercial game physics engines use this integrator." sits under the heading "Semi-implicit Euler" | confirmed; no change |
+| CS1 | legacy row CS1 | inventory :169, shamble-core.js:1479, shamble-game.js:3053 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| GP9 | legacy row GP9 | inventory :319 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| GP13 | legacy row GP13 | inventory :323 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| GP14 | legacy row GP14 | inventory :324, AUDIT_BUGS_PERF.md:10 (0.49 ms) | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| GW14 | legacy row GW14 | inventory :202, shamble-core.js:82, shamble-game.js:1575; 11²/48 = 2.52 m, plus 0.55 = 3.0… | verifier: confirmed; rust-reviewer: — | — | confirmed; REC2's "every legacy measurement" corrected (GW14 ran at 20, 60 and 144 Hz) |
+| GN10 | legacy row GN10 | inventory :275 | verifier: confirmed; rust-reviewer: — | — | confirmed; added to the unit's legacy facts |
+| GC15 | legacy row GC15 | inventory :254 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| GN4 | legacy row GN4 | inventory :269 | verifier: confirmed; rust-reviewer: — | — | confirmed; added to REC2's Rests on (measured at 60 and 144 fps) |
+| TL13 | legacy row TL13 | inventory :398, tools/sim.js:19 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| TL15 | legacy row TL15 | inventory :400, tools/perfbots.js:24, docs/reports/2026-10-16-three-teams-core.md:48 (0.80… | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| KT13 | legacy row KT13 | inventory :422 | verifier: confirmed; rust-reviewer: — | — | confirmed; no change |
+| `WEAPONS` and `T` | legacy row `WEAPONS` and `T` | docs/legacy-tuning.json (0.072, 0.2, 0.42, 0.06; `jumpV` 11, `gravity` 24, `stepUp` 0.55;… | verifier: confirmed. The smallest interval in all tables is 0.06 s, so "one shot per tick at 30 Hz" holds.; rust-reviewer: — | — | confirmed; no change |
+| REC2 "halves" | "30 Hz halves the CPU per simulated second (F8)" | IntegrationParameters (F8) | verifier: a number not in the source (finding 2) | F8 gives only the direction | fixed: marked inferred, with its assumption |
+
+### 3. Identical results between Wasm and native (unit `determinism`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-DET-F1 | Wasm floats follow IEEE 754, round to nearest, ties to even | webassembly.github.io/spec/core/exec/numerics.html (3.0, 2026-10-27) | verifier: confirmed; rust-reviewer: confirmed | "Floating-Point Operations": "All operators use round-to-nearest ties-to-even, except where otherwise specified." | confirmed; no change |
+| R1-DET-F2 | NaN sign and payload are non-deterministic | numerics.html | verifier: confirmed; rust-reviewer: confirmed | "NaN Propagation": "then its sign is non-deterministic…"; "Otherwise the payload is picked non-deterministically among all arithmetic NaNs" | confirmed; no change |
+| R1-DET-F3 | The host chooses the deterministic profile; tools target the full profile (in no Rests on list) | spec/core/appendix/profiles.html | verifier: confirmed; rust-reviewer: confirmed | "A host platform can thereby decide to support the language only under a restricted profile"; "Tools are generally expected to handle and produce code… | confirmed; added to REC2's and REC6's Rests on |
+| R1-DET-F4 | Relaxed SIMD depends on hardware, is fixed for one run, and its multiply-add may be fused or not | numerics.html | verifier: confirmed; rust-reviewer: confirmed | "Relaxed Operations": "…such as its hardware"; "These choices are fixed…"; "Relaxed multiply-add allows for fused or unfused results…"; "every paramet… | confirmed; no change |
+| R1-DET-F5 | Relaxed SIMD: Chrome 114, Firefox 145, Safari behind a flag, Node 21.0, Wasmtime 15 (context only) | raw.githubusercontent.com/WebAssembly/website/main/features.json | verifier: confirmed, verbatim (the doc says "inferred"); rust-reviewer: — | `"relaxedSimd": "114"` / `"145"` / `["flag", "Requires JavaScriptCore flag useWebAssemblyRelaxedSIMD"]` / `"21.0"` / `"15"` | fixed: label upgraded to confirmed |
+| R1-DET-F6 | Default proposals on wasm32-unknown-unknown | doc.rust-lang.org/rustc/platform-support/wasm32-unknown-unknown.html | verifier: confirmed; rust-reviewer: confirmed | "As of the time of this writing the proposals that are enabled by default…" followed by the 6-item list; simd128 is not in it | confirmed; no change |
+| R1-DET-F7 | Rust `+ - * /` round ties to even | std f32 (1.99.1) | verifier: confirmed; rust-reviewer: confirmed | type docs: "…rounded according to the roundTiesToEven direction defined in IEEE 754-2008." | confirmed; no change |
+| R1-DET-F8 | NaN bits are not portable | std f32 | verifier: confirmed; rust-reviewer: confirmed (location: type-level bullet) | "NaN bit patterns": "…not guaranteed to be portable or even fully deterministic!" | confirmed; location note added |
+| R1-DET-F9 | std transcendental functions have no fixed precision | std f32 | verifier: confirmed for sin, cos, tan, atan2, powf, exp and ln; the other functions stay inferred; rust-reviewer: confirmed for sin; others listed, no… | "The precision of this function is non-deterministic. This means it varies by platform, Rust version…" | fixed: confirmed for cos, tan, atan2, powf, exp, ln too; tan's libc binding quoted |
+| R1-DET-F10 | `sqrt` and `mul_add` exact; floor, ceil, round, trunc and fract precise | std f32 | verifier: confirmed; rust-reviewer: confirmed | sqrt: "…specified by IEEE 754 as `squareRoot` and guaranteed not to change."; mul_add: "…as `fusedMultiplyAdd` and guaranteed not to change."; the rou… | confirmed; no change |
+| R1-DET-F11 | No implicit fused multiply-add; opting in is explicit; `algebraic_*` has undefined precision | RFC 3514; std f32 | verifier: confirmed; rust-reviewer: confirmed (1.98.0 now C) | "…such as turning `a*b + c` into FMA operations"; "…explicit opt-in for such semantics-alternating transformations"; "…results of elementary operation… | fixed: "stable since 1.98.0" upgraded to confirmed |
+| R1-DET-F12 | 64-bit x86, 64-bit ARM and RISC-V fully compliant; i586 and 32-bit ARM NEON are the exceptions | RFC 3514 | verifier: confirmed; rust-reviewer: confirmed (RFC also names wasm for NaN) | "The most widely used targets (64bit x86 and 64bit ARM, and also the increasingly popular RISC-V) are fully compliant."; "On 32bit ARM, NEON SIMD oper… | fixed: the RFC's wasm NaN sentence added |
+| R1-DET-F13 | Compile-time NaN choice may differ from run time | RFC 3514 | verifier: confirmed; rust-reviewer: confirmed | "there is no guarantee that the choice made in const evaluation is consistent with the choice made at runtime." | confirmed; no change |
+| R1-DET-F14 | min, max and clamp: which zero comes back is non-deterministic | std f32 | verifier: confirmed; rust-reviewer: confirmed (+ clamp "Panics if `min > max`") | min and max: "…either input may be returned non-deterministically."; clamp: "…either `0.0` or `-0.0` is returned non-deterministically." | fixed: clamp's panic added (R1-RR-OQ3) |
+| R1-DET-F15 | Float-to-int casts saturate, NaN gives 0; integer overflow depends on build flags | Rust Reference, operator-expr | verifier: confirmed; rust-reviewer: confirmed | "Numeric cast": "…round the float towards zero", "`NaN` will return `0`", "…will saturate…"; "Overflow": "…`-C debug-assertions` and `-C overflow-chec… | confirmed; no change |
+| R1-DET-F16 | compiler-builtins supplies the pure-Rust math on wasm32-unknown-unknown but not on Unix | compiler-builtins/src/math/mod.rs (master) | verifier: confirmed; rust-reviewer: confirmed | group `partial_availability`: "- All unix targets (linux, macos, freebsd, android, etc)" / "- wasm with known target_os", plus its cfg. The doc's cfg… | confirmed; no change |
+| R1-DET-F17 | libm 0.2.16 is pure Rust; the default `arch` feature swaps in only exact operations | docs.rs/libm; libm arch/mod.rs; libm Cargo.toml | verifier: confirmed; rust-reviewer: confirmed | "libm in pure Rust"; `pub use wasm32::{ ceil, … sqrt, sqrtf, trunc, truncf, };`; `pub use x86::{sqrt, sqrtf, fma, fmaf};`; `default = ["arch"]` | confirmed; no change |
+| R1-DET-F18 | libm claims no accuracy or cross-platform identity (in no Rests on list) | docs.rs/libm; libm README | verifier: confirmed (an absence); rust-reviewer: confirmed (absence) | the fetch found no such sentence on either page | confirmed (an absence); added to REC2's Rests on |
+| R1-DET-F19 | Rapier by default is deterministic only on one machine | rapier.rs determinism page (0.36) | verifier: confirmed; rust-reviewer: confirmed | "By default, Rapier is locally deterministic…"; "However, doing this on two different computers may result in completely different results." | confirmed; no change |
+| R1-DET-F20 | Conditions for cross-platform identity | rapier.rs determinism page | verifier: confirmed; rust-reviewer: confirmed | "The `enhanced-determinism` feature of Rapier is enabled."; "…as well as WASM targets."; "…in the exact same order."; "…`ComplexField` or `RealField`… | confirmed; added to REC2's Rests on |
+| R1-DET-F21 | The flag excludes `simd8` but combines with `parallel` | rapier.rs determinism page | verifier: confirmed; rust-reviewer: confirmed (+ missed "is therefore its own determinism domain.") | "…cannot be enabled at the same time as the `simd8` feature,"; "The `parallel` feature, on the other hand, can be combined with it:" | fixed: the "determinism domain" sentence added |
+| R1-DET-F22 | The rapier3d flag forces libm and passes the flag to parry; the 4-lane path stays on; version 0.36.1 | rapier3d Cargo.toml; workspace Cargo.toml | verifier: confirmed; rust-reviewer: confirmed | `enhanced-determinism = ["simba/libm_force", "parry3d/enhanced-determinism"]`; `simba = { workspace = true, features = ["wide"] }` (no condition on it… | confirmed; added to REC2's Rests on |
+| R1-DET-F23 | The parry3d flag forces libm and scalar maths in glamx and adds indexmap | parry3d Cargo.toml; rapier workspace Cargo.toml | verifier: confirmed (why indexmap is there stays inferred); rust-reviewer: confirmed (pins + fast-math note now C) | `enhanced-determinism = ["simba/libm_force", "indexmap", "glamx/libm", "glamx/scalar-math"]`. The workspace pins and the no-fast-math comment are also… | fixed: workspace pins and the fast-math note upgraded to confirmed |
+| R1-DET-F24 | Rapier's page gives no cost and no way to check determinism | rapier.rs determinism page | verifier: confirmed (an absence); rust-reviewer: confirmed (absence) | whole page | confirmed; no change |
+| R1-DET-F25a | HashMap is randomly seeded, iterates in arbitrary order, and a fixed hasher brings a DoS warning | std HashMap | verifier: confirmed; rust-reviewer: — | "The algorithm is randomly seeded…"; iter: "An iterator visiting all key-value pairs in arbitrary order."; with_hasher: "…can expose a DoS attack vect… | confirmed; no change |
+| R1-DET-F25b | HashMap is "randomly seeded per process" | std HashMap | verifier: wrong; rust-reviewer: wrong (per instance) | const/static section: "each `HashMap` instance uses a different seed" | re-sourced: R1-DET-F33 (std HashMap: "each `HashMap` instance uses a different seed"); F25, REC5, REC6 and options Q5 corrected |
+| R1-DET-F26 | BTreeMap iterates in key order | std BTreeMap | verifier: confirmed; rust-reviewer: confirmed | "…stores its entries in key order."; iter: "…sorted by key." | confirmed; no change |
+| R1-DET-F27 | StdRng is not portable | docs.rs rand 0.10.3, StdRng | verifier: confirmed; rust-reviewer: confirmed | "Non-portable: any future library version may replace the algorithm…"; "…even with a fixed seed, output is not portable." | confirmed; no change |
+| R1-DET-F28 | rand_chacha and rand_pcg are portable; ChaCha has 2^64 streams and a settable position; Pcg64Mcg is slow on 32… | docs.rs rand_chacha 0.10.0, ChaCha8Rng, rand_pcg 0.10.2 | verifier: confirmed; rust-reviewer: confirmed | "These generators are all deterministic and portable … with testing against reference vectors."; set_stream: "…2^64 unique streams…" (the page shows "… | confirmed; REC4's Pcg32 fallback re-sourced: R1-DET-F34 |
+| R1-DET-F29 | The fixed crate has no trigonometry | docs.rs fixed 1.31.0 | verifier: confirmed; rust-reviewer: confirmed | "This crate does _not_ provide general analytic functions."; "No trigonometric functions are provided…" | confirmed; no change |
+| R1-DET-F30 | JavaScript Math differs between browsers and machines; Math.random takes no seed | MDN Math; MDN Math/random (not cited by the doc) | verifier: confirmed; rust-reviewer: — | "Many `Math` functions have a precision that's implementation-dependent."; Math/random: "…it cannot be chosen or reset by the user." | fixed: "no seed" confirmed on MDN Math.random (verifier's read) |
+| R1-DET-F31 | Lockstep needs bit-identical results; shipped PC games held them with IEEE floats; transcendental results diff… | gafferongames "Floating Point Determinism" (2010-02-24) | verifier: confirmed; rust-reviewer: — | Ken Miller (Pandemic): "absolutely identical results … least-significant bit of the mantissa", "…slightly different results for trancendental function… | fixed: tier relabelled "other" (R1-XU-OQ6 settled) |
+| R1-DET-F32 | Prediction gets corrected; lockstep desyncs | gafferongames "What Every Programmer Needs To Know About Game Networking" | verifier: confirmed; rust-reviewer: — | "running a subset of the game code for your player character…"; "invisibly 'rewinds and replays'…"; "…seldom corrected."; "one tiny difference results… | fixed: tier relabelled "other" (R1-XU-OQ6 settled) |
+| R1-DET-V3 | The goal is 12v12v12 or 24v24 (36 or 48 players) | docs/VISION_V2.md §3 | verifier: confirmed; rust-reviewer: — | "The goal: 12v12v12 or 24v24." | confirmed; no change |
+| R1-DET-V4 | Fair up to about 100 ms of ping | docs/VISION_V2.md §4 | verifier: confirmed; rust-reviewer: — | "[DEFAULT] Matches feel fair up to about 100 ms of ping." | confirmed; no change |
+| R1-DET-L1 | 11 wall-clock reads; shared Math.random; effects need their own RNG stream | docs/STATUS.md:70 | verifier: confirmed; rust-reviewer: — | ADR-001 inputs | confirmed; added to REC1's Rests on |
+| R1-DET-L2 | GP14: 10 calls plus 1 comment, animation clocks, sound noise drawn before spread, camera shake | docs/LEGACY_INVENTORY.md:324 | verifier: confirmed; rust-reviewer: — | GP14 row | confirmed; added to REC5's Rests on |
+| R1-DET-L3 | GN6: bot spread comes from the shared Math.random | docs/LEGACY_INVENTORY.md:271 | verifier: confirmed; rust-reviewer: — | GN6 row | confirmed; no change |
+| R1-DET-L4 | GN8: cull on and off give identical logs (69 and 207 events) | docs/LEGACY_INVENTORY.md:273 | verifier: confirmed; rust-reviewer: — | GN8 row | confirmed; added to REC6's Rests on |
+| R1-DET-L5 | GC5: 10.0, 12.0 and 13.1 shots per second against 13.9 | docs/LEGACY_INVENTORY.md:244 | verifier: confirmed; rust-reviewer: — | GC5 row | confirmed; no change |
+| R1-DET-L6 | TL13: at least 3 runs, N = 12/24/36/48, seeded bot matches on the native server | docs/LEGACY_INVENTORY.md:398 | verifier: confirmed; rust-reviewer: — | TL13 row | confirmed; added to REC1's Rests on |
+| REC4 fallback | Pcg32 as the fallback RNG | rand_pcg | verifier: not backed by F28, which quotes only Pcg64Mcg (finding 6) | crate root: Pcg32 "is a good choice on both 32-bit and 64-bit CPUs" | re-sourced: R1-DET-F34 |
+
+### 4. The boundary and the Web Worker (unit `boundary-worker`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-BND-F1 | rustwasm org wound down | Inside Rust 2025-07-21 | verifier: —; rust-reviewer: confirmed (omits "or transferred to their existing maintainers") | "archived in place" | fixed: the "or transferred" half added |
+| R1-BND-F2a | the CLI and the library must be the same version since 0.2.128 | GitHub release 0.2.128 | verifier: confirmed; rust-reviewer: — | release notes, "Requires matching `wasm-bindgen` and CLI versions (schema bump)." | confirmed; unchanged (REC4 rests on it) |
+| R1-BND-F2b | release cadence; breaking changes in 0.2.122, 0.2.123 and 0.2.128; the year 2026 | GitHub releases list | verifier: partly confirmed; rust-reviewer: partly confirmed (the version match and .123 confirmed; .122 breaking unsupported) | dates from 0.2.118 "10 Apr" to 0.2.129 "25 Sep" confirmed; 0.2.123 "a breaking change for callers that relied on widening `&mut` references." confirme… | fixed: 0.2.122 dropped, the year attributed to the asset timestamps, OQ7's count corrected (no recommendation rests on it) |
+| R1-BND-F3 | a .d.ts file is written by default | guide cli.md | verifier: confirmed; rust-reviewer: confirmed | `--typescript`: "Output a TypeScript declaration file for the generated JavaScript bindings. This is on by default." | confirmed; no change |
+| R1-BND-F4 | `typescript_custom_section` appends to the .d.ts | guide attribute page | verifier: confirmed; rust-reviewer: confirmed | "it will append the contents of the string to the `.d.ts` file exported by `wasm-bindgen-cli`" / "The primary target for this feature is for code gene… | confirmed; no change |
+| R1-BND-F5 | serde-wasm-bindgen makes many boundary calls; JSON runs at 2x to 0.2x its speed | guide serde page | verifier: confirmed; rust-reviewer: confirmed | heading "An alternative approach - using JSON", "This requires a lot of calls back and forth between Rust and JavaScript, which can sometimes be slow.… | confirmed; no change |
+| R1-BND-F6 | slices copied | number-slices.md | verifier: —; rust-reviewer: confirmed (&[T] inferred) | "since the results are copied back into its buffer." | confirmed; no change |
+| R1-BND-F7 | keep data in linear memory and read it through overlay views | Rust and WebAssembly book, game-of-life/implementing | verifier: confirmed; rust-reviewer: confirmed | "By working with pointers and overlays, we avoid copying the cells across the boundary on every tick."; banner "This project and website is no longer… | confirmed; no change |
+| R1-BND-F8 | tsify's purpose, its serde route and deprecation; tsify-next exists; neither page says which line is maintaine… | docs.rs tsify 0.5.8 and tsify-next 0.5.6 | verifier: confirmed; rust-reviewer: confirmed (js feature, deprecation now C) | `js` feature "enables serialization through serde-wasm-bindgen"; "Deprecated in favour of using Ts<T> as on function parameters and return type"; neit… | fixed: serde route and deprecation upgraded to confirmed |
+| R1-BND-F9 | ts-rs generates types at test time | docs.rs ts-rs 12.0.1 | verifier: confirmed; rust-reviewer: confirmed (MSRV now C) | "When running `cargo test` or `cargo test export_bindings`, …"; "no runtime part" is inferred from this; the minimum Rust version was not checked | fixed: MSRV upgraded to confirmed (rust-reviewer) |
+| R1-BND-F10 | only `repr(C)` gives a layout another language can read by offset | Rust Reference, type-layout | verifier: confirmed; rust-reviewer: confirmed | sections "The `Rust` representation", "The `C` representation", "`#[repr(C)]` Structs" | confirmed; no change |
+| R1-BND-F11 | a typed array is a view, and its offset must be a multiple of the element size | MDN TypedArray | verifier: confirmed; rust-reviewer: — | constructor section; Exceptions, RangeError | confirmed; no change |
+| R1-BND-F12 | shared memory needs a secure, isolated page, otherwise `postMessage` throws | MDN SharedArrayBuffer | verifier: confirmed; rust-reviewer: — | "To use shared memory your document must be in a secure context and cross-origin isolated." | confirmed; no change |
+| R1-BND-F15a | a transfer moves the buffer without copying and the sender loses it | MDN Transferable objects | verifier: confirmed; rust-reviewer: — | "literally moved … zero-copy operation" / "any attempt to read or write the object will throw an exception." | confirmed; no change |
+| R1-BND-F15b | without a transfer list the data is copied | MDN Transferable objects | verifier: unsupported; rust-reviewer: — | no sentence on the page says this, only a `structuredClone` code example | re-sourced: R1-BND-F34 (MDN structured clone algorithm: "copies complex JavaScript objects", used by postMessage); REC3 rests on it |
+| R1-BND-F15c | typed arrays are not transferable but their buffers are; WebTransport streams are on the list | MDN Transferable objects | verifier: confirmed; rust-reviewer: — | "…serializable, but not transferable. However their underlying buffer is an ArrayBuffer, which is a transferable object." | confirmed; its label upgraded |
+| R1-BND-F16 | growing a non-shared memory detaches its views; a shared one keeps its old length | MDN Memory.grow | verifier: confirmed; rust-reviewer: — | Examples, "Detachment upon growing" | confirmed; no change |
+| R1-BND-F17a | a shared Wasm memory's buffer is a SharedArrayBuffer | MDN SharedArrayBuffer | verifier: confirmed; rust-reviewer: — | section "WebAssembly shared memory" | confirmed; no change |
+| R1-BND-F17b | a module must declare a shared memory to import one | threads proposal Overview.md | verifier: confirmed; rust-reviewer: — | section "Shared Linear Memory", "It is a validation error to attempt to import shared linear memory if the module's memory import doesn't specify that… | fixed: the quote replaced by the rule the claim needs (re-read 2026-10-28) |
+| R1-BND-F17c | a shared memory must have a maximum size | threads proposal Overview.md | verifier: confirmed; rust-reviewer: — | section "Spec Changes", "Note that shared linear memory without an explicit maximum size is not permitted." | confirmed; no change |
+| R1-BND-F18 | Wasm threads need nightly Rust, `+atomics`, a rebuilt std and the `web` or `no-modules` output | guide raytrace.md | verifier: confirmed; rust-reviewer: confirmed | all six quotes found word for word | confirmed; no change |
+| R1-BND-F19 | `std::thread::spawn` panics; the default Wasm features; target tier 2 | rustc book, wasm32-unknown-unknown | verifier: confirmed; rust-reviewer: confirmed | page body | fixed: the `-Cpanic=abort` sentence added (R1-RR-OQ3) |
+| R1-BND-F20 | isolation is COOP `same-origin` plus COEP; it unlocks finer timers and the memory API | MDN COOP and crossOriginIsolated | verifier: confirmed; rust-reviewer: — | COOP intro; the crossOriginIsolated feature list | confirmed; REC5 now names the memory API it unlocks |
+| R1-BND-F21 | `require-corp` needs CORP on cross-origin resources; what `credentialless` does; frames are covered | MDN COEP and web.dev coop-coep | verifier: confirmed; rust-reviewer: — | directive descriptions; "The entire chain of the documents, including parent frames and child frames, must be cross-origin isolated, too." | confirmed; no change |
+| R1-BND-F22 | Safari has no `credentialless`; the version numbers | MDN browser-compat data, COEP json | verifier: confirmed; rust-reviewer: — | header 83 / mirror / 79 / 15.2; `credentialless` 96 / mirror / 119 / false | confirmed; no change |
+| R1-BND-F23a | COOP `same-origin` cuts the link to popups | MDN COOP | verifier: confirmed; rust-reviewer: — | "A document with `same-origin` will always open a document with `unsafe-none` in a new BCG." | confirmed; REC5's login reasoning now rests on F20 and F23a |
+| R1-BND-F23b | `same-origin-allow-popups` is meant for OAuth and payments | MDN COOP | verifier: confirmed; rust-reviewer: — | "…when using a cross-origin service for OAuth or payments." | confirmed; no change |
+| R1-BND-F23c | `same-origin-allow-popups` does not give isolation | MDN COOP and web.dev | verifier: unsupported; rust-reviewer: — | neither source says it, and both read the other way: MDN, "integrations where a document needs the benefits of cross-origin isolation"; web.dev change… | now an open question: R1-BND-OQ9 (clause dropped from F23; REC5 rests on F20 and F23a) |
+| R1-BND-F24a | the report-only header lets you test before enforcing | web.dev coop-coep | verifier: confirmed; rust-reviewer: — | "You will receive reports without blocking embedded content." | confirmed; no change |
+| R1-BND-F24b | the headers must also cover worker scripts | web.dev coop-coep | verifier: confirmed (the doc says "inferred"; it can be upgraded); rust-reviewer: — | "Recursively apply this to all documents including the top-level document, iframes and worker scripts." | fixed: label upgraded to confirmed |
+| R1-BND-F25 | module workers work in all four browsers | browser-compat data Worker.json; guide wasm-in-web-worker.md | verifier: confirmed; rust-reviewer: confirmed | `options_type_parameter` 80 / mirror / 114 / 15; the guide's "only Chrome supports modules in web workers" is out of date, as the doc says | confirmed; no change |
+| R1-BND-F26 | SharedArrayBuffer and Atomics are in all four; `waitAsync` is "Baseline 2025" | browser-compat data SharedArrayBuffer and Atomics; MDN waitAsync | verifier: confirmed; rust-reviewer: — | all values match; "Since November 2025, this feature works across the latest devices and browser versions." | confirmed; no change |
+| R1-BND-F27 | Wasm threads and the default Rust features are in all three engines | webassembly.org features.json | verifier: confirmed; rust-reviewer: — | all values match; "Edge follows Chrome" is inferred (no Edge key); `mutable-globals` is missing from the doc's list | fixed: the mutable-globals gap noted |
+| R1-BND-F28 | wasm-bindgen supports all four browsers | guide browser-support.md | verifier: confirmed; rust-reviewer: confirmed | "Firefox, Chrome, Safari, and Edge browsers are all supported by `wasm-bindgen`." | confirmed; no change |
+| R1-BND-F29 | WebTransport and WebSocket both work in workers | MDN WebTransport and WebSocket | verifier: confirmed; rust-reviewer: — | "This feature is available in Web Workers."; "Since March 2026, this feature works across the latest devices and browser versions." | confirmed; no change |
+| R1-BND-F30 | timers are 5 µs isolated and 100 µs not; a worker has its own time origin | MDN Performance.now | verifier: confirmed; rust-reviewer: — | "Security requirements"; intro, "the time when the worker is run in Worker and ServiceWorker contexts" | confirmed; added to REC2's Rests on |
+| R1-BND-F33 | Vite bundles workers and Wasm and can set dev-server headers | vite.dev features and server-options (v8.3.4) | verifier: confirmed; rust-reviewer: — | Web Workers, "Import with Constructors"; WebAssembly, "Manual Initialization"; `server.headers` | confirmed; no change |
+| CS1 | fixed step, button bitmask and input command declared but never wired | shamble-core.js:1479-1481 and the legacy inventory | verifier: confirmed; rust-reviewer: — | code | confirmed; no change |
+| GP2 | actions run at event time; press and release edges in v2 | legacy inventory, row GP2 | verifier: confirmed; rust-reviewer: — | row | confirmed; no change |
+| GP13 | rAF loop with variable dt clamped to 0.05 s; the world freezes for pause, shop, tutorial and hit-stop | shamble-game.js:3053 | verifier: confirmed; rust-reviewer: — | `loop()` | confirmed; no change |
+| GP14 | HUD writes interleaved through the step; `update()` costs 0.49 ms | inventory row GP14; AUDIT_BUGS_PERF.md:10 | verifier: confirmed; rust-reviewer: — | row; runtime profile | confirmed; no change |
+| GP10 | about 30 DOM writes per frame fell to 0.01 real writes | AUDIT_BUGS_PERF.md:27 and :85 | verifier: confirmed; rust-reviewer: — | P3; CS3 | confirmed; no change |
+| GC2 | 12 fixed slots; 0.80–1.00 ms per step at 48 soldiers | inventory row GC2; docs/reports/2026-10-16-three-teams-core.md:48 | verifier: confirmed; rust-reviewer: — | row; table | confirmed; no change |
+| GA15 | one state struct per soldier; aim pitch travels in a side channel | inventory row GA15 | verifier: confirmed; rust-reviewer: — | row | confirmed; no change |
+| VISION_V2 §3 | "Bots fill empty slots." | VISION_V2 §3 | verifier: confirmed; rust-reviewer: — | the [DEFAULT] line | confirmed; no change |
+| VISION_V2 §4 | four browsers; integrated-graphics laptop at 30+ fps; fair up to about 100 ms of ping | VISION_V2 §4 | verifier: confirmed; rust-reviewer: — | lines 1, 2 and 4 | confirmed; no change |
+| VISION_V2 §5 | guest play first, login later | VISION_V2 §5 | verifier: confirmed; rust-reviewer: — | line 1 | confirmed; no change |
+| LOOP_V2 §11 | scale points N = 12, 24, 36, 48 | LOOP_V2 §11 | verifier: confirmed; rust-reviewer: — | "Then run the scale test on this map (N = 12, 24, 36, 48)." | confirmed; no change |
+| REC2 basis | the sim's own Wasm memory cannot be handed to the page by transfer (needed for "one block copy per tick"; no finding) | WebAssembly JS API §5.3 | verifier: missing claim (finding 1) | §5.3 "Memories": "Set buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"." | re-sourced: R1-BND-F35 |
+
+### 5. Abilities and effects (unit `abilities`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-ABL-F1 | An attribute has a base and a current value | tranek README | verifier: confirmed; rust-reviewer: — | §4.3.2, l.510 | confirmed; no change |
+| R1-ABL-F2 | Three duration types | tranek | verifier: confirmed; rust-reviewer: — | §4.5.1 table, l.839-841 (the doc says §4.5) | fixed: section corrected to §4.5.1 |
+| R1-ABL-F3 | Periodic effects; they are not predicted | tranek | verifier: confirmed; rust-reviewer: — | §4.5.1 l.843 "**Note:** `Periodic Effects` cannot be [predicted]"; §4.10 l.2569 | fixed: section corrected to §4.5.1 |
+| R1-ABL-F4 | Aggregation formula; Multiply modifiers summed; Override | tranek | verifier: confirmed; rust-reviewer: — | §4.5.4 l.909-914; summing quote at §4.5.4.1 l.933 | fixed: Override rule quoted; summing location added |
+| R1-ABL-F5 | Stacking: Duration/Infinite only, by source or target, three policies | tranek | verifier: confirmed (its "only by tooltips" is overstated); rust-reviewer: — | §4.5.5 l.1041-1050 | fixed: "only" removed (see C1) |
+| R1-ABL-F6 | Tags are hierarchical and counted | tranek | verifier: confirmed; rust-reviewer: — | §4.2 l.419, l.427 | confirmed; no change |
+| R1-ABL-F7 | Granted tags; ongoing tag requirements | tranek | verifier: confirmed; rust-reviewer: — | §4.5.7 l.1081-1082 | confirmed; no change |
+| R1-ABL-F8 | Effects grant abilities, with a removal policy | tranek | verifier: confirmed; rust-reviewer: — | §4.5.6 l.1060-1070 | confirmed; no change |
+| R1-ABL-F9 | Executions are not predicted and must be C++ | tranek | verifier: confirmed; rust-reviewer: — | §4.5.12 l.1251; §4.10 l.2561 | confirmed; no change |
+| R1-ABL-F10 | Cost is an Instant effect; cooldown is a Duration effect plus a tag | tranek | verifier: confirmed; rust-reviewer: — | §4.5.14 l.1363; §4.5.15 l.1399 | confirmed; no change |
+| R1-ABL-F11 | Required, blocked and cancel tags; stun | tranek | verifier: confirmed; rust-reviewer: — | §4.6.9 l.2089-2093; §5.1 l.2885 | confirmed; no change |
+| R1-ABL-F12 | Local Predicted runs on the client first | tranek | verifier: confirmed; rust-reviewer: — | §4.6.8 l.2076 | confirmed; no change |
+| R1-ABL-F13 | Lists of what is and is not predicted | tranek | verifier: confirmed; rust-reviewer: — | §4.10 l.2557-2569 | confirmed; no change |
+| R1-ABL-F14 | The prediction key's round trip | tranek | verifier: confirmed; rust-reviewer: — | §4.10.1 l.2598, l.2610 (the doc says §4.10) | fixed: section corrected to §4.10.1 |
+| R1-ABL-F15 | Paragon and Fortnite do not predict damage; predict the minimum | tranek | verifier: confirmed; rust-reviewer: — | §4.10 l.2551-2555 | fixed: the attribution upgraded to confirmed |
+| R1-ABL-F16 | Cues are non-gameplay and unreliable | tranek | verifier: confirmed; rust-reviewer: — | §4.8.1 l.2303; "considered unreliable" is at §4.8.9 l.2507 (the doc says §4.8.1) | fixed: §4.8.9 added for the reliability sentence |
+| R1-ABL-F17 | Fortnite keeps its own bookkeeping for weapon fire rates | tranek | verifier: confirmed; rust-reviewer: — | §11.1.1, Q7, l.3352-3358 | fixed: latency context upgraded to confirmed; REC2's reason and REC4 now rest on it |
+| R1-ABL-F18 | The int16 activation key used as a shared seed | tranek | verifier: confirmed; rust-reviewer: — | §5.5 l.2942 | fixed: both inferred points upgraded; added to REC3's Rests on |
+| R1-ABL-F19 | Paragon slows: only the strongest applies | tranek | verifier: confirmed; rust-reviewer: — | §5.7 l.2959 | confirmed; no change |
+| R1-ABL-F21 | Quake III runs the same player code on both sides and adds a fire event | bg_pmove.c | verifier: confirmed; rust-reviewer: — | l.23-24; `PM_Weapon` l.1644 | confirmed; added to REC2's Rests on |
+| R1-ABL-F22 | Integer millisecond timer; `+=` carries the overshoot; releasing the trigger resets it; ammo is decremented; i… | bg_pmove.c, plus q_shared.h l.1157 `int weaponTime;` | verifier: confirmed; rust-reviewer: — | `PM_Weapon` l.1576-1705 | confirmed; no change |
+| R1-ABL-F23 | leafwing_abilities 0.13.0 | docs.rs | verifier: —; rust-reviewer: confirmed (bevy ^0.19 now C) | "Built for the Bevy game engine." | fixed: Bevy ^0.19 upgraded to confirmed |
+| R1-ABL-F24 | bevy_gauge 0.5.1 | docs.rs | verifier: —; rust-reviewer: confirmed (R1: inferred) | "Define attributes as expressions, not update systems." | fixed: label upgraded to confirmed |
+| R1-ABL-F25 | bevy_alchemy 0.6.0 | docs.rs README | verifier: —; rust-reviewer: confirmed (R1: inferred) | "New applications will overwrite the existing one." | fixed: label upgraded to confirmed |
+| R1-ABL-F26 | `HashMap` is randomly seeded and iterates in arbitrary order | doc.rust-lang.org | verifier: confirmed; rust-reviewer: — | overview; `iter` | confirmed; no change |
+| R1-ABL-N1 | 48 soldiers = 24v24 | VISION_V2 §3 | verifier: confirmed; rust-reviewer: — | l.44 | confirmed; REC6 now rests on it |
+| R1-ABL-N2 | "48 simulated players at a 30 Hz server tick within X ms" | V2_PHASE0_BRIEF | verifier: confirmed; rust-reviewer: — | l.138-139 | confirmed; REC6 now rests on it |
+| R1-ABL-N3 | "about 100 ms of ping" | VISION_V2 §4 | verifier: confirmed; rust-reviewer: — | l.54 | confirmed; no change |
+| R1-ABL-N4 | Shabzon 0.072 s, so 13.9 shots/s | shamble-core.js | verifier: confirmed; rust-reviewer: — | :114 (the 13.9 is in the GC5 row; REC2 cites CD12) | confirmed; no change |
+| R1-ABL-N5 | 10.0 vs 13.9 shots/s at 30 Hz; 28 % loss | GC5 | verifier: confirmed; rust-reviewer: — | LEGACY_INVENTORY l.244; 28.1 % by arithmetic; not re-measured | confirmed; no change |
+| R1-ABL-N6 | Warrior kills Conscript in 0.86 s | CD13 | verifier: confirmed; rust-reviewer: — | l.94; recomputed: 13 shots of 8 against 100 HP, 12 × 0.072 = 0.864 s | confirmed; no change |
+| R1-ABL-N7 | Head 2.6, body 1.0, legs 0.65; Bagpipe head 1.2 | shamble-core.js | verifier: confirmed; rust-reviewer: — | :88, :112 | confirmed; no change |
+| R1-ABL-N8 | Shabzon falloff 15 / 35 m, minimum 0.2; `falloffMult` | code | verifier: confirmed; rust-reviewer: — | core:114, game:1484 | confirmed; no change |
+| R1-ABL-N9 | Torque Bow fuse 0.55 s | shamble-game.js | verifier: confirmed; rust-reviewer: — | :1787 | confirmed; no change |
+| R1-ABL-N10 | Shabzon damage 8 | shamble-core.js | verifier: confirmed; rust-reviewer: — | :114 | confirmed; no change |
+| R1-ABL-N11 | Banzai speed ×1.3; Shield slow ×0.72 | code | verifier: confirmed; rust-reviewer: — | game:2774; core:85 | confirmed; no change |
+| R1-ABL-N12 | "Stolen items only last until the Hammer dies." | LOOP_V2 §6 | verifier: confirmed; rust-reviewer: — | l.86 | confirmed; REC1 mark 3 now follows its "item" and "last hit or tick" wording |
+| R1-ABL-N13 | Abilities locked until Tech 1 | LOOP_V2 §4 | verifier: confirmed; rust-reviewer: — | l.50, l.58 | confirmed; no change |
+| R1-ABL-N14 | Feel kit, split feedback, active reload with a short damage boost | LOOP_V2 §7 | verifier: confirmed; rust-reviewer: — | l.90-94 | confirmed; no change |
+| R1-ABL-N15 | Vehicles have "(leech, marking)" | VISION_V2 §6.4 | verifier: confirmed for the names only; reading "marking" as "an effect that grants a tag" is inference; rust-reviewer: — | l.71 | confirmed for the names; REC1 now marks "marking as a tag-granting effect" as our reading |
+| R1-ABL-N16 | The input command has a sequence field | CS1 | verifier: confirmed; rust-reviewer: — | LEGACY_INVENTORY l.169 | confirmed; no change |
+| R1-ABL-C1 | REC1: "F5 says GAS's own policies are only documented in tooltips" | tranek §4.5.5 | verifier: unsupported; rust-reviewer: — | l.1050 says only "They have helpful hover tooltips in the `GameplayEffect` Blueprint." There is no "only". | fixed: REC1's reason rewritten to the source's words (no "only") |
+| R1-ABL-C2 | REC2: F17 shows Fortnite keeps "the hottest path ... out of effect bookkeeping" | tranek §11.1.1 Q7 | verifier: unsupported; rust-reviewer: — | The source's reason is latency: "Higher latency connections would have a lower ROF with basic attacks." | fixed: REC2's reason re-based on the source's latency answer (R1-ABL-F17, confirmed); the hot-path point marked as our inference |
+
+### 6. Data formats and hot reload (unit `data-hotreload`)
+
+| Claim id | Claim | Source | Verdict (verifier; rust-reviewer) | Location | Final state |
+|---|---|---|---|---|---|
+| R1-DATA-F1 | deny_unknown_fields errors on unknown keys; by default JSON ignores them | serde container-attrs.md | verifier: confirmed; rust-reviewer: confirmed | deny_unknown_fields: "Always error during deserialization when encountering unknown fields." / "When this attribute is not present, by default unknown… | confirmed; no change |
+| R1-DATA-F2 | cannot be combined with flatten | same | verifier: confirmed; rust-reviewer: confirmed | deny_unknown_fields note: "this attribute is not supported in combination with flatten, neither on the outer struct nor on the flattened field." | confirmed; no change |
+| R1-DATA-F3 | try_from loads through a fallible conversion | same | verifier: confirmed; rust-reviewer: confirmed | try_from: "Deserialize this type by deserializing into `FromType`, then converting fallibly." | confirmed; no change |
+| R1-DATA-F4 | default and alias | serde field-attrs.md | verifier: confirmed; rust-reviewer: confirmed | default: "If the value is not present when deserializing, use the `Default::default()`."; alias: "Deserialize this field from the given name *or* from… | confirmed; no change |
+| R1-DATA-F5 | untagged gives poor errors; internal tag exists | container-attrs.md | verifier: confirmed; rust-reviewer: confirmed | untagged: "When no variant matches, `untagged` does not produce an informative error"; tag: "Use the internally tagged enum representation, with the g… | fixed: the rest of the sentence added |
+| R1-DATA-F6 | float_roundtrip is exact, about 2x float-parse cost | serde_json Cargo.toml 1.0.154 | verifier: confirmed; rust-reviewer: confirmed | float_roundtrip comment, matches the draft word for word | confirmed; no change |
+| R1-DATA-F7 | one-based line and column; Syntax vs Data | docs.rs serde_json Error | verifier: confirmed; rust-reviewer: confirmed | line(): "One-based line number at which the error was detected."; classify(): "Category::Data - input data that is semantically incorrect" | confirmed; no change |
+| R1-DATA-F8 | serde_path_to_error gives the field path | docs.rs 0.1.20 | verifier: confirmed; rust-reviewer: confirmed | crate root: "exposes the chain of field names leading to the error."; example "dependencies.serde.version" | confirmed; no change |
+| R1-DATA-F9 | recursion limit on by default; unbounded_depth is opt-in | Cargo.toml + docs.rs Deserializer | verifier: confirmed; rust-reviewer: confirmed (value unstated) | disable_recursion_limit: "This method is only available if serde_json is built with the "unbounded_depth" feature." (the default limit's value is not… | confirmed; no change |
+| R1-DATA-F10 | untyped Value tree, then from_value | docs.rs serde_json::value | verifier: confirmed; rust-reviewer: confirmed | "The Value enum, a loosely typed way of representing any valid JSON value."; from_value: "Interpret a `serde_json::Value` as an instance of type `T`." | confirmed; no change |
+| R1-DATA-F11 | preserve_order | Cargo.toml | verifier: confirmed; rust-reviewer: confirmed | preserve_order comment, verbatim | confirmed; added to REC1's Rests on |
+| R1-DATA-F12 | RON's limits and features | github ron-rs/ron README; docs.rs ron | verifier: confirmed; rust-reviewer: confirmed (now 0.12.3, 2026-10-28) | "RON is not designed to be a fully self-describing format (unlike JSON)"; "limited support" list covers tag, untagged and flatten; the feature list is… | fixed: version note (0.12.3) and the feature list upgraded |
+| R1-DATA-F13 | TOML has comments, no null; the crate targets spec 1.1.0 | toml.md; docs.rs toml | verifier: confirmed; rust-reviewer: confirmed | "A hash symbol marks the rest of the line as a comment, except when inside a string."; the "Values must have one of the following types." list has no… | confirmed; no change |
+| R1-DATA-F14 | serde_yaml archived | github dtolnay/serde-yaml | verifier: confirmed; rust-reviewer: confirmed | banner: "This repository was archived by the owner on Mar 25, 2024." and "This project is no longer maintained." | confirmed; no change |
+| R1-DATA-F15 | JSON Schema bounds, enum, required, UI annotations | draft-bhutton-json-schema-validation-01 | verifier: confirmed; rust-reviewer: — | §6.2.4 "minimum" definition; §9 "documentation and user interface display purposes"; §9.3 "applications SHOULD refrain from usage of the declared prop… | fixed: deprecated located at §9.3 |
+| R1-DATA-F16 | schemars writes 2020-12 and follows serde | docs.rs schemars 1.2.3 | verifier: confirmed; rust-reviewer: confirmed | "The default settings currently conform to JSON Schema 2020-12,"; "Any generated schema should match how serde_json would serialize/deserialize to/fro… | confirmed; no change |
+| R1-DATA-F17 | schemars reads garde range, length and pattern, and doc comments | schemars attributes.md | verifier: confirmed; rust-reviewer: confirmed | "many of which will be used by Schemars to generate more accurate schemas."; "Sets the `minimum`/`maximum` properties for number schemas." | confirmed; no change |
+| R1-DATA-F18 | garde: Validate, a context value, error paths | docs.rs garde 0.23.0 | verifier: confirmed; rust-reviewer: confirmed | "The context may be any type without generic parameters."; "username[0]: length is lower than 3"; no mention of Wasm (matches the draft and OQ5) | confirmed; REC2 now names its open Wasm dependency (OQ5) |
+| R1-DATA-F19 | Ajv validates 2020-12 | github ajv README | verifier: confirmed; rust-reviewer: — | Features: "Ajv implements JSON Schema draft-06/07/2019-09/2020-12 standards" | confirmed; no change |
+| R1-DATA-F20 | notify's known gaps; debouncers | docs.rs notify 8.2.1 | verifier: confirmed; rust-reviewer: confirmed | Known Problems: "Network mounted filesystems like NFS may not emit any events for notify to listen to." | confirmed; no change |
+| R1-DATA-F21 | Bevy hot reload is desktop-only, behind file_watcher | docs.rs bevy_asset 0.20.0 | verifier: confirmed; rust-reviewer: confirmed | "To enable asset hot reloading on desktop platforms, enable `bevy`'s `file_watcher` cargo feature." | confirmed; REC5 now marks the browser part as inferred |
+| R1-DATA-F22 | Vite server.ws.send / hot.on / hot.send | vite.dev api-plugin and api-hmr (v8.3.4) | verifier: confirmed; rust-reviewer: — | Client-server Communication; hot.send: "Send custom events back to Vite's dev server."; no mention of workers | confirmed; no change |
+| R1-DATA-F23 | "__proto__" in JSON; accessor; Object.assign uses [[Set]] | MDN (3 pages) | verifier: confirmed; rust-reviewer: — | "In JSON, `"__proto__"` is a normal property key."; proto page: accessor sentence; assign Description: "It uses `[[Get]]` on the source and `[[Set]]`… | confirmed; no change |
+| R1-DATA-F24 | use Map/Set instead of object literals | OWASP Prototype Pollution cheat sheet | verifier: confirmed; rust-reviewer: — | "Developers should use `new Set()` or `new Map()` instead of using object literals:" | confirmed; no change |
+| R1-DATA-F25 | validate syntax and meaning, on the server; set required and additional properties | OWASP Input Validation cheat sheet | verifier: confirmed; rust-reviewer: — | Common Pitfalls: "Validate on the server even when the browser checks the same fields." "Client-side validation is bypassable; use it for immediate fe… | confirmed; no change |
+| R1-DATA-F26 | JSON.parse numbers lose precision | MDN JSON.parse | verifier: confirmed; rust-reviewer: — | Description > The reviver parameter: "may lose precision in the process." | confirmed; no change |
+| R1-DATA-F27 | immutable plus hashed URLs | MDN Cache-Control | verifier: confirmed; rust-reviewer: — | Response Directives > immutable: both sentences verbatim | confirmed; no change |
+| R1-DATA-F28 | include_bytes | doc.rust-lang.org (1.99.1) | verifier: confirmed; rust-reviewer: — | "Includes a file as a reference to a byte array." | confirmed; no change |
+| R1-DATA-F29 | SHA-256 in Web Workers, secure contexts only | MDN SubtleCrypto.digest | verifier: confirmed; rust-reviewer: — | "This feature is available in Web Workers."; "available only in secure contexts (HTTPS)" | confirmed; REC6 now carries its secure-context caveat |
+| Legacy facts | legacy row Legacy facts | repo | verifier: confirmed; rust-reviewer: — | shamble-game.js:41 rulesMerge Object.assign; shamble-core.js:180 envMerge; shamble-game.js:661 version:1, read nowhere in shamble-*.js; shamble-editor… | confirmed; no change |
+| VISION_V2 §4, 100 ms | docs/VISION_V2.md:54 | VISION_V2 §4, 100 ms | verifier: confirmed; rust-reviewer: — | "`[DEFAULT]` Matches feel fair up to about 100 ms of ping." | confirmed; no change |
+| Design references | legacy row Design references | repo | verifier: confirmed; rust-reviewer: — | LOOP_V2.md:8 "one data table"; LOOP_V2 §7 Feel Lab `[DECIDED]`; EDITOR_V2 §2 rule 1, §3 validation panel ("the 6 m gap rule"), §4, §5; STATUS.md:96 SE… | confirmed; EDITOR_V2 §2 rule 1 and §3 added to REC1's and REC7's Rests on |
+
+### Other reviewer findings and what the fix step did
+- **Rests-on lists completed** (verifier, every unit): R1-ECS-REC1 (F7, F19, F20, F32, F35, the legacy kinds, CS7, GC2,
+  VISION_V2 §4), REC2 (GP14), REC3 (CS7, GC15); R1-TICK-REC2 (F3, GN4); R1-DET-REC1 (TL13, STATUS.md:70), REC2 (F3,
+  F18, F20, F22), REC5 (F33, GP14), REC6 (F3, F33, GN8); R1-BND-REC1 (F32), REC2 (F30, F35), REC3 (F34); R1-ABL-REC2
+  (F21), REC3 (F18, GC5), REC4 (F17), REC5 (CD12–CD14, CS3, CC9), REC6 (the brief's example and VISION_V2 §3);
+  R1-DATA-REC1 (F11, EDITOR_V2 §2 rule 1), REC2 (the open OQ5 and OQ11), REC7 (EDITOR_V2 §3).
+- **Recommendation text, reasons and marks changed:** R1-ECS-REC1 (reason: the clone_from overreach, bevy_ggrs named as
+  third-party, hecs's F19 and F20 weighed, the uneven 0.x argument; mark 2 rewritten); R1-TICK-REC2 ("halves" marked
+  inferred, "every legacy measurement" corrected, P3's explanation); R1-DET-REC4 (Pcg32 fallback sourced), REC5 and REC6
+  ("per process" corrected); R1-BND-REC2 (why the one copy), REC3 (basis F34), REC5 (the costs now each name a finding;
+  the login reasoning on F20 and F23a, with OQ9); R1-ABL-REC1 (C1; marking marked as our reading; mark 3 follows
+  LOOP_V2 §6), REC2 (C2), REC4 (the effect-removal gap and F17's known failure stated); R1-DATA-REC5 (F21's inference
+  labelled; the partial §6 trace stated, OQ12), REC6 (secure-context caveat). No pass-mark number changed.
+- **VISION_V2 links corrected:** R1-TICK-REC3 (§3, not §6.1), REC4 (the counters trace to no §6 item); R1-DET-REC6
+  (§6.6 wording); R1-BND-REC1 (§6.2 wording), REC6 (§6.1 dropped; offline play traces to no §6 item, OQ1);
+  R1-ABL-REC6 (no §6 item: a budget).
+- **Labels, tiers, versions and locations:** the upgrades and corrections in the "Final state" column; tiers of the two
+  Fiedler articles (R1-XU-OQ6 settled); the HashMap seed (R1-XU-OQ5 settled); ron 0.12.3; the rustwasm book archived.
+- **Rust risks** (rust-reviewer's ranked list): risk 5 fixed in place (R1-ECS-REC1 mark 2, R1-ECS-F35, R1-ECS-OQ2
+  settled); risk 9 joined R1-DET-OQ5; risks 2, 3, 4, 6, 7 and 8 and the tokio part of risk 1 became R1-RR-OQ1–OQ7.
+
+### Findings not applied as written, and why
+- **rust-reviewer's missed risks (2–4, 6–8) are open questions, not recommendation changes.** The reviewer asks for them
+  to go into the recommendations; the fix step may add no recommendation and no claim of its own (fix rule 6), and
+  their evidence (wide, simba, Cargo profiles, RustSec) was read by the reviewer, not by a unit or the verifier. The
+  synthesis decides (R1-RR-OQ1–OQ7). Risks 1 (beyond tokio) and 10 are R2's.
+- **R1-TICK-REC5's "read from shared memory" is kept** (verifier tick finding 7): it is a disagreement between two
+  units, which the assembly keeps on both sides by rule; R1-XU-OQ3 decides it. The fix step only added a pointer.
+- **R1-DATA-REC5's mid-match reload is kept, not cut back** (verifier data finding 3 offered "argue or cut back"): the
+  trace is now stated as partial and the choice is R1-DATA-OQ12, since dropping a development feature is Mustafa's and
+  the Advisor's call.
+- **R1-TICK-REC4's overrun counters are kept** (verifier tick finding 6): the recommendation's own pass marks read them;
+  their trace is now stated honestly (operations monitoring, R6's scope, no §6 item).
+- **R1-DET-REC5's link to §6.5 is kept** (verifier determinism finding 7, "loose"): server-side outcomes such as steals
+  depend on a fixed processing order (our inference).
+- **The GAS facts still come from one community write-up** (verifier abilities finding 9): Epic's documentation is
+  outside the allow list; R1-ABL-OQ1 stands.
 
 ## Sources
 
 ### Sources read (161)
 
-Every source read by any unit, merged and de-duplicated by URL (170 reads across the six units; a page read by more
-than one unit appears once, with every unit that read it). All were read on 2026-10-27. By tier: official 138, shipped game 8,
-other 14, and 1 labelled differently by two units (R1-XU-OQ6).
+Every source read by any unit, merged and de-duplicated by URL (170 reads across the six units; a page read by more than
+one unit appears once, with every unit that read it). All were read on 2026-10-27. By tier, after the fix step's
+relabelling (R1-XU-OQ6): official 138, shipped game 7, other 16.
 
 | # | URL | Title | Version or page date | Tier | Read by unit | Read |
 |---|---|---|---|---|---|---|
@@ -2764,11 +3334,11 @@ other 14, and 1 labelled differently by two units (R1-XU-OQ6).
 | 27 | https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html | RigidBodySet | rapier3d 0.36.1 | official | ecs | 2026-10-27 |
 | 28 | https://rapier.rs/docs/user_guides/rust/serialization | Rapier serialization guide | Rust guide 0.36, no date | official | ecs | 2026-10-27 |
 | 29 | https://github.com/dimforge/rapier/issues/910 | Non-determinism in BroadPhase when restoring from serialized snapshot | opened 2026-01-16, closed 2026-06-09 | other | ecs | 2026-10-27 |
-| 30 | https://rustwasm.github.io/book/reference/code-size.html | Shrinking .wasm code size | "unpublished documentation", no date | official | ecs | 2026-10-27 |
+| 30 | https://rustwasm.github.io/book/reference/code-size.html | Shrinking .wasm code size | "unpublished documentation", no date | official (archived: the book's repository was archived on 2025-08-25, verifier 2026-10-28) | ecs | 2026-10-27 |
 | 31 | https://github.com/SanderMertens/ecs-faq | ECS FAQ (other tier; read, not cited) | no date | other | ecs | 2026-10-27 |
 | 32 | https://gafferongames.com/post/fix_your_timestep/ | Glenn Fiedler, "Fix Your Timestep!" | page dated 2004-06-10 (read twice for quotes) | other | tick | 2026-10-27 |
 | 33 | https://gafferongames.com/post/snapshot_interpolation/ | Glenn Fiedler, "Snapshot Interpolation" | 2014-11-30 | other | tick | 2026-10-27 |
-| 34 | https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ | Glenn Fiedler, "What Every Programmer Needs To Know About Game Networking" | 2010-02-24 | other (tick) / shipped game, practitioner article (determinism): R1-XU-OQ6 | tick, determinism | 2026-10-27 |
+| 34 | https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ | Glenn Fiedler, "What Every Programmer Needs To Know About Game Networking" | 2010-02-24 | other (the determinism unit had "shipped game, practitioner article"; settled at the fix step: R1-XU-OQ6) | tick, determinism | 2026-10-27 |
 | 35 | https://gafferongames.com/post/integration_basics/ | Glenn Fiedler, "Integration Basics" | 2004-06-01 | other | tick | 2026-10-27 |
 | 36 | https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/server/sv_init.c | Quake III Arena GPL source, `code/server/sv_init.c` | master, (C) 1999-2005 | shipped game | tick | 2026-10-27 |
 | 37 | https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/server/sv_main.c | Quake III Arena GPL source, `code/server/sv_main.c` | master (same repository) | shipped game | tick | 2026-10-27 |
@@ -2816,7 +3386,7 @@ other 14, and 1 labelled differently by two units (R1-XU-OQ6).
 | 79 | https://docs.rs/rand_pcg/latest/rand_pcg/ | rand_pcg crate docs | 0.10.2, 2026-09-22 | official | determinism | 2026-10-27 |
 | 80 | https://docs.rs/fixed/latest/fixed/ | fixed crate docs | 1.31.0, 2026-09-20 | official | determinism | 2026-10-27 |
 | 81 | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math | MDN, `Math` | last modified 2025-07-10 | official | determinism | 2026-10-27 |
-| 82 | https://gafferongames.com/post/floating_point_determinism/ | Glenn Fiedler, "Floating Point Determinism" | 2010-02-24 | shipped game | determinism | 2026-10-27 |
+| 82 | https://gafferongames.com/post/floating_point_determinism/ | Glenn Fiedler, "Floating Point Determinism" | 2010-02-24 | other (quotes shipped-game developers; the unit had "shipped game"; relabelled at the fix step: R1-XU-OQ6) | determinism | 2026-10-27 |
 | 83 | https://blog.rust-lang.org/inside-rust/2025/07/21/sunsetting-the-rustwasm-github-org/ | "Sunsetting the rustwasm GitHub org" | 2025-07-21 | official | boundary-worker | 2026-10-27 |
 | 84 | https://github.com/wasm-bindgen/wasm-bindgen/releases | wasm-bindgen releases | 0.2.118 to 0.2.129 (2026) | official | boundary-worker | 2026-10-27 |
 | 85 | https://github.com/wasm-bindgen/wasm-bindgen/releases/tag/0.2.128 | release 0.2.128 | "05 Sep" (2026) | official | boundary-worker | 2026-10-27 |
@@ -2907,6 +3477,31 @@ Per unit, as each unit labelled its sources (the not-read count is the unit's ow
 | boundary-worker | 42 | 42 | 0 | 0 | 6 |
 | abilities | 8 | 1 | 1 | 6 | 9 |
 | data-hotreload | 35 | 35 | 0 | 0 | 5 |
+
+After the fix step's relabelling (R1-XU-OQ6), the determinism unit's two Fiedler articles count as other (its row
+would read 30 / 0 / 2).
+
+### Sources read at the fix step (2026-10-28)
+Read by engine-architect to re-source or correct the claims the reviewers found wrong, unsupported or incomplete. Three
+pages are new to this file; the rest are re-reads of pages listed above.
+
+| # | URL | Title | Version or page date | Tier | Used for | Read |
+|---|---|---|---|---|---|---|
+| F1 | https://doc.rust-lang.org/std/collections/struct.HashMap.html | Rust std `HashMap` (re-read; #21 above) | std 1.99.1 (2026-10-13) | official | R1-DET-F33 | 2026-10-28 |
+| F2 | https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm | MDN, The structured clone algorithm (new) | last modified 2025-06-29 | official | R1-BND-F34 | 2026-10-28 |
+| F3 | https://webassembly.github.io/spec/js-api/ | WebAssembly JavaScript Interface, §5.3 Memories (new) | Editor's Draft, 27 October 2026 | official | R1-BND-F35 | 2026-10-28 |
+| F4 | https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Opener-Policy | MDN, `Cross-Origin-Opener-Policy` (re-read; #108) | last modified 2026-07-12 | official | R1-BND-F23, R1-BND-OQ9 | 2026-10-28 |
+| F5 | https://doc.rust-lang.org/std/clone/trait.Clone.html | Rust std `Clone` (re-read; #24) | std 1.99.1 | official | R1-ECS-F35 | 2026-10-28 |
+| F6 | https://docs.rs/rapier3d/latest/rapier3d/dynamics/struct.RigidBodySet.html | rapier3d `RigidBodySet`, Trait Implementations (re-read; #27) | rapier3d 0.36.1 | official | R1-ECS-F35 | 2026-10-28 |
+| F7 | https://docs.rs/rand_pcg/latest/rand_pcg/ | rand_pcg crate docs (re-read; #79) | 0.10.2 | official | R1-DET-F34 | 2026-10-28 |
+| F8 | https://docs.rs/rand_pcg/latest/rand_pcg/struct.Lcg64Xsh32.html | rand_pcg `Lcg64Xsh32` (new) | 0.10.2 | official | R1-DET-F34 | 2026-10-28 |
+| F9 | https://raw.githubusercontent.com/WebAssembly/threads/main/proposals/threads/Overview.md | Wasm threads proposal overview (re-read; #117) | main | official | R1-BND-F17 (quote corrected) | 2026-10-28 |
+| F10 | https://raw.githubusercontent.com/tranek/GASDocumentation/master/README.md | GASDocumentation README (re-read in the verifier's downloaded copy; #122) | UE 5.3 | other | R1-ABL-F4, F5, F15, F17, F18 (quotes checked) | 2026-10-28 |
+
+Pages the reviewers read that this file now cites (read by the verifier on 2026-10-28, not by the fix step):
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random (R1-DET-F30) and
+https://github.com/rustwasm/book (the archive notice, R1-ECS-F33). rust-reviewer's own sources (RustSec, wide, simba,
+glam, Cargo profiles) are listed in its notes and feed only the open questions R1-RR-OQ1–OQ7.
 
 ### Sources not read (48)
 
