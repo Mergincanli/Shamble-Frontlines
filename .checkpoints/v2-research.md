@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 21:25 Amsterdam
+- **Last update:** 2026-10-28 21:50 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -58,8 +58,8 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
-| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
+| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe; fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
+| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read); fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer (high) | 1 owner, 7 question drafts | 7/7 (DONE 21:21) | yes, 605c09d (92 F, 25 REC, 33 OQ; 62 read: 61 official, 1 other; 22 not read) | spot-check pending (`prompts/verifier-r3.txt`) | `prompts/graphics-engineer-r3.txt` |
 | R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | running since 17:16 | no | pending | `prompts/engine-architect-r4.txt` |
 | R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | not launched (waits for 2 slots) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
@@ -133,15 +133,21 @@ key (condition A1).
 - Fix 2 + final check: run wf_0ad9f0c0-59d (task w0uq5j48e), launched 21:03 Amsterdam, script
   `v2-research-fix2-run1.js`: pipeline per topic, the owner's second fix (xhigh; prompts `prompts/*-r{1,2}-fix2.txt`,
   notes `*-fix2.md`), then a final check of only what it changed (verifier R1 high, R2 xhigh; prompts
-  `prompts/verifier-r{1,2}-final-check.txt`, notes `verifier-r{1,2}-final-check.md`).
+  `prompts/verifier-r{1,2}-final-check.txt`, notes `verifier-r{1,2}-final-check.md`). DONE 4/4 (21:24 Amsterdam),
+  reports verbatim in `<agent>-r{1,2}-fix2-result.md` and `verifier-r{1,2}-final-check-result.md`: R1 7 confirmed, 0
+  wrong, nits only; R2 14 confirmed, 1 wrong as worded (BUD-REC5, load-bearing for nothing), nits only. The session
+  applied the nits in the verifiers' words and added a "Final check" subsection to each part 7; gate PASS; committed
+  ae492a6. **Wave 1 is verified** (both headers: "verified (every recommendation claim)").
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
 - Wave 2 owners R3, R4, R6: background agents launched 16:16 UTC (17:16 Amsterdam); all three cut off by the org
   spend limit at about 16:26 UTC (HTTP 429, "resets 8pm (UTC)"), notes saved: R3 Q1 drafted
   (`graphics-engineer-r3-r3-wgpu-draft.md`), R6 Q1 drafted (`infra-engineer-r6-r6-host-draft.md`), R4 none yet.
   Resumed by message at 20:03 UTC: R3 and R4; R3 DONE at 20:21 UTC (file committed 605c09d); R6 resumed by message
-  at 20:22 UTC. Next slots: the R3 spot-check and the R5 owner with its CI helper (4 agents at once after this second
-  cut-off).
+  at 20:22 UTC. R3 spot-check then R3 fix: workflow run wf_1f477dcb-7cb (task wytqhqr2s, script
+  `v2-research-r3-check-fix-run1.js`, prompts `prompts/verifier-r3.txt`, `prompts/graphics-engineer-r3-fix.txt`),
+  launched 20:47 UTC. R5 CI helper: background agent launched 20:47 UTC (`prompts/infra-engineer-r5-ci.txt`, notes
+  `infra-engineer-r5-ci.md`). The R5 owner starts when R4 or R6 finishes (4 agents at once after this second cut-off).
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).

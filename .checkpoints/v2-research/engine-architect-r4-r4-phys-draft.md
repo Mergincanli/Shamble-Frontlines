@@ -211,9 +211,9 @@ All sources read 2026-10-28. Tier: official / shipped game / other.
 | Snapshot | Rapier's sets are part of every snapshot (R1-ECS-REC4) and allocate on clone (R1-ECS-REC1 mark 2, R1-ECS-F35); 0.36.0 broke old snapshots (F15) | Statics never change after load, so they stay out of the snapshot (alive flags live in our tables and filter queries through the predicate, F12) | Nothing outside our tables: static index immutable, dynamic index rebuilt each tick | As C |
 | Determinism | `enhanced-determinism` (R1-DET-REC3); the solver's SIMD path is open (R1-DET-OQ2, F16) | Same flag; no solver runs, so its SIMD lanes only matter if queries use them | parry3d's own flag forces libm and scalar maths (R1-DET-F23); the BVH build order is ours | Fully ours (R1-DET-REC2's rules) |
 | Wasm size and CPU | Largest (not measured: F27) | Rapier crate linked; how much unused code is stripped is not documented (inferred) | Smaller than A or B (inferred, not measured: F27) | Smallest (inferred) |
-| Version churn | 12 releases a year with API and format breaks (F15, F6) | The controller's feel can change on upgrade (F6) | parry moves as fast (F22), but the surface used is small: shapes, queries, BVH | None upstream |
-| Effort | Low to start, high to keep deterministic and snapshotted | Low for soldiers; vehicles and mover-vs-mover by us | Medium: the slide-and-step move (Quake's is two short files, F23, F24) and the vehicle sweep | Highest |
-| Fit with §6 | Gives dynamics no §6 item needs; vehicles as Bullet-style cars do not fit walkers and toy-box tanks (F8) | §6.2 well (autostep, slopes, F2); §6.4 by our code | §6.2 and §6.4, all by our code on proven queries | Same fit as C, more risk |
+| Version churn | 12 releases in about a year, with API and format breaks (F15, F6) | The controller's feel can change on upgrade (F6) | parry moves as fast (F22), but the surface used is small: shapes, queries, BVH | None upstream |
+| Effort | Low to start, high to keep deterministic and snapshotted | Low for soldiers; vehicles and mover-vs-mover by us | Medium: the slide-and-step move (Quake III keeps it in two files, F23, F24) and the vehicle sweep | Highest |
+| Fit with §6 | Gives dynamics no §6 item needs; vehicles as Bullet-style cars do not fit a walker and faction tanks (F8; LOOP_V2 §6) | §6.2 well (autostep, slopes, F2); §6.4 by our code | §6.2 and §6.4, all by our code on proven queries | Same fit as C, more risk |
 
 ## Recommendations
 
@@ -290,7 +290,7 @@ All sources read 2026-10-28. Tier: official / shipped game / other.
   or slides like a soldier; what happens to a soldier in its path is a game rule (OQ1). Mount points for weapons are sim
   data (GC17's lesson).
   The reason: kinematic bodies go through walls unless the game sweeps them (F7); Rapier's wheeled vehicle is a
-  Bullet-style dynamic car (F8), while LOOP_V2 §6's vehicles are a walker and toy-box tanks. Answering R1-TICK-OQ9: at
+  Bullet-style dynamic car (F8), while LOOP_V2 §6's vehicles are a walker and faction tanks. Answering R1-TICK-OQ9: at
   `JUG.maxSpeed` 6 m/s a vehicle moves 0.2 m per tick at 30 Hz (arithmetic), well under a soldier's 0.7 m radius, and
   the move is swept anyway, so no physics substeps are needed for kinematic vehicles.
   Rests on: F7, F8, F20; legacy GC17, GW13 (radius 0.7); R1-TICK-OQ9.
