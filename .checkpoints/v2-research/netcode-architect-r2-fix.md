@@ -122,3 +122,31 @@ Batch 15-16, applied:
 - nit · how-to-read bullet on fix-pass markers; recommendations intro (XU-OQ18 scope); fix-pass markers on TRN-REC3 header, INT-REC5 Spy, option 3.5 A, transport Q1
 Next: TL;DR check, sanity greps (dangling refs, ids), DONE.
 - nit · TL;DR counts (152 findings, 116 sources) and review line
+
+## Tally (by type, from the log above)
+- source: 7 (new findings SYNC-F36, TRN-F40, TRN-F41, TRN-F42, ROOM-F19; reviewer quotes re-read and added in place: SYNC-F20, TRN-F17)
+- recommendation: 22 (SYNC-REC2, REC3, REC5, REC6, REC8; BUD-REC1, REC2, REC4, REC5; INT-REC2, REC6, REC7; TRN-REC1, REC3, REC4; ROOM-REC2, REC3, REC5, REC6, REC8; new OQs SYNC-OQ15, ROOM-OQ11)
+- number: 3 (budgets table A RTT-reading rewinds; BUD-REC1 30/20 Hz RTT figures; BUD-REC4 200-250 ms RTT figure). New proposed values inside new safeguards/marks are counted under recommendation.
+- nit: 70 (labels upgraded per verifier, wording, Rests-on additions, Serves lines, OQ notes, pointers, header, TL;DR, part 7)
+## Became open questions
+- SYNC-REC5's victim-side reasoning + mark 2 (rested on SYNC-F34, unsupported, re-source failed: 403 + no allow-listed source) -> R2-SYNC-OQ15
+- ROOM-REC8's local-storage alternative (SEC-GUEST option b) -> R2-ROOM-OQ11 (REC8 itself now uses the cookie)
+## Re-sourced
+- SYNC-F19 (incomplete, C27) -> SYNC-F36 (g_active.c)
+- TRN-F28 "mature" (caveat, Rust risk 1) -> TRN-F40 (RustSec)
+- ROOM-REC8 storage basis (contradicted, M6) -> ROOM-F19 (OWASP)
+- plus new safeguard sources TRN-F41 (RFC 6455 §10), TRN-F42 (tungstenite docs)
+## Not applied / partly, with reasons (also in part 7)
+1. H1's 200 ms cap preference: cap value stays XU-OQ1 (Feel Lab, Mustafa/Advisor; SEC-REWIND). Rest of H1 applied.
+2. H2 final answer: REC3 follows server-only seed; final call stays Mustafa's (SYNC-OQ11, SEC-SPREAD).
+3. M7 longer codes / host-approved tokens / default host lock: to ROOM-OQ10 (host settings are Mustafa's, ROOM-OQ5).
+4. M8 scheme: recorded in ROOM-OQ2 for the ADR; key storage with R6 deferred baseline; RFC 8725 not read by R2.
+5. Rust risk 1 cargo-audit/cargo-deny CI gates: dependency audits are R6's deferred security baseline.
+6. Verifier V4 for BUD-REC4, BUD-REC5, TRN-REC6: no §6 item supported; left to the Advisor (XU-OQ18).
+7. Rust risks 2, 5-9: R1's scope.
+No reviewer finding disputed.
+## Final header status
+verified (every recommendation claim; 5 re-sourced claims await the second pass: R2-SYNC-F36, R2-TRN-F40, R2-TRN-F41, R2-TRN-F42, R2-ROOM-F19)
+Second verifier pass should cover: the 5 new findings; the 22 recommendation changes; the 3 number changes; the 2 in-place re-read quotes (SYNC-F20, TRN-F17).
+Backup of the pre-fix file: scratchpad r2fix/r2-netcode.before-fix.md. Nothing committed or pushed.
+DONE

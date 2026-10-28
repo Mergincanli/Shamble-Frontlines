@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 16:55 Amsterdam
+- **Last update:** 2026-10-28 17:30 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -114,9 +114,13 @@ key (condition A1).
   `security-auditor-r2-protocol-result.md`, `netcode-architect-r2-assemble-result.md`.
 - Rust review: run wf_38e94d0f-403 DONE: report verbatim in `rust-reviewer-r1-r2-result.md`, table in
   `rust-reviewer-r1-r2.md`.
-- Fix: run wf_7dd61ce0-f84 (task wt3t8iqa1), script `v2-research-wave1-fix-run1.js`: engine-architect fixes R1 and
-  netcode-architect fixes R2 (xhigh), prompts `prompts/*-fix.txt`. Then a second verifier pass only where a fix changed
-  a recommendation, a number or a source (the fixers log every change by type).
+- Fix: run wf_7dd61ce0-f84 DONE; topic files committed e4cda31 (R1: 185 F, 76 OQ; R2: 152 F, 72 OQ). Change logs by
+  type in `engine-architect-r1-fix.md` and `netcode-architect-r2-fix.md`.
+- Second pass: scope built by script from the files at a6a97fe / 7907f5c vs e4cda31 (`second-pass-scope-r1.md`,
+  `-r2.md`): R1 5 new findings, 9 basis claims without a first-pass verifier "confirmed" (incl. ECS-F7, F19, F20,
+  BND-F32 added to Rests-on lists at the fix), 46 changed basis findings, 29 changed recs; R2 5 new, 1 (TRN-F36), 32
+  changed, 27 changed recs. Prompts `prompts/verifier-r{1,2}-second-pass.txt` (WebFetch only, no curl, pending
+  VERIFY-FETCH); script `v2-research-second-pass-run1.js`; verifier R1 high, R2 xhigh, 2 agents.
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
 - Next: R1 fixer (engine-architect, xhigh) once the rust-reviewer is back; R2 fixer (netcode-architect, xhigh) once
