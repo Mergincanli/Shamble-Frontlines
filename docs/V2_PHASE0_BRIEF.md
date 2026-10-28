@@ -67,10 +67,10 @@ Otherwise, build it from these rules:
 - **Explicitly not allowed:** skipping verification, shrinking evidence, or using a weaker model to save tokens.
 
 ### 2d. Night shift v2 (update `.claude/NIGHT_SHIFT.md`)
-- **The window is now 00:10–08:30, Europe/Amsterdam:**
-  - start no new item after 07:45;
-  - have the report done by 08:20;
-  - stop by 08:30.
+- **The window is now 00:10–07:30, Europe/Amsterdam** (ends when Mustafa's day starts):
+  - start no new item after 06:45;
+  - have the report done by 07:20;
+  - the 07:10 wake-up is the last one (finish only); stop by 07:30.
 - **Handoff runs through checkpoints.** The status comment on the Night queue points to the active checkpoint file. A
   run that finds a stale "running" status (older than 45 minutes) resumes from that checkpoint.
 - **Focused agents per item type:**
@@ -98,7 +98,7 @@ Add these, in the same style as the existing agents:
 ## 3. Step 2: the routines (you set them up yourself)
 Once kit-v3-0 is merged:
 1. **Replace the old night-shift routines with one "Night shift" routine:**
-   - Schedule triggers **at least hourly from 00:10 to 07:40, Amsterdam time.** Use a cron schedule. Hourly starts
+   - Schedule triggers **at least hourly from 00:10 to 07:10, Amsterdam time** (`10 0-7 * * *`). Use a cron schedule. Hourly starts
      plus the window check also cope with the clock changes.
    - Model Opus 5.5, effort high.
    - This repository attached; no connectors.

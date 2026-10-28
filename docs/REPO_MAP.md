@@ -56,7 +56,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | Path | What it is |
 |---|---|
 | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit |
-| `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–08:30 Amsterdam) |
+| `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
 | `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"`, the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |

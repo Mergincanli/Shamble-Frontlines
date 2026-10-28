@@ -113,7 +113,7 @@ never counts as his go; every comment they write ends with the Claude Code foote
   is approved, with a link to its plan or verdict.
 - Anything that needs Mustafa (Brave checks, merges, decisions) never goes in the queue:
   it goes in "For Mustafa".
-- The night shift's own rules: `.claude/NIGHT_SHIFT.md` (window 00:10–08:30 Amsterdam).
+- The night shift's own rules: `.claude/NIGHT_SHIFT.md` (window 00:10–07:30 Amsterdam).
 
 ## Models and effort (quality first)
 - **Opus 5.5 for everything that thinks:** architecture, code, reviews, research, plans and reports, every subagent
