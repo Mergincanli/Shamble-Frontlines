@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-27 23:00 Amsterdam
+- **Last update:** 2026-10-28 04:50 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -58,7 +58,7 @@
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 6/6 | yes, a6a97fe (180 F, 37 REC, 67 OQ; 161 read, 48 not read) | pending: six verifiers prepared (workflow `v2-research-r1-verify-run1.js`), launch 07:35 | `prompts/engine-architect-r1-*.txt` (6) |
-| R2 | netcode-architect | 5 | 5/5 | assembling: workflow wf_bce24fc0-5c6 (assemble, then verifier + security-auditor) | pending | `prompts/netcode-architect-r2-*.txt` (5) |
+| R2 | netcode-architect | 5 | 5/5 | not yet: run wf_bce24fc0-5c6 cut off by the spend limit mid-assembly (notes + scratchpad r2asm/ kept) | pending | `prompts/netcode-architect-r2-*.txt` (5) |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -100,12 +100,16 @@ key (condition A1).
 - PR #29 (docs-after-r7) merged on Mustafa's "Merg #29" after the advisor's APPROVE of d973b3f (main e9f11be).
 
 ## Running work
-- R2 chain: workflow run wf_bce24fc0-5c6 (task wnmgq5o4d), launched 22:47 Amsterdam, script as launched
-  `.checkpoints/v2-research/v2-research-r2-chain-run1.js` (prompts embedded from `prompts/`): assemble, then verifier-r2
-  and security-auditor-r2. Resume: Workflow({scriptPath, resumeFromRunId: "wf_bce24fc0-5c6"}).
+- R2 chain, run wf_bce24fc0-5c6: FAILED on the org spend limit ("your 5-hour limit resets 2:20am (UTC)"), 2026-10-27
+  about 22:58 UTC. Both assembler calls failed (journal: two "failed" entries, no result cached), so verification
+  never started. The assembler's notes (`netcode-architect-r2-assemble.md`, committed) stop at "build and check";
+  its working files survive in the session scratchpad `r2asm/` (head.md, q6.md, notread.md, meta.json, build.py and a
+  built out.md of 297 KB). Mustafa wrote "Try again". Retry at 07:35 Amsterdam (day window): resume with
+  Workflow({scriptPath: ".checkpoints/v2-research/v2-research-r2-chain-run1.js", resumeFromRunId: "wf_bce24fc0-5c6"});
+  the failed calls re-run live and the assembler goes on from its notes.
 - R1 verify: workflow script `.checkpoints/v2-research/v2-research-r1-verify-run1.js` (six verifiers, high), NOT launched.
 - rust-reviewer-r1-r2: prompt saved, launch once both topic files exist.
-- Saver: `checkpoint.mjs watch v2-research`, background, restarted 22:24 Amsterdam; stops after 110 minutes.
-- 23:50 Amsterdam stop check: send_later trig_01Veu82e8opzfVF7b6ZKAHwp (stop anything running before 00:10).
+- Saver: stopped by the container restart (2026-10-28 early hours); restart it at 07:35.
+- 23:50 stop check (trig_01Veu82e8opzfVF7b6ZKAHwp): delivered late, at 03:43 UTC; nothing was running by then.
 - 07:35 Amsterdam resume: send_later trig_0183GKkBx4Fw3MTExPtQfMRj (resume R2 chain, launch R1 verify, then
   rust-reviewer, report).
