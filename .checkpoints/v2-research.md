@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 04:50 Amsterdam
+- **Last update:** 2026-10-28 15:55 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -99,17 +99,15 @@ key (condition A1).
   prompts `prompts/verifier-r1-<unit>.txt`. Not launched tonight: Mustafa warned the usage limit is near.
 - PR #29 (docs-after-r7) merged on Mustafa's "Merg #29" after the advisor's APPROVE of d973b3f (main e9f11be).
 
+- WINDOW-0730 (a): the R7 session puts the 07:30 end into kit-v3-1 · NIGHT-RESEARCH (a): keep the rule (research by
+  day only) · spend limit: run fewer agents at once (4–5), the same total work, so units finish before a cut-off:
+  the Advisor, relayed by Mustafa, 2026-10-28 about 15:50 Amsterdam.
+
 ## Running work
-- R2 chain, run wf_bce24fc0-5c6: FAILED on the org spend limit ("your 5-hour limit resets 2:20am (UTC)"), 2026-10-27
-  about 22:58 UTC. Both assembler calls failed (journal: two "failed" entries, no result cached), so verification
-  never started. The assembler's notes (`netcode-architect-r2-assemble.md`, committed) stop at "build and check";
-  its working files survive in the session scratchpad `r2asm/` (head.md, q6.md, notread.md, meta.json, build.py and a
-  built out.md of 297 KB). Mustafa wrote "Try again". Retry at 07:35 Amsterdam (day window): resume with
-  Workflow({scriptPath: ".checkpoints/v2-research/v2-research-r2-chain-run1.js", resumeFromRunId: "wf_bce24fc0-5c6"});
-  the failed calls re-run live and the assembler goes on from its notes.
-- R1 verify: workflow script `.checkpoints/v2-research/v2-research-r1-verify-run1.js` (six verifiers, high), NOT launched.
-- rust-reviewer-r1-r2: prompt saved, launch once both topic files exist.
-- Saver: stopped by the container restart (2026-10-28 early hours); restart it at 07:35.
-- 23:50 stop check (trig_01Veu82e8opzfVF7b6ZKAHwp): delivered late, at 03:43 UTC; nothing was running by then.
-- 07:35 Amsterdam resume: send_later trig_0183GKkBx4Fw3MTExPtQfMRj (resume R2 chain, launch R1 verify, then
-  rust-reviewer, report).
+- Resumed 2026-10-28 15:50 Amsterdam (the 07:35 wake reached the session only at 15:49; Mustafa: "Try again").
+- R2 chain: run wf_bce24fc0-5c6 resumed (task wqyaqsrsi), same script `v2-research-r2-chain-run1.js`: assemble (from the
+  assembler's notes and scratchpad `r2asm/`), then verifier-r2 + security-auditor-r2. At most 2 agents at once.
+- R1 verify: run wf_3fe63170-264 (task wbg2rrlcu), script `v2-research-r1-verify-run1.js`: six verifiers (high), one per
+  R1 question, at most 2 at once. Resume: Workflow({scriptPath, resumeFromRunId: "wf_3fe63170-264"}).
+- rust-reviewer-r1-r2: prompt saved; launch once `docs/research/r2-netcode.md` exists (then 5 agents at most at once).
+- Saver: restarted 15:50 Amsterdam (task b407vq1jx), stops after 110 minutes.
