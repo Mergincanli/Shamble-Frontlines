@@ -86,3 +86,21 @@ Next: RFCs (BUD-F1-F9, F15-F17; SYNC-F11; TRN-F16, F17, F24; ROOM-F11).
 - BUD-F17 confirmed: RFC 8446 §5.2 length rule verbatim.
 - ROOM-F11 confirmed: RFC 7519 §4.1.3 aud, §4.1.4 exp (+ leeway sentence), §4.1.7 jti: all verbatim.
 Next: datatracker drafts (BUD-F9 draft part, TRN-F3-F6, F16 draft part, F26, ROOM-F13), W3C ED/TR (BUD-F10-F14, TRN-F10, F12, F13, F18, F19).
+- TRN-F3 confirmed: datatracker draft-ietf-webtrans-http2 page: "draft-ietf-webtrans-http2-15", "Last updated 2026-07-06", "In WG Last Call", "Proposed Standard" (finding marks it inferred; the fields are on the page).
+- TRN-F4 confirmed: draft -16 §7.1 "Negotiating the Draft Version": both quotes; §9.2 value 0x2c7cf000 (SETTINGS_WT_ENABLED); draft -07 App. A.1 "Changes between draft versions 02 and 07": quote verbatim, WEBTRANSPORT_MAX_SESSIONS = 0xc671706a; draft -02 ENABLE_WEBTRANSPORT = 0x2b603742.
+- TRN-F16 draft part confirmed: -16 §4.5 Datagrams "the payload field directly follows the Quarter Stream ID field, which is at the start of the QUIC DATAGRAM frame payload"; §4.1 "datagrams, which are not retransmitted".
+- BUD-F9 draft part confirmed: -16 §4.5 "The WebTransport datagram payload is sent unmodified in the "HTTP Datagram Payload" field". Doc page: "draft-ietf-webtrans-http3-16", "Last updated 2026-07-06", "In WG Last Call".
+- TRN-F26 confirmed: -16 §8 Security Considerations "all of the WebTransport sessions share both congestion control and flow control context".
+- ROOM-F13 confirmed: -16 §3.2 Creating a New Session (two quotes), §5.2 Limiting the Number of Simultaneous Sessions ("Servers SHOULD limit the rate of incoming WebTransport sessions on HTTP/3 connections.").
+- (not in Rests on) TRN-F23 §3.4, TRN-F36 §3.2, TRN-F37 §6 quotes also found verbatim.
+- BUD-F10 confirmed: W3C ED (w3c.github.io, "Editor's Draft, 27 October 2026", "Don't cite this document other than as work in progress"): §5.3 maxDatagramSize "The maximum size data that may be passed to a WebTransportDatagramsWritable."; §5.1 path MTU sentence; [[OutgoingMaxDatagramSize]] "an implementation-defined integer".
+- BUD-F11 confirmed: ED §4.3 Procedures, writeDatagrams: "If duplex.[[OutgoingMaxDatagramSize]] is less than data's [[ByteLength]], return a promise resolved with undefined." This step comes before "Enqueue chunk", so no error and not queued is read directly from the algorithm (finding marks it inferred). TR §4.3 has the same step (with "datagrams" for "duplex").
+- BUD-F12 confirmed: ED §6.13 WebTransportConnectionStats: all four quotes verbatim.
+- BUD-F13 confirmed: ED §6.14 both quotes; §5.1 "expiration duration for outgoing datagrams (in milliseconds), or null" (units verbatim; finding marks inferred).
+- BUD-F14 confirmed: ED §6.9 Configuration: "This is a hint to the user agent. This configuration option is considered a feature at risk due to the lack of implementation in browsers of a congestion control algorithm, at the time of writing, that optimizes for low latency." (finding says no verbatim quote obtained; it is verbatim).
+- TRN-F10 W3C part confirmed: TR §6.9 same sentence.
+- TRN-F12 W3C part confirmed, location error: the [[Reliability]] "supports-unreliable"/"reliable-only" steps are in TR §6.2 Constructor, not §6.5; requireUnreliable sentence §6.9 verbatim.
+- TRN-F13 W3C part confirmed: TR §6.9 custom certificate requirements: all four quotes verbatim; SHA-256 only: "If hash.value is not null and hash.algorithm is an ASCII case-insensitive match with "sha-256"" (verbatim; finding marks inferred).
+- TRN-F18 confirmed: TR §5.1 (three quotes) and §4.3 writeDatagrams step.
+- TRN-F19 W3C part confirmed: TR §5.1 "beyond which datagrams are dropped from the head of the queue"; §4.3 "If more than duration milliseconds have passed since timestamp, then".
+Next: BCD JSON (TRN-F7-F11, F19 rows, F34, F38), MDN pages, WebKit post.
