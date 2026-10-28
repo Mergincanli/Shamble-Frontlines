@@ -59,3 +59,9 @@ Task: second verifier pass on R2 (netcode) research topic, docs/research/r2-netc
 - D · TRN-REC4 (:2597-2621): OK. F34 added to Rests on; decode rules design; 10 million proposed.
 - D · TRN-REC5 (:2623-2643): OK. docs.rs/crate/web-transport-quinn/0.13.5: "rcgen ^0.14 _dev_", "quinn ^0.11 _normal_": CONFIRMED (also in rust-reviewer notes :144).
 - D · TRN-REC6 (:2645-2665): OK on 1-3 (F10 wording matches §6.9, confirmed by me). Note: Serves names §4/§3 only, no §6 item (XU-OQ18, left to the Advisor).
+- D · ROOM-REC2 (:2682-2700): OK (Rests on confirmed; mark 6 proposed; reasoning consistent with F8).
+- D · ROOM-REC3 (:2701-2725): OK. Rests on F9-F12, F14, F19 confirmed; reason now deduces "no header" from the MDN option lists (first-pass confirmed, notes :121). Marks proposed.
+- D · ROOM-REC5 (:2737-2755): OK. Uses only F17's confirmed words ("configures ... at creation", "special permissions to update data on the lobby"); host check marked "our own rule"; F13 use marked inferred; mark 5 proposed.
+- D · ROOM-REC6 (:2756-2769): OK. Reason now matches F15 and my fetch (default "0"/"normal"; "N players in the game").
+- D · ROOM-REC8 (:2779-2794): OK. Rests on F14, F16, F19 confirmed (F19 by me); cookie claim matches OWASP HttpOnly sentence; Origin check on the token endpoint is design.
+  Next: F (grep F34, owner alone, local storage), G (counts), then optional check of W3C option list for ROOM-REC3.
