@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 17:10 Amsterdam
+- **Last update:** 2026-10-28 17:20 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -21,10 +21,11 @@
    smoke test uses the pre-installed Playwright 1.63 and its Chromium; toolkit pins 1.56.1).
 
 ## Current step
-6. Wave 1 units running (resumed 22:24 Amsterdam): engine-architect r1-ecs, r1-tick, r1-determinism,
-   r1-boundary-worker, r1-abilities, r1-data-hotreload; netcode-architect r2-sync, r2-budgets, r2-interest,
-   r2-transport, r2-rooms. Model opus, effort xhigh. Prompts saved verbatim: `prompts/<agent>-<topic>-<unit>.txt`
-   (advisor condition 1). Notes `<agent>-<topic>-<unit>.md`, drafts `…-draft.md`, all in `.checkpoints/v2-research/`.
+6. Wave 1 step 4 (second verifier pass, running) and wave 2 (R3, R4, R6 owners running; R5 owner and its CI helper
+   start when two slots free up: at most 5 agents at once). Wave-1 tally written before wave 2 launched
+   (`wave1-tally.md`; the second pass's counts are added when it returns). Units, drafts and notes as before; wave-2
+   prompts `prompts/<agent>-r<n>.txt` and `prompts/infra-engineer-r5-ci.txt`, each launched with a one-line message
+   that points the agent at its saved prompt file (the message is in each file's header).
 
 ## Next steps
 1. Count the 11 unit results (a draft file each, ending sources lists); restart any unit with no draft: its saved
@@ -59,10 +60,10 @@
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
 | R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
-| R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
-| R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
-| R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
-| R6 | infra-engineer | 1 | 0/1 | no | pending | wave 2; security baseline deferred (Advisor) |
+| R3 | graphics-engineer (high) | 1 owner, 7 question drafts | running since 17:16 | no | pending | `prompts/graphics-engineer-r3.txt` |
+| R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | running since 17:16 | no | pending | `prompts/engine-architect-r4.txt` |
+| R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | not launched (waits for 2 slots) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
+| R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | running since 17:16 | no | pending | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
 Agent ids are internal to this session and are not written here; the saved prompt plus the notes path is the restart
 key (condition A1).
 
@@ -103,7 +104,8 @@ key (condition A1).
   day only) · spend limit: run fewer agents at once (4–5), the same total work, so units finish before a cut-off:
   the Advisor, relayed by Mustafa, 2026-10-28 about 15:50 Amsterdam.
 
-- Method deviation found at the R2 tally: the verifiers (R1's six and R2's) fetched sources with curl and matched quotes
+- Method deviation found at the R2 tally (corrected 2026-10-28 17:15 from the transcripts, see `wave1-tally.md`: it
+  was two of R1's six verifiers, tick and abilities, R2's verifier, and also the R2 fixer): verifiers fetched sources with curl and matched quotes
   by exact text on the raw page, instead of WebFetch (prompt rule 2/3). Stronger evidence (exact text), but outside
   the WebFetch permission layer. Audit of every agent transcript: 23 curl calls plus the R2 verifier's loop over
   `scratchpad/r2v/bin/urls.txt` (111 URLs); every host is on the allow list except api.github.com, read once by the
@@ -124,7 +126,11 @@ key (condition A1).
   Amsterdam: run wf_64d0bbcd-730 (task w1wa82dkw); notes `verifier-r{1,2}-second-pass.md`.
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
-- Next: R1 fixer (engine-architect, xhigh) once the rust-reviewer is back; R2 fixer (netcode-architect, xhigh) once
-  verifier-r2, security-auditor and rust-reviewer are back; second verifier pass only where a fix changed a
-  recommendation, a number or a source. At most 4–5 agents at once (the Advisor, 2026-10-28).
-- Saver: restarted 15:50 Amsterdam (task b407vq1jx), stops after 110 minutes.
+- Wave 2 owners R3, R4, R6: background agents launched 16:16 UTC (17:16 Amsterdam); notes `graphics-engineer-r3.md`,
+  `engine-architect-r4.md`, `infra-engineer-r6.md`; question drafts `<agent>-r<n>-<prefix>-draft.md`.
+- Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
+  then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
+  docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).
+- Night stop (condition A2): at 23:50 Amsterdam, stop every research agent still running and list it; restart after
+  07:30 with its saved prompt plus "resume from your notes at <path>" (a send_later reminder is set for 23:50).
+- Saver: restarted 17:17 Amsterdam (task byo52kkev), stops after 110 minutes (about 19:07).
