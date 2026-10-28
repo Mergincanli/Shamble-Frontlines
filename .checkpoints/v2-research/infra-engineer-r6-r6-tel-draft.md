@@ -29,8 +29,8 @@ events stamped with ticks, sent until acked), R2-ROOM-OQ7 (whether private match
 ## Legacy facts used
 - **TL13 (sim.js):** the headless match already reports a kill matrix, deliveries, trucks and buildings lost, tech and
   silo captures, era per team and frags per slot over 90–300 s: the prototype of v2's match record, and proof that
-  "x3 runs, never one" (CLAUDE.md) applies to balance numbers too (STATUS figures: stall means 13.0 / 5.7 / 7.3 across
-  three runs of one build).
+  "x3 runs, never one" (CLAUDE.md) applies to balance numbers too (TL13's evidence: bot stall % of 13.0 / 5.7 / 7.3 in three
+  runs of one build against 3.4 / 16.1 / 6.5 of the other, the same mean of 8.67: noise).
 - **GE15 (career):** per-weapon kills credit the weapon in hand when the kill is processed, so a grenade kill counts
   for the held gun. v2's damage events must carry their source id (R1-ABL-REC5, R1-ECS-REC3) or unit and weapon rates
   are wrong from day one.

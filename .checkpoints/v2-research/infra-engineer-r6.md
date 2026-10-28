@@ -65,3 +65,4 @@
 - Leads only (search): https://gdcvault.com/play/1024237/ (Riot LoL balance talk, Greg Street) not read: gdcvault maintenance redirect / video only; https://arxiv.org/pdf/2502.01250v2 (win/pick rates limited insight in team games) outside allow list; Blizzard forum post outside allow list.
 - LOOP_V2 read: §1 points target, §4 uplink steal (hold E, countdown continues for new owner; two uplinks at full scale), §8 points race (cashouts most, deliveries, kills, structure kills; HQ kill = big points swing; ~20 min timer), §11 evidence counters (cashouts, steals, deliveries, harvester kills).
 - Next: write TEL draft.
+- R6-TEL draft written: infra-engineer-r6-r6-tel-draft.md (F1-F2, REC1-3, OQ1-5, A-10, A-11). DONE for Q4. Next: R6-SEC (OQ1 only, no research) then assemble topic file docs/research/r6-infrastructure.md.
