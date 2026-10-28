@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 21:05 Amsterdam
+- **Last update:** 2026-10-28 21:25 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -60,7 +60,7 @@
 |---|---|---|---|---|---|---|
 | R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
 | R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
-| R3 | graphics-engineer (high) | 1 owner, 7 question drafts | running since 17:16 | no | pending | `prompts/graphics-engineer-r3.txt` |
+| R3 | graphics-engineer (high) | 1 owner, 7 question drafts | 7/7 (DONE 21:21) | yes, 605c09d (92 F, 25 REC, 33 OQ; 62 read: 61 official, 1 other; 22 not read) | spot-check pending (`prompts/verifier-r3.txt`) | `prompts/graphics-engineer-r3.txt` |
 | R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | running since 17:16 | no | pending | `prompts/engine-architect-r4.txt` |
 | R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | not launched (waits for 2 slots) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
 | R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | running since 17:16 | no | pending | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
@@ -139,8 +139,9 @@ key (condition A1).
 - Wave 2 owners R3, R4, R6: background agents launched 16:16 UTC (17:16 Amsterdam); all three cut off by the org
   spend limit at about 16:26 UTC (HTTP 429, "resets 8pm (UTC)"), notes saved: R3 Q1 drafted
   (`graphics-engineer-r3-r3-wgpu-draft.md`), R6 Q1 drafted (`infra-engineer-r6-r6-host-draft.md`), R4 none yet.
-  Resumed by message at 20:03 UTC: R3 and R4. R6 waits for a slot (4 agents at once after this second cut-off); then
-  the R5 owner and its CI helper.
+  Resumed by message at 20:03 UTC: R3 and R4; R3 DONE at 20:21 UTC (file committed 605c09d); R6 resumed by message
+  at 20:22 UTC. Next slots: the R3 spot-check and the R5 owner with its CI helper (4 agents at once after this second
+  cut-off).
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).

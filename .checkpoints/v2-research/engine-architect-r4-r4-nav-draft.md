@@ -210,13 +210,13 @@ published documentation (docs.rs) or its own repository.
 - **R4-NAV-REC3. Local avoidance is a step inside the sim's movement phase, never a crowd system that moves agents.**
   Each bot's route gives a preferred velocity; an avoidance step adjusts it against neighbours taken from the movers'
   index in id order, and the result goes through the same movement as a player's input (R4-PHYS-REC1). The first
-  candidate is ORCA through dodgy_2d (F13's dependency; dodgy_2d 0.5.5 is "an implementation of ORCA" and "essentially a
-  port of RVO2", OBST), adopted only after an audit against R1-DET-REC2's float rules; a plain separation force is the
-  fallback.
+  candidate is ORCA through dodgy_2d (F13's dependency; R4-OBST-F3: dodgy_2d 0.5.5 is "An implementation of ORCA" and
+  "essentially a port of RVO2"), adopted only after an audit against R1-DET-REC2's float rules; a plain separation force
+  is the fallback.
   The reason: legacy has no avoidance and its strafing skips navigation (GN5); crowd modules that update positions
   themselves (F17, F13) would split position ownership from the sim; neighbour order must be stable for determinism
   (R1-ECS-REC2).
-  Rests on: F13, F17; R1-ECS-REC2, R1-DET-REC2; R4-PHYS-REC1; legacy GN5; R4-OBST's dodgy_2d finding.
+  Rests on: F13, F17; R1-ECS-REC2, R1-DET-REC2; R4-PHYS-REC1; legacy GN5; R4-OBST-F3.
   Serves: VISION_V2 §6.1 and §6.2.
   A spike must prove (proposed): 48 bots crossing in a 6 m choke point (LOOP_V2 §9's gap) for 10 minutes: 0 deadlocks
   longer than 3 s, and per-tick state hashes identical on native and Wasm; the avoidance step costs ≤ 0.2 ms p99 native
