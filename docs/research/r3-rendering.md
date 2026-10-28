@@ -6,7 +6,8 @@
   `.checkpoints/v2-research/graphics-engineer-r3.md`; one draft per question:
   `.checkpoints/v2-research/graphics-engineer-r3-r3-<id>-draft.md`.
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** draft: spot-check pending.
+- **Status:** spot-checked (44 of 77 key claims). The verifier's table, its critical read and the owner's fixes are
+  in part 7 ("Verifier spot-check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R3):** "three.js WebGPURenderer with
   TSL; the WebGL 2 fallback; candidate techniques for a comic look (toon ramps, screen-space outlines, ambient
   occlusion, emissive bloom); characters (skinning, instancing, LOD); budgets for the minimum and recommended hardware;
@@ -15,14 +16,14 @@
 | # | Brief question | Ids | Draft (`.checkpoints/v2-research/`) |
 |---|---|---|---|
 | 1 | three.js WebGPURenderer with TSL | R3-WGPU-F1–F22, REC1–REC4, OQ1–OQ5 | `graphics-engineer-r3-r3-wgpu-draft.md` |
-| 2 | the WebGL 2 fallback | R3-GL2-F1–F14, REC1–REC3, OQ1–OQ4 | `graphics-engineer-r3-r3-gl2-draft.md` |
-| 3 | candidate techniques for a comic look (toon ramps, screen-space outlines, ambient occlusion, emissive bloom) | R3-LOOK-F1–F15, REC1–REC3, OQ1–OQ5 | `graphics-engineer-r3-r3-look-draft.md` |
-| 4 | characters (skinning, instancing, LOD) | R3-CHAR-F1–F13, REC1–REC4, OQ1–OQ5 | `graphics-engineer-r3-r3-char-draft.md` |
-| 5 | budgets for the minimum and recommended hardware | R3-BUDGET-F1–F7, REC1–REC3, OQ1–OQ5 | `graphics-engineer-r3-r3-budget-draft.md` |
+| 2 | the WebGL 2 fallback | R3-GL2-F1–F14, REC1–REC3, OQ1–OQ5 | `graphics-engineer-r3-r3-gl2-draft.md` |
+| 3 | candidate techniques for a comic look (toon ramps, screen-space outlines, ambient occlusion, emissive bloom) | R3-LOOK-F1–F15, REC1–REC3, OQ1–OQ6 | `graphics-engineer-r3-r3-look-draft.md` |
+| 4 | characters (skinning, instancing, LOD) | R3-CHAR-F1–F13, REC1–REC4, OQ1–OQ6 | `graphics-engineer-r3-r3-char-draft.md` |
+| 5 | budgets for the minimum and recommended hardware | R3-BUDGET-F1–F7, REC1–REC3, OQ1–OQ6 | `graphics-engineer-r3-r3-budget-draft.md` |
 | 6 | how we measure it | R3-MEASURE-F1–F10, REC1–REC4, OQ1–OQ4 | `graphics-engineer-r3-r3-measure-draft.md` |
-| 7 | spatial audio with Web Audio | R3-AUDIO-F1–F11, REC1–REC4, OQ1–OQ5 | `graphics-engineer-r3-r3-audio-draft.md` |
+| 7 | spatial audio with Web Audio | R3-AUDIO-F1–F11, REC1–REC4, OQ1–OQ6 | `graphics-engineer-r3-r3-audio-draft.md` |
 
-**Totals:** 92 findings, 25 recommendations, 33 open questions; 62 sources read (61 official, 0 shipped game, 1 other),
+**Totals:** 92 findings, 25 recommendations, 38 open questions; 62 sources read (61 official, 0 shipped game, 1 other),
 22 sources not read.
 
 **How to read this file.**
@@ -50,7 +51,7 @@
 - three.js r186's WebGPURenderer ("experimental") falls back to WebGL 2 by itself; TSL builds WGSL and GLSL from one source.
 - WebGPU: Chrome, Edge, Safari 26, Firefox on Windows and Apple-silicon Macs; Firefox on Linux and Intel Macs falls back.
 - The fallback emulates compute and storage and has no GPU timer in Firefox or Safari; the four look techniques run on both.
-- Recommended: one TSL renderer, a pinned release, precompiled pipelines, rigid-skinned soldiers with a budget LOD.
+- Recommended: one TSL renderer, a pinned release, precompiled pipelines, one skinned mesh per soldier, a budget LOD.
 - Also: proposed Low and High budgets, frame times only from real hardware, an equal-power, voice-capped audio mixer.
 
 ## Findings
@@ -268,10 +269,11 @@ missing EXT_clip_control extension."
 · Source: WebGLBackend.js r186, `_setFramebuffer()`, `init()` · official (source) · read 2026-10-28 · confirmed in the
 source.
 
-**R3-GL2-F11.** WebGL 2 itself is everywhere the four target browsers run: Chrome 56, Edge (mirror), Firefox 51,
-Safari 15.
+**R3-GL2-F11.** WebGL 2 itself is everywhere the four target browsers run: the compatibility data's `version_added`
+values are chrome "56" (Edge mirrors Chrome), firefox "51" and safari "15".
 · Source: https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebGL2RenderingContext.json · official ·
-read 2026-10-28 · confirmed in the source.
+read 2026-10-28 · confirmed in the source for the quoted `version_added` values (the source is a data file, so the
+values are its only words); "everywhere the four browsers run" is inferred from them.
 
 **R3-GL2-F12.** Who lands on the fallback, by MDN's data (R3-WGPU-F17–F19): Firefox on Linux and on Intel Macs
 ("Does not support Linux.", "Does not support macOS on Intel CPUs."), Chrome on Linux without an Intel Gen12+ GPU,
@@ -561,10 +563,13 @@ renderer's output buffer is half float by default, and 4 × MSAA multiplies mult
 (R3-LOOK-F14, R3-WGPU-F14, F15).
 · Source: R3-LOOK-F14 · inferred (arithmetic).
 
-**R3-BUDGET-F6.** `renderer.info` reports draw calls and triangles per frame and GPU memory by kind (textures,
-attributes, render targets, programs, total), so every budget below except GPU time can be read from the renderer
-itself (R3-MEASURE-F3).
-· Source: https://threejs.org/docs/pages/Info.html · official · read 2026-10-28 · confirmed in the source.
+**R3-BUDGET-F6.** `renderer.info` reports draw calls ("The number of draw calls of the current frame.") and triangles
+per frame, memory sizes in bytes (`texturesSize`, `attributesSize`, `total`: "The total memory size in bytes.") and
+counts of programs ("The number of active programs.") and render targets ("The number of active renderTargets."), so
+every budget below except GPU time and frame time can be read from the renderer itself (R3-MEASURE-F3).
+· Source: https://threejs.org/docs/pages/Info.html · official · read 2026-10-28 · confirmed in the source for the
+quotes; "every budget below except GPU time and frame time" is inferred (matching the counters to the rows of
+R3-BUDGET-REC2's table).
 
 **R3-BUDGET-F7.** No allow-listed source gives GPU throughput for integrated or mid-range GPUs under WebGPU or WebGL 2,
 or a hardware share among players (the Steam Hardware Survey and vendor spec pages are off the allow list).
@@ -607,8 +612,8 @@ type, `memoryHeaps`).
 
 **R3-MEASURE-F3.** `renderer.info` gives per frame `render.drawCalls` ("The number of draw calls of the current
 frame."), `render.triangles`, `render.timestamp` ("The timestamp of the frame."), `compute.timestamp`, and memory by
-kind with byte sizes (`texturesSize`, `attributesSize`, `programs`, `renderTargets`, `total`: "The total memory size in
-bytes."); an app with its own loop sets `autoReset` to false and "must then call `renderer.info.reset()` once per frame
+kind: byte sizes (`texturesSize`, `attributesSize`, `total`: "The total memory size in bytes.") and counts
+(`programs`: "The number of active programs."; `renderTargets`: "The number of active renderTargets."); an app with its own loop sets `autoReset` to false and "must then call `renderer.info.reset()` once per frame
 manually."
 · Source: https://threejs.org/docs/pages/Info.html · official · read 2026-10-28 · confirmed in the source.
 
@@ -626,7 +631,8 @@ confirmed in the source.
 
 **R3-MEASURE-F6.** On the WebGL 2 backend three.js times with `EXT_disjoint_timer_query_webgl2` when present (R3-GL2-F4),
 which only Chrome (70+) and Edge (80+) desktop ship (R3-GL2-F5).
-· Source: R3-GL2-F4, F5 · official · read 2026-10-28 · confirmed in the sources.
+· Source: R3-GL2-F4, F5 · official · read 2026-10-28 · inferred (a combination of two findings confirmed in their
+sources; the quotes are in R3-GL2-F4 and F5).
 
 **R3-MEASURE-F7.** CPU timers are coarsened: `performance.now()` resolution is "5 microseconds" in cross-origin isolated
 contexts and "100 microseconds" in non-isolated ones; the `requestAnimationFrame` timestamp has "a minimal precision of
@@ -698,9 +704,11 @@ used only by the `linear` distance model."
 https://developer.mozilla.org/en-US/docs/Web/API/PannerNode; https://threejs.org/docs/pages/PositionalAudio.html
 (setMaxDistance) · official · read 2026-10-28 · confirmed in the source.
 
-**R3-AUDIO-F4.** Neither inverse nor exponential ever reaches zero gain, so a distant source keeps costing a voice
-unless the game stops it; only linear reaches zero (at `maxDistance` with `rolloffFactor` 1).
-· Source: F3 · inferred (from the formulas).
+**R3-AUDIO-F4.** Neither inverse nor exponential ever reaches zero gain, so distance alone never silences a distant
+source; only linear reaches zero (at `maxDistance` with `rolloffFactor` 1). Whatever its gain, even zero, a playing
+source keeps its nodes until the game stops it, so no distance curve bounds the number of voices.
+· Source: F3 · inferred (the first sentence from the formulas; the second is my reading of how audio nodes run, not
+stated in a source read, and the spike's voice counter checks it: R3-AUDIO-OQ2).
 
 **R3-AUDIO-F5.** three.js's `PositionalAudio` creates a PannerNode with `this.panner.panningModel = 'HRTF';`, so it
 uses the costlier model by default (against Web Audio's own default, F2); every `updateMatrixWorld` while playing ramps
@@ -810,7 +818,7 @@ All options are *look brief pending*. "Both backends" means the technique is pla
 | Option | What it is | Draw calls (per soldier, before shadows and outlines) | CPU per soldier | Backends | Risk | Fit with VISION_V2 §3, §6.4, §6.9 |
 |---|---|---|---|---|---|---|
 | C-A. Rigid parts as separate meshes (legacy) | One mesh per part, posed by Object3D transforms | one per part (legacy: about 120 per soldier with hulls, CL6) | matrix update per part (GA15) | both | The measured legacy cost at 48 (TL15) | Poor at 48+ |
-| C-B. One skinned mesh per soldier, rigid weights (one bone per part) | Parts merged into one geometry per material; joints become bones; procedural IK writes bone matrices | one per material per soldier | IK and pose as today, plus a bone upload | both (bone texture, F3) | Per-frame bounds (F2) | Good up to tens of soldiers |
+| C-B. One skinned mesh per soldier (rigid weights, one bone per part, for a legacy-style part model; any skin weights once the character model exists, CHAR-OQ3) | Parts merged into one geometry per material; joints become bones; procedural IK writes bone matrices | one per material per soldier | IK and pose as today, plus a bone upload | both (bone texture, F3) | Per-frame bounds (F2) | Good up to tens of soldiers |
 | C-C. Instanced skinning, one shared pose (F8) | One instanced skinned draw for a crowd | one per material for all | one mixer | both (inferred) | Every soldier in the same pose: unusable for aim and gait | Distant crowds only |
 | C-D. Instanced skinning, pose per instance by compute (F9) | Bone matrices per instance in a storage buffer, a compute skinning pass | one per material for all | pose per soldier on CPU (F9), upload once | WebGPU only (F9; R3-GL2-F2, F3) | Needs a WebGL 2 path of its own | Strong on WebGPU; fallback gap |
 | C-E. Instanced skinning by bone texture (custom TSL) | Per-instance bone matrices in a data texture read in the vertex stage | one per material for all | pose per soldier, one texture upload | both (inferred) | Not a shipped three.js node (F11); own code | Strong on both if it works |
@@ -908,7 +916,8 @@ Reason: the API renamed post-processing (r183), changed premultiplied alpha (r18
 within a year (F3); r186 still fixes timestamp queries and BatchedMesh offsets (F2). Tracking every release (F4's
 advice) is still the direction, just never mid-feature.
 Rests on: R3-WGPU-F1, F2, F3, F4.
-Serves: VISION_V2 §4 (no regression slips into the 30 and 60 fps targets unmeasured).
+Serves: VISION_V2 §4 (no regression slips into the 30 and 60 fps targets unmeasured). No VISION_V2 §6 item: it serves
+the §4 targets only.
 Spike must prove (proposed): an upgrade from one pinned release to the next changes the benchmark scene's p95 GPU and
 CPU frame time by no more than 5 % without an explained cause (R3-MEASURE).
 
@@ -918,7 +927,7 @@ match itself creates no new shader programs.**
 Reason: WebGPU creates pipelines asynchronously (F22) and three.js names the first-sight hitch "shader compilation
 stutter" (F10); legacy already compiles on first sight (TL15: 16 programs vs 9); the cutaway's blend-state toggle
 (GW17) is one such variant. Init itself is asynchronous (F9).
-Rests on: R3-WGPU-F9, F10, F22; legacy TL15, GW17.
+Rests on: R3-WGPU-F9, F10, F22; R3-MEASURE-F3 (mark 1's counter); legacy TL15, GW17.
 Serves: VISION_V2 §6.9 (large units and their effects "without dropping frames"), §4.
 Spike must prove (proposed): (1) `renderer.info.memory.programs` (R3-MEASURE-F3) is the same 5 s after deploy and at
 the end of a scripted 5-minute match; (2) the first appearance of each unit type and effect causes no frame above
@@ -931,7 +940,7 @@ Reason: the backend is chosen inside the renderer (F5), WebGPU's reach differs b
 the API exists only in secure contexts (F20). Legacy's pageshot already prints the WebGL renderer string on every shot
 (TL12), and the inventory asks v2 to print the WebGPU adapter or "WebGL 2 fallback".
 Rests on: R3-WGPU-F5, F17, F18, F19, F20, F21; legacy TL12.
-Serves: VISION_V2 §4.
+Serves: VISION_V2 §4. No VISION_V2 §6 item: the backend logging and the overlay line serve the §4 targets only.
 Spike must prove (proposed): on each browser of F17–F19 the overlay and the test log name the backend correctly
 (checked against `navigator.gpu` availability) in 10 of 10 starts.
 
@@ -941,8 +950,10 @@ Spike must prove (proposed): on each browser of F17–F19 the overlay and the te
 spikes must exist on the WebGL 2 backend; a WebGPU-only extra (compute, storage writes, bundles) enters only with a
 named fallback and a measured gain.**
 Reason: compute on the fallback is a transform-feedback emulation without indirect dispatch (F2), storage is texture
-emulation without atomics (F3), and bundles give no gain there (F9). The players who land there are not rare edge
-cases (F12, F13). Legacy's look uses nothing WebGL 2 lacks (CD15), so F-A loses nothing legacy had.
+emulation without atomics (F3), and bundles give no gain there (F9). Whole platform groups land there (F12: Firefox on
+Linux and on Intel Macs, Chrome on Linux without an Intel Gen12+ GPU); their share of players is unknown (OQ2). F13's
+31 % is about Direct3D 11.1 among Chrome users on Windows, which is what compatibility mode targets, not a share of
+fallback users; it shows only that hardware below core WebGPU's needs is common. Legacy's look uses nothing WebGL 2 lacks (CD15), so F-A loses nothing legacy had.
 Rests on: R3-GL2-F2, F3, F9, F12, F13; legacy CD15.
 Serves: VISION_V2 §4 (four browsers; the minimum laptop), §6.9.
 Spike must prove (proposed): the benchmark scene (R3-MEASURE-REC2) shows the same features on both backends
@@ -963,7 +974,7 @@ machine (if that machine runs Linux or an Intel Mac; otherwise on the closest av
 Edge) and CPU frame time elsewhere; never gate CI or a pass mark on a GPU timer the browser does not offer.**
 Reason: only Chrome and Edge ship the extension (F5); three.js skips timing without it (F4).
 Rests on: R3-GL2-F4, F5, F6.
-Serves: VISION_V2 §4 (measuring the targets on every browser).
+Serves: VISION_V2 §4 (measuring the targets on every browser). No VISION_V2 §6 item: it serves the §4 targets only.
 Spike must prove (proposed): the measurement harness (R3-MEASURE-REC1) reports GPU time on Chrome's WebGL 2 backend and
 reports "GPU time not available" (never 0) on Firefox and Safari's WebGL 2 backends.
 
@@ -976,23 +987,28 @@ per pass and memory per target, on both reference machines and both backends, re
 Advisor. The spike reports; it does not pick.**
 Reason: no source read gives GPU times (F15); each family scales with something different (F8, F11, F13), so the
 trade-offs depend on our scene (48+ soldiers, a few very large units).
-Rests on: R3-LOOK-F8, F11, F13, F14, F15.
+Rests on: R3-LOOK-F8, F11, F13, F14, F15; R3-MEASURE-F3 (the mark's counters).
 Serves: VISION_V2 §4 (both targets), §6.9 (spectacle budget).
 Spike must prove (proposed): a table with, per technique and variant, GPU ms (median and p95 over 600 frames, R3-MEASURE)
 at 1080p on the minimum and recommended reference machines, extra draw calls, and extra render-target memory from
 `renderer.info.memory` (R3-MEASURE-F3), each measured with only that technique on.
 
-**R3-LOOK-REC2. Build any post chain the brief picks on one scene pass with MRT (colour plus only the outputs the chosen
-effects read: normals, emissive), so no effect re-renders the scene; every effect gets a quality-tier switch (off, or a
-lower `resolutionScale`) from the start.**
-Reason: MRT gives one geometry pass multiple outputs (R3-WGPU-F13), bloom and depth-normal edges read MRT outputs (F7,
-F12), and GTAO's documented pre-pass doubles draw calls (F11), which hurts most where legacy already measures thousands
-of draws (TL15). Resolution scaling is the documented cost knob (F10; R3-WGPU-F13).
-Rests on: R3-LOOK-F7, F9, F10, F11, F12, F14; R3-WGPU-F13; legacy TL15.
+**R3-LOOK-REC2. Build any post chain the brief picks on one shared scene pass with MRT (colour plus only the outputs
+the chosen effects read: normals, emissive), so effects that only read buffers never re-render the scene; a variant
+that does draw geometry again (the hull outline's second draw of each toon object, F5; GTAO's documented pre-pass, F9,
+F11) is counted as a planned extra, not ruled out; every effect gets a quality-tier switch (off, or a lower
+`resolutionScale`) from the start.**
+Reason: MRT gives one geometry pass multiple outputs (R3-WGPU-F13), and bloom and depth-normal edges read MRT outputs
+(F7, F12), so they need no re-render. The hull outline and GTAO as documented do draw geometry again (F5, F11), which
+hurts most where legacy already measures thousands of draws (TL15), so their extra draws must show in the count, not
+hide in it. Whether to keep them is the brief's call: R3-LOOK-REC3 measures both outline families, R3-LOOK-OQ3 asks
+about AO without the pre-pass. Resolution scaling is the documented cost knob (F10; R3-WGPU-F13).
+Rests on: R3-LOOK-F5, F7, F9, F10, F11, F12, F14; R3-WGPU-F13; R3-MEASURE-F3 (the mark's counter); legacy TL15.
 Serves: VISION_V2 §4 (Low and High), §6.9.
 Spike must prove (proposed): with every effect the brief keeps turned on, `renderer.info.render.drawCalls` stays
-within 1.1 × the draw calls with all effects off (no scene re-render), and each effect's off and lowered settings each
-cut its own GPU time by at least 40 %.
+within 1.1 × the sum of the draw calls with all effects off and the planned extras (one per outlined object for a
+hull outline, one per drawn object for a GTAO pre-pass), so no unplanned re-render slips in; and each effect's off and
+lowered settings each cut its own GPU time by at least 40 %.
 
 **R3-LOOK-REC3. If the brief keeps outlines, the spike measures both families at 48 soldiers on screen (hull and
 screen-space), because the hull's cost follows draw calls and the screen-space cost follows pixels.**
@@ -1006,30 +1022,37 @@ machine at Low; the result goes to the look brief.
 
 ### Question 4: characters (skinning, instancing, LOD) (R3-CHAR)
 
-**R3-CHAR-REC1. Soldiers: one rigid-skinned mesh per soldier (C-B) as the baseline that runs on both backends; measure
-instanced per-instance skinning (C-E on both backends, C-D as the WebGPU variant) against it in the spike, and adopt it
-only if it wins at 48 soldiers on screen.**
+**R3-CHAR-REC1. Soldiers: one skinned mesh per soldier (C-B) as the baseline that runs on both backends (rigid weights,
+one bone per part, while the part-based model stays; any skin weights once the character model exists, CHAR-OQ3);
+measure instanced per-instance skinning (C-E on both backends, C-D as the WebGPU variant) against it in the spike, and
+adopt it only if it wins at 48 soldiers on screen.**
 Reason: separate parts are the measured legacy problem (CL6, TL15) and the inventory already points to rigid skinning
-(GA15); C-B uses only documented three.js features on both backends (F1, F3). Per-instance compute skinning is WebGPU
-only in three's example (F9), and the fallback lacks real compute (R3-GL2-F2), so it cannot be the only path.
+for today's part-based soldiers (GA15); C-B uses documented three.js skinning (F1; F3, the Skeleton page's bone
+texture), but how WebGPURenderer skins is unconfirmed (CHAR-OQ1), so the spike's mark checks C-B on both backends.
+Per-instance compute skinning is WebGPU only in three's example (F9), and the fallback lacks real compute
+(R3-GL2-F2), so it cannot be the only path.
 Rests on: R3-CHAR-F1, F2, F3, F4, F6, F8, F9; R3-GL2-F2, F3; legacy CL6, CL10, GA15, TL15.
 Serves: VISION_V2 §3 (48+ players, bots fill slots), §4, §6.7 (faction uniforms and variants as data: per-instance
 colour, F4, F6).
-Spike must prove (proposed): with 48 soldiers on screen in the benchmark scene, C-B uses at most 4 draw calls per
-soldier per pass (before outlines), and the CPU cost of posing plus upload stays within 2.0 ms per frame on the
-minimum machine; C-D or C-E is adopted only if it cuts total frame time by at least 20 % against C-B on both reference
+Spike must prove (proposed): with 48 soldiers on screen in the benchmark scene, C-B renders on both backends with at
+most 4 draw calls per soldier per pass (before outlines); the CPU cost of posing plus bone upload with every soldier on
+the full rig (no budget LOD) stays within 2.0 ms per frame on the minimum machine, and with R3-CHAR-REC2's budget LOD
+at Low within that tier's 1.0 ms (R3-BUDGET-REC2); C-D or C-E is adopted only if it cuts total frame time by at least 20 % against C-B on both reference
 machines.
 
-**R3-CHAR-REC2. A budget LOD for animation (L-2), not only distance LOD: a fixed number of soldiers get the full
-procedural rig each frame by importance, the rest update at a lower rate or with a cheaper rig; bounds set per soldier
+**R3-CHAR-REC2. A budget LOD for animation (L-2) as the base, under any camera: a fixed number of soldiers get the full
+procedural rig each frame by importance, the rest update at a lower rate or with a cheaper rig; distance LOD (L-1) on
+top only if the look brief's camera spreads soldiers over a wide range of distances (CHAR-OQ5); bounds set per soldier
 to a fixed padded sphere, not recomputed per frame.**
 Reason: legacy animates every soldier fully every frame (GA15: 1.2 to 2.4 ms at 48 by arithmetic, and nothing is
-culled); distance LOD helps less under a near-constant top-down distance (F13, F10); per-frame bound recomputation is
-a CPU cost the docs ask for on animated skinned meshes (F2), which a padded fixed sphere avoids.
+culled), and a budget LOD bounds that cost whatever the camera; distance LOD helps less under a legacy-like,
+near-constant top-down distance (F13, F10), but the v2 camera is look brief pending (CHAR-OQ5), so L-1 stays
+conditional; per-frame bound recomputation is a CPU cost the docs ask for on animated skinned meshes (F2), which a
+padded fixed sphere avoids.
 Rests on: R3-CHAR-F2, F10, F13; legacy GA15.
 Serves: VISION_V2 §3, §4 (30+ fps on the minimum laptop in the largest mode).
-Spike must prove (proposed): at 48 soldiers on screen, animation CPU time per frame at most 1.0 ms on the minimum
-machine at Low, with no soldier inside its padded sphere ever culled while visible (checked by rendering with culling
+Spike must prove (proposed): at 48 soldiers on screen, animation CPU time per frame (posing plus bone upload, as in
+R3-CHAR-REC1) at most 1.0 ms on the minimum machine at Low, with no soldier inside its padded sphere ever culled while visible (checked by rendering with culling
 off and on over 600 frames: identical pixels).
 
 **R3-CHAR-REC3. Soldiers' per-instance data (transform, faction colour, hit flash, health bar) is written from the
@@ -1044,30 +1067,43 @@ Spike must prove (proposed): zero bytes allocated per frame in the character upd
 legacy's method in TL15), and health bars for 48 soldiers in at most 2 draw calls.
 
 **R3-CHAR-REC4. Large units: parts as separate meshes under one group (V-A), each part's transform from the sim's
-vehicle-part records; static world geometry in bundles on WebGPU and merged by material content on both backends.**
+vehicle-part records; static world geometry merged by material content on both backends, and put in render bundles on
+WebGPU only if the spike measures a gain (R3-GL2-REC1's rule for WebGPU-only extras).**
 Reason: "a few" large units add few draws (VISION_V2 §6.9); parts map one-to-one onto R1-BND-REC2's vehicle-part
-section; static merging is legacy's measured win (CL9) and bundles help static draws on WebGPU only (F12). BatchedMesh
-does not lower GPU draw commands on WebGPU (F7), so it is judged on CPU time, not on `drawCalls`.
-Rests on: R3-CHAR-F7, F12; legacy CL9, GC16; wave 1 R1-BND-REC2.
+section; static merging is legacy's measured win (CL9) and works on both backends. Bundles help static draws on WebGPU
+only and give nothing on WebGL (F12), so they are a WebGPU-only extra: under R3-GL2-REC1 they enter only with a named
+fallback (merging) and a measured gain, which no source read gives. BatchedMesh does not lower GPU draw commands on
+WebGPU (F7), so it is judged on CPU time, not on `drawCalls`.
+Rests on: R3-CHAR-F7, F12; R3-GL2-REC1 (cited); legacy CL9, GC16; wave 1 R1-BND-REC2.
 Serves: VISION_V2 §6.4 (big, multi-part vehicles), §6.9.
-Spike must prove (proposed): three large units (each at least 20 parts) on screen with 48 soldiers add at most 1.5 ms
-GPU time and at most 150 draw calls against the scene without them, on the recommended machine at High.
+Spike must prove (proposed): four large units (each at least 20 parts; the count of R3-BUDGET-REC2's and R1-TICK's
+scene) on screen with 48 soldiers add at most 2.0 ms GPU time and at most 200 draw calls against the scene without
+them, on the recommended machine at High (4 units × 20 parts × 2 passes, shadow and main, is 160 draws, plus margin);
+render bundles stay only if they cut the WebGPU backend's CPU frame time in the benchmark scene.
 
 ### Question 5: budgets for the minimum and recommended hardware (R3-BUDGET)
 
 **R3-BUDGET-REC1. Reference machines (proposed, M-A with M-B as the fallback): the minimum is one named laptop with
-integrated graphics of Intel Gen12 (Iris Xe) class or the AMD integrated equivalent, a 1920 × 1080 screen, Windows 11,
-run on Chrome and Firefox; the recommended is one named desktop with a mid-range discrete card (one or two generations
-old), at 1920 × 1080 and 2560 × 1440. Mustafa's RTX 5080 is a headroom and Brave check, never the recommended
-reference.**
-Reason: VISION_V2 §4 names classes, not models, and no allow-listed source ranks GPUs (F7), so the models have to be
-picked and named in the ADR; the only GPU class an official source ties to WebGPU support is Intel Gen12+ (F4); the
-RTX 5080 is far above mid-range (legacy phase-0 report); Windows plus Chrome and Firefox covers both WebGPU and, on
-Firefox's fallback paths, the hardest WebGL 2 case (R3-GL2-REC2). R1 asks for the same machines (R1-TICK's P2).
-Rests on: R3-BUDGET-F4, F7; R3-GL2-F7, F8; legacy phase-0 report.
-Serves: VISION_V2 §4.
+integrated graphics of Intel Gen12 (Iris Xe) class or the AMD integrated equivalent, a laptop CPU of at least 4 cores
+and 8 threads from the same generation, a 1920 × 1080 screen, Windows 11, run on Chrome and Firefox (both on WebGPU
+there) and with the WebGL 2 backend forced (`forceWebGL`), plus a run of the same laptop under Linux for the real
+fallback (Firefox there has no WebGPU); the recommended is one named desktop with a mid-range discrete card (one or two
+generations old) and its CPU named, at 1920 × 1080 and 2560 × 1440. Mustafa's RTX 5080 is a headroom and Brave check,
+never the recommended reference.**
+Reason: VISION_V2 §4 names classes, not models, and no allow-listed source ranks GPUs or CPUs (F7), so the models have
+to be picked and named in the ADR. On Windows both Chrome and Firefox run WebGPU (R3-WGPU-F17, F18), so a Windows
+machine reaches the WebGL 2 backend only by forcing it; the players who really fall back are on Firefox on Linux and on
+Intel Macs (R3-GL2-F12). Intel Gen12+ is the GPU class Chrome needs for WebGPU on Linux (F4: it says nothing about
+Windows), so an Intel Gen12 laptop booted into Linux covers both Chrome's WebGPU path there and Firefox's real
+fallback, the hardest WebGL 2 case (no `WEBGL_multi_draw`, R3-GL2-REC2); an AMD laptop would fall back in Chrome on
+Linux as well. R1-TICK-OQ6 asks R3 for a named minimum laptop CPU; the 4-core, 8-thread floor is a proposal with no
+source (the sim's Worker and the page's main thread each want a core). The RTX 5080 is far above mid-range (legacy
+phase-0 report). R1 asks for the same machines (R1-TICK's P2).
+Rests on: R3-BUDGET-F4, F7; R3-WGPU-F17, F18; R3-GL2-F7, F8, F12; legacy phase-0 report; wave 1 R1-TICK-OQ6 (cited).
+Serves: VISION_V2 §4. No VISION_V2 §6 item: it serves the §4 targets only.
 Spike must prove (proposed): the two machines are named in the ADR draft with their GPU, CPU, RAM, screen and
-`devicePixelRatio`, and every R3 pass mark is reported on both.
+`devicePixelRatio`, and every R3 pass mark is reported on both; on the minimum laptop's Linux run the overlay
+(R3-WGPU-REC4) names the WebGL 2 backend in Firefox.
 
 **R3-BUDGET-REC2. Budgets (proposed, option B-2), measured in the worst case of the largest mode: 48 soldiers on screen
 in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's scene), on the reference machines.**
@@ -1077,14 +1113,14 @@ in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's s
 | Frame time, p95 | ≤ 33.3 ms | ≤ 16.7 ms |
 | Frame time, median | ≤ 28 ms | ≤ 14 ms |
 | Main-thread CPU per frame (render submission, interpolation, animation, UI) | ≤ 16 ms | ≤ 8 ms (inside F1's 10 ms) |
-| of which: character animation (R3-CHAR-REC2) | ≤ 1.0 ms | ≤ 2.0 ms (more soldiers on the full rig) |
+| of which: character animation (posing plus bone upload, with R3-CHAR-REC2's budget LOD) | ≤ 1.0 ms | ≤ 2.0 ms (more soldiers on the full rig) |
 | of which: sim cost seen by the page (R1-TICK, R1-BND) | ≤ 1.0 ms | ≤ 1.0 ms |
 | GPU time, total | ≤ 25 ms | ≤ 12 ms |
 | of which: shadow pass | ≤ 3 ms (one map, 1024² or off) | ≤ 2 ms |
 | of which: main scene pass | ≤ 16 ms | ≤ 6 ms |
 | of which: post-processing (whatever the look brief keeps) | ≤ 4 ms | ≤ 3 ms |
 | of which: effects, sprites, HUD in the 3D view | ≤ 2 ms | ≤ 1 ms |
-| Draw calls (`renderer.info.render.drawCalls`) | ≤ 800 | ≤ 1,500 |
+| Draw calls (`renderer.info.render.drawCalls`) | ≤ 800 without a per-object outline pass at Low; about ≤ 1,100 with one (see the arithmetic below) | ≤ 1,500 |
 | Triangles (`renderer.info.render.triangles`) | ≤ 500k | ≤ 1.5M |
 | GPU memory (`renderer.info.memory.total`) | ≤ 512 MB | ≤ 1 GB |
 | Render resolution | `devicePixelRatio` capped at 1, scene pass resolution scale 0.75–1 | ratio capped at 2 |
@@ -1093,12 +1129,20 @@ in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's s
 Reason: frame times follow VISION_V2 §4 directly; the median marks leave room for spikes. The CPU split keeps the
 page inside web.dev's 10 ms at 60 Hz (F1) and gives R1's sim mark its 1.0 ms. Draw calls are set well below legacy's
 5,843 at 48 (TL15) and a few times above its village 202–303, which legacy already judged a medium risk on weak
-machines (AUDIT P5). The resolution cap follows F3 and CD15 (ratio 2 shades four times the pixels). Memory follows the
+machines (AUDIT P5). The arithmetic behind the Low cap (proposed figures): soldiers at R3-CHAR-REC1's cap of 4 draws
+per soldier per pass give 192 per pass at 48; a shadow and a main pass make 384; the merged world about 202 (CL9; the
+unmerged village was 303, AUDIT §1); four large units up to 200 (R3-CHAR-REC4): about 786, inside 800. A hull outline
+pass adds one draw per outlined object (R3-LOOK-F5): 192 more for the soldiers and about 80 for the large units' parts,
+about 1,060 in all. So the 800 cap holds only without a per-object outline pass at Low; if the look brief keeps a hull
+outline at Low, the Low cap becomes about 1,100 (proposed), or the hull is a High-only setting. That trade is the
+brief's, measured by R3-LOOK-REC3; R3 does not choose it. The CPU-side animation row (1.0 ms) applies with the budget
+LOD; R3-CHAR-REC1's 2.0 ms mark is the cost with every soldier on the full rig, which is why the budget LOD exists. The
+resolution cap follows F3 and CD15 (ratio 2 shades four times the pixels). Memory follows the
 render-target arithmetic (F5): at 1080p a half-float colour target is 16.6 MB, so a post chain with MSAA, two MRT outputs and bloom can reach
 about 100 MB or more (an estimate, not a measurement). The triangle and memory figures are the loosest: no source gives them (F7), so the spike either confirms or
 moves them.
-Rests on: R3-BUDGET-F1, F2, F3, F5, F6, F7; R3-LOOK-F14; legacy AUDIT_BUGS_PERF §1, CL9, TL15, GA15, CD15, CD17; wave 1
-R1-TICK's scene and client mark.
+Rests on: R3-BUDGET-F1, F2, F3, F5, F6, F7; R3-LOOK-F5, F14; R3-CHAR-REC1, R3-CHAR-REC4 (cited for the arithmetic);
+legacy AUDIT_BUGS_PERF §1, CL9, TL15, GA15, CD15, CD17; wave 1 R1-TICK's scene and client mark.
 Serves: VISION_V2 §3 (the largest mode), §4 (both targets), §6.4 (large units), §6.9 (the spectacle budget).
 Spike must prove (proposed): every row of the table holds on its machine in the benchmark scene (R3-MEASURE-REC2) for 3
 runs of 600 measured frames after 300 warm-up frames, on Chrome on both machines and on Firefox on the minimum machine,
@@ -1133,12 +1177,13 @@ Spike must prove (proposed): on the recommended machine, the harness's GPU total
 time minus CPU work within 2 ms median when the scene is GPU-bound; two back-to-back runs of the same build give medians
 within 3 % of each other.
 
-**R3-MEASURE-REC2. A fixed benchmark scene: a recorded match replayed from its inputs (R1's identical-results work) at the
+**R3-MEASURE-REC2. A fixed benchmark scene: a recorded match replayed from its inputs (R1's identical-results work: R1-DET-REC1, R1-DET-REC6) at the
 largest mode's worst case (R3-BUDGET-REC2: 48 soldiers in one fight, 4 large units, 200 projectiles), with a scripted
 camera path, started from a URL flag on any build, including preview links (R5).**
 Reason: numbers compare only if every run draws the same frames; legacy's clustered worst case (TL15) and R1-TICK's scale
 scene give the load; preview links make it runnable on any machine with a browser.
-Rests on: R3-MEASURE-F3; legacy TL15; R3-BUDGET-REC2 (cited); wave 1 R1-TICK's spike scene (cited).
+Rests on: R3-MEASURE-F3; legacy TL15; R3-BUDGET-REC2 (cited); wave 1 R1-TICK's spike scene, R1-DET-REC1 and
+R1-DET-REC6 (cited).
 Serves: VISION_V2 §3, §4, §6.9.
 Spike must prove (proposed): two runs on the same machine produce identical `renderer.info.render.drawCalls` and
 `triangles` on every frame, and identical screenshots at three fixed frames.
@@ -1150,7 +1195,7 @@ as a hardware result.**
 Reason: headless Chrome renders on SwiftShader by default and is "at reduced performance" even with a GPU (F8); GPU
 runners are a paid cloud GPU, not a laptop (F9); legacy already treats SwiftShader timings as not counting (TL9, TL12).
 Rests on: R3-MEASURE-F3, F8, F9; legacy TL9, TL11, TL12.
-Serves: VISION_V2 §4.
+Serves: VISION_V2 §4. No VISION_V2 §6 item: it serves the §4 targets only.
 Spike must prove (proposed): the CI job fails when a change adds 10 % or more draw calls or 10 % or more GPU memory in
 the benchmark scene (a planted regression is caught in 1 of 1 tries), and runs in under 5 minutes.
 
@@ -1166,14 +1211,18 @@ without the overlay; with it open, within 3 %.
 
 ### Question 7: spatial audio with Web Audio (R3-AUDIO)
 
-**R3-AUDIO-REC1. One `AudioListener` at the local player's position, oriented with the camera; sources as `PannerNode`s
+**R3-AUDIO-REC1. One `AudioListener` at the local player's position, oriented with the camera, as long as the camera is
+legacy-like (top-down and high; the v2 camera is look brief pending, and AUDIO-OQ3 re-decides the placement with it);
+sources as `PannerNode`s
 with `equalpower` by default (P-B), the distance model and its numbers as per-weapon data (LOOP_V2 §7 feel kit); HRTF
 only as a measured option for a few priority voices (P-D).**
 Reason: a panner against one listener replaces legacy's split (gain from the player, pan from the camera, GP6) with one
 model (F1, F3); equal power is the efficient model (F2), while three's `PositionalAudio` silently picks HRTF (F5) and
-no source gives HRTF's cost (F9); a listener at the camera flattens distance under a top-down view (F11).
+no source gives HRTF's cost (F9); a listener at the camera flattens distance under a top-down view (F11), which is the
+only reason for the player position, so the placement holds only for such a camera (AUDIO-OQ3).
 Rests on: R3-AUDIO-F1, F2, F3, F5, F6, F9, F11; legacy GP6.
-Serves: VISION_V2 §3 (48+ players: hearing where a fight is), §6.9 (large units and their effects).
+Serves: the brief's R3 row ("spatial audio with Web Audio", `docs/V2_PHASE0_BRIEF.md` §4); VISION_V2 §3 (the largest
+mode, 12v12v12 or 24v24), §6.9 (large units and their effects). No VISION_V2 §6 item names audio.
 Spike must prove (proposed): with 32 concurrent equal-power voices, a 5-minute recorded capture has no dropout (checked by
 a listener and by the AudioContext staying in the "running" state) and main-thread audio work stays under
 0.5 ms per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms.
@@ -1181,11 +1230,12 @@ a listener and by the AudioContext staying in the "running" state) and main-thre
 **R3-AUDIO-REC2. A voice manager with a cap and priorities (V-B) plus distance culling: proposed start of 32 voices on
 Low and 48 on High, priorities as data (own weapon and shots at the player first, then large units, then by distance),
 per-kind throttles as legacy's 55 ms impact throttle, pooled nodes and pre-built noise buffers.**
-Reason: inverse and exponential gains never reach zero (F4), so without a cap every distant shot of a 48-player fight
-keeps a voice; legacy has no cap (GP6) and only a 90 m cull (GN8); it also builds a buffer per shot (GP6). Proposed
+Reason: a playing source costs its nodes whatever its gain until the game stops it, and inverse and exponential gains
+never reach zero anyway (F4), so no distance curve bounds the voice count: without a cap every shot of a 48-player
+fight inside the cull radius keeps a voice; legacy has no cap (GP6) and only a 90 m cull (GN8); it also builds a buffer per shot (GP6). Proposed
 numbers are starting points; no source gives a voice budget (F9).
 Rests on: R3-AUDIO-F3, F4, F9; legacy GP6, GN8.
-Serves: VISION_V2 §3, §6.9.
+Serves: the brief's R3 row (spatial audio); VISION_V2 §3, §6.9. No VISION_V2 §6 item names audio.
 Spike must prove (proposed): in the benchmark fight (R3-MEASURE-REC2), the count of live source nodes never exceeds the
 cap, shots at the player are never dropped (0 of all such events in 3 runs), and audio code allocates no new
 AudioBuffer after warm-up.
@@ -1193,10 +1243,11 @@ AudioBuffer after warm-up.
 **R3-AUDIO-REC3. Occlusion starts as option O-C (zones from map data) or none; O-B (rays plus a lowpass, F8) only if the
 spike shows players cannot tell sounds behind walls, and then at a low ray rate per voice, height-aware.**
 Reason: no source read describes occlusion or its cost (F8, F9); legacy has none (GP6); the inventory asks "whether
-occlusion is worth its cost". Rays against static geometry are cheap per voice but need floors and heights (VISION_V2
-§6.2), which R4's line-of-sight work owns.
+occlusion is worth its cost". Rays against static geometry are cheap per voice but need floors and heights, the
+simulation's data for VISION_V2 §6.2, which R4's line-of-sight work owns; the rays would reuse it.
 Rests on: R3-AUDIO-F8, F9; legacy GP6, GW15.
-Serves: VISION_V2 §6.2 (floors and building interiors), §6.9.
+Serves: the brief's R3 row (spatial audio: occlusion). No VISION_V2 §6 item names audio; §6.2 (floors and line of sight)
+is the simulation data the rays would reuse, not a need this recommendation serves.
 Spike must prove (proposed): with O-B on, at most 1 ray per voice per 100 ms and at most 0.2 ms per frame for all rays at
 the voice cap on the minimum machine; a blind listening test where 4 of 5 testers tell an occluded source from an open
 one.
@@ -1207,7 +1258,8 @@ input (F10), as legacy does.**
 Reason: the sim runs in a Worker (R1-TICK-REC5), Web Audio plays on the page's context, and autoplay rules gate the
 start (F10); legacy's first-input start (GP6) already works.
 Rests on: R3-AUDIO-F10; legacy GP6; wave 1 R1-BND-REC2, R1-TICK-REC5 (cited).
-Serves: VISION_V2 §4 (all four browsers), §6.9 (large units and their effects heard in step with what is drawn).
+Serves: the brief's R3 row (spatial audio); VISION_V2 §4 (all four browsers), §6.9 (large units and their effects heard
+in step with what is drawn). No VISION_V2 §6 item names audio.
 Spike must prove (proposed): sound onset trails the drawn event by at most one rendered frame plus the output
 latency, measured on 100 shots; zero autoplay warnings in the console on all four browsers.
 
@@ -1228,7 +1280,8 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-WGPU-OQ4. Colour output.** RenderPipeline tone-maps and converts colour space by default (F12); the internal
   buffer is half float (F14). Legacy's "authored hex = on-screen colour" rule (CD15) is the locked legacy look only.
   Which output transform v2 uses is for the look brief; technically both are reachable (`outputColorTransform`).
-- **R3-WGPU-OQ5. Which release to pin.** r186 is current (F1); releases arrive about every two to five months (F1).
+- **R3-WGPU-OQ5. Which release to pin.** r186 is current (F1); the last four releases came 55, 76 and 85 days apart
+  (F1's dates, my arithmetic: about every two to three months).
   Decided by: the release current when the spike starts.
 
 ### Question 2: the WebGL 2 fallback (R3-GL2)
@@ -1245,6 +1298,10 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   R3-WGPU-REC1 mark 2.
 - **R3-GL2-OQ4. Transform-feedback compute cost.** Whether TSL compute on the fallback is fast enough for any effect is
   unmeasured. Decided by: a spike only if REC1's F-B route is taken.
+- **R3-GL2-OQ5. "WebGPU required, no fallback" as a reference point.** The options table weighs four ways to keep a
+  fallback and no row for dropping it; dropping it would shut out the platform groups of F12, whose share is unknown
+  (OQ2). Not researched in this pass (a verifier finding, C7). Decided by: the rendering ADR draft (`docs/adr/0003`)
+  and Mustafa, with OQ2's share once telemetry exists.
 
 ### Question 3: candidate techniques for a comic look (R3-LOOK)
 
@@ -1259,6 +1316,11 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-LOOK-OQ5. Shipped-game practice.** Comic-look talks (for example Arc System Works' Guilty Gear Xrd, GDC 2015) and
   Valve's "Illustrative Rendering in Team Fortress 2" were not readable here. Decided by: the Advisor's search for an
   allow-listed copy, if the look brief wants them.
+- **R3-LOOK-OQ6. Anti-aliasing.** MSAA is the renderer's built-in option (R3-WGPU-F15) and multiplies the multisampled
+  MRT attachments' memory (F14); post-process anti-aliasing (FXAA, which needs sRGB input, R3-WGPU-F12; SMAA; TRAA,
+  F10, with its ghosting) is the alternative, and screen-space outlines alias (options table). These were not
+  researched as options in this pass (a verifier finding, C7). Decided by: a reading of three's anti-aliasing nodes,
+  then the look-test scene (REC1), only for the techniques the brief keeps.
 
 ### Question 4: characters (skinning, instancing, LOD) (R3-CHAR)
 
@@ -1275,6 +1337,10 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   in the benchmark scene.
 - **R3-CHAR-OQ5. Camera framing.** F13 assumes a top-down camera like legacy's; the v2 framing is look brief pending
   (R2-INT-REC1 holds it as data). Decided by: the look brief, then the LOD tiers.
+- **R3-CHAR-OQ6. GPU-driven culling and indirect draws.** Not researched in this pass (a verifier finding, C7). On the
+  fallback, indirect dispatch counts are refused (R3-GL2-F2), so either would be a WebGPU-only extra under
+  R3-GL2-REC1. Decided by: a source reading and a spike, only if the draw-call budget (R3-BUDGET-REC2) is still missed
+  after REC1 to REC4.
 
 ### Question 5: budgets for the minimum and recommended hardware (R3-BUDGET)
 
@@ -1288,6 +1354,10 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   OQ7 decides the N of the offline scale test. The draw-call and triangle rows scale with N.
 - **R3-BUDGET-OQ5. Triangle and memory rows.** They have no source (F7). Decided by: the spike's measurement and the
   character rework's real models (R3-CHAR-OQ3).
+- **R3-BUDGET-OQ6. Shadow technique.** REC2 budgets a shadow pass ("one map, 1024² or off" on Low), but one shadow map
+  against cascades was not researched as an option in this pass (a verifier finding, C7); legacy uses one 2048² map
+  over a 100 m frustum (CD17), and r186 removed `PCFSoftShadowMap` from WebGPURenderer (R3-WGPU-F3). Decided by: a
+  reading of three's WebGPU shadow options, then the shadow-pass row of REC2 in the spike.
 
 ### Question 6: how we measure it (R3-MEASURE)
 
@@ -1314,6 +1384,9 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   MDN's pages stood in. Decided by: a verifier read of https://www.w3.org/TR/webaudio-1.1/ in parts.
 - **R3-AUDIO-OQ5. Occlusion ownership.** Rays across floors depend on R4's line-of-sight data. Decided by: R4 and the
   synthesis.
+- **R3-AUDIO-OQ6. An AudioWorklet mixer or spatializer of our own.** Not researched in this pass (a verifier finding,
+  C7); it would replace built-in panners (F1, F2) with our own code. Decided by: REC1's spike, only if the built-in
+  panners miss its CPU mark.
 
 ### Pointers to other topics
 
@@ -1353,7 +1426,7 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 #### Question 6 (R3-MEASURE)
 
 - R5: REC3 is a gate v2 check (counts, not timings); REC2's URL flag runs on preview links.
-- R1: REC2 relies on R1's identical-results replay; if replay is not identical on the client, the benchmark falls back
+- R1: REC2 relies on R1's identical-results replay (R1-DET-REC1, R1-DET-REC6); if replay is not identical on the client, the benchmark falls back
   to a scripted bot match with a fixed seed (less exact).
 - R6: results logs could live with other telemetry.
 
