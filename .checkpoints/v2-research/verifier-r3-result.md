@@ -1,5 +1,7 @@
 # R3 verifier spot-check: the report, verbatim
 
+Workflow run wf_1f477dcb-7cb (script `v2-research-r3-check-fix-run1.js`, prompt `prompts/verifier-r3.txt`), returned 2026-10-28 (about 20:45 UTC; copied from the workflow's own result by the session). Notes: `verifier-r3.md`.
+
 VERDICT: PASS WITH NOTES. All 44 claims I checked are confirmed at their sources. The critical read found four problems that are more than nits (L1, L2, C1, C2 below), so the R3 file needs an owner fix. None of them is a source error.
 
 Gate: skipped, as the task says (research check; the main session runs the gate).
