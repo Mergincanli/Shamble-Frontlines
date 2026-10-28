@@ -144,3 +144,135 @@ Task: rust-reviewer, wave 1 step 3 (Verify): R1 Rust crate/determinism claims + 
 - OQ5 maintenance check (R2-TRN-OQ5, handed to rust-reviewer): releases in last 6 months (2026-04-28..10-28): wtransport 1 (0.7.2, 2026-08-11; 0.7.1 is 2026-04-26, just outside); web-transport-quinn 10 (0.11.11 2026-07-17 .. 0.13.5 2026-10-24). RustSec: no package page for wtransport, web-transport-quinn, h3 (404 = no advisories filed). Shared deps: docs.rs wtransport "quinn ^0.11.6", "rustls ^0.23.23", "rcgen ^0.14.5 normal optional", "tokio ^1.28.1"; web-transport-quinn "quinn ^0.11", "rustls ^0.23", "web-transport-proto ^0.6", "web-transport-trait ^0.5", rcgen only "_dev_" (so REC5's "rcgen with web-transport-quinn" means our own direct dep). Both sit on the same quinn 0.11 line -> swap cost really is the session layer only; both inherit quinn-proto/rustls/ring advisories.
 - DET-F1..F4 CONFIRMED (Wasm spec, WebAssembly 3.0 (2026-10-27)): "All operators use round-to-nearest ties-to-even, except where otherwise specified."; NaN "then its sign is non-deterministic and the payload is computed as follows:" "If the payload of all NaN inputs to the operator is canonical" "Otherwise the payload is picked non-deterministically among all arithmetic NaNs"; profiles: all 5 quotes verbatim; relaxed (offset 100000): "the set of possible results may depend on properties of the host environment, such as its hardware." "These choices are fixed, that is, parameters are constant during the execution of any given program." "Relaxed multiply-add allows for fused or unfused results, which leads to implementation-dependent rounding behaviour." "In the deterministic profile, every parameter is prescribed to be 0." Extra: Wasm fmin "Else if both z1 and z2 are zeroes of opposite signs, then return negative zero." (Wasm is deterministic at ±0; x86 minps / NEON vminnm / Rust min differ -> signed-zero hash risk is cross-target).
 - Read R1 RECs (ECS-REC1..4, DET-REC1..7, BND-REC2/4, DATA-REC2/7) and R2 REC1-6, ROOM-REC2 for missed-risk review. R2 has no decoder fuzzing, no own message-size caps, queue boundedness unstated (handoff to security-auditor at r2:2890-2900).
+- DET-F11 sub-quote now CONFIRMED (f32 page "Algebraic operators"): "This means that the results of elementary operations may have undefined precision, and “non-mathematical” values such as NaN, +/-Inf, or -0.0 may behave in unexpected ways, but these operations will never cause undefined behavior."
+- BND-F19 fully CONFIRMED: "There is no means by which this can be overridden."
+- glam 0.34.1 docs: scalar-math "disables SIMD support and uses native alignment for all types."; "Currently only SSE2 on x86/x86_64, NEON on Aarch64, and simd128 on WASM are supported."; no statement that SIMD and scalar give equal results (only serde/Debug equality). => if our sim uses glam directly: scalar-math (what parry's enhanced-determinism does via glamx/scalar-math) — inferred risk.
+- Status: all claims in scope checked. Writing final table next.
+
+## FULL TABLE (C = confirmed, W = wrong, U = unsupported, P = partly)
+### R1 ECS crates
+ECS-F1 bevy 0.16-0.20 dates, 0.20.0 | bevy-website news folders; docs.rs | C | "2026-10-08-bevy-0.20"
+ECS-F2 standalone | docs.rs bevy_ecs | C | "can easily be used as a standalone crate in other projects"
+ECS-F3 tables default, sparse opt-in | docs.rs bevy_ecs | C | "This is the default storage type."
+ECS-F4 query order not guaranteed | Query | C | "Iteration order is not guaranteed."
+ECS-F5 sort not cached | QueryIter | C | "The sort is not cached across system runs."
+ECS-F6 ambiguity Ignore; shuffle_seed debug | ScheduleBuildSettings | C | "Defaults to `LogLevel::Ignore`." / "crate feature `debug`"
+ECS-F7 single-thread exec; multi_threaded off | SingleThreadedExecutor; features | C | "Runs the schedule using a single thread."
+ECS-F8 World not Clone | World impls | C | impl list has no Clone
+ECS-F9 Entity opaque, not for wire | Entity | C | "Do not use for serialization between runs."
+ECS-F10 bevy_ggrs registers types, HashMap per frame | README; architecture.md | C | "a `HashMap<RollbackId, As>`"
+ECS-F11 strategy cost notes, no benches | architecture.md | C | "Heap-allocating clone each frame"
+ECS-F12 no stable query order | pitfalls.md | C | "Bevy does not guarantee a stable iteration order for queries."
+ECS-F13 unregistered state desyncs | pitfalls.md | C | "causing silent desyncs."
+ECS-F14 Changed<T> fires after rollback | pitfalls.md | C | "will fire after every rollback."
+ECS-F15 0.16 relationships, no_std | 0.16 post | C (R1: inferred) | "One of the hottest ECS features is finally here"
+ECS-F16 hecs library, goals | docs.rs hecs | C (order now C) | "It is a library, not a framework."
+ECS-F17 arbitrary order, id reuse | hecs World | C | "Entities are yielded in arbitrary order."
+ECS-F18 hecs World not Clone | hecs World impls | C | Default, Extend, FromIterator, IntoIterator, Send, Sync
+ECS-F19 freelist deterministic ids | hecs World | C (condition now C) | "May only be called when the set of live entity IDs exactly matches"
+ECS-F20 user context; column format | hecs serialize/column | C | "For some applications, a custom approach may be preferable."
+ECS-F21 plain Vecs for few types | hecs README | C | "storing each type of entity in a separate plain Vec."
+ECS-F22 state in other structures | hecs README | C | "Most games will store significant amounts of state in other structures."
+ECS-F33 generics grow size; wasm-opt 15-20% | rustwasm book code-size | C | "can often get another 15-20% savings on code size."
+### R1 plain data
+ECS-F23 HashMap per-instance seed | std HashMap | C | "each `HashMap` instance uses a different seed"
+ECS-F24 BTreeMap key order | std BTreeMap | C | "produce their items in key order"
+ECS-F25 slice iter start to end | std slice | C | "The iterator yields all items from start to end."
+ECS-F26 Vec::clone_from reuses buffer | std Vec | C | "as it avoids reallocation if possible."
+ECS-F27 Copy vs Clone; clone_from overridable | std Clone | C | "can be overridden to reuse the resources of `a`" (default body `*self = source.clone()`; derive implements only clone)
+ECS-F28 slotmap versioned keys, no_std | docs.rs slotmap 1.1.1 | C (indirection, serde now C) | "once a key is removed, it stays removed"
+### R1 Rapier
+ECS-F29 RigidBodySet Clone/Serialize, handles | docs.rs rapier3d 0.36.1 | C | "just an index + generation"; clone_from is core default
+ECS-F30 whole state serializable | rapier.rs serialization | C (needs `serde-serialize` feature) | "most data structures of Rapier become serializable using serde."
+ECS-F31 exact same byte vectors | rapier.rs serialization | C | "will result in the exact same byte vectors"
+ECS-F32 issue #910 BvhWorkspace | github rapier #910 | C | "it appears to be because BvhWorkspace is not serialized"; fixed "Parry 0.26.1" / "Rapier 0.33"
+TICK-F8 dt 1/60, ccd substeps 1 | IntegrationParameters | C | "(default: `1.0 / 60.0`)"
+DET-F19 local determinism only | rapier.rs determinism | C | "may result in completely different results."
+DET-F20 enhanced-determinism conditions | same | C | "as well as WASM targets."
+DET-F21 not with simd8; parallel ok | same | C (+ missed "is therefore its own determinism domain.") | "cannot be enabled at the same time as the `simd8` feature,"
+DET-F22 libm_force; 4-lane path stays | rapier3d Cargo.toml | C | `enhanced-determinism = ["simba/libm_force", "parry3d/enhanced-determinism"]`
+DET-F23 parry flag forces libm/scalar glamx | parry3d Cargo.toml; rapier workspace | C (pins + fast-math note now C) | `"glamx/libm", "glamx/scalar-math"`; "re-enables FMA contraction in"
+DET-F24 no cost, no test method | rapier.rs determinism | C (absence) | -
+### R1 floats Wasm vs native
+DET-F1 round-to-nearest | Wasm numerics | C | "All operators use round-to-nearest ties-to-even"
+DET-F2 NaN sign/payload nondeterministic | Wasm numerics | C | "its sign is non-deterministic"
+DET-F3 deterministic profile optional | Wasm profiles | C | "Tools are generally expected to handle and produce code for the full profile by default."
+DET-F4 relaxed results hardware-dependent | Wasm numerics (relaxed) | C | "Relaxed multiply-add allows for fused or unfused results"
+DET-F6 wasm32 default features | rustc book | C | "the proposals that are enabled by default"
+DET-F7 IEEE roundTiesToEven | std f32 | C | "rounded according to the roundTiesToEven direction"
+DET-F8 NaN bits not portable | std f32 | C (location: type-level bullet) | "not guaranteed to be portable or even fully deterministic!"
+DET-F9 sin precision varies | std f32 | C for sin; others listed, not quoted | "varies by platform, Rust version"
+DET-F10 sqrt, mul_add, floor exact | std f32 | C | "specified by IEEE 754 as `fusedMultiplyAdd` and guaranteed not to change."
+DET-F11 no implicit FMA; algebraic opt-in | RFC 3514; f32 | C (1.98.0 now C) | "such as turning `a*b + c` into FMA operations"
+DET-F12 64-bit targets compliant | RFC 3514 | C (RFC also names wasm for NaN) | "are fully compliant."
+DET-F13 const-eval NaN may differ | RFC 3514 | C | "no guarantee that the choice made in const evaluation is consistent"
+DET-F14 min/max/clamp signed zero | std f32 | C (+ clamp "Panics if `min > max`") | "either input may be returned non-deterministically."
+DET-F15 casts defined; overflow by flags | Reference | C | "`NaN` will return `0`"
+### R1 libm
+DET-F16 wasm gets Rust libm, unix system libm | compiler-builtins math/mod.rs | C | "/// - All unix targets (linux, macos, freebsd, android, etc)"
+DET-F17 libm 0.2.16 pure Rust; arch exact ops | docs.rs libm; arch/mod.rs | C | "libm in pure Rust"; `pub use x86::{sqrt, sqrtf, fma, fmaf};`
+DET-F18 no accuracy/identity claim | docs.rs libm; README | C (absence) | -
+### R1 collections, RNG, fixed
+DET-F25 HashMap seeded "per process" | std HashMap | W (per instance) | "each `HashMap` instance uses a different seed"
+DET-F26 BTreeMap sorted | std BTreeMap | C | "sorted by key."
+DET-F27 StdRng not portable | rand 0.10.3 | C | "even with a fixed seed, output is not portable"
+DET-F28 ChaCha/PCG portable, streams | rand_chacha 0.10.0; rand_pcg 0.10.2 | C | "deterministic and portable"; "unique streams of output are available per seed/key."
+DET-F29 fixed: no trig | fixed 1.31.0 | C | "No trigonometric functions are provided"
+### R1 boundary
+BND-F1 rustwasm org wound down | Inside Rust 2025-07-21 | C (omits "or transferred to their existing maintainers") | "archived in place"
+BND-F2 cadence; version match; breaks .122/.123/.128 | wasm-bindgen releases | P: match + .123 C; .122 breaking U | "Requires matching wasm-bindgen and CLI versions (schema bump)."
+BND-F3 .d.ts by default | cli.md | C | "This is on by default."
+BND-F4 typescript_custom_section | guide | C | "The primary target for this feature is for code generation."
+BND-F5 serde-wasm-bindgen many calls | guide | C | "requires a lot of calls back and forth"
+BND-F6 slices copied | number-slices.md | C (&[T] inferred) | "since the results are copied back into its buffer."
+BND-F7 overlays avoid copies | rustwasm book | C | "we avoid copying the cells across the boundary on every tick."
+BND-F8 tsify / tsify-next | docs.rs | C (js feature, deprecation now C) | "Deprecated in favour of using `Ts<T>`"
+BND-F9 ts-rs at cargo test; MSRV | docs.rs ts-rs 12.0.1 | C (MSRV now C) | "The Minimum Supported Rust Version for this crate is 1.88.0"
+BND-F10 repr(C) layout | Reference type-layout | C | "add padding bytes to the current offset"
+BND-F18 threads need nightly | raytrace.md | C | "Note that this requires a nightly Rust toolchain."
+BND-F19 thread::spawn panics; defaults | rustc book | C | "There is no means by which this can be overridden."
+BND-F25 guide's "only Chrome" outdated (guide part) | wasm-in-web-worker.md | C | "only Chrome supports modules in web workers"
+BND-F28 four browsers | browser-support.md | C | "Firefox, Chrome, Safari, and Edge browsers are all supported"
+### R1 tick crates
+TICK-F6 bevy 64 Hz | bevy Fixed | C | "The default timestep() is 64 hertz, or 15625 microseconds."
+TICK-F7 paused clock; max delta | bevy Fixed/Virtual | C | "If the virtual clock is paused, the FixedUpdate schedule will not run."
+TICK-F23 tokio ms timers; Burst default | tokio 1.54.1 | C | "MissedTickBehavior::Burst is the default"
+### R1 ability crates
+ABL-F23 leafwing_abilities 0.13.0 | docs.rs | C (bevy ^0.19 now C) | "Built for the Bevy game engine."
+ABL-F24 bevy_gauge 0.5.1 | docs.rs | C (R1: inferred) | "Define attributes as expressions, not update systems."
+ABL-F25 bevy_alchemy 0.6.0 | docs.rs README | C (R1: inferred) | "New applications will overwrite the existing one."
+### R1 serialization / data
+DATA-F1 deny_unknown_fields | serde.rs container-attrs | C | "Always error during deserialization when encountering unknown fields."
+DATA-F2 not with flatten | same | C | "not supported in combination with flatten"
+DATA-F3 try_from | same | C | "then converting fallibly."
+DATA-F4 default, alias | field-attrs | C | "May be repeated to specify multiple possible names"
+DATA-F5 untagged poor errors | container-attrs | C | "does not produce an informative error"
+DATA-F6 float_roundtrip 2x | serde_json Cargo.toml 1.0.154 | C | "approximately 2x performance cost"
+DATA-F7 line/column; categories | serde_json Error | C | "One-based line number at which the error was detected."
+DATA-F8 serde_path_to_error | docs.rs 0.1.20 | C | "exposes the chain of field names leading to the error"
+DATA-F9 recursion limit default | serde_json | C (value unstated) | "only available if serde_json is built with the `"unbounded_depth"` feature."
+DATA-F10 Value then from_value | serde_json value | C | "Interpret a `serde_json::Value` as an instance of type `T`."
+DATA-F11 preserve_order | Cargo.toml | C | "maintains insertion order."
+DATA-F12 RON limits | ron README; docs.rs | C (now 0.12.3, 2026-10-28) | "does not yet make any guarantees about roundtrips"
+DATA-F13 TOML no null; spec 1.1.0 | docs.rs toml | C | "1.1.8+spec-1.1.0"; Value variants list
+DATA-F14 serde_yaml archived | github | C | "(This project is no longer maintained.)"
+DATA-F16 schemars 2020-12 | docs.rs 1.2.3 | C | "currently conform to JSON Schema 2020-12"
+DATA-F17 schemars reads garde/validator | attributes.md | C | "Sets the minimum/maximum properties for number schemas."
+DATA-F18 garde 0.23.0 | docs.rs | C | "By default, the context is `()`."
+DATA-F20 notify gaps | docs.rs notify 8.2.1 | C | "may not emit any events"
+DATA-F21 bevy hot reload desktop | bevy_asset 0.20.0 | C | "enable `bevy`’s `file_watcher` cargo feature."
+### R2 Rust server stack
+TRN-F6 both stacks -02/-07 settings, no -16 | wtransport-proto settings.rs; web-transport-proto 0.6.3 | C | `VarInt::from_u32(0x2b60_3742)`; "// TODO remove when 07 is in the wild"
+TRN-F15 Identity::self_signed P-256, 14 days | docs.rs wtransport 0.7.2; Cargo.toml | C | "This function uses the `ECDSA P-256` algorithm."
+TRN-F17 quinn initial_mtu 1200 | quinn TransportConfig | C (+ max_datagram_size "a little over a kilobyte at minimum") | "Must be at least 1200, which is the default"
+TRN-F25 quinn congestion choice, datagram API | quinn congestion; Connection | C | "Experimental! Use at your own risk."
+TRN-F28 quinn 0.11.12, mature and active | crates.io | C for numbers; "mature" omits 8 RustSec advisories in 2026 | "newest_version":"0.11.12"
+TRN-F29 wtransport 0.7.2, not production-ready | crates.io; Cargo.toml; README; docs | C | "is not considered completely production-ready."
+TRN-F30 web-transport-quinn 0.13.5 family | crates.io; README | C (release list now C) | "mirrors the Quinn API, abstracting away the HTTP/3 setup."
+TRN-F31 h3 experimental; h3-webtransport idle | github h3; crates.io | C | "The `h3` crate is still very experimental."
+TRN-F33 tokio-tungstenite 0.30.0; axum 0.8.9 ws | crates.io; docs.rs | C (axum uses tungstenite ^0.29) | "Available on **crate feature `ws`** only."
+ROOM-F7 tokio cooperative; long work on own thread | tokio task; spawn_blocking | C (link now C) | "prefer a dedicated thread created with `thread::spawn`."
+ROOM-F8 panic ends thread; abort ends process; 2 MiB | std thread; cargo profiles | C | "Terminate the process upon panic."
+
+VERDICTS: R1 Rust claims REVISE; R2 Rust claims REVISE.
+DONE

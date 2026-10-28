@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 16:45 Amsterdam
+- **Last update:** 2026-10-28 16:55 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -57,8 +57,8 @@
 ## Per-topic table
 | Topic | Owner | Units | Drafts | Assembled | Verification | Prompts |
 |---|---|---|---|---|---|---|
-| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer running; fix next | `prompts/verifier-r1-*.txt` |
-| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer running; fix next | `prompts/netcode-architect-r2-*.txt` |
+| R1 | engine-architect | 6 | 6/6 | yes, a6a97fe | verified by six verifiers (run wf_3fe63170-264): 224 claims, 218 confirmed, 1 partly, 1 wrong (DET F25b), 4 unsupported (BND 2, ABL 2), 1 not checkable; rust-reviewer REVISE (facts hold: 110/112 Rust claims confirmed across R1 and R2; missing Rust risks); fixing | `prompts/verifier-r1-*.txt` |
+| R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer | 1 | 0/1 | no | pending | wave 2 |
 | R4 | engine-architect | 1 | 0/1 | no | pending | wave 2 |
 | R5 | test-engineer (+ infra-engineer CI part) | 1 | 0/1 | no | pending | wave 2 |
@@ -112,8 +112,11 @@ key (condition A1).
 ## Running work
 - R2 chain: run wf_bce24fc0-5c6 DONE (3/3): reports verbatim in `verifier-r2-result.md`,
   `security-auditor-r2-protocol-result.md`, `netcode-architect-r2-assemble-result.md`.
-- Rust review: run wf_38e94d0f-403 (task wjewm59xi), script `v2-research-rust-review-run1.js`: rust-reviewer (xhigh) on
-  R1 and R2's server stack.
+- Rust review: run wf_38e94d0f-403 DONE: report verbatim in `rust-reviewer-r1-r2-result.md`, table in
+  `rust-reviewer-r1-r2.md`.
+- Fix: run wf_7dd61ce0-f84 (task wt3t8iqa1), script `v2-research-wave1-fix-run1.js`: engine-architect fixes R1 and
+  netcode-architect fixes R2 (xhigh), prompts `prompts/*-fix.txt`. Then a second verifier pass only where a fix changed
+  a recommendation, a number or a source (the fixers log every change by type).
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
 - Next: R1 fixer (engine-architect, xhigh) once the rust-reviewer is back; R2 fixer (netcode-architect, xhigh) once
