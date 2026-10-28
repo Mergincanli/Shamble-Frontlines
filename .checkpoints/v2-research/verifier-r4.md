@@ -7,3 +7,5 @@ Task: wave 2 verifier spot-check of R4 (docs/research/r4-physics-navigation.md),
 - Next: fetch sources.
 
 ## Verdicts (saved as found)
+- V1 R4-PHYS-F24 (Q3 kinematic: 5 clip planes, 4 bumps, STEPSIZE 18, MIN_WALK_NORMAL 0.7, box trace) · bg_local.h + bg_slidemove.c · CONFIRMED · bg_local.h: "#define	MIN_WALK_NORMAL	0.7f		// can't walk on very steep slopes"; "#define	STEPSIZE		18"; bg_slidemove.c: "#define	MAX_CLIP_PLANES	5"; "numbumps = 4;"; "pm->trace ( &trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, pm->tracemask);"; "up[2] += STEPSIZE;". The "trace.plane.normal[2] < MIN_WALK_NORMAL" line is not in bg_slidemove.c (presumably bg_pmove.c, listed; not rechecked). Fetch: no rigid-body/mass/impulse code in bg_slidemove.c (paraphrase; matches file's "inferred").
+- V2 R4-PHYS-F23 (shared server/client movement) · bg_pmove.c header + comment above Pmove · CONFIRMED · "// bg_pmove.c -- both games player movement code"; "Can be called by either the server or the client".
