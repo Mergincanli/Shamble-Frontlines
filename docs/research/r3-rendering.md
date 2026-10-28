@@ -37,8 +37,8 @@
   `docs/LEGACY_TUNING.md`. The inventory's marks are working recommendations (the Advisor's R7-MARKS (a)); rows marked
   "look brief pending" stay pending. `docs/ART_DIRECTION.md` is cited only as the legacy look ("Living Comic", locked for
   the legacy build).
-- Wave 1 ids (R1-TICK-REC5, R1-BND-REC2, R1-BND-REC5, R1-XU-OQ3, R2-SYNC-REC4, R2-INT-REC1) are cited, not restated as
-  findings of this file.
+- Wave 1 ids (R1-TICK-REC5, R1-TICK-OQ6, R1-BND-REC2, R1-BND-REC5, R1-XU-OQ3, R1-DET-REC1, R1-DET-REC6, R2-SYNC-REC4,
+  R2-INT-REC1) are cited, not restated as findings of this file.
 - **The look is not decided.** Question 3 gives each technique's capability and cost only, each marked "look brief
   pending", and picks no technique or set of techniques. Recommendations here choose a renderer path, a measurement
   method or a budget, never a look.
@@ -1456,7 +1456,90 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 
 ## Verifier spot-check
 
-Pending: the wave 2 verifier spot-check.
+One verifier pass ran on 2026-10-28 (wave 2 of `.checkpoints/v2-research/plan.md`), and the owner's fix pass
+(graphics-engineer, the same day) applied it. Verdict: PASS WITH NOTES. The verifier checked 44 key claims at their
+sources (WebFetch, allow-listed domains, 39 fetches) and found none wrong or unsupported; its critical read found four
+problems in the recommendations that were more than nits (L1, L2, C1, C2). Its report, verbatim:
+`.checkpoints/v2-research/verifier-r3-result.md`; its notes with every quote in full:
+`.checkpoints/v2-research/verifier-r3.md`; the fix log: `.checkpoints/v2-research/graphics-engineer-r3-fix.md`.
+
+**Counts.** 44 checked · 44 confirmed · 0 wrong · 0 unsupported. Four claims outside the key list were also confirmed
+(R3-WGPU-F14, R3-WGPU-F16, R3-GL2-F1, R3-MEASURE-F1). Final state after the fix pass: 43 no change needed · 1 fixed
+(R3-MEASURE-F3) · 0 re-sourced · 0 now an open question. No recommendation rests on a claim whose verdict is wrong or
+unsupported; every one of the 25 has at least one checked basis claim. M = 77 distinct R3 finding ids in the 25 "Rests
+on:" lists before the fix (legacy and wave-1 ids not counted), N = 44 checked.
+
+| Claim id | Claim | Source | Verdict | Location and exact words (as the verifier gave them) | Final state after the fix pass |
+|---|---|---|---|---|---|
+| R3-WGPU-F1 | r186 dated 24 Sep; then r185 01 Jul, r184 16 Apr, r183 20 Feb | github.com/mrdoob/three.js/releases | confirmed | "24 Sep 14:35" (Latest); "01 Jul 23:22"; "16 Apr 16:49"; "20 Feb 15:31" | no change needed (R3-WGPU-OQ5's release gaps fixed from these dates, C9) |
+| R3-WGPU-F3 | API breaks in r183, r185, r186 | three.js wiki Migration Guide, sections 182→183, 184→185, 185→186 | confirmed | "`PostProcessing` has been renamed to `RenderPipeline`."; "…has changed how premultiplied alpha is implemented"; "`PCFSoftShadowMap` with `WebGPURenderer` has been removed" | no change needed |
+| R3-WGPU-F4 | three.js calls the renderer experimental | manual webgpurenderer, Migration | confirmed | "still in an experimental state"; "recommended to upgrade to the latest version whenever possible" | no change needed |
+| R3-WGPU-F5 | WebGL 2 is the built-in fallback | manual Usage; WebGPURenderer docs; WebGPURenderer.js | confirmed | "uses a WebGPU backend by default and a WebGL 2 backend as a fallback."; "uses a WebGL 2 backend no matter if WebGPU is supported or not."; "const backend = new BackendClass( parameters );" | no change needed |
+| R3-WGPU-F6 | custom GLSL and EffectComposer unsupported | manual Migration | confirmed | "…are not supported in WebGPURenderer. This part of your application must be ported to node materials and TSL." | no change needed |
+| R3-WGPU-F7 | no promise that WebGPURenderer is faster | manual Migration | confirmed | "you will encounter missing features or a better performance with WebGLRenderer." | no change needed |
+| R3-WGPU-F8 | WebGLRenderer kept but gets no big features | manual "State of WebGLRenderer" | confirmed | "the recommended choice for pure WebGL 2 applications"; "no plans to add larger new features" | no change needed |
+| R3-WGPU-F9 | start-up is asynchronous | manual Usage; Renderer docs | confirmed (the `await` line not rechecked) | "WebGPU is initialized in an asynchronous fashion."; "…for best compatibility." | no change needed |
+| R3-WGPU-F10 | compileAsync prevents compile stutter | Renderer docs, compileAsync | confirmed | "…a phenomenon which is called "shader compilation stutter"…" | no change needed |
+| R3-WGPU-F11 | one TSL source builds both WGSL and GLSL | TSL wiki: Learning TSL, Example, Architecture | confirmed | "capable of encoding code into different outputs such as `WGSL`/`GLSL`"; "`WGSLNodeBuilder` aimed at WebGPU and `GLSLNodeBuilder` aimed at WebGL2." | no change needed |
+| R3-WGPU-F15 | MSAA uses 4 samples by default | WebGPURenderer docs, samples | confirmed | "When `antialias` is `true`, `4` samples are used by default." | no change needed |
+| R3-WGPU-F17 | Chrome 113 / 144 (Linux: Intel Gen12+), Android 121 | MDN GPU.json, chrome | confirmed | "144" "…and Linux (Intel Gen12+ GPUs only)."; "113" "Supported on ChromeOS, macOS, and Windows."; chrome_android "121" | no change needed (now also in R3-BUDGET-REC1's fixed reason, C1) |
+| R3-WGPU-F18 | Firefox 141 / 145 / 147; no Intel Mac, no Linux | MDN GPU.json, firefox | confirmed | "Supports Windows since Firefox 141."; "…since Firefox 145."; "…since Firefox 147."; "Does not support macOS on Intel CPUs."; "Does not support Linux." | no change needed (now also in R3-BUDGET-REC1's fixed reason, C1) |
+| R3-WGPU-F22 | spec draft of 15 Sep 2026; pipeline creation is async | w3.org/TR/webgpu: status, §3.2.1, §10 | confirmed | "W3C Candidate Recommendation Draft, 15 September 2026"; "…internally asynchronous."; "return a Promise which resolves to a pipeline object when creation of the pipeline has completed." | no change needed |
+| R3-GL2-F2 | fallback compute is transform feedback; indirect counts refused | WebGLBackend.js r186, compute() | confirmed | "gl.beginTransformFeedback( gl.POINTS );"; "state.enable( gl.RASTERIZER_DISCARD );"; "…not IndirectStorageBufferAttribute" | no change needed |
+| R3-GL2-F4 | fallback GPU timing is skipped without the extension | WebGLBackend.js, init() and initTimestampQuery() | confirmed | "this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );"; "if ( ! this.disjoint \|\| ! this.trackTimestamp ) return;" | no change needed |
+| R3-GL2-F5 | timer extension: Chrome 70, Edge 80, not Firefox or Safari | MDN compat data JSON | confirmed | chrome "70"; edge "80"; firefox, safari, chrome_android "version_added": false | no change needed |
+| R3-GL2-F7 | without multi-draw, one draw per batch entry | WebGLBackend.js, _draw | confirmed | "if ( this.hasFeature( 'WEBGL_multi_draw' ) === false ) {" | no change needed |
+| R3-GL2-F8 | multi-draw: Chrome 86, Safari 15, not Firefox | MDN compat data JSON | confirmed | "86"; "15"; firefox "version_added": false | no change needed |
+| R3-GL2-F9 | render bundles bring no gain on WebGL | BundleGroup docs | confirmed | "…without any performance improvements." | no change needed |
+| R3-GL2-F12 | who lands on the fallback | MDN GPU.json | confirmed (the list is the owner's reading, labelled as such) | "Does not support Linux."; "Does not support macOS on Intel CPUs." | no change needed (now the basis of R3-GL2-REC1's and R3-BUDGET-REC1's fixed reasons, C1, C4) |
+| R3-GL2-F13 | 31 % lack Direct3D 11.1; compatibility mode is opt-in | Chrome blog posts for WebGPU 139 and 146 | confirmed | "on Windows, 31% of Chrome users don't have Direct3D 11.1 or higher."; "a new opt-in feature called compatibility mode." | no change needed; fixed: R3-GL2-REC1 no longer reads it as a share of fallback users (C4) |
+| R3-LOOK-F5 | inverted-hull outline details | ToonOutlinePassNode.js | confirmed | "thickness = 0.003"; "material.side = BackSide;"; "// TODO: support outline thickness ratio for each vertex"; two renderObject calls | no change needed; R3-LOOK-REC2 and R3-BUDGET-REC2 now count its extra draws (L1, L2) |
+| R3-LOOK-F9 | GTAO with a normals-and-depth pre-pass | GTAONode docs | confirmed | "…Ground Truth Ambient Occlusion (GTAO) to a scene."; "// pre-pass for normals and depth"; "normals can be automatically reconstructed from depth values" | no change needed; R3-LOOK-REC2 counts the pre-pass as a planned extra (L1) |
+| R3-LOOK-F10 | GTAO cost settings | GTAONode docs, properties | confirmed | "Changing this member triggers a shader recompilation."; "a value of `0.5` should be sufficient for most scenes." "Default is `1`." | no change needed |
+| R3-LOOK-F13 | bloom: 5 mips, 12 passes | BloomNode.js | confirmed | "this._nMips = 5;"; "[ 6, 10, 14, 18, 22 ]"; "{ depthBuffer: false, type: HalfFloatType }"; the loop quoted: 1 + 2×5 + 1 passes | no change needed |
+| R3-CHAR-F1 | skinned mesh needs skin indices and weights | SkinnedMesh docs | confirmed | "requires skin indices and weights as buffer attributes"; "useful when sharing a skeleton across multiple skinned meshes." | no change needed; R3-CHAR-REC1's wording fixed (L3, C11) |
+| R3-CHAR-F2 | skinned bounds must be recomputed per frame | SkinnedMesh docs, computeBoundingSphere | confirmed | "…should be recomputed per frame in order to reflect the current animation state." | no change needed |
+| R3-CHAR-F4 | InstancedMesh cuts draw calls; no skinning on its page | InstancedMesh docs | confirmed | "will help you to reduce the number of draw calls"; "Represents the color of all instances."; no skinning text on the page | no change needed |
+| R3-CHAR-F7 | WebGPU backend: one draw per BatchedMesh entry | WebGPUBackend.js, _draw | confirmed | "passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );"; "info.update( object, counts[ i ], 1 );" | no change needed |
+| R3-CHAR-F9 | pose-per-instance skinning example is WebGPU only | webgpu_skinning_instancing_individual.html | confirmed | "Per-instance poses are computed once and reused by every render pass."; "mixer.setTime( elapsed + timeOffsets[ i ] );"; "throw new Error( 'No WebGPU support' );" | no change needed |
+| R3-CHAR-F12 | a BundleGroup is one bundle, static by default | BundleGroup docs | confirmed | "considered as one render bundle"; static "Default is `true`." | no change needed; R3-CHAR-REC4's bundles now need a measured gain (C3) |
+| R3-BUDGET-F1 | 16.66 ms frame, 10 ms of work | web.dev rendering-performance | confirmed | "the browser has 16.66 milliseconds to produce each frame."; "all of your work needs to be completed inside 10 milliseconds" | no change needed |
+| R3-BUDGET-F4 | Intel Gen12+ is the only GPU class named | MDN GPU.json | confirmed | "(Intel Gen12+ GPUs only)" | no change needed; R3-BUDGET-REC1 now uses it for Linux only (C1) |
+| R3-MEASURE-F2 | Chrome rounds GPU timestamps to 100 µs | Chrome developer-features page | confirmed | "…quantized with a resolution of 100 microseconds"; "Do not use these features in production." | no change needed |
+| R3-MEASURE-F3 | renderer.info counters and manual reset | three.js Info docs | confirmed (nit: programs and render targets are counts, not byte sizes) | "The number of draw calls of the current frame."; "…call `renderer.info.reset()` once per frame manually." | fixed: programs and render targets listed as counts, with the docs' words ("The number of active programs."; "The number of active renderTargets.") |
+| R3-MEASURE-F4 | GPU timing is opt-in; 2048-query pool | WebGPUBackend.js, Renderer.js, WebGPURenderer.js | confirmed (the option's doc string was not seen in these files) | "this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );"; "async resolveTimestampsAsync( type = 'render' ) {"; "…( this.device, type, 2048 );" | no change needed (the doc-string quote stays as read by the owner; not rechecked) |
+| R3-MEASURE-F7 | performance.now() is 5 µs isolated, 100 µs otherwise | MDN Performance.now, "Security requirements" | confirmed | "Resolution in isolated contexts: 5 microseconds"; "Resolution in non-isolated contexts: 100 microseconds" | no change needed |
+| R3-MEASURE-F8 | headless Chrome renders in software | Chrome blog supercharge-web-ai-testing | confirmed | "Software only, hardware acceleration unavailable."; "SwiftShader Device (Subzero)"; after the drivers were installed: "Hardware accelerated but at reduced performance." | no change needed |
+| R3-AUDIO-F2 | equal power is the default panning model | MDN PannerNode.panningModel | confirmed | "generally regarded as simple and efficient. `equalpower` is the default value." | no change needed |
+| R3-AUDIO-F3 | distance formulas; inverse is the default | MDN PannerNode.distanceModel | confirmed (the maxDistance parts not rechecked) | inverse "refDistance / (refDistance + rolloffFactor * (Math.max(distance, refDistance) - refDistance))"; "`inverse` is the default" | no change needed |
+| R3-AUDIO-F5 | three.js PositionalAudio uses HRTF and does not allocate | PositionalAudio.js | confirmed | "this.panner.panningModel = 'HRTF';"; "const endTime = this.context.currentTime + this.listener.timeDelta;"; module-level "const _position = /*@__PURE__*/ new Vector3();" | no change needed |
+| R3-AUDIO-F8 | lowpass filter, 12 dB per octave | MDN BiquadFilterNode | confirmed | "always has exactly one input and one output."; "Standard second-order resonant lowpass filter with 12dB/octave rolloff." | no change needed |
+| R3-AUDIO-F10 | sound before user input meets autoplay rules | MDN Autoplay guide | confirmed | "…outside the context of handling a user input event is subject to autoplay rules." | no change needed |
+
+**The critical read and what the fix pass did** (the verifier's ids; L = look choices, C = other findings):
+
+| Id | The verifier's finding (short) | What the fix pass did |
+|---|---|---|
+| L1 | R3-LOOK-REC2's "no effect re-renders the scene" and its 1.1 × mark rule out the hull outline and GTAO's documented pre-pass, which the file keeps open | Fixed: REC2 now keeps both open; their extra draws are "planned extras", and the mark is 1.1 × (effects-off draws plus the planned extras); Rests on adds R3-LOOK-F5 |
+| L2 | R3-BUDGET-REC2's Low cap of 800 draw calls excludes hull outlines on Low by arithmetic, unsaid | Fixed: the arithmetic is shown (about 786 without a per-object outline pass, about 1,060 with one); the Low row reads "≤ 800 without a per-object outline pass at Low; about ≤ 1,100 with one" (proposed); the trade is left to the look brief |
+| L3 | "rigid-skinned soldiers" ties the baseline to legacy's part-based characters | Fixed: the TL;DR, R3-CHAR-REC1 and option C-B say "one skinned mesh per soldier", rigid weights only while the part-based model stays (CHAR-OQ3) |
+| L4 | R3-AUDIO-REC1 and R3-CHAR-REC2 assume a legacy-like top-down camera without saying so | Fixed: AUDIO-REC1's listener placement holds only for such a camera (AUDIO-OQ3); CHAR-REC2's budget LOD holds under any camera, distance LOD is conditional on the brief's camera (CHAR-OQ5) |
+| L5 | BUDGET-REC2's post slot and Low pixel-ratio cap are cost limits, not look picks | No change (note only; BUDGET-OQ3 already leaves the ratio cap to Mustafa) |
+| C1 | R3-BUDGET-REC1 does not follow: Intel Gen12+ applies to Chrome on Linux only; a Windows machine reaches WebGL 2 only by forcing it; no CPU class | Fixed: the reason is rewritten on R3-WGPU-F17, F18 and R3-GL2-F12; the minimum laptop adds a Linux run for the real fallback and a proposed CPU floor (4 cores, 8 threads, no source) for R1-TICK-OQ6 |
+| C2 | R3-CHAR-REC1's 2.0 ms and R3-CHAR-REC2's and R3-BUDGET-REC2's 1.0 ms contradict | Fixed: 2.0 ms is the cost with every soldier on the full rig (no budget LOD), 1.0 ms the Low budget with the budget LOD; all three say which |
+| C3 | R3-CHAR-REC4 adopts render bundles without a measured gain, against R3-GL2-REC1 | Fixed: bundles only with a measured gain; merging is the named fallback; the mark checks the gain |
+| C4 | R3-GL2-REC1 reads GL2-F13's 31 % as a share of fallback users | Fixed: the reason now rests on F12's platform groups, says their share is unknown (OQ2), and reads F13 as a Direct3D 11.1 statistic only |
+| C5 | Missing "Rests on:" entries | Fixed: R3-MEASURE-F3 added to R3-WGPU-REC3 and R3-LOOK-REC1 (and R3-LOOK-REC2); R3-MEASURE-REC2 cites R1-DET-REC1 and R1-DET-REC6 |
+| C6 | Recommendations that trace to no VISION_V2 §6 item without saying so; AUDIO-REC1's §3 and AUDIO-REC3's §6.2 | Fixed: R3-WGPU-REC2, R3-WGPU-REC4, R3-GL2-REC3, R3-BUDGET-REC1 and R3-MEASURE-REC3 say "No VISION_V2 §6 item"; the four audio recommendations serve the brief's R3 row and say no §6 item names audio; AUDIO-REC1's §3 now reads "the largest mode"; AUDIO-REC3 names §6.2 as reused data, not a need it serves |
+| C7 | Missing options: anti-aliasing, shadow technique, "WebGPU required" row, AudioWorklet, GPU-driven culling | Applied as open questions, not options (R3-GL2-OQ5, R3-LOOK-OQ6, R3-CHAR-OQ6, R3-BUDGET-OQ6, R3-AUDIO-OQ6): the fix rule allows no new claims, and an option row needs sourced findings; each says what would decide it. Partly applied, with that reason |
+| C8 | Findings marked "confirmed" without a quote: GL2-F11, BUDGET-F6, MEASURE-F6 | Fixed: GL2-F11 quotes the data file's `version_added` values; BUDGET-F6 quotes the Info docs; MEASURE-F6 is now "inferred" from R3-GL2-F4 and F5 |
+| C9 | Number nits: WGPU-OQ5's "two to five months"; counts listed as byte sizes; three against four large units; AUDIO-F4's reason for a cap | Fixed: OQ5 gives the gaps (55, 76, 85 days); MEASURE-F3 and BUDGET-F6 list programs and render targets as counts; CHAR-REC4 uses four large units (mark 200 draws and 2.0 ms, proposed, arithmetic shown); AUDIO-F4 and AUDIO-REC2 say a voice costs its nodes whatever its gain (inferred), so the cap, not the curve, bounds voices |
+| C10 | No silent contradiction of R1 or R2 | No change needed |
+| C11 | R3-CHAR-REC1's "documented on both backends" leans on the Skeleton page; WebGPURenderer's skinning is unconfirmed (CHAR-OQ1) | Fixed: REC1 says so and its mark checks C-B on both backends |
+
+**Not verified** (the verifier's list): claims off the check list (including R3-WGPU-F2, F12, F13, F19, F20, F21), the
+Firefox release dates in R3-WGPU-F18, the `maxDistance` parts of R3-AUDIO-F3, the `trackTimestamp` option's doc
+string, and any GPU timing (no source gives one, R3-LOOK-F15). The fix pass fetched no new page and re-sourced no claim.
 
 ## Sources
 
