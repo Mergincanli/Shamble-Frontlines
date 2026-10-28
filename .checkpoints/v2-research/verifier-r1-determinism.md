@@ -40,3 +40,76 @@ Next: rapier3d Cargo.toml (F22), parry3d Cargo.toml (F23).
 Next: parry3d Cargo.toml line.
 - F23 CONFIRMED (line). parry3d/Cargo.toml: `enhanced-determinism = ["simba/libm_force", "indexmap", "glamx/libm", "glamx/scalar-math"]`; `indexmap = { workspace = true, optional = true }`; no comment says why indexmap: the "stable iteration order" reason is inferred, and REC5 labels its use of it "(F23, inferred)". OK.
 Next: HashMap (F25), BTreeMap (F26).
+- F25 PARTLY WRONG: "randomly seeded per process" is wrong; the page says per instance. HashMap page (std): "As explained above, `HashMap` is randomly seeded: each `HashMap` instance uses a different seed, which means that `HashMap::new` normally cannot be used in a `const` or `static` initializer." (const/static section). Rest CONFIRMED: "The algorithm is randomly seeded, and a reasonable best-effort is made to generate this seed from a high quality, secure source of randomness provided by the host without blocking the program."; iter: "An iterator visiting all key-value pairs in arbitrary order."; "The hashing algorithm can be replaced on a per-`HashMap` basis using the default, with_hasher, and with_capacity_and_hasher methods."; with_hasher: "Setting it manually using this function can expose a DoS attack vector." -> resolves R1-XU-OQ5: per instance. Impact: REC5 pass mark ("seed differs per process") and REC6 reason ("separate processes catch hash-map order"): conclusion still holds (random seeds differ across processes too, and per instance even within one process), but the stated reason misquotes the source; fix the wording.
+- F26 CONFIRMED. BTreeMap (std 1.99.1): "Given a key type with a total order, an ordered map stores its entries in key order."; iter: "Gets an iterator over the entries of the map, sorted by key."
+Next: rand StdRng (F27), rand_chacha / ChaCha8Rng / rand_pcg (F28).
+- F27 CONFIRMED. docs.rs rand 0.10.3 (20 September 2026) StdRng: "Non-portable: any future library version may replace the algorithm and results may be platform-dependent." / "Also note that, even with a fixed seed, output is not portable."
+- F28 CONFIRMED. rand_chacha 0.10.0 (13 September 2026): "These generators are all deterministic and portable ... with testing against reference vectors." (ellipsis = link to book Reproducibility); ChaCha8Rng set_stream: "Set the stream number." "This is initialized to zero; 264 unique streams of output are available per seed/key." (2^64, superscript lost); set_word_pos: "Set the offset from the start of the stream, in 32-bit words."; get_word_pos/get_stream/get_seed exist (supports REC4's 'snapshot carries RNG exactly', still inferred). rand_pcg 0.10.2 (22 September 2026): "These generators are all deterministic and portable (see Reproducibility in the book)..."; Pcg64Mcg: "This has poor performance on 32-bit CPUs but is a good choice on 64-bit CPUs for both 32-bit and 64-bit output."; Pcg32: "This is a good choice on both 32-bit and 64-bit CPUs (for 32-bit output)."
+Next: fixed (F29), MDN Math (F30), gafferongames (F31, F32).
+- F29 CONFIRMED. docs.rs fixed 1.31.0 (20 September 2026): "Representation of binary fixed-point numbers up to 128 bits wide." / "This crate does _not_ provide general analytic functions." / "No trigonometric functions are provided, for example no `sin` or `cos`." ('Rapier f32/f64 only' inferred, consistent with workspace members rapier3d / rapier3d-f64 seen for F22.)
+- F30 CONFIRMED (main); no-seed part stays inferred from the Math page. MDN Math (last modified Jul 10, 2025): "Many `Math` functions have a precision that's _implementation-dependent_." / "This means that different browsers can give a different result. Even the same JavaScript engine on a different OS or architecture can give different results!"; Math.random: "Returns a pseudo-random number between `0` and `1`."; seeding: none described.
+- F30 no-seed part now CONFIRMED via an extra source (not cited by the doc): MDN Math/random intro: "The implementation selects the initial seed to the random number generation algorithm; it cannot be chosen or reset by the user." Suggest citing it.
+Next: gafferongames floating_point_determinism (F31), networking (F32).
+- F31 CONFIRMED. gafferongames "Floating Point Determinism" (Glenn Fiedler, February 24, 2010): Battlezone 2 (Ken Miller, Pandemic): "absolutely identical results on every client, down to the least-significant bit of the mantissa"; GPG (Elijah, Supreme Commander): "Also, every tick we assert that these fpu settings are still set:" / "We have never had a problem with the IEEE standard across any PC cpu AMD and Intel with this approach."; Pandemic (Ken Miller): "AMD and Intel processors produced slightly different results for trancendental functions".
+- F32 CONFIRMED. gafferongames "What Every Programmer Needs To Know About Game Networking" (Glenn Fiedler, February 24, 2010): "running a subset of the game code for your player character on the client machine"; "invisibly 'rewinds and replays' the last n frames of local player character movement while holding the rest of the world fixed."; (quoting Tim Sweeney) "so the client's position is seldom corrected."; "one tiny difference results in complete desynchronization over time."
+Next: F3 profiles page (not in Rests on, but REC2/OQ4 context) and tier rules for R1-XU-OQ6.
+- F3 (not in any Rests on) CONFIRMED. profiles.html (WebAssembly 3.0, 2026-10-27): "All NaN values generated by floating-point instructions are canonical and positive." / "All relaxed vector instructions have a fixed behaviour that does not depend on the implementation." / "Even under this profile, the memory.grow and table.grow instructions technically remain non-deterministic" / "A host platform can thereby decide to support the language only under a restricted profile" / "Tools are generally expected to handle and produce code for the full profile by default." Names no browser.
+- R1-XU-OQ6 (tiers): docs/research/README.md:22-23 tiers = official · "talks and papers from shipped games" · "everything else, marked as such". Both Fiedler pages are blog articles: tier "other" (F31 may add "quotes shipped-game developers"). F32's "shipped game (practitioner article)" label is wrong.
+- R1-XU-OQ5: per instance (see F25).
+
+Other findings (ranked):
+1. (medium) F25 "seeded per process" wrong; source says per instance. REC5 pass mark and REC6 reason restate it. Conclusion survives (seeds differ across processes and per instance), wording must follow the source.
+2. (medium) REC2 and REC6 depend on browsers not running Wasm's deterministic profile (F3, inferred part) but neither lists F3.
+3. (low) REC2's core premise that pinned libm gives bit-identical results on wasm32 and native is stated by no source (F18 absence; not in Rests on). Its pass mark tests it, so OK as a spike item; list F18 in Rests on.
+4. (low) REC2's alternative path (nalgebra ComplexField + simba libm_force) and "simd128 off until OQ2" rest on F20/F22, not listed in REC2's Rests on.
+5. (low) Legacy rows used in reasons but missing from Rests on: REC1 (TL13, STATUS.md:70), REC5 (GP14), REC6 (GN8). REC4 lists them.
+6. (low) REC4's Pcg32 fallback: F28 quotes only Pcg64Mcg's 32-bit cost; Pcg32's "good choice on both 32-bit and 64-bit CPUs" (rand_pcg page) is confirmed by me but not in F28; whether Pcg32 offers streams is unchecked.
+7. (low) §6 traces: all REC1-REC7 name at least one §6 item; REC5's §6.5 and REC6's "replay" under §6.6 are loose fits (§6.6 is match recording for tuning).
+8. (info) Can be upgraded: F5 confirmed verbatim; F23 workspace pins confirmed verbatim; F30 no-seed confirmed by MDN Math/random ("it cannot be chosen or reset by the user"); F9 confirmed verbatim also for cos, tan, atan2, powf, exp, ln.
+No pass-mark number unsourced and unmarked: all REC pass marks are "(proposed)"; 24v24/12v12v12 and ~100 ms sourced (VISION_V2 §3, §4).
+
+FULL TABLE (id · claim · source · verdict · location)
+F1 · Wasm floats IEEE 754, RNE ties-even · webassembly.github.io numerics · confirmed · "Floating-Point Operations": "All operators use round-to-nearest ties-to-even, except where otherwise specified."
+F2 · NaN sign/payload non-deterministic · numerics · confirmed · "NaN Propagation"
+F3 · deterministic profile is host's choice · profiles.html · confirmed · "A host platform can thereby decide..."
+F4 · relaxed SIMD hardware-dependent, fixed per run, FMA fused or not · numerics · confirmed · "Relaxed Operations"
+F5 · relaxed SIMD Chrome 114/Firefox 145/Safari flag/Node 21.0/Wasmtime 15 · features.json · confirmed (verbatim; doc says inferred) · relaxedSimd keys
+F6 · wasm32 default proposals list · rustc book wasm32-unknown-unknown · confirmed · "As of the time of this writing..."
+F7 · Rust + - * / roundTiesToEven · std f32 1.99.1 · confirmed · type docs
+F8 · NaN bits not portable · std f32 · confirmed · "NaN bit patterns"
+F9 · std transcendental precision non-deterministic · std f32 · confirmed (sin, cos, tan, atan2, powf, exp, ln; rest inferred) · method precision notes
+F10 · sqrt, mul_add exact; floor/ceil/round/trunc/fract precise · std f32 · confirmed · method precision notes
+F11 · no implicit FMA, explicit opt-in; algebraic_* undefined precision · RFC 3514; std f32 · confirmed · RFC Motivation/Alternatives; f32 algebraic operators
+F12 · x86-64/AArch64/RISC-V fully compliant; i586, ARM32 NEON exceptions · RFC 3514 · confirmed · Target-specific problems
+F13 · const-eval NaN choice may differ · RFC 3514 · confirmed · reference-level
+F14 · min/max/clamp signed zero non-deterministic · std f32 · confirmed · min, max, clamp docs
+F15 · float->int casts saturating, NaN->0; overflow by flags · Rust Reference operator-expr · confirmed · "Numeric cast", "Overflow"
+F16 · compiler-builtins supplies libm math on wasm32-unknown-unknown, not unix · compiler-builtins math/mod.rs · confirmed · `partial_availability` comment + cfg
+F17 · libm 0.2.16 pure Rust, function list; default arch swaps only exact ops · docs.rs libm; libm arch/mod.rs; libm Cargo.toml · confirmed · pub use lines; `default = ["arch"]`
+F18 · libm gives no accuracy/cross-platform claim · docs.rs libm; libm README · confirmed (absence) · whole page
+F19 · Rapier locally deterministic only · rapier.rs determinism (0.36) · confirmed · opening paragraph
+F20 · cross-platform conditions (flag, IEEE incl. WASM, order, ComplexField) · rapier.rs determinism · confirmed · conditions list
+F21 · no simd8 with flag; parallel OK · rapier.rs determinism · confirmed · notes
+F22 · rapier3d flag = simba/libm_force + parry flag; 4-lane wide always on; 0.36.1 · rapier3d Cargo.toml; workspace Cargo.toml · confirmed · [features], [dependencies], [workspace.package]
+F23 · parry3d flag = libm_force, indexmap, glamx libm/scalar-math · parry3d Cargo.toml · confirmed (indexmap reason inferred) · [features]
+F24 · no cost and no check method on Rapier page · rapier.rs determinism · confirmed (absence) · whole page
+F25a · HashMap random seed, arbitrary iter order, custom hasher, DoS warning · std HashMap · confirmed · top docs, iter, with_hasher
+F25b · HashMap "randomly seeded per process" · std HashMap · WRONG · const/static section: "each `HashMap` instance uses a different seed"
+F26 · BTreeMap key order · std BTreeMap · confirmed · top docs, iter
+F27 · StdRng non-portable · docs.rs rand 0.10.3 StdRng · confirmed · struct docs
+F28 · rand_chacha/rand_pcg portable; 2^64 streams; set_word_pos; Pcg64Mcg slow on 32-bit · docs.rs rand_chacha 0.10.0, ChaCha8Rng, rand_pcg 0.10.2 · confirmed · crate docs; set_stream; set_word_pos
+F29 · fixed 1.31.0 no trig · docs.rs fixed · confirmed · crate docs
+F30 · JS Math implementation-dependent; no seed · MDN Math (+ MDN Math/random) · confirmed · Description; Math/random intro
+F31 · lockstep needs bit identity; GPG IEEE OK; Pandemic transcendental AMD/Intel differ · gafferongames floating_point_determinism · confirmed · Ken Miller and Elijah quotes
+F32 · prediction corrected; lockstep desync · gafferongames networking article · confirmed · client-side prediction / lockstep sections
+V3 · goal 12v12v12 or 24v24 (36/48) · docs/VISION_V2.md §3 · confirmed · line 44
+V4 · fair up to about 100 ms ping · docs/VISION_V2.md §4 · confirmed · line 54 [DEFAULT]
+L-STATUS70 · 11 wall-clock reads, shared Math.random, cosmetic RNG stream · docs/STATUS.md:70 · confirmed
+L-GP14 · 10 calls+1 comment, animation clocks, sfxShot before spread, shake · LEGACY_INVENTORY.md:324 · confirmed
+L-GN6 · bot spread from shared Math.random · LEGACY_INVENTORY.md:271 · confirmed
+L-GN8 · cull on/off identical logs 69/207 events · LEGACY_INVENTORY.md:273 · confirmed
+L-GC5 · 10.0/12.0/13.1 vs 13.9 shots/s · LEGACY_INVENTORY.md:244 · confirmed
+L-TL13 · >=3 runs, N=12/24/36/48, seeded native bots · LEGACY_INVENTORY.md:398 · confirmed
+Counts: 41 claims: 40 confirmed, 1 wrong (F25b), 0 unsupported.
+Per REC wrong/unsupported basis: REC1 none; REC2 none; REC3 none; REC4 none; REC5 F25b; REC6 F25b; REC7 none.
+DONE

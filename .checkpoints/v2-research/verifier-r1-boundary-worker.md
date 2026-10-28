@@ -59,3 +59,62 @@ Web sources done. Next: legacy facts GP13 GP14 GC2 GA15 GP10 CS1 GP2 and VISION_
 - Legacy GA15: CONFIRMED. Inventory GA15: struct fields aim yaw, reload progress, throw charge, grounded, ADS; "Aim pitch travels outside the struct: pitchWeapon writes the gun's rotation.x".
 - Legacy GP2: CONFIRMED. Inventory GP2 lists event-time actions; v2 note "press and release edges ... neither lost nor doubled".
 Next: VISION_V2 §3/§4/§5/§6, LOOP_V2 §11.
+- VISION_V2 numbers: CONFIRMED. §3 "`[DEFAULT]` ... Bots fill empty slots."; §4 "Desktop browsers first: Chrome, Edge, Firefox and Safari." / "**Minimum:** a laptop with integrated graphics runs the largest mode at 30+ fps on Low." / "Matches feel fair up to about 100 ms of ping."; §5 "Guest play first; a simple login arrives with account progression"; §6.1 modes as data + rooms and private matches; §6.2 "aiming at height"; §6.3 data-driven abilities; §6.4 "big and multi-part"; §6.7 faction content as data; §6.8 moments; §6.9 spectacle budget "without dropping frames".
+- LOOP_V2 §11 (line 153-155): "Then run the scale test on this map (N = 12, 24, 36, 48)." CONFIRMED.
+- Pass marks: every REC's spike list is headed "Spike must prove (proposed)"; 16.7 ms = 1/60 s arithmetic. No unmarked unsourced number found.
+Flags drafted (to rank in final): REC2 missing basis "Wasm memory buffer cannot be transferred, hence the one copy"; REC2 uses F30 inline but not in Rests-on; REC1 mark records hardwareConcurrency (F32) not in Rests-on; REC3 F15 copy-by-default unsupported; REC5 F23c unsupported, "hosting constraints" no finding, "isolation buys only" omits measureUserAgentSpecificMemory (F20); REC6 offline play traces to no §6 item (self-flagged OQ1), §6.1 trace weak; REC1 §6.2 parenthetical adds "off the render thread" not in §6.2; F27 omits mutable-globals; OQ7 "broke compatibility three times" leans on unsupported 0.2.122.
+Next: optional F32 check, then final table + DONE.
+- (extra, not in BND rests-on) F32: CONFIRMED. MDN hardwareConcurrency: "...returns the number of logical processors available to run threads on the user's computer." / "The browser may, however, choose to report a lower number of logical cores in order to represent more accurately the number of Workers that can run at once, so don't treat this as an absolute measurement..."
+- REC2 missing-basis probe: WebAssembly JS API spec (webassembly.github.io/spec/js-api) §5.3 Memories: "Set buffer.[[ArrayBufferDetachKey]] to "WebAssembly.Memory"." -> the memory's own buffer has a detach key, so user code cannot transfer it (the throw itself is ECMA-262 DetachArrayBuffer, not on allow list, not read). This is why REC2 must copy once; R1 has no finding for it.
+
+## Final table
+| id | claim | source | verdict | location |
+|---|---|---|---|---|
+| F2a | CLI and lib must match since 0.2.128 | GH release 0.2.128 | confirmed | release notes, "Requires matching `wasm-bindgen` and CLI versions (schema bump)." |
+| F2b | cadence; breaking in .122/.123/.128; year 2026 | GH releases list | partly: dates + .123 confirmed; .122 breaking and year unsupported | .123: "a breaking change for callers that relied on widening `&mut` references." |
+| F3 | .d.ts on by default | guide cli.md | confirmed | --typescript |
+| F4 | typescript_custom_section appends to .d.ts | guide attr page | confirmed | body |
+| F5 | serde-wasm-bindgen many calls; JSON 2x-0.2x | guide serde page | confirmed | "An alternative approach - using JSON" |
+| F7 | keep data in linear memory, overlay views | rustwasm book | confirmed | game-of-life/implementing |
+| F8 | tsify desc, serde route, deprecation, tsify-next exists, status unclear | docs.rs tsify, tsify-next | confirmed | crate root pages |
+| F9 | ts-rs test-time generation | docs.rs ts-rs 12.0.1 | confirmed ("no runtime part" inferred; MSRV not checked) | crate root |
+| F10 | only repr(C) gives readable layout | Rust Reference type-layout | confirmed | "The Rust representation", "The C representation", "#[repr(C)] Structs" |
+| F11 | typed array = view; offset multiple of element size | MDN TypedArray | confirmed | constructor; Exceptions RangeError |
+| F12 | SAB needs secure + isolated; postMessage throws | MDN SharedArrayBuffer | confirmed | Security requirements / API availability |
+| F15a | transfer = zero-copy move, sender loses it | MDN Transferable objects | confirmed | intro paragraphs |
+| F15b | without transfer list data is copied | MDN Transferable objects | unsupported (no sentence; code example only) | - |
+| F15c | typed arrays not transferable; WT streams listed | MDN Transferable objects | confirmed | list |
+| F16 | grow detaches; shared keeps old length | MDN Memory.grow | confirmed | Examples > Detachment upon growing |
+| F17a | shared Memory buffer is a SAB | MDN SharedArrayBuffer | confirmed | WebAssembly shared memory |
+| F17b | module must declare shared to import shared | threads Overview.md | confirmed (doc's quote is the reverse rule) | Shared Linear Memory |
+| F17c | shared memory needs a maximum | threads Overview.md | confirmed | Spec Changes |
+| F18 | threads need nightly, +atomics, build-std, web/no-modules | guide raytrace.md | confirmed | body |
+| F19 | thread::spawn panics; default features | rustc book wasm32-unknown-unknown | confirmed | body; Tier 2 |
+| F20 | isolation = COOP same-origin + COEP; finer timers, memory API | MDN COOP, crossOriginIsolated | confirmed | COOP intro; crossOriginIsolated list |
+| F21 | require-corp needs CORP; credentialless; frames | MDN COEP; web.dev coop-coep | confirmed | directives; web.dev body |
+| F22 | Safari has no credentialless; versions | BCD COEP json; web.dev | confirmed | support objects |
+| F23a | same-origin severs popups | MDN COOP | confirmed | unsafe-none / same-origin |
+| F23b | allow-popups is for OAuth/payments | MDN COOP | confirmed | same-origin-allow-popups |
+| F23c | allow-popups gives no isolation | MDN COOP; web.dev | unsupported (sources lean the other way) | MDN "needs the benefits of cross-origin isolation"; web.dev 2021 changelog "relaxed condition for cross-origin isolation" |
+| F24a | report-only header | web.dev coop-coep | confirmed | "You will receive reports without blocking embedded content." |
+| F24b | headers must cover worker scripts | web.dev coop-coep | confirmed (doc said inferred) | "...including the top-level document, iframes and worker scripts." |
+| F25 | module workers in all four | BCD Worker.json; guide | confirmed | options_type_parameter 80/mirror/114/15 |
+| F26 | SAB, Atomics in all four; waitAsync Baseline 2025 | BCD SAB, Atomics; MDN waitAsync | confirmed | support objects; badge |
+| F27 | Wasm features + threads in three engines | webassembly features.json | confirmed (Edge inferred; mutable-globals missing from list) | chrome/firefox/safari keys |
+| F28 | wasm-bindgen supports four browsers | guide browser-support.md | confirmed | first sentence |
+| F29 | WebTransport, WebSocket in workers | MDN WebTransport, WebSocket | confirmed | notes; Baseline "Since March 2026" |
+| F30 | 5 us vs 100 us; worker time origin | MDN Performance.now | confirmed | Security requirements; intro |
+| F33 | Vite workers, ?init, server.headers | vite.dev features, server-options | confirmed | Web Workers; WebAssembly > Manual Initialization; server.headers |
+| CS1 | FIXED_DT, BTN, makeInputCommand unwired | shamble-core.js:1479-1481; LEGACY_INVENTORY CS1 | confirmed | code |
+| GP2 | event-time actions; edges | LEGACY_INVENTORY GP2 | confirmed | row |
+| GP13 | rAF variable dt clamp 0.05, freezes | shamble-game.js:3053 | confirmed | loop() |
+| GP14 | HUD writes interleaved; 0.49 ms | LEGACY_INVENTORY GP14; AUDIT_BUGS_PERF.md:10 | confirmed | row; runtime profile |
+| GP10 | ~30 writes -> 0.01 real writes | AUDIT_BUGS_PERF.md:27, :85 | confirmed | P3; CS3 |
+| GC2 | 12 slots; 0.80-1.00 ms at 48 | LEGACY_INVENTORY GC2; reports/2026-10-16-three-teams-core.md:48 | confirmed | row; table |
+| GA15 | state struct; aim pitch side channel | LEGACY_INVENTORY GA15 | confirmed | row |
+| V3 | bots fill empty slots | VISION_V2 §3 | confirmed | [DEFAULT] line |
+| V4 | four browsers; laptop iGPU 30+ fps; ~100 ms ping | VISION_V2 §4 | confirmed | lines 1,2,4 |
+| V5 | guest first, login later | VISION_V2 §5 | confirmed | line 1 |
+| L11 | N = 12, 24, 36, 48 | LOOP_V2 §11 | confirmed | "Then run the scale test on this map (N = 12, 24, 36, 48)." |
+Counts: 46 rows; confirmed 43, partly confirmed 1 (F2b), unsupported 2 (F15b, F23c), wrong 0.
+DONE
