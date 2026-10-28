@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 17:30 Amsterdam
+- **Last update:** 2026-10-28 17:10 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -120,7 +120,8 @@ key (condition A1).
   `-r2.md`): R1 5 new findings, 9 basis claims without a first-pass verifier "confirmed" (incl. ECS-F7, F19, F20,
   BND-F32 added to Rests-on lists at the fix), 46 changed basis findings, 29 changed recs; R2 5 new, 1 (TRN-F36), 32
   changed, 27 changed recs. Prompts `prompts/verifier-r{1,2}-second-pass.txt` (WebFetch only, no curl, pending
-  VERIFY-FETCH); script `v2-research-second-pass-run1.js`; verifier R1 high, R2 xhigh, 2 agents.
+  VERIFY-FETCH); script `v2-research-second-pass-run1.js`; verifier R1 high, R2 xhigh, 2 agents. Launched 17:09
+  Amsterdam: run wf_64d0bbcd-730 (task w1wa82dkw); notes `verifier-r{1,2}-second-pass.md`.
 - R1 verify: run wf_3fe63170-264 DONE, 6/6 returned; reports verbatim in `verifier-r1-results.json`, tables in
   `verifier-r1-<unit>.md`.
 - Next: R1 fixer (engine-architect, xhigh) once the rust-reviewer is back; R2 fixer (netcode-architect, xhigh) once
