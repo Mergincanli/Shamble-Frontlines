@@ -5,7 +5,8 @@
 - **Topic:** R6, infrastructure (`docs/V2_PHASE0_BRIEF.md` §4, row R6).
 - **Author agent:** infra-engineer (wave 2 of `.checkpoints/v2-research/plan.md`: one owner agent per topic).
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** spot-checked (19 of 40 key claims).
+- **Status:** spot-checked (21 of 42 key claims). The spot-check checked 19 of the then 40; the fix added R6-HOST-F8 and
+  F20 to "Rests on:" lists, and the second pass (2026-10-29) checked both at their source (part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R6):** "Hosting for previews and
   EU game servers; costs; logs, metrics and crash reports; balance telemetry (VISION_V2 §6.6); security baseline
   (content security policy, dependency audits, anti-cheat basics)"
@@ -41,7 +42,7 @@ plus `docs/LOOP_V2.md` as a project input, not counted), 20 sources not read.
 
 ## 2. TL;DR
 - Client and per-PR previews: Cloudflare (Workers static assets, or Pages) can send COOP and COEP from a `_headers` file (inferred: it takes any header), gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
-- Game servers: Hetzner Cloud in one EU location, one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME.
+- Game servers: Hetzner Cloud in one EU location, if its EU plans are orderable again (R6-HOST-OQ1), one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME.
 - Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start; about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 48-player rooms stay inside one VM's included 20 TB of traffic.
 - Operations: `tracing` JSON logs, Prometheus-format metrics with bounded labels (tick overruns, fallback share), Sentry with Wasm debug files in its EU region with IP collection off, Reporting API crash reports; all data in the EU; the law itself was not read (outside the allow list).
 - Telemetry: one record per match written at Ended (content hash, mode id, a 10 s points timeline, tick-stamped objective and kill events with source ids, unit time per slot, moments, no player ids) in EU object storage, analysed in batches per content hash. The security baseline is deferred (R6-SEC-OQ1).
@@ -206,9 +207,10 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
 - **TL9 (smoke test):** today's gate fails on any network request or WebSocket. A v2 preview that talks to a game server
   needs the gate v2 (R5) to allow the preview's own origins; the hosting choice must give a stable origin list.
 - **TL15 (perfbots):** 48 soldiers cost 0.80–1.00 ms per legacy JavaScript step: the only CPU number for sizing a
-  48-player room before the spike. R2-BUD-REC6 uses the same 0.80–1.00 ms figure but cites it as "legacy CM4"
-  (r2-netcode.md:2382), which in `docs/LEGACY_INVENTORY.md` is the DM_Tri map row; the measurement is TL15's, so the id
-  slip is R2's.
+  48-player room before the spike. R2-BUD-REC6 cites the same 0.80–1.00 ms figure as "legacy CM4"
+  (r2-netcode.md:2382). That citation is valid: in `docs/LEGACY_INVENTORY.md` the CM4 row (the DM_Tri map, line 152)
+  carries the figure ("perfbots at 48 soldiers, combat, mean 0.80-1.00 ms per update step"), as do GC2 (line 241) and
+  TL15 (line 400); it was measured on DM_Tri. (Corrected after the second pass, 2026-10-29.)
 
 ### 2. Costs (R6-COST)
 
@@ -297,8 +299,9 @@ no egress charge; Workers Paid minimum 5 USD); Fly.io R6-HOST-F22 (0.02 USD per 
   "we require debug information files to be augmented by a `build_id` custom section."; "upload your WebAssembly debug
   information files to Sentry or use a symbol server."; "We provide a tool called wasm-split that can automatically add
   this section if missing."; "use the `@sentry/wasm` package and apply its `wasmIntegration`"; "This feature is still
-  developing, so may be rough around the edges." (The JavaScript Wasm integration page returned 404.) The word "DWARF"
-  is a paraphrase: it sits in a link the fetch dropped ("if your compiler can output" [link]).
+  developing, so may be rough around the edges." (The JavaScript Wasm integration page returned 404.) "DWARF" is
+  confirmed too: the second pass's fetch returned the link text, "if your compiler can output" [WASM DWARF debug
+  information] "alongside the binary code." (2026-10-29).
 - **R6-OBS-F8.** The Reporting API (Baseline 2026, newly available since March 2026) sends reports to endpoints named
   in a `Reporting-Endpoints` header; its types include `crash`, `coep`, `coop` and `csp-violation`; crash reports
   cannot be observed in JavaScript because the page has crashed, but they reach an endpoint. Source:
@@ -315,7 +318,8 @@ no egress charge; Workers Paid minimum 5 USD); Fly.io R6-HOST-F22 (0.02 USD per 
   Source: https://docs.sentry.io/organization/data-storage-location/ (no date) · official · read 2026-10-28 · confirmed
   in the source: "Sentry supports data storage in both the US and the EU."; "Frankfurt, Germany."; "once selected, your
   data storage location can’t be changed."; "Here’s a list of the types of data that may be stored in the US,
-  regardless of your selected Data Storage Location."; the list, from the verifier's re-read: "User accounts,
+  regardless of your selected Data Storage Location."; the list includes, from the verifier's re-read (6 of its 11
+  items): "User accounts,
   notification settings, and 2FA authenticators"; "Organization settings, configurations, and teams"; "Access tokens
   for users and organizations"; "DSN keys"; "Cron check-ins"; "Detailed usage data".
 - **R6-OBS-F10.** Sentry's JavaScript SDK sends the user's IP address by default; `dataCollection: { userInfo: false }`
@@ -499,7 +503,7 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
   marks at several times of day (R6-HOST-REC2's spike).
 - **K4. Per-GB egress hosts (Fly.io) or managed fleets (GameLift):** per-GB pricing at 3.16 GB per 48-player room-hour
   costs more in egress per fully loaded host than the host itself costs on Hetzner (about 369 USD a month against 86.49
-  EUR for a CCX23, above); at the goal's average load, Fly's egress alone (about 276 USD) is of the same order as the
+  EUR for a CCX23, above; inferred: no exchange rate was read, and the comparison holds below about 4.27 USD per EUR); at the goal's average load, Fly's egress alone (about 276 USD) is of the same order as the
   whole Hetzner fleet (222.88–345.96 EUR); no exchange rate was read, so the two are not compared further. GameLift
   waives bandwidth but its EU rates and SDK were not read.
 
@@ -834,8 +838,9 @@ None (deferred).
   after the security baseline.
 - **R6-HOST-OQ6. Does the wildcard certificate need dns-01, and how long will certificates live?** RFC 8555 leaves both
   to the CA (F24); Let's Encrypt's and the CA/Browser Forum's pages are outside the allow list. Decided by: a read of
-  the chosen CA's policy. The verifier names a further option, ACME's tls-alpn-01 challenge (RFC 8737, not read in this
-  run), as needing only TCP 443, which the WebSocket fallback may open anyway; decided by a read of RFC 8737 if
+  the chosen CA's policy. The verifier names a further option, ACME's tls-alpn-01 challenge: RFC 8737 (February 2020,
+  read by the second pass on 2026-10-29) says "This connection MUST use TCP port 443."; that the WebSocket fallback may
+  open 443 anyway is inferred (R2 names no port; R6-HOST-REC2 opens "one TCP range"). Decided by: the port plan, if
   per-hostname certificates (R6-HOST-REC4's alternative) are wanted.
 - **R6-HOST-OQ7. What does a Hetzner IPv4 address cost today?** The 2022 page says 0.50 EUR per month (F19); the 2026
   tables say "Price incl. IPv4" (F15). Decided by: the price list at sign-up. Under 1 EUR per VM either way.
@@ -933,7 +938,8 @@ From Hosting for previews and EU game servers:
   (F1, F2); Netlify: yes, but the same for every deploy context (F7); Vercel: yes (F8); GitHub Pages: no (F11, F12).
   For the first three, the pages show a mechanism for any custom header; that it carries COOP and COEP is inferred (no
   page names them). Code-generated responses (a Worker, a function) set their own.
-- **R2:** reference server for R2-XU-OQ9: Hetzner CCX23 (4 dedicated vCPU, AMD), with CX33 measured beside it; "one
+- **R2:** R6-HOST-REC4's one wildcard certificate departs from R2-TRN-REC5's "a publicly trusted certificate per game
+  server hostname" (stated in REC4). Reference server for R2-XU-OQ9: Hetzner CCX23 (4 dedicated vCPU, AMD), with CX33 measured beside it; "one
   vCPU of the EU instance type" in R2-BUD-REC6 is one vCPU of CCX23. No load balancer on the UDP path. IPv6 is free on
   Hetzner (F19), so R2-BUD-OQ11's IPv6 share depends on players' networks.
 - **R5:** the preview link's CI part: a deploy step to Cloudflare from Actions needs an API token as a repository
@@ -1020,12 +1026,28 @@ verdict PASS WITH NOTES; its report is `.checkpoints/v2-research/verifier-r6-res
     (it is a condition for the stores §6.1 and §6.6 create).
 12. (low) R6-TEL-REC2's append file conflicted with R6-TEL-REC1's in-memory buffer. Fixed: a crashed room's buffer is
     lost and the supervisor writes a stub record marked incomplete; the pass mark follows.
-13. (low) R2 cites TL15's figure as "legacy CM4". Fixed: R6's TL15 line says the id slip is R2's.
+13. (low) R2 cites TL15's figure as "legacy CM4". Applied as "the id slip is R2's", which the second pass found wrong:
+    the CM4 row carries the figure too, so R2's citation is valid; the TL15 line now says so.
 - Arithmetic nit (3.156 GB, not 3.16, behind 18,431 and 13,823 GB). Fixed: the full-host sentence says so.
 
-**Counts:** 19 confirmed, 0 wrong, 0 unsupported (19 of 40 key claims checked). No recommendation rests on a wrong or
+**Counts:** 19 confirmed, 0 wrong, 0 unsupported (19 of 40 key claims checked; 42 after the fix added R6-HOST-F8 and F20,
+both checked by the second pass). No recommendation rests on a wrong or
 unsupported claim; none became an open question; no claim was re-sourced. Not checked at their source (21): HOST-F2
 (Workers half), F4, F6, F7, F9, F10, F11, F18, F19, F23; COST-F3, F4; OBS-F2, F3, F4, F6, F8, F10, F11, F12; TEL-F1.
+
+### Second pass (2026-10-29)
+
+The spot-check found more than nits, so the verifier checked what the fix changed (against 9d5e78a; report:
+`.checkpoints/v2-research/verifier-r6-second-pass-result.md`, notes `verifier-r6-second-pass.md`). Verdict: PASS WITH
+NOTES, nits only.
+- The four medium findings (the certificate plan against R2-TRN-REC5, option K4, the "Rests on:" gaps, F20 in
+  R6-HOST-REC2) closed; items 5 and 7 to 12 closed; item 6 (two missing options) not applied, with a sound reason.
+- 23 checked: 19 confirmed (among them R6-HOST-F8 and F20, newly in "Rests on:" lists), 2 wrong (item 13's "the id
+  slip is R2's"; the status count 40, now 42), 2 unsupported (K4's cross-currency comparison; R6-HOST-OQ6's 443 point).
+- Applied by the session on 2026-10-29 in the verifier's words: the status (21 of 42); the TL;DR's Hetzner pick made
+  conditional on R6-HOST-OQ1; the TL15 line (R2's CM4 citation is valid); R6-OBS-F7's "DWARF" confirmed; R6-OBS-F9's
+  list marked partial; K4 marked inferred; R6-HOST-OQ6 cites RFC 8737's port and marks the fallback point inferred; the
+  R2 pointer names REC4's departure. Review stops here: what remains is nits.
 
 ## 8. Sources
 
