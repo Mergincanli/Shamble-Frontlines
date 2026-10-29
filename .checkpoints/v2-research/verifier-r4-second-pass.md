@@ -17,3 +17,12 @@ Task: R4 wave 2 second pass (verifier) - check only what the fix (abdf477..HEAD)
   - S41 aasfile.h: TRAVEL_INVALID 1 "//temporary not possible" ... TRAVEL_FUNCBOB 19 "//func bob", 19 codes contiguous -> FLOORS-F5 "18 + INVALID" CONFIRMED.
   - S4 scene_queries: "Nonlinear shape-casting is more expensive than the linear one," "so it is recommended to use `cast_shape` whenever the shape doesn't rotate." -> F13 CONFIRMED (and backs PHYS-REC4's turning text).
   Next: F11 hashbrown dependency (NAV-REC1 "polyanya depends on hashbrown (F11)"), part 7 counts, totals, OQs added (none?), contradictions.
+- unit C done (file consistency):
+  - Totals: 62 F / 18 REC / 23 OQ counted by heading = match line 24. Sources read rows: official 1-36 + 47 = 37, shipped 37-44 = 8, other 45-46 = 2, total 47; not read 32 rows. Match.
+  - Part 7 table: 49 rows; verdicts 46 confirmed / 2 wrong / 1 unsupported; final states 41 "no change needed" + 8 "fixed" (PHYS-F2, F15, F20, F22, NAV-F2, F8, F15, FLOORS-F5). Match. Extras (PHYS-F5, F11, F13, F14, F16, NAV-F6) match verifier-r4.md:88.
+  - M recomputed by script (scratchpad m.py) over all "Rests on:" lists: abdf477 = 51, HEAD = 52 (added PHYS-F13 only). F13 now confirmed by me at source -> label should be "spot-checked (50 of 52 key claims)"; header still says 49 of 51 (part 7 line 1198 explains it, header does not).
+  - No open question added by the fix (OQ count 23 unchanged; diff adds none). Item 4 N/A.
+  - Pass marks: PHYS-REC4 / NAV-REC2 / OBST-REC1 all 8 vehicles; R1 P1's 4 left to R1-XU-OQ1 (line 1116) - no contradiction inside R4. NAV-REC3 floor mark uses FLOORS-REC2's building - consistent. OBST-REC3 conditional vs NAV-REC1 mark 1 - consistent, but trigger worded 3 ways (1022 "mark 1 fails, or a measured Test delay"; 1032 "only if mark 1 fails"; 1170 "only if a full bake misses mark 1") - nit.
+  - Remaining nits: (n1) header label 49/51 -> 50/52 + second-pass note; (n2) OBST-REC3 trigger wording; (n3) NAV-REC1 :795 "cannot be linked into" stronger than F8 ("interop is theoretically possible"; TL;DR and option A already softened); (n4) OBST-REC2 :1014 "LOOP_V2 §3 (team-funded rebuilds)" - §3's rebuild is a harvester's (LOOP_V2.md:32-35); (n5) NAV-REC4 :868 "offline too" glossed onto §6.2; (n6) source 47 URL "inferred" can go (page opens at that URL).
+- Every verifier item 1-12 is fixed in the file (lines recorded in answer). None left unapplied; item 5 inside option A is sound (no source weighs the C-capable targets for the sim).
+DONE
