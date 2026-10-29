@@ -79,3 +79,7 @@
 - R2 profiles (r2-netcode.md:1980-1986): RTT; P0 0/0/0, P1 50 ms ±10 1 %, P2 100 ±20 2 %, P3 150 ±30 5 %, P4 200 ±40 5 %, B1 = P2 + 1 s 100 % loss burst; "Every spike also covers reordering (F11)". R2-TRN-REC1: quinn 0.11.x + wtransport 0.7.x or web-transport-quinn 0.13.x by spike.
 - [Sources done for all five questions: S1-S61.] Next: write drafts LAYOUT, TSLINT, RUSTLINT, TEST, GATE.
 - [2026-10-29 resumed after spend-limit reset] LAYOUT draft exists (test-engineer-r5-layout-draft.md). Helper notes end DONE (draft infra-engineer-r5-ci-draft.md, 693 lines). Next: TSLINT draft.
+- TSLINT draft written (test-engineer-r5-tslint-draft.md: F1-F25, REC1-4, OQ1-6). Next: RUSTLINT draft.
+- RUSTLINT draft written (test-engineer-r5-rustlint-draft.md: F1-F15, REC1-6, OQ1-5). Next: TEST draft.
+- TEST draft written (test-engineer-r5-test-draft.md: F1-F14, REC1-6, OQ1-7). Next: GATE draft (read helper's RECs first for conflicts).
+- GATE draft written (test-engineer-r5-gate-draft.md: F1-F4 + legacy facts, REC1-4, OQ1-5). All five drafts done. Conflicts with helper found: Safari macOS job (TEST-REC1 vs CI-REC5), client lockfile (CI-REC4 vs LAYOUT-REC1), isolation headers always vs flag (PREV-REC4 vs LAYOUT-REC5) -> R5-XQ-OQ1-3. Next: assemble topic file.
