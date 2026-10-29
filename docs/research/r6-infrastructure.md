@@ -400,8 +400,9 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 #### Q3. Production certificates for game servers (R2-TRN-REC5, R2-TRN-OQ4)
 - **C1. One certificate per host via ACME http-01:** needs TCP 80 open on each game VM (F24).
 - **C2. One wildcard certificate per region name (for example `*.eu.<domain>`) via ACME dns-01:** one renewal job, the
-  same certificate copied to every VM (F24); the DNS provider's API key must live with that job (a secret: Mustafa
-  adds it; key handling belongs to the deferred baseline).
+  same certificate and private key copied to every VM (F24); the DNS provider's API key must live with that job (a
+  secret: Mustafa adds it; key handling belongs to the deferred baseline). R2-TRN-REC5 asks for a certificate "per game
+  server hostname": C2 departs from that (R6-HOST-REC4 says so).
 - **C3. Self-signed, hash-pinned, short-lived servers:** R2-TRN-REC5's development and preview path; for production
   only "if R6 picks short-lived ephemeral servers". G1/G2 keep VMs warm (F17), so they are not ephemeral.
 
@@ -586,16 +587,20 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   same-headers alternative), and send COOP and COEP from `_headers` on previews when R1-BND-REC5's option G3 is on.**
   Previews stay harmless rather than secret: a preview holds no secrets, talks only to the staging game server (REC3),
   and is limited to the account with Cloudflare Access if Mustafa wants it private (R6-HOST-OQ5). Netlify (B) is the
-  fallback with the same `_headers` file; Vercel (C) only on Pro, because Hobby is non-commercial.
-  *Reason:* it can send the isolation headers (F1, F2), gives every branch its own link with no cap on previews (F3,
+  fallback with the same `_headers` file; Vercel (C, headers from `vercel.json`, F8) only on Pro, because Hobby is
+  non-commercial (F9).
+  *Reason:* its `_headers` file sets custom response headers, so it can send the isolation headers (F1, F2; COOP and
+  COEP by name inferred), gives every branch its own link with no cap on previews (F3,
   F4, F6), charges nothing for static requests or egress (F5), and GitHub Pages cannot send the headers (F11, F12).
-  *Rests on:* F1, F2, F3, F4, F5, F6, F7, F9, F10, F11, F12.
+  *Rests on:* F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12; R1-BND-REC5 (option G3, wave 1, cited).
   *Serves:* §6.1 (rooms and private matches are reached from this client); §4 (desktop browsers first). The isolation
   headers serve R1-BND-REC5.
   *Spike must prove (proposed):* on one preview link: every HTML, JS, worker and Wasm response carries the configured
   headers (100 % of responses in a full page load, checked by a script); `crossOriginIsolated` is true in Chrome,
   Edge, Firefox and Safari when G3 is on and false with it off; the content bundle of R1-DATA-REC6 is served with an
-  immutable cache header and a repeat visit fetches 0 bytes of it; the largest build file stays under 25 MiB (F3).
+  immutable cache header and a repeat visit fetches 0 bytes of it; the largest build file stays under 25 MiB (F3: the
+  Pages per-asset limit; the Workers static-assets limit was not read, so the mark is rechecked against Workers' own
+  limits page before the spike).
 - **R6-HOST-REC2. Run game servers on Hetzner Cloud in one EU location, one room per process under a small supervisor
   per VM, with no load balancer on the game path. Name the reference server for R2 (R2-XU-OQ9): the dedicated CCX23
   (4 vCPU, 16 GB, x86-64 AMD), and measure the shared CX33 (4 vCPU, 8 GB) beside it.**
@@ -603,12 +608,18 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   UDP range for WebTransport and one TCP range for the WebSocket fallback (R2-TRN-REC3), plus nothing else. VMs stay up
   (billing rounds up to the hour, F17), and rooms start and end as processes inside them. The server CPU is x86-64 to
   start (dedicated plans are AMD, F15), which answers R1-DET-OQ7 for the first fleet; Arm (CAX) stays an option only
-  after R1-DET-REC6's matrix includes it.
+  after R1-DET-REC6's matrix includes it. The pick is conditional on R6-HOST-OQ1: on 2026-10-28 every EU plan on
+  Hetzner's product pages showed "This product is currently unavailable. Please check back later." (F20); until a
+  console check shows capacity, Hetzner is the working pick, not a settled one, and OQ1 and OQ4 name what is read next
+  if the shortage is real.
   *Reason:* dedicated vCPUs are sold for predictable load and gaming servers (F14), which the fair tick of §4 and
   R2-BUD-REC6 need; Hetzner includes 20 TB of egress per VM and charges 1 EUR per extra TB (F15, F16), far below
   per-GB pricing (F22), and its firewall handles UDP (F18). Shared CX33 is 9.6 times cheaper than CCX23 (8.99 against
   86.49 EUR, F15), so it is worth measuring, not assuming.
-  *Rests on:* F13, F14, F15, F16, F17, F18, F19, F22; legacy TL15.
+  *Rests on:* F13, F14, F15, F16, F17, F18, F19, F20 (the availability risk), F22; R2-BUD-REC6 (the per-tick budget the
+  reason names), R2-ROOM-REC2 (host and port from the lobby; the spike's marks: 8 rooms, within 10 %, under 2 s,
+  r2-netcode.md:2733–2738), R2-TRN-REC3 (the UDP and TCP ports), R1-DET-OQ7 and R1-DET-REC6 (the server CPU) (wave 1,
+  cited); legacy TL15.
   *Serves:* §6.1 (rooms and private matches), §6.5 (economy server-side), §6.6 and §6.8 (recorded and recognized on
   the server); §4 (one EU region, fair to about 100 ms).
   *Spike must prove (proposed):* R2-ROOM-REC2's marks on both CCX23 and CX33: 8 rooms of 48 players (bots) as 8
@@ -628,11 +639,14 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   its own binary; a closed PR's binary is gone within 24 h; a preview client never connects to a production server
   (its allowed origins and server list differ).
 - **R6-HOST-REC4. Production certificates: one wildcard certificate for the game-server names (option C2), from ACME
-  with dns-01, renewed by one job and copied to every game VM.** This keeps R2-TRN-REC5's "publicly trusted certificate"
-  without opening TCP 80 on game VMs.
+  with dns-01, renewed by one job and copied to every game VM.** This departs from R2-TRN-REC5's wording, "a publicly
+  trusted certificate per game server hostname" (r2-netcode.md:2667): every hostname is still covered by a publicly
+  trusted certificate, but by one shared certificate, so one private key sits on every game VM (a key-handling item for
+  the deferred baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the
+  baseline rejects a shared key. It needs no TCP 80 on game VMs.
   *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes
   adding a VM a copy, not an issuance.
-  *Rests on:* F24; R2-TRN-REC5.
+  *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
   *Serves:* §6.1; §4 (four browsers need a publicly trusted certificate in production, R2-TRN-REC5).
   *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the wildcard
   certificate; a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
@@ -857,7 +871,9 @@ None (deferred).
   - **Key storage:** the storage of the lobby's token-signing keys (R2-ROOM-OQ2, R2-ROOM-OQ9).
   - Also listed for security by R1's pointers (not R2's): R1-DATA-REC7's allow list and fuzz corpus, and COOP as a guard
     against XS-Leaks (R1-BND-REC5's unit).
-  Items R6 met on the way and left here: the DNS API key the wildcard certificate job needs (R6-HOST-REC4); the Sentry
+  Items R6 met on the way and left here: the DNS API key the wildcard certificate job needs (R6-HOST-REC4); the wildcard
+  certificate's private key, copied to every game VM (R6-HOST-REC4, a departure from R2-TRN-REC5's per-hostname
+  certificate); the Sentry
   and Cloudflare tokens CI would hold (R6-OBS-REC3, R6-HOST-REC1); whether previews are private (R6-HOST-OQ5). Secrets
   are Mustafa's to add; agents never add them.
 
@@ -866,6 +882,7 @@ None (deferred).
 | Recommendation | Source | Reason not read |
 |---|---|---|
 | R6-HOST-REC1 (Netlify as fallback) | https://www.netlify.com/pricing/ | outside the allow list |
+| R6-HOST-REC1 (the 25 MiB mark on Workers static assets) | Cloudflare Workers static-assets limits page (developers.cloudflare.com) | not fetched in this run (the mark uses the Pages limit, F3) |
 | R6-HOST-REC2 (Hetzner against alternatives) | https://docs.fly.io/networking/udp-and-tcp | outside the allow list (redirect from fly.io) |
 | R6-HOST-REC2 (Hetzner against alternatives) | https://cloud.google.com/vpc/network-pricing | fetched, but only the title came back (page truncated) |
 | R6-HOST-REC4 | https://letsencrypt.org/docs/ (challenge types, rate limits, lifetimes) | outside the allow list |

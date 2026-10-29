@@ -38,7 +38,7 @@ and 32 sources not read (part 8).
 
 ## TL;DR
 - Found: no VISION_V2 §6 item needs rigid-body dynamics; Rapier's controller is only rays and shape casts; C++ Detour
-  cannot join the browser sim (no C/C++ toolchain for `wasm32-unknown-unknown`); no Rust nav crate promises determinism.
+  does not fit R1's browser target (`wasm32-unknown-unknown`: no C/C++ toolchain); no Rust nav crate promises determinism.
 - Recommended (marks proposed): parry3d plus our own kinematic movement, Rapier's controller the measured fallback; one
   immutable static world from the map document; navigation baked into it and queried by the sim, links found by running
   the sim's movement (as Quake III's bots do); one height-aware sight query; vehicles avoided, never carved.
@@ -61,7 +61,9 @@ and 32 sources not read (part 8).
   (radians) between the floor’s normal and the `up` vector that the character is able to climb."; field `offset`: "A
   small gap to preserve between the character and its surroundings." Sources: the guide page above and
   https://docs.rs/rapier3d/latest/rapier3d/control/struct.KinematicCharacterController.html (rapier3d 0.36.1). Tier:
-  official. Read 2026-10-28. Sure: confirmed in the source.
+  official. Read 2026-10-28. Sure: confirmed in the source. The `autostep` doc also warns (quoted by the verifier,
+  2026-10-28): "Note that autostepping is currently a very computationally expensive feature, so it is disabled by
+  default."
 - **R4-PHYS-F3.** The controller holds no per-character state, so one instance can move every soldier; the call takes
   the time step, a query pipeline, a shape, a pose and the wanted translation. Quotes: the configuration "does not
   contain any collider-specific or rigid-body-specific information like handles, velocities, positions, etc."; the same
@@ -136,8 +138,8 @@ and 32 sources not read (part 8).
   shapes are named in the fetch summary: inferred).
 
 #### Rapier's versions, features and focus
-- **R4-PHYS-F15.** Rapier shipped 12 releases between 0.30.1 (17 Oct. 2025) and 0.36.1 (4 Oct. 2026), and 0.36.0
-  broke loading of older snapshots. Quotes: release headings "v0.36.1 (4 October 2026)" … "v0.30.1 (17 Oct. 2025)"
+- **R4-PHYS-F15.** Rapier shipped 12 releases from 0.30.1 (17 Oct. 2025) to 0.36.1 (4 Oct. 2026), counting both
+  ends and one beta (0.35.0-beta.0), and 0.36.0 broke loading of older snapshots. Quotes: release headings "v0.36.1 (4 October 2026)" … "v0.30.1 (17 Oct. 2025)"
   (as listed by the fetch); v0.36.0: "Snapshots serialized with previous versions can't be loaded anymore."; v0.35.0-
   beta.0: "The `IslandManager` and `RigidBodyActivation` serialization formats changed." Source: the CHANGELOG above.
   Tier: official. Read 2026-10-28. Sure: confirmed in the source.
@@ -166,12 +168,17 @@ and 32 sources not read (part 8).
   parry.", `partitioning` "Spatial partitioning tools." Source: https://docs.rs/parry3d/latest/parry3d/ (parry3d
   0.31.1). Tier: official. Read 2026-10-28. Sure: confirmed in the source; "no dynamics module" is inferred from the
   module list; that Rapier uses it is R1-DET-F22 / F23.
-- **R4-PHYS-F20.** parry3d has swept shape tests, overlap and distance tests, and ray casts between any two of its
-  shapes. Quotes: `cast_shapes` "Computes when two moving shapes will collide (shape casting / swept collision
-  detection)."; `intersection_test` "Tests whether two shapes are intersecting (overlapping)."; `RayCast` "Traits of
-  objects which can be transformed and tested for intersection with a ray." Source:
-  https://docs.rs/parry3d/latest/parry3d/query/index.html (parry3d 0.31.1). Tier: official. Read 2026-10-28. Sure:
-  confirmed in the source.
+- **R4-PHYS-F20.** parry3d has swept shape tests (a linear one and a nonlinear one), overlap tests and ray casts, but
+  not for every pair of its shapes: a swept test returns an error for a pair it does not support. Quotes: `cast_shapes`
+  "Computes when two moving shapes will collide (shape casting / swept collision detection)." (listed beside
+  `cast_shapes_nonlinear`); `intersection_test` "Tests whether two shapes are intersecting (overlapping)."; `RayCast`
+  "Traits of objects which can be transformed and tested for intersection with a ray."; `cast_shapes` returns "->
+  Result<Option<ShapeCastHit>, Unsupported>", and "`Err(Unsupported)` - This shape pair is not supported" (these two
+  quoted by the verifier, 2026-10-28). Sources: https://docs.rs/parry3d/latest/parry3d/query/index.html and the
+  `cast_shapes` function page (source 47, read by the verifier) (parry3d 0.31.1). Tier: official. Read 2026-10-28.
+  Sure: confirmed in the source; which pairs are unsupported is not in the quotes (R4-PHYS-REC1 mark 6 checks the
+  pairs v2 needs). Corrected at the fix pass: the draft said "between any two of its shapes", and listed distance
+  tests without a quote.
 - **R4-PHYS-F21.** parry3d's BVH is built once for static scenes and also supports moving leaves (insert, remove, a
   cheap refit); its ray cast calls a leaf test we supply. Quotes: "For scenes where objects don’t move, build the BVH
   once and query repeatedly:"; "The BVH supports dynamic scenes where objects move or are added/removed:"; `refit` is
@@ -181,10 +188,12 @@ and 32 sources not read (part 8).
   characters read). Tier: official. Read 2026-10-28. Sure: confirmed in the source; the build cost O(n log n) and refit
   O(n) are from the fetch summary (inferred).
 - **R4-PHYS-F22.** parry moves as fast as Rapier: Parry 0.26 went with Rapier 0.32 (January 2026), and Rapier 0.36.1
-  pins parry3d 0.31.1 (R1-DET-F23), five minor versions in about nine months. Quote: the 2025 review notes "Rapier 0.32
-  and Parry 0.26 moved most of the public API from nalgebra to glam" (fetch wording; the exact words were not returned).
-  Source: https://dimforge.com/blog/2026/01/09/the-year-2025-in-dimforge. Tier: official. Read 2026-10-28. Sure:
-  inferred.
+  pins parry3d 0.31.1 (R1-DET-F23), five minor versions in about nine months. Quotes (the exact words, found by the
+  verifier on 2026-10-28; the owner's fetch had returned only a paraphrase): "Starting with rapier 0.32 and parry 0.26,
+  most of their API and internals using the nalgebra linear algebra library" … "have been modified to use glam
+  instead."; CHANGELOG "## v0.32.0 (09 Jan. 2026)". Sources:
+  https://dimforge.com/blog/2026/01/09/the-year-2025-in-dimforge and the CHANGELOG above. Tier: official. Read
+  2026-10-28. Sure: confirmed in the source (by the verifier); the parry3d 0.31.1 pin rests on R1-DET-F23.
 
 #### A shipped shooter's movement: Quake III Arena (GPL source release)
 - **R4-PHYS-F23.** Quake III's player movement is shared code that the server and the client both run. Quotes: "//
@@ -213,7 +222,8 @@ and 32 sources not read (part 8).
   and 2^-13 m (0.12 mm) to 2,048 m.
 - **R4-PHYS-F27.** No source read in this run gives Rapier's or parry's Wasm size, the cost of one character-controller
   call, or the cost of one ray query. The one lead found (a tutorial claiming "~1.1 MB" of Wasm) is outside the allow
-  list and was not read. Read 2026-10-28. Sure: confirmed (an absence across the sources above).
+  list and was not read. Read 2026-10-28. Sure: inferred (an absence across the sources above; no quote can confirm
+  it).
 
 #### Legacy facts used (R4-PHYS)
 
@@ -252,7 +262,8 @@ and 32 sources not read (part 8).
   away from walls. Quotes: `walkableSlopeAngle` "The maximum slope that is considered walkable."; `walkableHeight`
   "Minimum floor to 'ceiling' height that will still allow the floor area to" "be considered walkable."; `walkableClimb`
   "Maximum ledge height that is considered to still be traversable."; `walkableRadius` "The distance to erode/shrink the
-  walkable area of the heightfield away from" "obstructions."; `cs` "The xz-plane cell size to use for fields." Source:
+  walkable area of the heightfield away from" "obstructions."; `cs` "The xz-plane cell size to use for fields."; height, climb and radius are in voxels ("[Units: vx]"), the cell
+  size in world units ("[Units: wu]") (the units quoted by the verifier). Source:
   https://raw.githubusercontent.com/recastnavigation/recastnavigation/main/Recast/Include/Recast.h (main). Tier:
   official. Read 2026-10-28. Sure: confirmed in the source.
 - **R4-NAV-F3.** Detour is the runtime half: it loads the mesh, a set of tiles of convex polygons, and answers path
@@ -285,9 +296,12 @@ and 32 sources not read (part 8).
 - **R4-NAV-F8.** Rust's browser target has no C or C++ toolchain, so C++ code such as Detour cannot simply be linked
   into the sim's `wasm32-unknown-unknown` build. Quotes: "This target currently has no equivalent in C/C++. There is no
   C/C++ toolchain for this target."; "While interop is theoretically possible it’s recommended to instead use one of:"
-  (Emscripten or WASI targets). Source: https://doc.rust-lang.org/rustc/platform-support/wasm32-unknown-unknown.html
-  (rustc book, current). Tier: official. Read 2026-10-28. Sure: confirmed in the source; the consequence for Detour is
-  inferred (R1 builds the sim for this target, R1-DET-F6).
+  `wasm32-unknown-emscripten` ("the Emscripten toolchain is typically chosen for running C/C++") and `wasm32-wasip1`
+  ("the wasi-sdk toolchain is used to compile C/C++ on this target and can interop with Rust code"; both quoted by the
+  verifier). Source: https://doc.rust-lang.org/rustc/platform-support/wasm32-unknown-unknown.html (rustc book,
+  current). Tier: official. Read 2026-10-28. Sure: confirmed in the source; the consequence for Detour is inferred (R1
+  builds the sim for this target, R1-DET-F6, R1-BND-F19; a sim built for one of the two C-capable targets could link
+  Detour, an option R1 does not weigh).
 
 #### Pure-Rust crates
 - **R4-NAV-F9.** rerecast is a Rust port of Recast's generation steps only; its roadmap names cross-platform determinism
@@ -328,15 +342,20 @@ and 32 sources not read (part 8).
   Sources: https://docs.rs/pathfinding/latest/pathfinding/ and .../directed/astar/fn.astar.html (pathfinding 4.16.0).
   Tier: official. Read 2026-10-28. Sure: confirmed in the source for the signature; "allocates per call" is inferred
   from the return type.
-- **R4-NAV-F15.** foldhash's random state, which hashbrown can use by default, seeds every hasher at random;
-  deterministic hashing needs its fixed state. Quotes: `RandomState` "always generates a random per-hasher seed";
-  `FixedState` makes a map "trivially vulnerable to HashDoS attacks." Sources: https://docs.rs/foldhash/latest/foldhash/
-  (foldhash 0.2.0) and https://docs.rs/hashbrown/latest/hashbrown/ (hashbrown 0.17.1; foldhash ^0.2.0 is an optional
-  dependency). Tier: official. Read 2026-10-28. Sure: confirmed in the source; whether polyanya's maps use it and
-  iterate in outcome-deciding code is not known (inferred risk).
+- **R4-NAV-F15.** foldhash's random state seeds every hasher at random, and deterministic hashing needs its fixed
+  state; hashbrown lists foldhash as an optional dependency, but the page read does not say which hasher hashbrown
+  uses by default. Quotes: `RandomState` "always generates a random per-hasher seed"; `FixedState` makes a map
+  "trivially vulnerable to HashDoS attacks."; hashbrown: "foldhash ^0.2.0 _normal_ _optional_", and
+  `DefaultHashBuilder` "Default hash builder for the `S` type parameter of HashMap and HashSet." Sources:
+  https://docs.rs/foldhash/latest/foldhash/ (foldhash 0.2.0) and https://docs.rs/hashbrown/latest/hashbrown/
+  (hashbrown 0.17.1). Tier: official. Read 2026-10-28. Sure: confirmed in the source for the quotes. Corrected at the
+  fix pass: the draft said hashbrown "can use [foldhash] by default", which the page does not say. Whether hashbrown's
+  default is foldhash, and whether polyanya's maps use a random seed and iterate in outcome-deciding code, is not known
+  (inferred risk, R4-NAV-OQ4).
 - **R4-NAV-F16.** None of the crate pages read (rerecast, oxidized_navigation, polyanya, landmass, pathfinding,
   dodgy_2d) makes a determinism promise, and none gives generation times, query costs or memory for a map of a given
-  size. Read 2026-10-28. Sure: confirmed (an absence across these pages; rerecast's roadmap item is a plan, F9).
+  size. Read 2026-10-28. Sure: inferred (an absence across these pages, which no quote can confirm; rerecast's roadmap
+  item is a plan, F9).
 
 #### Crowds that own their agents
 - **R4-NAV-F17.** Detour's crowd module steers and moves its agents itself, each considering at most 6 neighbours.
@@ -403,11 +422,13 @@ and 32 sources not read (part 8).
   movement." (beside "Overlapping navmeshes for 3D navigation (floors, bridges, …).", R4-NAV-F11). Source:
   https://docs.rs/polyanya/latest/polyanya/ (polyanya 0.18.0). Tier: official. Read 2026-10-28. Sure: confirmed in the
   source.
-- **R4-FLOORS-F5.** Quake III's bots know 19 typed ways to move between areas, among them walking, crouching, jumping
+- **R4-FLOORS-F5.** Quake III's bots know 18 typed ways to move between areas (19 travel-type codes, one of them
+  `TRAVEL_INVALID`, "temporary not possible"), among them walking, crouching, jumping
   onto a barrier, jumping, ladders, walking off a ledge, teleporters, elevators and jump pads. Quotes: "#define
   TRAVEL_WALK 2 //walking"; "TRAVEL_BARRIERJUMP 4 //jumping onto a barrier"; "TRAVEL_JUMP 5 //jumping";
-  "TRAVEL_LADDER 6 //climbing a ladder"; "TRAVEL_WALKOFFLEDGE 7 //walking of a ledge"; "TRAVEL_JUMPPAD 18 //jump pad".
-  Source: https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/botlib/aasfile.h (GPL release).
+  "TRAVEL_LADDER 6 //climbing a ladder"; "TRAVEL_WALKOFFLEDGE 7 //walking of a ledge"; "TRAVEL_JUMPPAD 18 //jump pad";
+  the codes run from "#define TRAVEL_INVALID 1 //temporary not possible" to "#define TRAVEL_FUNCBOB 19 //func bob"
+  (count corrected at the fix pass from the verifier's reading; the draft said 19 ways). Source: https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/botlib/aasfile.h (GPL release).
   Tier: shipped game. Read 2026-10-28. Sure: confirmed in the source.
 - **R4-FLOORS-F6.** Quake III finds jump links by predicting the player's own movement across the gap, and step and
   barrier links by comparing heights with the movement's maximum step and barrier. Quotes: "creates possible jump
@@ -473,8 +494,8 @@ and 32 sources not read (part 8).
   https://rapier.rs/docs/user_guides/rust/scene_queries (Rust 0.36). Tier: official. Read 2026-10-28. Sure: confirmed in
   the source. (Relevant to legacy CS4's inside-start miss: the start rule must be chosen, not inherited.)
 - **R4-LOS-F5.** No source read in this run gives the cost of one ray or segment query through a BVH, in Rust or in
-  Wasm. Read 2026-10-28. Sure: confirmed (an absence; R4-PHYS-F13 and F27 say the same for Rapier; R2-INT-OQ5 asks for
-  it).
+  Wasm. Read 2026-10-28. Sure: inferred (an absence no quote can confirm; R4-PHYS-F13 and F27 say the same for Rapier;
+  R2-INT-OQ5 asks for it).
 - (Used, read under other questions: R4-PHYS-F10, F12 (queries and filters), F21 (a BVH built once for a static
   scene); R4-FLOORS-F1 (stacked floors kept apart).)
 
@@ -503,8 +524,9 @@ and 32 sources not read (part 8).
 
 ### 5. Obstacles placed mid-match (for later building) (R4-OBST)
 
-Scope (task rule 11): the need is VISION_V2 §6.4, big vehicles as moving obstacles, plus structures that change state
-(destroyed, rebuilt). Player building is only "don't design it out": nothing here designs a building system.
+Scope (task rule 11): the need is VISION_V2 §6.4's vehicles, "big and multi-part, with their own weapons and abilities"
+(that bots must treat them as moving obstacles is inferred from it), plus structures that change state (destroyed,
+rebuilt). Player building is only "don't design it out": nothing here designs a building system.
 
 - **R4-OBST-F1.** Detour's tile cache takes temporary obstacles as cylinders, axis-aligned boxes or boxes rotated about
   the vertical axis, and applies them by rebuilding the tiles they touch. Quotes: "DT_OBSTACLE_CYLINDER,";
@@ -588,11 +610,11 @@ Scope (task rule 11): the need is VISION_V2 §6.4, big vehicles as moving obstac
 |---|---|---|---|---|
 | Generation | Recast, mature (F1, F2) | rerecast, 0.5.0 (F9) | A tool step, output stored in the map document; generator chosen by the spike (rerecast's mesh or D's grid) | Our grid from the sim's collision (GN11 method) at match start |
 | Runtime queries | Detour (F3-F5) | polyanya (F11) or landmass (F13) | Our own A* over the baked nodes plus string pulling, per-goal distance tables, typed links | Our A* (GN12) on cells |
-| Runs in the browser sim | No: no C/C++ toolchain for the target (F8); offline bots would need a second build | Yes (polyanya shows Wasm demos, F11) | Yes | Yes |
-| Determinism | C++ floats outside R1-DET-REC2's Rust rules (inferred) | No promise (F16); hashbrown's random seeds are a risk to audit (F15) | Ours: integer link costs (F18), id order, R1-DET-REC2; generation runs once, so its floats never differ between server and client | Ours |
+| Runs in the browser sim | Not in R1's `wasm32-unknown-unknown` build: no C/C++ toolchain for that target (F8, though "interop is theoretically possible"). F8's page names two targets that link C/C++ (`wasm32-unknown-emscripten`, `wasm32-wasip1`): keeping Detour would mean building the whole sim for one of them, which R1 does not weigh (R1-DET-F6, R1-BND-F19); otherwise offline bots would need a second build | Yes (polyanya shows Wasm demos, F11) | Yes | Yes |
+| Determinism | C++ floats outside R1-DET-REC2's Rust rules (inferred) | No promise (F16); a randomly seeded hasher in a dependency (foldhash, optional in hashbrown, F15) is a risk to audit | Ours: integer link costs (F18), id order, R1-DET-REC2; generation runs once, so its floats never differ between server and client | Ours |
 | State ownership | DetourCrowd moves agents itself (F17) | landmass manages agents (F13) | The sim's tables; navigation data is read-only | The sim's tables |
 | Path quality and cost | Good; sliced queries (F4) | Any-angle optimal (F11); costs unknown (F12, F16) | Depends on the generator; Q3 shows a coarse area graph is enough for shipped bots (F18, F19) | Many nodes; 8,000 cap failures (GN12); 2 m cells close gaps (GN11) |
-| Effort and risk | Low effort, blocked by F8 | Low effort, young 0.x dependencies | Medium: queries and funnel are ours; generation reuses a crate or D | Low; quality limits known |
+| Effort and risk | Low effort, blocked by F8 for R1's target | Low effort, young 0.x dependencies | Medium: queries and funnel are ours; generation reuses a crate or D | Low; quality limits known |
 | Fit with §6.2 | Floors and links (FLOORS) | Floors via layers (F11) | Floors via typed links and layers we define (FLOORS) | Needs layers and links added |
 
 ### 3. Bots moving between floors (R4-FLOORS)
@@ -643,19 +665,25 @@ VISION_V2 §4 minimum laptop for Wasm).
   "Rapier's sets in every snapshot" and R1-ECS-REC1 mark 2's separate Rapier allocation count fall away, and Rapier's
   snapshot-format breaks (F15) cannot reach us. Owning the move also keeps reach and step-up exactly the sim's own
   integrator (R1-TICK-REC6, GW14), where an upstream controller changed its snap rule in a minor release (F6). parry3d
-  gives the hard part, swept tests between any two shapes and a BVH (F19, F20, F21), and has its own determinism flag
+  gives the hard part, swept, overlap and ray tests and a BVH (F19, F20, F21), for the shape pairs it supports: a pair
+  it does not support returns an error (F20), so mark 6 checks every pair v2 needs. It has its own determinism flag
   (R1-DET-F23); it changes versions as often as Rapier (F22), but the surface we would use is small (shapes, queries,
   BVH), so an upgrade touches one sim module. Avian is Bevy-bound (F25), which R1-ECS-REC1's no-ECS layout rules out.
-  Rapier stays the measured fallback because its controller already does autostep, snapping and slopes (F2).
+  Rapier stays the measured fallback because its controller already does autostep, snapping and slopes (F2), though
+  its own docs call autostep "a very computationally expensive feature" (F2), so mark 5 measures it with autostep on.
   Rests on: F1, F2, F3, F4, F6, F15, F19, F20, F21, F22, F23, F24, F25, F27; R1-ECS-REC1 (marks 1, 2 and 5),
   R1-ECS-REC4, R1-TICK-REC2 (reference hardware), R1-TICK-REC6, R1-DET-REC1, R1-DET-F23; legacy GC3, GW13, GW14;
-  tuning `T.stepUp`, `moveSpeed`, `sprintMult`.
+  tuning `T.stepUp`, `moveSpeed`; legacy GP3 (the per-unit `sprintMult` and the banzai and bayonet-charge multipliers,
+  for mark 1's speed).
   Serves: VISION_V2 §6.2 (a true 3D simulation: floors, ledges, aiming at height) and §6.4 (big vehicles).
   A spike must prove (proposed pass marks; reference hardware as proposed in R1-TICK-REC2):
   1. **Movement parity.** On a greybox with platforms at 1.2, 2.5 and 4.0 m (legacy GC3's probe heights) and ramps, at
      the shipped tick: a soldier steps up 0.55 m and is stopped by 0.56 m; the jump apex equals R1-TICK-REC6's
-     integrated value within 1 mm; 0 tunnelling through a 0.2 m wall in 10,000 random moves at sprint speed (legacy
-     `moveSpeed` 6.3 × `sprintMult` 1.4286, about 9.0 m/s).
+     integrated value within 1 mm; 0 tunnelling through a 0.2 m wall in 10,000 random moves at the fastest soldier speed
+     in the movement data (legacy: about 13.3 m/s, `moveSpeed` 6.3 × the Imperial Warrior's `sprintMult` 1.62 × 1.3
+     under banzai or in the bayonet charge, GP3, shamble-core.js:128-137, shamble-game.js:2756 and :2774; that is
+     0.22 m per tick at 60 Hz and 0.44 m at 30 Hz, both more than the wall, arithmetic; `T.sprintMult` 1.4286 is never
+     read, GP3).
   2. **Cost.** At R1-ECS-REC1 mark 1's stress load, movement plus all physics queries take at most half of that mark's
      mean tick (≤ 1 ms native mean), reported separately from AI and abilities; Wasm in a Worker ≤ 2× native.
   3. **Determinism.** 0 per-tick hash mismatches between native and Wasm over R1-DET-REC1's runs, with parry3d's flag
@@ -663,7 +691,14 @@ VISION_V2 §4 minimum laptop for Wasm).
   4. **Size.** The sim .wasm with parry3d, with rapier3d (option B) and with neither, after wasm-opt and gzip, is
      recorded (extends R1-ECS-REC1 mark 5).
   5. **The fallback, measured once.** The same 48 soldiers moved by Rapier's controller over the same static world
-     (option B): cost, parity under mark 1, and size. The ADR picks C unless B wins on marks 1 and 2.
+     (option B), with autostep on (F2's cost warning): cost, parity under mark 1, and size. The ADR picks C unless B
+     wins on marks 1 and 2.
+  6. **Shape pairs.** Every shape pair the sim needs is supported by parry3d's swept, overlap and ray tests: the
+     soldier's capsule (or cylinder) and the grenade's ball against oriented boxes, ramp wedges (as convex shapes),
+     other convex shapes and whichever ground shape R4-PHYS-OQ4 picks (heightfield or triangle mesh), and vehicle
+     hulls (compounds) against the same and against soldier capsules: 0 `Err(Unsupported)` results (F20) over marks 1
+     and 2's runs. A pair that is not supported is listed in the ADR, since this recommendation's reason does not hold
+     for that pair.
 
 - **R4-PHYS-REC2. One static collision world from the map document, immutable for the match, with stable ids; one set
   of queries for every user.**
@@ -679,7 +714,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   BVH suits a build-once static scene (F21). R1's cross-topic note asks R4 whether the spatial index lives inside the
   snapshot or is rebuilt after a restore: rebuilt, from immutable map data and the tables. R1-DATA-OQ7's "map geometry
   probably needs a match restart" holds: the static world never changes mid-match except through alive flags.
-  Rests on: F21; R1-ECS-REC3, R1-ECS-F22, R1-DATA-OQ7; legacy CS5, CS6, CS7, CS8, GN7, GW9, GW15.
+  Rests on: F12 (the predicate that lets queries skip dead pieces), F21; R1-ECS-REC3, R1-ECS-F22, R1-DATA-OQ7; legacy
+  CS5, CS6, CS7, CS8, GN7, GN11 (mark (d)'s 42.8 ms), GW9, GW15.
   Serves: VISION_V2 §6.2 (line of sight across heights, ledges, interiors) and §6.3 (blasts and abilities query one
   world).
   A spike must prove (proposed): (a) a port-parity fuzz of 20,000 random rays (legacy CS6's method) gives the same
@@ -695,8 +731,9 @@ VISION_V2 §4 minimum laptop for Wasm).
   is a velocity change on the kinematic soldier.
   The reason: Rapier's CCD only concerns dynamic bodies (F9), which REC1 does not use; legacy's swept ray per step
   already keeps bolts from tunnelling (GC15) but integrates with the frame dt; grenades that ignore walls (GC14) are a
-  known gap; parry's swept tests give the time of impact (F20).
-  Rests on: F9, F20; legacy GC14, GC15; R2-SYNC-REC5; R1-TICK-REC1.
+  known gap; parry's swept tests give the time of impact for the shape pairs it supports (F20; REC1 mark 6 checks the
+  grenade's ball against the statics).
+  Rests on: F9, F20; legacy GC14, GC15; R2-SYNC-REC5; R1-TICK-REC1; LOOP_V2 §5 (knockback); REC1 mark 6.
   Serves: VISION_V2 §6.3 (weapons and abilities as data, whose projectiles share one flight model) and §6.2.
   A spike must prove (proposed): 0 tunnelling through a 0.2 m wall in 10,000 shots at the fastest projectile speed in
   the data, at 30 and 60 Hz; a grenade thrown at a wall bounces back in 100 % of 1,000 throws; the landing point of a
@@ -706,16 +743,20 @@ VISION_V2 §4 minimum laptop for Wasm).
   substeps at 30 Hz.**
   A vehicle is a pose plus parts (hull, turret, legs) in the sim's tables, each part a parry shape with its own hit
   volume and alive flag. Each tick it sweeps its hull from the old to the new pose against the static world and stops
-  or slides like a soldier; what happens to a soldier in its path is a game rule (OQ1). Mount points for weapons are sim
-  data (GC17's lesson).
+  or slides like a soldier; what happens to a soldier in its path is a game rule (OQ1). A linear sweep covers the
+  translation only: a long hull that also turns needs either a nonlinear cast (parry lists one, F20, and the guide says
+  nonlinear casts cost more than linear ones, F13) or a rotation checked by an overlap test before the linear sweep;
+  the spike picks one. Mount points for weapons are sim data (GC17's lesson).
   The reason: kinematic bodies go through walls unless the game sweeps them (F7); Rapier's wheeled vehicle is a
   Bullet-style dynamic car (F8), while LOOP_V2 §6's vehicles are a walker and faction tanks. Answering R1-TICK-OQ9: at
   `JUG.maxSpeed` 6 m/s a vehicle moves 0.2 m per tick at 30 Hz (arithmetic), well under a soldier's 0.7 m radius, and
-  the move is swept anyway, so no physics substeps are needed for kinematic vehicles.
-  Rests on: F7, F8, F20; legacy GC17, GW13 (radius 0.7); tuning `JUG.maxSpeed`; R1-TICK-OQ9, R1-DET-REC3,
+  the move is swept anyway, so no physics substeps are needed for kinematic vehicles (the 0.2 m is translation; turns
+  are swept as above).
+  Rests on: F7, F8, F13, F20 (supported pairs only: REC1 mark 6 includes hull compounds); legacy GC17, GW13 (radius 0.7); tuning `JUG.maxSpeed`; R1-TICK-OQ9, R1-DET-REC3,
   R1-ECS-REC1 (mark 1's stress load); LOOP_V2 §3 and §6.
   Serves: VISION_V2 §6.4 (big, multi-part vehicles).
-  A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of 48 soldiers for 10 minutes has 0
+  A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of 48 soldiers for 10 minutes, turning
+  on the spot and while moving, has 0
   ticks that end with a soldier or a wall inside its hull (penetration > 1 cm); the stress load for R1-DET-REC3 and
   R1-ECS-REC1 mark 1 keeps 8 big vehicles (R1-ECS-REC1's number), harvesters included (LOOP_V2 §3; how many per team
   is the game-designer's), at 30 and 60 Hz.
@@ -743,11 +784,15 @@ VISION_V2 §4 minimum laptop for Wasm).
   them, typed links (FLOORS), area ids and flags (OBST), and integer traversal costs. The sim crate holds the queries:
   nearest node, A* over nodes, a string-pulled straight path, link traversal. The bake runs in the editor's Test, on map
   save and in CI, from the same collision world the sim moves in (R4-PHYS-REC2), with Recast's four agent numbers set
-  from the soldier's movement data (radius 0.7 m, `T.stepUp` 0.55 m, the slope limit and height).
+  from the soldier's movement data (radius 0.7 m, `T.stepUp` 0.55 m, the slope limit and height); Recast takes height,
+  climb and radius in voxels (R4-NAV-F2), so the bake rounds each to its cell size and reports the rounding.
   The reason: the client runs the same sim for offline play, bots included (the starting principles), and C++ Detour
-  cannot join the sim's browser build (F8). R1-DET-REC1 (b) asks a bots-only match to hash the same on native and Wasm,
-  and no Rust navigation crate promises determinism (F16); polyanya depends on hashbrown, whose optional default
-  hasher seeds itself at random (F11, F15), though whether that reaches path results is not known. Baking
+  cannot be linked into the sim's browser build for the target R1 plans (`wasm32-unknown-unknown`, F8, R1-DET-F6);
+  building the whole sim for a C-capable target instead (F8's page names two) is not weighed by R1 and not proposed
+  here. R1-DET-REC1 (b) asks a bots-only match to hash the same on native and Wasm,
+  and no Rust navigation crate promises determinism (F16); polyanya depends on hashbrown (F11), which lists foldhash,
+  a hasher that seeds itself at random, as an optional dependency (F15); whether that reaches path results is not
+  known. Baking
   once makes generation's floating-point results shared data rather than something each target recomputes. Crowd
   layers that move agents themselves (F17, F13) would split position ownership away from the sim's movement and
   snapshot (R1-ECS-REC1). Quake III shipped bots on exactly this shape: a precomputed area graph with typed links and
@@ -757,7 +802,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   Rests on: F1, F2, F8, F9, F11, F12, F13, F15, F16, F17, F18, F19; R1-DET-REC1, R1-DET-REC2, R1-DET-F6, R1-ECS-REC1,
   R1-TICK-REC2 (reference hardware); R4-PHYS-REC2; legacy GN11, GN12, TL14; tuning `T.stepUp`, bot radius 0.7 (GW13);
   LOOP_V2 §9 (6 m gaps, reachability); EDITOR_V2 §3 (Test, validation panel).
-  Serves: VISION_V2 §6.2 (bots that move between levels) and §6.1 (bots fill empty slots in every mode).
+  Serves: VISION_V2 §6.2 (bots that move between levels) and §3 ("Bots fill empty slots."; the draft cited §6.1, which
+  is modes as data: corrected at the fix pass, here and in five more Serves lines).
   A spike must prove (proposed pass marks; the reference hardware of R1-TICK-REC2):
   1. **Bake time.** The Octopon-3 greybox (LOOP_V2 §9 layout) bakes in ≤ 1 s native and ≤ 3 s in a browser Worker,
      for each generator, so the editor's Test stays quick (EDITOR_V2 §3).
@@ -782,27 +828,31 @@ VISION_V2 §4 minimum laptop for Wasm).
   replan storm is a known bug; Detour itself caps work per update (F4); Quake III serves every bot from per-goal cached
   distances, hierarchically, and accepts a slightly longer route (F19); many bots share a few goals (GN9).
   Rests on: F4, F19; legacy GN5 (the stall figures), GN9, GN12, GN13, TL13; LOOP_V2 §10; R1-TICK-REC2 (the P1
-  scene).
-  Serves: VISION_V2 §6.1 (48+ players with bots) and §6.2 (bots between levels).
-  A spike must prove (proposed): in R1-TICK-REC2's P1 scene at N = 48 and N = 64 bots with an uplink cache carried
-  around the map: navigation (queries plus route following) takes ≤ 10 % of the tick's p99 budget; no bot waits more
+  scene), R1-XU-OQ1, R4-PHYS-REC4 (the vehicle count).
+  Serves: VISION_V2 §3 (up to 24v24, bots fill empty slots) and §6.2 (bots between levels).
+  A spike must prove (proposed): in R1-TICK-REC2's P1 scene at N = 48 and N = 64 bots, with 8 big vehicles instead of
+  P1's 4 (the count R4-PHYS-REC4 proposes; the one stress scene is R1-XU-OQ1's, for the synthesis), and an uplink
+  cache carried around the map: navigation (queries plus route following) takes ≤ 10 % of the tick's p99 budget; no bot waits more
   than 1 s for a route (legacy: 52-57 % route denials at 48, GN13); at most 2 replans per bot per second at p99; the
   headless stall rate is no worse than legacy's best measured 7.73 % (TL13 method, 3 runs per build).
 
 - **R4-NAV-REC3. Local avoidance is a step inside the sim's movement phase, never a crowd system that moves agents.**
   Each bot's route gives a preferred velocity; an avoidance step adjusts it against neighbours taken from the movers'
-  index in id order, and the result goes through the same movement as a player's input (R4-PHYS-REC1). The first
+  index in id order, on the same floor layer only (R4-FLOORS-REC2's layer ids: ORCA in dodgy_2d works in one plane,
+  "for 2D", R4-OBST-F3, so bots on stacked floors would otherwise avoid each other), and the result goes through the
+  same movement as a player's input (R4-PHYS-REC1). The first
   candidate is ORCA through dodgy_2d (F13's dependency; R4-OBST-F3: dodgy_2d 0.5.5 is "An implementation of ORCA" and
   "essentially a port of RVO2"), adopted only after an audit against R1-DET-REC2's float rules; a plain separation force
   is the fallback.
   The reason: legacy has no avoidance and its strafing skips navigation (GN5); crowd modules that update positions
   themselves (F17, F13) would split position ownership from the sim; neighbour order must be stable for determinism
   (R1-ECS-REC2).
-  Rests on: F13, F17; R1-ECS-REC2, R1-DET-REC2; R4-PHYS-REC1; legacy GN5; R4-OBST-F3; LOOP_V2 §9 (the 6 m gap).
-  Serves: VISION_V2 §6.1 and §6.2.
+  Rests on: F13, F17; R1-ECS-REC2, R1-DET-REC2; R4-PHYS-REC1; R4-FLOORS-REC2; legacy GN5; R4-OBST-F3; LOOP_V2 §9 (the
+  6 m gap).
+  Serves: VISION_V2 §3 (bots fill empty slots) and §6.2.
   A spike must prove (proposed): 48 bots crossing in a 6 m choke point (LOOP_V2 §9's gap) for 10 minutes: 0 deadlocks
   longer than 3 s, and per-tick state hashes identical on native and Wasm; the avoidance step costs ≤ 0.2 ms p99 native
-  at 48 (proposed).
+  at 48 (proposed); in R4-FLOORS-REC2's two-floor test building, 0 avoidance pairs join bots on different floors.
 
 - **R4-NAV-REC4. Navigation runs where bots run: on the server, and in the browser only for offline or local-bot play.
   Client prediction never runs it. Navigation data changes only with the map: a new bake means a new match.**
@@ -811,7 +861,7 @@ VISION_V2 §4 minimum laptop for Wasm).
   principles), so the code must also build for the browser (F8). R1-DATA-OQ7 asks what may reload mid-match: navigation
   data no (a re-bake needs a restart); flag toggles on baked data yes (OBST).
   Rests on: F8; R1-TICK-REC2, R1-DATA-OQ7.
-  Serves: VISION_V2 §6.1.
+  Serves: VISION_V2 §6.2 (bots that move between levels, offline too) and §3 (bots fill empty slots).
   A spike must prove (proposed): the client's Worker build without bots skips the navigation data (its size reported);
   with bots, offline play at the largest mode meets R1-TICK-REC2's P2 mark.
 
@@ -847,7 +897,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   The reason: the barracks is enterable and roofed in the first greybox (LOOP_V2 §2, GW20), and enterable structures
   come later (LOOP_V2 §9 [LATER]); a 2D grid cannot represent a floor above a floor (GN10, GN11), and fixing that later
   would change the data format. Sharing area ids with R2-INT-REC2 avoids two floor models.
-  Rests on: F1; R4-NAV-F2; R2-INT-REC2; legacy GN10, GN11, GW20.
+  Rests on: F1; R4-NAV-F2; R2-INT-REC2; legacy GN10, GN11, GW20; LOOP_V2 §2 (everyone spawns inside the barracks) and
+  §9 (enterable structures [LATER]).
   Serves: VISION_V2 §6.2 (floors and building interiors).
   A spike must prove (proposed): in a two-floor test building with stairs (R2-INT-REC2 (a)'s greybox): (a) nodes on
   each floor carry different layer and area ids and the only edges between floors run along the stairs; (b) a bot on
@@ -908,7 +959,7 @@ VISION_V2 §4 minimum laptop for Wasm).
   cut the average case, but not the worst case where everyone fights over the centre (R2-INT-F19 makes the same point
   for interest), which is why the marks below test that worst case.
   Rests on: F1, F2; R2-INT-F19, R2-INT-F20, R2-INT-REC2, R2-INT-REC3; legacy GN4.
-  Serves: VISION_V2 §6.2 and §6.1 (48+ players with bots).
+  Serves: VISION_V2 §6.2 and §3 (up to 24v24, bots fill empty slots).
   A spike must prove (proposed): at 24v24 and 16v16v16 with everyone in one fight on the greybox, every bot scans at
   least 4 times per second (legacy's rate at 12 soldiers, GN4) within R2-INT-REC3's 10 % budget; the share of pairs
   culled before a ray and the rays per tick are reported.
@@ -938,7 +989,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   Juggernaut entirely (GC17).
   Rests on: F1, F2, F3; R4-NAV-F10, R4-NAV-F13, R4-NAV-REC1, R4-NAV-REC2, R4-NAV-REC3; R4-PHYS-REC4 (the stress
   scene); legacy GC17, GN13; LOOP_V2 §10.
-  Serves: VISION_V2 §6.4 (big vehicles as moving obstacles) and §6.1 (bots in every mode).
+  Serves: VISION_V2 §6.4 (big, multi-part vehicles; that bots treat them as moving obstacles is inferred) and §3 (bots
+  fill empty slots).
   A spike must prove (proposed pass marks): R4-PHYS-REC4's stress scene (48 bots, 8 big vehicles including harvesters)
   for 10 minutes at 30 and 60 Hz: 0 bots stuck longer than 3 s against a vehicle; at most 2 replans per bot per second
   at p99 (R4-NAV-REC2's mark), with vehicles driving through the bots' routes; the marking and avoidance work for
@@ -954,24 +1006,28 @@ VISION_V2 §4 minimum laptop for Wasm).
   changes (R2-INT-F4) rather than rebuilding its graph; Detour's query filter and polyanya's switchable layers do the
   same job on a mesh (R4-NAV-F5, R4-NAV-F11). R1-DATA-OQ7 then holds: geometry and navigation data never change
   mid-match, only flags do.
-  Rests on: F4; R4-NAV-F5, R4-NAV-F11; R2-INT-F4, R2-INT-REC2; R1-DATA-OQ7; R4-PHYS-REC2; legacy GN11, GW15, GW20.
+  Rests on: F4; R4-NAV-F5, R4-NAV-F11; R2-INT-F4, R2-INT-REC2; R1-DATA-OQ7; R4-PHYS-REC2; legacy GN11, GW15, GW20;
+  LOOP_V2 §3 (team-funded rebuilds).
   Serves: VISION_V2 §6.2 (floors and interiors whose openings change) and §6.5 (objectives destroyed and rebuilt,
   team-funded rebuilds).
   A spike must prove (proposed): destroying a test wall opens its route, its sight lines and its portal in the same
   tick (0 ticks of disagreement over 1,000 destroy and rebuild cycles); every route found after a flip is walked by
   the sim's movement without failure in 1,000 traversals; a flip costs ≤ 0.1 ms native (proposed).
 
-- **R4-OBST-REC3. The bake's output is split into fixed tiles with stable ids, so the editor re-bakes only what an
-  edit touches; the sim never re-bakes during a match. Player building is not designed here, and nothing in the format
-  rules it out.**
-  The reason: EDITOR_V2 §3's Test plays the map with bots at once, so the bake should redo only edited tiles (Detour's
-  mesh is tile-based already, R4-NAV-F3; oxidized_navigation regenerates per tile, R4-NAV-F10). If Mustafa ever adds
-  player building, re-baking touched tiles in the sim (the tile-cache approach, F1) is the path the tiles keep open;
-  its determinism and cost would be that feature's questions (OQ3).
-  Rests on: F1; R4-NAV-F3, R4-NAV-F10; EDITOR_V2 §3.
-  Serves: EDITOR_V2 §3 (Test; validation panel), through VISION_V2 §6.2 (maps with verticality made in the editor).
-  A spike must prove (proposed): moving one block re-bakes only the tiles it overlaps (count reported), and the result
-  is byte-identical to a full bake of the edited map.
+- **R4-OBST-REC3. Split the bake into fixed tiles with stable ids only if a full bake is too slow for the editor's
+  Test (R4-NAV-REC1 mark 1 fails, or a measured Test delay needs it); the editor then re-bakes only what an edit
+  touches. Either way the sim never re-bakes during a match. Player building is not designed here.**
+  The reason: EDITOR_V2 §3's Test plays the map with bots at once, so a slow bake would have to redo only edited tiles
+  (Detour's mesh is tile-based already, R4-NAV-F3; oxidized_navigation regenerates per tile, R4-NAV-F10). R4-NAV-REC1
+  mark 1 already asks a full bake to take ≤ 1 s native and ≤ 3 s in a Worker; if it does, tiles would only keep a
+  player-building path open, which no VISION_V2 §6 item asks for, so they are not built. If Mustafa ever adds player
+  building, re-baking touched tiles in the sim (the tile-cache approach, F1) is that feature's path; its determinism
+  and cost would be its questions (OQ3).
+  Rests on: F1; R4-NAV-F3, R4-NAV-F10, R4-NAV-REC1 (mark 1); EDITOR_V2 §3.
+  Serves: EDITOR_V2 §3 (Test; validation panel), through VISION_V2 §6.2 (maps with verticality made in the editor),
+  and only if R4-NAV-REC1 mark 1 fails; keeping player building open is not a reason (no VISION_V2 §6 item needs it).
+  A spike must prove (proposed), only if tiling is adopted: moving one block re-bakes only the tiles it overlaps (count
+  reported), and the result is byte-identical to a full bake of the edited map.
 
 ## Open questions
 
@@ -1053,6 +1109,8 @@ with R4-PHYS-REC1's spike as the evidence.
   marks apply only to what Rapier holds.
 - R1-DET-REC3's flag moves to parry3d's own `enhanced-determinism` (R1-DET-F23); its spike scene stands, with the
   vehicle count it asked R4 for: 8 big vehicles, harvesters included (R4-PHYS-REC4).
+- R1-TICK-REC2's P1 scene has 4 big vehicles; R4 proposes 8 there too (R4-PHYS-REC4), so R4-NAV-REC2's mark runs P1
+  with 8. The one stress scene stays R1-XU-OQ1's, for the synthesis.
 - R1-TICK-OQ9 answered: no physics substeps for kinematic, swept vehicles at 30 Hz (R4-PHYS-REC4).
 - R1-DET-OQ3 answered with a bound: f32, up to a 2 km map (R4-PHYS-REC5).
 - R1-DATA-OQ7 answered for navigation: navigation data and geometry never change mid-match; only flags do
@@ -1078,7 +1136,8 @@ with R4-PHYS-REC1's spike as the evidence.
 #### From R4-NAV
 
 - R1: answers "whether navigation runs only on the server" (REC4) and R1-DATA-OQ7's navigation part; R1-DET-REC1 (b)
-  covers bots, so navigation is inside the hash test.
+  covers bots, so navigation is inside the hash test. The Wasm target: F8's page names two targets that link C/C++,
+  which R1 does not weigh; option A's main blocker (F8) holds only while ADR-0002 keeps `wasm32-unknown-unknown`.
 - R5: the reachability check in the sim crate, runnable from Node (editor) and CI (REC1 mark 4); the stall-rate
   comparison (TL13 method) in the v2 harness.
 - EDITOR_V2: the bake runs on Test and save; the validation panel reads the bake's gap and reachability reports.
@@ -1104,7 +1163,7 @@ with R4-PHYS-REC1's spike as the evidence.
 
 - R2: REC2's flag flips and R2-INT-REC2's portal re-flood are one event; vehicles as cover in rewind (R2-SYNC-OQ8).
 - R1: R1-DATA-OQ7 answered for navigation (flags only mid-match).
-- EDITOR_V2: tile re-bake on edit (REC3).
+- EDITOR_V2: tile re-bake on edit, only if a full bake misses R4-NAV-REC1 mark 1 (REC3).
 - game-designer: OQ1, OQ2.
 
 ### Recommendations that hinge on a source not read
