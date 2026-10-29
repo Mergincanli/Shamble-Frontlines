@@ -4,7 +4,8 @@
 - **Author agent:** engine-architect (wave 2 of `.checkpoints/v2-research/plan.md`: one owner agent for the topic,
   covering all of its brief questions).
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** draft: spot-check pending.
+- **Status:** spot-checked (49 of 51 key claims). The verifier's table, its critical read and the owner's fixes are
+  in part 7 ("Verifier spot-check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R4):** "Rapier 3D or custom;
   navigation meshes in Rust; bots moving between floors; line of sight across heights; obstacles placed mid-match (for
   later building)"
@@ -20,8 +21,8 @@ in the brief's order.
 | 4 | line of sight across heights | R4-LOS-F1–F5, REC1–REC3, OQ1–OQ5 |
 | 5 | obstacles placed mid-match (for later building) | R4-OBST-F1–F4, REC1–REC3, OQ1–OQ4 |
 
-Totals: 62 findings, 18 recommendations, 23 open questions; 46 sources read (36 official, 8 shipped game, 2 other)
-and 32 sources not read (part 8).
+Totals: 62 findings, 18 recommendations, 23 open questions; 47 sources read (37 official, 8 shipped game, 2 other;
+source 47 was read by the verifier, not the owner) and 32 sources not read (part 8).
 
 **Reading rules.**
 - Tiers: "official" is a project's own documentation or repository (for a third-party Rust crate, its docs.rs pages);
@@ -139,9 +140,10 @@ and 32 sources not read (part 8).
 
 #### Rapier's versions, features and focus
 - **R4-PHYS-F15.** Rapier shipped 12 releases from 0.30.1 (17 Oct. 2025) to 0.36.1 (4 Oct. 2026), counting both
-  ends and one beta (0.35.0-beta.0), and 0.36.0 broke loading of older snapshots. Quotes: release headings "v0.36.1 (4 October 2026)" … "v0.30.1 (17 Oct. 2025)"
-  (as listed by the fetch); v0.36.0: "Snapshots serialized with previous versions can't be loaded anymore."; v0.35.0-
-  beta.0: "The `IslandManager` and `RigidBodyActivation` serialization formats changed." Source: the CHANGELOG above.
+  ends and one beta (0.35.0-beta.0), and 0.36.0 broke loading of older snapshots. Quotes: release headings
+  "v0.36.1 (4 October 2026)" … "v0.30.1 (17 Oct. 2025)" (as listed by the fetch); v0.36.0: "Snapshots serialized with
+  previous versions can't be loaded anymore."; v0.35.0-beta.0: "The `IslandManager` and `RigidBodyActivation`
+  serialization formats changed." Source: the CHANGELOG above.
   Tier: official. Read 2026-10-28. Sure: confirmed in the source.
 - **R4-PHYS-F16.** In 0.35, SIMD became always on and the broad phase was reworked for large, mostly static worlds.
   Quotes: "SIMD is now always on, backed by `wide`"; "The broad phase was reworked for large, mostly-static worlds".
@@ -262,8 +264,9 @@ and 32 sources not read (part 8).
   away from walls. Quotes: `walkableSlopeAngle` "The maximum slope that is considered walkable."; `walkableHeight`
   "Minimum floor to 'ceiling' height that will still allow the floor area to" "be considered walkable."; `walkableClimb`
   "Maximum ledge height that is considered to still be traversable."; `walkableRadius` "The distance to erode/shrink the
-  walkable area of the heightfield away from" "obstructions."; `cs` "The xz-plane cell size to use for fields."; height, climb and radius are in voxels ("[Units: vx]"), the cell
-  size in world units ("[Units: wu]") (the units quoted by the verifier). Source:
+  walkable area of the heightfield away from" "obstructions."; `cs` "The xz-plane cell size to use for fields.";
+  height, climb and radius are in voxels ("[Units: vx]"), the cell size in world units ("[Units: wu]") (the units
+  quoted by the verifier). Source:
   https://raw.githubusercontent.com/recastnavigation/recastnavigation/main/Recast/Include/Recast.h (main). Tier:
   official. Read 2026-10-28. Sure: confirmed in the source.
 - **R4-NAV-F3.** Detour is the runtime half: it loads the mesh, a set of tiles of convex polygons, and answers path
@@ -428,7 +431,8 @@ and 32 sources not read (part 8).
   TRAVEL_WALK 2 //walking"; "TRAVEL_BARRIERJUMP 4 //jumping onto a barrier"; "TRAVEL_JUMP 5 //jumping";
   "TRAVEL_LADDER 6 //climbing a ladder"; "TRAVEL_WALKOFFLEDGE 7 //walking of a ledge"; "TRAVEL_JUMPPAD 18 //jump pad";
   the codes run from "#define TRAVEL_INVALID 1 //temporary not possible" to "#define TRAVEL_FUNCBOB 19 //func bob"
-  (count corrected at the fix pass from the verifier's reading; the draft said 19 ways). Source: https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/botlib/aasfile.h (GPL release).
+  (count corrected at the fix pass from the verifier's reading; the draft said 19 ways). Source:
+  https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/botlib/aasfile.h (GPL release).
   Tier: shipped game. Read 2026-10-28. Sure: confirmed in the source.
 - **R4-FLOORS-F6.** Quake III finds jump links by predicting the player's own movement across the gap, and step and
   barrier links by comparing heights with the movement's maximum step and barrier. Quotes: "creates possible jump
@@ -752,7 +756,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   `JUG.maxSpeed` 6 m/s a vehicle moves 0.2 m per tick at 30 Hz (arithmetic), well under a soldier's 0.7 m radius, and
   the move is swept anyway, so no physics substeps are needed for kinematic vehicles (the 0.2 m is translation; turns
   are swept as above).
-  Rests on: F7, F8, F13, F20 (supported pairs only: REC1 mark 6 includes hull compounds); legacy GC17, GW13 (radius 0.7); tuning `JUG.maxSpeed`; R1-TICK-OQ9, R1-DET-REC3,
+  Rests on: F7, F8, F13, F20 (supported pairs only: REC1 mark 6 includes hull compounds); legacy GC17, GW13 (radius
+  0.7); tuning `JUG.maxSpeed`; R1-TICK-OQ9, R1-DET-REC3,
   R1-ECS-REC1 (mark 1's stress load); LOOP_V2 §3 and §6.
   Serves: VISION_V2 §6.4 (big, multi-part vehicles).
   A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of 48 soldiers for 10 minutes, turning
@@ -789,11 +794,10 @@ VISION_V2 §4 minimum laptop for Wasm).
   The reason: the client runs the same sim for offline play, bots included (the starting principles), and C++ Detour
   cannot be linked into the sim's browser build for the target R1 plans (`wasm32-unknown-unknown`, F8, R1-DET-F6);
   building the whole sim for a C-capable target instead (F8's page names two) is not weighed by R1 and not proposed
-  here. R1-DET-REC1 (b) asks a bots-only match to hash the same on native and Wasm,
-  and no Rust navigation crate promises determinism (F16); polyanya depends on hashbrown (F11), which lists foldhash,
-  a hasher that seeds itself at random, as an optional dependency (F15); whether that reaches path results is not
-  known. Baking
-  once makes generation's floating-point results shared data rather than something each target recomputes. Crowd
+  here. R1-DET-REC1 (b) asks a bots-only match to hash the same on native and Wasm, and no Rust navigation crate
+  promises determinism (F16); polyanya depends on hashbrown (F11), which lists foldhash, a hasher that seeds itself at
+  random, as an optional dependency (F15); whether that reaches path results is not known. Baking once makes
+  generation's floating-point results shared data rather than something each target recomputes. Crowd
   layers that move agents themselves (F17, F13) would split position ownership away from the sim's movement and
   snapshot (R1-ECS-REC1). Quake III shipped bots on exactly this shape: a precomputed area graph with typed links and
   integer travel times (F18, F19). Legacy proves the rest: build from the movement collision so bots and movement agree
@@ -832,18 +836,18 @@ VISION_V2 §4 minimum laptop for Wasm).
   Serves: VISION_V2 §3 (up to 24v24, bots fill empty slots) and §6.2 (bots between levels).
   A spike must prove (proposed): in R1-TICK-REC2's P1 scene at N = 48 and N = 64 bots, with 8 big vehicles instead of
   P1's 4 (the count R4-PHYS-REC4 proposes; the one stress scene is R1-XU-OQ1's, for the synthesis), and an uplink
-  cache carried around the map: navigation (queries plus route following) takes ≤ 10 % of the tick's p99 budget; no bot waits more
-  than 1 s for a route (legacy: 52-57 % route denials at 48, GN13); at most 2 replans per bot per second at p99; the
+  cache carried around the map: navigation (queries plus route following) takes ≤ 10 % of the tick's p99 budget; no
+  bot waits more than 1 s for a route (legacy: 52-57 % route denials at 48, GN13); at most 2 replans per bot per
+  second at p99; the
   headless stall rate is no worse than legacy's best measured 7.73 % (TL13 method, 3 runs per build).
 
 - **R4-NAV-REC3. Local avoidance is a step inside the sim's movement phase, never a crowd system that moves agents.**
   Each bot's route gives a preferred velocity; an avoidance step adjusts it against neighbours taken from the movers'
   index in id order, on the same floor layer only (R4-FLOORS-REC2's layer ids: ORCA in dodgy_2d works in one plane,
   "for 2D", R4-OBST-F3, so bots on stacked floors would otherwise avoid each other), and the result goes through the
-  same movement as a player's input (R4-PHYS-REC1). The first
-  candidate is ORCA through dodgy_2d (F13's dependency; R4-OBST-F3: dodgy_2d 0.5.5 is "An implementation of ORCA" and
-  "essentially a port of RVO2"), adopted only after an audit against R1-DET-REC2's float rules; a plain separation force
-  is the fallback.
+  same movement as a player's input (R4-PHYS-REC1). The first candidate is ORCA through dodgy_2d (F13's dependency;
+  R4-OBST-F3: dodgy_2d 0.5.5 is "An implementation of ORCA" and "essentially a port of RVO2"), adopted only after an
+  audit against R1-DET-REC2's float rules; a plain separation force is the fallback.
   The reason: legacy has no avoidance and its strafing skips navigation (GN5); crowd modules that update positions
   themselves (F17, F13) would split position ownership from the sim; neighbour order must be stable for determinism
   (R1-ECS-REC2).
@@ -1177,16 +1181,108 @@ with R4-PHYS-REC1's spike as the evidence.
 
 ## Verifier spot-check
 
-Pending: the wave 2 verifier spot-check.
+One verifier pass ran on 2026-10-28 (wave 2 of `.checkpoints/v2-research/plan.md`), and the owner's fix pass
+(engine-architect, started the same day) applied it. Verdict: PASS WITH NOTES. The verifier checked 49 of the 51 key
+claims at their sources (WebFetch, allow-listed domains): 46 confirmed, 2 wrong (R4-PHYS-F20, R4-FLOORS-F5) and 1
+unsupported (R4-NAV-F15). Its critical read found five points that needed content edits (items 1 to 5) and seven
+smaller ones; none overturns a recommendation. Its report, verbatim: `.checkpoints/v2-research/verifier-r4-result.md`;
+its notes with every quote in full: `.checkpoints/v2-research/verifier-r4.md`; the fix log:
+`.checkpoints/v2-research/engine-architect-r4-fix.md`.
+
+**Counts.** 49 checked · 46 confirmed · 2 wrong · 1 unsupported. Not checked: R4-PHYS-F27 and R4-NAV-F16, absences no
+quote can confirm (now labelled "inferred"). Final state after the fix pass: 41 no change needed · 8 fixed (the three
+wrong or unsupported claims, plus R4-PHYS-F2, F15, F22, R4-NAV-F2 and F8 from the verifier's notes) · 0 re-sourced · 0
+now an open question. No recommendation rests on a claim whose verdict is wrong or unsupported: the three claims now
+say what their sources say, and the recommendations that cited them (R4-PHYS-REC1, REC3, REC4, R4-NAV-REC1,
+R4-FLOORS-REC1) rest on the corrected text. M = 51 distinct R4 finding ids in the "Rests on:" lists before the fix
+(legacy and wave-1 ids not counted, as in R3), N = 49 checked. After the fix, R4-PHYS-REC4 also rests on R4-PHYS-F13,
+which the verifier confirmed outside the key list (its note V37). Also confirmed outside the key list: R4-PHYS-F5,
+F11, F13, F14, F16 and R4-NAV-F6; and the legacy basis of R4-FLOORS-REC3 (GW14, `docs/LEGACY_INVENTORY.md:202`) and of
+R4-LOS-REC3 (GC3, `docs/LEGACY_INVENTORY.md:242`). The fix pass fetched no new page; the quotes it added come from the
+verifier's notes (source 47 is a page only the verifier read).
+
+| Claim id | Claim | Source | Verdict | Location and exact words (as the verifier gave them) | Final state after the fix pass |
+|---|---|---|---|---|---|
+| R4-PHYS-F24 | Quake III movement is kinematic: 5 planes, 4 bumps, STEPSIZE 18, MIN_WALK_NORMAL 0.7 | bg_local.h, bg_slidemove.c | confirmed | "#define MAX_CLIP_PLANES 5"; "numbumps = 4;"; "#define STEPSIZE 18"; "#define MIN_WALK_NORMAL 0.7f // can't walk on very steep slopes" | no change needed (the `trace.plane.normal[2]` line is from bg_pmove.c, one of F24's three sources; the verifier did not check it) |
+| R4-PHYS-F23 | Quake III movement is shared by server and client | bg_pmove.c | confirmed | "// bg_pmove.c -- both games player movement code"; "Can be called by either the server or the client" | no change needed |
+| R4-PHYS-F15 | 12 releases from 0.30.1 to 0.36.1; 0.36.0 breaks snapshots | Rapier CHANGELOG | confirmed (the 12 counts both ends and one beta) | "## v0.36.1 (4 October 2026)" … "## v0.30.1 (17 Oct. 2025)"; "Snapshots serialized with previous versions can't be loaded anymore." | fixed: "counting both ends and one beta (0.35.0-beta.0)" added |
+| R4-PHYS-F6 | snap-to-ground changed in 0.35.0 | CHANGELOG, v0.35.0, "Fixed" | confirmed | "The character controller's snap-to-ground now triggers on any movement that isn't upwards," | no change needed |
+| R4-PHYS-F1 | the character controller is only ray and shape casts | rapier.rs character_controller | confirmed | "is a higher-level tool that will emit the proper ray-casts and shape-casts to adjust the user-defined trajectory" | no change needed |
+| R4-PHYS-F3 | the controller holds no per-character state; move_shape takes dt: f32 | guide, "Setup and usage"; docs.rs 0.36.1 | confirmed | "It does not contain any collider-specific or rigid-body-specific information like handles, velocities, positions, etc."; "pub fn move_shape( &self, dt: f32, …" | no change needed |
+| R4-PHYS-F2 | autostep is off by default; snap, slope and offset | docs.rs fields, guide | confirmed (one caveat left out, see critical read 10) | "Should the character automatically step over small obstacles? (disabled by default)" | fixed: the autostep cost warning quoted; R4-PHYS-REC1's fallback reason and mark 5 use it (item 10) |
+| R4-PHYS-F4 | gravity is the caller's job | guide, Gravity | confirmed | "it is up to you to emulate gravity by adding a downward component to that movement vector." | no change needed |
+| R4-PHYS-F8 | the vehicle controller is a port of Bullet's btRaycastVehicle | guide, Vehicle controller | confirmed | "can be difficult to control for games requiring non-realistic vehicles."; "ported from the btRaycastVehicle of Bullet"; "The chassis is created like any other dynamic rigid-body," | no change needed |
+| R4-PHYS-F7 | kinematic bodies go through walls | rapier.rs rigid_bodies, "Rigid-body type" | confirmed | "kinematic bodies will simply ignore any contact force and go through walls and the ground." | no change needed |
+| R4-PHYS-F9 | CCD is only for dynamic bodies; "bullet" CCD is off by default | rapier.rs rigid_body_ccd | confirmed | "Every fast-moving dynamic rigid-body is swept against the fixed colliders and the soft-bodies of the scene."; "This is more expensive, therefore it is disabled by default" | no change needed |
+| R4-PHYS-F21 | the BVH is built once for static scenes; about 64 bytes per node pair | docs.rs parry3d Bvh | confirmed | "For scenes where objects don’t move, build the BVH once and query repeatedly:"; "~64 bytes per pair of children (3D f32 SIMD), O(n) total"; "O(n log n) where n is the number of leaves" | no change needed |
+| R4-PHYS-F20 | swept, overlap and ray tests between "any two" of parry's shapes | docs.rs parry3d query, fn.cast_shapes | **wrong** (overstated) | "-> Result<Option<ShapeCastHit>, Unsupported>"; "`Err(Unsupported)` - This shape pair is not supported" | fixed: "for the shape pairs it supports", with the verifier's two quotes (source 47); the unquoted "distance tests" dropped; R4-PHYS-REC1, REC3 and REC4 reworded; R4-PHYS-REC1 mark 6 added (item 1) |
+| R4-PHYS-F26 | f32 is binary32 with 24 significant bits; EPSILON | doc.rust-lang.org f32 (std 1.99.1) | confirmed (the spacing arithmetic also rechecked) | "the “binary32” type defined in IEEE 754-2008"; "MANTISSA_DIGITS: u32 = 24"; "EPSILON: f32 = 1.19209290e-07_f32" | no change needed |
+| R4-PHYS-F17 | rapier3d defaults to f32, 3D and std; listed flags; none for Wasm | docs.rs rapier3d features 0.36.1 | confirmed | default "`dim3`, `f32`, `std`"; "`enhanced-determinism`", "`serde-serialize`", "`parallel`", "`simd8`", "`fem`" | no change needed |
+| R4-PHYS-F22 | Parry 0.26 shipped with Rapier 0.32 (January 2026) | dimforge.com 2025 review, CHANGELOG | confirmed (the file says inferred; it can be upgraded) | "Starting with rapier 0.32 and parry 0.26, most of their API and internals using the nalgebra linear algebra library"; "## v0.32.0 (09 Jan. 2026)" | fixed: upgraded to "confirmed" with the verifier's exact words |
+| R4-PHYS-F12 | query filters; 32 collision groups | rapier.rs scene_queries, colliders | confirmed | "is the handle of one collider the query must ignore."; "there is a total of 32 groups." | no change needed (now also in R4-PHYS-REC2's Rests on, item 9) |
+| R4-PHYS-F19 | parry is geometry only, with no dynamics module | docs.rs parry3d root | confirmed | "parry is a 2 and 3-dimensional geometric library written with the rust programming language."; the module list has no dynamics module | no change needed |
+| R4-PHYS-F25 | Avian is built for Bevy | docs.rs avian3d 0.8.0 | confirmed | "Avian is an ECS-driven 2D and 3D physics engine for the Bevy game engine." | no change needed |
+| R4-NAV-F8 | Rust's browser target has no C/C++ toolchain | rustc book, wasm32-unknown-unknown, Requirements | confirmed | "There is no C/C++ toolchain for this target."; "While interop is theoretically possible it’s recommended to instead use one of:" | fixed: the two C-capable targets quoted; option A, R4-NAV-REC1 and the TL;DR say the blocker holds for R1's target (item 5) |
+| R4-NAV-F4 | Detour's path query can be sliced; at most 65535 search nodes | DetourNavMeshQuery.h | confirmed | "maxIter The maximum number of iterations to perform."; "maxNodes Maximum number of search nodes. [Limits: 0 < value <= 65535]" | no change needed |
+| R4-NAV-F19 | Quake III caches distances per goal, refreshes every 15 s, accepts a longer route | be_aas_route.c | confirmed | "#define CACHE_REFRESHTIME 15.0f //15 seconds refresh time"; "//NOTE: there might be a shorter route via another cluster!!! but we don't care" | no change needed |
+| R4-NAV-F17 | DetourCrowd moves its own agents; 6 neighbours | DetourCrowd.h | confirmed | "static const int DT_CROWDAGENT_MAX_NEIGHBOURS = 6;"; "Updates the steering and positions of all agents." | no change needed |
+| R4-NAV-F18 | precomputed area graph with integer travel times | aasfile.h | confirmed | "unsigned short int traveltime;//travel time of the inter area movement" | no change needed |
+| R4-NAV-F15 | foldhash seeds at random, and hashbrown uses it by default | docs.rs foldhash 0.2.0, hashbrown 0.17.1 | **unsupported** (the hashbrown-default part) | foldhash: "always generates a random per-hasher seed"; the hashbrown page only shows "foldhash ^0.2.0 _normal_ _optional_" and never names a default hasher | fixed: the hashbrown-default clause dropped (the default hasher is "not known"); R4-NAV-REC1's reason and option B reworded |
+| R4-NAV-F2 | Recast's four agent numbers | Recast.h rcConfig | confirmed (the units are voxels) | "Minimum floor to 'ceiling' height that will still allow the floor area to" / "be considered walkable. [Limit: >= 3] [Units: vx]" | fixed: the units quoted; R4-NAV-REC1 rounds the agent numbers to the cell size (item 12) |
+| R4-NAV-F11 | polyanya has floor layers and Wasm demos | docs.rs polyanya 0.18.0 | confirmed | "Overlapping navmeshes for 3D navigation (floors, bridges, …)."; "WASM demos made with Bevy are available here." | no change needed |
+| R4-NAV-F12 | polyanya states performance without numbers | same page | confirmed | "This crate seems to generate a few more nodes, but tends to be faster than the cpp implementation." | no change needed |
+| R4-NAV-F13 | landmass manages its own agents | docs.rs landmass 0.9.3 | confirmed | "While agents are "managed" by the archipelago, characters are only as obstacles to be avoided by agents." | no change needed |
+| R4-NAV-F9 | rerecast ports Recast's generation; determinism through libm is on its roadmap | docs.rs rerecast 0.5.0, GitHub README | confirmed | "Rust port of Recast, the industry-standard navigation mesh generator"; "cross-platform determinism (use `libm` feature)" | no change needed |
+| R4-NAV-F1 | Recast's build steps | recastnavigation README | confirmed | "First Recast rasterizes the input triangle meshes into voxels." | no change needed |
+| R4-NAV-F3 | Detour's mesh is tiles of convex polygons | DetourNavMesh.h | confirmed | "A navigation mesh based on tiles of convex polygons." | no change needed |
+| R4-NAV-F5 | polygon flags and per-area costs | DetourNavMeshQuery.h, DetourNavMesh.h | confirmed | "Cost per area type."; "static const int DT_MAX_AREAS = 64;" | no change needed |
+| R4-NAV-F10 | oxidized_navigation builds tiles asynchronously | docs.rs oxidized_navigation 0.12.0 | confirmed | "and asynchronously generates tiles of navigation meshes based on NavMeshSettings" | no change needed |
+| R4-FLOORS-F5 | Quake III knows "19 typed ways to move" | aasfile.h | **wrong** (the count; a nit) | "#define TRAVEL_INVALID 1 //temporary not possible" … "#define TRAVEL_FUNCBOB 19 //func bob": 18 ways to move plus an invalid marker | fixed: "18 typed ways to move (19 travel-type codes, one of them `TRAVEL_INVALID`)" |
+| R4-FLOORS-F6 | jump links are found by predicting the player's movement | be_aas_reach.c | confirmed | "// If the gaps exist a potential jump is predicted."; "AAS_PredictClientMovement(&move, -1, beststart, PRESENCE_NORMAL, qtrue," | no change needed |
+| R4-FLOORS-F7 | each link stores start, end and type; each area a presence type | aasfile.h | confirmed | "vec3_t start; //start point of inter area movement"; "int presencetype; //how a bot can be present in this area" | no change needed |
+| R4-FLOORS-F1 | span columns per cell; non-overlapping layers | Recast.h | confirmed | "The next span higher up in column."; "partitioning the heightfield in non-overlapping layers." | no change needed |
+| R4-FLOORS-F2 | Detour's off-mesh connections | DetourNavMesh.h | confirmed | "An off-mesh connection is a user defined traversable connection made up to two vertices." | no change needed |
+| R4-FLOORS-F3 | landmass "animation link" | docs.rs landmass | confirmed | "A link connecting two edges where an agent must perform some action (or animation) to use the link." | no change needed |
+| R4-FLOORS-F4 | polyanya one-way layers | docs.rs polyanya | confirmed | "One-way layers for directional movement." | no change needed |
+| R4-LOS-F1 | bots trace from the eye to the centre, bottom and top of the target; field-of-view check; result in [0, 1] | ai_dmq3.c BotEntityVisible | confirmed | "for (i = 0; i < 3; i++) {"; "if (!InFieldOfVision(viewangles, fov, entangles)) return 0;"; "if (bestvis >= 0.95) return bestvis;" | no change needed |
+| R4-LOS-F2 | distance cull depends on alertness; the visibility-set test is commented out | ai_dmq3.c | confirmed | "if (squaredist > Square(900.0 + alertness * 4000.0)) continue;"; "//if (!AAS_inPVS(eye, middle)) continue;" | no change needed (the field-of-view value stays inferred) |
+| R4-LOS-F3 | the caller controls BVH traversal | docs.rs parry3d partitioning, Bvh | confirmed | "Traverses the BVH in depth-first order with full control over traversal." | no change needed |
+| R4-LOS-F4 | a "solid" ray that starts inside a shape hits at distance 0 | rapier.rs scene_queries | confirmed | "if solid is true then the hit point will be the ray origin itself" | no change needed |
+| R4-OBST-F1 | tile-cache obstacle shapes; rebuilds the tiles they touch | DetourTileCache.h | confirmed | "DT_OBSTACLE_ORIENTED_BOX // OBB"; "Updates the tile cache by rebuilding tiles touched by unfinished obstacle requests." | no change needed |
+| R4-OBST-F2 | bounded queues of 64 | DetourTileCache.h | confirmed | "static const int MAX_REQUESTS = 64;"; "static const int MAX_UPDATE = 64;" | no change needed |
+| R4-OBST-F3 | dodgy_2d is ORCA, a port of RVO2 | docs.rs dodgy_2d 0.5.5 | confirmed | "An implementation of ORCA, a local collision avoidance algorithm for 2D."; "This crate is essentially a port of RVO2 to Rust." | no change needed (now also the reason for R4-NAV-REC3's floor filter, item 8) |
+| R4-OBST-F4 | Quake III can mark a link "temporary not possible" | aasfile.h | confirmed | "#define TRAVEL_INVALID 1 //temporary not possible" | no change needed |
+
+**The critical read and what the fix pass did** (the verifier's item numbers):
+
+| Item | The verifier's finding (short) | What the fix pass did |
+|---|---|---|
+| 1 | R4-PHYS-REC1's main reason overstates parry ("swept tests between any two shapes") | Fixed: R4-PHYS-F20 corrected; REC1's reason says "for the shape pairs it supports"; new mark 6: every pair v2 needs (the soldier's capsule or cylinder and the grenade's ball against oriented boxes, ramp wedges, convex shapes and R4-PHYS-OQ4's ground shape; vehicle hull compounds against the same and against capsules) gives 0 `Err(Unsupported)`; REC3 and REC4 reworded the same way |
+| 2 | R4-PHYS-REC1 mark 1 tests tunnelling at a dead tuning value (about 9.0 m/s) | Fixed: mark 1 uses the fastest soldier speed in the movement data, about 13.3 m/s (6.3 × 1.62 × 1.3; GP3; shamble-core.js:128-137, shamble-game.js:2756 and :2774, rechecked by the owner in the code; the bot movement line read, shamble-game.js:2909, gives at most 4.2 × 1.5 = 6.3 m/s), that is 0.22 m per tick at 60 Hz and 0.44 m at 30 Hz; Rests on cites GP3 instead of `T.sprintMult` |
+| 3 | Six recommendations cite §6.1 for "bots fill empty slots" | Fixed: R4-NAV-REC1 to REC4, R4-LOS-REC2 and R4-OBST-REC1 cite VISION_V2 §3 ("Bots fill empty slots."); R4-NAV-REC4 also serves §6.2 |
+| 4 | R4-OBST-REC3's tiled bake risks being a "for later" feature | Fixed: tiling is conditional on R4-NAV-REC1 mark 1 failing (or a measured Test delay); its Serves line says keeping player building open is not a reason; its mark applies only if tiling is adopted; the EDITOR_V2 pointer says the same |
+| 5 | NAV option A misses "build the sim for a C-capable target to keep Detour"; the TL;DR overstates F8 | Fixed: R4-NAV-F8 quotes `wasm32-unknown-emscripten` and `wasm32-wasip1`; option A's cell says keeping Detour would mean building the whole sim for one of them, which R1 does not weigh; R4-NAV-REC1's reason and the TL;DR say the blocker holds for R1's target; a pointer leaves the target to ADR-0002. Applied inside option A, not as a new column: no source read weighs those targets for the sim, and the fix rule adds no new claims |
+| 6 | Three absences labelled "confirmed" with no quote | Fixed: R4-PHYS-F27, R4-NAV-F16 and R4-LOS-F5 now read "inferred" (an absence no quote can confirm) |
+| 7 | R4-PHYS-REC4 does not cover turning | Fixed: a linear sweep covers translation only; a turning hull uses a nonlinear cast (parry lists one, R4-PHYS-F20; it costs more, F13) or a rotation checked by an overlap test before the sweep, picked by the spike; the mark adds turns on the spot and while moving; Rests on adds F13 |
+| 8 | R4-NAV-REC3's avoidance is 2D | Fixed: neighbours come from the same floor layer only (R4-FLOORS-REC2's layer ids); the mark adds 0 avoidance pairs across floors in the two-floor test building; Rests on adds R4-FLOORS-REC2 |
+| 9 | Some "Rests on" lists miss claims they use | Fixed: R4-PHYS-REC2 adds F12 and GN11; R4-FLOORS-REC2 adds LOOP_V2 §2 and §9; R4-PHYS-REC3 adds LOOP_V2 §5; R4-OBST-REC2 adds LOOP_V2 §3 |
+| 10 | R4-PHYS-F2 leaves out the autostep cost warning | Fixed: F2 quotes it; R4-PHYS-REC1's fallback reason cites it and mark 5 measures Rapier's controller with autostep on |
+| 11 | The vehicle count is not reconciled (8 here, 4 in R1-TICK-REC2's P1) | Fixed: R4 proposes 8 for P1 too; R4-NAV-REC2's mark runs P1 with 8; the wave-1 list says so; R1-XU-OQ1 still leaves the one stress scene to the synthesis |
+| 12 | Nits: Recast's units are voxels; "moving obstacles" is not §6.4's wording; F15's 12; FLOORS-F5's count | Fixed: R4-NAV-F2 quotes the units and R4-NAV-REC1 rounds to the cell size; the R4-OBST scope line and R4-OBST-REC1's Serves line use §6.4's words, "moving obstacles" marked inferred; F15 says "counting both ends and one beta"; FLOORS-F5 says 18 ways plus `TRAVEL_INVALID` |
+
+No verifier finding was left unapplied. **Not verified** (the verifier's list): R4-PHYS-F27 and R4-NAV-F16 (absences);
+that rapier 0.36.1 pins parry3d 0.31.1 (it rests on R1-DET-F23); the `trace.plane.normal[2] < MIN_WALK_NORMAL` line,
+which is not in bg_slidemove.c and is presumably in bg_pmove.c; the parts of Bvh.html, be_aas_reach.c and ai_dmq3.c
+past 100,000 characters; the field-of-view value in R4-LOS-F2, which stays inferred.
 
 ## Sources
 
-Every source in the read list was read on 2026-10-28 with WebFetch (none with a shell command). Counts: 46 read (36
-official, 8 shipped game, 2 other); 32 not read.
+Every source in the read list was read on 2026-10-28 with WebFetch (none with a shell command). Counts: 47 read (37
+official, 8 shipped game, 2 other; source 47 by the verifier); 32 not read.
 
-### Sources read (46)
+### Sources read (47)
 
-#### Official (36)
+#### Official (37)
 | # | URL | Title | Version or page date |
 |---|---|---|---|
 | 1 | https://rapier.rs/docs/user_guides/rust/character_controller | Rapier user guide: character controller (also the vehicle and PID controllers) | guide "Rust (0.36)"; no date |
@@ -1225,6 +1321,7 @@ official, 8 shipped game, 2 other); 32 not read.
 | 34 | https://docs.rs/hashbrown/latest/hashbrown/ | hashbrown | 0.17.1 (2026-09-24) |
 | 35 | https://docs.rs/foldhash/latest/foldhash/ | foldhash | 0.2.0 |
 | 36 | https://docs.rs/dodgy_2d/latest/dodgy_2d/ | dodgy_2d | 0.5.5 (2026-10-08) |
+| 47 | https://docs.rs/parry3d/latest/parry3d/query/fn.cast_shapes.html | parry3d `cast_shapes` (read by the verifier at the spot-check, not by the owner; its quotes are in `.checkpoints/v2-research/verifier-r4.md`, V32; the verifier names the page "docs.rs parry3d query, fn.cast_shapes", and the URL is docs.rs's usual path for it, inferred) | parry3d 0.31.1 |
 
 #### Shipped game (8): Quake III Arena, id Software, GPL source release (copyright 1999-2005), master branch
 | # | URL | Title |
