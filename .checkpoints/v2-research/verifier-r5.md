@@ -1,2 +1,6 @@
 Task: wave 2 verifier spot-check of R5 (docs/research/r5-toolchain-quality.md), v2-research plan wave 2. Started 2026-10-29.
 - Unit 1 done: read whole topic file (2114 lines) and owner notes. Next: compute M from Rests-on lists (script), diff helper draft vs file, then spot-checks numbers first.
+- Unit 2 done: M computed by parsing every "Rests on:" list (36 recs): M = 115 distinct R5 findings (all 117 except R5-CI-F8 and R5-PREV-F16). R5-GATE-REC2 names no R5 finding (legacy TL1, TL3, KT7, KT8 + R5-CI-REC5 only).
+- Unit 3 done (helper part): every non-heading line of infra-engineer-r5-ci-draft.md (694 lines) is in the topic file verbatim; only differences are dropped draft headers (lines 1-7, 11, 18, 221, 249, 316, 336, 367, 384, 390, 545, 567, 624, 642, 667, 678: title, author/status para, section and sub-headings). Ids and words match. Nits: file:758 "quoted in full in section 1" and file:1854 "(part 8)" are stale draft cross-references.
+- Plan of spot-checks (one+ per rec, numbers first): LAYOUT F5,F15,F7,F4,F12,F1,F14; TSLINT F4,F1,F13,F21,F15; RUSTLINT F1,F9,F11,F13,F14,F15; TEST F8,F5,F3,F12,F14,F2,F9; CI F5,F13,F15,F14,F18,F20,F17; PREV F3,F18,F13,F20,F12; GATE F4,F1,F2; GATE-REC2 legacy TL1 in repo.
+## Verdicts (saved as obtained)
