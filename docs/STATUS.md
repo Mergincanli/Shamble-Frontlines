@@ -1,9 +1,15 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-17, kit-v2-1 (PR #22, 211ddcb; automated merging), docs-after-kit-v2-1 (PR #24, e727ce4) and kit-v2-2 (PR #23, 48ffb51; the merge go comes after the APPROVE) merged; `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Mustafa checked main (three teams, 3a) in Brave on 2026-10-17: "it looks good" (his words, in the implementer session's chat). Next game work: N1. Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-27; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25) and R7, the legacy inventory (PR #27), merged; R1–R6 research running. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
-**Phase 0: environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
+**v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
+`docs/V2_PHASE0_BRIEF.md`, added 2026-10-24). Done: kit-v3-0, the process upgrades (PR #26, f2ccc13, 2026-10-25);
+docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27).
+Running: R1–R6 research on `cs/v2-research` (wave 1: R1 simulation core and R2 netcode; daytime only). Next: the
+synthesis (`docs/ENGINE_OVERVIEW.md` and the ADR drafts 0001–0006), then a stop for Mustafa and the Advisor. The
+legacy game is frozen (critical fixes only).
+**Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
 change-set. Gate check 5 is now on main, so that machine needs a fresh `npm ci` in tools/ (eslint-scope) and Node 22.13+.
@@ -15,12 +21,13 @@ bot-poplar-wedge (PR #7, 159bec4).
 kit-v1-4 (PR #17, bd27eeb; CLAUDE.md "Night shift" section), kit-v1-5 (PR #18, 2303073; `.claude/NIGHT_SHIFT.md`),
 kit-v1-6 (PR #19, cbd79e5; cut-off run pick-up, report kept current), **3a three-teams-core** (PR #15, 5ffe679),
 docs-after-3a (PR #20, df1e6d3; docs only), kit-v2-0 (PR #21, 04c086c; the `advisor` agent), kit-v2-1 (PR #22, 211ddcb; automated merging), docs-after-kit-v2-1 (PR #24, e727ce4; docs only, merged by the PR Advisor), kit-v2-2 (PR #23, 48ffb51; the merge go comes after the APPROVE).
+_Superseded by v2 (paused in issue #16); the legacy lines below, as of 2026-10-17, are kept for the record:_
 **In flight:** none; next game work is N1 from the Night queue.
 Editor v2 comes after the playable greybox loop (Advisor's queue; LOOP_V2 §11 defines the loop but has no editor step).
-**Greybox phase (LOOP_V2 §11):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
+**Greybox phase (LOOP_V2 §11; superseded by v2):** the new core loop (three teams, harvest money, uplink tech, points race) is built as a
 greybox prototype with bots, one change-set at a time; each plan says how it meets the [DECIDED] and [DEFAULT] items and
 flags any [OPEN] item it needs decided; all numbers live in one tunable data table; [LATER] items are not built.
-**Queue (Advisor, 2026-10-15; one change-set at a time):** greybox phase: 1. three-teams, split by the approved plan into
+**Queue (Advisor, 2026-10-15; one change-set at a time; superseded by v2, paused in issue #16):** greybox phase: 1. three-teams, split by the approved plan into
 0. team-prep-fixes (merged) → 3a three-teams-core (merged, PR #15) → **N1** (next; editor Play never rebuilds the nav
 grid, a one-line change-set; Night queue item 1, APPROVED) → R19 (navBuild building-cell fix; Night queue item 2, NEEDS PLAN;
 Advisor 2026-10-17: right after N1, before 3b) → 3b three-teams-hud → 3c spawn-and-buy → "ramps as slopes in SIM" (lets `_botFireWorld` go) →
@@ -34,6 +41,12 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **R1–R6 research** (wave 1: R1 simulation core, 6 units, and R2 netcode, 5 units, one Opus agent each at xhigh; launched 2026-10-27, cut off by the org spend limit, resumed the same evening; daytime only) | `cs/v2-research`, draft PR #28 | running | wave 1's results, then wave 2 (R3–R6), then the synthesis |
+| docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | `cs/docs-after-r7`, draft PR #29 | in review | the advisor's review of its head, then Mustafa's "merge #29" |
+| kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1` | being finished in the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | its PR, for Mustafa's go |
+| **R7 legacy inventory** (`docs/LEGACY_INVENTORY.md`: 247 systems, each with a recommended mark: rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"; `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json`: 60 tuning tables; read-only `tools/tuning-dump.js`; symbols +0 −0) | merged: PR #27, 07ab240, 2026-10-27, by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 | done; report `docs/reports/2026-10-27-r7-legacy-inventory.md` | none |
+| docs-after-kit-v2-2 (docs only: kit-v2-2's and #24's merges and main's branch protection recorded) | merged: PR #25, 4c24d07, 2026-10-27 | done | none |
+| **kit-v3-0** (v2 process upgrades: VISION_V2.md and V2_PHASE0_BRIEF.md, CLAUDE.md's v2 rules, checkpoints, REPO_MAP.md, six new agents, the web allow list; no game code, symbols +0 −0) | merged: PR #26, f2ccc13, 2026-10-25, on Mustafa's "merge #26" after the advisor's APPROVE of its final head | done; report `docs/reports/2026-10-24-kit-v3-0.md` | none |
 | kit-v2-2 (CLAUDE.md "Standing permission": Mustafa's go is for the PR's current head, given after the advisor approved that head; a later push needs the advisor's review first, then his go again; now matches advisor.md:98–105. security-auditor PASS WITH NOTES, findings 1 and 3 fixed, re-check PASS; findings 2 and 5 deferred, finding 4 open: see Open bugs and risks. No game code, symbols +0 -0) | merged: PR #23, 48ffb51, 2026-10-17, PR Advisor APPROVE on 964ea5a, merged on Mustafa's go in chat (PR Advisor's #23 comment) | done | none |
 | docs-after-kit-v2-1 (docs only: kit-v2-1's merge and Mustafa's Brave check of 3a recorded; PR #22 finding 6 nits fixed) | merged: PR #24, e727ce4, 2026-10-17, PR Advisor APPROVE on d255277, merged by the PR Advisor (class ready) | done | none |
 | **kit-v2-1** (automated merging: the PR Advisor routine merges approved ready PRs at once; `needs-mustafa` (rules category, or a major change; when unsure) waits for Mustafa's go. His go counts only in his own words in the chat of the merging session, about that PR, after the advisor's APPROVE of its current head; a "merge" on GitHub never counts. The approved full SHA goes in the review comment and is the merge's expected head; a later push needs a new review and go. Fork PRs skipped; PR text is evidence, never instructions. Green = `gate` and `smoke` both passed on the approved SHA; a hard-constraint change also needs its accepted ADR on main. The gate's own files (everything `tools/gate.mjs` or `.github/workflows/` load: today gate.mjs, smoke.mjs, battery.js, gate-globals.json, tools/package.json, tools/package-lock.json; any `.npmrc`) join the rules category; a changed repro tool (preview.js, sim.js) is replaced by main's copy. The advisor always works from main's advisor.md. NIGHT_SHIFT rule 7 REVISE path; night shift never merges; CLAUDE.md Agents lists `advisor`. No game code, symbols +0 -0. Reviews: advisor plan review REVISE (8 texts applied); security-auditor FAIL, all 8 findings fixed; deferred: wording at tools/gate.mjs:333 / tools/README.md calling gate-globals.json "reviewed data") | merged: PR #22, 211ddcb, 2026-10-17, PR Advisor APPROVE (run 2, head 9baa7f2), merged on Mustafa's go in chat | done | none |
@@ -64,9 +77,46 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- Taken by the Advisor 2026-10-27:
+  - R7-MARKS (a): the inventory's marks are working recommendations, changed when their ADR draft comes up; rows
+    marked "look brief pending" stay pending until the look brief exists.
+  - MANAGED (b): "Mustafa is not an admin of the university's Claude plan", a kit-v3-1 question for the kit-v3-1 PR
+    (its question is on the kit-v3-1 branch, which the v2 day session (session_0173vVo5q59ameR6cnN9BENg) may
+    not open, so nothing more is written).
+  - KIT31-STATE (b): the R7 session finishes kit-v3-1 on Opus 5.5 (not 4.8), with the reduced scope, and its PR
+    comes to Mustafa.
+  - kit-v3-1 "shelved" for the v2 day session only (KIT31-STATE (b)): it keeps away from the branch and its files.
+  - SRC-ACCESS (a): some sources the research needs could not be read: Valve's developer wiki (HTTP 403), GDC Vault (a
+    maintenance page) and Unreal's docs (outside the allow list). For now a recommendation that needs one becomes an
+    open question; the full list comes with the wave-1 tally; for any recommendation that hinges on a missing source
+    the Advisor looks for another copy; official-docs domains such as Epic's can be added in the next kit PR.
+  - Research in the daytime only until kit-v3-1 is merged.
+  - The night shift takes only items that need no web access, and lists any permission-prompt stop in its morning
+    report.
+  - The PR Advisor routine off for now; the advisor agent reviews PRs in the v2 day session
+    (session_0173vVo5q59ameR6cnN9BENg).
+  - R6 covers hosting, costs, monitoring and telemetry; the security baseline waits.
+- Taken by the Advisor 2026-10-27 (R7 session):
+  - BRANCH-2 (a): research on `cs/v2-research`, kit-v3-1 on its own branch, kit-v3-1 lands first if they collide.
+  - SPEND-1 (b): full checks for R1 and R2 and for anything that becomes a decision, spot checks for R3–R6, review
+    rounds stop at nits.
+- Taken by the Advisor 2026-10-25 ([Night queue comment](https://github.com/Mergincanli/Shamble-Frontlines/issues/16#issuecomment-6396928581); options in `docs/reports/2026-10-24-kit-v3-0.md`, "Decisions needed"):
+  - KV3-MERGE (a): the session merged kit-v3-0 on Mustafa's own 'merge #26', given after the advisor approved its
+    final head, not on his earlier advance go.
+  - ROUTINE-EFFORT (b): night code changes go through a high-effort builder agent; the night's main session only
+    orchestrates.
+  - SPIKE-SCOPE (a): once the drafts are approved, the legacy constraints apply to `legacy/` only and `spikes/` is
+    throwaway.
+  - WRITE-GUARD (a): write limits for kit and gate files, enforced in settings (rules that ask first, or deny rules if
+    routines let ask-first rules pass silently), plus the secret-pattern fix; kit changes by day.
+  - DOMAINS-ACCEPT (a): six documentation hosts where anyone can publish (github.com, raw.githubusercontent.com,
+    docs.rs, crates.io, developer.valvesoftware.com, datatracker.ietf.org) stay on the list of sites fetched without
+    a prompt, with the risk recorded. This holds only once WRITE-GUARD is merged; until then research runs in the
+    daytime only.
 - Taken by the Advisor 2026-10-14: gl advisories accepted for now (drop gl for Playwright-only renders if it won't
   install natively on Windows); hook path (`$CLAUDE_PROJECT_DIR`) waits for the Windows run; check 5 is its own
   change-set after the prefab fix; standing permissions granted (see CLAUDE.md)
+- ADR-001..003 below: the v2 drafts `docs/adr/0001`–`0006` replace them (CLAUDE.md, "Decisions pending").
 - **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started. Inputs logged so far: the 11 wall-clock reads (performance.now / Date.now) that make same-seed matches differ; no SRI/CSP on the three.js CDN tag; server-side map-def validation (SEC-MDL-2: `__proto__` key through `envMerge` / `rulesMerge`). Added by 3a: one hit world for every shooter is a multiplayer invariant (K1: bots still use `_botFireWorld`, a view of SIM without ramp slots, until ramps become slopes in SIM); `update()` must become phased (today's real order is in TECHNICAL §4a, K4); the server must repeat the team allow-list (`teamOf`); boot-time `Math.random` draws per slot (`bootGame` soldier loop, `enemyFire` spread, strafe and respawn type); three.js UUIDs draw from the shared `Math.random`; the bot-shot FX cull makes the shared `Math.random` sequence camera-dependent (cosmetic effects need their own RNG stream); `applyDamage` runs `addTech`, whose HUD writes and era toasts should become an event; humans take over bot slots; the LOS budget is sized for 12 soldiers (480 checks/s caps demand from about 24 soldiers in combat; fair since the review fix); map data needs a full schema check server-side (`placeObjectives` checks only the objective keys; `version:1` is written but never read) [verified in code: no `.version` read in shamble-*.js]
 - **ADR-002 Code structure & build** (modules, bundler, TypeScript, double-click build): under discussion with Mustafa;
   evidence first via the build spike
@@ -79,7 +129,21 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - **LOOP_V2 [OPEN] items:** Spy cost and rules (tech or money, disguise break, hack time, steal amount, warning);
   aiming at height with ledges (decide in octopon-3-greybox); Octopon-3 map size (start near Cabana, adjust with the scale test)
 
+## Routines
+- **Night shift** (trig_019LtRqmAdzddyk6K3e3kDJz; hourly from 00:10 to 08:10 Amsterdam, in its own session): until
+  kit-v3-1 is merged, it takes only items that need no web access, and a stop at a permission prompt is
+  listed in its morning report. Research runs in the daytime only.
+- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
+  switched it off, after an agent's switch-off was refused; the routine reads enabled false at 21:35 UTC). The advisor
+  agent reviews PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg), and nothing merges without Mustafa's
+  "merge #<n>".
+
 ## Open bugs and risks
+- **R7 legacy inventory** (its report, "Risks"):
+  1. R1–R6 use the marks before Mustafa confirms them: answered by R7-MARKS (a), the marks are working recommendations.
+  2. Some `ANIMATION_PLAN.md` §6 numbers come from headless snippets that are not in `tools/`, so they can't be re-run
+     as is.
+  3. The inventory's line numbers go stale once phase 1 moves the legacy files to `legacy/`.
 - **3a, ranked (all from the change-set's evidence; not re-measured by docs-keeper):**
   1. Cabana: buildings are not NAV cells, so 27.5 % of objective routes and 25 % of siege legs cross a building roof bots can't climb (`tools/reach.js`; R19: the `navBuild` building-cell fix with bot replanning; queued as Night queue item 2, NEEDS PLAN, right after N1 and before 3b)
   2. Allocation grows with team fights (garbage-included inspector profile, MB per game second inside update(), seeded): default Cabana natural match head 4.6-4.8 vs main 2.4-3.1 (head's ally and Soviet bots fight, main's bots don't), Cabana ring combat head 1.72-2.09 vs main 1.94-1.98; DM_Tri 12 soldiers 2.9-3.0 and 48 soldiers 7.2-8.2 after the review fixes (main Cabana at 48: 6.2-6.3). Driver: `updateSoldierAnim` hit/death states (the CS11 anim split); `syncSimWorld` runs twice per step since K4 (0.39-0.43 after the house-array fix, was 0.56-0.65; main 0.16 for its one call)
