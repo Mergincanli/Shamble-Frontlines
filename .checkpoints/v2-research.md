@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-29 22:16 Amsterdam
+- **Last update:** 2026-10-29 22:20 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -62,8 +62,8 @@
 | R2 | netcode-architect | 5 | 5/5 | yes, 7907f5c (147 F, 36 REC, 70 OQ; 113 read, 26 not read); fixed e4cda31; second fix + final check ae492a6 (verified, every recommendation claim) | verifier-r2: 135 claims, 133 confirmed (TRN-F12 wrong location), 0 wrong, 2 unsupported (SYNC-F34, ROOM-F17 part); security-auditor: REVISE, no Critical, 4 High (H1 backtrack window, H2 no-spread if shared seed, H3 no input limits, H4 weaker WebSocket fallback), 9 Medium; rust-reviewer REVISE (quinn advisories; client-sized allocations, panic and overflow policy, snapshot allocation, FMA by target); fixing | `prompts/netcode-architect-r2-*.txt` |
 | R3 | graphics-engineer (high) | 1 owner, 7 question drafts | 7/7 (DONE 21:21) | yes, 605c09d (92 F, 25 REC, 33 OQ; 62 read: 61 official, 1 other; 22 not read) | spot-check (run wf_1f477dcb-7cb): 44 of 77 key claims checked, 44 confirmed; critical read: 4 more than nits (L1, L2, C1, C2) + C3–C9; owner fix applied (ddd45df: 9 recs, 4 numbers, 5 new OQs, 38 OQ in all); second pass (run wf_7260c3bd-5b1, resumed after the cut-off): L1, L2, C1, C2 closed, 14 confirmed, 0 wrong, 2 unsupported in new OQs; its two one-sentence gaps and the nits applied by the session (c22675f). **Done: spot-checked (45 of 77 key claims)**, review stopped at nits | `prompts/graphics-engineer-r3.txt` |
 | R4 | engine-architect (xhigh) | 1 owner, 5 question drafts | 5/5 (DONE 21:28) | yes, abdf477 (62 F, 18 REC, 23 OQ; 46 read: 36 official, 8 shipped game, 2 other; 32 not read) | spot-check then fix running: run wf_d3f13cf7-77e (launched 21:33) | `prompts/engine-architect-r4.txt` |
-| R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | owner running since 21:29; helper DONE about 21:43 (`infra-engineer-r5-ci-draft.md`: 44 F, 10 REC, 13 OQ; 46 read, 15 not read) | no | pending | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
-| R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | 5/5 (DONE 21:31) | yes, 9d5e78a (43 F, 13 REC, 23 OQ; 42 read: 41 official, 1 other; 17 not read) | spot-check then fix running: run wf_12f840d1-878 (launched 21:43) | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
+| R5 | test-engineer (high) + infra-engineer CI helper (high) | 1 owner, 5 drafts + helper draft | owner DONE 2026-10-29 about 22:2x (cut off once); helper DONE 2026-10-28 about 21:43 (44 F, 10 REC, 13 OQ) | yes, 9a623a0 (117 F, 36 REC, 44 OQ; 108 read: 105 official, 2 shipped game, 1 other; 38 not-read rows) | spot-check then fix running: run wf_888e5b21-090 (the fix prompt adds the session's shape finding: TL;DR 16 lines) | `prompts/test-engineer-r5.txt`, `prompts/infra-engineer-r5-ci.txt` |
+| R6 | infra-engineer (high) | 1 owner, 4 question drafts + R6-SEC-OQ1 | 5/5 (DONE 21:31) | yes, 9d5e78a (43 F, 13 REC, 23 OQ; 42 read: 41 official, 1 other; 17 not read) | spot-check (run wf_12f840d1-878, resumed after the cut-off): 19 of 40 key claims, 19 confirmed; critical read: 4 medium (certificate plan departs from R2-TRN-REC5 silently; option K4's comparison; Rests-on gaps; Hetzner "unavailable" left out of HOST-REC2) + 9 low; owner fix applied (6 recs, 2 numbers, 23 nits; label "spot-checked (19 of 40 key claims)"); second pass on the fix running (run wf_d5608bdb-da9) | `prompts/infra-engineer-r6.txt`; security baseline deferred (Advisor) |
 Agent ids are internal to this session and are not written here; the saved prompt plus the notes path is the restart
 key (condition A1).
 
@@ -166,6 +166,11 @@ key (condition A1).
   spot-check cached, fix live, task wewlvbjlr; R6 wf_12f840d1-878, task wtgxyoez2; R3 second pass wf_7260c3bd-5b1,
   task wf7io9kwu); the R5 owner by message. Saver restarted (task bt9yig2mb). Night-stop reminder for 23:50 tonight
   set (send_later, 22:50 UTC). 4 agents at once.
+- 2026-10-29: R3 second pass DONE (R3 finished, c22675f). R6 check-fix DONE (reports `verifier-r6-result.md`,
+  `infra-engineer-r6-fix-result.md`); R6 second pass launched 21:20 UTC (run wf_d5608bdb-da9, task w4k55nhch; prompt
+  carries the session's note that the inventory's CM4 row also holds the 0.80–1.00 ms figure, so R2's "legacy CM4" is
+  not wrong). R5 owner DONE (9a623a0); R5 spot-check then fix launched 21:20 UTC (run wf_888e5b21-090, task we8kho4jw).
+  Running: R4 fix, R6 second pass, R5 check-fix: 3 agents.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).

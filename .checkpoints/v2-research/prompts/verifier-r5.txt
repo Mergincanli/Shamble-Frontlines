@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: R5 verifier spot-check (wave 2)
-# subagent_type: verifier · model: opus · effort: high
-# launched: not yet
+# subagent_type: verifier · model: opus · effort: high · launched in workflow v2-research-r5-check-fix-run1.js
+# launched: 2026-10-29T21:20:14Z in workflow run wf_888e5b21-090
 
 **Task:** the wave 2 verifier spot-check of research topic R5 (toolchain and quality) of SHAMBLE FRONTLINES v2 phase 0, as the approved plan says (/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md, wave 2): "one verifier pass reads the whole file critically (recommendations that don't follow from the findings, missing options, features not traced to a §6 need, look choices in R3) and spot-checks at least one basis claim per recommendation and at least 10 claims in all, numbers first". The file: /home/user/Shamble-Frontlines/docs/research/r5-toolchain-quality.md (written by test-engineer; status "draft: spot-check pending"). The owner's notes, with the quotes it recorded: /home/user/Shamble-Frontlines/.checkpoints/v2-research/test-engineer-r5.md; its question drafts: `test-engineer-r5-<prefix>-draft.md` beside it.
 

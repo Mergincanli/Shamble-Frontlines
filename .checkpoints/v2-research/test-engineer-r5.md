@@ -83,3 +83,5 @@
 - RUSTLINT draft written (test-engineer-r5-rustlint-draft.md: F1-F15, REC1-6, OQ1-5). Next: TEST draft.
 - TEST draft written (test-engineer-r5-test-draft.md: F1-F14, REC1-6, OQ1-7). Next: GATE draft (read helper's RECs first for conflicts).
 - GATE draft written (test-engineer-r5-gate-draft.md: F1-F4 + legacy facts, REC1-4, OQ1-5). All five drafts done. Conflicts with helper found: Safari macOS job (TEST-REC1 vs CI-REC5), client lockfile (CI-REC4 vs LAYOUT-REC1), isolation headers always vs flag (PREV-REC4 vs LAYOUT-REC5) -> R5-XQ-OQ1-3. Next: assemble topic file.
+- [2026-10-29] Topic file written: docs/research/r5-toolchain-quality.md (2114 lines), assembled from the five owner drafts and the helper's draft (unchanged, lines 13-16, 19-380, 386-676, 680-693 of infra-engineer-r5-ci-draft.md; only "###" headings demoted to "####"). Totals: 117 findings (73 + 44), 36 recs (26 + 10), 44 OQs (28 + 13 + XQ 3); sources read 108 unique (105 official, 2 shipped game, 1 other); 38 not-read rows. XQ-OQ1 Safari macOS, XQ-OQ2 lockfile path, XQ-OQ3 isolation headers flag. Nothing committed.
+DONE

@@ -37,3 +37,12 @@
 - nit · OBST-REC2 Rests on: + LOOP_V2 §3 (C9)
 - recommendation · OBST-REC3: tiling conditional on NAV-REC1 mark 1 failing; Serves says building is not a reason (C4)
 - nit · wave-1 list: P1 vehicle-count line added (C11); pointers: ADR-0002 target line (C5), tile re-bake conditional (C4)
+- Unit 3 done: part 7 written (49-row table with final states: 41 no change, 8 fixed, 0 re-sourced, 0 open questions; 12-item critical-read table; counts; not-verified list); header status "spot-checked (49 of 51 key claims)"; totals 47 sources read (37 official) with source 47 = parry3d cast_shapes page read by the verifier; Sources counts updated. Long lines rewrapped (formatting only, not counted). Note: the session committed my in-progress edits as 11b2089 (not me).
+- nit · part 7 replaced the pending line (table, critical read, counts)
+- nit · header status and totals; Sources counts
+- source · source 47 (docs.rs parry3d fn.cast_shapes, read by the verifier) added for R4-PHYS-F20's corrected quotes; F20 keeps its id (not a re-source)
+- Reclassified: the TL;DR line (first log line) counts as nit, not recommendation.
+- Disagreements with the verifier: none. Item 5 applied inside option A's cells, not as a new option column (no source weighs Emscripten/WASI for the sim; the fix rule adds no new claims).
+- Totals by type: recommendation 10 · number 3 · source 1 · nit 18.
+- Recommendations turned into open questions: none. Re-sourced claims: none. Header: "spot-checked (49 of 51 key claims)".
+DONE

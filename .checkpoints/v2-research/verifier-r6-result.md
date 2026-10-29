@@ -1,5 +1,7 @@
 # R6 verifier spot-check: the report, verbatim
 
+Workflow run wf_12f840d1-878 (script `v2-research-r6-check-fix-run1.js`, prompt `prompts/verifier-r6.txt`), started 2026-10-28, cut off by the spend limit, resumed and returned 2026-10-29 (about 21:17 UTC; copied from the workflow's own result by the session). Notes: `verifier-r6.md`.
+
 VERDICT: PASS WITH NOTES (research spot-check of R6, `/home/user/Shamble-Frontlines/docs/research/r6-infrastructure.md`)
 
 Gate: skipped, as the task says (research check; the main session runs the gate). Symbol diff: not applicable.
