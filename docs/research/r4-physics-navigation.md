@@ -4,8 +4,8 @@
 - **Author agent:** engine-architect (wave 2 of `.checkpoints/v2-research/plan.md`: one owner agent for the topic,
   covering all of its brief questions).
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** spot-checked (49 of 51 key claims). The verifier's table, its critical read and the owner's fixes are
-  in part 7 ("Verifier spot-check").
+- **Status:** spot-checked (50 of 52 key claims). The verifier's table, its critical read, the owner's fixes and the
+  second pass on them (2026-10-29: closed, nits only) are in part 7 ("Verifier spot-check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R4):** "Rapier 3D or custom;
   navigation meshes in Rust; bots moving between floors; line of sight across heights; obstacles placed mid-match (for
   later building)"
@@ -791,8 +791,10 @@ VISION_V2 §4 minimum laptop for Wasm).
   save and in CI, from the same collision world the sim moves in (R4-PHYS-REC2), with Recast's four agent numbers set
   from the soldier's movement data (radius 0.7 m, `T.stepUp` 0.55 m, the slope limit and height); Recast takes height,
   climb and radius in voxels (R4-NAV-F2), so the bake rounds each to its cell size and reports the rounding.
-  The reason: the client runs the same sim for offline play, bots included (the starting principles), and C++ Detour
-  cannot be linked into the sim's browser build for the target R1 plans (`wasm32-unknown-unknown`, F8, R1-DET-F6);
+  The reason: the client runs the same sim for offline play, bots included (the starting principles), and for the
+  target R1 plans (`wasm32-unknown-unknown`, F8, R1-DET-F6) the rustc book says "There is no C/C++ toolchain for this
+  target. While interop is theoretically possible…", so linking C++ Detour into the sim's browser build is not a
+  supported path (our reading of F8);
   building the whole sim for a C-capable target instead (F8's page names two) is not weighed by R1 and not proposed
   here. R1-DET-REC1 (b) asks a bots-only match to hash the same on native and Wasm, and no Rust navigation crate
   promises determinism (F16); polyanya depends on hashbrown (F11), which lists foldhash, a hasher that seeds itself at
@@ -865,7 +867,7 @@ VISION_V2 §4 minimum laptop for Wasm).
   principles), so the code must also build for the browser (F8). R1-DATA-OQ7 asks what may reload mid-match: navigation
   data no (a re-bake needs a restart); flag toggles on baked data yes (OBST).
   Rests on: F8; R1-TICK-REC2, R1-DATA-OQ7.
-  Serves: VISION_V2 §6.2 (bots that move between levels, offline too) and §3 (bots fill empty slots).
+  Serves: VISION_V2 §6.2 (bots that move between levels; "offline too" is our gloss) and §3 (bots fill empty slots).
   A spike must prove (proposed): the client's Worker build without bots skips the navigation data (its size reported);
   with bots, offline play at the largest mode meets R1-TICK-REC2's P2 mark.
 
@@ -1011,7 +1013,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   same job on a mesh (R4-NAV-F5, R4-NAV-F11). R1-DATA-OQ7 then holds: geometry and navigation data never change
   mid-match, only flags do.
   Rests on: F4; R4-NAV-F5, R4-NAV-F11; R2-INT-F4, R2-INT-REC2; R1-DATA-OQ7; R4-PHYS-REC2; legacy GN11, GW15, GW20;
-  LOOP_V2 §3 (team-funded rebuilds).
+  LOOP_V2 §3 (a destroyed harvester "is rebuilt with money from the whole team"; that a structure is rebuilt the same
+  way is our reading).
   Serves: VISION_V2 §6.2 (floors and interiors whose openings change) and §6.5 (objectives destroyed and rebuilt,
   team-funded rebuilds).
   A spike must prove (proposed): destroying a test wall opens its route, its sight lines and its portal in the same
@@ -1019,7 +1022,7 @@ VISION_V2 §4 minimum laptop for Wasm).
   the sim's movement without failure in 1,000 traversals; a flip costs ≤ 0.1 ms native (proposed).
 
 - **R4-OBST-REC3. Split the bake into fixed tiles with stable ids only if a full bake is too slow for the editor's
-  Test (R4-NAV-REC1 mark 1 fails, or a measured Test delay needs it); the editor then re-bakes only what an edit
+  Test (R4-NAV-REC1 mark 1 fails); the editor then re-bakes only what an edit
   touches. Either way the sim never re-bakes during a match. Player building is not designed here.**
   The reason: EDITOR_V2 §3's Test plays the map with bots at once, so a slow bake would have to redo only edited tiles
   (Detour's mesh is tile-based already, R4-NAV-F3; oxidized_navigation regenerates per tile, R4-NAV-F10). R4-NAV-REC1
@@ -1167,7 +1170,7 @@ with R4-PHYS-REC1's spike as the evidence.
 
 - R2: REC2's flag flips and R2-INT-REC2's portal re-flood are one event; vehicles as cover in rewind (R2-SYNC-OQ8).
 - R1: R1-DATA-OQ7 answered for navigation (flags only mid-match).
-- EDITOR_V2: tile re-bake on edit, only if a full bake misses R4-NAV-REC1 mark 1 (REC3).
+- EDITOR_V2: tile re-bake on edit, only if R4-NAV-REC1 mark 1 fails (REC3).
 - game-designer: OQ1, OQ2.
 
 ### Recommendations that hinge on a source not read
@@ -1275,6 +1278,22 @@ that rapier 0.36.1 pins parry3d 0.31.1 (it rests on R1-DET-F23); the `trace.plan
 which is not in bg_slidemove.c and is presumably in bg_pmove.c; the parts of Bvh.html, be_aas_reach.c and ai_dmq3.c
 past 100,000 characters; the field-of-view value in R4-LOS-F2, which stays inferred.
 
+### Second pass (2026-10-29)
+
+The spot-check's findings were slightly more than nits, so the verifier checked what the fix changed (against abdf477;
+report: `.checkpoints/v2-research/verifier-r4-second-pass-result.md`, notes `verifier-r4-second-pass.md`). Verdict: PASS
+WITH NOTES, nits only.
+- All 12 critical-read items and the 3 wrong or unsupported claims are fixed; none was cut or turned into an open
+  question. The owner's reason for folding the missing Detour option into existing text (no source read weighs the
+  C-capable Wasm targets) is sound.
+- 17 checked: 17 confirmed, 0 wrong, 0 unsupported, among them R4-PHYS-F13, which the fix added to R4-PHYS-REC4's basis
+  (so M is 52 and N is 50).
+- Nits applied by the session on 2026-10-29 in the verifier's words: the status (50 of 52); R4-NAV-REC1 quotes F8's
+  rustc-book sentence instead of "cannot be linked"; R4-OBST-REC3's tiling condition worded once ("R4-NAV-REC1 mark 1
+  fails") in its heading, its Serves line and the editor pointer; R4-OBST-REC2's LOOP_V2 §3 citation narrowed to the
+  harvester; "offline too" marked as our gloss; source 47's URL no longer marked inferred. Review stops here: what
+  remains is nits.
+
 ## Sources
 
 Every source in the read list was read on 2026-10-28 with WebFetch (none with a shell command). Counts: 47 read (37
@@ -1321,7 +1340,7 @@ official, 8 shipped game, 2 other; source 47 by the verifier); 32 not read.
 | 34 | https://docs.rs/hashbrown/latest/hashbrown/ | hashbrown | 0.17.1 (2026-09-24) |
 | 35 | https://docs.rs/foldhash/latest/foldhash/ | foldhash | 0.2.0 |
 | 36 | https://docs.rs/dodgy_2d/latest/dodgy_2d/ | dodgy_2d | 0.5.5 (2026-10-08) |
-| 47 | https://docs.rs/parry3d/latest/parry3d/query/fn.cast_shapes.html | parry3d `cast_shapes` (read by the verifier at the spot-check, not by the owner; its quotes are in `.checkpoints/v2-research/verifier-r4.md`, V32; the verifier names the page "docs.rs parry3d query, fn.cast_shapes", and the URL is docs.rs's usual path for it, inferred) | parry3d 0.31.1 |
+| 47 | https://docs.rs/parry3d/latest/parry3d/query/fn.cast_shapes.html | parry3d `cast_shapes` (read by the verifier at the spot-check, not by the owner; its quotes are in `.checkpoints/v2-research/verifier-r4.md`, V32; the verifier names the page "docs.rs parry3d query, fn.cast_shapes"; the second pass opened it at this URL, 2026-10-29) | parry3d 0.31.1 |
 
 #### Shipped game (8): Quake III Arena, id Software, GPL source release (copyright 1999-2005), master branch
 | # | URL | Title |
