@@ -176,3 +176,61 @@ I22 gap: R1-DATA-OQ11 r1:2731-2737 editor file:// + Wasm left to "ADR-0002 and R
 I23 gap: R1-ABL-REC6 r1:2405 "measured with the method R5 sets"; R1 pointer r1:2948 "Rust tick bench and a Worker tick bench in CI"; R5-TEST-REC1 r5:1395 bench tool not read, never gated; R5-TEST-OQ8. Existing R5-TEST-OQ8. low.
 I24 hidden dep: R5-TEST-REC4 r5:1451-1457 "one named set settles R2-XU-OQ12" with R2 P0-P4/B1, but R2-BUD-REC1 r2:2301 and BUD-REC4 r2:2357 marks still at +-10 ms jitter (P2 is +-20 ms) and R2-INT-REC1/ROOM marks unnamed latency. existing R2-XU-OQ12. low.
 I25 contradiction: isolation headers on previews vs prod: R5-PREV-REC4 r5:1609-1610 COOP/COEP on every preview vs R5-LAYOUT-REC5 behind flag; R1-BND-REC5 prod non-isolated; Mustafa's Brave check on a header set prod lacks. Existing R5-XQ-OQ3 (R5 internal, cites R1-BND-REC5). Decider engine-architect ADR-0002/0003 with R1-BND-REC2 mark 5.
+
+## Register R6 (r6-infrastructure.md) -- DONE
+- TL;DR r6:44-48: Cloudflare Workers static assets (or Pages) for client + previews, COOP/COEP via _headers; Hetzner Cloud one EU location, CCX23 dedicated (ref server), CX33 measured; no LB on UDP; one wildcard cert via ACME; cost ~18 EUR lean to 102 EUR + 5 USD start, 240-360 EUR + ~20 USD + Sentry goal; tracing JSON, Prometheus, Sentry EU, Reporting API; telemetry record at Ended (content hash, mode id, 10 s timeline, events with source ids, no player ids); security baseline deferred (R6-SEC-OQ1).
+- HOST-REC1 r6:609: Workers static assets primary, Pages alternative; COOP/COEP on previews "when R1-BND-REC5's option G3 is on"; "Previews stay harmless rather than secret: ... talks only to the staging game server (REC3)".
+- HOST-REC2 r6:627: Hetzner, supervisor per VM, no LB; CCX23 = ref server for R2 (R2-XU-OQ9); x86-64 answers R1-DET-OQ7.
+- HOST-REC3 r6:653: one shared staging game server for previews; self-signed pinned certs; offline previews in the worker; binaries via CI (pointer r6:946).
+- HOST-REC4 r6:664: wildcard cert departs from R2-TRN-REC5 per-hostname (stated).
+- COST A-2 r6:512 8 rooms/4-vCPU VM (2 per vCPU); start scenario reads 6v6v6 = 18 (totals) r6:442; no lobby line, no CI runner line.
+- OBS-REC1..4; OBS-REC3 Sentry wasmIntegration, debug files uploaded by CI; crash reports "to our own lobby endpoint" r6:730.
+- TEL-REC1..3: record shape; supervisor uploads; batch analysis by content hash.
+- OQs: HOST-OQ1 Hetzner availability; HOST-OQ5 private previews (Mustafa); COST-OQ1 rooms per VM; OBS-OQ5 client field perf (R3 + synthesis); TEL-OQ2 bots/private matches; SEC-OQ1 deferred list.
+- R6 cites no R5 id: R5's asks (PREV-OQ2 Pages deletion, PREV-OQ4 price, GPU runner, >10 GB cache, macOS runner cost) unanswered; lobby location/store (R2-ROOM-OQ9) unanswered (only key storage deferred); R3's client session report field unanswered (R6-OBS-OQ5 points back to R3); R1-BND-OQ5 embeds/login + CORP unanswered.
+
+## Pair comparison: DONE (R1xR2, R1xR3, R2xR3, R1..R3xR4, R1..R4xR5, R1..R5xR6). Wrong-cross-reference spot checks done (R6->r2 lines, R4->R1-DET-F6/BND-F19, R5->R1/R2 marks): all hold except the ambiguous "REC5's test" in R5-PREV-REC4.
+
+## FULL LIST (ranked by ADR impact)
+1 contradiction tick budget meaning + sum + density (R1-TICK-REC2 P1, R1-ECS-REC1 m1, R1-ABL-REC6, R4-PHYS-REC1 m2, R4-NAV-REC2, R2-BUD-REC6, R2-BUD-REC1, R2-ROOM-REC2, R2-SYNC-REC9, R2-INT-REC3, R2-TRN-REC1 m2, R6 A-2). existing R2-XU-OQ8, R1-XU-OQ1 (each internal). ADR-0001+0004 (+0006 density).
+2 hidden dep cursor aim across boundary (R1-BND-REC1 m2, R1-BND-REC3, R1-DET-REC2 vs R2-SYNC-REC8, R4-LOS-REC3). none. ADR-0001+0004.
+3 hidden dep Rapier assumed in R1 vs parry3d in R4 (R1-DET-REC3, ECS-REC4, ECS-REC1, TICK-REC2 reason, TL;DR, RR-OQ1 vs R4-PHYS-REC1; R4 lists some). existing: R4 "wave-1 items" + R4-PHYS-OQ3. ADR-0004.
+4 hidden dep where remote interpolation buffer lives (R1-TICK-REC5, R1-BND-REC2/REC6 vs R2-SYNC-REC4, R5-TEST-REC1). none. ADR-0001+0004.
+5 contradiction ability prediction scope (R1-ABL-REC4 vs R2-SYNC-REC3/OQ10). existing R1-ABL-OQ4, R2-SYNC-OQ10. ADR-0001+0005; Feel Lab spike.
+6 contradiction spread RNG sim stream vs server-only (R1-DET-REC4, R1-ABL-REC3 vs R2-SYNC-REC3). existing R2-SYNC-OQ11 (R2 side only). ADR-0001+0004; Mustafa SEC-SPREAD.
+7 hidden dep projectile E3 relies on cross-target identity (R2-BUD-REC2, SYNC-REC6, BUD-OQ8 vs R1-DET-REC1). existing R2-BUD-OQ8 (R1 never answers). ADR-0001+0004; spike.
+8 gap lobby + supervisor: no host, cost line or crate (R2-ROOM-REC2/REC8/OQ9 vs R6-HOST-REC2, R6-COST, R6-OBS-REC3, R5-LAYOUT-REC2). existing R2-ROOM-OQ9. ADR-0006+0002+0001.
+9 contradiction stress-scene entity counts (R1-ECS-REC1, R1-TICK-REC2, R3-BUDGET-REC2, R4-PHYS-REC4, R4-NAV-REC2, R2 estimate, R2-SYNC-REC5 m3). existing R1-XU-OQ1, R2-BUD-OQ5. synthesis + game-designer caps.
+10 contradiction team sizes / largest mode (R1-TICK-OQ7, R1-DET-REC1, R5-TEST-REC5 vs R2-ROOM-REC7, R2-ROOM-REC6, R2-INT-REC3, R4-LOS-REC1/2, R6-COST). existing R2-BUD-OQ6, R2-XU-OQ13, R3-BUDGET-OQ4. Mustafa.
+11 contradiction ref server core vs vCPU (R1-ECS-REC1, R1-TICK-REC2, R4 vs R2-BUD-REC6, R6 pointer). existing R2-XU-OQ9, R1-TICK-OQ6. ADR-0006 + synthesis.
+12 gap R1 timing pointers unanswered by R2 (TICK-OQ3, OQ4, OQ8). existing those OQs. ADR-0001.
+13 gap R1 protocol pointers unanswered by R2 (DET-OQ9, BND-OQ8, DATA-OQ3, DATA-REC6 hash at join vs JoinAccepted modeHash). existing those OQs. ADR-0001+0005.
+14 hidden dep replay scope: R1-ECS-REC1 m3 whole world vs R2-SYNC-REC3/REC9 and R4-NAV-REC4 local only. existing R1-XU-OQ2 etc. ADR-0004.
+15 hidden dep offline play assumed (R4-NAV-REC4, R6-HOST-REC3, R5-PREV-OQ3 vs R1-BND-OQ1/TICK-OQ7). existing R1-BND-OQ1, R1-TICK-OQ7, R1-XU-OQ12. Mustafa + Advisor.
+16 hidden dep per-soldier anim state in block/snapshot (R3 pointer vs R1-BND-REC2, R2 record). existing R1-BND-OQ6 (partly). ADR-0001+0003+0004.
+17 contradiction dependency advisories gate owner/placement (R1-RR-OQ7 vs R2-TRN-REC1 m5, R5-GATE-REC1, R6-SEC-OQ1). existing R5-GATE-OQ4, R6-SEC-OQ1. security-auditor/Advisor -> ADR-0002/0006.
+18 hidden dep recommendations waiting on deferred baseline (CSP R5-PREV-REC4, R2-ROOM-OQ11, R5-TSLINT-OQ5, key storage R2-ROOM-OQ2). existing R6-SEC-OQ1. Advisor.
+19 contradiction preview host Workers (R6) vs Pages-based needs/cleanup (R5); R5-PREV-OQ2 unanswered. existing R5-PREV-OQ2, R5-PREV-OQ4. ADR-0006 + ADR-0002.
+20 gap multiplayer previews: staging binary delivery by CI + cert hash on page origin (R6-HOST-REC3, R6 pointer vs R5-PREV-REC1; R2-TRN-REC5 vs static host). existing R5-PREV-OQ3. ADR-0002+0006 (+0001).
+21 contradiction preview privacy (R5-PREV-REC5 vs R6-HOST-REC1). existing R5-PREV-OQ1, R6-HOST-OQ5. Mustafa.
+22 contradiction isolation headers on previews always vs flag (R5-PREV-REC4 vs R5-LAYOUT-REC5, R6-HOST-REC1). existing R5-XQ-OQ3. engine-architect ADR-0002 with R1-BND-REC2 m5.
+23 contradiction wildcard vs per-hostname cert (R2-TRN-REC5 vs R6-HOST-REC4). existing R6-SEC-OQ1 / R2-TRN-OQ4 (stated by R6). ADR-0006 + security baseline.
+24 gap nav bake + R4 checks have no home in R5 crates/gate (R4-NAV-REC1, FLOORS-REC3, pointers vs R5-LAYOUT-REC2, GATE-REC1). none. ADR-0002+0004.
+25 gap editor file:// + Wasm (R1-DATA-OQ11 vs R5 silent, R5-LAYOUT-REC5, R3-WGPU-REC4). existing R1-DATA-OQ11. ADR-0002.
+26 gap client telemetry of backend/hardware (R3-GL2-OQ2, R3 pointers vs R6-TEL/R6-OBS-OQ5). existing R3-GL2-OQ2, R6-OBS-OQ5. ADR-0003+0006.
+27 hidden dep wire widths: generational ids + 16-bit tick wrap vs R2 7-bit index, 20-min match. none. ADR-0001.
+28 gap client trap recovery owner (R2 pointer says R1; R1-RR-OQ3 says synthesis). existing R1-RR-OQ3. ADR-0002+0004.
+29 contradiction HashMap ban scope (R1-DET-REC5 lookups allowed vs R5-RUSTLINT-REC2 type ban). existing R5-RUSTLINT-OQ5. ADR-0004 (engine-architect).
+30 hidden dep same open question two topics: soldier/vehicle blocking (R2-SYNC-OQ5 vs R4-PHYS-OQ1/NAV-OQ5). existing both. game-designer + Mustafa.
+31 gap content TS types source (R1-XU-OQ8 "with R5" vs R5-LAYOUT-REC3 both generators, no pick). existing R1-XU-OQ8. ADR-0005.
+32 hidden dep network profiles settled by R5 but R2 marks unchanged (R5-TEST-REC4 vs R2-BUD-REC1/REC4). existing R2-XU-OQ12. synthesis.
+33 gap CI runner costs left to R6 (GPU, macOS, self-hosted ref machines, >10 GB cache). existing R5-CI-OQ5, R5-TEST-OQ4, R3-MEASURE-OQ2. ADR-0006/0002.
+34 hidden dep Sentry: CI upload secret job + G12 external-request mutation (R6 pointer vs R5-GATE-REC3, R5 secret list). none. ADR-0002/0006.
+35 gap audio occlusion rays ownership (R3-AUDIO-REC3/OQ5 vs R4-LOS-REC1 users). existing R3-AUDIO-OQ5. ADR-0003/0004 (only if O-B).
+36 gap bench method (R1-ABL-REC6 "method R5 sets" vs R5-TEST-OQ8). existing R5-TEST-OQ8. ADR-0002.
+37 gap R1->R3 pointers (OffscreenCanvas A3, per-entity/per-field layout) unanswered. existing R1-BND-OQ6. ADR-0003/0004.
+38 gap R1-BND-OQ5 embeds/login and CORP -> R6 silent. existing R1-BND-OQ5. Mustafa with R6.
+39 gap R2->R3 cutaway visibility rule (look brief). existing R2-INT-OQ1. look brief.
+40 hidden dep R5-CI-OQ1 stale (bevy_ecs/hecs, Rapier). none. ADR-0002 cache spike.
+41 wrong cross-ref R5-PREV-REC4 "until REC5's test decides" -> deciding test is R1-BND-REC2 mark 5. none. editorial.
+DONE
