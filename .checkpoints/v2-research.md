@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-29 22:49 Amsterdam
+- **Last update:** 2026-10-30 00:42 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -27,7 +27,18 @@
    prompts `prompts/<agent>-r<n>.txt` and `prompts/infra-engineer-r5-ci.txt`, each launched with a one-line message
    that points the agent at its saved prompt file (the message is in each file's header).
 
-## Next steps
+## Next steps (from 30 October, 18:00 Amsterdam)
+1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
+2. Insert the critic's 41 items as cross-topic open questions (R<n>-XT-OQ<k>) in the affected topic files, in the
+   critic's words (main session, mechanical); no re-check (plan).
+3. docs-keeper: STATUS, ROADMAP, docs/research/README.md status column, REPO_MAP (new files); the stale STATUS lines
+   (the Routines line, the R1–R6 rows); then the gate and `node .claude/scripts/repo-map-check.mjs`.
+4. The report `docs/reports/<date>-v2-research.md` with /advisor-report: coverage table, source counts by tier, the
+   unread list (SRC-ACCESS), the critic's list, the SPEND-1 statement, the fetch-method audit, VERIFY-FETCH, the three
+   spend-limit cut-offs. Fold this checkpoint into it and delete `.checkpoints/v2-research*` in the last commit.
+5. Mark PR #28 ready; the advisor agent reviews its head; Mustafa's "merge #28".
+
+## Earlier next steps (done)
 1. Count the 11 unit results (a draft file each, ending sources lists); restart any unit with no draft: its saved
    prompt plus "resume from your notes at <notes path>".
 2. Assemble (save each prompt first under `prompts/`): engine-architect → `docs/research/r1-simulation-core.md`,
@@ -177,6 +188,18 @@ key (condition A1).
   task wgashsj8a; the critic reads R5 last). Running: 2 agents. The 23:50 stop applies to both (notes saved).
 - R5 second pass DONE; its nits applied by the session (8948522). **Wave 2 is done: all six topics final.** Running:
   the consistency critic (1 agent).
+- Main merged in (569f792: PR #29's STATUS and ROADMAP, no conflicts), so the docs-keeper step builds on main's STATUS.
+- Consistency critic DONE (run wf_23aff73b-38d, finished about 21:56 UTC before a container restart; its output file
+  survived): 41 items (12 contradictions, 13 hidden dependencies, 15 gaps, 1 wrong cross-reference), saved verbatim as
+  `engine-architect-consistency-result.json`; notes `engine-architect-consistency.md` (end with DONE). Top item: "25 %"
+  of the tick means the sim alone in R1, the whole tick in R2-BUD-REC6 and the sync work in R2-SYNC-REC9.
+- **Pause (Mustafa, 2026-10-30 about 00:35 Amsterdam):** "Today you and the nightshift bot are only allowed to work until
+  3 am, because I will need the usage for tomorrow, we will continue the project tomorrow after 18:00 again." Done: the
+  Night shift routine's cron is `CRON_TZ=Europe/Amsterdam 10 0-2 * * *` for tonight (its prompt cannot be changed from
+  this session: only from the conversation it posts into); issue #16's rules carry a dated "stop by 03:00, no new item
+  after 02:30, no work before 18:00 on 30 October" line. A send_later at 18:05 Amsterdam on 30 October
+  (trig: "Resume v2-research and restore the night shift") restores the cron to 0-7, removes the #16 line, and resumes
+  this change-set. Nothing of this change-set runs before then.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).

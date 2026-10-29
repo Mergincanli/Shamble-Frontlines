@@ -1,0 +1,848 @@
+{
+ "notes_path": "/home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-consistency.md",
+ "items": [
+  {
+   "rank": 1,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2",
+    "R4",
+    "R6"
+   ],
+   "ids": [
+    "R1-TICK-REC2",
+    "R1-ECS-REC1",
+    "R1-ABL-REC6",
+    "R4-PHYS-REC1",
+    "R4-NAV-REC2",
+    "R2-BUD-REC6",
+    "R2-BUD-REC1",
+    "R2-ROOM-REC2",
+    "R2-SYNC-REC9",
+    "R2-INT-REC3",
+    "R2-TRN-REC1",
+    "R6-COST A-2"
+   ],
+   "side_a": "r1-simulation-core.md:2014-2018 (R1-TICK-REC2 P1): \"At 60 Hz: p99 tick time at N = 48 at most 4.2 ms (25 % of 16.7 ms) on one core ... The 25 % leaves room for snapshot encoding, interest management and several matches per core (R2, R6)\"; r1:2025 \"Decision rule: 60 Hz if P1–P3 pass at 60 Hz\"; r1:1908-1909 (R1-ECS-REC1 mark 1) \"a mean tick ≤ 2 ms and a p99 tick ≤ 4 ms native\"; r1:2395-2397 (R1-ABL-REC6) ability/effect/weapon step \"at most 1 ms per tick\"; r4-physics-navigation.md:691-692 (R4-PHYS-REC1 mark 2) movement plus physics \"at most half of that mark's mean tick (≤ 1 ms native mean)\"; r4:841 (R4-NAV-REC2) navigation \"≤ 10 % of the tick's p99 budget\"",
+   "side_b": "r2-netcode.md:2377-2379 (R2-BUD-REC6): \"for the whole tick, not just the simulation step: at 48 players, p99 ≤ 25 % of the tick interval (≤ 4 ms at 60 Hz, ≤ 8 ms at 30 Hz) including the simulation (R1), lag-compensated hit tests and snapshot encoding\"; r2:2284 (R2-BUD-REC1) \"simulation tick 60 Hz if R1's tick spike meets its CPU mark\"; r2:2733 (R2-ROOM-REC2) \"p99 tick time at most 50 % of the tick period\"; r2:2276-2278 (R2-SYNC-REC9) sync work alone \"at most 25 % of the tick budget\"; r2:2447-2448 (R2-INT-REC3) visibility pass \"at most 10 % of the server tick budget\"; r2:2558 (R2-TRN-REC1 mark 2) \"at most 1 CPU core for the transport layer\"; r6-infrastructure.md:512 (A-2) \"8 rooms of 48 players per 4-vCPU VM\"",
+   "why": "\"25 %\" means the sim alone in R1, the whole tick in R2-BUD-REC6 and the sync work alone in R2-SYNC-REC9; R2-ROOM-REC2 allows 50 %. So the 60-or-30 Hz rule gives different answers: R1 passes 60 Hz with a 4.2 ms sim, but R2's rule needs sim plus encoding plus lag compensation within 4 ms. The shares don't add up either: R1-ABL-REC6 (1 ms) plus R4-PHYS-REC1 (1 ms mean) already fill R1-ECS-REC1's whole 2 ms mean, before navigation, AI, visibility and encoding. R6's cost density (2 rooms per vCPU) rests on R2-ROOM-REC2's 50 %, which leaves no room for R2-TRN-REC1's transport core per process or for R1's point that 30 Hz roughly halves CPU (r1:2956).",
+   "existing_oq": "R2-XU-OQ8 (R2's shares only) and R1-XU-OQ1 (R1's units only); neither names the other topic, R4's shares or R6's density",
+   "decided_by": "The synthesis: one tick budget, split across sim, physics, abilities, navigation, visibility, sync and transport, in ADR-0004 (sim core) and ADR-0001 (netcode), with the density used in ADR-0006 (costs); then R1-TICK-REC2 P1, R2-BUD-REC6 and R2-ROOM-REC2 spikes"
+  },
+  {
+   "rank": 2,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2",
+    "R4"
+   ],
+   "ids": [
+    "R1-BND-REC1",
+    "R1-BND-REC3",
+    "R1-DET-REC2",
+    "R2-SYNC-REC8",
+    "R4-LOS-REC3"
+   ],
+   "side_a": "r1-simulation-core.md:2206 (R1-BND-REC1 mark 2): \"the page makes zero calls into Wasm\"; r1:2108 (R1-DET-REC2): \"No sim value is computed in TypeScript.\"; r1:2228 (R1-BND-REC3): the command carries \"aim (yaw and pitch, for aiming at height)\" (\"The exact fields are R2's\")",
+   "side_b": "r2-netcode.md:2233-2236 (R2-SYNC-REC8): \"the command carries a quantised world aim point (option 3.7 B), picked on the client against its rendered world ... The cursor ray is cast into the world as the client draws it: interpolated remote entities and the static world, using the same Rust ray query\"; r4-physics-navigation.md:973-974 (R4-LOS-REC3): \"the client's cursor ray and the server's shot use the same static world ... and the same functions\"",
+   "why": "The aim point must come from a Rust ray query against what the page draws (interpolated positions live on the page). But R1 allows the page no Wasm calls and no sim maths in TypeScript, and R1's command carries yaw and pitch, not a point. No topic says which side casts the cursor ray, against which interpolated state, or how the result crosses the boundary.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0001 (the command format) and ADR-0004 (the boundary), with R2-SYNC-REC8 mark 1 and R1-BND-REC1 mark 2 as the spike marks"
+  },
+  {
+   "rank": 3,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R4",
+    "R5"
+   ],
+   "ids": [
+    "R1-DET-REC3",
+    "R1-ECS-REC4",
+    "R1-ECS-REC1",
+    "R1-TICK-REC2",
+    "R1-RR-OQ1",
+    "R4-PHYS-REC1",
+    "R4-PHYS-OQ3"
+   ],
+   "side_a": "r1-simulation-core.md:2125 (R1-DET-REC3): \"Rapier with `enhanced-determinism` on both targets.\"; r1:1965 (R1-ECS-REC4): \"If R4 picks Rapier, its sets are fields of the sim state\"; r1:1894 (R1-ECS-REC1 reason): \"Rapier's sets are Clone and Serialize and slot straight into the struct\"; r1:2000 (R1-TICK-REC2): \"60 Hz is the starting candidate: it is Rapier's default step (F8)\"; r1:58-59 (TL;DR): \"Rapier matches across machines only with `enhanced-determinism`\"; r1:2835-2840 (R1-RR-OQ1): FMA differences in \"Rapier's default 4-lane SIMD path\"",
+   "side_b": "r4-physics-navigation.md:663-665 (R4-PHYS-REC1): \"No physics engine: use parry3d (pinned, `enhanced-determinism` on) ... Measure Rapier's character controller ... as the fallback\"; r4:1114-1118: R4 states that R1-ECS-REC4, R1-ECS-REC1 mark 2 and R1-DET-REC3's crate change",
+   "why": "R4 states openly that some of R1's Rapier items change. It does not list R1-TICK-REC2's reason for starting at 60 Hz (Rapier's default step), R1-ECS-REC1's reason and mark 5, R1's TL;DR, or whether R1-RR-OQ1's SIMD/FMA hazard applies to parry3d's \"3D f32 SIMD\" BVH (R4-PHYS-OQ3 asks only by analogy). ADR-0004's determinism and snapshot sections rest on whichever crate wins.",
+   "existing_oq": "R4 'Wave-1 items R4 changes or answers' (r4:1110-1129) and R4-PHYS-OQ3, partly",
+   "decided_by": "ADR-0004 (sim core: physics), with R4-PHYS-REC1 marks 2-5 and R1-DET-REC6's suite as the evidence"
+  },
+  {
+   "rank": 4,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2",
+    "R3",
+    "R5"
+   ],
+   "ids": [
+    "R1-TICK-REC5",
+    "R1-BND-REC2",
+    "R1-BND-REC6",
+    "R2-SYNC-REC4",
+    "R5-TEST-REC1"
+   ],
+   "side_a": "r1-simulation-core.md:2060 (R1-TICK-REC5): \"The main thread draws every frame from the two newest ticks with `alpha`\"; r1:2212-2213 (R1-BND-REC2): the page \"keeps the latest two blocks for interpolation\"; r1:2263-2264 (R1-BND-REC6): \"Online, server snapshots, prediction and reconciliation run in the worker, which then publishes the same output block to the page\"",
+   "side_b": "r2-netcode.md:2099-2101 (R2-SYNC-REC4): \"The client draws remote entities between the two snapshots that bracket 'server time minus the delay'. The delay starts at 3 snapshot intervals\" (bounds 2 to 5 intervals, adaptive); r5-toolchain-quality.md:1387 (R5-TEST-REC1): TypeScript unit tests cover \"interpolation buffers\"",
+   "why": "A two-block buffer on the page cannot hold R2's 100 to 167 ms delay. So either the worker (Rust) runs R2's adaptive snapshot buffer and publishes already-delayed remote poses, or the page (TypeScript) keeps a snapshot buffer, as R5's test layer assumes. No topic places R2's interpolation and clock estimate on one side of R1's boundary.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0001 (interpolation design) with ADR-0004 (boundary: block contents and the number of blocks kept)"
+  },
+  {
+   "rank": 5,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-ABL-REC4",
+    "R2-SYNC-REC3",
+    "R2-SYNC-OQ10"
+   ],
+   "side_a": "r1-simulation-core.md:2354-2356 (R1-ABL-REC4): \"Predict only the local player's own abilities and weapons; never damage (option D2). The client predicts its own activation, cost, cooldown, granted tags, movement changes (Banzai speed, Shield slow), weapon timer and ammo\"",
+   "side_b": "r2-netcode.md:2061-2062 (R2-SYNC-REC3): \"Client prediction: own movement, own weapon state, own vehicle and cosmetic shot feedback (option 3.2 C)\"; r2:2889-2890 (R2-SYNC-OQ10): \"Predicting abilities (option 3.2 D). No source on predicting abilities and rolling them back was read\"; r2:3341: \"The prediction scope stops short of abilities (option 3.2 D, R2-SYNC-OQ10)\"",
+   "why": "R1 recommends predicting the local player's abilities. R2's recommended scope leaves them out and holds ability prediction open. R1 says R2 decides the prediction model, so the ability system's shape (prediction keys, rollback of a rejected press, cue de-duplication) depends on an R2 question that is still open.",
+   "existing_oq": "R1-ABL-OQ4 and R2-SYNC-OQ10",
+   "decided_by": "ADR-0001 (prediction scope) with ADR-0005 (ability system); a Feel Lab comparison of predicted and server-confirmed abilities (R2-SYNC-OQ10)"
+  },
+  {
+   "rank": 6,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-DET-REC4",
+    "R1-ABL-REC3",
+    "R1-DET-OQ9",
+    "R2-SYNC-REC3",
+    "R2-SYNC-OQ11"
+   ],
+   "side_a": "r1-simulation-core.md:2137-2140 (R1-DET-REC4): \"The sim draws only from `rand_chacha`'s `ChaCha8Rng` (pinned), seeded by the server per match, one stream per purpose (for example match setup, weapon spread, bot decisions, ability procs); the RNG state (seed, stream, position) is part of the sim state and its hash.\"; r1:2342-2343 (R1-ABL-REC3): \"Random rolls (spread) come from the simulation's seeded RNG\"",
+   "side_b": "r2-netcode.md:2073-2076 (R2-SYNC-REC3, security fix H2): \"Muzzle flash and tracer are drawn at once from a cosmetic spread on the client, not from a seed it shares with the server. The authoritative spread comes from a server-only random stream\"",
+   "why": "The client runs the same sim for prediction (R1-BND-REC6). If the spread stream lives in the sim's state and hash, the client knows it, which R2's security fix forbids. If it is server-only, client and server sim states differ by design, which affects R1-DET-OQ9's production hash comparison and what \"predict own weapon state\" means. R1 does not take up R2's fix.",
+   "existing_oq": "R2-SYNC-OQ11 (covers R2's side only)",
+   "decided_by": "ADR-0001 and ADR-0004 (which RNG streams are server-only and outside the client's sim state); Mustafa for matching tracers against cheat resistance (decision SEC-SPREAD)"
+  },
+  {
+   "rank": 7,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-DET-REC1",
+    "R2-BUD-REC2",
+    "R2-SYNC-REC6",
+    "R2-BUD-OQ8"
+   ],
+   "side_a": "r1-simulation-core.md:2089-2090 (R1-DET-REC1): \"Identity between Wasm and native is a target, tested on every change, but the netcode must not depend on it\"",
+   "side_b": "r2-netcode.md:2309-2310 (R2-BUD-REC2): \"send projectiles as spawn events with client-side deterministic flight plus correction events\"; r2:2200 (R2-SYNC-REC6): trajectories \"cannot drift between server and client\"; r2:2943-2944 (R2-BUD-OQ8): \"Can the client simulate projectile flight deterministically from a spawn event (E3), or must projectiles ride in every snapshot (E3b, +42 kbps at 48)? Decides: R1's determinism unit\"",
+   "why": "R2's chosen encoding and its bandwidth figure (146 rather than 188 kbps) rest on client-side flight that matches the server across targets. R1 says the netcode must not depend on that identity, and R1 never answers R2-BUD-OQ8, the question R2 put to it.",
+   "existing_oq": "R2-BUD-OQ8 (unanswered by R1)",
+   "decided_by": "ADR-0001 (E3 or E3b) with ADR-0004 (whether cross-target identity is a guarantee for the trajectory function); R2-SYNC-REC6 mark 1 and R2-BUD-REC2's desync count in the spike"
+  },
+  {
+   "rank": 8,
+   "kind": "gap",
+   "topics": [
+    "R2",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R2-ROOM-REC2",
+    "R2-ROOM-REC8",
+    "R2-ROOM-OQ9",
+    "R6-HOST-REC2",
+    "R6-COST-REC1",
+    "R6-OBS-REC3",
+    "R5-LAYOUT-REC2"
+   ],
+   "side_a": "r2-netcode.md:2722 (R2-ROOM-REC2): \"The supervisor (R6) starts a process per room; the lobby hands out host and port.\"; r2:2842-2843: \"The lobby speaks HTTPS: guest create, room create (private), code lookup, token request.\"; r2:3052-3053 (R2-ROOM-OQ9): \"Where the lobby runs and stores guest ids and the room directory. Same binary as the supervisor or a separate service; which store: R6.\"",
+   "side_b": "Missing answer. R6-HOST-REC2 (r6-infrastructure.md:627-631) places a supervisor per game VM and says \"the lobby hands out host and port\", but no R6 recommendation hosts the lobby or its store. R6-COST's lines (r6:467-476, 481-490) have no lobby; R6-OBS-REC3 (r6:730) still sends crash reports \"to our own lobby endpoint\"; R6-SEC-OQ1 defers only the signing-key storage. R5-LAYOUT-REC2 (r5-toolchain-quality.md:1171-1176) lists only \"`server` (the binary with transport and rooms ...)\" and \"No other crate or package until a §6 item asks for it.\"",
+   "why": "Join tokens, guest identity, room codes and crash reports all go through the lobby, and R2 hands its hosting and store to R6. R6 neither hosts nor costs it, and R5 has no crate for the lobby or the supervisor, so the infrastructure ADR and the cost budget leave out a required service.",
+   "existing_oq": "R2-ROOM-OQ9 (left to R6, unanswered)",
+   "decided_by": "ADR-0006 (hosting and cost of the lobby and its store) with ADR-0002 (crate list) and ADR-0001 (lobby protocol)"
+  },
+  {
+   "rank": 9,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+   ],
+   "ids": [
+    "R1-ECS-REC1",
+    "R1-TICK-REC2",
+    "R3-BUDGET-REC2",
+    "R3-CHAR-REC4",
+    "R4-PHYS-REC4",
+    "R4-NAV-REC2",
+    "R2-SYNC-REC5",
+    "R2-BUD-OQ5"
+   ],
+   "side_a": "r1-simulation-core.md:1907-1908 (R1-ECS-REC1 mark 1): \"48 soldiers (bots), 8 vehicles, 300 live projectiles and 200 active effects\"; r4-physics-navigation.md:765-767 (R4-PHYS-REC4): \"keeps 8 big vehicles (R1-ECS-REC1's number), harvesters included\"; r4:839-840 (R4-NAV-REC2): \"with 8 big vehicles instead of P1's 4\"",
+   "side_b": "r1:2013-2014 (R1-TICK-REC2 P1): \"plus 4 big vehicles and 200 live projectiles\"; r3-rendering.md:1110-1111 (R3-BUDGET-REC2): \"48 soldiers on screen in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's scene)\"; r2-netcode.md:1757-1758 (worked estimate): projectiles \"32 at 48 players\", vehicles \"one per squad of 4 ... + one harvester per team\" (15 at 48, r2:1771); r2:2173 (R2-SYNC-REC5 mark 3): \"48 soldiers plus 12 vehicles and harvesters\"",
+   "why": "Every spike pass mark (tick, render, bandwidth, history, navigation) is set on a different stress scene. R3 adopts R1-TICK's 4 vehicles, R4 adopts R1-ECS's 8, and R2 uses 12 to 15 vehicles and 32 projectiles. Results from the spikes could not be compared.",
+   "existing_oq": "R1-XU-OQ1 (R1's units only; R4 cites it) and R2-BUD-OQ5 (caps)",
+   "decided_by": "The synthesis: one stress scene shared by ADR-0001, 0003 and 0004, after the game-designer's caps on vehicles and projectiles (R2-BUD-OQ5)"
+  },
+  {
+   "rank": 10,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R1-TICK-OQ7",
+    "R1-DET-REC1",
+    "R2-ROOM-REC7",
+    "R2-ROOM-REC6",
+    "R2-INT-REC3",
+    "R4-LOS-REC1",
+    "R4-LOS-REC2",
+    "R5-TEST-REC5",
+    "R6-COST",
+    "R2-BUD-OQ6"
+   ],
+   "side_a": "r1-simulation-core.md:2587-2588 (R1-TICK-OQ7): \"the largest mode (48 soldiers, 47 of them bots)\"; r1:2098-2099 (R1-DET-REC1): \"a bots-only 24v24 match (48 players) and a 12v12v12 match (36 players)\"; r5-toolchain-quality.md:1468 (R5-TEST-REC5): \"24v24 = 48 and 12v12v12 = 36\"; r6-infrastructure.md:442: \"6v6v6 (start, three teams, upper end) | 18\" (totals)",
+   "side_b": "r2-netcode.md:2820 (R2-ROOM-REC7): \"mode files for 2×2, 2×8, 3×6, 3×18, 12v12v12 and 24v24\" (3×18 = 54); r2:2809 (R2-ROOM-REC6): \"3 teams × 16 slots\"; r2:2447 (R2-INT-REC3) and r4-physics-navigation.md:954, 969 (R4-LOS-REC1 mark 4, R4-LOS-REC2): \"24v24 and 16v16v16\"",
+   "why": "The topics read VISION_V2 §3's starting sizes as totals (R2 budgets, R6) or per team (R2 rooms), and test three-team play at 12v12v12, 16v16v16, 3×16 or 3×18. The largest mode, which sets the stress N, the offline N and the cost rows, is 48 in R1 but 54 in R2-ROOM-REC7.",
+   "existing_oq": "R2-BUD-OQ6 and R2-XU-OQ13 (R2's units only); R3-BUDGET-OQ4",
+   "decided_by": "Mustafa (VISION_V2 §3 reading), then the synthesis sets one list of test modes for every ADR"
+  },
+  {
+   "rank": 11,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2",
+    "R4",
+    "R6"
+   ],
+   "ids": [
+    "R1-ECS-REC1",
+    "R1-TICK-REC2",
+    "R1-TICK-OQ6",
+    "R4 (reference hardware line)",
+    "R2-BUD-REC6",
+    "R2-ROOM-REC2",
+    "R2-XU-OQ9",
+    "R6-HOST-REC2"
+   ],
+   "side_a": "r1-simulation-core.md:1905-1906 (R1-ECS-REC1): \"reference hardware proposed: one server core of the R6 host type\"; r1:2015-2016 (R1-TICK-REC2): \"on one core of the proposed reference server\"; r4-physics-navigation.md:658-659: \"one core of the R6 server type\"",
+   "side_b": "r2-netcode.md:2385 (R2-BUD-REC6): \"one vCPU of the EU instance type R6 recommends\"; r2:2732 (R2-ROOM-REC2): \"one 4-vCPU EU cloud VM\"; r6-infrastructure.md:942-943: \"'one vCPU of the EU instance type' in R2-BUD-REC6 is one vCPU of CCX23\"; r6:628-629 (R6-HOST-REC2): \"the dedicated CCX23 (4 vCPU, 16 GB, x86-64 AMD)\"",
+   "why": "R6 names the machine, but R1 and R4 measure on \"one core\" while R2 and R6 measure on \"one vCPU\". That unit decides every native tick mark and the rooms-per-VM figure the cost rests on.",
+   "existing_oq": "R2-XU-OQ9 (R6 answers it for R2 only) and R1-TICK-OQ6",
+   "decided_by": "ADR-0006 (the reference server and its measuring unit), adopted by ADR-0001 and ADR-0004 in the synthesis"
+  },
+  {
+   "rank": 12,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-TICK-OQ3",
+    "R1-TICK-OQ4",
+    "R1-TICK-OQ8",
+    "R2-BUD-OQ1",
+    "R2-BUD-REC4"
+   ],
+   "side_a": "r1-simulation-core.md:2575-2577 (R1-TICK-OQ4): \"Sub-tick input timestamps ... Decided by: R2's lag-compensation unit\"; r1:2591-2592 (R1-TICK-OQ8): \"Whether the client nudges its tick rate to keep its inputs arriving just in time at the server ... Decided by: R2's time-sync design\"; r1:2570-2573 (R1-TICK-OQ3): shipped references' tick rates \"Decided by: R2's reading of those sources, and the consistency critic aligning both topics\"",
+   "side_b": "Missing answer. R2 cites no R1 id at all. It has no sub-tick timestamp recommendation and no client tick-rate adjustment; r2:2343-2345 (R2-BUD-REC4) gives only \"a server input buffer of 1–3 ticks (proposed), adapted per client; clock offset from RTT samples\"; r2:2922-2925 (R2-BUD-OQ1): the large-team shooters' rates were not read either",
+   "why": "R1 leaves three timing questions to R2's design, and R2 does not take them up: which tick a client stamps and how it stays just ahead of the server is part of the command path both ADRs rely on. Neither topic could read the shipped references, so R1-TICK-OQ3 cannot be aligned.",
+   "existing_oq": "R1-TICK-OQ3, R1-TICK-OQ4, R1-TICK-OQ8; R2-BUD-OQ1",
+   "decided_by": "ADR-0001 (time sync and command stamping); the R2-SYNC-OQ3 spike; R1-TICK-OQ4 only if the tick falls back to 30 Hz"
+  },
+  {
+   "rank": 13,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-DET-OQ9",
+    "R1-BND-OQ8",
+    "R1-DATA-OQ3",
+    "R1-DATA-REC6",
+    "R2 room control messages"
+   ],
+   "side_a": "r1-simulation-core.md:2623-2624 (R1-DET-OQ9): \"Which hash function, and should production servers and clients compare hashes now and then to measure prediction divergence? R2 decides\"; r1:2660-2661 (R1-BND-OQ8): \"Does the server's snapshot reach the worker in the same layout as the page's block? ... Decides: R2\"; r1:2709-2712 (R1-DATA-OQ3): \"R2 may hold one\" (shipped source for mid-match tuning); r1:2490-2491 (R1-DATA-REC6): \"at join the server names the hash the match uses\"",
+   "side_b": "Missing answer. R2 has no hash-comparison, snapshot-layout or mid-match-tuning recommendation; r2-netcode.md:2840: \"`JoinAccepted{slot, team, squad, modeId, modeHash, serverTick}`\" carries a mode hash, not the content-set hash R1-DATA-REC6 checks",
+   "why": "R1 hands these protocol choices to R2 by id, and R2 answers none of them. The join message R2 does propose does not carry the content hash R1's bundle check and R6's match record (r6:757) both rely on.",
+   "existing_oq": "R1-DET-OQ9, R1-BND-OQ8, R1-DATA-OQ3",
+   "decided_by": "ADR-0001 (join handshake, snapshot format, divergence telemetry) with ADR-0005 (content hash)"
+  },
+  {
+   "rank": 14,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2",
+    "R4"
+   ],
+   "ids": [
+    "R1-ECS-REC1",
+    "R1-XU-OQ2",
+    "R1-ECS-OQ3",
+    "R2-SYNC-REC3",
+    "R2-SYNC-REC9",
+    "R4-NAV-REC4"
+   ],
+   "side_a": "r1-simulation-core.md:1917-1919 (R1-ECS-REC1 mark 3): \"Restore, plus re-simulating k = ceil(0.15 s × tick rate) ticks ... fits in ≤ 8 ms in Wasm on the minimum laptop. If it doesn't, whole-world replay is ruled out\"; r1:2761-2765 (R1-XU-OQ2): \"What decides it: R2's prediction recommendation\"",
+   "side_b": "r2-netcode.md:2267-2268 (R2-SYNC-REC9): \"only the local player and its vehicle are replayed\"; r2:2063-2066 (R2-SYNC-REC3); r4-physics-navigation.md:865-866 (R4-NAV-REC4): \"Prediction replays only the local player or its vehicle (R1-TICK-REC2 P3), which never needs a route\"",
+   "why": "R2 answers R1's question by subject without citing it, and R4 already builds on the local-only answer (no navigation in prediction). R1's whole-world replay mark (and the snapshot cost it sizes) is still a proposed spike mark for a model no topic recommends.",
+   "existing_oq": "R1-XU-OQ2 (with R1-ECS-OQ3, R1-DET-OQ6, R1-ABL-OQ4)",
+   "decided_by": "ADR-0001 (prediction scope), then ADR-0004 keeps or drops R1-ECS-REC1 mark 3"
+  },
+  {
+   "rank": 15,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R4",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R1-BND-OQ1",
+    "R1-TICK-OQ7",
+    "R1-XU-OQ12",
+    "R4-NAV-REC4",
+    "R6-HOST-REC3",
+    "R5-PREV-OQ3"
+   ],
+   "side_a": "r1-simulation-core.md:2636-2638 (R1-BND-OQ1): \"Is offline (solo against bots) play a v2 need? VISION_V2 §6 does not list it ... Decides: Mustafa\"",
+   "side_b": "r4-physics-navigation.md:863-864 (R4-NAV-REC4): \"Navigation runs where bots run: on the server, and in the browser only for offline or local-bot play\" (mark: \"offline play at the largest mode meets R1-TICK-REC2's P2 mark\"); r6-infrastructure.md:654-655 (R6-HOST-REC3): \"offline previews run the match in the worker with bots and need no server\"; r5-toolchain-quality.md:1827-1828 (R5-PREV-OQ3): \"At the start a preview can run the sim locally in the worker (R1-BND-REC6: offline play)\"",
+   "why": "R4 builds navigation for the browser, R6 serves previews without a game server, and R5 plans the first previews, all on offline play, which R1 leaves as an open VISION question (and, at the largest mode, as R1-TICK-OQ7).",
+   "existing_oq": "R1-BND-OQ1, R1-TICK-OQ7, R1-XU-OQ12",
+   "decided_by": "Mustafa and the Advisor (VISION_V2), then ADR-0004 and ADR-0006"
+  },
+  {
+   "rank": 16,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "ids": [
+    "R3-CHAR-REC3",
+    "R3-CHAR-REC4",
+    "R1-BND-REC2",
+    "R1-BND-OQ6",
+    "R2 worked estimate"
+   ],
+   "side_a": "r3-rendering.md:1421-1422 (R3 pointer to R1): \"REC3 and REC4 assume R1-BND-REC2's per-kind sections carry aim yaw and pitch, ADS, reload, throw and draw state per soldier (GA15 lists them)\"",
+   "side_b": "r1-simulation-core.md:2210-2211 (R1-BND-REC2): the block holds \"aligned sections per entity kind (soldiers, vehicle parts, projectiles, structures)\", no fields named; r2-netcode.md:1745: a soldier record carries \"Health, flags, weapon | 8 + 8 + 4 bits\"",
+   "why": "Animation of remote soldiers online needs those states in R2's snapshot, then in R1's block. R2's bit budget names none of them and R1 leaves the layout open, so R3's character path and R2's bandwidth figure may not fit together.",
+   "existing_oq": "R1-BND-OQ6 (block size and layout), partly",
+   "decided_by": "ADR-0001 (snapshot fields) with ADR-0004 (block layout) and ADR-0003 (what animation reads)"
+  },
+  {
+   "rank": 17,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R2",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R1-RR-OQ7",
+    "R2-TRN-REC1",
+    "R5-GATE-REC1",
+    "R5-GATE-OQ4",
+    "R6-SEC-OQ1"
+   ],
+   "side_a": "r1-simulation-core.md:2869-2870 (R1-RR-OQ7): \"lockfile floors, and cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis.\"; r5-toolchain-quality.md:1652-1653 (R5-GATE-REC1, scheduled): \"cargo-deny advisories (F3: a new advisory must not turn an unrelated PR red; a PR that changes `Cargo.lock` runs the advisories check too)\"",
+   "side_b": "r2-netcode.md:2577-2578 (R2-TRN-REC1 mark 5): \"An audit gate that keeps these current belongs to R6's security baseline (dependency audits), deferred by the Advisor.\"; r6-infrastructure.md:898-900 (R6-SEC-OQ1): the audit and \"the rust-reviewer's cargo-audit and cargo-deny gates\" are deferred",
+   "why": "R1 asks for audit gates in CI, R5 schedules the advisories check, and R2 and R6 hold the audit for a security baseline with no date. Who owns the check, and whether it blocks a PR, has three answers.",
+   "existing_oq": "R5-GATE-OQ4 and R6-SEC-OQ1",
+   "decided_by": "security-auditor with the security baseline (the Advisor decides whether it is researched before ADR-0006); recorded in ADR-0002 (gate) and ADR-0006"
+  },
+  {
+   "rank": 18,
+   "kind": "hidden dependency",
+   "topics": [
+    "R2",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R5-PREV-REC4",
+    "R5-TSLINT-OQ5",
+    "R2-ROOM-OQ11",
+    "R2-ROOM-OQ2",
+    "R6-SEC-OQ1"
+   ],
+   "side_a": "r5-toolchain-quality.md:1611 (R5-PREV-REC4): the preview header set includes \"R6's content security policy once written\"; r2-netcode.md:3062-3063 (R2-ROOM-OQ11): \"the content security policy is part of R6's deferred baseline\"; r2:3038 (R2-ROOM-OQ2): \"key storage stays with R6's deferred baseline\"; r5:1753-1755 (R5-TSLINT-OQ5): the `innerHTML` rule, \"Decides it: security-auditor with R6's security baseline\"",
+   "side_b": "r6-infrastructure.md:895-896 (R6-SEC-OQ1): \"deferred by the Advisor, 2026-10-27. ADR 0006 lists it as open, or it is researched before 0006 is accepted.\"",
+   "why": "Recommendations in R2 and R5 (guest-secret storage, preview headers, a lint rule, token keys) wait on a topic with no recommendation and no date. ADR-0001, 0002 and 0006 cannot close those items.",
+   "existing_oq": "R6-SEC-OQ1",
+   "decided_by": "The Advisor (research the baseline before ADR-0006, or list it open), then security-auditor"
+  },
+  {
+   "rank": 19,
+   "kind": "contradiction",
+   "topics": [
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R6-HOST-REC1",
+    "R5-PREV-REC2",
+    "R5-PREV-REC3",
+    "R5-PREV-OQ2",
+    "R5-PREV-OQ4"
+   ],
+   "side_a": "r6-infrastructure.md:609-610 (R6-HOST-REC1): \"Host the client and the per-PR previews on Cloudflare (Workers static assets; Pages as the same-headers alternative)\"",
+   "side_b": "r5-toolchain-quality.md:1590-1593 (R5-PREV-REC2): \"Cloudflare Pages meets every need except full cleanup ... Cloudflare Workers static assets, Netlify and Vercel meet most\"; r5:1594: \"F14 shows Workers previews without a stated `noindex`\"; r5:1600-1601 (R5-PREV-REC3): cleanup through \"`wrangler pages deployment delete … --force`\"; r5:1942-1943: \"Please settle R5-PREV-OQ2 (Pages deletion of a branch's latest deployment) and R5-PREV-OQ4 (host and price)\"",
+   "why": "R6 makes Workers static assets the primary host. R5's needs check, `noindex` reasoning and cleanup job are written for Pages, and R6 does not answer R5-PREV-OQ2 (it cites no R5 id).",
+   "existing_oq": "R5-PREV-OQ2 and R5-PREV-OQ4",
+   "decided_by": "ADR-0006 (host) with ADR-0002 (the preview workflow); a test project spike for deletion (R5-PREV-OQ2)"
+  },
+  {
+   "rank": 20,
+   "kind": "gap",
+   "topics": [
+    "R2",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R6-HOST-REC3",
+    "R5-PREV-REC1",
+    "R2-TRN-REC5",
+    "R5-PREV-OQ3"
+   ],
+   "side_a": "r6-infrastructure.md:653-656 (R6-HOST-REC3): one staging VM \"runs a supervisor that starts the room binary of the build a preview names, with self-signed, pinned certificates as R2-TRN-REC5 says\"; r6:946: \"the staging server (REC3) receives the PR's server binary from CI\"; r2-netcode.md:2665-2666 (R2-TRN-REC5): \"The hash is fetched from the page's own HTTPS origin.\"",
+   "side_b": "r5-toolchain-quality.md:1574-1575 (R5-PREV-REC1): the deploy job \"holds the only host token, never checks out or runs PR code\"; r5:1946-1947: \"the preview deploy job is the first CI job with a secret\"; r6:937-938: Cloudflare `_headers` apply to \"static files only\". No topic says how CI ships a PR's server binary to the staging VM, or how the staging server's fresh certificate hash reaches the static preview origin",
+   "why": "Multiplayer previews need a server-binary delivery job (a second CI secret and PR-built native code on a VM) and a way to publish the self-signed hash on the page's origin. R5's preview design covers only the static client.",
+   "existing_oq": "R5-PREV-OQ3 (asks whether previews need a server; R6 answers yes, but not how)",
+   "decided_by": "ADR-0002 (preview workflow) and ADR-0006 (staging server), with ADR-0001 (where the certificate hash is fetched from)"
+  },
+  {
+   "rank": 21,
+   "kind": "contradiction",
+   "topics": [
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R5-PREV-REC5",
+    "R6-HOST-REC1",
+    "R5-PREV-OQ1",
+    "R6-HOST-OQ5"
+   ],
+   "side_a": "r5-toolchain-quality.md:1626-1627 (R5-PREV-REC5): \"This changes once a preview talks to a real server or carries unreleased art: then the access wall is on.\"",
+   "side_b": "r6-infrastructure.md:611-612 (R6-HOST-REC1): \"Previews stay harmless rather than secret: a preview holds no secrets, talks only to the staging game server (REC3), and is limited to the account with Cloudflare Access if Mustafa wants it private\"",
+   "why": "R6's previews talk to a real staging server, the condition under which R5 turns the access wall on. R6 leaves the wall optional.",
+   "existing_oq": "R5-PREV-OQ1 and R6-HOST-OQ5",
+   "decided_by": "Mustafa (convenience against privacy), after the security baseline; recorded in ADR-0006"
+  },
+  {
+   "rank": 22,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R5-PREV-REC4",
+    "R5-LAYOUT-REC5",
+    "R6-HOST-REC1",
+    "R1-BND-REC5",
+    "R5-XQ-OQ3"
+   ],
+   "side_a": "r5-toolchain-quality.md:1609-1610 (R5-PREV-REC4): \"COOP `same-origin` and COEP `require-corp` on preview hostnames only\" (every preview isolated)",
+   "side_b": "r5:1217-1218 (R5-LAYOUT-REC5): send them \"only when an isolation flag is set\"; r6-infrastructure.md:609-610 (R6-HOST-REC1): send them \"on previews when R1-BND-REC5's option G3 is on\"; r1-simulation-core.md:2248-2249 (R1-BND-REC5): production not isolated at the start",
+   "why": "If every preview is isolated, Mustafa's Brave check runs a header set production will not ship. R5's layout part and R6 put isolation behind a flag.",
+   "existing_oq": "R5-XQ-OQ3 (R5's two parts; R6's flag wording not included)",
+   "decided_by": "engine-architect in ADR-0002 (headers per environment), with R1-BND-REC2 mark 5 deciding production isolation"
+  },
+  {
+   "rank": 23,
+   "kind": "contradiction",
+   "topics": [
+    "R2",
+    "R6"
+   ],
+   "ids": [
+    "R2-TRN-REC5",
+    "R6-HOST-REC4",
+    "R2-TRN-OQ4"
+   ],
+   "side_a": "r2-netcode.md:2667 (R2-TRN-REC5): \"Production: a publicly trusted certificate per game server hostname.\"",
+   "side_b": "r6-infrastructure.md:664-668 (R6-HOST-REC4): \"one wildcard certificate for the game-server names (option C2) ... This departs from R2-TRN-REC5's wording ... one private key sits on every game VM\"",
+   "why": "R6 states the departure itself. A shared private key on every VM is a security trade that neither topic settles.",
+   "existing_oq": "R6-SEC-OQ1 (lists the shared key) and R2-TRN-OQ4",
+   "decided_by": "ADR-0006, after the security baseline accepts or rejects a shared key (per-hostname certificates are R6's fallback)"
+  },
+  {
+   "rank": 24,
+   "kind": "gap",
+   "topics": [
+    "R4",
+    "R5"
+   ],
+   "ids": [
+    "R4-NAV-REC1",
+    "R4-FLOORS-REC3",
+    "R4-PHYS-REC2",
+    "R5-LAYOUT-REC2",
+    "R5-GATE-REC1"
+   ],
+   "side_a": "r4-physics-navigation.md:790-791 (R4-NAV-REC1): \"The bake runs in the editor's Test, on map save and in CI\" (mark 1, r4:814-815: \"≤ 1 s native and ≤ 3 s in a browser Worker\"); r4:924-925 (R4-FLOORS-REC3): stale tuning \"makes CI and the editor's validation panel report the map's navigation as stale\"; r4:1139-1140, 1148-1149: pointers to R5 (BVH counting test, parity fuzz, reachability from Node and CI, stall-rate comparison)",
+   "side_b": "Missing answer. R5 cites no R4 id. R5-LAYOUT-REC2 (r5-toolchain-quality.md:1169-1176) has no crate for the bake generator (rerecast or the layered grid) and says \"No other crate or package until a §6 item asks for it\"; G0-G12 (r5:1634-1653) have no bake or stale-bake check (R4's items appear only as inputs, r5:987-988)",
+   "why": "Where the bake code lives decides whether the generator ships in the player's Wasm (R4-NAV-REC4 wants a bot-free build to skip navigation data) and how the editor runs it in a Worker. The gate does not include R4's checks.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0002 (crate list and gate checks) with ADR-0004 (navigation)"
+  },
+  {
+   "rank": 25,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "ids": [
+    "R1-DATA-OQ11",
+    "R5-LAYOUT-REC5",
+    "R3-WGPU-REC4"
+   ],
+   "side_a": "r1-simulation-core.md:2731-2737 (R1-DATA-OQ11): \"EDITOR_V2 §5 keeps editor.html runnable by double-click; whether the Wasm validator loads from `file://` was not researched. Decides it: ADR-0002 (code structure and build) and R5's build research.\"",
+   "side_b": "Missing answer. R5 never mentions `file://` or double-click; r5-toolchain-quality.md:1215-1217 (R5-LAYOUT-REC5) builds the editor as a Vite entry with a module Worker loaded \"with `new Worker(new URL(...), import.meta.url)`\"; r3-rendering.md:937-938 (R3-WGPU-REC4): \"the game is served from a secure context (HTTPS, or localhost in development)\"",
+   "why": "R1 hands this question to R5, and R5's editor build does not address the double-click rule EDITOR_V2 keeps.",
+   "existing_oq": "R1-DATA-OQ11",
+   "decided_by": "ADR-0002 (editor build), or Mustafa if EDITOR_V2 §5's double-click rule must change"
+  },
+  {
+   "rank": 26,
+   "kind": "gap",
+   "topics": [
+    "R3",
+    "R6"
+   ],
+   "ids": [
+    "R3-GL2-OQ2",
+    "R3-BUDGET-OQ1",
+    "R6-TEL-REC1",
+    "R6-OBS-OQ5"
+   ],
+   "side_a": "r3-rendering.md:1300-1301 (R3-GL2-OQ2): \"Decided by: client telemetry of the backend after launch (R6's telemetry)\"; r3:1409-1410: \"the backend in use and the adapter info are worth one field in the client's session report\"",
+   "side_b": "r6-infrastructure.md:874-875 (R6-OBS-OQ5): \"Client performance in the field ... worth a per-match summary in the match record? R3 owns how it is measured. Decided by: R3 and the synthesis.\"; R6-TEL-REC1 (r6:756-770) records server-side data only, with no client session report",
+   "why": "Each topic hands client-side field data (backend share, hardware mix, frame time) to the other. No recommendation creates it, yet R3's fallback-share and hardware questions depend on it.",
+   "existing_oq": "R3-GL2-OQ2, R3-BUDGET-OQ1, R6-OBS-OQ5",
+   "decided_by": "The synthesis: ADR-0003 (what is measured) and ADR-0006 (where it is stored, under R6-OBS-REC4's data rules)"
+  },
+  {
+   "rank": 27,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R2"
+   ],
+   "ids": [
+    "R1-ECS-REC3",
+    "R1 pointer to R2 (tick wrap)",
+    "R2 worked estimate",
+    "R2-ROOM-REC1"
+   ],
+   "side_a": "r1-simulation-core.md:1947-1949 (R1-ECS-REC3): \"one id (kind, index, generation) for every entity ... used ... in snapshots\"; r1:2924-2925: \"a 16-bit tick on the wire wraps every 18.2 minutes at 60 Hz (inferred arithmetic)\"",
+   "side_b": "r2-netcode.md:1747: delta soldier record \"7-bit index\" with no generation bits; r2:2711 (R2-ROOM-REC1): match length \"about 20 min\"; R2 does not state a wire tick width",
+   "why": "R2's byte budget has no room for R1's generational ids, and with a 16-bit tick a 20-minute match at 60 Hz wraps. R2 does not answer either pointer.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0001 (wire id and tick widths), recomputing R2-BUD-REC2's estimate"
+  },
+  {
+   "rank": 28,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R2",
+    "R6"
+   ],
+   "ids": [
+    "R1-RR-OQ3",
+    "R2 pointer to R1 (trap recovery)",
+    "R6-OBS-REC3"
+   ],
+   "side_a": "r2-netcode.md:3281-3282: \"the client needs a restart that resyncs from the server's full snapshot (R2-XU-OQ6). R1 owns that recovery (Rust review, risk 4).\"",
+   "side_b": "r1-simulation-core.md:2848-2852 (R1-RR-OQ3): \"the Worker restarts from the server's snapshot after a trap ... Decides it: the synthesis (ADR-0002, ADR-0004).\" No R1 recommendation covers it; R6-OBS-REC3 only reports traps",
+   "why": "R2 says R1 owns client-trap recovery; R1 leaves it to the synthesis. No topic recommends it.",
+   "existing_oq": "R1-RR-OQ3",
+   "decided_by": "ADR-0004 (worker restart) with ADR-0001 (resync path, R2-XU-OQ6) and ADR-0002 (panic strategy)"
+  },
+  {
+   "rank": 29,
+   "kind": "contradiction",
+   "topics": [
+    "R1",
+    "R5"
+   ],
+   "ids": [
+    "R1-DET-REC5",
+    "R1-ECS-REC2",
+    "R5-RUSTLINT-REC2",
+    "R5-RUSTLINT-OQ5"
+   ],
+   "side_a": "r1-simulation-core.md:2157 (R1-DET-REC5): \"hash maps serve lookups only and are never iterated where the order can change an outcome\"; r1:1928-1929 (R1-ECS-REC2): \"The sim never iterates a default-hasher HashMap or HashSet\"",
+   "side_b": "r5-toolchain-quality.md:1317-1318 (R5-RUSTLINT-REC2): `disallowed-types` = `std::collections::HashMap`, `std::collections::HashSet` in the sim crate (the type, crate-wide)",
+   "why": "R1 allows HashMap lookups in the sim, while R5's lint bans the type outright.",
+   "existing_oq": "R5-RUSTLINT-OQ5",
+   "decided_by": "engine-architect in ADR-0004 (with an `#[allow]`-with-reason rule in ADR-0002)"
+  },
+  {
+   "rank": 30,
+   "kind": "hidden dependency",
+   "topics": [
+    "R2",
+    "R4"
+   ],
+   "ids": [
+    "R2-SYNC-OQ5",
+    "R2-SYNC-REC7",
+    "R4-PHYS-OQ1",
+    "R4-NAV-OQ5",
+    "R4-NAV-REC3"
+   ],
+   "side_a": "r2-netcode.md:2873-2877 (R2-SYNC-OQ5): \"Soldiers could not collide with each other, collide softly, or collide fully. What decides it: a game-design call ... and the REC7 spike's correction rate.\"",
+   "side_b": "r4-physics-navigation.md:1043-1045 (R4-PHYS-OQ1): \"Do soldiers block each other ... Does a vehicle push, stop or crush a soldier ... What decides it: the game-designer with Mustafa, then REC4's spike.\" (R4-NAV-OQ5 repeats it for avoidance)",
+   "why": "The same rule is asked twice, with different spikes named. R2-SYNC-REC7 mark 3 and R4-NAV-REC3's avoidance marks both depend on one answer.",
+   "existing_oq": "R2-SYNC-OQ5, R4-PHYS-OQ1, R4-NAV-OQ5",
+   "decided_by": "The game-designer with Mustafa, stated once in the synthesis (ADR-0004 and ADR-0001)"
+  },
+  {
+   "rank": 31,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R5"
+   ],
+   "ids": [
+    "R1-XU-OQ8",
+    "R1-BND-REC4",
+    "R1-DATA-REC3",
+    "R5-LAYOUT-REC3"
+   ],
+   "side_a": "r1-simulation-core.md:2798-2802 (R1-XU-OQ8): content TypeScript types from ts-rs (R1-BND-REC4) or the schemars schema (R1-DATA-REC3); \"What decides it: the content-data decision draft (docs/adr/0005), with R5.\"",
+   "side_b": "r5-toolchain-quality.md:1191-1194 (R5-LAYOUT-REC3): ts-rs output \"the JSON Schema of R1-DATA-REC3 and the output-block layout of R1-BND-REC4 (D4) write to the same package\": both generators kept, none chosen as content types' source",
+   "why": "R5 gives the outputs one home but does not choose between the two sources for content types.",
+   "existing_oq": "R1-XU-OQ8",
+   "decided_by": "ADR-0005 (content data), with ADR-0002"
+  },
+  {
+   "rank": 32,
+   "kind": "hidden dependency",
+   "topics": [
+    "R2",
+    "R5"
+   ],
+   "ids": [
+    "R5-TEST-REC4",
+    "R2-XU-OQ12",
+    "R2-BUD-REC1",
+    "R2-BUD-REC4",
+    "R2-INT-REC1"
+   ],
+   "side_a": "r5-toolchain-quality.md:1451-1457 (R5-TEST-REC4): \"Profiles: R2's P0–P4 and B1 by name; every network pass mark of R2 names its profile ... one named set settles R2-XU-OQ12\"",
+   "side_b": "r2-netcode.md:2301 (R2-BUD-REC1) and r2:2357 (R2-BUD-REC4): marks at \"100 ms RTT, ±10 ms jitter, 2 % loss\" (P2 is ±20 ms, r2:1983); r2:3164-3169 (R2-XU-OQ12): interest and rooms marks use \"latency\" without saying round trip or one way",
+   "why": "R5 treats R2's profile set as settled, but R2's own marks still use other jitter values and unnamed latencies, so some R2 marks cannot be run as R5 specifies.",
+   "existing_oq": "R2-XU-OQ12",
+   "decided_by": "The synthesis (ADR-0001) restates every R2 mark against a named profile"
+  },
+  {
+   "rank": 33,
+   "kind": "gap",
+   "topics": [
+    "R3",
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R5-CI-OQ5",
+    "R5-TEST-OQ4",
+    "R5-XQ-OQ1",
+    "R3-MEASURE-OQ2",
+    "R6-COST-REC1"
+   ],
+   "side_a": "r5-toolchain-quality.md:1943-1944 (to R6): \"whether a GPU runner (R5-CI-OQ5) or more than 10 GB of cache (R5-CI-F5, Pro account) would ever be paid\"; r5:1784 (R5-TEST-OQ4): macOS run cost \"Decides it: infra-engineer (R5-CI) and R6\"; r3-rendering.md:1373-1374 (R3-MEASURE-OQ2): self-hosted reference machines in CI \"Decided by: R5 and R6\"",
+   "side_b": "Missing answer. R6 cites no R5 or R3 id, and R6-COST's lines (r6-infrastructure.md:467-476, 481-490) include no CI runner, GPU runner, macOS runner or cache cost",
+   "why": "Real-Safari runs, WebGPU coverage in CI and reference-machine runs all depend on costs no topic sets.",
+   "existing_oq": "R5-CI-OQ5, R5-TEST-OQ4, R5-XQ-OQ1, R3-MEASURE-OQ2",
+   "decided_by": "ADR-0006 (costs) with ADR-0002 (CI); Mustafa for any paid plan"
+  },
+  {
+   "rank": 34,
+   "kind": "hidden dependency",
+   "topics": [
+    "R5",
+    "R6"
+   ],
+   "ids": [
+    "R6-OBS-REC3",
+    "R5-GATE-REC3",
+    "R5-PREV-REC1"
+   ],
+   "side_a": "r6-infrastructure.md:957-958 (to R5): \"CI uploads Wasm debug files to Sentry (a token: Mustafa's secret) and strips them from the shipped build; the gate v2's smoke test needs reporting off or the endpoints allowed (legacy TL9)\"",
+   "side_b": "r5-toolchain-quality.md:1701 (R5-GATE-REC3, G12 mutation): \"an outbound request to an external host\" must fail the gate; r5:1946-1947: \"the preview deploy job is the first CI job with a secret\" (no Sentry upload job)",
+   "why": "R6's crash reporting adds a CI secret job and an external endpoint that R5's CI design and smoke check do not allow for.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0002 (CI jobs, secrets and the smoke test's network rule) with ADR-0006"
+  },
+  {
+   "rank": 35,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "ids": [
+    "R3-AUDIO-REC3",
+    "R3-AUDIO-OQ5",
+    "R4-LOS-REC1",
+    "R1-BND-REC1"
+   ],
+   "side_a": "r3-rendering.md:1252-1253 (R3-AUDIO-REC3): occlusion rays \"need floors and heights, the simulation's data for VISION_V2 §6.2, which R4's line-of-sight work owns; the rays would reuse it\"; r3:1392-1393 (R3-AUDIO-OQ5): \"Decided by: R4 and the synthesis\"",
+   "side_b": "Missing answer. R4 never mentions audio; r4-physics-navigation.md:929-930 (R4-LOS-REC1) lists the query's users as \"bots, blasts, melee, the shield check and the shared visibility pass\"; r1-simulation-core.md:2206: the page makes zero calls into Wasm",
+   "why": "Page-side audio rays would need the sim's query across a boundary that allows no page calls. This only matters if option O-B is adopted.",
+   "existing_oq": "R3-AUDIO-OQ5",
+   "decided_by": "ADR-0003 with ADR-0004, only if R3-AUDIO-REC3's spike asks for O-B"
+  },
+  {
+   "rank": 36,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R5"
+   ],
+   "ids": [
+    "R1-ABL-REC6",
+    "R1 pointer to R5 (tick benches)",
+    "R5-TEST-REC1",
+    "R5-TEST-OQ8"
+   ],
+   "side_a": "r1-simulation-core.md:2405 (R1-ABL-REC6): \"A spike must prove: the numbers above, measured with the method R5 sets.\"; r1:2948: \"a Rust tick bench and a Worker tick bench in CI (R1-TICK-REC2 P1–P3)\"",
+   "side_b": "r5-toolchain-quality.md:1395 (R5-TEST-REC1): benchmarks \"the tool was not read (R5-TEST-OQ8)\" and \"never a gate pass or fail\"; r5:1791-1796 (R5-TEST-OQ8): the bench harness not researched",
+   "why": "R1's budget marks wait on a measuring method R5 has not chosen.",
+   "existing_oq": "R5-TEST-OQ8",
+   "decided_by": "ADR-0002 (bench tool and method)"
+  },
+  {
+   "rank": 37,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R3"
+   ],
+   "ids": [
+    "R1 pointer to R3",
+    "R1-BND-OQ6"
+   ],
+   "side_a": "r1-simulation-core.md:2937-2938 (to R3): \"rendering in a worker with OffscreenCanvas (boundary-worker option A3) and a per-entity or per-field layout for instancing (R1-BND-OQ6)\"",
+   "side_b": "Missing answer. R3 never mentions OffscreenCanvas, and R3-CHAR-REC3 (r3-rendering.md:1058-1060) writes per-instance data \"from the per-tick block into preallocated typed arrays\" without choosing a per-entity or per-field layout",
+   "why": "R1 asks R3 for two inputs to the block layout, and R3 gives neither.",
+   "existing_oq": "R1-BND-OQ6",
+   "decided_by": "ADR-0003 with ADR-0004 (block layout), measured in the R1-BND-REC2 spike"
+  },
+  {
+   "rank": 38,
+   "kind": "gap",
+   "topics": [
+    "R1",
+    "R6"
+   ],
+   "ids": [
+    "R1-BND-OQ5",
+    "R1-BND-REC5",
+    "R1 pointer to R6"
+   ],
+   "side_a": "r1-simulation-core.md:2649-2651 (R1-BND-OQ5): third-party embeds or cross-origin popups \"Decides: Mustafa (VISION_V2 §5) with R6\"; r1:2957-2958: \"whether preview and production hosting can set COOP, COEP and CORP headers, and third-party embeds and the later login flow under isolation\"",
+   "side_b": "r6-infrastructure.md:937-940 answers COOP and COEP per host only; no R6 text covers CORP, embeds or the login flow",
+   "why": "These are part of R1-BND-REC5's isolation cost, which R6 was asked to report.",
+   "existing_oq": "R1-BND-OQ5",
+   "decided_by": "Mustafa with ADR-0006, only if production isolation is adopted (R1-BND-REC2 mark 5)"
+  },
+  {
+   "rank": 39,
+   "kind": "gap",
+   "topics": [
+    "R2",
+    "R3"
+   ],
+   "ids": [
+    "R2-INT-REC2",
+    "R2-INT-OQ1",
+    "R3-WGPU-REC3"
+   ],
+   "side_a": "r2-netcode.md:3289-3290 (to R3): \"the client cutaway (GW17) must follow the same visibility rule as R2-INT-REC2; the look brief decides how it looks\"",
+   "side_b": "r3-rendering.md:928-929 (R3-WGPU-REC3) mentions only \"the cutaway's blend-state toggle (GW17)\" as a shader variant; R3 states no visibility rule",
+   "why": "This is a pointer R3 does not take up. It stays look brief pending and depends on R2-INT-OQ1.",
+   "existing_oq": "R2-INT-OQ1",
+   "decided_by": "The look brief and Mustafa (R2-INT-OQ1), then ADR-0003"
+  },
+  {
+   "rank": 40,
+   "kind": "hidden dependency",
+   "topics": [
+    "R1",
+    "R4",
+    "R5"
+   ],
+   "ids": [
+    "R5-CI-OQ1",
+    "R1-ECS-REC1",
+    "R4-PHYS-REC1"
+   ],
+   "side_a": "r5-toolchain-quality.md:1801-1802 (R5-CI-OQ1): cache sizes for \"a Cargo workspace like ours (native plus wasm32, bevy_ecs or hecs, Rapier, quinn and wtransport)\"",
+   "side_b": "r1-simulation-core.md:1878-1879 (R1-ECS-REC1): \"no ECS crate\"; r4-physics-navigation.md:663 (R4-PHYS-REC1): \"No physics engine: use parry3d\"",
+   "why": "R5's cache question assumes crates R1 and R4 recommend against, so it sizes a workspace no topic proposes.",
+   "existing_oq": "none",
+   "decided_by": "ADR-0002 (crate list), then the cache spike (R5-CI-REC1 mark 2)"
+  },
+  {
+   "rank": 41,
+   "kind": "wrong cross-reference",
+   "topics": [
+    "R1",
+    "R5"
+   ],
+   "ids": [
+    "R5-PREV-REC4",
+    "R1-BND-REC5",
+    "R1-BND-REC2"
+   ],
+   "side_a": "r5-toolchain-quality.md:1609-1610 (R5-PREV-REC4): \"(R1-BND-REC5 G3; production stays non-isolated until REC5's test decides)\"",
+   "side_b": "r1-simulation-core.md:2249 (R1-BND-REC5): \"Adopt it in production only if the spike's B2-against-B3 test passes REC2's threshold\": the deciding test is R1-BND-REC2 mark 5, not a REC5 test (and inside R5's section a bare \"REC5\" reads as R5-PREV-REC5)",
+   "why": "This is an ambiguous pointer to the test that decides production isolation.",
+   "existing_oq": "none",
+   "decided_by": "An editorial fix in the synthesis (cite R1-BND-REC2 mark 5)"
+  }
+ ]
+}
