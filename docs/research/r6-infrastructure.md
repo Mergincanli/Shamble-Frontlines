@@ -5,7 +5,7 @@
 - **Topic:** R6, infrastructure (`docs/V2_PHASE0_BRIEF.md` §4, row R6).
 - **Author agent:** infra-engineer (wave 2 of `.checkpoints/v2-research/plan.md`: one owner agent per topic).
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** draft: spot-check pending.
+- **Status:** spot-checked (19 of 40 key claims).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R6):** "Hosting for previews and
   EU game servers; costs; logs, metrics and crash reports; balance telemetry (VISION_V2 §6.6); security baseline
   (content security policy, dependency audits, anti-cheat basics)"
@@ -25,7 +25,7 @@
 Notes file: `infra-engineer-r6.md` (one summary per source, saved as read).
 
 Totals: 43 findings, 13 recommendations, 23 open questions, 42 sources read (41 official, 0 shipped game, 1 other;
-plus `docs/LOOP_V2.md` as a project input, not counted), 17 sources not read.
+plus `docs/LOOP_V2.md` as a project input, not counted), 20 sources not read.
 
 **How to read this file.**
 - Wave 1's findings and recommendations are cited by id (R1-…, R2-…), never copied as R6 findings. Legacy ids (CD2,
@@ -40,7 +40,7 @@ plus `docs/LOOP_V2.md` as a project input, not counted), 17 sources not read.
   decided, and nothing here touches the look.
 
 ## 2. TL;DR
-- Client and per-PR previews: Cloudflare (Workers static assets, or Pages) sends COOP and COEP from a `_headers` file, gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
+- Client and per-PR previews: Cloudflare (Workers static assets, or Pages) can send COOP and COEP from a `_headers` file (inferred: it takes any header), gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
 - Game servers: Hetzner Cloud in one EU location, one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME.
 - Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start; about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 48-player rooms stay inside one VM's included 20 TB of traffic.
 - Operations: `tracing` JSON logs, Prometheus-format metrics with bounded labels (tick overruns, fallback share), Sentry with Wasm debug files in its EU region with IP collection off, Reporting API crash reports; all data in the EU; the law itself was not read (outside the allow list).
@@ -71,7 +71,9 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
   https://developers.cloudflare.com/pages/platform/limits/ ("Last updated Sep 5, 2026") · official · read 2026-10-28 ·
   confirmed in the source: "Cloudflare Pages sites can contain up to 20,000 files on the Free plan."; "The maximum file
   size for a single Cloudflare Pages site asset is 25 MiB."; "You can have an unlimited number of preview deployments
-  active on your project at a time." The build counts are inferred (WebFetch summary, not quoted).
+  active on your project at a time."; "Paid plans (such as Pro, Business, and Enterprise plans) can have up to 100,000
+  files per site." The build counts are confirmed as table cells ("Builds per month": 500 / 5,000 / 20,000, the
+  verifier's re-read).
 - **R6-HOST-F4.** Cloudflare Pages gives each branch a hash URL plus a branch alias that follows the branch's newest
   commit, and these URLs are public by default; an access policy (Cloudflare Access) can limit previews to the account's
   members. Source: https://developers.cloudflare.com/pages/configuration/preview-deployments/ ("Last updated Oct 12,
@@ -133,7 +135,9 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
   there. Sources: https://docs.hetzner.com/cloud/general/locations (Last change 2021-11-03) and
   https://www.hetzner.com/cloud (no date, © 2026) · official · read 2026-10-28 · confirmed in the source: "DE
   Falkenstein `fsn1`", "DE Nuremberg `nbg1`", "FI Helsinki `hel1`"; "available to you in Germany, Finland, Singapore,
-  and the USA." Which type runs where is inferred (the availability grid is flattened in the fetch).
+  and the USA." Which type runs where is inferred (the availability grid is flattened in the fetch). The verifier's
+  re-read of the product pages found the location column "NBG1 HEL1" (no FSN1) for CX23, CX33, CX43, CAX21, CCX13,
+  CCX23 and CCX33, so these plans may not be offered in Falkenstein (unverified for the same reason).
 - **R6-HOST-F14.** Hetzner sells shared vCPU plans as suited to development and variable load, and dedicated vCPU plans
   for "highly predictable resources", naming gaming servers. Source: https://www.hetzner.com/cloud · official · read
   2026-10-28 · confirmed in the source: "Shared cloud plans are perfect for development and testing environments.";
@@ -144,11 +148,12 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
   traffic included unless said): shared Intel/AMD CX23 2 vCPU / 4 GB 5.99 (0.0096), CX33 4 vCPU / 8 GB 8.99 (0.0144),
   CX43 8 vCPU / 16 GB 16.49 (0.0264); shared Arm CAX21 4 vCPU / 8 GB 10.99 (0.0176); shared AMD CPX32 4 vCPU / 8 GB
   35.99 (0.0577); dedicated AMD CCX13 2 vCPU / 8 GB 43.49 (0.0697), CCX23 4 vCPU / 16 GB 86.49 (0.1386), CCX33 8 vCPU /
-  32 GB 138.99 (0.2227; 30 TB). The tables sit under the heading "Price incl. IPv4". Sources:
+  32 GB 138.99 (0.2227; 30 TB). The general-purpose tables sit under the heading "Price incl. IPv4". Sources:
   https://www.hetzner.com/cloud/cost-optimized, https://www.hetzner.com/cloud/regular-performance,
   https://www.hetzner.com/cloud/general-purpose (no dates, © 2026) · official · read 2026-10-28 · confirmed in the
-  source (table values as extracted; WebFetch rendered the tables, so the numbers are confirmed as table cells, not as
-  sentences).
+  source as table cells (WebFetch rendered the tables; the verifier re-read them): CX33 "€ 8.99 per month, excl. VAT",
+  "€ 0.0144 per hour, excl. VAT", "20 TB"; CCX23 "€ 86.49 per month, excl. VAT", "€ 0.1386 per hour, excl. VAT";
+  CCX13 "€ 43.49 per month, excl. VAT"; CCX33 "30 TB", "€ 138.99"; CAX21 "€ 10.99"; CX23 "€ 5.99"; CX43 "€ 16.49".
 - **R6-HOST-F16.** Hetzner charges for extra EU traffic per TB at 1.00 EUR, excluding VAT; the page's own sentence reads
   "per hour", which looks like a rendering error. Source: the three product pages of F15 · official · read 2026-10-28 ·
   confirmed in the source (the words): "For each additional TB at EU-Central locations we charge € 1.00 per hour, excl.
@@ -175,10 +180,12 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
 - **R6-HOST-F21.** Hetzner's load balancer overview names no protocols, so UDP support behind a Hetzner load balancer is
   unverified. Source: https://docs.hetzner.com/cloud/load-balancers/overview (Last change 2021-12-23) · official · read
   2026-10-28 · inferred (absence of a statement).
-- **R6-HOST-F22.** Fly.io prices (USD per month, Ashburn): performance-1x 2 GB 33.00, performance-2x 4 GB 66.00,
-  performance-4x 8 GB 132.01; egress in North America and Europe 0.02 USD per GB; a dedicated IPv4 2.00 USD per month.
+- **R6-HOST-F22.** Fly.io prices (USD per month, Ashburn; hourly rate in brackets): performance-1x 2 GB 33.00 (0.0458),
+  performance-2x 4 GB 66.00 (0.0917), performance-4x 8 GB 132.01 (0.1833); egress in North America and Europe 0.02 USD per GB; a dedicated IPv4 2.00 USD per month.
   Source: https://fly.io/pricing/ (no date) · official · read 2026-10-28 · confirmed in the source: "Egress, North
-  America and Europe | $0.02 / GB"; "Dedicated IPv4 | $2.00 / mo"; "$33.00", "$66.00", "$132.01". Fly.io's UDP page was
+  America and Europe | $0.02 / GB"; "Dedicated IPv4 | $2.00 / mo"; "| performance-1x · 2GB | $0.0458 | $33.00 |";
+  "| performance-2x · 4GB | $0.0917 | $66.00 |"; "| performance-4x · 8GB | $0.1833 | $132.01 |" (hourly rates from
+  the verifier's re-read). Fly.io's UDP page was
   not read (it redirects to docs.fly.io, outside the allow list).
 - **R6-HOST-F23.** Amazon GameLift Servers charges by instance hour only: network bandwidth is free on instance
   generation 6 and later. Its example rate for a c6a.large (2 vCPU, 4 GB) is 0.099 USD per hour on demand and 0.03 USD
@@ -199,7 +206,9 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
 - **TL9 (smoke test):** today's gate fails on any network request or WebSocket. A v2 preview that talks to a game server
   needs the gate v2 (R5) to allow the preview's own origins; the hosting choice must give a stable origin list.
 - **TL15 (perfbots):** 48 soldiers cost 0.80–1.00 ms per legacy JavaScript step: the only CPU number for sizing a
-  48-player room before the spike (R2-BUD-REC6 rests on it too).
+  48-player room before the spike. R2-BUD-REC6 uses the same 0.80–1.00 ms figure but cites it as "legacy CM4"
+  (r2-netcode.md:2382), which in `docs/LEGACY_INVENTORY.md` is the DM_Tri map row; the measurement is TL15's, so the id
+  slip is R2's.
 
 ### 2. Costs (R6-COST)
 
@@ -207,7 +216,8 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
   14 days of retention, 3 active users, 50k frontend sessions per month. Source: https://grafana.com/pricing/ (no date,
   © 2026; the first fetch returned HTTP 502, the second worked) · official · read 2026-10-28 · confirmed in the source:
   "Limited to 10k active series per month"; "Limited to 50 GB ingested per month" (logs, and the same for traces);
-  "Limited to 3 active users per month"; "Limited to 50k sessions per month". The 14-day retention is inferred (summary).
+  "Limited to 3 active users per month"; "Limited to 50k sessions per month"; "14 days retention" (metrics), "14 day
+  retention" (logs, traces), the last two from the verifier's re-read.
 - **R6-COST-F2.** Grafana Cloud Pro: a 19 USD monthly platform fee plus usage: metrics from 6.50 USD per 1k series; logs
   and traces 0.05 USD per GB processed, 0.40 USD per GB written, 0.10 USD per GB retained. Source: as F1 · official ·
   read 2026-10-28 · confirmed in the source: "Platform fee of $19 per month"; "Starts at $6.50/ 1k series";
@@ -227,8 +237,9 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
 - **R6-COST-F5.** Hetzner Object Storage: 6.49 EUR per month base, including 1 TB stored and 1 TB of egress, in
   Falkenstein, Nuremberg and Helsinki. Source: https://www.hetzner.com/storage/object-storage (no date, © 2026) ·
   official · read 2026-10-28 · confirmed in the source: "We charge a base price of € 6.49 per month, excl. VAT per
-  month."; "Storage: € 0.0087 per hour, excl. VAT per TB-hour." The included 1 TB and the locations are inferred
-  (summary).
+  month."; "Storage: € 0.0087 per hour, excl. VAT per TB-hour."; "This base price includes 1 TB of storage (up to 744
+  TB-hours) and 1 TB of egress traffic."; "Falkenstein, DE (FSN1), Helsinki, FI (HEL1), and Nuremberg, DE (NBG1)." (the
+  last two from the verifier's re-read).
 
 Prices from R6-HOST used here (not repeated as findings): Hetzner servers R6-HOST-F15 (CX33 8.99 EUR/mo, 0.0144/h;
 CCX23 86.49 EUR/mo, 0.1386/h; 20 TB traffic included), extra traffic R6-HOST-F16 (1 EUR per TB, inferred reading),
@@ -286,7 +297,8 @@ no egress charge; Workers Paid minimum 5 USD); Fly.io R6-HOST-F22 (0.02 USD per 
   "we require debug information files to be augmented by a `build_id` custom section."; "upload your WebAssembly debug
   information files to Sentry or use a symbol server."; "We provide a tool called wasm-split that can automatically add
   this section if missing."; "use the `@sentry/wasm` package and apply its `wasmIntegration`"; "This feature is still
-  developing, so may be rough around the edges." (The JavaScript Wasm integration page returned 404.)
+  developing, so may be rough around the edges." (The JavaScript Wasm integration page returned 404.) The word "DWARF"
+  is a paraphrase: it sits in a link the fetch dropped ("if your compiler can output" [link]).
 - **R6-OBS-F8.** The Reporting API (Baseline 2026, newly available since March 2026) sends reports to endpoints named
   in a `Reporting-Endpoints` header; its types include `crash`, `coep`, `coop` and `csp-violation`; crash reports
   cannot be observed in JavaScript because the page has crashed, but they reach an endpoint. Source:
@@ -303,7 +315,9 @@ no egress charge; Workers Paid minimum 5 USD); Fly.io R6-HOST-F22 (0.02 USD per 
   Source: https://docs.sentry.io/organization/data-storage-location/ (no date) · official · read 2026-10-28 · confirmed
   in the source: "Sentry supports data storage in both the US and the EU."; "Frankfurt, Germany."; "once selected, your
   data storage location can’t be changed."; "Here’s a list of the types of data that may be stored in the US,
-  regardless of your selected Data Storage Location." Which types are on the list is inferred (summary).
+  regardless of your selected Data Storage Location."; the list, from the verifier's re-read: "User accounts,
+  notification settings, and 2FA authenticators"; "Organization settings, configurations, and teams"; "Access tokens
+  for users and organizations"; "DSN keys"; "Cron check-ins"; "Detailed usage data".
 - **R6-OBS-F10.** Sentry's JavaScript SDK sends the user's IP address by default; `dataCollection: { userInfo: false }`
   turns it off, and IPs can still arrive in headers, cookies or query strings unless denied. Source:
   https://docs.sentry.io/platforms/javascript/data-management/data-collected/ (no date) · official · read 2026-10-28 ·
@@ -383,8 +397,8 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 | Option | COOP/COEP | Previews | Privacy of previews | Cost and limits | Risk |
 |---|---|---|---|---|---|
 | A. Cloudflare Workers static assets (or Pages) | Yes, `_headers` (F1, F2; COOP/COEP by name inferred) | Per branch (F4, F6), unlimited (F3) | Public by default; Cloudflare Access can limit them (F4, inferred) | Static requests free, no egress charge (F5); 25 MiB per file, 20,000 files (F3, Pages figures) | Code-generated responses need headers set in code (F2) |
-| B. Netlify | Yes, `_headers` (F7) | Deploy previews (inferred from F7) | Not read | Prices not read (outside allow list) | Headers cannot differ per context without a build trick (F7): G3 (isolated previews, not production) needs that trick |
-| C. Vercel | Yes, `vercel.json` (F8) | Yes; protected by default on all plans (F10) | Vercel Authentication: viewers need a Vercel account (F10) | Hobby is non-commercial only (F9); Pro 20 USD per seat per month | Commercial use forces Pro |
+| B. Netlify | Yes, `_headers` (F7; COOP/COEP by name inferred) | Deploy previews (inferred from F7) | Not read | Prices not read (outside allow list) | Headers cannot differ per context without a build trick (F7): G3 (isolated previews, not production) needs that trick |
+| C. Vercel | Yes, `vercel.json` (F8; COOP/COEP by name inferred) | Yes; protected by default on all plans (F10) | Vercel Authentication: viewers need a Vercel account (F10) | Hobby is non-commercial only (F9); Pro 20 USD per seat per month | Commercial use forces Pro |
 | D. GitHub Pages | No (F11, F12) | Not per PR natively (not read) | Public | 1 GB, 100 GB per month soft (F11) | Cannot meet R1-BND-REC5's G3 (isolation in previews) |
 | E. Serve the client from the game VMs (our own web server) | Yes (our server) | Our own work | Our own work | VM traffic (F15, F16) | Every preview, cache and certificate is ours to run: generic work no §6 item asks for |
 
@@ -407,8 +421,9 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
   only "if R6 picks short-lived ephemeral servers". G1/G2 keep VMs warm (F17), so they are not ephemeral.
 
 #### Q4. The starting region
-- Falkenstein or Nuremberg (Germany) or Helsinki (Finland), all in Hetzner's one EU zone (F13). No latency source was
-  read for any of them: the choice is a measurement.
+- Nuremberg (Germany) or Helsinki (Finland), in Hetzner's one EU zone (F13); Falkenstein (Germany) only if the plans
+  of R6-HOST-REC2 are offered there (their product pages list "NBG1 HEL1", F13). No latency source was read for any of
+  them: the choice is a measurement.
 
 ### 2. Costs (R6-COST)
 
@@ -433,10 +448,11 @@ client (R2). Ingress is free on Hetzner (R6-HOST-F17).
 | Hetzner CCX23, 8 rooms per VM (A-2) | 0.0173 EUR | 0 inside the 20 TB; 0.0032 EUR beyond | 0.1386 EUR/h ÷ 8; 3.16 GB × 1 EUR/TB |
 | Hetzner CCX23, 4 rooms per VM (one per vCPU, R1-ECS-OQ4) | 0.0347 EUR | as above | 0.1386 ÷ 4 |
 | Hetzner CX33, 8 rooms per VM (A-2, if the spike passes on shared vCPU) | 0.0018 EUR | as above | 0.0144 ÷ 8 |
-| Fly.io performance-2x, 4 rooms (A-3) | not computed per hour (monthly price only, R6-HOST-F22) | 0.063 USD | 3.16 GB × 0.02 USD |
+| Fly.io performance-2x, 4 rooms (A-3) | 0.0229 USD | 0.063 USD | 0.0917 USD/h ÷ 4 (R6-HOST-F22); 3.16 GB × 0.02 USD |
 | GameLift c6a.large, 4 rooms (A-3), Ohio rate | 0.025 USD on demand, 0.0075 USD Spot | 0 (gen 6+) | 0.099 or 0.03 USD/h ÷ 4 |
 
-A CCX23 running 8 rooms of 48 humans all month sends 8 × 3.16 GB × 730 h ≈ 18.4 TB, under its 20 TB (R6-HOST-F15):
+A CCX23 running 8 rooms of 48 humans all month sends 8 × 3.156 GB × 730 h ≈ 18.4 TB, under its 20 TB (R6-HOST-F15;
+3.16 in the table is 3.156 rounded, and the GB products here and below use 3.156):
 on Hetzner, egress costs nothing extra even at full load. The same traffic on Fly.io would cost about 369 USD per
 month per such host (18,431 GB × 0.02 USD).
 
@@ -482,7 +498,10 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
 - **K3. Shared-vCPU VMs:** about 9.6 times cheaper per VM; only if the tick p99 on shared hosts passes R2-ROOM-REC2's
   marks at several times of day (R6-HOST-REC2's spike).
 - **K4. Per-GB egress hosts (Fly.io) or managed fleets (GameLift):** per-GB pricing at 3.16 GB per 48-player room-hour
-  costs more than the whole Hetzner fleet (above); GameLift waives bandwidth but its EU rates and SDK were not read.
+  costs more in egress per fully loaded host than the host itself costs on Hetzner (about 369 USD a month against 86.49
+  EUR for a CCX23, above); at the goal's average load, Fly's egress alone (about 276 USD) is of the same order as the
+  whole Hetzner fleet (222.88–345.96 EUR); no exchange rate was read, so the two are not compared further. GameLift
+  waives bandwidth but its EU rates and SDK were not read.
 
 #### Assumptions
 - **A-1.** Every player is human and all are in view (R2's upper bound); bots cost no traffic.
@@ -683,7 +702,8 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   R2-ROOM-REC3 mark 3 says).**
   *Reason:* structured events at little cost (F1, F2); OWASP's exclusions (F12) match R2's log rule.
   *Rests on:* F1, F2, F12; R2-ROOM-REC3 (cited).
-  *Serves:* §6.1 (per-room crash reports and lifecycle, R2-ROOM-REC1, R2-ROOM-OQ9).
+  *Serves:* §4 ("Matches feel fair up to about 100 ms of ping": per-room logs show the tick overruns and room events
+  behind an unfair match); §6.1 (per-room crash reports and lifecycle, R2-ROOM-REC1, R2-ROOM-OQ9).
   *Spike must prove (proposed):* with logging at its production level, tick p99 within 2 % of a run with logging off;
   0 allocations per tick from logging on the hot path (counted); a grep of a 30-minute soak's logs finds 0 tokens,
   secrets or raw IPs.
@@ -716,12 +736,14 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   stripped build); a forced tab crash in Chrome produces a `crash` report at our endpoint (browsers that send none are
   listed); 0 IP addresses in a sample of 100 events.
 - **R6-OBS-REC4. Data protection defaults: every store in the EU (P1), no IP addresses or secrets in logs and reports,
-  and retention capped: logs 14 days, metrics 15 days, crash reports at Sentry's shortest setting (proposed).** The
-  legal side (lawful basis, privacy notice, how long the law allows) is not researched here: R6-OBS-OQ1.
+  and retention capped: logs 14 days, metrics 15 days (proposed); the cap for crash reports is open, because no page
+  read shows whether Sentry lets an organization set its retention (sentry.io is outside the allow list; R6-COST-OQ2's
+  read decides).** The legal side (lawful basis, privacy notice, how long the law allows) is not researched here: R6-OBS-OQ1.
   *Reason:* the EU choice is one-way on both Sentry and Grafana (F9, F11); OWASP asks for bounded retention and no
   personal data in logs (F12); 14 and 15 days are the free tier's and Prometheus's defaults (R6-COST-F1, F5).
   *Rests on:* F5, F9, F10, F11, F12; R6-COST-F1.
-  *Serves:* §6.1 and §6.6 (the data they produce stays within the rules Mustafa sets).
+  *Serves:* no §6 item asks for data protection as a feature; it is the condition under which the stores that §6.1
+  (rooms) and §6.6 (match records) create may run, under rules Mustafa sets (R6-OBS-OQ1).
   *Spike must prove (proposed):* a data map lists every store, its region and its retention, with 0 stores outside the
   EU for event data; data older than the cap is gone on a check one day after the cap.
 
@@ -758,14 +780,17 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   a Parquet compaction job (S2, `parquet` 60.1.0) only once a query needs it.**
   *Reason:* at the goal the volume is about 13 GB a month uncompressed (A-11), well inside 1 TB for 6.49 EUR (R6-COST-F5);
   Hetzner keeps it in the EU next to the servers, while Cloudflare R2's location was not read (S3); Parquet is
-  available in Rust when column queries are needed (F1). The supervisor uploads after exit, so a crashed room's partial
-  buffer can be flushed by the supervisor from a file the room appends to (proposed), and a storage outage only delays
-  uploads (records wait on the VM's disk).
-  *Rests on:* F1; R6-COST-F4, R6-COST-F5; R6-HOST-REC2 (the supervisor); A-11.
+  available in Rust when column queries are needed (F1). The supervisor uploads after exit, so a storage outage only
+  delays uploads (records wait on the VM's disk). A room that crashes loses its in-memory buffer (R6-TEL-REC1 writes at
+  Ended); the supervisor then writes a stub record marked incomplete with the header fields it holds (match id, build,
+  mode, start time, exit reason), so crashed matches are counted, never silently missing (proposed).
+  *Rests on:* F1; R6-COST-F4, R6-COST-F5; R6-HOST-REC2 (the supervisor); R6-TEL-REC1 (the buffer written at Ended);
+  A-11.
   *Serves:* §6.6.
   *Spike must prove (proposed):* with object storage unreachable for 1 hour, 0 records are lost and all upload within
   10 minutes of recovery; a record of schema version n is read by the analysis script for version n+1 (one added
-  field, old records still parse); a room killed with SIGKILL mid-match leaves a partial record marked incomplete.
+  field, old records still parse); a room killed with SIGKILL mid-match leaves a stub record marked incomplete, with
+  its exit reason.
 - **R6-TEL-REC3. Analyse in batches (N1), always grouped by content hash and mode id, with sample sizes shown next to
   every rate.** Derived numbers (proposed definitions, for the game-designer to refine): win rate per faction and per
   base position; unit pick rate (share of human player-time per unit id) and unit win rate (win rate of teams by
@@ -795,19 +820,23 @@ None (deferred).
   it is a real shortage, Netcup, OVHcloud or Scaleway (all outside the allow list, not read) or GameLift (G4) need a
   read.
 - **R6-HOST-OQ2. Which EU location gives the best ping across the player base?** No latency source was read. Decided
-  by: a spike measuring RTT from Mustafa's machine and from playtesters to `fsn1`, `nbg1` and `hel1`, against §4's
-  "about 100 ms".
+  by: a spike measuring RTT from Mustafa's machine and from playtesters to `nbg1` and `hel1` (and `fsn1` only if the
+  chosen plans are offered there: their product pages list "NBG1 HEL1", F13), against §4's "about 100 ms".
 - **R6-HOST-OQ3. Does a later fleet need a UDP load balancer?** Not with host:port from the lobby (R2-ROOM-REC2);
   Hetzner's load balancer page names no protocols (F21). Decided by: whether a later design routes many rooms through
   one address (R2-TRN-F39's connection IDs).
 - **R6-HOST-OQ4. Fly.io and GameLift as fallbacks.** Fly's UDP page is outside the allow list; GameLift's EU prices and
-  server SDK were not read (F23). Decided by: a read of those pages if OQ1 rules Hetzner out.
+  server SDK were not read (F23). Decided by: a read of those pages if OQ1 rules Hetzner out. Hetzner's dedicated root
+  servers (www.hetzner.com, not read in this run) are a further candidate at goal scale; decided by a read of their price
+  and location pages before the goal budget (R6-COST-REC1) is fixed.
 - **R6-HOST-OQ5. Private or only harmless previews?** Cloudflare Access can limit previews to the account (F4,
   inferred); Mustafa's Brave would then need a Cloudflare login. Decided by: Mustafa (convenience against privacy),
   after the security baseline.
 - **R6-HOST-OQ6. Does the wildcard certificate need dns-01, and how long will certificates live?** RFC 8555 leaves both
   to the CA (F24); Let's Encrypt's and the CA/Browser Forum's pages are outside the allow list. Decided by: a read of
-  the chosen CA's policy.
+  the chosen CA's policy. The verifier names a further option, ACME's tls-alpn-01 challenge (RFC 8737, not read in this
+  run), as needing only TCP 443, which the WebSocket fallback may open anyway; decided by a read of RFC 8737 if
+  per-hostname certificates (R6-HOST-REC4's alternative) are wanted.
 - **R6-HOST-OQ7. What does a Hetzner IPv4 address cost today?** The 2022 page says 0.50 EUR per month (F19); the 2026
   tables say "Price incl. IPv4" (F15). Decided by: the price list at sign-up. Under 1 EUR per VM either way.
 
@@ -817,7 +846,8 @@ None (deferred).
   figure (TL15). Decided by: R2-ROOM-REC2's spike on the reference server (R6-HOST-REC2).
 - **R6-COST-OQ2. Sentry's and Grafana's real bills.** Sentry's base prices and the Developer plan's limits are on
   sentry.io (outside the allow list); Grafana's usage depends on the series count R6-OBS sets. Decided by: reading
-  sentry.io/pricing with Mustafa, and R6-OBS's series estimate.
+  sentry.io/pricing with Mustafa (including whether Sentry's retention can be set, R6-OBS-REC4), and R6-OBS's series
+  estimate.
 - **R6-COST-OQ3. How many players, and when?** A-4 and A-5 are placeholders; VISION_V2 gives sizes, not player counts.
   Decided by: playtest data (R6-COST-REC2) and Mustafa's plans.
 - **R6-COST-OQ4. Is included traffic per VM, pooled, or prorated for VMs that run part of a month?** Not stated on the
@@ -901,7 +931,8 @@ From Hosting for previews and EU game servers:
 
 - **R1:** per host, can it send COOP and COEP? Cloudflare Pages and Workers: yes, from `_headers`, static files only
   (F1, F2); Netlify: yes, but the same for every deploy context (F7); Vercel: yes (F8); GitHub Pages: no (F11, F12).
-  Code-generated responses (a Worker, a function) set their own.
+  For the first three, the pages show a mechanism for any custom header; that it carries COOP and COEP is inferred (no
+  page names them). Code-generated responses (a Worker, a function) set their own.
 - **R2:** reference server for R2-XU-OQ9: Hetzner CCX23 (4 dedicated vCPU, AMD), with CX33 measured beside it; "one
   vCPU of the EU instance type" in R2-BUD-REC6 is one vCPU of CCX23. No load balancer on the UDP path. IPv6 is free on
   Hetzner (F19), so R2-BUD-OQ11's IPv6 share depends on players' networks.
@@ -933,7 +964,68 @@ From Balance telemetry, VISION_V2 §6.6:
 
 ## 7. Verifier spot-check
 
-Pending: the wave 2 verifier spot-check.
+The wave 2 verifier spot-checked 19 of the 40 key claims (the R6 findings named in a "Rests on:" list) on 2026-10-28/29,
+verdict PASS WITH NOTES; its report is `.checkpoints/v2-research/verifier-r6-result.md` and its exact quotes are in
+`.checkpoints/v2-research/verifier-r6.md`. The owner applied it on 2026-10-29 (log:
+`.checkpoints/v2-research/infra-engineer-r6-fix.md`). No source was re-read and no claim re-sourced in the fix.
+
+| Claim id | Claim | Source | Verdict | Location and exact words | Final state |
+|---|---|---|---|---|---|
+| R6-HOST-F15 | Hetzner CX/CAX/CCX prices in EUR, 20 TB included | hetzner.com/cloud/cost-optimized, /general-purpose | confirmed | table cells: CX33 "€ 8.99 per month, excl. VAT" "€ 0.0144 per hour"; CCX23 "€ 86.49 per month, excl. VAT" "€ 0.1386 per hour"; "20 TB"; CCX33 "30 TB" "€ 138.99"; CAX21 "€ 10.99" | fixed: the cell quotes added to the finding |
+| R6-HOST-F16 | extra traffic 1.00 EUR per TB | hetzner.com/cloud/general-purpose | confirmed (the words; the per-TB reading stays inferred, as the file says) | "For each additional TB at EU-Central locations we charge € 1.00 per hour, excl. VAT." | unchanged |
+| R6-HOST-F17 | billed by the hour, rounded up; only outgoing traffic | docs.hetzner.com/cloud/billing/faq (2020-07-07) | confirmed | "Servers have both a monthly price cap and a price per hour."; "We always round up the hourly usage of a server."; "We only bill for outgoing traffic." | unchanged |
+| R6-HOST-F22 | Fly.io prices | fly.io/pricing | confirmed | "performance-2x · 4GB \| $0.0917 \| $66.00"; "Egress, North America and Europe \| $0.02 / GB"; "Dedicated IPv4 \| $2.00 / mo" | fixed: hourly rates added (verifier's quotes); the room-hour table now gives 0.0229 USD |
+| R6-HOST-F3 | Pages: 20,000 files, 25 MiB per file, unlimited previews | developers.cloudflare.com/pages/platform/limits (Sep 5, 2026) | confirmed | "up to 20,000 files on the Free plan."; "25 MiB."; "unlimited number of preview deployments"; builds 500 / 5,000 / 20,000 (table cells) | fixed: build counts upgraded to confirmed (table cells) |
+| R6-HOST-F5 | static requests free, no egress charge, 5 USD minimum | developers.cloudflare.com/workers/platform/pricing (Oct 2, 2026) | confirmed | "Requests to static assets are free and unlimited."; "There are no additional charges for data transfer (egress)"; "a minimum charge of $5 USD per month for an account" | unchanged |
+| R6-HOST-F1 | `_headers` file, 100 rules, 2,000 characters | developers.cloudflare.com/pages/configuration/headers (Aug 25, 2026) | confirmed | "You may define up to 100 header rules."; "Each line in the `_headers` file has a 2,000 character limit." | unchanged (COOP and COEP by name stay inferred; TL;DR and pointers now say so) |
+| R6-HOST-F12 | GitHub Pages: COOP/COEP request open, "No ETA" | github.com/orgs/community/discussions/13309 | confirmed (community thread only) | "No ETA at the moment as to when this feature will be available." (Jul 10, 2023) | unchanged |
+| R6-HOST-F13 | EU locations and countries | hetzner.com/cloud | confirmed (which plan runs where stays inferred, as the file says) | "available to you in Germany, Finland, Singapore, and the USA."; "Falkenstein, Nuremberg, and Helsinki" | fixed: the product pages' "NBG1 HEL1" location column noted |
+| R6-HOST-F14 | shared vCPU for variable load; dedicated for gaming | hetzner.com/cloud | confirmed | "They are designed for variable usage patterns rather than sustained high workloads."; "highly predictable resources."; "gaming servers" | unchanged |
+| R6-HOST-F24 | ACME wildcard orders, dns-01 TXT record, http-01 on port 80 | RFC 8555 §7.1.3, §8.3, §8.4 | confirmed | "MAY have a wildcard domain name as its value."; "prepending the label "_acme-challenge""; "MUST be sent to TCP port 80" | unchanged |
+| R6-COST-F1 | Grafana Free: 10k series, 50 GB, 14 days, 3 users | grafana.com/pricing | confirmed (the 14 days too) | "Limited to 10k active series per month"; "Limited to 50 GB ingested per month"; "14 days retention"; "Limited to 3 active users per month" | fixed: the 14 days upgraded to confirmed |
+| R6-COST-F2 | Grafana Pro: 19 USD plus usage | grafana.com/pricing | confirmed | "Platform fee of $19 per month includes:"; "$6.50/ 1k series"; "$0.050/GB Process" "$0.400/GBWrite" "$0.100/GBRetain" | unchanged |
+| R6-COST-F5 | Hetzner Object Storage 6.49 EUR with 1 TB, EU locations | hetzner.com/storage/object-storage | confirmed (the 1 TB and the locations too) | "base price of € 6.49 per month, excl. VAT"; "includes 1 TB of storage (up to 744 TB-hours) and 1 TB of egress traffic."; "(FSN1) … (HEL1), and … (NBG1)" | fixed: the 1 TB and the locations upgraded to confirmed |
+| R6-OBS-F5 | Prometheus: 15 days default, 1–2 bytes per sample, not replicated | prometheus.io/docs/prometheus/latest/storage | confirmed | "the retention time defaults to `15d`."; "an average of only 1-2 bytes per sample."; "not clustered or replicated." | unchanged |
+| R6-OBS-F1 | `tracing` 0.1.44: spans and events; no allocation by default | docs.rs/tracing/latest | confirmed ("not built" stays inferred, as the file says) | "a span represents a _period of time_ with a beginning and an end."; "does not allocate by default." | unchanged |
+| R6-OBS-F7 | Sentry Wasm: build_id, wasm-split, wasmIntegration, "still developing" | docs.sentry.io/platforms/native/guides/wasm | confirmed (the word "DWARF" is paraphrase only: the fetch dropped the link text) | "augmented by a build_id custom section."; "We provide a tool called wasm-split"; "apply its wasmIntegration"; "This feature is still developing, so may be rough around the edges." | fixed: "DWARF" marked as paraphrase |
+| R6-OBS-F9 | Sentry: US or EU (Frankfurt), cannot be changed, some data stays in the US | docs.sentry.io/organization/data-storage-location | confirmed (the US list too) | "Sentry supports data storage in both the US and the EU."; "Frankfurt, Germany."; "once selected, your data storage location can’t be changed." | fixed: the US list quoted and upgraded to confirmed |
+| R6-TEL-F2 | LOOP_V2 points race, steals, counters | docs/LOOP_V2.md §4 l.44, §8 l.98–100, §11 l.153–154 | confirmed | "The countdown keeps running, now for the new owner."; "Destroying an HQ is a big points swing"; "(cashouts, steals, deliveries, harvester kills)" | unchanged |
+
+**The verifier's critical read, and what was done with each**
+1. (medium) The wildcard certificate departs from R2-TRN-REC5's "per game server hostname". Fixed: R6-HOST-REC4 and
+   option C2 state the departure, quote R2 in full and name per-hostname certificates as the alternative; the shared
+   private key is added to R6-SEC-OQ1's items met on the way.
+2. (medium) Option K4's "costs more than the whole Hetzner fleet" did not follow. Fixed: K4 now compares per fully
+   loaded host (about 369 USD against 86.49 EUR) and calls the goal-scale figures (about 276 USD against 222.88–345.96
+   EUR) the same order, with no exchange rate read.
+3. (medium) Missing "Rests on:" entries. Fixed: R6-HOST-REC2 adds F20, R2-BUD-REC6, R2-ROOM-REC2 (with its marks'
+   lines), R2-TRN-REC3, R1-DET-OQ7 and R1-DET-REC6; R6-HOST-REC1 adds F8 and R1-BND-REC5.
+4. (medium) R6-HOST-REC2 picked Hetzner without F20. Fixed: its text now quotes F20 and makes the pick conditional on
+   R6-HOST-OQ1 (a working pick until a console check shows capacity).
+5. (low–medium) fsn1 may not offer the recommended plans. Fixed: F13 notes the "NBG1 HEL1" location column; Q4 and
+   R6-HOST-OQ2 offer Falkenstein only if the plans are offered there.
+6. (low–medium) Two expected options (Hetzner dedicated root servers; ACME tls-alpn-01, RFC 8737). Partly applied: not
+   added as options, because the fix rule adds a new source only where a recommendation cannot stand without it, and
+   neither R6-HOST-REC2 nor R6-HOST-REC4 needs one; both are named as unread candidates in R6-HOST-OQ4 and R6-HOST-OQ6
+   and listed under "Sources not read".
+7. (low) The 25 MiB mark is a Pages limit. Fixed: R6-HOST-REC1's mark says so and is rechecked against the Workers
+   static-assets limits page before the spike; that page is listed as not read.
+8. (low) Fly.io's hourly price was on the page. Fixed: F22 carries the hourly rates; the room-hour table gives 0.0229
+   USD (0.0917 ÷ 4).
+9. (low) F15 confirmed without a quote. Fixed: the verifier's cell quotes are in F15.
+10. (low) COOP and COEP stated as fact. Fixed: the TL;DR, the Q1 table (Netlify, Vercel), R6-HOST-REC1's reason and the
+    R1 pointer now mark them inferred.
+11. (low) R6-OBS-REC4's Sentry retention had no source; loose "Serves" traces. Fixed: the Sentry cap is open, decided by
+    R6-COST-OQ2's read; R6-OBS-REC1 now serves §4's fair tick first; R6-OBS-REC4's "Serves" says no §6 item asks for it
+    (it is a condition for the stores §6.1 and §6.6 create).
+12. (low) R6-TEL-REC2's append file conflicted with R6-TEL-REC1's in-memory buffer. Fixed: a crashed room's buffer is
+    lost and the supervisor writes a stub record marked incomplete; the pass mark follows.
+13. (low) R2 cites TL15's figure as "legacy CM4". Fixed: R6's TL15 line says the id slip is R2's.
+- Arithmetic nit (3.156 GB, not 3.16, behind 18,431 and 13,823 GB). Fixed: the full-host sentence says so.
+
+**Counts:** 19 confirmed, 0 wrong, 0 unsupported (19 of 40 key claims checked). No recommendation rests on a wrong or
+unsupported claim; none became an open question; no claim was re-sourced. Not checked at their source (21): HOST-F2
+(Workers half), F4, F6, F7, F9, F10, F11, F18, F19, F23; COST-F3, F4; OBS-F2, F3, F4, F6, F8, F10, F11, F12; TEL-F1.
 
 ## 8. Sources
 
@@ -1025,3 +1117,6 @@ Counts by tier: official 41, shipped game 0, other 1; total 42.
 | 15 | https://arxiv.org/pdf/2502.01250v2 (win and pick rates in team games) | outside the allow list |
 | 16 | https://us.forums.blizzard.com/en/heroes/t/internal-data-used-for-balance-patches/33949 | outside the allow list |
 | 17 | postgresql.org, sqlite.org, duckdb.org | outside the allow list |
+| 18 | https://www.rfc-editor.org/rfc/rfc8737.html (ACME tls-alpn-01) | not fetched: named by the verifier; the fix step adds a source only where a recommendation cannot stand without it (R6-HOST-OQ6) |
+| 19 | Hetzner dedicated root server pages (www.hetzner.com) | not fetched, same reason (R6-HOST-OQ4) |
+| 20 | Cloudflare Workers static-assets limits page (developers.cloudflare.com) | not fetched, same reason (R6-HOST-REC1's 25 MiB mark) |
