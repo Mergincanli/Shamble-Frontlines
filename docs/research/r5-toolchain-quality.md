@@ -7,8 +7,9 @@
   owner's open questions R5-XQ-OQ1–OQ3 say so). Notes with every source summary and its exact quotes:
   `.checkpoints/v2-research/test-engineer-r5.md` and `.checkpoints/v2-research/infra-engineer-r5-ci.md`; one draft per
   question: `.checkpoints/v2-research/test-engineer-r5-<id>-draft.md` and `infra-engineer-r5-ci-draft.md`.
-- **Date:** 2026-10-28 (every source below was read that day); assembled 2026-10-29.
-- **Status:** draft: spot-check pending.
+- **Date:** 2026-10-28 (every source below was read that day); assembled 2026-10-29; spot-checked and fixed 2026-10-29.
+- **Status:** spot-checked (60 of 115 key claims). The verifier's table, its critical read and the owner's fixes are in
+  "Verifier spot-check" below.
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R5):** "Repository layout (a Cargo
   workspace plus TypeScript with Vite); strict TypeScript and lint rules; clippy and rustfmt; tests (cargo test,
   property tests, Vitest, Playwright, golden tests against legacy); CI with Rust caching; **preview links per PR**; the
@@ -19,15 +20,15 @@
 | 1 | Repository layout (a Cargo workspace plus TypeScript with Vite) | R5-LAYOUT-F1–F15, REC1–REC6, OQ1–OQ5 | test-engineer | `test-engineer-r5-layout-draft.md` |
 | 2 | strict TypeScript and lint rules | R5-TSLINT-F1–F25, REC1–REC4, OQ1–OQ6 | test-engineer | `test-engineer-r5-tslint-draft.md` |
 | 3 | clippy and rustfmt | R5-RUSTLINT-F1–F15, REC1–REC6, OQ1–OQ5 | test-engineer | `test-engineer-r5-rustlint-draft.md` |
-| 4 | tests (cargo test, property tests, Vitest, Playwright, golden tests against legacy) | R5-TEST-F1–F14, REC1–REC6, OQ1–OQ7 | test-engineer | `test-engineer-r5-test-draft.md` |
+| 4 | tests (cargo test, property tests, Vitest, Playwright, golden tests against legacy) | R5-TEST-F1–F14, REC1–REC6, OQ1–OQ8 | test-engineer | `test-engineer-r5-test-draft.md` |
 | 5 | CI with Rust caching | R5-CI-F1–F24, REC1–REC5, OQ1–OQ7 | infra-engineer | `infra-engineer-r5-ci-draft.md` (section 1) |
 | 6 | **preview links per PR** | R5-PREV-F1–F20, REC1–REC5, OQ1–OQ6 | infra-engineer | `infra-engineer-r5-ci-draft.md` (section 2) |
 | 7 | the gate v2 that replaces today's gate | R5-GATE-F1–F4 (plus today's gate as legacy facts), REC1–REC4, OQ1–OQ5 | test-engineer | `test-engineer-r5-gate-draft.md` |
 | – | Where the helper's parts and the owner's parts meet | – | test-engineer | R5-XQ-OQ1–OQ3 |
 
-**Totals:** 117 findings (owner 73, helper 44), 36 recommendations (owner 26, helper 10), 44 open questions (owner 28,
+**Totals:** 117 findings (owner 73, helper 44), 36 recommendations (owner 26, helper 10), 45 open questions (owner 29,
 helper 13, cross-part 3); 108 sources read (105 official, 2 shipped game, 1 other; owner 68, helper 44, 4 read by
-both), 38 rows of sources not read (part 8; a row can group several search leads).
+both), 39 rows of sources not read (the Sources part; a row can group several search leads).
 
 **How to read this file.**
 - Certainty marks: "confirmed in the source" means the source's own words, quoted in the finding, say it (the fetch
@@ -49,22 +50,11 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
   work that adds no engine feature.
 
 ## TL;DR
-- **Layout:** one repository, a Cargo virtual workspace (`crates/`: sim, content, protocol, sim-wasm, server, devtools)
-  and npm workspaces (`packages/`: client, editor, net, sim-worker, types, e2e) at the root, `legacy/` beside them; exact
-  toolchain pins (Rust 1.99.1, TypeScript 6.0.x) and mechanical dependency rules (cargo-deny bans, a lint rule and a walk
-  of Vite's manifest so the player page never loads the editor).
-- **Lint:** TypeScript 6.0, not 7, because typescript-eslint does not support 7 yet; strict tsconfig flags plus
-  typescript-eslint `strict-type-checked`; Prettier; clippy with `-D warnings` and a per-crate determinism set for the
-  sim (bans on std `HashMap`, wall clocks and std float maths), since clippy's hash-loop lint misses iterator chains.
-- **Tests:** proptest with fixed seeds in the gate, committed legacy goldens captured from the legacy oracle, a
-  determinism suite on native, Node and three browser engines (real Safari on macOS), a two-layer network simulator
-  (our own seeded link simulator plus an impairment socket under quinn) running R2's profiles P0–P4 and B1, and nightly
-  48-bot soaks; no retries, ever.
-- **CI and previews (helper):** rust-cache saved from `main` only, exact pins, one aggregate required check; previews
-  built without secrets and deployed from a separate job; the host is R6's choice.
-- **Gate v2:** one Node command, the same locally and in CI, checks G0–G12 fastest first, with today's base-ref,
-  exit-code and no-silent-skip rules, and a committed mutation suite (`--prove`) that shows every check fails on a
-  planted defect.
+- **Layout and lint:** one repo with Cargo and npm workspaces; exact pins (Rust 1.99.1, TypeScript 6.0.x: no typed lint
+  for 7 yet); dependency rules as checks; strict tsconfig, `strict-type-checked`, Prettier, clippy `-D warnings` plus
+  sim bans (std `HashMap`, clocks, std float maths). **Tests:** fixed seeds, committed legacy goldens, per-tick hashes
+  on native, Node, three engines and real Safari; R2's P0–P4 and B1 net sims; 48-bot soaks; no retries. **CI (helper):**
+  cached from `main`, one always-run required check, secret-free previews. **Gate v2:** one command, G0–G12, `--prove`.
 
 ## Findings
 
@@ -237,8 +227,8 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
   best practice for modern TypeScript codebases, but that do not impact program logic."; "With the exception of `all`,
   `strict`, and `strict-type-checked`, all configurations are considered "stable"."; `strict` is "not considered
   "stable" under Semantic Versioning (semver)."; "We do not recommend TypeScript projects extend from
-  `plugin:@typescript-eslint/all`." The page's advice that `strict` suits teams where many developers are highly
-  proficient in TypeScript comes from the fetch summary (inferred).
+  `plugin:@typescript-eslint/all`."; `strict` suits a project "only if a nontrivial percentage" … "of its developers are
+  highly proficient in TypeScript." (the verifier's words, 2026-10-29).
 - **R5-TSLINT-F14. ESLint's `no-restricted-imports` forbids imports by path pattern, with a message.** Source:
   https://eslint.org/docs/latest/rules/no-restricted-imports (latest is v10.13.0 in the version switcher) · official ·
   read 2026-10-28 · confirmed in the source: "Disallow specified modules when loaded by `import`"; `patterns` "allows
@@ -252,7 +242,8 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
 - **R5-TSLINT-F16. `no-floating-promises` reports promises nobody handles, and `recommended-type-checked` turns it on.**
   Source: https://typescript-eslint.io/rules/no-floating-promises/ · official · read 2026-10-28 · confirmed in the
   source: "Require Promise-like statements to be handled appropriately."; it also "reports when an Array containing
-  Promises is created and not properly handled." What it catches for us (inferred): an unawaited WebTransport write, a
+  Promises is created and not properly handled."; "Extending "plugin:@typescript-eslint/recommended-type-checked" in an
+  ESLint configuration enables this rule." What it catches for us (inferred): an unawaited WebTransport write, a
   Worker start-up promise or a `KVStore`-style async save whose error vanishes.
 - **R5-TSLINT-F17. `switch-exhaustiveness-check` requires every member of a union to have a case.** Source:
   https://typescript-eslint.io/rules/switch-exhaustiveness-check/ · official · read 2026-10-28 · confirmed in the source:
@@ -277,10 +268,13 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
   https://eslint.org/blog/2023/10/deprecating-formatting-rules/ (26 October 2023) · official · read 2026-10-28 ·
   confirmed in the source: "We recommend using a source code formatter instead of ESLint for formatting your code."; the
   rules "will not be removed until at least ESLint v10.0.0 (if not later)." The post names Prettier and dprint (fetch
-  summary, inferred).
+  summary, inferred). ESLint 10 is now current (F14, F20), so that window has opened; whether 10.x removed the rules
+  was not read (unverified).
 - **R5-TSLINT-F22. Prettier formats TypeScript, JSON, Markdown and YAML.** Source: https://github.com/prettier/prettier
   (README; no version shown) · official (the project's own page) · read 2026-10-28 · confirmed in the source: "Prettier is
-  an opinionated code formatter."; the language list includes TypeScript, JSON, Markdown and YAML.
+  an opinionated code formatter."; the language list reads "_JavaScript · TypeScript · Flow · JSX · JSON_", "_CSS ·
+  SCSS · Less_", "_HTML · Vue · Angular_", "_GraphQL · Markdown · YAML_" (quoted on a re-read of the same page,
+  2026-10-29).
 - **R5-TSLINT-F23. Biome is a formatter and linter that claims 97 % Prettier compatibility.** Source:
   https://github.com/biomejs/biome (README; no version shown) · official (the project's own page) · read 2026-10-28 ·
   confirmed in the source: "Biome offers formatter and linter, usable via CLI and LSP."; its formatter "scores **97%
@@ -423,8 +417,8 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
   successful test cases that must execute for the test as a whole to pass." (default 256, "can be overridden by setting
   the `PROPTEST_CASES` environment variable."); `failure_persistence` "Indicates whether and how to persist failed test
   results." (default `FileFailurePersistence::SourceParallel("proptest-regressions")`); the seed is "Set by using the
-  PROPTEST_RNG_SEED environment variable." That an unset variable means a fresh random seed per run is from the fetch
-  summary (inferred).
+  PROPTEST_RNG_SEED environment variable."; "If the environment variable is undefined, a random seed is generated" (the
+  verifier's words, 2026-10-29).
 - **R5-TEST-F3. insta 1.49.0 keeps snapshots as `.snap` files beside the tests, never writes them in CI, and can round
   floats.** Source: https://docs.rs/insta/latest/insta/ · official · read 2026-10-28 · confirmed in the source: snapshot
   tests "assert values against a reference value (the snapshot)"; stored "Right next to your test in a folder called
@@ -455,13 +449,15 @@ both), 38 rows of sources not read (part 8; a row can group several search leads
   confirmed in the source: `retry` "Retry the test specific number of times if it fails." (Default `0`); fake timers
   "mock calls to `setTimeout` and `setInterval`". Whether they fake `performance.now` is not on the page (confirmed by
   absence).
-- **R5-TEST-F8. Playwright's WebKit is not Safari; for the closest-to-Safari result it points to macOS.** Source:
-  https://playwright.dev/docs/browsers (no version shown) · official · read 2026-10-28 · confirmed in the source:
-  "Playwright can run tests on Chromium, WebKit and Firefox browsers."; "Playwright's WebKit is derived from the latest
-  WebKit main branch sources, often before these updates are incorporated"; "Playwright doesn't work with the branded
-  version of Safari since it relies on patches."; "While running WebKit on Linux CI is usually the most affordable
-  option, for the closest-to-Safari experience you should" (the rest of the sentence, run on macOS, is inferred from the
-  fetch summary); likewise "Playwright doesn't work with the branded version of Firefox since it relies on patches."
+- **R5-TEST-F8. Playwright's WebKit is not Safari, and Playwright cannot drive real (branded) Safari; for the
+  closest-to-Safari result it points to its own WebKit on macOS.** Source: https://playwright.dev/docs/browsers (no
+  version shown) · official · read 2026-10-28 · confirmed in the source: "Playwright can run tests on Chromium, WebKit
+  and Firefox browsers."; "Playwright's WebKit is derived from the latest WebKit main branch sources," "often before
+  these updates are incorporated into Apple Safari"; "Playwright doesn't work with the branded version of Safari since
+  it relies on patches."; "While running WebKit on Linux CI is usually the most affordable option," "for the
+  closest-to-Safari experience you should run WebKit on mac, for example if you do video playback." (the sentence's end
+  in the verifier's words, 2026-10-29); likewise "Playwright doesn't work with the branded version of Firefox since it
+  relies on patches." So real Safari is reached only through its WebDriver (F5, F6), not through Playwright.
 - **R5-TEST-F9. Playwright retries nothing by default, labels a test that passes only on retry "flaky", and can fail
   the run on any flaky test.** Sources: https://playwright.dev/docs/test-retries and
   https://playwright.dev/docs/api/class-testconfig · official · read 2026-10-28 · confirmed in the source: "By default
@@ -560,12 +556,14 @@ section answers "CI with Rust caching", plus how CI runs the gate v2. What the g
   dependencies)"; "The `~/.cargo/registry/src` directory is not cached." · Source: https://github.com/Swatinem/rust-cache
   (README) and https://github.com/Swatinem/rust-cache/releases · official (the tool's own docs) · read 2026-10-28 ·
   confirmed in the source.
-- **R5-CI-F2.** rust-cache keys each cache on the toolchain and the lockfile, so a toolchain bump or a lockfile change
-  starts a new cache. Quotes: the key holds "the rustc release / host / hash (for all installed toolchains when
-  available)" and "a hash of the workspace's `Cargo.lock`". The inputs include `shared-key` ("stable over multiple
-  jobs"), `save-if` ("Determines whether the cache should be saved."), `cache-on-failure`, `workspaces` ("`$workspace ->
-  $target`"), `cache-targets`, `cache-all-crates` and `cache-bin`. · Source: https://github.com/Swatinem/rust-cache
-  (README, inputs and cache key) · official (tool docs) · read 2026-10-28 · confirmed in the source.
+- **R5-CI-F2.** rust-cache keys each cache on the toolchain, the lockfile and the manifests, so a toolchain bump or a
+  lockfile change starts a new cache. Quotes: the key holds "the rustc release / host / hash (for all installed
+  toolchains when available)" and "a hash of the workspace's `Cargo.lock`" "and of the Cargo.toml of the workspace root
+  and every workspace member" (the second part added from the verifier's words, 2026-10-29). The inputs include
+  `shared-key` ("stable over multiple jobs"), `save-if` ("Determines whether the cache should be saved."),
+  `cache-on-failure`, `workspaces` ("`$workspace -> $target`"), `cache-targets`, `cache-all-crates` and `cache-bin`. ·
+  Source: https://github.com/Swatinem/rust-cache (README, inputs and cache key) · official (tool docs) · read 2026-10-28
+  · confirmed in the source.
 - **R5-CI-F3.** rust-cache caches only dependencies and turns incremental builds off. Quotes: before saving it removes
   "Incremental build artifacts."; "the workspace crates themselves are not cached since doing so is generally not
   effective."; "this action automatically sets `CARGO_INCREMENTAL=0` to disable incremental compilation." · Source:
@@ -755,7 +753,7 @@ section answers "CI with Rust caching", plus how CI runs the gate v2. What the g
 
 ### Question 6: preview links per PR (R5-PREV; infra-engineer)
 
-The brief's R5 row (docs/V2_PHASE0_BRIEF.md:125), quoted in full in section 1; this section answers "**preview links
+The brief's R5 row (docs/V2_PHASE0_BRIEF.md:125), quoted in full under Question 5; this section answers "**preview links
 per PR**". Mustafa opens each link in Brave on Windows. Which host serves the previews, and its limits and prices, is
 R6's: this section names the hosts considered and what the workflow needs from them, and leaves prices to R6.
 
@@ -910,8 +908,8 @@ R6's: this section names the hosts considered and what the workflow needs from t
 - **CLAUDE.md, "People".** Mustafa plays in Brave on Windows, and his screenshots are the final visual gate. The
   preview link is how that check reaches him for v2. Isolation's `crossOriginIsolated` must therefore be checked in
   Brave too (R1-BND-REC5 pass mark).
-- **Repository visibility.** Public (section 1): anyone can fork and open a pull request (R5-PREV-F1, F5), and
-  environment reviewers are on the Free plan (R5-PREV-F6).
+- **Repository visibility.** Public (Question 5's legacy facts): anyone can fork and open a pull request (R5-PREV-F1,
+  F5), and environment reviewers are on the Free plan (R5-PREV-F6).
 
 ### Question 7: the gate v2 that replaces today's gate (R5-GATE)
 
@@ -1065,7 +1063,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 | Playwright Test | Chromium, Firefox, WebKit (F8) | end-to-end client plus local server (`webServer`, F9); TL9's shape | WebKit is not Safari (F8) |
 | Vitest Browser Mode | via Playwright or WebdriverIO (F6) | component and boundary tests inside a page | maturity not stated (F6) |
 | wasm-bindgen-test | Node by default; Chrome, Firefox, Safari by WebDriver (F5) | Rust unit tests compiled to Wasm, unchanged | the guide read may be older than the crate |
-| Real Safari on macOS (safaridriver) | Safari | the only way to test Safari itself (F5, F8) | a macOS runner (cost: R5-CI, R6) |
+| Real Safari on macOS (safaridriver, through wasm-bindgen-test or WebdriverIO) | Safari | the only way to test Safari itself; Playwright cannot drive it (F5, F6, F8) | a macOS runner (cost: R5-CI, R6) |
 
 #### Network tests
 | Option | What it simulates | Deterministic | Covers the real transport | Cost |
@@ -1133,8 +1131,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 #### How the gate is run
 | Option | Shape | Fit | Risk |
 |---|---|---|---|
-| A. One Node orchestrator (`node tools/gate.mjs`, v2 edition) that runs named checks and calls cargo, tsc, ESLint, Vitest and Playwright | continuity with today's command, base ref, exit codes and `--json`; Node is needed anyway for Vite; works on Windows | one more script to keep (with its own mutation proofs) |
-| B. `cargo xtask gate` (a Rust binary) | one language for the gate and the sim | Mustafa's machine and every agent need the full Rust toolchain for any check, even a TypeScript-only one |
+| A. One Node orchestrator (working name `node tools/gate.mjs`, v2 edition; its path is R5-GATE-OQ3) that runs named checks and calls cargo, tsc, ESLint, Vitest and Playwright | continuity with today's command, base ref, exit codes and `--json`; Node is needed anyway for Vite; works on Windows | one more script to keep (with its own mutation proofs); like B, its setup and Rust checks (G0–G2) need the Rust toolchain |
+| B. `cargo xtask gate` (a Rust binary) | one language for the gate and the sim | the gate itself must compile before any check runs, and today's Node conventions are rewritten in Rust (inferred); like A, it needs the Rust toolchain |
 | C. A generic task runner (make, just) | familiar to many | not read; make is not native on Windows; no exit-code or base-ref conventions |
 | D. CI only (no local gate) | nothing local to keep | breaks CLAUDE.md's protocol (the gate must PASS before commit) and slows every step |
 
@@ -1161,7 +1159,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   drift apart (F2), a resolver that prefers versions our pinned Rust supports (F3), and a toolchain file every machine
   and CI honour (F6); npm is the only read option and is already in use (F8, TL17); several repositories would break the
   version matching wave 1 requires (R1-BND-F2).
-  Rests on: R5-LAYOUT-F1, F2, F3, F5, F6, F8; legacy TL17.
+  Rests on: R5-LAYOUT-F1, F2, F3, F5, F6, F8; legacy TL17; R1-BND-F2 (cited).
   Serves: none directly (toolchain); each crate and package in REC2 names its VISION_V2 §6 item.
   A spike must prove (proposed): from a fresh clone on the CI runner, `cargo test --workspace --locked` and
   `npm ci && npm test --workspaces` pass with no network access after the install steps; `rustc --version` in CI equals
@@ -1183,7 +1181,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Reason: wave 1's boundaries (R1-DATA-REC2, R2-TRN-REC4, TL4, TL7) need a mechanical check; project references alone do
   not promise to block an import (F13); the built manifest shows what the player page really loads (F15), and a lint
   rule catches it before the build (R5-TSLINT-F14).
-  Rests on: R5-LAYOUT-F9, F13, F14, F15; R5-TSLINT-F14; legacy TL4, TL7, KT13.
+  Rests on: R5-LAYOUT-F9, F13, F14, F15; R5-TSLINT-F14; R5-TEST-F4; legacy TL4, TL7, KT13; R1-DATA-REC2, R2-TRN-REC4
+  (cited).
   Serves: §6.1–§6.8 as listed per crate; the editor split serves §6.7 (the faction content pipeline is authored there).
   A spike must prove (proposed): each planted violation fails the gate on the right check and nothing else: `use` of the
   transport crate inside `sim`; a `tokio` dependency added to `sim`; an `import` of an `editor` module in `client`; a
@@ -1208,7 +1207,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   sim; wave 1 already flags target-dependent maths in a dependency (R1-RR-OQ1) and forbids non-deterministic float paths
   (R1-DET-REC2).
   Rests on: R5-LAYOUT-F4; R1-DET-REC2, R1-RR-OQ1 (cited).
-  Serves: §6.2 (identical sim on client and server).
+  Serves: §4 (fair to about 100 ms of ping: prediction and replay need an identical sim on client and server, as
+  R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches).
   A spike must prove (proposed): the resolved feature list of every dependency of `sim` (from `cargo tree -e features`)
   is identical for the `server` build and the `sim-wasm` build; a planted extra feature on a shared dependency in
   `server` makes the check fail.
@@ -1220,15 +1220,17 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Reason: Vite builds several pages (F9), recommends that Worker form (F11), sets headers per server (F12) and does not
   type-check (F10).
   Rests on: R5-LAYOUT-F9, F10, F11, F12; R1-BND-REC5 (cited).
-  Serves: §6.2 (the sim in a Worker on the client), §6.7 (the editor entry).
+  Serves: §6.2, §6.9 and §4 (the sim in a Worker on the client, as R1's option A2 traces it: the Worker carries the 3D
+  sim and keeps tick time off the render thread), §6.7 (the editor entry).
   A spike must prove (proposed): with the flag, `crossOriginIsolated === true` in Chromium, Firefox and WebKit under
   Playwright on both `vite` and `vite preview`; without it, `false`; the built player page loads no file from `editor`
   (REC2's manifest walk).
-- **R5-LAYOUT-REC6. The phase 1 move keeps the legacy oracle runnable.** The five game files move to `legacy/`;
-  `tools/` (preview.js, sim.js, battery.js, tuning-dump.js, the gate) moves with them or learns the new path, so today's
-  gate keeps guarding critical fixes to legacy and the legacy oracle can still produce golden values (R5-TEST-REC3) until
-  legacy retires; `.gitignore` adds `target/`, `pkg/`, `dist/`, `coverage/`, `playwright-report/`, `test-results/` and
-  proptest's and insta's pending files.
+- **R5-LAYOUT-REC6. The phase 1 move keeps the legacy oracle runnable.** The five game files move to `legacy/`; `tools/`
+  (preview.js, sim.js, battery.js, tuning-dump.js, the gate) moves with them or learns the new path (input to the phase
+  1 plan, which decides it, R5-LAYOUT-OQ5; nothing here changes today's tools), so today's gate keeps guarding critical
+  fixes to legacy and the legacy oracle can still produce golden values (R5-TEST-REC3) until legacy retires;
+  `.gitignore` adds `target/`, `pkg/`, `dist/`, `coverage/`, `playwright-report/`, `test-results/` and proptest's and
+  insta's pending files.
   Reason: legacy stays frozen with critical fixes only, so it still needs its gate; the golden tests need it to run
   (TL11); KT19 asks for the ignore list to follow this layout; one `target` folder per workspace (F1).
   Rests on: R5-LAYOUT-F1; legacy TL11, KT19, KT21, TL1.
@@ -1301,7 +1303,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   written invariant, a test and an `#[allow]` that gives its reason). `[workspace.lints.clippy]`: `all = { level =
   "warn", priority = -1 }`. The gate runs `cargo clippy --workspace --all-targets --locked -- -D warnings`, once for the
   host and once with `--target wasm32-unknown-unknown` for the crates that build for the browser. `pedantic` goes only on
-  `sim`, `protocol` and `content`, at warn under the same `-D warnings`.
+  `sim`, `protocol` and `content`, at warn, which under the same `-D warnings` fails the gate there: each hit is fixed
+  or allowed with a reason.
   Reason: only correctness denies by default (F1), so without `-D warnings` the rest only prints (F6); one table keeps
   the crates alike (F3, F4); pedantic is worth its noise in the outcome-deciding crates only (F2); `cfg` differences
   between targets mean one clippy run cannot see both builds (inferred).
@@ -1323,7 +1326,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   exactly KT13's wall-clock rule; the per-crate `clippy.toml` keeps the bans out of the server and tools, which need
   clocks (F5); the two float lints would rewrite sim maths into fused or banned calls (F10).
   Rests on: R5-RUSTLINT-F5, F7, F8, F9, F10; legacy KT13, TL13; R1-DET-REC2, R1-ECS-REC2 (cited).
-  Serves: §6.2 (one sim on client and server), §6.6 and §6.8 (telemetry and moments computed from re-runnable matches).
+  Serves: §4 (fair to about 100 ms of ping: prediction and replay need one sim on client and server, as R1-ECS-REC2
+  traces it), §6.6 and §6.8 (telemetry and moments computed from re-runnable matches).
   A spike must prove (proposed): each planted violation fails the gate on clippy, with the reason in the message: a
   `HashMap` field in a sim struct; `map.values().sum()` over a std `HashMap` (missed by F9's lint, caught by the type
   ban); `Instant::now()` in a tick function; `x.sin()` on an `f32` (if OQ1 says clippy cannot name it, the fallback
@@ -1331,7 +1335,9 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 - **R5-RUSTLINT-REC3. No implicit panics in the code that reads untrusted bytes.** In `protocol` (decoders) and in
   `content`'s loader: `unwrap_used`, `expect_used` and `indexing_slicing` at `deny`, with `allow-unwrap-in-tests`,
   `allow-expect-in-tests` and `allow-indexing-slicing-in-tests` set to `true` in those crates' `clippy.toml`. The sim
-  itself keeps them at warn under pedantic review, since its indices come from its own pools.
+  does not enable these three restriction lints (restriction lints are picked one by one, F1), since its indices come
+  from its own pools; enabling them at `warn` there would, under REC1's `-D warnings`, fail the gate on every index
+  read.
   Reason: wave 1 requires decoders that never panic and fuzzing with zero panics (R2-TRN-REC4, R1-RR-OQ3); these lints
   find the common panic sources at review time (F11, F12), and the fuzzing (R5-TEST-REC4) finds the rest; tests may
   unwrap (F11).
@@ -1346,7 +1352,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   (R1-RR-OQ4); a per-package override is allowed for this setting (F13, inferred), so the rest of the workspace keeps the
   release default.
   Rests on: R5-RUSTLINT-F13; R1-RR-OQ4, R1-DET-REC2 (cited).
-  Serves: §6.2.
+  Serves: §4 (client and server must not disagree on a tick, as R1-ECS-REC2 traces determinism), §6.6 and §6.8
+  (re-runnable matches).
   A spike must prove (proposed): a planted `u16` counter that overflows with `+` panics in the dev and the release test
   builds, native and Wasm alike; the same counter with `wrapping_add` gives the same value on all four; the tick cost of
   the checks is reported with method (R1-TICK's bench), and the ADR sets the limit.
@@ -1379,14 +1386,17 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   | Rust ↔ TypeScript boundary | Vitest (Node) loading the built `sim-wasm` | the layout hash of R1-BND-REC4, every message type round-trips between Rust encoders and TypeScript decoders | gate |
   | TypeScript unit | Vitest (Node) | client logic that is not rendering: input mapping, interpolation buffers, HUD state | gate |
   | Browser end-to-end | Playwright Test (Chromium, Firefox, WebKit) with the built client and a local server via `webServer` | TL9's smoke shape on v2, both transport backends (R2-TRN-REC4 mark 1), counts of R3-MEASURE-REC3 | gate |
-  | Safari | the e2e suite on macOS with real Safari | what WebKit on Linux cannot show (F8) | for PRs touching `client`, `net`, `sim-worker` or `sim`, else nightly (cost: R5-CI) |
+  | Safari | on macOS: the e2e suite in Playwright's WebKit, the closest stand-in Playwright offers (F8); the Rust-in-Wasm and determinism tests in real Safari through safaridriver (wasm-bindgen-test, F5) or WebdriverIO (Vitest Browser Mode, F6); no runner for the e2e suite in real Safari was read (R5-XQ-OQ1) | what WebKit on Linux cannot show (F8) | for PRs touching `client`, `net`, `sim-worker` or `sim`, else nightly (cost: R5-CI) |
   | Legacy golden | `cargo test` reading committed fixtures (REC3) | the behaviour v2 keeps equals legacy within stated tolerances | gate |
   | Determinism | REC2's suite | identical per-tick hashes on every target | gate (short), nightly (long) |
   | Network | REC4's two layers | R2's pass marks under named profiles | gate (L1 short), nightly (L1 long, L2) |
   | Soak and load | REC5 | 48+ players with bots, hours | nightly and before each playtest |
   | Fuzz | cargo-fuzz on decoders and the content loader | 0 panics, 0 over-limit allocations | nightly, Linux |
-  Reason: each tool is the read option for its layer (F1, F2, F4–F9); WebKit stands in for Safari only partly (F8).
-  Rests on: R5-TEST-F1, F2, F4, F5, F6, F8, F9; legacy TL9, TL15; R1-BND-REC4, R2-TRN-REC4, R3-MEASURE-REC3 (cited).
+  | Benchmarks | R1-TICK's tick bench at N players and a client render bench (TL15); the tool was not read (R5-TEST-OQ8) | tick and frame cost, reported with method (R5-RUSTLINT-REC4's overflow cost, REC5's tick p99) | on change-sets that touch the sim or the render path; never a gate pass or fail (R3-MEASURE-REC3: CI gates counts, not timings) |
+  Reason: each tool is the read option for its layer (F1, F2, F4–F9); WebKit stands in for Safari only partly, and
+  Playwright cannot drive real Safari, so Safari's own runs go through its WebDriver (F5, F6, F8); benchmarks report
+  numbers and never decide the gate (R3-MEASURE-REC3).
+  Rests on: R5-TEST-F1, F2, F4, F5, F6, F7, F8, F9; legacy TL9, TL15; R1-BND-REC4, R2-TRN-REC4, R3-MEASURE-REC3 (cited).
   Serves: §6.1–§6.9 through their tests; §4 (four desktop browsers).
   A spike must prove (proposed): one planted defect per layer fails that layer and is caught by the gate or nightly job
   the table names (for example: a byte-order swap in one encoder fails the boundary layer only; a page error in deploy
@@ -1395,17 +1405,21 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   release, built as the server builds the sim, R5-LAYOUT-REC4) plays a recorded match and writes one hash per tick; the
   gate runs it twice in two processes and once as Wasm in Node (the same runner compiled to Wasm, or wasm-bindgen-test);
   Playwright opens a replay page that runs the `sim-wasm` Worker in Chromium, Firefox and WebKit and returns the hash
-  stream; real Safari joins on macOS (REC1's rule). A comparer reports the first mismatching tick and a field-level diff.
+  stream; on macOS the same replay runs in real Safari through its WebDriver, as the replay runner compiled with
+  wasm-bindgen-test's `run_in_browser` (F5) or as a Vitest Browser Mode page under WebdriverIO (F6), since Playwright
+  cannot drive branded Safari (F8) (REC1's rule). A comparer reports the first mismatching tick and a field-level diff.
   Gate set: three short recordings (proposed: 2 minutes each at the tick rate R1-TICK picks, one per mode: two teams,
   three teams, bots only); nightly: R1-ECS-REC2 mark 1's 10-minute bot match and every recording added since.
   Reason: native and Wasm in Node are cheap and catch most divergence; the browsers must be in the matrix because their
-  engines differ (R1-DET-REC6's reason); Playwright drives three engines (F8) and Safari needs macOS (F5, F8).
-  Rests on: R5-TEST-F5, F8; R5-LAYOUT-F4; R1-DET-REC6, R1-ECS-REC2 (cited).
-  Serves: §6.2, §6.6, §6.8 (re-runnable matches); §3 (the 48-player scale).
+  engines differ (R1-DET-REC6's reason); Playwright drives three engines but not branded Safari (F8), and real Safari
+  is reached through safaridriver on macOS (F5, F6).
+  Rests on: R5-TEST-F5, F6, F8; R5-LAYOUT-F4; R1-DET-REC6, R1-ECS-REC2 (cited).
+  Serves: §4 (fair to about 100 ms of ping: prediction and replay need the same ticks on client and server, as
+  R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches); §3 (the 48-player scale).
   A spike must prove (proposed): R1-DET-REC6's planted divergences (one std `sin`, one `HashMap` iteration, one
   presentation RNG draw inside the sim) are each reported at the first tick they change; the gate's determinism step
   takes under 3 minutes on the CI runner; the nightly comparison of a 10-minute 48-bot match reports 0 mismatches across
-  native ×2, Node and three browser engines.
+  native ×2, Node, three browser engines under Playwright and real Safari on the macOS runner.
 - **R5-TEST-REC3. Golden tests against legacy: captured once from the legacy oracle, committed, read by v2 tests, one
   per kept behaviour.** How: a harness snippet per behaviour runs on the real legacy build through `node tools/preview.js
   legacy eval <snippet>` (TL11) and writes a JSON fixture with the legacy commit SHA, the inventory row id, the inputs
@@ -1422,7 +1436,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Reason: the oracle already runs the real code and produces reproducible dumps (TL11; the tuning dump was byte-identical
   over two runs); a committed fixture survives legacy's retirement; a golden must pin a behaviour we keep, so each names
   its row and its LOOP_V2 status; insta never writes in CI, so a changed snapshot fails (F3).
-  Rests on: R5-TEST-F3; legacy TL11, TL13, CS4, CS5, CS6, CS7, CD8, CD12, GE8, GA5, GA8, GW14, `docs/legacy-tuning.json`.
+  Rests on: R5-TEST-F3; legacy TL11, TL13, CS4, CS5, CS6, CS7, CD4, CD6, CD8, CD10–CD14, GE8, GA5, GA8, GW14,
+  `docs/legacy-tuning.json`; R1-DET-OQ3 (cited).
   Serves: §6.3 (abilities and tuning as data start from legacy's numbers), §6.2 (hit and sight maths in 3D start from
   the 2D-plus-height maths we keep).
   A spike must prove (proposed): each golden fails when the v2 value is moved by more than its tolerance (planted); the
@@ -1441,11 +1456,12 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   impairment below the protocol in exactly this set (F12), and quinn takes a custom socket (F13); turmoil fits Tokio
   sockets but QUIC on it is unread (F11); one named set settles R2-XU-OQ12; Fiedler's advice is to test past the
   expected worst case (F14).
-  Rests on: R5-TEST-F4, F11, F12, F13, F14; R2-TRN-REC4, R2-TRN-REC6, R2-XU-OQ12, R1-RR-OQ3 (cited).
+  Rests on: R5-TEST-F4, F11, F12, F13, F14; R2-TRN-REC4, R2-TRN-REC6, R2-TRN-OQ8, R2-XU-OQ12, R1-RR-OQ3 (cited).
   Serves: §4 (fair to about 100 ms of ping, P2), §6.1 (rooms survive bad networks).
   A spike must prove (proposed): in L1, the same seed and profile give an identical packet-fate log and identical
   per-tick hashes on two runs; measured loss, mean delay and jitter over 100,000 packets fall within 5 % of the profile
-  (relative); in L2, app-level RTT agrees with the profile within ±5 ms at P2 (R2-TRN-REC4 mark 2's form); a 1-minute
+  (relative); in L2, app-level RTT agrees with quinn's server-side `rtt()` within ±5 ms at 100 ms injected round trip
+  (R2-TRN-REC4 mark 2, as R2 sets it), and is then reported under P2's jitter and loss; a 1-minute
   L1 run per profile P0–P4 and B1 fits in the gate's network step, under 2 minutes in total.
 - **R5-TEST-REC5. Soak and load at 48 and more, with bots as protocol clients.** Bots are headless Rust clients that
   speak the real protocol (inputs in, snapshots out) so a full room needs no browsers; one nightly run per mode at the
@@ -1461,15 +1477,15 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   A spike must prove (proposed): a 30-minute 48-bot room at P2 runs with 0 panics, 0 hangs, 0 desyncs, a memory slope
   within 1 MB per 10 minutes after warm-up, and tick p99 inside the budget ADR-0004 sets; a planted leak (one buffer kept
   per snapshot) is flagged by the slope check within the run.
-- **R5-TEST-REC6. Flakes: no retries, fixed seeds in the gate, no wall-clock waits; a failure is a defect.**
-  Vitest `retry: 0` and Playwright `retries: 0` (both defaults, F7, F9) are written out; Playwright `failOnFlakyTests`
-  and `forbidOnly` on in CI (F9). The gate sets `PROPTEST_RNG_SEED` per run from the commit (proposed: a fixed seed per
-  test file) so a red result reproduces; a nightly run uses fresh seeds and any failure it finds is committed to
-  `proptest-regressions` with its fix (F2). Sim and network tests run on simulated time only, never `sleep`; browser
-  tests wait on state through the test-hook API (TL9), and page time is driven by Playwright's clock where a test needs
-  time to pass (F10). Rust tests hold no shared global state, because tests in a crate run on parallel threads (F1).
-  Every failure keeps its seed, recording and trace as CI artefacts, gets an issue, and is reproduced with `repeatEach`
-  or the seed before it is fixed; a test is never skipped or retried into green.
+- **R5-TEST-REC6. Flakes: no retries, fixed seeds in the gate, no wall-clock waits; a failure is a defect.** Vitest
+  `retry: 0` and Playwright `retries: 0` (both defaults, F7, F9) are written out; Playwright `failOnFlakyTests` and
+  `forbidOnly` on in CI (F9). The gate sets one fixed `PROPTEST_RNG_SEED` (proposed: a committed value, the same on
+  every run and machine) so a red result reproduces; a nightly run uses fresh seeds and any failure it finds is
+  committed to `proptest-regressions` with its fix (F2). Sim and network tests run on simulated time only, never
+  `sleep`; browser tests wait on state through the test-hook API (TL9), and page time is driven by Playwright's clock
+  where a test needs time to pass (F10). Rust tests hold no shared global state, because tests in a crate run on
+  parallel threads (F1). Every failure keeps its seed, recording and trace as CI artefacts, gets an issue, and is
+  reproduced with `repeatEach` or the seed before it is fixed; a test is never skipped or retried into green.
   Reason: a retry hides the defect (F9's own label for it is "flaky"); a random seed makes a red run unreproducible
   (F2); parallel threads expose shared state (F1); legacy's smoke already waits on state with generous timeouts (TL9).
   Rests on: R5-TEST-F1, F2, F7, F9, F10; legacy TL9.
@@ -1527,24 +1543,29 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   is faster than a cold one, reported over 3 runs each; (2) the Playwright job's wall time, browser install included,
   is reported against the legacy smoke job's 57-67 s.
 - **R5-CI-REC5. Run the gate v2 in CI as option G1. One workflow on push and pull_request runs parallel jobs, and one
-  final job is the only required check. Jobs skip by condition, never by path filter. Carry over the legacy hygiene:
-  SHA pins, `contents: read`, `persist-credentials: false`, concurrency cancel, per-job timeouts. Long checks run on a
-  schedule.** The jobs: Rust native (rustfmt, clippy, cargo test, R1-ECS-REC2's no-HashMap-iteration check), Rust
-  wasm32 (build, wasm-bindgen, generated-type diff), TypeScript (tsc, lint, Vitest), Playwright end-to-end on the built
-  client (TL9's harness shape), and determinism (R1-DET-REC6: two native processes, Wasm in Node; browser targets
-  inside the Playwright job). The scheduled jobs: R2-TRN-REC4's 10-million-input fuzz run per decoder, and the
-  latest-deps job (REC2); the fuzz run's cost and time are unknown. Add Dependabot for `github-actions` to keep the pins
-  moving (F24). Asking Mustafa to turn on the "require SHA pinning" setting (F23) is a later step; lockfiles wait until
-  they are generally available and confirmed for his plan (R5-CI-OQ3). Reason: one aggregate required check survives
-  jobs being added or renamed, and conditional skips count as success, while path-filtered workflows hang required
-  checks (F20). Parallel jobs on free 4-CPU runners cost nothing in a public repository (F17). The hygiene is GitHub's
-  own advice (F21) and is already proven here (KT8). Rests on: R5-CI-F17, F20, F21, F22, F23, F24; legacy KT8, TL1, TL9;
-  R1-DET-REC6, R1-ECS-REC2, R2-TRN-REC4 (wave 1). Serves: the CI side of every §6 item; the determinism job serves §6.6
-  and §3 (R1-DET-REC6). Spike must prove (proposed): (1) a PR that touches only TypeScript runs, and passes, the single
-  required check; (2) with warm caches, the PR wall time is at most 10 min at p50 over 5 runs and at most 20 min cold,
-  per job and in total (proposed budget; VISION_V2 sets no CI target; legacy is about 1 min); (3) the mutation suite
-  (TL17) makes each job fail on the fault it guards against; (4) a fork PR runs every job with no secret available
-  (R5-PREV-F1).
+  final job is the only required check; it runs whatever the other jobs did and fails unless every job it needs
+  succeeded. Jobs skip by condition, never by path filter. Carry over the legacy hygiene: SHA pins, `contents: read`,
+  `persist-credentials: false`, concurrency cancel, per-job timeouts. Long checks run on a schedule.** The jobs: Rust
+  native (rustfmt, clippy, cargo test, R1-ECS-REC2's no-HashMap-iteration check), Rust wasm32 (build, wasm-bindgen,
+  generated-type diff), TypeScript (tsc, lint, Vitest), Playwright end-to-end on the built client (TL9's harness shape),
+  and determinism (R1-DET-REC6: two native processes, Wasm in Node; browser targets inside the Playwright job). The
+  scheduled jobs: R2-TRN-REC4's 10-million-input fuzz run per decoder, and the latest-deps job (REC2); the fuzz run's
+  cost and time are unknown. Add Dependabot for `github-actions` to keep the pins moving (F24). Asking Mustafa to turn
+  on the "require SHA pinning" setting (F23) is a later step; lockfiles wait until they are generally available and
+  confirmed for his plan (R5-CI-OQ3). Reason: one aggregate required check survives jobs being added or renamed, and
+  conditional skips count as success, while path-filtered workflows hang required checks (F20). The same finding says a
+  job that depends on a failed job "is skipped and may not block merging" (F20), so the final job must run even after a
+  failure (for example `if: always()`, then a step that fails when any `needs.<job>.result` is not `success`; that
+  syntax is not quoted from the pages read: inferred) and must fail on every dependency that did not succeed, a skipped
+  one included until R5-GATE-OQ1 allows a deliberate skip, or a failing PR could merge. Parallel jobs on free 4-CPU
+  runners cost nothing in a public repository (F17). The hygiene is GitHub's own advice (F21) and is already proven here
+  (KT8). Rests on: R5-CI-F17, F20, F21, F22, F23, F24; legacy KT8, TL1, TL9; R1-DET-REC6, R1-ECS-REC2, R2-TRN-REC4 (wave
+  1). Serves: the CI side of every §6 item; the determinism job serves §6.6 and §3 (R1-DET-REC6). Spike must prove
+  (proposed): (1) a PR that touches only TypeScript runs, and passes, the single required check; (2) with warm caches,
+  the PR wall time is at most 10 min at p50 over 5 runs and at most 20 min cold, per job and in total (proposed budget;
+  VISION_V2 sets no CI target; legacy is about 1 min); (3) the mutation suite (TL17) makes each job fail on the fault it
+  guards against; (4) a fork PR runs every job with no secret available (R5-PREV-F1); (5) a PR with one deliberately
+  failing job, and one with a cancelled job, each turn the single required check red and cannot merge.
 
 ### Question 6: preview links per PR (R5-PREV; infra-engineer)
 
@@ -1565,14 +1586,16 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   (2) a fork PR runs the build and test jobs, the deploy job is skipped, and its log shows no secret; (3) the deploy
   job contains no `actions/checkout` of the PR head and no `npm ci` or `cargo` step (checked by reading the workflow, and
   by a test PR that changes package.json scripts: the change never runs in the deploy job).
-- **R5-PREV-REC2. Choose a host that meets these needs: deploy a prebuilt directory from Actions with a scoped
-  token; a stable link per PR branch; `noindex`; custom headers per hostname; an access option; deletion through a
-  CLI or API. On the docs read, Cloudflare Pages meets every need. Cloudflare Workers static assets, Netlify and Vercel
-  meet most. GitHub Pages lacks per-PR sites and custom headers. The choice and its price are R6's.** Reason: F10-F13
-  and F18 cover every need for Cloudflare Pages; F14 shows Workers previews without a stated `noindex`; Netlify's
-  natural path is P5 (F15), which builds outside our tested CI; Vercel's prebuilt path works (F17), but its plan terms
-  are R6's. Rests on: R5-PREV-F10, F11, F12, F13, F14, F15, F17, F18. Serves: none directly (process, as REC1). Spike
-  must prove (proposed): on the chosen host, every row of REC4's header check passes on a real preview link.
+- **R5-PREV-REC2. Choose a host that meets these needs: deploy a prebuilt directory from Actions with a scoped token; a
+  stable link per PR branch; `noindex`; custom headers per hostname; an access option; deletion through a CLI or API. On
+  the docs read, Cloudflare Pages meets every need except full cleanup: a branch's latest deployment cannot be deleted
+  (F13, R5-PREV-OQ2). Cloudflare Workers static assets, Netlify and Vercel meet most. GitHub Pages lacks per-PR sites
+  and custom headers. The choice and its price are R6's.** Reason: F10-F13 and F18 cover every need for Cloudflare Pages
+  but that cleanup point (F13); F14 shows Workers previews without a stated `noindex`; Netlify's natural path is P5
+  (F15), which builds outside our tested CI; Vercel's prebuilt path works (F17), but its plan terms are R6's. Rests on:
+  R5-PREV-F10, F11, F12, F13, F14, F15, F17, F18; the GitHub Pages, Netlify-headers and Vercel points rest on R6's notes
+  and inference, not on an R5 finding. Serves: none directly (process, as REC1). Spike must prove (proposed): on the
+  chosen host, every row of REC4's header check passes on a real preview link.
 - **R5-PREV-REC3. Clean up when the PR closes, and sweep weekly.** A `pull_request` `closed` job (same-repository
   only, environment `preview`) deletes the PR branch's preview deployments (on Pages: `wrangler pages deployment
   delete … --force`) and edits the PR comment to say the link is gone. A weekly scheduled job lists and deletes
@@ -1587,7 +1610,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   G3; production stays non-isolated until REC5's test decides), `X-Robots-Tag: noindex` (the host default, F12, F15),
   `.wasm` served as `application/wasm`, and R6's content security policy once written. Use the same values in Vite's
   `server.headers` and `preview.headers`, so local development matches the preview (F19). After deploying, the job
-  fetches the preview's HTML and `.wasm` and fails if a header is missing. Reason: R1-BND-REC5 allows isolation in
+  fetches the preview's HTML and `.wasm` and fails if a header is missing. Whether the preview Mustafa checks should
+  instead carry production's header set is R5-XQ-OQ3. Reason: R1-BND-REC5 allows isolation in
   development and previews and asks that `crossOriginIsolated` be proven on a preview link. Cloudflare's `_headers`
   rules can target one hostname pattern (F18), and Vite sets the same headers locally (F19). The wrong `.wasm` type
   breaks streaming instantiation (F20). Rests on: R5-PREV-F12, F15, F18, F19, F20; R1-BND-REC5 (wave 1). Serves: §4 (four
@@ -1615,9 +1639,9 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   | G2 | Rust lint | clippy `-D warnings` on host and on `wasm32-unknown-unknown`; the determinism and panic lint sets | R5-RUSTLINT-REC1, REC2, REC3; R1-ECS-REC2 mark 2; R1-DET-REC2 |
   | G3 | TypeScript | `tsc -b`; ESLint typed lint, `--max-warnings 0` | R5-TSLINT-REC1, REC2 |
   | G4 | boundary | generated types and schema regenerate with zero diff; wasm-bindgen CLI equals the library in `Cargo.lock` | R5-LAYOUT-REC3; R1-BND-REC4, R1-DATA-REC3, R1-BND-F2 |
-  | G5 | dependency rules | cargo-deny bans (sim ↛ transport, async runtime), `multiple-versions` and `wildcards` at deny with a reviewed skip list; same-feature check for `sim` | R5-LAYOUT-REC2, REC4; R2-TRN-REC4 mark 3; F4 |
+  | G5 | dependency rules | cargo-deny bans (sim ↛ transport, async runtime), `multiple-versions` and `wildcards` at deny with a reviewed skip list; same-feature check for `sim` | R5-LAYOUT-REC2, REC4; R2-TRN-REC4 mark 3; R5-LAYOUT-F4 (features), R5-GATE-F4 (duplicates, wildcards) |
   | G6 | build | native release (server, devtools); `sim-wasm` to Wasm; Vite build of both entries | — |
-  | G7 | budgets | Wasm bytes (raw and gzip), JS bytes per entry, against a committed budget file; fail above it | F2; R1-RR-OQ5 |
+  | G7 | budgets | Wasm bytes (raw and gzip), JS bytes per entry, against a committed budget file; fail above it | R5-GATE-F2; R1-RR-OQ5 |
   | G8 | player build | walk Vite's manifest from the player entry: no chunk from `editor` | R5-LAYOUT-REC2; TL4 |
   | G9 | tests | `cargo test --workspace` (unit, property with the gate's fixed seeds, legacy goldens, insta), Wasm tests in Node, Vitest (Node) | R5-TEST-REC1, REC3, REC6 |
   | G10 | determinism | the short recordings: native ×2 processes, Wasm in Node, Wasm in Chromium, Firefox, WebKit; first mismatch reported | R5-TEST-REC2; R1-DET-REC6 |
@@ -1631,10 +1655,12 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   each check enforces one wave 1 or R5 recommendation, so no check is "for later"; size limits only warn in Vite (F2);
   advisories change without code changes (F3); duplicate and wildcard versions only warn by default (F4).
   Rests on: R5-GATE-F1, F2, F3, F4; R5-LAYOUT-F6, F14, F15; R5-TEST-F2, F3; legacy TL1, TL4, TL9, KT7.
-  Serves: the gate of every §6 item; G10 serves §6.2, §6.6, §6.8; G11 serves §4's fairness target.
+  Serves: the gate of every §6 item; G10 serves §4, §6.6, §6.8 (as R1-ECS-REC2 traces determinism); G11 serves §4's
+  fairness target.
   A spike must prove (proposed): see REC3 (every check fails on its planted defect).
-- **R5-GATE-REC2. One command, the same locally and in CI, carrying today's conventions (option A).** `node tools/gate.mjs`
-  (v2 edition) with today's base-ref rule, exit codes 0, 1 and 2, `--json`, and the TL3 habit as `--allow-removed` (a
+- **R5-GATE-REC2. One command, the same locally and in CI, carrying today's conventions (option A).** A Node
+  orchestrator (working name `node tools/gate.mjs`, v2 edition; where it lives beside legacy's gate is R5-GATE-OQ3)
+  with today's base-ref rule, exit codes 0, 1 and 2, `--json`, and the TL3 habit as `--allow-removed` (a
   list of exported Rust items and TypeScript exports the approved plan removes; the generated-types diff of G4 shows
   them). `--quick` runs G0–G5 and the tests of changed crates and packages (local use between steps; never for a
   commit); the full run is the default. CI runs the same check ids as parallel jobs (R5-CI-REC5's option G1) and the
@@ -1642,10 +1668,15 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   drop out of CI. Today's gate keeps running on `legacy/` changes while legacy lives (R5-LAYOUT-REC6).
   Time budget (proposed): `--quick` under 60 s warm; the full local run under 10 minutes warm on a recent desktop; CI
   as R5-CI-REC5 proposes (10 minutes p50 warm, 20 minutes cold).
-  Reason: TL1 and KT7 ask to keep the base ref, the exit codes and "never a silent skip"; Node runs on Mustafa's Windows
-  machine without the Rust toolchain for TypeScript-only work (options B and D fail CLAUDE.md's protocol or that need);
-  a check missing from CI is a silent skip by another route.
-  Rests on: legacy TL1, TL3, KT7, KT8; R5-CI-REC5 (folded part).
+  Reason: TL1 and KT7 ask to keep the base ref, the exit codes and "never a silent skip", and today's gate is a Node
+  script, so option A carries them unchanged; Node is needed anyway for Vite and the TypeScript tools. A and B both
+  need the Rust toolchain (G0 checks it, and `--quick` runs G1–G2's cargo fmt and clippy), so the toolchain does not
+  separate them: B would build the gate itself before every run and move its conventions into a second language for
+  no check it adds (inferred); D fails CLAUDE.md's protocol (the gate must PASS before a commit). A local run without
+  the Rust toolchain for TypeScript-only work is not provided here (R5-GATE-OQ1). A check missing from CI is a silent
+  skip by another route.
+  Rests on: no R5 web finding; legacy facts only: tools/gate.mjs:37, :71-89, :194, :213, :372 and tools/README.md:19
+  (the verifier confirmed each in the repository), TL1, TL3, KT7, KT8; R5-CI-REC5 (folded part).
   Serves: none directly (process).
   A spike must prove (proposed): the full gate on a clean tree passes in the budget above, measured over 5 runs, on
   Linux and Windows; removing one check from the CI workflow fails the aggregate job; a missing Playwright browser gives
@@ -1662,7 +1693,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   | G3 | unchecked index read; unawaited promise; non-exhaustive switch over a generated union; import of `editor` from `client` | `import type` from `types` in `editor` |
   | G4 | Rust field renamed without regeneration; hand edit to a generated file; wasm-bindgen CLI one patch off | regeneration after a rename |
   | G5 | `quinn` or `tokio` added to `sim`; a server-only feature on a shared maths dependency | a new dev-dependency in `sim` (proptest) |
-  | G7 | a 200 KB constant table added to the Wasm build | a change inside the budget |
+  | G7 | a constant table added to the Wasm build that crosses the committed budget (its size is set once REC4's budget exists) | a change inside the budget |
   | G8 | a dynamic `import()` of the editor from `client` | the editor entry importing `client` code |
   | G9 | a rule change that breaks a property; a v2 value moved beyond a golden's tolerance; a changed insta snapshot | a refactor with equal outputs |
   | G10 | R1-DET-REC6's three planted divergences (std `sin`, `HashMap` order, presentation RNG in the sim) | a presentation RNG draw outside the sim |
@@ -1757,6 +1788,12 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   L2 covers the same need for UDP. Decides it: only if L2 cannot reproduce a bug seen in a playtest.
 - **R5-TEST-OQ7. quickcheck or bolero instead of proptest.** Not read. Decides it: no need unless proptest fails a
   spike mark; proptest is the read option.
+- **R5-TEST-OQ8. cargo-nextest, code coverage and the bench harness were not researched.** cargo-nextest (said to run
+  each test in its own process, which would bear on F1's shared-thread risk and REC6's shared-state rule; not read:
+  unverified), coverage tools (cargo-llvm-cov, Vitest's coverage; R5-LAYOUT-REC6 already ignores `coverage/`) and the
+  tool for REC1's benchmark layer are options a reader would expect. Decides it: reading their pages (GitHub, docs.rs
+  and vitest.dev are on the allow list; nexte.st is not) for the ADR-0002 draft; until then `cargo test`, no coverage
+  gate, and benchmarks reported with method, never gated (R3-MEASURE-REC3).
 
 ### Question 5: CI with Rust caching (R5-CI; infra-engineer)
 
@@ -1800,8 +1837,10 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 
 ### Question 7: the gate v2 that replaces today's gate (R5-GATE)
 
-- **R5-GATE-OQ1. Which checks run on a TypeScript-only or Rust-only PR?** Path-based selection saves time but can skip
-  a check silently. Decides it: the first month's CI times against R5-CI-REC5's budget; until then every check runs.
+- **R5-GATE-OQ1. Which checks run on a TypeScript-only or Rust-only PR?** Path-based selection saves time but can skip a
+  check silently. It includes whether a local TypeScript-only run without the Rust toolchain is needed (R5-GATE-REC2
+  does not provide one). Decides it: the first month's CI times against R5-CI-REC5's budget; until then every check
+  runs.
 - **R5-GATE-OQ2. WebGPU in the end-to-end check.** Standard runners have no GPU (R5-CI-OQ5); G12's counts may run on
   the WebGL 2 fallback only. Decides it: graphics-engineer with R3-MEASURE.
 - **R5-GATE-OQ3. Where the gate v2 lives while legacy's gate stays.** Both in `tools/`, or the legacy gate inside
@@ -1817,22 +1856,29 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 The helper's findings, options, recommendations and open questions above are unchanged. Where they meet the owner's
 parts, the difference is written here; nothing is decided.
 
-- **R5-XQ-OQ1. Real Safari on macOS: in the PR gate or not?** R5-TEST-REC1 runs the end-to-end and determinism suites
-  in real Safari on macOS for pull requests that touch `client`, `net`, `sim-worker` or `sim`, because Playwright's
-  WebKit is not Safari (R5-TEST-F8). R5-CI-REC5's job list has no macOS job, and its determinism job puts the browser
-  targets inside the Playwright job (Chromium, Firefox and WebKit on Linux). What decides it: the macOS runner's time and
-  cost for a public repository (R5-TEST-OQ4, R6), then the synthesis (ADR-0002); until then the macOS run can be nightly
-  without breaking either part.
+- **R5-XQ-OQ1. Safari on macOS: in the PR gate or not, and does the end-to-end suite need real Safari?** R5-TEST-REC1
+  runs, on macOS, the end-to-end suite in Playwright's WebKit and the determinism replay in real Safari through its
+  WebDriver, for pull requests that touch `client`, `net`, `sim-worker` or `sim`, because Playwright's WebKit is not
+  Safari and Playwright cannot drive branded Safari (R5-TEST-F8, F5, F6). No runner for the end-to-end suite in real
+  Safari was read (a WebdriverIO suite beside Playwright would be one; not researched). R5-CI-REC5's job list has no
+  macOS job, and its determinism job puts the browser targets inside the Playwright job (Chromium, Firefox and WebKit on
+  Linux). What decides it: the macOS runner's time and cost for a public repository (R5-TEST-OQ4, R6), then the
+  synthesis (ADR-0002); until then the macOS run can be nightly without breaking either part. Whether the end-to-end
+  suite needs real Safari: decided by whether the WebKit run on macOS misses a Safari bug that a playtest or Mustafa's
+  checks find.
 - **R5-XQ-OQ2. One npm lockfile or a client lockfile?** R5-CI-REC4 keys the npm cache on "the client lockfile";
   R5-LAYOUT-REC1 has one root `package-lock.json` for all npm workspaces. If the root lockfile is the client's, the two
   agree. What decides it: the phase 1 restructure plan, which fixes the lockfile's path for R5-CI-REC4's
   `cache-dependency-path`.
-- **R5-XQ-OQ3. Isolation headers in local development: always, or behind a flag?** R5-PREV-REC4 uses the same COOP and
-  COEP values in Vite's `server.headers` and `preview.headers` "so local development matches the preview".
+- **R5-XQ-OQ3. Isolation headers in local development and in previews: always, or behind a flag?** R5-PREV-REC4 uses the
+  same COOP and COEP values in Vite's `server.headers` and `preview.headers` "so local development matches the preview".
   R5-LAYOUT-REC5 sends them locally only behind an isolation flag, so that by default the local build behaves like
-  production, which R1-BND-REC5 keeps non-isolated at the start. Both serve R1-BND-REC5 (G3: isolation allowed in
-  development and previews). What decides it: engine-architect with R1-BND-REC5's adoption test; whichever way, the
-  end-to-end suite should run once isolated and once not, so both paths are tested.
+  production, which R1-BND-REC5 keeps non-isolated at the start. The same gap holds for previews: R5-PREV-REC4 isolates
+  every preview while production stays non-isolated, so Mustafa's Brave check on a preview would run a header set
+  production does not have. Both serve R1-BND-REC5 (G3: isolation allowed in development and previews). What decides it:
+  engine-architect with R1-BND-REC5's adoption test; whichever way, the end-to-end suite should run once isolated and
+  once not, so both paths are tested, and the preview Mustafa checks should carry the header set production will ship
+  (one option: a production-headers preview for his check and an isolated one for profiling).
 
 ### Recommendations that hinge on a source not read
 
@@ -1849,9 +1895,10 @@ parts, the difference is written here; nothing is decided.
 | R5-TEST-REC2, REC4 (L2 under the WebTransport crate) | wtransport and web-transport-quinn docs | not fetched in this run; R5-TEST-OQ2 |
 | R5-TEST-REC4 (OS-level impairment left out) | Linux netem documentation (man7.org) | outside the allow list; R5-TEST-OQ6 |
 | R5-TEST-REC1 (proptest over alternatives) | docs.rs/quickcheck, docs.rs/bolero | not fetched in this run; R5-TEST-OQ7 |
+| R5-TEST-REC1, REC6 (test runner, coverage, bench tool) | cargo-nextest, cargo-llvm-cov, Vitest coverage, a bench harness | not fetched in this run; R5-TEST-OQ8 |
 | R5-GATE-REC2 (task runners ruled out) | https://just.systems/ | outside the allow list |
 | R5-GATE-REC3 (cargo-mutants options) | https://mutants.rs/ | outside the allow list (README read) |
-| R5-CI-…, R5-PREV-… | – | the helper's parts name their unread sources in their own "Sources not read" tables (part 8) and in their open questions (for example R5-CI-OQ4, R5-PREV-OQ2); the owner adds none |
+| R5-CI-…, R5-PREV-… | – | the helper's parts name their unread sources in their own "Sources not read" tables (the Sources part) and in their open questions (for example R5-CI-OQ4, R5-PREV-OQ2); the owner adds none |
 
 ### Pointers to other topics
 
@@ -1905,7 +1952,119 @@ parts, the difference is written here; nothing is decided.
 
 ## Verifier spot-check
 
-Pending: the wave 2 verifier spot-check.
+One verifier pass ran on 2026-10-29 (wave 2 of `.checkpoints/v2-research/plan.md`), and the owner's fix pass
+(test-engineer, the same day) applied it. Verdict: PASS WITH NOTES. The verifier checked 60 of the 115 key claims at
+their sources (WebFetch, allow-listed domains): 60 confirmed, 0 wrong, 0 unsupported. Its critical read found two
+substantive points (items 1 and 2), three wording fixes beyond nits (items 3 to 5) and smaller points (items 6 to 10).
+Its report, verbatim: `.checkpoints/v2-research/verifier-r5-result.md`; its notes with every quote in full:
+`.checkpoints/v2-research/verifier-r5.md`; the fix log: `.checkpoints/v2-research/test-engineer-r5-fix.md`.
+
+| Claim id | Claim | Source | Verdict | Location and exact words (as the verifier gave them) | Final state after the fix pass |
+|---|---|---|---|---|---|
+| R5-LAYOUT-F5 | Rust 1.99.1 on 15 Oct 2026 | blog.rust-lang.org/releases | confirmed | "Releases in 2026": "Announcing Rust 1.99.1" (Oct. 15, 2026); "Announcing Rust 1.99.0" (Oct. 1, 2026) | no change needed |
+| R5-LAYOUT-F1, F2 | one lockfile, one target folder, key inheritance | cargo/reference/workspaces.html | confirmed | "All packages share a common `Cargo.lock` file which resides in the _workspace root_."; "...a directory named `target` in the _workspace root_."; "`{key}.workspace = true`"; "(requires Rust 1.99+)" | no change needed |
+| R5-LAYOUT-F4 | feature unification | cargo/reference/features.html, "Feature unification" | confirmed | "Cargo will use the union of all features enabled on that dependency when building it."; "features should be _additive_" | no change needed |
+| R5-LAYOUT-F7 | ts-rs 12.0.1 and its export folder | docs.rs/ts-rs | confirmed | "ts-rs 12.0.1"; "When running `cargo test` or `cargo test export_bindings`, the following TypeScript type will be exported"; "Base directory into which bindings will be exported" | no change needed |
+| R5-LAYOUT-F12 | preview headers | vite.dev/config/preview-options | confirmed | v8.3.4; "Specify server response headers."; "Unless noted, the options in this section are only applied to preview." | no change needed |
+| R5-LAYOUT-F14 (and R5-GATE-F4) | cargo-deny bans | cargo-deny bans/cfg.html | confirmed | `deny` "Determines specific crates that are denied."; `wrappers` "allows specific crates to have a direct dependency on the banned crate" "but denies all transitive dependencies on it." | no change needed |
+| R5-LAYOUT-F15 | Vite manifest fields | vite.dev/guide/backend-integration | confirmed | "The input file name of this chunk / asset if known"; "Whether this chunk or asset is an entry point"; "The list of statically imported chunks by this chunk"; "The list of dynamically imported chunks by this chunk" | no change needed |
+| R5-TSLINT-F1 | TypeScript releases | github.com/microsoft/TypeScript/releases | confirmed | "TypeScript 7.0.2" 20 Aug (Latest); "TypeScript 7.1 Beta" 20 Oct; "TypeScript 6.0.3" 16 Apr; "TypeScript 6.0" 23 Mar | no change needed |
+| R5-TSLINT-F4 | supported TypeScript range | typescript-eslint.io dependency-versions (v8.72.1) | confirmed | "The version range of TypeScript currently supported is `>=4.8.4 <6.1.0`."; "...ESLint currently supported is `^8.57.0 \|\| ^9.0.0 \|\| ^10.0.0`." | no change needed |
+| R5-TSLINT-F5 | no TypeScript 7 support yet | typescript-eslint issue #12518 | confirmed | "opened on Jul 8, 2026", "closed this as not planned"; "typescript-eslint isn't compatible with TS 7 at this time, because there is no TS 7 API at this time."; marked blocked on Aug 10, 2026, pointing to #10940 | no change needed |
+| R5-TSLINT-F13 | `strict` configs are not semver-stable | typescript-eslint.io/users/configs | confirmed (the part marked "inferred" is in the source) | "With the exception of `all`, `strict`, and `strict-type-checked`, all configurations are considered "stable"."; "not considered "stable" under Semantic Versioning (semver)."; "only if a nontrivial percentage" … "of its developers are highly proficient in TypeScript." | fixed: the proficiency caveat is now quoted and confirmed |
+| R5-TSLINT-F15 | typed lint costs a project build | typescript-eslint typed-linting page | confirmed | "you incur the performance penalty of asking TypeScript to do a build of your project before ESLint can do its linting."; "a few seconds or less" | no change needed |
+| R5-TSLINT-F16 | `no-floating-promises` | its rule page | confirmed (config membership stated without a quote) | "Extending "plugin:@typescript-eslint/recommended-type-checked" in an ESLint configuration enables this rule." | fixed: that quote added |
+| R5-TSLINT-F21 | ESLint recommends a formatter | eslint.org blog | confirmed | "Published 26 Oct, 2023"; "We recommend using a source code formatter instead of ESLint for formatting your code."; "will not be removed until at least ESLint v10.0.0" | fixed: notes that ESLint 10 is current and whether it removed the rules was not read (critical read 10) |
+| R5-RUSTLINT-F1, F2 | lint groups | clippy/lints.html | confirmed | "The `clippy::correctness` group is the only lint group in Clippy whose lints are deny-by-default"; "It is **not** recommended to enable the whole group"; "contains lints which are buggy or need more work." | no change needed |
+| R5-RUSTLINT-F7, F8, F15 | banned methods and types, lint versions | raw clippy disallowed_items.rs | confirmed | DISALLOWED_FIELDS "1.95.0", DISALLOWED_METHODS "1.49.0", DISALLOWED_TYPES "1.55.0"; `{ path = "std::time::Instant::now" },` | no change needed |
+| R5-RUSTLINT-F9 | `iter_over_hash_type` covers `for` loops only | raw iter_over_hash_type.rs | confirmed | "...(i.e., `HashSet` and `HashMap`) in for loops."; version "1.76.0"; `if let Some(for_loop) = ForLoop::hir(expr)` | no change needed |
+| R5-RUSTLINT-F11 | tests may unwrap if allowed | clippy/lint_configuration.html | confirmed | "Whether `unwrap` should be allowed in test functions or `#[cfg(test)]`", Default `false` (the same for expect and indexing_slicing) | no change needed |
+| R5-RUSTLINT-F13 (and R5-CI-F10) | overflow and incremental defaults | cargo/reference/profiles.html | confirmed | `overflow-checks = true` (dev) and `false` (release); "Profile settings can be overridden for specific packages and build-time crates."; "Overrides cannot specify the `panic`, `lto`, or `rpath` settings."; `incremental = true` / `false` | no change needed |
+| R5-RUSTLINT-F14 | rustfmt options | raw rustfmt Configurations.md | confirmed | style_edition and edition default "2015", stable "Yes"; max_width `100`; newline_style "Auto"; imports_granularity "No (tracking issue: #4991)"; group_imports "No (… #5083)" | no change needed |
+| R5-TEST-F2 | proptest defaults | docs.rs proptest Config | confirmed (the part marked "inferred" is in the source) | "proptest 1.12.0"; "The default is 256, which can be overridden by setting the `PROPTEST_CASES` environment variable."; "Set by using the PROPTEST_RNG_SEED environment variable"; "If the environment variable is undefined, a random seed is generated" | fixed: the seed default is now quoted and confirmed |
+| R5-TEST-F3 | insta snapshots | docs.rs/insta | confirmed | "insta 1.49.0"; "`no` for CI environments or `new` otherwise"; "`no`: does not write to snapshot files at all; just runs tests" | no change needed |
+| R5-TEST-F5 | wasm-bindgen-test in browsers | rustwasm.github.io …/browsers.html | confirmed | "Use Safari for headless browser testing, and `safaridriver` as its WebDriver."; "Note that this will ignore any environment variable set." | no change needed (now in R5-TEST-REC2's Safari path) |
+| R5-TEST-F6 | Vitest Browser Mode providers | vitest.dev/guide/browser | confirmed | "v5.0.5"; "webdriverio supports these browsers:" firefox, chrome, edge, safari | no change needed (now in R5-TEST-REC2's Rests on) |
+| R5-TEST-F8 | Playwright's WebKit is not Safari | playwright.dev/docs/browsers | confirmed for the quoted parts; the inferred end of a sentence points to WebKit on macOS, not to real Safari | "Playwright doesn't work with the branded version of Safari since it relies on patches."; "…for the closest-to-Safari experience you should run WebKit on mac" | fixed: the sentence is completed in the source's words and the title says Playwright cannot drive branded Safari; R5-TEST-REC1's Safari row, R5-TEST-REC2 and R5-XQ-OQ1 reworded (critical read 1) |
+| R5-TEST-F9 | Playwright flake settings | playwright.dev TestConfig | confirmed | failOnFlakyTests "Added in: v1.52", "Whether to exit with an error if any tests are marked as flaky. Useful on CI."; "By default failing tests are not retried." | no change needed |
+| R5-TEST-F12 | GameNetworkingSockets fault injection | raw steamnetworkingtypes.h | confirmed | "[global float, 0--100] Randomly discard N pct of packets instead of sending/recv"; "Delay all outbound/inbound packets by N ms"; "Simulated jitter/clumping."; "Globally duplicate some percentage of packets."; "Global UDP token bucket rate limits."; separate _Send and _Recv values | no change needed |
+| R5-TEST-F13 | quinn on a custom socket | docs.rs quinn Endpoint | confirmed | "quinn 0.11.12"; `new_with_abstract_socket(… socket: Arc<dyn AsyncUdpSocket>, …)`; "Construct an endpoint with arbitrary configuration and pre-constructed abstract socket" | no change needed |
+| R5-TEST-F14 | Fiedler on network testing | gafferongames.com | confirmed | "Sep 6, 2016"; "99% packet loss, 10 seconds of latency"; "Your soak test passes when it runs overnight and doesn't hang or assert." | no change needed |
+| R5-CI-F1, F2, F3 | what rust-cache saves and keys on | github.com/Swatinem/rust-cache | confirmed (nit: F2 leaves out the Cargo.toml part of the key) | "./target (build artifacts of dependencies)"; "the workspace crates themselves are not cached since doing so is generally not effective."; "sets CARGO_INCREMENTAL=0"; key: "the rustc release / host / hash" and "a hash of the workspace's Cargo.lock and of the Cargo.toml of the workspace root and every workspace member" | fixed (F2): the Cargo.toml part of the key added in the verifier's words |
+| R5-CI-F5, F7 | cache limits | docs.github.com dependency-caching; github.blog changelog 2025-11-20 | confirmed | "By default, the limit is 10 GB per repository"; "not been accessed in over 7 days."; "up to 200 uploads per minute", "1500 downloads per minute"; "going beyond the 10 GB per repo limit requires a valid Pro, Team, or Enterprise account." | no change needed |
+| R5-CI-F9 | what sccache cannot cache | github.com/mozilla/sccache, Known Caveats | confirmed | "This includes `bin`, `dylib`, `cdylib`, and `proc-macro` crates."; "Incrementally compiled crates cannot be cached." | no change needed |
+| R5-CI-F13 | rustup 1.28 stops installing toolchains automatically | blog.rust-lang.org Rustup-1.28.0 | confirmed | "rustup will no longer automatically install the active toolchain if it is not installed."; "rustup show active-toolchain \|\| rustup toolchain install" | no change needed |
+| R5-CI-F14 | latest wasm-bindgen | wasm-bindgen releases | confirmed | "0.2.129", "released this 25 Sep 07:13"; "Show all 17 assets" | no change needed |
+| R5-CI-F15 | install-action | github.com/taiki-e/install-action | confirmed | "this action will also verify SHA256 checksums for downloaded files"; "none: disable all fallback options." | no change needed |
+| R5-CI-F17 | hosted runners | docs.github.com github-hosted-runners | confirmed | "free and unlimited on public repositories."; ubuntu-24.04 public "4" \| "16 GB" \| "14 GB"; GPU only under larger runners | no change needed |
+| R5-CI-F18 | Playwright in CI | playwright.dev/docs/ci | confirmed | "Caching browser binaries is not recommended…"; "setting workers to '1' in CI"; `mcr.microsoft.com/playwright:v1.64.1-noble` | no change needed |
+| R5-CI-F20 | skipped jobs and required checks | docs.github.com troubleshooting-required-status-checks | confirmed | "Associated checks stay in a "Pending" state and block merging."; a job skipped by a condition "reports "Success""; a job that depends on a failed job "is skipped and may not block merging." | no change to the finding; R5-CI-REC5 fixed to use its last clause (critical read 2) |
+| R5-CI-F22 | workflow lockfiles | github.blog changelog 2026-10-14 | confirmed (date, plans, path) | "GitHub Enterprise Cloud with data residency, Team, and Free plans."; ".github/workflows/actions.lock" | no change needed |
+| R5-PREV-F1 to F4 | fork PRs and trigger events | docs.github.com events-that-trigger-workflows | confirmed | "secrets are not passed to the runner when a workflow is triggered from a forked repository."; "Avoid using this event if you need to build or run code from the pull request."; workflow_run "is able to access secrets and write tokens, even if the previous workflow was not."; default activity types `opened`, `synchronize`, `reopened` | no change needed |
+| R5-PREV-F6 | environment reviewers | docs.github.com deployments-and-environments | confirmed | "If you are on a GitHub Free, GitHub Pro, or GitHub Team plan, required reviewers are only available for public repositories." | no change needed |
+| R5-PREV-F12, F13 | Pages preview deployments | developers.cloudflare.com pages/preview-deployments (updated Oct 12, 2026) | confirmed | "By default, these deployment URLs are public."; "…includes the X-Robots-Tag: noindex HTTP response header."; "The latest deployment for a branch cannot be deleted." | no change to the findings; R5-PREV-REC2's "meets every need" qualified by F13 (critical read 10) |
+| R5-PREV-F14 | Workers previews | developers.cloudflare.com workers/previews (updated Sep 22, 2026) | confirmed | "Only the 1000 most recently deployed aliases are retained."; "must not exceed 63 characters"; "If Version URLs are enabled, the URL is public and available after version creation." | no change needed |
+| R5-PREV-F18 | Pages `_headers` file | developers.cloudflare.com pages/headers (updated Aug 25, 2026) | confirmed | "You may define up to 100 header rules."; "Each line in the `_headers` file has a 2,000 character limit."; `https://:version.:project.pages.dev/*` | no change needed |
+| R5-PREV-F20 | Wasm MIME type | MDN instantiateStreaming (modified Sep 22, 2026) | confirmed | "If the response has an incorrect MIME type (instead of `application/wasm`), the promise rejects with a TypeError." | no change needed |
+| R5-GATE-F1 | cargo-mutants | github.com/sourcefrog/cargo-mutants | confirmed | "Inject bugs and see if your tests catch them!" | no change needed |
+| R5-GATE-F2 | Vite size limit only warns | vite.dev/config/build-options | confirmed | "Limit for chunk size warnings (in kB)." Default "500"; reportCompressedSize Default "true" | no change needed (R5-GATE-REC1's G7 row now names it in full) |
+| R5-GATE-F4 | cargo-deny defaults | bans/cfg.html | confirmed | `multiple-versions` warn (default) "Prints a warning for each crate with duplicates, but does not fail the check."; the same for `wildcards` | no change needed (R5-GATE-REC1's G5 row now names it in full) |
+
+R5-GATE-REC2 names no R5 finding, so the verifier checked its legacy basis in the repository instead (not counted in
+N), all confirmed: tools/gate.mjs:71-89 (the newer merge-base), :37 (exit 2), :194 (`ORDER`), :213 (exit codes 0, 1
+and 2), :372 ("[5a] smoke (slowest, so last)"), tools/README.md:19 ("About 20 s … 2.5 s") and
+.github/workflows/gate.yml:67-72 (the tool version read from the lockfile).
+
+**The critical read, ranked, and what the fix pass did.**
+1. Real Safari does not follow from F8 (R5-TEST-REC1, REC2, R5-XQ-OQ1). Fixed: F8 now quotes the whole sentence and
+   says Playwright cannot drive branded Safari; R5-TEST-REC1's Safari row runs the e2e suite in Playwright's WebKit on
+   macOS and the Wasm and determinism tests in real Safari through safaridriver (F5) or WebdriverIO (F6), and says no
+   runner for an e2e suite in real Safari was read; R5-TEST-REC2 names that WebDriver path, rests on F6 too and adds
+   real Safari to its nightly mark; R5-XQ-OQ1 asks whether the e2e suite needs real Safari and what decides it.
+2. The single required check can be skipped (R5-CI-REC5, the helper's part). Fixed: the final job runs whatever the
+   other jobs did and fails unless every job it needs succeeded (the `if: always()` form is marked inferred: no page
+   read quotes it); the reason cites F20's "is skipped and may not block merging"; spike mark 5 makes a failing and a
+   cancelled job turn the required check red.
+3. "At warn" fails the gate (R5-RUSTLINT-REC3). Fixed: the sim does not enable the three restriction lints, and the
+   text says why `warn` would fail every index read under `-D warnings`; R5-RUSTLINT-REC1 says pedantic at warn fails
+   the gate in its three crates.
+4. R5-GATE-REC2's case against option B applies to A. Fixed: the reason now says A and B both need the Rust toolchain
+   and picks A for continuity; options A and B say so; a Rust-free TypeScript run is not provided and is part of
+   R5-GATE-OQ1.
+5. §6.2 mis-traced. Fixed in R5-LAYOUT-REC4, R5-RUSTLINT-REC2, R5-RUSTLINT-REC4, R5-TEST-REC2 and, for the same
+   reason, R5-GATE-REC1's G10 line: they now serve §4 (and §6.6, §6.8), as R1-ECS-REC2 traces determinism. Kept in
+   part, with the reason: R5-LAYOUT-REC5's "Serves" is about the sim in a Worker, not an identical sim, and R1 traces
+   that Worker (its option A2) to §6.2, §6.9 and §4; the line now names all three.
+6. Previews would not match production (R5-PREV-REC4). R5-XQ-OQ3 now covers previews too (one option: a
+   production-headers preview for Mustafa's Brave check and an isolated one for profiling); R5-PREV-REC4 points to it
+   and is otherwise unchanged.
+7. Missing options (cargo-nextest, coverage, a benchmark layer). R5-TEST-REC1's table gains a benchmark row (reported
+   with method, never a gate pass or fail, R3-MEASURE-REC3); new open question R5-TEST-OQ8 records that nextest,
+   coverage tools and the bench tool were not researched, with what decides it; a not-read row names their pages.
+8. Missing "Rests on:" entries. Added: R1-BND-F2 (R5-LAYOUT-REC1); R5-TEST-F4, R1-DATA-REC2, R2-TRN-REC4
+   (R5-LAYOUT-REC2); F7 (R5-TEST-REC1); CD4, CD6, CD10–CD14, R1-DET-OQ3 (R5-TEST-REC3); R2-TRN-OQ8 (R5-TEST-REC4);
+   R5-PREV-REC2 now says its GitHub Pages, Netlify-headers and Vercel points rest on R6's notes and inference;
+   R5-GATE-REC2 now says it rests on no R5 web finding and names the repository lines the verifier confirmed.
+9. Wave 1 drift (R5-TEST-REC4's L2 mark). Fixed: app RTT agrees with quinn's server-side `rtt()` within ±5 ms at
+   100 ms injected round trip, as R2-TRN-REC4 mark 2 sets it, and is then reported under P2.
+10. Nits, all applied: F22's language list is quoted (a re-read of the same README); GATE-REC1's "F2" and "F4" are
+    written in full; R5-TEST-REC6 uses one fixed committed seed; the G7 mutation drops the 200 KB figure until a budget
+    exists; R5-PREV-REC2 notes the cleanup gap (F13, R5-PREV-OQ2); F21 notes that ESLint 10's removal of the rules was
+    not read; the stale "section 1" and "part 8" references are fixed (and one more "section 1" in Question 6's
+    legacy facts). Also from the verifier's notes: the two "inferred" parts it found in the sources (F13, F2) are now
+    quoted, F16's config quote is added, and CI-F2 has the Cargo.toml part of the key.
+- On "research only": R5-GATE-REC2 now calls `node tools/gate.mjs` a working name whose path is R5-GATE-OQ3, and
+  R5-LAYOUT-REC6 says the move of `tools/` is input to the phase 1 plan; nothing here changes today's gate, tools or CI.
+- Not applied: none. The one partial disagreement is item 5's R5-LAYOUT-REC5 (above).
+
+**Counts.** 60 checked · 60 confirmed · 0 wrong · 0 unsupported. M = 115 key claims (every finding except R5-CI-F8 and
+R5-PREV-F16, which no "Rests on:" list names), N = 60 (R5-CI-F10 counted with R5-RUSTLINT-F13). Final state of the
+60: 54 no change needed to the finding (for R5-CI-F20 and R5-PREV-F13 the recommendations citing them were fixed), 6
+fixed (R5-TSLINT-F13, F16, F21, R5-TEST-F2, F8, R5-CI-F2), 0 re-sourced, 0 now an open question. No
+recommendation rests on a wrong or unsupported claim. No recommendation became an open question. The fix pass fetched
+one page again (the Prettier README, source 25) to quote F22's language list; it added no finding and no new source.
+Not verified by the verifier: parts of R5-LAYOUT-F3, R5-CI-F4, F16, F19, F21, F23, F24, the R5-PREV-F3 quotes from
+the secure-use page, TOOLS.md and the rustup 1.28.2 post.
 
 ## Sources
 
@@ -2067,6 +2226,7 @@ cited).
 | Linux `tc netem` documentation (man7.org) | outside the allow list (R5-TEST-OQ6) |
 | https://mutants.rs/ | outside the allow list (the README was read) |
 | https://nexte.st/ | outside the allow list |
+| github.com/nextest-rs/nextest, docs.rs/cargo-llvm-cov, vitest.dev's coverage guide, a Rust bench harness's docs | on the allow list; not fetched in this run (R5-TEST-OQ8, added by the fix pass) |
 | https://just.systems/ | outside the allow list |
 | infoq.com, dev.to, ecorpit.com, mergify.com, coddy.tech (search results on TypeScript 7 and linting) | outside the allow list (search leads only; nothing used) |
 | devblogs.microsoft.com/typescript (search result) | outside the allow list (search lead only) |
@@ -2103,10 +2263,10 @@ cited).
 
 | Part | Read | Official | Shipped game | Other | Not read (rows) |
 |---|---|---|---|---|---|
-| Questions 1–4 and 7 (test-engineer) | 68 | 65 | 2 | 1 | 24 |
+| Questions 1–4 and 7 (test-engineer) | 68 | 65 | 2 | 1 | 25 |
 | Question 5 (infra-engineer) | 26 (one title-only, nothing used) | 26 | 0 | 0 | 10 |
 | Question 6 (infra-engineer) | 20 | 20 | 0 | 0 | 4 |
-| Whole file, each page once | 108 | 105 | 2 | 1 | 38 |
+| Whole file, each page once | 108 | 105 | 2 | 1 | 39 |
 
 "Each page once": 4 pages were read by both authors (Vite server options, Vite preview options, rustup overrides,
 Cargo profiles) and 2 pages appear in both of the helper's tables (GitHub's "Secure use reference" and "Managing GitHub
