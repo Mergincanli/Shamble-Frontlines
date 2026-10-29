@@ -6,8 +6,8 @@
   `.checkpoints/v2-research/graphics-engineer-r3.md`; one draft per question:
   `.checkpoints/v2-research/graphics-engineer-r3-r3-<id>-draft.md`.
 - **Date:** 2026-10-28 (every source below was read that day).
-- **Status:** spot-checked (44 of 77 key claims). The verifier's table, its critical read and the owner's fixes are
-  in part 7 ("Verifier spot-check").
+- **Status:** spot-checked (45 of 77 key claims). The verifier's table, its critical read, the owner's fixes and the
+  second pass on them (2026-10-29: closed, nits only) are in part 7 ("Verifier spot-check").
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R3):** "three.js WebGPURenderer with
   TSL; the WebGL 2 fallback; candidate techniques for a comic look (toon ramps, screen-space outlines, ambient
   occlusion, emissive bloom); characters (skinning, instancing, LOD); budgets for the minimum and recommended hardware;
@@ -1078,7 +1078,9 @@ Rests on: R3-CHAR-F7, F12; R3-GL2-REC1 (cited); legacy CL9, GC16; wave 1 R1-BND-
 Serves: VISION_V2 §6.4 (big, multi-part vehicles), §6.9.
 Spike must prove (proposed): four large units (each at least 20 parts; the count of R3-BUDGET-REC2's and R1-TICK's
 scene) on screen with 48 soldiers add at most 2.0 ms GPU time and at most 200 draw calls against the scene without
-them, on the recommended machine at High (4 units × 20 parts × 2 passes, shadow and main, is 160 draws, plus margin);
+them, before any outline or ambient-occlusion pre-pass, on the recommended machine at High (4 units × 20 parts × 2
+passes, shadow and main, is 160 draws, plus margin; a hull outline adds about 80 more for the same parts,
+R3-BUDGET-REC2, second pass 2026-10-29);
 render bundles stay only if they cut the WebGPU backend's CPU frame time in the benchmark scene.
 
 ### Question 5: budgets for the minimum and recommended hardware (R3-BUDGET)
@@ -1134,8 +1136,12 @@ per soldier per pass give 192 per pass at 48; a shadow and a main pass make 384;
 unmerged village was 303, AUDIT §1); four large units up to 200 (R3-CHAR-REC4): about 786, inside 800. A hull outline
 pass adds one draw per outlined object (R3-LOOK-F5): 192 more for the soldiers and about 80 for the large units' parts,
 about 1,060 in all. So the 800 cap holds only without a per-object outline pass at Low; if the look brief keeps a hull
-outline at Low, the Low cap becomes about 1,100 (proposed), or the hull is a High-only setting. That trade is the
-brief's, measured by R3-LOOK-REC3; R3 does not choose it. The CPU-side animation row (1.0 ms) applies with the budget
+outline at Low, the Low cap becomes about 1,100 (proposed), or the hull is a High-only setting. A GTAO pre-pass
+(R3-LOOK-REC2's other planned extra) adds about one draw per drawn object as well: about 192 for the soldiers and 80
+for the large units' parts, plus the world's main-pass share, so it passes both 800 and 1,100 at Low; whether Low keeps
+it is the same trade (second pass, 2026-10-29). Both counts are conservative, since the world's 202 already includes
+the world's shadow pass and its own hulls (CS12 gives 398 as the count just before the merge). That trade is the brief's, measured by
+R3-LOOK-REC3; R3 does not choose it. The CPU-side animation row (1.0 ms) applies with the budget
 LOD; R3-CHAR-REC1's 2.0 ms mark is the cost with every soldier on the full rig, which is why the budget LOD exists. The
 resolution cap follows F3 and CD15 (ratio 2 shades four times the pixels). Memory follows the
 render-target arithmetic (F5): at 1080p a half-float colour target is 16.6 MB, so a post chain with MSAA, two MRT outputs and bloom can reach
@@ -1317,7 +1323,8 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   Valve's "Illustrative Rendering in Team Fortress 2" were not readable here. Decided by: the Advisor's search for an
   allow-listed copy, if the look brief wants them.
 - **R3-LOOK-OQ6. Anti-aliasing.** MSAA is the renderer's built-in option (R3-WGPU-F15) and multiplies the multisampled
-  MRT attachments' memory (F14); post-process anti-aliasing (FXAA, which needs sRGB input, R3-WGPU-F12; SMAA; TRAA,
+  MRT attachments' memory (F14); post-process anti-aliasing (FXAA, which needs sRGB input, R3-WGPU-F12; SMAA, named
+  here as a candidate only: no finding or source read covers it; TRAA,
   F10, with its ghosting) is the alternative, and screen-space outlines alias (options table). These were not
   researched as options in this pass (a verifier finding, C7). Decided by: a reading of three's anti-aliasing nodes,
   then the look-test scene (REC1), only for the techniques the brief keeps.
@@ -1338,8 +1345,8 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-CHAR-OQ5. Camera framing.** F13 assumes a top-down camera like legacy's; the v2 framing is look brief pending
   (R2-INT-REC1 holds it as data). Decided by: the look brief, then the LOD tiers.
 - **R3-CHAR-OQ6. GPU-driven culling and indirect draws.** Not researched in this pass (a verifier finding, C7). On the
-  fallback, indirect dispatch counts are refused (R3-GL2-F2), so either would be a WebGPU-only extra under
-  R3-GL2-REC1. Decided by: a source reading and a spike, only if the draw-call budget (R3-BUDGET-REC2) is still missed
+  fallback, indirect dispatch counts are refused (R3-GL2-F2), so either would likely be a WebGPU-only extra under
+  R3-GL2-REC1 (inferred: F2 covers compute dispatch counts only, not indirect draws). Decided by: a source reading and a spike, only if the draw-call budget (R3-BUDGET-REC2) is still missed
   after REC1 to REC4.
 
 ### Question 5: budgets for the minimum and recommended hardware (R3-BUDGET)
@@ -1467,7 +1474,8 @@ problems in the recommendations that were more than nits (L1, L2, C1, C2). Its r
 (R3-WGPU-F14, R3-WGPU-F16, R3-GL2-F1, R3-MEASURE-F1). Final state after the fix pass: 43 no change needed · 1 fixed
 (R3-MEASURE-F3) · 0 re-sourced · 0 now an open question. No recommendation rests on a claim whose verdict is wrong or
 unsupported; every one of the 25 has at least one checked basis claim. M = 77 distinct R3 finding ids in the 25 "Rests
-on:" lists before the fix (legacy and wave-1 ids not counted), N = 44 checked.
+on:" lists (legacy and wave-1 ids not counted; unchanged by the fix), N = 44 checked (45 after the second pass, which
+confirmed R3-BUDGET-F6's new quotes).
 
 | Claim id | Claim | Source | Verdict | Location and exact words (as the verifier gave them) | Final state after the fix pass |
 |---|---|---|---|---|---|
@@ -1540,6 +1548,23 @@ on:" lists before the fix (legacy and wave-1 ids not counted), N = 44 checked.
 **Not verified** (the verifier's list): claims off the check list (including R3-WGPU-F2, F12, F13, F19, F20, F21), the
 Firefox release dates in R3-WGPU-F18, the `maxDistance` parts of R3-AUDIO-F3, the `trackTimestamp` option's doc
 string, and any GPU timing (no source gives one, R3-LOOK-F15). The fix pass fetched no new page and re-sourced no claim.
+
+### Second pass (2026-10-29)
+
+The spot-check found more than nits, so the verifier checked what the fix changed (`git diff 605c09d`; report:
+`.checkpoints/v2-research/verifier-r3-second-pass-result.md`, notes `verifier-r3-second-pass.md`). Verdict: PASS WITH
+NOTES.
+- L1, L2, C1 and C2 closed; C3 to C11 closed or, for C7, turned into open questions with a sound reason; L5 left as a
+  note. No fix chooses a look or a set of look techniques.
+- Claims and numbers checked: 14 confirmed (11 at a source, among them R3-BUDGET-F6's quotes, 3 arithmetic), 0 wrong,
+  2 unsupported (both in new open questions: SMAA in R3-LOOK-OQ6 had no source; R3-CHAR-OQ6's WebGPU-only point was an
+  unmarked inference).
+- Two minor gaps of the L2 kind, each one sentence with no new source, which the verifier said the session could word
+  without another pass: (A) R3-BUDGET-REC2's Low draw-call cap now says a GTAO pre-pass passes both caps; (B)
+  R3-CHAR-REC4's mark now says it counts before any outline or pre-pass. Applied by the session on 2026-10-29 in the
+  verifier's figures, with the nits: R3-LOOK-OQ6 marks SMAA as a candidate with no source; R3-CHAR-OQ6 marks its point
+  inferred; the world's 202 is noted as including its own hulls; M is "unchanged by the fix".
+- Label: "spot-checked (45 of 77 key claims)". Review stops here: what remains is nits.
 
 ## Sources
 
