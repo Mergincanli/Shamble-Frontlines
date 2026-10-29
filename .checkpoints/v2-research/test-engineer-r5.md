@@ -78,3 +78,4 @@
 - Repo: docs/reports/2026-10-14-gate-check-5.md: 22/22 mutation proofs fail exactly the expected checks; controls "PASS as they should" (valid handlers, commented-out tag, animated Deploy button); 5/5 clean runs 16.7-19.3 s; smoke fails on any wait over 30 s; CI gate 10/17 s, smoke 57/59 s cached, 63-67 s uncached.
 - R2 profiles (r2-netcode.md:1980-1986): RTT; P0 0/0/0, P1 50 ms ±10 1 %, P2 100 ±20 2 %, P3 150 ±30 5 %, P4 200 ±40 5 %, B1 = P2 + 1 s 100 % loss burst; "Every spike also covers reordering (F11)". R2-TRN-REC1: quinn 0.11.x + wtransport 0.7.x or web-transport-quinn 0.13.x by spike.
 - [Sources done for all five questions: S1-S61.] Next: write drafts LAYOUT, TSLINT, RUSTLINT, TEST, GATE.
+- [2026-10-29 resumed after spend-limit reset] LAYOUT draft exists (test-engineer-r5-layout-draft.md). Helper notes end DONE (draft infra-engineer-r5-ci-draft.md, 693 lines). Next: TSLINT draft.

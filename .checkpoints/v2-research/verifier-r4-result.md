@@ -1,5 +1,7 @@
 # R4 verifier spot-check: the report, verbatim
 
+Workflow run wf_d3f13cf7-77e (script `v2-research-r4-check-fix-run1.js`, prompt `prompts/verifier-r4.txt`), returned 2026-10-28 (about 20:46 UTC; copied from the workflow's own result by the session). Notes: `verifier-r4.md`.
+
 VERDICT: PASS WITH NOTES. I checked 49 of the 51 key claims: 46 are confirmed, 2 are wrong and 1 is unsupported. No recommendation is overturned, but five points need content edits, so the findings are slightly more than nits.
 
 This was a research check, so I skipped the gate and the symbol checks as instructed. I used WebFetch only, on allow-listed domains. My notes, with the full table and DONE at the end, are in /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r4.md.

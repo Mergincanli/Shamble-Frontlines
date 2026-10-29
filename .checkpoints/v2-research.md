@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-28 21:46 Amsterdam
+- **Last update:** 2026-10-29 22:08 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -156,6 +156,16 @@ key (condition A1).
   R3 check-fix DONE at about 20:45 UTC (reports `verifier-r3-result.md`, `graphics-engineer-r3-fix-result.md`; the
   fixed file is in ddd45df). R3 second pass: run wf_7260c3bd-5b1 (task wyeyt2bgh), launched 20:46 UTC.
   Running: R3 second pass, R4 and R6 check-fix workflows, and the R5 owner: 4 agents.
+- Third spend-limit cut, 2026-10-28 about 20:50 UTC ("resets 1am (UTC)"): R4's spot-check had finished
+  (`verifier-r4-result.md`: 49 of 51 key claims checked, 46 confirmed, 2 wrong (PHYS-F20 "any two shapes", FLOORS-F5's
+  count), 1 unsupported (NAV-F15's hashbrown default); slightly more than nits); cut part way: the R4 fix, the R6
+  spot-check, the R5 owner (1 of 5 drafts: layout), the R3 second pass. Notes saved for each. The 23:50 night-stop
+  reminder found nothing running (it fired 22:51 UTC, after the cut). The session stayed idle until Mustafa's "Try
+  again" on 2026-10-29 about 21:07 UTC.
+- Resumed 2026-10-29 about 21:10 UTC (22:10 Amsterdam): workflows resumed with resumeFromRunId (R4 wf_d3f13cf7-77e:
+  spot-check cached, fix live, task wewlvbjlr; R6 wf_12f840d1-878, task wtgxyoez2; R3 second pass wf_7260c3bd-5b1,
+  task wf7io9kwu); the R5 owner by message. Saver restarted (task bt9yig2mb). Night-stop reminder for 23:50 tonight
+  set (send_later, 22:50 UTC). 4 agents at once.
 - Next: when the second pass returns: the owners fix R1 and R2 where it found wrong or unsupported claims (fix rule),
   then the R5 owner and helper; then each wave-2 file's verifier spot-check (high), fixes, the consistency critic,
   docs-keeper, gate, report, PR. At most 4–5 agents at once (the Advisor, 2026-10-28).
