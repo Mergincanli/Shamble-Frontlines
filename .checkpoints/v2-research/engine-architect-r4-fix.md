@@ -18,3 +18,22 @@
 - recommendation · NAV-F15 (W2): hashbrown-default clause dropped (basis of NAV-REC1)
 - number · FLOORS-F5: 19 -> 18 ways plus TRAVEL_INVALID (W3)
 - nit · OBST scope line: §6.4's own words; "moving obstacles" inferred (C12)
+- Unit 2 done (options and recommendations, 30 replacements): NAV option A cells; PHYS-REC1 reason, Rests on, marks 1/5, new mark 6; PHYS-REC2/3/4; NAV-REC1..4; FLOORS-REC2; LOS-REC2; OBST-REC1/2/3; wave-1 list (P1 count); pointers (ADR-0002 target; tile re-bake conditional). Next: part 7, sources (#47), header status and totals.
+- recommendation · NAV option A: C-capable targets named; blocker holds only for R1's target (C5)
+- nit · NAV option table determinism and effort cells reworded (NAV-F15, F8)
+- recommendation · PHYS-REC1 reason: "any two shapes" -> supported pairs; autostep cost (W1, C1, C10)
+- number · PHYS-REC1 mark 1: sprint speed 9.0 m/s -> fastest soldier 13.3 m/s (0.22/0.44 m per tick) (C2)
+- recommendation · PHYS-REC1 mark 5: autostep on; new mark 6 (shape pairs, 0 Unsupported) (C1, C10)
+- nit · PHYS-REC1 Rests on: tuning sprintMult -> legacy GP3
+- nit · PHYS-REC2 Rests on: + F12, GN11 (C9)
+- recommendation · PHYS-REC3 reason: supported pairs (W1); Rests on + LOOP_V2 §5, REC1 mark 6 (C9)
+- recommendation · PHYS-REC4: turning (nonlinear cast or rotate-then-sweep), mark adds turns; Rests on + F13 (W1, C7)
+- recommendation · NAV-REC1 reason: Detour/target; hashbrown clause dropped; voxel rounding (W2, C5, C12)
+- nit · NAV-REC1..4, LOS-REC2, OBST-REC1 Serves: §6.1 -> VISION_V2 §3; NAV-REC4 + §6.2 (C3) [6 lines]
+- number · NAV-REC2 mark: P1 with 8 big vehicles instead of 4; Rests on + R1-XU-OQ1, R4-PHYS-REC4 (C11)
+- recommendation · NAV-REC3: neighbours filtered by floor layer; new floor mark; Rests on + R4-FLOORS-REC2 (C8)
+- nit · FLOORS-REC2 Rests on: + LOOP_V2 §2, §9 (C9)
+- nit · OBST-REC1 Serves: §6.4 words, moving obstacles inferred (C12)
+- nit · OBST-REC2 Rests on: + LOOP_V2 §3 (C9)
+- recommendation · OBST-REC3: tiling conditional on NAV-REC1 mark 1 failing; Serves says building is not a reason (C4)
+- nit · wave-1 list: P1 vehicle-count line added (C11); pointers: ADR-0002 target line (C5), tile re-bake conditional (C4)
