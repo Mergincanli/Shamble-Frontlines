@@ -7,9 +7,10 @@
   owner's open questions R5-XQ-OQ1–OQ3 say so). Notes with every source summary and its exact quotes:
   `.checkpoints/v2-research/test-engineer-r5.md` and `.checkpoints/v2-research/infra-engineer-r5-ci.md`; one draft per
   question: `.checkpoints/v2-research/test-engineer-r5-<id>-draft.md` and `infra-engineer-r5-ci-draft.md`.
-- **Date:** 2026-10-28 (every source below was read that day); assembled 2026-10-29; spot-checked and fixed 2026-10-29.
-- **Status:** spot-checked (60 of 115 key claims). The verifier's table, its critical read and the owner's fixes are in
-  "Verifier spot-check" below.
+- **Date:** 2026-10-28 (every source below was read that day, except the Prettier README's re-read for R5-TSLINT-F22 on
+  2026-10-29); assembled 2026-10-29; spot-checked and fixed 2026-10-29.
+- **Status:** spot-checked (61 of 115 key claims). The verifier's table, its critical read, the owner's fixes and the
+  second pass on them (2026-10-29: closed, nits only) are in "Verifier spot-check" below.
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R5):** "Repository layout (a Cargo
   workspace plus TypeScript with Vite); strict TypeScript and lint rules; clippy and rustfmt; tests (cargo test,
   property tests, Vitest, Playwright, golden tests against legacy); CI with Rust caching; **preview links per PR**; the
@@ -1063,7 +1064,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 | Playwright Test | Chromium, Firefox, WebKit (F8) | end-to-end client plus local server (`webServer`, F9); TL9's shape | WebKit is not Safari (F8) |
 | Vitest Browser Mode | via Playwright or WebdriverIO (F6) | component and boundary tests inside a page | maturity not stated (F6) |
 | wasm-bindgen-test | Node by default; Chrome, Firefox, Safari by WebDriver (F5) | Rust unit tests compiled to Wasm, unchanged | the guide read may be older than the crate |
-| Real Safari on macOS (safaridriver, through wasm-bindgen-test or WebdriverIO) | Safari | the only way to test Safari itself; Playwright cannot drive it (F5, F6, F8) | a macOS runner (cost: R5-CI, R6) |
+| Real Safari on macOS (wasm-bindgen-test through safaridriver, F5; or WebdriverIO, which lists Safari among its browsers, F6) | Safari | the only way to test Safari itself; Playwright cannot drive it (F5, F6, F8) | a macOS runner (cost: R5-CI, R6) |
 
 #### Network tests
 | Option | What it simulates | Deterministic | Covers the real transport | Cost |
@@ -1341,7 +1342,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Reason: wave 1 requires decoders that never panic and fuzzing with zero panics (R2-TRN-REC4, R1-RR-OQ3); these lints
   find the common panic sources at review time (F11, F12), and the fuzzing (R5-TEST-REC4) finds the rest; tests may
   unwrap (F11).
-  Rests on: R5-RUSTLINT-F11, F12; R2-TRN-REC4, R1-RR-OQ3 (cited).
+  Rests on: R5-RUSTLINT-F1, F11, F12; R2-TRN-REC4, R1-RR-OQ3 (cited).
   Serves: §6.1 (rooms and private matches stay up when a client sends bad bytes).
   A spike must prove (proposed): a planted `.unwrap()` and a planted `buf[i]` in a decoder fail clippy; the same in a
   `#[test]` pass; R2-TRN-REC4's fuzz mark (10 million inputs per message type, 0 panics) holds.
@@ -1396,9 +1397,11 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Reason: each tool is the read option for its layer (F1, F2, F4–F9); WebKit stands in for Safari only partly, and
   Playwright cannot drive real Safari, so Safari's own runs go through its WebDriver (F5, F6, F8); benchmarks report
   numbers and never decide the gate (R3-MEASURE-REC3).
-  Rests on: R5-TEST-F1, F2, F4, F5, F6, F7, F8, F9; legacy TL9, TL15; R1-BND-REC4, R2-TRN-REC4, R3-MEASURE-REC3 (cited).
+  Rests on: R5-TEST-F1, F2, F4, F5, F6, F7, F8, F9; legacy TL9, TL15; R1-BND-REC4, R1-TICK-REC2, R2-TRN-REC4,
+  R3-MEASURE-REC3 (cited).
   Serves: §6.1–§6.9 through their tests; §4 (four desktop browsers).
-  A spike must prove (proposed): one planted defect per layer fails that layer and is caught by the gate or nightly job
+  A spike must prove (proposed): one planted defect per layer (the benchmark layer excepted: it never decides the gate)
+  fails that layer and is caught by the gate or nightly job
   the table names (for example: a byte-order swap in one encoder fails the boundary layer only; a page error in deploy
   fails e2e only); every layer's clean run passes 20 times in a row on one commit.
 - **R5-TEST-REC2. The determinism suite's tools (R1-DET-REC6 asks R5 to pick them).** A `devtools` replay runner (native,
@@ -1412,7 +1415,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   three teams, bots only); nightly: R1-ECS-REC2 mark 1's 10-minute bot match and every recording added since.
   Reason: native and Wasm in Node are cheap and catch most divergence; the browsers must be in the matrix because their
   engines differ (R1-DET-REC6's reason); Playwright drives three engines but not branded Safari (F8), and real Safari
-  is reached through safaridriver on macOS (F5, F6).
+  is reached through safaridriver (F5) or WebdriverIO, which lists Safari among its browsers (F6).
   Rests on: R5-TEST-F5, F6, F8; R5-LAYOUT-F4; R1-DET-REC6, R1-ECS-REC2 (cited).
   Serves: §4 (fair to about 100 ms of ping: prediction and replay need the same ticks on client and server, as
   R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches); §3 (the 48-player scale).
@@ -1544,16 +1547,20 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   is reported against the legacy smoke job's 57-67 s.
 - **R5-CI-REC5. Run the gate v2 in CI as option G1. One workflow on push and pull_request runs parallel jobs, and one
   final job is the only required check; it runs whatever the other jobs did and fails unless every job it needs
-  succeeded. Jobs skip by condition, never by path filter. Carry over the legacy hygiene: SHA pins, `contents: read`,
+  succeeded. No job is skipped by path filter, and the final job treats a skipped job as a failure until R5-GATE-OQ1
+  allows a deliberate skip. Carry over the legacy hygiene: SHA pins, `contents: read`,
   `persist-credentials: false`, concurrency cancel, per-job timeouts. Long checks run on a schedule.** The jobs: Rust
   native (rustfmt, clippy, cargo test, R1-ECS-REC2's no-HashMap-iteration check), Rust wasm32 (build, wasm-bindgen,
   generated-type diff), TypeScript (tsc, lint, Vitest), Playwright end-to-end on the built client (TL9's harness shape),
   and determinism (R1-DET-REC6: two native processes, Wasm in Node; browser targets inside the Playwright job). The
+  final job waits on exactly these five; the preview deploy (skipped on fork PRs, R5-PREV-REC1 mark 2) and the
+  conditional Safari run (R5-TEST-REC1) are not among them (second pass, 2026-10-29). The
   scheduled jobs: R2-TRN-REC4's 10-million-input fuzz run per decoder, and the latest-deps job (REC2); the fuzz run's
   cost and time are unknown. Add Dependabot for `github-actions` to keep the pins moving (F24). Asking Mustafa to turn
   on the "require SHA pinning" setting (F23) is a later step; lockfiles wait until they are generally available and
-  confirmed for his plan (R5-CI-OQ3). Reason: one aggregate required check survives jobs being added or renamed, and
-  conditional skips count as success, while path-filtered workflows hang required checks (F20). The same finding says a
+  confirmed for his plan (R5-CI-OQ3). Reason: one aggregate required check survives jobs being added or renamed; a job
+  skipped by condition reports success to GitHub, while path-filtered workflows hang required checks (F20), which is
+  why the final job, not GitHub, decides what a skip means. The same finding says a
   job that depends on a failed job "is skipped and may not block merging" (F20), so the final job must run even after a
   failure (for example `if: always()`, then a step that fails when any `needs.<job>.result` is not `success`; that
   syntax is not quoted from the pages read: inferred) and must fail on every dependency that did not succeed, a skipped
@@ -1788,9 +1795,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   L2 covers the same need for UDP. Decides it: only if L2 cannot reproduce a bug seen in a playtest.
 - **R5-TEST-OQ7. quickcheck or bolero instead of proptest.** Not read. Decides it: no need unless proptest fails a
   spike mark; proptest is the read option.
-- **R5-TEST-OQ8. cargo-nextest, code coverage and the bench harness were not researched.** cargo-nextest (said to run
-  each test in its own process, which would bear on F1's shared-thread risk and REC6's shared-state rule; not read:
-  unverified), coverage tools (cargo-llvm-cov, Vitest's coverage; R5-LAYOUT-REC6 already ignores `coverage/`) and the
+- **R5-TEST-OQ8. cargo-nextest, code coverage and the bench harness were not researched.** cargo-nextest (how it
+  isolates tests is unread; whether it would bear on F1's shared-thread risk and REC6's shared-state rule is open), coverage tools (cargo-llvm-cov, Vitest's coverage; R5-LAYOUT-REC6 already ignores `coverage/`) and the
   tool for REC1's benchmark layer are options a reader would expect. Decides it: reading their pages (GitHub, docs.rs
   and vitest.dev are on the allow list; nexte.st is not) for the ADR-0002 draft; until then `cargo test`, no coverage
   gate, and benchmarks reported with method, never gated (R3-MEASURE-REC3).
@@ -1877,8 +1883,8 @@ parts, the difference is written here; nothing is decided.
   every preview while production stays non-isolated, so Mustafa's Brave check on a preview would run a header set
   production does not have. Both serve R1-BND-REC5 (G3: isolation allowed in development and previews). What decides it:
   engine-architect with R1-BND-REC5's adoption test; whichever way, the end-to-end suite should run once isolated and
-  once not, so both paths are tested, and the preview Mustafa checks should carry the header set production will ship
-  (one option: a production-headers preview for his check and an isolated one for profiling).
+  once not, so both paths are tested. One option among others: the preview Mustafa checks carries the header set
+  production will ship (a production-headers preview for his check and an isolated one for profiling).
 
 ### Recommendations that hinge on a source not read
 
@@ -2065,6 +2071,22 @@ recommendation rests on a wrong or unsupported claim. No recommendation became a
 one page again (the Prettier README, source 25) to quote F22's language list; it added no finding and no new source.
 Not verified by the verifier: parts of R5-LAYOUT-F3, R5-CI-F4, F16, F19, F21, F23, F24, the R5-PREV-F3 quotes from
 the secure-use page, TOOLS.md and the rustup 1.28.2 post.
+
+### Second pass (2026-10-29)
+
+The spot-check found more than nits, so the verifier checked what the fix changed (`git diff 9a623a0`; report:
+`.checkpoints/v2-research/verifier-r5-second-pass-result.md`, notes `verifier-r5-second-pass.md`). Verdict: PASS WITH
+NOTES, nits only.
+- All ten points of the critical read are fixed, cut or turned into open questions (R5-XQ-OQ3 for the preview headers,
+  R5-TEST-OQ8 for the missing options); the owner's reason for keeping §6.2 in R5-LAYOUT-REC5 is sound.
+- Checked: 13 confirmed, 0 wrong, 2 unsupported (both in wording the fix added: F6 credited with safaridriver; the
+  nextest sentence in R5-TEST-OQ8), and 6 counts redone and correct. R5-TSLINT-F22, a key claim, is now confirmed at its
+  source, so N is 61.
+- Applied by the session on 2026-10-29 in the verifier's words: R5-CI-REC5's headline and reason now match its body (a
+  skipped job fails the final job until R5-GATE-OQ1 decides), and it names the five jobs the final job waits on; F6 is
+  credited only with listing Safari; R5-RUSTLINT-REC3 rests on F1 too; R5-TEST-REC1 rests on R1-TICK-REC2 and its mark
+  exempts the benchmark layer; R5-TEST-OQ8 no longer states how nextest isolates tests; R5-XQ-OQ3 gives its answer as
+  one option; the re-read date of 2026-10-29 is noted. Review stops here: what remains is nits.
 
 ## Sources
 
@@ -2271,4 +2293,4 @@ cited).
 "Each page once": 4 pages were read by both authors (Vite server options, Vite preview options, rustup overrides,
 Cargo profiles) and 2 pages appear in both of the helper's tables (GitHub's "Secure use reference" and "Managing GitHub
 Actions settings for a repository"), so 68 + 26 + 20 − 4 − 2 = 108. A not-read row can name several pages (search
-leads are grouped). Every source was read 2026-10-28.
+leads are grouped). Every source was read 2026-10-28, except the Prettier README, re-read for R5-TSLINT-F22 on 2026-10-29.
