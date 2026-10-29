@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: consistency critic across R1–R6 (once, after every topic's checks)
 # subagent_type: engine-architect · model: opus · effort: xhigh · launched in workflow v2-research-consistency-run1.js
-# launched: not yet
+# launched: 2026-10-29T21:41:19Z in workflow run wf_23aff73b-38d
 
 **Task:** the consistency critic of SHAMBLE FRONTLINES v2 phase 0 research, as the approved plan says (/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan.md, "Then, once"): "the consistency critic (engine-architect, xhigh) lists contradictions across the six topics (for example two tick rates); it resolves none; its list goes into the report and into the affected topics' open questions (no new claims, no re-check)." The six files, all checked: /home/user/Shamble-Frontlines/docs/research/r1-simulation-core.md, r2-netcode.md, r3-rendering.md, r4-physics-navigation.md, r5-toolchain-quality.md, r6-infrastructure.md (same folder).
 

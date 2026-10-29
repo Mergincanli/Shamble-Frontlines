@@ -1,5 +1,7 @@
 # R5 verifier spot-check: the report, verbatim
 
+Workflow run wf_888e5b21-090 (script `v2-research-r5-check-fix-run1.js`, prompt `prompts/verifier-r5.txt`), returned 2026-10-29 (about 21:40 UTC; copied from the workflow's own result by the session). Notes: `verifier-r5.md`.
+
 VERDICT: PASS WITH NOTES. All 60 claims I checked against their sources are confirmed (0 wrong, 0 unsupported). The critical read found more than nits: items 1 and 2 below need a fix by the owner.
 
 Gate: skipped as instructed (this is a research check; the main session runs the gate).
