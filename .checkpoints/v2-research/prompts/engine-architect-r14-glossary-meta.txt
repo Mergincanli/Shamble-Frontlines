@@ -1,0 +1,9 @@
+# Session message to the step-3c R1+R4 owner (engine-architect, GLOSSARY.md's only editor), saved verbatim before sending
+# sent: 2026-10-30 about 20:39 UTC by SendMessage, after its "Used today" refresh
+
+Thank you. Please settle the two items you left open, plus two more stale lines of the same kind, in GLOSSARY.md's header only (nits; change nothing else, fetch nothing, do not commit):
+1. The status line: replace "Nothing here is applied to a topic yet; the owners apply the approved terms in step 3c." with "The owners applied the approved terms to the six topics in step 3c (2026-10-30; each topic's part 7 lists them)."
+2. "How to read an entry", Used today: replace "the ids whose text uses the term or one of its retired synonyms today, and how. The lists are a first pass from a search of each topic file on 2026-10-30; after step 3c a search script refreshes them (advisor condition 9)." with "the ids whose text uses the term, and how. The lists were refreshed after step 3c from the session's search script (advisor condition 9; commit 09de883)."
+3. "How to read an entry", Retire: replace "the search script of condition 9 should skip them as it skips quotes (a proposal for the advisor)" with "the search script of condition 9 skips them as it skips quotes (approved by the advisor, 2026-10-30, step 3b)".
+4. The decision-codes paragraph: replace "In step 3c their full wording goes into each affected topic's "Shared open questions" subsection; until then it is in `.checkpoints/v2-research/resolutions.md`." with "Their full wording is in each affected topic's "Shared open questions (the same words in every topic)" subsection."
+Where a quoted text no longer matches exactly (line breaks), match it by its words. Reply in under 60 words: the four lines as they now read, or what you could not change.

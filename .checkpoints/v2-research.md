@@ -158,6 +158,21 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   `prompts/engine-architect-r14-usedin.txt`, HEAD 09de883). UNREAD_SOURCES.md re-run after step 3c: same counts,
   only the notes' commit moves (36cc386). The 10-row sample drawn: `unread-sample.md` (hinge 3, named 2, note 3, no
   tie 2), for the R1+R4 unit.
+- **Step 3c complete**: GLOSSARY.md's "Used today" refresh, OBJECT-1's change and four stale header lines done by
+  engine-architect (reports verbatim `engine-architect-r14-usedin-result.md`); field check: only Used today, the
+  measuring-unit entry's three fields and the header changed. Committed **f67245e** (HEAD for steps 3d R2 and R1+R4).
+  Final check at f67245e: **0 exact hits**, 607 in context (R1 129, R2 198, R3 80, R4 55, R5 49, R6 96), after the
+  script counts a bare number inside a compound ("48-player", the skeptic's gap: +27 hits) and not in decimals.
+- **Step 3d R3+R5+R6 DONE** (run wf_1359fb87-b9e, about 20:34 UTC; reports verbatim `verifier-r356-3d-result.md`,
+  `verifier-r356-3d-skeptic-result.md`): PASS WITH NOTES; all 52 approved changes present; 11 shared and 31 cross-topic
+  questions word for word; 210 in-context hits judged, 5 wrong; skeptic: 2 more unsure (counted wrong), 2 hash-map
+  pattern variants, the compound gap (fixed; 15 new R3/R5/R6 hits in `scripts/glossary-hits-3c-r356-added.tsv`). One
+  claim checked at its source (Pages' static requests free: confirmed; egress part unsupported). Labels unchanged.
+  For the owners: R6 r6:46 TL;DR scope, r6:709 both MODES-3 values, r6:799 and r6:665 bare 48, R5 r5:401-402, r5:1477,
+  r5:1561, r5:2087, nits (R6-OBS-REC4 pointer, R6-HOST-REC1 Rests on). For the advisor: R3-LOOK-REC3's bare 48 (a look
+  row) and R3's marks without a statistic (prompt `prompts/advisor-3d-r3.txt`).
+- Launched about 20:42 UTC: the advisor on the two R3 items; step 3d R2 (xhigh) and R1+R4 (high) units, each verifier
+  then skeptic, on f67245e. Running: 3 agents.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

@@ -13,7 +13,6 @@ R1	323		The largest mode, and its N	context	48
 R1	330		Team size and how modes are written	context	players
 R1	337		Player count (N)	context	characters
 R1	426	R1-TICK-F13	Tick period	context	the tick interval
-R1	552	R1-TICK-F26	The largest mode, and its N	context	48
 R1	569	R1-TICK-F26	The largest mode, and its N	context	48
 R1	570	R1-TICK-F26	The largest mode, and its N	context	48
 R1	593		Player count (N)	context	characters
@@ -157,7 +156,7 @@ R2	858	R2-INT-F19	Team size and how modes are written	context	players
 R2	858	R2-INT-F19	The largest mode, and its N	context	48
 R2	863	R2-INT-F19	Big vehicle and very large unit	context	vehicles
 R2	867	R2-INT-F20	Preview isolation and the isolation flag	context	always
-R2	870	R2-INT-F20	The measuring unit: one vCPU	exact	one core
+R2	870	R2-INT-F20	The measuring unit: one vCPU	context	one core
 R2	882	R2-INT-F20	The largest mode, and its N	context	48
 R2	884	R2-INT-F20	Team size and how modes are written	context	players
 R2	887	R2-INT-F20	Team size and how modes are written	context	players
@@ -166,6 +165,7 @@ R2	1383	R2-TRN-F42	Team size and how modes are written	context	players
 R2	1395	R2-ROOM-F1	Team size and how modes are written	context	players
 R2	1528	R2-ROOM-F15	Team size and how modes are written	context	players
 R2	1539	R2-ROOM-F16	Team size and how modes are written	context	players
+R2	1583	R2-ROOM-F19	The largest mode, and its N	context	48
 R2	1583	R2-ROOM-F19	The largest mode, and its N	context	48
 R2	1610		Team size and how modes are written	context	players
 R2	1616		The largest mode, and its N	context	48
@@ -209,6 +209,7 @@ R2	1781		The largest mode, and its N	context	48
 R2	1781		The largest mode, and its N	context	48
 R2	1782		Big vehicle and very large unit	context	vehicles
 R2	1782		The largest mode, and its N	context	48
+R2	1785		The largest mode, and its N	context	48
 R2	1786		The largest mode, and its N	context	48
 R2	1827		Big vehicle and very large unit	context	vehicles
 R2	1827		Preview isolation and the isolation flag	context	always
@@ -226,6 +227,7 @@ R2	2023	R2-SYNC-REC1	The server tick budget	context	25 %
 R2	2084	R2-SYNC-REC3	The authority	context	server-only
 R2	2098	R2-SYNC-REC3	Big vehicle and very large unit	context	vehicles
 R2	2101	R2-SYNC-REC3	Team size and how modes are written	context	players
+R2	2103	R2-SYNC-REC3	The largest mode, and its N	context	48
 R2	2136	R2-SYNC-REC5	Big vehicle and very large unit	context	vehicles
 R2	2186		The largest mode, and its N	context	48
 R2	2225	R2-SYNC-REC7	Big vehicle and very large unit	context	vehicles
@@ -238,9 +240,11 @@ R2	2292	R2-SYNC-REC9	The largest mode, and its N	context	48
 R2	2294	R2-SYNC-REC9	The server tick budget	context	25 %
 R2	2296	R2-SYNC-REC9	Team size and how modes are written	context	players
 R2	2296	R2-SYNC-REC9	Team size and how modes are written	context	players
+R2	2303	R2-BUD-REC1	The largest mode, and its N	context	48
 R2	2319	R2-BUD-REC1	Team size and how modes are written	context	players
 R2	2319	R2-BUD-REC1	The largest mode, and its N	context	48
 R2	2323	R2-BUD-REC1	The largest mode, and its N	context	48
+R2	2331	R2-BUD-REC2	The largest mode, and its N	context	48
 R2	2335	R2-BUD-REC2	Big vehicle and very large unit	context	vehicles
 R2	2338	R2-BUD-REC2	Team size and how modes are written	context	players
 R2	2338	R2-BUD-REC2	The largest mode, and its N	context	48
@@ -248,6 +252,7 @@ R2	2350	R2-BUD-REC3	Team size and how modes are written	context	players
 R2	2350	R2-BUD-REC3	The largest mode, and its N	context	48
 R2	2351	R2-BUD-REC3	Team size and how modes are written	context	players
 R2	2355	R2-BUD-REC3	Team size and how modes are written	context	players
+R2	2358	R2-BUD-REC3	The largest mode, and its N	context	48
 R2	2398	R2-BUD-REC6	The server tick budget	context	50 %
 R2	2400	R2-BUD-REC6	The server tick budget	context	25 %
 R2	2401	R2-BUD-REC6	The server tick budget	context	50 %
@@ -279,7 +284,9 @@ R2	2718	R2-TRN-REC5	The largest mode, and its N	context	48
 R2	2724	R2-TRN-REC6	Preview isolation and the isolation flag	context	always
 R2	2737	R2-TRN-REC6	Team size and how modes are written	context	players
 R2	2739	R2-TRN-REC6	The server tick budget	context	50 %
+R2	2773	R2-ROOM-REC2	The largest mode, and its N	context	48
 R2	2774	R2-ROOM-REC2	The server tick budget	context	50 %
+R2	2777	R2-ROOM-REC2	The largest mode, and its N	context	48
 R2	2783	R2-ROOM-REC3	Player count (N)	context	characters
 R2	2807	R2-ROOM-REC3	Player count (N)	context	characters
 R2	2845	R2-ROOM-REC6	Team size and how modes are written	context	players
@@ -289,11 +296,13 @@ R2	2918	R2-SYNC-OQ5	Team size and how modes are written	context	players
 R2	2918	R2-SYNC-OQ5	Team size and how modes are written	context	players
 R2	2928	R2-SYNC-OQ8	Big vehicle and very large unit	context	vehicles
 R2	2939	R2-SYNC-OQ11	The authority	context	server-only
+R2	2952	R2-SYNC-OQ13	The largest mode, and its N	context	48
 R2	2980	R2-BUD-OQ5	Big vehicle and very large unit	context	vehicles
 R2	2985	R2-BUD-OQ6	Team size and how modes are written	context	players
 R2	2985	R2-BUD-OQ6	The largest mode, and its N	context	48
 R2	2988	R2-BUD-OQ7	Team size and how modes are written	context	players
 R2	2988	R2-BUD-OQ7	The largest mode, and its N	context	48
+R2	2989	R2-BUD-OQ7	The largest mode, and its N	context	48
 R2	2992	R2-BUD-OQ8	The largest mode, and its N	context	48
 R2	2993	R2-BUD-OQ9	The largest mode, and its N	context	48
 R2	2998	R2-BUD-OQ11	Team size and how modes are written	context	players
@@ -301,6 +310,7 @@ R2	3066	R2-TRN-OQ7	Team size and how modes are written	context	players
 R2	3160	R2-XU-OQ5	Team size and how modes are written	context	players
 R2	3160	R2-XU-OQ5	The largest mode, and its N	context	48
 R2	3180	R2-XU-OQ8	The server tick budget	context	25 %
+R2	3182	R2-XU-OQ8	The largest mode, and its N	context	48
 R2	3182	R2-XU-OQ8	The server tick budget	context	50 %
 R2	3183	R2-XU-OQ8	The server tick budget	context	25 %
 R2	3193	R2-XU-OQ8	The authority	context	server-only
@@ -311,6 +321,7 @@ R2	3244	R2-XU-OQ15	The largest mode, and its N	context	48
 R2	3295	R2-XU-OQ18	The largest mode, and its N	context	48
 R2	3295	R2-XU-OQ18	The start modes and the goal modes	context	the goal
 R2	3302		The advisories check	context	dependency audits
+R2	3492		The largest mode, and its N	context	48
 R2	3983		The largest mode, and its N	context	48
 R2	4024		Player count (N)	context	characters
 R2	4040		Player count (N)	context	characters
@@ -341,6 +352,7 @@ R3	824		The largest mode, and its N	context	48
 R3	834		Big vehicle and very large unit	context	large units
 R3	834		Big vehicle and very large unit	context	vehicles
 R3	845		Preview isolation and the isolation flag	context	always
+R3	885		The largest mode, and its N	context	48
 R3	886		Big vehicle and very large unit	context	large units
 R3	913	R3-WGPU-REC1	Active effect (and visual effect)	context	effects
 R3	935	R3-WGPU-REC3	Active effect (and visual effect)	context	effects
@@ -377,6 +389,7 @@ R3	1239	R3-AUDIO-REC1	Active effect (and visual effect)	context	effects
 R3	1239	R3-AUDIO-REC1	Big vehicle and very large unit	context	large units
 R3	1245	R3-AUDIO-REC2	Big vehicle and very large unit	context	large units
 R3	1245	R3-AUDIO-REC2	The largest mode, and its N	context	48
+R3	1248	R3-AUDIO-REC2	The largest mode, and its N	context	48
 R3	1258	R3-AUDIO-REC3	Team size and how modes are written	context	players
 R3	1276	R3-AUDIO-REC4	Active effect (and visual effect)	context	effects
 R3	1276	R3-AUDIO-REC4	Big vehicle and very large unit	context	large units
@@ -388,6 +401,7 @@ R3	1369	R3-BUDGET-OQ4	The largest mode, and its N	context	48
 R3	1369	R3-BUDGET-OQ4	The largest mode, and its N	context	Largest N
 R3	1369	R3-BUDGET-OQ4	The start modes and the goal modes	context	the goal
 R3	1371	R3-BUDGET-OQ4	The largest mode, and its N	context	48
+R3	1396	R3-AUDIO-OQ2	The largest mode, and its N	context	48
 R3	1412	R3-AUDIO-OQ6	The largest mode, and its N	context	48
 R3	1412	R3-AUDIO-OQ6	The start modes and the goal modes	context	the goal
 R3	1496	R3-XT-OQ8	Team size and how modes are written	context	players
@@ -396,7 +410,6 @@ R4	49		Big vehicle and very large unit	context	vehicles
 R4	93	R4-PHYS-F6	Big vehicle and very large unit	context	vehicles
 R4	152	R4-PHYS-F16	Preview isolation and the isolation flag	context	always
 R4	194	R4-PHYS-F21	Player count (N)	context	characters
-R4	247	R4-PHYS-F27	The largest mode, and its N	context	48
 R4	397	R4-NAV-F19	The start modes and the goal modes	context	the goal
 R4	398	R4-NAV-F19	The largest mode, and its N	context	48
 R4	405	R4-NAV-F19	The largest mode, and its N	context	48
@@ -449,6 +462,7 @@ R4	1450		Player count (N)	context	characters
 R4	1481		Player count (N)	context	characters
 R4	1483		Player count (N)	context	characters
 R5	37		Player count (N)	context	characters
+R5	58		The largest mode, and its N	context	48
 R5	523	R5-TEST-F14	Team size and how modes are written	context	players
 R5	525	R5-TEST-F14	The largest mode, and its N	context	48
 R5	823	R5-PREV-F10	The client host	context	Cloudflare
@@ -469,9 +483,12 @@ R5	1125		The access wall	context	Cloudflare Access
 R5	1125		The client host	context	Cloudflare
 R5	1398	R5-TEST-REC1	Team size and how modes are written	context	players
 R5	1400	R5-TEST-REC1	Team size and how modes are written	context	players
+R5	1426	R5-TEST-REC2	The largest mode, and its N	context	48
+R5	1429	R5-TEST-REC2	The largest mode, and its N	context	48
 R5	1475	R5-TEST-REC5	The largest mode, and its N	context	48
 R5	1477	R5-TEST-REC5	The test-mode list	context	24v24 = 48 and 12v12v12 = 36
 R5	1478	R5-TEST-REC5	The largest mode, and its N	context	48
+R5	1487	R5-TEST-REC5	The largest mode, and its N	context	48
 R5	1573	R5-CI-REC5	Preview isolation and the isolation flag	context	always
 R5	1608	R5-PREV-REC2	The client host	context	Cloudflare
 R5	1644	R5-PREV-REC5	The access wall	context	Cloudflare Access
@@ -493,6 +510,7 @@ R5	2403		The client host	context	Cloudflare
 R5	2404		The client host	context	Cloudflare
 R5	2405		The client host	context	Cloudflare
 R5	2455		Player count (N)	context	characters
+R6	48		The largest mode, and its N	context	48
 R6	48		The start modes and the goal modes	context	the goal
 R6	61	R6-HOST-F1	Player count (N)	context	characters
 R6	61	R6-HOST-F1	The client host	context	Cloudflare
@@ -507,13 +525,16 @@ R6	89	R6-HOST-F5	The client host	context	Cloudflare
 R6	93	R6-HOST-F6	The client host	context	Cloudflare
 R6	95	R6-HOST-F6	The client host	context	Cloudflare
 R6	211	R6-HOST-F24	The largest mode, and its N	context	48
+R6	212	R6-HOST-F24	The largest mode, and its N	context	48
 R6	236	R6-COST-F4	The client host	context	Cloudflare
 R6	238	R6-COST-F4	The client host	context	Cloudflare
 R6	250	R6-COST-F5	The client host	context	Cloudflare
 R6	255	R6-COST-F5	The largest mode, and its N	context	48
+R6	256	R6-COST-F5	The largest mode, and its N	context	48
 R6	370	R6-TEL-F1	The client host	context	Cloudflare
 R6	405	R6-TEL-F1	The access wall	context	Cloudflare Access
 R6	405	R6-TEL-F1	The client host	context	Cloudflare
+R6	417		The largest mode, and its N	context	48
 R6	446		The largest mode, and its N	context	48
 R6	446		The largest mode, and its N	context	48
 R6	450		Team size and how modes are written	context	players
@@ -523,6 +544,7 @@ R6	479		The client host	context	Cloudflare
 R6	482		Team size and how modes are written	context	players
 R6	482		The largest mode, and its N	context	48
 R6	503		The start modes and the goal modes	context	the goal
+R6	508		The largest mode, and its N	context	48
 R6	510		The start modes and the goal modes	context	the goal
 R6	516		Team size and how modes are written	context	players
 R6	516		The largest mode, and its N	context	48
@@ -534,6 +556,7 @@ R6	526		The start modes and the goal modes	context	the goal
 R6	567		The start modes and the goal modes	context	the goal
 R6	587		The start modes and the goal modes	context	the goal
 R6	591		The client host	context	Cloudflare
+R6	602		The largest mode, and its N	context	48
 R6	605		The start modes and the goal modes	context	the goal
 R6	665	R6-HOST-REC2	Team size and how modes are written	context	players
 R6	665	R6-HOST-REC2	The largest mode, and its N	context	48
@@ -545,6 +568,8 @@ R6	702	R6-COST-REC1	The largest mode, and its N	context	48
 R6	703	R6-COST-REC1	Team size and how modes are written	context	players
 R6	709	R6-COST-REC1	Team size and how modes are written	context	players
 R6	709	R6-COST-REC1	The largest mode, and its N	context	48
+R6	710	R6-COST-REC1	The largest mode, and its N	context	48
+R6	744	R6-OBS-REC2	The largest mode, and its N	context	48
 R6	799	R6-TEL-REC1	Team size and how modes are written	context	players
 R6	799	R6-TEL-REC1	The largest mode, and its N	context	48
 R6	806	R6-TEL-REC2	The start modes and the goal modes	context	the goal

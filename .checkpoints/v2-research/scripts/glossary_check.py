@@ -4,7 +4,8 @@ For every glossary entry, find each retired phrase in each topic file, outside q
 --skip-records) outside the dated records the advisor's step-3b answer lets the search skip. Whole words only; a hit
 inside the entry's own term name, inside one of its "Marked by" phrases or inside a longer retired phrase does not
 count; each place in a file is counted once, under the longest phrase that covers it. A phrase matches across a line
-break (any run of spaces and line breaks between its words).
+break (any run of spaces and line breaks between its words). A bare number ("48") also matches as the first part of a
+hyphenated compound ("48-player", "48-bot"), not inside a range ("48-54"), a decimal or an id.
 
 Quoted text: straight quotes are paired in order inside each block of text (a paragraph, a list item or a table row,
 so a quote may run over a line break), curly quotes as opening and closing marks; a block with an odd number of
@@ -88,6 +89,8 @@ def pat(ph, marked=False):
     if marked and not ph.endswith('(s)') and re.sub(r'\s*\([^)]*\)$', '', ph).strip():
         ph = re.sub(r'\s*\([^)]*\)$', '', ph)
     core = re.escape(ph.lower()).replace(re.escape('(s)'), 's?').replace(re.escape(' '), r'\s+')
+    if ph.isdigit():   # a bare number also counts in a compound such as "48-player" or "48-bot" (the step-3d skeptic)
+        return r'(?<![\w-])(?<!\d\.)' + core + r'(?!\w|\.\d|-\d)'
     return r'(?<![\w-])' + core + r'(?![\w-])'
 
 

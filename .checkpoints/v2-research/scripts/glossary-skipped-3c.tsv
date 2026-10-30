@@ -87,6 +87,7 @@ R2	1532	R2-ROOM-F15	Team size and how modes are written	context	players	quoted t
 R2	1537	R2-ROOM-F15	Team size and how modes are written	context	players	dated record
 R2	1558	R2-ROOM-F17	Preview isolation and the isolation flag	context	always	quoted text
 R2	2411	R2-BUD-REC6	The largest mode, and its N	context	48	quoted text
+R2	2764	R2-ROOM-REC2	The largest mode, and its N	context	48	dated record
 R2	2943	R2-SYNC-OQ11	The authority	context	server-only	dated record
 R2	2984	R2-BUD-OQ6	Team size and how modes are written	context	players	quoted text
 R2	2984	R2-BUD-OQ6	Team size and how modes are written	context	players	quoted text
@@ -114,6 +115,7 @@ R2	3263	R2-XU-OQ18	The largest mode, and its N	context	48	dated record
 R2	3293	R2-XU-OQ18	Team size and how modes are written	context	players	quoted text
 R2	3294	R2-XU-OQ18	Team size and how modes are written	context	players	quoted text
 R2	3294	R2-XU-OQ18	The start modes and the goal modes	context	the goal	quoted text
+R2	3439	R2-XT-OQ15	The largest mode, and its N	context	48	quoted text
 R2	3594		Team size and how modes are written	context	players	dated record
 R2	3624		The server tick budget	context	25 %	dated record
 R2	3645		Preview isolation and the isolation flag	context	always	dated record
@@ -147,9 +149,9 @@ R2	3896		The largest mode, and its N	context	48	dated record
 R2	3897		Preview isolation and the isolation flag	context	always	dated record
 R2	3897		Team size and how modes are written	context	players	dated record
 R2	3897		The authority	context	server-only	dated record
-R2	3905		The measuring unit: one vCPU	exact	one core	dated record
-R2	3907		The measuring unit: one vCPU	exact	one core	dated record
-R2	3909		The measuring unit: one vCPU	exact	one core	dated record
+R2	3905		The measuring unit: one vCPU	context	one core	dated record
+R2	3907		The measuring unit: one vCPU	context	one core	dated record
+R2	3909		The measuring unit: one vCPU	context	one core	dated record
 R3	14		Player count (N)	context	characters	quoted text
 R3	135	R3-WGPU-F12	Active effect (and visual effect)	context	effects	quoted text
 R3	535	R3-CHAR-F13	The design point and headroom	context	the largest mode	quoted text
@@ -158,6 +160,7 @@ R3	537	R3-CHAR-F13	Active effect (and visual effect)	context	effects	quoted text
 R3	594	R3-BUDGET-F7	The reference server	context	to be named with R3, R5 and R6	quoted text
 R3	725	R3-AUDIO-F6	Active effect (and visual effect)	context	effects	quoted text
 R3	731	R3-AUDIO-F7	Active effect (and visual effect)	context	effects	quoted text
+R3	765	R3-AUDIO-F11	The largest mode, and its N	context	48	quoted text
 R3	768	R3-AUDIO-F11	Active effect (and visual effect)	context	effects	quoted text
 R3	1369	R3-BUDGET-OQ4	Team size and how modes are written	context	players	quoted text
 R3	1369	R3-BUDGET-OQ4	Team size and how modes are written	context	players	quoted text
