@@ -74,3 +74,10 @@ Task: step 3c owner apply (R2): apply approved consistency resolutions, glossary
 - Not applied: C17.b2, C23.b* (BASELINE-WHEN). Note: C23.2's approved text carries "r6:424-425" without "at commit 8dee746" (applied as approved; the advisor's commit nit covered only the cross-topic texts).
 
 DONE
+
+## Advisor ruling OBJECT-1, applied 2026-10-30 (advisor-object-1-verdict.md: OBJECT upheld, option (b); nit approved)
+- R2-INT-F20 (r2:870): "4–9 % of one core" -> "4–9 % of one core of the measuring machine": nit.
+- R2-TRN-OQ4 (C23.2's text, r2:3051): "r6:424-425" -> "r6:424-425 at commit 8dee746": nit.
+- Part 7 "Consistency resolutions (2026-10-30)": OBJECT line now says upheld by the advisor (option (b)) and names both nits: nit.
+- Totals now: recommendation 20, nit 97, number 0, source 0. GLOSSARY.md not touched (engine-architect's change).
+DONE

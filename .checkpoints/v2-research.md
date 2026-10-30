@@ -142,6 +142,12 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - Step 3d unit R3+R5+R6 launched 20:18 UTC as workflow run wf_1359fb87-b9e (task w6xk2bo06): verifier, then skeptic,
   both high, on R3, R5 and R6 at 41f9cf9 (final files); inputs `scripts/glossary-hits-3c-r356.tsv` (210 in-context
   hits, 0 exact), `apply-3c-r356.tsv`, `quotes-3c-r356.tsv`. The 10-row source sample moves to the R1+R4 unit (last).
+- **OBJECT-1 ruled** (advisor, run wf_02baa00f-caf, about 20:21 UTC; verbatim `advisor-object-1-verdict.md`): APPROVE (b)
+  with two changes: "one core" moves to "Retire (in context)" ("for a server time mark or a share of the reference
+  server"), exact keeps "per core", "server core", "1 CPU core"; Keeps adds the legacy-measurement place; condition:
+  r2:870 reads "4–9 % of one core of the measuring machine". The C23.2 nit: APPROVE ("at commit 8dee746"). Applied:
+  the two R2 nits by the R2 owner (message `prompts/r2-object-1-nits.txt`); the glossary change by engine-architect in
+  its "Used today" refresh (item 3 added to `prompts/engine-architect-r14-usedin.txt` before sending).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

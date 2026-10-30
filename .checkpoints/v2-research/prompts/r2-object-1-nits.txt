@@ -1,0 +1,7 @@
+# Session message to the R2 owner (netcode-architect, step 3c), saved verbatim before sending
+# sent: by SendMessage after the advisor's ruling advisor-object-1-verdict.md (2026-10-30 about 20:22 UTC)
+
+The advisor has ruled on your OBJECT and your nit (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-object-1-verdict.md). Your OBJECT is upheld: "one core" moves to "Retire (in context)" in the glossary (engine-architect makes that glossary change; you do not edit GLOSSARY.md). Apply these two changes to /home/user/Shamble-Frontlines/docs/research/r2-netcode.md, and nothing else:
+1. In R2-INT-F20 (r2:870), the advisor's condition: change "4–9 % of one core" to "4–9 % of one core of the measuring machine".
+2. The approved nit: in the text C23.2 added, change "r6:424-425" to "r6:424-425 at commit 8dee746".
+Log both as nits in your notes (a new line "Advisor ruling OBJECT-1, applied 2026-10-30"), and in part 7's "Consistency resolutions (2026-10-30)" subsection change the OBJECT line to say it was upheld by the advisor (option (b)) and these two nits were applied. Do not commit. Reply in under 60 words with the two lines as they now read.
