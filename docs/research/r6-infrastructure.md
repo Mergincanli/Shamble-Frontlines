@@ -43,9 +43,9 @@ plus `docs/LOOP_V2.md` as a project input, not counted), 20 sources not read.
   decided, and nothing here touches the look.
 
 ## 2. TL;DR
-- Client and per-PR previews: Cloudflare Pages (the client host, [GLOSSARY](GLOSSARY.md#the-client-host)), or Workers static assets as the alternative, can send COOP and COEP from a `_headers` file (inferred: it takes any header), gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
+- Client and per-PR previews: Cloudflare Pages (the client host, [GLOSSARY](GLOSSARY.md#the-client-host)), or Workers static assets as the alternative, can send COOP and COEP from a `_headers` file (inferred: it takes any header) and gives every branch its own link with no cap; on Workers static assets, static traffic costs nothing (R6-HOST-F5); GitHub Pages cannot send those headers.
 - Game servers: Hetzner Cloud in one EU location, if its EU plans are orderable again (R6-HOST-OQ1), one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME ([GLOSSARY](GLOSSARY.md#game-server-certificate)).
-- Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start ([GLOSSARY](GLOSSARY.md#the-start-modes-and-the-goal-modes)); about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 48-player rooms stay inside one VM's included 20 TB of traffic.
+- Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start ([GLOSSARY](GLOSSARY.md#the-start-modes-and-the-goal-modes)); about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 24v24 (48-player) rooms stay inside one VM's included 20 TB of traffic.
 - Operations: `tracing` JSON logs, Prometheus-format metrics with bounded labels (tick overruns, fallback share), Sentry with Wasm debug files in its EU region with IP collection off, Reporting API crash reports; all data in the EU; the law itself was not read (outside the allow list).
 - Telemetry: one record per match written at Ended (content hash, mode id, a 10 s points timeline, tick-stamped objective and kill events with source ids, unit time per slot, moments, no player ids) in EU object storage, analysed in batches per content hash. The security baseline is deferred (R6-SEC-OQ1; [GLOSSARY](GLOSSARY.md#the-security-baseline)).
 
@@ -414,7 +414,7 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 |---|---|---|---|---|---|
 | G1. Hetzner Cloud, dedicated vCPU (CCX) | Own public IPv4/IPv6 per VM; firewall filters UDP (F18, F19); no load balancer needed, since the lobby hands out host:port (R2-ROOM-REC2) | "highly predictable resources" (F14) | CCX23 4 vCPU 86.49 EUR/mo, 20 TB included, 1 EUR per extra TB (F15, F16) | Hourly billing, rounded up (F17): keep VMs warm, rooms are processes | EU availability on 2026-10-28 unclear (F20); single provider |
 | G2. Hetzner Cloud, shared vCPU (CX/CAX) | Same as G1 | Shared with neighbours (F14): server tick p99 (GLOSSARY: [server tick time](GLOSSARY.md#server-tick-time), [time statistics](GLOSSARY.md#time-statistics)) must be measured | CX33 4 vCPU 8.99 EUR/mo (F15) | Same as G1 | Noisy neighbours could break the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget)) |
-| G3. Fly.io Machines | UDP not read (docs outside allow list) | performance types (F22), dedicated-ness not read | performance-2x 66 USD/mo + 0.02 USD/GB egress (F22) | Not read | 3.2 GB per 48-player match-hour (R2) at 0.02 USD/GB adds up (R6-COST) |
+| G3. Fly.io Machines | UDP not read (docs outside allow list) | performance types (F22), dedicated-ness not read | performance-2x 66 USD/mo + 0.02 USD/GB egress (F22) | Not read | 3.2 GB per 24v24 (48-player) match-hour (R2) at 0.02 USD/GB adds up (R6-COST) |
 | G4. Amazon GameLift Servers | Managed fleets (not read in detail) | Instance types | 0.099 USD/h c6a.large on demand, Ohio; bandwidth free on gen 6+ (F23); EU rates not read | Managed scaling (not read) | Vendor lock-in to its server SDK (not read) |
 
 #### Q3. Production certificates for game servers (R2-TRN-REC5, R2-TRN-OQ4)
@@ -505,7 +505,7 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
   (R6-HOST-OQ2's spike can time it); hourly round-up (R6-HOST-F17) makes VMs per match wasteful.
 - **K3. Shared-vCPU VMs:** about 9.6 times cheaper per VM; only if the server tick p99 on shared hosts passes R2-ROOM-REC2's
   marks at several times of day (R6-HOST-REC2's spike).
-- **K4. Per-GB egress hosts (Fly.io) or managed fleets (GameLift):** per-GB pricing at 3.16 GB per 48-player room-hour
+- **K4. Per-GB egress hosts (Fly.io) or managed fleets (GameLift):** per-GB pricing at 3.16 GB per 24v24 (48-player) room-hour
   costs more in egress per fully loaded host than the host itself costs on Hetzner (about 369 USD a month against 86.49
   EUR for a CCX23, above; inferred: no exchange rate was read, and the comparison holds below about 4.27 USD per EUR); at the goal's average load, Fly's egress alone (about 276 USD) is of the same order as the
   whole Hetzner fleet (222.88–345.96 EUR); no exchange rate was read, so the two are not compared further. GameLift
@@ -599,7 +599,7 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
   health.
 
 #### Assumptions
-- **A-10.** A 20-minute 48-player match: about 10 gameplay events per second (R2's worked estimate uses the same rate)
+- **A-10.** A 20-minute 24v24 (48-player) match: about 10 gameplay events per second (R2's worked estimate uses the same rate)
   → 12,000 events × about 80 B as JSON ≈ 1 MB uncompressed; the timeline adds about 360 samples; compression is not
   estimated (no source).
 - **A-11.** At the goal's average of 6 rooms (A-5) with 20-minute matches: about 13,000 matches a month (6 × 3 × 730),
@@ -631,7 +631,8 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   deletion of a branch's latest deployment (PREV-DELETE); for Workers previews `noindex`, rules per hostname and
   deletion were not read (R5-PREV-F14), and Workers' broader features (F6) serve no VISION_V2 §6 item. Whether a
   direct upload counts against Pages' 500 builds a month (F3) is for the spike.
-  *Rests on:* F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12; R1-BND-REC5 (option G3, wave 1, cited).
+  *Rests on:* F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12; R1-BND-REC5 (option G3, wave 1, cited);
+  R5-PREV-F12, R5-PREV-F13, R5-PREV-F14, R5-PREV-F18 (R5's findings, cited by the reason).
   *Serves:* §6.1 (rooms and private matches are reached from this client); §4 (desktop browsers first). The isolation
   headers serve R1-BND-REC5.
   *Spike must prove (proposed):* on one preview link: every HTML, JS, worker and Wasm response carries the configured
@@ -662,8 +663,8 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   *Cross-topic open questions:* R6-XT-OQ1 (part 6).
   *Serves:* §6.1 (rooms and private matches), §6.5 (economy server-side), §6.6 and §6.8 (recorded and recognized on
   the server); §4 (one EU region, fair to about 100 ms).
-  *Spike must prove (proposed):* R2-ROOM-REC2's marks on both CCX23 and CX33: 8 rooms of 48 players (bots) as 8
-  processes, each room's server tick p99 within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day
+  *Spike must prove (proposed):* R2-ROOM-REC2's marks on both CCX23 and CX33: 8 rooms of [the largest mode](GLOSSARY.md#the-largest-mode-and-its-n) (48 players under MODES-3 (a),
+  54 under (b); bots) as 8 processes, each room's server tick p99 within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day
   (shared hosts vary with neighbours); WebTransport over UDP and WebSocket over TCP reach the VM through the firewall
   from all four browsers; a room process starts in under 2 s (R2's mark); a VM with no rule for a port drops it
   (negative test).
@@ -706,8 +707,9 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   (wave 1, cited); assumptions A-1 to A-7.
   *Cross-topic open questions:* R6-XT-OQ1, R6-XT-OQ7 (part 6).
   *Serves:* §6.1 (rooms and private matches at the §3 sizes).
-  *Spike must prove (proposed):* rooms per VM measured on CCX23 and CX33 at 48, 36 and 18 players (the number that
-  replaces A-2); measured egress per 48-player match-hour within ±20 % of 3.16 GB with interest management off, and
+  *Spike must prove (proposed):* rooms per VM measured on CCX23 and CX33 at 48, 36 and 18 players (the goal modes and the three-team start
+  mode's upper end under MODES-3 (a); under (b), 54, 48 and 36) (the number that
+  replaces A-2); measured egress per 24v24 (48-player) match-hour within ±20 % of 3.16 GB with interest management off, and
   the figure with it on; the spike's own bill (a few hours of one or two VMs) under 5 EUR.
 - **R6-COST-REC2. Put a cost line into every match record and a monthly bill check into operations.** Each match
   record (R6-TEL) carries its room-hours and bytes sent, so cost per match is a query, not a guess; a monthly check
@@ -741,7 +743,8 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   item.
   *Rests on:* F3, F4, F5, F11; R6-COST-F1; R1-TICK-REC4, R2-BUD-REC6, R2-TRN-OQ7 (cited); A-8.
   *Serves:* §6.1 (rooms); §4 (fair to about 100 ms: the server tick budget and the fallback share are what make it visible).
-  *Spike must prove (proposed):* every metric listed is present after a 30-minute 48-player soak; a deliberately
+  *Spike must prove (proposed):* every metric listed is present after a 30-minute soak at the largest mode's N (48 players under
+  MODES-3 (a), 54 under (b)); a deliberately
   stalled tick shows as one overrun and its dropped time within one scrape; the series count is reported and is under
   5,000 for 8 rooms on one VM.
 - **R6-OBS-REC3. Client errors and crashes: Sentry's browser SDK with `wasmIntegration` and build ids from `wasm-split`
@@ -766,6 +769,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   *Reason:* the EU choice is one-way on both Sentry and Grafana (F9, F11); OWASP asks for bounded retention and no
   personal data in logs (F12); 14 and 15 days are the free tier's and Prometheus's defaults (R6-COST-F1, F5).
   *Rests on:* F5, F9, F10, F11, F12; R6-COST-F1.
+  *Cross-topic open questions:* R6-XT-OQ5 (part 6).
   *Serves:* no §6 item asks for data protection as a feature; it is the condition under which the stores that §6.1
   (rooms) and §6.6 (match records) create may run, under rules Mustafa sets (R6-OBS-OQ1).
   *Spike must prove (proposed):* a data map lists every store, its region and its retention, with 0 stores outside the
@@ -796,7 +800,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   legacy TL13, GE15, GC18; A-10.
   *Cross-topic open questions:* R6-XT-OQ5 (part 6).
   *Serves:* §6.6 (balance telemetry), §6.8 (moments), §6.5 (economy numbers on evidence), §6.1 (mode id, private flag).
-  *Spike must prove (proposed):* in 30 bot matches across 3 modes (2 teams, 3 teams, 48 players), 100 % write a record
+  *Spike must prove (proposed):* in 30 bot matches across 3 modes (2 teams, 3 teams, and the largest mode: 48 players under MODES-3 (a), 54 under (b)), 100 % write a record
   before Closed; every kill event names a source id that resolves in the content set of the record's hash; the points
   total recomputed from events equals the final points in 100 % of records; recording adds under 1 % to server tick p99 and
   0 allocations per tick after warm-up (bounded buffer, preallocated); a record is at most 1 MB uncompressed (A-10).
@@ -1192,6 +1196,19 @@ new claim, number or source; quoted source text and the dated records above are 
   (part 6, "Cross-topic open questions (consistency critic, 2026-10-29)"), with pointers from R6-HOST-REC2,
   R6-HOST-REC3, R6-COST-REC1, R6-OBS-REC3 and R6-TEL-REC1.
 - **OBJECT:** none.
+
+Step 3d fixes (2026-10-30):
+- TL;DR, client line: free static traffic scoped to Workers static assets (R6-HOST-F5), as C19.6 does.
+- R6-COST-REC1's spike: the room sizes give both MODES-3 readings ((a) 48, 36, 18; (b) 54, 48, 36); its egress mark
+  names the 24v24 (48-player) match-hour of the 3.16 GB row.
+- R6-TEL-REC1's spike: its full-size mode is the largest mode (48 under MODES-3 (a), 54 under (b)).
+- R6-HOST-REC2's spike: 8 rooms of the largest mode (48 under MODES-3 (a), 54 under (b)).
+- R6-OBS-REC2's spike: the 30-minute soak runs at the largest mode's N (48 or 54, MODES-3).
+- R6-OBS-REC4: pointer to R6-XT-OQ5.
+- R6-HOST-REC1's "Rests on:" adds R5-PREV-F12, F13, F14 and F18, which its reason cites.
+- "48-player" judged per the glossary rule: the TL;DR's cost line, the Q2 table (G3), K4 and A-10 now name 24v24
+  beside the 48 (their figures are R2's 24v24 row); TL15's "48-player room" (legacy facts of R6-HOST and R6-COST) is
+  kept, since it repeats the legacy figure's own 48 soldiers.
 
 ## 8. Sources
 
