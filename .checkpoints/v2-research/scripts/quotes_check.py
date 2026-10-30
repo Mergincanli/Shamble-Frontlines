@@ -17,6 +17,8 @@ out = sys.argv[sys.argv.index('--out') + 1] if '--out' in sys.argv else None
 
 
 def show(ref, fn):
+    if ref == 'WT':   # the working tree, for a file not yet committed
+        return open('/home/user/Shamble-Frontlines/docs/research/' + fn).read()
     return subprocess.run(['git', '-C', '/home/user/Shamble-Frontlines', 'show', f'{ref}:docs/research/{fn}'],
                           capture_output=True, text=True, check=True).stdout
 

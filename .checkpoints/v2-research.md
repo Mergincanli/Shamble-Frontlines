@@ -129,6 +129,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   45 change items, every after text or insert found except C17.5 (R5), whose "R6's security baseline" the owner then
   renamed to the glossary's "the security baseline" (a rename, as the step's order allows); C17.b3 and C23.b1–b3 not
   applied (they wait for BASELINE-WHEN), as required.
+- R3 owner DONE about 20:15 UTC (report verbatim `graphics-engineer-r3-consistency-result.md`): C9.12–C9.16, C10.12–C10.13;
+  1 number (C9.13), 4 recommendation changes (C9.14; the bare 48 for the largest mode in R3-CHAR-REC1–REC3 now reads
+  "the largest mode's N (48 or 54, MODES-3)", a value that changes only under MODES-3 (b): the verifier judges it), 27
+  nits; no OBJECT; R3-LOOK-REC3's counts kept word for word (a look row). 0 exact hits; quotes: none gone; apply
+  check: all 7 items found. Committed **41f9cf9**. Running: R1+R4 and R2 owners.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

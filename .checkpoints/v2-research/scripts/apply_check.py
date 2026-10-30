@@ -19,6 +19,8 @@ out = sys.argv[sys.argv.index('--out') + 1] if '--out' in sys.argv else None
 
 
 def show(fn):
+    if ref == 'WT':   # the working tree, for a file not yet committed
+        return open('/home/user/Shamble-Frontlines/docs/research/' + fn).read()
     return subprocess.run(['git', '-C', '/home/user/Shamble-Frontlines', 'show', f'{ref}:docs/research/{fn}'],
                           capture_output=True, text=True, check=True).stdout
 
@@ -33,13 +35,20 @@ def norm(t):
 
 
 def backtick_text(body, label):
-    """The text between the first and the last backtick of a "- label:" sub-bullet (inner backticks are the file's
-    own); the sub-bullet runs over its indented continuation lines."""
-    m = re.search(r'^  - ' + label + r':(.*?)(?=^\S|^  - |\Z)', body, re.S | re.M)
-    if not m or m.group(1).count('`') < 2:
+    """The text of a "- label:" sub-bullet between its opening backtick and its closing one: the first backtick at the
+    end of a line with an even number of backticks before it (inner backticks are the file's own, in pairs). The text
+    may run over lines that start at column 0 (the file's own line breaks)."""
+    m = re.search(r'^  - ' + label + r':[ \t]*`', body, re.M)
+    if not m:
         return None
-    t = m.group(1)
-    return t[t.index('`') + 1:t.rindex('`')]
+    a = m.end()
+    inner = 0
+    for k in range(a, len(body)):
+        if body[k] == '`':
+            if inner % 2 == 0 and re.match(r'[ \t]*(\n|$)', body[k + 1:]):
+                return body[a:k]
+            inner += 1
+    return None
 
 
 def inline_after(body):

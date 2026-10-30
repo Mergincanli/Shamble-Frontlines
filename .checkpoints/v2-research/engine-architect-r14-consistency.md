@@ -73,3 +73,18 @@ R1 "### Cross-topic open questions (consistency critic, 2026-10-29)" inserted ri
 R1 R1-XT-OQ1..OQ18 inserted in the critic's words (ranks 2, 3, 4, 7, 12, 13, 14, 15, 16, 25, 27, 28, 31, 35, 36, 37, 38, 40), each "<id>" set to the R1 id; texts taken by script from cross-topic-oqs.md -- nit (18 lines in one)
 ## Step 4 (R1)
 R1 header: line "Glossary and cross-topic resolutions applied 2026-10-30 (see GLOSSARY.md and part 7)" added with the GLOSSARY.md link; id table gains 2 rows (shared decision questions; R1-XT-OQ1–OQ18); totals 77 -> 99 open questions (+4 shared, +18 XT), R1-XU-OQ1 listed as settled at the consistency step; labels unchanged -- nit
+## Step 2 (R4)
+R4 every "(GLOSSARY" mark in the applied after texts linked (preface, PHYS-REC1 mark 2, PHYS-REC4, NAV-REC2, LOS-REC1 mark 4, LOS-REC2, OBST-REC1, wave-1 list x2); touched lines reflowed, no word changed -- nit
+R4 R4-PHYS-REC1 mark 5 "The same 48 soldiers" -> "The same soldiers as mark 2 (the largest mode's N, GLOSSARY)" (largest mode, in context; follows C9.17's scene; 54 under MODES-3 (b)) -- recommendation
+R4 R4-OBST-REC2 spike "a flip costs ≤ 0.1 ms native" -> "... at p99 (proposed; GLOSSARY)" (Time statistics rule) -- recommendation
+R4 legacy facts used (R4-LOS), wave-1 line: "≤ 10 % of the tick budget" (Retire exact) -> "≤ 10 % of the server tick budget, GLOSSARY: 5 % of the tick period" (R2-INT-REC3's value as GLOSSARY states it; a pointer, not an R4 mark) -- nit
+R4 R4-NAV-REC2 "N = 64 headroom run" linked (design point and headroom); "tick period" linked -- nit
+R4 first-use links: N (design inputs, LOOP_V2 §11 scale test), bot slots (needs list), big vehicles (LOS options table), state hash (PHYS-REC3 spike), time statistics (PHYS-REC1 mark 2) -- nit (5 in one)
+R4 first literal hits NOT linked (other meaning): "goal" r4:161 (Rapier's 2026 goal), "N" r4:343 (a crate signature `&N`), "preview" r4:719 (the grenade-arc preview), "mean" r4:399 (a stall-rate mean in a legacy fact; Time statistics linked at PHYS-REC1 mark 2). Start/goal modes and Preview are not used in R4 in the glossary's sense.
+R4 in-context hits left: vehicles (general / tables / findings), characters (sources' "characters read", Rapier's character controller), 48 (legacy facts GN4/GN13, R4-PHYS-REC4 "a crowd of 48 soldiers", R4-NAV-REC3 choke test "48 bots"; not the largest mode), always (findings, legacy CS2), 25 % (R4-FLOORS-F7 legacy route share), stress load (R4-PHYS-REC4 Rests-on line, kept per GLOSSARY), R1-TICK-REC2's P1 scene (wave-1 list C9.22 after text, names R1's own scene; kept per GLOSSARY). One-off time marks left without a statistic: R4-PHYS-REC2 (d) BVH build ≤ 50 ms at match start, R4-NAV-REC1 mark 1 bake ≤ 1 s / ≤ 3 s; for the step-3d verifier.
+## Step 3 (R4)
+R4 "### Shared open questions (the same words in every topic)" inserted before "### Wave-1 items R4 changes or answers" (resolutions.md's place), 3-line intro -- nit
+R4 C10.16 MODES-3 inserted word for word -- nit
+R4 "### Cross-topic open questions (consistency critic, 2026-10-29)" right after it, 3-line intro -- nit
+R4 R4-XT-OQ1..OQ8 inserted in the critic's words (ranks 2, 3, 14, 15, 24, 30, 35, 40) -- nit (8 lines in one)
+R4 pointers "Cross-topic open questions: ..." at the end of PHYS-REC1 (OQ2, OQ8), PHYS-REC2 (OQ5), NAV-REC1 (OQ5), NAV-REC3 (OQ6), NAV-REC4 (OQ3, OQ4), FLOORS-REC3 (OQ5), LOS-REC1 (OQ7), LOS-REC3 (OQ1) -- nit (8 in one)
