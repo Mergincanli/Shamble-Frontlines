@@ -61,8 +61,17 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   187 rows, 180 sources, 148 addresses each once, 67 hinge rows; needed-for: 44 hinge, 4 named, 24 note, 108 no tie).
   Re-run after step 3c; step 3d samples 10 rows.
 - Asked now (advisor condition 5): MODES-3 and PREVIEW-WALL (Mustafa), BASELINE-WHEN (the Advisor).
-- Next: step 3b (advisor at xhigh on `resolutions.md`), step 3c (owners), step 3d (three verifier units), then
-  docs-keeper, gate, report, PR ready.
+- Step 3a DONE (run wf_02517947-3e7, about 40 min): 7 resolved, 1 aligned (ABL-PREDICT), 4 escalated (MODES-3,
+  PREVIEW-WALL, BASELINE-WHEN for #17 and #23); GLOSSARY.md 34 terms (committed as a draft); 28 shared cross-topic open
+  questions (72 insertions) + rank 41's nit in C22.1; report `engine-architect-resolve-result.md`.
+- Step 3b: advisor (xhigh) on the resolutions, run wf_d38cd72c-feb (task wd5bl1f22), launched about 18:00 UTC.
+- Session finding for the condition-9 check (`scripts/glossary_check.py`, baseline `scripts/glossary-baseline.json`):
+  the glossary's "Retire" lists hold common words with conditions ("48", "players", "always", "Core", "vehicles",
+  "effects": 1,335 hits today outside quotes and dated records), so "zero retired synonyms" cannot be checked as
+  written. Needed before step 3c: per term, an unconditional list of exact phrases (must reach zero) and a conditional
+  list (listed for the step-3d verifier to judge in context). Take it up with the advisor's verdict.
+- Step 3c prompts drafted (generator `scp sp3/mk3c.py`, not yet run): five owners, background agents, 4 at once.
+- Next: step 3b's verdict, then step 3c, step 3d (three verifier units), docs-keeper, gate, report, PR ready.
 
 ## Next steps (from 30 October, 18:00 Amsterdam; superseded in part by the Advisor's decisions above)
 1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
