@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 17:30 Amsterdam
+- **Last update:** 2026-10-30 18:21 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -48,6 +48,21 @@ routine's stored sources must be checked after creation (the night shift reads N
 These change the approved plan (the critic "resolves none"): from 18:00, write `plan-amendments-2.md` (how the 12
 contradictions get resolved, who writes the glossary and applies it to each file, UNREAD_SOURCES.md, curl by day) and
 have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
+
+## Running work (2026-10-30 evening)
+- 18:06: night schedule restored (cron 0-7), issue #16's "Tonight only" line removed; NS-2 attempted: a fresh-session
+  routine created from this session had no repository and no connectors (`sources: []`), deleted at once; the old
+  routine kept. NS-2 (2026-10-30, a fresh session per run) goes to Mustafa (Routines page).
+- `plan-amendments-2.md`: advisor APPROVE with 13 conditions (`advisor-amendments-2-verdict.md`), conditions applied in
+  the amendment (3d1b733).
+- Step 3a: engine-architect (xhigh), workflow run wf_02517947-3e7 (task w4wxzze92), launched about 17:20 UTC; writes
+  docs/research/GLOSSARY.md, `resolutions.md`, `cross-topic-oqs.md`; notes `engine-architect-resolve.md`.
+- UNREAD_SOURCES.md committed 82298ab (script `scripts/build_unread.py`, check `scripts/unread-check.json`: 8 tables,
+  187 rows, 180 sources, 148 addresses each once, 67 hinge rows; needed-for: 44 hinge, 4 named, 24 note, 108 no tie).
+  Re-run after step 3c; step 3d samples 10 rows.
+- Asked now (advisor condition 5): MODES-3 and PREVIEW-WALL (Mustafa), BASELINE-WHEN (the Advisor).
+- Next: step 3b (advisor at xhigh on `resolutions.md`), step 3c (owners), step 3d (three verifier units), then
+  docs-keeper, gate, report, PR ready.
 
 ## Next steps (from 30 October, 18:00 Amsterdam; superseded in part by the Advisor's decisions above)
 1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
