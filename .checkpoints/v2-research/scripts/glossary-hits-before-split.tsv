@@ -1,0 +1,818 @@
+topic	line	nearest id	entry	kind	phrase
+R1	1		The measuring unit: one vCPU	context	Core
+R1	3		The measuring unit: one vCPU	context	Core
+R1	38		The largest mode, and its N	context	48
+R1	42		Player count (N)	context	characters
+R1	71		The measuring unit: one vCPU	context	Core
+R1	215	R1-ECS-F27	Preview isolation and the isolation flag	context	always
+R1	257	R1-ECS-F33	Preview isolation and the isolation flag	context	always
+R1	264	R1-ECS-F34	The measuring unit: one vCPU	context	Core
+R1	274	R1-ECS-F35	The measuring unit: one vCPU	context	Core
+R1	286	R1-ECS-F35	Team size and how modes are written	context	players
+R1	291	R1-ECS-F35	The largest mode, and its N	context	48
+R1	292	R1-ECS-F35	The largest mode, and its N	context	48
+R1	304	R1-ECS-F35	Big vehicle and very large unit	context	vehicles
+R1	310	R1-ECS-F35	The largest mode, and its N	context	48
+R1	311	R1-ECS-F35	Big vehicle and very large unit	context	vehicles
+R1	311	R1-ECS-F35	The start modes and the goal modes	context	the goal
+R1	314		Active effect (and visual effect)	context	effects
+R1	315		The largest mode, and its N	context	48
+R1	322		Team size and how modes are written	context	players
+R1	323		Big vehicle and very large unit	context	big
+R1	323		Big vehicle and very large unit	context	vehicles
+R1	326		Player count (N)	context	characters
+R1	415	R1-TICK-F13	Tick period	context	the tick interval
+R1	424	R1-TICK-F14	Sim step time	context	Whole ticks
+R1	541	R1-TICK-F26	The largest mode, and its N	context	48
+R1	558	R1-TICK-F26	The largest mode, and its N	context	48
+R1	559	R1-TICK-F26	The largest mode, and its N	context	48
+R1	582		Player count (N)	context	characters
+R1	589	R1-DET-F1	The measuring unit: one vCPU	context	Core
+R1	603	R1-DET-F3	The measuring unit: one vCPU	context	Core
+R1	647	R1-DET-F10	Preview isolation and the isolation flag	context	always
+R1	844	R1-DET-F34	Active effect (and visual effect)	context	effects
+R1	853		The largest mode, and its N	context	48
+R1	1043	R1-BND-F23	Preview isolation and the isolation flag	context	always
+R1	1103	R1-BND-F32	The measuring unit: one vCPU	context	Core
+R1	1156	R1-BND-F35	The largest mode, and its N	context	48
+R1	1179		Active effect (and visual effect)	context	effects
+R1	1180		Big vehicle and very large unit	context	vehicles
+R1	1188	R1-ABL-F1	Active effect (and visual effect)	context	effects
+R1	1192	R1-ABL-F2	Active effect (and visual effect)	context	effects
+R1	1198	R1-ABL-F3	Active effect (and visual effect)	context	effects
+R1	1199	R1-ABL-F3	Active effect (and visual effect)	context	effects
+R1	1200	R1-ABL-F3	Active effect (and visual effect)	context	effects
+R1	1201	R1-ABL-F3	Active effect (and visual effect)	context	effects
+R1	1202	R1-ABL-F3	Active effect (and visual effect)	context	effects
+R1	1210	R1-ABL-F5	Active effect (and visual effect)	context	effects
+R1	1227	R1-ABL-F8	Active effect (and visual effect)	context	effects
+R1	1255	R1-ABL-F14	Active effect (and visual effect)	context	effects
+R1	1256	R1-ABL-F14	Active effect (and visual effect)	context	effects
+R1	1257	R1-ABL-F14	Active effect (and visual effect)	context	effects
+R1	1270	R1-ABL-F16	Active effect (and visual effect)	context	effects
+R1	1271	R1-ABL-F16	Active effect (and visual effect)	context	effects
+R1	1273	R1-ABL-F17	Active effect (and visual effect)	context	effects
+R1	1275	R1-ABL-F17	Team size and how modes are written	context	players
+R1	1285	R1-ABL-F18	Preview isolation and the isolation flag	context	always
+R1	1291	R1-ABL-F20	Active effect (and visual effect)	context	effects
+R1	1292	R1-ABL-F20	Team size and how modes are written	context	players
+R1	1327	R1-ABL-F23	Active effect (and visual effect)	context	effects
+R1	1336	R1-ABL-F25	Active effect (and visual effect)	context	effects
+R1	1390	R1-DATA-F1	Preview isolation and the isolation flag	context	always
+R1	1619		Active effect (and visual effect)	context	effects
+R1	1619		Big vehicle and very large unit	context	vehicles
+R1	1625		Active effect (and visual effect)	context	effects
+R1	1625		Active effect (and visual effect)	context	effects
+R1	1625		Active effect (and visual effect)	context	effects
+R1	1628		Active effect (and visual effect)	context	effects
+R1	1628		Big vehicle and very large unit	context	vehicles
+R1	1651		Sim step time	context	Whole ticks
+R1	1679		Big vehicle and very large unit	context	vehicles
+R1	1725		The client's sim share	context	tick time
+R1	1779		Active effect (and visual effect)	context	effects
+R1	1784		Active effect (and visual effect)	context	effects
+R1	1787		Active effect (and visual effect)	context	effects
+R1	1791		Active effect (and visual effect)	context	effects
+R1	1793		Active effect (and visual effect)	context	effects
+R1	1809		Active effect (and visual effect)	context	effects
+R1	1809		Team size and how modes are written	context	players
+R1	1826		Big vehicle and very large unit	context	big
+R1	1864		Preview isolation and the isolation flag	context	always
+R1	1866		State hash	context	its hash
+R1	1866		State hash	context	its hash
+R1	1868		Preview isolation and the isolation flag	context	always
+R1	1905	R1-ECS-REC1	The reference server	context	one server core of the R6 host type
+R1	1907	R1-ECS-REC1	Sim step time	context	tick cost
+R1	1907	R1-ECS-REC1	The largest mode, and its N	context	48
+R1	1907	R1-ECS-REC1	The stress scene	context	stress load
+R1	1908	R1-ECS-REC1	Active effect (and visual effect)	context	200 active effects
+R1	1908	R1-ECS-REC1	Big vehicle and very large unit	context	8 vehicles
+R1	1908	R1-ECS-REC1	Sim step time	context	mean tick
+R1	1909	R1-ECS-REC1	Sim step time	context	p99 tick
+R1	1909	R1-ECS-REC1	The largest mode, and its N	context	48
+R1	1915	R1-ECS-REC1	The stress scene	context	stress load
+R1	1919	R1-ECS-REC1	The prediction scope	context	partial prediction
+R1	1956	R1-ECS-REC3	Active effect (and visual effect)	context	effects
+R1	1972	R1-ECS-REC4	Big vehicle and very large unit	context	big
+R1	1972	R1-ECS-REC4	Big vehicle and very large unit	context	vehicles
+R1	1981	R1-TICK-REC1	Sim step time	context	Whole ticks
+R1	1990	R1-TICK-REC1	Active effect (and visual effect)	context	effects
+R1	2011	R1-TICK-REC2	Big vehicle and very large unit	context	big
+R1	2011	R1-TICK-REC2	Big vehicle and very large unit	context	vehicles
+R1	2012	R1-TICK-REC2	The reference server	context	to be named with R3, R5 and R6
+R1	2013	R1-TICK-REC2	The largest mode, and its N	context	48
+R1	2014	R1-TICK-REC2	Big vehicle and very large unit	context	big
+R1	2014	R1-TICK-REC2	Big vehicle and very large unit	context	vehicles
+R1	2015	R1-TICK-REC2	The client's sim share	context	tick time
+R1	2015	R1-TICK-REC2	The largest mode, and its N	context	48
+R1	2015	R1-TICK-REC2	The reference server	context	one core of the proposed reference server
+R1	2015	R1-TICK-REC2	The server tick budget	context	25 %
+R1	2016	R1-TICK-REC2	The server tick budget	context	25 %
+R1	2017	R1-TICK-REC2	The measuring unit: one vCPU	context	per core
+R1	2017	R1-TICK-REC2	The server tick budget	context	25 %
+R1	2020	R1-TICK-REC2	The client's sim share	context	tick time
+R1	2020	R1-TICK-REC2	Tick period	context	the period
+R1	2028	R1-TICK-REC3	Sim step time	context	Whole ticks
+R1	2036	R1-TICK-REC3	The client's sim share	context	tick time
+R1	2036	R1-TICK-REC3	The client's sim share	context	tick time
+R1	2036	R1-TICK-REC3	The largest mode, and its N	context	48
+R1	2036	R1-TICK-REC3	The stress scene	context	P1's scene
+R1	2097	R1-DET-REC1	Team size and how modes are written	context	players
+R1	2097	R1-DET-REC1	The largest mode, and its N	context	48
+R1	2098	R1-DET-REC1	Team size and how modes are written	context	players
+R1	2098	R1-DET-REC1	Team size and how modes are written	context	players
+R1	2098	R1-DET-REC1	The largest mode, and its N	context	48
+R1	2103	R1-DET-REC2	The measuring unit: one vCPU	context	Core
+R1	2119	R1-DET-REC2	Big vehicle and very large unit	context	vehicles
+R1	2131	R1-DET-REC3	Big vehicle and very large unit	context	big
+R1	2132	R1-DET-REC3	Big vehicle and very large unit	context	vehicles
+R1	2133	R1-DET-REC3	Player count (N)	context	48 characters
+R1	2134	R1-DET-REC3	Big vehicle and very large unit	context	vehicles
+R1	2136	R1-DET-REC3	Sim step time	context	the per-tick sim budget
+R1	2139	R1-DET-REC4	State hash	context	its hash
+R1	2140	R1-DET-REC4	Active effect (and visual effect)	context	effects
+R1	2157	R1-DET-REC5	The hash-map ban in the sim crate	context	hash maps serve lookups only
+R1	2162	R1-DET-REC5	Team size and how modes are written	context	players
+R1	2178	R1-DET-REC6	Active effect (and visual effect)	context	effects
+R1	2182	R1-DET-REC6	The largest mode, and its N	context	48
+R1	2204	R1-BND-REC1	The largest mode, and its N	context	48
+R1	2206	R1-BND-REC1	The largest mode, and its N	context	48
+R1	2218	R1-BND-REC2	Big vehicle and very large unit	context	vehicles
+R1	2224	R1-BND-REC2	The largest mode, and its N	context	48
+R1	2278	R1-ABL-REC1	Active effect (and visual effect)	context	effects
+R1	2280	R1-ABL-REC1	Active effect (and visual effect)	context	effects
+R1	2321	R1-ABL-REC2	Active effect (and visual effect)	context	effects
+R1	2324	R1-ABL-REC2	Active effect (and visual effect)	context	effects
+R1	2340	R1-ABL-REC3	Active effect (and visual effect)	context	effects
+R1	2354	R1-ABL-REC4	The prediction scope	context	predict only the local player's own abilities and weapons
+R1	2356	R1-ABL-REC4	Active effect (and visual effect)	context	effects
+R1	2356	R1-ABL-REC4	Team size and how modes are written	context	players
+R1	2362	R1-ABL-REC4	Active effect (and visual effect)	context	effects
+R1	2362	R1-ABL-REC4	Team size and how modes are written	context	players
+R1	2380	R1-ABL-REC5	Big vehicle and very large unit	context	vehicles
+R1	2387	R1-ABL-REC5	Active effect (and visual effect)	context	effects
+R1	2395	R1-ABL-REC6	Active effect (and visual effect)	context	effects
+R1	2395	R1-ABL-REC6	The largest mode, and its N	context	48
+R1	2396	R1-ABL-REC6	The reference server	context	the proposed reference server core
+R1	2396	R1-ABL-REC6	Time statistics	context	costs at most 1 ms per tick
+R1	2402	R1-ABL-REC6	Team size and how modes are written	context	players
+R1	2402	R1-ABL-REC6	The largest mode, and its N	context	48
+R1	2410	R1-DATA-REC1	Big vehicle and very large unit	context	vehicles
+R1	2429	R1-DATA-REC2	State hash	context	its hash
+R1	2447	R1-DATA-REC3	Preview isolation and the isolation flag	context	always
+R1	2490	R1-DATA-REC6	State hash	context	its hash
+R1	2545	R1-ECS-OQ4	Team size and how modes are written	context	players
+R1	2545	R1-ECS-OQ4	The measuring unit: one vCPU	context	per core
+R1	2547	R1-ECS-OQ4	The client's sim share	context	tick time
+R1	2584	R1-TICK-OQ6	The measuring unit: one vCPU	context	server core
+R1	2588	R1-TICK-OQ7	The largest mode, and its N	context	the largest mode (48 soldiers, 47 of them bots)
+R1	2594	R1-TICK-OQ9	Big vehicle and very large unit	context	big
+R1	2594	R1-TICK-OQ9	Big vehicle and very large unit	context	vehicles
+R1	2594	R1-TICK-OQ9	Big vehicle and very large unit	context	vehicles
+R1	2645	R1-BND-OQ3	The measuring unit: one vCPU	context	Core
+R1	2652	R1-BND-OQ6	Big vehicle and very large unit	context	big
+R1	2653	R1-BND-OQ6	Big vehicle and very large unit	context	vehicles
+R1	2655	R1-BND-OQ6	The largest mode, and its N	context	48
+R1	2679	R1-ABL-OQ3	Active effect (and visual effect)	context	effects
+R1	2697	R1-ABL-OQ10	Active effect (and visual effect)	context	effects
+R1	2749	R1-XU-OQ1	The server tick budget	context	the tick budget
+R1	2750	R1-XU-OQ1	Active effect (and visual effect)	context	200 active effects
+R1	2750	R1-XU-OQ1	Big vehicle and very large unit	context	8 vehicles
+R1	2750	R1-XU-OQ1	Sim step time	context	mean tick
+R1	2750	R1-XU-OQ1	The largest mode, and its N	context	48
+R1	2752	R1-XU-OQ1	Big vehicle and very large unit	context	big
+R1	2752	R1-XU-OQ1	Big vehicle and very large unit	context	vehicles
+R1	2752	R1-XU-OQ1	The largest mode, and its N	context	48
+R1	2753	R1-XU-OQ1	The largest mode, and its N	context	48
+R1	2754	R1-XU-OQ1	Tick period	context	the period
+R1	2756	R1-XU-OQ1	Active effect (and visual effect)	context	effects
+R1	2756	R1-XU-OQ1	The largest mode, and its N	context	48
+R1	2758	R1-XU-OQ1	The largest mode, and its N	context	48
+R1	2759	R1-XU-OQ1	The server tick budget	context	the tick budget
+R1	2870	R1-RR-OQ7	The advisories check	context	cargo-audit and cargo-deny as CI gates
+R1	2882	R1-RR-OQ7	Active effect (and visual effect)	context	effects
+R1	2883	R1-RR-OQ7	Active effect (and visual effect)	context	effects
+R1	2902	R1-RR-OQ7	Active effect (and visual effect)	context	effects
+R1	2908	R1-RR-OQ7	Active effect (and visual effect)	context	effects
+R1	2938		Active effect (and visual effect)	context	effects
+R1	2955		The measuring unit: one vCPU	context	per core
+R1	2956		The measuring unit: one vCPU	context	per core
+R1	2961		The security baseline	context	R6's security baseline
+R1	3484		Player count (N)	context	characters
+R1	3490		The largest mode, and its N	context	48
+R1	3491		Player count (N)	context	characters
+R1	3492		Player count (N)	context	characters
+R1	3496		The measuring unit: one vCPU	context	Core
+R1	3496		The measuring unit: one vCPU	context	Core
+R1	3497		The measuring unit: one vCPU	context	Core
+R1	3564		Player count (N)	context	characters
+R1	3566		Player count (N)	context	characters
+R1	3643		The largest mode, and its N	context	48
+R1	3658		The measuring unit: one vCPU	context	Core
+R1	3696		The access wall	context	login wall
+R1	3697		The largest mode, and its N	context	48
+R2	14		Team size and how modes are written	context	players
+R2	20		Team size and how modes are written	context	players
+R2	51		The measuring unit: one vCPU	context	Core
+R2	77		Team size and how modes are written	context	players
+R2	286	R2-SYNC-F23	Team size and how modes are written	context	players
+R2	304	R2-SYNC-F25	Team size and how modes are written	context	players
+R2	320	R2-SYNC-F27	Team size and how modes are written	context	players
+R2	327	R2-SYNC-F28	Team size and how modes are written	context	players
+R2	335	R2-SYNC-F28	Big vehicle and very large unit	context	big
+R2	365	R2-SYNC-F32	Team size and how modes are written	context	players
+R2	365	R2-SYNC-F32	Team size and how modes are written	context	players
+R2	368	R2-SYNC-F32	Player count (N)	context	characters
+R2	441	R2-SYNC-F36	The measuring unit: one vCPU	context	Core
+R2	447		The measuring unit: one vCPU	context	Core
+R2	448		Big vehicle and very large unit	context	vehicles
+R2	452		The largest mode, and its N	context	48
+R2	455		Team size and how modes are written	context	players
+R2	455		The largest mode, and its N	context	48
+R2	462		Team size and how modes are written	context	players
+R2	465		Team size and how modes are written	context	players
+R2	465		Team size and how modes are written	context	players
+R2	597	R2-BUD-F23	The server tick budget	context	25 %
+R2	693	R2-BUD-F35	Preview isolation and the isolation flag	context	always
+R2	693	R2-BUD-F35	Team size and how modes are written	context	players
+R2	697	R2-BUD-F35	The largest mode, and its N	context	48
+R2	697	R2-BUD-F35	The largest mode, and its N	context	48
+R2	698	R2-BUD-F35	Big vehicle and very large unit	context	vehicles
+R2	713	R2-INT-F1	Preview isolation and the isolation flag	context	always
+R2	719	R2-INT-F1	Preview isolation and the isolation flag	context	always
+R2	768	R2-INT-F8	Preview isolation and the isolation flag	context	always
+R2	769	R2-INT-F8	Team size and how modes are written	context	players
+R2	779	R2-INT-F9	Preview isolation and the isolation flag	context	always
+R2	781	R2-INT-F10	Preview isolation and the isolation flag	context	always
+R2	787	R2-INT-F11	Team size and how modes are written	context	players
+R2	854	R2-INT-F19	Team size and how modes are written	context	players
+R2	854	R2-INT-F19	The largest mode, and its N	context	48
+R2	859	R2-INT-F19	Big vehicle and very large unit	context	vehicles
+R2	863	R2-INT-F20	Preview isolation and the isolation flag	context	always
+R2	866	R2-INT-F20	The measuring unit: one vCPU	context	one core
+R2	877	R2-INT-F20	Big vehicle and very large unit	context	big
+R2	878	R2-INT-F20	The largest mode, and its N	context	48
+R2	880	R2-INT-F20	Team size and how modes are written	context	players
+R2	883	R2-INT-F20	Team size and how modes are written	context	players
+R2	884	R2-INT-F20	Preview isolation and the isolation flag	context	always
+R2	937	R2-TRN-F5	The measuring unit: one vCPU	context	Core
+R2	1335	R2-TRN-F41	Big vehicle and very large unit	context	big
+R2	1346	R2-TRN-F42	Big vehicle and very large unit	context	big
+R2	1347	R2-TRN-F42	Big vehicle and very large unit	context	big
+R2	1379	R2-TRN-F42	Team size and how modes are written	context	players
+R2	1391	R2-ROOM-F1	Team size and how modes are written	context	players
+R2	1524	R2-ROOM-F15	Team size and how modes are written	context	players
+R2	1526	R2-ROOM-F15	Team size and how modes are written	context	players
+R2	1528	R2-ROOM-F15	Team size and how modes are written	context	players
+R2	1535	R2-ROOM-F16	Team size and how modes are written	context	players
+R2	1554	R2-ROOM-F17	Preview isolation and the isolation flag	context	always
+R2	1579	R2-ROOM-F19	The largest mode, and its N	context	48
+R2	1606		Team size and how modes are written	context	players
+R2	1612		The largest mode, and its N	context	48
+R2	1614		Team size and how modes are written	context	players
+R2	1625		Active effect (and visual effect)	context	effects
+R2	1673		The largest mode, and its N	context	48
+R2	1677		Team size and how modes are written	context	players
+R2	1677		The largest mode, and its N	context	48
+R2	1692		Team size and how modes are written	context	players
+R2	1692		The largest mode, and its N	context	48
+R2	1695		Team size and how modes are written	context	players
+R2	1698		The server tick budget	context	25 %
+R2	1721		Server tick time	context	whole tick
+R2	1721		Team size and how modes are written	context	players
+R2	1721		The largest mode, and its N	context	48
+R2	1721		The measuring unit: one vCPU	context	per core
+R2	1721		The server tick budget	context	25 %
+R2	1722		Server tick time	context	whole tick
+R2	1723		The largest mode, and its N	context	48
+R2	1724		The largest mode, and its N	context	48
+R2	1725		Team size and how modes are written	context	players
+R2	1725		The largest mode, and its N	context	48
+R2	1725		The largest mode, and its N	context	48
+R2	1733		The largest mode, and its N	context	48
+R2	1756		The largest mode, and its N	context	48
+R2	1757		Live projectile	context	projectiles alive
+R2	1757		Team size and how modes are written	context	players
+R2	1757		The largest mode, and its N	context	48
+R2	1758		Big vehicle and very large unit	context	vehicles
+R2	1761		Big vehicle and very large unit	context	vehicles
+R2	1761		Team size and how modes are written	context	players
+R2	1769		The start modes and the goal modes	context	(start, upper end)
+R2	1771		The largest mode, and its N	context	48
+R2	1771		The largest mode, and its N	context	48
+R2	1773		The largest mode, and its N	context	48
+R2	1773		The largest mode, and its N	context	48
+R2	1774		The largest mode, and its N	context	48
+R2	1774		The largest mode, and its N	context	48
+R2	1775		The largest mode, and its N	context	48
+R2	1775		The largest mode, and its N	context	48
+R2	1776		The largest mode, and its N	context	48
+R2	1776		The largest mode, and its N	context	48
+R2	1777		The largest mode, and its N	context	48
+R2	1777		The largest mode, and its N	context	48
+R2	1778		Big vehicle and very large unit	context	vehicles
+R2	1778		The largest mode, and its N	context	48
+R2	1782		The largest mode, and its N	context	48
+R2	1821		Big vehicle and very large unit	context	big
+R2	1821		Big vehicle and very large unit	context	vehicles
+R2	1821		Preview isolation and the isolation flag	context	always
+R2	1822		Big vehicle and very large unit	context	big
+R2	1822		Big vehicle and very large unit	context	vehicles
+R2	1822		Team size and how modes are written	context	players
+R2	1825		Preview isolation and the isolation flag	context	always
+R2	1849		Team size and how modes are written	context	players
+R2	1875		Game-server certificate	context	a publicly trusted certificate
+R2	1900		Server tick time	context	a room's tick
+R2	1975		Team size and how modes are written	context	players
+R2	2004	R2-SYNC-REC1	The largest mode, and its N	context	48
+R2	2011	R2-SYNC-REC1	The largest mode, and its N	context	48
+R2	2016	R2-SYNC-REC1	The largest mode, and its N	context	48
+R2	2017	R2-SYNC-REC1	The server tick budget	context	the share of the tick budget the tick-rate unit sets
+R2	2074	R2-SYNC-REC3	Shared stream and authority-only stream	context	server-only random stream
+R2	2076	R2-SYNC-REC3	The authority	context	server-only
+R2	2089	R2-SYNC-REC3	Big vehicle and very large unit	context	vehicles
+R2	2091	R2-SYNC-REC3	Team size and how modes are written	context	players
+R2	2109	R2-SYNC-REC4	Big vehicle and very large unit	context	big
+R2	2115	R2-SYNC-REC4	Big vehicle and very large unit	context	big
+R2	2115	R2-SYNC-REC4	Big vehicle and very large unit	context	vehicles
+R2	2125	R2-SYNC-REC5	Big vehicle and very large unit	context	big
+R2	2125	R2-SYNC-REC5	Big vehicle and very large unit	context	vehicles
+R2	2173		Big vehicle and very large unit	context	vehicles and harvesters
+R2	2173		The largest mode, and its N	context	48
+R2	2174		The largest mode, and its N	context	48
+R2	2190	R2-SYNC-REC6	The measuring unit: one vCPU	context	Core
+R2	2212	R2-SYNC-REC7	Big vehicle and very large unit	context	big
+R2	2212	R2-SYNC-REC7	Big vehicle and very large unit	context	vehicles
+R2	2222	R2-SYNC-REC7	Team size and how modes are written	context	players
+R2	2226	R2-SYNC-REC7	Big vehicle and very large unit	context	big
+R2	2226	R2-SYNC-REC7	Big vehicle and very large unit	context	vehicles
+R2	2265	R2-SYNC-REC9	The largest mode, and its N	context	48
+R2	2271	R2-SYNC-REC9	Team size and how modes are written	context	players
+R2	2271	R2-SYNC-REC9	The largest mode, and its N	context	48
+R2	2276	R2-SYNC-REC9	The largest mode, and its N	context	48
+R2	2277	R2-SYNC-REC9	The sim step share and the server-only share	context	25 % of the tick budget
+R2	2279	R2-SYNC-REC9	Team size and how modes are written	context	players
+R2	2279	R2-SYNC-REC9	Team size and how modes are written	context	players
+R2	2301	R2-BUD-REC1	Team size and how modes are written	context	players
+R2	2301	R2-BUD-REC1	The largest mode, and its N	context	48
+R2	2305	R2-BUD-REC1	The largest mode, and its N	context	48
+R2	2317	R2-BUD-REC2	Big vehicle and very large unit	context	vehicles
+R2	2319	R2-BUD-REC2	Team size and how modes are written	context	players
+R2	2319	R2-BUD-REC2	The largest mode, and its N	context	48
+R2	2331	R2-BUD-REC3	Team size and how modes are written	context	players
+R2	2331	R2-BUD-REC3	The largest mode, and its N	context	48
+R2	2332	R2-BUD-REC3	Team size and how modes are written	context	players
+R2	2336	R2-BUD-REC3	Team size and how modes are written	context	players
+R2	2377	R2-BUD-REC6	Server tick time	context	whole tick
+R2	2377	R2-BUD-REC6	Team size and how modes are written	context	players
+R2	2377	R2-BUD-REC6	The largest mode, and its N	context	48
+R2	2377	R2-BUD-REC6	The server tick budget	context	CPU budget per tick
+R2	2378	R2-BUD-REC6	Tick period	context	the tick interval
+R2	2379	R2-BUD-REC6	The server tick budget	context	25 %
+R2	2380	R2-BUD-REC6	The measuring unit: one vCPU	context	per core
+R2	2382	R2-BUD-REC6	The largest mode, and its N	context	48
+R2	2385	R2-BUD-REC6	The largest mode, and its N	context	48
+R2	2386	R2-BUD-REC6	Server tick time	context	p99 whole tick
+R2	2386	R2-BUD-REC6	Team size and how modes are written	context	players
+R2	2410	R2-INT-REC1	The largest mode, and its N	context	48
+R2	2447	R2-INT-REC3	Team size and how modes are written	context	players
+R2	2456	R2-INT-REC4	Preview isolation and the isolation flag	context	always
+R2	2462	R2-INT-REC4	Team size and how modes are written	context	players
+R2	2464	R2-INT-REC4	Big vehicle and very large unit	context	vehicles
+R2	2464	R2-INT-REC4	Team size and how modes are written	context	players
+R2	2464	R2-INT-REC4	The largest mode, and its N	context	48
+R2	2467	R2-INT-REC4	The largest mode, and its N	context	48
+R2	2467	R2-INT-REC4	Time statistics	context	at most 0.5 ms per tick
+R2	2494	R2-INT-REC6	Preview isolation and the isolation flag	context	always
+R2	2497	R2-INT-REC6	Big vehicle and very large unit	context	big
+R2	2499	R2-INT-REC6	Team size and how modes are written	context	players
+R2	2503	R2-INT-REC6	Big vehicle and very large unit	context	big
+R2	2503	R2-INT-REC6	Big vehicle and very large unit	context	vehicles
+R2	2514	R2-INT-REC7	Preview isolation and the isolation flag	context	always
+R2	2556	R2-TRN-REC1	The largest mode, and its N	context	48
+R2	2558	R2-TRN-REC1	The reference server	context	reference server hardware R6 names
+R2	2558	R2-TRN-REC1	Transport runtime time	context	1 CPU core for the transport
+R2	2569	R2-TRN-REC1	Team size and how modes are written	context	players
+R2	2573	R2-TRN-REC1	Server tick time	context	tick p99
+R2	2577		The advisories check	context	audit gate
+R2	2577		The security baseline	context	R6's security baseline
+R2	2578		The advisories check	context	dependency audits
+R2	2587	R2-TRN-REC2	Big vehicle and very large unit	context	big
+R2	2667	R2-TRN-REC5	Game-server certificate	context	a publicly trusted certificate
+R2	2680	R2-TRN-REC5	The largest mode, and its N	context	48
+R2	2686	R2-TRN-REC6	Preview isolation and the isolation flag	context	always
+R2	2699	R2-TRN-REC6	Team size and how modes are written	context	players
+R2	2701	R2-TRN-REC6	The server tick budget	context	50 %
+R2	2732	R2-ROOM-REC2	The reference server	context	one 4-vCPU EU cloud VM, R6 to name it
+R2	2732	R2-ROOM-REC2	The reference server	context	reference host
+R2	2733	R2-ROOM-REC2	The client's sim share	context	tick time
+R2	2733	R2-ROOM-REC2	The server tick budget	context	50 %
+R2	2734	R2-ROOM-REC2	The reference server	context	reference host
+R2	2736	R2-ROOM-REC2	Server tick time	context	tick p99
+R2	2742	R2-ROOM-REC3	Player count (N)	context	characters
+R2	2766	R2-ROOM-REC3	Player count (N)	context	characters
+R2	2804	R2-ROOM-REC6	Team size and how modes are written	context	players
+R2	2820	R2-ROOM-REC7	Team size and how modes are written	context	2×2
+R2	2853	R2-ROOM-REC8	Team size and how modes are written	context	players
+R2	2873	R2-SYNC-OQ5	Big vehicle and very large unit	context	vehicles
+R2	2873	R2-SYNC-OQ5	Team size and how modes are written	context	players
+R2	2873	R2-SYNC-OQ5	Team size and how modes are written	context	players
+R2	2883	R2-SYNC-OQ8	Big vehicle and very large unit	context	vehicles
+R2	2893	R2-SYNC-OQ11	The authority	context	server-only
+R2	2933	R2-BUD-OQ5	Big vehicle and very large unit	context	vehicles
+R2	2937	R2-BUD-OQ6	Team size and how modes are written	context	players
+R2	2937	R2-BUD-OQ6	The largest mode, and its N	context	48
+R2	2940	R2-BUD-OQ7	Team size and how modes are written	context	players
+R2	2940	R2-BUD-OQ7	The largest mode, and its N	context	48
+R2	2944	R2-BUD-OQ8	The largest mode, and its N	context	48
+R2	2945	R2-BUD-OQ9	The largest mode, and its N	context	48
+R2	2950	R2-BUD-OQ11	Team size and how modes are written	context	players
+R2	3016	R2-TRN-OQ7	Team size and how modes are written	context	players
+R2	3029	R2-ROOM-OQ1	Server tick time	context	tick p99
+R2	3031	R2-ROOM-OQ2	The security baseline	context	R6's security baseline
+R2	3063	R2-ROOM-OQ11	The security baseline	context	R6's deferred baseline
+R2	3101	R2-XU-OQ4	The largest mode, and its N	context	48
+R2	3110	R2-XU-OQ5	Team size and how modes are written	context	players
+R2	3110	R2-XU-OQ5	The largest mode, and its N	context	48
+R2	3129	R2-XU-OQ8	Server tick time	context	whole tick
+R2	3129	R2-XU-OQ8	The server tick budget	context	25 %
+R2	3129	R2-XU-OQ8	Tick period	context	the tick interval
+R2	3131	R2-XU-OQ8	The server tick budget	context	50 %
+R2	3132	R2-XU-OQ8	The server tick budget	context	25 %
+R2	3138	R2-XU-OQ8	The measuring unit: one vCPU	context	1 CPU core
+R2	3138	R2-XU-OQ8	Transport runtime time	context	the transport layer
+R2	3171	R2-XU-OQ13	Team size and how modes are written	context	players
+R2	3171	R2-XU-OQ13	Team size and how modes are written	context	players
+R2	3190	R2-XU-OQ15	Team size and how modes are written	context	players
+R2	3190	R2-XU-OQ15	The largest mode, and its N	context	48
+R2	3204	R2-XU-OQ18	Team size and how modes are written	context	players
+R2	3206	R2-XU-OQ18	Team size and how modes are written	context	players
+R2	3244	R2-XU-OQ18	The measuring unit: one vCPU	context	per core
+R2	3274		The measuring unit: one vCPU	context	Core
+R2	3279		The authority	context	server-only
+R2	3293		Big vehicle and very large unit	context	big
+R2	3293		Big vehicle and very large unit	context	vehicles
+R2	3310		The security baseline	context	R6's security baseline
+R2	3708		The measuring unit: one vCPU	context	Core
+R2	3708		The measuring unit: one vCPU	context	Core
+R2	3734		The largest mode, and its N	context	48
+R2	3775		Player count (N)	context	characters
+R2	3791		Player count (N)	context	characters
+R2	3793		Player count (N)	context	characters
+R3	13		Player count (N)	context	characters
+R3	21		Player count (N)	context	characters
+R3	31		Player count (N)	context	characters
+R3	72	R3-WGPU-F2	The measuring unit: one vCPU	context	Core
+R3	134	R3-WGPU-F12	Active effect (and visual effect)	context	effects
+R3	284	R3-GL2-F13	The measuring unit: one vCPU	context	Core
+R3	420	R3-LOOK-F15	Player count (N)	context	characters
+R3	422	R3-LOOK-F15	The largest mode, and its N	context	48
+R3	430	R3-LOOK-F15	Player count (N)	context	characters
+R3	514	R3-CHAR-F13	The largest mode, and its N	context	48
+R3	517	R3-CHAR-F13	The largest mode, and its N	context	48
+R3	518	R3-CHAR-F13	The largest mode, and its N	context	48
+R3	525	R3-CHAR-F13	Player count (N)	context	characters
+R3	535	R3-CHAR-F13	Team size and how modes are written	context	players
+R3	535	R3-CHAR-F13	The largest mode, and its N	context	48
+R3	535	R3-CHAR-F13	The start modes and the goal modes	context	the goal
+R3	536	R3-CHAR-F13	Active effect (and visual effect)	context	effects
+R3	575	R3-BUDGET-F7	Team size and how modes are written	context	players
+R3	583	R3-BUDGET-F7	The largest mode, and its N	context	48
+R3	583	R3-BUDGET-F7	The largest mode, and its N	context	48
+R3	584	R3-BUDGET-F7	The largest mode, and its N	context	48
+R3	585	R3-BUDGET-F7	The largest mode, and its N	context	48
+R3	591	R3-BUDGET-F7	Big vehicle and very large unit	context	big
+R3	591	R3-BUDGET-F7	Big vehicle and very large unit	context	vehicles
+R3	591	R3-BUDGET-F7	The largest mode, and its N	context	48
+R3	721	R3-AUDIO-F6	Active effect (and visual effect)	context	effects
+R3	727	R3-AUDIO-F7	Active effect (and visual effect)	context	effects
+R3	763	R3-AUDIO-F11	Big vehicle and very large unit	context	large units
+R3	779	R3-AUDIO-F11	Team size and how modes are written	context	players
+R3	792		Active effect (and visual effect)	context	effects
+R3	793		Active effect (and visual effect)	context	effects
+R3	794		Preview isolation and the isolation flag	context	always
+R3	795		The measuring unit: one vCPU	context	Core
+R3	816		Player count (N)	context	characters
+R3	820		The largest mode, and its N	context	48
+R3	830		Big vehicle and very large unit	context	large units
+R3	830		Big vehicle and very large unit	context	vehicles
+R3	841		Preview isolation and the isolation flag	context	always
+R3	882		Big vehicle and very large unit	context	large units
+R3	909	R3-WGPU-REC1	Active effect (and visual effect)	context	effects
+R3	931	R3-WGPU-REC3	Active effect (and visual effect)	context	effects
+R3	931	R3-WGPU-REC3	Big vehicle and very large unit	context	large units
+R3	954	R3-GL2-REC1	Team size and how modes are written	context	players
+R3	956	R3-GL2-REC1	The measuring unit: one vCPU	context	Core
+R3	989	R3-LOOK-REC1	Big vehicle and very large unit	context	large units
+R3	997	R3-LOOK-REC2	Active effect (and visual effect)	context	effects
+R3	997	R3-LOOK-REC2	Active effect (and visual effect)	context	effects
+R3	1009	R3-LOOK-REC2	Active effect (and visual effect)	context	effects
+R3	1013	R3-LOOK-REC3	The largest mode, and its N	context	48
+R3	1019	R3-LOOK-REC3	Team size and how modes are written	context	players
+R3	1020	R3-LOOK-REC3	The largest mode, and its N	context	48
+R3	1023	R3-LOOK-REC3	Player count (N)	context	characters
+R3	1028	R3-CHAR-REC1	The largest mode, and its N	context	48
+R3	1035	R3-CHAR-REC1	Team size and how modes are written	context	players
+R3	1037	R3-CHAR-REC1	The largest mode, and its N	context	48
+R3	1047	R3-CHAR-REC2	The largest mode, and its N	context	48
+R3	1054	R3-CHAR-REC2	The largest mode, and its N	context	48
+R3	1067	R3-CHAR-REC3	The largest mode, and its N	context	48
+R3	1069	R3-CHAR-REC4	Big vehicle and very large unit	context	large units
+R3	1072	R3-CHAR-REC4	Big vehicle and very large unit	context	large units
+R3	1078	R3-CHAR-REC4	Big vehicle and very large unit	context	big
+R3	1078	R3-CHAR-REC4	Big vehicle and very large unit	context	vehicles
+R3	1079	R3-CHAR-REC4	Big vehicle and very large unit	context	large units
+R3	1080	R3-CHAR-REC4	The largest mode, and its N	context	48
+R3	1097	R3-BUDGET-REC1	Team size and how modes are written	context	players
+R3	1102	R3-BUDGET-REC1	The measuring unit: one vCPU	context	Core
+R3	1110	R3-BUDGET-REC2	The largest mode, and its N	context	48
+R3	1110	R3-BUDGET-REC2	The stress scene	context	the worst case of the largest mode
+R3	1111	R3-BUDGET-REC2	Active effect (and visual effect)	context	effects
+R3	1111	R3-BUDGET-REC2	Big vehicle and very large unit	context	large units
+R3	1111	R3-BUDGET-REC2	The stress scene	context	R1-TICK's scene
+R3	1124	R3-BUDGET-REC2	Active effect (and visual effect)	context	effects
+R3	1133	R3-BUDGET-REC2	The largest mode, and its N	context	48
+R3	1135	R3-BUDGET-REC2	The largest mode, and its N	context	48
+R3	1136	R3-BUDGET-REC2	Big vehicle and very large unit	context	large units
+R3	1137	R3-BUDGET-REC2	Big vehicle and very large unit	context	large units
+R3	1141	R3-BUDGET-REC2	Big vehicle and very large unit	context	large units
+R3	1151	R3-BUDGET-REC2	The stress scene	context	R1-TICK's scene
+R3	1152		Big vehicle and very large unit	context	large units
+R3	1162	R3-BUDGET-REC3	Active effect (and visual effect)	context	effects
+R3	1163	R3-BUDGET-REC3	Active effect (and visual effect)	context	effects
+R3	1167	R3-BUDGET-REC3	The server tick budget	context	50 %
+R3	1187	R3-MEASURE-REC2	Big vehicle and very large unit	context	large units
+R3	1187	R3-MEASURE-REC2	Live projectile	context	200 projectiles
+R3	1187	R3-MEASURE-REC2	The largest mode, and its N	context	48
+R3	1210	R3-MEASURE-REC4	Team size and how modes are written	context	players
+R3	1231	R3-AUDIO-REC1	Active effect (and visual effect)	context	effects
+R3	1231	R3-AUDIO-REC1	Big vehicle and very large unit	context	large units
+R3	1237	R3-AUDIO-REC2	Big vehicle and very large unit	context	large units
+R3	1237	R3-AUDIO-REC2	The largest mode, and its N	context	48
+R3	1250	R3-AUDIO-REC3	Team size and how modes are written	context	players
+R3	1267	R3-AUDIO-REC4	Active effect (and visual effect)	context	effects
+R3	1267	R3-AUDIO-REC4	Big vehicle and very large unit	context	large units
+R3	1297	R3-GL2-OQ1	The measuring unit: one vCPU	context	Core
+R3	1298	R3-GL2-OQ2	Team size and how modes are written	context	players
+R3	1332	R3-LOOK-OQ6	Player count (N)	context	characters
+R3	1354	R3-BUDGET-OQ1	Team size and how modes are written	context	players
+R3	1360	R3-BUDGET-OQ4	Team size and how modes are written	context	players
+R3	1360	R3-BUDGET-OQ4	The largest mode, and its N	context	48
+R3	1360	R3-BUDGET-OQ4	The largest mode, and its N	context	Largest N
+R3	1360	R3-BUDGET-OQ4	The start modes and the goal modes	context	the goal
+R3	1431	R3-AUDIO-OQ6	Team size and how modes are written	context	players
+R3	1646		The largest mode, and its N	context	48
+R4	45		Big vehicle and very large unit	context	vehicles
+R4	89	R4-PHYS-F6	Big vehicle and very large unit	context	vehicles
+R4	98	R4-PHYS-F8	Big vehicle and very large unit	context	vehicles
+R4	148	R4-PHYS-F16	Preview isolation and the isolation flag	context	always
+R4	190	R4-PHYS-F21	Player count (N)	context	characters
+R4	243	R4-PHYS-F27	The largest mode, and its N	context	48
+R4	336	R4-NAV-F13	Player count (N)	context	characters
+R4	338	R4-NAV-F13	Player count (N)	context	characters
+R4	393	R4-NAV-F19	The start modes and the goal modes	context	the goal
+R4	394	R4-NAV-F19	The largest mode, and its N	context	48
+R4	401	R4-NAV-F19	The largest mode, and its N	context	48
+R4	444	R4-FLOORS-F6	Player count (N)	context	characters
+R4	461	R4-FLOORS-F7	The server tick budget	context	25 %
+R4	481	R4-LOS-F1	Player count (N)	context	characters
+R4	510	R4-LOS-F5	Big vehicle and very large unit	context	vehicles
+R4	514	R4-LOS-F5	The largest mode, and its N	context	48
+R4	514	R4-LOS-F5	The largest mode, and its N	context	48
+R4	526	R4-LOS-F5	The server tick budget	context	the tick budget
+R4	531	R4-LOS-F5	Big vehicle and very large unit	context	vehicles
+R4	559	R4-OBST-F4	Player count (N)	context	characters
+R4	574	R4-OBST-F4	Big vehicle and very large unit	context	big
+R4	574	R4-OBST-F4	Big vehicle and very large unit	context	vehicles
+R4	591	R4-OBST-F4	Big vehicle and very large unit	context	big
+R4	591	R4-OBST-F4	Big vehicle and very large unit	context	vehicles
+R4	602	R4-OBST-F4	Big vehicle and very large unit	context	vehicles
+R4	602	R4-OBST-F4	Big vehicle and very large unit	context	vehicles
+R4	608		Big vehicle and very large unit	context	vehicles
+R4	609		Big vehicle and very large unit	context	vehicles
+R4	629		Preview isolation and the isolation flag	context	always
+R4	641		Big vehicle and very large unit	context	big
+R4	641		Big vehicle and very large unit	context	vehicles
+R4	641		Big vehicle and very large unit	context	vehicles
+R4	641		Big vehicle and very large unit	context	vehicles
+R4	647		Big vehicle and very large unit	context	vehicles
+R4	647		Big vehicle and very large unit	context	vehicles
+R4	653		Big vehicle and very large unit	context	big
+R4	658		The reference server	context	one core of the R6 server type
+R4	682	R4-PHYS-REC1	Big vehicle and very large unit	context	big
+R4	682	R4-PHYS-REC1	Big vehicle and very large unit	context	vehicles
+R4	691	R4-PHYS-REC1	The stress scene	context	stress load
+R4	692	R4-PHYS-REC1	Sim step time	context	mean tick
+R4	697	R4-PHYS-REC1	The largest mode, and its N	context	48
+R4	746	R4-PHYS-REC4	Big vehicle and very large unit	context	big
+R4	746	R4-PHYS-REC4	Big vehicle and very large unit	context	vehicles
+R4	755	R4-PHYS-REC4	Big vehicle and very large unit	context	vehicles
+R4	757	R4-PHYS-REC4	Big vehicle and very large unit	context	vehicles
+R4	761	R4-PHYS-REC4	The stress scene	context	stress load
+R4	762	R4-PHYS-REC4	Big vehicle and very large unit	context	big
+R4	762	R4-PHYS-REC4	Big vehicle and very large unit	context	vehicles
+R4	763	R4-PHYS-REC4	The largest mode, and its N	context	48
+R4	765	R4-PHYS-REC4	The stress scene	context	stress load
+R4	766	R4-PHYS-REC4	Big vehicle and very large unit	context	big
+R4	766	R4-PHYS-REC4	Big vehicle and very large unit	context	vehicles
+R4	839	R4-NAV-REC2	Big vehicle and very large unit	context	big
+R4	839	R4-NAV-REC2	Big vehicle and very large unit	context	vehicles
+R4	839	R4-NAV-REC2	The largest mode, and its N	context	48
+R4	839	R4-NAV-REC2	The stress scene	context	R1-TICK-REC2's P1 scene
+R4	841	R4-NAV-REC2	The server tick budget	context	the tick's p99 budget
+R4	842	R4-NAV-REC2	The largest mode, and its N	context	48
+R4	859	R4-NAV-REC3	The largest mode, and its N	context	48
+R4	861	R4-NAV-REC3	The largest mode, and its N	context	48
+R4	919	R4-FLOORS-REC3	Team size and how modes are written	context	players
+R4	954	R4-LOS-REC1	The sim step share and the server-only share	context	10 % budget
+R4	963	R4-LOS-REC2	The largest mode, and its N	context	48
+R4	970	R4-LOS-REC2	The sim step share and the server-only share	context	10 % budget
+R4	985	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	989	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	993	R4-OBST-REC1	Player count (N)	context	characters
+R4	998	R4-OBST-REC1	Big vehicle and very large unit	context	big
+R4	998	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	1000	R4-OBST-REC1	Big vehicle and very large unit	context	big
+R4	1000	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	1000	R4-OBST-REC1	The largest mode, and its N	context	48
+R4	1000	R4-OBST-REC1	The stress scene	context	R4-PHYS-REC4's stress scene
+R4	1002	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	1003	R4-OBST-REC1	Big vehicle and very large unit	context	vehicles
+R4	1074	R4-FLOORS-OQ1	Preview isolation and the isolation flag	context	always
+R4	1075	R4-FLOORS-OQ2	Big vehicle and very large unit	context	vehicles
+R4	1075	R4-FLOORS-OQ2	Big vehicle and very large unit	context	vehicles
+R4	1085	R4-LOS-OQ1	Big vehicle and very large unit	context	vehicles
+R4	1086	R4-LOS-OQ1	Big vehicle and very large unit	context	big
+R4	1086	R4-LOS-OQ1	Big vehicle and very large unit	context	vehicles
+R4	1118	R4-OBST-OQ4	Big vehicle and very large unit	context	big
+R4	1118	R4-OBST-OQ4	Big vehicle and very large unit	context	vehicles
+R4	1119	R4-OBST-OQ4	Big vehicle and very large unit	context	big
+R4	1119	R4-OBST-OQ4	Big vehicle and very large unit	context	vehicles
+R4	1119	R4-OBST-OQ4	The stress scene	context	R1-TICK-REC2's P1 scene
+R4	1121	R4-OBST-OQ4	Big vehicle and very large unit	context	vehicles
+R4	1171	R4-OBST-OQ4	Big vehicle and very large unit	context	vehicles
+R4	1322		Player count (N)	context	characters
+R4	1353		Player count (N)	context	characters
+R4	1355		Player count (N)	context	characters
+R5	36		Player count (N)	context	characters
+R5	394	R5-RUSTLINT-F15	The measuring unit: one vCPU	context	Core
+R5	444	R5-TEST-F6	Preview isolation and the isolation flag	context	always
+R5	522	R5-TEST-F14	Team size and how modes are written	context	players
+R5	524	R5-TEST-F14	The largest mode, and its N	context	48
+R5	822	R5-PREV-F10	The client host	context	Cloudflare
+R5	828	R5-PREV-F10	The client host	context	Cloudflare
+R5	835	R5-PREV-F11	The client host	context	Cloudflare
+R5	837	R5-PREV-F12	The client host	context	Cloudflare
+R5	839	R5-PREV-F12	The access wall	context	the access policy
+R5	839	R5-PREV-F12	The client host	context	Cloudflare
+R5	841	R5-PREV-F12	Player count (N)	context	characters
+R5	842	R5-PREV-F12	The client host	context	Cloudflare
+R5	849	R5-PREV-F14	The client host	context	Cloudflare
+R5	850	R5-PREV-F14	The access wall	context	Cloudflare Access
+R5	852	R5-PREV-F14	The access wall	context	Cloudflare Access
+R5	853	R5-PREV-F14	Player count (N)	context	characters
+R5	856	R5-PREV-F14	The client host	context	Cloudflare
+R5	858	R5-PREV-F15	Preview	context	deploy preview
+R5	860	R5-PREV-F15	Preview	context	deploy preview
+R5	862	R5-PREV-F15	Preview	context	deploy preview
+R5	886	R5-PREV-F18	The client host	context	Cloudflare
+R5	974	R5-GATE-F4	The measuring unit: one vCPU	context	Core
+R5	1085		Preview isolation and the isolation flag	context	always
+R5	1117		The client host	context	Cloudflare
+R5	1123		The client host	context	Cloudflare
+R5	1124		The access wall	context	Cloudflare Access
+R5	1124		The client host	context	Cloudflare
+R5	1225	R5-LAYOUT-REC5	The client's sim share	context	tick time
+R5	1359	R5-RUSTLINT-REC4	Sim step time	context	tick cost
+R5	1394	R5-TEST-REC1	Team size and how modes are written	context	players
+R5	1396	R5-TEST-REC1	Server tick time	context	tick p99
+R5	1396	R5-TEST-REC1	Team size and how modes are written	context	players
+R5	1469	R5-TEST-REC5	The largest mode, and its N	context	48
+R5	1471	R5-TEST-REC5	The largest mode, and its N	context	48
+R5	1471	R5-TEST-REC5	The test-mode list	context	24v24 = 48 and 12v12v12 = 36
+R5	1481	R5-TEST-REC5	Server tick time	context	tick p99
+R5	1565	R5-CI-REC5	Preview isolation and the isolation flag	context	always
+R5	1599	R5-PREV-REC2	The client host	context	Cloudflare
+R5	1615	R5-PREV-REC4	The production header set and the preview header set	context	a preview-only header set
+R5	1622	R5-PREV-REC4	The client host	context	Cloudflare
+R5	1631	R5-PREV-REC5	The access wall	context	Cloudflare Access
+R5	1631	R5-PREV-REC5	The client host	context	Cloudflare
+R5	1633	R5-PREV-REC5	The staging game server	context	a real server
+R5	1702	R5-GATE-REC3	The authority	context	server-only
+R5	1761	R5-TSLINT-OQ5	The security baseline	context	R6's security baseline
+R5	1807	R5-CI-OQ1	Big vehicle and very large unit	context	big
+R5	1829	R5-PREV-OQ1	The client host	context	Cloudflare
+R5	1834	R5-PREV-OQ3	The staging game server	context	an EU server
+R5	1855	R5-GATE-OQ4	The advisories check	context	cargo-audit and cargo-deny as CI gates
+R5	1879	R5-XQ-OQ3	Preview isolation and the isolation flag	context	always
+R5	1952		The security baseline	context	R6's security baseline
+R5	1953		The advisories check	context	dependency audits
+R5	2144		The largest mode, and its N	context	48
+R5	2213		Player count (N)	context	characters
+R5	2215		The client host	context	Cloudflare
+R5	2216		The client host	context	Cloudflare
+R5	2217		The client host	context	Cloudflare
+R5	2218		The client host	context	Cloudflare
+R5	2219		The client host	context	Cloudflare
+R5	2269		Player count (N)	context	characters
+R6	12		The advisories check	context	dependency audits
+R6	44		The client host	context	Cloudflare
+R6	46		The start modes and the goal modes	context	the goal
+R6	59	R6-HOST-F1	Player count (N)	context	characters
+R6	59	R6-HOST-F1	The client host	context	Cloudflare
+R6	64	R6-HOST-F2	The client host	context	Cloudflare
+R6	66	R6-HOST-F2	The client host	context	Cloudflare
+R6	72	R6-HOST-F3	The client host	context	Cloudflare
+R6	79	R6-HOST-F4	The access wall	context	Cloudflare Access
+R6	80	R6-HOST-F4	The client host	context	Cloudflare
+R6	82	R6-HOST-F4	Preview isolation and the isolation flag	context	always
+R6	83	R6-HOST-F4	The access wall	context	the access policy
+R6	85	R6-HOST-F5	The client host	context	Cloudflare
+R6	87	R6-HOST-F5	The client host	context	Cloudflare
+R6	91	R6-HOST-F6	The client host	context	Cloudflare
+R6	93	R6-HOST-F6	The client host	context	Cloudflare
+R6	164	R6-HOST-F17	Preview isolation and the isolation flag	context	always
+R6	195	R6-HOST-F23	The measuring unit: one vCPU	context	Core
+R6	209	R6-HOST-F24	The largest mode, and its N	context	48
+R6	234	R6-COST-F4	The client host	context	Cloudflare
+R6	236	R6-COST-F4	The client host	context	Cloudflare
+R6	248	R6-COST-F5	The client host	context	Cloudflare
+R6	253	R6-COST-F5	The largest mode, and its N	context	48
+R6	368	R6-TEL-F1	The client host	context	Cloudflare
+R6	373	R6-TEL-F1	Sim step time	context	Whole ticks
+R6	403	R6-TEL-F1	The access wall	context	Cloudflare Access
+R6	403	R6-TEL-F1	The client host	context	Cloudflare
+R6	414		Server tick time	context	tick p99
+R6	414		The server tick budget	context	the tick budget
+R6	422		The security baseline	context	the deferred baseline
+R6	444		The largest mode, and its N	context	48
+R6	444		The largest mode, and its N	context	48
+R6	449		The largest mode, and its N	context	48
+R6	458		The largest mode, and its N	context	48
+R6	472		The client host	context	Cloudflare
+R6	475		The client host	context	Cloudflare
+R6	478		Team size and how modes are written	context	players
+R6	478		The largest mode, and its N	context	48
+R6	499		The start modes and the goal modes	context	the goal
+R6	502		Server tick time	context	tick p99
+R6	506		The start modes and the goal modes	context	the goal
+R6	512		Team size and how modes are written	context	players
+R6	512		The largest mode, and its N	context	48
+R6	513		The largest mode, and its N	context	48
+R6	515		The largest mode, and its N	context	48
+R6	516		Preview isolation and the isolation flag	context	always
+R6	517		The start modes and the goal modes	context	the goal
+R6	558		The start modes and the goal modes	context	the goal
+R6	578		The start modes and the goal modes	context	the goal
+R6	582		The client host	context	Cloudflare
+R6	596		The start modes and the goal modes	context	the goal
+R6	609	R6-HOST-REC1	The client host	context	Cloudflare
+R6	612	R6-HOST-REC1	The access wall	context	Cloudflare Access
+R6	648	R6-HOST-REC2	Team size and how modes are written	context	players
+R6	648	R6-HOST-REC2	The largest mode, and its N	context	48
+R6	649	R6-HOST-REC2	Server tick time	context	tick p99
+R6	668	R6-HOST-REC4	The security baseline	context	the deferred baseline
+R6	673	R6-HOST-REC4	Game-server certificate	context	a publicly trusted certificate
+R6	675	R6-HOST-REC4	The largest mode, and its N	context	48
+R6	680	R6-COST-REC1	The start modes and the goal modes	context	the goal
+R6	684	R6-COST-REC1	The largest mode, and its N	context	48
+R6	685	R6-COST-REC1	Team size and how modes are written	context	players
+R6	690	R6-COST-REC1	Team size and how modes are written	context	players
+R6	690	R6-COST-REC1	The largest mode, and its N	context	48
+R6	711	R6-OBS-REC1	Server tick time	context	tick p99
+R6	716	R6-OBS-REC2	The client's sim share	context	tick time
+R6	724	R6-OBS-REC2	The server tick budget	context	the tick budget
+R6	778	R6-TEL-REC1	Team size and how modes are written	context	players
+R6	778	R6-TEL-REC1	The largest mode, and its N	context	48
+R6	780	R6-TEL-REC1	Server tick time	context	tick p99
+R6	785	R6-TEL-REC2	The start modes and the goal modes	context	the goal
+R6	786	R6-TEL-REC2	The client host	context	Cloudflare
+R6	798	R6-TEL-REC3	Preview isolation and the isolation flag	context	always
+R6	835	R6-HOST-OQ4	The start modes and the goal modes	context	the goal
+R6	836	R6-HOST-OQ5	The access wall	context	Cloudflare Access
+R6	837	R6-HOST-OQ5	The client host	context	Cloudflare
+R6	850	R6-COST-OQ1	The largest mode, and its N	context	48
+R6	856	R6-COST-OQ3	Team size and how modes are written	context	players
+R6	895	R6-SEC-OQ1	The advisories check	context	dependency audits
+R6	898	R6-SEC-OQ1	The advisories check	context	dependency audits
+R6	912	R6-SEC-OQ1	The client host	context	Cloudflare
+R6	920	R6-SEC-OQ1	The client host	context	Cloudflare
+R6	920	R6-SEC-OQ1	The client host	context	Cloudflare
+R6	931	R6-SEC-OQ1	The client host	context	Cloudflare
+R6	941		Game-server certificate	context	a publicly trusted certificate
+R6	944		Team size and how modes are written	context	players
+R6	945		The client host	context	Cloudflare
+R6	950		The start modes and the goal modes	context	the goal
+R6	951		Team size and how modes are written	context	players
+R6	1059		The client host	context	Cloudflare
+R6	1060		The client host	context	Cloudflare
+R6	1061		The client host	context	Cloudflare
+R6	1062		The client host	context	Cloudflare
+R6	1063		The client host	context	Cloudflare
+R6	1063		The client host	context	Cloudflare
+R6	1064		The client host	context	Cloudflare
+R6	1094		The client host	context	Cloudflare
+R6	1094		The client host	context	Cloudflare
+R6	1137		The client host	context	Cloudflare
+R6	1144		The client host	context	Cloudflare
+R6	1144		The client host	context	Cloudflare

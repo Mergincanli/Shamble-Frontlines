@@ -1,0 +1,20 @@
+{
+ "exact_total": 0,
+ "context_total": 817,
+ "links": {
+  "R1": false,
+  "R2": false,
+  "R3": false,
+  "R4": false,
+  "R5": false,
+  "R6": false
+ },
+ "by_topic": {
+  "R1/context": 212,
+  "R2/context": 248,
+  "R3/context": 103,
+  "R4/context": 92,
+  "R5/context": 61,
+  "R6/context": 101
+ }
+}
