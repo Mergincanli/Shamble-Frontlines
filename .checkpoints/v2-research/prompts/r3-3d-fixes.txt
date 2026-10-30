@@ -1,5 +1,5 @@
 # Session message to the R3 owner (graphics-engineer, step 3c), saved verbatim before sending: the step-3d fix round
-# sent: 2026-10-30 about 20:45 UTC by SendMessage
+# sent: 2026-10-30 about 20:43 UTC by SendMessage
 
 Step 3d checked your step-3c changes (the verifier's report, verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r356-3d-result.md; the skeptic's: verifier-r356-3d-skeptic-result.md), and the advisor ruled on the two R3 items it raised (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-3d-r3-verdict.md). Apply these in /home/user/Shamble-Frontlines/docs/research/r3-rendering.md only, under the same rules as step 3c (R3's owner changes only counts, arithmetic and glossary terms; look rows keep their words; no new claim, number or source; quoted source text and dated records unchanged; fetch nothing; log each change by type in your notes). Line numbers are those of commit f67245e.
 1. The advisor's item 5 (R3-LOOK-REC3): add, right after the row's "Spike must prove", the advisor's line word for word: "Term note (outside the look row, which keeps its words under condition 5): its "48" means the largest mode's [N](GLOSSARY.md#player-count-n) (48 or 54, MODES-3)." Change nothing inside the row. Log it as a nit.

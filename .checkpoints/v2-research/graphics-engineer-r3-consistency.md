@@ -37,3 +37,4 @@ Restarted 2026-10-30 ~20:10 UTC after the spend limit: r3-rendering.md unchanged
 ## Totals
 recommendation 4 (C9.14; R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC3: the largest mode's N, 48 or 54); number 1 (C9.13, approved arithmetic); source 0; nit 27 (C9.12, C9.15, C9.16, C10.12; MODES-3 + 8 XT entries; 5 pointers; 5 glossary wording changes; link pass; header 2; part 7). OBJECT: none.
 DONE
+## Step 3d fix round (2026-10-30, coordinator message; advisor-3d-r3-verdict.md items 5, 6; script's compound-48 hits)

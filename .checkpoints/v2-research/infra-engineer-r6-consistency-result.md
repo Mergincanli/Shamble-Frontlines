@@ -26,7 +26,7 @@ I've applied every approved R6 item, the glossary terms and the shared open ques
 
 Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/infra-engineer-r6-consistency.md
 
-## Addendum: the step-3d fix round (reply to `prompts/r6-3d-fixes.txt`, about 20:44 UTC, verbatim)
+## Addendum: the step-3d fix round (reply to `prompts/r6-3d-fixes.txt`, about 20:43 UTC, verbatim)
 
 All six step-3d items are fixed in r6-infrastructure.md only (lines as at f67245e). The check script still finds 0 exact retired phrases in R6, and nothing is committed.
 1. r6:46 (TL;DR): "free static traffic" now applies to Workers static assets only (R6-HOST-F5), as in C19.6. nit

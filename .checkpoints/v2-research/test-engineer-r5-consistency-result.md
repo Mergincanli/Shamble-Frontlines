@@ -27,7 +27,7 @@ Step 3c for R5 is done. All approved items are applied to `/home/user/Shamble-Fr
 
 Notes, ending in DONE: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/test-engineer-r5-consistency.md`. Nothing is committed.
 
-## Addendum: the step-3d fix round (reply to `prompts/r5-3d-fixes.txt`, about 20:44 UTC, verbatim)
+## Addendum: the step-3d fix round (reply to `prompts/r5-3d-fixes.txt`, about 20:43 UTC, verbatim)
 
 I fixed all four step-3d items in `/home/user/Shamble-Frontlines/docs/research/r5-toolchain-quality.md`, and added one line per change under "Step 3d fixes (2026-10-30):" in part 7. Nothing is committed.
 
