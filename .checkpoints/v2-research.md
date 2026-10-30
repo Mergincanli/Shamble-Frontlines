@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 21:13 Amsterdam (20:13 UTC)
+- **Last update:** 2026-10-30 21:24 Amsterdam (20:24 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -148,6 +148,16 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   r2:870 reads "4–9 % of one core of the measuring machine". The C23.2 nit: APPROVE ("at commit 8dee746"). Applied:
   the two R2 nits by the R2 owner (message `prompts/r2-object-1-nits.txt`); the glossary change by engine-architect in
   its "Used today" refresh (item 3 added to `prompts/engine-architect-r14-usedin.txt` before sending).
+- R1+R4 owner DONE about 20:23 UTC (report verbatim `engine-architect-r14-consistency-result.md`): 25 recommendation
+  changes (R1 16, R4 9), no OBJECT, C17.b1 waits; exact R1 13 → 0, R4 5 → 0; quotes: none gone; apply check: C9.4 and
+  C9.8 differ by logged renames. Committed **09de883**. **Step 3c's five owners are all done** (R5 1da4e5f, R6 de0a003,
+  R3 41f9cf9, R2 2684735 + e9ff1f9, R1+R4 09de883). Check at 09de883 (glossary before its refresh): exact 1 (r2:870,
+  OBJECT-1's place, in context once the glossary changes), in context 581; term uses 945; first uses 122, 102 linked
+  (`scripts/glossary-check-3c-prerefresh.txt`).
+- "Used today" refresh plus OBJECT-1's glossary change sent 20:23 UTC to the same engine-architect agent (prompt
+  `prompts/engine-architect-r14-usedin.txt`, HEAD 09de883). UNREAD_SOURCES.md re-run after step 3c: same counts,
+  only the notes' commit moves (36cc386). The 10-row sample drawn: `unread-sample.md` (hinge 3, named 2, note 3, no
+  tie 2), for the R1+R4 unit.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
