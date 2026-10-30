@@ -32,3 +32,6 @@
 - hits 86-130 judged (wrong so far: r2:2017, 2022, 2103, 2186, 2292, 2319, 2338, 2358; rule: single full-match 48 in a pass mark/spike with no marking words = wrong, consistent with the R1+R4 verifier's standard). Next: hits 131-198.
 - hits 131-170 judged (new wrong: r2:2439, 2499, 2588, 2718, 2773, 2777, 2952). Next: hits 171-198.
 - hits 171-198 judged (new wrong: r2:2993). All 198 judged: see hits.tsv counts. Next: verify row count vs source TSV; first-use links; labels.
+- First uses: 25 R2 terms; 7 script-unlinked all OK (r2:56 "mean" verb; 404 "start time"; 451 legacy grenade "preview"; 456 legacy "slots"; 1528 TF2's N; 2295 reference server, linked earlier at r2:2023 on "the proposed reference server"; 2613 advisories check, linked on r2:2611). Header link r2:13 OK. All 48 GLOSSARY.md#anchors in R2 resolve (26 distinct, 0 bad).
+- Hits: 198 judged, aligned 1:1 with glossary-hits-3c-r2.tsv; 182 right, 16 wrong (all "48" for the largest mode): r2:2017, 2022, 2103, 2186, 2292, 2319, 2338, 2358, 2439, 2499, 2588, 2718, 2773, 2777, 2952, 2993.
+- Next: shared OQ + XT-OQ texts word-for-word check; then labels.
