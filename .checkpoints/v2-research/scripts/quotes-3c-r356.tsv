@@ -1,0 +1,37 @@
+topic	gone or new	quoted text (spaces normalized)	new quote found in the approved texts
+R3	new	Cross-topic open questions	yes
+R3	new	The goal: 12v12v12 or 24v24	yes
+R3	new	Retire (exact)	no
+R3	new	the worst case of the largest mode	yes
+R3	new	Retire (in context)	no
+R3	new	R1-TICK's spike scene	no
+R3	new	Open questions	no
+R3	new	Shared open questions (the same words in every topic)	yes
+R3	new	Cross-topic open questions (consistency critic, 2026-10-29)	yes
+R5	new	Consistency resolutions (2026-10-30)	no
+R5	new	two teams with 2–8 players, and three teams with 6–18 players	yes
+R5	new	The goal: 12v12v12 or 24v24	yes
+R5	new	ADR 0006 lists it as open, or it is researched before 0006 is accepted	yes
+R5	new	to force deletion of aliased deployments	yes
+R5	new	the 1000 most recently deployed aliases are retained	yes
+R5	new	until R1-BND-REC2 mark 5's test decides	yes
+R5	new	Retire (exact)	no
+R5	new	Retire (in context)	no
+R5	new	a preview-only header set	no
+R5	new	Cloudflare's `_headers`	no
+R5	new	R6's security baseline	yes
+R5	new	an EU server	no
+R5	new	Open questions	no
+R5	new	Shared open questions (the same words in every topic)	yes
+R5	new	Cross-topic open questions (consistency critic, 2026-10-29)	yes
+R6	new	two teams with 2–8 players, and three teams with 6–18 players	yes
+R6	new	The goal: 12v12v12 or 24v24	yes
+R6	new	ADR 0006 lists it as open, or it is researched before 0006 is accepted	yes
+R6	new	The latest deployment for a branch cannot be deleted	yes
+R6	new	to force deletion of aliased deployments	yes
+R6	new	the 1000 most recently deployed aliases are retained	yes
+R6	new	the reference server	yes
+R6	new	the tick budget	yes
+R6	new	the deferred baseline	yes
+R6	new	Shared open questions (the same words in every topic)	yes
+R6	new	Cross-topic open questions (consistency critic, 2026-10-29)	yes

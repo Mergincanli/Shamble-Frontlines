@@ -88,3 +88,6 @@ R4 C10.16 MODES-3 inserted word for word -- nit
 R4 "### Cross-topic open questions (consistency critic, 2026-10-29)" right after it, 3-line intro -- nit
 R4 R4-XT-OQ1..OQ8 inserted in the critic's words (ranks 2, 3, 14, 15, 24, 30, 35, 40) -- nit (8 lines in one)
 R4 pointers "Cross-topic open questions: ..." at the end of PHYS-REC1 (OQ2, OQ8), PHYS-REC2 (OQ5), NAV-REC1 (OQ5), NAV-REC3 (OQ6), NAV-REC4 (OQ3, OQ4), FLOORS-REC3 (OQ5), LOS-REC1 (OQ7), LOS-REC3 (OQ1) -- nit (8 in one)
+R1 R1-XU-OQ2: "R1-ABL-REC4 predicts only the local player's own abilities and weapons" (prediction scope, in context: a settled scope) -> "predicts the local player's own weapons, and its own abilities if ABL-PREDICT says so", matching C5.1 -- nit
+## Step 4 (R4)
+R4 header: glossary line with GLOSSARY.md link; id table +2 rows; totals 23 -> 32 open questions (+MODES-3, +8 XT); label unchanged -- nit

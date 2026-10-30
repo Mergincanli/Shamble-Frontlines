@@ -47,7 +47,7 @@ Task: step 3c owner apply (R2): apply approved consistency resolutions, glossary
 - TRN-REC6 mark 2 "Simulation tick duration at p99" -> "Server tick time at p99" (GLOSSARY lists this mark under server tick time): recommendation (scope named: the whole tick with its sends).
 - ROOM-REC2 (C11.10 text) "reference host: the reference server" -> "on the reference server"; mark 2 "on the reference host" -> "on the reference server"; mark 4 "tick p99" -> "server tick p99": nit.
 - ROOM-OQ1 "tick p99" -> "server tick p99"; ROOM-OQ2 and ROOM-OQ11 "R6's (deferred) security baseline" -> "the security baseline": nit.
-- XU-OQ8: lead "The units gave shares of different wholes (as first written; settled below)"; "the whole tick ... of the tick interval" -> "the server tick time ... of the tick period"; "room's tick" -> "server tick time"; "the transport layer on at most 1 CPU core" -> "the transport runtime on at most 1 vCPU": nit.
+- XU-OQ8: lead "The units gave shares of different wholes (their figures before 2026-10-30, in the glossary's terms; settled below)"; "the whole tick ... of the tick interval" -> "the server tick time ... of the tick period"; "room's tick" -> "server tick time"; "the transport layer on at most 1 CPU core" -> "the transport runtime on at most 1 vCPU": nit.
 - Pointers to R1: spread "a server-only stream" -> "an authority-only stream since the fix pass": nit. Pointers to R6: "R6's security baseline" -> "The security baseline (R6)", "the dependency audit that keeps ... current" -> "the policy of the advisories check that keeps ... current (...; R5-GATE-REC1 schedules the check)": nit.
 - OBJECT (not applied): r2:866 R2-INT-F20 "4-9 % of one core": the legacy JavaScript hasLOS measurement on unrecorded hardware (a browser, so client hardware: GLOSSARY Keeps "Core, for client hardware"); "one vCPU" (of the reference server) would misstate the finding. Left as is; the check script will count 1 exact hit. Proposal: the glossary's measuring-unit entry adds r2:866 under Keeps.
 - Left as is (in context, other meaning): bare "48" (R2's design point, VISION_V2 "design for 48+"; resolutions changed the ones that mean the largest mode), "players" (all player counts, none a team size), "always", "characters" (display-name characters), "vehicles" in the worked estimate (its own assumption), "a room's tick" (r2:1900, the tick loop), Source's "server-only seed" (r2:2076, 2893), "dependency audits" (the baseline's subject), "a publicly trusted certificate" (r2:1875 and TRN-REC5 name the per-hostname form).
@@ -60,3 +60,17 @@ Task: step 3c owner apply (R2): apply approved consistency resolutions, glossary
 - Pointers "*Cross-topic open question(s):* R2-XT-OQk (Open questions)." added to: SYNC-REC3 (7), SYNC-REC4 (2), SYNC-REC6 (3), SYNC-REC7 (13), SYNC-REC8 (1), SYNC-REC9 (7), BUD-REC1 (14), BUD-REC2 (3, 11), BUD-REC4 (5, 14), INT-REC1 (14), INT-REC2 (15), TRN-REC5 (10), ROOM-REC1 (11), ROOM-REC2 (4), ROOM-REC8 (4): nit x15.
 - "See also R2-XT-OQk (below)." added to the named R2 questions: BUD-OQ8 (3), ROOM-OQ9 (4), BUD-OQ1 (5), ROOM-OQ2 (9, outside its dated bracket), ROOM-OQ11 (9), SYNC-OQ5 (13), XU-OQ12 (14), INT-OQ1 (15): nit x8. Also the pointer to R1 on trap recovery (12) and the worked estimate (8, 11): nit x2.
 - Reclassified (stricter, so the verifier checks them): C11.9 -> recommendation (TRN-REC1 mark 2's cap moves from "1 CPU core" to "1 vCPU", which may be half a core, R6-HOST-F23, though resolution 11 calls it a rename); C6.5 -> recommendation (SYNC-REC3 now names the offline Worker as the stream's holder).
+
+## Step 4: header and part 7 (scratchpad r2c/step4.py)
+- Header: line "Glossary and cross-topic resolutions applied 2026-10-30 (see GLOSSARY.md and part 7)" after Status; unit-table row for the shared and XT questions; totals sentence (+19 open questions, 91 in all): nit x3. Status label unchanged.
+- Part 7: "### Consistency resolutions (2026-10-30)" at its end, before "## Sources" (applied ids, glossary terms, p99 marks, questions added, the OBJECT, counts, which approved texts carry a later rename): nit.
+- Check after all steps (glossary_check.py --skip-records): R2 exact 1 (r2:870 now, the OBJECT), in context 185 (+3 from the approved shared texts: MODES-3 "the goal 24v24, N = 48", BASELINE-WHEN "dependency audits"); header links GLOSSARY.md: True; first uses 25, unlinked 7, all documented false hits (other meaning, or the link on the line before).
+- Verbatim check: approved after texts present word for word (links normalized) except C1.9, C1.10, C1.10b, C1.13, C11.9, C11.10, C17.3, C23.1, each differing only by a logged step-2 rename, link or p99.
+
+## Totals
+- recommendation 20: C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8, C6.5, C9.9, C9.10, C10.6, C10.7, C10.8, C11.9; p99 marks BUD-REC6, INT-REC1, INT-REC2, INT-REC4; TRN-REC6 mark 2.
+- nit 94 (step 1: 17, step 2: 14, step 2b: 12, step 3: 46, step 4: 4, course-correction heading: 1).
+- number 0, source 0. OBJECT 1 (r2:866/870 R2-INT-F20 "one core").
+- Not applied: C17.b2, C23.b* (BASELINE-WHEN). Note: C23.2's approved text carries "r6:424-425" without "at commit 8dee746" (applied as approved; the advisor's commit nit covered only the cross-topic texts).
+
+DONE
