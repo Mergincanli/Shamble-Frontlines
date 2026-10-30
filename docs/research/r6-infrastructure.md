@@ -803,7 +803,8 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   *Spike must prove (proposed):* in 30 bot matches across 3 modes (2 teams, 3 teams, and the largest mode: 48 players under MODES-3 (a), 54 under (b)), 100 % write a record
   before Closed; every kill event names a source id that resolves in the content set of the record's hash; the points
   total recomputed from events equals the final points in 100 % of records; recording adds under 1 % to server tick p99 and
-  0 allocations per tick after warm-up (bounded buffer, preallocated); a record is at most 1 MB uncompressed (A-10).
+  0 allocations per tick after warm-up (bounded buffer, preallocated); a 24v24 record is at most 1 MB uncompressed (A-10),
+  and a record of the largest mode at most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b)).
 - **R6-TEL-REC2. Store records as compressed JSON-lines files in EU object storage (S1, Hetzner Object Storage in the
   game servers' location), uploaded by the supervisor after the room exits, with a schema version in every record and
   a Parquet compaction job (S2, `parquet` 60.1.0) only once a query needs it.**
@@ -1198,17 +1199,18 @@ new claim, number or source; quoted source text and the dated records above are 
 - **OBJECT:** none.
 
 Step 3d fixes (2026-10-30):
-- TL;DR, client line: free static traffic scoped to Workers static assets (R6-HOST-F5), as C19.6 does.
+- TL;DR, client line: free static traffic scoped to Workers static assets (R6-HOST-F5), as C19.6 does. (nit)
 - R6-COST-REC1's spike: the room sizes give both MODES-3 readings ((a) 48, 36, 18; (b) 54, 48, 36); its egress mark
-  names the 24v24 (48-player) match-hour of the 3.16 GB row.
-- R6-TEL-REC1's spike: its full-size mode is the largest mode (48 under MODES-3 (a), 54 under (b)).
-- R6-HOST-REC2's spike: 8 rooms of the largest mode (48 under MODES-3 (a), 54 under (b)).
-- R6-OBS-REC2's spike: the 30-minute soak runs at the largest mode's N (48 or 54, MODES-3).
-- R6-OBS-REC4: pointer to R6-XT-OQ5.
-- R6-HOST-REC1's "Rests on:" adds R5-PREV-F12, F13, F14 and F18, which its reason cites.
+  names the 24v24 (48-player) match-hour of the 3.16 GB row. (recommendation; the egress wording a nit)
+- R6-TEL-REC1's spike: its full-size mode is the largest mode (48 under MODES-3 (a), 54 under (b)); a 24v24 record is
+  at most 1 MB (A-10), a largest-mode record at most 1 MB × N / 48 (1.125 MB at 54). (recommendation)
+- R6-HOST-REC2's spike: 8 rooms of the largest mode (48 under MODES-3 (a), 54 under (b)). (recommendation)
+- R6-OBS-REC2's spike: the 30-minute soak runs at the largest mode's N (48 or 54, MODES-3). (recommendation)
+- R6-OBS-REC4: pointer to R6-XT-OQ5. (nit)
+- R6-HOST-REC1's "Rests on:" adds R5-PREV-F12, F13, F14 and F18, which its reason cites. (nit)
 - "48-player" judged per the glossary rule: the TL;DR's cost line, the Q2 table (G3), K4 and A-10 now name 24v24
   beside the 48 (their figures are R2's 24v24 row); TL15's "48-player room" (legacy facts of R6-HOST and R6-COST) is
-  kept, since it repeats the legacy figure's own 48 soldiers.
+  kept, since it repeats the legacy figure's own 48 soldiers. (nit)
 
 ## 8. Sources
 
