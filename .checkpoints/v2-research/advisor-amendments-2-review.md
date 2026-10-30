@@ -1,0 +1,2 @@
+Task: Advisor review of plan-amendments-2.md (v2-research, cs/v2-research, PR #28): verdict APPROVE/REVISE/ESCALATE with conditions; per-contradiction decider.
+- Unit 1 done: read plan-amendments-2, checkpoint, plan.md, plan-amendments.md, my earlier verdict, the 12 contradictions (ranks 1,5,6,9,10,11,17,19,21,22,23,29). Critic's own decided_by: #10 Mustafa (VISION §3), #6 Mustafa SEC-SPREAD part, #21 Mustafa privacy, #17/#23 security baseline (Advisor), rest synthesis/ADR/engine-architect.
