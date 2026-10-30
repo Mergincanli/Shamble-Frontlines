@@ -14,3 +14,9 @@ Task: step 3a of plan-amendments-2 (glossary GLOSSARY.md + resolutions.md for th
 - unit 0: GLOSSARY.md skeleton and resolutions.md skeleton written
 - unit G2: glossary §2 (6 terms: player count, team size, start/goal modes, largest mode, design point/headroom, test-mode list) written
 - unit #10: resolution 10 written (escalated MODES-3; 23 changes R10-1..R10-23)
+- unit G1a: glossary §1 reference server + measuring unit written
+- unit #11: resolution 11 written (resolved; R11-1..R11-13)
+- unit G3: glossary §3 (stress scene, big vehicle/very large unit, live projectile, active/visual effect) written
+- unit #9: resolution 9 written (resolved; R9-1..R9-22)
+- unit G1b: glossary §1 tick terms written (tick period, sim step time, server tick time, transport runtime, statistics, server tick budget, shares, client sim share)
+- unit #1: resolution 1 written (resolved, B50 recommended; R1-R1-1..R1-R6-2)
