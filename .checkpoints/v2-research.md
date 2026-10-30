@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 19:41 Amsterdam (18:41 UTC)
+- **Last update:** 2026-10-30 19:44 Amsterdam (18:44 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -103,6 +103,15 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   header holds its launch record): engine-architect R1+R4 (xhigh), netcode-architect R2 (xhigh), test-engineer R5
   (high), infra-engineer R6 (high); prompts `prompts/<agent>-<k>-consistency.txt`, notes `<agent>-<k>-consistency.md`.
   graphics-engineer R3 (high) starts when a slot frees. If cut off: resume each by message from its notes.
+- 18:46 UTC: correction sent to the four running owners (verbatim `prompts/step3c-correction-1.txt`): the prompt's
+  step 3 named the new subsection "Shared open questions (consistency critic, 2026-10-30)"; the approved files name
+  two, "### Shared open questions (the same words in every topic)" and "### Cross-topic open questions (consistency
+  critic, 2026-10-29)". `mk3c.py` fixed and now writes only the keys asked for (R3's prompt regenerated; launched
+  prompts unchanged, md5 checked). Night-stop reminder set for 22:50 UTC (23:50 Amsterdam). Saver restarted 18:41 UTC
+  (task bd7o9zhjo, 110 minutes). Fetch audit script `scripts/fetch_audit.py` (all transcripts): every host requested
+  is on the allow list except api.github.com (the advisor's #29 review: 3 Bash calls, 10 curl requests via `$A`);
+  off-list hosts appear only as WebFetch redirect targets, not fetched (gdconf.com, bevy.org, clippy.rust-lang.org,
+  docs.fly.io).
 - Next: commit each owner's file as it returns after the write-guard check (and save its return verbatim as
   `<agent>-<k>-consistency-result.md`); then the GLOSSARY "Used today" refresh (engine-architect); then step 3d (three
   verifier units, `scripts/mk3d.py 7c6e0d7 <after>`, `scripts/unread_sample.py`), docs-keeper, gate, report, PR ready.
