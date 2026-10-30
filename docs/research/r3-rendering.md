@@ -1240,7 +1240,7 @@ Serves: the brief's R3 row ("spatial audio with Web Audio", `docs/V2_PHASE0_BRIE
 mode, 12v12v12 or 24v24), §6.9 (large units and their effects). No VISION_V2 §6 item names audio.
 Spike must prove (proposed): with 32 concurrent equal-power voices, a 5-minute recorded capture has no dropout (checked by
 a listener and by the AudioContext staying in the "running" state) and main-thread audio work stays under
-0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms (p99).
+0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices raises that p99 by less than 0.3 ms.
 
 **R3-AUDIO-REC2. A voice manager with a cap and priorities (V-B) plus distance culling: proposed start of 32 voices on
 Low and 48 on High, priorities as data (own weapon and shots at the player first, then large units, then by distance),
@@ -1675,7 +1675,8 @@ Step 3d fixes (2026-10-30):
 - R3-CHAR-REC2: 1.0 ms (p99) (a recommendation change).
 - R3-CHAR-REC4: 2.0 ms (p99) GPU time (a recommendation change).
 - R3-AUDIO-REC3: 0.2 ms (p99) per frame (a recommendation change).
-- R3-AUDIO-REC1: p99 written out, by the advisor's item-6 ruling (the same rule; found by the owner).
+- R3-AUDIO-REC1: p99 written out, by the advisor's item-6 ruling (the same rule; found by the owner); the HRTF
+  addition reads as a rise of that p99 by less than 0.3 ms, since p99s do not add (a nit from the final check).
 - Options for question 7, row V-A: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3)
   (a nit).
 - R3-AUDIO-REC2's reason: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3) (a nit).
