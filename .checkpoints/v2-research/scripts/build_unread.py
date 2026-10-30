@@ -170,6 +170,12 @@ f"Counts: {len(rows)} not-read rows in the six topics ({', '.join(f'{t} {c}' for
 "them), the source as the topic names it, and why it was not read.",'',
 '| Topic | Recommendation | What hinges on it | Source not read | Why not read | Other copy (the Advisor) |','|---|---|---|---|---|---|']
 for t,rec,need,src,why in hinge: L.append(f'| {t} | {esc(rec)} | {esc(need)} | {esc(src)} | {esc(why)} | |')
+needs_all=' '.join(n for _,_,n,_ in out)
+only1=[(t,re.split(r'\s+\(',rec,maxsplit=1)[0].strip(),src) for t,rec,need,src,why in hinge
+       if src.strip() not in ('', '–') and f"{t} {re.split(r'\s+\(',rec,maxsplit=1)[0].strip()}" not in needs_all]
+if only1:
+    L+=['',"Part 1 sources that no \"Sources not read\" table lists (so part 2 has no row for them): "+
+        '; '.join(f'{t} {rid}: {esc(src)}' for t,rid,src in only1)+'.']
 L+=['','## 2. Every source not read','',
 "One row per source, merged across the topics. \"Needed for\" gives, in this order: the part 1 rows that name it; the",
 "findings, recommendations or open questions that name it; the unit's own note on it (file and line, at the commit",

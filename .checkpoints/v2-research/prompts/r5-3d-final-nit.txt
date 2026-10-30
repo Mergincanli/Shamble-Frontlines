@@ -1,0 +1,4 @@
+# Session message to the R5 owner (test-engineer), saved verbatim before sending: a nit from the step-3d final check
+# sent: 2026-10-30 about 21:01 UTC by SendMessage
+
+One nit from the final check of your fix round (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r356-3d-final-result.md): r5:1426 keeps "the 48-player scale", rightly, since it means VISION_V2 §3's design point; it would read better as "the design point (48 players)" with the glossary link (GLOSSARY.md#the-design-point-and-headroom). Apply it in /home/user/Shamble-Frontlines/docs/research/r5-toolchain-quality.md if the sentence reads right that way, log it as a nit with a part-7 line; change nothing else; do not commit. Reply in under 30 words with the line as it now reads (or why you kept it).

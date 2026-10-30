@@ -47,3 +47,4 @@ Follow-up (coordinator): 4 header nits in GLOSSARY.md (status line, Used today a
 Follow-up applied (nits, header only; matched by words, the 4 paragraphs rewrapped at 120): status line, How to read / Retire, How to read / Used today, decision-codes paragraph, all in the coordinator's words. Body below "## 1. Tick budgets" unchanged (diff empty). Not committed.
 DONE
 Follow-up 2 (coordinator, advisor-3d-r3-verdict item 6 point 3): Time statistics / Used today, R3 part extended with R3-BUDGET-REC2's CPU, animation, sim and GPU rows, CHAR-REC1, CHAR-REC2, CHAR-REC4, AUDIO-REC1, AUDIO-REC3 (sub-budgets at p99) -- nit; only that field changed (diff checked). DONE
+Follow-up 3 (coordinator): step 3d fixes to R1 and R4 (verifier-r14-3d-result.md, skeptic). Items: 1 r1:2049 25 %; 2 five bare 48s; 3 nits (pointers, Rests on, hash-map ban).

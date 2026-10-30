@@ -62,3 +62,4 @@ DONE
 - 4 r5:1426 "§3 (the 48-player scale)" kept: the design point of VISION_V2 §3, not the largest mode
 - part 7: "Step 3d fixes (2026-10-30):" lines added · nit
 DONE (step 3d fixes)
+- final-check nit: r5:1426 "§3 (the 48-player scale)" -> "§3 (the design point (48 players))", linked; part-7 line updated · nit. DONE

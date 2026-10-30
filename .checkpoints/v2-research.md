@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 21:52 Amsterdam (20:52 UTC)
+- **Last update:** 2026-10-30 22:02 Amsterdam (21:02 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -206,6 +206,20 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b))"; the session redid 54/48 = 1.125) and R6's
   typed part-7 lines, committed **1bfd235**. R3, R5 and R6 are final for step 3d (the R5 nit and the glossary credit nit
   ride with the next round; the completeness critic reads the final state).
+- **Step 3d R1+R4 DONE** (run wf_5519b651-63d, about 20:57 UTC; verbatim `verifier-r14-3d-result.md`,
+  `verifier-r14-3d-skeptic-result.md`): PASS WITH NOTES; all 50 R1/R4 approved changes present (C9.4, C9.8 by logged
+  renames); 11 basis claims confirmed (2 by curl, raw.githubusercontent.com and doc.rust-lang.org, both 200): R1 keeps
+  "verified (every recommendation claim)", R4 keeps "50 of 52"; 184 hits judged, 5 wrong; skeptic 1 more (r1:2049's
+  "25 % of the server tick budget" names the wrong whole). Resolution 1's table recomputed: N = 48 and 25 % option all
+  match; N = 54 at 60 Hz only if the 0.7 ms interest mark scales ×1.125 (unstated); N = 54 at 30 Hz sums of rounded
+  parts, 0.01 ms high. Source sample: 7 of 10 hold, 3 wrong (UNREAD script faults).
+- UNREAD script fixed (whole addresses; name-only hinge ties; 19 ties read by hand and listed in the script; units'
+  notes only): 33 needed-for cells corrected (hinge 44 → 72, named 4 → 3, note 24 → 23, no tie 108 → 82); every hinge
+  row now tied back except 3 sources no not-read table lists (named in the header) and R5's "–" row. Committed
+  **f2239f9**; changed rows in `scripts/unread-changes-3d.tsv` for the final check.
+- Fix round sent about 21:01 UTC: R1+R4 (`prompts/r14-3d-fixes.txt`: r1:2049, five bare 48s, pointers and Rests-on nits)
+  and R5's design-point nit (`prompts/r5-3d-final-nit.txt`). GLOSSARY items (single events have no p99; §1's N = 54
+  notes; the R3-AUDIO-REC1 credit; Used today's "25 % of the server tick budget") wait for the R2 unit's results.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
