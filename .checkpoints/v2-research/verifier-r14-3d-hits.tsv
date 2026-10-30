@@ -99,3 +99,33 @@ R1	2562	State hash	its hash	right	content bundle's hash
 R1	2618	Team size and how modes are written	players	right	"48+ players": design-point marking
 R1	2664	The largest mode, and its N	48	right	"48 soldiers under MODES-3 (a), 54 under (b)" beside "the largest mode"
 R1	2671	Big vehicle and very large unit	vehicles	right	heading says "Big vehicles"; "multi-part vehicles" beside it
+R1	2734	Big vehicle and very large unit	vehicles	right	"multi-part vehicles" as an entity cap kind, not a stress count
+R1	2736	The largest mode, and its N	48	wrong	R1-BND-OQ6 asks about "the largest mode"; its Decides sentence then fixes "at N = 48" with no marking words: the largest mode meant by a bare 48 (54 under MODES-3 (b))
+R1	2760	Active effect (and visual effect)	effects	right	Source's repeated (presentation) effects during re-prediction (finding about another game)
+R1	2779	Active effect (and visual effect)	effects	right	"Effects as their own entities" (layout question), no count
+R1	2832	Active effect (and visual effect)	200 active effects	right	R1-XU-OQ1 list: record of the units' first proposals, kept by approved C9.4/C9.8 ("keeps its quote of the old mark"), settled by the dated C9.8 sentence
+R1	2832	Big vehicle and very large unit	8 vehicles	right	same record of the old R1-ECS-REC1 mark (approved to stay)
+R1	2832	The largest mode, and its N	48	right	same record of the old mark
+R1	2834	The largest mode, and its N	48	right	record: old R1-TICK-REC2 P1 scale list
+R1	2835	The largest mode, and its N	48	right	record: old P1 mark "p99 at N = 48" (C9.4 note: R1-XU-OQ1 keeps the old quote)
+R1	2838	The largest mode, and its N	48	right	record: old R1-ABL-REC6 "48 soldiers"
+R1	2840	The largest mode, and its N	48	right	LOOP_V2 §11 scale points N = 12, 24, 36, 48
+R1	2954	The advisories check	cargo-audit and cargo-deny as CI gates	right	"The reviewer's proposal": kept quoted as such (GLOSSARY Retire in context clause)
+R1	2983	The largest mode, and its N	48	right	MODES-3 shared text "the goal 24v24, N = 48" beside "the largest mode"
+R1	2983	The start modes and the goal modes	the goal	right	MODES-3 shared text: the goal 24v24 under reading (a), correct use
+R1	2990	The advisories check	dependency audits	right	the baseline's subject (GLOSSARY: the phrase stays for the baseline's subject)
+R1	3114	Active effect (and visual effect)	effects	right	pointer: effects as rows in a pool (layout), no count
+R1	3115	Active effect (and visual effect)	effects	right	pointer: R1-ABL-OQ10 effects as entities (layout)
+R1	3134	Active effect (and visual effect)	effects	right	"random effects draw from a named sim RNG stream" (gameplay effects, no count)
+R1	3140	Active effect (and visual effect)	effects	right	"cues and effects reach presentation as typed events" (no count)
+R1	3170	Active effect (and visual effect)	effects	right	"cues drive effects and the spectacle budget": presentation, no count
+R1	3760	Player count (N)	characters	right	source table "first 100,000 characters"
+R1	3766	The largest mode, and its N	48	right	source row number 48
+R1	3767	Player count (N)	characters	right	source table "characters"
+R1	3768	Player count (N)	characters	right	source table "characters"
+R1	3840	Player count (N)	characters	right	source table "characters"
+R1	3842	Player count (N)	characters	right	source table "characters"
+R1	3919	The largest mode, and its N	48	right	heading count "Sources not read (48)"
+R1	3972	The access wall	login wall	right	search result's report of gdcvault's login, not our access wall
+R1	3973	The largest mode, and its N	48	right	source row number 48
+R4	49	Big vehicle and very large unit	vehicles	right	needs list "vehicles avoided, never carved" (general)
