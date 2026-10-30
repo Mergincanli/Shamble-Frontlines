@@ -184,7 +184,13 @@ for topic, fn in FILES.items():
 
 exact_total = sum(v for (t, k), v in counts.items() if k == 'exact')
 context_total = sum(v for (t, k), v in counts.items() if k == 'context')
-links = {t: ('GLOSSARY.md' in open(R + f).read().split('\n## ', 1)[0]) for t, f in FILES.items()}
+def header(text):
+    """The file's header: the text before the first part heading, or R6's own "## 1. Header" section."""
+    parts = re.split(r'\n(?=## )', text)
+    return parts[0] + ('\n' + parts[1] if len(parts) > 1 and re.match(r'## (1\. )?Header\b', parts[1]) else '')
+
+
+links = {t: ('GLOSSARY.md' in header(open(R + f).read())) for t, f in FILES.items()}
 print(f'entries {len(entries)}; exact hits {exact_total}; in-context hits {context_total}'
       f'{" (quotes and dated records skipped)" if skip_records else " (quotes skipped)"}')
 for t in FILES:

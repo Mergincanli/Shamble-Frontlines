@@ -40,3 +40,17 @@ R1 C11.1 C11.2 C11.3 C11.4 C11.5 C11.6 C11.7 (two pairs) -- nit (7 lines)
 R4 C11.13 r4:658 -- nit
 R1 C17.1 R1-RR-OQ7 -- nit (C17.b1 not applied: waits on BASELINE-WHEN)
 R1 C29.1 R1-DET-REC5, C29.2 R1-ECS-REC2, C29.3 R1-ECS-REC2 mark 2 -- recommendation (3 lines)
+## Step 2: glossary (R1), done so far
+R1 every "(GLOSSARY" mark in the applied after texts turned into a link GLOSSARY.md#<entry>; touched lines reflowed to <=120 chars (no word changed) -- nit
+R1 R1-ECS-REC1: links one vCPU, reference server, stress scene, largest mode's N, live projectiles, sim step time, sim step share, tick period -- nit
+R1 R1-ECS-REC1 mark 1 label "Tick cost" -> "Sim step time" (Sim step time, in context "tick cost") -- nit
+R1 R1-ECS-REC1 mark 2 "≤ 0.2 ms native and ≤ 0.5 ms Wasm" + "at p99" (Time statistics rule) -- recommendation
+R1 R1-ECS-REC1 mark 3 "fits in ≤ 8 ms" -> "fits in ≤ 8 ms at p99" (Time statistics rule) -- recommendation
+R1 R1-ECS-REC1 mark 3 "R2's partial prediction" -> "R2's prediction scope (GLOSSARY link)" (prediction scope, in context) -- nit
+R1 R1-TICK-REC2 P1 "p99 tick time" -> "p99 sim step time" (combined view of resolutions.md) -- nit
+R1 R1-TICK-REC2 P2 "p99 tick time at most 40 % of the period (6.7 ms at 60 Hz, 13.3 ms at 30 Hz)" -> "p99 sim step time within the client's sim share (GLOSSARY: at most 40 % of the tick period, 6.7 ms at 60 Hz, 13.3 ms at 30 Hz)" (same values) -- nit
+R1 R1-TICK-REC3 "p99 tick time ... mean tick time" -> "p99 sim step time ... mean sim step time" -- nit
+R1 R1-BND-REC5 heading: G3 gains link "(G3; GLOSSARY: the isolation flag)" (resolution 22: "the glossary link goes on its first G3") -- nit
+R1 R1-BND-REC5 spike: "preview link" linked (first use of Preview) -- nit
+R1 R1-XU-OQ1 heading and closing "the tick budget" -> "the server tick budget" (Retire exact; 2 hits); body "mean tick" -> "mean sim step time", "the period" -> "the tick period"; old values kept (record of the units' proposals) -- nit
+R1 R1-RR-OQ7 C17.1 text linked (advisories check, security baseline) -- nit

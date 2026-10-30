@@ -1,7 +1,7 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: step 3c owner apply (R3)
 # subagent_type: graphics-engineer · model: opus · effort: high · launched as a background agent with a one-line pointer message
-# launched: not yet
+# launched: 2026-10-30T18:49Z as a background agent; launch message: "Your task is written, word for word, in /home/user/Shamble-Frontlines/.checkpoints/v2-research/prompts/graphics-engineer-r3-consistency.txt. It was saved before launch; the lines above "**Task:**" are the session's launch record. Read the whole file first, then follow it exactly as your task. It names your notes file: look there first, as it says."
 
 **Task:** step 3c of the approved plan amendment `/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan-amendments-2.md` for SHAMBLE FRONTLINES v2 phase 0 research: you are the owner of R3: /home/user/Shamble-Frontlines/docs/research/r3-rendering.md. Apply to your file, and to no other file, what the advisor approved: the resolutions of the 12 contradictions, the shared glossary's terms, and the shared cross-topic open questions.
 

@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 19:44 Amsterdam (18:44 UTC)
+- **Last update:** 2026-10-30 19:49 Amsterdam (18:49 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -112,6 +112,19 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   is on the allow list except api.github.com (the advisor's #29 review: 3 Bash calls, 10 curl requests via `$A`);
   off-list hosts appear only as WebFetch redirect targets, not fetched (gdconf.com, bevy.org, clippy.rust-lang.org,
   docs.fly.io).
+- R5 owner DONE about 18:48 UTC (report verbatim `test-engineer-r5-consistency-result.md`): 4 recommendation changes
+  (C19.1, C21.1, C22.1, C22.3), 64 nits, no OBJECT; C17.b3 waits; 0 exact hits; committed **1da4e5f**. R6 owner DONE
+  about 18:49 UTC (`infra-engineer-r6-consistency-result.md`): 6 recommendation changes (C1.21, C19.5, C19.6, C21.4,
+  C21.8, C22.5), 51 nits, no OBJECT; C23.b1–b3 wait; 0 exact hits; committed **de0a003**. Its two notes, for step 3d
+  and later: R6-HOST-REC1's "Rests on" does not list the R5 findings C19.6 now cites (the verifier checks it); if
+  BASELINE-WHEN picks (b), C23.b2's quote "…rejects a shared key." needs adjusting, since C23.3 replaced its final
+  period. Check script: the header-link test now reads R6's "## 1. Header" section (R6 was a false "no").
+- R3 owner launched 18:49 UTC (background, pointer message; header stamped). Running: R1+R4, R2, R3.
+- Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
+  read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
+  in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
+  (prompts from `scripts/mk3d.py`). Their findings go the same way (owner fixes, final check). Units run as one
+  workflow per unit (verifier, then skeptic), three at once, within the 4-at-once limit.
 - Next: commit each owner's file as it returns after the write-guard check (and save its return verbatim as
   `<agent>-<k>-consistency-result.md`); then the GLOSSARY "Used today" refresh (engine-architect); then step 3d (three
   verifier units, `scripts/mk3d.py 7c6e0d7 <after>`, `scripts/unread_sample.py`), docs-keeper, gate, report, PR ready.

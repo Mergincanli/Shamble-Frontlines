@@ -40,3 +40,14 @@ Heading note: resolution shared questions go under "### Shared open questions (t
 - pending: pointers from named recommendations; GLOSSARY links; header; part 7
 - Session correction (mid-task): XT subsection renamed to "### Cross-topic open questions (consistency critic, 2026-10-29)", right after the shared subsection, as cross-topic-oqs.md says · nit
 - Pointers "Cross-topic open questions: ... (below)." added at the end of R5-TEST-REC1 (XT-OQ2, OQ13), R5-LAYOUT-REC2 (OQ3, OQ7), R5-LAYOUT-REC3 (OQ9), R5-LAYOUT-REC5 (OQ8), R5-TEST-REC4 (OQ10), R5-CI-REC1 (OQ14), R5-PREV-REC1 (OQ6, OQ12), R5-PREV-REC4 (OQ5), R5-GATE-REC1 (OQ7), R5-GATE-REC3 (OQ12) · nit each (10). XT-OQ1, OQ4, OQ11 name no R5 recommendation: no pointer.
+## Step 2b: links
+- 15 "(GLOSSARY...)" markers from the approved texts turned into links to their entries (GLOSSARY.md#anchor; anchors checked against the headings) · nit (1 unit)
+- 11 first-use links by wrapping the term itself (words unchanged): preview (r5:27 table), N (TL15), Cloudflare Pages (R5-PREV-F10), the advisories check (R5-GATE-F3), sim step time (R5-LAYOUT-REC5), 48+ (R5-TEST-REC1 table), server tick time and p99 (benchmark row), the access wall (R5-PREV-REC3 spike), the staging game server (R5-PREV-REC5), the security baseline (R5-TSLINT-OQ5), goal (MODES-3 text) · nit each (11). Script's remaining "no" first uses are not term uses: r5:1170 "Start with", r5:531 "sprint mean".
+## Step 4: header and part 7
+- Header line "Glossary and cross-topic resolutions applied 2026-10-30 (see GLOSSARY.md and part 7)" with link · nit
+- Totals: 45 -> 63 open questions (shared 4, cross-topic 14) · nit (count)
+- Part 7 subsection "### Consistency resolutions (2026-10-30)" at the end of "## Verifier spot-check" · nit
+- Pointer wording fix (CI-REC1) and XT intro wording · nit
+## Check after edits: glossary_check.py --skip-records: R5 exact 0, in context 45 (new ones are inside approved word-for-word texts or kept as judged); header links GLOSSARY.md: True. repo-map-check OK.
+## Counts: recommendation 4 (C19.1, C21.1, C22.1, C22.3); number 0; source 0; nit 64 (10 resolution texts, rank-41 via C22.1, 4 shared inserts, 14 XT inserts, 10 pointers, 9 renames, 1 marker-link unit, 11 first-use links, header line, totals, part 7, heading correction, wording fix). OBJECT: none. Not applied: C17.b3 (waits for BASELINE-WHEN).
+DONE
