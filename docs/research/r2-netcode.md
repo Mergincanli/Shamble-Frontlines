@@ -10,6 +10,7 @@
   day (PASS WITH NOTES: 2 claims wrong, 2 unsupported), and the second fix pass corrected all four without re-sourcing
   (part 7). A final check of the second fix pass, the same day, re-checked ROOM-REC3's reworded reason and the other
   changes and found nits only, applied by the session (part 7, "Final check").
+- Glossary and cross-topic resolutions applied 2026-10-30 (see [GLOSSARY.md](GLOSSARY.md) and part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R2):** "Snapshots, client
   prediction, interpolation and lag compensation for 48+ players; tick rate and bandwidth budgets; interest management
   for a top-down camera; the WebTransport server stack in Rust plus the WebSocket fallback; rooms and private matches;
@@ -17,19 +18,22 @@
 
 | # | Brief question | Unit | Ids | Draft and notes (`.checkpoints/v2-research/`) |
 |---|---|---|---|---|
-| 1 | Snapshots, client prediction, interpolation and lag compensation for 48+ players | `sync` | R2-SYNC-F1–F36, REC1–REC9, OQ1–OQ15 | `netcode-architect-r2-sync-draft.md`, `netcode-architect-r2-sync.md` |
+| 1 | Snapshots, client prediction, interpolation and lag compensation for 48+ players ([GLOSSARY](GLOSSARY.md#the-design-point-and-headroom)) | `sync` | R2-SYNC-F1–F36, REC1–REC9, OQ1–OQ15 | `netcode-architect-r2-sync-draft.md`, `netcode-architect-r2-sync.md` |
 | 2 | Tick rate and bandwidth budgets | `budgets` | R2-BUD-F1–F35, REC1–REC6, OQ1–OQ11 | `netcode-architect-r2-budgets-draft.md`, `netcode-architect-r2-budgets.md` |
 | 3 | Interest management for a top-down camera | `interest` | R2-INT-F1–F20, REC1–REC7, OQ1–OQ8 | `netcode-architect-r2-interest-draft.md`, `netcode-architect-r2-interest.md` |
 | 4 | The WebTransport server stack in Rust plus the WebSocket fallback | `transport` | R2-TRN-F1–F42, REC1–REC6, OQ1–OQ9 | `netcode-architect-r2-transport-draft.md`, `netcode-architect-r2-transport.md` |
 | 5 | Rooms and private matches | `rooms` | R2-ROOM-F1–F19, REC1–REC8, OQ1–OQ11 | `netcode-architect-r2-rooms-draft.md`, `netcode-architect-r2-rooms.md` |
 | 6 | Learn from shipped games (Valve's Source networking, Overwatch's GDC talks, Glenn Fiedler's articles, Quake 3) | all five | an index under Findings | – |
 | – | Conflicts and gaps between the units (added at assembly) | – | R2-XU-OQ1–OQ18 | – |
+| – | Shared and cross-topic questions (consistency resolutions, 2026-10-30) | – | ABL-PREDICT, SEC-SPREAD, MODES-3, BASELINE-WHEN; R2-XT-OQ1–OQ15 | – |
 
 Totals: 147 findings, 36 recommendations, 70 open questions (52 from the units, 18 added at assembly), 113 sources
 read (131 entries across the units; 18 were a source another unit had also read), 26 sources not read. After the fix
 pass (2026-10-28): 152 findings (5 added: R2-SYNC-F36, R2-TRN-F40, R2-TRN-F41, R2-TRN-F42, R2-ROOM-F19), 36
 recommendations, 72 open questions (2 added: R2-SYNC-OQ15, R2-ROOM-OQ11), 116 sources read (3 added), 26 not read.
-The second fix pass (2026-10-28) changed none of these totals.
+The second fix pass (2026-10-28) changed none of these totals. The consistency resolutions (2026-10-30) add 19 open
+questions, 91 in all (the 4 shared questions ABL-PREDICT, SEC-SPREAD, MODES-3 and BASELINE-WHEN, and the 15
+cross-topic questions R2-XT-OQ1–OQ15); the findings, recommendations and sources are unchanged.
 
 **How to read this file.**
 - The findings, options, recommendations and open questions are copied from the unit drafts unchanged, ids included.
@@ -181,7 +185,7 @@ transport unit's to confirm (inferred here).
 
 **R2-SYNC-F12.** Client-side prediction keeps a circular buffer of the local player's past states and inputs. When a
 correction arrives, the client rewinds to it and replays the newer inputs. What the player's own input did not cause
-(being hit by a rocket) cannot be predicted.
+(being hit by a rocket) cannot be predicted ([GLOSSARY](GLOSSARY.md#the-prediction-scope)).
 · Source: https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/ (the part on
 client-side prediction) · Tier: other · Read 2026-10-27 · Confirmed in the source: "keep a circular buffer of past
 character state and input for the local player on the client"; "In effect the client invisibly "rewinds and replays"
@@ -463,7 +467,7 @@ Brief question (quoted): "Snapshots, client prediction, interpolation and lag co
 and bandwidth budgets**; interest management for a top-down camera; ..." (`docs/V2_PHASE0_BRIEF.md` §4, R2 row; this
 unit answers the bold part). Target it serves: "Matches feel fair up to about 100 ms of ping. Servers start in one EU
 region." (`docs/VISION_V2.md` §4, `[DEFAULT]`). Scale: "two teams with 2–8 players, and three teams with 6–18 players"
-to start; "The goal: 12v12v12 or 24v24" (VISION_V2 §3, `[DECIDED]`); LOOP_V2 §2: "12v12v12 to 16v16v16, possibly more,
+to start ([GLOSSARY](GLOSSARY.md#the-start-modes-and-the-goal-modes)); "The goal: 12v12v12 or 24v24" (VISION_V2 §3, `[DECIDED]`); LOOP_V2 §2: "12v12v12 to 16v16v16, possibly more,
 in squads of 4. Bots fill empty slots."
 
 Tiers: **official** (specifications, standards drafts) · **shipped game** (source code or docs of a shipped game or of
@@ -694,7 +698,7 @@ verbatim by the fetch; "inferred" means the claim rests on the fetch tool's summ
 | Inventory CD21, CD4; LEGACY_TUNING `T` | Ground 372 × 252 m; arena half-size 186 × 126 m; every legacy map shares it. LOOP_V2 §9: Octopon-3 size `[OPEN]`, "Start near Cabana's footprint". | 16 bits per horizontal axis at 1 cm covers ±327.68 m, nearly twice the legacy half-extent. |
 | Inventory GP3; `shamble-game.js:2774-2775` | Player speed = 6.3 m/s × sprintMult (at most 1.62) × 1.3 in Banzai × 0.72 with the shield: at most about 13.3 m/s. Jump 11 m/s, gravity 24 (CD4). | Bounds for relative position deltas and for velocity quantization (±20 m/s leaves margin). Bots' `speedMult` path was not checked. |
 | Inventory CD5 | Camera height 40, boom 56.6, fov 15°. | Input to the interest unit (a narrow top-down view), not used here. |
-| Inventory CM4, GC2 | DM_Tri, 48 soldiers in combat: 0.80–1.00 ms mean per update step, p95 0.97–1.54 ms, 3 reps (legacy JavaScript, headless, `tools/perfbots.js`); 12 fixed soldier slots today. | A ballpark for one simulation step at 48 soldiers; not a server measurement and not Rust. |
+| Inventory CM4, GC2 | DM_Tri, 48 soldiers in combat: 0.80–1.00 ms mean ([GLOSSARY](GLOSSARY.md#time-statistics)) per update step, p95 0.97–1.54 ms, 3 reps (legacy JavaScript, headless, `tools/perfbots.js`); 12 fixed soldier slots today. | A ballpark for one simulation step at 48 soldiers; not a server measurement and not Rust. |
 | Inventory GE6, CD14, GC17 | One harvester per team; one vehicle type (Juggernaut: 5.5 m/s, 3 shells 80 ms apart). VISION_V2 §6.4: vehicles multi-part, seats `[OPEN]`. | Vehicle counts in the estimate are assumptions; turret yaw is a second angle per vehicle. |
 | Inventory GC14, GC15, GC11 | Frags (1.5 s fuse, 3 carried), Molotovs (1.4 s), Torque Bow bolts (0.55 s after sticking), all swept per step. | Projectiles are short-lived; their count, not their size, drives the cost. |
 | LEGACY_TUNING `WEAPONS` | Fastest fire interval: Shabzon 0.072 s (13.9 shots/s); Lancer bursts 3 × 0.06 s; Bagpipe 8 pellets. Juggernaut ripple 80 ms (GC17). | 0.072 s is 2.16 ticks at 30 Hz and 4.32 ticks at 60 Hz: without carrying the fractional remainder, the Shabzon would fire at 10/s (30 Hz, −28 %) or 12/s (60 Hz, −14 %). |
@@ -1377,7 +1381,7 @@ Unit **rooms**. Draft: `.checkpoints/v2-research/netcode-architect-r2-rooms-draf
 Brief question (quoted): "rooms and private matches" (V2_PHASE0_BRIEF §4, row R2). Unit scope as assigned: the room and
 match lifecycle (create, fill, start, end, tear down); one process per room versus many rooms per process at 48+
 players; joining with a short-lived signed token from a lobby, and reconnecting; private matches with room codes,
-including VISION_V2 §3's organized play; bots filling empty slots on the server; modes, team count, team size and
+including VISION_V2 §3's organized play; bots filling empty slots on the server; modes, team count, team size ([GLOSSARY](GLOSSARY.md#team-size-and-how-modes-are-written)) and
 factions as data (VISION_V2 §6.1); guest play first (VISION_V2 §5); what a spike must prove.
 
 Every source read 2026-10-27. "Confirmed in
@@ -1692,7 +1696,7 @@ not support (R2-XU-OQ2). Read as the round trip, every rewind above is 50 ms lon
 | Option | What it is | 48 players at 30 Hz (table D) | Complexity / risk |
 |---|---|---|---|
 | E1 | Raw floats, full state every snapshot | about 536 kbps, 2 datagrams per snapshot | trivial; every snapshot fragmented in two |
-| E2 | Quantized (centimetres, 16-bit angles), full state | about 251 kbps; a full snapshot is about 1021 bytes, close to the 1171-byte limit (over it with live projectiles or at 64 players) | low |
+| E2 | Quantized (centimetres, 16-bit angles), full state | about 251 kbps; a full snapshot is about 1021 bytes, close to the 1171-byte limit (over it with live projectiles ([GLOSSARY](GLOSSARY.md#live-projectile)) or at 64 players) | low |
 | E3 | E2 + delta against the last acknowledged snapshot, lists of changed entities, projectiles as spawn events + deterministic flight | about 146 kbps; about 609 bytes per snapshot | medium: per-client baseline ring (Quake III keeps 32, F25), application acks (F8) |
 | E3b | E3, but projectiles re-sent in every snapshot | about 188 kbps | medium; needs no deterministic projectile flight on the client |
 | E4 | E3 + arithmetic (range) coding | about 25 % below E3 by Fiedler's single data point (F23) | high: a context model to build and tune; defer until E3 is measured |
@@ -1718,8 +1722,8 @@ not support (R2-XU-OQ2). Read as the round trip, every rewind above is 50 ms lon
 
 | Item | Budget idea (proposed) | Evidence |
 |---|---|---|
-| Whole tick at 60 Hz (16.7 ms) | ≤ 4 ms p99 for 48 players, about 25 % of the interval, leaving room for bursts and for several rooms per core | assumption; no source read gives a server tick budget |
-| Whole tick at 30 Hz (33.3 ms) | ≤ 8 ms p99 | assumption |
+| Server tick time at 60 Hz (16.7 ms) ([GLOSSARY](GLOSSARY.md#1-tick-budgets): server tick time, tick period, one vCPU) | ≤ 4 ms p99 for 48 players, about 25 % of the tick period, leaving room for bursts and for several rooms per vCPU | assumption; no source read gives a server tick budget; weighed and set aside on 2026-10-30 for the server tick budget's 50 % (R2-BUD-REC6) |
+| Server tick time at 30 Hz (33.3 ms) | ≤ 8 ms p99 | assumption |
 | Simulation step | R1's tick unit | legacy JS 0.80–1.00 ms mean per step at 48 soldiers (CM4) |
 | Snapshot encode, 48 clients | 10–50 µs per client per snapshot, so 0.5–2.4 ms per snapshot round | assumption: to be measured |
 | Lag-compensation history | 1 s × 60 ticks × 48 soldiers × 64 bytes ≈ 184 KB per room; about 72 rewound shots per second at 48 players | Source keeps 1 s (F29); bytes per pose and shots per second are assumptions |
@@ -1765,8 +1769,8 @@ assumed in view (no interest management).
 
 | Case | P | V | Bytes per snapshot | Rate | Per client |
 |---|---|---|---|---|---|
-| Two teams, 4v4 (VISION_V2 §3 start, upper end) | 8 | 4 | 180 | 30 Hz | 44.2 kbps |
-| Three teams, 6v6v6 (start, upper end) | 18 | 7 | 283 | 30 Hz | 70.3 kbps |
+| Two teams, 4v4 (VISION_V2 §3 start, upper end, as totals: MODES-3 (a)) | 8 | 4 | 180 | 30 Hz | 44.2 kbps |
+| Three teams, 6v6v6 (start, upper end, as totals: MODES-3 (a)) | 18 | 7 | 283 | 30 Hz | 70.3 kbps |
 | 12v12v12 (goal) | 36 | 12 | 465 | 30 Hz | 116.2 kbps |
 | 24v24 or 16v16v16 (goal; design point 48) | 48 | 15 | 584 (609 with events) | 30 Hz | **146.1 kbps** |
 | 32v32 (48+ headroom) | 64 | 18 | 732 | 30 Hz | 183.7 kbps |
@@ -1785,13 +1789,15 @@ Bots cost no network traffic.
 Comparison points: Fiedler's example budget 256 kbit/s (F34); Valve's library default clamp 256 KiB/s ≈ 2.1 Mbit/s
 (F31); Quake III's 1999 default 3000 B/s = 24 kbit/s (F26).
 
+*Cross-topic open questions on this estimate:* R2-XT-OQ8, R2-XT-OQ11 (Open questions).
+
 ### Brief question 3: interest management for a top-down camera (interest unit)
 
 **Q-A. The relevance region (what is "near enough to send")**
 
 | Option | Complexity | CPU per tick | Bandwidth | Risk | Fit with VISION_V2 §6 |
 |---|---|---|---|---|---|
-| A1. No region: send everything | None | Lowest | Highest; the worst case equals the average | Every enemy position reaches every client (F16); serialization grows with N² | Fails §6.2's hiding needs |
+| A1. No region: send everything | None | Lowest | Highest; the worst case equals the average | Every enemy position reaches every client (F16); serialization grows with N² ([GLOSSARY](GLOSSARY.md#player-count-n)) | Fails §6.2's hiding needs |
 | A2. Fixed circle around the player | Low | Grid query, trivial | Good | Wrong if the framing, aspect or pan changes; pop-in at the edge | Weak: the framing is look brief pending |
 | A3. Region from the camera parameters as data: a yaw-proof circle around the player of radius = view-footprint circumradius + the largest camera offset the client rig may use (dead zone, look-ahead, ADS pan) + a motion margin, with enter/exit hysteresis | Medium | Grid query plus one distance test per candidate | Good (F19) | Needs the client rig to stay inside the server's bound (OQ2) | Good: §6.1 (modes as data: the camera per mode) |
 | A4. A3 shifted toward the aim direction (the server has the aim from input commands) | Medium+ | Same | Slightly better than A3 | The aim the server sees is about one RTT old; a quick flick shows an edge before the data arrives | As A3; an optimisation over it |
@@ -1832,7 +1838,7 @@ Comparison points: Fiedler's example budget 256 kbit/s (F34); Valve's library de
 
 | Option | What it is | Complexity and effort | Maturity and maintenance | Draft and interop | Risk | Fit with VISION_V2 |
 |---|---|---|---|---|---|---|
-| A. wtransport 0.7.x on quinn | Its own session, stream and datagram API; self-signed certificate helper; access to the inner quinn connection | Low: one crate, tokio | Since 2023-05; 0.7.2 (2026-08-11); about 1.08 M downloads; README "not considered completely production-ready" (F29) | Draft-02 and -07 settings (F6) | Pre-1.0 API; one project; lags when browsers move to a new draft | Serves the rooms and authoritative server of §6.1 |
+| A. wtransport 0.7.x on quinn | Its own session, stream and datagram API; self-signed certificate helper; access to the inner quinn connection | Low: one crate, tokio | Since 2023-05; 0.7.2 (2026-08-11); about 1.08 M downloads; README "not considered completely production-ready" (F29) | Draft-02 and -07 settings (F6) | Pre-1.0 API; one project; lags when browsers move to a new draft | Serves the rooms and authoritative server ([GLOSSARY](GLOSSARY.md#the-authority)) of §6.1 |
 | B. web-transport-quinn 0.13.x on quinn | Mirrors the quinn API; sibling crates: a browser wrapper, an async trait, qmux over WebSocket | Low to medium | Since 2024-04; 0.13.5 (2026-10-24); about 2.03 M downloads; six releases in four weeks; no stability statement (F30) | Draft-02 and -07 settings (F6) | Frequent pre-1.0 releases (API stability not checked); its own trait and qmux are young | Same; the trait and qmux could cover the fallback too (Q4) |
 | C. h3 + h3-quinn + h3-webtransport | hyperium's HTTP/3 with a WebTransport extension | Medium: lower level | h3 "still very experimental"; h3-webtransport 0.1.2, idle since 2025-05 (F31) | Not checked | Highest: experimental and idle | Same; nothing extra |
 | D. Our own minimal WebTransport handshake on quinn | Write the HTTP/3 SETTINGS and CONNECT exchange ourselves (as web-transport-proto does) | High: protocol work and upkeep on every draft change | Ours | Whatever we write | High effort for no game-specific gain | Weak: an engine feature the game does not need |
@@ -2013,8 +2019,9 @@ interval.
      decoded snapshots, checked by hash).
   2. After the B1 burst, every client is decoding deltas again within 500 ms of the link coming back.
   3. No datagram exceeds the transport unit's payload size.
-  4. The server's snapshot work for 48 clients, measured per snapshot on the proposed reference server, is reported and
-     stays within the share of the tick budget the tick-rate unit sets.
+  4. The server's snapshot work for 48 clients, measured per snapshot on the proposed reference server
+     ([GLOSSARY](GLOSSARY.md#the-reference-server)), is reported and stays within the server-only share ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 25 % of the tick period, shared with lag compensation,
+     interest, commands and the tick's sends).
 
 **R2-SYNC-REC2. Input commands: one per tick, sent with redundancy, carrying the view time.**
 - Each command holds:
@@ -2071,13 +2078,15 @@ C); replay from the authoritative state; linear error decay (option 3.3 B), plus
 - Smoothing. The client draws an error offset that fades over a data-set time (proposed 100 ms, Quake III's default,
   F15). It snaps above a data-set distance (proposed 2 m, F16), and clears the offset on respawn or teleport (F24).
 - Shot feedback (fix pass, security review H2). Muzzle flash and tracer are drawn at once from a cosmetic spread on the
-  client, not from a seed it shares with the server. The authoritative spread comes from a server-only random stream,
-  and the hit event corrects the tracer. A seed the client knows would let a cheat cancel the spread through the aim
+  client, not from a seed it shares with the server. The authoritative spread comes from an authority-only random
+  stream ([GLOSSARY](GLOSSARY.md#shared-stream-and-authority-only-stream); the server online, the Worker in an offline match; R1-DET-REC4), and
+  the hit event corrects the tracer. A seed the client knows would let a cheat cancel the spread through the aim
   point it sends (REC8; the security review's reasoning); Source's server-only seed is "independent of the client"
   (F20). Sharing the seed after all, for matching tracers, is OQ11, Mustafa's call.
 - What the client does not predict:
   - damage, deaths and hits on others (F12: what your own input did not cause);
-  - the uplink countdown and steals (LOOP_V2 §4): the client shows the server's tick-stamped state.
+  - the uplink countdown and steals (LOOP_V2 §4): the client shows the server's tick-stamped state;
+  - its own abilities, until ABL-PREDICT (below) says otherwise (option 3.2 D, OQ10).
 - The local player's own state goes in its snapshot without lossy quantisation, or the server quantises its own state
   the same way each tick. Otherwise every replay starts from a slightly different state (the quantise-both-sides lesson,
   F6; applied here, inferred).
@@ -2087,6 +2096,7 @@ C); replay from the authoritative state; linear error decay (option 3.3 B), plus
   prediction is corrected, which is why R1's identical-results goal matters to the feel (inferred).
 - Rests on: F5, F6, F12, F13, F14, F15, F16, F17, F20, F24.
 - Serves: §4 (fairness), LOOP_V2 §7 (split feedback: the shot feels instant, the hit is confirmed), §6.4 (vehicles).
+- *Cross-topic open question:* R2-XT-OQ7 (Open questions).
 - Spike pass marks (proposed):
   1. Under P0–P4 on a scripted course with no other players: 0 corrections larger than 1 mm whenever every command
      arrived in time; every other correction is counted and traced to a late or lost command.
@@ -2112,7 +2122,8 @@ intervals; short extrapolation, then hold.**
   assumed 30 Hz snapshot rate, 3 intervals is 100 ms (the default principles' ~100 ms), and Fiedler reports 150 ms
   with a jitter margin (F21).
 - Rests on: F21, F22, F23, F24, F26.
-- Serves: §4 (fairness), §6.4 (big vehicles drawn smoothly).
+- Serves: §4 (fairness), §6.4 (big vehicles drawn smoothly; [GLOSSARY](GLOSSARY.md#big-vehicle-and-very-large-unit)).
+- *Cross-topic open question:* R2-XT-OQ2 (Open questions).
 - Spike pass marks (proposed):
   1. Under P2, extrapolation in fewer than 1 % of rendered frames; under P3, fewer than 3 %.
   2. Under B1, no extrapolation beyond the one-interval cap.
@@ -2170,7 +2181,8 @@ sim-owned hit volumes, capped (option 3.5 B).**
      cases up to P2 and 95 % at P3, and false hits (a miss in the view counted as a hit) stay below 0.5 %.
   2. (Moved to OQ15 in the fix pass, because it rested on F34: the measured "hit after cover" window never exceeds the
      cap.)
-  3. The history for 48 soldiers plus 12 vehicles and harvesters stays at or under 1 MB.
+  3. The history for the stress scene's soldiers and big vehicles ([GLOSSARY](GLOSSARY.md#the-stress-scene): the largest mode's N
+     and 15, harvesters included) stays at or under 1 MB.
   4. A rewound shot against 48 candidates takes at most 20 µs at the 99th percentile on the proposed reference server,
      at 700 shots per second.
   5. A scripted cheat client that announces the largest allowed delay and puts its view time at the edge of the
@@ -2201,6 +2213,7 @@ owner shows an immediate cosmetic copy (option 3.6 B).**
   authority for every landing point.
 - Rests on: F12, F15, F25, F35.
 - Serves: §6.3 (abilities such as the Molotov), §6.4 (vehicle weapons), LOOP_V2 §5 (Javelin rockets) and §7.
+- *Cross-topic open question:* R2-XT-OQ3 (Open questions).
 - Spike pass marks (proposed):
   1. 10,000 random throws: the trajectory function gives bit-identical points on Wasm and native.
   2. Under P2, the owner's cosmetic copy is within 0.5 m of the server's at hand-over, and the hand-over never moves it
@@ -2224,6 +2237,7 @@ are sim data in snapshots and history.**
   history is the same table as REC5.
 - Rests on: F12, F13, F15, F28, F29.
 - Serves: VISION_V2 §6.4 (vehicles as first-class, big and multi-part).
+- *Cross-topic open question:* R2-XT-OQ13 (Open questions).
 - Spike pass marks (proposed):
   1. A piloted Juggernaut under P2 and P3 meets REC3's correction marks.
   2. Hits on each part meet REC5's registration marks.
@@ -2253,6 +2267,7 @@ against its rendered world.**
     changes the angle. The point is chosen for intent at height and for validation, not for precision.
 - Rests on: F19, F28 (the view time that makes the picked point consistent with the rewound targets).
 - Serves: VISION_V2 §6.2 (aiming at height; line of sight across heights).
+- *Cross-topic open question:* R2-XT-OQ1 (Open questions).
 - Spike pass marks (proposed):
   1. Scripted shots at static targets on the ground, at 2.5 m and at 4 m (legacy platform heights, GC3), under P0–P3:
      the server's hit point lies within 5 cm of the client-picked point in at least 99.9 % of shots.
@@ -2272,10 +2287,12 @@ client sees, not with the match size.**
   flat. The spikes must measure the server side at the full count.
 - Rests on: F8, F13, F17, F31, F32.
 - Serves: VISION_V2 §3 (12v12v12 or 24v24; design for 48+), §6.1.
+- *Cross-topic open question:* R2-XT-OQ7 (Open questions).
 - Spike pass marks (proposed):
   1. One match server with 48 clients (any mix of bots and headless clients) under P2 for 30 minutes. Snapshot
-     encoding, lag compensation and command handling together use at most 25 % of the tick budget at the 99th
-     percentile on the proposed reference server.
+     encoding, lag compensation, command handling, interest (the region query, ranking and packing) and the tick's
+     send calls together stay within the server-only share ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 25 % of the tick period) at the 99th
+     percentile on one vCPU of the reference server.
   2. The same match at 24 and 36 players shows the server's sync cost growing no faster than linearly in players ×
      visible entities.
 
@@ -2298,6 +2315,7 @@ client sees, not with the match size.**
   Rests on: R2-BUD-F26, F28, F29, F31, F32, F34, F35; legacy CS1 and `WEAPONS`; the worked estimate; R2-SYNC-F28 (the
   round-trip reading; added in the second fix pass).
   Serves VISION_V2 §6.1 (modes of any size), §6.2 (aiming at height in the input), §4 (fair to about 100 ms).
+  *Cross-topic open question:* R2-XT-OQ14 (Open questions).
   Spike must prove (proposed): at 48 players (simulated clients plus bots), 30 Hz snapshots, 100 ms RTT, ±10 ms jitter,
   2 % loss: rewind ≤ the cap (R2-XU-OQ1: 200 or 250 ms) for 100 % of shots, with the share of shots the cap clips
   recorded (on the round-trip reading, R2-XU-OQ2, the rewind at this RTT is 200–250 ms, so a 200 ms cap clips some;
@@ -2316,6 +2334,7 @@ client sees, not with the match size.**
   Rests on: R2-BUD-F8, F19, F20, F21, F22, F23, F24, F25, F34; the worked estimate (assumptions marked).
   Serves VISION_V2 §3 (12v12v12 or 24v24), §6.1, §6.4 (vehicles with turrets and seats), §6.5 (economy state
   server-side), §6.8 (events stamped with ticks for moments).
+  *Cross-topic open questions:* R2-XT-OQ3, R2-XT-OQ11 (Open questions).
   Spike must prove (proposed): at 48 players all in view, 30 Hz, 10-minute bot match: mean ≤ 160 kbps and p99 of
   1-second windows ≤ 256 kbps per client, counted at the UDP payload plus 28 B per datagram; with the interest unit's
   filter on the Octopon-3 greybox: mean ≤ 100 kbps; decoded positions within 1 cm and angles within 0.01° of the
@@ -2354,6 +2373,7 @@ client sees, not with the match size.**
   it is the round trip (arithmetic; R2-XU-OQ2); Source keeps 1 s of history.
   Rests on: R2-BUD-F12, F29, F32, F35; R2-TRN-F9 (added in the fix pass).
   Serves VISION_V2 §4 (fair to about 100 ms; one EU region).
+  *Cross-topic open questions:* R2-XT-OQ5, R2-XT-OQ14 (Open questions).
   Spike must prove (proposed): at 100 ms RTT, ±10 ms jitter, 2 % loss: ≤ 0.5 % of rendered frames need extrapolation
   with a 100 ms delay; at 5 % loss the adaptive delay stays ≤ 150 ms; clock offset error ≤ 5 ms after 2 s of samples
   (measured against the simulator's true clock).
@@ -2374,17 +2394,25 @@ client sees, not with the match size.**
   Spike must prove (proposed): with the link throttled to 128 kbps for 10 s, the client keeps receiving snapshots
   (≤ 2 missing per second), the local player's own state is never deprioritized, and the full rate returns within 2 s
   after the throttle ends.
-- **R2-BUD-REC6. A server CPU budget per tick for the whole tick, not just the simulation step: at 48 players, p99 ≤ 25
-  % of the tick interval (≤ 4 ms at 60 Hz, ≤ 8 ms at 30 Hz) including the simulation (R1), lag-compensated hit tests
-  and snapshot encoding for every client, measured separately.** Reason: no source read gives a tick budget; 25 %
-  leaves room for bursts and for more than one room per core; per-client encode cost is the unknown that grows with
-  player count.
+- **R2-BUD-REC6. A server tick budget for the whole server tick, not just the simulation step: at the largest mode's
+  N, p99 server tick time within the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): ≤ 50 % of the tick period,
+  ≤ 8.3 ms at 60 Hz, ≤ 16.7 ms at 30 Hz), split into the sim step share (R1) and the server-only share (lag-compensated hit tests,
+  interest, snapshot encoding for every client, commands and the tick's sends), 25 % each, measured separately.**
+  Reason: no source read gives a tick budget; the topics' own part marks fit inside 50 % at 30 Hz, and at 60 Hz on
+  every tick but one that both encodes a snapshot and re-floods after a portal change, while 25 % for the whole server tick
+  would not hold them at 60 Hz on any snapshot tick (the arithmetic, a planning check of ceilings, is in [GLOSSARY](GLOSSARY.md#1-tick-budgets)'s
+  tick-budget section); 50 % leaves room for bursts (a p99 tick at half the period can double before it overruns);
+  how many rooms share a vCPU is measured (R2-ROOM-REC2 mark 2), not budgeted; per-client encode cost is the unknown
+  that grows with player count.
   Rests on: legacy CM4 (0.80–1.00 ms per step in JS at 48 soldiers); R2-BUD-F25, F29 (history and ring sizes); the
   estimate's assumptions.
   Serves VISION_V2 §3 (48+), §6.1 (rooms).
-  Spike must prove (proposed): on the reference server (proposed: one vCPU of the EU instance type R6 recommends), 48
-  players, 30-minute soak: p99 whole tick ≤ 4 ms at 60 Hz (or ≤ 8 ms at 30 Hz), 0 missed ticks, snapshot encode ≤ 50 µs
-  per client per snapshot, memory per room reported.
+  Spike must prove (proposed): on one vCPU of the reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): the CCX23 of R6-HOST-REC2),
+  the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)) with a snapshot-receiving client on every soldier (R2-SYNC-REC9 mark 1's "48 clients"),
+  30-minute soak: p99 server tick time ≤ 8.3 ms at 60 Hz (or ≤ 16.7 ms at 30 Hz), the sim
+  step ([GLOSSARY](GLOSSARY.md#sim-step-time)) and the server-only work each within their 25 % share, 0 missed ticks, snapshot encode ≤ 50 µs
+  per client per snapshot at p99 ([GLOSSARY](GLOSSARY.md#time-statistics)), memory per room reported. The mark is checked at the tick rate R1-TICK-REC2's rule
+  picks; if it fails there, it fails like any spike mark and goes back to the drafts, and the rule does not change.
 
 ### Brief question 3: interest management for a top-down camera (interest unit)
 
@@ -2404,11 +2432,12 @@ client sees, not with the match size.**
   - Rests on: F1, F3, F15, F17, F18, F19.
   - Serves: §6.1 (modes as data: team sizes up to 24v24 on one server; the camera per mode), §6.2 (what is hidden
     follows the 3D world).
+  - *Cross-topic open question:* R2-XT-OQ14 (Open questions).
   - Spike must prove (proposed): (a) no pop-in. Over a recorded 10-minute bot match replayed under 0, 50, 100 and
     200 ms latency with ±20 ms jitter and 0–5 % loss, 0 rendered frames contain an entity whose bounds intersect the
     client's actual view while the client lacks its state. (b) Churn: at most 2 enter/exit events per client per
-    second, averaged over the match (proposed). (c) The region query for 48 clients takes at most 0.2 ms per tick on
-    the reference server (proposed). (d) Bytes per client per second, with the region against without it, reported
+    second, averaged over the match (proposed). (c) The region query for 48 clients takes at most 0.2 ms per tick at
+    p99 on the reference server (proposed). (d) Bytes per client per second, with the region against without it, reported
     for the even-spread case and the centre-fight case (F19 predicts about 10 times fewer in the first and no saving
     in the second).
 
@@ -2425,12 +2454,13 @@ client sees, not with the match size.**
     kept harassing them" needs occupants hidden from those outside.
   - Rests on: F1, F4, F16 (plus legacy GW17, GW20).
   - Serves: §6.2 (floors and building interiors, line of sight across heights).
+  - *Cross-topic open question:* R2-XT-OQ15 (Open questions).
   - Spike must prove (proposed): (a) a "reader" test client that logs every enemy state it receives logs 0 enemies
     inside an area not connected to the viewer, and 0 positions of shooters or throwers that were not relevant to it in
     any shot event or projectile record (this second part added in the fix pass, security review M5), over a 10-minute
     bot match on a greybox with at least two enterable,
-    two-floor buildings and the barracks (LOOP_V2 §2). (b) The pair test costs at most 0.1 µs per enemy pair, and a
-    re-flood after a portal change at most 1 ms for the map's area count (proposed). (c) 0 frames where an enemy
+    two-floor buildings and the barracks (LOOP_V2 §2). (b) The pair test costs at most 0.1 µs per enemy pair at p99, and a
+    re-flood after a portal change at most 1 ms at p99 for the map's area count (proposed). (c) 0 frames where an enemy
     walking through an open door is visible to the client before its state arrives (the same harness as REC1 (a)).
 
 - **R2-INT-REC3. One shared visibility pass for bots and interest, used for line-of-sight hiding only if the game
@@ -2444,10 +2474,12 @@ client sees, not with the match size.**
     avoids paying twice.
   - Rests on: F20 (inferred cost), F16 (plus legacy CS6, CS9, GN4).
   - Serves: §6.2 (line of sight across heights); LOOP_V2 §10 (bots).
-  - Spike must prove (proposed): at 24v24 and 16v16v16, all players in one fight on the greybox, the full pass with
-    three sample points takes at most 10 % of the server tick budget on the reference server (the tick rate comes
-    from the tick unit), with 0 pop-in frames as REC1 (a), and Wasm and native results identical per tick (R1's
-    state-hash test).
+  - Spike must prove (proposed): at 24v24 and 16v16v16 (the test-mode list, [GLOSSARY](GLOSSARY.md#the-test-mode-list)) and, under
+    MODES-3 (b), 18v18v18, all players in one fight on the greybox, the full pass with three sample points takes at
+    most 10 % of the server tick budget ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 5 % of the tick period, 0.8 ms at
+    60 Hz and 1.7 ms at 30 Hz, inside the sim step share) on one vCPU of the reference server (the tick rate comes from
+    the tick unit), with 0 pop-in frames as REC1 (a), and Wasm and native results identical per tick (R1's state-hash
+    test).
 
 - **R2-INT-REC4. A per-client priority accumulator under a byte budget per snapshot (option C2), layered on
   relevance.**
@@ -2461,10 +2493,10 @@ client sees, not with the match size.**
   - Rests on: F2, F14, F19.
   - Serves: §6.1 (48+ players in one match). [Fix pass, after the verifier: §6.9 was removed from this line. It is the
     renderer's spectacle budget, not a network need.]
-  - Spike must prove (proposed): in the worst case (48 players plus vehicles and projectiles in the centre field),
+  - Spike must prove (proposed): in the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)), with its fight in the centre field,
     0 snapshots exceed the per-client budget (the number comes from the tick and bandwidth unit). The nearest 8
     enemies are in every snapshot; every relevant entity is sent at least every 4 snapshots. Ranking and packing for
-    48 clients take at most 0.5 ms per tick on the reference server.
+    48 clients take at most 0.5 ms per tick at p99 on the reference server.
 
 - **R2-INT-REC5. A visibility class on every field and event type, held as data: public, team, owner, spatial.**
   - Public (on the reliable stream): match clock, points, uplink sites with owner and countdown, the cache location
@@ -2555,8 +2587,10 @@ What a spike must prove (proposed pass marks):
    browser on a clean local network (proposed). Record the negotiated draft per browser; this answers OQ1.
 2. Load: one server process holds 48 WebTransport sessions. Each sends 60 input datagrams/s (≤ 100 bytes) and receives 30
    snapshot datagrams/s (≤ 1,000 bytes; placeholder numbers until the tick and bandwidth unit sets them). Proposed limits: at
-   most 1 CPU core for the transport layer, and p99 server send-call time ≤ 1 ms, on reference server hardware R6 names
-   (proposed).
+   most 1 vCPU for the transport runtime ([GLOSSARY](GLOSSARY.md#transport-runtime-time)), and p99 server send-call time ≤ 1 ms, on the
+   reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): R6-HOST-REC2's CCX23) (proposed).
+   The transport runtime runs beside the tick, not in it; its measured share of a vCPU per room enters
+   the rooms-per-VM figure (R2-ROOM-REC2 mark 2, R6-COST-OQ1).
 3. Swap cost: the thin interface hides the crate. Switching crates in the spike changes no code outside the transport module
    (checked by diff).
 4. Hostile input (added in the fix pass: security review H3 and M1, Rust review risk 3). Every limit is data, every value
@@ -2570,12 +2604,13 @@ What a spike must prove (proposed pass marks):
      (R2-ROOM-F13), with quinn's retry or refusal of new connections under load and `H3_EXCESSIVE_LOAD` for abusers
      (F36; the quinn calls are the security review's).
    Pass: a flood test (proposed: 1,000 sessions that never send Join, plus 10 clients sending oversize datagrams at full
-   rate and opening streams) leaves the room's tick p99 within 10 % of a clean run and its memory under R2-ROOM-REC2's
+   rate and opening streams) leaves the room's server tick p99 within 10 % of a clean run and its memory under R2-ROOM-REC2's
    ceiling. A session from an origin not on the list is refused with 403, from all four browsers.
 5. Version floors (added in the fix pass, Rust review risk 1): the lockfile resolves quinn-proto ≥ 0.11.18, rustls ≥
    0.23.46, ring ≥ 0.17.12 and tokio ≥ 1.54.1 (F40). wtransport's `dangerous-configuration` feature stays off (the Rust
-   review found it in wtransport's Cargo.toml). An audit gate that keeps these current belongs to R6's security baseline
-   (dependency audits), deferred by the Advisor.
+   review found it in wtransport's Cargo.toml). An advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) that gates pull requests to keep
+   these current belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the
+   Advisor; R5-GATE-REC1 already schedules the advisories check, and its policy waits on BASELINE-WHEN (below).
 
 **R2-TRN-REC2. Send inputs and snapshots as datagrams, and reliable traffic on streams. Cap each snapshot datagram at a proposed
 1,000 bytes of payload and make every datagram decodable on its own (no fragmenting of one snapshot). Put reliable control on
@@ -2627,7 +2662,7 @@ What a spike must prove (proposed pass marks):
 1. With UDP blocked to the server, each of the four browsers reaches a playing WebSocket session ≤ 3 s after the page starts
    connecting. Proposed: WebTransport attempt timeout 1.5 s, then WebSocket.
 2. The same recorded input replay drives both transports to identical server state hashes on every tick (the per-tick state
-   hash of the default principles).
+   hash of the default principles; [GLOSSARY](GLOSSARY.md#state-hash)).
 3. At 100 ms RTT and 1 % loss over WebSocket: report the head-of-line stall distribution. Proposed pass: p99 extra snapshot delay
    ≤ 250 ms, and the server never holds more than one unsent snapshot per client.
 4. One hostile-input suite (REC1 mark 4, plus oversized frames and messages) runs against both transports with the same pass
@@ -2660,11 +2695,13 @@ What a spike must prove (proposed pass marks):
    and 0 allocations above the size limits. (Added in the fix pass, security review M9.)
 
 **R2-TRN-REC5. Certificates.**
-- Development and previews: self-signed ECDSA P-256 certificates valid ≤ 14 days, made by the server at start (wtransport's
+- Development and previews ([GLOSSARY](GLOSSARY.md#preview)): self-signed ECDSA P-256 certificates valid ≤ 14 days, made by the server at start (wtransport's
   `Identity::self_signed`, or rcgen as our own dependency with web-transport-quinn, which lists rcgen only as a dev
   dependency: Rust review), pinned through `serverCertificateHashes`. The hash is fetched from
   the page's own HTTPS origin.
-- Production: a publicly trusted certificate per game server hostname. Hash pinning in production stays an option, only if R6
+- Production: a publicly trusted certificate per game server hostname ([GLOSSARY](GLOSSARY.md#game-server-certificate)). R6-HOST-REC4 proposes one wildcard
+  certificate instead, which puts one private key on every game VM; whether the security baseline accepts that is
+  BASELINE-WHEN (below). Hash pinning in production stays an option, only if R6
   picks short-lived ephemeral servers.
 
 Reason:
@@ -2674,6 +2711,7 @@ Reason:
 
 Rests on: F7, F13, F14, F15.
 Serves: §6.1 (private matches on real servers); the §4 browsers.
+*Cross-topic open question:* R2-XT-OQ10 (Open questions).
 What a spike must prove (proposed pass marks):
 1. All four browsers connect with a pinned self-signed certificate, and all four with a publicly trusted one: 100 % of 20
    attempts each.
@@ -2700,7 +2738,7 @@ Serves: the §4 fairness target (about 100 ms) at the §3 scale (48+ players).
 What a spike must prove (proposed pass marks):
 1. With a bottleneck set below the snapshot stream's rate (proposed: 50 % of it), the newest snapshot the client holds is never
    older than 3 snapshot intervals. Server memory per session stays flat (no queue growth over a 10-minute soak).
-2. Simulation tick duration at p99 is unchanged (within 5 %) between a clean network and the bottleneck run.
+2. Server tick time ([GLOSSARY](GLOSSARY.md#server-tick-time)) at p99 is unchanged (within 5 %) between a clean network and the bottleneck run.
 3. NewReno and Cubic are compared under the REC2 netem profile. Pick the one with the lower p99 snapshot age; record the numbers.
 
 ### Brief question 5: rooms and private matches (rooms unit)
@@ -2714,6 +2752,7 @@ What a spike must prove (proposed pass marks):
   Reason: the shipped hosting services all model a session as a bounded life with activation, health and an end (F1,
   F3, F5); legacy shows in-place resets and world freezes do not survive multiplayer.
   Rests on: F1, F3, F5. Serves VISION §6.1 (rooms), §6.6 (results and telemetry recorded at Ended).
+  *Cross-topic open question:* R2-XT-OQ11 (Open questions).
   Spike must prove (proposed): (1) 100 create → fill with bots → run 60 s → end → close cycles in one host with zero
   leaked rooms, threads, sockets or ports, and memory back within 1 MB of baseline after the cycles; (2) a room stuck in
   Created past its activation timeout is closed and reported; (3) results and telemetry for a match are written before
@@ -2729,11 +2768,13 @@ What a spike must prove (proposed pass marks):
   tick (VISION §4), teardown is process exit, and density comes from processes per host (F4); many rooms per process
   is "more economical" but needs "more management" (F6), and rooms must not share an async worker (F7).
   Rests on: F1, F4, F5, F6, F7, F8, F18. Serves VISION §6.1, §4 (fair up to about 100 ms of ping).
-  Spike must prove (proposed; reference host proposed: one 4-vCPU EU cloud VM, R6 to name it): (1) one 48-player room
-  (bots) holds its tick: p99 tick time at most 50 % of the tick period chosen by the tick-rate unit, over 20 minutes;
-  (2) 8 such rooms as 8 processes on the reference host: each room's p99 within 10 % of the single-room figure;
+  *Cross-topic open question:* R2-XT-OQ4 (Open questions).
+  Spike must prove (proposed; on the reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): the 4-vCPU CCX23 of
+  R6-HOST-REC2)): (1) one 48-player room (bots) holds its tick: p99 server tick time within the server tick budget
+  ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of the tick period chosen by the tick-rate unit), over 20 minutes;
+  (2) 8 such rooms as 8 processes on the reference server: each room's p99 within 10 % of the single-room figure;
   (3) per-room process memory measured (RSS at start and after 20 minutes) and reported, with a proposed ceiling of
-  64 MB for a 48-player room; (4) killing one room's process (SIGKILL) leaves the other rooms' tick p99 and connections
+  64 MB for a 48-player room; (4) killing one room's process (SIGKILL) leaves the other rooms' server tick p99 and connections
   unchanged; (5) room start-up (process spawn to Open) under 2 s; (6) a panic injected into one connection's handler
   closes that connection only, and the room's tick and its other connections continue (proposed; added in the fix
   pass).
@@ -2806,7 +2847,8 @@ What a spike must prove (proposed pass marks):
   team. [Fix pass: the unit's "keeps servers full this way" overstated F15.] Legacy already plans humans taking bot slots
   (GC2, STATUS :68).
   Rests on: F15. Serves VISION §3 ("Bots fill empty slots"), §6.1.
-  Spike must prove (proposed): (1) 3 teams × 16 slots, 30 humans (simulated clients) joining and leaving in random
+  Spike must prove (proposed): (1) the largest mode's N in three teams ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); 3 teams × 16
+  slots under MODES-3 (a), 3 × 18 under (b)), 30 humans (simulated clients) joining and leaving in random
   order for 10 minutes: after every change, within 1 s, each team has exactly its size in humans plus bots and no team
   exceeds it; (2) a human never waits for a slot while a bot holds one on the team they are assigned to; (3) the same
   seed and the same join/leave script give the same per-tick state hash on two runs.
@@ -2817,7 +2859,9 @@ What a spike must prove (proposed pass marks):
   Reason: VISION §3 [DEFAULT] and §6.1 want all of it as data; legacy shows teams as data work (CD10, GC2) and that
   unchecked merges are a hole (GW2).
   Rests on: legacy CD10, GC2, GW2 (no external finding needed); format per R1. Serves VISION §6.1.
-  Spike must prove (proposed): (1) mode files for 2×2, 2×8, 3×6, 3×18, 12v12v12 and 24v24 load and each runs 60 s
+  Spike must prove (proposed): (1) mode files for every mode of the test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list); under
+  MODES-3 (a): 1v1, 4v4, 2v2v2, 6v6v6, 12v12v12, 16v16v16 and 24v24; under (b): 2v2, 8v8, 6v6v6, 18v18v18, 12v12v12,
+  16v16v16 and 24v24; plus the N = 64 headroom mode) load and each runs 60 s
   with bots, with no code change between them; (2) 20 malformed mode files are all rejected at load with a named error.
 - **R2-ROOM-REC8. Guest first: an anonymous guest account from the lobby (option 3.7 A).** On first visit the lobby
   issues a guest id and a random secret of at least 64 bits. The secret lives in an HttpOnly, Secure,
@@ -2831,6 +2875,7 @@ What a spike must prove (proposed pass marks):
   (F19).
   Rests on: F14, F16; F19 (added in the fix pass). Serves VISION §6.1 (a player identity for rooms and reconnects) and prepares §6.10 [LATER]
   without building it; VISION §5 [DECIDED].
+  *Cross-topic open question:* R2-XT-OQ4 (Open questions).
   Spike must prove (proposed): (1) a fresh browser profile reaches a room with no input beyond "Play"; (2) a page reload
   keeps the same guest id and rejoins the held slot (with REC4); (3) the secret is 128 random bits from the OS source
   (proposed; at least 64 required); (4) no script on the game's origin can read the guest secret: `document.cookie`
@@ -2874,7 +2919,7 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   past, so colliding with them mispredicts (Quake III collides the predicted player with the snapshot's solid entities,
   F17). Soldiers could not collide with each other, collide softly, or collide
   fully. What decides it: a game-design call (does body-blocking matter in LOOP_V2's fights?) and the REC7 spike's
-  correction rate.
+  correction rate. See also R2-XT-OQ13 (below).
 - **R2-SYNC-OQ6. Projectile spawn fast-forward.** The options are none, a fixed prestep (Quake III's 50 ms, F35), or the
   shooter's latency up to the cap. Fast-forward makes throws land where aimed at high ping, but lets high-ping
   projectiles appear mid-flight for others. What decides it: a Feel Lab test under P2 and P3.
@@ -2888,7 +2933,8 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   blade's reach (inferred). What decides it: a game-design call plus the REC5 spike extended to melee.
 - **R2-SYNC-OQ10. Predicting abilities (option 3.2 D).** No source on predicting abilities and rolling them back was
   read in this run; the Overwatch talks are video only. What decides it: a Feel Lab comparison of predicted against
-  server-confirmed Molotov and Shield, or a readable source.
+  server-confirmed Molotov and Shield, or a readable source. Shared as ABL-PREDICT (below); the final call is
+  Mustafa's (game feel).
 - **R2-SYNC-OQ11. The shared spread seed.** A seed the client knows makes predicted tracers match the server's spread
   (F20), but lets a cheat cancel the spread. Source adds a server-only seed (F20), whose purpose is inferred. What
   decides it: security-auditor's protocol review, then Mustafa (feel against cheat resistance). [Fix pass, 2026-10-28:
@@ -2896,7 +2942,8 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   spread and shifts the aim point it sends (REC8) to cancel it. Source's server seed is "independent of the client"
   (F20, now quoted). The review's answer: authoritative spread from a server-only keyed random stream, with cosmetic
   client tracers corrected by the hit event; REC3 now follows it. Still Mustafa's call: matching tracers against cheat
-  resistance (the security review's decision SEC-SPREAD).]
+  resistance (the security review's decision SEC-SPREAD).] R1-DET-REC4 now keeps spread in an authority-only stream
+  ([GLOSSARY](GLOSSARY.md#shared-stream-and-authority-only-stream)). Shared as SEC-SPREAD (below).
 - **R2-SYNC-OQ12. Hermite interpolation.** It needs velocity in snapshots (more bytes) and is only worth it if linear
   interpolation shows artefacts at the chosen snapshot rate (F22). What decides it: the REC4 spike at that rate, with
   sprinting soldiers and the Juggernaut.
@@ -2922,7 +2969,7 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
 - **R2-BUD-OQ1.** What tick and update rates do recent large-team shooters publish (Overwatch's 63 Hz, Battlefield,
   Fortnite, Apex Legends, Valorant)? None was read: the Overwatch talk is video on GDC Vault (redirected to a
   maintenance page outside the allow list), the rest sit on vendor blogs and press outside the allow list. Decides:
-  reading them in a later run, if their domains are added; until then the spike's own numbers decide.
+  reading them in a later run, if their domains are added; until then the spike's own numbers decide. See also R2-XT-OQ5 (below).
 - **R2-BUD-OQ2.** Source's default snapshot rate and interpolation delay (`cl_updaterate`, `cl_interp`) are engine-side
   and not in the SDK; the Valve Developer Community pages refused the fetcher (HTTP 403). Decides: reading those pages
   in another run; REC4 does not rest on them.
@@ -2932,16 +2979,17 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   of height, add a bit or use 2 cm. Decides: the map change-set's greybox.
 - **R2-BUD-OQ5.** Caps on vehicles and live projectiles per team are not in VISION_V2 or LOOP_V2; the estimate assumes
   one vehicle per squad and 32 projectiles. Decides: game-designer's caps; the spike then tests the cap as the worst
-  case.
+  case. Until then every topic's stress marks use one proposed scene ([GLOSSARY](GLOSSARY.md#the-stress-scene): the stress scene; 15 big vehicles,
+  300 live projectiles); the estimate's 32 projectiles stay its own bandwidth assumption.
 - **R2-BUD-OQ6.** VISION_V2 §3 says "two teams with 2–8 players, and three teams with 6–18 players": totals or per
   team? The estimate reads them as totals; per team they would mean up to 16 and 54 players. 54 is above the 48 design
-  point but inside the estimate's 64-player row. Decides: Mustafa.
+  point but inside the estimate's 64-player row. Decides: Mustafa. Shared as MODES-3 (below).
 - **R2-BUD-OQ7.** Hermite or linear interpolation (F33): Hermite adds a velocity. Sent absolute (3 × 10 bits per
   moving entity, 62 moving entities at 48 players) it costs about +56 kbps at 30 Hz (arithmetic), which would push the
   48-player case to about 202 kbps; delta-coded it costs less. Decides: the snapshot-model unit and the spike's visual
   check.
 - **R2-BUD-OQ8.** Can the client simulate projectile flight deterministically from a spawn event (E3), or must
-  projectiles ride in every snapshot (E3b, +42 kbps at 48)? Decides: R1's determinism unit and the spike's desync count.
+  projectiles ride in every snapshot (E3b, +42 kbps at 48)? Decides: R1's determinism unit and the spike's desync count. See also R2-XT-OQ3 (below).
 - **R2-BUD-OQ9.** The real cost of encoding 48 per-client delta snapshots and of encryption per datagram is unknown.
   Decides: REC6's spike.
 - **R2-BUD-OQ10.** How the server's QUIC congestion controller (and the browser's) behaves for a 30 Hz stream of
@@ -2956,7 +3004,7 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   Under the first rule, roofs and hidden floors hide, and walls in open ground do not. Under the second (fog of
   war), every wall hides. This decides whether REC3's ray pass hides anything or only serves bots, and how the cutaway
   works (GW17). It is a game rule tied to the look. Decided by Mustafa with the game-designer, after the look brief
-  sets the framing.
+  sets the framing. See also R2-XT-OQ15 (below).
 - **R2-INT-OQ2. The camera framing and the aspect ratio.** Height, FOV, ADS pan or zoom, look-ahead and the largest
   allowed aspect set REC1's radius, and they are look brief pending. A wider monitor sees more ground, so a fair
   match needs either a fixed world width per mode (letterboxing beyond it) or a region sized for the widest allowed
@@ -2999,7 +3047,9 @@ by: the REC2 measurement.
 
 **R2-TRN-OQ4. Production certificates: public certificates per hostname or short-lived pinned ones?** This depends on how R6
 hosts game servers (fixed hosts or ephemeral machines) and on the HTTPS matchmaker as the trusted intermediary (F14). Decided by:
-R6's hosting choice, then the REC5 spike.
+R6's hosting choice, then the REC5 spike. R6's game VMs stay warm, so they are not ephemeral (R6's option C3,
+r6:424-425), which leaves production pinning out (REC5); the per-hostname or wildcard form waits on BASELINE-WHEN
+(below).
 
 **R2-TRN-OQ5. wtransport or web-transport-quinn?** The maintenance risk differs: "not considered completely production-ready"
 (F29) versus fast 0.x churn (F30). Contributor counts and issue response times were not read. Decided by: the REC1 spike pass
@@ -3026,16 +3076,16 @@ recommendation, and the snapshots and prediction unit covers it.
 ### Brief question 5: rooms and private matches (rooms unit)
 
 - **R2-ROOM-OQ1. Process per room or many per process, finally?** Decided by REC2's spike numbers (per-process memory,
-  start-up, tick p99 with neighbours) against R6's host sizes and costs.
+  start-up, server tick p99 with neighbours) against R6's host sizes and costs.
 - **R2-ROOM-OQ2. Token signature scheme and keys.** Asymmetric signature (rooms hold only a public key) or a shared key
-  with AEAD as in netcode.io (F9, F10)? Key rotation and storage? Not researched here (R6's security baseline is
+  with AEAD as in netcode.io (F9, F10)? Key rotation and storage? Not researched here (the security baseline is
   deferred by the Advisor; security-auditor reviews R2's protocol). Decided by security-auditor's review. [Fix pass,
   2026-10-28: the review (M8) answers it. With a shared key, one compromised room process could mint tokens for any
   player, room or slot. So: an asymmetric signature (the lobby signs; rooms hold only the public key); one pinned
   algorithm, an explicit token type and a key id for rotation (the review cites RFC 8725, not read by R2); the
   signature verified before the replay cache is touched; a bounded cache that refuses new tokens when full; MACs, if
   any, compared in constant time; and the room re-checks any pre-assigned team or slot against the mode. Now decided by:
-  Mustafa and the Advisor accepting the review's scheme in the ADR; key storage stays with R6's deferred baseline.]
+  Mustafa and the Advisor accepting the review's scheme in the ADR; key storage stays with R6's deferred baseline.] See also R2-XT-OQ9 (below).
 - **R2-ROOM-OQ3. The soldier of a dropped player during the grace window.** Stands still, bot-driven, or removed? A game
   rule: Mustafa (game-designer can model it).
 - **R2-ROOM-OQ4. Joining a match in progress.** May humans join a Running public or private match? Does the bot leave
@@ -3050,7 +3100,7 @@ recommendation, and the snapshots and prediction unit covers it.
   browser support for it in WebTransport was not researched here (transport unit). It changes how often REC4 runs, not
   its design.
 - **R2-ROOM-OQ9. Where the lobby runs and stores guest ids and the room directory.** Same binary as the supervisor or a
-  separate service; which store: R6.
+  separate service; which store: R6. See also R2-XT-OQ4 (below).
 - **R2-ROOM-OQ10. Code length and alphabet.** 6 symbols from 32 is a proposal; whether a password is also offered for
   private rooms is design plus security-auditor. [Fix pass, security review M7: guests are free and any guest can get a
   join token, so in practice the code is the access secret, and many guests on many addresses can scan the 32^6 space.
@@ -3060,8 +3110,8 @@ recommendation, and the snapshots and prediction unit covers it.
 - **R2-ROOM-OQ11. Where the guest secret lives (added in the fix pass, 2026-10-28).** REC8 now keeps it in an HttpOnly,
   Secure, SameSite=Strict cookie on the lobby's origin, as OWASP prefers (F19). The alternative is local storage, with
   the risk accepted in writing until accounts exist (VISION_V2 §6.10): any XSS on the game's origin would then take the
-  guest identity for good, and the content security policy is part of R6's deferred baseline. Decided by: Mustafa and
-  the Advisor (the security review's decision SEC-GUEST recommends the cookie).
+  guest identity for good, and the content security policy is part of the security baseline, deferred by the Advisor. Decided by: Mustafa and
+  the Advisor (the security review's decision SEC-GUEST recommends the cookie). See also R2-XT-OQ9 (below).
 
 ### Cross-unit open questions (assembly)
 
@@ -3125,25 +3175,29 @@ and resolve nothing. Each says what the drafts leave to decide it.
   legacy row). R2-BUD-REC4 keeps "1 s of hitbox history", and budgets table E estimates about 184 KB per room and
   "about 72 rewound shots per second at 48 players" (assumptions). Decided by: the REC5 spike (sync) and the CPU
   accounting of R2-XU-OQ8.
-- **R2-XU-OQ8. One CPU accounting for the server tick.** The units give shares of different wholes:
-  - R2-BUD-REC6: the whole tick at p99 ≤ 25 % of the tick interval (≤ 4 ms at 60 Hz, ≤ 8 ms at 30 Hz), simulation,
+- **R2-XU-OQ8. One CPU accounting for the server tick.** The units gave shares of different wholes (their figures before 2026-10-30, in the
+  glossary's terms; settled below):
+  - R2-BUD-REC6: the server tick time at p99 ≤ 25 % of the tick period (≤ 4 ms at 60 Hz, ≤ 8 ms at 30 Hz), simulation,
     hit tests and encoding included; encoding ≤ 50 µs per client per snapshot.
-  - R2-ROOM-REC2: one 48-player room's tick at p99 ≤ 50 % of the tick period.
+  - R2-ROOM-REC2: one 48-player room's server tick time at p99 ≤ 50 % of the tick period.
   - R2-SYNC-REC9: snapshot encoding, lag compensation and command handling together ≤ 25 % of "the tick budget" at
     p99. R2-SYNC-REC1 mark 4 defers to "the share of the tick budget the tick-rate unit sets", and R2-SYNC-REC5 mark 4
     sets ≤ 20 µs per rewound shot at p99.
   - R2-INT-REC3: the visibility pass ≤ 10 % of "the server tick budget". R2-INT-REC1: the region query ≤ 0.2 ms per
     tick. R2-INT-REC4: ranking and packing ≤ 0.5 ms per tick. R2-INT-REC2: ≤ 0.1 µs per enemy pair, and a re-flood
     ≤ 1 ms.
-  - R2-TRN-REC1: the transport layer on at most 1 CPU core, with p99 send-call time ≤ 1 ms.
+  - R2-TRN-REC1: the transport runtime on at most 1 vCPU, with p99 send-call time ≤ 1 ms.
 
   The term "tick budget" has no single definition, and the shares are not summed against one total anywhere. Decided by:
-  the synthesis, which sets one tick budget and divides it; then the spikes.
+  the synthesis, which sets one tick budget and divides it; then the spikes. Settled by the shared glossary
+  (2026-10-30): one server tick budget, 50 % of the tick period, split into a sim step share and a server-only share
+  of 25 % each, every figure above placed inside one of them ([GLOSSARY](GLOSSARY.md#the-server-tick-budget)).
 - **R2-XU-OQ9. The reference server.** R2-BUD-REC6 proposes "one vCPU of the EU instance type R6 recommends", and
   R2-ROOM-REC2 proposes "one 4-vCPU EU cloud VM, R6 to name it" (8 rooms on it). R2-TRN-REC1 asks for "reference
   server hardware R6 names". The sync unit's marks (R2-SYNC-REC1, REC5, REC9) and the interest unit's marks (REC1,
   REC3, REC4) name "the proposed reference server" without defining it. Decided by: R6's instance choice; the synthesis
-  names one reference machine.
+  names one reference machine. Answered by R6-HOST-REC2: the reference server is a CCX23, and every server mark is
+  measured on one of its vCPUs ([GLOSSARY](GLOSSARY.md#the-measuring-unit-one-vcpu)).
 - **R2-XU-OQ10. Can the browser read its own connection statistics?** R2-BUD-F12 and R2-BUD-F13 (from the W3C
   Editor's Draft at `w3c.github.io`) describe `smoothedRtt`, `rttVariation`, `estimatedSendRate`, `expiredOutgoing`
   and `lostOutgoing`. R2-BUD-REC4 takes the clock offset from "the browser's smoothedRtt and rttVariation plus our own
@@ -3166,11 +3220,11 @@ and resolve nothing. Each says what the drafts leave to decide it.
   R2-TRN-REC2 uses 100 ms RTT, ±20 ms and 2 % loss. R2-INT-REC1 uses "0, 50, 100 and 200 ms latency with ±20 ms
   jitter and 0–5 % loss". The rooms marks use "0-200 ms simulated latency" with 0–5 % loss. The interest and rooms
   marks do not say whether "latency" means round trip or one way. Decided by: one set of named profiles for all R2
-  spikes (R5's network simulator runs them).
+  spikes (R5's network simulator runs them). See also R2-XT-OQ14 (below).
 - **R2-XU-OQ13. Team sizes: totals or per team?** The budgets estimate reads VISION_V2 §3's "two teams with 2–8
   players, and three teams with 6–18 players" as totals (rows 4v4 and 6v6v6) and raises it as R2-BUD-OQ6. The rooms
   unit's marks read them per team: mode files "2×2, 2×8, 3×6, 3×18" (R2-ROOM-REC7) and "3 teams × 16 slots"
-  (R2-ROOM-REC6). Decided by: Mustafa (R2-BUD-OQ6).
+  (R2-ROOM-REC6). Decided by: Mustafa (R2-BUD-OQ6). Shared as MODES-3 (below).
 - **R2-XU-OQ14. The legacy top speed of a soldier.** The units derive three figures from the legacy tables:
   - sync (`T` row): "`moveSpeed` 6.3 m/s, `sprintMult` 1.4286 (about 9.0 m/s); unit `speedMult` up to 1.5
     (Warrior)". It feeds the 1.8 m lead in R2-SYNC-F34 and REC5, and the 9 m/s target in R2-SYNC-REC5's mark 1.
@@ -3212,6 +3266,143 @@ and resolve nothing. Each says what the drafts leave to decide it.
   Left for the Advisor: R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6 (whether the §4 fairness target is trace enough), and
   R2-INT-REC7 if spectators are wanted.]
 
+### Shared open questions (the same words in every topic)
+
+The questions below carry the same words in every topic they touch (resolutions 5, 6, 10, 17 and 23 of the
+consistency resolutions, approved by the advisor on 2026-10-30; part 7, "Consistency resolutions (2026-10-30)"). Each
+is headed by its decision code.
+
+- **ABL-PREDICT (Mustafa, after a Feel Lab test). Does the client predict the local player's own abilities?** The
+  prediction scope ([GLOSSARY](GLOSSARY.md#the-prediction-scope)) covers the player's own movement, own weapon state,
+  own vehicle and cosmetic shot feedback (R2-SYNC-REC3, option 3.2 C), and never damage. R1-ABL-REC4 (option D2) would
+  add the player's own ability activation, cost, cooldown, granted tags and movement changes (Banzai speed, Shield
+  slow). No source on predicting abilities and rolling them back was read (R2-SYNC-OQ10). If yes, the ability system
+  uses R1-ABL-REC4's prediction key (the command's sequence number), undoes a rejected press and keys cues so that a
+  re-simulated activation does not play twice; whether that runs through per-effect keys or through R2-SYNC-REC3's
+  replay from the authoritative state is R1-ABL-OQ4. If no, ability presses wait for the server's confirmation and
+  R1-ABL-REC4's ability marks drop out. Decided by: R2-SYNC-OQ10's Feel Lab comparison of predicted against
+  server-confirmed Molotov and Shield (or a readable source), then Mustafa (game feel). Also asked as R2-SYNC-OQ10 and
+  R1-ABL-OQ4.
+- **SEC-SPREAD (Mustafa). Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicted
+  tracers match the server's spread, but lets a cheat cancel the spread through the aim point it sends (R2-SYNC-OQ11,
+  the security review's finding H2). The design keeps weapon spread in an authority-only stream
+  ([GLOSSARY](GLOSSARY.md#shared-stream-and-authority-only-stream); R1-DET-REC4, R2-SYNC-REC3): the client draws its
+  tracers from a cosmetic spread and the hit event corrects them. If Mustafa picks matching tracers, spread moves to a
+  shared stream, inside the client's state and its compared hash; nothing else in the stream design changes. Also
+  asked as R2-SYNC-OQ11. Decided by: Mustafa.
+- **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+  and three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
+  6v6v6; the largest mode is then the goal 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N
+  ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which the stress scene, the offline scale test (R1-TICK-OQ7),
+  the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the test-mode list
+  ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives
+  both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+- **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+  security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits,
+  anti-cheat basics) was deferred by the Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched
+  before 0006 is accepted" (R6-SEC-OQ1). Two cross-topic disagreements wait on it: who owns the advisories check
+  ([GLOSSARY](GLOSSARY.md#the-advisories-check)) and whether an advisory blocks a pull request (R1-RR-OQ7, R2-TRN-REC1
+  mark 5, R5-GATE-REC1, R5-GATE-OQ4, R6-SEC-OQ1), and one wildcard certificate whose private key sits on every game VM
+  (R6-HOST-REC4) against a certificate per game-server hostname (R2-TRN-REC5). (a) Research it now, as one
+  security-auditor topic before the drafts. (b) List it open in ADR 0006 with interim positions: R5-GATE-REC1's
+  scheduled advisories check stays the mechanism and the baseline sets the policy later; R2-TRN-REC5's certificate per
+  hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave both as one shared open question.
+  Decided by: the Advisor.
+
+### Cross-topic open questions (consistency critic, 2026-10-29)
+
+The consistency critic's cross-topic items that touch R2, in the critic's words, with both sides' ids (approved by the
+advisor on 2026-10-30). The same question stands in each other topic it goes into, under that topic's own id.
+
+- **R2-XT-OQ1. Who casts the cursor ray for the aim point, and how does the point cross the boundary?** The aim point
+  must come from a Rust ray query against what the page draws (interpolated positions live on the page). But R1 allows
+  the page no Wasm calls and no sim maths in TypeScript, and R1's command carries yaw and pitch, not a point. No topic
+  says which side casts the cursor ray, against which interpolated state, or how the result crosses the boundary. Side
+  A: R1-BND-REC1; R1-BND-REC3; R1-DET-REC2. Side B: R2-SYNC-REC8; R4-LOS-REC3. Existing questions: none. Decided by:
+  ADR-0001 (the command format) and ADR-0004 (the boundary), with R2-SYNC-REC8 mark 1 and R1-BND-REC1 mark 2 as the
+  spike marks. (Consistency critic, 2026-10-29, rank 2.)
+- **R2-XT-OQ2. Where does the remote-entity interpolation buffer live: in the worker or on the page?** A two-block
+  buffer on the page cannot hold R2's 100 to 167 ms delay. So either the worker (Rust) runs R2's adaptive snapshot
+  buffer and publishes already-delayed remote poses, or the page (TypeScript) keeps a snapshot buffer, as R5's test
+  layer assumes. No topic places R2's interpolation and clock estimate on one side of R1's boundary. Side A:
+  R1-TICK-REC5; R1-BND-REC2; R1-BND-REC6. Side B: R2-SYNC-REC4; R5-TEST-REC1. Existing questions: none. Decided by:
+  ADR-0001 (interpolation design) with ADR-0004 (boundary: block contents and the number of blocks kept). (Consistency
+  critic, 2026-10-29, rank 4.)
+- **R2-XT-OQ3. Does the E3 projectile encoding rest on the cross-target identity R1 says the netcode must not need?**
+  R2's chosen encoding and its bandwidth figure (146 rather than 188 kbps) rest on client-side flight that matches the
+  server across targets. R1 says the netcode must not depend on that identity, and R1 never answers R2-BUD-OQ8, the
+  question R2 put to it. Side A: R1-DET-REC1. Side B: R2-BUD-REC2; R2-SYNC-REC6; R2-BUD-OQ8. Existing questions:
+  R2-BUD-OQ8 (unanswered by R1). Decided by: ADR-0001 (E3 or E3b) with ADR-0004 (whether cross-target identity is a
+  guarantee for the trajectory function); R2-SYNC-REC6 mark 1 and R2-BUD-REC2's desync count in the spike.
+  (Consistency critic, 2026-10-29, rank 7.)
+- **R2-XT-OQ4. Who hosts, costs and builds the lobby and the room supervisor?** Join tokens, guest identity, room
+  codes and crash reports all go through the lobby, and R2 hands its hosting and store to R6. R6 neither hosts nor
+  costs it, and R5 has no crate for the lobby or the supervisor, so the infrastructure ADR and the cost budget leave
+  out a required service. Side A: R2-ROOM-REC2; R2-ROOM-OQ9. Side B: missing answer (R6-HOST-REC2, R6-OBS-REC3,
+  R5-LAYOUT-REC2 named). Also named: R2-ROOM-REC8, R6-COST-REC1. Existing questions: R2-ROOM-OQ9 (left to R6,
+  unanswered). Decided by: ADR-0006 (hosting and cost of the lobby and its store) with ADR-0002 (crate list) and
+  ADR-0001 (lobby protocol). (Consistency critic, 2026-10-29, rank 8.)
+- **R2-XT-OQ5. Who answers R1's timing questions (sub-tick input timestamps, client tick nudging, shipped tick
+  rates)?** R1 leaves three timing questions to R2's design, and R2 does not take them up: which tick a client stamps
+  and how it stays just ahead of the server is part of the command path both ADRs rely on. Neither topic could read
+  the shipped references, so R1-TICK-OQ3 cannot be aligned. Side A: R1-TICK-OQ3; R1-TICK-OQ4; R1-TICK-OQ8. Side B:
+  missing answer (R2-BUD-OQ1, R2-BUD-REC4 named). Existing questions: R1-TICK-OQ3, R1-TICK-OQ4, R1-TICK-OQ8;
+  R2-BUD-OQ1. Decided by: ADR-0001 (time sync and command stamping); the R2-SYNC-OQ3 spike; R1-TICK-OQ4 only if the
+  tick falls back to 30 Hz. (Consistency critic, 2026-10-29, rank 12.)
+- **R2-XT-OQ6. Who answers R1's protocol questions (hash comparison, snapshot layout, mid-match tuning, the content
+  hash at join)?** R1 hands these protocol choices to R2 by id, and R2 answers none of them. The join message R2 does
+  propose does not carry the content hash R1's bundle check and R6's match record (r6:757 at commit 8dee746) both rely
+  on. Side A: R1-DET-OQ9; R1-BND-OQ8; R1-DATA-OQ3; R1-DATA-REC6. Side B: missing answer. Also named: R2 room control
+  messages. Existing questions: R1-DET-OQ9, R1-BND-OQ8, R1-DATA-OQ3. Decided by: ADR-0001 (join handshake, snapshot
+  format, divergence telemetry) with ADR-0005 (content hash). (Consistency critic, 2026-10-29, rank 13.)
+- **R2-XT-OQ7. Is whole-world replay still a spike mark?** R2 answers R1's question by subject without citing it, and
+  R4 already builds on the local-only answer (no navigation in prediction). R1's whole-world replay mark (and the
+  snapshot cost it sizes) is still a proposed spike mark for a model no topic recommends. Side A: R1-ECS-REC1;
+  R1-XU-OQ2. Side B: R2-SYNC-REC3; R2-SYNC-REC9; R4-NAV-REC4. Also named: R1-ECS-OQ3. Existing questions: R1-XU-OQ2
+  (with R1-ECS-OQ3, R1-DET-OQ6, R1-ABL-OQ4). Decided by: ADR-0001 (prediction scope), then ADR-0004 keeps or drops
+  R1-ECS-REC1 mark 3. (Consistency critic, 2026-10-29, rank 14.)
+- **R2-XT-OQ8. Do the snapshot and the output block carry remote soldiers' animation state?** Animation of remote
+  soldiers online needs those states in R2's snapshot, then in R1's block. R2's bit budget names none of them and R1
+  leaves the layout open, so R3's character path and R2's bandwidth figure may not fit together. Side A: R1-BND-REC2.
+  Side B: none by id. Also named: R3-CHAR-REC3, R3-CHAR-REC4, R1-BND-OQ6, R2 worked estimate. Existing questions:
+  R1-BND-OQ6 (block size and layout), partly. Decided by: ADR-0001 (snapshot fields) with ADR-0004 (block layout) and
+  ADR-0003 (what animation reads). (Consistency critic, 2026-10-29, rank 16.)
+- **R2-XT-OQ9. Which recommendations wait on the deferred security baseline?** Recommendations in R2 and R5
+  (guest-secret storage, preview headers, a lint rule, token keys) wait on a topic with no recommendation and no date.
+  ADR-0001, 0002 and 0006 cannot close those items. Side A: R5-PREV-REC4; R5-TSLINT-OQ5; R2-ROOM-OQ11; R2-ROOM-OQ2.
+  Side B: R6-SEC-OQ1. Existing questions: R6-SEC-OQ1. Decided by: The Advisor (research the baseline before ADR-0006,
+  or list it open), then security-auditor. Decision code: BASELINE-WHEN. (Consistency critic, 2026-10-29, rank 18.)
+- **R2-XT-OQ10. How do multiplayer previews get their server binary and their certificate hash?** Multiplayer previews
+  need a server-binary delivery job (a second CI secret and PR-built native code on a VM) and a way to publish the
+  self-signed hash on the page's origin. R5's preview design covers only the static client. Side A: R6-HOST-REC3;
+  R2-TRN-REC5. Side B: R5-PREV-REC1. Also named: R5-PREV-OQ3. Existing questions: R5-PREV-OQ3 (asks whether previews
+  need a server; R6 answers yes, but not how). Decided by: ADR-0002 (preview workflow) and ADR-0006 (staging server),
+  with ADR-0001 (where the certificate hash is fetched from). (Consistency critic, 2026-10-29, rank 20.)
+- **R2-XT-OQ11. Do the wire's entity ids and tick counter fit R1's generational ids and a 20-minute match?** R2's byte
+  budget has no room for R1's generational ids, and with a 16-bit tick a 20-minute match at 60 Hz wraps. R2 does not
+  answer either pointer. Side A: R1-ECS-REC3. Side B: R2-ROOM-REC1. Also named: R1 pointer to R2 (tick wrap), R2
+  worked estimate. Existing questions: none. Decided by: ADR-0001 (wire id and tick widths), recomputing R2-BUD-REC2's
+  estimate. (Consistency critic, 2026-10-29, rank 27.)
+- **R2-XT-OQ12. Who owns recovery from a trap in the client's Wasm sim?** R2 says R1 owns client-trap recovery; R1
+  leaves it to the synthesis. No topic recommends it. Side A: none by id. Side B: R1-RR-OQ3; R6-OBS-REC3. Also named:
+  R2 pointer to R1 (trap recovery). Existing questions: R1-RR-OQ3. Decided by: ADR-0004 (worker restart) with ADR-0001
+  (resync path, R2-XU-OQ6) and ADR-0002 (panic strategy). (Consistency critic, 2026-10-29, rank 28.)
+- **R2-XT-OQ13. Do soldiers block each other? (one rule, asked twice)** The same rule is asked twice, with different
+  spikes named. R2-SYNC-REC7 mark 3 and R4-NAV-REC3's avoidance marks both depend on one answer. Side A: R2-SYNC-OQ5.
+  Side B: R4-PHYS-OQ1; R4-NAV-OQ5. Also named: R2-SYNC-REC7, R4-NAV-REC3. Existing questions: R2-SYNC-OQ5,
+  R4-PHYS-OQ1, R4-NAV-OQ5. Decided by: The game-designer with Mustafa, stated once in the synthesis (ADR-0004 and
+  ADR-0001). (Consistency critic, 2026-10-29, rank 30.)
+- **R2-XT-OQ14. Do R2's marks all name one of R5's network profiles?** R5 treats R2's profile set as settled, but R2's
+  own marks still use other jitter values and unnamed latencies, so some R2 marks cannot be run as R5 specifies. Side
+  A: R5-TEST-REC4; R2-XU-OQ12. Side B: R2-BUD-REC1; R2-BUD-REC4. Also named: R2-INT-REC1. Existing questions:
+  R2-XU-OQ12. Decided by: The synthesis (ADR-0001) restates every R2 mark against a named profile. (Consistency
+  critic, 2026-10-29, rank 32.)
+- **R2-XT-OQ15. Does the client's cutaway follow the server's visibility rule?** This is a pointer R3 does not take
+  up. It stays look brief pending and depends on R2-INT-OQ1. Side A: R2-INT-REC2. Side B: R3-WGPU-REC3. Also named:
+  R2-INT-OQ1. Existing questions: R2-INT-OQ1. Decided by: The look brief and Mustafa (R2-INT-OQ1), then ADR-0003.
+  (Consistency critic, 2026-10-29, rank 39.)
+
 ### Pointers between the R2 units
 
 These come from the units' cross-unit notes and duplicate questions; they claim nothing new.
@@ -3241,7 +3432,7 @@ These come from the units' cross-unit notes and duplicate questions; they claim 
   server shuts down (R2-TRN-F37). Several rooms per process would route by `:path` (R2-ROOM-F13), and one process per
   room gives one port per room (R2-ROOM-F18). The rooms unit notes per-process certificates if
   `serverCertificateHashes` is used (certificates: R2-TRN-REC5).
-- **Rooms and budgets:** R2-BUD-REC6's per-room CPU and memory set rooms per core (R2-ROOM-REC2), and
+- **Rooms and budgets:** R2-BUD-REC6's per-room CPU and memory set rooms per vCPU (R2-ROOM-REC2), and
   R2-ROOM-REC2's tick mark uses the budgets unit's tick period.
 - **Interest and budgets:** R2-INT-REC4 needs the per-client byte budget and the snapshot rate from the budgets unit
   (R2-BUD-REC1, REC2). The budgets estimate is all in view: the interest cut scales only "the per-entity part and the
@@ -3276,10 +3467,10 @@ From the units' cross-unit notes, with no new claims:
     (R2-SYNC-F5).
   - R2-SYNC-REC6 needs a bit-identical trajectory function, and spawn-only projectiles need R1's determinism
     (R2-BUD-OQ8).
-  - Seeded random streams per purpose, including spread (a server-only stream after the fix pass, R2-SYNC-OQ11), and a
+  - Seeded random streams per purpose, including spread (an authority-only stream since the fix pass, R2-SYNC-OQ11; [GLOSSARY](GLOSSARY.md#shared-stream-and-authority-only-stream)), and a
     seeded RNG per room.
   - After a trap in the client's Wasm simulation (wasm32 builds abort on panic, per the Rust review), the client needs a
-    restart that resyncs from the server's full snapshot (R2-XU-OQ6). R1 owns that recovery (Rust review, risk 4).
+    restart that resyncs from the server's full snapshot (R2-XU-OQ6). R1 owns that recovery (Rust review, risk 4). Cross-topic open question: R2-XT-OQ12.
   - R2-BUD-REC1's 60 Hz depends on R1's tick-unit step cost. Weapon cooldowns carry the fractional tick at either rate,
     and swept projectile tests run per tick (GC15).
   - The visibility pass and relevance sets run on the fixed tick, in a deterministic order, checked by the state hash.
@@ -3307,8 +3498,9 @@ From the units' cross-unit notes, with no new claims:
   - The room supervisor, fleet scaling, regions, draining on deploys and VM retirement, per-room crash reports, the
     lobby's store and signing-key storage (R2-ROOM-OQ9).
   - Telemetry of relevance churn and budget overruns; the reference server (R2-XU-OQ9).
-  - R6's security baseline is deferred by the Advisor (2026-10-27). Waiting on it, after the fix pass: the dependency
-    audit that keeps R2-TRN-REC1's version floors current (R2-TRN-F40), the content security policy R2-ROOM-OQ11 weighs,
+  - The security baseline (R6; [GLOSSARY](GLOSSARY.md#the-security-baseline)) is deferred by the Advisor (2026-10-27). Waiting on it, after
+    the fix pass: the policy of the advisories check that keeps R2-TRN-REC1's version floors current (R2-TRN-F40;
+    R5-GATE-REC1 schedules the check), the content security policy R2-ROOM-OQ11 weighs,
     and the cheat detection that R2-SYNC-REC5's view-time log is kept for.
 - **security-auditor (R2 protocol review; done 2026-10-28, verdict REVISE, applied in the fix pass: see part 7):**
   - The shared spread seed (R2-SYNC-OQ11).
@@ -3663,6 +3855,61 @@ NOTES, nits only.
   rows 22 and 114, four reasons changed); TRN-F36's quote keeps "[RFC6454]"; the 66 ms slices are qualified by
   `pmove_fixed`; TRN-REC3's "only" is "of the sources read"; ROOM-REC3 and option 3.2 mark WebSocket's "no auth header"
   as inferred, as F12 does. None changes a recommendation's design, a number or a source, so no further pass runs.
+
+### Consistency resolutions (2026-10-30)
+
+The consistency critic (2026-10-29) found 12 contradictions between the topics and 29 other items. The advisor ruled
+on the resolutions on 2026-10-30 (4 approved, 4 revised, 4 escalated), and approved the shared glossary
+([GLOSSARY.md](GLOSSARY.md)) and the cross-topic questions. The netcode-architect applied what touches R2 the same
+day, as approved, with nothing new claimed, numbered or sourced. Change ids are those of the resolutions.
+
+**Resolutions applied, by rank and change id.**
+- 1, the server tick budget (revised by the advisor): C1.7 (R2-SYNC-REC1 mark 4), C1.8 (R2-SYNC-REC9 mark 1), C1.9
+  (R2-BUD-REC6 heading and reason), C1.10 and C1.10b (R2-BUD-REC6 spike), C1.11 (R2-INT-REC3 spike), C1.12
+  (R2-ROOM-REC2 mark 1), C1.13 (R2-TRN-REC1 mark 2), C1.14 (R2-XU-OQ8).
+- 5, ABL-PREDICT (aligned): C5.8 (R2-SYNC-REC3), C5.9 (R2-SYNC-OQ10), C5.10 (the shared question).
+- 6, the spread stream: C6.5 (R2-SYNC-REC3), C6.6 (R2-SYNC-OQ11, outside its dated note), C6.7 (SEC-SPREAD).
+- 9, the stress scene (revised): C9.9 (R2-SYNC-REC5 mark 3), C9.10 (R2-INT-REC4 spike), C9.11 (R2-BUD-OQ5).
+- 10, MODES-3 (escalated; the interim wording): C10.4 and C10.5 (the worked estimate's rows), C10.6 (R2-INT-REC3),
+  C10.7 (R2-ROOM-REC6), C10.8 (R2-ROOM-REC7), C10.9 (R2-BUD-OQ6), C10.10 (R2-XU-OQ13), C10.11 (the shared question).
+- 11, one vCPU of the reference server: C11.8 (R2-BUD-REC6), C11.9 (R2-TRN-REC1 mark 2), C11.10 (R2-ROOM-REC2),
+  C11.11 (R2-XU-OQ9), C11.12 (budgets table E and the pointers between units).
+- 17, BASELINE-WHEN (escalated; "now" changes only): C17.3 (R2-TRN-REC1 mark 5), C17.4 (the shared question).
+- 23, BASELINE-WHEN (escalated; "now" changes only): C23.1 (R2-TRN-REC5), C23.2 (R2-TRN-OQ4).
+- Not applied: C17.b2 and every C23.b change, which wait for the Advisor's answer to BASELINE-WHEN. Resolutions 19,
+  21, 22 and 29 change nothing in R2.
+
+**Glossary terms.** The header links [GLOSSARY.md](GLOSSARY.md), and so does the first use of each term R2 uses (the
+tick period, sim step time, server tick time, transport runtime time, time statistics, the server tick budget, the
+sim step share and the server-only share, the reference server, the measuring unit, player count, team size, the start
+and goal modes, the largest mode, the design point, the test-mode list, the stress scene, big vehicles, live
+projectiles, the authority, the prediction scope, shared and authority-only streams, the state hash, preview, the
+security baseline, the advisories check and the game-server certificate). Retired wordings replaced: "whole tick"
+(budgets table E, R2-BUD-REC6, R2-XU-OQ8), "the share of the tick budget", "25 % of the tick budget", "one vCPU of the
+EU instance type", "reference server hardware R6 names", "1 CPU core", "reference host", "per core", "server-only
+random stream", "audit gate", "the tick interval", "tick p99" (R2-TRN-REC1 mark 4, R2-ROOM-REC2 mark 4, R2-ROOM-OQ1),
+"the transport layer" as a CPU budget, and "R6's (deferred) security baseline" (R2-ROOM-OQ2, R2-ROOM-OQ11, the pointers
+to R6). R2-TRN-REC6 mark 2's "simulation tick duration" is now the server tick time, as the glossary lists it. A time
+mark that names no statistic is a p99, so four marks now say so: R2-BUD-REC6's encoding (50 µs per client per
+snapshot), R2-INT-REC1 (c) (0.2 ms per tick), R2-INT-REC2 (b) (0.1 µs per enemy pair; the re-flood, 1 ms) and
+R2-INT-REC4 (0.5 ms per tick). Left as written, because there they mean something else: the bare "48" of R2's marks
+(the design point, VISION_V2 §3's "design for 48+"; the resolutions changed the marks that mean the largest mode),
+"players" (always a player count here), Source's "server-only seed" and the dated records. Where a retired wording
+sat inside an approved text (C1.9, C11.9, C11.10, C17.3), the rename followed the resolution, as the order of work
+says; C1.10, C1.10b, C1.13 and C23.1 differ from the approved text only by a link or the p99.
+
+**Open questions added (19; 91 in all).** The shared questions ABL-PREDICT, SEC-SPREAD, MODES-3 and BASELINE-WHEN,
+and the cross-topic questions R2-XT-OQ1 to R2-XT-OQ15 (the critic's ranks 2, 4, 7, 8, 12, 13, 14, 16, 18, 20, 27, 28,
+30, 32 and 39), each with a pointer from the recommendations and R2 questions it names.
+
+**OBJECT (one, not applied).** R2-INT-F20's "4–9 % of one core" (the interest findings) stays: it is the legacy
+JavaScript `hasLOS` cost measured in a browser on hardware that was not recorded, so "one vCPU of the reference
+server" would misstate the finding; the glossary keeps "core" for client hardware. The glossary's measuring-unit
+entry could list this place under Keeps (the advisor decides).
+
+**Changes by type.** 20 recommendation changes (C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8, C6.5, C9.9,
+C9.10, C10.6, C10.7, C10.8, C11.9; the four p99 marks; R2-TRN-REC6 mark 2), 0 number changes, 0 sources, and 94 nits
+(term renames, links, pointers, the inserted questions, the header, line wraps).
 
 ## Sources
 
