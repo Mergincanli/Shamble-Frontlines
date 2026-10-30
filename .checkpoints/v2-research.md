@@ -174,6 +174,12 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - Launched 20:39 UTC: the advisor on the two R3 items (run wf_5f85b87e-ee4, task wwhsfkwhd); step 3d R2 (xhigh; run
   wf_efa16a80-44a, task wc9qcslll) and R1+R4 (high; run wf_5519b651-63d, task wf6cv24xc) units, each verifier then
   skeptic, on f67245e. Running: 3 agents. If cut off: resume each with its script path and resumeFromRunId.
+- The advisor's R3 ruling (run wf_5f85b87e-ee4, about 20:40 UTC; verbatim `advisor-3d-r3-verdict.md`): item 5 APPROVE (b),
+  a term note after R3-LOOK-REC3 in the advisor's words; item 6 APPROVE (a), "p99" written into the listed marks, each a
+  recommendation change; engine-architect corrects R3's "Used today" line under Time statistics afterwards.
+- Step-3d fix round sent about 20:41 UTC to the R6 and R5 owners (messages `prompts/r6-3d-fixes.txt`,
+  `prompts/r5-3d-fixes.txt`); R3's (`prompts/r3-3d-fixes.txt`) goes when a slot frees. Then a final check of only
+  what the fix round changed (verifier, high), and the glossary's Time-statistics line for R3.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
