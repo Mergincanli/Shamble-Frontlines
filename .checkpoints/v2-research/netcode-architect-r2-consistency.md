@@ -1,0 +1,1 @@
+Task: step 3c owner apply (R2): apply approved consistency resolutions, glossary terms and shared cross-topic OQs to docs/research/r2-netcode.md (prompt: .checkpoints/v2-research/prompts/netcode-architect-r2-consistency.txt)

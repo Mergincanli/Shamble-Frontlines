@@ -1,0 +1,1 @@
+Task: step 3c owner apply (R6) — apply approved consistency resolutions, glossary terms and shared cross-topic OQs to docs/research/r6-infrastructure.md (prompt: .checkpoints/v2-research/prompts/infra-engineer-r6-consistency.txt)

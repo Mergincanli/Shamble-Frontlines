@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 19:38 Amsterdam (18:38 UTC)
+- **Last update:** 2026-10-30 19:41 Amsterdam (18:41 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -99,8 +99,12 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   script also skips "[Second fix pass" (2) and "[Second verifier pass" (4), the same records as "[Fix pass" and
   "[Verifier"; their hits are in the skipped list. Two retired phrases are word patterns with "…", not searchable: the
   step-3d verifiers read for them.
-- Next: run `mk3c.py`, launch the five step-3c owners (4 at once, background pointer prompts), commit each file as it
-  returns after the write-guard check; then the GLOSSARY "Used today" refresh (engine-architect); then step 3d (three
+- **Step 3c launched 18:39 UTC** (19:39 Amsterdam), background agents with one-line pointer messages (each prompt's
+  header holds its launch record): engine-architect R1+R4 (xhigh), netcode-architect R2 (xhigh), test-engineer R5
+  (high), infra-engineer R6 (high); prompts `prompts/<agent>-<k>-consistency.txt`, notes `<agent>-<k>-consistency.md`.
+  graphics-engineer R3 (high) starts when a slot frees. If cut off: resume each by message from its notes.
+- Next: commit each owner's file as it returns after the write-guard check (and save its return verbatim as
+  `<agent>-<k>-consistency-result.md`); then the GLOSSARY "Used today" refresh (engine-architect); then step 3d (three
   verifier units, `scripts/mk3d.py 7c6e0d7 <after>`, `scripts/unread_sample.py`), docs-keeper, gate, report, PR ready.
   Research stops at 00:10 Amsterdam (23:10 UTC).
 
