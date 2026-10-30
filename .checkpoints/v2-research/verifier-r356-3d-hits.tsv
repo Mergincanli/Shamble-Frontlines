@@ -1,1 +1,78 @@
 topic	line	entry	phrase	verdict	reason
+R3	22	Player count (N)	characters	right	part-list heading: "characters" = the rendering topic, not a soldier count
+R3	32	Player count (N)	characters	right	text characters of the fetch tool, unrelated
+R3	421	Player count (N)	characters	right	legacy CL6 hull factor for character meshes, legacy fact
+R3	423	The largest mode, and its N	48	right	legacy measurement at 48 (TL15), not the largest mode
+R3	431	Player count (N)	characters	right	question heading: character rendering topic
+R3	515	The largest mode, and its N	48	right	legacy GA15 arithmetic at 48, a measurement
+R3	518	The largest mode, and its N	48	right	legacy measurement at 48 (CL6/TL15)
+R3	519	The largest mode, and its N	48	right	legacy measurement at 48 (TL15 ring)
+R3	536	Team size and how modes are written	players	right	VISION_V2 goal modes total (36 or 48 players), people in all, beside goal mode link
+R3	536	The largest mode, and its N	48	right	48 = 24v24 goal total, beside the goal-mode marking words
+R3	576	Team size and how modes are written	players	right	players as people (hardware share)
+R3	584	The largest mode, and its N	48	right	source line numbers 48-50
+R3	584	The largest mode, and its N	48	right	legacy TL15 measurement of 48 soldiers
+R3	585	The largest mode, and its N	48	right	legacy TL15 measurement at 48
+R3	586	The largest mode, and its N	48	right	legacy GA15 arithmetic at 48
+R3	592	The largest mode, and its N	48	right	R1 wave-1 fact: R1's own old scene counts as R1 wrote them, followed by the stress scene and reference server sentence
+R3	767	Big vehicle and very large unit	large units	right	legacy GC16: large units as a category, VISION_V2 6.9 words
+R3	783	Team size and how modes are written	players	right	"Fallback players": people
+R3	796	Active effect (and visual effect)	effects	right	options row: "effects" = visual effects in general, not a count
+R3	797	Active effect (and visual effect)	effects	right	options row: extra visual effect code paths, not a count
+R3	798	Preview isolation and the isolation flag	always	right	"always runs the Low settings": unrelated to isolation
+R3	820	Player count (N)	characters	right	options-part heading: character rendering topic
+R3	824	The largest mode, and its N	48	right	legacy cost at 48 (TL15) and "48+" design point
+R3	834	Big vehicle and very large unit	large units	right	options intro: large units as the VISION_V2 6.4/6.9 category
+R3	834	Big vehicle and very large unit	vehicles	right	"multi-part vehicles and walkers": the category, not a stress count
+R3	845	Preview isolation and the isolation flag	always	right	"always there": unrelated
+R3	886	Big vehicle and very large unit	large units	right	audio priority kind: large units as a category
+R3	913	Active effect (and visual effect)	effects	right	post effects, presentation, not a count
+R3	935	Active effect (and visual effect)	effects	right	Serves line quoting VISION_V2 6.9 words
+R3	935	Big vehicle and very large unit	large units	right	Serves line quoting VISION_V2 6.9 words
+R3	960	Team size and how modes are written	players	right	players as people
+R3	1003	Active effect (and visual effect)	effects	right	post effects (look row), not a count
+R3	1003	Active effect (and visual effect)	effects	right	post effects (look row), not a count
+R3	1015	Active effect (and visual effect)	effects	right	"all effects off": post effects in a draw-call mark, not an effects count (look row)
+R3	1019	The largest mode, and its N	48	wrong	R3-LOOK-REC3 heading: bare "48 soldiers on screen" means the largest mode, as in CHAR-REC1 before C3c; look row frozen by condition 5, so goes to the advisor/session, not the owner
+R3	1025	Team size and how modes are written	players	right	"48+ players": design point with its marking word
+R3	1026	The largest mode, and its N	48	wrong	R3-LOOK-REC3 mark: top step "48" stands for the largest mode with no marking words or 54 value; look row frozen by condition 5 (advisor/session)
+R3	1029	Player count (N)	characters	right	question heading: character rendering topic
+R3	1034	The largest mode, and its N	48	right	beside the marking words "the largest mode's N", both values given
+R3	1041	Team size and how modes are written	players	right	"48+ players": design point
+R3	1043	The largest mode, and its N	48	right	beside "the largest mode's N", both values
+R3	1053	The largest mode, and its N	48	right	legacy GA15 arithmetic at 48
+R3	1060	The largest mode, and its N	48	right	beside "the largest mode's N", both values
+R3	1074	The largest mode, and its N	48	right	beside "the largest mode's N", both values
+R3	1076	Big vehicle and very large unit	large units	right	R3-CHAR-REC4 heading: large units as the category the rec covers, not the stress count
+R3	1079	Big vehicle and very large unit	large units	right	"a few" large units quoting VISION_V2 6.9
+R3	1085	Big vehicle and very large unit	vehicles	right	Serves: VISION_V2 6.4 words "big, multi-part vehicles"
+R3	1104	Team size and how modes are written	players	right	players as people
+R3	1131	Active effect (and visual effect)	effects	right	GPU time row: visual effects, a time row not a count (glossary lists it as visual effects)
+R3	1140	The largest mode, and its N	48	right	legacy TL15 measurement at 48
+R3	1142	The largest mode, and its N	48	right	arithmetic at 48, sentence closes "at N = 48" with the N = 54 value
+R3	1143	The largest mode, and its N	48	right	"at N = 48" carries the marking word N and gives the 54 case
+R3	1159	The stress scene	R1-TICK's scene	right	Rests-on line naming R1-TICK's own wave-1 scene (exempt by the entry)
+R3	1160	Big vehicle and very large unit	large units	right	Serves: VISION_V2 6.4 category
+R3	1170	Active effect (and visual effect)	effects	right	legacy effect caps (FX pools), presentation, not the stress count
+R3	1171	Active effect (and visual effect)	effects	right	which visual effects exist: the look brief's, not a count
+R3	1175	The server tick budget	50 %	right	50 % of GPU frame time: the whole is named
+R3	1218	Team size and how modes are written	players	right	players as people
+R3	1239	Active effect (and visual effect)	effects	right	Serves quoting VISION_V2 6.9
+R3	1239	Big vehicle and very large unit	large units	right	Serves quoting VISION_V2 6.9
+R3	1245	Big vehicle and very large unit	large units	right	audio priority kind: category
+R3	1245	The largest mode, and its N	48	right	48 voices on High: unrelated to N
+R3	1258	Team size and how modes are written	players	right	players as people
+R3	1276	Active effect (and visual effect)	effects	right	Serves quoting VISION_V2 6.9
+R3	1276	Big vehicle and very large unit	large units	right	Serves quoting VISION_V2 6.9
+R3	1307	Team size and how modes are written	players	right	"target players": people
+R3	1341	Player count (N)	characters	right	question heading: character rendering topic
+R3	1363	Team size and how modes are written	players	right	players as people (hardware mix)
+R3	1369	Team size and how modes are written	players	right	quoted VISION_V2 words and goal totals
+R3	1369	The largest mode, and its N	48	right	goal totals (36 or 48) and design point 48+
+R3	1369	The largest mode, and its N	Largest N	right	"Largest N" heading no longer fixes N at 48: the entry ends "48 or 54 by MODES-3"
+R3	1369	The start modes and the goal modes	the goal	right	"as the goal": the goal modes, correct use
+R3	1371	The largest mode, and its N	48	right	"48 or 54" beside the largest mode's N
+R3	1412	The largest mode, and its N	48	right	MODES-3 approved shared text: "the goal 24v24, N = 48" under reading (a)
+R3	1412	The start modes and the goal modes	the goal	right	MODES-3 approved shared text: the goal mode
+R3	1496	Team size and how modes are written	players	right	players as people
+R3	1745	The largest mode, and its N	48	right	sources table row number
