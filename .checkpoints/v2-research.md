@@ -134,6 +134,14 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   "the largest mode's N (48 or 54, MODES-3)", a value that changes only under MODES-3 (b): the verifier judges it), 27
   nits; no OBJECT; R3-LOOK-REC3's counts kept word for word (a look row). 0 exact hits; quotes: none gone; apply
   check: all 7 items found. Committed **41f9cf9**. Running: R1+R4 and R2 owners.
+- R2 owner DONE about 20:19 UTC (report verbatim `netcode-architect-r2-consistency-result.md`): 20 recommendation
+  changes, 94 nits; one **OBJECT**, not applied: R2-INT-F20's "4–9 % of one core" (r2:870, a legacy browser
+  measurement on unrecorded hardware), the one exact hit left; its nit: C23.2's "r6:424-425" lacks "at commit
+  8dee746". Quotes: none gone; apply check: 6 after texts differ by later renames or links (the owner lists them; the
+  verifier judges). Committed **2684735**. OBJECT and nit to the advisor (prompt `prompts/advisor-object-1.txt`).
+- Step 3d unit R3+R5+R6 launched 20:18 UTC as workflow run wf_1359fb87-b9e (task w6xk2bo06): verifier, then skeptic,
+  both high, on R3, R5 and R6 at 41f9cf9 (final files); inputs `scripts/glossary-hits-3c-r356.tsv` (210 in-context
+  hits, 0 exact), `apply-3c-r356.tsv`, `quotes-3c-r356.tsv`. The 10-row source sample moves to the R1+R4 unit (last).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

@@ -91,3 +91,5 @@ R4 pointers "Cross-topic open questions: ..." at the end of PHYS-REC1 (OQ2, OQ8)
 R1 R1-XU-OQ2: "R1-ABL-REC4 predicts only the local player's own abilities and weapons" (prediction scope, in context: a settled scope) -> "predicts the local player's own weapons, and its own abilities if ABL-PREDICT says so", matching C5.1 -- nit
 ## Step 4 (R4)
 R4 header: glossary line with GLOSSARY.md link; id table +2 rows; totals 23 -> 32 open questions (+MODES-3, +8 XT); label unchanged -- nit
+R1 part 7: "### Consistency resolutions (2026-10-30)" added at the end of "## Verifier spot-check" (resolutions by rank and change id, recommendation changes, glossary summary, questions added, OBJECT: none) -- nit
+R4 part 7: the same subsection added at the end of "## Verifier spot-check" -- nit
