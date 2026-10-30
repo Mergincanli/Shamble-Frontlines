@@ -76,3 +76,48 @@ R3	1412	The largest mode, and its N	48	right	MODES-3 approved shared text: "the 
 R3	1412	The start modes and the goal modes	the goal	right	MODES-3 approved shared text: the goal mode
 R3	1496	Team size and how modes are written	players	right	players as people
 R3	1745	The largest mode, and its N	48	right	sources table row number
+R5	37	Player count (N)	characters	right	text characters of the fetch tool, unrelated
+R5	523	Team size and how modes are written	players	right	"N players": the player count with its marking word N
+R5	525	The largest mode, and its N	48	right	LOOP_V2 scale steps "N = 12, 24, 36, 48", marked by N
+R5	823	The client host	Cloudflare	right	"Cloudflare Pages" names the product (linked to the client host)
+R5	829	The client host	Cloudflare	right	URL
+R5	836	The client host	Cloudflare	right	URL (cloudflare/wrangler-action)
+R5	838	The client host	Cloudflare	right	"Cloudflare Pages" product and "the Cloudflare account": named product and account
+R5	843	The client host	Cloudflare	right	URL
+R5	850	The client host	Cloudflare	right	"Cloudflare Workers": product named
+R5	851	The access wall	Cloudflare Access	right	Cloudflare Access as a product in a finding
+R5	857	The client host	Cloudflare	right	URL
+R5	859	Preview	deploy preview	right	Netlify's Deploy Preview product name in its own finding
+R5	887	The client host	Cloudflare	right	URL
+R5	986	The advisories check	cargo-audit and cargo-deny as CI gates	right	names R1-RR-OQ7's proposal in its words, not R5's check
+R5	1086	Preview isolation and the isolation flag	always	right	"always rebuild": unrelated to isolation
+R5	1118	The client host	Cloudflare	right	"Cloudflare Git integration": a product named
+R5	1124	The client host	Cloudflare	right	options row "Cloudflare Pages" and "Cloudflare account": product and account
+R5	1125	The access wall	Cloudflare Access	right	Cloudflare Access as a product feature of Workers (F14)
+R5	1125	The client host	Cloudflare	right	"Cloudflare Workers static assets": product named
+R5	1398	Team size and how modes are written	players	right	"48+ players": design point with its marking word
+R5	1400	Team size and how modes are written	players	right	"N players": marked by N
+R5	1475	The largest mode, and its N	48	right	R5-TEST-REC5 heading "at 48 and more": the design point 48+ (and more covers 54), not a fixed largest mode
+R5	1477	The test-mode list	24v24 = 48 and 12v12v12 = 36	right	approved C10.17 text: names the VISION_V2 goal modes, beside "the largest mode", not every test mode
+R5	1478	The largest mode, and its N	48	right	scale steps marked by N
+R5	1573	Preview isolation and the isolation flag	always	right	GitHub expression if: always(), unrelated
+R5	1608	The client host	Cloudflare	right	"Cloudflare Workers static assets": product named
+R5	1644	The access wall	Cloudflare Access	right	Cloudflare Access as a product (F14), not the decision name
+R5	1644	The client host	Cloudflare	right	"the Cloudflare account" (F12): the account
+R5	1717	The authority	server-only	right	a cargo "server-only feature" on a dependency: not authority state
+R5	1847	The client host	Cloudflare	right	"a Cloudflare login": the account login
+R5	1874	The advisories check	cargo-audit and cargo-deny as CI gates	right	names R1-RR-OQ7's proposal, not R5's check
+R5	1898	Preview isolation and the isolation flag	always	right	question heading lists the options ("always, or behind a flag"); the entry is settled with the isolation flag
+R5	1919	The largest mode, and its N	48	right	MODES-3 approved shared text
+R5	1925	The advisories check	dependency audits	right	BASELINE-WHEN approved text: dependency audits as the baseline's subject
+R5	1942	The client host	Cloudflare	right	PREVIEW-WALL approved text: Mustafa's Cloudflare account
+R5	1943	The access wall	Cloudflare Access	right	PREVIEW-WALL approved text: Cloudflare Access as a product
+R5	2095	The advisories check	dependency audits	right	pointer to the security baseline: dependency audits as the baseline's subject
+R5	2330	The largest mode, and its N	48	right	sources table row number
+R5	2399	Player count (N)	characters	right	URL character range
+R5	2401	The client host	Cloudflare	right	sources URL
+R5	2402	The client host	Cloudflare	right	sources URL
+R5	2403	The client host	Cloudflare	right	sources URL
+R5	2404	The client host	Cloudflare	right	sources URL
+R5	2405	The client host	Cloudflare	right	sources URL
+R5	2455	Player count (N)	characters	right	URL character range
