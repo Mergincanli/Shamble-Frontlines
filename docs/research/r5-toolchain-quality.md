@@ -1423,7 +1423,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   is reached through safaridriver (F5) or WebdriverIO, which lists Safari among its browsers (F6).
   Rests on: R5-TEST-F5, F6, F8; R5-LAYOUT-F4; R1-DET-REC6, R1-ECS-REC2 (cited).
   Serves: §4 (fair to about 100 ms of ping: prediction and replay need the same ticks on client and server, as
-  R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches); §3 (the 48-player scale).
+  R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches); §3 ([the design point](GLOSSARY.md#the-design-point-and-headroom) (48 players)).
   A spike must prove (proposed): R1-DET-REC6's planted divergences (one std `sin`, one `HashMap` iteration, one
   presentation RNG draw inside the sim) are each reported at the first tick they change; the gate's determinism step
   takes under 3 minutes on the CI runner; the nightly comparison of a 10-minute bot match at [the largest mode's N](GLOSSARY.md#the-largest-mode-and-its-n) (48, or 54 under MODES-3 (b)) reports 0 mismatches across
@@ -2283,8 +2283,8 @@ into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim, 
     (recommendation).
   - r5:1487 (R5-TEST-REC5's spike): the 30-minute room runs at the largest mode's N, 48 or 54 under MODES-3 (b)
     (recommendation).
-  - r5:1426 (R5-TEST-REC2's Serves line, "the 48-player scale" of VISION_V2 §3): kept; it names §3's design point,
-    not the largest mode.
+  - r5:1426 (R5-TEST-REC2's Serves line): "the 48-player scale" of VISION_V2 §3, which names §3's design point and not
+    the largest mode, now reads "the design point (48 players)", linked (nit).
 
 ## Sources
 
