@@ -85,3 +85,56 @@ once), the verifier (3d), docs-keeper; plus the advisor's PR review. Research ru
 Unchanged, plus the two new files: `git status --porcelain` may show changes only under `docs/research/`,
 `docs/reports/` and `.checkpoints/v2-research/` (and, for docs-keeper's step, `docs/STATUS.md`, `docs/ROADMAP.md`,
 `docs/REPO_MAP.md`).
+
+## The advisor's verdict and how its 13 conditions are applied
+APPROVE with 13 conditions, 2026-10-30 about 17:20 UTC (verbatim: `advisor-amendments-2-verdict.md`). Applied as follows,
+in this file and in every prompt before launch:
+1. Three outcomes per contradiction: **resolved**, **aligned** (one shared open question, same words in every affected
+   topic, one decider and a decision code) or **escalated** (needs a decision). The report counts each kind.
+2. Order: #10, #11, #9 and their glossary terms first, then #1; #19 before #21 and #22; #5 with #6. A resolution that
+   depends on an escalated item holds under every option (written in terms of, for example, "the largest mode's N"); a
+   glossary entry that depends on one states both readings and the code, and picks neither.
+3. Step 3a works in small units (one term or one contradiction each, written whole); `resolutions.md` gives, per item,
+   both sides' words with ids, the exact before and after text per file, and the basis ids.
+4. Every changed number comes from the files (id), is arithmetic shown in `resolutions.md`, or is a pass mark marked
+   "proposed" with its reason. No new sourced fact.
+5. Step 3b runs at xhigh; its verdict goes to `advisor-resolutions-verdict.md`. MODES-3, PREVIEW-WALL and BASELINE-WHEN
+   are asked now (the session's report of 2026-10-30).
+6. Step 3c: an owner who finds an approved resolution wrong for its file logs OBJECT with the reason and does not apply
+   it (the advisor decides); owners change nothing beyond the approved text, the glossary terms and nits; quoted source
+   text never changes. The session records the SHA before step 3c and commits each owner's file as it returns, after
+   the write-guard check.
+7. Steps 3a and 3c fetch nothing; only step 3d fetches. curl rules: GET over https only (`--proto =https`), no data,
+   upload or method flags; no `-L` (a redirect is recorded and followed as a new fetch only when its target host is on
+   the allow list); no auth headers, cookies, netrc or config files; time and size caps; `-o` into a fresh empty
+   scratchpad folder; downloads never run, Python on them only with `-I`; the HTTP code and final URL recorded. The
+   host audit lists requested and final hosts by tool. The report says past curl use is covered by (a), except the 3
+   api.github.com calls of the #29 review (off the allow list; a PR review, not research).
+8. UNREAD_SOURCES.md: inputs all 8 not-read tables and the 6 hinge tables; URLs matched ignoring the scheme, `www.`
+   and a trailing slash; rows without a URL stay as their own rows in the topic's words; the brief question from the
+   unit column, or for R3 to R6 from the per-question draft or table that names the URL; every "needed for" cell cites
+   topic ids, or quotes the notes with the file at a commit SHA, or says "no tie found in the file or notes"; "search
+   lead" only where the topic's own words say so; a script shows every source URL appears exactly once, with the counts
+   in the report. Built and pushed first; re-run after step 3c; step 3d samples 10 rows.
+9. The glossary is checkable: each entry gives the term, its one definition, the words that mark it, the synonyms to
+   retire, and the ids that use it per topic. After step 3c a search script lists every hit of each term and each
+   retired synonym per topic and must find zero retired synonyms outside quoted source text. Each topic header links
+   GLOSSARY.md, and so does the first use of each term; the "used in" lists are refreshed from the script's output (in
+   the report).
+10. Step 3d in three units, at most 4 agents at once: R2 at xhigh; R1 and R4 at high; R3, R5 and R6 at high. In R3 to
+    R6 every changed recommendation gets at least one basis claim checked at its source unless its verifier table
+    already confirms one; in R1 and R2 every changed basis claim not already confirmed is checked; the "N of M" labels
+    are recounted; a value that changes because of a definition is a recommendation change and is checked.
+11. The other 29 items: rank 41 is fixed in R5 as a nit (cite R1-BND-REC2 mark 5); items a resolution settles are
+    marked "settled by resolution <rank>"; each shared open question carries its decision code.
+12. The 12 resolutions and the advisor's per-item verdicts go into the report word for word. Risks: a spend cut in the
+    middle of step 3c (each owner's file is committed as it returns; a cut-off owner resumes from its notes); a
+    resolution taking Mustafa's call (escalated items stay open questions until he answers); R1 or R2 losing "verified"
+    (step 3d recounts; the label changes if a changed basis claim is not confirmed). Evidence: the script outputs, the
+    verifier tables, the gate, the repo-map check. Answers from Mustafa or the Advisor that arrive before the PR is
+    marked ready are applied the same way (owner applies, verifier checks); later ones go to the synthesis.
+13. NS-2 is called "NS-2 (2026-10-30, a fresh session per run)". Mustafa's item lists the exact settings with the
+    one-line prompt word for word; order: create the new routine, then disable the old one in the same sitting, and
+    delete the old one after one good night; the session then reads both routines back and confirms only one is enabled.
+Nits applied: the write-guard stand-in also allows `.checkpoints/v2-research.md`; research launched between 07:30 and
+08:30 counts a still-running night run in the 4-at-once limit until the WINDOW-0730 rules PR lands.
