@@ -6,6 +6,7 @@
 - **Date:** 2026-10-28 (every source below was read that day).
 - **Status:** spot-checked (50 of 52 key claims). The verifier's table, its critical read, the owner's fixes and the
   second pass on them (2026-10-29: closed, nits only) are in part 7 ("Verifier spot-check").
+- Glossary and cross-topic resolutions applied 2026-10-30 (see [GLOSSARY.md](GLOSSARY.md) and part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R4):** "Rapier 3D or custom;
   navigation meshes in Rust; bots moving between floors; line of sight across heights; obstacles placed mid-match (for
   later building)"
@@ -20,8 +21,11 @@ in the brief's order.
 | 3 | bots moving between floors | R4-FLOORS-F1–F7, REC1–REC3, OQ1–OQ4 |
 | 4 | line of sight across heights | R4-LOS-F1–F5, REC1–REC3, OQ1–OQ5 |
 | 5 | obstacles placed mid-match (for later building) | R4-OBST-F1–F4, REC1–REC3, OQ1–OQ4 |
+| – | shared decision question (added 2026-10-30) | MODES-3 |
+| – | cross-topic open questions (consistency critic, added 2026-10-30) | R4-XT-OQ1–OQ8 |
 
-Totals: 62 findings, 18 recommendations, 23 open questions; 47 sources read (37 official, 8 shipped game, 2 other;
+Totals: 62 findings, 18 recommendations, 32 open questions (23 in the five question sections, 9 added at the consistency
+step of 2026-10-30: MODES-3 and R4-XT-OQ1–OQ8); 47 sources read (37 official, 8 shipped game, 2 other;
 source 47 was read by the verifier, not the owner) and 32 sources not read (part 8).
 
 **Reading rules.**
@@ -398,7 +402,8 @@ source 47 was read by the verifier, not the owner) and 32 sources not read (part
   "a 3D navigation check inside the Rust sim, callable from the editor and CI".
 - **TL13 (via GN5):** headless stall rate, base mean 8.82 % against 7.73 % after the bot-poplar-wedge fix (40 runs).
 - Design inputs: LOOP_V2 §9 (6 m gaps, reachability on Octopon-3), §10 (replan storm before uplinks), §11 (scale test
-  N = 12 / 24 / 36 / 48); EDITOR_V2 §2 rule 5 (validation testable in Node), §3 (validation panel; Test plays the map
+  N ([GLOSSARY](GLOSSARY.md#player-count-n)) = 12 / 24 / 36 / 48); EDITOR_V2 §2 rule 5 (validation testable in Node),
+  §3 (validation panel; Test plays the map
   with bots instantly).
 
 ### 3. Bots moving between floors (R4-FLOORS)
@@ -523,7 +528,8 @@ source 47 was read by the verifier, not the owner) and 32 sources not read (part
   sight world.
 - Wave 1: R2-INT-F20 (enemy-pair counts: 576 at 24v24, 768 at 16v16v16, 432 at 12v12v12, and the legacy-cost
   arithmetic), R2-INT-REC2 (areas and portals, O(1) connectivity), R2-INT-REC3 (one shared visibility pass, ≤ 10 % of
-  the tick budget), R2-SYNC-REC5 and REC8 (rewound shots; aim point at height), R2-INT-OQ1 (what a player may see),
+  the server tick budget, [GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 5 % of the tick
+  period), R2-SYNC-REC5 and REC8 (rewound shots; aim point at height), R2-INT-OQ1 (what a player may see),
   R2-INT-OQ5 (the cost of a BVH ray).
 
 ### 5. Obstacles placed mid-match (for later building) (R4-OBST)
@@ -582,7 +588,8 @@ rebuilt). Player building is only "don't design it out": nothing here designs a 
 #### What the simulation asks of physics (from VISION_V2 §6, LOOP_V2 and the legacy rows; the author's reading)
 
 - Soldiers: kinematic movement with a step-up, slopes (ramps, plateaus), drop-downs, a ballistic jump, push-out from
-  statics; one rule for every soldier, since humans take over bot slots (GW14). §6.2.
+  statics; one rule for every soldier, since humans take over bot slots
+  ([GLOSSARY](GLOSSARY.md#team-size-and-how-modes-are-written)) (GW14). §6.2.
 - Shots: hitscan rays against rewound movers and the present static world (R2-SYNC-REC5); the aim point at height
   (R2-SYNC-REC8). §6.2.
 - Slow projectiles: bolts, grenades, Molotovs, Javelin rockets (LOOP_V2 §5) swept per tick; grenades bouncing off walls
@@ -638,7 +645,7 @@ rebuilt). Player building is only "don't design it out": nothing here designs a 
 | What | Segment queries through the static BVH | As A, plus vehicle hulls (and soldiers, if the rule says) from the per-tick movers index | Visibility between map cells baked offline; no rays at runtime |
 | Height | Yes, if eyes and targets are 3D points and ramps are slopes | Yes | Coarse: per cell, not per point |
 | Cost | Bounded by pairs × points (R2-INT-F20) | Plus the movers index (rebuilt each tick anyway, R4-PHYS-REC2) | Cheapest at runtime; bake cost; wrong for moving cover |
-| Fit | §6.2; vehicles never give cover | §6.2 and §6.4 (big vehicles as cover, R2-SYNC-OQ8) | Not enough alone: open-ground walls and moving vehicles; Q3 itself commented its PVS test out of bot sight (F2) |
+| Fit | §6.2; vehicles never give cover | §6.2 and §6.4 ([big vehicles](GLOSSARY.md#big-vehicle-and-very-large-unit) as cover, R2-SYNC-OQ8) | Not enough alone: open-ground walls and moving vehicles; Q3 itself commented its PVS test out of bot sight (F2) |
 
 ### 5. Obstacles placed mid-match (for later building) (R4-OBST)
 
@@ -655,8 +662,9 @@ rebuilt). Player building is only "don't design it out": nothing here designs a 
 ## Recommendations
 
 Every pass mark and every reference machine below is proposed (VISION_V2 §3, §4 and §6 give the only targets).
-Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes (one core of the R6 server type; the
-VISION_V2 §4 minimum laptop for Wasm).
+Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes
+([one vCPU](GLOSSARY.md#the-measuring-unit-one-vcpu) of the reference server,
+[GLOSSARY](GLOSSARY.md#the-reference-server): R6-HOST-REC2's CCX23; the VISION_V2 §4 minimum laptop for Wasm).
 
 ### 1. Rapier 3D or custom (R4-PHYS)
 
@@ -688,13 +696,16 @@ VISION_V2 §4 minimum laptop for Wasm).
      under banzai or in the bayonet charge, GP3, shamble-core.js:128-137, shamble-game.js:2756 and :2774; that is
      0.22 m per tick at 60 Hz and 0.44 m at 30 Hz, both more than the wall, arithmetic; `T.sprintMult` 1.4286 is never
      read, GP3).
-  2. **Cost.** At R1-ECS-REC1 mark 1's stress load, movement plus all physics queries take at most half of that mark's
-     mean tick (≤ 1 ms native mean), reported separately from AI and abilities; Wasm in a Worker ≤ 2× native.
+  2. **Cost.** In the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)), movement plus all physics queries take
+     at most 1 ms native [mean](GLOSSARY.md#time-statistics), with the p99 reported, inside the sim step share
+     ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share)), reported separately from AI and
+     abilities; Wasm in a Worker ≤ 2× native.
   3. **Determinism.** 0 per-tick hash mismatches between native and Wasm over R1-DET-REC1's runs, with parry3d's flag
      on; the static BVH built from the same map document has byte-identical nodes on both targets.
   4. **Size.** The sim .wasm with parry3d, with rapier3d (option B) and with neither, after wasm-opt and gzip, is
      recorded (extends R1-ECS-REC1 mark 5).
-  5. **The fallback, measured once.** The same 48 soldiers moved by Rapier's controller over the same static world
+  5. **The fallback, measured once.** The same soldiers as mark 2 (the largest mode's N,
+     [GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)) moved by Rapier's controller over the same static world
      (option B), with autostep on (F2's cost warning): cost, parity under mark 1, and size. The ADR picks C unless B
      wins on marks 1 and 2.
   6. **Shape pairs.** Every shape pair the sim needs is supported by parry3d's swept, overlap and ray tests: the
@@ -703,6 +714,8 @@ VISION_V2 §4 minimum laptop for Wasm).
      hulls (compounds) against the same and against soldier capsules: 0 `Err(Unsupported)` results (F20) over marks 1
      and 2's runs. A pair that is not supported is listed in the ADR, since this recommendation's reason does not hold
      for that pair.
+
+  Cross-topic open questions: R4-XT-OQ2, R4-XT-OQ8.
 
 - **R4-PHYS-REC2. One static collision world from the map document, immutable for the match, with stable ids; one set
   of queries for every user.**
@@ -728,6 +741,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   random rays; (d) the static BVH build for the greybox takes ≤ 50 ms native at match start (proposed; legacy's nav
   grid build took 42.8 ms on Cabana, GN11).
 
+  Cross-topic open questions: R4-XT-OQ5.
+
 - **R4-PHYS-REC3. Projectiles as per-tick swept queries, never as physics bodies; no CCD.**
   Hitscan is a ray query (R2-SYNC-REC5). Each slow projectile (bolt, grenade, Molotov, rocket) moves by the sim's
   integrator on the fixed tick, then tests the segment from its last position: a ray for point-like ones, a shape cast
@@ -741,7 +756,7 @@ VISION_V2 §4 minimum laptop for Wasm).
   Serves: VISION_V2 §6.3 (weapons and abilities as data, whose projectiles share one flight model) and §6.2.
   A spike must prove (proposed): 0 tunnelling through a 0.2 m wall in 10,000 shots at the fastest projectile speed in
   the data, at 30 and 60 Hz; a grenade thrown at a wall bounces back in 100 % of 1,000 throws; the landing point of a
-  fixed throw is identical on native and Wasm (state hash).
+  fixed throw is identical on native and Wasm ([state hash](GLOSSARY.md#state-hash)).
 
 - **R4-PHYS-REC4. Big vehicles as kinematic compound bodies, moved by a swept test against statics and soldiers; no
   substeps at 30 Hz.**
@@ -762,9 +777,9 @@ VISION_V2 §4 minimum laptop for Wasm).
   Serves: VISION_V2 §6.4 (big, multi-part vehicles).
   A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of 48 soldiers for 10 minutes, turning
   on the spot and while moving, has 0
-  ticks that end with a soldier or a wall inside its hull (penetration > 1 cm); the stress load for R1-DET-REC3 and
-  R1-ECS-REC1 mark 1 keeps 8 big vehicles (R1-ECS-REC1's number), harvesters included (LOOP_V2 §3; how many per team
-  is the game-designer's), at 30 and 60 Hz.
+  ticks that end with a soldier or a wall inside its hull (penetration > 1 cm); the stress scene
+  ([GLOSSARY](GLOSSARY.md#the-stress-scene)), which R1-DET-REC3 and R1-ECS-REC1 mark 1 use, holds 15 big vehicles,
+  harvesters included (LOOP_V2 §3; how many per team is the game-designer's, R2-BUD-OQ5), at 30 and 60 Hz.
 
 - **R4-PHYS-REC5. f32 for the whole sim, revisited only if a map exceeds 2 km across.**
   The reason: R1-DET-OQ3 leaves f32 or f64 to R4 with the map size. Legacy spans 372 m (`GROUND_W`); LOOP_V2 §9 starts
@@ -823,6 +838,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   6. **The comparison.** For both generators: node count, data size in the map document, mean and p99 query cost, and
      path length against the straight-line optimum; the ADR picks by marks 1 to 5 first, then these numbers.
 
+  Cross-topic open questions: R4-XT-OQ5.
+
 - **R4-NAV-REC2. Path requests go through a queue with a fixed budget per tick, measured in node expansions, served in
   a rotating fair order; bots heading to shared goals read cached per-goal distance tables.**
   Each bot asks for a route when it has none, when its goal moves past a threshold, or when it is stuck, with
@@ -836,12 +853,13 @@ VISION_V2 §4 minimum laptop for Wasm).
   Rests on: F4, F19; legacy GN5 (the stall figures), GN9, GN12, GN13, TL13; LOOP_V2 §10; R1-TICK-REC2 (the P1
   scene), R1-XU-OQ1, R4-PHYS-REC4 (the vehicle count).
   Serves: VISION_V2 §3 (up to 24v24, bots fill empty slots) and §6.2 (bots between levels).
-  A spike must prove (proposed): in R1-TICK-REC2's P1 scene at N = 48 and N = 64 bots, with 8 big vehicles instead of
-  P1's 4 (the count R4-PHYS-REC4 proposes; the one stress scene is R1-XU-OQ1's, for the synthesis), and an uplink
-  cache carried around the map: navigation (queries plus route following) takes ≤ 10 % of the tick's p99 budget; no
-  bot waits more than 1 s for a route (legacy: 52-57 % route denials at 48, GN13); at most 2 replans per bot per
-  second at p99; the
-  headless stall rate is no worse than legacy's best measured 7.73 % (TL13 method, 3 runs per build).
+  A spike must prove (proposed): in the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)) at the largest mode's
+  N and in its N = 64 [headroom run](GLOSSARY.md#the-design-point-and-headroom), and an uplink cache carried around
+  the map: navigation (queries plus route following) takes ≤ 10 % of the server tick budget at p99
+  ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 5 % of the [tick period](GLOSSARY.md#tick-period), inside the sim
+  step share); no bot waits more than 1 s for a route (legacy: 52-57 % route denials at 48, GN13); at most 2 replans
+  per bot per second at p99; the headless stall rate is no worse than legacy's best measured 7.73 % (TL13 method, 3
+  runs per build).
 
 - **R4-NAV-REC3. Local avoidance is a step inside the sim's movement phase, never a crowd system that moves agents.**
   Each bot's route gives a preferred velocity; an avoidance step adjusts it against neighbours taken from the movers'
@@ -860,6 +878,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   longer than 3 s, and per-tick state hashes identical on native and Wasm; the avoidance step costs ≤ 0.2 ms p99 native
   at 48 (proposed); in R4-FLOORS-REC2's two-floor test building, 0 avoidance pairs join bots on different floors.
 
+  Cross-topic open questions: R4-XT-OQ6.
+
 - **R4-NAV-REC4. Navigation runs where bots run: on the server, and in the browser only for offline or local-bot play.
   Client prediction never runs it. Navigation data changes only with the map: a new bake means a new match.**
   The reason: R1's cross-topic note asks whether navigation runs only on the server. Prediction replays only the local
@@ -870,6 +890,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   Serves: VISION_V2 §6.2 (bots that move between levels; "offline too" is our gloss) and §3 (bots fill empty slots).
   A spike must prove (proposed): the client's Worker build without bots skips the navigation data (its size reported);
   with bots, offline play at the largest mode meets R1-TICK-REC2's P2 mark.
+
+  Cross-topic open questions: R4-XT-OQ3, R4-XT-OQ4.
 
 ### 3. Bots moving between floors (R4-FLOORS)
 
@@ -924,6 +946,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   A spike must prove (proposed): changing `jumpV` in the tuning data without re-baking makes CI and the editor's
   validation panel report the map's navigation as stale (1 of 1 cases); after the re-bake the hash matches.
 
+  Cross-topic open questions: R4-XT-OQ5.
+
 ### 4. Line of sight across heights (R4-LOS)
 
 - **R4-LOS-REC1. One height-aware sight query in the sim, used by bots, blasts, melee, the shield check and the shared
@@ -951,8 +975,12 @@ VISION_V2 §4 minimum laptop for Wasm).
   3. **Ramps and ledges.** On the Octopon-3 greybox, 0 of 10,000 pairs blocked by a ramp's bounding box but clear of
      its slope (the legacy disagreement, GN7).
   4. **Cost, answering R2-INT-OQ5.** Mean and p99 cost of one segment query on the greybox, native and in a browser
-     Worker, with method; and R2-INT-REC3's full pass (24v24 and 16v16v16, three points) inside its 10 % budget.
+     Worker, with method; and R2-INT-REC3's full pass (24v24 and 16v16v16 from the test-mode list,
+     [GLOSSARY](GLOSSARY.md#the-test-mode-list), and 18v18v18 under MODES-3 (b); three points) inside its share
+     ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 5 % of the tick period).
   5. **Determinism.** The pass's results hash identically on native and Wasm per tick.
+
+  Cross-topic open questions: R4-XT-OQ7.
 
 - **R4-LOS-REC2. Cull before casting, and budget sight in rays per tick: distance and team first, then area
   connectivity, then (if bots get one) field of view, then segments.**
@@ -966,8 +994,10 @@ VISION_V2 §4 minimum laptop for Wasm).
   for interest), which is why the marks below test that worst case.
   Rests on: F1, F2; R2-INT-F19, R2-INT-F20, R2-INT-REC2, R2-INT-REC3; legacy GN4.
   Serves: VISION_V2 §6.2 and §3 (up to 24v24, bots fill empty slots).
-  A spike must prove (proposed): at 24v24 and 16v16v16 with everyone in one fight on the greybox, every bot scans at
-  least 4 times per second (legacy's rate at 12 soldiers, GN4) within R2-INT-REC3's 10 % budget; the share of pairs
+  A spike must prove (proposed): at 24v24 and 16v16v16 (the test-mode list, [GLOSSARY](GLOSSARY.md#the-test-mode-list))
+  and, under MODES-3 (b), 18v18v18, with everyone in one fight on the greybox, every bot scans at least 4 times per
+  second (legacy's rate at 12 soldiers, GN4) within R2-INT-REC3's share
+  ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 5 % of the tick period); the share of pairs
   culled before a ray and the rays per tick are reported.
 
 - **R4-LOS-REC3. Aim at height through the same queries on both sides: the client's cursor ray and the server's shot
@@ -979,6 +1009,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   Serves: VISION_V2 §6.2 (aiming at height).
   A spike must prove (proposed): R2-SYNC-REC8's mark 1; and a downward cursor ray onto a ramp lands within 1 cm of the
   slope in 1,000 of 1,000 samples (legacy: 1.25 m above it).
+
+  Cross-topic open questions: R4-XT-OQ1.
 
 ### 5. Obstacles placed mid-match (for later building) (R4-OBST)
 
@@ -997,8 +1029,9 @@ VISION_V2 §4 minimum laptop for Wasm).
   scene); legacy GC17, GN13; LOOP_V2 §10.
   Serves: VISION_V2 §6.4 (big, multi-part vehicles; that bots treat them as moving obstacles is inferred) and §3 (bots
   fill empty slots).
-  A spike must prove (proposed pass marks): R4-PHYS-REC4's stress scene (48 bots, 8 big vehicles including harvesters)
-  for 10 minutes at 30 and 60 Hz: 0 bots stuck longer than 3 s against a vehicle; at most 2 replans per bot per second
+  A spike must prove (proposed pass marks): the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene): the largest
+  mode's N bots, 15 big vehicles including harvesters) for 10 minutes at 30 and 60 Hz: 0 bots stuck longer than 3 s
+  against a vehicle; at most 2 replans per bot per second
   at p99 (R4-NAV-REC2's mark), with vehicles driving through the bots' routes; the marking and avoidance work for
   vehicles reported as a share of the tick; per-tick hashes identical on native and Wasm.
 
@@ -1019,7 +1052,8 @@ VISION_V2 §4 minimum laptop for Wasm).
   team-funded rebuilds).
   A spike must prove (proposed): destroying a test wall opens its route, its sight lines and its portal in the same
   tick (0 ticks of disagreement over 1,000 destroy and rebuild cycles); every route found after a flip is walked by
-  the sim's movement without failure in 1,000 traversals; a flip costs ≤ 0.1 ms native (proposed).
+  the sim's movement without failure in 1,000 traversals; a flip costs ≤ 0.1 ms native at p99 (proposed;
+  [GLOSSARY](GLOSSARY.md#time-statistics)).
 
 - **R4-OBST-REC3. Split the bake into fixed tiles with stable ids only if a full bake is too slow for the editor's
   Test (R4-NAV-REC1 mark 1 fails); the editor then re-bakes only what an edit
@@ -1107,6 +1141,71 @@ VISION_V2 §4 minimum laptop for Wasm).
   oriented hull is best an obstacle polygon updated per tick or several circles is not settled by the pages read.
   Decided by REC1's spike.
 
+### Shared open questions (the same words in every topic)
+Added 2026-10-30 (step 3c): the decision questions the consistency resolutions share between topics, worded as
+approved (`.checkpoints/v2-research/resolutions.md`, advisor verdict of 2026-10-30), each headed by its decision code,
+so a search for the code finds every copy.
+- **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+  and three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
+  6v6v6; the largest mode is then the goal 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N
+  ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which the stress scene, the offline scale test (R1-TICK-OQ7),
+  the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the test-mode list
+  ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives
+  both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+
+### Cross-topic open questions (consistency critic, 2026-10-29)
+Added 2026-10-30 (step 3c): the consistency critic's hidden dependencies and gaps that touch this topic, in the
+critic's words (`.checkpoints/v2-research/cross-topic-oqs.md`, approved by the advisor on 2026-10-30), each with its
+id and both sides' ids; the recommendations they name point here.
+- **R4-XT-OQ1. Who casts the cursor ray for the aim point, and how does the point cross the boundary?** The aim point
+  must come from a Rust ray query against what the page draws (interpolated positions live on the page). But R1 allows
+  the page no Wasm calls and no sim maths in TypeScript, and R1's command carries yaw and pitch, not a point. No topic
+  says which side casts the cursor ray, against which interpolated state, or how the result crosses the boundary. Side
+  A: R1-BND-REC1; R1-BND-REC3; R1-DET-REC2. Side B: R2-SYNC-REC8; R4-LOS-REC3. Existing questions: none. Decided by:
+  ADR-0001 (the command format) and ADR-0004 (the boundary), with R2-SYNC-REC8 mark 1 and R1-BND-REC1 mark 2 as the
+  spike marks. (Consistency critic, 2026-10-29, rank 2.)
+- **R4-XT-OQ2. Which R1 items still assume Rapier, now that R4 recommends parry3d?** R4 states openly that some of
+  R1's Rapier items change. It does not list R1-TICK-REC2's reason for starting at 60 Hz (Rapier's default step),
+  R1-ECS-REC1's reason and mark 5, R1's TL;DR, or whether R1-RR-OQ1's SIMD/FMA hazard applies to parry3d's "3D f32
+  SIMD" BVH (R4-PHYS-OQ3 asks only by analogy). ADR-0004's determinism and snapshot sections rest on whichever crate
+  wins. Side A: R1-DET-REC3; R1-ECS-REC4; R1-ECS-REC1; R1-TICK-REC2; R1-RR-OQ1. Side B: R4-PHYS-REC1. Also named:
+  R4-PHYS-OQ3. Existing questions: R4 'Wave-1 items R4 changes or answers' (r4:1110-1129 at commit 8dee746) and
+  R4-PHYS-OQ3, partly. Decided by: ADR-0004 (sim core: physics), with R4-PHYS-REC1 marks 2-5 and R1-DET-REC6's suite
+  as the evidence. (Consistency critic, 2026-10-29, rank 3.)
+- **R4-XT-OQ3. Is whole-world replay still a spike mark?** R2 answers R1's question by subject without citing it, and
+  R4 already builds on the local-only answer (no navigation in prediction). R1's whole-world replay mark (and the
+  snapshot cost it sizes) is still a proposed spike mark for a model no topic recommends. Side A: R1-ECS-REC1;
+  R1-XU-OQ2. Side B: R2-SYNC-REC3; R2-SYNC-REC9; R4-NAV-REC4. Also named: R1-ECS-OQ3. Existing questions: R1-XU-OQ2
+  (with R1-ECS-OQ3, R1-DET-OQ6, R1-ABL-OQ4). Decided by: ADR-0001 (prediction scope), then ADR-0004 keeps or drops
+  R1-ECS-REC1 mark 3. (Consistency critic, 2026-10-29, rank 14.)
+- **R4-XT-OQ4. Do browser navigation and server-less previews rest on an undecided offline-play need?** R4 builds
+  navigation for the browser, R6 serves previews without a game server, and R5 plans the first previews, all on
+  offline play, which R1 leaves as an open VISION question (and, at the largest mode, as R1-TICK-OQ7). Side A:
+  R1-BND-OQ1. Side B: R4-NAV-REC4; R6-HOST-REC3; R5-PREV-OQ3. Also named: R1-TICK-OQ7, R1-XU-OQ12. Existing questions:
+  R1-BND-OQ1, R1-TICK-OQ7, R1-XU-OQ12. Decided by: Mustafa and the Advisor (VISION_V2), then ADR-0004 and ADR-0006.
+  (Consistency critic, 2026-10-29, rank 15.)
+- **R4-XT-OQ5. Where do the navigation bake and R4's checks live in the crates and the gate?** Where the bake code
+  lives decides whether the generator ships in the player's Wasm (R4-NAV-REC4 wants a bot-free build to skip
+  navigation data) and how the editor runs it in a Worker. The gate does not include R4's checks. Side A: R4-NAV-REC1;
+  R4-FLOORS-REC3. Side B: missing answer (R5-LAYOUT-REC2 named). Also named: R4-PHYS-REC2, R5-GATE-REC1. Existing
+  questions: none. Decided by: ADR-0002 (crate list and gate checks) with ADR-0004 (navigation). (Consistency critic,
+  2026-10-29, rank 24.)
+- **R4-XT-OQ6. Do soldiers block each other? (one rule, asked twice)** The same rule is asked twice, with different
+  spikes named. R2-SYNC-REC7 mark 3 and R4-NAV-REC3's avoidance marks both depend on one answer. Side A: R2-SYNC-OQ5.
+  Side B: R4-PHYS-OQ1; R4-NAV-OQ5. Also named: R2-SYNC-REC7, R4-NAV-REC3. Existing questions: R2-SYNC-OQ5,
+  R4-PHYS-OQ1, R4-NAV-OQ5. Decided by: The game-designer with Mustafa, stated once in the synthesis (ADR-0004 and
+  ADR-0001). (Consistency critic, 2026-10-29, rank 30.)
+- **R4-XT-OQ7. Who owns audio occlusion rays, if option O-B is chosen?** Page-side audio rays would need the sim's
+  query across a boundary that allows no page calls. This only matters if option O-B is adopted. Side A:
+  R3-AUDIO-REC3; R3-AUDIO-OQ5. Side B: missing answer (R4-LOS-REC1 named). Also named: R1-BND-REC1. Existing
+  questions: R3-AUDIO-OQ5. Decided by: ADR-0003 with ADR-0004, only if R3-AUDIO-REC3's spike asks for O-B.
+  (Consistency critic, 2026-10-29, rank 35.)
+- **R4-XT-OQ8. Does R5's cache question size a workspace no topic proposes?** R5's cache question assumes crates R1
+  and R4 recommend against, so it sizes a workspace no topic proposes. Side A: R5-CI-OQ1. Side B: R1-ECS-REC1;
+  R4-PHYS-REC1. Existing questions: none. Decided by: ADR-0002 (crate list), then the cache spike (R5-CI-REC1 mark 2).
+  (Consistency critic, 2026-10-29, rank 40.)
+
 ### Wave-1 items R4 changes or answers (said openly, not silently)
 
 These follow from R4's recommendations; where they change a wave-1 recommendation, the ADR-0004 synthesis decides,
@@ -1114,10 +1213,11 @@ with R4-PHYS-REC1's spike as the evidence.
 - R1-ECS-REC4 and R1-ECS-REC1 mark 2 assumed Rapier's sets in the snapshot. Under R4-PHYS-REC1 (option C) there are
   none; if the spike picks option B instead, the static world stays outside the snapshot (R4-PHYS-REC2), and R1's
   marks apply only to what Rapier holds.
-- R1-DET-REC3's flag moves to parry3d's own `enhanced-determinism` (R1-DET-F23); its spike scene stands, with the
-  vehicle count it asked R4 for: 8 big vehicles, harvesters included (R4-PHYS-REC4).
-- R1-TICK-REC2's P1 scene has 4 big vehicles; R4 proposes 8 there too (R4-PHYS-REC4), so R4-NAV-REC2's mark runs P1
-  with 8. The one stress scene stays R1-XU-OQ1's, for the synthesis.
+- R1-DET-REC3's flag moves to parry3d's own `enhanced-determinism` (R1-DET-F23); its spike scene is now
+  the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)), whose 15 big vehicles include harvesters
+  (R4-PHYS-REC4).
+- R1-TICK-REC2's P1 scene had 4 big vehicles and R4 proposed 8 (R4-PHYS-REC4); R1, R3 and R4 now share one
+  stress scene with 15 ([GLOSSARY](GLOSSARY.md#the-stress-scene)), which settles the scene part of R1-XU-OQ1.
 - R1-TICK-OQ9 answered: no physics substeps for kinematic, swept vehicles at 30 Hz (R4-PHYS-REC4).
 - R1-DET-OQ3 answered with a bound: f32, up to a 2 km map (R4-PHYS-REC5).
 - R1-DATA-OQ7 answered for navigation: navigation data and geometry never change mid-match; only flags do
@@ -1293,6 +1393,34 @@ WITH NOTES, nits only.
   fails") in its heading, its Serves line and the editor pointer; R4-OBST-REC2's LOOP_V2 §3 citation narrowed to the
   harvester; "offline too" marked as our gloss; source 47's URL no longer marked inferred. Review stops here: what
   remains is nits.
+
+### Consistency resolutions (2026-10-30)
+Applied by engine-architect in step 3c of `.checkpoints/v2-research/plan-amendments-2.md`: the resolutions of the
+consistency critic's 12 contradictions as the advisor approved them on 2026-10-30
+(`.checkpoints/v2-research/resolutions.md`, verdict in `advisor-resolutions-verdict.md`), the terms of
+[GLOSSARY.md](GLOSSARY.md) and the shared cross-topic open questions (`cross-topic-oqs.md`). Nothing was fetched; no
+claim, number or source was added. Every "before" quote matched the file exactly once.
+- **Resolution 1 (the server tick budget; REVISE, applied as folded):** C1.15 (R4-PHYS-REC1 mark 2), C1.16
+  (R4-NAV-REC2), C1.17 (R4-LOS-REC1 mark 4), C1.18 (R4-LOS-REC2).
+- **Resolution 9 (the stress scene; REVISE, wording outside R4's texts):** C9.17 (R4-PHYS-REC1 mark 2), C9.18
+  (R4-PHYS-REC4), C9.19 (R4-NAV-REC2), C9.20 (R4-OBST-REC1), C9.21 and C9.22 (the wave-1 list).
+- **Resolution 10 (MODES-3, escalated; the interim wording):** C10.14 (R4-LOS-REC1 mark 4), C10.15 (R4-LOS-REC2),
+  C10.16 (MODES-3 inserted).
+- **Resolution 11 (one vCPU of the reference server):** C11.13 (the recommendations' preface).
+- **Resolutions 5, 6, 17, 19, 21, 22, 23 and 29:** no R4 change.
+- **Recommendation changes, for the verifier (advisor condition 4):** C1.15 to C1.18, C9.18 to C9.20; and two that
+  follow from definitions: R4-PHYS-REC1 mark 5's "The same 48 soldiers" is now the same soldiers as mark 2 (the largest
+  mode's N, so 54 under MODES-3 (b)), and R4-OBST-REC2's flip cost now says "at p99" (GLOSSARY: time statistics).
+- **Glossary terms:** the header and the first use of each term link GLOSSARY.md; every "Retire (exact)" phrase is
+  gone outside quotes and dated records (the session's check script: 5 hits before, 0 after; the one outside the
+  resolutions was "the tick budget" in the wave-1 line of the R4-LOS legacy facts, now the server tick budget with
+  GLOSSARY's 5 % of the tick period). In-context words that mean something else (vehicles in general, the sources'
+  "characters read", 48 in legacy facts and in R4-PHYS-REC4's and R4-NAV-REC3's crowd tests, a Rests-on line's "stress
+  load", the wave-1 list's name of R1's own P1 scene) stay; the step-3d verifier judges them.
+- **Shared question added** (part 6, "Shared open questions (the same words in every topic)"): MODES-3. **Cross-topic
+  questions added** (part 6, "Cross-topic open questions (consistency critic, 2026-10-29)"): R4-XT-OQ1 to R4-XT-OQ8 in
+  the critic's words, with a pointer line in each of the 8 recommendations they name.
+- **OBJECT:** none.
 
 ## Sources
 
