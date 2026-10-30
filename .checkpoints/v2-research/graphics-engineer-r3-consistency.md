@@ -38,3 +38,17 @@ Restarted 2026-10-30 ~20:10 UTC after the spend limit: r3-rendering.md unchanged
 recommendation 4 (C9.14; R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC3: the largest mode's N, 48 or 54); number 1 (C9.13, approved arithmetic); source 0; nit 27 (C9.12, C9.15, C9.16, C10.12; MODES-3 + 8 XT entries; 5 pointers; 5 glossary wording changes; link pass; header 2; part 7). OBJECT: none.
 DONE
 ## Step 3d fix round (2026-10-30, coordinator message; advisor-3d-r3-verdict.md items 5, 6; script's compound-48 hits)
+- Item 5: R3-LOOK-REC3 term note added word for word after its spike mark; row unchanged. nit
+- Item 6: ", p99" on R3-BUDGET-REC2's 8 rows (CPU, animation, sim cost, GPU total, shadow, main, post-processing, effects). recommendation
+- Item 6: R3-CHAR-REC1 2.0 ms (p99), 1.0 ms (p99). recommendation
+- Item 6: R3-CHAR-REC2 1.0 ms (p99). recommendation
+- Item 6: R3-CHAR-REC4 2.0 ms (p99) GPU time. recommendation
+- Item 6: R3-AUDIO-REC3 0.2 ms (p99) per frame. recommendation
+- Item 3: r3:885 options V-A "48-player fight" -> fight at the largest mode's N (48 or 54, MODES-3; GP6): wrong (v2's largest fight, cf. GP6 "At 48+ players"). nit
+- Item 3: r3:1248 R3-AUDIO-REC2 reason "48-player fight" -> fight at the largest mode's N (48 or 54, MODES-3): wrong. nit (a reason, no mark changes)
+- Item 3: r3:1396 R3-AUDIO-OQ2 "48-bot fight" is the inventory's wording (GP6, docs/LEGACY_INVENTORY.md:316 "a 48-bot fight"), unquoted paraphrase: kept, the term added beside it ("for v2, a fight at the largest mode's N, 48 or 54, MODES-3"). nit
+- Part 7: "Step 3d fixes (2026-10-30):" with 9 lines added under "Consistency resolutions (2026-10-30)". nit
+- Observation (not changed, not in the advisor's list): R3-AUDIO-REC1's spike "under 0.5 ms per frame" and "less than 0.3 ms" also name no statistic.
+- Checks: glossary_check R3 exact 0, header link True; repo-map OK. No OBJECT. Not committed.
+## Fix-round totals: recommendation 5 (BUDGET-REC2 rows, CHAR-REC1, CHAR-REC2, CHAR-REC4, AUDIO-REC3); nit 5 (LOOK-REC3 note, 885, 1248, 1396, part 7); number 0; source 0.
+DONE (fix round)
