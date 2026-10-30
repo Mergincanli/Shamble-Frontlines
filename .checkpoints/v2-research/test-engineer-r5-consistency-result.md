@@ -40,3 +40,7 @@ I fixed all four step-3d items in `/home/user/Shamble-Frontlines/docs/research/r
    - r5:1426 stays: "the 48-player scale" names VISION_V2 §3's design point, not the largest mode.
 
 The check script still finds 0 exact hits in R5; the in-context count went from 45 to 48. My guess is the three extra hits are the new "(48, or 54 under MODES-3 (b))" values, which sit beside the term. Notes: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/test-engineer-r5-consistency.md`.
+
+## Addendum: the final check's nit (reply to `prompts/r5-3d-final-nit.txt`, about 21:02 UTC, verbatim)
+
+Applied as a nit, with its part-7 line; not committed. r5:1426 now reads: "§3 ([the design point](GLOSSARY.md#the-design-point-and-headroom) (48 players))."
