@@ -27,3 +27,5 @@
 - Re-ran glossary_check.py --skip-records into scratchpad/3d-r2/run: R2 exact 0, in context 198, header links True; my R2 hit rows identical to glossary-hits-3c-r2.tsv (diff empty).
 - Exact retired phrases grepped by hand: outside part 7 only inside quotes in R2-XU-OQ8 (r2:3183-3184, framed "their figures before 2026-10-30") and R2-XU-OQ9 (r2:3195-3197: present-tense quotes "R2-BUD-REC6 proposes "one vCPU of the EU instance type R6 recommends"", ROOM-REC2 "one 4-vCPU EU cloud VM, R6 to name it", TRN-REC1 "reference server hardware R6 names": the recs no longer say this; answered by C11.11's closing sentence) -> NIT (stale quotes, no framing like XU-OQ8's). Unsearchable exact pattern "the worst case (48 players plus vehicles and projectiles …)": 0 in R2. Retire (exact) = 0 confirmed.
 - Hits file started: verifier-r2-3d-hits.tsv (header). Next: judge 198 hits in order.
+- hits 1-40 judged (all right). Next: hits 41-80.
+- hits 41-85 judged (all right). Next: hits 86-130.

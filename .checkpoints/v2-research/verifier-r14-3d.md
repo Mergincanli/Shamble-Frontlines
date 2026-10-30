@@ -21,3 +21,21 @@ Hits judged 0-29 (R1 42..1270): 30 right. Next rows 30+.
 Hits judged 30-64: 35 right. Next 65+.
 Hits judged 65-99: 34 right, 1 wrong (R1:2279 BND-REC2 mark 4 '48 soldiers'). Next 100+.
 Hits judged 100-129: 29 right, 1 wrong (R1:2736 BND-OQ6 'at N = 48'). R1 done (129 rows: 127 right, 2 wrong). Next R4 rows 130+.
+Hits judged 130-183: R4 55 rows: 52 right, 3 wrong (r4:778, r4:877, r4:879). ALL 184 judged: 179 right, 5 wrong.
+Check 4 extras: Retire (exact) by reading: R1 0 and R4 0 outside dated records ("whole ticks" hits are GLOSSARY "Keeps"; "the tick budget" only in part-7 2026-10-30 record quoting the old phrase). Header links GLOSSARY.md both. Unlinked first literal uses (R1 slots r1:293, predicted r1:518, start r1:209; R4 N r4:347, preview r4:727, goal r4:165, mean r4:403) all other meanings: right. Not-searchable pattern "zero uses of ... outcome code": gone (C29.3). Nit: r1:1633 options table "a rule against default-hasher HashMap iteration (F23)" predates the type ban (findings table, not a REC).
+VISION_V2 §3 (docs/VISION_V2.md:43-44) has both MODES-3 quotes (bold markup aside): confirmed.
+Check 5 labels: R1 keep "verified (every recommendation claim)" (K1-K10 confirmed, none wrong/unsupported). R4: no Rests-on list changed in 3c, every changed R4 REC rests on an R4 finding confirmed in part 7 (PHYS-REC1 F1.., PHYS-REC4 F7/F8/F13, NAV-REC2 F4/F19, LOS-REC1 F1/F3/F4, LOS-REC2 F1/F2, OBST-REC1 F1-F3, OBST-REC2 F4): label stays "spot-checked (50 of 52 key claims)".
+Next: check 6 source sample.
+Check 6 (sample, 10 rows):
+1 riotgames fog-war -> R2-INT-REC3: holds (r2:3537 hinge row cites it).
+2 cedric-neukirchen -> note netcode-architect-r2-interest.md:187 at 381122d: holds (line matches).
+3 sohu/juejin/gamedev Overwatch write-ups -> "no tie found": DOES NOT HOLD: r2:3531 hinge row R2-SYNC-REC1 lists "sohu.com, juejin.cn and gamedev.net" write-ups; UNREAD_SOURCES.md:34 (part 1) has the same row. Cell should be "a recommendation hinges on it (part 1: R2 R2-SYNC-REC1)". Script matcher misses non-URL names.
+4 gdcvault 1024041 -> R1-ABL-REC1: holds (r1:3213 hinge row).
+5 rapier.rs/docs/ -> "named by R4-LOS-F4, PHYS-F1, F11, F12, F17, F7, F9": DOES NOT HOLD as worded: the ids exist (r4:56..503) but cite guide sub-pages (rapier.rs/docs/user_guides/rust/...), which were read; the index itself is cited by none (r4:1503 "allowed, not fetched: the docs index; the specific guide pages were read"). URL-prefix artefact; should be no tie (not needed).
+6 w3.org 2019/09/03-me-irc -> note engine-architect-r1-boundary-worker.md:57 at 381122d: holds (line ends "www.w3.org/2019/09/03-me-irc (allowed, meeting log, not read: other-tier lead only)").
+7 mutants.rs -> R5-GATE-REC3: holds (r5:2048).
+8 Web Audio spec -> R3-AUDIO-OQ4: holds (r3:1401-1402 names www.w3.org/TR/webaudio-1.1/).
+9 SkinningNode.html -> graphics-engineer-r3.md:74 at 381122d: holds.
+10 Intel/AMD/NVIDIA spec pages -> "no tie found": DOES NOT HOLD: r3:1524 hinge row "R3-BUDGET-REC1 | Intel, AMD and NVIDIA product specification pages"; UNREAD_SOURCES.md:50 part 1. Should be "a recommendation hinges on it (part 1: R3 R3-BUDGET-REC1)".
+Sample: 7 hold, 3 do not (rows 3, 5, 10): back to the session's unread_sample/UNREAD_SOURCES script.
+Next: final review of unlisted diff changes, then report.

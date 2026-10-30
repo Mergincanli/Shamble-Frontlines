@@ -1,1 +1,86 @@
 topic	line	entry	phrase	right or wrong	reason
+R2	21	Team size and how modes are written	players	right	"48+ players": a player count (the design point, linked), not a team size
+R2	81	Team size and how modes are written	players	right	heading "for 48+ players": player count, not a team size
+R2	290	Team size and how modes are written	players	right	Quake III draws players (entities), not a team size
+R2	308	Team size and how modes are written	players	right	Quake III interpolates players (entities)
+R2	324	Team size and how modes are written	players	right	"the players' current server" positions: entities
+R2	331	Team size and how modes are written	players	right	Source rewinds "the other players": entities
+R2	369	Team size and how modes are written	players	right	Source filter "players within 1.5 x ...": entities (1st)
+R2	369	Team size and how modes are written	players	right	Source filter "and players ...": entities (2nd)
+R2	372	Player count (N)	characters	right	"265,981 characters" of a fetched page, not soldiers
+R2	452	Big vehicle and very large unit	vehicles	right	legacy GC17 design implication ("Vehicles need sim-owned mount points"), not a stress count
+R2	456	The largest mode, and its N	48	right	legacy GC2 measurement "At 48 soldiers": a measured count, not the largest mode
+R2	459	Team size and how modes are written	players	right	"48 players all on full auto": player count, not a team size
+R2	459	The largest mode, and its N	48	right	legacy-facts upper-bound arithmetic at a stated 48 (design point), not a mark set at the largest mode
+R2	601	The server tick budget	25 %	right	Fiedler's arithmetic coding "by 25 %" on data: not a tick share
+R2	697	Preview isolation and the isolation flag	always	right	"stance is always 0": not about previews
+R2	697	Team size and how modes are written	players	right	legacy hit world "players (id, position, ...)": entities
+R2	701	The largest mode, and its N	48	right	legacy CM4 "48 soldiers in combat": the measured count
+R2	701	The largest mode, and its N	48	right	"one simulation step at 48 soldiers": the same legacy measurement
+R2	702	Big vehicle and very large unit	vehicles	right	VISION_V2 §6.4 "vehicles multi-part" / estimate's vehicle counts as assumptions: not a stress count
+R2	717	Preview isolation and the isolation flag	always	right	Quake III "always" sends: not previews
+R2	772	Preview isolation and the isolation flag	always	right	Source "sent always": transmit state, not previews
+R2	773	Team size and how modes are written	players	right	"a team's players": entities, not a size
+R2	785	Preview isolation and the isolation flag	always	right	"A spectator always ...": not previews
+R2	791	Team size and how modes are written	players	right	"one team's players": entities, not a size
+R2	858	Team size and how modes are written	players	right	"48 players spread evenly": player count
+R2	858	The largest mode, and its N	48	right	R2-INT-F19's own arithmetic at a stated 48, not a mark at the largest mode
+R2	863	Big vehicle and very large unit	vehicles	right	"before vehicles, projectiles and events": bandwidth arithmetic, not a stress count
+R2	867	Preview isolation and the isolation flag	always	right	"teammates are always relevant": not previews
+R2	870	The measuring unit: one vCPU	one core	right	"one core of the measuring machine": a legacy measurement's machine (GLOSSARY Keeps, OBJECT-1 upheld)
+R2	882	The largest mode, and its N	48	right	legacy CD6/GN4 "demand about 1,100/s at 48 soldiers": legacy measurement
+R2	884	Team size and how modes are written	players	right	legacy hit world "players plus kinded static boxes": entities
+R2	887	Team size and how modes are written	players	right	"Spawning players inside it": entities
+R2	888	Preview isolation and the isolation flag	always	right	legacy "always delivers shots": not previews
+R2	1383	Team size and how modes are written	players	right	rooms scope "at 48+ players": design point player count
+R2	1395	Team size and how modes are written	players	right	GameLift "accept players": people, not a size
+R2	1528	Team size and how modes are written	players	right	TF2 "N players": TF2's player count
+R2	1539	Team size and how modes are written	players	right	PlayFab "new players": people
+R2	1583	The largest mode, and its N	48	right	legacy GC2 "perfbots at 48 soldiers": measurement
+R2	1583	The largest mode, and its N	48	right	"the 48-soldier JS number": the same legacy measurement
+R2	1610	Team size and how modes are written	players	right	options heading "for 48+ players": player count
+R2	1616	The largest mode, and its N	48	right	sync option A analysis "48 browsers must all agree": the design point, not a mark at the largest mode
+R2	1618	Team size and how modes are written	players	right	"authority over many players": people
+R2	1629	Active effect (and visual effect)	effects	right	"cosmetic rollback of effects": not a count
+R2	1677	The largest mode, and its N	48	right	table header "Downstream at 48 (table D)": the estimate's design-point row
+R2	1681	Team size and how modes are written	players	right	"at 48 players": player count
+R2	1681	The largest mode, and its N	48	right	T3 bandwidth at the estimate's 48 (design point)
+R2	1696	Team size and how modes are written	players	right	"48 players at 30 Hz": player count
+R2	1696	The largest mode, and its N	48	right	encoding options header at the estimate's 48 (design point)
+R2	1699	Team size and how modes are written	players	right	"at 64 players": headroom player count
+R2	1702	The server tick budget	25 %	right	"about 25 % below E3": bandwidth, not a tick share
+R2	1725	Team size and how modes are written	players	right	"for 48 players": player count
+R2	1725	The largest mode, and its N	48	right	the set-aside budget idea's own 48 (option table, recorded as weighed and set aside)
+R2	1725	The server tick budget	25 %	right	"about 25 % of the tick period": whole named
+R2	1725	The server tick budget	50 %	right	"the server tick budget's 50 %": beside the marking words
+R2	1727	The largest mode, and its N	48	right	legacy CM4 "at 48 soldiers": measurement
+R2	1728	The largest mode, and its N	48	right	table E budget idea "Snapshot encode, 48 clients": the design-point estimate behind 48 x 50 µs
+R2	1729	Team size and how modes are written	players	right	"at 48 players": player count
+R2	1729	The largest mode, and its N	48	right	history arithmetic "48 soldiers": the estimate at the design point
+R2	1729	The largest mode, and its N	48	right	"72 rewound shots per second at 48 players": the estimate at the design point
+R2	1737	The largest mode, and its N	48	right	"IPv6: 48 B": bytes
+R2	1760	The largest mode, and its N	48	right	estimate assumption "at 48: 10 events/s"
+R2	1761	Live projectile	projectiles alive	right	the bandwidth estimate's own 32 (GLOSSARY: R2's estimate keeps it), not the stress count
+R2	1761	Team size and how modes are written	players	right	"32 at 48 players": player count
+R2	1761	The largest mode, and its N	48	right	the estimate's assumption at 48
+R2	1762	Big vehicle and very large unit	vehicles	right	the estimate's vehicle assumption row (bandwidth), not the stress count
+R2	1765	Big vehicle and very large unit	vehicles	right	"V = vehicles": formula symbol
+R2	1765	Team size and how modes are written	players	right	"P = players and bots": player count
+R2	1775	The largest mode, and its N	48	right	row "(goal; design point 48)": labelled design point
+R2	1775	The largest mode, and its N	48	right	the P column value 48 of the design-point row
+R2	1777	The largest mode, and its N	48	right	estimate row "48, E3 at 20 Hz": design-point variant
+R2	1777	The largest mode, and its N	48	right	P column 48 of that row
+R2	1778	The largest mode, and its N	48	right	estimate row "48, E3 at 60 Hz"
+R2	1778	The largest mode, and its N	48	right	P column 48
+R2	1779	The largest mode, and its N	48	right	estimate row "48, E3b"
+R2	1779	The largest mode, and its N	48	right	P column 48
+R2	1780	The largest mode, and its N	48	right	estimate row "48, E2"
+R2	1780	The largest mode, and its N	48	right	P column 48
+R2	1781	The largest mode, and its N	48	right	estimate row "48, E1"
+R2	1781	The largest mode, and its N	48	right	P column 48
+R2	1782	Big vehicle and very large unit	vehicles	right	"5 vehicles in view": illustrative interest cut, not a stress count
+R2	1782	The largest mode, and its N	48	right	estimate row "48, illustrative interest cut"
+R2	1785	The largest mode, and its N	48	right	"A 48-human room": egress estimate at the design point
+R2	1786	The largest mode, and its N	48	right	"48 x 146 kbps": the same egress arithmetic
+R2	1827	Big vehicle and very large unit	vehicles	right	interest options row "Big units and vehicles": not a count
+R2	1827	Preview isolation and the isolation flag	always	right	"D5 always relevant": not previews

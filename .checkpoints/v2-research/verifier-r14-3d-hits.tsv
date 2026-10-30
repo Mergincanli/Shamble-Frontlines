@@ -129,3 +129,57 @@ R1	3919	The largest mode, and its N	48	right	heading count "Sources not read (48
 R1	3972	The access wall	login wall	right	search result's report of gdcvault's login, not our access wall
 R1	3973	The largest mode, and its N	48	right	source row number 48
 R4	49	Big vehicle and very large unit	vehicles	right	needs list "vehicles avoided, never carved" (general)
+R4	93	Big vehicle and very large unit	vehicles	right	heading "Rapier's bodies, vehicles and CCD" (findings about Rapier)
+R4	152	Preview isolation and the isolation flag	always	right	Rapier's "SIMD is now always on" (finding)
+R4	194	Player count (N)	characters	right	"first 100,000 of 117,438 characters read"
+R4	397	The start modes and the goal modes	the goal	right	a bot's navigation goal (legacy GN13)
+R4	398	The largest mode, and its N	48	right	legacy measurement "at 48 soldiers" (GN13)
+R4	405	The largest mode, and its N	48	right	LOOP_V2 §11 scale test N = 12/24/36/48
+R4	449	Player count (N)	characters	right	source characters read
+R4	466	The server tick budget	25 %	right	"25 % of siege legs" (legacy route share)
+R4	486	Player count (N)	characters	right	source characters read
+R4	519	The largest mode, and its N	48	right	legacy sight-check demand at 48 (GN4)
+R4	519	The largest mode, and its N	48	right	legacy "at 48 soldiers" scan rate
+R4	530	The sim step share and the server-only share	10 % of the server tick budget	right	value given beside it ("5 % of the tick period", linked)
+R4	537	Big vehicle and very large unit	vehicles	right	quotes VISION_V2 §6.4 "big and multi-part"
+R4	565	Player count (N)	characters	right	landmass quote "characters are only as obstacles"
+R4	580	Big vehicle and very large unit	vehicles	right	"big, multi-part vehicles" (design input, marking word big)
+R4	598	Big vehicle and very large unit	vehicles	right	"Big multi-part vehicles" (needs list, marking word)
+R4	609	Big vehicle and very large unit	vehicles	right	options table: Rapier sets hold vehicles (general)
+R4	609	Big vehicle and very large unit	vehicles	right	options table: soldiers and vehicles in our tables (general)
+R4	615	Big vehicle and very large unit	vehicles	right	options table effort row (general)
+R4	616	Big vehicle and very large unit	vehicles	right	options table fit row: Bullet-style cars (general)
+R4	636	Preview isolation and the isolation flag	always	right	"Always walkable" (floors options table), not isolation
+R4	648	Big vehicle and very large unit	vehicles	right	"vehicles never give cover" (option fit), no count
+R4	648	Big vehicle and very large unit	vehicles	right	"moving vehicles" (option fit), beside linked "big vehicles"
+R4	654	Big vehicle and very large unit	vehicles	right	"Moving vehicles" row of obstacle options table (general)
+R4	654	Big vehicle and very large unit	vehicles	right	same row, "Vehicles are large obstacles" (general)
+R4	770	Big vehicle and very large unit	vehicles	right	LOOP_V2 §6's vehicles (walker, tanks), general
+R4	772	Big vehicle and very large unit	vehicles	right	"kinematic vehicles" physics, no count
+R4	776	The stress scene	stress load	right	Rests-on line naming R1-ECS-REC1 mark 1's own scene (GLOSSARY carve-out)
+R4	777	Big vehicle and very large unit	vehicles	right	Serves "big, multi-part vehicles" (marking word)
+R4	778	The largest mode, and its N	48	wrong	R4-PHYS-REC4 spike "a crowd of 48 soldiers": single N in a pass mark, not a scale list nor labelled design point; reads as everyone in the largest mode (54 under MODES-3 (b)); unsure, so wrong
+R4	858	The sim step share and the server-only share	10 % of the server tick budget	right	value given beside it (5 % of the tick period, inside the sim step share)
+R4	860	The largest mode, and its N	48	right	legacy "52-57 % route denials at 48" (GN13)
+R4	877	The largest mode, and its N	48	wrong	R4-NAV-REC3 spike "48 bots crossing in a 6 m choke point": full-count crowd mark with no marking words (same mark as r4:879); unsure, so wrong
+R4	879	The largest mode, and its N	48	wrong	R4-NAV-REC3 "avoidance step costs ≤ 0.2 ms p99 native at 48": resolution 1 uses this as the sim-step-share row at the largest mode and scales it x1.125 at N = 54, so the largest mode is meant by a bare 48
+R4	941	Team size and how modes are written	players	right	"bots and players differ" (humans), not a team size
+R4	991	The largest mode, and its N	48	right	legacy "at 48 soldiers" scan rate (GN4)
+R4	1017	Big vehicle and very large unit	vehicles	right	"Moving vehicles are never carved" (rule), no count
+R4	1021	Big vehicle and very large unit	vehicles	right	"Wrecks and idle vehicles" (rule), no count
+R4	1025	Player count (N)	characters	right	libraries' "moving characters" (finding)
+R4	1030	Big vehicle and very large unit	vehicles	right	Serves "big, multi-part vehicles"
+R4	1035	Big vehicle and very large unit	vehicles	right	"vehicles driving through the bots' routes" in a mark already set on the stress scene's 15 big vehicles; no count
+R4	1036	Big vehicle and very large unit	vehicles	right	"work for vehicles reported" (no count)
+R4	1108	Preview isolation and the isolation flag	always	right	legacy "stance is always 0"
+R4	1109	Big vehicle and very large unit	vehicles	right	R4-FLOORS-OQ2 heading "Vehicles between levels" (general)
+R4	1109	Big vehicle and very large unit	vehicles	right	"Do bots drive vehicles" (general)
+R4	1119	Big vehicle and very large unit	vehicles	right	"Do soldiers and vehicles block sight" (general); "Big vehicles" follows
+R4	1150	The largest mode, and its N	48	right	MODES-3 shared text "the goal 24v24, N = 48" beside "the largest mode"
+R4	1150	The start modes and the goal modes	the goal	right	MODES-3 shared text, correct use
+R4	1219	The stress scene	R1-TICK-REC2's P1 scene	right	wave-1 list naming R1's own former scene (GLOSSARY carve-out; C9.22 approved text)
+R4	1221	Big vehicle and very large unit	vehicles	right	"kinematic, swept vehicles" (physics), no count
+R4	1271	Big vehicle and very large unit	vehicles	right	pointer "vehicles as cover in rewind" (general)
+R4	1450	Player count (N)	characters	right	source table characters
+R4	1481	Player count (N)	characters	right	source table characters
+R4	1483	Player count (N)	characters	right	source table characters
