@@ -7,11 +7,12 @@
 - **Date:** 2026-10-28 (every source below was read that day).
 - **Status:** spot-checked (21 of 42 key claims). The spot-check checked 19 of the then 40; the fix added R6-HOST-F8 and
   F20 to "Rests on:" lists, and the second pass (2026-10-29) checked both at their source (part 7).
+- Glossary and cross-topic resolutions applied 2026-10-30 (see [GLOSSARY.md](GLOSSARY.md) and part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R6):** "Hosting for previews and
   EU game servers; costs; logs, metrics and crash reports; balance telemetry (VISION_V2 §6.6); security baseline
   (content security policy, dependency audits, anti-cheat basics)"
 - **Scope, as the Advisor amended it on 2026-10-27:** "In R6, cover hosting, costs, monitoring and telemetry; the
-  security baseline waits until later." The CI side of preview links (how a pull request gets its link) is R5's; R6
+  security baseline waits until later." The CI side of preview links ([GLOSSARY](GLOSSARY.md#preview); how a pull request gets its link) is R5's; R6
   covers what the hosts can do, their limits and prices. Cross-origin isolation stays R1's question; R6 only states,
   per host, whether it can send the headers.
 
@@ -25,7 +26,8 @@
 
 Notes file: `infra-engineer-r6.md` (one summary per source, saved as read).
 
-Totals: 43 findings, 13 recommendations, 23 open questions, 42 sources read (41 official, 0 shipped game, 1 other;
+Totals: 43 findings, 13 recommendations, 36 open questions (23 of R6's own, 4 shared decision questions and 9
+cross-topic questions, part 6), 42 sources read (41 official, 0 shipped game, 1 other;
 plus `docs/LOOP_V2.md` as a project input, not counted), 20 sources not read.
 
 **How to read this file.**
@@ -41,11 +43,11 @@ plus `docs/LOOP_V2.md` as a project input, not counted), 20 sources not read.
   decided, and nothing here touches the look.
 
 ## 2. TL;DR
-- Client and per-PR previews: Cloudflare (Workers static assets, or Pages) can send COOP and COEP from a `_headers` file (inferred: it takes any header), gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
-- Game servers: Hetzner Cloud in one EU location, if its EU plans are orderable again (R6-HOST-OQ1), one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME.
-- Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start; about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 48-player rooms stay inside one VM's included 20 TB of traffic.
+- Client and per-PR previews: Cloudflare Pages (the client host, [GLOSSARY](GLOSSARY.md#the-client-host)), or Workers static assets as the alternative, can send COOP and COEP from a `_headers` file (inferred: it takes any header), gives every branch its own link with no cap, and charges nothing for static traffic; GitHub Pages cannot send those headers.
+- Game servers: Hetzner Cloud in one EU location, if its EU plans are orderable again (R6-HOST-OQ1), one room per process on a dedicated-vCPU CCX23 (proposed as R2's reference server), with the 9.6 times cheaper shared CX33 measured beside it; no load balancer on the UDP path; one wildcard certificate through ACME ([GLOSSARY](GLOSSARY.md#game-server-certificate)).
+- Cost: about 18 EUR a month (lean) to 102 EUR + 5 USD at the start ([GLOSSARY](GLOSSARY.md#the-start-modes-and-the-goal-modes)); about 240–360 EUR + about 20 USD plus Sentry at the goal; even 8 full 48-player rooms stay inside one VM's included 20 TB of traffic.
 - Operations: `tracing` JSON logs, Prometheus-format metrics with bounded labels (tick overruns, fallback share), Sentry with Wasm debug files in its EU region with IP collection off, Reporting API crash reports; all data in the EU; the law itself was not read (outside the allow list).
-- Telemetry: one record per match written at Ended (content hash, mode id, a 10 s points timeline, tick-stamped objective and kill events with source ids, unit time per slot, moments, no player ids) in EU object storage, analysed in batches per content hash. The security baseline is deferred (R6-SEC-OQ1).
+- Telemetry: one record per match written at Ended (content hash, mode id, a 10 s points timeline, tick-stamped objective and kill events with source ids, unit time per slot, moments, no player ids) in EU object storage, analysed in batches per content hash. The security baseline is deferred (R6-SEC-OQ1; [GLOSSARY](GLOSSARY.md#the-security-baseline)).
 
 ## 3. Findings
 
@@ -245,7 +247,7 @@ Ids are global (R6-HOST-F1 and so on). Every source was read on 2026-10-28; pric
 
 Prices from R6-HOST used here (not repeated as findings): Hetzner servers R6-HOST-F15 (CX33 8.99 EUR/mo, 0.0144/h;
 CCX23 86.49 EUR/mo, 0.1386/h; 20 TB traffic included), extra traffic R6-HOST-F16 (1 EUR per TB, inferred reading),
-hourly billing rounded up R6-HOST-F17, IPv4 R6-HOST-F19; Cloudflare static hosting R6-HOST-F5 (free static requests,
+hourly billing rounded up R6-HOST-F17, IPv4 R6-HOST-F19; Cloudflare Workers static hosting R6-HOST-F5 (free static requests,
 no egress charge; Workers Paid minimum 5 USD); Fly.io R6-HOST-F22 (0.02 USD per GB egress); GameLift R6-HOST-F23
 (bandwidth free on gen 6+, c6a.large 0.099 USD/h on demand, Ohio).
 
@@ -411,7 +413,7 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 | Option | UDP and ports | Fair tick (§4) | Cost basis | Start-up and scaling | Risk |
 |---|---|---|---|---|---|
 | G1. Hetzner Cloud, dedicated vCPU (CCX) | Own public IPv4/IPv6 per VM; firewall filters UDP (F18, F19); no load balancer needed, since the lobby hands out host:port (R2-ROOM-REC2) | "highly predictable resources" (F14) | CCX23 4 vCPU 86.49 EUR/mo, 20 TB included, 1 EUR per extra TB (F15, F16) | Hourly billing, rounded up (F17): keep VMs warm, rooms are processes | EU availability on 2026-10-28 unclear (F20); single provider |
-| G2. Hetzner Cloud, shared vCPU (CX/CAX) | Same as G1 | Shared with neighbours (F14): tick p99 must be measured | CX33 4 vCPU 8.99 EUR/mo (F15) | Same as G1 | Noisy neighbours could break the tick budget |
+| G2. Hetzner Cloud, shared vCPU (CX/CAX) | Same as G1 | Shared with neighbours (F14): server tick p99 (GLOSSARY: [server tick time](GLOSSARY.md#server-tick-time), [time statistics](GLOSSARY.md#time-statistics)) must be measured | CX33 4 vCPU 8.99 EUR/mo (F15) | Same as G1 | Noisy neighbours could break the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget)) |
 | G3. Fly.io Machines | UDP not read (docs outside allow list) | performance types (F22), dedicated-ness not read | performance-2x 66 USD/mo + 0.02 USD/GB egress (F22) | Not read | 3.2 GB per 48-player match-hour (R2) at 0.02 USD/GB adds up (R6-COST) |
 | G4. Amazon GameLift Servers | Managed fleets (not read in detail) | Instance types | 0.099 USD/h c6a.large on demand, Ohio; bandwidth free on gen 6+ (F23); EU rates not read | Managed scaling (not read) | Vendor lock-in to its server SDK (not read) |
 
@@ -419,7 +421,7 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 - **C1. One certificate per host via ACME http-01:** needs TCP 80 open on each game VM (F24).
 - **C2. One wildcard certificate per region name (for example `*.eu.<domain>`) via ACME dns-01:** one renewal job, the
   same certificate and private key copied to every VM (F24); the DNS provider's API key must live with that job (a
-  secret: Mustafa adds it; key handling belongs to the deferred baseline). R2-TRN-REC5 asks for a certificate "per game
+  secret: Mustafa adds it; key handling belongs to the deferred security baseline). R2-TRN-REC5 asks for a certificate "per game
   server hostname": C2 departs from that (R6-HOST-REC4 says so).
 - **C3. Self-signed, hash-pinned, short-lived servers:** R2-TRN-REC5's development and preview path; for production
   only "if R6 picks short-lived ephemeral servers". G1/G2 keep VMs warm (F17), so they are not ephemeral.
@@ -436,21 +438,22 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 R2's per-client downstream at E3, 30 Hz, IPv4, every entity in view (R2's worked bandwidth estimate, R2-BUD-REC2),
 times the number of humans (bots cost no traffic, R2). 1 kbps for one hour = 0.45 MB.
 
-| Mode (VISION_V2 §3) | Humans (A-1) | Per client | Room downstream | Egress per match-hour |
+| Mode (VISION_V2 §3; [GLOSSARY](GLOSSARY.md#team-size-and-how-modes-are-written)) | Humans (A-1) | Per client | Room downstream | Egress per match-hour |
 |---|---|---|---|---|
-| 4v4 (start, two teams, upper end) | 8 | 44.2 kbps | 354 kbps | 0.16 GB |
-| 6v6v6 (start, three teams, upper end) | 18 | 70.3 kbps | 1.27 Mbit/s | 0.57 GB |
+| 4v4 (start, two teams, upper end, as totals: MODES-3 (a)) | 8 | 44.2 kbps | 354 kbps | 0.16 GB |
+| 6v6v6 (start, three teams, upper end, as totals: MODES-3 (a)) | 18 | 70.3 kbps | 1.27 Mbit/s | 0.57 GB |
 | 12v12v12 (goal) | 36 | 116.2 kbps | 4.18 Mbit/s | 1.88 GB |
-| 24v24 (goal, design point 48) | 48 | 146.1 kbps | 7.01 Mbit/s | 3.16 GB (R2: about 3.2) |
+| 24v24 (goal, design point 48, [GLOSSARY](GLOSSARY.md#the-design-point-and-headroom)) | 48 | 146.1 kbps | 7.01 Mbit/s | 3.16 GB (R2: about 3.2) |
 
 Interest management lowers these (R2-BUD-REC2's mark: mean ≤ 100 kbps with the filter); IPv6 adds 4.8 kbps per
-client (R2). Ingress is free on Hetzner (R6-HOST-F17).
+client (R2). Ingress is free on Hetzner (R6-HOST-F17). Under MODES-3 (b) the start modes' upper ends are 8v8
+(16 players) and 18v18v18 (54); their rows follow from R2's formula (r2:1760-1762) once Mustafa answers.
 
 ##### Cost per room-hour (48 humans)
 | Host | Compute per room-hour | Egress per room-hour | Basis |
 |---|---|---|---|
 | Hetzner CCX23, 8 rooms per VM (A-2) | 0.0173 EUR | 0 inside the 20 TB; 0.0032 EUR beyond | 0.1386 EUR/h ÷ 8; 3.16 GB × 1 EUR/TB |
-| Hetzner CCX23, 4 rooms per VM (one per vCPU, R1-ECS-OQ4) | 0.0347 EUR | as above | 0.1386 ÷ 4 |
+| Hetzner CCX23, 4 rooms per VM (one per vCPU, R1-ECS-OQ4; [GLOSSARY](GLOSSARY.md#the-measuring-unit-one-vcpu)) | 0.0347 EUR | as above | 0.1386 ÷ 4 |
 | Hetzner CX33, 8 rooms per VM (A-2, if the spike passes on shared vCPU) | 0.0018 EUR | as above | 0.0144 ÷ 8 |
 | Fly.io performance-2x, 4 rooms (A-3) | 0.0229 USD | 0.063 USD | 0.0917 USD/h ÷ 4 (R6-HOST-F22); 3.16 GB × 0.02 USD |
 | GameLift c6a.large, 4 rooms (A-3), Ohio rate | 0.025 USD on demand, 0.0075 USD Spot | 0 (gen 6+) | 0.099 or 0.03 USD/h ÷ 4 |
@@ -461,7 +464,8 @@ on Hetzner, egress costs nothing extra even at full load. The same traffic on Fl
 month per such host (18,431 GB × 0.02 USD).
 
 ##### Monthly scenarios
-**Start (VISION_V2 §3: two teams of 2–8, three teams of 6–18).** A-4: up to 2 rooms at once, 18 humans each,
+**Start (VISION_V2 §3: two teams of 2–8, three teams of 6–18, read as totals: MODES-3 (a); under (b) a start
+room holds up to 54).** A-4: up to 2 rooms at once, 18 humans each,
 playtests about 4 hours a day; servers stay on all month (R6-HOST-REC2).
 
 | Line | Lean | Reference |
@@ -469,7 +473,7 @@ playtests about 4 hours a day; servers stay on all month (R6-HOST-REC2).
 | Production game VM | CX33 8.99 EUR | CCX23 86.49 EUR |
 | Staging VM for previews (R6-HOST-REC3) | CX33 8.99 EUR | CX33 8.99 EUR |
 | Egress (2 × 0.57 GB × 4 h × 30 ≈ 137 GB) | 0 (inside 20 TB) | 0 |
-| Client and previews on Cloudflare | 0 USD (free static) | 5 USD (Workers Paid, only if Worker code is needed) |
+| Client and previews on Cloudflare Pages | 0 USD (Pages' Free plan, R6-HOST-F3; price inferred from the plan's name) | 5 USD (Workers Paid, only if Worker code is needed) |
 | Metrics, logs (Grafana Cloud Free) | 0 | 0 |
 | Crash reports (Sentry Developer, limits not read) | 0 | 0 |
 | Match records (R6-TEL; Cloudflare R2 free 10 GB, or Hetzner Object Storage) | 0 USD | 6.49 EUR |
@@ -499,7 +503,7 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
 - **K2. A fixed base plus VMs added by the hour for the evening peak:** cheaper (game VMs about 36 % less in the goal case: 222.88 against 345.96 EUR; the total about 34 % less);
   needs automation through the provider's API, a supervisor that drains, and a VM start-up time nobody has measured
   (R6-HOST-OQ2's spike can time it); hourly round-up (R6-HOST-F17) makes VMs per match wasteful.
-- **K3. Shared-vCPU VMs:** about 9.6 times cheaper per VM; only if the tick p99 on shared hosts passes R2-ROOM-REC2's
+- **K3. Shared-vCPU VMs:** about 9.6 times cheaper per VM; only if the server tick p99 on shared hosts passes R2-ROOM-REC2's
   marks at several times of day (R6-HOST-REC2's spike).
 - **K4. Per-GB egress hosts (Fly.io) or managed fleets (GameLift):** per-GB pricing at 3.16 GB per 48-player room-hour
   costs more in egress per fully loaded host than the host itself costs on Hetzner (about 369 USD a month against 86.49
@@ -510,6 +514,11 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
 #### Assumptions
 - **A-1.** Every player is human and all are in view (R2's upper bound); bots cost no traffic.
 - **A-2.** 8 rooms of 48 players per 4-vCPU VM (R2-ROOM-REC2's proposal); smaller rooms fit at least as many.
+  It is a density to measure at the tick rate R1-TICK-REC2's rule picks (R2-ROOM-REC2 mark 2), not one the server tick
+  budget guarantees: at the budget's ceiling ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of one vCPU per room at p99) two rooms fill a vCPU before
+  the transport runtime ([GLOSSARY](GLOSSARY.md#transport-runtime-time)), so the 4-rooms-per-VM row (one per vCPU) is the case to budget unless R2-ROOM-REC2 marks 1 and 2 pass on it
+  (R6-COST-OQ1). At 30 Hz the CPU per simulated second roughly halves (R1-TICK-REC2,
+  inferred).
 - **A-3.** 4 rooms of 48 per 2-vCPU or 4 GB instance on Fly.io or GameLift (the same 2 rooms per vCPU as A-2).
 - **A-4.** Start: up to 2 rooms at once, 18 humans each, about 4 hours a day.
 - **A-5.** Goal: peak 20 rooms of 48 humans; average 6 rooms over 730 hours.
@@ -528,7 +537,7 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
 #### Q2. Server metrics
 | Option | What | Cost | Risk |
 |---|---|---|---|
-| M1. `metrics` + Prometheus exporter, scraped by a self-hosted Prometheus on the staging VM | F4, F5 | 0 extra (staging VM, R6-HOST-REC3); disk about 0.6 GB at A-8 | Not replicated (F5): metrics lost with the VM, not the game |
+| M1. `metrics` + Prometheus exporter, scraped by a self-hosted Prometheus on the staging VM ([GLOSSARY](GLOSSARY.md#the-staging-game-server)) | F4, F5 | 0 extra (staging VM, R6-HOST-REC3); disk about 0.6 GB at A-8 | Not replicated (F5): metrics lost with the VM, not the game |
 | M2. Same exporter, stored in Grafana Cloud (EU stack) | F4, F11, R6-COST-F1 | Free under 10k series | How scraped data reaches Grafana Cloud was not read (R6-OBS-OQ2) |
 | M3. OpenTelemetry metrics (Stable, F3) over OTLP | F3 | as M2 | More dependencies in the room binary |
 
@@ -606,26 +615,33 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
 
 ### 1. Hosting for previews and EU game servers (R6-HOST)
 
-- **R6-HOST-REC1. Host the client and the per-PR previews on Cloudflare (Workers static assets; Pages as the
-  same-headers alternative), and send COOP and COEP from `_headers` on previews when R1-BND-REC5's option G3 is on.**
-  Previews stay harmless rather than secret: a preview holds no secrets, talks only to the staging game server (REC3),
-  and is limited to the account with Cloudflare Access if Mustafa wants it private (R6-HOST-OQ5). Netlify (B) is the
+- **R6-HOST-REC1. Host the client and the per-PR previews on Cloudflare Pages ([GLOSSARY](GLOSSARY.md#the-client-host): the client host), with Workers static
+  assets as the same-headers alternative, and send COOP and COEP from `_headers` only on previews built with the isolation flag on ([GLOSSARY](GLOSSARY.md#preview-isolation-and-the-isolation-flag); R1-BND-REC5's
+  option G3); the preview Mustafa checks carries production's header set.**
+  Previews stay harmless rather than secret: a preview holds no secrets, and once previews reach a game server they talk only to the staging game server
+  (REC3); whether those previews sit behind the access wall is PREVIEW-WALL (Mustafa; [GLOSSARY](GLOSSARY.md#the-access-wall): the access wall), and
+  until he answers no preview talks to a game server (R6-HOST-OQ5). Netlify (B) is the
   fallback with the same `_headers` file; Vercel (C, headers from `vercel.json`, F8) only on Pro, because Hobby is
   non-commercial (F9).
   *Reason:* its `_headers` file sets custom response headers, so it can send the isolation headers (F1, F2; COOP and
   COEP by name inferred), gives every branch its own link with no cap on previews (F3,
-  F4, F6), charges nothing for static requests or egress (F5), and GitHub Pages cannot send the headers (F11, F12).
+  F4, F6), and GitHub Pages cannot send the headers (F11, F12); on Workers, static requests and egress cost nothing
+  (F5). Pages comes first because it meets each of R5-PREV-REC2's needs on findings already read (`noindex` by
+  default, header rules per hostname, an access policy, deletion through Wrangler: R5-PREV-F12, F13, F18), all but the
+  deletion of a branch's latest deployment (PREV-DELETE); for Workers previews `noindex`, rules per hostname and
+  deletion were not read (R5-PREV-F14), and Workers' broader features (F6) serve no VISION_V2 §6 item. Whether a
+  direct upload counts against Pages' 500 builds a month (F3) is for the spike.
   *Rests on:* F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12; R1-BND-REC5 (option G3, wave 1, cited).
   *Serves:* §6.1 (rooms and private matches are reached from this client); §4 (desktop browsers first). The isolation
   headers serve R1-BND-REC5.
   *Spike must prove (proposed):* on one preview link: every HTML, JS, worker and Wasm response carries the configured
   headers (100 % of responses in a full page load, checked by a script); `crossOriginIsolated` is true in Chrome,
-  Edge, Firefox and Safari when G3 is on and false with it off; the content bundle of R1-DATA-REC6 is served with an
+  Edge, Firefox and Safari when the isolation flag is on and false with it off; the content bundle of R1-DATA-REC6 is served with an
   immutable cache header and a repeat visit fetches 0 bytes of it; the largest build file stays under 25 MiB (F3: the
-  Pages per-asset limit; the Workers static-assets limit was not read, so the mark is rechecked against Workers' own
-  limits page before the spike).
+  Pages per-asset limit; if the alternative, Workers static assets, is used, the mark is rechecked against Workers'
+  own limits page, not read).
 - **R6-HOST-REC2. Run game servers on Hetzner Cloud in one EU location, one room per process under a small supervisor
-  per VM, with no load balancer on the game path. Name the reference server for R2 (R2-XU-OQ9): the dedicated CCX23
+  per VM, with no load balancer on the game path. Name the reference server ([GLOSSARY](GLOSSARY.md#the-reference-server)) for R2 (R2-XU-OQ9): the dedicated CCX23
   (4 vCPU, 16 GB, x86-64 AMD), and measure the shared CX33 (4 vCPU, 8 GB) beside it.**
   Each VM has its own public IPv4 and IPv6; the lobby hands out host and port (R2-ROOM-REC2); the firewall opens one
   UDP range for WebTransport and one TCP range for the WebSocket fallback (R2-TRN-REC3), plus nothing else. VMs stay up
@@ -639,24 +655,26 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   R2-BUD-REC6 need; Hetzner includes 20 TB of egress per VM and charges 1 EUR per extra TB (F15, F16), far below
   per-GB pricing (F22), and its firewall handles UDP (F18). Shared CX33 is 9.6 times cheaper than CCX23 (8.99 against
   86.49 EUR, F15), so it is worth measuring, not assuming.
-  *Rests on:* F13, F14, F15, F16, F17, F18, F19, F20 (the availability risk), F22; R2-BUD-REC6 (the per-tick budget the
+  *Rests on:* F13, F14, F15, F16, F17, F18, F19, F20 (the availability risk), F22; R2-BUD-REC6 (the server tick budget the
   reason names), R2-ROOM-REC2 (host and port from the lobby; the spike's marks: 8 rooms, within 10 %, under 2 s,
   r2-netcode.md:2733–2738), R2-TRN-REC3 (the UDP and TCP ports), R1-DET-OQ7 and R1-DET-REC6 (the server CPU) (wave 1,
   cited); legacy TL15.
+  *Cross-topic open questions:* R6-XT-OQ1 (part 6).
   *Serves:* §6.1 (rooms and private matches), §6.5 (economy server-side), §6.6 and §6.8 (recorded and recognized on
   the server); §4 (one EU region, fair to about 100 ms).
   *Spike must prove (proposed):* R2-ROOM-REC2's marks on both CCX23 and CX33: 8 rooms of 48 players (bots) as 8
-  processes, each room's tick p99 within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day
+  processes, each room's server tick p99 within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day
   (shared hosts vary with neighbours); WebTransport over UDP and WebSocket over TCP reach the VM through the firewall
   from all four browsers; a room process starts in under 2 s (R2's mark); a VM with no rule for a port drops it
   (negative test).
 - **R6-HOST-REC3. Previews get one shared staging game server, not one per PR.** One small VM (proposed CX33) runs a
   supervisor that starts the room binary of the build a preview names, with self-signed, pinned certificates as
   R2-TRN-REC5 says for previews; offline previews run the match in the worker with bots and need no server
-  (R1-BND-REC6). Old binaries are deleted when their PR closes (R5's CI side).
+  (R1-BND-REC6). Until Mustafa answers PREVIEW-WALL (below), previews do not use the staging server. Old binaries are deleted when their PR closes (R5's CI side).
   *Reason:* a VM per PR bills at least an hour each time (F17) and adds machines to run; previews only need a server
   that speaks the PR's protocol version.
   *Rests on:* F15, F17; R2-TRN-REC5, R1-BND-REC6 (wave 1, cited).
+  *Cross-topic open questions:* R6-XT-OQ2, R6-XT-OQ4 (part 6).
   *Serves:* §6.1 (rooms, tested per PR).
   *Spike must prove (proposed):* two previews of different builds play at the same time on one staging VM, each against
   its own binary; a closed PR's binary is gone within 24 h; a preview client never connects to a production server
@@ -665,14 +683,14 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   with dns-01, renewed by one job and copied to every game VM.** This departs from R2-TRN-REC5's wording, "a publicly
   trusted certificate per game server hostname" (r2-netcode.md:2667): every hostname is still covered by a publicly
   trusted certificate, but by one shared certificate, so one private key sits on every game VM (a key-handling item for
-  the deferred baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the
-  baseline rejects a shared key. It needs no TCP 80 on game VMs.
+  the deferred security baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the
+  baseline rejects a shared key; when the baseline is researched is BASELINE-WHEN (below). It needs no TCP 80 on game VMs.
   *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes
   adding a VM a copy, not an issuance.
   *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
   *Serves:* §6.1; §4 (four browsers need a publicly trusted certificate in production, R2-TRN-REC5).
   *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the wildcard
-  certificate; a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
+  certificate ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
   when any VM's certificate has under 14 days left (proposed).
 
 ### 2. Costs (R6-COST)
@@ -686,6 +704,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   storage start free (F1, F4).
   *Rests on:* F1, F2, F3, F4, F5; R6-HOST-F5, F15, F16, F17, F22, F23; R2's worked bandwidth estimate and R2-ROOM-REC2
   (wave 1, cited); assumptions A-1 to A-7.
+  *Cross-topic open questions:* R6-XT-OQ1, R6-XT-OQ7 (part 6).
   *Serves:* §6.1 (rooms and private matches at the §3 sizes).
   *Spike must prove (proposed):* rooms per VM measured on CCX23 and CX33 at 48, 36 and 18 players (the number that
   replaces A-2); measured egress per 48-player match-hour within ±20 % of 3.16 GB with interest management off, and
@@ -708,12 +727,12 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   *Rests on:* F1, F2, F12; R2-ROOM-REC3 (cited).
   *Serves:* §4 ("Matches feel fair up to about 100 ms of ping": per-room logs show the tick overruns and room events
   behind an unfair match); §6.1 (per-room crash reports and lifecycle, R2-ROOM-REC1, R2-ROOM-OQ9).
-  *Spike must prove (proposed):* with logging at its production level, tick p99 within 2 % of a run with logging off;
+  *Spike must prove (proposed):* with logging at its production level, server tick p99 within 2 % of a run with logging off;
   0 allocations per tick from logging on the hot path (counted); a grep of a 30-minute soak's logs finds 0 tokens,
   secrets or raw IPs.
 - **R6-OBS-REC2. Server metrics: the `metrics` facade with `metrics-exporter-prometheus`, scraped by a Prometheus on the
   staging VM to start (M1); Grafana Cloud EU (M2) once its ingestion path is read. Labels are bounded (VM, room slot
-  0–7, mode id, transport), never a player or match id. The first metrics are the ones wave 1 asked for:** tick time
+  0–7, mode id, transport), never a player or match id. The first metrics are the ones wave 1 asked for:** server tick time
   histogram and overruns and dropped time (R1-TICK-REC4), per-phase time (R2-BUD-REC6), sessions by transport
   (WebTransport or WebSocket: the fallback share, R2-TRN-OQ7), bytes and datagrams sent and dropped, per-client budget
   overruns and relevance churn (R2's pointers), joins refused by reason, room starts, ends and crashes, process memory.
@@ -721,7 +740,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   3,600, inside Grafana's free 10k (R6-COST-F1) if M2 follows; distributed tracing (T2) is Beta (F3) and serves no §6
   item.
   *Rests on:* F3, F4, F5, F11; R6-COST-F1; R1-TICK-REC4, R2-BUD-REC6, R2-TRN-OQ7 (cited); A-8.
-  *Serves:* §6.1 (rooms); §4 (fair to about 100 ms: the tick budget and the fallback share are what make it visible).
+  *Serves:* §6.1 (rooms); §4 (fair to about 100 ms: the server tick budget and the fallback share are what make it visible).
   *Spike must prove (proposed):* every metric listed is present after a 30-minute 48-player soak; a deliberately
   stalled tick shows as one overrun and its dropped time within one scrape; the series count is reported and is under
   5,000 for 8 rooms on one VM.
@@ -733,6 +752,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   to JavaScript but reach a reporting endpoint (F8); the EU location must be chosen at creation and cannot change
   (F9); the SDK sends IPs unless told not to (F10); Rust panics are captured (F6).
   *Rests on:* F6, F7, F8, F9, F10; R6-COST-F3.
+  *Cross-topic open questions:* R6-XT-OQ1, R6-XT-OQ6, R6-XT-OQ8 (part 6).
   *Serves:* §4 (four desktop browsers: crashes per browser are the evidence); §6.1 (per-room crash reports,
   R2-ROOM-OQ9).
   *Spike must prove (proposed):* a deliberate Wasm trap in the simulation worker arrives in Sentry with Rust function
@@ -774,10 +794,11 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   (GE15) and missing assists (GC18); recording inside the room at Ended reuses R2-ROOM-REC1's guarantee.
   *Rests on:* F2; R6-OBS-F12; R1-DATA-REC6, R1-ABL-REC5, R1-ECS-REC3, R1-TICK-REC3, R2-ROOM-REC1, R2-BUD-REC2 (cited);
   legacy TL13, GE15, GC18; A-10.
+  *Cross-topic open questions:* R6-XT-OQ5 (part 6).
   *Serves:* §6.6 (balance telemetry), §6.8 (moments), §6.5 (economy numbers on evidence), §6.1 (mode id, private flag).
   *Spike must prove (proposed):* in 30 bot matches across 3 modes (2 teams, 3 teams, 48 players), 100 % write a record
   before Closed; every kill event names a source id that resolves in the content set of the record's hash; the points
-  total recomputed from events equals the final points in 100 % of records; recording adds under 1 % to tick p99 and
+  total recomputed from events equals the final points in 100 % of records; recording adds under 1 % to server tick p99 and
   0 allocations per tick after warm-up (bounded buffer, preallocated); a record is at most 1 MB uncompressed (A-10).
 - **R6-TEL-REC2. Store records as compressed JSON-lines files in EU object storage (S1, Hetzner Object Storage in the
   game servers' location), uploaded by the supervisor after the room exits, with a schema version in every record and
@@ -835,7 +856,7 @@ None (deferred).
   and location pages before the goal budget (R6-COST-REC1) is fixed.
 - **R6-HOST-OQ5. Private or only harmless previews?** Cloudflare Access can limit previews to the account (F4,
   inferred); Mustafa's Brave would then need a Cloudflare login. Decided by: Mustafa (convenience against privacy),
-  after the security baseline.
+  after the security baseline. Shared as PREVIEW-WALL (below), where the timing is option (c).
 - **R6-HOST-OQ6. Does the wildcard certificate need dns-01, and how long will certificates live?** RFC 8555 leaves both
   to the CA (F24); Let's Encrypt's and the CA/Browser Forum's pages are outside the allow list. Decided by: a read of
   the chosen CA's policy. The verifier names a further option, ACME's tls-alpn-01 challenge: RFC 8737 (February 2020,
@@ -848,7 +869,8 @@ None (deferred).
 ### 2. Costs (R6-COST)
 
 - **R6-COST-OQ1. How many rooms fit one VM?** A-2 (8 rooms of 48 per 4-vCPU VM) is R2's proposal over a JavaScript
-  figure (TL15). Decided by: R2-ROOM-REC2's spike on the reference server (R6-HOST-REC2).
+  figure (TL15). Decided by: R2-ROOM-REC2's spike on the reference server (R6-HOST-REC2), at the tick rate R1-TICK-REC2's rule
+  picks, with each room's transport runtime counted ([GLOSSARY](GLOSSARY.md#transport-runtime-time)).
 - **R6-COST-OQ2. Sentry's and Grafana's real bills.** Sentry's base prices and the Developer plan's limits are on
   sentry.io (outside the allow list); Grafana's usage depends on the series count R6-OBS sets. Decided by: reading
   sentry.io/pricing with Mustafa (including whether Sentry's retention can be set, R6-OBS-REC4), and R6-OBS's series
@@ -893,11 +915,12 @@ None (deferred).
 ### 5. Security baseline, deferred (R6-SEC)
 
 - **R6-SEC-OQ1. Security baseline (content security policy, dependency audits, anti-cheat basics): deferred by the
-  Advisor, 2026-10-27. ADR 0006 lists it as open, or it is researched before 0006 is accepted.** The items wave 1 left
+  Advisor, 2026-10-27. ADR 0006 lists it as open, or it is researched before 0006 is accepted.** Which one is BASELINE-WHEN (below). The items wave 1 left
   to the baseline (from `docs/research/r2-netcode.md`, by id):
   - **Dependency audits:** the audit that keeps R2-TRN-REC1's version floors current (R2-TRN-REC1 mark 5, R2-TRN-F40:
     quinn-proto ≥ 0.11.18, rustls ≥ 0.23.46, ring ≥ 0.17.12, tokio ≥ 1.54.1); the rust-reviewer's cargo-audit and
-    cargo-deny gates (R2's list of deferred reviewer findings, item 5: finding R-1).
+    cargo-deny gates (R2's list of deferred reviewer findings, item 5: finding R-1); the mechanism R5 designs is
+    R5-GATE-REC1's scheduled advisories check (R5-GATE-OQ4; [GLOSSARY](GLOSSARY.md#the-advisories-check)).
   - **Content security policy:** the CSP that R2-ROOM-OQ11 weighs (where the guest secret lives: an HttpOnly cookie or
     local storage).
   - **Anti-cheat basics:** the cheat detection R2-SYNC-REC5's per-command view-time offset and aim log is kept for;
@@ -909,8 +932,94 @@ None (deferred).
   Items R6 met on the way and left here: the DNS API key the wildcard certificate job needs (R6-HOST-REC4); the wildcard
   certificate's private key, copied to every game VM (R6-HOST-REC4, a departure from R2-TRN-REC5's per-hostname
   certificate); the Sentry
-  and Cloudflare tokens CI would hold (R6-OBS-REC3, R6-HOST-REC1); whether previews are private (R6-HOST-OQ5). Secrets
+  and Cloudflare tokens CI would hold (R6-OBS-REC3, R6-HOST-REC1); whether previews are private (R6-HOST-OQ5; PREVIEW-WALL). Secrets
   are Mustafa's to add; agents never add them.
+
+### Shared open questions (the same words in every topic)
+
+- **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+  and three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
+  6v6v6; the largest mode is then the goal 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which [the stress scene](GLOSSARY.md#the-stress-scene), the offline
+  scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the
+  test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives both values. Also
+  asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+- **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+  security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits, anti-cheat basics) was deferred by the
+  Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched before 0006 is accepted" (R6-SEC-OQ1).
+  Two cross-topic disagreements wait on it: who owns the advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) and whether an advisory blocks a
+  pull request (R1-RR-OQ7, R2-TRN-REC1 mark 5, R5-GATE-REC1, R5-GATE-OQ4, R6-SEC-OQ1), and one wildcard certificate
+  whose private key sits on every game VM (R6-HOST-REC4) against a certificate per game-server hostname (R2-TRN-REC5).
+  (a) Research it now, as one security-auditor topic before the drafts. (b) List it open in ADR 0006 with interim
+  positions: R5-GATE-REC1's scheduled advisories check stays the mechanism and the baseline sets the policy later;
+  R2-TRN-REC5's certificate per hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave
+  both as one shared open question. Decided by: the Advisor.
+- **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+  for a branch cannot be deleted", while `--force` serves "to force deletion of aliased deployments" (R5-PREV-F13), so
+  the last link's fate is unclear. On Workers static assets, the alternative host, only "the 1000 most recently
+  deployed aliases are retained" (R5-PREV-F14), and an explicit deletion was not read. Decided by: a spike on a test
+  project on the client host ([GLOSSARY](GLOSSARY.md#the-client-host)), with R5-PREV-REC3's mark: 24 h after a PR closes, its preview URL no longer
+  serves the build (HTTP 404, or the access wall), or the remaining case is written down with the reason. If Pages
+  fails it with no workaround, Workers static assets is weighed again (R6-HOST-REC1). Also asked as R5-PREV-OQ2.
+- **PREVIEW-WALL (Mustafa). Should per-PR previews that talk to the staging game server be private?** Private means
+  behind the access wall ([GLOSSARY](GLOSSARY.md#the-access-wall)): the host's access policy on Mustafa's Cloudflare account (R5-PREV-F12,
+  R6-HOST-F4) or Cloudflare Access (R5-PREV-F14), so each Brave check needs one login per session (R5-PREV-REC5). Open
+  means anyone with the link can open the preview and the staging game server it talks to (R6-HOST-REC3). (a) Private
+  from the first preview that reaches the staging server; (b) open, since previews hold no secrets; (c) decided after
+  the security baseline (BASELINE-WHEN). Until Mustafa answers, no preview talks to a game server: previews run the
+  match offline in the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3); a preview that carries
+  unreleased art is behind the access wall, as R5-PREV-REC5 already says (R5-PREV-OQ1 asks that part). Also asked as
+  R5-PREV-OQ1 and R6-HOST-OQ5. Decided by: Mustafa.
+
+### Cross-topic open questions (consistency critic, 2026-10-29)
+
+- **R6-XT-OQ1. Who hosts, costs and builds the lobby and the room supervisor?** Join tokens, guest identity, room
+  codes and crash reports all go through the lobby, and R2 hands its hosting and store to R6. R6 neither hosts nor
+  costs it, and R5 has no crate for the lobby or the supervisor, so the infrastructure ADR and the cost budget leave
+  out a required service. Side A: R2-ROOM-REC2; R2-ROOM-OQ9. Side B: missing answer (R6-HOST-REC2, R6-OBS-REC3,
+  R5-LAYOUT-REC2 named). Also named: R2-ROOM-REC8, R6-COST-REC1. Existing questions: R2-ROOM-OQ9 (left to R6,
+  unanswered). Decided by: ADR-0006 (hosting and cost of the lobby and its store) with ADR-0002 (crate list) and
+  ADR-0001 (lobby protocol). (Consistency critic, 2026-10-29, rank 8.)
+- **R6-XT-OQ2. Do browser navigation and server-less previews rest on an undecided offline-play need?** R4 builds
+  navigation for the browser, R6 serves previews without a game server, and R5 plans the first previews, all on
+  offline play, which R1 leaves as an open VISION question (and, at the largest mode, as R1-TICK-OQ7). Side A:
+  R1-BND-OQ1. Side B: R4-NAV-REC4; R6-HOST-REC3; R5-PREV-OQ3. Also named: R1-TICK-OQ7, R1-XU-OQ12. Existing questions:
+  R1-BND-OQ1, R1-TICK-OQ7, R1-XU-OQ12. Decided by: Mustafa and the Advisor (VISION_V2), then ADR-0004 and ADR-0006.
+  (Consistency critic, 2026-10-29, rank 15.)
+- **R6-XT-OQ3. Which recommendations wait on the deferred security baseline?** Recommendations in R2 and R5
+  (guest-secret storage, preview headers, a lint rule, token keys) wait on a topic with no recommendation and no date.
+  ADR-0001, 0002 and 0006 cannot close those items. Side A: R5-PREV-REC4; R5-TSLINT-OQ5; R2-ROOM-OQ11; R2-ROOM-OQ2.
+  Side B: R6-SEC-OQ1. Existing questions: R6-SEC-OQ1. Decided by: The Advisor (research the baseline before ADR-0006,
+  or list it open), then security-auditor. Decision code: BASELINE-WHEN. (Consistency critic, 2026-10-29, rank 18.)
+- **R6-XT-OQ4. How do multiplayer previews get their server binary and their certificate hash?** Multiplayer previews
+  need a server-binary delivery job (a second CI secret and PR-built native code on a VM) and a way to publish the
+  self-signed hash on the page's origin. R5's preview design covers only the static client. Side A: R6-HOST-REC3;
+  R2-TRN-REC5. Side B: R5-PREV-REC1. Also named: R5-PREV-OQ3. Existing questions: R5-PREV-OQ3 (asks whether previews
+  need a server; R6 answers yes, but not how). Decided by: ADR-0002 (preview workflow) and ADR-0006 (staging server),
+  with ADR-0001 (where the certificate hash is fetched from). (Consistency critic, 2026-10-29, rank 20.)
+- **R6-XT-OQ5. Who creates the client's field data (backend, hardware, frame time)?** Each topic hands client-side
+  field data (backend share, hardware mix, frame time) to the other. No recommendation creates it, yet R3's
+  fallback-share and hardware questions depend on it. Side A: R3-GL2-OQ2. Side B: R6-TEL-REC1; R6-OBS-OQ5. Also named:
+  R3-BUDGET-OQ1. Existing questions: R3-GL2-OQ2, R3-BUDGET-OQ1, R6-OBS-OQ5. Decided by: The synthesis: ADR-0003 (what
+  is measured) and ADR-0006 (where it is stored, under R6-OBS-REC4's data rules). (Consistency critic, 2026-10-29,
+  rank 26.)
+- **R6-XT-OQ6. Who owns recovery from a trap in the client's Wasm sim?** R2 says R1 owns client-trap recovery; R1
+  leaves it to the synthesis. No topic recommends it. Side A: none by id. Side B: R1-RR-OQ3; R6-OBS-REC3. Also named:
+  R2 pointer to R1 (trap recovery). Existing questions: R1-RR-OQ3. Decided by: ADR-0004 (worker restart) with ADR-0001
+  (resync path, R2-XU-OQ6) and ADR-0002 (panic strategy). (Consistency critic, 2026-10-29, rank 28.)
+- **R6-XT-OQ7. Who sets the CI runner costs (GPU, macOS, reference machines, cache)?** Real-Safari runs, WebGPU
+  coverage in CI and reference-machine runs all depend on costs no topic sets. Side A: R5-CI-OQ5; R5-TEST-OQ4;
+  R3-MEASURE-OQ2. Side B: missing answer. Also named: R5-XQ-OQ1, R6-COST-REC1. Existing questions: R5-CI-OQ5,
+  R5-TEST-OQ4, R5-XQ-OQ1, R3-MEASURE-OQ2. Decided by: ADR-0006 (costs) with ADR-0002 (CI); Mustafa for any paid plan.
+  (Consistency critic, 2026-10-29, rank 33.)
+- **R6-XT-OQ8. Where do the Sentry upload job and the smoke test's network rule fit?** R6's crash reporting adds a CI
+  secret job and an external endpoint that R5's CI design and smoke check do not allow for. Side A: none by id. Side
+  B: R5-GATE-REC3. Also named: R6-OBS-REC3, R5-PREV-REC1. Existing questions: none. Decided by: ADR-0002 (CI jobs,
+  secrets and the smoke test's network rule) with ADR-0006. (Consistency critic, 2026-10-29, rank 34.)
+- **R6-XT-OQ9. Who answers R1-BND-OQ5 (embeds, cross-origin popups, CORP and the login flow under isolation)?** These
+  are part of R1-BND-REC5's isolation cost, which R6 was asked to report. Side A: R1-BND-OQ5. Side B: none by id. Also
+  named: R1-BND-REC5, R1 pointer to R6. Existing questions: R1-BND-OQ5. Decided by: Mustafa with ADR-0006, only if
+  production isolation is adopted (R1-BND-REC2 mark 5). (Consistency critic, 2026-10-29, rank 38.)
 
 ### Recommendations that hinge on a source not read
 
@@ -940,16 +1049,17 @@ From Hosting for previews and EU game servers:
   page names them). Code-generated responses (a Worker, a function) set their own.
 - **R2:** R6-HOST-REC4's one wildcard certificate departs from R2-TRN-REC5's "a publicly trusted certificate per game
   server hostname" (stated in REC4). Reference server for R2-XU-OQ9: Hetzner CCX23 (4 dedicated vCPU, AMD), with CX33 measured beside it; "one
-  vCPU of the EU instance type" in R2-BUD-REC6 is one vCPU of CCX23. No load balancer on the UDP path. IPv6 is free on
+  vCPU of the EU instance type" in R2-BUD-REC6 is one vCPU of CCX23 (R2-BUD-REC6 now names it the reference server,
+  resolution 11). No load balancer on the UDP path. IPv6 is free on
   Hetzner (F19), so R2-BUD-OQ11's IPv6 share depends on players' networks.
-- **R5:** the preview link's CI part: a deploy step to Cloudflare from Actions needs an API token as a repository
+- **R5:** the preview link's CI part: a deploy step to the client host (Cloudflare Pages) from Actions needs an API token as a repository
   secret (Mustafa adds it); the staging server (REC3) receives the PR's server binary from CI.
 
 From Costs:
 
 - **R2:** at the goal, egress is not a cost driver on Hetzner (inside 20 TB per VM at full load); it is on per-GB hosts.
   Interest management's savings (R2-BUD-REC2) matter for players' links, not for this bill.
-- **R1:** R1-ECS-OQ4's "one match per core" costs 0.0347 EUR per room-hour on CCX23, against 0.0173 at R2's 2 rooms per
+- **R1:** R1-ECS-OQ4's "one match per core" (one per vCPU of the reference server since resolution 11) costs 0.0347 EUR per room-hour on CCX23, against 0.0173 at R2's 2 rooms per
   vCPU.
 
 From Logs, metrics and crash reports:
@@ -1048,6 +1158,40 @@ NOTES, nits only.
   conditional on R6-HOST-OQ1; the TL15 line (R2's CM4 citation is valid); R6-OBS-F7's "DWARF" confirmed; R6-OBS-F9's
   list marked partial; K4 marked inferred; R6-HOST-OQ6 cites RFC 8737's port and marks the fallback point inferred; the
   R2 pointer names REC4's departure. Review stops here: what remains is nits.
+
+### Consistency resolutions (2026-10-30)
+
+Step 3c of `.checkpoints/v2-research/plan-amendments-2.md`: the owner applied, to this file only, the consistency
+critic's resolutions as the advisor approved them (`.checkpoints/v2-research/advisor-resolutions-verdict.md`, folded
+into `resolutions.md`), the terms of [GLOSSARY.md](GLOSSARY.md), and the shared open questions. Nothing was fetched; no
+new claim, number or source; quoted source text and the dated records above are unchanged. Log:
+`.checkpoints/v2-research/infra-engineer-r6-consistency.md`.
+- **Resolution 1 (the server tick budget):** C1.21 (A-2: a density to measure, not one the budget guarantees; the
+  4-rooms-per-VM row is the case to budget unless R2-ROOM-REC2 marks 1 and 2 pass), C1.22 (R6-COST-OQ1).
+- **Resolution 10 (MODES-3, escalated):** C10.19 and C10.20 (the egress table's start rows read as totals), C10.21
+  (the rows under reading (b)), C10.22 (the Start scenario), C10.23 (MODES-3 inserted).
+- **Resolution 11 (one vCPU of the reference server):** no text change; R6-HOST-REC2's first "the reference server"
+  links the glossary.
+- **Resolution 17 (BASELINE-WHEN, escalated):** C17.7 and C17.8 (R6-SEC-OQ1), C17.9 (BASELINE-WHEN inserted).
+- **Resolution 19 (Pages first):** C19.5 and C19.6 (R6-HOST-REC1's heading and reason), C19.7 (its spike), C19.8 (the
+  Start scenario's client line), C19.9 (PREV-DELETE inserted).
+- **Resolution 21 (PREVIEW-WALL, escalated):** C21.4 (R6-HOST-REC1), C21.5 (R6-HOST-OQ5), C21.6 (R6-SEC-OQ1), C21.7
+  (PREVIEW-WALL inserted), C21.8 (R6-HOST-REC3).
+- **Resolution 22 (the isolation flag):** C22.5 (R6-HOST-REC1's heading), C22.6 (its spike).
+- **Resolution 23 (BASELINE-WHEN, escalated):** C23.3 (R6-HOST-REC4). C23.b1 to C23.b3 are not applied: they wait for
+  the Advisor's answer to BASELINE-WHEN.
+- **Resolutions 5, 6, 9 and 29:** no change in R6.
+- **Glossary terms:** "the tick budget" became the server tick budget (the Q2 options table, R6-OBS-REC2, and
+  R6-HOST-REC2's "Rests on"); "tick p99" and "tick time" for the whole tick became server tick p99 and server tick time
+  (the Q2 table, K3, R6-HOST-REC2's spike, R6-OBS-REC1, R6-OBS-REC2, R6-TEL-REC1); "the deferred baseline" became the
+  deferred security baseline (option C2, R6-HOST-REC4); Cloudflare alone became the client host, Cloudflare Pages
+  (the TL;DR, the pointer to R5), or Cloudflare Workers where R6-HOST-F5 is meant (R6-COST's list of prices); the pointers to R1 and R2 note resolution 11's vCPU wording beside their quotes. Each
+  term's first use links its entry.
+- **Shared open questions:** MODES-3, BASELINE-WHEN, PREV-DELETE and PREVIEW-WALL (part 6, "Shared open questions (the
+  same words in every topic)"), and R6-XT-OQ1 to R6-XT-OQ9, the critic's ranks 8, 15, 18, 20, 26, 28, 33, 34 and 38
+  (part 6, "Cross-topic open questions (consistency critic, 2026-10-29)"), with pointers from R6-HOST-REC2,
+  R6-HOST-REC3, R6-COST-REC1, R6-OBS-REC3 and R6-TEL-REC1.
+- **OBJECT:** none.
 
 ## 8. Sources
 
