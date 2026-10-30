@@ -1,0 +1,9 @@
+entries 34; exact hits 0; in-context hits 737 (quotes and dated records skipped)
+  R1: exact 0, in context 186, header links GLOSSARY.md: False; skipped: 21 in quoted text, 39 in dated records; blocks with an unpaired straight quote: 34
+  R2: exact 0, in context 231, header links GLOSSARY.md: False; skipped: 40 in quoted text, 16 in dated records; blocks with an unpaired straight quote: 0
+  R3: exact 0, in context 97, header links GLOSSARY.md: False; skipped: 11 in quoted text, 6 in dated records; blocks with an unpaired straight quote: 0
+  R4: exact 0, in context 70, header links GLOSSARY.md: False; skipped: 7 in quoted text, 4 in dated records; blocks with an unpaired straight quote: 0
+  R5: exact 0, in context 55, header links GLOSSARY.md: False; skipped: 11 in quoted text, 5 in dated records; blocks with an unpaired straight quote: 0
+  R6: exact 0, in context 98, header links GLOSSARY.md: False; skipped: 12 in quoted text, 6 in dated records; blocks with an unpaired straight quote: 0
+  not searchable (a pattern in words; the step-3d verifiers read for it): The hash-map ban in the sim crate / context: "zero uses of std HashMap or HashSet iteration in … outcome code"
+  not searchable (a pattern in words; the step-3d verifiers read for it): The stress scene / context: "the worst case (48 players plus vehicles and projectiles …)"

@@ -1,0 +1,179 @@
+topic	line	nearest id	entry	kind	phrase	skipped as
+R1	215	R1-ECS-F27	Preview isolation and the isolation flag	context	always	quoted text
+R1	257	R1-ECS-F33	Preview isolation and the isolation flag	context	always	quoted text
+R1	647	R1-DET-F10	Preview isolation and the isolation flag	context	always	quoted text
+R1	832	R1-DET-F34	Active effect (and visual effect)	context	effects	quoted text
+R1	1043	R1-BND-F23	Preview isolation and the isolation flag	context	always	quoted text
+R1	1200	R1-ABL-F3	Active effect (and visual effect)	context	effects	quoted text
+R1	1201	R1-ABL-F3	Active effect (and visual effect)	context	effects	quoted text
+R1	1202	R1-ABL-F3	Active effect (and visual effect)	context	effects	quoted text
+R1	1254	R1-ABL-F13	Active effect (and visual effect)	context	effects	quoted text
+R1	1270	R1-ABL-F16	Active effect (and visual effect)	context	effects	quoted text
+R1	1271	R1-ABL-F16	Active effect (and visual effect)	context	effects	quoted text
+R1	1285	R1-ABL-F18	Preview isolation and the isolation flag	context	always	quoted text
+R1	1289	R1-ABL-F19	Active effect (and visual effect)	context	effects	quoted text
+R1	1390	R1-DATA-F1	Preview isolation and the isolation flag	context	always	quoted text
+R1	2286	R1-ABL-REC1	Big vehicle and very large unit	context	vehicles	quoted text
+R1	2399	R1-ABL-REC6	Team size and how modes are written	context	players	quoted text
+R1	2399	R1-ABL-REC6	The largest mode, and its N	context	48	quoted text
+R1	2401	R1-ABL-REC6	Team size and how modes are written	context	players	quoted text
+R1	2401	R1-ABL-REC6	The largest mode, and its N	context	48	quoted text
+R1	2755	R1-XU-OQ1	Big vehicle and very large unit	context	vehicles	quoted text
+R1	2755	R1-XU-OQ1	Player count (N)	context	48 characters	quoted text
+R1	3029		Preview isolation and the isolation flag	context	always	dated record
+R1	3044		Preview isolation and the isolation flag	context	always	dated record
+R1	3050		Preview isolation and the isolation flag	context	always	dated record
+R1	3050		Preview isolation and the isolation flag	context	always	dated record
+R1	3052		The measuring unit: one vCPU	context	Core	dated record
+R1	3053		The largest mode, and its N	context	48	dated record
+R1	3053		The largest mode, and its N	context	48	dated record
+R1	3053		The largest mode, and its N	context	48	dated record
+R1	3077		Sim step time	context	Whole ticks	dated record
+R1	3092		The largest mode, and its N	context	48	dated record
+R1	3097		The largest mode, and its N	context	48	dated record
+R1	3106		The measuring unit: one vCPU	context	Core	dated record
+R1	3108		The measuring unit: one vCPU	context	Core	dated record
+R1	3142		Team size and how modes are written	context	players	dated record
+R1	3142		The largest mode, and its N	context	48	dated record
+R1	3142		The start modes and the goal modes	context	the goal	dated record
+R1	3142		The start modes and the goal modes	context	the goal	dated record
+R1	3144		Active effect (and visual effect)	context	effects	dated record
+R1	3149		The largest mode, and its N	context	48	dated record
+R1	3181		Preview isolation and the isolation flag	context	always	dated record
+R1	3201		The largest mode, and its N	context	48	dated record
+R1	3201		The largest mode, and its N	context	48	dated record
+R1	3206		The largest mode, and its N	context	48	dated record
+R1	3206		The largest mode, and its N	context	48	dated record
+R1	3209		Active effect (and visual effect)	context	effects	dated record
+R1	3215		Active effect (and visual effect)	context	effects	dated record
+R1	3215		Active effect (and visual effect)	context	effects	dated record
+R1	3220		Active effect (and visual effect)	context	effects	dated record
+R1	3238		The largest mode, and its N	context	48	dated record
+R1	3239		Team size and how modes are written	context	players	dated record
+R1	3239		The largest mode, and its N	context	48	dated record
+R1	3245		The measuring unit: one vCPU	context	Core	dated record
+R1	3248		The measuring unit: one vCPU	context	Core	dated record
+R1	3252		Big vehicle and very large unit	context	vehicles	dated record
+R1	3261		Preview isolation and the isolation flag	context	always	dated record
+R1	3346		The measuring unit: one vCPU	context	Core	dated record
+R1	3351		Preview isolation and the isolation flag	context	always	dated record
+R1	3360		Team size and how modes are written	context	players	dated record
+R1	3385		The largest mode, and its N	context	48	dated record
+R2	14		Team size and how modes are written	context	players	quoted text
+R2	14		The largest mode, and its N	context	48	quoted text
+R2	335	R2-SYNC-F28	Big vehicle and very large unit	context	big	quoted text
+R2	462		Team size and how modes are written	context	players	quoted text
+R2	462		The largest mode, and its N	context	48	quoted text
+R2	465		Team size and how modes are written	context	players	quoted text
+R2	465		Team size and how modes are written	context	players	quoted text
+R2	466		The start modes and the goal modes	context	the goal	quoted text
+R2	642	R2-BUD-F29	Big vehicle and very large unit	context	big	dated record
+R2	719	R2-INT-F1	Preview isolation and the isolation flag	context	always	quoted text
+R2	779	R2-INT-F9	Preview isolation and the isolation flag	context	always	quoted text
+R2	783	R2-INT-F10	Preview isolation and the isolation flag	context	always	quoted text
+R2	784	R2-INT-F10	Preview isolation and the isolation flag	context	always	quoted text
+R2	784	R2-INT-F10	Team size and how modes are written	context	players	quoted text
+R2	1044	R2-TRN-F14	Game-server certificate	context	a publicly trusted certificate	quoted text
+R2	1335	R2-TRN-F41	Big vehicle and very large unit	context	big	quoted text
+R2	1346	R2-TRN-F42	Big vehicle and very large unit	context	big	quoted text
+R2	1347	R2-TRN-F42	Big vehicle and very large unit	context	big	quoted text
+R2	1526	R2-ROOM-F15	Team size and how modes are written	context	players	quoted text
+R2	1528	R2-ROOM-F15	Team size and how modes are written	context	players	quoted text
+R2	1533	R2-ROOM-F15	Team size and how modes are written	context	players	dated record
+R2	1554	R2-ROOM-F17	Preview isolation and the isolation flag	context	always	quoted text
+R2	2897	R2-SYNC-OQ11	Shared stream and authority-only stream	context	server-only keyed random stream	dated record
+R2	2936	R2-BUD-OQ6	Team size and how modes are written	context	players	quoted text
+R2	2936	R2-BUD-OQ6	Team size and how modes are written	context	players	quoted text
+R2	3038	R2-ROOM-OQ2	The security baseline	context	R6's deferred baseline	dated record
+R2	3101	R2-XU-OQ4	The largest mode, and its N	context	48	quoted text
+R2	3124	R2-XU-OQ7	Team size and how modes are written	context	players	quoted text
+R2	3124	R2-XU-OQ7	The largest mode, and its N	context	48	quoted text
+R2	3126	R2-XU-OQ7	Team size and how modes are written	context	players	quoted text
+R2	3126	R2-XU-OQ7	The largest mode, and its N	context	48	quoted text
+R2	3132	R2-XU-OQ8	The server tick budget	context	the tick budget	quoted text
+R2	3133	R2-XU-OQ8	The server tick budget	context	the share of the tick budget the tick-rate unit sets	quoted text
+R2	3135	R2-XU-OQ8	The server tick budget	context	the server tick budget	quoted text
+R2	3142	R2-XU-OQ9	The reference server	context	one vCPU of the EU instance type R6 recommends	quoted text
+R2	3143	R2-XU-OQ9	The reference server	context	one 4-vCPU EU cloud VM, R6 to name it	quoted text
+R2	3143	R2-XU-OQ9	The reference server	context	reference server hardware R6 names	quoted text
+R2	3171	R2-XU-OQ13	Team size and how modes are written	context	players	quoted text
+R2	3171	R2-XU-OQ13	Team size and how modes are written	context	players	quoted text
+R2	3172	R2-XU-OQ13	Team size and how modes are written	context	2×2	quoted text
+R2	3204	R2-XU-OQ18	Team size and how modes are written	context	players	quoted text
+R2	3204	R2-XU-OQ18	The largest mode, and its N	context	48	quoted text
+R2	3206	R2-XU-OQ18	Team size and how modes are written	context	players	quoted text
+R2	3206	R2-XU-OQ18	The largest mode, and its N	context	48	quoted text
+R2	3209	R2-XU-OQ18	Team size and how modes are written	context	players	dated record
+R2	3209	R2-XU-OQ18	The largest mode, and its N	context	48	dated record
+R2	3402		Team size and how modes are written	context	players	dated record
+R2	3432		The server tick budget	context	25 %	dated record
+R2	3453		Preview isolation and the isolation flag	context	always	dated record
+R2	3565		The measuring unit: one vCPU	context	Core	dated record
+R2	3571		The authority	context	server-only	dated record
+R2	3575		The security baseline	context	R6's deferred baseline	dated record
+R2	3577		The advisories check	context	dependency audits	dated record
+R2	3577		The security baseline	context	R6's security baseline	dated record
+R2	3608		Big vehicle and very large unit	context	big	dated record
+R2	3616		Team size and how modes are written	context	players	dated record
+R3	13		Player count (N)	context	characters	quoted text
+R3	134	R3-WGPU-F12	Active effect (and visual effect)	context	effects	quoted text
+R3	534	R3-CHAR-F13	The design point and headroom	context	the largest mode	quoted text
+R3	535	R3-CHAR-F13	Big vehicle and very large unit	context	large units	quoted text
+R3	536	R3-CHAR-F13	Active effect (and visual effect)	context	effects	quoted text
+R3	593	R3-BUDGET-F7	The reference server	context	to be named with R3, R5 and R6	quoted text
+R3	721	R3-AUDIO-F6	Active effect (and visual effect)	context	effects	quoted text
+R3	727	R3-AUDIO-F7	Active effect (and visual effect)	context	effects	quoted text
+R3	764	R3-AUDIO-F11	Active effect (and visual effect)	context	effects	quoted text
+R3	1360	R3-BUDGET-OQ4	Team size and how modes are written	context	players	quoted text
+R3	1360	R3-BUDGET-OQ4	Team size and how modes are written	context	players	quoted text
+R3	1488		Big vehicle and very large unit	context	big	dated record
+R3	1524		Preview isolation and the isolation flag	context	always	dated record
+R3	1533		Player count (N)	context	characters	dated record
+R3	1541		The design point and headroom	context	the largest mode	dated record
+R3	1544		Big vehicle and very large unit	context	large units	dated record
+R3	1544		Big vehicle and very large unit	context	large units	dated record
+R4	98	R4-PHYS-F8	Big vehicle and very large unit	context	vehicles	quoted text
+R4	149	R4-PHYS-F16	Preview isolation and the isolation flag	context	always	quoted text
+R4	336	R4-NAV-F13	Player count (N)	context	characters	quoted text
+R4	338	R4-NAV-F13	Player count (N)	context	characters	quoted text
+R4	350	R4-NAV-F15	Preview isolation and the isolation flag	context	always	quoted text
+R4	510	R4-LOS-F5	Big vehicle and very large unit	context	vehicles	quoted text
+R4	531	R4-LOS-F5	Big vehicle and very large unit	context	big	quoted text
+R4	1217		Big vehicle and very large unit	context	vehicles	dated record
+R4	1233		Preview isolation and the isolation flag	context	always	dated record
+R4	1237		Player count (N)	context	characters	dated record
+R4	1279		Player count (N)	context	characters	dated record
+R5	444	R5-TEST-F6	Preview isolation and the isolation flag	context	always	quoted text
+R5	826	R5-PREV-F10	The client host	context	Cloudflare	quoted text
+R5	839	R5-PREV-F12	Preview	context	preview deployment	quoted text
+R5	839	R5-PREV-F12	The access wall	context	the access policy	quoted text
+R5	839	R5-PREV-F12	The client host	context	Cloudflare	quoted text
+R5	840	R5-PREV-F12	The client host	context	Cloudflare	quoted text
+R5	841	R5-PREV-F12	Player count (N)	context	characters	quoted text
+R5	852	R5-PREV-F14	The access wall	context	Cloudflare Access	quoted text
+R5	853	R5-PREV-F14	Player count (N)	context	characters	quoted text
+R5	860	R5-PREV-F15	Preview	context	deploy preview	quoted text
+R5	862	R5-PREV-F15	Preview	context	deploy preview	quoted text
+R5	2011		The client host	context	Cloudflare	dated record
+R5	2012		Player count (N)	context	characters	dated record
+R5	2012		The client host	context	Cloudflare	dated record
+R5	2013		The client host	context	Cloudflare	dated record
+R5	2031		Preview isolation and the isolation flag	context	always	dated record
+R6	12		The advisories check	context	dependency audits	quoted text
+R6	13		The security baseline	context	the security baseline	quoted text
+R6	73	R6-HOST-F3	The client host	context	Cloudflare	quoted text
+R6	74	R6-HOST-F3	The client host	context	Cloudflare	quoted text
+R6	82	R6-HOST-F4	Preview isolation and the isolation flag	context	always	quoted text
+R6	164	R6-HOST-F17	Preview isolation and the isolation flag	context	always	quoted text
+R6	195	R6-HOST-F23	The measuring unit: one vCPU	context	Core	quoted text
+R6	212	R6-HOST-F24	The largest mode, and its N	context	48	quoted text
+R6	362	R6-TEL-F1	Big vehicle and very large unit	context	big	quoted text
+R6	665	R6-HOST-REC4	Game-server certificate	context	a publicly trusted certificate	quoted text
+R6	941		Game-server certificate	context	a publicly trusted certificate	quoted text
+R6	952		The measuring unit: one vCPU	context	per core	quoted text
+R6	982		Preview isolation and the isolation flag	context	always	dated record
+R6	984		The client host	context	Cloudflare	dated record
+R6	985		The client host	context	Cloudflare	dated record
+R6	986		Player count (N)	context	characters	dated record
+R6	986		The client host	context	Cloudflare	dated record
+R6	998		Big vehicle and very large unit	context	big	dated record

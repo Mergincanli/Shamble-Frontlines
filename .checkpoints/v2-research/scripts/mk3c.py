@@ -15,7 +15,8 @@ def prompt(k):
 **Inputs** (read them all first):
 - The proposals: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/resolutions.md` (per contradiction: the outcome, both sides' words, and the exact before and after text per file).
 - The advisor's ruling on them: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-resolutions-verdict.md`. It decides: apply an item only as approved; where it says REVISE, apply its revised text; an escalated item goes in as the shared open question with its decision code, worded as approved.
-- The glossary: `/home/user/Shamble-Frontlines/docs/research/GLOSSARY.md` (one definition per term: "Marked by", "Retire", "Depends on", "Used today").
+- The glossary: `/home/user/Shamble-Frontlines/docs/research/GLOSSARY.md` (one definition per term: "Marked by", "Retire (exact)", "Retire (in context)", "Keeps", "Depends on", "Used today").
+- The session's search of the glossary's retired phrases after the Retire split: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/scripts/glossary-hits-split.tsv` (one row per hit: topic, line, nearest id, entry, kind (exact or context), phrase; quoted text and dated records skipped). Use the rows of your topic{'s' if len(fl)>1 else ''} to find each place; line numbers are those of the file before your edits.
 - The shared cross-topic open questions: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/cross-topic-oqs.md` (the critic's other 29 items, with the file, the id `R<n>-XT-OQ<k>` and the code for each), as the advisor approved them.
 
 **The advisor's conditions for this step** (`advisor-resolutions-verdict.md`, "Conditions for step 3c"): apply the APPROVE and REVISE items as folded into resolutions.md (each item is marked "As approved, 2026-10-30"). For an escalated item apply only its "now" changes and its shared question; the changes C17.b1–b3 and C23.b1–b3 wait for the Advisor's BASELINE-WHEN answer: do not apply them. Log these as `recommendation` changes (the verifier checks them): C1.1, C1.5, C1.8–C1.11, C1.15–C1.18, C1.21; C5.1–C5.4; C6.1, C6.2; C9.1, C9.3, C9.7, C9.9, C9.14, C9.18–C9.20; C19.1, C19.5, C19.6; C21.1, C21.4, C21.8; C22.1, C22.3, C22.5; C29.1–C29.3; and every mark the "a time mark that names no statistic is a p99" rule changes (at least R1-ABL-REC6, R2-INT-REC1, R2-INT-REC4 and R2-INT-REC2).{extra}
@@ -42,5 +43,5 @@ A usage limit can cut you off part way, and you would then be started again with
 """
 for k,(agent,eff,fl,what) in OWN.items():
     p=prompt(k)
-    open(f'{D}/prompts/{agent}-{k}-consistency.txt','w').write(f"# Prepared prompt (verbatim, saved before launch under advisor condition A1)\n# description: step 3c owner apply ({what})\n# subagent_type: {agent} · model: opus · effort: {eff} · launched in workflow v2-research-apply-run1.js\n# launched: not yet\n\n"+p)
+    open(f'{D}/prompts/{agent}-{k}-consistency.txt','w').write(f"# Prepared prompt (verbatim, saved before launch under advisor condition A1)\n# description: step 3c owner apply ({what})\n# subagent_type: {agent} · model: opus · effort: {eff} · launched as a background agent with a one-line pointer message\n# launched: not yet\n\n"+p)
 print('ok')

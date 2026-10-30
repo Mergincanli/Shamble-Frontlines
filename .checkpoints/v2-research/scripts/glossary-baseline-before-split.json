@@ -1,0 +1,57 @@
+{
+ "exact_total": 0,
+ "context_total": 737,
+ "links": {
+  "R1": false,
+  "R2": false,
+  "R3": false,
+  "R4": false,
+  "R5": false,
+  "R6": false
+ },
+ "by_topic": {
+  "R1/context": 186,
+  "R2/context": 231,
+  "R3/context": 97,
+  "R4/context": 70,
+  "R5/context": 55,
+  "R6/context": 98
+ },
+ "skipped": {
+  "R1/quoted text": 21,
+  "R1/dated record": 39,
+  "R2/quoted text": 40,
+  "R2/dated record": 16,
+  "R3/quoted text": 11,
+  "R3/dated record": 6,
+  "R4/quoted text": 7,
+  "R4/dated record": 4,
+  "R5/quoted text": 11,
+  "R5/dated record": 5,
+  "R6/quoted text": 12,
+  "R6/dated record": 6
+ },
+ "odd_quote_blocks": {
+  "R1": 34,
+  "R2": 0,
+  "R3": 0,
+  "R4": 0,
+  "R5": 0,
+  "R6": 0
+ },
+ "term_uses": 573,
+ "first_uses_linked": 0,
+ "first_uses": 68,
+ "not_searchable": [
+  [
+   "The hash-map ban in the sim crate",
+   "context",
+   "zero uses of std HashMap or HashSet iteration in \u2026 outcome code"
+  ],
+  [
+   "The stress scene",
+   "context",
+   "the worst case (48 players plus vehicles and projectiles \u2026)"
+  ]
+ ]
+}

@@ -1,0 +1,9 @@
+ok Sim step time | moved to Keeps: ['Whole ticks']
+ok The measuring unit: one vCPU | moved to Keeps: ['Core', 'at least 4 cores and 8 threads']
+ok Player count (N) | moved to Keeps: ["the largest mode's N"]
+ok Big vehicle and very large unit | moved to Keeps: ['big']
+ok The authority | moved to Keeps: ['authority-only']
+ok Shared stream and authority-only stream | moved to Keeps: ['server-only keyed random stream']
+ok The security baseline | moved to Keeps: ['the security baseline']
+phrases that span a line break in either file (compared with spaces normalized): ['10 % of the server tick budget', '2×2, 2×8, 3×6, 3×18, 12v12v12 and 24v24', "a physics scene of the largest mode's size", 'at most 0.1 µs per enemy pair', 'at most 0.2 ms per tick', 'one vCPU of the EU instance type R6 recommends', "when R1-BND-REC5's option G3 is on", 'zero uses of std HashMap or HashSet iteration in … outcome code']
+entries 34 problems 0

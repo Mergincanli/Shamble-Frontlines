@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # subagent_type: engine-architect · model: opus · effort: xhigh · launched in workflow v2-research-retire-split-edit-run1.js
-# launched: not yet
+# launched: 2026-10-30T18:21Z in workflow run wf_1eb87409-4bd
 
 **Task:** a format-only edit of `/home/user/Shamble-Frontlines/docs/research/GLOSSARY.md` before step 3c of `/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan-amendments-2.md`, as the advisor approved on 2026-10-30 (its ruling: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-retire-split.md` and below). You are the glossary's only editor (advisor condition 6); no topic owner is editing yet.
 
