@@ -11,6 +11,7 @@
   2026-10-29); assembled 2026-10-29; spot-checked and fixed 2026-10-29.
 - **Status:** spot-checked (61 of 115 key claims). The verifier's table, its critical read, the owner's fixes and the
   second pass on them (2026-10-29: closed, nits only) are in "Verifier spot-check" below.
+- Glossary and cross-topic resolutions applied 2026-10-30 (see [GLOSSARY.md](GLOSSARY.md) and part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R5):** "Repository layout (a Cargo
   workspace plus TypeScript with Vite); strict TypeScript and lint rules; clippy and rustfmt; tests (cargo test,
   property tests, Vitest, Playwright, golden tests against legacy); CI with Rust caching; **preview links per PR**; the
@@ -23,12 +24,12 @@
 | 3 | clippy and rustfmt | R5-RUSTLINT-F1–F15, REC1–REC6, OQ1–OQ5 | test-engineer | `test-engineer-r5-rustlint-draft.md` |
 | 4 | tests (cargo test, property tests, Vitest, Playwright, golden tests against legacy) | R5-TEST-F1–F14, REC1–REC6, OQ1–OQ8 | test-engineer | `test-engineer-r5-test-draft.md` |
 | 5 | CI with Rust caching | R5-CI-F1–F24, REC1–REC5, OQ1–OQ7 | infra-engineer | `infra-engineer-r5-ci-draft.md` (section 1) |
-| 6 | **preview links per PR** | R5-PREV-F1–F20, REC1–REC5, OQ1–OQ6 | infra-engineer | `infra-engineer-r5-ci-draft.md` (section 2) |
+| 6 | **[preview](GLOSSARY.md#preview) links per PR** | R5-PREV-F1–F20, REC1–REC5, OQ1–OQ6 | infra-engineer | `infra-engineer-r5-ci-draft.md` (section 2) |
 | 7 | the gate v2 that replaces today's gate | R5-GATE-F1–F4 (plus today's gate as legacy facts), REC1–REC4, OQ1–OQ5 | test-engineer | `test-engineer-r5-gate-draft.md` |
 | – | Where the helper's parts and the owner's parts meet | – | test-engineer | R5-XQ-OQ1–OQ3 |
 
-**Totals:** 117 findings (owner 73, helper 44), 36 recommendations (owner 26, helper 10), 45 open questions (owner 29,
-helper 13, cross-part 3); 108 sources read (105 official, 2 shipped game, 1 other; owner 68, helper 44, 4 read by
+**Totals:** 117 findings (owner 73, helper 44), 36 recommendations (owner 26, helper 10), 63 open questions (owner 29,
+helper 13, cross-part 3, shared 4 and cross-topic 14 added 2026-10-30); 108 sources read (105 official, 2 shipped game, 1 other; owner 68, helper 44, 4 read by
 both), 39 rows of sources not read (the Sources part; a row can group several search leads).
 
 **How to read this file.**
@@ -518,7 +519,7 @@ both), 39 rows of sources not read (the Sources part; a row can group several se
   objective counters, slot bias); v2 runs seeded, deterministic bot matches on the native server. Legacy same-seed runs
   differ (11 wall-clock reads, STATUS:111).
 - **TL14** (redesign): reachability becomes a 3D navigation check in the Rust sim, callable from the editor and CI.
-- **TL15** (redesign): warm-up then measured steps, percentiles, reps, the fairness metric; in v2 a Rust tick bench at N
+- **TL15** (redesign): warm-up then measured steps, percentiles, reps, the fairness metric; in v2 a Rust tick bench at [N](GLOSSARY.md#player-count-n)
   players plus a client render bench.
 - **LOOP_V2 §11**: evidence per greybox step is the gate, `sim.js` with three teams and at least 3 runs per build,
   objective counters (cashouts, steals, deliveries, harvester kills); then the scale test at N = 12, 24, 36, 48.
@@ -819,7 +820,7 @@ R6's: this section names the hosts considered and what the workflow needs from t
 
 **Hosts considered and how they deploy a preview**
 
-- **R5-PREV-F10.** Cloudflare Pages takes a direct upload from GitHub Actions through cloudflare/wrangler-action v4,
+- **R5-PREV-F10.** [Cloudflare Pages](GLOSSARY.md#the-client-host) takes a direct upload from GitHub Actions through cloudflare/wrangler-action v4,
   with an account-scoped "Pages Edit" API token stored as a repository secret. With the GitHub token it can also
   create a GitHub Deployment. Quotes: the example command is `"pages deploy YOUR_DIRECTORY_OF_STATIC_ASSETS
   --project-name=YOUR_PROJECT_NAME"`; it "automatically triggers on the current git branch, unless you add a `branch`
@@ -950,7 +951,7 @@ These are legacy facts, cited by file and line and by inventory row, not web fin
   read 2026-10-28 · confirmed in the source: `build.chunkSizeWarningLimit` is the "Limit for chunk size warnings (in
   kB)." (default 500); `build.reportCompressedSize` "Enable/disable gzip-compressed size reporting." (default `true`).
   Consequence (inferred): a size budget that fails the build is a check of our own.
-- **R5-GATE-F3. cargo-deny has four check classes; the advisories check reads an advisory database that also lists
+- **R5-GATE-F3. cargo-deny has four check classes; [the advisories check](GLOSSARY.md#the-advisories-check) reads an advisory database that also lists
   unmaintained crates.** Sources: https://embarkstudios.github.io/cargo-deny/ and
   https://embarkstudios.github.io/cargo-deny/checks/advisories/index.html (no version shown) · official (the tool's docs)
   · read 2026-10-28 · confirmed in the source: "cargo-deny supports several classes of checks" (advisories, bans,
@@ -1189,6 +1190,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   transport crate inside `sim`; a `tokio` dependency added to `sim`; an `import` of an `editor` module in `client`; a
   dynamic `import()` of the editor in `client` (only the manifest walk sees a path built at run time); controls (a
   legal import of `types` in `editor`) pass.
+  Cross-topic open questions: R5-XT-OQ3, R5-XT-OQ7 (below).
 - **R5-LAYOUT-REC3. Generated TypeScript types live in one committed package, `packages/types`, written by `cargo test`
   and diffed in CI.** ts-rs exports into `packages/types/src/generated/` through `TS_RS_EXPORT_DIR` in
   `.cargo/config.toml`; the JSON Schema of R1-DATA-REC3 and the output-block layout of R1-BND-REC4 (D4) write to the same
@@ -1200,6 +1202,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Serves: §6.3 and §6.7 (content and abilities typed from one definition on both sides).
   A spike must prove (proposed): renaming a field of an exported Rust type without regenerating fails the gate; a hand
   edit to a generated file fails the gate; two runs of the generator on the same commit give byte-identical files.
+  Cross-topic open questions: R5-XT-OQ9 (below).
 - **R5-LAYOUT-REC4. The sim crate is built with one feature set on every target, and the gate checks it.** The `sim`
   crate exposes no feature that changes maths; dependencies it shares with `server` get their maths-relevant features
   set once in `[workspace.dependencies]`; the determinism suite (R5-TEST-REC2) tests the native sim built as the server
@@ -1222,10 +1225,11 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   type-check (F10).
   Rests on: R5-LAYOUT-F9, F10, F11, F12; R1-BND-REC5 (cited).
   Serves: §6.2, §6.9 and §4 (the sim in a Worker on the client, as R1's option A2 traces it: the Worker carries the 3D
-  sim and keeps tick time off the render thread), §6.7 (the editor entry).
+  sim and keeps [sim step time](GLOSSARY.md#sim-step-time) off the render thread), §6.7 (the editor entry).
   A spike must prove (proposed): with the flag, `crossOriginIsolated === true` in Chromium, Firefox and WebKit under
   Playwright on both `vite` and `vite preview`; without it, `false`; the built player page loads no file from `editor`
   (REC2's manifest walk).
+  Cross-topic open questions: R5-XT-OQ8 (below).
 - **R5-LAYOUT-REC6. The phase 1 move keeps the legacy oracle runnable.** The five game files move to `legacy/`; `tools/`
   (preview.js, sim.js, battery.js, tuning-dump.js, the gate) moves with them or learns the new path (input to the phase
   1 plan, which decides it, R5-LAYOUT-OQ5; nothing here changes today's tools), so today's gate keeps guarding critical
@@ -1356,8 +1360,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Serves: §4 (client and server must not disagree on a tick, as R1-ECS-REC2 traces determinism), §6.6 and §6.8
   (re-runnable matches).
   A spike must prove (proposed): a planted `u16` counter that overflows with `+` panics in the dev and the release test
-  builds, native and Wasm alike; the same counter with `wrapping_add` gives the same value on all four; the tick cost of
-  the checks is reported with method (R1-TICK's bench), and the ADR sets the limit.
+  builds, native and Wasm alike; the same counter with `wrapping_add` gives the same value on all four; the checks' cost in
+  sim step time is reported with method (R1-TICK's bench), and the ADR sets the limit.
 - **R5-RUSTLINT-REC5. rustfmt with stable options only, and the gate in check mode.** `rustfmt.toml` at the root:
   `edition = "2024"`, `style_edition = "2024"`, `newline_style = "Unix"`; everything else default (`max_width` 100). No
   unstable options, so the formatter runs on the pinned stable toolchain. The gate runs `cargo fmt --all --check`.
@@ -1391,9 +1395,9 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   | Legacy golden | `cargo test` reading committed fixtures (REC3) | the behaviour v2 keeps equals legacy within stated tolerances | gate |
   | Determinism | REC2's suite | identical per-tick hashes on every target | gate (short), nightly (long) |
   | Network | REC4's two layers | R2's pass marks under named profiles | gate (L1 short), nightly (L1 long, L2) |
-  | Soak and load | REC5 | 48+ players with bots, hours | nightly and before each playtest |
+  | Soak and load | REC5 | [48+](GLOSSARY.md#the-design-point-and-headroom) players with bots, hours | nightly and before each playtest |
   | Fuzz | cargo-fuzz on decoders and the content loader | 0 panics, 0 over-limit allocations | nightly, Linux |
-  | Benchmarks | R1-TICK's tick bench at N players and a client render bench (TL15); the tool was not read (R5-TEST-OQ8) | tick and frame cost, reported with method (R5-RUSTLINT-REC4's overflow cost, REC5's tick p99) | on change-sets that touch the sim or the render path; never a gate pass or fail (R3-MEASURE-REC3: CI gates counts, not timings) |
+  | Benchmarks | R1-TICK's tick bench at N players and a client render bench (TL15); the tool was not read (R5-TEST-OQ8) | sim step time and frame cost, reported with method (R5-RUSTLINT-REC4's overflow cost, REC5's [server tick time](GLOSSARY.md#server-tick-time) [p99](GLOSSARY.md#time-statistics)) | on change-sets that touch the sim or the render path; never a gate pass or fail (R3-MEASURE-REC3: CI gates counts, not timings) |
   Reason: each tool is the read option for its layer (F1, F2, F4–F9); WebKit stands in for Safari only partly, and
   Playwright cannot drive real Safari, so Safari's own runs go through its WebDriver (F5, F6, F8); benchmarks report
   numbers and never decide the gate (R3-MEASURE-REC3).
@@ -1404,6 +1408,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   fails that layer and is caught by the gate or nightly job
   the table names (for example: a byte-order swap in one encoder fails the boundary layer only; a page error in deploy
   fails e2e only); every layer's clean run passes 20 times in a row on one commit.
+  Cross-topic open questions: R5-XT-OQ2, R5-XT-OQ13 (below).
 - **R5-TEST-REC2. The determinism suite's tools (R1-DET-REC6 asks R5 to pick them).** A `devtools` replay runner (native,
   release, built as the server builds the sim, R5-LAYOUT-REC4) plays a recorded match and writes one hash per tick; the
   gate runs it twice in two processes and once as Wasm in Node (the same runner compiled to Wasm, or wasm-bindgen-test);
@@ -1466,11 +1471,13 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   (relative); in L2, app-level RTT agrees with quinn's server-side `rtt()` within ±5 ms at 100 ms injected round trip
   (R2-TRN-REC4 mark 2, as R2 sets it), and is then reported under P2's jitter and loss; a 1-minute
   L1 run per profile P0–P4 and B1 fits in the gate's network step, under 2 minutes in total.
+  Cross-topic open questions: R5-XT-OQ10 (below).
 - **R5-TEST-REC5. Soak and load at 48 and more, with bots as protocol clients.** Bots are headless Rust clients that
   speak the real protocol (inputs in, snapshots out) so a full room needs no browsers; one nightly run per mode at the
-  targets of VISION_V2 §3 (24v24 = 48 and 12v12v12 = 36, plus LOOP_V2 §11's N = 12, 24, 36, 48 scale steps) over L1 at
-  P2, 30 minutes each (proposed), and one L2 run with 4 real browser clients among the bots. Measured: server tick p50,
-  p99 and max (against R1-TICK's budget), bytes per client per second (against R2-BUD's budget), resident memory slope,
+  targets of VISION_V2 §3 (24v24 = 48 and 12v12v12 = 36, plus the largest mode where it is neither ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); MODES-3: 18v18v18 = 54
+  under reading (b)), plus LOOP_V2 §11's N = 12, 24, 36, 48 scale steps) over L1 at
+  P2, 30 minutes each (proposed), and one L2 run with 4 real browser clients among the bots. Measured: server tick time p50,
+  p99 and max (against the server tick budget, [GLOSSARY](GLOSSARY.md#the-server-tick-budget)), bytes per client per second (against R2-BUD's budget), resident memory slope,
   queue lengths, desyncs (from REC2's hashes on sampled clients), panics and hangs; plus TL13's match metrics (stall %,
   kill matrix, objective counters) for game-designer. Before each playtest, one 3-hour soak (proposed).
   Reason: v2 is designed for 48+ (CLAUDE.md, VISION_V2 §3); legacy's soak and scale habits carry (START_HERE §5, TL15,
@@ -1478,7 +1485,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Rests on: R5-TEST-F14; legacy TL13, TL15, LOOP_V2 §11.
   Serves: §3 (modes and scale), §6.1, §6.6 (the telemetry fields are exercised at full size).
   A spike must prove (proposed): a 30-minute 48-bot room at P2 runs with 0 panics, 0 hangs, 0 desyncs, a memory slope
-  within 1 MB per 10 minutes after warm-up, and tick p99 inside the budget ADR-0004 sets; a planted leak (one buffer kept
+  within 1 MB per 10 minutes after warm-up, and server tick time p99 inside the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget); ADR-0004 and ADR-0001 adopt it); a planted leak (one buffer kept
   per snapshot) is flagged by the slope check within the run.
 - **R5-TEST-REC6. Flakes: no retries, fixed seeds in the gate, no wall-clock waits; a failure is a defect.** Vitest
   `retry: 0` and Playwright `retries: 0` (both defaults, F7, F9) are written out; Playwright `failOnFlakyTests` and
@@ -1512,6 +1519,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   dependency crate is recompiled in a PR run (checked in `cargo build` output or `--timings`, F11); (2) the
   repository's total cache stays at or below 8 GB with every v2 job cached (read from the repository's Actions cache
   list), leaving room under 10 GB; (3) warm against cold time per Rust job, reported over 3 runs each.
+  Cross-topic open questions: R5-XT-OQ14, which names mark 2 (below).
 - **R5-CI-REC2. Pin the Rust toolchain exactly and build with `--locked`.** `rust-toolchain.toml` holds an exact
   `x.y.z` channel, `targets = ["wasm32-unknown-unknown"]`, components `clippy` and `rustfmt`, and `profile = "minimal"`.
   CI installs it with `rustup toolchain install` (no arguments) before any cargo call. Cargo.lock is committed, and
@@ -1593,11 +1601,13 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   (2) a fork PR runs the build and test jobs, the deploy job is skipped, and its log shows no secret; (3) the deploy
   job contains no `actions/checkout` of the PR head and no `npm ci` or `cargo` step (checked by reading the workflow, and
   by a test PR that changes package.json scripts: the change never runs in the deploy job).
+  Cross-topic open questions: R5-XT-OQ6, R5-XT-OQ12 (below).
 - **R5-PREV-REC2. Choose a host that meets these needs: deploy a prebuilt directory from Actions with a scoped token; a
   stable link per PR branch; `noindex`; custom headers per hostname; an access option; deletion through a CLI or API. On
   the docs read, Cloudflare Pages meets every need except full cleanup: a branch's latest deployment cannot be deleted
   (F13, R5-PREV-OQ2). Cloudflare Workers static assets, Netlify and Vercel meet most. GitHub Pages lacks per-PR sites
-  and custom headers. The choice and its price are R6's.** Reason: F10-F13 and F18 cover every need for Cloudflare Pages
+  and custom headers. R6 hosts the client and the previews on Cloudflare Pages, with Workers static assets as the alternative
+  (R6-HOST-REC1; [GLOSSARY](GLOSSARY.md#the-client-host): the client host); whether a closed PR's preview disappears there is PREV-DELETE (below).** Reason: F10-F13 and F18 cover every need for Cloudflare Pages
   but that cleanup point (F13); F14 shows Workers previews without a stated `noindex`; Netlify's natural path is P5
   (F15), which builds outside our tested CI; Vercel's prebuilt path works (F17), but its plan terms are R6's. Rests on:
   R5-PREV-F10, F11, F12, F13, F14, F15, F17, F18; the GitHub Pages, Netlify-headers and Vercel points rest on R6's notes
@@ -1610,28 +1620,32 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   closing is an event workflows can catch (F4). Pages deletes by id but keeps a branch's latest deployment (F13), so a
   sweep backs up the close job, and what stays reachable must be known (R5-PREV-OQ2). Short artifact retention limits
   what a public repository keeps lying around (F9). Rests on: R5-PREV-F4, F9, F13, F14. Serves: none. Spike must prove
-  (proposed): 24 h after a PR closes, its preview URL no longer serves the build (HTTP 404, or the access wall), or the
+  (proposed): 24 h after a PR closes, its preview URL no longer serves the build (HTTP 404, or [the access wall](GLOSSARY.md#the-access-wall)), or the
   remaining case is written down with the reason; the sweep leaves 0 previews of closed PRs older than 7 days.
-- **R5-PREV-REC4. Preview headers: a preview-only header set, scoped by hostname, generated by the build. The deploy
-  job checks the headers.** The set: COOP `same-origin` and COEP `require-corp` on preview hostnames only (R1-BND-REC5
-  G3; production stays non-isolated until REC5's test decides), `X-Robots-Tag: noindex` (the host default, F12, F15),
-  `.wasm` served as `application/wasm`, and R6's content security policy once written. Use the same values in Vite's
-  `server.headers` and `preview.headers`, so local development matches the preview (F19). After deploying, the job
-  fetches the preview's HTML and `.wasm` and fails if a header is missing. Whether the preview Mustafa checks should
-  instead carry production's header set is R5-XQ-OQ3. Reason: R1-BND-REC5 allows isolation in
-  development and previews and asks that `crossOriginIsolated` be proven on a preview link. Cloudflare's `_headers`
+- **R5-PREV-REC4. Preview headers: the preview header set, scoped by hostname, generated by the build. The deploy
+  job checks the headers.** The set is the preview header set ([GLOSSARY](GLOSSARY.md#the-production-header-set-and-the-preview-header-set)): production's header set, that is `.wasm` served as
+  `application/wasm` and R6's content security policy once written, plus `X-Robots-Tag: noindex` (the host default,
+  F12, F15). COOP `same-origin` and COEP `require-corp` are added only on a preview built with the isolation flag on
+  ([GLOSSARY](GLOSSARY.md#preview-isolation-and-the-isolation-flag); R1-BND-REC5 G3, for profiling); production stays non-isolated until R1-BND-REC2 mark 5's test decides. Vite's
+  `server.headers` and `preview.headers` take the same sets behind the same flag (R5-LAYOUT-REC5), so local development
+  matches the preview (F19). The preview Mustafa checks is built with the flag off. After deploying, the job
+  fetches the preview's HTML and `.wasm` and fails if a header is missing. This settles R5-XQ-OQ3. Reason: R1-BND-REC5 allows isolation in
+  development and previews and asks that `crossOriginIsolated` be proven on a preview link. Cloudflare Pages' `_headers`
   rules can target one hostname pattern (F18), and Vite sets the same headers locally (F19). The wrong `.wasm` type
   breaks streaming instantiation (F20). Rests on: R5-PREV-F12, F15, F18, F19, F20; R1-BND-REC5 (wave 1). Serves: §4 (four
   desktop browsers, including Safari) through R1-BND-REC5; no §6 item names isolation (as R1-BND-REC5 says). Spike must
   prove (proposed): (1) the deploy job's header check passes, and fails when a header is removed (mutation); (2)
-  `crossOriginIsolated` is true on a preview link in Chrome, Edge, Firefox, Safari and Brave (R1-BND-REC5's pass mark,
-  plus Brave for Mustafa); (3) the production build's headers do not include COOP/COEP.
+  `crossOriginIsolated` is true on a preview built with the isolation flag on, and false on one built with it off, in
+  Chrome, Edge, Firefox, Safari and Brave (R1-BND-REC5's pass mark, plus Brave for Mustafa); (3) the production build's
+  headers, and those of a preview built with the flag off, do not include COOP/COEP.
+  Cross-topic open questions: R5-XT-OQ5 (below).
 - **R5-PREV-REC5. Keep previews public but unlisted at the start (`noindex`, branch-name links), and offer Mustafa
   the access wall as a choice, not a default.** Reason: Mustafa opens links in Brave (CLAUDE.md), and an access policy
   limits viewing to the Cloudflare account (F12) or Cloudflare Access (F14), which puts a login in front of every
   check. A preview contains only what the public repository already contains (inferred), so the main exposure is
-  search indexing, which `noindex` handles (F12, F15). This changes once a preview talks to a real server or carries
-  unreleased art: then the access wall is on. Rests on: R5-PREV-F12, F14, F15. Serves: none (process). Spike must
+  search indexing, which `noindex` handles (F12, F15). This changes once a preview carries unreleased art: then the access wall ([GLOSSARY](GLOSSARY.md#the-access-wall)) is on. Whether it is also
+  on once a preview talks to [the staging game server](GLOSSARY.md#the-staging-game-server) (R6-HOST-REC3) is PREVIEW-WALL (Mustafa; below); until he
+  answers, no preview talks to a game server. Rests on: R5-PREV-F12, F14, F15. Serves: none (process). Spike must
   prove (proposed): a preview link opens in Brave on Windows without a login. If Mustafa picks the access wall, he
   logs in once per session and the link works after that.
 
@@ -1665,6 +1679,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Serves: the gate of every §6 item; G10 serves §4, §6.6, §6.8 (as R1-ECS-REC2 traces determinism); G11 serves §4's
   fairness target.
   A spike must prove (proposed): see REC3 (every check fails on its planted defect).
+  Cross-topic open questions: R5-XT-OQ7 (below).
 - **R5-GATE-REC2. One command, the same locally and in CI, carrying today's conventions (option A).** A Node
   orchestrator (working name `node tools/gate.mjs`, v2 edition; where it lives beside legacy's gate is R5-GATE-OQ3)
   with today's base-ref rule, exit codes 0, 1 and 2, `--json`, and the TL3 habit as `--allow-removed` (a
@@ -1715,6 +1730,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Serves: none directly (it keeps the gate honest for every §6 item).
   A spike must prove (proposed): `--prove` passes on the first gate v2 build: every mutation fails exactly its named
   checks and every control passes; `--prove` itself takes under 30 minutes (it rebuilds per mutation; proposed).
+  Cross-topic open questions: R5-XT-OQ12 (below).
 - **R5-GATE-REC4. Budgets are data in the repository, reviewed like code.** One committed file holds the size budgets
   (Wasm raw and gzip, JS per entry), R3-MEASURE-REC3's count baselines and their 10 % limits, the gate's time budgets and
   the proptest case counts; raising a budget is a reviewed change with its reason, like `gate-globals.json` today
@@ -1758,7 +1774,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   of these flags in calls into three.js was not measured. Decides it: the spike counts the errors and the casts the
   client needs.
 - **R5-TSLINT-OQ5. Which rule enforces "`textContent`, never `innerHTML`" for dynamic text?** No rule for it was read.
-  Decides it: security-auditor with R6's security baseline; ESLint's `no-restricted-properties` or `no-restricted-syntax`
+  Decides it: security-auditor with [the security baseline](GLOSSARY.md#the-security-baseline); ESLint's `no-restricted-properties` or `no-restricted-syntax`
   are candidates (not read).
 - **R5-TSLINT-OQ6. `skipLibCheck`.** Off checks every `.d.ts`, including the generated ones (tsconfig reference, S17 in the notes: "Skip type
   checking of declaration files."), at a cost not measured. Decides it: the spike's `tsc -b` time with it on and off.
@@ -1777,7 +1793,9 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 - **R5-RUSTLINT-OQ4. Overflow checks cost on the hot tick.** Not measured. Decides it: REC4's bench.
 - **R5-RUSTLINT-OQ5. Allowed HashMap use inside the sim for non-outcome code.** R1-ECS-REC2 limits the ban to outcome
   code; REC2 bans the type crate-wide. Decides it: engine-architect, when the sim's modules exist; an `#[allow]` with a
-  reason is the escape.
+  reason is the escape. Settled on 2026-10-30 ([GLOSSARY](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate): the hash-map ban): the ban stays crate-wide, and an `#[allow]`
+  with a written reason may admit a map that is only looked up and lies outside the serialized sim state
+  (R1-DET-REC5, R1-DET-REC6); ADR-0002 records the rule.
 
 ### Question 4: tests (R5-TEST)
 
@@ -1826,16 +1844,17 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 
 
 - **R5-PREV-OQ1. Access wall or public-unlisted previews?** It is Mustafa's call (R5-PREV-REC5). What decides it: does
-  he accept a Cloudflare login per Brave session, and will previews carry anything not already public?
+  he accept a Cloudflare login per Brave session, and will previews carry anything not already public? Its staging-server part is shared as PREVIEW-WALL (below).
 - **R5-PREV-OQ2. Does a closed PR's preview really disappear on Cloudflare Pages?** "The latest deployment for a branch
   cannot be deleted" and "`--force` ... to force deletion of aliased deployments" (F13) leave the last link's fate
-  unclear. Decided by a spike on a test project, or by R6 reading the Pages API docs.
+  unclear. Decided by a spike on a test project, or by R6 reading the Pages API docs. Shared as PREV-DELETE (below).
 - **R5-PREV-OQ3. Do previews need a game server?** At the start a preview can run the sim locally in the worker
-  (R1-BND-REC6: offline play). Multiplayer previews need an EU server and certificates (R2-TRN-REC5: self-signed for at
+  (R1-BND-REC6: offline play). Multiplayer previews need the staging game server and certificates (R2-TRN-REC5: self-signed for at
   most 14 days, pinned via `serverCertificateHashes`, in dev and previews). Decided by phase 1's slice plan and R6's
   hosting.
 - **R5-PREV-OQ4. Which host, at what price?** R6 decides from its price and limit research. This draft gives only the
-  technical needs (R5-PREV-REC2).
+  technical needs (R5-PREV-REC2). Answered by R6-HOST-REC1: Cloudflare Pages, with Workers static assets as the
+  alternative; the start budget's line is 0 USD on Pages' Free plan (R6-COST-REC1, R6-HOST-F3; the price is inferred from the plan's name, no Pages price page was read).
 - **R5-PREV-OQ5. Does GitHub show the environment URL on the PR page?** It is not stated in the pages read (F7). If
   not, the PR comment (REC1) is the link Mustafa uses. Decided by the spike.
 - **R5-PREV-OQ6. Do branch aliases match `https://:version.:project.pages.dev/*`?** It is inferred only (F18). Decided
@@ -1852,8 +1871,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
 - **R5-GATE-OQ3. Where the gate v2 lives while legacy's gate stays.** Both in `tools/`, or the legacy gate inside
   `legacy/`. Decides it: the phase 1 restructure plan (R5-LAYOUT-OQ5).
 - **R5-GATE-OQ4. Advisories: in the PR gate or only scheduled and on lockfile changes?** F3 says the verdict can change
-  without our change; R1-RR-OQ7 asks for cargo-audit and cargo-deny as CI gates. Decides it: security-auditor with R6's
-  security baseline.
+  without our change; R1-RR-OQ7 asks for cargo-audit and cargo-deny as CI gates. Decides it: security-auditor with the
+  security baseline. Shared as BASELINE-WHEN (below).
 - **R5-GATE-OQ5. `--prove` cost.** Rebuilding per mutation may take long; whether mutations can share one build is
   unmeasured. Decides it: the spike's REC3 time mark.
 
@@ -1884,7 +1903,130 @@ parts, the difference is written here; nothing is decided.
   production does not have. Both serve R1-BND-REC5 (G3: isolation allowed in development and previews). What decides it:
   engine-architect with R1-BND-REC5's adoption test; whichever way, the end-to-end suite should run once isolated and
   once not, so both paths are tested. One option among others: the preview Mustafa checks carries the header set
-  production will ship (a production-headers preview for his check and an isolated one for profiling).
+  production will ship (a production-headers preview for his check and an isolated one for profiling). Settled on
+  2026-10-30 ([GLOSSARY](GLOSSARY.md#preview-isolation-and-the-isolation-flag): preview isolation and the isolation flag): R5-LAYOUT-REC5's flag rule holds for local
+  development and previews alike, the preview Mustafa checks is built with the flag off, an isolated preview is built
+  only for profiling, and the end-to-end suite runs once with the flag and once without.
+
+### Shared open questions (the same words in every topic)
+
+The questions below carry the same words in every topic they touch (resolutions 10, 17, 19 and 21 of the consistency
+resolutions, approved by the advisor on 2026-10-30; part 7, "Consistency resolutions (2026-10-30)"). Each is headed by
+its decision code.
+
+- **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players, and
+  three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
+  6v6v6; the largest mode is then the [goal](GLOSSARY.md#the-start-modes-and-the-goal-modes) 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which the stress scene, the offline
+  scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the
+  test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives both values. Also asked
+  as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+- **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+  security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits, anti-cheat basics) was deferred by the
+  Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched before 0006 is accepted" (R6-SEC-OQ1). Two
+  cross-topic disagreements wait on it: who owns the advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) and whether an advisory blocks a pull
+  request (R1-RR-OQ7, R2-TRN-REC1 mark 5, R5-GATE-REC1, R5-GATE-OQ4, R6-SEC-OQ1), and one wildcard certificate whose
+  private key sits on every game VM (R6-HOST-REC4) against a certificate per game-server hostname (R2-TRN-REC5). (a)
+  Research it now, as one security-auditor topic before the drafts. (b) List it open in ADR 0006 with interim positions:
+  R5-GATE-REC1's scheduled advisories check stays the mechanism and the baseline sets the policy later; R2-TRN-REC5's
+  certificate per hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave both as one shared
+  open question. Decided by: the Advisor.
+- **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+  for a branch cannot be deleted", while `--force` serves "to force deletion of aliased deployments" (R5-PREV-F13), so
+  the last link's fate is unclear. On Workers static assets, the alternative host, only "the 1000 most recently deployed
+  aliases are retained" (R5-PREV-F14), and an explicit deletion was not read. Decided by: a spike on a test project on
+  the client host ([GLOSSARY](GLOSSARY.md#the-client-host)), with R5-PREV-REC3's mark: 24 h after a PR closes, its preview URL no longer serves the
+  build (HTTP 404, or the access wall), or the remaining case is written down with the reason. If Pages fails it with no
+  workaround, Workers static assets is weighed again (R6-HOST-REC1). Also asked as R5-PREV-OQ2.
+- **PREVIEW-WALL (Mustafa). Should per-PR previews that talk to the staging game server be private?** Private means
+  behind the access wall ([GLOSSARY](GLOSSARY.md#the-access-wall)): the host's access policy on Mustafa's Cloudflare account (R5-PREV-F12, R6-HOST-F4)
+  or Cloudflare Access (R5-PREV-F14), so each Brave check needs one login per session (R5-PREV-REC5). Open means anyone
+  with the link can open the preview and the staging game server it talks to (R6-HOST-REC3). (a) Private from the first
+  preview that reaches the staging server; (b) open, since previews hold no secrets; (c) decided after the security
+  baseline (BASELINE-WHEN). Until Mustafa answers, no preview talks to a game server: previews run the match offline in
+  the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3); a preview that carries unreleased art is behind
+  the access wall, as R5-PREV-REC5 already says (R5-PREV-OQ1 asks that part). Also asked as R5-PREV-OQ1 and R6-HOST-OQ5.
+  Decided by: Mustafa.
+
+### Cross-topic open questions (consistency critic, 2026-10-29)
+
+The consistency critic's cross-topic items that touch R5, in the critic's words, with both sides' ids (approved by the
+advisor on 2026-10-30). The same question stands in each other topic it goes into, under that topic's own id.
+
+- **R5-XT-OQ1. Which R1 items still assume Rapier, now that R4 recommends parry3d?** R4 states openly that some of R1's
+  Rapier items change. It does not list R1-TICK-REC2's reason for starting at 60 Hz (Rapier's default step),
+  R1-ECS-REC1's reason and mark 5, R1's TL;DR, or whether R1-RR-OQ1's SIMD/FMA hazard applies to parry3d's "3D f32 SIMD"
+  BVH (R4-PHYS-OQ3 asks only by analogy). ADR-0004's determinism and snapshot sections rest on whichever crate wins.
+  Side A: R1-DET-REC3; R1-ECS-REC4; R1-ECS-REC1; R1-TICK-REC2; R1-RR-OQ1. Side B: R4-PHYS-REC1. Also named: R4-PHYS-OQ3.
+  Existing questions: R4 'Wave-1 items R4 changes or answers' (r4:1110-1129 at commit 8dee746) and R4-PHYS-OQ3, partly.
+  Decided by: ADR-0004 (sim core: physics), with R4-PHYS-REC1 marks 2-5 and R1-DET-REC6's suite as the evidence.
+  (Consistency critic, 2026-10-29, rank 3.)
+- **R5-XT-OQ2. Where does the remote-entity interpolation buffer live: in the worker or on the page?** A two-block
+  buffer on the page cannot hold R2's 100 to 167 ms delay. So either the worker (Rust) runs R2's adaptive snapshot
+  buffer and publishes already-delayed remote poses, or the page (TypeScript) keeps a snapshot buffer, as R5's test
+  layer assumes. No topic places R2's interpolation and clock estimate on one side of R1's boundary. Side A:
+  R1-TICK-REC5; R1-BND-REC2; R1-BND-REC6. Side B: R2-SYNC-REC4; R5-TEST-REC1. Existing questions: none. Decided by:
+  ADR-0001 (interpolation design) with ADR-0004 (boundary: block contents and the number of blocks kept). (Consistency
+  critic, 2026-10-29, rank 4.)
+- **R5-XT-OQ3. Who hosts, costs and builds the lobby and the room supervisor?** Join tokens, guest identity, room codes
+  and crash reports all go through the lobby, and R2 hands its hosting and store to R6. R6 neither hosts nor costs it,
+  and R5 has no crate for the lobby or the supervisor, so the infrastructure ADR and the cost budget leave out a
+  required service. Side A: R2-ROOM-REC2; R2-ROOM-OQ9. Side B: missing answer (R6-HOST-REC2, R6-OBS-REC3, R5-LAYOUT-REC2
+  named). Also named: R2-ROOM-REC8, R6-COST-REC1. Existing questions: R2-ROOM-OQ9 (left to R6, unanswered). Decided by:
+  ADR-0006 (hosting and cost of the lobby and its store) with ADR-0002 (crate list) and ADR-0001 (lobby protocol).
+  (Consistency critic, 2026-10-29, rank 8.)
+- **R5-XT-OQ4. Do browser navigation and server-less previews rest on an undecided offline-play need?** R4 builds
+  navigation for the browser, R6 serves previews without a game server, and R5 plans the first previews, all on offline
+  play, which R1 leaves as an open VISION question (and, at the largest mode, as R1-TICK-OQ7). Side A: R1-BND-OQ1. Side
+  B: R4-NAV-REC4; R6-HOST-REC3; R5-PREV-OQ3. Also named: R1-TICK-OQ7, R1-XU-OQ12. Existing questions: R1-BND-OQ1,
+  R1-TICK-OQ7, R1-XU-OQ12. Decided by: Mustafa and the Advisor (VISION_V2), then ADR-0004 and ADR-0006. (Consistency
+  critic, 2026-10-29, rank 15.)
+- **R5-XT-OQ5. Which recommendations wait on the deferred security baseline?** Recommendations in R2 and R5
+  (guest-secret storage, preview headers, a lint rule, token keys) wait on a topic with no recommendation and no date.
+  ADR-0001, 0002 and 0006 cannot close those items. Side A: R5-PREV-REC4; R5-TSLINT-OQ5; R2-ROOM-OQ11; R2-ROOM-OQ2. Side
+  B: R6-SEC-OQ1. Existing questions: R6-SEC-OQ1. Decided by: The Advisor (research the baseline before ADR-0006, or list
+  it open), then security-auditor. Decision code: BASELINE-WHEN. (Consistency critic, 2026-10-29, rank 18.)
+- **R5-XT-OQ6. How do multiplayer previews get their server binary and their certificate hash?** Multiplayer previews
+  need a server-binary delivery job (a second CI secret and PR-built native code on a VM) and a way to publish the
+  self-signed hash on the page's origin. R5's preview design covers only the static client. Side A: R6-HOST-REC3;
+  R2-TRN-REC5. Side B: R5-PREV-REC1. Also named: R5-PREV-OQ3. Existing questions: R5-PREV-OQ3 (asks whether previews
+  need a server; R6 answers yes, but not how). Decided by: ADR-0002 (preview workflow) and ADR-0006 (staging server),
+  with ADR-0001 (where the certificate hash is fetched from). (Consistency critic, 2026-10-29, rank 20.)
+- **R5-XT-OQ7. Where do the navigation bake and R4's checks live in the crates and the gate?** Where the bake code lives
+  decides whether the generator ships in the player's Wasm (R4-NAV-REC4 wants a bot-free build to skip navigation data)
+  and how the editor runs it in a Worker. The gate does not include R4's checks. Side A: R4-NAV-REC1; R4-FLOORS-REC3.
+  Side B: missing answer (R5-LAYOUT-REC2 named). Also named: R4-PHYS-REC2, R5-GATE-REC1. Existing questions: none.
+  Decided by: ADR-0002 (crate list and gate checks) with ADR-0004 (navigation). (Consistency critic, 2026-10-29, rank
+  24.)
+- **R5-XT-OQ8. Does the editor still open by double-click with a Wasm validator?** R1 hands this question to R5, and
+  R5's editor build does not address the double-click rule EDITOR_V2 keeps. Side A: R1-DATA-OQ11. Side B: missing answer
+  (R5-LAYOUT-REC5, R3-WGPU-REC4 named). Existing questions: R1-DATA-OQ11. Decided by: ADR-0002 (editor build), or
+  Mustafa if EDITOR_V2 §5's double-click rule must change. (Consistency critic, 2026-10-29, rank 25.)
+- **R5-XT-OQ9. Where do content's TypeScript types come from?** R5 gives the outputs one home but does not choose
+  between the two sources for content types. Side A: R1-XU-OQ8; R1-BND-REC4; R1-DATA-REC3. Side B: R5-LAYOUT-REC3.
+  Existing questions: R1-XU-OQ8. Decided by: ADR-0005 (content data), with ADR-0002. (Consistency critic, 2026-10-29,
+  rank 31.)
+- **R5-XT-OQ10. Do R2's marks all name one of R5's network profiles?** R5 treats R2's profile set as settled, but R2's
+  own marks still use other jitter values and unnamed latencies, so some R2 marks cannot be run as R5 specifies. Side A:
+  R5-TEST-REC4; R2-XU-OQ12. Side B: R2-BUD-REC1; R2-BUD-REC4. Also named: R2-INT-REC1. Existing questions: R2-XU-OQ12.
+  Decided by: The synthesis (ADR-0001) restates every R2 mark against a named profile. (Consistency critic, 2026-10-29,
+  rank 32.)
+- **R5-XT-OQ11. Who sets the CI runner costs (GPU, macOS, reference machines, cache)?** Real-Safari runs, WebGPU
+  coverage in CI and reference-machine runs all depend on costs no topic sets. Side A: R5-CI-OQ5; R5-TEST-OQ4;
+  R3-MEASURE-OQ2. Side B: missing answer. Also named: R5-XQ-OQ1, R6-COST-REC1. Existing questions: R5-CI-OQ5,
+  R5-TEST-OQ4, R5-XQ-OQ1, R3-MEASURE-OQ2. Decided by: ADR-0006 (costs) with ADR-0002 (CI); Mustafa for any paid plan.
+  (Consistency critic, 2026-10-29, rank 33.)
+- **R5-XT-OQ12. Where do the Sentry upload job and the smoke test's network rule fit?** R6's crash reporting adds a CI
+  secret job and an external endpoint that R5's CI design and smoke check do not allow for. Side A: none by id. Side B:
+  R5-GATE-REC3. Also named: R6-OBS-REC3, R5-PREV-REC1. Existing questions: none. Decided by: ADR-0002 (CI jobs, secrets
+  and the smoke test's network rule) with ADR-0006. (Consistency critic, 2026-10-29, rank 34.)
+- **R5-XT-OQ13. Which bench method measures R1's budget marks?** R1's budget marks wait on a measuring method R5 has not
+  chosen. Side A: R1-ABL-REC6. Side B: R5-TEST-REC1; R5-TEST-OQ8. Also named: R1 pointer to R5 (tick benches). Existing
+  questions: R5-TEST-OQ8. Decided by: ADR-0002 (bench tool and method). (Consistency critic, 2026-10-29, rank 36.)
+- **R5-XT-OQ14. Does R5's cache question size a workspace no topic proposes?** R5's cache question assumes crates R1 and
+  R4 recommend against, so it sizes a workspace no topic proposes. Side A: R5-CI-OQ1. Side B: R1-ECS-REC1; R4-PHYS-REC1.
+  Existing questions: none. Decided by: ADR-0002 (crate list), then the cache spike (R5-CI-REC1 mark 2). (Consistency
+  critic, 2026-10-29, rank 40.)
 
 ### Recommendations that hinge on a source not read
 
@@ -1949,7 +2091,7 @@ parts, the difference is written here; nothing is decided.
   R5-PREV-OQ2 (Pages deletion of a branch's latest deployment) and R5-PREV-OQ4 (host and price), and whether a GPU
   runner (R5-CI-OQ5) or more than 10 GB of cache (R5-CI-F5, Pro account) would ever be paid. The server CPU
   architecture (R1-DET-OQ7) decides R5-CI-OQ7's arm64 leg.
-- **For R6's security baseline (security-auditor):** the preview deploy job is the first CI job with a secret
+- **For the security baseline (R6; security-auditor):** the preview deploy job is the first CI job with a secret
   (R5-PREV-REC1). Dependency audits (cargo-deny or cargo-audit; both installable through install-action, R5-CI-F15) and
   the CSP that REC4's header set waits for are yours.
 - **For Mustafa (settings he owns, never changed by agents):** the required check name for the gate v2, the
@@ -2087,6 +2229,50 @@ NOTES, nits only.
   credited only with listing Safari; R5-RUSTLINT-REC3 rests on F1 too; R5-TEST-REC1 rests on R1-TICK-REC2 and its mark
   exempts the benchmark layer; R5-TEST-OQ8 no longer states how nextest isolates tests; R5-XQ-OQ3 gives its answer as
   one option; the re-read date of 2026-10-29 is noted. Review stops here: what remains is nits.
+
+### Consistency resolutions (2026-10-30)
+
+Step 3c of `.checkpoints/v2-research/plan-amendments-2.md`, applied by the owner (test-engineer) to this file only, as
+the advisor approved them on 2026-10-30 (`.checkpoints/v2-research/advisor-resolutions-verdict.md`; the texts as folded
+into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim, number or source was added. Notes:
+`.checkpoints/v2-research/test-engineer-r5-consistency.md`.
+- **Resolutions applied** (by the critic's rank and change id; each "before" text matched the file exactly once):
+  - rank 1 (the server tick budget): C1.19 (R5-TEST-REC5, measured server tick time against the server tick budget),
+    C1.20 (R5-TEST-REC5's spike mark);
+  - rank 10 (MODES-3, escalated; interim wording): C10.17 (R5-TEST-REC5 adds the largest mode where it is neither
+    goal), C10.18 (MODES-3 inserted);
+  - rank 17 (BASELINE-WHEN, escalated): C17.5 (R5-GATE-OQ4 points to the shared question), C17.6 (BASELINE-WHEN
+    inserted); C17.b3 is not applied: it waits for the Advisor's BASELINE-WHEN answer;
+  - rank 19 (the client host): C19.1 (R5-PREV-REC2's heading: R6 hosts on Cloudflare Pages, Workers static assets the
+    alternative; a recommendation change), C19.2 (R5-PREV-OQ2), C19.3 (R5-PREV-OQ4, in the advisor's revised words),
+    C19.4 (PREV-DELETE inserted);
+  - rank 21 (PREVIEW-WALL, escalated; interim wording in the advisor's revised words): C21.1 (R5-PREV-REC5: unreleased
+    art keeps the access wall on; the staging-server part is PREVIEW-WALL; until it is answered no preview talks to a
+    game server; a recommendation change), C21.2 (R5-PREV-OQ1), C21.3 (PREVIEW-WALL inserted);
+  - rank 22 (the isolation flag): C22.1 (R5-PREV-REC4's set is the preview header set, COOP and COEP only with the
+    isolation flag on; a recommendation change), C22.2 (R5-PREV-REC4 settles R5-XQ-OQ3), C22.3 (R5-PREV-REC4 marks 2
+    and 3; a recommendation change), C22.4 (R5-XQ-OQ3 settled);
+  - rank 29 (the hash-map ban): C29.4 (R5-RUSTLINT-OQ5 settled);
+  - rank 41 (wrong cross-reference, a nit): applied through C22.1 ("until R1-BND-REC2 mark 5's test decides").
+  - Ranks 5, 6, 9, 11 and 23 change nothing in R5.
+- **Glossary terms** ([GLOSSARY.md](GLOSSARY.md); linked from the header and from the first use of each term the file
+  uses): no "Retire (exact)" phrase was in this file. "Retire (in context)" words replaced where they carried the
+  term's meaning: "tick time" in R5-LAYOUT-REC5 and "tick cost" in R5-RUSTLINT-REC4's spike (sim step time); the
+  benchmark row of R5-TEST-REC1 (sim step time; REC5's server tick time p99); "a preview-only header set" in
+  R5-PREV-REC4's heading (the preview header set); "Cloudflare's `_headers`" in R5-PREV-REC4's reason (Cloudflare
+  Pages', F18 being the Pages page); "R6's security baseline" in R5-TSLINT-OQ5, R5-GATE-OQ4 and the pointers to R6 (the
+  security baseline); "an EU server" in R5-PREV-OQ3 (the staging game server). The other in-context hits stay: they
+  name a product, an account, a URL or a source table row, a scale step or the design point (48+), the reviewer's
+  proposal in R1-RR-OQ7's words, or an option inside a question. No value changed because of a definition, and no
+  R5 time mark is a tick-time mark without a statistic.
+- **Shared open questions added** (part "Open questions"): MODES-3, BASELINE-WHEN, PREV-DELETE and PREVIEW-WALL under
+  "Shared open questions (the same words in every topic)"; R5-XT-OQ1 to R5-XT-OQ14 (the critic's ranks 3, 4, 8, 15,
+  18, 20, 24, 25, 31, 32, 33, 34, 36 and 40) under "Cross-topic open questions (consistency critic, 2026-10-29)", with
+  a pointer from each R5 recommendation they name (R5-LAYOUT-REC2, REC3, REC5; R5-TEST-REC1, REC4; R5-CI-REC1;
+  R5-PREV-REC1, REC4; R5-GATE-REC1, REC3).
+- **Header:** the open-question total becomes 63 (18 added); the status label is unchanged (the step-3d verifier
+  recounts it).
+- **OBJECT:** none.
 
 ## Sources
 
