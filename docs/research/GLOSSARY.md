@@ -8,7 +8,7 @@
   with the tick budgets, and make every topic use it").
 - **Date:** 2026-10-30.
 - **Author:** engine-architect (step 3a of `.checkpoints/v2-research/plan-amendments-2.md`).
-- **Status:** draft: awaiting the advisor's review of the resolutions (step 3b). Nothing here is applied to a topic
+- **Status:** terms approved 2026-10-30 (advisor, step 3b; its changes folded in by the session). Nothing here is applied to a topic
   yet; the owners apply the approved terms in step 3c. Every number here comes from a topic file (its id is given), is
   arithmetic on those numbers (shown), or is a pass mark marked "proposed" with its reason. No new source was read.
 
@@ -39,10 +39,37 @@ goes into each affected topic's "Shared open questions" subsection; until then i
 ## 1. Tick budgets
 
 The terms below make one budget out of the figures the topics give today. The budget itself (its total and its two
-shares) is resolution 1's proposal and waits for the advisor's review; every figure inside it is a topic's own mark,
-restated against the defined whole. Arithmetic at the stress scene's N = 48 (resolution 1 shows it, also for N = 54):
-at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.3 ms in the server-only share, inside
-4.2 ms each; at 30 Hz to about 5.3 ms and 3.6 ms, inside 8.3 ms each.
+shares) is resolution 1, decided by the advisor on 2026-10-30; every figure inside it is a topic's own mark, restated
+against the defined whole. The check below adds each part's ceiling: a planning check that the marks fit together, not
+a bound (see "Time statistics"); the server tick time's p99 is always measured directly.
+
+| Part (N = 48) | Mark and id | 60 Hz, ms | 30 Hz, ms |
+|---|---|---|---|
+| movement and physics | ≤ 1 ms mean, R4-PHYS-REC1 mark 2 (mean mark; its p99 is reported, not capped) | 1.00 | 1.00 |
+| avoidance | ≤ 0.2 ms p99, R4-NAV-REC3 | 0.20 | 0.20 |
+| abilities, effects, weapons | ≤ 1 ms, R1-ABL-REC6 | 1.00 | 1.00 |
+| navigation | 5 % of the period, R4-NAV-REC2 | 0.83 | 1.67 |
+| visibility pass | 5 % of the period, R2-INT-REC3 | 0.83 | 1.67 |
+| **sim step share, sum (limit)** | | **3.87 (4.17)** | **5.53 (8.33)** |
+| snapshot encoding | 48 × 50 µs, R2-BUD-REC6 | 2.40 | 2.40 |
+| lag compensation | 700 shots/s × 20 µs, R2-SYNC-REC5 mark 4 | 0.23 | 0.47 |
+| interest | 0.2 + 0.5 ms, R2-INT-REC1, R2-INT-REC4 | 0.70 | 0.70 |
+| enclosure pair test | 0.1 µs × 768 enemy pairs, R2-INT-REC2 (b) | 0.08 | 0.08 |
+| **server-only share, sum (limit)** | | **3.41 (4.17)** | **3.64 (8.33)** |
+| re-flood after a portal change (that tick only) | +1.00 ms, R2-INT-REC2 (b) | +1.00 | +1.00 |
+| server-only share on a re-flood tick | | 4.41 | 4.64 |
+| **server tick, sum (limit 50 %)** | | **7.28 (8.33)** | **9.18 (16.67)** |
+| server tick on a re-flood tick | | 8.28 | 10.18 |
+
+Snapshots run at 30 Hz (R2-BUD-REC1), so at a 60 Hz tick every second tick encodes. Left at 60 Hz: 0.30 ms in the sim
+step share, 0.76 ms in the server-only share (−0.24 on a re-flood tick). At N = 54 (MODES-3 (b); the per-soldier,
+per-client and per-shot marks scaled by 1.125 for this check only, 972 enemy pairs): at 60 Hz the sim step share is
+4.14 ms (0.03 left), the server-only share 3.85 ms (4.85 on a re-flood tick), the server tick 7.99 ms (8.99 on a
+re-flood tick, over 8.33); at 30 Hz 5.81, 4.12 (5.12), 9.93 (10.93) ms. At 30 Hz the marks fit at N = 48 and N = 54,
+re-flood ticks included; at 60 Hz they fit on every tick without a re-flood. The 60 Hz tight spots (the visibility
+pass, the re-flood tick, the rest of the sim at N = 54) are for the spike to measure. Under 25 % of the period for the
+whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over two ticks) against 4.17, and 7.51 ms at
+30 Hz (8.51 with a re-flood) against 8.33.
 
 ### Tick period
 - **Definition:** the time between two ticks, 1 / tick rate: 16.7 ms at 60 Hz, 33.3 ms at 30 Hz (r1:2015-2016,
@@ -94,11 +121,14 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
 
 ### Time statistics
 - **Definition:** a time mark that names no statistic is a p99 over the run it names; a mean is always called "mean".
-  Shares are compared at p99. Adding the p99s of parts gives an upper bound for the p99 of their sum, which is how the
-  budget's arithmetic is checked.
+  Shares are compared at p99. Adding the parts' p99 ceilings is a planning check that the marks fit together, not a
+  bound: p99s do not add (two parts that each take 1 ms on 0.6 % of ticks and nothing otherwise each have a p99 of 0,
+  but together they take 1 ms on about 1.2 % of ticks, so the sum's p99 is 1 ms). The server tick time's p99 is always
+  measured directly, with the parts reported beside it.
 - **Marked by:** "p99", "mean".
 - **Retire:** a time mark with no statistic, such as "costs at most 1 ms per tick" (R1-ABL-REC6), "at most 0.2 ms per
-  tick" (R2-INT-REC1) and "at most 0.5 ms per tick" (R2-INT-REC4): each now reads as a p99.
+  tick" (R2-INT-REC1), "at most 0.5 ms per tick" (R2-INT-REC4), and R2-INT-REC2 (b)'s pair test ("at most 0.1 µs per
+  enemy pair") and its re-flood: each now reads as a p99.
 - **Used today:** every topic that sets time marks (R1, R2, R3, R4, R6); R3's frame marks already name p95 and the
   median.
 
@@ -108,8 +138,8 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
   overruns (R1-TICK-REC2 P1's "max at most 16.7 ms, zero overruns"). It is split into the sim step share and the
   server-only share, 25 % of the tick period each. The 50 % is R2-ROOM-REC2's figure; the two 25 % shares are
   R1-TICK-REC2 P1's figure for the sim and R2-SYNC-REC9's for the sync work, read against the tick period.
-- **Depends on:** the advisor's review of resolution 1, which also weighs 25 % for the whole tick (R2-BUD-REC6's
-  figure). No escalated decision.
+- **Decided by the advisor, 2026-10-30** (resolution 1; 25 % for the whole tick, R2-BUD-REC6's figure, was weighed and
+  not taken). No escalated decision.
 - **Marked by:** "the server tick budget".
 - **Retire:** "the tick budget", "the server tick budget" with no number behind it, "the tick's p99 budget"
   (R4-NAV-REC2), "the share of the tick budget the tick-rate unit sets" (R2-SYNC-REC1 mark 4), "CPU budget per tick"
@@ -132,8 +162,10 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
     most 5 % of the tick period (R2-INT-REC3's "10 %", the same figures); the rest of the sim takes what is left;
   - **the server-only share:** the server-only work of the server tick time. Inside it: snapshot encoding at most
     50 µs per client per snapshot (R2-BUD-REC6), a rewound shot at most 20 µs at 700 shots per second (R2-SYNC-REC5
-    mark 4), the region query at most 0.2 ms (R2-INT-REC1), ranking and packing at most 0.5 ms (R2-INT-REC4), command
-    handling and the tick's send calls (each send call at most 1 ms, R2-TRN-REC1 mark 2).
+    mark 4), the region query at most 0.2 ms (R2-INT-REC1), ranking and packing at most 0.5 ms (R2-INT-REC4), the
+    enclosure pair test at most 0.1 µs per enemy pair and, on a tick with a portal change, its re-flood at most 1 ms
+    (R2-INT-REC2 (b)), command handling and the tick's send calls (each send call at most 1 ms, R2-TRN-REC1 mark 2;
+    per call, not per tick: the tick's sends have no per-tick mark and share what is left).
 - **Marked by:** "the sim step share", "the server-only share", "a share of the tick period".
 - **Retire:** "the share of the tick budget" (R2-SYNC-REC1 mark 4), "25 % of the tick budget" (R2-SYNC-REC9), "10 %
   of the server tick budget" or "10 % budget" without its value (R2-INT-REC3, R4-NAV-REC2, R4-LOS-REC1, R4-LOS-REC2),
@@ -284,10 +316,14 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
     fight on screen"); the benchmark scene (R3-MEASURE-REC2) is a recording of this scene with a scripted camera;
   - **map:** one 3D greybox shared by every mark that uses the scene (R1-TICK-REC2's "DM_Tri-sized greybox").
   Each count's basis is in resolution 9: the soldier count from MODES-3; 15 big vehicles from R2's worked estimate at
-  48 players in three teams (one per squad of 4 plus one harvester per team: 12 + 3, r2:1758 and r2:1771); 4 very
+  48 players in three teams, which is R2's stated assumption (one vehicle per squad of 4, LOOP_V2 §2's squad size,
+  plus one harvester per team, GE6: 12 + 3; R2 labels the row "assumption", r2:1758, r2:1771), where 4 and 8 come with
+  no rule; 4 very
   large units from R1-TICK-REC2, R3-CHAR-REC4 and VISION_V2 §6.9 ("a few very large units"); 300 projectiles from
   R1-ECS-REC1; 8 effects per soldier from R1-ABL-REC6. R2's worked bandwidth estimate is not the stress scene: its
-  counts (15 vehicles, 32 projectiles alive) are its own assumptions for bytes per second.
+  counts (15 vehicles, 32 projectiles alive) are its own assumptions for bytes per second. For a server mark that
+  includes the server-only share, every soldier has a snapshot-receiving client (R2-SYNC-REC9 mark 1), as the budget's
+  48 × 50 µs assumes.
 - **Depends on:** MODES-3, for N and the three-team arrangement only; every other count is the same under both readings.
 - **Marked by:** "the stress scene", "the stress scene's fight on screen".
 - **Retire:** "stress load" (R1-ECS-REC1, R4-PHYS-REC1, R4-PHYS-REC4), "P1's scene" and "R1-TICK-REC2's P1 scene"
@@ -306,9 +342,9 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
 
 ### Big vehicle and very large unit
 - **Definition:** a big vehicle is a multi-part vehicle in the sim (VISION_V2 §6.4: "big and multi-part"), harvesters
-  included (R4-PHYS-REC4). A very large unit is a big vehicle of at least 20 parts, the "very large units" of
-  VISION_V2 §6.9 whose draw cost R3 budgets (R3-CHAR-REC4). Which vehicles are very large is the roster's (the
-  game-designer's); the stress scene fixes only the counts.
+  included (R4-PHYS-REC4). A very large unit is one of VISION_V2 §6.9's "very large units"; in the stress
+  scene each is a big vehicle of at least 20 parts (R3-CHAR-REC4's test load). Which units are very large, and whether
+  every one is a vehicle, is the roster's (the game-designer's).
 - **Marked by:** "big vehicle(s)", "very large unit(s)".
 - **Retire:** "vehicles" without "big" in a stress count (R1-ECS-REC1: "8 vehicles"); "large units" (R3) where it means
   the stress scene's very large units; "vehicles and harvesters" (R2-SYNC-REC5 mark 3) as two counts.
@@ -371,8 +407,7 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
 
 ### Shared stream and authority-only stream
 - **Definition:** the sim's random numbers come from one seeded generator with one stream per purpose
-  (R1-DET-REC4). A shared stream is held by the authority and by the client's predicting sim alike (for example, the
-  local player's own ability procs if ABL-PREDICT says yes). An authority-only stream is seeded and held by the
+  (R1-DET-REC4). A shared stream is held by the authority and by the client's predicting sim alike. An authority-only stream is seeded and held by the
   authority alone, stays out of the client's predicting state and out of any hash compared between a client and the
   server. Weapon spread is an authority-only stream (R2-SYNC-REC3, from the security review's finding H2: a seed the
   client knows lets a cheat cancel the spread through the aim point it sends); the client draws its tracers from a
@@ -407,7 +442,7 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
   the only host token (R5-PREV-REC1), with one stable link per PR branch, public but unlisted (`noindex`) by default
   (R5-PREV-REC5). It runs the match offline in the worker with bots and needs no game server (R6-HOST-REC3,
   R1-BND-REC6), unless it is a multiplayer preview that talks to the staging game server (and then PREVIEW-WALL
-  applies). It carries the preview header set.
+  applies). It carries the preview header set. Until PREVIEW-WALL is answered there are no multiplayer previews.
 - **Marked by:** "preview", "preview link", "multiplayer preview".
 - **Retire:** "deploy preview" (Netlify's product name, R5-PREV-F15) for our previews; "preview deployment" where the
   link Mustafa opens is meant.
@@ -421,7 +456,7 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
   static assets as the alternative that takes the same `_headers` file (proposed by resolution 19; R6-HOST-REC1 named
   Workers first). The pick rests on R5-PREV-REC2's needs list, which Pages meets on the findings read, all but the
   deletion of a branch's latest deployment (R5-PREV-F13; PREV-DELETE).
-- **Depends on:** the advisor's review of resolution 19; PREV-DELETE (a spike) may send it back to Workers.
+- **Decided by the advisor, 2026-10-30** (resolution 19); PREV-DELETE (a spike) may send it back to Workers.
 - **Marked by:** "the client host", "Cloudflare Pages", "Workers static assets (the alternative)".
 - **Retire:** "Cloudflare (Workers static assets; Pages as the same-headers alternative)" (R6-HOST-REC1's old order);
   "Cloudflare" alone where one of the two products is meant.
@@ -446,7 +481,8 @@ at 60 Hz the parts' ceilings add up to about 3.7 ms in the sim step share and 3.
   behind it is PREVIEW-WALL.
 - **Depends on:** PREVIEW-WALL (Mustafa): (a) on from the first preview that reaches the staging game server; (b)
   off, since previews hold no secrets; (c) decided after the security baseline. This glossary picks none. Under every
-  option, previews that reach no game server are public but unlisted (R5-PREV-REC5).
+  option, previews that reach no game server and carry no unreleased art are public but unlisted; one that carries
+  unreleased art is behind the wall (R5-PREV-REC5, R5-PREV-OQ1).
 - **Marked by:** "the access wall".
 - **Retire:** "the access policy", "Cloudflare Access" and "private previews" as names for the decision (each stays
   as the name of a product or setting); "login wall".
