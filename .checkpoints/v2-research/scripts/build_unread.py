@@ -48,7 +48,7 @@ for t,f in files.items():
             if not need:
                 m=re.match(r'(\S+)\s*\((.*)\)\s*$', rec); need=m.group(2) if m else ''
             hinge.append((t,rec,need,src,why))
-            for u in URL.findall(src): hinge_norm[norm(u)].append((t,rec.split(' ')[0]))
+            for u in URL.findall(src): hinge_norm[norm(u)].append((t,re.split(r'\s+\(',rec,maxsplit=1)[0].strip()))
 # 2. not-read tables
 rows=[]; tables=0
 for t,f in files.items():
@@ -70,7 +70,8 @@ for t,f in files.items():
 def cites(t,u):
     s=open(R+files[t]).read(); s2=re.sub(r'https?://(www\.)?','',s)
     out=set(); key=norm(u)
-    for m in re.finditer(re.escape(key), s2):
+    # the whole address only: "rapier.rs/docs" must not match "rapier.rs/docs/user_guides/..." (step-3d verifier, row 5)
+    for m in re.finditer(re.escape(key) + r'/?(?=[.,;:]?(?:[\s)|`>\]"\'*]|$))', s2):
         pre=s2[max(0,m.start()-3000):m.start()]
         # skip hits inside the sources tables
         line=s2[s2.rfind('\n',0,m.start())+1:m.start()]
@@ -85,8 +86,11 @@ def note(u):
     for o in res:
         if not o or '-draft.md:' in o: continue
         path,_,rest=o.partition(':'); ln,_,txt=rest.partition(':')
+        # the units' own notes only: not the later checks' and rulings' files (they quote these rows back)
+        if re.search(r'verifier|advisor|consistency|usedin|resolve|retire|resolutions|cross-topic|plan|provenance|request|tally|second-pass|unread-sample|rust-reviewer|security-auditor', os.path.basename(path)): continue
         txt=re.sub(r'\s+',' ',txt.strip())
         if txt.startswith('|') or len(txt)<len(key)+25: continue
+        if len(key)==len(norm(u)[:90]) and not re.search(re.escape(key) + r'/?(?=[.,;:]?(?:[\s)|`>\]"\'*]|$))', re.sub(r'https?://(www\.)?','',txt)): continue
         if best is None or len(txt)<len(best[2]): best=(os.path.basename(path),ln,txt)
     return best
 merged=collections.OrderedDict()
@@ -99,10 +103,47 @@ for r in rows:
     m['reasons'].append(r['topic']+': '+r['reason'])
     for u in r['urls']: m['cited']|=cites(r['topic'],u); m['norms'].add(norm(u))
     if re.search(r'search (lead|result)', r['reason'], re.I): m['lead']=True
+def names(text):
+    """The distinctive names of a source written without an address: its host-and-path tokens (github.com/Effect-TS/tsgo,
+    not the bare github.com), else its capitalized words, taken before any bracket."""
+    head=re.split(r'\s*\(', re.sub(r'[`*]','',text), maxsplit=1)[0]
+    doms=list(dict.fromkeys(re.findall(r'\b[a-z0-9-]+(?:\.[a-z][a-z0-9-]*)+(?:/[A-Za-z0-9._-]+)*', head)))
+    return doms if doms else list(dict.fromkeys(re.findall(r'\b[A-Z][A-Za-z0-9]+\b', head)))
+# Ties the names cannot find, read by hand by the session on 2026-10-30 after the step-3d verifier's sample: each topic's
+# hinge row names the same source in other words. Key: (topic, the part-2 source text's start); value: the hinge row.
+MANUAL_TIES={('R1','https://gdcvault.com/play/1024001/'):'R1 R1-TICK-REC2',   # "the same Overwatch talk (above)"
+             ('R2','https://gdcvault.com/play/1024001/'):'R2 R2-SYNC-REC2',   # "The same Overwatch talk (gdcvault 1024001)."
+             ('R2 ','https://gdcvault.com/play/1024001/'):'R2 R2-BUD-REC1',   # "gdcvault 1024001 (as above)"
+             ('R3','https://discourse.threejs.org/t/webgpurenderer-forcewebgl-true-vs-webglrenderer/87805'):'R3 R3-WGPU-REC1',
+             ('R3','registry.khronos.org, `EXT_disjoint_timer_query_webgl2`'):'R3 R3-GL2-REC3',
+             ('R3','https://raw.githubusercontent.com/mrdoob/three.js/r186/src/nodes/accessors/SkinningNode.js'):'R3 R3-CHAR-REC1',
+             ('R3','https://threejs.org/docs/pages/SkinningNode.html'):'R3 R3-CHAR-REC1',
+             ('R5','https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/'):'R5 R5-RUSTLINT-REC3, REC4',
+             ('R5','https://github.com/rust-lang/rust-clippy/tree/master/clippy_lints/src/'):'R5 R5-RUSTLINT-REC3, REC4',
+             ('R1','rand\'s book, "Reproducibility" chapter'):'R1 R1-DET-REC4',
+             ('R2','Other Overwatch GDC 2017 talks on the same vault'):'R2 R2-SYNC-REC3',
+             ('R3','activision.com, "Practical Real-Time Strategies'):'R3 R3-LOOK-REC1',
+             ('R3','Arc System Works, Guilty Gear Xrd art-style talk'):'R3 R3-LOOK-REC3',
+             ('R3','GitHub "supported runners and hardware resources"'):'R3 R3-MEASURE-REC3',
+             ('R3',"brave.com, Brave's WebGPU support"):'R3 R3-WGPU-REC4',
+             ('R5',"the current npm major's workspaces page"):'R5 R5-LAYOUT-REC1',
+             ('R5','wtransport and web-transport-quinn docs'):'R5 R5-TEST-REC2, REC4',
+             ('R5','Linux `tc netem` documentation'):'R5 R5-TEST-REC4',
+             ('R5','github.com/nextest-rs/nextest, docs.rs/cargo-llvm-cov'):'R5 R5-TEST-REC1, REC6'}
+def manual_ties(m):
+    return {v for (mt,start),v in MANUAL_TIES.items() if m['src'].startswith(start)}
+def text_hinges(k, m):
+    manual=manual_ties(m)
+    if not k.startswith('TEXT:') or manual: return manual
+    t=k.split(':')[1]
+    ns=names(m['src'])
+    # one name is enough only when it is distinctive: a path, or a host of three labels (registry.khronos.org, not github.com)
+    if len(ns)<2 and not (ns and ('/' in ns[0] or ns[0].count('.')>=2)): return set()
+    return {f"{ht} {re.split(r'\s+\(',rec,maxsplit=1)[0].strip()}" for ht,rec,need,src,why in hinge if ht==t and all(n in src for n in ns)}
 out=[]
 for k,m in merged.items():
     need=[]
-    hits=sorted(set(f"{t} {rid}" for n in m['norms'] for (t,rid) in hinge_norm.get(n,[])))
+    hits=sorted(set(f"{t} {rid}" for n in m['norms'] for (t,rid) in hinge_norm.get(n,[])) | text_hinges(k, m))
     if hits: need.append('a recommendation hinges on it (part 1: '+', '.join(hits)+')')
     if m['cited']: need.append('named by '+', '.join(sorted(m['cited'])))
     if not need:
