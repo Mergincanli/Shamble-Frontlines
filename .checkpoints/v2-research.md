@@ -190,6 +190,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   (`prompts/r3-3d-fixes-2.txt`); compound 48s: r3:885 and r3:1248 renamed, r3:1396 kept (the inventory's words) with
   the term beside. 7 recommendation changes. Committed **1b69364**. Glossary's Time-statistics R3 line sent to
   engine-architect (`prompts/engine-architect-glossary-r3-timestats.txt`).
+- GLOSSARY.md's Time-statistics R3 line done (reply appended to `engine-architect-r14-usedin-result.md`); field check: only
+  that Used today field; committed **d54f3c0**. Check at d54f3c0: 0 exact, 611 in context. Step 3d final check of R3,
+  R5 and R6 launched 20:47 UTC (run wf_ca6f48ca-efd, task w6zjv4ew7; prompt `prompts/verifier-r356-3d-final.txt`;
+  24 hits on changed lines in `scripts/glossary-hits-3d-final-r356.tsv`). Running: R2 and R1+R4 units, the final
+  check (3 agents). Write-guard grep now allows `.checkpoints/v2-research.md` (it is on the allowed list).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
