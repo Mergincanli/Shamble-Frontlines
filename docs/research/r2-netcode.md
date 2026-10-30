@@ -867,7 +867,7 @@ checked. Sources S1–S14 are listed in section 6. [Assembler's note: the intere
   teammates are always relevant: 24v24 gives 24 × 24 = 576 unordered pairs, 16v16v16 gives 3 × 16 × 16 = 768, and
   12v12v12 gives 432. Legacy `hasLOS` measured 2.7–5.7 µs per call in JavaScript (linear over 220 static boxes, no
   broad phase). At that cost a 768-pair pass with one sample point takes 2.1–4.4 ms, and 6–13 ms with three points.
-  At 20 passes/s, one point is 4–9 % of one core. A Rust ray cast with a spatial index has not been measured.
+  At 20 passes/s, one point is 4–9 % of one core of the measuring machine. A Rust ray cast with a spatial index has not been measured.
   Inputs: CS6, CS9 (legacy measurements, reports/2026-10-15-team-prep-fixes.md:56; the hardware is not recorded),
   VISION_V2 §3. How sure: inferred.
 
@@ -3048,7 +3048,7 @@ by: the REC2 measurement.
 **R2-TRN-OQ4. Production certificates: public certificates per hostname or short-lived pinned ones?** This depends on how R6
 hosts game servers (fixed hosts or ephemeral machines) and on the HTTPS matchmaker as the trusted intermediary (F14). Decided by:
 R6's hosting choice, then the REC5 spike. R6's game VMs stay warm, so they are not ephemeral (R6's option C3,
-r6:424-425), which leaves production pinning out (REC5); the per-hostname or wildcard form waits on BASELINE-WHEN
+r6:424-425 at commit 8dee746), which leaves production pinning out (REC5); the per-hostname or wildcard form waits on BASELINE-WHEN
 (below).
 
 **R2-TRN-OQ5. wtransport or web-transport-quinn?** The maintenance risk differs: "not considered completely production-ready"
@@ -3902,10 +3902,12 @@ says; C1.10, C1.10b, C1.13 and C23.1 differ from the approved text only by a lin
 and the cross-topic questions R2-XT-OQ1 to R2-XT-OQ15 (the critic's ranks 2, 4, 7, 8, 12, 13, 14, 16, 18, 20, 27, 28,
 30, 32 and 39), each with a pointer from the recommendations and R2 questions it names.
 
-**OBJECT (one, not applied).** R2-INT-F20's "4–9 % of one core" (the interest findings) stays: it is the legacy
-JavaScript `hasLOS` cost measured in a browser on hardware that was not recorded, so "one vCPU of the reference
-server" would misstate the finding; the glossary keeps "core" for client hardware. The glossary's measuring-unit
-entry could list this place under Keeps (the advisor decides).
+**OBJECT (one; upheld by the advisor, option (b), 2026-10-30).** R2-INT-F20's "4–9 % of one core" (the interest
+findings) was not renamed to "one vCPU": it is the legacy JavaScript `hasLOS` cost measured in a browser on hardware
+that was not recorded, so "one vCPU of the reference server" would misstate the finding. The advisor moved "one core"
+to the glossary's "Retire (in context)" (engine-architect edits GLOSSARY.md). Two nits from that ruling were applied:
+R2-INT-F20 now reads "4–9 % of one core of the measuring machine", and R2-TRN-OQ4's "r6:424-425" (added by C23.2)
+now reads "r6:424-425 at commit 8dee746".
 
 **Changes by type.** 20 recommendation changes (C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8, C6.5, C9.9,
 C9.10, C10.6, C10.7, C10.8, C11.9; the four p99 marks; R2-TRN-REC6 mark 2), 0 number changes, 0 sources, and 94 nits
