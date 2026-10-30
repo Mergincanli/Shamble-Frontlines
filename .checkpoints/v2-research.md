@@ -103,7 +103,7 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   header holds its launch record): engine-architect R1+R4 (xhigh), netcode-architect R2 (xhigh), test-engineer R5
   (high), infra-engineer R6 (high); prompts `prompts/<agent>-<k>-consistency.txt`, notes `<agent>-<k>-consistency.md`.
   graphics-engineer R3 (high) starts when a slot frees. If cut off: resume each by message from its notes.
-- 18:46 UTC: correction sent to the four running owners (verbatim `prompts/step3c-correction-1.txt`): the prompt's
+- 18:44 UTC: correction sent to the four running owners (verbatim `prompts/step3c-correction-1.txt`): the prompt's
   step 3 named the new subsection "Shared open questions (consistency critic, 2026-10-30)"; the approved files name
   two, "### Shared open questions (the same words in every topic)" and "### Cross-topic open questions (consistency
   critic, 2026-10-29)". `mk3c.py` fixed and now writes only the keys asked for (R3's prompt regenerated; launched

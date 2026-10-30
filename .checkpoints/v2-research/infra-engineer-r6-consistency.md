@@ -36,3 +36,10 @@ Started 2026-10-30. Base: working tree clean at aa1ba8f. Target file: docs/resea
 - C23.3 applied, R6-HOST-REC4 (BASELINE-WHEN pointer). nit
 - C23.b1-b3 NOT applied (wait for BASELINE-WHEN). Checked: every applied "after" text found in the file (chk.py, whitespace-normalized); every "before" matched once in the pre-edit file.
 - Coordinator correction received: subsections named per resolutions.md / cross-topic-oqs.md ("### Shared open questions (the same words in every topic)" and "### Cross-topic open questions (consistency critic, 2026-10-29)"); prompt's name not used. nit
+- C10.23 inserted MODES-3 in new "### Shared open questions (the same words in every topic)" before "### Recommendations that hinge on a source not read". nit
+- C17.9 inserted BASELINE-WHEN (same subsection). nit
+- C19.9 inserted PREV-DELETE (same subsection). nit
+- C21.7 inserted PREVIEW-WALL (same subsection; with the step-3b addition on unreleased art). nit
+- R6-XT-OQ1..OQ9 inserted (ranks 8,15,18,20,26,28,33,34,38; critic's words, verbatim from cross-topic-oqs.md) in "### Cross-topic open questions (consistency critic, 2026-10-29)" right after. nit (9 entries)
+- Verified: the four shared texts match resolutions.md word for word (whitespace-normalized).
+- Pointers added (a '*Cross-topic open questions:*' line before '*Serves:*'): R6-HOST-REC2 (XT-OQ1), R6-HOST-REC3 (XT-OQ2, OQ4), R6-COST-REC1 (XT-OQ1, OQ7), R6-OBS-REC3 (XT-OQ1, OQ6, OQ8), R6-TEL-REC1 (XT-OQ5). XT-OQ3 names only R6-SEC-OQ1 (an OQ, already points to BASELINE-WHEN) and XT-OQ9 names no R6 recommendation: no pointer. nit (5 lines)

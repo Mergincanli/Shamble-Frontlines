@@ -5,7 +5,7 @@ Reads every transcript of this session (the main session and every subagent, bac
 per agent and tool, the web fetches: WebFetch calls (the URL asked for, and the host a redirect notice in the result
 names), curl or wget in Bash commands (each URL in the command; a loop over a URL file is listed as such), and
 WebSearch calls (queries, which fetch no page). Hosts are checked against the WebFetch allow list in
-.claude/settings.json. Usage: python3 fetch_audit.py [--since 2026-10-30T00:00] [--md out.md] [--json out.json]
+.claude/settings.json. Usage: python3 fetch_audit.py [--since 2026-10-30T00:00] [--md out.md] [--grouped out.md] [--json out.json]
 """
 import glob, json, os, re, sys, collections
 from urllib.parse import urlparse
@@ -132,6 +132,17 @@ if arg('--md'):
         f.write('| Agent | Run | Time (UTC) | Tool | Requested host | Final host | URL or note |\n|---|---|---|---|---|---|---|\n')
         for r in rows:
             f.write('| ' + ' | '.join(str(x).replace('|', '\\|') for x in r) + ' |\n')
+if arg('--grouped'):   # one row per agent, tool and host pair, with the count: the audit table for the report
+    g = collections.Counter()
+    for a, run, t, tool, rh, fh, u in rows:
+        g[(a, run, tool, rh, fh if fh != rh else '')] += 1
+    with open(arg('--grouped'), 'w') as f:
+        f.write('| Agent | Run | Tool | Requested host | Final host (if different) | Calls | On the allow list |\n'
+                '|---|---|---|---|---|---|---|\n')
+        for (a, run, tool, rh, fh), n in sorted(g.items()):
+            ok = ('n/a' if rh.startswith('(') or not rh else 'yes' if rh in allow else 'NO') + \
+                 (f'; final {"yes" if fh in allow else "NO"}' if fh else '')
+            f.write('| ' + ' | '.join(str(x).replace('|', '\\|') for x in (a, run, tool, rh, fh, n, ok)) + ' |\n')
 if arg('--json'):
     json.dump({'rows': len(rows), 'requested': {k: dict(v) for k, v in req.items()},
                'final': {k: dict(v) for k, v in fin.items()},

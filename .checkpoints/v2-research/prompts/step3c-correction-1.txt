@@ -1,4 +1,4 @@
 # Session message to the four running step-3c owners (R1+R4, R2, R5, R6), saved verbatim before sending
-# sent: 2026-10-30T18:46Z by SendMessage; also folded into mk3c.py before the R3 owner's launch
+# sent: 2026-10-30T18:44Z by SendMessage; also folded into mk3c.py before the R3 owner's launch
 
 Correction from the session to step 3 of your task (the subsection names): use the names and places the approved files give, not the one in your prompt. The shared decision questions (MODES-3, ABL-PREDICT, SEC-SPREAD, PREV-DELETE, PREVIEW-WALL, BASELINE-WHEN, as your file needs) go in a subsection "### Shared open questions (the same words in every topic)", at the place resolutions.md names in "Where shared open questions go". The critic's items R<n>-XT-OQ<k> go in a second subsection "### Cross-topic open questions (consistency critic, 2026-10-29)", right after it, as cross-topic-oqs.md says in "Where they go". Do not use the name "Shared open questions (consistency critic, 2026-10-30)" from your prompt; if you already inserted under it, rename it to the right one. Everything else in your task stands. Log this as a nit in your notes.
