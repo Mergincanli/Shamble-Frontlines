@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 00:42 Amsterdam
+- **Last update:** 2026-10-30 17:30 Amsterdam
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -27,7 +27,22 @@
    prompts `prompts/<agent>-r<n>.txt` and `prompts/infra-engineer-r5-ci.txt`, each launched with a one-line message
    that points the agent at its saved prompt file (the message is in each file's header).
 
-## Next steps (from 30 October, 18:00 Amsterdam)
+## The Advisor's decisions, 2026-10-30 (relayed by Mustafa at about 17:29 Amsterdam, verbatim)
+> - VERIFY-FETCH: (a). Daytime only, read-only fetches from allow-listed hosts, with the host
+>   audit in each report. The night shift stays on WebFetch only until kit-v3-1 is merged.
+> - Unread sources: commit the full list to the research branch as
+>   docs/research/UNREAD_SOURCES.md, with what each source was needed for. The Advisor will look
+>   for other copies from there.
+> - The critic's 41 items: resolve the 12 contradictions before the decision drafts. Add a shared
+>   glossary (docs/research/GLOSSARY.md) with one definition per term, starting with the tick
+>   budgets, and make every topic use it.
+> - Schedule: back to normal from tonight (the window ends at 07:30, as decided under
+>   WINDOW-0730).
+These change the approved plan (the critic "resolves none"): from 18:00, write `plan-amendments-2.md` (how the 12
+contradictions get resolved, who writes the glossary and applies it to each file, UNREAD_SOURCES.md, curl by day) and
+have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
+
+## Next steps (from 30 October, 18:00 Amsterdam; superseded in part by the Advisor's decisions above)
 1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
 2. Insert the critic's 41 items as cross-topic open questions (R<n>-XT-OQ<k>) in the affected topic files, in the
    critic's words (main session, mechanical); no re-check (plan).
