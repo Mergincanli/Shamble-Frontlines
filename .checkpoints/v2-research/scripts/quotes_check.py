@@ -39,9 +39,8 @@ def quotes(text):
 
 
 C = '/home/user/Shamble-Frontlines/.checkpoints/v2-research/'
-APPROVED = ' '.join(re.sub(r'^\s*> ?', '', open(C + f).read(), flags=re.M).split()) for f in ()) if False else ' '.join(
-    re.sub(r'^\s*> ?', '', ''.join(open(C + f).read() for f in
-           ('resolutions.md', 'cross-topic-oqs.md', 'advisor-resolutions-verdict.md')), flags=re.M).split())
+APPROVED = ' '.join(re.sub(r'^\s*> ?', '', ''.join(open(C + f).read() for f in (
+    'resolutions.md', 'cross-topic-oqs.md', 'advisor-resolutions-verdict.md')), flags=re.M).split())
 rows = []
 for t, fn in FILES.items():
     qb, qh = quotes(show(base, fn)), quotes(show(head, fn))
