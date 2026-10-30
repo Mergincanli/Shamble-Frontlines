@@ -38,6 +38,13 @@
 >   budgets, and make every topic use it.
 > - Schedule: back to normal from tonight (the window ends at 07:30, as decided under
 >   WINDOW-0730).
+> - NS-2 (from the night shift): (c). When you restore the night schedule, make the "Night
+>   shift" routine start a fresh session on every firing, keeping the same one-line prompt, the
+>   repository, Opus 5.5 and the hourly 00:10–07:10 schedule. If the routine can't be switched,
+>   create a new one with those settings and remove the old one, or list it for Mustafa to delete.
+(NS-2 relayed at about 17:40.) Checked read-only: update_trigger cannot switch the persistent-session routine
+trig_019LtRqmAdzddyk6K3e3kDJz; create_trigger can make a fresh-session one but has no repository field, so the new
+routine's stored sources must be checked after creation (the night shift reads NIGHT_SHIFT.md from the repo).
 These change the approved plan (the critic "resolves none"): from 18:00, write `plan-amendments-2.md` (how the 12
 contradictions get resolved, who writes the glossary and applies it to each file, UNREAD_SOURCES.md, curl by day) and
 have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
