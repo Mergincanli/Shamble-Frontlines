@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 18:21 Amsterdam
+- **Last update:** 2026-10-30 19:25 Amsterdam (18:25 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -71,7 +71,23 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   written. Needed before step 3c: per term, an unconditional list of exact phrases (must reach zero) and a conditional
   list (listed for the step-3d verifier to judge in context). Take it up with the advisor's verdict.
 - Step 3c prompts drafted (generator `scp sp3/mk3c.py`, not yet run): five owners, background agents, 4 at once.
-- Next: step 3b's verdict, then step 3c, step 3d (three verifier units), docs-keeper, gate, report, PR ready.
+- Step 3b DONE (run wf_d38cd72c-feb, about 18:14 UTC): 4 APPROVE, 4 REVISE, 4 ESCALATE; verdict verbatim in
+  `advisor-resolutions-verdict.md`; its changes folded into `resolutions.md`, GLOSSARY.md and `cross-topic-oqs.md`
+  by the session (99c280d; GLOSSARY "terms approved" 8909523). **SHA before step 3c: 99c280d** (topic files unchanged
+  since 8dee746). Pre-fold copy of resolutions: `scratchpad/sp3/resolutions.before-fold.md`.
+- The Retire split (condition 9 made checkable): advisor APPROVE with conditions (run wf_06dbf34d-b30, about 18:21
+  UTC; verbatim `advisor-retire-split-verdict.md`); check script fixed per its item 2 (whole words, each place once,
+  hits inside term names and "Marked by" phrases skipped): baseline before the split 0 exact, 817 in context
+  (`scripts/glossary-baseline2.json`, hits `scripts/glossary-hits-before-split.tsv`). The step-3c prompt generator
+  (`scripts/mk3c.py`) carries the renaming rule; `scripts/retire_split_compare.py` checks that the quoted phrases match
+  before and after (item 4).
+- The split edit: engine-architect (format only), workflow run wf_1eb87409-4bd (task wlqyojhoj), launched 18:21 UTC;
+  prompt `prompts/engine-architect-retire-split.txt`, notes `engine-architect-retire-split.md`; the pre-split glossary
+  is in `scratchpad/sp3/GLOSSARY.before-split.md` (from HEAD).
+- Next: when the split returns, run the compare (0 problems), re-run the baseline and record both counts here, commit
+  GLOSSARY.md; then run `mk3c.py`, launch the five step-3c owners (4 at once, background pointer prompts), commit each
+  file as it returns after the write-guard check; then step 3d (three verifier units), docs-keeper, gate, report, PR
+  ready. Research stops at 00:10 Amsterdam (23:10 UTC).
 
 ## Next steps (from 30 October, 18:00 Amsterdam; superseded in part by the Advisor's decisions above)
 1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
