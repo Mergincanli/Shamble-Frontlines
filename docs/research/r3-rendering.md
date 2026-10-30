@@ -882,7 +882,7 @@ Spatialization:
 Voice management:
 | Option | What it is | Trade-off |
 |---|---|---|
-| V-A. No limit (legacy) | every event plays | Unbounded nodes in a 48-player fight (GP6) |
+| V-A. No limit (legacy) | every event plays | Unbounded nodes in a fight at the largest mode's N (48 or 54, MODES-3; GP6) |
 | V-B. Voice cap with priorities | a fixed number of voices; priority by kind (own weapon, shots at the player, large units, nearby, far), distance and age; the lowest is stolen or never started; per-kind caps and throttles | Bounded cost; needs tuning; quiet sources vanish |
 | V-C. Distance cull only (legacy's 90 m) | sources beyond a radius never start | Simple, but a cluster within the radius is still unbounded |
 
@@ -1025,6 +1025,7 @@ Rests on: R3-LOOK-F5, F6, F8; legacy CL6, TL15.
 Serves: VISION_V2 §3 (48+ players), §4, §6.9.
 Spike must prove (proposed): for each family, GPU and CPU frame time at 12, 24 and 48 soldiers on screen on the minimum
 machine at Low; the result goes to the look brief.
+Term note (outside the look row, which keeps its words under condition 5): its "48" means the largest mode's [N](GLOSSARY.md#player-count-n) (48 or 54, MODES-3).
 
 ### Question 4: characters (skinning, instancing, LOD) (R3-CHAR)
 
@@ -1042,8 +1043,8 @@ Serves: VISION_V2 §3 (48+ players, bots fill slots), §4, §6.7 (faction unifor
 colour, F4, F6).
 Spike must prove (proposed): with the largest mode's N soldiers on screen (48 or 54, MODES-3) in the benchmark scene, C-B renders on both backends with at
 most 4 draw calls per soldier per pass (before outlines); the CPU cost of posing plus bone upload with every soldier on
-the full rig (no budget LOD) stays within 2.0 ms per frame on the minimum machine, and with R3-CHAR-REC2's budget LOD
-at Low within that tier's 1.0 ms (R3-BUDGET-REC2); C-D or C-E is adopted only if it cuts total frame time by at least 20 % against C-B on both reference
+the full rig (no budget LOD) stays within 2.0 ms (p99) per frame on the minimum machine, and with R3-CHAR-REC2's budget LOD
+at Low within that tier's 1.0 ms (p99) (R3-BUDGET-REC2); C-D or C-E is adopted only if it cuts total frame time by at least 20 % against C-B on both reference
 machines.
 
 **R3-CHAR-REC2. A budget LOD for animation (L-2) as the base, under any camera: a fixed number of soldiers get the full
@@ -1058,7 +1059,7 @@ padded fixed sphere avoids.
 Rests on: R3-CHAR-F2, F10, F13; legacy GA15.
 Serves: VISION_V2 §3, §4 (30+ fps on the minimum laptop in the largest mode).
 Spike must prove (proposed): at the largest mode's N soldiers on screen (48 or 54, MODES-3), animation CPU time per frame (posing plus bone upload, as in
-R3-CHAR-REC1) at most 1.0 ms on the minimum machine at Low, with no soldier inside its padded sphere ever culled while visible (checked by rendering with culling
+R3-CHAR-REC1) at most 1.0 ms (p99) on the minimum machine at Low, with no soldier inside its padded sphere ever culled while visible (checked by rendering with culling
 off and on over 600 frames: identical pixels).
 
 **R3-CHAR-REC3. Soldiers' per-instance data (transform, faction colour, hit flash, health bar) is written from the
@@ -1084,7 +1085,7 @@ WebGPU (F7), so it is judged on CPU time, not on `drawCalls`.
 Rests on: R3-CHAR-F7, F12; R3-GL2-REC1 (cited); legacy CL9, GC16; wave 1 R1-BND-REC2.
 Serves: VISION_V2 §6.4 (big, multi-part vehicles), §6.9.
 Cross-topic open questions: R3-XT-OQ2 (Open questions, "Cross-topic open questions").
-Spike must prove (proposed): the stress scene's four [very large units](GLOSSARY.md#big-vehicle-and-very-large-unit) ([GLOSSARY](GLOSSARY.md#the-stress-scene); each at least 20 parts) on screen with its soldiers add at most 2.0 ms GPU time and at most 200 draw calls against the scene without
+Spike must prove (proposed): the stress scene's four [very large units](GLOSSARY.md#big-vehicle-and-very-large-unit) ([GLOSSARY](GLOSSARY.md#the-stress-scene); each at least 20 parts) on screen with its soldiers add at most 2.0 ms (p99) GPU time and at most 200 draw calls against the scene without
 them, before any outline or ambient-occlusion pre-pass, on the recommended machine at High (4 units × 20 parts × 2
 passes, shadow and main, is 160 draws, plus margin; a hull outline adds about 80 more for the same parts,
 R3-BUDGET-REC2, second pass 2026-10-29);
@@ -1121,14 +1122,14 @@ in one fight, its 4 very large units and its 300 live projectiles with their [vi
 |---|---|---|
 | Frame time, p95 | ≤ 33.3 ms | ≤ 16.7 ms |
 | Frame time, median | ≤ 28 ms | ≤ 14 ms |
-| Main-thread CPU per frame (render submission, interpolation, animation, UI) | ≤ 16 ms | ≤ 8 ms (inside F1's 10 ms) |
-| of which: character animation (posing plus bone upload, with R3-CHAR-REC2's budget LOD) | ≤ 1.0 ms | ≤ 2.0 ms (more soldiers on the full rig) |
-| of which: sim cost seen by the page ([the client's sim share](GLOSSARY.md#the-clients-sim-share); R1-TICK, R1-BND) | ≤ 1.0 ms | ≤ 1.0 ms |
-| GPU time, total | ≤ 25 ms | ≤ 12 ms |
-| of which: shadow pass | ≤ 3 ms (one map, 1024² or off) | ≤ 2 ms |
-| of which: main scene pass | ≤ 16 ms | ≤ 6 ms |
-| of which: post-processing (whatever the look brief keeps) | ≤ 4 ms | ≤ 3 ms |
-| of which: effects, sprites, HUD in the 3D view | ≤ 2 ms | ≤ 1 ms |
+| Main-thread CPU per frame (render submission, interpolation, animation, UI), p99 | ≤ 16 ms | ≤ 8 ms (inside F1's 10 ms) |
+| of which: character animation (posing plus bone upload, with R3-CHAR-REC2's budget LOD), p99 | ≤ 1.0 ms | ≤ 2.0 ms (more soldiers on the full rig) |
+| of which: sim cost seen by the page ([the client's sim share](GLOSSARY.md#the-clients-sim-share); R1-TICK, R1-BND), p99 | ≤ 1.0 ms | ≤ 1.0 ms |
+| GPU time, total, p99 | ≤ 25 ms | ≤ 12 ms |
+| of which: shadow pass, p99 | ≤ 3 ms (one map, 1024² or off) | ≤ 2 ms |
+| of which: main scene pass, p99 | ≤ 16 ms | ≤ 6 ms |
+| of which: post-processing (whatever the look brief keeps), p99 | ≤ 4 ms | ≤ 3 ms |
+| of which: effects, sprites, HUD in the 3D view, p99 | ≤ 2 ms | ≤ 1 ms |
 | Draw calls (`renderer.info.render.drawCalls`) | ≤ 800 without a per-object outline pass at Low; about ≤ 1,100 with one (see the arithmetic below) | ≤ 1,500 |
 | Triangles (`renderer.info.render.triangles`) | ≤ 500k | ≤ 1.5M |
 | GPU memory (`renderer.info.memory.total`) | ≤ 512 MB | ≤ 1 GB |
@@ -1239,14 +1240,14 @@ Serves: the brief's R3 row ("spatial audio with Web Audio", `docs/V2_PHASE0_BRIE
 mode, 12v12v12 or 24v24), §6.9 (large units and their effects). No VISION_V2 §6 item names audio.
 Spike must prove (proposed): with 32 concurrent equal-power voices, a 5-minute recorded capture has no dropout (checked by
 a listener and by the AudioContext staying in the "running" state) and main-thread audio work stays under
-0.5 ms per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms.
+0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms (p99).
 
 **R3-AUDIO-REC2. A voice manager with a cap and priorities (V-B) plus distance culling: proposed start of 32 voices on
 Low and 48 on High, priorities as data (own weapon and shots at the player first, then large units, then by distance),
 per-kind throttles as legacy's 55 ms impact throttle, pooled nodes and pre-built noise buffers.**
 Reason: a playing source costs its nodes whatever its gain until the game stops it, and inverse and exponential gains
-never reach zero anyway (F4), so no distance curve bounds the voice count: without a cap every shot of a 48-player
-fight inside the cull radius keeps a voice; legacy has no cap (GP6) and only a 90 m cull (GN8); it also builds a buffer per shot (GP6). Proposed
+never reach zero anyway (F4), so no distance curve bounds the voice count: without a cap every shot of a fight at the largest
+mode's N (48 or 54, MODES-3) inside the cull radius keeps a voice; legacy has no cap (GP6) and only a 90 m cull (GN8); it also builds a buffer per shot (GP6). Proposed
 numbers are starting points; no source gives a voice budget (F9).
 Rests on: R3-AUDIO-F3, F4, F9; legacy GP6, GN8.
 Serves: the brief's R3 row (spatial audio); VISION_V2 §3, §6.9. No VISION_V2 §6 item names audio.
@@ -1263,7 +1264,7 @@ Rests on: R3-AUDIO-F8, F9; legacy GP6, GW15.
 Serves: the brief's R3 row (spatial audio: occlusion). No VISION_V2 §6 item names audio; §6.2 (floors and line of sight)
 is the simulation data the rays would reuse, not a need this recommendation serves.
 Cross-topic open questions: R3-XT-OQ6 (Open questions, "Cross-topic open questions").
-Spike must prove (proposed): with O-B on, at most 1 ray per voice per 100 ms and at most 0.2 ms per frame for all rays at
+Spike must prove (proposed): with O-B on, at most 1 ray per voice per 100 ms and at most 0.2 ms (p99) per frame for all rays at
 the voice cap on the minimum machine; a blind listening test where 4 of 5 testers tell an occluded source from an open
 one.
 
@@ -1394,7 +1395,7 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-AUDIO-OQ1. HRTF cost.** No allow-listed source gives it (F9); the Chromium and W3C mailing-list discussions found
   by search are off the allow list. Decided by: REC1's spike mark.
 - **R3-AUDIO-OQ2. Voice counts in a real fight.** The inventory asks for a count of concurrent voices in a 48-bot fight
-  (GP6); no measurement exists. Decided by: the spike's counter under REC2.
+  (GP6; for v2, a fight at the largest mode's N, 48 or 54, MODES-3); no measurement exists. Decided by: the spike's counter under REC2.
 - **R3-AUDIO-OQ3. Listener placement.** F11 assumes a legacy-like top-down camera; the camera is look brief pending.
   Decided by: the look brief's camera, then a listening check by Mustafa.
 - **R3-AUDIO-OQ4. Spec details.** The specification's PannerNode and spatialization sections were not reached (F9);
@@ -1664,6 +1665,21 @@ new numbers are the approved arithmetic of C9.13. Notes: `.checkpoints/v2-resear
 - **Header:** the open-question total becomes 47 (9 added); the status label is unchanged (the step-3d verifier
   recounts it).
 - **OBJECT:** none.
+
+Step 3d fixes (2026-10-30):
+- R3-LOOK-REC3: the advisor's term note added after its spike mark, outside the look row (its "48" is the largest
+  mode's N, 48 or 54); the row's words unchanged (a nit).
+- R3-BUDGET-REC2: ", p99" added to the main-thread CPU, character animation, sim cost and the five GPU rows (time
+  statistics: a time mark with no statistic is a p99; a recommendation change).
+- R3-CHAR-REC1: 2.0 ms (p99) and 1.0 ms (p99) (a recommendation change).
+- R3-CHAR-REC2: 1.0 ms (p99) (a recommendation change).
+- R3-CHAR-REC4: 2.0 ms (p99) GPU time (a recommendation change).
+- R3-AUDIO-REC3: 0.2 ms (p99) per frame (a recommendation change).
+- R3-AUDIO-REC1: p99 written out, by the advisor's item-6 ruling (the same rule; found by the owner).
+- Options for question 7, row V-A: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3)
+  (a nit).
+- R3-AUDIO-REC2's reason: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3) (a nit).
+- R3-AUDIO-OQ2: the inventory's "48-bot fight" (GP6's words) stays; the largest mode's N is named beside it (a nit).
 
 ## Sources
 
