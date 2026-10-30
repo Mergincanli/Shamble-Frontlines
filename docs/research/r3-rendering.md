@@ -8,6 +8,7 @@
 - **Date:** 2026-10-28 (every source below was read that day).
 - **Status:** spot-checked (45 of 77 key claims). The verifier's table, its critical read, the owner's fixes and the
   second pass on them (2026-10-29: closed, nits only) are in part 7 ("Verifier spot-check").
+- Glossary and cross-topic resolutions applied 2026-10-30 (see [GLOSSARY.md](GLOSSARY.md) and part 7).
 - **The brief's questions for this topic (quoted, `docs/V2_PHASE0_BRIEF.md` §4, row R3):** "three.js WebGPURenderer with
   TSL; the WebGL 2 fallback; candidate techniques for a comic look (toon ramps, screen-space outlines, ambient
   occlusion, emissive bloom); characters (skinning, instancing, LOD); budgets for the minimum and recommended hardware;
@@ -23,7 +24,7 @@
 | 6 | how we measure it | R3-MEASURE-F1–F10, REC1–REC4, OQ1–OQ4 | `graphics-engineer-r3-r3-measure-draft.md` |
 | 7 | spatial audio with Web Audio | R3-AUDIO-F1–F11, REC1–REC4, OQ1–OQ6 | `graphics-engineer-r3-r3-audio-draft.md` |
 
-**Totals:** 92 findings, 25 recommendations, 38 open questions; 62 sources read (61 official, 0 shipped game, 1 other),
+**Totals:** 92 findings, 25 recommendations, 47 open questions (38 own, 1 shared, 8 cross-topic); 62 sources read (61 official, 0 shipped game, 1 other),
 22 sources not read.
 
 **How to read this file.**
@@ -522,7 +523,7 @@ pending).
 - **CL9**: static merging cut village draw calls 398 to 202; soldiers are not merged.
 - **R1-BND-REC2** (wave 1): the page receives one flat block per tick with sections per entity kind (soldiers, vehicle
   parts); **R1-TICK-REC5**: the main thread interpolates between two ticks every frame; **R2-INT-REC1**: the server's
-  relevance region bounds which entities a client knows. Together they bound how many characters the renderer can ever
+  relevance region bounds which entities a client knows. Together they bound how many soldiers the renderer can ever
   be asked to draw and give it typed arrays to write instance data from.
 
 ### Question 5: budgets for the minimum and recommended hardware (R3-BUDGET)
@@ -532,7 +533,7 @@ Question 5 of R3. Author: graphics-engineer (Opus 5.5, effort high), 2026-10-28.
 
 **Everything in this section is proposed.** The targets come only from VISION_V2 §3, §4 and §6: "a laptop with
 integrated graphics runs the largest mode at 30+ fps on Low" and "a mid-range graphics card runs it at 60 fps on High";
-the goal mode is "12v12v12 or 24v24" (36 or 48 players; bots fill empty slots), and CLAUDE.md says to design for 48+; §6.9 asks for "a few very large
+the [goal mode](GLOSSARY.md#the-start-modes-and-the-goal-modes) is "12v12v12 or 24v24" (36 or 48 players; bots fill empty [slots](GLOSSARY.md#team-size-and-how-modes-are-written)), and CLAUDE.md says to design for [48+](GLOSSARY.md#the-design-point-and-headroom); §6.9 asks for "a few very large
 units and their effects without dropping frames". The reference machines and every number below are proposals for the
 ADR draft (`docs/adr/0003`), to be confirmed by Mustafa.
 
@@ -580,7 +581,7 @@ or a hardware share among players (the Steam Hardware Survey and vendor spec pag
   303, manor 238, centre 170, base 140; at most 12k triangles; P5: "Draw calls ~300/frame in the village (driver
   overhead on weak machines)", rated medium. **CL9**: village 202 after merging (STATUS health), triangles up to +12 %
   "still under 18k".
-- **TL15** (reports/2026-10-16-three-teams-core.md:48–50): 48 soldiers' sim step 0.80–1.00 ms mean (p95 0.97–1.54);
+- **TL15** (reports/2026-10-16-three-teams-core.md:48–50): 48 soldiers' sim step 0.80–1.00 ms [mean](GLOSSARY.md#time-statistics) (p95 0.97–1.54);
   draw calls 1,480 at 12 and 5,843 at 48 with every soldier on screen; 16 shader programs.
 - **GA15**: soldier animation 26 to 51 µs each (1.2 to 2.4 ms at 48 by arithmetic).
 - **CD15**: pixel ratio capped at 2 with MSAA on; the row asks a spike to measure ratio 1 and 2 on integrated graphics.
@@ -588,9 +589,12 @@ or a hardware share among players (the Steam Hardware Survey and vendor spec pag
 - **STATUS health**: JS heap 42.7 MB at boot (editor rebuild row, 2026-10-14).
 - **Phase-0 report** (docs/reports/2026-10-13-phase-0.md:9): Mustafa's PC has an RTX 5080, a high-end card, above the
   "mid-range" class of VISION_V2 §4.
-- **R1 wave 1**: R1-TICK's spike scene (48 soldiers with full AI, 4 big vehicles, 200 live projectiles) and its client
+- **R1 wave 1**: R1-TICK's spike scene (48 soldiers with full AI, 4 [big vehicles](GLOSSARY.md#big-vehicle-and-very-large-unit), 200 [live projectiles](GLOSSARY.md#live-projectile)) and its client
   mark "the page's frame time p95 with the sim in the worker is no worse than with no sim at all by more than 1.0 ms"
-  (R1-TICK-REC5's and R1-BND's marks); R1 asks for the reference hardware "to be named with R3, R5 and R6".
+  (R1-TICK-REC5's and R1-BND's marks); R1 asks for the reference hardware "to be named with R3, R5 and R6". Since
+  2026-10-30 (resolutions 9 and 11) R1-TICK-REC2 P1 and R3-BUDGET-REC2 share [the stress scene](GLOSSARY.md#the-stress-scene)
+  (15 big vehicles, 300 live projectiles), and R1 names
+  [the reference server](GLOSSARY.md#the-reference-server) and R3-BUDGET-REC1's minimum laptop as its reference hardware.
 
 ### Question 6: how we measure it (R3-MEASURE)
 
@@ -929,6 +933,7 @@ stutter" (F10); legacy already compiles on first sight (TL15: 16 programs vs 9);
 (GW17) is one such variant. Init itself is asynchronous (F9).
 Rests on: R3-WGPU-F9, F10, F22; R3-MEASURE-F3 (mark 1's counter); legacy TL15, GW17.
 Serves: VISION_V2 §6.9 (large units and their effects "without dropping frames"), §4.
+Cross-topic open questions: R3-XT-OQ8 (Open questions, "Cross-topic open questions").
 Spike must prove (proposed): (1) `renderer.info.memory.programs` (R3-MEASURE-F3) is the same 5 s after deploy and at
 the end of a scripted 5-minute match; (2) the first appearance of each unit type and effect causes no frame above
 1.5 × the median frame time of that run.
@@ -941,6 +946,7 @@ the API exists only in secure contexts (F20). Legacy's pageshot already prints t
 (TL12), and the inventory asks v2 to print the WebGPU adapter or "WebGL 2 fallback".
 Rests on: R3-WGPU-F5, F17, F18, F19, F20, F21; legacy TL12.
 Serves: VISION_V2 §4. No VISION_V2 §6 item: the backend logging and the overlay line serve the §4 targets only.
+Cross-topic open questions: R3-XT-OQ3 (Open questions, "Cross-topic open questions").
 Spike must prove (proposed): on each browser of F17–F19 the overlay and the test log name the backend correctly
 (checked against `navigator.gpu` availability) in 10 of 10 starts.
 
@@ -1025,7 +1031,7 @@ machine at Low; the result goes to the look brief.
 **R3-CHAR-REC1. Soldiers: one skinned mesh per soldier (C-B) as the baseline that runs on both backends (rigid weights,
 one bone per part, while the part-based model stays; any skin weights once the character model exists, CHAR-OQ3);
 measure instanced per-instance skinning (C-E on both backends, C-D as the WebGPU variant) against it in the spike, and
-adopt it only if it wins at 48 soldiers on screen.**
+adopt it only if it wins at [the largest mode](GLOSSARY.md#the-largest-mode-and-its-n)'s N soldiers on screen (48, or 54 under MODES-3 (b)).**
 Reason: separate parts are the measured legacy problem (CL6, TL15) and the inventory already points to rigid skinning
 for today's part-based soldiers (GA15); C-B uses documented three.js skinning (F1; F3, the Skeleton page's bone
 texture), but how WebGPURenderer skins is unconfirmed (CHAR-OQ1), so the spike's mark checks C-B on both backends.
@@ -1034,7 +1040,7 @@ Per-instance compute skinning is WebGPU only in three's example (F9), and the fa
 Rests on: R3-CHAR-F1, F2, F3, F4, F6, F8, F9; R3-GL2-F2, F3; legacy CL6, CL10, GA15, TL15.
 Serves: VISION_V2 §3 (48+ players, bots fill slots), §4, §6.7 (faction uniforms and variants as data: per-instance
 colour, F4, F6).
-Spike must prove (proposed): with 48 soldiers on screen in the benchmark scene, C-B renders on both backends with at
+Spike must prove (proposed): with the largest mode's N soldiers on screen (48 or 54, MODES-3) in the benchmark scene, C-B renders on both backends with at
 most 4 draw calls per soldier per pass (before outlines); the CPU cost of posing plus bone upload with every soldier on
 the full rig (no budget LOD) stays within 2.0 ms per frame on the minimum machine, and with R3-CHAR-REC2's budget LOD
 at Low within that tier's 1.0 ms (R3-BUDGET-REC2); C-D or C-E is adopted only if it cuts total frame time by at least 20 % against C-B on both reference
@@ -1051,7 +1057,7 @@ conditional; per-frame bound recomputation is a CPU cost the docs ask for on ani
 padded fixed sphere avoids.
 Rests on: R3-CHAR-F2, F10, F13; legacy GA15.
 Serves: VISION_V2 §3, §4 (30+ fps on the minimum laptop in the largest mode).
-Spike must prove (proposed): at 48 soldiers on screen, animation CPU time per frame (posing plus bone upload, as in
+Spike must prove (proposed): at the largest mode's N soldiers on screen (48 or 54, MODES-3), animation CPU time per frame (posing plus bone upload, as in
 R3-CHAR-REC1) at most 1.0 ms on the minimum machine at Low, with no soldier inside its padded sphere ever culled while visible (checked by rendering with culling
 off and on over 600 frames: identical pixels).
 
@@ -1063,8 +1069,9 @@ frame; instanced and batched meshes take per-instance colour (F4, F6); legacy's 
 (GN1) are the allocation and draw-call pattern to avoid.
 Rests on: R3-CHAR-F4, F6; legacy GN1; wave 1 R1-BND-REC2, R1-TICK-REC5 (cited, not restated as findings).
 Serves: VISION_V2 §3, §6.7, §6.9.
+Cross-topic open questions: R3-XT-OQ2 (Open questions, "Cross-topic open questions").
 Spike must prove (proposed): zero bytes allocated per frame in the character update path over 60 s (heap sampling, as
-legacy's method in TL15), and health bars for 48 soldiers in at most 2 draw calls.
+legacy's method in TL15), and health bars for the largest mode's N soldiers (48 or 54, MODES-3) in at most 2 draw calls.
 
 **R3-CHAR-REC4. Large units: parts as separate meshes under one group (V-A), each part's transform from the sim's
 vehicle-part records; static world geometry merged by material content on both backends, and put in render bundles on
@@ -1076,8 +1083,8 @@ fallback (merging) and a measured gain, which no source read gives. BatchedMesh 
 WebGPU (F7), so it is judged on CPU time, not on `drawCalls`.
 Rests on: R3-CHAR-F7, F12; R3-GL2-REC1 (cited); legacy CL9, GC16; wave 1 R1-BND-REC2.
 Serves: VISION_V2 §6.4 (big, multi-part vehicles), §6.9.
-Spike must prove (proposed): four large units (each at least 20 parts; the count of R3-BUDGET-REC2's and R1-TICK's
-scene) on screen with 48 soldiers add at most 2.0 ms GPU time and at most 200 draw calls against the scene without
+Cross-topic open questions: R3-XT-OQ2 (Open questions, "Cross-topic open questions").
+Spike must prove (proposed): the stress scene's four [very large units](GLOSSARY.md#big-vehicle-and-very-large-unit) ([GLOSSARY](GLOSSARY.md#the-stress-scene); each at least 20 parts) on screen with its soldiers add at most 2.0 ms GPU time and at most 200 draw calls against the scene without
 them, before any outline or ambient-occlusion pre-pass, on the recommended machine at High (4 units × 20 parts × 2
 passes, shadow and main, is 160 draws, plus margin; a hull outline adds about 80 more for the same parts,
 R3-BUDGET-REC2, second pass 2026-10-29);
@@ -1107,8 +1114,8 @@ Spike must prove (proposed): the two machines are named in the ADR draft with th
 `devicePixelRatio`, and every R3 pass mark is reported on both; on the minimum laptop's Linux run the overlay
 (R3-WGPU-REC4) names the WebGL 2 backend in Firefox.
 
-**R3-BUDGET-REC2. Budgets (proposed, option B-2), measured in the worst case of the largest mode: 48 soldiers on screen
-in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's scene), on the reference machines.**
+**R3-BUDGET-REC2. Budgets (proposed, option B-2), measured in the stress scene's fight on screen ([GLOSSARY](GLOSSARY.md#the-stress-scene)): the largest mode's [N](GLOSSARY.md#player-count-n) soldiers
+in one fight, its 4 very large units and its 300 live projectiles with their [visual effects](GLOSSARY.md#active-effect-and-visual-effect), on the reference machines.**
 
 | Budget (all passes of one frame) | Minimum laptop, Low, 30+ fps | Recommended card, High, 60 fps |
 |---|---|---|
@@ -1116,7 +1123,7 @@ in one fight, 4 large units, 200 live projectiles and their effects (R1-TICK's s
 | Frame time, median | ≤ 28 ms | ≤ 14 ms |
 | Main-thread CPU per frame (render submission, interpolation, animation, UI) | ≤ 16 ms | ≤ 8 ms (inside F1's 10 ms) |
 | of which: character animation (posing plus bone upload, with R3-CHAR-REC2's budget LOD) | ≤ 1.0 ms | ≤ 2.0 ms (more soldiers on the full rig) |
-| of which: sim cost seen by the page (R1-TICK, R1-BND) | ≤ 1.0 ms | ≤ 1.0 ms |
+| of which: sim cost seen by the page ([the client's sim share](GLOSSARY.md#the-clients-sim-share); R1-TICK, R1-BND) | ≤ 1.0 ms | ≤ 1.0 ms |
 | GPU time, total | ≤ 25 ms | ≤ 12 ms |
 | of which: shadow pass | ≤ 3 ms (one map, 1024² or off) | ≤ 2 ms |
 | of which: main scene pass | ≤ 16 ms | ≤ 6 ms |
@@ -1133,12 +1140,13 @@ page inside web.dev's 10 ms at 60 Hz (F1) and gives R1's sim mark its 1.0 ms. Dr
 5,843 at 48 (TL15) and a few times above its village 202–303, which legacy already judged a medium risk on weak
 machines (AUDIT P5). The arithmetic behind the Low cap (proposed figures): soldiers at R3-CHAR-REC1's cap of 4 draws
 per soldier per pass give 192 per pass at 48; a shadow and a main pass make 384; the merged world about 202 (CL9; the
-unmerged village was 303, AUDIT §1); four large units up to 200 (R3-CHAR-REC4): about 786, inside 800. A hull outline
-pass adds one draw per outlined object (R3-LOOK-F5): 192 more for the soldiers and about 80 for the large units' parts,
+unmerged village was 303, AUDIT §1); four very large units up to 200 (R3-CHAR-REC4): about 786, inside 800, at N = 48 (at N = 54, MODES-3 (b),
+the soldiers alone take 54 × 4 × 2 = 432 draws and the sum is about 834, over 800: R3-BUDGET-OQ4). A hull outline
+pass adds one draw per outlined object (R3-LOOK-F5): 192 more for the soldiers and about 80 for the very large units' parts,
 about 1,060 in all. So the 800 cap holds only without a per-object outline pass at Low; if the look brief keeps a hull
 outline at Low, the Low cap becomes about 1,100 (proposed), or the hull is a High-only setting. A GTAO pre-pass
 (R3-LOOK-REC2's other planned extra) adds about one draw per drawn object as well: about 192 for the soldiers and 80
-for the large units' parts, plus the world's main-pass share, so it passes both 800 and 1,100 at Low; whether Low keeps
+for the very large units' parts, plus the world's main-pass share, so it passes both 800 and 1,100 at Low; whether Low keeps
 it is the same trade (second pass, 2026-10-29). Both counts are conservative, since the world's 202 already includes
 the world's shadow pass and its own hulls (CS12 gives 398 as the count just before the merge). That trade is the brief's, measured by
 R3-LOOK-REC3; R3 does not choose it. The CPU-side animation row (1.0 ms) applies with the budget
@@ -1184,10 +1192,10 @@ time minus CPU work within 2 ms median when the scene is GPU-bound; two back-to-
 within 3 % of each other.
 
 **R3-MEASURE-REC2. A fixed benchmark scene: a recorded match replayed from its inputs (R1's identical-results work: R1-DET-REC1, R1-DET-REC6) at the
-largest mode's worst case (R3-BUDGET-REC2: 48 soldiers in one fight, 4 large units, 200 projectiles), with a scripted
-camera path, started from a URL flag on any build, including preview links (R5).**
-Reason: numbers compare only if every run draws the same frames; legacy's clustered worst case (TL15) and R1-TICK's scale
-scene give the load; preview links make it runnable on any machine with a browser.
+stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene); R3-BUDGET-REC2's fight on screen), with a scripted
+camera path, started from a URL flag on any build, including [preview links](GLOSSARY.md#preview) (R5).**
+Reason: numbers compare only if every run draws the same frames; legacy's clustered worst case (TL15) and the stress scene
+([GLOSSARY](GLOSSARY.md#the-stress-scene)) give the load; preview links make it runnable on any machine with a browser.
 Rests on: R3-MEASURE-F3; legacy TL15; R3-BUDGET-REC2 (cited); wave 1 R1-TICK's spike scene, R1-DET-REC1 and
 R1-DET-REC6 (cited).
 Serves: VISION_V2 §3, §4, §6.9.
@@ -1254,6 +1262,7 @@ simulation's data for VISION_V2 §6.2, which R4's line-of-sight work owns; the r
 Rests on: R3-AUDIO-F8, F9; legacy GP6, GW15.
 Serves: the brief's R3 row (spatial audio: occlusion). No VISION_V2 §6 item names audio; §6.2 (floors and line of sight)
 is the simulation data the rays would reuse, not a need this recommendation serves.
+Cross-topic open questions: R3-XT-OQ6 (Open questions, "Cross-topic open questions").
 Spike must prove (proposed): with O-B on, at most 1 ray per voice per 100 ms and at most 0.2 ms per frame for all rays at
 the voice cap on the minimum machine; a blind listening test where 4 of 5 testers tell an occluded source from an open
 one.
@@ -1358,7 +1367,8 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-BUDGET-OQ3. HiDPI laptops on Low.** Many integrated-graphics laptops ship with ratios above 1 (F3); a cap at 1
   softens text in the 3D view. Decided by: the spike's GPU time at ratio 1 and 2 (CD15's request) and Mustafa's look.
 - **R3-BUDGET-OQ4. Largest N.** VISION_V2 §3 starts small ("two teams with 2–8 players, and three teams with 6–18 players") and names 12v12v12 or 24v24 as the goal (36 or 48 players; CLAUDE.md: design for 48+); R1-TICK's
-  OQ7 decides the N of the offline scale test. The draw-call and triangle rows scale with N.
+  OQ7 decides the N of the offline scale test. The draw-call and triangle rows scale with N. The largest mode's
+  N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)) is 48 or 54 by the answer to MODES-3 (below).
 - **R3-BUDGET-OQ5. Triangle and memory rows.** They have no source (F7). Decided by: the spike's measurement and the
   character rework's real models (R3-CHAR-OQ3).
 - **R3-BUDGET-OQ6. Shadow technique.** REC2 budgets a shadow pass ("one map, 1024² or off" on Low), but one shadow map
@@ -1376,7 +1386,7 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
   what three.js allocated (F3), and the adapter's `memoryHeaps` appear only with Chrome's developer flag (F2). Decided
   by: the spike reads both on the minimum machine.
 - **R3-MEASURE-OQ4. Cross-origin isolation for profiling.** Isolation gives 5 µs CPU timers (F7) but not finer GPU timers
-  (F1); R1-BND-REC5 allows it in development and previews. Decided by: the R1-BND-REC5 route already recommended; no
+  (F1); R1-BND-REC5 allows it in development and previews (the [isolation flag](GLOSSARY.md#preview-isolation-and-the-isolation-flag)). Decided by: the R1-BND-REC5 route already recommended; no
   new need from R3.
 
 ### Question 7: spatial audio with Web Audio (R3-AUDIO)
@@ -1394,6 +1404,61 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 - **R3-AUDIO-OQ6. An AudioWorklet mixer or spatializer of our own.** Not researched in this pass (a verifier finding,
   C7); it would replace built-in panners (F1, F2) with our own code. Decided by: REC1's spike, only if the built-in
   panners miss its CPU mark.
+
+### Shared open questions (the same words in every topic)
+
+- **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+  and three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
+  6v6v6; the largest mode is then the goal 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N
+  ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which [the stress scene](GLOSSARY.md#the-stress-scene), the
+  offline scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of
+  the test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest
+  mode's N gives both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+
+### Cross-topic open questions (consistency critic, 2026-10-29)
+
+- **R3-XT-OQ1. Where does the remote-entity interpolation buffer live: in the worker or on the page?** A two-block
+  buffer on the page cannot hold R2's 100 to 167 ms delay. So either the worker (Rust) runs R2's adaptive snapshot
+  buffer and publishes already-delayed remote poses, or the page (TypeScript) keeps a snapshot buffer, as R5's test
+  layer assumes. No topic places R2's interpolation and clock estimate on one side of R1's boundary. Side A:
+  R1-TICK-REC5; R1-BND-REC2; R1-BND-REC6. Side B: R2-SYNC-REC4; R5-TEST-REC1. Existing questions: none. Decided by:
+  ADR-0001 (interpolation design) with ADR-0004 (boundary: block contents and the number of blocks kept). (Consistency
+  critic, 2026-10-29, rank 4.)
+- **R3-XT-OQ2. Do the snapshot and the output block carry remote soldiers' animation state?** Animation of remote
+  soldiers online needs those states in R2's snapshot, then in R1's block. R2's bit budget names none of them and R1
+  leaves the layout open, so R3's character path and R2's bandwidth figure may not fit together. Side A: R1-BND-REC2.
+  Side B: none by id. Also named: R3-CHAR-REC3, R3-CHAR-REC4, R1-BND-OQ6, R2 worked estimate. Existing questions:
+  R1-BND-OQ6 (block size and layout), partly. Decided by: ADR-0001 (snapshot fields) with ADR-0004 (block layout) and
+  ADR-0003 (what animation reads). (Consistency critic, 2026-10-29, rank 16.)
+- **R3-XT-OQ3. Does the editor still open by double-click with a Wasm validator?** R1 hands this question to R5, and
+  R5's editor build does not address the double-click rule EDITOR_V2 keeps. Side A: R1-DATA-OQ11. Side B: missing
+  answer (R5-LAYOUT-REC5, R3-WGPU-REC4 named). Existing questions: R1-DATA-OQ11. Decided by: ADR-0002 (editor build),
+  or Mustafa if EDITOR_V2 §5's double-click rule must change. (Consistency critic, 2026-10-29, rank 25.)
+- **R3-XT-OQ4. Who creates the client's field data (backend, hardware, frame time)?** Each topic hands client-side
+  field data (backend share, hardware mix, frame time) to the other. No recommendation creates it, yet R3's
+  fallback-share and hardware questions depend on it. Side A: R3-GL2-OQ2. Side B: R6-TEL-REC1; R6-OBS-OQ5. Also named:
+  R3-BUDGET-OQ1. Existing questions: R3-GL2-OQ2, R3-BUDGET-OQ1, R6-OBS-OQ5. Decided by: The synthesis: ADR-0003 (what
+  is measured) and ADR-0006 (where it is stored, under R6-OBS-REC4's data rules). (Consistency critic, 2026-10-29,
+  rank 26.)
+- **R3-XT-OQ5. Who sets the CI runner costs (GPU, macOS, reference machines, cache)?** Real-Safari runs, WebGPU
+  coverage in CI and reference-machine runs all depend on costs no topic sets. Side A: R5-CI-OQ5; R5-TEST-OQ4;
+  R3-MEASURE-OQ2. Side B: missing answer. Also named: R5-XQ-OQ1, R6-COST-REC1. Existing questions: R5-CI-OQ5,
+  R5-TEST-OQ4, R5-XQ-OQ1, R3-MEASURE-OQ2. Decided by: ADR-0006 (costs) with ADR-0002 (CI); Mustafa for any paid plan.
+  (Consistency critic, 2026-10-29, rank 33.)
+- **R3-XT-OQ6. Who owns audio occlusion rays, if option O-B is chosen?** Page-side audio rays would need the sim's
+  query across a boundary that allows no page calls. This only matters if option O-B is adopted. Side A:
+  R3-AUDIO-REC3; R3-AUDIO-OQ5. Side B: missing answer (R4-LOS-REC1 named). Also named: R1-BND-REC1. Existing
+  questions: R3-AUDIO-OQ5. Decided by: ADR-0003 with ADR-0004, only if R3-AUDIO-REC3's spike asks for O-B.
+  (Consistency critic, 2026-10-29, rank 35.)
+- **R3-XT-OQ7. Does R3 need OffscreenCanvas, or a per-entity or per-field block layout?** R1 asks R3 for two inputs to
+  the block layout, and R3 gives neither. Side A: R1-BND-OQ6. Side B: missing answer. Also named: R1 pointer to R3.
+  Existing questions: R1-BND-OQ6. Decided by: ADR-0003 with ADR-0004 (block layout), measured in the R1-BND-REC2
+  spike. (Consistency critic, 2026-10-29, rank 37.)
+- **R3-XT-OQ8. Does the client's cutaway follow the server's visibility rule?** This is a pointer R3 does not take up.
+  It stays look brief pending and depends on R2-INT-OQ1. Side A: R2-INT-REC2. Side B: R3-WGPU-REC3. Also named:
+  R2-INT-OQ1. Existing questions: R2-INT-OQ1. Decided by: The look brief and Mustafa (R2-INT-OQ1), then ADR-0003.
+  (Consistency critic, 2026-10-29, rank 39.)
 
 ### Pointers to other topics
 
@@ -1426,7 +1491,7 @@ latency, measured on 100 shots; zero autoplay warnings in the console on all fou
 
 #### Question 5 (R3-BUDGET)
 
-- R1: REC2's scene is R1-TICK's spike scene, so the client and the sim are measured on the same load; REC1's machines
+- R1: REC2's scene is [the stress scene](GLOSSARY.md#the-stress-scene), which R1-TICK's spike also runs, so the client and the sim are measured on the same load; REC1's machines
   are the ones R1 asks for.
 - R6: the hardware mix and backend share of real players come from telemetry (OQ1).
 
@@ -1565,6 +1630,40 @@ NOTES.
   verifier's figures, with the nits: R3-LOOK-OQ6 marks SMAA as a candidate with no source; R3-CHAR-OQ6 marks its point
   inferred; the world's 202 is noted as including its own hulls; M is "unchanged by the fix".
 - Label: "spot-checked (45 of 77 key claims)". Review stops here: what remains is nits.
+
+### Consistency resolutions (2026-10-30)
+
+Step 3c of `.checkpoints/v2-research/plan-amendments-2.md`, applied by the owner (graphics-engineer) to this file only,
+as the advisor approved them on 2026-10-30 (`.checkpoints/v2-research/advisor-resolutions-verdict.md`; the texts as
+folded into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim or source was added; the only
+new numbers are the approved arithmetic of C9.13. Notes: `.checkpoints/v2-research/graphics-engineer-r3-consistency.md`.
+- **Resolutions applied** (by the critic's rank and change id; each "before" text matched the file exactly once):
+  - rank 9 (the stress scene): C9.12 (R3-CHAR-REC4's spike: the stress scene's four very large units with its
+    soldiers), C9.13 (R3-BUDGET-REC2's arithmetic: about 786 draws at N = 48; at N = 54, MODES-3 (b), about 834, over
+    800, R3-BUDGET-OQ4), C9.14 (R3-BUDGET-REC2's heading: the stress scene's fight on screen, with 300 live
+    projectiles instead of 200; a recommendation change), C9.15 and C9.16 (R3-MEASURE-REC2's heading and reason);
+  - rank 10 (MODES-3, escalated; interim wording): C10.12 (R3-BUDGET-OQ4: the largest mode's N is 48 or 54), C10.13
+    (MODES-3 inserted);
+  - ranks 1, 5, 6, 11, 17, 19, 21, 22, 23 and 29 change nothing in R3. The look rows (post-processing, outline,
+    style) are unchanged.
+- **Glossary terms** ([GLOSSARY.md](GLOSSARY.md); linked from the header and from the first use of each term this
+  file uses): the one "Retire (exact)" phrase ("the worst case of the largest mode") went with C9.14. "Retire (in
+  context)" words replaced where they carried the term's meaning: "characters" for soldiers in the R3-CHAR legacy
+  facts (soldiers); a bare 48 for the largest mode in R3-CHAR-REC1 (heading and mark), R3-CHAR-REC2's mark and
+  R3-CHAR-REC3's mark (the largest mode's N, 48 or 54 under MODES-3 (b); a recommendation change under reading (b));
+  "large units" for the stress scene's in R3-BUDGET-REC2's arithmetic (very large units); "R1-TICK's spike scene" in
+  the pointer to R1 for question 5 (the stress scene). The R1 wave-1 fact in question 5's legacy facts keeps R1's
+  old words and now names the stress scene and the reference server after them. The other in-context hits stay:
+  legacy measurements at 48, R3-LOOK-REC3's soldier counts (a look row), "players" as people, "large units" and
+  "effects" for the category or in VISION_V2's words, the Rests-on lines that name R1-TICK's own scene, and unrelated
+  words ("always", the 50 % of GPU frame time).
+- **Shared open questions added** (part "Open questions"): MODES-3 under "Shared open questions (the same words in
+  every topic)"; R3-XT-OQ1 to R3-XT-OQ8 (the critic's ranks 4, 16, 25, 26, 33, 35, 37 and 39) under "Cross-topic
+  open questions (consistency critic, 2026-10-29)", with a pointer from each R3 recommendation they name
+  (R3-WGPU-REC3, R3-WGPU-REC4, R3-CHAR-REC3, R3-CHAR-REC4, R3-AUDIO-REC3).
+- **Header:** the open-question total becomes 47 (9 added); the status label is unchanged (the step-3d verifier
+  recounts it).
+- **OBJECT:** none.
 
 ## Sources
 
