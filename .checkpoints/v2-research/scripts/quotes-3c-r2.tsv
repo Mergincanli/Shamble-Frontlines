@@ -1,0 +1,19 @@
+topic	gone or new	quoted text (spaces normalized)	new quote found in the approved texts
+R2	new	Consistency resolutions (2026-10-30)	no
+R2	new	ADR 0006 lists it as open, or it is researched before 0006 is accepted	yes
+R2	new	the share of the tick budget	yes
+R2	new	25 % of the tick budget	yes
+R2	new	one vCPU of the EU instance type	yes
+R2	new	reference host	yes
+R2	new	server-only random stream	yes
+R2	new	the tick interval	yes
+R2	new	the transport layer	yes
+R2	new	R6's (deferred) security baseline	no
+R2	new	simulation tick duration	no
+R2	new	design for 48+	no
+R2	new	server-only seed	no
+R2	new	4–9 % of one core	no
+R2	new	one vCPU of the reference server	yes
+R2	new	Retire (in context)	no
+R2	new	4–9 % of one core of the measuring machine	no
+R2	new	r6:424-425 at commit 8dee746	no
