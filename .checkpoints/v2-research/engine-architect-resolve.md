@@ -36,3 +36,6 @@ Task: step 3a of plan-amendments-2 (glossary GLOSSARY.md + resolutions.md for th
 - summary table written
 - glossary header wording fixed; 34 terms in 7 sections
 - cross-topic-oqs.md written (28 shared XT-OQs, 0 settled, rank 41 nit)
+- final checks: 116 before-quotes each found exactly once in its topic file (checkbefore.py); topic files untouched (git status); glossary 34 terms in 7 sections.
+- Answer summary: #1 resolved (50 % budget = 25 % sim + 25 % server-only; 25 % whole-tick option weighed); #5 aligned ABL-PREDICT (Mustafa after Feel Lab); #6 resolved (authority-only streams; SEC-SPREAD open); #9 resolved (one proposed stress scene); #10 escalated MODES-3; #11 resolved (one vCPU of CCX23); #17 escalated BASELINE-WHEN; #19 resolved (Pages first) + aligned PREV-DELETE; #21 escalated PREVIEW-WALL; #22 resolved (isolation flag); #23 escalated BASELINE-WHEN; #29 resolved (type ban + reviewed allow). 29 others: 28 shared XT-OQs (72 insertions), 0 settled, rank 41 nit (folded into C22.1).
+DONE
