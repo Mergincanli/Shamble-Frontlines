@@ -1,0 +1,7 @@
+# Session message to the R6 owner (infra-engineer), saved verbatim before sending: the open item and a nit from the step-3d final check
+# sent: 2026-10-30 about 20:53 UTC by SendMessage
+
+The final check of your fix round (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r356-3d-final-result.md) closed everything except one item, plus a nit. Fix them in /home/user/Shamble-Frontlines/docs/research/r6-infrastructure.md only, under the same rules (no new claim or source; a changed number only as arithmetic you show; do not commit):
+1. R6-TEL-REC1's spike (r6:803–806): the 30 matches now include the largest mode (48 under MODES-3 (a), 54 under (b)), but "a record is at most 1 MB uncompressed (A-10)" rests on A-10, which is a 24v24 (48-player) match. At 54 players the same per-player rate gives about 1.08 MB, over the mark. Make the mark hold under both readings: either scope it ("a 24v24 record is at most 1 MB uncompressed (A-10)") and scale it for the largest mode (1 MB × N / 48, so 1.125 MB at 54, with the arithmetic shown), or another wording that holds under both. Log it as a recommendation change.
+2. Nit: R6's part-7 "Step 3d fixes (2026-10-30)" lines give no change type; add the type (nit or recommendation) to each line, as your reply listed them.
+Reply in under 60 words with the mark as it now reads.

@@ -29,3 +29,6 @@
 - Hits file started: verifier-r2-3d-hits.tsv (header). Next: judge 198 hits in order.
 - hits 1-40 judged (all right). Next: hits 41-80.
 - hits 41-85 judged (all right). Next: hits 86-130.
+- hits 86-130 judged (wrong so far: r2:2017, 2022, 2103, 2186, 2292, 2319, 2338, 2358; rule: single full-match 48 in a pass mark/spike with no marking words = wrong, consistent with the R1+R4 verifier's standard). Next: hits 131-198.
+- hits 131-170 judged (new wrong: r2:2439, 2499, 2588, 2718, 2773, 2777, 2952). Next: hits 171-198.
+- hits 171-198 judged (new wrong: r2:2993). All 198 judged: see hits.tsv counts. Next: verify row count vs source TSV; first-use links; labels.

@@ -84,3 +84,116 @@ R2	1785	The largest mode, and its N	48	right	"A 48-human room": egress estimate 
 R2	1786	The largest mode, and its N	48	right	"48 x 146 kbps": the same egress arithmetic
 R2	1827	Big vehicle and very large unit	vehicles	right	interest options row "Big units and vehicles": not a count
 R2	1827	Preview isolation and the isolation flag	always	right	"D5 always relevant": not previews
+R2	1828	Big vehicle and very large unit	vehicles	right	interest options row "Multi-part vehicles, passengers": not a count
+R2	1828	Team size and how modes are written	players	right	"seated players": people
+R2	1831	Preview isolation and the isolation flag	always	right	"teammates always relevant": not previews
+R2	1855	Team size and how modes are written	players	right	"Players on networks ...": people
+R2	1881	Game-server certificate	a publicly trusted certificate	right	the form is named in the sentence ("for each game server hostname")
+R2	1906	Server tick time	a room's tick	right	"A room's tick loop is long-running CPU work": the loop, not a time mark
+R2	1981	Team size and how modes are written	players	right	recommendations heading "for 48+ players": player count
+R2	2010	The largest mode, and its N	48	right	SYNC-REC1 reason "between 48 browsers": an argument at the design point, not a mark
+R2	2017	The largest mode, and its N	48	wrong	SYNC-REC1 mark 1 "48 clients ..., 10 minutes each": a single full-match N in a pass mark, no marking words, no 54 value; reads as the largest mode (54 under MODES-3 (b)); unsure, so wrong. Owner R2: "the largest mode's N" or label "the design point, N = 48"
+R2	2022	The largest mode, and its N	48	wrong	SYNC-REC1 mark 4 "snapshot work for 48 clients ... within the server-only share": a CPU mark in a share the budget tests at the largest mode's N (GLOSSARY §1 scales it at N = 54); bare 48. Owner R2
+R2	2023	The server tick budget	25 %	right	"25 % of the tick period": whole named, beside "the server-only share"
+R2	2084	The authority	server-only	right	"Source's server-only seed": Source's own seed (a source fact), not our state
+R2	2098	Big vehicle and very large unit	vehicles	right	Serves "§6.4 (vehicles)": not a count
+R2	2101	Team size and how modes are written	players	right	"no other players": people
+R2	2103	The largest mode, and its N	48	wrong	SYNC-REC3 mark 2 "Under P3 in a 48-player brawl": a single full-match N in a pass mark, no marking words; unsure, so wrong. Owner R2
+R2	2136	Big vehicle and very large unit	vehicles	right	history description "vehicles and big units (position, hull ...)": not a count
+R2	2186	The largest mode, and its N	48	wrong	SYNC-REC5 mark 4 "A rewound shot against 48 candidates ... at 700 shots per second": GLOSSARY §1 uses it as the lag-compensation row at N = 48 and scales it x1.125 at N = 54, so the largest mode is meant by a bare 48. Owner R2
+R2	2225	Big vehicle and very large unit	vehicles	right	SYNC-REC7 heading "Vehicles and big multi-part units": not a count
+R2	2235	Team size and how modes are written	players	right	"Seats for several players": people
+R2	2239	Big vehicle and very large unit	vehicles	right	Serves "§6.4 (vehicles as first-class, big and multi-part)": not a count
+R2	2280	The largest mode, and its N	48	right	SYNC-REC9 body: the WEAPONS-table estimate "about 700 at 48" (inferred arithmetic), not a mark
+R2	2286	Team size and how modes are written	players	right	"48 players multiply ...": player count in a reason
+R2	2286	The largest mode, and its N	48	right	SYNC-REC9 reason: an argument at the design point, not a mark
+R2	2292	The largest mode, and its N	48	wrong	SYNC-REC9 mark 1 "One match server with 48 clients ... within the server-only share": CPU mark in the share; C1.10 cites these "48 clients" as the stress scene's client on every soldier, so the largest mode is meant by a bare 48. Owner R2
+R2	2294	The server tick budget	25 %	right	"25 % of the tick period": whole named
+R2	2296	Team size and how modes are written	players	right	"at 24 and 36 players": scale points
+R2	2296	Team size and how modes are written	players	right	"in players x visible entities": player count
+R2	2303	The largest mode, and its N	48	right	BUD-REC1 reason "the 48-player downstream (286 kbps against 146)": the estimate's design-point row
+R2	2319	Team size and how modes are written	players	right	"at 48 players": player count
+R2	2319	The largest mode, and its N	48	wrong	BUD-REC1 spike "at 48 players (simulated clients plus bots)": a single full-match N in a spike, no marking words; unsure, so wrong. Owner R2
+R2	2323	The largest mode, and its N	48	right	"upstream <= 48 kbps per client": a bit rate
+R2	2331	The largest mode, and its N	48	right	BUD-REC2 reason "the all-in-view 48-player case from about 536": the estimate's design-point row
+R2	2335	Big vehicle and very large unit	vehicles	right	Serves "§6.4 (vehicles with turrets and seats)": not a count
+R2	2338	Team size and how modes are written	players	right	"at 48 players all in view": player count
+R2	2338	The largest mode, and its N	48	wrong	BUD-REC2 spike "at 48 players all in view, ... 10-minute bot match": a single full-match N in a spike, no marking words; unsure, so wrong. Owner R2
+R2	2350	Team size and how modes are written	players	right	"At 48 players": player count in a reason
+R2	2350	The largest mode, and its N	48	right	BUD-REC3 reason: the estimate's 48-player snapshot size (arithmetic), not a mark
+R2	2351	Team size and how modes are written	players	right	"at 64 players": headroom count
+R2	2355	Team size and how modes are written	players	right	Serves "§3 (48+ players)": design point with its marking "48+"
+R2	2358	The largest mode, and its N	48	wrong	BUD-REC3 spike "in a 30-minute 48-player soak": a single full-match N in a soak mark, no marking words; unsure, so wrong. Owner R2
+R2	2398	The server tick budget	50 %	right	"≤ 50 % of the tick period": whole named
+R2	2400	The server tick budget	25 %	right	"25 % each": beside "the sim step share" and "the server-only share", the tick period named in the same sentence
+R2	2401	The server tick budget	50 %	right	reason "fit inside 50 %": the same item's heading names the whole (≤ 50 % of the tick period); approved text (C1.9, verdict item g)
+R2	2402	The server tick budget	25 %	right	"25 % for the whole server tick": names the set-aside option and its whole
+R2	2404	Sim step time	p99 tick	right	"a p99 tick at half the period": the whole server tick (not the sim alone); approved text (C1.9)
+R2	2404	The server tick budget	50 %	right	"50 % leaves room for bursts": same item as the heading's "≤ 50 % of the tick period"; beside "half the period"; approved text (C1.9)
+R2	2404	Tick period	the period	right	"a p99 tick at half the period": the tick period (ticks), cannot mean the snapshot interval
+R2	2407	The largest mode, and its N	48	right	Rests on "legacy CM4 (... at 48 soldiers)": legacy measurement
+R2	2413	The authority	server-only	right	"the server-only work ... within their 25 % share": the glossary's own server-only share, not state an offline match holds
+R2	2413	The server tick budget	25 %	right	"each within their 25 % share": beside the share marking words, the period named in the sentence's 8.3/16.7 ms
+R2	2439	The largest mode, and its N	48	wrong	INT-REC1 (c) "The region query for 48 clients ... 0.2 ms per tick at p99": GLOSSARY §1 uses it as the interest row at N = 48 and scales it x1.125 at N = 54, so the largest mode is meant by a bare 48. Owner R2
+R2	2439	Time statistics	at most 0.2 ms per tick	right	the statistic is now named ("at p99", next line)
+R2	2462	Time statistics	at most 0.1 µs per enemy pair	right	"at p99" named in the sentence
+R2	2478	Team size and how modes are written	players	right	"all players in one fight": people
+R2	2479	The sim step share and the server-only share	10 % of the server tick budget	right	value follows at once ("5 % of the tick period, 0.8 ms ... 1.7 ms")
+R2	2488	Preview isolation and the isolation flag	always	right	"always included": not previews
+R2	2494	Team size and how modes are written	players	right	Serves "§6.1 (48+ players in one match)": design point marked "48+"
+R2	2499	The largest mode, and its N	48	wrong	INT-REC4 spike, now "in the stress scene" (the largest mode's N soldiers), still says "Ranking and packing for 48 clients": fixes N at 48 inside a stress-scene mark (54 under MODES-3 (b)); GLOSSARY §1 scales it at N = 54. Owner R2
+R2	2499	Time statistics	at most 0.5 ms per tick	right	"at p99" named in the sentence
+R2	2526	Preview isolation and the isolation flag	always	right	"always sent": not previews
+R2	2531	Team size and how modes are written	players	right	"seated players": people
+R2	2535	Big vehicle and very large unit	vehicles	right	Serves "§6.4 (vehicles: big, multi-part ...)": not a count
+R2	2546	Preview isolation and the isolation flag	always	right	Source "observer target is always sent": not previews
+R2	2588	The largest mode, and its N	48	wrong	TRN-REC1 mark 2 "one server process holds 48 WebTransport sessions": a single full-match N in a load mark, no marking words; unsure, so wrong. Owner R2
+R2	2603	Team size and how modes are written	players	right	"players behind one NAT": people
+R2	2612	The advisories check	dependency audits	right	"the security baseline (...; dependency audits)": the baseline's subject (GLOSSARY keeps it)
+R2	2702	Game-server certificate	a publicly trusted certificate	right	form named ("per game server hostname")
+R2	2718	The largest mode, and its N	48	wrong	TRN-REC5 mark 2 "Certificate rotation with 48 live sessions": a single full-match N in a pass mark, no marking words; unsure, so wrong (low stakes). Owner R2
+R2	2724	Preview isolation and the isolation flag	always	right	"always the non-waiting send_datagram": not previews
+R2	2737	Team size and how modes are written	players	right	Serves "(48+ players)": design point marked "48+"
+R2	2739	The server tick budget	50 %	right	"proposed: 50 % of it": whole named (the snapshot stream's rate)
+R2	2773	The largest mode, and its N	48	wrong	ROOM-REC2 mark 1 "one 48-player room (bots) holds its tick ... within the server tick budget": the budget is tested at the largest mode's N (GLOSSARY), so a full-size room fixed at 48 with no marking words; unsure, so wrong. Owner R2
+R2	2774	The server tick budget	50 %	right	"50 % of the tick period": whole named
+R2	2777	The largest mode, and its N	48	wrong	ROOM-REC2 mark 3 "64 MB for a 48-player room": same full-size room as mark 1, bare 48; unsure, so wrong. Owner R2
+R2	2783	Player count (N)	characters	right	display-name "characters": text
+R2	2807	Player count (N)	characters	right	display-name "characters outside ...": text
+R2	2845	Team size and how modes are written	players	right	TF2 "keeps N players": TF2's player count
+R2	2898	Team size and how modes are written	players	right	open-questions heading "for 48+ players"
+R2	2918	Big vehicle and very large unit	vehicles	right	SYNC-OQ5 "remote players or vehicles": collision subject, not a count
+R2	2918	Team size and how modes are written	players	right	"predicted players": people
+R2	2918	Team size and how modes are written	players	right	"remote players": people
+R2	2928	Big vehicle and very large unit	vehicles	right	SYNC-OQ8 "large moving vehicles as cover": not a count
+R2	2939	The authority	server-only	right	"Source adds a server-only seed": Source's seed (source fact)
+R2	2952	The largest mode, and its N	48	wrong	SYNC-OQ13 "checked in the 48-player spike": names a full-size spike by a bare 48 (follows the marks above); unsure, so wrong (low stakes). Owner R2
+R2	2980	Big vehicle and very large unit	vehicles	right	BUD-OQ5 "Caps on vehicles and live projectiles per team": design caps, not a stress count
+R2	2985	Team size and how modes are written	players	right	"up to 16 and 54 players": totals (player counts), not a team size
+R2	2985	The largest mode, and its N	48	right	"the 48 design point": beside the marking words "design point"
+R2	2988	Team size and how modes are written	players	right	"at 48 players": player count in arithmetic
+R2	2988	The largest mode, and its N	48	right	BUD-OQ7 arithmetic on the estimate's 48-player row
+R2	2989	The largest mode, and its N	48	right	"the 48-player case to about 202 kbps": the estimate's row
+R2	2992	The largest mode, and its N	48	right	"+42 kbps at 48": the estimate's E3b row
+R2	2993	The largest mode, and its N	48	wrong	BUD-OQ9 "encoding 48 per-client delta snapshots ... Decides: REC6's spike": REC6's spike is now at the largest mode's N, so the bare 48 stands for it; unsure, so wrong (low stakes). Owner R2
+R2	2998	Team size and how modes are written	players	right	"Share of players on IPv6": people
+R2	3066	Team size and how modes are written	players	right	"How many players will need the WebSocket fallback?": people
+R2	3160	Team size and how modes are written	players	right	"at 48 players": player count
+R2	3160	The largest mode, and its N	48	right	XU-OQ5 restates the budgets estimate's 48-player snapshot size (R2-BUD-REC3)
+R2	3180	The server tick budget	25 %	right	XU-OQ8 record of BUD-REC6's old figure ("their figures before 2026-10-30"), whole named
+R2	3182	The largest mode, and its N	48	right	XU-OQ8 record of ROOM-REC2's figure before 2026-10-30 (framed by the entry's lead)
+R2	3182	The server tick budget	50 %	right	"≤ 50 % of the tick period": whole named
+R2	3183	The server tick budget	25 %	right	record of SYNC-REC9's old "25 % of "the tick budget"" (quoted old words, framed as before 2026-10-30)
+R2	3193	The authority	server-only	right	"a server-only share": the glossary's own term
+R2	3193	The server tick budget	50 %	right	"50 % of the tick period": whole named
+R2	3194	The server tick budget	25 %	right	"of 25 % each": beside the share words, the tick period named in the sentence
+R2	3244	Team size and how modes are written	players	right	"at 48 players": player count
+R2	3244	The largest mode, and its N	48	right	XU-OQ15 restates the estimate's 146.1 kbps at 48
+R2	3295	The largest mode, and its N	48	right	MODES-3 approved shared text "the goal 24v24, N = 48" beside "the largest mode"
+R2	3295	The start modes and the goal modes	the goal	right	"the goal 24v24": a goal mode, correctly named
+R2	3302	The advisories check	dependency audits	right	BASELINE-WHEN: the baseline's subject (approved shared text)
+R2	3492	The largest mode, and its N	48	right	pointers to R6: the estimate's "48-human room at E3, all in view" egress figure
+R2	3983	The largest mode, and its N	48	right	sources table row number 48
+R2	4024	Player count (N)	characters	right	"265,981 characters read": text
+R2	4040	Player count (N)	characters	right	"characters 0–200,000 of 273,620 read": text
+R2	4042	Player count (N)	characters	right	"characters 0–100,000 of 451,076 read": text

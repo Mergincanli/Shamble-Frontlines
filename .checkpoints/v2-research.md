@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 21:46 Amsterdam (20:46 UTC)
+- **Last update:** 2026-10-30 21:52 Amsterdam (20:52 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -195,6 +195,12 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   R5 and R6 launched 20:47 UTC (run wf_ca6f48ca-efd, task w6zjv4ew7; prompt `prompts/verifier-r356-3d-final.txt`;
   24 hits on changed lines in `scripts/glossary-hits-3d-final-r356.tsv`). Running: R2 and R1+R4 units, the final
   check (3 agents). Write-guard grep now allows `.checkpoints/v2-research.md` (it is on the allowed list).
+- **Step 3d final check of R3+R5+R6 DONE** (run wf_ca6f48ca-efd, about 20:52 UTC; verbatim `verifier-r356-3d-final-result.md`):
+  PASS WITH NOTES; all fix items closed; 24 hits on changed lines judged, 24 right; labels unchanged (R3 45 of 77, R5
+  61 of 115, R6 21 of 42); no fetch. One open item: R6-TEL-REC1's 1 MB record mark fails under MODES-3 (b) (54 players
+  ≈ 1.08 MB); nits: r3:1243's "adds … (p99)", GLOSSARY:156's credit for R3-AUDIO-REC1, R6's part-7 lines lack types,
+  r5:1426 could say "the design point". Sent about 20:53 UTC: the R6 item and nit (`prompts/r6-3d-final-fix.txt`), the
+  R3 nit (`prompts/r3-3d-final-fix.txt`); the R5 and glossary nits ride with the next round.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

@@ -1,0 +1,4 @@
+# Session message to the R3 owner (graphics-engineer), saved verbatim before sending: a nit from the step-3d final check
+# sent: 2026-10-30 about 20:53 UTC by SendMessage
+
+The final check of your fix round (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r356-3d-final-result.md) closed every R3 item and left one nit, from the R3-AUDIO-REC1 mark I asked you to add: "HRTF for 4 priority voices adds less than 0.3 ms (p99)" states a difference at p99, which is unclear because p99s do not add. Reword it in /home/user/Shamble-Frontlines/docs/research/r3-rendering.md, for example "HRTF for 4 priority voices raises that p99 by less than 0.3 ms", and keep its part-7 line in step. Log it as a nit; change nothing else; do not commit. Reply in under 40 words with the mark as it now reads.

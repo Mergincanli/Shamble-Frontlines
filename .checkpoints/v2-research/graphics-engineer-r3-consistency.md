@@ -56,3 +56,5 @@ DONE (fix round)
 - Follow-up: R3-AUDIO-REC1 spike "less than 0.3 ms (p99)". recommendation
 - Part 7 "Step 3d fixes": R3-AUDIO-REC1 line added. nit. Not committed.
 DONE (follow-up)
+- Final-check nit: R3-AUDIO-REC1 "adds less than 0.3 ms (p99)" -> "raises that p99 by less than 0.3 ms"; part-7 line kept in step. nit. Not committed.
+DONE (final nit)
