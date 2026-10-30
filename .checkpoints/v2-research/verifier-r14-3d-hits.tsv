@@ -29,3 +29,73 @@ R1	1240	Active effect (and visual effect)	effects	right	GAS effects grant abilit
 R1	1268	Active effect (and visual effect)	effects	right	GAS predicted effects (finding)
 R1	1269	Active effect (and visual effect)	effects	right	GAS effects under a key (finding)
 R1	1270	Active effect (and visual effect)	effects	right	GAS predicted effects (finding)
+R1	1286	Active effect (and visual effect)	effects	right	Fortnite "cooldown effects" (finding about another game)
+R1	1288	Team size and how modes are written	players	right	Paragon's high-latency players, not a team size
+R1	1304	Active effect (and visual effect)	effects	right	GAS replication of effects (finding)
+R1	1305	Team size and how modes are written	players	right	GAS replication mode "for players", not a team size
+R1	1340	Active effect (and visual effect)	effects	right	a crate page's silence on effects (finding)
+R1	1349	Active effect (and visual effect)	effects	right	bevy_alchemy periodic effects (finding)
+R1	1632	Active effect (and visual effect)	effects	right	options table: pools for effects (data layout), no count
+R1	1632	Big vehicle and very large unit	vehicles	right	options table: pools for vehicles (data layout), no count
+R1	1638	Active effect (and visual effect)	effects	right	options table "Effects as entities" (layout), no count
+R1	1638	Active effect (and visual effect)	effects	right	same row, layout, no count
+R1	1638	Active effect (and visual effect)	effects	right	same row, layout, no count
+R1	1641	Active effect (and visual effect)	effects	right	options table, upkeep row, kinds, no count
+R1	1641	Big vehicle and very large unit	vehicles	right	options table, kinds, no count
+R1	1692	Big vehicle and very large unit	vehicles	right	determinism options table, general (no stress count)
+R1	1792	Active effect (and visual effect)	effects	right	heading "how abilities and effects are expressed": ability model
+R1	1797	Active effect (and visual effect)	effects	right	GAS effect types in options table A1
+R1	1800	Active effect (and visual effect)	effects	right	options table A4/A5 ability model, no count
+R1	1804	Active effect (and visual effect)	effects	right	"instant effects" in the damage pipeline (ability model)
+R1	1806	Active effect (and visual effect)	effects	right	"cooldown effects per shot" (ability model option)
+R1	1822	Active effect (and visual effect)	effects	right	option D2 "effects on other players" (gameplay effects, not a count)
+R1	1822	Team size and how modes are written	players	right	"other players", not a team size
+R1	1877	Preview isolation and the isolation flag	always	right	content "always consistent with the code", not isolation
+R1	1879	State hash	its hash	right	content bundle's hash in URL, not the RNG/state hash
+R1	1879	State hash	its hash	right	content bundle's hash checked at join, not the state hash
+R1	1881	Preview isolation and the isolation flag	always	right	"always matches the server" (content), not isolation
+R1	1926	The server tick budget	25 %	right	"25 % of the tick period" beside "the sim step share"
+R1	1929	The largest mode, and its N	48	right	legacy JS step at 48 soldiers (reference measurement)
+R1	1981	Active effect (and visual effect)	effects	right	Serves §6.3 "effects name their source and target", no count
+R1	2019	Active effect (and visual effect)	effects	right	Serves §6.3 abilities and effects built from data, no count
+R1	2043	The largest mode, and its N	48	right	scale step list N = 12/24/36/48/64 beside "the largest mode's N"
+R1	2047	The server tick budget	25 %	right	"25 % of 16.7 ms" beside "the sim step share"
+R1	2048	The server tick budget	25 %	right	"25 % of 33.3 ms": whole named
+R1	2049	The server tick budget	25 %	right	"The other 25 % of the server tick budget": whole named
+R1	2050	The server tick budget	50 %	right	"50 % of the tick period": whole named
+R1	2137	Team size and how modes are written	players	right	Serves §3 "48 players and bots": total, not a team size
+R1	2137	The largest mode, and its N	48	right	Serves line "§3 (48 players and bots)": VISION_V2 §3's design-for-48 figure, not a mark
+R1	2138	Team size and how modes are written	players	right	"24v24 match (48 players)": N in all, not a team size
+R1	2138	Team size and how modes are written	players	right	"12v12v12 match (36 players)": N in all
+R1	2138	The largest mode, and its N	48	right	the goal 24v24's N, beside "the largest mode where it is neither"
+R1	2162	Big vehicle and very large unit	vehicles	right	Serves §6.4 (vehicles) in general
+R1	2192	Active effect (and visual effect)	effects	right	presentation effects (visual), explicitly presentation
+R1	2216	Team size and how modes are written	players	right	"48+ players and bots": design-point marking "48+"
+R1	2232	Active effect (and visual effect)	effects	right	"NaN and relaxed-SIMD effects": other meaning
+R1	2236	The largest mode, and its N	48	right	"the scale test at 48": LOOP_V2 §11 scale point
+R1	2258	The largest mode, and its N	48	right	LOOP_V2 §11 scale points N = 12, 24, 36, 48
+R1	2260	The largest mode, and its N	48	right	scale comparison "at N = 12 and N = 48" (stated scale points)
+R1	2273	Big vehicle and very large unit	vehicles	right	Serves §6.4 multi-part vehicles as records, no count
+R1	2279	The largest mode, and its N	48	wrong	R1-BND-REC2 mark 4 "a 10-minute match with 48 soldiers": a single full-match N in a pass mark, reads as the largest mode (54 under MODES-3 (b)) with no marking words (not a scale list, not labelled design point); unsure, so wrong
+R1	2340	Active effect (and visual effect)	effects	right	ability model (effects that are instant, timed...), no count
+R1	2342	Active effect (and visual effect)	effects	right	ability model, no count
+R1	2383	Active effect (and visual effect)	effects	right	instant damage effect / effects to weapon attributes (model)
+R1	2386	Active effect (and visual effect)	effects	right	Fortnite's effect system (finding)
+R1	2402	Active effect (and visual effect)	effects	right	effects start/tick/expire on tick boundaries (model rule)
+R1	2404	Shared stream and authority-only stream	the simulation's seeded RNG	right	beside "authority-only stream" (C6.2 as approved)
+R1	2421	Active effect (and visual effect)	effects	right	"effects on other players wait for the server" (gameplay effects, no count)
+R1	2421	Team size and how modes are written	players	right	"other players", not a team size
+R1	2427	Active effect (and visual effect)	effects	right	"weapon timers out of effects" (model)
+R1	2427	Team size and how modes are written	players	right	"high-latency players" (Paragon)
+R1	2447	Big vehicle and very large unit	vehicles	right	faction data "units and vehicles", no count
+R1	2454	Active effect (and visual effect)	effects	right	"abilities granted by effects" (model)
+R1	2463	Time statistics	costs at most 1 ms per tick	right	followed by "at p99" (marking word beside)
+R1	2472	Team size and how modes are written	players	right	quoted brief text "48 simulated players" and VISION_V2 §3's 48 players
+R1	2472	The largest mode, and its N	48	right	quoted brief pass mark and VISION_V2 §3 (24v24, 48 players): quoted/dated (verifier 2026-10-28)
+R1	2481	Big vehicle and very large unit	vehicles	right	content file kinds list
+R1	2500	State hash	its hash	right	content set's hash, not the state hash
+R1	2518	Preview isolation and the isolation flag	always	right	validator verdict "always", not isolation
+R1	2562	State hash	its hash	right	content bundle's hash
+R1	2618	Team size and how modes are written	players	right	"48+ players": design-point marking
+R1	2664	The largest mode, and its N	48	right	"48 soldiers under MODES-3 (a), 54 under (b)" beside "the largest mode"
+R1	2671	Big vehicle and very large unit	vehicles	right	heading says "Big vehicles"; "multi-part vehicles" beside it

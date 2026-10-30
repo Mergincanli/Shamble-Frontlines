@@ -18,3 +18,5 @@ Claims checked (basis of changed recs), topic files at f67245e:
 - K10 R1-DET-REC5 "REC6's canonical serialization walks the whole state" · r1:2223 "after each tick the sim writes a canonical serialization of its whole state" · confirmed (internal).
 Next: R4 changed recs, glossary hits.
 Hits judged 0-29 (R1 42..1270): 30 right. Next rows 30+.
+Hits judged 30-64: 35 right. Next 65+.
+Hits judged 65-99: 34 right, 1 wrong (R1:2279 BND-REC2 mark 4 '48 soldiers'). Next 100+.

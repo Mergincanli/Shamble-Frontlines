@@ -1,4 +1,4 @@
 # Session message to the R3 owner (graphics-engineer), saved verbatim before sending: one more mark under the advisor's item-6 ruling
-# sent: 2026-10-30 about 20:46 UTC by SendMessage
+# sent: 2026-10-30 about 20:45 UTC by SendMessage
 
 Yes: R3-AUDIO-REC1's spike mark ("under 0.5 ms", "less than 0.3 ms") names no statistic, so under the glossary's "Time statistics" rule it reads as p99 too, and the advisor's item-6 ruling (option (a)) is to write that out. Add "(p99)" after each of its two time values, in the same way as the other marks, and log each as a recommendation change, with a part-7 line ("Step 3d fixes": "R3-AUDIO-REC1: p99 written out, by the advisor's item-6 ruling (the same rule; found by the owner)"). You may OBJECT with a reason instead. Change nothing else; do not commit. Reply in under 40 words with the mark as it now reads.

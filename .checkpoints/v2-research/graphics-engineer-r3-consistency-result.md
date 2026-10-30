@@ -46,6 +46,6 @@ R3-AUDIO-REC1's spike mark ("under 0.5 ms", "less than 0.3 ms") also names no st
 
 Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/graphics-engineer-r3-consistency.md
 
-## Addendum: R3-AUDIO-REC1 (reply to `prompts/r3-3d-fixes-2.txt`, about 20:47 UTC, verbatim)
+## Addendum: R3-AUDIO-REC1 (reply to `prompts/r3-3d-fixes-2.txt`, about 20:46 UTC, verbatim)
 
 Done (two recommendation changes, part-7 line added, not committed). R3-AUDIO-REC1's mark now reads: "main-thread audio work stays under 0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms (p99)."

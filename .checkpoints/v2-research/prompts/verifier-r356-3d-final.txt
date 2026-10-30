@@ -1,11 +1,11 @@
 # Prepared prompt (verbatim, saved before launch under advisor condition A1)
 # description: step 3d final check of R3, R5 and R6: only what the fix round changed
 # subagent_type: verifier · model: opus · effort: high · launched in workflow v2-research-step3d-final with a one-line pointer message
-# launched: not yet
+# launched: 2026-10-30T20:47Z in workflow v2-research-step3d-final; launch message: "Your task is written, word for word, in /home/user/Shamble-Frontlines/.checkpoints/v2-research/prompts/verifier-r356-3d-final.txt. It was saved before launch; the lines above "**Task:**" are the session's launch record. Read the whole file first, then follow it exactly as your task. It names your notes file: look there first, as it says."
 
 **Task:** the final check of step 3d for R3, R5 and R6 of SHAMBLE FRONTLINES v2 phase 0 research (plan amendment `/home/user/Shamble-Frontlines/.checkpoints/v2-research/plan-amendments-2.md`, step 3d; the same pattern as the waves' final checks: check only what the fix round changed). Your earlier pass found the problems (its report, verbatim: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r356-3d-result.md`; the skeptic's: `verifier-r356-3d-skeptic-result.md`), the advisor ruled on two R3 items (`advisor-3d-r3-verdict.md`), and the owners applied the fix round asked in `prompts/r3-3d-fixes.txt`, `prompts/r5-3d-fixes.txt` and `prompts/r6-3d-fixes.txt` (their replies are appended to `<owner>-<k>-consistency-result.md`).
 
-**The diff to check:** `git -C /home/user/Shamble-Frontlines diff f67245e {HEAD} -- docs/research/r3-rendering.md docs/research/r5-toolchain-quality.md docs/research/r6-infrastructure.md docs/research/GLOSSARY.md` (f67245e is the files as your first pass read them; {HEAD} after the fix round).
+**The diff to check:** `git -C /home/user/Shamble-Frontlines diff f67245e d54f3c0 -- docs/research/r3-rendering.md docs/research/r5-toolchain-quality.md docs/research/r6-infrastructure.md docs/research/GLOSSARY.md` (f67245e is the files as your first pass read them; d54f3c0 after the fix round).
 
 **What to check, and only this:**
 1. Each item of the three fix messages: applied as asked, or declined with a reason that holds? The advisor's two R3 rulings: applied word for word (item 5's term note outside the look row; item 6's "p99" marks)? Nothing inside R3-LOOK-REC3's row changed?

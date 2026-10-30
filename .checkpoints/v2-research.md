@@ -184,7 +184,7 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   VISION_V2's design point), committed **d768190**; R6 DONE (4 recommendation changes, r6:665, 709, 744, 799; TL;DR
   scoped to Workers; r6:212 and r6:256 kept: the legacy perfbots figure), committed **10662c4**; replies appended
   verbatim to each owner's result file. Both: 0 exact hits, no quote gone. R3's fix round sent about 20:43 UTC.
-- R3's fix round DONE about 20:47 UTC (replies appended to `graphics-engineer-r3-consistency-result.md`): the advisor's two
+- R3's fix round DONE about 20:46 UTC (replies appended to `graphics-engineer-r3-consistency-result.md`): the advisor's two
   rulings applied (term note outside R3-LOOK-REC3, the row unchanged; p99 written into the listed marks), plus
   R3-AUDIO-REC1's two marks, which the owner found by the same rule and the session asked it to write out
   (`prompts/r3-3d-fixes-2.txt`); compound 48s: r3:885 and r3:1248 renamed, r3:1396 kept (the inventory's words) with

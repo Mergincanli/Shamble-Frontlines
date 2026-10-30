@@ -28,3 +28,7 @@ All four header lines in /home/user/Shamble-Frontlines/docs/research/GLOSSARY.md
 4. "Their full wording is in each affected topic's "Shared open questions (the same words in every topic)" subsection."
 
 The body is unchanged. Nothing is committed.
+
+## Addendum: R3's line under "Time statistics" (reply to `prompts/engine-architect-glossary-r3-timestats.txt`, about 20:47 UTC, verbatim)
+
+Done; only that field changed, not committed. It now reads: "…R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median), R3-BUDGET-REC2's CPU, animation, sim and GPU rows, R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC4, R3-AUDIO-REC1 and R3-AUDIO-REC3 (sub-budgets at p99, written out in step 3d by the advisor's ruling)."
