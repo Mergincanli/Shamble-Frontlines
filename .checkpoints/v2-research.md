@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 19:25 Amsterdam (18:25 UTC)
+- **Last update:** 2026-10-30 19:45 Amsterdam (18:45 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -84,10 +84,25 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - The split edit: engine-architect (format only), workflow run wf_1eb87409-4bd (task wlqyojhoj), launched 18:21 UTC;
   prompt `prompts/engine-architect-retire-split.txt`, notes `engine-architect-retire-split.md`; the pre-split glossary
   is in `scratchpad/sp3/GLOSSARY.before-split.md` (from HEAD).
-- Next: when the split returns, run the compare (0 problems), re-run the baseline and record both counts here, commit
-  GLOSSARY.md; then run `mk3c.py`, launch the five step-3c owners (4 at once, background pointer prompts), commit each
-  file as it returns after the write-guard check; then step 3d (three verifier units), docs-keeper, gate, report, PR
-  ready. Research stops at 00:10 Amsterdam (23:10 UTC).
+- The split DONE (about 18:34 UTC; report verbatim `engine-architect-retire-split-result.md`): 30 phrases exact, 73 in
+  context, 8 keeps (111 quoted phrases before); 8 glossary phrases rejoined across line breaks. Compare: 34 entries, 0
+  problems (`scripts/retire-split-compare.txt`). Committed **7c6e0d7** (the SHA before step 3c; the topic files are
+  unchanged since 8dee746).
+- Check script fixed again (the agent's gap and the session's own): phrases match across line breaks; straight quotes
+  paired inside each block (a quote may span lines); hits skipped as quotes or dated records are listed (`--skipped`,
+  as the advisor's step-3b answer asks); term uses and first uses listed (`--terms`, `--first-uses`). **Both counts
+  (advisor ruling item 4), final script, quotes and dated records skipped:** before the split 0 exact, 737 in context
+  (`scripts/glossary-baseline-before-split.json`); after it 42 exact, 640 in context (`scripts/glossary-baseline-split.json`,
+  hits `scripts/glossary-hits-split.tsv`); 737 − 682 = 55, exactly the hits of the phrases moved to Keeps (Core 30, big
+  19, Whole ticks 5, at least 4 cores and 8 threads 1). Earlier scripts gave 1,335 and 817 (history). Skipped after
+  the split: 104 in quoted text, 64 in dated records (`scripts/glossary-skipped-split.tsv`). Note for the report: the
+  script also skips "[Second fix pass" (2) and "[Second verifier pass" (4), the same records as "[Fix pass" and
+  "[Verifier"; their hits are in the skipped list. Two retired phrases are word patterns with "…", not searchable: the
+  step-3d verifiers read for them.
+- Next: run `mk3c.py`, launch the five step-3c owners (4 at once, background pointer prompts), commit each file as it
+  returns after the write-guard check; then the GLOSSARY "Used today" refresh (engine-architect); then step 3d (three
+  verifier units, `scripts/mk3d.py 7c6e0d7 <after>`, `scripts/unread_sample.py`), docs-keeper, gate, report, PR ready.
+  Research stops at 00:10 Amsterdam (23:10 UTC).
 
 ## Next steps (from 30 October, 18:00 Amsterdam; superseded in part by the Advisor's decisions above)
 1. Restore the Night shift cron (0-7) and remove issue #16's "Tonight only" rule line.
