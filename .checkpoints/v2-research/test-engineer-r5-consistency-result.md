@@ -26,3 +26,17 @@ Step 3c for R5 is done. All approved items are applied to `/home/user/Shamble-Fr
 **Check script after edits:** R5 has 0 exact hits and 45 in-context hits. The new in-context hits sit inside approved word-for-word texts or were kept on judgement. Dated-record skips rose from 5 to 19 because the new part 7 subsection sits in the skipped verifier part.
 
 Notes, ending in DONE: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/test-engineer-r5-consistency.md`. Nothing is committed.
+
+## Addendum: the step-3d fix round (reply to `prompts/r5-3d-fixes.txt`, about 20:44 UTC, verbatim)
+
+I fixed all four step-3d items in `/home/user/Shamble-Frontlines/docs/research/r5-toolchain-quality.md`, and added one line per change under "Step 3d fixes (2026-10-30):" in part 7. Nothing is committed.
+
+1. r5:401–402: R1's old words were not a quote, so they stay. I added "; since 2026-10-30 the mark is the hash-map ban" with the link (nit).
+2. r5:1477: the list now opens with "items 1 and 4 of the test-mode list:", linked. The modes the soak runs are unchanged (nit).
+3. r5:1561 now reads "the check of R1-ECS-REC2 mark 2, the hash-map ban", and r5:2087 reads "(the hash-map ban in the sim crate)", both linked (nit each).
+4. Bare 48s:
+   - r5:58: "48-bot soaks" becomes "bot soaks up to the largest mode's N" (nit, since REC5's value already changed through C10.17).
+   - r5:1429 and r5:1487: each match now runs at the largest mode's N, "48, or 54 under MODES-3 (b)" (recommendation each).
+   - r5:1426 stays: "the 48-player scale" names VISION_V2 §3's design point, not the largest mode.
+
+The check script still finds 0 exact hits in R5; the in-context count went from 45 to 48. My guess is the three extra hits are the new "(48, or 54 under MODES-3 (b))" values, which sit beside the term. Notes: `/home/user/Shamble-Frontlines/.checkpoints/v2-research/test-engineer-r5-consistency.md`.

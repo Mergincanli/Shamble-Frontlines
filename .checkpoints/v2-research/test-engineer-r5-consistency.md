@@ -51,3 +51,14 @@ Heading note: resolution shared questions go under "### Shared open questions (t
 ## Check after edits: glossary_check.py --skip-records: R5 exact 0, in context 45 (new ones are inside approved word-for-word texts or kept as judged); header links GLOSSARY.md: True. repo-map-check OK.
 ## Counts: recommendation 4 (C19.1, C21.1, C22.1, C22.3); number 0; source 0; nit 64 (10 resolution texts, rank-41 via C22.1, 4 shared inserts, 14 XT inserts, 10 pointers, 9 renames, 1 marker-link unit, 11 first-use links, header line, totals, part 7, heading correction, wording fix). OBJECT: none. Not applied: C17.b3 (waits for BASELINE-WHEN).
 DONE
+## Step 3d fixes (coordinator, 2026-10-30; lines of f67245e)
+- 1 r5:401-402 wave-1 list: added "; since 2026-10-30 the mark is the hash-map ban" (linked) · nit
+- 2 r5:1477 R5-TEST-REC5: "items 1 and 4 of the test-mode list:" (linked) before the list · nit
+- 3a r5:1561 R5-CI-REC5: "R1-ECS-REC2's no-HashMap-iteration check" -> "the check of R1-ECS-REC2 mark 2, the hash-map ban" · nit
+- 3b r5:2087 pointer: "(no HashMap iteration in the sim)" -> "(the hash-map ban in the sim crate)" · nit
+- 4 r5:58 TL;DR "48-bot soaks" -> "bot soaks up to the largest mode's N" · nit (value already changed in REC5 by C10.17)
+- 4 r5:1429 R5-TEST-REC2 spike "10-minute 48-bot match" -> "10-minute bot match at the largest mode's N (48, or 54 under MODES-3 (b))" · recommendation
+- 4 r5:1487 R5-TEST-REC5 spike "30-minute 48-bot room" -> "30-minute room of bots at the largest mode's N (48, or 54 under MODES-3 (b))" · recommendation
+- 4 r5:1426 "§3 (the 48-player scale)" kept: the design point of VISION_V2 §3, not the largest mode
+- part 7: "Step 3d fixes (2026-10-30):" lines added · nit
+DONE (step 3d fixes)

@@ -25,3 +25,15 @@ I've applied every approved R6 item, the glossary terms and the shared open ques
 - R6-HOST-REC1's "Rests on" doesn't list the R5 findings that C19.6 now cites.
 
 Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/infra-engineer-r6-consistency.md
+
+## Addendum: the step-3d fix round (reply to `prompts/r6-3d-fixes.txt`, about 20:44 UTC, verbatim)
+
+All six step-3d items are fixed in r6-infrastructure.md only (lines as at f67245e). The check script still finds 0 exact retired phrases in R6, and nothing is committed.
+1. r6:46 (TL;DR): "free static traffic" now applies to Workers static assets only (R6-HOST-F5), as in C19.6. nit
+2. r6:709: the room sizes give both MODES-3 readings ((a) 48, 36, 18; (b) 54, 48, 36). recommendation. Next to it, r6:710's egress mark now says "per 24v24 (48-player) match-hour". nit
+3. r6:799: "the largest mode: 48 players under MODES-3 (a), 54 under (b)". recommendation
+4. r6:665: "8 rooms of the largest mode (48 under (a), 54 under (b); bots)", with a glossary link. recommendation
+5. Added a pointer from R6-OBS-REC4 to R6-XT-OQ5, and R5-PREV-F12, F13, F14 and F18 to R6-HOST-REC1's "Rests on:" list. nit
+6. r6:48, r6:417, r6:508 and r6:602 now read "24v24 (48-player)", since their figures come from R2's 24v24 row. nit. r6:744's soak now runs at the largest mode's N (48 or 54). recommendation. r6:212 and r6:256 stay as they were: they repeat the 48 soldiers of the legacy perfbots figure (TL15), stated right beside it.
+
+Part 7 has a "Step 3d fixes (2026-10-30):" line with one entry per change. Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/infra-engineer-r6-consistency.md

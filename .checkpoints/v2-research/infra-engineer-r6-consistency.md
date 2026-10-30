@@ -61,3 +61,15 @@ Started 2026-10-30. Base: working tree clean at aa1ba8f. Target file: docs/resea
 ## Totals
 recommendation 6 (C1.21, C19.5, C19.6, C21.4, C21.8, C22.5); number 0; source 0; nit 51 (13 resolution nits, 4 shared + 9 cross-topic questions, 5 pointers, 16 glossary wording changes, link pass, header, part 7, subsection naming). OBJECT: none.
 DONE
+
+## Step 3d fixes (coordinator, 2026-10-30; line numbers of f67245e)
+- 1 r6:46 TL;DR: "charges nothing for static traffic" scoped to Workers static assets (R6-HOST-F5), as C19.6. nit
+- 2 r6:709 R6-COST-REC1 spike: sizes give both readings ((a) 48, 36, 18; (b) 54, 48, 36); r6:710 egress mark "per 24v24 (48-player) match-hour" (the 3.16 GB row). recommendation (sizes); nit (710)
+- 3 r6:799 R6-TEL-REC1 spike: "the largest mode: 48 players under MODES-3 (a), 54 under (b)". recommendation
+- 4 r6:665 R6-HOST-REC2 spike: "8 rooms of the largest mode (48 under (a), 54 under (b); bots)", linked. recommendation
+- 5a R6-OBS-REC4: pointer to R6-XT-OQ5. nit
+- 5b R6-HOST-REC1 Rests on: + R5-PREV-F12, F13, F14, F18. nit
+- 6 judged: r6:48 -> "24v24 (48-player)" nit; r6:212, r6:256 kept (TL15's own 48 soldiers, stated beside it); r6:417 -> "24v24 (48-player)" nit; r6:508 -> same nit; r6:602 A-10 -> "24v24 (48-player)" nit; r6:710 see item 2; r6:744 R6-OBS-REC2 soak -> "at the largest mode's N (48 under (a), 54 under (b))" recommendation.
+- Part 7: "Step 3d fixes (2026-10-30):" with one line per change. nit
+- Check script: R6 exact 0. Not committed.
+DONE

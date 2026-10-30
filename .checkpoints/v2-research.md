@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 21:24 Amsterdam (20:24 UTC)
+- **Last update:** 2026-10-30 21:43 Amsterdam (20:43 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -180,6 +180,10 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - Step-3d fix round sent about 20:41 UTC to the R6 and R5 owners (messages `prompts/r6-3d-fixes.txt`,
   `prompts/r5-3d-fixes.txt`); R3's (`prompts/r3-3d-fixes.txt`) goes when a slot frees. Then a final check of only
   what the fix round changed (verifier, high), and the glossary's Time-statistics line for R3.
+- Fix round: R5 DONE (2 recommendation changes, r5:1429 and r5:1487; nits; r5:1426 kept: "the 48-player scale" is
+  VISION_V2's design point), committed **d768190**; R6 DONE (4 recommendation changes, r6:665, 709, 744, 799; TL;DR
+  scoped to Workers; r6:212 and r6:256 kept: the legacy perfbots figure), committed **10662c4**; replies appended
+  verbatim to each owner's result file. Both: 0 exact hits, no quote gone. R3's fix round sent about 20:45 UTC.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
