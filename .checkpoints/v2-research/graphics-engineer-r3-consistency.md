@@ -17,3 +17,12 @@ Restarted 2026-10-30 ~20:10 UTC after the spend limit: r3-rendering.md unchanged
 - C9.16 applied, R3-MEASURE-REC2 reason: the stress scene gives the load. nit
 - C10.12 applied, R3-BUDGET-OQ4 end: largest mode's N 48 or 54 by MODES-3. nit
 - Checked: each "before" matched exactly once.
+## Glossary step
+- Retire (exact): the only hit ("the worst case of the largest mode", R3-BUDGET-REC2 heading) went with C9.14; script: R3 exact 0.
+- Player count (in context "characters" for soldiers): legacy-facts R1-BND/R1-TICK/R2-INT line (Q4) "how many characters" -> "how many soldiers". nit
+- Largest mode (in context bare "48" for the largest mode): R3-CHAR-REC1 heading and mark, R3-CHAR-REC2 mark, R3-CHAR-REC3 mark -> "the largest mode's N soldiers (48, or 54 under MODES-3 (b))". recommendation (value changes under MODES-3 (b))
+- Very large unit (in context "large units" = the stress scene's): R3-BUDGET-REC2 arithmetic, the hull-outline and GTAO sentences ("the very large units' parts"). nit
+- Stress scene (in context "R1-TICK's spike scene" as the scene a mark is set on): pointer Q5 to R1 -> "the stress scene, which R1-TICK's spike also runs". nit
+- R1 wave-1 legacy fact (R1's old scene counts and its quote "to be named with R3, R5 and R6"): words kept, new terms added after it (stress scene with 15 big vehicles, 300 live projectiles; the reference server and R3-BUDGET-REC1's laptop, resolutions 9 and 11). nit
+- Kept (judged): legacy measurements at 48 (TL15, GA15, CL6, STATUS risk 3); R3-LOOK-REC3's "48 soldiers" and "12, 24 and 48" (a look row: word for word, condition 5); "players" as people (hardware mix, fallback players, Serves 48+); "large units" for the category (CHAR-REC4 heading and reason, options, audio, Serves §6.4/§6.9 quotes); "effects" (look rows, §6.9 quotes, the GPU row is a time row, not a count); "always" (options rows, unrelated); "50 %" (GPU frame time named); "Largest N" heading (does not fix 48); Rests-on "R1-TICK's scene"/"R1-TICK's spike scene" (names R1's own scene).
+- Links at first uses: time statistics (TL15 "mean"; line 201's "mean" is a verb), start/goal modes, team size, design point (Q5 intro), stress scene, big vehicles, live projectiles, reference server (R1 wave-1 fact), largest mode (CHAR-REC1 heading), very large units (CHAR-REC4 spike), N and visual effects (BUDGET-REC2 heading), client's sim share (BUDGET-REC2 row), preview (MEASURE-REC2), isolation flag (MEASURE-OQ4); approved "(GLOSSARY" markers converted to links. nit
