@@ -73,7 +73,7 @@ A usage limit can cut you off part way, and you would then be started again with
 def skeptic(k):
     eff, topics, files, extra = UNITS[k]
     fl = ', '.join(RS + f for f in files)
-    return f"""**Task:** an independent second check of step 3d's glossary judgments for {', '.join(topics)} ({fl}), added by the session to the approved step 3d as more evidence (read-only). The step-3d verifier has judged every "in context" hit of these topics, one line per hit, in `{D}/verifier-{k}-3d-hits.tsv` (topic, line, entry, phrase, right or wrong, reason); its report is `{D}/verifier-{k}-3d-result.md`. Try to refute its "right" judgments.
+    return f"""**Task:** an independent second check of step 3d's glossary judgments for {', '.join(topics)} ({fl}), added by the session to the approved step 3d as more evidence (read-only). The step-3d verifier has judged every "in context" hit of these topics, one line per hit, in `{D}/verifier-{k}-3d-hits.tsv` (topic, line, entry, phrase, right or wrong, reason); its notes are `{D}/verifier-{k}-3d.md`. Try to refute its "right" judgments.
 
 **The rule** (the advisor's, `{D}/advisor-retire-split-verdict.md`): an "in context" hit is wrong when, in its sentence, it carries the term's meaning without the term's marking words. It is right when it means something else, sits beside the marking words, or is quoted text or a dated record. When unsure, count it wrong.
 

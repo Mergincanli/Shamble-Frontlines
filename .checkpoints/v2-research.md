@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 21:11 Amsterdam (20:11 UTC)
+- **Last update:** 2026-10-30 21:13 Amsterdam (20:13 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -123,6 +123,12 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - **Fourth spend-limit cut**, about 18:52 UTC (HTTP 429, "your 5-hour limit resets 8:10pm (UTC)"): the R1+R4, R2 and R3
   owners stopped part way, notes saved (R1+R4 63 lines, R2 38, R3 1). Resumed by message at 20:11 UTC on Mustafa's
   "Try again", each from its notes and the file's current state (restart rule).
+- Session checks on R5 and R6 (scripts, for step 3d and the report): `scripts/quotes_check.py 7c6e0d7 de0a003`: no quoted
+  text left either file (R5 572 → 589 quotes, R6 254 → 265; the new ones come from the approved texts, the PREV-DELETE
+  question's source quotes included, or are the step's own labels); `scripts/apply_check.py de0a003 --topics R5,R6`:
+  45 change items, every after text or insert found except C17.5 (R5), whose "R6's security baseline" the owner then
+  renamed to the glossary's "the security baseline" (a rename, as the step's order allows); C17.b3 and C23.b1–b3 not
+  applied (they wait for BASELINE-WHEN), as required.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

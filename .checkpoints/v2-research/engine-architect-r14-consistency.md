@@ -61,3 +61,15 @@ R1 in-context hits left as they are (other meaning, legacy fact, quoted, a findi
 R1 first-use links added (first hit that carries the term's meaning): authoritative (CS8 legacy row), mean (Time statistics, legacy measurement), slots and the goal (entity kinds, ecs legacy facts), big vehicles (tick unit scope), active effects (R1-ABL-F1 paraphrase, outside the quote), state hash (R1-ECS-REC1 mark 4), sim step time (boundary options A2) -- nit (7 lines in one)
 R1 first literal hits NOT linked (other meaning): "start" r1:205 (a slice's start), "slots" r1:288 (memory slots), "predicted" r1:507 (a finding's predicted time; the prediction scope is linked at R1-ECS-REC1 mark 3)
 Check script after R1 step 2: R1 exact 0.
+RESUMED 2026-10-30 after the spend-limit cut (20:10 UTC): state checked, R1 steps 1-2 and R4 step 1 present in the files as logged; R4 step 2, shared OQs, XT-OQs, header, part 7 not yet done.
+## Step 3 (R1)
+R1 pointers "Cross-topic open questions: R1-XT-OQ<k>" added at the end of the 17 named recommendations: ECS-REC1 (OQ2, OQ7, OQ18), ECS-REC3 (OQ11), ECS-REC4 (OQ2), TICK-REC2 (OQ2), TICK-REC5 (OQ3), DET-REC1 (OQ4), DET-REC2 (OQ1), DET-REC3 (OQ2), BND-REC1 (OQ1, OQ14), BND-REC2 (OQ3, OQ9), BND-REC3 (OQ1), BND-REC4 (OQ13), BND-REC5 (OQ17), BND-REC6 (OQ3), ABL-REC6 (OQ15), DATA-REC3 (OQ13), DATA-REC6 (OQ6) -- nit (17 lines in one)
+R1 "### Shared open questions (the same words in every topic)" inserted before "### Pointers between R1's units" (resolutions.md's place), with a 3-line intro -- nit
+R1 C5.7 ABL-PREDICT inserted word for word (GLOSSARY mark linked) -- nit
+R1 C6.4 SEC-SPREAD inserted word for word -- nit
+R1 C10.3 MODES-3 inserted word for word -- nit
+R1 C17.2 BASELINE-WHEN inserted word for word -- nit
+R1 "### Cross-topic open questions (consistency critic, 2026-10-29)" inserted right after it, with a 3-line intro -- nit
+R1 R1-XT-OQ1..OQ18 inserted in the critic's words (ranks 2, 3, 4, 7, 12, 13, 14, 15, 16, 25, 27, 28, 31, 35, 36, 37, 38, 40), each "<id>" set to the R1 id; texts taken by script from cross-topic-oqs.md -- nit (18 lines in one)
+## Step 4 (R1)
+R1 header: line "Glossary and cross-topic resolutions applied 2026-10-30 (see GLOSSARY.md and part 7)" added with the GLOSSARY.md link; id table gains 2 rows (shared decision questions; R1-XT-OQ1–OQ18); totals 77 -> 99 open questions (+4 shared, +18 XT), R1-XU-OQ1 listed as settled at the consistency step; labels unchanged -- nit

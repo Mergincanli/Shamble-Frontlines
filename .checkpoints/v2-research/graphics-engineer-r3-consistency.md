@@ -10,3 +10,10 @@ Restarted 2026-10-30 ~20:10 UTC after the spend limit: r3-rendering.md unchanged
 - Part 7 = "## Verifier spot-check"; add "### Consistency resolutions (2026-10-30)" after "### Second pass (2026-10-29)".
 
 ## Log (type)
+- C9.12 applied, R3-CHAR-REC4 spike: the stress scene's four very large units with its soldiers. nit (not in the advisor's recommendation list)
+- C9.13 applied, R3-BUDGET-REC2 arithmetic: N = 48 qualifier, N = 54 sum 834 over 800 (R3-BUDGET-OQ4). number (approved arithmetic, no new source)
+- C9.14 applied, R3-BUDGET-REC2 heading: stress scene's fight on screen, N soldiers, 4 very large units, 300 live projectiles (was 200). recommendation
+- C9.15 applied, R3-MEASURE-REC2 heading: the stress scene. nit
+- C9.16 applied, R3-MEASURE-REC2 reason: the stress scene gives the load. nit
+- C10.12 applied, R3-BUDGET-OQ4 end: largest mode's N 48 or 54 by MODES-3. nit
+- Checked: each "before" matched exactly once.
