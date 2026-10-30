@@ -24,3 +24,28 @@ R3 step 3c is finished, and I raised no OBJECT. Every approved "before" text mat
 Files are in /home/user/Shamble-Frontlines:
 - docs/research/r3-rendering.md
 - .checkpoints/v2-research/graphics-engineer-r3-consistency.md (my notes, ending in DONE)
+
+## Addendum: the step-3d fix round (reply to `prompts/r3-3d-fixes.txt`, about 20:45 UTC, verbatim)
+
+All three step-3d items are applied to /home/user/Shamble-Frontlines/docs/research/r3-rendering.md, with no OBJECT and nothing committed. The glossary check still finds 0 retired phrases in R3.
+
+1. **R3-LOOK-REC3:** your term note is added word for word after its "Spike must prove"; the row itself is unchanged. Nit.
+2. **p99 marks** (5 recommendation changes):
+   - R3-BUDGET-REC2: ", p99" after all 8 row names (CPU, animation, sim cost and the five GPU rows).
+   - R3-CHAR-REC1: "2.0 ms (p99)" and "1.0 ms (p99)".
+   - R3-CHAR-REC2: "1.0 ms (p99)".
+   - R3-CHAR-REC4: "2.0 ms (p99) GPU time".
+   - R3-AUDIO-REC3: "0.2 ms (p99) per frame".
+3. **Compound 48s** (3 nits):
+   - r3:885 (row V-A) and r3:1248 (R3-AUDIO-REC2's reason) meant the largest fight, so I renamed them to a fight at the largest mode's N (48 or 54, MODES-3).
+   - r3:1396 (R3-AUDIO-OQ2) is the inventory's own wording (LEGACY_INVENTORY.md:316), so "48-bot fight" stays and the term is added beside it.
+
+Part 7 has a new "Step 3d fixes" list with one line per change.
+
+R3-AUDIO-REC1's spike mark ("under 0.5 ms", "less than 0.3 ms") also names no statistic. It is not on your list, so I left it. Your call whether it gets "(p99)" too.
+
+Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/graphics-engineer-r3-consistency.md
+
+## Addendum: R3-AUDIO-REC1 (reply to `prompts/r3-3d-fixes-2.txt`, about 20:47 UTC, verbatim)
+
+Done (two recommendation changes, part-7 line added, not committed). R3-AUDIO-REC1's mark now reads: "main-thread audio work stays under 0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms (p99)."

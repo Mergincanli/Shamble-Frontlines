@@ -1,0 +1,31 @@
+topic	line	entry	phrase	verdict	reason
+R1	42	The largest mode, and its N	48	right	count of sources not read, not a mode
+R1	46	Player count (N)	characters	right	text characters in a fetch quote cap
+R1	291	Team size and how modes are written	players	right	legacy record schema field, not a team size
+R1	296	The largest mode, and its N	48	right	legacy measurement at 48 soldiers (stated scale point)
+R1	298	The largest mode, and its N	48	right	file line number (three-teams-core.md:48)
+R1	310	Big vehicle and very large unit	vehicles	right	general v2 vehicle design, not a stress count
+R1	317	The largest mode, and its N	48	right	"up to 48 at the goal": the goal mode's N (24v24), not the largest mode
+R1	317	The start modes and the goal modes	the goal	right	means the goal modes, linked to GLOSSARY; beside marking word "goal"
+R1	319	Big vehicle and very large unit	vehicles	right	entity kind list from LOOP_V2, not a stress count
+R1	322	Active effect (and visual effect)	effects	right	"active ability effects" as an entity kind, carries marking words
+R1	323	The largest mode, and its N	48	right	design-doc fact "counts beyond 48 soldiers", not a mark
+R1	330	Team size and how modes are written	players	right	"48+ players" total N (linked design point), not a team size
+R1	337	Player count (N)	characters	right	text characters
+R1	426	Tick period	the tick interval	right	Source engine's own tick interval (finding about another game)
+R1	569	The largest mode, and its N	48	right	legacy measurement at 48 soldiers
+R1	570	The largest mode, and its N	48	right	file line number (:48)
+R1	593	Player count (N)	characters	right	text characters
+R1	855	Active effect (and visual effect)	effects	right	legacy FX stubbed (presentation), not a count
+R1	864	The largest mode, and its N	48	right	LOOP_V2 §11 scale step N = 48 (stated scale point)
+R1	1168	The largest mode, and its N	48	right	legacy perfbots measurement at 48
+R1	1191	Active effect (and visual effect)	effects	right	VISION_V2 §6.3 paraphrase (abilities and effects from data), no count
+R1	1192	Big vehicle and very large unit	vehicles	right	§6.4 vehicles in general, no stress count
+R1	1205	Active effect (and visual effect)	effects	right	GAS gameplay effects (finding about Unreal GAS)
+R1	1211	Active effect (and visual effect)	effects	right	GAS Duration/Infinite effects (finding)
+R1	1212	Active effect (and visual effect)	effects	right	GAS periodic effects (finding)
+R1	1223	Active effect (and visual effect)	effects	right	GAS stacking (finding)
+R1	1240	Active effect (and visual effect)	effects	right	GAS effects grant abilities (finding)
+R1	1268	Active effect (and visual effect)	effects	right	GAS predicted effects (finding)
+R1	1269	Active effect (and visual effect)	effects	right	GAS effects under a key (finding)
+R1	1270	Active effect (and visual effect)	effects	right	GAS predicted effects (finding)

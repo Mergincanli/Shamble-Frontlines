@@ -52,3 +52,7 @@ DONE
 - Checks: glossary_check R3 exact 0, header link True; repo-map OK. No OBJECT. Not committed.
 ## Fix-round totals: recommendation 5 (BUDGET-REC2 rows, CHAR-REC1, CHAR-REC2, CHAR-REC4, AUDIO-REC3); nit 5 (LOOK-REC3 note, 885, 1248, 1396, part 7); number 0; source 0.
 DONE (fix round)
+- Follow-up (coordinator): R3-AUDIO-REC1 spike "0.5 ms (p99) per frame". recommendation
+- Follow-up: R3-AUDIO-REC1 spike "less than 0.3 ms (p99)". recommendation
+- Part 7 "Step 3d fixes": R3-AUDIO-REC1 line added. nit. Not committed.
+DONE (follow-up)
