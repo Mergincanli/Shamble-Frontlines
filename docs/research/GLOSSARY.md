@@ -151,11 +151,13 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   unit, the budgets options table E, R2-BUD-REC1 and R2-BUD-REC2 (mean rates and bandwidth), R2-BUD-REC6, R2-INT-REC1,
   R2-INT-REC2 (the pair test and the re-flood at p99), R2-INT-REC4, R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3,
   R2-TRN-REC6, R2-ROOM-REC2, R2-XU-OQ8. R3: the legacy facts used (the legacy step's mean; the harness's mean, p50,
-  p95 and max), R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median). R4: the legacy
-  facts used by R4-NAV (a mean stall rate), R4-PHYS-REC1 mark 2 (a mean mark, its p99 reported), R4-NAV-REC1,
-  R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1 mark 4 (mean and p99), R4-OBST-REC1, R4-OBST-REC2 (the flip cost, now at p99).
-  R5: the legacy facts used (a mean), R5-TEST-REC1, R5-TEST-REC4 (mean delay), R5-TEST-REC5. R6: the legacy facts used
-  (a mean), the options table Q2, the egress table (R2-BUD-REC2's mean), the assumptions (A-2, at p99).
+  p95 and max), R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median), R3-BUDGET-REC2's
+  CPU, animation, sim and GPU rows, R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC4, R3-AUDIO-REC1 and R3-AUDIO-REC3
+  (sub-budgets at p99, written out in step 3d by the advisor's ruling). R4: the legacy facts used by R4-NAV (a mean
+  stall rate), R4-PHYS-REC1 mark 2 (a mean mark, its p99 reported), R4-NAV-REC1, R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1
+  mark 4 (mean and p99), R4-OBST-REC1, R4-OBST-REC2 (the flip cost, now at p99). R5: the legacy facts used (a mean),
+  R5-TEST-REC1, R5-TEST-REC4 (mean delay), R5-TEST-REC5. R6: the legacy facts used (a mean), the options table Q2, the
+  egress table (R2-BUD-REC2's mean), the assumptions (A-2, at p99).
 
 ### The server tick budget
 - **Definition:** the p99 server tick time a room may use, on one vCPU of the reference server, tested in the stress
