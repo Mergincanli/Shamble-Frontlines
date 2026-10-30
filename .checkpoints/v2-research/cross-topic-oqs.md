@@ -1,5 +1,8 @@
 # Cross-topic open questions from the consistency critic (step 3a)
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** APPROVE, with two nits, folded: rank 15's
+note (offline previews) and "at commit 8dee746" on the line references inside inserted text (ranks 3 and 13).
+
 - **Task:** step 3a of `plan-amendments-2.md`, part 3: the critic's other 29 items (13 hidden dependencies, 15 gaps,
   1 wrong cross-reference), as cross-topic open questions for step 3c. Author: engine-architect, 2026-10-30.
 - **Source:** `engine-architect-consistency-result.json` (the critic's list) and its notes
@@ -78,7 +81,7 @@
   > R1-ECS-REC1's reason and mark 5, R1's TL;DR, or whether R1-RR-OQ1's SIMD/FMA hazard applies to parry3d's "3D f32
   > SIMD" BVH (R4-PHYS-OQ3 asks only by analogy). ADR-0004's determinism and snapshot sections rest on whichever crate
   > wins. Side A: R1-DET-REC3; R1-ECS-REC4; R1-ECS-REC1; R1-TICK-REC2; R1-RR-OQ1. Side B: R4-PHYS-REC1. Also named:
-  > R4-PHYS-OQ3. Existing questions: R4 'Wave-1 items R4 changes or answers' (r4:1110-1129) and R4-PHYS-OQ3, partly.
+  > R4-PHYS-OQ3. Existing questions: R4 'Wave-1 items R4 changes or answers' (r4:1110-1129 at commit 8dee746) and R4-PHYS-OQ3, partly.
   > Decided by: ADR-0004 (sim core: physics), with R4-PHYS-REC1 marks 2-5 and R1-DET-REC6's suite as the evidence.
   > (Consistency critic, 2026-10-29, rank 3.)
 
@@ -148,7 +151,7 @@
 - **Text to insert** (the same in each file, headed by that file's id):
   > **<id>. Who answers R1's protocol questions (hash comparison, snapshot layout, mid-match tuning, the content hash
   > at join)?** R1 hands these protocol choices to R2 by id, and R2 answers none of them. The join message R2 does
-  > propose does not carry the content hash R1's bundle check and R6's match record (r6:757) both rely on. Side A:
+  > propose does not carry the content hash R1's bundle check and R6's match record (r6:757 at commit 8dee746) both rely on. Side A:
   > R1-DET-OQ9; R1-BND-OQ8; R1-DATA-OQ3; R1-DATA-REC6. Side B: missing answer. Also named: R2 room control messages.
   > Existing questions: R1-DET-OQ9, R1-BND-OQ8, R1-DATA-OQ3. Decided by: ADR-0001 (join handshake, snapshot format,
   > divergence telemetry) with ADR-0005 (content hash). (Consistency critic, 2026-10-29, rank 13.)
@@ -169,6 +172,9 @@
   > R1-ECS-REC1 mark 3. (Consistency critic, 2026-10-29, rank 14.)
 
 ## Rank 15 (hidden dependency): Do browser navigation and server-less previews rest on an undecided offline-play need?
+
+- **Note (advisor, step 3b; not inserted):** resolution 21's interim also rests on offline previews. If Mustafa says
+  offline play is not a need (R1-BND-OQ1), PREVIEW-WALL must be answered before the first preview.
 - **Goes into:** R1 as R1-XT-OQ8; R4 as R4-XT-OQ4; R5 as R5-XT-OQ4; R6 as R6-XT-OQ2.
 - **Decision code:** none.
 - **Ids:** Side A: R1-BND-OQ1. Side B: R4-NAV-REC4; R6-HOST-REC3; R5-PREV-OQ3. Also named: R1-TICK-OQ7, R1-XU-OQ12.

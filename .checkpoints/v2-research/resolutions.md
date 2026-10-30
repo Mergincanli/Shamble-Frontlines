@@ -69,6 +69,8 @@ closing sentence, "Shared as <code> (below).". The critic's other 29 items go in
 
 ## 1. What the tick budget covers, and its shares
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** REVISE, folded (the decision stands; the arithmetic, the p99 note and changes C1.5, C1.9, C1.10, C1.21 revised; new C1.10b).
+
 **Outcome: resolved** (one server tick budget, split into two shares; every existing figure placed inside one of them).
 Decider: the advisor (the advisor's table: "Me (engineering), after #9/#10/#11. The 60-or-30 Hz rule stays as it is").
 It builds on resolution 9 (the stress scene), 10 (the largest mode's N) and 11 (one vCPU of the reference server).
@@ -107,29 +109,41 @@ It builds on resolution 9 (the stress scene), 10 (the largest mode's N) and 11 (
   step share, as today; R2-BUD-REC6 checks the whole at the rate the rule picks.
 - A time mark that names no statistic is a p99 (GLOSSARY: time statistics).
 
-**Arithmetic: do the parts fit?** Each part at its own ceiling; sums of p99s are an upper bound. Snapshots run at 30 Hz
+**Arithmetic: do the parts fit?** Each part at its own ceiling. Adding the parts' p99 ceilings is a planning check that the marks fit together, not a bound: p99s do not add (two parts that each take 1 ms on 0.6 % of ticks and nothing otherwise each have a p99 of 0, but together they take 1 ms on about 1.2 % of ticks, so the sum's p99 is 1 ms). The server tick time's p99 is always measured directly, with the parts reported beside it. Snapshots run at 30 Hz
 (R2-BUD-REC1), so at a 60 Hz tick every second tick encodes, at 30 Hz every tick. Tick period 16.67 ms (60 Hz), 33.33 ms
 (30 Hz); 25 % = 4.17 or 8.33 ms; 5 % = 0.83 or 1.67 ms.
 
 | Part (N = 48) | Mark and id | 60 Hz, ms | 30 Hz, ms |
 |---|---|---|---|
-| movement and physics | ≤ 1 ms mean, R4-PHYS-REC1 mark 2 | 1.00 | 1.00 |
+| movement and physics | ≤ 1 ms mean, R4-PHYS-REC1 mark 2 (mean mark; its p99 is reported, not capped) | 1.00 | 1.00 |
+| avoidance | ≤ 0.2 ms p99, R4-NAV-REC3 (r4:860) | 0.20 | 0.20 |
 | abilities, effects, weapons | ≤ 1 ms, R1-ABL-REC6 | 1.00 | 1.00 |
 | navigation | 5 % of the period, R4-NAV-REC2 | 0.83 | 1.67 |
 | visibility pass | 5 % of the period, R2-INT-REC3 | 0.83 | 1.67 |
-| **sim step share, sum (limit)** | | **3.67 (4.17)** | **5.33 (8.33)** |
+| **sim step share, sum (limit)** | | **3.87 (4.17)** | **5.53 (8.33)** |
 | snapshot encoding | 48 × 50 µs, R2-BUD-REC6 | 2.40 | 2.40 |
 | lag compensation | 700 shots/s × 20 µs = 14 ms/s, R2-SYNC-REC5 mark 4 | 0.23 | 0.47 |
 | interest | 0.2 + 0.5 ms, R2-INT-REC1, R2-INT-REC4 | 0.70 | 0.70 |
-| **server-only share, sum (limit)** | | **3.33 (4.17)** | **3.57 (8.33)** |
-| **server tick, sum (limit 50 %)** | | **7.00 (8.33)** | **8.90 (16.67)** |
+| enclosure pair test | 0.1 µs × 768 enemy pairs, R2-INT-REC2 (b) | 0.08 | 0.08 |
+| **server-only share, sum (limit)** | | **3.41 (4.17)** | **3.64 (8.33)** |
+| re-flood after a portal change (that tick only) | +1.00 ms, R2-INT-REC2 (b) | +1.00 | +1.00 |
+| server-only share on a re-flood tick | | 4.41 | 4.64 |
+| **server tick, sum (limit 50 %)** | | **7.28 (8.33)** | **9.18 (16.67)** |
+| server tick on a re-flood tick | | 8.28 | 10.18 |
 
-What is left: at 60 Hz, 0.50 ms in the sim step share for the rest of the sim (AI decisions, projectiles, economy,
-objectives, moments) and 0.83 ms in the server-only share for command handling and the send calls; at 30 Hz, 3.00 ms
-and 4.77 ms. At N = 54 (MODES-3 (b)), scaling the per-soldier, per-client and per-shot marks by 54 / 48 = 1.125 (an
-assumption for this check only; the marks are set at 48): sim step 1.125 + 1.125 + 0.83 + 0.83 = 3.92 ms at 60 Hz
-(5.58 at 30 Hz); server-only 2.70 + 0.26 + 0.79 = 3.75 ms at 60 Hz (2.70 + 0.53 + 0.79 = 4.02 at 30 Hz): both still
-inside 4.17 ms (8.33 ms), so the proposal holds under either reading of MODES-3.
+What is left at 60 Hz: 0.30 ms in the sim step share, 0.76 ms in the server-only share (−0.24 on a re-flood tick). At
+30 Hz (arithmetic on the table above): 2.80 ms and 4.69 ms (3.69 on a re-flood tick).
+
+At N = 54 (MODES-3 (b); the same 1.125 scaling of the per-soldier, per-client and per-shot marks, an assumption for
+this check only, and 972 enemy pairs):
+
+| | 60 Hz | 30 Hz |
+|---|---|---|
+| Sim step share | 4.14 ms (left 0.03) | 5.81 ms |
+| Server-only share | 3.85 ms | 4.12 ms |
+| Server-only, re-flood tick | 4.85 ms | 5.12 ms |
+| Server tick | 7.99 ms | 9.93 ms |
+| Server tick, re-flood tick | 8.99 ms (over 8.33) | 10.93 ms |
 
 The tightest part is the visibility pass: R2-INT-F20's legacy JavaScript figure for a three-point pass of 768 pairs is
 6–13 ms (unindexed, per pass), against 0.83 ms per tick at 60 Hz here; the pass is amortized across ticks
@@ -138,16 +152,18 @@ proposal does not hide it.
 
 **The option the advisor may prefer instead: 25 % for the whole tick (R2-BUD-REC6's figure).** The whole server tick
 ≤ 4.17 ms at 60 Hz, 8.33 ms at 30 Hz, with R2-INT-REC3's and R4-NAV-REC2's "10 %" then 2.5 % of the period (0.42 or
-0.83 ms). Arithmetic at N = 48: at 60 Hz the sim parts are 1 + 1 + 0.42 + 0.42 = 2.83 ms and the server-only parts on a
-snapshot tick 3.33 ms, 6.17 ms in all, over 4.17 ms; even with encoding spread over two ticks (proposed in no topic)
-2.83 + 0.23 + 0.70 + 1.20 = 4.97 ms, still over. At 30 Hz: 3.67 + 3.57 = 7.23 ms, inside 8.33 ms. So under 25 % the
-topics' own marks cannot meet the budget at 60 Hz, and the 60-or-30 rule would land on 30 Hz by arithmetic before
+0.83 ms). Arithmetic at N = 48, the same rows as above: at 60 Hz 3.03 + 3.41 = 6.44 ms (5.24 ms with encoding spread over two ticks), against 4.17. At 30 Hz 7.51 ms, or 8.51 ms with a re-flood, against 8.33. So under 25 % the topics' own marks cannot meet the budget at 60 Hz on any snapshot tick, nor at 30 Hz on a re-flood tick, and the 60-or-30 rule would land on 30 Hz by arithmetic before
 P1–P3 are measured. Its gain: two rooms per vCPU at the ceiling use half of it, leaving the other half for the
 transport runtimes and the system, so R6's A-2 would follow from the budget.
 
 **Why 50 % (the recommendation).**
-1. The marks the topics already set add up inside it at 60 Hz and 30 Hz, at N = 48 and N = 54 (table above); under
-   25 % they do not at 60 Hz, which would decide the tick rate before the spike the rule waits for.
+1. At 30 Hz the topics' marks fit inside it at N = 48 and N = 54, re-flood ticks included. At 60 Hz they fit on every
+   tick without a re-flood; on a tick that encodes a snapshot and re-floods after a portal change, the server-only
+   share's ceilings (4.41 ms at N = 48) pass its 4.17 ms and, at N = 54, the whole (8.99 ms) passes 8.33 ms; at N = 54
+   the sim step share keeps 0.03 ms for the rest of the sim. Under 25 % for the whole tick the marks do not fit at
+   60 Hz on any snapshot tick, nor at 30 Hz on a re-flood tick, which would decide the tick rate before the spike the
+   rule waits for. The 60 Hz tight spots (the visibility pass, the re-flood tick, the rest of the sim at N = 54) are
+   for the spike to measure.
 2. It changes the fewest marks. R1-TICK-REC2 P1's 25 %, R2-SYNC-REC9's 25 % and R2-ROOM-REC2's 50 % keep their
    numbers. R2-BUD-REC6's whole moves from 25 % to 50 %, R1-ECS-REC1 mark 1's p99 from 4 ms to 4.2 ms (R1-TICK-REC2's
    arithmetic for 25 % of 16.7 ms; R1-XU-OQ1 already lists the two) with its 2 ms mean now reported, and the nested
@@ -188,7 +204,7 @@ R1:
   - after: `it fits inside the sim step share (GLOSSARY).`
 - C1.5, r1:2396 (R1-ABL-REC6):
   - before: `costs at most 1 ms per tick`
-  - after: `costs at most 1 ms per tick at p99, inside the sim step share (GLOSSARY),`
+  - after: `costs at most 1 ms per tick at p99, inside the sim step share on the server and the client's sim share on the laptop (GLOSSARY),`
 - C1.6, r1:2546-2547 (R1-ECS-OQ4):
   - before: `Decided by: REC1 mark 1's
   native tick time against the tick period the tick unit picks, and R6's hosting cost per match.`
@@ -220,16 +236,23 @@ R2:
   p99 server tick time within the server tick budget (GLOSSARY: ≤ 50 % of the tick period, ≤ 8.3 ms at 60 Hz,
   ≤ 16.7 ms at 30 Hz), split into the sim step share (R1) and the server-only share (lag-compensated hit tests,
   interest, snapshot encoding for every client, commands and the tick's sends), 25 % each, measured separately.**
-  Reason: no source read gives a tick budget; the topics' own part marks add up inside 50 % at both tick rates, while
-  25 % for the whole tick would not hold them at 60 Hz (the arithmetic is in GLOSSARY's tick-budget section); 50 % leaves
+  Reason: no source read gives a tick budget; the topics' own part marks fit inside 50 % at 30 Hz, and at 60 Hz on
+  every tick but one that both encodes a snapshot and re-floods after a portal change, while 25 % for the whole tick
+  would not hold them at 60 Hz on any snapshot tick (the arithmetic, a planning check of ceilings, is in GLOSSARY's
+  tick-budget section); 50 % leaves
   room for bursts (a p99 tick at half the period can double before it overruns); how many rooms share a vCPU is
   measured (R2-ROOM-REC2 mark 2), not budgeted; per-client encode cost is the unknown that grows with player count.`
 - C1.10, r2:2385-2387 (R2-BUD-REC6, spike):
   - before: `48
   players, 30-minute soak: p99 whole tick ≤ 4 ms at 60 Hz (or ≤ 8 ms at 30 Hz), 0 missed ticks,`
   - after: `the
-  stress scene (GLOSSARY), 30-minute soak: p99 server tick time ≤ 8.3 ms at 60 Hz (or ≤ 16.7 ms at 30 Hz), the sim
+  stress scene (GLOSSARY) with a snapshot-receiving client on every soldier (R2-SYNC-REC9 mark 1's "48 clients"),
+  30-minute soak: p99 server tick time ≤ 8.3 ms at 60 Hz (or ≤ 16.7 ms at 30 Hz), the sim
   step and the server-only work each within their 25 % share, 0 missed ticks,`
+- C1.10b, r2:2387 (R2-BUD-REC6, spike, after C1.10; new in step 3b):
+  - before: `per client per snapshot, memory per room reported.`
+  - after: `per client per snapshot, memory per room reported. The mark is checked at the tick rate R1-TICK-REC2's rule
+  picks; if it fails there, it fails like any spike mark and goes back to the drafts, and the rule does not change.`
 - C1.11, r2:2447-2449 (R2-INT-REC3, spike):
   - before: `takes at most 10 % of the server tick budget on the reference server (the tick rate comes
     from the tick unit)`
@@ -284,8 +307,8 @@ R6:
   - after: `- **A-2.** 8 rooms of 48 players per 4-vCPU VM (R2-ROOM-REC2's proposal); smaller rooms fit at least as many.
   It is a density to measure at the tick rate R1-TICK-REC2's rule picks (R2-ROOM-REC2 mark 2), not one the server tick
   budget guarantees: at the budget's ceiling (GLOSSARY: 50 % of one vCPU per room at p99) two rooms fill a vCPU before
-  the transport runtime, so the 4-rooms-per-VM row (one per vCPU) is the case to budget if the measured ticks do not
-  sit well below the ceiling (R6-COST-OQ1). At 30 Hz the CPU per simulated second roughly halves (R1-TICK-REC2,
+  the transport runtime, so the 4-rooms-per-VM row (one per vCPU) is the case to budget unless R2-ROOM-REC2 marks 1 and 2 pass on it
+  (R6-COST-OQ1). At 30 Hz the CPU per simulated second roughly halves (R1-TICK-REC2,
   inferred).`
 - C1.22, r6:850-851 (R6-COST-OQ1):
   - before: `Decided by: R2-ROOM-REC2's spike on the reference server (R6-HOST-REC2).`
@@ -315,6 +338,8 @@ scaling is an assumption for the check only.
 
 
 ## 5. Whether the client predicts the player's own abilities
+
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** APPROVE (aligned as ABL-PREDICT).
 
 **Outcome: aligned. Decision code ABL-PREDICT (new); decider: Mustafa (game feel), after the Feel Lab comparison that
 R2-SYNC-OQ10 names.** The advisor's table: "Shared wording now (R1-ABL-REC4 depends on R2-SYNC-OQ10). The final call is
@@ -408,6 +433,8 @@ numbers:** none.
 
 ## 6. The spread random stream: in the sim state or server-only
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** APPROVE.
+
 **Outcome: resolved** for the design: R1 adopts R2's server-only spread stream as an authority-only stream, kept out of
 the client's state and out of any hash compared with a client (GLOSSARY: shared stream and authority-only stream; state
 hash). The tracer-against-cheating trade-off stays open as **SEC-SPREAD (Mustafa)**, Mustafa's existing decision
@@ -491,6 +518,8 @@ R2-SYNC-REC3, R2-SYNC-F20, R2-SYNC-OQ11. **New numbers:** none.
 
 ## 9. The stress scene
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** REVISE, folded (wording only; the scene is approved).
+
 **Outcome: resolved** (one proposed worst-case scene; the game-designer's caps replace its counts later, R2-BUD-OQ5).
 Decider: the advisor (the advisor's table: "Me: one proposed worst-case scene. Caps later (R2-BUD-OQ5)").
 
@@ -514,7 +543,7 @@ Decider: the advisor (the advisor's table: "Me: one proposed worst-case scene. C
 | Part | Count | Basis | Why this one |
 |---|---|---|---|
 | Soldiers | the largest mode's N (48 or 54, MODES-3), bots with full AI, in three teams, all in one combat cluster; scale steps N = 12, 24, 36, 48 and the N = 64 headroom run where a mark asks | R1-TICK-REC2 P1 (cluster, scale steps); resolution 10 | three teams give more enemy pairs at the same N (arithmetic below), and R2-INT-REC3 bounds the visibility cost by the enemy-pair count (R2-INT-F20); R2's vehicle count is the three-team count |
-| Big vehicles | 15 in play, harvesters included | R2's worked estimate at 48 (r2:1758, r2:1771) | the largest count any topic uses at 48, so no mark runs on fewer vehicles than another topic assumes; it comes from a stated rule (squads of 4, LOOP_V2 §2; one harvester per team, GE6), where 4 and 8 come with none (R1-ECS-REC1: "proposed, not a design target") |
+| Big vehicles | 15 in play, harvesters included | R2's worked estimate at 48 (r2:1758, r2:1771) | the largest count any topic uses at 48, so no mark runs on fewer vehicles than another topic assumes; it comes from R2's stated assumption (one vehicle per squad of 4, LOOP_V2 §2's squad size, plus one harvester per team, GE6; R2 labels the row "assumption", r2:1758), where 4 and 8 come with no rule (R1-ECS-REC1: "proposed, not a design target") |
 | of which very large units | 4, each at least 20 parts | R1-TICK-REC2 P1, R3-CHAR-REC4; VISION_V2 §6.9 ("a few very large units") | R3's draw-call arithmetic rests on 4 (r3:1134-1136); the part counts of the other 11 are in no file |
 | Live projectiles | 300 | R1-ECS-REC1 | the largest stress count (against 200 in R1-TICK-REC2 and R3); R2's 32 is its bandwidth assumption, not a stress count |
 | Active effects | up to 8 per soldier: N × 8 | R1-ABL-REC6 | the effect unit's own load, and the larger one (384 at 48 against R1-ECS-REC1's 200) |
@@ -660,6 +689,8 @@ R3-MEASURE-REC2, R4-PHYS-REC1, R4-PHYS-REC4, R4-NAV-REC2, R4-OBST-REC1; VISION_V
 
 ## 10. Mode sizes: totals or per team
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** ESCALATE (MODES-3, Mustafa); the interim wording C10.1–C10.23 is approved.
+
 **Outcome: escalated. Decision code MODES-3; decider: Mustafa** (the advisor's table: "Mustafa now (MODES-3 below)").
 
 **Both sides.**
@@ -797,6 +828,8 @@ r2:466. **New numbers:** 54 (3 × 18, arithmetic), per-team ranges under (a) (ar
 
 ## 11. One core or one vCPU as the measuring unit
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** APPROVE.
+
 **Outcome: resolved.** The reference server is the CCX23 that R6 names, and every server time mark is measured on one
 vCPU of it (GLOSSARY: the reference server; the measuring unit). Decider: the advisor (the advisor's table: "Me").
 
@@ -892,6 +925,8 @@ r6:942-943, R2-XU-OQ9, R1-TICK-OQ6, R6-HOST-OQ1. **New numbers:** none.
 
 
 ## 17. Who owns the dependency audit in CI
+
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** ESCALATE (BASELINE-WHEN, the Advisor); interim C17.1–C17.9 approved; C17.b1–b3 apply only if the Advisor picks (b).
 
 **Outcome: escalated. Decision code BASELINE-WHEN; decider: the Advisor** (relayed by Mustafa; the advisor's table:
 "The Advisor (BASELINE-WHEN below)"). Resolution 23 turns on the same code.
@@ -994,6 +1029,8 @@ none.
 
 ## 19. Previews on Cloudflare Workers or Pages
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** REVISE, folded (wording only: C19.3, C19.8; Pages first and PREV-DELETE approved).
+
 **Outcome: resolved** for the host (Cloudflare Pages for the client and the previews, Workers static assets as the
 alternative), with one **aligned** spike item attached: **PREV-DELETE** (R5-PREV-OQ2, now shared by R5 and R6). Decider:
 the advisor (the advisor's table: "Me. Whether Pages can delete a branch's latest preview (R5-PREV-OQ2) becomes a
@@ -1056,7 +1093,7 @@ R5:
   technical needs (R5-PREV-REC2).`
   - after: `This draft gives only the
   technical needs (R5-PREV-REC2). Answered by R6-HOST-REC1: Cloudflare Pages, with Workers static assets as the
-  alternative; the start budget's line is 0 USD on Pages' Free plan (R6-COST-REC1, R6-HOST-F3).`
+  alternative; the start budget's line is 0 USD on Pages' Free plan (R6-COST-REC1, R6-HOST-F3; the price is inferred from the plan's name, no Pages price page was read).`
 - C19.4: insert PREV-DELETE.
 
 R6:
@@ -1084,7 +1121,7 @@ R6:
   own limits page, not read).`
 - C19.8, r6:472 (Start scenario, client line):
   - before: `| Client and previews on Cloudflare | 0 USD (free static) |`
-  - after: `| Client and previews on Cloudflare Pages | 0 USD (Pages' Free plan, R6-HOST-F3) |`
+  - after: `| Client and previews on Cloudflare Pages | 0 USD (Pages' Free plan, R6-HOST-F3; price inferred from the plan's name) |`
 - C19.9: insert PREV-DELETE.
 
 R1–R4: no change.
@@ -1095,6 +1132,8 @@ are quoted from the findings).
 
 
 ## 21. A login wall on previews
+
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** ESCALATE (PREVIEW-WALL, Mustafa); the interim wording REVISED and folded (C21.1, C21.2, C21.4, new C21.8, the shared text).
 
 **Outcome: escalated. Decision code PREVIEW-WALL; decider: Mustafa** (the advisor's table: "Mustafa (privacy against
 convenience), now (PREVIEW-WALL below)").
@@ -1132,7 +1171,8 @@ the multiplayer previews wait for the baseline. The two topics then state one qu
 > anyone with the link can open the preview and the staging game server it talks to (R6-HOST-REC3). (a) Private from
 > the first preview that reaches the staging server; (b) open, since previews hold no secrets; (c) decided after the
 > security baseline (BASELINE-WHEN). Until Mustafa answers, no preview talks to a game server: previews run the match
-> offline in the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3). Also asked as R5-PREV-OQ1 and
+> offline in the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3); a preview that carries unreleased
+> art is behind the access wall, as R5-PREV-REC5 already says (R5-PREV-OQ1 asks that part). Also asked as R5-PREV-OQ1 and
 > R6-HOST-OQ5. Decided by: Mustafa.
 
 *Changes per file (before → after).*
@@ -1141,20 +1181,21 @@ R5:
 - C21.1, r5:1633-1634 (R5-PREV-REC5):
   - before: `This changes once a preview talks to a real server or carries
   unreleased art: then the access wall is on.`
-  - after: `Whether the access wall (GLOSSARY) goes on once a preview talks to the staging game server (R6-HOST-REC3) or
-  carries unreleased art is PREVIEW-WALL (Mustafa; below); until he answers, no preview talks to a game server.`
+  - after: `This changes once a preview carries unreleased art: then the access wall (GLOSSARY) is on. Whether it is also
+  on once a preview talks to the staging game server (R6-HOST-REC3) is PREVIEW-WALL (Mustafa; below); until he
+  answers, no preview talks to a game server.`
 - C21.2, r5:1828-1829 (R5-PREV-OQ1), at the end of the entry:
   - before: `and will previews carry anything not already public?`
-  - after: `and will previews carry anything not already public? Shared as PREVIEW-WALL (below).`
+  - after: `and will previews carry anything not already public? Its staging-server part is shared as PREVIEW-WALL (below).`
 - C21.3: insert PREVIEW-WALL.
 
 R6:
 - C21.4, r6:611-612 (R6-HOST-REC1):
   - before: `a preview holds no secrets, talks only to the staging game server (REC3),
   and is limited to the account with Cloudflare Access if Mustafa wants it private (R6-HOST-OQ5).`
-  - after: `a preview holds no secrets and talks only to the staging game server (REC3); whether
-  previews that reach it sit behind the access wall is PREVIEW-WALL (Mustafa; GLOSSARY: the access wall), and until he
-  answers no preview talks to a game server (R6-HOST-OQ5).`
+  - after: `a preview holds no secrets, and once previews reach a game server they talk only to the staging game server
+  (REC3); whether those previews sit behind the access wall is PREVIEW-WALL (Mustafa; GLOSSARY: the access wall), and
+  until he answers no preview talks to a game server (R6-HOST-OQ5).`
 - C21.5, r6:838 (R6-HOST-OQ5), at the end of the entry:
   - before: `Decided by: Mustafa (convenience against privacy),
   after the security baseline.`
@@ -1164,6 +1205,11 @@ R6:
   - before: `whether previews are private (R6-HOST-OQ5).`
   - after: `whether previews are private (R6-HOST-OQ5; PREVIEW-WALL).`
 - C21.7: insert PREVIEW-WALL.
+- C21.8, r6:655-656 (R6-HOST-REC3; new in step 3b):
+  - before: `need no server
+  (R1-BND-REC6).`
+  - after: `need no server
+  (R1-BND-REC6). Until Mustafa answers PREVIEW-WALL (below), previews do not use the staging server.`
 
 R1–R4: no change.
 
@@ -1172,6 +1218,8 @@ R6-HOST-OQ5, R6-SEC-OQ1, R1-BND-REC6. **New numbers:** none.
 
 
 ## 22. Isolation headers on every preview, or behind a flag
+
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** APPROVE (with the rank-41 fix through C22.1).
 
 **Outcome: resolved.** One isolation flag, off by default in local development, previews and production; on only for
 profiling builds (GLOSSARY: preview isolation and the isolation flag; the production header set and the preview header
@@ -1258,6 +1306,8 @@ R6-HOST-REC1, R3-MEASURE-F7, R3-MEASURE-OQ4. **New numbers:** none.
 
 ## 23. One wildcard certificate on every game server
 
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** ESCALATE (BASELINE-WHEN, the Advisor); interim C23.1–C23.3 approved; the (b)-only set REVISED and folded (C23.b1, C23.b2).
+
 **Outcome: escalated. Decision code BASELINE-WHEN (shared with resolution 17); decider: the Advisor.**
 
 **Both sides.**
@@ -1309,11 +1359,15 @@ R6:
 - C23.b1, r6:664-665 (R6-HOST-REC4, heading): "Production certificates: one wildcard certificate for the game-server names
   (option C2), from ACME with dns-01, renewed by one job and copied to every game VM." → "Production certificates: a
   publicly trusted certificate per game-server hostname (R2-TRN-REC5; option C1, or ACME dns-01 per name), until the
-  security baseline weighs one wildcard certificate (option C2), renewed by one job and copied to every game VM
+  security baseline weighs one wildcard certificate (option C2: renewed by one job and copied to every game VM)
   (BASELINE-WHEN (b))."
 - C23.b2, r6:665-669 (R6-HOST-REC4, body): "This departs from R2-TRN-REC5's wording" → "C2 would depart from
   R2-TRN-REC5's wording", and "Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the baseline
-  rejects a shared key." → "C2 replaces them only if the baseline accepts a shared key."
+  rejects a shared key." → "C2 replaces them only if the baseline accepts a shared key."; also r6:669 "It needs no TCP
+  80 on game VMs." → "With dns-01 per name it needs no TCP 80 on game VMs (F24); C1's http-01 needs TCP 80."; and the
+  Reason (r6:670-671) → "a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game VMs;
+  RFC 8555 proves control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for the baseline to weigh:
+  one certificate for all VMs makes adding a VM a copy, not an issuance; RFC 8555 allows wildcard orders (F24)."
 - C23.b3, R6-HOST-REC4's spike: "with the wildcard certificate" → "with the per-hostname certificates".
 - R2: no change under (b).
 - Under (a), the security-auditor's topic decides; under (c), the "now" changes are all.
@@ -1324,6 +1378,8 @@ R1, R3, R4, R5: no change.
 
 
 ## 29. HashMap in the sim: lookups allowed, or the type banned
+
+**As approved, 2026-10-30 (advisor, step 3b; `advisor-resolutions-verdict.md`):** REVISE, folded (C29.2).
 
 **Outcome: resolved.** The crate-wide type ban holds (R5-RUSTLINT-REC2); R1's "lookups only" rule becomes the reason a
 reviewed `#[allow]` may admit one map (GLOSSARY: the hash-map ban in the sim crate). Decider: the advisor (the advisor's
@@ -1367,7 +1423,7 @@ R1:
   - before: `The
   sim never iterates a default-hasher HashMap or HashSet (BTreeMap or an index-ordered Vec instead).`
   - after: `The
-  sim uses no default-hasher HashMap or HashSet (BTreeMap or an index-ordered Vec instead; GLOSSARY: the hash-map ban).`
+  sim uses no std HashMap or HashSet (R5-RUSTLINT-REC2 bans the types) (BTreeMap or an index-ordered Vec instead; GLOSSARY: the hash-map ban).`
 - C29.3, r1:1943-1944 (R1-ECS-REC2 mark 2):
   - before: `A CI check finds zero uses of std HashMap or HashSet iteration in the sim crate's outcome code (the tooling is
      R5's).`
