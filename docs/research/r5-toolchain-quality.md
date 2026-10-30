@@ -55,7 +55,7 @@ both), 39 rows of sources not read (the Sources part; a row can group several se
 - **Layout and lint:** one repo with Cargo and npm workspaces; exact pins (Rust 1.99.1, TypeScript 6.0.x: no typed lint
   for 7 yet); dependency rules as checks; strict tsconfig, `strict-type-checked`, Prettier, clippy `-D warnings` plus
   sim bans (std `HashMap`, clocks, std float maths). **Tests:** fixed seeds, committed legacy goldens, per-tick hashes
-  on native, Node, three engines and real Safari; R2's P0–P4 and B1 net sims; 48-bot soaks; no retries. **CI (helper):**
+  on native, Node, three engines and real Safari; R2's P0–P4 and B1 net sims; bot soaks up to [the largest mode's N](GLOSSARY.md#the-largest-mode-and-its-n); no retries. **CI (helper):**
   cached from `main`, one always-run required check, secret-free previews. **Gate v2:** one command, G0–G12, `--prove`.
 
 ## Findings
@@ -399,7 +399,7 @@ both), 39 rows of sources not read (the Sources part; a row can group several se
 - **CS1**: the legacy loop is variable-step, though the docs called it deterministic (code contradicts docs).
 - Wave 1 cited, not restated: R1-DET-REC2 (float rules; R5 picks the lint or build check that fails on a std
   transcendental call, `algebraic_*` or `relaxed-simd`), R1-ECS-REC2 mark 2 (a CI check finds zero std HashMap or
-  HashSet iteration in the sim's outcome code; tooling is R5's), R1-RR-OQ3 (panics reachable from content and input),
+  HashSet iteration in the sim's outcome code; tooling is R5's; since 2026-10-30 the mark is [the hash-map ban](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate)), R1-RR-OQ3 (panics reachable from content and input),
   R1-RR-OQ4 (overflow differs between profiles; ADR-0002 with R5), R1-RR-OQ6 (unsafe for the output block),
   R2-TRN-REC4 (decoders never panic).
 
@@ -1426,7 +1426,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   R1-ECS-REC2 traces it), §6.6 and §6.8 (re-runnable matches); §3 (the 48-player scale).
   A spike must prove (proposed): R1-DET-REC6's planted divergences (one std `sin`, one `HashMap` iteration, one
   presentation RNG draw inside the sim) are each reported at the first tick they change; the gate's determinism step
-  takes under 3 minutes on the CI runner; the nightly comparison of a 10-minute 48-bot match reports 0 mismatches across
+  takes under 3 minutes on the CI runner; the nightly comparison of a 10-minute bot match at [the largest mode's N](GLOSSARY.md#the-largest-mode-and-its-n) (48, or 54 under MODES-3 (b)) reports 0 mismatches across
   native ×2, Node, three browser engines under Playwright and real Safari on the macOS runner.
 - **R5-TEST-REC3. Golden tests against legacy: captured once from the legacy oracle, committed, read by v2 tests, one
   per kept behaviour.** How: a harness snippet per behaviour runs on the real legacy build through `node tools/preview.js
@@ -1474,7 +1474,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Cross-topic open questions: R5-XT-OQ10 (below).
 - **R5-TEST-REC5. Soak and load at 48 and more, with bots as protocol clients.** Bots are headless Rust clients that
   speak the real protocol (inputs in, snapshots out) so a full room needs no browsers; one nightly run per mode at the
-  targets of VISION_V2 §3 (24v24 = 48 and 12v12v12 = 36, plus the largest mode where it is neither ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); MODES-3: 18v18v18 = 54
+  targets of VISION_V2 §3 (items 1 and 4 of [the test-mode list](GLOSSARY.md#the-test-mode-list): 24v24 = 48 and 12v12v12 = 36, plus the largest mode where it is neither ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); MODES-3: 18v18v18 = 54
   under reading (b)), plus LOOP_V2 §11's N = 12, 24, 36, 48 scale steps) over L1 at
   P2, 30 minutes each (proposed), and one L2 run with 4 real browser clients among the bots. Measured: server tick time p50,
   p99 and max (against the server tick budget, [GLOSSARY](GLOSSARY.md#the-server-tick-budget)), bytes per client per second (against R2-BUD's budget), resident memory slope,
@@ -1484,7 +1484,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   LOOP_V2 §11); an overnight soak passes when nothing hangs or asserts (F14), and we add numbers.
   Rests on: R5-TEST-F14; legacy TL13, TL15, LOOP_V2 §11.
   Serves: §3 (modes and scale), §6.1, §6.6 (the telemetry fields are exercised at full size).
-  A spike must prove (proposed): a 30-minute 48-bot room at P2 runs with 0 panics, 0 hangs, 0 desyncs, a memory slope
+  A spike must prove (proposed): a 30-minute room of bots at [the largest mode's N](GLOSSARY.md#the-largest-mode-and-its-n) (48, or 54 under MODES-3 (b)) at P2 runs with 0 panics, 0 hangs, 0 desyncs, a memory slope
   within 1 MB per 10 minutes after warm-up, and server tick time p99 inside the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget); ADR-0004 and ADR-0001 adopt it); a planted leak (one buffer kept
   per snapshot) is flagged by the slope check within the run.
 - **R5-TEST-REC6. Flakes: no retries, fixed seeds in the gate, no wall-clock waits; a failure is a defect.** Vitest
@@ -1558,7 +1558,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   succeeded. No job is skipped by path filter, and the final job treats a skipped job as a failure until R5-GATE-OQ1
   allows a deliberate skip. Carry over the legacy hygiene: SHA pins, `contents: read`,
   `persist-credentials: false`, concurrency cancel, per-job timeouts. Long checks run on a schedule.** The jobs: Rust
-  native (rustfmt, clippy, cargo test, R1-ECS-REC2's no-HashMap-iteration check), Rust wasm32 (build, wasm-bindgen,
+  native (rustfmt, clippy, cargo test, the check of R1-ECS-REC2 mark 2, [the hash-map ban](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate)), Rust wasm32 (build, wasm-bindgen,
   generated-type diff), TypeScript (tsc, lint, Vitest), Playwright end-to-end on the built client (TL9's harness shape),
   and determinism (R1-DET-REC6: two native processes, Wasm in Node; browser targets inside the Playwright job). The
   final job waits on exactly these five; the preview deploy (skipped on fork PRs, R5-PREV-REC1 mark 2) and the
@@ -2084,7 +2084,7 @@ advisor on 2026-10-30). The same question stands in each other topic it goes int
 #### From R5-CI and R5-PREV (infra-engineer)
 
 - **For the R5 owner (test-engineer):** R5-CI-REC5's job list is a frame for your gate v2 checks; the check names and
-  pass marks are yours. R1-ECS-REC2 pass mark 2 (no HashMap iteration in the sim) needs a tool from you; CI only runs
+  pass marks are yours. R1-ECS-REC2 pass mark 2 ([the hash-map ban](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate) in the sim crate) needs a tool from you; CI only runs
   it. The Playwright job's WebGPU coverage is R5-CI-OQ5 (no GPU on standard runners). Commit the mutation suite (TL17)
   so each CI job's guard is proven.
 - **For R6 (infra-engineer, hosting and costs):** previews need the R5-PREV-REC2 needs list. Please settle
@@ -2273,6 +2273,18 @@ into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim, 
 - **Header:** the open-question total becomes 63 (18 added); the status label is unchanged (the step-3d verifier
   recounts it).
 - **OBJECT:** none.
+- Step 3d fixes (2026-10-30):
+  - r5:401-402 (the wave-1 list, R1-ECS-REC2 mark 2): the hash-map ban added beside R1's old words (nit).
+  - r5:1477 (R5-TEST-REC5): the list named as items 1 and 4 of the test-mode list (nit).
+  - r5:1561 (R5-CI-REC5's job list): the check restated as R1-ECS-REC2 mark 2's, the hash-map ban (nit).
+  - r5:2087 (the pointer to the R5 owner): R1-ECS-REC2 pass mark 2 restated as the hash-map ban (nit).
+  - r5:58 (TL;DR): "48-bot soaks" becomes bot soaks up to the largest mode's N (nit; REC5's value changed by C10.17).
+  - r5:1429 (R5-TEST-REC2's spike): the 10-minute match runs at the largest mode's N, 48 or 54 under MODES-3 (b)
+    (recommendation).
+  - r5:1487 (R5-TEST-REC5's spike): the 30-minute room runs at the largest mode's N, 48 or 54 under MODES-3 (b)
+    (recommendation).
+  - r5:1426 (R5-TEST-REC2's Serves line, "the 48-player scale" of VISION_V2 §3): kept; it names §3's design point,
+    not the largest mode.
 
 ## Sources
 
