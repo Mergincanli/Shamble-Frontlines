@@ -20,3 +20,19 @@ Task: step 3a of plan-amendments-2 (glossary GLOSSARY.md + resolutions.md for th
 - unit #9: resolution 9 written (resolved; R9-1..R9-22)
 - unit G1b: glossary §1 tick terms written (tick period, sim step time, server tick time, transport runtime, statistics, server tick budget, shares, client sim share)
 - unit #1: resolution 1 written (resolved, B50 recommended; R1-R1-1..R1-R6-2)
+- unit G5: glossary §5 (preview, client host, staging server, access wall, isolation flag, header sets) written
+- unit #19: resolution 19 written (resolved: Pages first; aligned PREV-DELETE; R19-1..R19-9)
+- unit #21: resolution 21 written (escalated PREVIEW-WALL; R21-1..R21-7)
+- unit #22: resolution 22 written (resolved: isolation flag; R22-1..R22-6)
+- unit G4: glossary §4 (authority, prediction scope, shared/authority-only streams, state hash) written
+- unit #5: resolution 5 written (aligned ABL-PREDICT; R5-1..R5-10)
+- unit #6: resolution 6 written (resolved design, SEC-SPREAD open; R6-1..R6-7)
+- unit G6: glossary §6 (security baseline, advisories check, game-server certificate) written
+- unit #17: resolution 17 written (escalated BASELINE-WHEN; R17-1..9, b1..b3)
+- unit #23: resolution 23 written (escalated BASELINE-WHEN; R23-1..3, b1..b3)
+- unit #29 + G7: resolution 29 written (resolved; R29-1..4) and glossary §7 hash-map ban
+- all 12 resolutions written. Next: (1) summary table; (2) rename change ids to C<rank>.<n>; (3) script-check every "before" quote against the topic files; (4) glossary final pass (term count); (5) cross-topic-oqs.md (29 items).
+- renamed change ids to C<rank>.<n> (144 refs); header explains quote format
+- summary table written
+- glossary header wording fixed; 34 terms in 7 sections
+- cross-topic-oqs.md written (28 shared XT-OQs, 0 settled, rank 41 nit)
