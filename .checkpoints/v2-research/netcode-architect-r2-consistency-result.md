@@ -29,3 +29,13 @@ C17.b2 and C23.b* were not applied; they wait for BASELINE-WHEN.
 Files:
 - /home/user/Shamble-Frontlines/docs/research/r2-netcode.md
 - /home/user/Shamble-Frontlines/.checkpoints/v2-research/netcode-architect-r2-consistency.md (ends with DONE)
+
+## Addendum: the advisor's OBJECT-1 ruling applied (reply to `prompts/r2-object-1-nits.txt`, about 20:22 UTC, verbatim)
+
+Both nits are applied, part 7's OBJECT line now says upheld (option (b)), and the notes are logged. Nothing committed.
+
+r2:870: "At 20 passes/s, one point is 4–9 % of one core of the measuring machine."
+
+r2:3050-3051: "(R6's option C3, r6:424-425 at commit 8dee746), which leaves production pinning out (REC5);"
+
+Totals: 20 recommendation, 97 nit.

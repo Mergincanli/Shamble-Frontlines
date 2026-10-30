@@ -93,3 +93,14 @@ R1 R1-XU-OQ2: "R1-ABL-REC4 predicts only the local player's own abilities and we
 R4 header: glossary line with GLOSSARY.md link; id table +2 rows; totals 23 -> 32 open questions (+MODES-3, +8 XT); label unchanged -- nit
 R1 part 7: "### Consistency resolutions (2026-10-30)" added at the end of "## Verifier spot-check" (resolutions by rank and change id, recommendation changes, glossary summary, questions added, OBJECT: none) -- nit
 R4 part 7: the same subsection added at the end of "## Verifier spot-check" -- nit
+R4 PHYS-REC1 mark 2 and NAV-REC2: the links I had added inside C1.15's and C9.19's after texts were moved onto the term words themselves ([mean], [headroom run]) so both after texts stay word for word -- nit
+Over-long lines from the edits split outside links, code and quotes (R1 entity-kinds paragraph rewrapped by hand so LOOP_V2's quote is not split) -- nit
+## Verification (final)
+- glossary_check.py --skip-records: R1 exact 0 (13 before), in context 130 (153 before); R4 exact 0 (5 before), in context 56 (60 before); header links GLOSSARY.md: True for both; unpaired-quote blocks R1 34 = 34 before, R4 0 = 0.
+- First uses not linked (other meaning): R1 "slots" (memory), "predicted" (a finding), "start" (a slice); R4 "N" (code), "preview" (grenade arc), "goal" (Rapier's roadmap), "mean" (a stall-rate mean in a legacy fact).
+- Every approved after text is in the files word for word (link markup ignored), except C9.4 and C9.8, changed afterwards only by logged glossary renames (tick time -> sim step time; the tick budget -> the server tick budget).
+- Word-level diff against the originals reviewed (scratchpad r14/*.removed.txt): every removal is a logged change.
+- OBJECT: none. Not applied: C17.b1 (waits for BASELINE-WHEN). GLOSSARY.md not edited. Nothing fetched; nothing committed.
+## Counts
+recommendation 25 (R1 16: C1.1, C1.5, C5.1-C5.4, C6.1, C6.2, C9.1, C9.3, C9.7, C29.1-C29.3, R1-ECS-REC1 marks 2 and 3 at p99; R4 9: C1.15-C1.18, C9.18-C9.20, R4-PHYS-REC1 mark 5, R4-OBST-REC2 at p99) · number 0 · source 0 · nit: 28 resolution changes (R1 22, R4 6), 5 shared-question insertions (R1 4, R4 1), 26 XT-OQ insertions (R1 18, R4 8), 25 pointer lines (R1 17, R4 8), about 22 glossary rename/link/reflow units, 2 headers, 2 part-7 subsections, 1 subsection-name correction.
+DONE
