@@ -201,6 +201,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   ≈ 1.08 MB); nits: r3:1243's "adds … (p99)", GLOSSARY:156's credit for R3-AUDIO-REC1, R6's part-7 lines lack types,
   r5:1426 could say "the design point". Sent about 20:53 UTC: the R6 item and nit (`prompts/r6-3d-final-fix.txt`), the
   R3 nit (`prompts/r3-3d-final-fix.txt`); the R5 and glossary nits ride with the next round.
+- The final check's follow-ups DONE about 20:53 UTC: R3's nit ("raises that p99 by less than 0.3 ms"), committed **902c249**;
+  R6-TEL-REC1's record mark ("a 24v24 record is at most 1 MB uncompressed (A-10), and a record of the largest mode at
+  most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b))"; the session redid 54/48 = 1.125) and R6's
+  typed part-7 lines, committed **1bfd235**. R3, R5 and R6 are final for step 3d (the R5 nit and the glossary credit nit
+  ride with the next round; the completeness critic reads the final state).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

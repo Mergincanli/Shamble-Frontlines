@@ -37,3 +37,7 @@ All six step-3d items are fixed in r6-infrastructure.md only (lines as at f67245
 6. r6:48, r6:417, r6:508 and r6:602 now read "24v24 (48-player)", since their figures come from R2's 24v24 row. nit. r6:744's soak now runs at the largest mode's N (48 or 54). recommendation. r6:212 and r6:256 stay as they were: they repeat the 48 soldiers of the legacy perfbots figure (TL15), stated right beside it.
 
 Part 7 has a "Step 3d fixes (2026-10-30):" line with one entry per change. Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/infra-engineer-r6-consistency.md
+
+## Addendum: the final check's open item and nit (reply to `prompts/r6-3d-final-fix.txt`, about 20:53 UTC, verbatim)
+
+Both items are fixed in r6-infrastructure.md (not committed). The record mark is logged as a recommendation change. Each part-7 step-3d line now gives its type. The mark now reads: "a 24v24 record is at most 1 MB uncompressed (A-10), and a record of the largest mode at most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b))."

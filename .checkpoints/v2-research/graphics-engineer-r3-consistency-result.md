@@ -49,3 +49,7 @@ Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/graphics-engineer-
 ## Addendum: R3-AUDIO-REC1 (reply to `prompts/r3-3d-fixes-2.txt`, about 20:46 UTC, verbatim)
 
 Done (two recommendation changes, part-7 line added, not committed). R3-AUDIO-REC1's mark now reads: "main-thread audio work stays under 0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices adds less than 0.3 ms (p99)."
+
+## Addendum: the final check's nit (reply to `prompts/r3-3d-final-fix.txt`, about 20:53 UTC, verbatim)
+
+Reworded as a nit; the part-7 line now says the same; not committed. R3-AUDIO-REC1's mark now reads: "main-thread audio work stays under 0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices raises that p99 by less than 0.3 ms."

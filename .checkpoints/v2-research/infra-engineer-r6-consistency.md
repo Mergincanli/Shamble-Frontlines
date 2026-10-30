@@ -73,3 +73,8 @@ DONE
 - Part 7: "Step 3d fixes (2026-10-30):" with one line per change. nit
 - Check script: R6 exact 0. Not committed.
 DONE
+
+## Final-check fixes (coordinator, 2026-10-30)
+- R6-TEL-REC1 spike: record mark scoped to 24v24 (1 MB, A-10) and scaled for the largest mode (1 MB × N / 48; 1.125 MB at 54, arithmetic). recommendation
+- Part 7 "Step 3d fixes" lines: change type added to each (and the TEL line notes the record mark). nit
+DONE
