@@ -8,9 +8,11 @@
   with the tick budgets, and make every topic use it").
 - **Date:** 2026-10-30.
 - **Author:** engine-architect (step 3a of `.checkpoints/v2-research/plan-amendments-2.md`).
-- **Status:** terms approved 2026-10-30 (advisor, step 3b; its changes folded in by the session). Nothing here is applied to a topic
-  yet; the owners apply the approved terms in step 3c. Every number here comes from a topic file (its id is given), is
-  arithmetic on those numbers (shown), or is a pass mark marked "proposed" with its reason. No new source was read.
+- **Status:** terms approved 2026-10-30 (advisor, step 3b; its changes folded in by the session). The owners applied the
+  approved terms to the six topics in step 3c (2026-10-30; each topic's part 7 lists them). Every number here comes from
+  a topic file (its id is given), is arithmetic on those numbers (shown), or is a pass mark marked "proposed" with its
+  reason. No new source was read.
+- Used today lists refreshed 2026-10-30 after step 3c, from the session's search script (commit 09de883).
 
 ## How to read an entry
 
@@ -19,26 +21,24 @@ Each entry has these parts:
 - **Marked by:** the words that mark the term in a topic's text.
 - **Retire (exact)** and **Retire (in context):** synonyms and loose wordings that stop being used, outside quoted
   source text, which never changes. The topics' dated records (bracketed fix-pass notes, verifier tables, "settled at
-  the fix step" notes) also keep their words, since they record what a text said; the search script of condition 9
-  should skip them as it skips quotes (a proposal for the advisor). A "Retire (exact)" phrase is wrong wherever else it
-  appears (none of its hits on 2026-10-30 is a correct use). A "Retire (in context)" phrase is retired only where it
-  carries the term's meaning, as its context words say.
+  the fix step" notes) also keep their words, since they record what a text said; the search script of condition 9 skips
+  them as it skips quotes (approved by the advisor, 2026-10-30, step 3b). A "Retire (exact)" phrase is wrong wherever
+  else it appears (none of its hits on 2026-10-30 is a correct use). A "Retire (in context)" phrase is retired only
+  where it carries the term's meaning, as its context words say.
 - **Keeps:** words the text keeps that the Retire field quoted before 2026-10-30 (kept phrases, marking words,
   replacement words), written without quotation marks so the search script does not count them.
 - **Depends on:** only where the definition turns on a decision not yet taken. The entry then states every reading
   with its decision code and picks none.
-- **Used today:** per topic, the ids whose text uses the term or one of its retired synonyms today, and how. The lists
-  are a first pass from a search of each topic file on 2026-10-30; after step 3c a search script refreshes them
-  (advisor condition 9). Where the text has no id, a section name or a line reference (for example r2:3245, at commit
-  8dee746) stands in.
+- **Used today:** per topic, the ids whose text uses the term, and how. The lists were refreshed after step 3c from the
+  session's search script (advisor condition 9; commit 09de883). Where the text has no id, a section name or a line
+  reference (for example r2:3245, at commit 8dee746) stands in.
 
 Decision codes used below: **MODES-3** (Mustafa: VISION_V2 §3's starting sizes, totals or per team), **PREVIEW-WALL**
 (Mustafa: an access wall on previews that reach the staging server), **BASELINE-WHEN** (the Advisor: research the
 deferred security baseline before ADR 0006, or list it open), **SEC-SPREAD** (Mustafa: matching tracers against cheat
-resistance, R2-SYNC-OQ11), **ABL-PREDICT** (Mustafa, after a Feel Lab test: does the client predict its own
-abilities), **PREV-DELETE** (a spike: does a closed PR's preview really disappear). In step 3c their full wording
-goes into each affected topic's "Shared open questions" subsection; until then it is in
-`.checkpoints/v2-research/resolutions.md`.
+resistance, R2-SYNC-OQ11), **ABL-PREDICT** (Mustafa, after a Feel Lab test: does the client predict its own abilities),
+**PREV-DELETE** (a spike: does a closed PR's preview really disappear). Their full wording is in each affected topic's
+"Shared open questions (the same words in every topic)" subsection.
 
 ## 1. Tick budgets
 
@@ -83,8 +83,12 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "the tick interval" for our tick period (R2-BUD-REC6, R2-XU-OQ8); "the period" alone where
   it could mean the snapshot interval.
-- **Used today:** R1: R1-TICK-REC2 (P1's "25 % of 16.7 ms", P2's "40 % of the period"), R1-ECS-OQ4. R2: R2-BUD-REC6
-  ("tick interval"), R2-ROOM-REC2 ("tick period"), R2-XU-OQ8, the pointers between units (r2:3245). R3–R6: none.
+- **Used today:** R1: R1-ECS-REC1 mark 1 (25 % of the tick period), R1-TICK-REC2 (P1's server tick budget, 50 % of the
+  tick period; P2's client's sim share, 40 %), R1-XU-OQ1 (P2's 40 %). R2: the budgets options table E, R2-SYNC-REC1
+  mark 4 and R2-SYNC-REC9 mark 1 (the server-only share), R2-BUD-REC6 and R2-ROOM-REC2 (50 % of the tick period),
+  R2-INT-REC3 (5 %), R2-XU-OQ8, the pointers between the R2 units (the budgets unit's tick period). R4: the legacy
+  facts used for R4-LOS (R2-INT-REC3's 5 %), R4-NAV-REC2, R4-LOS-REC1 mark 4, R4-LOS-REC2 (5 % of the tick period
+  each). R3, R5, R6: none.
 
 ### Sim step time
 - **Definition:** the time of one call of the simulation step: every phase of the sim crate's tick (movement and
@@ -97,9 +101,10 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   (R1-ECS-REC1 mark 1, R1-TICK-REC2 P1 and P2, R1-TICK-REC3, R1-ECS-OQ4, R1-XU-OQ1, R4-PHYS-REC1 mark 2,
   R5-LAYOUT-REC5, the R5 benchmark row in R5-TEST-REC1).
 - **Keeps:** Whole ticks for an integer count of ticks (R1-TICK-REC1), a different phrase.
-- **Used today:** R1: R1-ECS-REC1, R1-TICK-REC2, R1-TICK-REC3, R1-DET-REC3, R1-ECS-OQ4, R1-TICK-OQ5, R1-BND-OQ2,
-  R1-XU-OQ1. R2: the budgets options table E ("Simulation step"), R2-BUD-REC6 ("the simulation step"). R4:
-  R4-PHYS-REC1 mark 2. R5: R5-LAYOUT-REC5, R5-TEST-REC1. R3, R6: none.
+- **Used today:** R1: the boundary options table (Q1, row A2), R1-ECS-REC1 mark 1, R1-TICK-REC2 (P1 and P2),
+  R1-TICK-REC3, R1-ECS-OQ4, R1-XU-OQ1 (the old mean mark, as first proposed). R2: R2-BUD-REC6 (the sim step's share in
+  the spike). R5: R5-LAYOUT-REC5 (sim step time off the render thread), R5-RUSTLINT-REC4 (reported with method),
+  R5-TEST-REC1 (the benchmark row). R3, R4, R6: none.
 
 ### Server tick time
 - **Definition:** the time one server tick takes on the room's tick thread, from the start of the tick's work to its
@@ -112,9 +117,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "a room's tick", "tick p99" and "tick time" where the whole server tick is meant
   (R2-ROOM-REC2, R2-TRN-REC1 mark 4, R2-TRN-REC6 mark 2, R5-TEST-REC5, R6-HOST-REC2, R6-OBS-REC1, R6-OBS-REC2,
   R6-TEL-REC1, R6's options tables and K3).
-- **Used today:** R1: R1-TICK-REC2 ("leaves room for snapshot encoding, interest management", r1:2017). R2:
-  R2-BUD-REC6, R2-ROOM-REC2, R2-TRN-REC1 mark 4, R2-TRN-REC6 mark 2, R2-ROOM-OQ1, R2-XU-OQ8. R5: R5-TEST-REC5. R6:
-  R6-HOST-REC2, R6-OBS-REC1, R6-OBS-REC2, R6-TEL-REC1, the options table Q2 and K3. R3, R4: none.
+- **Used today:** R2: the budgets options table E (its 60 Hz and 30 Hz rows), R2-BUD-REC6, R2-TRN-REC1 mark 4 (server
+  tick p99 within 10 % of a clean run), R2-TRN-REC6 mark 2, R2-ROOM-REC2 (marks 1 and 4), R2-ROOM-OQ1, R2-XU-OQ8. R5:
+  R5-TEST-REC1 (the benchmark row), R5-TEST-REC5 (p50, p99 and max; the spike's p99 inside the server tick budget).
+  R6: the options table Q2 (shared vCPU), K3 in the monthly scenarios, R6-HOST-REC2, R6-OBS-REC1, R6-OBS-REC2,
+  R6-TEL-REC1. R1, R3, R4: none.
 
 ### Transport runtime time
 - **Definition:** the CPU time a room's network runtime uses outside the tick thread (encryption, sockets,
@@ -124,8 +131,8 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Marked by:** "transport runtime time", "the transport runtime".
 - **Retire (exact):** "1 CPU core for the transport".
 - **Retire (in context):** "the transport layer" as a CPU budget (R2-TRN-REC1 mark 2, R2-XU-OQ8).
-- **Used today:** R2: the rooms options (r2:1900), R2-TRN-REC1 mark 2, R2-ROOM-REC2, R2-XU-OQ8. R5: R5-LAYOUT-REC2 and
-  R5-GATE-REC1 (G5) name the transport only as a crate the sim must not depend on. R1, R3, R4, R6: none.
+- **Used today:** R2: R2-TRN-REC1 mark 2 (at most 1 vCPU; beside the tick, its share entering the rooms-per-VM
+  figure), R2-XU-OQ8. R6: the assumptions (A-2). R1, R3, R4, R5: none.
 
 ### Time statistics
 - **Definition:** a time mark that names no statistic is a p99 over the run it names; a mean is always called "mean".
@@ -138,8 +145,17 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** a time mark with no statistic, such as "costs at most 1 ms per tick" (R1-ABL-REC6),
   "at most 0.2 ms per tick" (R2-INT-REC1), "at most 0.5 ms per tick" (R2-INT-REC4), and R2-INT-REC2 (b)'s pair test
   ("at most 0.1 µs per enemy pair") and its re-flood: each now reads as a p99.
-- **Used today:** every topic that sets time marks (R1, R2, R3, R4, R6); R3's frame marks already name p95 and the
-  median.
+- **Used today:** R1: the legacy facts used by the ecs and tick units (the legacy step's mean and p95), R1-ECS-REC1
+  (mark 1's p99 with the mean reported; marks 2 and 3 at p99), R1-TICK-REC2 (P1 to P3), R1-TICK-REC3, R1-TICK-REC4 and
+  R1-TICK-REC5 (jitter p99), R1-ABL-REC6 (now at p99), R1-XU-OQ1, R1-XU-OQ2. R2: the legacy facts used by the budgets
+  unit, the budgets options table E, R2-BUD-REC1 and R2-BUD-REC2 (mean rates and bandwidth), R2-BUD-REC6, R2-INT-REC1,
+  R2-INT-REC2 (the pair test and the re-flood at p99), R2-INT-REC4, R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3,
+  R2-TRN-REC6, R2-ROOM-REC2, R2-XU-OQ8. R3: the legacy facts used (the legacy step's mean; the harness's mean, p50,
+  p95 and max), R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median). R4: the legacy
+  facts used by R4-NAV (a mean stall rate), R4-PHYS-REC1 mark 2 (a mean mark, its p99 reported), R4-NAV-REC1,
+  R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1 mark 4 (mean and p99), R4-OBST-REC1, R4-OBST-REC2 (the flip cost, now at p99).
+  R5: the legacy facts used (a mean), R5-TEST-REC1, R5-TEST-REC4 (mean delay), R5-TEST-REC5. R6: the legacy facts used
+  (a mean), the options table Q2, the egress table (R2-BUD-REC2's mean), the assumptions (A-2, at p99).
 
 ### The server tick budget
 - **Definition:** the p99 server tick time a room may use, on one vCPU of the reference server, tested in the stress
@@ -154,13 +170,14 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   "the share of the tick budget the tick-rate unit sets" (R2-SYNC-REC1 mark 4).
 - **Retire (in context):** "the server tick budget" with no number behind it, "CPU budget per tick" for the whole
   (R2-BUD-REC6), and "25 %" or "50 %" with no named whole.
-- **Used today:** R1: R1-TICK-REC2 (25 % for the sim alone), R1-DET-REC3 ("the per-tick sim budget"), R1-XU-OQ1. R2:
-  the TL;DR ("R1's CPU mark"), the budgets options table E, R2-SYNC-REC1 mark 4, R2-SYNC-REC9 (25 % "of the tick
-  budget"), R2-BUD-REC1 ("its CPU mark"), R2-BUD-REC6 (25 % for the whole tick), R2-INT-REC3 (10 % "of the server tick
-  budget"), R2-ROOM-REC2 (50 % of the tick period), R2-XU-OQ8. R4: R4-NAV-REC2 ("the tick's p99 budget"), R4-LOS-REC1
-  mark 4 and R4-LOS-REC2 ("10 % budget"), the legacy facts used (r4:526). R6: R6-HOST-REC2 ("the per-tick budget"),
-  R6-OBS-REC2, the options table Q2 ("the tick budget"). R3, R5: none (R5-TEST-REC5 names "R1-TICK's budget" and "the
-  budget ADR-0004 sets").
+- **Used today:** R1: R1-TICK-REC2 (P1: the other 25 % of the server tick budget is the server-only share), R1-XU-OQ1
+  (settled: one server tick budget with its shares). R2: the budgets options table E (25 % weighed and set aside for
+  the server tick budget's 50 %), R2-BUD-REC6 (50 %, split into the two shares), R2-INT-REC3 (10 % of the server tick
+  budget, 5 % of the tick period), R2-ROOM-REC2 (50 % of the tick period), R2-XU-OQ8 (settled by the glossary). R4:
+  the legacy facts used for R4-LOS (R2-INT-REC3's 10 %), R4-NAV-REC2 (10 % at p99, 5 % of the tick period). R5:
+  R5-TEST-REC5 (server tick time measured against it). R6: the options table Q2 (noisy neighbours could break it), the
+  assumptions (A-2: a density to measure, not one the budget guarantees), R6-HOST-REC2 (rests on R2-BUD-REC6's
+  budget), R6-OBS-REC2 (makes it visible). R3: none.
 
 ### The sim step share and the server-only share
 - **Definition:** the two parts of the server tick budget, each at most 25 % of the tick period at p99 (4.2 ms at
@@ -181,9 +198,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   "half of that mark's mean tick" (R4-PHYS-REC1 mark 2).
 - **Retire (in context):** "10 % of the server tick budget" or "10 % budget" without its value (R2-INT-REC3,
   R4-NAV-REC2, R4-LOS-REC1, R4-LOS-REC2).
-- **Used today:** R1: R1-TICK-REC2 P1, R1-ABL-REC6, R1-DET-REC3. R2: R2-SYNC-REC1 mark 4, R2-SYNC-REC5 mark 4,
-  R2-SYNC-REC9, R2-BUD-REC6, R2-INT-REC1, R2-INT-REC3, R2-INT-REC4, R2-TRN-REC1 mark 2, R2-XU-OQ8. R4: R4-PHYS-REC1
-  mark 2, R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1 mark 4, R4-LOS-REC2. R3, R5, R6: none.
+- **Used today:** R1: R1-ECS-REC1 mark 1 (within the sim step share), R1-TICK-REC2 P1 (the sim step share; the other
+  25 % the server-only share), R1-DET-REC3, R1-ABL-REC6, R1-ECS-OQ4. R2: R2-SYNC-REC1 mark 4 and R2-SYNC-REC9 mark 1
+  (within the server-only share), R2-BUD-REC6 (split into the two shares), R2-INT-REC3 (inside the sim step share),
+  R2-XU-OQ8 (settled: a sim step share and a server-only share). R4: R4-PHYS-REC1 mark 2, R4-NAV-REC2 (inside the sim
+  step share), R4-LOS-REC1 mark 4 and R4-LOS-REC2 ("its share", 5 % of the tick period). R3, R5, R6: none.
 
 ### The client's sim share
 - **Definition:** in the client, the sim step time in Wasm in the Worker on the minimum laptop, at most 40 % of the
@@ -193,8 +212,8 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Marked by:** "the client's sim share", "the page's cost of the sim".
 - **Retire (exact):** none.
 - **Retire (in context):** "tick time" for the client's Worker (R1-TICK-REC2 P2).
-- **Used today:** R1: R1-TICK-REC2 P2, R1-BND-REC1, R1-ABL-REC6 (the minimum laptop), R1-ECS-REC1 ("Wasm in a Worker
-  ≤ 2× native"). R3: R3-BUDGET-REC2. R4: R4-PHYS-REC1 mark 2, R4-NAV-REC4. R2, R5, R6: none.
+- **Used today:** R1: R1-TICK-REC2 P2 (40 % of the tick period), R1-ABL-REC6 (on the laptop). R3: R3-BUDGET-REC2 (the
+  row "sim cost seen by the page"). R2, R4, R5, R6: none.
 
 ### The reference server
 - **Definition:** the machine on which every native server pass mark is measured: a Hetzner Cloud CCX23 (4 dedicated
@@ -209,10 +228,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   (R2-ROOM-REC2), "reference server hardware R6 names" (R2-TRN-REC1), "reference host".
 - **Retire (in context):** "to be named with R3, R5 and R6" for the server.
 - **Used today:** R1: R1-ECS-REC1, R1-TICK-REC2, R1-TICK-REC4 ("the reference server (Linux)"), R1-ABL-REC6,
-  R1-TICK-OQ6, R1-XU-OQ12. R2: R2-SYNC-REC1 mark 4, R2-SYNC-REC5 mark 4, R2-SYNC-REC9, R2-BUD-REC6, R2-INT-REC1,
-  R2-INT-REC3, R2-INT-REC4, R2-TRN-REC1 mark 2, R2-ROOM-REC2, R2-XU-OQ9 (all "the proposed reference server" or an R6
-  pointer). R4: the recommendations' preface (r4:658), R4-PHYS-REC1, R4-NAV-REC1 (via R1-TICK-REC2). R6: R6-HOST-REC2
-  (names it), R6-COST-REC1, R6-COST-OQ1, the cost tables, the pointer to R2 (r6:942-943). R3, R5: none.
+  R1-ECS-OQ4, R1-TICK-OQ6 (R6 proposes it). R2: R2-SYNC-REC1 mark 4 and R2-SYNC-REC5 mark 4 ("the proposed reference
+  server"), R2-SYNC-REC9, R2-BUD-REC6, R2-INT-REC1, R2-INT-REC3, R2-INT-REC4, R2-TRN-REC1 mark 2, R2-ROOM-REC2,
+  R2-XU-OQ9 (answered: a CCX23), the pointers to other topics. R3: the legacy facts used (R3's reference hardware
+  beside the minimum laptop). R4: the recommendations' preface (via R1-TICK-REC2). R6: R6-HOST-REC2 (names it),
+  R6-COST-OQ1, the pointers to other topics (R2-BUD-REC6's unit; R1-ECS-OQ4's one match per vCPU). R5: none.
 
 ### The measuring unit: one vCPU
 - **Definition:** a server time mark is the elapsed time of that work on one vCPU of the reference server, with no other
@@ -222,15 +242,18 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   (R6-HOST-F15), and it is not always a whole core: AWS lists a "c6a.large (1 core, 2 vCPU, 4 GB)" (R6-HOST-F23). No
   topic says whether a CCX23 dedicated vCPU is a whole core, so "core" is not used for server marks.
 - **Marked by:** "one vCPU", "per vCPU", "a share of one vCPU".
-- **Retire (exact):** "one core", "per core", "server core", "1 CPU core": every use today is for server work
-  (R1-ECS-REC1, R1-TICK-REC2, R1-ABL-REC6, R1-ECS-OQ4, R1-TICK-OQ6, r1:2955-2956, r4:658, R2-TRN-REC1 mark 2).
-- **Retire (in context):** none.
-- **Keeps:** Core, for client hardware (at least 4 cores and 8 threads, R3-BUDGET-REC1) and where a source is quoted.
-- **Used today:** R1: "core" in R1-ECS-REC1, R1-TICK-REC2, R1-ABL-REC6, R1-ECS-OQ4, R1-TICK-OQ6 and the pointer to R6
-  (r1:2955-2956). R2: "vCPU" in R2-BUD-REC6, R2-ROOM-REC2, R2-XU-OQ9; "core" in R2-TRN-REC1 mark 2, R2-BUD-REC6's
-  reason ("more than one room per core"), the budgets options table E ("several rooms per core") and the pointers
-  between units (r2:3244, "rooms per core"). R4: "core" (r4:658). R6: "vCPU" throughout (R6-HOST-REC2, R6-COST A-2,
-  A-3, R6-COST-OQ1, the cost tables); r6:453 reads R1-ECS-OQ4's "one per core" as one per vCPU. R3, R5: none.
+- **Retire (exact):** "per core", "server core", "1 CPU core": every use today is for server work (R1-ECS-REC1,
+  R1-TICK-REC2, R1-ABL-REC6, R1-ECS-OQ4, R1-TICK-OQ6, r1:2955-2956, r4:658, R2-TRN-REC1 mark 2).
+- **Retire (in context):** "one core", for a server time mark or a share of the reference server.
+- **Keeps:** Core, for client hardware (at least 4 cores and 8 threads, R3-BUDGET-REC1) and where a source is quoted;
+  and a share of the machine a legacy measurement ran on (R2-INT-F20).
+- **Used today:** R1: R1-ECS-REC1, R1-TICK-REC2, R1-ABL-REC6, R1-ECS-OQ4 (one match per vCPU), R1-TICK-OQ6, the
+  pointers to other topics (R6: matches per vCPU). R2: the budgets options table E, R2-SYNC-REC9, R2-BUD-REC6,
+  R2-INT-REC3, R2-TRN-REC1 mark 2 (at most 1 vCPU for the transport runtime), R2-ROOM-REC2 (the 4-vCPU CCX23),
+  R2-XU-OQ9 (every server mark on one of its vCPUs), the pointers between the R2 units (rooms per vCPU). R4: the
+  recommendations' preface. R6: the cost per room-hour table (one per vCPU), the assumptions (A-2, A-3), R6-HOST-REC2
+  (4 vCPU), R6-COST-OQ1 (a 4-vCPU VM), the pointers to other topics (R2-BUD-REC6's unit; R1-ECS-OQ4 read as one per
+  vCPU). R3, R5: none.
 
 ## 2. Modes and scale
 
@@ -242,11 +265,19 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "characters" for soldiers (R1-DET-REC3: "48 characters"); a bare "48" where the largest mode
   is meant.
 - **Keeps:** write the largest mode's N.
-- **Used today:** R1: R1-ECS-REC1 (48 soldiers), R1-TICK-REC2 (N = 12 / 24 / 36 / 48 / 64), R1-TICK-REC3 (N = 48),
-  R1-DET-REC1, R1-DET-REC3, R1-BND-REC1 (N = 12, 24, 36, 48), R1-ABL-REC6, R1-BND-OQ6. R2: the worked estimate
-  (P = players and bots), R2-SYNC-REC9, R2-BUD-REC6, R2-INT-REC1, R2-TRN-REC1 mark 2, R2-ROOM-REC2. R3:
-  R3-BUDGET-REC2, R3-BUDGET-OQ4. R4: R4-PHYS-REC4, R4-NAV-REC2 (N = 48 and 64), R4-NAV-REC3. R5: R5-TEST-REC5. R6: the
-  cost tables ("Humans", A-1 to A-5).
+- **Used today:** R1: the legacy facts used by the determinism unit (the scale test at N = 12 / 24 / 36 / 48),
+  R1-ECS-REC1 (the largest mode's N soldiers), R1-TICK-REC2 (N = 12 / 24 / 36 / 48 / 64 and the largest mode's N; P2:
+  OQ7 decides N), R1-TICK-REC3, R1-DET-REC1 (48 and 36 players), R1-DET-REC3, R1-BND-REC1 (N = 12, 24, 36, 48),
+  R1-ABL-REC6, R1-TICK-OQ7 (it sets N in P2), R1-BND-OQ6 (N = 48), R1-XU-OQ1, MODES-3 (N = 48 or 54). R2: the worked
+  estimate (P = players and bots), R2-ROOM-F15 (TF2's quota keeps N players), R2-SYNC-REC9 and R2-BUD-REC6 (cost that
+  grows with the player count), R2-INT-REC1 (48 clients), R2-TRN-REC1 mark 2 (48 sessions), R2-ROOM-REC2 (a 48-player
+  room), R2-ROOM-REC6 (F15's N players), R2-ROOM-REC7 (the N = 64 headroom mode), MODES-3. R3: R3-CHAR-REC1 (the
+  largest mode's N soldiers, 48 or 54), R3-BUDGET-REC2 (N soldiers; N = 48 and N = 54), R3-BUDGET-OQ4 ("Largest N";
+  the N of the offline scale test), MODES-3. R4: the legacy facts used by R4-NAV (LOOP_V2 §11's N = 12 / 24 / 36 /
+  48), R4-PHYS-REC4 (a crowd of 48 soldiers), R4-NAV-REC2 (the largest mode's N and N = 64), R4-NAV-REC3 (48 bots),
+  MODES-3. R5: the legacy facts used (TL15's tick bench at N; the scale test at N = 12, 24, 36, 48), R5-TEST-REC1 (the
+  tick bench at N players), R5-TEST-REC5 (LOOP_V2 §11's N steps), MODES-3. R6: the cost tables (humans; A-1 to A-5),
+  MODES-3.
 
 ### Team size and how modes are written
 - **Definition:** the team size is the number of slots on one team. A mode is written per team: "24v24" is two teams of
@@ -256,11 +287,23 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "2×2"-style labels that do not say whether they count per team (R2-ROOM-REC7), once MODES-3
   is answered; "players" for a team size.
-- **Used today:** R1: R1-DET-REC1 (24v24, 12v12v12), R1-TICK-REC2, R1-ABL-REC6 ("48 soldiers (VISION_V2 §3, 24v24)").
-  R2: the worked estimate (4v4, 6v6v6, 12v12v12, "24v24 or 16v16v16", 32v32), R2-INT-REC3 (24v24 and 16v16v16),
-  R2-ROOM-REC6 ("3 teams × 16 slots"), R2-ROOM-REC7 ("2×2, 2×8, 3×6, 3×18, 12v12v12 and 24v24"), R2-XU-OQ13. R3:
-  R3-AUDIO-REC1, R3-BUDGET-OQ4. R4: R4-NAV-REC2, R4-LOS-REC1 mark 4, R4-LOS-REC2 (24v24 and 16v16v16). R5:
-  R5-TEST-REC5 (24v24 = 48, 12v12v12 = 36). R6: the egress table (4v4, 6v6v6, 12v12v12, 24v24).
+- **Used today:** R1: the legacy facts used by the ecs unit (soldiers in slots; the goal "24v24" or "12v12v12"; GC2's
+  slot table), the legacy facts used by the boundary unit (GC2's soldier slots), R1-TICK-REC2 (up to 24v24, bots
+  filling empty slots), R1-TICK-REC3, R1-DET-REC4 and R1-BND-OQ1 (bots fill empty slots), R1-DET-REC1 (24v24,
+  12v12v12, 18v18v18), R1-BND-REC6 (bots filling the slots), R1-ABL-REC6 (24v24), MODES-3. R2: the legacy facts used
+  by the sync, budgets, transport and rooms units (12 fixed soldier slots; `teams.size` 4; humans take over bot
+  slots), the brief question 5 scope (team count, team size), R2-INT-F20 (pairs at 24v24 and 16v16v16), the worked
+  estimate (4v4 to 32v32), the rooms options 3.5 and 3.6 (bots per team, team size), R2-SYNC-REC1 (bot slots),
+  R2-SYNC-REC9 (bots fill slots; 12v12v12, 24v24), R2-BUD-REC2 (12v12v12, 24v24), R2-INT-REC1 (24v24), R2-INT-REC3
+  (24v24, 16v16v16, 18v18v18), R2-ROOM-REC4 (GameLift holds slots), R2-ROOM-REC6 (bots per team = team size − humans;
+  3 × 16 or 3 × 18 slots), R2-ROOM-REC7 (team count and team size; the test modes), R2-ROOM-OQ5 (team size),
+  R2-XU-OQ13 (4v4, 6v6v6), MODES-3. R3: the budgets findings (r3:536: 12v12v12 or 24v24, bots fill empty slots),
+  R3-CHAR-REC1 (bots fill slots), R3-AUDIO-REC1 (12v12v12, 24v24), R3-BUDGET-OQ4, MODES-3. R4: the needs list (humans
+  take over bot slots), the legacy facts used for R4-LOS (pairs at 24v24, 16v16v16, 12v12v12), R4-NAV-REC2,
+  R4-NAV-REC3, R4-NAV-REC4, R4-FLOORS-REC3, R4-LOS-REC2 and R4-OBST-REC1 (bots fill empty slots; up to 24v24),
+  R4-LOS-REC1 mark 4 (24v24, 16v16v16, 18v18v18), MODES-3. R5: R5-TEST-REC5 (24v24 = 48, 12v12v12 = 36, 18v18v18 =
+  54), MODES-3. R6: the egress table (4v4 to 24v24), the monthly scenarios (12v12v12, 24v24), R6-TEL-REC1 (slots, not
+  people), R6-TEL-OQ2 (bots fill slots), MODES-3.
 
 ### The start modes and the goal modes
 - **Definition:** the goal modes are 24v24 (N = 48) and 12v12v12 (N = 36): VISION_V2 §3, "The goal: 12v12v12 or
@@ -271,9 +314,15 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Marked by:** "start", "start small", "goal".
 - **Retire (exact):** none.
 - **Retire (in context):** "the goal" for a start mode; "(start, upper end)" with no reading named.
-- **Used today:** R2: the worked estimate (rows "4v4 (VISION_V2 §3 start, upper end)" and "6v6v6 (start, upper end)":
-  reading (a)), R2-ROOM-REC7 (reading (b)), R2-BUD-OQ6 and R2-XU-OQ13 (ask the question). R3: R3-BUDGET-OQ4 (quotes
-  both). R6: the egress table and the Start scenario (reading (a)). R1, R4, R5: the goals only.
+- **Used today:** R1: the legacy facts used by the ecs unit ("up to 48 at the goal"), R1-DET-REC1 ("the two goals of
+  VISION_V2 §3"), MODES-3. R2: the budgets unit's scope (VISION_V2 §3's sizes "to start"), the worked estimate (rows
+  "4v4 (VISION_V2 §3 start, upper end, as totals: MODES-3 (a))" and "6v6v6 (start, upper end, …)": reading (a); the
+  goal rows 12v12v12 and "24v24 or 16v16v16"), MODES-3. R3: the budgets findings (r3:536, the goal modes),
+  R3-BUDGET-OQ4 (quotes both), MODES-3. R4: MODES-3. R5: R5-PREV-OQ4 (the start budget's line), MODES-3. R6: the TL;DR
+  (the start and goal budgets), the egress table (the start rows read as totals, MODES-3 (a); the goal rows) and its
+  note on reading (b), the Start and Goal scenarios with A-4 and A-5, A-11 and the monitoring and storage notes at the
+  goal, R6-COST-REC1 (the start and goal budgets), R6-TEL-REC2 (the volume at the goal), R6-HOST-OQ4 (goal scale), the
+  pointers to other topics (at the goal), MODES-3.
 
 ### The largest mode, and its N
 - **Definition:** the mode, among the start and goal modes, with the most players; "the largest mode's N" is its
@@ -285,10 +334,14 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "the largest mode (48 soldiers, 47 of them bots)" (R1-TICK-OQ7) and "Largest N"
   (R3-BUDGET-OQ4) where they fix N at 48; "48" alone where the largest mode is meant.
-- **Used today:** R1: R1-TICK-REC2 (P2: "offline at the largest mode (OQ7 decides N)"), R1-DET-REC3 ("the largest
-  mode's size (48 characters …)"), R1-TICK-OQ7, R1-DET-OQ1, R1-BND-OQ6, R1-XU-OQ12. R2: none by name (R2-BUD-OQ6 asks
-  the question). R3: the budgets findings (r3:534, quoting VISION_V2 §4), R3-CHAR-REC2, R3-BUDGET-REC2,
-  R3-MEASURE-REC2, R3-BUDGET-OQ4. R4: R4-NAV-REC4 ("offline play at the largest mode"). R5, R6: none by name.
+- **Used today:** R1: R1-ECS-REC1 (the stress scene's soldiers), R1-TICK-REC2 (P1 at the largest mode's N; P2 offline
+  at the largest mode), R1-TICK-REC3, R1-DET-REC1 (the largest mode where it is neither goal), R1-DET-REC3,
+  R1-ABL-REC6, R1-TICK-OQ7 (48 under MODES-3 (a), 54 under (b)), R1-DET-OQ1, R1-BND-OQ6, R1-XU-OQ12, R1-XT-OQ8,
+  MODES-3. R2: R2-SYNC-REC5 mark 3, R2-BUD-REC6, R2-ROOM-REC6 (the largest mode's N in three teams), MODES-3. R3:
+  R3-CHAR-REC1, R3-CHAR-REC2 and R3-CHAR-REC3 (48 or 54 soldiers on screen), R3-BUDGET-REC2, R3-AUDIO-REC1,
+  R3-BUDGET-OQ4, MODES-3. R4: R4-PHYS-REC1 mark 5, R4-NAV-REC2, R4-NAV-REC4 ("offline play at the largest mode"),
+  R4-OBST-REC1, R4-XT-OQ4, MODES-3. R5: R5-TEST-REC5 (the largest mode where it is neither goal), R5-XT-OQ4, MODES-3.
+  R6: R6-XT-OQ2, MODES-3.
 
 ### The design point and headroom
 - **Definition:** the design point is N = 48, the 24v24 goal (VISION_V2 §3), which R2's estimate and R6's cost table
@@ -300,8 +353,14 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Marked by:** "design point", "headroom", "48+".
 - **Retire (exact):** none.
 - **Retire (in context):** "the largest mode" for the design point.
-- **Used today:** R2: the worked estimate ("24v24 or 16v16v16 (goal; design point 48)", "32v32 (48+ headroom)"),
-  R2-BUD-OQ6, R2-TRN-REC2. R3: R3-BUDGET-OQ4. R5: R5-TEST-REC5. R6: the egress table ("24v24 (goal, design point 48)").
+- **Used today:** R1: the tick unit's scope ("48+ players plus bots"), R1-DET-REC5 (48+ players and bots), R1-ECS-OQ4,
+  R1-TICK-OQ5. R2: the header and the sync unit's scope (48+ players), the legacy facts used by the sync and rooms
+  units, the rooms unit's scope, the sync options 3.1 and the rooms options 3.1 (at 48+), the worked estimate ("design
+  point 48", "32v32 (48+ headroom)"), R2-SYNC-REC9, R2-BUD-REC3, R2-BUD-REC6, R2-INT-REC4, R2-TRN-REC2 ("the 48+
+  design point"), R2-TRN-REC6, R2-ROOM-REC7 (the N = 64 headroom mode), R2-SYNC-OQ4, R2-BUD-OQ6 ("54 is above the 48
+  design point"). R3: the budgets findings (CLAUDE.md's design for 48+), the character options table, R3-LOOK-REC1,
+  R3-LOOK-REC3, R3-CHAR-REC1, R3-BUDGET-OQ4. R4: R4-NAV-REC2 (the N = 64 headroom run). R5: R5-TEST-REC1 (the soak and
+  load row), R5-TEST-REC5 (designed for 48+). R6: the egress table ("24v24 (goal, design point 48)").
 
 ### The test-mode list
 - **Definition:** the one list of modes the spikes run (proposed by resolution 10; it replaces the topics' separate
@@ -318,8 +377,8 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** each topic's own mode list in a pass mark that means "every mode we test"
   (R2-ROOM-REC7's "2×2, 2×8, 3×6, 3×18, 12v12v12 and 24v24"; R5-TEST-REC5's "24v24 = 48 and 12v12v12 = 36").
-- **Used today:** R1: R1-DET-REC1 (24v24 and 12v12v12). R2: R2-INT-REC3, R2-ROOM-REC6, R2-ROOM-REC7. R4: R4-LOS-REC1
-  mark 4, R4-LOS-REC2. R5: R5-TEST-REC2 (two teams, three teams, bots only), R5-TEST-REC5. R3, R6: none.
+- **Used today:** R1: MODES-3. R2: R2-INT-REC3, R2-ROOM-REC7 (mode files for every mode of the list), MODES-3. R3:
+  MODES-3. R4: R4-LOS-REC1 mark 4, R4-LOS-REC2, MODES-3. R5: MODES-3. R6: MODES-3.
 
 ## 3. The stress scene
 
@@ -353,14 +412,15 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "stress load" (R1-ECS-REC1, R4-PHYS-REC1, R4-PHYS-REC4), "R1-TICK-REC2's P1 scene"
   (R4-NAV-REC2) and "R1-TICK's scene" (R3-BUDGET-REC2, R3-CHAR-REC4), each with its own counts, where the scene a
   stress mark is set on is meant, not where a Rests-on line or a list of wave-1 changes names that unit's own scene.
-- **Used today:** R1: R1-ECS-REC1 marks 1 and 2 (48 soldiers, 8 vehicles, 300 projectiles, 200 effects),
-  R1-TICK-REC2 P1 (4 big vehicles, 200 projectiles), R1-TICK-REC3, R1-DET-REC3, R1-ABL-REC6 (8 effects per soldier),
-  R1-XU-OQ1 (lists the differences). R2: R2-SYNC-REC5 mark 3 ("48 soldiers plus 12 vehicles and harvesters"),
-  R2-INT-REC4, R2-BUD-OQ5; the worked estimate (its own counts). R3: R3-CHAR-REC4, R3-BUDGET-REC2 (4 large units,
-  200 projectiles), R3-MEASURE-REC2, and the marks run "in the benchmark scene" (R3-WGPU-REC1, R3-WGPU-REC2,
-  R3-GL2-REC1, R3-GL2-REC2, R3-CHAR-REC1, R3-BUDGET-REC3, R3-MEASURE-REC3, R3-MEASURE-REC4, R3-WGPU-OQ2,
-  R3-CHAR-OQ4). R4: R4-PHYS-REC1 mark 2, R4-PHYS-REC4 (8 big vehicles), R4-NAV-REC2, R4-OBST-REC1, R4-LOS-REC2 ("worst
-  case"), the wave-1 list (r4:1115-1120). R5, R6: none.
+- **Used today:** R1: R1-ECS-REC1 marks 1 and 2, R1-TICK-REC2 P1, R1-TICK-REC3, R1-DET-REC3, R1-ABL-REC6 (8 effects
+  per soldier), R1-XU-OQ1 (settled: one stress scene), MODES-3. R2: R2-SYNC-REC5 mark 3 (the history for its soldiers
+  and big vehicles), R2-BUD-REC6 (the spike, with a snapshot-receiving client on every soldier), R2-INT-REC4,
+  R2-BUD-OQ5 (one proposed scene until the caps), MODES-3. R3: the legacy facts used (P1's old scene, now the stress
+  scene), R3-CHAR-REC4, R3-BUDGET-REC2 ("the stress scene's fight on screen"), R3-MEASURE-REC2, the marks run "in the
+  benchmark scene", a recording of it (R3-WGPU-REC1, R3-WGPU-REC2, R3-GL2-REC1, R3-GL2-REC2, R3-CHAR-REC1,
+  R3-BUDGET-REC3, R3-MEASURE-REC3, R3-MEASURE-REC4, R3-WGPU-OQ2, R3-CHAR-OQ4), the pointers to other topics
+  (R1-TICK-REC2's scene), MODES-3. R4: R4-PHYS-REC1 mark 2, R4-PHYS-REC4 (15 big vehicles), R4-NAV-REC2, R4-OBST-REC1,
+  the wave-1 list, MODES-3. R5: MODES-3. R6: MODES-3.
 
 ### Big vehicle and very large unit
 - **Definition:** a big vehicle is a multi-part vehicle in the sim (VISION_V2 §6.4: "big and multi-part"), harvesters
@@ -373,11 +433,14 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   "large units" (R3) where it means the stress scene's very large units; "vehicles and harvesters" (R2-SYNC-REC5
   mark 3) as two counts.
 - **Keeps:** big, the word that marks a stress count (big vehicles).
-- **Used today:** R1: R1-ECS-REC1 ("8 vehicles"), R1-ECS-REC4, R1-TICK-REC2 ("4 big vehicles"), R1-TICK-OQ9,
-  R1-XU-OQ1. R2: the worked estimate ("Vehicles: one per squad of 4 … + one harvester per team"), R2-SYNC-REC4,
-  R2-SYNC-REC5 mark 3, R2-SYNC-REC7. R3: R3-WGPU-REC3, R3-LOOK-REC1, R3-CHAR-REC4, R3-BUDGET-REC2, R3-MEASURE-REC2,
-  R3-AUDIO-REC1, R3-AUDIO-REC2, R3-AUDIO-REC4 ("large units"). R4: R4-PHYS-REC1, R4-PHYS-REC4, R4-NAV-REC2,
-  R4-OBST-REC1, R4-LOS-OQ1, the wave-1 list. R5, R6: none for the count (R6's telemetry names unit kinds).
+- **Used today:** R1: the tick unit's scope, R1-ECS-REC1 (15 big vehicles), R1-ECS-REC4 (§6.4: big vehicles as
+  physical bodies), R1-TICK-REC2 (P1's 15; §6.4), R1-DET-REC3 (15, the count R4-PHYS-REC4 takes up), R1-TICK-OQ9,
+  R1-XU-OQ1 (P1's old 4). R2: R2-SYNC-REC4 (§6.4), R2-SYNC-REC5 mark 3, R2-BUD-OQ5 (15 big vehicles), the pointers to
+  other topics (big vehicles as cover). R3: the legacy facts used (P1's old 4; the stress scene's 15), R3-LOOK-REC1
+  ("a few very large units"), R3-CHAR-REC4 (the four very large units), R3-BUDGET-REC2 (4 very large units and their
+  parts' draws). R4: the LOS options table (big vehicles as cover), R4-PHYS-REC1 (§6.4), R4-PHYS-REC4 (big vehicles as
+  kinematic compound bodies; 15 in the stress scene), R4-OBST-REC1, R4-LOS-OQ1, the wave-1 list. R5, R6: none for the
+  count (R6's telemetry names unit kinds).
 
 ### Live projectile
 - **Definition:** a projectile entity in flight in the sim (bolt, grenade, Molotov, rocket: R4-PHYS-REC3), counted at
@@ -386,9 +449,10 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "200 projectiles" as a stress count (R3-MEASURE-REC2); "projectiles alive" for the stress
   count (R2's estimate keeps its own 32 as an assumption for bandwidth).
-- **Used today:** R1: R1-ECS-REC1 (300), R1-TICK-REC2 (200), R1-XU-OQ1. R2: the worked estimate (32 alive at 48),
-  the encoding options table (r2:1695), R2-BUD-REC3 ("32 live projectiles"), R2-BUD-OQ5. R3: R3-BUDGET-REC2 (200),
-  R3-MEASURE-REC2 (200). R4, R5, R6: none for the count.
+- **Used today:** R1: R1-ECS-REC1 (300), R1-TICK-REC2 (300), R1-XU-OQ1 (the old 300 and 200). R2: the encoding options
+  table B (r2:1699), R2-BUD-REC3 ("32 live projectiles", the bandwidth assumption), R2-BUD-OQ5 (caps; the stress
+  scene's 300). R3: the legacy facts used (P1's old 200; the stress scene's 300), R3-BUDGET-REC2 (300). R4, R5, R6:
+  none for the count.
 
 ### Active effect (and visual effect)
 - **Definition:** an active effect is a gameplay effect currently applied in the sim (R1-ABL-REC1: instant, timed or
@@ -399,10 +463,9 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** a bare "effects" in a count (R3-BUDGET-REC2's heading, R1-ECS-REC1's "200 active effects"
   as the stress count).
-- **Used today:** R1: R1-ECS-REC1 (200 active effects), R1-ABL-REC1 (the effect model), R1-ABL-REC6 (up to 8 per
-  soldier), R1-XU-OQ1. R3: "effects" as visual effects in R3-BUDGET-REC2 (heading and the GPU row "effects, sprites, HUD
-  in the 3D view"), R3-BUDGET-REC3 ("the effect caps (FX pools)"), R3-AUDIO-REC1 ("large units and their effects"). R2,
-  R4, R5, R6: none.
+- **Used today:** R1: R1-ABL-F1 (GAS's active effects), R1-ECS-REC1 and R1-TICK-REC2 P1 (up to 8 per soldier),
+  R1-ABL-REC6 (up to 8 per soldier), R1-XU-OQ1 (the old 200 and 8 per soldier). R3: R3-BUDGET-REC2 (the projectiles'
+  visual effects). R2, R4, R5, R6: none.
 
 ## 4. Prediction and random streams
 
@@ -414,8 +477,13 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "server-only" for state an offline match also holds.
 - **Keeps:** write authority-only.
-- **Used today:** R1: R1-DET-REC1 ("the server is the authority"), R1-DET-F32, R1-BND-REC6. R2: R2-SYNC-REC1,
-  R2-SYNC-REC3, R2-SYNC-REC6 ("keep the server the authority"), R2-SYNC-OQ11. R5: R5-GATE-REC3. R3, R4, R6: none.
+- **Used today:** R1: the legacy facts used by the ecs unit (legacy's authoritative state) and the tick unit (a shared
+  authoritative sim), R1-DET-F32 ("server authority"), R1-TICK-REC4 (§6.5's authoritative economy), R1-DET-REC1 ("the
+  server is the authority"), R1-DET-REC4 (the authority's sim state), R1-ABL-REC4 and R1-ABL-OQ4 (replay from the
+  authoritative state), ABL-PREDICT. R2: the transport options Q1 (the authoritative server), R2-SYNC-REC1 ("the only
+  authority"), R2-SYNC-REC3 (replay from the authoritative state; the authoritative spread), R2-SYNC-REC5 (the
+  server's authoritative fire origin), R2-SYNC-REC6 ("keep the server the authority"), R2-TRN-REC1 (an authoritative
+  server), ABL-PREDICT. R3, R4, R5, R6: none.
 
 ### The prediction scope
 - **Definition:** what the client's predicting sim runs ahead of the server for the local player: its own movement,
@@ -430,10 +498,15 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "predict only the local player's own abilities and weapons" as a settled scope
   (R1-ABL-REC4's heading); "partial prediction" (R1-ECS-REC1 mark 3) for this scope.
-- **Used today:** R1: R1-ECS-REC1 mark 3, R1-DET-REC1, R1-BND-REC6, R1-ABL-REC4, R1-ECS-OQ3, R1-DET-OQ6, R1-DET-OQ9,
-  R1-ABL-OQ4, R1-XU-OQ2, the pointers to R2. R2: R2-SYNC-REC3, R2-SYNC-REC6, R2-SYNC-REC7, R2-SYNC-REC8,
-  R2-SYNC-REC9, R2-SYNC-OQ5, R2-SYNC-OQ7, R2-SYNC-OQ10, R2-SYNC-OQ11, the hinge table (r2:3341). R4: R4-NAV-REC4
-  ("Prediction replays only the local player or its vehicle"). R3, R5, R6: none.
+- **Used today:** R1: R1-TICK-F24 (Fiedler's predicted time), R1-ABL-F3, F9, F13, F14, F15, F17 and F20 (what GAS and
+  Epic's games predict), the determinism options Q1, R1-ECS-REC1 mark 3 (R2's prediction scope), R1-DET-REC1,
+  R1-BND-REC6, R1-ABL-REC1 (GAS does not predict execution code), R1-ABL-REC4, R1-ECS-OQ3, R1-DET-OQ6, R1-DET-OQ9,
+  R1-ABL-OQ4, R1-XU-OQ2, ABL-PREDICT, SEC-SPREAD (predicted tracers), the pointers to R2. R2: R2-SYNC-F12,
+  R2-SYNC-F17, the legacy facts used by the sync unit, the sync options 3.2 (the client prediction scope) and 3.7 (the
+  predicted fire origin), R2-SYNC-REC3 (option 3.2 C; what the client does not predict), R2-SYNC-REC6, R2-SYNC-REC7,
+  R2-SYNC-REC8, R2-SYNC-REC9, R2-SYNC-OQ5, R2-SYNC-OQ7, R2-SYNC-OQ10, R2-SYNC-OQ11, ABL-PREDICT, SEC-SPREAD, the hinge
+  table (R2-SYNC-REC1's option 3.1 B; "The prediction scope stops short of abilities"). R4: R4-NAV-REC4 ("Prediction
+  replays only the local player or its vehicle"). R3, R5, R6: none.
 
 ### Shared stream and authority-only stream
 - **Definition:** the sim's random numbers come from one seeded generator with one stream per purpose
@@ -450,9 +523,10 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** "server-only random stream" (R2-SYNC-REC3), since an offline match's Worker is the authority too.
 - **Retire (in context):** "the simulation's seeded RNG" for spread without naming the stream kind (R1-ABL-REC3).
 - **Keeps:** server-only keyed random stream, in the bracketed fix-pass record in R2-SYNC-OQ11.
-- **Used today:** R1: R1-DET-REC4 (streams per purpose, "part of the sim state and its hash"), R1-ABL-REC3 ("Random
-  rolls (spread) come from the simulation's seeded RNG"), R1-DET-OQ11, R1-DET-OQ9. R2: R2-SYNC-F20, R2-SYNC-REC3
-  ("a server-only random stream"), R2-SYNC-OQ11, the pointers to R1 (r2:3279-3280). R3–R6: none.
+- **Used today:** R1: R1-DET-REC4 (streams shared or authority-only; weapon spread authority-only), R1-ABL-REC3
+  (spread from an authority-only stream), R1-DET-OQ9 (a compared hash leaves authority-only streams out), SEC-SPREAD.
+  R2: R2-SYNC-REC3 ("an authority-only random stream"), R2-SYNC-OQ11, SEC-SPREAD, the pointers to other topics (R1's
+  streams per purpose). R3–R6: none.
 
 ### State hash
 - **Definition:** a fixed, unseeded hash of a canonical serialization of a sim state after a tick (R1-DET-REC6). "The
@@ -462,9 +536,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Marked by:** "the state hash", "per-tick state hash", "the client-held state's hash".
 - **Retire (exact):** none.
 - **Retire (in context):** "its hash" for the RNG where it is unclear which state is meant (R1-DET-REC4).
-- **Used today:** R1: R1-ECS-REC2, R1-TICK-REC1, R1-DET-REC1, R1-DET-REC4, R1-DET-REC6, R1-DET-OQ9, R1-RR-OQ6, the
-  pointers between R1's units. R2: R2-INT-REC3, R2-TRN-REC3, R2-ROOM-REC6, the pointers to R1. R4: R4-PHYS-REC1,
-  R4-PHYS-REC3, R4-NAV-REC3, R4-OBST-REC1. R5: R5-TEST-REC1, R5-TEST-REC2, R5-TEST-REC4. R3, R6: none.
+- **Used today:** R1: R1-ECS-REC1 mark 4, R1-ECS-REC2 (per-tick state hashes), R1-TICK-REC1, R1-DET-REC1, R1-DET-REC4
+  (the authority's state hash), R1-DET-REC6, R1-DET-OQ9, R1-RR-OQ6, the pointers between R1's units (the per-tick
+  state hash). R2: R2-INT-REC3 (R1's state hash), R2-TRN-REC3 and R2-ROOM-REC6 (the per-tick state hash), the pointers
+  to other topics. R4: R4-PHYS-REC1 mark 3 and R4-OBST-REC1 (per-tick hashes), R4-PHYS-REC3, R4-NAV-REC3 (per-tick
+  state hashes). R5: R5-TEST-REC1 and R5-TEST-REC4 (per-tick hashes), R5-TEST-REC2 (one hash per tick). R3, R6: none.
 
 ## 5. Previews and hosting
 
@@ -478,10 +554,19 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "deploy preview" (Netlify's product name, R5-PREV-F15) for our previews;
   "preview deployment" where the link Mustafa opens is meant.
-- **Used today:** R1: R1-BND-REC5 (G3, previews for profiling), the pointers to R5 and R6. R3: R3-MEASURE-REC2 (the
-  benchmark on preview links), R3-MEASURE-OQ4. R5: the R5-PREV part (R5-PREV-F1–F20, REC1–REC5, OQ1–OQ6),
-  R5-LAYOUT-REC5, R5-CI-REC5, R5-XQ-OQ3, the pointers to R6. R6: R6-HOST-F3, F4, F6, F7, R6-HOST-REC1, R6-HOST-REC3,
-  R6-HOST-OQ5, R6-SEC-OQ1, the cost tables. R2: R2-TRN-REC5 ("Development and previews: self-signed …"). R4: none.
+- **Used today:** R1: the boundary options Q6 (G3: isolated in development and previews), R1-BND-REC5 (previews for
+  profiling; a preview link), R1-XT-OQ8 (server-less previews), the pointers to other topics (preview and production
+  hosting). R2: R2-TRN-REC5 ("Development and previews: self-signed …"), R2-XT-OQ9 (preview headers), R2-XT-OQ10
+  (multiplayer previews). R3: R3-MEASURE-REC2 (the benchmark on preview links), R3-MEASURE-OQ4, the pointers to other
+  topics. R4: R4-XT-OQ4 (server-less previews). R5: the header's question table (question 6), R5-LAYOUT-F12 and the
+  legacy facts used (R1-BND-REC5's isolation in development and previews; today's CI has no preview; a preview link
+  adds a check), the question 6 parts and the preview options (P1, P2, the hosts table), R5-PREV-F9, F11, F12, F14,
+  F15, F17, F18, R5-LAYOUT-REC5, R5-CI-REC5 (the preview deploy), R5-PREV-REC1 to REC5, R5-PREV-OQ1, OQ2, OQ3, OQ6,
+  R5-XQ-OQ3, PREV-DELETE, PREVIEW-WALL, R5-XT-OQ4, R5-XT-OQ5, R5-XT-OQ6, the pointers from R5-CI and R5-PREV. R6: the
+  header, the TL;DR, the hosting section, R6-HOST-F3, F4, F6, F7, the legacy facts used (a v2 preview that talks to a
+  game server), the options tables Q1 and Q3, the cost tables (the staging VM for previews; client and previews on
+  Cloudflare Pages), R6-HOST-REC1, R6-HOST-REC3, R6-HOST-OQ5, R6-SEC-OQ1, PREV-DELETE, PREVIEW-WALL, R6-XT-OQ2,
+  R6-XT-OQ3, R6-XT-OQ4, the pointers to other topics.
 
 ### The client host
 - **Definition:** where the player build and the previews are served from: Cloudflare Pages, with Cloudflare Workers
@@ -493,9 +578,12 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** "Cloudflare (Workers static assets; Pages as the same-headers alternative)" (R6-HOST-REC1's old
   order).
 - **Retire (in context):** "Cloudflare" alone where one of the two products is meant.
-- **Used today:** R5: R5-PREV-REC2, R5-PREV-REC3, R5-PREV-OQ2, R5-PREV-OQ4, the Pages findings (R5-PREV-F10–F13, F18).
-  R6: the TL;DR, the options table Q1 (row A), R6-HOST-REC1, R6-HOST-F1–F6, R6-COST's client line, the pointers to R1.
-  R1, R2, R3, R4: none.
+- **Used today:** R5: R5-PREV-F10, F12, F13, F18 (the Pages findings), the hosts table in the preview options,
+  R5-PREV-REC2 (R6 hosts on Cloudflare Pages, Workers static assets the alternative), R5-PREV-REC3 (deletion on
+  Pages), R5-PREV-REC4 (Pages' `_headers`), R5-PREV-OQ2, R5-PREV-OQ4 (answered by R6-HOST-REC1), PREV-DELETE. R6: the
+  TL;DR, R6-HOST-F1, F3, F4, the options table Q1 (row A), the cost tables (client and previews on Cloudflare Pages),
+  R6-HOST-REC1, PREV-DELETE, the hinge table (REC1's 25 MiB mark on Workers static assets), the pointers to other
+  topics (R1: Pages and Workers can send COOP and COEP; R5: the deploy step to the client host). R1, R2, R3, R4: none.
 
 ### The staging game server
 - **Definition:** the one small shared VM (proposed CX33) whose supervisor starts the room binary of the build a
@@ -505,9 +593,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "a real server" where the staging server is meant (R5-PREV-REC5); "an EU server" for
   previews (R5-PREV-OQ3).
-- **Used today:** R5: R5-PREV-REC5 ("a real server"), R5-PREV-OQ3. R6: R6-HOST-REC1, R6-HOST-REC3, R6-OBS-REC2,
-  R6-TEL-REC3, the cost tables ("Staging VM for previews"), the pointer to R5 (r6:946). R1–R4: none (R2-TRN-REC5's
-  "Development and previews" certificates are its certificates).
+- **Used today:** R5: R5-PREV-REC5 (whether the access wall is also on once a preview talks to it), R5-PREV-OQ3
+  (multiplayer previews need it), PREVIEW-WALL. R6: the metrics options Q2 and the analysis options Q4 (on the staging
+  VM), R6-HOST-REC1, R6-HOST-REC3 (one shared staging game server), R6-OBS-REC2, R6-TEL-REC3, the cost tables
+  ("Staging VM for previews"), PREVIEW-WALL, the pointers to other topics (the staging server receives the PR's
+  binary). R1–R4: none (R2-TRN-REC5's "Development and previews" certificates are its certificates).
 
 ### The access wall
 - **Definition:** a login in front of a preview: the host's access policy, which limits viewing to Mustafa's
@@ -521,8 +611,9 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "the access policy", "Cloudflare Access" and "private previews" as names for the decision
   (each stays as the name of a product or setting); "login wall" as a name for the access wall.
-- **Used today:** R5: R5-PREV-F12, R5-PREV-F14, the options for previews (r5:1123), R5-PREV-REC3, R5-PREV-REC5,
-  R5-PREV-OQ1. R6: R6-HOST-F4, the options table Q1, R6-HOST-REC1, R6-HOST-OQ5, R6-SEC-OQ1. R1–R4: none.
+- **Used today:** R5: R5-PREV-REC3 (HTTP 404, or the access wall), R5-PREV-REC5 (the access wall as a choice; on once
+  a preview carries unreleased art), PREV-DELETE, PREVIEW-WALL. R6: R6-HOST-REC1 (whether those previews sit behind
+  the access wall is PREVIEW-WALL), PREV-DELETE, PREVIEW-WALL. R1–R4: none.
 
 ### Preview isolation and the isolation flag
 - **Definition:** the isolation flag is one build switch that adds the cross-origin isolation headers, COOP
@@ -535,10 +626,10 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "COOP and COEP on preview hostnames only" for every preview (R5-PREV-REC4);
   "when R1-BND-REC5's option G3 is on" (R6-HOST-REC1) as the name of the switch; "always" isolated previews.
-- **Used today:** R1: R1-BND-REC5 (G1 and G3), R1-BND-OQ9, the boundary options (r1:1768), the pointers to R5 and R6.
-  R3: R3-MEASURE-F7, R3-MEASURE-OQ4. R5: R5-LAYOUT-REC5 ("only when an isolation flag is set"), R5-PREV-REC4 (every
-  preview), R5-GATE-REC1, R5-GATE-REC3, R5-XQ-OQ3, the CI options (r5:1104). R6: the options tables Q1 and Q2,
-  R6-HOST-REC1 ("when R1-BND-REC5's option G3 is on"), R6-HOST-F1, R6-HOST-F12. R2, R4: none.
+- **Used today:** R1: R1-BND-REC5 (G3, the isolation flag). R3: R3-MEASURE-OQ4 (the isolation flag, for profiling).
+  R5: R5-LAYOUT-REC5 ("only when an isolation flag is set"), R5-PREV-REC4 (COOP and COEP only on a preview built with
+  the isolation flag on), R5-XQ-OQ3 (settled 2026-10-30; an isolated preview only for profiling). R6: R6-HOST-REC1
+  (COOP and COEP only on previews built with the isolation flag on). R2, R4: none.
 
 ### The production header set and the preview header set
 - **Definition:** the production header set is the set of response headers the player build ships with: `.wasm` as
@@ -551,9 +642,9 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "a preview-only header set" that differs from production in anything but `noindex`
   (R5-PREV-REC4).
-- **Used today:** R5: R5-PREV-REC4, R5-XQ-OQ3, the pointers to R6's baseline (r5:1954). R6: R6-HOST-F7 (Netlify's one
-  set for every context), R6-HOST-REC1. R1: R1-BND-REC5 (what production adds if isolation is adopted). R2, R3, R4:
-  none.
+- **Used today:** R5: R5-PREV-REC4 (the preview header set), R5-XQ-OQ3 (the header set production will ship), the
+  pointers to R6 (REC4's header set waits for the CSP). R6: R6-HOST-F7 (Netlify's one header set for every deploy
+  context), R6-HOST-REC1 (the preview Mustafa checks carries production's header set). R1, R2, R3, R4: none.
 
 ## 6. The deferred security baseline
 
@@ -570,10 +661,12 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "R6's deferred baseline", "the deferred baseline", "R6's security baseline" as different
   names (R2-ROOM-OQ2, R2-ROOM-OQ11, R2-TRN-REC1, R5-TSLINT-OQ5, R5-GATE-OQ4).
 - **Keeps:** one name, the security baseline.
-- **Used today:** R1: the pointers (r1:2961). R2: R2-TRN-REC1 mark 5, R2-SYNC-REC5 ("R6's anti-cheat basics"),
-  R2-ROOM-OQ2, R2-ROOM-OQ11, the pointers to R6 (r2:3310). R5: R5-TSLINT-OQ5, R5-GATE-OQ4, the pointers to R6's
-  baseline (r5:1952). R6: the header, the TL;DR, section 5 (R6-SEC), the certificate options (r6:422), R6-HOST-REC4,
-  R6-HOST-OQ5, R6-SEC-OQ1. R3, R4: none.
+- **Used today:** R1: R1-RR-OQ7 (whether an advisory blocks a PR is left to it), BASELINE-WHEN, the pointers to other
+  topics (security). R2: R2-TRN-REC1 mark 5, R2-TRN-REC5 (whether it accepts one wildcard key), R2-ROOM-OQ2,
+  R2-ROOM-OQ11, BASELINE-WHEN, R2-XT-OQ9 (the deferred security baseline), the pointers to other topics. R5:
+  R5-TSLINT-OQ5, R5-GATE-OQ4, BASELINE-WHEN, PREVIEW-WALL (option (c)), R5-XT-OQ5, the pointers from R5-CI and
+  R5-PREV. R6: the header, the TL;DR, section 5 (R6-SEC), the certificate options (key handling in the deferred
+  security baseline), R6-HOST-REC4, R6-HOST-OQ5, R6-SEC-OQ1, BASELINE-WHEN, PREVIEW-WALL, R6-XT-OQ3. R3, R4: none.
 
 ### The advisories check
 - **Definition:** the CI check that compares the locked Rust dependencies with published security advisories
@@ -586,9 +679,10 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "cargo-audit and cargo-deny as CI gates" as the name of the check (R1-RR-OQ7: the
   reviewer's proposal stays quoted as such), "dependency audits" for the check itself (the phrase stays for the
   baseline's subject).
-- **Used today:** R1: R1-RR-OQ7. R2: R2-TRN-F40, R2-TRN-REC1 mark 5, R2-TRN-OQ5, the transport options (r2:1840).
-  R5: R5-CI-F15, R5-GATE-F3, R5-GATE-F4, R5-LAYOUT-REC2, R5-GATE-REC1 (G5 and the scheduled list), R5-LAYOUT-OQ3,
-  R5-GATE-OQ4, the pointers to R6's baseline. R6: the header, R6-SEC-OQ1. R3, R4: none.
+- **Used today:** R1: R1-RR-OQ7 (R5-GATE-REC1 schedules it), BASELINE-WHEN. R2: R2-TRN-REC1 mark 5 (R5-GATE-REC1
+  already schedules it), BASELINE-WHEN, the pointers to other topics (its policy). R5: R5-GATE-F3, R5-GATE-REC1
+  (scheduled, and run on every PR that changes `Cargo.lock`), BASELINE-WHEN. R6: R6-SEC-OQ1 (R5-GATE-REC1's scheduled
+  advisories check), BASELINE-WHEN. R3, R4: none.
 
 ### Game-server certificate
 - **Definition:** the TLS certificate a production game server presents to browsers. R2-TRN-REC5 asks for "a publicly
@@ -602,8 +696,11 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (exact):** none.
 - **Retire (in context):** "a publicly trusted certificate" for production with no form named (per hostname or
   wildcard).
-- **Used today:** R2: R2-TRN-REC5, R2-TRN-OQ4, the pointers to R6. R6: the TL;DR, R6-HOST-F24, the certificate
-  options (C1–C3), R6-HOST-REC4, R6-HOST-OQ6, R6-SEC-OQ1, the pointers to R2. R1, R3, R4, R5: none.
+- **Used today:** R2: R2-TRN-REC5 (a certificate per game server hostname; R6's wildcard), R2-TRN-OQ4 (the
+  per-hostname or wildcard form waits on BASELINE-WHEN), BASELINE-WHEN. R6: the TL;DR, R6-HOST-F24 (ACME wildcard
+  orders), the certificate options (C1–C3), R6-HOST-REC4 (the wildcard certificate; per-hostname certificates the
+  alternative), R6-HOST-OQ6, R6-SEC-OQ1 (the wildcard certificate's key), BASELINE-WHEN, the pointers to other topics
+  (R2). R1, R3, R4, R5: none.
 
 ## 7. Determinism checks in the sim crate
 
@@ -618,7 +715,7 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
 - **Retire (in context):** "hash maps serve lookups only" as a rule by itself (R1-DET-REC5);
   "zero uses of std HashMap or HashSet iteration in … outcome code" as the check (R1-ECS-REC2 mark 2), since no lint
   can find that.
-- **Used today:** R1: the TL;DR, R1-ECS-F23, R1-DET-F25, R1-DET-F33, R1-ABL-F26, R1-ECS-REC2, R1-DET-REC5,
-  R1-DET-REC6, R1-ABL-REC3, R1-XU-OQ5, the pointers to R5. R4: R4-NAV-F15 (a crate's hasher). R5: the TL;DR,
-  R5-RUSTLINT-F8, F9, R5-RUSTLINT-REC2, R5-TEST-REC2, R5-CI-REC5, R5-GATE-REC3, R5-RUSTLINT-OQ3, R5-RUSTLINT-OQ5, the
-  pointers from R5-CI. R2, R3, R6: none.
+- **Used today:** R1: R1-ECS-REC2 (the sim uses no std HashMap or HashSet; mark 2, R5-RUSTLINT-REC2's type ban),
+  R1-DET-REC5 (the type ban, with a reviewed `#[allow]`). R5: R5-RUSTLINT-F8 (clippy's `disallowed_types`),
+  R5-RUSTLINT-REC2 (the ban itself: `disallowed-types` in the sim crate), R5-RUSTLINT-OQ3 (maps from other crates),
+  R5-RUSTLINT-OQ5 (settled 2026-10-30). R2, R3, R4, R6: none.
