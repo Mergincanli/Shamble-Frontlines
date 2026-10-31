@@ -1474,7 +1474,7 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   Cross-topic open questions: R5-XT-OQ10 (below).
 - **R5-TEST-REC5. Soak and load at 48 and more, with bots as protocol clients.** Bots are headless Rust clients that
   speak the real protocol (inputs in, snapshots out) so a full room needs no browsers; one nightly run per mode at the
-  targets of VISION_V2 §3 (items 1 and 4 of [the test-mode list](GLOSSARY.md#the-test-mode-list): 24v24 = 48 and 12v12v12 = 36, plus the largest mode where it is neither ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); MODES-3: 18v18v18 = 54
+  targets of VISION_V2 §3 (items 1 and 4 of [the test-mode list](GLOSSARY.md#the-test-mode-list): [24v24](GLOSSARY.md#team-size-and-how-modes-are-written) = 48 and [12v12v12](GLOSSARY.md#team-size-and-how-modes-are-written) = 36, plus the largest mode where it is neither ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n); MODES-3: 18v18v18 = 54
   under reading (b)), plus LOOP_V2 §11's N = 12, 24, 36, 48 scale steps) over L1 at
   P2, 30 minutes each (proposed), and one L2 run with 4 real browser clients among the bots. Measured: server tick time p50,
   p99 and max (against the server tick budget, [GLOSSARY](GLOSSARY.md#the-server-tick-budget)), bytes per client per second (against R2-BUD's budget), resident memory slope,
@@ -1917,7 +1917,7 @@ its decision code.
 - **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players, and
   three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
   6v6v6; the largest mode is then the [goal](GLOSSARY.md#the-start-modes-and-the-goal-modes) 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
-  mode is then 18v18v18, N = 54. The answer sets the largest mode's N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which the stress scene, the offline
+  mode is then 18v18v18, N = 54. The answer sets the largest mode's N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n)), which [the stress scene](GLOSSARY.md#the-stress-scene), the offline
   scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the
   test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives both values. Also asked
   as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
@@ -2285,6 +2285,8 @@ into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim, 
     (recommendation).
   - r5:1426 (R5-TEST-REC2's Serves line): "the 48-player scale" of VISION_V2 §3, which names §3's design point and not
     the largest mode, now reads "the design point (48 players)", linked (nit).
+  - r5:1920 (MODES-3): "the stress scene" linked to its glossary entry, as in R6's copy (nit).
+  - r5:1477 (R5-TEST-REC5): the mode names 24v24 and 12v12v12 linked to the glossary's team-size entry (nit).
 
 ## Sources
 
