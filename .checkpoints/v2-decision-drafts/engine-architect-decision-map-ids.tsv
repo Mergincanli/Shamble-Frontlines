@@ -1,0 +1,522 @@
+id	owner	cites	note
+R1-ECS-REC1	0004	0001,0002,SPIKE_PLAN	starting point; its Rapier reasons and mark 5 change with R4-PHYS-REC1 (XT rank 3); marks restated at 30 Hz (TICK-30)
+R1-ECS-REC2	0004	0002	lint side is R5-RUSTLINT-REC2 (0002)
+R1-ECS-REC3	0004	0001,0002,0006	wire widths are XT rank 27 (0001)
+R1-ECS-REC4	0004		conditional on Rapier; R4-PHYS-REC1 recommends parry3d (XT rank 3)
+R1-TICK-REC1	0004	0001,0005	durations converted at load: content side 0005
+R1-TICK-REC2	0001	0004,SPIKE_PLAN	the tick rate rule: changed by TICK-30 (30 Hz baseline, 60 Hz only with >= 25 % headroom); P1/P2 sim marks are 0004, P3 replay 0001
+R1-TICK-REC3	0004	0006	telemetry sampling cadence used by R6-TEL-REC1
+R1-TICK-REC4	0004	0001,0006	the server loop; snapshot sending after the tick is 0001; overrun metrics 0006; "15 ticks" is the 60 Hz form
+R1-TICK-REC5	0004	0001,0002,0003	Worker pacing is the tick mechanism (0004); Worker host 0002; per-frame interpolation 0003; resync 0001. Copy row at r3:771 is a reference
+R1-TICK-REC6	0004	0002,0005	editor reach check uses the sim integrator
+R1-DET-REC1	0004	0001	lockstep rejected; cross-target identity vs E3 is XT rank 7
+R1-DET-REC2	0004	0002	lint enforcement in 0002 (R5-RUSTLINT)
+R1-DET-REC3	0004	0002	changed by R4-PHYS-REC1: parry3d with enhanced-determinism, not Rapier (XT rank 3)
+R1-DET-REC4	0004	0001,0003	weapon spread on an authority-only stream (SEC-SPREAD (a)); presentation RNG is the page's
+R1-DET-REC5	0004	0002	hash-map ban enforced by R5-RUSTLINT-REC2
+R1-DET-REC6	0004	0002,0006	suite tools are R5-TEST-REC2 (0002); server CPU in the matrix (0006)
+R1-DET-REC7	0004		
+R1-BND-REC1	0002	0003,0004	the boundary spike
+R1-BND-REC2	0002	0001,0003,0004	block layout 0002; its remote-entity fields come from 0001 snapshots (XT ranks 4, 16). Copy row at r3:524 is a reference
+R1-BND-REC3	0002	0001	the posting mechanism (C1) is 0002; command fields are 0001 (R2-SYNC-REC2)
+R1-BND-REC4	0002	0001,0005	content-schema types: XT rank 31 (0005)
+R1-BND-REC5	0002	0003,0006	the isolation flag; production headers on the client host (0006)
+R1-BND-REC6	0002	0001,0004	where the connection lives (the Worker) is 0002; what flows over it is 0001
+R1-ABL-REC1	0005	0004	data model 0005; the sim executes the closed set of operations (0004)
+R1-ABL-REC2	0005	0004	the damage pipeline runs in the sim
+R1-ABL-REC3	0004	0005	one time representation with R1-TICK-REC1 (R1-XU-OQ7)
+R1-ABL-REC4	0001	0004,0005	the prediction scope; abilities wait for ABL-PREDICT
+R1-ABL-REC5	0005	0004,0006	ids also key telemetry (R6-TEL-REC1)
+R1-ABL-REC6	0004	0005	a part of the sim step share (1 ms); 0004 owns the share and its parts
+R1-DATA-REC1	0005	0002	
+R1-DATA-REC2	0005	0002,0004	content is the sim crate's only dependency (R5-LAYOUT-REC2)
+R1-DATA-REC3	0005	0002	schema output lives in packages/types (R5-LAYOUT-REC3)
+R1-DATA-REC4	0005	0002	golden migration fixtures in the gate
+R1-DATA-REC5	0005	0001,0002,0004	reload messages travel on the game connection (0001); Vite plugin (0002); swap between ticks (0004)
+R1-DATA-REC6	0005	0001,0006	the content hash at join (XT rank 13, 0001); bundle caching on the client host and the match record (0006)
+R1-DATA-REC7	0005	0001,0006	private-match overrides (0001); listed for the security baseline (0006)
+R1-DATA-REC8	0005	0002	golden fixtures R5-TEST-REC3
+R1-ECS-OQ1	0004	0002	size measured by REC1 mark 5; the Wasm size budget itself is R1-RR-OQ5 (0002)
+R1-ECS-OQ2	0004		settled at the R1 fix step: hand-written clone_from
+R1-ECS-OQ3	0001	0004	prediction scope decides (R2-SYNC-REC3; XT rank 14)
+R1-ECS-OQ4	0004	0001,0006	one room per process (R2-ROOM-REC2); cost per room (0006)
+R1-ECS-OQ5	0004		
+R1-ECS-OQ6	0004		
+R1-ECS-OQ7	0004	0005	roster and ability lists decide (game-designer)
+R1-TICK-OQ1	0001	0004	60 vs 64 Hz; under TICK-30 it matters only if 60 Hz passes its headroom test
+R1-TICK-OQ2	0004	0002	stated once with R1-BND-OQ2 (R1-XU-OQ12)
+R1-TICK-OQ3	0001		shipped tick rates (unread sources)
+R1-TICK-OQ4	0001	0004	sub-tick timestamps: live under TICK-30 (XT rank 12)
+R1-TICK-OQ5	0004	0001	measured by P1-P3 and the netcode proof test
+R1-TICK-OQ6	0003	0001,0004,0006,SPIKE_PLAN	client machines named in 0003 (R3-BUDGET-REC1); the server half answered by R6-HOST-REC2 (0006); Mustafa approves
+R1-TICK-OQ7	DESIGN	0002,0003,0004	Mustafa and the Advisor: offline at the largest mode on the minimum laptop (sets N in P2)
+R1-TICK-OQ8	0001	0004	client tick nudging is time sync (XT rank 12)
+R1-TICK-OQ9	0004	0001	substeps for big vehicles: live under TICK-30
+R1-DET-OQ1	0004		
+R1-DET-OQ2	0004	0002	simd128 stays off until the suite passes
+R1-DET-OQ3	0004		answered by R4-PHYS-REC5 (f32) unless a map exceeds 2 km
+R1-DET-OQ4	0004		
+R1-DET-OQ5	0004		
+R1-DET-OQ6	0001	0004	answered by R2-SYNC-REC3; abilities ride with ABL-PREDICT
+R1-DET-OQ7	0006	0004	answered by R6-HOST-REC2: x86-64 to start; ARM only after the suite covers it
+R1-DET-OQ8	0004		
+R1-DET-OQ9	0001	0004,0006	hash comparison as divergence telemetry is protocol (XT rank 13)
+R1-DET-OQ10	0004		
+R1-DET-OQ11	0004		
+R1-BND-OQ1	DESIGN	0002,0004,0006	Mustafa (VISION_V2). Partly answered by SLICE-ORDER: slice 2 is "played locally" and the game is client + local server from slice 1; offline as a shipped feature stays open
+R1-BND-OQ2	0004	0002	stated once with R1-TICK-OQ2 (R1-XU-OQ12)
+R1-BND-OQ3	0003	0002,0004	minimum laptop named in 0003 (R3-BUDGET-REC1)
+R1-BND-OQ4	0002		
+R1-BND-OQ5	0006	0002	Mustafa with ADR-0006, only if production isolation is adopted (XT rank 38)
+R1-BND-OQ6	0002	0001,0003	block size measured in the boundary spike
+R1-BND-OQ7	0002		
+R1-BND-OQ8	0001	0002	snapshot format decides (XT rank 13)
+R1-BND-OQ9	0002	0006	
+R1-ABL-OQ1	0005		
+R1-ABL-OQ2	0005		
+R1-ABL-OQ3	0005		
+R1-ABL-OQ4	0001	0005	rides with ABL-PREDICT and R2-SYNC-REC3
+R1-ABL-OQ5	0004	0005	determinism of attribute math
+R1-ABL-OQ6	DESIGN	0005	game rules the system must carry but not decide (stacking, regen, seats, marking, active reload numbers)
+R1-ABL-OQ7	0004	0005	under TICK-30 every legacy weapon fits one shot per tick (r1 tuning arithmetic)
+R1-ABL-OQ8	0001	0005	interest decides who sees which tags
+R1-ABL-OQ9	0005		
+R1-ABL-OQ10	0004	0005	sim data layout decides
+R1-DATA-OQ1	0005		
+R1-DATA-OQ2	0005	0002	Wasm size
+R1-DATA-OQ3	0005	0001	Mustafa's call on production mid-match changes
+R1-DATA-OQ4	0005		
+R1-DATA-OQ5	0005		
+R1-DATA-OQ6	0005		
+R1-DATA-OQ7	0005	0004	
+R1-DATA-OQ8	0005	0002	
+R1-DATA-OQ9	0005		
+R1-DATA-OQ10	DESIGN	0001,0005	game-designer and Mustafa: which tunables a private match exposes
+R1-DATA-OQ11	0002	0005	editor build (XT rank 25)
+R1-DATA-OQ12	0005	0004	Mustafa and the Advisor: iteration speed vs REC5 marks 2 and 3
+R1-XU-OQ1	0004	0001,SPIKE_PLAN	settled by GLOSSARY (one stress scene, one server tick budget)
+R1-XU-OQ2	0001	0004	prediction scope (XT rank 14)
+R1-XU-OQ3	0002	0003,0004	B2 against B3 (R1-BND-REC2 mark 5)
+R1-XU-OQ4	0002	0004	W3 needs shared memory and so isolation (0002's call)
+R1-XU-OQ5	0004		settled: per instance
+R1-XU-OQ6	0004		settled: tier "other"
+R1-XU-OQ7	0004	0001,0005	one representation, one mark
+R1-XU-OQ8	0005	0002	XT rank 31
+R1-XU-OQ9	0005		
+R1-XU-OQ10	0005	0004	what a reload may change; R1-TICK-REC1 makes the tick a build-time constant
+R1-XU-OQ11	0004	0001	
+R1-XU-OQ12	0004	0002,0003	hidden tabs here; reference hardware is R1-TICK-OQ6 (0003); offline play is R1-BND-OQ1 (DESIGN)
+R1-RR-OQ1	0004	0002,0006	build flags (no +fma) and ARM hosts
+R1-RR-OQ2	0005	0001,0006	length rules on collections; bounded queues on the network side
+R1-RR-OQ3	0004	0001,0002,0005	worker restart (XT rank 28); panic strategy 0002; loaders return errors 0005
+R1-RR-OQ4	0002	0004	build profiles; R5-RUSTLINT-REC4
+R1-RR-OQ5	0002	0003,0004	the Wasm size budget: set from the spike's measured size (no research number)
+R1-RR-OQ6	0002	0004	the block writer; the state hash already reads fields
+R1-RR-OQ7	0006	0002	security baseline (BASELINE-WHEN (b)); mechanism R5-GATE-REC1
+ABL-PREDICT	0001	0004,0005,SPIKE_PLAN	open: Mustafa after a Feel Lab test (Molotov, Shield); 0001 lists it (prediction scope), 0005 carries both answers; copies: r1-simulation-core.md:2967, r2-netcode.md:3277
+SEC-SPREAD	0001	0003,0004	answered (a): spread on an authority-only stream; tracers use a cosmetic spread the hit corrects; copies: r1-simulation-core.md:2979, r2-netcode.md:3289
+MODES-3	0001	0002,0003,0004,0005,0006,SPIKE_PLAN	answered (a): totals; largest mode 24v24, N = 48; copies: r1-simulation-core.md:2987, r2-netcode.md:3297, r3-rendering.md:1411, r4-physics-navigation.md:1153, r5-toolchain-quality.md:1918, r6-infrastructure.md:949
+BASELINE-WHEN	0006	0001,0002,0005	answered (b): 0006 lists the security baseline open with interim positions; researched before the first online playtest; copies: r1-simulation-core.md:2997, r2-netcode.md:3307, r5-toolchain-quality.md:1927, r6-infrastructure.md:958
+R1-XT-OQ1	0001	0002,0003,0004	critic rank 2: cursor ray for the aim point and how it crosses the boundary
+R1-XT-OQ2	0004	0002	critic rank 3: R1 items that still assume Rapier
+R1-XT-OQ3	0001	0002,0003	critic rank 4: where the remote-entity interpolation buffer lives
+R1-XT-OQ4	0001	0004	critic rank 7: E3 projectile encoding vs cross-target identity
+R1-XT-OQ5	0001	0004	critic rank 12: R1 timing questions (sub-tick stamps, tick nudging, shipped rates)
+R1-XT-OQ6	0001	0004,0005,0006	critic rank 13: R1 protocol questions (hash comparison, snapshot layout, mid-match tuning, content hash at join)
+R1-XT-OQ7	0001	0004	critic rank 14: is whole-world replay still a spike mark
+R1-XT-OQ8	DESIGN	0002,0004,0006	critic rank 15: offline-play need behind browser navigation and server-less previews (Mustafa and the Advisor)
+R1-XT-OQ9	0001	0002,0003	critic rank 16: remote soldiers' animation state in snapshot and block
+R1-XT-OQ10	0002	0005	critic rank 25: editor by double-click with a Wasm validator (Mustafa if EDITOR_V2 §5 must change)
+R1-XT-OQ11	0001	0004	critic rank 27: wire entity ids and tick width vs generational ids and a 20-minute match
+R1-XT-OQ12	0004	0001,0002	critic rank 28: recovery from a trap in the client's Wasm sim
+R1-XT-OQ13	0005	0002	critic rank 31: where content's TypeScript types come from
+R1-XT-OQ14	0003	0004	critic rank 35: audio occlusion rays, only if O-B
+R1-XT-OQ15	0002	0003,0004	critic rank 36: bench method for R1's budget marks
+R1-XT-OQ16	0003	0002	critic rank 37: OffscreenCanvas, or a per-entity or per-field block layout
+R1-XT-OQ17	0006	0002	critic rank 38: R1-BND-OQ5 embeds and login flow under isolation (only if production isolation)
+R1-XT-OQ18	0002	0004	critic rank 40: R5 cache question sizes a workspace no topic proposes
+R2-SYNC-REC1	0001	0004	
+R2-SYNC-REC2	0001	0002	command fields here; the page-to-worker posting is R1-BND-REC3 (0002)
+R2-SYNC-REC3	0001	0004,0005	ABL-PREDICT open; SEC-SPREAD (a) applied
+R2-SYNC-REC4	0001	0002,0003	where the buffer lives: XT rank 4
+R2-SYNC-REC5	0001	0004	rewind cap: R2-XU-OQ1
+R2-SYNC-REC6	0001	0004	the shared trajectory function runs in the sim crate (XT rank 7)
+R2-SYNC-REC7	0001	0004	
+R2-SYNC-REC8	0001	0002,0003,0004	XT rank 2; R4-LOS-REC3
+R2-SYNC-REC9	0001	0004	
+R2-BUD-REC1	0001	0004	snapshot 30 Hz; the tick half is replaced by TICK-30
+R2-BUD-REC2	0001	0004	E3 depends on XT rank 7
+R2-BUD-REC3	0001		
+R2-BUD-REC4	0001		
+R2-BUD-REC5	0001		
+R2-BUD-REC6	0001	0004,0006	server tick budget and server-only share; its reason at r2:2402-2403 is carry-forward 2
+R2-INT-REC1	0001	0003	camera parameters as data
+R2-INT-REC2	0001	0004,0005	areas and portals from map data (R4-FLOORS-REC2)
+R2-INT-REC3	0001	0004	the pass runs inside the sim step share (0004 owns the number)
+R2-INT-REC4	0001		
+R2-INT-REC5	0001	0005	visibility classes held as data
+R2-INT-REC6	0001	0003	
+R2-INT-REC7	0001		conditional on R2-XU-OQ17 (spectators)
+R2-TRN-REC1	0001	0006	version floors wait on the security baseline
+R2-TRN-REC2	0001		
+R2-TRN-REC3	0001	0006	firewall TCP range
+R2-TRN-REC4	0001	0002	thin transport interface; a local backend for the client + local server skeleton is an interface item
+R2-TRN-REC5	0006	0001	certificates (seam: machines and certificates are 0006); carry-forward 4
+R2-TRN-REC6	0001		
+R2-ROOM-REC1	0001	0006	records written at Ended
+R2-ROOM-REC2	0001	0004,0006	the room process; the VMs and the supervisor are 0006
+R2-ROOM-REC3	0001	0006	key storage is a security-baseline item
+R2-ROOM-REC4	0001		
+R2-ROOM-REC5	0001		
+R2-ROOM-REC6	0001	0004	bot AI is 0004
+R2-ROOM-REC7	0001	0005	mode file format and validation are content data (0005)
+R2-ROOM-REC8	0001	0006	guest store hosting (R2-ROOM-OQ9)
+R2-SYNC-OQ1	0001		
+R2-SYNC-OQ2	0001		
+R2-SYNC-OQ3	0001		
+R2-SYNC-OQ4	0001		
+R2-SYNC-OQ5	0001	0004	body-blocking is DESIGN (XT rank 30); the spike measures the rest
+R2-SYNC-OQ6	0001		
+R2-SYNC-OQ7	DESIGN	0001,0004,0005	VISION_V2 §6.4 [OPEN]: seats per vehicle (Mustafa)
+R2-SYNC-OQ8	0001	0004	
+R2-SYNC-OQ9	0001	0005	design call plus the REC5 spike extended to melee
+R2-SYNC-OQ10	0001	0005	ABL-PREDICT
+R2-SYNC-OQ11	0001	0003,0004	answered: SEC-SPREAD (a), server-only spread
+R2-SYNC-OQ12	0001		
+R2-SYNC-OQ13	0004	0001	bot reaction tuning
+R2-SYNC-OQ14	0001		
+R2-SYNC-OQ15	0001		
+R2-BUD-OQ1	0001		
+R2-BUD-OQ2	0001		
+R2-BUD-OQ3	0001		
+R2-BUD-OQ4	0001	0004	map size, LOOP_V2 §9 [OPEN]
+R2-BUD-OQ5	DESIGN	0001,0004,SPIKE_PLAN	game-designer's caps on vehicles and projectiles; until then the stress scene's counts
+R2-BUD-OQ6	0001		answered: MODES-3 (a)
+R2-BUD-OQ7	0001		
+R2-BUD-OQ8	0001	0004	XT rank 7
+R2-BUD-OQ9	0001		
+R2-BUD-OQ10	0001		
+R2-BUD-OQ11	0001	0006	
+R2-INT-OQ1	DESIGN	0001,0003,0004	what a player may see: LOOK_V2 does not settle it (Mustafa with the game-designer)
+R2-INT-OQ2	DESIGN	0001,0003	camera framing: LOOK_V2 does not set it
+R2-INT-OQ3	DESIGN	0001	team-private economy state (LOOP_V2 owner)
+R2-INT-OQ4	DESIGN	0001,0003	what the minimap shows
+R2-INT-OQ5	0001	0004	
+R2-INT-OQ6	0001	0003	game design plus a reader-client test
+R2-INT-OQ7	0001		
+R2-INT-OQ8	DESIGN	0001,0005	Spy rules, LOOP_V2 §5 [OPEN]
+R2-TRN-OQ1	0001		
+R2-TRN-OQ2	0001		
+R2-TRN-OQ3	0001		
+R2-TRN-OQ4	0006	0001	BASELINE-WHEN (b): per hostname holds
+R2-TRN-OQ5	0001		
+R2-TRN-OQ6	0001		
+R2-TRN-OQ7	0001	0006	connection telemetry
+R2-TRN-OQ8	0001		
+R2-TRN-OQ9	0001		
+R2-ROOM-OQ1	0001	0006	
+R2-ROOM-OQ2	0001	0006	security-auditor review; key storage under the security baseline
+R2-ROOM-OQ3	DESIGN	0001	game rule
+R2-ROOM-OQ4	DESIGN	0001	game rule
+R2-ROOM-OQ5	DESIGN	0001,0005	Mustafa: what a private host may set
+R2-ROOM-OQ6	DESIGN	0001	game rule
+R2-ROOM-OQ7	DESIGN	0001,0006	also R6-TEL-OQ2
+R2-ROOM-OQ8	0001		
+R2-ROOM-OQ9	0006	0001,0002	XT rank 8
+R2-ROOM-OQ10	0001		
+R2-ROOM-OQ11	0006	0001	the CSP is the security baseline's
+R2-XU-OQ1	0001		
+R2-XU-OQ2	0001		
+R2-XU-OQ3	0001		
+R2-XU-OQ4	0001		
+R2-XU-OQ5	0001		
+R2-XU-OQ6	0001		
+R2-XU-OQ7	0001	0004	
+R2-XU-OQ8	0001	0004	settled by GLOSSARY
+R2-XU-OQ9	0006	0001	answered by R6-HOST-REC2 (CCX23)
+R2-XU-OQ10	0001		
+R2-XU-OQ11	0001		
+R2-XU-OQ12	0001	0002	named profiles; the simulator is R5-TEST-REC4 (0002)
+R2-XU-OQ13	0001		answered: MODES-3 (a)
+R2-XU-OQ14	0005	0001,0004	one top speed per unit type is unit data
+R2-XU-OQ15	0001		
+R2-XU-OQ16	0001		
+R2-XU-OQ17	DESIGN	0001	Mustafa: whether rooms have spectators or casters
+R2-XU-OQ18	0001	0002,0003,0004,0005,0006	trace rule for §3/§4-only recs: the Advisor; applies to every draft
+R2-XT-OQ1	0001	0002,0003,0004	critic rank 2: cursor ray for the aim point and how it crosses the boundary
+R2-XT-OQ2	0001	0002,0003	critic rank 4: where the remote-entity interpolation buffer lives
+R2-XT-OQ3	0001	0004	critic rank 7: E3 projectile encoding vs cross-target identity
+R2-XT-OQ4	0006	0001,0002	critic rank 8: who hosts, costs and builds the lobby and the room supervisor
+R2-XT-OQ5	0001	0004	critic rank 12: R1 timing questions (sub-tick stamps, tick nudging, shipped rates)
+R2-XT-OQ6	0001	0004,0005,0006	critic rank 13: R1 protocol questions (hash comparison, snapshot layout, mid-match tuning, content hash at join)
+R2-XT-OQ7	0001	0004	critic rank 14: is whole-world replay still a spike mark
+R2-XT-OQ8	0001	0002,0003	critic rank 16: remote soldiers' animation state in snapshot and block
+R2-XT-OQ9	0006	0001,0002	critic rank 18: recommendations waiting on the security baseline (BASELINE-WHEN (b))
+R2-XT-OQ10	0002	0001,0006	critic rank 20: multiplayer previews' server binary and certificate hash
+R2-XT-OQ11	0001	0004	critic rank 27: wire entity ids and tick width vs generational ids and a 20-minute match
+R2-XT-OQ12	0004	0001,0002	critic rank 28: recovery from a trap in the client's Wasm sim
+R2-XT-OQ13	DESIGN	0001,0004	critic rank 30: do soldiers block each other (game-designer with Mustafa)
+R2-XT-OQ14	0001	0002	critic rank 32: every R2 mark names an R5 network profile
+R2-XT-OQ15	0003	0001	critic rank 39: does the client's cutaway (roof fade) follow the server's visibility rule
+R3-WGPU-REC1	0003		
+R3-WGPU-REC2	0003		
+R3-WGPU-REC3	0003		
+R3-WGPU-REC4	0003	0002	secure context; test screenshots print the backend
+R3-GL2-REC1	0003		
+R3-GL2-REC2	0003		
+R3-GL2-REC3	0003		
+R3-LOOK-REC1	0003	SPIKE_PLAN	the look proof test; LOOK_V2 now exists, so the table serves the [DECIDED] items
+R3-LOOK-REC2	0003		
+R3-LOOK-REC3	0003	SPIKE_PLAN	LOOK_V2 keeps outlines (§2 ink, §6.2 line weight)
+R3-CHAR-REC1	0003	0005	per-unit budgets in the asset pipeline
+R3-CHAR-REC2	0003		
+R3-CHAR-REC3	0003	0002	reads the output block
+R3-CHAR-REC4	0003	0004,0005	parts from the sim's vehicle-part records
+R3-BUDGET-REC1	0003	0001,0002,0004,SPIKE_PLAN	names the client reference machines every client mark uses
+R3-BUDGET-REC2	0003	0002,0004,0005	frame budgets; per-unit asset budgets derive from it (0005)
+R3-BUDGET-REC3	0003	0005	quality tiers are data
+R3-MEASURE-REC1	0003		
+R3-MEASURE-REC2	0003	0002,0004	benchmark scene replays a recorded match (R1-DET)
+R3-MEASURE-REC3	0003	0002	CI gates only hardware-independent numbers
+R3-MEASURE-REC4	0003		
+R3-AUDIO-REC1	0003		
+R3-AUDIO-REC2	0003		
+R3-AUDIO-REC3	0003	0004	XT rank 35
+R3-AUDIO-REC4	0003	0002	event section of the output block
+R3-WGPU-OQ1	0003		Brave check on Mustafa's machine during the look proof test
+R3-WGPU-OQ2	0003		
+R3-WGPU-OQ3	0003		
+R3-WGPU-OQ4	0003		LOOK_V2 decides vibrant colour, not the output transform
+R3-WGPU-OQ5	0003		
+R3-GL2-OQ1	0003		
+R3-GL2-OQ2	0003	0006	client telemetry after launch
+R3-GL2-OQ3	0003		
+R3-GL2-OQ4	0003		
+R3-GL2-OQ5	0003		Mustafa, with OQ2's share
+R3-LOOK-OQ1	0003		
+R3-LOOK-OQ2	0003	0005	LOOK_V2 §6.2: thick outer, thin inner; the unit (world or pixel) stays open
+R3-LOOK-OQ3	0003		
+R3-LOOK-OQ4	0003		
+R3-LOOK-OQ5	0003		
+R3-LOOK-OQ6	0003		
+R3-CHAR-OQ1	0003		
+R3-CHAR-OQ2	0003		
+R3-CHAR-OQ3	0005	0003	the character model is authored content (LOOK_V2 §3, §8)
+R3-CHAR-OQ4	0003		
+R3-CHAR-OQ5	DESIGN	0001,0003	camera framing (same as R2-INT-OQ2)
+R3-CHAR-OQ6	0003		
+R3-BUDGET-OQ1	0003		Mustafa and the Advisor pick the models
+R3-BUDGET-OQ2	0003		
+R3-BUDGET-OQ3	0003		
+R3-BUDGET-OQ4	0003		answered: MODES-3 (a), N = 48
+R3-BUDGET-OQ5	0003		
+R3-BUDGET-OQ6	0003		
+R3-MEASURE-OQ1	0003		
+R3-MEASURE-OQ2	0006	0002,0003	cost and security of self-hosted runners (XT rank 33)
+R3-MEASURE-OQ3	0003		
+R3-MEASURE-OQ4	0002	0003	the isolation flag (R1-BND-REC5)
+R3-AUDIO-OQ1	0003		
+R3-AUDIO-OQ2	0003		
+R3-AUDIO-OQ3	0003		
+R3-AUDIO-OQ4	0003		
+R3-AUDIO-OQ5	0003	0004	XT rank 35
+R3-AUDIO-OQ6	0003		
+R3-XT-OQ1	0001	0002,0003	critic rank 4: where the remote-entity interpolation buffer lives
+R3-XT-OQ2	0001	0002,0003	critic rank 16: remote soldiers' animation state in snapshot and block
+R3-XT-OQ3	0002	0005	critic rank 25: editor by double-click with a Wasm validator (Mustafa if EDITOR_V2 §5 must change)
+R3-XT-OQ4	0003	0006	critic rank 26: who creates the client's field data
+R3-XT-OQ5	0006	0002,0003	critic rank 33: CI runner costs (GPU, macOS, reference machines, cache); Mustafa for any paid plan
+R3-XT-OQ6	0003	0004	critic rank 35: audio occlusion rays, only if O-B
+R3-XT-OQ7	0003	0002	critic rank 37: OffscreenCanvas, or a per-entity or per-field block layout
+R3-XT-OQ8	0003	0001	critic rank 39: does the client's cutaway (roof fade) follow the server's visibility rule
+R4-PHYS-REC1	0004	0002	supersedes R1's Rapier items (XT rank 3); crate list in 0002
+R4-PHYS-REC2	0004	0005	static world from the map document
+R4-PHYS-REC3	0004		
+R4-PHYS-REC4	0004	0001,0003	
+R4-PHYS-REC5	0004		
+R4-NAV-REC1	0004	0002,0005	bake tool and map document (XT rank 24)
+R4-NAV-REC2	0004		
+R4-NAV-REC3	0004		
+R4-NAV-REC4	0004	0002	Worker build without navigation when no bots
+R4-FLOORS-REC1	0004	0005	editor links
+R4-FLOORS-REC2	0004	0001,0003,0005	floors and ceilings feed enclosures (0001), roof fade (0003), map data (0005)
+R4-FLOORS-REC3	0004	0005	movement data is content
+R4-LOS-REC1	0004	0001,0003	the shared pass serves interest (0001); audio occlusion O-B (0003)
+R4-LOS-REC2	0004		
+R4-LOS-REC3	0004	0001,0002,0003	XT rank 2
+R4-OBST-REC1	0004		
+R4-OBST-REC2	0004	0001,0003,0005	baked states carry LOOK_V2 §4 damage stages only in part (two states)
+R4-OBST-REC3	0004	0005	
+R4-PHYS-OQ1	DESIGN	0001,0004	who blocks whom (XT rank 30)
+R4-PHYS-OQ2	0004		
+R4-PHYS-OQ3	0004		
+R4-PHYS-OQ4	0004		
+R4-PHYS-OQ5	0004		Mustafa, only if a §6 item asks for dynamics
+R4-NAV-OQ1	0004		
+R4-NAV-OQ2	0004		
+R4-NAV-OQ3	0004		
+R4-NAV-OQ4	0004		
+R4-NAV-OQ5	DESIGN	0001,0004	XT rank 30
+R4-FLOORS-OQ1	DESIGN	0004	game design: stances
+R4-FLOORS-OQ2	DESIGN	0004	game design: vehicle-driving bots, Juggernaut on ramps
+R4-FLOORS-OQ3	DESIGN	0004,0005	game design: fall damage
+R4-FLOORS-OQ4	0005	0004	what a reload may change (R1-DATA-OQ7)
+R4-LOS-OQ1	DESIGN	0001,0004	Mustafa with the game-designer
+R4-LOS-OQ2	DESIGN	0001,0004	same as R2-INT-OQ1
+R4-LOS-OQ3	DESIGN	0004	bot field of view
+R4-LOS-OQ4	DESIGN	0004	fractional blockers are design; yes/no by data flag
+R4-LOS-OQ5	0004		
+R4-OBST-OQ1	DESIGN	0001,0004	XT rank 30
+R4-OBST-OQ2	DESIGN	0004	harvester lanes, LOOP_V2 §3
+R4-OBST-OQ3	DESIGN	0004	only if Mustafa adds building to VISION_V2 §6
+R4-OBST-OQ4	0004		
+R4-XT-OQ1	0001	0002,0003,0004	critic rank 2: cursor ray for the aim point and how it crosses the boundary
+R4-XT-OQ2	0004	0002	critic rank 3: R1 items that still assume Rapier
+R4-XT-OQ3	0001	0004	critic rank 14: is whole-world replay still a spike mark
+R4-XT-OQ4	DESIGN	0002,0004,0006	critic rank 15: offline-play need behind browser navigation and server-less previews (Mustafa and the Advisor)
+R4-XT-OQ5	0002	0004	critic rank 24: navigation bake and R4 checks in the crates and the gate
+R4-XT-OQ6	DESIGN	0001,0004	critic rank 30: do soldiers block each other (game-designer with Mustafa)
+R4-XT-OQ7	0003	0004	critic rank 35: audio occlusion rays, only if O-B
+R4-XT-OQ8	0002	0004	critic rank 40: R5 cache question sizes a workspace no topic proposes
+R5-LAYOUT-REC1	0002		
+R5-LAYOUT-REC2	0002	0001,0004,0005	crate and package list, dependency rules
+R5-LAYOUT-REC3	0002	0005	
+R5-LAYOUT-REC4	0002	0004	
+R5-LAYOUT-REC5	0002		
+R5-LAYOUT-REC6	0002		
+R5-TSLINT-REC1	0002		
+R5-TSLINT-REC2	0002		
+R5-TSLINT-REC3	0002		
+R5-TSLINT-REC4	0002		
+R5-RUSTLINT-REC1	0002		
+R5-RUSTLINT-REC2	0002	0004	the hash-map ban; determinism rules are 0004
+R5-RUSTLINT-REC3	0002	0001,0005	decoders and the content loader
+R5-RUSTLINT-REC4	0002	0004	
+R5-RUSTLINT-REC5	0002		
+R5-RUSTLINT-REC6	0002		
+R5-TEST-REC1	0002		
+R5-TEST-REC2	0002	0004	tools for R1-DET-REC6
+R5-TEST-REC3	0002	0004,0005	
+R5-TEST-REC4	0002	0001	profiles are 0001's (XT rank 32)
+R5-TEST-REC5	0002	0001,SPIKE_PLAN	the load layer the netcode proof test uses
+R5-TEST-REC6	0002		
+R5-CI-REC1	0002		
+R5-CI-REC2	0002		
+R5-CI-REC3	0002		
+R5-CI-REC4	0002		
+R5-CI-REC5	0002		
+R5-PREV-REC1	0002	0006	the preview build and deploy job (0002); the host and its token scope (0006)
+R5-PREV-REC2	0006	0002	the client host (R6-HOST-REC1)
+R5-PREV-REC3	0006	0002	cleanup policy and PREV-DELETE; the close and sweep jobs are workflows (0002 cites)
+R5-PREV-REC4	0002	0006	the build generates the preview header set; the CSP waits on the security baseline
+R5-PREV-REC5	0006	0002	answered: PREVIEW-WALL (a)
+R5-GATE-REC1	0002		
+R5-GATE-REC2	0002		
+R5-GATE-REC3	0002		
+R5-GATE-REC4	0002	0001,0003,0004	every budget lives as data in the repository
+R5-LAYOUT-OQ1	0002		
+R5-LAYOUT-OQ2	0002		
+R5-LAYOUT-OQ3	0002		
+R5-LAYOUT-OQ4	0002		
+R5-LAYOUT-OQ5	0002		
+R5-TSLINT-OQ1	0002		
+R5-TSLINT-OQ2	0002		
+R5-TSLINT-OQ3	0002		
+R5-TSLINT-OQ4	0002		
+R5-TSLINT-OQ5	0006	0002	security baseline (security-auditor)
+R5-TSLINT-OQ6	0002		
+R5-RUSTLINT-OQ1	0002	0004	
+R5-RUSTLINT-OQ2	0002		
+R5-RUSTLINT-OQ3	0002	0004	
+R5-RUSTLINT-OQ4	0002	0004	
+R5-RUSTLINT-OQ5	0002	0004	settled by resolution 29 (GLOSSARY §7)
+R5-TEST-OQ1	0002		
+R5-TEST-OQ2	0002		
+R5-TEST-OQ3	0002		
+R5-TEST-OQ4	0002	0006	macOS runner cost
+R5-TEST-OQ5	0002		
+R5-TEST-OQ6	0002		
+R5-TEST-OQ7	0002		
+R5-TEST-OQ8	0002	0004	bench tool (XT rank 36)
+R5-CI-OQ1	0002		
+R5-CI-OQ2	0002		
+R5-CI-OQ3	0002		
+R5-CI-OQ4	0002		
+R5-CI-OQ5	0002	0003,0006	
+R5-CI-OQ6	0002		
+R5-CI-OQ7	0002	0004,0006	
+R5-PREV-OQ1	0006		answered: PREVIEW-WALL (a)
+R5-PREV-OQ2	0006	SPIKE_PLAN	PREV-DELETE
+R5-PREV-OQ3	0006	0001,0002	staging game server
+R5-PREV-OQ4	0006		answered by R6-HOST-REC1
+R5-PREV-OQ5	0002		
+R5-PREV-OQ6	0002	0006	REC4's header check on a real preview
+R5-GATE-OQ1	0002		
+R5-GATE-OQ2	0002	0003	
+R5-GATE-OQ3	0002		
+R5-GATE-OQ4	0006	0002	security baseline; interim: scheduled and on lockfile changes
+R5-GATE-OQ5	0002		
+R5-XQ-OQ1	0002		
+R5-XQ-OQ2	0002		
+R5-XQ-OQ3	0002	0006	settled 2026-10-30: the isolation flag
+PREV-DELETE	0006	0002,SPIKE_PLAN	a spike: does a closed PR's preview disappear on Cloudflare Pages; may send the host back to Workers; copies: r5-toolchain-quality.md:1939, r6-infrastructure.md:970
+PREVIEW-WALL	0006	0002	answered (a): previews that reach the staging game server are behind the access wall from the first one; copies: r5-toolchain-quality.md:1946, r6-infrastructure.md:977
+R5-XT-OQ1	0004	0002	critic rank 3: R1 items that still assume Rapier
+R5-XT-OQ2	0001	0002,0003	critic rank 4: where the remote-entity interpolation buffer lives
+R5-XT-OQ3	0006	0001,0002	critic rank 8: who hosts, costs and builds the lobby and the room supervisor
+R5-XT-OQ4	DESIGN	0002,0004,0006	critic rank 15: offline-play need behind browser navigation and server-less previews (Mustafa and the Advisor)
+R5-XT-OQ5	0006	0001,0002	critic rank 18: recommendations waiting on the security baseline (BASELINE-WHEN (b))
+R5-XT-OQ6	0002	0001,0006	critic rank 20: multiplayer previews' server binary and certificate hash
+R5-XT-OQ7	0002	0004	critic rank 24: navigation bake and R4 checks in the crates and the gate
+R5-XT-OQ8	0002	0005	critic rank 25: editor by double-click with a Wasm validator (Mustafa if EDITOR_V2 §5 must change)
+R5-XT-OQ9	0005	0002	critic rank 31: where content's TypeScript types come from
+R5-XT-OQ10	0001	0002	critic rank 32: every R2 mark names an R5 network profile
+R5-XT-OQ11	0006	0002,0003	critic rank 33: CI runner costs (GPU, macOS, reference machines, cache); Mustafa for any paid plan
+R5-XT-OQ12	0002	0006	critic rank 34: Sentry upload job and the smoke test's network rule
+R5-XT-OQ13	0002	0003,0004	critic rank 36: bench method for R1's budget marks
+R5-XT-OQ14	0002	0004	critic rank 40: R5 cache question sizes a workspace no topic proposes
+R6-HOST-REC1	0006	0002	the client host; 25 MiB per-asset limit
+R6-HOST-REC2	0006	0001,0002,0004	names the reference server every server mark uses
+R6-HOST-REC3	0006	0001,0002	staging game server; PREVIEW-WALL (a)
+R6-HOST-REC4	0006	0001	certificate per hostname (carry-forward 4)
+R6-COST-REC1	0006	0001	rooms per VM measured by R2-ROOM-REC2 mark 2
+R6-COST-REC2	0006	0001	
+R6-OBS-REC1	0006	0001	
+R6-OBS-REC2	0006	0001,0004	metrics R1-TICK-REC4 and R2-BUD-REC6 ask for
+R6-OBS-REC3	0006	0002,0004	Sentry upload job (XT rank 34); Wasm trap
+R6-OBS-REC4	0006		
+R6-TEL-REC1	0006	0001,0004,0005	the record shape; the sim emits events and moments (0004), the room writes at Ended (0001), ids and content hash (0005)
+R6-TEL-REC2	0006		
+R6-TEL-REC3	0006	0004	
+R6-HOST-OQ1	0006		
+R6-HOST-OQ2	0006		
+R6-HOST-OQ3	0006		
+R6-HOST-OQ4	0006		
+R6-HOST-OQ5	0006		answered: PREVIEW-WALL (a)
+R6-HOST-OQ6	0006		only if the security baseline weighs the wildcard
+R6-HOST-OQ7	0006		
+R6-COST-OQ1	0006	0001	
+R6-COST-OQ2	0006		
+R6-COST-OQ3	0006		
+R6-COST-OQ4	0006		
+R6-COST-OQ5	0006		
+R6-OBS-OQ1	0006		
+R6-OBS-OQ2	0006		
+R6-OBS-OQ3	0006		
+R6-OBS-OQ4	0006		
+R6-OBS-OQ5	0003	0006	R3 owns how client performance is measured (XT rank 26)
+R6-TEL-OQ1	0006		test-engineer and game-designer
+R6-TEL-OQ2	DESIGN	0006	Mustafa: whether bot and private matches count in rates
+R6-TEL-OQ3	DESIGN	0004,0005,0006	Mustafa and the game-designer: moment rules and thresholds
+R6-TEL-OQ4	0006		Mustafa after the data-protection read
+R6-TEL-OQ5	0006		
+R6-SEC-OQ1	0006	0001,0002,0005	BASELINE-WHEN (b): open with interim positions
+R6-XT-OQ1	0006	0001,0002	critic rank 8: who hosts, costs and builds the lobby and the room supervisor
+R6-XT-OQ2	DESIGN	0002,0004,0006	critic rank 15: offline-play need behind browser navigation and server-less previews (Mustafa and the Advisor)
+R6-XT-OQ3	0006	0001,0002	critic rank 18: recommendations waiting on the security baseline (BASELINE-WHEN (b))
+R6-XT-OQ4	0002	0001,0006	critic rank 20: multiplayer previews' server binary and certificate hash
+R6-XT-OQ5	0003	0006	critic rank 26: who creates the client's field data
+R6-XT-OQ6	0004	0001,0002	critic rank 28: recovery from a trap in the client's Wasm sim
+R6-XT-OQ7	0006	0002,0003	critic rank 33: CI runner costs (GPU, macOS, reference machines, cache); Mustafa for any paid plan
+R6-XT-OQ8	0002	0006	critic rank 34: Sentry upload job and the smoke test's network rule
+R6-XT-OQ9	0006	0002	critic rank 38: R1-BND-OQ5 embeds and login flow under isolation (only if production isolation)

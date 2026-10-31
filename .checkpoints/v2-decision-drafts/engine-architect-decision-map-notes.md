@@ -38,3 +38,11 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
   room writes record (0001), storage/analysis (0006). Costs: COST-REC1 start ~18 EUR/mo lean to ~102 EUR + 5 USD ref,
   goal ~240-360 EUR + ~20 USD + Sentry paid (r6:703-705); 3.16 GB per room-hour (R2 estimate); spike bill < 5 EUR.
   Next: LEGACY_INVENTORY headers, shared OQs; then write map parts a..h.
+- 8 All six topics read; ownership rules decided (encoded in scratchpad script assign.py, to be written next):
+  defaults by prefix (R1-ECS/TICK/DET 0004, R1-BND 0002, R1-ABL/DATA 0005, R2 0001, R3 0003, R4 0004, R5 0002, R6 0006)
+  plus overrides: TICK-REC2/OQ1/OQ3/OQ4/OQ8 0001; TICK-OQ6 0003; TICK-OQ7 DESIGN; ABL-REC3/REC6/OQ5/OQ7/OQ10 0004;
+  ABL-REC4/OQ4/OQ8 0001; BND-OQ1 DESIGN; BND-OQ2 0004; BND-OQ3 0003; BND-OQ5 0006; BND-OQ8 0001; DET-OQ6/OQ9 0001;
+  DET-OQ7 0006; TRN-REC5/TRN-OQ4/ROOM-OQ9/ROOM-OQ11/XU-OQ9 0006; XU-OQ14 0005; R5-PREV REC2/REC3/REC5/OQ1-4 0006;
+  R5-GATE-OQ4, R5-TSLINT-OQ5 0006 (security baseline); R3-MEASURE-OQ2 0006; R3-MEASURE-OQ4 0002; R3-CHAR-OQ3 0005;
+  R6-OBS-OQ5 0003; XT by critic rank, "ADR-0004 (boundary)" remapped to 0002 per plan. SHARED: ABL-PREDICT, SEC-SPREAD,
+  MODES-3 -> 0001; BASELINE-WHEN, PREV-DELETE, PREVIEW-WALL -> 0006.

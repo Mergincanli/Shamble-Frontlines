@@ -262,8 +262,6 @@ R2-XT-OQ12	XT	r2-netcode.md	3395	Who owns recovery from a trap in the client's W
 R2-XT-OQ13	XT	r2-netcode.md	3399	Do soldiers block each other? (one rule, asked twice)
 R2-XT-OQ14	XT	r2-netcode.md	3404	Do R2's marks all name one of R5's network profiles?
 R2-XT-OQ15	XT	r2-netcode.md	3409	Does the client's cutaway follow the server's visibility rule?
-R1-BND-REC2	REC	r3-rendering.md	524	
-R1-TICK-REC5	REC	r3-rendering.md	771	/ R1-BND-REC2
 R3-WGPU-REC1	REC	r3-rendering.md	902	Option A: one WebGPURenderer, every material and post effect in TSL, the WebGL 2 backend a
 R3-WGPU-REC2	REC	r3-rendering.md	917	Pin one exact three.js release (r186 today, or the newest at the spike's start) and step o
 R3-WGPU-REC3	REC	r3-rendering.md	928	Build every render pipeline behind the loading screen: `await renderer.init()`, then `comp
