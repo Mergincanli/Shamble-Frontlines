@@ -7,14 +7,14 @@
 This record decides how the game's rules run. There is one Rust simulation: the same code runs natively on the match
 server and as WebAssembly in the browser's Web Worker. Its state is plain typed tables in one struct (no ECS crate),
 every entity has one id, and time is a whole number of ticks of one constant. Runs are reproducible: the same seed, data
-and inputs give the same [state hash](../research/GLOSSARY.md#state-hash) after every tick on every run of a build, and the same hash on Wasm and native is a
-target that a test checks on every change. Physics is collision queries plus our own kinematic movement (parry3d, no
-physics engine); bot navigation is baked into the map document and queried by the sim; one height-aware sight query
-serves bots, blasts, melee and the aim point. The record also says where the player's upgrade tracks live (a player
-record apart from the soldier), how dropped weapons exist in the world, and which random stream draws upgrade offers.
-It decides no game rule. Why: VISION_V2 §6 asks for a true 3D world, data-driven abilities, [big vehicles](../research/GLOSSARY.md#big-vehicle-and-very-large-unit), a server-side
-economy, telemetry and moments, and SLICE-ORDER asks that movement and shooting be input-driven and replayable from day
-one.
+and inputs give the same [state hash](../research/GLOSSARY.md#state-hash) after every tick on every run of a build, and
+the same hash on Wasm and native is a target that a test checks on every change. Physics is collision queries plus our
+own kinematic movement (parry3d, no physics engine); bot navigation is baked into the map document and queried by the
+sim; one height-aware sight query serves bots, blasts, melee and the aim point. The record also says where the player's
+upgrade tracks live (a player record apart from the soldier), how dropped weapons exist in the world, and which random
+stream draws upgrade offers. It decides no game rule. Why: VISION_V2 §6 asks for a true 3D world, data-driven abilities,
+[big vehicles](../research/GLOSSARY.md#big-vehicle-and-very-large-unit), a server-side economy, telemetry and moments,
+and SLICE-ORDER asks that movement and shooting be input-driven and replayable from day one.
 
 ## Context
 
@@ -378,8 +378,8 @@ research ids, and the need it serves.
     floors, debris as the ruin's walkable surfaces), sight flags, ceilings (a collapsed roof stops being a ceiling) and
     portals, each structure's stages baked over its own nodes only, never as combinations across structures. The
     research bakes two states and a ruin's shape (R4-OBST-REC2), so the third stage is an extension the sim core spike
-    must prove (no research finding covers it). What moves a building from one stage to the next is a game rule for Mustafa
-    (OQ-0004-4); the stages and their assets are content (ADR 0005); drawing them is ADR 0003's. Roofs that fade
+    must prove (no research finding covers it). What moves a building from one stage to the next is a game rule for
+    Mustafa (OQ-0004-4); the stages and their assets are content (ADR 0005); drawing them is ADR 0003's. Roofs that fade
     (LOOK_V2 §4 `[DEFAULT]`) are drawn by ADR 0003; the sim's part is what the camera needs: the local player's floor
     layer and enclosure area id, written into the output block (ADR 0002's layout). What a player may see inside a
     building is a design question (R2-INT-OQ1), and whether the cutaway follows the server's visibility rule is ADR
@@ -395,10 +395,10 @@ research ids, and the need it serves.
     0001's). Their behaviour is a sim phase at its own cadences (part 4) that reads the shared sight pass, the navigation
     queries and the game state, and writes commands. The behaviour set is LOOP_V2 §10's (fights across three teams,
     buying T1 units, escorting and hunting harvesters, carrying, defending and stealing uplinks, a simple per-team role
-    mix); no research covers a bot AI architecture, so its structure is OQ-0004-1. Bots act on the
-    present while humans see about 100 ms of the past (R2-SYNC-OQ13): bot reaction is tuning data the game-designer
-    sets, starting from legacy's 0.25 s scan cadence (GN4), and the sim core spike reports bot reaction times at N = 48.
-    A field of view for bots is a design question (R4-LOS-OQ3).
+    mix); no research covers a bot AI architecture, so its structure is OQ-0004-1. Bots act on the present while humans
+    see about 100 ms of the past (R2-SYNC-OQ13): bot reaction is tuning data the game-designer sets, starting from
+    legacy's 0.25 s scan cadence (GN4), and the sim core spike reports bot reaction times at N = 48. A field of view for
+    bots is a design question (R4-LOS-OQ3).
     - Why: one simulation for humans and bots keeps the slot model simple and the bots fair under the same rules.
     - Ids: R2-SYNC-OQ13 (r2-netcode.md, lines 2952–2954); cites R2-ROOM-REC6 (lines 2842–2856).
     - Need: VISION_V2 §3 ("Bots fill empty slots") and §6.2 (bots between levels); LOOP_V2 §10.
@@ -463,9 +463,9 @@ research ids, and the need it serves.
     (its loader returns errors and is fuzzed with zero panics); inside the sim, values a client or content can set never
     reach an `unwrap`, an unchecked index or a `clamp` with unchecked bounds (`f32::clamp` panics on bad bounds,
     R1-DET-F14). On the server a panic stops that room's match (each room is its own process, R2-ROOM-REC2); in the
-    browser `-Cpanic=abort` ends the sim's instance. Online, after a trap, the Worker's host starts a fresh instance and rejoins through ADR 0001's resync path,
-    and the trap is reported (R6-OBS-REC3, ADR 0006); the panic strategy is ADR 0002's. In local play the trapped
-    instance was the authority; recovery there is not researched (OQ-0004-7).
+    browser `-Cpanic=abort` ends the sim's instance. Online, after a trap, the Worker's host starts a fresh instance and
+    rejoins through ADR 0001's resync path, and the trap is reported (R6-OBS-REC3, ADR 0006); the panic strategy is ADR
+    0002's. In local play the trapped instance was the authority; recovery there is not researched (OQ-0004-7).
     - Why: a panic on the server is a denial of service for a whole room, and in the browser it ends the match for that
       player.
     - Ids: R1-RR-OQ3, R1-XT-OQ12, R2-XT-OQ12, R6-XT-OQ6 (r1-simulation-core.md, lines 2936–2940, 3084–3087;
@@ -692,8 +692,8 @@ restart).
   nothing and leaks nothing. The strongest argument against would be a later wish to show offers before the server
   confirms them; that would be a prediction-scope change (ADR 0001), with this stream's kind revisited then.
 - **A player record apart from the soldier.** Settled by UPGRADE-SCOPE; the engineering point is that the record is
-  bounded by content, allocated at match start and reset in one phase, so it adds nothing to the sim step time and no client-sized
-  allocation.
+  bounded by content, allocated at match start and reset in one phase, so it adds nothing to the sim step time and no
+  client-sized allocation.
 - **Rate-independent mechanism under a 30 Hz baseline.** Cadences in seconds and durations in sub-tick units mean that
   unlocking 60 Hz under the 60 Hz margin is a rebuild plus a re-bake (links are measured at the shipped tick), not a
   redesign.
@@ -800,11 +800,12 @@ restart).
   - Research ids: R1-RR-OQ3, partly (r1-simulation-core.md, lines 2936–2940).
 
 Design questions this record cites and does not own (in `docs/adr/README.md`'s register): who blocks whom (R4-PHYS-OQ1,
-R4-NAV-OQ5, R4-OBST-OQ1, R2-XT-OQ13, R4-XT-OQ6; R2-SYNC-OQ5's measurement is ADR 0001's); what a player may see (R2-INT-OQ1, R4-LOS-OQ2); soldiers
-and vehicles as blockers of sight and shots, a bot field of view, partial blockers (R4-LOS-OQ1, OQ3, OQ4); stances,
-vehicle-driving bots and fall damage (R4-FLOORS-OQ1–OQ3); harvester lanes (R4-OBST-OQ2); player building
-(R4-OBST-OQ3); offline play at the largest mode (R1-TICK-OQ7, R1-BND-OQ1, critic rank 15); moment rules and thresholds
-(R6-TEL-OQ3); the caps on vehicles and projectiles that replace the stress scene's counts (R2-BUD-OQ5).
+R4-NAV-OQ5, R4-OBST-OQ1, R2-XT-OQ13, R4-XT-OQ6; R2-SYNC-OQ5's measurement is ADR 0001's); what a player may see
+(R2-INT-OQ1, R4-LOS-OQ2); soldiers and vehicles as blockers of sight and shots, a bot field of view, partial blockers
+(R4-LOS-OQ1, OQ3, OQ4); stances, vehicle-driving bots and fall damage (R4-FLOORS-OQ1–OQ3); harvester lanes
+(R4-OBST-OQ2); player building (R4-OBST-OQ3); offline play at the largest mode (R1-TICK-OQ7, R1-BND-OQ1, critic rank
+15); moment rules and thresholds (R6-TEL-OQ3); the caps on vehicles and projectiles that replace the stress scene's
+counts (R2-BUD-OQ5).
 
 ## What a spike must prove
 

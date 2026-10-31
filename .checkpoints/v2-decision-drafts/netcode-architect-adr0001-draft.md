@@ -1065,3 +1065,136 @@ in the foundation).
   smoothing are data, so a first retry needs no code change; otherwise back to the drafts with the numbers.
 - **After acceptance:** the protocol carries its version in `protocols` and in `Join`, so a message change is a
   version bump; the frozen legacy game stays the playable build until v2 replaces it.
+
+## Appendix A: research dispositions
+One row per id the decision map gives this record (127).
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-TICK-REC2 | changed: TICK-30 replaces its rule (r1-simulation-core.md:2029, 2061–2062); 30 Hz is the baseline, 60 Hz only with the 60 Hz margin; P1–P3 stay marks at 30 Hz and, for the margin run, at 60 Hz; P1 and P2 are ADR 0004's, P3 this record's | parts 2, 4; budgets table |
+| R1-ABL-REC4 | adopted: the player's own weapon state is predicted, damage never; its ability half waits for ABL-PREDICT | part 4; OQ-0001-4 |
+| R1-ECS-OQ3 | answered: only the local soldier and the vehicle it drives are replayed, no whole-world replay | part 4 |
+| R1-TICK-OQ1 | spike: only if the 60 Hz margin passes; then ADR 0004's determinism suite and ADR 0002's Worker smoothness test decide | part 2 |
+| R1-TICK-OQ3 | answered: TICK-30 sets the rate; the shipped rates stay unread and no decision here rests on them | part 2 |
+| R1-TICK-OQ4 | open: OQ-0001-7 | part 5 |
+| R1-TICK-OQ8 | open: OQ-0001-6 | part 5 |
+| R1-DET-OQ6 | answered: own movement, own weapon state, own vehicle and cosmetic shot feedback; abilities per ABL-PREDICT | part 4 |
+| R1-DET-OQ9 | answered: no state hash is exchanged with clients; the Worker counts prediction mismatches and correction sizes; the test hash function is ADR 0004's | part 6 (Divergence) |
+| R1-BND-OQ8 | answered: no; the wire format is per client and delta-coded, and the Worker writes ADR 0002's block from its own state | part 6 (Not the block) |
+| R1-ABL-OQ4 | open: OQ-0001-4 (rides with ABL-PREDICT; the replay from the authoritative state is the model for everything predicted) | parts 4, OQ-0001-4 |
+| R1-ABL-OQ8 | answered: tags carry a visibility class; marking makes an enemy team-relevant; the Spy's disguise ([LATER]) would be public with its truth in team and owner fields | part 9 (e) |
+| R1-XU-OQ2 | answered: local replay only, 200 ms of game time within 1 ms p99 | part 4 |
+| ABL-PREDICT | open: OQ-0001-4 (interim: ability presses wait for the server) | part 4 |
+| SEC-SPREAD | answered: (a) applied: spread in an authority-only stream, cosmetic tracers corrected by the hit | part 4 |
+| MODES-3 | answered: (a) applied: N = 48 in every mark | parts 2, 3; budgets table |
+| R1-XT-OQ1 | answered: the Worker casts the cursor ray against the state it published and the command carries a world aim point; how the page's ray crosses is ADR 0002's | part 5 |
+| R1-XT-OQ3 | answered: the interpolation buffer lives in the Worker | part 7 |
+| R1-XT-OQ4 | answered: E3; correctness never rests on cross-target identity, since landings are server events; E3b if the proof test counts a desync | part 6 |
+| R1-XT-OQ5 | answered: command stamping, the input buffer and the clock from own pings; tick nudging and sub-tick stamps stay open | part 5; OQ-0001-6, OQ-0001-7 |
+| R1-XT-OQ6 | answered: `Join` and `JoinAccepted` carry the content hash, the snapshot is not the block, divergence is counted not hashed, a development reload message only if ADR 0005 keeps it | part 6; message catalogue |
+| R1-XT-OQ7 | answered: no whole-world replay; ADR 0004 may drop R1-ECS-REC1 mark 3 | part 4 |
+| R1-XT-OQ9 | answered: remote soldiers carry stance flags, weapon id and aim, and action starts as cosmetic events | part 6 |
+| R1-XT-OQ11 | answered: records name kind and index, the generation on entry; the header carries a 32-bit tick, other ticks are 16-bit offsets | part 6 (Wire widths) |
+| R2-SYNC-REC1 | adopted | part 6 |
+| R2-SYNC-REC2 | adopted | part 5 |
+| R2-SYNC-REC3 | adopted, with SEC-SPREAD (a); abilities per ABL-PREDICT | part 4 |
+| R2-SYNC-REC4 | changed: the buffer lives in the Worker (R2-XT-OQ2), and its 2–5 interval bound and marks are the one bound and mark R2-XU-OQ3 asks for | part 7 |
+| R2-SYNC-REC5 | adopted; the cap value stays open | part 8; OQ-0001-5 |
+| R2-SYNC-REC6 | adopted (E3, with E3b as the fallback) | parts 6, 7 |
+| R2-SYNC-REC7 | adopted | parts 4, 6 |
+| R2-SYNC-REC8 | adopted; the Worker casts the ray | part 5 |
+| R2-SYNC-REC9 | adopted | parts 3, 14 |
+| R2-BUD-REC1 | changed: the snapshot half (30 Hz) stands; the tick half is replaced by TICK-30; inputs repeat every unacknowledged command up to the cap (R2-SYNC-REC2) instead of 3; marks restated at 30 Hz and against P2 and P3 | parts 2, 5; budgets table |
+| R2-BUD-REC2 | adopted; the hard cap proposed at 256 kbps | part 6; budgets table |
+| R2-BUD-REC3 | adopted, with one cap rule (R2-XU-OQ5) | part 6 |
+| R2-BUD-REC4 | changed: the interpolation bound follows R2-SYNC-REC4 (R2-XU-OQ3); the rewind cap is OQ-0001-5 and the history keeps the cap plus a margin, not 1 s (R2-XU-OQ7); the input buffer and the clock are adopted; need: VISION_V2 §4 only | parts 5, 7, 8 |
+| R2-BUD-REC5 | adopted; need: VISION_V2 §4 only | part 10 |
+| R2-BUD-REC6 | changed: restated at 30 Hz, its reason corrected (r2-netcode.md:2402–2403, carry-forward 2), its "the rule does not change" replaced by TICK-30 | parts 2, 3; budgets table |
+| R2-INT-REC1 | adopted | part 9 (a) |
+| R2-INT-REC2 | adopted | part 9 (b) |
+| R2-INT-REC3 | adopted: the pass serves the bots and hides by sight only if R2-INT-OQ1's rule asks; its 5 % is part of ADR 0004's sim step share | part 9 (c) |
+| R2-INT-REC4 | adopted | part 9 (d) |
+| R2-INT-REC5 | adopted | part 9 (e); message catalogue |
+| R2-INT-REC6 | adopted | part 9 (f) |
+| R2-INT-REC7 | changed: not built; a spectator profile is added only if Mustafa wants spectators (R2-XU-OQ17); no VISION_V2 §6 item names them | part 9 |
+| R2-TRN-REC1 | adopted; its load mark restated at 30 Hz (30 input datagrams per second per session) | part 10; budgets table |
+| R2-TRN-REC2 | adopted, with one cap rule | parts 6, 10 |
+| R2-TRN-REC3 | adopted; tokio-tungstenite picked, since the room serves no HTTP | part 10 |
+| R2-TRN-REC4 | changed: a third, loopback backend for the local server (SLICE-ORDER condition 1) | part 10 |
+| R2-TRN-REC6 | adopted; need: VISION_V2 §4 only | part 10 |
+| R2-ROOM-REC1 | adopted; the fresh sim per match also resets the player records (UPGRADE-SCOPE) | part 11 |
+| R2-ROOM-REC2 | adopted | part 11 |
+| R2-ROOM-REC3 | adopted, with R2-ROOM-OQ2's signature scheme | part 11 |
+| R2-ROOM-REC4 | adopted | part 11 |
+| R2-ROOM-REC5 | adopted; code length and access stay open | part 11; OQ-0001-11 |
+| R2-ROOM-REC6 | adopted | part 11 |
+| R2-ROOM-REC7 | adopted; the file format and validation are ADR 0005's | part 11 |
+| R2-ROOM-REC8 | adopted; where the secret finally lives is R2-ROOM-OQ11 (ADR 0006) | part 11 |
+| R2-SYNC-OQ1 | answered: TICK-30 and part 2 (30 Hz tick and snapshots); the marks are restated at 30 Hz | parts 2, 6–8 |
+| R2-SYNC-OQ2 | open: OQ-0001-5 | part 8 |
+| R2-SYNC-OQ3 | open: OQ-0001-6 | part 5 |
+| R2-SYNC-OQ4 | answered: independent entity-group datagrams, deltas against one baseline, acknowledged per group | part 6 |
+| R2-SYNC-OQ5 | spike: the netcode proof test measures corrections next to movers (R2-SYNC-REC7 mark 3); the collision rule itself is a design question (R2-XT-OQ13) | What a spike must prove |
+| R2-SYNC-OQ6 | open: OQ-0001-8 | part 6 |
+| R2-SYNC-OQ8 | open: OQ-0001-9 | part 8 |
+| R2-SYNC-OQ9 | open: OQ-0001-9 | part 8 |
+| R2-SYNC-OQ10 | open: OQ-0001-4 | part 4 |
+| R2-SYNC-OQ11 | answered: SEC-SPREAD (a) | part 4 |
+| R2-SYNC-OQ12 | spike: the netcode proof test (linear first; Hermite only on artefacts) | part 7 |
+| R2-SYNC-OQ14 | answered: no recommendation rests on the unread Valve pages; the victim's side is OQ-0001-5 | part 8 |
+| R2-SYNC-OQ15 | open: OQ-0001-5 | part 8 |
+| R2-BUD-OQ1 | answered: TICK-30 sets the rate; the unread shipped rates decide nothing here | part 2 |
+| R2-BUD-OQ2 | answered: no recommendation rests on the unread Source defaults | part 7 |
+| R2-BUD-OQ3 | spike: the netcode proof test records each browser's `maxDatagramSize` | part 6 |
+| R2-BUD-OQ4 | answered: the protocol holds ±327.68 m and 0–40.95 m at 1 cm; a larger map adds a bit or uses 2 cm once LOOP_V2 §9's map size [OPEN] is set | part 6 |
+| R2-BUD-OQ6 | answered: MODES-3 (a) | Context |
+| R2-BUD-OQ7 | spike: the netcode proof test (the same question as R2-SYNC-OQ12) | part 7 |
+| R2-BUD-OQ8 | answered: E3, E3b if the proof test counts a desync | part 6 |
+| R2-BUD-OQ9 | spike: the netcode proof test measures encoding per client | budgets table |
+| R2-BUD-OQ10 | spike: the netcode proof test (R2-TRN-REC6's marks) | What a spike must prove |
+| R2-BUD-OQ11 | open: OQ-0001-13 | Open questions |
+| R2-INT-OQ5 | spike: only if R2-INT-OQ1's rule asks for sight hiding; the pass's settings and cost are measured in ADR 0004's sim core spike (its 5 % is ADR 0004's number) | part 9 (c) |
+| R2-INT-OQ6 | open: OQ-0001-12 | part 9 (f) |
+| R2-INT-OQ7 | answered: the hysteresis and margin values are data, set from R2-INT-REC1 marks (a) and (b) when interest management is built in slice 3 | part 9 (a); Migration plan, step 5 |
+| R2-TRN-OQ1 | spike: the netcode proof test logs each browser's negotiated draft; then ADR 0002's recurring beta-channel run | What a spike must prove |
+| R2-TRN-OQ2 | spike: the netcode proof test with UDP blocked | What a spike must prove |
+| R2-TRN-OQ3 | spike: the netcode proof test (R2-TRN-REC2 mark 1) | part 6 |
+| R2-TRN-OQ5 | spike: the netcode proof test picks the crate | part 10 |
+| R2-TRN-OQ6 | answered: qmux is not adopted; it is re-assessed only if the thin interface needs more than one ordered channel over WebSocket | part 10; Options Q17 |
+| R2-TRN-OQ7 | open: OQ-0001-13 | Open questions |
+| R2-TRN-OQ8 | spike: the netcode proof test, measured on the client side | What a spike must prove |
+| R2-TRN-OQ9 | answered: no transport decision needs the unread page | Sources |
+| R2-ROOM-OQ1 | spike: the netcode proof test (R2-ROOM-REC2's marks) | part 11 |
+| R2-ROOM-OQ2 | answered: the security review's scheme (asymmetric signature, one pinned algorithm, token type, key id, signature before the cache, a bounded cache), accepted with this record; key storage waits on the security baseline (ADR 0006) | part 11 |
+| R2-ROOM-OQ8 | open: OQ-0001-13 | Open questions |
+| R2-ROOM-OQ10 | open: OQ-0001-11 | part 11 |
+| R2-XU-OQ1 | open: OQ-0001-5 | part 8 |
+| R2-XU-OQ2 | spike: the netcode proof test measures how far behind the server's present the client's view is when its command arrives | part 8 |
+| R2-XU-OQ3 | answered: 2 to 5 intervals, starting at 3, with R2-SYNC-REC4's marks | part 7 |
+| R2-XU-OQ4 | answered: every unacknowledged command up to a cap of 8 (data) within 48 kbps; the real size is measured by the proof test | part 5; bandwidth estimate |
+| R2-XU-OQ5 | answered: min(the smallest measured `maxDatagramSize`, 1,150 B), 1,000 B in the load until measured | part 6 |
+| R2-XU-OQ6 | answered: the first full state over a reliable stream, deltas after its acknowledgement; one join mark, a complete world within 300 ms at P2 | part 6; What a spike must prove |
+| R2-XU-OQ7 | answered: the history keeps the cap plus a margin, at most 1 MB; the load is sized at 700 shots per second | part 8 |
+| R2-XU-OQ8 | answered: settled by the glossary (one server tick budget, two 25 % shares), restated at 30 Hz | part 3 |
+| R2-XU-OQ10 | answered: own pings and acknowledgements; browser counters only where `getStats()` exists | parts 5, 10 |
+| R2-XU-OQ11 | answered: one guard per direction: `outgoingMaxAge` on client inputs, the non-waiting `send_datagram` on the server | part 10 |
+| R2-XU-OQ12 | answered: one named set, P0–P4 and B1 | part 13 |
+| R2-XU-OQ13 | answered: MODES-3 (a) | Context |
+| R2-XU-OQ15 | spike: the netcode proof test measures the record sizes | bandwidth estimate |
+| R2-XU-OQ16 | answered: Fiedler's articles are cited as practitioner articles, behind specifications and shipped-game code (the README's order); the one rule here resting on them, three intervals of interpolation, is measured by the proof test | part 7 |
+| R2-XU-OQ18 | answered: the drafts' trace reading (a VISION_V2 §3 or §4 target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in docs/adr/README.md): R2-BUD-REC4, R2-BUD-REC5, R2-TRN-REC6; R2-BUD-REC3 traces to §6.1; R2-INT-REC7 is not built | parts 7, 10 |
+| R2-XT-OQ1 | answered (= R1-XT-OQ1) | part 5 |
+| R2-XT-OQ2 | answered (= R1-XT-OQ3) | part 7 |
+| R2-XT-OQ3 | answered (= R1-XT-OQ4) | part 6 |
+| R2-XT-OQ5 | answered (= R1-XT-OQ5); its open parts are OQ-0001-6 and OQ-0001-7 | part 5 |
+| R2-XT-OQ6 | answered (= R1-XT-OQ6) | part 6; message catalogue |
+| R2-XT-OQ7 | answered (= R1-XT-OQ7) | part 4 |
+| R2-XT-OQ8 | answered (= R1-XT-OQ9) | part 6 |
+| R2-XT-OQ11 | answered (= R1-XT-OQ11) | part 6 |
+| R2-XT-OQ14 | answered: every R2 mark restated against a named profile | part 13 |
+| R3-XT-OQ1 | answered (= R1-XT-OQ3) | part 7 |
+| R3-XT-OQ2 | answered (= R1-XT-OQ9) | part 6 |
+| R4-XT-OQ1 | answered (= R1-XT-OQ1) | part 5 |
+| R4-XT-OQ3 | answered (= R1-XT-OQ7) | part 4 |
+| R5-XT-OQ2 | answered (= R1-XT-OQ3) | part 7 |
+| R5-XT-OQ10 | answered (= R2-XT-OQ14) | part 13 |

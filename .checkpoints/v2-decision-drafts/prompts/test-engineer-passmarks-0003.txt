@@ -1,0 +1,62 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: test-engineer · effort: xhigh · model: opus · 2026-10-31, launched about 22:56 Amsterdam
+
+You write the pass marks of ADR 0003 of the v2 decision drafts of SHAMBLE FRONTLINES (plan step 4): the measurable marks
+its spike must meet before Mustafa accepts it. You edit no file outside /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/: your outputs are notes files there.
+
+## Read first
+1. The draft: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0003-draft.md (its "Decision" parts and its "What a spike must prove"; the decision is the drafter's, not yours).
+2. The plan, revision 3: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/plan.md, above all "Settled inputs" (with TICK-60-HEADROOM: the 60 Hz margin), "Rules every
+   author follows" (rules 2, 5, 7, 10 and 12 bind you most) and steps 4, 6 and 10.
+3. The decision map's part g (the spike candidates) and part j (J1: the 60 Hz margin; J6: TICK-60-SETUP and the reading
+   of "100 ms of simulated latency"): /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-decision-map.md.
+4. docs/research/GLOSSARY.md: §1 (time statistics: a time mark with no statistic is a p99; p99s do not add), §2 (N, the
+   test-mode list), §3 (the stress scene), §8 in the map's part J1 (the foundation, the netcode proof test, the 60 Hz
+   margin); docs/research/r5-toolchain-quality.md (R5-TEST, R5-GATE: the test layers, the gate v2, how a check is proven
+   to bite); the research the draft's spike claims cite.
+5. The draft's claims ledgers: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0003-claims.md.
+
+## Write
+1. /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-passmarks-0003.md, with two parts:
+   - `### Pass marks` (the whole subsection, replacing the draft's placeholder line, which the session swaps verbatim):
+     a table `| mark | what it proves (decision part) | number and statistic | hardware | method and tool | runs and
+     noise | basis |`, one row per mark, ids `PM-0003-1`, `PM-0003-2` …; then, under it, the pass/fail rule (what
+     happens when one mark fails: it goes back to the draft); then, where a person judges (rule 12: the netcode proof
+     test's "looks correct", the whole look proof test, any feel check), a numbered Brave checklist for Mustafa, each
+     step with its expected result, beside the measurable marks (for the netcode proof test: the share of client-shown
+     hits the server confirms, correction sizes and prediction error at 100 ms simulated latency with stated jitter and
+     loss).
+   - `### Spike entries (for docs/SPIKE_PLAN.md)`: for each spike this draft's marks belong to (names from the map's
+     part g): what it proves · its marks (by PM id) · its dependencies · a rough size (S: about a day; M: 2–4 days; L: a
+     week or more of session work) · the research spikes it subsumes (ids).
+2. /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-passmarks-0003-claims.md: a claims ledger for your rows, in the plan's ledger shape (rule 9): every
+   number with its citation and tier.
+
+## Rules for every mark
+- Every number comes from the research (cited: file, id, lines at 9e7db28), is arithmetic on research numbers (shown),
+  is a settled input (STATUS code or GLOSSARY §8), or is marked "proposed" with its reason. A mark with no statistic is
+  a p99; name the statistic anyway.
+- Hardware named precisely: server marks on one vCPU of the reference server (GLOSSARY: the reference server, the
+  measuring unit); client marks on the minimum laptop and the recommended desktop (R3-BUDGET-REC1's proposal, the
+  naming open where the research leaves it open); Mustafa's own machine in Brave on Windows for what he judges. Never a
+  headless frame rate as a hardware result.
+- Method precise enough to repeat: the scene (the stress scene, GLOSSARY §3, where the mark is a budget), N = 48
+  (MODES-3 (a)), the duration and warm-up, the tool, the statistic, the run count, and how noise is judged.
+- TICK-30: marks at 30 Hz are the baseline; a 60 Hz mark appears only as the 60 Hz margin's test, as the plan's
+  TICK-60-HEADROOM paragraph rules it; the margin is measured in one run, never summed from parts.
+- Network marks name their profile (R2's P0–P4 and B1; the 100 ms reading per the map's J6).
+- Decide nothing the draft does not decide; where a decision part has no measurable mark, say so in one line.
+- No web fetching (everything is in the repository). Plain words; decimals with periods.
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-passmarks-0003-notes.md (make the folder; you may always write there). Look there first: if the first
+line names another task, move the file into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/old/ and start fresh; if the notes end with DONE, write your answer
+from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each unit you
+finish (a decision part's marks, the checklist, the spike entries), add a line or two: what is done, what you found and
+where, what comes next. Write each finished part into its file as soon as it is done. End with DONE, then give your
+answer. Never commit or push.
+
+## Return
+At most 20 lines: the number of marks, the spikes they belong to, the marks you had to mark "proposed" (and why), any
+decision part with no measurable mark, anything in the draft's spike claims you think is unprovable as written, and
+your files' paths.

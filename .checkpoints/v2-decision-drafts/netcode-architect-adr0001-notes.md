@@ -32,3 +32,4 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - 16. Trade-off analysis and Consequences written. Next: Open questions (13).
 - 17. Open questions OQ-0001-1..13 written. Next: What a spike must prove, Migration, Test plan, Rollback.
 - 18. What a spike must prove, Pass marks placeholder, Migration plan, Test plan, Rollback written. Next: Appendix A (127 rows), Sources.
+- 19. Appendix A written (127 rows: adopted 30, changed 7, answered 57, open 17, spike 16; script appA.py in scratchpad). Next: Sources, then claims ledger.
