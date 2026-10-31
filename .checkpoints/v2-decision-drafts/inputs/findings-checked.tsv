@@ -1,0 +1,651 @@
+finding	file	line	checked	verdicts
+R1-ECS-F1	r1-simulation-core.md	84	yes	confirmed
+R1-ECS-F2	r1-simulation-core.md	90	yes	confirmed
+R1-ECS-F3	r1-simulation-core.md	93	yes	confirmed
+R1-ECS-F4	r1-simulation-core.md	98	yes	confirmed
+R1-ECS-F5	r1-simulation-core.md	102	yes	confirmed
+R1-ECS-F6	r1-simulation-core.md	106	yes	confirmed
+R1-ECS-F7	r1-simulation-core.md	112	yes	confirmed
+R1-ECS-F8	r1-simulation-core.md	118	yes	confirmed
+R1-ECS-F9	r1-simulation-core.md	121	yes	confirmed
+R1-ECS-F10	r1-simulation-core.md	128	yes	confirmed
+R1-ECS-F11	r1-simulation-core.md	137	yes	confirmed
+R1-ECS-F12	r1-simulation-core.md	141	yes	confirmed
+R1-ECS-F13	r1-simulation-core.md	145	yes	confirmed
+R1-ECS-F14	r1-simulation-core.md	149	yes	confirmed
+R1-ECS-F15	r1-simulation-core.md	153	yes	confirmed
+R1-ECS-F16	r1-simulation-core.md	161	yes	confirmed
+R1-ECS-F17	r1-simulation-core.md	168	yes	confirmed
+R1-ECS-F18	r1-simulation-core.md	174	yes	confirmed
+R1-ECS-F19	r1-simulation-core.md	177	yes	confirmed
+R1-ECS-F20	r1-simulation-core.md	182	yes	confirmed
+R1-ECS-F21	r1-simulation-core.md	190	yes	confirmed
+R1-ECS-F22	r1-simulation-core.md	195	yes	confirmed
+R1-ECS-F23	r1-simulation-core.md	201	yes	confirmed
+R1-ECS-F24	r1-simulation-core.md	205	yes	confirmed
+R1-ECS-F25	r1-simulation-core.md	209	yes	confirmed
+R1-ECS-F26	r1-simulation-core.md	212	yes	confirmed
+R1-ECS-F27	r1-simulation-core.md	218	yes	confirmed
+R1-ECS-F28	r1-simulation-core.md	223	yes	confirmed
+R1-ECS-F29	r1-simulation-core.md	233	yes	confirmed
+R1-ECS-F30	r1-simulation-core.md	239	yes	confirmed
+R1-ECS-F31	r1-simulation-core.md	245	yes	confirmed
+R1-ECS-F32	r1-simulation-core.md	251	yes	confirmed
+R1-ECS-F33	r1-simulation-core.md	259	yes	confirmed
+R1-ECS-F34	r1-simulation-core.md	267	yes	unsupported
+R1-ECS-F35	r1-simulation-core.md	274	yes	confirmed
+R1-TICK-F1	r1-simulation-core.md	341	yes	confirmed
+R1-TICK-F2	r1-simulation-core.md	347	yes	confirmed
+R1-TICK-F3	r1-simulation-core.md	352	yes	confirmed
+R1-TICK-F4	r1-simulation-core.md	360	yes	confirmed
+R1-TICK-F5	r1-simulation-core.md	367	yes	confirmed
+R1-TICK-F6	r1-simulation-core.md	372	yes	confirmed
+R1-TICK-F7	r1-simulation-core.md	380	yes	confirmed
+R1-TICK-F8	r1-simulation-core.md	389	yes	confirmed
+R1-TICK-F9	r1-simulation-core.md	396	yes	confirmed
+R1-TICK-F10	r1-simulation-core.md	401	yes	confirmed
+R1-TICK-F11	r1-simulation-core.md	408	yes	confirmed
+R1-TICK-F12	r1-simulation-core.md	414	yes	confirmed
+R1-TICK-F13	r1-simulation-core.md	426	yes	confirmed
+R1-TICK-F14	r1-simulation-core.md	435	yes	confirmed
+R1-TICK-F15	r1-simulation-core.md	442	yes	confirmed
+R1-TICK-F16	r1-simulation-core.md	451	yes	confirmed
+R1-TICK-F17	r1-simulation-core.md	459	yes	confirmed
+R1-TICK-F18	r1-simulation-core.md	468	yes	confirmed
+R1-TICK-F19	r1-simulation-core.md	481	no	
+R1-TICK-F20	r1-simulation-core.md	487	yes	confirmed
+R1-TICK-F21	r1-simulation-core.md	494	yes	confirmed
+R1-TICK-F22	r1-simulation-core.md	499	yes	confirmed
+R1-TICK-F23	r1-simulation-core.md	507	yes	confirmed
+R1-TICK-F24	r1-simulation-core.md	517	yes	confirmed
+R1-TICK-F25	r1-simulation-core.md	527	no	
+R1-TICK-F26	r1-simulation-core.md	533	yes	confirmed
+R1-DET-F1	r1-simulation-core.md	598	yes	confirmed
+R1-DET-F2	r1-simulation-core.md	603	yes	confirmed
+R1-DET-F3	r1-simulation-core.md	608	yes	confirmed
+R1-DET-F4	r1-simulation-core.md	617	yes	confirmed
+R1-DET-F5	r1-simulation-core.md	624	yes	confirmed
+R1-DET-F6	r1-simulation-core.md	630	yes	confirmed
+R1-DET-F7	r1-simulation-core.md	640	yes	confirmed
+R1-DET-F8	r1-simulation-core.md	644	yes	confirmed
+R1-DET-F9	r1-simulation-core.md	648	yes	confirmed
+R1-DET-F10	r1-simulation-core.md	655	yes	confirmed
+R1-DET-F11	r1-simulation-core.md	661	yes	confirmed
+R1-DET-F12	r1-simulation-core.md	670	yes	confirmed
+R1-DET-F13	r1-simulation-core.md	676	yes	confirmed
+R1-DET-F14	r1-simulation-core.md	679	yes	confirmed
+R1-DET-F15	r1-simulation-core.md	684	yes	confirmed
+R1-DET-F16	r1-simulation-core.md	693	yes	confirmed
+R1-DET-F17	r1-simulation-core.md	701	yes	confirmed
+R1-DET-F18	r1-simulation-core.md	709	yes	confirmed
+R1-DET-F19	r1-simulation-core.md	715	yes	confirmed
+R1-DET-F20	r1-simulation-core.md	720	yes	confirmed
+R1-DET-F21	r1-simulation-core.md	727	yes	confirmed
+R1-DET-F22	r1-simulation-core.md	732	yes	confirmed
+R1-DET-F23	r1-simulation-core.md	740	yes	confirmed
+R1-DET-F24	r1-simulation-core.md	748	yes	confirmed
+R1-DET-F25	r1-simulation-core.md	754	no	
+R1-DET-F26	r1-simulation-core.md	763	yes	confirmed
+R1-DET-F27	r1-simulation-core.md	767	yes	confirmed
+R1-DET-F28	r1-simulation-core.md	771	yes	confirmed
+R1-DET-F29	r1-simulation-core.md	779	yes	confirmed
+R1-DET-F30	r1-simulation-core.md	785	yes	confirmed
+R1-DET-F31	r1-simulation-core.md	796	yes	confirmed
+R1-DET-F32	r1-simulation-core.md	806	yes	confirmed
+R1-DET-F33	r1-simulation-core.md	816	yes	confirmed
+R1-DET-F34	r1-simulation-core.md	823	no	
+R1-BND-F1	r1-simulation-core.md	886	yes	confirmed
+R1-BND-F2	r1-simulation-core.md	894	no	
+R1-BND-F3	r1-simulation-core.md	903	yes	confirmed
+R1-BND-F4	r1-simulation-core.md	907	yes	confirmed
+R1-BND-F5	r1-simulation-core.md	912	yes	confirmed
+R1-BND-F6	r1-simulation-core.md	918	yes	confirmed
+R1-BND-F7	r1-simulation-core.md	924	yes	confirmed
+R1-BND-F8	r1-simulation-core.md	932	yes	confirmed
+R1-BND-F9	r1-simulation-core.md	941	yes	confirmed
+R1-BND-F10	r1-simulation-core.md	947	yes	confirmed
+R1-BND-F11	r1-simulation-core.md	955	yes	confirmed
+R1-BND-F12	r1-simulation-core.md	964	yes	confirmed
+R1-BND-F13	r1-simulation-core.md	971	no	
+R1-BND-F14	r1-simulation-core.md	978	no	
+R1-BND-F15	r1-simulation-core.md	983	no	
+R1-BND-F16	r1-simulation-core.md	993	yes	confirmed
+R1-BND-F17	r1-simulation-core.md	999	no	
+R1-BND-F18	r1-simulation-core.md	1010	yes	confirmed
+R1-BND-F19	r1-simulation-core.md	1019	yes	confirmed
+R1-BND-F20	r1-simulation-core.md	1030	yes	confirmed
+R1-BND-F21	r1-simulation-core.md	1038	yes	confirmed
+R1-BND-F22	r1-simulation-core.md	1047	yes	confirmed
+R1-BND-F23	r1-simulation-core.md	1053	no	
+R1-BND-F24	r1-simulation-core.md	1064	no	
+R1-BND-F25	r1-simulation-core.md	1073	yes	confirmed
+R1-BND-F26	r1-simulation-core.md	1078	yes	confirmed
+R1-BND-F27	r1-simulation-core.md	1085	yes	confirmed
+R1-BND-F28	r1-simulation-core.md	1091	yes	confirmed
+R1-BND-F29	r1-simulation-core.md	1098	yes	confirmed
+R1-BND-F30	r1-simulation-core.md	1104	yes	confirmed
+R1-BND-F31	r1-simulation-core.md	1109	no	
+R1-BND-F32	r1-simulation-core.md	1115	yes	confirmed
+R1-BND-F33	r1-simulation-core.md	1121	yes	confirmed
+R1-BND-F34	r1-simulation-core.md	1130	yes	confirmed
+R1-BND-F35	r1-simulation-core.md	1138	yes	confirmed
+R1-ABL-F1	r1-simulation-core.md	1199	yes	confirmed
+R1-ABL-F2	r1-simulation-core.md	1205	yes	confirmed
+R1-ABL-F3	r1-simulation-core.md	1211	yes	confirmed
+R1-ABL-F4	r1-simulation-core.md	1216	yes	confirmed
+R1-ABL-F5	r1-simulation-core.md	1223	yes	confirmed
+R1-ABL-F6	r1-simulation-core.md	1231	yes	confirmed
+R1-ABL-F7	r1-simulation-core.md	1235	yes	confirmed
+R1-ABL-F8	r1-simulation-core.md	1240	yes	confirmed
+R1-ABL-F9	r1-simulation-core.md	1244	yes	confirmed
+R1-ABL-F10	r1-simulation-core.md	1248	yes	confirmed
+R1-ABL-F11	r1-simulation-core.md	1252	yes	confirmed
+R1-ABL-F12	r1-simulation-core.md	1258	yes	confirmed
+R1-ABL-F13	r1-simulation-core.md	1261	yes	confirmed
+R1-ABL-F14	r1-simulation-core.md	1268	yes	confirmed
+R1-ABL-F15	r1-simulation-core.md	1275	yes	confirmed
+R1-ABL-F16	r1-simulation-core.md	1281	yes	confirmed
+R1-ABL-F17	r1-simulation-core.md	1286	yes	confirmed
+R1-ABL-F18	r1-simulation-core.md	1296	yes	confirmed
+R1-ABL-F19	r1-simulation-core.md	1301	yes	confirmed
+R1-ABL-F20	r1-simulation-core.md	1304	no	
+R1-ABL-F21	r1-simulation-core.md	1317	yes	confirmed
+R1-ABL-F22	r1-simulation-core.md	1322	yes	confirmed
+R1-ABL-F23	r1-simulation-core.md	1332	yes	confirmed
+R1-ABL-F24	r1-simulation-core.md	1342	yes	confirmed
+R1-ABL-F25	r1-simulation-core.md	1348	yes	confirmed
+R1-ABL-F26	r1-simulation-core.md	1357	yes	confirmed
+R1-DATA-F1	r1-simulation-core.md	1402	yes	confirmed
+R1-DATA-F2	r1-simulation-core.md	1407	yes	confirmed
+R1-DATA-F3	r1-simulation-core.md	1410	yes	confirmed
+R1-DATA-F4	r1-simulation-core.md	1414	yes	confirmed
+R1-DATA-F5	r1-simulation-core.md	1420	yes	confirmed
+R1-DATA-F6	r1-simulation-core.md	1426	yes	confirmed
+R1-DATA-F7	r1-simulation-core.md	1433	yes	confirmed
+R1-DATA-F8	r1-simulation-core.md	1438	yes	confirmed
+R1-DATA-F9	r1-simulation-core.md	1442	yes	confirmed
+R1-DATA-F10	r1-simulation-core.md	1448	yes	confirmed
+R1-DATA-F11	r1-simulation-core.md	1453	yes	confirmed
+R1-DATA-F12	r1-simulation-core.md	1459	yes	confirmed
+R1-DATA-F13	r1-simulation-core.md	1468	yes	confirmed
+R1-DATA-F14	r1-simulation-core.md	1476	yes	confirmed
+R1-DATA-F15	r1-simulation-core.md	1482	yes	confirmed
+R1-DATA-F16	r1-simulation-core.md	1489	yes	confirmed
+R1-DATA-F17	r1-simulation-core.md	1494	yes	confirmed
+R1-DATA-F18	r1-simulation-core.md	1502	yes	confirmed
+R1-DATA-F19	r1-simulation-core.md	1510	yes	confirmed
+R1-DATA-F20	r1-simulation-core.md	1515	yes	confirmed
+R1-DATA-F21	r1-simulation-core.md	1521	yes	confirmed
+R1-DATA-F22	r1-simulation-core.md	1526	yes	confirmed
+R1-DATA-F23	r1-simulation-core.md	1534	yes	confirmed
+R1-DATA-F24	r1-simulation-core.md	1544	yes	confirmed
+R1-DATA-F25	r1-simulation-core.md	1548	yes	confirmed
+R1-DATA-F26	r1-simulation-core.md	1555	yes	confirmed
+R1-DATA-F27	r1-simulation-core.md	1561	yes	confirmed
+R1-DATA-F28	r1-simulation-core.md	1566	yes	confirmed
+R1-DATA-F29	r1-simulation-core.md	1571	yes	confirmed,wrong
+R2-SYNC-F1	r2-netcode.md	97	yes	confirmed
+R2-SYNC-F2	r2-netcode.md	102	yes	confirmed
+R2-SYNC-F3	r2-netcode.md	106	yes	confirmed
+R2-SYNC-F4	r2-netcode.md	112	yes	confirmed
+R2-SYNC-F5	r2-netcode.md	118	yes	confirmed
+R2-SYNC-F6	r2-netcode.md	125	yes	confirmed
+R2-SYNC-F7	r2-netcode.md	133	yes	confirmed
+R2-SYNC-F8	r2-netcode.md	142	yes	confirmed
+R2-SYNC-F9	r2-netcode.md	159	yes	confirmed
+R2-SYNC-F10	r2-netcode.md	167	no	
+R2-SYNC-F11	r2-netcode.md	175	yes	confirmed
+R2-SYNC-F12	r2-netcode.md	186	yes	confirmed
+R2-SYNC-F13	r2-netcode.md	195	yes	confirmed
+R2-SYNC-F14	r2-netcode.md	206	yes	confirmed
+R2-SYNC-F15	r2-netcode.md	212	yes	confirmed
+R2-SYNC-F16	r2-netcode.md	221	yes	confirmed
+R2-SYNC-F17	r2-netcode.md	230	yes	confirmed
+R2-SYNC-F18	r2-netcode.md	241	yes	confirmed
+R2-SYNC-F19	r2-netcode.md	251	yes	confirmed
+R2-SYNC-F20	r2-netcode.md	262	yes	confirmed
+R2-SYNC-F21	r2-netcode.md	276	yes	confirmed
+R2-SYNC-F22	r2-netcode.md	285	yes	confirmed
+R2-SYNC-F23	r2-netcode.md	290	yes	confirmed
+R2-SYNC-F24	r2-netcode.md	302	yes	confirmed
+R2-SYNC-F25	r2-netcode.md	308	yes	confirmed
+R2-SYNC-F26	r2-netcode.md	316	yes	confirmed
+R2-SYNC-F27	r2-netcode.md	324	no	
+R2-SYNC-F28	r2-netcode.md	331	yes	confirmed
+R2-SYNC-F29	r2-netcode.md	347	yes	confirmed
+R2-SYNC-F30	r2-netcode.md	356	yes	confirmed
+R2-SYNC-F31	r2-netcode.md	362	yes	confirmed
+R2-SYNC-F32	r2-netcode.md	368	yes	confirmed
+R2-SYNC-F33	r2-netcode.md	382	yes	confirmed
+R2-SYNC-F34	r2-netcode.md	391	yes	unsupported
+R2-SYNC-F35	r2-netcode.md	404	yes	confirmed
+R2-SYNC-F36	r2-netcode.md	421	no	
+R2-BUD-F1	r2-netcode.md	480	yes	confirmed
+R2-BUD-F2	r2-netcode.md	484	yes	confirmed
+R2-BUD-F3	r2-netcode.md	487	yes	confirmed
+R2-BUD-F4	r2-netcode.md	491	yes	confirmed
+R2-BUD-F5	r2-netcode.md	496	yes	confirmed
+R2-BUD-F6	r2-netcode.md	499	yes	confirmed
+R2-BUD-F7	r2-netcode.md	504	yes	confirmed
+R2-BUD-F8	r2-netcode.md	507	yes	confirmed
+R2-BUD-F9	r2-netcode.md	514	yes	confirmed
+R2-BUD-F10	r2-netcode.md	522	yes	confirmed
+R2-BUD-F11	r2-netcode.md	528	yes	confirmed
+R2-BUD-F12	r2-netcode.md	533	yes	confirmed
+R2-BUD-F13	r2-netcode.md	539	yes	confirmed
+R2-BUD-F14	r2-netcode.md	546	yes	confirmed
+R2-BUD-F15	r2-netcode.md	553	yes	confirmed
+R2-BUD-F16	r2-netcode.md	559	no	
+R2-BUD-F17	r2-netcode.md	565	no	
+R2-BUD-F18	r2-netcode.md	570	yes	confirmed
+R2-BUD-F19	r2-netcode.md	579	yes	confirmed
+R2-BUD-F20	r2-netcode.md	584	yes	confirmed
+R2-BUD-F21	r2-netcode.md	588	yes	confirmed
+R2-BUD-F22	r2-netcode.md	597	yes	confirmed
+R2-BUD-F23	r2-netcode.md	601	yes	confirmed
+R2-BUD-F24	r2-netcode.md	604	yes	confirmed
+R2-BUD-F25	r2-netcode.md	610	yes	confirmed
+R2-BUD-F26	r2-netcode.md	618	yes	confirmed
+R2-BUD-F27	r2-netcode.md	625	yes	confirmed
+R2-BUD-F28	r2-netcode.md	629	yes	confirmed
+R2-BUD-F29	r2-netcode.md	636	yes	confirmed
+R2-BUD-F30	r2-netcode.md	649	yes	confirmed
+R2-BUD-F31	r2-netcode.md	655	yes	confirmed
+R2-BUD-F32	r2-netcode.md	663	yes	confirmed
+R2-BUD-F33	r2-netcode.md	672	no	
+R2-BUD-F34	r2-netcode.md	675	yes	confirmed
+R2-BUD-F35	r2-netcode.md	685	yes	confirmed
+R2-INT-F1	r2-netcode.md	716	yes	confirmed
+R2-INT-F2	r2-netcode.md	727	yes	confirmed
+R2-INT-F3	r2-netcode.md	735	yes	confirmed
+R2-INT-F4	r2-netcode.md	742	yes	confirmed
+R2-INT-F5	r2-netcode.md	749	yes	confirmed
+R2-INT-F6	r2-netcode.md	758	yes	confirmed
+R2-INT-F7	r2-netcode.md	764	yes	confirmed
+R2-INT-F8	r2-netcode.md	772	yes	confirmed
+R2-INT-F9	r2-netcode.md	780	yes	confirmed
+R2-INT-F10	r2-netcode.md	785	yes	confirmed
+R2-INT-F11	r2-netcode.md	791	yes	confirmed
+R2-INT-F12	r2-netcode.md	796	yes	confirmed,unsupported
+R2-INT-F13	r2-netcode.md	805	yes	confirmed
+R2-INT-F14	r2-netcode.md	811	yes	confirmed
+R2-INT-F15	r2-netcode.md	821	yes	confirmed
+R2-INT-F16	r2-netcode.md	830	yes	confirmed
+R2-INT-F17	r2-netcode.md	839	yes	confirmed
+R2-INT-F18	r2-netcode.md	848	yes	confirmed
+R2-INT-F19	r2-netcode.md	857	yes	confirmed
+R2-INT-F20	r2-netcode.md	866	yes	confirmed
+R2-TRN-F1	r2-netcode.md	909	no	
+R2-TRN-F2	r2-netcode.md	914	no	
+R2-TRN-F3	r2-netcode.md	921	yes	confirmed
+R2-TRN-F4	r2-netcode.md	927	yes	confirmed
+R2-TRN-F5	r2-netcode.md	938	yes	confirmed
+R2-TRN-F6	r2-netcode.md	945	yes	confirmed
+R2-TRN-F7	r2-netcode.md	959	yes	confirmed
+R2-TRN-F8	r2-netcode.md	976	yes	confirmed
+R2-TRN-F9	r2-netcode.md	986	yes	confirmed
+R2-TRN-F10	r2-netcode.md	995	yes	confirmed,unsupported
+R2-TRN-F11	r2-netcode.md	1007	yes	confirmed
+R2-TRN-F12	r2-netcode.md	1020	yes	confirmed,wrong
+R2-TRN-F13	r2-netcode.md	1033	yes	confirmed
+R2-TRN-F14	r2-netcode.md	1047	yes	confirmed
+R2-TRN-F15	r2-netcode.md	1057	yes	confirmed
+R2-TRN-F16	r2-netcode.md	1066	yes	confirmed
+R2-TRN-F17	r2-netcode.md	1079	yes	confirmed
+R2-TRN-F18	r2-netcode.md	1092	yes	confirmed
+R2-TRN-F19	r2-netcode.md	1102	yes	confirmed
+R2-TRN-F20	r2-netcode.md	1113	yes	confirmed
+R2-TRN-F21	r2-netcode.md	1125	yes	confirmed
+R2-TRN-F22	r2-netcode.md	1130	yes	confirmed
+R2-TRN-F23	r2-netcode.md	1140	no	
+R2-TRN-F24	r2-netcode.md	1151	yes	confirmed
+R2-TRN-F25	r2-netcode.md	1162	yes	confirmed
+R2-TRN-F26	r2-netcode.md	1176	yes	confirmed
+R2-TRN-F27	r2-netcode.md	1182	no	
+R2-TRN-F28	r2-netcode.md	1190	yes	confirmed
+R2-TRN-F29	r2-netcode.md	1197	yes	confirmed
+R2-TRN-F30	r2-netcode.md	1213	yes	confirmed
+R2-TRN-F31	r2-netcode.md	1231	yes	confirmed
+R2-TRN-F32	r2-netcode.md	1238	yes	confirmed
+R2-TRN-F33	r2-netcode.md	1246	yes	confirmed
+R2-TRN-F34	r2-netcode.md	1261	yes	confirmed
+R2-TRN-F35	r2-netcode.md	1268	yes	confirmed
+R2-TRN-F36	r2-netcode.md	1274	yes	confirmed
+R2-TRN-F37	r2-netcode.md	1286	no	
+R2-TRN-F38	r2-netcode.md	1292	yes	confirmed
+R2-TRN-F39	r2-netcode.md	1298	no	
+R2-TRN-F40	r2-netcode.md	1304	no	
+R2-TRN-F41	r2-netcode.md	1332	no	
+R2-TRN-F42	r2-netcode.md	1347	no	
+R2-ROOM-F1	r2-netcode.md	1393	yes	confirmed
+R2-ROOM-F2	r2-netcode.md	1402	yes	confirmed
+R2-ROOM-F3	r2-netcode.md	1411	yes	confirmed
+R2-ROOM-F4	r2-netcode.md	1422	yes	confirmed
+R2-ROOM-F5	r2-netcode.md	1428	yes	confirmed
+R2-ROOM-F6	r2-netcode.md	1437	yes	confirmed
+R2-ROOM-F7	r2-netcode.md	1448	yes	confirmed
+R2-ROOM-F8	r2-netcode.md	1459	yes	confirmed
+R2-ROOM-F9	r2-netcode.md	1470	yes	confirmed
+R2-ROOM-F10	r2-netcode.md	1479	yes	confirmed
+R2-ROOM-F11	r2-netcode.md	1486	yes	confirmed
+R2-ROOM-F12	r2-netcode.md	1494	yes	confirmed,unsupported,wrong
+R2-ROOM-F13	r2-netcode.md	1510	yes	confirmed
+R2-ROOM-F14	r2-netcode.md	1518	yes	confirmed
+R2-ROOM-F15	r2-netcode.md	1528	yes	confirmed
+R2-ROOM-F16	r2-netcode.md	1539	yes	confirmed
+R2-ROOM-F17	r2-netcode.md	1548	yes	confirmed,unsupported
+R2-ROOM-F18	r2-netcode.md	1562	yes	confirmed
+R2-ROOM-F19	r2-netcode.md	1565	no	
+R3-WGPU-F1	r3-rendering.md	67	yes	confirmed
+R3-WGPU-F2	r3-rendering.md	73	no	
+R3-WGPU-F3	r3-rendering.md	78	yes	confirmed
+R3-WGPU-F4	r3-rendering.md	85	yes	confirmed
+R3-WGPU-F5	r3-rendering.md	91	yes	confirmed
+R3-WGPU-F6	r3-rendering.md	97	yes	confirmed,unsupported
+R3-WGPU-F7	r3-rendering.md	104	yes	confirmed
+R3-WGPU-F8	r3-rendering.md	109	yes	confirmed
+R3-WGPU-F9	r3-rendering.md	115	yes	confirmed
+R3-WGPU-F10	r3-rendering.md	121	yes	confirmed
+R3-WGPU-F11	r3-rendering.md	127	yes	confirmed
+R3-WGPU-F12	r3-rendering.md	133	no	
+R3-WGPU-F13	r3-rendering.md	139	no	
+R3-WGPU-F14	r3-rendering.md	144	no	
+R3-WGPU-F15	r3-rendering.md	150	yes	confirmed
+R3-WGPU-F16	r3-rendering.md	154	no	
+R3-WGPU-F17	r3-rendering.md	159	yes	confirmed
+R3-WGPU-F18	r3-rendering.md	164	yes	confirmed
+R3-WGPU-F19	r3-rendering.md	171	no	
+R3-WGPU-F20	r3-rendering.md	177	no	
+R3-WGPU-F21	r3-rendering.md	182	no	
+R3-WGPU-F22	r3-rendering.md	188	yes	confirmed
+R3-GL2-F1	r3-rendering.md	214	no	
+R3-GL2-F2	r3-rendering.md	219	yes	confirmed
+R3-GL2-F3	r3-rendering.md	225	no	
+R3-GL2-F4	r3-rendering.md	234	yes	confirmed
+R3-GL2-F5	r3-rendering.md	240	yes	confirmed
+R3-GL2-F6	r3-rendering.md	247	no	
+R3-GL2-F7	r3-rendering.md	252	yes	confirmed
+R3-GL2-F8	r3-rendering.md	257	yes	confirmed
+R3-GL2-F9	r3-rendering.md	262	yes	confirmed
+R3-GL2-F10	r3-rendering.md	267	no	
+R3-GL2-F11	r3-rendering.md	273	no	
+R3-GL2-F12	r3-rendering.md	279	yes	confirmed
+R3-GL2-F13	r3-rendering.md	285	yes	confirmed
+R3-GL2-F14	r3-rendering.md	293	no	
+R3-LOOK-F1	r3-rendering.md	318	no	
+R3-LOOK-F2	r3-rendering.md	323	no	
+R3-LOOK-F3	r3-rendering.md	331	no	
+R3-LOOK-F4	r3-rendering.md	337	no	
+R3-LOOK-F5	r3-rendering.md	343	yes	confirmed
+R3-LOOK-F6	r3-rendering.md	352	no	
+R3-LOOK-F7	r3-rendering.md	360	no	
+R3-LOOK-F8	r3-rendering.md	366	no	
+R3-LOOK-F9	r3-rendering.md	373	yes	confirmed
+R3-LOOK-F10	r3-rendering.md	379	yes	confirmed
+R3-LOOK-F11	r3-rendering.md	386	no	
+R3-LOOK-F12	r3-rendering.md	392	no	
+R3-LOOK-F13	r3-rendering.md	397	yes	confirmed
+R3-LOOK-F14	r3-rendering.md	405	no	
+R3-LOOK-F15	r3-rendering.md	411	no	
+R3-CHAR-F1	r3-rendering.md	436	yes	confirmed
+R3-CHAR-F2	r3-rendering.md	441	yes	confirmed
+R3-CHAR-F3	r3-rendering.md	447	no	
+R3-CHAR-F4	r3-rendering.md	452	yes	confirmed
+R3-CHAR-F5	r3-rendering.md	457	no	
+R3-CHAR-F6	r3-rendering.md	463	no	
+R3-CHAR-F7	r3-rendering.md	469	yes	confirmed
+R3-CHAR-F8	r3-rendering.md	476	no	
+R3-CHAR-F9	r3-rendering.md	482	yes	confirmed
+R3-CHAR-F10	r3-rendering.md	490	no	
+R3-CHAR-F11	r3-rendering.md	495	no	
+R3-CHAR-F12	r3-rendering.md	501	yes	confirmed
+R3-CHAR-F13	r3-rendering.md	505	no	
+R3-BUDGET-F1	r3-rendering.md	540	yes	confirmed
+R3-BUDGET-F2	r3-rendering.md	545	no	
+R3-BUDGET-F3	r3-rendering.md	551	no	
+R3-BUDGET-F4	r3-rendering.md	557	yes	confirmed
+R3-BUDGET-F5	r3-rendering.md	562	no	
+R3-BUDGET-F6	r3-rendering.md	567	no	
+R3-BUDGET-F7	r3-rendering.md	575	no	
+R3-MEASURE-F1	r3-rendering.md	604	no	
+R3-MEASURE-F2	r3-rendering.md	610	yes	confirmed
+R3-MEASURE-F3	r3-rendering.md	617	yes	confirmed
+R3-MEASURE-F4	r3-rendering.md	624	yes	confirmed
+R3-MEASURE-F5	r3-rendering.md	633	no	
+R3-MEASURE-F6	r3-rendering.md	636	no	
+R3-MEASURE-F7	r3-rendering.md	641	yes	confirmed
+R3-MEASURE-F8	r3-rendering.md	648	yes	confirmed
+R3-MEASURE-F9	r3-rendering.md	655	no	
+R3-MEASURE-F10	r3-rendering.md	660	no	
+R3-AUDIO-F1	r3-rendering.md	690	no	
+R3-AUDIO-F2	r3-rendering.md	696	yes	confirmed
+R3-AUDIO-F3	r3-rendering.md	702	yes	confirmed
+R3-AUDIO-F4	r3-rendering.md	711	no	
+R3-AUDIO-F5	r3-rendering.md	717	yes	confirmed
+R3-AUDIO-F6	r3-rendering.md	724	no	
+R3-AUDIO-F7	r3-rendering.md	730	no	
+R3-AUDIO-F8	r3-rendering.md	736	yes	confirmed
+R3-AUDIO-F9	r3-rendering.md	743	no	
+R3-AUDIO-F10	r3-rendering.md	749	yes	confirmed
+R3-AUDIO-F11	r3-rendering.md	753	no	
+R4-PHYS-F1	r4-physics-navigation.md	56	yes	confirmed
+R4-PHYS-F2	r4-physics-navigation.md	61	yes	confirmed
+R4-PHYS-F3	r4-physics-navigation.md	72	yes	confirmed
+R4-PHYS-F4	r4-physics-navigation.md	80	yes	confirmed
+R4-PHYS-F5	r4-physics-navigation.md	84	no	
+R4-PHYS-F6	r4-physics-navigation.md	88	yes	confirmed
+R4-PHYS-F7	r4-physics-navigation.md	94	yes	confirmed
+R4-PHYS-F8	r4-physics-navigation.md	99	yes	confirmed
+R4-PHYS-F9	r4-physics-navigation.md	106	yes	confirmed
+R4-PHYS-F10	r4-physics-navigation.md	116	no	
+R4-PHYS-F11	r4-physics-navigation.md	124	no	
+R4-PHYS-F12	r4-physics-navigation.md	131	yes	confirmed
+R4-PHYS-F13	r4-physics-navigation.md	136	no	
+R4-PHYS-F14	r4-physics-navigation.md	140	no	
+R4-PHYS-F15	r4-physics-navigation.md	146	yes	confirmed
+R4-PHYS-F16	r4-physics-navigation.md	152	no	
+R4-PHYS-F17	r4-physics-navigation.md	156	yes	confirmed
+R4-PHYS-F18	r4-physics-navigation.md	162	no	
+R4-PHYS-F19	r4-physics-navigation.md	171	yes	confirmed
+R4-PHYS-F20	r4-physics-navigation.md	177	yes	unsupported,wrong
+R4-PHYS-F21	r4-physics-navigation.md	188	yes	confirmed
+R4-PHYS-F22	r4-physics-navigation.md	196	yes	confirmed
+R4-PHYS-F23	r4-physics-navigation.md	205	yes	confirmed
+R4-PHYS-F24	r4-physics-navigation.md	209	yes	confirmed
+R4-PHYS-F25	r4-physics-navigation.md	219	yes	confirmed
+R4-PHYS-F26	r4-physics-navigation.md	223	yes	confirmed
+R4-PHYS-F27	r4-physics-navigation.md	229	no	
+R4-NAV-F1	r4-physics-navigation.md	259	yes	confirmed
+R4-NAV-F2	r4-physics-navigation.md	266	yes	confirmed
+R4-NAV-F3	r4-physics-navigation.md	276	yes	confirmed
+R4-NAV-F4	r4-physics-navigation.md	281	yes	confirmed
+R4-NAV-F5	r4-physics-navigation.md	289	yes	confirmed
+R4-NAV-F6	r4-physics-navigation.md	293	no	
+R4-NAV-F7	r4-physics-navigation.md	297	no	
+R4-NAV-F8	r4-physics-navigation.md	303	yes	confirmed
+R4-NAV-F9	r4-physics-navigation.md	314	yes	confirmed
+R4-NAV-F10	r4-physics-navigation.md	322	yes	confirmed
+R4-NAV-F11	r4-physics-navigation.md	328	yes	confirmed
+R4-NAV-F12	r4-physics-navigation.md	335	yes	confirmed
+R4-NAV-F13	r4-physics-navigation.md	338	yes	confirmed
+R4-NAV-F14	r4-physics-navigation.md	346	no	
+R4-NAV-F15	r4-physics-navigation.md	352	yes	unsupported
+R4-NAV-F16	r4-physics-navigation.md	362	no	
+R4-NAV-F17	r4-physics-navigation.md	368	yes	confirmed
+R4-NAV-F18	r4-physics-navigation.md	376	yes	confirmed
+R4-NAV-F19	r4-physics-navigation.md	381	yes	confirmed
+R4-FLOORS-F1	r4-physics-navigation.md	411	yes	confirmed
+R4-FLOORS-F2	r4-physics-navigation.md	419	yes	confirmed
+R4-FLOORS-F3	r4-physics-navigation.md	426	yes	confirmed
+R4-FLOORS-F4	r4-physics-navigation.md	429	yes	confirmed
+R4-FLOORS-F5	r4-physics-navigation.md	433	yes	wrong
+R4-FLOORS-F6	r4-physics-navigation.md	442	yes	confirmed
+R4-FLOORS-F7	r4-physics-navigation.md	450	yes	confirmed
+R4-LOS-F1	r4-physics-navigation.md	479	yes	confirmed
+R4-LOS-F2	r4-physics-navigation.md	488	yes	confirmed
+R4-LOS-F3	r4-physics-navigation.md	494	yes	confirmed
+R4-LOS-F4	r4-physics-navigation.md	500	yes	confirmed
+R4-LOS-F5	r4-physics-navigation.md	505	no	
+R4-OBST-F1	r4-physics-navigation.md	542	yes	confirmed
+R4-OBST-F2	r4-physics-navigation.md	548	yes	confirmed
+R4-OBST-F3	r4-physics-navigation.md	553	yes	confirmed
+R4-OBST-F4	r4-physics-navigation.md	560	yes	confirmed
+R5-LAYOUT-F1	r5-toolchain-quality.md	66	yes	confirmed
+R5-LAYOUT-F2	r5-toolchain-quality.md	71	no	
+R5-LAYOUT-F3	r5-toolchain-quality.md	75	no	
+R5-LAYOUT-F4	r5-toolchain-quality.md	83	yes	confirmed
+R5-LAYOUT-F5	r5-toolchain-quality.md	92	yes	confirmed
+R5-LAYOUT-F6	r5-toolchain-quality.md	96	no	
+R5-LAYOUT-F7	r5-toolchain-quality.md	103	yes	confirmed
+R5-LAYOUT-F8	r5-toolchain-quality.md	109	no	
+R5-LAYOUT-F9	r5-toolchain-quality.md	116	no	
+R5-LAYOUT-F10	r5-toolchain-quality.md	121	no	
+R5-LAYOUT-F11	r5-toolchain-quality.md	125	no	
+R5-LAYOUT-F12	r5-toolchain-quality.md	130	yes	confirmed
+R5-LAYOUT-F13	r5-toolchain-quality.md	135	no	
+R5-LAYOUT-F14	r5-toolchain-quality.md	141	yes	confirmed
+R5-LAYOUT-F15	r5-toolchain-quality.md	146	yes	confirmed
+R5-TSLINT-F1	r5-toolchain-quality.md	177	yes	confirmed
+R5-TSLINT-F2	r5-toolchain-quality.md	182	no	
+R5-TSLINT-F3	r5-toolchain-quality.md	188	no	
+R5-TSLINT-F4	r5-toolchain-quality.md	192	yes	confirmed
+R5-TSLINT-F5	r5-toolchain-quality.md	196	yes	confirmed
+R5-TSLINT-F6	r5-toolchain-quality.md	202	no	
+R5-TSLINT-F7	r5-toolchain-quality.md	207	no	
+R5-TSLINT-F8	r5-toolchain-quality.md	211	no	
+R5-TSLINT-F9	r5-toolchain-quality.md	214	no	
+R5-TSLINT-F10	r5-toolchain-quality.md	216	no	
+R5-TSLINT-F11	r5-toolchain-quality.md	218	no	
+R5-TSLINT-F12	r5-toolchain-quality.md	221	no	
+R5-TSLINT-F13	r5-toolchain-quality.md	225	yes	confirmed
+R5-TSLINT-F14	r5-toolchain-quality.md	234	no	
+R5-TSLINT-F15	r5-toolchain-quality.md	239	yes	confirmed
+R5-TSLINT-F16	r5-toolchain-quality.md	244	yes	confirmed
+R5-TSLINT-F17	r5-toolchain-quality.md	250	no	
+R5-TSLINT-F18	r5-toolchain-quality.md	256	no	
+R5-TSLINT-F19	r5-toolchain-quality.md	260	no	
+R5-TSLINT-F20	r5-toolchain-quality.md	264	no	
+R5-TSLINT-F21	r5-toolchain-quality.md	269	yes	confirmed
+R5-TSLINT-F22	r5-toolchain-quality.md	275	no	
+R5-TSLINT-F23	r5-toolchain-quality.md	280	no	
+R5-TSLINT-F24	r5-toolchain-quality.md	284	no	
+R5-TSLINT-F25	r5-toolchain-quality.md	287	no	
+R5-RUSTLINT-F1	r5-toolchain-quality.md	306	yes	confirmed
+R5-RUSTLINT-F2	r5-toolchain-quality.md	312	no	
+R5-RUSTLINT-F3	r5-toolchain-quality.md	315	no	
+R5-RUSTLINT-F4	r5-toolchain-quality.md	322	no	
+R5-RUSTLINT-F5	r5-toolchain-quality.md	326	no	
+R5-RUSTLINT-F6	r5-toolchain-quality.md	332	no	
+R5-RUSTLINT-F7	r5-toolchain-quality.md	335	yes	confirmed
+R5-RUSTLINT-F8	r5-toolchain-quality.md	344	no	
+R5-RUSTLINT-F9	r5-toolchain-quality.md	348	yes	confirmed
+R5-RUSTLINT-F10	r5-toolchain-quality.md	355	no	
+R5-RUSTLINT-F11	r5-toolchain-quality.md	363	yes	confirmed
+R5-RUSTLINT-F12	r5-toolchain-quality.md	370	no	
+R5-RUSTLINT-F13	r5-toolchain-quality.md	374	yes	confirmed
+R5-RUSTLINT-F14	r5-toolchain-quality.md	380	yes	confirmed
+R5-RUSTLINT-F15	r5-toolchain-quality.md	389	no	
+R5-TEST-F1	r5-toolchain-quality.md	409	no	
+R5-TEST-F2	r5-toolchain-quality.md	415	yes	confirmed
+R5-TEST-F3	r5-toolchain-quality.md	424	yes	confirmed
+R5-TEST-F4	r5-toolchain-quality.md	430	no	
+R5-TEST-F5	r5-toolchain-quality.md	435	yes	confirmed
+R5-TEST-F6	r5-toolchain-quality.md	443	yes	confirmed
+R5-TEST-F7	r5-toolchain-quality.md	449	no	
+R5-TEST-F8	r5-toolchain-quality.md	454	yes	confirmed
+R5-TEST-F9	r5-toolchain-quality.md	463	yes	confirmed
+R5-TEST-F10	r5-toolchain-quality.md	471	no	
+R5-TEST-F11	r5-toolchain-quality.md	476	no	
+R5-TEST-F12	r5-toolchain-quality.md	485	yes	confirmed
+R5-TEST-F13	r5-toolchain-quality.md	496	yes	confirmed
+R5-TEST-F14	r5-toolchain-quality.md	502	yes	confirmed
+R5-CI-F1	r5-toolchain-quality.md	555	yes	confirmed
+R5-CI-F2	r5-toolchain-quality.md	561	no	
+R5-CI-F3	r5-toolchain-quality.md	569	no	
+R5-CI-F4	r5-toolchain-quality.md	573	no	
+R5-CI-F5	r5-toolchain-quality.md	583	yes	confirmed
+R5-CI-F6	r5-toolchain-quality.md	593	no	
+R5-CI-F7	r5-toolchain-quality.md	600	no	
+R5-CI-F8	r5-toolchain-quality.md	603	no	
+R5-CI-F9	r5-toolchain-quality.md	610	yes	confirmed
+R5-CI-F10	r5-toolchain-quality.md	617	yes	confirmed
+R5-CI-F11	r5-toolchain-quality.md	625	no	
+R5-CI-F12	r5-toolchain-quality.md	632	no	
+R5-CI-F13	r5-toolchain-quality.md	640	yes	confirmed
+R5-CI-F14	r5-toolchain-quality.md	647	yes	confirmed
+R5-CI-F15	r5-toolchain-quality.md	653	yes	confirmed
+R5-CI-F16	r5-toolchain-quality.md	665	no	
+R5-CI-F17	r5-toolchain-quality.md	673	yes	confirmed
+R5-CI-F18	r5-toolchain-quality.md	679	yes	confirmed
+R5-CI-F19	r5-toolchain-quality.md	686	no	
+R5-CI-F20	r5-toolchain-quality.md	695	yes	confirmed
+R5-CI-F21	r5-toolchain-quality.md	701	no	
+R5-CI-F22	r5-toolchain-quality.md	708	yes	confirmed
+R5-CI-F23	r5-toolchain-quality.md	719	no	
+R5-CI-F24	r5-toolchain-quality.md	725	no	
+R5-PREV-F1	r5-toolchain-quality.md	765	yes	confirmed
+R5-PREV-F2	r5-toolchain-quality.md	770	no	
+R5-PREV-F3	r5-toolchain-quality.md	775	no	
+R5-PREV-F4	r5-toolchain-quality.md	783	no	
+R5-PREV-F5	r5-toolchain-quality.md	788	no	
+R5-PREV-F6	r5-toolchain-quality.md	796	yes	confirmed
+R5-PREV-F7	r5-toolchain-quality.md	805	no	
+R5-PREV-F8	r5-toolchain-quality.md	811	no	
+R5-PREV-F9	r5-toolchain-quality.md	815	no	
+R5-PREV-F10	r5-toolchain-quality.md	823	no	
+R5-PREV-F11	r5-toolchain-quality.md	831	no	
+R5-PREV-F12	r5-toolchain-quality.md	838	yes	confirmed
+R5-PREV-F13	r5-toolchain-quality.md	845	no	
+R5-PREV-F14	r5-toolchain-quality.md	850	yes	confirmed
+R5-PREV-F15	r5-toolchain-quality.md	859	no	
+R5-PREV-F16	r5-toolchain-quality.md	867	no	
+R5-PREV-F17	r5-toolchain-quality.md	873	no	
+R5-PREV-F18	r5-toolchain-quality.md	882	yes	confirmed
+R5-PREV-F19	r5-toolchain-quality.md	890	no	
+R5-PREV-F20	r5-toolchain-quality.md	896	yes	confirmed
+R5-GATE-F1	r5-toolchain-quality.md	946	yes	confirmed
+R5-GATE-F2	r5-toolchain-quality.md	950	yes	confirmed
+R5-GATE-F3	r5-toolchain-quality.md	954	no	
+R5-GATE-F4	r5-toolchain-quality.md	961	yes	confirmed
+R6-HOST-F1	r6-infrastructure.md	60	yes	confirmed
+R6-HOST-F2	r6-infrastructure.md	66	no	
+R6-HOST-F3	r6-infrastructure.md	72	yes	confirmed
+R6-HOST-F4	r6-infrastructure.md	80	no	
+R6-HOST-F5	r6-infrastructure.md	87	yes	confirmed
+R6-HOST-F6	r6-infrastructure.md	93	no	
+R6-HOST-F7	r6-infrastructure.md	100	no	
+R6-HOST-F8	r6-infrastructure.md	107	no	
+R6-HOST-F9	r6-infrastructure.md	111	no	
+R6-HOST-F10	r6-infrastructure.md	116	no	
+R6-HOST-F11	r6-infrastructure.md	122	no	
+R6-HOST-F12	r6-infrastructure.md	127	yes	confirmed
+R6-HOST-F13	r6-infrastructure.md	136	yes	confirmed
+R6-HOST-F14	r6-infrastructure.md	144	yes	confirmed
+R6-HOST-F15	r6-infrastructure.md	150	yes	confirmed
+R6-HOST-F16	r6-infrastructure.md	160	yes	confirmed
+R6-HOST-F17	r6-infrastructure.md	164	yes	confirmed
+R6-HOST-F18	r6-infrastructure.md	169	no	
+R6-HOST-F19	r6-infrastructure.md	175	no	
+R6-HOST-F20	r6-infrastructure.md	180	no	
+R6-HOST-F21	r6-infrastructure.md	183	no	
+R6-HOST-F22	r6-infrastructure.md	186	yes	confirmed
+R6-HOST-F23	r6-infrastructure.md	193	no	
+R6-HOST-F24	r6-infrastructure.md	198	yes	confirmed
+R6-COST-F1	r6-infrastructure.md	219	yes	confirmed
+R6-COST-F2	r6-infrastructure.md	225	yes	confirmed
+R6-COST-F3	r6-infrastructure.md	229	no	
+R6-COST-F4	r6-infrastructure.md	236	no	
+R6-COST-F5	r6-infrastructure.md	241	yes	confirmed
+R6-OBS-F1	r6-infrastructure.md	262	yes	confirmed
+R6-OBS-F2	r6-infrastructure.md	270	no	
+R6-OBS-F3	r6-infrastructure.md	275	no	
+R6-OBS-F4	r6-infrastructure.md	279	no	
+R6-OBS-F5	r6-infrastructure.md	285	yes	confirmed
+R6-OBS-F6	r6-infrastructure.md	291	no	
+R6-OBS-F7	r6-infrastructure.md	297	yes	confirmed
+R6-OBS-F8	r6-infrastructure.md	307	no	
+R6-OBS-F9	r6-infrastructure.md	318	yes	confirmed
+R6-OBS-F10	r6-infrastructure.md	327	no	
+R6-OBS-F11	r6-infrastructure.md	332	no	
+R6-OBS-F12	r6-infrastructure.md	338	no	
+R6-TEL-F1	r6-infrastructure.md	358	no	

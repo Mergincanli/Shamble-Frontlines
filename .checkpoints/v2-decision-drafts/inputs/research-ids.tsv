@@ -1,0 +1,536 @@
+id	kind	file	line	title
+R1-ECS-REC1	REC	r1-simulation-core.md	1891	Custom plain data (option C): one sim-state struct of typed tables, phases as plain functi
+R1-ECS-REC2	REC	r1-simulation-core.md	1952	Determinism rules for the layout, whatever option the ADR picks.
+R1-ECS-REC3	REC	r1-simulation-core.md	1973	The sim defines entity identity: one id (kind, index, generation) for every entity, static
+R1-ECS-REC4	REC	r1-simulation-core.md	1993	If R4 picks Rapier, its sets are fields of the sim state and go into every snapshot and se
+R1-TICK-REC1	REC	r1-simulation-core.md	2009	One fixed tick, counted in integers, the same constant on server and client; durations are
+R1-TICK-REC2	REC	r1-simulation-core.md	2029	Start the spike at 60 Hz, measure 30 Hz beside it on the same scene, and choose by the pas
+R1-TICK-REC3	REC	r1-simulation-core.md	2066	Slow systems run on cadences in whole ticks, stated in game time and staggered by slot.
+R1-TICK-REC4	REC	r1-simulation-core.md	2078	The server counts due ticks from a monotonic clock, catches up within a bound, and sends s
+R1-TICK-REC5	REC	r1-simulation-core.md	2094	In the browser, the Worker owns the tick; the main thread renders every frame and interpol
+R1-TICK-REC6	REC	r1-simulation-core.md	2118	Map validation computes reach with the sim's own integrator at the shipped tick.
+R1-DET-REC1	REC	r1-simulation-core.md	2129	Two levels, and what the netcode really needs.
+R1-DET-REC2	REC	r1-simulation-core.md	2146	Float rules for the sim crate.
+R1-DET-REC3	REC	r1-simulation-core.md	2170	Rapier with `enhanced-determinism` on both targets.
+R1-DET-REC4	REC	r1-simulation-core.md	2184	One seeded sim RNG with streams, and no clock.
+R1-DET-REC5	REC	r1-simulation-core.md	2208	Stable iteration order.
+R1-DET-REC6	REC	r1-simulation-core.md	2222	Prove it with recorded matches and per-tick state hashes.
+R1-DET-REC7	REC	r1-simulation-core.md	2242	No fixed point.
+R1-BND-REC1	REC	r1-simulation-core.md	2252	Run the client simulation in one dedicated module Web Worker, single-threaded, on stable R
+R1-BND-REC2	REC	r1-simulation-core.md	2265	One flat, versioned output block per tick, written by Rust into preallocated linear memory
+R1-BND-REC3	REC	r1-simulation-core.md	2286	Inputs enter as one command per tick, posted from the page to the worker (C1).
+R1-BND-REC4	REC	r1-simulation-core.md	2297	Generate every type that crosses the boundary from Rust, from three sources: wasm-bindgen'
+R1-BND-REC5	REC	r1-simulation-core.md	2309	Do not require cross-origin isolation for v2's start (G1); allow it in development and pre
+R1-BND-REC6	REC	r1-simulation-core.md	2326	The worker owns the network connection in multiplayer and runs the same sim locally when o
+R1-ABL-REC1	REC	r1-simulation-core.md	2342	A reduced GAS subset, as data, over a closed set of Rust operations (option A2).
+R1-ABL-REC2	REC	r1-simulation-core.md	2380	Weapons keep their own bookkeeping and share the damage pipeline (option B1).
+R1-ABL-REC3	REC	r1-simulation-core.md	2402	Integer time on the fixed tick, with carried remainders and a stable order (option C1).
+R1-ABL-REC4	REC	r1-simulation-core.md	2421	Predict only the local player's own weapons, and its own abilities if ABL-PREDICT says so;
+R1-ABL-REC5	REC	r1-simulation-core.md	2448	One table per kind, linked by validated ids (option E1).
+R1-ABL-REC6	REC	r1-simulation-core.md	2465	Cost budget for the ability and effect step (proposed).
+R1-DATA-REC1	REC	r1-simulation-core.md	2484	JSON is the one content format.
+R1-DATA-REC2	REC	r1-simulation-core.md	2500	One Rust content crate loads and validates, the same code everywhere.
+R1-DATA-REC3	REC	r1-simulation-core.md	2518	The schema is generated from the Rust types and drives the editor's inputs.
+R1-DATA-REC4	REC	r1-simulation-core.md	2532	Every file carries a format name and a version; migrations run on the tree.
+R1-DATA-REC5	REC	r1-simulation-core.md	2542	Hot reload in development, swapped between ticks; production pins content per match.
+R1-DATA-REC6	REC	r1-simulation-core.md	2565	Content reaches the browser as a hashed, cached bundle, and every match records its conten
+R1-DATA-REC7	REC	r1-simulation-core.md	2582	The server validates everything a client or editor sends, through the same pipeline.
+R1-DATA-REC8	REC	r1-simulation-core.md	2596	Import legacy-tuning.json once, with every key accounted for.
+R1-ECS-OQ1	OQ	r1-simulation-core.md	2612	What do the options really cost in Wasm size and compile time?
+R1-ECS-OQ2	OQ	r1-simulation-core.md	2614	Does `#[derive(Clone)]` give a field-wise `clone_from` that reuses each Vec's buffer?
+R1-ECS-OQ3	OQ	r1-simulation-core.md	2619	Does the client re-simulate the whole world, or only what it predicts (its own soldier, it
+R1-ECS-OQ4	OQ	r1-simulation-core.md	2622	Does the server need parallelism inside one match at 48+ players, or is one match per vCPU
+R1-ECS-OQ5	OQ	r1-simulation-core.md	2627	Is the pinned Rapier version's serialized and cloned state complete?
+R1-ECS-OQ6	OQ	r1-simulation-core.md	2629	What did Overwatch's ECS experience teach about gameplay architecture at scale?
+R1-ECS-OQ7	OQ	r1-simulation-core.md	2633	Will the entity kinds stay few?
+R1-TICK-OQ1	OQ	r1-simulation-core.md	2640	60 Hz or 64 Hz?
+R1-TICK-OQ2	OQ	r1-simulation-core.md	2645	Are worker timers throttled in hidden tabs?
+R1-TICK-OQ3	OQ	r1-simulation-core.md	2649	The tick rates of the brief's named references.
+R1-TICK-OQ4	OQ	r1-simulation-core.md	2654	Sub-tick input timestamps.
+R1-TICK-OQ5	OQ	r1-simulation-core.md	2658	The real cost per tick of v2 at 48+.
+R1-TICK-OQ6	OQ	r1-simulation-core.md	2662	The reference hardware.
+R1-TICK-OQ7	OQ	r1-simulation-core.md	2667	Offline at the largest mode?
+R1-TICK-OQ8	OQ	r1-simulation-core.md	2672	Client tick speed-up and slow-down.
+R1-TICK-OQ9	OQ	r1-simulation-core.md	2675	Big vehicles at 30 Hz.
+R1-DET-OQ1	OQ	r1-simulation-core.md	2680	
+R1-DET-OQ2	OQ	r1-simulation-core.md	2682	
+R1-DET-OQ3	OQ	r1-simulation-core.md	2686	
+R1-DET-OQ4	OQ	r1-simulation-core.md	2689	
+R1-DET-OQ5	OQ	r1-simulation-core.md	2691	
+R1-DET-OQ6	OQ	r1-simulation-core.md	2697	
+R1-DET-OQ7	OQ	r1-simulation-core.md	2701	
+R1-DET-OQ8	OQ	r1-simulation-core.md	2704	
+R1-DET-OQ9	OQ	r1-simulation-core.md	2706	
+R1-DET-OQ10	OQ	r1-simulation-core.md	2710	
+R1-DET-OQ11	OQ	r1-simulation-core.md	2713	
+R1-BND-OQ1	OQ	r1-simulation-core.md	2721	Is offline (solo against bots) play a v2 need?
+R1-BND-OQ2	OQ	r1-simulation-core.md	2724	Does a worker's tick timer keep its rate in a hidden tab, in each of the four browsers?
+R1-BND-OQ3	OQ	r1-simulation-core.md	2728	What is the minimum reference machine, and how many cores does it give the page?
+R1-BND-OQ4	OQ	r1-simulation-core.md	2732	Which tsify line, if any, is maintained?
+R1-BND-OQ5	OQ	r1-simulation-core.md	2734	Will the game page ever need third-party embeds
+R1-BND-OQ6	OQ	r1-simulation-core.md	2737	How big is one output block for the largest mode, and is the layout per entity or per fiel
+R1-BND-OQ7	OQ	r1-simulation-core.md	2741	Is wasm-bindgen's new home healthy for a multi-year project?
+R1-BND-OQ8	OQ	r1-simulation-core.md	2745	Does the server's snapshot reach the worker in the same layout as the page's block?
+R1-BND-OQ9	OQ	r1-simulation-core.md	2747	Can `same-origin-allow-popups` give cross-origin isolation?
+R1-ABL-OQ1	OQ	r1-simulation-core.md	2756	
+R1-ABL-OQ2	OQ	r1-simulation-core.md	2759	
+R1-ABL-OQ3	OQ	r1-simulation-core.md	2763	
+R1-ABL-OQ4	OQ	r1-simulation-core.md	2766	
+R1-ABL-OQ5	OQ	r1-simulation-core.md	2770	
+R1-ABL-OQ6	OQ	r1-simulation-core.md	2772	
+R1-ABL-OQ7	OQ	r1-simulation-core.md	2776	
+R1-ABL-OQ8	OQ	r1-simulation-core.md	2779	
+R1-ABL-OQ9	OQ	r1-simulation-core.md	2781	
+R1-ABL-OQ10	OQ	r1-simulation-core.md	2783	
+R1-DATA-OQ1	OQ	r1-simulation-core.md	2788	Comments in content files.
+R1-DATA-OQ2	OQ	r1-simulation-core.md	2791	A binary runtime format.
+R1-DATA-OQ3	OQ	r1-simulation-core.md	2795	Shipped-game practice for mid-match tuning changes.
+R1-DATA-OQ4	OQ	r1-simulation-core.md	2799	serde_json's default depth limit.
+R1-DATA-OQ5	OQ	r1-simulation-core.md	2801	garde on wasm32.
+R1-DATA-OQ6	OQ	r1-simulation-core.md	2804	Faction variants: copies or overrides.
+R1-DATA-OQ7	OQ	r1-simulation-core.md	2807	What a reload may change mid-match.
+R1-DATA-OQ8	OQ	r1-simulation-core.md	2811	Hot reload into a Web Worker under Vite.
+R1-DATA-OQ9	OQ	r1-simulation-core.md	2813	The hash on the Rust side.
+R1-DATA-OQ10	OQ	r1-simulation-core.md	2815	Which tunables private matches expose.
+R1-DATA-OQ11	OQ	r1-simulation-core.md	2817	The editor's double-click rule and Wasm.
+R1-DATA-OQ12	OQ	r1-simulation-core.md	2824	Mid-match reload of simulation numbers in development.
+R1-XU-OQ1	XU	r1-simulation-core.md	2835	The stress scene and the server tick budget differ between units.
+R1-XU-OQ2	XU	r1-simulation-core.md	2848	Whole-world or local replay, and its budget.
+R1-XU-OQ3	XU	r1-simulation-core.md	2854	Shared memory or a transferred buffer for what the page draws.
+R1-XU-OQ4	XU	r1-simulation-core.md	2861	The Worker's pacing fallback and how inputs arrive.
+R1-XU-OQ5	XU	r1-simulation-core.md	2866	Is the std `HashMap` seed per instance or per process?
+R1-XU-OQ6	XU	r1-simulation-core.md	2872	One source, two tiers.
+R1-XU-OQ7	XU	r1-simulation-core.md	2880	Fire rates: two time representations, two pass marks.
+R1-XU-OQ8	XU	r1-simulation-core.md	2886	Where content's TypeScript types come from.
+R1-XU-OQ9	XU	r1-simulation-core.md	2891	How definitions are laid out in files.
+R1-XU-OQ10	XU	r1-simulation-core.md	2895	Gap: may the tick constant change on hot reload?
+R1-XU-OQ11	XU	r1-simulation-core.md	2899	Gap: does an exactly representable `dt` matter for identical results?
+R1-XU-OQ12	XU	r1-simulation-core.md	2903	The same open question in two units, with different test conditions.
+R1-RR-OQ1	RR	r1-simulation-core.md	2923	FMA that differs by target in Rapier's default 4-lane SIMD path (risk 2).
+R1-RR-OQ2	RR	r1-simulation-core.md	2933	Allocations a client or a content file controls (risk 3).
+R1-RR-OQ3	RR	r1-simulation-core.md	2936	Panics reachable from content and input (risk 4).
+R1-RR-OQ4	RR	r1-simulation-core.md	2941	Overflow behaviour differs between build profiles (risk 6).
+R1-RR-OQ5	RR	r1-simulation-core.md	2946	No budget for Wasm size and speed (risk 7).
+R1-RR-OQ6	RR	r1-simulation-core.md	2951	Hashing state and writing the output block (risk 8).
+R1-RR-OQ7	RR	r1-simulation-core.md	2955	Dependency floors and advisories (risk 1, the R1 part).
+ABL-PREDICT	SHARED	r1-simulation-core.md	2967	Does the client predict the local player's own abilities?** The
+SEC-SPREAD	SHARED	r1-simulation-core.md	2979	Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicte
+MODES-3	SHARED	r1-simulation-core.md	2987	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+BASELINE-WHEN	SHARED	r1-simulation-core.md	2997	Research the deferred security baseline before ADR 0006, or list it open there?** The
+R1-XT-OQ1	XT	r1-simulation-core.md	3015	Who casts the cursor ray for the aim point, and how does the point cross the boundary?
+R1-XT-OQ2	XT	r1-simulation-core.md	3022	Which R1 items still assume Rapier, now that R4 recommends parry3d?
+R1-XT-OQ3	XT	r1-simulation-core.md	3030	Where does the remote-entity interpolation buffer live: in the worker or on the page?
+R1-XT-OQ4	XT	r1-simulation-core.md	3037	Does the E3 projectile encoding rest on the cross-target identity R1 says the netcode must
+R1-XT-OQ5	XT	r1-simulation-core.md	3044	Who answers R1's timing questions (sub-tick input timestamps, client tick nudging, shipped
+R1-XT-OQ6	XT	r1-simulation-core.md	3051	Who answers R1's protocol questions (hash comparison, snapshot layout, mid-match tuning, t
+R1-XT-OQ7	XT	r1-simulation-core.md	3057	Is whole-world replay still a spike mark?
+R1-XT-OQ8	XT	r1-simulation-core.md	3063	Do browser navigation and server-less previews rest on an undecided offline-play need?
+R1-XT-OQ9	XT	r1-simulation-core.md	3069	Do the snapshot and the output block carry remote soldiers' animation state?
+R1-XT-OQ10	XT	r1-simulation-core.md	3075	Does the editor still open by double-click with a Wasm validator?
+R1-XT-OQ11	XT	r1-simulation-core.md	3079	Do the wire's entity ids and tick counter fit R1's generational ids and a 20-minute match?
+R1-XT-OQ12	XT	r1-simulation-core.md	3084	Who owns recovery from a trap in the client's Wasm sim?
+R1-XT-OQ13	XT	r1-simulation-core.md	3088	Where do content's TypeScript types come from?
+R1-XT-OQ14	XT	r1-simulation-core.md	3092	Who owns audio occlusion rays, if option O-B is chosen?
+R1-XT-OQ15	XT	r1-simulation-core.md	3097	Which bench method measures R1's budget marks?
+R1-XT-OQ16	XT	r1-simulation-core.md	3101	Does R3 need OffscreenCanvas, or a per-entity or per-field block layout?
+R1-XT-OQ17	XT	r1-simulation-core.md	3105	Who answers R1-BND-OQ5 (embeds, cross-origin popups, CORP and the login flow under isolati
+R1-XT-OQ18	XT	r1-simulation-core.md	3109	Does R5's cache question size a workspace no topic proposes?
+R2-SYNC-REC1	REC	r2-netcode.md	1996	State sync: delta snapshots against each client's last acknowledged snapshot (option 3.1 E
+R2-SYNC-REC2	REC	r2-netcode.md	2026	Input commands: one per tick, sent with redundancy, carrying the view time.
+R2-SYNC-REC3	REC	r2-netcode.md	2068	Client prediction: own movement, own weapon state, own vehicle and cosmetic shot feedback 
+R2-SYNC-REC4	REC	r2-netcode.md	2107	Interpolation: remote entities drawn on an adaptive delay (option 3.4 C), starting at 3 sn
+R2-SYNC-REC5	REC	r2-netcode.md	2133	Lag-compensated hitscan: rewind to the shooter's view time, as a pure query on a per-tick 
+R2-SYNC-REC6	REC	r2-netcode.md	2194	Projectiles: server-simulated, replicated as trajectories, evaluated by one shared Rust fu
+R2-SYNC-REC7	REC	r2-netcode.md	2225	Vehicles and big multi-part units: the pilot predicts the vehicle through its own command 
+R2-SYNC-REC8	REC	r2-netcode.md	2247	Aiming at height: the command carries a quantised world aim point (option 3.7 B), picked o
+R2-SYNC-REC9	REC	r2-netcode.md	2276	What changes at 48+: budget the per-client and per-shot costs, and make every cost scale w
+R2-BUD-REC1	REC	r2-netcode.md	2302	Rates: snapshots at 30 Hz; simulation tick 60 Hz if R1's tick spike meets its CPU mark, el
+R2-BUD-REC2	REC	r2-netcode.md	2326	Downstream encoding E3 with a budget: quantize (1 cm positions in 16/16/12 bits, 16-bit ya
+R2-BUD-REC3	REC	r2-netcode.md	2345	Packet size: no snapshot datagram above min(the runtime maximum datagram size, 1150 bytes 
+R2-BUD-REC4	REC	r2-netcode.md	2361	Buffers for "fair to about 100 ms": interpolation delay 100 ms by default (3 snapshot inte
+R2-BUD-REC5	REC	r2-netcode.md	2381	Adapt the send budget to the congestion controller: read estimatedSendRate, lostOutgoing a
+R2-BUD-REC6	REC	r2-netcode.md	2398	A server tick budget for the whole server tick, not just the simulation step: at the large
+R2-INT-REC1	REC	r2-netcode.md	2420	Relevance region from camera parameters held as data (option A3), with hysteresis.
+R2-INT-REC2	REC	r2-netcode.md	2445	Enclosure hiding as the main anti-wallhack measure (option B2): interiors and floors as ar
+R2-INT-REC3	REC	r2-netcode.md	2467	One shared visibility pass for bots and interest, used for line-of-sight hiding only if th
+R2-INT-REC4	REC	r2-netcode.md	2485	A per-client priority accumulator under a byte budget per snapshot (option C2), layered on
+R2-INT-REC5	REC	r2-netcode.md	2502	A visibility class on every field and event type, held as data: public, team, owner, spati
+R2-INT-REC6	REC	r2-netcode.md	2523	Events and long-range entities: their own radius per type, area-aware; parts travel with t
+R2-INT-REC7	REC	r2-netcode.md	2545	Spectators as their own interest profile: follow-a-player live, or free camera on a delaye
+R2-TRN-REC1	REC	r2-netcode.md	2565	Build the server on quinn 0.11.x. Pick the WebTransport layer by spike between wtransport 
+R2-TRN-REC2	REC	r2-netcode.md	2617	Send inputs and snapshots as datagrams, and reliable traffic on streams. Cap each snapshot
+R2-TRN-REC3	REC	r2-netcode.md	2639	Fall back to binary WebSocket (tokio-tungstenite 0.30.x, or axum 0.8.x `ws` if the server 
+R2-TRN-REC4	REC	r2-netcode.md	2673	Use our own thin transport interface on both sides, with two backends each, and keep it ou
+R2-TRN-REC5	REC	r2-netcode.md	2699	Certificates.
+R2-TRN-REC6	REC	r2-netcode.md	2724	Treat congestion control as ours to manage on the server.
+R2-ROOM-REC1	REC	r2-netcode.md	2748	An explicit room lifecycle, one fresh simulation per match.
+R2-ROOM-REC2	REC	r2-netcode.md	2762	One room per OS process to start; inside it, the sim on its own thread and network I/O on 
+R2-ROOM-REC3	REC	r2-netcode.md	2783	Join with a short-lived signed token from the lobby, checked by the room offline (option 3
+R2-ROOM-REC4	REC	r2-netcode.md	2812	Reconnect by holding the slot for a grace window and rejoining with a fresh token (option 
+R2-ROOM-REC5	REC	r2-netcode.md	2823	Private rooms: a short code that only locates the room, a host with server-checked rights,
+R2-ROOM-REC6	REC	r2-netcode.md	2842	Bots fill per team on the server and drive the same input path as humans (option 3.5 A).
+R2-ROOM-REC7	REC	r2-netcode.md	2857	Modes as validated data; a room is a mode id plus allowed overrides (option 3.6 A).
+R2-ROOM-REC8	REC	r2-netcode.md	2868	Guest first: an anonymous guest account from the lobby (option 3.7 A).
+R2-SYNC-OQ1	OQ	r2-netcode.md	2902	Snapshot and tick rates.
+R2-SYNC-OQ2	OQ	r2-netcode.md	2905	The rewind cap: 200 ms (the netcode default principles) or 250 ms (proposed here)?
+R2-SYNC-OQ3	OQ	r2-netcode.md	2909	When the server runs commands.
+R2-SYNC-OQ4	OQ	r2-netcode.md	2916	Snapshots larger than one datagram.
+R2-SYNC-OQ5	OQ	r2-netcode.md	2920	Collision between predicted players and remote players or vehicles.
+R2-SYNC-OQ6	OQ	r2-netcode.md	2925	Projectile spawn fast-forward.
+R2-SYNC-OQ7	OQ	r2-netcode.md	2928	Several seats in a vehicle (VISION_V2 §6.4 [OPEN]).
+R2-SYNC-OQ8	OQ	r2-netcode.md	2930	What else gets rewound.
+R2-SYNC-OQ9	OQ	r2-netcode.md	2933	Melee and short-range abilities.
+R2-SYNC-OQ10	OQ	r2-netcode.md	2936	Predicting abilities (option 3.2 D).
+R2-SYNC-OQ11	OQ	r2-netcode.md	2940	The shared spread seed.
+R2-SYNC-OQ12	OQ	r2-netcode.md	2949	Hermite interpolation.
+R2-SYNC-OQ13	OQ	r2-netcode.md	2952	Bots see the present, humans see the past.
+R2-SYNC-OQ14	OQ	r2-netcode.md	2955	Valve's wiki pages (unread, HTTP 403).
+R2-SYNC-OQ15	OQ	r2-netcode.md	2960	The victim's side of lag compensation (added in the fix pass, 2026-10-28).
+R2-BUD-OQ1	OQ	r2-netcode.md	2971	
+R2-BUD-OQ2	OQ	r2-netcode.md	2975	
+R2-BUD-OQ3	OQ	r2-netcode.md	2978	
+R2-BUD-OQ4	OQ	r2-netcode.md	2980	
+R2-BUD-OQ5	OQ	r2-netcode.md	2982	
+R2-BUD-OQ6	OQ	r2-netcode.md	2986	
+R2-BUD-OQ7	OQ	r2-netcode.md	2989	
+R2-BUD-OQ8	OQ	r2-netcode.md	2993	
+R2-BUD-OQ9	OQ	r2-netcode.md	2995	
+R2-BUD-OQ10	OQ	r2-netcode.md	2997	
+R2-BUD-OQ11	OQ	r2-netcode.md	3000	
+R2-INT-OQ1	OQ	r2-netcode.md	3005	What may a player see: what the overhead camera could show, or what the character can see?
+R2-INT-OQ2	OQ	r2-netcode.md	3010	The camera framing and the aspect ratio.
+R2-INT-OQ3	OQ	r2-netcode.md	3014	Which economy and objective state is team-private?
+R2-INT-OQ4	OQ	r2-netcode.md	3018	What the minimap shows.
+R2-INT-OQ5	OQ	r2-netcode.md	3022	How conservative LOS hiding must be, and what it costs in Rust.
+R2-INT-OQ6	OQ	r2-netcode.md	3026	Do far sound events reveal too much?
+R2-INT-OQ7	OQ	r2-netcode.md	3029	Hysteresis and margin values.
+R2-INT-OQ8	OQ	r2-netcode.md	3031	The Spy's rules (LOOP_V2 §5 [OPEN]: what breaks the disguise, how defenders are warned)
+R2-TRN-OQ1	OQ	r2-netcode.md	3036	Which WebTransport draft does each browser negotiate today, and when do they move to -16?
+R2-TRN-OQ2	OQ	r2-netcode.md	3042	Does Chrome or Firefox fall back to WebTransport over HTTP/2 the way Safari does, and does
+R2-TRN-OQ3	OQ	r2-netcode.md	3047	What `maxDatagramSize` do the four browsers report on real paths?
+R2-TRN-OQ4	OQ	r2-netcode.md	3050	Production certificates: public certificates per hostname or short-lived pinned ones?
+R2-TRN-OQ5	OQ	r2-netcode.md	3056	wtransport or web-transport-quinn?
+R2-TRN-OQ6	OQ	r2-netcode.md	3064	Is qmux worth adopting as the fallback framing later?
+R2-TRN-OQ7	OQ	r2-netcode.md	3068	How many players will need the WebSocket fallback?
+R2-TRN-OQ8	OQ	r2-netcode.md	3071	Does the browser's own congestion controller limit client inputs in practice?
+R2-TRN-OQ9	OQ	r2-netcode.md	3075	Valve's Source networking page could not be read (HTTP 403).
+R2-ROOM-OQ1	OQ	r2-netcode.md	3080	Process per room or many per process, finally?
+R2-ROOM-OQ2	OQ	r2-netcode.md	3082	Token signature scheme and keys.
+R2-ROOM-OQ3	OQ	r2-netcode.md	3091	The soldier of a dropped player during the grace window.
+R2-ROOM-OQ4	OQ	r2-netcode.md	3093	Joining a match in progress.
+R2-ROOM-OQ5	OQ	r2-netcode.md	3095	What a private-room host may set.
+R2-ROOM-OQ6	OQ	r2-netcode.md	3097	Host leaves.
+R2-ROOM-OQ7	OQ	r2-netcode.md	3099	Do private matches count?
+R2-ROOM-OQ8	OQ	r2-netcode.md	3101	Can WebTransport survive an address change without a reconnect?
+R2-ROOM-OQ9	OQ	r2-netcode.md	3104	Where the lobby runs and stores guest ids and the room directory.
+R2-ROOM-OQ10	OQ	r2-netcode.md	3106	Code length and alphabet.
+R2-ROOM-OQ11	OQ	r2-netcode.md	3112	Where the guest secret lives (added in the fix pass, 2026-10-28).
+R2-XU-OQ1	XU	r2-netcode.md	3123	The rewind cap: 250 ms (sync) or 200 ms (budgets)?
+R2-XU-OQ2	XU	r2-netcode.md	3132	Is the latency term in Source's rewind formula a round trip or one way?
+R2-XU-OQ3	XU	r2-netcode.md	3144	Interpolation delay: bounds and extrapolation marks.
+R2-XU-OQ4	XU	r2-netcode.md	3151	Input redundancy and the size of a command.
+R2-XU-OQ5	XU	r2-netcode.md	3158	The snapshot datagram cap: 1,000 bytes (transport) or 1,150 bytes (budgets)?
+R2-XU-OQ6	XU	r2-netcode.md	3166	How a joining or resyncing client gets its first full state, and how fast.
+R2-XU-OQ7	XU	r2-netcode.md	3174	Hit-history length and the rewound-shot load.
+R2-XU-OQ8	XU	r2-netcode.md	3180	One CPU accounting for the server tick.
+R2-XU-OQ9	XU	r2-netcode.md	3197	The reference server.
+R2-XU-OQ10	XU	r2-netcode.md	3203	Can the browser read its own connection statistics?
+R2-XU-OQ11	XU	r2-netcode.md	3214	Where the outgoing maximum age applies, and its value.
+R2-XU-OQ12	XU	r2-netcode.md	3220	The network profiles behind the pass marks.
+R2-XU-OQ13	XU	r2-netcode.md	3226	Team sizes: totals or per team?
+R2-XU-OQ14	XU	r2-netcode.md	3230	The legacy top speed of a soldier.
+R2-XU-OQ15	XU	r2-netcode.md	3243	Snapshot size per client: the interest illustration against the budgets estimate.
+R2-XU-OQ16	XU	r2-netcode.md	3248	The tier of Glenn Fiedler's articles.
+R2-XU-OQ17	XU	r2-netcode.md	3255	Spectators and casters fall between two units.
+R2-XU-OQ18	XU	r2-netcode.md	3260	Four recommendations name no VISION_V2 §6 item.
+ABL-PREDICT	SHARED	r2-netcode.md	3277	Does the client predict the local player's own abilities?** The
+SEC-SPREAD	SHARED	r2-netcode.md	3289	Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicte
+MODES-3	SHARED	r2-netcode.md	3297	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+BASELINE-WHEN	SHARED	r2-netcode.md	3307	Research the deferred security baseline before ADR 0006, or list it open there?** The
+R2-XT-OQ1	XT	r2-netcode.md	3326	Who casts the cursor ray for the aim point, and how does the point cross the boundary?
+R2-XT-OQ2	XT	r2-netcode.md	3333	Where does the remote-entity interpolation buffer live: in the worker or on the page?
+R2-XT-OQ3	XT	r2-netcode.md	3340	Does the E3 projectile encoding rest on the cross-target identity R1 says the netcode must
+R2-XT-OQ4	XT	r2-netcode.md	3347	Who hosts, costs and builds the lobby and the room supervisor?
+R2-XT-OQ5	XT	r2-netcode.md	3354	Who answers R1's timing questions (sub-tick input timestamps, client tick nudging, shipped
+R2-XT-OQ6	XT	r2-netcode.md	3361	Who answers R1's protocol questions (hash comparison, snapshot layout, mid-match tuning, t
+R2-XT-OQ7	XT	r2-netcode.md	3367	Is whole-world replay still a spike mark?
+R2-XT-OQ8	XT	r2-netcode.md	3373	Do the snapshot and the output block carry remote soldiers' animation state?
+R2-XT-OQ9	XT	r2-netcode.md	3379	Which recommendations wait on the deferred security baseline?
+R2-XT-OQ10	XT	r2-netcode.md	3384	How do multiplayer previews get their server binary and their certificate hash?
+R2-XT-OQ11	XT	r2-netcode.md	3390	Do the wire's entity ids and tick counter fit R1's generational ids and a 20-minute match?
+R2-XT-OQ12	XT	r2-netcode.md	3395	Who owns recovery from a trap in the client's Wasm sim?
+R2-XT-OQ13	XT	r2-netcode.md	3399	Do soldiers block each other? (one rule, asked twice)
+R2-XT-OQ14	XT	r2-netcode.md	3404	Do R2's marks all name one of R5's network profiles?
+R2-XT-OQ15	XT	r2-netcode.md	3409	Does the client's cutaway follow the server's visibility rule?
+R1-BND-REC2	REC	r3-rendering.md	524	
+R1-TICK-REC5	REC	r3-rendering.md	771	/ R1-BND-REC2
+R3-WGPU-REC1	REC	r3-rendering.md	902	Option A: one WebGPURenderer, every material and post effect in TSL, the WebGL 2 backend a
+R3-WGPU-REC2	REC	r3-rendering.md	917	Pin one exact three.js release (r186 today, or the newest at the spike's start) and step o
+R3-WGPU-REC3	REC	r3-rendering.md	928	Build every render pipeline behind the loading screen: `await renderer.init()`, then `comp
+R3-WGPU-REC4	REC	r3-rendering.md	941	Detect and report the backend: the client logs which backend runs (WebGPU or "WebGL 2 fall
+R3-GL2-REC1	REC	r3-rendering.md	955	Option F-A for the first slice, F-B only by measured need: every technique the engine ship
+R3-GL2-REC2	REC	r3-rendering.md	969	Do not let the draw-call budget depend on BatchedMesh or multi-draw on the fallback: test 
+R3-GL2-REC3	REC	r3-rendering.md	979	GPU timing on the fallback is best effort: use `EXT_disjoint_timer_query_webgl2` where it 
+R3-LOOK-REC1	REC	r3-rendering.md	991	Measure every candidate technique alone, in one look-test scene, before the look brief clo
+R3-LOOK-REC2	REC	r3-rendering.md	1002	Build any post chain the brief picks on one shared scene pass with MRT (colour plus only t
+R3-LOOK-REC3	REC	r3-rendering.md	1019	If the brief keeps outlines, the spike measures both families at 48 soldiers on screen (hu
+R3-CHAR-REC1	REC	r3-rendering.md	1032	Soldiers: one skinned mesh per soldier (C-B) as the baseline that runs on both backends (r
+R3-CHAR-REC2	REC	r3-rendering.md	1050	A budget LOD for animation (L-2) as the base, under any camera: a fixed number of soldiers
+R3-CHAR-REC3	REC	r3-rendering.md	1065	Soldiers' per-instance data (transform, faction colour, hit flash, health bar) is written 
+R3-CHAR-REC4	REC	r3-rendering.md	1077	Large units: parts as separate meshes under one group (V-A), each part's transform from th
+R3-BUDGET-REC1	REC	r3-rendering.md	1096	Reference machines (proposed, M-A with M-B as the fallback): the minimum is one named lapt
+R3-BUDGET-REC2	REC	r3-rendering.md	1118	Budgets (proposed, option B-2), measured in the stress scene's fight on screen ([GLOSSARY]
+R3-BUDGET-REC3	REC	r3-rendering.md	1166	Quality tiers are data: one table holds, per tier (Low, Medium, High), the pixel-ratio cap
+R3-MEASURE-REC1	REC	r3-rendering.md	1181	One client measurement harness: per frame it records CPU frame time from `performance.now(
+R3-MEASURE-REC2	REC	r3-rendering.md	1195	A fixed benchmark scene: a recorded match replayed from its inputs (R1's identical-results
+R3-MEASURE-REC3	REC	r3-rendering.md	1206	Split by where it runs: CI (W-A) gates only hardware-independent numbers (zero console err
+R3-MEASURE-REC4	REC	r3-rendering.md	1217	Port legacy's perf overlay to v2 (GP5): backend and adapter, frame time median and p95, dr
+R3-AUDIO-REC1	REC	r3-rendering.md	1229	One `AudioListener` at the local player's position, oriented with the camera, as long as t
+R3-AUDIO-REC2	REC	r3-rendering.md	1245	A voice manager with a cap and priorities (V-B) plus distance culling: proposed start of 3
+R3-AUDIO-REC3	REC	r3-rendering.md	1258	Occlusion starts as option O-C (zones from map data) or none; O-B (rays plus a lowpass, F8
+R3-AUDIO-REC4	REC	r3-rendering.md	1271	Sounds are triggered on the page from the per-tick event section (R1-BND-REC2) and from in
+R3-WGPU-OQ1	OQ	r3-rendering.md	1286	Brave on Windows.
+R3-WGPU-OQ2	OQ	r3-rendering.md	1290	Firefox and Safari "partial".
+R3-WGPU-OQ3	OQ	r3-rendering.md	1294	WebGPURenderer against WebGLRenderer on our scene.
+R3-WGPU-OQ4	OQ	r3-rendering.md	1296	Colour output.
+R3-WGPU-OQ5	OQ	r3-rendering.md	1299	Which release to pin.
+R3-GL2-OQ1	OQ	r3-rendering.md	1305	Does three.js r186 request a WebGPU compatibility-mode adapter, or can it?
+R3-GL2-OQ2	OQ	r3-rendering.md	1308	How many target players fall back?
+R3-GL2-OQ3	OQ	r3-rendering.md	1312	Visual differences between backends.
+R3-GL2-OQ4	OQ	r3-rendering.md	1315	Transform-feedback compute cost.
+R3-GL2-OQ5	OQ	r3-rendering.md	1317	"WebGPU required, no fallback" as a reference point.
+R3-LOOK-OQ1	OQ	r3-rendering.md	1324	GPU cost of each technique on our hardware.
+R3-LOOK-OQ2	OQ	r3-rendering.md	1326	Outline width model.
+R3-LOOK-OQ3	OQ	r3-rendering.md	1328	AO without the pre-pass.
+R3-LOOK-OQ4	OQ	r3-rendering.md	1330	Bloom target sizes.
+R3-LOOK-OQ5	OQ	r3-rendering.md	1332	Shipped-game practice.
+R3-LOOK-OQ6	OQ	r3-rendering.md	1335	Anti-aliasing.
+R3-CHAR-OQ1	OQ	r3-rendering.md	1344	How WebGPURenderer skins.
+R3-CHAR-OQ2	OQ	r3-rendering.md	1347	A bone-texture instanced path on WebGL 2 (C-E).
+R3-CHAR-OQ3	OQ	r3-rendering.md	1349	The character model itself.
+R3-CHAR-OQ4	OQ	r3-rendering.md	1352	BatchedMesh against InstancedMesh for varied props and uniforms.
+R3-CHAR-OQ5	OQ	r3-rendering.md	1355	Camera framing.
+R3-CHAR-OQ6	OQ	r3-rendering.md	1357	GPU-driven culling and indirect draws.
+R3-BUDGET-OQ1	OQ	r3-rendering.md	1364	Which models.
+R3-BUDGET-OQ2	OQ	r3-rendering.md	1366	High-refresh screens.
+R3-BUDGET-OQ3	OQ	r3-rendering.md	1368	HiDPI laptops on Low.
+R3-BUDGET-OQ4	OQ	r3-rendering.md	1370	Largest N.
+R3-BUDGET-OQ5	OQ	r3-rendering.md	1373	Triangle and memory rows.
+R3-BUDGET-OQ6	OQ	r3-rendering.md	1375	Shadow technique.
+R3-MEASURE-OQ1	OQ	r3-rendering.md	1382	Timestamp-query support in Firefox and Safari.
+R3-MEASURE-OQ2	OQ	r3-rendering.md	1384	Self-hosted reference machines in CI.
+R3-MEASURE-OQ3	OQ	r3-rendering.md	1386	GPU memory on integrated graphics.
+R3-MEASURE-OQ4	OQ	r3-rendering.md	1389	Cross-origin isolation for profiling.
+R3-AUDIO-OQ1	OQ	r3-rendering.md	1395	HRTF cost.
+R3-AUDIO-OQ2	OQ	r3-rendering.md	1397	Voice counts in a real fight.
+R3-AUDIO-OQ3	OQ	r3-rendering.md	1399	Listener placement.
+R3-AUDIO-OQ4	OQ	r3-rendering.md	1401	Spec details.
+R3-AUDIO-OQ5	OQ	r3-rendering.md	1403	Occlusion ownership.
+R3-AUDIO-OQ6	OQ	r3-rendering.md	1405	An AudioWorklet mixer or spatializer of our own.
+MODES-3	SHARED	r3-rendering.md	1411	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+R3-XT-OQ1	XT	r3-rendering.md	1424	Where does the remote-entity interpolation buffer live: in the worker or on the page?
+R3-XT-OQ2	XT	r3-rendering.md	1431	Do the snapshot and the output block carry remote soldiers' animation state?
+R3-XT-OQ3	XT	r3-rendering.md	1437	Does the editor still open by double-click with a Wasm validator?
+R3-XT-OQ4	XT	r3-rendering.md	1441	Who creates the client's field data (backend, hardware, frame time)?
+R3-XT-OQ5	XT	r3-rendering.md	1447	Who sets the CI runner costs (GPU, macOS, reference machines, cache)?
+R3-XT-OQ6	XT	r3-rendering.md	1452	Who owns audio occlusion rays, if option O-B is chosen?
+R3-XT-OQ7	XT	r3-rendering.md	1457	Does R3 need OffscreenCanvas, or a per-entity or per-field block layout?
+R3-XT-OQ8	XT	r3-rendering.md	1461	Does the client's cutaway follow the server's visibility rule?
+R4-PHYS-REC1	REC	r4-physics-navigation.md	672	No physics engine: use parry3d (pinned, `enhanced-determinism` on) for shapes, queries and
+R4-PHYS-REC2	REC	r4-physics-navigation.md	721	One static collision world from the map document, immutable for the match, with stable ids
+R4-PHYS-REC3	REC	r4-physics-navigation.md	747	Projectiles as per-tick swept queries, never as physics bodies; no CCD.
+R4-PHYS-REC4	REC	r4-physics-navigation.md	762	Big vehicles as kinematic compound bodies, moved by a swept test against statics and soldi
+R4-PHYS-REC5	REC	r4-physics-navigation.md	786	f32 for the whole sim, revisited only if a map exceeds 2 km across.
+R4-NAV-REC1	REC	r4-physics-navigation.md	802	The sim owns the navigation runtime; the navigation data is baked by a tool and stored in 
+R4-NAV-REC2	REC	r4-physics-navigation.md	845	Path requests go through a queue with a fixed budget per tick, measured in node expansions
+R4-NAV-REC3	REC	r4-physics-navigation.md	867	Local avoidance is a step inside the sim's movement phase, never a crowd system that moves
+R4-NAV-REC4	REC	r4-physics-navigation.md	888	Navigation runs where bots run: on the server, and in the browser only for offline or loca
+R4-FLOORS-REC1	REC	r4-physics-navigation.md	903	Typed links generated by the bake and checked by running the sim's own movement, with edit
+R4-FLOORS-REC2	REC	r4-physics-navigation.md	925	Floors are separate layers with ceilings from day one, even though interiors are [LATER].
+R4-FLOORS-REC3	REC	r4-physics-navigation.md	941	One movement rule, one source of numbers: the bake reads the soldier's movement data, and 
+R4-LOS-REC1	REC	r4-physics-navigation.md	958	One height-aware sight query in the sim, used by bots, blasts, melee, the shield check and
+R4-LOS-REC2	REC	r4-physics-navigation.md	990	Cull before casting, and budget sight in rays per tick: distance and team first, then area
+R4-LOS-REC3	REC	r4-physics-navigation.md	1008	Aim at height through the same queries on both sides: the client's cursor ray and the serv
+R4-OBST-REC1	REC	r4-physics-navigation.md	1022	Moving vehicles are never carved into the navigation data: they are obstacles in the sim's
+R4-OBST-REC2	REC	r4-physics-navigation.md	1043	Structures that change state are baked in both states; a change flips flags on the affecte
+R4-OBST-REC3	REC	r4-physics-navigation.md	1063	Split the bake into fixed tiles with stable ids only if a full bake is too slow for the ed
+R4-PHYS-OQ1	OQ	r4-physics-navigation.md	1082	Who blocks whom.
+R4-PHYS-OQ2	OQ	r4-physics-navigation.md	1085	Our own move or Rapier's controller.
+R4-PHYS-OQ3	OQ	r4-physics-navigation.md	1087	parry3d's BVH and SIMD across targets.
+R4-PHYS-OQ4	OQ	r4-physics-navigation.md	1090	The shape of the ground.
+R4-PHYS-OQ5	OQ	r4-physics-navigation.md	1093	If dynamics is ever needed.
+R4-NAV-OQ1	OQ	r4-physics-navigation.md	1099	Which generator.
+R4-NAV-OQ2	OQ	r4-physics-navigation.md	1100	rerecast's maturity and browser build.
+R4-NAV-OQ3	OQ	r4-physics-navigation.md	1103	Distance tables or flow fields for crowds.
+R4-NAV-OQ4	OQ	r4-physics-navigation.md	1106	If polyanya is used anyway.
+R4-NAV-OQ5	OQ	r4-physics-navigation.md	1108	Do soldiers block each other?
+R4-FLOORS-OQ1	OQ	r4-physics-navigation.md	1112	Crouching and other stances.
+R4-FLOORS-OQ2	OQ	r4-physics-navigation.md	1114	Vehicles between levels.
+R4-FLOORS-OQ3	OQ	r4-physics-navigation.md	1117	Fall damage and drop height.
+R4-FLOORS-OQ4	OQ	r4-physics-navigation.md	1119	Movement tuning hot-reloaded mid-match.
+R4-LOS-OQ1	OQ	r4-physics-navigation.md	1124	Do soldiers and vehicles block sight and shots?
+R4-LOS-OQ2	OQ	r4-physics-navigation.md	1127	What a player may see.
+R4-LOS-OQ3	OQ	r4-physics-navigation.md	1129	A field of view for bots.
+R4-LOS-OQ4	OQ	r4-physics-navigation.md	1131	Partial blockers.
+R4-LOS-OQ5	OQ	r4-physics-navigation.md	1133	The cost of a segment query
+R4-OBST-OQ1	OQ	r4-physics-navigation.md	1137	What a vehicle does to soldiers in its path
+R4-OBST-OQ2	OQ	r4-physics-navigation.md	1139	Do harvesters follow fixed lanes or navigation?
+R4-OBST-OQ3	OQ	r4-physics-navigation.md	1142	Player building, if ever.
+R4-OBST-OQ4	OQ	r4-physics-navigation.md	1145	ORCA against non-circular hulls.
+MODES-3	SHARED	r4-physics-navigation.md	1153	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+R4-XT-OQ1	XT	r4-physics-navigation.md	1168	Who casts the cursor ray for the aim point, and how does the point cross the boundary?
+R4-XT-OQ2	XT	r4-physics-navigation.md	1175	Which R1 items still assume Rapier, now that R4 recommends parry3d?
+R4-XT-OQ3	XT	r4-physics-navigation.md	1183	Is whole-world replay still a spike mark?
+R4-XT-OQ4	XT	r4-physics-navigation.md	1189	Do browser navigation and server-less previews rest on an undecided offline-play need?
+R4-XT-OQ5	XT	r4-physics-navigation.md	1195	Where do the navigation bake and R4's checks live in the crates and the gate?
+R4-XT-OQ6	XT	r4-physics-navigation.md	1201	Do soldiers block each other? (one rule, asked twice)
+R4-XT-OQ7	XT	r4-physics-navigation.md	1206	Who owns audio occlusion rays, if option O-B is chosen?
+R4-XT-OQ8	XT	r4-physics-navigation.md	1211	Does R5's cache question size a workspace no topic proposes?
+R5-LAYOUT-REC1	REC	r5-toolchain-quality.md	1153	One repository with both workspaces at its root (option A), npm workspaces, and pinned too
+R5-LAYOUT-REC2	REC	r5-toolchain-quality.md	1170	Start with only the crates and packages a §6 item needs, and enforce who may depend on who
+R5-LAYOUT-REC3	REC	r5-toolchain-quality.md	1194	Generated TypeScript types live in one committed package, `packages/types`, written by `ca
+R5-LAYOUT-REC4	REC	r5-toolchain-quality.md	1206	The sim crate is built with one feature set on every target, and the gate checks it.
+R5-LAYOUT-REC5	REC	r5-toolchain-quality.md	1219	Vite: two HTML entries, the Worker by URL, and isolation headers behind a flag.
+R5-LAYOUT-REC6	REC	r5-toolchain-quality.md	1233	The phase 1 move keeps the legacy oracle runnable.
+R5-TSLINT-REC1	REC	r5-toolchain-quality.md	1250	TypeScript 6.0.x, pinned exactly, with one shared strict base tsconfig.
+R5-TSLINT-REC2	REC	r5-toolchain-quality.md	1265	ESLint 10 flat config with typescript-eslint `strict-type-checked` plus `stylistic-type-ch
+R5-TSLINT-REC3	REC	r5-toolchain-quality.md	1283	Prettier formats the TypeScript packages and their JSON; the gate runs it in check mode.
+R5-TSLINT-REC4	REC	r5-toolchain-quality.md	1292	The per-edit hook checks only what changed, fast.
+R5-RUSTLINT-REC1	REC	r5-toolchain-quality.md	1306	One workspace lint table, every crate opts in, and the gate turns warnings into errors (op
+R5-RUSTLINT-REC2	REC	r5-toolchain-quality.md	1321	The determinism lint set for `sim` (and for the parts of `content` the sim calls).
+R5-RUSTLINT-REC3	REC	r5-toolchain-quality.md	1340	No implicit panics in the code that reads untrusted bytes.
+R5-RUSTLINT-REC4	REC	r5-toolchain-quality.md	1353	One overflow rule on every target: overflow checks on for `sim` and `protocol` in every pr
+R5-RUSTLINT-REC5	REC	r5-toolchain-quality.md	1365	rustfmt with stable options only, and the gate in check mode.
+R5-RUSTLINT-REC6	REC	r5-toolchain-quality.md	1374	The toolchain pin includes clippy and rustfmt; a toolchain upgrade is its own change-set.
+R5-TEST-REC1	REC	r5-toolchain-quality.md	1386	The layers, the tool for each, and where each runs.
+R5-TEST-REC2	REC	r5-toolchain-quality.md	1412	The determinism suite's tools (R1-DET-REC6 asks R5 to pick them).
+R5-TEST-REC3	REC	r5-toolchain-quality.md	1431	Golden tests against legacy: captured once from the legacy oracle, committed, read by v2 t
+R5-TEST-REC4	REC	r5-toolchain-quality.md	1454	The network simulator in two layers, with R2's profiles as the named set.
+R5-TEST-REC5	REC	r5-toolchain-quality.md	1475	Soak and load at 48 and more, with bots as protocol clients.
+R5-TEST-REC6	REC	r5-toolchain-quality.md	1490	Flakes: no retries, fixed seeds in the gate, no wall-clock waits; a failure is a defect.
+R5-CI-REC1	REC	r5-toolchain-quality.md	1510	Cache the Rust dependencies with Swatinem/rust-cache v2.9.3, pinned by SHA. Use one `share
+R5-CI-REC2	REC	r5-toolchain-quality.md	1523	Pin the Rust toolchain exactly and build with `--locked`.
+R5-CI-REC3	REC	r5-toolchain-quality.md	1536	Pin the wasm-bindgen CLI to the library version that Cargo.lock records, and fail CI on an
+R5-CI-REC4	REC	r5-toolchain-quality.md	1547	Node: setup-node v7 with `cache: npm` and `cache-dependency-path` set to the client lockfi
+R5-CI-REC5	REC	r5-toolchain-quality.md	1556	Run the gate v2 in CI as option G1. One workflow on push and pull_request runs parallel jo
+R5-PREV-REC1	REC	r5-toolchain-quality.md	1588	Use workflow shape P1. Build in the ordinary `pull_request` workflow with no secret, and d
+R5-PREV-REC2	REC	r5-toolchain-quality.md	1605	Choose a host that meets these needs: deploy a prebuilt directory from Actions with a scop
+R5-PREV-REC3	REC	r5-toolchain-quality.md	1616	Clean up when the PR closes, and sweep weekly.
+R5-PREV-REC4	REC	r5-toolchain-quality.md	1625	Preview headers: the preview header set, scoped by hostname, generated by the build. The d
+R5-PREV-REC5	REC	r5-toolchain-quality.md	1642	Keep previews public but unlisted at the start (`noindex`, branch-name links), and offer M
+R5-GATE-REC1	REC	r5-toolchain-quality.md	1655	The gate v2's checks, in order, fastest first, each with an id and a reason.
+R5-GATE-REC2	REC	r5-toolchain-quality.md	1683	One command, the same locally and in CI, carrying today's conventions (option A).
+R5-GATE-REC3	REC	r5-toolchain-quality.md	1706	The gate proves itself in one command: a committed mutation suite with controls.
+R5-GATE-REC4	REC	r5-toolchain-quality.md	1734	Budgets are data in the repository, reviewed like code.
+R5-LAYOUT-OQ1	OQ	r5-toolchain-quality.md	1750	npm or pnpm?
+R5-LAYOUT-OQ2	OQ	r5-toolchain-quality.md	1753	wasm-pack or the wasm-bindgen CLI directly?
+R5-LAYOUT-OQ3	OQ	r5-toolchain-quality.md	1756	Can cargo-deny ban a workspace crate (for example, forbid `server` as a dependency of `sim
+R5-LAYOUT-OQ4	OQ	r5-toolchain-quality.md	1759	Do ts-rs exports from parallel test threads conflict when many types write into one folder
+R5-LAYOUT-OQ5	OQ	r5-toolchain-quality.md	1761	Where do the legacy docs and the gate go in phase 1?
+R5-TSLINT-OQ1	OQ	r5-toolchain-quality.md	1766	When does typescript-eslint support TypeScript 7?
+R5-TSLINT-OQ2	OQ	r5-toolchain-quality.md	1768	Is a TypeScript-7-native type-aware linter worth it (option C)?
+R5-TSLINT-OQ3	OQ	r5-toolchain-quality.md	1770	Do the generated types pass `erasableSyntaxOnly`?
+R5-TSLINT-OQ4	OQ	r5-toolchain-quality.md	1773	`exactOptionalPropertyTypes` and `noUncheckedIndexedAccess` against three.js's own types.
+R5-TSLINT-OQ5	OQ	r5-toolchain-quality.md	1776	Which rule enforces "`textContent`, never `innerHTML`" for dynamic text?
+R5-TSLINT-OQ6	OQ	r5-toolchain-quality.md	1779	`skipLibCheck`.
+R5-RUSTLINT-OQ1	OQ	r5-toolchain-quality.md	1784	Can `disallowed-methods` name std's float methods (`f32::sin`, `f64::atan2`, `f32::algebra
+R5-RUSTLINT-OQ2	OQ	r5-toolchain-quality.md	1788	The `panic` and `arithmetic_side_effects` lints were not read.
+R5-RUSTLINT-OQ3	OQ	r5-toolchain-quality.md	1790	Hash maps from dependencies.
+R5-RUSTLINT-OQ4	OQ	r5-toolchain-quality.md	1793	Overflow checks cost on the hot tick.
+R5-RUSTLINT-OQ5	OQ	r5-toolchain-quality.md	1794	Allowed HashMap use inside the sim for non-outcome code.
+R5-TEST-OQ1	OQ	r5-toolchain-quality.md	1802	Does Playwright's clock reach the sim's Worker?
+R5-TEST-OQ2	OQ	r5-toolchain-quality.md	1804	Can wtransport or web-transport-quinn be built on a custom quinn endpoint, so L2 sits unde
+R5-TEST-OQ3	OQ	r5-toolchain-quality.md	1806	A golden for intended behaviour or for legacy's behaviour?
+R5-TEST-OQ4	OQ	r5-toolchain-quality.md	1809	How long a real-Safari run takes and costs on macOS runners.
+R5-TEST-OQ5	OQ	r5-toolchain-quality.md	1810	Is turmoil worth adding for the server's own async code (rooms, timers) besides L1?
+R5-TEST-OQ6	OQ	r5-toolchain-quality.md	1812	OS-level impairment as a third layer.
+R5-TEST-OQ7	OQ	r5-toolchain-quality.md	1814	quickcheck or bolero instead of proptest.
+R5-TEST-OQ8	OQ	r5-toolchain-quality.md	1816	cargo-nextest, code coverage and the bench harness were not researched.
+R5-CI-OQ1	OQ	r5-toolchain-quality.md	1825	How big are our caches?
+R5-CI-OQ2	OQ	r5-toolchain-quality.md	1828	Is sccache worth adding later?
+R5-CI-OQ3	OQ	r5-toolchain-quality.md	1830	Workflow lockfiles.
+R5-CI-OQ4	OQ	r5-toolchain-quality.md	1833	The wasm-opt (binaryen) pin.
+R5-CI-OQ5	OQ	r5-toolchain-quality.md	1835	GPU for WebGPU tests.
+R5-CI-OQ6	OQ	r5-toolchain-quality.md	1838	Dependabot and SHA pins.
+R5-CI-OQ7	OQ	r5-toolchain-quality.md	1840	An arm64 determinism leg.
+R5-PREV-OQ1	OQ	r5-toolchain-quality.md	1846	Access wall or public-unlisted previews?
+R5-PREV-OQ2	OQ	r5-toolchain-quality.md	1848	Does a closed PR's preview really disappear on Cloudflare Pages?
+R5-PREV-OQ3	OQ	r5-toolchain-quality.md	1851	Do previews need a game server?
+R5-PREV-OQ4	OQ	r5-toolchain-quality.md	1855	Which host, at what price?
+R5-PREV-OQ5	OQ	r5-toolchain-quality.md	1858	Does GitHub show the environment URL on the PR page?
+R5-PREV-OQ6	OQ	r5-toolchain-quality.md	1860	Do branch aliases match `https://:version.:project.pages.dev/*`?
+R5-GATE-OQ1	OQ	r5-toolchain-quality.md	1865	Which checks run on a TypeScript-only or Rust-only PR?
+R5-GATE-OQ2	OQ	r5-toolchain-quality.md	1869	WebGPU in the end-to-end check.
+R5-GATE-OQ3	OQ	r5-toolchain-quality.md	1871	Where the gate v2 lives while legacy's gate stays.
+R5-GATE-OQ4	OQ	r5-toolchain-quality.md	1873	Advisories: in the PR gate or only scheduled and on lockfile changes?
+R5-GATE-OQ5	OQ	r5-toolchain-quality.md	1877	`--prove` cost.
+R5-XQ-OQ1	OQ	r5-toolchain-quality.md	1885	Safari on macOS: in the PR gate or not, and does the end-to-end suite need real Safari?
+R5-XQ-OQ2	OQ	r5-toolchain-quality.md	1895	One npm lockfile or a client lockfile?
+R5-XQ-OQ3	OQ	r5-toolchain-quality.md	1899	Isolation headers in local development and in previews: always, or behind a flag?
+MODES-3	SHARED	r5-toolchain-quality.md	1918	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+BASELINE-WHEN	SHARED	r5-toolchain-quality.md	1927	Research the deferred security baseline before ADR 0006, or list it open there?** The
+PREV-DELETE	SHARED	r5-toolchain-quality.md	1939	Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+PREVIEW-WALL	SHARED	r5-toolchain-quality.md	1946	Should per-PR previews that talk to the staging game server be private?** Private means
+R5-XT-OQ1	XT	r5-toolchain-quality.md	1963	Which R1 items still assume Rapier, now that R4 recommends parry3d?
+R5-XT-OQ2	XT	r5-toolchain-quality.md	1971	Where does the remote-entity interpolation buffer live: in the worker or on the page?
+R5-XT-OQ3	XT	r5-toolchain-quality.md	1978	Who hosts, costs and builds the lobby and the room supervisor?
+R5-XT-OQ4	XT	r5-toolchain-quality.md	1985	Do browser navigation and server-less previews rest on an undecided offline-play need?
+R5-XT-OQ5	XT	r5-toolchain-quality.md	1991	Which recommendations wait on the deferred security baseline?
+R5-XT-OQ6	XT	r5-toolchain-quality.md	1996	How do multiplayer previews get their server binary and their certificate hash?
+R5-XT-OQ7	XT	r5-toolchain-quality.md	2002	Where do the navigation bake and R4's checks live in the crates and the gate?
+R5-XT-OQ8	XT	r5-toolchain-quality.md	2008	Does the editor still open by double-click with a Wasm validator?
+R5-XT-OQ9	XT	r5-toolchain-quality.md	2012	Where do content's TypeScript types come from?
+R5-XT-OQ10	XT	r5-toolchain-quality.md	2016	Do R2's marks all name one of R5's network profiles?
+R5-XT-OQ11	XT	r5-toolchain-quality.md	2021	Who sets the CI runner costs (GPU, macOS, reference machines, cache)?
+R5-XT-OQ12	XT	r5-toolchain-quality.md	2026	Where do the Sentry upload job and the smoke test's network rule fit?
+R5-XT-OQ13	XT	r5-toolchain-quality.md	2030	Which bench method measures R1's budget marks?
+R5-XT-OQ14	XT	r5-toolchain-quality.md	2033	Does R5's cache question size a workspace no topic proposes?
+R6-HOST-REC1	REC	r6-infrastructure.md	619	Host the client and the per-PR previews on Cloudflare Pages ([GLOSSARY](GLOSSARY.md#the-cl
+R6-HOST-REC2	REC	r6-infrastructure.md	645	Run game servers on Hetzner Cloud in one EU location, one room per process under a small s
+R6-HOST-REC3	REC	r6-infrastructure.md	672	Previews get one shared staging game server, not one per PR.
+R6-HOST-REC4	REC	r6-infrastructure.md	684	Production certificates: a publicly trusted certificate per game-server hostname (R2-TRN-R
+R6-COST-REC1	REC	r6-infrastructure.md	703	Budget the start at about 18 EUR per month (lean) to about 102 EUR + 5 USD (reference), an
+R6-COST-REC2	REC	r6-infrastructure.md	718	Put a cost line into every match record and a monthly bill check into operations.
+R6-OBS-REC1	REC	r6-infrastructure.md	729	Server logs: `tracing` with JSON lines on standard output per room process; the supervisor
+R6-OBS-REC2	REC	r6-infrastructure.md	739	Server metrics: the `metrics` facade with `metrics-exporter-prometheus`, scraped by a Prom
+R6-OBS-REC3	REC	r6-infrastructure.md	754	Client errors and crashes: Sentry's browser SDK with `wasmIntegration` and build ids from 
+R6-OBS-REC4	REC	r6-infrastructure.md	769	Data protection defaults: every store in the EU (P1), no IP addresses or secrets in logs a
+R6-TEL-REC1	REC	r6-infrastructure.md	784	Every match writes one record (W2), recorded inside the room (R-a), with this shape (propo
+R6-TEL-REC2	REC	r6-infrastructure.md	812	Store records as compressed JSON-lines files in EU object storage (S1, Hetzner Object Stor
+R6-TEL-REC3	REC	r6-infrastructure.md	828	Analyse in batches (N1), always grouped by content hash and mode id, with sample sizes sho
+R6-HOST-OQ1	OQ	r6-infrastructure.md	852	Is Hetzner's EU capacity actually available?
+R6-HOST-OQ2	OQ	r6-infrastructure.md	856	Which EU location gives the best ping across the player base?
+R6-HOST-OQ3	OQ	r6-infrastructure.md	859	Does a later fleet need a UDP load balancer?
+R6-HOST-OQ4	OQ	r6-infrastructure.md	862	Fly.io and GameLift as fallbacks.
+R6-HOST-OQ5	OQ	r6-infrastructure.md	866	Private or only harmless previews?
+R6-HOST-OQ6	OQ	r6-infrastructure.md	869	Does the wildcard certificate need dns-01, and how long will certificates live?
+R6-HOST-OQ7	OQ	r6-infrastructure.md	875	What does a Hetzner IPv4 address cost today?
+R6-COST-OQ1	OQ	r6-infrastructure.md	880	How many rooms fit one VM?
+R6-COST-OQ2	OQ	r6-infrastructure.md	883	Sentry's and Grafana's real bills.
+R6-COST-OQ3	OQ	r6-infrastructure.md	887	How many players, and when?
+R6-COST-OQ4	OQ	r6-infrastructure.md	889	Is included traffic per VM, pooled, or prorated for VMs that run part of a month?
+R6-COST-OQ5	OQ	r6-infrastructure.md	891	VAT and currency.
+R6-OBS-OQ1	OQ	r6-infrastructure.md	896	What does EU data-protection law require of us?
+R6-OBS-OQ2	OQ	r6-infrastructure.md	900	How do metrics and logs reach Grafana Cloud?
+R6-OBS-OQ3	OQ	r6-infrastructure.md	902	Does Sentry's Wasm symbolication work for Rust built by wasm-bindgen?
+R6-OBS-OQ4	OQ	r6-infrastructure.md	904	Which browsers send `crash` reports?
+R6-OBS-OQ5	OQ	r6-infrastructure.md	905	Client performance in the field
+R6-TEL-OQ1	OQ	r6-infrastructure.md	910	How many matches before a rate means something?
+R6-TEL-OQ2	OQ	r6-infrastructure.md	913	Do bot matches and private matches count?
+R6-TEL-OQ3	OQ	r6-infrastructure.md	915	Which moments does the server recognize, and with what thresholds?
+R6-TEL-OQ4	OQ	r6-infrastructure.md	917	How long are match records kept?
+R6-TEL-OQ5	OQ	r6-infrastructure.md	920	How shipped games do it.
+R6-SEC-OQ1	OQ	r6-infrastructure.md	926	Security baseline (content security policy, dependency audits, anti-cheat basics): deferre
+MODES-3	SHARED	r6-infrastructure.md	949	How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 player
+BASELINE-WHEN	SHARED	r6-infrastructure.md	958	Research the deferred security baseline before ADR 0006, or list it open there?** The
+PREV-DELETE	SHARED	r6-infrastructure.md	970	Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+PREVIEW-WALL	SHARED	r6-infrastructure.md	977	Should per-PR previews that talk to the staging game server be private?** Private means
+R6-XT-OQ1	XT	r6-infrastructure.md	991	Who hosts, costs and builds the lobby and the room supervisor?
+R6-XT-OQ2	XT	r6-infrastructure.md	998	Do browser navigation and server-less previews rest on an undecided offline-play need?
+R6-XT-OQ3	XT	r6-infrastructure.md	1004	Which recommendations wait on the deferred security baseline?
+R6-XT-OQ4	XT	r6-infrastructure.md	1009	How do multiplayer previews get their server binary and their certificate hash?
+R6-XT-OQ5	XT	r6-infrastructure.md	1015	Who creates the client's field data (backend, hardware, frame time)?
+R6-XT-OQ6	XT	r6-infrastructure.md	1021	Who owns recovery from a trap in the client's Wasm sim?
+R6-XT-OQ7	XT	r6-infrastructure.md	1025	Who sets the CI runner costs (GPU, macOS, reference machines, cache)?
+R6-XT-OQ8	XT	r6-infrastructure.md	1030	Where do the Sentry upload job and the smoke test's network rule fit?
+R6-XT-OQ9	XT	r6-infrastructure.md	1034	Who answers R1-BND-OQ5 (embeds, cross-origin popups, CORP and the login flow under isolati

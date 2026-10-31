@@ -1,0 +1,83 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: xhigh · 2026-10-31 about 18:35 Amsterdam
+
+You are the lead of the v2 decision drafts for SHAMBLE FRONTLINES (brief: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/DRAFTS_BRIEF.md;
+plan: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/plan.md, revision 1, under the advisor's review right now).
+This unit is the plan's step 2, the **decision map**: a working document that the seven draft authors read before they
+write, so the six drafts neither overlap nor leave gaps. It is notes only: you edit no file outside your notes.
+
+## Read first
+- The brief (all of it) and the plan (all of it): the settled inputs (brief §1), the two definitions (brief §2), the
+  deliverables (§3), the rules every author follows (plan, "Rules every author follows"), and the authorship table.
+- docs/VISION_V2.md (§6 is the requirements list), docs/LOOP_V2.md, docs/EDITOR_V2.md, docs/LOOK_V2.md (new today:
+  Mustafa's look brief; it IS decided where it says [DECIDED]), docs/STATUS.md "Decisions pending" (the 2026-10-31
+  decisions and the five carry-forwards), docs/research/README.md, docs/research/GLOSSARY.md, the six topic files
+  (their Recommendations, Open questions, "Conflicts and gaps"/"Cross-unit open questions", "Shared open questions",
+  "Cross-topic open questions" and "Pointers to other topics" sections; read Findings only where you need them),
+  docs/LEGACY_INVENTORY.md (headers and marks), docs/adr/0000-template.md.
+- The canonical id list: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/research-ids.tsv (535
+  rows: every recommendation and open-question id DEFINED in r1–r6, with file and line at 9e7db28; kinds REC 167 (two
+  R1 ids are defined twice: R1-TICK-REC5, R1-BND-REC2), OQ 241, RR 7, XU 30, XT 72, SHARED 18 = 6 codes × their topics).
+
+## Write (your notes; make the folder if needed)
+1. /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-decision-map.md, with these parts:
+   a. **Scope per draft:** for each of ADR 0001–0006, what it decides, in a few lines, and what it takes from the other
+      drafts. Settle every seam explicitly, at least: the tick rate rule and the server tick budget's total and
+      server-only share (0001) vs the fixed-tick mechanism, the sim step share and determinism (0004); the Rust ↔
+      TypeScript boundary, the Web Worker, the generated types and the client + local server skeleton (0002) vs the
+      message protocol (0001); CI, the gate v2 and the preview build (0002) vs preview hosting, privacy and PREV-DELETE
+      (0006); rooms and the room process (0001) vs the machines, certificates and costs under them (0006); content data
+      and hot reload, the ability system (with in-match upgrades on the player, UPGRADE-SCOPE) and the asset pipeline
+      (0005) vs what the sim executes (0004) and what the renderer draws (0003); moments and balance telemetry: recorded
+      by the sim (which draft) vs stored and analysed (0006); spatial audio (0003); bots and navigation (0004); the
+      look (0003, against LOOK_V2) vs the asset pipeline's look-related rules (0005).
+   b. **Ownership of every id:** a table with one row per id in research-ids.tsv (for SHARED codes and the critic's XT
+      items, one row per code or critic rank, listing every copy's id): id · owner draft (0001–0006, or SPIKE_PLAN, or
+      "design question (Mustafa)" for a pure design matter no engine draft settles, with a reason) · the other drafts
+      that must cite it. Exactly one owner per id.
+   c. **Shared numbers:** every number more than one draft will use (the tick period and shares at 30 Hz and 60 Hz,
+      bandwidth per client, memory per room, snapshot rate, interpolation delay, rewind cap, frame-time and GPU budgets
+      on the minimum and recommended hardware, draw calls, Wasm size, the client's sim share, rooms per VM, costs,
+      N = 48 and the stress scene): value · source id and line · owner draft · GLOSSARY term. Other drafts cite it and
+      never restate it differently. Use 48 where the research gives 48 and 54 (carry-forward 3); restate for the 30 Hz
+      baseline where TICK-30 changes a mark (carry-forward 2).
+   d. **Interfaces between the drafts:** what crosses each seam (data, messages, files, tools), and its owner.
+   e. **Traces:** each VISION_V2 §6 item (1–10) → the draft(s) and the part that serves it; each LOOK_V2 item tagged
+      [DECIDED] or [DEFAULT] → the draft and part that achieves it (0003 mostly; buildings, damage stages and interiors
+      also touch 0004 and 0005); LOOK_V2's [OPEN] item → stays open (which draft lists it).
+   f. **Loose-ends register:** STATUS's five carry-forwards; the critic's remaining items (ABL-PREDICT open, PREV-DELETE
+      as a spike item, the answered MODES-3 (a), PREVIEW-WALL (a), SEC-SPREAD (a), BASELINE-WHEN (b) to apply, and every
+      XT and XU question); and the advisor's PR #28 finding 2 (R2-BUD-REC6's reason, r2-netcode.md:2402-2403): each with
+      the draft that resolves it or lists it as an open question, and how (one line).
+   g. **The spike candidates:** every "what a spike must prove" in the research's recommendations, grouped into a
+      proposed small set of spikes (at least: the netcode proof test as brief §2 defines it, the look proof test, the
+      Rust ↔ TypeScript boundary spike), each with the research ids it subsumes, its owner draft, its dependencies and
+      its place in the order (the netcode proof test runs before the foundation, brief §1).
+   h. **Research gaps:** anything a draft must decide where the research has no finding (for example the asset
+      pipeline: glTF/GLB compression, LOD generation, Spline export; LOOK_V2 items such as halftone flashes, line boil,
+      roof fade, damage stages), with what rule 2 of the plan makes of it (an open question or a spike mark).
+2. /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-decision-map-ids.tsv: the ownership
+   table of part b as TSV with a header row `id<TAB>owner<TAB>cites<TAB>note`, one row per id of research-ids.tsv (for
+   SHARED codes, one row per code; `owner` is 0001…0006, SPIKE_PLAN or DESIGN; `cites` is a comma-separated list or
+   empty). The session runs a script on it: every id exactly once.
+
+## Rules
+- Use the GLOSSARY's terms and decide nothing that the brief, the plan or STATUS leaves to Mustafa or the Advisor; do
+  not decide the look beyond LOOK_V2. Name no number you did not take from a research line (cite it) or from the brief.
+- This map assigns; it does not write the drafts' decisions. Where the research gives a recommendation, note it as the
+  starting point; the owner draft adopts, changes or rejects it.
+- Fetch no web page (nothing here needs one).
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-decision-map-notes.md (make the folder;
+you may always write there). Look there first: if the first line names another task, move the file into
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/old/ and start fresh; if the notes end with DONE, write
+your answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each
+unit you finish (a part of the map, a topic's ids assigned), add a line or two: what is done, what you found and where,
+what comes next. Write each part of the map into the map file as soon as it is finished, never only in your context.
+End with DONE, then give your answer. Never commit or push.
+
+## Return
+A short structured summary (at most 40 lines): the seams you settled (one line each), the counts per owner draft, the
+spike set you propose (one line each), the research gaps, anything the plan or the brief leaves unclear that the
+session must decide, and the paths of your two files.
