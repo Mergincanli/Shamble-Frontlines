@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-31 11:55 Amsterdam (10:55 UTC)
+- **Last update:** 2026-10-31 11:59 Amsterdam (10:59 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -270,6 +270,10 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   hits, 617 in context (all judged), no quote gone, every approved change present; labels unchanged (R1, R2 verified;
   R3 45 of 77; R4 50 of 52; R5 61 of 115; R6 21 of 42). Report and appendix drafted (e361f9d; placeholders left: the
   gate, the repo-map check). docs-keeper launched (prompt `prompts/docs-keeper-v2-research.txt`).
+- docs-keeper DONE about 10:58 UTC (verbatim `docs-keeper-v2-research-result.md`): STATUS, ROADMAP, REPO_MAP, README; repo-map
+  check "repo map OK: 103 entries cover 93 required paths"; committed **85f89ea**. Final gate: PASS, all 8 checks, at
+  85f89ea. Report and appendix final: **20eb7ec**. Next: stop the saver; the last commit deletes `.checkpoints/v2-research*`
+  (runs CI); PR #28's body updated and marked ready; the advisor reviews its head; Mustafa's "merge #28".
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
