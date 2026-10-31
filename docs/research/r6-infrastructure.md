@@ -414,7 +414,7 @@ Not researched: deferred by the Advisor on 2026-10-27. No findings (see R6-SEC-O
 |---|---|---|---|---|---|
 | G1. Hetzner Cloud, dedicated vCPU (CCX) | Own public IPv4/IPv6 per VM; firewall filters UDP (F18, F19); no load balancer needed, since the lobby hands out host:port (R2-ROOM-REC2) | "highly predictable resources" (F14) | CCX23 4 vCPU 86.49 EUR/mo, 20 TB included, 1 EUR per extra TB (F15, F16) | Hourly billing, rounded up (F17): keep VMs warm, rooms are processes | EU availability on 2026-10-28 unclear (F20); single provider |
 | G2. Hetzner Cloud, shared vCPU (CX/CAX) | Same as G1 | Shared with neighbours (F14): server tick p99 (GLOSSARY: [server tick time](GLOSSARY.md#server-tick-time), [time statistics](GLOSSARY.md#time-statistics)) must be measured | CX33 4 vCPU 8.99 EUR/mo (F15) | Same as G1 | Noisy neighbours could break the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget)) |
-| G3. Fly.io Machines | UDP not read (docs outside allow list) | performance types (F22), dedicated-ness not read | performance-2x 66 USD/mo + 0.02 USD/GB egress (F22) | Not read | 3.2 GB per 24v24 (48-player) match-hour (R2) at 0.02 USD/GB adds up (R6-COST) |
+| G3. Fly.io Machines | UDP not read (docs outside allow list) | performance types (F22), dedicated-ness not read | performance-2x 66 USD/mo + 0.02 USD/GB egress (F22) | Not read | 3.2 GB per [24v24](GLOSSARY.md#team-size-and-how-modes-are-written) (48-player) match-hour (R2) at 0.02 USD/GB adds up (R6-COST) |
 | G4. Amazon GameLift Servers | Managed fleets (not read in detail) | Instance types | 0.099 USD/h c6a.large on demand, Ohio; bandwidth free on gen 6+ (F23); EU rates not read | Managed scaling (not read) | Vendor lock-in to its server SDK (not read) |
 
 #### Q3. Production certificates for game servers (R2-TRN-REC5, R2-TRN-OQ4)
@@ -513,13 +513,14 @@ EUR per month; at 4 rooms per VM, 21.62 EUR.
 
 #### Assumptions
 - **A-1.** Every player is human and all are in view (R2's upper bound); bots cost no traffic.
-- **A-2.** 8 rooms of 48 players per 4-vCPU VM (R2-ROOM-REC2's proposal); smaller rooms fit at least as many.
+- **A-2.** 8 rooms of 48 players (a 24v24 room) per 4-vCPU VM (R2-ROOM-REC2's proposal, which R2 now states for the
+  largest mode's N); smaller rooms fit at least as many.
   It is a density to measure at the tick rate R1-TICK-REC2's rule picks (R2-ROOM-REC2 mark 2), not one the server tick
   budget guarantees: at the budget's ceiling ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of one vCPU per room at p99) two rooms fill a vCPU before
   the transport runtime ([GLOSSARY](GLOSSARY.md#transport-runtime-time)), so the 4-rooms-per-VM row (one per vCPU) is the case to budget unless R2-ROOM-REC2 marks 1 and 2 pass on it
   (R6-COST-OQ1). At 30 Hz the CPU per simulated second roughly halves (R1-TICK-REC2,
   inferred).
-- **A-3.** 4 rooms of 48 per 2-vCPU or 4 GB instance on Fly.io or GameLift (the same 2 rooms per vCPU as A-2).
+- **A-3.** 4 rooms of 48 (24v24) per 2-vCPU or 4 GB instance on Fly.io or GameLift (the same 2 rooms per vCPU as A-2).
 - **A-4.** Start: up to 2 rooms at once, 18 humans each, about 4 hours a day.
 - **A-5.** Goal: peak 20 rooms of 48 humans; average 6 rooms over 730 hours.
 - **A-6.** K2: 2 VMs always on, 2 more for 6 hours a day, 30 days.
@@ -804,7 +805,7 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   before Closed; every kill event names a source id that resolves in the content set of the record's hash; the points
   total recomputed from events equals the final points in 100 % of records; recording adds under 1 % to server tick p99 and
   0 allocations per tick after warm-up (bounded buffer, preallocated); a 24v24 record is at most 1 MB uncompressed (A-10),
-  and a record of the largest mode at most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b)).
+  and a record of the largest mode at most 1 MB × [N](GLOSSARY.md#player-count-n) / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b)).
 - **R6-TEL-REC2. Store records as compressed JSON-lines files in EU object storage (S1, Hetzner Object Storage in the
   game servers' location), uploaded by the supervisor after the room exits, with a schema version in every record and
   a Parquet compaction job (S2, `parquet` 60.1.0) only once a query needs it.**
@@ -1211,6 +1212,8 @@ Step 3d fixes (2026-10-30):
 - "48-player" judged per the glossary rule: the TL;DR's cost line, the Q2 table (G3), K4 and A-10 now name 24v24
   beside the 48 (their figures are R2's 24v24 row); TL15's "48-player room" (legacy facts of R6-HOST and R6-COST) is
   kept, since it repeats the legacy figure's own 48 soldiers. (nit)
+- Glossary links: N in R6-TEL-REC1's record mark (player count), 24v24 in the Q2 table's G3 row (team size). (nit)
+- A-2 and A-3 name their 48 as a 24v24 room; A-2 notes that R2 now states R2-ROOM-REC2 for the largest mode's N. (nit)
 
 ## 8. Sources
 
