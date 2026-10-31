@@ -233,6 +233,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   recommendation changes); pointer and Rests-on nits; 0 exact hits; no quote gone. Committed **3aad9d8**. Glossary nits
   sent about 10:15 UTC (`prompts/engine-architect-glossary-3d.txt`: one-off deadlines; §1's N = 54 scaling and rounding
   notes; "whole tick" in the glossary's own text; R1's Used-today wording; R3-AUDIO-REC1's credit).
+- Glossary step-3d nits DONE and committed **96a4c29** (word diff: only the five). **Step 3d R2 DONE** (skeptic resumed,
+  about 10:17 UTC; verbatim `verifier-r2-3d-skeptic-result.md`): 4 more (r2:2401, 2402, 2404, 2413: shares without their
+  whole). R2's fix round sent about 10:18 UTC (`prompts/r2-3d-fixes.txt`: 16 bare 48s, the four, the misattributed
+  quote, nits). Final check of R1+R4, the glossary nits and the 33 corrected UNREAD rows launched (prompt
+  `prompts/verifier-r14-3d-final.txt`; 9 hits on changed lines in `scripts/glossary-hits-3d-final-r14.tsv`).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

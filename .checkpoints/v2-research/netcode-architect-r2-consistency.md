@@ -81,3 +81,5 @@ DONE
 - Part 7 "Consistency resolutions (2026-10-30)": OBJECT line now says upheld by the advisor (option (b)) and names both nits: nit.
 - Totals now: recommendation 20, nit 97, number 0, source 0. GLOSSARY.md not touched (engine-architect's change).
 DONE
+
+## Step 3d fix round (coordinator message, 2026-10-31; verifier-r2-3d-result.md, verifier-r2-3d-skeptic-result.md)
