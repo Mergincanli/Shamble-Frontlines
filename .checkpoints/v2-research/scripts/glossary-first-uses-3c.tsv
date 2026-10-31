@@ -1,76 +1,76 @@
 topic	entry	line of first use	phrase	GLOSSARY.md on that line or the next
 R1	Active effect (and visual effect)	1200	active effect(s)	yes
 R1	Big vehicle and very large unit	333	big vehicle(s)	yes
-R1	Live projectile	1924	live projectiles	yes
+R1	Live projectile	1925	live projectiles	yes
 R1	Player count (N)	864	N	yes
-R1	Preview	2319	preview link	yes
-R1	Preview isolation and the isolation flag	2307	the isolation flag	yes
-R1	Shared stream and authority-only stream	2187	authority-only stream	yes
+R1	Preview	2322	preview link	yes
+R1	Preview isolation and the isolation flag	2310	the isolation flag	yes
+R1	Shared stream and authority-only stream	2188	authority-only stream	yes
 R1	Sim step time	1738	sim step time	yes
-R1	State hash	1942	State hash	yes
+R1	State hash	1943	State hash	yes
 R1	Team size and how modes are written	293	slots	no
-R1	The advisories check	2956	the advisories check	yes
+R1	The advisories check	2960	the advisories check	yes
 R1	The authority	289	authoritative	yes
-R1	The client's sim share	2054	the client's sim share	yes
+R1	The client's sim share	2055	the client's sim share	yes
 R1	The design point and headroom	330	48+	yes
-R1	The hash-map ban in the sim crate	1954	the hash-map ban	yes
-R1	The largest mode, and its N	1924	the largest mode's N	yes
-R1	The measuring unit: one vCPU	1919	one vCPU	yes
+R1	The hash-map ban in the sim crate	1633	the hash-map ban	yes
+R1	The largest mode, and its N	1925	the largest mode's N	yes
+R1	The measuring unit: one vCPU	1920	one vCPU	yes
 R1	The prediction scope	518	predicted	no
-R1	The reference server	1919	the reference server	yes
-R1	The security baseline	2957	the security baseline	yes
-R1	The server tick budget	2049	the server tick budget	yes
-R1	The sim step share and the server-only share	1925	the sim step share	yes
+R1	The reference server	1920	the reference server	yes
+R1	The security baseline	2961	the security baseline	yes
+R1	The server tick budget	2050	the server tick budget	yes
+R1	The sim step share and the server-only share	1926	the sim step share	yes
 R1	The start modes and the goal modes	209	start	no
-R1	The stress scene	1922	the stress scene	yes
-R1	The test-mode list	2986	the test-mode list	yes
-R1	Tick period	1927	Tick period	yes
+R1	The stress scene	1915	the stress scene	no
+R1	The test-mode list	2990	the test-mode list	yes
+R1	Tick period	1928	Tick period	yes
 R1	Time statistics	296	mean	yes
 R2	Big vehicle and very large unit	2125	big vehicle(s)	yes
 R2	Live projectile	1699	live projectiles	yes
 R2	Player count (N)	1528	N	no
 R2	Preview	451	preview	no
 R2	Server tick time	1725	server tick time	yes
-R2	Shared stream and authority-only stream	2945	authority-only stream	yes
-R2	Sim step time	2412	the sim step	yes
-R2	State hash	2664	per-tick state hash	yes
+R2	Shared stream and authority-only stream	2946	authority-only stream	yes
+R2	Sim step time	2413	the sim step	yes
+R2	State hash	2665	per-tick state hash	yes
 R2	Team size and how modes are written	456	slots	no
-R2	The advisories check	2613	the advisories check	no
+R2	The advisories check	2614	the advisories check	no
 R2	The authority	1841	authoritative	yes
 R2	The design point and headroom	21	48+	yes
-R2	The largest mode, and its N	2184	the largest mode's N	yes
+R2	The largest mode, and its N	2017	the largest mode's N	yes
 R2	The measuring unit: one vCPU	1725	one vCPU	yes
 R2	The prediction scope	188	predicted	yes
-R2	The reference server	2295	the reference server	no
-R2	The security baseline	2612	the security baseline	yes
+R2	The reference server	2296	the reference server	no
+R2	The security baseline	2613	the security baseline	yes
 R2	The server tick budget	1725	the server tick budget	yes
 R2	The sim step share and the server-only share	2023	the server-only share	yes
 R2	The start modes and the goal modes	404	start	no
 R2	The stress scene	2184	the stress scene	yes
-R2	The test-mode list	2477	the test-mode list	yes
+R2	The test-mode list	2478	the test-mode list	yes
 R2	Tick period	1725	Tick period	yes
 R2	Time statistics	56	mean	no
-R2	Transport runtime time	2590	the transport runtime	yes
-R3	Active effect (and visual effect)	1118	visual effect(s)	yes
+R2	Transport runtime time	2591	the transport runtime	yes
+R3	Active effect (and visual effect)	1119	visual effect(s)	yes
 R3	Big vehicle and very large unit	592	big vehicle(s)	yes
 R3	Live projectile	592	live projectiles	yes
-R3	Player count (N)	1034	N	yes
+R3	Player count (N)	1028	N	yes
 R3	Preview	676	preview	no
 R3	Team size and how modes are written	536	slots	yes
-R3	The client's sim share	1126	the client's sim share	yes
+R3	The client's sim share	1127	the client's sim share	yes
 R3	The design point and headroom	536	48+	yes
-R3	The largest mode, and its N	1034	the largest mode	yes
+R3	The largest mode, and its N	885	the largest mode's N	no
 R3	The reference server	597	the reference server	yes
 R3	The start modes and the goal modes	536	goal	yes
 R3	The stress scene	595	the stress scene	yes
-R3	The test-mode list	1416	the test-mode list	yes
+R3	The test-mode list	1417	the test-mode list	yes
 R3	Time statistics	202	mean	no
 R4	Big vehicle and very large unit	648	big vehicle(s)	yes
 R4	Player count (N)	347	N	no
 R4	Preview	727	preview	no
 R4	State hash	759	State hash	yes
 R4	Team size and how modes are written	591	slots	yes
-R4	The design point and headroom	857	headroom	yes
+R4	The design point and headroom	859	headroom	yes
 R4	The largest mode, and its N	707	the largest mode's N	yes
 R4	The measuring unit: one vCPU	666	one vCPU	yes
 R4	The reference server	666	the reference server	yes
@@ -78,7 +78,7 @@ R4	The server tick budget	531	the server tick budget	yes
 R4	The sim step share and the server-only share	700	the sim step share	yes
 R4	The start modes and the goal modes	165	goal	no
 R4	The stress scene	699	the stress scene	yes
-R4	The test-mode list	978	the test-mode list	yes
+R4	The test-mode list	982	the test-mode list	yes
 R4	Tick period	531	the tick period	yes
 R4	Time statistics	403	mean	no
 R5	Player count (N)	522	N	yes
@@ -90,34 +90,34 @@ R5	The access wall	1623	the access wall	yes
 R5	The advisories check	954	the advisories check	yes
 R5	The client host	823	Cloudflare Pages	yes
 R5	The design point and headroom	1398	48+	yes
-R5	The hash-map ban in the sim crate	1796	the hash-map ban	yes
-R5	The largest mode, and its N	1477	the largest mode	yes
+R5	The hash-map ban in the sim crate	402	the hash-map ban	yes
+R5	The largest mode, and its N	58	the largest mode's N	yes
 R5	The production header set and the preview header set	1625	the preview header set	yes
 R5	The security baseline	1777	the security baseline	yes
 R5	The server tick budget	1480	the server tick budget	yes
 R5	The staging game server	1647	the staging game server	yes
 R5	The start modes and the goal modes	1170	start	no
 R5	The stress scene	1920	the stress scene	yes
-R5	The test-mode list	1921	the test-mode list	yes
+R5	The test-mode list	1477	the test-mode list	yes
 R5	Time statistics	531	mean	no
-R6	Game-server certificate	692	the wildcard certificate	yes
-R6	Player count (N)	942	N	yes
+R6	Game-server certificate	693	the wildcard certificate	yes
+R6	Player count (N)	807	N	no
 R6	Preview	15	preview	yes
 R6	Preview isolation and the isolation flag	619	the isolation flag	yes
 R6	Server tick time	416	server tick p99	yes
 R6	Team size and how modes are written	565	slots	no
 R6	The access wall	622	the access wall	yes
-R6	The advisories check	950	the advisories check	yes
+R6	The advisories check	955	the advisories check	yes
 R6	The client host	46	Cloudflare Pages	yes
 R6	The design point and headroom	446	design point	yes
-R6	The largest mode, and its N	942	the largest mode	yes
+R6	The largest mode, and its N	666	the largest mode	yes
 R6	The measuring unit: one vCPU	456	per vCPU	yes
-R6	The reference server	644	the reference server	yes
+R6	The reference server	645	the reference server	yes
 R6	The security baseline	50	the security baseline	yes
 R6	The server tick budget	416	the server tick budget	yes
 R6	The staging game server	540	the staging VM	yes
 R6	The start modes and the goal modes	48	start	yes
-R6	The stress scene	943	the stress scene	yes
-R6	The test-mode list	944	the test-mode list	yes
+R6	The stress scene	948	the stress scene	yes
+R6	The test-mode list	949	the test-mode list	yes
 R6	Time statistics	383	mean	no
 R6	Transport runtime time	519	the transport runtime	yes

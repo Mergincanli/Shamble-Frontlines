@@ -30,195 +30,202 @@ R1	1287	R1-ABL-F17	The prediction scope	predicted
 R1	1289	R1-ABL-F17	The start modes and the goal modes	start
 R1	1309	R1-ABL-F20	The prediction scope	predicted
 R1	1372	R1-ABL-F26	The start modes and the goal modes	start
+R1	1633		The hash-map ban in the sim crate	the hash-map ban
 R1	1639		The start modes and the goal modes	goal
 R1	1690		The prediction scope	predicted
 R1	1738		Sim step time	sim step time
 R1	1747		Team size and how modes are written	slots
 R1	1858		Player count (N)	N
 R1	1858		Player count (N)	N
-R1	1919	R1-ECS-REC1	The measuring unit: one vCPU	one vCPU
-R1	1919	R1-ECS-REC1	The reference server	the reference server
-R1	1922	R1-ECS-REC1	Sim step time	sim step time
-R1	1922	R1-ECS-REC1	The stress scene	the stress scene
-R1	1924	R1-ECS-REC1	Active effect (and visual effect)	active effect(s)
-R1	1924	R1-ECS-REC1	Big vehicle and very large unit	big vehicle(s)
-R1	1924	R1-ECS-REC1	Live projectile	live projectiles
-R1	1924	R1-ECS-REC1	The largest mode, and its N	the largest mode's N
-R1	1925	R1-ECS-REC1	Sim step time	sim step time
-R1	1925	R1-ECS-REC1	The sim step share and the server-only share	the sim step share
-R1	1925	R1-ECS-REC1	Time statistics	p99
-R1	1927	R1-ECS-REC1	Tick period	Tick period
-R1	1928	R1-ECS-REC1	Time statistics	mean
+R1	1915	R1-ECS-REC1	Big vehicle and very large unit	big vehicle(s)
+R1	1915	R1-ECS-REC1	The stress scene	the stress scene
+R1	1920	R1-ECS-REC1	The measuring unit: one vCPU	one vCPU
+R1	1920	R1-ECS-REC1	The reference server	the reference server
+R1	1923	R1-ECS-REC1	Sim step time	sim step time
+R1	1923	R1-ECS-REC1	The stress scene	the stress scene
+R1	1925	R1-ECS-REC1	Active effect (and visual effect)	active effect(s)
+R1	1925	R1-ECS-REC1	Big vehicle and very large unit	big vehicle(s)
+R1	1925	R1-ECS-REC1	Live projectile	live projectiles
+R1	1925	R1-ECS-REC1	The largest mode, and its N	the largest mode's N
+R1	1926	R1-ECS-REC1	Sim step time	sim step time
+R1	1926	R1-ECS-REC1	The sim step share and the server-only share	the sim step share
+R1	1926	R1-ECS-REC1	Time statistics	p99
+R1	1928	R1-ECS-REC1	Tick period	Tick period
 R1	1929	R1-ECS-REC1	Time statistics	mean
-R1	1934	R1-ECS-REC1	Time statistics	p99
-R1	1935	R1-ECS-REC1	The stress scene	the stress scene
-R1	1938		Time statistics	p99
-R1	1942		State hash	State hash
-R1	1954	R1-ECS-REC2	The hash-map ban in the sim crate	the hash-map ban
-R1	1999	R1-ECS-REC4	Big vehicle and very large unit	big vehicle(s)
-R1	2024	R1-TICK-REC1	State hash	State hash
-R1	2028	R1-TICK-REC2	The start modes and the goal modes	start
-R1	2039	R1-TICK-REC2	Team size and how modes are written	slots
-R1	2040	R1-TICK-REC2	Big vehicle and very large unit	big vehicle(s)
-R1	2041	R1-TICK-REC2	The reference server	the reference server
-R1	2043	R1-TICK-REC2	Player count (N)	N
-R1	2043	R1-TICK-REC2	The stress scene	the stress scene
-R1	2044	R1-TICK-REC2	The largest mode, and its N	the largest mode's N
-R1	2045	R1-TICK-REC2	Active effect (and visual effect)	active effect(s)
-R1	2045	R1-TICK-REC2	Big vehicle and very large unit	big vehicle(s)
-R1	2045	R1-TICK-REC2	Live projectile	live projectiles
-R1	2046	R1-TICK-REC2	Sim step time	sim step time
-R1	2046	R1-TICK-REC2	The largest mode, and its N	the largest mode's N
-R1	2046	R1-TICK-REC2	Time statistics	p99
-R1	2047	R1-TICK-REC2	The sim step share and the server-only share	the sim step share
-R1	2048	R1-TICK-REC2	The measuring unit: one vCPU	one vCPU
-R1	2048	R1-TICK-REC2	The reference server	the reference server
-R1	2048	R1-TICK-REC2	Time statistics	p99
-R1	2049	R1-TICK-REC2	Player count (N)	N
-R1	2049	R1-TICK-REC2	The server tick budget	the server tick budget
-R1	2049	R1-TICK-REC2	Time statistics	mean
+R1	1930	R1-ECS-REC1	Time statistics	mean
+R1	1935		Time statistics	p99
+R1	1936		The stress scene	the stress scene
+R1	1939		Time statistics	p99
+R1	1943		State hash	State hash
+R1	1955	R1-ECS-REC2	The hash-map ban in the sim crate	the hash-map ban
+R1	2000	R1-ECS-REC4	Big vehicle and very large unit	big vehicle(s)
+R1	2025	R1-TICK-REC1	State hash	State hash
+R1	2029	R1-TICK-REC2	The start modes and the goal modes	start
+R1	2040	R1-TICK-REC2	Team size and how modes are written	slots
+R1	2041	R1-TICK-REC2	Big vehicle and very large unit	big vehicle(s)
+R1	2042	R1-TICK-REC2	The reference server	the reference server
+R1	2044	R1-TICK-REC2	Player count (N)	N
+R1	2044	R1-TICK-REC2	The stress scene	the stress scene
+R1	2045	R1-TICK-REC2	The largest mode, and its N	the largest mode's N
+R1	2046	R1-TICK-REC2	Active effect (and visual effect)	active effect(s)
+R1	2046	R1-TICK-REC2	Big vehicle and very large unit	big vehicle(s)
+R1	2046	R1-TICK-REC2	Live projectile	live projectiles
+R1	2047	R1-TICK-REC2	Sim step time	sim step time
+R1	2047	R1-TICK-REC2	The largest mode, and its N	the largest mode's N
+R1	2047	R1-TICK-REC2	Time statistics	p99
+R1	2048	R1-TICK-REC2	The sim step share and the server-only share	the sim step share
+R1	2049	R1-TICK-REC2	The measuring unit: one vCPU	one vCPU
+R1	2049	R1-TICK-REC2	The reference server	the reference server
 R1	2049	R1-TICK-REC2	Time statistics	p99
-R1	2050	R1-TICK-REC2	The sim step share and the server-only share	the server-only share
+R1	2050	R1-TICK-REC2	Player count (N)	N
+R1	2050	R1-TICK-REC2	The server tick budget	the server tick budget
 R1	2050	R1-TICK-REC2	Tick period	the tick period
-R1	2052	R1-TICK-REC2	The design point and headroom	headroom
-R1	2053	R1-TICK-REC2	Player count (N)	N
-R1	2053	R1-TICK-REC2	The largest mode, and its N	the largest mode
-R1	2053	R1-TICK-REC2	Time statistics	p99
-R1	2054	R1-TICK-REC2	Sim step time	sim step time
-R1	2054	R1-TICK-REC2	The client's sim share	the client's sim share
-R1	2054	R1-TICK-REC2	Tick period	the tick period
-R1	2059	R1-TICK-REC2	Time statistics	p99
-R1	2072	R1-TICK-REC3	Team size and how modes are written	slots
-R1	2073	R1-TICK-REC3	The largest mode, and its N	the largest mode's N
-R1	2073	R1-TICK-REC3	The stress scene	the stress scene
-R1	2074	R1-TICK-REC3	Sim step time	sim step time
-R1	2074	R1-TICK-REC3	Sim step time	sim step time
-R1	2074	R1-TICK-REC3	Time statistics	mean
-R1	2074	R1-TICK-REC3	Time statistics	p99
-R1	2086	R1-TICK-REC4	The authority	authoritative
-R1	2089	R1-TICK-REC4	The reference server	the reference server
-R1	2089	R1-TICK-REC4	The start modes and the goal modes	start
-R1	2089	R1-TICK-REC4	Time statistics	p99
-R1	2109	R1-TICK-REC5	The start modes and the goal modes	start
-R1	2109	R1-TICK-REC5	Time statistics	p99
-R1	2111	R1-TICK-REC5	Time statistics	mean
-R1	2129	R1-DET-REC1	State hash	State hash
-R1	2130	R1-DET-REC1	The authority	the authority
-R1	2139	R1-DET-REC1	The largest mode, and its N	the largest mode
-R1	2175	R1-DET-REC3	Big vehicle and very large unit	big vehicle(s)
-R1	2177	R1-DET-REC3	The largest mode, and its N	the largest mode's N
-R1	2177	R1-DET-REC3	The stress scene	the stress scene
-R1	2178	R1-DET-REC3	Big vehicle and very large unit	big vehicle(s)
-R1	2180	R1-DET-REC3	The sim step share and the server-only share	the sim step share
-R1	2185	R1-DET-REC4	State hash	State hash
-R1	2185	R1-DET-REC4	The authority	the authority
+R1	2050	R1-TICK-REC2	Time statistics	mean
+R1	2050	R1-TICK-REC2	Time statistics	p99
+R1	2051	R1-TICK-REC2	The sim step share and the server-only share	the server-only share
+R1	2051	R1-TICK-REC2	Tick period	the tick period
+R1	2053	R1-TICK-REC2	The design point and headroom	headroom
+R1	2054	R1-TICK-REC2	Player count (N)	N
+R1	2054	R1-TICK-REC2	The largest mode, and its N	the largest mode
+R1	2054	R1-TICK-REC2	Time statistics	p99
+R1	2055	R1-TICK-REC2	Sim step time	sim step time
+R1	2055	R1-TICK-REC2	The client's sim share	the client's sim share
+R1	2055	R1-TICK-REC2	Tick period	the tick period
+R1	2060	R1-TICK-REC2	Time statistics	p99
+R1	2073	R1-TICK-REC3	Team size and how modes are written	slots
+R1	2074	R1-TICK-REC3	The largest mode, and its N	the largest mode's N
+R1	2074	R1-TICK-REC3	The stress scene	the stress scene
+R1	2075	R1-TICK-REC3	Sim step time	sim step time
+R1	2075	R1-TICK-REC3	Sim step time	sim step time
+R1	2075	R1-TICK-REC3	Time statistics	mean
+R1	2075	R1-TICK-REC3	Time statistics	p99
+R1	2087	R1-TICK-REC4	The authority	authoritative
+R1	2090	R1-TICK-REC4	The reference server	the reference server
+R1	2090	R1-TICK-REC4	The start modes and the goal modes	start
+R1	2090	R1-TICK-REC4	Time statistics	p99
+R1	2110	R1-TICK-REC5	The start modes and the goal modes	start
+R1	2110	R1-TICK-REC5	Time statistics	p99
+R1	2112	R1-TICK-REC5	Time statistics	mean
+R1	2130	R1-DET-REC1	State hash	State hash
+R1	2131	R1-DET-REC1	The authority	the authority
+R1	2140	R1-DET-REC1	The largest mode, and its N	the largest mode
+R1	2176	R1-DET-REC3	Big vehicle and very large unit	big vehicle(s)
+R1	2178	R1-DET-REC3	The largest mode, and its N	the largest mode's N
+R1	2178	R1-DET-REC3	The stress scene	the stress scene
+R1	2179	R1-DET-REC3	Big vehicle and very large unit	big vehicle(s)
+R1	2181	R1-DET-REC3	The sim step share and the server-only share	the sim step share
 R1	2186	R1-DET-REC4	State hash	State hash
 R1	2186	R1-DET-REC4	The authority	the authority
-R1	2187	R1-DET-REC4	Shared stream and authority-only stream	authority-only stream
-R1	2202	R1-DET-REC4	Team size and how modes are written	slots
-R1	2206	R1-DET-REC4	State hash	State hash
-R1	2210	R1-DET-REC5	The hash-map ban in the sim crate	the hash-map ban
-R1	2216	R1-DET-REC5	The design point and headroom	48+
-R1	2258	R1-BND-REC1	Player count (N)	N
+R1	2187	R1-DET-REC4	State hash	State hash
+R1	2187	R1-DET-REC4	The authority	the authority
+R1	2188	R1-DET-REC4	Shared stream and authority-only stream	authority-only stream
+R1	2203	R1-DET-REC4	Team size and how modes are written	slots
+R1	2207	R1-DET-REC4	State hash	State hash
+R1	2211	R1-DET-REC5	The hash-map ban in the sim crate	the hash-map ban
+R1	2217	R1-DET-REC5	The design point and headroom	48+
 R1	2260	R1-BND-REC1	Player count (N)	N
-R1	2260	R1-BND-REC1	Player count (N)	N
-R1	2306	R1-BND-REC5	The start modes and the goal modes	start
-R1	2307	R1-BND-REC5	Preview isolation and the isolation flag	the isolation flag
-R1	2319	R1-BND-REC5	Preview	preview
-R1	2319	R1-BND-REC5	Preview	preview link
-R1	2325	R1-BND-REC6	Team size and how modes are written	slots
-R1	2349	R1-ABL-REC1	The prediction scope	predict
-R1	2402	R1-ABL-REC3	The start modes and the goal modes	start
-R1	2403	R1-ABL-REC3	The start modes and the goal modes	start
-R1	2405	R1-ABL-REC3	Shared stream and authority-only stream	authority-only stream
-R1	2415	R1-ABL-REC3	The start modes and the goal modes	start
-R1	2415	R1-ABL-REC3	The start modes and the goal modes	start
-R1	2417	R1-ABL-REC4	The prediction scope	predict
-R1	2425	R1-ABL-REC4	The prediction scope	predicted
-R1	2425	R1-ABL-REC4	The prediction scope	predicted
-R1	2426	R1-ABL-REC4	The prediction scope	predicted
-R1	2433	R1-ABL-REC4	The authority	authoritative
-R1	2462	R1-ABL-REC6	The largest mode, and its N	the largest mode's N
-R1	2462	R1-ABL-REC6	The stress scene	the stress scene
-R1	2463	R1-ABL-REC6	Active effect (and visual effect)	active effect(s)
-R1	2464	R1-ABL-REC6	The client's sim share	the client's sim share
-R1	2464	R1-ABL-REC6	The sim step share and the server-only share	the sim step share
-R1	2464	R1-ABL-REC6	Time statistics	p99
-R1	2465	R1-ABL-REC6	The measuring unit: one vCPU	one vCPU
-R1	2465	R1-ABL-REC6	The reference server	the reference server
-R1	2518	R1-DATA-REC3	The authority	authoritative
-R1	2529	R1-DATA-REC4	Player count (N)	N
-R1	2529	R1-DATA-REC4	Player count (N)	N
-R1	2618	R1-ECS-OQ4	The design point and headroom	48+
-R1	2618	R1-ECS-OQ4	The measuring unit: one vCPU	per vCPU
-R1	2618	R1-ECS-OQ4	The reference server	the reference server
-R1	2621	R1-ECS-OQ4	Sim step time	sim step time
-R1	2621	R1-ECS-OQ4	The sim step share and the server-only share	the sim step share
-R1	2654	R1-TICK-OQ5	The design point and headroom	48+
-R1	2659	R1-TICK-OQ6	The measuring unit: one vCPU	one vCPU
-R1	2660	R1-TICK-OQ6	The reference server	the reference server
-R1	2663	R1-TICK-OQ7	The largest mode, and its N	the largest mode
-R1	2664	R1-TICK-OQ7	The largest mode, and its N	the largest mode
-R1	2666	R1-TICK-OQ7	Player count (N)	N
-R1	2671	R1-TICK-OQ9	Big vehicle and very large unit	big vehicle(s)
-R1	2677	R1-DET-OQ1	The largest mode, and its N	the largest mode
-R1	2693	R1-DET-OQ6	The prediction scope	predict
-R1	2705	R1-DET-OQ9	State hash	State hash
-R1	2718	R1-BND-OQ1	Team size and how modes are written	slots
-R1	2733	R1-BND-OQ6	The largest mode, and its N	the largest mode
-R1	2736	R1-BND-OQ6	Player count (N)	N
-R1	2764	R1-ABL-OQ4	The authority	authoritative
-R1	2831	R1-XU-OQ1	The server tick budget	the server tick budget
-R1	2831	R1-XU-OQ1	The stress scene	the stress scene
-R1	2832	R1-XU-OQ1	Active effect (and visual effect)	active effect(s)
-R1	2832	R1-XU-OQ1	Live projectile	live projectiles
-R1	2832	R1-XU-OQ1	Sim step time	sim step time
-R1	2832	R1-XU-OQ1	Time statistics	mean
-R1	2833	R1-XU-OQ1	Time statistics	p99
-R1	2834	R1-XU-OQ1	Big vehicle and very large unit	big vehicle(s)
-R1	2834	R1-XU-OQ1	Live projectile	live projectiles
-R1	2834	R1-XU-OQ1	Player count (N)	N
-R1	2834	R1-XU-OQ1	Time statistics	p99
-R1	2835	R1-XU-OQ1	Player count (N)	N
-R1	2835	R1-XU-OQ1	Time statistics	p99
-R1	2835	R1-XU-OQ1	Time statistics	p99
-R1	2836	R1-XU-OQ1	Tick period	the tick period
-R1	2838	R1-XU-OQ1	Active effect (and visual effect)	active effect(s)
-R1	2840	R1-XU-OQ1	Player count (N)	N
-R1	2841	R1-XU-OQ1	The server tick budget	the server tick budget
-R1	2846	R1-XU-OQ2	Time statistics	p99
-R1	2855	R1-XU-OQ3	The start modes and the goal modes	start
-R1	2905	R1-XU-OQ12	The largest mode, and its N	the largest mode
-R1	2948	R1-RR-OQ6	State hash	State hash
-R1	2956	R1-RR-OQ7	The advisories check	the advisories check
-R1	2957	R1-RR-OQ7	The security baseline	the security baseline
-R1	2963	R1-RR-OQ7	The prediction scope	predict
-R1	2963	R1-RR-OQ7	The prediction scope	the prediction scope
-R1	2970	R1-RR-OQ7	The authority	authoritative
-R1	2971	R1-RR-OQ7	The prediction scope	predicted
-R1	2974	R1-RR-OQ7	The prediction scope	predicted
-R1	2976	R1-RR-OQ7	Shared stream and authority-only stream	authority-only stream
-R1	2979	R1-RR-OQ7	Shared stream and authority-only stream	shared stream
-R1	2982	R1-RR-OQ7	The start modes and the goal modes	start
-R1	2983	R1-RR-OQ7	Player count (N)	N
-R1	2983	R1-RR-OQ7	The largest mode, and its N	the largest mode
-R1	2983	R1-RR-OQ7	The largest mode, and its N	the largest mode
-R1	2983	R1-RR-OQ7	The start modes and the goal modes	goal
-R1	2984	R1-RR-OQ7	Player count (N)	N
-R1	2984	R1-RR-OQ7	The largest mode, and its N	the largest mode's N
-R1	2985	R1-RR-OQ7	The stress scene	the stress scene
-R1	2986	R1-RR-OQ7	The test-mode list	the test-mode list
-R1	2987	R1-RR-OQ7	The largest mode, and its N	the largest mode's N
-R1	2989	R1-RR-OQ7	The security baseline	the security baseline
-R1	2992		The advisories check	the advisories check
-R1	3055	R1-XT-OQ8	The largest mode, and its N	the largest mode
-R1	3108	R1-XT-OQ18	State hash	per-tick state hash
-R1	3123	R1-XT-OQ18	The start modes and the goal modes	start
-R1	3187		The measuring unit: one vCPU	per vCPU
-R1	3188		The measuring unit: one vCPU	per vCPU
-R1	3189		Preview	preview
-R1	3193		The security baseline	the security baseline
-R1	3777		The start modes and the goal modes	start
+R1	2262	R1-BND-REC1	Player count (N)	N
+R1	2262	R1-BND-REC1	Player count (N)	N
+R1	2281	R1-BND-REC2	The largest mode, and its N	the largest mode's N
+R1	2309	R1-BND-REC5	The start modes and the goal modes	start
+R1	2310	R1-BND-REC5	Preview isolation and the isolation flag	the isolation flag
+R1	2322	R1-BND-REC5	Preview	preview
+R1	2322	R1-BND-REC5	Preview	preview link
+R1	2328	R1-BND-REC6	Team size and how modes are written	slots
+R1	2352	R1-ABL-REC1	The prediction scope	predict
+R1	2405	R1-ABL-REC3	The start modes and the goal modes	start
+R1	2406	R1-ABL-REC3	The start modes and the goal modes	start
+R1	2407	R1-ABL-REC3	The hash-map ban in the sim crate	the hash-map ban
+R1	2409	R1-ABL-REC3	Shared stream and authority-only stream	authority-only stream
+R1	2419	R1-ABL-REC3	The start modes and the goal modes	start
+R1	2419	R1-ABL-REC3	The start modes and the goal modes	start
+R1	2421	R1-ABL-REC4	The prediction scope	predict
+R1	2429	R1-ABL-REC4	The prediction scope	predicted
+R1	2429	R1-ABL-REC4	The prediction scope	predicted
+R1	2430	R1-ABL-REC4	The prediction scope	predicted
+R1	2437	R1-ABL-REC4	The authority	authoritative
+R1	2466	R1-ABL-REC6	The largest mode, and its N	the largest mode's N
+R1	2466	R1-ABL-REC6	The stress scene	the stress scene
+R1	2467	R1-ABL-REC6	Active effect (and visual effect)	active effect(s)
+R1	2468	R1-ABL-REC6	The client's sim share	the client's sim share
+R1	2468	R1-ABL-REC6	The sim step share and the server-only share	the sim step share
+R1	2468	R1-ABL-REC6	Time statistics	p99
+R1	2469	R1-ABL-REC6	The measuring unit: one vCPU	one vCPU
+R1	2469	R1-ABL-REC6	The reference server	the reference server
+R1	2522	R1-DATA-REC3	The authority	authoritative
+R1	2533	R1-DATA-REC4	Player count (N)	N
+R1	2533	R1-DATA-REC4	Player count (N)	N
+R1	2622	R1-ECS-OQ4	The design point and headroom	48+
+R1	2622	R1-ECS-OQ4	The measuring unit: one vCPU	per vCPU
+R1	2622	R1-ECS-OQ4	The reference server	the reference server
+R1	2625	R1-ECS-OQ4	Sim step time	sim step time
+R1	2625	R1-ECS-OQ4	The sim step share and the server-only share	the sim step share
+R1	2658	R1-TICK-OQ5	The design point and headroom	48+
+R1	2663	R1-TICK-OQ6	The measuring unit: one vCPU	one vCPU
+R1	2664	R1-TICK-OQ6	The reference server	the reference server
+R1	2667	R1-TICK-OQ7	The largest mode, and its N	the largest mode
+R1	2668	R1-TICK-OQ7	The largest mode, and its N	the largest mode
+R1	2670	R1-TICK-OQ7	Player count (N)	N
+R1	2675	R1-TICK-OQ9	Big vehicle and very large unit	big vehicle(s)
+R1	2681	R1-DET-OQ1	The largest mode, and its N	the largest mode
+R1	2697	R1-DET-OQ6	The prediction scope	predict
+R1	2709	R1-DET-OQ9	State hash	State hash
+R1	2722	R1-BND-OQ1	Team size and how modes are written	slots
+R1	2737	R1-BND-OQ6	The largest mode, and its N	the largest mode
+R1	2740	R1-BND-OQ6	The largest mode, and its N	the largest mode's N
+R1	2768	R1-ABL-OQ4	The authority	authoritative
+R1	2835	R1-XU-OQ1	The server tick budget	the server tick budget
+R1	2835	R1-XU-OQ1	The stress scene	the stress scene
+R1	2836	R1-XU-OQ1	Active effect (and visual effect)	active effect(s)
+R1	2836	R1-XU-OQ1	Live projectile	live projectiles
+R1	2836	R1-XU-OQ1	Sim step time	sim step time
+R1	2836	R1-XU-OQ1	Time statistics	mean
+R1	2837	R1-XU-OQ1	Time statistics	p99
+R1	2838	R1-XU-OQ1	Big vehicle and very large unit	big vehicle(s)
+R1	2838	R1-XU-OQ1	Live projectile	live projectiles
+R1	2838	R1-XU-OQ1	Player count (N)	N
+R1	2838	R1-XU-OQ1	Time statistics	p99
+R1	2839	R1-XU-OQ1	Player count (N)	N
+R1	2839	R1-XU-OQ1	Time statistics	p99
+R1	2839	R1-XU-OQ1	Time statistics	p99
+R1	2840	R1-XU-OQ1	Tick period	the tick period
+R1	2842	R1-XU-OQ1	Active effect (and visual effect)	active effect(s)
+R1	2844	R1-XU-OQ1	Player count (N)	N
+R1	2845	R1-XU-OQ1	The server tick budget	the server tick budget
+R1	2850	R1-XU-OQ2	Time statistics	p99
+R1	2859	R1-XU-OQ3	The start modes and the goal modes	start
+R1	2909	R1-XU-OQ12	The largest mode, and its N	the largest mode
+R1	2952	R1-RR-OQ6	State hash	State hash
+R1	2960	R1-RR-OQ7	The advisories check	the advisories check
+R1	2961	R1-RR-OQ7	The security baseline	the security baseline
+R1	2967	R1-RR-OQ7	The prediction scope	predict
+R1	2967	R1-RR-OQ7	The prediction scope	the prediction scope
+R1	2974	R1-RR-OQ7	The authority	authoritative
+R1	2975	R1-RR-OQ7	The prediction scope	predicted
+R1	2978	R1-RR-OQ7	The prediction scope	predicted
+R1	2980	R1-RR-OQ7	Shared stream and authority-only stream	authority-only stream
+R1	2983	R1-RR-OQ7	Shared stream and authority-only stream	shared stream
+R1	2986	R1-RR-OQ7	The start modes and the goal modes	start
+R1	2987	R1-RR-OQ7	Player count (N)	N
+R1	2987	R1-RR-OQ7	The largest mode, and its N	the largest mode
+R1	2987	R1-RR-OQ7	The largest mode, and its N	the largest mode
+R1	2987	R1-RR-OQ7	The start modes and the goal modes	goal
+R1	2988	R1-RR-OQ7	Player count (N)	N
+R1	2988	R1-RR-OQ7	The largest mode, and its N	the largest mode's N
+R1	2989	R1-RR-OQ7	The stress scene	the stress scene
+R1	2990	R1-RR-OQ7	The test-mode list	the test-mode list
+R1	2991	R1-RR-OQ7	The largest mode, and its N	the largest mode's N
+R1	2993	R1-RR-OQ7	The security baseline	the security baseline
+R1	2996		The advisories check	the advisories check
+R1	3059	R1-XT-OQ8	The largest mode, and its N	the largest mode
+R1	3112	R1-XT-OQ18	State hash	per-tick state hash
+R1	3127	R1-XT-OQ18	The start modes and the goal modes	start
+R1	3140	R1-XT-OQ18	The hash-map ban in the sim crate	the hash-map ban
+R1	3192		The measuring unit: one vCPU	per vCPU
+R1	3193		The measuring unit: one vCPU	per vCPU
+R1	3194		Preview	preview
+R1	3198		The security baseline	the security baseline
+R1	3794		The start modes and the goal modes	start
 R2	21		The design point and headroom	48+
 R2	56		Time statistics	mean
 R2	81		The design point and headroom	48+
@@ -286,17 +293,21 @@ R2	1958		Team size and how modes are written	team size
 R2	1960		Team size and how modes are written	team size
 R2	1981		The design point and headroom	48+
 R2	2011	R2-SYNC-REC1	Team size and how modes are written	slots
+R2	2017	R2-SYNC-REC1	The largest mode, and its N	the largest mode's N
+R2	2022	R2-SYNC-REC1	The largest mode, and its N	the largest mode's N
 R2	2023	R2-SYNC-REC1	The sim step share and the server-only share	the server-only share
 R2	2023	R2-SYNC-REC1	Tick period	the tick period
 R2	2069	R2-SYNC-REC3	The authority	authoritative
 R2	2081	R2-SYNC-REC3	The authority	authoritative
 R2	2086	R2-SYNC-REC3	The prediction scope	predict
 R2	2096	R2-SYNC-REC3	The start modes and the goal modes	goal
+R2	2103	R2-SYNC-REC3	The largest mode, and its N	the largest mode's N
 R2	2125	R2-SYNC-REC4	Big vehicle and very large unit	big vehicle(s)
 R2	2141	R2-SYNC-REC5	The authority	authoritative
 R2	2184		Big vehicle and very large unit	big vehicle(s)
 R2	2184		The largest mode, and its N	the largest mode's N
 R2	2184		The stress scene	the stress scene
+R2	2186		The largest mode, and its N	the largest mode's N
 R2	2196	R2-SYNC-REC6	The start modes and the goal modes	start
 R2	2196	R2-SYNC-REC6	The start modes and the goal modes	start
 R2	2201	R2-SYNC-REC6	Preview	preview
@@ -307,159 +318,178 @@ R2	2276	R2-SYNC-REC9	The design point and headroom	48+
 R2	2282	R2-SYNC-REC9	Player count (N)	Player count (N)
 R2	2284	R2-SYNC-REC9	Team size and how modes are written	slots
 R2	2289	R2-SYNC-REC9	The design point and headroom	48+
-R2	2294	R2-SYNC-REC9	The sim step share and the server-only share	the server-only share
-R2	2294	R2-SYNC-REC9	Tick period	the tick period
-R2	2295	R2-SYNC-REC9	The measuring unit: one vCPU	one vCPU
-R2	2295	R2-SYNC-REC9	The reference server	the reference server
-R2	2323	R2-BUD-REC1	Time statistics	mean
-R2	2338	R2-BUD-REC2	Time statistics	mean
-R2	2338	R2-BUD-REC2	Time statistics	p99
-R2	2340	R2-BUD-REC2	Time statistics	mean
-R2	2351	R2-BUD-REC3	Live projectile	live projectiles
-R2	2355	R2-BUD-REC3	The design point and headroom	48+
-R2	2397	R2-BUD-REC6	The largest mode, and its N	the largest mode's N
-R2	2398	R2-BUD-REC6	Server tick time	server tick time
-R2	2398	R2-BUD-REC6	The server tick budget	the server tick budget
-R2	2398	R2-BUD-REC6	Tick period	the tick period
-R2	2398	R2-BUD-REC6	Time statistics	p99
-R2	2399	R2-BUD-REC6	The sim step share and the server-only share	the server-only share
-R2	2399	R2-BUD-REC6	The sim step share and the server-only share	the sim step share
-R2	2404	R2-BUD-REC6	Time statistics	p99
-R2	2406	R2-BUD-REC6	Player count (N)	Player count (N)
-R2	2409	R2-BUD-REC6	The design point and headroom	48+
-R2	2410	R2-BUD-REC6	The measuring unit: one vCPU	one vCPU
-R2	2410	R2-BUD-REC6	The reference server	the reference server
-R2	2411	R2-BUD-REC6	The stress scene	the stress scene
-R2	2412	R2-BUD-REC6	Server tick time	server tick time
-R2	2412	R2-BUD-REC6	Sim step time	the sim step
-R2	2412	R2-BUD-REC6	Time statistics	p99
-R2	2414	R2-BUD-REC6	Time statistics	p99
-R2	2440	R2-INT-REC1	The reference server	the reference server
-R2	2440	R2-INT-REC1	Time statistics	p99
-R2	2462	R2-INT-REC2	Time statistics	p99
+R2	2292	R2-SYNC-REC9	The largest mode, and its N	the largest mode's N
+R2	2295	R2-SYNC-REC9	The sim step share and the server-only share	the server-only share
+R2	2295	R2-SYNC-REC9	Tick period	the tick period
+R2	2296	R2-SYNC-REC9	The measuring unit: one vCPU	one vCPU
+R2	2296	R2-SYNC-REC9	The reference server	the reference server
+R2	2320	R2-BUD-REC1	The largest mode, and its N	the largest mode's N
+R2	2324	R2-BUD-REC1	Time statistics	mean
+R2	2339	R2-BUD-REC2	Player count (N)	N
+R2	2339	R2-BUD-REC2	The design point and headroom	design point
+R2	2339	R2-BUD-REC2	Time statistics	mean
+R2	2339	R2-BUD-REC2	Time statistics	p99
+R2	2341	R2-BUD-REC2	Time statistics	mean
+R2	2352	R2-BUD-REC3	Live projectile	live projectiles
+R2	2356	R2-BUD-REC3	The design point and headroom	48+
+R2	2359	R2-BUD-REC3	The largest mode, and its N	the largest mode's N
+R2	2398	R2-BUD-REC6	The largest mode, and its N	the largest mode's N
+R2	2399	R2-BUD-REC6	Server tick time	server tick time
+R2	2399	R2-BUD-REC6	The server tick budget	the server tick budget
+R2	2399	R2-BUD-REC6	Tick period	the tick period
+R2	2399	R2-BUD-REC6	Time statistics	p99
+R2	2400	R2-BUD-REC6	The sim step share and the server-only share	the server-only share
+R2	2400	R2-BUD-REC6	The sim step share and the server-only share	the sim step share
+R2	2402	R2-BUD-REC6	The server tick budget	the server tick budget
+R2	2402	R2-BUD-REC6	Tick period	the tick period
+R2	2403	R2-BUD-REC6	Tick period	the tick period
+R2	2405	R2-BUD-REC6	Server tick time	server tick time
+R2	2405	R2-BUD-REC6	Time statistics	p99
+R2	2407	R2-BUD-REC6	Player count (N)	Player count (N)
+R2	2410	R2-BUD-REC6	The design point and headroom	48+
+R2	2411	R2-BUD-REC6	The measuring unit: one vCPU	one vCPU
+R2	2411	R2-BUD-REC6	The reference server	the reference server
+R2	2412	R2-BUD-REC6	The stress scene	the stress scene
+R2	2413	R2-BUD-REC6	Server tick time	server tick time
+R2	2413	R2-BUD-REC6	Sim step time	the sim step
+R2	2413	R2-BUD-REC6	Time statistics	p99
+R2	2414	R2-BUD-REC6	Tick period	the tick period
+R2	2415	R2-BUD-REC6	Time statistics	p99
+R2	2440	R2-INT-REC1	The largest mode, and its N	the largest mode's N
+R2	2441	R2-INT-REC1	The reference server	the reference server
+R2	2441	R2-INT-REC1	Time statistics	p99
 R2	2463	R2-INT-REC2	Time statistics	p99
-R2	2477	R2-INT-REC3	The test-mode list	the test-mode list
-R2	2479	R2-INT-REC3	The server tick budget	the server tick budget
-R2	2479	R2-INT-REC3	Tick period	the tick period
-R2	2480	R2-INT-REC3	The measuring unit: one vCPU	one vCPU
-R2	2480	R2-INT-REC3	The reference server	the reference server
-R2	2480	R2-INT-REC3	The sim step share and the server-only share	the sim step share
-R2	2494	R2-INT-REC4	The design point and headroom	48+
-R2	2496	R2-INT-REC4	The stress scene	the stress scene
-R2	2499	R2-INT-REC4	The reference server	the reference server
-R2	2499	R2-INT-REC4	Time statistics	p99
-R2	2582	R2-TRN-REC1	The authority	authoritative
-R2	2590	R2-TRN-REC1	The reference server	the reference server
-R2	2590	R2-TRN-REC1	Time statistics	p99
-R2	2590	R2-TRN-REC1	Transport runtime time	the transport runtime
-R2	2592	R2-TRN-REC1	Transport runtime time	the transport runtime
-R2	2607		Server tick time	server tick p99
-R2	2612		The security baseline	the security baseline
-R2	2613		The advisories check	the advisories check
-R2	2627	R2-TRN-REC2	The design point and headroom	48+
-R2	2627	R2-TRN-REC2	The design point and headroom	design point
-R2	2629	R2-TRN-REC2	The start modes and the goal modes	start
-R2	2635	R2-TRN-REC2	Time statistics	p99
-R2	2664	R2-TRN-REC3	State hash	per-tick state hash
-R2	2666	R2-TRN-REC3	Time statistics	p99
-R2	2698	R2-TRN-REC5	Preview	preview
-R2	2698	R2-TRN-REC5	The start modes and the goal modes	start
-R2	2703	R2-TRN-REC5	The security baseline	the security baseline
-R2	2723	R2-TRN-REC6	The start modes and the goal modes	start
-R2	2737	R2-TRN-REC6	The design point and headroom	48+
-R2	2741	R2-TRN-REC6	Server tick time	server tick time
-R2	2741	R2-TRN-REC6	Time statistics	p99
+R2	2464	R2-INT-REC2	Time statistics	p99
+R2	2478	R2-INT-REC3	The test-mode list	the test-mode list
+R2	2480	R2-INT-REC3	The server tick budget	the server tick budget
+R2	2480	R2-INT-REC3	Tick period	the tick period
+R2	2481	R2-INT-REC3	The measuring unit: one vCPU	one vCPU
+R2	2481	R2-INT-REC3	The reference server	the reference server
+R2	2481	R2-INT-REC3	The sim step share and the server-only share	the sim step share
+R2	2495	R2-INT-REC4	The design point and headroom	48+
+R2	2497	R2-INT-REC4	The stress scene	the stress scene
+R2	2500	R2-INT-REC4	The largest mode, and its N	the largest mode's N
+R2	2500	R2-INT-REC4	The reference server	the reference server
+R2	2500	R2-INT-REC4	Time statistics	p99
+R2	2583	R2-TRN-REC1	The authority	authoritative
+R2	2589	R2-TRN-REC1	The largest mode, and its N	the largest mode's N
+R2	2591	R2-TRN-REC1	The reference server	the reference server
+R2	2591	R2-TRN-REC1	Time statistics	p99
+R2	2591	R2-TRN-REC1	Transport runtime time	the transport runtime
+R2	2593	R2-TRN-REC1	Transport runtime time	the transport runtime
+R2	2608		Server tick time	server tick p99
+R2	2613		The security baseline	the security baseline
+R2	2614		The advisories check	the advisories check
+R2	2628	R2-TRN-REC2	The design point and headroom	48+
+R2	2628	R2-TRN-REC2	The design point and headroom	48+
+R2	2628	R2-TRN-REC2	The design point and headroom	design point
+R2	2630	R2-TRN-REC2	The start modes and the goal modes	start
+R2	2636	R2-TRN-REC2	Time statistics	p99
+R2	2665	R2-TRN-REC3	State hash	per-tick state hash
+R2	2667	R2-TRN-REC3	Time statistics	p99
+R2	2699	R2-TRN-REC5	Preview	preview
+R2	2699	R2-TRN-REC5	The start modes and the goal modes	start
+R2	2704	R2-TRN-REC5	The security baseline	the security baseline
+R2	2719	R2-TRN-REC5	The largest mode, and its N	the largest mode's N
+R2	2724	R2-TRN-REC6	The start modes and the goal modes	start
+R2	2738	R2-TRN-REC6	The design point and headroom	48+
+R2	2742	R2-TRN-REC6	Server tick time	server tick time
 R2	2742	R2-TRN-REC6	Time statistics	p99
-R2	2760	R2-ROOM-REC2	The start modes and the goal modes	start
-R2	2772	R2-ROOM-REC2	The reference server	the reference server
-R2	2773	R2-ROOM-REC2	Server tick time	server tick time
-R2	2773	R2-ROOM-REC2	The server tick budget	the server tick budget
-R2	2773	R2-ROOM-REC2	Time statistics	p99
-R2	2774	R2-ROOM-REC2	Tick period	the tick period
-R2	2775	R2-ROOM-REC2	The reference server	the reference server
-R2	2775	R2-ROOM-REC2	Time statistics	p99
-R2	2776	R2-ROOM-REC2	The start modes and the goal modes	start
-R2	2777	R2-ROOM-REC2	Server tick time	server tick p99
-R2	2815	R2-ROOM-REC4	Team size and how modes are written	slots
-R2	2822	R2-ROOM-REC5	The start modes and the goal modes	start
-R2	2828	R2-ROOM-REC5	The start modes and the goal modes	start
-R2	2841	R2-ROOM-REC6	Team size and how modes are written	team size
-R2	2845	R2-ROOM-REC6	Player count (N)	N
-R2	2847	R2-ROOM-REC6	Team size and how modes are written	slots
-R2	2850	R2-ROOM-REC6	The largest mode, and its N	the largest mode's N
-R2	2851	R2-ROOM-REC6	Team size and how modes are written	slots
-R2	2854	R2-ROOM-REC6	State hash	per-tick state hash
-R2	2856	R2-ROOM-REC7	Team size and how modes are written	team size
-R2	2862	R2-ROOM-REC7	The test-mode list	the test-mode list
-R2	2864	R2-ROOM-REC7	Player count (N)	N
-R2	2864	R2-ROOM-REC7	The design point and headroom	headroom
-R2	2873	R2-ROOM-REC8	The start modes and the goal modes	start
-R2	2886	R2-ROOM-REC8	The start modes and the goal modes	start
-R2	2898	R2-ROOM-REC8	The design point and headroom	48+
-R2	2914	R2-SYNC-OQ4	The design point and headroom	48+
-R2	2917	R2-SYNC-OQ4	The design point and headroom	48+
-R2	2918	R2-SYNC-OQ5	The prediction scope	predicted
+R2	2743	R2-TRN-REC6	Time statistics	p99
+R2	2761	R2-ROOM-REC2	The start modes and the goal modes	start
+R2	2773	R2-ROOM-REC2	The reference server	the reference server
+R2	2774	R2-ROOM-REC2	Server tick time	server tick time
+R2	2774	R2-ROOM-REC2	The largest mode, and its N	the largest mode's N
+R2	2774	R2-ROOM-REC2	The server tick budget	the server tick budget
+R2	2774	R2-ROOM-REC2	Time statistics	p99
+R2	2775	R2-ROOM-REC2	Tick period	the tick period
+R2	2776	R2-ROOM-REC2	The reference server	the reference server
+R2	2776	R2-ROOM-REC2	Time statistics	p99
+R2	2777	R2-ROOM-REC2	The start modes and the goal modes	start
+R2	2778	R2-ROOM-REC2	Server tick time	server tick p99
+R2	2778	R2-ROOM-REC2	The largest mode, and its N	the largest mode's N
+R2	2816	R2-ROOM-REC4	Team size and how modes are written	slots
+R2	2823	R2-ROOM-REC5	The start modes and the goal modes	start
+R2	2829	R2-ROOM-REC5	The start modes and the goal modes	start
+R2	2842	R2-ROOM-REC6	Team size and how modes are written	team size
+R2	2846	R2-ROOM-REC6	Player count (N)	N
+R2	2848	R2-ROOM-REC6	Team size and how modes are written	slots
+R2	2851	R2-ROOM-REC6	The largest mode, and its N	the largest mode's N
+R2	2852	R2-ROOM-REC6	Team size and how modes are written	slots
+R2	2855	R2-ROOM-REC6	State hash	per-tick state hash
+R2	2857	R2-ROOM-REC7	Team size and how modes are written	team size
+R2	2863	R2-ROOM-REC7	The test-mode list	the test-mode list
+R2	2865	R2-ROOM-REC7	Player count (N)	N
+R2	2865	R2-ROOM-REC7	The design point and headroom	headroom
+R2	2874	R2-ROOM-REC8	The start modes and the goal modes	start
+R2	2887	R2-ROOM-REC8	The start modes and the goal modes	start
+R2	2899	R2-ROOM-REC8	The design point and headroom	48+
+R2	2915	R2-SYNC-OQ4	The design point and headroom	48+
+R2	2918	R2-SYNC-OQ4	The design point and headroom	48+
 R2	2919	R2-SYNC-OQ5	The prediction scope	predicted
-R2	2935	R2-SYNC-OQ10	The prediction scope	predicted
-R2	2938	R2-SYNC-OQ11	The prediction scope	predicted
-R2	2945	R2-SYNC-OQ11	Shared stream and authority-only stream	authority-only stream
-R2	2980	R2-BUD-OQ5	Live projectile	live projectiles
-R2	2982	R2-BUD-OQ5	Big vehicle and very large unit	big vehicle(s)
-R2	2982	R2-BUD-OQ5	The stress scene	the stress scene
-R2	2983	R2-BUD-OQ5	Live projectile	live projectiles
-R2	2985	R2-BUD-OQ6	The design point and headroom	design point
-R2	2985	R2-BUD-OQ6	Time statistics	mean
-R2	3037	R2-TRN-OQ1	Preview	preview
-R2	3079	R2-ROOM-OQ1	Server tick time	server tick p99
-R2	3081	R2-ROOM-OQ2	The security baseline	the security baseline
-R2	3093	R2-ROOM-OQ5	Team size and how modes are written	team size
-R2	3113	R2-ROOM-OQ11	The security baseline	the security baseline
-R2	3180	R2-XU-OQ8	Server tick time	server tick time
-R2	3180	R2-XU-OQ8	Tick period	the tick period
-R2	3180	R2-XU-OQ8	Time statistics	p99
-R2	3182	R2-XU-OQ8	Server tick time	server tick time
-R2	3182	R2-XU-OQ8	Tick period	the tick period
-R2	3182	R2-XU-OQ8	Time statistics	p99
-R2	3184	R2-XU-OQ8	Time statistics	p99
+R2	2920	R2-SYNC-OQ5	The prediction scope	predicted
+R2	2936	R2-SYNC-OQ10	The prediction scope	predicted
+R2	2939	R2-SYNC-OQ11	The prediction scope	predicted
+R2	2946	R2-SYNC-OQ11	Shared stream and authority-only stream	authority-only stream
+R2	2953	R2-SYNC-OQ13	The largest mode, and its N	the largest mode's N
+R2	2981	R2-BUD-OQ5	Live projectile	live projectiles
+R2	2983	R2-BUD-OQ5	Big vehicle and very large unit	big vehicle(s)
+R2	2983	R2-BUD-OQ5	The stress scene	the stress scene
+R2	2984	R2-BUD-OQ5	Live projectile	live projectiles
+R2	2986	R2-BUD-OQ6	The design point and headroom	design point
+R2	2986	R2-BUD-OQ6	Time statistics	mean
+R2	2994	R2-BUD-OQ9	The largest mode, and its N	the largest mode's N
+R2	3038	R2-TRN-OQ1	Preview	preview
+R2	3080	R2-ROOM-OQ1	Server tick time	server tick p99
+R2	3082	R2-ROOM-OQ2	The security baseline	the security baseline
+R2	3094	R2-ROOM-OQ5	Team size and how modes are written	team size
+R2	3114	R2-ROOM-OQ11	The security baseline	the security baseline
+R2	3181	R2-XU-OQ8	Server tick time	server tick time
+R2	3181	R2-XU-OQ8	Tick period	the tick period
+R2	3181	R2-XU-OQ8	Time statistics	p99
+R2	3183	R2-XU-OQ8	Server tick time	server tick time
+R2	3183	R2-XU-OQ8	Tick period	the tick period
+R2	3183	R2-XU-OQ8	Time statistics	p99
 R2	3185	R2-XU-OQ8	Time statistics	p99
-R2	3189	R2-XU-OQ8	Time statistics	p99
-R2	3189	R2-XU-OQ8	Transport runtime time	the transport runtime
-R2	3193	R2-XU-OQ8	Tick period	the tick period
-R2	3195	R2-XU-OQ9	The reference server	the reference server
-R2	3199	R2-XU-OQ9	The reference server	the reference server
-R2	3275	R2-XU-OQ18	The prediction scope	predict
-R2	3275	R2-XU-OQ18	The prediction scope	the prediction scope
-R2	3282	R2-XU-OQ18	The authority	authoritative
-R2	3283	R2-XU-OQ18	The prediction scope	predicted
-R2	3286	R2-XU-OQ18	The prediction scope	predicted
-R2	3288	R2-XU-OQ18	Shared stream and authority-only stream	authority-only stream
-R2	3291	R2-XU-OQ18	Shared stream and authority-only stream	shared stream
-R2	3294	R2-XU-OQ18	The start modes and the goal modes	start
-R2	3295	R2-XU-OQ18	Player count (N)	N
-R2	3295	R2-XU-OQ18	The largest mode, and its N	the largest mode
-R2	3295	R2-XU-OQ18	The largest mode, and its N	the largest mode
-R2	3295	R2-XU-OQ18	The start modes and the goal modes	goal
+R2	3186	R2-XU-OQ8	Time statistics	p99
+R2	3190	R2-XU-OQ8	Time statistics	p99
+R2	3190	R2-XU-OQ8	Transport runtime time	the transport runtime
+R2	3194	R2-XU-OQ8	Tick period	the tick period
+R2	3196	R2-XU-OQ9	The reference server	the reference server
+R2	3200	R2-XU-OQ9	The reference server	the reference server
+R2	3276	R2-XU-OQ18	The prediction scope	predict
+R2	3276	R2-XU-OQ18	The prediction scope	the prediction scope
+R2	3283	R2-XU-OQ18	The authority	authoritative
+R2	3284	R2-XU-OQ18	The prediction scope	predicted
+R2	3287	R2-XU-OQ18	The prediction scope	predicted
+R2	3289	R2-XU-OQ18	Shared stream and authority-only stream	authority-only stream
+R2	3292	R2-XU-OQ18	Shared stream and authority-only stream	shared stream
+R2	3295	R2-XU-OQ18	The start modes and the goal modes	start
 R2	3296	R2-XU-OQ18	Player count (N)	N
-R2	3296	R2-XU-OQ18	The largest mode, and its N	the largest mode's N
-R2	3297	R2-XU-OQ18	The stress scene	the stress scene
-R2	3298	R2-XU-OQ18	The test-mode list	the test-mode list
-R2	3299		The largest mode, and its N	the largest mode's N
-R2	3301		The security baseline	the security baseline
-R2	3304		The advisories check	the advisories check
-R2	3372	R2-XT-OQ9	Preview	preview
-R2	3378	R2-XT-OQ10	Preview	preview
-R2	3380	R2-XT-OQ10	Preview	preview
-R2	3435	R2-XT-OQ15	The measuring unit: one vCPU	per vCPU
-R2	3436	R2-XT-OQ15	Tick period	Tick period
-R2	3449		The start modes and the goal modes	start
-R2	3470		Shared stream and authority-only stream	authority-only stream
-R2	3476		State hash	the state hash
-R2	3484		Big vehicle and very large unit	big vehicle(s)
-R2	3500		The reference server	the reference server
-R2	3501		The security baseline	the security baseline
-R2	3502		The advisories check	the advisories check
-R2	3531		The prediction scope	predict
-R2	3533		The prediction scope	the prediction scope
+R2	3296	R2-XU-OQ18	The largest mode, and its N	the largest mode
+R2	3296	R2-XU-OQ18	The largest mode, and its N	the largest mode
+R2	3296	R2-XU-OQ18	The start modes and the goal modes	goal
+R2	3297	R2-XU-OQ18	Player count (N)	N
+R2	3297	R2-XU-OQ18	The largest mode, and its N	the largest mode's N
+R2	3298	R2-XU-OQ18	The stress scene	the stress scene
+R2	3299	R2-XU-OQ18	The test-mode list	the test-mode list
+R2	3300		The largest mode, and its N	the largest mode's N
+R2	3302		The security baseline	the security baseline
+R2	3305		The advisories check	the advisories check
+R2	3373	R2-XT-OQ9	Preview	preview
+R2	3379	R2-XT-OQ10	Preview	preview
+R2	3381	R2-XT-OQ10	Preview	preview
+R2	3436	R2-XT-OQ15	The measuring unit: one vCPU	per vCPU
+R2	3437	R2-XT-OQ15	Tick period	Tick period
+R2	3450		The start modes and the goal modes	start
+R2	3471		Shared stream and authority-only stream	authority-only stream
+R2	3477		State hash	the state hash
+R2	3485		Big vehicle and very large unit	big vehicle(s)
+R2	3501		The reference server	the reference server
+R2	3502		The security baseline	the security baseline
+R2	3503		The advisories check	the advisories check
+R2	3532		The prediction scope	predict
+R2	3534		The prediction scope	the prediction scope
 R3	202	R3-WGPU-F22	Time statistics	mean
 R3	536	R3-CHAR-F13	Team size and how modes are written	slots
 R3	536	R3-CHAR-F13	The design point and headroom	48+
@@ -476,65 +506,85 @@ R3	676	R3-MEASURE-F10	Preview	preview
 R3	782	R3-AUDIO-F11	The start modes and the goal modes	start
 R3	824		The design point and headroom	48+
 R3	832		The design point and headroom	48+
+R3	885		The largest mode, and its N	the largest mode's N
 R3	887		The start modes and the goal modes	start
 R3	917	R3-WGPU-REC2	The start modes and the goal modes	start
 R3	995	R3-LOOK-REC1	Big vehicle and very large unit	very large unit(s)
 R3	995	R3-LOOK-REC1	The design point and headroom	48+
 R3	1006	R3-LOOK-REC2	The start modes and the goal modes	start
 R3	1025	R3-LOOK-REC3	The design point and headroom	48+
-R3	1034	R3-CHAR-REC1	Player count (N)	N
-R3	1034	R3-CHAR-REC1	The largest mode, and its N	the largest mode
-R3	1041	R3-CHAR-REC1	Team size and how modes are written	slots
-R3	1041	R3-CHAR-REC1	The design point and headroom	48+
-R3	1043	R3-CHAR-REC1	The largest mode, and its N	the largest mode's N
-R3	1059	R3-CHAR-REC2	The largest mode, and its N	the largest mode
-R3	1060	R3-CHAR-REC2	The largest mode, and its N	the largest mode's N
-R3	1074	R3-CHAR-REC3	The largest mode, and its N	the largest mode's N
-R3	1087	R3-CHAR-REC4	Big vehicle and very large unit	very large unit(s)
-R3	1087	R3-CHAR-REC4	The stress scene	the stress scene
-R3	1100	R3-BUDGET-REC1	The design point and headroom	headroom
-R3	1117	R3-BUDGET-REC2	Player count (N)	N
-R3	1117	R3-BUDGET-REC2	The largest mode, and its N	the largest mode
-R3	1117	R3-BUDGET-REC2	The stress scene	the stress scene's fight on screen
-R3	1118	R3-BUDGET-REC2	Active effect (and visual effect)	visual effect(s)
-R3	1118	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
-R3	1118	R3-BUDGET-REC2	Live projectile	live projectiles
-R3	1126	R3-BUDGET-REC2	The client's sim share	the client's sim share
-R3	1143	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
-R3	1143	R3-BUDGET-REC2	Player count (N)	N
-R3	1143	R3-BUDGET-REC2	Player count (N)	N
-R3	1145	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
-R3	1149	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
-R3	1160		The largest mode, and its N	the largest mode
-R3	1168	R3-BUDGET-REC3	The start modes and the goal modes	start
-R3	1182	R3-MEASURE-REC1	Time statistics	p99
-R3	1194	R3-MEASURE-REC2	The stress scene	the stress scene
-R3	1196	R3-MEASURE-REC2	Preview	preview
-R3	1196	R3-MEASURE-REC2	Preview	preview
-R3	1197	R3-MEASURE-REC2	The stress scene	the stress scene
-R3	1198	R3-MEASURE-REC2	Preview	preview
-R3	1238	R3-AUDIO-REC1	The largest mode, and its N	the largest mode
-R3	1244	R3-AUDIO-REC2	The start modes and the goal modes	start
-R3	1274	R3-AUDIO-REC4	The start modes and the goal modes	start
-R3	1274	R3-AUDIO-REC4	The start modes and the goal modes	start
-R3	1369	R3-BUDGET-OQ4	Player count (N)	N
-R3	1369	R3-BUDGET-OQ4	The design point and headroom	48+
-R3	1369	R3-BUDGET-OQ4	The start modes and the goal modes	goal
+R3	1028	R3-LOOK-REC3	Player count (N)	N
+R3	1028	R3-LOOK-REC3	The largest mode, and its N	the largest mode
+R3	1035	R3-CHAR-REC1	Player count (N)	N
+R3	1035	R3-CHAR-REC1	The largest mode, and its N	the largest mode
+R3	1042	R3-CHAR-REC1	Team size and how modes are written	slots
+R3	1042	R3-CHAR-REC1	The design point and headroom	48+
+R3	1044	R3-CHAR-REC1	The largest mode, and its N	the largest mode's N
+R3	1046	R3-CHAR-REC1	Time statistics	p99
+R3	1047	R3-CHAR-REC1	Time statistics	p99
+R3	1060	R3-CHAR-REC2	The largest mode, and its N	the largest mode
+R3	1061	R3-CHAR-REC2	The largest mode, and its N	the largest mode's N
+R3	1062	R3-CHAR-REC2	Time statistics	p99
+R3	1075	R3-CHAR-REC3	The largest mode, and its N	the largest mode's N
+R3	1088	R3-CHAR-REC4	Big vehicle and very large unit	very large unit(s)
+R3	1088	R3-CHAR-REC4	The stress scene	the stress scene
+R3	1088	R3-CHAR-REC4	Time statistics	p99
+R3	1101	R3-BUDGET-REC1	The design point and headroom	headroom
+R3	1118	R3-BUDGET-REC2	Player count (N)	N
+R3	1118	R3-BUDGET-REC2	The largest mode, and its N	the largest mode
+R3	1118	R3-BUDGET-REC2	The stress scene	the stress scene's fight on screen
+R3	1119	R3-BUDGET-REC2	Active effect (and visual effect)	visual effect(s)
+R3	1119	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
+R3	1119	R3-BUDGET-REC2	Live projectile	live projectiles
+R3	1125	R3-BUDGET-REC2	Time statistics	p99
+R3	1126	R3-BUDGET-REC2	Time statistics	p99
+R3	1127	R3-BUDGET-REC2	The client's sim share	the client's sim share
+R3	1127	R3-BUDGET-REC2	Time statistics	p99
+R3	1128	R3-BUDGET-REC2	Time statistics	p99
+R3	1129	R3-BUDGET-REC2	Time statistics	p99
+R3	1130	R3-BUDGET-REC2	Time statistics	p99
+R3	1131	R3-BUDGET-REC2	Time statistics	p99
+R3	1132	R3-BUDGET-REC2	Time statistics	p99
+R3	1144	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
+R3	1144	R3-BUDGET-REC2	Player count (N)	N
+R3	1144	R3-BUDGET-REC2	Player count (N)	N
+R3	1146	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
+R3	1150	R3-BUDGET-REC2	Big vehicle and very large unit	very large unit(s)
+R3	1161		The largest mode, and its N	the largest mode
+R3	1169	R3-BUDGET-REC3	The start modes and the goal modes	start
+R3	1183	R3-MEASURE-REC1	Time statistics	p99
+R3	1195	R3-MEASURE-REC2	The stress scene	the stress scene
+R3	1197	R3-MEASURE-REC2	Preview	preview
+R3	1197	R3-MEASURE-REC2	Preview	preview
+R3	1198	R3-MEASURE-REC2	The stress scene	the stress scene
+R3	1199	R3-MEASURE-REC2	Preview	preview
+R3	1239	R3-AUDIO-REC1	The largest mode, and its N	the largest mode
+R3	1243	R3-AUDIO-REC1	Time statistics	p99
+R3	1243	R3-AUDIO-REC1	Time statistics	p99
+R3	1245	R3-AUDIO-REC2	The start modes and the goal modes	start
+R3	1249	R3-AUDIO-REC2	The largest mode, and its N	the largest mode's N
+R3	1267	R3-AUDIO-REC3	Time statistics	p99
+R3	1275	R3-AUDIO-REC4	The start modes and the goal modes	start
+R3	1275	R3-AUDIO-REC4	The start modes and the goal modes	start
 R3	1370	R3-BUDGET-OQ4	Player count (N)	N
-R3	1370	R3-BUDGET-OQ4	Player count (N)	N
-R3	1370	R3-BUDGET-OQ4	The largest mode, and its N	the largest mode's N
-R3	1411	R3-AUDIO-OQ6	The start modes and the goal modes	start
-R3	1412	R3-AUDIO-OQ6	Player count (N)	N
-R3	1412	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode
-R3	1412	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode
-R3	1412	R3-AUDIO-OQ6	The start modes and the goal modes	goal
+R3	1370	R3-BUDGET-OQ4	The design point and headroom	48+
+R3	1370	R3-BUDGET-OQ4	The start modes and the goal modes	goal
+R3	1371	R3-BUDGET-OQ4	Player count (N)	N
+R3	1371	R3-BUDGET-OQ4	Player count (N)	N
+R3	1371	R3-BUDGET-OQ4	The largest mode, and its N	the largest mode's N
+R3	1398	R3-AUDIO-OQ2	The largest mode, and its N	the largest mode's N
+R3	1412	R3-AUDIO-OQ6	The start modes and the goal modes	start
 R3	1413	R3-AUDIO-OQ6	Player count (N)	N
-R3	1413	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode's N
-R3	1414	R3-AUDIO-OQ6	The stress scene	the stress scene
-R3	1416	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode's N
-R3	1416	R3-AUDIO-OQ6	The test-mode list	the test-mode list
-R3	1494	R3-XT-OQ8	The stress scene	the stress scene
-R3	1500	R3-XT-OQ8	Preview	preview
+R3	1413	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode
+R3	1413	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode
+R3	1413	R3-AUDIO-OQ6	The start modes and the goal modes	goal
+R3	1414	R3-AUDIO-OQ6	Player count (N)	N
+R3	1414	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode's N
+R3	1415	R3-AUDIO-OQ6	The stress scene	the stress scene
+R3	1417	R3-AUDIO-OQ6	The largest mode, and its N	the largest mode's N
+R3	1417	R3-AUDIO-OQ6	The test-mode list	the test-mode list
+R3	1495	R3-XT-OQ8	The stress scene	the stress scene
+R3	1501	R3-XT-OQ8	Preview	preview
 R4	165	R4-PHYS-F18	The start modes and the goal modes	goal
 R4	347	R4-NAV-F14	Player count (N)	N
 R4	347	R4-NAV-F14	The start modes and the goal modes	start
@@ -566,66 +616,73 @@ R4	727	R4-PHYS-REC2	Preview	preview
 R4	741	R4-PHYS-REC2	The start modes and the goal modes	start
 R4	759	R4-PHYS-REC3	State hash	State hash
 R4	761	R4-PHYS-REC4	Big vehicle and very large unit	big vehicle(s)
-R4	780	R4-PHYS-REC4	The stress scene	the stress scene
-R4	781	R4-PHYS-REC4	Big vehicle and very large unit	big vehicle(s)
-R4	834	R4-NAV-REC1	The start modes and the goal modes	goal
-R4	838		Time statistics	mean
-R4	838		Time statistics	p99
-R4	845	R4-NAV-REC2	The start modes and the goal modes	goal
-R4	855	R4-NAV-REC2	Team size and how modes are written	slots
-R4	856	R4-NAV-REC2	The largest mode, and its N	the largest mode's N
-R4	856	R4-NAV-REC2	The stress scene	the stress scene
-R4	857	R4-NAV-REC2	Player count (N)	N
-R4	857	R4-NAV-REC2	The design point and headroom	headroom
-R4	858	R4-NAV-REC2	The server tick budget	the server tick budget
-R4	858	R4-NAV-REC2	Time statistics	p99
-R4	859	R4-NAV-REC2	The sim step share and the server-only share	the sim step share
-R4	859	R4-NAV-REC2	Tick period	Tick period
-R4	861	R4-NAV-REC2	Time statistics	p99
-R4	876	R4-NAV-REC3	Team size and how modes are written	slots
-R4	878	R4-NAV-REC3	Time statistics	p99
-R4	890	R4-NAV-REC4	Team size and how modes are written	slots
-R4	892	R4-NAV-REC4	The largest mode, and its N	the largest mode
-R4	900	R4-FLOORS-REC1	The start modes and the goal modes	start
-R4	916	R4-FLOORS-REC1	The start modes and the goal modes	goal
-R4	917	R4-FLOORS-REC1	The start modes and the goal modes	goal
-R4	933	R4-FLOORS-REC2	The start modes and the goal modes	goal
-R4	942	R4-FLOORS-REC3	Team size and how modes are written	slots
-R4	977	R4-LOS-REC1	Time statistics	mean
-R4	977	R4-LOS-REC1	Time statistics	p99
-R4	978	R4-LOS-REC1	The test-mode list	the test-mode list
-R4	980	R4-LOS-REC1	Tick period	the tick period
-R4	989	R4-LOS-REC2	The start modes and the goal modes	start
-R4	996	R4-LOS-REC2	Team size and how modes are written	slots
-R4	997	R4-LOS-REC2	The test-mode list	the test-mode list
-R4	1000	R4-LOS-REC2	Tick period	the tick period
-R4	1028	R4-OBST-REC1	The stress scene	the stress scene
-R4	1031	R4-OBST-REC1	Team size and how modes are written	slots
-R4	1032	R4-OBST-REC1	The largest mode, and its N	the largest mode's N
+R4	778	R4-PHYS-REC4	The largest mode, and its N	the largest mode's N
+R4	781	R4-PHYS-REC4	The stress scene	the stress scene
+R4	782	R4-PHYS-REC4	Big vehicle and very large unit	big vehicle(s)
+R4	835	R4-NAV-REC1	The start modes and the goal modes	goal
+R4	839		Time statistics	mean
+R4	839		Time statistics	p99
+R4	846	R4-NAV-REC2	The start modes and the goal modes	goal
+R4	854	R4-NAV-REC2	The stress scene	the stress scene
+R4	857	R4-NAV-REC2	Team size and how modes are written	slots
+R4	858	R4-NAV-REC2	The largest mode, and its N	the largest mode's N
+R4	858	R4-NAV-REC2	The stress scene	the stress scene
+R4	859	R4-NAV-REC2	Player count (N)	N
+R4	859	R4-NAV-REC2	The design point and headroom	headroom
+R4	860	R4-NAV-REC2	The server tick budget	the server tick budget
+R4	860	R4-NAV-REC2	Time statistics	p99
+R4	861	R4-NAV-REC2	The sim step share and the server-only share	the sim step share
+R4	861	R4-NAV-REC2	Tick period	Tick period
+R4	863	R4-NAV-REC2	Time statistics	p99
+R4	878	R4-NAV-REC3	Team size and how modes are written	slots
+R4	879	R4-NAV-REC3	The largest mode, and its N	the largest mode's N
+R4	881	R4-NAV-REC3	Player count (N)	N
+R4	881	R4-NAV-REC3	Player count (N)	N
+R4	881	R4-NAV-REC3	Time statistics	p99
+R4	894	R4-NAV-REC4	Team size and how modes are written	slots
+R4	896	R4-NAV-REC4	The largest mode, and its N	the largest mode
+R4	904	R4-FLOORS-REC1	The start modes and the goal modes	start
+R4	920	R4-FLOORS-REC1	The start modes and the goal modes	goal
+R4	921	R4-FLOORS-REC1	The start modes and the goal modes	goal
+R4	937	R4-FLOORS-REC2	The start modes and the goal modes	goal
+R4	946	R4-FLOORS-REC3	Team size and how modes are written	slots
+R4	981	R4-LOS-REC1	Time statistics	mean
+R4	981	R4-LOS-REC1	Time statistics	p99
+R4	982	R4-LOS-REC1	The test-mode list	the test-mode list
+R4	984	R4-LOS-REC1	Tick period	the tick period
+R4	993	R4-LOS-REC2	The start modes and the goal modes	start
+R4	1000	R4-LOS-REC2	Team size and how modes are written	slots
+R4	1001	R4-LOS-REC2	The test-mode list	the test-mode list
+R4	1004	R4-LOS-REC2	Tick period	the tick period
 R4	1032	R4-OBST-REC1	The stress scene	the stress scene
-R4	1033	R4-OBST-REC1	Big vehicle and very large unit	big vehicle(s)
-R4	1035	R4-OBST-REC1	Time statistics	p99
-R4	1055	R4-OBST-REC2	Time statistics	p99
-R4	1120	R4-LOS-OQ1	Big vehicle and very large unit	big vehicle(s)
-R4	1149	R4-OBST-OQ4	The start modes and the goal modes	start
-R4	1150	R4-OBST-OQ4	Player count (N)	N
-R4	1150	R4-OBST-OQ4	The largest mode, and its N	the largest mode
-R4	1150	R4-OBST-OQ4	The largest mode, and its N	the largest mode
-R4	1150	R4-OBST-OQ4	The start modes and the goal modes	goal
-R4	1151	R4-OBST-OQ4	Player count (N)	N
-R4	1151	R4-OBST-OQ4	The largest mode, and its N	the largest mode's N
-R4	1152	R4-OBST-OQ4	The stress scene	the stress scene
-R4	1153	R4-OBST-OQ4	The test-mode list	the test-mode list
-R4	1154	R4-OBST-OQ4	The largest mode, and its N	the largest mode's N
-R4	1184	R4-XT-OQ4	The largest mode, and its N	the largest mode
-R4	1217	R4-XT-OQ8	Big vehicle and very large unit	big vehicle(s)
-R4	1217	R4-XT-OQ8	The stress scene	the stress scene
-R4	1219	R4-XT-OQ8	Big vehicle and very large unit	big vehicle(s)
+R4	1035	R4-OBST-REC1	Team size and how modes are written	slots
+R4	1036	R4-OBST-REC1	The largest mode, and its N	the largest mode's N
+R4	1036	R4-OBST-REC1	The stress scene	the stress scene
+R4	1037	R4-OBST-REC1	Big vehicle and very large unit	big vehicle(s)
+R4	1039	R4-OBST-REC1	Time statistics	p99
+R4	1059	R4-OBST-REC2	Time statistics	p99
+R4	1124	R4-LOS-OQ1	Big vehicle and very large unit	big vehicle(s)
+R4	1153	R4-OBST-OQ4	The start modes and the goal modes	start
+R4	1154	R4-OBST-OQ4	Player count (N)	N
+R4	1154	R4-OBST-OQ4	The largest mode, and its N	the largest mode
+R4	1154	R4-OBST-OQ4	The largest mode, and its N	the largest mode
+R4	1154	R4-OBST-OQ4	The start modes and the goal modes	goal
+R4	1155	R4-OBST-OQ4	Player count (N)	N
+R4	1155	R4-OBST-OQ4	The largest mode, and its N	the largest mode's N
+R4	1156	R4-OBST-OQ4	The stress scene	the stress scene
+R4	1157	R4-OBST-OQ4	The test-mode list	the test-mode list
+R4	1158	R4-OBST-OQ4	The largest mode, and its N	the largest mode's N
+R4	1188	R4-XT-OQ4	The largest mode, and its N	the largest mode
+R4	1221	R4-XT-OQ8	Big vehicle and very large unit	big vehicle(s)
+R4	1221	R4-XT-OQ8	The stress scene	the stress scene
+R4	1223	R4-XT-OQ8	Big vehicle and very large unit	big vehicle(s)
 R5	27		Preview	preview
 R5	27		Preview	preview
+R5	58		The largest mode, and its N	the largest mode's N
 R5	130	R5-LAYOUT-F12	Preview	preview
 R5	132	R5-LAYOUT-F12	Preview	preview
 R5	159	R5-LAYOUT-F15	Preview	preview
+R5	402	R5-RUSTLINT-F15	The hash-map ban in the sim crate	the hash-map ban
 R5	516	R5-TEST-F14	Preview	preview
 R5	522	R5-TEST-F14	Player count (N)	N
 R5	525	R5-TEST-F14	Player count (N)	N
@@ -673,20 +730,25 @@ R5	1400	R5-TEST-REC1	Player count (N)	N
 R5	1400	R5-TEST-REC1	Server tick time	server tick time
 R5	1400	R5-TEST-REC1	Sim step time	sim step time
 R5	1400	R5-TEST-REC1	Time statistics	p99
+R5	1426	R5-TEST-REC2	The design point and headroom	design point
+R5	1429	R5-TEST-REC2	The largest mode, and its N	the largest mode's N
 R5	1432	R5-TEST-REC3	Preview	preview
 R5	1449	R5-TEST-REC3	The start modes and the goal modes	start
 R5	1449	R5-TEST-REC3	The start modes and the goal modes	start
 R5	1470	R5-TEST-REC4	Time statistics	mean
 R5	1477	R5-TEST-REC5	The largest mode, and its N	the largest mode
+R5	1477	R5-TEST-REC5	The test-mode list	the test-mode list
 R5	1478	R5-TEST-REC5	Player count (N)	N
 R5	1479	R5-TEST-REC5	Server tick time	server tick time
 R5	1480	R5-TEST-REC5	The server tick budget	the server tick budget
 R5	1480	R5-TEST-REC5	Time statistics	p99
 R5	1483	R5-TEST-REC5	The design point and headroom	48+
+R5	1487	R5-TEST-REC5	The largest mode, and its N	the largest mode's N
 R5	1488	R5-TEST-REC5	Server tick time	server tick time
 R5	1488	R5-TEST-REC5	The server tick budget	the server tick budget
 R5	1488	R5-TEST-REC5	Time statistics	p99
 R5	1512	R5-CI-REC1	The start modes and the goal modes	start
+R5	1561	R5-CI-REC5	The hash-map ban in the sim crate	the hash-map ban
 R5	1564	R5-CI-REC5	Preview	preview
 R5	1585	R5-CI-REC5	Preview	preview
 R5	1589	R5-PREV-REC1	Preview	preview
@@ -784,19 +846,21 @@ R5	1980	R5-XT-OQ4	The largest mode, and its N	the largest mode
 R5	1985	R5-XT-OQ5	Preview	preview
 R5	1991	R5-XT-OQ6	Preview	preview
 R5	1993	R5-XT-OQ6	Preview	preview
+R5	2087		The hash-map ban in the sim crate	the hash-map ban
 R5	2094		Preview	preview
 R5	2094		The security baseline	the security baseline
 R5	2098		Preview	preview
-R5	2291		Preview	preview
-R5	2383		Preview	preview
-R5	2403		Preview	preview
-R5	2405		Preview	preview
-R5	2410		Preview	preview
-R5	2466		The client host	Cloudflare Pages
-R5	2479		Preview	preview
+R5	2303		Preview	preview
+R5	2395		Preview	preview
+R5	2415		Preview	preview
+R5	2417		Preview	preview
+R5	2422		Preview	preview
+R5	2478		The client host	Cloudflare Pages
+R5	2491		Preview	preview
 R6	15		Preview	preview
 R6	15		Preview	preview
 R6	46		The client host	Cloudflare Pages
+R6	46		The client host	Workers static assets (the alternative)
 R6	46		The client host	Workers static assets (the alternative)
 R6	46		The client host	the client host
 R6	48		The start modes and the goal modes	goal
@@ -861,86 +925,94 @@ R6	621	R6-HOST-REC1	The staging game server	the staging game server
 R6	622	R6-HOST-REC1	The access wall	the access wall
 R6	622	R6-HOST-REC1	The access wall	the access wall
 R6	623	R6-HOST-REC1	Preview	preview
-R6	637	R6-HOST-REC1	Preview	preview link
-R6	639	R6-HOST-REC1	Preview isolation and the isolation flag	the isolation flag
-R6	641	R6-HOST-REC1	The client host	Workers static assets (the alternative)
-R6	644	R6-HOST-REC2	The reference server	the reference server
-R6	648	R6-HOST-REC2	The start modes and the goal modes	start
+R6	638	R6-HOST-REC1	Preview	preview link
+R6	640	R6-HOST-REC1	Preview isolation and the isolation flag	the isolation flag
+R6	642	R6-HOST-REC1	The client host	Workers static assets (the alternative)
+R6	645	R6-HOST-REC2	The reference server	the reference server
 R6	649	R6-HOST-REC2	The start modes and the goal modes	start
-R6	658	R6-HOST-REC2	The server tick budget	the server tick budget
-R6	666	R6-HOST-REC2	Server tick time	server tick p99
-R6	671	R6-HOST-REC3	Preview	preview
-R6	680	R6-HOST-REC3	Preview	preview
-R6	692	R6-HOST-REC4	Game-server certificate	the wildcard certificate
-R6	698	R6-COST-REC1	The start modes and the goal modes	goal
-R6	698	R6-COST-REC1	The start modes and the goal modes	start
-R6	704	R6-COST-REC1	The start modes and the goal modes	start
-R6	730	R6-OBS-REC1	Server tick time	server tick p99
-R6	733	R6-OBS-REC2	The staging game server	the staging VM
-R6	734	R6-OBS-REC2	The start modes and the goal modes	start
-R6	735	R6-OBS-REC2	Server tick time	server tick time
-R6	743	R6-OBS-REC2	The server tick budget	the server tick budget
-R6	778	R6-TEL-REC1	The start modes and the goal modes	start
-R6	785	R6-TEL-REC1	Team size and how modes are written	slots
-R6	791	R6-TEL-REC1	Team size and how modes are written	slots
-R6	801	R6-TEL-REC1	Server tick time	server tick p99
-R6	806	R6-TEL-REC2	The start modes and the goal modes	goal
-R6	811	R6-TEL-REC2	The start modes and the goal modes	start
-R6	833	R6-TEL-REC3	The staging game server	the staging VM
-R6	855	R6-HOST-OQ4	The start modes and the goal modes	goal
-R6	856	R6-HOST-OQ4	The start modes and the goal modes	goal
-R6	859	R6-HOST-OQ5	The security baseline	the security baseline
-R6	860	R6-HOST-OQ6	Game-server certificate	the wildcard certificate
-R6	872	R6-COST-OQ1	The reference server	the reference server
-R6	904	R6-TEL-OQ2	Team size and how modes are written	slots
-R6	932	R6-SEC-OQ1	Game-server certificate	the wildcard certificate
-R6	932	R6-SEC-OQ1	Game-server certificate	the wildcard certificate
-R6	941	R6-SEC-OQ1	The start modes and the goal modes	start
-R6	942	R6-SEC-OQ1	Player count (N)	N
-R6	942	R6-SEC-OQ1	The largest mode, and its N	the largest mode
-R6	942	R6-SEC-OQ1	The largest mode, and its N	the largest mode
-R6	942	R6-SEC-OQ1	The start modes and the goal modes	goal
-R6	943	R6-SEC-OQ1	Player count (N)	N
-R6	943	R6-SEC-OQ1	The largest mode, and its N	the largest mode's N
-R6	943	R6-SEC-OQ1	The stress scene	the stress scene
-R6	944	R6-SEC-OQ1	The test-mode list	the test-mode list
-R6	945	R6-SEC-OQ1	The largest mode, and its N	the largest mode's N
-R6	947	R6-SEC-OQ1	The security baseline	the security baseline
-R6	950	R6-SEC-OQ1	The advisories check	the advisories check
-R6	957		Preview	preview
-R6	957		The client host	Cloudflare Pages
-R6	959		The client host	Workers static assets (the alternative)
-R6	961		Preview	preview
-R6	961		The client host	the client host
-R6	962		The access wall	the access wall
-R6	963		The client host	Workers static assets (the alternative)
-R6	964		The staging game server	the staging game server
-R6	965		The access wall	the access wall
-R6	967		Preview	preview
-R6	967		The staging game server	the staging game server
-R6	968		Preview	preview
-R6	969		Preview	preview
-R6	969		The security baseline	the security baseline
-R6	970		Preview	preview
-R6	971		The access wall	the access wall
-R6	985	R6-XT-OQ2	The largest mode, and its N	the largest mode
-R6	990	R6-XT-OQ3	Preview	preview
-R6	996	R6-XT-OQ4	Preview	preview
-R6	998	R6-XT-OQ4	Preview	preview
-R6	1029	R6-XT-OQ9	The client host	Workers static assets (the alternative)
-R6	1038	R6-XT-OQ9	Time statistics	mean
-R6	1046	R6-XT-OQ9	The client host	Cloudflare Pages
-R6	1052	R6-XT-OQ9	The measuring unit: one vCPU	one vCPU
-R6	1052	R6-XT-OQ9	The reference server	the reference server
-R6	1055	R6-XT-OQ9	Preview	preview link
-R6	1055	R6-XT-OQ9	The client host	Cloudflare Pages
-R6	1055	R6-XT-OQ9	The client host	the client host
-R6	1060	R6-XT-OQ9	The start modes and the goal modes	goal
-R6	1062	R6-XT-OQ9	The measuring unit: one vCPU	per vCPU
-R6	1062	R6-XT-OQ9	The measuring unit: one vCPU	per vCPU
-R6	1062	R6-XT-OQ9	The reference server	the reference server
-R6	1203		The client host	Cloudflare Pages
-R6	1204		The client host	Cloudflare Pages
-R6	1205		Preview	preview
-R6	1205		The client host	Cloudflare Pages
-R6	1206		The client host	Workers static assets (the alternative)
+R6	650	R6-HOST-REC2	The start modes and the goal modes	start
+R6	659	R6-HOST-REC2	The server tick budget	the server tick budget
+R6	666	R6-HOST-REC2	The largest mode, and its N	the largest mode
+R6	667	R6-HOST-REC2	Server tick time	server tick p99
+R6	672	R6-HOST-REC3	Preview	preview
+R6	681	R6-HOST-REC3	Preview	preview
+R6	693	R6-HOST-REC4	Game-server certificate	the wildcard certificate
+R6	699	R6-COST-REC1	The start modes and the goal modes	goal
+R6	699	R6-COST-REC1	The start modes and the goal modes	start
+R6	705	R6-COST-REC1	The start modes and the goal modes	start
+R6	710	R6-COST-REC1	The start modes and the goal modes	goal
+R6	710	R6-COST-REC1	The start modes and the goal modes	start
+R6	732	R6-OBS-REC1	Server tick time	server tick p99
+R6	735	R6-OBS-REC2	The staging game server	the staging VM
+R6	736	R6-OBS-REC2	The start modes and the goal modes	start
+R6	737	R6-OBS-REC2	Server tick time	server tick time
+R6	745	R6-OBS-REC2	The server tick budget	the server tick budget
+R6	746	R6-OBS-REC2	The largest mode, and its N	the largest mode's N
+R6	782	R6-TEL-REC1	The start modes and the goal modes	start
+R6	789	R6-TEL-REC1	Team size and how modes are written	slots
+R6	795	R6-TEL-REC1	Team size and how modes are written	slots
+R6	803	R6-TEL-REC1	The largest mode, and its N	the largest mode
+R6	805	R6-TEL-REC1	Server tick time	server tick p99
+R6	807	R6-TEL-REC1	Player count (N)	N
+R6	807	R6-TEL-REC1	Player count (N)	N
+R6	807	R6-TEL-REC1	The largest mode, and its N	the largest mode
+R6	811	R6-TEL-REC2	The start modes and the goal modes	goal
+R6	816	R6-TEL-REC2	The start modes and the goal modes	start
+R6	838	R6-TEL-REC3	The staging game server	the staging VM
+R6	860	R6-HOST-OQ4	The start modes and the goal modes	goal
+R6	861	R6-HOST-OQ4	The start modes and the goal modes	goal
+R6	864	R6-HOST-OQ5	The security baseline	the security baseline
+R6	865	R6-HOST-OQ6	Game-server certificate	the wildcard certificate
+R6	877	R6-COST-OQ1	The reference server	the reference server
+R6	909	R6-TEL-OQ2	Team size and how modes are written	slots
+R6	937	R6-SEC-OQ1	Game-server certificate	the wildcard certificate
+R6	937	R6-SEC-OQ1	Game-server certificate	the wildcard certificate
+R6	946	R6-SEC-OQ1	The start modes and the goal modes	start
+R6	947	R6-SEC-OQ1	Player count (N)	N
+R6	947	R6-SEC-OQ1	The largest mode, and its N	the largest mode
+R6	947	R6-SEC-OQ1	The largest mode, and its N	the largest mode
+R6	947	R6-SEC-OQ1	The start modes and the goal modes	goal
+R6	948	R6-SEC-OQ1	Player count (N)	N
+R6	948	R6-SEC-OQ1	The largest mode, and its N	the largest mode's N
+R6	948	R6-SEC-OQ1	The stress scene	the stress scene
+R6	949	R6-SEC-OQ1	The test-mode list	the test-mode list
+R6	950	R6-SEC-OQ1	The largest mode, and its N	the largest mode's N
+R6	952	R6-SEC-OQ1	The security baseline	the security baseline
+R6	955	R6-SEC-OQ1	The advisories check	the advisories check
+R6	962		Preview	preview
+R6	962		The client host	Cloudflare Pages
+R6	964		The client host	Workers static assets (the alternative)
+R6	966		Preview	preview
+R6	966		The client host	the client host
+R6	967		The access wall	the access wall
+R6	968		The client host	Workers static assets (the alternative)
+R6	969		The staging game server	the staging game server
+R6	970		The access wall	the access wall
+R6	972		Preview	preview
+R6	972		The staging game server	the staging game server
+R6	973		Preview	preview
+R6	974		Preview	preview
+R6	974		The security baseline	the security baseline
+R6	975		Preview	preview
+R6	976		The access wall	the access wall
+R6	990	R6-XT-OQ2	The largest mode, and its N	the largest mode
+R6	995	R6-XT-OQ3	Preview	preview
+R6	1001	R6-XT-OQ4	Preview	preview
+R6	1003	R6-XT-OQ4	Preview	preview
+R6	1034	R6-XT-OQ9	The client host	Workers static assets (the alternative)
+R6	1043	R6-XT-OQ9	Time statistics	mean
+R6	1051	R6-XT-OQ9	The client host	Cloudflare Pages
+R6	1057	R6-XT-OQ9	The measuring unit: one vCPU	one vCPU
+R6	1057	R6-XT-OQ9	The reference server	the reference server
+R6	1060	R6-XT-OQ9	Preview	preview link
+R6	1060	R6-XT-OQ9	The client host	Cloudflare Pages
+R6	1060	R6-XT-OQ9	The client host	the client host
+R6	1065	R6-XT-OQ9	The start modes and the goal modes	goal
+R6	1067	R6-XT-OQ9	The measuring unit: one vCPU	per vCPU
+R6	1067	R6-XT-OQ9	The measuring unit: one vCPU	per vCPU
+R6	1067	R6-XT-OQ9	The reference server	the reference server
+R6	1222		The client host	Cloudflare Pages
+R6	1223		The client host	Cloudflare Pages
+R6	1224		Preview	preview
+R6	1224		The client host	Cloudflare Pages
+R6	1225		The client host	Workers static assets (the alternative)
