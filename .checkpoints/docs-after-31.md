@@ -2,7 +2,7 @@
 - **Goal:** STATUS and ROADMAP record PR #31's merge (2f5b52e) and DRAFTS-SESSION (a); the v2 day session hands over and
   stops · plan: `docs-after-31/plan.md` (revision 1; the advisor's review pending)
 - **Branch:** cs/docs-after-31 · **Base:** origin/main 2f5b52e (PR #31's merge commit)
-- **Last update:** 2026-10-31 16:28 Amsterdam
+- **Last update:** 2026-10-31 16:26 Amsterdam
 
 ## Steps done
 1. PR #31 merged on Mustafa's "merge #31" (2026-10-31), after the advisor's APPROVE of
