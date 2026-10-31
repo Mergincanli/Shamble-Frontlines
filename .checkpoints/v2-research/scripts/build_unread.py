@@ -111,15 +111,18 @@ def names(text):
     return doms if doms else list(dict.fromkeys(re.findall(r'\b[A-Z][A-Za-z0-9]+\b', head)))
 # Ties the names cannot find, read by hand by the session on 2026-10-30 after the step-3d verifier's sample: each topic's
 # hinge row names the same source in other words. Key: (topic, the part-2 source text's start); value: the hinge row.
-MANUAL_TIES={('R1','https://gdcvault.com/play/1024001/'):'R1 R1-TICK-REC2',   # "the same Overwatch talk (above)"
-             ('R2','https://gdcvault.com/play/1024001/'):'R2 R2-SYNC-REC2',   # "The same Overwatch talk (gdcvault 1024001)."
-             ('R2 ','https://gdcvault.com/play/1024001/'):'R2 R2-BUD-REC1',   # "gdcvault 1024001 (as above)"
+MANUAL_TIES={('R1','https://gdcvault.com/play/1024001/-Overwatch-Gameplay-Architecture-and'):'R1 R1-TICK-REC2',   # "the same Overwatch talk (above)"
+             ('R2','https://gdcvault.com/play/1024001/-Overwatch-Gameplay-Architecture-and'):'R2 R2-SYNC-REC2',   # "The same Overwatch talk (gdcvault 1024001)."
+             ('R2 ','https://gdcvault.com/play/1024001/-Overwatch-Gameplay-Architecture-and'):'R2 R2-BUD-REC1',   # "gdcvault 1024001 (as above)"
+             ('R2','https://gdcvault.com/play/1024041/Networking-Scripted-Weapons-and-Abilities'):'R2 R2-SYNC-REC3',   # Dan Reed's talk, named in words
+             ('R2','https://www.sohu.com/a/148848770_466876'):'R2 R2-SYNC-REC1',   # a write-up of the talk (R1's ecs note: "Third-party write-ups (edgegap.com, sohu, juejin, ...)")
+             ('R2','https://juejin.cn/post/6844903635864780813'):'R2 R2-SYNC-REC1',
              ('R3','https://discourse.threejs.org/t/webgpurenderer-forcewebgl-true-vs-webglrenderer/87805'):'R3 R3-WGPU-REC1',
              ('R3','registry.khronos.org, `EXT_disjoint_timer_query_webgl2`'):'R3 R3-GL2-REC3',
              ('R3','https://raw.githubusercontent.com/mrdoob/three.js/r186/src/nodes/accessors/SkinningNode.js'):'R3 R3-CHAR-REC1',
              ('R3','https://threejs.org/docs/pages/SkinningNode.html'):'R3 R3-CHAR-REC1',
-             ('R5','https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/'):'R5 R5-RUSTLINT-REC3, REC4',
-             ('R5','https://github.com/rust-lang/rust-clippy/tree/master/clippy_lints/src/'):'R5 R5-RUSTLINT-REC3, REC4',
+             # the `panic` and `arithmetic_side_effects` source files only (not the disallowed lint's: R5 read disallowed_items.rs)
+             ('R5','https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/arithmetic_side_effects.rs'):'R5 R5-RUSTLINT-REC3, REC4',
              ('R1','rand\'s book, "Reproducibility" chapter'):'R1 R1-DET-REC4',
              ('R2','Other Overwatch GDC 2017 talks on the same vault'):'R2 R2-SYNC-REC3',
              ('R3','activision.com, "Practical Real-Time Strategies'):'R3 R3-LOOK-REC1',
@@ -131,7 +134,11 @@ MANUAL_TIES={('R1','https://gdcvault.com/play/1024001/'):'R1 R1-TICK-REC2',   # 
              ('R5','Linux `tc netem` documentation'):'R5 R5-TEST-REC4',
              ('R5','github.com/nextest-rs/nextest, docs.rs/cargo-llvm-cov'):'R5 R5-TEST-REC1, REC6'}
 def manual_ties(m):
-    return {v for (mt,start),v in MANUAL_TIES.items() if m['src'].startswith(start)}
+    """An address key ties the row whose first address is exactly that address (no folder prefixes: the step-3d final
+    check found that fault); a text key ties the text row that starts with it."""
+    first=(m['src'].split() or [''])[0].rstrip('/')
+    return {v for (mt,start),v in MANUAL_TIES.items()
+            if (first==start.rstrip('/') if start.startswith('http') else m['src'].startswith(start))}
 def text_hinges(k, m):
     manual=manual_ties(m)
     if not k.startswith('TEXT:') or manual: return manual

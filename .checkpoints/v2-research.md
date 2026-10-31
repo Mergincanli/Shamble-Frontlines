@@ -244,6 +244,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   start-up"), nits (shares named, CLAUDE.md credited at six places, totals 37 and 110); 0 exact; no quote gone.
   Committed **2382ea2**. R2 final check launched 10:22 UTC (xhigh; run wf_cbb704b7-47f, task w0ludbq1s; prompt
   `prompts/verifier-r2-3d-final.txt`; 32 hits on 59 changed lines). Running: the R1+R4 and R2 final checks.
+- **R1+R4 final check DONE** (run wf_6ff21603-bee, about 10:24 UTC; verbatim `verifier-r14-3d-final-result.md`): PASS WITH
+  NOTES; all fix items closed; 9 hits on changed lines, 9 right; labels kept (R1 verified, R4 50 of 52); glossary nits
+  closed; UNREAD: 31 of 33 corrected rows hold, 2 wrong (the hand-tie list keyed by a folder, clippy_lints/src/: the
+  same prefix fault), plus three possible ties. Fixed by the session (hand ties match whole addresses; sohu and juejin
+  write-ups under R2-SYNC-REC1, gdcvault 1024041 under R2-SYNC-REC3; 5 cells): committed **7bb3d2e**.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
