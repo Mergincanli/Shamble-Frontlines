@@ -775,7 +775,8 @@ Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes
   0.7); tuning `JUG.maxSpeed`; R1-TICK-OQ9, R1-DET-REC3,
   R1-ECS-REC1 (mark 1's stress load); LOOP_V2 §3 and §6.
   Serves: VISION_V2 §6.4 (big, multi-part vehicles).
-  A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of 48 soldiers for 10 minutes, turning
+  A spike must prove (proposed): a vehicle driven into walls, ramps and a crowd of the largest mode's N soldiers (48,
+  or 54 under MODES-3 (b)) for 10 minutes, turning
   on the spot and while moving, has 0
   ticks that end with a soldier or a wall inside its hull (penetration > 1 cm); the stress scene
   ([GLOSSARY](GLOSSARY.md#the-stress-scene)), which R1-DET-REC3 and R1-ECS-REC1 mark 1 use, holds 15 big vehicles,
@@ -850,8 +851,9 @@ Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes
   The reason: legacy's budget counts searches per `update()` call, so searching grows with frame rate (GN13), and the
   replan storm is a known bug; Detour itself caps work per update (F4); Quake III serves every bot from per-goal cached
   distances, hierarchically, and accepts a slightly longer route (F19); many bots share a few goals (GN9).
-  Rests on: F4, F19; legacy GN5 (the stall figures), GN9, GN12, GN13, TL13; LOOP_V2 §10; R1-TICK-REC2 (the P1
-  scene), R1-XU-OQ1, R4-PHYS-REC4 (the vehicle count).
+  Rests on: F4, F19; legacy GN5 (the stall figures), GN9, GN12, GN13, TL13; LOOP_V2 §10; the stress scene
+  ([GLOSSARY](GLOSSARY.md#the-stress-scene); it replaced R1-TICK-REC2's P1 scene and settled R1-XU-OQ1's scene part),
+  R4-PHYS-REC4 (the vehicle count).
   Serves: VISION_V2 §3 (up to 24v24, bots fill empty slots) and §6.2 (bots between levels).
   A spike must prove (proposed): in the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)) at the largest mode's
   N and in its N = 64 [headroom run](GLOSSARY.md#the-design-point-and-headroom), and an uplink cache carried around
@@ -874,9 +876,11 @@ Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes
   Rests on: F13, F17; R1-ECS-REC2, R1-DET-REC2; R4-PHYS-REC1; R4-FLOORS-REC2; legacy GN5; R4-OBST-F3; LOOP_V2 §9 (the
   6 m gap).
   Serves: VISION_V2 §3 (bots fill empty slots) and §6.2.
-  A spike must prove (proposed): 48 bots crossing in a 6 m choke point (LOOP_V2 §9's gap) for 10 minutes: 0 deadlocks
-  longer than 3 s, and per-tick state hashes identical on native and Wasm; the avoidance step costs ≤ 0.2 ms p99 native
-  at 48 (proposed); in R4-FLOORS-REC2's two-floor test building, 0 avoidance pairs join bots on different floors.
+  A spike must prove (proposed): the largest mode's N bots (48, or 54 under MODES-3 (b)) crossing in a 6 m choke point
+  (LOOP_V2 §9's gap) for 10 minutes: 0 deadlocks longer than 3 s, and per-tick state hashes identical on native and
+  Wasm; the avoidance step costs ≤ 0.2 ms p99 native at N = 48 (proposed; at N = 54 the tick-budget check scales it
+  ×1.125, [GLOSSARY](GLOSSARY.md#1-tick-budgets)); in R4-FLOORS-REC2's two-floor test building, 0 avoidance pairs
+  join bots on different floors.
 
   Cross-topic open questions: R4-XT-OQ6.
 
@@ -891,7 +895,7 @@ Reference hardware, where a mark needs it, is the one R1-TICK-REC2 proposes
   A spike must prove (proposed): the client's Worker build without bots skips the navigation data (its size reported);
   with bots, offline play at the largest mode meets R1-TICK-REC2's P2 mark.
 
-  Cross-topic open questions: R4-XT-OQ3, R4-XT-OQ4.
+  Cross-topic open questions: R4-XT-OQ3, R4-XT-OQ4, R4-XT-OQ5.
 
 ### 3. Bots moving between floors (R4-FLOORS)
 
@@ -1421,6 +1425,15 @@ claim, number or source was added. Every "before" quote matched the file exactly
   questions added** (part 6, "Cross-topic open questions (consistency critic, 2026-10-29)"): R4-XT-OQ1 to R4-XT-OQ8 in
   the critic's words, with a pointer line in each of the 8 recommendations they name.
 - **OBJECT:** none.
+
+Step 3d fixes (2026-10-30):
+- R4-PHYS-REC4 spike: "a crowd of 48 soldiers" is now the largest mode's N soldiers (48, or 54 under MODES-3 (b)) —
+  recommendation.
+- R4-NAV-REC3 spike: "48 bots" is now the largest mode's N bots (48, or 54 under MODES-3 (b)) — recommendation.
+- R4-NAV-REC3 spike: the avoidance cost is ≤ 0.2 ms p99 at N = 48, and GLOSSARY's tick-budget check scales it ×1.125
+  at N = 54 — recommendation.
+- R4-NAV-REC4's pointer line gains R4-XT-OQ5 — nit.
+- R4-NAV-REC2's "Rests on": the stress scene replaces "R1-TICK-REC2 (the P1 scene), R1-XU-OQ1" — nit.
 
 ## Sources
 

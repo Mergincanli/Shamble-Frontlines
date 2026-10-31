@@ -1630,7 +1630,7 @@ rests on official documentation and specifications, plus the legacy facts in §2
 | | A. bevy_ecs 0.20 (standalone) | B. hecs 0.11.2 | C. Custom plain data (typed tables in one state struct) |
 |---|---|---|---|
 | **Shape** | A World of archetype tables (F3), systems in schedules, single- or multi-threaded executor (F7). | An archetype World with no scheduler; plain functions query it (F16, F17). | One sim-state struct: a fixed-slot soldier table sized by the mode, generational pools for vehicles, projectiles and effects (F28 shows the key scheme), per-team tables, static colliders with ids, the RNG state, the tick counter, the tick's event list; phases are plain functions called in a fixed order. |
-| **Deterministic order** | Not guaranteed (F4, F12); needs a sort in every outcome-deciding system, redone each run (F5); order ambiguities ignored by default (F6). Achievable, but every system has to opt in. | Arbitrary (F17); needs our own ordering (an index or a sort) on every outcome loop. | Storage order is iteration order (F25), and we control it. Still needs a rule against default-hasher HashMap iteration (F23); BTreeMap where a map is needed (F24). |
+| **Deterministic order** | Not guaranteed (F4, F12); needs a sort in every outcome-deciding system, redone each run (F5); order ambiguities ignored by default (F6). Achievable, but every system has to opt in. | Arbitrary (F17); needs our own ordering (an index or a sort) on every outcome loop. | Storage order is iteration order (F25), and we control it. Still needs a rule against default-hasher HashMap iteration (F23; now the hash-map ban, [GLOSSARY](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate)); BTreeMap where a map is needed (F24). |
 | **Whole-state snapshot / restore** | The World is not Clone (F8). The proven route (bevy_ggrs) registers each type, keeps per-frame maps keyed by a rollback id and reconciles entities on load (F10). Unregistered state silently desyncs (F13), and change detection fires after every restore (F14). | The World is not Clone (F18). We would write a snapshot by hand, per component type, or serialize (F20); the freelist makes re-created ids match (F19). | Derive or write Clone over the whole struct; a hand-written clone_from into a preallocated copy reuses buffers (F26, F27; that a derived or default clone_from does not is inferred from F35). Nothing lives outside the struct, so nothing can be "unregistered" (inferred: it holds only if the sim keeps no globals or statics, which is a code rule). |
 | **Ids across server and client** | Entity must not be lined up between instances (F9): a separate network id plus MapEntities mapping, as bevy_ggrs does (F10). | Ids can be aligned through the freelist (F19), but only while the live sets match exactly. | The sim defines the id (kind, index, generation, F28), and the same id is used on the wire, in events and in the TS client. |
 | **Serialization for snapshots** | An optional serialize feature (F7); Entity's serialized form has no format guarantee (F9). | Context-based serialization with a compact column format (F20). | serde on our own types, the route Rapier (F30) and slotmap (F28, inferred) use; the wire format and deltas are R2's. |
@@ -1911,7 +1911,8 @@ its "Rests on:" list and the VISION_V2 items it serves.
 
   Rests on: F1, F4, F5, F8, F9, F10, F12, F13, F14, F17, F18, F19, F20, F21, F25, F26, F27, F28, F29, F30, F32, F35
   (plus F7 and F33 for the size marks; F34, an absence no quote can confirm, only says why mark 5 measures); the legacy
-  facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4 for mark 3.
+  facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4 for mark 3; R2's worked bandwidth estimate for mark
+  1's 15 big vehicles (an R2 assumption, through the stress scene).
   Serves VISION_V2 §6.1, §6.2, §6.3, §6.4, §6.5, §6.6 and §6.8, and §4 ("matches feel fair up to about 100 ms of
   ping", which needs reproducible replay).
 
@@ -2046,8 +2047,8 @@ A spike must prove (proposed pass marks; reference hardware proposed: the refere
   DM_Tri-sized greybox, 36,000 ticks per run, 3 runs. At 60 Hz: p99 sim step time at the largest mode's N at most
   4.2 ms (the sim step share, [GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 25 % of 16.7 ms)
   on one vCPU of the reference server, max at most 16.7 ms, zero overruns. At 30 Hz: p99 at most 8.3 ms (25 % of
-  33.3 ms). Report mean, p50, p95, p99 and max per N. The other 25 % of the server tick budget
-  ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of the tick period) is the server-only share, for snapshot
+  33.3 ms). Report mean, p50, p95, p99 and max per N. The other 25 % of the tick period, inside the server tick budget
+  ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of the tick period), is the server-only share, for snapshot
   encoding, interest management, lag compensation and commands (R2-SYNC-REC9); how many matches share a vCPU is
   measured, not budgeted (R2-ROOM-REC2 mark 2); headroom itself is Fiedler's advice (F3).
 - P2 client, Wasm in a dedicated Worker on the proposed minimum laptop, offline at the largest mode (OQ7 decides N): p99
@@ -2237,6 +2238,7 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   A spike must prove (proposed): the suite runs REC1's matches and reports 0 mismatches on all targets; a deliberately
   injected divergence (one std `sin` call, one `HashMap` iteration, one presentation RNG draw inside the sim) is caught
   at the first tick it changes the state; hashing cost per tick is reported, with method.
+  Cross-topic open questions: R1-XT-OQ2.
 - **R1-DET-REC7. No fixed point.** Keep IEEE floats under REC2's rules.
   Reason: shipped PC games held float identity with strict control (F31); the targets we need are IEEE-compliant (F1,
   F7, F12); the netcode does not need bit-identity for correctness (F32); fixed point would exclude Rapier and bring no
@@ -2276,10 +2278,11 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   under 0.1 MB/s over a 10-minute match (allocation sampling); (3) the time from the worker finishing tick T to T's
   block being readable on the page is at most one display frame (16.7 ms at 60 Hz) at p95, measured on a shared clock
   (`performance.timeOrigin + performance.now()` on both sides, since a worker has its own time origin, F30); (4) zero
-  lost or reordered events over a 10-minute match with 48 soldiers; (5) B2 against B3 on the four browsers: if B3 saves
+  lost or reordered events over a 10-minute match with the largest mode's N soldiers (48, or 54 under MODES-3 (b));
+  (5) B2 against B3 on the four browsers: if B3 saves
   at least 0.5 ms of page time per frame or one frame of latency at p95 on the minimum machine, the ADR weighs isolation
   (REC5); otherwise B2 stands.
-  Cross-topic open questions: R1-XT-OQ3, R1-XT-OQ9.
+  Cross-topic open questions: R1-XT-OQ3, R1-XT-OQ9, R1-XT-OQ16, R1-XT-OQ17.
 - **R1-BND-REC3. Inputs enter as one command per tick, posted from the page to the worker (C1).** The command carries
   seq, tick, move, aim (yaw and pitch, for aiming at height), the held-button bitmask and press and release edge
   counters; the worker stamps the tick it applies it to. The exact fields are R2's. Reason: one small message per tick
@@ -2401,7 +2404,8 @@ A spike must prove (proposed): the editor's reach value equals the measured jump
   time unit in which the tick step is exact, and reports the rounding of each value. Timers carry their remainder
   (F22's `+=`), so table rates hold on any tick rate. Effects start, tick and expire only on tick boundaries; the order
   of application within a tick is fixed (for example by entity index, then effect start tick, then a per-match sequence
-  number), and no per-tick logic iterates a randomly seeded `HashMap` (F26). Random rolls come from the
+  number), and no per-tick logic iterates a randomly seeded `HashMap` (F26; the hash-map ban,
+  [GLOSSARY](GLOSSARY.md#the-hash-map-ban-in-the-sim-crate), bans the types). Random rolls come from the
   simulation's seeded RNG streams (spread from an authority-only stream, R1-DET-REC4; SEC-SPREAD), never from the
   activation key alone (F18 is a 16-bit key that both sides know).
 - Reason: GC5 measured the legacy reset-not-carry rule losing up to 28 % of the Shabzon's rate at 30 Hz
@@ -2733,7 +2737,7 @@ Rapier steps per tick)? Rapier says smaller steps are more accurate and cost mor
 - **R1-BND-OQ6. How big is one output block for the largest mode, and is the layout per entity or per field?** It
   depends on the entity caps (soldiers, multi-part vehicles, projectiles, events), on R2's snapshot contents and on
   R3's instancing needs. It decides whether the one copy per tick matters. Decides: the spike measures bytes per
-  tick and copy time at N = 48.
+  tick and copy time at the largest mode's N (48, or 54 under MODES-3 (b)).
 - **R1-BND-OQ7. Is wasm-bindgen's new home healthy for a multi-year project?** It moved in 2025 and broke
   compatibility at least twice in 2026, in 0.2.123 and 0.2.128 (F1, F2; the unit's "three times" counted 0.2.122,
   which the fix step dropped). Decides: reading the maintenance issue (#4533) and the guide's
@@ -3133,7 +3137,8 @@ From the units' cross-unit notes; where a note shows a disagreement or a gap, it
   the canonical state serialization of R1-DET-REC6 may share a format with snapshots.
 - **determinism and abilities:** proc chances and random effects draw from a named sim RNG stream (R1-DET-REC4);
   ability data is checked finite at load; floats or fixed point for attribute maths (R1-ABL-OQ5) is the determinism
-  unit's, and R1-DET-REC7 recommends no fixed point; no `HashMap` iteration in per-tick logic (R1-ABL-F26).
+  unit's, and R1-DET-REC7 recommends no fixed point; no `HashMap` iteration in per-tick logic (R1-ABL-F26; the
+  hash-map ban, R1-ECS-REC2, bans the types).
 - **determinism and data-hotreload:** the content data's hash is part of a recorded match (R1-DET-REC6) and of every
   match record (R1-DATA-REC6); whether text-to-float parsing gives the same bits on both targets was not researched by
   the determinism unit, and R1-DATA-REC1 mark 1 tests it.
@@ -3705,6 +3710,18 @@ claim, number or source was added. Every "before" quote matched the file exactly
   (consistency critic, 2026-10-29)"): R1-XT-OQ1 to R1-XT-OQ18 in the critic's words, with a pointer line in each of
   the 17 recommendations they name.
 - **OBJECT:** none.
+
+Step 3d fixes (2026-10-30):
+- R1-TICK-REC2 P1: "The other 25 % of the server tick budget" now reads "The other 25 % of the tick period, inside the
+  server tick budget", the whole GLOSSARY gives the server-only share (4.2 ms at 60 Hz, as intended) — nit.
+- R1-BND-REC2 mark 4: "48 soldiers" is now the largest mode's N soldiers (48, or 54 under MODES-3 (b)) —
+  recommendation.
+- R1-BND-OQ6: "copy time at N = 48" is now at the largest mode's N (48, or 54 under MODES-3 (b)) — recommendation (its
+  measuring point changes under (b)).
+- Pointer lines: R1-BND-REC2 gains R1-XT-OQ16 and R1-XT-OQ17; R1-DET-REC6 gains R1-XT-OQ2 — nit.
+- R1-ECS-REC1's "Rests on" names R2's worked bandwidth estimate for mark 1's 15 big vehicles — nit.
+- The hash-map ban named beside the iteration-only wording: the ECS options table (deterministic order), R1-ABL-REC3
+  and the pointers between R1's units — nit.
 
 ## Sources
 
