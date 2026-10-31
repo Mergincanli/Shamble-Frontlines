@@ -237,7 +237,8 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   about 10:17 UTC; verbatim `verifier-r2-3d-skeptic-result.md`): 4 more (r2:2401, 2402, 2404, 2413: shares without their
   whole). R2's fix round sent about 10:18 UTC (`prompts/r2-3d-fixes.txt`: 16 bare 48s, the four, the misattributed
   quote, nits). Final check of R1+R4, the glossary nits and the 33 corrected UNREAD rows launched (prompt
-  `prompts/verifier-r14-3d-final.txt`; 9 hits on changed lines in `scripts/glossary-hits-3d-final-r14.tsv`).
+  `prompts/verifier-r14-3d-final.txt`; 9 hits on changed lines in `scripts/glossary-hits-3d-final-r14.tsv`): run
+  wf_6ff21603-bee (task w2s1z7fh9), 10:19 UTC; it reuses the R3+R5+R6 final check's script, so its labels read "r356".
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
