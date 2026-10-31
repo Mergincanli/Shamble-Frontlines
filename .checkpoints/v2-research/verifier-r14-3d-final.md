@@ -32,3 +32,22 @@ No URL or source added; only new number is ×1.125 (GLOSSARY §1 arithmetic) and
 
 ## Check 5 (GLOSSARY nits) — closed
 Word diff d54f3c0..5b57e40: only the five. (1) Time statistics definition, G:143-144 sentence added as asked. (2) G:70 "and the interest marks (0.70 ms)" (table G:60 = 0.70) and G:72-73 exact sums 4.11 (5.11), 9.92 (10.92): my recomputation 4.110, 9.918 -> matches. (3) G:74 and G:170 "for the server tick". (4) G:177 in "The server tick budget" Used today (the wording sat there, not in the shares entry, whose R1 line G:205 never had the defect); holds. (5) G:155. Removed tokens: "ms.", "whole" x2, "period)", "budget", "ruling)." — no number removed or changed.
+
+## Check 6 (UNREAD_SOURCES, 33 changed rows) — 31 hold, 2 do not
+All 33 "now" cells found exactly once in part 2 at 5b57e40. Part 1 rows checked against each topic's hinge table at 5b57e40 (r1:3203-3222, r2:3524-3536, r3:1511-1528, r5:2031-2048, r6:1029-1045): copied row for row.
+Hold (tsv row: tie): 1 gdcvault 1024001 (R1-ECS-REC1; R1-TICK-REC2 "the same Overwatch talk"; R2-BUD-REC1 "gdcvault 1024001"; R2-SYNC-REC1; R2-SYNC-REC2) · 2 rand book (R1-DET-REC4) · 3,4 Epic docs and GameplayPrediction.h (R1-ABL-REC1..5) · 5 other Overwatch talks (R2-SYNC-REC3) · 6 sohu/juejin/gamedev write-ups (R2-SYNC-REC1) · 7 discourse 87805 (R3-WGPU-REC1) · 8 WebGL 2 spec (R3-GL2-REC1) · 9 EXT_disjoint (R3-GL2-REC3) · 10 GTAO (R3-LOOK-REC1) · 11 TF2 NPAR, 12 GG Xrd (R3-LOOK-REC3) · 13,14 SkinningNode src/docs (R3-CHAR-REC1) · 15 Steam, 16 Intel/AMD/NVIDIA (R3-BUDGET-REC1) · 17 GitHub runners (R3-MEASURE-REC3) · 18 lists.w3.org, 19 codereview (R3-AUDIO-REC1) · 20 brave.com (R3-WGPU-REC4) · 21 rapier.rs/docs/ "no tie found" (only r4:1516, the not-read row itself; no finding or note names the index) · 22 clippy lint list (R5-RUSTLINT-REC2, REC3) · 24 arithmetic_side_effects.rs (R5-RUSTLINT-REC3, REC4: "their clippy source files", r5:1788 OQ2) · 26 npm major (R5-LAYOUT-REC1) · 27 quickcheck/bolero (R5-TEST-REC1) · 28 wtransport (R5-TEST-REC2, REC4) · 29 netem (R5-TEST-REC4) · 30 nextest etc. (R5-TEST-REC1, REC6) · 31 Grafana (R6-OBS-REC2) · 32 R2 data location (R6-TEL-REC2) · 33 Workers limits (R6-HOST-REC1).
+Do NOT hold:
+- tsv 23, UNREAD:221 clippy_lints/src/disallowed_methods.rs -> "R5-RUSTLINT-REC3, REC4". The hinge row is "(`panic`, `arithmetic_side_effects` left out) | their clippy source files". disallowed_methods.rs is the disallowed lint, read via disallowed_items.rs (r5:2432 "the lint moved to disallowed_items.rs, read"; r5:2332 S38). Cause: build_unread.py MANUAL_TIES key 'https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/' is a prefix: the same prefix artefact the fix meant to remove. Should be "no tie found in the file or notes".
+- tsv 25, UNREAD:223 github.com/rust-lang/rust-clippy/tree/master/clippy_lints/src/disallowed -> same; same cause (prefix key 'https://github.com/rust-lang/rust-clippy/tree/master/clippy_lints/src/'). Should be "no tie found".
+Sample rows re-checked: 3 (write-ups) now R2-SYNC-REC1, holds; 5 (rapier.rs/docs/) now no tie, holds; 10 (Intel/AMD/NVIDIA) now R3-BUDGET-REC1, holds.
+Nits outside the 33: UNREAD:102 sohu.com/a/148848770 ("Overwatch talk write-up") and :103 juejin.cn still "no tie found" while R2-SYNC-REC1's hinge row names sohu.com and juejin.cn write-ups (no URL, so identity not provable); UNREAD:137 gdcvault 1024041 (Dan Reed's talk) lists only R1-ABL-REC1, while R2-SYNC-REC3's hinge row names "Dan Reed's on networking scripted weapons and abilities".
+
+## Check 7 (labels) — closed
+R1 (r1:10) keeps "verified (every recommendation claim)": the fix round added one basis (R1-ECS-REC1 Rests on R2's worked estimate, confirmed last pass as K1, r2:1762/1777) and changed only proposed marks' N. R4 (r4:7) keeps "spot-checked (50 of 52 key claims)": R4-NAV-REC2's new basis is the glossary's stress scene (no source claim); R4-PHYS-REC4 and R4-NAV-REC3 changed proposed marks only.
+
+## Host audit
+No fetch (curl 0, WebFetch 0). No source check needed: no new source or source claim in the diffs.
+
+## Summary
+Checks 1-5, 7 closed; check 6: two rows wrong (UNREAD:221, :223), same prefix-tie fault in build_unread.py MANUAL_TIES. Nits only otherwise.
+DONE
