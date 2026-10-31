@@ -54,7 +54,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/research/r3-rendering.md` | R3: rendering and presentation (WebGPU and the WebGL 2 fallback, characters, budgets, look techniques, audio; never decides the look) |
 | `docs/research/r4-physics-navigation.md` | R4: physics and navigation (physics engine, navigation, floors, line of sight, obstacles placed mid-match) |
 | `docs/research/r5-toolchain-quality.md` | R5: toolchain and quality (repository layout, lint, tests, CI, previews per PR, the v2 gate) |
-| `docs/research/r6-infrastructure.md` | R6: infrastructure (hosting, costs, monitoring, telemetry; the security baseline deferred) |
+| `docs/research/r6-infrastructure.md` | R6: infrastructure (hosting, costs, monitoring, telemetry); the security baseline goes into the ADR 0006 draft as open and is researched before the first online playtest (BASELINE-WHEN (b)) |
 | `docs/research/GLOSSARY.md` | One definition per term the six topics share, starting with the tick budgets |
 | `docs/research/UNREAD_SOURCES.md` | Every source R1–R6 could not read, with what each was needed for |
 | `docs/reference/` | Renegade X and Kane's Wrath reference: inspiration, not what's built |
@@ -76,7 +76,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/agents/docs-keeper.md` | STATUS, ROADMAP, this map, doc drift |
 | `.claude/agents/art-director.md` | The legacy look and UI; v2 rendering research, never choosing the look |
 | `.claude/agents/perf-auditor.md` | Frame time, allocation, draw calls; v2 budgets |
-| `.claude/agents/security-auditor.md` | Security and anti-cheat; R6 security baseline |
+| `.claude/agents/security-auditor.md` | Security and anti-cheat; the security baseline (open in the ADR 0006 draft, researched before the first online playtest: BASELINE-WHEN (b)) |
 | `.claude/agents/netcode-architect.md` | Authority, tick, prediction, lag compensation, protocol; R2 |
 | `.claude/agents/engine-architect.md` | Module boundaries, the Rust ↔ TypeScript boundary; R1, R4, the synthesis |
 | `.claude/agents/graphics-engineer.md` | WebGPU and TSL, the render pipeline, GPU budget; R3 |

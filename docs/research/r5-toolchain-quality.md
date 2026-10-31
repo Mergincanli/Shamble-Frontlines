@@ -1872,7 +1872,8 @@ For float use, a ban on all float arithmetic (a "no float" lint) does not fit: w
   `legacy/`. Decides it: the phase 1 restructure plan (R5-LAYOUT-OQ5).
 - **R5-GATE-OQ4. Advisories: in the PR gate or only scheduled and on lockfile changes?** F3 says the verdict can change
   without our change; R1-RR-OQ7 asks for cargo-audit and cargo-deny as CI gates. Decides it: security-auditor with the
-  security baseline. Shared as BASELINE-WHEN (below).
+  security baseline. Shared as BASELINE-WHEN (below). Interim (BASELINE-WHEN (b)): scheduled and on lockfile changes, as
+  R5-GATE-REC1 has it; the baseline sets the policy.
 - **R5-GATE-OQ5. `--prove` cost.** Rebuilding per mutation may take long; whether mutations can share one build is
   unmeasured. Decides it: the spike's REC3 time mark.
 
@@ -1921,6 +1922,8 @@ its decision code.
   scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the
   test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives both values. Also asked
   as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
+  values for 48 and 54, the 48 value holds.
 - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
   security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits, anti-cheat basics) was deferred by the
   Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched before 0006 is accepted" (R6-SEC-OQ1). Two
@@ -1931,6 +1934,8 @@ its decision code.
   R5-GATE-REC1's scheduled advisories check stays the mechanism and the baseline sets the policy later; R2-TRN-REC5's
   certificate per hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave both as one shared
   open question. Decided by: the Advisor.
+  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
+  above; the baseline is researched before the first online playtest, in its own fresh session.
 - **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
   for a branch cannot be deleted", while `--force` serves "to force deletion of aliased deployments" (R5-PREV-F13), so
   the last link's fate is unclear. On Workers static assets, the alternative host, only "the 1000 most recently deployed
@@ -1947,6 +1952,8 @@ its decision code.
   the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3); a preview that carries unreleased art is behind
   the access wall, as R5-PREV-REC5 already says (R5-PREV-OQ1 asks that part). Also asked as R5-PREV-OQ1 and R6-HOST-OQ5.
   Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
+  the first one.
 
 ### Cross-topic open questions (consistency critic, 2026-10-29)
 
@@ -2243,6 +2250,7 @@ into `resolutions.md` and `cross-topic-oqs.md`). Nothing was fetched; no claim, 
     goal), C10.18 (MODES-3 inserted);
   - rank 17 (BASELINE-WHEN, escalated): C17.5 (R5-GATE-OQ4 points to the shared question), C17.6 (BASELINE-WHEN
     inserted); C17.b3 is not applied: it waits for the Advisor's BASELINE-WHEN answer;
+    Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b3, word for word.
   - rank 19 (the client host): C19.1 (R5-PREV-REC2's heading: R6 hosts on Cloudflare Pages, Workers static assets the
     alternative; a recommendation change), C19.2 (R5-PREV-OQ2), C19.3 (R5-PREV-OQ4, in the advisor's revised words),
     C19.4 (PREV-DELETE inserted);
