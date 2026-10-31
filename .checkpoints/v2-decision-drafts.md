@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:27 Amsterdam
+- **Last update:** 2026-10-31 23:36 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -30,21 +30,30 @@ ledger 355 rows; Appendix A 65); 0005's three sections: abilities (game-designer
 GPU rules (graphics-engineer; ledger 43 rows; 1 row), content data and asset pipeline (engine-architect; ledger 281 rows;
 26 rows). Step 4 pass marks: 0003 done (test-engineer, 43 marks); five to go.
 
-## Next steps (the next day session, after 08:30 Amsterdam)
-1. Re-read this checkpoint and the plan (revision 3); `git log --oneline -3` must show this commit or a later
-   checkpoint commit.
-2. ADR 0005's frame: `prompts/engine-architect-adr0005-frame.txt` (engine-architect, xhigh); then a script check that the
-   four sections sit in the record byte for byte.
-3. Pass marks (step 4) for 0001, 0002, 0004, 0005, 0006: fill `prompts/_test-engineer-passmarks-TEMPLATE.txt` per draft
-   (≤ 5 agents at once).
-4. Assembly (step 5): `scripts/assemble.py <draft> docs/adr/000N-<name>.md <passmarks>` per draft; write guard; commit.
-5. Synthesis (step 6): engine-architect writes ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (the register: the 38
-   DESIGN ids, the decision-map codes the drafts cite (I-n, G-n, LE-x, J-n, S-n), the features whose need is outside
-   VISION_V2 §6) and GLOSSARY §8 (the text in the map's part J1); then `scripts/dispositions.py` must show 521 of 521.
-6. Verification (step 7, fetching only before 22:00): `prompts/_verifier-TEMPLATE.txt`, one unit per draft and one for
-   the synthesis; skeptics on wrong or unsupported verdicts; then the consistency pass (step 8), the fix round (step 9,
-   the open findings below first), the reviews (step 10), docs-keeper (step 11), the gate (step 12), the report and the
-   draft PR (step 13).
+## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
+Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
+1. 03:55: re-read this checkpoint and the plan (revision 3); `git log --oneline -3` shows this commit or a later
+   checkpoint commit; start the saver (`checkpoint.mjs watch`, every 5 minutes).
+2. Wave A (≤ 5 agents): ADR 0005's frame (`prompts/engine-architect-adr0005-frame.txt`); pass marks for 0001, 0002,
+   0004, 0006 (`prompts/_test-engineer-passmarks-TEMPLATE.txt`, filled and saved per draft). Then pass marks for 0005
+   once the frame lands; a script check that the four 0005 sections sit in the frame byte for byte.
+3. Assembly (step 5): `scripts/assemble.py` per draft into `docs/adr/000N-<name>.md`; write guard; commit.
+4. Synthesis (step 6, engine-architect): ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (the 38 DESIGN ids; the map's
+   codes the drafts cite; the features whose need is outside VISION_V2 §6), GLOSSARY §8 appended after line 742 (text in
+   the map's J1); `scripts/dispositions.py` → 521 of 521; commit.
+5. Verification against the research only, no web (step 7, part 1; one verifier per draft and one for the synthesis;
+   every source check marked "pending (before 08:30)"); skeptics on wrong or unsupported verdicts; the consistency
+   critic and the completeness critic (step 8); the glossary and citation scripts.
+6. Fix round (step 9): each finding to its author agent; re-verify what changed.
+7. From 08:30 (daytime): the source checks (step 7, part 2: allow-listed pages, curl, the host audit); their fixes.
+8. Reviews on the final diff (step 10), ≤ 5 at once; docs-keeper (step 11); the gate (step 12); the report and the draft
+   PR (step 13).
+9. Stop by 11:00: no new agent after 10:30; at 10:40 (a scheduled reminder) the session checkpoints, records what is
+   not done, and reports. Priorities if time runs short: the deliverables exist and are assembled (2–4) > checked
+   against the research and consistent (5–6) > source checks (7) > reviews (8) > docs-keeper and the PR; whatever is
+   not done is said plainly in the report, and the next day session finishes it.
+- A spend-limit cut during the run: record it, launch nothing new, resume after the reset (the window that opens at
+  03:50 closes at 08:50).
 
 ## Open findings
 - The research has no asset-pipeline findings (ASSET-RESEARCH (a), ruled; asset-pipeline research unit before the asset
@@ -102,6 +111,14 @@ GPU rules (graphics-engineer; ledger 43 rows; 1 row), content data and asset pip
   R3 44/92, R4 49/62, R5 49/117, R6 18/42.
 
 ## Decisions taken
+- 2026-10-31 about 23:33, Mustafa (in the session's chat), word for word: "the next usage reset is going to be on 03:50
+  AM, so you can maybe tell it to prepare accordingly (starting the task at the right time)" and "Just for today
+  (tonight): 03:55, it can work until 11:00 because I will not have much time to use claude, so it can work if needed.
+  You can take the lead in ensuring things get done accordingly, decide on when it start and when its done. Remember:
+  just for today (upcoming session)". It sets aside, for the run of 2026-11-01 03:55–11:00 only, the brief's "daytime
+  only" and the advisor's condition 17 (no new agent between 23:00 and 08:30). The session keeps web fetching to 08:30
+  and later, since daytime-only exists for unattended fetching before the write guard (DOMAINS-ACCEPT (a),
+  NIGHT-RESEARCH (a)). Every other condition holds. After this run the normal rules apply again.
 - 2026-10-31: the drafts brief (Mustafa and the Advisor) and LOOK_V2 (attachments of the session's first message).
 - 2026-10-31 about 18:41, Mustafa: the UPGRADE-SCOPE update (tracks per unit and per weapon type, pick one of three per
   level, owned by the player, surviving death and switching, reset every match; a class comes with its own weapon;
