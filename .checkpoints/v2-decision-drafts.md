@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 18:53 Amsterdam
+- **Last update:** 2026-10-31 22:54 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -20,11 +20,22 @@
 5. The map's addendum done (part j); 0001 and 0004 launched · this commit.
 
 ## Current step
-Step 3, drafting: five units running (0001, 0003 + 0005's asset section, 0004, 0005's ability section, 0006).
+Step 3, drafting. All five running units were cut at about 19:18 Amsterdam (18:18 UTC) by the org spend limit ("your
+5-hour limit resets 9:50pm (UTC)"); the limit reset at 22:50 Amsterdam (Mustafa: "it has reset now"). The five are
+resumed by message at about 22:55 (not new agents; condition 17 allows no new agent after 23:00). State at the cut, from
+their notes: 0003 draft and ledger done, 0005 asset section written, its ledger next; 0006 draft and ledger done, final
+counts next; 0005 ability section and ledger written, last fixes in hand; 0004 draft done, ledger part way; 0001 draft
+through Rollback, Appendix A (127 rows), Sources and the ledger next.
 
 ## Next steps
-1. As slots free (≤ 5 at once): 0002 (`prompts/engine-architect-adr0002.txt`); 0005's content data and frame
-   (engine-architect, after both 0005 sections); test-engineer's pass marks per draft as each lands (step 4).
+1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
+   17). A unit still running at 00:10 is recorded here; the next day session reads its notes before using its result.
+2. Next day session (daytime): 0002 (`prompts/engine-architect-adr0002.txt`); 0005's content data
+   (`prompts/engine-architect-adr0005-content.txt`) and frame (`prompts/engine-architect-adr0005-frame.txt`, after the
+   three sections); test-engineer's pass marks per draft (`prompts/_test-engineer-passmarks-TEMPLATE.txt`); assembly
+   (`v2-decision-drafts/scripts/assemble.py`; the session's scripts are copied into `v2-decision-drafts/scripts/` so a
+   new container has them); synthesis; verification (`prompts/_verifier-TEMPLATE.txt`); consistency; fixes; reviews;
+   docs-keeper; gate; report; draft PR.
 2. Pass marks per draft as each lands (step 4); assembly (step 5); synthesis (step 6); verification (step 7; no
    fetching verifier after 22:00, no new agent after 23:00).
 
@@ -58,4 +69,8 @@ Step 3, drafting: five units running (0001, 0003 + 0005's asset section, 0004, 0
 - Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
   notes `graphics-engineer-adr0003-notes.md`), infra-engineer (0006; `infra-engineer-adr0006-notes.md`), game-designer
   (0005 ability section; `game-designer-adr0005-notes.md`). Prompts in `prompts/`.
-- checkpoint saver: `checkpoint.mjs watch` in the background since 18:22 (110 min).
+- checkpoint saver: `checkpoint.mjs watch` ran 18:22–20:12 and ended (its 110 minutes); restarted at about 22:55.
+- Spend-limit cut, 2026-10-31 about 19:18 Amsterdam: agents netcode-architect (0001), infra-engineer (0006),
+  rust-reviewer (0004), graphics-engineer (0003, 0005 asset section), game-designer (0005 ability section) failed with
+  HTTP 429 "org's monthly spend limit … your 5-hour limit resets 9:50pm (UTC)"; each resumed from its notes by message
+  after the reset.
