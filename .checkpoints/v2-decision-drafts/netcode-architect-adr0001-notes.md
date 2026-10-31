@@ -34,3 +34,6 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - 18. What a spike must prove, Pass marks placeholder, Migration plan, Test plan, Rollback written. Next: Appendix A (127 rows), Sources.
 - 19. Appendix A written (127 rows: adopted 30, changed 7, answered 57, open 17, spike 16; script appA.py in scratchpad). Next: Sources, then claims ledger.
 - 20. Sources written. Draft complete (all headings). Next: proofread pass (fix 'the join mark below' reference, GW17 effort cell, Q26 effort cell, check retire phrases), then claims ledger.
+- 21. Proofread fixes applied (TICK-30 quoted in Context, whole tick wording, join mark ref, GW17 and KVStore cells). No Edit tool: use python replace. Next: claims ledger netcode-architect-adr0001-claims.md, part 1 (Context).
+- 22. Ledger part 1 (Context, rows 1-40) written. Next: ledger part 2 (Decision parts 1-14).
+- 23. Ledger part 2 (rows 41-99, Decision parts 1-5) written. Next: ledger part 3 (Decision parts 6-14).

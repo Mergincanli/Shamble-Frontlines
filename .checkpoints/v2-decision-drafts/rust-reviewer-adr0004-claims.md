@@ -154,3 +154,191 @@ and the others named. "r1" = `docs/research/r1-simulation-core.md`, "r2" = `r2-n
 | 133 | Why: `StdRng` non-portable; ChaCha8 portable, reference-tested, streams and a settable position; shared `Math.random` made same-seed matches differ | Part 8 | r1, R1-DET-REC4, 2184–2207 | research verified |
 | 134 | Need for part 8: §3, §6.3, §6.5, §6.6; UPGRADE-SCOPE | Part 8 | r1, R1-DET-REC4 "Serves", 2184–2207; UPGRADE-SCOPE | research verified; settled |
 
+## Decision, parts 9 to 21
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 135 | State in dense arrays or slot maps keyed by stable ids, iterated in id order; phases in a fixed order | Part 9 | r1, R1-DET-REC5, 2208–2221 | research verified |
+| 136 | The hash-map ban: no std `HashMap`/`HashSet`; `BTreeMap` or index-ordered `Vec`; one escape, a reviewed `#[allow(clippy::disallowed_types)]` with a reason for a lookup-only map outside the serialized state; the lint is ADR 0002's (R5-RUSTLINT-REC2) | Part 9 | GL §7, 729–742; r1, R1-DET-REC5, 2208–2221; r5, R5-RUSTLINT-REC2, 1321–1339 | research verified (GL from R1-ECS-REC2, R1-DET-REC5) |
+| 137 | Canonical serialization each tick: fixed field order, floats by `to_bits`, streams' state, tick counter; a fixed, unseeded hash | Part 9 | r1, R1-DET-REC6, 2222–2241 | research verified |
+| 138 | Field by field, never raw struct bytes: padding bytes are uninitialised | Part 9 | r1, R1-RR-OQ6, 2951–2954 | research, source to check |
+| 139 | The hash function is picked in the sim core spike; the research names none | Part 9 | r1, R1-DET-REC6 ("a fixed, unseeded hash function"), 2222–2241; R1-DET-OQ9 (production comparison is ADR 0001's), 2706–2709 | proposed mark (no named function in the research) |
+| 140 | The suite: recorded match = seed, map and mode data, content hash, per-tick inputs; native twice in separate processes, Wasm in Node.js, Wasm in Chrome and Edge, Firefox, Safari; first mismatch with field-level diff; `libm` and stream unit vectors; injected divergences caught at the first tick | Part 9 | r1, R1-DET-REC6, 2222–2241 | research verified |
+| 141 | Tools and CI jobs are ADR 0002's (R5-TEST-REC2) | Part 9 | r5, R5-TEST-REC2, 1412–1430; id table (R5-TEST-REC2 owner 0002) | research, source to check |
+| 142 | Recorded matches keep §6.8's `[LATER]` kill-cams, replays and highlights possible | Part 9 | VISION_V2 §6.8; r1, R1-TICK-REC1 "Serves" (§6.8, replays not designed out), 2009–2027 | design doc; research verified |
+| 143 | Why: no source gives a verification method; every `HashMap` instance its own seed; engines differ | Part 9 | r1, R1-DET-REC6 reason, 2222–2241 | research verified |
+| 144 | R1-XU-OQ5 settled per instance; R1-XU-OQ6 settled tier "other" | Part 9 | r1, R1-XU-OQ5, 2866–2871; R1-XU-OQ6, 2872–2879 | research verified (settled by the R1 verifier at the fix step) |
+| 145 | Need for part 9: §6.6, §6.8; §3 (the scale test at 48) | Part 9 | r1, R1-DET-REC6 "Serves", 2222–2241 | research verified |
+| 146 | No physics engine: parry3d pinned, `enhanced-determinism` on; our own kinematic slide-and-step move (option C) | Part 10 | r4, R4-PHYS-REC1, 672–719 | research, source to check (F1–F4, F19, F21–F24 checked) |
+| 147 | Rapier's controller (option B) measured once as the fallback; picked only if it wins on parity and cost | Part 10 | r4, R4-PHYS-REC1 mark 5, 708–711 ("The ADR picks C unless B wins on marks 1 and 2") | research, source to check |
+| 148 | One static world from the map document, immutable, ids; BVH built once in id order; destructible state in the sim's tables filters queries; movers' index rebuilt each tick; one set of query functions for shots, sight, blasts, melee, aim, arc preview | Part 10 | r4, R4-PHYS-REC2, 721–745 | research, source to check (F12, F21 checked) |
+| 149 | Projectiles per-tick swept queries, no physics bodies, no CCD; grenades reflect at the normal; knockback a velocity change | Part 10 | r4, R4-PHYS-REC3, 747–760 | research, source to check |
+| 150 | Big vehicles kinematic compound bodies (hull, turret, legs, each with hit volume and alive flag), swept against statics and soldiers | Part 10 | r4, R4-PHYS-REC4, 762–784 | research, source to check |
+| 151 | At 30 Hz a vehicle at 6 m/s moves 0.2 m per tick, so no substeps (R1-TICK-OQ9) | Part 10 | r4, R4-PHYS-REC4, 762–784 (`JUG.maxSpeed` 6); 6 ÷ 30 = 0.2 m | research, source to check; arithmetic |
+| 152 | A turning hull: nonlinear cast or overlap test before the sweep, picked by the spike | Part 10 | r4, R4-PHYS-REC4, 762–784 | research, source to check |
+| 153 | Vehicle against soldier and soldiers blocking each other are design questions | Part 10 | r4, R4-PHYS-OQ1, 1082–1084; R4-XT-OQ6, 1201–1205; id table (owner DESIGN) | research, source to check |
+| 154 | Physics behind one sim module; a later need for dynamics swaps one module; none in §6 today | Part 10 | r4, R4-PHYS-OQ5, 1093–1095; Options needs list, 589–604 | research, source to check |
+| 155 | The R1 items that assumed Rapier and what each becomes (DET-REC3 flag to parry3d; ECS-REC4, ECS-OQ5 only under B; ECS-REC1 reasons and mark 5 to R4-PHYS-REC1 mark 4; TICK-REC2's Rapier reason gone; RR-OQ1's hazard tested on parry3d's BVH; DET-OQ1, OQ2 asked of parry3d) | Part 10 | r1, R1-XT-OQ2, 3022–3029; r4, wave-1 items, 1216–1237; R4-PHYS-OQ3, 1087–1089 | research, source to check (the list is this record's answer to critic rank 3) |
+| 156 | Why: no §6 item needs a solver; Quake III's shared movement is kinematic trace code; owning the move keeps reach the sim's integrator | Part 10 | r4, R4-PHYS-REC1 reason, 672–719 (F23, F24 checked: confirmed) | research verified (F23, F24) |
+| 157 | Need for part 10: §6.2, §6.3, §6.4 | Part 10 | r4, R4-PHYS-REC1–REC3 "Serves" | research, source to check |
+| 158 | Sim-owned navigation runtime; data baked by a tool, stored in the map document, read-only in a match: convex nodes with heights, portals, typed links, area ids and flags, integer costs; queries: nearest node, A*, string-pulled path, link traversal | Part 11 | r4, R4-NAV-REC1, 802–843 | research, source to check |
+| 159 | The bake runs in Test, on save and in CI, from the sim's collision world, agent numbers from the movement data, rounding reported | Part 11 | r4, R4-NAV-REC1, 802–843 | research, source to check |
+| 160 | Where the bake code lives is ADR 0002's (R4-XT-OQ5) | Part 11 | r4, R4-XT-OQ5, 1195–1200 | research, source to check |
+| 161 | The spike compares rerecast's mesh and a layered grid from the sim's own collision | Part 11 | r4, R4-NAV-REC1, 802–843; R4-NAV-OQ1, line 1099 | research, source to check |
+| 162 | Path queue with a fixed per-tick budget in node expansions, rotating fair order, hysteresis; per-goal distance tables for shared goals | Part 11 | r4, R4-NAV-REC2, 845–865 | research, source to check (F4, F19 checked) |
+| 163 | Avoidance a step in movement, neighbours on the same floor layer in id order, result through a player's movement; ORCA via dodgy_2d after an audit; separation fallback | Part 11 | r4, R4-NAV-REC3, 867–886 | research, source to check (R4-OBST-F3 checked) |
+| 164 | Navigation runs where bots run: server, and the browser's local server, a slice 2 need under SLICE-ORDER; never in prediction; a bot-free Worker build skips the data; new bake = new match | Part 11 | r4, R4-NAV-REC4, 888–899; STATUS SLICE-ORDER | research, source to check; settled |
+| 165 | polyanya not used at run time, so no audit unless a later change brings it in | Part 11 | r4, R4-NAV-OQ4, 1106–1107; option C, 619–631 | research, source to check (this record's answer) |
+| 166 | Why: Detour cannot link into the browser build; no nav crate promises determinism; baking once shares generation's floats; Quake III's precomputed area graph | Part 11 | r4, R4-NAV-REC1 reason, 802–843; R4-NAV-F8 (checked), F16 (not checked), F18, F19 (checked) | research, source to check (F16) |
+| 167 | Need for part 11: §6.2, §3; LOOP_V2 §9, §10; EDITOR_V2 §3 | Part 11 | r4, R4-NAV-REC1 "Serves" and "Rests on", 802–843 | research, source to check; design doc |
+| 168 | Typed links (walk, jump-up, one-way drop-down, gap jump) kept only if the sim's movement completes them at the shipped tick; editor overrides; type list is data; each link's stored fields; a bot issues a player's inputs | Part 12 | r4, R4-FLOORS-REC1, 903–923 | research, source to check (R4-FLOORS-F2–F4, F6, F7 checked; F5's count corrected) |
+| 169 | Planks and ladders as later link types need no format change | Part 12 | r4, R4-FLOORS-REC1 ("open to later ones (ladder, jump pad) without a format change"), 903–923; LOOK_V2 §4 (planks) | research, source to check (planks are this record's application) |
+| 170 | Floors separate layers with ceilings from day one; walkable only if the soldier fits; node layer and enclosure area id shared with R2-INT-REC2 | Part 12 | r4, R4-FLOORS-REC2, 925–939; r2, R2-INT-REC2, 2445–2465 | research, source to check; research verified (R2-INT-REC2) |
+| 171 | The bake reads movement data from the sim's tuning table; the map records a hash; a mismatch marks navigation stale | Part 12 | r4, R4-FLOORS-REC3, 941–954 | research, source to check |
+| 172 | Why: hand links can promise impossible jumps (GW14); 2D grid cannot stack floors (GN10, GN11); humans take over bot slots | Part 12 | r4, R4-FLOORS-REC1–REC3 reasons, 903–954 | research, source to check |
+| 173 | One height-aware sight query for bots, blasts, melee, shield check, visibility pass: eye point from stance data to sample points (three per soldier, per part for a vehicle), any-hit, statics and flagged movers; per-collider blocking flags | Part 13 | r4, R4-LOS-REC1, 958–988 | research, source to check (R4-LOS-F1–F4 checked) |
+| 174 | Who blocks sight and shots (R4-LOS-OQ1) and partial blockers (R4-LOS-OQ4) are design questions answered as data | Part 13 | r4, R4-LOS-OQ1, 1124–1126; R4-LOS-OQ4, 1131–1132 | research, source to check |
+| 175 | Cull order (distance and team, connectivity, field of view, segments); rays per tick with carried remainders and a rotating start | Part 13 | r4, R4-LOS-REC2, 990–1006 | research, source to check |
+| 176 | Cursor ray and server shot use the same static world and functions; the ray query is this record's, the command field ADR 0001's, the crossing ADR 0002's (critic rank 2) | Part 13 | r4, R4-LOS-REC3, 1008–1018; R4-XT-OQ1, 1168–1174; decision map I-19 (notes) | research, source to check; settled (the division) |
+| 177 | Why: three legacy worlds (CS9, GN7, GW15); a plain segment test is height-aware with 3D points, slopes and separate floors, as Quake III's bots show | Part 13 | r4, R4-LOS-REC1 reason, 958–988 | research, source to check (F1 checked) |
+| 178 | Moving vehicles never carved: avoidance obstacles by hull footprint; slow or stopped vehicles mark nodes with a temporary cost refreshed past a threshold; only crossing routes replan | Part 14 | r4, R4-OBST-REC1, 1022–1041 | research, source to check (R4-OBST-F1–F3 checked) |
+| 179 | A changing structure baked in each state; a change flips node, link and portal flags in its tick, with colliders' state and ADR 0001's re-flood; no navigation generated in a match | Part 14 | r4, R4-OBST-REC2, 1043–1061 | research, source to check (R4-OBST-F4 checked) |
+| 180 | LOOK_V2 §4's damage stages: intact, damaged, ruin with interior exposed; debris and planks become routes | Part 14 | LOOK_V2 §4 | design doc |
+| 181 | One baked state per stage the map declares (three for LOOK_V2 §4), each with surfaces, links, sight flags, ceilings and portals; each structure baked over its own nodes, never in combinations | Part 14 | r4, R4-OBST-REC2 (two states and a ruin's shape), 1043–1061 | proposed mark (extends REC2 to LOOK_V2 §4's three stages; reason: LOOK_V2 §4 `[DEFAULT]`; the research tested two) |
+| 182 | The research bakes two states and a ruin's shape | Part 14 | r4, R4-OBST-REC2, 1043–1061 | research, source to check |
+| 183 | Stage triggers are a rule for Mustafa; stages and assets are content (ADR 0005); drawing is ADR 0003's | Part 14 | plan rule 6; decision map e2 (notes) | settled (the drafts' rules and division) |
+| 184 | Roofs that fade are ADR 0003's; the sim gives the local player's floor layer and area id in the block | Part 14 | LOOK_V2 §4; r4, R4-FLOORS-REC2 (area ids), 925–939 | design doc; research, source to check |
+| 185 | What a player may see inside is R2-INT-OQ1, a design question; the cutaway rule is ADR 0003's (critic rank 39) | Part 14 | r2, R2-INT-OQ1, 3005–3009; id table (DESIGN; rank 39 owner 0003) | research, source to check |
+| 186 | Tiles only if a full bake is too slow for Test; no re-bake in a match; player building not designed (R4-OBST-OQ3) | Part 14 | r4, R4-OBST-REC3, 1063–1076; R4-OBST-OQ3, 1142–1144 | research, source to check |
+| 187 | Why: carving a mover means rebuilding tiles every tick on both targets on the same tick; flag flips are identical and avoid the replan storm | Part 14 | r4, R4-OBST-REC1 reason, 1022–1041; Options Q8 table, 651–662 | research, source to check |
+| 188 | Need for part 14: §6.2, §6.4, §6.5; damage stages LOOK_V2 §4 only | Part 14 | r4, R4-OBST-REC1, REC2 "Serves"; LOOK_V2 §4 | research, source to check; design doc |
+| 189 | Bots run where the authority runs, fill slots and send the same commands as humans | Part 15 | r2, R2-ROOM-REC6, 2842–2856; GL the authority, 485–500 | research verified |
+| 190 | Bot behaviour is a sim phase at its cadences reading the sight pass, navigation and state, writing commands | Part 15 | r1, R1-TICK-REC3, 2066–2076; r2, R2-INT-REC3 (bots read the pass), 2467–2483 | research verified |
+| 191 | The behaviour set is LOOP_V2 §10's | Part 15 | LOOP_V2 §10 | design doc |
+| 192 | No research covers a bot AI architecture | Part 15 | decision map h, G10 (0 hits; notes); r4 and r1 have no such finding | research, source to check (an absence, the map's grep) |
+| 193 | Humans see about 100 ms of the past; bots the present (R2-SYNC-OQ13) | Part 15 | r2, R2-SYNC-OQ13, 2952–2954 | research, source to check |
+| 194 | Legacy scans every 0.25 s (GN4) | Part 15 | r2, R2-SYNC-OQ13, 2952–2954 ("GN4 scans every 0.25 s") | research, source to check |
+| 195 | Bot reaction is tuning data the game-designer sets; the spike reports reaction times at N = 48 | Part 15 | r2, R2-SYNC-OQ13 ("What decides it: the game-designer's bot reaction tuning … checked in the spike"), 2952–2954 | research, source to check (this record's answer) |
+| 196 | A bot field of view is a design question (R4-LOS-OQ3) | Part 15 | r4, R4-LOS-OQ3, 1129–1130; id table (DESIGN) | research, source to check |
+| 197 | ADR 0005 defines the data model: a reduced GAS subset over a closed set of operations; weapons beside it sharing one damage pipeline | Part 16 | r1, R1-ABL-REC1, 2342–2378; R1-ABL-REC2, 2380–2400 | research verified |
+| 198 | The weapon state machine (timer, ammo, burst count, charge, reload, active-reload window) is per-soldier sim state | Part 16 | r1, R1-ABL-REC2, 2380–2400; LOOP_V2 §7 | research verified; design doc |
+| 199 | The ability, effect and weapon step ≤ 1 ms p99 in the stress scene with up to 8 active effects per soldier, 384 at N = 48, heap-free | Part 16 | r1, R1-ABL-REC6, 2465–2480; GL stress scene, 397–437 (N × 8) | research verified; arithmetic (48 × 8 = 384) |
+| 200 | Own-ability prediction waits for ABL-PREDICT; sim code the same either way | Part 16 | STATUS ABL-PREDICT; r1, R1-ABL-REC4, 2421–2446 | settled; research verified |
+| 201 | Definitions read by id; a development reload swaps them between ticks (R1-DATA-REC5, ADR 0005's) | Part 16 | r1, R1-DATA-REC5, 2542–2563; id table note ("swap between ticks (0004)") | research verified |
+| 202 | Why: a closed set of operations keeps combos in data while the sim stays reviewable and deterministic | Part 16 | r1, R1-ABL-REC1 reason, 2342–2378 | research verified |
+| 203 | Economy and objectives (money, deliveries, rebuilds, uplinks, tiers, power-plant pricing, points race) as sim phases with numbers in ADR 0005's tables and rules as LOOP_V2 §3, §4, §8 state | Part 17 | LOOP_V2 §3, §4, §8; VISION_V2 §6.5 | design doc |
+| 204 | Team filtering (GC1) and presence counting (GE8) are sim code | Part 17 | LEGACY_INVENTORY GC1 (line 240), GE8 (line 294), both "rewrite in Rust" | research verified (R7 rows) |
+| 205 | Visibility classes are ADR 0001's | Part 17 | r2, R2-INT-REC5 (by id; owner 0001 in the id table) | settled (the division) |
+| 206 | A tier or payment is an event, never a HUD write (legacy `addTech`) | Part 17 | STATUS ADR-001 entry (line 199: "should become an event") | settled (a STATUS record) |
+| 207 | Need for part 17: §6.5 | Part 17 | VISION_V2 §6.5 | design doc |
+| 208 | A player record per slot (PlayerState), beside the soldier tables, apart from the soldier (Pawn), holding one track per unit type and per weapon type (level, picks, pending offer) keyed by ADR 0005's type ids | Part 18 | UPGRADE-SCOPE; decision map J5 (notes) | settled |
+| 209 | The record survives death and unit switches; a weapon type's track waits while no gun of that type is held | Part 18 | UPGRADE-SCOPE | settled |
+| 210 | The record's size is bounded by content type counts, allocated at match start; nothing a client sends sizes it | Part 18 | r1, R1-RR-OQ2 (bounded allocation as a risk), 2933–2935 | proposed mark (this record's design; reason: client-sized allocation is a denial-of-service risk) |
+| 211 | At match start every record is built empty; nothing carries over; ADR 0001's room lifecycle calls the phase | Part 18 | UPGRADE-SCOPE; LOOP_V2 §8 ("Nothing carries into the next match"); decision map J5 (notes) | settled; design doc |
+| 212 | A class's own weapon comes from the unit definition (ADR 0005) | Part 18 | UPGRADE-SCOPE; decision map J5 row 1 (notes) | settled |
+| 213 | A dead soldier's weapon becomes a pickup entity: id, weapon type id, position settled with the movement query, lifetime in ticks from ADR 0005's data | Part 18 | UPGRADE-SCOPE ("dropped weapons are world pickups"); decision map J5 (notes) | settled (the need); proposed mark (the entity's fields) |
+| 214 | A pickup claim is an input command handled in fixed order, so ties resolve the same everywhere | Part 18 | r1, R1-DET-REC5 (fixed order), 2208–2221 | research verified (the ordering rule); the claim-as-command is this record's |
+| 215 | Offers drawn on the authority from the authority-only offers stream when a track levels; the server refuses unoffered picks and unplaced pickups (ADR 0001) | Part 18 | part 8 (rows 123, 127); decision map J5 row 4 (notes) | proposed mark; settled (the division) |
+| 216 | Picks, offers shown, weapons looted, time per weapon type are telemetry events (ADR 0006's fields) | Part 18 | decision map J5 row 5 (notes) | settled (the division) |
+| 217 | Carry slots, looted ammo and levelling speed are ADR 0005's open questions | Part 18 | UPGRADE-SCOPE; plan rev 3, ADR 0005 paragraph | settled |
+| 218 | Why: a record apart from the soldier is the only place that outlives death and switch; pickups as entities get ids, snapshots and hashes | Part 18 | UPGRADE-SCOPE; parts 1–3 | settled; proposed (the reasoning) |
+| 219 | Need for part 18: UPGRADE-SCOPE | Part 18 | UPGRADE-SCOPE; decision map J3 (notes) | settled |
+| 220 | Tick-stamped events: hits, deaths and kills with killer and victim slot and unit id, source weapon or ability id, assisting slots; purchases; uplink events; harvester deliveries and kills; structure kills; tech tiers | Part 19 | r6, R6-TEL-REC1, 784–811 | research, source to check |
+| 221 | Blasts with position and strength, for the concussion shake and the fragments; cosmetic shot events | Part 19 | LOOK_V2 §2, §3, §7; decision map I-20 (notes) | design doc; settled (the division) |
+| 222 | The event list is part of the state and its hash; ADR 0002 places it in the block; ADR 0001 delivers it; the room writes the record at Ended; ADR 0006 owns the shape | Part 19 | r1, R1-ECS-REC1 / options C (the tick's event list in the state), 1630–1644; decision map S6, I-10 (notes) | research verified; settled |
+| 223 | A moment phase after the outcome phases reads events and state and emits moments by rules held as data; thresholds a design question (R6-TEL-OQ3); moments and telemetry read one stream | Part 19 | r6, R6-TEL-REC1 ("so the moment rules and the telemetry read the same stream"), 784–811; R6-TEL-OQ3, 915–916 | research, source to check; the phase placement is proposed (no research on the mechanism) |
+| 224 | Timeline sampled every 10 s of game time | Part 19 | r6, R6-TEL-REC1, 784–811 | research, source to check |
+| 225 | No research covers a moment mechanism | Part 19 | decision map h, G11 (notes) | research, source to check (an absence) |
+| 226 | Need for part 19: §6.6, §6.8 | Part 19 | r6, R6-TEL-REC1 "Serves" | research, source to check |
+| 227 | The sim takes only validated commands and content; the loader returns errors and is fuzzed with zero panics | Part 20 | r1, R1-RR-OQ3 (the reviewer's proposal), 2936–2940; r5, R5-LAYOUT-REC2 (decoders that never panic), 1170–1193 | research, source to check |
+| 228 | No `unwrap`, unchecked index or unchecked `clamp` on client- or content-set values; `f32::clamp` panics on bad bounds | Part 20 | r1, R1-DET-F14, 679–683 (checked: confirmed) | research verified (F14); proposed mark (the rule; reason: a panic is a denial of service) |
+| 229 | On the server a panic stops that room's match (each room its own process) | Part 20 | r2, R2-ROOM-REC2, line 2762; R2-ROOM-F8 (line 1459, checked: an uncaught panic ends only its own thread) | research verified |
+| 230 | In the browser `-Cpanic=abort` ends the sim's instance | Part 20 | r1, R1-BND-F19, 1019–1028 (checked) | research verified |
+| 231 | Online, after a trap, a fresh instance rejoins through ADR 0001's resync; the trap is reported (R6-OBS-REC3) | Part 20 | r1, R1-RR-OQ3, 2936–2940; R1-XT-OQ12, 3084–3087; r6, R6-OBS-REC3, 754–768 | research, source to check |
+| 232 | In local play the trapped instance was the authority; recovery not researched | Part 20 | GL the authority, 485–500; no finding | research verified (GL); the gap is an absence |
+| 233 | Need for part 20: VISION_V2 §4 only | Part 20 | VISION_V2 §4 | design doc |
+| 234 | Editor reach = the sim's movement at the shipped `dt`; reachability and the sub-6 m gap report run in the sim crate, from Node and CI, identical on native and Wasm | Part 21 | r1, R1-TICK-REC6, 2118–2125; r4, R4-NAV-REC1 marks 3–4, 835–837 | research verified (REC6); research, source to check (R4) |
+| 235 | Why: integration error depends on the step; legacy's formula overstates reach (GW14) | Part 21 | r1, R1-TICK-REC6, 2118–2125 | research verified |
+| 236 | Need for part 21: §6.2; EDITOR_V2 §3; LOOP_V2 §9 | Part 21 | r1, R1-TICK-REC6 "Serves"; EDITOR_V2 §3; LOOP_V2 §9 | research verified; design doc |
+
+## Options considered
+
+Cells copied or condensed from the cited research table are `research, source to check` (R4 tables; R1 options cells
+are unit text outside the recommendations). Cells the research table has no row for (template 0000's "Cost",
+"Security and anti-cheat", "Effect on the look and feel" where the table is silent) are the author's assessment from the
+same table's cells, tier `proposed mark` with that reason, so the verifier can weigh them.
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 237 | Q1 table: shape, order, snapshot, ids, size, upkeep and fit of bevy_ecs 0.20, hecs 0.11.2 and plain data | Options Q1 | r1, Options ECS table, 1630–1644 | research, source to check |
+| 238 | Q1: a migration roughly each 0.x release (five releases in 18 months, inferred) | Options Q1 | r1, Options ECS table, "Upkeep and risk" row (F1), 1630–1644 | research, source to check (inferred there) |
+| 239 | Q1: bevy's multi-threaded executor is the one thing C lacks (R1-ECS-OQ4); sizes unmeasured (R1-ECS-OQ1) | Options Q1 | r1, R1-ECS-OQ4, 2622–2626; R1-ECS-OQ1, 2612–2613 | research, source to check |
+| 240 | Q1: legacy's flat pooled SIM records (CS8) are C's starting layout | Options Q1 | LEGACY_INVENTORY CS8 v2 note (line 176) | research verified (R7 row) |
+| 241 | Q1 cells "Cost: no money", "Security: neutral", "Effect on look and feel: none directly" | Options Q1 | none in the table | proposed mark (template dimensions; the author's assessment) |
+| 242 | Q2: the tick rate is settled by TICK-30; the 20/60/64/66 Hz rows and variable commands not weighed | Options Q2 | STATUS TICK-30; r1, Options 4a, 1648–1659 | settled |
+| 243 | Q2 slow systems: everything every tick scales AI, sight and route cost with the rate; cadences keep it to what must be fine-grained; legacy does it in seconds (GN4) | Options Q2 | r1, Options 4b, 1660–1665 | research, source to check |
+| 244 | Q2 server loop: millisecond timers miss the period; `Burst` catches up unbounded; the accumulator gives an exact average rate; integer-ms period: 62.5 Hz at 60 Hz | Options Q2 | r1, Options 4c, 1666–1672 | research, source to check |
+| 245 | Integer-ms period at 30 Hz gives 1000/33 ≈ 30.3 Hz | Options Q2 | ⌊1000/30⌋ = 33 ms; 1000/33 = 30.3 Hz | arithmetic |
+| 246 | Q2 client loop W1–W4 cells (rAF rate 60–144 Hz and stops in background tabs; W2 independent, late timers, hidden-tab unknown; W3 precise, needs shared memory and isolation, inputs through shared memory; W4 as W1) | Options Q2 | r1, Options 4d, 1673–1682 | research, source to check |
+| 247 | W3's isolation narrows embeds (R1-BND-OQ5, if adopted) | Options Q2 | r1, R1-XT-OQ17 (R1-BND-OQ5's embeds under isolation), 3105–3108 | research, source to check |
+| 248 | Q2 cells "Cost: none", "Effect on look and feel" judgements, "Effort: small" | Options Q2 | none in the tables | proposed mark (template dimensions; the author's assessment) |
+| 249 | Q3: option E (lockstep-grade) settled by the stack's server authority | Options Q3 | r1, Options Q1 row E ("not the brief's model (server authority)"), 1685–1694; STATUS (the stack) | settled |
+| 250 | Q3 table A–D cells (complexity, cost unknown for `libm` and the flag, risk, fit, effort; D excludes the collision library and brings no trig) | Options Q3 | r1, Options Q1 table, 1685–1694; R1-DET-OQ1, 2680–2681 | research, source to check |
+| 251 | Q3 transcendental sub-choices (std varies by platform and Rust version, different code on Wasm and Linux; `libm` same code, no accuracy bound; nalgebra ComplexField with `libm_force`; own approximations) | Options Q3 | r1, Options Q2 table, 1695–1703 | research, source to check |
+| 252 | parry3d now uses glam (R4-PHYS-F22) | Options Q3 | r4, R4-PHYS-F22, 196–202 (checked: confirmed) | research verified |
+| 253 | RNG sub-choices: StdRng non-portable; ChaCha8 portable, reference-tested, 2^64 streams per seed, settable position; Pcg32 portable, stream parameters "may be closely correlated"; `_mulberry32` quality not researched | Options Q3 | r1, Options Q4 table, 1713–1721 | research, source to check |
+| 254 | Any generator whose seed a client holds lets it predict draws | Options Q3 | GL, shared stream and authority-only stream, 525–545 (H2's reasoning) | research verified (GL definition from R1-DET-REC4, R2-SYNC-REC3) |
+| 255 | Iteration sub-choices: std `HashMap` arbitrary and seeded per instance; fixed hasher repeatable for one build, not shown identical on wasm32 and 64-bit, loses HashDoS resistance; `BTreeMap` sorted, slower lookups unmeasured; dense arrays by id | Options Q3 | r1, Options Q5 table, 1722–1730 | research, source to check |
+| 256 | Q4 table A–D (complexity, snapshot, determinism, size and CPU, churn, effort, fit) | Options Q4 | r4, Options PHYS table, 606–617 | research, source to check |
+| 257 | 12 Rapier releases in about a year with format breaks | Options Q4 | r4, R4-PHYS-F15, 146–151 (checked: confirmed) | research verified |
+| 258 | Autostep "very computationally expensive" | Options Q4 | r4, R4-PHYS-F2, 61–71 (checked: confirmed) | research verified |
+| 259 | Legacy GW13 and GW14 are C's reference; D ports CS4, CS5 | Options Q4 | r4, Options PHYS table "What it is", 606–617; R4-PHYS-REC1 "Rests on", 672–719 | research, source to check |
+| 260 | Q4 "Effect on look and feel" for C: movement feel ours to tune, as Quake III's is | Options Q4 | r4, R4-PHYS-F23, F24 (checked) | proposed mark (the author's assessment from F23, F24) |
+| 261 | Q5 table A–D (Detour blocked for the browser build; pure-Rust crates young, no determinism promise; C ours; D many nodes, 8,000-node cap fails, 2 m cells close gaps) | Options Q5 | r4, Options NAV table, 619–631 | research, source to check |
+| 262 | Q6 table A–C (hand links can promise impossible jumps; generated links measured; no links loses LOOP_V2 §9's drop-downs) | Options Q6 | r4, Options FLOORS table, 632–641 | research, source to check |
+| 263 | Q6: the reachability check (TL14) moves into the sim | Options Q6 | r4, legacy facts (R4-NAV), TL14, lines 401–402 | research, source to check |
+| 264 | Q7 table A–C (cost bounded by pairs × points; movers' index rebuilt each tick anyway; precomputed visibility coarse, wrong for moving cover) | Options Q7 | r4, Options LOS table, 642–650 | research, source to check |
+| 265 | Q7: A shares the pass interest uses (ADR 0001) | Options Q7 | r2, R2-INT-REC3, 2467–2483 | research verified |
+| 266 | Q8 table A–C (carving rebuilds each tick, nondeterministic risk, replans; avoidance only leaves walls closed; flags plus avoidance identical, crossed routes only) | Options Q8 | r4, Options OBST table, 651–662 | research, source to check |
+| 267 | Q9: the two stream kinds are GL §4's; SEC-SPREAD weighed them for spread; no research weighs them for offers | Options Q9 | GL, 525–545; STATUS SEC-SPREAD (a) | research verified (GL); the absence is this record's statement |
+| 268 | Q9 cells: a shared stream lets a seed-holding client compute its (and others') next offers; authority-only keeps the seed and leaves the client hash; an offer arrives with the server's message | Options Q9 | GL, 525–545; GL state hash, 546–559 | proposed mark (applies GL's reasoning to offers) |
+| 269 | Q10: tracks on the soldier entity settled out by UPGRADE-SCOPE | Options Q10 | UPGRADE-SCOPE | settled |
+| 270 | Q11: R1 plans no recovery; the reviewer proposes a Worker restart from the server's snapshot | Options Q11 | r1, R1-RR-OQ3, 2936–2940 | research, source to check |
+| 271 | Q11 cells (a short freeze then back in step; the server stays the authority; effort in the Worker host) | Options Q11 | none in the research | proposed mark (template dimensions; the author's assessment) |
+
+## Trade-off analysis and Consequences
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 272 | Plain data wins on order, one-call snapshot and sim-owned ids; against: we write pools, ids, change detection; kinds may multiply (R1-ECS-OQ7) | Trade-off | r1, Options ECS table, 1630–1644; R1-ECS-OQ7, 2633–2636 | research, source to check |
+| 273 | `libm` and parry3d flag costs unmeasured; a dependency's SIMD path can differ (R1-RR-OQ1, R4-PHYS-OQ3); worst case more corrections | Trade-off | r1, R1-DET-OQ1, 2680–2681; R1-RR-OQ1, 2923–2932; r4, R4-PHYS-OQ3, 1087–1089; r1, R1-DET-REC1, 2129–2145 | research, source to check |
+| 274 | parry3d returns an error for an unsupported pair (R4-PHYS-F20) | Trade-off | r4, R4-PHYS-F20, 177–187 (verifier: wrong as first written, corrected to this text at R4's fix pass) | research, source to check |
+| 275 | Neither navigation generator measured on Octopon-3's blocks and plateaus; every damage stage adds to the bake | Trade-off | r4, R4-NAV-REC1 ("not settled by any source (F12, F16), so it is measured"), 802–843 | research, source to check |
+| 276 | A later wish to show offers before confirmation would be a prediction-scope change | Trade-off | GL the prediction scope, 501–524 | proposed mark (the author's reasoning) |
+| 277 | Unlocking 60 Hz is a rebuild plus a re-bake (links measured at the shipped tick) | Trade-off; Consequences | r4, R4-FLOORS-REC1 (links checked "at the shipped tick"), 903–923; r1, R1-TICK-REC1, 2009–2027 | research, source to check |
+| 278 | Easier / harder lists (replayable matches, prediction with the server's code, one hit world, editor checks share sim code, flips in one tick, tracks by construction; we own pools, movement, runtime, bake; review load; dependency audits; no research on bot architecture or moments) | Consequences | parts 1–21 and their citations; decision map h (G10, G11) (notes) | proposed mark (consequences drawn from the decision) |
+| 279 | Revisit triggers (R1-ECS-OQ7, R1-ECS-OQ4, 2 km map, dynamics, R1-DET-REC7's rule, R1-DET-OQ11, R4-OBST-REC3, R4-OBST-OQ3, ABL-PREDICT yes, 60 Hz unlocked) | Consequences | r1, 2633–2636, 2622–2626, 2242–2248, 2713–2717; r4, 786–798, 1093–1095, 1063–1076, 1142–1144; STATUS ABL-PREDICT, TICK-30 | research, source to check; settled |
+| 280 | Hard constraints: the classic-scripts and double-click constraint does not apply to the sim (a Rust crate), under SPIKE-SCOPE (a), after acceptance | Consequences | CLAUDE.md "Hard constraints"; STATUS SPIKE-SCOPE (a); plan rule 11 | settled |
+| 281 | "Animation is cosmetic … Nothing animated decides a hit" carries into v2 unchanged (part 8) | Consequences | CLAUDE.md "Hard constraints"; r1, R1-DET-REC4, 2184–2207 | settled; research verified |
+| 282 | "No allocation per frame in hot paths" becomes part 6's heap-free step; other hard constraints are not the sim's; "no external assets" ends with LOOK_V2 §8 | Consequences | CLAUDE.md "Code rules", "Hard constraints"; LOOK_V2 §8 | settled; design doc |
+| 283 | Nothing in CLAUDE.md or `.claude/` changes in this PR; the inventory file is not edited | Consequences | plan rev 3, "Not touched"; rule 11 | settled |
+| 284 | Confirmed "rewrite in Rust" rows: CS2, CS4–CS9, GW9, GW13–GW15, GC1, GC2, GC5, GC7, GC17, GN4–GN6, GN12, GN13, GP14, GE8, CM11, CM13, CD4, CD6, CD8, CD10–CD14 | Consequences | LEGACY_INVENTORY lines 85–95, 159, 161, 170–177, 197, 201–203, 240–246, 256, 269–271, 277–278, 294, 324 | research verified (R7 marks as read) |
+| 285 | GN10: rewrite in Rust → redesign (typed links replace climb steering) | Consequences | LEGACY_INVENTORY GN10 (line 275); r4, R4-FLOORS-REC1, 903–923 | proposed mark (a mark change for Mustafa) |
+| 286 | GN11: rewrite in Rust → redesign (baked navigation; the grid method a candidate generator) | Consequences | LEGACY_INVENTORY GN11 (line 276); r4, R4-NAV-REC1, 802–843 | proposed mark |
+| 287 | GC4: rewrite in Rust → the state machine stays; loadout redesign (UPGRADE-SCOPE) | Consequences | LEGACY_INVENTORY GC4 (line 243); UPGRADE-SCOPE | proposed mark |
+| 288 | GC14: look brief pending lifted; LOOK_V2 §3, §7 bring fragmentation back; per-fragment damage a design question | Consequences | LEGACY_INVENTORY GC14 (line 253); LOOK_V2 §3, §7 | proposed mark; design doc |
+| 289 | GC11, GC12, GC13, GC15: look brief pending lifted; sim half unchanged | Consequences | LEGACY_INVENTORY lines 250–252, 254; LOOK_V2 (exists, 2026-10-31) | proposed mark |
+
+## Open questions
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 290 | OQ-0004-1: LOOP_V2 §10 calls the role mix "the biggest prototype risk"; no research on bot architecture; the parts it runs on | OQ-0004-1 | LOOP_V2 §10; decision map h, G10 (notes); cites R2-ROOM-REC6, R1-TICK-REC3, R4-LOS-REC2, R4-NAV-REC2 | design doc; research, source to check (the absence) |
+| 291 | OQ-0004-2: about a dozen kinds; deployables, zones, mines would favour an ECS; trigger "a new kind cannot be a row" | OQ-0004-2 | r1, R1-ECS-OQ7, 2633–2636 | research, source to check |
+| 292 | OQ-0004-3: boxes and wedges, a heightfield or a triangle mesh, all parry shapes; terrain sculpting `[LATER]` | OQ-0004-3 | r4, R4-PHYS-OQ4, 1090–1092; EDITOR_V2 §3 | research, source to check; design doc |
+| 293 | OQ-0004-4: legacy buildings already have health (GW20); the sim carries any trigger as data | OQ-0004-4 | LEGACY_INVENTORY GW20 (line 208) | research verified (R7 row) |
+| 294 | OQ-0004-5: UPGRADE-SCOPE says only "Other weapons come only from killed enemies' drops; dropped weapons are world pickups"; the listed rule options | OQ-0004-5 | UPGRADE-SCOPE (verbatim) | settled (the quote); the options are questions, not claims |
+| 295 | OQ-0004-6: bots fill slots and humans take over bot slots | OQ-0004-6 | r2, R2-ROOM-REC6, 2842–2856 | research verified |
+| 296 | OQ-0004-7: snapshot-outside-the-instance and input-replay options not researched; input replay possible under SLICE-ORDER condition 2 | OQ-0004-7 | r1, R1-RR-OQ3, 2936–2940; STATUS SLICE-ORDER | research, source to check; settled |
+| 297 | The DESIGN-owned questions listed after OQ-0004-7 (who blocks whom; what a player may see; blockers, field of view, partial blockers; stances, vehicle bots, fall damage; harvester lanes; player building; offline play; moment thresholds; the caps) | Open questions | id table (owner DESIGN): R4-PHYS-OQ1, R4-NAV-OQ5, R4-OBST-OQ1, R2-XT-OQ13, R4-XT-OQ6, R2-INT-OQ1, R4-LOS-OQ1–OQ4, R4-FLOORS-OQ1–OQ3, R4-OBST-OQ2, OQ3, R1-TICK-OQ7, R1-BND-OQ1, R6-TEL-OQ3, R2-BUD-OQ5; R2-SYNC-OQ5 owner 0001 | settled (the id table's owners) |
+
