@@ -26,3 +26,10 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Ledger rows 1-38 (Context) written. Next: rows for parts 1-12.
 - Ledger rows 39-117 (parts 1-6) written. Next: parts 7-12 rows.
 - Ledger rows 118-181 (parts 7-12) written. Next: rows for Options, Trade-off, Consequences, OQs, spike items, migration, rollback.
+- Ledger rows 182-259 written (Options, Trade-off, Consequences, OQs, spike, migration, test, rollback, Appendix A). Next: verify the sub-line refs used in rows 204-253.
+- Ledger line refs fixed. Next: check draft claims missed by ledger; tier counts; then final self-review.
+- Ledger complete: 261 rows; counts appended. Next: final review of the draft's later sections, then DONE + return.
+- Final checks: headings in brief order; 7 OQs (OQ-0002-1..7); Appendix A 104 rows = map ids (adopted 32, changed 7, rejected 0, answered 40, open 11, spike 14); ledger 261 rows (first tier: verified 72, source-to-check 114, arithmetic 4, settled 19, design doc 8, proposed 16, cross-draft 18, inventory 10).
+- Ids possibly belonging elsewhere (said in return): R5-TEST-OQ3 (a rule question: DESIGN), R5-TEST-OQ2 (decided by the netcode proof test: 0001), R5-PREV-OQ5/OQ6 (decided by 0006's preview hosting check).
+- Not researched/decided on judgement: room + navbake crates; multiplayer-preview delivery shape; CLI over wasm-pack (wasm-pack pages unread); local-match Worker load; Wasm size budget (no number); editor file:// load.
+DONE

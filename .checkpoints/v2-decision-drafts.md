@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:20 Amsterdam
+- **Last update:** 2026-10-31 23:27 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -22,30 +22,29 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
-Step 3, drafting. Cut at about 19:18 by the org spend limit, resumed at about 22:52 after the reset (Mustafa: "it has
-reset now"). Done: ADR 0006 (infra-engineer: 966 lines, ledger 355 rows, Appendix A 65/65; notes DONE); ADR 0005's ability
-section (game-designer: 624 lines, ledger 295 rows, Appendix A rows 7/7; notes DONE); ADR 0003 and ADR 0005's GPU-rules
-section (graphics-engineer: ledgers 265 and 43 rows, Appendix A 71/71 and 1/1; notes DONE); ADR 0004 (rust-reviewer:
-1,027 lines, ledger 360 rows, Appendix A 82/82; notes DONE); ADR 0001 (netcode-architect: ledger 360 rows, Appendix A
-127/127; 13 open questions, among them OQ-0001-1 TICK-60-HEADROOM (confirm at the stop), OQ-0001-2 TICK-60-SETUP
-(recommends the sim core spike's sim inside the proof-test server, deferral as fallback), OQ-0001-3 "100 ms" = P2;
-notes DONE); pass marks for 0003 (test-engineer: 43 marks PM-0003-1..43 in the look proof test (PM-1..17, size L,
-PM-17 Mustafa's 30-step Brave checklist) and the render budget bench (PM-18..43, size L); ledger 34 proposed rows; notes
-DONE); ADR 0005's content data and asset pipeline sections (engine-architect: one section file, ledger 281 rows,
-Appendix A rows 26; with the ability section's 7 and the GPU section's 1, all 34 ADR 0005 ids are covered; notes DONE).
-Running: 0002 (engine-architect, launched 22:54). No new agent from 23:00 (condition 17).
+Step 3 (drafting) is done for every unit; the night stop (condition 17) holds the rest for the next day session.
+Drafts and sections (all in `v2-decision-drafts/`, notes DONE): 0001 netcode-architect (1,236 lines; ledger 360 rows;
+Appendix A 127); 0002 engine-architect (ledger 261 rows; Appendix A 104); 0003 graphics-engineer (ledger 265 rows;
+Appendix A 71); 0004 rust-reviewer (1,027 lines; ledger 360 rows; Appendix A 82); 0006 infra-engineer (966 lines;
+ledger 355 rows; Appendix A 65); 0005's three sections: abilities (game-designer; 624 lines; ledger 295 rows; 7 rows),
+GPU rules (graphics-engineer; ledger 43 rows; 1 row), content data and asset pipeline (engine-architect; ledger 281 rows;
+26 rows). Step 4 pass marks: 0003 done (test-engineer, 43 marks); five to go.
 
-## Next steps
-1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
-   17). A unit still running at 00:10 is recorded here; the next day session reads its notes before using its result.
-2. Next day session (daytime): 0002 (`prompts/engine-architect-adr0002.txt`); 0005's content data
-   (`prompts/engine-architect-adr0005-content.txt`) and frame (`prompts/engine-architect-adr0005-frame.txt`, after the
-   three sections); test-engineer's pass marks per draft (`prompts/_test-engineer-passmarks-TEMPLATE.txt`); assembly
-   (`v2-decision-drafts/scripts/assemble.py`; the session's scripts are copied into `v2-decision-drafts/scripts/` so a
-   new container has them); synthesis; verification (`prompts/_verifier-TEMPLATE.txt`); consistency; fixes; reviews;
-   docs-keeper; gate; report; draft PR.
-2. Pass marks per draft as each lands (step 4); assembly (step 5); synthesis (step 6); verification (step 7; no
-   fetching verifier after 22:00, no new agent after 23:00).
+## Next steps (the next day session, after 08:30 Amsterdam)
+1. Re-read this checkpoint and the plan (revision 3); `git log --oneline -3` must show this commit or a later
+   checkpoint commit.
+2. ADR 0005's frame: `prompts/engine-architect-adr0005-frame.txt` (engine-architect, xhigh); then a script check that the
+   four sections sit in the record byte for byte.
+3. Pass marks (step 4) for 0001, 0002, 0004, 0005, 0006: fill `prompts/_test-engineer-passmarks-TEMPLATE.txt` per draft
+   (≤ 5 agents at once).
+4. Assembly (step 5): `scripts/assemble.py <draft> docs/adr/000N-<name>.md <passmarks>` per draft; write guard; commit.
+5. Synthesis (step 6): engine-architect writes ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (the register: the 38
+   DESIGN ids, the decision-map codes the drafts cite (I-n, G-n, LE-x, J-n, S-n), the features whose need is outside
+   VISION_V2 §6) and GLOSSARY §8 (the text in the map's part J1); then `scripts/dispositions.py` must show 521 of 521.
+6. Verification (step 7, fetching only before 22:00): `prompts/_verifier-TEMPLATE.txt`, one unit per draft and one for
+   the synthesis; skeptics on wrong or unsupported verdicts; then the consistency pass (step 8), the fix round (step 9,
+   the open findings below first), the reviews (step 10), docs-keeper (step 11), the gate (step 12), the report and the
+   draft PR (step 13).
 
 ## Open findings
 - The research has no asset-pipeline findings (ASSET-RESEARCH (a), ruled; asset-pipeline research unit before the asset
@@ -81,8 +80,16 @@ Running: 0002 (engine-architect, launched 22:54). No new agent from 23:00 (condi
   proposed; OQ-0005-CD4), so ADR 0001's `ContentReload` message and ADR 0004 part 16 ("a development reload swaps them
   between ticks") hold only under the mid-match option: consistency pass. Legacy rows ED5 and ED7 (Character Lab, Anim
   Lab) are listed by no draft. Its "For the frame" carries the record-level parts.
+- ADR 0002 (engine-architect): its ledger adds two tiers outside the plan's six ("cross-draft" 18, "inventory" 10; the
+  verifier may fold them); ids its author thinks belong elsewhere: R5-TEST-OQ3 (DESIGN), R5-TEST-OQ2 (0001), R5-PREV-OQ5
+  and OQ6 (0006); judgement calls marked: the `room` and `navbake` crates, the multiplayer-preview delivery shape, the
+  wasm-bindgen CLI over wasm-pack, two labelled choices (a second production-isolation trigger, a `forceWebGL` CI run);
+  loopback in the protocol crate (aligned with 0001); no legacy row's mark changes.
 
 ## Key numbers
+- Dispositions across the six drafts (23:26; 0005 from its three sections' Appendix A rows): 483 of 521 ids, each
+  exactly once, every one in the draft the map assigns; the 38 not yet disposed are exactly the map's DESIGN-owned ids
+  (they go into docs/adr/README.md's register at step 6).
 - Early script checks on the finished parts (22:57): `dispositions.py` parses 0003's 71 and 0006's 65 Appendix A rows,
   0 duplicates, 0 in the wrong draft; `cite_check.py` (a coarse pre-check: it reads a citation group's line range
   against the first file named in it, so groups citing two files give false hits) flags 7 ranges in 0003, 16 in 0006
@@ -109,8 +116,8 @@ Running: 0002 (engine-architect, launched 22:54). No new agent from 23:00 (condi
 - engine-architect decision map: done about 18:45 (521 of 521 ids, one owner each: 0001 127, 0002 104, 0003 71,
   0004 82, 0005 34, 0006 65, DESIGN 38); its addendum (part j, from line 1032) done about 18:52, owners unchanged,
   coverage re-run 521/521; GLOSSARY §8 text in part J1.
-- Drafting, launched about 18:53: netcode-architect (0001; `netcode-architect-adr0001-notes.md`), rust-reviewer (0004;
-  `rust-reviewer-adr0004-notes.md`).
+- Every drafting unit finished by 23:25 (notes DONE); nothing is running except the checkpoint saver (`watch`, every
+  5 minutes, started 22:52, ends by itself after 110 minutes).
 - Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
   notes `graphics-engineer-adr0003-notes.md`), infra-engineer (0006; `infra-engineer-adr0006-notes.md`), game-designer
   (0005 ability section; `game-designer-adr0005-notes.md`). Prompts in `prompts/`.

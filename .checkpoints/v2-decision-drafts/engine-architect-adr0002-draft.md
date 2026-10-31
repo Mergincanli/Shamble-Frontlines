@@ -12,8 +12,8 @@ above it, and a gate check proves that. In the browser the simulation runs in on
 server from slice 1 and owns the network connection online; the page gets one block of data per tick and posts one
 command per tick, so no call crosses the boundary per entity or per frame. TypeScript types are generated from the Rust
 code. One command, the gate v2, runs the same checks locally and in CI and proves itself with planted defects; every
-pull request gets a [preview](../research/GLOSSARY.md#preview) link. The reason: VISION_V2 asks for one simulation shared by server and client, four
-desktop browsers on a modest laptop, and 48 players; [the foundation](../research/GLOSSARY.md#the-foundation) the Advisor defined is exactly this structure,
+pull request from this repository gets a [preview](../research/GLOSSARY.md#preview) link. The reason: the settled stack runs one Rust simulation natively on the server and as Wasm in the
+browser, and VISION_V2 asks for four desktop browsers on a modest laptop and 48 players; [the foundation](../research/GLOSSARY.md#the-foundation) the Advisor defined is exactly this structure,
 and the R1 and R5 research found one way to build it that is checked by machines rather than by memory.
 
 ## Context
@@ -374,7 +374,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | Legacy golden | `cargo test` on committed fixtures captured from the legacy oracle | kept behaviour equals legacy within each fixture's tolerance | gate (G9) |
    | Determinism | the `devtools` replay runner (below) | identical per-tick hashes on every target | gate (G10, short), nightly (long) |
    | Network | L1 (gate, short; nightly, long), L2 (nightly) | ADR 0001's marks under named profiles | gate (G11), nightly |
-   | Soak and load | bots as headless Rust protocol clients | rooms of 48 for 30 minutes per mode | nightly, and before each playtest |
+   | Soak and load | bots as headless Rust protocol clients | a room at every mode of the test-mode list for 30 minutes, up to the largest mode's N (48) | nightly, and before each playtest |
    | Fuzz | cargo-fuzz on every decoder and the content loader | 0 panics, 0 allocations above the size limits | nightly, Linux |
    | Benchmarks | the `devtools` tick bench; ADR 0003's client harness | [sim step time](../research/GLOSSARY.md#sim-step-time) and frame cost, with the method stated | change-sets touching the sim or the render path; never a gate pass or fail |
    - **The determinism suite's tools:** a `devtools` replay runner, built as the server builds the sim, plays a
