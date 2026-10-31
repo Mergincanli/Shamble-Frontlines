@@ -1,15 +1,18 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), and docs-after-r7 (PR #29) merged; R1–R6 research done on `cs/v2-research` (PR #28, not merged yet). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), and docs-after-r7 (PR #29) and the R1–R6 research (PR #28, b6effde, 2026-10-31) merged. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
 `docs/V2_PHASE0_BRIEF.md`, added 2026-10-24). Done: kit-v3-0, the process upgrades (PR #26, f2ccc13, 2026-10-25);
 docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27);
-docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only). Done, waiting to merge: R1–R6 research (PR #28, below). Next:
-the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), which wait for the answers under "Decisions
-pending" where they depend on them; then a stop for Mustafa and the Advisor. The legacy game is frozen (critical
-fixes only).
+docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only).
+Next: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the 2026-10-31 decisions
+under "Decisions pending"; then a stop for Mustafa and the Advisor; then phase 1 and the playable slices in the new
+order (SLICE-ORDER, Mustafa and the Advisor: 1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4
+the loop), with the netcode proof test before the foundation, in the Advisor's words: "The netcode proof test (48
+simulated players over WebTransport) still runs before the foundation." The legacy game is frozen (critical fixes
+only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
@@ -42,9 +45,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | `cs/v2-research`, draft PR #28 | done; ready for review once this docs step and the report are in | the advisor's review of its head, then Mustafa's "merge #28" (the PR Advisor routine is off) |
+| **docs-after-v2-research** (this change-set; docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | `cs/docs-after-v2-research`, draft PR #31 | plan approved by the advisor with 16 conditions; docs being written | the advisor's review of its final head, then Mustafa's "merge #31" |
+| **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
 | docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
-| kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1` | being finished in the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | its PR, for Mustafa's go |
+| kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1`, PR #30 (open since 2026-10-27; not a draft; head 5be7d37) | from the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | PR #30, for Mustafa's go |
 | **R7 legacy inventory** (`docs/LEGACY_INVENTORY.md`: 247 systems, each with a recommended mark: rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"; `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json`: 60 tuning tables; read-only `tools/tuning-dump.js`; symbols +0 −0) | merged: PR #27, 07ab240, 2026-10-27, by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 | done; report `docs/reports/2026-10-27-r7-legacy-inventory.md` | none |
 | docs-after-kit-v2-2 (docs only: kit-v2-2's and #24's merges and main's branch protection recorded) | merged: PR #25, 4c24d07, 2026-10-27 | done | none |
 | **kit-v3-0** (v2 process upgrades: VISION_V2.md and V2_PHASE0_BRIEF.md, CLAUDE.md's v2 rules, checkpoints, REPO_MAP.md, six new agents, the web allow list; no game code, symbols +0 −0) | merged: PR #26, f2ccc13, 2026-10-25, on Mustafa's "merge #26" after the advisor's APPROVE of its final head | done; report `docs/reports/2026-10-24-kit-v3-0.md` | none |
@@ -73,30 +77,75 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 | Phase 0 setup | merged (2d30e4a) | PARTIAL | Mustafa's Windows run |
 
 ## Targets
-- **Multiplayer:** three teams, one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly
-  larger): design for 48+ players. Bots fill empty slots. Milestones: 2–8 players → 16 → full scale, with load tests at
+- **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
+  with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
+  24v24; the largest mode 24v24, 48 players. One faction per team, squads of 4, bots fill empty slots; design for 48+
+  players (CLAUDE.md).
+- **Multiplayer (before VISION_V2, 2026-10-24; LOOP_V2 §2 and DESIGN_NOTES still carry it: DOCS-ALIGN):** three teams,
+  one per faction, of 12–16 players each in squads of 4 (12v12v12 to 16v16v16, possibly larger): design for 48+
+  players. Bots fill empty slots. Milestones: 2–8 players → 16 → full scale, with load tests at
   each step.
 
 ## Decisions pending
+- **Taken by Mustafa and the Advisor 2026-10-31 (relayed by Mustafa in the v2 day session's chat):** SLICE-ORDER, the
+  order of the v2 playable slices: "1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4 the loop".
+  Their conditions, for the decision drafts:
+  1. "From slice 1, the game runs as a client plus a local server (the Rust simulation in a Web Worker), talking
+     through the same messages the network will carry. No offline-only shortcuts."
+  2. "Player movement and shooting are driven by inputs and can be replayed from day one, so prediction slots in later
+     without rework."
+  3. "The netcode proof test (48 simulated players over WebTransport) still runs before the foundation."
+- **Taken by Mustafa 2026-10-31 (in the v2 day session's chat (session_0173vVo5q59ameR6cnN9BENg), with his "merge
+  #28"):**
+  - MODES-3 (a) (do VISION_V2 §3's starting sizes count players in total or per team): totals; "the biggest match is
+    24v24 = 48".
+  - PREVIEW-WALL (a) (do the per-PR preview links sit behind a Cloudflare login): "private from the first preview that
+    reaches the test game server".
+  - SEC-SPREAD (a) (who knows the weapon spread): "server-only spread": the spread stays known only to the server;
+    tracers use a similar-looking spread that the hit corrects.
+  - ABL-PREDICT (does the client predict the player's own abilities): "later, after the Feel Lab test" (Waiting, below).
+- **Taken by the Advisor 2026-10-31 (relayed by Mustafa):**
+  - BASELINE-WHEN (b) (when the postponed security baseline is researched): "List it in ADR 0006 as open, with
+    temporary positions. Research the security baseline before the first online playtest, in its own fresh session."
+  - VISION-LINE (a) (a bracket in VISION_V2 §3 saying the starting sizes are totals): "I wrote that line; the
+    clarification is right. Add it as proposed." Added in this change-set (af2560c).
+  - TICK-30 (the server tick rate): "The 60 Hz margin (8.28 of 8.33 ms) is effectively zero. For the decision drafts: a
+    30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof test shows at least 25 % headroom
+    on the target hardware."
 - **Waiting (from R1–R6; the full wording is in each topic's "Shared open questions" and the v2-research report):**
-  - MODES-3 (Mustafa): do VISION_V2 §3's starting sizes count players in total or per team? It sets the largest mode,
-    48 players (totals, 24v24) or 54 (per team, 18v18v18); some research marks fail at 54. Recommended: totals.
-  - PREVIEW-WALL (Mustafa): do per-PR previews that reach the staging game server sit behind a Cloudflare login?
-    Recommended: yes, from the first such preview.
-  - BASELINE-WHEN (the Advisor): research the deferred security baseline before ADR 0006, or list it open there?
-    Recommended: list it open with interim positions.
-  - ABL-PREDICT (Mustafa, after a Feel Lab test): does the client predict the player's own abilities?
-  - SEC-SPREAD (Mustafa): the spread random stream's cheat trade-off: tracers that match the server's spread, or
-    spread kept server-only so a cheat can't cancel it (the research's default)?
-  - NS-2 (Mustafa): create the Night shift routine that starts a fresh session on every run, on the Routines page
-    (a session can't switch the old routine, and one it creates has no repository); steps in the v2-research report.
-  - Next after PR #28: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`); the parts that depend
-    on the answers above wait for them.
+  - ABL-PREDICT (Mustafa, after a Feel Lab test that compares both ways on the Molotov and the Shield): does the client
+    predict the player's own abilities?
+- **Next: the decision drafts** (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the decisions above.
+  They carry forward:
+  1. The synthesis verifies every ADR claim and number, R3–R6's included (research plan condition 9; the advisor's #28
+     review, finding 4).
+  2. R2-BUD-REC6's reason (r2-netcode.md:2402-2403) says the marks fit the 50 % server tick budget at 60 Hz on every
+     tick but one that both encodes a snapshot and re-floods; that holds at N = 54 (8.99 of 8.33 ms), but at N = 48
+     that tick fits by 0.05 ms (8.28 of 8.33 ms) while its server-only share is 0.24 ms over its own 25 % (4.41 of
+     4.17 ms) (GLOSSARY.md:62-75). Under TICK-30 the drafts restate these marks for the 30 Hz baseline and say what the
+     25 % headroom for 60 Hz is measured against (the advisor's #28 review, finding 2).
+  3. Where a research mark gives values for 48 and 54, the drafts use 48; where a research sentence says "until
+     Mustafa answers …", the answer applies.
+  4. R6-HOST-REC4 now recommends a certificate per hostname (C23.b1–b3); four sentences still describe the wildcard as
+     R6's proposal (r2-netcode.md:2703-2705, r6-infrastructure.md:47, 938-940 and 1056, lines at b6effde): the drafts
+     follow REC4.
+  5. No doc defines SLICE-ORDER's "netcode proof test" or "the foundation" yet: the drafts' plan names the research
+     spike the proof test is and what the foundation is, for the Advisor to confirm.
+- **Open, KIT-ALIGN** (rules files the 2026-10-31 answers left stale; a kit change-set after PR #30 aligns them, with
+  Mustafa's go): `CLAUDE.md:7-8` and `.claude/agents/netcode-architect.md:17-19` (the per-team reading of VISION_V2
+  §3); `CLAUDE.md:192`, `.claude/agents/security-auditor.md:14` and `.claude/agents/infra-engineer.md:29-30` (the
+  security baseline as part of R6); `.claude/agents/infra-engineer.md:23-26` and `.claude/agents/security-auditor.md:46`
+  (preview privacy, costs at the starting scale); optional: `.claude/agents/netcode-architect.md:37` and
+  `.claude/agents/security-auditor.md:30` (server-only spread as a rule).
+- **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md` §1 ("Then:
+  playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the security
+  baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
+  `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more").
 - Taken by the Advisor 2026-10-30 (relayed by Mustafa): VERIFY-FETCH (a), research may read allow-listed pages with
   curl by day (read-only, the host audit in each report); the night shift stays on WebFetch until kit-v3-1 is merged.
   The unread sources go in `docs/research/UNREAD_SOURCES.md`; the critic's 12 contradictions are resolved before the
   drafts, with a shared glossary (`docs/research/GLOSSARY.md`). NS-2 (c): the night shift starts a fresh session per
-  run (now with Mustafa, above).
+  run (carried out 2026-10-31: see Routines).
 - Taken by the Advisor 2026-10-28 (relayed by Mustafa): WINDOW-0730 (a), the night shift ends at 07:30 (the R7 session
   writes it into kit-v3-1; the routine's cron already runs 00:10–07:10); NIGHT-RESEARCH (a), research stays daytime
   only; fewer agents at once (4–5) for the same work, so units finish before a spend-limit cut.
@@ -154,10 +203,19 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   aiming at height with ledges (decide in octopon-3-greybox); Octopon-3 map size (start near Cabana, adjust with the scale test)
 
 ## Routines
-- **Night shift** (trig_019LtRqmAdzddyk6K3e3kDJz; hourly from 00:10 to 07:10 Amsterdam (cron restored 2026-10-30), in
-  one persistent session; NS-2 replaces it with a fresh-session routine, Mustafa's step): until
-  kit-v3-1 is merged, it takes only items that need no web access, and a stop at a permission prompt is
-  listed in its morning report. Research runs in the daytime only.
+_NS-2 (c) (the night shift starts a fresh session on every run) carried out 2026-10-31. These facts are the v2 day
+session's read-back with the routines API at about 14:06 UTC; docs-keeper could not check them [assumed]._
+- **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh), created by Mustafa on the Routines
+  page at 13:50 UTC: a fresh session on every run (no persistent session), the repository attached, Opus 5.5, the same
+  one-line prompt. Its schedule reads `CRON_TZ=Europe/Amsterdam 10 0 * * *` (once a night, 00:10) until Mustafa sets
+  `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` on its page (the API refuses agents' edits to routines they did not
+  create). Its test run at 13:51 UTC read `.claude/NIGHT_SHIFT.md` from main and stopped silently, outside the window;
+  it has not yet posted on issue #16 (tomorrow morning's comment is the first proof it can post). Until kit-v3-1 is
+  merged, it takes only items that need no web access, and a stop at a permission prompt is listed in its morning
+  report. Research runs in the daytime only.
+- **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): switched off by the v2 day session
+  (session_0173vVo5q59ameR6cnN9BENg) at 13:54 UTC under NS-2 (c). Mustafa deletes it after one good night of the new
+  routine (deleting it also deletes its session).
 - **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
   switched it off, after an agent's switch-off was refused; the routine reads enabled false at 21:35 UTC). The advisor
   agent reviews PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg), and nothing merges without Mustafa's
@@ -165,8 +223,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 
 ## Open bugs and risks
 - **R1–R6 research** (its report, "Risks"):
-  1. If MODES-3 picks 54 players, marks written for 48 fail: R2's bandwidth (about 164–171 kbps against a 160 kbps
-     mean), R3's hull-outline cap, and the 60 Hz server tick on a re-flood tick (only the last is in the files).
+  1. Closed 2026-10-31 by MODES-3 (a): the largest mode is 48 players, so the three marks that failed only at 54 are no
+     longer at risk. At 48 and 60 Hz the re-flood tick still has almost no margin (carry-forward 2), and the Advisor
+     made 30 Hz the baseline (TICK-30).
   2. R3–R6 are spot-checked only: the drafts must verify every ADR claim and number, R3–R6's included.
   3. Unread sources: 67 rows where a recommendation hinges on one wait for other copies (`docs/research/UNREAD_SOURCES.md`).
   4. The org spend limit cut the research five times; notes-first kept every cut recoverable.

@@ -5,3 +5,5 @@ Task: docs-keeper part L of docs-after-v2-research (STATUS, ROADMAP, research/RE
 - STATUS header line 3 + Phase paragraph done. Next: In flight.
 - STATUS In flight done (R1–R6 merged row; new first row PR #31; kit-v3-1 names PR #30). Next: Targets.
 - STATUS Targets done (v2 bullet first; old bullet with condition 9 note). Next: Decisions pending.
+- STATUS Decisions pending done (3 new groups, Waiting = ABL-PREDICT only, Next with carry-forwards 1-5, KIT-ALIGN, DOCS-ALIGN; NS-2 (c) 2026-10-30 line points at Routines). Next: Routines.
+- STATUS Routines (new routine + old switched off, [assumed] note, 14:06 UTC) and risk 1 (condition 8 exact) done. STATUS complete. Next: ROADMAP.
