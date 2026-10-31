@@ -177,15 +177,15 @@ built from the tested artifact. Each part says what, why, its research ids and t
    |---|---|---|---|---|
    | `sim` | the simulation: state, phases, tick, the navigation runtime (ADR 0004) | `content` only (and its maths dependencies, ADR 0004); no transport, no async runtime, no clock | the foundation | §6.1–§6.5 |
    | `content` | loads and validates content data (ADR 0005) | nothing above it | slice 1 (weapons are data) | §6.3, §6.7 |
-   | `protocol` | message types, the codec, decoders that never panic (ADR 0001) | `content` ids only | the foundation | §6.1 |
+   | `protocol` | message types, the codec, decoders that never panic, the Rust side of the thin transport interface with its loopback backend (ADR 0001) | `sim` and `content` types only, as ADR 0001 needs them; no transport crate, no async runtime (it builds for Wasm) | the foundation | §6.1 |
    | `room` | the room's match logic with no I/O and no async runtime: the slot table, bots filling slots through the input path, per-client command queues, per-client snapshot and event encoding through `protocol` (ADR 0001 decides what it does) | `sim`, `protocol`, `content` | the foundation | §6.1; SLICE-ORDER condition 1 |
    | `sim-wasm` | the wasm-bindgen bindings the Worker loads: the client endpoint (prediction, snapshot decoding, the block writer) and the local server (`room` + `sim`) | `sim`, `room`, `protocol`, `content` | the foundation | §6.2, §6.9 |
    | `server` | the room process: transport on quinn and the WebSocket fallback, the async runtime, the supervisor hook, metrics (ADR 0001, ADR 0006) | `room`, `protocol`, `sim`, `content` | slice 3 (online) | §6.1, §6.5, §6.6, §6.8 |
    | `devtools` | the replay runner, the hash comparer, the tick bench, the legacy-golden reader | anything | the foundation | §6.6, §6.8 |
    | `navbake` | the navigation bake (ADR 0004's generator), run by CI, on map save and in the editor's Test | `sim`, `content` | slice 2 (bots) | §6.2 (bots between levels) |
    The packages: `client` (the player entry: input, camera, HUD, rendering), `editor` (its own entry), `sim-worker`
-   (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the client side of ADR 0001's thin transport
-   interface: WebTransport, WebSocket and the loopback backend), `types` (generated types, part 5) and `e2e`
+   (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the browser's two backends of ADR 0001's thin
+   transport interface, WebTransport and WebSocket, which R2-TRN-REC4 puts in TypeScript), `types` (generated types, part 5) and `e2e`
    (Playwright tests). The lobby and the room supervisor get a crate when ADR 0006 decides where the lobby runs
    (OQ-0006-3: the supervisor's binary or its own service); until then no crate is created for them.
    The rules, each a gate check (G5, G8, part 9): `sim` depends on `content` only, with no transport, no async runtime
@@ -283,7 +283,10 @@ built from the tested artifact. Each part says what, why, its research ids and t
      alternative (W3), which needs shared memory, passes it; then the default flips everywhere at once, B3 and posted
      inputs through shared memory (C2) become available, and the cost list of R1-BND-REC5 applies (OQ-0002-4).
    - **The Worker owns the network connection** online (option H2): server snapshots, prediction and reconciliation
-     never touch the page, which sees only the block. What flows over the connection is ADR 0001's.
+     never touch the page, which sees only the block. The Worker's host hands the tick's received datagrams to Wasm in
+     one call and takes the tick's outgoing ones in one call, so its Wasm calls per tick stay the same at every N
+     (R1-BND-REC1 mark 2), even when a snapshot is split into several datagrams. What flows over the connection is ADR
+     0001's.
    - Why: the tick leaves the render thread; one bounded copy per tick needs neither isolation nor nightly Rust; one
      small message per tick is constant work; the block's layout is the only thing tsify and ts-rs cannot type.
    - Ids: R1-BND-REC1 to R1-BND-REC6, R5-LAYOUT-REC3, R5-LAYOUT-REC5, R1-XU-OQ3, R1-XU-OQ4, R1-BND-OQ4, R1-BND-OQ6,
@@ -299,11 +302,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
 6. **The client + local server skeleton.** From slice 1 the same `sim-worker` build runs in two modes behind one mode
    flag, with the same page code: online, the Worker's client endpoint talks to the room process through `net`'s
    WebTransport or WebSocket backend; in a local match, the same Worker also runs the local server (`room` and `sim`,
-   [the authority](../research/GLOSSARY.md#the-authority), with bots filling slots), and the client endpoint reaches it through `net`'s loopback backend with
-   the same encoded messages (ADR 0001 part 10). The page never handles a network packet and cannot tell the two modes
-   apart. Whether the local server and the client endpoint share one Wasm instance or run as two, and so whether the
-   loopback stays inside Rust or passes through the TypeScript interface, is measured in the boundary spike
-   (OQ-0002-3). The Worker's host (TypeScript) receives the page's commands, paces the tick (ADR 0004 part 5), steps
+   [the authority](../research/GLOSSARY.md#the-authority), with bots filling slots), and the client endpoint reaches it through the loopback backend with
+   the same encoded messages (ADR 0001 part 10; its migration plan puts the loopback in the protocol crate). The page never handles a network packet and cannot tell the two modes
+   apart. The local server and the client endpoint share one Wasm instance, so the loopback's bytes never leave linear
+   memory; whether a second instance is worth its cost, so that a trap in the client endpoint leaves the authority
+   running, is measured in the boundary spike (OQ-0002-3). The Worker's host (TypeScript) receives the page's commands, paces the tick (ADR 0004 part 5), steps
    the instance or instances, and posts each block; the commands it forwards pass through it, outside the Wasm
    instance, which is what OQ-0004-7's recovery options need to know. The foundation's skeleton ends with an empty
    scene drawn from blocks that came through this whole path (Migration plan, phase 2).
@@ -814,20 +817,20 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     mutation proofs still fail on the right checks, `docs/legacy-tuning.json` is reproduced byte for byte) with the
     fewest path changes, and where the legacy docs go (row KT21).
   - Research ids: R5-LAYOUT-OQ5, R5-GATE-OQ3.
-- **OQ-0002-3. In a local match, do the local server and the client endpoint share one Wasm instance, and does the
-  loopback stay inside Rust?**
+- **OQ-0002-3. In a local match, do the local server and the client endpoint share one Wasm instance?**
   - Why it matters: it sets the Worker's Wasm calls per tick and its memory in local play, and whether a trap in the
     client endpoint also ends the authority (ADR 0004's OQ-0004-7).
-  - Options: (a) one instance, with the loopback inside Rust: the fewest calls; a trap ends both; (b) two instances in
-    the one Worker, with the loopback as the third backend of `net`'s TypeScript interface (ADR 0001 part 10; R2-TRN-REC4
-    puts the client's interface in TypeScript): a client trap leaves the authority running; a constant few more calls
-    per tick and a second copy of the Wasm memory.
-  - Proposed start: (b), because it keeps the client endpoint's path the same as online play (SLICE-ORDER condition 1:
-    no offline-only shortcuts), unless the spike's marks below fail.
+  - Options: (a) one instance, with the loopback in Rust, in the protocol crate as ADR 0001's migration plan places
+    it: the fewest calls; a trap ends both; (b) two instances in the one Worker, with the loopback's bytes passed
+    between them by the Worker's host (TypeScript): a client trap leaves the authority running; a constant few more
+    calls per tick and a second copy of the Wasm memory.
+  - Proposed start: (a), because it matches ADR 0001's placement of the loopback and keeps the Worker's calls per tick
+    within R1-BND-REC1's bound; (b) if OQ-0004-7 needs the authority to survive a client trap and the spike's marks
+    below hold for it.
   - Decider: the boundary spike, with ADR 0001 (the interface) and ADR 0004 (OQ-0004-7).
   - What decides it: Wasm calls per tick, the same at N = 12 and N = 48 (R1-BND-REC1 mark 2); the Worker's time per tick
     in a local match on the minimum laptop against the client's sim share (ADR 0004); the memory of each layout.
-  - Research ids: none of its own; it applies R1-BND-REC1 mark 2 and R2-TRN-REC4 as ADR 0001 changes it.
+  - Research ids: none of its own; it applies R1-BND-REC1 mark 2, and R2-TRN-REC4 as ADR 0001 changes it.
 - **OQ-0002-4. Does production ever turn on cross-origin isolation, and can a later login popup live with it?**
   - Why it matters: isolation would make the SharedArrayBuffer ring (B3), inputs through shared memory (C2) and the
     `Atomics.wait` pacing (W3) available, and it costs a CORP header on every cross-origin `no-cors` resource and cuts
@@ -879,9 +882,9 @@ sets the final table.
    `hardwareConcurrency` recorded), at N = 12, 24, 36 and 48 soldiers, the page's frame time p95 with the sim in the
    Worker is no worse than with no sim by more than 1.0 ms (the page's cost of the sim: ADR 0003 owns the budget row,
    which states it as a p99, decision map LE-B); the page makes zero calls into Wasm; the Worker makes the same number of
-   Wasm calls per tick at N = 12 and N = 48, at most 4 for the online client; in a local match at most 8 (proposed:
-   R1-BND-REC1's 4 per sim state, times the two sim states a local match steps, the client endpoint and the local
-   server); the same build runs in the latest desktop Chrome, Edge, Firefox and Safari, and in Brave (Mustafa's
+   Wasm calls per tick at N = 12 and N = 48, at most 4 for the online client and for a local match in one instance
+   (OQ-0002-3 (a)), at most 8 for a local match in two instances (b) (proposed: R1-BND-REC1's 4 per instance stepped,
+   times two instances); the same build runs in the latest desktop Chrome, Edge, Firefox and Safari, and in Brave (Mustafa's
    browser).
 2. **The block** (part 5; R1-BND-REC2, r1 lines 2265–2285): per tick at most one block copy in the Worker and zero
    copies and zero per-entity calls on the page; after warm-up no buffer or typed-array allocation per frame on the

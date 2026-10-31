@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:00 Amsterdam
+- **Last update:** 2026-10-31 23:03 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -29,8 +29,10 @@ section (graphics-engineer: ledgers 265 and 43 rows, Appendix A 71/71 and 1/1; n
 1,027 lines, ledger 360 rows, Appendix A 82/82; notes DONE); ADR 0001 (netcode-architect: ledger 360 rows, Appendix A
 127/127; 13 open questions, among them OQ-0001-1 TICK-60-HEADROOM (confirm at the stop), OQ-0001-2 TICK-60-SETUP
 (recommends the sim core spike's sim inside the proof-test server, deferral as fallback), OQ-0001-3 "100 ms" = P2;
-notes DONE). Running: 0002 (engine-architect, launched 22:54), 0005 content data and asset pipeline (engine-architect,
-launched 22:54), pass marks for 0003 (test-engineer, launched 22:55). No new agent from 23:00 (condition 17).
+notes DONE); pass marks for 0003 (test-engineer: 43 marks PM-0003-1..43 in the look proof test (PM-1..17, size L,
+PM-17 Mustafa's 30-step Brave checklist) and the render budget bench (PM-18..43, size L); ledger 34 proposed rows; notes
+DONE). Running: 0002 (engine-architect, launched 22:54), 0005 content data and asset pipeline (engine-architect,
+launched 22:54). No new agent from 23:00 (condition 17).
 
 ## Next steps
 1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
@@ -65,6 +67,15 @@ launched 22:54), pass marks for 0003 (test-engineer, launched 22:55). No new age
 - ADR 0001: R1-TICK-OQ1 (60 or 64 Hz) and R2-INT-OQ5 may belong to 0004 (consistency pass); it replaces four lines
   under TICK-30 (r1:2029/2061–2062, R2-BUD-REC1's tick half at r2:2302, r2:2415–2416, GLOSSARY:85), one more than
   condition 2 lists: the verifier checks it.
+- Pass marks 0003 (test-engineer), for the 0003 author's fix round: (a) vsync makes the desktop's median ≤ 14 ms
+  unpassable and the laptop's median ≤ 28 ms a hidden 60 fps demand; "WebGPU ≤ 1.1 × WebGL 2" and the overlay mark can't
+  fail at vsync (proposed: measure uncapped; the browser switch is not researched); (b) the overlay's 1 % mark is below
+  the harness's own 3 % spread; (c) sub-ms marks sit near the 100 µs timer step; (d) the first-sight stutter check passes
+  if the browser cached shaders; (e) "zero bytes per frame" needs a planted allocation to prove the method; (f) the look
+  proof test needs a synthetic recording for its backend marks; (g) the Safari 26 marks need a Mac the draft never names.
+  The page's cost of the sim gates twice (R3 p99 in the bench, PM-20; R1-BND-REC1's p95 in 0002's boundary spike). The
+  map's part g put R3-MEASURE-REC1/REC4 in the look test, the draft in the bench (the draft holds). The map's N12 cites
+  r1:2258–2260; it is 2259–2261.
 
 ## Key numbers
 - Early script checks on the finished parts (22:57): `dispositions.py` parses 0003's 71 and 0006's 65 Appendix A rows,

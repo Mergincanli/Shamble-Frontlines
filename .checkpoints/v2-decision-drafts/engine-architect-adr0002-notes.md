@@ -21,3 +21,4 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Appendix A written: 104 rows, matches map ids exactly. Next: Sources, then ledger.
 - Sources written. Next: verify a few remaining cites (r5 2038-2056, r1 3209-3256, R6 754-768), then ledger.
 - Linked first uses of glossary terms; retired-phrase scan clean. Next: proofread pass, then ledger.
+- Fixed: loopback placement aligned with ADR 0001 (protocol crate holds Rust loopback; net = browser backends); OQ-0002-3 proposed start (a); datagram batching to keep calls constant; protocol deps no longer invented.
