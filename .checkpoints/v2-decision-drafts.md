@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:36 Amsterdam
+- **Last update:** 2026-10-31 23:53 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -111,7 +111,7 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   R3 44/92, R4 49/62, R5 49/117, R6 18/42.
 
 ## Decisions taken
-- 2026-10-31 about 23:33, Mustafa (in the session's chat), word for word: "the next usage reset is going to be on 03:50
+- 2026-10-31 between about 23:30 and 23:50, Mustafa (in the session's chat), word for word: "the next usage reset is going to be on 03:50
   AM, so you can maybe tell it to prepare accordingly (starting the task at the right time)" and "Just for today
   (tonight): 03:55, it can work until 11:00 because I will not have much time to use claude, so it can work if needed.
   You can take the lead in ensuring things get done accordingly, decide on when it start and when its done. Remember:
@@ -133,8 +133,12 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
 - engine-architect decision map: done about 18:45 (521 of 521 ids, one owner each: 0001 127, 0002 104, 0003 71,
   0004 82, 0005 34, 0006 65, DESIGN 38); its addendum (part j, from line 1032) done about 18:52, owners unchanged,
   coverage re-run 521/521; GLOSSARY §8 text in part J1.
-- Every drafting unit finished by 23:25 (notes DONE); nothing is running except the checkpoint saver (`watch`, every
-  5 minutes, started 22:52, ends by itself after 110 minutes).
+- Every drafting unit finished by 23:25 (notes DONE); the checkpoint saver was stopped at 23:26 (its last save: nothing
+  to save). Nothing runs until the scheduled start.
+- Scheduled tasks (send_later into this session, human_request): trig_01BH1UStnQLgHuzsethFGmTU fires 2026-11-01 03:55
+  Amsterdam (02:55 UTC): the run's start; trig_01WnvjBEFsLQPXjoj7WdwN7d fires 10:40 Amsterdam (09:40 UTC): the wrap-up.
+- Ready for the run: pass-mark prompts filled and saved for 0001, 0002, 0004, 0005, 0006
+  (`prompts/test-engineer-passmarks-000N.txt`); the verifier template now allows fetching only between 08:30 and 22:00.
 - Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
   notes `graphics-engineer-adr0003-notes.md`), infra-engineer (0006; `infra-engineer-adr0006-notes.md`), game-designer
   (0005 ability section; `game-designer-adr0005-notes.md`). Prompts in `prompts/`.
