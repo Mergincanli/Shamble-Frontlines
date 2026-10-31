@@ -1198,3 +1198,38 @@ One row per id the decision map gives this record (127).
 | R4-XT-OQ3 | answered (= R1-XT-OQ7) | part 4 |
 | R5-XT-OQ2 | answered (= R1-XT-OQ3) | part 7 |
 | R5-XT-OQ10 | answered (= R2-XT-OQ14) | part 13 |
+
+## Sources
+Line numbers are at commit 9e7db28; the research files do not change in this PR.
+- `docs/research/r2-netcode.md`: the header and TL;DR (lines 1–76); Options, Brief questions 1–5 (lines 1606–1975),
+  with the worked bandwidth estimate (lines 1731–1792); Recommendations, Brief questions 1–5 (lines 1977–2895), with
+  the network profiles (lines 1987–1992) and the room control messages (lines 2886–2890); Open questions: the units'
+  (lines 2896–3116), the cross-unit questions R2-XU-OQ1–OQ18 (lines 3118–3269), the shared questions (lines
+  3271–3320), the cross-topic questions R2-XT-OQ1–OQ15 (lines 3321–3413), the pointers (lines 3414–3531) and the
+  recommendations that hinge on a source not read (lines 3532–3546); Findings R2-SYNC-F17 (line 230) and R2-TRN-F35
+  (lines 1267–1271).
+- `docs/research/r1-simulation-core.md`: Recommendations, unit tick, R1-TICK-REC1–REC5 (lines 2009–2116); unit
+  determinism, R1-DET-REC1 (lines 2129–2145) and R1-DET-REC4 (lines 2184–2207); R1-ECS-REC3 (lines 1973–1990); unit
+  boundary, R1-BND-REC1–REC6 (lines 2252–2339); R1-ABL-REC4 (lines 2421–2446); R1-DATA-REC5–REC7 (lines 2542–2594);
+  Open questions R1-ECS-OQ3 (lines 2619–2621), R1-TICK-OQ1–OQ9 (lines 2640–2677), R1-DET-OQ6 and OQ9 (lines 2697–2709),
+  R1-BND-OQ8 (lines 2745–2746), R1-ABL-OQ4 to OQ8 (lines 2766–2780), R1-XU-OQ2 (lines 2848–2853), R1-XT-OQ1–OQ11
+  (lines 3015–3083); the shared questions ABL-PREDICT, SEC-SPREAD and MODES-3 (lines 2967–2996).
+- `docs/research/r6-infrastructure.md`: R6-HOST-REC2–REC4 (lines 645–701), R6-COST-REC1 (lines 703–719),
+  R6-OBS-REC1–REC2 (lines 729–752), R6-TEL-REC1 (lines 784–811).
+- `docs/research/r3-rendering.md`: R3-CHAR-REC3; R3-XT-OQ1 and OQ2 (lines 1424–1436).
+- `docs/research/r4-physics-navigation.md`: R4-LOS-REC3; R4-FLOORS-REC2 (from line 925); R4-XT-OQ1 and OQ3 (lines
+  1168–1188).
+- `docs/research/r5-toolchain-quality.md`: R5-TEST-REC4 and REC5 (lines 1454–1495); R5-XT-OQ2 (lines 1971–1977) and
+  OQ10 (lines 2016–2020).
+- `docs/research/GLOSSARY.md`: §1 Tick budgets (lines 46–264), §2 Modes and scale (lines 265–394), §3 The stress
+  scene (lines 395–482), §4 Prediction and random streams (lines 483–558), §5 and §6 for previews, certificates and the
+  security baseline (lines 560–725), and §8 (the foundation, the netcode proof test, the 60 Hz margin, and its closing
+  note on TICK-30).
+- `docs/research/README.md` (the answered questions and the shape of a topic).
+- `docs/VISION_V2.md` §1–§6; `docs/LOOP_V2.md` §2–§4, §7–§10; `docs/EDITOR_V2.md` §3; `docs/LOOK_V2.md` §3–§4.
+- `docs/STATUS.md`, "Decisions pending" (lines 93–202): SLICE-ORDER, MODES-3, PREVIEW-WALL, SEC-SPREAD, ABL-PREDICT,
+  BASELINE-WHEN, TICK-30, the five carry-forwards, SPIKE-SCOPE, R7-MARKS and the ADR-001 entry; UPGRADE-SCOPE as
+  Mustafa wrote it on 2026-10-31 (recorded in STATUS with that day's decisions).
+- `docs/LEGACY_INVENTORY.md`: the marks and the rows CS1, CS7, CS11, GC1, GC2, GC3, GC5, GC13, GC15, GP2, GP13, GW1,
+  GW17, GN4, GN8, CD5 and CD11.
+- `docs/adr/0000-template.md`.

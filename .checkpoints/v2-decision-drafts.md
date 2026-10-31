@@ -59,6 +59,11 @@ after 23:00 (condition 17).
   Mustafa; AB12 and AB13 are for the Advisor.
 
 ## Key numbers
+- Early script checks on the finished parts (22:57): `dispositions.py` parses 0003's 71 and 0006's 65 Appendix A rows,
+  0 duplicates, 0 in the wrong draft; `cite_check.py` (a coarse pre-check: it reads a citation group's line range
+  against the first file named in it, so groups citing two files give false hits) flags 7 ranges in 0003, 16 in 0006
+  (3 of them clearly r2 ranges inside an r6 group), 2 in the ability section, 0 in the GPU section: hints for the
+  verifiers, not findings.
 - Research ids defined in r1–r6 at 9e7db28 (`inputs/research-ids.tsv`, built by script, rebuilt after the review): 533
   rows, 521 unique ids: REC 165, OQ 241, RR 7, XU 30, XT 72, 6 shared codes (18 copies). Matches the research report's
   165 recommendations and 278 own open questions (241 + 30 + 7).
