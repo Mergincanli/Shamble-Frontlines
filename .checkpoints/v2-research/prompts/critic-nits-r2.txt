@@ -1,0 +1,3 @@
+# Session message to netcode-architect (R2), saved verbatim before sending (2026-10-31 about 10:53 UTC)
+Last nits from step 3d's completeness critic (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-3d-critic-result.md, check 4 and check 3). Links only, plus what is named below; change nothing else, no new claim, number or source; log each as a nit with a part-7 line under "Step 3d fixes"; do not commit. Line numbers are those of the current file. Reply in under 40 words.
+r2:858 ("With 48 players spread evenly"): link the player count to GLOSSARY.md#player-count-n, its first real use; r2:867 ("24v24 gives 24 × 24"): link the mode name to GLOSSARY.md#team-size-and-how-modes-are-written, its first real use (r2:456 is a legacy fact: leave it).

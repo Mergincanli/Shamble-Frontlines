@@ -63,3 +63,4 @@ DONE
 - part 7: "Step 3d fixes (2026-10-30):" lines added · nit
 DONE (step 3d fixes)
 - final-check nit: r5:1426 "§3 (the 48-player scale)" -> "§3 (the design point (48 players))", linked; part-7 line updated · nit. DONE
+- critic nits: r5:1920 "the stress scene" linked (#the-stress-scene); r5:1477 24v24 and 12v12v12 linked (#team-size-and-how-modes-are-written); part-7 lines added · nit x2. DONE
