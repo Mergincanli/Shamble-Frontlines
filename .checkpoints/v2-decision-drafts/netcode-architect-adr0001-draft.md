@@ -21,8 +21,9 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
   with a headroom run at N = 64 ([the design point and headroom](../research/GLOSSARY.md#the-design-point-and-headroom)).
   The start modes are 1v1 to 4v4 and 2v2v2 to 6v6v6; the goal is 12v12v12 or 24v24 (VISION_V2 §3). Bots fill empty
   slots (VISION_V2 §3 [DEFAULT], LOOP_V2 §2).
-- **Tick:** 30 Hz is the baseline; 60 Hz only if the netcode proof test shows at least 25 % headroom (TICK-30, brief §1),
-  read as [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) (TICK-60-HEADROOM, the advisor's reading of
+- **Tick:** TICK-30 (brief §1): "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof
+  test shows at least 25 % headroom on the target hardware" (STATUS.md, "Decisions pending", lines 118–120), read as
+  [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) (TICK-60-HEADROOM, the advisor's reading of
   2026-10-31, confirmed by Mustafa and the Advisor at the stop).
 - **Latency and region:** matches feel fair up to about 100 ms of ping; servers start in one EU region (VISION_V2 §4
   [DEFAULT]). Desktop Chrome, Edge, Firefox and Safari (VISION_V2 §4 [DECIDED]).
@@ -546,7 +547,7 @@ client on every soldier, over a 30-minute soak, re-flood ticks included, unless 
 | Server tick overrun | catch-up bounded, dropped time recorded (ADR 0004's loop) | 0 overruns in the soak; counters (ADR 0006) |
 | A panic in one connection's handler | that connection closes; the room's tick and other connections go on | R2-ROOM-REC2 mark 6 |
 | A room process dies | that match ends; other rooms on the VM are unaffected | R2-ROOM-REC2 mark 4 |
-| A trap in the client's Wasm sim | the Worker restarts (ADR 0004) and resyncs through `FullState` | the join mark below |
+| A trap in the client's Wasm sim | the Worker restarts (ADR 0004) and resyncs through `FullState` | the join mark (What a spike must prove, item 2) |
 | A hidden tab or a sleeping laptop | online, the client does not simulate the gap; it resyncs | back in step within 0.5 s (R1-TICK-REC5, ADR 0004) |
 | A player drops | slot held for the grace window; fresh token; newest connection wins | 100 % rejoin the same slot (R2-ROOM-REC4) |
 | The lobby is down | no new joins; running rooms go on (tokens are checked offline) | none |
@@ -683,7 +684,7 @@ Settled by the glossary's resolution 1 (GLOSSARY.md:167–188: the server tick b
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | B1. Region only | lowest | none | none | weak: occupants of buildings and hidden floors are sent | none | none | free | fails pillar 6 ("I sat in a building…") |
-| **B2. Enclosures as areas with portals (chosen)** | medium | O(1) per pair plus a re-flood | ≤ 0.1 µs per pair, ≤ 1 ms per re-flood | strong for interiors and floors | low risk if portals are conservative | GW17's cutaway shows the same structures | Q3's shipped area test | needs area and portal data from the map |
+| **B2. Enclosures as areas with portals (chosen)** | medium | O(1) per pair plus a re-flood | ≤ 0.1 µs per pair, ≤ 1 ms per re-flood | strong for interiors and floors | low risk if portals are conservative | the cutaway (GW17) follows the same rule | Q3's shipped area test | needs area and portal data from the map |
 | B3. Per-pair line of sight (fog of war) | high | highest | amortisable | strongest | pop-in at corners under latency | GN4's sight budget | strongest | only if R2-INT-OQ1's rule says the character's sight limits the view |
 | B4. B2 plus B3 through portals and sight-blocking walls | high | between B2 and B3 | between | strong | as B3 at fewer places | none | targeted | its weight depends on R2-INT-OQ1 |
 
@@ -771,7 +772,7 @@ The three combine; they are not alternatives.
 ### Q26. Guest identity (rooms 3.7, lines 1964–1971)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
-| **A. An anonymous guest account from the lobby (chosen, secret in an HttpOnly cookie)** | low | a lobby store (ADR 0006) | none | a secret of at least 64 bits no script can read | zero input before play | KVStore keeps settings today | reconnect and later linking | needs the lobby |
+| **A. An anonymous guest account from the lobby (chosen, secret in an HttpOnly cookie)** | low | a lobby store (ADR 0006) | none | a secret of at least 64 bits no script can read | zero input before play | the guest id may sit in the KVStore successor | reconnect and later linking | needs the lobby |
 | B. No identity | lowest | none | none | none | none | none | simplest | no reconnect across a reload |
 C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
 
@@ -874,7 +875,7 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
   *Why it matters:* arrival order affects corrections, fairness and speed-hack exposure. · *Options:* (a) run commands
   as they arrive, several in one tick within the cap (Source); (b) buffer them and run exactly one per client per
   tick, repeating the last on a miss, late commands dropped and catch-up limited to the redundancy window; for the
-  client, nudging its tick pace or re-aligning by whole ticks (not researched). · *Decider:* the netcode proof test. ·
+  client, nudging its tick pace or re-aligning by skipping or repeating a tick (not researched). · *Decider:* the netcode proof test. ·
   *What decides it:* correction rates and fairness under P2 to P4. · *Research ids:* R2-SYNC-OQ3, R1-TICK-OQ8,
   R1-XT-OQ5 = R2-XT-OQ5 (the time-sync part).
 - **OQ-0001-7. Do shots carry their moment inside a tick at 30 Hz?** · *Why it matters:* a 33 ms tick quantises when a
