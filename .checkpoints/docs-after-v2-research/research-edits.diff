@@ -1,0 +1,192 @@
+--- a/docs/research/GLOSSARY.md
++++ b/docs/research/GLOSSARY.md
+@@ -41,2 +41,4 @@
+ "Shared open questions (the same words in every topic)" subsection.
++Answered on 2026-10-31: MODES-3 (a), PREVIEW-WALL (a) and SEC-SPREAD (a) by Mustafa, BASELINE-WHEN (b) by the
++Advisor; ABL-PREDICT waits for a Feel Lab test and PREV-DELETE for its spike.
+ 
+@@ -317,2 +319,3 @@
+   per team: 2v2 to 8v8 (N = 4 to 16) and 6v6v6 to 18v18v18 (N = 18 to 54). This glossary picks neither.
++  **Answered 2026-10-31 (Mustafa): MODES-3 (a), totals,** so reading (a) holds.
+ - **Marked by:** "start", "start small", "goal".
+@@ -336,2 +339,3 @@
+   mark gives both values until Mustafa answers.
++  **Answered 2026-10-31 (Mustafa): MODES-3 (a), totals,** so the largest mode is the goal 24v24, N = 48.
+ - **Marked by:** "the largest mode", "the largest mode's N".
+@@ -356,2 +360,3 @@
+   (b) the largest mode's N (54) is above the design point (R2-BUD-OQ6: "54 is above the 48 design point").
++  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so the design point equals the largest mode's N (48).
+ - **Marked by:** "design point", "headroom", "48+".
+@@ -379,2 +384,4 @@
+   (item 1). Under (b): 2v2, 8v8, 6v6v6 and 18v18v18, and the largest mode is 18v18v18 (N = 54).
++  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so items 3 and 4 are 1v1, 4v4, 2v2v2 and 6v6v6, and the largest
++  mode is 24v24.
+ - **Marked by:** "the test-mode list", "the test modes".
+@@ -411,2 +418,3 @@
+ - **Depends on:** MODES-3, for N and the three-team arrangement only; every other count is the same under both readings.
++  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so the soldiers are N = 48, in three teams (16v16v16).
+ - **Marked by:** "the stress scene", "the stress scene's fight on screen".
+@@ -500,2 +508,3 @@
+   stands). This glossary picks neither.
++  **Mustafa, 2026-10-31: ABL-PREDICT is answered later, after the Feel Lab test.**
+ - **Marked by:** "the prediction scope", "predict", "predicted".
+@@ -525,2 +534,3 @@
+   definition is the same under both.
++  **Answered 2026-10-31 (Mustafa): SEC-SPREAD (a),** so weapon spread stays authority-only.
+ - **Marked by:** "shared stream", "authority-only stream".
+@@ -556,2 +566,3 @@
+   applies). It carries the preview header set. Until PREVIEW-WALL is answered there are no multiplayer previews.
++  PREVIEW-WALL was answered (a) on 2026-10-31: a multiplayer preview is behind the access wall from the first one.
+ - **Marked by:** "preview", "preview link", "multiplayer preview".
+@@ -613,2 +624,4 @@
+   unreleased art is behind the wall (R5-PREV-REC5, R5-PREV-OQ1).
++  **Answered 2026-10-31 (Mustafa): PREVIEW-WALL (a),** so the wall is on from the first preview that reaches the
++  staging game server.
+ - **Marked by:** "the access wall".
+@@ -662,2 +675,4 @@
+   open question. This glossary picks none.
++  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so it is listed open in ADR 0006 with the interim
++  positions above, and researched before the first online playtest, in its own fresh session.
+ - **Marked by:** "the security baseline".
+@@ -698,2 +713,4 @@
+   question. This glossary picks none.
++  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard is
++  an option the baseline weighs.
+ - **Marked by:** "a certificate per hostname", "the wildcard certificate".
+--- a/docs/research/r1-simulation-core.md
++++ b/docs/research/r1-simulation-core.md
+@@ -2957,3 +2957,5 @@
+   loop would use); its wider list (quinn-proto, rustls, ring) is R2's. The reviewer's proposal: lockfile floors, and
+-  cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis. R5-GATE-REC1 schedules a
++  cargo-audit and cargo-deny as CI gates. Decided (BASELINE-WHEN (b)): the mechanism is R5-GATE-REC1's scheduled
++  advisories check, also run on every PR that changes `Cargo.lock`; whether an advisory blocks a PR, and who owns that
++  policy, is the security baseline's (R6-SEC-OQ1). R5-GATE-REC1 schedules a
+   cargo-deny advisories check and runs it on every PR that changes `Cargo.lock`
+@@ -2977,2 +2979,3 @@
+   R1-ABL-OQ4.
++  **Mustafa, 2026-10-31: answered later, after the Feel Lab test.**
+ - **SEC-SPREAD (Mustafa). Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicted
+@@ -2984,2 +2987,3 @@
+   asked as R2-SYNC-OQ11. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), server-only spread:** weapon spread stays in the authority-only stream.
+ - **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+@@ -2992,2 +2996,4 @@
+   both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+@@ -3003,2 +3009,4 @@
+   Decided by: the Advisor.
++  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
++  above; the baseline is researched before the first online playtest, in its own fresh session.
+ 
+--- a/docs/research/r2-netcode.md
++++ b/docs/research/r2-netcode.md
+@@ -2611,5 +2611,6 @@
+    0.23.46, ring ≥ 0.17.12 and tokio ≥ 1.54.1 (F40). wtransport's `dangerous-configuration` feature stays off (the Rust
+-   review found it in wtransport's Cargo.toml). An advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) that gates pull requests to keep
+-   these current belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the
+-   Advisor; R5-GATE-REC1 already schedules the advisories check, and its policy waits on BASELINE-WHEN (below).
++   review found it in wtransport's Cargo.toml). The check that keeps these current is R5-GATE-REC1's scheduled advisories check
++   ([GLOSSARY](GLOSSARY.md#the-advisories-check); also run when `Cargo.lock` changes); its policy, whether an advisory blocks a PR,
++   belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the Advisor
++   (BASELINE-WHEN (b)).
+ 
+@@ -3286,2 +3287,3 @@
+   R1-ABL-OQ4.
++  **Mustafa, 2026-10-31: answered later, after the Feel Lab test.**
+ - **SEC-SPREAD (Mustafa). Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicted
+@@ -3293,2 +3295,3 @@
+   asked as R2-SYNC-OQ11. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), server-only spread:** weapon spread stays in the authority-only stream.
+ - **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
+@@ -3301,2 +3304,4 @@
+   both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+@@ -3312,2 +3317,4 @@
+   Decided by: the Advisor.
++  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
++  above; the baseline is researched before the first online playtest, in its own fresh session.
+ 
+--- a/docs/research/r3-rendering.md
++++ b/docs/research/r3-rendering.md
+@@ -1418,2 +1418,4 @@
+   mode's N gives both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ 
+--- a/docs/research/r4-physics-navigation.md
++++ b/docs/research/r4-physics-navigation.md
+@@ -1160,2 +1160,4 @@
+   both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ 
+--- a/docs/research/r5-toolchain-quality.md
++++ b/docs/research/r5-toolchain-quality.md
+@@ -1874,3 +1874,4 @@
+   without our change; R1-RR-OQ7 asks for cargo-audit and cargo-deny as CI gates. Decides it: security-auditor with the
+-  security baseline. Shared as BASELINE-WHEN (below).
++  security baseline. Shared as BASELINE-WHEN (below). Interim (BASELINE-WHEN (b)): scheduled and on lockfile changes, as
++  R5-GATE-REC1 has it; the baseline sets the policy.
+ - **R5-GATE-OQ5. `--prove` cost.** Rebuilding per mutation may take long; whether mutations can share one build is
+@@ -1923,2 +1924,4 @@
+   as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+@@ -1933,2 +1936,4 @@
+   open question. Decided by: the Advisor.
++  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
++  above; the baseline is researched before the first online playtest, in its own fresh session.
+ - **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+@@ -1949,2 +1954,4 @@
+   Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
++  the first one.
+ 
+--- a/docs/research/r6-infrastructure.md
++++ b/docs/research/r6-infrastructure.md
+@@ -683,14 +683,17 @@
+   (its allowed origins and server list differ).
+-- **R6-HOST-REC4. Production certificates: one wildcard certificate for the game-server names (option C2), from ACME
+-  with dns-01, renewed by one job and copied to every game VM.** This departs from R2-TRN-REC5's wording, "a publicly
++- **R6-HOST-REC4. Production certificates: a publicly trusted certificate per game-server hostname (R2-TRN-REC5;
++  option C1, or ACME dns-01 per name), until the security baseline weighs one wildcard certificate (option C2: renewed
++  by one job and copied to every game VM) (BASELINE-WHEN (b)).** C2 would depart from R2-TRN-REC5's wording, "a publicly
+   trusted certificate per game server hostname" (r2-netcode.md:2667): every hostname is still covered by a publicly
+   trusted certificate, but by one shared certificate, so one private key sits on every game VM (a key-handling item for
+-  the deferred security baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the
+-  baseline rejects a shared key; when the baseline is researched is BASELINE-WHEN (below). It needs no TCP 80 on game VMs.
+-  *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes
+-  adding a VM a copy, not an issuance.
++  the deferred security baseline, R6-SEC-OQ1). C2 replaces them only if the
++  baseline accepts a shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 per name it needs
++  no TCP 80 on game VMs (F24); C1's http-01 needs TCP 80.
++  *Reason:* a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game VMs; RFC 8555 proves
++  control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for the baseline to weigh: one certificate
++  for all VMs makes adding a VM a copy, not an issuance; RFC 8555 allows wildcard orders (F24).
+   *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
+   *Serves:* §6.1; §4 (four browsers need a publicly trusted certificate in production, R2-TRN-REC5).
+-  *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the wildcard
+-  certificate ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
++  *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the per-hostname
++  certificates ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
+   when any VM's certificate has under 14 days left (proposed).
+@@ -952,2 +955,4 @@
+   asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
++  values for 48 and 54, the 48 value holds.
+ - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
+@@ -962,2 +967,4 @@
+   both as one shared open question. Decided by: the Advisor.
++  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
++  above; the baseline is researched before the first online playtest, in its own fresh session.
+ - **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
+@@ -978,2 +985,4 @@
+   R5-PREV-OQ1 and R6-HOST-OQ5. Decided by: Mustafa.
++  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
++  the first one.
+ 

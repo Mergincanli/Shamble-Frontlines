@@ -1,116 +1,209 @@
-# Plan: docs-after-v2-research (docs only), revision 1 (DRAFT: the sweep's findings are not folded in yet)
+# Plan: docs-after-v2-research (docs only), revision 2
+
+Revision 1 (commit 9f2c3f5) was a draft written before the read-only sweep came back. Revision 2 folds in the sweep
+(`sweep-a-decisions.md`, `sweep-b-merge-state.md`: 56 + 18 findings) and the second message of 2026-10-31. Both
+messages are word for word in `decisions-2026-10-31.md`.
 
 ## Goal
 The docs catch up with PR #28's merge (R1–R6 research, merge commit b6effde, 2026-10-31) and record the decisions of
-2026-10-31, word for word in `decisions-2026-10-31.md`:
-- Mustafa: MODES-3 (a) totals, the biggest match 24v24 = 48 · PREVIEW-WALL (a) private from the first preview that
-  reaches the test game server · SEC-SPREAD (a) server-only spread · ABL-PREDICT later, after the Feel Lab test.
-- The Advisor: BASELINE-WHEN (b): ADR 0006 lists the security baseline as open, with temporary positions; the baseline
-  is researched before the first online playtest, in its own fresh session.
-The decision drafts (the next step) must find these answers where they start: STATUS and the research folder.
+2026-10-31 where the next step, the decision drafts, starts from: STATUS, ROADMAP, the research folder, VISION_V2 §3
+(one line) and the Night queue. The decisions:
+- **Mustafa:** MODES-3 (a), totals, the biggest match 24v24 = 48 · PREVIEW-WALL (a), private from the first preview
+  that reaches the test game server · SEC-SPREAD (a), server-only spread · ABL-PREDICT later, after the Feel Lab test.
+- **The Advisor:** BASELINE-WHEN (b): ADR 0006 lists the security baseline as open, with temporary positions; the
+  baseline is researched before the first online playtest, in its own fresh session · VISION-LINE (a): add the totals
+  reading to VISION_V2 §3 as proposed · TICK-30: "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if
+  the netcode proof test shows at least 25 % headroom on the target hardware".
+- **Mustafa and the Advisor:** SLICE-ORDER: "1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4
+  the loop", with three conditions for the decision drafts: (1) from slice 1 the game runs as a client plus a local
+  server (the Rust simulation in a Web Worker), talking through the same messages the network will carry, no
+  offline-only shortcuts; (2) player movement and shooting are driven by inputs and can be replayed from day one, so
+  prediction slots in later without rework; (3) the netcode proof test (48 simulated players over WebTransport) still
+  runs before the foundation. "Record the new order in ROADMAP and STATUS."
 
 ## Branch
-`cs/docs-after-v2-research`, from origin/main b6effde, in the main checkout (nothing else runs there now); first commit
-1bd662d (the checkpoint, pushed). This session pushes `cs/` branches (cs/v2-research, merged as #28).
+`cs/docs-after-v2-research`, from origin/main b6effde, in the main checkout; commits so far are checkpoint-only
+(1bd662d, 9f2c3f5).
 
 ## Change type and scope
-Docs only: `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/research/README.md`; and one line of `docs/VISION_V2.md` §3 if
-the advisor allows it (item 4). No game code; no rules files (`.claude/`, `CLAUDE.md`, `tools/` untouched); no new
-files (the checkpoint is deleted before ready). Symbols +0 −0. The research topic files, `GLOSSARY.md`,
-`UNREAD_SOURCES.md` and the v2-research report stay as merged: they are verified, dated records, and the advisor's #28
-review sends its one wording fix there to the synthesis ("Fix in the synthesis").
+Docs only, symbols +0 −0. Four parts:
+- **L. Living docs** (docs-keeper): `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/research/README.md`, `docs/REPO_MAP.md`
+  (two descriptions).
+- **V. `docs/VISION_V2.md` line 43** (the session): one bracket, as the Advisor decided (VISION-LINE (a)).
+- **R. The research files** (the session, by script): 34 exact edits in 7 files, +65 −12 lines.
+- **I. Issue #16's body** (the session): three sentences, after this plan is approved.
+Out of scope, listed for their owners: the rules files (KIT-ALIGN, below), design inputs other than VISION_V2 line 43
+(DOCS-ALIGN, below), and research sentences whose rewording needs judgment (left to the drafts, below).
 
-## The edits
-docs-keeper writes STATUS, ROADMAP and the research README, checking every new fact against git, GitHub or the
-decisions file first. Every decision code gets its meaning in plain words on the line where it appears.
-
-1. **`docs/STATUS.md`**, in the sections it has:
-   - **Header line 3:** "Last updated: 2026-10-31"; R1–R6 research merged (PR #28, b6effde); drop "(PR #28, not merged
-     yet)".
-   - **Phase, the v2 paragraph:** R1–R6 research joins "Done" (PR #28, b6effde, 2026-10-31; docs only); "Done, waiting
-     to merge" goes. "Next": the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the
-     2026-10-31 answers (Decisions pending); then a stop for Mustafa and the Advisor.
+## L. Living docs (docs-keeper; every fact checked against git, GitHub or the decisions file first; every decision code
+explained in plain words on its line; plain words first, internal names in brackets after)
+1. **`docs/STATUS.md`:**
+   - **Header line 3:** "Last updated: 2026-10-31"; the R1–R6 research merged (PR #28, b6effde); "(PR #28, not merged
+     yet)" goes.
+   - **Phase, the v2 paragraph:** R1–R6 joins "Done" (PR #28, b6effde, 2026-10-31; docs only); "Done, waiting to
+     merge" goes. "Next": the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the
+     2026-10-31 decisions; then a stop for Mustafa and the Advisor; then phase 1 and the playable slices in the new
+     order (SLICE-ORDER, below), with the netcode proof test before the foundation.
    - **In flight:** the R1–R6 row becomes "merged: PR #28, b6effde, 2026-10-31, on Mustafa's 'merge #28' after the
-     advisor's APPROVE of 854d42f" | done | none. A new first row: docs-after-v2-research (this PR) | waiting on the
-     advisor's review of its head, then Mustafa's "merge #<n>".
-   - **Targets:** a v2 bullet first, from VISION_V2 §3 read with MODES-3 (a): the start modes are two teams with 2–8
-     players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal is 12v12v12 or
-     24v24; the largest mode is 24v24, 48 players; one faction per team, squads of 4, bots fill empty slots; design for
-     48+ players (CLAUDE.md). The old bullet (12–16 per team, 12v12v12 to 16v16v16, milestones 2–8 → 16 → full scale)
-     is kept, marked "legacy target (before v2), superseded", as STATUS does with its other legacy paragraphs.
+     advisor's APPROVE of 854d42f" | done; report `docs/reports/2026-10-31-v2-research.md` | none. A new first row:
+     docs-after-v2-research (this PR) | waiting on the advisor's review of its head, then Mustafa's "merge #<n>". The
+     kit-v3-1 row names its pull request: "PR #30 (open since 2026-10-27)", waiting on Mustafa's go (sweep B: PR #30,
+     head `cs/kit-v3-1` 5be7d37, not a draft, last updated 2026-10-28; the session does not open the branch).
+   - **Targets:** a v2 bullet first: VISION_V2 §3 read with MODES-3 (a): start with two teams with 2–8 players in total
+     (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or 24v24; the largest mode
+     24v24, 48 players; one faction per team, squads of 4, bots fill empty slots; design for 48+ players (CLAUDE.md).
+     The old bullet stays, marked "legacy target (before v2), superseded".
    - **Decisions pending:**
-     - New first group, "Taken by Mustafa 2026-10-31 (in the v2 day session's chat, with his 'merge #28')": MODES-3 (a):
-       VISION_V2 §3's starting sizes count players in total, so the largest mode is 24v24, 48 players (not 18v18v18,
-       54) · PREVIEW-WALL (a): per-PR previews that reach the test game server sit behind a Cloudflare login on his
-       account from the first one · SEC-SPREAD (a): weapon spread stays known only to the server; tracers use a
-       similar-looking spread that the hit corrects (the research's default) · ABL-PREDICT: answered later, after the
-       Feel Lab test (it stays under "Waiting").
-     - New group, "Taken by the Advisor 2026-10-31 (relayed by Mustafa)": BASELINE-WHEN (b): ADR 0006 lists the security
-       baseline as open, with temporary positions; the baseline is researched before the first online playtest, in
-       its own fresh session.
-     - "Waiting": keeps ABL-PREDICT (with "after the Feel Lab test") and NS-2; the answered entries leave it. The "Next
-       after PR #28" line becomes "Next: the decision drafts", with what they carry forward: (1) the synthesis plan
-       verifies every ADR claim and number, R3–R6's included (research plan condition 9; the advisor's #28 review,
-       finding 4); (2) R2-BUD-REC6's reason holds only at N = 54: at N = 48 every 60 Hz tick fits, the re-flood tick by
-       0.05 ms (8.28 of 8.33 ms, GLOSSARY §1) (finding 2); (3) where a research mark gives values for 48 and 54, the
-       drafts use 48.
-     - New open item, **VISION-WORDING**: `CLAUDE.md:7` and `.claude/agents/netcode-architect.md:17` read VISION_V2 §3
-       per team ("two teams of 2–8 and three teams of 6–18"); under MODES-3 (a) they need the totals reading. They are
-       rules files, so a kit change-set aligns them, with Mustafa's go (kit-v3-1 lands first if they collide, BRANCH-2
-       (a)).
-   - **Open bugs and risks, R1–R6 research:** risk 1 ("If MODES-3 picks 54 players…") becomes: "MODES-3 (a), 2026-10-31,
-     keeps the largest mode at 48 players, so the marks written for 48 hold; the 60 Hz server tick on a re-flood tick
-     fits by 0.05 ms (8.28 of 8.33 ms, GLOSSARY §1), so a 60 Hz choice has almost no room." Risks 2–4 stay.
+     - New first group, "Taken by Mustafa and the Advisor 2026-10-31": SLICE-ORDER, the order and its three conditions
+       in their words (above).
+     - New group, "Taken by Mustafa 2026-10-31 (in the v2 day session's chat, with his 'merge #28')": MODES-3 (a),
+       PREVIEW-WALL (a), SEC-SPREAD (a) (spread stays known only to the server; tracers use a similar-looking spread
+       that the hit corrects), ABL-PREDICT later, after the Feel Lab test.
+     - New group, "Taken by the Advisor 2026-10-31 (relayed by Mustafa)": BASELINE-WHEN (b) and its timing;
+       VISION-LINE (a); TICK-30 (in its words).
+     - **Waiting:** ABL-PREDICT (after the Feel Lab test) stays; NS-2 leaves (carried out, see Routines) unless the new
+       routine's schedule is still unset when docs-keeper edits; the answered entries leave. The line "Next
+       after PR #28 …" becomes "Next: the decision drafts", with what they carry forward:
+       1. The synthesis verifies every ADR claim and number, R3–R6's included (research plan condition 9; the
+          advisor's #28 review, finding 4).
+       2. R2-BUD-REC6's reason (`r2-netcode.md:2402-2403`) and GLOSSARY §1's 60 Hz sentence (`GLOSSARY.md:73-74`) were
+          written with N = 54 in view. At N = 48 a 60 Hz tick that both encodes a snapshot and re-floods fits the 50 %
+          server tick budget by 0.05 ms (8.28 of 8.33 ms), while its server-only share is 0.24 ms over its own 25 %
+          (4.41 of 4.17 ms) (`GLOSSARY.md:62-66`). Under TICK-30 the drafts restate these marks for the 30 Hz baseline
+          and say what the 25 % headroom for 60 Hz is measured against (the advisor's #28 review, finding 2).
+       3. Where a research mark gives values for 48 and 54, the drafts use 48; where a research sentence says "until
+          Mustafa answers …", the answer applies.
+     - New open item **KIT-ALIGN** (rules files the answers left stale; a kit change-set after PR #30 aligns them, with
+       Mustafa's go): `CLAUDE.md:7-8` and `.claude/agents/netcode-architect.md:17-19` (the per-team reading of
+       VISION_V2 §3); `CLAUDE.md:192`, `.claude/agents/security-auditor.md:14` and `.claude/agents/infra-engineer.md:29-30`
+       (the security baseline as part of R6); `.claude/agents/infra-engineer.md:23-26` and
+       `.claude/agents/security-auditor.md:46` (preview privacy, costs at the starting scale); optional:
+       `.claude/agents/netcode-architect.md:37` and `.claude/agents/security-auditor.md:30` (server-only spread as a rule).
+     - New open item **DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md`
+       §1 ("Then: playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the
+       security baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
+       `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more").
+   - **Routines** (NS-2 carried out on 2026-10-31; facts from the routines API, read back by the session): the night
+     shift is now "Shamble Frontline Night shift" (trig_01QpV6y6UaG1Na2q3jumRDxh), created by Mustafa on the Routines
+     page at 13:50 UTC: a fresh session on every run (no persistent session), the repository attached, Opus 5.5, the
+     same one-line prompt; its 13:51 UTC test run read `.claude/NIGHT_SHIFT.md` from main and stopped silently outside
+     the window. Its schedule reads `CRON_TZ=Europe/Amsterdam 10 0 * * *` until Mustafa sets `10 0-7 * * *` on its page
+     (the API refuses agents' edits to routines they did not create). The old "Night shift"
+     (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session) was switched off by the session at 13:54 UTC under NS-2
+     (c); deleting it, after one good night, is Mustafa's step (deleting it also deletes its session). docs-keeper
+     writes the state as it stands when it edits, read again from the API by the session.
+   - **Open bugs and risks, R1–R6 research:** risk 1 becomes "Closed 2026-10-31 by MODES-3 (a): the largest mode is 48
+     players, where the marks written for 48 hold." Risks 2–4 stay.
 2. **`docs/ROADMAP.md`:**
+   - **Phases:** two v2 lines after the legacy list: "v2 phase 0 (V2_PHASE0_BRIEF): IN PROGRESS: kit-v3-0, R7 and R1–R6
+     done (PRs #26, #27, #28); next: the decision drafts" and "v2 slices (Mustafa and the Advisor, 2026-10-31), after
+     phase 1: 1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4 the loop". Phase 6 ("Multiplayer —
+     NOT STARTED") gets "(legacy plan; v2 replaces it)".
+   - **Next / open:** a new first bullet: "v2, next: the decision drafts from the merged research and the 2026-10-31
+     decisions (STATUS); then phase 1 and the slices in the new order, with the netcode proof test (48 simulated
+     players over WebTransport) before the foundation; the security baseline is researched before the first online
+     playtest, in its own fresh session."
    - **Recent work:** the R1–R6 entry becomes MERGED (PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the
-     advisor's APPROVE of 854d42f); a terse new entry for this change-set with the 2026-10-31 answers in one line.
-     Hygiene rule: 8–12 entries, the oldest folded into "Build history".
-   - **Next / open:** a new first bullet for v2 phase 0: next, the decision drafts; the security baseline is researched
-     before the first online playtest, in its own fresh session (BASELINE-WHEN (b)); ABL-PREDICT waits for a Feel Lab
-     test. Where things stand: STATUS.
-3. **`docs/research/README.md`:** after the opening paragraph ("Nothing here is decided…"), one short paragraph:
-   "Answered since (2026-10-31; STATUS, 'Decisions pending'): MODES-3 (a), the largest mode is 24v24, 48 players;
-   PREVIEW-WALL (a), previews that reach the test game server are private from the first one; SEC-SPREAD (a), weapon
-   spread stays server-only; BASELINE-WHEN (b), ADR 0006 lists the security baseline as open. ABL-PREDICT waits for a
-   Feel Lab test. The topic files and GLOSSARY.md keep the questions as written; the decision drafts apply the
-   answers."
-4. **`docs/VISION_V2.md` §3, line 43** (the advisor rules on this item): the file is "written by Mustafa and the
-   Advisor", and its own tag means "[DECIDED] Mustafa decided it". The line is where the per-team reading began (two
-   rules files and the research's MODES-3 question). Options: (a) the session appends Mustafa's answer in brackets,
-   nothing else changed: "two teams with 2–8 players, and three teams with 6–18 players (in total: 1v1 to 4v4, and
-   2v2v2 to 6v6v6; MODES-3 (a), Mustafa, 2026-10-31)."; (b) VISION_V2 is left to Mustafa and the Advisor, and the
-   wording goes to them under "Decisions needed". Recommendation: (a), since it records his own answer in his words'
-   place and stops the misreading at its source.
-5. **Issue #16 (the Night queue):** unchanged, because nothing new can run unattended: the security baseline research
-   is web research by day in its own session (research stays in the daytime only until kit-v3-1 is merged). [Pending
-   the sweep's issue #16 check.]
+     advisor's APPROVE of 854d42f), its future-tense sentence goes; a missing entry for docs-after-r7 (PR #29, e9f11be,
+     2026-10-27) and a new one for this change-set are added: 11 entries, inside the file's 8–12 rule.
+3. **`docs/research/README.md`:** after the opening paragraph, "Answered since (2026-10-31; STATUS, 'Decisions
+   pending'): MODES-3 (a), the largest mode is 24v24, N = 48; PREVIEW-WALL (a); SEC-SPREAD (a); BASELINE-WHEN (b), and
+   the six changes approved for (b) are applied (C17.b1–b3, C23.b1–b3). ABL-PREDICT waits for a Feel Lab test. The
+   Advisor set a 30 Hz server tick as the baseline for 48 players (TICK-30). Each answered question carries an
+   'Answered' note; where a file still gives values for 48 and 54, or says 'until … answers', the answer applies, and
+   the decision drafts restate those marks." Under the table: "R1–R6 merged in PR #28 (b6effde, 2026-10-31)." The R6
+   owner cell: "infra-engineer (the security baseline: security-auditor, in its own session before the first online
+   playtest; BASELINE-WHEN (b))".
+4. **`docs/REPO_MAP.md`:** line 57 (r6: "the security baseline deferred") and line 79 (security-auditor: "R6 security
+   baseline") say where the baseline now goes (BASELINE-WHEN (b)). The repo-map check is re-run.
+
+## V. `docs/VISION_V2.md` line 43 (the session; VISION-LINE (a): "I wrote that line; the clarification is right. Add it
+as proposed.")
+- before: ``- `[DECIDED]` **Start small:** two teams with 2–8 players, and three teams with 6–18 players.``
+- after (wrapped at the file's width, nothing else changed):
+  ``- `[DECIDED]` **Start small:** two teams with 2–8 players, and three teams with 6–18 players (in total: 1v1 to 4v4,``
+  ``  and 2v2v2 to 6v6v6; MODES-3 (a), Mustafa, 2026-10-31).``
+
+## R. The research files (the session, by `scripts/apply_research_answers.py`; exact texts in the script, the preview
+diff in `research-edits.diff`, the table in `research-edits-table.md`)
+- **16 notes under the shared questions**, the same words in every topic: MODES-3 ×6 ("Answered 2026-10-31 (Mustafa):
+  (a), totals. The largest mode is the goal 24v24, N = 48; where a mark gives values for 48 and 54, the 48 value
+  holds."), BASELINE-WHEN ×4, SEC-SPREAD ×2, PREVIEW-WALL ×2, ABL-PREDICT ×2 ("answered later, after the Feel Lab test").
+- **12 glossary edits:** a note under each "Depends on" tied to an answered question (10), one summary line under the
+  list of decision codes, and one sentence after the Preview definition's "Until PREVIEW-WALL is answered there are no
+  multiplayer previews."
+- **The six changes approved on 2026-10-30 for BASELINE-WHEN (b)** (appendix §2: C17.b1–b3 at 1071-1080; C23.b1–b3 at
+  1415-1428, as REVISED at 1596-1599). The step-3b verdict, condition 2: "C17.b1–b3 and C23.b1–b3 wait for
+  BASELINE-WHEN"; its "before the PR is ready" case did not happen, so they apply now:
+  - **Verbatim (4):** C17.b1 (R1-RR-OQ7; the whole line is replaced so the approved words wrap; step 3c's interim
+    sentence after it stays, so the mechanism is named twice), C17.b3 (R5-GATE-OQ4), C23.b1 with C23.b2's first part
+    (R6-HOST-REC4's heading, "This departs" → "C2 would depart"), C23.b3 (the spike).
+  - **Adapted, for the advisor to rule (2)** (the step-3b rule: a quote that no longer matches is an OBJECT, never
+    improvised):
+    - **C17.b2** (R2-TRN-REC1 mark 5): the approved "before" ("An audit gate that keeps these current belongs to R6's
+      security baseline (dependency audits), deferred by the Advisor.") no longer occurs, because step 3c reworded the
+      sentence. Proposed: the approved "after" text, keeping step 3c's two glossary links at their terms.
+    - **C23.b2** (R6-HOST-REC4's body): the approved quote "… stay the alternative if the baseline rejects a shared
+      key." now ends "… rejects a shared key; when the baseline is researched is BASELINE-WHEN (below)." (step 3c's
+      interim clause). Proposed: replace only the approved part ("C2 replaces them only if the baseline accepts a shared
+      key") and keep that clause; the TCP 80 sentence and the Reason as approved.
+- **Dry run:** every anchor and every "before" occurs exactly once (34 of 34); the research files are untouched until
+  this plan is approved.
+- **Not touched, for the drafts** (rewording needs judgment): R2-BUD-REC6's reason and GLOSSARY §1's 60 Hz sentence
+  (carry-forward 2), the "until Mustafa answers PREVIEW-WALL" sentences inside R5-PREV-REC5, R6-HOST-REC1 and
+  R6-HOST-REC3, R6-HOST-OQ5's "after the security baseline", the marks that give values for 48 and 54, and TICK-30's
+  consequences for the tick-rate marks.
+
+## I. Issue #16, the Night queue (the session, after approval; the PR body keeps the old and new text)
+1. "kit-v3-1 is being finished in the R7 session, and its PR goes to Mustafa ([Advisor verdicts, 2026-10-27, second
+   message](…#issuecomment-6454223695))." → "kit-v3-1 is being finished in the R7 session, in
+   [PR #30](https://github.com/Mergincanli/Shamble-Frontlines/pull/30) (open since 2026-10-27), which goes to Mustafa
+   ([Advisor verdicts, 2026-10-27, second message](…#issuecomment-6454223695))."
+2. "Last updated: 2026-10-30." → "R1–R6 research is merged ([PR #28](https://github.com/Mergincanli/Shamble-Frontlines/pull/28),
+   main `b6effde`, 2026-10-31). The decision drafts come next, and the security baseline is researched before the first
+   online playtest; both are day work, so nothing new is queued. Last updated: 2026-10-31."
+3. "No game-code changes until the v2 brief, so the old queue is paused below ([Advisor verdict,
+   2026-10-17](…#issuecomment-6238312490))." → "The legacy game is frozen (critical fixes only, CLAUDE.md) and phase 0
+   writes no engine code, so the old queue stays paused below ([Advisor verdict, 2026-10-17](…#issuecomment-6238312490))."
+   (The brief exists since 2026-10-24, so "until the v2 brief" reads as if the pause had ended.)
+The research-schedule sentence stays: NIGHT-RESEARCH (a) (2026-10-28) was "keep the rule (research by day only)".
 
 ## Evidence and report
 - No report file (docs-only change-sets have none): the PR body is the report: what changed, what each fact was
-  checked against, the gate result, Decisions needed, For Mustafa.
-- Gate: PASS on the branch (`node tools/gate.mjs`, run in the main checkout, which has `tools/node_modules`), plus CI's
-  `gate` and `smoke` checks on the PR head. Repo-map check (no paths added or removed).
-- Before the PR review, a read-only verification workflow over the final diff (ultracode): a fact checker (every changed
-  line's facts against git, GitHub and the decisions file), a wording checker (each answer says what Mustafa and the
-  Advisor said, nothing added; every code explained on its line), and a completeness critic (anything still stale;
-  anything this plan lists but the diff lacks). docs-keeper fixes what they find; the session fixes the README or
-  VISION_V2 line if it made them.
+  checked against, the gate result, the issue #16 diff, Decisions needed, For Mustafa.
+- Gate: PASS on the branch (`node tools/gate.mjs`), and CI's `gate` and `smoke` on the PR head. Repo-map check.
+- A read-only verification workflow over the final diff (four agents, effort high, ultracode): (V1) the research
+  diff equals `research-edits.diff` hunk for hunk, and nothing else in `docs/research/r*.md` or `GLOSSARY.md` changed;
+  (V2) every new fact in STATUS, ROADMAP, README, REPO_MAP, VISION_V2 and issue #16 against git, GitHub and the
+  decisions file; (V3) each recorded decision says what Mustafa and the Advisor said, nothing added, every code
+  explained on its line; (V4) a completeness critic: anything this plan lists but the diff lacks, anything still stale.
+  Findings are fixed (docs-keeper for its files, the session for the rest) before the advisor's PR review.
 
 ## Reviewers
-The advisor agent: this plan, then the PR's head, in this session. docs-keeper writes STATUS, ROADMAP and the README.
+The advisor agent: this plan, then the PR's head, in this session. docs-keeper writes part L.
 
 ## Merge path
-A draft PR while work is in progress. The advisor reviews its head here; the checkpoint is folded into the PR body and
+A draft PR while work is in progress; the advisor reviews its head; the checkpoint is folded into the PR body and
 deleted in the last commit (CHECKPOINTS.md §9; that commit runs CI); the PR is marked ready; on Mustafa's "merge #<n>"
 (docs only: no Brave check) the session merges with the approved full SHA as the expected head, with `gate` and `smoke`
 green on it. A push after the APPROVE needs a new review and a new go.
 
 ## Risks
-1. If the advisor rules (b) on item 4, VISION_V2 §3 stays ambiguous until Mustafa and the Advisor edit it.
-2. kit-v3-1 may land with the per-team wording in CLAUDE.md; STATUS keeps VISION-WORDING open until a kit change-set
-   fixes it.
-3. STATUS is long and its line numbers drift: docs-keeper greps before each edit.
-4. The thin 60 Hz margin at N = 48 is recorded for the drafts, not decided here.
+1. The research files change after their verification. Only decision notes and the six approved texts change, and V1
+   proves nothing else did.
+2. If the advisor rejects the two adapted texts, those two stay unapplied and STATUS lists them for the drafts.
+3. kit-v3-1 (PR #30) may merge with the per-team wording; KIT-ALIGN stays open until a kit change-set fixes it.
+4. "The foundation" (condition 3) is recorded in the Advisor's words. The session reads it as phase 1 (V2_PHASE0_BRIEF
+   §1: the repository restructure, toolchain and CI gate v2) but writes no reading into the docs.
+5. STATUS is long and its line numbers drift: docs-keeper greps before each edit.
+
+## For the advisor's plan review
+- The two adapted texts (C17.b2, C23.b2): approve, or give the text.
+- Issue #16 item 3: include or leave.
+- The scope: the research edits in this change-set (recommended: the six approved texts are due, and the drafts should
+  start from files that carry the answers), or leave the research files to the drafts.
 
 ## For Mustafa
-Nothing to check in Brave. NS-2 is still his step. Say "merge #<n>" once the advisor has approved its head.
+Nothing to check in Brave. On the new night-shift routine's page, set the schedule to `CRON_TZ=Europe/Amsterdam 10 0-7 *
+* *`; after one good night, delete the old "Night shift" routine. Say "merge #<n>" once the advisor has approved this
+PR's head.
