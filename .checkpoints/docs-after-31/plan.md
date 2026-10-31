@@ -59,14 +59,14 @@ verdict is posted on the PR naming the full SHA, so that session can merge it). 
 2. If Mustafa changes the night routine's schedule after docs-keeper edits, STATUS's Routines line goes stale until the
    next docs pass.
 
-## Conditions (advisor APPROVE of revision 1, 2026-10-31 about 15:33 UTC; verbatim in `advisor-verdicts.md`)
+## Conditions (advisor APPROVE of revision 1, 2026-10-31 about 15:29 UTC; verbatim in `advisor-verdicts.md`)
 1. Phase paragraph: replace `with the netcode proof test before the foundation, in their words (Mustafa and the Advisor): `
    with `with, in their words (Mustafa and the Advisor): `; the rest of the sentence stays.
 2. Routines, the PR Advisor bullet: the sentence about the v2 day session becomes the advisor's exact text (past tense,
    "until its handover on 2026-10-31"); the 2026-10-27 decision record stays.
-3. PR #30's row: re-read before docs-keeper writes (15:35 UTC: unchanged, so the row stays).
+3. PR #30's row: re-read before docs-keeper writes (about 15:29 UTC: unchanged, so the row stays).
 4. The final head deletes the checkpoint in a CI-running commit; `git ls-tree` prints nothing; the PR body quotes the
    three messages exactly.
 5. DRAFTS-SESSION's question in the session's own words: "(should the decision drafts be planned in this session or a
    fresh one)".
-Re-read at 15:35 UTC: the new night routine still reads `CRON_TZ=Europe/Amsterdam 10 0 * * *`, so Routines stays.
+Re-read at about 15:29 UTC: the new night routine still reads `CRON_TZ=Europe/Amsterdam 10 0 * * *`, so Routines stays.

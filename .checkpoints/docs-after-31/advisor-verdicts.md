@@ -1,5 +1,5 @@
 # Advisor verdict on docs-after-31, plan revision 1 (verbatim)
-From the advisor agent in session_0173vVo5q59ameR6cnN9BENg, 2026-10-31 about 15:33 UTC; prompt in `prompts/advisor-plan-review.txt`.
+From the advisor agent in session_0173vVo5q59ameR6cnN9BENg, 2026-10-31 about 15:29 UTC; prompt in `prompts/advisor-plan-review.txt`.
 
 ## Verdict: APPROVE, with 5 conditions
 The plan records PR #31's merge and the Advisor's choice about where the drafts get planned (DRAFTS-SESSION (a)) without adding anything they did not decide. It handles my PR #31 cosmetic note 3 correctly. Its claim about the checkpoints holds. It is docs only, the smallest correct change, and plans the right evidence (the gate, the repo-map check, CI on the final head). The conditions fix one line that goes stale once this session stops, and pin down exact wording.

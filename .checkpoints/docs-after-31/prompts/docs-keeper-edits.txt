@@ -1,0 +1,50 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: docs-keeper · 2026-10-31 about 15:31 UTC
+
+**Task:** the docs edits of the change-set docs-after-31 (docs only; plan approved with 5 conditions). Work in
+/home/user/Shamble-Frontlines (branch cs/docs-after-31; draft PR #32). Edit exactly two files: `docs/STATUS.md` and
+`docs/ROADMAP.md`. Never commit or push. The plan is `.checkpoints/docs-after-31/plan.md` (part "The edits" and the
+"Conditions" section); the advisor's exact texts are in `.checkpoints/docs-after-31/advisor-verdicts.md`. Use them word
+for word where given. Grep before each edit; if a "before" text below differs from the file, change nothing for that
+item and say so.
+
+**STATUS** (`docs/STATUS.md`):
+1. Header line 3: "… docs-after-r7 (PR #29) and the R1–R6 research (PR #28, b6effde, 2026-10-31) merged." becomes "…
+   docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31) and docs-after-v2-research (PR #31, 2f5b52e,
+   2026-10-31) merged."
+2. Phase, the v2 paragraph: add "docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only)" to the "Done" list.
+   In "Next", say the decision drafts are planned "in a fresh session that Mustafa starts with the Advisor's drafts brief
+   (DRAFTS-SESSION (a))". Condition 1, exact: replace `with the netcode proof test before the foundation, in their words
+   (Mustafa and the Advisor): ` with `with, in their words (Mustafa and the Advisor): ` and keep the rest of that sentence.
+   End the paragraph's v2 part with: "The v2 day session (session_0173vVo5q59ameR6cnN9BENg) handed over and stopped on
+   2026-10-31."
+3. In flight: the docs-after-v2-research row becomes "merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's \"merge #31\"
+   after the advisor's APPROVE of 1c687d1" | "done; the report is PR #31's body" | "none". A new first row:
+   "docs-after-31 (this change-set; docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover)"
+   | "`cs/docs-after-31`, PR #32" | "plan approved by the advisor with 5 conditions" | "the advisor's review of its final
+   head, then Mustafa's go". The PR #30 row stays (re-read at about 15:29 UTC: unchanged).
+4. Decisions pending, the group "Taken by the Advisor 2026-10-31 (relayed by Mustafa)": add a bullet "DRAFTS-SESSION (a)
+   (should the decision drafts be planned in this session or a fresh one): \"Mustafa starts a fresh session with the
+   Advisor's drafts brief.\""
+5. Routines, the PR Advisor bullet, condition 2 exact: replace `The advisor agent reviews PRs in the v2 day session
+   (session_0173vVo5q59ameR6cnN9BENg), and nothing merges without Mustafa's "merge #<n>".` with `The advisor agent
+   reviewed PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg) until its handover on 2026-10-31; while the
+   routine is off, the session that opens a PR runs the advisor agent on it (CLAUDE.md protocol steps 2 and 6), and
+   nothing merges without Mustafa's "merge #<n>".` Leave the 2026-10-27 decision record (under Decisions pending) as it
+   is. The night routine's facts stay (re-read at about 15:29 UTC: still `CRON_TZ=Europe/Amsterdam 10 0 * * *`).
+
+**ROADMAP** (`docs/ROADMAP.md`):
+1. Recent work: "**Docs after v2 research [2026-10-31, IN PROGRESS]** — docs-after-v2-research
+   (`cs/docs-after-v2-research`, draft PR #31; …" becomes "**Docs after v2 research [2026-10-31, MERGED]** — PR #31,
+   2f5b52e, 2026-10-31, on Mustafa's \"merge #31\" after the advisor's APPROVE of 1c687d1 (…" (keep the rest of the
+   entry), and its last sentence notes: "Handover: the decision drafts are planned in a fresh session (DRAFTS-SESSION
+   (a)); STATUS caught up in PR #32." No new entry (11 stay).
+2. Next / open, the "v2, next" bullet: after "the decision drafts" add "in a fresh session from the Advisor's drafts
+   brief (DRAFTS-SESSION (a))".
+
+**Facts to check** (git): `git log --merges --format='%h %cI %s' -3 origin/main` (2f5b52e = PR #31, 2026-10-31; parents
+b6effde and 1c687d1). Everything else is in the plan, the verdict and STATUS itself.
+
+**How:** plain words first, internal names in brackets after; keep the structure; invent nothing. Keep notes in
+`.checkpoints/docs-after-31/docs-keeper-edits.md` (start with one line naming the task; a line per unit; end with DONE).
+
+**Return** (under 150 words): what you changed, by file and line; anything you could not apply and why.
