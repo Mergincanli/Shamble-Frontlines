@@ -3,7 +3,7 @@
   `docs-after-v2-research/decisions-2026-10-31.md`) in STATUS, ROADMAP, the research folder, VISION_V2 §3 (one line)
   and the Night queue · plan: `docs-after-v2-research/plan.md` (revision 2; advisor APPROVE with 16 conditions)
 - **Branch:** cs/docs-after-v2-research · **Base:** origin/main b6effde (PR #28's merge commit)
-- **Last update:** 2026-10-31 15:15 Amsterdam
+- **Last update:** 2026-10-31 15:27 Amsterdam
 
 ## Steps done
 1. PR #28 merged on Mustafa's "merge #28" in this session's chat (2026-10-31), after the advisor's APPROVE of
@@ -23,7 +23,9 @@
    is enabled (read back at 13:54 UTC).
 7. The advisor's plan review: APPROVE with 16 conditions (verbatim in `advisor-verdicts.md`; folded into plan.md).
 8. Part R applied (39 edits in 7 files, +75 −17; the applied diff equals the regenerated preview line for line) and
-   part V (VISION_V2 line 43) · the commit that carries this checkpoint update.
+   part V (VISION_V2 line 43) · af2560c.
+9. Draft PR #31 opened (the session watches it); docs-keeper launched on part L (prompt `prompts/docs-keeper-edits.txt`,
+   notes `docs-keeper-edits.md`).
 
 ## Current step
 docs-keeper writes part L (STATUS, ROADMAP, the research README, REPO_MAP) under conditions 7–12.
