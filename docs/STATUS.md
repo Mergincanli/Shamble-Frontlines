@@ -1,17 +1,20 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29) and the R1–R6 research (PR #28, b6effde, 2026-10-31) merged. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31) and docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) merged. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
 `docs/V2_PHASE0_BRIEF.md`, added 2026-10-24). Done: kit-v3-0, the process upgrades (PR #26, f2ccc13, 2026-10-25);
 docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27);
-docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only).
-Next: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the 2026-10-31 decisions
+docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only);
+docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only).
+Next: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), planned in a fresh session that Mustafa
+starts with the Advisor's drafts brief (DRAFTS-SESSION (a)), starting from the 2026-10-31 decisions
 under "Decisions pending"; then a stop for Mustafa and the Advisor; then phase 1 and the playable slices in the new
 order (SLICE-ORDER, Mustafa and the Advisor: 1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4
-the loop), with the netcode proof test before the foundation, in their words (Mustafa and the Advisor): "The netcode proof test (48
-simulated players over WebTransport) still runs before the foundation." The legacy game is frozen (critical fixes
+the loop), with, in their words (Mustafa and the Advisor): "The netcode proof test (48
+simulated players over WebTransport) still runs before the foundation." The v2 day session
+(session_0173vVo5q59ameR6cnN9BENg) handed over and stopped on 2026-10-31. The legacy game is frozen (critical fixes
 only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
@@ -45,7 +48,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **docs-after-v2-research** (this change-set; docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | `cs/docs-after-v2-research`, draft PR #31 | plan approved by the advisor with 16 conditions; docs written (05b2d3a) and issue #16 edited (14:12 UTC); verification V1–V4 done, its findings fixed | the advisor's review of the final head, then Mustafa's "merge #31" |
+| docs-after-31 (this change-set; docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | `cs/docs-after-31`, PR #32 | plan approved by the advisor with 5 conditions | the advisor's review of its final head, then Mustafa's go |
+| **docs-after-v2-research** (docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's "merge #31" after the advisor's APPROVE of 1c687d1 | done; the report is PR #31's body | none |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
 | docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
 | kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1`, PR #30 (open since 2026-10-27; not a draft; head 5be7d37) | from the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | PR #30 conflicts with main (GitHub: mergeable state "dirty", base e9f11be, read 2026-10-31); it needs an update for main's changes, a day-session advisor's APPROVE of its head, then Mustafa's go (its own merge path) |
@@ -108,7 +112,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - BASELINE-WHEN (b) (when the postponed security baseline is researched): "List it in ADR 0006 as open, with
     temporary positions. Research the security baseline before the first online playtest, in its own fresh session."
   - VISION-LINE (a) (a bracket in VISION_V2 §3 saying the starting sizes are totals): "I wrote that line; the
-    clarification is right. Add it as proposed." Added in this change-set (af2560c).
+    clarification is right. Add it as proposed." Added in docs-after-v2-research (PR #31, af2560c).
+  - DRAFTS-SESSION (a) (should the decision drafts be planned in this session or a fresh one): "Mustafa starts a fresh
+    session with the Advisor's drafts brief."
   - TICK-30 (the server tick rate): "The 60 Hz margin (8.28 of 8.33 ms) is effectively zero. For the decision drafts: a
     30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof test shows at least 25 % headroom
     on the target hardware."
@@ -218,8 +224,9 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
   routine (deleting it also deletes its session).
 - **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
   switched it off, after an agent's switch-off was refused; the routine reads enabled false at 21:35 UTC). The advisor
-  agent reviews PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg), and nothing merges without Mustafa's
-  "merge #<n>".
+  agent reviewed PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg) until its handover on 2026-10-31; while
+  the routine is off, the session that opens a PR runs the advisor agent on it (CLAUDE.md protocol steps 2 and 6), and
+  nothing merges without Mustafa's "merge #<n>".
 
 ## Open bugs and risks
 - **R1–R6 research** (its report, "Risks"):
