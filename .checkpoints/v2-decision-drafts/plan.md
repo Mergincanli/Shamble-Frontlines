@@ -1,6 +1,6 @@
 # Plan: v2-decision-drafts (docs only), revision 2
 
-Revision 2 folds in the advisor's APPROVE of revision 1 and its 19 conditions (2026-10-31, about 18:50 Amsterdam;
+Revision 2 folds in the advisor's APPROVE of revision 1 and its 19 conditions (2026-10-31, about 18:35 Amsterdam;
 verbatim in `advisor-verdicts.md` §1). Folding needs no second review (the verdict). Each condition's place is marked
 [Cn] below.
 
@@ -22,7 +22,7 @@ Then a draft PR, the report per CLAUDE.md, and a stop. No engine code, no spikes
 ## Branch, base, slug
 - Branch `claude/laughing-lovelace-ox61se`: this cloud session is limited to it, so it stands in for
   `cs/v2-decision-drafts` (CLAUDE.md, standing permission). Base: 9e7db28 (PR #32's merge; the remote main, read with
-  `git ls-remote`; the local `origin/main` was fetched up to it at about 18:55). Slug and checkpoint:
+  `git ls-remote`; the local `origin/main` was fetched up to it at about 18:36). Slug and checkpoint:
   `v2-decision-drafts` (`.checkpoints/v2-decision-drafts.md`, notes in `.checkpoints/v2-decision-drafts/`).
 - Resume check: no checkpoint for this task existed on main or this branch, so this is a fresh start, not a restart.
 

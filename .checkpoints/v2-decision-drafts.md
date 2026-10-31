@@ -4,12 +4,12 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 2: the advisor's APPROVE of revision 1 with 19 conditions, folded; verdict verbatim in `advisor-verdicts.md` §1)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 19:00 Amsterdam
+- **Last update:** 2026-10-31 18:38 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
-2. Plan review: the advisor's APPROVE with 19 conditions (about 18:50); folded into plan revision 2 (no second review
+2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
    needed, per the verdict); `origin/main` fetched to 9e7db28 (condition 1); the id list rebuilt (REC 165: the two R3
    rows were references, condition 6) · this commit.
 
@@ -35,12 +35,12 @@ running; then its addendum (condition 7) by the same agent.
 
 ## Decisions taken
 - 2026-10-31: the drafts brief (Mustafa and the Advisor) and LOOK_V2 (attachments of the session's first message).
-- 2026-10-31 about 18:50, the advisor: plan APPROVE with 19 conditions; rulings ASSET-RESEARCH (a), TICK-60-HEADROOM
+- 2026-10-31 about 18:35, the advisor: plan APPROVE with 19 conditions; rulings ASSET-RESEARCH (a), TICK-60-HEADROOM
   ruled now (base 8.33 ms, p99 ≤ 6.25 ms; confirmed at the stop), GLOSSARY-8 yes (three entries and a note),
   CHECKPOINT-AT-STOP keep.
 
 ## Running work
 - advisor plan review: done (APPROVE), notes `advisor-plan-review.md` (DONE).
-- engine-architect decision map: background agent, launched 18:37, running; notes `engine-architect-decision-map-notes.md`,
+- engine-architect decision map: background agent, launched about 18:22, running; notes `engine-architect-decision-map-notes.md`,
   outputs `engine-architect-decision-map.md` and `-ids.tsv`.
 - checkpoint saver: `checkpoint.mjs watch` in the background since 18:22 (110 min).

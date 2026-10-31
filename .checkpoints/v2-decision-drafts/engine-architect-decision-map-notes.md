@@ -46,3 +46,7 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
   R5-GATE-OQ4, R5-TSLINT-OQ5 0006 (security baseline); R3-MEASURE-OQ2 0006; R3-MEASURE-OQ4 0002; R3-CHAR-OQ3 0005;
   R6-OBS-OQ5 0003; XT by critic rank, "ADR-0004 (boundary)" remapped to 0002 per plan. SHARED: ABL-PREDICT, SEC-SPREAD,
   MODES-3 -> 0001; BASELINE-WHEN, PREV-DELETE, PREVIEW-WALL -> 0006.
+- 9 TSV written and checked: .checkpoints/v2-decision-drafts/engine-architect-decision-map-ids.tsv, 521 rows (every id
+  once; SHARED as 6 codes; dup copies at r3:524/771 noted). Counts: 0001 127, 0002 104, 0003 71, 0004 82, 0005 34,
+  0006 65, DESIGN 38, SPIKE_PLAN 0. Part b markdown generated to scratchpad partb.md (re-run assign.py to regenerate).
+  Next: write the map file: header + part a (scope, seams), then b, c, d, e, f, g, h, session items.

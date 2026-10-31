@@ -1,7 +1,7 @@
 # Advisor verdicts on v2-decision-drafts (verbatim)
 
 ## 1. Plan revision 1: APPROVE with 19 conditions
-From the advisor agent in this session (session_0173vVo6CEsV7ckERUa6TtEd), 2026-10-31, returned about 18:50 Amsterdam;
+From the advisor agent in this session (session_0173vVo6CEsV7ckERUa6TtEd), 2026-10-31, returned about 18:35 Amsterdam;
 prompt `prompts/advisor-plan-review.txt`; its notes `advisor-plan-review.md` (ending DONE).
 
 ## Plan review: v2-decision-drafts, plan revision 1 (base 9e7db28, head d6c71e4)
