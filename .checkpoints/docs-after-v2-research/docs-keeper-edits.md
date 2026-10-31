@@ -7,3 +7,7 @@ Task: docs-keeper part L of docs-after-v2-research (STATUS, ROADMAP, research/RE
 - STATUS Targets done (v2 bullet first; old bullet with condition 9 note). Next: Decisions pending.
 - STATUS Decisions pending done (3 new groups, Waiting = ABL-PREDICT only, Next with carry-forwards 1-5, KIT-ALIGN, DOCS-ALIGN; NS-2 (c) 2026-10-30 line points at Routines). Next: Routines.
 - STATUS Routines (new routine + old switched off, [assumed] note, 14:06 UTC) and risk 1 (condition 8 exact) done. STATUS complete. Next: ROADMAP.
+- ROADMAP done: Phases (phase 6 note, two v2 lines, condition 12), Next/open first bullet, Recent work (new PR #31 entry, R1–R6 MERGED, docs-after-r7 PR #29 entry) = 11 entries. Next: research README.
+- research/README done (condition 7 paragraph verbatim, merge line under table, R6 owner cell). Next: REPO_MAP.
+- REPO_MAP lines 57, 79 done; repo-map-check OK (103 entries, 93 paths).
+DONE
