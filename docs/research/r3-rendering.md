@@ -882,7 +882,7 @@ Spatialization:
 Voice management:
 | Option | What it is | Trade-off |
 |---|---|---|
-| V-A. No limit (legacy) | every event plays | Unbounded nodes in a fight at the largest mode's N (48 or 54, MODES-3; GP6) |
+| V-A. No limit (legacy) | every event plays | Unbounded nodes in a fight at [the largest mode](GLOSSARY.md#the-largest-mode-and-its-n)'s [N](GLOSSARY.md#player-count-n) (48 or 54, MODES-3; GP6) |
 | V-B. Voice cap with priorities | a fixed number of voices; priority by kind (own weapon, shots at the player, large units, nearby, far), distance and age; the lowest is stolen or never started; per-kind caps and throttles | Bounded cost; needs tuning; quiet sources vanish |
 | V-C. Distance cull only (legacy's 90 m) | sources beyond a radius never start | Simple, but a cluster within the radius is still unbounded |
 
@@ -1677,6 +1677,8 @@ Step 3d fixes (2026-10-30):
 - R3-AUDIO-REC3: 0.2 ms (p99) per frame (a recommendation change).
 - R3-AUDIO-REC1: p99 written out, by the advisor's item-6 ruling (the same rule; found by the owner); the HRTF
   addition reads as a rise of that p99 by less than 0.3 ms, since p99s do not add (a nit from the final check).
+- Options for question 7, row V-A: the largest mode and the player count N linked to GLOSSARY.md at their first
+  uses in R3's own text (links only; a nit from the completeness critic).
 - Options for question 7, row V-A: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3)
   (a nit).
 - R3-AUDIO-REC2's reason: "a 48-player fight" becomes a fight at the largest mode's N (48 or 54, MODES-3) (a nit).

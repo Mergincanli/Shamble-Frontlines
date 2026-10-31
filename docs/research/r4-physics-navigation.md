@@ -526,7 +526,8 @@ source 47 was read by the verifier, not the owner) and 32 sources not read (part
   1.25 m).
 - **GW16:** covers and props carry separate flags for "solid" and "blocks sight"; non-blocking ones are left out of the
   sight world.
-- Wave 1: R2-INT-F20 (enemy-pair counts: 576 at 24v24, 768 at 16v16v16, 432 at 12v12v12, and the legacy-cost
+- Wave 1: R2-INT-F20 (enemy-pair counts: 576 at [24v24](GLOSSARY.md#team-size-and-how-modes-are-written), 768 at
+  16v16v16, 432 at 12v12v12, and the legacy-cost
   arithmetic), R2-INT-REC2 (areas and portals, O(1) connectivity), R2-INT-REC3 (one shared visibility pass, ≤ 10 % of
   the server tick budget, [GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 5 % of the tick
   period), R2-SYNC-REC5 and REC8 (rewound shots; aim point at height), R2-INT-OQ1 (what a player may see),
@@ -1434,6 +1435,7 @@ Step 3d fixes (2026-10-30):
   at N = 54 — recommendation.
 - R4-NAV-REC4's pointer line gains R4-XT-OQ5 — nit.
 - R4-NAV-REC2's "Rests on": the stress scene replaces "R1-TICK-REC2 (the P1 scene), R1-XU-OQ1" — nit.
+- The legacy facts used for R4-LOS: "24v24" linked to GLOSSARY.md (team size, its first use; the completeness critic) — nit.
 
 ## Sources
 

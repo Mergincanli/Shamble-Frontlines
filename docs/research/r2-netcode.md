@@ -855,7 +855,7 @@ checked. Sources S1–S14 are listed in section 6. [Assembler's note: the intere
   inferred (arithmetic; not run in code, as the no-spike rule requires). The framing is look brief pending: these
   numbers are an example, not a target.
 - **R2-INT-F19.** On the legacy arena (372 m × 252 m = 93,744 m², CD21), a relevance circle of radius 28 m covers
-  2.6 % of the map, 40 m covers 5.4 % and 50 m covers 8.4 %. With 48 players spread evenly, a 40 m circle holds
+  2.6 % of the map, 40 m covers 5.4 % and 50 m covers 8.4 %. With 48 players ([GLOSSARY](GLOSSARY.md#player-count-n)) spread evenly, a 40 m circle holds
   about 2.5 of the 47 others. In the worst case, everyone fighting over the centre field (LOOP_V2 §3, §9), it holds
   all 47. Interest management therefore cuts the average per-client snapshot by roughly an order of magnitude, and
   the worst case by nothing. Only per-entity priority and rate control under a per-client byte budget bound the
@@ -864,7 +864,7 @@ checked. Sources S1–S14 are listed in section 6. [Assembler's note: the intere
   events.
   Inputs: CD21, F18, F2, F14. How sure: inferred (the sizes are illustrative, not measured).
 - **R2-INT-F20.** The cost of hiding enemies by per-pair line of sight is bounded by the enemy pairs, because
-  teammates are always relevant: 24v24 gives 24 × 24 = 576 unordered pairs, 16v16v16 gives 3 × 16 × 16 = 768, and
+  teammates are always relevant: 24v24 ([GLOSSARY](GLOSSARY.md#team-size-and-how-modes-are-written)) gives 24 × 24 = 576 unordered pairs, 16v16v16 gives 3 × 16 × 16 = 768, and
   12v12v12 gives 432. Legacy `hasLOS` measured 2.7–5.7 µs per call in JavaScript (linear over 220 static boxes, no
   broad phase). At that cost a 768-pair pass with one sample point takes 2.1–4.4 ms, and 6–13 ms with three points.
   At 20 passes/s, one point is 4–9 % of one core of the measuring machine. A Rust ray cast with a spatial index has not been measured.
@@ -3913,7 +3913,7 @@ now reads "r6:424-425 at commit 8dee746".
 
 **Changes by type.** 20 recommendation changes in step 3c (C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8,
 C6.5, C9.9, C9.10, C10.6, C10.7, C10.8, C11.9; the four p99 marks; R2-TRN-REC6 mark 2) and 17 in the step 3d fixes
-below, 37 in all; 0 number changes; 0 sources; 110 nits (94 in step 3c, 3 from the OBJECT-1 ruling, 13 in the step 3d
+below, 37 in all; 0 number changes; 0 sources; 112 nits (94 in step 3c, 3 from the OBJECT-1 ruling, 15 in the step 3d
 fixes: term renames, links, pointers, the inserted questions, the header, line wraps).
 
 Step 3d fixes (2026-10-31):
@@ -3936,6 +3936,7 @@ Step 3d fixes (2026-10-31):
 - R2-XU-OQ9 framed as before 2026-10-30, in the past tense: nit.
 - This part's totals and this list: nit (2).
 - The same credit for "design for 48+" in the Serves lines of R2-BUD-REC3, R2-BUD-REC6, R2-TRN-REC2 and R2-TRN-REC6 (`CLAUDE.md`; VISION_V2 §3 holds the modes): nit (4).
+- Glossary links at the first real uses of the player count (R2-INT-F19, "48 players spread evenly") and of a mode name (R2-INT-F20, "24v24"), from the completeness critic: nit (2).
 
 ## Sources
 

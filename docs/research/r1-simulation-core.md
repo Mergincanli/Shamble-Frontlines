@@ -1912,7 +1912,7 @@ its "Rests on:" list and the VISION_V2 items it serves.
   Rests on: F1, F4, F5, F8, F9, F10, F12, F13, F14, F17, F18, F19, F20, F21, F25, F26, F27, F28, F29, F30, F32, F35
   (plus F7 and F33 for the size marks; F34, an absence no quote can confirm, only says why mark 5 measures); the legacy
   facts (about a dozen kinds; CS7; GC2 for mark 1); VISION_V2 §4 for mark 3; R2's worked bandwidth estimate for mark
-  1's 15 big vehicles (an R2 assumption, through the stress scene).
+  1's 15 big vehicles (an R2 assumption, through [the stress scene](GLOSSARY.md#the-stress-scene)).
   Serves VISION_V2 §6.1, §6.2, §6.3, §6.4, §6.5, §6.6 and §6.8, and §4 ("matches feel fair up to about 100 ms of
   ping", which needs reproducible replay).
 
@@ -3722,6 +3722,7 @@ Step 3d fixes (2026-10-30):
 - R1-ECS-REC1's "Rests on" names R2's worked bandwidth estimate for mark 1's 15 big vehicles — nit.
 - The hash-map ban named beside the iteration-only wording: the ECS options table (deterministic order), R1-ABL-REC3
   and the pointers between R1's units — nit.
+- R1-ECS-REC1's "Rests on": "the stress scene" linked to GLOSSARY.md (the completeness critic) — nit.
 
 ## Sources
 
