@@ -53,3 +53,12 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
 - 10 parts a and b written to the map file.
 - 11 part c (shared numbers N1-N54) written.
 - 12 parts d (interfaces I-1..I-21) and e (traces: §6 1-10, LOOK_V2 every item) written.
+- 13 part f (loose ends: CF-1..5, critic items, LE-A..P) written.
+- 13b CF-4 line numbers corrected to 9e7db28 (r2:2704-2706, r6:47, 941-943, 1065-1066).
+- 14 part g (spikes: proof test, boundary, sim core, content+ability, look, render bench, preview check, asset later; order) written.
+- 14b part g coverage check by hand: added R2-TRN-REC5 dev certs + R1-ABL-REC4 (own weapons) to the proof test, R1-DET-REC7 note, R5-PREV-REC5 to later milestones. Every REC with a mark is now in a group.
+- 15 parts h (gaps G1-G21) and i (9 session items) written. Map complete. Next: final checks, then DONE.
+- 16 final checks: TSV 521 rows, every research id once, every id appears in the map text; map sections a-i present (1026 lines). Nothing committed.
+DONE
+- 17 ADDENDUM task started (part j: advisor conditions 2,3,6,7,8,10,11; Mustafa's UPGRADE-SCOPE update). Reading plan rev 3, advisor-verdicts §1, UPGRADE-SCOPE input.
+- 18 parts a-i edited (headroom -> the 60 Hz margin; N2/N3 per ruling; CF-2; LE-K; LE-P; part g proof-test and sim-core rows; part i item 1 text; 0005 a.2 and G13 upgrade wording; e pointer; i pointer); TSV notes R1-TICK-REC2, R1-TICK-OQ1 reworded (no owner change).

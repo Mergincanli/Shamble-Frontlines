@@ -4,7 +4,7 @@ R1-ECS-REC2	0004	0002	lint side is R5-RUSTLINT-REC2 (0002)
 R1-ECS-REC3	0004	0001,0002,0006	wire widths are XT rank 27 (0001)
 R1-ECS-REC4	0004		conditional on Rapier; R4-PHYS-REC1 recommends parry3d (XT rank 3)
 R1-TICK-REC1	0004	0001,0005	durations converted at load: content side 0005
-R1-TICK-REC2	0001	0004,SPIKE_PLAN	the tick rate rule: changed by TICK-30 (30 Hz baseline, 60 Hz only with >= 25 % headroom); P1/P2 sim marks are 0004, P3 replay 0001
+R1-TICK-REC2	0001	0004,SPIKE_PLAN	the tick rate rule: changed by TICK-30 (30 Hz baseline, 60 Hz only with a 60 Hz margin of at least 25 %); P1/P2 sim marks are 0004, P3 replay 0001
 R1-TICK-REC3	0004	0006	telemetry sampling cadence used by R6-TEL-REC1
 R1-TICK-REC4	0004	0001,0006	the server loop; snapshot sending after the tick is 0001; overrun metrics 0006; "15 ticks" is the 60 Hz form
 R1-TICK-REC5	0004	0001,0002,0003	Worker pacing is the tick mechanism (0004); Worker host 0002; per-frame interpolation 0003; resync 0001. Copy row at r3:771 is a reference
@@ -43,7 +43,7 @@ R1-ECS-OQ4	0004	0001,0006	one room per process (R2-ROOM-REC2); cost per room (00
 R1-ECS-OQ5	0004		
 R1-ECS-OQ6	0004		
 R1-ECS-OQ7	0004	0005	roster and ability lists decide (game-designer)
-R1-TICK-OQ1	0001	0004	60 vs 64 Hz; under TICK-30 it matters only if 60 Hz passes its headroom test
+R1-TICK-OQ1	0001	0004	60 vs 64 Hz; under TICK-30 it matters only if 60 Hz reaches the 60 Hz margin
 R1-TICK-OQ2	0004	0002	stated once with R1-BND-OQ2 (R1-XU-OQ12)
 R1-TICK-OQ3	0001		shipped tick rates (unread sources)
 R1-TICK-OQ4	0001	0004	sub-tick timestamps: live under TICK-30 (XT rank 12)

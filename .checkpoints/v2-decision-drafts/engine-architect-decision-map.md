@@ -29,8 +29,9 @@ Decides:
    Feel Lab test decides); SEC-SPREAD (a) applied (spread on an authority-only stream; tracers drawn from a cosmetic
    spread the hit corrects).
 2. **The tick rate rule:** R1-TICK-REC2's rule as TICK-30 changes it (brief §1): 30 Hz is the baseline; 60 Hz only if
-   the netcode proof test shows at least 25 % headroom. 0001 proposes what the headroom is measured against
-   (carry-forward 2; the plan's TICK-60-HEADROOM, for the advisor at the stop). Also the snapshot rate (R2-BUD-REC1),
+   the netcode proof test shows a 60 Hz margin of at least 25 % (GLOSSARY §8; the advisor's ruling, TICK-60-HEADROOM,
+   confirmed at the stop: p99 server tick time ≤ 6.25 ms against the 8.33 ms server tick budget at 60 Hz; part j, J1;
+   carry-forward 2). Also the snapshot rate (R2-BUD-REC1),
    the input rate and redundancy, time sync and command stamping (R1-TICK-OQ3, OQ4, OQ8; critic rank 12), and 60 or
    64 Hz (R1-TICK-OQ1) should 60 Hz ever pass.
 3. **The server tick budget:** its total (50 % of the tick period) and the server-only share (25 %) with every part
@@ -164,8 +165,8 @@ Decides:
 2. **The ability system** (game-designer; R1-ABL-REC1, REC2, REC5): a reduced GAS subset as data over a closed set of
    operations, weapons' own bookkeeping on the shared damage pipeline, one table per kind linked by validated ids.
    **In-match upgrades** ride on it: owned by the player (UPGRADE-SCOPE, brief §1: GAS on the PlayerState, not the
-   Pawn; picks survive death and reset at the start of every match); how a pick applies after a switch to a different
-   unit is an open question (brief §3).
+   Pawn; picks survive death and reset at the start of every match); the brief's question how a pick applies after a switch to a different unit is answered by Mustafa's
+   UPGRADE-SCOPE update (tracks survive switching; part j, J5, which replaces this item's upgrade wording).
 3. **The asset pipeline** (LOOK_V2 §8; graphics-engineer for the GPU rules): glTF/GLB in, the automated step (compress,
    build LODs, rename materials into the faction colour slots), budgets per unit (triangles, materials, textures), no
    Spline runtime; assets carry no baked look, since the engine applies it (0003). The research has no findings here
@@ -199,7 +200,7 @@ events the record is built from (0004), the content hash (0005).
 ### The seams, settled
 | # | Seam | One side decides | Other side decides | Rule |
 |---|---|---|---|---|
-| S1 | Tick | 0001: the tick rate rule under TICK-30 and the 25 % headroom base; the snapshot rate; the server tick budget's total (50 %) and the server-only share (25 %) and its parts | 0004: the fixed-tick mechanism (counter, `dt`, conversion, cadences, server loop, Worker pacing); the sim step share (25 %) and its parts; the client's sim share (40 %); determinism | 0001 adds 0004's sim step share into the total; neither restates the other's parts. R1-TICK-REC2's P1 and P2 sim marks are 0004's; P3 (prediction replay) is 0001's. |
+| S1 | Tick | 0001: the tick rate rule under TICK-30 and the 60 Hz margin (N3); the snapshot rate; the server tick budget's total (50 %) and the server-only share (25 %) and its parts | 0004: the fixed-tick mechanism (counter, `dt`, conversion, cadences, server loop, Worker pacing); the sim step share (25 %) and its parts; the client's sim share (40 %); determinism | 0001 adds 0004's sim step share into the total; neither restates the other's parts. R1-TICK-REC2's P1 and P2 sim marks are 0004's; P3 (prediction replay) is 0001's. |
 | S2 | Boundary vs protocol | 0002: the Worker, the output block's layout and versioning, the page-to-worker command posting, the generated types, the isolation flag, the Worker owning the connection, the client + local server skeleton | 0001: every message's fields and meaning, including the command, the snapshot fields the block is filled from, the events and their visibility, and the rule that the local server path uses the same messages | The block's contents derived from snapshots are 0001's fields in 0002's layout (ranks 4, 16). Whether the local server is reached through 0001's transport interface is interface I-3. |
 | S3 | CI and previews | 0002: CI, the gate v2, the preview build, the deploy job's shape, the generated header sets, the close and sweep jobs as workflows | 0006: the host, its token scope, the access wall, the cleanup policy and PREV-DELETE, the staging game server, runner costs, secrets policy | The deploy job runs what 0006's host needs; 0006 never specifies a workflow step, 0002 never a host setting. |
 | S4 | Rooms vs machines | 0001: the room lifecycle and process model, threads, tokens, reconnect, private rooms, the lobby protocol, the browser-side certificate requirement | 0006: the VMs, the supervisor, the firewall, the lobby's hosting and store, the production certificate form and issuance, rooms per VM as a cost figure, monitoring | 0001's spike measures rooms per process and per VM; 0006 turns the number into cost (R6-COST-OQ1). R2-TRN-REC5 and R2-TRN-OQ4 go to 0006 (certificates). |
@@ -227,7 +228,7 @@ or no note. A recommendation's note is its starting point only: the owner adopts
 | R1-ECS-REC3 | 0004 | 0001,0002,0006 | wire widths are XT rank 27 (0001) |
 | R1-ECS-REC4 | 0004 | - | conditional on Rapier; R4-PHYS-REC1 recommends parry3d (XT rank 3) |
 | R1-TICK-REC1 | 0004 | 0001,0005 | durations converted at load: content side 0005 |
-| R1-TICK-REC2 | 0001 | 0004,SPIKE_PLAN | the tick rate rule: changed by TICK-30 (30 Hz baseline, 60 Hz only with >= 25 % headroom); P1/P2 sim marks are 0004, P3 replay 0001 |
+| R1-TICK-REC2 | 0001 | 0004,SPIKE_PLAN | the tick rate rule: changed by TICK-30 (30 Hz baseline, 60 Hz only with a 60 Hz margin of at least 25 %); P1/P2 sim marks are 0004, P3 replay 0001 |
 | R1-TICK-REC3 | 0004 | 0006 | telemetry sampling cadence used by R6-TEL-REC1 |
 | R1-TICK-REC4 | 0004 | 0001,0006 | the server loop; snapshot sending after the tick is 0001; overrun metrics 0006; "15 ticks" is the 60 Hz form |
 | R1-TICK-REC5 | 0004 | 0001,0002,0003 | Worker pacing is the tick mechanism (0004); Worker host 0002; per-frame interpolation 0003; resync 0001. Copy row at r3:771 is a reference |
@@ -266,7 +267,7 @@ or no note. A recommendation's note is its starting point only: the owner adopts
 | R1-ECS-OQ5 | 0004 | - | - |
 | R1-ECS-OQ6 | 0004 | - | - |
 | R1-ECS-OQ7 | 0004 | 0005 | roster and ability lists decide (game-designer) |
-| R1-TICK-OQ1 | 0001 | 0004 | 60 vs 64 Hz; under TICK-30 it matters only if 60 Hz passes its headroom test |
+| R1-TICK-OQ1 | 0001 | 0004 | 60 vs 64 Hz; under TICK-30 it matters only if 60 Hz reaches the 60 Hz margin |
 | R1-TICK-OQ2 | 0004 | 0002 | stated once with R1-BND-OQ2 (R1-XU-OQ12) |
 | R1-TICK-OQ3 | 0001 | - | shipped tick rates (unread sources) |
 | R1-TICK-OQ4 | 0001 | 0004 | sub-tick timestamps: live under TICK-30 (XT rank 12) |
@@ -715,15 +716,15 @@ or no note. A recommendation's note is its starting point only: the owner adopts
 Every number below is used by more than one draft. The owner states it; every other draft cites the owner (and the
 research line) and never restates it differently. Values are the research's (cited), arithmetic on them (shown), or a
 settled input. N = 48 everywhere (MODES-3 (a), brief §1; carry-forward 3: where a research mark gives 48 and 54, 48
-holds). The 30 Hz column is the baseline (TICK-30); the 60 Hz column is kept only where the headroom test needs it
+holds). The 30 Hz column is the baseline (TICK-30); the 60 Hz column is kept only where the 60 Hz margin run needs it
 (carry-forward 2). "p99" unless named otherwise ([GLOSSARY: time statistics], GLOSSARY.md:141).
 
 ### c1. Tick and server budgets
-| # | Number | 30 Hz (baseline) | 60 Hz (headroom test only) | Source | Owner | GLOSSARY term |
+| # | Number | 30 Hz (baseline) | 60 Hz (the 60 Hz margin run only) | Source | Owner | GLOSSARY term |
 |---|---|---|---|---|---|---|
 | N1 | Tick period | 33.3 ms | 16.7 ms | arithmetic, 1 / rate (GLOSSARY.md:82-96) | 0001 (the rate), 0004 (the constant) | tick period |
-| N2 | Tick rate | 30 Hz | only if the netcode proof test shows ≥ 25 % headroom | brief §1 (TICK-30), replacing R1-TICK-REC2's rule (r1:2061-2062) | 0001 | tick period |
-| N3 | 60 Hz headroom base (what 25 % is measured against) | n/a | proposed in the plan (TICK-60-HEADROOM): the stress scene with a snapshot-receiving client on every soldier, one vCPU of the reference server, p99 server tick time at 60 Hz ≤ 75 % of the 8.33 ms server tick budget (arithmetic: 1 − 0.25), re-flood ticks included | brief §1; plan.md "Decisions for you"; carry-forward 2 | 0001 (the advisor confirms at the stop) | the server tick budget |
+| N2 | Tick rate | 30 Hz | only if the netcode proof test shows a 60 Hz margin of at least 25 % (N3); otherwise 30 Hz | TICK-30 (brief §1), replacing R1-TICK-REC2's rule (r1:2029; the rule at r1:2061-2062), r2:2415-2416 and GLOSSARY:85 | 0001 | the 60 Hz margin (GLOSSARY §8) |
+| N3 | The 60 Hz margin | n/a | 1 − (p99 server tick time at a 60 Hz tick ÷ 8.33 ms) ≥ 25 %, so p99 ≤ 6.25 ms; setup: one vCPU of the reference server, the stress scene at N = 48 with a snapshot-receiving client on every soldier, R2-BUD-REC6's 30-minute soak, re-flood ticks included; plus every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3); measured in one run, never summed from parts | the advisor's ruling TICK-60-HEADROOM (advisor-verdicts.md §1, condition 2), confirmed by Mustafa and the Advisor at the stop; carry-forward 2 | 0001 | the 60 Hz margin (GLOSSARY §8) |
 | N4 | Server tick budget (total) | 16.7 ms (50 %), max under one tick period, zero overruns | 8.3 ms | R2-BUD-REC6 (r2:2398-2419); R1-TICK-REC2 P1 (r1:2044-2053); GLOSSARY.md:167-188 | 0001 | the server tick budget |
 | N5 | Sim step share | 8.3 ms (25 %) | 4.2 ms | R1-TICK-REC2 P1 (r1:2044-2053); GLOSSARY.md:189-213 | 0004 | the sim step share |
 | N6 | Server-only share | 8.3 ms (25 %) | 4.2 ms | R2-SYNC-REC9, R2-BUD-REC6 (r2:2398-2419); GLOSSARY.md:189-213 | 0001 | the server-only share |
@@ -838,7 +839,7 @@ What crosses each seam, who defines it ("owner"), and who uses it. A draft that 
 
 Recommendations that trace only to VISION_V2 §3 or §4 (R2-BUD-REC4, REC5, R2-TRN-REC6, R3-WGPU-REC2, REC4,
 R3-GL2-REC3, R3-BUDGET-REC1, R3-MEASURE-REC3; R2-XU-OQ18): whether that is trace enough under plan rule 4 is the
-Advisor's (part f, LE-G). Spatial audio traces to LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 (punchy weapons
+Advisor's (part f, LE-G; the session's reading is recorded in part j, J3). Spatial audio traces to LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 (punchy weapons
 through VFX, sound and feedback), which rule 4 accepts.
 
 ### e2. LOOK_V2 (every `[DECIDED]` and `[DEFAULT]` item; the `[OPEN]` item stays open)
@@ -879,3 +880,150 @@ through VFX, sound and feedback), which rule 4 accepts.
 | §8 | DEFAULT | budgets per unit (triangles, materials, textures); never Spline's runtime | 0005 a.3 (graphics-engineer), derived from 0003's totals (N45–N47) | R3-BUDGET-REC2, R3-CHAR-REC1 (totals and per-soldier draws only) |
 | §8 | OPEN | the tree style | stays open: 0003 lists it as an open question for Mustafa; 0005 notes that tree assets wait for it | |
 | §9 | (requirement) | the rendering draft shows how each `[DECIDED]` item is achieved; its look proof test is judged by Mustafa in the browser, side by side with legacy screenshots | 0003 a.8; SPIKE_PLAN | |
+
+## f. Loose-ends register
+
+Each item: where it is resolved, or which draft lists it as an open question, and how. `docs/adr/README.md` carries
+the final register (plan step 6); "OQ" means the owner draft's numbered open question (plan rule 7).
+
+### f1. STATUS's five carry-forwards
+| Code | Item | Resolved in / listed by | How |
+|---|---|---|---|
+| CF-1 | Verify every ADR claim and number, R3–R6 included (research plan condition 9; the advisor's #28 review, finding 4) | plan steps 7 and 9 (every draft's claims ledger) | each draft keeps a claims ledger; the verifier checks every claim and number; unreadable sources make the claim "unverified" and the decision an OQ or a spike mark |
+| CF-2 | R2-BUD-REC6's reason (r2:2402-2403) holds at N = 54, not at N = 48: at 60 Hz the re-flood tick fits by 0.05 ms (8.28 of 8.33) while its server-only share is 0.24 ms over (4.41 of 4.17); restate for 30 Hz and say what the 60 Hz margin is measured against | 0001 (owner of R2-BUD-REC6) | states the corrected reason in its own text, citing r2:2402-2403 as the superseded line; restates the budget at 30 Hz (N4–N10: 9.18 of 16.67 ms, 10.18 on a re-flood tick); states the 60 Hz margin as the advisor ruled it (N3; TICK-60-HEADROOM, confirmed at the stop) and adds "(at N = 54, MODES-3 (b))" where it restates r2:2402-2403; 0004 cites for the sim step share |
+| CF-3 | Use 48 where a mark gives 48 and 54; where a sentence says "until … answers", the answer applies | every draft; checked in the consistency pass (plan step 8) | part c uses 48 throughout; each draft's Appendix A notes the answered code (MODES-3 (a), PREVIEW-WALL (a), SEC-SPREAD (a), BASELINE-WHEN (b)) where a research sentence still waits |
+| CF-4 | R6-HOST-REC4 recommends a certificate per hostname; four sentences still call the wildcard R6's proposal (STATUS cites them at b6effde as r2:2703-2705, r6:47, 938-940, 1056; at 9e7db28 they are r2:2704-2706, r6:47, r6:941-943, r6:1065-1066) | 0006 (owner of R6-HOST-REC4, R2-TRN-REC5, R2-TRN-OQ4) | states the per-hostname position (BASELINE-WHEN (b)), lists the four lines as superseded with the corrected text; the wildcard stays an option the security baseline weighs; 0001 cites |
+| CF-5 | No doc defines "the netcode proof test" or "the foundation"; the drafts' plan names the research spike the proof test is | brief §2 (the Advisor's definitions); GLOSSARY §8 (plan GLOSSARY-8); SPIKE_PLAN; 0001 (owns the proof test); 0002 (the foundation is its migration plan) | GLOSSARY §8 quotes brief §2; part g names the research spikes the proof test subsumes |
+
+### f2. The critic's remaining items and the answered escalations
+| Code | State | Resolved in / listed by | How |
+|---|---|---|---|
+| ABL-PREDICT | open (Mustafa, after a Feel Lab test on the Molotov and the Shield) | 0001 OQ (the prediction scope); 0005 cites | 0001 lists it with both readings (GLOSSARY: the prediction scope); 0005's ability system carries both (own ability state replayable, or presses wait for confirmation); the Feel Lab test is a later test in SPIKE_PLAN, not a pre-acceptance spike (LE-N) |
+| PREV-DELETE | a spike item | 0006; SPIKE_PLAN (the preview hosting check) | the check deletes a branch's latest deployment on a test project; a failure may send the client host back to Workers static assets (GLOSSARY: the client host) |
+| MODES-3 (a) | answered: totals; largest mode 24v24, N = 48 | 0001 (code owner); every draft applies it | N = 48 in every mark; the test-mode list reads (a) |
+| PREVIEW-WALL (a) | answered: previews that reach the staging game server are private from the first one | 0006; 0002 cites | 0006 sets the access wall on the host for multiplayer previews; offline previews stay public but unlisted, behind the wall if they carry unreleased art (GLOSSARY: the access wall) |
+| SEC-SPREAD (a) | answered: server-only spread | 0001; 0004 and 0003 cite | spread drawn from an authority-only stream (0004, R1-DET-REC4); tracers drawn from a cosmetic spread that the hit event corrects (0003); no client-held hash covers it (GLOSSARY: state hash) |
+| BASELINE-WHEN (b) | answered: listed open in ADR 0006 with interim positions; researched before the first online playtest, in its own fresh session | 0006 | interim positions: R5-GATE-REC1's scheduled advisories check (also on every `Cargo.lock` change); a certificate per hostname; the items waiting on it are R6-SEC-OQ1's list and critic rank 18 (R2-ROOM-OQ2 key storage, R2-ROOM-OQ11, R5-GATE-OQ4, R5-TSLINT-OQ5, R1-RR-OQ7, R1-DATA-REC7's allow list, COOP as an XS-Leaks guard) |
+| XT (28 ranks, 72 ids) | open cross-topic questions | owners in part b (the XT table) | each owner answers it or lists it as an OQ; the citing drafts reference that answer; "ADR-0004 (boundary)" reads 0002 |
+| XU (30 ids: R1-XU 12, R2-XU 18) | settled ones (R1-XU-OQ1, OQ5, OQ6; R2-XU-OQ8, OQ9, OQ10, OQ13) and open ones | owners in part b | settled: the owner records "answered (where)"; open: the owner picks one value and one mark, or lists an OQ with the spike that decides it |
+| PR #28 finding 2 | R2-BUD-REC6's reason (r2:2402-2403) | 0001 | the same item as CF-2 |
+
+### f3. Loose ends this map found (for the register)
+| Code | Item | Resolved in / listed by | How |
+|---|---|---|---|
+| LE-A | The critic's XT texts put the boundary in ADR 0004; the plan puts it in 0002 | this map | ranks 2, 4, 16, 37 read "0002" for the boundary part |
+| LE-B | One budget, two statistics: the page's cost of the sim is p99 ≤ 1.0 ms in R3-BUDGET-REC2 (r3:1127) and a p95 frame-time difference ≤ 1.0 ms in R1-BND-REC1 mark 1 (r1:2258-2260) | 0003 owns the number (N12); 0002 cites | test-engineer's pass marks state both statistics or pick one, with the reason |
+| LE-C | R1-TICK-REC4's and REC5's "15 ticks" are the 60 Hz form of 0.25 s | 0004 | restated at 30 Hz as game time (0.25 s), the tick count rounded and marked proposed |
+| LE-D | "36,000 ticks per run" is 10 minutes at 60 Hz and 20 minutes at 30 Hz (R1-TICK-REC1, REC2 P1) | 0004 | each mark says game time and ticks |
+| LE-E | R2-TRN-REC1 mark 2's load (60 input datagrams/s, 1,000 B snapshots) are placeholders at the 60 Hz form | 0001 | restated at 30 Hz with the command size R2-XU-OQ4 picks |
+| LE-F | Brief §2's "100 ms of simulated latency" does not say round trip or one way; R2's P2 is 100 ms round trip, ±20 ms, 2 % loss | 0001 (N54) | names the profile the human client runs; VISION_V2 §4 says "ping" (part i) |
+| LE-G | Trace rule: recommendations serving only VISION_V2 §3 or §4 (R2-XU-OQ18 and R3's "no §6 item" lines) against plan rule 4 (§6, LOOP_V2, EDITOR_V2, LOOK_V2) | 0001 lists R2-XU-OQ18; every draft cites | the Advisor decides whether a §3 or §4 target is trace enough (part i) |
+| LE-H | R7-MARKS (a): 118 inventory rows are "look brief pending"; LOOK_V2 now exists | 0003 (look pipeline, characters, presentation rows); 0005 (asset and building-kit rows) | each lists the rows whose mark it would change; `docs/LEGACY_INVENTORY.md` changes only after Mustafa accepts the drafts |
+| LE-I | SLICE-ORDER's slice 2 ("played locally") and condition 1 (client + local server) partly answer the offline-play questions (R1-BND-OQ1, R1-TICK-OQ7, rank 15) | DESIGN; 0002 and 0004 cite | the drafts build local play with bots from slice 2; whether offline play ships, and at the largest mode on the minimum laptop, stays Mustafa's |
+| LE-J | Plan rule 8's script counts owner dispositions in the six drafts only; 38 ids are DESIGN | the session (part i) | proposal: `docs/adr/README.md` lists them under "design questions for Mustafa" and the script counts that list as their owner; citing drafts dispose them as "design question, cited" |
+| LE-K | The netcode proof test runs before the foundation, so its sim is a throwaway stand-in; the server tick budget is "tested in the stress scene" (GLOSSARY.md:167-188) | 0001 with test-engineer (part i) | answered (part j, J6 (2)): 0001 proposes how the stress scene's sim load reaches the 60 Hz margin run and lists it for the Advisor (TICK-60-SETUP); the margin is measured in one run, never summed |
+| LE-L | The plan's authorship table gives 0001 "R6-HOST (servers)"; this brief's seam puts machines and certificates in 0006 | this map | the map follows the seam: every R6-HOST id, R2-TRN-REC5 and R2-TRN-OQ4 are 0006's; 0001 cites them |
+| LE-M | R2-INT-REC3's visibility pass is an 0001 id, but its 5 % is a part of the sim step share | this map | the id is 0001's; the number is 0004's (N7) |
+| LE-N | ABL-PREDICT's Feel Lab test needs abilities in the engine, so it cannot be a phase 0 spike | SPIKE_PLAN | listed as a later test with its trigger (abilities playable, slice 4), alongside the other Feel Lab weighings (R2-SYNC-OQ2's rewind cap feel, R2-SYNC-OQ6's projectile prestep) |
+| LE-O | The stress scene's counts are proposals until the game-designer sets caps (R2-BUD-OQ5) | SPIKE_PLAN (N52); DESIGN for the caps | the spike plan holds the counts once; drafts cite GLOSSARY and the spike plan |
+| LE-P | R1-TICK-REC2's decision rule ("60 Hz if P1–P3 pass at 60 Hz") is replaced by TICK-30 | 0001 | records R1-TICK-REC2 as "changed (TICK-30)", keeping P1–P3 as marks at 30 Hz and at 60 Hz for the 60 Hz margin run |
+
+## g. The spike candidates
+
+Every "what a spike must prove" in the research's recommendations, grouped into a proposed small set. Working names
+only (SPIKE_PLAN defines the names, the pass marks come from test-engineer in plan step 4, the sizes from the
+synthesis). Spikes are throwaway, in `spikes/`, exempt from the legacy constraints (SPIKE-SCOPE (a)), and none starts
+before Mustafa and the Advisor approve the drafts (brief §4). "Subsumes" lists the recommendations whose marks the
+spike carries, then the open questions it decides.
+
+| Spike (working name) | Proves | Subsumes | Owner | Depends on | Place in the order |
+|---|---|---|---|---|---|
+| **The netcode proof test** (brief §2) | the Rust sim native as a server and as Wasm in the client; WebTransport with the WebSocket fallback; 48 simulated clients at a 30 Hz tick within 0001's server tick time, bandwidth per client and memory per room; one human client at 100 ms (N54) sees prediction, reconciliation and lag-compensated hits that look correct; the 60 Hz margin run (N2, N3) | R2-SYNC-REC1, REC2, REC3, REC4, REC5, REC8 (if aiming at height is in the load), REC9; R2-BUD-REC1–REC6; R2-TRN-REC1–REC4, REC6, and REC5's development certificates (self-signed, pinned; the production form is later, with R6-HOST-REC4); R1-ABL-REC4 (own weapons only; own abilities wait for ABL-PREDICT); R2-ROOM-REC2 (marks 1, 3, 5, 6; marks 2 and 4 for rooms per VM); R2-INT-REC1, REC4 (only if the bandwidth mark uses the interest filter); R2-SYNC-REC6 (only if the load has live projectiles: LE-K); R1-TICK-REC2 P1 at 30 and 60 Hz, P3; R1-TICK-REC4; R1-BND-REC6; R5-TEST-REC4 (L1, L2), REC5 (bots as protocol clients); R6-HOST-REC2 (CCX23 and CX33); R6-COST-REC1 (rooms per VM, egress per match-hour, the bill); R6-OBS-REC1 (logging cost), REC2 (metrics). Decides: R2-SYNC-OQ2 (the numbers), OQ3; R2-BUD-OQ3, OQ9, OQ10; R2-TRN-OQ1, OQ3, OQ5, OQ8; R2-ROOM-OQ1; R2-XU-OQ2, OQ5, OQ6, OQ7; R1-TICK-OQ5; R6-COST-OQ1; carry-forward 2 | 0001 | the drafts approved; the reference server orderable (R6-HOST-OQ1); a throwaway sim with movement, hitscan and bots as protocol clients, native and Wasm (shared with the boundary spike's client and the sim core spike); the four browsers (Safari needs a macOS machine); the network profiles named (N27) | first: before the foundation (brief §1, SLICE-ORDER condition 3) |
+| **The Rust ↔ TypeScript boundary spike** | one module Worker; the output block (B2, with B3 measured); commands posted; generated types with the layout hash; the isolation flag; four browsers; Worker pacing, smoothness on 60, 120 and 144 Hz displays, hidden tabs; the page's frame time with the sim in the Worker at N = 12, 24, 36, 48; the client's sim share on the minimum laptop | R1-BND-REC1–REC5; R1-TICK-REC5; R1-TICK-REC2 P2 (with the sim core spike's load); R5-LAYOUT-REC3, REC5; R6-OBS-REC3 (a Wasm trap reaching Sentry, if Sentry is set up). Decides: R1-BND-OQ2, OQ3 (core count recorded), OQ6; R1-XU-OQ3, OQ4; R1-TICK-OQ2; R1-DATA-OQ8; R1-RR-OQ5 (size measured), OQ6; critic ranks 4 (the implementation side) and 37 | 0002 | the minimum laptop named (0003, N41); a stand-in sim in Wasm; shares the client harness with the netcode proof test | with the netcode proof test, before the foundation (its result fixes the skeleton the foundation builds; the brief fixes only the proof test's place: part i) |
+| **The sim core spike** | sim step time in the stress scene on the reference server and in Wasm; snapshot and fidelity; ids; cross-target identity with per-tick hashes; RNG streams; parry3d queries, movement parity, cost, size; navigation bake, coverage, gaps, reachability, path queue, avoidance; floors and links; sight queries; moving obstacles and structure states | R1-ECS-REC1–REC3 (REC4 only if Rapier comes back); R1-TICK-REC1, REC2 (P1 and P2 sim marks), REC3, REC6; R1-DET-REC1–REC6 (R1-DET-REC7 has no mark of its own: it stands or falls with REC1–REC6); R4-PHYS-REC1–REC5; R4-NAV-REC1–REC4; R4-FLOORS-REC1–REC3; R4-LOS-REC1–REC3; R4-OBST-REC1, REC2 (REC3 only if tiling is needed); R1-ABL-REC6 (with the content spike); R2-SYNC-REC6 mark 1 (trajectory bit-identity); R5-TEST-REC2; R5-LAYOUT-REC4. Decides: R1-ECS-OQ1, OQ4, OQ5; R1-DET-OQ1, OQ2, OQ4, OQ8, OQ10; R1-TICK-OQ9; R1-RR-OQ1; R4-PHYS-OQ2–OQ4; R4-NAV-OQ1–OQ3; R4-LOS-OQ5; R4-OBST-OQ4; critic rank 3 | 0004 | the reference server and the minimum laptop; a 3D greybox (DM_Tri-sized, N52); bot behaviour enough for "full AI" (a research gap, part h); the stress scene's counts (SPIKE_PLAN) | in parallel with the netcode proof test; its sim (or step times calibrating a stand-in) reaches the 60 Hz margin run inside one proof-test run, never summed (TICK-60-SETUP, part j, J6 (2)); before slice 1 |
+| **The content and ability spike** | the legacy weapons and the three T1 abilities run from data with no ability-specific Rust code; a new combination by data only; the §6.4 primitives (an effect removed when its source dies; marking); number changes need no code; the JSON corpus, fuzzing with zero panics, the generated schema, migrations, hot reload within 1 s, the bundle hash, server-side validation, the legacy import; in-match upgrade picks survive death and reset at match start (UPGRADE-SCOPE; mark to be written by test-engineer, no research mark) | R1-ABL-REC1, REC2, REC3 (with the sim core spike), REC5, REC6; R1-DATA-REC1–REC8; R5-TEST-REC3 (goldens). Decides: R1-DATA-OQ2, OQ4, OQ5, OQ9; R1-ABL-OQ7; R1-RR-OQ2, OQ3 (zero panics); R1-XU-OQ7 | 0005 | the sim core spike's throwaway sim; `docs/legacy-tuning.json`; LOOP_V2 §5's T1 abilities | after the sim core spike; before slice 1 (weapons are data from slice 1) |
+| **The look proof test** (LOOK_V2 §9) | how each LOOK_V2 `[DECIDED]` item looks, judged by Mustafa in the browser side by side with legacy screenshots; each candidate technique's GPU time and memory alone, on both reference machines and both backends; both outline families at 12, 24 and 48 soldiers; backend parity; no first-sight shader stutter; the backend reported (and Brave's backend on Mustafa's machine) | R3-LOOK-REC1–REC3; R3-WGPU-REC1, REC3, REC4; R3-GL2-REC1, REC3; R3-BUDGET-REC1 (the machines named); R3-MEASURE-REC1, REC4. Decides: R3-WGPU-OQ1–OQ3; R3-GL2-OQ1, OQ3; R3-LOOK-OQ1, OQ3, OQ4, OQ6; R3-BUDGET-OQ3; R3-MEASURE-OQ1, OQ3 | 0003 | LOOK_V2; both reference machines; Mustafa's time in Brave; a few hand-made test assets (a soldier, a building with an interior, a vehicle, props), since the asset pipeline is not researched yet | in parallel with the netcode proof test (no shared dependency); before any art production and before slice 1's renderer |
+| **The render budget bench** (may merge into the look proof test) | the budget table in the benchmark scene with the techniques the look test keeps: characters at N = 48 on screen, the four very large units, the Firefox WebGL 2 worst case, quality tiers, the CI split, audio in the benchmark fight | R3-CHAR-REC1–REC4; R3-BUDGET-REC2, REC3; R3-GL2-REC2; R3-MEASURE-REC2, REC3; R3-AUDIO-REC1–REC4; R3-WGPU-REC2 (upgrade check, later). Decides: R3-CHAR-OQ1, OQ2, OQ4, OQ6; R3-BUDGET-OQ2, OQ5, OQ6; R3-AUDIO-OQ1, OQ2, OQ6 | 0003 | the look proof test's techniques; the boundary spike's block (per-instance data from it); a recorded match for the benchmark scene (the sim core spike's determinism, or a synthetic recording) | after the look proof test and the boundary spike; before slice 1's renderer work |
+| **The preview hosting check** (small) | PREV-DELETE: a closed PR's preview really disappears; the header sets on 100 % of responses; `crossOriginIsolated` true only with the isolation flag; the bundle served immutable; the 25 MiB limit; the environment URL on the PR page | R6-HOST-REC1; R5-PREV-REC2, REC3 (the 24 h mark), REC4's header check. Decides: PREV-DELETE (R5-PREV-OQ2); R5-PREV-OQ5, OQ6 | 0006 | Mustafa's Cloudflare account and a test project (secrets are Mustafa's to add); a static page with a `.wasm` | before the foundation's preview step (a failure sends the host to Workers static assets) |
+| **The asset spike** (later) | the asset pipeline once researched: compression, LODs, slot renaming, per-unit budgets, the loader on both backends | none in R1–R6 (part h); ASSET-RESEARCH (a) researches it first | 0005 | the asset research; the look proof test's results | before the first authored model enters the game |
+
+Not throwaway spikes (proven elsewhere, owner in brackets):
+- **The foundation's own acceptance checks** (0002): R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4;
+  R5-RUSTLINT-REC1–REC6; R5-TEST-REC1, REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4; R5-GATE-REC1–REC4; R1-BND-REC4's CI
+  checks. The foundation ends when an empty scene runs through the full stack with CI green and a preview link
+  (brief §2), so these marks are its milestones, not a spike's.
+- **Later milestones** (phase 1 slices): R2-ROOM-REC1, REC3–REC8 and R2-INT-REC2, REC3, REC5–REC7 (slice 3, online;
+  REC3's visibility pass with the bots of slice 2); R2-SYNC-REC6, REC7 (projectiles and vehicles, when they enter);
+  R6-HOST-REC3 and R5-PREV-REC5's access wall (the first multiplayer preview, PREVIEW-WALL (a)); R6-HOST-REC4, R6-OBS-REC3, REC4 (before the first online playtest,
+  with the security baseline); R6-TEL-REC1–REC3, R6-COST-REC2 (slice 4, the loop); R1-DATA-REC5's editor reload
+  (slice 5); R4-OBST-REC3 (only if tiling is needed); the Feel Lab tests (ABL-PREDICT; R2-SYNC-OQ2's feel weighing;
+  R2-SYNC-OQ6) once abilities and projectiles are playable (LE-N).
+
+The proposed order: (0) drafts approved → (1) in parallel: the netcode proof test, the boundary spike, the sim core
+spike, the look proof test, the preview hosting check → (2) the foundation (phase 1: restructure, toolchain, CI gate
+v2, private previews, generated types, the client + local server skeleton) → (3) the content and ability spike and the
+render budget bench, before slice 1 → (4) slices 1–6 (SLICE-ORDER), the asset spike before the first authored model.
+The research spike the netcode proof test is (CF-5): the union of R2-BUD-REC6's spike (the server tick budget in the
+stress scene with a snapshot-receiving client on every soldier), R2-SYNC-REC9's (48 clients), R2-TRN-REC1's and
+REC3's (both transports, interop and load), R2-ROOM-REC2's (a room holds its tick; memory) and R1-TICK-REC2's P1 and
+P3, with R2-SYNC-REC3 and REC5's marks for the one human client.
+
+## h. Research gaps
+
+What a draft must decide where R1–R6 have no finding, and what plan rule 2 makes of it (a claim the research does not
+support is dropped, becomes an open question, or becomes a spike mark). Counts are greps of `docs/research/r*.md` at
+9e7db28.
+
+| # | Gap | What the research has | Owner | Rule 2 makes it |
+|---|---|---|---|---|
+| G1 | The asset pipeline: texture and mesh compression (KTX2, Basis, meshopt, Draco: 0 hits), LOD generation, Spline export checks, renaming materials into faction colour slots, the glTF/GLB loader on both backends (R3's 12 glTF hits concern skinned instancing), per-unit budgets (triangles, materials, textures) | totals only: R3-BUDGET-REC2 (N44–N46), R3-CHAR-REC1's 4 draws per soldier per pass, R3-CHAR-REC4's very large units (N47) | 0005 (graphics-engineer for the GPU rules) | open questions, researched before the asset spike (the plan's ASSET-RESEARCH (a), pending the advisor); per-unit budgets either arithmetic on N45–N47 (shown) or marked proposed with the reason |
+| G2 | Halftone flashes and ink line boil (LOOK_V2 §7 `[DEFAULT]`) | none (0 hits) | 0003 | built as defaults; the technique an OQ; its cost a proposed mark in the look proof test, measured like R3-LOOK-REC1 |
+| G3 | Roof fade (LOOK_V2 §4 `[DEFAULT]`) | legacy GW17 (the cutaway), R2-INT-REC2 and critic rank 39 (it follows the server's visibility rule); R3-WGPU-REC3 names the cutaway's blend-state variant; no rendering technique | 0003 (with 0001, 0004) | OQ for the technique and its interaction with the ink pass; a look-test mark; the visibility rule stays R2-INT-OQ1 (DESIGN) |
+| G4 | Damage stages: intact → damaged → ruin with the interior exposed; debris and planks as routes (LOOK_V2 §4 `[DEFAULT]`) | R4-OBST-REC2 bakes two states and a ruin's shape; R4-PHYS-REC2's alive flag; legacy ruins sink to 15 % of their height (r4:579) | 0004 (states), 0005 (stage definitions, assets per stage), 0003 (drawing) | the third state and per-stage assets are OQs; extending the two-state flip to three is a proposed mark in the sim core spike |
+| G5 | Visual effects: fragments, muzzle flashes, tracers, impacts, debris; the effect pools | R3-BUDGET-REC2's effects row (≤ 2 ms Low, ≤ 1 ms High) and R3-BUDGET-REC3's effect caps; particles appear only as option F-B's example (r3:797) | 0003 | the budget row stands; the technique is an OQ (F-A applies: nothing WebGPU-only without a fallback) |
+| G6 | The grenade concussion shake (LOOK_V2 §2) | legacy behaviour; presentation randomness off the sim (R1-DET-REC4) | 0003 | port the legacy behaviour as the default (the inventory's port-to-TypeScript rows); nothing to research beyond the blast event (I-20) |
+| G7 | Soft shadows and the lighting model: warm sun, cool shadows, moods per map (LOOK_V2 §2, §6.5) | R3-BUDGET-OQ6: the shadow technique was not researched; r186 removed `PCFSoftShadowMap` from WebGPURenderer (R3-WGPU-F3) | 0003 | OQ; a look-test mark against the shadow-pass row (N44) |
+| G8 | Inner lines thinner than the silhouette ink (LOOK_V2 §6.2) | R3-LOOK-OQ2 covers the width model only | 0003 | OQ; look-test mark |
+| G9 | Vegetation and "lush" environments; mesh LOD for PA's principle (LOOK_V2 §1, §5) | R3-CHAR-OQ4 (BatchedMesh or InstancedMesh for props); only animation LOD researched (R3-CHAR-REC2); 0 hits for foliage | 0003 with 0005 | OQs (the tree style itself stays `[OPEN]`) |
+| G10 | Bot behaviour: three-team fights, buying, escorting and hunting harvesters, carrying and stealing uplinks, the role mix (LOOP_V2 §10) | navigation and sight (R4), cadences (R1-TICK-REC3), legacy GN rows; 0 hits for an AI architecture | 0004 | OQ; the stress scene's "bots with full AI" needs a stated behaviour set (a proposed spike condition) |
+| G11 | Moment recognition (VISION_V2 §6.8) | R6-TEL-REC1 stores moments as tagged events; thresholds are R6-TEL-OQ3 (DESIGN); nothing on the mechanism | 0004 (the phase), 0005 (the rule format) | stated at §6.8's level (a sim phase reading the event stream, as R6-TEL-REC1 asks); the rule format an OQ |
+| G12 | Economy and objectives as sim phases (VISION_V2 §6.5, LOOP_V2 §3–§4) | cadences (R1-TICK-REC3), visibility classes (R2-INT-REC5), legacy GE rows | 0004 with 0005 | stated at LOOP_V2's level; numbers in 0005's tables; rules stay LOOP_V2's |
+| G13 | In-match upgrade tracks (UPGRADE-SCOPE as Mustafa updated it: part j, J5) | the settled input only; 0 research findings | 0005 (game-designer; carriers per J5) | the shape is settled (tracks per unit and weapon type on the player, surviving death and switching: the old unit-switch question is answered); carry slots, ammo for looted weapons and levelling speed are OQs for Mustafa (J5) |
+| G14 | Service points and account persistence (LOOP_V2 §8: the prototype records Service points; VISION_V2 §6.10 `[LATER]`) | R2-ROOM-REC8 (guest identity), R2-ROOM-OQ9 (where the lobby stores guest ids) | 0006 | OQ (no store is built before §6.10 is due) |
+| G15 | The Feel Lab tool (LOOP_V2 §7: live tuning of the feel kit) | R1-DATA-OQ12 notes the Feel Lab covers client feel data; no research on the tool | 0005 (feel-kit data), 0003 (presentation) | OQ |
+| G16 | The HUD and menus on the page (war-room UI) | legacy PG and GP rows (port to TypeScript); no v2 research | 0003 | stated as the page's DOM layer, ported per the inventory rows; no engine feature beyond that |
+| G17 | The Wasm size budget | no number (R1-ECS-OQ1, R1-RR-OQ5) | 0002 | the boundary and sim core spikes measure it; the budget is set from the number, under N37's 25 MiB host limit |
+| G18 | Aim help onto bodies (LOOP_V2 §9 `[OPEN]`, technical) | R2-SYNC-REC8: if aim help exists, the server applies it (r2:2251-2252); no technique researched | 0001 | OQ, only if aim help is adopted |
+| G19 | Map size (LOOP_V2 §9 `[OPEN]`) | R4-PHYS-REC5 (f32 to 2 km), R2-BUD-OQ4 (position bits to ±327 m and 41 m of height) | 0004, 0001 | stays open; each draft states the limit its choice holds to |
+| G20 | Camera framing and what a player may see (R2-INT-OQ1, OQ2; R3-CHAR-OQ5; R3-AUDIO-OQ3) | the research left them to the look brief; LOOK_V2 does not set them | DESIGN | stays open (Mustafa); the drafts keep the camera as data (R2-INT-REC1) |
+| G21 | The security baseline | deferred by decision (BASELINE-WHEN (b)) | 0006 | listed open with interim positions; researched before the first online playtest |
+
+## i. For the session: what the plan or the brief leaves unclear
+
+All nine were answered on 2026-10-31: part j, J6.
+
+1. **DESIGN ids and the coverage script (LE-J).** Plan rule 8 counts owner dispositions in the six drafts only; 38 ids
+   are pure design questions. Proposal: `docs/adr/README.md` lists them as "design questions for Mustafa" and the
+   script counts that list as their owner. The session (or the advisor) confirms.
+2. **The netcode proof test's sim load (LE-K).** It runs before the foundation, so its sim is a stand-in. Is its
+   server tick mark set on the full stress scene with stand-in systems, or on its own load with the sim core spike's
+   sim step time added for the 60 Hz decision? This matters for the 60 Hz margin. 0001 with test-engineer
+   proposes; the advisor confirms with TICK-60-HEADROOM.
+3. **"100 ms of simulated latency" (LE-F, N54).** Round trip (VISION_V2 §4 says "ping") or one way; and which R2
+   profile (P2 is 100 ms round trip, ±20 ms, 2 % loss). 0001 states it; the Advisor wrote the definition, so the
+   report should ask.
+4. **The trace rule for §3 and §4 targets (LE-G, R2-XU-OQ18).** Plan rule 4 lists §6, LOOP_V2, EDITOR_V2 and LOOK_V2;
+   several adopted-looking recommendations trace only to VISION_V2 §3 or §4 (performance, browsers, fairness). The
+   Advisor decides whether that is trace enough; until then each draft names the §3 or §4 target and flags it.
+5. **Which spikes must precede the foundation.** The brief fixes only the netcode proof test. The map proposes the
+   boundary spike, the sim core spike, the look proof test and the preview hosting check in parallel with it, and the
+   content and ability spike and the render budget bench before slice 1 (part g). The spike plan proposes; the
+   Advisor confirms.
+6. **The plan's authorship table vs this brief's seams (LE-L).** The table lists "R6-HOST (servers)" under 0001; the
+   seam puts machines and certificates in 0006. The map follows the seam; the plan's table may want the same words.
+7. **The stress scene's owner (N52, LE-O).** The map makes SPIKE_PLAN its owner (a fixture every spike shares, counts
+   held once). If the session prefers a draft, 0004 is the natural one (the sim builds the scene).
+8. **The Feel Lab tests (LE-N).** ABL-PREDICT waits for one, but it needs abilities in the engine, so it cannot be a
+   phase 0 spike. The map lists it as a later test (slice 4); the Advisor may want it earlier with a stand-in.
+9. **ASSET-RESEARCH and TICK-60-HEADROOM** are still with the advisor (plan "Decisions for you"); parts c (N3), g (the
+   asset spike) and h (G1) assume the plan's recommendations, (a) and "confirm at the stop".

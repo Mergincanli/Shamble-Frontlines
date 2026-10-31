@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 18:45 Amsterdam
+- **Last update:** 2026-10-31 18:52 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -14,15 +14,19 @@
    rows were references, condition 6) · 5ab5eae.
 3. Mustafa's UPGRADE-SCOPE update (about 18:41, in the session's chat; it replaces the brief's upgrade note): saved
    verbatim to `inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md`; plan revision 3 applies it (settled inputs, the ADR 0005
-   paragraph, the map addendum's part (e), docs-keeper's STATUS record) · this commit.
+   paragraph, the map addendum's part (e), docs-keeper's STATUS record) · f927ab3.
+4. Decision map (step 2) done; coverage script: 521 of 521 ids, one owner each; addendum sent; drafting started
+   (0003, 0006, 0005's ability section) · this commit.
 
 ## Current step
-Step 2: the decision map (engine-architect, notes only; prompt `prompts/engine-architect-decision-map.txt`), still
-running; then its addendum (condition 7) by the same agent.
+Step 2's addendum (same engine-architect agent, resumed by message; `prompts/engine-architect-decision-map-addendum.txt`)
+and step 3's first three drafting units (0003, 0006, 0005's ability section), running.
 
 ## Next steps
-1. When the map returns: run `map_coverage.py` on its id table; send the addendum (plan step 2, condition 7 plus part
-   (e), UPGRADE-SCOPE) to the same agent; then launch the drafting units (step 3, ≤ 5 at once; prompts from the scratchpad drafts, saved to `prompts/`).
+1. When the addendum returns: re-run `map_coverage.py`; launch 0001 (netcode-architect) and 0004 (rust-reviewer) with
+   their saved prompts (`prompts/netcode-architect-adr0001.txt`, `prompts/rust-reviewer-adr0004.txt`); then 0002
+   (`prompts/engine-architect-adr0002.txt`) and 0005's frame (engine-architect, after both 0005 sections) as slots
+   free (≤ 5 at once).
 2. Pass marks per draft as each lands (step 4); assembly (step 5); synthesis (step 6); verification (step 7; no
    fetching verifier after 22:00, no new agent after 23:00).
 
@@ -48,6 +52,9 @@ running; then its addendum (condition 7) by the same agent.
 
 ## Running work
 - advisor plan review: done (APPROVE), notes `advisor-plan-review.md` (DONE).
-- engine-architect decision map: background agent, launched about 18:22, running; notes `engine-architect-decision-map-notes.md`,
-  outputs `engine-architect-decision-map.md` and `-ids.tsv`.
+- engine-architect decision map: done about 18:45 (521 of 521 ids, one owner each: 0001 127, 0002 104, 0003 71,
+  0004 82, 0005 34, 0006 65, DESIGN 38); its addendum sent about 18:46 (same agent), running.
+- Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
+  notes `graphics-engineer-adr0003-notes.md`), infra-engineer (0006; `infra-engineer-adr0006-notes.md`), game-designer
+  (0005 ability section; `game-designer-adr0005-notes.md`). Prompts in `prompts/`.
 - checkpoint saver: `checkpoint.mjs watch` in the background since 18:22 (110 min).

@@ -1,4 +1,4 @@
-# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: xhigh · 2026-10-31 about 18:35 Amsterdam
+# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: xhigh · 2026-10-31, launched about 18:22 Amsterdam
 
 You are the lead of the v2 decision drafts for SHAMBLE FRONTLINES (brief: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/DRAFTS_BRIEF.md;
 plan: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/plan.md, revision 1, under the advisor's review right now).

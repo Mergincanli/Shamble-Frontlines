@@ -1,4 +1,4 @@
-# Prepared prompt (verbatim, saved before launch) · subagent_type: advisor · effort: xhigh · 2026-10-31 about 18:25 Amsterdam
+# Prepared prompt (verbatim, saved before launch) · subagent_type: advisor · effort: xhigh · 2026-10-31, launched about 18:22 Amsterdam
 
 **Task:** review the plan of the change-set v2-decision-drafts (SHAMBLE FRONTLINES; branch
 claude/laughing-lovelace-ox61se, which stands in for cs/v2-decision-drafts because this cloud session is limited to it;

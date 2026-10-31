@@ -1,0 +1,179 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: graphics-engineer · effort: xhigh · model: opus · 2026-10-31, launched about 18:48 Amsterdam
+
+You write ADR 0003 (rendering and presentation) of the v2 decision drafts of SHAMBLE FRONTLINES (plan step 3), and the
+asset section of ADR 0005 (its GPU rules). You edit no file outside /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/: your outputs are notes files there.
+
+## Your files
+- The draft: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0003-draft.md (the whole ADR 0003, in the shape below).
+- The ADR 0005 asset section: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0005-assets-section.md: one section headed
+  `## The asset pipeline: GPU rules (graphics-engineer)`, with its own subsections (what the section decides, its
+  options, its open questions numbered `OQ-0005-AS1`, `OQ-0005-AS2` …, and "What a spike must prove (this section's
+  part)"); engine-architect places it verbatim in ADR 0005. Its Appendix A rows (for the ids the map gives ADR 0005 that
+  are yours: the R3 ones) go at the end of that file under `### Appendix A rows (for the frame)`.
+- The claims ledgers: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0003-claims.md and /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0005-assets-claims.md.
+
+## Your unit
+Title: "ADR-0003: Rendering and presentation". Draft file: graphics-engineer-adr0003-draft.md. Second output (a section
+for ADR 0005): graphics-engineer-adr0005-assets-section.md. Research: r3-rendering.md (every unit), GLOSSARY §2–§3.
+**The look is decided now where LOOK_V2 says [DECIDED]** (brief §1: "The look is docs/LOOK_V2.md"). Your agent file
+(written before LOOK_V2 existed) says the look is not decided; for this draft LOOK_V2 is the look, and you still decide
+nothing it leaves [OPEN] (the tree style) and change none of its items. Must:
+- Show how each LOOK_V2 [DECIDED] item is achieved (LOOK_V2 §9): a trace table, one row per item of §1–§8 tagged
+  [DECIDED] or [DEFAULT] (item · the technique or the system that delivers it · the research id, or "not researched:
+  open question or spike mark" (plan rule 2) · what the look proof test shows · the draft that owns it if not 0003).
+  [DEFAULT] items are built as defaults; the Advisor's additions (§6) are [DEFAULT].
+- The look proof test: judged by Mustafa in the browser (Brave on Windows), side by side with screenshots of the legacy
+  game (LOOK_V2 §9); also its measurable marks (GPU time per pass, frame time on the reference machines).
+- The renderer (WebGPURenderer with TSL, a pinned release) and the WebGL 2 fallback (what it loses); characters
+  (skinning, instancing, LOD) for slimmer, serious proportions with detail up close (LOOK_V2 §3, §5); the budgets for
+  the minimum (integrated graphics, largest mode, 30+ fps on Low) and recommended (mid-range card, 60 fps on High)
+  hardware (VISION_V2 §4); the spectacle budget (VISION_V2 §6.9); how it is measured (never a headless frame rate as a
+  hardware result); spatial audio with Web Audio.
+- The asset section for ADR 0005 (separate file): the GPU-side rules of LOOK_V2 §8's pipeline, proposing only what R3-CHAR
+  and R3-BUDGET support (LODs, the faction colour material slots, what "the engine applies the comic look" means for an
+  imported model). ASSET-RESEARCH (a), the advisor's ruling: everything else is an open question marked "not
+  researched" (compression formats, the LOD tool, export checks, the material-slot renaming step, the per-unit budget
+  numbers), grouped under one research unit, "asset-pipeline research" (graphics-engineer, verified like R3, its own
+  daytime session), placed by the spike plan before the asset spike. The look proof test says whether it needs authored
+  models; if it does, it uses plain glTF/GLB exports and decides nothing about compression or LODs.
+
+## Read first (in this order)
+1. The brief: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/DRAFTS_BRIEF.md (all of it).
+2. The approved plan, revision 3 (revision 2 folds in the advisor's conditions; revision 3 applies Mustafa's UPGRADE-SCOPE update): /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/plan.md. Its "Settled
+   inputs" (with TICK-60-HEADROOM), its "Rules every author follows" (1–12) and its ADR 0005 paragraph bind you; the
+   advisor's verdict behind them is advisor-verdicts.md §1 in the same folder.
+3. The decision map: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-decision-map.md (with
+   its addendum at the end) and its id table engine-architect-decision-map-ids.tsv: the ids your draft owns are the rows
+   whose owner is your ADR number. Stay inside your scope; cite the other drafts' scope by number ("ADR 0004 decides …")
+   without deciding it. If the map gives you an id you think belongs elsewhere, dispose of it anyway and say so in
+   your return.
+4. docs/VISION_V2.md (§6 is the requirements list), docs/LOOP_V2.md, docs/EDITOR_V2.md, docs/LOOK_V2.md (Mustafa's look
+   brief, 2026-10-31: its [DECIDED] items are decided), docs/STATUS.md "Decisions pending" (the 2026-10-31 decisions and
+   the five carry-forwards), docs/research/GLOSSARY.md (and the §8 text in the decision map's addendum: "The
+   foundation", "The netcode proof test", "The 60 Hz margin"; link them as ../research/GLOSSARY.md#the-foundation,
+   #the-netcode-proof-test and #the-60-hz-margin), docs/research/README.md, docs/adr/0000-template.md,
+   docs/LEGACY_INVENTORY.md (the rows your scope touches).
+5. Your research (below), in full where your scope needs it; the other topics' Recommendations and Open questions where
+   the decision map says your draft cites them.
+
+## The draft's shape (every draft uses it; headings exactly as written)
+```
+# ADR-000N: <title>
+
+**Status:** Proposed
+**Date:** 2026-10-31
+**Author:** <your agent name> (<sections by other agents, if any>) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+
+<one paragraph in plain words: what this record decides and why>
+
+## Context
+## Decision
+## Options considered
+## Trade-off analysis
+## Consequences
+## Open questions
+## What a spike must prove
+### Pass marks
+Written by test-engineer (plan step 4).
+## Migration plan
+## Test plan
+## Rollback
+## Appendix A: research dispositions
+## Sources
+```
+- **Context:** the requirements (the VISION_V2 §6 items the draft serves, with their numbers; LOOP_V2, EDITOR_V2 or
+  LOOK_V2 sections; the settled inputs, cited by STATUS decision code or GLOSSARY §8 entry, with "brief §n" only beside
+  it), the few findings the decision turns on, what it takes from and gives to the other drafts (by number), and what
+  the legacy game proves (inventory rows, cited).
+- **Decision:** a few sentences, then numbered parts; each part says what, why (one line), its research ids, and the
+  VISION_V2 §6 item that needs it (or, where the need is only in LOOP_V2, EDITOR_V2, LOOK_V2 or GLOSSARY §8's
+  foundation, says so in those words: "need: LOOK_V2 §4 only").
+- **Options considered:** per question the decision answers, the options from the research's Options sections, each
+  with the template's table (complexity; cost; scalability and performance; security and anti-cheat; effect on the
+  look and feel; effort from the current code) and pros and cons. An option that contradicts a settled input appears
+  only as one line, "settled by <code or GLOSSARY §8 entry>", and is not weighed.
+- **Consequences:** easier; harder; revisit when; "Hard constraints in CLAUDE.md that change" (which legacy constraint
+  stops applying to v2 code, and under which decision code: SPIKE-SCOPE (a); LOOK_V2 §8 for "no external assets";
+  nothing in CLAUDE.md or .claude/ changes in this PR); "Legacy inventory rows": a table of the rows whose mark this
+  decision would change (row id · mark now · proposed mark · why), including "look brief pending" rows LOOK_V2 now
+  unblocks; the inventory file itself is not edited (the change waits for Mustafa's acceptance).
+- **Open questions:** `- **OQ-000N-k. <the question>**` then: why it matters (one line) · the options · the decider
+  (Mustafa, the Advisor, a named spike, a later design session) · what decides it · the research ids it carries.
+- **What a spike must prove:** the claims your decision needs proven before it is accepted, each tied to a decision
+  part, with candidate marks from the research (cited). Name the spike in words; the spike plan gives the final names.
+  Where a person must judge (Mustafa: the look, the feel, "looks correct"), say so; the test-engineer adds the Brave
+  checklist.
+- **Migration plan:** phases with verifiable milestones, in the slice order (SLICE-ORDER: move & shoot → bots and three
+  teams locally → online → the loop → Octopon-3 and Editor v2 → scale to 48), with the foundation (GLOSSARY §8) first,
+  and the netcode proof test before it.
+- **Test plan:** the tests and harnesses that prove it works (network simulation with latency, jitter and loss where it
+  applies; determinism by state hash; renders; soak; playtests).
+- **Rollback:** how to back out if the decision fails its spike or later.
+- **Appendix A: research dispositions:** one table, `| id | disposition | where or why |`, with one row per id the
+  decision map gives your draft as owner: for a recommendation, `adopted` · `changed: <how, why>` · `rejected: <why>`;
+  for an open question (own, RR, XU, XT, shared), `answered: <how, which part>` · `open: OQ-000N-k` · `spike: <which>`.
+- **Sources:** the research files and sections you cite, and nothing you did not read.
+
+## Rules (the plan's rules, condensed; the plan's text wins where they differ)
+1. Every claim and number cites its research file, section and id, with lines at commit 9e7db28 (the topic files do not
+   change in this PR), for example `(r2-netcode.md, Recommendations, Brief question 2, R2-BUD-REC6, lines 2398–2420)`.
+   Check every line range you cite (`sed -n` the lines). Design rules cite VISION_V2, LOOP_V2, EDITOR_V2 or LOOK_V2 by §.
+2. A number comes from the research (cited), is arithmetic on research numbers (shown), is a settled input, or is a pass
+   mark marked "proposed" with its reason. Nothing else. A claim the research does not support is dropped, becomes an
+   open question, or becomes a spike mark.
+3. Options come from the research; an option the research lacks is labelled "not researched" and cannot be the proposed
+   decision.
+4. Every engine feature you propose traces to its need (above). An item tagged [LATER] or [OPEN] gets no proposed
+   feature; say only what keeps it possible (VISION_V2 §6.4's seats, §6.8's kill-cams, replays and highlights, §6.10's
+   accounts, and the same tags in LOOP_V2, EDITOR_V2 and LOOK_V2). No generic-engine feature "for later".
+5. The GLOSSARY's terms with their marking words; no "Retire (exact)" phrase; an "in context" phrase only where it does
+   not carry the term's meaning; link the first use of each term in your draft, for example
+   `[the server tick budget](../research/GLOSSARY.md#the-server-tick-budget)`. Give no existing term a new meaning:
+   TICK-30's 25 % is "the 60 Hz margin", never "headroom" (GLOSSARY:355–373 uses headroom for a run above the largest
+   mode's N), except inside a quote of TICK-30.
+6. The look: LOOK_V2 is Mustafa's decision. Where two techniques both meet a LOOK_V2 item but look different, propose one
+   on cost and robustness and name the visible difference as Mustafa's call in the look proof test. Visible values (line
+   widths, ramp steps, AO strength, colours, glow strength) are tuning for that test, not draft decisions. A LOOK_V2 item
+   that could be read as a rule (fragments that deal damage, planks and debris as routes, enterable ruins) is built as
+   LOOK_V2 states it; any rule beyond that is an open design question for Mustafa, unless LOOP_V2 settles it. Decide
+   nothing LOOK_V2 leaves [OPEN] (the tree style).
+7. N = 48 (MODES-3 (a)): where a research mark gives 48 and 54, use 48; where a research sentence says "until … answers",
+   the answer applies (carry-forward 3). TICK-30: 30 Hz is the baseline; 60 Hz only with a 60 Hz margin of at least 25 %
+   (the plan's TICK-60-HEADROOM paragraph). Where your scope holds a 60 Hz research mark, restate it for 30 Hz and keep
+   the 60 Hz value as what the margin rule unlocks (carry-forward 2).
+8. Where a research sentence is superseded (by a 2026-10-31 answer or a carry-forward), state the corrected text and cite
+   the line it supersedes; never edit a research file.
+9. Never decide the look beyond LOOK_V2, design a rule, unit or ability (Mustafa's), write engine code, run a spike,
+   fetch a web page (everything you need is in the repository), or state a number you did not source.
+10. Plain words first, internal names in brackets after them; decimals with periods; short sentences; no filler.
+
+## The claims ledger (a notes file beside your draft, not part of it)
+One row per claim or number in your draft: `| # | the claim, as written (short) | section | citation (file, id, lines)
+| tier |`, tier one of: `research verified` (an R1 or R2 recommendation claim, or a finding the topic's verifier table
+lists as checked) · `research, source to check` (any other finding: R3–R6 findings outside their spot-check tables, and
+R1 or R2 findings outside their checked set; the guide is
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/findings-checked.tsv) · `arithmetic` (show it) ·
+`settled` (a STATUS code or GLOSSARY §8) · `design doc` (VISION_V2, LOOP_V2, EDITOR_V2, LOOK_V2) · `proposed mark` (with
+its reason). Every claim in the draft has a row; the verifier checks both ways.
+
+## The decision map's addendum
+The lead is writing part "j. Addendum" at the end of the decision map right now (it lands within about 20 minutes of
+your start). Read the map's parts a–i first; before you write your Open questions and your Appendix A, read part j (if
+it is not there yet, go on with other sections and check again). Part j holds: the GLOSSARY §8 text (the anchors above),
+the loose ends added by the advisor (the old ADR-001..003 entries, SEC-MDL-2, the SRI/CSP item, the 11 wall-clock
+reads), the trace rule's reading, how ADR 0005 is put together, and the UPGRADE-SCOPE seams.
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-adr0003-notes.md (make the folder; you may always write there). Look there first: if the first line names
+another task, move the file into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/old/ and start fresh; if the notes end with DONE, write your answer from them;
+otherwise go on from where they stop. Start a new file with one line naming your task. After each unit you finish (a
+research unit read, a section of the draft written, a ledger part done), add a line or two: what is done, what you
+found and where, what comes next. Write each finished section of your draft into its file as soon as it is done, never
+only in your context. End with DONE, then give your answer. Never commit or push.
+
+## Return
+A short structured summary (at most 30 lines): the decision in three lines; the decision parts (one line each, with
+their research ids); the open questions (ids and one line each); the counts (claims in your ledger by tier; ids in
+your Appendix A by disposition); any id the map gave you that you think belongs elsewhere; anything you could not
+decide or source; the paths of your files.
