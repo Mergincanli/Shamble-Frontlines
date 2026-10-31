@@ -44,3 +44,7 @@ The check script still finds 0 exact hits in R5; the in-context count went from 
 ## Addendum: the final check's nit (reply to `prompts/r5-3d-final-nit.txt`, about 21:02 UTC, verbatim)
 
 Applied as a nit, with its part-7 line; not committed. r5:1426 now reads: "§3 ([the design point](GLOSSARY.md#the-design-point-and-headroom) (48 players))."
+
+## Addendum: the completeness critic's nits (reply to `prompts/critic-nits-r5.txt`, about 10:54 UTC on 2026-10-31, verbatim)
+
+Both links are in, each logged as a nit with a part-7 line; nothing else changed and nothing is committed. r5:1920 links "the stress scene" to #the-stress-scene; r5:1477 links "24v24" and "12v12v12" to #team-size-and-how-modes-are-written.

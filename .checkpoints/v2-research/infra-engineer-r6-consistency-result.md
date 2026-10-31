@@ -41,3 +41,7 @@ Part 7 has a "Step 3d fixes (2026-10-30):" line with one entry per change. Notes
 ## Addendum: the final check's open item and nit (reply to `prompts/r6-3d-final-fix.txt`, about 20:53 UTC, verbatim)
 
 Both items are fixed in r6-infrastructure.md (not committed). The record mark is logged as a recommendation change. Each part-7 step-3d line now gives its type. The mark now reads: "a 24v24 record is at most 1 MB uncompressed (A-10), and a record of the largest mode at most 1 MB × N / 48 (arithmetic: 1.125 MB at N = 54 under MODES-3 (b))."
+
+## Addendum: the completeness critic's nits (reply to `prompts/critic-nits-r6.txt`, about 10:55 UTC on 2026-10-31, verbatim)
+
+All four nits are in r6-infrastructure.md: N at r6:807 and 24v24 at r6:417 now link to the glossary. A-2 and A-3 call their 48 a 24v24 room, and A-2 says R2 now states its mark for the largest mode's N. Each has a part-7 line, logged as nits. Not committed.

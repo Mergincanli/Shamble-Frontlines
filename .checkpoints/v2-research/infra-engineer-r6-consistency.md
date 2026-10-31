@@ -78,3 +78,9 @@ DONE
 - R6-TEL-REC1 spike: record mark scoped to 24v24 (1 MB, A-10) and scaled for the largest mode (1 MB × N / 48; 1.125 MB at 54, arithmetic). recommendation
 - Part 7 "Step 3d fixes" lines: change type added to each (and the TEL line notes the record mark). nit
 DONE
+
+## Critic nits (coordinator, 2026-10-31)
+- Link N (player count) at R6-TEL-REC1 record mark; link 24v24 (team size) at Q2 G3 row. nit
+- A-2 "48 players (a 24v24 room)", R2-ROOM-REC2 now stated for the largest mode's N; A-3 "48 (24v24)". nit
+- Part 7 lines added under "Step 3d fixes". nit
+DONE

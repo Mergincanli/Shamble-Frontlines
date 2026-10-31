@@ -53,3 +53,7 @@ Done (two recommendation changes, part-7 line added, not committed). R3-AUDIO-RE
 ## Addendum: the final check's nit (reply to `prompts/r3-3d-final-fix.txt`, about 20:53 UTC, verbatim)
 
 Reworded as a nit; the part-7 line now says the same; not committed. R3-AUDIO-REC1's mark now reads: "main-thread audio work stays under 0.5 ms (p99) per frame on the minimum machine; HRTF for 4 priority voices raises that p99 by less than 0.3 ms."
+
+## Addendum: the completeness critic's nits (reply to `prompts/critic-nits-r3.txt`, about 10:54 UTC on 2026-10-31, verbatim)
+
+Done, links only (nit), with the part-7 line added; not committed. Row V-A (r3:885) links "the largest mode" and "N", their first uses in R3's own text. I left r3:592, R1's old counts, unlinked.

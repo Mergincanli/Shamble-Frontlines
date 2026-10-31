@@ -39,3 +39,7 @@ All three items are fixed in R1 and R4, and each file's part 7 has its "Step 3d 
    - "The hash-map ban" sits beside the old wording at r1:1633, r1:2404 and r1:3136.
 
 Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-r14-consistency.md
+
+## Addendum: the completeness critic's nits (reply to `prompts/critic-nits-r14.txt`, about 10:54 UTC on 2026-10-31, verbatim)
+
+Both links are in, each logged as a nit with a part-7 "Step 3d fixes" line; not committed. r1:1915 now links "the stress scene"; r4:529 links "24v24" to team size (I split that line to keep it short).

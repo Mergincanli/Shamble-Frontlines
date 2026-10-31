@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-31 11:53 Amsterdam (10:53 UTC)
+- **Last update:** 2026-10-31 11:55 Amsterdam (10:55 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -265,6 +265,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   R2's 7 compound 48s never judged (the critic judged all 7 right) and R2's bandwidth at 54 players (for the report;
   also R3's hull-outline cap at 54). Last nits sent about 10:53 UTC (`prompts/critic-nits-*.txt`): R1+R4, R2, R3, R5 now;
   R6 when a slot frees.
+- Last nits DONE about 10:55 UTC (replies appended to each owner's result file): first-use links in all six files, R6's
+  A-2/A-3 name their 24v24 room. Committed b92199c (R5), 749b363 (R1–R4), 910768b (R6). **Step 3d complete**: 0 exact
+  hits, 617 in context (all judged), no quote gone, every approved change present; labels unchanged (R1, R2 verified;
+  R3 45 of 77; R4 50 of 52; R5 61 of 115; R6 21 of 42). Report and appendix drafted (e361f9d; placeholders left: the
+  gate, the repo-map check). docs-keeper launched (prompt `prompts/docs-keeper-v2-research.txt`).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units

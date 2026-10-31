@@ -59,3 +59,7 @@ The glossary check finds 0 exact hits in R2.
 ## Addendum: the four remaining "48+" credits (reply to `prompts/r2-3d-fixes-2.txt`, about 10:22 UTC on 2026-10-31, verbatim)
 
 All four lines (r2:2356, 2410, 2628, 2738) now credit "design for 48+ players" to `CLAUDE.md` and VISION_V2 §3 for the modes. Each is logged as a nit, with a part-7 line. Totals: 37 recommendation, 110 nits. Not committed.
+
+## Addendum: the completeness critic's nits (reply to `prompts/critic-nits-r2.txt`, about 10:54 UTC on 2026-10-31, verbatim)
+
+Both glossary links are added: r2:858 ("48 players", player count) and r2:867 ("24v24", team size). Both are logged as nits, with a part-7 line. I also updated part 7's totals to keep them accurate: 37 recommendation, 112 nits. Not committed.
