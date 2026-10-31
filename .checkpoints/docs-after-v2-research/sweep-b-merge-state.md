@@ -1,0 +1,11 @@
+# Sweep B (merge state and drift) for docs-after-v2-research: stale lines in STATUS, ROADMAP, REPO_MAP, START_HERE, MODULE_MAP, research README, TECHNICAL, Night queue #16, kit-v3-1 state
+- verified: b6effde parents e9f11be + 854d42f, 2026-10-31 14:26:30 +0100 (13:26:30 UTC); e9f11be = PR #29 2026-10-27
+- STATUS.md checked: stale #28-unmerged lines at 3, 9, 45, 81-94 (pending list incl. answered MODES-3/PREVIEW-WALL/BASELINE-WHEN/SEC-SPREAD; "Next after PR #28"), 157-158 Routines (cron 00:10-07:10 vs claimed fact), 167-169 Risk 1 (MODES-3 answered 48), Targets 76-78 drift vs VISION_V2 §3 and MODES-3 (12-16 per team).
+- ROADMAP.md checked: line 85 "DONE, awaiting merge"; no Recent work entry for docs-after-r7 (PR #29, e9f11be); 9 entries (hygiene OK); Phases 21-28 have no v2 phase 0 line; Next / open has no v2 next step.
+- REPO_MAP.md checked: nothing stale from the merge (research rows describe files; report row says "(PR #28)"); repo-map-check: "repo map OK: 103 entries cover 93 required paths", exit 0.
+- START_HERE.md, MODULE_MAP.md, TECHNICAL.md checked: no statement about the research state or v2 phase 0 progress; nothing stale from the merge.
+- research/README.md checked: statuses current; only nit: R1-R6 rows don't name PR #28 while R7 says "done (PR #27)".
+- Issue #16 checked (body + last 3 comments): body "Last updated: 2026-10-30"; no line about R1-R6 or PR #28 merge or the next step; kit-v3-1 line names no PR (PR #30 open); "Until kit-v3-1 is merged, research runs in the daytime only" drifts from NIGHT-RESEARCH (a) 2026-10-28 (daytime only, no end); "No game-code changes until the v2 brief" / "The v2 brief decides" dated (brief exists since 2026-10-24). Last 3 comments: "Nothing queued tonight. Night shift done." 2026-10-29 01:11Z, 2026-10-29 23:12Z, 2026-10-31 01:11Z.
+- kit-v3-1: open PR #30 "kit-v3-1: routine guard, high effort, no routine stalls", head cs/kit-v3-1 5be7d37, not draft, created 2026-10-27 21:54Z, updated 2026-10-28 15:04Z; STATUS:47 names no PR number. Branch not opened.
+- PR #28 verified: merged_at 2026-10-31T13:26:31Z, head 854d42f; advisor APPROVE comment 6542571633 (2026-10-31 11:05Z) names full SHA 854d42f121ab...; its finding 1 = STATUS:3 and :45 stale. PR #29 merged 2026-10-27T21:53:07Z head d973b3f.
+DONE

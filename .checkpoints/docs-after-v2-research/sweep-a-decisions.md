@@ -1,0 +1,2 @@
+# Sweep A (by decision) for docs-after-v2-research: find every line the 2026-10-31 decisions make stale or must record
+- MODES-3 (in progress): searched code MODES-3/R2-BUD-OQ6/R2-XU-OQ13/R3-BUDGET-OQ4 + content (2–8, 6–18, 18v18v18, 54, 48 or 54, 16v16v16, 24v24, 12v12v12, 48+) outside research/reports. A: STATUS 76-77, 82-83, 168-169; research/README 5-6. B: VISION_V2 43-44, LOOP_V2 19-20, DESIGN_NOTES 34-35. C: CLAUDE.md 7-8, netcode-architect 17-19, infra-engineer 26. Research D next.
