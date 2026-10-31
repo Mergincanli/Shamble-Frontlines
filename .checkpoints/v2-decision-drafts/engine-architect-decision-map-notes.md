@@ -62,3 +62,7 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
 DONE
 - 17 ADDENDUM task started (part j: advisor conditions 2,3,6,7,8,10,11; Mustafa's UPGRADE-SCOPE update). Reading plan rev 3, advisor-verdicts §1, UPGRADE-SCOPE input.
 - 18 parts a-i edited (headroom -> the 60 Hz margin; N2/N3 per ruling; CF-2; LE-K; LE-P; part g proof-test and sim-core rows; part i item 1 text; 0005 a.2 and G13 upgrade wording; e pointer; i pointer); TSV notes R1-TICK-REC2, R1-TICK-OQ1 reworded (no owner change).
+- 19 writing part j (J1 GLOSSARY §8 built from brief lines 52-66 byte for byte).
+- 20 part j appended (J1-J6 + change list); GLOSSARY §8 text also saved in scratchpad glossary8.md.
+- 21 checks: brief quotes in §8 equal brief lines 52-66 (15 lines); anchors and closing note present; TSV 521 rows, 4 cols, owners unchanged.
+DONE

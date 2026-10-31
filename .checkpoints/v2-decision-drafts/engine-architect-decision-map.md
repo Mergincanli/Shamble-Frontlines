@@ -1027,3 +1027,203 @@ All nine were answered on 2026-10-31: part j, J6.
    phase 0 spike. The map lists it as a later test (slice 4); the Advisor may want it earlier with a stand-in.
 9. **ASSET-RESEARCH and TICK-60-HEADROOM** are still with the advisor (plan "Decisions for you"); parts c (N3), g (the
    asset spike) and h (G1) assume the plan's recommendations, (a) and "confirm at the stop".
+
+
+## j. Addendum (2026-10-31: the advisor's condition 7 and Mustafa's UPGRADE-SCOPE update)
+
+Inputs: `plan.md` revision 3; `advisor-verdicts.md` §1 (APPROVE with 19 conditions, and its rulings);
+`inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md` (Mustafa's words; they replace the brief's upgrade note). Part j wins
+where it and parts a–i differ.
+
+**Changes made to parts a–i** (and to the id table):
+1. "Headroom" for TICK-30's 25 % became "the 60 Hz margin" (plan rule 5): part a (0001 item 2; seam S1), part b
+   (R1-TICK-REC2, R1-TICK-OQ1 notes), part c (intro, the 60 Hz column heading, N2, N3), part f (CF-2, LE-K, LE-P),
+   part g (the netcode proof test's "Proves"; the sim core spike's place, now "never summed"), part i (item 2).
+   "Headroom" still marks the N = 64 run (N51, N53) and R3's RTX 5080 check (N41).
+2. N2 and N3 follow the advisor's ruling (J1); CF-2 states the margin as ruled and adds "(at N = 54, MODES-3 (b))".
+3. LE-K and the sim core spike's row point to J6 (2).
+4. Part a (0005 item 2) and part h (G13): the brief's unit-switch question is answered by Mustafa's update (J5).
+5. Part e's trace paragraph and part i's heading point here (J3, J6).
+6. `engine-architect-decision-map-ids.tsv`: no owner changed; the notes of R1-TICK-REC2 and R1-TICK-OQ1 say "the 60 Hz
+   margin". The coverage result (521 of 521) stands.
+
+### J1. The 60 Hz margin, and GLOSSARY §8 ready to append
+Shared-number row (replaces N3; N2 now reads "30 Hz; 60 Hz only with a 60 Hz margin of at least 25 %, otherwise 30 Hz"):
+
+| # | Number | Value | Source | Owner | GLOSSARY term |
+|---|---|---|---|---|---|
+| N3 | The 60 Hz margin | 1 − (p99 server tick time at 60 Hz ÷ 8.33 ms) ≥ 25 %, so p99 ≤ 6.25 ms; setup: one vCPU of the reference server, the stress scene at N = 48 with a snapshot-receiving client on every soldier, R2-BUD-REC6's 30-minute soak, re-flood ticks included; plus every 60 Hz mark the research sets (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3); otherwise 30 Hz | TICK-60-HEADROOM, the advisor's ruling (advisor-verdicts.md §1, condition 2), confirmed at the stop | 0001 | the 60 Hz margin (GLOSSARY §8) |
+
+0001 owns it and the 30 Hz baseline marks (R2-BUD-REC6 restated from GLOSSARY §1's 30 Hz column), and states three
+lines as replaced by TICK-30: R1-TICK-REC2's rule (r1:2029), "the rule does not change" (r2:2415-2416) and "which does
+not change" (GLOSSARY:85).
+
+The §8 text below goes after GLOSSARY line 742, byte for byte (the session appends it in step 6; the two brief
+quotes were copied from `inputs/DRAFTS_BRIEF.md` lines 52-59 and 60-66 by script). Anchors: `#the-foundation`,
+`#the-netcode-proof-test`, `#the-60-hz-margin`.
+
+````markdown
+## 8. Phase 1 terms (the Advisor, 2026-10-31)
+
+### The foundation
+- **Definition:** the Advisor's drafts brief, §2, 2026-10-31:
+
+> - **The foundation.** Phase 1's work before slice 1's gameplay:
+>   - the repository restructure, moving the old game to `legacy/`;
+>   - the toolchain: a Cargo workspace plus TypeScript with Vite;
+>   - CI gate v2, and private preview links;
+>   - TypeScript types generated from the Rust code;
+>   - the client + local server skeleton: the simulation in a Web Worker, behind the same message protocol the network uses.
+>
+>   It ends when an empty scene runs through the full stack in the browser, with CI green and a preview link.
+
+- **Marked by:** "the foundation".
+- **Retire (exact):** none.
+- **Retire (in context):** none.
+- **Used today:** none in R1–R6 (a phase 1 term); the decision drafts, `docs/ENGINE_OVERVIEW.md` and
+  `docs/SPIKE_PLAN.md` use it.
+
+### The netcode proof test
+- **Definition:** the Advisor's drafts brief, §2, 2026-10-31:
+
+> - **The netcode proof test.** A throwaway spike that proves the online path:
+>   - the Rust simulation runs natively as a server, and as Wasm in the client;
+>   - they connect over WebTransport, with the WebSocket fallback;
+>   - 48 simulated clients run at a 30 Hz tick, with tick time, bandwidth per client and memory all within the budgets that
+>     ADR 0001 sets;
+>   - one human client at 100 ms of simulated latency sees prediction, reconciliation and lag-compensated hits that look
+>     correct.
+
+- **Marked by:** "the netcode proof test".
+- **Retire (exact):** none.
+- **Retire (in context):** none.
+- **Used today:** none in R1–R6 (a phase 1 term); the decision drafts, `docs/ENGINE_OVERVIEW.md` and
+  `docs/SPIKE_PLAN.md` use it.
+
+### The 60 Hz margin
+- **Definition:** 1 − (p99 server tick time at a 60 Hz tick ÷ the server tick budget at 60 Hz, 8.33 ms). It is measured
+  in the netcode proof test, in one run (p99s do not add: see time statistics): on one vCPU of the reference server, in
+  the stress scene at N = 48 with a snapshot-receiving client on every soldier, over R2-BUD-REC6's 30-minute soak,
+  re-flood ticks included. A 60 Hz tick needs a 60 Hz margin of at least 25 % (a p99 server tick time of at most
+  6.25 ms) and every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3);
+  otherwise the tick stays at 30 Hz.
+- **Depends on:** TICK-60-HEADROOM (the advisor's reading of 2026-10-31: TICK-30's 25 % is measured against the
+  server tick budget at 60 Hz, 8.33 ms), confirmed by Mustafa and the Advisor at the stop.
+- **Marked by:** "the 60 Hz margin".
+- **Retire (exact):** none.
+- **Retire (in context):** "headroom" where TICK-30's 25 % is meant. TICK-30's own word "headroom" appears only in
+  quotes of TICK-30; headroom keeps its meaning of a run above the largest mode's N (the design point and headroom).
+- **Used today:** none in R1–R6 (a phase 1 term); ADR 0001 owns it, and ADR 0004 and `docs/SPIKE_PLAN.md` cite it.
+
+TICK-30 (the Advisor, 2026-10-31) replaces, for the drafts, the tick-rate rule the Tick period entry calls unchanged (line 85): 30 Hz is the baseline, 60 Hz needs a 60 Hz margin of at least 25 %.
+````
+
+### J2. Loose-ends register: three more items (condition 7 (b))
+| Code | Item | Disposed by | How |
+|---|---|---|---|
+| OLD-ADR | STATUS:198: the v2 drafts replace ADR-001..003 | `docs/adr/README.md`; docs-keeper (STATUS) | README's index records the replacement; STATUS's three entries are marked replaced |
+| ADR-001 | STATUS:199 (authority, tick, transport, hosting, offline play) | 0001 (authority, tick rate, transport, rooms); 0004 (the tick mechanism); 0006 (hosting); DESIGN (offline play, S11) | its logged inputs: one hit world for every shooter, K1 → 0004 (R4-PHYS-REC2, R4-LOS-REC1); a phased `update()`, K4 → 0004 (R1-ECS-REC1); the server repeats the team allow-list (`teamOf`) → 0001 (forged commands rejected, R2-SYNC-REC2) with 0004; boot-time `Math.random` per slot, three.js UUIDs on the shared `Math.random`, the camera-dependent FX cull → 0004 (R1-DET-REC4's streams; presentation randomness on the page, 0003); `addTech`'s HUD writes as an event → 0004 (events, I-2, I-20); humans take over bot slots → 0001 (R2-ROOM-REC6); the LOS budget sized for 12 → 0004 (R4-LOS-REC2 at 48); a full server-side schema check, `version:1` never read → 0005 (R1-DATA-REC4, REC7) |
+| ADR-002 | STATUS:200-201 (modules, bundler, TypeScript, double-click build; "evidence first via the build spike") | 0002 | the stack is settled (Vite, TypeScript, Cargo workspace: GLOSSARY §8, the foundation); the build spike's role passes to the boundary spike and the foundation; the double-click player build ends with the legacy engine, recorded under template 0000's "Hard constraints in CLAUDE.md that change" (condition 13); the editor's double-click rule is J3's EDITOR_V2 §5 item |
+| ADR-003 | STATUS:202 (stay on r128 or upgrade) | 0003 | settled: the latest three.js with WebGPURenderer (brief §1); the pin and step-by-step upgrade policy is R3-WGPU-REC2 |
+| SEC-MDL-2 | STATUS:257 (`__proto__` through `envMerge` / `rulesMerge`; "belongs with the server-side map-def validation") | 0005; 0006 cites | content is parsed into typed Rust structs by one validating crate on server and client (R1-DATA-REC2, whose fuzz corpus includes `__proto__` keys; REC7 server-side validation); the legacy file stays frozen |
+| CDN-SRI | STATUS:262 (no SRI/CSP on the three.js CDN tag; "belongs with hosting") | 0006; 0002 cites | v2 bundles three.js from npm with Vite and serves it from the client host, so no CDN tag; the CSP is the security baseline's (BASELINE-WHEN (b)), part of the production header set |
+| WALL-CLOCK | STATUS:273 (11 `performance.now` / `Date.now` reads; "deterministic shared simulation") | 0004 | the step reads no clock (R1-TICK-REC1, with its CI check; R1-DET-REC4); the legacy reads stay in the frozen legacy game |
+| RP-13 | PR #28 finding 4: research-plan condition 13 (two branches from one session) | closed | it no longer applies: the research merged in PR #28, and this change-set runs on one branch |
+
+### J3. Traces (condition 8, and part i's question 4)
+- **The rule:** every draft names the VISION_V2 §6 item a feature serves. A feature whose need is only in LOOP_V2,
+  EDITOR_V2, LOOK_V2 or GLOSSARY §8's foundation says so ("need: LOOK_V2 §4 only"), and `docs/adr/README.md` lists it,
+  one line each, for the stop review. **The session's reading (2026-10-31):** a VISION_V2 §3 or §4 target counts like
+  LOOP_V2 under condition 8; the draft writes "need: VISION_V2 §4 only", and README lists it. UPGRADE-SCOPE is a
+  settled input (Mustafa, 2026-10-31) and is cited the same way ("need: UPGRADE-SCOPE"). This answers LE-G and
+  R2-XU-OQ18's question for every draft.
+- **Features for README's list** (need outside §6), by draft:
+  - 0001: R2-BUD-REC4, REC5, R2-TRN-REC6 (VISION_V2 §4 only).
+  - 0002: the repository restructure, the toolchain, CI gate v2, private preview links, generated types, the client
+    + local server skeleton (GLOSSARY §8, the foundation), with R5's lint, test and gate recommendations; the editor
+    entry (EDITOR_V2 §5).
+  - 0003: R3-WGPU-REC2, REC4, R3-GL2-REC3, R3-BUDGET-REC1, R3-MEASURE-REC3 and the quality tiers (VISION_V2 §4 only);
+    spatial audio (LOOP_V2 §7, LOOK_V2 §7); the look techniques (LOOK_V2 §1–§7); roof fade (LOOK_V2 §4); halftone
+    flashes and line boil (LOOK_V2 §7); the concussion shake (LOOK_V2 §2); the HUD port (LOOP_V2 §11's three-team HUD).
+  - 0004: bot behaviour (LOOP_V2 §10, with VISION_V2 §3's "Bots fill empty slots"); map validation with the sim's
+    integrator, reachability and the 6 m gap check (EDITOR_V2 §3, LOOP_V2 §9); tiled re-bakes (EDITOR_V2 §3, only if
+    needed); damage stages (LOOK_V2 §4); weapon drops and pickups and the player record (UPGRADE-SCOPE); active reload
+    (LOOP_V2 §7).
+  - 0005: the feel kit as data and the Feel Lab (LOOP_V2 §7); the asset pipeline (LOOK_V2 §8); the map document rules
+    (EDITOR_V2 §2); development hot reload (R1-DATA-REC5; its §6.3 trace is partial, R1-DATA-OQ12); the upgrade
+    tracks (UPGRADE-SCOPE).
+  - 0006: preview hosting and the access wall (GLOSSARY §8, the foundation; PREVIEW-WALL (a)); CI runner costs.
+- **EDITOR_V2 §2's five rules → 0005:** rules 1, 2 and 5 (the document is the truth, versioned JSON with stable ids;
+  every edit a command with do and undo; a document layer that knows nothing about THREE and is tested in Node) are
+  content data (R1-DATA-REC1–REC4, R1-ECS-REC3's static ids); rules 3 and 4 (the scene mirrors the document per
+  entity; unmerged edit mode) are the editor's scene, need only in EDITOR_V2: 0005 lists them for EDITOR_V2's own
+  architecture plan (EDITOR_V2 §6 step 2), and 0003 cites only the shared material cache. No draft designs the editor.
+- **EDITOR_V2 §5's two lines → 0002, listed for DOCS-ALIGN:** "It still runs by double-clicking editor.html" (critic
+  rank 25: whether a Wasm validator loads from `file://`; Mustafa if the rule must change) and "Written so it ports
+  cleanly if ADR-002 moves the project to modules" (the v2 stack is modules with Vite, so the line is overtaken; 0002
+  says so and leaves the text to its owners).
+- **No proposed feature for [LATER] or [OPEN] items;** each draft says only what keeps them possible: VISION_V2 §6.4
+  seats [OPEN] (R2-SYNC-OQ7), §6.8 kill-cams, replays and highlights [LATER] (recorded matches keep them possible),
+  §6.10 accounts and §5 cosmetics [LATER]; LOOP_V2: the Spy, the Hammer's leech, more tanks and the unlock catalogue
+  [LATER], the Spy's cost, map size and aiming at height [OPEN] (aiming at height is still served, because §6.2 names
+  it); EDITOR_V2: enterable structures, terrain sculpting and the prefab library v2 [LATER] (interiors and floors are
+  served through §6.2 and LOOK_V2 §3); LOOK_V2: the tree style [OPEN]; spectators (R2-INT-REC7) unless Mustafa wants
+  them (R2-XU-OQ17).
+
+### J4. How ADR 0005 is put together (condition 11; ASSET-RESEARCH (a))
+1. **game-designer** writes the ability system section (in-match upgrades included, J5) into its own notes file;
+   **graphics-engineer** writes the asset section's GPU rules into its own notes file; each fixes only its own text.
+2. **engine-architect** writes the content data part and the asset pipeline part, then, after both sections land, the
+   frame: the header, the context, the joined decision, the consequences, the open-question numbering (OQ-0005-n
+   across all parts) and Appendix A, placing the two sections verbatim.
+3. **ASSET-RESEARCH (a), the advisor's ruling:** the asset part takes LOOK_V2 §8's flow as given and proposes only what
+   R1-DATA, R3-CHAR and R3-BUDGET support. Compression formats, the LOD tool, export checks, the material-slot
+   renaming step and the per-unit budget numbers are open questions marked "not researched", grouped under one
+   research unit, "asset-pipeline research" (graphics-engineer, verified like R3, in its own daytime session), which
+   SPIKE_PLAN places before the asset spike (part g's last row; part h, G1). If the look proof test needs authored
+   models, it uses plain glTF/GLB exports and decides nothing about compression or LODs. (Correction to part h, G1:
+   R3 has one glTF mention, R3-CHAR-F8 at r3:476; the other hits are "GLB" inside "WebGLBackend".)
+4. 0005 designs no upgrade, ability, unit or rule (escalation category 2); it shows that the system can carry them.
+
+### J5. UPGRADE-SCOPE as Mustafa updated it (plan step 2 (e))
+His words (verbatim in the input file) replace the brief's upgrade note: a roguelike track per unit and per weapon
+type (pick one of three per level), owned by the player; tracks survive death and switching and reset at the start of
+every match; a class always comes with its own weapon; other weapons come only from killed enemies' drops, which are
+world pickups; progress belongs to the weapon type, so a lost gun's track waits for the next gun of that type; the
+tracks live on the PlayerState, not the Pawn.
+
+| Part | Carried by | What it decides (never the upgrade's design) |
+|---|---|---|
+| The tracks as data (per unit type and per weapon type; levels; offers of three; what a pick grants, through the ability system) | 0005 (game-designer) | the data shape and that the GAS subset can carry it; the class's own weapon in the unit definition |
+| The player record that holds the tracks, separate from the soldier entity (the PlayerState, not the Pawn): survives death and unit switches, keeps a weapon type's track while no gun of that type is held, resets at match start | 0004 | where the record lives in the sim state (per player slot, beside the soldier tables) and its reset in the match lifecycle (0001's room lifecycle cites) |
+| Weapon drops from killed enemies as world pickup entities; which random stream draws the offers of three | 0004 | pickups as sim entities (their lifetime and pickup rule as data from 0005); the stream kind for offers (GLOSSARY: shared stream and authority-only stream) |
+| The server's authority over tracks, offers, picks, drops and pickups; their messages and replication; refusing a pick the server did not offer or a pickup it did not place | 0001 | the messages, visibility classes (tracks and offers to their owner; drops spatial) and whether any of it is predicted (the prediction scope) |
+| Pick and track telemetry for balance (picks per track and level, offers shown, looted weapons, time per weapon type) | 0006 (the record's shape), recorded per seam S6 (0004 emits, 0001's room writes) | the fields in R6-TEL-REC1's per-slot section |
+| The offer and track UI on the page | 0003 | presentation from owner-only data in the block (I-21) |
+
+- **Open, listed by 0005 for Mustafa with options and no pick:** carry slots; ammo for looted weapons; how fast tracks
+  level, including catch-up when switching.
+- **WEAPON-UNLOCKS, listed the same way by 0005, never resolved:** LOOP_V2 §8's third gate (an unlocked item bought each
+  life with match money) and VISION_V2 §1's "Finally unlocked that weapon" sit beside "no weapon choice when buying"
+  and "other weapons come only from killed enemies' drops". 0006 cites it (account progression is [LATER]).
+- **Answered:** the brief's question "how a pick applies after a switch to a different unit": tracks survive switching
+  (switch back and the track is still there). Parts a (0005 item 2) and h (G13) now say so.
+- No research id concerns upgrades, so no owner in the id table changes; interface I-21 reads with this table.
+
+### J6. Part i, answered (2026-10-31)
+1. The 38 DESIGN ids are disposed in `docs/adr/README.md`'s register, which the coverage script counts (condition 6).
+2. 0001 proposes how the stress scene's sim load reaches the 60 Hz margin run (for example the sim core spike's sim
+   inside the proof-test server, a stand-in calibrated by the sim core spike's measured step times, or the 60 Hz check
+   deferred until the real sim runs the stress scene), recommends one, and lists it as an open question for the
+   Advisor (TICK-60-SETUP). The 30 Hz baseline marks may use a stand-in. Since p99s do not add (GLOSSARY: time
+   statistics), the margin is measured in one run, never summed.
+3. "100 ms of simulated latency": 0001 states its reading as R2's P2 profile, 100 ms round trip (VISION_V2 §4's "about
+   100 ms of ping"), with P2's jitter and loss, and lists the reading for the Advisor to confirm (N54).
+4. As J3: a VISION_V2 §3 or §4 target counts like LOOP_V2; "need: VISION_V2 §4 only", listed in README.
+5. Only the netcode proof test is settled as before the foundation (SLICE-ORDER); SPIKE_PLAN proposes the rest of
+   part g's order for Mustafa and the Advisor.
+6. The seam holds: machines and certificates in 0006 (LE-L).
+7. SPIKE_PLAN owns the stress scene's use in the spikes, citing GLOSSARY §3 for its definition (N52).
+8. The Feel Lab test for ABL-PREDICT needs abilities in the engine, so SPIKE_PLAN places it after them (condition 10
+   asks only that it be placed) (LE-N).
+9. Ruled: ASSET-RESEARCH (a) (J4); TICK-60-HEADROOM as J1.
