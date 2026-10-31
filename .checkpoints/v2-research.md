@@ -228,10 +228,10 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   part; working tree, notes saved). The night-stop reminder fired 22:51 UTC with nothing running. The session's worker
   restarted; resumed 2026-10-31 about 10:13 UTC (11:13 Amsterdam, inside the day window): saver restarted; the R1+R4
   owner resumed by message; the R2 skeptic resumed with resumeFromRunId (the verifier cached).
-- 2026-10-31: the R1+R4 fix round DONE about 10:16 UTC (reply appended to `engine-architect-r14-consistency-result.md`):
+- 2026-10-31: the R1+R4 fix round DONE about 10:15 UTC (reply appended to `engine-architect-r14-consistency-result.md`):
   r1:2049 now "25 % of the tick period, inside the server tick budget"; five bare 48s → the largest mode's N (5
   recommendation changes); pointer and Rests-on nits; 0 exact hits; no quote gone. Committed **3aad9d8**. Glossary nits
-  sent about 10:17 UTC (`prompts/engine-architect-glossary-3d.txt`: one-off deadlines; §1's N = 54 scaling and rounding
+  sent about 10:15 UTC (`prompts/engine-architect-glossary-3d.txt`: one-off deadlines; §1's N = 54 scaling and rounding
   notes; "whole tick" in the glossary's own text; R1's Used-today wording; R3-AUDIO-REC1's credit).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the

@@ -1,5 +1,5 @@
 # Session message to engine-architect (GLOSSARY.md's only editor), saved verbatim before sending: the step-3d glossary nits
-# sent: 2026-10-31 about 10:17 UTC by SendMessage
+# sent: 2026-10-31 about 10:15 UTC by SendMessage
 
 Thank you; R1 and R4 are committed (3aad9d8). Now the glossary nits the step-3d checks found (the verifiers' reports: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-r14-3d-result.md, verifier-r14-3d-skeptic-result.md, verifier-r2-3d-result.md, verifier-r356-3d-final-result.md). Apply them to /home/user/Shamble-Frontlines/docs/research/GLOSSARY.md only (nits: no new claim or source, no approved number changed; match each text by its words; do not commit):
 1. "Time statistics", Definition: add at the end "A one-off deadline (a single event, such as a rebuild, a bake or a recovery) is a plain limit, not a statistic." (the R1+R4 verifier: the owners left such deadlines without a statistic, rightly).

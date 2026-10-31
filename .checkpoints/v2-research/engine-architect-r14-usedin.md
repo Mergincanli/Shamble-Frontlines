@@ -48,3 +48,4 @@ Follow-up applied (nits, header only; matched by words, the 4 paragraphs rewrapp
 DONE
 Follow-up 2 (coordinator, advisor-3d-r3-verdict item 6 point 3): Time statistics / Used today, R3 part extended with R3-BUDGET-REC2's CPU, animation, sim and GPU rows, CHAR-REC1, CHAR-REC2, CHAR-REC4, AUDIO-REC1, AUDIO-REC3 (sub-budgets at p99) -- nit; only that field changed (diff checked). DONE
 Follow-up 3 (coordinator): step 3d fixes to R1 and R4 (verifier-r14-3d-result.md, skeptic). Items: 1 r1:2049 25 %; 2 five bare 48s; 3 nits (pointers, Rests on, hash-map ban).
+Follow-up 4 (coordinator): 5 glossary nits from step 3d (time statistics one-off deadline; N=54 sentence; whole tick x2; R1 Used today P1 wording; R3 credit)

@@ -26,7 +26,7 @@ Files:
 - /home/user/Shamble-Frontlines/docs/research/r4-physics-navigation.md
 - /home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-r14-consistency.md
 
-## Addendum: the step-3d fix round (reply to `prompts/r14-3d-fixes.txt`, cut off by the spend limit about 21:04 UTC on 2026-10-30, resumed 2026-10-31 10:14 UTC, returned about 10:16 UTC, verbatim)
+## Addendum: the step-3d fix round (reply to `prompts/r14-3d-fixes.txt`, cut off by the spend limit about 21:04 UTC on 2026-10-30, resumed 2026-10-31 10:14 UTC, returned about 10:15 UTC, verbatim)
 
 All three items are fixed in R1 and R4, and each file's part 7 has its "Step 3d fixes (2026-10-30):" lines. Nothing is committed. The glossary check still finds 0 exact hits in both files.
 
