@@ -50,3 +50,5 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
   once; SHARED as 6 codes; dup copies at r3:524/771 noted). Counts: 0001 127, 0002 104, 0003 71, 0004 82, 0005 34,
   0006 65, DESIGN 38, SPIKE_PLAN 0. Part b markdown generated to scratchpad partb.md (re-run assign.py to regenerate).
   Next: write the map file: header + part a (scope, seams), then b, c, d, e, f, g, h, session items.
+- 10 parts a and b written to the map file.
+- 11 part c (shared numbers N1-N54) written.
