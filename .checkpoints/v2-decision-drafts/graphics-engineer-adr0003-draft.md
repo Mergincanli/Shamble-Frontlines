@@ -334,7 +334,7 @@ judges the look) and the render budget bench (the numbers).
      backend, adapter, browser version, `devicePixelRatio`, resolution and whether GPU times are quantized
      (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193).
    - A fixed benchmark scene: a recorded match replayed from its inputs (ADR 0004's identical results: r1-simulation-core.md, Recommendations, R1-DET-REC1, lines 2129–2145, and
-     R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, previews included
+     R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, [previews](../research/GLOSSARY.md#preview) included
      (R3-MEASURE-REC2, lines 1195–1204). If replay on the client is not identical, the fallback is a scripted bot
      match with a fixed seed, less exact (r3-rendering.md, Pointers Q6, lines 1504–1505).
    - CI gates only hardware-independent numbers (zero console errors, draw calls, triangles, programs, GPU memory
@@ -446,7 +446,7 @@ another file is named.
 
 Each table carries the template's dimensions for every option the research's Options sections give (r3-rendering.md,
 Options, lines 774–894). "Presentation only" in the security column means the option draws what the client already
-holds and changes nothing the authority decides. An option that contradicts a settled input is one line, not weighed.
+holds and changes nothing [the authority](../research/GLOSSARY.md#the-authority) decides. An option that contradicts a settled input is one line, not weighed.
 
 ### Q1. Which renderer (R3-WGPU; Options Q1, lines 778–790)
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
@@ -1050,7 +1050,7 @@ Read for this record (lines at 9e7db28; the topic files do not change in this PR
 - `docs/research/r6-infrastructure.md`: R6-OBS-REC4 (lines 769–780); R6-OBS-OQ5 (905–906); R6-XT-OQ5 (1015–1020).
 - `docs/research/GLOSSARY.md`: §1 (time statistics, the client's sim share), §2 (player count, the largest mode, the
   design point), §3 (the stress scene, big vehicle and very large unit, live projectile, active effect
-  and visual effect), §4 (shared stream and authority-only stream); §8 as the decision map's addendum (J1) gives it.
+  and visual effect), §4 (the authority; shared stream and authority-only stream), §5 (preview); §8 as the decision map's addendum (J1) gives it.
 - `docs/research/README.md` (the shape of a topic file); `docs/adr/0000-template.md`.
 - `docs/VISION_V2.md` §4, §6; `docs/LOOP_V2.md` §7, §11; `docs/LOOK_V2.md` (all); `docs/EDITOR_V2.md` §2;
   `docs/V2_PHASE0_BRIEF.md` §0 (line 8); `docs/STATUS.md` "Decisions pending" (lines 93–202).

@@ -34,3 +34,4 @@ R1-ECS-REC1 1891-1950; R1-ECS-REC2 1952-1971; R1-ECS-REC3 1973-1991; R1-ECS-REC4
 - 18:16 UTC: Appendix A (82/82: adopted 25, changed 10, rejected 1, answered 27, spike 17, open 2) and Sources written. Next: remove 'decision map' cites; glossary-term pass; then ledger.
 - 18:17 UTC: draft complete (all sections). Glossary pass: retired phrases fixed (whole tick, the period, tick cost, bare 48), first uses linked (state hash, big vehicles, very large units, stress scene, largest mode, prediction scope, server tick time, headroom). Draft keeps the map's I-n/S-n interface codes (flag in return). Next: claims ledger, section by section (Context first).
 - 21:53 UTC: resumed after spend-limit cut. Ledger part 1 (Summary+Context, rows 1-44) done in rust-reviewer-adr0004-claims.md. Next: ledger Decision parts 1-21.
+- 21:54 UTC: ledger rows 45-134 (Decision parts 1-8) done. Next: ledger parts 9-21.

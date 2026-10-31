@@ -248,7 +248,7 @@ M Migration plan · TP Test plan · R Rollback · A Appendix A.
 | 209 | "No external assets" ends with the legacy engine | CQ | LOOK_V2 §8 | design doc |
 | 210 | "animation never moves a launch point or a hitbox" | CQ | r1 R1-DET-REC4, 2193–2194 | research verified |
 | 211 | Every "mark now" in the inventory table, with its line | INV | INV lines 86, 90, 96–98, 100, 110–123, 131–141, 191, 192, 205, 217–231, 245, 247, 255, 266, 273, 311, 314–315, 317, 319, 320, 322, 360–378 | research, source to check |
-| 212 | 118 rows carry "look brief pending" (the inventory's tally) | INV (intro, via R7-MARKS) | INV line 22 (header tally) | research, source to check |
+| 212 | "Pending" is the row's *Look brief pending* note; every row a player sees carries it | INV (intro) | INV header, lines 19–21 | research, source to check |
 | 213 | Building-kit, texture and asset rows are ADR 0005's | INV | decision map f3, LE-H | settled (the map's assignment) |
 | 214 | Each proposed inventory mark and its reason | INV | the draft's parts named in each row; LOOK_V2 § named | design doc (LOOK_V2) and the draft's proposals |
 | 215 | CL5's drop, CL11's Rust mark, GP6's port are unchanged | INV (not listed) | INV lines 114, 120, 316 | research, source to check |

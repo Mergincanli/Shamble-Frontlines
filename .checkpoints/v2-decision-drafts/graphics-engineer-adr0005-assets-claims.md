@@ -54,5 +54,5 @@ recommendation numbers are `proposed mark`).
 
 ## Counts
 - Rows: 43.
-- By tier (first tier named): research verified 3 · research, source to check 16 · arithmetic 4 · settled 8 ·
-  design doc 3 · proposed mark 12 · restating another file's rows 1 (row 8).
+- By tier (first tier named): research verified 3 · research, source to check 14 · arithmetic 4 · settled 6 ·
+  design doc 3 · proposed mark 12 · restating another file's rows 1 (row 8) (counted by script).

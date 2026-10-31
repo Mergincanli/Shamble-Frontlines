@@ -203,14 +203,14 @@
 | 165 | No research on tracks | AB-8 | row 26 | arithmetic |
 | 166 | Need: UPGRADE-SCOPE, outside VISION_V2 §6, LOOP_V2, EDITOR_V2 and LOOK_V2 | AB-8 | map J3 ("UPGRADE-SCOPE … is cited the same way ('need: UPGRADE-SCOPE')") | settled |
 | 167 | If ABL-PREDICT says yes: own activation, cost, cooldown, granted tags, movement changes; the command's sequence number as the key; cues keyed to play once | AB-9 | R1-ABL-REC4, r1:2423–2428; ABL-PREDICT, r1:2967–2978 | research verified |
-| 168 | If no: ability presses wait for the server's confirmation | AB-9 | ABL-PREDICT, r1:2977–2978; GL "The prediction scope", lines 505–510 | research verified |
+| 168 | If no: ability presses wait for the server's confirmation | AB-9 | ABL-PREDICT, r1:2974–2975; GL "The prediction scope", lines 505–510 | research verified |
 | 169 | Nothing in AB-1 to AB-8 depends on the answer; only the prediction scope changes | AB-9 | GL "The prediction scope", Depends on, lines 505–510 (the two readings differ only in what the scope adds) | research verified |
 | 170 | Need §6.3 | AB-9 | R1-ABL-REC4 "Serves", r1:2440 | research verified |
 | 171 | The mark: at most 1 ms per tick at p99 in the stress scene, up to 8 active effects per soldier, on one vCPU of the reference server and the minimum laptop in Wasm in a Worker; nothing allocated on the heap in steady state | AB-10 | R1-ABL-REC6, r1:2465–2472; GL "The stress scene", lines 397–418 | research verified |
 | 172 | N = 48 soldiers | AB-10 | MODES-3 (a) | settled |
 | 173 | 48 × 8 = 384 active effects | AB-10 | 48 × 8 = 384; GL line 405 | arithmetic |
-| 174 | At 30 Hz, 1 ms is 12 % of the sim step share | AB-10 | 1 ÷ 8.33 = 0.120; 8.33 ms = 25 % of 33.3 ms (GL "The sim step share …", lines 190–191; GL §1 table, line 63) | arithmetic |
-| 175 | At 60 Hz, 24 % of 4.17 ms | AB-10 | 1 ÷ 4.17 = 0.240; 4.17 ms from GL §1 table, line 63 | arithmetic |
+| 174 | At 30 Hz, 1 ms is 12 % of the sim step share | AB-10 | 1 ÷ 8.33 = 0.120; 8.33 ms = 25 % of 33.3 ms (GL "The sim step share …", lines 190–191; GL §1 table, line 60) | arithmetic |
+| 175 | At 60 Hz, 24 % of 4.17 ms | AB-10 | 1 ÷ 4.17 = 0.240; 4.17 ms from GL §1 table, line 60 | arithmetic |
 | 176 | The 1 ms is the same at both rates | AB-10 | GL §1 table, line 57 (abilities, effects, weapons: 1.00 at 60 Hz and 1.00 at 30 Hz) | research verified |
 | 177 | Proposed: run the step at 8, 16 and 32 active effects per soldier (384, 768, 1,536 at N = 48) and report the count that reaches 1 ms p99 | AB-10 | reason: picks are long-lived active effects whose count is not designed (OQ-0005-AB3); 48 × 16 = 768, 48 × 32 = 1,536 | proposed mark |
 | 178 | The stress scene's 8 per soldier predates UPGRADE-SCOPE | AB-10 | GL dated 2026-10-30 (line 9), its 8 from R1-ABL-REC6 (line 415); UPGRADE-SCOPE dated 2026-10-31 | settled |
@@ -347,3 +347,8 @@
 | 293 | Seams: whether pickups are predicted (R2-SYNC-F17) | Frame | r2:230–236 | research verified |
 | 294 | Seams: a knocked-back local player's predicted movement is corrected (ADR 0001) | Frame | GL "The prediction scope", lines 502–504 (own movement replayed from the authoritative state on every snapshot); r4:750–751; an inference | research verified |
 | 295 | The map gave this section seven ids, and all belong here | Frame | engine-architect-decision-map-ids.tsv (owner 0005: R1-ABL-REC1, REC2, REC5, OQ1, OQ2, OQ3, OQ9) | settled |
+
+## Counts
+295 rows: research verified 90 · research, source to check 66 · settled 60 · design doc 58 · arithmetic 11 · proposed
+mark 10. Final line checks (2026-10-31): three citations corrected in this ledger (row 168: r1:2974–2975; rows 174–175:
+GL §1 table line 60); every other range re-opened with `sed -n`.

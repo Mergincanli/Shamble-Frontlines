@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 22:54 Amsterdam
+- **Last update:** 2026-10-31 22:56 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -17,15 +17,17 @@
    paragraph, the map addendum's part (e), docs-keeper's STATUS record) · f927ab3.
 4. Decision map (step 2) done; coverage script: 521 of 521 ids, one owner each; addendum sent; drafting started
    (0003, 0006, 0005's ability section) · b2719db.
-5. The map's addendum done (part j); 0001 and 0004 launched · this commit.
+5. The map's addendum done (part j); 0001 and 0004 launched · deeea0d.
+6. Spend-limit cut (about 19:18) recorded; resumed after the reset (22:52); 0006 and 0005's ability section finished;
+   0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
-Step 3, drafting. All five running units were cut at about 19:18 Amsterdam (18:18 UTC) by the org spend limit ("your
-5-hour limit resets 9:50pm (UTC)"); the limit reset at 22:50 Amsterdam (Mustafa: "it has reset now"). The five are
-resumed by message at about 22:55 (not new agents; condition 17 allows no new agent after 23:00). State at the cut, from
-their notes: 0003 draft and ledger done, 0005 asset section written, its ledger next; 0006 draft and ledger done, final
-counts next; 0005 ability section and ledger written, last fixes in hand; 0004 draft done, ledger part way; 0001 draft
-through Rollback, Appendix A (127 rows), Sources and the ledger next.
+Step 3, drafting. Cut at about 19:18 by the org spend limit, resumed at about 22:52 after the reset (Mustafa: "it has
+reset now"). Done: ADR 0006 (infra-engineer: 966 lines, ledger 355 rows, Appendix A 65/65; notes DONE) and ADR 0005's
+ability section (game-designer: 624 lines, ledger 295 rows, Appendix A rows 7/7; notes DONE). Running: 0001
+(netcode-architect, resumed), 0003 + 0005 GPU section (graphics-engineer, resumed), 0004 (rust-reviewer, resumed),
+0002 (engine-architect, launched 22:54), 0005 content data and asset pipeline (engine-architect, launched 22:55). No new
+agent after 23:00 (condition 17).
 
 ## Next steps
 1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
