@@ -7,7 +7,8 @@ table lists as checked: `inputs/findings-checked.tsv`) · `research, source to c
 recommendations and findings outside their checked set, R1 and R2 open questions and RR risks, which their verifiers
 did not check) · `arithmetic` (shown) · `settled` (a STATUS code or GLOSSARY §8) · `design doc` (VISION_V2, LOOP_V2,
 EDITOR_V2, LOOK_V2) · `proposed mark` (with its reason). Where one claim rests on several tiers, the weakest is given
-and the others named. "r1" = `docs/research/r1-simulation-core.md`, "r2" = `r2-netcode.md`, "r4" =
+and the others named. `settled` also marks the drafts' division of scope (plan revision 3 and the decision map,
+approved by the advisor), cited with "(notes)". Row 360 points back to the rows of the part each disposition names. "r1" = `docs/research/r1-simulation-core.md`, "r2" = `r2-netcode.md`, "r4" =
 `r4-physics-navigation.md`, "r5" = `r5-toolchain-quality.md`, "r6" = `r6-infrastructure.md`, "GL" = `GLOSSARY.md`.
 
 ## Summary paragraph and Context
@@ -341,4 +342,79 @@ same table's cells, tier `proposed mark` with that reason, so the verifier can w
 | 295 | OQ-0004-6: bots fill slots and humans take over bot slots | OQ-0004-6 | r2, R2-ROOM-REC6, 2842–2856 | research verified |
 | 296 | OQ-0004-7: snapshot-outside-the-instance and input-replay options not researched; input replay possible under SLICE-ORDER condition 2 | OQ-0004-7 | r1, R1-RR-OQ3, 2936–2940; STATUS SLICE-ORDER | research, source to check; settled |
 | 297 | The DESIGN-owned questions listed after OQ-0004-7 (who blocks whom; what a player may see; blockers, field of view, partial blockers; stances, vehicle bots, fall damage; harvester lanes; player building; offline play; moment thresholds; the caps) | Open questions | id table (owner DESIGN): R4-PHYS-OQ1, R4-NAV-OQ5, R4-OBST-OQ1, R2-XT-OQ13, R4-XT-OQ6, R2-INT-OQ1, R4-LOS-OQ1–OQ4, R4-FLOORS-OQ1–OQ3, R4-OBST-OQ2, OQ3, R1-TICK-OQ7, R1-BND-OQ1, R6-TEL-OQ3, R2-BUD-OQ5; R2-SYNC-OQ5 owner 0001 | settled (the id table's owners) |
+
+## What a spike must prove (S1–S20)
+
+The Pass marks table under it is the test-engineer's (plan step 4); its rows join this ledger then.
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 298 | The stress scene at N = 48: 16v16v16, 15 big vehicles (4 very large units), 300 live projectiles, up to 8 active effects per soldier, one DM_Tri-sized greybox | Spike intro | GL §3, 397–437; MODES-3 (a) | research verified (GL); settled |
+| 299 | ADR 0001 owns the 60 Hz margin run and how the sim's load reaches it (TICK-60-SETUP) | Spike intro | GL §8, the 60 Hz margin; decision map J6 (2) (notes) | settled |
+| 300 | No claim here needs a person's judgement; "look correct" is ADR 0001's | Spike intro | GL §8, the netcode proof test; plan rule 12 | settled |
+| 301 | S1: p99 ≤ 8.3 ms at 30 Hz (≤ 4.2 ms at 60 Hz); mean, p50, p95, p99, max per N; N = 12, 24, 36, 48 and the N = 64 headroom run; 3 runs; parts reported | S1 | r1, R1-TICK-REC2 P1, 2044–2053; R1-ECS-REC1 mark 1, 1923–1931; GL 53–69 | research verified |
+| 302 | 36,000 ticks per run = 20 minutes at 30 Hz, 10 at 60 Hz | S1, S17 | 36,000 ÷ 30 = 1,200 s; 36,000 ÷ 60 = 600 s | arithmetic |
+| 303 | S2: p99 ≤ 13.3 ms at 30 Hz in a dedicated Worker on the minimum laptop, page 30+ fps on Low; Wasm ≤ 2 × native; N from R1-TICK-OQ7 | S2 | r1, R1-TICK-REC2 P2, 2054–2057; R1-ECS-REC1 mark 1, 1923–1931; R1-TICK-OQ7, 2667–2670 | research verified |
+| 304 | S3: p99 ≤ 2 × mean; sight checks per game second per bot within 1 % at 30 and 60 Hz | S3 | r1, R1-TICK-REC3, 2074–2076 | research verified |
+| 305 | S4: every legacy interval within 1 shot at 30 and 60 Hz and within 1 shot of 60 / interval over 60 s | S4 | r1, R1-TICK-REC1, 2023–2024 | research verified |
+| 306 | It meets R1-ABL-REC3's 1 % for the Shabzon: 1 shot in 833 is 0.12 % | S4 | 60 ÷ 0.072 = 833.3 shots; 1 ÷ 833 = 0.12 % | arithmetic |
+| 307 | CD13's Warrior-kills-Conscript 0.86 s within one tick | S4 | r1, R1-ABL-REC3, 2416–2419 | research verified |
+| 308 | A CI check finds no clock read in the step (no `std::time`, no host time import) | S4 | r1, R1-TICK-REC1, line 2027 | research verified |
+| 309 | The units-per-tick figure chosen from the rounding report | S4 | none in the research | proposed mark (reason: part 4 needs a number the research does not give) |
+| 310 | S5: 0 heap allocations per snapshot after warm-up (counting allocator); ≤ 0.2 ms native, ≤ 0.5 ms Wasm p99 | S5 | r1, R1-ECS-REC1 mark 2, 1932–1937 | research verified |
+| 311 | S5: snapshot–restore–continue equals an uninterrupted 10-minute bot match by per-tick hash; serialize round trip byte-identical | S5 | r1, R1-ECS-REC1 mark 4, 1942–1945 | research verified |
+| 312 | 10 minutes = 18,000 ticks at 30 Hz | S5, S7 | 600 s × 30 = 18,000 | arithmetic |
+| 313 | Whole-world replay k = ⌈0.15 s × 30⌉ = 5 ticks within 8 ms p99, only if ADR 0001 keeps it | S5 | r1, R1-ECS-REC1 mark 3, 1938–1941; 0.15 × 30 = 4.5, rounded up to 5 | research verified; arithmetic |
+| 314 | S6: ids survive restore; despawned id never resolves (property test, 10,000 cases); client maps ids with no extra table | S6 | r1, R1-ECS-REC3, 1985–1989 | research verified |
+| 315 | S7: same seed and input log twice on one build, same hash every tick for 36,000 ticks | S7 | r1, R1-TICK-REC1, 2025–2026 | research verified |
+| 316 | S7: bots-only 24v24 (48) and 12v12v12 (36), 10 minutes, 3 seeds, 0 mismatches native–native and native–Wasm; no third match under MODES-3 (a) | S7 | r1, R1-DET-REC1, 2139–2144; STATUS MODES-3 (a) | research verified; settled |
+| 317 | S7: different std `HashMap` seeds in the two processes, same hashes | S7 | r1, R1-ECS-REC2 mark 1, 1966–1971 | research verified |
+| 318 | S7: parry3d's flag on, stress scene, 0 mismatches over 10 minutes; flag cost on and off reported | S7 | r1, R1-DET-REC3, 2178–2182 (applied to parry3d per R4-PHYS-REC1) | research verified (as written for Rapier); the transfer to parry3d is this record's change |
+| 319 | S7: ≥ 10,000 inputs per `libm` function bit-identical on x86-64, AArch64 if picked, Wasm per browser engine; a build check on std transcendentals, `algebraic_*`, `relaxed-simd`; cost reported | S7 | r1, R1-DET-REC2, 2165–2168 | research verified |
+| 320 | S7: the suite with 0 mismatches, catching each injected divergence at its first tick, hashing cost reported | S7 | r1, R1-DET-REC6, 2238–2240 | research verified |
+| 321 | S7: `simd128` on decides R1-DET-OQ2; `libm` accuracy against reference values (R1-DET-OQ8); Wasm `sqrt` against IEEE (R1-DET-OQ10) | S7 | r1, R1-DET-OQ2, 2682–2685; R1-DET-OQ8, 2704–2705; R1-DET-OQ10, 2710–2712 | research, source to check |
+| 322 | S8: first 10,000 outputs per stream identical; saved and restored stream continues identically; muting sound, moving the camera or changing frame rate changes no hash | S8 | r1, R1-DET-REC4, 2205–2207 | research verified |
+| 323 | S8: 0 bytes of authority-only stream state in the client's predicting state | S8 | GL 525–545; STATUS SEC-SPREAD (a) | proposed mark (reason: the test of part 8's rule) |
+| 324 | S8: ChaCha8's cost per tick reported, deciding whether R1-DET-OQ11 returns | S8 | r1, R1-DET-OQ11, 2713–2717 | research, source to check |
+| 325 | S9: R4-PHYS-REC1's six marks (0.55 m climbed, 0.56 m stopped; apex within 1 mm; 0 tunnelling through 0.2 m in 10,000 moves at about 13.3 m/s; ≤ 1 ms native mean, Wasm ≤ 2×; 0 mismatches and byte-identical BVH; sizes; fallback; 0 unsupported pairs) | S9 | r4, R4-PHYS-REC1, 692–717 | research, source to check |
+| 326 | 13.3 m/s is 0.44 m per tick at 30 Hz | S9 | r4, R4-PHYS-REC1 mark 1, 693–699 ("0.44 m at 30 Hz"); 13.3 ÷ 30 = 0.44 | research, source to check; arithmetic |
+| 327 | S9: R1-ECS-REC1 mark 5 (smaller than a bevy_ecs 0.20 stub; one-line incremental rebuild ≤ 10 s) | S9 | r1, R1-ECS-REC1 mark 5, 1946–1949 | research verified |
+| 328 | S9: R4-PHYS-REC2 (20,000 rays; 0 of 1,200 shots over 1 cm above a ramp; byte-identical after restore; BVH build ≤ 50 ms) | S9 | r4, R4-PHYS-REC2, 739–743 | research, source to check |
+| 329 | S9: R4-PHYS-REC3 (0 tunnelling at 30 and 60 Hz; 1,000 of 1,000 bounces; identical landings) | S9 | r4, R4-PHYS-REC3, 758–760 | research, source to check |
+| 330 | S9: R4-PHYS-REC4 (0 ticks with penetration over 1 cm, 10 minutes, 48 soldiers) | S9 | r4, R4-PHYS-REC4, 779–784 | research, source to check |
+| 331 | S9: R4-PHYS-REC5 (marks hold at the far corner; distance within 0.1 %) | S9 | r4, R4-PHYS-REC5, 796–798 | research, source to check |
+| 332 | S10: R4-NAV-REC1's six marks (bake ≤ 1 s native, ≤ 3 s Worker; ≥ 99.9 % coverage, 0 unstandable; 6 m gap; reachability identical; 10,000 identical paths; comparison) | S10 | r4, R4-NAV-REC1, 830–841 | research, source to check |
+| 333 | S10: R4-NAV-REC2 (≤ 5 % of the tick period, 1.67 ms at 30 Hz, at N = 48 and the N = 64 headroom run; no wait over 1 s; ≤ 2 replans per bot per second p99; stall ≤ 7.73 %) | S10 | r4, R4-NAV-REC2, 859–865; 0.05 × 33.33 = 1.67 | research, source to check; arithmetic |
+| 334 | S10: R4-NAV-REC3 (48 bots, 6 m choke, 10 minutes, 0 deadlocks over 3 s; identical hashes; ≤ 0.2 ms p99; 0 cross-floor pairs) and REC4 (bot-free build skips the data; with bots meets S2) | S10 | r4, R4-NAV-REC3, 880–884; R4-NAV-REC4, 896–897 | research, source to check |
+| 335 | S11: FLOORS-REC1 (0 links above reach; 1,000 of 1,000 traversals at 30 and 60 Hz; 0 % unreachable surfaces; drop-downs ≥ 95 % of 200), REC2 (separate ids; 100 of 100; roof not walkable), REC3 (stale 1 of 1) | S11 | r4, R4-FLOORS-REC1, 918–923; REC2, 936–939; REC3, 951–952 | research, source to check |
+| 336 | S12: LOS-REC1 (20,000 pairs; 0 of 10,000 through floors; 0 of 10,000 ramp errors; cost within 5 %, 1.67 ms at 30 Hz; identical hashes), REC2 (≥ 4 scans per second), REC3 (within 1 cm in 1,000 of 1,000; R2-SYNC-REC8 mark 1 ADR 0001's) | S12 | r4, R4-LOS-REC1, 975–986; REC2, 1002–1006; REC3, 1015–1016 | research, source to check |
+| 337 | S13: OBST-REC1 (0 stuck over 3 s; ≤ 2 replans p99; identical hashes) and REC2 (same tick, 0 ticks of disagreement over 1,000 cycles; 1,000 traversals; flip ≤ 0.1 ms p99) | S13 | r4, R4-OBST-REC1, 1037–1041; REC2, 1058–1061 | research, source to check |
+| 338 | S13: the same marks with three stages, a plank link only in the ruin stage, bake still within S10's bake time | S13 | LOOK_V2 §4; r4, R4-OBST-REC2, 1043–1061 | proposed mark (reason: LOOK_V2 §4 names three stages, the research tested two) |
+| 339 | S14: the spike's bot set (legacy GN combat behaviour ported plus a carried cache as a moving goal) | S14 | LEGACY_INVENTORY GN4–GN6, GN13 (lines 269–271, 278); r4, R4-NAV-REC2, 859–865 | proposed mark (reason: "bots with full AI" has no research definition) |
+| 340 | S14: bot reaction times at N = 48 reported (no mark) | S14 | r2, R2-SYNC-OQ13, 2952–2954 | research, source to check |
+| 341 | S15: ≤ 1 ms p99 with 384 active effects, reference server and laptop, 0 heap allocations; 120 s scenario, 3 seeds, identical logs | S15 | r1, R1-ABL-REC6, 2465–2480; R1-ABL-REC3, 2416–2419; 48 × 8 = 384 | research verified; arithmetic |
+| 342 | S16: UPGRADE-SCOPE's sentences as checks (0 entries lost over deaths and switches; track resumes with the next gun; empty records at match start; pickup ids through restore; identical tie resolution) | S16 | UPGRADE-SCOPE | proposed mark (reason: no research mark; test-engineer sets the numbers) |
+| 343 | S17: jitter p99 ≤ 2 ms over 36,000 ticks on the reference server (Linux); back on schedule within 1 s after a 200 ms stall; counters in the metrics | S17 | r1, R1-TICK-REC4, 2090–2092 | research verified |
+| 344 | S17, S18: never more than 7 ticks in one wake or frame (the research's 15 at 60 Hz) | S17, S18 | r1, R1-TICK-REC4, 2090–2092; R1-TICK-REC5, 2109–2114; ⌊0.25 × 30⌋ = 7 | proposed mark (restatement for 30 Hz); arithmetic |
+| 345 | S18: four browsers; foreground jitter p99 ≤ 4 ms over 10 minutes; displacement SD ≤ 5 % of mean on 60, 120, 144 Hz; after 60 s hidden, no tick ran locally; online back in step within 0.5 s | S18 | r1, R1-TICK-REC5, 2109–2114 | research verified |
+| 346 | S18: the same after more than 5 minutes hidden | S18 | r1, R1-BND-OQ2, 2724–2727 | research, source to check |
+| 347 | S19: reach within 1 mm for `T.jumpV` 11, `T.gravity` 24, `T.stepUp` 0.55 | S19 | r1, R1-TICK-REC6, 2124–2125 | research verified |
+| 348 | S20: zero panics over the fuzzed content corpus (ADR 0005's mark, R1-RR-OQ3) | S20 | r1, R1-RR-OQ3, 2936–2940 | research, source to check |
+| 349 | S20: zero panics over fuzzed commands fed to the sim | S20 | none in the research | proposed mark (reason: part 20's rule needs its own test) |
+| 350 | S20: an injected trap ends in a fresh instance back in step via ADR 0001's resync, reported (R6-OBS-REC3) | S20 | r6, R6-OBS-REC3, 754–768; r1, R1-XT-OQ12, 3084–3087 | research, source to check |
+| 351 | Each claim's spike: the sim core spike; S17 the netcode proof test; S18 the boundary spike; S15, S16 the content and ability spike | Spike table | decision map g (spike candidates and what they subsume) (notes) | settled (the drafts' working names; SPIKE_PLAN names them) |
+
+## Migration plan, Test plan, Rollback, Appendix A
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 352 | Phases in the slice order, the netcode proof test before the foundation, the foundation before slice 1 | Migration | STATUS SLICE-ORDER; GL §8 (the foundation) | settled |
+| 353 | Phase 1: the sim core spike in parallel with the netcode proof test, then the content and ability spike before slice 1 | Migration | decision map g, "The proposed order" (notes); SPIKE_PLAN confirms | settled (proposed order, for SPIKE_PLAN and the Advisor) |
+| 354 | Phase 2: the foundation's empty scene through the full stack, hashes matching | Migration | GL §8, the foundation ("an empty scene runs through the full stack") | settled; the hash milestone is proposed |
+| 355 | Phases 3–8 milestones (S-marks on the real crate per slice; S1 ≤ 8.3 ms at N = 48, 3 runs) | Migration | the S rows above | proposed mark (milestones built from the spike claims) |
+| 356 | Test plan items: suite on every change with ADR 0002's tools (gate set and nightly 10-minute match); unit vectors; property tests (10,000 cases); 20,000-ray and 20,000-pair parity fuzzes; fuzzing for panics; benchmarks (3 runs, method); soak 36,000 ticks; navigation checks in CI; network simulation is ADR 0001's; playtests with LOOP_V2 §11's evidence | Test plan | r5, R5-TEST-REC2, 1412–1430; r1, R1-DET-REC6, 2222–2241; R1-ECS-REC3, 1973–1991; r4, R4-PHYS-REC2, 739–743; R4-LOS-REC1, 975–986; LOOP_V2 §11 | research verified (R1); research, source to check (R4, R5); design doc |
+| 357 | Rollback options: B for movement; own query for a missing pair; legacy grid generator; "back to the drafts" with R1-ECS-OQ4; level B and R1-DET-REC7's rule; two stages | Rollback | r4, Options PHYS 606–617, NAV 619–631; r1, R1-TICK-REC2 rule, 2061–2062; R1-ECS-OQ4, 2622–2626; R1-DET-REC7, 2242–2248; r4, R4-OBST-REC2, 1043–1061 | research, source to check; research verified (R1) |
+| 358 | After acceptance each change is its own change-set, so a revert backs it out | Rollback | CLAUDE.md, the change-set protocol | settled |
+| 359 | Appendix A: 82 ids, one row each (adopted 25, changed 10, rejected 1, answered 27, spike 17, open 2) | Appendix A | engine-architect-decision-map-ids.tsv (owner 0004) | arithmetic (counted by script) |
+| 360 | Each "changed" and "answered" disposition's reason | Appendix A | as rows 46–236 for the part named in each row | as the cited row |
 

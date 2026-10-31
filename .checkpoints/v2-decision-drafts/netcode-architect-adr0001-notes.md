@@ -37,3 +37,6 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - 21. Proofread fixes applied (TICK-30 quoted in Context, whole tick wording, join mark ref, GW17 and KVStore cells). No Edit tool: use python replace. Next: claims ledger netcode-architect-adr0001-claims.md, part 1 (Context).
 - 22. Ledger part 1 (Context, rows 1-40) written. Next: ledger part 2 (Decision parts 1-14).
 - 23. Ledger part 2 (rows 41-99, Decision parts 1-5) written. Next: ledger part 3 (Decision parts 6-14).
+- 24. Ledger part 3 (rows 100-195, Decision parts 6-14) written. Next: ledger part 4 (subsections: components, ownership, catalogue, bandwidth, budgets, failure modes, anti-cheat).
+- 25. Ledger part 4 (rows 196-264) written. Next: ledger part 5 (Options, Trade-offs, Consequences, OQs, spike, migration, test plan, rollback).
+- 26. Ledger part 5 (rows 265-305: Options, trade-offs, consequences) written. Next: ledger part 6 (OQs, spike section, migration, test plan, rollback, Appendix A note).

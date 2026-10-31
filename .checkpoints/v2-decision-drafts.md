@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 22:55 Amsterdam
+- **Last update:** 2026-10-31 23:00 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -25,10 +25,11 @@
 Step 3, drafting. Cut at about 19:18 by the org spend limit, resumed at about 22:52 after the reset (Mustafa: "it has
 reset now"). Done: ADR 0006 (infra-engineer: 966 lines, ledger 355 rows, Appendix A 65/65; notes DONE); ADR 0005's ability
 section (game-designer: 624 lines, ledger 295 rows, Appendix A rows 7/7; notes DONE); ADR 0003 and ADR 0005's GPU-rules
-section (graphics-engineer: ledgers 265 and 43 rows, Appendix A 71/71 and 1/1; notes DONE). Running: 0001
-(netcode-architect, resumed), 0004 (rust-reviewer, resumed), 0002 (engine-architect, launched 22:54), 0005 content data
-and asset pipeline (engine-architect, launched 22:54), pass marks for 0003 (test-engineer, launched 22:55). No new agent
-after 23:00 (condition 17).
+section (graphics-engineer: ledgers 265 and 43 rows, Appendix A 71/71 and 1/1; notes DONE); ADR 0004 (rust-reviewer:
+1,027 lines, ledger 360 rows, Appendix A 82/82; notes DONE). Running: 0001 (netcode-architect, resumed; ledger part
+6 of the 127-row Appendix A record), 0002 (engine-architect, launched 22:54), 0005 content data and asset pipeline
+(engine-architect, launched 22:54), pass marks for 0003 (test-engineer, launched 22:55). No new agent from 23:00
+(condition 17).
 
 ## Next steps
 1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
@@ -57,6 +58,9 @@ after 23:00 (condition 17).
   section is the authority (the verifier prompt says so).
 - ADR 0005's ability section: AB11 (on legacy numbers the Banzai blade kills through the Riot Shield) is listed for
   Mustafa; AB12 and AB13 are for the Advisor.
+- ADR 0004: uses the map's interface and seam codes (I-1, I-9, I-10, I-12, I-16, I-17, I-19, I-20, I-21, S1): they need a
+  lasting home (ENGINE_OVERVIEW or adr/README) or removal; OQ-0004-5 (drops and pickups) and OQ-0004-6 (bots' player
+  records) may sit better with ADR 0005's upgrade questions (consistency pass); R1-XU-OQ6 disposed as answered.
 
 ## Key numbers
 - Early script checks on the finished parts (22:57): `dispositions.py` parses 0003's 71 and 0006's 65 Appendix A rows,
