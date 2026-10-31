@@ -112,7 +112,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - BASELINE-WHEN (b) (when the postponed security baseline is researched): "List it in ADR 0006 as open, with
     temporary positions. Research the security baseline before the first online playtest, in its own fresh session."
   - VISION-LINE (a) (a bracket in VISION_V2 §3 saying the starting sizes are totals): "I wrote that line; the
-    clarification is right. Add it as proposed." Added in this change-set (af2560c).
+    clarification is right. Add it as proposed." Added in docs-after-v2-research (PR #31, af2560c).
   - DRAFTS-SESSION (a) (should the decision drafts be planned in this session or a fresh one): "Mustafa starts a fresh
     session with the Advisor's drafts brief."
   - TICK-30 (the server tick rate): "The 60 Hz margin (8.28 of 8.33 ms) is effectively zero. For the decision drafts: a
