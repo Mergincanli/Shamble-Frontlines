@@ -822,7 +822,7 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
 - **Hard constraints in CLAUDE.md that change** (for v2 code only, under SPIKE-SCOPE (a); nothing in CLAUDE.md or
   `.claude/` changes in this PR):
   - "the game runs by double-clicking index.html (file://)": WebTransport works only in secure contexts (HTTPS)
-    (r2-netcode.md, Findings, Brief question 4, R2-TRN-F35, lines 1267–1271), so the online client is served over
+    (r2-netcode.md, Findings, Brief question 4, R2-TRN-F35, lines 1268–1272), so the online client is served over
     HTTPS; how the v2 build is opened locally is ADR 0002's.
   - "Persistence only through `KVStore`": the guest secret lives in an HttpOnly cookie on the lobby's origin that no
     script can read (R2-ROOM-REC8); the guest id may stay in the KVStore successor.
@@ -1208,7 +1208,7 @@ Line numbers are at commit 9e7db28; the research files do not change in this PR.
   (lines 2896–3116), the cross-unit questions R2-XU-OQ1–OQ18 (lines 3118–3269), the shared questions (lines
   3271–3320), the cross-topic questions R2-XT-OQ1–OQ15 (lines 3321–3413), the pointers (lines 3414–3531) and the
   recommendations that hinge on a source not read (lines 3532–3546); Findings R2-SYNC-F17 (line 230) and R2-TRN-F35
-  (lines 1267–1271).
+  (lines 1268–1272).
 - `docs/research/r1-simulation-core.md`: Recommendations, unit tick, R1-TICK-REC1–REC5 (lines 2009–2116); unit
   determinism, R1-DET-REC1 (lines 2129–2145) and R1-DET-REC4 (lines 2184–2207); R1-ECS-REC3 (lines 1973–1990); unit
   boundary, R1-BND-REC1–REC6 (lines 2252–2339); R1-ABL-REC4 (lines 2421–2446); R1-DATA-REC5–REC7 (lines 2542–2594);

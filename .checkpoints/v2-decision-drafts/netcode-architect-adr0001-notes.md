@@ -40,3 +40,7 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - 24. Ledger part 3 (rows 100-195, Decision parts 6-14) written. Next: ledger part 4 (subsections: components, ownership, catalogue, bandwidth, budgets, failure modes, anti-cheat).
 - 25. Ledger part 4 (rows 196-264) written. Next: ledger part 5 (Options, Trade-offs, Consequences, OQs, spike, migration, test plan, rollback).
 - 26. Ledger part 5 (rows 265-305: Options, trade-offs, consequences) written. Next: ledger part 6 (OQs, spike section, migration, test plan, rollback, Appendix A note).
+- 27. Ledger part 6 (rows 306-360) written. Next: ledger tier counts, final checks (line ranges sample), DONE, return.
+- 28. Fixed R2-TRN-F35 lines to 1268–1272 (draft and ledger). Ledger complete: 360 rows (verified 187, source to check 82, settled 35, arithmetic 26, proposed 16, design doc 14). Draft complete (Appendix A 127: adopted 30, changed 7, answered 57, open 17, spike 16; 13 OQs; 14 decision parts).
+- Return notes: ids better placed elsewhere but disposed: R1-TICK-OQ1 (0004's tick/determinism), R2-INT-OQ5 (cost is 0004's sim step share). Not sourced/decided: WebSocket framing overhead (measured), loopback codec cost in the Worker (unmeasured), real command size (measured), Ping rate (proposed, no number), TICK-60-SETUP (OQ for the Advisor), pickup prediction (OQ for Mustafa).
+DONE

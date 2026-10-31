@@ -325,10 +325,73 @@ INV = docs/LEGACY_INVENTORY.md. The test-engineer's pass-mark rows join this led
 | 296 | At P2 a 30 Hz client needs 200–250 ms of rewind | Trade-offs | row 139 | research verified |
 | 297 | About +8 ms average input wait against 60 Hz | Trade-offs | r2 table A, T2 row | research, source to check |
 | 298 | E3b at +42 kbps | Trade-offs | row 105 | arithmetic |
-| 299 | WebTransport needs a secure context (HTTPS) | Consequences | r2 R2-TRN-F35, lines 1267–1271 (checked) | research verified |
+| 299 | WebTransport needs a secure context (HTTPS) | Consequences | r2 R2-TRN-F35, lines 1268–1272 (checked) | research verified |
 | 300 | Guest secret in an HttpOnly cookie; guest id may stay in the KVStore successor | Consequences | r2 R2-ROOM-REC8 | research verified |
 | 301 | Legacy constraints change for v2 code under SPIKE-SCOPE (a); nothing in CLAUDE.md changes in this PR | Consequences | SPIKE-SCOPE (a), STATUS.md:187–188 | settled |
 | 302 | GC3 mark now: port to TypeScript; look brief pending; height-aim rule pending LOOP_V2 §9 | Consequences, rows | INV line 242 | research, source to check |
 | 303 | GC3 proposed split (TypeScript ray from the camera; Rust aim query in the Worker) | Consequences, rows | part 5; r2 R2-SYNC-REC8 | proposed mark (follows part 5) |
 | 304 | GN8 mark now: port to TypeScript; look brief pending; radii 90 m and 50 m | Consequences, rows | INV line 273 | research, source to check |
 | 305 | GN8 proposed split (server event radii in Rust as data; client cull in TypeScript) | Consequences, rows | part 9 (f); r2 R2-INT-REC6 | proposed mark (follows part 9) |
+
+## Part 6: open questions, the spike, migration, tests, rollback, Appendix A
+| # | Claim (short) | Section | Citation | Tier |
+|---|---|---|---|---|
+| 306 | OQ-0001-1: TICK-60-HEADROOM's reading, decided by Mustafa and the Advisor at the stop | Open questions | TICK-60-HEADROOM (advisor, 2026-10-31); GL §8 | settled |
+| 307 | OQ-0001-2 options (a)–(c) and the recommendation (a), fallback (c); (b) loses the load coupling (inference); the 30 Hz marks may use a stand-in, leaving 7.49 ms | Open questions | TICK-60-SETUP (the drafts' assignment to this record); row 294; GL "Time statistics" | proposed mark (a real sim measured in one run is the only setup that keeps the tail; recommended to the Advisor) |
+| 308 | OQ-0001-3 options P2 or 100 ms each way (P4's latency) | Open questions | r2 lines 1987–1992; R2-XU-OQ2 | research verified |
+| 309 | OQ-0001-4 ABL-PREDICT options; Feel Lab on the Molotov and the Riot Shield | Open questions | r2 ABL-PREDICT, lines 3277–3288; STATUS.md:121–123 | settled |
+| 310 | OQ-0001-5: 200 ms (default principles; security review prefers) or 250 ms (sync unit) | Open questions | r2 R2-XU-OQ1, lines 3123–3131; R2-SYNC-OQ2, OQ15 | research, source to check |
+| 311 | OQ-0001-6 options: as they arrive within a cap (Source) or one per tick buffered; nudging or skipping (not researched) | Open questions | r2 R2-SYNC-OQ3, lines 2909–2915; r1 R1-TICK-OQ8, lines 2672–2673 | research, source to check |
+| 312 | OQ-0001-7: no source read on sub-tick stamps | Open questions | r1 R1-TICK-OQ4, lines 2654–2656 | research, source to check |
+| 313 | OQ-0001-8: none, Quake III's 50 ms prestep, or latency up to the cap | Open questions | r2 R2-SYNC-OQ6, lines 2925–2927 | research, source to check |
+| 314 | OQ-0001-9: at 9 m/s a target moves about 1.8 m in 200 ms, half the blade's reach | Open questions | r2 R2-SYNC-OQ9, lines 2933–2935 | research, source to check |
+| 315 | OQ-0001-10 options; Quake III's predicted pickups | Open questions | r2 R2-SYNC-F17, line 230 | research verified |
+| 316 | OQ-0001-11: guests are free, so the code is in practice the access secret; 6 of 32; 8 or more; host approval; lock on | Open questions | r2 R2-ROOM-OQ10, lines 3106–3111 | research, source to check |
+| 317 | OQ-0001-12: an exact position on a gunshot 80 m away is a radar; three options | Open questions | r2 R2-INT-OQ6, lines 3026–3028 | research, source to check |
+| 318 | OQ-0001-13: fallback share, IPv6 share, address changes from telemetry | Open questions | r2 R2-TRN-OQ7, R2-BUD-OQ11, R2-ROOM-OQ8 | research, source to check |
+| 319 | The proof test's definition quoted word for word | What a spike must prove | GL §8 the netcode proof test (brief §2) | settled |
+| 320 | Its sim: throwaway, movement, hitscan, bots as protocol clients, native and Wasm | What a spike must prove | r5 R5-TEST-REC5 (bots as protocol clients), lines 1475–1495 | research, source to check |
+| 321 | Interop: 99 of 100 per browser, negotiated draft recorded; swap by diff; version floors | Spike item 1 | r2 R2-TRN-REC1 marks 1, 3, 5 | research verified |
+| 322 | UDP blocked → WebSocket within 3 s; identical hashes on both transports; HOL p99 ≤ 250 ms at P2 (restated from 100 ms and 1 %), ≤ 1 unsent snapshot | Spike item 1 | r2 R2-TRN-REC3 marks 1–3 | research verified |
+| 323 | One build, four browsers, both backends; RTT within ±5 ms at P2 (restated from 100 ms injected RTT); cargo tree; 10 million inputs, 0 panics | Spike item 1 | r2 R2-TRN-REC4 marks 1–4 | research verified |
+| 324 | maxDatagramSize ≥ 1,000 B, every 10 s; lost-or-late ≤ loss + 1 pp at P2; 0 of 10,000 one-shot actions at P3 (from 5 % loss); 1 MB bulk ≤ 5 ms p99 | Spike item 1 | r2 R2-TRN-REC2 marks 1–4 | research verified |
+| 325 | Dev certificates: 20 of 20 with a pinned self-signed certificate; a 15-day certificate rejected | Spike item 1 | r2 R2-TRN-REC5 marks 1, 3 | research verified |
+| 326 | Decoded snapshots match by hash under P0, P2, P3, B1; 500 ms after B1; no datagram above the cap | Spike item 2 | r2 R2-SYNC-REC1 marks 1–3 | research verified |
+| 327 | Sync cost no faster than linear at 24, 36, 48 | Spike item 2 | r2 R2-SYNC-REC9 mark 2 | research verified |
+| 328 | Join: complete world within 300 ms at P2 (restated from 100 ms RTT, 2 % loss) | Spike item 2 | r2 R2-BUD-REC3 mark; R2-XU-OQ6 | research verified |
+| 329 | 99.9 % of commands before their tick at P3; 0 of 10,000 presses lost or doubled; forged rejected; lag switch capped | Spike item 2 | r2 R2-SYNC-REC2 marks 1–4 | research verified |
+| 330 | Missing inputs ≤ 0.1 % of player-ticks at P3 (restated from 5 % random loss) | Spike item 2 | r2 R2-BUD-REC1 mark | research verified |
+| 331 | Throttle 128 kbps for 10 s: ≤ 2 missing per second; own state kept; full rate within 2 s | Spike item 2 | r2 R2-BUD-REC5 mark | research verified |
+| 332 | Bottleneck at 50 %: newest snapshot ≤ 3 intervals old; memory flat; tick p99 within 5 %; NewReno vs Cubic | Spike item 2 | r2 R2-TRN-REC6 marks 1–3 | research verified |
+| 333 | Flood: 1,000 sessions, 10 oversize clients; p99 within 10 %; memory under the ceiling; 403 | Spike item 2 | r2 R2-TRN-REC1 mark 4 | research verified |
+| 334 | A handler panic closes only that connection | Spike item 2 | r2 R2-ROOM-REC2 mark 6 | research verified |
+| 335 | 8 rooms as 8 processes, each within 10 %; a killed room leaves others unchanged; CCX23 and CX33 | Spike item 2 | r2 R2-ROOM-REC2 marks 2, 4; r6 R6-HOST-REC2 mark | research verified |
+| 336 | The 60 Hz margin mark | Spike item 3 | row 48 | settled |
+| 337 | Mustafa judges "look correct" in Brave; test-engineer writes the checklist | Spike item 4 | plan rule 12 (advisor condition 10) | settled |
+| 338 | Corrections: 0 > 1 mm in time, P0–P4; P3 brawl > 5 cm in < 1 %, ≤ 5 cm per frame; input-to-screen same at P0 and P4 within one tick; replay ≤ 1 ms | Spike item 4 | r2 R2-SYNC-REC3 marks 1–3; r1 R1-TICK-REC2 P3 | research verified |
+| 339 | Interpolation: < 1 % frames at P2, < 3 % at P3; one interval under B1; settles in 5 s; 0 slides in 1,000 respawns | Spike item 4 | r2 R2-SYNC-REC4 marks 1–4 | research verified |
+| 340 | Clock offset error ≤ 5 ms after 2 s of samples | Spike item 4 | r2 R2-BUD-REC4 mark | research verified |
+| 341 | Hits: ≥ 99 % up to P2, 95 % at P3, false < 0.5 %, 9 m/s target; 100 % within the cap, clipped share recorded; cheat client; history ≤ 1 MB; 20 µs | Spike item 4 | r2 R2-SYNC-REC5 marks 1, 3–6 | research verified |
+| 342 | Server hit point within 5 cm in ≥ 99.9 % of shots at 0, 2.5, 4 m, P0–P3; aim ≤ 80 bits | Spike item 4 | r2 R2-SYNC-REC8 marks 1–2 | research verified |
+| 343 | No damage or kill on another soldier before confirmation | Spike item 4 | r1 R1-ABL-REC4 mark | research verified |
+| 344 | What the proof test decides (crate, cap, E3/E3b with 0 desyncs over 1,000 throws, process model, encode cost, controllers, drafts, UDP blocked, rewind estimate, sizes, Hermite, timing, sub-tick) | Spike item 5 | r2 R2-TRN-OQ5, R2-BUD-OQ3, R2-XU-OQ5, R2-BUD-REC2, R2-ROOM-OQ1, R2-BUD-OQ9, OQ10, R2-TRN-OQ1, OQ2, OQ8, R2-XU-OQ2, OQ4, OQ15, R2-SYNC-OQ12 | research verified |
+| 345 | Reported: egress per 48-player match-hour and the spike's bill | Spike item 5 | r6 R6-COST-REC1 mark | research, source to check |
+| 346 | Migration step 1 done-when: marks met, tick rate, crate, E3/E3b, process model, cap named; Brave checklist | Migration | SLICE-ORDER condition 3; this record's parts | settled |
+| 347 | Step 2: foundation ends when an empty scene runs through the full stack with CI green and a preview link | Migration | GL §8 the foundation | settled |
+| 348 | Step 3: movement and shooting input-driven and replayable from day one | Migration | SLICE-ORDER condition 2, STATUS.md:98–99 | settled |
+| 349 | Steps 3–8 milestone marks (R2-SYNC-REC2 1–2, REC3 1–3; ROOM-REC6 1–3, REC7 1–2; ROOM-REC1/3/4/5/8, INT-REC2, INT-REC5; ROOM-REC1 mark 3; BUD-REC2 100 kbps, INT-REC1 (a), INT-REC2 (c); budgets with the real sim; R5-TEST-REC5) | Migration | the cited recommendations' marks | research verified |
+| 350 | First multiplayer preview behind the access wall; security baseline before the first online playtest | Migration | PREVIEW-WALL (a) STATUS.md:106–107; BASELINE-WHEN (b) STATUS.md:112–113 | settled |
+| 351 | Editor's Test plays the map with bots | Migration | EDITOR_V2 §3 | design doc |
+| 352 | L1 seeded on simulated time in the gate; L2 under quinn; TCP proxy for WebSocket | Test plan | r5 R5-TEST-REC4, lines 1454–1474 | research, source to check |
+| 353 | Bots as headless protocol clients, 48 per room, 30 min at P2 per mode; a 3-hour soak before each playtest | Test plan | r5 R5-TEST-REC5, lines 1475–1495 | research, source to check |
+| 354 | Forged picks and pickups refused with no effect, same harness as R2-SYNC-REC2 mark 3 | Test plan | design of this record (part 12) | proposed mark (the refusal rule of part 12 needs its own test) |
+| 355 | Recurring run against beta channels | Test plan | r2 R2-TRN-OQ1 | research, source to check |
+| 356 | Rollback: 30 Hz failure back to the drafts; 60 Hz failure keeps 30 Hz | Rollback | part 2's restated rule | settled |
+| 357 | Rollback: a crate swap touches only the transport module | Rollback | r2 R2-TRN-REC1 mark 3 | research verified |
+| 358 | Rollback: option B with panic = "unwind" and per-room containment | Rollback | r2 R2-ROOM-REC2 | research verified |
+| 359 | Appendix A: 127 ids, one disposition each (adopted 30, changed 7, answered 57, open 17, spike 16) | Appendix A | the decision map's id table, owner 0001 | arithmetic |
+| 360 | Sources: line ranges listed | Sources | the files as cited | research verified |
+
+## Counts
+360 rows: research verified 187 · research, source to check 82 · settled 35 · arithmetic 26 · proposed mark 16 ·
+design doc 14. The test-engineer's pass-mark rows are added in plan step 4.
