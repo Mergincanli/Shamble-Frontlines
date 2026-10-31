@@ -400,4 +400,16 @@ pass) lists both among its 19 confirmed; the topic's own verifier section is the
 | 355 | Rollback: versioned records, old records still parse | Rollback | r6, R6-TEL-REC2's mark, lines 824–826 | proposed mark (the research's) |
 
 ## Counts
-Computed by script over the tier column (see the notes file for the run).
+Computed by script over the tier column (355 rows, numbered 1–355 with no gap or duplicate). A row with two tiers is
+counted by its first; 26 rows carry two tiers.
+
+| Tier | Rows |
+|---|---|
+| research verified | 55 |
+| research, source to check | 137 |
+| arithmetic | 23 |
+| settled | 64 |
+| design doc | 23 |
+| proposed mark | 43 |
+| repeat of an earlier row ("as #n") | 10 |
+| **Total** | **355** |

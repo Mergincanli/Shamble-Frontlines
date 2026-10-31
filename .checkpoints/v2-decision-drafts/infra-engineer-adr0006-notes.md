@@ -28,3 +28,4 @@
 - 24 Ledger part 1 written (rows 1-119: header, Context, Decision 1-7) to infra-engineer-adr0006-claims.md. Next: ledger part 2 (Decision 8-14), part 3 (Options, Trade-offs, Consequences, OQs, spike, migration, test, rollback).
 - 25 Ledger part 2 written (rows 120-216: Decision 8-14). Next: ledger part 3 (Options Q1-Q13, Trade-offs, Consequences, OQs, spike marks, migration, test plan, rollback).
 - 26 Ledger part 3 written (rows 217-355: Options, Trade-offs, Consequences, OQs, spike, migration, test, rollback). Next: count tiers by script, append counts; final checks; DONE; return.
+- 27 Tier counts (script, 355 rows, no gaps/dups; first tier counted, 26 rows mixed): research verified 55, research source to check 137, arithmetic 23, settled 64, design doc 23, proposed mark 43, repeats 10. Appended to the ledger. Next: final checks (headings order, Appendix 65/65, glossary scan), DONE, return.
