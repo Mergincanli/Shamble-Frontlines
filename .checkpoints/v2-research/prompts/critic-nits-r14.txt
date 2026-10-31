@@ -1,4 +1,0 @@
-# Session message to engine-architect (R1, R4), saved verbatim before sending (2026-10-31 about 10:53 UTC)
-Last nits from step 3d's completeness critic (verbatim: /home/user/Shamble-Frontlines/.checkpoints/v2-research/verifier-3d-critic-result.md, check 4 and check 3). Links only, plus what is named below; change nothing else, no new claim, number or source; log each as a nit with a part-7 line under "Step 3d fixes"; do not commit. Line numbers are those of the current file. Reply in under 40 words.
-R1: r1:1915 (R1-ECS-REC1's "Rests on" line): link "the stress scene" ([the stress scene](GLOSSARY.md#the-stress-scene)); it is the first real use.
-R4: r4:529 ("576 at 24v24", the wave-1 list): link the mode name to GLOSSARY.md#team-size-and-how-modes-are-written, the first real use of team size in R4.

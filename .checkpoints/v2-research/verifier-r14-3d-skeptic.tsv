@@ -1,2 +1,0 @@
-topic	line	entry	phrase	verifier_verdict	skeptic_verdict	reason
-R1	2049	The server tick budget	25 %	right	unsure (count wrong)	R1-TICK-REC2 P1: 'The other 25 % of the server tick budget (GLOSSARY: 50 % of the tick period) is the server-only share': the 25 % is of the tick period, but the sentence names the server tick budget as its whole (read literally: 25 % of 8.3 ms = 2.1 ms); near the retired exact '25 % of the tick budget'. The glossary's Used today echoes the wording.
