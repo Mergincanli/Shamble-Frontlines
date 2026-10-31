@@ -50,6 +50,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 - **Docs loop v2, team prep fixes, map dedupe (2026-10-15/16):** docs-loop-v2 (PR #9, 67cf55b: `docs/LOOP_V2.md`) · team-prep-fixes (PR #11, 513f2fc: bots hit through the SIM hit world; allocation-light LOS and shot checks via `rayStatics`; reports/2026-10-15-team-prep-fixes.md) · map-dedupe-on-load (PR #10: exact duplicate trees / props dropped on Load; reports/2026-10-14-map-dedupe-on-load.md). Brave checks passed.
 - **Three teams core, 3a (2026-10-17):** PR #15, 5ffe679: teams as data, a 12-slot soldier table, team-filtered shots, two-layer damage, bot targeting under a LOS budget, the DM_Tri arena (`?map=tri`); Mustafa's Brave check passed; follow-ups in STATUS.
 - **Kit v1.3 (2026-10-17):** PR #14, 9614ecf: the "Reporting to Mustafa" rule in CLAUDE.md and the advisor-report template.
+- **Kit v1.4–v1.6, the night shift (2026-10-17):** kit-v1-4 (PR #17, bd27eeb: CLAUDE.md "Night shift": approved unattended work goes into the Night queue, issue #16) · kit-v1-5 (PR #18, 2303073: `.claude/NIGHT_SHIFT.md`, the routines read it from main) · kit-v1-6 (PR #19, cbd79e5: a cut-off run is picked up; the report comment updated per item). No game code.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -81,7 +82,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**R1–R6 research [2026-10-27, IN PROGRESS]** — on `cs/v2-research` (draft PR #28): wave 1 is R1 simulation core (6 units) and R2 netcode (5 units), one Opus agent each at xhigh; cut off by the org spend limit on launch day and resumed the same evening. Daytime only until kit-v3-1 is merged. Next: wave 2 (R3–R6), then the synthesis.
+**R1–R6 research [2026-10-27 to 10-31, DONE, awaiting merge]** — `cs/v2-research`, PR #28 (docs only, symbols +0 −0): six topic files in `docs/research/` (R1 simulation core … R6 infrastructure), plus `GLOSSARY.md` (34 shared terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). Three verification levels: R1 and R2 verified (every recommendation claim); R3–R6 spot-checked (45 of 77, 50 of 52, 61 of 115, 21 of 42 key claims); every change from the 12 contradictions re-checked (7 resolved, 1 aligned, 4 escalated). Merges on Mustafa's "merge #28" after the advisor's APPROVE. Report: `docs/reports/2026-10-31-v2-research.md`. Next: the decision drafts.
 
 **R7 legacy inventory [2026-10-27, MERGED]** — PR #27, 07ab240, merged by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 (docs and one read-only tool, symbols +0 −0): `docs/LEGACY_INVENTORY.md` (247 systems; marks rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"), `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json` (60 tuning tables), `tools/tuning-dump.js`. The marks are working recommendations (R7-MARKS (a)). Report: `docs/reports/2026-10-27-r7-legacy-inventory.md`.
 
@@ -98,10 +99,4 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **Kit v2.0 [2026-10-17, MERGED]** — kit-v2-0 (PR #21, 04c086c, PR Advisor APPROVE, Mustafa's go in chat): new `.claude/agents/advisor.md` (plan reviews, PR reviews, merges by the PR Advisor routine); CLAUDE.md protocol steps 2 and 6 and the standing permission route plans and PRs through the advisor; NIGHT_SHIFT rule 7: NEEDS PLAN items get a plan reviewed by the advisor agent; labels `ready-to-merge`, `needs-mustafa`, `changes-requested`. No game code touched.
 
 **Docs after 3a [2026-10-17, MERGED]** — docs-after-3a (PR #20, df1e6d3, PR Advisor APPROVE, Mustafa's go in chat; docs only): STATUS and ROADMAP caught up with the 2026-10-17 merges and the Advisor's R19-ORDER / LOS-SIZE / K4-MEASURE verdicts.
-
-**Kit v1.6 [2026-10-17, MERGED]** — kit-v1-6 (PR #19, cbd79e5, Advisor APPROVE, Mustafa's go): `.claude/NIGHT_SHIFT.md` now says an earlier night's cut-off run is picked up, and the report comment on the Night queue is updated after every finished item. No game code touched.
-
-**Kit v1.5 [2026-10-17, MERGED]** — kit-v1-5 (PR #18, 2303073, Advisor APPROVE, Mustafa's go): new `.claude/NIGHT_SHIFT.md` holds the night shift's rules; the three night-shift routines read it from main. No game code touched.
-
-**Kit v1.4 [2026-10-17, MERGED]** — kit-v1-4 (PR #17, bd27eeb, Advisor APPROVE, Mustafa's go): CLAUDE.md gets a "Night shift" section: approved unattended work goes into the Night queue (issue #16) the day it is approved; anything that needs Mustafa never does. No game code touched.
 

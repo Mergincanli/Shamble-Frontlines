@@ -1,14 +1,15 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-27; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25) and R7, the legacy inventory (PR #27), merged; R1–R6 research running. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), and docs-after-r7 (PR #29) merged; R1–R6 research done on `cs/v2-research` (PR #28, not merged yet). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
 `docs/V2_PHASE0_BRIEF.md`, added 2026-10-24). Done: kit-v3-0, the process upgrades (PR #26, f2ccc13, 2026-10-25);
-docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27).
-Running: R1–R6 research on `cs/v2-research` (wave 1: R1 simulation core and R2 netcode; daytime only). Next: the
-synthesis (`docs/ENGINE_OVERVIEW.md` and the ADR drafts 0001–0006), then a stop for Mustafa and the Advisor. The
-legacy game is frozen (critical fixes only).
+docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27);
+docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only). Done, waiting to merge: R1–R6 research (PR #28, below). Next:
+the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), which wait for the answers under "Decisions
+pending" where they depend on them; then a stop for Mustafa and the Advisor. The legacy game is frozen (critical
+fixes only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
@@ -41,8 +42,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **R1–R6 research** (wave 1: R1 simulation core, 6 units, and R2 netcode, 5 units, one Opus agent each at xhigh; launched 2026-10-27, cut off by the org spend limit, resumed the same evening; daytime only) | `cs/v2-research`, draft PR #28 | running | wave 1's results, then wave 2 (R3–R6), then the synthesis |
-| docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | `cs/docs-after-r7`, draft PR #29 | in review | the advisor's review of its head, then Mustafa's "merge #29" |
+| **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | `cs/v2-research`, draft PR #28 | done; ready for review once this docs step and the report are in | the advisor's review of its head, then Mustafa's "merge #28" (the PR Advisor routine is off) |
+| docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
 | kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1` | being finished in the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | its PR, for Mustafa's go |
 | **R7 legacy inventory** (`docs/LEGACY_INVENTORY.md`: 247 systems, each with a recommended mark: rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"; `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json`: 60 tuning tables; read-only `tools/tuning-dump.js`; symbols +0 −0) | merged: PR #27, 07ab240, 2026-10-27, by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 | done; report `docs/reports/2026-10-27-r7-legacy-inventory.md` | none |
 | docs-after-kit-v2-2 (docs only: kit-v2-2's and #24's merges and main's branch protection recorded) | merged: PR #25, 4c24d07, 2026-10-27 | done | none |
@@ -77,6 +78,28 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Waiting (from R1–R6; the full wording is in each topic's "Shared open questions" and the v2-research report):**
+  - MODES-3 (Mustafa): do VISION_V2 §3's starting sizes count players in total or per team? It sets the largest mode,
+    48 players (totals, 24v24) or 54 (per team, 18v18v18); some research marks fail at 54. Recommended: totals.
+  - PREVIEW-WALL (Mustafa): do per-PR previews that reach the staging game server sit behind a Cloudflare login?
+    Recommended: yes, from the first such preview.
+  - BASELINE-WHEN (the Advisor): research the deferred security baseline before ADR 0006, or list it open there?
+    Recommended: list it open with interim positions.
+  - ABL-PREDICT (Mustafa, after a Feel Lab test): does the client predict the player's own abilities?
+  - SEC-SPREAD (Mustafa): the spread random stream's cheat trade-off: tracers that match the server's spread, or
+    spread kept server-only so a cheat can't cancel it (the research's default)?
+  - NS-2 (Mustafa): create the Night shift routine that starts a fresh session on every run, on the Routines page
+    (a session can't switch the old routine, and one it creates has no repository); steps in the v2-research report.
+  - Next after PR #28: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`); the parts that depend
+    on the answers above wait for them.
+- Taken by the Advisor 2026-10-30 (relayed by Mustafa): VERIFY-FETCH (a), research may read allow-listed pages with
+  curl by day (read-only, the host audit in each report); the night shift stays on WebFetch until kit-v3-1 is merged.
+  The unread sources go in `docs/research/UNREAD_SOURCES.md`; the critic's 12 contradictions are resolved before the
+  drafts, with a shared glossary (`docs/research/GLOSSARY.md`). NS-2 (c): the night shift starts a fresh session per
+  run (now with Mustafa, above).
+- Taken by the Advisor 2026-10-28 (relayed by Mustafa): WINDOW-0730 (a), the night shift ends at 07:30 (the R7 session
+  writes it into kit-v3-1; the routine's cron already runs 00:10–07:10); NIGHT-RESEARCH (a), research stays daytime
+  only; fewer agents at once (4–5) for the same work, so units finish before a spend-limit cut.
 - Taken by the Advisor 2026-10-27:
   - R7-MARKS (a): the inventory's marks are working recommendations, changed when their ADR draft comes up; rows
     marked "look brief pending" stay pending until the look brief exists.
@@ -87,9 +110,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     comes to Mustafa.
   - kit-v3-1 "shelved" for the v2 day session only (KIT31-STATE (b)): it keeps away from the branch and its files.
   - SRC-ACCESS (a): some sources the research needs could not be read: Valve's developer wiki (HTTP 403), GDC Vault (a
-    maintenance page) and Unreal's docs (outside the allow list). For now a recommendation that needs one becomes an
-    open question; the full list comes with the wave-1 tally; for any recommendation that hinges on a missing source
-    the Advisor looks for another copy; official-docs domains such as Epic's can be added in the next kit PR.
+    maintenance page) and Unreal's docs (outside the allow list). A recommendation that needs one became an open
+    question; the full list is `docs/research/UNREAD_SOURCES.md` (67 hinge rows); for any recommendation that hinges
+    on a missing source the Advisor looks for another copy; official-docs domains such as Epic's can be added in the
+    next kit PR.
   - Research in the daytime only until kit-v3-1 is merged.
   - The night shift takes only items that need no web access, and lists any permission-prompt stop in its morning
     report.
@@ -130,7 +154,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   aiming at height with ledges (decide in octopon-3-greybox); Octopon-3 map size (start near Cabana, adjust with the scale test)
 
 ## Routines
-- **Night shift** (trig_019LtRqmAdzddyk6K3e3kDJz; hourly from 00:10 to 08:10 Amsterdam, in its own session): until
+- **Night shift** (trig_019LtRqmAdzddyk6K3e3kDJz; hourly from 00:10 to 07:10 Amsterdam (cron restored 2026-10-30), in
+  one persistent session; NS-2 replaces it with a fresh-session routine, Mustafa's step): until
   kit-v3-1 is merged, it takes only items that need no web access, and a stop at a permission prompt is
   listed in its morning report. Research runs in the daytime only.
 - **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
@@ -139,6 +164,12 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   "merge #<n>".
 
 ## Open bugs and risks
+- **R1–R6 research** (its report, "Risks"):
+  1. If MODES-3 picks 54 players, marks written for 48 fail: R2's bandwidth (about 164–171 kbps against a 160 kbps
+     mean), R3's hull-outline cap, and the 60 Hz server tick on a re-flood tick (only the last is in the files).
+  2. R3–R6 are spot-checked only: the drafts must verify every ADR claim and number, R3–R6's included.
+  3. Unread sources: 67 rows where a recommendation hinges on one wait for other copies (`docs/research/UNREAD_SOURCES.md`).
+  4. The org spend limit cut the research five times; notes-first kept every cut recoverable.
 - **R7 legacy inventory** (its report, "Risks"):
   1. R1–R6 use the marks before Mustafa confirms them: answered by R7-MARKS (a), the marks are working recommendations.
   2. Some `ANIMATION_PLAN.md` §6 numbers come from headless snippets that are not in `tools/`, so they can't be re-run
