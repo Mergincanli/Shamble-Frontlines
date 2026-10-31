@@ -52,3 +52,4 @@ Task: v2 decision drafts, step 2, the decision map (engine-architect), notes.
   Next: write the map file: header + part a (scope, seams), then b, c, d, e, f, g, h, session items.
 - 10 parts a and b written to the map file.
 - 11 part c (shared numbers N1-N54) written.
+- 12 parts d (interfaces I-1..I-21) and e (traces: §6 1-10, LOOK_V2 every item) written.

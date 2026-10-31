@@ -1,6 +1,6 @@
 # UPGRADE-SCOPE: Mustafa's update in the session's chat, 2026-10-31 (verbatim)
 
-Received in session_0173vVo6CEsV7ckERUa6TtEd at about 18:45 Amsterdam, typed by Mustafa (a user message, not an agent
+Received in session_0173vVo6CEsV7ckERUa6TtEd at about 18:41 Amsterdam, typed by Mustafa (a user message, not an agent
 report). It replaces the drafts brief's upgrade note (brief §1 "UPGRADE-SCOPE" and §3's ADR 0005 sentence on in-match
 upgrades), as its first line says.
 

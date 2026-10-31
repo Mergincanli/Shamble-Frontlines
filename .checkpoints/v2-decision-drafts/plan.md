@@ -1,4 +1,9 @@
-# Plan: v2-decision-drafts (docs only), revision 2
+# Plan: v2-decision-drafts (docs only), revision 3
+
+Revision 3 (about 18:43) applies Mustafa's UPGRADE-SCOPE update of 2026-10-31 (his words, verbatim in
+`inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md`; it replaces the brief's upgrade note). It answers the open question
+condition 11 named ("how a pick applies after a switch to a different unit": tracks survive switching) and names three
+new ones; nothing else changes. A decision of Mustafa's, applied as written, so no new review; the report logs it.
 
 Revision 2 folds in the advisor's APPROVE of revision 1 and its 19 conditions (2026-10-31, about 18:35 Amsterdam;
 verbatim in `advisor-verdicts.md` §1). Folding needs no second review (the verdict). Each condition's place is marked
@@ -60,8 +65,14 @@ changes.
 
 ## Settled inputs (never reopened)
 The stack; N = 48 (MODES-3 (a)); TICK-30; SLICE-ORDER and its three conditions; PREVIEW-WALL (a); SEC-SPREAD (a);
-ABL-PREDICT (waits for the Feel Lab test); BASELINE-WHEN (b); UPGRADE-SCOPE (the player owns in-match upgrade picks:
-they survive death and reset every match; GAS on the PlayerState, not the Pawn; docs-keeper adds the code to STATUS);
+ABL-PREDICT (waits for the Feel Lab test); BASELINE-WHEN (b); UPGRADE-SCOPE as Mustafa updated it on 2026-10-31
+(verbatim in `inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md`; docs-keeper records his words in STATUS with today's
+decisions): every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the
+player; tracks survive death and switching and reset at the start of every match; a class always comes with its own
+weapon (no weapon choice when buying); other weapons come only from killed enemies' drops, and dropped weapons are world
+pickups; progress belongs to the weapon type, not the physical gun; the tracks live on the PlayerState, not the Pawn.
+Open, for Mustafa (listed, never decided): carry slots, ammo for looted weapons, and how fast tracks level (including
+catch-up when switching);
 SPIKE-SCOPE (a); R7-MARKS (a); LOOK_V2 (authored glTF/GLB models allowed in v2); GLOSSARY §8's foundation and netcode
 proof test (brief §2). Where a research mark gives 48 and 54, the drafts use 48; where it says "until … answers", the
 answer applies (carry-forward 3).
@@ -162,10 +173,15 @@ test-engineer) write their text whole into their notes; the session copies it in
 copying) and credits the author in the draft's header. netcode-architect and engine-architect follow the same route, so
 every draft is assembled the same way. Each author fixes only its own text.
 
-**ADR 0005** [C4, C11]: it designs no upgrade, ability, unit or rule (escalation category 2). It shows that the ability
-system can carry the in-match upgrades (pick one of three, owned by the player, kept through death, reset every match;
-GAS on the PlayerState, not the Pawn) and lists "how a pick applies after a switch to a different unit" as an open
-question for Mustafa, with options and no pick. Its asset part takes LOOK_V2 §8's flow as given and proposes only what
+**ADR 0005** [C4, C11, and Mustafa's UPGRADE-SCOPE update]: it designs no upgrade, ability, unit or rule (escalation
+category 2). It shows that the ability system can carry UPGRADE-SCOPE as Mustafa wrote it: a roguelike track per unit
+and per weapon type (pick one of three per level), owned by the player (the PlayerState, not the Pawn), surviving death
+and switching, reset every match; progress on the weapon type, waiting when a gun is lost for the next gun of that
+type. It lists, for Mustafa, with their options and no pick: carry slots, ammo for looted weapons, and how fast tracks
+level (including catch-up when switching); any tension it finds with LOOP_V2 or VISION_V2 (for example LOOP_V2 §8's
+third gate, buying an unlocked item each life, next to "no weapon choice when buying") is listed the same way, never
+resolved. The other drafts carry their parts as the decision map's addendum assigns them: the player record that holds
+the tracks and the weapon drops and pickups as sim entities (0004), their authority, messages and replication (0001). Its asset part takes LOOK_V2 §8's flow as given and proposes only what
 R1-DATA, R3-CHAR and R3-BUDGET support; the rest (compression formats, the LOD tool, export checks, the material-slot
 renaming step and the per-unit budget numbers) are open questions marked "not researched", grouped under one research
 unit, "asset-pipeline research" (graphics-engineer, verified like R3, in its own daytime session), which SPIKE_PLAN
@@ -184,7 +200,9 @@ graphics-engineer's parts land, and places those parts verbatim as sections.
    CDN tag, :273 the 11 wall-clock reads), each with its draft; one line closing PR #28 finding 4's research-plan
    condition 13 (two branches from one session): it no longer applies; (c) the traces of rule 4, including EDITOR_V2
    §2's document rules (→ 0005) and EDITOR_V2 §5's double-click and "if ADR-002" lines (→ 0002, listed for DOCS-ALIGN);
-   (d) how ADR 0005 is put together (above). A script checks the id table: every one of the 521 ids exactly once, owner
+   (d) how ADR 0005 is put together (above); (e) UPGRADE-SCOPE as Mustafa updated it: which draft carries each part
+   (the tracks as data, the player record that holds them, weapon drops and world pickups in the sim, their authority,
+   messages, replication and telemetry) and where its three open questions are listed. A script checks the id table: every one of the 521 ids exactly once, owner
    in {0001…0006, SPIKE_PLAN, DESIGN}.
 3. **Drafting** (≤ 5 agents at once, NIGHT-RESEARCH (a)): the units of the table. Each writes its draft (or section), its
    claims ledger and its notes, and returns a short summary. Prompts saved before launch in `prompts/`. ADR 0005's frame
@@ -227,7 +245,8 @@ graphics-engineer's parts land, and places those parts verbatim as sections.
     not its own pass-mark tables) · and each draft's author reviews its draft's pass-mark table for domain fit [C15].
     Every finding is fixed or explicitly deferred with a reason; fixes go through step 9's loop once more.
 11. **docs-keeper** (high): STATUS (this change-set's row; PR #32's row marked merged; UPGRADE-SCOPE recorded with the
-    other 2026-10-31 decisions, as brief §1 asks; the carry-forwards' state; KIT-ALIGN gains the stale "look is not
+    other 2026-10-31 decisions in Mustafa's own words of his update (verbatim in the inputs folder), as he and brief §1
+    ask; the carry-forwards' state; KIT-ALIGN gains the stale "look is not
     decided" lines, CLAUDE.md:5, :23–24, art-director.md:16, graphics-engineer.md:19, and the "toy-box" lines CLAUDE.md:4
     and art-director.md:10, which may clash with LOOK_V2 §3, flagged for Mustafa, not changed [C18]; DOCS-ALIGN gains
     EDITOR_V2 §5's double-click line and its "if ADR-002 moves the project to modules" line; "Next": the stop),

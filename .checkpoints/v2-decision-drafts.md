@@ -1,25 +1,28 @@
 # Checkpoint: v2-decision-drafts
 - **Goal:** the v2 decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`, the spike plan, the loose ends)
   from the drafts brief (`v2-decision-drafts/inputs/DRAFTS_BRIEF.md`), then a draft PR, the report and a stop for Mustafa
-  and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 2: the advisor's APPROVE of revision 1 with 19 conditions, folded; verdict verbatim in `advisor-verdicts.md` §1)
+  and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 18:38 Amsterdam
+- **Last update:** 2026-10-31 18:45 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
    needed, per the verdict); `origin/main` fetched to 9e7db28 (condition 1); the id list rebuilt (REC 165: the two R3
-   rows were references, condition 6) · this commit.
+   rows were references, condition 6) · 5ab5eae.
+3. Mustafa's UPGRADE-SCOPE update (about 18:41, in the session's chat; it replaces the brief's upgrade note): saved
+   verbatim to `inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md`; plan revision 3 applies it (settled inputs, the ADR 0005
+   paragraph, the map addendum's part (e), docs-keeper's STATUS record) · this commit.
 
 ## Current step
 Step 2: the decision map (engine-architect, notes only; prompt `prompts/engine-architect-decision-map.txt`), still
 running; then its addendum (condition 7) by the same agent.
 
 ## Next steps
-1. When the map returns: run `map_coverage.py` on its id table; send the addendum (plan step 2, condition 7) to the same
-   agent; then launch the drafting units (step 3, ≤ 5 at once; prompts from the scratchpad drafts, saved to `prompts/`).
+1. When the map returns: run `map_coverage.py` on its id table; send the addendum (plan step 2, condition 7 plus part
+   (e), UPGRADE-SCOPE) to the same agent; then launch the drafting units (step 3, ≤ 5 at once; prompts from the scratchpad drafts, saved to `prompts/`).
 2. Pass marks per draft as each lands (step 4); assembly (step 5); synthesis (step 6); verification (step 7; no
    fetching verifier after 22:00, no new agent after 23:00).
 
@@ -35,6 +38,10 @@ running; then its addendum (condition 7) by the same agent.
 
 ## Decisions taken
 - 2026-10-31: the drafts brief (Mustafa and the Advisor) and LOOK_V2 (attachments of the session's first message).
+- 2026-10-31 about 18:41, Mustafa: the UPGRADE-SCOPE update (tracks per unit and per weapon type, pick one of three per
+  level, owned by the player, surviving death and switching, reset every match; a class comes with its own weapon;
+  other weapons only from enemy drops, as world pickups; progress on the weapon type; on the PlayerState). Open for him:
+  carry slots, ammo for looted weapons, track levelling speed with catch-up.
 - 2026-10-31 about 18:35, the advisor: plan APPROVE with 19 conditions; rulings ASSET-RESEARCH (a), TICK-60-HEADROOM
   ruled now (base 8.33 ms, p99 ≤ 6.25 ms; confirmed at the stop), GLOSSARY-8 yes (three entries and a note),
   CHECKPOINT-AT-STOP keep.

@@ -791,3 +791,91 @@ holds). The 30 Hz column is the baseline (TICK-30); the 60 Hz column is kept onl
 | N52 | The stress scene | N = 48 bots with full AI in three teams (16v16v16) in one combat cluster; 15 big vehicles (harvesters included), 4 of them very large units of ≥ 20 parts; 300 live projectiles; up to 8 active effects per soldier (384); one DM_Tri-sized 3D greybox; for server marks a snapshot-receiving client on every soldier; scale steps N = 12, 24, 36, 48 and 64 (headroom) | GLOSSARY.md:397-437 (resolution 9); counts replaced by the game-designer's caps when they exist (R2-BUD-OQ5, DESIGN) | SPIKE_PLAN (a shared spike fixture; no draft restates its counts) | the stress scene |
 | N53 | The test-mode list | 24v24, 12v12v12, 16v16v16, 1v1, 4v4, 2v2v2, 6v6v6, and N = 64 labelled headroom | GLOSSARY.md:375-394 (reading (a)) | SPIKE_PLAN | the test-mode list |
 | N54 | The netcode proof test's human client | "100 ms of simulated latency" (brief §2); which R2 profile that is (P2's 100 ms round trip, or one way) is for 0001 to state (part i) | brief §2; VISION_V2 §4 ("about 100 ms of ping") | 0001 | (GLOSSARY §8 once added) |
+
+## d. Interfaces between the drafts
+
+What crosses each seam, who defines it ("owner"), and who uses it. A draft that uses an interface cites its owner.
+
+| # | Interface | What crosses | Owner (defines) | Used by |
+|---|---|---|---|---|
+| I-1 | Content → sim | typed definitions loaded and validated by the content crate, read by id; tuning converted to ticks at load (R1-TICK-REC1) | 0005 (schema, ids); 0004 (how the sim executes them) | 0004, 0001 (unit data such as top speed, R2-XU-OQ14) |
+| I-2 | Sim → page | the per-tick output block: header (tick, layout hash, counts), sections per entity kind (soldiers, vehicle parts, projectiles, structures), the event section (hits, deaths, purchases, captures, moments) (R1-BND-REC2) | 0002 (layout, versioning, pool, transfer); 0001 (the fields of remote entities online, ranks 4 and 16); 0004 (writes it) | 0003 (draws, animates, plays sounds from it) |
+| I-3 | Page → Worker, and the local server | one command per tick, posted (R1-BND-REC3); the small control API (wasm-bindgen `.d.ts`: start, mode flag, content bundle); the local server reached through the same messages | 0002 (posting, control API, skeleton); 0001 (command fields; whether the local path is a backend of the thin transport interface, R2-TRN-REC4) | 0003 (input mapping on the page) |
+| I-4 | Worker ↔ server | the message protocol: commands, snapshots and deltas, events with visibility classes, join and resync, control stream, lobby messages, the content hash at join, dev reload and private-match override messages; WebTransport datagrams and streams, WebSocket fallback | 0001 | 0002 (Worker owns the connection), 0005 (reload, overrides, hash), 0006 (certificates, firewall) |
+| I-5 | Generated types | Rust → `packages/types`: the block layout and its hash (own generator), protocol types (ts-rs), content schema and content types (rank 31) | 0002 (package, gate diff); 0005 (content types' source); 0001 (protocol types) | 0003, the editor |
+| I-6 | Content bundle | hashed, cached bundle; immutable cache header on the client host; the hash every match records | 0005 (bundle, hash); 0006 (serving it) | 0001 (hash at join), 0006 (match record) |
+| I-7 | Modes → rooms | a room = mode id + allowed overrides (R2-ROOM-REC7); the mode file format and validation; the allow list of private-match tunables (DESIGN: R1-DATA-OQ10, R2-ROOM-OQ5) | 0001 (room); 0005 (file) | 0006 (record's mode id) |
+| I-8 | Assets → renderer | glTF/GLB with named material slots (faction colour slots, emissive slots), LOD levels, per-unit budgets; no baked look | 0005 (rules; graphics-engineer's GPU rules) | 0003 (loader, materials in TSL, LOD switching, per-instance colour) |
+| I-9 | Map document → sim, bake, renderer, editor | static colliders with stable ids (R4-PHYS-REC2); baked navigation stored in the map document (R4-NAV-REC1); floors, ceilings, enclosure areas and portals (R4-FLOORS-REC2, R2-INT-REC2); structure states (LOOK_V2 §4 damage stages); per-map lighting mood (LOOK_V2 §6.5) | 0005 (document schema); 0004 (bake tool, states) | 0001 (enclosures for interest), 0003 (draws stages, roof fade, mood), the editor (0002) |
+| I-10 | Events → match record → storage | tick-stamped events and recognized moments; the room's record written at Ended; supervisor upload to EU object storage | 0004 (events, moments); 0001 (the room writes it); 0006 (shape, storage, analysis) | 0005 (ids, content hash) |
+| I-11 | Room process ↔ supervisor ↔ lobby | process spawn, host and port from the lobby, join tokens checked by the room offline (R2-ROOM-REC2, REC3) | 0001 (protocol, token format); 0006 (supervisor, lobby hosting, key storage under the security baseline) | 0002 (crate list, rank 8) |
+| I-12 | Server → monitoring | server tick time histogram, overruns and dropped time (R1-TICK-REC4), per-phase time (R2-BUD-REC6), sessions by transport, bytes, memory, room starts and crashes (R6-OBS-REC2) | 0006 (metrics, labels, logs); 0004 and 0001 (the counters they emit) | |
+| I-13 | CI → client host and staging | the built artifact and its header sets, deployed with the host token from environment `preview`; for multiplayer previews the room binary and the certificate hash (rank 20) | 0002 (workflow); 0006 (host, token scope, staging server, access wall) | 0001 (where the certificate hash is fetched) |
+| I-14 | Budgets as data | every budget of every draft as data in the repository, reviewed like code (R5-GATE-REC4) | 0002 (where and how checked); each number's owner (part c) fills its row | all |
+| I-15 | Reference hardware | the reference server (N34) and the client reference machines (N41) | 0006; 0003 | every spike |
+| I-16 | Test fixtures | the stress scene, the test-mode list (N52, N53), the network profiles (N27), recorded matches | SPIKE_PLAN (scenes, modes); 0001 (profiles); 0004 (recordings) | 0001, 0002, 0003, 0004 |
+| I-17 | Determinism suite → CI and benchmark | recorded matches with per-tick state hashes; the benchmark scene replays a recorded match (R3-MEASURE-REC2) | 0004 (rules, suite); 0002 (tools, jobs, R5-TEST-REC2) | 0003 |
+| I-18 | Client field data | backend, adapter, frame time per match; crash reports | 0003 (what is measured, rank 26); 0006 (where stored, R6-OBS-REC3, REC4) | |
+| I-19 | The aim point | cursor ray against what the page draws → a world aim point in the command (rank 2; R2-SYNC-REC8, R4-LOS-REC3) | 0001 (command field); 0002 (how it crosses); 0004 (the ray query) | 0003 (interpolated state) |
+| I-20 | Events → feel | hits, deaths, blasts (position and strength for the concussion shake and the fragments), cosmetic shot events, purchases, moments → VFX, audio, HUD; the shot feels instant, hit feedback on confirmation (LOOP_V2 §7) | 0004 (emits); 0001 (delivery and visibility online); 0002 (event section) | 0003 (presents), 0005 (feel kit data) |
+| I-21 | Upgrade picks | the player's picks on the player's slot (UPGRADE-SCOPE), defined as data; sent to their owner; shown on the HUD | 0005 (data model); 0004 (state on the slot); 0001 (visibility class) | 0003 |
+
+## e. Traces
+
+### e1. VISION_V2 §6
+| § | Need | Draft and part that serve it |
+|---|---|---|
+| 6.1 | Modes as data: 2 or 3 teams of any size, one faction per team, rooms and private matches | 0001 a.8 (rooms, private rooms R2-ROOM-REC5, a room as mode id + overrides REC7, bots fill slots REC6), a.5 (the split path at 48+, R2-BUD-REC3); 0005 a.1 (mode files, factions as data); 0006 a.2 (hosting rooms, the lobby); 0004 a.7 (team filtering in the sim) |
+| 6.2 | A true 3D sim: floors and interiors, ledges, line of sight across heights; bots between levels; aiming at height | 0004 a.5–a.6 (R4-PHYS, R4-FLOORS, R4-LOS, R4-NAV); 0001 a.4 and a.6 (aim point in the command, enclosure interest); 0002 a.3 (the aim point across the boundary, rank 2); 0003 a.7 (cursor ray against what is drawn; roof fade) |
+| 6.3 | A data-driven ability and effect system | 0005 a.2 (GAS subset as data, in-match upgrades); 0004 a.3 and a.7 (execution, its 1 ms part, determinism); 0001 a.1 (prediction scope, ABL-PREDICT) |
+| 6.4 | Vehicles as first-class: big, multi-part, own weapons and abilities (leech, marking); seats [OPEN] | 0004 a.5 (kinematic compound bodies, R4-PHYS-REC4; obstacles R4-OBST-REC1); 0001 a.1, a.6 (R2-SYNC-REC7, parts in interest R2-INT-REC6); 0003 a.3 (R3-CHAR-REC4); 0005 a.2 (vehicle definitions, mounts, leech and marking as operations, R1-ABL-REC1 mark 3); seats: DESIGN (R2-SYNC-OQ7) |
+| 6.5 | Economy and objectives: money, tech, steals, saving up, team-funded actions; server-side and tunable | 0004 a.7 (sim phases); 0005 a.1 (tuning tables, LOOP_V2 "one data table"); 0001 a.6 (visibility classes; team-private state is DESIGN, R2-INT-OQ3) |
+| 6.6 | Balance telemetry | 0004 a.7 (events); 0001 a.8 (the room writes the record at Ended); 0006 a.5 (shape, storage, analysis); 0005 a.1 (ids, content hash) |
+| 6.7 | A faction content pipeline: units, uniforms, variants as data | 0005 a.1 (faction variants, R1-DATA-OQ6) and a.3 (faction colour slots); 0003 a.3 (per-instance faction colour, R3-CHAR-REC1, REC3) |
+| 6.8 | Moments recognized by the server; [LATER] kill-cams, replays, highlights | 0004 a.7 (recognition); 0005 a.4 (rules as data); 0006 a.5 (stored with the record); [LATER] parts not designed out: recorded matches and per-tick hashes (R1-DET-REC6, R1-TICK-REC1) |
+| 6.9 | A spectacle budget: a few very large units and their effects without dropping frames | 0003 a.3–a.4 (R3-CHAR-REC4, R3-BUDGET-REC2's very large units, R3-WGPU-REC3 no first-sight stutter); 0002 a.3 (the sim off the render thread, R1-BND-REC1); 0004 a.3 (4 very large units in the stress scene) |
+| 6.10 | [LATER] Accounts: server-side ownership of unlocks and cosmetics | not built ([LATER]); 0001 a.8 (guest identity, R2-ROOM-REC8, prepares it); 0006 a.2 (the lobby's store, R2-ROOM-OQ9). LOOP_V2 §8's Service points storage is a research gap (part h) |
+
+Recommendations that trace only to VISION_V2 §3 or §4 (R2-BUD-REC4, REC5, R2-TRN-REC6, R3-WGPU-REC2, REC4,
+R3-GL2-REC3, R3-BUDGET-REC1, R3-MEASURE-REC3; R2-XU-OQ18): whether that is trace enough under plan rule 4 is the
+Advisor's (part f, LE-G). Spatial audio traces to LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 (punchy weapons
+through VFX, sound and feedback), which rule 4 accepts.
+
+### e2. LOOK_V2 (every `[DECIDED]` and `[DEFAULT]` item; the `[OPEN]` item stays open)
+| LOOK_V2 | Tag | Item | Achieved by (draft, part) | Research behind it |
+|---|---|---|---|---|
+| §1 | DECIDED | cel-shaded comic rendering with bold ink | 0003 a.2 | R3-LOOK-F1, F2 (toon ramps), R3-LOOK-REC3 (outline families) |
+| §1 | DECIDED | iconic, RA-style unit silhouettes | 0005 a.3 (authored models) with 0003 a.2 (outlines, LOD keep the silhouette) | none for the models (part h) |
+| §1 | DECIDED | clean, well-lit scenes with emissive accents | 0003 a.2 (lighting, emissive and bloom on the MRT pass) | R3-LOOK-REC2 |
+| §1 | DECIDED | lush environments, for adults | 0005 a.3 (assets) with 0003 a.3–a.4 (props instanced, budgets) | R3-CHAR-OQ4 (props); vegetation not researched (part h) |
+| §2 | DECIDED | vibrant colours, soft shadows, geometry that reads | 0003 a.2 (output transform, shadows) | R3-WGPU-OQ4 (colour output), R3-BUDGET-OQ6 (shadow technique not researched; r186 removed `PCFSoftShadowMap`, R3-WGPU-F3) |
+| §2 | DECIDED | thick black outlines, strongest on buildings | 0003 a.2 | R3-LOOK-REC3, R3-LOOK-OQ2 (width model) |
+| §2 | DECIDED | props: logs and trees with variety | 0005 a.3 (assets) with 0003 a.3 (instancing) | R3-CHAR-OQ4; the tree style is `[OPEN]` |
+| §2 | DECIDED | uniform details as faction identity (conscript shoulders, stripe, trench coat) | 0005 a.1 and a.3 (models, faction variants) with 0003 a.3 (per-instance colour) | R1-DATA-OQ6, R3-CHAR-REC1 |
+| §2 | DECIDED | small movement touches (body reacting to strafing) | 0003 a.3 (procedural animation on the page, budget LOD) | R3-CHAR-REC2; legacy GA rows (port to TypeScript) |
+| §2 | DECIDED | architecture: half-timbered house with brick-tile roof, plastered house with silo tower | 0005 a.3 (building assets) with 0003 a.2 (ink strongest on buildings) | none (part h) |
+| §2 | DECIDED | grenade concussion: shake tilting away from the blast, stronger closer in | 0003 a.7 (camera effect from the blast event, presentation RNG) with 0004 a.7 (blast event with position and strength) | R1-DET-REC4 (presentation randomness off the sim); technique not researched (part h) |
+| §3 | DECIDED | adult audience, not a children's game | 0005 a.3 (assets) and 0003 a.2 (look); no engine feature | none needed |
+| §3 | DECIDED | slimmer, serious character proportions | 0005 a.3 (authored character models, R3-CHAR-OQ3) with 0003 a.3 (skinning with any weights, R3-CHAR-REC1) | R3-CHAR-REC1 |
+| §3 | DECIDED | weapons with real silhouettes | 0005 a.3 (weapon models; LOOK_V2 §6.3 weapons and headgear first) | none (part h) |
+| §3 | DECIDED | the thatched roof goes in its current form | 0005 a.3 (building kit) | legacy CM rows |
+| §3 | DECIDED | buildings sized for play: interiors, upper floors, verticality | 0004 a.6 (floor layers with ceilings, R4-FLOORS-REC2); 0001 a.6 (enclosures, R2-INT-REC2); 0005 a.1 (map and building data); 0003 a.2 (roof fade, AO in interiors) | R4-FLOORS, R2-INT-REC2, R3-LOOK-OQ3 |
+| §3 | DECIDED | fragmentation comes back (fragments flying) | 0003 a.2 and a.7 (visual effects from the blast event); whether fragments deal damage per fragment is DESIGN | no visual-effects research (part h) |
+| §4 | DECIDED | lush countryside plus contested urban centres: ruined enterable buildings, collapsed roofs, planks to upper floors, corners to hold | 0004 a.6 (typed links for planks, R4-FLOORS-REC1; structure states, R4-OBST-REC2); 0005 a.1 (map and building content); 0003 a.2 (ruins drawn); 0001 a.6 (portals) | R4-FLOORS-REC1, R4-OBST-REC2 |
+| §4 | DEFAULT | damage stages: intact → damaged → ruin with the interior exposed; debris and planks become routes | 0004 a.6 (states flip baked flags; the research bakes two states, not three); 0005 a.1, a.3 (stages per building, assets per stage); 0003 a.2 (mesh per stage, debris); 0001 a.6 (re-flood on a portal change) | R4-OBST-REC2 (two states and a ruin's shape) only (part h) |
+| §4 | DEFAULT | roofs fade when the player is inside | 0003 a.2 (cutaway), with 0001's visibility rule (rank 39) and 0004's floor layers (which enclosure the local player is in) | legacy GW17; R2-INT-REC2; rendering technique not researched (part h) |
+| §5 | DECIDED | iconic silhouettes drawable from memory | 0005 a.3 with 0003 a.2 | none for the models (part h) |
+| §5 | DECIDED | PA's principle: readable from a distance, depth up close | 0005 a.3 (LOD levels) with 0003 a.3 (LOD switching; the budget LOD) | R3-CHAR-REC2 (animation LOD); mesh LOD generation not researched (part h) |
+| §6.1 | DEFAULT | value hierarchy: environment one step calmer than units, faction colours and effects | 0003 a.2 (per material class tone; tiers); 0005 a.3 (material classes) | none (art direction on R3-LOOK's techniques) |
+| §6.2 | DEFAULT | line weight: thick on silhouettes, thinner inside | 0003 a.2 | R3-LOOK-OQ2; inner lines not researched (part h) |
+| §6.3 | DEFAULT | weapons and headgear first | 0005 a.3 (per-unit budgets favour them) with 0003 | none |
+| §6.4 | DEFAULT | glow language: objectives, faction tech, muzzle flashes emissive | 0003 a.2 (emissive and bloom); 0005 a.3 (emissive slots) | R3-LOOK-REC2 |
+| §6.5 | DEFAULT | lighting: warm sun, cool shadows; soft AO in corners; moods per map | 0003 a.2 (lighting, AO); 0005 a.1 (mood as map data) | R3-LOOK-OQ3 (AO without the pre-pass); lighting model not researched (part h) |
+| §7 | DECIDED | punchy weapons through VFX, sound and feedback (LOOP_V2 §7 feel kit) | 0003 a.2, a.6, a.7 (VFX, audio, feedback on confirmed hits); 0005 a.1 (feel kit as data); 0001 a.1 (split feedback) | R3-AUDIO; VFX not researched (part h) |
+| §7 | DECIDED | grenades: fragmentation first, with the concussion screen effect | 0003 a.2, a.7 | as §2 and §3 above |
+| §7 | DEFAULT | comic impact touches, sparingly: halftone flashes, ink line boil | 0003 a.2 (as defaults) | none (part h) |
+| §8 | DECIDED | v2 may use authored 3D models | 0005 a.3; 0003 a.2 (the engine applies the look) | none for the pipeline (part h) |
+| §8 | DEFAULT | the flow: sketch → Spline model → glTF/GLB export → automated compress, LODs, faction-slot renaming → the engine applies the comic look | 0005 a.3 (steps 3–4); 0003 a.2 (step 5) | none (part h) |
+| §8 | DEFAULT | budgets per unit (triangles, materials, textures); never Spline's runtime | 0005 a.3 (graphics-engineer), derived from 0003's totals (N45–N47) | R3-BUDGET-REC2, R3-CHAR-REC1 (totals and per-soldier draws only) |
+| §8 | OPEN | the tree style | stays open: 0003 lists it as an open question for Mustafa; 0005 notes that tree assets wait for it | |
+| §9 | (requirement) | the rendering draft shows how each `[DECIDED]` item is achieved; its look proof test is judged by Mustafa in the browser, side by side with legacy screenshots | 0003 a.8; SPIKE_PLAN | |
