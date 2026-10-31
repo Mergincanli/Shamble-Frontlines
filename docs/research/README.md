@@ -5,15 +5,19 @@ agent; the verifier spot-checks its key claims against their sources. `engine-ar
 `docs/ENGINE_OVERVIEW.md` and the decision drafts `docs/adr/0001`–`0006`. Nothing here is decided: Mustafa and the
 Advisor review the drafts before any spike starts.
 
-| # | Topic | File | Owner |
-|---|---|---|---|
-| R1 | Simulation core | `r1-simulation-core.md` | engine-architect |
-| R2 | Netcode | `r2-netcode.md` | netcode-architect |
-| R3 | Rendering and presentation | `r3-rendering.md` | graphics-engineer |
-| R4 | Physics and navigation | `r4-physics-navigation.md` | engine-architect |
-| R5 | Toolchain and quality | `r5-toolchain-quality.md` | test-engineer (CI: infra-engineer) |
-| R6 | Infrastructure | `r6-infrastructure.md` | infra-engineer (security baseline: security-auditor) |
-| R7 | Legacy harvest | `../LEGACY_INVENTORY.md`, `../LEGACY_TUNING.md` | main session |
+| # | Topic | File | Owner | Status |
+|---|---|---|---|---|
+| R1 | Simulation core | `r1-simulation-core.md` | engine-architect | verified (every recommendation claim) |
+| R2 | Netcode | `r2-netcode.md` | netcode-architect | verified (every recommendation claim) |
+| R3 | Rendering and presentation | `r3-rendering.md` | graphics-engineer | spot-checked (45 of 77 key claims) |
+| R4 | Physics and navigation | `r4-physics-navigation.md` | engine-architect | spot-checked (50 of 52 key claims) |
+| R5 | Toolchain and quality | `r5-toolchain-quality.md` | test-engineer (CI: infra-engineer) | spot-checked (61 of 115 key claims) |
+| R6 | Infrastructure | `r6-infrastructure.md` | infra-engineer (security baseline: security-auditor) | spot-checked (21 of 42 key claims) |
+| R7 | Legacy harvest | `../LEGACY_INVENTORY.md`, `../LEGACY_TUNING.md` | main session | done (PR #27) |
+
+Shared by all six topics:
+- `GLOSSARY.md`: one definition per term the topics share, starting with the tick budgets.
+- `UNREAD_SOURCES.md`: every source the topics could not read, with what each was needed for.
 
 ## The shape of a topic file
 1. **Header:** topic, author agent, date, the brief's questions for this topic (quoted), status (draft, verified).

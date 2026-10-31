@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-10-25.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-10-31.
 
 ## Top level
 | Path | What it is |
@@ -48,9 +48,19 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/ROADMAP.md` | History and plan, terse |
 | `docs/ui_theme_mockup.html` | The war-room UI mockup (legacy UI source of truth) |
 | `docs/adr/` | Decision records; `0000-template.md` is the format (v2 drafts 0001–0006 land here) |
-| `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape and the owners |
+| `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape, the owners and each topic's status |
+| `docs/research/r1-simulation-core.md` | R1: the simulation core (ECS, tick, determinism, the Rust ↔ TypeScript boundary, abilities, data and hot reload) |
+| `docs/research/r2-netcode.md` | R2: netcode (transport, sync and prediction, interest, rooms, bandwidth budgets) |
+| `docs/research/r3-rendering.md` | R3: rendering and presentation (WebGPU and the WebGL 2 fallback, characters, budgets, look techniques, audio; never decides the look) |
+| `docs/research/r4-physics-navigation.md` | R4: physics and navigation (physics engine, navigation, floors, line of sight, obstacles placed mid-match) |
+| `docs/research/r5-toolchain-quality.md` | R5: toolchain and quality (repository layout, lint, tests, CI, previews per PR, the v2 gate) |
+| `docs/research/r6-infrastructure.md` | R6: infrastructure (hosting, costs, monitoring, telemetry; the security baseline deferred) |
+| `docs/research/GLOSSARY.md` | One definition per term the six topics share, starting with the tick budgets |
+| `docs/research/UNREAD_SOURCES.md` | Every source R1–R6 could not read, with what each was needed for |
 | `docs/reference/` | Renegade X and Kane's Wrath reference: inspiration, not what's built |
 | `docs/reports/` | One advisor report per change-set (`YYYY-MM-DD-<slug>.md`): the decision trail |
+| `docs/reports/2026-10-31-v2-research.md` | The R1–R6 research report (PR #28): outcome, evidence, risks, decisions needed |
+| `docs/reports/2026-10-31-v2-research-appendix.md` | Its appendix: coverage table, the 12 resolutions and the advisor's rulings, fetch audit, check outputs |
 
 ## .claude/
 | Path | What it is |
