@@ -104,3 +104,16 @@ Over-long lines from the edits split outside links, code and quotes (R1 entity-k
 ## Counts
 recommendation 25 (R1 16: C1.1, C1.5, C5.1-C5.4, C6.1, C6.2, C9.1, C9.3, C9.7, C29.1-C29.3, R1-ECS-REC1 marks 2 and 3 at p99; R4 9: C1.15-C1.18, C9.18-C9.20, R4-PHYS-REC1 mark 5, R4-OBST-REC2 at p99) · number 0 · source 0 · nit: 28 resolution changes (R1 22, R4 6), 5 shared-question insertions (R1 4, R4 1), 26 XT-OQ insertions (R1 18, R4 8), 25 pointer lines (R1 17, R4 8), about 22 glossary rename/link/reflow units, 2 headers, 2 part-7 subsections, 1 subsection-name correction.
 DONE
+## Step 3d fix round (prompt saved as prompts/r14-3d-fixes.txt; resumed 2026-10-31 after a spend cut; all edits were already in the working tree, checked against f67245e)
+R1 R1-TICK-REC2 P1 "other 25 % of the server tick budget" -> "other 25 % of the tick period, inside the server tick budget" -- nit
+R1 R1-BND-REC2 mark 4 "48 soldiers" -> the largest mode's N soldiers (48, or 54 under MODES-3 (b)) -- recommendation
+R1 R1-BND-OQ6 "N = 48" -> the largest mode's N (48, or 54 under (b)) -- recommendation
+R1 pointers: BND-REC2 + XT-OQ16, XT-OQ17; DET-REC6 + XT-OQ2 -- nit
+R1 R1-ECS-REC1 Rests on + R2's worked bandwidth estimate (15 big vehicles) -- nit
+R1 hash-map ban named beside iteration wording: ECS options table, ABL-REC3, pointers between R1's units -- nit
+R4 R4-PHYS-REC4 spike "a crowd of 48 soldiers" -> the largest mode's N -- recommendation
+R4 R4-NAV-REC3 spike "48 bots" -> the largest mode's N bots -- recommendation; avoidance ≤ 0.2 ms p99 at N = 48, ×1.125 at N = 54 per GLOSSARY's check -- recommendation
+R4 R4-NAV-REC4 pointer + XT-OQ5 -- nit
+R4 R4-NAV-REC2 Rests on: the stress scene replaces R1-TICK-REC2 (the P1 scene), R1-XU-OQ1 -- nit
+Part 7 of both files: "Step 3d fixes (2026-10-30):" lines added, one per change with its type. Check script: exact 0 in R1 and R4; no new over-long lines. Not committed.
+DONE
