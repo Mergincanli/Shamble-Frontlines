@@ -25,3 +25,17 @@ Files:
 - /home/user/Shamble-Frontlines/docs/research/r1-simulation-core.md
 - /home/user/Shamble-Frontlines/docs/research/r4-physics-navigation.md
 - /home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-r14-consistency.md
+
+## Addendum: the step-3d fix round (reply to `prompts/r14-3d-fixes.txt`, cut off by the spend limit about 21:04 UTC on 2026-10-30, resumed 2026-10-31 10:14 UTC, returned about 10:16 UTC, verbatim)
+
+All three items are fixed in R1 and R4, and each file's part 7 has its "Step 3d fixes (2026-10-30):" lines. Nothing is committed. The glossary check still finds 0 exact hits in both files.
+
+1. **r1:2049** now reads "The other 25 % of the tick period, inside the server tick budget (… 50 % of the tick period)". Logged as a nit: 4.2 ms at 60 Hz was the intended value.
+2. **The five bare 48s** now name the largest mode's N (48, or 54 under MODES-3 (b)), each logged as a recommendation: R1-BND-REC2 mark 4, R1-BND-OQ6, R4-PHYS-REC4, and both R4-NAV-REC3 hits. In R4-NAV-REC3 the avoidance cost now reads ≤ 0.2 ms p99 at N = 48, scaled ×1.125 at N = 54 by GLOSSARY's tick-budget check.
+3. **Nits:**
+   - Pointer lines added: R1-BND-REC2 to R1-XT-OQ16 and R1-XT-OQ17, R1-DET-REC6 to R1-XT-OQ2, R4-NAV-REC4 to R4-XT-OQ5.
+   - R4-NAV-REC2's "Rests on" now names the stress scene.
+   - R1-ECS-REC1's "Rests on" now names R2's worked estimate.
+   - "The hash-map ban" sits beside the old wording at r1:1633, r1:2404 and r1:3136.
+
+Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/engine-architect-r14-consistency.md
