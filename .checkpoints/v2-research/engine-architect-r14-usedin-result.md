@@ -32,3 +32,12 @@ The body is unchanged. Nothing is committed.
 ## Addendum: R3's line under "Time statistics" (reply to `prompts/engine-architect-glossary-r3-timestats.txt`, about 20:47 UTC, verbatim)
 
 Done; only that field changed, not committed. It now reads: "…R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median), R3-BUDGET-REC2's CPU, animation, sim and GPU rows, R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC4, R3-AUDIO-REC1 and R3-AUDIO-REC3 (sub-budgets at p99, written out in step 3d by the advisor's ruling)."
+
+## Addendum: the step-3d glossary nits (reply to `prompts/engine-architect-glossary-3d.txt`, about 10:16 UTC on 2026-10-31, verbatim)
+
+All five changed, not committed; a word diff shows only these:
+1. Time statistics, definition: "…A one-off deadline (a single event, such as a rebuild, a bake or a recovery) is a plain limit, not a statistic."
+2. §1: "…and the interest marks (0.70 ms) scaled by 1.125…"; "…10.93 ms (sums of rounded parts; the exact sums are 0.01 ms lower: 4.11 (5.11), 9.92 (10.92))".
+3. Both now say "for the server tick".
+4. "(P1: the other 25 % of the tick period, inside the server tick budget, is the server-only share)". It was in "The server tick budget" entry, so I changed it there.
+5. "…advisor's ruling; R3-AUDIO-REC1's by the same rule, found by R3's owner)".
