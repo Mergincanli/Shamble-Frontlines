@@ -2014,12 +2014,12 @@ interval.
 - Serves: VISION_V2 §6.1 (modes as data, rooms and private matches), §6.2 (positions in 3D), §6.4, §6.5 (economy and
   objectives server-side), and §4 (fairness).
 - Spike pass marks (proposed):
-  1. 48 clients (bots plus scripted headless clients), 10 minutes each under P0, P2, P3 and B1: every snapshot a client
+  1. As many clients as the largest mode's N ([GLOSSARY](GLOSSARY.md#the-largest-mode-and-its-n): 48, or 54 under MODES-3 (b); bots plus scripted headless clients), 10 minutes each under P0, P2, P3 and B1: every snapshot a client
      decodes rebuilds exactly the server's quantised state for that tick and that client's entity set (100 % of
      decoded snapshots, checked by hash).
   2. After the B1 burst, every client is decoding deltas again within 500 ms of the link coming back.
   3. No datagram exceeds the transport unit's payload size.
-  4. The server's snapshot work for 48 clients, measured per snapshot on the proposed reference server
+  4. The server's snapshot work for the largest mode's N clients (48, or 54 under MODES-3 (b)), measured per snapshot on the proposed reference server
      ([GLOSSARY](GLOSSARY.md#the-reference-server)), is reported and stays within the server-only share ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 25 % of the tick period, shared with lag compensation,
      interest, commands and the tick's sends).
 
@@ -2100,7 +2100,7 @@ C); replay from the authoritative state; linear error decay (option 3.3 B), plus
 - Spike pass marks (proposed):
   1. Under P0–P4 on a scripted course with no other players: 0 corrections larger than 1 mm whenever every command
      arrived in time; every other correction is counted and traced to a late or lost command.
-  2. Under P3 in a 48-player brawl: corrections larger than 5 cm in fewer than 1 % of snapshots, and the visible
+  2. Under P3 in a brawl of the largest mode's N players (48, or 54 under MODES-3 (b)): corrections larger than 5 cm in fewer than 1 % of snapshots, and the visible
      correction never moves the player more than 5 cm in one frame below the snap threshold.
   3. Input-to-screen latency for own movement and muzzle flash is the same at P0 and P4, within one tick.
 
@@ -2183,7 +2183,7 @@ sim-owned hit volumes, capped (option 3.5 B).**
      cap.)
   3. The history for the stress scene's soldiers and big vehicles ([GLOSSARY](GLOSSARY.md#the-stress-scene): the largest mode's N
      and 15, harvesters included) stays at or under 1 MB.
-  4. A rewound shot against 48 candidates takes at most 20 µs at the 99th percentile on the proposed reference server,
+  4. A rewound shot against the largest mode's N candidates (48, or 54 under MODES-3 (b)) takes at most 20 µs at the 99th percentile on the proposed reference server,
      at 700 shots per second.
   5. A scripted cheat client that announces the largest allowed delay and puts its view time at the edge of the
      tolerance gains no more rewind than the tolerance over an honest client at the same RTT, under P0 and P1 (1,000
@@ -2286,10 +2286,11 @@ client sees, not with the match size.**
 - Reason: 48 players multiply the server's per-client work and the shots per second, while the client's work stays
   flat. The spikes must measure the server side at the full count.
 - Rests on: F8, F13, F17, F31, F32.
-- Serves: VISION_V2 §3 (12v12v12 or 24v24; design for 48+), §6.1.
+- Serves: VISION_V2 §3 (12v12v12 or 24v24; `CLAUDE.md`: design for 48+ players), §6.1.
 - *Cross-topic open question:* R2-XT-OQ7 (Open questions).
 - Spike pass marks (proposed):
-  1. One match server with 48 clients (any mix of bots and headless clients) under P2 for 30 minutes. Snapshot
+  1. One match server with 48 clients (the largest mode's N, or 54 clients under MODES-3 (b); any mix of bots and
+     headless clients) under P2 for 30 minutes. Snapshot
      encoding, lag compensation, command handling, interest (the region query, ranking and packing) and the tick's
      send calls together stay within the server-only share ([GLOSSARY](GLOSSARY.md#the-sim-step-share-and-the-server-only-share): 25 % of the tick period) at the 99th
      percentile on one vCPU of the reference server.
@@ -2316,7 +2317,7 @@ client sees, not with the match size.**
   round-trip reading; added in the second fix pass).
   Serves VISION_V2 §6.1 (modes of any size), §6.2 (aiming at height in the input), §4 (fair to about 100 ms).
   *Cross-topic open question:* R2-XT-OQ14 (Open questions).
-  Spike must prove (proposed): at 48 players (simulated clients plus bots), 30 Hz snapshots, 100 ms RTT, ±10 ms jitter,
+  Spike must prove (proposed): at the largest mode's N players (48, or 54 under MODES-3 (b); simulated clients plus bots), 30 Hz snapshots, 100 ms RTT, ±10 ms jitter,
   2 % loss: rewind ≤ the cap (R2-XU-OQ1: 200 or 250 ms) for 100 % of shots, with the share of shots the cap clips
   recorded (on the round-trip reading, R2-XU-OQ2, the rewind at this RTT is 200–250 ms, so a 200 ms cap clips some;
   changed from "≤ 200 ms" in the second fix pass); server-side missing-input rate ≤ 0.1 % of player-ticks at 5 % random
@@ -2335,7 +2336,7 @@ client sees, not with the match size.**
   Serves VISION_V2 §3 (12v12v12 or 24v24), §6.1, §6.4 (vehicles with turrets and seats), §6.5 (economy state
   server-side), §6.8 (events stamped with ticks for moments).
   *Cross-topic open questions:* R2-XT-OQ3, R2-XT-OQ11 (Open questions).
-  Spike must prove (proposed): at 48 players all in view, 30 Hz, 10-minute bot match: mean ≤ 160 kbps and p99 of
+  Spike must prove (proposed): at the design point, N = 48 ([GLOSSARY](GLOSSARY.md#the-design-point-and-headroom)), all in view, 30 Hz, 10-minute bot match: mean ≤ 160 kbps and p99 of
   1-second windows ≤ 256 kbps per client, counted at the UDP payload plus 28 B per datagram; with the interest unit's
   filter on the Octopon-3 greybox: mean ≤ 100 kbps; decoded positions within 1 cm and angles within 0.01° of the
   server's values; 0 desyncs of deterministic projectile flight against the server over 1000 throws (if E3, else E3b);
@@ -2352,10 +2353,10 @@ client sees, not with the match size.**
   1257 B (65 + 16 + 63 × 11.25 + 18 × 18.75 + 130, arithmetic). So the split path is needed from the first large
   match, not later.
   Rests on: R2-BUD-F1, F2, F3, F4, F5, F6, F9, F10, F11, F18, F27, F30.
-  Serves VISION_V2 §3 (48+ players), §6.1 (teams of any size: the split path is needed from the first large match;
+  Serves VISION_V2 §3 (the modes; `CLAUDE.md`: design for 48+ players), §6.1 (teams of any size: the split path is needed from the first large match;
   added in the fix pass for R2-XU-OQ18), §4 (browsers first).
   Spike must prove (proposed): 0 datagrams larger than the reported maximum (server and browser side) in a 30-minute
-  48-player soak; a client joining mid-match has a complete world within 300 ms at 100 ms RTT and 2 % loss; the
+  soak at the largest mode's N (48, or 54 under MODES-3 (b)); a client joining mid-match has a complete world within 300 ms at 100 ms RTT and 2 % loss; the
   maxDatagramSize each target browser reports is recorded (Chrome, Edge, Firefox, Safari where it runs WebTransport).
 - **R2-BUD-REC4. Buffers for "fair to about 100 ms": interpolation delay 100 ms by default (3 snapshot intervals at 30
   Hz), adapting up to 150 ms from measured jitter and loss; lag-compensation rewind = the server's latency estimate +
@@ -2398,19 +2399,19 @@ client sees, not with the match size.**
   N, p99 server tick time within the server tick budget ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): ≤ 50 % of the tick period,
   ≤ 8.3 ms at 60 Hz, ≤ 16.7 ms at 30 Hz), split into the sim step share (R1) and the server-only share (lag-compensated hit tests,
   interest, snapshot encoding for every client, commands and the tick's sends), 25 % each, measured separately.**
-  Reason: no source read gives a tick budget; the topics' own part marks fit inside 50 % at 30 Hz, and at 60 Hz on
-  every tick but one that both encodes a snapshot and re-floods after a portal change, while 25 % for the whole server tick
+  Reason: no source read gives a tick budget; the topics' own part marks fit inside the server tick budget's 50 % of the tick period at 30 Hz, and at 60 Hz on
+  every tick but one that both encodes a snapshot and re-floods after a portal change, while 25 % of the tick period for the server tick
   would not hold them at 60 Hz on any snapshot tick (the arithmetic, a planning check of ceilings, is in [GLOSSARY](GLOSSARY.md#1-tick-budgets)'s
-  tick-budget section); 50 % leaves room for bursts (a p99 tick at half the period can double before it overruns);
+  tick-budget section); 50 % leaves room for bursts (a p99 server tick time at half the period can double before it overruns);
   how many rooms share a vCPU is measured (R2-ROOM-REC2 mark 2), not budgeted; per-client encode cost is the unknown
   that grows with player count.
   Rests on: legacy CM4 (0.80–1.00 ms per step in JS at 48 soldiers); R2-BUD-F25, F29 (history and ring sizes); the
   estimate's assumptions.
-  Serves VISION_V2 §3 (48+), §6.1 (rooms).
+  Serves VISION_V2 §3 (the modes; `CLAUDE.md`: design for 48+ players), §6.1 (rooms).
   Spike must prove (proposed): on one vCPU of the reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): the CCX23 of R6-HOST-REC2),
   the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)) with a snapshot-receiving client on every soldier (R2-SYNC-REC9 mark 1's "48 clients"),
   30-minute soak: p99 server tick time ≤ 8.3 ms at 60 Hz (or ≤ 16.7 ms at 30 Hz), the sim
-  step ([GLOSSARY](GLOSSARY.md#sim-step-time)) and the server-only work each within their 25 % share, 0 missed ticks, snapshot encode ≤ 50 µs
+  step ([GLOSSARY](GLOSSARY.md#sim-step-time)) and the server-only work each within its 25 % share of the tick period, 0 missed ticks, snapshot encode ≤ 50 µs
   per client per snapshot at p99 ([GLOSSARY](GLOSSARY.md#time-statistics)), memory per room reported. The mark is checked at the tick rate R1-TICK-REC2's rule
   picks; if it fails there, it fails like any spike mark and goes back to the drafts, and the rule does not change.
 
@@ -2436,7 +2437,7 @@ client sees, not with the match size.**
   - Spike must prove (proposed): (a) no pop-in. Over a recorded 10-minute bot match replayed under 0, 50, 100 and
     200 ms latency with ±20 ms jitter and 0–5 % loss, 0 rendered frames contain an entity whose bounds intersect the
     client's actual view while the client lacks its state. (b) Churn: at most 2 enter/exit events per client per
-    second, averaged over the match (proposed). (c) The region query for 48 clients takes at most 0.2 ms per tick at
+    second, averaged over the match (proposed). (c) The region query for the largest mode's N clients (48, or 54 under MODES-3 (b)) takes at most 0.2 ms per tick at
     p99 on the reference server (proposed). (d) Bytes per client per second, with the region against without it, reported
     for the even-spread case and the centre-fight case (F19 predicts about 10 times fewer in the first and no saving
     in the second).
@@ -2496,7 +2497,7 @@ client sees, not with the match size.**
   - Spike must prove (proposed): in the stress scene ([GLOSSARY](GLOSSARY.md#the-stress-scene)), with its fight in the centre field,
     0 snapshots exceed the per-client budget (the number comes from the tick and bandwidth unit). The nearest 8
     enemies are in every snapshot; every relevant entity is sent at least every 4 snapshots. Ranking and packing for
-    48 clients take at most 0.5 ms per tick at p99 on the reference server.
+    the largest mode's N clients (48, or 54 under MODES-3 (b)) take at most 0.5 ms per tick at p99 on the reference server.
 
 - **R2-INT-REC5. A visibility class on every field and event type, held as data: public, team, owner, spatial.**
   - Public (on the reliable stream): match clock, points, uplink sites with owner and countdown, the cache location
@@ -2585,7 +2586,7 @@ What a spike must prove (proposed pass marks):
 1. Interop: Chrome 156, Edge 156, Firefox 158 and Safari 27 (macOS) each open a WebTransport session to the Rust server with
    each candidate crate, and exchange datagrams plus one bidirectional stream. At least 99 of 100 connection attempts succeed per
    browser on a clean local network (proposed). Record the negotiated draft per browser; this answers OQ1.
-2. Load: one server process holds 48 WebTransport sessions. Each sends 60 input datagrams/s (≤ 100 bytes) and receives 30
+2. Load: one server process holds as many WebTransport sessions as the largest mode's N (48, or 54 under MODES-3 (b)). Each sends 60 input datagrams/s (≤ 100 bytes) and receives 30
    snapshot datagrams/s (≤ 1,000 bytes; placeholder numbers until the tick and bandwidth unit sets them). Proposed limits: at
    most 1 vCPU for the transport runtime ([GLOSSARY](GLOSSARY.md#transport-runtime-time)), and p99 server send-call time ≤ 1 ms, on the
    reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): R6-HOST-REC2's CCX23) (proposed).
@@ -2624,7 +2625,7 @@ Reason:
 
 Rests on: F16, F17, F18, F19, F20, F21, F22.
 Serves: §6.1 (the per-mode match flow over the control stream); the §4 fairness target (no head-of-line stalls on the
-WebTransport path); the 48+ design point of VISION_V2 §3.
+WebTransport path); the 48+ design point (`CLAUDE.md`: design for 48+ players) for VISION_V2 §3's modes.
 What a spike must prove (proposed pass marks):
 1. `maxDatagramSize` is recorded at session start and every 10 s on each of the four browsers. Pass: ≥ 1,000 bytes on all four,
    on loopback and on a real EU path; otherwise the cap drops to the smallest value measured.
@@ -2715,7 +2716,7 @@ Serves: §6.1 (private matches on real servers); the §4 browsers.
 What a spike must prove (proposed pass marks):
 1. All four browsers connect with a pinned self-signed certificate, and all four with a publicly trusted one: 100 % of 20
    attempts each.
-2. Certificate rotation with 48 live sessions: 0 sessions dropped, and new connections succeed with the new hash within one
+2. Certificate rotation with as many live sessions as the largest mode's N (48, or 54 under MODES-3 (b)): 0 sessions dropped, and new connections succeed with the new hash within one
    reload.
 3. A certificate valid for 15 days is rejected by all four browsers (a negative test of the rule).
 
@@ -2734,7 +2735,7 @@ Reason:
 - quinn offers a pluggable controller and the non-blocking send (F25).
 
 Rests on: F10, F16, F19, F24, F25, F26.
-Serves: the §4 fairness target (about 100 ms) at the §3 scale (48+ players).
+Serves: the §4 fairness target (about 100 ms) at the §3 scale (VISION_V2 §3's modes; `CLAUDE.md`: design for 48+ players).
 What a spike must prove (proposed pass marks):
 1. With a bottleneck set below the snapshot stream's rate (proposed: 50 % of it), the newest snapshot the client holds is never
    older than 3 snapshot intervals. Server memory per session stays flat (no queue growth over a 10-minute soak).
@@ -2770,12 +2771,12 @@ What a spike must prove (proposed pass marks):
   Rests on: F1, F4, F5, F6, F7, F8, F18. Serves VISION §6.1, §4 (fair up to about 100 ms of ping).
   *Cross-topic open question:* R2-XT-OQ4 (Open questions).
   Spike must prove (proposed; on the reference server ([GLOSSARY](GLOSSARY.md#the-reference-server): the 4-vCPU CCX23 of
-  R6-HOST-REC2)): (1) one 48-player room (bots) holds its tick: p99 server tick time within the server tick budget
+  R6-HOST-REC2)): (1) one room of the largest mode's N players (48, or 54 under MODES-3 (b); bots) holds its tick: p99 server tick time within the server tick budget
   ([GLOSSARY](GLOSSARY.md#the-server-tick-budget): 50 % of the tick period chosen by the tick-rate unit), over 20 minutes;
   (2) 8 such rooms as 8 processes on the reference server: each room's p99 within 10 % of the single-room figure;
   (3) per-room process memory measured (RSS at start and after 20 minutes) and reported, with a proposed ceiling of
-  64 MB for a 48-player room; (4) killing one room's process (SIGKILL) leaves the other rooms' server tick p99 and connections
-  unchanged; (5) room start-up (process spawn to Open) under 2 s; (6) a panic injected into one connection's handler
+  64 MB for such a room (the largest mode's N: 48, or 54 under MODES-3 (b)); (4) killing one room's process (SIGKILL) leaves the other rooms' server tick p99 and connections
+  unchanged; (5) every room start-up (process spawn to Open) under 2 s; (6) a panic injected into one connection's handler
   closes that connection only, and the room's tick and its other connections continue (proposed; added in the fix
   pass).
 - **R2-ROOM-REC3. Join with a short-lived signed token from the lobby, checked by the room offline (option 3.2 A).**
@@ -2949,7 +2950,7 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   sprinting soldiers and the Juggernaut.
 - **R2-SYNC-OQ13. Bots see the present, humans see the past.** Bots act on present state (F31) while humans see entities
   about 100 ms late. What decides it: the game-designer's bot reaction tuning (GN4 scans every 0.25 s), checked in the
-  48-player spike.
+  spike at the largest mode's N (48, or 54 under MODES-3 (b)).
 - **R2-SYNC-OQ14. Valve's wiki pages (unread, HTTP 403).** The Source Multiplayer Networking and Lag Compensation pages
   would confirm Source's default interpolation delay and its explanation of shooter against victim. No recommendation
   rests on them; a verifier who can open them should check F26 and F34. [Fix pass: the verifier could not open them
@@ -2990,7 +2991,7 @@ First each unit's own, then the assembly's cross-unit questions, the pointers, a
   check.
 - **R2-BUD-OQ8.** Can the client simulate projectile flight deterministically from a spawn event (E3), or must
   projectiles ride in every snapshot (E3b, +42 kbps at 48)? Decides: R1's determinism unit and the spike's desync count. See also R2-XT-OQ3 (below).
-- **R2-BUD-OQ9.** The real cost of encoding 48 per-client delta snapshots and of encryption per datagram is unknown.
+- **R2-BUD-OQ9.** The real cost of encoding the largest mode's N per-client delta snapshots (48, or 54 under MODES-3 (b)) and of encryption per datagram is unknown.
   Decides: REC6's spike.
 - **R2-BUD-OQ10.** How the server's QUIC congestion controller (and the browser's) behaves for a 30 Hz stream of
   600-byte datagrams under 2–5 % random loss (does it throttle below 150 kbps?). Decides: the spike under the network
@@ -3192,10 +3193,10 @@ and resolve nothing. Each says what the drafts leave to decide it.
   the synthesis, which sets one tick budget and divides it; then the spikes. Settled by the shared glossary
   (2026-10-30): one server tick budget, 50 % of the tick period, split into a sim step share and a server-only share
   of 25 % each, every figure above placed inside one of them ([GLOSSARY](GLOSSARY.md#the-server-tick-budget)).
-- **R2-XU-OQ9. The reference server.** R2-BUD-REC6 proposes "one vCPU of the EU instance type R6 recommends", and
-  R2-ROOM-REC2 proposes "one 4-vCPU EU cloud VM, R6 to name it" (8 rooms on it). R2-TRN-REC1 asks for "reference
-  server hardware R6 names". The sync unit's marks (R2-SYNC-REC1, REC5, REC9) and the interest unit's marks (REC1,
-  REC3, REC4) name "the proposed reference server" without defining it. Decided by: R6's instance choice; the synthesis
+- **R2-XU-OQ9. The reference server.** Before 2026-10-30 (answered below), R2-BUD-REC6 proposed "one vCPU of the EU
+  instance type R6 recommends", and R2-ROOM-REC2 proposed "one 4-vCPU EU cloud VM, R6 to name it" (8 rooms on it).
+  R2-TRN-REC1 asked for "reference server hardware R6 names". The sync unit's marks (R2-SYNC-REC1, REC5, REC9) and the
+  interest unit's marks (REC1, REC3, REC4) named "the proposed reference server" without defining it. Decided by: R6's instance choice; the synthesis
   names one reference machine. Answered by R6-HOST-REC2: the reference server is a CCX23, and every server mark is
   measured on one of its vCPUs ([GLOSSARY](GLOSSARY.md#the-measuring-unit-one-vcpu)).
 - **R2-XU-OQ10. Can the browser read its own connection statistics?** R2-BUD-F12 and R2-BUD-F13 (from the W3C
@@ -3892,8 +3893,9 @@ random stream", "audit gate", "the tick interval", "tick p99" (R2-TRN-REC1 mark 
 to R6). R2-TRN-REC6 mark 2's "simulation tick duration" is now the server tick time, as the glossary lists it. A time
 mark that names no statistic is a p99, so four marks now say so: R2-BUD-REC6's encoding (50 µs per client per
 snapshot), R2-INT-REC1 (c) (0.2 ms per tick), R2-INT-REC2 (b) (0.1 µs per enemy pair; the re-flood, 1 ms) and
-R2-INT-REC4 (0.5 ms per tick). Left as written, because there they mean something else: the bare "48" of R2's marks
-(the design point, VISION_V2 §3's "design for 48+"; the resolutions changed the marks that mean the largest mode),
+R2-INT-REC4 (0.5 ms per tick). Left as written, because there they mean something else: the bare "48"s that are not a
+whole match's count in a mark (corrected in the step 3d fixes below: 16 bare "48"s in marks and questions were whole-match
+counts; 15 now name the largest mode's N and one the design point, which `CLAUDE.md` words "Design for 48+ players"),
 "players" (always a player count here), Source's "server-only seed" and the dated records. Where a retired wording
 sat inside an approved text (C1.9, C11.9, C11.10, C17.3), the rename followed the resolution, as the order of work
 says; C1.10, C1.10b, C1.13 and C23.1 differ from the approved text only by a link or the p99.
@@ -3909,9 +3911,31 @@ to the glossary's "Retire (in context)" (engine-architect edits GLOSSARY.md). Tw
 R2-INT-F20 now reads "4–9 % of one core of the measuring machine", and R2-TRN-OQ4's "r6:424-425" (added by C23.2)
 now reads "r6:424-425 at commit 8dee746".
 
-**Changes by type.** 20 recommendation changes (C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8, C6.5, C9.9,
-C9.10, C10.6, C10.7, C10.8, C11.9; the four p99 marks; R2-TRN-REC6 mark 2), 0 number changes, 0 sources, and 94 nits
-(term renames, links, pointers, the inserted questions, the header, line wraps).
+**Changes by type.** 20 recommendation changes in step 3c (C1.7, C1.8, C1.9, C1.10, C1.10b, C1.11, C1.13, C5.8,
+C6.5, C9.9, C9.10, C10.6, C10.7, C10.8, C11.9; the four p99 marks; R2-TRN-REC6 mark 2) and 17 in the step 3d fixes
+below, 37 in all; 0 number changes; 0 sources; 110 nits (94 in step 3c, 3 from the OBJECT-1 ruling, 13 in the step 3d
+fixes: term renames, links, pointers, the inserted questions, the header, line wraps).
+
+Step 3d fixes (2026-10-31):
+- The largest mode's N (48, or 54 under MODES-3 (b)) for a bare whole-match "48": R2-SYNC-REC1 marks 1 and 4,
+  R2-SYNC-REC3 mark 2, R2-SYNC-REC5 mark 4, R2-SYNC-REC9 mark 1 (its "48 clients" kept, since R2-BUD-REC6 quotes it),
+  the R2-BUD-REC1 and R2-BUD-REC3 spikes, R2-INT-REC1 (c), R2-INT-REC4, R2-TRN-REC1 mark 2, R2-TRN-REC5 mark 2,
+  R2-ROOM-REC2 marks 1 and 3: recommendation (13; each value changes under (b)).
+- The same in R2-SYNC-OQ13 and R2-BUD-OQ9: recommendation (2; open questions, logged so because the N changes under
+  (b)).
+- The R2-BUD-REC2 spike: "at the design point, N = 48", since its 160 kbps mark rests on the 48-player estimate:
+  nit.
+- R2-BUD-REC6's reason: "fit inside the server tick budget's 50 % of the tick period", "25 % of the tick period for
+  the server tick", "a p99 server tick time at half the period": nit (3).
+- R2-BUD-REC6's spike: "each within its 25 % share of the tick period" (it read as 25 % of the 8.3 ms budget):
+  recommendation.
+- R2-ROOM-REC2 mark 5: "every room start-up under 2 s" (with no statistic it read as a p99 since 2026-10-30; a spike
+  of a few rooms has no meaningful p99): recommendation.
+- "Design for 48+" is `CLAUDE.md`'s, not VISION_V2 §3's: R2-SYNC-REC9's Serves line and this part's statement above:
+  nit (2).
+- R2-XU-OQ9 framed as before 2026-10-30, in the past tense: nit.
+- This part's totals and this list: nit (2).
+- The same credit for "design for 48+" in the Serves lines of R2-BUD-REC3, R2-BUD-REC6, R2-TRN-REC2 and R2-TRN-REC6 (`CLAUDE.md`; VISION_V2 §3 holds the modes): nit (4).
 
 ## Sources
 
