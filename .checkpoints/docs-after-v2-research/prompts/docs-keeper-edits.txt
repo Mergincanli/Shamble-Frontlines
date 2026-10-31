@@ -1,5 +1,7 @@
 # Launched prompt (verbatim)
 # subagent_type: docs-keeper · model and effort: from the agent's frontmatter (opus, high) · launched: 2026-10-31 about 14:25 UTC
+# Correction (added after launch, 14:09 UTC): the launch was at about 14:07 UTC, and the routines were read at about 14:06 UTC;
+# the prompt below (as sent) says "about 14:25 UTC" and "about 14:20 UTC". Facts in the docs must use the real times.
 
 **Task:** part L of the change-set docs-after-v2-research (docs only; the plan is approved with 16 conditions). Work in
 /home/user/Shamble-Frontlines (branch cs/docs-after-v2-research at af2560c; draft PR #31). Edit exactly four files:
