@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-30 22:02 Amsterdam (21:02 UTC)
+- **Last update:** 2026-10-31 11:13 Amsterdam (10:13 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -220,6 +220,14 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
 - Fix round sent about 21:01 UTC: R1+R4 (`prompts/r14-3d-fixes.txt`: r1:2049, five bare 48s, pointers and Rests-on nits)
   and R5's design-point nit (`prompts/r5-3d-final-nit.txt`). GLOSSARY items (single events have no p99; §1's N = 54
   notes; the R3-AUDIO-REC1 credit; Used today's "25 % of the server tick budget") wait for the R2 unit's results.
+- **Fifth spend-limit cut**, about 21:04 UTC on 2026-10-30 ("resets 1:10am (UTC)"): the R2 unit's verifier had just finished
+  (report verbatim `verifier-r2-3d-result.md`: PASS WITH NOTES, R2 keeps "verified", 10 claims confirmed, 1 wrong
+  (r2:3896 attributes CLAUDE.md's "Design for 48+" to VISION_V2), 198 hits judged, 16 wrong (bare 48s); table of
+  resolution 1 recomputed: all match except the N = 54, 30 Hz rounding; GLOSSARY:74-75 and :168 use the retired "whole
+  tick"); its skeptic failed at once; the R1+R4 owner stopped part way through its fix round (R1 mostly applied, R4
+  part; working tree, notes saved). The night-stop reminder fired 22:51 UTC with nothing running. The session's worker
+  restarted; resumed 2026-10-31 about 10:13 UTC (11:13 Amsterdam, inside the day window): saver restarted; the R1+R4
+  owner resumed by message; the R2 skeptic resumed with resumeFromRunId (the verifier cached).
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
