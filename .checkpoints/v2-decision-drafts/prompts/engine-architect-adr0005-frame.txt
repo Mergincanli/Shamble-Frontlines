@@ -1,0 +1,54 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: xhigh · model: opus · 2026-10-31, saved about 18:56 Amsterdam
+
+You write the frame of ADR 0005 (content data, abilities and assets) of the v2 decision drafts of SHAMBLE FRONTLINES
+(plan step 3, the advisor's condition 11) and place its four sections in it verbatim. You edit no file outside /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/.
+
+## Inputs (all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/)
+- The sections: engine-architect-adr0005-content-section.md (two sections: "## Content data (engine-architect)" and
+  "## The asset pipeline (engine-architect)"), game-designer-adr0005-abilities-section.md ("## The ability and effect
+  system (game-designer)"), graphics-engineer-adr0005-assets-section.md ("## The asset pipeline: GPU rules
+  (graphics-engineer)"); each ends with "### Appendix A rows (for the frame)" and, for some, "### For the frame".
+- Their claims ledgers (*-adr0005-*-claims.md) and the authors' notes.
+- plan.md (revision 3: rules 1–12, the ADR 0005 paragraph, Mustafa's UPGRADE-SCOPE update), advisor-verdicts.md §1
+  (conditions 4 and 11), engine-architect-decision-map.md (part a's 0005 scope; part j: J4 how 0005 is put together,
+  J5 UPGRADE-SCOPE), inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md, docs/adr/0000-template.md.
+
+## Write /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-adr0005-draft.md, the whole record, in this order
+```
+# ADR-0005: Content data, abilities and assets
+**Status:** Proposed
+**Date:** 2026-10-31
+**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+<one paragraph in plain words>
+## Context                 (yours: the requirements and settled inputs the record serves, by STATUS code or GLOSSARY §8)
+## Decision                (yours: the joined decision in a few sentences, then numbered parts that point to the sections' parts)
+<the four sections, verbatim, each up to (not including) its "### Appendix A rows (for the frame)" and "### For the frame">
+## Options considered      (yours: options across sections only; each section keeps its own)
+## Trade-off analysis
+## Consequences            (with "Hard constraints in CLAUDE.md that change" and "Legacy inventory rows", as the plan's shape says)
+## Open questions          (yours: every OQ id of the four sections, listed with one line each and where it is, plus the frame's own OQ-0005-k)
+## What a spike must prove (yours: joined, pointing to each section's part)
+### Pass marks
+Written by test-engineer (plan step 4).
+## Migration plan
+## Test plan
+## Rollback
+## Appendix A: research dispositions   (the sections' Appendix A rows, verbatim, merged into one table, plus your own rows)
+## Sources
+```
+- Place each section byte for byte: the session checks it with a script. Never edit a section's text; if two sections
+  disagree, say so in the frame's Open questions (the authors fix their own text in the fix round).
+- The frame obeys the plan's rules like any draft (citations, numbers, traces, glossary, no design: ADR 0005 designs no
+  upgrade, ability, unit or rule) and keeps a claims ledger: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-adr0005-frame-claims.md.
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-adr0005-frame-notes.md (make the folder; you may always write there). Look there first: if the
+first line names another task, move the file into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/old/ and start fresh; if the notes end with DONE, write your answer
+from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each unit you
+finish, add a line or two: what is done, what you found and where, what comes next. Write the record into its file as
+you go. End with DONE, then give your answer. Never commit or push.
+
+## Return
+At most 20 lines: the joined decision in three lines, any disagreement between the sections, the counts (OQs by section,
+Appendix A rows by disposition), and your files' paths.

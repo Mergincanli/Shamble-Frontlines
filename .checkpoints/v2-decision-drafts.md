@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 18:57 Amsterdam
+- **Last update:** 2026-10-31 18:53 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -51,9 +51,9 @@ Step 3, drafting: five units running (0001, 0003 + 0005's asset section, 0004, 0
 ## Running work
 - advisor plan review: done (APPROVE), notes `advisor-plan-review.md` (DONE).
 - engine-architect decision map: done about 18:45 (521 of 521 ids, one owner each: 0001 127, 0002 104, 0003 71,
-  0004 82, 0005 34, 0006 65, DESIGN 38); its addendum (part j, from line 1032) done about 18:55, owners unchanged,
+  0004 82, 0005 34, 0006 65, DESIGN 38); its addendum (part j, from line 1032) done about 18:52, owners unchanged,
   coverage re-run 521/521; GLOSSARY §8 text in part J1.
-- Drafting, launched about 18:56: netcode-architect (0001; `netcode-architect-adr0001-notes.md`), rust-reviewer (0004;
+- Drafting, launched about 18:53: netcode-architect (0001; `netcode-architect-adr0001-notes.md`), rust-reviewer (0004;
   `rust-reviewer-adr0004-notes.md`).
 - Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
   notes `graphics-engineer-adr0003-notes.md`), infra-engineer (0006; `infra-engineer-adr0006-notes.md`), game-designer
