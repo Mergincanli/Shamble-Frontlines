@@ -1,0 +1,33 @@
+topic	line	nearest id	entry	kind	phrase
+R2	2017	R2-SYNC-REC1	The largest mode, and its N	context	48
+R2	2022	R2-SYNC-REC1	The largest mode, and its N	context	48
+R2	2103	R2-SYNC-REC3	Team size and how modes are written	context	players
+R2	2103	R2-SYNC-REC3	The largest mode, and its N	context	48
+R2	2186		The largest mode, and its N	context	48
+R2	2289	R2-SYNC-REC9	Team size and how modes are written	context	players
+R2	2292	R2-SYNC-REC9	The largest mode, and its N	context	48
+R2	2320	R2-BUD-REC1	Team size and how modes are written	context	players
+R2	2320	R2-BUD-REC1	The largest mode, and its N	context	48
+R2	2339	R2-BUD-REC2	The largest mode, and its N	context	48
+R2	2356	R2-BUD-REC3	Team size and how modes are written	context	players
+R2	2359	R2-BUD-REC3	The largest mode, and its N	context	48
+R2	2402	R2-BUD-REC6	The server tick budget	context	50 %
+R2	2403	R2-BUD-REC6	The server tick budget	context	25 %
+R2	2405	R2-BUD-REC6	The server tick budget	context	50 %
+R2	2405	R2-BUD-REC6	Tick period	context	the period
+R2	2410	R2-BUD-REC6	Team size and how modes are written	context	players
+R2	2414	R2-BUD-REC6	The authority	context	server-only
+R2	2414	R2-BUD-REC6	The server tick budget	context	25 %
+R2	2440	R2-INT-REC1	The largest mode, and its N	context	48
+R2	2440	R2-INT-REC1	Time statistics	context	at most 0.2 ms per tick
+R2	2500	R2-INT-REC4	The largest mode, and its N	context	48
+R2	2500	R2-INT-REC4	Time statistics	context	at most 0.5 ms per tick
+R2	2589	R2-TRN-REC1	The largest mode, and its N	context	48
+R2	2628	R2-TRN-REC2	Team size and how modes are written	context	players
+R2	2719	R2-TRN-REC5	The largest mode, and its N	context	48
+R2	2738	R2-TRN-REC6	Team size and how modes are written	context	players
+R2	2774	R2-ROOM-REC2	Team size and how modes are written	context	players
+R2	2774	R2-ROOM-REC2	The largest mode, and its N	context	48
+R2	2778	R2-ROOM-REC2	The largest mode, and its N	context	48
+R2	2953	R2-SYNC-OQ13	The largest mode, and its N	context	48
+R2	2994	R2-BUD-OQ9	The largest mode, and its N	context	48

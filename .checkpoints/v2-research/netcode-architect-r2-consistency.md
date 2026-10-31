@@ -103,3 +103,8 @@ DONE
 - Check after: R2 exact 0, in context 199 (new hits are "48" inside "(48, or 54 under MODES-3 (b))" beside the marking words, and "players" in "the largest mode's N players").
 - Round totals: recommendation 17, nit 9. File totals: recommendation 37, nit 106, number 0, source 0.
 DONE
+
+## Coordinator follow-up (2026-10-31): the same slip at r2:2355, 2409, 2627, 2737
+- BUD-REC3 Serves, BUD-REC6 Serves, TRN-REC2 Serves, TRN-REC6 Serves: "design for 48+ players" credited to `CLAUDE.md`, VISION_V2 §3 for the modes: nit x4. XU-OQ18's quotes left (quoted old words).
+- Part 7: one line added, nit total 106 -> 110 (step 3d 9 -> 13). File totals: recommendation 37, nit 110, number 0, source 0.
+DONE

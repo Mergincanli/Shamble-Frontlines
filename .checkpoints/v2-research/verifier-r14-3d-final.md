@@ -29,3 +29,6 @@ No URL or source added; only new number is ×1.125 (GLOSSARY §1 arithmetic) and
 - R4 879 · largest mode · "48" · right: beside "the largest mode's N".
 - R4 881 · largest mode · "48" · right: "at N = 48" is the stated measuring point, with N = 54's scaling in the same sentence and "the largest mode's N bots" at r4:879.
 - Retire (exact): glossary_check.py --skip-records on the working tree (R1/R4/GLOSSARY identical to 5b57e40): R1 exact 0, R4 exact 0 (R1 in-context 129, R4 56; +1 in R4 = the new "N = 48" at r4:881).
+
+## Check 5 (GLOSSARY nits) — closed
+Word diff d54f3c0..5b57e40: only the five. (1) Time statistics definition, G:143-144 sentence added as asked. (2) G:70 "and the interest marks (0.70 ms)" (table G:60 = 0.70) and G:72-73 exact sums 4.11 (5.11), 9.92 (10.92): my recomputation 4.110, 9.918 -> matches. (3) G:74 and G:170 "for the server tick". (4) G:177 in "The server tick budget" Used today (the wording sat there, not in the shares entry, whose R1 line G:205 never had the defect); holds. (5) G:155. Removed tokens: "ms.", "whole" x2, "period)", "budget", "ruling)." — no number removed or changed.

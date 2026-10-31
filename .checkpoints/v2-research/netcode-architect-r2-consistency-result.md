@@ -55,3 +55,7 @@ All four items are fixed in r2-netcode.md; nothing committed. This round: 17 rec
 Not changed, outside your list: the same "VISION_V2 §3 (48+)" slip at r2:2355, 2409, 2627 and 2737.
 
 The glossary check finds 0 exact hits in R2.
+
+## Addendum: the four remaining "48+" credits (reply to `prompts/r2-3d-fixes-2.txt`, about 10:22 UTC on 2026-10-31, verbatim)
+
+All four lines (r2:2356, 2410, 2628, 2738) now credit "design for 48+ players" to `CLAUDE.md` and VISION_V2 §3 for the modes. Each is logged as a nit, with a part-7 line. Totals: 37 recommendation, 110 nits. Not committed.
