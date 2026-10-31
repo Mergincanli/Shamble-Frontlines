@@ -59,5 +59,25 @@ parts.append('\n### The approved changes found in their files: `apply_check.py`\
 parts.append('\n### Quoted source text: `quotes_check.py 7c6e0d7 ' + HEAD + '`\n\n```\n' +
              run(S + 'quotes_check.py', '7c6e0d7', HEAD) + '```\n')
 parts.append('\n### UNREAD_SOURCES.md: `build_unread.py`\'s check\n\n```\n' + open(S + 'unread-check.json').read() + '```\n')
+parts.append("""
+## 5. The steps with their commits (the checkpoint, folded in; CHECKPOINTS §9)
+
+| Step | What | Commits |
+|---|---|---|
+| Start | Branch from main 07ab240 after R7 (PR #27); plan and verdicts recovered word for word | 8ff1c74 |
+| Wave 1 | R1 and R2: 11 units, assembled; six R1 verifiers, the R2 verifier, rust-reviewer, security-auditor; fix pass; second verifier pass; second fix round and final check: both verified | a6a97fe, 7907f5c, e4cda31, ae492a6 |
+| Wave 2 | R3–R6 owners; a spot-check, an owner fix and a second pass each | R3 605c09d → c22675f; R4 abdf477 → 16212b6; R5 9a623a0 → 8948522; R6 9d5e78a → 1decc70 |
+| Main merged | PR #29's STATUS and ROADMAP brought in before the docs step | 569f792 |
+| Critic | The consistency critic: 41 items (12 contradictions) | in `.checkpoints/` (engine-architect-consistency-result.json) |
+| The Advisor's 2026-10-30 decisions | UNREAD_SOURCES.md; the glossary; the 12 contradictions (steps 3a–3d) | 82298ab |
+| Step 3a/3b | Glossary and resolutions drafted; the advisor's verdict folded word for word | e797518, 8909523 |
+| Retire split | Format-only split, ruled by the advisor | 7c6e0d7 |
+| Step 3c | Owners apply, one per file; OBJECT-1 ruled and applied; the glossary's Used today refresh | 1da4e5f, de0a003, 41f9cf9, 2684735, e9ff1f9, 09de883, 36cc386, f67245e |
+| Step 3d | Three verifier units with skeptics; fix rounds; three final checks; the completeness critic and its nits | d768190, 10662c4, 1b69364, d54f3c0, 902c249, 1bfd235, f2239f9, 8260592, 3aad9d8, 96a4c29, 2382ea2, 7bb3d2e, b92199c, 749b363, 910768b |
+| Docs | docs-keeper (STATUS, ROADMAP, README, REPO_MAP); the report; the gate | see the PR's last commits |
+
+Spend-limit cuts (all resumed from the agents' notes, nothing lost): 2026-10-27 about 18:25 UTC; 2026-10-28 about 16:26
+and 20:50 UTC; 2026-10-30 about 18:52 and 21:04 UTC.
+""")
 open(OUT, 'w').write(''.join(parts))
 print('wrote', OUT, sum(p.count('\n') for p in parts), 'lines')
