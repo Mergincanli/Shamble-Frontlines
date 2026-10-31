@@ -108,3 +108,9 @@ DONE
 - BUD-REC3 Serves, BUD-REC6 Serves, TRN-REC2 Serves, TRN-REC6 Serves: "design for 48+ players" credited to `CLAUDE.md`, VISION_V2 §3 for the modes: nit x4. XU-OQ18's quotes left (quoted old words).
 - Part 7: one line added, nit total 106 -> 110 (step 3d 9 -> 13). File totals: recommendation 37, nit 110, number 0, source 0.
 DONE
+
+## Completeness critic nits (2026-10-31)
+- r2:858 R2-INT-F19 "48 players" linked to GLOSSARY.md#player-count-n: nit.
+- r2:867 R2-INT-F20 "24v24" linked to GLOSSARY.md#team-size-and-how-modes-are-written: nit.
+- Part 7: one line added; nit total 110 -> 112 (step 3d 13 -> 15). File totals: recommendation 37, nit 112, number 0, source 0.
+DONE

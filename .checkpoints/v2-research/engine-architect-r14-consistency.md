@@ -117,3 +117,4 @@ R4 R4-NAV-REC4 pointer + XT-OQ5 -- nit
 R4 R4-NAV-REC2 Rests on: the stress scene replaces R1-TICK-REC2 (the P1 scene), R1-XU-OQ1 -- nit
 Part 7 of both files: "Step 3d fixes (2026-10-30):" lines added, one per change with its type. Check script: exact 0 in R1 and R4; no new over-long lines. Not committed.
 DONE
+Follow-up 5 (coordinator, completeness critic): R1-ECS-REC1 Rests on 'the stress scene' linked; R4 legacy facts (LOS) '24v24' linked (line split there); part-7 Step 3d lines added in both -- nit x2. Not committed. DONE

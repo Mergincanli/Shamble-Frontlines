@@ -58,3 +58,5 @@ DONE (fix round)
 DONE (follow-up)
 - Final-check nit: R3-AUDIO-REC1 "adds less than 0.3 ms (p99)" -> "raises that p99 by less than 0.3 ms"; part-7 line kept in step. nit. Not committed.
 DONE (final nit)
+- Critic nit: r3:885 (options row V-A, not a look row) links "the largest mode" (#the-largest-mode-and-its-n) and "N" (#player-count-n), first uses in R3's own text (592 is R1's old counts in a wave-1 fact). Part-7 line added. nit. Not committed.
+DONE (critic nits)
