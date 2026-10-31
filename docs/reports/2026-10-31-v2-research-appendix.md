@@ -1,11 +1,11 @@
 # Appendix to the v2-research report (2026-10-31)
 
 The records the report (`docs/reports/2026-10-31-v2-research.md`) cites, word for word where the plan asks for it, and the
-check scripts' outputs. The working notes they come from are in `.checkpoints/v2-research/` at commit addb159.
+check scripts' outputs. The working notes they come from are in `.checkpoints/v2-research/` at commit 85f89ea.
 
 ## 1. Coverage: every brief §4 question (plan condition 12)
 
-Made by `scripts/coverage_table.py` from each topic file's own question table at addb159. "Lead recommendation" is the
+Made by `scripts/coverage_table.py` from each topic file's own question table at 85f89ea. "Lead recommendation" is the
 heading of the question's first recommendation, shortened; R2's question 6 is answered across its five units (an
 index under its Findings); R6's question 5, the security baseline, was deferred by the Advisor on 2026-10-27
 (R6-SEC-OQ1; when it is researched is BASELINE-WHEN).
@@ -53,7 +53,7 @@ index under its Findings); R6's question 5, the security baseline, was deferred 
 
 ### The resolutions, as folded after the advisor's step-3b verdict
 
-From `.checkpoints/v2-research/resolutions.md` at commit addb159 (that folder is deleted in this PR's last commit; the history keeps it).
+From `.checkpoints/v2-research/resolutions.md` at commit 85f89ea (that folder is deleted in this PR's last commit; the history keeps it).
 
 ### Resolutions of the critic's 12 contradictions (step 3a, proposals for the advisor's review)
 
@@ -1503,7 +1503,7 @@ numbers:** none.
 
 ### The advisor's step-3b verdict on the resolutions, the glossary and the cross-topic questions
 
-From `.checkpoints/v2-research/advisor-resolutions-verdict.md` at commit addb159 (that folder is deleted in this PR's last commit; the history keeps it).
+From `.checkpoints/v2-research/advisor-resolutions-verdict.md` at commit 85f89ea (that folder is deleted in this PR's last commit; the history keeps it).
 
 ### Step 3b: the advisor's verdict on the resolutions, the glossary and the cross-topic open questions (verbatim)
 
@@ -1666,7 +1666,7 @@ Files:
 
 ### The advisor's ruling on the glossary's Retire split
 
-From `.checkpoints/v2-research/advisor-retire-split-verdict.md` at commit addb159 (that folder is deleted in this PR's last commit; the history keeps it).
+From `.checkpoints/v2-research/advisor-retire-split-verdict.md` at commit 85f89ea (that folder is deleted in this PR's last commit; the history keeps it).
 
 ### The advisor's ruling on the glossary Retire split (verbatim)
 
@@ -1698,7 +1698,7 @@ My notes are in /home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-r
 
 ### The advisor's ruling on step 3c's one OBJECT
 
-From `.checkpoints/v2-research/advisor-object-1-verdict.md` at commit addb159 (that folder is deleted in this PR's last commit; the history keeps it).
+From `.checkpoints/v2-research/advisor-object-1-verdict.md` at commit 85f89ea (that folder is deleted in this PR's last commit; the history keeps it).
 
 ### The advisor's ruling on step 3c's OBJECT-1 (R2-INT-F20, "one core") and the C23.2 nit (verbatim)
 
@@ -1719,7 +1719,7 @@ Notes: /home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-object-1.m
 
 ### The advisor's ruling on the two R3 items of step 3d
 
-From `.checkpoints/v2-research/advisor-3d-r3-verdict.md` at commit addb159 (that folder is deleted in this PR's last commit; the history keeps it).
+From `.checkpoints/v2-research/advisor-3d-r3-verdict.md` at commit 85f89ea (that folder is deleted in this PR's last commit; the history keeps it).
 
 ### The advisor's ruling on the two R3 items of step 3d (verbatim)
 
@@ -1745,7 +1745,7 @@ My notes are in /home/user/Shamble-Frontlines/.checkpoints/v2-research/advisor-3
 Every web fetch in this change-set's agent transcripts and the session's own, by agent, tool and host, from `scripts/fetch_audit.py --grouped` (a WebFetch "redirect notice" row is a redirect the tool reported and did not follow; "(from a file or variable)" is a curl whose address was in a variable or a URL file).
 
 ```
-transcripts read; fetch rows 1511
+transcripts read; fetch rows 1512
   WebFetch: 1414 requests to 54 hosts; 14 different final hosts named (4 hosts)
   curl: 22 requests to 11 hosts; 6 different final hosts named (5 hosts)
 hosts off the allow list (tool, requested or final, host, agent: count):
@@ -1765,6 +1765,7 @@ hosts off the allow list (tool, requested or final, host, agent: count):
 |---|---|---|---|---|---|---|
 | advisor: Advisor PR review of #29 | background | curl | (from a file or variable) |  | 9 | n/a |
 | advisor: Advisor PR review of #29 | background | curl | api.github.com |  | 1 | NO |
+| docs-keeper: docs-keeper | wf_336a6842-8fb | curl | (from a file or variable) |  | 1 | n/a |
 | engine-architect: R1 unit abilities: GAS-style system | background | WebFetch | developer.valvesoftware.com |  | 2 | yes |
 | engine-architect: R1 unit abilities: GAS-style system | background | WebFetch | doc.rust-lang.org |  | 1 | yes |
 | engine-architect: R1 unit abilities: GAS-style system | background | WebFetch | docs.rs |  | 5 | yes |
@@ -2142,18 +2143,18 @@ hosts off the allow list (tool, requested or final, host, agent: count):
 | verifier: verifier-r2 | wf_bce24fc0-5c6 | curl | (from a file or variable) |  | 1 | n/a |
 | verifier: verifier-r2 | wf_bce24fc0-5c6 | curl | (proxy status) |  | 1 | n/a |
 
-## 4. The check scripts' outputs at addb159
+## 4. The check scripts' outputs at 85f89ea
 
 ### The glossary check (condition 9): `glossary_check.py --skip-records`
 
 ```
 entries 34; exact hits 0; in-context hits 617 (quotes and dated records skipped)
   R1: exact 0, in context 129, header links GLOSSARY.md: True; skipped: 24 in quoted text, 58 in dated records; blocks with an unpaired straight quote: 34
-  R2: exact 0, in context 201, header links GLOSSARY.md: True; skipped: 41 in quoted text, 59 in dated records; blocks with an unpaired straight quote: 0
-  R3: exact 0, in context 82, header links GLOSSARY.md: True; skipped: 16 in quoted text, 34 in dated records; blocks with an unpaired straight quote: 0
+  R2: exact 0, in context 201, header links GLOSSARY.md: True; skipped: 41 in quoted text, 61 in dated records; blocks with an unpaired straight quote: 0
+  R3: exact 0, in context 82, header links GLOSSARY.md: True; skipped: 16 in quoted text, 35 in dated records; blocks with an unpaired straight quote: 0
   R4: exact 0, in context 56, header links GLOSSARY.md: True; skipped: 9 in quoted text, 20 in dated records; blocks with an unpaired straight quote: 0
   R5: exact 0, in context 49, header links GLOSSARY.md: True; skipped: 14 in quoted text, 29 in dated records; blocks with an unpaired straight quote: 0
-  R6: exact 0, in context 100, header links GLOSSARY.md: True; skipped: 12 in quoted text, 31 in dated records; blocks with an unpaired straight quote: 0
+  R6: exact 0, in context 100, header links GLOSSARY.md: True; skipped: 12 in quoted text, 33 in dated records; blocks with an unpaired straight quote: 0
   not searchable (a pattern in words; the step-3d verifiers read for it): The hash-map ban in the sim crate / context: "zero uses of std HashMap or HashSet iteration in … outcome code"
   not searchable (a pattern in words; the step-3d verifiers read for it): The stress scene / exact: "the worst case (48 players plus vehicles and projectiles …)"
 ```
@@ -2161,19 +2162,19 @@ entries 34; exact hits 0; in-context hits 617 (quotes and dated records skipped)
 ### The approved changes found in their files: `apply_check.py`
 
 ```
-items 143; to read by hand 13
+items 143; to read by hand 14
 ```
 
 The items to read by hand are the ones whose after text a later glossary rename, link or ruling changed; the step-3d verifiers read each (their reports, `verifier-*-3d-result.md`).
 
-### Quoted source text: `quotes_check.py 7c6e0d7 addb159`
+### Quoted source text: `quotes_check.py 7c6e0d7 85f89ea`
 
 ```
-R1: quotes at base 1034, at head 1047; gone 0, new 13
-R2: quotes at base 834, at head 863; gone 0, new 26
+R1: quotes at base 1034, at head 1048; gone 0, new 14
+R2: quotes at base 834, at head 864; gone 0, new 27
 R3: quotes at base 341, at head 358; gone 0, new 11
 R4: quotes at base 361, at head 371; gone 0, new 10
-R5: quotes at base 572, at head 592; gone 0, new 19
+R5: quotes at base 572, at head 593; gone 0, new 20
 R6: quotes at base 254, at head 266; gone 0, new 12
 ```
 
@@ -2195,3 +2196,22 @@ R6: quotes at base 254, at head 266; gone 0, new 12
   "named": 4
  }
 }```
+
+## 5. The steps with their commits (the checkpoint, folded in; CHECKPOINTS §9)
+
+| Step | What | Commits |
+|---|---|---|
+| Start | Branch from main 07ab240 after R7 (PR #27); plan and verdicts recovered word for word | 8ff1c74 |
+| Wave 1 | R1 and R2: 11 units, assembled; six R1 verifiers, the R2 verifier, rust-reviewer, security-auditor; fix pass; second verifier pass; second fix round and final check: both verified | a6a97fe, 7907f5c, e4cda31, ae492a6 |
+| Wave 2 | R3–R6 owners; a spot-check, an owner fix and a second pass each | R3 605c09d → c22675f; R4 abdf477 → 16212b6; R5 9a623a0 → 8948522; R6 9d5e78a → 1decc70 |
+| Main merged | PR #29's STATUS and ROADMAP brought in before the docs step | 569f792 |
+| Critic | The consistency critic: 41 items (12 contradictions) | in `.checkpoints/` (engine-architect-consistency-result.json) |
+| The Advisor's 2026-10-30 decisions | UNREAD_SOURCES.md; the glossary; the 12 contradictions (steps 3a–3d) | 82298ab |
+| Step 3a/3b | Glossary and resolutions drafted; the advisor's verdict folded word for word | e797518, 8909523 |
+| Retire split | Format-only split, ruled by the advisor | 7c6e0d7 |
+| Step 3c | Owners apply, one per file; OBJECT-1 ruled and applied; the glossary's Used today refresh | 1da4e5f, de0a003, 41f9cf9, 2684735, e9ff1f9, 09de883, 36cc386, f67245e |
+| Step 3d | Three verifier units with skeptics; fix rounds; three final checks; the completeness critic and its nits | d768190, 10662c4, 1b69364, d54f3c0, 902c249, 1bfd235, f2239f9, 8260592, 3aad9d8, 96a4c29, 2382ea2, 7bb3d2e, b92199c, 749b363, 910768b |
+| Docs | docs-keeper (STATUS, ROADMAP, README, REPO_MAP); the report; the gate | see the PR's last commits |
+
+Spend-limit cuts (all resumed from the agents' notes, nothing lost): 2026-10-27 about 18:25 UTC; 2026-10-28 about 16:26
+and 20:50 UTC; 2026-10-30 about 18:52 and 21:04 UTC.
