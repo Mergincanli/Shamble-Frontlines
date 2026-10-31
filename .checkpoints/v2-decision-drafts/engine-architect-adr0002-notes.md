@@ -12,3 +12,6 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - OQs planned: 1 editor double-click (R1-DATA-OQ11, R1-XT-OQ10, R3-XT-OQ3, R5-XT-OQ8); 2 legacy gate/tools place (R5-LAYOUT-OQ5, R5-GATE-OQ3); 3 loopback place/calls; 4 production isolation + popups (R1-BND-OQ9); 5 real Safari in CI (R5-XQ-OQ1, R5-TEST-OQ4); 6 jump golden (R5-TEST-OQ3); 7 unread tool pages (R1-BND-OQ7).
 - DONE draft: header, intro paragraph, Context (requirements, 12 findings, takes/gives, legacy proves) written to engine-architect-adr0002-draft.md; line ranges checked. Next: Decision section (parts 1-12).
 - Decision parts 1-6 written to draft.
+- Decision parts 7-12 written to draft. Next: verify line ranges in parts 7-12, then Options considered.
+- Fixed citations parts 7-12. Next: Options considered (Q1-Q20 tables from r5 options 997-1146 and r1 options 1731-1788).
+- Options considered Q1-Q19 written. Next: Trade-off analysis, Consequences.
