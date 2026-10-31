@@ -21,3 +21,7 @@
 - Writing content data section now (CD-1..CD-14, OQ CD1..CD8).
 - DONE content data section written to engine-architect-adr0005-content-section.md (CD-1..CD-14, Options Q1-Q7, Trade-off, OQ-0005-CD1..CD8, spike marks 1-10). Lines to re-verify in ledger: r1:2303-2305 (BND-REC4 marks), r5:1202-1204 (LAYOUT-REC3 mark), r2:2864-2867, r4:732-734, r1:2536, r1:2485, r1:2514, r1:1768, r1:1852, r3:1043-1044.
 - Next: write asset pipeline section + Appendix A + For the frame (append to same file).
+- DONE asset pipeline section, Appendix A (26 rows: adopted 4, changed 4, answered 8, open 5, spike 5), For the frame appended. Next: verify cited lines in asset part; then claims ledger.
+- Self-review pass done on section (line fixes: BND-REC4 marks 2304-2306, LAYOUT-REC3 mark 1203-1204, R4-PHYS-REC2 721-745 & 733-734, R4-NAV-REC1 802-843, R3-CHAR-REC1 serves 1042-1043, REC6 record 2571-2572, TICK-REC1 2012-2013, R6-HOST-REC1 mark 639-644 (bundle 641-642, 25MiB 642-643); LOOK_V2 §8 quote fixed; Appendix counts adopted 4 changed 4 answered 7 open 6 spike 5).
+- Next: claims ledger engine-architect-adr0005-content-claims.md.
+- Added starting-principle citations (.claude/agents/engine-architect.md:25-26, 33-34) in AP-1, AP-6. Now writing ledger.

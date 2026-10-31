@@ -227,7 +227,7 @@ map document is content data under EDITOR_V2 §2's rules.
     connection. Every match record stores the content hash and the mode id (ADR 0006's record), so pick and win rates
     are grouped by tuning version; the hash must resolve to an archived content set (the mark below), and where shipped
     bundles are kept is ADR 0006's storage (I-6). The bundle, like every build file, stays under the client host's
-    25 MiB per-file limit (r6, Findings §1, R6-HOST-F3, lines 72–79; R6-HOST-REC1's mark, lines 637–642, ADR 0006's).
+    25 MiB per-file limit (r6, Findings §1, R6-HOST-F3, lines 72–79; R6-HOST-REC1's mark, lines 639–644, ADR 0006's).
   - Why: "client and server must run the same numbers for prediction; telemetry must know which numbers a match used"
     (r1, line 2573).
   - Research: R1-DATA-REC6 (r1, lines 2565–2580), on F27, F28, F29; the Rust SHA-256 crate is R1-DATA-OQ9 (lines
@@ -279,8 +279,8 @@ map document is content data under EDITOR_V2 §2's rules.
     (decision map, part j, J3).
   - Why: EDITOR_V2 §2 rule 1 already chose versioned JSON with stable ids, and the sim, the bake, the renderer and the
     editor all read one document (I-9).
-  - Research: R1-DATA-REC1–REC4; R1-ECS-REC3 (r1, lines 1973–1990); R4-PHYS-REC2 (r4, lines 721–742), R4-NAV-REC1
-    (r4, lines 802–830), R4-FLOORS-REC2 (r4, lines 925–939), R4-FLOORS-REC3 (r4, lines 941–952), all ADR 0004's.
+  - Research: R1-DATA-REC1–REC4; R1-ECS-REC3 (r1, lines 1973–1990); R4-PHYS-REC2 (r4, lines 721–745), R4-NAV-REC1
+    (r4, lines 802–843), R4-FLOORS-REC2 (r4, lines 925–939), R4-FLOORS-REC3 (r4, lines 941–952), all ADR 0004's.
   - Need: EDITOR_V2 §2 rules 1, 2 and 5, and §4; VISION_V2 §6.1 and §6.2 (floors and interiors read from map data).
 - **CD-12. Moment rules and telemetry ids are content.**
   - What: the definition ids (AB-4) key the telemetry, and every match record carries the content hash and the mode id
@@ -321,8 +321,8 @@ map document is content data under EDITOR_V2 §2's rules.
 
 ### Options considered (this section)
 Every option below comes from R1's Options section for the data unit (r1, Options §6, lines 1834–1882), or from the
-open question that asked it. Columns follow template 0000. "Presentation only" is not a row here: content feeds the
-authority, so every option touches security.
+open question that asked it. Columns follow template 0000. Content feeds
+[the authority](../research/GLOSSARY.md#the-authority), so no option here is presentation only.
 
 **Question 1: the file format** (r1, Options §6, Q1, lines 1836–1843)
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
@@ -365,8 +365,8 @@ YAML is not an option: the serde YAML crate is archived (F14).
 |---|---|---|---|---|---|---|
 | **A1. Development only; simulation numbers at the next match, client data live** (proposed, CD-7: R1-DATA-OQ12's own question, "Is a swap at the next match enough for development?") | Low: the file watcher, the whole-set check, the Vite push to the page | none at run time | nothing changes inside a match | production pins one set per match | the Feel Lab stays live; a simulation-number change needs a new match | new |
 | A2. Development only; swapped between ticks, server first, clients at the same tick (R1-DATA-REC5 as written) | Medium: a reload message (ADR 0001's `ContentReload`), the "applies from tick T" rule, the rules of what may change (R1-DATA-OQ7) | REC5's marks 2 and 3 | must not cause extra mispredictions (REC5 mark 2) | production pins one set per match | simulation numbers change mid-fight in development | new |
-| B. Live tuning in production too | Medium | not researched | – | matches whose rules change mid-way make telemetry (§6.6) and fairness harder; shipped practice not read (line 1871–1872) | – | new |
-| C. No hot reload; restart on any change | Lowest | none | – | – | works against LOOP_V2's tuning loop and the decided Feel Lab (line 1873–1874) | none |
+| B. Live tuning in production too | Medium | not researched | – | matches whose rules change mid-way make telemetry (§6.6) and fairness harder; shipped practice not read (lines 1871–1872) | – | new |
+| C. No hot reload; restart on any change | Lowest | none | – | – | works against LOOP_V2's tuning loop and the decided Feel Lab (lines 1873–1874) | none |
 
 - **A1.** Pros: no reload message, no mid-match rules, no re-bake question; the Feel Lab stays live. Cons: a
   simulation-number change is seen only in a new match. **A2.** Pros: the fastest tuning loop. Cons: a message, two
@@ -439,8 +439,8 @@ YAML is not an option: the serde YAML crate is archived (F14).
 - **OQ-0005-CD3. May production ever change numbers in the middle of a match?**
   - Why it matters: live changes help balance, but a match whose rules change mid-way is harder to compare and to keep
     fair (§6.6; r1, lines 1871–1872).
-  - Options: (a) never: one content set per match (proposed, CD-7); (b) allowed for named tunables, announced to
-    every client.
+  - Options: (a) never: one content set per match (proposed, CD-7); (b) allowed for named tunables (the research's option B,
+    r1, lines 1871–1872).
   - Decider: Mustafa. What decides it: a readable shipped-game source first (Valve's console-variable pages answered
     HTTP 403; SRC-ACCESS (a)), then his call. ADR 0001 answers the protocol side of critic rank 13. Research ids:
     R1-DATA-OQ3 (lines 2795–2798).
@@ -532,10 +532,372 @@ the research lacks is marked proposed, with its reason. The test-engineer writes
    the imported set passes CD-2. Proposed (reason: CD-10's change for LOOK_V2): 100 % of the look group's values
    appear in the report, each marked for ADR 0003's look proof test.
 9. **OQ-0005-CD2's numbers** (R1-DATA-REC1 mark 2, lines 2496–2498): loading a content set the size of the imported
-   legacy tables plus two maps and two modes takes a time the spike reports, natively on the server and in Wasm in the
-   Worker, with the size serde_json and garde add to the Wasm module; the budgets are set from these numbers.
+   legacy tables plus two maps and two modes, on the native server, takes a time the spike reports. Proposed (reason:
+   the client loads the same set in its Worker, and R1-RR-OQ5 asks for the size): the same load timed in Wasm in the
+   Worker, and the size serde_json and garde add to the Wasm module recorded; the budgets are set from these numbers.
 10. **Mode files** (R2-ROOM-REC7's mark, r2, lines 2864–2867, ADR 0001's): stated there; this crate supplies the load
     and the rejections.
 
 No item here needs Mustafa's judgement before acceptance; the Feel Lab's feel is his to judge in playtests later.
 
+## The asset pipeline (engine-architect)
+
+*Written by engine-architect for ADR 0005, 2026-10-31. This section and the GPU section ("The asset pipeline: GPU
+rules", graphics-engineer) together make the record's asset part: the GPU section decides what an imported model
+carries and what the GPU budget allows it; this one decides how assets sit in the content model and the build.*
+
+### Context (this section)
+
+**What it serves.**
+- LOOK_V2 §8: "v2 may use authored 3D models" (`[DECIDED]`); the flow (`[DEFAULT]`): a concept sketch, a 3D model in
+  Spline, a glTF/GLB export, "an automated step that compresses it, builds LODs and renames materials into the faction
+  colour slots", and "the engine applies the comic look"; budgets per unit, "triangles, materials and textures", and
+  "The game never runs Spline's own runtime" (`[DEFAULT]`); the tree style (`[OPEN]`).
+- The LOOK_V2 items the models carry: iconic silhouettes (§1, §5), uniform details as faction identity (§2), the
+  architecture direction (§2), slimmer, serious proportions and real weapon silhouettes (§3).
+- VISION_V2 §6.7 (uniforms and variants as data), §6.9 (a few very large units without dropping frames), §4 (the
+  minimum and recommended machines).
+
+**Settled inputs.** LOOK_V2 (authored glTF/GLB models allowed; brief §1). ASSET-RESEARCH (a), the advisor's ruling of
+2026-10-31 (plan, "Rulings"; decision map, part j, J4): this part takes LOOK_V2 §8's flow as given and proposes only
+what R1-DATA, R3-CHAR and R3-BUDGET support; compression formats, the LOD tool, export checks, the material-slot
+renaming step and the per-unit budget numbers are open questions marked "not researched", grouped under one research
+unit, the asset-pipeline research (graphics-engineer, verified like R3, in its own daytime session), which
+`docs/SPIKE_PLAN.md` places before the asset spike. SPIKE-SCOPE (a).
+
+**The findings it turns on.**
+- The research has no finding on the pipeline itself: no hit for KTX2, meshopt, Draco, Spline, gltf-transform or Basis
+  Universal, and one glTF mention, three.js's example that loads a glTF skinned mesh (r3, Findings Q4, R3-CHAR-F8,
+  lines 476–480) (plan, Risks, item 3; decision map, part h, gap G1, as corrected in part j, J4).
+- What the research does support: content as validated JSON whose every reference resolves at load (R1-DATA-REC1,
+  REC2; the content data section, CD-1, CD-2); static files with a hash in the URL and `immutable` (R1-DATA-F27, r1,
+  lines 1561–1565); the client host's limit of 25 MiB per file (r6, Findings §1, R6-HOST-F3, lines 72–79); budgets as
+  reviewed data in the repository (r5, Recommendations, R5-GATE-REC4, lines 1734–1744); static colliders "built from
+  the map document, never from render objects" (r4, Recommendations, R4-PHYS-REC2, lines 723–724); a very large unit's
+  parts take "each part's transform from the sim's vehicle-part records" (r3, R3-CHAR-REC4, lines 1077–1078); and the
+  frame totals and per-soldier draws the GPU section derives its caps from (R3-BUDGET-REC2, R3-CHAR-REC1).
+
+**What it takes from and gives to the other drafts.**
+- *Inside this record:* the GPU section's parts 1–9 and its open questions OQ-0005-AS1 to AS6 (compression, the LOD
+  tool, export checks, slot renaming, the per-unit budgets beyond its two caps, the soldier's vertex and bone counts);
+  the content data section's loader, files, reload and bundle (CD-1 to CD-8).
+- *Gives:* to ADR 0003, the asset list and the material-slot classes (interface I-8); ADR 0003 loads the models,
+  gives each slot its class's toon material, switches LOD levels and colours faction slots per instance (its parts 5
+  and 6). ADR 0003 also proposes that soldiers, weapons and very large units become authored models (its inventory
+  rows CL10, CC1–CC5, CC6, CC8, GC16).
+- *Takes:* the budget file and the gate (ADR 0002, R5-GATE-REC4, interface I-14); the dependency checks and the
+  player build's manifest walk (ADR 0002, R5-LAYOUT-REC2); the client host that serves the files (ADR 0006); the
+  vehicle-part records and the static world from the map document (ADR 0004).
+
+**What the legacy game proves.**
+- No external assets: every asset is built in code (CLAUDE.md's hard constraint), from character recipes (CL10),
+  wardrobe parts (CC1), the building kit (CM9, CM10), procedural trees (GW18), farmyard props (GW19) and canvas
+  textures (CL13, CM5). LOOK_V2 §8: "The legacy rule 'no external assets' ends with the legacy engine."
+- Render objects decided outcomes: blasts raycast render meshes (GW15) and collider sizes depend on render maths (GW9)
+  (r4, lines 730–731).
+- Unchecked links between data and builders: a missing gun key falls back silently to the AMK (CC9,
+  `docs/LEGACY_INVENTORY.md` line 138); builders and the look pipeline share an unchecked `userData` tag contract
+  (CL14, line 123).
+
+### Decision (this section's parts)
+
+The flow stays LOOK_V2 §8's. An asset is presentation only: it never decides a collision, a hit or a shot.
+Definitions name assets by id, and one asset list in the content set holds, for each asset, its file, its hash, its
+material slots with their classes and its counts; the loader refuses a reference that does not resolve. Asset files
+are served like the content bundle: hashed names, immutable, each under the host's file limit. Per-unit budgets are
+reviewed data, and the gate checks every listed asset against them. The automated step is a tool outside the player
+build. Which asset families go through the flow, beyond those ADR 0003 makes authored, is open; the content model
+carries a procedural kit spec and an authored asset side by side until it is answered.
+
+- **AP-1. An asset decides nothing.**
+  - What: no collider, hit shape, shot origin, navigation data or vehicle-part layout is ever read from a model.
+    Static colliders come from the map document (CD-11; R4-PHYS-REC2); a soldier's hit shape is simulation data (CL11,
+    "rewrite in Rust"); shots leave from the sim's fixed points, and a weapon model's sockets are cosmetic (CC9's note);
+    a very large unit's parts take their transforms from the sim's vehicle-part records, which the asset's part names
+    match (R3-CHAR-REC4; the GPU section's part 3). The server loads no model, and no crate that reads glTF enters the
+    `sim` or `server` dependency trees (a gate check, proposed below).
+  - Why: legacy's render-derived colliders and render-mesh blast rays are failures R4 names (GW9, GW15); an asset
+    changes whenever its art changes, and a change of art must never change an outcome (the starting principles:
+    "Presentation never decides a hit, a death or a purchase", `.claude/agents/engine-architect.md` lines 25–26).
+  - Research: R4-PHYS-REC2 (r4, lines 721–745); R3-CHAR-REC4 (r3, lines 1077–1093); legacy CL11, CC9.
+  - Need: VISION_V2 §6.2 (one 3D simulation world) and §6.4 (multi-part vehicles); CLAUDE.md's "Animation is
+    cosmetic … Nothing animated decides a hit" carries into v2 unchanged.
+- **AP-2. Definitions name assets by id; the asset list is content.**
+  - What: a unit, vehicle, weapon, faction uniform, building part or prop definition names its model by an asset id.
+    One asset list in the content set (client content, CD-6) holds for each asset: its id; its file name with its
+    hash; its material slots, each with its class (AP-3); its LOD levels, if it has any (the GPU section's part 5);
+    and its counts of triangles, materials and textures, which the budget check reads (AP-5). The loader's whole-set
+    checks (CD-2) refuse a reference to an asset the list does not hold, and a slot whose class is not in the class
+    list, naming the file and the field; nothing falls back to a default model. Who writes the list (the automated
+    step or a person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.
+  - Why: the same verdict for assets as for every other reference; CC9's silent fallback and CL14's unchecked tags
+    are the legacy failures, and R1-DATA-REC2's cross-reference stage and R1-ABL-REC5's validated ids already remove
+    them for every other kind.
+  - Research: R1-DATA-REC1, REC2 (r1, lines 2484–2516); R1-ABL-REC5 (r1, lines 2448–2459).
+  - Need: VISION_V2 §6.7 (units, uniforms and variants as data); LOOK_V2 §8.
+- **AP-3. The material-slot classes are one content table.**
+  - What: the classes the GPU section's part 2 names (for example environment, unit, faction colour, emissive), and
+    the slot names that map to each, are one client-content table (CD-6), validated like all content and read by ADR
+    0003 (interface I-8). Adding a class is a content change reviewed together with the ADR 0003 material it needs. A
+    faction's colours reach its faction colour slots from the faction definition (CD-13). The table says which slots
+    exist; how a class looks is ADR 0003's and Mustafa's (LOOK_V2).
+  - Why: the GPU section makes the list "this ADR's content data"; one table keeps the asset side and the renderer on
+    the same names.
+  - Research: R1-DATA-REC1, REC2; the GPU section's part 2 (R3-CHAR-REC3, r3, lines 1065–1075).
+  - Need: VISION_V2 §6.7; LOOK_V2 §2 (uniform details), §6.1 (the value hierarchy by material class), §6.4 (the glow
+    language's emissive slots).
+- **AP-4. Asset files are served like the content bundle.**
+  - What: each processed asset file is served from the client host with its hash in its name, as immutable, like the
+    content bundle (CD-8); each file stays under the host's 25 MiB per-file limit. Because the asset list sits in the
+    content set, the content hash names the asset versions a build uses.
+  - Why: "A modern best practice for static resources is to include version/hashes in their URLs, while never
+    modifying the resources" (F27), so a returning player fetches only files whose hash changed (the mark below).
+  - Research: R1-DATA-F27 (r1, lines 1561–1565); R1-DATA-REC6 (lines 2565–2580); R6-HOST-F3 (r6, lines 72–79) and
+    R6-HOST-REC1's mark (lines 639–644, ADR 0006's). Download size and compression are the GPU section's OQ-0005-AS1.
+  - Need: LOOK_V2 §8 (authored models reach the browser); VISION_V2 §4 (desktop browsers first).
+- **AP-5. Per-unit budgets are reviewed data, and the gate checks every listed asset against them.**
+  - What: the budgets per unit LOOK_V2 §8 asks for sit in the repository's budget file (ADR 0002, R5-GATE-REC4;
+    interface I-14): today the GPU section's two derived caps (a soldier as drawn: at most 4 materials per pass; a very
+    large unit: at most 25 parts × materials per pass), the rest once OQ-0005-AS5 sets them. The gate compares each
+    asset's counts in the asset list with its budget and fails on any excess; raising a budget is a reviewed change
+    with its reason.
+  - Why: R5-GATE-REC4's rule ("raising a budget is a reviewed change with its reason"); the frame totals every asset
+    shares stay ADR 0003's (R3-BUDGET-REC2).
+  - Research: R5-GATE-REC4 (r5, lines 1734–1744); R3-BUDGET-REC2 (r3, lines 1118–1137, ADR 0003's); the GPU section's
+    part 4.
+  - Need: LOOK_V2 §8 (budgets per unit); VISION_V2 §4, §6.9.
+- **AP-6. The automated step is a tool, outside the player build.**
+  - What: LOOK_V2 §8's step 4 runs as a tool ("tools may depend on everything", `.claude/agents/engine-architect.md`
+    lines 33–34), never in the player build and never at run time; the game loads only its output, glTF/GLB files,
+    and never Spline's runtime (the GPU section's part 6). Its package is added when the asset spike starts, with its
+    need named (R5-LAYOUT-REC2: "No other crate or package until a §6 item asks for it"; need: LOOK_V2 §8 only). What
+    it does (compression, LOD levels, slot renaming, export checks) is the GPU section's OQ-0005-AS1 to AS4; where it
+    runs, what it writes and where source and processed files live is OQ-0005-AP1. Steps 1 and 2 (the sketch and the
+    model in Spline) are authoring outside the code.
+  - Why: dependencies point one way, and the player page carries only what it runs (R5-LAYOUT-REC2's manifest walk
+    checks it).
+  - Research: R5-LAYOUT-REC2 (r5, lines 1170–1193, ADR 0002's).
+  - Need: LOOK_V2 §8 only.
+- **AP-7. A procedural kit spec and an authored asset sit side by side.**
+  - What: until OQ-0005-AP2 is answered, the content model carries either form for buildings, props and the ground: a
+    kit spec in the map document (CD-11; ED10's note: the spec "must live in the v2 document entity") drawn by a ported
+    builder, or an asset id (AP-2) drawn from an authored model. Soldiers, weapons and very large units are authored, as
+    ADR 0003 proposes. Trees wait for the tree style (LOOK_V2 §8 `[OPEN]`; the GPU section's part 9).
+  - Why: every v1 map must load through a migration (EDITOR_V2 §4), and its buildings are kit specs (CM7's note:
+    "Migrate houses[].bt entries to kit specs"); LOOK_V2 §8 allows authored models without requiring them.
+  - Research: none beyond the legacy rows (CM7, CM9, CM10, ED10); R1-DATA-REC4 for the migration.
+  - Need: EDITOR_V2 §4; LOOK_V2 §8.
+
+### Options considered (this section)
+The research's options for models (R3, Options Q4: the soldier, very large unit and LOD options) are the GPU
+section's. For this section's questions the research gives R1's general options, applied to assets; the rest are
+marked "not researched".
+
+**How content refers to assets**
+| Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
+|---|---|---|---|---|---|---|
+| **a. By id, through an asset list checked at load** (proposed, AP-2; R1-DATA-REC2's cross-reference stage) | Low | one list entry per asset | one check per load | presentation only (AP-1); no fallback model | a missing model fails at load, not on screen | new; replaces CC9's fallback |
+| b. By file path in each definition, checked only when the page loads the file | Low | none | – | presentation only | a missing model shows up on screen, or as a fallback (CC9) | the legacy shape |
+
+- **a.** Pros: one verdict for every reference; the budget check has its counts. Cons: a list to keep in step with
+  the files (OQ-0005-AP1). **b.** Pros: nothing to maintain. Cons: legacy's silent failure.
+
+**How assets reach the browser** (R1's delivery options, Options §6, Q5, r1, lines 1876–1882, applied to assets)
+| Option | Complexity | Cost | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort |
+|---|---|---|---|---|---|---|
+| **A. Separate files with their hash in the name, immutable** (proposed, AP-4; F27) | Low | one file per asset version | a changed asset re-downloads alone | presentation only | none | new |
+| B. Inside the content bundle | Low | every art change changes the one bundle | the 25 MiB per-file limit (R6-HOST-F3) binds bundle and art together | presentation only | none | new |
+| C. Embedded in the client build | Low | every art change is a code release | – | presentation only | none | new |
+
+- **A.** Pros: cached per file; the bundle stays small. Cons: more files per page load; the host allows 20,000 files
+  per site on the Free plan (R6-HOST-F3) and no asset count is known yet. **B.** Cons: art and tuning versions tied.
+  **C.** Cons: art tied to code releases.
+
+**Which asset families go through the flow** (OQ-0005-AP2): all authored; units, vehicles and weapons authored with
+buildings and props from the ported kit; or family by family after the look proof test. None is researched, so none is
+proposed; the decider is Mustafa in the look proof test.
+
+### Trade-off analysis (this section)
+- **Why ids, a list and a budget check:** assets get the same verdict as every other reference (CD-2), the gate has
+  the counts LOOK_V2 §8's budgets need, and nothing about an asset can change an outcome (AP-1). This is the least the
+  research supports that still makes an authored model safe to add.
+- **The strongest argument against:** the research says nothing about Spline's export or the step that would write
+  the list (gap G1), so the list's producer, whether its counts can be trusted, and whether slot names survive export
+  are all open (OQ-0005-AP1; the GPU section's AS3 and AS4); the asset spike may move fields in the list. AP-1 and
+  AP-4 stand whatever it finds.
+- **Side by side (AP-7):** carrying both forms costs a second drawing path for buildings and props until OQ-0005-AP2
+  is answered; dropping the kit now would break the v1 migration that EDITOR_V2 §4 asks for.
+
+### Open questions (this section)
+All three are **not researched**. OQ-0005-AP1 belongs to the asset-pipeline research with the GPU section's
+OQ-0005-AS1 to AS5; OQ-0005-AP2 and AP3 are Mustafa's.
+
+- **OQ-0005-AP1. Where does the automated step run, what does it write, and where do the files live?**
+  - Why it matters: the asset list (AP-2) and the budget check (AP-5) need a producer they can trust, and source and
+    processed files need a home.
+  - Options (not researched): (a) a tool the artist runs when importing a model, which commits the processed file and
+    its list entry; (b) a CI job that processes committed exports on every change (ADR 0002 would place it); (c) a
+    build step that processes exports at build time and commits nothing processed. With each: whether the gate recounts
+    a file or trusts its entry; where Spline source files and raw exports are kept.
+  - Decider: the asset-pipeline research, then the asset spike. What decides it: what the research finds Spline's
+    export and the tools for step 4 can do. Research ids: none.
+- **OQ-0005-AP2. Which asset families become authored models, and which stay procedural builders?**
+  - Why it matters: LOOK_V2 §8 allows authored models without requiring them; legacy builds buildings, props, the
+    ground and their textures in code (CM5–CM10, CM12, GW19, CL13, CD20, CD21), and the v1 maps' buildings are kit
+    specs that must migrate (EDITOR_V2 §4). ADR 0003 already proposes authored soldiers, weapons and very large units.
+  - Options (not researched): (a) every family authored; (b) buildings and props from the ported kit, everything else
+    authored; (c) family by family, after the look proof test.
+  - Decider: Mustafa, in the look proof test (how each looks, beside legacy screenshots, LOOK_V2 §9), with the
+    asset-pipeline research's cost and tooling. Trees wait for the tree style (LOOK_V2 §8 `[OPEN]`). Research ids: none.
+- **OQ-0005-AP3. May an AI-generated draft model ever ship?**
+  - Why it matters: LOOK_V2 §8's step 2 names "AI-generated for drafts, or a clean model built by Claude", and nothing
+    in the pipeline tells a draft from a clean model.
+  - Options (not researched): (a) drafts never ship: the asset list marks drafts and a release build refuses them; (b)
+    a draft may ship once Mustafa approves it; (c) no mark: every asset is judged in Brave like any other visual
+    change.
+  - Decider: Mustafa. What decides it: what he meant by "for drafts". Research ids: none.
+
+### What a spike must prove (this section's part)
+- **In ADR 0003's look proof test** (plain glTF/GLB exports, no compression or LOD step: ASSET-RESEARCH (a)): every
+  test model is named by id in the test content and listed in the asset list; a dangling asset id, and a slot whose
+  class is not in the class table, each fail at load with the file and field named (proposed; reason: R1-DATA-REC2's
+  error mark, r1, lines 2515–2516, applied to assets). Mustafa judges each family's look there (OQ-0005-AP2).
+- **In the asset spike**, after the asset-pipeline research: the tool processes the test models and writes their list
+  entries (OQ-0005-AP1's answer); every asset file is served immutable with its hash in its name, and a repeat visit
+  fetches 0 bytes of it (proposed; reason: R1-DATA-REC6's and R6-HOST-REC1's bundle mark, r1, lines 2577–2578, r6,
+  lines 641–642, applied to assets); every file stays under 25 MiB (R6-HOST-REC1's mark, lines 642–643); a planted
+  over-budget asset fails the gate, and a budget raised without a change to the budget file fails too (R5-GATE-REC4's
+  mark, r5, lines 1743–1744, applied to asset budgets); a planted dependency on a glTF reader in `sim` fails the gate
+  (proposed; reason: AP-1, checked like R5-LAYOUT-REC2's planted violations, r5, lines 1189–1192).
+
+### Appendix A rows (for the frame)
+The 26 ids the decision map gives ADR 0005 that are neither the ability section's (7) nor the GPU section's (1).
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-DATA-REC1 | adopted | CD-1; spike marks 1 and 9 |
+| R1-DATA-REC2 | changed: adds a maximum length on every collection (R1-RR-OQ2) and the no-panic loader (R5-RUSTLINT-REC3, R1-RR-OQ3), and refuses a fallback model too; the stages as written | CD-2; spike mark 2 |
+| R1-DATA-REC3 | adopted | CD-3 (content's TypeScript types come from ts-rs beside it, answering critic rank 31); spike mark 3 |
+| R1-DATA-REC4 | adopted | CD-4; spike mark 4 |
+| R1-DATA-REC5 | changed: simulation numbers apply at the next match in development (proposed; the mid-match swap is OQ-0005-CD4's option (b)), client content applies live, production pins one set per match as written; reason: its own partial trace (r1, lines 2555–2558) and plan rule 4 | CD-7; spike mark 5 |
+| R1-DATA-REC6 | adopted | CD-8; spike mark 6 |
+| R1-DATA-REC7 | changed: the path for a map uploaded to a private match is not built (no VISION_V2 §6 item asks for it); the rule holds for every payload a client or the editor sends | CD-9; spike mark 7 |
+| R1-DATA-REC8 | changed: the look group, "pending the look brief" (r1, lines 2597–2598), is listed value by value for ADR 0003's look proof test, since LOOK_V2 exists | CD-10; spike mark 8 |
+| R1-DATA-OQ1 | open: OQ-0005-CD1 | comments in content files (Mustafa, after a trial in the spike) |
+| R1-DATA-OQ2 | spike: the content and ability spike measures load time and Wasm size; the budgets and the binary-format fallback are OQ-0005-CD2 | CD-2; spike mark 9 |
+| R1-DATA-OQ3 | open: OQ-0005-CD3 | production mid-match changes (Mustafa); proposed: never |
+| R1-DATA-OQ4 | spike: the content and ability spike's fuzz run records the default depth limit | CD-2; spike mark 2 |
+| R1-DATA-OQ5 | spike: the content and ability spike builds and tests the crate on wasm32; the fallback is stated in CD-2 | CD-2; spike mark 2 |
+| R1-DATA-OQ6 | open: OQ-0005-CD5 | proposed: full definitions that reference shared ones (CD-13); the faction design session decides |
+| R1-DATA-OQ7 | open: OQ-0005-CD4 | under the proposal nothing changes mid-match; the list of what may change is option (b)'s |
+| R1-DATA-OQ8 | spike: the Rust ↔ TypeScript boundary spike (how files reach the Worker under Vite) | CD-7 |
+| R1-DATA-OQ9 | spike: the content and ability spike checks the Rust SHA-256 crate against WebCrypto | CD-8; spike mark 6 |
+| R1-DATA-OQ12 | open: OQ-0005-CD4 | Mustafa and the Advisor; proposed: the next match |
+| R1-XU-OQ8 | answered: ts-rs on the same Rust types, beside the JSON Schema in `packages/types` | CD-3 |
+| R1-XU-OQ9 | answered: one definition per file, one folder per kind | CD-5 |
+| R1-XU-OQ10 | answered: the tick rate is a build-time constant and never changes on a reload (ADR 0004, part 4) | CD-6, CD-7 |
+| R1-RR-OQ2 | answered: a maximum length on every collection in the schema, refused at load; the network side's bounded queues are ADR 0001's | CD-2; spike mark 2 |
+| R1-XT-OQ13 | answered: as R1-XU-OQ8 (critic rank 31) | CD-3 |
+| R5-XT-OQ9 | answered: as R1-XU-OQ8 (critic rank 31) | CD-3 |
+| R2-XU-OQ14 | answered: one top speed per unit type in the unit definition, read by ADR 0001 and ADR 0004; keeping it true under speed effects is OQ-0005-CD8 | CD-6 |
+| R4-FLOORS-OQ4 | open: OQ-0005-CD4 | under the proposal movement tuning waits for the next match and a stale bake is reported (R4-FLOORS-REC3) |
+
+Counts: adopted 4 · changed 4 · answered 7 · open 6 · spike 5 (26 rows).
+
+### For the frame
+- **The decision in lines.** *Content data:* content is JSON, one definition per file, loaded and validated by one
+  Rust crate with the same verdict on server, Worker, editor and tools; schema and TypeScript types come from the same
+  Rust types; every file is versioned and migrated; one hashed bundle per content set, named at join and recorded per
+  match; production pins one set per match, and development validates every save at once, applying client data live
+  and simulation numbers at the next match (proposed). *Asset pipeline:* LOOK_V2 §8's flow as given; an asset decides
+  nothing; definitions name assets by id through a checked asset list; asset files are hashed and immutable; per-unit
+  budgets are reviewed data the gate checks; the automated step is a tool; the rest waits for the asset-pipeline
+  research.
+- **Parts to point to:** CD-1 to CD-14; AP-1 to AP-7. **Open questions:** OQ-0005-CD1 (comments: Mustafa), CD2 (load
+  and size budgets: the spike, then the Advisor), CD3 (production mid-match changes: Mustafa), CD4 (development reload
+  of simulation numbers: Mustafa and the Advisor), CD5 (faction variants: the faction design session), CD6 (moment
+  rule format: a design session, then ADR 0004), CD7 (the Feel Lab tool: a design session), CD8 (top speed kept true:
+  ADR 0004 with the game-designer); OQ-0005-AP1 (the step's place and output: the asset-pipeline research), AP2
+  (authored or procedural per family: Mustafa in the look proof test), AP3 (drafts shipping: Mustafa).
+- **For `docs/adr/README.md`'s list of features whose need is outside VISION_V2 §6:** development reload, live for
+  client content and at the next match for simulation content (CD-7: LOOP_V2 line 8 and §7; R1-DATA-REC5's §6.3 trace
+  is partial); the feel kit and the Feel Lab's data (CD-14: LOOP_V2 §7); the map document's rules (CD-11: EDITOR_V2
+  §2); the asset list, the hashed asset files, the per-unit budget check and the step's tool (AP-2 to AP-6: LOOK_V2
+  §8); the kit spec beside the authored asset (AP-7: EDITOR_V2 §4, LOOK_V2 §8); the quality-tier table's format
+  (CD-14: VISION_V2 §4 only, ADR 0003's rows). The upgrade tracks' files are the ability section's kinds (need:
+  UPGRADE-SCOPE).
+- **Consequences.** *Easier:* tuning with no code change; one verdict everywhere, so a file the editor accepts is a
+  file the server accepts; editor and Feel Lab fields from the schema; telemetry grouped by content hash; private-room
+  overrides that cannot reach outside an allow list; an authored model that cannot change an outcome and cannot ship
+  over budget. *Harder:* a Rust type and a reviewed length bound per collection; JSON without comments; a simulation
+  number tested in a new match, not the current one; two generators that must agree; an asset list to keep in step
+  with the files; two drawing paths for buildings and props until OQ-0005-AP2 is answered. *Revisit when:* the
+  spike's load time or Wasm size misses its budget (OQ-0005-CD2, option D); garde fails on wasm32; Mustafa and the
+  Advisor pick the mid-match swap (OQ-0005-CD4); the faction design session (OQ-0005-CD5); a need for map upload
+  appears (CD-9); a shipped-game source on mid-match tuning becomes readable (OQ-0005-CD3); the asset-pipeline
+  research lands (OQ-0005-AP1, AS1 to AS5); Mustafa answers the tree style.
+- **Hard constraints in CLAUDE.md that change:** "No external assets (procedural textures, synthesized audio)" stops
+  applying to v2 code under LOOK_V2 §8 ("The legacy rule 'no external assets' ends with the legacy engine"); authored
+  glTF/GLB models enter only through AP-2 to AP-6, and synthesized audio is ADR 0003's matter. "Animation is cosmetic
+  … Nothing animated decides a hit" carries into v2 unchanged (AP-1). "Persistence only through KVStore" is untouched:
+  content is not persistence. Spikes are exempt (SPIKE-SCOPE (a)). Nothing in CLAUDE.md or `.claude/` changes in this
+  PR.
+- **Legacy inventory rows** (the rows ADR 0003 leaves to this record: the building kit, the kit and ground textures
+  and builders, the tree and prop builders, and the other asset rows; the inventory file is not edited, the change
+  waits for Mustafa's acceptance; "pending" is the row's *Look brief pending* note):
+
+  | Row id (`LEGACY_INVENTORY.md` line) | Mark now | Proposed mark | Why |
+  |---|---|---|---|
+  | CM1, CM2, CM4 (149, 150, 152) | redesign (pending) | unchanged: the maps migrate into the map document (CD-4, CD-11); pending becomes "asset families pending (OQ-0005-AP2)" | LOOK_V2 now sets the look; whether the maps' buildings are kit specs or authored assets is open |
+  | CM7 (155) | port to TypeScript (pending) | port to TypeScript as kit presets, except the thatched roof, which goes in its current form; pending becomes "OQ-0005-AP2" | LOOK_V2 §3 `[DECIDED]`: "The thatched roof goes in its current form"; §2 keeps the half-timbered house with the brick-tile roof |
+  | CM5, CM6, CM8, CM9, CM10, CM12, CL13, CD20, CD21, GW19 (153, 154, 156, 157, 158, 160, 122, 101, 102, 207) | port to TypeScript (pending) | unchanged (the seeded procedural technique, its data in the map document); pending becomes "OQ-0005-AP2: authored through the flow or kept procedural, family by family" | LOOK_V2 §8 allows authored models without requiring them; §2 keeps the architecture direction and the props "as a base to build on" |
+  | GW18 (206) | port to TypeScript (pending) | unchanged; pending becomes "the tree style, LOOK_V2 §8 `[OPEN]`" | the tree style is Mustafa's open item |
+  | GW20 (208) | redesign (pending) | unchanged (LOOP_V2 §2, §8); pending becomes "OQ-0005-AP2" for the structures' builders | the structures' look follows the families' answer |
+  | ED9 (344) | redesign (pending) | unchanged; pending becomes "the mood values are ADR 0003's look-test tuning (LOOK_V2 §6.5)" | the mood lives in the map document (CD-11); LOOK_V2 §6.5 `[DEFAULT]` sets moods per map |
+  | ED10 (345) | redesign (pending) | unchanged; the spec lives in the document entity (CD-11); pending becomes "OQ-0005-AP2" | ED10's own note; LOOK_V2 §8 |
+
+  The content data parts change no mark; the marks they rely on stand: CD4, CD6, CD7, CD10, CD12, CD14 (their dead keys
+  go through the import, CD-10); GW2, GE1 (rules as validated data); GW12, GE11, CM1, ED13 (CD-4, CD-11); CD2 (KVStore
+  stays a client port; content does not pass through it); CC9 (port to TypeScript; its sockets join the feel kit,
+  CD-14); TL11 (the legacy oracle the import's goldens use). Not listed here: ED5 and ED7 (the Character Lab and the
+  Anim Lab), which follow ADR 0003's CL10 and GA rows; the frame or ADR 0003 places them.
+- **Migration (proposed places in SLICE-ORDER; [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test)
+  runs first and needs nothing from this record):**
+  1. *The foundation:* the `content` crate's place in the workspace and the generated schema and types in
+     `packages/types`, diffed by the gate (CD-3; ADR 0002's milestone); the dependency check that keeps glTF readers
+     out of `sim` and `server` (AP-1).
+  2. *The content and ability spike,* after the sim core spike and before slice 1 (decision map, part g): spike marks
+     1–9 of the content data section.
+  3. *Slice 1, move & shoot:* the crate with CD-1 to CD-8 on weapons and movement (the import's weapon and movement
+     tables, CD-10); the bundle and its hash in local play. *Done when:* spike marks 1, 2, 4 and 6 pass on the real
+     crate in CI.
+  4. *Slice 2, bots and three teams, played locally:* units, factions and modes as files (CD-6, CD-13); Cabana and
+     DM_Tri migrated (CD-4, CD-11).
+  5. *Slice 3, online:* the hash at join with ADR 0001 (CD-8); the server's validation of private-room overrides
+     (CD-9).
+  6. *Slice 4, the loop:* the rule tables (CD-6); moment rules once OQ-0005-CD6 is answered (CD-12); the feel kit and
+     the Feel Lab for the feel pass (CD-14); the upgrade tracks' files.
+  7. *Slice 5, Octopon-3 and Editor v2:* the map document under EDITOR_V2 §2 (CD-11), with EDITOR_V2's own
+     architecture plan.
+  8. *Slice 6, scale to 48:* the load-time and size budgets re-measured on the full content (OQ-0005-CD2).
+  - *Assets:* the look proof test uses plain exports; the asset-pipeline research, then the asset spike, come before
+    the first authored model enters the game (AP-1 to AP-6).
+- **Test plan:** the spike marks become CI checks: the fuzz corpus on native and Wasm (CD-2); the float round trip
+  (CD-1); the schema and types diff (CD-3); migration goldens, with insta snapshots of validation errors
+  (R5-TEST-REC3; CD-4); the import report (CD-10); the bundle tampering cases (CD-8); the asset list's reference
+  checks, the per-unit budget check and the glTF dependency check (AP-1, AP-2, AP-5).
+- **Rollback:** if JSON misses its budgets, the build compiles the same JSON into a binary runtime format (option D)
+  and JSON stays the authored form; if garde fails on wasm32, checked newtypes and hand-written checks replace it
+  (r1, lines 2801–2803); if next-match reload proves too slow for tuning, OQ-0005-CD4's option (b) is REC5 as written,
+  and ADR 0001's catalogue already holds its message; if the asset list does not fit what the asset-pipeline research
+  finds, its fields change and AP-1, AP-4 and AP-5 stand.
+- **Seams the other drafts carry:** ADR 0004: converting authored seconds (part 4), the moment phase (CD-12), the
+  answer to OQ-0005-CD8, and the static world and bake read from the map document; ADR 0001: the content hash in
+  `Join` and `JoinAccepted`, the overrides in `HostCommand`, `ContentReload` only if OQ-0005-CD4 picks (b), the mode
+  file's use in rooms; ADR 0002: `content` in the crate list, `packages/types`, the loader's lints, the goldens, the
+  Vite plugin, the budget file and its gate check, the manifest walk; ADR 0006: serving the bundle and the asset files
+  immutable, keeping shipped bundles so a recorded hash resolves, the record's content hash and mode id, and the allow
+  list under the security baseline; ADR 0003: the slot classes and the asset list (I-8), the quality-tier rows, the
+  Feel Lab's screen, the look values from the import report.
+- **Ids:** the map gave this unit 26 ids (above), and all belong here. R3-CHAR-OQ3, which the map also gives ADR 0005,
+  is the GPU section's (its OQ-0005-AS6).

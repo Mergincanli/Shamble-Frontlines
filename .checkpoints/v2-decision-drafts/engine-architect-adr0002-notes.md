@@ -15,3 +15,9 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Decision parts 7-12 written to draft. Next: verify line ranges in parts 7-12, then Options considered.
 - Fixed citations parts 7-12. Next: Options considered (Q1-Q20 tables from r5 options 997-1146 and r1 options 1731-1788).
 - Options considered Q1-Q19 written. Next: Trade-off analysis, Consequences.
+- Trade-off + Consequences (hard constraints, inventory table: no mark changes) written. Next: Open questions OQ-0002-1..7, spike section, migration, test plan, rollback, Appendix A, Sources.
+- OQs 1-7 and spike section written. Next: Migration plan, Test plan, Rollback, Appendix A, Sources.
+- Migration plan, Test plan, Rollback written. Next: Appendix A (104 ids), Sources; then ledger.
+- Appendix A written: 104 rows, matches map ids exactly. Next: Sources, then ledger.
+- Sources written. Next: verify a few remaining cites (r5 2038-2056, r1 3209-3256, R6 754-768), then ledger.
+- Linked first uses of glossary terms; retired-phrase scan clean. Next: proofread pass, then ledger.

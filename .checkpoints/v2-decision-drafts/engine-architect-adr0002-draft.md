@@ -12,8 +12,8 @@ above it, and a gate check proves that. In the browser the simulation runs in on
 server from slice 1 and owns the network connection online; the page gets one block of data per tick and posts one
 command per tick, so no call crosses the boundary per entity or per frame. TypeScript types are generated from the Rust
 code. One command, the gate v2, runs the same checks locally and in CI and proves itself with planted defects; every
-pull request gets a preview link. The reason: VISION_V2 asks for one simulation shared by server and client, four
-desktop browsers on a modest laptop, and 48 players; the foundation the Advisor defined is exactly this structure,
+pull request gets a [preview](../research/GLOSSARY.md#preview) link. The reason: VISION_V2 asks for one simulation shared by server and client, four
+desktop browsers on a modest laptop, and 48 players; [the foundation](../research/GLOSSARY.md#the-foundation) the Advisor defined is exactly this structure,
 and the R1 and R5 research found one way to build it that is checked by machines rather than by memory.
 
 ## Context
@@ -41,7 +41,7 @@ and the R1 and R5 research found one way to build it that is checked by machines
   events in the per-tick block), §6.6 and §6.8 (re-runnable matches, which the determinism suite's tools check), §6.1
   (rooms and private matches: the crate list and the decoders that never panic).
 - **VISION_V2 §3 and §4:** design for 48 players, bots fill empty slots; Chrome, Edge, Firefox and Safari; a laptop with
-  integrated graphics runs the largest mode at 30+ fps on Low; fair up to about 100 ms of ping. MODES-3 (a): the
+  integrated graphics runs [the largest mode](../research/GLOSSARY.md#the-largest-mode-and-its-n) at 30+ fps on Low; fair up to about 100 ms of ping. MODES-3 (a): the
   largest mode is 24v24, so [the largest mode's N](../research/GLOSSARY.md#the-largest-mode-and-its-n) is 48.
 - **TICK-30** (STATUS, "Decisions pending"): the server tick is 30 Hz at the baseline; 60 Hz only with
   [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) of at least 25 % (ADR 0001 owns it). The per-tick
@@ -79,7 +79,7 @@ and the R1 and R5 research found one way to build it that is checked by machines
 10. Fork pull requests get no secrets, while `pull_request_target` and `workflow_run` hand secrets and write tokens to
     runs a pull request triggers (r5-toolchain-quality.md, Findings, Question 6, R5-PREV-F1 to F3, lines 765–782).
 11. Vite's size limit only warns (r5-toolchain-quality.md, Findings, Question 7, R5-GATE-F2, lines 950–953).
-12. The client host serves no file larger than 25 MiB (r6-infrastructure.md, Findings §1, R6-HOST-F3, lines 72–79;
+12. [The client host](../research/GLOSSARY.md#the-client-host) serves no file larger than 25 MiB (r6-infrastructure.md, Findings §1, R6-HOST-F3, lines 72–79;
     decision map N37), and WebTransport runs only in secure contexts (r2-netcode.md, Findings, Brief question 4,
     R2-TRN-F35, lines 1268–1272).
 
@@ -88,12 +88,12 @@ and the R1 and R5 research found one way to build it that is checked by machines
   design (its buffer in the Worker), the thin transport interface with its loopback backend for the local server, and
   the network profiles (ADR 0001); the fixed-tick mechanism, the Worker's pacing, the determinism rules, the panic-free
   sim and the restart after a trap (ADR 0004); the content schema and where content's TypeScript types come from (ADR
-  0005); the frame budget rows, among them the page's cost of the sim, and the client reference machines (ADR 0003); the
+  0005); the frame budget rows, among them [the page's cost of the sim](../research/GLOSSARY.md#the-clients-sim-share), and the client reference machines (ADR 0003); the
   client host, its token scope, the access wall, the cleanup policy, the staging game server, the secrets policy and
   runner costs (ADR 0006).
 - **Gives:** the repository, the crates and packages and the rules on who may depend on whom; the toolchains and build
   profiles; the Worker, the per-tick output block's layout and versioning, the command posting, the generated types and
-  the isolation flag (decision map interfaces I-2, I-3, I-5); the client + local server skeleton; lint, tests and the
+  [the isolation flag](../research/GLOSSARY.md#preview-isolation-and-the-isolation-flag) (decision map interfaces I-2, I-3, I-5); the client + local server skeleton; lint, tests and the
   tools of the determinism suite (I-17); CI, the gate v2 and the one file where every draft's budgets live as data
   (I-14); the preview build and its workflows (I-13); the editor build.
 
@@ -111,8 +111,8 @@ and the R1 and R5 research found one way to build it that is checked by machines
 - Exact pins, a lockfile, `npm ci` and the CI hygiene (SHA-pinned actions, read-only token, `persist-credentials:
   false`, concurrency cancel) are proven here (rows TL17 and KT8, lines 402 and 417).
 - The headless "SIM fence" leaked through comments (row CS11; r1-simulation-core.md, legacy facts, lines 1176–1178),
-  the frame loop stepped the world inside the render loop (rows GP13 and GP14, lines 1159–1164), and the input command
-  was declared but never wired (row CS1, lines 1150–1154): the crate boundary, the Worker and the per-tick command fix
+  the frame loop stepped the world inside the render loop (rows GP13 and GP14; r1 lines 1159–1164), and the input command
+  was declared but never wired (row CS1; r1 lines 1150–1154): the crate boundary, the Worker and the per-tick command fix
   these.
 - At 48 soldiers the legacy JavaScript combat step took 0.80–1.00 ms per update step on the main thread (row GC2;
   r1-simulation-core.md, lines 1168–1171): a scale for what the Worker takes off the page, not a v2 figure.
@@ -257,7 +257,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
      with no copy, keeps the two newest blocks to interpolate between ticks (R1-TICK-REC5) and returns older ones to
      the pool. Whether a section is laid out per entity or per field is measured in the boundary spike (bytes per tick
      and copy time at N = 48); ADR 0003 reads typed arrays either way. The block writer serializes field by field, as
-     the state hash already does (R1-DET-REC6), so struct padding never reaches the page and no `unsafe` is needed; if
+     [the state hash](../research/GLOSSARY.md#state-hash) already does (R1-DET-REC6), so struct padding never reaches the page and no `unsafe` is needed; if
      the spike's copy time says otherwise, R1-RR-OQ6's two alternatives (a derive that rejects padding, or `unsafe` with
      a written invariant and a test) are weighed then. The SharedArrayBuffer ring (B3) is the spike's measured
      alternative, never the sim's own shared Wasm memory (B4). At the 30 Hz baseline that is 30 blocks a second
@@ -299,7 +299,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
 6. **The client + local server skeleton.** From slice 1 the same `sim-worker` build runs in two modes behind one mode
    flag, with the same page code: online, the Worker's client endpoint talks to the room process through `net`'s
    WebTransport or WebSocket backend; in a local match, the same Worker also runs the local server (`room` and `sim`,
-   the authority, with bots filling slots), and the client endpoint reaches it through `net`'s loopback backend with
+   [the authority](../research/GLOSSARY.md#the-authority), with bots filling slots), and the client endpoint reaches it through `net`'s loopback backend with
    the same encoded messages (ADR 0001 part 10). The page never handles a network packet and cannot tell the two modes
    apart. Whether the local server and the client endpoint share one Wasm instance or run as two, and so whether the
    loopback stays inside Rust or passes through the TypeScript interface, is measured in the boundary spike
@@ -371,7 +371,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | Network | L1 (gate, short; nightly, long), L2 (nightly) | ADR 0001's marks under named profiles | gate (G11), nightly |
    | Soak and load | bots as headless Rust protocol clients | rooms of 48 for 30 minutes per mode | nightly, and before each playtest |
    | Fuzz | cargo-fuzz on every decoder and the content loader | 0 panics, 0 allocations above the size limits | nightly, Linux |
-   | Benchmarks | the `devtools` tick bench; ADR 0003's client harness | sim step time and frame cost, with the method stated | change-sets touching the sim or the render path; never a gate pass or fail |
+   | Benchmarks | the `devtools` tick bench; ADR 0003's client harness | [sim step time](../research/GLOSSARY.md#sim-step-time) and frame cost, with the method stated | change-sets touching the sim or the render path; never a gate pass or fail |
    - **The determinism suite's tools:** a `devtools` replay runner, built as the server builds the sim, plays a
      recorded match and writes one [state hash](../research/GLOSSARY.md#state-hash) per tick; the gate runs it twice in
      two processes and once as Wasm in Node; Playwright opens a replay page that runs the `sim-wasm` Worker in Chromium,
@@ -393,7 +393,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    - **Soak and load:** bots as headless Rust clients that speak the real protocol; one nightly run per mode of
      [the test-mode list](../research/GLOSSARY.md#the-test-mode-list) over L1 at P2, 30 minutes each, and one L2 run with
      4 real browser clients among the bots; measured: [server tick time](../research/GLOSSARY.md#server-tick-time) p50,
-     p99 and max against [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) (ADR 0001's), bytes per
+     [p99](../research/GLOSSARY.md#time-statistics) and max against [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) (ADR 0001's), bytes per
      client per second, the resident-memory slope, queue lengths, desyncs, panics and hangs, plus legacy TL13's match
      metrics; before each playtest one 3-hour soak.
    - **Flakes:** no retries (`retry: 0`, `retries: 0` written out; `failOnFlakyTests` and `forbidOnly` on in CI); one
@@ -716,7 +716,7 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
 - **The local server in the same Worker** wins because SLICE-ORDER condition 1 allows no offline-only path, and one
   Worker build then serves local play, prediction and online play. The strongest argument against it: in a local match
   the Worker runs the authority's sim step, the loopback encoding and decoding, and the client endpoint's prediction
-  and block writing, a load no research measured (ADR 0001, trade-off 5, counts it in the client's sim share); the
+  and block writing, a load no research measured (ADR 0001, trade-off 5, counts it in [the client's sim share](../research/GLOSSARY.md#the-clients-sim-share)); the
   boundary spike measures it, and OQ-0002-3 picks between one Wasm instance and two.
 - **Two crates beyond R5's list** (`room`, `navbake`) cost two more dependency checks; without them the local server
   cannot run in the Worker, and the bake's generator would risk shipping in the player's Wasm. No research compared
@@ -790,3 +790,395 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   | KT7, KT12 (lines 416, 421) | drop | drop (no change) | the v2 gate and lint replace them; KT12's rules move with `legacy/` |
   | PG1, PG18, PG19 (lines 359, 376, 377) | drop | drop (no change) | two Vite entries replace the hand-synced pages; modules replace the script order; three.js is bundled |
   | CS11 (line 179) | redesign | redesign (no change) | part 3: the crate boundary replaces the comment fence |
+
+## Open questions
+- **OQ-0002-1. Does the v2 editor still open by double-clicking its HTML file?**
+  - Why it matters: EDITOR_V2 §5 keeps the rule, and the v2 editor is a Vite-built page whose validation panel and Test
+    run a module Worker with the bake and map checks in Wasm (part 11); whether such a page loads from `file://` was not
+    researched (R1-DATA-OQ11). A `file://` page counts as a secure context on MDN's table (R1-DATA-OQ11's second
+    verifier pass, r1 lines 2819–2823), so that rule alone does not settle it.
+  - Options: (a) keep the rule, if the built editor's module Worker and Wasm load from `file://` in Chrome, Edge,
+    Firefox, Safari and Brave; (b) change the rule: the editor opens from a local server (`vite` or `vite preview` on
+    localhost) or from its preview link, which changes EDITOR_V2 §5; (c) a double-click editor that edits the document
+    only, with the bake and map checks run elsewhere (not researched).
+  - Decider: the boundary spike (does it load?), then Mustafa if EDITOR_V2 §5's rule must change.
+  - What decides it: the spike's load test of the built editor entry from `file://` in the four browsers and Brave.
+  - Research ids: R1-DATA-OQ11, R1-XT-OQ10, R3-XT-OQ3, R5-XT-OQ8.
+- **OQ-0002-2. Where do the legacy gate and tools live after the move, and where does the gate v2's script live?**
+  - Why it matters: today's gate must keep guarding critical fixes to `legacy/`, the legacy oracle must keep producing
+    golden values, and R5's working name for the gate v2 is today's path.
+  - Options: (a) both gates and the legacy tools in `tools/`, the legacy ones learning the `legacy/` path; (b) the
+    legacy gate and tools inside `legacy/`, `tools/` for the gate v2.
+  - Decider: the phase 1 restructure plan (the main session with docs-keeper), as R5 names it.
+  - What decides it: which layout keeps R5-LAYOUT-REC6's marks (today's gate passes on `legacy/`, the four Phase 0
+    mutation proofs still fail on the right checks, `docs/legacy-tuning.json` is reproduced byte for byte) with the
+    fewest path changes, and where the legacy docs go (row KT21).
+  - Research ids: R5-LAYOUT-OQ5, R5-GATE-OQ3.
+- **OQ-0002-3. In a local match, do the local server and the client endpoint share one Wasm instance, and does the
+  loopback stay inside Rust?**
+  - Why it matters: it sets the Worker's Wasm calls per tick and its memory in local play, and whether a trap in the
+    client endpoint also ends the authority (ADR 0004's OQ-0004-7).
+  - Options: (a) one instance, with the loopback inside Rust: the fewest calls; a trap ends both; (b) two instances in
+    the one Worker, with the loopback as the third backend of `net`'s TypeScript interface (ADR 0001 part 10; R2-TRN-REC4
+    puts the client's interface in TypeScript): a client trap leaves the authority running; a constant few more calls
+    per tick and a second copy of the Wasm memory.
+  - Proposed start: (b), because it keeps the client endpoint's path the same as online play (SLICE-ORDER condition 1:
+    no offline-only shortcuts), unless the spike's marks below fail.
+  - Decider: the boundary spike, with ADR 0001 (the interface) and ADR 0004 (OQ-0004-7).
+  - What decides it: Wasm calls per tick, the same at N = 12 and N = 48 (R1-BND-REC1 mark 2); the Worker's time per tick
+    in a local match on the minimum laptop against the client's sim share (ADR 0004); the memory of each layout.
+  - Research ids: none of its own; it applies R1-BND-REC1 mark 2 and R2-TRN-REC4 as ADR 0001 changes it.
+- **OQ-0002-4. Does production ever turn on cross-origin isolation, and can a later login popup live with it?**
+  - Why it matters: isolation would make the SharedArrayBuffer ring (B3), inputs through shared memory (C2) and the
+    `Atomics.wait` pacing (W3) available, and it costs a CORP header on every cross-origin `no-cors` resource and cuts
+    cross-origin popups off from their opener (R1-BND-REC5, r1 lines 2309–2325).
+  - Options: (a) stay non-isolated (G1); (b) isolate production (G2) when part 5's rule fires (B3 passes R1-BND-REC2
+    mark 5, or the timer pacing fails its jitter mark and W3 passes); the login VISION_V2 §5 plans then needs a page or
+    a redirect outside the isolated game page, unless `same-origin-allow-popups` gives isolation (R1-BND-OQ9).
+  - Decider: the boundary spike's results, then this record; for embeds and the login flow under isolation, Mustafa with
+    ADR 0006 (R1-BND-OQ5, only if isolation is adopted).
+  - What decides it: R1-BND-REC2 mark 5 and ADR 0004's jitter mark for the timer pacing; for the popup, a test of
+    `crossOriginIsolated` under `same-origin-allow-popups` in the four browsers.
+  - Research ids: R1-BND-OQ9.
+- **OQ-0002-5. Does real Safari run on pull requests, and does the end-to-end suite need it?**
+  - Why it matters: Playwright's WebKit is not Safari (R5-TEST-F8), so a Safari-only bug reaches players unless real
+    Safari runs somewhere; the macOS runner's time and cost are not known.
+  - Options: (a) on pull requests that touch `client`, `net`, `sim-worker` or `sim` (R5-TEST-REC1); (b) nightly only;
+    (c) also an end-to-end suite in real Safari through WebdriverIO (not researched).
+  - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the cost is known.
+  - Decider: infra-engineer's reading of the macOS runner's time and cost (ADR 0006 for costs; Mustafa for any paid
+    plan), then this record.
+  - What decides it: the macOS runner's time and price for a public repository; whether WebKit on macOS misses a Safari
+    bug that a playtest or Mustafa's checks find.
+  - Research ids: R5-XQ-OQ1, R5-TEST-OQ4.
+- **OQ-0002-6. Which jump reach do the golden tests pin?**
+  - Why it matters: the reach is 3.07 m by the formula and about 2.98 m as legacy integrates it at 60 Hz (rows GW14 and
+    GN10, as R5-TEST-OQ3 cites them, r5 lines 1806–1808); with a fixed tick v2 gets one value, and bots and maps are tuned for it.
+  - Options: (a) the formula's value (the intended behaviour); (b) legacy's integrated value; (c) whatever v2's
+    integrator gives at its tick, with bots and maps tuned to it.
+  - Decider: the game-designer with Mustafa, from the loop slice on (a rule question).
+  - What decides it: which value LOOP_V2's map rules and the bots are tuned for; until then the jump is not golden
+    (R5-TEST-REC3).
+  - Research ids: R5-TEST-OQ3.
+- **OQ-0002-7. Is wasm-bindgen's new home healthy for a multi-year project?**
+  - Why it matters: the boundary rests on wasm-bindgen, which moved to a new organisation in 2025 and broke
+    compatibility at least twice in 2026, in 0.2.123 and 0.2.128 (R1-BND-OQ7, r1 lines 2741–2744; R1-BND-F1, F2).
+  - Options: (a) keep wasm-bindgen behind the exact pin and the CI mismatch check (part 2), with every bump its own
+    change-set; no other binding generator was researched.
+  - Decider: a by-day reading of its maintenance issue (#4533) and the guide's governance page, both on the allow list
+    (VERIFY-FETCH (a)); this draft fetched nothing.
+  - What decides it: what those two pages say about maintainers and release policy.
+  - Research ids: R1-BND-OQ7.
+
+## What a spike must prove
+**The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs with the netcode proof test,
+before the foundation, and shares its client harness and stand-in sim. Its results go into this record before Mustafa
+accepts it. The candidate marks below are the research's (cited) or are marked proposed with the reason; test-engineer
+sets the final table.
+1. **The Worker** (part 5; R1-BND-REC1, r1 lines 2252–2264): on the minimum laptop named in ADR 0003 (its
+   `hardwareConcurrency` recorded), at N = 12, 24, 36 and 48 soldiers, the page's frame time p95 with the sim in the
+   Worker is no worse than with no sim by more than 1.0 ms (the page's cost of the sim: ADR 0003 owns the budget row,
+   which states it as a p99, decision map LE-B); the page makes zero calls into Wasm; the Worker makes the same number of
+   Wasm calls per tick at N = 12 and N = 48, at most 4 for the online client; in a local match at most 8 (proposed:
+   R1-BND-REC1's 4 per sim state, times the two sim states a local match steps, the client endpoint and the local
+   server); the same build runs in the latest desktop Chrome, Edge, Firefox and Safari, and in Brave (Mustafa's
+   browser).
+2. **The block** (part 5; R1-BND-REC2, r1 lines 2265–2285): per tick at most one block copy in the Worker and zero
+   copies and zero per-entity calls on the page; after warm-up no buffer or typed-array allocation per frame on the
+   page, and boundary-caused heap growth under 0.1 MB/s over a 10-minute match (allocation sampling); tick T's block
+   readable on the page at most one display frame (16.7 ms at 60 Hz) after the Worker finishes tick T, at p95, on a
+   shared clock (`performance.timeOrigin + performance.now()` on both sides); zero lost or reordered events over a
+   10-minute match at the largest mode's N (48); bytes per tick and copy time at N = 48 for a per-entity and a per-field
+   layout (R1-BND-OQ6); B2 against B3 on the four browsers: B3 is weighed only if it saves at least 0.5 ms of page time
+   per frame or one frame of latency at p95 on the minimum laptop. The field-by-field writer's copy time is reported
+   beside the copy (R1-RR-OQ6).
+3. **The command** (part 5; R1-BND-REC3, r1 lines 2286–2296): with injected delay, duplication and reordering of
+   commands, zero lost and zero doubled presses over 10,000 scripted presses; in local play, from the key event's
+   timestamp to the tick that applies it, at most one tick plus one frame at p95; the cursor ray and view time reach the
+   Worker in the same message (proposed: part 5 sends no second message).
+4. **Generated types** (part 5; R1-BND-REC4, r1 lines 2297–2308; R5-LAYOUT-REC3, r5 lines 1194–1205): CI regenerates
+   every type with zero diff against the committed output; a Rust layout change without regeneration fails at build or
+   at startup (layout-hash mismatch), proven by a test; `tsc --strict` passes on the generated output with the base
+   tsconfig, `erasableSyntaxOnly` included (R5-TSLINT-OQ3); CI fails when the wasm-bindgen CLI and library differ; two
+   generator runs on one commit give byte-identical files (R5-LAYOUT-OQ4).
+5. **Isolation** (part 5; R1-BND-REC5, r1 lines 2309–2325; R5-LAYOUT-REC5, r5 lines 1219–1232): with the isolation
+   flag, `crossOriginIsolated === true` in Chromium, Firefox and WebKit under Playwright on both `vite` and
+   `vite preview`, and `false` without it; if production isolation is adopted (OQ-0002-4), `crossOriginIsolated` is
+   true in all four browsers on a preview link and a report-only run of a full match shows zero COEP violations.
+6. **The connection and the skeleton** (part 6; R1-BND-REC6, r1 lines 2326–2338): the page handles zero network
+   messages (a counter); a 100 ms busy loop injected on the page leaves no gap in the Worker's processing of server
+   snapshots (Worker timestamps); the local match and the online client run the same Wasm file and the same page code,
+   differing only in the mode flag; the Wasm calls per tick, the Worker's time per tick and the memory of one instance
+   against two in a local match (OQ-0002-3).
+7. **The Worker's pacing and the client's sim share** (ADR 0004's marks, measured here as the decision map's part g
+   places them): ADR 0004's S18 (tick start jitter, smoothness on 60, 120 and 144 Hz displays, hidden tabs) and
+   R1-TICK-REC2's P2 with the stand-in load; if the timer pacing fails its jitter mark, W3 is measured on an isolated
+   build (OQ-0002-4).
+8. **Size and tools** (parts 2, 4 and 7): the `sim-wasm` file's size recorded raw and gzipped, with and without
+   wasm-opt, at `opt-level` "s" and "z" (R1-RR-OQ5, R5-CI-OQ4); no pass mark (the research has no number): the
+   measurement becomes the budget file's first limit, under the client host's 25 MiB per-file limit; the count of
+   type errors and casts the page needs against three.js's types under the base tsconfig (R5-TSLINT-OQ4); `tsc -b` time
+   with `skipLibCheck` on and off (R5-TSLINT-OQ6); whether Playwright's clock reaches the Worker (R5-TEST-OQ1).
+9. **The editor from `file://`** (part 11; OQ-0002-1): the built editor entry, opened from `file://`, loads its module
+   Worker and Wasm in Chrome, Edge, Firefox, Safari and Brave, or the failure is recorded per browser.
+10. **Optional, only if Mustafa has created the EU Sentry organisation by then** (ADR 0006): a deliberate Wasm trap in
+    the Worker reaches Sentry with Rust function names in the four browsers (R6-OBS-REC3's mark).
+
+**Where a person judges:** Mustafa runs the spike's page and a preview link in Brave on his Windows machine (marks 1
+and 9 name Brave); test-engineer adds the Brave checklist with each step's expected result.
+
+**The foundation** is not a spike: its acceptance checks are the milestones of the Migration plan's phase 2 (decision
+map part g, "Not throwaway spikes").
+
+### Pass marks
+Written by test-engineer (plan step 4).
+
+## Migration plan
+In the slice order (SLICE-ORDER), with the netcode proof test first and the foundation before slice 1. The legacy game
+stays playable throughout: frozen, critical fixes only, guarded by today's gate, in `legacy/` from phase 2 on.
+0. **The drafts approved** by Mustafa and the Advisor; ADR 0003 names the minimum laptop.
+1. **The spikes before the foundation** (`docs/SPIKE_PLAN.md` orders them): the netcode proof test (ADR 0001) and,
+   beside it, this record's boundary spike, sharing the client harness. *Done when:* the boundary spike's marks are
+   recorded in this record, OQ-0002-3 is answered, and OQ-0002-1 and OQ-0002-4 have their spike results.
+2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
+   1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
+      gate passes on `legacy/`, the four Phase 0 mutation proofs (a deleted function, an unguarded editor call, a syntax
+      error, a cross-file duplicate) still fail on the right checks, `node tools/preview.js legacy eval
+      tools/tuning-dump.js` reproduces `docs/legacy-tuning.json` byte for byte (R5-LAYOUT-REC6, r5 lines 1243–1245), and
+      Mustafa starts a match from `legacy/index.html` by double-click in Brave.
+   2. *The toolchain.* The two workspaces and the pins (part 2), the first crates (`sim`, `protocol`, `room`,
+      `sim-wasm`, `devtools`) and packages (`client`, `sim-worker`, `net`, `types`, `e2e`). *Done when:* from a fresh
+      clone on the CI runner, `cargo test --workspace --locked` and `npm ci && npm test --workspaces` pass with no
+      network access after the install steps; `rustc --version` in CI equals the pin; deleting the toolchain file fails
+      G0 with exit 2 (R5-LAYOUT-REC1, r5 lines 1166–1169); a pull request that edits `Cargo.toml` without `Cargo.lock`
+      fails at the first cargo step (R5-CI-REC2).
+   3. *The gate v2 and CI.* G0–G12 (G13 joins with the first committed map, slice 2), `--prove`, the budget file, the
+      workflow with its one required check. *Done when:* `--prove` passes with every mutation failing exactly its named
+      checks and every control passing (R5-GATE-REC3); a TypeScript-only pull request runs and passes the single
+      required check; with warm caches the pull-request wall time is at most 10 minutes at p50 over 5 runs and at most
+      20 minutes cold (R5-CI-REC5 mark 2, proposed by R5: VISION_V2 sets no CI target); a failing and a cancelled job
+      each turn the required check red; a fork pull request runs every job with no secret; the repository's Rust cache
+      stays at or below 8 GB (R5-CI-REC1 mark 2); Mustafa names the required check in his branch protection (his
+      setting).
+   4. *Generated types.* `packages/types` with the three generators. *Done when:* the marks of the spike's item 4 hold
+      in CI.
+   5. *The client + local server skeleton.* *Done when:* the Worker's client endpoint and local server exchange
+      `Join`, `JoinAccepted`, `Input` and `Snapshot` over the loopback backend with L1 behind it in CI (ADR 0001's
+      milestone); the page posts one command per tick, receives one block per tick and draws an empty scene from it,
+      naming its backend (ADR 0003's milestone); the page makes zero Wasm calls; the first recording's per-tick hashes
+      match natively twice and in Wasm (ADR 0004's milestone).
+   6. *Previews.* After ADR 0006's preview hosting check: the build, deploy, close and sweep workflows and the generated
+      header sets. *Done when:* a same-repository pull request has its link within 5 minutes after the build job ends
+      (median of 5 runs, R5-PREV-REC1 mark 1); the deploy job's header check passes and fails when a header is removed
+      (R5-PREV-REC4 mark 1); Mustafa opens the link in Brave and sees the empty scene (his Brave check).
+   *The foundation is done when* an empty scene runs through the full stack in the browser, with CI green and a preview
+   link (GLOSSARY §8).
+3. **Slice 1, move & shoot:** `content` enters (weapons as data, ADR 0005); the block's soldier, projectile and event
+   sections and the owner-only section for the local player's weapon state; the first legacy goldens (the ray maths,
+   shot resolution, the imported tuning tables); the determinism recordings in G10. *Done when:* ADR 0001's and ADR
+   0004's slice-1 milestones pass through this skeleton, and the boundary marks of the spike's items 1–3 hold on the
+   real slice at N = 12.
+4. **Slice 2, bots and three teams, played locally:** `navbake` enters; G13 runs on the first committed map; bots fill
+   slots in the local server; nightly soaks over L1. *Done when:* G13 and its `--prove` pair pass, and a nightly
+   30-minute bot room at N = 48 over L1 runs with 0 panics, 0 hangs and 0 desyncs (R5-TEST-REC5's mark).
+5. **Slice 3, online:** `server` enters; L2 in the nightly run; G12 over both transport backends; the first multiplayer
+   preview behind the access wall, with the binary-delivery job once the security baseline has set its token's scope
+   (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up. *Done when:* G12
+   passes on both backends and a multiplayer preview plays against the staging game server.
+6. **Slice 4, the loop:** the owner-only section carries upgrade tracks and offers, and the pickups section carries
+   world pickups (UPGRADE-SCOPE; ADR 0004 part 18, ADR 0005). *Done when:* the boundary layer's round-trip test covers
+   every new message and section.
+7. **Slice 5, Octopon-3 and Editor v2:** the `editor` package and entry, with OQ-0002-1's answer applied; the editor
+   runs `navbake` and the map checks in its Worker. *Done when:* G8 shows no editor chunk in the player build and the
+   editor's checks give the same result as G13 on the same map.
+8. **Slice 6, scale to 48:** soak and load for every mode of the test-mode list; the tick bench in the stress scene.
+   *Done when:* R5-TEST-REC5's marks pass for every mode, with ADR 0001's server tick budget.
+
+## Test plan
+- **The gate proves itself:** `--prove` on every change to the gate, its checks or its budget file, and nightly: each
+  planted defect fails exactly its named checks and each control passes (R5-GATE-REC3).
+- **The boundary layer:** Vitest loads the built `sim-wasm`, checks the layout hash and round-trips every message type
+  between the Rust encoders and the TypeScript decoders (G9).
+- **Determinism by state hash:** the replay runner's per-tick hashes, native in two processes, Wasm in Node, Wasm in
+  Chromium, Firefox and WebKit (G10), and real Safari on macOS (OQ-0002-5); the first mismatching tick and a field-level
+  diff are reported (R5-TEST-REC2); the rules are ADR 0004's.
+- **Network simulation:** L1 in the gate (one minute per profile, P0–P4 and B1, with latency, jitter, loss, reordering,
+  duplication and a rate limit, seeded), L1 long runs and L2 (real browsers over WebTransport through an impairment
+  socket under quinn, WebSocket through a delaying TCP proxy) nightly; ADR 0001's marks under its named profiles
+  (R5-TEST-REC4).
+- **Soak and load:** bots as protocol clients, one 30-minute room per mode of the test-mode list over L1 at P2,
+  nightly, and a 3-hour soak before each playtest (R5-TEST-REC5).
+- **Renders and real pages:** Playwright on the built client and a local server, the backend named on every shot, once
+  with three.js's `forceWebGL`, and once with and once without the isolation flag; ADR 0003's counts against their
+  baseline (G12).
+- **Flakes:** the gate's whole suite 20 times on one commit gives 20 identical verdicts (R5-TEST-REC6).
+- **Playtests and Brave checks:** Mustafa's checks on preview links, starting with the empty scene of phase 2.
+
+## Rollback
+- **Before acceptance:** the record is a draft; if the boundary spike fails, Mustafa and the Advisor reject or revise
+  it, and nothing is built.
+- **The block or the pacing fails its marks:** the measured alternatives take over behind the isolation flag, which
+  then becomes production's default (OQ-0002-4): the SharedArrayBuffer ring (B3) for the block, `Atomics.wait` (W3) for
+  the pacing, inputs through shared memory (C2), with R1-BND-REC5's costs. The page code that reads typed arrays does
+  not change (part 5).
+- **The local match overloads the Worker:** OQ-0002-3's other layout; running the local server in a second Worker was
+  not researched and would need its own spike.
+- **A crate placement fails** (for example `room` does not build for Wasm with a dependency the server needs): the
+  dependency moves to `server`, behind the transport interface; G5 shows the violation before any merge.
+- **The gate v2 is too slow:** `--quick` locally, the long set nightly, and path selection only with a tested selection
+  rule (R5-GATE-OQ1).
+- **Previews fail PREV-DELETE:** the deploy target changes to Workers static assets, which takes the same `_headers`
+  file (ADR 0006); the workflow shape stays.
+- **The restructure:** a move of five files, reverted by reverting its one change-set; the legacy game runs from
+  either place, and today's gate proves it.
+- **After acceptance:** a superseding ADR, as template 0000 asks.
+
+## Appendix A: research dispositions
+One row per id the decision map gives this record as owner (104 ids, in the map's order). Recommendations: adopted ·
+changed (how, why) · rejected (why). Open questions: answered (how, which part) · open (its OQ) · spike (which).
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-BND-REC1 | adopted | part 5; the spike's item 1 |
+| R1-BND-REC2 | changed: two sections added (weapon pickups; the local player's owner-only data), remote entities written at ADR 0001's interpolation delay, and mark 4 at N = 48 (MODES-3 (a)) | part 5: UPGRADE-SCOPE's pickups and the I-21 upgrade data must reach the page; ADR 0001 put the interpolation buffer in the Worker; the spike's item 2 |
+| R1-BND-REC3 | changed: the per-tick message also carries the cursor ray and the view time | part 5: ADR 0001 part 5 has the Worker cast the aim ray (I-19); the fields are ADR 0001's; the spike's item 3 |
+| R1-BND-REC4 | adopted | part 5 (content's source is ADR 0005's, critic rank 31); the spike's item 4 |
+| R1-BND-REC5 | changed: a second trigger for production isolation, the timer pacing failing its jitter mark while W3 passes | part 5: R1-XU-OQ4 reads the pacing and the block together; OQ-0002-4 |
+| R1-BND-REC6 | adopted ("offline" reads "local play", SLICE-ORDER) | parts 5 and 6; the spike's item 6 |
+| R1-BND-OQ4 | answered: tsify is not used while ts-rs covers the types; the question reopens only if ts-rs proves short | part 5 |
+| R1-BND-OQ6 | spike: the boundary spike (bytes per tick and copy time at N = 48, per entity and per field) | part 5; the spike's item 2 |
+| R1-BND-OQ7 | open: OQ-0002-7 | part 2 (the pin is the hedge) |
+| R1-BND-OQ9 | open: OQ-0002-4 | part 5 |
+| R1-DATA-OQ11 | open: OQ-0002-1 | part 11 |
+| R1-XU-OQ3 | spike: the boundary spike (B2 against B3, R1-BND-REC2 mark 5) | part 5; the spike's item 2 |
+| R1-XU-OQ4 | spike: the boundary spike (the timer pacing's jitter; W3 on an isolated build only if it fails) | part 5's rule; the spike's item 7 |
+| R1-RR-OQ4 | answered: overflow checks on for `sim` and `protocol` in every profile; explicit wrapping or checked counters | part 4 |
+| R1-RR-OQ5 | spike: the boundary spike and the sim core spike measure the size; the budget file takes the measurement | part 4; the spike's item 8 |
+| R1-RR-OQ6 | answered: the block writer serializes field by field, as the state hash does; the derive or `unsafe` only if the copy time says so | part 5; the spike's item 2 reports the copy time |
+| R1-XT-OQ10 | open: OQ-0002-1 | part 11 |
+| R1-XT-OQ15 | answered: the tick bench is a mode of the `devtools` replay runner (3 runs per build; mean, p50, p95, p99, max) | part 8 |
+| R1-XT-OQ18 | answered: the crate list follows ADR 0004 (no ECS crate, parry3d) and ADR 0001 (quinn, the proof test's WebTransport crate); the cache is measured on it | part 3 |
+| R2-XT-OQ10 | answered: the binary-delivery job and the hash written into the preview's files; the token's scope waits on the security baseline | part 10 |
+| R3-MEASURE-OQ4 | answered: the isolation flag, for profiling builds only | part 5 |
+| R3-XT-OQ3 | open: OQ-0002-1 | part 11 |
+| R4-XT-OQ5 | answered: the bake in its own `navbake` crate, never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
+| R4-XT-OQ8 | answered: as R1-XT-OQ18 | part 3 |
+| R5-LAYOUT-REC1 | adopted | parts 1 and 2 |
+| R5-LAYOUT-REC2 | changed: the `room` and `navbake` crates added; nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; R4-XT-OQ5 |
+| R5-LAYOUT-REC3 | adopted | part 5; the spike's item 4 |
+| R5-LAYOUT-REC4 | adopted | part 3 (G5) |
+| R5-LAYOUT-REC5 | adopted | parts 5 and 11; the spike's item 5 |
+| R5-LAYOUT-REC6 | adopted | part 1; Migration plan, phase 2, step 1 (where the tools go: OQ-0002-2) |
+| R5-TSLINT-REC1 | adopted | parts 2 and 7 |
+| R5-TSLINT-REC2 | changed: the import rule also bars `spikes/` | part 7: SPIKE-SCOPE (a) makes spikes throwaway |
+| R5-TSLINT-REC3 | adopted | part 7 |
+| R5-TSLINT-REC4 | adopted | part 7 (a kit change-set builds the hook) |
+| R5-RUSTLINT-REC1 | adopted | part 7 (G2) |
+| R5-RUSTLINT-REC2 | adopted | part 7, with GLOSSARY §7's one escape |
+| R5-RUSTLINT-REC3 | adopted | part 7 |
+| R5-RUSTLINT-REC4 | adopted | part 4 |
+| R5-RUSTLINT-REC5 | adopted | part 7 (G1) |
+| R5-RUSTLINT-REC6 | adopted | part 2 |
+| R5-TEST-REC1 | adopted | part 8 (the Safari row's schedule: OQ-0002-5) |
+| R5-TEST-REC2 | adopted (the nightly match at N = 48, MODES-3 (a)) | part 8 |
+| R5-TEST-REC3 | adopted | part 8 (the jump: OQ-0002-6) |
+| R5-TEST-REC4 | adopted | part 8 (profiles: ADR 0001's) |
+| R5-TEST-REC5 | adopted (N = 48 and the test-mode list, MODES-3 (a)) | part 8; Migration plan, phases 4 and 8 |
+| R5-TEST-REC6 | adopted | part 8 |
+| R5-CI-REC1 | adopted | part 9 |
+| R5-CI-REC2 | adopted | part 2 |
+| R5-CI-REC3 | adopted | part 2 |
+| R5-CI-REC4 | adopted (the cache keys on the root lockfile) | part 9 |
+| R5-CI-REC5 | adopted | part 9 |
+| R5-PREV-REC1 | adopted | part 10 |
+| R5-PREV-REC4 | adopted | part 10 (the CSP waits on the security baseline) |
+| R5-GATE-REC1 | changed: G13 (maps) added; G2 also reads the build flags and the workspace-lints opt-in; G12 names its network rule | part 9: R4-XT-OQ5 found R4's checks missing; ADR 0004's flag rule needs a check |
+| R5-GATE-REC2 | adopted | part 9 (its path: OQ-0002-2) |
+| R5-GATE-REC3 | changed: G13's mutation and control added | part 9 |
+| R5-GATE-REC4 | adopted | part 9 (every draft's budgets, I-14) |
+| R5-LAYOUT-OQ1 | answered: npm, the option read and already in use; pnpm and Yarn were not read | part 2 |
+| R5-LAYOUT-OQ2 | answered: the wasm-bindgen CLI directly, not wasm-pack | part 2 |
+| R5-LAYOUT-OQ3 | answered: `cargo tree` checks a path crate; whether cargo-deny also bans one is tried on the foundation's planted `server` dependency | part 3 |
+| R5-LAYOUT-OQ4 | spike: the boundary spike (two generator runs give byte-identical files) | the spike's item 4 |
+| R5-LAYOUT-OQ5 | open: OQ-0002-2 | part 1 |
+| R5-TSLINT-OQ1 | answered: TypeScript 6.0.x until typescript-eslint supports 7; the move is its own change-set | part 2 |
+| R5-TSLINT-OQ2 | answered: not weighed (its pages were not read); revisit with R5-TSLINT-OQ1 | part 2 |
+| R5-TSLINT-OQ3 | spike: the boundary spike (`tsc --strict` on the generated package) | the spike's item 4 |
+| R5-TSLINT-OQ4 | spike: the boundary spike (errors and casts against three.js's types) | the spike's item 8 |
+| R5-TSLINT-OQ6 | spike: the boundary spike (`tsc -b` time with `skipLibCheck` on and off) | the spike's item 8 |
+| R5-RUSTLINT-OQ1 | answered: the method ban, with a reviewed text scan of `sim` as the fallback; G2's planted `x.sin()` proves which | part 7 |
+| R5-RUSTLINT-OQ2 | answered: not added (their sources were not read); REC3's lints and fuzzing cover panics, REC4 overflow | part 7 |
+| R5-RUSTLINT-OQ3 | answered: rust-reviewer lists the map types of `sim`'s dependency tree, which join `disallowed-types` | part 7 |
+| R5-RUSTLINT-OQ4 | spike: the sim core spike reports the overflow checks' cost with part 8's method; the limit is set from it | part 4 |
+| R5-RUSTLINT-OQ5 | answered: settled by resolution 29 (GLOSSARY §7); this record states the rule | part 7 |
+| R5-TEST-OQ1 | spike: the boundary spike | the spike's item 8 |
+| R5-TEST-OQ2 | spike: the netcode proof test (the WebTransport crates' interop, ADR 0001) | part 8 |
+| R5-TEST-OQ3 | open: OQ-0002-6 | part 8 |
+| R5-TEST-OQ4 | open: OQ-0002-5 | part 8 |
+| R5-TEST-OQ5 | answered: turmoil is not added; only if L1 cannot express a room case | part 8 |
+| R5-TEST-OQ6 | answered: no OS-level layer; only if L2 cannot reproduce a playtest bug | part 8 |
+| R5-TEST-OQ7 | answered: proptest, the option read | part 8 |
+| R5-TEST-OQ8 | answered: the bench method in part 8; no cargo-nextest, coverage gate or bench crate (none was read) | part 8 |
+| R5-CI-OQ1 | answered: measured on this workspace in the foundation against the 8 GB mark; fewer keys or Mustafa's paid limit if over | part 9; Migration plan, phase 2, step 3 |
+| R5-CI-OQ2 | answered: no sccache at the start; weighed again only from measured dependency rebuild times | part 9 |
+| R5-CI-OQ3 | answered: SHA pins and Dependabot until workflow lockfiles are generally available on Mustafa's plan | part 9 |
+| R5-CI-OQ4 | spike: the boundary spike measures with and without wasm-opt; if kept, the foundation pins it like the CLI | part 2; the spike's item 8 |
+| R5-CI-OQ5 | answered: CI gates counts on whatever backend the runner gives, plus a `forceWebGL` run; no GPU runner | part 9 |
+| R5-CI-OQ6 | answered: a trial on one action in the foundation | part 9 |
+| R5-CI-OQ7 | answered: no arm64 leg while the fleet is x86-64 | part 9 |
+| R5-PREV-OQ5 | spike: the preview hosting check (ADR 0006) | part 10 |
+| R5-PREV-OQ6 | spike: the preview hosting check (ADR 0006) | part 10 |
+| R5-GATE-OQ1 | answered: every check runs on every pull request until the first month's CI times | part 9 |
+| R5-GATE-OQ2 | answered: as R5-CI-OQ5, with ADR 0003's counts-only rule | part 9 |
+| R5-GATE-OQ3 | open: OQ-0002-2 | part 9 |
+| R5-GATE-OQ5 | answered: measured on the first gate v2 build against R5-GATE-REC3's proposed 30 minutes | part 9; Migration plan, phase 2, step 3 |
+| R5-XQ-OQ1 | open: OQ-0002-5 | part 8 |
+| R5-XQ-OQ2 | answered: one root lockfile, which CI's npm cache keys on | part 2 |
+| R5-XQ-OQ3 | answered: settled 2026-10-30 (GLOSSARY, the isolation flag); the preview Mustafa checks is built with the flag off | parts 5 and 10 |
+| R5-XT-OQ6 | answered: as R2-XT-OQ10 | part 10 |
+| R5-XT-OQ7 | answered: as R4-XT-OQ5 | parts 3 and 9 |
+| R5-XT-OQ8 | open: OQ-0002-1 | part 11 |
+| R5-XT-OQ12 | answered: test builds carry no crash-reporting endpoint, so G12's rule holds; the upload job runs only on deployed builds, in its own environment | part 9 |
+| R5-XT-OQ13 | answered: as R1-XT-OQ15 | part 8 |
+| R5-XT-OQ14 | answered: as R1-XT-OQ18 | part 3 |
+| R6-XT-OQ4 | answered: as R2-XT-OQ10 | part 10 |
+| R6-XT-OQ8 | answered: as R5-XT-OQ12 | part 9 |
+
+## Sources
+Every file below was read for this record; line numbers are at commit 9e7db28 (the topic files do not change in this
+pull request).
+- `docs/research/r5-toolchain-quality.md`: the header and TL;DR (lines 1–60); Findings, Questions 1–7 (lines 61–990:
+  R5-LAYOUT-F4, R5-RUSTLINT-F1, F9, F13, R5-TSLINT-F4, F5, F13, F15, F21, R5-TEST-F8, R5-CI-F9, F15, F17, F20,
+  R5-PREV-F1 to F3, R5-GATE-F2 and the legacy facts used, lines 534, 938, 969–990); Options (lines 992–1146);
+  Recommendations (lines 1148–1744); Open questions, including R5-XQ, the shared and the cross-topic questions (lines
+  1746–2036); the recommendations that hinge on a source not read (lines 2038–2056); the Verifier spot-check, its
+  second pass and the consistency resolutions (lines 2108–2298).
+- `docs/research/r1-simulation-core.md`: Findings, unit boundary-worker (lines 868–1178: R1-BND-F1, F2, F12, F19, F22,
+  F25, F29, F33 and the legacy facts CS1, GP2, GP13, GP14, GC2, GA15, CS11); Options, unit boundary-worker (lines
+  1731–1788); Recommendations, unit boundary-worker (lines 2250–2338); R1-TICK-REC2 (lines 2044–2062); Open questions
+  (R1-BND-OQ1 to OQ9, lines 2719–2752; R1-DATA-OQ11, lines 2817–2823; R1-XU-OQ3, OQ4, lines 2854–2865; R1-RR-OQ3 to
+  OQ6, lines 2936–2954; R1-XT-OQ10 to OQ18, lines 3075–3112); the hinge table (lines 3209–3229); the Verifier
+  spot-check's counts (lines 3231–3256).
+- `docs/research/r2-netcode.md`: R2-TRN-F35 (lines 1268–1272); R2-TRN-REC4 (lines 2673–2698); R2-ROOM-REC2 (lines
+  2762–2772); R2-ROOM-OQ9 (lines 3104–3105); R2-XT-OQ10 (lines 3384–3389).
+- `docs/research/r3-rendering.md`: R3-WGPU-F5 (lines 91–96); R3-MEASURE-F8, F9 (lines 648–658); R3-WGPU-REC4 (lines
+  941–951); R3-MEASURE-REC3 (lines 1206–1215); R3-MEASURE-OQ4 (lines 1389–1391); R3-XT-OQ3 (lines 1437–1440).
+- `docs/research/r4-physics-navigation.md`: R4-NAV-REC1 (lines 802–810); R4-NAV-REC4 (lines 888–899); R4-XT-OQ5
+  (lines 1195–1200); R4-XT-OQ8 (lines 1211–1214).
+- `docs/research/r6-infrastructure.md`: R6-HOST-F3 (lines 72–79); R6-HOST-REC1's mark (line 642); R6-HOST-REC3 (lines
+  672–683); R6-OBS-REC3 (lines 754–768); R6-XT-OQ4 (lines 1009–1014); R6-XT-OQ8 (lines 1030–1034).
+- `docs/research/GLOSSARY.md`: "How to read an entry" and the decision codes (lines 1–45); §1, tick budgets (lines
+  46–224); §2, modes and scale (lines 335–394); §3, the stress scene (lines 395–437); §5, previews and hosting (lines
+  560–665); §6, the security baseline (lines 667–725); §7, the hash-map ban (lines 727–742); §8, the phase 1 terms (the
+  text in the decision map's addendum, part j, J1, appended in this pull request).
+- `docs/research/README.md` (the topic table and the shape of a topic file).
+- `docs/VISION_V2.md` §3, §4, §5 and §6; `docs/LOOP_V2.md` §11; `docs/EDITOR_V2.md` §2, §3 and §5; `docs/LOOK_V2.md`
+  §8 and §9.
+- `docs/STATUS.md`, "Decisions pending" (lines 93–210: SLICE-ORDER, MODES-3, PREVIEW-WALL, BASELINE-WHEN, TICK-30,
+  the five carry-forwards, DOCS-ALIGN, R7-MARKS, SPIKE-SCOPE, the old ADR-001 and ADR-002 entries).
+- `docs/LEGACY_INVENTORY.md`: the marks (lines 1–40) and rows CS1, CS11 (lines 169, 179), PG1, PG18, PG19 (lines 359,
+  376, 377), TL1 to TL17 (lines 386–402), KT1, KT7, KT8, KT9, KT12, KT19, KT21 (lines 410–430).
+- `docs/adr/0000-template.md`.
+- The other decision drafts, cited by number and part: ADR 0001 (parts 4–7 and 10, its components diagram and its
+  migration plan), ADR 0003 (parts 8 and 10), ADR 0004 (parts 1, 5, 9, 18–20, OQ-0004-7, S18), ADR 0006 (parts 1–6 and
+  13).
