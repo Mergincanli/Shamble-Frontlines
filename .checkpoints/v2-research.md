@@ -5,7 +5,7 @@
   instructions in this session), approved by the advisor with 8 conditions (`advisor-amendments-verdict.md`, part A)
 - **Branch:** cs/v2-research (session_0173vVo5q59ameR6cnN9BENg; the main checkout, never switched while research runs)
   · **Base:** origin/main 07ab240 (R7 merged; `docs/LEGACY_INVENTORY.md` checked present)
-- **Last update:** 2026-10-31 11:15 Amsterdam (10:15 UTC)
+- **Last update:** 2026-10-31 11:23 Amsterdam (10:23 UTC)
 
 ## Steps done
 1. Plan and verdict recovered verbatim from the R7 session's transcript (`provenance.md`): one review round, APPROVE
@@ -239,6 +239,11 @@ have the advisor agent review it before any edit (CLAUDE.md protocol step 2).
   quote, nits). Final check of R1+R4, the glossary nits and the 33 corrected UNREAD rows launched (prompt
   `prompts/verifier-r14-3d-final.txt`; 9 hits on changed lines in `scripts/glossary-hits-3d-final-r14.tsv`): run
   wf_6ff21603-bee (task w2s1z7fh9), 10:19 UTC; it reuses the R3+R5+R6 final check's script, so its labels read "r356".
+- R2's fix round DONE about 10:22 UTC (replies appended to `netcode-architect-r2-consistency-result.md`): 17 recommendation
+  changes (16 bare 48s → the largest mode's N, r2:2338 kept as the design point; r2:2413; ROOM-REC2 mark 5 "every room
+  start-up"), nits (shares named, CLAUDE.md credited at six places, totals 37 and 110); 0 exact; no quote gone.
+  Committed **2382ea2**. R2 final check launched 10:22 UTC (xhigh; run wf_cbb704b7-47f, task w0ludbq1s; prompt
+  `prompts/verifier-r2-3d-final.txt`; 32 hits on 59 changed lines). Running: the R1+R4 and R2 final checks.
 - Ultracode on (system reminder, about 18:46 UTC): step 3d keeps the plan's three verifier units and adds two
   read-only checks as more evidence: a skeptic per unit that tries to refute the verifier's "right" judgments of the
   in-context hits (same rule, when unsure wrong), and a completeness critic across all six topics after the units
