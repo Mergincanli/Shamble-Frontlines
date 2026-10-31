@@ -339,7 +339,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
      float bans live in `crates/sim/clippy.toml` (`disallowed-types`: std `HashMap`, `HashSet`, `Instant`,
      `SystemTime`; `disallowed-methods`: `Instant::now`, `SystemTime::now`, std's transcendental float methods and the
      `algebraic_*` methods), at deny, with `iter_over_hash_type` as a backstop; `suboptimal_flops` and
-     `imprecise_flops` are allowed with a comment, and `cargo clippy --fix` never runs on `sim`. The only escape from
+     `imprecise_flops` are allowed with a comment, and `cargo clippy --fix` never runs on `sim`; the same set covers the
+     parts of `content` the sim calls. The only escape from
      the ban is a reviewed `#[allow]` with a written reason for a map that is only looked up and lies outside the
      serialized sim state (resolution 29). Map types from the sim's dependencies join `disallowed-types` from a list
      rust-reviewer makes from `cargo tree` of `sim` once ADR 0004's dependencies are fixed. If clippy cannot name std's

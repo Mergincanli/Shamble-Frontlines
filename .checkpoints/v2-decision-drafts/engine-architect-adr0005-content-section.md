@@ -61,8 +61,8 @@ code" (GLOSSARY §8, brief §2).
 - *Gives* (decision map, part d): typed definitions read by id (I-1); content's TypeScript types and schema (I-5's
   content part); the content bundle and its hash (I-6); the mode file (I-7's file); the map document's schema rules
   (I-9); with the GPU section, the material-slot class list (I-8).
-- *Takes:* ADR 0004 runs the definitions inside the sim step and converts authored seconds into its integer time unit
-  (its part 4); ADR 0002 sets the crate and package list, with `content` as the sim's only dependency (R5-LAYOUT-REC2),
+- *Takes:* ADR 0004 runs the definitions inside [the sim step](../research/GLOSSARY.md#sim-step-time) and converts
+  authored seconds into its integer time unit (its part 4); ADR 0002 sets the crate and package list, with `content` as the sim's only dependency (R5-LAYOUT-REC2),
   the `packages/types` package (R5-LAYOUT-REC3), the no-panic lints for the loader (R5-RUSTLINT-REC3), the golden
   fixtures (R5-TEST-REC3), the Vite plugin's place, and the editor's build and its double-click question (critic rank
   25); ADR 0001's `Join` and `JoinAccepted` messages carry the content hash, its `HostCommand` carries a private room's
@@ -555,7 +555,8 @@ carries and what the GPU budget allows it; this one decides how assets sit in th
   "The game never runs Spline's own runtime" (`[DEFAULT]`); the tree style (`[OPEN]`).
 - The LOOK_V2 items the models carry: iconic silhouettes (§1, §5), uniform details as faction identity (§2), the
   architecture direction (§2), slimmer, serious proportions and real weapon silhouettes (§3).
-- VISION_V2 §6.7 (uniforms and variants as data), §6.9 (a few very large units without dropping frames), §4 (the
+- VISION_V2 §6.7 (uniforms and variants as data), §6.9 (a few
+  [very large units](../research/GLOSSARY.md#big-vehicle-and-very-large-unit) without dropping frames), §4 (the
   minimum and recommended machines).
 
 **Settled inputs.** LOOK_V2 (authored glTF/GLB models allowed; brief §1). ASSET-RESEARCH (a), the advisor's ruling of
@@ -657,8 +658,9 @@ carries a procedural kit spec and an authored asset side by side until it is ans
   - Need: LOOK_V2 §8 (authored models reach the browser); VISION_V2 §4 (desktop browsers first).
 - **AP-5. Per-unit budgets are reviewed data, and the gate checks every listed asset against them.**
   - What: the budgets per unit LOOK_V2 §8 asks for sit in the repository's budget file (ADR 0002, R5-GATE-REC4;
-    interface I-14): today the GPU section's two derived caps (a soldier as drawn: at most 4 materials per pass; a very
-    large unit: at most 25 parts × materials per pass), the rest once OQ-0005-AS5 sets them. The gate compares each
+    interface I-14): today the GPU section's two derived caps (a soldier as drawn: at most 4 materials per pass, from
+    ADR 0003's 4 draw calls per soldier per pass, r3, lines 1044–1045; a very large unit: at most 25 parts × materials
+    per pass, 200 draw calls ÷ 4 units ÷ 2 passes, r3, lines 1088–1090), the rest once OQ-0005-AS5 sets them. The gate compares each
     asset's counts in the asset list with its budget and fails on any excess; raising a budget is a reviewed change
     with its reason.
   - Why: R5-GATE-REC4's rule ("raising a budget is a reviewed change with its reason"); the frame totals every asset

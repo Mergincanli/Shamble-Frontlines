@@ -22,3 +22,7 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Sources written. Next: verify a few remaining cites (r5 2038-2056, r1 3209-3256, R6 754-768), then ledger.
 - Linked first uses of glossary terms; retired-phrase scan clean. Next: proofread pass, then ledger.
 - Fixed: loopback placement aligned with ADR 0001 (protocol crate holds Rust loopback; net = browser backends); OQ-0002-3 proposed start (a); datagram batching to keep calls constant; protocol deps no longer invented.
+- Proofread fixes: command bullet (no duplicate aim), R2-ROOM-REC2 2762-2772, content part of determinism lint set. Next: claims ledger.
+- Ledger rows 1-38 (Context) written. Next: rows for parts 1-12.
+- Ledger rows 39-117 (parts 1-6) written. Next: parts 7-12 rows.
+- Ledger rows 118-181 (parts 7-12) written. Next: rows for Options, Trade-off, Consequences, OQs, spike items, migration, rollback.

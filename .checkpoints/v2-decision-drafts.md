@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:18 Amsterdam
+- **Last update:** 2026-10-31 23:20 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -31,8 +31,9 @@ section (graphics-engineer: ledgers 265 and 43 rows, Appendix A 71/71 and 1/1; n
 (recommends the sim core spike's sim inside the proof-test server, deferral as fallback), OQ-0001-3 "100 ms" = P2;
 notes DONE); pass marks for 0003 (test-engineer: 43 marks PM-0003-1..43 in the look proof test (PM-1..17, size L,
 PM-17 Mustafa's 30-step Brave checklist) and the render budget bench (PM-18..43, size L); ledger 34 proposed rows; notes
-DONE). Running: 0002 (engine-architect, launched 22:54), 0005 content data and asset pipeline (engine-architect,
-launched 22:54). No new agent from 23:00 (condition 17).
+DONE); ADR 0005's content data and asset pipeline sections (engine-architect: one section file, ledger 281 rows,
+Appendix A rows 26; with the ability section's 7 and the GPU section's 1, all 34 ADR 0005 ids are covered; notes DONE).
+Running: 0002 (engine-architect, launched 22:54). No new agent from 23:00 (condition 17).
 
 ## Next steps
 1. Tonight: only the five resumed units finish (no new agent after 23:00, no fetching verifier after 22:00; condition
@@ -76,6 +77,10 @@ launched 22:54). No new agent from 23:00 (condition 17).
   The page's cost of the sim gates twice (R3 p99 in the bench, PM-20; R1-BND-REC1's p95 in 0002's boundary spike). The
   map's part g put R3-MEASURE-REC1/REC4 in the look test, the draft in the bench (the draft holds). The map's N12 cites
   r1:2258–2260; it is 2259–2261.
+- ADR 0005 content (engine-architect): CD-7 changes R1-DATA-REC5 (in development, sim numbers apply from the next match,
+  proposed; OQ-0005-CD4), so ADR 0001's `ContentReload` message and ADR 0004 part 16 ("a development reload swaps them
+  between ticks") hold only under the mid-match option: consistency pass. Legacy rows ED5 and ED7 (Character Lab, Anim
+  Lab) are listed by no draft. Its "For the frame" carries the record-level parts.
 
 ## Key numbers
 - Early script checks on the finished parts (22:57): `dispositions.py` parses 0003's 71 and 0006's 65 Appendix A rows,

@@ -25,3 +25,8 @@
 - Self-review pass done on section (line fixes: BND-REC4 marks 2304-2306, LAYOUT-REC3 mark 1203-1204, R4-PHYS-REC2 721-745 & 733-734, R4-NAV-REC1 802-843, R3-CHAR-REC1 serves 1042-1043, REC6 record 2571-2572, TICK-REC1 2012-2013, R6-HOST-REC1 mark 639-644 (bundle 641-642, 25MiB 642-643); LOOK_V2 §8 quote fixed; Appendix counts adopted 4 changed 4 answered 7 open 6 spike 5).
 - Next: claims ledger engine-architect-adr0005-content-claims.md.
 - Added starting-principle citations (.claude/agents/engine-architect.md:25-26, 33-34) in AP-1, AP-6. Now writing ledger.
+- Ledger written: 281 rows (research verified 106, source to check 69, arithmetic 2, settled 59, design doc 36, proposed mark 9). Next: verify ledger line refs (docs, map, drafts).
+- Ledger line refs verified and corrected (map lines recomputed: G1 979, G4 982, G11 989, G15 993, N50 786, I-6 807, I-14 815, S5 207, S9 211, rank 25 687; 0001 draft Join 481-482, HostCommand 486). Next: final checks (glossary terms, retired phrases, numbers without source), then DONE + return.
+- Final checks done: glossary links (foundation, client host, security baseline, authority, sim step, very large units, netcode proof test); no "headroom", no bare "Cloudflare", no p99; AP-5 arithmetic shown inline.
+- For the return: flag ADR 0001 ContentReload (only if OQ-0005-CD4 (b)) and ADR 0004 part 16 sentence "a development reload swaps them between ticks" (true only under (b)) for the consistency pass; ED5/ED7 inventory rows unassigned; R3-CHAR-OQ3 is GPU section's.
+DONE
