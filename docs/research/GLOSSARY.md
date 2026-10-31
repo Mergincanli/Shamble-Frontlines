@@ -67,13 +67,14 @@ a bound (see "Time statistics"); the server tick time's p99 is always measured d
 
 Snapshots run at 30 Hz (R2-BUD-REC1), so at a 60 Hz tick every second tick encodes. Left at 60 Hz: 0.30 ms in the sim
 step share, 0.76 ms in the server-only share (−0.24 on a re-flood tick). At N = 54 (MODES-3 (b); the per-soldier,
-per-client and per-shot marks scaled by 1.125 for this check only, 972 enemy pairs): at 60 Hz the sim step share is
-4.14 ms (0.03 left), the server-only share 3.85 ms (4.85 on a re-flood tick), the server tick 7.99 ms (8.99 on a
-re-flood tick, over 8.33); at 30 Hz 5.81, 4.12 (5.12), 9.93 (10.93) ms. At 30 Hz the marks fit at N = 48 and N = 54,
-re-flood ticks included; at 60 Hz they fit on every tick without a re-flood. The 60 Hz tight spots (the visibility
-pass, the re-flood tick, the rest of the sim at N = 54) are for the spike to measure. Under 25 % of the period for the
-whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over two ticks) against 4.17, and 7.51 ms at
-30 Hz (8.51 with a re-flood) against 8.33.
+per-client and per-shot marks and the interest marks (0.70 ms) scaled by 1.125 for this check only, 972 enemy pairs): at
+60 Hz the sim step share is 4.14 ms (0.03 left), the server-only share 3.85 ms (4.85 on a re-flood tick), the server
+tick 7.99 ms (8.99 on a re-flood tick, over 8.33); at 30 Hz 5.81, 4.12 (5.12), 9.93 (10.93) ms (sums of rounded parts;
+the exact sums are 0.01 ms lower: 4.11 (5.11), 9.92 (10.92)). At 30 Hz the marks fit at N = 48 and N = 54, re-flood
+ticks included; at 60 Hz they fit on every tick without a re-flood. The 60 Hz tight spots (the visibility pass, the
+re-flood tick, the rest of the sim at N = 54) are for the spike to measure. Under 25 % of the period for the server tick
+the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over two ticks) against 4.17, and 7.51 ms at 30 Hz (8.51
+with a re-flood) against 8.33.
 
 ### Tick period
 - **Definition:** the time between two ticks, 1 / tick rate: 16.7 ms at 60 Hz, 33.3 ms at 30 Hz (r1:2015-2016,
@@ -139,7 +140,8 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   Shares are compared at p99. Adding the parts' p99 ceilings is a planning check that the marks fit together, not a
   bound: p99s do not add (two parts that each take 1 ms on 0.6 % of ticks and nothing otherwise each have a p99 of 0,
   but together they take 1 ms on about 1.2 % of ticks, so the sum's p99 is 1 ms). The server tick time's p99 is always
-  measured directly, with the parts reported beside it.
+  measured directly, with the parts reported beside it. A one-off deadline (a single event, such as a rebuild, a bake or
+  a recovery) is a plain limit, not a statistic.
 - **Marked by:** "p99", "mean".
 - **Retire (exact):** none.
 - **Retire (in context):** a time mark with no statistic, such as "costs at most 1 ms per tick" (R1-ABL-REC6),
@@ -149,15 +151,15 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   (mark 1's p99 with the mean reported; marks 2 and 3 at p99), R1-TICK-REC2 (P1 to P3), R1-TICK-REC3, R1-TICK-REC4 and
   R1-TICK-REC5 (jitter p99), R1-ABL-REC6 (now at p99), R1-XU-OQ1, R1-XU-OQ2. R2: the legacy facts used by the budgets
   unit, the budgets options table E, R2-BUD-REC1 and R2-BUD-REC2 (mean rates and bandwidth), R2-BUD-REC6, R2-INT-REC1,
-  R2-INT-REC2 (the pair test and the re-flood at p99), R2-INT-REC4, R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3,
-  R2-TRN-REC6, R2-ROOM-REC2, R2-XU-OQ8. R3: the legacy facts used (the legacy step's mean; the harness's mean, p50,
-  p95 and max), R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median), R3-BUDGET-REC2's
-  CPU, animation, sim and GPU rows, R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC4, R3-AUDIO-REC1 and R3-AUDIO-REC3
-  (sub-budgets at p99, written out in step 3d by the advisor's ruling). R4: the legacy facts used by R4-NAV (a mean
-  stall rate), R4-PHYS-REC1 mark 2 (a mean mark, its p99 reported), R4-NAV-REC1, R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1
-  mark 4 (mean and p99), R4-OBST-REC1, R4-OBST-REC2 (the flip cost, now at p99). R5: the legacy facts used (a mean),
-  R5-TEST-REC1, R5-TEST-REC4 (mean delay), R5-TEST-REC5. R6: the legacy facts used (a mean), the options table Q2, the
-  egress table (R2-BUD-REC2's mean), the assumptions (A-2, at p99).
+  R2-INT-REC2 (the pair test and the re-flood at p99), R2-INT-REC4, R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3, R2-TRN-REC6,
+  R2-ROOM-REC2, R2-XU-OQ8. R3: the legacy facts used (the legacy step's mean; the harness's mean, p50, p95 and max),
+  R3-MEASURE-REC1 (median, p95, p99 and max; R3's frame marks name p95 and the median), R3-BUDGET-REC2's CPU, animation,
+  sim and GPU rows, R3-CHAR-REC1, R3-CHAR-REC2, R3-CHAR-REC4, R3-AUDIO-REC1 and R3-AUDIO-REC3 (sub-budgets at p99,
+  written out in step 3d by the advisor's ruling; R3-AUDIO-REC1's by the same rule, found by R3's owner). R4: the legacy
+  facts used by R4-NAV (a mean stall rate), R4-PHYS-REC1 mark 2 (a mean mark, its p99 reported), R4-NAV-REC1,
+  R4-NAV-REC2, R4-NAV-REC3, R4-LOS-REC1 mark 4 (mean and p99), R4-OBST-REC1, R4-OBST-REC2 (the flip cost, now at p99).
+  R5: the legacy facts used (a mean), R5-TEST-REC1, R5-TEST-REC4 (mean delay), R5-TEST-REC5. R6: the legacy facts used
+  (a mean), the options table Q2, the egress table (R2-BUD-REC2's mean), the assumptions (A-2, at p99).
 
 ### The server tick budget
 - **Definition:** the p99 server tick time a room may use, on one vCPU of the reference server, tested in the stress
@@ -165,21 +167,21 @@ whole tick the same rows give 6.44 ms at 60 Hz (5.24 with encoding spread over t
   overruns (R1-TICK-REC2 P1's "max at most 16.7 ms, zero overruns"). It is split into the sim step share and the
   server-only share, 25 % of the tick period each. The 50 % is R2-ROOM-REC2's figure; the two 25 % shares are
   R1-TICK-REC2 P1's figure for the sim and R2-SYNC-REC9's for the sync work, read against the tick period.
-- **Decided by the advisor, 2026-10-30** (resolution 1; 25 % for the whole tick, R2-BUD-REC6's figure, was weighed and
+- **Decided by the advisor, 2026-10-30** (resolution 1; 25 % for the server tick, R2-BUD-REC6's figure, was weighed and
   not taken). No escalated decision.
 - **Marked by:** "the server tick budget".
 - **Retire (exact):** "the tick budget", "the tick's p99 budget" (R4-NAV-REC2),
   "the share of the tick budget the tick-rate unit sets" (R2-SYNC-REC1 mark 4).
 - **Retire (in context):** "the server tick budget" with no number behind it, "CPU budget per tick" for the whole
   (R2-BUD-REC6), and "25 %" or "50 %" with no named whole.
-- **Used today:** R1: R1-TICK-REC2 (P1: the other 25 % of the server tick budget is the server-only share), R1-XU-OQ1
-  (settled: one server tick budget with its shares). R2: the budgets options table E (25 % weighed and set aside for
-  the server tick budget's 50 %), R2-BUD-REC6 (50 %, split into the two shares), R2-INT-REC3 (10 % of the server tick
-  budget, 5 % of the tick period), R2-ROOM-REC2 (50 % of the tick period), R2-XU-OQ8 (settled by the glossary). R4:
-  the legacy facts used for R4-LOS (R2-INT-REC3's 10 %), R4-NAV-REC2 (10 % at p99, 5 % of the tick period). R5:
-  R5-TEST-REC5 (server tick time measured against it). R6: the options table Q2 (noisy neighbours could break it), the
-  assumptions (A-2: a density to measure, not one the budget guarantees), R6-HOST-REC2 (rests on R2-BUD-REC6's
-  budget), R6-OBS-REC2 (makes it visible). R3: none.
+- **Used today:** R1: R1-TICK-REC2 (P1: the other 25 % of the tick period, inside the server tick budget, is the
+  server-only share), R1-XU-OQ1 (settled: one server tick budget with its shares). R2: the budgets options table E (25 %
+  weighed and set aside for the server tick budget's 50 %), R2-BUD-REC6 (50 %, split into the two shares), R2-INT-REC3
+  (10 % of the server tick budget, 5 % of the tick period), R2-ROOM-REC2 (50 % of the tick period), R2-XU-OQ8 (settled
+  by the glossary). R4: the legacy facts used for R4-LOS (R2-INT-REC3's 10 %), R4-NAV-REC2 (10 % at p99, 5 % of the tick
+  period). R5: R5-TEST-REC5 (server tick time measured against it). R6: the options table Q2 (noisy neighbours could
+  break it), the assumptions (A-2: a density to measure, not one the budget guarantees), R6-HOST-REC2 (rests on
+  R2-BUD-REC6's budget), R6-OBS-REC2 (makes it visible). R3: none.
 
 ### The sim step share and the server-only share
 - **Definition:** the two parts of the server tick budget, each at most 25 % of the tick period at p99 (4.2 ms at
