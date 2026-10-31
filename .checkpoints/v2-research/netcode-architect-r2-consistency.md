@@ -83,3 +83,23 @@ DONE
 DONE
 
 ## Step 3d fix round (coordinator message, 2026-10-31; verifier-r2-3d-result.md, verifier-r2-3d-skeptic-result.md)
+(scratchpad r2c/fix3d.py, fix3d-p7.py; every replacement matched once; line numbers of f67245e)
+- r2:2017 SYNC-REC1 m1 "48 clients" -> "As many clients as the largest mode's N (GLOSSARY link: 48, or 54 under MODES-3 (b); ...)": recommendation.
+- r2:2022 SYNC-REC1 m4 -> "the largest mode's N clients (48, or 54 ...)": recommendation.
+- r2:2103 SYNC-REC3 m2 "48-player brawl" -> "a brawl of the largest mode's N players (...)": recommendation.
+- r2:2186 SYNC-REC5 m4 "48 candidates" -> "the largest mode's N candidates (...)": recommendation.
+- r2:2292 SYNC-REC9 m1: keeps "48 clients" (BUD-REC6 quotes it), adds "(the largest mode's N, or 54 clients under MODES-3 (b); ...)": recommendation.
+- r2:2319 BUD-REC1 spike -> "at the largest mode's N players (...)": recommendation.
+- r2:2338 BUD-REC2 spike -> "at the design point, N = 48 (GLOSSARY link)": nit (the 160 kbps mark rests on the 48-player estimate; value unchanged under (b)).
+- r2:2358 BUD-REC3 spike "48-player soak" -> "soak at the largest mode's N (...)": recommendation.
+- r2:2439 INT-REC1 (c), r2:2499 INT-REC4, r2:2588 TRN-REC1 m2, r2:2718 TRN-REC5 m2, r2:2773 ROOM-REC2 m1, r2:2777 ROOM-REC2 m3 -> the largest mode's N (48, or 54 ...): recommendation x6.
+- r2:2952 SYNC-OQ13, r2:2993 BUD-OQ9 -> the largest mode's N (...): recommendation x2 (open questions; logged so because N changes under (b), as the coordinator's rule says).
+- Skeptic: r2:2401 "fit inside the server tick budget's 50 % of the tick period", r2:2402 "25 % of the tick period for the server tick", r2:2404 "a p99 server tick time at half the period": nit x3; r2:2413 "each within its 25 % share of the tick period": recommendation.
+- ROOM-REC2 mark 5 "every room start-up ... under 2 s" (rooms draft gives no statistic; a few-room spike has no meaningful p99; a start-up is a wait a player sees): recommendation.
+- r2:2289 Serves "(12v12v12 or 24v24; `CLAUDE.md`: design for 48+ players)": nit. r2:3896 part 7 statement corrected (bare 48s; CLAUDE.md's "Design for 48+ players"): nit.
+- R2-XU-OQ9: "Before 2026-10-30 (answered below)", past tense: nit.
+- Part 7: totals (37 recommendation, 106 nits) and "Step 3d fixes (2026-10-31):" list: nit x2.
+- Not changed (outside the list; same slip as r2:2289, older text): "VISION_V2 §3 (48+ players)" r2:2355, "VISION_V2 §3 (48+)" r2:2409, "the 48+ design point of VISION_V2 §3" r2:2627, "the §3 scale (48+ players)" r2:2737, and XU-OQ18's quotes of them.
+- Check after: R2 exact 0, in context 199 (new hits are "48" inside "(48, or 54 under MODES-3 (b))" beside the marking words, and "players" in "the largest mode's N players").
+- Round totals: recommendation 17, nit 9. File totals: recommendation 37, nit 106, number 0, source 0.
+DONE

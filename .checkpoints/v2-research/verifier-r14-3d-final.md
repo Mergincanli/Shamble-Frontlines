@@ -17,3 +17,15 @@ R1-BND-REC2 mark 4, R1-BND-OQ6, R4-PHYS-REC4 spike, R4-NAV-REC3 bots, R4-NAV-REC
 
 ## Check 3 (no new claim, number or source) — closed
 No URL or source added; only new number is ×1.125 (GLOSSARY §1 arithmetic) and "4.2 ms at 60 Hz" in the part-7 record (GLOSSARY figure). New phrases "it replaced R1-TICK-REC2's P1 scene and settled R1-XU-OQ1's scene part" and "an R2 assumption, through the stress scene" restate G:389-410 and r1:2846.
+
+## Check 4 (glossary hits on changed lines, 9 rows of glossary-hits-3d-final-r14.tsv) — closed: 9 right, 0 wrong
+- R1 2050 · server tick budget · "25 %" · right: "25 % of the tick period, inside the server tick budget" names its whole.
+- R1 2051 · server tick budget · "50 %" · right: "50 % of the tick period" beside "the server tick budget" link.
+- R1 2281 · largest mode · "48" · right: "the largest mode's N soldiers (48, or 54 under MODES-3 (b))".
+- R1 2408 · shared/authority-only stream · "the simulation's seeded RNG" · right: same sentence names "an authority-only stream" (r1:2409).
+- R1 2740 · largest mode · "48" · right: beside "the largest mode's N".
+- R4 778 · largest mode · "48" · right: beside "the largest mode's N" (r4:778-779).
+- R4 855 · stress scene · "R1-TICK-REC2's P1 scene" · right: record of what the stress scene replaced, beside "the stress scene" link.
+- R4 879 · largest mode · "48" · right: beside "the largest mode's N".
+- R4 881 · largest mode · "48" · right: "at N = 48" is the stated measuring point, with N = 54's scaling in the same sentence and "the largest mode's N bots" at r4:879.
+- Retire (exact): glossary_check.py --skip-records on the working tree (R1/R4/GLOSSARY identical to 5b57e40): R1 exact 0, R4 exact 0 (R1 in-context 129, R4 56; +1 in R4 = the new "N = 48" at r4:881).

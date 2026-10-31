@@ -1,0 +1,4 @@
+# Session message to the R2 owner (netcode-architect), saved verbatim before sending: the four places it found by the same slip
+# sent: 2026-10-31 about 10:22 UTC by SendMessage
+
+Yes, please: fix the same slip at r2:2355, 2409, 2627 and 2737 (line numbers at commit f67245e, or find them by their words): VISION_V2 §3 holds the modes, but "design for 48+" is CLAUDE.md's, so credit each the way you did at r2:2289 and r2:3896. Log each as a nit with a part-7 line under "Step 3d fixes (2026-10-31):", and update the totals. Change nothing else; do not commit. Reply in under 40 words.

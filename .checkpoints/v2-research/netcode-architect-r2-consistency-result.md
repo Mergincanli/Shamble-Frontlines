@@ -39,3 +39,19 @@ r2:870: "At 20 passes/s, one point is 4–9 % of one core of the measuring machi
 r2:3050-3051: "(R6's option C3, r6:424-425 at commit 8dee746), which leaves production pinning out (REC5);"
 
 Totals: 20 recommendation, 97 nit.
+
+## Addendum: the step-3d fix round (reply to `prompts/r2-3d-fixes.txt`, about 10:21 UTC on 2026-10-31, verbatim)
+
+All four items are fixed in r2-netcode.md; nothing committed. This round: 17 recommendation, 9 nits.
+
+1. Fourteen marks and both open questions (r2:2952, 2993) now read "the largest mode's N (48, or 54 under MODES-3 (b))": 16 recommendation changes.
+   - r2:2292 keeps "48 clients", which R2-BUD-REC6 quotes, and adds the reading.
+   - r2:2338 (the BUD-REC2 spike) is "the design point, N = 48", because its 160 kbps mark rests on the 48-player estimate: nit.
+   - Part 7's statement is corrected: nit.
+2. r2:2401, 2402 and 2404 reworded as asked: nits. r2:2413 now says "its 25 % share of the tick period": recommendation.
+3. r2:3896 and r2:2289 now credit `CLAUDE.md`: nits.
+4. Part 7 totals now 37 recommendation, 106 nits; R2-XU-OQ9 is in the past tense, "Before 2026-10-30": nits. ROOM-REC2 mark 5 now says "every room start-up": recommendation, since a spike of a few rooms has no meaningful p99.
+
+Not changed, outside your list: the same "VISION_V2 §3 (48+)" slip at r2:2355, 2409, 2627 and 2737.
+
+The glossary check finds 0 exact hits in R2.
