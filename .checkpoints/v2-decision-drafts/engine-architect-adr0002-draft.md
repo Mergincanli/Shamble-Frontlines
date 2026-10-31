@@ -238,7 +238,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
      end a 48-player match.
    - Ids: R5-RUSTLINT-REC4, R1-RR-OQ4, R1-RR-OQ5, R5-RUSTLINT-OQ4 (r5-toolchain-quality.md, Recommendations, Question 3,
      lines 1353–1364; Open questions, line 1793; r1-simulation-core.md, Open questions, lines 2941–2950); cites
-     R2-ROOM-REC2 (r2-netcode.md, Recommendations, Brief question 5, lines 2762–2768, its fix-pass note on `panic = "unwind"`), R1-RR-OQ3 and
+     R2-ROOM-REC2 (r2-netcode.md, Recommendations, Brief question 5, lines 2762–2772, its fix-pass note on `panic = "unwind"` and its "Serves"), R1-RR-OQ3 and
      R1-XT-OQ12 (ADR 0004's), R6-HOST-REC1's 25 MiB mark (decision map N37, r6 line 642).
    - Need: VISION_V2 §4 (client and server must not disagree on a tick, as R5-RUSTLINT-REC4 traces it, r5 lines
      1360–1361), §6.6 and §6.8; the panic strategy: §6.1 (rooms stay up, R2-ROOM-REC2's "Serves").
@@ -262,10 +262,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
      a written invariant and a test) are weighed then. The SharedArrayBuffer ring (B3) is the spike's measured
      alternative, never the sim's own shared Wasm memory (B4). At the 30 Hz baseline that is 30 blocks a second
      (one per tick).
-   - **One command per tick, posted** from the page to the Worker (option C1): the input fields ADR 0001 defines (seq,
-     move, aim, the held-button bitmask, press and release edge counters), plus the camera's cursor ray and the view time
-     the page drew, so the Worker can cast the aim ray against the state it published (ADR 0001 part 5; decision map
-     I-19); one message, no extra one for the aim. The Worker stamps the tick it applies the command to.
+   - **One command per tick, posted** from the page to the Worker (option C1): a sequence number, the move input, the
+     held-button bitmask and press and release edge counters (their exact fields are ADR 0001's), plus the camera's
+     cursor ray and the view time the page drew; the Worker casts that ray against the state it published and fills the
+     network command's aim point (ADR 0001 part 5; decision map I-19), so the aim needs no second message. The Worker
+     stamps the tick it applies the command to.
    - **The small control API** (create, mode flag, load the content bundle, step, the block's pointer and length) is
      wasm-bindgen's own, with its `.d.ts` (option D1); it is called a constant number of times per tick, never per
      entity.
