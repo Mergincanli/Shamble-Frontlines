@@ -4,7 +4,7 @@
 The docs catch up with the merge of the R1–R6 research ([#28](https://github.com/Mergincanli/Shamble-Frontlines/pull/28), b6effde) and record the decisions of 2026-10-31, so the decision drafts start from them.
 
 ## Outcome
-DONE pending verification: docs only, symbols +0 −0; the four checks (V1–V4) and the advisor's review of the final head are still to come.
+DONE: docs only, symbols +0 −0. The four checks (V1–V4) found nothing wrong in substance; their 12 small findings are fixed or listed below. The advisor's review of the final head is next (condition 15).
 
 ## Plan and approval
 - Plan revision 2 (STATUS, ROADMAP, the research folder, one line of VISION_V2, the Night queue), built from a read-only sweep (two agents: 56 + 18 findings).
@@ -25,18 +25,23 @@ DONE pending verification: docs only, symbols +0 −0; the four checks (V1–V4)
 ## Evidence
 - Gate at 05b2d3a: **PASS**, all 8 checks: syntax 5/5 · concatenation · symbols +0 −0 · player build (51 refs, all guarded) · smoke (index.html 8/8, editor.html 5/5, 0 errors) · names · layering · script order. Repo-map check: "repo map OK: 103 entries cover 93 required paths".
 - The research edits: a dry run matched every anchor exactly once (39 of 39); the applied diff equals the reviewed preview line for line (75 added, 17 removed).
-- Verification workflow (V1 exact edits, V2 facts, V3 decision wording, V4 completeness): pending.
-- Not verified here: the routines facts come from the session's routines API reads (no other reviewer can repeat them); the new routine has not yet posted on issue #16.
+- Verification workflow at e99773f (four read-only agents, effort high): **V1 exact edits**: the research diff equals the reviewed preview (92 changed lines, identical multisets); re-running the script on b6effde's files gives byte-identical files; every "Answered" note sits inside its own entry and agrees with it; VISION_V2 changes only line 43; nothing outside the planned files changed; markdown intact. **V2 facts**, **V3 decision wording**, **V4 completeness**: no wrong fact or quote; 11 small findings (below).
+- Not verified here: the routines facts come from the session's routines API reads (no reviewer can repeat them). The 13:55 UTC comment on issue #16 was not the new routine's: its only run (13:51:55–13:52:18 UTC) stopped silently before then, so the new routine has not yet posted.
 
 ## Reviews
 - Advisor, plan: APPROVE with 16 conditions (all applied above). Advisor, final head: pending (after the checkpoint is deleted, condition 15).
-- Verification V1–V4: pending.
+- V1: one nit (the GLOSSARY summary line named "(a)" and "(b)" without words): reworded with the words. The SEC-SPREAD notes already say "server-only spread", so they stay.
+- V2: the routines read-back time (STATUS now names both reads, 13:54 and 14:06 UTC); this change-set's own In-flight row was out of date (fixed); line numbers cited without their commit (now "lines at b6effde"); "possibly more" quoted for two docs (fixed: LOOP_V2 says "more", DESIGN_NOTES "larger").
+- V3: NS-2 (c) without plain words on one line (fixed); the FOUNDATION question's options were badly cut, since the brief's phase 1 includes the first slice: withdrawn here, because STATUS's carry-forward 5 already sends it to the drafts' plan.
+- V4: the 2026-10-28 line about the old routine's cron (now marked: the old routine is off); condition 3 credited to the Advisor alone (now "their words", Mustafa and the Advisor); kit-v3-1's row (PR #30 conflicts with main: noted, nothing acted on); two more wildcard mentions in GLOSSARY's certificate entry (listed below; STATUS item 4 keeps the advisor's exact text, for the advisor to decide at its review).
 
 ## Decisions and deviations
 - The report is this PR body, not a file, as the approved plan and the earlier docs-only change-sets have it.
 - NS-2: Mustafa created the fresh-session routine; the API refused the session's schedule edit (agents may only edit routines they created), so the schedule is his step; the session switched the old routine off at 13:54 UTC (reversible).
 - Left for the decision drafts: R2-BUD-REC6's reason and GLOSSARY §1's 60 Hz sentence (rewording needs judgment), and the sentences listed below.
 - docs-keeper's prompt gave two wrong times (14:25 and 14:20 UTC); it was corrected to 14:06 UTC before it wrote the Routines facts.
+- After verification: STATUS fixes by docs-keeper, the GLOSSARY summary line by the session (both above). The research diff therefore differs from the reviewed preview by that one line (+1).
+- Carry-forward 2 keeps the advisor's text, with ", lines at b6effde" added: this change-set moves GLOSSARY's lines.
 
 ## Risks
 1. The new night routine is unproven at posting: tomorrow morning's comment on issue #16 is the first proof; until Mustafa edits it, it runs once a night.
@@ -47,7 +52,7 @@ DONE pending verification: docs only, symbols +0 −0; the four checks (V1–V4)
 The decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), planned from the merged research, the 2026-10-31 decisions and STATUS's five carry-forwards.
 
 ## Decisions needed
-- **FOUNDATION (the Advisor):** does "the foundation" in the slice order's condition 3 ("the netcode proof test … still runs before the foundation") mean phase 1, that is, the repository restructure, toolchain and CI gate v2 (V2_PHASE0_BRIEF §1)? Why it matters: the decision drafts schedule the proof test against it, and no document defines it. Options: (a) yes, phase 1; (b) something else (say what). Recommendation: (a).
+None. (What "the foundation" and "the netcode proof test" mean goes to the decision drafts' plan, for the Advisor to confirm: STATUS, carry-forward 5.)
 
 ## For Mustafa
 1. On the new night routine's page (https://claude.ai/code/routines/trig_01QpV6y6UaG1Na2q3jumRDxh), set the schedule to `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` (it now runs once a night, at 00:10).
@@ -105,8 +110,8 @@ A comment posted at 13:55 UTC (6544279732, by another session under the Merginca
 
 <details><summary>Not touched, for the decision drafts (condition 11)</summary>
 
-- R2-BUD-REC6's reason (`r2-netcode.md:2402-2403`) and GLOSSARY §1's 60 Hz sentence (`GLOSSARY.md:73-74`): at N = 48 a 60 Hz tick that encodes and re-floods fits the 50 % budget by 0.05 ms (8.28 of 8.33 ms) while its server-only share is 0.24 ms over its 25 % (4.41 of 4.17 ms); TICK-30 makes 30 Hz the baseline.
-- Four sentences that still describe the wildcard certificate as R6's proposal (lines at b6effde): `r2-netcode.md:2703-2705`, `r6-infrastructure.md:47`, `938-940` and `1056`; R6-HOST-REC4 holds.
+- R2-BUD-REC6's reason (`r2-netcode.md:2402-2403`) and GLOSSARY §1's 60 Hz sentence (`GLOSSARY.md:73-74`, lines at b6effde): at N = 48 a 60 Hz tick that encodes and re-floods fits the 50 % budget by 0.05 ms (8.28 of 8.33 ms) while its server-only share is 0.24 ms over its 25 % (4.41 of 4.17 ms); TICK-30 makes 30 Hz the baseline.
+- Four sentences that still describe the wildcard certificate as R6's proposal (lines at b6effde): `r2-netcode.md:2703-2705`, `r6-infrastructure.md:47`, `938-940` and `1056`; R6-HOST-REC4 holds. Two more in GLOSSARY's certificate entry (V4): its definition (`GLOSSARY.md:693`, answered by the entry's own new note) and its "Used today" line (`705-706`), lines at b6effde.
 - The "until Mustafa answers PREVIEW-WALL" sentences inside R5-PREV-REC5, R6-HOST-REC1 and R6-HOST-REC3; R6-HOST-OQ5's "after the security baseline"; the marks that give values for 48 and 54 (48 holds); TICK-30's consequences for the tick-rate marks.
 - Rules files (KIT-ALIGN) and the Advisor's documents (DOCS-ALIGN): listed in STATUS, not edited.
 </details>
@@ -119,7 +124,8 @@ A comment posted at 13:55 UTC (6544279732, by another session under the Merginca
 4. Advisor plan review: APPROVE with 16 conditions: a5405d2 (prompt), the verdict folded in af2560c.
 5. The research answers (39 edits) and the VISION_V2 line: af2560c.
 6. Draft PR #31; docs-keeper's part L: 1a1327b, ca4fffd, f180f6e (a work-in-progress snapshot), 05b2d3a.
-7. Issue #16 edited (14:12 UTC). Gate PASS at 05b2d3a.
+7. Issue #16 edited (14:12 UTC). Gate PASS at 05b2d3a; the report in this body (e99773f).
+8. Verification V1–V4 (workflow, four agents) at e99773f; fixes: STATUS (docs-keeper) and the GLOSSARY summary line.
 </details>
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

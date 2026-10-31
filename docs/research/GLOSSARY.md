@@ -39,8 +39,9 @@ deferred security baseline before ADR 0006, or list it open), **SEC-SPREAD** (Mu
 resistance, R2-SYNC-OQ11), **ABL-PREDICT** (Mustafa, after a Feel Lab test: does the client predict its own abilities),
 **PREV-DELETE** (a spike: does a closed PR's preview really disappear). Their full wording is in each affected topic's
 "Shared open questions (the same words in every topic)" subsection.
-Answered on 2026-10-31: MODES-3 (a), PREVIEW-WALL (a) and SEC-SPREAD (a) by Mustafa, BASELINE-WHEN (b) by the
-Advisor; ABL-PREDICT waits for a Feel Lab test and PREV-DELETE for its spike.
+Answered on 2026-10-31: by Mustafa, MODES-3 (a) (totals), PREVIEW-WALL (a) (previews that reach the staging game
+server are private from the first one) and SEC-SPREAD (a) (server-only spread); by the Advisor, BASELINE-WHEN (b)
+(listed open in ADR 0006). ABL-PREDICT waits for a Feel Lab test and PREV-DELETE for its spike.
 
 ## 1. Tick budgets
 

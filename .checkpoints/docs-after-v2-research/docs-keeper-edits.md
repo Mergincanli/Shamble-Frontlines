@@ -11,3 +11,5 @@ Task: docs-keeper part L of docs-after-v2-research (STATUS, ROADMAP, research/RE
 - research/README done (condition 7 paragraph verbatim, merge line under table, R6 owner cell). Next: REPO_MAP.
 - REPO_MAP lines 57, 79 done; repo-map-check OK (103 entries, 93 paths).
 DONE
+- Follow-up task: eight STATUS fixes from verification V2–V4 (coordinator). Starting.
+- Follow-up: all 8 STATUS edits applied (lines 48, 51, 13, 125, 143, 150, 207, 217); every before-text matched; PR #30 mergeable_state dirty, base e9f11be, head 5be7d37 confirmed via gh REST. GLOSSARY.md diff in the tree is not mine. DONE

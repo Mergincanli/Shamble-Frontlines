@@ -10,7 +10,7 @@ docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28
 Next: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the 2026-10-31 decisions
 under "Decisions pending"; then a stop for Mustafa and the Advisor; then phase 1 and the playable slices in the new
 order (SLICE-ORDER, Mustafa and the Advisor: 1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4
-the loop), with the netcode proof test before the foundation, in the Advisor's words: "The netcode proof test (48
+the loop), with the netcode proof test before the foundation, in their words (Mustafa and the Advisor): "The netcode proof test (48
 simulated players over WebTransport) still runs before the foundation." The legacy game is frozen (critical fixes
 only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
@@ -45,10 +45,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **docs-after-v2-research** (this change-set; docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | `cs/docs-after-v2-research`, draft PR #31 | plan approved by the advisor with 16 conditions; docs being written | the advisor's review of its final head, then Mustafa's "merge #31" |
+| **docs-after-v2-research** (this change-set; docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | `cs/docs-after-v2-research`, draft PR #31 | plan approved by the advisor with 16 conditions; docs written (05b2d3a) and issue #16 edited (14:12 UTC); verification V1–V4 done, its findings fixed | the advisor's review of the final head, then Mustafa's "merge #31" |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
 | docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
-| kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1`, PR #30 (open since 2026-10-27; not a draft; head 5be7d37) | from the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | PR #30, for Mustafa's go |
+| kit-v3-1 (write guards for kit and gate files, a builder agent, a default effort, the secret-pattern fix) | `cs/kit-v3-1`, PR #30 (open since 2026-10-27; not a draft; head 5be7d37) | from the R7 session (session_017agAXp7koecrVYw8LUufy5) on Opus 5.5 with the reduced scope (KIT31-STATE (b), the Advisor, 2026-10-27); "shelved" only meant "not in the v2 day session", which keeps away from its branch and files | PR #30 conflicts with main (GitHub: mergeable state "dirty", base e9f11be, read 2026-10-31); it needs an update for main's changes, a day-session advisor's APPROVE of its head, then Mustafa's go (its own merge path) |
 | **R7 legacy inventory** (`docs/LEGACY_INVENTORY.md`: 247 systems, each with a recommended mark: rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"; `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json`: 60 tuning tables; read-only `tools/tuning-dump.js`; symbols +0 −0) | merged: PR #27, 07ab240, 2026-10-27, by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 | done; report `docs/reports/2026-10-27-r7-legacy-inventory.md` | none |
 | docs-after-kit-v2-2 (docs only: kit-v2-2's and #24's merges and main's branch protection recorded) | merged: PR #25, 4c24d07, 2026-10-27 | done | none |
 | **kit-v3-0** (v2 process upgrades: VISION_V2.md and V2_PHASE0_BRIEF.md, CLAUDE.md's v2 rules, checkpoints, REPO_MAP.md, six new agents, the web allow list; no game code, symbols +0 −0) | merged: PR #26, f2ccc13, 2026-10-25, on Mustafa's "merge #26" after the advisor's APPROVE of its final head | done; report `docs/reports/2026-10-24-kit-v3-0.md` | none |
@@ -122,7 +122,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   2. R2-BUD-REC6's reason (r2-netcode.md:2402-2403) says the marks fit the 50 % server tick budget at 60 Hz on every
      tick but one that both encodes a snapshot and re-floods; that holds at N = 54 (8.99 of 8.33 ms), but at N = 48
      that tick fits by 0.05 ms (8.28 of 8.33 ms) while its server-only share is 0.24 ms over its own 25 % (4.41 of
-     4.17 ms) (GLOSSARY.md:62-75). Under TICK-30 the drafts restate these marks for the 30 Hz baseline and say what the
+     4.17 ms) (GLOSSARY.md:62-75, lines at b6effde). Under TICK-30 the drafts restate these marks for the 30 Hz baseline and say what the
      25 % headroom for 60 Hz is measured against (the advisor's #28 review, finding 2).
   3. Where a research mark gives values for 48 and 54, the drafts use 48; where a research sentence says "until
      Mustafa answers …", the answer applies.
@@ -140,14 +140,14 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md` §1 ("Then:
   playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the security
   baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
-  `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more").
+  `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES).
 - Taken by the Advisor 2026-10-30 (relayed by Mustafa): VERIFY-FETCH (a), research may read allow-listed pages with
   curl by day (read-only, the host audit in each report); the night shift stays on WebFetch until kit-v3-1 is merged.
   The unread sources go in `docs/research/UNREAD_SOURCES.md`; the critic's 12 contradictions are resolved before the
   drafts, with a shared glossary (`docs/research/GLOSSARY.md`). NS-2 (c): the night shift starts a fresh session per
   run (carried out 2026-10-31: see Routines).
 - Taken by the Advisor 2026-10-28 (relayed by Mustafa): WINDOW-0730 (a), the night shift ends at 07:30 (the R7 session
-  writes it into kit-v3-1; the routine's cron already runs 00:10–07:10); NIGHT-RESEARCH (a), research stays daytime
+  writes it into kit-v3-1; the routine's cron already runs 00:10–07:10 (the old routine, switched off 2026-10-31; the new routine runs hourly once Mustafa sets its schedule: see Routines)); NIGHT-RESEARCH (a), research stays daytime
   only; fewer agents at once (4–5) for the same work, so units finish before a spend-limit cut.
 - Taken by the Advisor 2026-10-27:
   - R7-MARKS (a): the inventory's marks are working recommendations, changed when their ADR draft comes up; rows
@@ -204,7 +204,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 
 ## Routines
 _NS-2 (c) (the night shift starts a fresh session on every run) carried out 2026-10-31. These facts are the v2 day
-session's read-back with the routines API at about 14:06 UTC; docs-keeper could not check them [assumed]._
+session's read-backs with the routines API at 13:54 UTC and again at about 14:06 UTC; docs-keeper could not check them [assumed]._
 - **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh), created by Mustafa on the Routines
   page at 13:50 UTC: a fresh session on every run (no persistent session), the repository attached, Opus 5.5, the same
   one-line prompt. Its schedule reads `CRON_TZ=Europe/Amsterdam 10 0 * * *` (once a night, 00:10) until Mustafa sets
@@ -214,7 +214,7 @@ session's read-back with the routines API at about 14:06 UTC; docs-keeper could 
   merged, it takes only items that need no web access, and a stop at a permission prompt is listed in its morning
   report. Research runs in the daytime only.
 - **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): switched off by the v2 day session
-  (session_0173vVo5q59ameR6cnN9BENg) at 13:54 UTC under NS-2 (c). Mustafa deletes it after one good night of the new
+  (session_0173vVo5q59ameR6cnN9BENg) at 13:54 UTC, when the night shift moved to a fresh session on every run (NS-2 (c)). Mustafa deletes it after one good night of the new
   routine (deleting it also deletes its session).
 - **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
   switched it off, after an agent's switch-off was refused; the routine reads enabled false at 21:35 UTC). The advisor
