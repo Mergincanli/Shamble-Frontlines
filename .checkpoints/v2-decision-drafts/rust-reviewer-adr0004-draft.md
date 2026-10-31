@@ -7,12 +7,12 @@
 This record decides how the game's rules run. There is one Rust simulation: the same code runs natively on the match
 server and as WebAssembly in the browser's Web Worker. Its state is plain typed tables in one struct (no ECS crate),
 every entity has one id, and time is a whole number of ticks of one constant. Runs are reproducible: the same seed, data
-and inputs give the same state hash after every tick on every run of a build, and the same hash on Wasm and native is a
+and inputs give the same [state hash](../research/GLOSSARY.md#state-hash) after every tick on every run of a build, and the same hash on Wasm and native is a
 target that a test checks on every change. Physics is collision queries plus our own kinematic movement (parry3d, no
 physics engine); bot navigation is baked into the map document and queried by the sim; one height-aware sight query
 serves bots, blasts, melee and the aim point. The record also says where the player's upgrade tracks live (a player
 record apart from the soldier), how dropped weapons exist in the world, and which random stream draws upgrade offers.
-It decides no game rule. Why: VISION_V2 §6 asks for a true 3D world, data-driven abilities, big vehicles, a server-side
+It decides no game rule. Why: VISION_V2 §6 asks for a true 3D world, data-driven abilities, [big vehicles](../research/GLOSSARY.md#big-vehicle-and-very-large-unit), a server-side
 economy, telemetry and moments, and SLICE-ORDER asks that movement and shooting be input-driven and replayable from day
 one.
 
@@ -23,9 +23,10 @@ one.
   interiors, ledges, line of sight across heights, bots between levels, aiming at height), §6.3 (abilities and effects
   from data, executed by the sim), §6.4 (big, multi-part vehicles; seats `[OPEN]`), §6.5 (economy and objectives,
   server-side and tunable), §6.6 (balance telemetry), §6.8 (moments; kill-cams, replays and highlights `[LATER]`) and
-  §6.9 (a few very large units: the sim's share is that they are in the stress scene; drawing them is ADR 0003's).
+  §6.9 (a few [very large units](../research/GLOSSARY.md#big-vehicle-and-very-large-unit): the sim's share is that they are in
+  [the stress scene](../research/GLOSSARY.md#the-stress-scene); drawing them is ADR 0003's).
 - VISION_V2 §3 ("Bots fill empty slots") and §4 (matches feel fair up to about 100 ms of ping; the minimum laptop runs
-  the largest mode at 30+ fps).
+  [the largest mode](../research/GLOSSARY.md#the-largest-mode-and-its-n) at 30+ fps).
 - LOOP_V2 §2 (spawn inside the barracks), §3 and §4 (money, harvesters, uplinks, tech tiers), §5 and §6 (units and
   vehicles), §7 (active reload, split feedback), §8 (points race; "Nothing carries into the next match"), §9 (the
   Octopon-3 greybox: plateau, ramps, drop-downs, 6 m gaps, the reachability check) and §10 (bots that fight across three
@@ -74,7 +75,8 @@ one.
    Findings, R1-BND-F19, lines 1019–1028; Open questions, R1-RR-OQ3, lines 2936–2940).
 
 **What it takes from and gives to the other drafts.**
-- Takes: the tick rate and the 60 Hz margin (ADR 0001); the prediction scope, the messages and the room lifecycle
+- Takes: the tick rate and the 60 Hz margin (ADR 0001); [the prediction scope](../research/GLOSSARY.md#the-prediction-scope), the
+  messages and the room lifecycle
   (ADR 0001); the definitions of units, weapons, abilities, tracks and maps as typed content (ADR 0005, interface I-1);
   the Worker, the output block's layout, the panic strategy, the build profiles and the lints (ADR 0002); the reference
   server (ADR 0006, R6-HOST-REC2); the client reference machines (ADR 0003, R3-BUDGET-REC1).
@@ -105,14 +107,14 @@ one.
 - The legacy JavaScript step took 0.80–1.00 ms mean at 48 soldiers, without physics or a 3D world (GC2;
   r1-simulation-core.md, R1-ECS-REC1 mark 1, lines 1930–1931): a reference, not a prediction (R1-TICK-OQ5, lines
   2658–2660).
-- The ADR-001 inputs STATUS logged (decision map, J2) land here: one hit world for every shooter (K1), a phased
+- The ADR-001 inputs STATUS logged ("Decisions pending", ADR-001) land here: one hit world for every shooter (K1), a phased
   `update()` (K4), boot-time `Math.random` draws, three.js UUIDs and the camera-dependent effects cull on the shared
-  generator, `addTech`'s HUD writes as an event, and a sight budget sized for 12 soldiers. Parts 1, 8, 13, 17 and 19
-  of the decision dispose of them; the team allow-list on the server is ADR 0001's, with team filtering in the sim.
+  generator, `addTech`'s HUD writes as an event, and a sight budget sized for 12 soldiers. Parts 1, 8, 10, 13, 17 and
+  19 of the decision dispose of them; the team allow-list on the server is ADR 0001's, with team filtering in the sim.
 
 ## Decision
 
-One Rust simulation crate holds the game's rules and runs them in whole ticks: natively in each room process on the
+One Rust simulation crate holds the game's rules and runs them one tick at a time: natively in each room process on the
 server, and as Wasm in the browser's Web Worker for prediction and for the local server of SLICE-ORDER. Its state is
 one plain struct of typed tables, its only clock is an integer tick counter, its random numbers come from seeded
 streams, and it reads no wall clock, no hash-map order and no platform maths, so a recorded match can be replayed and
@@ -188,8 +190,8 @@ research ids, and the need it serves.
    page's render clock only. After a long gap (a hidden tab, a sleeping laptop) the browser does not simulate the gap:
    in local play the match pauses; online the Worker resyncs from the server's state through ADR 0001's path, with
    catch-up per frame bounded at 7 ticks (the same rule, proposed). Pause, shop and hit-stop never stop the shared tick
-   online; hit-stop is presentation time. The loops read the clock; the step never does (WALL-CLOCK, decision map J2:
-   the legacy reads stay in the frozen legacy game). Whether Worker timers keep their rate in a hidden tab is measured in
+   online; hit-stop is presentation time. The loops read the clock; the step never does (the 11 wall-clock reads STATUS
+   lists stay in the frozen legacy game). Whether Worker timers keep their rate in a hidden tab is measured in
    the boundary spike, for 60 s and for more than 5 minutes (R1-TICK-OQ2 and R1-BND-OQ2, stated once: R1-XU-OQ12).
    - Why: Tokio's timers are millisecond-granular, so the rate must come from elapsed time; `requestAnimationFrame`
      follows the display and stops in background tabs.
@@ -376,7 +378,7 @@ research ids, and the need it serves.
     floors, debris as the ruin's walkable surfaces), sight flags, ceilings (a collapsed roof stops being a ceiling) and
     portals, each structure's stages baked over its own nodes only, never as combinations across structures. The
     research bakes two states and a ruin's shape (R4-OBST-REC2), so the third stage is an extension the sim core spike
-    must prove (decision map h, G4). What moves a building from one stage to the next is a game rule for Mustafa
+    must prove (no research finding covers it). What moves a building from one stage to the next is a game rule for Mustafa
     (OQ-0004-4); the stages and their assets are content (ADR 0005); drawing them is ADR 0003's. Roofs that fade
     (LOOK_V2 §4 `[DEFAULT]`) are drawn by ADR 0003; the sim's part is what the camera needs: the local player's floor
     layer and enclosure area id, written into the output block (ADR 0002's layout). What a player may see inside a
@@ -393,7 +395,7 @@ research ids, and the need it serves.
     0001's). Their behaviour is a sim phase at its own cadences (part 4) that reads the shared sight pass, the navigation
     queries and the game state, and writes commands. The behaviour set is LOOP_V2 §10's (fights across three teams,
     buying T1 units, escorting and hunting harvesters, carrying, defending and stealing uplinks, a simple per-team role
-    mix); no research covers a bot AI architecture (decision map h, G10), so its structure is OQ-0004-1. Bots act on the
+    mix); no research covers a bot AI architecture, so its structure is OQ-0004-1. Bots act on the
     present while humans see about 100 ms of the past (R2-SYNC-OQ13): bot reaction is tuning data the game-designer
     sets, starting from legacy's 0.25 s scan cadence (GN4), and the sim core spike reports bot reaction times at N = 48.
     A field of view for bots is a design question (R4-LOS-OQ3).
@@ -419,7 +421,7 @@ research ids, and the need it serves.
     are sim code. What each team may see of another team's state is ADR 0001's visibility classes. A tier reached or
     money paid is an event (part 19), never a HUD write from the sim (legacy's `addTech`).
     - Why: LOOP_V2's economy is server-side and tunable, and its outcomes must replay like everything else.
-    - Ids: none of its own (decision map h, G12); cites R1-TICK-REC3 (cadences).
+    - Ids: none of its own (no research finding on economy phases); cites R1-TICK-REC3 (cadences).
     - Need: VISION_V2 §6.5.
 18. **The player record, weapon drops and pickups (UPGRADE-SCOPE).** Each player slot has a player record, the
     PlayerState, in a table beside the soldier tables and apart from the soldier entity, the Pawn. For the match it
@@ -441,7 +443,7 @@ research ids, and the need it serves.
     a tie is broken (OQ-0004-5); and what bots and slot takeovers do with records (OQ-0004-6).
     - Why: Mustafa put the tracks on the player, not the unit; a record apart from the soldier is the only place that
       outlives a death and a switch, and pickups as ordinary entities get ids, snapshots and hashes for free.
-    - Ids: none in the research (decision map h, G13; J5).
+    - Ids: none (no research finding on upgrades).
     - Need: UPGRADE-SCOPE (a settled input, listed in `docs/adr/README.md`).
 19. **Events, moments and telemetry.** Each tick the sim appends tick-stamped events to the tick's event list: hits,
     deaths and kills (killer and victim slot and unit id, the source weapon or ability id, assisting slots), blasts
@@ -452,7 +454,7 @@ research ids, and the need it serves.
     ADR 0006 owns the record's shape. A moment phase runs after the outcome phases: it reads the tick's events and the
     state and emits moment events by rules held as data (ADR 0005's format; their thresholds are a design question,
     R6-TEL-OQ3), so the moments and the telemetry read the same stream. The timeline is sampled every 10 s of game time.
-    No research covers a moment mechanism (decision map h, G11), so this part stays at VISION_V2 §6.8's level.
+    No research covers a moment mechanism, so this part stays at VISION_V2 §6.8's level.
     - Why: every §6.6 number and §6.8 moment is a function of the events and the timeline (R6-TEL-REC1).
     - Ids: none of its own; cites R6-TEL-REC1 (r6-infrastructure.md, lines 784–811) and R1-TICK-REC3.
     - Need: VISION_V2 §6.6, §6.8.
@@ -504,21 +506,21 @@ Sources: r1-simulation-core.md, Options, A fixed tick rate, lines 1648–1682.
 - **Slow systems (4b, lines 1660–1665), the server loop (4c, lines 1666–1672) and the client loop (4d, lines
   1673–1682):**
 
-| Dimension | Everything every tick | Cadences in whole ticks, staggered by slot (proposed) |
+| Dimension | Everything every tick | Cadences counted in ticks, staggered by slot (proposed) |
 |---|---|---|
 | Complexity | Lowest | Low: one cadence per system, stated in game time |
 | Cost | None | None |
-| Scalability and performance | AI, sight and route costs scale with the tick rate | Per-tick cost grows only with what must be fine-grained |
+| Scalability and performance | AI, sight and route costs scale with the tick rate | The sim step time grows only with what must be fine-grained |
 | Security and anti-cheat | Neutral | Neutral |
 | Effect on the look and feel | None | None if cadences are in game time (bots behave the same at any rate) |
 | Effort from the current code | n/a | Legacy already does this in seconds (GN4) |
-| Pros / cons | Simple / expensive at 48 bots | Affordable / cadences must be stated in seconds |
+| Pros / cons | Simple / expensive at N = 48 | Affordable / cadences must be stated in seconds |
 
 | Dimension | Timer period as the clock | Monotonic accumulator, bounded catch-up (proposed) | Integer-millisecond period |
 |---|---|---|---|
 | Complexity | Low | Low, plus an overrun policy | Low |
 | Cost | None | None | None |
-| Scalability and performance | Millisecond timers cannot hit the period exactly; `Burst` catches up without a bound | Average rate exact whatever the timer granularity | 30 Hz becomes 1000/33 ≈ 30.3 Hz (the research shows the 60 Hz case: 62.5 Hz) |
+| Scalability and performance | Millisecond timers cannot hit the tick period exactly; `Burst` catches up without a bound | Average rate exact whatever the timer granularity | 30 Hz becomes 1000/33 ≈ 30.3 Hz (the research shows the 60 Hz case: 62.5 Hz) |
 | Security and anti-cheat | Unbounded catch-up after a stall | A stall drops time and is recorded | Neutral |
 | Effect on the look and feel | Rate drift | Steady rate | Rate error |
 | Effort from the current code | Small | Small | Small |
@@ -685,12 +687,12 @@ restart).
 - **Baked navigation over a runtime library.** It builds for the browser, makes generation's floats shared data and
   lets structure states flip flags instead of rebuilding tiles. Against it: we write the runtime, neither generator is
   measured on Octopon-3's blocks and plateaus yet, and every damage stage multiplies what the bake covers (the third
-  stage is untested: G4). The bake-time mark and the comparison of generators decide it.
+  stage is untested). The bake-time mark and the comparison of generators decide it.
 - **An authority-only stream for offers.** Nothing predicts an offer, so keeping the stream on the authority costs
   nothing and leaks nothing. The strongest argument against would be a later wish to show offers before the server
   confirms them; that would be a prediction-scope change (ADR 0001), with this stream's kind revisited then.
 - **A player record apart from the soldier.** Settled by UPGRADE-SCOPE; the engineering point is that the record is
-  bounded by content, allocated at match start and reset in one phase, so it adds no per-tick cost and no client-sized
+  bounded by content, allocated at match start and reset in one phase, so it adds nothing to the sim step time and no client-sized
   allocation.
 - **Rate-independent mechanism under a 30 Hz baseline.** Cadences in seconds and durations in sub-tick units mean that
   unlocking 60 Hz under the 60 Hz margin is a rebuild plus a re-bake (links are measured at the shipped tick), not a
@@ -732,7 +734,7 @@ restart).
 | GN10 (bot verticality: climb steering) | rewrite in Rust | redesign | Typed links found by the bake and checked by the sim's movement replace climb steering (part 12, R4-FLOORS-REC1); collision and gravity stay with the movement rows |
 | GN11 (nav grid build) | rewrite in Rust | redesign | Navigation is baked into the map document by a tool, not built at match start; the legacy method (a grid from the movement collision) survives as one of the two candidate generators (part 11, R4-NAV-REC1) |
 | GC4 (player weapon state: loadout, switching, reload, spread) | rewrite in Rust | rewrite in Rust (the state machine); loadout: redesign | UPGRADE-SCOPE: a class always comes with its own weapon and other weapons come from drops; carry slots are open (part 18) |
-| GC14 (frag grenades and blast damage) | rewrite in Rust, look brief pending | rewrite in Rust; look brief pending lifted | LOOK_V2 §3 and §7 bring fragmentation back; the sim emits the blast event (position, strength) that ADR 0003 draws; whether fragments deal damage per fragment is a design question (decision map e2) |
+| GC14 (frag grenades and blast damage) | rewrite in Rust, look brief pending | rewrite in Rust; look brief pending lifted | LOOK_V2 §3 and §7 bring fragmentation back; the sim emits the blast event (position, strength) that ADR 0003 draws; whether fragments deal damage per fragment is a design question for Mustafa |
 | GC11, GC12, GC13, GC15 (class abilities, melee, the charged throw and arc preview, bolts) | rewrite in Rust, look brief pending | rewrite in Rust; look brief pending lifted | LOOK_V2 exists; what a player sees of them is ADR 0003's presentation from the sim's events, and the sim half is unchanged (ADR 0003 may list the same rows for their presentation half) |
 
 ## Open questions
@@ -740,11 +742,11 @@ restart).
 - **OQ-0004-1. How is bot behaviour structured?**
   - Why it matters: LOOP_V2 §10 calls the bots' role mix "the biggest prototype risk", and the stress scene needs
     "bots with full AI".
-  - Options: not researched (no finding on a bot AI architecture: decision map h, G10); the research gives the parts it
+  - Options: not researched (no finding on a bot AI architecture); the research gives the parts it
     runs on (cadences, the shared sight pass, the navigation queue, the slot model).
   - Decider: a bot research unit, or the slice 2 plan, with the game-designer; Mustafa for the behaviour set.
   - What decides it: LOOP_V2 §10's behaviours kept "simple and observable", run in the slice 2 local server.
-  - Research ids: none (gap G10); it cites R2-ROOM-REC6, R1-TICK-REC3, R4-LOS-REC2, R4-NAV-REC2.
+  - Research ids: none (a research gap); it cites R2-ROOM-REC6, R1-TICK-REC3, R4-LOS-REC2, R4-NAV-REC2.
 - **OQ-0004-2. Will the entity kinds stay few?**
   - Why it matters: part 1 rests on about a dozen known kinds; many new kinds (deployables, zones, mines) would favour an
     ECS.
@@ -767,7 +769,7 @@ restart).
     legacy buildings already have health, GW20; or another trigger).
   - Decider: Mustafa, with the game-designer (rule 6: no rule beyond LOOK_V2 is designed here).
   - What decides it: a design session on LOOK_V2 §4's places, before slice 4 brings structure damage.
-  - Research ids: none (gap G4); it cites R4-OBST-REC2.
+  - Research ids: none (a research gap); it cites R4-OBST-REC2.
 - **OQ-0004-5. Which weapons drop, and who may take them?** (beyond ADR 0005's carry slots, looted ammo and levelling
   speed)
   - Why it matters: part 18 builds pickups as world entities, but UPGRADE-SCOPE says only "Other weapons come only from
@@ -778,7 +780,7 @@ restart).
     rotating start, nearest first).
   - Decider: Mustafa with the game-designer; ADR 0005 holds the answers as data.
   - What decides it: the in-match upgrade design session.
-  - Research ids: none (gap G13); UPGRADE-SCOPE.
+  - Research ids: none (a research gap); UPGRADE-SCOPE.
 - **OQ-0004-6. What do bots and slot takeovers do with player records?**
   - Why it matters: bots fill slots and humans take over bot slots (R2-ROOM-REC6), so a slot's record can change hands
     mid-match.
@@ -804,3 +806,221 @@ vehicle-driving bots and fall damage (R4-FLOORS-OQ1–OQ3); harvester lanes (R4-
 (R4-OBST-OQ3); offline play at the largest mode (R1-TICK-OQ7, R1-BND-OQ1, critic rank 15); moment rules and thresholds
 (R6-TEL-OQ3); the caps on vehicles and projectiles that replace the stress scene's counts (R2-BUD-OQ5).
 
+## What a spike must prove
+
+Most claims are for one throwaway spike, called here **the sim core spike** (working name; `docs/SPIKE_PLAN.md` gives
+the final names): the sim on one vCPU of the reference server and in Wasm on the minimum laptop, in the stress scene at
+N = 48 (three teams, 16v16v16: 15 big vehicles, 4 of them very large units, 300 live projectiles, up to 8 active
+effects per soldier, one DM_Tri-sized 3D greybox; GLOSSARY.md, §3, lines 397–437), at 30 Hz, with the 60 Hz form run
+where the 60 Hz margin run needs it (ADR 0001 owns that run and how the sim's load reaches it: TICK-60-SETUP). Three
+claims belong to other spikes, named in the table. Every mark below is the research's (cited; all proposed there),
+restated for 30 Hz where the research wrote the 60 Hz form, or marked "proposed" with its reason. No claim here needs a
+person's judgement; the netcode proof test's "look correct" is ADR 0001's.
+
+| # | Claim | Part | Candidate marks (source) | Spike |
+|---|---|---|---|---|
+| S1 | The sim fits the sim step share at N = 48 | 6 | p99 sim step time ≤ 8.3 ms at 30 Hz (≤ 4.2 ms for the 60 Hz margin run); mean, p50, p95, p99 and max reported per N at N = 12, 24, 36, 48 and the N = 64 [headroom](../research/GLOSSARY.md#the-design-point-and-headroom) run; 36,000 ticks per run (20 minutes of game time at 30 Hz, 10 at 60 Hz: arithmetic), 3 runs; each part of the share reported on its own against its ceiling (R1-TICK-REC2 P1, r1-simulation-core.md lines 2044–2053; R1-ECS-REC1 mark 1, lines 1923–1931; GLOSSARY.md lines 53–69) | the sim core spike |
+| S2 | The browser runs the whole sim within the client's sim share | 6 | p99 sim step time ≤ 13.3 ms at 30 Hz in Wasm in a dedicated Worker on the minimum laptop while the page holds 30+ fps on Low for the whole run; Wasm ≤ 2 × native (R1-TICK-REC2 P2, lines 2054–2057; R1-ECS-REC1 mark 1); N for the pass from R1-TICK-OQ7 (a design question), the scale steps reported meanwhile | the sim core spike's sim in the boundary spike's Worker |
+| S3 | Cadences keep the sim step time flat from tick to tick | 4 | p99 sim step time ≤ 2 × mean; sight checks per game second per bot equal within 1 % at 30 Hz and 60 Hz (R1-TICK-REC3, lines 2074–2076) | the sim core spike |
+| S4 | One time representation holds every rate | 4 | with held fire for 60 s of game time, every legacy `fireInterval` and `burstInterval` gives the same shot count at 30 and 60 Hz within 1 shot and within 1 shot of 60 / interval (R1-TICK-REC1, lines 2023–2024), which also meets R1-ABL-REC3's 1 % for the Shabzon (1 shot in 833 is 0.12 %: arithmetic); CD13's Warrior-kills-Conscript time of 0.86 s within one tick (R1-ABL-REC3, lines 2416–2419); a CI check finds no clock read in the step (no `std::time`, no host time import in the Wasm module: R1-TICK-REC1, line 2027); the units-per-tick figure chosen from the rounding report (proposed: the research gives none) | the sim core spike |
+| S5 | Snapshot and restore are cheap and exact | 3 | 0 heap allocations per snapshot after warm-up (a counting global allocator); ≤ 0.2 ms native and ≤ 0.5 ms Wasm at p99 in the stress scene (R1-ECS-REC1 mark 2, lines 1932–1937); a run snapshotted, restored and continued gives the same per-tick state hash as an uninterrupted run over a 10-minute bot match (18,000 ticks at 30 Hz: arithmetic), and serialize → deserialize → serialize is byte-identical (mark 4, lines 1942–1945); whole-world restore plus k = ⌈0.15 s × 30⌉ = 5 ticks of replay within 8 ms p99 in Wasm on the minimum laptop only if ADR 0001's prediction scope keeps it (mark 3, lines 1938–1941) | the sim core spike |
+| S6 | Ids are stable and never stale | 2 | ids survive snapshot and restore unchanged; a despawned id never resolves after its slot is reused (a property test over random spawn and despawn sequences, 10,000 cases); a server snapshot applied on the client maps every id with no lookup table beyond the pools (R1-ECS-REC3, lines 1985–1989) | the sim core spike |
+| S7 | Same build and cross-target identity | 7, 9 | the same seed and input log, run twice on the same build, give the same state hash at every tick for 36,000 ticks (R1-TICK-REC1, lines 2025–2026); bots-only 24v24 (N = 48) and 12v12v12 (N = 36), 10 minutes each (18,000 ticks at 30 Hz), 3 seeds each: 0 mismatching per-tick state hashes between two native runs in separate processes, and 0 against the Wasm runs (R1-DET-REC1, lines 2139–2144; the largest mode is the 24v24 goal under MODES-3 (a), so no third match); the same with the two native processes' std `HashMap` seeds different (R1-ECS-REC2 mark 1, lines 1966–1971); with parry3d's `enhanced-determinism` on, the stress scene gives 0 mismatches between native and Wasm over 10 minutes, and parry3d's cost with the flag on and off is reported with method (R1-DET-REC3, lines 2178–2182, applied to parry3d); at least 10,000 fixed inputs per `libm` function the sim uses give bit-identical outputs on native x86-64, native AArch64 if ADR 0006 picks it, and Wasm in each browser engine; a build check fails on a std transcendental call, `algebraic_*` or `relaxed-simd`; `libm` against std cost reported (R1-DET-REC2, lines 2165–2168); the suite runs these matches with 0 mismatches on every target, catches each injected divergence at the first tick it changes the state, and reports its hashing cost per tick (R1-DET-REC6, lines 2238–2240); the same suite with `simd128` on decides R1-DET-OQ2; `libm`'s accuracy for the aim and sight functions checked against reference values (R1-DET-OQ8, lines 2704–2705) and Wasm's `sqrt` against IEEE in the unit vectors (R1-DET-OQ10, lines 2710–2712) | the sim core spike |
+| S8 | Streams replay exactly and stay where they belong | 8 | the first 10,000 outputs of each stream are identical on native and Wasm; a stream saved mid-match and restored continues identically; muting sound, moving the camera or changing the display frame rate changes no state hash in a recorded match (R1-DET-REC4, lines 2205–2207); the client's predicting state holds 0 bytes of any authority-only stream's state (proposed: SEC-SPREAD (a) and part 8 make this the stream rule's test); ChaCha8's cost per tick reported, which decides whether R1-DET-OQ11 comes back (lines 2713–2717) | the sim core spike |
+| S9 | parry3d plus our own movement is enough | 10 | the six marks of R4-PHYS-REC1 (r4-physics-navigation.md, lines 692–717): movement parity (a 0.55 m step climbed and 0.56 m stopped; the jump apex within 1 mm of the integrated value; 0 tunnelling through a 0.2 m wall in 10,000 random moves at about 13.3 m/s, which is 0.44 m per tick at 30 Hz); movement plus all physics queries ≤ 1 ms native mean with p99 reported, Wasm ≤ 2 × native; 0 per-tick hash mismatches native against Wasm and a byte-identical static BVH; the sim .wasm size with parry3d, with rapier3d and with neither, after wasm-opt and gzip (also R1-ECS-REC1 mark 5, lines 1946–1949, against a bevy_ecs 0.20 stub, and a one-line incremental native rebuild ≤ 10 s); Rapier's controller measured once as the fallback; 0 `Err(Unsupported)` shape pairs. Also R4-PHYS-REC2 (lines 739–743: 20,000-ray parity with the legacy SIM, 0 of 1,200 bot shots more than 1 cm above a ramp, byte-identical queries after a restore, static BVH build ≤ 50 ms native), REC3 (lines 758–760: 0 tunnelling at the fastest projectile speed at 30 and 60 Hz, grenades bounce back in 1,000 of 1,000 throws, identical landing points), REC4 (lines 779–784: 0 ticks with a soldier or wall more than 1 cm inside a vehicle hull over 10 minutes with 48 soldiers) and REC5 (lines 796–798: the marks hold at the far corner of the largest planned map; distance per second within 0.1 %) | the sim core spike |
+| S10 | Baked navigation works and is affordable | 11 | R4-NAV-REC1's six marks (lines 830–841: bake ≤ 1 s native and ≤ 3 s in a browser Worker for each generator; ≥ 99.9 % coverage and 0 unstandable nodes; a 6 m gap stays a route; reachability in the sim crate identical on native and Wasm; 10,000 path queries byte-identical; the generator comparison); R4-NAV-REC2 (lines 859–865: navigation ≤ 5 % of the tick period at p99, 1.67 ms at 30 Hz, at N = 48 and the N = 64 headroom run with a carried uplink cache; no bot waits more than 1 s for a route; ≤ 2 replans per bot per second at p99; a stall rate no worse than legacy's 7.73 %); R4-NAV-REC3 (lines 880–884: 48 bots in a 6 m choke for 10 minutes with 0 deadlocks over 3 s, identical hashes, avoidance ≤ 0.2 ms p99, 0 avoidance pairs across floors); R4-NAV-REC4 (lines 896–897: a Worker build without bots skips the navigation data, its size reported; with bots, local play at the largest mode meets S2) | the sim core spike |
+| S11 | Floors and links are correct by construction | 12 | R4-FLOORS-REC1 (lines 918–923: 0 generated jump links above the integrated reach; each kept link succeeds in 1,000 of 1,000 traversals at 30 and 60 Hz; 0 % of routes need an unreachable surface; drop-downs taken when shorter in ≥ 95 % of 200 trials); R4-FLOORS-REC2 (lines 936–939: separate layer and area ids per floor, no walking through ceilings in 100 of 100 trials, the barracks roof not walkable); R4-FLOORS-REC3 (lines 951–952: a changed `jumpV` without a re-bake is reported stale, 1 of 1) | the sim core spike |
+| S12 | One sight query serves every user | 13 | R4-LOS-REC1 (lines 975–986: 20,000-pair parity with legacy `hasLOS`; 0 of 10,000 pairs see through floors; 0 of 10,000 ramp disagreements; the cost of one segment query and of the full pass at 24v24 and 16v16v16 within its 5 % share, 1.67 ms at 30 Hz; identical hashes); R4-LOS-REC2 (lines 1002–1006: every bot scans at least 4 times per second within the same share); R4-LOS-REC3 (lines 1015–1016: a downward cursor ray onto a ramp lands within 1 cm in 1,000 of 1,000 samples; R2-SYNC-REC8 mark 1 is ADR 0001's) | the sim core spike |
+| S13 | Changing structures and damage stages flip in one tick | 14 | R4-OBST-REC1 (lines 1037–1041: 0 bots stuck over 3 s against a vehicle, ≤ 2 replans per bot per second at p99, identical hashes); R4-OBST-REC2 (lines 1058–1061: route, sight and portal change in the same tick with 0 ticks of disagreement over 1,000 destroy and rebuild cycles; 1,000 traversals after a flip; a flip ≤ 0.1 ms native at p99); the same marks with three stages per structure on the two-floor test building, including a plank link that exists only in the ruin stage, and the bake with every stage still within S10's bake-time mark (proposed: LOOK_V2 §4 names three stages and the research tested two) | the sim core spike |
+| S14 | Bots run the stress scene | 15 | the spike's "bots with full AI" is a stated behaviour set (proposed, since no research defines it: the legacy GN rows' combat behaviour ported, meaning target scans, combat movement, gunfire and route following, plus R4-NAV-REC2's carried uplink cache as a moving shared goal); bot reaction times at N = 48 reported (R2-SYNC-OQ13, r2-netcode.md lines 2952–2954; no mark) | the sim core spike |
+| S15 | The ability, effect and weapon step fits its part | 16 | ≤ 1 ms p99 per tick in the stress scene with 384 active effects, on one vCPU of the reference server and on the minimum laptop in Wasm, 0 heap allocations in steady state (R1-ABL-REC6, r1-simulation-core.md lines 2465–2480); a 120 s scripted scenario with every test ability, 3 seeds, gives byte-identical logs on native and Wasm (R1-ABL-REC3, lines 2416–2419) | the content and ability spike (after the sim core spike) |
+| S16 | The player record behaves as UPGRADE-SCOPE says | 18 | no research mark; proposed (UPGRADE-SCOPE's sentences as checks): over scripted deaths and unit switches, 0 track entries lost or changed; a weapon type's track resumes when the next gun of that type is picked up; every record is empty at the start of every match; pickups keep their ids through snapshot and restore; two claims on one pickup in one tick resolve the same way on native and Wasm (the state hash). test-engineer sets the numbers | the content and ability spike |
+| S17 | The server loop keeps time | 5 | on the reference server (Linux), tick start jitter p99 ≤ 2 ms over 36,000 ticks (20 minutes at 30 Hz); after an injected 200 ms stall, back on schedule within 1 s and never more than 7 ticks in one wake (proposed restatement of the research's 15 at 60 Hz); overrun and dropped-time counters in the metrics (R1-TICK-REC4, r1-simulation-core.md lines 2090–2092) | the netcode proof test (ADR 0001) |
+| S18 | The Worker paces the tick in every browser | 5 | on Chrome, Edge, Firefox and Safari: foreground tick start jitter p99 ≤ 4 ms over 10 minutes; per-frame displacement of a constant-speed unit with a standard deviation ≤ 5 % of its mean on 60, 120 and 144 Hz displays; after 60 s hidden, local play ran no tick and resumes where it stopped, and online the client is back in step within 0.5 s and never runs more than 7 ticks in one frame (proposed restatement of 15 at 60 Hz) (R1-TICK-REC5, lines 2109–2114); the same after more than 5 minutes hidden (R1-BND-OQ2, lines 2724–2727) | the boundary spike (ADR 0002) |
+| S19 | The editor's reach is the sim's reach | 21 | the editor's reach value equals the measured jump apex plus step-up within 1 mm at the shipped tick for `T.jumpV` 11, `T.gravity` 24, `T.stepUp` 0.55 (R1-TICK-REC6, lines 2124–2125) | the sim core spike |
+| S20 | No panic from input or content; recovery online | 20 | zero panics over the fuzzed content corpus (ADR 0005's mark, R1-RR-OQ3) and over fuzzed commands fed to the sim (proposed: part 20's rule needs its own test, the decoders being ADR 0001's); a trap injected into the client's Worker ends in a fresh instance back in step through ADR 0001's resync mark, and the trap reaches error reporting (R6-OBS-REC3) | the sim core spike with the boundary spike |
+
+### Pass marks
+Written by test-engineer (plan step 4).
+
+## Migration plan
+
+In the slice order (SLICE-ORDER), with the netcode proof test before the foundation and the foundation (GLOSSARY §8)
+before slice 1. The legacy game stays frozen and playable throughout; v2 work is additive.
+
+| Phase | Work | Verifiable milestone |
+|---|---|---|
+| 0 | Mustafa and the Advisor approve the drafts | the sign-off line of this record |
+| 1 | Spikes, throwaway in `spikes/` (SPIKE-SCOPE (a)): the netcode proof test first; the sim core spike in parallel with it, its sim or its measured step times feeding the 60 Hz margin run as ADR 0001 sets (TICK-60-SETUP); the boundary spike; then the content and ability spike | S1–S14, S19 and S20 recorded in this record; S17 from the netcode proof test; S18 from the boundary spike; S15 and S16 from the content and ability spike; option C or B, the navigation generator, the units per tick and the hash function chosen from the numbers |
+| 2 | The foundation (ADR 0002 builds it): the sim crate in the workspace with the hash-map ban and the float rules as lints, a replay runner, and the first recording in CI | an empty scene runs through the full stack; its per-tick hashes match natively twice and in Wasm |
+| 3 | Slice 1, move & shoot: soldier table and ids, the tick and its loops, movement on parry3d against a greybox map document, hitscan and weapons from data in integer time, the local server in the Worker; every match input-driven and recorded | S4, S5, S6 and S9 hold on the real crate; the determinism suite is green on slice 1 recordings on every target |
+| 4 | Slice 2, bots and three teams played locally: the bake and the navigation runtime, floors and links, the sight query and pass, avoidance, bot behaviour (after OQ-0004-1), cadences; the Worker runs the whole local match | S2, S3, S10–S12 and S14 hold at the slice's N; reachability on the greybox runs in CI |
+| 5 | Slice 3, online: the native room loop, authority-only streams kept off the client, the restore that ADR 0001's prediction scope uses, recovery after a trap | S17 and S8's last mark on the real crate; S20's online recovery; the netcode proof test's marks rerun on the real sim |
+| 6 | Slice 4, the loop: economy and objective phases, the ability system's execution, player records, pickups and offers (after OQ-0004-5, OQ-0004-6 and ADR 0005's upgrade questions), events and moments, structure states and damage stages (after OQ-0004-4) | S13, S15 and S16 on the real crate; a recorded full match replays with identical per-tick hashes on every target |
+| 7 | Slice 5, Octopon-3 and Editor v2: the bake in the editor's Test and on save; the validation panel's reach, reachability and 6 m gap checks from the sim crate; tiles only if S10's bake time fails | S19 and S10's gap and reachability marks; the panel's results equal CI's on native and Wasm |
+| 8 | Slice 6, scale to 48: the stress scene on the real sim at N = 12, 24, 36, 48 and the N = 64 headroom run; the 60 Hz margin run if ADR 0001 schedules it | S1 on the real crate: p99 sim step time ≤ 8.3 ms at N = 48, 3 runs per build |
+
+## Test plan
+
+- **The determinism suite** (part 9) on every sim change, with ADR 0002's tools (R5-TEST-REC2): recorded matches run
+  natively twice in separate processes, as Wasm in Node.js, and as Wasm in Chromium, Firefox and WebKit, with real
+  Safari through its WebDriver; a small gate set on every change and a nightly 10-minute bot match; the first mismatch
+  reported with a field-level diff; the injected-divergence tests.
+- **Unit vectors:** every `libm` function the sim uses (at least 10,000 inputs each), every random stream (its first
+  10,000 outputs) and the sim's own sampling functions, on the same targets.
+- **Property tests:** ids over random spawn and despawn sequences (10,000 cases); snapshot fidelity (restore and
+  continue against an uninterrupted run); the time representation (random durations converted and accumulated keep the
+  fire-rate mark); player records over random deaths, switches and pickups.
+- **Port-parity fuzzes against the legacy SIM:** 20,000 random rays (R4-PHYS-REC2) and 20,000 sight pairs
+  (R4-LOS-REC1).
+- **Fuzzing for panics:** commands into the sim, and content into ADR 0005's loader, with zero panics as the mark.
+- **Benchmarks:** sim step time per part, on one vCPU of the reference server and in Wasm on the minimum laptop; mean,
+  p50, p95, p99 and max; 3 runs per build, with the method stated (the bench tool is ADR 0002's); a counting allocator
+  for heap allocations per tick.
+- **Soak:** the stress scene for 36,000 ticks (20 minutes at 30 Hz), the sim step share and memory recorded.
+- **Navigation checks in CI on every map change:** bake time, coverage, reachability from every spawn to every goal,
+  gaps under 6 m, a stale-bake check.
+- **Network simulation** (latency, jitter, loss) belongs to ADR 0001's tests; the sim meets it in the trap-recovery and
+  prediction-restore tests, run under ADR 0001's network profiles.
+- **Playtests:** slice 2's local matches with bots, with LOOP_V2 §11's evidence (objective counters, at least 3 runs per
+  build).
+
+## Rollback
+
+- **Before acceptance** (the spike is throwaway, so nothing to undo in the game): a failed claim sends this record back
+  to Mustafa and the Advisor with its numbers, and the measured alternative takes its place:
+  - our own movement fails parity or cost: option B, Rapier's controller over the same static world, measured in the
+    same spike;
+  - parry3d lacks a needed shape pair: the pair is listed, and its query is written by us (option D for that pair) or
+    option B is taken;
+  - neither navigation generator passes: the legacy grid, ported and layered (option D of Q5), as the generator, with
+    the same runtime;
+  - the sim step share fails at N = 48: R1-TICK-REC2's last branch, "back to the drafts", with parallelism inside a
+    match (R1-ECS-OQ4) as the measured candidate;
+  - cross-target identity fails and cannot be fixed: same-build reproducibility stays required (level B), the client
+    is corrected more often, and fixed point comes back only under R1-DET-REC7's revisit rule;
+  - the third damage stage fails S13: two baked states, as the research tested, and the third waits for Mustafa
+    (OQ-0004-4).
+- **After acceptance:** each change lands as its own change-set (CLAUDE.md), so backing out is a revert; the physics
+  code behind one module, the navigation runtime behind its queries and the stream kinds in one table keep each swap
+  local; recorded matches and their per-tick hashes show whether a rollback restored the earlier behaviour.
+
+## Appendix A: research dispositions
+
+One row per research id this record owns (82 ids, the owner list of the drafts' id table).
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-ECS-REC1 | changed: marks restated at 30 Hz (TICK-30); its Rapier reasons and mark 5 replaced by R4-PHYS-REC1 (mark 4: size with parry3d, rapier3d or neither); mark 3 kept only if ADR 0001's prediction scope needs whole-world replay | parts 1 and 3; S1, S5, S9 |
+| R1-ECS-REC2 | adopted | parts 1 and 9; S7 |
+| R1-ECS-REC3 | adopted | part 2; S6 |
+| R1-ECS-REC4 | rejected: under R4-PHYS-REC1 no Rapier sets are in the state; it returns only if option B wins the fallback measurement | parts 3 and 10 |
+| R1-TICK-REC1 | changed: one time representation with R1-ABL-REC3 (integer sub-tick units, remainders carried); its 36,000 ticks read as 20 minutes of game time at 30 Hz | part 4; S4, S7 |
+| R1-TICK-REC3 | adopted | part 4; S3 |
+| R1-TICK-REC4 | changed: catch-up bound 0.25 s of game time, 7 ticks at 30 Hz (proposed; 15 is the 60 Hz form); 36,000 ticks are 20 minutes at 30 Hz | part 5; S17 |
+| R1-TICK-REC5 | changed: at most 7 ticks per frame at 30 Hz (proposed; 15 is the 60 Hz form); the page reads ADR 0002's block, not shared memory (R1-XU-OQ3 is ADR 0002's); "offline" reads "local play" (SLICE-ORDER) | part 5; S18 |
+| R1-TICK-REC6 | adopted | part 21; S19 |
+| R1-DET-REC1 | changed: the third match drops, since the largest mode is the 24v24 goal (MODES-3 (a)); 10 minutes are 18,000 ticks at 30 Hz | part 7; S7 |
+| R1-DET-REC2 | changed: f32 fixed (R4-PHYS-REC5); the FMA build rules of R1-RR-OQ1 added | part 7; S7 |
+| R1-DET-REC3 | changed: the flag is parry3d's `enhanced-determinism`, not Rapier's (R4-PHYS-REC1; critic rank 3) | parts 7 and 10; S7 |
+| R1-DET-REC4 | changed: every stream is authority-only unless ADR 0001's prediction scope draws from it; the offers stream is authority-only; raw output mapped by the sim's own functions (R1-DET-OQ5) | part 8; S8 |
+| R1-DET-REC5 | adopted | part 9 |
+| R1-DET-REC6 | adopted | part 9; S7 (its tools are ADR 0002's) |
+| R1-DET-REC7 | adopted | part 7 |
+| R1-ABL-REC3 | adopted (one representation with R1-TICK-REC1) | parts 4 and 16; S4, S15 |
+| R1-ABL-REC6 | adopted | parts 6 and 16; S15 |
+| R1-ECS-OQ1 | spike: the sim core spike records the size (S9); the budget is ADR 0002's (R1-RR-OQ5) | part 1 |
+| R1-ECS-OQ2 | answered: settled at the R1 fix step; `clone_from` written by hand | part 3 |
+| R1-ECS-OQ4 | spike: the sim core spike (S1); one thread per match unless S1 fails at N = 48 | part 1 |
+| R1-ECS-OQ5 | answered: moot with no Rapier state; R1-ECS-REC4's test runs only if option B wins | parts 3 and 10 |
+| R1-ECS-OQ6 | answered: the decision does not wait for the unread Overwatch talk; OQ-0004-2's revisit trigger carries the risk it guards | part 1 |
+| R1-ECS-OQ7 | open: OQ-0004-2 | part 1 |
+| R1-TICK-OQ2 | spike: the boundary spike (S18), stated once with R1-BND-OQ2 | part 5 |
+| R1-TICK-OQ5 | spike: the sim core spike (S1, S2); the [server tick time](../research/GLOSSARY.md#server-tick-time) is the netcode proof test's (ADR 0001) | part 6 |
+| R1-TICK-OQ9 | answered: no substeps for kinematic, swept vehicles at 30 Hz (R4-PHYS-REC4) | part 10 |
+| R1-DET-OQ1 | spike: the sim core spike (S7: parry3d's flag cost) | part 7 |
+| R1-DET-OQ2 | spike: the sim core spike (S7: the suite with `simd128` on); off until then | part 7 |
+| R1-DET-OQ3 | answered: f32, up to a map 2 km across (R4-PHYS-REC5) | part 7 |
+| R1-DET-OQ4 | answered: it matters only if NaN enters state, which part 7 forbids; the suite's browser runs check it | part 7 |
+| R1-DET-OQ5 | answered: raw ChaCha8 output mapped by the sim's own sampling functions, with pinned test vectors | part 8 |
+| R1-DET-OQ8 | spike: the sim core spike (S7: reference values for the sim's `libm` functions) | part 7 |
+| R1-DET-OQ10 | spike: the sim core spike (S7: Wasm's `sqrt` in the unit vectors) | part 7 |
+| R1-DET-OQ11 | spike: the sim core spike (S8: ChaCha8's cost); the question returns only if the cost asks for a fallback | part 8 |
+| R1-BND-OQ2 | spike: the boundary spike (S18), stated once with R1-TICK-OQ2 | part 5 |
+| R1-ABL-OQ5 | answered: f32 under part 7's rules, with a fixed aggregation order per attribute | parts 7 and 16 |
+| R1-ABL-OQ7 | answered: under TICK-30 no legacy fire interval is shorter than a tick; the loader's rounding report flags any future one | part 4 |
+| R1-ABL-OQ10 | answered: active effects are rows in an ordered pool on their target | part 1 |
+| R1-XU-OQ1 | answered: settled by the glossary (one stress scene; one server tick budget with its shares) | part 6 |
+| R1-XU-OQ5 | answered: settled at the R1 fix step (the std `HashMap` seed is per instance) | part 9 |
+| R1-XU-OQ6 | answered: settled at the R1 fix step (both articles are tier "other"); nothing here depends on it | part 9 |
+| R1-XU-OQ7 | answered: one representation, one mark | part 4; S4 |
+| R1-XU-OQ11 | answered: no; `dt` is one constant with the same bits on every target, and timers count integer units; 64 Hz is R1-TICK-OQ1, ADR 0001's | part 7 |
+| R1-XU-OQ12 | answered: each question stated once: hidden tabs here (S18), the reference hardware with ADR 0003 and ADR 0006, offline play a design question | part 5 |
+| R1-RR-OQ1 | answered: baseline x86-64, no `+fma` or `-C target-cpu=native`, glam's `scalar-math`, native AArch64 in the hash test before ARM hosts; S7 proves it | part 7 |
+| R1-RR-OQ3 | answered: no panic reachable from input or content; online, the Worker restarts and resyncs; local play is OQ-0004-7 | part 20; S20 |
+| R1-XT-OQ2 | answered: the list of R1 items that assumed Rapier, and what each becomes | part 10 |
+| R1-XT-OQ12 | answered: this record owns the restart; ADR 0001 the resync path; ADR 0002 the panic strategy | part 20 |
+| R2-SYNC-OQ13 | answered: bot reaction is tuning data the game-designer sets; S14 reports it at N = 48 | part 15 |
+| R2-XT-OQ12 | answered: as R1-XT-OQ12 | part 20 |
+| R4-PHYS-REC1 | adopted | part 10; S9 |
+| R4-PHYS-REC2 | adopted | parts 3 and 10; S9 |
+| R4-PHYS-REC3 | adopted | part 10; S9 |
+| R4-PHYS-REC4 | adopted (N = 48, MODES-3 (a)) | part 10; S9 |
+| R4-PHYS-REC5 | adopted | part 7; S9 |
+| R4-NAV-REC1 | adopted | parts 11 and 21; S10 |
+| R4-NAV-REC2 | adopted | part 11; S10 |
+| R4-NAV-REC3 | adopted (N = 48, MODES-3 (a)) | part 11; S10 |
+| R4-NAV-REC4 | changed: SLICE-ORDER makes local play with bots a slice 2 need, so the browser's local-server build carries navigation from slice 2 | part 11; S10 |
+| R4-FLOORS-REC1 | adopted | part 12; S11 |
+| R4-FLOORS-REC2 | adopted | parts 12 and 14; S11 |
+| R4-FLOORS-REC3 | adopted | part 12; S11 |
+| R4-LOS-REC1 | adopted | part 13; S12 |
+| R4-LOS-REC2 | adopted | part 13; S12 |
+| R4-LOS-REC3 | adopted | part 13; S12 |
+| R4-OBST-REC1 | adopted | part 14; S13 |
+| R4-OBST-REC2 | changed: from two baked states to one per damage stage the map declares (three for LOOK_V2 §4), each structure's stages baked over its own nodes; the third stage is a proposed mark | part 14; S13 |
+| R4-OBST-REC3 | adopted | part 14 |
+| R4-PHYS-OQ2 | spike: the sim core spike (S9: R4-PHYS-REC1 marks 2, 4 and 5) | part 10 |
+| R4-PHYS-OQ3 | spike: the sim core spike (S9 mark 3; S7's suite) | part 10 |
+| R4-PHYS-OQ4 | open: OQ-0004-3 | part 10 |
+| R4-PHYS-OQ5 | answered: no dynamics until a VISION_V2 §6 item asks; the physics code sits behind one sim module | part 10 |
+| R4-NAV-OQ1 | spike: the sim core spike (S10: R4-NAV-REC1 marks 1–6) | part 11 |
+| R4-NAV-OQ2 | spike: the sim core spike (S10: rerecast built for the browser Worker and compared) | part 11 |
+| R4-NAV-OQ3 | spike: the sim core spike (S10: R4-NAV-REC2's marks at N = 48 and the N = 64 headroom run) | part 11 |
+| R4-NAV-OQ4 | answered: polyanya is not used at run time; rust-reviewer audits its maps before any later adoption | part 11 |
+| R4-LOS-OQ5 | spike: the sim core spike (S12: R4-LOS-REC1 mark 4) | part 13 |
+| R4-OBST-OQ4 | spike: the sim core spike (S10 and S13: a moving hull as an obstacle polygon or as circles) | part 11 |
+| R4-XT-OQ2 | answered: as R1-XT-OQ2 | part 10 |
+| R5-XT-OQ1 | answered: as R1-XT-OQ2 | part 10 |
+| R6-XT-OQ6 | answered: as R1-XT-OQ12 | part 20 |
+
+## Sources
+
+Research files at commit 9e7db28 (unchanged in this PR), and the sections read for this record:
+- `docs/research/r1-simulation-core.md`: header and TL;DR (lines 1–67); Findings R1-BND-F19 (lines 1019–1028) and
+  R1-DET-F14 (lines 679–683); Options, units `ecs`, `tick`, `determinism` (lines 1626–1730); Recommendations, units
+  `ecs`, `tick`, `determinism` (lines 1884–2248) and `abilities` (lines 2340–2480); Open questions, units `ecs`, `tick`,
+  `determinism` (lines 2608–2717), R1-BND-OQ2 (lines 2724–2727), R1-ABL-OQ5 to OQ10 (lines 2770–2784), the conflicts
+  between units (lines 2830–2912), the rust-reviewer risks (lines 2914–2961), the cross-topic questions (lines
+  3011–3112).
+- `docs/research/r4-physics-navigation.md`: header and TL;DR (lines 1–50); Findings, Rapier and parry3d (lines 53–233),
+  navigation (lines 296–408), obstacles (lines 536–584); Options (lines 585–662); Recommendations (lines 663–1076); Open
+  questions, the shared question and the cross-topic questions (lines 1078–1214); wave-1 items R4 changes (lines
+  1216–1237); the verifier's spot-check summary (lines 1292–1310).
+- `docs/research/r2-netcode.md`: R2-SYNC-REC3 (lines 2068–2105), R2-INT-REC2 and REC3 (lines 2445–2483),
+  R2-ROOM-REC2 (line 2762), R2-ROOM-REC6 (lines 2842–2856), R2-SYNC-OQ13 (lines 2952–2954), R2-XT-OQ12 (lines
+  3395–3398).
+- `docs/research/r5-toolchain-quality.md`: R5-LAYOUT-REC2 (lines 1170–1193), R5-LAYOUT-REC4 (lines 1206–1218),
+  R5-RUSTLINT-REC2 (lines 1321–1339), R5-TEST-REC2 (lines 1412–1430), R5-XT-OQ1 (lines 1963–1970).
+- `docs/research/r6-infrastructure.md`: R6-OBS-REC3 (lines 754–768), R6-TEL-REC1 (lines 784–811), R6-XT-OQ6 (lines
+  1021–1024).
+- `docs/research/GLOSSARY.md`: §1 tick budgets (lines 46–264), §2 the largest mode and headroom (lines 335–374), §3 the
+  stress scene and its counts (lines 395–482), §4 the authority, the prediction scope, the stream kinds and the state
+  hash (lines 483–559), §7 the hash-map ban (lines 727–742), and §8 as the session appends it (the foundation, the
+  netcode proof test, the 60 Hz margin).
+- `docs/research/README.md` (the topic statuses).
+
+Design documents and records: `docs/VISION_V2.md` (§3, §4, §6), `docs/LOOP_V2.md` (§2–§11), `docs/EDITOR_V2.md` (§2,
+§3, §5), `docs/LOOK_V2.md` (§3, §4, §8), `docs/STATUS.md` ("Decisions pending"; "Open bugs and risks"),
+`docs/LEGACY_INVENTORY.md` (rows CS1–CS11, GW9, GW13–GW17, GW20, GC1–GC5, GC7, GC11–GC17, GN4–GN14, GE8, GP9, GP13,
+GP14, CM11, CM13, CD4–CD14, TL13–TL15), `docs/adr/0000-template.md`.

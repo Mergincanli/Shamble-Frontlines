@@ -104,7 +104,8 @@ secret and repository setting named below is Mustafa's to create, never a sessio
   mean), kill sources (row GE15: a grenade kill counts for the held gun) and damage contribution (row GC18: assists
   never counted) (r6-infrastructure.md, Findings §4, legacy facts, lines 380–388).
 - The three.js CDN tag has no integrity hash and no CSP (row PG19; STATUS "no SRI/CSP on the three.js CDN tag
-  (belongs with hosting, ADR-001)").
+  (belongs with hosting, ADR-001)"). STATUS's old ADR-001 entry lists hosting among its subjects; the v2 drafts
+  replace ADR-001..003, and hosting is decided here (decision map part j, J2: items ADR-001 and CDN-SRI).
 
 ## Decision
 
@@ -124,7 +125,8 @@ account, payment, secret and repository setting below is Mustafa's to create.
    production and the preview header set on previews; COOP and COEP appear only on a preview built with
    [the isolation flag](../research/GLOSSARY.md#preview-isolation-and-the-isolation-flag) on, and the preview Mustafa
    checks is built with it off (R5-XQ-OQ3, settled 2026-10-30: r5-toolchain-quality.md, Open questions, R5-XQ-OQ3,
-   lines 1899–1910). The content bundle is served with an immutable cache header (R1-DATA-REC6; interface I-6). Every
+   lines 1899–1910). The content bundle is served with an immutable cache header (R1-DATA-REC6, as R6-HOST-REC1's mark names it, r6 lines
+   641–642; interface I-6). Every
    served file, authored models included (LOOK_V2 §8), stays under 25 MiB, Pages' per-asset limit (r6-infrastructure.md,
    Findings §1, R6-HOST-F3, lines 72–79). three.js is bundled from npm by Vite and served from the client host, so v2
    has no CDN script tag (the STATUS item "no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)"; inventory
@@ -143,7 +145,7 @@ account, payment, secret and repository setting below is Mustafa's to create.
    R5-PREV-REC5, lines 1642–1650). Every multiplayer preview, which talks to [the staging game server](../research/GLOSSARY.md#the-staging-game-server), is behind the
    access wall from the first one (PREVIEW-WALL (a)). The access wall is the client host's access policy, limited to
    Mustafa's Cloudflare account, or Cloudflare Access; Mustafa logs in once per Brave session (R5-PREV-REC5;
-   R5-PREV-F12, F14, r5 lines 838–858). Pages' policy restricts "project deployments" as a whole (R5-PREV-F12, lines
+   R5-PREV-F12, F14, r5 lines 838–858). Pages' policy restricts "project deployments" as a whole (R5-PREV-F12, r5 lines
    838–844), so from the first multiplayer preview every preview of the project sits behind the wall (proposed interim
    position; whether to split them is OQ-0006-4). The policy covers previews, not the production domain
    (r6-infrastructure.md, Findings §1, R6-HOST-F4, lines 80–86, inferred), so the game itself stays public.
@@ -176,7 +178,7 @@ account, payment, secret and repository setting below is Mustafa's to create.
 5. **Game servers and the reference server.** Hetzner Cloud in one EU location; one room per process (R2-ROOM-REC2,
    ADR 0001's) under a small supervisor per VM; no load balancer on the game path, since the lobby hands out host and
    port; each VM has its own public IPv4 and IPv6 address. The firewall opens one UDP range for WebTransport and one
-   TCP range for the WebSocket fallback (R2-TRN-REC3), plus the one rule part 9's metrics path may need, and nothing
+   TCP range for the WebSocket fallback (R2-TRN-REC3, as R6-HOST-REC2 says, r6 lines 648–649), plus the one rule part 9's metrics path may need, and nothing
    else; Hetzner's firewall is stateful, drops all inbound traffic no rule allows and costs nothing
    (r6-infrastructure.md, Findings §1, R6-HOST-F18, lines 169–174). VMs stay up and rooms start and end as processes
    inside them, because billing rounds up to the hour (R6-HOST-F17). The server CPU is x86-64 (the dedicated plans are
@@ -248,7 +250,7 @@ account, payment, secret and repository setting below is Mustafa's to create.
      (r6-infrastructure.md, Options §2, start scenario, lines 466–480).
    - *Goal* (12v12v12 or 24v24; A-5: a peak of 20 rooms of 48 humans, an average of 6 rooms, the fleet sized to the peak
      plus one VM for draining): at R6's 8 rooms per VM, about 361 EUR (a fixed CCX23 fleet of 4 VMs) or about 238 EUR
-     (a fixed base plus VMs added by the hour, K2), each + 19–24 USD + Sentry's paid plan, match records included (lines
+     (a fixed base plus VMs added by the hour, K2), each + 19–24 USD + Sentry's paid plan, match records included (r6 lines
      482–494). **Changed from R6-COST-REC1:** at the 4 rooms per VM that A-2 names "the case to budget" until
      R2-ROOM-REC2 marks 1 and 2 pass (r6 lines 516–522), the fixed fleet is ceil(20 ÷ 4) + 1 = 6 CCX23, 6 × 86.49 = 518.94
      EUR, so about 534 EUR with the staging VM and the match records (518.94 + 8.99 + 6.49 = 534.42 EUR) + 19–24 USD +
@@ -275,7 +277,7 @@ account, payment, secret and repository setting below is Mustafa's to create.
    costs: GLOSSARY §8, the foundation (CI gate v2) only.
 9. **Logs and metrics.** Each room process writes `tracing` JSON lines to standard output; the supervisor adds VM and
    room ids and ships them; no line holds a token, a guest secret or a raw id (salted hashes where an id is needed, as
-   R2-ROOM-REC3 mark 3 says) (r6-infrastructure.md, Recommendations §3, R6-OBS-REC1, lines 729–738). Metrics use the
+   R2-ROOM-REC3 mark 3 says, r2 lines 2807–2809) (r6-infrastructure.md, Recommendations §3, R6-OBS-REC1, lines 729–738). Metrics use the
    `metrics` facade with `metrics-exporter-prometheus`, scraped by a Prometheus on the staging VM to start, Grafana
    Cloud's EU stack once its ingestion path is read (OQ-0006-8); labels are bounded (VM, room slot 0–7, mode id,
    transport), never a player or match id; the first metrics are the [server tick time](../research/GLOSSARY.md#server-tick-time) histogram, overruns and dropped
@@ -366,8 +368,8 @@ account, payment, secret and repository setting below is Mustafa's to create.
     | B5 | The lobby's token-signing keys (R2-ROOM-OQ2, R2-ROOM-OQ9) | how and where they are stored | only in the lobby host's environment, added by Mustafa | 0001 (scheme); 0006 (storage) |
     | B6 | The `textContent` rule (R5-TSLINT-OQ5) | which lint rule enforces it | CLAUDE.md's code rule ("Dynamic or player-provided text: `textContent`, never `innerHTML`") holds by review | 0002 |
     | B7 | Anti-cheat basics: the view-time offset and aim log (R2-SYNC-REC5), Origin-less requests tagged (R2-TRN-REC1), the reader-client and byte-audit tests (R2-INT-REC2, REC5) | the detection policy | built as ADR 0001 designs them; no detection policy | 0001 |
-    | B8 | R1-DATA-REC7's allow list and fuzz corpus; COOP as an XS-Leaks guard (R1-BND-REC5) | whether they suffice | as ADR 0005 and ADR 0002 design them; production non-isolated at the start | 0005; 0002 |
-    | B9 | The tokens CI holds (the client host's deploy token, the Sentry upload token) and a multiplayer preview's binary delivery (R6-XT-OQ4) | their scope and handling | each in its own GitHub environment, added by Mustafa (below) | 0002 (the jobs); 0006 (the scope) |
+    | B8 | R1-DATA-REC7's allow list and fuzz corpus, with the server-side map validation the STATUS item SEC-MDL-2 asks for (`__proto__` through `envMerge`); COOP as an XS-Leaks guard (R1-BND-REC5) | whether they suffice | as ADR 0005 and ADR 0002 design them (SEC-MDL-2 is ADR 0005's: decision map part j, J2); production non-isolated at the start, so the isolation-only items wait (OQ-0006-12) | 0005; 0002 |
+    | B9 | The tokens CI holds (the client host's deploy token; the Sentry upload token, "a token: Mustafa's secret", r6 line 1082) and a multiplayer preview's binary delivery (R6-XT-OQ4) | their scope and handling | each held only by the job that needs it, in a GitHub environment, as R5-PREV-REC1 does for the deploy token (proposed for the others); added by Mustafa (below) | 0002 (the jobs); 0006 (the scope) |
     | B10 | The staging VM runs pull-request-built native code (R6-XT-OQ4, "PR-built native code on a VM") beside the Prometheus store (part 9) | whether they share a VM | they share it: fork pull requests get no preview (R5-PREV-REC1), so only this repository's pull requests run there | 0006 |
     | B11 | Self-hosted CI runners (R3-MEASURE-OQ2) | whether any is allowed | none (part 8) | 0006 |
 
@@ -548,7 +550,7 @@ Researching it before this record, or leaving it as one shared question: settled
   no player reaches a game server before then except through a multiplayer preview behind the access wall (part 2).
 - **What breaks if a provider is down** (inferred from the parts above, not measured): Cloudflare down, no new client
   or preview loads; Hetzner Cloud down, no online match runs, while local play with bots still runs in the Worker
-  (SLICE-ORDER condition 1); object storage down, records wait on the VM's disk and upload later (R6-TEL-REC2, lines
+  (SLICE-ORDER condition 1); object storage down, records wait on the VM's disk and upload later (R6-TEL-REC2, r6 lines
   817–818); Sentry or Grafana down, reports and metrics are lost for that time and the game runs on.
 
 ## Consequences
@@ -666,7 +668,7 @@ Researching it before this record, or leaving it as one shared question: settled
 - **OQ-0006-8. What do Sentry and Grafana really cost, and how do logs and metrics reach Grafana Cloud?**
   - *Why it matters:* the goal budget names "Sentry's paid plan" without a price, and M2 waits on the ingestion path.
   - *Options:* Sentry's Developer plan or a paid plan (base prices on sentry.io, outside the allow list; whether its
-    retention can be set); Grafana Cloud Free under 10k series, or Pro at 19 USD plus usage (R6-COST-F1, F2, F3, lines
+    retention can be set); Grafana Cloud Free under 10k series, or Pro at 19 USD plus usage (R6-COST-F1, F2, F3, r6 lines
     219–235).
   - *Decider:* Mustafa, with a read of sentry.io/pricing before he creates the Sentry organization; a read of
     Grafana's ingestion docs if M2 is wanted.
@@ -693,7 +695,7 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Options:* confidence intervals per cell and a minimum match count; a shipped game's published method, if one is
     found.
   - *Decider:* test-engineer and the game-designer, before the first tuning pass.
-  - *What decides it:* a statistics source, and a transcript or paper on an allowed domain (R6-TEL-OQ1, OQ5, lines
+  - *What decides it:* a statistics source, and a transcript or paper on an allowed domain (R6-TEL-OQ1, OQ5, r6 lines
     910–912 and 920–922).
   - *Carries:* R6-TEL-OQ1, R6-TEL-OQ5.
 - **OQ-0006-12. If production isolation is ever adopted: embeds, cross-origin popups, CORP and the login flow.**
@@ -735,11 +737,13 @@ and 3:
 
 **2. This record's operations marks inside the netcode proof test** (ADR 0001's spike, on the reference server; its
 precondition is OQ-0006-1). They prove parts 5, 7, 8 and 9:
-- rooms per VM: on the CCX23 and on the CX33, the number of rooms of 48, 36 and 18 players that run as separate
-  processes with each room's server tick p99 within 10 % of the single-room figure, over 20 minutes, repeated at 3
-  times of day on the shared host (r6-infrastructure.md, R6-HOST-REC2's mark, lines 667–671; R6-COST-REC1's mark, lines
-  714–717; R2-ROOM-REC2 mark 2, r2-netcode.md lines 2775–2782, ADR 0001's test). This replaces A-2 and fixes part 8's
-  goal budget (R6-COST-OQ1);
+- rooms per VM: on the CCX23 and on the CX33, 8 rooms of 48 players (bots) as 8 processes, each room's server tick p99
+  within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day on the shared host
+  (r6-infrastructure.md, R6-HOST-REC2's mark, lines 667–671; R2-ROOM-REC2 mark 2, r2-netcode.md lines 2775–2782, ADR
+  0001's test); and rooms per VM measured on both machines at 48, 36 and 18 players (R6-COST-REC1's mark, r6 lines
+  714–717), counted as the most rooms for which R2-ROOM-REC2 marks 1 and 2 still hold (the counting rule is proposed
+  here, so the figure means the same on both machines). This replaces A-2 and fixes part 8's goal budget
+  (R6-COST-OQ1);
 - WebTransport over UDP and WebSocket over TCP reach the VM through the firewall from all four browsers; a VM with no
   rule for a port drops it (negative test) (R6-HOST-REC2's mark); and the metrics path part 9 picks (scrape or push,
   R6-OBS-F4) works with only the rule it needs (proposed: the negative test extended to that rule);
@@ -823,7 +827,7 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
 - **Telemetry** (slice 4): in 30 bot matches across 3 modes (2 teams, 3 teams, and 24v24), 100 % write a record before
   Closed; every kill event names a source id that resolves in the content set of the record's hash; the points total
   recomputed from events equals the final points in 100 % of records; recording adds under 1 % to server tick p99 and
-  0 allocations per tick after warm-up; a 24v24 record is at most 1 MB uncompressed (R6-TEL-REC1's mark, lines
+  0 allocations per tick after warm-up; a 24v24 record is at most 1 MB uncompressed (R6-TEL-REC1's mark, r6 lines
   807–811, at N = 48); with object storage unreachable for 1 hour, 0 records are lost and all upload within 10 minutes
   of recovery; a record of schema version n is read by the script for version n + 1; a room killed with SIGKILL
   mid-match leaves a stub record marked incomplete (R6-TEL-REC2's mark, r6 lines 824–827); the analysis script reproduces

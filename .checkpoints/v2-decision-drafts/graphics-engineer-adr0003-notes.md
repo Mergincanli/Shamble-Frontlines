@@ -34,3 +34,7 @@ R3-WGPU-F1 67-71; R3-WGPU-F2 73-76; R3-WGPU-F3 78-83; R3-WGPU-F4 85-89; R3-WGPU-
 - Draft: Trade-off analysis, Consequences (incl. inventory rows table) written (20:15 CET). Next: Open questions (check map j done), What a spike must prove, Migration, Test, Rollback, Appendix A, Sources.
 - Draft: Open questions OQ-0003-1..15 written. Next: What a spike must prove.
 - Draft: What a spike must prove, Migration plan, Test plan, Rollback written (20:45 CET). Next: Appendix A, Sources.
+- Draft: Appendix A (71 rows: adopted 23, changed 2, answered 15, open 12, spike 19) and Sources written (21:00 CET). DRAFT COMPLETE pending self-check. Next: self-check pass (glossary terms, 'headroom', citations), then claims ledger, then 0005 section + ledger.
+- Self-check done: Appendix ids == map's 71; no 'headroom'; no retire-exact phrases; 120 R3 line citations in range. Next: ADR 0003 claims ledger (file graphics-engineer-adr0003-claims.md), tiers: verified = verifier-table R3 findings + R1/R2 recs; source-to-check = other findings, legacy facts, R4/R6 recs, research-absence greps; proposed mark = R3 rec numbers.
+- Ledger 0003 written: 265 rows (verified 44, source-to-check 90, arithmetic 10, settled 44, design doc 13, proposed 61, restating 3). Next: ADR 0005 asset section + its ledger (21:20 CET).
+- 0005 asset section written (OQ-0005-AS1..AS6; Appendix row R3-CHAR-OQ3 -> AS6). Next: its ledger.

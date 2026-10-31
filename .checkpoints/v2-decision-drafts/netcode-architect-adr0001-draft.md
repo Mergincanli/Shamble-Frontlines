@@ -403,3 +403,665 @@ server in the browser. The parts:
     R2-SYNC-REC9 (48 clients for 30 minutes), R2-TRN-REC1 and R2-TRN-REC3 (both transports: interop, load, hostile
     input), R2-ROOM-REC2 (a room holds its tick; memory per room) and R1-TICK-REC2's P1 and P3, with R2-SYNC-REC3's and
     R2-SYNC-REC5's marks for the one human client. *Need:* GLOSSARY §8 (the netcode proof test); VISION_V2 §6.1.
+
+### Components and data flow
+```
+ Browser                                                     | Game server VM (ADR 0006: supervisor, firewall)
+ page (TypeScript)        Worker (Rust sim crate as Wasm)    | room process (native Rust, one per match)
+ ---------------------    -------------------------------    | ------------------------------------------------
+ input, camera, draw  --> per-tick command + cursor ray      |  network I/O runtime (async, other threads):
+ HUD, audio (ADR 0003)    client endpoint:                   |   WebTransport on quinn | WebSocket (tokio-
+       ^                   - command builder + aim ray cast  |   tungstenite) -> decode, check sizes, bounded
+       |                   - prediction + replay (part 4)    |   per-client queues; encode -> non-waiting send
+       |                   - snapshot decode, ack            |  tick thread (30 Hz, ADR 0004's loop):
+       |                   - interpolation buffer (part 7)   |   commands -> sim step (bots, weapons; hitscan via
+       +---- per-tick  <-- - writes the output block         |   the lag-compensation query) -> hit history ->
+             block         thin transport interface:         |   interest per client -> delta encode + events
+             (ADR 0002)    [WebTransport | WebSocket |       |   -> hand datagrams to the I/O runtime; metrics
+                            loopback]                        |  match record written at Ended (ADR 0006's shape)
+                           local match only: the local       |
+                           server (authority sim, room       | lobby (HTTPS; hosted by ADR 0006): guest id,
+                           logic, bots) on the loopback side |  private-room create, code lookup, join token
+```
+- **The boundaries:** the page never handles a network packet and makes no Wasm calls; the Worker owns the connection
+  (R1-BND-REC6, ADR 0002); the sim crate depends on no transport crate (R2-TRN-REC4 mark 3).
+- **One server tick (30 Hz):** take the due ticks (ADR 0004); pick each client's command for this tick from its
+  bounded queue (already decoded on the I/O side) and check it; run the sim step, in which bots produce commands
+  through the same path and hitscan shots resolve through the lag-compensation query (counted in the server-only
+  share); record the tick's hit volumes; for each client, query the region, run the enclosure test (re-flood on a
+  portal change), rank and pack, delta-encode against its acknowledged snapshot and add its events; hand the datagrams
+  to the I/O runtime without waiting; emit the counters (server tick time, per-phase time, bytes, overruns).
+- **One client tick online (Worker):** decode the snapshots that arrived and acknowledge the newest; reset the local
+  player to the server's state for its last processed command and replay the newer commands (skipped when they
+  match); advance the interpolation clock; build this tick's command from the page's posted input, casting the aim ray
+  against the state published for the page's view time; send the input datagram; write the block: the predicted local
+  player, remote entities at the delayed time, the tick's events.
+- **A local match (slices 1 and 2):** the same Worker build also runs the local server, the authority, with room logic
+  and bots; the client endpoint reaches it through the loopback backend with the same encoded messages, and tests put
+  the network simulator's profiles between them.
+
+### State ownership
+| State | Authority (online · local match) | Predicted on the client? | Sent to | Class |
+|---|---|---|---|---|
+| Soldier movement and position | room sim · Worker's local server | local player only (part 4) | everyone relevant | spatial; own state owner, full precision |
+| Own weapon state (ammo, fire timers, reload, active reload) | room sim · local server | yes, local player | owner | owner |
+| Weapon spread | room sim, authority-only stream · local server | never (cosmetic spread for tracers) | nobody | none |
+| Hits, damage, deaths | room sim · local server | never | relevant clients; the shooter's hit confirmation | spatial; owner |
+| Own ability activation, cost, cooldown | room sim · local server | not until ABL-PREDICT | owner; its effects to relevant clients | owner; spatial |
+| Projectiles | room sim · local server | owner's cosmetic copy only | relevant clients, from the tick they become relevant | spatial |
+| A piloted vehicle | room sim · local server | the pilot | relevant clients (parts with the parent) | spatial |
+| Personal money | room sim · local server | never | owner | owner |
+| Team economy and tech | room sim · local server | never | team, or public (R2-INT-OQ3, a design question) | team or public |
+| Uplinks, countdown, steals, cache location | room sim · local server | never | everyone | public |
+| Upgrade tracks, offers, picks | room sim (the player record, ADR 0004) · local server | never | owner | owner |
+| Weapon drops and world pickups | room sim (sim entities, ADR 0004) · local server | not for now (OQ-0001-10) | relevant clients | spatial |
+| Slot table, teams, squads, bots | room · local server | never | everyone (roster) | public |
+| Room phase, host, settings | room (host commands checked) · local server | never | everyone in the room | public |
+| Server tick and clock | room | client keeps an estimate | everyone (snapshot header) | public |
+| Interpolation delay | client chooses, room clamps to the mode's range | n/a | room | n/a |
+| View time and aim point | client stamps; room accepts within tolerance and rebuilds the ray | n/a | room | n/a |
+| RTT used for lag compensation | room's own measurement | n/a | n/a | n/a |
+| Camera and framing | page (ADR 0003); bounds held as mode data for interest | n/a | n/a | n/a |
+| Animation, visual effects, sound, presentation randomness | page (ADR 0003) | n/a (cosmetic) | n/a | n/a |
+| Guest identity and join tokens | lobby (signs); room verifies | n/a | the guest's own browser (cookie) | n/a |
+| Content bundle and its hash | ADR 0005 builds; room names the hash at join | n/a | client host serves it (ADR 0006) | public |
+| Match record | room writes it at Ended | n/a | storage (ADR 0006) | n/a |
+
+### Message catalogue
+Every message type has a visibility class; one with none fails the audit test (R2-INT-REC5). Sizes are the R2
+estimate's where it has one; the rest are measured by the proof test (R2-XU-OQ15). The local server path carries the
+same messages over the loopback backend.
+
+| Message | Direction | Channel | Class | When | Contents | Server checks |
+|---|---|---|---|---|---|---|
+| `Input` | client → room | datagram | n/a | every tick (30 Hz) | newest snapshot decoded (ack, per entity group); every unacknowledged command up to the cap: tick, sequence, move, buttons, press counters, aim point, view time | part 5's list; size ≤ command size × cap; rate limit |
+| `Snapshot` (one or more datagrams per tick) | room → client | datagram | per field | every tick (30 Hz) | header (32-bit server tick, baseline tick, last processed command, group index); own-state section (owner); spatial records; team and public sections; event section (gameplay events until acknowledged, cosmetic once) | n/a (the client drops what it cannot decode) |
+| `Ping` / `Pong` | both ways | datagram | n/a | a few per second (proposed) | sender's time; on the answer, the receiver's tick | rate limit |
+| `Join` | client → room | control stream, first message | n/a | once, within 2 s | join token, protocol version, content hash | token (signature first, audience, expiry, unique id), version, hash |
+| `JoinAccepted` / `JoinRejected` | room → client | control stream | owner | once | slot, team, squad, mode id, mode hash, content hash, server tick, tick and snapshot rates / reason | n/a |
+| `FullState` | room → client | unidirectional stream | per field | at join and on resync | the client's whole relevant world at one tick | n/a |
+| `ClientSettings` | client → room | control stream | n/a | on change | announced interpolation delay | clamped to the mode's range, at most one interval per second |
+| `RoomState` | room → client | control stream | public | on change | phase, countdown, roster (human or bot per slot) | n/a |
+| `HostCommand` | client → room | control stream | n/a | private rooms, before start | start, kick, lock, settings (factions per team, allowed overrides) | sender is the host; values inside the mode's allowed overrides |
+| `PickUpgrade` | client → room | control stream | n/a | when an offer is open | offer id, choice (one of three) | open offer to this player, choice in range, not already picked |
+| `ContentReload` (development builds only) | room → client | control stream | public | on a valid content change | the changed set and the tick it applies from | only if ADR 0005 keeps development reload over the game connection (R1-DATA-REC5) |
+| `RoomEnded` | room → client | control stream | public | at Ended | results | n/a |
+| `Leave` / `Kick` | either way | control stream | owner | once | reason | n/a |
+| Lobby calls (HTTPS) | browser → lobby | HTTPS | n/a | per visit or room | guest create (sets the cookie), private-room create, code lookup, token request | Origin check; rate limits per client, per address and global |
+| Supervisor calls | supervisor ↔ room | local to the VM (ADR 0006) | n/a | per room | spawn with room id, mode id, overrides and the lobby's public key; health check; exit; record upload | ADR 0006 |
+
+Upgrade offers, pick results, track changes, hit confirmations, kills, purchases and drops are not separate message
+types: they are gameplay events or owner-section fields inside `Snapshot`, each with its class.
+
+### Bandwidth estimate
+- **Downstream per client (N = 48, everyone in view, E3, 30 Hz):** about 584 B per snapshot (609 B with events) and
+  about 146.1 kbps; projectiles in every snapshot (E3b) about 188.3 kbps; the start modes' upper ends 44.2 kbps (4v4)
+  and 70.3 kbps (6v6v6); 12v12v12 116.2 kbps; the N = 64 headroom run 183.7 kbps (r2-netcode.md, Options, Brief
+  question 2, worked bandwidth estimate, lines 1764–1782). Interest management cuts the per-entity part and the events,
+  not the overhead; on the Octopon-3 greybox the mark is a mean of at most 100 kbps (R2-BUD-REC2). This record adds the
+  32-bit server tick (about +0.5 kbps, part 6) and action-start events for remote animation (not in the estimate; the
+  proof test measures them, R2-XU-OQ15). IPv6 adds 20 B per datagram: +4.8 kbps at 30 Hz.
+- **The per-client cap:** 256 kbps (proposed), about 1,067 B per snapshot interval at 30 Hz, counted like R2-BUD-REC2's
+  mark (UDP payload plus 28 B per datagram); Fiedler's example budget is the same 256 kbps (r2-netcode.md, line 1789).
+- **Upstream per client:** with the estimate's 8 B commands, newest plus 3 repeats, sending at 30 Hz costs about 22.3 kbps
+  (option U1's 44.6 kbps at 60 sends per second, halved; r2-netcode.md, Options, Brief question 2, table C, lines
+  1704–1710). The mark is at most 48 kbps (IPv4: R2-BUD-REC1), which at 30 sends per second leaves 200 B per datagram
+  (48,000 ÷ 8 ÷ 30), 143 B after the 57 B of IPv4 transport overhead (r2-netcode.md, line 1742), for the header and
+  the repeated commands with their aim points (at most 80 bits each) and view times. The real command size is
+  measured (R2-XU-OQ4).
+- **One room of 48 humans:** about 48 × 146 kbps ≈ 7.0 Mbit/s out and about 3.2 GB per match-hour (r2-netcode.md,
+  line 1786); about 48 × 22.3 kbps ≈ 1.07 Mbit/s in (arithmetic). Bots cost no network traffic. R6 prices 3.16 GB per
+  room-hour inside the 20 TB each VM includes (r6-infrastructure.md, R6-COST-REC1, lines 703–719; ADR 0006).
+- **WebSocket fallback:** the same payload plus TCP, TLS and WebSocket framing; not estimated here, measured in the
+  proof test.
+
+### Budgets for the netcode proof test
+The netcode proof test's "48 simulated clients run at a 30 Hz tick, with tick time, bandwidth per client and memory
+all within the budgets that ADR 0001 sets" (GLOSSARY §8) is judged against these. Every server mark is measured on one
+vCPU of the reference server (R6-HOST-REC2's CCX23; ADR 0006), in the stress scene at N = 48 with a snapshot-receiving
+client on every soldier, over a 30-minute soak, re-flood ticks included, unless the row says otherwise.
+
+| Budget | Value | Basis |
+|---|---|---|
+| Server tick time, 30 Hz (the baseline) | p99 ≤ 16.7 ms; max < 33.3 ms; 0 overruns (0 missed ticks) | R2-BUD-REC6 (r2-netcode.md:2398–2416) restated from GLOSSARY §1's 30 Hz column (GLOSSARY.md:53–69, 167–188); R1-TICK-REC2 P1 |
+| Its two shares, 30 Hz | sim step time p99 ≤ 8.3 ms (ADR 0004's parts); server-only work p99 ≤ 8.3 ms, measured separately | R2-BUD-REC6; R2-SYNC-REC9 mark 1; GLOSSARY.md:189–213 |
+| Parts of the server-only share | snapshot encode ≤ 50 µs per client per snapshot p99; rewound shot ≤ 20 µs p99 at 700 shots/s; region query ≤ 0.2 ms p99; ranking and packing ≤ 0.5 ms p99; pair test ≤ 0.1 µs per pair p99; re-flood ≤ 1 ms p99 (reported beside the whole, never summed into it) | R2-BUD-REC6; R2-SYNC-REC5 mark 4; R2-INT-REC1 (c); R2-INT-REC4; R2-INT-REC2 (b) |
+| The 60 Hz margin run (decides 60 Hz) | p99 server tick time ≤ 6.25 ms against 8.33 ms; each share ≤ 4.2 ms p99; R1-TICK-REC2 P1–P3 at 60 Hz; one run, same setup | TICK-60-HEADROOM (the advisor's reading, confirmed at the stop); GLOSSARY §8, the 60 Hz margin |
+| Prediction replay | 200 ms of game time (6 ticks at 30 Hz) ≤ 1 ms p99, minimum laptop | R1-TICK-REC2 P3 (r1-simulation-core.md:2058–2060) |
+| Transport runtime | ≤ 1 vCPU per process with 48 sessions; p99 send call ≤ 1 ms | R2-TRN-REC1 mark 2 (r2-netcode.md:2565–2615), load restated at 30 Hz: 30 input datagrams per second per session |
+| Downstream per client | mean ≤ 160 kbps and p99 of 1-second windows ≤ 256 kbps, N = 48, everyone in view, 30 Hz, counted at UDP payload + 28 B per datagram; hard cap 256 kbps (proposed); 0 datagrams above the cap rule | R2-BUD-REC2 (r2-netcode.md:2326–2344); R2-BUD-REC3 |
+| Upstream per client | ≤ 48 kbps (IPv4) under P2 | R2-BUD-REC1 (r2-netcode.md:2302–2325), restated against P2 |
+| Memory per room | resident memory reported at start and after 20 minutes, ≤ 64 MB at N = 48 (proposed); memory per session flat over the soak (no queue growth); hit history ≤ 1 MB | R2-ROOM-REC2 mark 3 (r2-netcode.md:2762–2782); R2-TRN-REC6 mark 1; R2-SYNC-REC5 mark 3 |
+| Room start-up | process spawn to Open < 2 s | R2-ROOM-REC2 mark 5 |
+
+### Failure modes
+| Failure | What happens | Bound or mark |
+|---|---|---|
+| Loss, jitter, reordering | deltas against the last acknowledged snapshot; commands repeated until acknowledged; extrapolate one interval, then hold | P0–P4; R2-SYNC-REC1, REC2, REC4 marks |
+| A burst of total loss (B1) | the client holds; on return the server deltas from an older baseline or the defaults | deltas again within 500 ms (R2-SYNC-REC1 mark 2) |
+| No QUIC on the player's network | WebTransport times out, WebSocket takes over | playing ≤ 3 s after the page starts connecting (R2-TRN-REC3 mark 1) |
+| A browser moves to a WebTransport draft the crate lacks | connections fail on that browser; WebSocket keeps it playable | the recurring test against beta browsers (R2-TRN-OQ1; ADR 0002) |
+| Congestion (the window can fall to 2 datagrams) | low-priority entities first, then 20 Hz snapshots; the local player's own state never dropped | R2-BUD-REC5 mark; R2-TRN-REC6 marks |
+| A client never acknowledges events | its event queue stops at the cap; resync or disconnect | R2-BUD-REC2's mark |
+| Server tick overrun | catch-up bounded, dropped time recorded (ADR 0004's loop) | 0 overruns in the soak; counters (ADR 0006) |
+| A panic in one connection's handler | that connection closes; the room's tick and other connections go on | R2-ROOM-REC2 mark 6 |
+| A room process dies | that match ends; other rooms on the VM are unaffected | R2-ROOM-REC2 mark 4 |
+| A trap in the client's Wasm sim | the Worker restarts (ADR 0004) and resyncs through `FullState` | the join mark below |
+| A hidden tab or a sleeping laptop | online, the client does not simulate the gap; it resyncs | back in step within 0.5 s (R1-TICK-REC5, ADR 0004) |
+| A player drops | slot held for the grace window; fresh token; newest connection wins | 100 % rejoin the same slot (R2-ROOM-REC4) |
+| The lobby is down | no new joins; running rooms go on (tokens are checked offline) | none |
+| Version or content mismatch | `JoinRejected` with the reason; the client reloads the bundle | R1-DATA-REC6's mark (ADR 0005) |
+| A tick counter wraps | wire ticks are 32-bit in the header, 16-bit offsets elsewhere | the 60 Hz margin run's 30-minute soak crosses 65,536 ticks |
+| Certificate expiry | ADR 0006's alert and renewal | ADR 0006 |
+| No Hetzner capacity in the EU | the reference server cannot be ordered | R6-HOST-OQ1 (ADR 0006) |
+
+### Anti-cheat implications
+- Server authority: the client's sim online is a predicting copy, never the authority; no hit, state or RTT a client
+  reports is trusted.
+- Command checks and the lag-switch cap (part 5); forged commands are rejected and counted, with no effect beyond
+  their valid part (R2-SYNC-REC2 mark 3).
+- Lag compensation: the view-time tolerance of one snapshot interval, the final cap and the server's own RTT stop a
+  client from buying extra rewind; view-time offsets and aims are logged for later detection (part 8).
+- Spread lives in an authority-only stream (SEC-SPREAD (a)), so a cheat cannot cancel it through the aim point.
+- Aim help, if adopted, is applied by the server; aim help shaped on a client cannot be told from an aimbot.
+- Interest management withholds what a player may not see: enclosures, the region, the stripped shooter id and the
+  re-based projectile records; a "reader" test client and a byte-level audit prove it (R2-INT-REC2, REC5).
+- Upgrades and pickups: a pick the server did not offer, or a pickup it did not place, is refused (part 12).
+- Hostile input: the transport limits, Origin checks, `wss` only, decoders that never panic, fuzzing (part 10).
+- Admission: asymmetric join tokens checked before the replay cache, single use; room codes only locate; host
+  commands checked against the host's id; the guest secret out of script's reach (part 11).
+- Not decided here: cheat detection, the content security policy and key storage wait on the security baseline,
+  listed open in ADR 0006 (BASELINE-WHEN (b)).
+
+## Options considered
+One table per question this record answers, with the template's dimensions as columns. Options and their facts are
+the research's (r2-netcode.md, Options, lines 1606–1975, unless a row says otherwise); "chosen" marks the proposed
+option. An option that contradicts a settled input appears as one line and is not weighed.
+
+### Q1. The state-sync model (sync options 3.1, lines 1612–1620)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Deterministic lockstep | high | lowest bandwidth | latency is the worst player's; stalls on a missing input; 48 browsers must agree bit for bit | every client holds the whole state: a wallhack sees everything | one slow player lags everyone | legacy is not deterministic (STATUS: 11 wall-clock reads) | least bandwidth | late join hard; one divergent client breaks the match; R1-DET-REC1 rejects it |
+| B. Predict everything, roll back | high | unassessed | client cost grows with entities at 48+ | unassessed | unassessed | none | (no source read: the Overwatch talk is video only) | unassessed, so not proposable |
+| C. State synchronisation | medium | low bandwidth | built for physics objects, not authority over many players | medium | divergence and pops | none | low bandwidth | "approximate and lossy" |
+| D. Full snapshots, no delta | low | about 251 kbps at N = 48 (E2) | bandwidth grows with entities × rate | server authority | robust to loss | none | simplest | over budget at 48+ |
+| **E. Delta against each client's acknowledged snapshot (chosen)** | medium | about 146 kbps at N = 48 (E3) | per-client encoding, bounded by interest | server is the only authority; no client determinism needed | tolerates loss and reordering | CS7's pure shot query fits a rewound server | shipped (Quake III), documented (Fiedler); late join from defaults | a spike when a baseline expires; per-client rings |
+
+### Q2. What the client predicts (sync options 3.2, lines 1622–1629)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Nothing | lowest | none | none | nothing to exploit | every input waits a round trip | none | simplest | fails VISION_V2 §4 and LOOP_V2 §7 "the shot feels instant" |
+| B. Own movement only | low | small | flat per client | none | weapons lag a round trip | legacy has no prediction | Quake III, QuakeWorld | shots and reloads still lag |
+| **C. Own movement, weapon state, vehicle, cosmetic shot feedback (chosen, with a cosmetic spread)** | medium | replay ≤ 1 ms per 200 ms | flat per client: only the local player and its vehicle replay | with a shared seed a cheat cancels spread, so the spread stays authority-only (SEC-SPREAD (a)) | serves LOOP_V2 §7's split feedback | weapon state already lives in the sim (GC4) | instant feel for what the player controls | tracers corrected by the hit event |
+| D. Abilities and projectiles too | high | cosmetic rollback of effects | larger replays | more client state | better ability feel | none | best feel for abilities | no source read on ability rollback; ABL-PREDICT decides |
+
+### Q3. Correction smoothing (sync options 3.3, lines 1631–1637)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Snap | lowest | none | none | none | visible jumps | none | exact at once | pops on every correction |
+| **B. Linear error decay over a set time, plus a snap threshold (chosen)** | low | a visual offset per frame | none | none | smooth; Quake III's 100 ms | none | shipped default | lags the truth for 100 ms |
+| C. Exponential pull, snap above 2 m | low | none | none | none | smooth, long tail | none | simple | a slow tail on large errors |
+
+### Q4. The interpolation delay and where its buffer lives (sync options 3.4, lines 1639–1645; R2-XT-OQ2, lines 3333–3339)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Under one interval, then extrapolate (Quake III) | low | none | none | none | every late or lost snapshot extrapolates | none | smallest delay | poor smoothness at 2–5 % loss |
+| B. A fixed number of intervals | low | none | none | none | steady | none | simple | no answer to changing jitter |
+| **C. Adaptive, starting at 3 intervals (chosen)** | medium | a jitter estimate | none | the server clamps the announced delay | smooth at 2–5 % loss (Fiedler) | none | measured rule | 100–167 ms of delay |
+| Buffer on the page (TypeScript) | medium | a snapshot buffer per frame on the page | page CPU | none | as C | GP13's loop is replaced anyway | close to drawing | the page would need the view time, the aim ray and sim maths the boundary forbids |
+| **Buffer in the Worker (chosen)** | medium | delayed poses written into each block | page stays light | none | as C | none | view time, aim ray and command built in one place | the block carries delayed poses (ADR 0002's layout) |
+
+### Q5. Lag compensation for hitscan (sync options 3.5, lines 1647–1653)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. None (Quake III) | lowest | none | none | none | a 100 ms shooter leads by about 1.8 m | none | simple | unfair for VISION_V2 §4 |
+| **B. Server rewind to the view time, capped (chosen)** | medium | ≤ 20 µs per shot; ≤ 1 MB of history | grows with shots per second | the tolerance, cap and own RTT bound the abuse | the shooter's view is the truth up to the cap | `resolveShot` is a pure query built for this (CS7) | Source's shipped model | the victim's side unmeasured (R2-SYNC-OQ15) |
+| C. Client-side hit detection | low | none | none | an authority leak, trivially cheatable | instant | none | instant | rejected |
+
+### Q6. Projectiles (sync options 3.6, lines 1655–1664; encodings E3 and E3b, lines 1694–1700)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Server only, shown when the spawn arrives | low | none | none | server authority | the owner sees the throw a round trip late | GC14, GC15's sim logic | simple | breaks LOOP_V2 §7's instant feel |
+| **B. Server-simulated; the owner's cosmetic copy at once (chosen)** | medium | a hand-over blend | none | server decides every landing point | instant for the owner | GC13's shared trajectory idea | serves LOOP_V2 §7 | a match rule (owner, command sequence) and a hand-over |
+| C. Client-authoritative | low | none | none | authority leak | instant | none | none | rejected |
+| **E3: trajectories, flight on the client (chosen)** | medium | about 146 kbps at N = 48 | bytes only on change | landings are server events | a divergence shows only until the next change event | one trajectory function | cheapest | rests on bit-identical flight for display |
+| E3b: projectiles in every snapshot | low | about 188 kbps | +42 kbps | same | always matches | none | no client flight needed | more bytes: the fallback if the proof test counts a desync |
+
+### Q7. The aim in the command, and who casts the cursor ray (sync options 3.7, lines 1666–1671; R2-XT-OQ1, lines 3326–3332)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A. Direction: yaw and pitch, 16 bits each | low | 32 bits | none | the server cannot check a clicked point | an origin error shifts the whole ray | legacy aims at the ground plane | compact | misses the clicked point by the origin error |
+| **B. A quantised world aim point (chosen)** | medium | at most 80 bits | none | the server checks range and plausibility | keeps the clicked point at any height | GC3 already rays into the SIM | intent exact at height | more bits |
+| The page casts the ray | medium | page-side ray code | none | none | as B | GC3's ray | near the camera | sim maths in TypeScript or Wasm calls from the page, both ruled out by R1-BND-REC1 |
+| **The Worker casts it against what it published (chosen)** | medium | one ray per tick | none | none | as B | none | the same query and world as the server (R4-LOS-REC3) | the page posts its cursor ray and view time (ADR 0002) |
+
+### Q8. The tick and snapshot rates (budgets option table A, lines 1675–1692)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| T1. 60 Hz tick, 30 Hz snapshots, 60 Hz input | medium | 2 × T2's step cost | 146 kbps down; the 60 Hz marks leave almost no margin at N = 48 | as T2 | finer input and fire timing (±8 ms) | legacy `FIXED_DT` is 1/60 | legacy parity | only with the 60 Hz margin (TICK-30) |
+| **T2. 30 Hz tick, snapshots and input (chosen, TICK-30's baseline)** | low | lowest step cost | 146 kbps down; 9.18 of 16.67 ms | as T1 | +8 ms average input wait; fire intervals quantise harder (remainders carried) | none | the baseline TICK-30 sets | coarser timing (OQ-0001-7) |
+| T3. 60 Hz tick and snapshots | medium | 2 × the encoding | 286 kbps, over the 256 kbps example | as T1 | shorter delay | none | interpolation 50–85 ms | over the bandwidth budget |
+| T4. 20 Hz tick, snapshots 20 Hz | settled by TICK-30 (a tick below the 30 Hz baseline) | | | | | | | |
+
+### Q9. Downstream encoding (budgets option table B, lines 1694–1700)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| E1. Raw floats, full state | trivial | about 536 kbps | two datagrams per snapshot | none | none | none | trivial | far over budget |
+| E2. Quantised, full state | low | about 251 kbps | 1,373 B with projectiles: over the datagram | none | none | none | simple | over budget |
+| **E3. E2 + delta + spawn-event projectiles (chosen)** | medium | about 146 kbps | about 609 B per snapshot | none | none | none | half a datagram | per-client rings, acks |
+| E3b. E3 with projectiles every snapshot | medium | about 188 kbps | +42 kbps | none | none | none | no client flight | the fallback |
+| E4. E3 + range coding | high | about 25 % below E3 (one data point) | CPU per client | none | none | none | fewer bytes | deferred until E3 is measured |
+
+### Q10. Upstream (budgets option table C, lines 1704–1710)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **U1. Every tick, newest + repeats (chosen, at 30 Hz, repeating every unacknowledged command up to the cap)** | low | about 22.3 kbps at 30 Hz with 8 B commands | ≤ 48 kbps | the catch-up cap equals the redundancy cap | no extra input delay | CS1's command record | an input is lost only after several lost packets in a row | more bytes than U2 |
+| U2. U1 with delta-coded repeats | low | about 36 kbps at 60 Hz | fewer bytes | as U1 | as U1 | none | cheaper | adopt once U1 is measured |
+| U3. Send at 30 Hz with two new ticks | low | about 22.3 kbps | fewer sends | as U1 | adds up to one tick of delay at a 60 Hz tick | none | cheap | applies only to a 60 Hz tick |
+
+### Q11. Packet size (budgets option table D, lines 1712–1719)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **P1. Datagrams under the cap; split by entity groups that decode alone (chosen for deltas)** | medium | per-group baselines | a lost datagram loses only its entities | none | none | none | no reassembly | per-group acks |
+| P2. Application fragmentation | low | none | loss multiplies with fragments | none | stalls under loss | none | simplest encoder | fragile at 2–5 % loss |
+| P3. Grow to a probed path MTU | medium | none | fewer splits | none | none | none | fewer datagrams | depends on each browser's `maxDatagramSize` |
+| **P4. Join and resync over a reliable stream (chosen)** | low | a stream per transfer | none | none | a one-off wait at join | none | the large message never meets the limit | head-of-line wait at join only |
+
+### Q12. Server CPU per tick (budgets option table E, lines 1721–1729)
+Settled by the glossary's resolution 1 (GLOSSARY.md:167–188: the server tick budget is 50 % of the tick period with two
+25 % shares; 25 % for the whole server tick was weighed and not taken, the advisor, 2026-10-30).
+
+### Q13. The relevance region (interest Q-A, lines 1796–1803)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| A1. No region | none | highest bandwidth | serialisation grows with N² | every enemy position reaches every client | none | legacy sends nothing (single player) | none | fails §6.2's hiding |
+| A2. A fixed circle | low | trivial | good | some | pop-in if the framing changes | none | simple | wrong once the framing or aspect changes |
+| **A3. A circle from camera parameters as data, with hysteresis (chosen)** | medium | grid query + one test per candidate | good (about 10 times fewer bytes when spread out, none in a centre fight) | the circle also covers ground behind the camera (an accepted risk) | no pop-in if the client stays in the bound | CD5's framing values become the data | follows the data per mode | needs the client rig inside the server's bound |
+| A4. A3 shifted toward the aim | medium+ | same | slightly better | smaller leak behind the camera | a quick flick may show an edge first | none | fewer bytes | a later optimisation only if the spike needs it |
+
+### Q14. Hiding what a player must not see (interest Q-B, lines 1805–1812)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| B1. Region only | lowest | none | none | weak: occupants of buildings and hidden floors are sent | none | none | free | fails pillar 6 ("I sat in a building…") |
+| **B2. Enclosures as areas with portals (chosen)** | medium | O(1) per pair plus a re-flood | ≤ 0.1 µs per pair, ≤ 1 ms per re-flood | strong for interiors and floors | low risk if portals are conservative | GW17's cutaway shows the same structures | Q3's shipped area test | needs area and portal data from the map |
+| B3. Per-pair line of sight (fog of war) | high | highest | amortisable | strongest | pop-in at corners under latency | GN4's sight budget | strongest | only if R2-INT-OQ1's rule says the character's sight limits the view |
+| B4. B2 plus B3 through portals and sight-blocking walls | high | between B2 and B3 | between | strong | as B3 at fewer places | none | targeted | its weight depends on R2-INT-OQ1 |
+
+### Q15. Rate control inside the region (interest Q-C, lines 1814–1820)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| C1. Everything relevant, slow the whole stream when over | low | none | rate only | none | a crowded fight stales everyone at once | none | Quake III | no peak bound per snapshot |
+| **C2. Per-client priority accumulator under a byte budget (chosen)** | medium | ≤ 0.5 ms per tick for 48 clients | a hard bound per snapshot | none | close threats stay fresh; far ones degrade, never starve | none | Fiedler | tuning per type |
+| C3. Fixed tiers | low–medium | none | approximate | none | ignores threat | none | simple | no read source; can exceed the budget |
+
+### Q16. The WebTransport server stack (transport Q1, lines 1837–1846)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. wtransport 0.7.x on quinn (a candidate)** | low | one crate | the spike's load mark | inherits quinn's advisories; `dangerous-configuration` off | none | new | one crate, certificate helper | "not considered completely production-ready" |
+| **B. web-transport-quinn 0.13.x on quinn (a candidate)** | low–medium | crate family | the spike's load mark | inherits quinn's advisories | none | new | mirrors quinn's API | frequent 0.x releases |
+| C. h3 + h3-webtransport | medium | none | unknown | not checked | none | new | hyperium's | "still very experimental", idle since 2025-05: ruled out |
+| D. Our own handshake on quinn | high | upkeep on every draft change | ours | ours | none | new | full control | generic protocol work no §6 item asks for: ruled out |
+The netcode proof test picks between A and B (R2-TRN-OQ5).
+
+### Q17. The fallback when WebTransport fails (transport Q2, lines 1848–1855)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. Binary WebSocket (chosen)** | low | mature crates | head-of-line blocking; no unreliable channel | Origin check, `wss`, explicit limits | stalls under loss (the newest-snapshot rule bounds them) | none | everywhere, also in workers | worse under loss |
+| C. qmux over WebSocket | medium | a young crate, draft -02 | still head-of-line blocked | as A | as A | none | one stream and datagram API on both | early draft; revisit only if needed (R2-TRN-OQ6) |
+B (WebTransport over HTTP/2) and D (no fallback): settled by the stack (WebTransport with a WebSocket fallback, brief §1).
+
+### Q18. One transport interface over both, and the local path (transport Q4, lines 1866–1875; SLICE-ORDER condition 1)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. Our own thin interface, both sides, with a loopback backend for the local server (chosen)** | low | four operations, three backends | none | bounded queues; decoders outside the sim thread | none | CS11's fence becomes a crate boundary | smallest, game-specific; the simulator's L1 plugs in behind it (R5-TEST-REC4) | written twice (Rust, TypeScript) |
+| B. web-transport-trait plus qmux | medium | a fast-moving 0.x family | none | young code | none | none | real streams over WebSocket | ties us to an early draft |
+| C. A WebTransport polyfill over WebSocket | unknown | unknown | unknown | unknown | unknown | none | none | not assessed (the lead was not read) |
+A local server reached by direct calls instead of messages: settled by SLICE-ORDER condition 1 ("no offline-only shortcuts").
+
+### Q19. Congestion control for a real-time stream (transport Q6, lines 1887–1896)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. Choose the server controller in quinn (chosen: NewReno or Cubic by measurement)** | low | none | measured | none | snapshot age under a bottleneck | none | pluggable | BBR experimental |
+| **B. Drop stale data, never queue (chosen)** | low | none | no queue growth | none | fresh snapshots | none | the tick never blocks on a send | lost snapshots |
+| **C. Adapt the rate (chosen)** | medium | none | degrades by priority, then rate | none | fewer updates under pressure | none | stays playable | tuning |
+The three combine; they are not alternatives.
+
+### Q20. Where a room runs (rooms 3.1, lines 1900–1906)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. One OS process per room (chosen)** | lowest | per-process memory unknown (measured) | density from processes per host | a crash or leak ends one room | a fair tick (no noisy neighbour inside) | legacy resets in place (GE12) | GameLift's and PlayFab's default | one port per room |
+| B. Many rooms per process, a thread each | higher | a shared baseline | one port and certificate | an abort or out-of-memory takes all rooms | as A while healthy | none | cheaper for tiny rooms | the fallback only if A is too costly |
+| C. Rooms as tasks on one async runtime | lower | cheapest | a long tick stalls other tasks | as B | tick jitter across rooms | none | none | ruled out |
+
+### Q21. How a player is admitted (rooms 3.2, lines 1908–1919)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. A signed token checked offline by the room (chosen, asymmetric)** | medium | none | no lobby call on the join path | a compromised room cannot mint tokens (asymmetric); replay blocked by the used-id cache | fast joins | none | lobby off the hot path | keys to publish and rotate |
+| B. netcode.io-style encrypted token | medium | none | same | every server holds a key that can mint tokens | same | none | hides contents | shared key risk |
+| C. A ticket checked by a call to the lobby | low | none | a round trip per join | the lobby a live dependency | slower joins | none | simplest crypto | lobby on every join |
+
+### Q22. Reconnecting (rooms 3.3, lines 1921–1931)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. Hold the slot, rejoin with a fresh token (chosen)** | low | none | none | one verification path | the player returns to their slot | slot id = sim id (GC2) | one join path | a held slot during the window |
+| B. A room-issued resume secret | medium | none | saves a lobby call | a second credential to protect | as A | none | faster | more to secure |
+| C. No hold | lowest | none | none | none | the slot goes to a bot or another player | none | simplest | splits the match record |
+
+### Q23. Private matches and room codes (rooms 3.4, lines 1933–1943)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. A short code that only locates; joining needs a token (chosen)** | low | none | none | rate limits; the code is not the secret (about 30 bits) | easy to read out over voice | none | simple | brute-force bounded only by limits (OQ-0001-11) |
+| B. A long invite link as the credential | low | none | none | unguessable, but URLs leak | poor over voice | none | strong | leaks through logs and history |
+| C. Both | medium | two paths | none | as A and B | most convenient | none | flexible | two paths to build and test |
+
+### Q24. Bots filling slots (rooms 3.5, lines 1945–1953)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. A per-team fill quota on the server (chosen)** | low | bots' CPU in the sim step share | teams always full | bots use the human input path | full matches at any human count | GC2's slots, STATUS's "humans take over bot slots" | meets "bots fill empty slots" | when a human replaces a bot is a game rule |
+| B. A ratio of bots to humans | low | none | teams not kept full | none | uneven | none | none | fails VISION_V2 §3 |
+| C. Fixed or no bots | lowest | none | none | none | empty slots | none | for a host who turns bots off | only if Mustafa allows it (R2-ROOM-OQ5) |
+
+### Q25. Modes as data (rooms 3.6, lines 1955–1962)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. Validated mode files; a room is a mode id plus allowed overrides (chosen)** | low | none | none | unknown and prototype keys refused (SEC-MDL-2) | none | CD10's teams as data | VISION_V2 §3 and §6.1 | format work (ADR 0005) |
+| B. Modes in Rust code | low | none | none | none | none | none | simple at first | every mode a code change |
+| C. Per-map rules only | low | none | none | GW2's unchecked merge | none | legacy GW2 | none | cannot say "same map, 2 or 3 teams" |
+
+### Q26. Guest identity (rooms 3.7, lines 1964–1971)
+| Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
+|---|---|---|---|---|---|---|---|---|
+| **A. An anonymous guest account from the lobby (chosen, secret in an HttpOnly cookie)** | low | a lobby store (ADR 0006) | none | a secret of at least 64 bits no script can read | zero input before play | KVStore keeps settings today | reconnect and later linking | needs the lobby |
+| B. No identity | lowest | none | none | none | none | none | simplest | no reconnect across a reload |
+C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+
+## Trade-off analysis
+- **Why this design wins.** Server authority with delta snapshots, local-only prediction, interpolation and a capped
+  rewind is the model the research could verify in shipped code (Quake III, Source) and in Fiedler's measurements; it
+  needs no bit-exact agreement between 48 browsers, joins mid-match from defaults, and makes every server cost scale
+  with what each client sees rather than with the match (R2-SYNC-REC1, R2-SYNC-REC9). The alternatives either fail the
+  fairness target (no prediction, no lag compensation), leak authority (client-side hits or projectiles), break the
+  bandwidth budget (60 Hz snapshots, full snapshots), or rest on sources nobody could read (predict-everything with
+  rollback).
+- **Why 30 Hz.** At N = 48 the 60 Hz marks leave 0.05 ms on the worst tick and overrun the server-only share there
+  (finding 3); 30 Hz leaves 7.49 ms of the 16.67 ms budget on the planning check (16.67 − 9.18; 6.49 on a re-flood
+  tick), keeps one shot per tick for every legacy weapon, and halves the replay per correction. The 60 Hz path stays
+  open through the 60 Hz margin rule.
+- **The strongest arguments against.**
+  1. *Fairness against the rewind cap.* At P2 (100 ms round trip) a 30 Hz client with a 100–150 ms delay needs a
+     rewind of 200–250 ms, so the security review's 200 ms cap clips shots at the very latency VISION_V2 §4 names, and
+     250 ms lengthens the victim's "hit behind cover" window, which no source measures. This is a feel trade-off, not
+     an engineering one (OQ-0001-5).
+  2. *Coarser input at 30 Hz.* About +8 ms of average input wait against 60 Hz, and the moment of a click inside a
+     33 ms tick is not carried (OQ-0001-7).
+  3. *Pre-1.0 transport crates.* Neither WebTransport crate claims production readiness; the thin interface, the
+     version floors, the per-browser interop marks and the WebSocket fallback are the hedge.
+  4. *Client flight for E3.* Correctness never rests on identical trajectories (landings are server events), but what a
+     remote client draws between change events does; E3b is the measured fallback at +42 kbps.
+  5. *Weight in the Worker.* The interpolation buffer and the aim ray live in the Worker, and in a local match the
+     Worker also encodes and decodes every message for the loopback path; that cost is not measured yet and counts in
+     the client's sim share, ADR 0004's (the proof test reports it).
+  6. *One process per room* may cost more memory than shared processes; option B is the fallback the proof test can
+     trigger.
+
+## Consequences
+- **Easier:** one simulation path for local and online play, so every slice exercises the network's own messages;
+  anti-cheat by construction (authority, withholding, checks); a WebTransport crate swap confined to one module; bots
+  that fill slots through the human input path; costs that scale with what each client sees; tests that replay
+  recorded inputs to the same state hash on both transports.
+- **Harder:** every gameplay feature must be an input, an authoritative result and replicated state or events, each
+  field with a visibility class; the local player's code must be replayable; the Worker carries the interpolation
+  buffer, the aim ray and, in local matches, the loopback codec; testing needs the network simulator, soaks and real
+  browsers; players on the WebSocket fallback see head-of-line stalls under loss.
+- **Revisit when:** the netcode proof test reports (the tick rate, the WebTransport crate, the rewind cap's clipped
+  share, E3 or E3b, the process model, the datagram cap); a browser moves to a new WebTransport draft; connection
+  telemetry shows the fallback share (OQ-0001-13); Mustafa decides seats (§6.4 [OPEN]), spectators (R2-XU-OQ17) or the
+  line-of-sight rule (R2-INT-OQ1); ABL-PREDICT is answered; the real sim's step times at slice 6 differ from the proof
+  test's; the security baseline is researched (BASELINE-WHEN (b)).
+- **Hard constraints in CLAUDE.md that change** (for v2 code only, under SPIKE-SCOPE (a); nothing in CLAUDE.md or
+  `.claude/` changes in this PR):
+  - "the game runs by double-clicking index.html (file://)": WebTransport works only in secure contexts (HTTPS)
+    (r2-netcode.md, Findings, Brief question 4, R2-TRN-F35, lines 1267–1271), so the online client is served over
+    HTTPS; how the v2 build is opened locally is ADR 0002's.
+  - "Persistence only through `KVStore`": the guest secret lives in an HttpOnly cookie on the lobby's origin that no
+    script can read (R2-ROOM-REC8); the guest id may stay in the KVStore successor.
+  - "Animation is cosmetic: shots come from `playerFireOrigin()`" is kept and becomes a server rule (part 8).
+  - The classic-script, three.js r128 and "no external assets" constraints are ADR 0002's, ADR 0003's and LOOK_V2 §8's
+    (ADR 0005), not this record's.
+- **Legacy inventory rows** (the inventory itself changes only once Mustafa accepts the drafts):
+
+| Row | Mark now | Proposed mark | Why |
+|---|---|---|---|
+| GC3 (cursor aim and ADS sight line, line 242) | port to TypeScript; look brief pending; the height-aim rule pending LOOP_V2 §9 [OPEN] | split: the camera-to-cursor ray stays port to TypeScript; the aim ray query against the world is rewrite in Rust (the sim crate in the Worker); the sight line's appearance is ADR 0003's | part 5: the Worker casts the aim ray against the state it published (R2-SYNC-REC8, R2-XT-OQ1); aiming at height is served through VISION_V2 §6.2, aim help stays LOOP_V2 §9 [OPEN] |
+| GN8 (bot-shot effects and sound cull, line 273) | port to TypeScript; look brief pending | split: the per-event-type radii (sound 90 m, visuals 50 m) become the server's event interest radii as data, rewrite in Rust; the client's cosmetic cull stays port to TypeScript; how the effects look is ADR 0003's | part 9 (f): events filtered by a radius per type on the server (R2-INT-REC6) |
+
+## Open questions
+- **OQ-0001-1. Is TICK-60-HEADROOM's reading confirmed?** The 60 Hz margin is measured against the server tick budget
+  at 60 Hz (8.33 ms), so 60 Hz needs a p99 server tick time of at most 6.25 ms in part 2's setup, plus every 60 Hz mark
+  the research sets. · *Why it matters:* it decides whether and how 60 Hz can ever be chosen. · *Options:* (a) confirm
+  the advisor's reading as ruled on 2026-10-31; (b) another reading of TICK-30's "25 % headroom". · *Decider:* Mustafa
+  and the Advisor, "confirm at the stop". · *What decides it:* their confirmation. · *Research ids:* R1-TICK-REC2,
+  R2-BUD-REC6, R1-TICK-OQ1.
+- **OQ-0001-2. How does the stress scene's sim load reach the 60 Hz margin run (TICK-60-SETUP)?** · *Why it matters:*
+  the proof test runs before the foundation with a throwaway sim, and the margin must be measured in one run, since
+  p99s do not add. · *Options* (test set-ups, not research options): (a) the sim core spike's sim (ADR 0004's spike)
+  runs inside the proof-test server for that run; (b) a stand-in burns, tick by tick, the step times the sim core spike
+  recorded; (c) the 60 Hz check waits until the real sim runs the stress scene (slice 6), and the tick stays at 30 Hz
+  until then. **Recommended: (a)**, with (c) as the fallback if the sim core spike's sim cannot run the stress scene in
+  time. (b) is weaker because a replayed series loses the link between the sim's load and the server-only load in the
+  same fight, and the margin is a tail statistic (our inference). The 30 Hz baseline marks may use a stand-in: on the
+  planning check they leave 7.49 ms. · *Decider:* the Advisor. · *What decides it:* the Advisor's reading of the
+  options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
+- **OQ-0001-3. Is "100 ms of simulated latency" P2?** The proof test's human client runs at P2: 100 ms round trip,
+  ±20 ms jitter, 2 % loss (part 13). · *Why it matters:* it sets what "look correct" is judged at. · *Options:* (a) P2,
+  the round trip, as VISION_V2 §4's "ping"; (b) 100 ms each way, a 200 ms round trip (P4's latency). · *Decider:* the
+  Advisor, who wrote the definition. · *What decides it:* the Advisor's reading. · *Research ids:* R2-XU-OQ12,
+  R2-XU-OQ2.
+- **OQ-0001-4. Does the client predict the player's own abilities (ABL-PREDICT)?** · *Why it matters:* it sets how an
+  ability press feels at 100 ms and how much the Worker replays. · *Options:* (yes) R1-ABL-REC4's prediction key (the
+  command's sequence number), a rejected press rolled back, cues keyed so they play once; (no) a press waits for the
+  server's confirmation (the interim). · *Decider:* Mustafa. · *What decides it:* a Feel Lab test that compares both
+  ways on the Molotov and the Riot Shield, once abilities are playable. · *Research ids:* ABL-PREDICT, R2-SYNC-OQ10,
+  R1-ABL-OQ4, R1-ABL-REC4.
+- **OQ-0001-5. The rewind cap: 200 or 250 ms, and the victim's side?** · *Why it matters:* at P2 a 30 Hz client needs
+  200–250 ms of rewind, so 200 ms clips some shots at VISION_V2 §4's latency, while 250 ms lengthens the window in
+  which a victim is hit just after reaching cover. · *Options:* (a) 200 ms (the default principles; the security review
+  prefers it, with a tolerance of one snapshot interval); (b) 250 ms (the sync unit's proposal). · *Decider:* Mustafa
+  and the Advisor. · *What decides it:* the proof test's numbers at P2 and P3 (the share of shots each cap clips, the
+  "hit after cover" window), then a Feel Lab weighing. · *Research ids:* R2-XU-OQ1, R2-SYNC-OQ2, R2-SYNC-OQ15,
+  R2-XU-OQ2.
+- **OQ-0001-6. When does the server run each client's commands, and how does the client keep them just in time?** ·
+  *Why it matters:* arrival order affects corrections, fairness and speed-hack exposure. · *Options:* (a) run commands
+  as they arrive, several in one tick within the cap (Source); (b) buffer them and run exactly one per client per
+  tick, repeating the last on a miss, late commands dropped and catch-up limited to the redundancy window; for the
+  client, nudging its tick pace or re-aligning by whole ticks (not researched). · *Decider:* the netcode proof test. ·
+  *What decides it:* correction rates and fairness under P2 to P4. · *Research ids:* R2-SYNC-OQ3, R1-TICK-OQ8,
+  R1-XT-OQ5 = R2-XT-OQ5 (the time-sync part).
+- **OQ-0001-7. Do shots carry their moment inside a tick at 30 Hz?** · *Why it matters:* a 33 ms tick quantises when a
+  click happens. · *Options:* (a) no: the command's tick and the view time's fraction only; (b) a sub-tick fire offset
+  in the command. Not researched (no source read). · *Decider:* the netcode proof test, then Mustafa in the Feel Lab if
+  it fails or feels late. · *What decides it:* R2-SYNC-REC5 mark 1's registration at 30 Hz. · *Research ids:*
+  R1-TICK-OQ4.
+- **OQ-0001-8. How far does a new projectile move forward on spawn?** · *Why it matters:* throws landing where aimed at
+  high ping, against projectiles appearing mid-flight for others. · *Options:* none; a fixed prestep (Quake III's
+  50 ms); the shooter's latency up to the cap. · *Decider:* Mustafa. · *What decides it:* a Feel Lab test under P2 and
+  P3 once projectiles are playable (slice 4). · *Research ids:* R2-SYNC-OQ6.
+- **OQ-0001-9. What else does lag compensation cover?** Destructible statics and moving vehicles as cover (judged at
+  present or rewound), and melee and short-range abilities (the Banzai blade, the bayonet, the Riot Shield block) at
+  the attacker's view time. · *Why it matters:* at 9 m/s a target moves about 1.8 m in 200 ms, half the blade's reach.
+  · *Options:* per item, present state or rewound. · *Decider:* the netcode proof test for cover; for melee, a design
+  call by Mustafa with the game-designer. · *What decides it:* the rewind test extended with a destructible wall, a
+  moving Juggernaut as cover, and melee. · *Research ids:* R2-SYNC-OQ8, R2-SYNC-OQ9.
+- **OQ-0001-10. Are weapon pickups predicted?** · *Why it matters:* a pickup that waits for the server shows one round
+  trip late. · *Options:* (a) not predicted (the interim); (b) Quake III's predicted pickups, the item hidden at once
+  (R2-SYNC-F17), rolled back if the server refuses. · *Decider:* Mustafa. · *What decides it:* a Feel Lab test once
+  drops exist, alongside ABL-PREDICT's. · *Research ids:* none owned (UPGRADE-SCOPE; R2-SYNC-F17).
+- **OQ-0001-11. Room codes: length, alphabet and access.** · *Why it matters:* guests are free, so in practice the code
+  is the access secret. · *Options:* 6 symbols from 32 (the proposal); 8 or more; tokens for a private room only on the
+  host's approval; the host lock on by default for organized play. · *Decider:* Mustafa (what a host may set,
+  R2-ROOM-OQ5) with the security review's options. · *What decides it:* Mustafa's call. · *Research ids:*
+  R2-ROOM-OQ10.
+- **OQ-0001-12. Do far sound events reveal too much?** · *Why it matters:* an exact position on a gunshot 80 m away is
+  a radar for a cheat. · *Options:* a coarser origin at distance; direction only; an accepted leak. · *Decider:* Mustafa
+  with the game-designer. · *What decides it:* their call, checked by the reader-client test. · *Research ids:*
+  R2-INT-OQ6.
+- **OQ-0001-13. What do real players' networks show?** How many need the WebSocket fallback, the IPv6 share, and how
+  often an address change forces a reconnect. · *Why it matters:* how good the fallback must feel, the IPv6 overhead,
+  how often reconnect runs (not its design). · *Options:* none (measurements). · *Decider:* connection telemetry from
+  the first online playtest (ADR 0006's monitoring). · *What decides it:* the measured shares. · *Research ids:*
+  R2-TRN-OQ7, R2-BUD-OQ11, R2-ROOM-OQ8.
+
+## What a spike must prove
+The spike is the netcode proof test (GLOSSARY §8; brief §2), in the Advisor's words:
+
+> - **The netcode proof test.** A throwaway spike that proves the online path:
+>   - the Rust simulation runs natively as a server, and as Wasm in the client;
+>   - they connect over WebTransport, with the WebSocket fallback;
+>   - 48 simulated clients run at a 30 Hz tick, with tick time, bandwidth per client and memory all within the budgets that
+>     ADR 0001 sets;
+>   - one human client at 100 ms of simulated latency sees prediction, reconciliation and lag-compensated hits that look
+>     correct.
+
+It runs before the foundation (SLICE-ORDER condition 3), throwaway, in `spikes/` (SPIKE-SCOPE (a)), only after
+Mustafa and the Advisor approve the drafts. Its sim is a throwaway one with movement, hitscan and bots as protocol
+clients, native and Wasm. It takes in the research spikes named in part 14. What it must prove, by decision part, with
+candidate marks from the research (all proposed there; restated at 30 Hz and against part 13's profiles):
+
+1. **The online path runs end to end on four browsers (parts 1 and 10).**
+   - Each WebTransport candidate crate: Chrome, Edge, Firefox and Safari each succeed in at least 99 of 100 connection
+     attempts on a clean local network, the negotiated draft recorded (R2-TRN-REC1 mark 1); switching crates changes no
+     code outside the transport module (mark 3); the lockfile meets the version floors (mark 5).
+   - With UDP blocked, each browser reaches a playing WebSocket session within 3 s (R2-TRN-REC3 mark 1); one recorded
+     input replay drives both transports to identical server state hashes on every tick (mark 2); over WebSocket, the
+     p99 extra snapshot delay is reported and at most 250 ms at P2 (restated from "100 ms RTT and 1 % loss"), and the
+     server never holds more than one unsent snapshot per client (mark 3).
+   - One client build runs unchanged on the four browsers over both backends; app-level RTT agrees with quinn's `rtt()`
+     within ±5 ms at P2; the sim crate depends on no transport crate (`cargo tree`); 10 million random and mutated
+     inputs per message type give 0 panics and 0 allocations above the size limits (R2-TRN-REC4 marks 1–4).
+   - `maxDatagramSize` recorded at session start and every 10 s on the four browsers, at least 1,000 B on loopback and on
+     a real EU path, otherwise the cap drops to the smallest value measured; lost-or-late snapshots at most the injected
+     loss plus 1 percentage point at P2; 0 of 10,000 one-shot actions lost at P3; a 1 MB bulk transfer adds at most 5 ms
+     to the control stream's p99 (R2-TRN-REC2 marks 1–4).
+   - Development certificates (ADR 0006's): all four browsers connect with a pinned self-signed certificate in 20 of 20
+     attempts, and reject one valid for 15 days (R2-TRN-REC5 marks 1 and 3).
+2. **48 simulated clients stay within the budgets (parts 2, 3, 6, 11, 14).** The "Budgets for the netcode proof test"
+   table above, plus: every decoded snapshot rebuilds the server's quantised state for that client by hash under P0,
+   P2, P3 and B1, deltas again within 500 ms after B1, no datagram above the payload cap (R2-SYNC-REC1 marks 1–4); the
+   server's sync cost growing no faster than linearly in players × visible entities at 24, 36 and 48 (R2-SYNC-REC9
+   mark 2); a client joining mid-match has a complete world within 300 ms at P2 (R2-BUD-REC3, the one join mark,
+   R2-XU-OQ6); at least 99.9 % of commands reach the server before their tick at P3, 0 lost and 0 doubled of 10,000
+   presses, every forged command rejected and counted, a lag-switch client held to the catch-up cap (R2-SYNC-REC2 marks
+   1–4); missing inputs at most 0.1 % of player-ticks at P3 (R2-BUD-REC1); a never-acknowledging client capped and
+   resynced or dropped (R2-BUD-REC2); with the link throttled to 128 kbps for 10 s, at most 2 missing snapshots per
+   second, the own state never deprioritised, the full rate back within 2 s (R2-BUD-REC5); with a bottleneck at 50 % of
+   the snapshot rate, the newest snapshot never older than 3 intervals and memory per session flat, server tick p99
+   within 5 % of a clean run, NewReno against Cubic recorded (R2-TRN-REC6 marks 1–3); a flood (1,000 sessions that never
+   join, 10 clients sending oversize datagrams and opening streams) leaves server tick p99 within 10 % of a clean run
+   and memory under the ceiling, and a wrong origin gets 403 on all four browsers (R2-TRN-REC1 mark 4); a panic in one
+   connection's handler closes only that connection (R2-ROOM-REC2 mark 6). For rooms per VM: 8 rooms as 8 processes on
+   one reference server, each room's p99 within 10 % of one room, and a killed room leaves the others unchanged
+   (R2-ROOM-REC2 marks 2 and 4, on the CCX23 and the CX33: R6-HOST-REC2, ADR 0006).
+3. **The 60 Hz margin (part 2):** in one run with part 2's setup, p99 server tick time at most 6.25 ms at a 60 Hz tick,
+   both shares within 4.2 ms, and R1-TICK-REC2 P1–P3 at 60 Hz; how the sim load gets there is OQ-0001-2. A failure
+   keeps 30 Hz.
+4. **The human client at P2 sees prediction, reconciliation and lag-compensated hits that look correct (parts 4, 7,
+   8).** Mustafa judges "look correct" in Brave (test-engineer writes his checklist); the measurable marks beside it:
+   - corrections: 0 larger than 1 mm whenever every command arrived in time, P0 to P4; in a brawl of 48 at P3,
+     corrections larger than 5 cm in fewer than 1 % of snapshots and never more than 5 cm in one frame below the snap
+     threshold; input-to-screen latency for own movement and muzzle flash the same at P0 and P4 within one tick
+     (R2-SYNC-REC3 marks 1–3); the 6-tick replay within 1 ms p99 (R1-TICK-REC2 P3);
+   - interpolation: extrapolation in fewer than 1 % of rendered frames at P2 and 3 % at P3, never beyond one interval
+     under B1, the adaptive delay settled within 5 s of a profile change, 0 visible slides in 1,000 scripted respawns
+     (R2-SYNC-REC4 marks 1–4, the one mark R2-XU-OQ3 asks for); clock offset error at most 5 ms after 2 s of samples,
+     against the simulator's true clock (R2-BUD-REC4);
+   - hits: shots whose ray hits the target in the shooter's view register on the server in at least 99 % of cases up to
+     P2 and 95 % at P3, false hits below 0.5 %, against a strafing, sprinting target at 9 m/s (R2-SYNC-REC5 mark 1); no
+     shot rewound beyond the cap, and the share each candidate cap clips recorded (mark 6, OQ-0001-5); a cheat client at
+     the edge of the tolerance gains no more rewind than the tolerance (mark 5); history at most 1 MB and a rewound shot
+     at most 20 µs p99 (marks 3 and 4); server hit points within 5 cm of the client-picked point in at least 99.9 % of
+     shots at the ground, 2.5 m and 4 m, P0 to P3, and the aim at most 80 bits per command (R2-SYNC-REC8 marks 1–2);
+   - feedback: no damage number or kill on another soldier shown before the server's confirmation (R1-ABL-REC4).
+5. **What the proof test decides:** the WebTransport crate (R2-TRN-OQ5); the datagram cap from the measured
+   `maxDatagramSize` (R2-BUD-OQ3 = R2-TRN-OQ3, R2-XU-OQ5); E3 or E3b (0 desyncs of client-side flight over 1,000 throws,
+   R2-BUD-REC2; only if projectiles are in the load); the process model (R2-ROOM-OQ1); the encoding cost per client
+   (R2-BUD-OQ9); the controllers' behaviour under 2–5 % loss, server and browser side (R2-BUD-OQ10, R2-TRN-OQ8); each
+   browser's negotiated draft and its behaviour with UDP blocked (R2-TRN-OQ1, R2-TRN-OQ2); the rewind estimate, by
+   measuring how far behind the server's present the client's view is when its command arrives (R2-XU-OQ2); the real
+   record and command sizes (R2-XU-OQ15, R2-XU-OQ4); linear against Hermite (R2-SYNC-OQ12); command timing
+   (OQ-0001-6); whether shots need sub-tick stamps (OQ-0001-7). Reported, not judged: the egress per 48-player
+   match-hour and the spike's own bill (R6-COST-REC1, ADR 0006).
+
+### Pass marks
+Written by test-engineer (plan step 4).
+
+## Migration plan
+In the slice order (SLICE-ORDER). The legacy game stays playable, frozen, until v2 replaces it (it moves to `legacy/`
+in the foundation).
+1. **The netcode proof test** (before the foundation): run after the drafts are approved, beside the other phase 0
+   spikes `docs/SPIKE_PLAN.md` orders. *Done when:* the pass marks are met and recorded in this record, with the tick
+   rate (30 Hz unless the 60 Hz margin passes), the WebTransport crate, E3 or E3b, the process model and the datagram
+   cap named; Mustafa's Brave checklist passed.
+2. **The foundation** (ADR 0002 carries it): the protocol crate (message types, the codec, the thin transport interface
+   with its loopback backend) goes into the client + local server skeleton, its types generated for TypeScript. *Done
+   when:* an empty scene runs through the full stack in the browser with CI green and a preview link (GLOSSARY §8), and
+   the Worker's client side and local server exchange `Join`, `JoinAccepted`, `Input` and `Snapshot` over the loopback
+   backend, with the network simulator's L1 behind it in CI.
+3. **Slice 1, move & shoot:** movement and shooting are driven by input commands from day one and replayable
+   (SLICE-ORDER condition 2); the local server is the authority; prediction and reconciliation of own movement and
+   weapon state run against it through the loopback. *Done when:* a recorded input replay gives the same per-tick state
+   hash on two runs, and R2-SYNC-REC2 marks 1–2 and R2-SYNC-REC3 marks 1–3 pass on the loopback under L1's profiles.
+4. **Slice 2, bots and three teams, played locally:** bots on the local server through the human input path, the slot
+   table and teams built from mode data (the format is ADR 0005's). *Done when:* R2-ROOM-REC6 marks 1–3 and R2-ROOM-REC7
+   marks 1–2 pass on the local server.
+5. **Slice 3, online:** the room process on the staging game server (ADR 0006), the lobby (guests, tokens, private
+   rooms), both transports, interest management, lag compensation and reconnect; the first multiplayer preview behind
+   the access wall (PREVIEW-WALL (a)); the security baseline researched before the first online playtest
+   (BASELINE-WHEN (b)). *Done when:* R2-ROOM-REC1, REC3, REC4, REC5 and REC8's marks, the reader client (R2-INT-REC2)
+   and the byte-level audit (R2-INT-REC5) pass, and Mustafa's first online playtest is run.
+6. **Slice 4, the loop:** economy and objectives with their visibility classes (team-private state as Mustafa decides,
+   R2-INT-OQ3), the uplink countdown never predicted, the match record written at Ended, upgrade offers, picks, drops
+   and pickups (part 12), and the Feel Lab tests (OQ-0001-4, -5, -8, -10). *Done when:* the refusal tests of part 12
+   and R2-ROOM-REC1 mark 3 pass, and Mustafa has answered the Feel Lab questions.
+7. **Slice 5, Octopon-3 and Editor v2:** enclosure areas and portals from the map document (ADR 0004, ADR 0005); the
+   editor's Test plays the map with bots through the local server (EDITOR_V2 §3). *Done when:* the downstream mean is at
+   most 100 kbps with interest on the Octopon-3 greybox (R2-BUD-REC2) and R2-INT-REC1 (a) and R2-INT-REC2 (c) show 0
+   pop-in frames there.
+8. **Slice 6, scale to 48:** the budgets again with the real sim in the stress scene, 8 rooms per VM (with ADR 0006),
+   the soaks on the test-mode list, and the 60 Hz margin run here if OQ-0001-2 chose (c). *Done when:* the budgets
+   table passes with the real sim and R5-TEST-REC5's soak passes for every mode on
+   [the test-mode list](../research/GLOSSARY.md#the-test-mode-list).
+
+## Test plan
+- **Network simulation:** L1, our link simulator behind the thin transport interface (seeded, on simulated time, in the
+  gate), and L2, an impairment wrapper under quinn's socket for real browsers, with a delaying TCP proxy for WebSocket
+  (R5-TEST-REC4, ADR 0002), running part 13's profiles P0 to P4 and B1, each with reordering.
+- **Determinism by state hash:** recorded input replays give identical per-tick server state hashes on both transports
+  (R2-TRN-REC3 mark 2) and on the loopback; the same seed and join-and-leave script give the same hash twice
+  (R2-ROOM-REC6 mark 3); decoded snapshots rebuild the server's quantised state by hash (R2-SYNC-REC1 mark 1).
+- **Load and soak:** bots as headless protocol clients, 48 per room, 30 minutes at P2 for every mode on the test-mode
+  list, with server tick time, bytes per client, memory slope, queue lengths, desyncs, panics and hangs measured, and
+  one 3-hour soak before each playtest (R5-TEST-REC5, ADR 0002).
+- **Hostile input:** the forged-command and lag-switch suites (R2-SYNC-REC2 marks 3–4), the flood test on both
+  transports (R2-TRN-REC1 mark 4, R2-TRN-REC3 mark 4), bad join tokens (R2-ROOM-REC3 mark 1), decoder fuzzing
+  (R2-TRN-REC4 mark 4), forged upgrade picks and pickups refused and counted with no effect (part 12; proposed, the same
+  harness as R2-SYNC-REC2 mark 3).
+- **Anti-wallhack:** the reader client that logs everything it receives (R2-INT-REC2 (a), R2-SYNC-REC6 mark 4) and the
+  byte-level audit of every message against its class (R2-INT-REC5).
+- **Browsers:** one client build on Chrome, Edge, Firefox and Safari over both backends (R2-TRN-REC4 mark 1), and a
+  recurring run against their beta channels (R2-TRN-OQ1; ADR 0002's CI).
+- **Playtests:** Mustafa's Brave checklist for the human client at P2 (test-engineer), then online playtests from
+  slice 3.
+
+## Rollback
+- **The 30 Hz baseline fails at N = 48:** back to the drafts with the measured numbers (part 2's restated rule).
+- **The 60 Hz margin fails:** nothing to undo; the tick stays at 30 Hz.
+- **One WebTransport crate fails:** the other one, behind the thin interface (a swap touches only the transport module,
+  R2-TRN-REC1 mark 3). **Both fail:** back to the drafts; the transport is a settled input, so Mustafa and the Advisor
+  decide.
+- **Client-side projectile flight desyncs:** E3b, about +42 kbps per client.
+- **One process per room is too heavy:** many rooms per process (option B), with `panic = "unwind"` and per-room
+  containment (R2-ROOM-REC2).
+- **Corrections, interpolation or hit registration miss their marks:** the delays, the cap, the tolerance and the
+  smoothing are data, so a first retry needs no code change; otherwise back to the drafts with the numbers.
+- **After acceptance:** the protocol carries its version in `protocols` and in `Join`, so a message change is a
+  version bump; the frozen legacy game stays the playable build until v2 replaces it.

@@ -474,7 +474,7 @@ holds and changes nothing the authority decides. An option that contradicts a se
 | Option | Complexity | Cost | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort |
 |---|---|---|---|---|---|---|
 | **F-A. Same features on both backends** (proposed) | Low: one look, one test matrix | lowest | forgoes GPU particles and compute culling on WebGPU; §6.9's visual effects must fit CPU or vertex work | presentation only | one look everywhere | legacy uses nothing WebGL 2 lacks (CD15; r3-rendering.md, Findings Q2, legacy facts, lines 300–302) |
-| F-B. Tiered: WebGPU-only extras with a defined fallback each | Medium | two code paths per extra, tests on both | more visual effects on WebGPU | presentation only | fewer or simpler effects on the fallback; drift | each extra needs its fallback built |
+| F-B. Tiered: WebGPU-only extras with a defined fallback each | Medium | two code paths per extra, tests on both | more visual effects on WebGPU | presentation only | fewer or simpler visual effects on the fallback; drift | each extra needs its fallback built |
 | F-C. The fallback always runs Low | Low | small | strong Linux or Firefox-on-Mac machines get Low | presentation only | Low settings even on strong machines | small |
 | F-D. Try WebGPU compatibility mode before WebGL 2 | unknown: needs three.js support (R3-GL2-OQ1, lines 1305–1307) | unknown | could widen WebGPU's reach on older devices; opt-in, platforms still being added (R3-GL2-F13, lines 285–291) | presentation only | none | a source reading first |
 
@@ -950,3 +950,112 @@ Each phase ends on a milestone that proves it done; the legacy game stays playab
 - **A three.js upgrade regresses:** stay on the previous pin (V1).
 - **HRTF or occlusion costs too much:** equal power only; zones or none.
 - **Any technique misses on Low:** a tier change in data moves it to High only, with no code change.
+
+## Appendix A: research dispositions
+
+One row per id the decision map gives this record as owner (71 ids). "Part" is a Decision part; line numbers are the
+research file's at 9e7db28.
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-TICK-OQ6 | open: OQ-0003-1 | the client classes are proposed in part 7; the models are Mustafa's and the Advisor's; the server half is ADR 0006's (R6-HOST-REC2) |
+| R1-BND-OQ3 | open: OQ-0003-1 | the minimum laptop's model; ADR 0002's boundary spike records its core count |
+| R1-XT-OQ14 | answered: part 9 | occlusion starts as zones or none; if O-B is ever proposed, the rays run on the page against a client copy of the map's static geometry, so no page call into the sim (R1-BND-REC1 mark 2); ADR 0004 cited for the floor data |
+| R1-XT-OQ16 | answered: part 10 | no OffscreenCanvas (not researched, not proposed: the page keeps rendering); the renderer reads typed arrays whatever the layout (r3-rendering.md lines 1489–1491), so ADR 0002 picks the layout by measurement (R1-BND-OQ6) |
+| R2-XT-OQ15 | answered: part 5.i | the cutaway follows R2-INT-REC2's rule (r2-netcode.md lines 2450–2451); what a player may see stays R2-INT-OQ1, a design question |
+| R3-WGPU-REC1 | adopted | part 1 |
+| R3-WGPU-REC2 | adopted | part 2 (also disposes of the old ADR-003 entry, STATUS:202) |
+| R3-WGPU-REC3 | adopted | part 3; the warm-up list names LOOK_V2 §4's damage-stage meshes and the roof fade's blend variant |
+| R3-WGPU-REC4 | adopted | part 4 |
+| R3-GL2-REC1 | adopted | part 1 |
+| R3-GL2-REC2 | adopted | part 1; its mark in the render budget bench |
+| R3-GL2-REC3 | adopted | part 4 |
+| R3-LOOK-REC1 | changed: the table now serves LOOK_V2 | LOOK_V2 exists, so each technique the trace table names is measured alone and the table goes to the look proof test, where Mustafa judges, instead of "before the look brief closes" (r3-rendering.md line 991); part 5 |
+| R3-LOOK-REC2 | adopted | part 5: MRT outputs for depth, normals and emissive; planned extras counted |
+| R3-LOOK-REC3 | changed: one family proposed | LOOK_V2 keeps ink (§2, §6.2), so both families are measured as REC3 asks; this record proposes the screen-space family on cost and robustness, and Mustafa's look call decides between them (plan rule 6); part 5.b, OQ-0003-2 |
+| R3-CHAR-REC1 | adopted (N = 48) | part 6; MODES-3 (a) replaces "48 or 54" (r3-rendering.md lines 1035, 1044) |
+| R3-CHAR-REC2 | adopted (N = 48) | part 6; MODES-3 (a) replaces "48 or 54" (line 1061) |
+| R3-CHAR-REC3 | adopted (N = 48) | part 6; MODES-3 (a) replaces "48 or 54" (line 1075) |
+| R3-CHAR-REC4 | adopted | part 6 and part 7's spectacle budget |
+| R3-BUDGET-REC1 | adopted | part 7; the models are OQ-0003-1 |
+| R3-BUDGET-REC2 | adopted (N = 48) | part 7; the N = 54 sum (lines 1144–1145) no longer applies; the Low draw cap is read through part 5.b's ink |
+| R3-BUDGET-REC3 | adopted | part 7 |
+| R3-MEASURE-REC1 | adopted | part 8 |
+| R3-MEASURE-REC2 | adopted | part 8, with the fixed-seed fallback (Pointers Q6, lines 1504–1505) |
+| R3-MEASURE-REC3 | adopted | part 8 |
+| R3-MEASURE-REC4 | adopted | part 8 |
+| R3-AUDIO-REC1 | adopted | part 9; the placement holds while the camera is top-down (OQ-0003-13) |
+| R3-AUDIO-REC2 | adopted | part 9 |
+| R3-AUDIO-REC3 | adopted | part 9 |
+| R3-AUDIO-REC4 | adopted | part 9 |
+| R3-WGPU-OQ1 | spike: the look proof test | Brave's backend on Mustafa's machine is recorded |
+| R3-WGPU-OQ2 | spike: the look proof test | `renderer.hasFeature` checks on Firefox and Safari |
+| R3-WGPU-OQ3 | spike: the look proof test | R3-WGPU-REC1 mark 3 |
+| R3-WGPU-OQ4 | open: OQ-0003-3 | Mustafa's call; LOOK_V2 decides vibrant colour, not the output transform |
+| R3-WGPU-OQ5 | answered: part 2 | the newest release when the look proof test starts |
+| R3-GL2-OQ1 | spike: the look proof test | after a reading of three.js's WebGPU device request |
+| R3-GL2-OQ2 | open: OQ-0003-11 | the share waits for client field data; what the client reports is part 8 |
+| R3-GL2-OQ3 | spike: the look proof test | R3-WGPU-REC1 mark 2 |
+| R3-GL2-OQ4 | answered: part 1 | F-A runs no TSL compute on the fallback; a spike only if an F-B extra is proposed |
+| R3-GL2-OQ5 | open: OQ-0003-11 | Mustafa, with the share |
+| R3-LOOK-OQ1 | spike: the look proof test | R3-LOOK-REC1's table |
+| R3-LOOK-OQ2 | open: OQ-0003-2 | the width model, inner lines and building weight are Mustafa's call |
+| R3-LOOK-OQ3 | spike: the look proof test | single-pass AO (part 5.c) |
+| R3-LOOK-OQ4 | spike: the look proof test | `renderer.info.memory.texturesSize` |
+| R3-LOOK-OQ5 | answered: LOOK_V2 | LOOK_V2 (2026-10-31) sets the look without the shipped-game talks; no part rests on them |
+| R3-LOOK-OQ6 | spike: the look proof test | after a reading of three.js's anti-aliasing nodes (part 5.n) |
+| R3-CHAR-OQ1 | spike: the render budget bench | after a reading of the skinning node's source; the bench checks C-B on both backends |
+| R3-CHAR-OQ2 | spike: the render budget bench | C-E against C-B (part 6) |
+| R3-CHAR-OQ4 | spike: the render budget bench | CPU and GPU time of `BatchedMesh` against `InstancedMesh` |
+| R3-CHAR-OQ6 | spike: the render budget bench | only if the draw-call budget is still missed after part 6 |
+| R3-BUDGET-OQ1 | open: OQ-0003-1 | Mustafa and the Advisor pick the models |
+| R3-BUDGET-OQ2 | open: OQ-0003-10 | the bench's frame-pacing numbers, then Mustafa |
+| R3-BUDGET-OQ3 | open: OQ-0003-12 | Mustafa, on the look proof test's GPU times at ratio 1 and 2 |
+| R3-BUDGET-OQ4 | answered: part 7 | MODES-3 (a): N = 48 |
+| R3-BUDGET-OQ5 | spike: the render budget bench | with the first authored models |
+| R3-BUDGET-OQ6 | open: OQ-0003-4 | a reading of three.js's WebGPU shadow options, then both spikes |
+| R3-MEASURE-OQ1 | spike: the look proof test | `renderer.hasFeature` on Firefox and Safari |
+| R3-MEASURE-OQ3 | spike: the look proof test | `renderer.info.memory` and the adapter's `memoryHeaps` read on the minimum machine |
+| R3-AUDIO-OQ1 | spike: the render budget bench | R3-AUDIO-REC1's HRTF mark |
+| R3-AUDIO-OQ2 | spike: the render budget bench | the voice counter in the benchmark fight |
+| R3-AUDIO-OQ3 | open: OQ-0003-13 | the camera framing first (R2-INT-OQ2) |
+| R3-AUDIO-OQ4 | open: OQ-0003-14 | a read of the Web Audio specification |
+| R3-AUDIO-OQ5 | answered: part 9 | as R3-XT-OQ6 |
+| R3-AUDIO-OQ6 | spike: the render budget bench | only if the built-in panners miss R3-AUDIO-REC1's CPU mark |
+| R3-XT-OQ4 | answered: part 8 | what the client reports per match; ADR 0006 stores it |
+| R3-XT-OQ6 | answered: part 9 | as R1-XT-OQ14 |
+| R3-XT-OQ7 | answered: part 10 | as R1-XT-OQ16 |
+| R3-XT-OQ8 | answered: part 5.i | as R2-XT-OQ15 |
+| R4-XT-OQ7 | answered: part 9 | as R1-XT-OQ14 |
+| R6-OBS-OQ5 | answered: part 8 | a per-match client summary; whether it joins the match record, and where it is stored, is ADR 0006's |
+| R6-XT-OQ5 | answered: part 8 | as R3-XT-OQ4 |
+
+Counts: adopted 23 · changed 2 · rejected 0 · answered 15 · open 12 · spike 19 (71 in all).
+
+## Sources
+
+Read for this record (lines at 9e7db28; the topic files do not change in this PR):
+- `docs/research/r3-rendering.md`: the header and "How to read this file" (lines 1–48); Findings Q1–Q7 with their
+  legacy facts (lines 58–772); Options (lines 774–894); Recommendations (lines 896–1281); Open questions, including
+  the shared and cross-topic questions (lines 1282–1465); Pointers to other topics (lines 1466–1511); the hinge table
+  (lines 1513–1531); Verifier spot-check, second pass and consistency resolutions (lines 1532–1688).
+- `docs/research/r1-simulation-core.md`: Options Q1 of the boundary unit, row A3 (line 1739); Recommendations
+  R1-TICK-REC5 (lines 2094–2116), R1-DET-REC1 (2129–2145), R1-DET-REC4 (2184–2207), R1-DET-REC6 (2222–2241),
+  R1-BND-REC1 (2252–2264), R1-BND-REC2 (2265–2285); Open questions R1-TICK-OQ6 (2662–2665), R1-BND-OQ3 (2728–2731),
+  R1-BND-OQ6 (2737–2740), R1-XT-OQ14 (3092–3096), R1-XT-OQ16 (3101–3105).
+- `docs/research/r2-netcode.md`: Recommendations R2-INT-REC1 (lines 2420–2443) and R2-INT-REC2 (2445–2466); Open
+  questions R2-INT-OQ1 (3005–3009), R2-INT-OQ2 (3010–3013), R2-XU-OQ12 (3220–3225), R2-XT-OQ15 (3409–3412).
+- `docs/research/r4-physics-navigation.md`: Recommendations R4-FLOORS-REC1 (lines 903–924), R4-FLOORS-REC2
+  (925–939), R4-OBST-REC2 (1043–1061); R4-XT-OQ7 (1206–1210).
+- `docs/research/r6-infrastructure.md`: R6-OBS-REC4 (lines 769–780); R6-OBS-OQ5 (905–906); R6-XT-OQ5 (1015–1020).
+- `docs/research/GLOSSARY.md`: §1 (time statistics, the client's sim share), §2 (player count, the largest mode, the
+  design point), §3 (the stress scene, big vehicle and very large unit, live projectile, active effect
+  and visual effect), §4 (shared stream and authority-only stream); §8 as the decision map's addendum (J1) gives it.
+- `docs/research/README.md` (the shape of a topic file); `docs/adr/0000-template.md`.
+- `docs/VISION_V2.md` §4, §6; `docs/LOOP_V2.md` §7, §11; `docs/LOOK_V2.md` (all); `docs/EDITOR_V2.md` §2;
+  `docs/V2_PHASE0_BRIEF.md` §0 (line 8); `docs/STATUS.md` "Decisions pending" (lines 93–202).
+- `docs/LEGACY_INVENTORY.md`: the rows cited by id and line (CD5, CD9, CD15–CD17, CD19, CL1–CL4, CL6–CL10, CL12,
+  CL14, CC1–CC6, CC8, CC9, CC11, CC12, GW3, GW4, GW17, GA1–GA15, GC6, GC8, GC16, GN1, GN8, GP1, GP4, GP5, GP6, GP7,
+  GP9, GP10, GP12, PG2–PG8, PG10–PG12, PG14–PG16, PG20).
+- The decision drafts' working files: the decision map (`engine-architect-decision-map.md`, parts a, c, d, e, g, h
+  and j, and its id table), the plan (revision 3) and the advisor's verdict on it (§1, the ASSET-RESEARCH ruling).

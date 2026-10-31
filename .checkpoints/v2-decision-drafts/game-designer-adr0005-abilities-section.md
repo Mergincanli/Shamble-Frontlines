@@ -56,7 +56,7 @@ Short citations: r1, r2 and r4 are `docs/research/r1-simulation-core.md`, `r2-ne
   Findings §5, R1-ABL-F17, lines 1286–1295). Quake III's weapon timer is an integer counter that carries its overshoot
   into the next shot (R1-ABL-F22, lines 1322–1330).
 - Upgrade tracks: the research has no finding on them (no topic file mentions a roguelike track, an offer of three or
-  in-match upgrades; its "playerstate" hits are Quake III's player state, r1:1320, r2:199–203). What this section says
+  in-match upgrades; its "playerstate" hits are Quake III's player state, r1:1320, r2:199–237). What this section says
   about tracks rests on UPGRADE-SCOPE and on R1-ABL-REC1's vocabulary only. Anything more is an open question or a
   proposed spike mark (plan rule 2).
 
@@ -174,7 +174,7 @@ weapon.
   | The Hammer's leech (§6 `[DECIDED]` `[LATER]`) | not built; kept possible by two primitives VISION_V2 §6.4 needs anyway: an effect removed when its source dies, and a trigger on the last hit or tick that moves the victim's item to the source (R1-ABL-REC1 mark 3, lines 2372–2376) | none | the item and the leech rules |
   | Marking (VISION_V2 §6.4) | an effect that grants a tag (the research's reading, R1-ABL-REC1, lines 2359–2361); who sees the tag is ADR 0001's interest management (R1-ABL-OQ8) | none | what marking does (R1-ABL-OQ6) |
   | The Spy's disguise and hack (§5 `[DECIDED]` `[LATER]`; cost, what breaks the disguise, hack length, the amount stolen and the warnings `[OPEN]`) | not built; kept possible: the disguise as a tag-granting effect whose shown identity differs per team (an enemy client receives the disguise as the identity it sees: R2-INT-REC5, ADR 0001); the hack as a timed ability with cancel tags; the cost as an instant effect on a named attribute, so the player's money and the team's tech both stay possible | none | all of it (R2-INT-OQ8, a design question) |
-  | Legacy Bayonet, Torque Bow, health regen (not in LOOP_V2) | test cases only (R1-ABL-REC1 mark 1) | Bayonet 1.3 s charge, kills within 2.4 m, 10 s cooldown (r1:1373); Torque Bow fuse 0.55 s (r1:1376); regen after 3.5 s at 16 HP/s (LEGACY_TUNING.md, `T`, lines 126–127) | whether each stays (R1-ABL-OQ6) |
+  | Legacy Bayonet, Torque Bow, health regen (not in LOOP_V2) | the Bayonet and the Torque Bow are test cases only (R1-ABL-REC1 mark 1); regen would be a periodic effect, "a candidate periodic effect" in the research (r1:1380) | Bayonet 1.3 s charge, kills within 2.4 m, 10 s cooldown (r1:1373); Torque Bow fuse 0.55 s (r1:1376); regen after 3.5 s at 16 HP/s (LEGACY_TUNING.md, `T`, lines 126–127) | whether each stays (R1-ABL-OQ6) |
 
   - Research: R1-ABL-REC1, REC2; R4-PHYS-REC3 (r4-physics-navigation.md, Recommendations, lines 747–751).
   - Need: VISION_V2 §6.3, §6.4; the rows' rules: LOOP_V2 §4–§7.
@@ -226,7 +226,8 @@ weapon.
   key and cues keyed so that a replayed activation plays once (R1-ABL-REC4, lines 2421–2433, ADR 0001's). If no,
   ability presses wait for the server's confirmation. Nothing in AB-1 to AB-8 depends on the answer: the definitions
   are the same either way; only the prediction scope changes (ADR 0001). Need: VISION_V2 §6.3.
-- **AB-10. The per-tick cost (R1-ABL-REC6, owned by ADR 0004), and one proposed addition.**
+- **AB-10. What the ability, effect and weapon step may cost per tick (R1-ABL-REC6, owned by ADR 0004), and one
+  proposed addition.**
   - The mark as the research sets it: the ability, effect and weapon step in
     [the stress scene](../research/GLOSSARY.md#the-stress-scene) (N = 48 soldiers, each with up to 8
     [active effects](../research/GLOSSARY.md#active-effect-and-visual-effect), so 48 × 8 = 384) takes at most 1 ms
@@ -236,10 +237,10 @@ weapon.
     R1-ABL-REC6, lines 2465–2472; GLOSSARY.md, §3 The stress scene, lines 397–418).
   - At the 30 Hz baseline, 1 ms is 12 % of the sim step share (1 ÷ 8.33 = 0.12); at 60 Hz it would be 24 % of 4.17 ms
     (1 ÷ 4.17 = 0.24). The 1 ms itself is the same at both rates.
-  - Proposed addition: picks are long-lived effects, and how many a soldier holds is not designed yet (OQ-0005-AB3).
-    So the spike runs the step at 8, 16 and 32 active effects per soldier (384, 768 and 1,536 at N = 48) and reports
-    the count at which the step reaches 1 ms p99. Reason: the stress scene's 8 per soldier predates UPGRADE-SCOPE, and
-    the curve tells Mustafa how much room track content has before a number is designed.
+  - Proposed addition: picks are long-lived active effects, and how many a soldier holds is not designed yet
+    (OQ-0005-AB3). So the spike runs the step at 8, 16 and 32 active effects per soldier (384, 768 and 1,536 at
+    N = 48) and reports the count at which the step reaches 1 ms p99. Reason: the stress scene's 8 per soldier
+    predates UPGRADE-SCOPE, and the curve tells Mustafa how much room track content has before a number is designed.
   - Need: VISION_V2 §3 and §4 only (a budget, not a feature: R1-ABL-REC6, line 2478).
 
 ### Options considered (this section)
@@ -323,7 +324,7 @@ Option B1: weapons keep their own bookkeeping (proposed: AB-3).
 | Scalability / performance | keeps the per-shot cost low |
 | Security & anti-cheat | the authority decides ammo, cooldowns and reloads (GC4's mark: "the server must decide them") |
 | Effect on the art direction / feel | avoids Paragon's lower rate of fire at high latency (F17) |
-| Effort from the current code | legacy weapon state is already a per-soldier state machine (GC4, line 243) |
+| Effort from the current code | legacy's player weapon state is already a state machine: switching, swap and fire cooldowns, timed reloads, spread (GC4, line 243) |
 
 **Pros:** Fortnite's and Quake III's shape (F17, F22). **Cons:** a second mechanism beside effects.
 
@@ -596,7 +597,7 @@ test-engineer writes the final pass marks; the candidates below are the research
 - **Consequences.** Easier: combos and counters by data; tuning with no code change; content work within the closed
   set without a programmer; telemetry keyed by the same ids. Harder: every mechanic outside the closed set is a
   reviewed Rust change (knockback is the first); designers must know the aggregation order and the stacking policies;
-  tracks add long-lived effects per soldier, which the 1 ms part must absorb. Revisit when: the spike's mark 1 or 2
+  tracks add long-lived active effects per soldier, which the 1 ms part must absorb. Revisit when: the spike's mark 1 or 2
   fails (OQ-0005-AB13); track content exists (restate the stress scene's active effects per soldier with ADR 0004);
   ABL-PREDICT is answered; the Spy or the Hammer leaves `[LATER]`; seats are decided.
 - **Hard constraints in CLAUDE.md that change:** none because of this section. Tracks reset every match, so they need

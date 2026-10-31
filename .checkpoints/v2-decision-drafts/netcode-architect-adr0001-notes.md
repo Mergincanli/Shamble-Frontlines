@@ -27,3 +27,8 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - Next: write draft header+summary+Context.
 - 12. Draft: header, summary, Context written to netcode-architect-adr0001-draft.md. Next: Decision (intro + parts 1-14), then subsections.
 - 13. Decision intro + parts 1-14 written. Next: Decision subsections (components/data flow, ownership, catalogue, bandwidth, budgets, failure modes, anti-cheat).
+- 14. Decision subsections written (components, ownership, catalogue, bandwidth, budgets, failure modes, anti-cheat). Next: Options considered.
+- 15. Options considered written (Q1-Q26). Next: Trade-off analysis, Consequences.
+- 16. Trade-off analysis and Consequences written. Next: Open questions (13).
+- 17. Open questions OQ-0001-1..13 written. Next: What a spike must prove, Migration, Test plan, Rollback.
+- 18. What a spike must prove, Pass marks placeholder, Migration plan, Test plan, Rollback written. Next: Appendix A (127 rows), Sources.

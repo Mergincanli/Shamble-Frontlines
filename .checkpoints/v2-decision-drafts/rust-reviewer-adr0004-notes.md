@@ -29,3 +29,7 @@ R1-ECS-REC1 1891-1950; R1-ECS-REC2 1952-1971; R1-ECS-REC3 1973-1991; R1-ECS-REC4
 - 18:08 UTC: Decision section (21 parts) written. Next: verify the cited lines in Decision, then Options considered.
 - 18:10 UTC: Options considered (Q1-Q11) written. Next: Trade-off analysis, Consequences (with inventory rows), OQs.
 - 18:11 UTC: Trade-off, Consequences (+inventory table), Open questions OQ-0004-1..7 written. Next: spike section, migration, test plan, rollback, Appendix A, Sources; then ledger.
+- 18:13 UTC: Spike section S1-S20 written (exact end lines verified: r1 1985-1989, 2139-2144, 2165-2168, 2178-2182, 2238-2240; r4 739-743, 830-841, 880-884, 896-897, 951-952, 975-986, 1015-1016). Next: Migration, Test plan, Rollback, Appendix A, Sources.
+- 18:15 UTC: Migration, Test plan, Rollback written; S7 gained DET-OQ8/OQ10, S8 ChaCha8 cost. Next: Appendix A (82 rows), Sources; then replace 'decision map h/J2/e2' citations with lasting wording.
+- 18:16 UTC: Appendix A (82/82: adopted 25, changed 10, rejected 1, answered 27, spike 17, open 2) and Sources written. Next: remove 'decision map' cites; glossary-term pass; then ledger.
+- 18:17 UTC: draft complete (all sections). Glossary pass: retired phrases fixed (whole tick, the period, tick cost, bare 48), first uses linked (state hash, big vehicles, very large units, stress scene, largest mode, prediction scope, server tick time, headroom). Draft keeps the map's I-n/S-n interface codes (flag in return). Next: claims ledger, section by section (Context first).
