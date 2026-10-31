@@ -1,9 +1,9 @@
 # Checkpoint: docs-after-v2-research
 - **Goal:** record PR #28's merge and the 2026-10-31 decisions (two messages, verbatim in
   `docs-after-v2-research/decisions-2026-10-31.md`) in STATUS, ROADMAP, the research folder, VISION_V2 §3 (one line)
-  and the Night queue · plan: `docs-after-v2-research/plan.md` (revision 2; the advisor's review pending)
+  and the Night queue · plan: `docs-after-v2-research/plan.md` (revision 2; advisor APPROVE with 16 conditions)
 - **Branch:** cs/docs-after-v2-research · **Base:** origin/main b6effde (PR #28's merge commit)
-- **Last update:** 2026-10-31 15:00 Amsterdam
+- **Last update:** 2026-10-31 15:15 Amsterdam
 
 ## Steps done
 1. PR #28 merged on Mustafa's "merge #28" in this session's chat (2026-10-31), after the advisor's APPROVE of
@@ -21,23 +21,26 @@
    update routines they created"): Mustafa sets `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` on its page. The old "Night
    shift" (trig_019LtRqmAdzddyk6K3e3kDJz) was switched off by the session at 13:54:19 UTC (NS-2 (c)); only the new one
    is enabled (read back at 13:54 UTC).
+7. The advisor's plan review: APPROVE with 16 conditions (verbatim in `advisor-verdicts.md`; folded into plan.md).
+8. Part R applied (39 edits in 7 files, +75 −17; the applied diff equals the regenerated preview line for line) and
+   part V (VISION_V2 line 43) · the commit that carries this checkpoint update.
 
 ## Current step
-The advisor's review of plan revision 2 (APPROVE → build; REVISE → fix; ESCALATE → Mustafa).
+docs-keeper writes part L (STATUS, ROADMAP, the research README, REPO_MAP) under conditions 7–12.
 
 ## Next steps
-1. On APPROVE (with its conditions): `python3 -I .checkpoints/docs-after-v2-research/scripts/apply_research_answers.py
-   --apply` (the two ADAPTED texts as the advisor rules); the VISION_V2 line; docs-keeper's part L; the issue #16 edits
-   (after the research and docs commits); gate; repo-map check; the verification workflow (V1–V4); fixes.
-2. Draft PR (body = report); the advisor reviews the head; fold this checkpoint into the PR body and delete it
-   (CHECKPOINTS.md §9); ready; Mustafa's "merge #<n>".
+1. docs-keeper's part L; then the issue #16 edits (conditions 13; items 1 and 3 as planned); gate; repo-map check;
+   the verification workflow (V1–V4; V1 against `research-edits.diff`); fixes.
+2. Draft PR (body = report, with both messages verbatim and the issue #16 old/new text); fold this checkpoint into the
+   body and delete `.checkpoints/docs-after-v2-research*` in a CI-running commit; check `git ls-tree` is empty; the
+   advisor reviews that final head; ready; Mustafa's "merge #<n>" (condition 15).
 
 ## Open findings
 - The advisor's #28 review (PR comment 6542571633), non-blocking: (1) STATUS stale → this change-set; (2) R2-BUD-REC6's
   reason holds only at N = 54 → the drafts (carry-forward 2 in the plan); (3) the report's "three decisions stay open"
   → a dated record, STATUS lists them; (4) plan condition 9 → the drafts' plan.
 - Rules files (KIT-ALIGN) and the Advisor's documents (DOCS-ALIGN): listed in the plan, not edited here.
-- Two of the six approved (b)-only texts need the advisor's ruling (C17.b2, C23.b2: their quotes changed in step 3c).
+- The advisor ruled the adapted texts (conditions 2–4: C17.b1 merged, C17.b2 as written, C23.b2 with one word fix).
 
 ## Key numbers
 - GLOSSARY.md:62-66, N = 48, 60 Hz: a tick that encodes and re-floods fits the 50 % server tick budget by 0.05 ms

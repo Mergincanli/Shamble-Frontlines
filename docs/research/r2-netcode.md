@@ -2609,9 +2609,10 @@ What a spike must prove (proposed pass marks):
    ceiling. A session from an origin not on the list is refused with 403, from all four browsers.
 5. Version floors (added in the fix pass, Rust review risk 1): the lockfile resolves quinn-proto ≥ 0.11.18, rustls ≥
    0.23.46, ring ≥ 0.17.12 and tokio ≥ 1.54.1 (F40). wtransport's `dangerous-configuration` feature stays off (the Rust
-   review found it in wtransport's Cargo.toml). An advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) that gates pull requests to keep
-   these current belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the
-   Advisor; R5-GATE-REC1 already schedules the advisories check, and its policy waits on BASELINE-WHEN (below).
+   review found it in wtransport's Cargo.toml). The check that keeps these current is R5-GATE-REC1's scheduled advisories check
+   ([GLOSSARY](GLOSSARY.md#the-advisories-check); also run when `Cargo.lock` changes); its policy, whether an advisory blocks a PR,
+   belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the Advisor
+   (BASELINE-WHEN (b)).
 
 **R2-TRN-REC2. Send inputs and snapshots as datagrams, and reliable traffic on streams. Cap each snapshot datagram at a proposed
 1,000 bytes of payload and make every datagram decodable on its own (no fragmenting of one snapshot). Put reliable control on
@@ -3284,6 +3285,7 @@ is headed by its decision code.
   R1-ABL-REC4's ability marks drop out. Decided by: R2-SYNC-OQ10's Feel Lab comparison of predicted against
   server-confirmed Molotov and Shield (or a readable source), then Mustafa (game feel). Also asked as R2-SYNC-OQ10 and
   R1-ABL-OQ4.
+  **Mustafa, 2026-10-31: answered later, after the Feel Lab test.**
 - **SEC-SPREAD (Mustafa). Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicted
   tracers match the server's spread, but lets a cheat cancel the spread through the aim point it sends (R2-SYNC-OQ11,
   the security review's finding H2). The design keeps weapon spread in an authority-only stream
@@ -3291,6 +3293,7 @@ is headed by its decision code.
   tracers from a cosmetic spread and the hit event corrects them. If Mustafa picks matching tracers, spread moves to a
   shared stream, inside the client's state and its compared hash; nothing else in the stream design changes. Also
   asked as R2-SYNC-OQ11. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a), server-only spread:** weapon spread stays in the authority-only stream.
 - **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
   and three teams with 6–18 players" to start, and "The goal: 12v12v12 or 24v24". (a) Totals: 1v1 to 4v4, and 2v2v2 to
   6v6v6; the largest mode is then the goal 24v24, N = 48. (b) Per team: 2v2 to 8v8, and 6v6v6 to 18v18v18; the largest
@@ -3299,6 +3302,8 @@ is headed by its decision code.
   the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the test-mode list
   ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives
   both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
+  values for 48 and 54, the 48 value holds.
 - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
   security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits,
   anti-cheat basics) was deferred by the Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched
@@ -3310,6 +3315,8 @@ is headed by its decision code.
   scheduled advisories check stays the mechanism and the baseline sets the policy later; R2-TRN-REC5's certificate per
   hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave both as one shared open question.
   Decided by: the Advisor.
+  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
+  above; the baseline is researched before the first online playtest, in its own fresh session.
 
 ### Cross-topic open questions (consistency critic, 2026-10-29)
 
@@ -3879,6 +3886,8 @@ day, as approved, with nothing new claimed, numbered or sourced. Change ids are 
 - 23, BASELINE-WHEN (escalated; "now" changes only): C23.1 (R2-TRN-REC5), C23.2 (R2-TRN-OQ4).
 - Not applied: C17.b2 and every C23.b change, which wait for the Advisor's answer to BASELINE-WHEN. Resolutions 19,
   21, 22 and 29 change nothing in R2.
+  Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b2, fitted to step 3c's wording with its two
+  glossary links (advisor plan review, 2026-10-31). R2 has no C23.b change under (b).
 
 **Glossary terms.** The header links [GLOSSARY.md](GLOSSARY.md), and so does the first use of each term R2 uses (the
 tick period, sim step time, server tick time, transport runtime time, time statistics, the server tick budget, the

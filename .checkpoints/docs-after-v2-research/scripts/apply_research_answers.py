@@ -14,9 +14,19 @@ Three kinds of edit, all exact:
   after   : `anchor` (an exact whole line) must occur exactly once; `add` is inserted right after it.
 Nothing else in any file changes. --apply refuses to write if any check fails.
 """
-import sys, json, pathlib
+import sys, json, pathlib, textwrap
 
 R = 'docs/research/'
+
+
+def wrap(text, indent='  '):
+    """Wrap one paragraph at the files' usual width (120), every line indented; returns the lines."""
+    return textwrap.fill(text, width=120, initial_indent=indent, subsequent_indent=indent,
+                         break_long_words=False, break_on_hyphens=False).split('\n')
+
+
+def wrap_block(text, indent='  '):
+    return '\n'.join(wrap(text, indent)) + '\n'
 
 # ---- The answered shared questions (one note per copy, the same words in every topic file) ----
 MODES = ["  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives",
@@ -73,8 +83,10 @@ GL = [
      ["  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so it is listed open in ADR 0006 with the interim",
       "  positions above, and researched before the first online playtest, in its own fresh session."]),
     ('G-certificate', "- **Depends on:** BASELINE-WHEN (the Advisor), as above: under (b) the certificate per hostname holds and the wildcard",
-     ["  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard is",
-      "  an option the baseline weighs."]),
+     # advisor condition 5 (plan review, 2026-10-31): exact text
+     wrap("**Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard "
+          "is an option the baseline weighs; R6-HOST-REC4 now recommends the certificate per hostname (C23.b1–b3, applied "
+          "2026-10-31).")),
 ]
 for fid, anchor, add in GL:
     ap(fid, G, anchor, add, 'the answer of 2026-10-31, under the entry\'s "Depends on"')
@@ -92,13 +104,18 @@ EDITS.append(dict(id='G-preview', kind='after', file=R + G,
 # ---- The six (b)-only changes approved on 2026-10-30 (appendix §2: C17.b1–b3 at 1071-1080; C23.b1–b3 at 1415-1428,
 #      as REVISED at 1596-1599). V = verbatim; ADAPTED = the approved text fitted to step 3c's wording (advisor rules) ----
 EDITS += [
-    dict(id='C17.b1', status='verbatim', kind='replace', file=R + 'r1-simulation-core.md',
-         before="  cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis. R5-GATE-REC1 schedules a\n",
-         after="  cargo-audit and cargo-deny as CI gates. Decided (BASELINE-WHEN (b)): the mechanism is R5-GATE-REC1's scheduled\n"
-               "  advisories check, also run on every PR that changes `Cargo.lock`; whether an advisory blocks a PR, and who owns that\n"
-               "  policy, is the security baseline's (R6-SEC-OQ1). R5-GATE-REC1 schedules a\n",
-         why='R1-RR-OQ7: C17.b1 as approved (the quote matches; step 3c\'s interim sentence after it stays, so the mechanism '
-             'is named twice)'),
+    dict(id='C17.b1', status='MERGED (advisor condition 2)', kind='replace', file=R + 'r1-simulation-core.md',
+         before="  cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis. R5-GATE-REC1 schedules a\n"
+                "  cargo-deny advisories check and runs it on every PR that changes `Cargo.lock`\n"
+                "  ([GLOSSARY](GLOSSARY.md#the-advisories-check): the advisories check); whether an advisory blocks a PR is\n"
+                "  R5-GATE-OQ4, left to [the security baseline](GLOSSARY.md#the-security-baseline). Shared as BASELINE-WHEN (below).\n",
+         after=wrap_block("cargo-audit and cargo-deny as CI gates. Decided (BASELINE-WHEN (b)): the mechanism is R5-GATE-REC1's "
+                          "scheduled advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check): cargo-deny's advisories "
+                          "check), also run on every PR that changes `Cargo.lock`; whether an advisory blocks a PR (R5-GATE-OQ4), "
+                          "and who owns that policy, is the security baseline's "
+                          "([GLOSSARY](GLOSSARY.md#the-security-baseline); R6-SEC-OQ1). Shared as BASELINE-WHEN (below)."),
+         why='R1-RR-OQ7: C17.b1 merged with step 3c\'s interim sentence, in the advisor\'s exact text (plan review, '
+             '2026-10-31, condition 2), wrapped at the file\'s width'),
     dict(id='C17.b2', status='ADAPTED', kind='replace', file=R + 'r2-netcode.md',
          before="An advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check)) that gates pull requests to keep\n"
                 "   these current belongs to the security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline); dependency audits), deferred by the\n"
@@ -123,25 +140,51 @@ EDITS += [
                "  by one job and copied to every game VM) (BASELINE-WHEN (b)).** C2 would depart from R2-TRN-REC5's wording,",
          why='R6-HOST-REC4 heading: C23.b1 as REVISED by the advisor (the quote matches across its line break), together '
              'with C23.b2\'s first part ("This departs" → "C2 would depart")'),
-    dict(id='C23.b2', status='ADAPTED', kind='replace', file=R + 'r6-infrastructure.md',
-         before="Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the\n"
+    dict(id='C23.b2', status='ADAPTED (advisor condition 4)', kind='replace', file=R + 'r6-infrastructure.md',
+         before="  the deferred security baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the\n"
                 "  baseline rejects a shared key; when the baseline is researched is BASELINE-WHEN (below). It needs no TCP 80 on game VMs.\n"
                 "  *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes\n"
-                "  adding a VM a copy, not an issuance.",
-         after="C2 replaces them only if the\n"
-               "  baseline accepts a shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 per name it needs\n"
-               "  no TCP 80 on game VMs (F24); C1's http-01 needs TCP 80.\n"
-               "  *Reason:* a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game VMs; RFC 8555 proves\n"
-               "  control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for the baseline to weigh: one certificate\n"
-               "  for all VMs makes adding a VM a copy, not an issuance; RFC 8555 allows wildcard orders (F24).",
-         why='R6-HOST-REC4 body and Reason: C23.b2 as REVISED; ADAPTED in one place: the approved quote "… rejects a shared '
-             'key." now ends "… rejects a shared key; when the baseline is researched is BASELINE-WHEN (below)." (step 3c\'s '
-             'interim C23 clause), so only the approved part is replaced and that clause stays'),
+                "  adding a VM a copy, not an issuance.\n",
+         after=wrap_block("the deferred security baseline, R6-SEC-OQ1). C2 replaces the per-hostname certificates only if the "
+                          "baseline accepts a shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 "
+                          "per name it needs no TCP 80 on game VMs (F24); C1's http-01 needs TCP 80.")
+               + wrap_block("*Reason:* a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game "
+                            "VMs; RFC 8555 proves control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for "
+                            "the baseline to weigh: one certificate for all VMs makes adding a VM a copy, not an issuance; RFC "
+                            "8555 allows wildcard orders (F24)."),
+         why='R6-HOST-REC4 body and Reason: C23.b2 as REVISED, fitted to step 3c\'s interim clause ("when the baseline is '
+             'researched is BASELINE-WHEN (below)" stays), with "them" → "the per-hostname certificates" (advisor plan '
+             'review, 2026-10-31, condition 4)'),
+    dict(id='C23.b2-rests-on', status='advisor condition 4', kind='replace', file=R + 'r6-infrastructure.md',
+         before="*Rests on:* F24; R2-TRN-REC5 (the departure is stated above).",
+         after="*Rests on:* F24; R2-TRN-REC5 (C2's departure from it is stated above).",
+         why='R6-HOST-REC4 "Rests on", in the advisor\'s exact text (condition 4)'),
     dict(id='C23.b3', status='verbatim', kind='replace', file=R + 'r6-infrastructure.md',
          before="with the wildcard\n  certificate ([GLOSSARY](GLOSSARY.md#game-server-certificate))",
          after="with the per-hostname\n  certificates ([GLOSSARY](GLOSSARY.md#game-server-certificate))",
          why='R6-HOST-REC4 spike: C23.b3 as approved ("with the wildcard certificate" → "with the per-hostname certificates")'),
 ]
+
+# ---- The logged changes (advisor condition 6): one line after each step-3c "not applied" log, at that line's indent;
+#      the "not applied" lines themselves stay unchanged ----
+LOGS = [
+    ('LOG-R1', 'r1-simulation-core.md', "  Not applied: C17.b1, which waits for the Advisor's answer to BASELINE-WHEN.", '  ',
+     "Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b1, merged with step 3c's sentence "
+     "(advisor plan review, 2026-10-31)."),
+    ('LOG-R2', 'r2-netcode.md', "  21, 22 and 29 change nothing in R2.", '  ',
+     "Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b2, fitted to step 3c's wording with its "
+     "two glossary links (advisor plan review, 2026-10-31). R2 has no C23.b change under (b)."),
+    ('LOG-R5', 'r5-toolchain-quality.md',
+     "    inserted); C17.b3 is not applied: it waits for the Advisor's BASELINE-WHEN answer;", '    ',
+     "Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b3, word for word."),
+    ('LOG-R6', 'r6-infrastructure.md', "  the Advisor's answer to BASELINE-WHEN.", '  ',
+     "Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C23.b1 and C23.b3 word for word, C23.b2 "
+     "fitted to step 3c's interim clause (advisor plan review, 2026-10-31). C23.b1 is a recommendation change: "
+     "R6-HOST-REC4 now recommends a certificate per hostname, with the wildcard an option the baseline weighs."),
+]
+for fid, f, anchor, indent, text in LOGS:
+    EDITS.append(dict(id=fid, kind='after', file=R + f, anchor=anchor, add=wrap(text, indent),
+                      why='the logged change asked by step-3b condition 2 (advisor plan review, condition 6)'))
 
 
 def entry_end(lines, i):

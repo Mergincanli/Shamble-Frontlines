@@ -39,6 +39,8 @@ deferred security baseline before ADR 0006, or list it open), **SEC-SPREAD** (Mu
 resistance, R2-SYNC-OQ11), **ABL-PREDICT** (Mustafa, after a Feel Lab test: does the client predict its own abilities),
 **PREV-DELETE** (a spike: does a closed PR's preview really disappear). Their full wording is in each affected topic's
 "Shared open questions (the same words in every topic)" subsection.
+Answered on 2026-10-31: MODES-3 (a), PREVIEW-WALL (a) and SEC-SPREAD (a) by Mustafa, BASELINE-WHEN (b) by the
+Advisor; ABL-PREDICT waits for a Feel Lab test and PREV-DELETE for its spike.
 
 ## 1. Tick budgets
 
@@ -315,6 +317,7 @@ with a re-flood) against 8.33.
   three teams with 6–18 players"; which modes those words name depends on MODES-3.
 - **Depends on:** MODES-3. Reading (a), totals: 1v1 to 4v4 (N = 2 to 8) and 2v2v2 to 6v6v6 (N = 6 to 18). Reading (b),
   per team: 2v2 to 8v8 (N = 4 to 16) and 6v6v6 to 18v18v18 (N = 18 to 54). This glossary picks neither.
+  **Answered 2026-10-31 (Mustafa): MODES-3 (a), totals,** so reading (a) holds.
 - **Marked by:** "start", "start small", "goal".
 - **Retire (exact):** none.
 - **Retire (in context):** "the goal" for a start mode; "(start, upper end)" with no reading named.
@@ -334,6 +337,7 @@ with a re-flood) against 8.33.
 - **Depends on:** MODES-3. Under (a) the largest mode is the goal 24v24, N = 48. Under (b) it is the start mode
   18v18v18, N = 54 (R2-BUD-OQ6: "per team they would mean up to 16 and 54 players"). This glossary picks neither; a
   mark gives both values until Mustafa answers.
+  **Answered 2026-10-31 (Mustafa): MODES-3 (a), totals,** so the largest mode is the goal 24v24, N = 48.
 - **Marked by:** "the largest mode", "the largest mode's N".
 - **Retire (exact):** none.
 - **Retire (in context):** "the largest mode (48 soldiers, 47 of them bots)" (R1-TICK-OQ7) and "Largest N"
@@ -354,6 +358,7 @@ with a re-flood) against 8.33.
   headroom)" row).
 - **Depends on:** MODES-3, for how the two relate. Under (a) the design point equals the largest mode's N (48). Under
   (b) the largest mode's N (54) is above the design point (R2-BUD-OQ6: "54 is above the 48 design point").
+  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so the design point equals the largest mode's N (48).
 - **Marked by:** "design point", "headroom", "48+".
 - **Retire (exact):** none.
 - **Retire (in context):** "the largest mode" for the design point.
@@ -377,6 +382,8 @@ with a re-flood) against 8.33.
   5. the headroom run, N = 64, labelled headroom.
 - **Depends on:** MODES-3, for items 3 and 4. Under (a): 1v1, 4v4, 2v2v2 and 6v6v6, and the largest mode is 24v24
   (item 1). Under (b): 2v2, 8v8, 6v6v6 and 18v18v18, and the largest mode is 18v18v18 (N = 54).
+  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so items 3 and 4 are 1v1, 4v4, 2v2v2 and 6v6v6, and the largest
+  mode is 24v24.
 - **Marked by:** "the test-mode list", "the test modes".
 - **Retire (exact):** none.
 - **Retire (in context):** each topic's own mode list in a pass mark that means "every mode we test"
@@ -409,6 +416,7 @@ with a re-flood) against 8.33.
   includes the server-only share, every soldier has a snapshot-receiving client (R2-SYNC-REC9 mark 1), as the budget's
   48 × 50 µs assumes.
 - **Depends on:** MODES-3, for N and the three-team arrangement only; every other count is the same under both readings.
+  **Answered 2026-10-31 (Mustafa): MODES-3 (a),** so the soldiers are N = 48, in three teams (16v16v16).
 - **Marked by:** "the stress scene", "the stress scene's fight on screen".
 - **Retire (exact):** "P1's scene" (R1-TICK-REC3), "the worst case of the largest mode" (R3-BUDGET-REC2,
   R3-MEASURE-REC2), "R4-PHYS-REC4's stress scene" (R4-OBST-REC1), "a physics scene of the largest mode's size"
@@ -498,6 +506,7 @@ with a re-flood) against 8.33.
   own ability activation, cost, cooldown, granted tags and movement changes such as Banzai speed and Shield slow
   (R1-ABL-REC4, option D2); (no) ability presses wait for the server's confirmation (R2-SYNC-REC3's scope as it
   stands). This glossary picks neither.
+  **Mustafa, 2026-10-31: ABL-PREDICT is answered later, after the Feel Lab test.**
 - **Marked by:** "the prediction scope", "predict", "predicted".
 - **Retire (exact):** none.
 - **Retire (in context):** "predict only the local player's own abilities and weapons" as a settled scope
@@ -523,6 +532,7 @@ with a re-flood) against 8.33.
 - **Depends on:** SEC-SPREAD (Mustafa, R2-SYNC-OQ11), for weapon spread only: under the security review's answer it
   stays authority-only; if Mustafa picks matching tracers, it becomes a shared stream. Every other part of the
   definition is the same under both.
+  **Answered 2026-10-31 (Mustafa): SEC-SPREAD (a),** so weapon spread stays authority-only.
 - **Marked by:** "shared stream", "authority-only stream".
 - **Retire (exact):** "server-only random stream" (R2-SYNC-REC3), since an offline match's Worker is the authority too.
 - **Retire (in context):** "the simulation's seeded RNG" for spread without naming the stream kind (R1-ABL-REC3).
@@ -554,6 +564,7 @@ with a re-flood) against 8.33.
   (R5-PREV-REC5). It runs the match offline in the worker with bots and needs no game server (R6-HOST-REC3,
   R1-BND-REC6), unless it is a multiplayer preview that talks to the staging game server (and then PREVIEW-WALL
   applies). It carries the preview header set. Until PREVIEW-WALL is answered there are no multiplayer previews.
+  PREVIEW-WALL was answered (a) on 2026-10-31: a multiplayer preview is behind the access wall from the first one.
 - **Marked by:** "preview", "preview link", "multiplayer preview".
 - **Retire (exact):** none.
 - **Retire (in context):** "deploy preview" (Netlify's product name, R5-PREV-F15) for our previews;
@@ -611,6 +622,8 @@ with a re-flood) against 8.33.
   off, since previews hold no secrets; (c) decided after the security baseline. This glossary picks none. Under every
   option, previews that reach no game server and carry no unreleased art are public but unlisted; one that carries
   unreleased art is behind the wall (R5-PREV-REC5, R5-PREV-OQ1).
+  **Answered 2026-10-31 (Mustafa): PREVIEW-WALL (a),** so the wall is on from the first preview that reaches the
+  staging game server.
 - **Marked by:** "the access wall".
 - **Retire (exact):** none.
 - **Retire (in context):** "the access policy", "Cloudflare Access" and "private previews" as names for the decision
@@ -660,6 +673,8 @@ with a re-flood) against 8.33.
   (b) listed open in ADR 0006, with interim positions (R5-GATE-REC1's scheduled advisories check as the mechanism;
   R2-TRN-REC5's certificate per hostname, with R6's wildcard as an option the baseline weighs); (c) left as one shared
   open question. This glossary picks none.
+  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so it is listed open in ADR 0006 with the interim
+  positions above, and researched before the first online playtest, in its own fresh session.
 - **Marked by:** "the security baseline".
 - **Retire (exact):** none.
 - **Retire (in context):** "R6's deferred baseline", "the deferred baseline", "R6's security baseline" as different
@@ -696,6 +711,8 @@ with a re-flood) against 8.33.
 - **Depends on:** BASELINE-WHEN (the Advisor), as above: under (b) the certificate per hostname holds and the wildcard
   is an option the baseline weighs; under (a) the research decides; under (c) both stay as written with one shared
   question. This glossary picks none.
+  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard is an
+  option the baseline weighs; R6-HOST-REC4 now recommends the certificate per hostname (C23.b1–b3, applied 2026-10-31).
 - **Marked by:** "a certificate per hostname", "the wildcard certificate".
 - **Retire (exact):** none.
 - **Retire (in context):** "a publicly trusted certificate" for production with no form named (per hostname or

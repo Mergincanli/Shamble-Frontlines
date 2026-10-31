@@ -1158,6 +1158,8 @@ so a search for the code finds every copy.
   the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the test-mode list
   ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives
   both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
+  values for 48 and 54, the 48 value holds.
 
 ### Cross-topic open questions (consistency critic, 2026-10-29)
 Added 2026-10-30 (step 3c): the consistency critic's hidden dependencies and gaps that touch this topic, in the

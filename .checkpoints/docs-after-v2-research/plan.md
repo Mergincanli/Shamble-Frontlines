@@ -207,3 +207,28 @@ green on it. A push after the APPROVE needs a new review and a new go.
 Nothing to check in Brave. On the new night-shift routine's page, set the schedule to `CRON_TZ=Europe/Amsterdam 10 0-7 *
 * *`; after one good night, delete the old "Night shift" routine. Say "merge #<n>" once the advisor has approved this
 PR's head.
+
+## Conditions (advisor APPROVE of revision 2, 2026-10-31 about 14:05 UTC; verbatim in `advisor-verdicts.md`)
+1. Part R in this change-set; the preview and table regenerated after conditions 2–6; V1 compares against them.
+2. C17.b1: the advisor's merged text (replaces "Decides it … (below)." in R1-RR-OQ7), wrapped at the file's width.
+3. C17.b2 exactly as in the script.
+4. C23.b2: "them" → "the per-hostname certificates"; REC4's "Rests on" → "(C2's departure from it is stated above)".
+5. The glossary's certificate note: the advisor's exact text (R6-HOST-REC4 now recommends the certificate per hostname).
+6. Four logged-change lines after the step-3c "not applied" logs (r1:3690, r2:3880-3881, r5:2245, r6:1187-1188).
+7. The README's "Answered since" paragraph: the advisor's exact text.
+8. STATUS risk 1: the advisor's exact text (closed; the 60 Hz margin; TICK-30).
+9. STATUS Targets: the old bullet is not marked superseded; it gets "(before VISION_V2, 2026-10-24; LOOP_V2 §2 and
+   DESIGN_NOTES still carry it: DOCS-ALIGN)".
+10. NS-2 leaves "Waiting" in every case; the schedule edit and deleting the old routine go under Routines and in "For
+    Mustafa".
+11. Carry-forwards: item 2 in the advisor's exact text; item 4 (the four sentences that still call the wildcard R6's
+    proposal: r2-netcode.md:2703-2705, r6-infrastructure.md:47, 938-940 and 1056, lines at b6effde); item 5 (no doc
+    defines "netcode proof test" or "the foundation" yet: the drafts' plan names them for the Advisor to confirm).
+12. ROADMAP Phases: "v2 playable slices, in order (Mustafa and the Advisor, 2026-10-31): 1 move & shoot → 2 bots and
+    three teams (played locally) → 3 online → 4 the loop" (no "after phase 1").
+13. Issue #16 item 2: the advisor's exact text; items 1 and 3 as planned.
+14. The PR body carries both messages word for word and the issue #16 old and new text; V3 checks the quotes.
+15. Merge path: fold and delete the checkpoint in a CI-running commit → `git ls-tree -r --name-only HEAD -- .checkpoints`
+    prints nothing → the advisor reviews that final head → ready → Mustafa's "merge #<n>" → merge with that SHA.
+16. "For Mustafa" adds: tomorrow morning, check issue #16 has the new night shift's comment (the first proof it can post).
+Applied so far: 1–6 (research edits, commit below), and V (VISION_V2 line 43).

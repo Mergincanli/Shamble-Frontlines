@@ -50,36 +50,45 @@
  - **Marked by:** "the security baseline".
 @@ -698,2 +713,4 @@
    question. This glossary picks none.
-+  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard is
-+  an option the baseline weighs.
++  **Answered 2026-10-31 (the Advisor): BASELINE-WHEN (b),** so the certificate per hostname holds and the wildcard is an
++  option the baseline weighs; R6-HOST-REC4 now recommends the certificate per hostname (C23.b1–b3, applied 2026-10-31).
  - **Marked by:** "a certificate per hostname", "the wildcard certificate".
 --- a/docs/research/r1-simulation-core.md
 +++ b/docs/research/r1-simulation-core.md
-@@ -2957,3 +2957,5 @@
+@@ -2957,6 +2957,6 @@
    loop would use); its wider list (quinn-proto, rustls, ring) is R2's. The reviewer's proposal: lockfile floors, and
 -  cargo-audit and cargo-deny as CI gates. Decides it: R5's CI research and the synthesis. R5-GATE-REC1 schedules a
+-  cargo-deny advisories check and runs it on every PR that changes `Cargo.lock`
+-  ([GLOSSARY](GLOSSARY.md#the-advisories-check): the advisories check); whether an advisory blocks a PR is
+-  R5-GATE-OQ4, left to [the security baseline](GLOSSARY.md#the-security-baseline). Shared as BASELINE-WHEN (below).
 +  cargo-audit and cargo-deny as CI gates. Decided (BASELINE-WHEN (b)): the mechanism is R5-GATE-REC1's scheduled
-+  advisories check, also run on every PR that changes `Cargo.lock`; whether an advisory blocks a PR, and who owns that
-+  policy, is the security baseline's (R6-SEC-OQ1). R5-GATE-REC1 schedules a
-   cargo-deny advisories check and runs it on every PR that changes `Cargo.lock`
-@@ -2977,2 +2979,3 @@
++  advisories check ([GLOSSARY](GLOSSARY.md#the-advisories-check): cargo-deny's advisories check), also run on every PR
++  that changes `Cargo.lock`; whether an advisory blocks a PR (R5-GATE-OQ4), and who owns that policy, is the security
++  baseline's ([GLOSSARY](GLOSSARY.md#the-security-baseline); R6-SEC-OQ1). Shared as BASELINE-WHEN (below).
+ 
+@@ -2977,2 +2977,3 @@
    R1-ABL-OQ4.
 +  **Mustafa, 2026-10-31: answered later, after the Feel Lab test.**
  - **SEC-SPREAD (Mustafa). Matching tracers, or cheat resistance?** A spread seed the client knows makes its predicted
-@@ -2984,2 +2987,3 @@
+@@ -2984,2 +2985,3 @@
    asked as R2-SYNC-OQ11. Decided by: Mustafa.
 +  **Answered 2026-10-31 (Mustafa): (a), server-only spread:** weapon spread stays in the authority-only stream.
  - **MODES-3 (Mustafa). How are VISION_V2 §3's starting sizes read?** VISION_V2 §3 says "two teams with 2–8 players,
-@@ -2992,2 +2996,4 @@
+@@ -2992,2 +2994,4 @@
    both values. Also asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
 +  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
 +  values for 48 and 54, the 48 value holds.
  - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
-@@ -3003,2 +3009,4 @@
+@@ -3003,2 +3007,4 @@
    Decided by: the Advisor.
 +  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
 +  above; the baseline is researched before the first online playtest, in its own fresh session.
  
+@@ -3690,2 +3696,4 @@
+   Not applied: C17.b1, which waits for the Advisor's answer to BASELINE-WHEN.
++  Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b1, merged with step 3c's sentence (advisor
++  plan review, 2026-10-31).
+ - **Resolution 22 (the isolation flag):** no R1 text change; the glossary link sits on R1-BND-REC5's first G3.
 --- a/docs/research/r2-netcode.md
 +++ b/docs/research/r2-netcode.md
 @@ -2611,5 +2611,6 @@
@@ -109,6 +118,11 @@
    Decided by: the Advisor.
 +  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
 +  above; the baseline is researched before the first online playtest, in its own fresh session.
+ 
+@@ -3881,2 +3888,4 @@
+   21, 22 and 29 change nothing in R2.
++  Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b2, fitted to step 3c's wording with its two
++  glossary links (advisor plan review, 2026-10-31). R2 has no C23.b change under (b).
  
 --- a/docs/research/r3-rendering.md
 +++ b/docs/research/r3-rendering.md
@@ -147,6 +161,10 @@
 +  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
 +  the first one.
  
+@@ -2245,2 +2252,3 @@
+     inserted); C17.b3 is not applied: it waits for the Advisor's BASELINE-WHEN answer;
++    Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C17.b3, word for word.
+   - rank 19 (the client host): C19.1 (R5-PREV-REC2's heading: R6 hosts on Cloudflare Pages, Workers static assets the
 --- a/docs/research/r6-infrastructure.md
 +++ b/docs/research/r6-infrastructure.md
 @@ -683,14 +683,17 @@
@@ -162,13 +180,14 @@
 -  baseline rejects a shared key; when the baseline is researched is BASELINE-WHEN (below). It needs no TCP 80 on game VMs.
 -  *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes
 -  adding a VM a copy, not an issuance.
-+  the deferred security baseline, R6-SEC-OQ1). C2 replaces them only if the
-+  baseline accepts a shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 per name it needs
-+  no TCP 80 on game VMs (F24); C1's http-01 needs TCP 80.
+-  *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
++  the deferred security baseline, R6-SEC-OQ1). C2 replaces the per-hostname certificates only if the baseline accepts a
++  shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 per name it needs no TCP 80 on game
++  VMs (F24); C1's http-01 needs TCP 80.
 +  *Reason:* a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game VMs; RFC 8555 proves
 +  control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for the baseline to weigh: one certificate
 +  for all VMs makes adding a VM a copy, not an issuance; RFC 8555 allows wildcard orders (F24).
-   *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
++  *Rests on:* F24; R2-TRN-REC5 (C2's departure from it is stated above).
    *Serves:* §6.1; §4 (four browsers need a publicly trusted certificate in production, R2-TRN-REC5).
 -  *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the wildcard
 -  certificate ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
@@ -190,3 +209,9 @@
 +  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
 +  the first one.
  
+@@ -1188,2 +1197,5 @@
+   the Advisor's answer to BASELINE-WHEN.
++  Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C23.b1 and C23.b3 word for word, C23.b2 fitted
++  to step 3c's interim clause (advisor plan review, 2026-10-31). C23.b1 is a recommendation change: R6-HOST-REC4 now
++  recommends a certificate per hostname, with the wildcard an option the baseline weighs.
+ - **Resolutions 5, 6, 9 and 29:** no change in R6.

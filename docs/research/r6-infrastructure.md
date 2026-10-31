@@ -681,18 +681,21 @@ Every pass mark and every reference machine below is proposed. "Serves" names th
   *Spike must prove (proposed):* two previews of different builds play at the same time on one staging VM, each against
   its own binary; a closed PR's binary is gone within 24 h; a preview client never connects to a production server
   (its allowed origins and server list differ).
-- **R6-HOST-REC4. Production certificates: one wildcard certificate for the game-server names (option C2), from ACME
-  with dns-01, renewed by one job and copied to every game VM.** This departs from R2-TRN-REC5's wording, "a publicly
+- **R6-HOST-REC4. Production certificates: a publicly trusted certificate per game-server hostname (R2-TRN-REC5;
+  option C1, or ACME dns-01 per name), until the security baseline weighs one wildcard certificate (option C2: renewed
+  by one job and copied to every game VM) (BASELINE-WHEN (b)).** C2 would depart from R2-TRN-REC5's wording, "a publicly
   trusted certificate per game server hostname" (r2-netcode.md:2667): every hostname is still covered by a publicly
   trusted certificate, but by one shared certificate, so one private key sits on every game VM (a key-handling item for
-  the deferred security baseline, R6-SEC-OQ1). Per-hostname certificates (C1, or dns-01 per name) stay the alternative if the
-  baseline rejects a shared key; when the baseline is researched is BASELINE-WHEN (below). It needs no TCP 80 on game VMs.
-  *Reason:* RFC 8555 allows wildcard orders and proves control through DNS (F24); one certificate for all VMs makes
-  adding a VM a copy, not an issuance.
-  *Rests on:* F24; R2-TRN-REC5 (the departure is stated above).
+  the deferred security baseline, R6-SEC-OQ1). C2 replaces the per-hostname certificates only if the baseline accepts a
+  shared key; when the baseline is researched is BASELINE-WHEN (below). With dns-01 per name it needs no TCP 80 on game
+  VMs (F24); C1's http-01 needs TCP 80.
+  *Reason:* a certificate per hostname is R2-TRN-REC5's and puts no shared private key on the game VMs; RFC 8555 proves
+  control through DNS (F24), so dns-01 per name needs no TCP 80. C2's gain, for the baseline to weigh: one certificate
+  for all VMs makes adding a VM a copy, not an issuance; RFC 8555 allows wildcard orders (F24).
+  *Rests on:* F24; R2-TRN-REC5 (C2's departure from it is stated above).
   *Serves:* §6.1; §4 (four browsers need a publicly trusted certificate in production, R2-TRN-REC5).
-  *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the wildcard
-  certificate ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
+  *Spike must prove (proposed):* R2-TRN-REC5's marks (all four browsers, 20 of 20 connections) with the per-hostname
+  certificates ([GLOSSARY](GLOSSARY.md#game-server-certificate)); a forced renewal swaps the certificate on a VM with 48 live sessions and drops 0 of them; an alert fires
   when any VM's certificate has under 14 days left (proposed).
 
 ### 2. Costs (R6-COST)
@@ -950,6 +953,8 @@ None (deferred).
   scale test (R1-TICK-OQ7), the soak runs (R5-TEST-REC5) and the cost rows (R6-COST) use, and items 3 and 4 of the
   test-mode list ([GLOSSARY](GLOSSARY.md#the-test-mode-list)). Until it is answered, a mark that needs the largest mode's N gives both values. Also
   asked as R2-BUD-OQ6, R2-XU-OQ13 and R3-BUDGET-OQ4. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a), totals.** The largest mode is the goal 24v24, N = 48; where a mark gives
+  values for 48 and 54, the 48 value holds.
 - **BASELINE-WHEN (the Advisor). Research the deferred security baseline before ADR 0006, or list it open there?** The
   security baseline ([GLOSSARY](GLOSSARY.md#the-security-baseline): content security policy, dependency audits, anti-cheat basics) was deferred by the
   Advisor on 2026-10-27, and "ADR 0006 lists it as open, or it is researched before 0006 is accepted" (R6-SEC-OQ1).
@@ -960,6 +965,8 @@ None (deferred).
   positions: R5-GATE-REC1's scheduled advisories check stays the mechanism and the baseline sets the policy later;
   R2-TRN-REC5's certificate per hostname stays, and R6's wildcard becomes an option the baseline weighs. (c) Leave
   both as one shared open question. Decided by: the Advisor.
+  **Answered 2026-10-31 (the Advisor): (b).** ADR 0006 lists the security baseline as open, with the interim positions
+  above; the baseline is researched before the first online playtest, in its own fresh session.
 - **PREV-DELETE (a spike). Does a closed PR's preview really disappear?** On Cloudflare Pages, "The latest deployment
   for a branch cannot be deleted", while `--force` serves "to force deletion of aliased deployments" (R5-PREV-F13), so
   the last link's fate is unclear. On Workers static assets, the alternative host, only "the 1000 most recently
@@ -976,6 +983,8 @@ None (deferred).
   match offline in the worker and stay public but unlisted (R5-PREV-REC5, R6-HOST-REC3); a preview that carries
   unreleased art is behind the access wall, as R5-PREV-REC5 already says (R5-PREV-OQ1 asks that part). Also asked as
   R5-PREV-OQ1 and R6-HOST-OQ5. Decided by: Mustafa.
+  **Answered 2026-10-31 (Mustafa): (a):** previews that reach the staging game server are behind the access wall from
+  the first one.
 
 ### Cross-topic open questions (consistency critic, 2026-10-29)
 
@@ -1186,6 +1195,9 @@ new claim, number or source; quoted source text and the dated records above are 
 - **Resolution 22 (the isolation flag):** C22.5 (R6-HOST-REC1's heading), C22.6 (its spike).
 - **Resolution 23 (BASELINE-WHEN, escalated):** C23.3 (R6-HOST-REC4). C23.b1 to C23.b3 are not applied: they wait for
   the Advisor's answer to BASELINE-WHEN.
+  Applied 2026-10-31 (docs-after-v2-research, after BASELINE-WHEN (b)): C23.b1 and C23.b3 word for word, C23.b2 fitted
+  to step 3c's interim clause (advisor plan review, 2026-10-31). C23.b1 is a recommendation change: R6-HOST-REC4 now
+  recommends a certificate per hostname, with the wildcard an option the baseline weighs.
 - **Resolutions 5, 6, 9 and 29:** no change in R6.
 - **Glossary terms:** "the tick budget" became the server tick budget (the Q2 options table, R6-OBS-REC2, and
   R6-HOST-REC2's "Rests on"); "tick p99" and "tick time" for the whole tick became server tick p99 and server tick time
