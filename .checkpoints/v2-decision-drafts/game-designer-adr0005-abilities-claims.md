@@ -253,7 +253,7 @@
 | 211 | A4 cheaper today but every combo is code; A1 and A3 add machinery no §6 item asks for; A5 ties abilities to Bevy and float time | Trade-offs | lines 1796–1800 | research, source to check |
 | 212 | B1 keeps Paragon's latency problem out of the weapons | Trade-offs | R1-ABL-F17 | research verified |
 | 213 | E1 keeps one definition, and so one track id, for a class every faction shares | Trade-offs | LOOP_V2 §5 lines 67–68; UPGRADE-SCOPE bullet 1 (a track per unit type) | design doc |
-| 214 | The strongest argument against: one community write-up (R1-ABL-OQ1); Overwatch's scripted abilities not read (R1-ABL-OQ2) | Trade-offs | r1:2756–2762 | research, source to check |
+| 214 | The strongest argument against: one community write-up (R1-ABL-OQ1); Overwatch's scripted abilities not read (R1-ABL-OQ2); the case against scripting rests on cost and on the research's own judgement that A3 "adds a runtime no §6 item asks for" (quoted as written, fix round 3, X2) | Trade-offs | r1:2756–2762; r1, Options §5, Question A, line 1798 | research, source to check |
 | 215 | A closed set means a new mechanic without an operation waits for a reviewed Rust change | Trade-offs | line 1797 | research, source to check |
 | 216 | The spike's marks 1 and 2 test exactly this | Trade-offs | R1-ABL-REC1 marks 1–2, r1:2365–2371 | research verified |
 | 217 | Tracks that survive death let power grow (pillar 2); levelling and catch-up decide the way back (pillar 1) | Trade-offs | VISION_V2 §2, lines 26–30; UPGRADE-SCOPE bullet 2 | design doc |

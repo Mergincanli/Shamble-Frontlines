@@ -38,6 +38,24 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+Evening of 2026-11-01 (daytime rules: fetching until 22:00, no new agent after 23:00). Resumed at 19:07 after the
+fourth cut. Applied since: 0002's second round (03645ce: 24 of 25 blocks; the block for the note under the pass-mark
+table is test-engineer's text, held in `engine-architect-0002-fixes-2-held-for-test-engineer.md`), game-designer's
+0005 round (03645ce: F14, F2), test-engineer's second round (57c43c2: 42 blocks in all six drafts, all inside its own
+"Pass marks" sections), engine-architect's 0005 round (57c43c2: 25 blocks; its NOTE X2 goes to game-designer). Checks
+at 57c43c2: guard PASS, dispositions 521 of 521, glossary exact 0. The completeness critic is done: VERDICT GAPS
+(`verifier-completeness-findings.md`, 16 items). Nothing is missing from the drafts themselves; the gaps are in the
+process around them: (1) the fix texts are not re-verified, (2) step 10 has not started, (3) the report, (4) the
+appendix lacks the advisor's verdict and the plan's rules, (5) 18 "look brief pending" inventory rows have no outcome,
+(6) two pass-mark texts, (7) STATUS is stale, (8) 0006:550, (9) the citation flags, (10) pending source checks and
+unlabelled "unverified" claims, (11) 44 glossary hits in the synthesis docs, (12) script outputs not saved, (13) gate
+smoke, (14–16) small. Running since about 19:20: test-engineer round 3 (`prompts/fix3-test-engineer.txt`: PM-0002-3,
+the held note, PM-0002-29, PM-0002-31, 0006's three short "proof test" forms), game-designer X2
+(`fix3-game-designer.txt`), netcode-architect (`fix3-netcode-architect.txt`: 0001:40 and :718, the stack's citation),
+infra-engineer (`fix3-infra-engineer.txt`: 0006:550), and verifier fixcheck-b (`verifier-fixcheck-b.txt`: the fix texts
+of 0002, 0004 and 0005, and first the pending source checks, before 22:00).
+
+Earlier (kept for the record):
 Fourth spend-limit cut, about 14:20 Amsterdam ("resets 5:50pm (UTC)", 18:50 Amsterdam): game-designer's 0005 round,
 engine-architect's 0002 and 0005 rounds, test-engineer's second pass-mark round and the completeness critic failed
 with HTTP 429 (notes kept). Applied before the cut: 0004's second round (8eb2f67; 14 of 16 blocks, F4 and F2-PMtext
@@ -92,30 +110,21 @@ Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.
 
-## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
-Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
-1. 03:55: re-read this checkpoint and the plan (revision 3); `git log --oneline -3` shows this commit or a later
-   checkpoint commit; start the saver (`checkpoint.mjs watch`, every 5 minutes).
-2. Wave A (≤ 5 agents): ADR 0005's frame (`prompts/engine-architect-adr0005-frame.txt`); pass marks for 0001, 0002,
-   0004, 0006 (`prompts/_test-engineer-passmarks-TEMPLATE.txt`, filled and saved per draft). Then pass marks for 0005
-   once the frame lands; a script check that the four 0005 sections sit in the frame byte for byte.
-3. Assembly (step 5): `scripts/assemble.py` per draft into `docs/adr/000N-<name>.md`; write guard; commit.
-4. Synthesis (step 6, engine-architect): ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (the 38 DESIGN ids; the map's
-   codes the drafts cite; the features whose need is outside VISION_V2 §6), GLOSSARY §8 appended after line 742 (text in
-   the map's J1); `scripts/dispositions.py` → 521 of 521; commit.
-5. Verification against the research only, no web (step 7, part 1; one verifier per draft and one for the synthesis;
-   every source check marked "pending (before 08:30)"); skeptics on wrong or unsupported verdicts; the consistency
-   critic and the completeness critic (step 8); the glossary and citation scripts.
-6. Fix round (step 9): each finding to its author agent; re-verify what changed.
-7. From 08:30 (daytime): the source checks (step 7, part 2: allow-listed pages, curl, the host audit); their fixes.
-8. Reviews on the final diff (step 10), ≤ 5 at once; docs-keeper (step 11); the gate (step 12); the report and the draft
-   PR (step 13).
-9. Stop by 11:00: no new agent after 10:30; at 10:40 (a scheduled reminder) the session checkpoints, records what is
-   not done, and reports. Priorities if time runs short: the deliverables exist and are assembled (2–4) > checked
-   against the research and consistent (5–6) > source checks (7) > reviews (8) > docs-keeper and the PR; whatever is
-   not done is said plainly in the report, and the next day session finishes it.
-- A spend-limit cut during the run: record it, launch nothing new, resume after the reset (the window that opens at
-  03:50 closes at 08:50). It happened at about 05:30; resumed about 09:00.
+## Next steps (evening of 2026-11-01)
+1. Apply each small round as it returns: dry run, check the blocks sit in the author's own text, apply, guard,
+   dispositions, glossary; commit; push.
+2. Verifier fixcheck-a (`prompts/verifier-fixcheck-a.txt`: the fix texts of 0001, 0003 and 0006; 0001's and 0006's
+   citation flags) as soon as a slot frees.
+3. Synthesis round 2 (`prompts/fix2-engine-architect-synthesis.txt` plus an addendum: the completeness critic's items
+   5, 11, 15 and the authors' notes for README and SPIKE_PLAN) to the synthesis author, after the small rounds.
+4. Verifier fixcheck-c on the synthesis round and the small rounds' texts, plus 0002's citation flags.
+5. Step 10 reviews (`prompts/review-*.txt`, one template), ≤ 5 at once as slots free; every finding fixed or deferred
+   with a reason.
+6. docs-keeper: STATUS (the carry-forward states, the stale ADR-001 lines, the pointer to the verdict), the repo map.
+7. The report, plus appendix §3 (the advisor's verdict §1, word for word) and §4 (the plan's settled inputs and rules
+   1–12, word for word); a final commit that runs CI; PR #33's body; the PR stays a draft.
+If time or the spend limit runs short, finish in this order: report and appendix > re-verification > reviews.
+Whatever is not done is stated plainly in the report.
 
 ## Open findings
 - The research has no asset-pipeline findings (ASSET-RESEARCH (a), ruled; asset-pipeline research unit before the asset

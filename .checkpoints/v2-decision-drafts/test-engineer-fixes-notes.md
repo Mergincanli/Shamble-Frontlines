@@ -39,3 +39,6 @@ Left to me by rust-reviewer (NOTE F4-F2-PM): PM-0004-68 "MAC: Safari 26" -> "MAC
   Checks: all 42 dry-applied on scratch copies (apply_fixes.py, FILE lines); every PM row 7 columns; glossary exact hits 0 everywhere; in-context: 0001 +1 ("48 headless clients" in PM-0001-57, as PM-0001-17), 0005 -1; new prose lines <= 120 chars.
   Caveats for the session: 0005 key MAC block may duplicate an engine-architect fix (critic gave 0005:1932 to the 0005 frame author); step 24 cites README's "fragments as damage" row, which README does not have yet (synthesis adds it; 0003:247-248 already cites it); SPIKE_PLAN:30 still says "MAC, a macOS machine with Safari" (synthesis, F4).
 DONE (round 2)
+
+# Round 3 (prompts/fix3-test-engineer.txt), started 19:18 Amsterdam; deadline 20:30; BEFOREs from 57c43c2
+Items: PM-0002-3 (Wasm calls per tick, engine-architect's F-2 wording); the note on PM-0002-3 (held block); PM-0002-29 (Wasm size procedure, part 4); PM-0002-31 (decision map part g citation); 0006 PM rows ~882, 884 'the proof test's' -> 'the netcode proof test's'.

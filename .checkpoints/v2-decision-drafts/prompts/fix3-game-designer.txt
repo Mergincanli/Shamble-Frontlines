@@ -1,0 +1,7 @@
+# Prepared message (verbatim, saved before sending) · to game-designer a1332f494e02ac2a4 (SendMessage), effort xhigh · 2026-11-01 about 19:17 Amsterdam
+
+One more small fix in your ability section of ADR 0005 (from the session; deadline 20:15 Amsterdam): verifier finding X2 (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-adr0005-verdicts.md, row X2; engine-architect's NOTE X2 in engine-architect-0005-fixes-2.md says the same).
+- Your Trade-off analysis (now doc line 1088 at commit 57c43c2) says the case against scripting rests on "no §6 item asks for a runtime". Those words appear in quotation marks, but they paraphrase R1. r1-simulation-core.md line 1798 (Options, Question A, option A3, the fit column) reads: "Serves §6.3 but adds a runtime no §6 item asks for".
+- Quote it as written and cite it (r1-simulation-core.md, line 1798), or write a NOTE with your reason.
+- Also look at doc line 1001 ("runtime no §6 item asks for."). Change it only if it presents the words as a quote.
+Write FIX blocks, each with a FILE line and every BEFORE copied from the doc at 57c43c2, into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/game-designer-fixes-3.md. Update your claims ledger row if one changes. End your notes with DONE (round 3). Return at most 6 lines.
