@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:01 Amsterdam
+- **Last update:** 2026-11-01 09:03 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -155,6 +155,11 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   loopback in the protocol crate (aligned with 0001); no legacy row's mark changes.
 
 ## Key numbers
+- Script checks on the six assembled drafts (about 09:05; outputs in `consistency-scripts.txt`): dispositions 483 of
+  521, each once, all in the map's draft (the 38 DESIGN ids wait for the README); citations: 3,355 research ids cited,
+  0 that exist nowhere, 75 line ranges flagged (many false: groups citing two files); glossary (the research's own check,
+  pointed at the drafts): 2 exact hits ("whole tick" in PM-0001-4 and PM-0001-39, test-engineer's rows: fix to "the
+  server tick time measured directly"), 489 in-context hits to judge (244 of them "the largest mode, and its N").
 - Dispositions across the six drafts (23:26; 0005 from its three sections' Appendix A rows): 483 of 521 ids, each
   exactly once, every one in the draft the map assigns; the 38 not yet disposed are exactly the map's DESIGN-owned ids
   (they go into docs/adr/README.md's register at step 6).

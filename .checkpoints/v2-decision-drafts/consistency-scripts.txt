@@ -1,0 +1,120 @@
+# Script outputs for the consistency critic (the session, 2026-11-01 09:02 Amsterdam, on the six assembled drafts)
+
+## dispositions.py (six drafts; README's DESIGN table not yet written)
+ids: 521; disposed: 483; missing: 38; more than once: 0; not where the map puts them: 0; unknown ids: 0
+MISSING R1-ABL-OQ6 R1-BND-OQ1 R1-DATA-OQ10 R1-TICK-OQ7 R1-XT-OQ8 R2-BUD-OQ5 R2-INT-OQ1 R2-INT-OQ2 R2-INT-OQ3 R2-INT-OQ4 R2-INT-OQ8 R2-ROOM-OQ3 R2-ROOM-OQ4 R2-ROOM-OQ5 R2-ROOM-OQ6 R2-ROOM-OQ7 R2-SYNC-OQ7 R2-XT-OQ13 R2-XU-OQ17 R3-CHAR-OQ5 R4-FLOORS-OQ1 R4-FLOORS-OQ2 R4-FLOORS-OQ3 R4-LOS-OQ1 R4-LOS-OQ2 R4-LOS-OQ3 R4-LOS-OQ4 R4-NAV-OQ5 R4-OBST-OQ1 R4-OBST-OQ2 R4-OBST-OQ3 R4-PHYS-OQ1 R4-XT-OQ4 R4-XT-OQ
+rows per place: {'0001': 127, '0002': 104, '0003': 71, '0004': 82, '0005': 34, '0006': 65}
+
+## cite_check.py per draft (a coarse pre-check: a group citing two files reads its ranges against the first file, so some hits are false)
+### docs/adr/0001-multiplayer-netcode.md
+ids cited: 634; citation groups with a research file: 78
+ids not found anywhere in docs/research: 0
+line-range problems: 3
+  RANGE ('docs/adr/0001-multiplayer-netcode.md', 'r2-netcode.md', 'R2-BUD-REC1 not within lines 1770-1790 (±20)')
+  RANGE ('docs/adr/0001-multiplayer-netcode.md', 'r2-netcode.md', 'R2-TRN-REC3 not within lines 2565-2615 (±20)')
+  RANGE ('docs/adr/0001-multiplayer-netcode.md', 'r2-netcode.md', 'R2-TRN-REC1 not within lines 2639-2671 (±20)')
+### docs/adr/0002-code-structure-build-toolchain.md
+ids cited: 621; citation groups with a research file: 82
+ids not found anywhere in docs/research: 0
+line-range problems: 35
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-REC4 not within lines 894-902 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-F2 not within lines 2297-2308 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-F29 not within lines 1073-1077 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-F25 not within lines 1098-1103 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-F22 not within lines 964-970 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R1-BND-F12 not within lines 1047-1052 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R5-TEST-REC3 not within lines 396-396 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-F1 not within lines 1153-1169 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-REC4 not within lines 1153-1169 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-OQ7 not within lines 1153-1169 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-F1 not within lines 1750-1755 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-REC4 not within lines 1750-1755 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-OQ7 not within lines 1750-1755 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-F1 not within lines 886-893 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-REC4 not within lines 886-893 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-OQ7 not within lines 886-893 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-F1 not within lines 2297-2308 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-REC4 not within lines 2297-2308 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R1-BND-OQ7 not within lines 2297-2308 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'lines 2741-2744 out of range (file has 2505)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r2-netcode.md', 'R1-BND-F19 not within lines 1019-1025 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r2-netcode.md', 'R2-TRN-REC4 not within lines 1019-1025 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r2-netcode.md', 'R1-BND-F19 not within lines 2673-2698 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'lines 3109-3112 out of range (file has 2505)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'lines 2941-2950 out of range (file has 2505)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R3-MEASURE-OQ4 not within lines 2252-2338 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R3-MEASURE-OQ4 not within lines 1731-1788 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R3-MEASURE-OQ4 not within lines 2732-2733 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R3-MEASURE-OQ4 not within lines 1194-1205 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r1-simulation-core.md', 'R3-MEASURE-OQ4 not within lines 1389-1391 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'lines 3097-3100 out of range (file has 2505)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R6-XT-OQ8 not within lines 1510-1522 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R6-XT-OQ8 not within lines 1825-1841 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'R6-XT-OQ8 not within lines 1030-1034 (±20)')
+  RANGE ('docs/adr/0002-code-structure-build-toolchain.md', 'r5-toolchain-quality.md', 'lines 3384-3389 out of range (file has 2505)')
+### docs/adr/0003-rendering.md
+ids cited: 515; citation groups with a research file: 82
+ids not found anywhere in docs/research: 0
+line-range problems: 8
+  RANGE ('docs/adr/0003-rendering.md', 'r3-rendering.md', 'R3-WGPU-F6 not within lines 127-131 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r3-rendering.md', 'R3-WGPU-F11 not within lines 97-102 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r2-netcode.md', 'R3-CHAR-OQ5 not within lines 3010-3013 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r2-netcode.md', 'R2-INT-OQ2 not within lines 1355-1356 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r2-netcode.md', 'R3-CHAR-OQ5 not within lines 1355-1356 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r1-simulation-core.md', 'R1-DET-REC6 not within lines 2129-2145 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r1-simulation-core.md', 'R1-DET-REC1 not within lines 2222-2241 (±20)')
+  RANGE ('docs/adr/0003-rendering.md', 'r5-toolchain-quality.md', 'R5-GATE-REC3 not within lines 1727-1728 (±20)')
+### docs/adr/0004-simulation-core.md
+ids cited: 564; citation groups with a research file: 96
+ids not found anywhere in docs/research: 0
+line-range problems: 11
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-DET-REC5 not within lines 2146-2169 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-DET-REC2 not within lines 2208-2221 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'R4-PHYS-F1 not within lines 589-604 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'R4-OBST-REC1 not within lines 721-745 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 1930-1931 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'lines 3022-3029 out of range (file has 1543)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'lines 1963-1970 out of range (file has 1543)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 2044-2053 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 1923-1931 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-TICK-REC2 not within lines 53-69 (±20)')
+  RANGE ('docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 53-69 (±20)')
+### docs/adr/0005-content-abilities-assets.md
+ids cited: 461; citation groups with a research file: 55
+ids not found anywhere in docs/research: 0
+line-range problems: 2
+  RANGE ('docs/adr/0005-content-abilities-assets.md', 'r1-simulation-core.md', 'R1-ABL-OQ1 not within lines 1185-1189 (±20)')
+  RANGE ('docs/adr/0005-content-abilities-assets.md', 'r1-simulation-core.md', 'R1-ABL-REC6 not within lines 397-418 (±20)')
+### docs/adr/0006-infrastructure-operations.md
+ids cited: 560; citation groups with a research file: 120
+ids not found anywhere in docs/research: 0
+line-range problems: 16
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R5-PREV-F12 not within lines 60-65 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-HOST-F1 not within lines 838-849 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R5-PREV-F12 not within lines 838-849 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 1605-1615 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-HOST-F5 not within lines 476-476 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 2699-2723 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 3050-3054 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-COST-REC1 not within lines 499-500 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r5-toolchain-quality.md', 'R5-CI-F17 not within lines 913-914 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 2104-2106 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-HOST-OQ6 not within lines 420-427 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r5-toolchain-quality.md', 'lines 2955-2961 out of range (file has 2505)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 1622-1624 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-HOST-REC2 not within lines 667-671 (±20)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'lines 2775-2782 out of range (file has 1323)')
+  RANGE ('docs/adr/0006-infrastructure-operations.md', 'r6-infrastructure.md', 'R6-OBS-OQ3 not within lines 765-768 (±20)')
+
+## glossary_check_drafts.py (the research's own glossary check, pointed at the drafts)
+entries 34; exact hits 2; in-context hits 489 (quotes skipped)
+  0001: exact 2, in context 128, header links GLOSSARY.md: False; skipped: 13 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0002: exact 0, in context 54, header links GLOSSARY.md: True; skipped: 1 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0003: exact 0, in context 63, header links GLOSSARY.md: True; skipped: 7 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0004: exact 0, in context 90, header links GLOSSARY.md: True; skipped: 1 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0005: exact 0, in context 77, header links GLOSSARY.md: False; skipped: 10 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0006: exact 0, in context 77, header links GLOSSARY.md: True; skipped: 4 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  not searchable (a pattern in words; the step-3d verifiers read for it): The hash-map ban in the sim crate / context: "zero uses of std HashMap or HashSet iteration in … outcome code"
+  not searchable (a pattern in words; the step-3d verifiers read for it): The stress scene / exact: "the worst case (48 players plus vehicles and projectiles …)"
+
+The 2 exact hits: ADR 0001 lines 1097 and 1134, "the whole tick timed directly" in PM-0001-4 and PM-0001-39 (test-engineer's rows): the retired exact phrase; the fix is "the server tick time measured directly". The 489 in-context hits are in glossary-hits-drafts.tsv (topic, line, entry, phrase): each needs a judgement (right: another meaning, beside the marking words, or quoted; wrong: carries the term's meaning without its marking words).
