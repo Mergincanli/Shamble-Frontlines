@@ -185,3 +185,45 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   codes section adds one line: "ADR 0002's gate checks G1–G13, ADR 0004's spike claims S1–S20 and ADR 0006's option
   labels (G1–G4, S1–S3, K1–K4, B1–B11) are local to their draft; register codes always carry their word (gap, seam)".
 - Owners: engine-architect (0002), engine-architect synthesis (SPIKE_PLAN, README), graphics-engineer (0003:1275).
+
+### F13 (L). Terms: the same thing under different words
+- Event names: ADR 0004 part 19 emits the events (I-10, I-20; docs/adr/0004-simulation-core.md:448–452: "hits, deaths
+  and kills ..., blasts ..., cosmetic shot events, purchases, uplink cache events, harvester deliveries and kills,
+  structure kills and stage changes, tech tiers, upgrade picks and pickups"); docs/adr/0001-multiplayer-netcode.md:230
+  ("hits, kills, deaths, purchases, captures, tier changes, pick results, ..."), docs/adr/0002-code-structure-build-
+  toolchain.md:253 ("captures, pick results, drops") and docs/ENGINE_OVERVIEW.md:57 ("captures") name a "capture" event
+  that neither 0004 nor LOOP_V2 defines (LOOP_V2 has no "captur" at all). Outcome: the three use 0004's words ("uplink
+  cache events", "tech tiers", "upgrade picks and pickups") or say "the events of ADR 0004 part 19". Owners:
+  netcode-architect (0001:230), engine-architect (0002:253), engine-architect synthesis (ENGINE_OVERVIEW:57).
+- "The proof test": GLOSSARY §8 marks the term by "the netcode proof test" only; ADR 0001 shortens it 23 times, and the
+  short form also appears in docs/SPIKE_PLAN.md:369, docs/adr/README.md:228 and docs/adr/0006-infrastructure-operations.md:
+  550, beside "the look proof test". Outcome: the full name outside ADR 0001 (SPIKE_PLAN, README, 0006); ADR 0001 may
+  keep the short form after defining it once ("the netcode proof test (below: the proof test)"). Owners: synthesis
+  (SPIKE_PLAN, README), infra-engineer (0006:550), netcode-architect (0001, one definition line).
+- Glossary in-context hits judged wrong or marginal (of 489; see the table below): docs/adr/0005-content-abilities-
+  assets.md:2027 (PM-0005-32, "points 4 effects per soldier apart": a bare "effects" in a count, retired in context;
+  read "4 active effects per soldier") (owner: test-engineer, its row); docs/adr/0006-infrastructure-operations.md:869
+  (PM-0006-13 "8 rooms of 48 on each machine": "48" alone for the largest mode's N; read "8 rooms at N = 48") and :873
+  (PM-0006-17 "V = 15 moving vehicles": the stress scene's big vehicles; read "15 big vehicles" unless it quotes R2's
+  symbol) (owner: test-engineer, its rows).
+
+### F14 (L). Small seam and cross-reference slips
+- R5-TEST-OQ2 (the WebTransport crates' interop): docs/adr/0002-code-structure-build-toolchain.md:1351 disposes it as
+  "spike: the netcode proof test (... ADR 0001)"; ADR 0001 never names the id (0 hits), though its spike covers
+  interop (0001:404, R2-TRN-REC1 and REC3). Outcome: ADR 0001's "What the proof test decides" (0001:994 on) adds
+  R5-TEST-OQ2. Owner: netcode-architect.
+- OQ-0001-1 option (b) "another reading of TICK-30's '25 % headroom'" (docs/adr/0001-multiplayer-netcode.md:843) names no
+  reading, while GLOSSARY:30–31 asks a "Depends on" to state every reading, and GLOSSARY §8's entry (:790) states only
+  the ruled one (synthesis list item 14). GLOSSARY §8 is the Advisor's text (condition 3) and does not change. Outcome:
+  OQ-0001-1 (b) reads "not confirmed: Mustafa and the Advisor name the base, and part 2's mark and GLOSSARY §8 follow".
+  Owner: netcode-architect.
+- OQ-0005-AB5 ends "ADR 0006 cites this" (docs/adr/0005-content-abilities-assets.md:1160); ADR 0006 does not (0 hits for
+  AB5, WEAPON-UNLOCKS or unlock), and needs not: accounts are `[LATER]` (0006:34). Outcome: drop the sentence, or 0006:34
+  adds "the unlock catalogue's weapon question is OQ-0005-AB5". Owner: game-designer (AB section).
+- Telemetry timeline: docs/adr/0004-simulation-core.md:460 states "The timeline is sampled every 10 s of game time", a
+  part of the record's shape, which seam S6 gives ADR 0006 (0006:341–342 states the same 10 s). Same value; 0004 should
+  cite it ("ADR 0006's record samples ... every 10 s"). Owner: rust-reviewer.
+- Author lines: ADR 0001, 0002 and 0006 credit test-engineer for the "Pass marks" table on line 5; ADR 0003, 0004 and
+  0005 carry test-engineer's PM rows too but do not credit them (each file's line 5). Outcome: one form on all six,
+  "(the 'Pass marks' table: test-engineer, plan step 4)". Owners: graphics-engineer, rust-reviewer, the 0005 frame
+  author (engine-architect).

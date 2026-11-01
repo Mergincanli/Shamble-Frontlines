@@ -147,7 +147,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | F132 | 34 ids owned by 0005: 26 + 7 + 1 | engine-architect-decision-map-ids.tsv (awk owner 0005: 34); the sections' Appendix rows (26, 7, 1); scripts/di | confirmed | map ids tsv owner 0005 = 34 ids; Appendix A lists exactly those 34 (comm -3 empty) |  |
 | F133 | Counts: adopted 6 (4 + 2) · changed 5 (4 + 1) · answered 8 (7 + 1) · open 9 (6 + 2 + 1) · spike 6 (5 + 1) · rejected 0; total 34 | the sections' rows, counted | confirmed | Appendix A rows counted: adopted 6, answered 8, changed 5, open 9, spike 6 |  |
 | F134 | "spike mark n" in the content rows is the content section's item n; the ability rows' "What a spike must prove" n is that section's item n | the rows' wording | confirmed | read at the rows' wording |  |
-| F135 | Sources list and the line ranges in it | each range re-opened with sed on 2026-11-01 (r1:1577–1579, 1600–1602, 1826–1832, 1845–1855, 2565–2575, 2596–26 | pending (time) | the Sources list ranges not re-opened one by one; every range used by a row above was opened |  |
+| F135 | Sources list and the line ranges in it | each range re-opened with sed on 2026-11-01 (r1:1577–1579, 1600–1602, 1826–1832, 1845–1855, 2565–2575, 2596–26 | confirmed | every range in the Sources list re-opened: r1 1577-1579, 1600-1602, 1826-1832, 1845-1855, 2565-2575, 2596-2606, 2756-2758, 2946-2950; r6 828-836; LOOK_V2 65-78 |  |
 | C1 | VISION_V2 §6.1 modes as data | VISION_V2.md:64 | confirmed | VISION_V2:64 "Modes as data: 2 or 3 teams of any size ... plus rooms and private matches" |  |
 | C2 | §6.3 quote "Units, vehicles, weapons and abilities are built from data, so combos and counters can emerge and tuning needs no code changes" | VISION_V2.md:69–70 | confirmed | VISION_V2:69-70 |  |
 | C3 | §6.5 "All server-side and tunable" | VISION_V2.md:74 | confirmed | VISION_V2:74 "All server-side and tunable." |  |
@@ -691,7 +691,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A260 | AB11: the triangle `[DEFAULT]`; the legacy numbers of AB-7 (11 of 16 pellets; 63 vs 19; 2999.7 vs 150) | rows 131–134 | confirmed | 11 × 11 = 121 ≥ 120 (Warrior maxHealth 120, Bagpipe damage 11, pellets 8 → 11 of 16); 63 vs 19; 2999.7 vs 150 |  |
 | A261 | AB11 options (a)–(c); the data carries all three | R1-ABL-REC1, r1:2350–2352 (frontal-arc and target-tag stages) | confirmed (batch) | cited lines read: r1:2350:2352 |  |
 | A262 | AB11: sims at Tech 0 and Tech 1 (3 or more runs, as CD13 asks), then the Feel Lab | INV CD13 line 94 | confirmed (batch) | cited lines read: INV:94:94 |  |
-| A263 | AB11 research ids: R1-ABL-OQ6 (a design question); R2-SYNC-OQ9 (ADR 0001's) | map ids table (R1-ABL-OQ6: DESIGN; R2-SYNC-OQ9: 0001) | confirmed | map ids: R2-SYNC-OQ9 owner 0001; R1-ABL-OQ6 DESIGN per the ledger (map row not re-opened) |  |
+| A263 | AB11 research ids: R1-ABL-OQ6 (a design question); R2-SYNC-OQ9 (ADR 0001's) | map ids table (R1-ABL-OQ6: DESIGN; R2-SYNC-OQ9: 0001) | confirmed | map ids: R2-SYNC-OQ9 owner 0001; R1-ABL-OQ6 owner DESIGN |  |
 | A264 | AB12: every GAS concept from one community write-up | R1-ABL-OQ1, r1:2756–2758 | confirmed (batch) | cited lines read: r1:2756:2758 |  |
 | A265 | AB12 option (b): SRC-ACCESS (a), "official-docs domains such as Epic's can be added in the next kit PR" | STATUS.md lines 167–171 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A266 | AB12 proposed (a): the subset is defined by our own test cases and proven by the spike | reason: R1-ABL-REC1 marks 1–4 test our own content, r1:2364–2378 | confirmed (proposed, labelled; batch) | cited lines read: r1:2364:2378 |  |
@@ -1009,12 +1009,17 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE240 | The look proof test runs in parallel with the netcode proof test, before the content and ability spike | map part g order (lines 962–965) | confirmed (row covers SPIKE_PLAN text, not this ADR) | map 944, 945, 948, 955-965 consistent |  |
 | PTE241 | The asset spike before the first authored model enters the game; none of R1–R6 | map part g row 948; part h; ASSET-RESEARCH (a) | confirmed (row covers SPIKE_PLAN text, not this ADR) | map 944, 945, 948, 955-965 consistent |  |
 | PTE242 | The Feel Lab test needs abilities in the engine (slice 4) | map J6 (8); LE-N; draft Migration item 7 | confirmed (row covers SPIKE_PLAN text, not this ADR) | map 944, 945, 948, 955-965 consistent |  |
+| X1 | PM-0005-22 (doc 2017): "on a 30 Hz tick no shot can land on a 0.06 s instant" | no ledger row | confirmed | 0.06 s is the Lancer's burstInterval (LEGACY_TUNING:201; r1:1370 "burst (Lancer 3 at 0.06 s)"); 0.06 s ÷ 33.3 ms = 1.8 ticks, not a whole tick | the only number in the document that no ledger row holds (script scan of every number) |
+| X2 | Ability trade-off (doc 1079): the case against scripting rests on "no §6 item asks for a runtime" | no ledger row (quote with no citation) | citation off | r1:1798 (option A3, fit column): "Serves §6.3 but adds a runtime no §6 item asks for" | the quoted words are a paraphrase in quotation marks; fix: quote r1:1798 as written and cite it |
+| X3 | AB2 option (b) (doc 1112): less "what did the victim have" | no ledger row | confirmed | the author's own phrase in quotation marks, not a citation | no source needed |
+| X4 | Frame vs its draft; pass marks vs test-engineer-passmarks-0005.md | both-ways check | confirmed | diff of engine-architect-adr0005-draft.md and the ADR: only the "### Pass marks" placeholder differs; the placed pass marks equal the test-engineer file's lines 11-236 but for one blank line | sections themselves: placed byte for byte (session's check, not repeated) |
+| X5 | Ledger rows PTE232-PTE242 (and PTE238) | both-ways check | confirmed (rows cover SPIKE_PLAN entries, not this ADR) | the test-engineer file's "Spike entries" section is not placed in the ADR (the assembly stops at the marker); the rows were checked against the map (944, 945, 948, 955-965) | not a defect: they belong to docs/SPIKE_PLAN.md's ledger |
 
 ## Counts
 
-996 rows (996 ledger rows: frame 135, content and asset pipeline 281, abilities 295, GPU rules 43, pass marks 242; 0 rows added by the verifier, prefixed X).
+1001 rows (996 ledger rows: frame 135, content and asset pipeline 281, abilities 295, GPU rules 43, pass marks 242; 5 rows added by the verifier, prefixed X).
 
-confirmed 992 · wrong 1 · unsupported 1 · citation off 1 · unverified 0 · pending 1
+confirmed 997 · wrong 1 · unsupported 1 · citation off 2 · unverified 0 · pending 0
 
 (findings pending)
 
@@ -1029,3 +1034,4 @@ confirmed 992 · wrong 1 · unsupported 1 · citation off 1 · unverified 0 · p
 | raw.githubusercontent.com | https://raw.githubusercontent.com/mrdoob/three.js/r186/examples/webgpu_skinning_instancing.html | 200 | 5201 | 2026-11-01T09:13:42 |
 | threejs.org | https://threejs.org/docs/pages/InstancedMesh.html | 200 | 15467 | 2026-11-01T09:13:56 |
 | raw.githubusercontent.com | https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/indexing_slicing.rs | 200 | 10505 | 2026-11-01T09:19:11 |
+| raw.githubusercontent.com | https://raw.githubusercontent.com/mrdoob/three.js/r186/src/objects/BatchedMesh.js | 200 | 48114 | 2026-11-01T13:57:19 |
