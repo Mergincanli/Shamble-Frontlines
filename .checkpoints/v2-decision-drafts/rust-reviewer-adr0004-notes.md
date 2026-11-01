@@ -47,3 +47,5 @@ DONE
 - 12:55 UTC: fixes file written by script (11 FIX entries: row-166, row-39, row-182, N1, row-253, N3, N6-S3, N6-S4, N6-S9, N6-S11, N6-S13), each BEFORE unique and trial-applied to a scratch copy without overlap; ADR not edited. Row 20: no change (STATUS:94-96 records it). Row 38: refuted. Ledger fix-round section appended (rows 39,166,182,253,304,305,329,335,337 restated; new 361,362).
 DONE (fix round)
 - 13:05 UTC 2026-11-01: SECOND FIX ROUND started (prompts/fix2-rust-reviewer.txt; output rust-reviewer-fixes-2.md; deadline 15:45 Amsterdam).
+- 13:09 UTC: rust-reviewer-fixes-2.md written by script: 16 FIX (F14-author, F3-part6-a, F3-part6-b, F1, F2-part18-drop, F2-part18-open, F14-timeline, F2-OQs, F14-fragments, F3-S1, F3-S2, F7 (S21, S22), F4 (MAC key), F2-PMtext, F2-migration, F3-migration), 2 NOTE (F4-F2-PM: two fixes edit test-engineer's subsection prose, PM-0004-68 cell and line 924 left; F2-README: OQs kept as pointers per the session's message, AB9 must absorb two options). All BEFOREs unique, trial-applied without overlap; ADR not edited. Ledger: 'Second fix round' section appended.
+DONE (second fix round)

@@ -27,3 +27,8 @@ Output files: test-engineer-passmarks-000N-fixes.md (N = 1, 2, 3, 4, 6). No memo
   Checks on scratch copies: apply_fixes.py dry-applied all 13 blocks OK; glossary script exact hits 2 -> 0 (0001), no new in-context hits except one "48" in PM-0006-17's R2 arithmetic (P = 48, as the row already uses); cite_check output unchanged; every PM row still 7 columns; new bullet lines <= 120 chars.
   Not fixed (outside the brief): PM-0002-42 plants an `enum` from R5-TSLINT-REC1's own mark (r5:1259-1261), same unverified premise; ADR 0001 F4's restated R2-BUD-REC2 precision mark names no PM row (PM-0001-17 checks quantised fidelity only).
 DONE
+
+# Round 2 (brief prompts/fix2-test-engineer.txt), started 14:10 Amsterdam; deadline 15:45
+Output: test-engineer-fixes-2.md (FIX blocks with FILE lines). Round 1 applied in c70c6d2.
+To do: F3 two decimals (0001 PM rows with 8.3/16.7/4.2/6.7/13.3/33.3; others); F7 two PM rows in 0004 (S21, S22 from rust-reviewer-fixes-2.md: R2-SYNC-REC6 mark 1 r2:2218; R5-LAYOUT-REC4 r5:1216-1218); F13 PM-0005-32 "4 active effects", PM-0006-13 "8 rooms at N = 48", PM-0006-17 "V = 15"; PM-0002-42 enum note; 0001 R2-BUD-REC2 precision row.
+Left to me by rust-reviewer (NOTE F4-F2-PM): PM-0004-68 "MAC: Safari 26" -> "MAC"; 0004 key line ~924 "(arithmetic; the draft and GLOSSARY round the first two)" stale after F3. rust-reviewer edits 0004:873-874 (MAC key) and :1047 in my subsection: do not overlap.

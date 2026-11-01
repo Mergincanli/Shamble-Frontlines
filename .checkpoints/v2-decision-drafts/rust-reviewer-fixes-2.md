@@ -62,8 +62,8 @@ BEFORE:
     level (ADR 0005's open questions); which deaths drop which weapons, how long a drop lies, who may pick it up and how
     a tie is broken (OQ-0004-5); and what bots and slot takeovers do with records (OQ-0004-6).
 AFTER:
-    level (ADR 0005's open questions); which deaths drop which weapons, how long a drop lies, who may pick it up and which
-    order breaks a tie (OQ-0005-AB9); and what bots and slot takeovers do with records (OQ-0005-AB10).
+    level (ADR 0005's open questions); which deaths drop which weapons, how long a drop lies, who may pick it up and
+    which order breaks a tie (OQ-0005-AB9); and what bots and slot takeovers do with records (OQ-0005-AB10).
 END
 
 ### FIX F14-timeline

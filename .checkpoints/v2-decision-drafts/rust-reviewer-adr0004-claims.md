@@ -434,3 +434,22 @@ The Pass marks table under it is the test-engineer's (plan step 4); its rows joi
 | 337 | S13 (OBST-REC1): over 10 minutes at 30 Hz, the 60 Hz form only in the 60 Hz margin's test | S13 | r4, R4-OBST-REC1, 1037–1041 (line 1038: "for 10 minutes at 30 and 60 Hz"); GL §8 | research, source to check; settled |
 | 361 | Every option comes from the research or a settled input: Options sections (Q1–Q8), GLOSSARY §4 (Q9), UPGRADE-SCOPE (Q10), R1-RR-OQ3 (Q11) | Options preface | r1, 1626–1730; r4, 585–662; GL 525–545; UPGRADE-SCOPE; r1, R1-RR-OQ3, 2936–2940 | research, source to check; settled |
 | 362 | Not yet in the README register: whether grenade fragments deal damage per fragment; LOOK_V2 §3 and §7 bring fragmentation back as a visible effect, which ADR 0003 draws from the blast event; a rule for Mustafa, no research id | Open questions | LOOK_V2 §3, §7; docs/adr/0003-rendering.md:424, :1076; docs/adr/README.md (no entry) | design doc |
+
+## Second fix round (plan step 9, after the consistency pass, 2026-11-01): rows as they read after rust-reviewer-fixes-2.md
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 89 | The sim step share: 8.33 ms at 30 Hz (4.17 ms in the 60 Hz margin run only) | Part 6 | r1, R1-TICK-REC2 P1, 2044–2053; GL 189–213; 0.25 × 33.33 = 8.33, 0.25 × 16.67 = 4.17 | research verified; arithmetic |
+| 99 | The client's sim share: 13.33 ms at 30 Hz (6.67 ms at 60 Hz) | Part 6 | r1, R1-TICK-REC2 P2, 2054–2057; GL 214–224; 0.4 × 33.33 = 13.33, 0.4 × 16.67 = 6.67 | research verified; arithmetic |
+| 201 | In development definitions change at a match boundary under ADR 0005's CD-7 (proposed); a between-ticks swap only if OQ-0005-CD4 picks (b) | Part 16 | docs/adr/0005-content-abilities-assets.md, CD-7 and OQ-0005-CD4; r1, R1-DATA-REC5, 2542–2563 | settled (the drafts' division, seam S5); research verified |
+| 213 | When a soldier dies, the weapons the drop rule names (OQ-0005-AB9) become pickup entities | Part 18 | UPGRADE-SCOPE; ADR 0005 OQ-0005-AB9 | settled |
+| 224 | ADR 0006's record samples the timeline every 10 s of game time (R6-TEL-REC1); the sim supplies the samples | Part 19 | r6, R6-TEL-REC1, 784–811 (lines 788–789); ADR 0006 part on the record | research, source to check |
+| 294 | OQ-0004-5 is a pointer to OQ-0005-AB9; the tie mechanism (fixed, deterministic order) stays this record's | Open questions | ADR 0005 OQ-0005-AB9; r1, R1-DET-REC5 (fixed order), 2208–2221 | settled; research verified |
+| 295 | OQ-0004-6 is a pointer to OQ-0005-AB10; how a bot picks is bot behaviour (part 15) | Open questions | ADR 0005 OQ-0005-AB10 | settled |
+| 301 | S1: p99 ≤ 8.33 ms at 30 Hz (≤ 4.17 ms for the 60 Hz margin run) | S1; Migration phase 8 | as row 89 | research verified; arithmetic |
+| 303 | S2: p99 ≤ 13.33 ms at 30 Hz | S2 | as row 99 | research verified; arithmetic |
+| 362 | Per-fragment damage: also asked by ADR 0003, listed once in README's "Decisions the drafts ask for"; Mustafa with the game-designer | Open questions | LOOK_V2 §3, §7; docs/adr/0003-rendering.md; docs/adr/README.md (row added by the synthesis, F14) | design doc; settled |
+| 363 | S21: 10,000 random throws give bit-identical trajectory points on Wasm and native (the id is ADR 0001's) | S21 | r2, R2-SYNC-REC6 mark 1, line 2218 | research verified |
+| 364 | S22: `sim`'s resolved dependency features identical for `server` and `sim-wasm`; a planted extra feature fails (the id is ADR 0002's; the foundation re-proves it) | S22 | r5, R5-LAYOUT-REC4, 1216–1218 | research, source to check |
+| 365 | MAC: SPIKE_PLAN's macOS machine, stable Safari on the day of the run, version recorded; WebGPU from Safari 26.0, WebTransport from 26.4 | Pass marks key (F4) | r3, R3-WGPU-F19, 171–174; r2, R2-TRN-F7, 959–975 (line 966); SPIKE_PLAN "Shared fixtures" | research, source to check |
+| 366 | Author line credits test-engineer for the "Pass marks" table | Header | plan revision 3, step 4 | settled |

@@ -34,3 +34,4 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Not researched/decided on judgement: room + navbake crates; multiplayer-preview delivery shape; CLI over wasm-pack (wasm-pack pages unread); local-match Worker load; Wasm size budget (no number); editor file:// load.
 DONE
 Fix round 2 (2026-11-01, started 14:06 Amsterdam): brief prompts/fix2-engine-architect-0002.txt; output engine-architect-0002-fixes-2.md.
+- fix2: read verifier F-list, skeptic-2, consistency F11/F12/F13; chosen: F-2 option (a) batching; writing fixes file now.

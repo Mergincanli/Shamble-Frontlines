@@ -66,8 +66,8 @@ BEFORE:
   docs-keeper): the upgrade tracks live on the player; the page only shows the owner's offers and tracks (I-21 of the
   decision map; ADR 0005 designs them).
 AFTER:
-- **UPGRADE-SCOPE** (Mustafa, 2026-10-31, recorded in STATUS "Decisions pending"): the upgrade tracks live on the player; the page only shows the owner's offers and tracks (interface
-  I-21; ADR 0005 designs them).
+- **UPGRADE-SCOPE** (Mustafa, 2026-10-31, recorded in STATUS "Decisions pending"): the upgrade tracks live on the
+  player; the page only shows the owner's offers and tracks (interface I-21; ADR 0005 designs them).
 END
 
 ### FIX F10 (SPIKE-SCOPE)
@@ -114,8 +114,8 @@ BEFORE:
      rule: "The client's cutaway (GW17) follows the same rule, so what is not sent is also what the screen would not
      show" (r2-netcode.md, Recommendations, R2-INT-REC2, lines 2445–2466, quote at 2450–2451); what a player may see
 AFTER:
-     r4-physics-navigation.md, Recommendations, R4-FLOORS-REC2, lines 925–939) and, as legacy GW17 does, between the camera and the player (a behaviour LOOK_V2 does not name:
-     OQ-0003-15). Its blend state is
+     r4-physics-navigation.md, Recommendations, R4-FLOORS-REC2, lines 925–939) and, as legacy GW17 does, between the
+     camera and the player (a behaviour LOOK_V2 does not name: OQ-0003-15). Its blend state is
      a precompiled variant (part 3), and the ink is masked on faded structures. It follows the server's visibility
      rule: "The client's cutaway (GW17) follows the same rule, so what is not sent is also what the screen would not
      show" (r2-netcode.md, Recommendations, R2-INT-REC2, lines 2445–2466, quote at 2451–2452); what a player may see
@@ -266,8 +266,8 @@ AFTER:
   Why it matters: the fallback keeps Firefox on Linux and Intel Macs, Chrome on Linux without Intel Gen12+, and Safari
   before 26 in the game (R3-GL2-F12, lines 279–283), and its share decides whether WebGPU-only extras (F-B) are worth
   their fallback work. Options: none to weigh: the share is measured, from client field data (part 8). The fallback
-  itself stays (settled by the stack: R3-GL2-OQ5 is answered in Appendix A). Decider: client field data after launch,
-  read by Mustafa. What decides it: the backend each match reports (part 8). Research ids: R3-GL2-OQ2 (lines
+  itself stays (settled by the stack: R3-GL2-OQ5 is answered in Appendix A). Decider: Mustafa, on client field data after
+  launch. What decides it: the backend each match reports (part 8). Research ids: R3-GL2-OQ2 (lines
   1308–1311).
 END
 
@@ -436,9 +436,10 @@ BEFORE:
    1065–1075). Emissive slots write the emissive output that drives the glow, so only they glow (r3, Findings Q3,
 AFTER:
    example environment, unit, faction colour, emissive); the list and the names are this ADR's content data (interface
-   I-8, `docs/adr/README.md`), consumed by ADR 0003. Faction colour slots take the faction's colour at load, as one shared material per
-   slot and faction, or as per-instance colour where a mesh is instanced (`instanceColor` on `InstancedMesh`: r3,
-   Findings Q4, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour: R3-CHAR-F6, lines 463–467; R3-CHAR-REC3, Recommendations Q4, lines
+   I-8 in `docs/adr/README.md`), consumed by ADR 0003. Faction colour slots take the faction's colour at load, as one shared material per
+   slot and faction, or as per-instance colour where a mesh is instanced (`instanceColor` on
+   `InstancedMesh`: r3, Findings Q4, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour:
+   R3-CHAR-F6, lines 463–467; R3-CHAR-REC3, Recommendations Q4, lines
    1065–1075). Emissive slots write the emissive output that drives the glow, so only they glow (r3, Findings Q3,
 END
 
