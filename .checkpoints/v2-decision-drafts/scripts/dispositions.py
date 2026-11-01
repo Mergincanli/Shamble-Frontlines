@@ -18,12 +18,17 @@ for fn in sys.argv[3:]:
     name = p.name
     where = '0001' if name.startswith('0001') else '0002' if name.startswith('0002') else '0003' if name.startswith('0003') else '0004' if name.startswith('0004') else '0005' if name.startswith('0005') else '0006' if name.startswith('0006') else 'DESIGN' if name == 'README.md' else 'SPIKE_PLAN' if name == 'SPIKE_PLAN.md' else name
     # sections that hold dispositions
-    if where in ('DESIGN',):
-        m = re.search(r'^##+ .*(?:register|design questions|DESIGN).*$', text, re.M | re.I)
-        sect = text[m.start():] if m else ''
-    elif where == 'SPIKE_PLAN':
-        m = re.search(r'^##+ .*dispositions.*$', text, re.M | re.I)
-        sect = text[m.start():] if m else ''
+    if where in ('DESIGN', 'SPIKE_PLAN'):
+        # only the one section that holds the dispositions, up to the next heading of the same or a higher level
+        name = r'Design questions \(DESIGN-owned research ids\)' if where == 'DESIGN' else r'Research dispositions'
+        m = re.search(r'^(#+) ' + name + r'.*$', text, re.M)
+        if m:
+            level = len(m.group(1))
+            rest = text[m.end():]
+            n = re.search(r'^#{1,%d} ' % level, rest, re.M)
+            sect = rest[:n.start()] if n else rest
+        else:
+            sect = ''
     else:
         m = re.search(r'^## Appendix A.*$', text, re.M)
         sect = text[m.start():] if m else ''

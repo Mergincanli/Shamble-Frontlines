@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-10-31 23:53 Amsterdam
+- **Last update:** 2026-11-01 03:58 Amsterdam
 
 ## Steps done
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -22,13 +22,10 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
-Step 3 (drafting) is done for every unit; the night stop (condition 17) holds the rest for the next day session.
-Drafts and sections (all in `v2-decision-drafts/`, notes DONE): 0001 netcode-architect (1,236 lines; ledger 360 rows;
-Appendix A 127); 0002 engine-architect (ledger 261 rows; Appendix A 104); 0003 graphics-engineer (ledger 265 rows;
-Appendix A 71); 0004 rust-reviewer (1,027 lines; ledger 360 rows; Appendix A 82); 0006 infra-engineer (966 lines;
-ledger 355 rows; Appendix A 65); 0005's three sections: abilities (game-designer; 624 lines; ledger 295 rows; 7 rows),
-GPU rules (graphics-engineer; ledger 43 rows; 1 row), content data and asset pipeline (engine-architect; ledger 281 rows;
-26 rows). Step 4 pass marks: 0003 done (test-engineer, 43 marks); five to go.
+The scheduled run (2026-11-01 03:55–11:00, Mustafa's one-off exception) started 03:55; the branch matched (b8ce07c).
+Wave A running since about 03:57: ADR 0005's frame (engine-architect), pass marks for 0001, 0002, 0004, 0006
+(test-engineer ×4). Prepared: `prompts/engine-architect-synthesis.txt`; `scripts/dispositions.py` now counts only the
+README's "Design questions (DESIGN-owned research ids)" table and SPIKE_PLAN's "Research dispositions" section.
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -133,10 +130,12 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
 - engine-architect decision map: done about 18:45 (521 of 521 ids, one owner each: 0001 127, 0002 104, 0003 71,
   0004 82, 0005 34, 0006 65, DESIGN 38); its addendum (part j, from line 1032) done about 18:52, owners unchanged,
   coverage re-run 521/521; GLOSSARY §8 text in part J1.
-- Every drafting unit finished by 23:25 (notes DONE); the checkpoint saver was stopped at 23:26 (its last save: nothing
-  to save). Nothing runs until the scheduled start.
-- Scheduled tasks (send_later into this session, human_request): trig_01BH1UStnQLgHuzsethFGmTU fires 2026-11-01 03:55
-  Amsterdam (02:55 UTC): the run's start; trig_01WnvjBEFsLQPXjoj7WdwN7d fires 10:40 Amsterdam (09:40 UTC): the wrap-up.
+- Every drafting unit finished by 23:25 (notes DONE). The run's saver: `checkpoint.mjs watch` every 5 minutes, started
+  03:56. Wave A (launched about 03:57, background agents, opus, xhigh): engine-architect (0005 frame; notes
+  `engine-architect-adr0005-frame-notes.md`), test-engineer ×4 (notes `test-engineer-passmarks-000N-notes.md` for 0001,
+  0002, 0004, 0006).
+- Scheduled tasks (send_later into this session, human_request): trig_01BH1UStnQLgHuzsethFGmTU fired 2026-11-01 03:55
+  Amsterdam (02:55 UTC): the run's start (done); trig_01WnvjBEFsLQPXjoj7WdwN7d fires 10:40 Amsterdam (09:40 UTC): the wrap-up.
 - Ready for the run: pass-mark prompts filled and saved for 0001, 0002, 0004, 0005, 0006
   (`prompts/test-engineer-passmarks-000N.txt`); the verifier template now allows fetching only between 08:30 and 22:00.
 - Drafting, launched about 18:48 (background agents, effort xhigh, opus): graphics-engineer (0003 + 0005 asset section;
