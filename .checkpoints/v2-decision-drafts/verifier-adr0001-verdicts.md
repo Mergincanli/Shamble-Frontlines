@@ -26,7 +26,7 @@ pending (outside fetch hours). "doc:n" = line n of the assembled ADR.
 | 15 | §6.4 seats [OPEN]; §6.8 kill-cams [LATER]; §6.10 [LATER] | VISION_V2 §6 | confirmed | VISION:73, 79, 81 | rule 4: nothing built for them (checked parts 6, 9, 11) |
 | 16 | LOOP_V2 §7 split-feedback quote | LOOP_V2 §7 | confirmed | LOOP:92 verbatim | |
 | 17 | LOOP_V2 §4, §3, §9 [OPEN], §8 ~20 min, §10 | LOOP_V2 | confirmed | LOOP:41, 25, 128–129, 100, 133 | |
-| 18 | LOOK_V2 §3 interiors, §4 enterable ruins, roofs fade [DEFAULT] | LOOK_V2 §3–§4 | confirmed | LOOK:31, 36–41 | [DEFAULT] belongs to the roof fade only (ruins are [DECIDED]); wording could misread |
+| 18 | LOOK_V2 §3 interiors, §4 enterable ruins, roofs fade [DEFAULT] | LOOK_V2 §3–§4 | confirmed | LOOK:32, 36–41 | [DEFAULT] belongs to the roof fade only (ruins are [DECIDED]); wording could misread |
 | 19 | settled-inputs list | STATUS; UPGRADE-SCOPE; GL §8 | confirmed (settled) | STATUS:94–120, 187–188; plan:66–78 | no settled input reopened (condition 12) |
 | 20 | delta vs acked snapshot: loss, reorder, unchanged free, mid-match join, no bit-exact agreement | R2-SYNC-REC1 | confirmed | r2:2006–2010 | |
 | 21 | netcode must not depend on Wasm/native identity; lockstep rejected | R1-DET-REC1 | confirmed | r1:2131–2132 "the netcode must not depend on it … Reject lockstep (Q1-E)" | |

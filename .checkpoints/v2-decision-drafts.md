@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:03 Amsterdam
+- **Last update:** 2026-11-01 09:04 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -41,9 +41,10 @@ five running agents (pass marks 0005; verifiers 0001, 0002, 0004, 0006) failed w
 resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed at about 09:00 (after the reset):
 pass marks 0005 (46 marks; its ledger last); ADR 0005 assembled (233f6f7; its four sections byte for byte, checked by
 script); all six drafts now in docs/adr/. Draft PR #33 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/33),
-subscribed to its activity. Running: the synthesis (engine-architect, launched about 09:03; documents due by 10:05),
-pass marks 0005's ledger (test-engineer), verifiers 0001, 0002, 0006 (resumed; source checks allowed now; verdicts
-due 10:15). Waiting: verifier 0004 (resume when a slot frees), verifiers 0003, 0005 and the synthesis, the critics,
+subscribed to its activity (its head is a [skip ci] checkpoint commit for now: the run's last commit must run CI).
+Pass marks 0005 done with its ledger (242 rows); docs/adr/0005 re-assembled from the final file: identical. Running:
+the synthesis (engine-architect, launched about 09:03; documents due by 10:05), verifiers 0001, 0002, 0004, 0006
+(resumed; source checks allowed now; verdicts due 10:15). Waiting: verifiers 0003, 0005 and the synthesis, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
 
@@ -130,6 +131,14 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   map puts R2-SYNC-REC6 mark 1 and R5-LAYOUT-REC4 in the sim core spike but no draft's table names them (SPIKE_PLAN
   places them); S9's "largest planned map" read as part 7's 2 km bound; PM-0004-2 checks the stress scene's load every
   tick; S20's online recovery needs the proof test's server.
+- Pass marks 0005 (test-engineer), for the 0005 authors' fix round: "0 accepted invalid" is met by a loader that
+  refuses everything (a labelled corpus with valid controls added); CD-1's "written back as the same text" may fail on
+  serde_json's number format (not researched; the spike's first run settles it); R1-ABL-REC2's 1e-6 tolerance read as
+  stored values, shots within one tick; "zero matches for the ids" cannot prove no ability-specific code (a rename test
+  added); fuzzed definitions that load run 300 ticks each; OQ-0005-AP2 needs the look proof test to port the kit
+  builders, which 0003's spike entry does not list; the glTF dependency check sits in the asset spike in one place and
+  the foundation in another; "every legacy number present once" vs CD-10's drops (read as mapped once or dropped with a
+  reason); CD-10's "value" read as each leaf (725 outside the look and state groups, 2,011 in the look group).
 - Write guard: condition 1's `cmp - <(head -n 742 GLOSSARY.md)` fails on an unchanged file, because the base GLOSSARY ends
   without a final newline (742 newlines, then an unterminated last line); `scripts/write_guard.sh` checks the exact
   intent instead (the base file is a byte prefix of today's), so §8 can be appended and nothing above it may change.
