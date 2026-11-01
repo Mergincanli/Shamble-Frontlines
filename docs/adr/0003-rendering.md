@@ -1111,8 +1111,9 @@ LOOK_V2's words. He records "achieved" or "not yet" (with a note), or his pick w
 28. The same frame at pixel ratio 1 and 2, with PM-0003-14's GPU times beside it (OQ-0003-12). Pick: ratio 1 or 2 on
     Low.
 29. The legacy touches LOOK_V2 does not name, each shown beside legacy (OQ-0003-15): comic words, the kill vignette,
-    the toy-soldier death fall, the skin rim, and the camera-player cutaway (structures between the camera and the
-    player fade, beyond LOOK_V2 §4's roofs; walk the player behind a building). Pick: keep, change or drop each.
+    the toy-soldier death fall, the skin rim, the camera-player cutaway (structures between the camera and the player
+    fade, beyond LOOK_V2 §4's roofs; walk the player behind a building), and the ground grid, the red arena border and
+    the world text labels. Pick: keep, change or drop each.
 30. Nothing to judge for LOOK_V2 §8: the test assets are plain glTF/GLB exports given the comic look by the engine
     (steps 2 to 29 show it); compression, LODs and slot renaming are not tested here (ASSET-RESEARCH (a)); the
     per-unit budgets are counted in PM-0003-15 and PM-0003-22.

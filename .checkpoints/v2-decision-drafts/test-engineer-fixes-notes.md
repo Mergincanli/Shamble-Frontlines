@@ -49,3 +49,7 @@ DONE (round 3)
 
 # Round 4 (prompts/fix4-test-engineer.txt), started 19:28; deadline 20:15; BEFOREs from aa85bf0
 Task: replace pointers into each draft's own lines (in my pass-mark sections) with stable anchors (part + row/item named); research citations stay.
+- Round 4 written: test-engineer-fixes-4.md, 37 FIX blocks + 1 NOTE (scratchpad make_fixes4.py). 36 for ADR 0001 (key's wrap pointer + 35 rows: every "the draft, … (line N)" resolved against netcode-architect-adr0001-draft.md, whose lines the pointers match, and replaced by part + named row/bullet/item; no ADR 0001 line number kept), BEFOREs from aa85bf0 (= working tree). 1 for ADR 0003 step 29 (coordinator's addition: GW5's ground grid, red arena border, world text labels), BEFORE from disk (graphics-engineer's GW5 block applied, uncommitted).
+  Other drafts 0002-0006: no self-pointers by line number in my sections (searched every line citation not tied to r1-r6/GLOSSARY/another file).
+  Checks: all 37 dry-applied (0001 at aa85bf0 and working tree; 0003 on disk); 0 "the draft … line N" left in 0001's section; PM rows 7 columns; glossary exact hits 0.
+DONE (round 4)
