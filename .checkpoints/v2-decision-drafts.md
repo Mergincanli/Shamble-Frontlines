@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 14:00 Amsterdam
+- **Last update:** 2026-11-01 14:01 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -56,7 +56,13 @@ unsupported: AB5's "ADR 0006 cites this" (ability section, or a cite in 0006 par
 sections' own disagreements; G22: "≤ 800 draw calls" without its hull-at-Low condition; condition 12: the GPU options
 row "a look baked into each asset" should read "settled by LOOK_V2 §8"; C53: STATUS line 257 is now 314 (cite by name);
 X2: a misquote of r1:1798; 8 fetches, all 200). All six drafts are now verified. The completeness critic launched (about
-14:03). The 0005 fix round waits for the consistency critic, so each author gets one batch.
+14:03). The 0005 fix round waits for the consistency critic, so each author gets one batch. The synthesis' verifier
+done: PASS WITH NOTES (57 of 61; row 37 wrong: the overview's second §6.4 primitive is the leech trigger, not marking;
+row 33 unsupported: "tools may depend on everything" vs navbake's sim + content; row 53: STATUS line numbers moved with
+549490f (cite by name); row 54: the needs register misses R2-BUD-REC4 and over-includes the roof fade; drift after the
+fix rounds: OQ-0001-14 (count 89), OQ-0006-5's Advisor part, 0004's fragment question not in the design register; S11
+dangling; SPIKE_PLAN's "seven targets" lists six; OQ-0003-6 listed once of twice). The third skeptic (0005 G10, A246;
+overview 37, 33; README 54) launched about 14:06.
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.
