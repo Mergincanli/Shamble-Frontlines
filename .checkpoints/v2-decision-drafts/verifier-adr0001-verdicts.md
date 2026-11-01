@@ -618,3 +618,23 @@ pending (outside fetch hours). "doc:n" = line n of the assembled ADR.
 | TE247 | size L | proposed | not in this document | | |
 | TE248 | subsumes part 14's research spikes | draft; map | not in this document as a row | substance in doc:400–406 | |
 | TE249 | decides list | draft App. A | not in this document as a row | substance in doc:985–993 and App. A | |
+| N1 | Trade-off 5: the Worker's interpolation, aim ray and loopback codec cost "counts in the client's sim share, ADR 0004's" (doc:802–804) | no ledger row | unsupported (term stretched) | GL:215 "the client's sim share: in the client, the sim step time in Wasm in the Worker" | codec, interpolation buffer and aim ray are not sim step time (finding F3) |
+| N2 | Trade-offs 1–4 and 6 (rewind clipping, +8 ms, pre-1.0 crates, E3 client flight, one process per room) | no ledger row | confirmed | rows 296, 297, 28; r2:2213 "Blasts are server events"; r2:3340–3345; r2:2764 | |
+| N3 | Consequences: easier and harder lists; revisit-when list | no ledger row | confirmed | restate parts 1–14; r2:2666–2667; r2:2651–2653 | |
+| N4 | "Animation is cosmetic … playerFireOrigin()" kept, becomes a server rule | no ledger row | confirmed | r2:2140–2141 "the `playerFireOrigin` rule, GC5" | |
+| N5 | classic-script, r128, "no external assets" are ADR 0002's, 0003's, LOOK_V2 §8's | no ledger row | confirmed (settled) | plan rule 11; advisor C13 | |
+| N6 | legacy moves to `legacy/` in the foundation | no ledger row | confirmed (settled) | GL §8 foundation quote (map J1) "the repository restructure, moving the old game to `legacy/`" | |
+| N7 | rollback after acceptance: version in `protocols` and `Join` | no ledger row | confirmed | r2:2681–2682 | |
+| N8 | summary: "a shot is judged against what the shooter saw, within a cap" | no ledger row | confirmed | r2:2172–2174 | |
+| N9 | doc:1244 "---8<--- the subsection ends on the line above ---" | no ledger row | wrong (assembly artefact) | the cut marker of test-engineer-passmarks-0001.md:260 copied into the ADR | finding F5 |
+| N10 | GLOSSARY §8 anchors (#the-60-hz-margin, #the-foundation, #the-netcode-proof-test) | no ledger row | unverified (not yet resolvable) | GLOSSARY.md is still 742 lines at HEAD; §8 lands in step 6 | re-check after step 6 |
+| N11 | Q4 C "100–167 ms of delay" | row 270 | confirmed | r2:3334 "R2's 100 to 167 ms delay" | |
+| N12 | Budgets: downstream "N = 48, everyone in view" measured in the stress scene | row 240 | confirmed, with a note | r2:2339 set the mark on the estimate scene (32 projectiles, r2:1761); the stress scene has 300 (GL:404) | the table row does not say the scene changed; PM-0001-12 reports ES beside it; worth a clause in the row |
+| N13 | Appendix A R2-BUD-REC2 "adopted" and R2-BUD-REC1 "marks restated" | rows 359, 330 | unsupported (incomplete) | R2-BUD-REC2's mark "decoded positions within 1 cm and angles within 0.01°" (r2:2341) is in no proof-test mark; 10-bit pitch is 0.18° steps (r2:1748), so the angle part cannot pass as written; R2-BUD-REC1's Shabzon fire-rate mark (r2:2324–2325) is not restated (ADR 0004's S4 covers fire intervals) | finding F4 |
+| N14 | Appendix A dispositions, each against its id's research text | row 359 | confirmed except one | e.g. R2-BUD-OQ2 vs r2:2977; R2-ROOM-OQ2 vs r2:3089–3090; R2-INT-OQ7 vs r2:3029–3030; R1-TICK-OQ1 vs r1:2641–2643 | R2-XU-OQ18 is finding F7 |
+| N15 | Appendix A R2-XU-OQ18 "answered: the drafts' trace reading" | row 169 | unsupported as "answered" | r2:3268 "Left for the Advisor: R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6 (whether the §4 fairness target is trace enough)"; map J3 calls it "the session's reading (2026-10-31)" | finding F7 |
+| N16 | Test plan: "48 per room, 30 minutes at P2 for every mode on the test-mode list" (doc:1291) | row 353 | wrong (as worded) | GL:375–386: the list holds 1v1, 4v4, 2v2v2, 6v6v6 (2 to 18 players); r5:1476–1479 runs each mode at its size | finding F8 |
+| N17 | Q10 U1 "the catch-up cap equals the redundancy cap" (doc:659) | row 277 | wrong (as worded) | r2:2039–2041 "proposed no larger than the redundancy cap"; doc part 5 (doc:195–196) "no larger than" | finding F10 |
+| N18 | PM text: "by the draft's own Rollback (lines 1056–1068)" (doc:1160) | TE217 | citation off | the Rollback is doc:1305–1317 | finding F2 |
+| N19 | PM-0001-4 and PM-0001-39 "the whole tick timed directly" (doc:1097, 1134) | TE68 | rule 5 breach | GL:120 "Retire (exact): "whole tick" and "p99 whole tick"" | finding F1 |
+| N20 | part 3 restatement of r2:2402–2403 in quotes adds "re-flood ticks included" | row 71 | citation off (quote fidelity) | r2:2402 has no such words; true per GL:76–77 | finding F9 |

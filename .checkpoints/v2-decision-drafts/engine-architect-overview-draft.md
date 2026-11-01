@@ -89,8 +89,8 @@ confirmation, LOOP_V2 §7); post the next command. Presentation randomness stays
 
 **Who owns which state:** the authority owns all game state (soldiers, vehicles, projectiles, effects, money, tech,
 player records with their upgrade tracks); the Worker owns predicted local state and the interpolation buffer; the page
-owns only presentation state (camera, animation, VFX pools, audio voices, HUD). Content is read-only after load in
-production (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
+owns only presentation state (camera, animation, VFX pools, audio voices, HUD). Production pins one content set per
+match (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
 
 ## Where each VISION_V2 §6 requirement lives
 | §6 | Requirement | Where it lives (draft, part) |
@@ -98,7 +98,7 @@ production (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
 | 1 | Modes as data: 2 or 3 teams of any size, one faction per team, rooms and private matches | ADR 0001 part 11 (rooms, private rooms, a room as a mode id plus overrides, bots fill slots); ADR 0005 CD-6 (mode files, factions as data); ADR 0006 parts 5–6 (hosting rooms, the lobby) |
 | 2 | A true 3D sim: floors, interiors, ledges, sight across heights; bots between levels; aiming at height | ADR 0004 parts 10–13 (collision queries, baked navigation, floors and typed links, sight); ADR 0001 parts 5 and 9 (the aim point in the command; enclosures in interest); ADR 0002 part 5 (the aim point across the boundary); ADR 0003 (cursor ray against what is drawn; roof fade) |
 | 3 | A data-driven ability and effect system | ADR 0005 AB-1 to AB-10 (a reduced GAS subset as data, upgrades included); ADR 0004 part 16 (execution and its cost); ADR 0001 part 4 (the prediction scope) |
-| 4 | Vehicles as first-class: big, multi-part, own weapons and abilities | ADR 0004 parts 10 and 14 (compound bodies, vehicles as obstacles); ADR 0001 parts 6 and 9 (parts in snapshots and interest); ADR 0003 part 6 (very large units); ADR 0005 AB-1, AB-7 (leech and marking as operations). `[OPEN]` seats: no feature; R2-SYNC-OQ7 stays a design question |
+| 4 | Vehicles as first-class: big, multi-part, own weapons and abilities | ADR 0004 parts 10 and 14 (compound bodies, vehicles as obstacles); ADR 0001 parts 6 and 9 (parts in snapshots and interest); ADR 0003 part 6 (very large units); ADR 0005 AB-6 (the two primitives §6.4 needs: an effect removed when its source dies, and marking). `[OPEN]` seats: no feature; R2-SYNC-OQ7 stays a design question |
 | 5 | Economy and objectives, server-side and tunable | ADR 0004 part 17 (sim phases); ADR 0005 CD-6, CD-10 (tuning tables); ADR 0001 part 9 (visibility classes) |
 | 6 | Balance telemetry | ADR 0004 part 19 (events); ADR 0001 part 11 (the room writes the record at Ended); ADR 0006 part 12 (shape, storage, analysis); ADR 0005 CD-12 (ids, content hash) |
 | 7 | A faction content pipeline as data | ADR 0005 CD-13 (faction variants) and AP-3 (faction colour slots); ADR 0003 part 6 (per-instance faction colour) |
