@@ -11,7 +11,7 @@ Options (774–894), Recommendations (896–1281), Open questions (1282–1465),
 every cited line; LOOK_V2, VISION_V2 §4 and §6, LOOP_V2 §7 and §11, EDITOR_V2 §2, STATUS and the brief's line 8.
 (2) A script (scratch `cites.py`) checked every ledger row that gives an id and lines: the cited lines fall inside that
 id's block in all of them (2 rows cite an id without lines). (3) The source of every R3 finding a claim rests on that
-is outside R3's spot-check table was read with curl by day (22 requests, 09:09–09:17, all HTTP 200; audit at the end).
+is outside R3's spot-check table was read with curl by day (24 requests, 09:09–09:23, all HTTP 200; audit at the end).
 (4) Legacy facts behind the decision's numbers were checked in the repository (reports, STATUS, LEGACY_INVENTORY).
 (5) Arithmetic recomputed. (6) Rules 2–7 and conditions 2, 9, 12 checked across the whole document.
 
@@ -549,6 +549,13 @@ set (0 missing, 0 extra, 0 duplicates); 23 + 2 + 15 + 12 + 19 = 71. Arithmetic: 
 `#the-netcode-proof-test` resolve only once GLOSSARY §8 lands (synthesis, plan step 6); the 11 other glossary anchors
 resolve. Plan step 7: each "wrong" or "unsupported" above gets one skeptic before it goes to the owner.
 
+**Also read at source** (findings under recommendations the document adopts, outside R3's table): R3-WGPU-F13
+(PassNode docs: "can provide multiple outputs via MRT for further processing"; resolution "a factor that is multiplied with
+the renderer's width and height"), R3-WGPU-F14 (WebGPURenderer docs: "The default HalfFloatType is recommend for best
+quality."), R3-LOOK-F6 (SobelOperatorNode.js r186), R3-CHAR-F3 (Skeleton docs: boneTexture "A texture holding the bone
+data for use in the vertex shader."), R3-CHAR-F11 (r186 examples/files.json: 230 WebGPU examples, none for LOD or
+impostors; the skinning ones as listed): all confirmed.
+
 **Not verified.** No GPU or frame timing (none exists before the spikes). The source behind R3-WGPU-F17, F18, F22,
 R3-GL2-F2, F5, F7–F9, F12, F13 and the other spot-checked findings was not re-read (R3's verifier read it). R4 and R6
 recommendations were checked in their research text only: ADR 0003 uses them as ownership statements, not as external
@@ -584,6 +591,8 @@ hosts only; each page read as data. Pages saved under `.gate/verifier-adr0003/fe
 | 09:09:51 | WGPU-F19 | webkit.org | https://webkit.org/blog/17333/webkit-features-in-safari-26-0/ | 200 | 133189 |
 | 09:09:52 | WGPU-F14 | threejs.org | https://threejs.org/docs/pages/WebGPURenderer.html | 200 | 7040 |
 | 09:17:16 | AUDIO-OQ4 | www.w3.org | https://www.w3.org/TR/webaudio-1.1/ | 200 | 3087268 |
+| 09:23:25 | CHAR-F3 | threejs.org | https://threejs.org/docs/pages/Skeleton.html | 200 | 10365 |
+| 09:23:25 | CHAR-F11 | raw.githubusercontent.com | https://raw.githubusercontent.com/mrdoob/three.js/r186/examples/files.json | 200 | 17928 |
 
-22 requests · 6 hosts (threejs.org 9, raw.githubusercontent.com 6, developer.mozilla.org 4, docs.github.com 1,
-webkit.org 1, www.w3.org 1) · 22 × HTTP 200 · 0 unreadable.
+24 requests · 6 hosts (threejs.org 10, raw.githubusercontent.com 7, developer.mozilla.org 4, docs.github.com 1,
+webkit.org 1, www.w3.org 1) · 24 × HTTP 200 · 0 unreadable.
