@@ -37,7 +37,7 @@ checklist · SE the spike entries.
 | TE5 | MAC with Safari 26; real Safari through its WebDriver | PRE | r5 R5-TEST-REC1 Safari row, 1394 | research, source to check |
 | TE6 | MP: Mustafa's PC in Brave, only what he judges, never a budget result | PRE | brief (hardware rule); plan rule 12; PM3 PRE | settled |
 | TE7 | CI: counts, verdicts, hashes and byte comparisons, never a time | PRE | r5 R5-TEST-REC1 benchmark row, 1400 | research, source to check |
-| TE8 | "Wasm" = the crate in Node and in a dedicated Worker in Chromium, Firefox and WebKit under Playwright | PRE | r5 R5-TEST-REC1 table, 1388–1390 (Rust in Wasm in Node; Playwright's three engines) | proposed (test-engineer: the client runs the crate in a Worker; Node alone does not show an engine difference) |
+| TE8 | "Wasm" = the crate in Node and in a dedicated Worker in Chromium, Firefox and WebKit under Playwright | PRE | r5 R5-TEST-REC1 table, 1389–1393 (Rust in Wasm in Node; Playwright's three engines) | proposed (test-engineer: the client runs the crate in a Worker; Node alone does not show an engine difference) |
 | TE9 | `JSON.parse` also in real Safari | PRE | r5 1394 | proposed (test-engineer: each engine parses JSON with its own code; the editor runs in all four browsers, VISION_V2 §4) |
 | TE10 | SS: N = 48 in three teams of 16; 15 big vehicles, 4 very large units; 300 live projectiles; up to 8 active effects per soldier (384) | PRE | GL 397–418; MODES-3 (a) | settled (GLOSSARY, STATUS) |
 | TE11 | 48 × 8 = 384 | PRE | GL 404 | arithmetic |
@@ -111,7 +111,7 @@ checklist · SE the spike entries.
 | TE74 | Bite: a deliberately changed type | PM-7 | r1 2529 | research verified |
 | TE75 | Zero diff on regeneration; `tsc --strict` passes | PM-8 | r1 R1-BND-REC4 marks 1, 3, 2304–2306 | research verified |
 | TE76 | Rename without regeneration fails; hand edit fails | PM-8 | r5 R5-LAYOUT-REC3 mark, 1203–1204 | research, source to check |
-| TE77 | Shares PM-0002-15 (the gate's G4) | PM-8 | PM2 PM-0002-15; r5 R5-GATE-REC1 G4 (1660) | settled (PM2) |
+| TE77 | Shares PM-0002-15 (the gate's G4) | PM-8 | PM2 PM-0002-15; r5 R5-GATE-REC1 G4 (1662) | settled (PM2) |
 | TE78 | Legacy import files typed against the generated types pass the Rust validator | PM-8 | CD-3 (proposed there; reason F16, R1-BND-F9, r1 941–946) | proposed (the draft's) |
 | TE79 | Cabana, DM_Tri and Mustafa's maps migrate and validate 100 %; byte-identical round trip; future version refused | PM-9 | r1 R1-DATA-REC4 mark, 2539–2540 | research verified |
 | TE80 | Property test of random valid documents, 10,000 cases | PM-9 | none | proposed (test-engineer: two maps exercise few field shapes) |
@@ -144,7 +144,7 @@ checklist · SE the spike entries.
 | TE107 | `boot_changes` entries become map data | PM-14 | CD-10; r1 R1-DATA-REC8, 2598–2599 | research verified |
 | TE108 | Look group's values listed, each marked for the look proof test | PM-14 | CD-10 / content item 8 (proposed there) | proposed (the draft's) |
 | TE109 | Each mapped row keeps its legacy `where` | PM-14 | CD-10; r1 2599–2600 | research verified |
-| TE110 | Dead keys CD4, CD6, CD7, CD10, CD12, CD14 dropped with a reason or kept by decision | PM-14 | r1 2600–2601; CD-10 | research verified |
+| TE110 | Dead keys CD4, CD6, CD7, CD10, CD12, CD14 dropped with a reason or kept by decision | PM-14 | r1 2599–2600; CD-10 | research verified |
 | TE111 | Every kept value exact (bits) | PM-14 | r5 R5-TEST-REC3, 1438 ("exact for every value v2 keeps") | research, source to check |
 | TE112 | Bites: a planted key in a copy of LT; a kept value moved by one unit in the last place | PM-14 | r5 R5-TEST-REC3 mark ("each golden fails when the v2 value is moved") | proposed (test-engineer) |
 | TE113 | Changing every client-content value leaves the per-tick state hashes identical on native and Wasm | PM-15 | CD-6 ("a presentation value cannot reach an outcome"); AP-1 | proposed (test-engineer: the claim had no mark) |
@@ -152,10 +152,10 @@ checklist · SE the spike entries.
 | TE115 | Bite: a feel-kit value read in the sim | PM-15 | none | proposed (test-engineer) |
 | TE116 | Load time of the legacy tables plus two maps and two modes natively: reported | PM-16 | r1 R1-DATA-REC1 mark 2, 2496–2498 | research verified |
 | TE117 | The same load in Wasm in the Worker; serde_json and garde's size recorded | PM-16 | content item 9 (proposed there; reason R1-RR-OQ5, r1 2946–2950) | proposed (the draft's) |
-| TE118 | The budgets set from these numbers (the Advisor) | PM-16 | OQ-0005-CD2; r1 R1-DATA-OQ2, 2791–2794; r5 R5-GATE-REC4 ("starting values from the first spike's measurements", 1739–1740) | settled (the draft); research, source to check |
+| TE118 | The budgets set from these numbers (the Advisor) | PM-16 | OQ-0005-CD2; r1 R1-DATA-OQ2, 2791–2794; r5 R5-GATE-REC4 ("Starting values come from the first spike's measurements", 1737–1738) | settled (the draft); research, source to check |
 | TE119 | Maps Cabana and DM_Tri; modes 24v24 and 16v16v16 | PM-16 | GL test-mode list, 375–394 | proposed (test-engineer: from the test-mode list) |
 | TE120 | Median and max over 20 cold loads | PM-16 | none | proposed (test-engineer) |
-| TE121 | Size as module with the crate minus a stub-loader build, under the boundary spike's settings, raw and gzip | PM-16 | r5 R5-GATE-REC1 G7 (Wasm bytes raw and gzip, 1663); R1-RR-OQ5 | research, source to check; proposed (test-engineer: method) |
+| TE121 | Size as module with the crate minus a stub-loader build, under the boundary spike's settings, raw and gzip | PM-16 | r5 R5-GATE-REC1 G7 (Wasm bytes raw and gzip, 1665); R1-RR-OQ5 | research, source to check; proposed (test-engineer: method) |
 | TE122 | RS native; ML Chrome and Firefox Wasm | PM-16 | content item 9 ("on the native server"; "in Wasm in the Worker") | proposed (the draft's); settled (machines) |
 | TE123 | Mustafa's content trial answers OQ-0005-CD1 | PM-17 | r1 R1-DATA-OQ1, 2788–2790 ("a short trial in the spike"); OQ-0005-CD1 | research, source to check; settled (the draft) |
 | TE124 | 0 matches for the test ids in the sim's non-test code; the test content runs | PM-18 | r1 R1-ABL-REC1 mark 1, 2365–2368 | research verified |
@@ -222,9 +222,9 @@ checklist · SE the spike entries.
 | TE185 | Under 25 MiB = 26,214,400 bytes | PM-39 | r6 R6-HOST-REC1 mark, 642–643; 25 × 1,048,576 | research, source to check; arithmetic |
 | TE186 | PM-0006-4 and -5 methods | PM-39 | PM6 | settled (PM6) |
 | TE187 | Over-budget asset fails; raise without the file fails | PM-40 | r5 R5-GATE-REC4 mark, 1743–1744 (applied to assets in the AP spike part) | research, source to check; proposed (the draft's) |
-| TE188 | Controls: an asset at its budget; a raise written with its reason | PM-40 | r5 R5-GATE-REC3 (a control per check), 1706–1710 | research, source to check; proposed (test-engineer) |
+| TE188 | Controls: an asset at its budget; a raise written with its reason | PM-40 | r5 R5-GATE-REC3 (a control per check), 1707–1709 | research, source to check; proposed (test-engineer) |
 | TE189 | Planted glTF reader in `sim` fails | PM-41 | AP spike part (proposed there: AP-1; r5 1189–1192) | proposed (the draft's) |
-| TE190 | The same in `server`; the tool's package imported from `client` fails the manifest walk; control: the tool depending on a glTF reader | PM-41 | AP-1 ("`sim` or `server` dependency trees"); AP-6 ("never in the player build"); r5 R5-LAYOUT-REC2 (manifest walk), 1180–1183 | proposed (test-engineer) |
+| TE190 | The same in `server`; the tool's package imported from `client` fails the manifest walk; control: the tool depending on a glTF reader | PM-41 | AP-1 ("`sim` or `server` dependency trees"); AP-6 ("never in the player build"); r5 R5-LAYOUT-REC2 (manifest walk), 1181–1182 | proposed (test-engineer) |
 | TE191 | The draft's migration places the dependency check in the foundation | PM-41 | draft Migration plan item 2 (lines 1925–1927) | settled (the draft's text) |
 | TE192 | Every slot classed, every faction slot coloured, loader on both backends | PM-42 | GPU spike part (draft 1655–1658) | proposed (the draft's) |
 | TE193 | Colours read back equal the faction data | PM-42 | CD-13; GPU part 2 | proposed (test-engineer: method) |
@@ -235,7 +235,7 @@ checklist · SE the spike entries.
 | TE198 | Feel Lab: predicted against server-confirmed Molotov and Shield; Mustafa judges | PM-45, PM-46 | AB item 8; ABL-PREDICT (r1 2967–2980; STATUS "Waiting"); R2-SYNC-OQ10 (r2 2936–2939) | settled (STATUS); research verified |
 | TE199 | Reported per ability and variant at P2: response time median and p95 over 200 presses; confirmed share; rollbacks per 100; largest correction | PM-45 | plan rule 12 (the netcode proof test's measures, applied to the feel check) | proposed (test-engineer: counts and statistics) |
 | TE200 | R1-ABL-REC4's marks (same tick; undo within one round trip plus one tick; one cue over 1,000 presses; no damage before the server) are ADR 0001's | PM-45, NOM | r1 R1-ABL-REC4 mark, 2441–2445; map part b (owner 0001) | research verified; settled |
-| TE201 | 3 runs; L2; server on RS | PM-45 | r5 R5-TEST-REC4 (L2 for real browsers), 1460–1463 | proposed (test-engineer) |
+| TE201 | 3 runs; L2; server on RS | PM-45 | r5 R5-TEST-REC4 (L2 for real browsers), 1457–1459 | proposed (test-engineer) |
 | TE202 | Mustafa's answer to ABL-PREDICT recorded | PM-46 | STATUS ABL-PREDICT ("Mustafa, after a Feel Lab test") | settled |
 
 ## The failure rule and the "no mark" lines
