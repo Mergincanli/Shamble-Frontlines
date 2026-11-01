@@ -150,3 +150,38 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   carry-forward 3); README's loose-ends rows cite the STATUS section and item name ("STATUS, ADR-001", "STATUS, Deferred:
   SEC-MDL-2") instead of line numbers, since docs-keeper edits STATUS again before ready.
 - Owners: graphics-engineer (0003:45–60, 141, 1182); netcode-architect (0001:97); engine-architect synthesis (README).
+
+### F11 (M). One Wasm file, two procedures for its size budget
+- Documents: docs/adr/0002-code-structure-build-toolchain.md:233–236 (part 4: "the boundary spike and the sim core spike
+  measure the `sim-wasm` file ... and the budget file (part 9) takes the measured value as its first limit"), :922–925
+  (spike item 8), :1292 (R1-RR-OQ5: "the budget file takes the measurement"); docs/adr/0004-simulation-core.md:1149
+  ("the budget is ADR 0002's (R1-RR-OQ5)"); docs/adr/0005-content-abilities-assets.md, OQ-0005-CD2 ("What load time and
+  Wasm size may content cost ... Decider: the content and ability spike's measurement, then the Advisor sets the
+  budgets").
+- Disagreement: the content crate (serde_json, garde) lives in the same `sim-wasm` file (0002 part 3: `sim-wasm` = `sim` +
+  `room` + `protocol` + `content`). Under 0002 the first limit is fixed by the boundary and sim core spikes, which run
+  before the content and ability spike (SPIKE_PLAN order), so content's bytes would fail the limit the day they land;
+  under 0005 the Advisor sets a content Wasm budget later. Two deciders and two dates for one number.
+- Outcome: ADR 0002 owns the `sim-wasm` size budget (N50); its first limit is set after the content and ability spike
+  has measured the content crate's share (until then the size is recorded, not gated), and the Advisor sets it from both
+  measurements. OQ-0005-CD2 keeps content load time and the content share's size as inputs to that one budget and cites
+  ADR 0002 part 4 for the decider.
+- Owners: engine-architect (0002 part 4 and item 8; also the 0005 content-section author for CD2's decider line).
+
+### F12 (L). Codes without a lasting home, and code families that collide
+- Documents: docs/adr/0002-code-structure-build-toolchain.md:318 ("decision map S11": README's seam table has S1, S3, S4,
+  S6, S12 only), :918, :936, :1034 ("the decision map's part g", "map part g, 'Not throwaway spikes'", "the map's part
+  g": README carries no part g); docs/SPIKE_PLAN.md:354 ("decision map part h": README's "Research gaps" is that part,
+  under another name); docs/adr/0003-rendering.md:1275 (lists the decision map's checkpoint file among sources). The
+  map is deleted before the PR is marked ready.
+- Collisions (synthesis list item 11): bare G-n and S-n are used for four different families: ADR 0002's gate checks
+  G1–G13 (0002:433 on, e.g. "G5 | dependency rules"), ADR 0006's option labels G1–G4 (hosting, 0006 Options) and S1–S3
+  (record storage), ADR 0004's spike claims S1–S20 (0004:822–843), and README's gaps G1–G15 and seams S1–S12 (cited
+  with "gap"/"seam" in front). "G5" is dependency rules in 0002 and visual effects as "gap G5".
+- Outcome: 0002:318 cites "seam S11" and README adds the S11 row (offline and local play: DESIGN decides whether offline
+  ships; 0002 and 0004 build local play from slice 2), or 0002 drops the code and cites R1-BND-OQ1 (DESIGN). 0002's
+  "part g" references become "SPIKE_PLAN item 3" / "SPIKE_PLAN, the foundation's acceptance checks". SPIKE_PLAN:354 says
+  "(README, research gaps)". 0003:1275 drops the checkpoint file from its sources or names README instead. README's
+  codes section adds one line: "ADR 0002's gate checks G1–G13, ADR 0004's spike claims S1–S20 and ADR 0006's option
+  labels (G1–G4, S1–S3, K1–K4, B1–B11) are local to their draft; register codes always carry their word (gap, seam)".
+- Owners: engine-architect (0002), engine-architect synthesis (SPIKE_PLAN, README), graphics-engineer (0003:1275).
