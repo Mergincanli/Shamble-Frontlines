@@ -240,17 +240,17 @@ map J3), one line each, for the stop review. Each draft's "Need:" line is the so
 - **ADR 0001:** the server's authority over upgrade tracks, offers, picks, drops and pickups, and their messages (part 12): UPGRADE-SCOPE.
 - **ADR 0002:** the repository restructure (part 1), the pinned toolchains (part 2), the lint set (part 7), CI gate v2 (part 9), the preview build (part 10): GLOSSARY §8, the foundation only (with VISION_V2 §4, §6.6 and §6.8 for the determinism checks).
 - **ADR 0002:** the editor build as its own entry (part 11): EDITOR_V2 §5 only (it also serves §6.7's authoring).
-- **ADR 0003:** the latest-three.js pin and upgrade policy, the WebGL 2 fallback's scope, the quality tiers, the measurement harness and the client's per-match report (parts 2, 1, 7, 8): VISION_V2 §4 only.
+- **ADR 0003:** the three.js pin and upgrade policy (part 2), the backend report (part 4), the reference machines and quality tiers (part 7), the measurement harness and the client's per-match report (part 8): VISION_V2 §4 only.
 - **ADR 0003:** the look pipeline (part 5): LOOK_V2 §1–§7 only (with VISION_V2 §6.9 for its cost); halftone flashes and line boil: LOOK_V2 §7 only; the concussion shake: LOOK_V2 §2 only; roof fade: LOOK_V2 §4.
 - **ADR 0003:** spatial audio (part 9): LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 only.
-- **ADR 0004:** the server and Worker loops and inputs replayable from day one (part 5): VISION_V2 §4 only and SLICE-ORDER condition 2.
-- **ADR 0004:** the sim step share and its parts (part 6): VISION_V2 §3 and §4 only (a budget, not a feature); identical results across browsers (part 7): VISION_V2 §4 only.
+- **ADR 0004:** snapshot and restore for re-simulation (part 3): VISION_V2 §4 only and SLICE-ORDER condition 2 (replayable from day one).
+- **ADR 0004:** the sim step share and its parts (part 6): VISION_V2 §3 and §4 only (a budget, not a feature); no panic from input or content, and recovery from a trap (part 20): VISION_V2 §4 only.
 - **ADR 0004:** bot behaviour in the sim (part 15): VISION_V2 §3 ("Bots fill empty slots") and LOOP_V2 §10, beside §6.2's bots between levels.
 - **ADR 0004:** the player record, weapon drops and pickups, the offers' random stream (parts 8, 18): UPGRADE-SCOPE.
 - **ADR 0004:** map validation with the sim's own integrator (part 21): EDITOR_V2 §3 and LOOP_V2 §9, beside §6.2; active reload (part 16): LOOP_V2 §7.
 - **ADR 0004:** three damage stages and structure states (part 14): LOOK_V2 §4.
 - **ADR 0005:** the feel kit as client content and the Feel Lab's data (CD-14): LOOP_V2 §7 only; development hot reload (CD-7): LOOP_V2 line 8 and §7 only; the quality-tier table (CD-14): VISION_V2 §4 only.
-- **ADR 0005:** the map document as content (CD-11) and format versions with migrations (CD-4): EDITOR_V2 §2 and §4, beside §6.1 and §6.2.
+- **ADR 0005:** the map document as content (CD-11): EDITOR_V2 §2 (rules 1, 2 and 5) and §4, beside §6.1 and §6.2; EDITOR_V2 §2 rules 3 and 4 are left to EDITOR_V2's own architecture plan (decision map J3).
 - **ADR 0005:** the upgrade tracks on the ability model (AB-8, AB-4's two added kinds): UPGRADE-SCOPE.
 - **ADR 0005:** the ability step's cost per tick (AB-10): VISION_V2 §3 and §4 only (a budget, not a feature).
 - **ADR 0005:** the asset pipeline (AP-1 to AP-7) and its GPU rules: LOOK_V2 §8 (with VISION_V2 §4, §6.7 and §6.9 where each part names them); the automated step as a tool outside the player build (AP-6): LOOK_V2 §8 only.

@@ -43,3 +43,6 @@ Next: spike section + pass marks (799-1101), then Migration/Test/Rollback/AppA (
   r2 cites: 2437-2439 (INT-REC1 (a)), 2445-2466 (INT-REC2; quote 2451-2452, not 2450-2451: citation off by one line), 3005-3009, 3010-3013, 3220-3225 confirmed.
   r4: FLOORS-REC2 925-939 confirmed (layer + enclosure area id = R2-INT-REC2's); OBST-REC2 1043-1061 "baked in both states" confirmed; FLOORS-REC1 903-924 = typed links (walk, jump-up, drop-down, gap jump; list is data) but names no planks or debris -> N5 the plank mapping is an inference (no "plank" in r4). r6 OBS-REC4 769-780 confirmed.
 Next: pass marks 884-1101.
+- Pass marks PM-1..43 (884-1021) checked vs r3 marks, r5 (1487-1489 slope + planted leak, 1490-1498 REC6, 1670 G12, 1706-1709/1723/1727-1728 REC3, 1734-1744 REC4: all confirmed), arithmetic (nearest rank 594/570/300; 882; 1,202; 240; 0.5 MB; 33.3/16.7) all correct.
+  N6 (PM-0003-4, TE44): "median frame time" where R3-WGPU-REC1 mark 3 (r3:913-915) says "median CPU frame time" (the spike section at ADR ~826 keeps "CPU"): wording drift, nit.
+Next: checklists 1023-1101, Migration/Test/Rollback/AppA/Sources 1102-1276.

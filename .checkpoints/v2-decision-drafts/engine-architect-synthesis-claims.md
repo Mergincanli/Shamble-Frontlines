@@ -17,7 +17,7 @@ value, a draft's, or a count.
 | 5 | The test-mode list: 24v24, 12v12v12; 16v16v16; 1v1, 4v4, 2v2v2, 6v6v6; N = 64 headroom | SPIKE_PLAN fixtures | GLOSSARY §2 (GLOSSARY:375–394) | glossary |
 | 6 | Sizes: S about a day, M 2 to 4 days, L a week or more of session work | SPIKE_PLAN | every test-engineer-passmarks-000N.md, "Spike entries" first line | pass-mark file |
 | 7 | Each spike's size (netcode proof test L + M; boundary L + M + S; sim core L; look L + S/M; preview hosting S, ≥ 2 days; content and ability L + S; bench L; asset M; Feel Lab M; foundation L, six change-sets) | SPIKE_PLAN table and items | passmarks-0001:262–302; -0002:246–295; -0003:229–270; -0004:224–297; -0005:239–318; -0006:169–221 | pass-mark file |
-| 8 | Pass-mark id ranges per spike (PM-0001-1 to -56; PM-0002-1 to -34, -35 to -69, -70 to -76; PM-0003-1 to -17, -18 to -42, -43; PM-0004-1 to -61, -62 to -66, -67, -68 to -70, -71, -72; PM-0005-1 to -32, -33 to -37, -38 to -44, -45, -46; PM-0006-1 to -10, -11 to -27, -28 to -31) | SPIKE_PLAN | the spike entries above; rows counted in the drafts: 56, 76, 43, 72, 46, 31 (`grep -c "^| PM-000N-"`, max id equal) | counted |
+| 8 | Pass-mark id ranges per spike (PM-0001-1 to -56; PM-0002-1 to -34, -35 to -69, -70 to -76; PM-0003-1 to -17, -18 to -42, -43; PM-0004-1 to -61, -62 to -66, -67, -68 to -70, -71, -72; PM-0005-1 to -32, -33 to -37, -38 to -44, -45, -46; PM-0006-1 to -10, -11 to -27, -28 to -31) | SPIKE_PLAN | the spike entries above; rows counted in the drafts: 56, 76, 43, 72, 46, 31 (`grep -c` on the table rows, max id equal) | counted |
 | 9 | The 60 Hz margin run's marks: PM-0001-39, -40; PM-0004-71, -72 | SPIKE_PLAN item 2 | 0001:1134–1135; 0004:1014–1015 | draft |
 | 10 | Checklist homes: PM-0001-53 (netcode), PM-0002-34 (spike), foundation checklist (0002:1159), PM-0003-17 (look), bench checklist (0003:1092), PM-0005-17 (content), PM-0005-37 (families), LOD checklist (0005:2123), PM-0005-46 (Feel Lab), PM-0006-9 (hosting), PM-0006-12 and -18 (operations) | SPIKE_PLAN "Who judges what" | grep of the drafts' "####" checklist headings and rows | draft |
 | 11 | N = 12, 24, 36, 48 for the page's frame-time comparison | SPIKE_PLAN item 3 | ADR 0002 "What a spike must prove" item 1 (0002:883–890) | draft |
@@ -34,7 +34,7 @@ value, a draft's, or a count.
 | 22 | Line numbers in README rows (OQ lines, "line 161", "line 76") | README | the assembled drafts on 2026-11-01 (grep) | draft (may move in the fix round) |
 | 23 | P2: 100 ms round trip with P2's jitter and loss | README "100 ms" row | ADR 0001 OQ-0001-3 (0001:856), part 13 | draft |
 | 24 | 118 inventory rows "look brief pending" | README LE-H | map part f3 (LE-H) | map |
-| 25 | GLOSSARY.md at 9e7db28: 742 newlines, 64,088 bytes, unterminated line 743 | glossary8 correction 1 | `git show 9e7db28:docs/research/GLOSSARY.md | wc -lc`; `tail -c` | counted |
+| 25 | GLOSSARY.md at 9e7db28: 742 newlines, 64,088 bytes, unterminated line 743 | glossary8 correction 1 | `git show 9e7db28:docs/research/GLOSSARY.md` piped to `wc -lc`; `tail -c` | counted |
 
 ## Claims (structure, ownership, placement)
 | # | Claim | Where used | Source | Tier |
@@ -73,3 +73,13 @@ value, a draft's, or a count.
   by eye, not against every draft's full OQ text.
 - The XT rank rows for ranks 2, 4 and 35: the owner's Appendix A grep matched other rows; the part named comes from the
   draft's options sections (0001 Q4, Q7; 0003 part 9), not from the rank's own Appendix A row.
+
+## Corrections made in the verification pass (same session)
+- ENGINE_OVERVIEW's §6 table: §6.2's ADR 0003 parts named (part 10, the cursor ray; part 5.i, the roof fade); §6.6's
+  content hash is ADR 0005 CD-8, not CD-12; §6.9's ADR 0004 share is the stress scene its sim is measured in (0004:26,
+  :814), not part 6; §6.4's primitives are ADR 0005 AB-6 (0005:875, :895).
+- README "Needs outside VISION_V2 §6": ADR 0003's parts re-pointed by the "Need:" lines' positions (0003:142 part 2,
+  :158 part 4, :287/:329 part 7, :343/:353 part 8); ADR 0004's by theirs (0004:160 part 3, :226 part 6, :473 part 20);
+  ADR 0005 CD-4 dropped (its need includes §6.1 and §6.7, 0005:317).
+- README "Design questions": cross-references to other research ids removed from the "why" column, so the section
+  holds exactly the 38 DESIGN ids, each once (checked by `diff` against the id table).

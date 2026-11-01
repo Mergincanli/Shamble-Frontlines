@@ -39,3 +39,6 @@ Task: engine-architect synthesis of the v2 decision drafts (plan step 6): ENGINE
 - The legacy rows ED5 and ED7 (Character Lab, Anim Lab): listed by no draft except as OQ-0005-4 (in README's decisions table).
 
 - Note: the step lines above carried guessed clock times; corrected to (step). All five outputs were done by 09:14 Amsterdam (date check); verification pass follows.
+- (step) verification pass: Mermaid edges normalized to `-->|"label"|`; overview §6 refs fixed (0003 parts 10 and 5.i; CD-8; 0004's §6.9 share); README need lines re-pointed to their parts, CD-4 dropped; design section holds exactly the 38 DESIGN ids (diff with the id table: same); every table's columns consistent (script); ledger records the corrections. Finished about 09:25 Amsterdam.
+
+DONE
