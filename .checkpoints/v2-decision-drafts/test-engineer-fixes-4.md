@@ -4,7 +4,8 @@ Author: test-engineer, 19:28–19:55 Amsterdam. Every BEFORE was copied by scrip
 (the working tree matches it), whole lines, unique. Each old pointer was resolved against the draft it was
 written on (netcode-architect-adr0001-draft.md, whose lines it matches: e.g. its line 527 is the row "Server
 tick time, 30 Hz (the baseline)", now line 533), then replaced by the part and the row, bullet or item it names.
-No line number into ADR 0001 is kept. Research and GLOSSARY citations are untouched.
+No line number into ADR 0001 is kept. Research and GLOSSARY citations are untouched. The last block (ADR 0003,
+step 29) is copied from the file on disk, where graphics-engineer's GW5 block is applied but not committed.
 
 ### NOTE (the other five drafts)
 Their pass-mark sections were searched (every "line"/"lines" citation not tied to r1–r6, GLOSSARY or another
@@ -299,4 +300,17 @@ BEFORE:
 | PM-0001-56 | The proof test's records are complete (part 14, item 5) | recorded: both crates' results on PM-0001-11, -25, -28, -35 and their pick, with its reason (R2-TRN-OQ5: the draft names no rule beyond the marks); each browser's negotiated draft and its behaviour with UDP blocked (R2-TRN-OQ1, OQ2); the real record sizes per entity kind and the command size (R2-XU-OQ15, OQ4); NewReno against Cubic (PM-0001-24) and each browser's received snapshot rate and age at P2 to P4 (R2-BUD-OQ10, R2-TRN-OQ8); the smoothness of a remote soldier sprinting straight and turning, drawn with linear interpolation (the standard deviation of its per-frame displacement as a share of the mean, R1-TICK-REC5's measure) beside Mustafa's step 5 (R2-SYNC-OQ12); OQ-0001-6's two command-timing options, each run with PM-0001-42's correction share and PM-0001-48's registration at P2 to P4; Brave's transport and version on MP | as each row names | read once per item and written to the results log | passes when every item has a number or a value | the draft, spike item 5 (lines 985–993); r1 R1-TICK-REC5's measure (lines 2111–2112); OQ-0001-6 (lines 874–880) |
 AFTER:
 | PM-0001-56 | The proof test's records are complete (part 14, item 5) | recorded: both crates' results on PM-0001-11, -25, -28, -35 and their pick, with its reason (R2-TRN-OQ5: the draft names no rule beyond the marks); each browser's negotiated draft and its behaviour with UDP blocked (R2-TRN-OQ1, OQ2); the real record sizes per entity kind and the command size (R2-XU-OQ15, OQ4); NewReno against Cubic (PM-0001-24) and each browser's received snapshot rate and age at P2 to P4 (R2-BUD-OQ10, R2-TRN-OQ8); the smoothness of a remote soldier sprinting straight and turning, drawn with linear interpolation (the standard deviation of its per-frame displacement as a share of the mean, R1-TICK-REC5's measure) beside Mustafa's step 5 (R2-SYNC-OQ12); OQ-0001-6's two command-timing options, each run with PM-0001-42's correction share and PM-0001-48's registration at P2 to P4; Brave's transport and version on MP | as each row names | read once per item and written to the results log | passes when every item has a number or a value | the draft, "What a spike must prove" item 5; r1 R1-TICK-REC5's measure (lines 2111–2112); OQ-0001-6 |
+END
+
+### FIX GW5 (0003 checklist step 29: the ground grid, the arena border, the world labels)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+29. The legacy touches LOOK_V2 does not name, each shown beside legacy (OQ-0003-15): comic words, the kill vignette,
+    the toy-soldier death fall, the skin rim, and the camera-player cutaway (structures between the camera and the
+    player fade, beyond LOOK_V2 §4's roofs; walk the player behind a building). Pick: keep, change or drop each.
+AFTER:
+29. The legacy touches LOOK_V2 does not name, each shown beside legacy (OQ-0003-15): comic words, the kill vignette,
+    the toy-soldier death fall, the skin rim, the camera-player cutaway (structures between the camera and the player
+    fade, beyond LOOK_V2 §4's roofs; walk the player behind a building), and the ground grid, the red arena border and
+    the world text labels. Pick: keep, change or drop each.
 END
