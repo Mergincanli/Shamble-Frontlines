@@ -53,3 +53,5 @@ DONE
 DONE
 - Fix round 2 (consistency findings) started 14:04 Amsterdam; output netcode-architect-fixes-2.md.
 - Located all texts (F1 489; F2 386-387; F3 126, 145-148, 528-531, 975; F8 337-338, 955-956; F10 25, 97, 1487; F13 230, 44; F14 994, 845). Writing fixes-2 via script.
+- Fixes-2 written: netcode-architect-fixes-2.md, 15 FIX blocks (F1; F2; F3 x4: part 2, part 3, budgets table, spike item 3; F8 x2: part 10, spike item 1; F10 x3: Context TICK-30, legacy ADR-001, Sources; F13 x2: event names, "the proof test" defined once; F14 x2: R5-TEST-OQ2, OQ-0001-1 (b)). No NOTE: no disagreement. All 15 BEFOREs verified unique by script; no overlaps. Left: PM rows (test-engineer's: PM-0001-4, -5, -39, -40 carry 16.7/8.3/4.2), tick period prose "33.3 ms" (prose may keep one decimal per F3's outcome).
+DONE

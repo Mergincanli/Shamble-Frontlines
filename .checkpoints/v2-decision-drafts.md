@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 14:05 Amsterdam
+- **Last update:** 2026-11-01 14:06 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,7 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- 45c957f · ADR 0001 second fix round (consistency F1, F2, F3, F8, F10, F13, F14).
 - 7da03b1 · ADR 0004 fix round (rust-reviewer's 11 exact replacements).
 - 03df0ae · ADR 0001 fix round (netcode-architect's 10 exact replacements; verifier F2, F4–F10).
 - 09803a9 · ADR 0006 fix round (infra-engineer's 22 exact replacements; verifier findings 1, 2, 4, 7–13).
@@ -72,7 +73,9 @@ Advisor): sent to netcode-architect (0001) and graphics-engineer (0003 + 0005 GP
 (synthesis): `prompts/fix2-*.txt`, sent as slots free. test-engineer's pass-mark round (running) also gets the critic's
 F3 (0001 rows: two decimals), F7 (0004 rows) and F13 rows as a follow-up. The third skeptic done: G10, A246, row 33,
 row 54 upheld, row 37 partly (its texts in `verifier-skeptic-3-results.md`; the roof fade stays in the register as
-"LOOK_V2 §4, beside §6.2"). rust-reviewer's second round sent about 14:13.
+"LOOK_V2 §4, beside §6.2"). rust-reviewer's second round sent about 14:13. 0001's second round applied (45c957f: 15 blocks, no NOTE; its PM rows
+-4, -5, -39, -40 still carry 16.7 / 8.3 / 4.2 ms: test-engineer's follow-up). engine-architect's 0002 round sent about
+14:15.
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.
