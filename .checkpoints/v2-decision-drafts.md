@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:08 Amsterdam
+- **Last update:** 2026-11-01 09:10 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -47,10 +47,12 @@ Pass marks 0005 done with its ledger (242 rows); docs/adr/0005 re-assembled from
 0006 done: FAIL with 3 defects (Sentry's IP note: `userInfo` off is not enough, headers, cookies and query strings need
 deny lists; R6-HOST-OQ4's second trigger "before the goal budget is fixed" dropped; the assembler's cut marker copied
 into the draft) and 11 lower findings; 581 of 588 rows confirmed; 29 source fetches, 28 read (one 403, read from its
-raw copy). The cut marker was in all six drafts: removed (cf00def; assemble.py now stops at it). Running: the synthesis
-(engine-architect, launched about 09:03; documents due by 10:05), verifiers 0001, 0002, 0004 (resumed), 0003
-(launched about 09:08). Waiting: verifier 0005 and the synthesis' verifier, the skeptics for 0006's findings 1–2, the
-critics,
+raw copy). The cut marker was in all six drafts: removed (cf00def; assemble.py now stops at it). Verifier 0001 done:
+PASS WITH NOTES (609 of 629 rows confirmed; 3 wrong, 3 unsupported, 5 citation off, 1 rule breach (F1, "whole tick"),
+1 unverified (the §8 anchors, until step 6); 3 source fetches, all 200; its line numbers are before cf00def, which
+moved lines after 1244 up by 2). Running: the synthesis (engine-architect, launched about 09:03; documents due by
+10:05), verifiers 0002, 0004 (resumed), 0003 (launched about 09:08), 0005 (launched about 09:10). Waiting: the
+synthesis' verifier, the skeptics (0006 findings 1–2; 0001 F2, F4, F5, F6, F7), the fix round, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
 
