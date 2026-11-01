@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:19 Amsterdam
+- **Last update:** 2026-11-01 09:23 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,7 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- 09803a9 · ADR 0006 fix round (infra-engineer's 22 exact replacements; verifier findings 1, 2, 4, 7–13).
 - 80a27b3 · ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md, GLOSSARY §8 (synthesis); 521/521 ids disposed.
 - 549490f · docs-keeper: STATUS, ROADMAP, REPO_MAP.
 - cf00def · the pass-mark files' cut marker removed from all six drafts (verifier 0006 finding 3); assemble.py fixed.
@@ -69,8 +70,10 @@ done (09:18): 9 upheld, 2 partly (0004 row 253, 0006 finding 1), 1 refuted (0004
 `verifier-skeptic-1-results.md`. Fix round (step 9) started: infra-engineer resumed for 0006 (about 09:20,
 `prompts/fix-0006-infra-engineer.txt`; it writes BEFORE/AFTER blocks to `infra-engineer-adr0006-fixes.md`; the session
 applies them with `scripts/apply_fixes.py`); prepared: `prompts/fix-0001-netcode-architect.txt`,
-`prompts/fix-0004-rust-reviewer.txt` (send when slots free). Running (5): verifiers 0003, 0005, the synthesis' verifier,
-the consistency critic, infra-engineer's fixes. Waiting: the synthesis' verifier, the skeptic for 0002,
+`prompts/fix-0004-rust-reviewer.txt` (send when slots free). 0006's fixes applied: 22 blocks, all exact (09803a9);
+glossary 0 exact in 0006; dispositions still 521/521. netcode-architect resumed for 0001's fixes (about 09:24).
+Running (5): verifiers 0003, 0005, the synthesis' verifier, the consistency critic, netcode-architect's fixes. Still
+open for 0006: findings 5 and 6 (pass-mark rows: test-engineer), 14 (ledger only). Waiting: the synthesis' verifier, the skeptic for 0002,
 0003, 0005's findings, the fix round, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).

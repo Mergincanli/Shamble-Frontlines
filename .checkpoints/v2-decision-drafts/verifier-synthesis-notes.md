@@ -5,3 +5,8 @@ Next: SPIKE_PLAN read, PM ranges/sizes vs passmark files and drafts.
 Next: README (OQ counts, deciders, 38 DESIGN rows), then overview spot-checks.
 09:40 README: OQ counts per draft by grep '^- **OQ-' = 13,7,15,7,34,12 = 88 (arith ok; 0005 = 8+13+3+6+4). Every OQ line number in "Decisions the drafts ask for" matches the drafts (all ~60 checked). Omitted OQs (0001-6,-13; 0002-2,-3,-7; 0003-6,-7,-14; 0004-2,-3,-7; 0005-CD8,AP1,AS1,AS3-6; 0006-5,-11) have non-Mustafa/Advisor deciders -> completeness ok. Note: OQ-0003-6's "what decides it" includes "Mustafa's look" (0003:744-745); SPIKE_PLAN:225 omits -6 while SPIKE_PLAN:239 includes it (minor). GLOSSARY first 64,088 bytes identical to 9e7db28; closing note 797 == condition 3 text verbatim; line 85 "which does not change" ok.
 Next: 38 DESIGN rows vs id table; README rest.
+09:45 DESIGN rows: README:108-145 id set == id table owner DESIGN set (38 = 38, diff empty, no dups). Dispositions/whys match id-table notes; 21 question texts spot-read in r1/r2/r4/r6 (match).
+Next: README 200-337 (XT ranks count 28, XT 72/XU 30, loose ends, needs, codes), overview spot checks.
+09:50 README XT: 28 rank rows, 72 XT ids == id table's 72 (diff empty), owners and ranks all match tsv; each rank's "resolved in" matches the owner draft's Appendix A row (0001:1338-1345,1442; 0002:1294-1300,1377; 0003:1178-1180,1240; 0004:1170-1171; 0005:2239; 0006:1025-1034). Ledger's "not verified" ranks 2,4,35 now confirmed (0001:1338 part 5; 0001:1339 part 7; 0003:1178 part 9). XU 30 in tsv.
+Next: loose ends lines (STATUS 198-202,257,262,273; 0001:161; 0005:76), LE-H 118, needs lines, overview §6 table.
+(note: timestamps 09:31-09:50 above were estimates; real clock at this line 09:22)

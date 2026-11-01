@@ -37,3 +37,35 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   OQ-0004-5 and OQ-0004-6 and cites "OQ-0005-AB9, AB10" at 443, 1039 and 1068 (the tie rule's mechanism, a fixed
   deterministic order, stays 0004's part 18). README drops rows 69–70.
 - Owners: rust-reviewer (0004); engine-architect and game-designer (0005 AB9); engine-architect synthesis (README).
+
+### F3 (H). The same tick-budget marks at two precisions: a run between them passes one draft and fails the other
+- Documents: docs/adr/0001-multiplayer-netcode.md:125–126 (part 2, "4.2 ms each"), :1134 (PM-0001-39: "sim step time p99
+  and server-only work p99 at most 4.2 ms each; max under 16.7 ms"), :1135 (PM-0001-40: "at most 4.2 ms", "max at most
+  16.7 ms", "p99 at most 6.7 ms"); docs/adr/0004-simulation-core.md:823 (claim S1: "≤ 8.3 ms at 30 Hz (≤ 4.2 ms for the
+  60 Hz margin run)"), :824 (S2: "≤ 13.3 ms"), :942 (PM-0004-3: "≤ 8.33 ms (25 % of 33.33 ms)"), :947 (PM-0004-8:
+  "≤ 13.33 ms"), :1014 (PM-0004-71: "≤ 4.17 ms (25 % of 16.67 ms), max ≤ 16.67 ms", "≤ 6.67 ms"); GLOSSARY §8:783
+  and condition 2 ("8.33 ms", "6.25 ms").
+- Disagreement: a p99 of 4.18 ms passes 0001's 60 Hz mark and fails 0004's; 8.31 ms passes 0004's S1 claim and fails
+  PM-0004-3. ADR 0004 disagrees with itself (S1/S2 vs PM-0004-3/-8/-71). (Synthesis list item 1, widened to the 30 Hz rows.)
+- Outcome: every pass mark states the share at two decimals, the form TICK-60-HEADROOM's ruling uses (8.33, 6.25):
+  30 Hz: 16.67 / 8.33 / 8.33 / 13.33 ms, max under 33.33 ms; 60 Hz: 8.33 / 4.17 / 4.17 / 6.67 ms, max under 16.67 ms.
+  Prose and the GLOSSARY's one-decimal sums may keep "about 8.3 ms". The owner of each share states it (N4 and N6:
+  0001; N5 and N11: 0004); the other cites.
+- Owners: test-engineer for the PM rows it wrote in 0001 (PM-0001-39, -40, and every 30 Hz row with "8.3"/"16.7") with
+  netcode-architect for part 2's prose; rust-reviewer for 0004's claim table S1, S2 (lines 823–824).
+
+### F4 (M). The Mac test machine is defined five ways
+- Documents: docs/SPIKE_PLAN.md:30 ("MAC, a macOS machine with Safari"), :167 ("MAC with the latest Safari");
+  docs/adr/0002-code-structure-build-toolchain.md:949 ("with the latest Safari"); docs/adr/0001-multiplayer-netcode.md:
+  1017–1019 ("the stable releases on the day of the run, recorded (R2-TRN-REC1 mark 1 names ... Safari 27"); docs/adr/
+  0003-rendering.md:822, :897, :1143 ("Safari 26"); docs/adr/0004-simulation-core.md:865 ("a macOS machine with Safari
+  26"); docs/adr/0005-content-abilities-assets.md:1932 ("Safari 26"); docs/adr/0006-infrastructure-operations.md:790
+  ("a macOS machine with Safari").
+- Disagreement: one shared machine (SPIKE_PLAN "Shared fixtures") pinned to Safari 26 in three drafts, "latest" in two,
+  27 in one. Safari 26.0 is WebGPU's floor (R3-WGPU-F19, r3:171–174); WebTransport needs 26.4 (r2:1008–1021); R2-TRN-
+  REC1 mark 1 names 27 (r2:2586). A Safari 26.0 machine fails 0001's transport marks by construction.
+- Outcome: SPIKE_PLAN:30 defines MAC once: "a macOS machine with the stable Safari on the day of the run, its version
+  recorded (WebGPU from 26.0, R3-WGPU-F19; WebTransport from 26.4)". 0003, 0004, 0005 replace "Safari 26" in their
+  machine keys and matrices with "MAC (SPIKE_PLAN)"; 0001 and 0002 cite it.
+- Owners: engine-architect synthesis (SPIKE_PLAN:30); graphics-engineer (0003); rust-reviewer (0004); the 0005 frame
+  author (engine-architect) for 0005:1932.
