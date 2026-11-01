@@ -572,68 +572,68 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A141 | Carried by a target-tag multiplier | R1-ABL-REC1, r1:2351 | confirmed (batch) | cited lines read: r1:2351:2351 |  |
 | A142 | Legacy never reduces the Juggernaut's 1500 HP | INV GC17, line 256 | confirmed (batch) | cited lines read: INV:256:256 |  |
 | A143 | Javelin "weak against infantry" | LOOP_V2 §5, lines 71–72 | confirmed (batch) | cited lines read: LOOP_V2:71:72 |  |
-| A144 | Track content and levelling are Mustafa's | UPGRADE-SCOPE, "Still open" line | pending (time) |  |  |
+| A144 | Track content and levelling are Mustafa's | UPGRADE-SCOPE, "Still open" line | confirmed | inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md "Still open; list them as open questions, don't decide them" |  |
 | A145 | These are sums on starting values, not balance evidence; CD13 asks for sims of each matchup (3 or more runs) | INV CD13 line 94 ("sims of each matchup (3+ runs) before keeping these values") | confirmed (batch) | cited lines read: INV:94:94 |  |
 | A146 | Research line: R1-ABL-REC5 serves §6.6 (ids key pick and win rates) | r1:2459 | confirmed (batch) | cited lines read: r1:2459:2459 |  |
 | A147 | The section adds only the track kind and its load checks, and no new operation: a pick is an effect or a granted ability | UPGRADE-SCOPE; R1-ABL-REC1, r1:2345 ("effects that grant tags or abilities"); proven by spike mark u1 | confirmed (proposed, labelled; batch) | cited lines read: r1:2345:2345 |  |
 | A148 | A track per unit type and per weapon type, candidates per level, each an effect or granted ability with optional requirements | UPGRADE-SCOPE bullet 1; R1-ABL-REC1, r1:2343–2345 | confirmed (batch) | cited lines read: r1:2343:2345 |  |
 | A149 | The offer size is a data value, 3, so no number is hard-coded | UPGRADE-SCOPE bullet 1 ("pick one of three"); LOOP_V2 line 8's rule | confirmed (batch) | cited lines read: LOOP_V2:8:8 |  |
-| A150 | The player's record holds per track its level, its picks and any open offer (ADR 0004 decides) | map J5 (0004: the player record) | pending (time) |  |  |
+| A150 | The player's record holds per track its level, its picks and any open offer (ADR 0004 decides) | map J5 (0004: the player record) | confirmed | map 1198-1200 |  |
 | A151 | ADR 0001 decides the pick command and the visibility class; R2-INT-REC5's classes are public, team, owner, spatial | map J5; R2-INT-REC5, r2:2502 | confirmed (batch) | cited lines read: r2:2502:2502 |  |
-| A152 | The record, not the soldier, holds every track; on each spawn the picks of that unit type's track apply | UPGRADE-SCOPE bullets 2 and 6 | pending (time) |  |  |
+| A152 | The record, not the soldier, holds every track; on each spawn the picks of that unit type's track apply | UPGRADE-SCOPE bullets 2 and 6 | confirmed | UPGRADE-SCOPE bullets 2 and 6 |  |
 | A153 | Respawns and purchases are commands the authority checks | INV GE13 line 299 ("Purchases must be server-validated commands"); GL "The authority", lines 485–500 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A154 | Nothing is saved; accounts `[LATER]` | UPGRADE-SCOPE bullet 2 (reset every match); VISION_V2 §6.10, line 81 | confirmed (batch) | cited lines read: VISION_V2:81:81 |  |
-| A155 | The record starts empty at every match start, with ADR 0001's room lifecycle | map J5 ("its reset in the match lifecycle (0001's room lifecycle cites)") | pending (time) |  |  |
-| A156 | The unit names its weapons; a purchase gives exactly those and names a unit, never a weapon | UPGRADE-SCOPE bullet 3 | pending (time) |  |  |
-| A157 | A drop is a world pickup entity (ADR 0004); the authority checks who may take it, refuses a pickup it did not place, and sets the drops' vis | UPGRADE-SCOPE bullet 4; map J5 ("refusing … a pickup it did not place") | pending (time) |  |  |
-| A158 | A weapon type's picks apply to whichever gun of that type the player holds and leave the gun when lost; a pickup carries none of its last ho | UPGRADE-SCOPE bullet 5 | pending (time) |  |  |
-| A159 | The record is per player slot, beside the soldier tables | UPGRADE-SCOPE bullet 6; map part a, 0004 item 7 ("held on the player's slot, not the unit's") | pending (time) |  |  |
-| A160 | The authority draws the three with a sim random stream; which stream is ADR 0004's | map J5; R1-DET-REC4, r1:2184–2193 (one stream per purpose) | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A155 | The record starts empty at every match start, with ADR 0001's room lifecycle | map J5 ("its reset in the match lifecycle (0001's room lifecycle cites)") | confirmed | map 1198 "its reset in the match lifecycle (0001's room lifecycle cites" |  |
+| A156 | The unit names its weapons; a purchase gives exactly those and names a unit, never a weapon | UPGRADE-SCOPE bullet 3 | confirmed | "A class always comes with its own weapon: no weapon choice when buying." |  |
+| A157 | A drop is a world pickup entity (ADR 0004); the authority checks who may take it, refuses a pickup it did not place, and sets the drops' vis | UPGRADE-SCOPE bullet 4; map J5 ("refusing … a pickup it did not place") | confirmed | map 1200 "refusing a pick the server did not offer or a pickup it did not place" |  |
+| A158 | A weapon type's picks apply to whichever gun of that type the player holds and leave the gun when lost; a pickup carries none of its last ho | UPGRADE-SCOPE bullet 5 | confirmed | "Progress belongs to the weapon type, not the physical gun" |  |
+| A159 | The record is per player slot, beside the soldier tables | UPGRADE-SCOPE bullet 6; map part a, 0004 item 7 ("held on the player's slot, not the unit's") | confirmed | "the tracks live on the PlayerState, not the Pawn" |  |
+| A160 | The authority draws the three with a sim random stream; which stream is ADR 0004's | map J5; R1-DET-REC4, r1:2184–2193 (one stream per purpose) | confirmed (batch) | cited lines read: r1:2184:2193 |  |
 | A161 | A shared stream would let the owner's client foresee its next offers, the reasoning that kept spread authority-only (SEC-SPREAD (a)) | GL "Shared stream and authority-only stream", lines 526–533 (a shared stream is held by the client's predictin | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
-| A162 | A pick that was not offered, or for a closed offer, is refused | map J5 ("refusing a pick the server did not offer") | pending (time) |  |  |
+| A162 | A pick that was not offered, or for a closed offer, is refused | map J5 ("refusing a pick the server did not offer") | confirmed | map 1200 |  |
 | A163 | The pick and track fields of the match record are ADR 0006's, keyed by AB-4's ids | map J5; R6-TEL-REC1, r6:784–811; R1-ABL-REC5, r1:2459 | confirmed (batch) | cited lines read: r6:784:811 r1:2459:2459 |  |
 | A164 | If a pick changes something in the prediction scope, the predicting sim needs its owner's track state; ADR 0001's | GL "The prediction scope", lines 502–504 (own movement and weapon state replayed from the authoritative state) | confirmed (batch) | cited lines read: GL:502:504 |  |
-| A165 | No research on tracks | row 26 | pending (time) |  |  |
-| A166 | Need: UPGRADE-SCOPE, outside VISION_V2 §6, LOOP_V2, EDITOR_V2 and LOOK_V2 | map J3 ("UPGRADE-SCOPE … is cited the same way ('need: UPGRADE-SCOPE')") | pending (time) |  |  |
+| A165 | No research on tracks | row 26 | confirmed | grep re-run (A26) |  |
+| A166 | Need: UPGRADE-SCOPE, outside VISION_V2 §6, LOOP_V2, EDITOR_V2 and LOOK_V2 | map J3 ("UPGRADE-SCOPE … is cited the same way ('need: UPGRADE-SCOPE')") | confirmed | map 1138 "need: UPGRADE-SCOPE" |  |
 | A167 | If ABL-PREDICT says yes: own activation, cost, cooldown, granted tags, movement changes; the command's sequence number as the key; cues keye | R1-ABL-REC4, r1:2423–2428; ABL-PREDICT, r1:2967–2978 | confirmed (batch) | cited lines read: r1:2423:2428 r1:2967:2978 |  |
 | A168 | If no: ability presses wait for the server's confirmation | ABL-PREDICT, r1:2974–2975; GL "The prediction scope", lines 505–510 | confirmed (batch) | cited lines read: r1:2974:2975 GL:505:510 |  |
 | A169 | Nothing in AB-1 to AB-8 depends on the answer; only the prediction scope changes | GL "The prediction scope", Depends on, lines 505–510 (the two readings differ only in what the scope adds) | confirmed (batch) | cited lines read: GL:505:510 |  |
 | A170 | Need §6.3 | R1-ABL-REC4 "Serves", r1:2440 | confirmed (batch) | cited lines read: r1:2440:2440 |  |
 | A171 | The mark: at most 1 ms per tick at p99 in the stress scene, up to 8 active effects per soldier, on one vCPU of the reference server and the  | R1-ABL-REC6, r1:2465–2472; GL "The stress scene", lines 397–418 | confirmed (batch) | cited lines read: r1:2465:2472 GL:397:418 |  |
-| A172 | N = 48 soldiers | MODES-3 (a) | pending (time) |  |  |
+| A172 | N = 48 soldiers | MODES-3 (a) | confirmed | STATUS:104-105 "24v24 = 48" |  |
 | A173 | 48 × 8 = 384 active effects | 48 × 8 = 384; GL line 405 | confirmed | 48 × 8 = 384 |  |
 | A174 | At 30 Hz, 1 ms is 12 % of the sim step share | 1 ÷ 8.33 = 0.120; 8.33 ms = 25 % of 33.3 ms (GL "The sim step share …", lines 190–191; GL §1 table, line 60) | confirmed | 1/8.33 = 0.120; 8.33 = 25 % of 33.3 |  |
 | A175 | At 60 Hz, 24 % of 4.17 ms | 1 ÷ 4.17 = 0.240; 4.17 ms from GL §1 table, line 60 | confirmed | 1/4.17 = 0.240; 4.17 = 25 % of 16.67 |  |
-| A176 | The 1 ms is the same at both rates | GL §1 table, line 57 (abilities, effects, weapons: 1.00 at 60 Hz and 1.00 at 30 Hz) | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A176 | The 1 ms is the same at both rates | GL §1 table, line 57 (abilities, effects, weapons: 1.00 at 60 Hz and 1.00 at 30 Hz) | confirmed | GL:57 "abilities, effects, weapons \| ≤ 1 ms, R1-ABL-REC6 \| 1.00 \| 1.00" |  |
 | A177 | Proposed: run the step at 8, 16 and 32 active effects per soldier (384, 768, 1,536 at N = 48) and report the count that reaches 1 ms p99 | reason: picks are long-lived active effects whose count is not designed (OQ-0005-AB3); 48 × 16 = 768, 48 × 32  | pending (time) |  |  |
-| A178 | The stress scene's 8 per soldier predates UPGRADE-SCOPE | GL dated 2026-10-30 (line 9), its 8 from R1-ABL-REC6 (line 415); UPGRADE-SCOPE dated 2026-10-31 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A178 | The stress scene's 8 per soldier predates UPGRADE-SCOPE | GL dated 2026-10-30 (line 9), its 8 from R1-ABL-REC6 (line 415); UPGRADE-SCOPE dated 2026-10-31 | confirmed | GL:415 "8 effects per soldier from R1-ABL-REC6" |  |
 | A179 | Need VISION_V2 §3 and §4 only; a budget, not a feature | R1-ABL-REC6, r1:2478 | confirmed (batch) | cited lines read: r1:2478:2478 |  |
 | A180 | Question C is ADR 0004's (R1-ABL-REC3); question D is ADR 0001's (R1-ABL-REC4) | map ids table (REC3 owner 0004; REC4 owner 0001) | pending (time) |  |  |
-| A181 | The research has no option for how tracks are carried; a separate upgrade system is not researched | row 26 | pending (time) |  |  |
-| A182 | A1: 11 concept sections (F1–F20), several for Unreal's object and replication model; the highest effort; performance unknown | r1, Options §5, Question A, line 1796 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A183 | A1: execution code is not predicted anyway (F9) | line 1796; R1-ABL-F9, r1:1244–1247 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A181 | The research has no option for how tracks are carried; a separate upgrade system is not researched | row 26 | confirmed | grep re-run (A26) |  |
+| A182 | A1: 11 concept sections (F1–F20), several for Unreal's object and replication model; the highest effort; performance unknown | r1, Options §5, Question A, line 1796 | confirmed (batch) | cited lines read: r1:1796:1796 |  |
+| A183 | A1: execution code is not predicted anyway (F9) | line 1796; R1-ABL-F9, r1:1244–1247 | confirmed (batch) | cited lines read: r1:1244:1247 |  |
 | A184 | A1: legacy has none of it (CD12, CD13, GC11 are tables plus code) | line 1799 (A4: "The legacy shape (CD12, CD13, GC11): each ability is code, only tuning is data") | pending (time) |  |  |
 | A185 | A1: builds generic-engine features "for later" (CLAUDE.md: REVISE); over-serves §6.3 | line 1796 | pending (time) |  |  |
 | A186 | A2: Medium; one generic interpreter over plain data; every new operation a reviewed Rust change; bounded by data size, no script VM, testabl | line 1797 | pending (time) |  |  |
 | A187 | A2: held to 1 ms p99 (AB-10) | R1-ABL-REC6, r1:2465–2472 | confirmed (batch) | cited lines read: r1:2465:2472 |  |
 | A188 | A2: content cannot add code paths; definitions validated at load | R1-ABL-REC1, r1:2346–2347; R1-ABL-REC5, r1:2452–2453 | confirmed (batch) | cited lines read: r1:2346:2347 r1:2452:2453 |  |
 | A189 | A2: a number change needs no code (mark 4) | R1-ABL-REC1 mark 4, r1:2377–2378 | confirmed (batch) | cited lines read: r1:2377:2378 |  |
-| A190 | A2: the legacy tables convert; each operation traces to a legacy or LOOP_V2 test case | R1-ABL-REC5 mark, r1:2460–2461; line 1797 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A190 | A2: the legacy tables convert; each operation traces to a legacy or LOOP_V2 test case | R1-ABL-REC5 mark, r1:2460–2461; line 1797 | confirmed (batch) | cited lines read: r1:2460:2461 r1:1797:1797 |  |
 | A191 | A2 pros and cons (serves §6.3–§6.7; a needed mechanic may lack an operation, then a reviewed Rust change; knockback is one) | line 1797; r4:750–751 | confirmed (batch) | cited lines read: r4:750:751 |  |
 | A192 | A3: a second language and runtime in both builds; performance not researched | line 1798 | pending (time) |  |  |
-| A193 | A3: determinism and Wasm support not researched (R1-ABL-OQ9); the options table's "(OQ10)" points to the effects-as-entities question | line 1798 says "(OQ10)"; R1-ABL-OQ9 is line 2781, R1-ABL-OQ10 line 2783 (a reference slip, stated, not edited: | pending (time) |  |  |
+| A193 | A3: determinism and Wasm support not researched (R1-ABL-OQ9); the options table's "(OQ10)" points to the effects-as-entities question | line 1798 says "(OQ10)"; R1-ABL-OQ9 is line 2781, R1-ABL-OQ10 line 2783 (a reference slip, stated, not edited: | confirmed | r1:1798 says "(OQ10)"; the determinism and Wasm question is R1-ABL-OQ9 at r1:2781-2782; OQ10 (r1:2783-2784) is effects as entities | the doc correctly reports a citation slip inside the research (r1:1798) |
 | A194 | A3: no legacy precedent (legacy abilities are code, GC11) | line 1799; INV GC11 line 250 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A195 | A3: Overwatch's Statescript a shipped example, the talk not read; adds a runtime no §6 item asks for | line 1798; R1-ABL-OQ2, r1:2759–2762 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A195 | A3: Overwatch's Statescript a shipped example, the talk not read; adds a runtime no §6 item asks for | line 1798; R1-ABL-OQ2, r1:2759–2762 | confirmed (batch) | cited lines read: r1:2759:2762 |  |
 | A196 | A4: low at first, grows per ability; best performance; combos and counters need code per pairing (content waits for programmers); the legacy | line 1799 | pending (time) |  |  |
 | A197 | A5: medium plus glue; not measured; Bevy-bound, one slice each (F23–F25); ties to the ECS choice; none documents fixed ticks, determinism or | line 1800 | pending (time) |  |  |
-| A198 | A5: leafwing's cooldowns tick by a `Duration` from `f32` seconds | R1-ABL-F23, r1:1332–1341 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A198 | A5: leafwing's cooldowns tick by a `Duration` from `f32` seconds | R1-ABL-F23, r1:1332–1341 | confirmed (batch) | cited lines read: r1:1332:1341 |  |
 | A199 | Cells marked "not researched" or "not measured": the research gives no assessment there | lines 1796–1800, 1803–1808, 1827–1832 | pending (time) |  |  |
 | A200 | B1: one more mechanism to learn; keeps the per-shot cost low | Options §5, Question B, lines 1803–1805 | pending (time) |  |  |
 | A201 | B1: the authority decides ammo, cooldowns and reloads (GC4's mark "the server must decide them") | INV GC4, line 243 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A202 | B1: avoids Paragon's lower rate of fire at high latency (F17); Fortnite's and Quake III's shape (F17, F22) | R1-ABL-F17, F22 | pending (time) |  |  |
 | A203 | B1: legacy's player weapon state is already a state machine (switching, swap and fire cooldowns, timed reloads, spread) | INV GC4, line 243 | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A204 | B2: one mechanism; an effect per shot at up to 13.9 shots per second per soldier (cost inferred); the predicted-cooldown problem F17 points  | lines 1806–1808 | pending (time) |  |  |
-| A205 | 13.9 shots per second | 1 ÷ 0.072 s = 13.9; R1-ABL-N4 confirmed, r1:3485 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A205 | 13.9 shots per second | 1 ÷ 0.072 s = 13.9; R1-ABL-N4 confirmed, r1:3485 | confirmed (batch) | cited lines read: r1:3485:3485 |  |
 | A206 | E1: ids resolved to dense integer handles at load; an unknown id a load error; no silent fallback (CC9); matches the legacy tables | Options §5, Question E, lines 1827–1829 | pending (time) |  |  |
 | A207 | E1 pro: shared content written once (the three T1 classes serve every faction) | LOOP_V2 §5, lines 67–68; line 1831 | confirmed (batch) | cited lines read: LOOP_V2:67:68 |  |
 | A208 | E1 con: harder to read than E2, which the research calls "simpler to read" | line 1830 | pending (time) |  |  |
@@ -642,29 +642,29 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A211 | A4 cheaper today but every combo is code; A1 and A3 add machinery no §6 item asks for; A5 ties abilities to Bevy and float time | lines 1796–1800 | pending (time) |  |  |
 | A212 | B1 keeps Paragon's latency problem out of the weapons | R1-ABL-F17 | pending (time) |  |  |
 | A213 | E1 keeps one definition, and so one track id, for a class every faction shares | LOOP_V2 §5 lines 67–68; UPGRADE-SCOPE bullet 1 (a track per unit type) | confirmed (batch) | cited lines read: LOOP_V2:67:68 |  |
-| A214 | The strongest argument against: one community write-up (R1-ABL-OQ1); Overwatch's scripted abilities not read (R1-ABL-OQ2) | r1:2756–2762 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A214 | The strongest argument against: one community write-up (R1-ABL-OQ1); Overwatch's scripted abilities not read (R1-ABL-OQ2) | r1:2756–2762 | confirmed (batch) | cited lines read: r1:2756:2762 |  |
 | A215 | A closed set means a new mechanic without an operation waits for a reviewed Rust change | line 1797 | pending (time) |  |  |
 | A216 | The spike's marks 1 and 2 test exactly this | R1-ABL-REC1 marks 1–2, r1:2365–2371 | confirmed (batch) | cited lines read: r1:2365:2371 |  |
 | A217 | Tracks that survive death let power grow (pillar 2); levelling and catch-up decide the way back (pillar 1) | VISION_V2 §2, lines 26–30; UPGRADE-SCOPE bullet 2 | confirmed (batch) | cited lines read: VISION_V2:26:30 |  |
-| A218 | No track numbers exist, so neither side can be measured yet | UPGRADE-SCOPE "Still open" line | pending (time) |  |  |
+| A218 | No track numbers exist, so neither side can be measured yet | UPGRADE-SCOPE "Still open" line | confirmed | "Still open" line |  |
 | A219 | A mode can carry its own values: a room is a mode id plus allowed overrides | R2-ROOM-REC7, r2:2857–2867 | confirmed (batch) | cited lines read: r2:2857:2867 |  |
 | A220 | Balance is checked per mode, separately; "Two-team and three-team battles are both tested" | VISION_V2 §3, lines 45–46 | confirmed (batch) | cited lines read: VISION_V2:45:46 |  |
-| A221 | AB1 to AB11 have no pick: Mustafa's words "list them as open questions, don't decide them" | UPGRADE-SCOPE "Still open" line; advisor-verdicts.md §1, condition 11 | pending (time) |  |  |
-| A222 | AB1: each held gun's picks apply | UPGRADE-SCOPE bullet 5; AB-8 | pending (time) |  |  |
+| A221 | AB1 to AB11 have no pick: Mustafa's words "list them as open questions, don't decide them" | UPGRADE-SCOPE "Still open" line; advisor-verdicts.md §1, condition 11 | confirmed | "Still open; list them as open questions, don't decide them" |  |
+| A222 | AB1: each held gun's picks apply | UPGRADE-SCOPE bullet 5; AB-8 | confirmed | bullet 5 |  |
 | A223 | AB1 options (a)–(c) and trade-offs (class identity in the triangle; tracks acting at once; more active effects; top-down readability) | LOOP_V2 §5, lines 67–68; AB-10; game-designer's reading | confirmed (batch) | cited lines read: LOOP_V2:67:68 LOOP_V2:10:10 |  |
 | A224 | AB1: the Javelin comes with rockets and a Luger sidearm | LOOP_V2 §5, lines 71–72 | confirmed (batch) | cited lines read: LOOP_V2:71:72 |  |
 | A225 | AB1: playtests with bots, sims 3 runs per build | CLAUDE.md, change-set protocol 4 ("gameplay / AI → `tools/sim.js` ×3 runs") | pending (time) |  |  |
-| A226 | AB1, AB2: the research has no finding on loot | row 26 (no topic file mentions drops or loot of weapons as v2 rules; R2-SYNC-F17 is Quake III item pickups) | pending (time) |  |  |
+| A226 | AB1, AB2: the research has no finding on loot | row 26 (no topic file mentions drops or loot of weapons as v2 rules; R2-SYNC-F17 is Quake III item pickups) | confirmed | no topic file names weapon drops or loot as v2 rules; R2-SYNC-F17 (r2:230-236) is Quake III item pickups |  |
 | A227 | AB2: LOOP_V2 does not say how class weapons refill | `grep -n 'refill\\|resupply\\|ammo' docs/LOOP_V2.md`: 0 hits | confirmed | grep -c 'refill\|resupply\|ammo' LOOP_V2.md = 0 |  |
 | A228 | AB2: in legacy, normal guns have unlimited reserve by a quirk | INV GC4, line 243 | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A229 | AB2 options (a)–(c) and trade-offs | game-designer's reading of LOOP_V2 §5 (class identity) | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A230 | AB3: sets the snowball (VISION_V2 §2 pillars 1 and 2 `[OPEN]`); DESIGN_NOTES open question 2 quoted | VISION_V2 §2 lines 26–30; DN line 52 | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A231 | AB3 options (a)–(d) and (i)–(iii) with trade-offs | game-designer's reading of VISION_V2 §2 pillars 1–4 (lines 26–34), LOOP_V2 §4 (uplinks), §5 (triangle) | confirmed (batch) | cited lines read: VISION_V2:26:34 |  |
 | A232 | AB3: both sides measured once numbers exist (time to kill both ways, per matchup; catch-up time), sims 3 runs per build, two-team and three- | proposed method; reason: VISION_V2 §2 asks for both sides, §3 for both mode kinds; CLAUDE.md sim rule | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A233 | AB3: nothing can be computed now | UPGRADE-SCOPE "Still open" | pending (time) |  |  |
+| A233 | AB3: nothing can be computed now | UPGRADE-SCOPE "Still open" | confirmed | "Still open" line |  |
 | A234 | AB3: the snowball design session VISION_V2 §2 and §7 call for | VISION_V2 §2 lines 29–30; §7 lines 84–85 | confirmed (batch) | cited lines read: VISION_V2:29:30 VISION_V2:84:85 |  |
 | A235 | AB3: the match record is ADR 0006's (R6-TEL-REC1) | map ids table | pending (time) |  |  |
-| A236 | AB4: UPGRADE-SCOPE ties progress to "the weapon type" | UPGRADE-SCOPE bullet 5 | pending (time) |  |  |
+| A236 | AB4: UPGRADE-SCOPE ties progress to "the weapon type" | UPGRADE-SCOPE bullet 5 | confirmed | bullet 5 "the weapon type" |  |
 | A237 | AB4: the same Luger for the Recruit and as the Javelin's sidearm | LOOP_V2 §5, lines 69–72 | confirmed (batch) | cited lines read: LOOP_V2:69:72 |  |
 | A238 | AB4: abilities hand out weapons (Katana; Molotov thrown) | R1-ABL-REC2, r1:2385–2386 | confirmed (batch) | cited lines read: r1:2385:2386 |  |
 | A239 | AB4: the Juggernaut's mounted cannon | INV GC17 line 256; CD14 line 95; r1:1372 | confirmed (batch) | cited lines read: INV:256:256 INV:95:95 r1:1372:1372 |  |
@@ -674,7 +674,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A243 | AB5 (WEAPON-UNLOCKS, the map's code): LOOP_V2 §8 third gate quoted; VISION_V2 §1 quoted; UPGRADE-SCOPE quoted | LOOP_V2 §8 line 109; VISION_V2 §1 line 22; UPGRADE-SCOPE bullets 3–4; map J5 (the code) | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A244 | AB5 options (a)–(d) and trade-offs (pillar 7) | LOOP_V2 §8 lines 105–110; VISION_V2 §2 line 39; game-designer's reading | confirmed (batch) | cited lines read: LOOP_V2:105:110 VISION_V2:39:39 |  |
 | A245 | AB5: the catalogue `[LATER]`; accounts `[LATER]` | LOOP_V2 §8 line 113; VISION_V2 §6.10 line 81 | confirmed (batch) | cited lines read: LOOP_V2:113:113 VISION_V2:81:81 |  |
-| A246 | AB5: ADR 0006 cites this | map J5 ("0006 cites it") | pending (time) |  |  |
+| A246 | AB5: ADR 0006 cites this | map J5 ("0006 cites it") | unsupported | doc 1160 "ADR 0006 cites this"; docs/adr/0006-infrastructure-operations.md has no hit for "unlock" or OQ-0005-AB5; map J5 line 1208 says "0006 cites it" | the frame itself flags it (doc 1891) for the consistency pass; fix: ADR 0006 cites OQ-0005-AB5, or AB5 drops "ADR 0006 cites this" |
 | A247 | AB6: LOOP_V2 §12 and DESIGN_NOTES call the team's tiers the answer to in-match progression ("Momentum") | LOOP_V2 §12, lines 164–165; DN lines 19–20 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A248 | AB6 options (a)–(c) and trade-offs (pillars 1 and 4) | VISION_V2 §2 lines 26, 33–34; AB-5; game-designer's reading | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A249 | AB7: "sophistication, not damage" (decided); "give breadth, never raw power" (decided); the Advisor's not-decided "toward sidegrades over ra | DN lines 27–28, 40–41; LOOP_V2 §8 line 105 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
@@ -682,11 +682,11 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A251 | AB7 options and trade-offs; LOOP_V2 §8 every counter role from level 1 | LOOP_V2 §8 lines 111–112; AB-1 (stacking limit) | confirmed (batch) | cited lines read: LOOP_V2:111:112 |  |
 | A252 | AB8: the open offer is state on the record (ADR 0004); the answer a command the authority checks (ADR 0001); ADR 0003 draws it | map J5 | pending (time) |  |  |
 | A253 | AB8 options; everyone spawns in front of the buy terminal | LOOP_V2 §2 line 22; game-designer's reading | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A254 | AB9: ADR 0004's pickups read these values from data | map J5 | pending (time) |  |  |
-| A255 | AB9 options; his words name "killed enemies' drops" only | UPGRADE-SCOPE bullet 4 | pending (time) |  |  |
-| A256 | AB9: Quake III predicts item pickups (R2-SYNC-F17); whether a pickup is predicted is ADR 0001's | r2, Findings, R2-SYNC-F17, lines 230–236 (checked: yes, findings-checked.tsv); map seam (prediction scope 0001 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A254 | AB9: ADR 0004's pickups read these values from data | map J5 | confirmed | map 1199 "their lifetime and pickup rule as data from 0005" |  |
+| A255 | AB9 options; his words name "killed enemies' drops" only | UPGRADE-SCOPE bullet 4 | confirmed | bullet 4 "killed enemies' drops" |  |
+| A256 | AB9: Quake III predicts item pickups (R2-SYNC-F17); whether a pickup is predicted is ADR 0001's | r2, Findings, R2-SYNC-F17, lines 230–236 (checked: yes, findings-checked.tsv); map seam (prediction scope 0001 | confirmed (batch) | cited lines read: r2:230:236 |  |
 | A257 | AB10: bots fill empty slots `[DECIDED]` | LOOP_V2 §2 lines 19–20; VISION_V2 §3 line 49 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A258 | AB10: a joining human takes a bot's slot (R2-ROOM-REC6) | r2:2842–2846 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A258 | AB10: a joining human takes a bot's slot (R2-ROOM-REC6) | r2:2842–2846 | confirmed (batch) | cited lines read: r2:2842:2846 |  |
 | A259 | AB10 options and trade-offs (three-team modes with uneven bot counts); how a bot picks is bot behaviour (ADR 0004) | VISION_V2 §3; map part a, 0004 item 7 (bot behaviour) | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A260 | AB11: the triangle `[DEFAULT]`; the legacy numbers of AB-7 (11 of 16 pellets; 63 vs 19; 2999.7 vs 150) | rows 131–134 | confirmed | 11 × 11 = 121 ≥ 120 (Warrior maxHealth 120, Bagpipe damage 11, pellets 8 → 11 of 16); 63 vs 19; 2999.7 vs 150 |  |
 | A261 | AB11 options (a)–(c); the data carries all three | R1-ABL-REC1, r1:2350–2352 (frontal-arc and target-tag stages) | confirmed (batch) | cited lines read: r1:2350:2352 |  |
@@ -695,7 +695,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A264 | AB12: every GAS concept from one community write-up | R1-ABL-OQ1, r1:2756–2758 | confirmed (batch) | cited lines read: r1:2756:2758 |  |
 | A265 | AB12 option (b): SRC-ACCESS (a), "official-docs domains such as Epic's can be added in the next kit PR" | STATUS.md lines 167–171 | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A266 | AB12 proposed (a): the subset is defined by our own test cases and proven by the spike | reason: R1-ABL-REC1 marks 1–4 test our own content, r1:2364–2378 | confirmed (proposed, labelled; batch) | cited lines read: r1:2364:2378 |  |
-| A267 | AB13: the Overwatch talk (GDC 2017) not read | R1-ABL-OQ2, r1:2759–2762 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A267 | AB13: the Overwatch talk (GDC 2017) not read | R1-ABL-OQ2, r1:2759–2762 | confirmed (batch) | cited lines read: r1:2759:2762 |  |
 | A268 | AB13 proposed (a): revisit only if mark 1 or 2 fails or new operations are needed often | reason: marks 1–2 test the closed set, r1:2365–2371; R1-ABL-OQ9, r1:2781–2782 | confirmed (proposed, labelled; batch) | cited lines read: r1:2365:2371 r1:2781:2782 |  |
 | A269 | The content and ability spike is a working name; `docs/SPIKE_PLAN.md` names and places the spikes | plan.md rule 5; map part g | pending (time) |  |  |
 | A270 | Item 1: R1-ABL-REC1's four marks as written | r1:2364–2378 | confirmed (batch) | cited lines read: r1:2364:2378 |  |
@@ -708,8 +708,8 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A277 | Item 6 proposed u1–u6 (no track-specific code; death; switching; a lost gun; reset; offers and forged picks; byte-identical offer logs on tw | reason: UPGRADE-SCOPE, no research mark; 1,000 is R1-ABL-REC4's count (r1:2444); the byte-identical log follow | confirmed (proposed, labelled; batch) | cited lines read: r1:2444:2444 r1:2418:2419 |  |
 | A278 | Item 7: R1-ABL-REC6's mark (ADR 0004's), measured with the method ADR 0002 sets (R1-XT-OQ15) | r1:2465–2472; R1-XT-OQ15, r1:3097–3100 ("Decided by: ADR-0002") | confirmed (batch) | cited lines read: r1:2465:2472 r1:3097:3100 |  |
 | A279 | Item 8: no spike before acceptance; the Feel Lab test compares predicted and server-confirmed Molotov and Shield once abilities are playable | ABL-PREDICT, r1:2967–2980; R2-SYNC-OQ10, r2:2936–2939; map J6 (8), LE-N (after abilities exist) | confirmed (batch) | cited lines read: r1:2967:2980 r2:2936:2939 |  |
-| A280 | R1-ABL-REC5 changed because UPGRADE-SCOPE came after the research | R1 verified 2026-10-28 (r1:3233–3236); UPGRADE-SCOPE 2026-10-31 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A281 | R1-ABL-OQ3: the cue-once rule is tested where a replay happens: own weapon cues in the netcode proof test (the prediction scope covers own w | R1-ABL-OQ3, r1:2763–2765; R1-ABL-REC4, r1:2427–2428, 2444; GL "The prediction scope", lines 502–504; GL §8 "Th | pending (time) |  |  |
+| A280 | R1-ABL-REC5 changed because UPGRADE-SCOPE came after the research | R1 verified 2026-10-28 (r1:3233–3236); UPGRADE-SCOPE 2026-10-31 | confirmed | r1:3233-3236 (verifier ran 2026-10-28); UPGRADE-SCOPE 2026-10-31 |  |
+| A281 | R1-ABL-OQ3: the cue-once rule is tested where a replay happens: own weapon cues in the netcode proof test (the prediction scope covers own w | R1-ABL-OQ3, r1:2763–2765; R1-ABL-REC4, r1:2427–2428, 2444; GL "The prediction scope", lines 502–504; GL §8 "Th | confirmed (batch) | cited lines read: r1:2763:2765 r1:2427:2428 r1:2444:2444 GL:502:504 |  |
 | A282 | R1-ABL-OQ9 matters only if A3 returns | r1:2781–2782 | confirmed (batch) | cited lines read: r1:2781:2782 |  |
 | A283 | The decision in three lines | AB-1 to AB-8 (rows 41–166) | pending (time) |  |  |
 | A284 | README trace list: track kind and drop/pickup values (UPGRADE-SCOPE); active reload fields (LOOP_V2 §7 only); the AB-10 curve (VISION_V2 §3  | map J3 (the trace rule and its reading) | pending (time) |  |  |
@@ -719,11 +719,11 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | A288 | The "look brief pending" notes on GC11, GC14, GC15, CC9 and CC12 concern presentation, ADR 0003's | INV lines 250, 253, 254, 138, 141 (mark column); map part f, LE-H (0003 takes presentation rows) | confirmed | quoted words found at the cited lines (script .gate/v0005/auto.mjs) |  |
 | A289 | Migration places in SLICE-ORDER (slice 1 weapons as data; slice 2 T1 classes; slice 4 tiers, abilities, tracks after AB1–AB3; slice 6 REC6 w | SLICE-ORDER, STATUS.md lines 94–95 (the order); the places are proposals | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | A290 | Test plan: CI goldens; R1-ABL-REC3's 120 s, 3-seed, native and Wasm log in ADR 0004's suite; sims 3 runs per build in both mode kinds; telem | r1:2418–2419; R1-ABL-REC5 mark r1:2462–2463; CLAUDE.md sim rule; VISION_V2 §3 | confirmed (batch) | cited lines read: r1:2418:2419 r1:2462:2463 |  |
-| A291 | Rollback: a failing mechanic becomes a reviewed operation; many failures fall back to A4 with E1 kept and reopen A3; if u1 fails, tracks get | options A2, r1:1797 (the Rust-change route); A4, r1:1799 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A292 | Seams: pickups are a new entity kind, which R1-ECS-OQ7 asks ADR 0004 to weigh | R1-ECS-OQ7, r1:2633–2636; map ids table (owner 0004) | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| A293 | Seams: whether pickups are predicted (R2-SYNC-F17) | r2:230–236 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| A291 | Rollback: a failing mechanic becomes a reviewed operation; many failures fall back to A4 with E1 kept and reopen A3; if u1 fails, tracks get | options A2, r1:1797 (the Rust-change route); A4, r1:1799 | confirmed (batch) | cited lines read: r1:1797:1797 r1:1799:1799 |  |
+| A292 | Seams: pickups are a new entity kind, which R1-ECS-OQ7 asks ADR 0004 to weigh | R1-ECS-OQ7, r1:2633–2636; map ids table (owner 0004) | confirmed (batch) | cited lines read: r1:2633:2636 |  |
+| A293 | Seams: whether pickups are predicted (R2-SYNC-F17) | r2:230–236 | confirmed (batch) | cited lines read: r2:230:236 |  |
 | A294 | Seams: a knocked-back local player's predicted movement is corrected (ADR 0001) | GL "The prediction scope", lines 502–504 (own movement replayed from the authoritative state on every snapshot | confirmed (batch) | cited lines read: GL:502:504 r4:750:751 |  |
-| A295 | The map gave this section seven ids, and all belong here | engine-architect-decision-map-ids.tsv (owner 0005: R1-ABL-REC1, REC2, REC5, OQ1, OQ2, OQ3, OQ9) | pending (time) |  |  |
+| A295 | The map gave this section seven ids, and all belong here | engine-architect-decision-map-ids.tsv (owner 0005: R1-ABL-REC1, REC2, REC5, OQ1, OQ2, OQ3, OQ9) | confirmed | ids tsv owner 0005 includes R1-ABL-REC1, REC2, REC5, OQ1, OQ2, OQ3, OQ9 (7) |  |
 | G1 | LOOK_V2 §8's flow, quoted (sketch, Spline, glTF/GLB, automated compress/LODs/renaming, the engine applies the look); budgets per unit; never | LOOK_V2 §8 | confirmed | LOOK_V2:65-74 §8 (flow, budgets per unit, never Spline's runtime) |  |
 | G2 | The research has no findings on compression, LOD generation, export checks or slot renaming | grep of docs/research/r*.md at 9e7db28 (0 whole-word hits for KTX2, meshopt, meshoptimizer, Draco, Spline, glt | confirmed | grep r1-r6 at HEAD (=9e7db28): 0 hits KTX2, meshopt, Draco, Spline, gltf-transform, "Basis Universal"; 1 "glTF" (r3:476) |  |
 | G3 | The one glTF mention: three.js's example loads a glTF skinned mesh into the WebGPU renderer | r3 R3-CHAR-F8, 476–480; advisor-verdicts.md §1 condition 4 | confirmed | r3:476-480; source raw.githubusercontent.com r186 webgpu_skinning_instancing.html l.44 GLTFLoader, l.84 'models/gltf/Michelle.glb', l.113 child.isInstancedMesh = true, l.93 instanceCount = 30, l.138 new THREE.WebGPURenderer |  |
@@ -768,9 +768,9 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | G42 | Spike: zero console errors on both backends with the test models | r3 R3-WGPU-REC1 mark 1, 910–912 (zero console errors) | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | G43 | Appendix row: R3-CHAR-OQ3 is ADR 0005's | engine-architect-decision-map-ids.tsv (R3-CHAR-OQ3, owner 0005) | pending (time) |  |  |
 | PTE1 | RS: one vCPU of the reference server, a Hetzner CCX23, Linux, one EU location | GL 225–230 (from R6-HOST-REC2, r6 645–650); GL 244–250 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| PTE2 | Bench process pinned to the vCPU, VM otherwise idle | PM4 PRE (proposed there: a neighbour moves a p99) | pending (time) |  |  |
+| PTE2 | Bench process pinned to the vCPU, VM otherwise idle | PM4 PRE (proposed there: a neighbour moves a p99) | confirmed | PM-0004-1 exists in docs/adr with the meaning the row gives |  |
 | PTE3 | ML and RD are R3-BUDGET-REC1's machines, named by PM-0003-1 | r3 R3-BUDGET-REC1, 1096–1103; PM3 PM-0003-1 | confirmed (batch) | cited lines read: r3:1096:1103 |  |
-| PTE4 | ML's Wasm marks in Chrome and Firefox on Windows 11; mains power and power mode recorded | PM4 PRE (R3-BUDGET-REC1's two browsers there) | pending (time) |  |  |
+| PTE4 | ML's Wasm marks in Chrome and Firefox on Windows 11; mains power and power mode recorded | PM4 PRE (R3-BUDGET-REC1's two browsers there) | confirmed | PM-0004-1 exists in docs/adr with the meaning the row gives |  |
 | PTE5 | MAC with Safari 26; real Safari through its WebDriver | r5 R5-TEST-REC1 Safari row, 1394 | confirmed (batch) | cited lines read: r5:1394:1394 |  |
 | PTE6 | MP: Mustafa's PC in Brave, only what he judges, never a budget result | brief (hardware rule); plan rule 12; PM3 PRE | pending (time) |  |  |
 | PTE7 | CI: counts, verdicts, hashes and byte comparisons, never a time | r5 R5-TEST-REC1 benchmark row, 1400 | confirmed (batch) | cited lines read: r5:1400:1400 |  |
@@ -778,8 +778,8 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE9 | `JSON.parse` also in real Safari | r5 1394 | confirmed (proposed, labelled; batch) | cited lines read: r5:1394:1394 |  |
 | PTE10 | SS: N = 48 in three teams of 16; 15 big vehicles, 4 very large units; 300 live projectiles; up to 8 active effects per soldier (384) | GL 397–418; MODES-3 (a) | confirmed (batch) | cited lines read: GL:397:418 |  |
 | PTE11 | 48 × 8 = 384 | GL 404 | confirmed | 48 × 8 = 384 |  |
-| PTE12 | SS driven from a recording, counts topped up every tick | PM4 PRE, PM-0004-2 | pending (time) |  |  |
-| PTE13 | LS and BS are ADR 0003's scenes | PM3 PRE | pending (time) |  |  |
+| PTE12 | SS driven from a recording, counts topped up every tick | PM4 PRE, PM-0004-2 | confirmed | PM-0004-2 exists in docs/adr with the meaning the row gives |  |
+| PTE13 | LS and BS are ADR 0003's scenes | PM3 PRE | confirmed | PM-0003-18 exists in docs/adr with the meaning the row gives |  |
 | PTE14 | The test content list (12 items) | r1 R1-ABL-REC1 mark 1, 2365–2368 | confirmed (batch) | cited lines read: r1:2365:2368 |  |
 | PTE15 | Test-only definitions are fixtures, never game content | draft AB item 6 ("test-only tracks that are not game content"); the advisor's condition 11 (no design) | pending (time) |  |  |
 | PTE16 | T: 3 runs, 900 warm-up then 36,000 measured ticks at 30 Hz; every run meets the mark | PM4 PRE (from r1 R1-TICK-REC2 P1, 2044–2053) | confirmed (batch) | cited lines read: r1:2044:2053 |  |
@@ -796,7 +796,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE27 | P2 is VISION_V2 §4's "about 100 ms of ping" | map J6 (3); OQ-0001-3; r2 1990–1991 | confirmed (batch) | cited lines read: r2:1990:1991 |  |
 | PTE28 | A refusal count needs an acceptance control; every corpus file carries its expected verdict and changed path | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE29 | Every automated mark has a planted defect; "a check without a failing case can't be shown to work" | r5 R5-GATE-REC3, 1727–1728 | confirmed (batch) | cited lines read: r5:1727:1728 |  |
-| PTE30 | Rule A: one planted 64-byte allocation per tick must be counted | PM4 rule A | pending (time) |  |  |
+| PTE30 | Rule A: one planted 64-byte allocation per tick must be counted | PM4 rule A | confirmed | PM-0004 exists in docs/adr with the meaning the row gives |  |
 | PTE31 | Gate tests: 20 identical verdicts in 20 runs; one fixed `PROPTEST_RNG_SEED`; fresh seeds nightly; failures committed as regression fixtures | r5 R5-TEST-REC6, 1492–1494, 1503–1504 | confirmed (batch) | cited lines read: r5:1492:1494 r5:1503:1504 |  |
 | PTE32 | A fixed generator seed for C in the gate | r5 1492–1494 applied to the corpus | confirmed (proposed, labelled; batch) | cited lines read: r5:1492:1494 |  |
 | PTE33 | The two fuzz marks share one corpus and one loader run; the next-match change shares one run (Shabzon 8 → 9) | draft frame "What a spike must prove" 1 (lines 1896–1900: "as the test-engineer decides") | pending (time) |  |  |
@@ -843,7 +843,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE74 | Bite: a deliberately changed type | r1 2529 | confirmed (batch) | cited lines read: r1:2529:2529 |  |
 | PTE75 | Zero diff on regeneration; `tsc --strict` passes | r1 R1-BND-REC4 marks 1, 3, 2304–2306 | confirmed (batch) | cited lines read: r1:2304:2306 |  |
 | PTE76 | Rename without regeneration fails; hand edit fails | r5 R5-LAYOUT-REC3 mark, 1203–1204 | confirmed (batch) | cited lines read: r5:1203:1204 |  |
-| PTE77 | Shares PM-0002-15 (the gate's G4) | PM2 PM-0002-15; r5 R5-GATE-REC1 G4 (1662) | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| PTE77 | Shares PM-0002-15 (the gate's G4) | PM2 PM-0002-15; r5 R5-GATE-REC1 G4 (1662) | confirmed | PM-0002-15 exists in docs/adr with the meaning the row gives |  |
 | PTE78 | Legacy import files typed against the generated types pass the Rust validator | CD-3 (proposed there; reason F16, R1-BND-F9, r1 941–946) | pending (time) |  | citation resolves to existing lines (script); content not compared |
 | PTE79 | Cabana, DM_Tri and Mustafa's maps migrate and validate 100 %; byte-identical round trip; future version refused | r1 R1-DATA-REC4 mark, 2539–2540 | confirmed (batch) | cited lines read: r1:2539:2540 |  |
 | PTE80 | Property test of random valid documents, 10,000 cases | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
@@ -862,7 +862,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE93 | 3 tampering cases (stale, one changed byte, missing) 100 %; repeat visit 0 bytes; 100 % of records resolve to an archived set | r1 R1-DATA-REC6 mark, 2576–2579 | confirmed (batch) | cited lines read: r1:2576:2579 |  |
 | PTE94 | 0 matches started on a mismatched bundle; the archive re-hashes; the record carries the mode id | CD-8 ("Every match record stores the content hash and the mode id") | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE95 | Rust SHA-256 equals WebCrypto on every spike bundle | r1 R1-DATA-OQ9, 2813–2814 | confirmed (batch) | cited lines read: r1:2813:2814 |  |
-| PTE96 | `transferSize` 0; 3 repeats from a fresh profile | PM6 PM-0006-4 | pending (time) |  |  |
+| PTE96 | `transferSize` 0; 3 repeats from a fresh profile | PM6 PM-0006-4 | confirmed | PM-0006-4 exists in docs/adr with the meaning the row gives |  |
 | PTE97 | WebCrypto needs a secure context; localhost used | r1 R1-DATA-REC6, 2567–2569 (F29) | confirmed (batch) | cited lines read: r1:2567:2569 |  |
 | PTE98 | Each tampering case 10 times | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE99 | C through the override path: 0 accepted invalid, 0 crashes; `__proto__` refused; prototypes unchanged | r1 R1-DATA-REC7 mark, 2591–2594 (without map upload, CD-9) | confirmed (batch) | cited lines read: r1:2591:2594 |  |
@@ -927,7 +927,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE158 | u2: 1,000 cycles; effect lists compared field by field; shares PM-0004-64 | draft u2 (1,000: R1-ABL-REC4's count, r1 2444); PM4 PM-0004-64 | confirmed (proposed, labelled; batch) | cited lines read: r1:2444:2444 |  |
 | PTE159 | u3: 1,000 cycles | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE160 | u4: 1,000 exchanges; ADR 0004's pickups (PM-0004-66) | PM4 PM-0004-66 | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
-| PTE161 | u5: 100 consecutive matches; shares PM-0004-65 | PM4 PM-0004-65; LOOP_V2 §8 | pending (time) |  | citation resolves to existing lines (script); content not compared |
+| PTE161 | u5: 100 consecutive matches; shares PM-0004-65 | PM4 PM-0004-65; LOOP_V2 §8 | confirmed | PM-0004-65 exists in docs/adr with the meaning the row gives |  |
 | PTE162 | u6: offers of the data's size (3), distinct, requirements met; 1,000 forged refused; 1,000 offered accepted; byte-identical logs on two runs | draft u6; UPGRADE-SCOPE ("pick one of three"); AB-8 offer row | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE163 | Bites for u1–u6 (a branch on a track id; picks on the soldier; one shared track; picks on the gun; a pick effect on a pooled unit; any candi | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE164 | Step p99 at 8, 16, 32 active effects per soldier (384, 768, 1,536) reported; the 1 ms bracket | AB-10 (proposed there); 48 × 16 = 768, 48 × 32 = 1,536 | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
@@ -939,20 +939,20 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE170 | Models load on both backends with 0 console errors, drawn with the engine's materials, no own material left | GPU spike part (draft 1650–1654; R3-WGPU-REC1 mark 1, r3 910–912) | confirmed (proposed, labelled; batch) | cited lines read: r3:910:912 |  |
 | PTE171 | Material identity checked against the cache | GPU part 7 (shared, cached) | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE172 | 0 model requests other than listed glTF/GLB; 0 requests outside the client's host | GPU part 6 (only glTF/GLB); r5 R5-GATE-REC3 G12 mutation (outbound request), 1723 | confirmed (proposed, labelled; batch) | cited lines read: r5:1723:1723 |  |
-| PTE173 | PM-0003-2's 10 starts per browser and backend | PM3 PM-0003-2, -5 | pending (time) |  |  |
+| PTE173 | PM-0003-2's 10 starts per browser and backend | PM3 PM-0003-2, -5 | confirmed | PM-0003-2 exists in docs/adr with the meaning the row gives |  |
 | PTE174 | Material objects at most the distinct (slot class, faction) pairs | GPU spike part (proposed there; R3-LOOK-F3, r3 331–334) | confirmed (proposed, labelled; batch) | cited lines read: r3:331:334 |  |
 | PTE175 | Counted by identity on listed assets' meshes; every model in each faction | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE176 | Bite: per-mesh material clone (CL4) | INV CL4, line 113 | confirmed (batch) | cited lines read: INV:113:113 |  |
 | PTE177 | Soldier at most 4 per pass | GPU part 4 (R3-CHAR-REC1, r3 1044–1045) | confirmed (batch) | cited lines read: r3:1044:1045 |  |
 | PTE178 | Very large unit at most 25 per pass: 200 ÷ 4 ÷ 2 = 25 | GPU part 4 (R3-CHAR-REC4, r3 1088–1090) | confirmed | 200/4/2 = 25 |  |
-| PTE179 | Method (shown − hidden) ÷ passes, PM-0003-25's | PM3 PM-0003-25 | pending (time) |  |  |
+| PTE179 | Method (shown − hidden) ÷ passes, PM-0003-25's | PM3 PM-0003-25 | confirmed | PM-0003-25 exists in docs/adr with the meaning the row gives |  |
 | PTE180 | Bites: 5 slots → 5 × 2 = 10 > 8; 30 parts → 30 × 2 = 60 > 50 | 4 × 2 = 8; 25 × 2 = 50 | confirmed | 5×2 = 10 > 8; 30×2 = 60 > 50 |  |
 | PTE181 | Mustafa judges each family in the look proof test, beside legacy screenshots | OQ-0005-AP2; LOOK_V2 §9 (76–78); plan rule 12 | confirmed (batch) | cited lines read: LOOK_V2:76:78 |  |
 | PTE182 | The tool processes the test models and writes their entries | AP section's spike part; OQ-0005-AP1 | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE183 | Entry counts equal an independent recount | OQ-0005-AP1 (recount or trust) | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE184 | Hash in name, immutable, repeat visit 0 bytes | AP spike part (proposed there: r1 2577–2578; r6 641–642) | confirmed (proposed, labelled; batch) | cited lines read: r1:2577:2578 r6:641:642 |  |
 | PTE185 | Under 25 MiB = 26,214,400 bytes | r6 R6-HOST-REC1 mark, 642–643; 25 × 1,048,576 | confirmed (batch) | cited lines read: r6:642:643 |  |
-| PTE186 | PM-0006-4 and -5 methods | PM6 | pending (time) |  |  |
+| PTE186 | PM-0006-4 and -5 methods | PM6 | confirmed | PM-0006-5 exists in docs/adr with the meaning the row gives |  |
 | PTE187 | Over-budget asset fails; raise without the file fails | r5 R5-GATE-REC4 mark, 1743–1744 (applied to assets in the AP spike part) | confirmed (batch) | cited lines read: r5:1743:1744 |  |
 | PTE188 | Controls: an asset at its budget; a raise written with its reason | r5 R5-GATE-REC3 (a control per check), 1707–1709 | confirmed (batch) | cited lines read: r5:1707:1709 |  |
 | PTE189 | Planted glTF reader in `sim` fails | AP spike part (proposed there: AP-1; r5 1189–1192) | confirmed (proposed, labelled; batch) | cited lines read: r5:1189:1192 |  |
@@ -975,17 +975,17 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | PTE206 | Other drafts' marks go back to their own drafts | PM4 failure rule | pending (time) |  |  |
 | PTE207 | A mark's number changes only in the draft; raising a budget is a reviewed change | r5 R5-GATE-REC4, 1734–1738 | confirmed (batch) | cited lines read: r5:1734:1738 |  |
 | PTE208 | CD-5 holds by review; duplicate ids are a defect class of C | CD-5; r1 2514 | confirmed (batch) | cited lines read: r1:2514:2514 |  |
-| PTE209 | Time conversion is PM-0004-11; top speed has only load checks until OQ-0005-CD8 | PM4 PM-0004-11; OQ-0005-CD8 | pending (time) |  |  |
+| PTE209 | Time conversion is PM-0004-11; top speed has only load checks until OQ-0005-CD8 | PM4 PM-0004-11; OQ-0005-CD8 | confirmed | PM-0004-11 exists in docs/adr with the meaning the row gives |  |
 | PTE210 | EDITOR_V2 §4's 1,000 commands are slice 5's "Done when" | draft Migration item 8 (lines 1941–1943); EDITOR_V2 §4 | pending (time) |  |  |
 | PTE211 | CD-12 no mark until OQ-0005-CD6; CD-13 none until OQ-0005-CD5 | draft open questions table | pending (time) |  |  |
-| PTE212 | Quality-tier rows are PM-0003-23 and -33 | PM3 | pending (time) |  |  |
+| PTE212 | Quality-tier rows are PM-0003-23 and -33 | PM3 | confirmed | PM-0003-23 exists in docs/adr with the meaning the row gives |  |
 | PTE213 | Content item 10 is R2-ROOM-REC7's mark, ADR 0001's, slices 2 and 3 | r2 R2-ROOM-REC7 mark, 2864–2867; PM 0001's "no mark" line (test-engineer-passmarks-0001.md line 196) | pending (time) |  |  |
 | PTE214 | R1-DATA-OQ8 is PM-0002-31 | PM2 PM-0002-31; r1 2811–2812 | confirmed (batch) | cited lines read: r1:2811:2812 |  |
 | PTE215 | AB-8's messages and telemetry are ADR 0001's and 0006's; its open rules have no mark | map J5; OQ-0005-AB1 to AB3 | pending (time) |  |  |
-| PTE216 | Own weapon cues once on replay: ADR 0001's in the netcode proof test | r1 R1-ABL-OQ3, 2763–2765; draft Appendix A row R1-ABL-OQ3 | pending (time) |  | citation resolves to existing lines (script); content not compared |
-| PTE217 | Replay of every test ability on native and Wasm is PM-0004-63 | PM4 PM-0004-63 | pending (time) |  |  |
+| PTE216 | Own weapon cues once on replay: ADR 0001's in the netcode proof test | r1 R1-ABL-OQ3, 2763–2765; draft Appendix A row R1-ABL-OQ3 | confirmed (batch) | cited lines read: r1:2763:2765 |  |
+| PTE217 | Replay of every test ability on native and Wasm is PM-0004-63 | PM4 PM-0004-63 | confirmed | PM-0004-63 exists in docs/adr with the meaning the row gives |  |
 | PTE218 | The asset-pipeline research's marks are set by that research | ASSET-RESEARCH (a); GPU spike part ("its marks come from that research") | pending (time) |  |  |
-| PTE219 | GPU part 7's warm-up is PM-0003-7, -8 | PM3 | pending (time) |  |  |
+| PTE219 | GPU part 7's warm-up is PM-0003-7, -8 | PM3 | confirmed | PM-0003-7 exists in docs/adr with the meaning the row gives |  |
 | PTE220 | Content trial steps 1–6 (8 → 9 within about a second; next match 12 hits; a word for a number names the field; a broken brace names line and | CD-2, CD-7; PM-0005-4, -10, -21; OQ-0005-CD1 | pending (time) |  |  |
 | PTE221 | The development server started on his PC with the session's steps | none | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
 | PTE222 | A family can be picked only where both forms are shown | OQ-0005-AP2; AP-7 (both forms side by side) | confirmed (proposed, labelled; batch) | the pass-mark text (doc 1915-2140) read: the number carries "proposed" or its basis cell names the proposal |  |
@@ -1014,7 +1014,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 
 996 rows (996 ledger rows: frame 135, content and asset pipeline 281, abilities 295, GPU rules 43, pass marks 242; 0 rows added by the verifier, prefixed X).
 
-confirmed 787 · wrong 1 · unsupported 0 · citation off 1 · unverified 0 · pending 207
+confirmed 844 · wrong 1 · unsupported 1 · citation off 1 · unverified 0 · pending 149
 
 (findings pending)
 

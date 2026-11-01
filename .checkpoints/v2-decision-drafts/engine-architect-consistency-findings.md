@@ -69,3 +69,36 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   machine keys and matrices with "MAC (SPIKE_PLAN)"; 0001 and 0002 cite it.
 - Owners: engine-architect synthesis (SPIKE_PLAN:30); graphics-engineer (0003); rust-reviewer (0004); the 0005 frame
   author (engine-architect) for 0005:1932.
+
+### F5 (M). A "Retire (exact)" phrase in two pass marks
+- Documents: docs/adr/0001-multiplayer-netcode.md:1097 (PM-0001-4: "the whole tick timed directly on the tick thread"),
+  :1134 (PM-0001-39: "the whole tick timed directly, never summed from its phases"); GLOSSARY "Server tick time",
+  Retire (exact) "whole tick" (the session's glossary script, consistency-scripts.txt: exact hits 2).
+- Outcome: "the server tick time measured directly on the tick thread" (PM-0001-4) and "the server tick time measured
+  directly, never summed from its phases" (PM-0001-39).
+- Owner: test-engineer (its rows in ADR 0001).
+
+### F6 (M). The look proof test: ADR 0003 owns it but never names ADR 0005's share
+- Documents: docs/adr/0003-rendering.md:806–837 (the look proof test and part 11's asset list; 0 mentions of PM-0005,
+  OQ-0005-AP2 or the kit builders in the whole file); docs/adr/0005-content-abilities-assets.md:1498, :1901 (its share:
+  PM-0005-33 to -37, OQ-0005-AP2's families checklist, the content crate's whole-set check, ported kit builders beside
+  authored models); docs/SPIKE_PLAN.md:212–234 (lists both, and says "ADR 0003's own asset list names only authored
+  assets"). Synthesis list item 6.
+- Disagreement: an implementer reading the owning draft builds a look test that cannot run PM-0005-33 to -37 (no kit
+  builders, no minimal content loader) and Mustafa's per-family pick (OQ-0005-AP2) has no slot in 0003's checklist.
+- Outcome: ADR 0003's look proof test gains one bullet: "ADR 0005's share runs in the same test: PM-0005-33 to PM-0005-37,
+  the families checklist for OQ-0005-AP2; inputs added: the ported kit builders beside the authored models, and a
+  minimal content loader running the content crate's whole-set check." Part 11's asset list adds the kit builders.
+- Owner: graphics-engineer (0003).
+
+### F7 (M). Two research marks placed in the sim core spike by SPIKE_PLAN only; no draft owns a row for them
+- Documents: docs/SPIKE_PLAN.md:204–207 ("no draft's table names them ... R2-SYNC-REC6 mark 1 (throws bit-identical on
+  Wasm and native) and R5-LAYOUT-REC4 (one feature set for `sim` on every target)"); docs/adr/0004-simulation-core.md:
+  822–843 (spike claims S1–S20) and :940–1016 (PM-0004 rows: neither id); 0001 and 0002 adopt the recommendations.
+  Synthesis list item 3.
+- Disagreement: SPIKE_PLAN may place spikes but not write marks ("Pass marks ... are never restated here", SPIKE_PLAN:9);
+  as written, the sim core spike carries two marks with no owning pass-mark row, so nobody's table judges them.
+- Outcome: ADR 0004 adds two pass-mark rows to the sim core spike: "throws bit-identical on Wasm and native (R2-SYNC-
+  REC6 mark 1; the id is ADR 0001's)" and "one feature set for `sim` on every target (R5-LAYOUT-REC4; the id is ADR
+  0002's, re-proven later as a gate check)", with their PM numbers cited back in SPIKE_PLAN:204–207.
+- Owners: rust-reviewer with test-engineer (0004 rows); engine-architect synthesis (SPIKE_PLAN cites the new numbers).

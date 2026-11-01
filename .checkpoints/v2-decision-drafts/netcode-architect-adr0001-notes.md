@@ -44,3 +44,6 @@ Task: ADR 0001 (multiplayer and netcode) draft for the v2 decision drafts (netco
 - 28. Fixed R2-TRN-F35 lines to 1268–1272 (draft and ledger). Ledger complete: 360 rows (verified 187, source to check 82, settled 35, arithmetic 26, proposed 16, design doc 14). Draft complete (Appendix A 127: adopted 30, changed 7, answered 57, open 17, spike 16; 13 OQs; 14 decision parts).
 - Return notes: ids better placed elsewhere but disposed: R1-TICK-OQ1 (0004's tick/determinism), R2-INT-OQ5 (cost is 0004's sim step share). Not sourced/decided: WebSocket framing overhead (measured), loopback codec cost in the Worker (unmeasured), real command size (measured), Ping rate (proposed, no number), TICK-60-SETUP (OQ for the Advisor), pickup prediction (OQ for Mustafa).
 DONE
+
+## Fix round (plan step 9), 2026-11-01
+- Started 09:23 Amsterdam. Findings F2, F4-F10; output netcode-architect-adr0001-fixes.md.
