@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 13:52 Amsterdam
+- **Last update:** 2026-11-01 13:54 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,7 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- 03df0ae · ADR 0001 fix round (netcode-architect's 10 exact replacements; verifier F2, F4–F10).
 - 09803a9 · ADR 0006 fix round (infra-engineer's 22 exact replacements; verifier findings 1, 2, 4, 7–13).
 - 80a27b3 · ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md, GLOSSARY §8 (synthesis); 521/521 ids disposed.
 - 549490f · docs-keeper: STATUS, ROADMAP, REPO_MAP.
@@ -42,7 +43,11 @@ reminder fired at 10:40 but reached the session only at 13:52 and is superseded.
 chat: "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
 His one-off night exception ended at 11:00; the normal rules apply again (daytime: fetching until 22:00, no new agent
 after 23:00). Resumed at about 13:53: the four cut agents, and rust-reviewer for 0004's fixes (5 running). Prepared:
-`prompts/verifier-skeptic-2.txt` (0002's and 0003's wrong, unsupported and rule findings), launched when a slot frees.
+`prompts/verifier-skeptic-2.txt` (0002's and 0003's wrong, unsupported and rule findings): launched about 13:57.
+0001's fixes applied (03df0ae: 10 blocks for F2, F4–F10; F8 was a citation inside test-engineer's pass-mark text that
+the session assigned to the drafter by mistake: a stale line range replaced by the section's name, accepted and said so
+in the report; F1 waits for test-engineer). Prepared: `prompts/fix-passmarks-test-engineer.txt` (the pass-mark rows of
+0001, 0002, 0003, 0004, 0006).
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.

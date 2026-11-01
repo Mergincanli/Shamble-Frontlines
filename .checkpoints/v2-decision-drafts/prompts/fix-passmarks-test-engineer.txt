@@ -1,0 +1,36 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: test-engineer · effort: xhigh · model: opus · 2026-11-01, saved about 13:58 Amsterdam
+
+Fix round (plan step 9) for the pass-mark tables you (test-engineer) wrote in the v2 decision drafts of SHAMBLE
+FRONTLINES. The drafts are assembled in /home/user/Shamble-Frontlines/docs/adr/ (they are the master copies now); each
+"### Pass marks" subsection is your text. The verifiers' findings are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-adr000N-verdicts.md. Fix these, and only these
+(text outside your pass-mark subsections belongs to the drafts' authors):
+- ADR 0001, F1 (rule breach, GLOSSARY:120 retires "whole tick" exactly): PM-0001-4 and PM-0001-39 say "the whole tick
+  timed directly": use "the server tick time measured directly" (or equivalent with the glossary's marking words).
+- ADR 0006, finding 5 (TE140): PM-0006-17 swaps R6's 3.16 GB reference for "R2's estimate at the counts that ran"
+  without an inline "proposed"; finding 6: the run counts and method settings in PM-0006-4, -6, -7, -8, -12 and -22 have
+  no inline "proposed" (one sentence under "How to read the table" may cover them).
+- ADR 0004, TE69 (citation off): the cited r3 line 1123 should be 1123–1124.
+- ADR 0002, F-7 (TE123–125): PM-0002-26 defines "back in step", the number of hide trials and the displays differently
+  from ADR 0004's PM-0004-68 to -70: make the two read the same (say which you align to, and why); F-13 (TE33, TE74,
+  TE107, TE122): the R1-BND-OQ2, OQ3, OQ6 and OQ9 line numbers are off by 1–3; F-14 (TE98): that `erasableSyntaxOnly`
+  rejects an `enum` is not on the source page and R5-TSLINT-F12 itself calls it unverified: say so in the row.
+- ADR 0003, TE44 (nit): PM-0003-4 drops "CPU" from R3-WGPU-REC1 mark 3's "median CPU frame time"; X7 (observation):
+  PM-0003-12 should say whether full-screen post passes count toward the Low cap's 800 draw calls (bloom alone is 12;
+  the ADR's "about 786, inside 800" counts none).
+
+Write one file per draft you change, /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-passmarks-000N-fixes.md,
+with one entry per fix in this exact shape (the session's script applies it to the docs/adr file):
+```
+### FIX <finding id>
+BEFORE:
+<the exact current text in the docs/adr file, copied, unique in the file; whole lines>
+AFTER:
+<the replacement text>
+END
+```
+Copy each BEFORE byte for byte from the docs/adr file (sed -n the lines; tables are long lines: copy the whole row).
+Keep the plan's rules (numbers sourced or "proposed" with a reason; glossary terms; no new decision). Do not edit the
+docs yourself. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-fixes-notes.md
+(look there first; end with DONE). Finish by 15:30 Amsterdam. Never commit, push or fetch. Return at most 12 lines: the
+fixes written per draft (ids) and any finding you did not fix, with why.

@@ -59,7 +59,7 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   docs/adr/0002-code-structure-build-toolchain.md:949 ("with the latest Safari"); docs/adr/0001-multiplayer-netcode.md:
   1017–1019 ("the stable releases on the day of the run, recorded (R2-TRN-REC1 mark 1 names ... Safari 27"); docs/adr/
   0003-rendering.md:822, :897, :1143 ("Safari 26"); docs/adr/0004-simulation-core.md:865 ("a macOS machine with Safari
-  26"); docs/adr/0005-content-abilities-assets.md:1932 ("Safari 26"); docs/adr/0006-infrastructure-operations.md:790
+  26"); docs/adr/0005-content-abilities-assets.md:1932 ("Safari 26"); docs/adr/0006-infrastructure-operations.md:817
   ("a macOS machine with Safari").
 - Disagreement: one shared machine (SPIKE_PLAN "Shared fixtures") pinned to Safari 26 in three drafts, "latest" in two,
   27 in one. Safari 26.0 is WebGPU's floor (R3-WGPU-F19, r3:171–174); WebTransport needs 26.4 (r2:1008–1021); R2-TRN-
@@ -102,3 +102,31 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   REC6 mark 1; the id is ADR 0001's)" and "one feature set for `sim` on every target (R5-LAYOUT-REC4; the id is ADR
   0002's, re-proven later as a gate check)", with their PM numbers cited back in SPIKE_PLAN:204–207.
 - Owners: rust-reviewer with test-engineer (0004 rows); engine-architect synthesis (SPIKE_PLAN cites the new numbers).
+
+### F8 (H). The netcode proof test's WebSocket leg needs a certificate only ADR 0006 knows about (new with 0006's fix round, 09803a9)
+- Documents: docs/adr/0006-infrastructure-operations.md:655–672 (OQ-0006-5, now: "which certificate does the WebSocket
+  fallback present on development and staging servers?"; "A WebSocket cannot pin a certificate hash ... the netcode
+  proof test's WebSocket leg needs one first (PM-0006-15)"; Decider "... the development and staging case before the
+  netcode proof test starts (the Advisor, from a short read)"), :871 (PM-0006-15: 20 of 20 `wss` sessions from each of
+  the four browsers); docs/adr/0001-multiplayer-netcode.md:334–337 ("development and preview servers use self-signed,
+  pinned certificates valid at most 14 days, whose hash the page fetches"), :946–947 (the spike's certificate mark names
+  only the pinned self-signed certificate); docs/SPIKE_PLAN.md:104–110 (item 1 "Depends on": "the development
+  certificates (ADR 0006)" only); docs/adr/README.md:94–103 (no OQ-0006-5 row, though it now routes a part to the Advisor).
+- Disagreement: read alone, ADR 0001 and SPIKE_PLAN start the proof test with pinned self-signed certificates on both
+  transports; ADR 0006 says the `wss` leg cannot work that way (R2-ROOM-F12, r2:1494–1500) and makes a decision a
+  precondition. The first spike would stall on its WebSocket marks (0001's R2-TRN-REC3 leg, PM-0006-15).
+- Outcome: 0001:336 reads "development and preview servers use self-signed, pinned certificates for WebTransport ...
+  (R2-TRN-REC5); the WebSocket fallback cannot pin a hash (R2-ROOM-F12) and presents the certificate ADR 0006's
+  OQ-0006-5 names for development and staging". SPIKE_PLAN item 1 "Depends on" adds "OQ-0006-5's development and staging
+  answer (the Advisor, before the test starts)". README "Decisions the drafts ask for" adds the OQ-0006-5 row (the
+  Advisor for development and staging; security-auditor for production).
+- Owners: netcode-architect (0001:336, and 0001:946 if it should name the `wss` leg's certificate); engine-architect
+  synthesis (SPIKE_PLAN, README).
+
+### F9 (M). README's line pointers into ADR 0006 are stale after 0006's fix round
+- Documents: docs/adr/README.md:94–103. Script check of all 68 "line N" pointers in README against the current drafts:
+  10 miss, all into ADR 0006 (OQ-0006-1 at 598 is now 613; -2 608→625; -3 615→632; -4 626→643; -6 647→673; -7 658→684;
+  -8 668→694; -9 677→703; -10 686→712; -12 701→727). The other 58 hold (four rows that name a decision code with its OQ
+  in brackets match the OQ's line).
+- Outcome: re-point the ten rows after every draft's fix round lands (a last script pass before the PR is marked ready).
+- Owner: engine-architect synthesis (README).

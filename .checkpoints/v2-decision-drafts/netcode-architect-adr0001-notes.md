@@ -48,3 +48,6 @@ DONE
 ## Fix round (plan step 9), 2026-11-01
 - Started 09:23 Amsterdam. Findings F2, F4-F10; output netcode-architect-adr0001-fixes.md.
 - Resumed 13:53 Amsterdam after a spend-limit cut; no fixes file existed; findings read, texts located (doc lines 802-804, 159-161, 659, 1289, 622, 647, 1159-1160, 1356, 1355, 1433, 909-913). Writing fixes now via script.
+- Fixes written to netcode-architect-adr0001-fixes.md: F2, F4 (R2-BUD-REC1 and REC2 rows, both "changed"), F5 (Appendix row -> open: OQ-0001-14, plus the new OQ-0001-14 entry after OQ-0001-13), F6, F7, F8 (test-engineer's paragraph, as the brief assigns), F9, F10 (Q6 and Q9 headings). All BEFOREs asserted unique by script. Ledger rows 272/276 updated to 1694–1702 (notes only).
+- Not edited (test-engineer's text): the PM section's list at doc:1184 does not name OQ-0001-14 (an Advisor ruling, no mark needed).
+DONE

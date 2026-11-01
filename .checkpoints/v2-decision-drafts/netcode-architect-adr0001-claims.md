@@ -298,11 +298,11 @@ INV = docs/LEGACY_INVENTORY.md. The test-engineer's pass-mark rows join this led
 | 269 | Q3 rows A–C (Quake III 100 ms; 10 % per update, snap 2 m) | Options Q3 | r2 Options 3.3, lines 1631–1637 | research, source to check |
 | 270 | Q4 rows A–C; page-side buffer needs view time, aim ray and sim maths the boundary forbids | Options Q4 | r2 Options 3.4, lines 1639–1645; R2-XT-OQ2, lines 3333–3339; r1 R1-BND-REC1 | research, source to check |
 | 271 | Q5 rows A–C (1.8 m lead; Source's model; authority leak) | Options Q5 | r2 Options 3.5, lines 1647–1653 | research, source to check |
-| 272 | Q6 rows A–C and E3, E3b (146 and 188 kbps, +42) | Options Q6 | r2 Options 3.6, lines 1655–1664; table B, lines 1694–1700 | research, source to check |
+| 272 | Q6 rows A–C and E3, E3b (146 and 188 kbps, +42) | Options Q6 | r2 Options 3.6, lines 1655–1664; table B, lines 1694–1702 | research, source to check |
 | 273 | Q7 rows A, B (32 bits; up to 80 bits); who casts the ray | Options Q7 | r2 Options 3.7, lines 1666–1671; R2-XT-OQ1; r4 R4-LOS-REC3 | research, source to check |
 | 274 | Q8 rows T1–T4 (2 × step cost, ±8 ms, +8 ms wait, 286 kbps, interp 50–85 ms) | Options Q8 | r2 table A, lines 1675–1692 | research, source to check |
 | 275 | Q8 T4 settled by TICK-30 | Options Q8 | TICK-30 | settled |
-| 276 | Q9 rows E1–E4 (536, 251, 146, 188 kbps; 25 % below E3; 1,373 B over the datagram) | Options Q9 | r2 table B, lines 1694–1700; worked estimate line 1780 | research, source to check |
+| 276 | Q9 rows E1–E4 (536, 251, 146, 188 kbps; 25 % below E3; 1,373 B over the datagram) | Options Q9 | r2 table B, lines 1694–1702; worked estimate line 1780 | research, source to check |
 | 277 | Q10 rows U1–U3 (22.3 at 30 Hz arithmetic; 36 kbps; 22.3 kbps; loss of four in a row) | Options Q10 | r2 table C, lines 1704–1710 | research, source to check |
 | 278 | Q11 rows P1–P4 | Options Q11 | r2 table D, lines 1712–1719 | research, source to check |
 | 279 | Q12 settled by GL resolution 1 (25 % for the whole weighed and not taken) | Options Q12 | GL lines 167–188 | settled |
