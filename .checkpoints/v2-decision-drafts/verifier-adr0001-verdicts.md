@@ -108,3 +108,99 @@ pending (outside fetch hours). "doc:n" = line n of the assembled ADR.
 | 97 | throws and charged shots use the point | R2-SYNC-REC8 | confirmed | r2:2259–2260 | |
 | 98 | aim help applied by the server | R2-SYNC-REC8 (L1) | confirmed | r2:2253–2255 | |
 | 99 | the page makes no Wasm calls | R1-BND-REC1 m2 | confirmed | r1:2262 "the page makes zero calls into Wasm" | |
+| 100 | delta vs acked; defaults for new; explicit removals; no baseline → defaults | R2-SYNC-REC1 | confirmed | r2:1998–2004 | |
+| 101 | shared world-state ring; per-client sent ring, proposed 32 | R2-SYNC-REC1 | confirmed | r2:1997–1998, 2004–2005 | |
+| 102 | 32 ≈ 1.07 s at 30 Hz | arithmetic | confirmed | 32 ÷ 30 = 1.067 | |
+| 103 | E3: 1 cm in 16/16/12 bits (±327.68 m, 0–40.95 m), yaw 16, pitch 10 | R2-BUD-REC2; estimate | confirmed | r2:2326–2327, 1745–1748; 2^16 cm = 655.36 m; 2^12 cm = 40.96 m | |
+| 104 | projectiles as trajectory records; re-based on relevance | R2-SYNC-REC6 | confirmed | r2:2196–2200 | |
+| 105 | E3b ≈ +42 kbps | R2-BUD-OQ8; estimate | confirmed | r2:2994; 188.3 − 146.1 = 42.2 | |
+| 106 | hard cap 256 kbps (proposed), UDP payload + 28 B | proposed; R2-BUD-REC2 | confirmed (proposed, labelled) | r2:2330 "enforce a hard per-client cap"; r2:2340; r2:1789 | |
+| 107 | 256 kbps ≈ 1,067 B per interval | arithmetic | confirmed | 256,000 ÷ 8 ÷ 30 = 1,066.7 | |
+| 108 | datagram cap min(smallest maxDatagramSize, 1,150 B); 1,000 B until measured | R2-BUD-REC3; R2-TRN-REC2; R2-XU-OQ5 | confirmed | r2:2345–2346, 2631–2632, 3158–3165 | |
+| 109 | split by entity groups, decode alone, acked per group | R2-BUD-REC3; R2-SYNC-OQ4 | confirmed | r2:2346–2347, 2917–2919 | |
+| 110 | first full state over a reliable stream | R2-BUD-REC3 (P4) | confirmed | r2:2347–2348 | |
+| 111 | gameplay events until acked; bounded queue; resync or disconnect; cosmetic once | R2-BUD-REC2 (M4) | confirmed | r2:2329–2332 | |
+| 112 | hit confirmation a gameplay event | R2-SYNC-REC5 | confirmed | r2:2171 "Hit confirmation goes back as a reliable event with the tick" | |
+| 113 | remote soldier fields; action starts as cosmetic events | estimate rows | confirmed | r2:1745–1749 (position, yaw, pitch, health, flags, weapon); flag meanings and action-start events are the draft's answer to R2-XT-OQ8 (r2:3373–3378) | |
+| 114 | fits 90-bit full and 60-bit delta records; flags rarely change | estimate | confirmed | r2:1750–1751 "health and flags rarely"; 44+16+10+8+8+4 = 90 | |
+| 115 | vehicles: hull/turret transforms, health per part; parts and seats with parent | R2-SYNC-REC7; R2-INT-REC6 | confirmed | r2:2233–2235, 2532 | |
+| 116 | sim id (kind, index, generation), never a library id | R1-ECS-REC3 | confirmed | r1:1973–1975 | |
+| 117 | record names kind+index; generation on entry | proposed | confirmed (proposed) | | the generation's bytes on entry records are not added to the estimate R1-XT-OQ11 asks to recompute (r1:3082–3083); low note |
+| 118 | 32-bit header tick, 16-bit offsets | proposed; R2-XT-OQ11 | confirmed (proposed) | r2:3390–3394 | |
+| 119 | 16-bit wrap 36.4 min at 30 Hz, 18.2 at 60 Hz | arithmetic | confirmed | 65,536 ÷ 30 = 2,184.5 s; ÷ 60 = 1,092.3 s | |
+| 120 | +2 B on the 8 B header ≈ +0.5 kbps | arithmetic | confirmed | r2:1743 (8 B, assumption); 2 × 8 × 30 = 480 bit/s | |
+| 121 | wire format ≠ block; Worker decodes then writes the block | R1-BND-OQ8 | confirmed | r1:2745–2746 "couples the wire format to presentation" | |
+| 122 | no state hash exchanged; compared hash leaves authority-only streams out | GL state hash; R1-DET-OQ9 | confirmed | GL:549–550; r1:2706–2709 | |
+| 123 | buffer in the Worker; page interpolates the two newest blocks | R2-XT-OQ2; R1-TICK-REC5 | confirmed | r2:3334–3336; r1:2099 | |
+| 124 | start 3 intervals, adapt 2–5 | R2-SYNC-REC4 | confirmed | r2:2110–2111 | |
+| 125 | 66.7–166.7 ms | arithmetic | confirmed | 2 × 33.33; 5 × 33.33 | |
+| 126 | extrapolate ≤ 1 interval then hold; placed respawns; linear first | R2-SYNC-REC4 | confirmed | r2:2114–2118 | |
+| 127 | remote projectiles on the delayed timeline | R2-SYNC-REC6 | confirmed | r2:2205–2207 | |
+| 128 | announced delay clamped, ≤ 1 interval/s | R2-SYNC-REC5 | confirmed | r2:2151–2153 | |
+| 129 | three intervals: Fiedler's measured rule at 2–5 % loss | R2-SYNC-REC4 | confirmed | r2:2120–2121 | |
+| 130 | history of sim hit volumes, no animation | R2-SYNC-REC5 | confirmed | r2:2134–2137 | |
+| 131 | ray from server fire origin; movers at view time, statics now | R2-SYNC-REC5 | confirmed | r2:2140–2143 | |
+| 132 | tolerance ≤ one interval (33.3 ms) | R2-SYNC-REC5 (H1) | confirmed | r2:2147–2148 | |
+| 133 | RTT: quinn rtt(), or lowest recent own ping on WS | R2-SYNC-REC5 (H4) | confirmed | r2:2148–2151 | |
+| 134 | cap bounds the final rewind; 200 or 250 ms open | R2-SYNC-REC5; R2-XU-OQ1 | confirmed | r2:2154–2157; r2:3123 | |
+| 135 | history = cap + margin, ≤ 1 MB | R2-SYNC-REC5 m3 | confirmed | r2:2138; r2:2184–2185 | |
+| 136 | filters; died/teleported stops | R2-SYNC-REC5 | confirmed | r2:2163–2167 | |
+| 137 | bots shoot at present | R2-SYNC-REC5 (F31) | confirmed | r2:2168 | |
+| 138 | view-time offsets and aims logged; detection later | R2-SYNC-REC5 | confirmed | r2:2160–2162 | |
+| 139 | P2 with 100–150 ms delay needs 200–250 ms; 200 ms cap clips some | R2-SYNC-REC5 | confirmed | r2:2157–2158 "a 100 ms player with a 100–150 ms delay needs 200–250 ms (F28's formula; inferred)" | research marks it inferred |
+| 140 | ~1.8 m lead without lag compensation | R2-SYNC-REC5 | confirmed | r2:2172–2174; 9 m/s × 0.2 s | |
+| 141 | region from camera worst-case view, margin, hysteresis, grid | R2-INT-REC1 | confirmed | r2:2421–2427 | |
+| 142 | areas, portals, flood numbers, re-flood | R2-INT-REC2 | confirmed | r2:2447–2451 | |
+| 143 | area ids shared with navigation | R4-FLOORS-REC2 | confirmed | r4:927–929 "the same area ids as R2-INT-REC2's interiors-and-floors map data" | R4 recommendation; no external fact needed |
+| 144 | one shared pass for bots; sight hiding only if R2-INT-OQ1 says | R2-INT-REC3 | confirmed | r2:2469–2473 | |
+| 145 | own state always; nearest 8 every snapshot; all every 4 | R2-INT-REC4 | confirmed | r2:2488–2489, 2498–2499 | |
+| 146 | visibility classes public/team/owner/spatial | R2-INT-REC5 | confirmed | r2:2502–2508 | |
+| 147 | event radii, area test, shots at viewer, stripped shooter id, big-unit bounds | R2-INT-REC6 | confirmed | r2:2525–2532 | |
+| 148 | a shooter can only hit what it was sent | r2 pointers | confirmed | r2:3431–3433 | |
+| 149 | cutaway follows the same rule | R2-INT-REC2; R2-XT-OQ15 | confirmed | r2:2451–2452 | |
+| 150 | spectators only if Mustafa wants them | R2-INT-REC7; R2-XU-OQ17 | confirmed | r2:2546, 3258–3259 | |
+| 151 | quinn 0.11.x; pick between wtransport 0.7.x and web-transport-quinn 0.13.x; h3 and own handshake out | R2-TRN-REC1 | confirmed | r2:2565–2566 | |
+| 152 | tokio-tungstenite 0.30.x; axum only if serving HTTP | R2-TRN-REC3 | confirmed | r2:2639–2640 | |
+| 153 | room serves no HTTP pages | proposed | confirmed (proposed, labelled) | | |
+| 154 | one transport per client; requireUnreliable; no WT over HTTP/2; newest snapshot only on WS | R2-TRN-REC3 | confirmed | r2:2640–2641, 2652–2653 | |
+| 155 | WT timeout 1.5 s then WS | R2-TRN-REC3 m1 | confirmed | r2:2665 | |
+| 156 | datagrams; one bidi control stream; bulk on uni streams | R2-TRN-REC2 | confirmed | r2:2617–2619 | |
+| 157 | thin interface, four operations, outside the sim | R2-TRN-REC4; options Q4 A | confirmed | r2:2673; r2:1869–1870 | |
+| 158 | third, loopback backend | SLICE-ORDER cond. 1 | confirmed (settled) | STATUS:97–98 | |
+| 159 | decoders never panic, size first; sim thread never parses bytes | R2-TRN-REC4 | confirmed | r2:2679–2680 | |
+| 160 | version in `protocols` and Join | R2-TRN-REC4 | confirmed | r2:2681–2682 ("first control message everywhere else") | |
+| 161 | NewReno/Cubic; non-waiting send; outgoingMaxAge 100 ms; RTT/loss feed adaptation | R2-TRN-REC6 | confirmed | r2:2725–2729 | |
+| 162 | drop low priority, then 20 Hz, never above cap | R2-BUD-REC5 | confirmed | r2:2384 | |
+| 163 | 20 Hz = two of three ticks | arithmetic | confirmed | | |
+| 164 | hostile-input limits | R2-TRN-REC1 m4; REC3 | confirmed | r2:2599–2606, 2654–2658 | |
+| 165 | version floors; dangerous-configuration off | R2-TRN-REC1 m5 (F40) | confirmed (research and source) | r2:2610–2612; source S1: rustsec.org RUSTSEC-2026-0338/0340/0343 "Patched >=0.11.18", 0346/0348 ">=0.23.46", 2025-0009 ">=0.17.12", 0384 ">=1.54.1" | F40 was outside R2's checked set |
+| 166 | advisories check; policy is the baseline's | R2-TRN-REC1 m5; GL | confirmed | r2:2612–2615; GL:691 | |
+| 167 | production: certificate per hostname | R6-HOST-REC4; CF-4 | confirmed | r6:684–686; STATUS:135–137 | R6 recommendation resting on R2-TRN-REC5 (no external fact) |
+| 168 | dev: self-signed, pinned, ≤ 14 days, hash from own HTTPS origin | R2-TRN-REC5 | confirmed | r2:2700–2703 | |
+| 169 | need lines (loopback; congestion §4 only) | map J3 | confirmed (settled by the session's reading) | map J3 (decision-map:1134–1141) | see finding F7 on R2-XU-OQ18 |
+| 170 | lifecycle, timeouts, health check, no pause, fresh sim | R2-ROOM-REC1 | confirmed | r2:2748–2753 | |
+| 171 | fresh sim resets player records and tracks | UPGRADE-SCOPE | confirmed (settled) | plan:72 "reset at the start of every match" | |
+| 172 | one room per process; panic = "unwind"; isolation | R2-ROOM-REC2 | confirmed | r2:2762–2768 | |
+| 173 | token claims; 30 s, ≤ 5 s leeway; first control message | R2-ROOM-REC3 | confirmed | r2:2784–2789 | |
+| 174 | signature scheme per the security review | R2-ROOM-OQ2 | confirmed | r2:3085–3089 | constant-time MAC compare omitted (moot with asymmetric) |
+| 175 | room assigns team and squad | R2-ROOM-REC3 | confirmed | r2:2789–2790 | |
+| 176 | grace 60 s; fresh token; newest connection wins | R2-ROOM-REC4 | confirmed | r2:2813–2815 | |
+| 177 | private rooms: code locates, limits, host checks, faction per team | R2-ROOM-REC5 | confirmed | r2:2824–2831 | |
+| 178 | slot table; bots per team; same input path | R2-ROOM-REC6 | confirmed | r2:2842–2845 | |
+| 179 | room = mode id + overrides | R2-ROOM-REC7 | confirmed | r2:2857 | |
+| 180 | guest id + ≥ 64-bit secret in HttpOnly/Secure/SameSite=Strict cookie | R2-ROOM-REC8 (F19) | confirmed (research and source) | r2:2869–2872; source S2: OWASP Session Management cheat sheet, "The localStorage API": "Use HttpOnly; Secure; SameSite=Strict cookies (preferred)" | F19 was outside R2's checked set |
+| 181 | match record before Closed | R2-ROOM-REC1 m3 | confirmed | r2:2760–2761 | |
+| 182 | hosting services: bounded life, one process each | R2-ROOM-REC1, REC2 | confirmed | r2:2754, 2769 | |
+| 183 | authority over tracks, offers, picks, drops, pickups | UPGRADE-SCOPE | confirmed (settled) | plan:70–73 | |
+| 184 | offers owner class; PickUpgrade; refusals | proposed | confirmed (proposed, labelled) | doc:375–378; "*Research:* no research id concerns upgrades" | |
+| 185 | dropped weapons are sim entities, spatial | UPGRADE-SCOPE | confirmed (settled) | plan:72 "dropped weapons are world pickups" | |
+| 186 | pickups via button edges; authority picks | proposed | confirmed (proposed) | | |
+| 187 | carry slots, ammo, levelling are Mustafa's | UPGRADE-SCOPE | confirmed (settled) | plan:74–75 | |
+| 188 | Quake III predicts item pickups | R2-SYNC-F17 | confirmed | r2:230–231; verifier-confirmed (r2:3594) | |
+| 189 | no research id concerns upgrades | id table | confirmed | research-ids.tsv: only R5-RUSTLINT-REC6 (a toolchain upgrade) matches | |
+| 190 | profiles P0–P4, B1; round trip; reordering | r2 1987–1992 | confirmed | r2:1985–1992 | |
+| 191 | budgets/interest/rooms latencies restated as P2, P0–P2+P4, P0–P4 | R2-XU-OQ12; R2-XT-OQ14 | confirmed | r2:3221–3223 | |
+| 192 | "100 ms of simulated latency" read as P2 | proposed (OQ-0001-3) | confirmed (proposed; the Advisor confirms) | map J6 (3) | |
+| 193 | the simulator is ADR 0002's | R5-TEST-REC4 | confirmed | r5:1454; map owner | |
+| 194 | proof test before the foundation, throwaway, spikes/, after approval | SLICE-ORDER c3; SPIKE-SCOPE (a) | confirmed (settled) | STATUS:101, 187–188 | |
+| 195 | research spikes taken in | named recs | confirmed | r2:2411–2416, 2292–2298, 2585–2615, 2663–2671, 2774–2782; r1:2044–2060 | |
