@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 04:22 Amsterdam
+- **Last update:** 2026-11-01 09:00 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -34,8 +34,11 @@ section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assemble
 (2a0e5f6) into docs/adr/; pass marks for 0001 (test-engineer; 56 marks, all in the netcode proof test, Mustafa's
 15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de); pass marks for 0002 (76 marks; the boundary
 spike PM-0002-1..34, the foundation's acceptance checks -35..69, later milestones -70..76); ADR 0002 assembled
-(789bedb); pass marks for 0004 (72 marks); ADR 0004 assembled (d321a13). Running: pass marks for 0005
-(test-engineer), verifiers for 0006, 0001, 0002 and 0004 (research checks; source checks pending until 08:30).
+(789bedb); pass marks for 0004 (72 marks); ADR 0004 assembled (d321a13). Second spend-limit cut, about 05:30: the
+five running agents (pass marks 0005; verifiers 0001, 0002, 0004, 0006) failed with HTTP 429, "your 5-hour limit
+resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed at about 09:00 (after the reset), in
+priority order for the 11:00 stop: pass marks 0005 → ADR 0005 assembled → the synthesis; the verifiers alongside (from
+08:30 they may fetch sources).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -60,7 +63,7 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
    against the research and consistent (5–6) > source checks (7) > reviews (8) > docs-keeper and the PR; whatever is
    not done is said plainly in the report, and the next day session finishes it.
 - A spend-limit cut during the run: record it, launch nothing new, resume after the reset (the window that opens at
-  03:50 closes at 08:50).
+  03:50 closes at 08:50). It happened at about 05:30; resumed about 09:00.
 
 ## Open findings
 - The research has no asset-pipeline findings (ASSET-RESEARCH (a), ruled; asset-pipeline research unit before the asset
