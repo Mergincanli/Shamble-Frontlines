@@ -1534,10 +1534,11 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
    `onBeforeCompile` are "not supported in WebGPURenderer" (r3, Findings Q1, R3-WGPU-F6, lines 97–102). *Need:*
    LOOK_V2 §8 (step 5) only.
 2. **Material slots name a material class.** Every slot's name maps to one class from a small fixed list (for
-   example environment, unit, faction colour, emissive); the list and the names are this ADR's content data (decision
-   map I-8), consumed by ADR 0003. Faction colour slots take the faction's colour at load, as one shared material per
-   slot and faction, or as per-instance colour where a mesh is instanced (`instanceColor` on `InstancedMesh` and
-   `BatchedMesh`: r3, Findings Q4, R3-CHAR-F4, F6, lines 452–467; R3-CHAR-REC3, Recommendations Q4, lines
+   example environment, unit, faction colour, emissive); the list and the names are this ADR's content data (interface
+   I-8 in `docs/adr/README.md`), consumed by ADR 0003. Faction colour slots take the faction's colour at load, as one shared material per
+   slot and faction, or as per-instance colour where a mesh is instanced (`instanceColor` on
+   `InstancedMesh`: r3, Findings Q4, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour:
+   R3-CHAR-F6, lines 463–467; R3-CHAR-REC3, Recommendations Q4, lines
    1065–1075). Emissive slots write the emissive output that drives the glow, so only they glow (r3, Findings Q3,
    R3-LOOK-F12, lines 392–395; LOOK_V2 §6.4). *Need:* VISION_V2 §6.7 (faction uniforms and variants as data);
    LOOK_V2 §2 (uniform details), §6.4.
@@ -1555,7 +1556,7 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
      draw calls over the shadow and the main pass (R3-CHAR-REC4, lines 1088–1090), and 200 ÷ 4 units ÷ 2 passes = 25.
      R3's own test load, 20 parts each with one material, fits (4 × 20 × 2 = 160, lines 1089–1090).
    - The frame totals every asset shares stay ADR 0003's (r3, R3-BUDGET-REC2, lines 1121–1137): at Low, ≤ 800 draw
-     calls, ≤ 500k triangles, ≤ 512 MB of GPU memory; at High, ≤ 1,500, ≤ 1.5M, ≤ 1 GB.
+     calls (without a per-object outline pass; about 1,100 with one, r3 line 1133), ≤ 500k triangles, ≤ 512 MB of GPU memory; at High, ≤ 1,500, ≤ 1.5M, ≤ 1 GB.
    *Need:* VISION_V2 §4, §6.9; LOOK_V2 §8 (budgets per unit).
 5. **LOD levels are optional data; switching is the engine's.** A model may carry mesh LOD levels. The engine
    switches them through three.js's `LOD`, which switches "at the distances specified" with a `hysteresis` "to avoid
@@ -1585,8 +1586,9 @@ and the legacy facts it cites; an option the research lacks is marked "not resea
 |---|---|---|---|---|---|---|
 | **One shared toon material per slot class, applied at load** (proposed, part 1) | Low | one material per class and faction | materials stay few, so sharing and merging work (R3-LOOK-F3) | presentation only | one look on every asset, set in one place | new; legacy's per-mesh conversion is the lesson (CL4) |
 | Convert each mesh's material at load (legacy's `toonify`) | Low | one material per mesh | defeats batching and merging (CL4) | presentation only | the same look | ports, then fails the draw-call budget |
-| A look baked into each asset by the modelling tool | not researched | – | – | – | – | – |
 
+- A look baked into each asset by the modelling tool: settled by LOOK_V2 §8 (step 5, "the engine applies the comic
+  look"); not weighed.
 - **Shared per class.** Pros: bounded materials; one place to tune the look. Cons: every slot must be named into a
   class (OQ-0005-AS4). **Per mesh.** Pros: no naming rule. Cons: one material per mesh, legacy's measured problem.
 
@@ -1603,7 +1605,7 @@ and the legacy facts it cites; an option the research lacks is marked "not resea
 | Option | Complexity | Cost | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort |
 |---|---|---|---|---|---|---|
 | **One shared material per slot and faction** (with option C-B, proposed) | Low | one material per faction per slot | one draw per material per soldier (Options Q4, line 825) | presentation only | colour per faction, uniform across a team | new |
-| Per-instance colour (`instanceColor`, R3-CHAR-F4, F6) | Low | none per faction | only with instanced meshes (C-D, C-E: measured against C-B in ADR 0003) | presentation only | the same | new |
+| Per-instance colour (`instanceColor` on `InstancedMesh`, R3-CHAR-F4; per-instance colour on `BatchedMesh`, R3-CHAR-F6) | Low | none per faction | only with instanced meshes (C-D, C-E: measured against C-B in ADR 0003) | presentation only | the same | new |
 
 - The choice follows ADR 0003's skinning option: C-B uses shared materials per faction; an instanced candidate that
   wins its mark uses per-instance colour.

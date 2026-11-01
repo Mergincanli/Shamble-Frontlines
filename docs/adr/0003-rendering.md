@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** graphics-engineer · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** graphics-engineer (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
 
 This record decides how SHAMBLE FRONTLINES v2 draws and plays its game in the browser: one three.js WebGPURenderer
 with every material and screen effect written once in TSL, which falls back to WebGL 2 by itself; how each item of the
@@ -15,7 +15,9 @@ a settled input, or a mark marked proposed.
 How to read the citations: each gives the research file, its section, the id and the lines at commit 9e7db28 (the
 topic files do not change in this PR). "Findings Q1" means the Findings section, question 1, of that file; legacy ids
 (CD15, CL6, GA15 …) are rows of `docs/LEGACY_INVENTORY.md`. Terms are the
-[glossary's](../research/GLOSSARY.md); each is linked at its first use.
+[glossary's](../research/GLOSSARY.md); each is linked at its first use. The
+codes this record takes from the decision drafts' working map (interfaces I-n, research gaps "gap Gn", loose ends
+LE-x, the map's addendum parts J-n and shared numbers N-n) are kept in [the register's codes](README.md#codes-the-drafts-cite).
 
 ## Context
 
@@ -42,22 +44,21 @@ topic files do not change in this PR). "Findings Q1" means the Findings section,
 - **The stack:** a TypeScript client on the latest three.js with the WebGPU renderer and a WebGL 2 fallback
   (`docs/V2_PHASE0_BRIEF.md` §0, line 8; brief §1). A renderer other than three.js WebGPU is settled by it.
 - **[N](../research/GLOSSARY.md#player-count-n) = 48:** [the largest mode](../research/GLOSSARY.md#the-largest-mode-and-its-n) is 24v24 (MODES-3 (a), Mustafa, 2026-10-31; brief §1). Where an R3 mark gives values for
-  48 and 54, the 48 value holds (carry-forward 3, STATUS:133–134).
-- **SLICE-ORDER** and its conditions (STATUS:94–101; brief §1): from slice 1 the simulation runs in a Web Worker behind
+  48 and 54, the 48 value holds (carry-forward 3).
+- **SLICE-ORDER** and its conditions (brief §1): from slice 1 the simulation runs in a Web Worker behind
   the network's own messages, so the page only reads what the Worker publishes. The netcode proof test runs before the
   foundation ([GLOSSARY §8: the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test);
   [the foundation](../research/GLOSSARY.md#the-foundation)).
-- **SEC-SPREAD (a)** (STATUS:108–109): weapon spread is known only to the server; "tracers use a similar-looking spread
+- **SEC-SPREAD (a)**: weapon spread is known only to the server; "tracers use a similar-looking spread
   that the hit corrects", so this draft draws tracers from a cosmetic spread.
-- **TICK-30** (STATUS:118–120): a 30 Hz server tick is the baseline. The page interpolates between ticks whatever the
+- **TICK-30**: a 30 Hz server tick is the baseline. The page interpolates between ticks whatever the
   rate (R1-TICK-REC5, below); [the client's sim share](../research/GLOSSARY.md#the-clients-sim-share) at 30 Hz is ADR 0004's number.
 - **LOOK_V2** (Mustafa and the Advisor, 2026-10-31; brief §1): the look is decided where LOOK_V2 says `[DECIDED]`, and
   authored 3D models (glTF/GLB) are allowed in v2 (LOOK_V2 §8).
-- **UPGRADE-SCOPE** (Mustafa, 2026-10-31; `inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md`, recorded in STATUS by
-  docs-keeper): the upgrade tracks live on the player; the page only shows the owner's offers and tracks (I-21 of the
-  decision map; ADR 0005 designs them).
-- **SPIKE-SCOPE (a)** (STATUS:187–188): spikes are throwaway in `spikes/`, exempt from the legacy constraints.
-- **R7-MARKS (a)** (STATUS:159–160): the inventory's marks are working recommendations; this draft lists the rows whose
+- **UPGRADE-SCOPE** (Mustafa, 2026-10-31, recorded in STATUS "Decisions pending"): the upgrade tracks live on the
+  player; the page only shows the owner's offers and tracks (interface I-21; ADR 0005 designs them).
+- **SPIKE-SCOPE (a)**: spikes are throwaway in `spikes/`, exempt from the legacy constraints.
+- **R7-MARKS (a)**: the inventory's marks are working recommendations; this draft lists the rows whose
   mark it would change (Consequences), and the inventory file changes only after Mustafa accepts the drafts.
 
 ### The findings the decision turns on
@@ -138,7 +139,7 @@ judges the look) and the render budget bench (the numbers).
    researched, R3-WGPU-F1, lines 67–71). Upgrade one release at a time, with the migration guide as the checklist and
    the benchmark scene re-run before and after (version policy V1). *Why:* the API broke in r183, r185 and r186
    within a year (R3-WGPU-F3, lines 78–83). This also disposes of the old ADR-003 entry ("stay on r128 vs upgrade",
-   STATUS:202): the stack settles the upgrade, and this part is its policy. *Ids:* R3-WGPU-REC2 (Recommendations Q1,
+   STATUS, ADR-003): the stack settles the upgrade, and this part is its policy. *Ids:* R3-WGPU-REC2 (Recommendations Q1,
    lines 917–926); answers R3-WGPU-OQ5. *Need:* VISION_V2 §4 only.
 3. **No first-sight stutter.** Behind the loading screen: `await renderer.init()`, then `compileAsync()` on a warm-up
    scene that holds every material variant a match can show: each faction's material slots, each visual effect,
@@ -186,7 +187,7 @@ judges the look) and the render budget bench (the numbers).
      soldiers on screen on the minimum laptop at Low (R3-LOOK-REC3, lines 1019–1028). *The visible difference is
      Mustafa's call:* the hull draws a line of even width around each object, with legacy's ink contact line where
      objects meet the ground (CL6); the screen-space pass draws a line in pixels from depth and normal changes, can
-     mark folds inside a shape, and must be masked where the roof fade hides structures (r3-rendering.md, Options Q3,
+     mark folds inside a shape (inferred from R3-LOOK-F7; OQ-0003-2), and must be masked where the roof fade hides structures (r3-rendering.md, Options Q3,
      lines 810–813). If he picks the hull, the Low cap becomes about 1,100 (proposed) or the hull a High-only setting
      (R3-BUDGET-REC2, lines 1146–1148). Its known failures: threshold tuning and thin lines that alias (line 813).
    - **c. Ambient occlusion in corners.** GTAO (three.js's node, R3-LOOK-F9, lines 373–377) at half resolution ("a
@@ -222,10 +223,11 @@ judges the look) and the render budget bench (the numbers).
      the look proof test, not decisions; nothing beyond the legacy precedent was researched.
    - **i. The roof fade.** Port legacy's cutaway (GW17) as a fade of any structure carrying a fade flag (the
      inventory's note, line 205): over the enclosure the local player is in (ADR 0004's floor layers and area ids,
-     r4-physics-navigation.md, Recommendations, R4-FLOORS-REC2, lines 925–939) and between the camera and the player. Its blend state is
+     r4-physics-navigation.md, Recommendations, R4-FLOORS-REC2, lines 925–939) and, as legacy GW17 does, between the
+     camera and the player (a behaviour LOOK_V2 does not name: OQ-0003-15). Its blend state is
      a precompiled variant (part 3), and the ink is masked on faded structures. It follows the server's visibility
      rule: "The client's cutaway (GW17) follows the same rule, so what is not sent is also what the screen would not
-     show" (r2-netcode.md, Recommendations, R2-INT-REC2, lines 2445–2466, quote at 2450–2451); what a player may see
+     show" (r2-netcode.md, Recommendations, R2-INT-REC2, lines 2445–2466, quote at 2451–2452); what a player may see
      is R2-INT-OQ1 (r2-netcode.md, Open questions, lines 3005–3009), a design question for Mustafa. LOOK_V2 §4's own case, the roof of
      the building the player is in, is inside that rule, since the viewer's own area is connected to itself. The fade's
      technique (a blend-state variant, or a fade computed in the shader) was not researched: OQ-0003-6. *Answers*
@@ -233,14 +235,17 @@ judges the look) and the render budget bench (the numbers).
    - **j. Damage stages and ruins.** A mesh per stage (ADR 0005's assets), swapped when the block's structure section
      reports a new state (ADR 0004's states: R4-OBST-REC2 bakes two, r4-physics-navigation.md, Recommendations, lines 1043–1061; a
      third stage is ADR 0004's and ADR 0005's), every stage mesh compiled in the warm-up (part 3). Debris and dust are
-     visual effects (5.k). Planks and debris as routes are ADR 0004's typed links (r4-physics-navigation.md, Recommendations, R4-FLOORS-REC1, lines 903–924); this
+     visual effects (5.k). Planks and debris as routes are ADR 0004's (its part 14: planks as typed links to upper floors, debris
+     as the ruin's walkable surfaces; the link type list is data: r4-physics-navigation.md, Recommendations,
+     R4-FLOORS-REC1, lines 903–924); this
      record only draws them. *Need:* VISION_V2 §6.2; LOOK_V2 §4.
    - **k. Visual effects.** Fragments, muzzle flashes, tracers (from the cosmetic spread, SEC-SPREAD (a)), impacts and
      debris are pooled per kind, with caps as tier data (legacy GP1's pools, `LEGACY_INVENTORY.md` line 311;
      R3-BUDGET-REC3, lines 1166–1177), spawned from the block's events and the feel kit's data (ADR 0005; decision map
      I-20), on CPU or vertex work on both backends (F-A); GPU particles come only as an F-B extra with a measured gain.
      They fit R3-BUDGET-REC2's visual-effects row (≤ 2 ms p99 at Low, ≤ 1 ms at High; line 1132). The particle
-     technique was not researched: OQ-0003-7. Whether a fragment deals damage is a design question for Mustafa; this
+     technique was not researched: OQ-0003-7. Whether a fragment deals damage is a design question for Mustafa (`docs/adr/README.md`,
+     "Decisions the drafts ask for": fragments as damage); this
      part only draws fragments. *Need:* LOOK_V2 §3, §7; LOOP_V2 §7.
    - **l. Comic impact touches, sparingly.** Halftone flashes as legacy's DOM overlay (CD16: a CSS multiply layer,
      "not a render pass", `LEGACY_INVENTORY.md` line 97), triggered by big-moment events; ink line boil's technique
@@ -272,7 +277,8 @@ judges the look) and the render budget bench (the numbers).
      preallocated typed arrays, never by traversing scene objects; health bars and flashes are instanced or
      per-instance attributes (R3-CHAR-REC3, lines 1065–1075). Faction colour comes from the faction colour slots
      (ADR 0005, I-8): one shared material per slot and faction, or per-instance colour where meshes are instanced
-     (`instanceColor`, R3-CHAR-F4, F6, lines 452–467).
+     (`instanceColor` on `InstancedMesh`, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour,
+     R3-CHAR-F6, lines 463–467).
    - Very large units: parts as separate meshes under one group (option V-A), each part's transform from the sim's
      vehicle-part records; the static world merged by material content on both backends; render bundles on WebGPU
      only if they cut CPU frame time (R3-CHAR-REC4, lines 1077–1092).
@@ -391,7 +397,9 @@ judges the look) and the render budget bench (the numbers).
     a few plain glTF/GLB exports (one soldier in LOOK_V2 §3's proportions with its faction colour slots, one weapon,
     one two-floor building with an interior and its damage stages, one very large unit of at least 20 parts, a few
     props), because LOOK_V2 §3's proportions and weapon silhouettes cannot be judged on legacy's primitive parts
-    (CL10, `LEGACY_INVENTORY.md` line 119). It decides nothing about compression or LODs (ASSET-RESEARCH (a), the advisor's ruling; decision map J4).
+    (CL10, `LEGACY_INVENTORY.md` line 119). It decides nothing about compression or LODs (ASSET-RESEARCH (a), the advisor's ruling; J4).
+    Beside them run ADR 0005's ported kit builders, for the asset families OQ-0005-AP2 asks Mustafa to judge
+    (authored model or procedural builder).
     The only glTF evidence in the research is three.js's own example, which loads a glTF skinned mesh into the
     WebGPU renderer (R3-CHAR-F8, lines 476–480).
 
@@ -421,7 +429,7 @@ another file is named.
 | §3 `[DECIDED]` weapons with real silhouettes | authored weapon models on the hand sockets (legacy CC9's data ported) | models not researched (ADR 0005) | weapons read at the game camera | 0005 (weapon models) |
 | §3 `[DECIDED]` the thatched roof goes | content only: the building kit drops it | none needed | absent from the test buildings | 0005 (building kit) |
 | §3 `[DECIDED]` buildings sized for play: interiors, upper floors, verticality | interiors drawn with AO in corners (5.c), the roof fade (5.i), floors from the sim | R3-LOOK-OQ3 (1328–1329); R4-FLOORS-REC2 (r4-physics-navigation.md 925–939); R2-INT-REC2 (r2-netcode.md 2445–2466) | a two-floor building, entered, its roof fading | 0004 (floors), 0005 (building assets) |
-| §3 `[DECIDED]` fragmentation comes back | pooled fragments as visual effects from the blast event, on both backends (5.k) | R3-GL2-REC1 (955–967); R3-BUDGET-REC2's visual-effects row (1132); the particle technique not researched: OQ-0003-7 | a grenade blast with flying fragments beside legacy's smoke and fire | 0004 (the blast event); damage per fragment is a design question |
+| §3 `[DECIDED]` fragmentation comes back | pooled fragments as visual effects from the blast event, on both backends (5.k) | R3-GL2-REC1 (955–967); R3-BUDGET-REC2's visual-effects row (1132); the particle technique not researched: OQ-0003-7 | a grenade blast with flying fragments beside legacy's smoke and fire | 0004 (the blast event); damage per fragment is a design question (`docs/adr/README.md`, "Decisions the drafts ask for") |
 | §4 `[DECIDED]` lush countryside plus contested urban centres (enterable ruins, collapsed roofs, planks to upper floors, corners) | the same pipeline; ruins as damage-stage meshes (5.j); planks as the sim's typed links | R4-FLOORS-REC1 (r4-physics-navigation.md 903–924), R4-OBST-REC2 (1043–1061) | a ruin entered by a plank | 0004 (routes, states), 0005 (assets) |
 | §4 `[DEFAULT]` damage stages: intact → damaged → ruin; debris and planks become routes | a mesh per stage swapped on the structure-state event, every stage compiled in the warm-up; debris as visual effects (5.j, part 3) | R3-WGPU-REC3 (928–939); R4-OBST-REC2 bakes two states: a third is ADR 0004's question (decision map part h, G4) | a building through three stages with no frame above the first-sight mark | 0004 (states), 0005 (stage assets) |
 | §4 `[DEFAULT]` roofs fade when the player is inside | the cutaway over the player's enclosure, ink masked, precompiled blend variant (5.i) | legacy GW17; R2-INT-REC2; R3-WGPU-REC3; the fade technique not researched: OQ-0003-6 | walking in and out; ink hidden on faded parts | 0004 (which enclosure), 0001 (visibility rule) |
@@ -478,8 +486,8 @@ holds and changes nothing [the authority](../research/GLOSSARY.md#the-authority)
 | F-C. The fallback always runs Low | Low | small | strong Linux or Firefox-on-Mac machines get Low | presentation only | Low settings even on strong machines | small |
 | F-D. Try WebGPU compatibility mode before WebGL 2 | unknown: needs three.js support (R3-GL2-OQ1, lines 1305–1307) | unknown | could widen WebGPU's reach on older devices; opt-in, platforms still being added (R3-GL2-F13, lines 285–291) | presentation only | none | a source reading first |
 
-- "WebGPU required, no fallback" was not researched as an option (R3-GL2-OQ5, lines 1317–1320); it stays Mustafa's
-  question (OQ-0003-11).
+- "WebGPU required, no fallback" appears only as settled by the stack (`docs/V2_PHASE0_BRIEF.md` §0, line 8; R3-GL2-OQ5,
+  lines 1317–1320); it is not weighed.
 - **F-A.** Pros: the fallback's emulations (R3-GL2-F2, F3) never matter; nothing legacy had is lost. Cons: WebGPU's
   compute stays unused until a measured need.
 - **F-B.** Pros: richer visual effects where WebGPU runs. Cons: two paths per extra; look drift. Kept for measured
@@ -503,9 +511,11 @@ holds and changes nothing [the authority](../research/GLOSSARY.md#the-authority)
 | Inverted hull, three.js `toonOutlinePass` (F4, F5) | Low: shipped | one extra draw per outlined object | scales with outlined objects and vertices; Low cap about 1,100 draws (R3-BUDGET-REC2) | presentation only | width constant on screen; only toon materials; gaps at hard corners without smoothed normals (CL7) | new; legacy's GLSL hull does not carry over |
 | Inverted hull, own TSL (world-unit width, ground clamp as CL6) | Medium: own code | the same extra draw per object | as above | presentation only | legacy's look: even world-unit width with the ink contact line | the outline-normal algorithm ports (CL7, `LEGACY_INVENTORY.md` line 116); the shader is new |
 | Screen-space Sobel on colour (F6) | Low: shipped node | one full-screen pass, 9 samples per pixel | scales with pixels only | presentation only | picks up texture detail; misses edges between same-coloured surfaces | new |
-| **Screen-space depth and normal edges** (proposed, 5.b; F7) | Medium: a custom TSL node | one full-screen pass plus one normal attachment, about 16.6 MB at 1080p (F14) | scales with pixels only; Low stays at 800 draws | presentation only | lines in pixels; can mark folds inside a shape; threshold tuning; thin lines alias; needs masking for the roof fade | new |
+| **Screen-space depth and normal edges** (proposed, 5.b; F7) | Medium: a custom TSL node | one full-screen pass plus one normal attachment, about 16.6 MB at 1080p (F14) | scales with pixels only; Low stays at 800 draws | presentation only | lines in pixels; can mark folds inside a shape (inferred: OQ-0003-2); threshold tuning; thin lines alias; needs masking for the roof fade | new |
 
-- **The hulls.** Pros: legacy's proven look; a per-object weight for buildings is a plain thickness value (F5).
+- **The hulls.** Pros: legacy's proven look (our own TSL hull); in our own hull a per-object weight is a plain
+  thickness value, as legacy's CL6 does (characters 0.8×); the shipped pass takes one thickness for all objects (F5),
+  so a per-object weight there is not researched.
   Cons: doubles the draws of outlined objects, the measured legacy problem (CL6, TL15).
 - **Sobel on colour.** Pros: shipped, cheap. Cons: draws texture detail as ink and misses same-coloured edges.
 - **Depth and normal edges.** Pros: fixed cost per pixel whatever N; shares the normal buffer with AO. Cons: custom
@@ -564,7 +574,7 @@ open questions (OQ-0003-3, OQ-0003-4), not proposals.
 | **M-A. Named models bought or borrowed** (proposed, with M-B as the fallback) | Low | money, and someone to run them | repeatable numbers | none | – | none in code |
 | M-B. Classes only | Low | free | numbers not comparable between runs | none | – | none |
 | M-C. Mustafa's PC as the recommended machine | Low | free | far above mid-range, so it hides problems | none | Brave is the final visual gate anyway | none |
-| M-D. A cloud GPU instance | Medium | rented by the minute | repeatable; not a laptop | runner access is ADR 0006's | – | CI setup |
+| M-D. A cloud GPU instance | Medium | rented (GitHub's GPU runners bill per minute, R3-MEASURE-F9, lines 655–658); R6's cost | repeatable; not a laptop | runner access is ADR 0006's | – | CI setup |
 | B-1. Frame time only | Low | – | says nothing about where time goes | none | – | – |
 | **B-2. Frame time plus per-pass GPU, CPU, draw calls, triangles, memory** (proposed) | Medium | needs timestamp queries | every regression has an owner | none | – | the harness (part 8) |
 | B-3. Adaptive resolution on top of B-2 | Medium | one more control loop | holds the target on weak machines | none | the image softens under load | new |
@@ -619,8 +629,9 @@ open questions (OQ-0003-3, OQ-0003-4), not proposals.
 - **Screen-space ink over the hull** wins on cost at N = 48: its pass is fixed per pixel, it shares the normal output
   with the AO, and it keeps the Low cap at 800 draws, where the hull adds a draw per outlined object (R3-LOOK-F8;
   R3-BUDGET-REC2, lines 1142–1148), the cost legacy measured at 5,843 draws with 48 soldiers on screen (TL15). *The
-  strongest argument against:* LOOK_V2 §2 keeps legacy's ink, and legacy's ink is a hull; the hull is shipped code
-  with a known look and a trivial per-object weight for buildings, while the screen-space pass is our own TSL node with
+  strongest argument against:* LOOK_V2 §2 keeps legacy's ink, and legacy's ink is a hull; the hull is legacy's known
+  look (our own TSL hull, with a plain per-object weight for buildings, CL6) or shipped code (one thickness for the
+  pass, R3-LOOK-F5), while the screen-space pass is our own TSL node with
   thresholds to tune, aliasing, a mask for the roof fade, and a per-class weight that is not researched. That is why
   both families are measured, and why the look call is Mustafa's: if he prefers the hull, the record keeps it at the
   measured cost (about 1,100 draws at Low, or High only).
@@ -653,7 +664,7 @@ open questions (OQ-0003-3, OQ-0003-4), not proposals.
   look in a dedicated session before any art production.
 - **Revisit when:** the look proof test fails a frame-time mark on the minimum laptop (drop a technique to High only,
   or change family); a three.js upgrade changes a pass's cost by more than R3-WGPU-REC2's 5 %; client field data shows
-  the fallback share (R3-GL2-OQ2), which may reopen dropping the fallback (OQ-0003-11) or allow F-B extras; the camera
+  the fallback share (R3-GL2-OQ2), which may allow F-B extras; the camera
   framing is decided (R2-INT-OQ2), which re-decides distance LOD and the listener's place; Mustafa picks the hull
   family.
 - **Hard constraints in CLAUDE.md that change:** none in this PR: nothing in `CLAUDE.md` or `.claude/` changes. Once
@@ -693,12 +704,13 @@ ADR 0005's.
 | GA1–GA15 (217–231) | port to TypeScript (pending) | port to TypeScript; pending removed; GA15 adds the budget LOD (part 6) | LOOK_V2 §2 keeps small movement touches |
 | GA14 (230) | port to TypeScript (pending) | port to TypeScript; pending becomes "Mustafa's call: whether the toy-soldier death fall fits LOOK_V2 §3's adult audience" | LOOK_V2 §3 |
 | GW4 (192) | port to TypeScript (pending) | port to TypeScript: the texel-snapped sun frustum (part 5.f); pending removed | LOOK_V2 §2 soft shadows |
-| GW17 (205) | port to TypeScript (pending) | port to TypeScript: the roof fade by flag over the player's enclosure, precompiled blend variant, ink masked (part 5.i); pending removed | LOOK_V2 §4 `[DEFAULT]` roofs fade |
+| GW17 (205) | port to TypeScript (pending) | port to TypeScript: the roof fade by flag over the player's enclosure and the camera-player cutaway (OQ-0003-15), precompiled blend variant, ink masked (part 5.i); pending removed | LOOK_V2 §4 `[DEFAULT]` roofs fade |
 | GP1, GN8, GC8 (311, 273, 247) | port to TypeScript (pending) | port to TypeScript: pools per kind with caps as tier data, spawned from events (part 5.k); pending removed | LOOK_V2 §3, §7 |
 | GN1 (266) | port to TypeScript (pending) | port to TypeScript: instanced health bars and a per-instance flash (part 6); pending removed | R3-CHAR-REC3 |
 | GC16 (255) | port to TypeScript (pending) | redesign: very large units as authored multi-part models in one group (part 6, option V-A) | LOOK_V2 §5 (never "a block on wheels with a tube") |
 | GP5 (315) | redesign (pending) | redesign: the perf overlay ported with backend, GPU time and programs (part 8); pending removed | R3-MEASURE-REC4 |
-| GP7, GP10, GP12, PG2–PG8, PG10–PG12, PG14–PG16, PG20 (317, 320, 322, 360–366, 368–370, 372–374, 378) | port to TypeScript (pending) | unchanged; pending stays for the HUD's layout, which LOOK_V2 does not set | LOOK_V2 covers the 3D look, not the HUD |
+| GP7, GP10, GP12, PG3, PG7, PG8, PG10, PG14, PG16 (317, 320, 322, 361, 365, 366, 368, 372, 374) | port to TypeScript (pending) | unchanged; pending stays for the HUD's layout, which LOOK_V2 does not set | LOOK_V2 covers the 3D look, not the HUD |
+| PG2, PG4–PG6, PG11, PG12, PG15, PG20 (360, 362–364, 369, 370, 373, 378) | redesign (pending) | unchanged; pending stays for the HUD's layout, which LOOK_V2 does not set | LOOK_V2 covers the 3D look, not the HUD |
 | GP9 (319) | port to TypeScript (pending) | unchanged; pending becomes "Mustafa's call: LOOK_V2 does not mention the kill vignette" | presentation-time hit-stop stays (R1-TICK-REC5) |
 
 ## Open questions
@@ -715,7 +727,8 @@ ADR 0005's.
   Why it matters: LOOK_V2 §2 asks for ink "especially strong on buildings" and §6.2 for thinner lines inside.
   Options: width in world units (legacy CL6), constant on screen (three.js's hull, R3-LOOK-F5), or in pixels
   (screen-space); inner lines from normal edges (screen-space) or none beyond the silhouette (hull); the building
-  weight as a per-pixel class value in an MRT output (screen-space, not researched) or a per-object thickness (hull).
+  weight as a per-pixel class value in an MRT output (screen-space, not researched) or a per-object thickness (our own TSL hull, as CL6; the
+  shipped pass has one thickness for all objects, R3-LOOK-F5).
   Decider: Mustafa, in the look proof test, with its measured cost; the family in part 5.b follows his pick.
   What decides it: side-by-side frames with legacy at the game camera. Research ids: R3-LOOK-OQ2 (lines 1326–1327);
   the decision map's gap G8.
@@ -768,11 +781,12 @@ ADR 0005's.
   Decider: Mustafa (feel), on the render budget bench's numbers. What decides it: smoothness on 60, 120 and 144 Hz
   displays with each option (the boundary spike's smoothness mark, R1-TICK-REC5, r1-simulation-core.md lines
   2094–2116) and power on the minimum laptop. Research ids: R3-BUDGET-OQ2.
-- **OQ-0003-11. Should v2 one day drop the WebGL 2 fallback, and how many players use it?**
-  Why it matters: the fallback doubles the test matrix; dropping it shuts out Firefox on Linux and Intel Macs, Chrome
-  on Linux without Intel Gen12+, and Safari before 26 (R3-GL2-F12, lines 279–283). Options: keep it with the same
-  features (part 1); "WebGPU required" (not researched). Decider: Mustafa. What decides it: the fallback share from
-  client field data after launch (part 8). Research ids: R3-GL2-OQ5 (lines 1317–1320), R3-GL2-OQ2 (lines
+- **OQ-0003-11. How many players use the WebGL 2 fallback?**
+  Why it matters: the fallback keeps Firefox on Linux and Intel Macs, Chrome on Linux without Intel Gen12+, and Safari
+  before 26 in the game (R3-GL2-F12, lines 279–283), and its share decides whether WebGPU-only extras (F-B) are worth
+  their fallback work. Options: none to weigh: the share is measured, from client field data (part 8). The fallback
+  itself stays (settled by the stack: R3-GL2-OQ5 is answered in Appendix A). Decider: Mustafa, on client field data after
+  launch. What decides it: the backend each match reports (part 8). Research ids: R3-GL2-OQ2 (lines
   1308–1311).
 - **OQ-0003-12. Is the pixel ratio capped at 1 on Low for HiDPI laptops?**
   Why it matters: ratio 2 shades four times the pixels (R3-BUDGET-F3, lines 551–555), while a cap at 1 softens text
@@ -785,14 +799,16 @@ ADR 0005's.
   first (R2-INT-OQ2, a design question), then Mustafa's listening check. What decides it: the framing's height and
   angle. Research ids: R3-AUDIO-OQ3 (lines 1399–1400).
 - **OQ-0003-14. Do the Web Audio specification's PannerNode and spatialization sections change part 9?**
-  Why it matters: MDN stood in for the specification, whose fetched text stopped before those sections
-  (R3-AUDIO-F9, lines 743–747). Options: a read of the specification's sections; keep MDN's pages. Decider: the
-  verifier (plan step 7, VERIFY-FETCH (a)) or the render budget bench's preparation. What decides it: whether the
-  specification's text differs from MDN on the panning and distance models. Research ids: R3-AUDIO-OQ4 (lines
+  Answered by its decider, the verifier (plan step 7, 2026-11-01), from the W3C Working Draft of 22 September 2026
+  (https://www.w3.org/TR/webaudio-1.1/): `panningModel` "Defaults to "equalpower"", `distanceModel` "Defaults to
+  "inverse""; equal power is "a simple and relatively inexpensive algorithm" and HRTF "somewhat more costly than
+  "equalpower"", as MDN says (R3-AUDIO-F2, F3, lines 696–709). Part 9 is unchanged. Research ids: R3-AUDIO-OQ4 (lines
   1401–1402).
 - **OQ-0003-15. The legacy look touches LOOK_V2 does not name: keep, change or drop each?**
   Why it matters: they are on screen today, and LOOK_V2 §3 asks that nothing look like a children's game. The items:
-  comic words (CL12, GW3), the kill vignette (GP9), the toy-soldier death fall (GA14) and the skin rim (CL3).
+  comic words (CL12, GW3), the kill vignette (GP9), the toy-soldier death fall (GA14), the skin rim (CL3) and the
+  camera-player cutaway, which fades structures between the camera and the player beyond LOOK_V2 §4's roofs (GW17,
+  `LEGACY_INVENTORY.md` line 205).
   Options per item: keep, change or drop. Decider: Mustafa, in the look proof test. What decides it: his judgement,
   side by side with legacy. Research ids: none (legacy rows only).
 
@@ -819,7 +835,7 @@ and measured with the harness of part 8 on the two reference machines, never hea
   draws with all effects off plus the planned extras; each effect's off and lowered settings each cut its own GPU time
   by at least 40 % (R3-LOOK-REC2, lines 1014–1017).
 - **Both backends (1):** the benchmark scene renders on the WebGPU backend in Chrome, Edge, Firefox on Windows and
-  Safari 26, and on the WebGL 2 backend (`forceWebGL`) in the same browsers, with zero console errors; the two
+  Safari on MAC (`docs/SPIKE_PLAN.md`, shared fixtures), and on the WebGL 2 backend (`forceWebGL`) in the same browsers, with zero console errors; the two
   backends' screenshots of the same frame differ in at most 1 % of pixels by more than 8/255 per channel (a proposed
   tolerance; effects on one backend only are off for this test); the WebGPU backend's median CPU frame time is no
   worse than 1.1 × the WebGL 2 backend's on the same machine (R3-WGPU-REC1, lines 910–915). The fallback shows the
@@ -832,8 +848,11 @@ and measured with the harness of part 8 on the two reference machines, never hea
   available", never 0, on Firefox's and Safari's (R3-GL2-REC3, lines 984–985).
 - **Frame time beside the look:** frame time median and p95 with the kept set of techniques on, on both machines,
   against the budget table's frame-time rows (part 7); the full table is the render budget bench's.
+- **ADR 0005's share runs in the same test:** its asset marks PM-0005-33 to PM-0005-37 and the families checklist for
+  OQ-0005-AP2 (which asset families become authored models and which stay procedural builders: Mustafa's pick).
 - **Needs:** LOOK_V2; both reference machines (OQ-0003-1); Mustafa's time in Brave; a few authored test assets as
-  plain glTF/GLB exports (part 11); legacy screenshots at the same framing.
+  plain glTF/GLB exports (part 11), with ADR 0005's ported kit builders beside them and a minimal content loader that
+  runs the content crate's whole-set check (ADR 0005); legacy screenshots at the same framing.
 
 ### The render budget bench (parts 6, 7, 8 and 9)
 - **Every budget row** holds on its machine in the benchmark scene, for 3 runs of 600 measured frames after 300
@@ -1140,7 +1159,7 @@ Each phase ends on a milestone that proves it done; the legacy game stays playab
   CI is ever reported as a hardware result.
 - **Reference machines (W-C):** each mark from the harness, 3 runs of 600 frames after 300 warm-up frames, in a results
   log with backend, adapter, browser, `devicePixelRatio` and resolution.
-- **Backend matrix:** Chrome, Edge, Firefox (Windows) and Safari 26 on WebGPU; the same with WebGL 2 forced; Firefox on
+- **Backend matrix:** Chrome, Edge, Firefox (Windows) and Safari on MAC (`docs/SPIKE_PLAN.md`) on WebGPU; the same with WebGL 2 forced; Firefox on
   Linux for the real fallback; Brave on Mustafa's PC.
 - **Determinism (ADR 0004's):** the benchmark scene replays a recorded match; identical counts on every frame and
   identical screenshots at three frames; if client replay is not identical, a fixed-seed bot match stands in.
@@ -1177,9 +1196,9 @@ research file's at 9e7db28.
 | R1-BND-OQ3 | open: OQ-0003-1 | the minimum laptop's model; ADR 0002's boundary spike records its core count |
 | R1-XT-OQ14 | answered: part 9 | occlusion starts as zones or none; if O-B is ever proposed, the rays run on the page against a client copy of the map's static geometry, so no page call into the sim (R1-BND-REC1 mark 2); ADR 0004 cited for the floor data |
 | R1-XT-OQ16 | answered: part 10 | no OffscreenCanvas (not researched, not proposed: the page keeps rendering); the renderer reads typed arrays whatever the layout (r3-rendering.md lines 1489–1491), so ADR 0002 picks the layout by measurement (R1-BND-OQ6) |
-| R2-XT-OQ15 | answered: part 5.i | the cutaway follows R2-INT-REC2's rule (r2-netcode.md lines 2450–2451); what a player may see stays R2-INT-OQ1, a design question |
+| R2-XT-OQ15 | answered: part 5.i | the cutaway follows R2-INT-REC2's rule (r2-netcode.md lines 2451–2452); what a player may see stays R2-INT-OQ1, a design question |
 | R3-WGPU-REC1 | adopted | part 1 |
-| R3-WGPU-REC2 | adopted | part 2 (also disposes of the old ADR-003 entry, STATUS:202) |
+| R3-WGPU-REC2 | adopted | part 2 (also disposes of the old ADR-003 entry in STATUS) |
 | R3-WGPU-REC3 | adopted | part 3; the warm-up list names LOOK_V2 §4's damage-stage meshes and the roof fade's blend variant |
 | R3-WGPU-REC4 | adopted | part 4 |
 | R3-GL2-REC1 | adopted | part 1 |
@@ -1209,10 +1228,10 @@ research file's at 9e7db28.
 | R3-WGPU-OQ4 | open: OQ-0003-3 | Mustafa's call; LOOK_V2 decides vibrant colour, not the output transform |
 | R3-WGPU-OQ5 | answered: part 2 | the newest release when the look proof test starts |
 | R3-GL2-OQ1 | spike: the look proof test | after a reading of three.js's WebGPU device request |
-| R3-GL2-OQ2 | open: OQ-0003-11 | the share waits for client field data; what the client reports is part 8 |
+| R3-GL2-OQ2 | open: OQ-0003-11 | the share, from client field data; what the client reports is part 8 |
 | R3-GL2-OQ3 | spike: the look proof test | R3-WGPU-REC1 mark 2 |
 | R3-GL2-OQ4 | answered: part 1 | F-A runs no TSL compute on the fallback; a spike only if an F-B extra is proposed |
-| R3-GL2-OQ5 | open: OQ-0003-11 | Mustafa, with the share |
+| R3-GL2-OQ5 | answered: settled by the stack | part 1: the fallback stays (`docs/V2_PHASE0_BRIEF.md` §0, line 8) |
 | R3-LOOK-OQ1 | spike: the look proof test | R3-LOOK-REC1's table |
 | R3-LOOK-OQ2 | open: OQ-0003-2 | the width model, inner lines and building weight are Mustafa's call |
 | R3-LOOK-OQ3 | spike: the look proof test | single-pass AO (part 5.c) |
@@ -1234,7 +1253,7 @@ research file's at 9e7db28.
 | R3-AUDIO-OQ1 | spike: the render budget bench | R3-AUDIO-REC1's HRTF mark |
 | R3-AUDIO-OQ2 | spike: the render budget bench | the voice counter in the benchmark fight |
 | R3-AUDIO-OQ3 | open: OQ-0003-13 | the camera framing first (R2-INT-OQ2) |
-| R3-AUDIO-OQ4 | open: OQ-0003-14 | a read of the Web Audio specification |
+| R3-AUDIO-OQ4 | answered: OQ-0003-14 | the verifier read the Web Audio 1.1 draft (2026-11-01); part 9 unchanged |
 | R3-AUDIO-OQ5 | answered: part 9 | as R3-XT-OQ6 |
 | R3-AUDIO-OQ6 | spike: the render budget bench | only if the built-in panners miss R3-AUDIO-REC1's CPU mark |
 | R3-XT-OQ4 | answered: part 8 | what the client reports per match; ADR 0006 stores it |
@@ -1245,7 +1264,7 @@ research file's at 9e7db28.
 | R6-OBS-OQ5 | answered: part 8 | a per-match client summary; whether it joins the match record, and where it is stored, is ADR 0006's |
 | R6-XT-OQ5 | answered: part 8 | as R3-XT-OQ4 |
 
-Counts: adopted 23 · changed 2 · rejected 0 · answered 15 · open 12 · spike 19 (71 in all).
+Counts: adopted 23 · changed 2 · rejected 0 · answered 17 · open 10 · spike 19 (71 in all).
 
 ## Sources
 
@@ -1265,12 +1284,14 @@ Read for this record (lines at 9e7db28; the topic files do not change in this PR
 - `docs/research/r6-infrastructure.md`: R6-OBS-REC4 (lines 769–780); R6-OBS-OQ5 (905–906); R6-XT-OQ5 (1015–1020).
 - `docs/research/GLOSSARY.md`: §1 (time statistics, the client's sim share), §2 (player count, the largest mode, the
   design point), §3 (the stress scene, big vehicle and very large unit, live projectile, active effect
-  and visual effect), §4 (the authority; shared stream and authority-only stream), §5 (preview); §8 as the decision map's addendum (J1) gives it.
+  and visual effect), §4 (the authority; shared stream and authority-only stream), §5 (preview), §8 (the foundation,
+  the netcode proof test).
 - `docs/research/README.md` (the shape of a topic file); `docs/adr/0000-template.md`.
 - `docs/VISION_V2.md` §4, §6; `docs/LOOP_V2.md` §7, §11; `docs/LOOK_V2.md` (all); `docs/EDITOR_V2.md` §2;
-  `docs/V2_PHASE0_BRIEF.md` §0 (line 8); `docs/STATUS.md` "Decisions pending" (lines 93–202).
+  `docs/V2_PHASE0_BRIEF.md` §0 (line 8); `docs/STATUS.md` "Decisions pending" (cited by decision code).
 - `docs/LEGACY_INVENTORY.md`: the rows cited by id and line (CD5, CD9, CD15–CD17, CD19, CL1–CL4, CL6–CL10, CL12,
   CL14, CC1–CC6, CC8, CC9, CC11, CC12, GW3, GW4, GW17, GA1–GA15, GC6, GC8, GC16, GN1, GN8, GP1, GP4, GP5, GP6, GP7,
   GP9, GP10, GP12, PG2–PG8, PG10–PG12, PG14–PG16, PG20).
-- The decision drafts' working files: the decision map (`engine-architect-decision-map.md`, parts a, c, d, e, g, h
-  and j, and its id table), the plan (revision 3) and the advisor's verdict on it (§1, the ASSET-RESEARCH ruling).
+- `docs/adr/README.md`, "Codes the drafts cite" (the decision map's codes this record uses: I-n, gaps, LE-B, J4,
+  N12) and "Decisions the drafts ask for"; ASSET-RESEARCH (a), the advisor's ruling, as STATUS "Decisions pending"
+  records it.
