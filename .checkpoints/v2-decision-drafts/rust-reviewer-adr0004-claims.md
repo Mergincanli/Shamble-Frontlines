@@ -418,3 +418,19 @@ The Pass marks table under it is the test-engineer's (plan step 4); its rows joi
 | 359 | Appendix A: 82 ids, one row each (adopted 25, changed 10, rejected 1, answered 27, spike 17, open 2) | Appendix A | engine-architect-decision-map-ids.tsv (owner 0004) | arithmetic (counted by script) |
 | 360 | Each "changed" and "answered" disposition's reason | Appendix A | as rows 46–236 for the part named in each row | as the cited row |
 
+
+## Fix round (plan step 9, 2026-11-01): rows as they read after rust-reviewer-adr0004-fixes.md
+
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 39 | The 2 m grid can close gaps of 3 to 5.4 m, depending on grid alignment; 27.5 % of objective routes cross a roof bots cannot climb | Context, legacy | r4, legacy facts (R4-NAV), 391–393 (GN11); STATUS "Open bugs and risks", line 327 | research, source to check; settled |
+| 166 | Why: Detour cannot simply be linked into the sim's Wasm build (no C/C++ toolchain, R4-NAV-F8; R4-NAV-REC1 reads it as not a supported path); no nav crate promises determinism; baking once; Quake III's area graph | Part 11 | r4, R4-NAV-F8, 303–311 (checked: confirmed); R4-NAV-REC1, 812–814; F16 (not checked); F18, F19 (checked) | research, source to check (F16) |
+| 182 | The research bakes two states, the second of which may be a ruin's shape | Part 14 | r4, R4-OBST-REC2, 1046–1047 | research, source to check |
+| 253 | Pcg32: portable, "a good choice on both 32-bit and 64-bit CPUs", stream parameters "may be closely correlated" | Options Q3 | r1, Options Q4 table, line 1719 (R1-DET-F34) | research verified (F34 confirmed at R1's fix step, r1:3591) |
+| 304 | S3: p99 ≤ 2 × mean at 30 Hz; sight checks at 60 Hz within 1 % of the 30 Hz count, the 60 Hz form only in the 60 Hz margin's test | S3 | r1, R1-TICK-REC3, 2074–2076; GL §8 the 60 Hz margin; PM-0004-72 | research verified; settled |
+| 305 | S4: within 1 shot of 60 / interval at 30 Hz; the same count within 1 shot at 60 Hz in the 60 Hz margin's test only | S4 | r1, R1-TICK-REC1, 2023–2024; GL §8 | research verified; settled |
+| 329 | S9 (REC3): 0 tunnelling at 30 Hz, the 60 Hz form only in the 60 Hz margin's test | S9 | r4, R4-PHYS-REC3, 758–760; GL §8 | research, source to check; settled |
+| 335 | S11 (FLOORS-REC1): 1,000 of 1,000 traversals at 30 Hz, the 60 Hz form only in the 60 Hz margin's test | S11 | r4, R4-FLOORS-REC1, 918–923; GL §8 | research, source to check; settled |
+| 337 | S13 (OBST-REC1): over 10 minutes at 30 Hz, the 60 Hz form only in the 60 Hz margin's test | S13 | r4, R4-OBST-REC1, 1037–1041 (line 1038: "for 10 minutes at 30 and 60 Hz"); GL §8 | research, source to check; settled |
+| 361 | Every option comes from the research or a settled input: Options sections (Q1–Q8), GLOSSARY §4 (Q9), UPGRADE-SCOPE (Q10), R1-RR-OQ3 (Q11) | Options preface | r1, 1626–1730; r4, 585–662; GL 525–545; UPGRADE-SCOPE; r1, R1-RR-OQ3, 2936–2940 | research, source to check; settled |
+| 362 | Not yet in the README register: whether grenade fragments deal damage per fragment; LOOK_V2 §3 and §7 bring fragmentation back as a visible effect, which ADR 0003 draws from the blast event; a rule for Mustafa, no research id | Open questions | LOOK_V2 §3, §7; docs/adr/0003-rendering.md:424, :1076; docs/adr/README.md (no entry) | design doc |

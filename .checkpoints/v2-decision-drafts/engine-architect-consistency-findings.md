@@ -135,3 +135,18 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   in brackets match the OQ's line).
 - Outcome: re-point the ten rows after every draft's fix round lands (a last script pass before the PR is marked ready).
 - Owner: engine-architect synthesis (README).
+
+### F10 (M). Line citations into STATUS are stale (STATUS was rewritten by 549490f); plan rule C12 says cite the code
+- Documents and what the cited STATUS line holds today: docs/adr/0003-rendering.md:45 (STATUS:133–134, carry-forward 3:
+  now an unrelated line), :46 (STATUS:94–101, SLICE-ORDER: now the "Taken by Mustafa" header), :50 (STATUS:108–109,
+  SEC-SPREAD: now the foundation's text; SEC-SPREAD is at STATUS:151–152), :52 (STATUS:118–120, TICK-30: now a header;
+  TICK-30 is at STATUS:161), :59 (STATUS:187–188, SPIKE-SCOPE: now at :235), :60 (STATUS:159–160, R7-MARKS: now at
+  :207), :141 and :1182 (STATUS:202, ADR-003: now at :252); docs/adr/0001-multiplayer-netcode.md:97 (STATUS.md line
+  199, ADR-001's inputs: now at :249); docs/adr/README.md:208–214 (STATUS:198, 199, 200–201, 202, 257, 262, 273: ADR-001..3
+  now at :246–252, SEC-MDL-2 at :314, CDN-SRI at :319, WALL-CLOCK at :330) and :333 (J2's ":257, :262, :273").
+- Disagreement: a reader following the pointer lands on another decision. Plan rule C12 (plan.md:79): cite settled
+  inputs "by the STATUS decision code or the GLOSSARY §8 entry".
+- Outcome: the drafts cite the codes alone (SEC-SPREAD (a), TICK-30, SLICE-ORDER, SPIKE-SCOPE (a), R7-MARKS (a),
+  carry-forward 3); README's loose-ends rows cite the STATUS section and item name ("STATUS, ADR-001", "STATUS, Deferred:
+  SEC-MDL-2") instead of line numbers, since docs-keeper edits STATUS again before ready.
+- Owners: graphics-engineer (0003:45–60, 141, 1182); netcode-architect (0001:97); engine-architect synthesis (README).
