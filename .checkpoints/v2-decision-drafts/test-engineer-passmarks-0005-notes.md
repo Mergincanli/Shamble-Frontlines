@@ -13,3 +13,6 @@ Task: test-engineer pass marks of ADR 0005 (content data, abilities, assets) for
 - Next: write test-engineer-passmarks-0005.md.
 - WROTE test-engineer-passmarks-0005.md (46 marks PM-1..46, failure rule, no-mark lines, 4 checklists: content, families, LOD, Feel Lab; spike entries x4 + in-other-spikes). Line-check found: r5:1395 is the golden row, not Safari; INV CS7 not at 172. Next: fix those two cites, then claims ledger.
 - Fixed cites: Safari row r5:1394; INV CS7 line 175; 'Tick times' -> 'Sim step times' (GL anchor #sim-step-time, GL:97). 46 rows x 7 cols checked; no retired GLOSSARY phrase, no 'headroom'. Next: claims ledger.
+- WROTE claims ledger test-engineer-passmarks-0005-claims.md: 242 rows TE1-TE242 (rv 36, stc 36, arith 13, settled 56, design 5, proposed draft's 24, proposed TE 72); line cites re-checked, 8 fixed. Next: final checks then DONE.
+- Final checks done (46 PM rows, 7 cols; 242 ledger rows; cites re-read). Return written from the FINDINGS line above. Nothing committed.
+DONE

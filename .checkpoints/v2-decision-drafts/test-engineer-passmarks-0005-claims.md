@@ -268,7 +268,7 @@ checklist · SE the spike entries.
 | TE221 | The development server started on his PC with the session's steps | CC | none | proposed (test-engineer) |
 | TE222 | A family can be picked only where both forms are shown | FC | OQ-0005-AP2; AP-7 (both forms side by side) | proposed (test-engineer: a reading) |
 | TE223 | Building: the half-timbered house with the brick-tile roof | FC 1 | LOOK_V2 §2, §3 | design doc |
-| TE224 | Props (barrels, carts, hay bales, logs) | FC 2 | LT `BK.PROPS` in `boot_changes` (barrels, cart, haybales …); LOOK_V2 §2 | design doc; research, source to check (legacy data) |
+| TE224 | Props (barrels, carts, hay bales, logs) | FC 2 | LT `BK.PROPS` in `boot_changes` (barrels, cart, haybales, logpile …); LOOK_V2 §2 (line 17: "logs and trees with variety") | design doc; research, source to check (legacy data) |
 | TE225 | Trees not judged: LOOK_V2 §8 `[OPEN]` | FC 4 | LOOK_V2 §8 (line 74) | design doc |
 | TE226 | No missing piece or grey stand-in (missing models fail at load) | FC 5 | AP-2; PM-0005-33 | settled (the draft) |
 | TE227 | LOD: readable from a distance, depth up close; no pop or flicker | LC | LOOK_V2 §5; GPU part 5 | design doc |
@@ -295,4 +295,7 @@ checklist · SE the spike entries.
 
 ## Counts
 - Rows: 242 (TE1–TE242), counted by script on this file.
-- By first tier (script on this file): see the line below, written after the count.
+- By first tier (script on this file): research verified 36 · research, source to check 36 · arithmetic 13 · settled 56 ·
+  design doc 5 · proposed (the draft's, or another draft's) 24 · proposed (test-engineer) 72.
+- Line citations re-read against the files on 2026-11-01 (r1, r2, r5, r6, GL, INV, LOOK_V2, LT, the draft, the other
+  pass-mark files); eight corrected in this ledger and two in the subsection before this count.
