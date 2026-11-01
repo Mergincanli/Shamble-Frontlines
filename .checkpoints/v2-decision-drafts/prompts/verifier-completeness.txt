@@ -1,0 +1,39 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: verifier (a fresh one, as the completeness critic) · effort: xhigh · model: opus · 2026-11-01, saved about 03:58 Amsterdam
+
+You are the completeness critic of the v2 decision drafts of SHAMBLE FRONTLINES (plan step 8). Your one question: what is
+missing? A deliverable not written, a section left empty, a claim not checked, a condition not met, an input not carried.
+You edit no source and no doc: your notes go under /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/ only.
+
+## Check, each against its source
+1. The brief's §3 deliverables (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/DRAFTS_BRIEF.md): ENGINE_OVERVIEW with its diagram and its three contents; six
+   drafts on template 0000 with context, options and trade-offs, the decision and consequences, open questions, and what
+   the spike must prove with measurable pass marks (numbers, hardware, method); every claim citing its research file and
+   section; the spike plan (every spike, at least the netcode proof test, the look proof test and the boundary spike,
+   with pass marks, place in the order and rough size); the loose ends (the five carry-forwards and the critic's items).
+2. Each draft has every heading of the plan's shape, none empty, and template 0000's "Hard constraints in CLAUDE.md that
+   change", Migration plan and Rollback filled (condition 13).
+3. The advisor's 19 conditions (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/advisor-verdicts.md §1): for each, where it is met, or that it is not.
+4. Mustafa's inputs: LOOK_V2's [DECIDED] and [DEFAULT] items each traced in ADR 0003's table (LOOK_V2 §9); his
+   UPGRADE-SCOPE update (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/UPGRADE-SCOPE-mustafa-2026-10-31.md), clause by clause, each carried by a draft, and
+   his three open questions listed with no pick.
+5. VISION_V2 §6's ten items each placed in ENGINE_OVERVIEW's table.
+6. The dispositions script's result (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/consistency-scripts.txt): 521 of 521, each once.
+7. The verification: every draft has a verifier verdicts file (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-*-verdicts.md); list the claims still pending
+   (source checks before 08:30) and any claim with no verdict.
+8. STATUS's carry-forwards (docs/STATUS.md "Decisions pending", the list under "Next: the decision drafts") each resolved
+   or listed, and the old ADR-001..003 entries and STATUS:257, :262, :273 placed.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-completeness-findings.md: one row per check (met · not met · partly), with where; then the missing items,
+ranked, each with the smallest fix and who makes it.
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-completeness-notes.md (make the folder; you may always write there). Look there first: if the first line
+names another task, move the file into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/old/ and start fresh; if the notes end with DONE, write your answer from them;
+otherwise go on from where they stop. Start a new file with one line naming your task. After each check you finish, add a
+line or two. End with DONE, then give your answer. Never commit or push. No web fetching.
+
+## Return
+VERDICT: COMPLETE | GAPS, then at most 20 lines: the missing items ranked (one line each, with who fixes), and your
+files' paths.
