@@ -16,3 +16,4 @@ Task: test-engineer pass marks of ADR 0001 (multiplayer and netcode) for the v2 
 - Next: write the md file.
 - WROTE test-engineer-passmarks-0001.md (56 marks, failure rule, no-mark lines, 15-step Brave checklist, spike entry). Next: verify row structure (pipes per row), a few line cites (R1-TICK-REC5 measure 2110-2112, R6-OBS-REC2 745-747, GLOSSARY stress-scene scale steps 401-403, draft lines cited), then the claims ledger.
 - Cite check: 151 ids, 0 missing, 0 range problems after fixes (R1-TICK-REC5 2111-2112; R6-OBS-REC2 741-742; R5-GATE-REC3 1706-1728). Next: claims ledger.
+- WROTE test-engineer-passmarks-0001-claims.md (TE1-TE249). Next: count tiers by script, verify a few ledger line cites (draft lines 846-855, 1005-1029, 1056-1066, 476-495, 815-816; map 1094-1095; 0006 598-611, 756-760), then DONE.

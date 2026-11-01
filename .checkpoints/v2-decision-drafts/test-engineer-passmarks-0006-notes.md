@@ -12,3 +12,8 @@ Task: test-engineer pass marks for ADR 0006 (infrastructure and operations), v2 
 - WROTE test-engineer-passmarks-0006.md (31 marks PM-1..31, failure rule, no-mark lines, hosting checklist 8 steps, operations checklist 2 steps, spike entries x3). Line cites fixed (r6:615, 741-744, A-1 r6:515, R5-TEST-F6 443-448); PM-15 wss note made self-contained (R2-ROOM-F12). Next: line-wrap check, then claims ledger.
 - Fixes applied to PM-7 wording, PM-2 GLOSSARY lines, PM-13 bite (20 % busy-wait in one room's tick), PM-22 triggers (presence-only for untriggered counters), PM-23 control, PM-24 labels.
 - Checklist ordering note (steps 5-8 after PM-6's 24 h reading) and 0001 cross-ref (R2-TRN-REC5 m1/m3 = PM-25/27) added. Pass-marks file DONE. Next: claims ledger test-engineer-passmarks-0006-claims.md.
+- WROTE claims ledger (226 rows draft); computing counts.
+- Ledger counts written: 226 rows; rv 26, stc 21, arith 11, settled 54, design 1, proposed 113 (R6 21, R5 12, R2 1, R3 1, draft 2, TE 76). Next: glossary retired-phrase check on both files, cross-check every PM's cites appear in ledger, then DONE.
+- Checks run: 31 PM rows, 7 columns each; ledger 226 rows TE1-TE226 in order, 5 columns each; no GLOSSARY "Retire (exact)" phrase and no "headroom" in the subsection ("access policy" only as the setting's name). Nothing committed.
+- Return written from the FINDINGS line above.
+DONE

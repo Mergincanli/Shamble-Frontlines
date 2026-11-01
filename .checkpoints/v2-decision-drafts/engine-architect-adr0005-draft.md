@@ -80,7 +80,7 @@ its options and no pick. Four sections by three authors carry the detail; this f
   session), which `docs/SPIKE_PLAN.md` places before the asset spike.
 - **GLOSSARY §8:** [the foundation](../research/GLOSSARY.md#the-foundation) includes "TypeScript types generated from
   the Rust code"; [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) runs before the foundation
-  (SLICE-ORDER, condition 3) and needs nothing from this record.
+  (SLICE-ORDER, condition 3); it is throwaway and needs none of this record's machinery.
 - **No design here** (the advisor's condition 11, 2026-10-31: escalation category 2): this record designs no upgrade,
   ability, unit or rule. It shows that the engine can carry Mustafa's answers and lists what his rules leave open.
 
@@ -1920,7 +1920,8 @@ The legacy game stays playable in `legacy/` at every step (ADR 0002); v2 is play
 SLICE-ORDER and the "Done when" lines are proposed (reason: each names the spike items that test what its slice brings,
 run again on the real crate; slice 1's list is the content data section author's, with the map migration item moved to
 slice 2, where the maps migrate).
-1. **The netcode proof test** runs first and needs nothing from this record.
+1. **The netcode proof test** runs first; it needs none of this record's machinery (the cue-once check it carries for
+   R1-ABL-OQ3 is ADR 0001's mark).
 2. **The foundation:** the `content` crate's place in the workspace; the generated schema and types in
    `packages/types`, diffed by the gate (CD-3; ADR 0002's milestone); the dependency check that keeps glTF readers out
    of `sim` and `server` (AP-1).

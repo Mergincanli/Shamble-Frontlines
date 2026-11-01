@@ -80,7 +80,7 @@ its options and no pick. Four sections by three authors carry the detail; this f
   session), which `docs/SPIKE_PLAN.md` places before the asset spike.
 - **GLOSSARY §8:** [the foundation](../research/GLOSSARY.md#the-foundation) includes "TypeScript types generated from
   the Rust code"; [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) runs before the foundation
-  (SLICE-ORDER, condition 3) and needs nothing from this record.
+  (SLICE-ORDER, condition 3); it is throwaway and needs none of this record's machinery.
 - **No design here** (the advisor's condition 11, 2026-10-31: escalation category 2): this record designs no upgrade,
   ability, unit or rule. It shows that the engine can carry Mustafa's answers and lists what his rules leave open.
 

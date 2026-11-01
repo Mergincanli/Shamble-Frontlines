@@ -4,9 +4,12 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 03:58 Amsterdam
+- **Last update:** 2026-11-01 04:19 Amsterdam
 
 ## Steps done
+(Earlier steps below; the run of 2026-11-01:)
+- 5bdad85 · ADR 0006 assembled (infra-engineer's draft + test-engineer's PM-0006-1..31), write guard PASS.
+- 2a0e5f6 · ADR 0003 assembled (graphics-engineer's draft + PM-0003-1..43), write guard PASS.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
@@ -22,10 +25,11 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
-The scheduled run (2026-11-01 03:55–11:00, Mustafa's one-off exception) started 03:55; the branch matched (b8ce07c).
-Wave A running since about 03:57: ADR 0005's frame (engine-architect), pass marks for 0001, 0002, 0004, 0006
-(test-engineer ×4). Prepared: `prompts/engine-architect-synthesis.txt`; `scripts/dispositions.py` now counts only the
-README's "Design questions (DESIGN-owned research ids)" table and SPIKE_PLAN's "Research dispositions" section.
+The run (03:55–11:00). Done since 03:55: ADR 0005's frame (engine-architect; record 2,059 lines, the four sections byte
+for byte, 34 open questions, ledger 135 rows; `engine-architect-adr0005-frame-parts/build_draft.py` rebuilds it after
+section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assembled (5bdad85) and ADR 0003 assembled
+(2a0e5f6) into docs/adr/. Running: pass marks for 0001, 0002, 0004, 0005 (test-engineer), verifier for 0006 (research
+checks; source checks pending until 08:30).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -86,6 +90,24 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   proposed; OQ-0005-CD4), so ADR 0001's `ContentReload` message and ADR 0004 part 16 ("a development reload swaps them
   between ticks") hold only under the mid-match option: consistency pass. Legacy rows ED5 and ED7 (Character Lab, Anim
   Lab) are listed by no draft. Its "For the frame" carries the record-level parts.
+- Write guard: condition 1's `cmp - <(head -n 742 GLOSSARY.md)` fails on an unchanged file, because the base GLOSSARY ends
+  without a final newline (742 newlines, then an unterminated last line); `scripts/write_guard.sh` checks the exact
+  intent instead (the base file is a byte prefix of today's), so §8 can be appended and nothing above it may change.
+  Report it as a deviation in form, not in intent.
+- Pass marks 0006 (test-engineer), for the 0006 author's fix round: PREV-DELETE's "or the remaining case is written
+  down" cannot fail (read it as a fail with its reason); with the access policy on, leftover links pass trivially (run
+  with the policy off); Pages has a branch link plus one per deployment (all checked); the `wss` fallback cannot use the
+  pinned self-signed certificate (the WebSocket constructor takes no hashes, R2-ROOM-F12); "nothing else" in the
+  firewall leaves no admin or deploy path; rooms per VM on the throwaway sim stands for the real one only if its tick
+  costs at least as much; the egress mark's reference must be recomputed from the counts run (no vehicles: 112.3 vs
+  146.1 kbps); "under 5 EUR" is 36 CCX23-hours; the CX33 start-up under 2 s restored; "with interest on" needs the
+  filter in the proof test's sim; the access-wall login check's place differs between the map and the draft.
+- ADR 0005's frame (engine-architect): sections disagree on model ids and faction colours in sim definitions (AP-2 and
+  CD-13 vs CD-6, AB-3/AB-4 and inventory row CD13): OQ-0005-1, the frame leans to client definitions keyed by the same
+  id; CD-6 "a weapon definition is a weapon type" pre-empts OQ-0005-AB4 (b): OQ-0005-2; frame-only OQ-0005-3 (what the
+  content hash covers) and OQ-0005-4 (Character Lab and Anim Lab, rows ED5 and ED7); AB5 says "ADR 0006 cites this", 0006
+  does not; the author line follows the brief (0002 also credits test-engineer: align at assembly); spike item 4 (map
+  migration) moved to slice 2.
 - ADR 0002 (engine-architect): its ledger adds two tiers outside the plan's six ("cross-draft" 18, "inventory" 10; the
   verifier may fold them); ids its author thinks belong elsewhere: R5-TEST-OQ3 (DESIGN), R5-TEST-OQ2 (0001), R5-PREV-OQ5
   and OQ6 (0006); judgement calls marked: the `room` and `navbake` crates, the multiplayer-preview delivery shape, the
