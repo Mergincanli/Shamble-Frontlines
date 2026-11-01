@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 14:04 Amsterdam
+- **Last update:** 2026-11-01 14:05 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -70,7 +70,9 @@ skeptics' outcomes), format `prompts/fix-round-2-TEMPLATE.txt` (FIX blocks with 
 Advisor): sent to netcode-architect (0001) and graphics-engineer (0003 + 0005 GPU) about 14:11; saved for rust-reviewer
 (0004), engine-architect (0002), engine-architect (0005 frame + content), game-designer (0005 abilities), engine-architect
 (synthesis): `prompts/fix2-*.txt`, sent as slots free. test-engineer's pass-mark round (running) also gets the critic's
-F3 (0001 rows: two decimals), F7 (0004 rows) and F13 rows as a follow-up.
+F3 (0001 rows: two decimals), F7 (0004 rows) and F13 rows as a follow-up. The third skeptic done: G10, A246, row 33,
+row 54 upheld, row 37 partly (its texts in `verifier-skeptic-3-results.md`; the roof fade stays in the register as
+"LOOK_V2 §4, beside §6.2"). rust-reviewer's second round sent about 14:13.
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.

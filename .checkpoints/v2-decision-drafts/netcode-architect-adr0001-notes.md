@@ -52,3 +52,4 @@ DONE
 - Not edited (test-engineer's text): the PM section's list at doc:1184 does not name OQ-0001-14 (an Advisor ruling, no mark needed).
 DONE
 - Fix round 2 (consistency findings) started 14:04 Amsterdam; output netcode-architect-fixes-2.md.
+- Located all texts (F1 489; F2 386-387; F3 126, 145-148, 528-531, 975; F8 337-338, 955-956; F10 25, 97, 1487; F13 230, 44; F14 994, 845). Writing fixes-2 via script.
