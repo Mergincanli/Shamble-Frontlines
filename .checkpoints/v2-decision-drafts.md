@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:16 Amsterdam
+- **Last update:** 2026-11-01 09:17 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,7 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- 80a27b3 · ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md, GLOSSARY §8 (synthesis); 521/521 ids disposed.
 - 549490f · docs-keeper: STATUS, ROADMAP, REPO_MAP.
 - cf00def · the pass-mark files' cut marker removed from all six drafts (verifier 0006 finding 3); assemble.py fixed.
 - 233f6f7 · ADR 0005 assembled (engine-architect's frame with the four sections byte for byte + PM-0005-1..46), write
@@ -60,8 +61,12 @@ Vite reload plugin not in 0002; 42 fetches, 39 read, github.com 403 in this sess
 (engine-architect, launched about 09:03; documents due by 10:05), verifiers 0003 (launched about 09:08) and 0005
 (about 09:10), the skeptic for twelve findings of 0001, 0004, 0006 (launched about 09:14; `prompts/verifier-skeptic-1.txt`),
 docs-keeper done about 09:18: STATUS, ROADMAP, REPO_MAP (549490f); the repo-map check passes once the overview, the
-spike plan, the drafts' README and the report exist (its four "not in the repository" lines). The synthesis wrote its
-five files by 09:14 (overview 133 lines, spike plan 385, README 337, GLOSSARY §8 80) and is checking them. Waiting: the synthesis' verifier, the skeptic for 0002,
+spike plan, the drafts' README and the report exist (its four "not in the repository" lines). The synthesis done:
+ENGINE_OVERVIEW (133 lines), SPIKE_PLAN, docs/adr/README.md copied verbatim, GLOSSARY §8 appended after the base's
+unterminated last line (80a27b3); dispositions.py: 521 of 521, each once; repo-map check: only the report missing.
+The synthesis listed 14 cross-draft disagreements (its notes, "For the consistency pass"). Running (5): verifiers 0003,
+0005, the synthesis' verifier (about 09:18), the skeptic for 0001/0004/0006, the consistency critic (about 09:18).
+Waiting: the synthesis' verifier, the skeptic for 0002,
 0003, 0005's findings, the fix round, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
