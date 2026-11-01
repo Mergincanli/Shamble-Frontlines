@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
 
 This record decides how everything the game runs on is written down as data and checked: units, vehicles, weapons,
 abilities, effects, Mustafa's in-match upgrade tracks, modes, maps, rule tables, the feel kit and the list of 3D
@@ -90,8 +90,8 @@ Four sections by three authors, placed below verbatim (decision map, part j, J4;
 (engine-architect) and "The asset pipeline: GPU rules" (graphics-engineer). Each section keeps its own context,
 options, trade-offs, open questions and spike part. This frame adds the joined decision, the options that cross
 sections, the consequences, every open question in one list, the joined spike, migration, test and rollback plans, and
-one Appendix A. Where two sections disagree, the frame says so (OQ-0005-1, OQ-0005-2) and each author fixes its own
-text in the fix round.
+one Appendix A. Where two sections disagreed, the frame asks the question (OQ-0005-1, OQ-0005-2); after the fix
+round no section answers either, and each points to it.
 
 ### Where this record sits among the drafts
 It defines the content every other draft reads (decision map, part d): typed definitions read by id (I-1; ADR 0004
@@ -235,9 +235,8 @@ code" (GLOSSARY §8, brief §2).
 - The starting values already exist as JSON with provenance: `docs/legacy-tuning.json` has 60 tables, each with its
   `where` (file:line) and a group (gameplay, simulation, progression, look or state) (lines 1583–1586).
 - Dead tuning looks live: keys that no code reads sit in CD4, CD6, CD7, CD10, CD12 and CD14 (lines 1594–1597).
-- Unchecked merges: `rulesMerge` and `envMerge` take any key, `__proto__` included (GW2, GE1; the STATUS item
-  SEC-MDL-2, `docs/STATUS.md` line 257), and the editor's `RULES_SCHEMA` limits bind only its sliders, never a load
-  (lines 1603–1607).
+- Unchecked merges: `rulesMerge` and `envMerge` take any key, `__proto__` included (GW2, GE1; STATUS, SEC-MDL-2), and
+  the editor's `RULES_SCHEMA` limits bind only its sliders, never a load (lines 1603–1607).
 - Versions and fallbacks: the v1 map save writes `version:1` that nothing reads, rounds positions to 0.1 m and has no
   ids (GW12, lines 1610–1612); a missing objective falls back silently to DM_Cabana's (GE11, CM1, lines 1613–1615); a
   failed save falls back to memory without a word, and there is no import (ED13, lines 1616–1618); a missing gun key
@@ -343,9 +342,11 @@ map document is content data under EDITOR_V2 §2's rules.
     when the sim takes a content set, reporting each rounding (R1-TICK-REC1, r1, lines 2012–2013; ADR 0004, part 4).
     The tick rate is never content: it is a build-time constant, so no reload can change it. This answers R1-XU-OQ10
     (r1, lines 2895–2898), as ADR 0004's part 4 expects.
-  - Weapons and units: a weapon definition is a weapon type and names its upgrade track, so progress belongs to the
-    type, not to the gun; a unit definition names its class's own weapons (the ability section, AB-4; UPGRADE-SCOPE).
-    This section adds no field to either; it holds them in the same format, files and checks as every other kind.
+  - Weapons and units: a weapon definition names its upgrade track, and progress belongs to the weapon type, not to
+    the gun (UPGRADE-SCOPE); whether each weapon definition is its own type or several definitions share one track is
+    OQ-0005-AB4, and this section takes no side (OQ-0005-2). A unit definition names its class's own weapons (the
+    ability section, AB-4). This section adds no field to either; it holds them in the same format, files and checks as
+    every other kind.
   - Top speed: each unit definition carries one top speed per unit type (metres per second), a validated field that
     ADR 0001 (velocity bounds, the interest margin) and ADR 0004 (movement) read, in place of the three figures R2's
     units derived from the legacy tables: about 9.0, about 10.2 and at most about 13.3 m/s (r2, Open questions,
@@ -452,14 +453,16 @@ map document is content data under EDITOR_V2 §2's rules.
     gap G11.
   - Need: VISION_V2 §6.6, §6.8.
 - **CD-13. Faction content (VISION_V2 §6.7).**
-  - What: a faction is a definition (AB-4) that names its units, vehicles and colours. The three T1 classes are written
-    once and shared by every faction (LOOP_V2 §5); a faction differs through its own definitions and its uniforms. Its
+  - What: a faction is a definition (AB-4) that names its units and vehicles. The three T1 classes are written once
+    and shared by every faction (LOOP_V2 §5); a faction differs through its own definitions and its uniforms. Its
     soldiers are dressed by (faction, class) as data (CC6's note, `docs/LEGACY_INVENTORY.md` line 136), its uniform
     models are assets named by id (AP-2), and its colours reach the assets' faction colour slots (AP-3; the GPU
-    section's part 2). A faction variant is a full definition of its own that references shared definitions by id
-    (proposed: no `extends` and no merge, so the merge rules SEC-MDL-2 came from do not return); whether variants may
-    override a base definition is OQ-0005-CD5, for the faction design session. Team colours never change (VISION_V2
-    §5); their values are ADR 0003's look tuning.
+    section's part 2). Where its colours and model ids sit is OQ-0005-1: proposed, pending it, in a client definition
+    keyed by the faction's id, as the feel kit is keyed by the weapon's (CD-14), so the faction's simulation definition
+    holds no presentation field. A faction variant is a full definition of its own that references shared definitions
+    by id (proposed: no `extends` and no merge, so the merge rules SEC-MDL-2 came from do not return); whether variants
+    may override a base definition is OQ-0005-CD5, for the faction design session. Team colours never change
+    (VISION_V2 §5); their values are ADR 0003's look tuning.
   - Why: §6.7 asks for per-faction units, uniforms and variants as data; E1's ids let a variant reuse shared parts
     without copying them (the ability section, AB-4).
   - Research: R1-DATA-OQ6 (r1, lines 2804–2806); R1-ABL-REC5 (option E1); R3-CHAR-REC1's per-instance colour serves
@@ -566,9 +569,10 @@ YAML is not an option: the serde YAML crate is archived (F14).
   a second writer; validators B and C add a second verdict or none.
 - **The strongest argument against:** no shipped-game source backs this unit (r1, lines 1577–1579), so it rests on
   documentation and legacy lessons. JSON has no comments (OQ-0005-CD1). Exact floats double float-parse time (F6).
-  serde_json, garde and regex enlarge the Worker's Wasm, which has no budget yet (R1-RR-OQ5, r1, lines 2946–2950,
-  ADR 0002's), and garde on wasm32 is unread (R1-DATA-OQ5). The content and ability spike measures load time and size
-  before acceptance (OQ-0005-CD2), and option D stays the way out.
+  serde_json, garde and regex enlarge the Worker's Wasm, which has no size limit yet (R1-RR-OQ5, r1, lines 2946–2950;
+  the one `sim-wasm` budget is ADR 0002's, part 4), and garde on wasm32 is unread (R1-DATA-OQ5). The content and
+  ability spike measures load time and the content crate's share of the size before acceptance (OQ-0005-CD2), and
+  option D stays the way out.
 - **Reload:** the proposal gives up mid-match swaps of simulation numbers (REC5's marks 2 and 3) for a smaller
   engine: no reload message, no rules for what may change mid-match, no on-the-spot re-bake. The cost is tuning speed:
   a damage change is seen in the next match, not the current one. The Feel Lab, which LOOP_V2 §7 decided, stays live.
@@ -586,15 +590,19 @@ YAML is not an option: the serde YAML crate is archived (F14).
     (b) JSONC or JSON5 for hand-edited files (not researched).
   - Decider: Mustafa, after a short trial in the content and ability spike. What decides it: how much tuning he edits
     as raw files rather than in the editor and the Feel Lab. Research ids: R1-DATA-OQ1 (r1, lines 2788–2790).
-- **OQ-0005-CD2. What load time and Wasm size may content cost, and is JSON fast and small enough?**
+- **OQ-0005-CD2. What load time may content cost, how much of the Wasm file is content's, and is JSON fast and small
+  enough?**
   - Why it matters: the research sets no number for either ("against a budget the ADR sets (no number is sourced
-    yet)", r1, lines 2497–2498), and the Worker's Wasm has no size budget (R1-RR-OQ5).
-  - Options: (a) JSON at run time, with budgets set from the spike's measurement (proposed, as ADR 0002 sets the Wasm
-    size budget from its measurement); (b) a binary runtime format compiled from the same JSON (postcard or bincode,
-    not read), only if (a) misses its budgets.
-  - Decider: the content and ability spike's measurement, then the Advisor sets the budgets. What decides it: the
-    measured native and Wasm load times of a content set the size of the imported legacy tables plus two maps and two
-    modes, and the size serde_json and garde add to the Wasm module. Research ids: R1-DATA-OQ2 (lines 2791–2794).
+    yet)", r1, lines 2497–2498), and the Worker's Wasm file (`sim-wasm`, which holds the `content` crate) has one size
+    budget, ADR 0002's (part 4; R1-RR-OQ5), whose first limit waits for this spike's measurement of content's share.
+  - Options: (a) JSON at run time, with a load-time budget set from the spike's measurement and content's size share
+    an input to ADR 0002's one `sim-wasm` budget (proposed); (b) a binary runtime format compiled from the same JSON
+    (postcard or bincode, not read), only if (a) misses its load-time budget or the size limit ADR 0002 sets.
+  - Decider: for load time, the content and ability spike's measurement, then the Advisor sets the budget; for size,
+    ADR 0002 part 4: the Advisor sets the first `sim-wasm` limit from the boundary and sim core spikes' measurements and
+    this spike's content share, and until then the size is recorded, not gated. What decides it: the measured native
+    and Wasm load times of a content set the size of the imported legacy tables plus two maps and two modes, and the
+    size serde_json and garde add to the Wasm module. Research ids: R1-DATA-OQ2 (lines 2791–2794).
 - **OQ-0005-CD3. May production ever change numbers in the middle of a match?**
   - Why it matters: live changes help balance, but a match whose rules change mid-way is harder to compare and to keep
     fair (§6.6; r1, lines 1871–1872).
@@ -693,7 +701,8 @@ the research lacks is marked proposed, with its reason. The test-engineer writes
 9. **OQ-0005-CD2's numbers** (R1-DATA-REC1 mark 2, lines 2496–2498): loading a content set the size of the imported
    legacy tables plus two maps and two modes, on the native server, takes a time the spike reports. Proposed (reason:
    the client loads the same set in its Worker, and R1-RR-OQ5 asks for the size): the same load timed in Wasm in the
-   Worker, and the size serde_json and garde add to the Wasm module recorded; the budgets are set from these numbers.
+   Worker, and the size serde_json and garde add to the Wasm module recorded; the load-time budget is set from these
+   numbers, and the size is content's share in ADR 0002's one `sim-wasm` budget (part 4).
 10. **Mode files** (R2-ROOM-REC7's mark, r2, lines 2864–2867, ADR 0001's): stated there; this crate supplies the load
     and the rejections.
 
@@ -1364,13 +1373,15 @@ carries a procedural kit spec and an authored asset side by side until it is ans
   - Need: VISION_V2 §6.2 (one 3D simulation world) and §6.4 (multi-part vehicles); CLAUDE.md's "Animation is
     cosmetic … Nothing animated decides a hit" carries into v2 unchanged.
 - **AP-2. Definitions name assets by id; the asset list is content.**
-  - What: a unit, vehicle, weapon, faction uniform, building part or prop definition names its model by an asset id.
-    One asset list in the content set (client content, CD-6) holds for each asset: its id; its file name with its
-    hash; its material slots, each with its class (AP-3); its LOD levels, if it has any (the GPU section's part 5);
-    and its counts of triangles, materials and textures, which the budget check reads (AP-5). The loader's whole-set
-    checks (CD-2) refuse a reference to an asset the list does not hold, and a slot whose class is not in the class
-    list, naming the file and the field; nothing falls back to a default model. Who writes the list (the automated
-    step or a person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.
+  - What: each unit, vehicle, weapon, faction uniform, building part and prop names its model by an asset id. Where
+    that id sits is OQ-0005-1: proposed, pending it, in a client definition keyed by the simulation definition's id,
+    as the feel kit is (CD-14), so no simulation definition holds an asset id (CD-6); the map document holds its own
+    references either way (CD-11). One asset list in the content set (client content, CD-6) holds for each asset: its
+    id; its file name with its hash; its material slots, each with its class (AP-3); its LOD levels, if it has any (the
+    GPU section's part 5); and its counts of triangles, materials and textures, which the budget check reads (AP-5).
+    The loader's whole-set checks (CD-2) refuse a reference to an asset the list does not hold, and a slot whose class
+    is not in the class list, naming the file and the field; nothing falls back to a default model. Who writes the
+    list (the automated step or a person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.
   - Why: the same verdict for assets as for every other reference; CC9's silent fallback and CL14's unchecked tags
     are the legacy failures, and R1-DATA-REC2's cross-reference stage and R1-ABL-REC5's validated ids already remove
     them for every other kind.
@@ -1380,8 +1391,8 @@ carries a procedural kit spec and an authored asset side by side until it is ans
   - What: the classes the GPU section's part 2 names (for example environment, unit, faction colour, emissive), and
     the slot names that map to each, are one client-content table (CD-6), validated like all content and read by ADR
     0003 (interface I-8). Adding a class is a content change reviewed together with the ADR 0003 material it needs. A
-    faction's colours reach its faction colour slots from the faction definition (CD-13). The table says which slots
-    exist; how a class looks is ADR 0003's and Mustafa's (LOOK_V2).
+    faction's colours reach its faction colour slots from the faction's data (CD-13; where those colours sit is
+    OQ-0005-1). The table says which slots exist; how a class looks is ADR 0003's and Mustafa's (LOOK_V2).
   - Why: the GPU section makes the list "this ADR's content data"; one table keeps the asset side and the renderer on
     the same names.
   - Research: R1-DATA-REC1, REC2; the GPU section's part 2 (R3-CHAR-REC3, r3, lines 1065–1075).
@@ -1679,7 +1690,8 @@ refers to assets")
 | B. A pipeline per family: ability data in its own loader, models checked by the page when it loads a file | Medium: two or three loaders | each family's own tooling | each loader smaller | a reference across families (a unit's ability, a unit's model) is checked twice or by no one; R1's own warning: "two validators of one schema can disagree" (r1, line 1852) | a missing model shows on screen or falls back (CC9) | the legacy shape |
 
 - **A.** Pros: one verdict and one hash for everything a match runs on. Cons: one crate grows with every kind, and its
-  Wasm size is unbudgeted until the spike measures it (OQ-0005-CD2). **B.** Pros: smaller pieces. Cons: no check sees
+  Wasm size is recorded, not gated, until the spikes have measured it (ADR 0002 part 4; OQ-0005-CD2). **B.** Pros:
+  smaller pieces. Cons: no check sees
   the links between families, which is where legacy failed silently (CC9, CL14). The split per family is not
   researched beyond R1's option B.
 
@@ -1688,13 +1700,13 @@ fact CD12: "separate files, or separate sections, for what the simulation decide
 r1-simulation-core.md, Findings §6, lines 1600–1602)
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
 |---|---|---|---|---|---|---|
-| a. A presentation section in the simulation definition's own file, typed apart from the simulation part (how AP-2 and CD-13 read today) | Low: one file per unit | none | – | presentation only, if the sim's types leave the section out | a unit's numbers and its model in one file | close to legacy's mixed tables; CD13's note says "Avoid: bot-only fields mixed into the player class, and a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94) |
-| b. A client definition keyed by the simulation definition's id, as the feel kit is (AB-3, CD-14) | Low: one more file for each definition with a presentation side | files kept in step | – | presentation only; no simulation type holds a presentation field, so CD-6's split holds by kind | an art or feel change touches only client files | new; the feel kit already works this way |
+| a. A presentation section in the simulation definition's own file, typed apart from the simulation part (how AP-2 and CD-13 read before the fix round) | Low: one file per unit | none | – | presentation only, if the sim's types leave the section out | a unit's numbers and its model in one file | close to legacy's mixed tables; CD13's note says "Avoid: bot-only fields mixed into the player class, and a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94) |
+| **b. A client definition keyed by the simulation definition's id, as the feel kit is (AB-3, CD-14)** (proposed, pending OQ-0005-1) | Low: one more file for each definition with a presentation side | files kept in step | – | presentation only; no simulation type holds a presentation field, so CD-6's split holds by kind | an art or feel change touches only client files | new; the feel kit already works this way |
 
 - Both options apply R1-DATA-REC8's simulation and client groups (r1, lines 2596–2598). The map document holds both
-  sides in one document either way (EDITOR_V2 §2, rule 1). The frame leans to (b) for definitions, because the feel
-  kit already takes it and a weapon's presentation (feel kit, sockets, model) then sits in one place. The sections
-  disagree today, so this is OQ-0005-1, and each author fixes its own text in the fix round.
+  sides in one document either way (EDITOR_V2 §2, rule 1). Proposed: (b) for definitions, because the feel kit already
+  takes it and a weapon's presentation (feel kit, sockets, model) then sits in one place. The question stays open for
+  the Advisor as OQ-0005-1; AP-2, AP-3 and CD-13 state (b) as the proposal pending it and decide nothing.
 
 **Question F3: what the content hash covers** (r1-simulation-core.md, Recommendations §6, R1-DATA-REC6, lines
 2565–2575)
@@ -1708,7 +1720,8 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   is listed as OQ-0005-3.
 
 ## Trade-off analysis
-- **Why one model:** a unit names its weapons, abilities and track, and its model (AP-2); a faction names its units
+- **Why one model:** a unit names its weapons, abilities and track, and its model is named under the unit's id (AP-2;
+  where that reference sits is OQ-0005-1); a faction names its units
   and vehicles; an ability names its effects and tags; a track names its candidates. One content crate checks every one
   of those links at load, on the server, in the Worker and in the editor alike (CD-2, AB-4, AP-2), so the silent
   fallbacks and unchecked links legacy shipped (CC9, GE11, CL14) cannot return, and one hash names the numbers every match used (CD-8). The ability model, the upgrade tracks and the asset
@@ -1718,8 +1731,9 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   shipped-game source was read for the data unit (r1-simulation-core.md, lines 1577–1579); every GAS fact comes from
   one community write-up (R1-ABL-OQ1, r1, lines 2756–2758); and the research has nothing at all on the asset step (the
   asset sections' gap). One crate and one hash also tie three families together: an art change changes the hash every
-  match records (OQ-0005-3), and the Worker's Wasm carries the whole loader before any size budget exists (R1-RR-OQ5;
-  OQ-0005-CD2). The content and ability spike and the asset spike are where this is proven or refuted, and each
+  match records (OQ-0005-3), and the Worker's Wasm carries the whole loader before its one size budget has a first
+  limit (R1-RR-OQ5; ADR 0002 part 4; OQ-0005-CD2). The content and ability spike and the asset spike are where this is
+  proven or refuted, and each
   section names its way out (Rollback, below).
 - **Tracks on the ability system:** riding on the same model costs long-lived active effects per soldier, which the
   ability, effect and weapon step must absorb; the ability section proposes measuring the curve before any track
@@ -1742,7 +1756,7 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   a new match, not the current one (CD-7); two generators that must agree (CD-3); an asset list kept in step with the
   files (AP-2); every material slot named into a class (OQ-0005-AS4); two drawing paths for buildings and props until
   OQ-0005-AP2 is answered (AP-7).
-- **Revisit when:** the content and ability spike's load time or Wasm size misses its budget (OQ-0005-CD2, option
+- **Revisit when:** content's load time misses its budget, or the Wasm file the limit ADR 0002 sets (OQ-0005-CD2, option
   D), or garde fails on wasm32 (CD-2); the ability marks 1 or 2 fail (OQ-0005-AB13); track content exists (the stress scene's active effects
   per soldier restated with ADR 0004, AB-10); ABL-PREDICT is answered; Mustafa and the Advisor pick the mid-match swap
   (OQ-0005-CD4); the faction design session meets (OQ-0005-CD5); a shipped-game source on mid-match tuning becomes
@@ -1796,7 +1810,7 @@ no pick; where a section proposes an answer, the line says so.
 | OQ | The question, in one line | Decider | Where |
 |---|---|---|---|
 | OQ-0005-CD1 | Do hand-edited content files need comments? | Mustafa, after a trial in the content and ability spike | Content data |
-| OQ-0005-CD2 | What load time and Wasm size may content cost, and is JSON fast and small enough? | the content and ability spike measures; the Advisor sets the budgets | Content data |
+| OQ-0005-CD2 | What load time may content cost, how much of the Wasm file is content's, and is JSON fast and small enough? | load time: the content and ability spike measures, the Advisor sets the budget; size: ADR 0002 part 4's one `sim-wasm` budget, which takes content's share as an input | Content data |
 | OQ-0005-CD3 | May production ever change numbers in the middle of a match? (proposed: never) | Mustafa | Content data |
 | OQ-0005-CD4 | In development, do simulation numbers apply at the next match or inside a running match? (proposed: the next match) | Mustafa and the Advisor | Content data |
 | OQ-0005-CD5 | Faction variants: full definitions that reference shared ones, or overrides of a base? (proposed: full definitions) | the faction design session (Mustafa) | Content data |
@@ -1811,8 +1825,8 @@ no pick; where a section proposes an answer, the line says so.
 | OQ-0005-AB6 | How do the player's tracks sit beside the team's tech tiers? | Mustafa | The ability and effect system |
 | OQ-0005-AB7 | May a pick add raw power, or only change how a unit or weapon plays? | Mustafa | The ability and effect system |
 | OQ-0005-AB8 | The offer: when does it appear, and when can the player answer it? | Mustafa | The ability and effect system |
-| OQ-0005-AB9 | Which drop and pickup rules does UPGRADE-SCOPE leave unstated? (ADR 0004 asks the same as OQ-0004-5) | Mustafa | The ability and effect system |
-| OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? (ADR 0004 asks the same as OQ-0004-6) | Mustafa | The ability and effect system |
+| OQ-0005-AB9 | Which drop and pickup rules does UPGRADE-SCOPE leave unstated? (the one home of the drop and pickup questions; ADR 0004's OQ-0004-5 keeps only the tie mechanism) | Mustafa, with the game-designer | The ability and effect system |
+| OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? (the one home of these questions: ADR 0004's OQ-0004-6 moved here) | Mustafa | The ability and effect system |
 | OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa, after sims of each matchup | The ability and effect system |
 | OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (proposed: accept it) | the Advisor | The ability and effect system |
 | OQ-0005-AB13 | When does scripting (option A3) come back? (proposed: if the spike's ability mark 1 or 2 fails, or new operations are needed often; the talk is read when a copy appears) | the Advisor | The ability and effect system |
@@ -1825,8 +1839,8 @@ no pick; where a section proposes an answer, the line says so.
 | OQ-0005-AS4 | How are a model's materials renamed into the slot classes and faction colour slots? | the asset-pipeline research | The asset pipeline: GPU rules |
 | OQ-0005-AS5 | What are the per-unit budgets beyond the two derived caps? | the asset-pipeline research, then the render budget bench | The asset pipeline: GPU rules |
 | OQ-0005-AS6 | How many vertices and bones does the authored soldier have? | the model's author, then the render budget bench | The asset pipeline: GPU rules |
-| OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? | the Advisor, at the stop review, on the fix round's text | this frame |
-| OQ-0005-2 | Is a weapon definition the same thing as a weapon type? | Mustafa (through OQ-0005-AB4), then the fix round | this frame |
+| OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? (proposed: client definitions) | the Advisor, at the stop review | this frame |
+| OQ-0005-2 | Is a weapon definition the same thing as a weapon type? | Mustafa (through OQ-0005-AB4); open for the Advisor until then | this frame |
 | OQ-0005-3 | What does the content hash cover? | the Advisor | this frame |
 | OQ-0005-4 | What do the Character Lab and the Anim Lab work on once soldiers are authored models? | Mustafa with the Advisor | this frame |
 
@@ -1839,35 +1853,35 @@ The frame's own questions, in full:
 
 - **OQ-0005-1. Do presentation references sit on the simulation definitions, or in client definitions keyed by the
   same id?**
-  - The disagreement: AP-2 has "a unit, vehicle, weapon, faction uniform, building part or prop definition names its
-    model by an asset id", and CD-13 has a faction definition name "its units, vehicles and colours". CD-6 classes
-    units, vehicles, weapons and factions as simulation content, whose step "takes the simulation part by type, so a
-    presentation value cannot reach an outcome", and says of the weapon and unit definitions "This section adds no
-    field to either"; the ability section's unit kind names no model (AB-4), and its feel kit is "a separate client
-    definition keyed by the same id" (AB-3).
+  - The question: AP-2 has each unit, vehicle, weapon, faction uniform, building part and prop name its model by an
+    asset id, and CD-13 gives each faction its colours. CD-6 classes units, vehicles, weapons and factions as
+    simulation content, whose step "takes the simulation part by type, so a presentation value cannot reach an
+    outcome", and says of the weapon and unit definitions "This section adds no field to either"; the ability section's
+    unit kind names no model (AB-4), and its feel kit is "a separate client definition keyed by the same id" (AB-3).
+    Before the fix round AP-2 and CD-13 put these references on the simulation definitions; now AP-2, AP-3 and CD-13
+    state option (b) as a proposal pending this question and decide nothing.
   - Why it matters: it decides whether CD-6's split holds by kind or only by a rule about fields, and whether a
     weapon's presentation (feel kit, sockets, model) sits in one place or two. The legacy lesson points the same way:
     CD13's note says to avoid "a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94).
   - Options: (a) a presentation section in the definition's own file, typed apart from the simulation part; (b) a
     client definition keyed by the simulation definition's id, as the feel kit is (Options considered, Question F2,
     with their trade-offs). The map document keeps both sides in one document either way (EDITOR_V2 §2, rule 1).
-  - The frame's lean: (b) for definitions, for the reasons under Question F2.
-  - Decider: the Advisor, at the stop review, on the text the authors write in the fix round (engine-architect for
-    AP-2, AP-3, CD-6 and CD-13; the game-designer if AB-4's kinds change). What decides it: whether CD-6's split can
-    be checked by type alone. Research ids: none. Both options apply R1-DATA-REC8's groups (r1-simulation-core.md,
-    lines 2596–2598) and the legacy fact CD12 (r1-simulation-core.md, lines 1600–1602).
+  - Proposed: (b) for definitions, for the reasons under Question F2, pending this question.
+  - Decider: the Advisor, at the stop review (the game-designer changes AB-4's kinds if the answer needs it). What
+    decides it: whether CD-6's split can be checked by type alone. Research ids: none. Both options apply
+    R1-DATA-REC8's groups (r1-simulation-core.md, lines 2596–2598) and the legacy fact CD12 (r1-simulation-core.md,
+    lines 1600–1602).
 - **OQ-0005-2. Is a weapon definition the same thing as a weapon type?**
-  - The disagreement: CD-6 says "a weapon definition is a weapon type and names its upgrade track, so progress belongs
-    to the type, not to the gun". OQ-0005-AB4 leaves open which definitions share a track, and its option (b) lets
-    several definitions share one (the Luger in two classes; the variants of one weapon); CD-6's wording reads as
-    AB4's option (a) or (c).
-  - Why it matters: UPGRADE-SCOPE ties progress to "the weapon type", and ADR 0004 part 18 keys the player record's
-    tracks by "the type ids ADR 0005 defines"; if one type spans several definitions, the key is the track's id, not
-    the weapon's.
-  - Options: the answer follows OQ-0005-AB4. Under its (a) or (c), a definition is a type, as CD-6 says; under (b), a
-    track's id is the type, and CD-6 says only that a weapon definition names its track.
-  - Decider: Mustafa answers OQ-0005-AB4; the content data section's author aligns CD-6's wording in the fix round,
-    so that it leaves AB4 open. Research ids: none (UPGRADE-SCOPE).
+  - The question: UPGRADE-SCOPE ties progress to "the weapon type", and OQ-0005-AB4 leaves open which definitions
+    share a track; its option (b) lets several definitions share one (the Luger in two classes; the variants of one
+    weapon). Before the fix round CD-6 read "a weapon definition is a weapon type", which matched only AB4's option (a)
+    or (c); CD-6 now says only that a weapon definition names its upgrade track, and points to OQ-0005-AB4.
+  - Why it matters: ADR 0004 part 18 keys the player record's tracks by "the type ids ADR 0005 defines"; if one type
+    spans several definitions, the key is the track's id, not the weapon's.
+  - Options: the answer follows OQ-0005-AB4. Under its (a) or (c), a definition is a type; under (b), a track's id is
+    the type.
+  - Decider: Mustafa answers OQ-0005-AB4; the question stays open for the Advisor until then. Research ids: none
+    (UPGRADE-SCOPE).
 - **OQ-0005-3. What does the content hash cover?**
   - Why it matters: one hash covers simulation content, client content and the asset list (CD-6, CD-8, AP-4), and
     pick and win rates are grouped by it ("always grouped by content hash and mode id", because "pick and win rates are
@@ -1891,11 +1905,12 @@ The frame's own questions, in full:
   - Decider: Mustafa with the Advisor (EDITOR_V2 is theirs). What decides it: ADR 0003's look proof test, which shows
     the authored soldier. Research ids: none.
 
-For the consistency pass (plan step 8), three points where this record and another draft differ; the frame changes
-neither text: ADR 0004 part 16 says "a development reload swaps them between ticks, never inside one (R1-DATA-REC5,
-ADR 0005's)", while CD-7 proposes simulation numbers at the next match and keeps the swap as OQ-0005-CD4's option (b);
-OQ-0004-5 and OQ-0004-6 ask Mustafa what OQ-0005-AB9 and AB10 ask, so each is one question for him; OQ-0005-AB5 says
-"ADR 0006 cites this", and ADR 0006 part 12 does not name it yet.
+The consistency pass (plan step 8) settled the three points where this record and another draft differed: ADR 0004
+part 16 now changes definitions at a match boundary under CD-7 and swaps them between ticks only if OQ-0005-CD4
+chooses its option (b), and ADR 0001's `ContentReload` message carries the same condition; OQ-0005-AB9 and AB10 are
+the one home of the drop, pickup and bot-record questions, which ADR 0004 cites (its OQ-0004-5 keeps only the tie
+mechanism, and OQ-0004-6 moved here); and OQ-0005-AB5 now says why ADR 0006 does not cite it: ADR 0006 builds no account store, so the unlock
+catalogue's weapon question is asked only in this record.
 
 ## What a spike must prove
 Each section's spike part above stands as written. The test-engineer writes the pass marks below (plan step 4);
@@ -1936,8 +1951,10 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
   [the reference server](../research/GLOSSARY.md#the-reference-server) (a Hetzner CCX23, Linux, one EU location; GL
   lines 225–230), the bench process pinned to it, the VM otherwise idle. **ML**, the minimum laptop, and **RD**, the
   recommended desktop (R3-BUDGET-REC1, r3 lines 1096–1103; named by PM-0003-1); ML's Wasm marks run in Chrome and
-  Firefox on Windows 11, with mains power and the power mode recorded. **MAC**, a macOS machine with Safari 26, for
-  the marks that name Safari (real Safari through its WebDriver: R5-TEST-REC1's Safari row, r5 line 1394). **MP**,
+  Firefox on Windows 11, with mains power and the power mode recorded. **MAC**, SPIKE_PLAN's macOS machine: the
+  stable Safari on the day of the run, its version recorded (WebGPU from Safari 26.0, R3-WGPU-F19, r3 lines 171–174;
+  WebTransport from 26.4, R2-TRN-F7, r2 lines 959–975), for the marks that name Safari (real Safari through its
+  WebDriver: R5-TEST-REC1's Safari row, r5 line 1394). **MP**,
   Mustafa's PC (Windows) in Brave: only what he judges, never a budget result. **CI**, the gate v2's runners: counts,
   verdicts, hashes and byte comparisons, never a time (R5-TEST-REC1's benchmark row, r5 line 1400); a browser engine in
   CI means Playwright's Chromium, Firefox or WebKit, headless.
@@ -2000,7 +2017,7 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
 | **Precondition** | | | | | | |
 | PM-0005-1 | The machines and targets exist, and every result names them (a precondition of every spike here) | RS, ML, RD and MAC recorded as PM-0003-1 and PM-0004-1 name them; the CI engine versions (Node, Chromium, Firefox, WebKit) and the Rust toolchain recorded with every CI result | RS, ML, RD, MAC, CI | a results-log header per machine and per CI image, written before the first run; every later row names its machine, browser or engine, and commit | checked before each spike's first run | R3-BUDGET-REC1's mark (r3 lines 1114–1116); R6-HOST-REC2 (r6 lines 645–650); ADR 0004's PM-0004-1 |
 | **The content and ability spike: content data** | | | | | | |
-| PM-0005-2 | Every side reads the same numbers (CD-1; content item 1) | 100 % of doubles parse to the same 64-bit pattern in native Rust, in Rust on Wasm and in `JSON.parse` | CI (native, Wasm, `JSON.parse` in Node and the three engines); MAC: Safari 26 (`JSON.parse`) | the corpus: every number in `docs/legacy-tuning.json` (2,038, counted by script at 9e7db28) plus 10,000 generated doubles, 5,000 from uniform random 64-bit patterns with NaN and the infinities left out (JSON cannot carry them) and 5,000 decimals of up to 17 significant digits inside the legacy file's range (proposed: the first half reaches subnormals and extreme exponents, the second the values content holds), plus −0 and the largest and smallest finite doubles; each side writes each value's bits as 16 hex digits; a script compares | 1 run per target (exact). Bites: a parser that rounds through `f32` on one side | R1-DATA-REC1 mark 1 (lines 2494–2496); CD-1 |
+| PM-0005-2 | Every side reads the same numbers (CD-1; content item 1) | 100 % of doubles parse to the same 64-bit pattern in native Rust, in Rust on Wasm and in `JSON.parse` | CI (native, Wasm, `JSON.parse` in Node and the three engines); MAC: Safari (`JSON.parse`) | the corpus: every number in `docs/legacy-tuning.json` (2,038, counted by script at 9e7db28) plus 10,000 generated doubles, 5,000 from uniform random 64-bit patterns with NaN and the infinities left out (JSON cannot carry them) and 5,000 decimals of up to 17 significant digits inside the legacy file's range (proposed: the first half reaches subnormals and extreme exponents, the second the values content holds), plus −0 and the largest and smallest finite doubles; each side writes each value's bits as 16 hex digits; a script compares | 1 run per target (exact). Bites: a parser that rounds through `f32` on one side | R1-DATA-REC1 mark 1 (lines 2494–2496); CD-1 |
 | PM-0005-3 | One canonical writer, the same text everywhere (CD-1; content item 1) | 100 % of the PM-0005-2 corpus written back as the same text as its input (the research's mark); the canonical writer's output byte-identical on native and Wasm, and idempotent (write, parse, write gives the same bytes and the same bits); an integer above 2^53 (9,007,199,254,740,993) in a content file refused at load with the file and field named | CI | the writer of CD-1 run over the corpus on every target; byte comparison by script. Recorded: every number whose canonical text differs from `JSON.stringify`'s text for the same double (not researched: the two writers' number formats may differ for integral doubles and exponent forms, which would fail the research's mark as written; if any TypeScript code writes content, it must give the canonical text or write through the Wasm writer) | 1 run per target. Bites: a writer that prints 15 significant digits; a planted 2^53 + 1 in a weapon file | R1-DATA-REC1 mark 1 (lines 2494–2496) and "no finding" (lines 2491–2492); CD-1 ("Content integers stay within the range a double holds exactly") |
 | PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2 |
 | PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound | 1 run. Bites: a `Vec` field added without a bound | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
@@ -2021,7 +2038,7 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
 | PM-0005-19 | A new combination needs data only (AB-1, AB-7; ability item 1) | a test-only definition putting the Riot Shield's block on a vehicle and the Banzai speed buff on another class loads and behaves as its parts: the vehicle takes 30 % of an SMG hit inside the block's arc and 100 % behind it; the class moves at 1.3 × its speed for 10 s, then at 1 ×; the change set that adds it touches only content files (0 Rust changes) | CI | the combination's files; `git diff --name-only` of its commit; a scripted fixture (hits from inside and outside the arc, cos 0.30; speed sampled every tick) | 1 run. Bites: a block keyed to the Peacekeeper's unit id | R1-ABL-REC1 mark 2 (lines 2369–2371); legacy numbers: block 0.7, arc cos 0.30, ×1.3 for 10 s (r1 line 1373; INV CD8, line 89) |
 | PM-0005-20 | The two §6.4 primitives work (AB-1, AB-6; ability item 1) | an effect removed when its source dies, on the tick the death is processed, in 1,000 of 1,000 scripted deaths; a trigger on the last hit, and on the last periodic tick, moves the victim's item (a granted ability) to the source in 1,000 of 1,000 scripted kills, with two kills of one victim in one tick resolved by the stable order the same way on native and Wasm (proposed counts and tie case) | CI | a fixture with test-only definitions (the item and the leech rules stay undesigned, `[LATER]`) | 1 run per target. Bites: removal one tick late; a periodic-tick kill not firing the trigger | R1-ABL-REC1 mark 3 (lines 2372–2376); R1-ABL-REC3's stable order (lines 2406–2409) |
 | PM-0005-21 | One number changed in data changes the next match (AB-1; ability item 1, last clause; shares PM-0005-10's run) | after the Shabzon's damage is saved as 9: 0 Rust changes; in the running match a hit deals 8; in the next match a hit deals 9, and a Conscript (100 HP) dies on the 12th body hit instead of the 13th (9 × 12 = 108 ≥ 100; 8 × 12 = 96 < 100) | CI (the counts); ML (the run of PM-0005-10) | PM-0005-10's run; the hit counts from the sim's events | as PM-0005-10. Bites: as PM-0005-10 | R1-ABL-REC1 mark 4 (lines 2377–2378); legacy Shabzon damage 8, Conscript HP 100 (`docs/legacy-tuning.json`, `WEAPONS`, `UNIT_TYPES`) |
-| PM-0005-22 | Weapons as data equal the legacy tables (AB-2, AB-3; ability item 2) | for the seven legacy weapons and the Juggernaut cannon: damage per body part (head 2.6, body 1.0, legs 0.65; Bagpipe head 1.2), the Shabzon's falloff at 10, 15, 25, 35 and 50 m against legacy's `falloffMult`, pellet count, magazine, reload and burst: integer results exactly, floating-point results within 1e-6 relative; timing fields compared as stored values (the loader's converted duration in seconds within the rounding it reports, PM-0004-11) and as behaviour (each shot within one tick, 33.3 ms, of the table's time) (proposed reading: on a 30 Hz tick no shot can land on a 0.06 s instant, so 1e-6 applies to stored values only); a bot and a human firing one definition from the same inputs give identical results (whether v2 keeps one model is Mustafa's, R1-ABL-OQ6) | CI | golden fixtures captured from the legacy oracle (`tools/preview.js legacy eval`), each with the legacy commit, the inventory row and the inputs; v2's tests read them | 1 run; joins the gate. Bites: a v2 value moved beyond its tolerance (R5-TEST-REC3's mark); the legacy reset-not-carry timer (GC5) | R1-ABL-REC2's mark (lines 2396–2400); R5-TEST-REC3 (r5 lines 1431–1453); INV CS7, CD8 (lines 175, 89) |
+| PM-0005-22 | Weapons as data equal the legacy tables (AB-2, AB-3; ability item 2) | for the seven legacy weapons and the Juggernaut cannon: damage per body part (head 2.6, body 1.0, legs 0.65; Bagpipe head 1.2), the Shabzon's falloff at 10, 15, 25, 35 and 50 m against legacy's `falloffMult`, pellet count, magazine, reload and burst: integer results exactly, floating-point results within 1e-6 relative; timing fields compared as stored values (the loader's converted duration in seconds within the rounding it reports, PM-0004-11) and as behaviour (each shot within one tick, 33.33 ms, of the table's time) (proposed reading: on a 30 Hz tick no shot can land on a 0.06 s instant, so 1e-6 applies to stored values only); a bot and a human firing one definition from the same inputs give identical results (whether v2 keeps one model is Mustafa's, R1-ABL-OQ6) | CI | golden fixtures captured from the legacy oracle (`tools/preview.js legacy eval`), each with the legacy commit, the inventory row and the inputs; v2's tests read them | 1 run; joins the gate. Bites: a v2 value moved beyond its tolerance (R5-TEST-REC3's mark); the legacy reset-not-carry timer (GC5) | R1-ABL-REC2's mark (lines 2396–2400); R5-TEST-REC3 (r5 lines 1431–1453); INV CS7, CD8 (lines 175, 89) |
 | PM-0005-23 | One table per kind, every link checked, fuzzed definitions never panic the sim (AB-4; ability item 3; shares C) | the legacy `WEAPONS`, `UNIT_TYPES`, `VEHICLE_TYPES` and ability fields convert with every legacy number mapped once or dropped with a reason (0 unmapped, 0 mapped twice: proposed reading, as CD-10 drops bot-only fields and colours); an unknown id, an unknown tag and an out-of-range value each fail at load with the file and field named, for every kind, track definitions included (a track naming an unknown effect fails); 0 panics when every definition of C that the loader accepts runs in a scripted 300-tick scenario (10 s at 30 Hz: proposed; the research's "never panic the simulation" is about running them, not loading them) | CI; CI nightly (the sim runs on fresh seeds) | the conversion report by script; C's accepted definitions each given to a unit or weapon in the scenario | 1 run (C's 10,000 files); nightly fresh seeds. Bites: a sim that indexes an array with a pellet count of 0; a planted dangling ability id | R1-ABL-REC5's mark (lines 2460–2463); AB-4 (proposed there: track definitions) |
 | PM-0005-24 | Tech tiers gate abilities and purchases (AB-5; ability item 4) | an ability press before the team's Tech 1, and a T2 purchase before Tech 2, refused by the authority in 1,000 of 1,000 scripted attempts each; the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed) | CI | scripted team state at Tech 0, 1 and 2; the authority's verdict log | 1 run. Bites: an ability with no tier tag | AB-5 (proposed there; LOOP_V2 §4 lines 50–52, `[DECIDED]`; INV GE4, line 290); the count 1,000 from R1-ABL-REC4 (line 2444) |
 | PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
@@ -2031,10 +2048,10 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
 | PM-0005-29 | u4: a lost gun's track waits for the next gun of its type (AB-8) | the player drops W and takes another W from the world: the player's W picks apply to it; a second player who takes the first gun gets their own W picks and none of the first player's; 1,000 of 1,000 scripted exchanges (proposed count) | CI | scripted drops and claims (ADR 0004's pickup entities, PM-0004-66) | 1 run. Bites: picks stored on the gun | AB-8 (proposed there); UPGRADE-SCOPE |
 | PM-0005-30 | u5: every track is empty at a match's first tick (AB-8) | 100 of 100 consecutive matches in one process start with every track empty and no pick effect on any unit | CI | shares ADR 0004's PM-0004-65 runs (that row checks the record; this one the effects) | 1 run. Bites: a pick effect left on a pooled unit | AB-8 (proposed there); UPGRADE-SCOPE; LOOP_V2 §8 |
 | PM-0005-31 | u6: only offered picks count, and offers repeat (AB-8) | every offer holds the data's offer size (3) of distinct candidates whose requirements hold; a pick that was not offered, or for a closed offer, refused in 1,000 of 1,000 forged picks; 1,000 of 1,000 offered picks accepted (a control: proposed); the same seed and inputs give byte-identical offer logs on two runs, and on native and Wasm only if ADR 0004 puts the offers in a stream the client holds | CI | forged pick commands; the offer log written by the authority | 2 runs (the log); 1 run (the counts). Bites: an authority that accepts any candidate of the track; offers drawn from a clock seed | AB-8 (proposed there); UPGRADE-SCOPE; SEC-SPREAD (a)'s reasoning |
-| PM-0005-32 | How many long-lived active effects the step can carry (AB-10; ability item 7) | reported, no pass number: the ability, effect and weapon step's p99 per tick in SS at 8, 16 and 32 active effects per soldier (384, 768 and 1,536 at N = 48), and the bracket in which it reaches 1 ms (where the crossing lies between two points, points 4 effects per soldier apart are added: proposed); the extra effects are permanent attribute modifiers on the soldier's unit and weapon, the shape AB-8 gives picks (proposed); the effect count per soldier checked equal to the target on every tick | RS (native); ML: Chrome and Firefox (Wasm, isolation flag on) | T per point; the 8-per-soldier point is ADR 0004's PM-0004-62 run (its 1 ms p99 and 0 allocations are that row's pass marks) | T, V per point. Passes when every cell holds a number | AB-10 (proposed there); R1-ABL-REC6 (lines 2465–2472); GL lines 397–418 (8 per soldier) |
+| PM-0005-32 | How many long-lived active effects the step can carry (AB-10; ability item 7) | reported, no pass number: the ability, effect and weapon step's p99 per tick in SS at 8, 16 and 32 active effects per soldier (384, 768 and 1,536 at N = 48), and the bracket in which it reaches 1 ms (where the crossing lies between two points, points 4 active effects per soldier apart are added: proposed); the extra effects are permanent attribute modifiers on the soldier's unit and weapon, the shape AB-8 gives picks (proposed); the effect count per soldier checked equal to the target on every tick | RS (native); ML: Chrome and Firefox (Wasm, isolation flag on) | T per point; the 8-per-soldier point is ADR 0004's PM-0004-62 run (its 1 ms p99 and 0 allocations are that row's pass marks) | T, V per point. Passes when every cell holds a number | AB-10 (proposed there); R1-ABL-REC6 (lines 2465–2472); GL lines 397–418 (8 per soldier) |
 | **ADR 0003's look proof test: this record's asset marks** | | | | | | |
 | PM-0005-33 | Every test model is listed, and a broken link fails at load (AP-2, AP-3) | 100 % of the test models named by id in the test content and listed in the asset list; a dangling asset id and a slot whose class is not in the class table each fail at load with the file and field named (1 of 1 each); 0 stand-in models drawn | CI | the content crate's whole-set check on the look test's content | 1 run. Bites: the two planted defects | AP-2 (proposed there: R1-DATA-REC2's error mark, lines 2515–2516) |
-| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than its slot class's shared material (identity against the material cache); 0 model requests other than listed glTF/GLB files, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari 26, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
+| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than its slot class's shared material (identity against the material cache); 0 model requests other than listed glTF/GLB files, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
 | PM-0005-35 | Materials are shared by content (GPU section parts 1, 2, 7) | the material objects on listed assets' meshes number at most the distinct (slot class, faction) pairs those meshes show, on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with every test model in each faction's colours; distinct material objects counted by identity, pairs counted from the slots' classes and factions | 1 run per backend (counts repeat, PM-0003-35). Bites: a loader that clones the class material per mesh (legacy's per-mesh conversion, CL4) | the GPU section's spike part (proposed there; R3-LOOK-F3, r3 lines 331–334) |
 | PM-0005-36 | The two derived per-unit caps hold (GPU section part 4; AP-5) | the test soldier as drawn: (draw calls with it shown − hidden) at most 4 × the passes that draw it; the test very large unit: at most 25 × those passes; on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with one soldier, then one very large unit, shown and hidden; shadow and main pass (PM-0003-25's method, here for one unit) | 1 run per backend. Bites: a soldier with 5 material slots (10 draws over 2 passes, above 8); a very large unit of 30 single-material parts (60, above 50) | the GPU section's part 4: 4 per pass (R3-CHAR-REC1, r3 lines 1044–1045); 200 ÷ 4 ÷ 2 = 25 (R3-CHAR-REC4, r3 lines 1088–1090) |
 | PM-0005-37 | Mustafa's verdict on each asset family (OQ-0005-AP2; AP-7) | every step of the families checklist below judged, with a pick or "not yet" per family | MP: Brave on Windows | the families checklist (below), each view beside a legacy screenshot at the same framing | one session; a "not yet" goes back to the draft | OQ-0005-AP2; LOOK_V2 §9 (lines 76–78); plan rule 12 |
@@ -2043,7 +2060,7 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
 | PM-0005-39 | Asset files are served like the bundle (AP-4) | every asset file's name holds the hash of its bytes (recomputed); its `Cache-Control` contains `immutable`; a repeat visit fetches 0 bytes of it (`transferSize` 0); the largest asset file under 25 MiB (26,214,400 bytes) | the client host's preview (ADR 0006's hosting setup); ML: Chrome | ADR 0006's PM-0006-4 and PM-0006-5 methods, applied to every asset file | 3 repeats from a fresh profile. Bites: an asset served `no-cache`; a planted 26 MiB file is flagged | the asset pipeline section's spike part (proposed there: R1-DATA-REC6, lines 2577–2578; R6-HOST-REC1's mark, r6 lines 641–643) |
 | PM-0005-40 | The gate holds the per-unit budgets (AP-5) | a planted over-budget asset fails the gate's asset budget check; a budget raised without a change to the budget file fails; controls pass: an asset exactly at its budget, and a raise written in the budget file with its reason | CI | `gate --prove`'s mutations and controls | every `--prove` run; 1 of 1 each | the asset pipeline section's spike part (R5-GATE-REC4's mark, r5 lines 1743–1744); R5-GATE-REC3 (r5 lines 1706–1732) |
 | PM-0005-41 | No asset reader reaches the sim, the server or the player build (AP-1, AP-6) | a planted glTF reader dependency in `sim`, and the same in `server`, each fails the dependency check; a planted import of the asset tool's package from `client` fails the player-build manifest walk (proposed: AP-6's "never in the player build"); control: the tool depending on a glTF reader passes | CI | `gate --prove` (the dependency rules check and the manifest walk, ADR 0002's) | 1 of 1 each. The draft's migration puts the dependency check in the foundation; the bite runs here once the tool's package exists | AP-1, AP-6 (proposed there); R5-LAYOUT-REC2's mark (r5 lines 1189–1192) |
-| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to its faction definition's colour value, for every faction and test model; 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari 26 | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour | the GPU section's spike part |
+| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to its faction definition's colour value, for every faction and test model; 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour | the GPU section's spike part |
 | PM-0005-43 | The stress scene's fight on screen fits ADR 0003's frame totals with real models (GPU section part 4) | PM-0003-18 (frame time), PM-0003-21 (GPU time) and PM-0003-22 (draw calls, triangles, GPU memory) each pass with BS built from the real models | ML at Low; RD at High (as those rows) | those rows' methods on BS with the real models | as those rows (H, V, rule B) | the GPU section's spike part; R3-BUDGET-REC2's rows (r3 lines 1121–1137) |
 | PM-0005-44 | Only if the research proposes LOD levels and the framing spreads distances (part 5): levels keep the silhouette | 0 level switches while the camera holds inside a switch's hysteresis band for 600 frames (proposed: flicker shows as switches); Mustafa's verdict in the LOD checklist below | ML: Chrome on WebGPU; MP: Brave | a scripted camera dwell at each switch distance; the LOD checklist | 1 dwell per switch; one session | the GPU section's part 5 and spike part (R3-CHAR-F10, r3 lines 490–493); OQ-0005-AS2 |
 | **The Feel Lab test (ABL-PREDICT), once abilities are playable** | | | | | | |
@@ -2172,7 +2189,8 @@ slice 2, where the maps migrate).
    architecture plan. *Done when:* EDITOR_V2 §4's bars on the document (1,000 random commands undone and redone return
    a byte-identical document; every v1 map migrates).
 9. **Slice 6, scale to 48:** the ability, effect and weapon step measured with real content (R1-ABL-REC6; ability item
-   7); the load-time and size budgets measured again on the full content (OQ-0005-CD2; content item 9).
+   7); content's load time and its share of the Wasm size measured again on the full content (OQ-0005-CD2; content
+   item 9; the size limit is ADR 0002's, part 4).
 - **Assets:** the look proof test uses plain glTF/GLB exports (the GPU section's part 8); the asset-pipeline research,
   then the asset spike, come before the first authored model enters the game (AP-1 to AP-6); until OQ-0005-AP2 is
   answered, buildings and props keep the ported kit beside authored assets (AP-7).
@@ -2195,8 +2213,8 @@ slice 2, where the maps migrate).
 ## Rollback
 No spike starts before approval, and spikes are throwaway (SPIKE-SCOPE (a)), so nothing needs backing out before slice
 1. After that, by part:
-- JSON misses its budgets: the build compiles the same JSON into a binary runtime format (option D), and JSON stays
-  the authored form (OQ-0005-CD2).
+- JSON misses its load-time budget, or content's share takes the Wasm file past the limit ADR 0002 sets: the build
+  compiles the same JSON into a binary runtime format (option D), and JSON stays the authored form (OQ-0005-CD2).
 - garde fails on wasm32: checked newtypes and hand-written checks replace it, and schemars attributes carry the ranges
   (CD-2).
 - Reload at the next match proves too slow for tuning: OQ-0005-CD4's option (b) is R1-DATA-REC5 as written, and ADR
@@ -2230,7 +2248,7 @@ Counts: adopted 6 · changed 5 · answered 8 · open 9 · spike 6 · rejected 0 
 | R1-DATA-REC7 | changed: the path for a map uploaded to a private match is not built (no VISION_V2 §6 item asks for it); the rule holds for every payload a client or the editor sends | CD-9; spike mark 7 |
 | R1-DATA-REC8 | changed: the look group, "pending the look brief" (r1, lines 2597–2598), is listed value by value for ADR 0003's look proof test, since LOOK_V2 exists | CD-10; spike mark 8 |
 | R1-DATA-OQ1 | open: OQ-0005-CD1 | comments in content files (Mustafa, after a trial in the spike) |
-| R1-DATA-OQ2 | spike: the content and ability spike measures load time and Wasm size; the budgets and the binary-format fallback are OQ-0005-CD2 | CD-2; spike mark 9 |
+| R1-DATA-OQ2 | spike: the content and ability spike measures load time and content's share of the Wasm size; the load-time budget and the binary-format fallback are OQ-0005-CD2, the size limit ADR 0002's (part 4) | CD-2; spike mark 9 |
 | R1-DATA-OQ3 | open: OQ-0005-CD3 | production mid-match changes (Mustafa); proposed: never |
 | R1-DATA-OQ4 | spike: the content and ability spike's fuzz run records the default depth limit | CD-2; spike mark 2 |
 | R1-DATA-OQ5 | spike: the content and ability spike builds and tests the crate on wasm32; the fallback is stated in CD-2 | CD-2; spike mark 2 |
