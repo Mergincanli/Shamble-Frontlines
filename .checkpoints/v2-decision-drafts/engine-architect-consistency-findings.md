@@ -36,7 +36,12 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   team" and "anyone") and takes one decider line: "Mustafa, with the game-designer". AB10 is unchanged. ADR 0004 deletes
   OQ-0004-5 and OQ-0004-6 and cites "OQ-0005-AB9, AB10" at 443, 1039 and 1068 (the tie rule's mechanism, a fixed
   deterministic order, stays 0004's part 18). README drops rows 69–70.
-- Owners: rust-reviewer (0004); engine-architect and game-designer (0005 AB9); engine-architect synthesis (README).
+- Also: 0004 part 18 (docs/adr/0004-simulation-core.md:435–436) states a rule the same paragraph then calls open: "When a
+  soldier dies, its weapon becomes a pickup entity" pre-empts AB9's options (a)/(b)/(c) and "any death" vs "a death to
+  an enemy". Proposed: "When a soldier dies, the weapons the drop rule names (OQ-0005-AB9) become pickup entities".
+  ADR 0001 part 12 (docs/adr/0001-multiplayer-netcode.md:386–387) lists the open rules as "carry slots, ammo for looted
+  weapons and how fast tracks level"; it should add "the drop rules and bots' records (OQ-0005-AB9, AB10)".
+- Owners: rust-reviewer (0004); engine-architect and game-designer (0005 AB9); engine-architect synthesis (README). netcode-architect (0001:386–387).
 
 ### F3 (H). The same tick-budget marks at two precisions: a run between them passes one draft and fails the other
 - Documents: docs/adr/0001-multiplayer-netcode.md:125–126 (part 2, "4.2 ms each"), :1134 (PM-0001-39: "sim step time p99
