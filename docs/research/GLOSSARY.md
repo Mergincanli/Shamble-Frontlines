@@ -741,3 +741,57 @@ with a re-flood) against 8.33.
   R1-DET-REC5 (the type ban, with a reviewed `#[allow]`). R5: R5-RUSTLINT-F8 (clippy's `disallowed_types`),
   R5-RUSTLINT-REC2 (the ban itself: `disallowed-types` in the sim crate), R5-RUSTLINT-OQ3 (maps from other crates),
   R5-RUSTLINT-OQ5 (settled 2026-10-30). R2, R3, R4, R6: none.
+
+## 8. Phase 1 terms (the Advisor, 2026-10-31)
+
+### The foundation
+- **Definition:** the Advisor's drafts brief, §2, 2026-10-31:
+
+> - **The foundation.** Phase 1's work before slice 1's gameplay:
+>   - the repository restructure, moving the old game to `legacy/`;
+>   - the toolchain: a Cargo workspace plus TypeScript with Vite;
+>   - CI gate v2, and private preview links;
+>   - TypeScript types generated from the Rust code;
+>   - the client + local server skeleton: the simulation in a Web Worker, behind the same message protocol the network uses.
+>
+>   It ends when an empty scene runs through the full stack in the browser, with CI green and a preview link.
+
+- **Marked by:** "the foundation".
+- **Retire (exact):** none.
+- **Retire (in context):** none.
+- **Used today:** none in R1–R6 (a phase 1 term); the decision drafts, `docs/ENGINE_OVERVIEW.md` and
+  `docs/SPIKE_PLAN.md` use it.
+
+### The netcode proof test
+- **Definition:** the Advisor's drafts brief, §2, 2026-10-31:
+
+> - **The netcode proof test.** A throwaway spike that proves the online path:
+>   - the Rust simulation runs natively as a server, and as Wasm in the client;
+>   - they connect over WebTransport, with the WebSocket fallback;
+>   - 48 simulated clients run at a 30 Hz tick, with tick time, bandwidth per client and memory all within the budgets that
+>     ADR 0001 sets;
+>   - one human client at 100 ms of simulated latency sees prediction, reconciliation and lag-compensated hits that look
+>     correct.
+
+- **Marked by:** "the netcode proof test".
+- **Retire (exact):** none.
+- **Retire (in context):** none.
+- **Used today:** none in R1–R6 (a phase 1 term); the decision drafts, `docs/ENGINE_OVERVIEW.md` and
+  `docs/SPIKE_PLAN.md` use it.
+
+### The 60 Hz margin
+- **Definition:** 1 − (p99 server tick time at a 60 Hz tick ÷ the server tick budget at 60 Hz, 8.33 ms). It is measured
+  in the netcode proof test, in one run (p99s do not add: see time statistics): on one vCPU of the reference server, in
+  the stress scene at N = 48 with a snapshot-receiving client on every soldier, over R2-BUD-REC6's 30-minute soak,
+  re-flood ticks included. A 60 Hz tick needs a 60 Hz margin of at least 25 % (a p99 server tick time of at most
+  6.25 ms) and every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3);
+  otherwise the tick stays at 30 Hz.
+- **Depends on:** TICK-60-HEADROOM (the advisor's reading of 2026-10-31: TICK-30's 25 % is measured against the
+  server tick budget at 60 Hz, 8.33 ms), confirmed by Mustafa and the Advisor at the stop.
+- **Marked by:** "the 60 Hz margin".
+- **Retire (exact):** none.
+- **Retire (in context):** "headroom" where TICK-30's 25 % is meant. TICK-30's own word "headroom" appears only in
+  quotes of TICK-30; headroom keeps its meaning of a run above the largest mode's N (the design point and headroom).
+- **Used today:** none in R1–R6 (a phase 1 term); ADR 0001 owns it, and ADR 0004 and `docs/SPIKE_PLAN.md` cite it.
+
+TICK-30 (the Advisor, 2026-10-31) replaces, for the drafts, the tick-rate rule the Tick period entry calls unchanged (line 85): 30 Hz is the baseline, 60 Hz needs a 60 Hz margin of at least 25 %.
