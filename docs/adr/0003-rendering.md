@@ -1098,8 +1098,6 @@ Beside it: PM-0003-42 (frame pacing and power per option), PM-0003-38 and PM-000
 2. Listen through the benchmark fight. Expected: his own shots and shots at him are always heard; no crackle, gap or
    dropout. Record: achieved or not yet.
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 

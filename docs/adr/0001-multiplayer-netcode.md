@@ -1241,8 +1241,6 @@ profile's latency (PM-0001-3). Each step: what to do, the expected result, and w
 15. The verdict at P2 on WebTransport. Record: "achieved" or "not yet" for each of prediction (steps 3 and 4),
     reconciliation (steps 4 and 12) and lag-compensated hits (steps 7 to 9).
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 In the slice order (SLICE-ORDER). The legacy game stays playable, frozen, until v2 replaces it (it moves to `legacy/`

@@ -1168,8 +1168,6 @@ or "not yet" (with a note) for each step.
 5. The foundation's end: on the last foundation pull request, CI shows green and the link of step 3 shows the empty
    scene. Expected: both. Record: done or not yet.
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 In the slice order (SLICE-ORDER), with the netcode proof test first and the foundation before slice 1. The legacy game

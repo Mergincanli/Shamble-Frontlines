@@ -924,8 +924,6 @@ hides what PREV-DELETE must see.
 2. After the session says the last VM is deleted, open the spike's project in the Hetzner console and read its costs.
    Expected: one amount in EUR before VAT, written down (PM-0006-18).
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 

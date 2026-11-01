@@ -2137,8 +2137,6 @@ shuffled by the session and their labels hidden until he has answered (proposed:
 4. Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per
    ability.
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 The legacy game stays playable in `legacy/` at every step (ADR 0002); v2 is playable from slice 1. The places in

@@ -1051,8 +1051,6 @@ for the netcode proof test (prediction, reconciliation and lag-compensated hits 
 correction sizes and prediction error) is ADR 0001's, and the boundary spike's is ADR 0002's. PM-0004-69 measures what
 a player would see as smoothness, so it needs no judgement here.
 
----8<--- the subsection ends on the line above ---
-
 
 ## Migration plan
 
