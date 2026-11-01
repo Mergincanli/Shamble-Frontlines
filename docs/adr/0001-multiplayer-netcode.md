@@ -157,9 +157,10 @@ server in the browser. The parts:
    [transport runtime](../research/GLOSSARY.md#transport-runtime-time) runs beside the tick on other threads, at most
    1 vCPU per process with 48 sessions; it counts in rooms per VM, not in server tick time. R2-BUD-REC6's reason
    (r2-netcode.md:2402–2403) is restated: "the topics' own part marks fit inside the server tick budget's 50 % of the
-   tick period at 30 Hz, re-flood ticks included, and at 60 Hz on every tick but one that both encodes a snapshot and
+   tick period at 30 Hz, and at 60 Hz on every tick but one that both encodes a snapshot and
    re-floods after a portal change (at N = 54, MODES-3 (b)); at N = 48 that tick fits by 0.05 ms (8.28 of 8.33 ms)
-   while its server-only share is 0.24 ms over its own 25 % (4.41 of 4.17 ms) (GLOSSARY.md:62–75)." *Why:* one
+   while its server-only share is 0.24 ms over its own 25 % (4.41 of 4.17 ms) (GLOSSARY.md:62–75)." At 30 Hz the
+   marks fit with re-flood ticks included (10.18 of 16.67 ms: GLOSSARY.md:69, 76–77). *Why:* one
    accounting for the whole server tick, sized at the baseline rate. *Research:* R2-BUD-REC6 (changed), R2-SYNC-REC9,
    R2-XU-OQ8 (settled by the glossary), R2-TRN-REC1 mark 2. *Need:* VISION_V2 §6.1 (rooms at 48 players).
 4. **The prediction scope.** The client's Worker predicts, for the local player only,
@@ -619,7 +620,7 @@ option. An option that contradicts a settled input appears as one line and is no
 | **B. Server rewind to the view time, capped (chosen)** | medium | ≤ 20 µs per shot; ≤ 1 MB of history | grows with shots per second | the tolerance, cap and own RTT bound the abuse | the shooter's view is the truth up to the cap | `resolveShot` is a pure query built for this (CS7) | Source's shipped model | the victim's side unmeasured (R2-SYNC-OQ15) |
 | C. Client-side hit detection | low | none | none | an authority leak, trivially cheatable | instant | none | instant | rejected |
 
-### Q6. Projectiles (sync options 3.6, lines 1655–1664; encodings E3 and E3b, lines 1694–1700)
+### Q6. Projectiles (sync options 3.6, lines 1655–1664; encodings E3 and E3b, lines 1694–1702)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | A. Server only, shown when the spawn arrives | low | none | none | server authority | the owner sees the throw a round trip late | GC14, GC15's sim logic | simple | breaks LOOP_V2 §7's instant feel |
@@ -644,7 +645,7 @@ option. An option that contradicts a settled input appears as one line and is no
 | T3. 60 Hz tick and snapshots | medium | 2 × the encoding | 286 kbps, over the 256 kbps example | as T1 | shorter delay | none | interpolation 50–85 ms | over the bandwidth budget |
 | T4. 20 Hz tick, snapshots 20 Hz | settled by TICK-30 (a tick below the 30 Hz baseline) | | | | | | | |
 
-### Q9. Downstream encoding (budgets option table B, lines 1694–1700)
+### Q9. Downstream encoding (budgets option table B, lines 1694–1702)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | E1. Raw floats, full state | trivial | about 536 kbps | two datagrams per snapshot | none | none | none | trivial | far over budget |
@@ -656,7 +657,7 @@ option. An option that contradicts a settled input appears as one line and is no
 ### Q10. Upstream (budgets option table C, lines 1704–1710)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
-| **U1. Every tick, newest + repeats (chosen, at 30 Hz, repeating every unacknowledged command up to the cap)** | low | about 22.3 kbps at 30 Hz with 8 B commands | ≤ 48 kbps | the catch-up cap equals the redundancy cap | no extra input delay | CS1's command record | an input is lost only after several lost packets in a row | more bytes than U2 |
+| **U1. Every tick, newest + repeats (chosen, at 30 Hz, repeating every unacknowledged command up to the cap)** | low | about 22.3 kbps at 30 Hz with 8 B commands | ≤ 48 kbps | the catch-up cap no larger than the redundancy cap | no extra input delay | CS1's command record | an input is lost only after several lost packets in a row | more bytes than U2 |
 | U2. U1 with delta-coded repeats | low | about 36 kbps at 60 Hz | fewer bytes | as U1 | as U1 | none | cheaper | adopt once U1 is measured |
 | U3. Send at 30 Hz with two new ticks | low | about 22.3 kbps | fewer sends | as U1 | adds up to one tick of delay at a 60 Hz tick | none | cheap | applies only to a 60 Hz tick |
 
@@ -800,8 +801,9 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
   4. *Client flight for E3.* Correctness never rests on identical trajectories (landings are server events), but what a
      remote client draws between change events does; E3b is the measured fallback at +42 kbps.
   5. *Weight in the Worker.* The interpolation buffer and the aim ray live in the Worker, and in a local match the
-     Worker also encodes and decodes every message for the loopback path; that cost is not measured yet and counts in
-     the client's sim share, ADR 0004's (the proof test reports it).
+     Worker also encodes and decodes every message for the loopback path; that cost is not measured yet. It is
+     reported beside the client's sim share (ADR 0004's), not inside it, since that share is sim step time only
+     (GLOSSARY.md:214–218).
   6. *One process per room* may cost more memory than shared processes; option B is the fallback the proof test can
      trigger.
 
@@ -911,6 +913,13 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
   how often reconnect runs (not its design). · *Options:* none (measurements). · *Decider:* connection telemetry from
   the first online playtest (ADR 0006's monitoring). · *What decides it:* the measured shares. · *Research ids:*
   R2-TRN-OQ7, R2-BUD-OQ11, R2-ROOM-OQ8.
+- **OQ-0001-14. Is a VISION_V2 §3 or §4 target trace enough for an engine feature?** R2-BUD-REC4, R2-BUD-REC5 and
+  R2-TRN-REC6 serve only VISION_V2 §4's "matches feel fair up to about 100 ms of ping". · *Why it matters:* the trace
+  rule admits a feature only with its need, and these three carry the fairness target. · *Options:* (a) yes: a §3 or §4
+  target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in `docs/adr/README.md` (the reading these
+  drafts use until the ruling); (b) no: each is traced to a §6 item its own reasoning supports, or dropped. ·
+  *Decider:* the Advisor, at the stop. · *What decides it:* the Advisor's ruling. · *Research ids:* R2-XU-OQ18
+  (r2-netcode.md, Open questions, lines 3260–3269).
 
 ## What a spike must prove
 The spike is the netcode proof test (GLOSSARY §8; brief §2), in the Advisor's words:
@@ -1156,8 +1165,8 @@ another file is named; "the draft" is this record.
 (PM-0001-54, PM-0001-55) only when its condition holds; PM-0001-56 when its record is complete; PM-0001-39 and
 PM-0001-40 only where OQ-0001-2 places the 60 Hz margin run (under its option (c) they move to slice 6). A failing run is
 never re-run until green: its data, seed, build commit, machine, browser and profile are kept, and its cause is found
-and written down (R5-TEST-REC6). A run set that fails V-S is neither a pass nor a fail. Then, by the draft's own
-Rollback (lines 1056–1068): a 30 Hz baseline mark (PM-0001-4 to PM-0001-27) that fails sends part 2 and part 3 back to
+and written down (R5-TEST-REC6). A run set that fails V-S is neither a pass nor a fail. Then, by this record's own
+Rollback section: a 30 Hz baseline mark (PM-0001-4 to PM-0001-27) that fails sends part 2 and part 3 back to
 the drafts with the measured numbers; PM-0001-39 or PM-0001-40 failing changes nothing, and the tick stays at 30 Hz; a
 WebTransport crate failing PM-0001-28, -11 or -25 is replaced by the other behind the thin interface, and both failing
 goes back to the drafts, where Mustafa and the Advisor decide (the transport is a settled input); PM-0001-54 failing
@@ -1286,8 +1295,8 @@ in the foundation).
 - **Determinism by state hash:** recorded input replays give identical per-tick server state hashes on both transports
   (R2-TRN-REC3 mark 2) and on the loopback; the same seed and join-and-leave script give the same hash twice
   (R2-ROOM-REC6 mark 3); decoded snapshots rebuild the server's quantised state by hash (R2-SYNC-REC1 mark 1).
-- **Load and soak:** bots as headless protocol clients, 48 per room, 30 minutes at P2 for every mode on the test-mode
-  list, with server tick time, bytes per client, memory slope, queue lengths, desyncs, panics and hangs measured, and
+- **Load and soak:** bots as headless protocol clients, a full room at each mode's N, 30 minutes at P2 for every mode on
+  the test-mode list (2 to 64 players: GLOSSARY.md:375–388), with server tick time, bytes per client, memory slope, queue lengths, desyncs, panics and hangs measured, and
   one 3-hour soak before each playtest (R5-TEST-REC5, ADR 0002).
 - **Hostile input:** the forged-command and lag-switch suites (R2-SYNC-REC2 marks 3–4), the flood test on both
   transports (R2-TRN-REC1 mark 4, R2-TRN-REC3 mark 4), bad join tokens (R2-ROOM-REC3 mark 1), decoder fuzzing
@@ -1352,8 +1361,8 @@ One row per id the decision map gives this record (127).
 | R2-SYNC-REC7 | adopted | parts 4, 6 |
 | R2-SYNC-REC8 | adopted; the Worker casts the ray | part 5 |
 | R2-SYNC-REC9 | adopted | parts 3, 14 |
-| R2-BUD-REC1 | changed: the snapshot half (30 Hz) stands; the tick half is replaced by TICK-30; inputs repeat every unacknowledged command up to the cap (R2-SYNC-REC2) instead of 3; marks restated at 30 Hz and against P2 and P3 | parts 2, 5; budgets table |
-| R2-BUD-REC2 | adopted; the hard cap proposed at 256 kbps | part 6; budgets table |
+| R2-BUD-REC1 | changed: the snapshot half (30 Hz) stands; the tick half is replaced by TICK-30; inputs repeat every unacknowledged command up to the cap (R2-SYNC-REC2) instead of 3; marks restated at 30 Hz and against P2 and P3; its Shabzon mark (mean delivered fire rate within 1 % of 13.9 shots/s at the chosen tick, r2-netcode.md:2324–2325) is a sim mark, carried by ADR 0004's mark S4 (one time representation holds every rate, which meets R1-ABL-REC3's 1 % for the Shabzon) | parts 2, 5; budgets table; ADR 0004 |
+| R2-BUD-REC2 | changed: its precision mark "decoded positions within 1 cm and angles within 0.01° of the server's values" (r2-netcode.md:2341) cannot pass for pitch, sent in 10 bits of 0.18° steps (line 1748); restated as positions within 1 cm, yaw within 0.01° (a 16-bit step is about 0.0055°, line 2263) and pitch within one 0.18° step (proposed: the field's own resolution); the hard cap proposed at 256 kbps | part 6; budgets table |
 | R2-BUD-REC3 | adopted, with one cap rule (R2-XU-OQ5) | part 6 |
 | R2-BUD-REC4 | changed: the interpolation bound follows R2-SYNC-REC4 (R2-XU-OQ3); the rewind cap is OQ-0001-5 and the history keeps the cap plus a margin, not 1 s (R2-XU-OQ7); the input buffer and the clock are adopted; need: VISION_V2 §4 only | parts 5, 7, 8 |
 | R2-BUD-REC5 | adopted; need: VISION_V2 §4 only | part 10 |
@@ -1430,7 +1439,7 @@ One row per id the decision map gives this record (127).
 | R2-XU-OQ13 | answered: MODES-3 (a) | Context |
 | R2-XU-OQ15 | spike: the netcode proof test measures the record sizes | bandwidth estimate |
 | R2-XU-OQ16 | answered: Fiedler's articles are cited as practitioner articles, behind specifications and shipped-game code (the README's order); the one rule here resting on them, three intervals of interpolation, is measured by the proof test | part 7 |
-| R2-XU-OQ18 | answered: the drafts' trace reading (a VISION_V2 §3 or §4 target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in docs/adr/README.md): R2-BUD-REC4, R2-BUD-REC5, R2-TRN-REC6; R2-BUD-REC3 traces to §6.1; R2-INT-REC7 is not built | parts 7, 10 |
+| R2-XU-OQ18 | open: OQ-0001-14 (r2-netcode.md:3268 leaves it to the Advisor); until the Advisor rules, these drafts use the session's trace reading (a VISION_V2 §3 or §4 target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in docs/adr/README.md) for R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6; R2-BUD-REC3 traces to §6.1; R2-INT-REC7 is not built | parts 7, 10; Open questions |
 | R2-XT-OQ1 | answered (= R1-XT-OQ1) | part 5 |
 | R2-XT-OQ2 | answered (= R1-XT-OQ3) | part 7 |
 | R2-XT-OQ3 | answered (= R1-XT-OQ4) | part 6 |
