@@ -1,13 +1,26 @@
 # Verifier: ADR 0005 (content data, abilities and assets), claims check
 
 Task: v2-decision-drafts plan step 7, unit ADR 0005 (brief: prompts/verifier-adr0005.txt). Document checked:
-`docs/adr/0005-content-abilities-assets.md` (2,282 lines) against its five ledgers (row ids: F = frame,
-C = content data and asset pipeline, A = abilities, G = GPU rules, P = pass marks; "PTE" rows are the pass-mark ledger's
-"TE" rows). Research files at 9e7db28 (`git diff --quiet 9e7db28 HEAD` on docs/research, LOOP_V2, VISION_V2, EDITOR_V2,
-LEGACY_INVENTORY, LEGACY_TUNING exits 0; STATUS's committed text is 9e7db28's, the working tree holds an uncommitted
-STATUS edit). Scripts and fetched pages: `.gate/v0005/` (rows.mjs, auto.mjs, idcheck.mjs, fetch.sh, gen.mjs; src/).
-Verdict words: confirmed · wrong · unsupported · citation off · unverified · pending (time). "confirmed" for a row
-the verifier did not open by hand is stated in its "where" cell (script: quoted words found at the cited lines).
+`docs/adr/0005-content-abilities-assets.md` at HEAD (2,282 lines; last changed by cf00def, which was in place before
+this check began) against its five ledgers. Row ids: F = frame ledger, C = content data and asset pipeline ledger,
+A = ability ledger, G = GPU rules ledger, PTE = the pass-mark ledger's TE rows, X = rows the verifier added.
+Research and design docs: r1-r6, LOOP_V2, VISION_V2, EDITOR_V2, LOOK_V2, LEGACY_INVENTORY, LEGACY_TUNING unchanged since
+9e7db28 (LOOK_V2 added in 6617e25); GLOSSARY only gained §8 after line 740 (80a27b3), so every cited GLOSSARY line
+holds and all 19 GLOSSARY anchors the ADR links resolve; STATUS changed in 549490f (docs-keeper), so STATUS line numbers
+are 9e7db28's. Legacy facts (R7 rows) were checked against the legacy code where a claim rests on them
+(shamble-core.js:279, :792; shamble-game.js:41, :552, :601, :661, :1374-1375, :1514-1515; docs/legacy-tuning.json
+recounted by script).
+
+Method and what the verdict words mean:
+- confirmed: the verifier opened the cited lines (research, design doc, inventory, map, other ADR, legacy code or the
+  fetched source) and they say what the row says. Three ways, shown in the "where" cell: a row written by hand (the
+  words quoted); "batch": the cited lines were read by hand in a block together with the document's text, not written
+  up row by row; "quoted words found at the cited lines (script)": `.gate/v0005/auto.mjs` found every quoted phrase of
+  the row within the cited range (±2 lines).
+- wrong · unsupported · citation off · unverified · pending: as the brief defines them. No row is pending.
+- Scripts and fetched pages: `.gate/v0005/` (rows.mjs parses the ledgers; auto.mjs and idcheck.mjs check quotes and
+  line ranges; batch.mjs and gen.mjs build this file; fetch.sh does every fetch and writes the audit; src/ holds the
+  pages, which were read as data only).
 
 ## Verdicts
 
@@ -200,7 +213,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | C50 | ADR 0003 owns the quality-tier rows and draws what the feel kit describes | map part b (R3-BUDGET-REC3 owner 0003, line 464); 0003 draft, line 329 | confirmed | map 464 (R3-BUDGET-REC3 owner 0003) |  |
 | C51 | legacy-tuning.json: 60 tables, each with `where` and a group (gameplay, simulation, progression, look, state) | r1, legacy facts, lines 1583–1586; verifier row "Legacy facts", line 3534 | confirmed | r1:1583-1586 "60 tables, each {where, group, ...}; group is gameplay, simulation, progression, look or state" |  |
 | C52 | dead keys in CD4, CD6, CD7, CD10, CD12, CD14 | r1, lines 1594–1597 | confirmed | r1:1594-1597 |  |
-| C53 | `rulesMerge` and `envMerge` take any key, `__proto__` included (GW2, GE1); `RULES_SCHEMA` limits bind only sliders | r1, lines 1603–1607; STATUS.md:257 (SEC-MDL-2) | confirmed | r1:1603-1607; STATUS:257 at 9e7db28/HEAD (SEC-MDL-2) | the working tree's uncommitted STATUS edit moves SEC-MDL-2 to line 314: recheck the doc's "STATUS.md line 257" (doc line 214) when that edit lands |
+| C53 | `rulesMerge` and `envMerge` take any key, `__proto__` included (GW2, GE1); `RULES_SCHEMA` limits bind only sliders | r1, lines 1603–1607; STATUS.md:257 (SEC-MDL-2) | confirmed | r1:1603-1607; STATUS:257 at 9e7db28 (SEC-MDL-2) | at HEAD (549490f, docs-keeper) SEC-MDL-2 is STATUS line 314: the doc's "docs/STATUS.md line 257" (doc 239) is stale for a reader at HEAD (finding 6) |
 | C54 | v1 save writes `version:1` nothing reads, rounds to 0.1 m, no ids (GW12) | r1, lines 1610–1612 | confirmed | r1:1610-1612 |  |
 | C55 | missing objective falls back to DM_Cabana's (GE11, CM1) | r1, lines 1613–1615 | confirmed | r1:1613-1615 |  |
 | C56 | failed save falls back to memory silently; no import (ED13) | r1, lines 1616–1618 | confirmed | r1:1616-1618 |  |
@@ -733,7 +746,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | G7 | Custom GLSL and onBeforeCompile "not supported in WebGPURenderer" | r3 R3-WGPU-F6, 97–102 | confirmed | r3:97-99 "...onBeforeCompile() are not supported in WebGPURenderer." |  |
 | G8 | The engine gives each slot the shared node toon material of its class (ADR 0003, 5.a) | ADR 0003 draft, part 5.a (its ledger rows 60–64) | confirmed | docs/adr/0003:406 "node toon materials with shared ramps per material class (part 5.a)" |  |
 | G9 | Slot list and names are ADR 0005's content data, consumed by ADR 0003 | decision map I-8, seam S9 | confirmed | map 809 (I-8), 211 (S9) |  |
-| G10 | instanceColor on InstancedMesh and BatchedMesh | r3 R3-CHAR-F4, 452–455; R3-CHAR-F6, 463–467 | wrong (minor) | r3:452-455 F4 instanceColor on InstancedMesh (InstancedMesh page: 2 hits "instanceColor"); r3:463-467 F6 says BatchedMesh "has per-instance colour"; BatchedMesh page has setColorAt( instanceId, color ), 0 hits "instanceColor" | doc 1540-1541 and Options row 1604 call BatchedMesh's per-instance colour `instanceColor`; fix: "`instanceColor` on InstancedMesh, `setColorAt` on BatchedMesh" |
+| G10 | instanceColor on InstancedMesh and BatchedMesh | r3 R3-CHAR-F4, 452–455; R3-CHAR-F6, 463–467 | wrong (minor) | r3:452-455 F4 instanceColor on InstancedMesh (InstancedMesh page: 2 hits "instanceColor"); r3:463-467 F6 says BatchedMesh "has per-instance colour"; BatchedMesh page has setColorAt( instanceId, color ), 0 hits "instanceColor" | doc 1539-1540 and Options row 1606 call BatchedMesh's per-instance colour `instanceColor`; fix: "`instanceColor` on InstancedMesh, `setColorAt` on BatchedMesh" |
 | G11 | Per-instance data, faction colour included, from the block (R3-CHAR-REC3) | r3 R3-CHAR-REC3, 1065–1075 | confirmed | r3:1065-1075 |  |
 | G12 | Emissive output drives a selective glow ("use the `emissive` material property…") | r3 R3-LOOK-F12, 392–395; LOOK_V2 §6.4 | confirmed | r3:392-395; threejs.org/docs/pages/BloomNode.html: "For a selective bloom, use the emissive material property to control which objects should contribute to bloom or not. This can be achieved via MRT." |  |
 | G13 | Skinned mesh "requires skin indices and weights as buffer attributes in its geometry" | r3 R3-CHAR-F1, 436–439 | confirmed | r3:436-439; threejs.org SkinnedMesh page: "the skinned mesh requires skin indices and weights as buffer attributes in its geometry" |  |
@@ -745,7 +758,7 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 | G19 | Four very large units: 200 draw calls over the shadow and main pass | r3 R3-CHAR-REC4 mark, 1088–1090 | confirmed | r3:1088-1090 "at most 200 draw calls against the scene without them ... (4 units × 20 parts × 2 passes, shadow and main, is 160 draws, plus margin" |  |
 | G20 | 200 ÷ 4 units ÷ 2 passes = 25 per unit per pass | row 19 | confirmed | 200 ÷ 4 ÷ 2 = 25 |  |
 | G21 | R3's test load fits: 4 × 20 × 2 = 160 | r3 1089–1090 | confirmed | 4 × 20 × 2 = 160 (r3:1089-1090) |  |
-| G22 | Frame totals: Low ≤ 800 draws, ≤ 500k triangles, ≤ 512 MB; High ≤ 1,500, ≤ 1.5M, ≤ 1 GB | r3 R3-BUDGET-REC2, 1121–1137 (memory 1135) | confirmed | r3:1133-1135: draw calls "≤ 800 without a per-object outline pass at Low; about ≤ 1,100 with one" / ≤ 1,500; triangles ≤ 500k / ≤ 1.5M; memory ≤ 512 MB / ≤ 1 GB | doc 1567 drops the outline qualifier on Low's 800 (r3:1133); add "(without a per-object outline pass; about 1,100 with one)" |
+| G22 | Frame totals: Low ≤ 800 draws, ≤ 500k triangles, ≤ 512 MB; High ≤ 1,500, ≤ 1.5M, ≤ 1 GB | r3 R3-BUDGET-REC2, 1121–1137 (memory 1135) | confirmed | r3:1133-1135: draw calls "≤ 800 without a per-object outline pass at Low; about ≤ 1,100 with one" / ≤ 1,500; triangles ≤ 500k / ≤ 1.5M; memory ≤ 512 MB / ≤ 1 GB | doc 1557-1558 drops the outline qualifier on Low's 800 (r3:1133); add "(without a per-object outline pass; about 1,100 with one)" |
 | G23 | three.js LOD switches "at the distances specified" with hysteresis "to avoid flickering" | r3 R3-CHAR-F10, 490–493 | confirmed | r3:490-493; threejs.org LOD page: "rendering can be switched between them at the distances specified"; hysteresis "Threshold used to avoid flickering at LOD boundaries, as a fraction of distance." |  |
 | G24 | Distance LOD only where the framing spreads distances; budget LOD for animation | r3 R3-CHAR-REC2, 1050–1063 | confirmed | r3:1050-1053 |  |
 | G25 | Camera framing is a design question LOOK_V2 does not settle | r3 R3-CHAR-OQ5, 1355–1356; decision map b (owner DESIGN) | confirmed | r3:1355-1356 "the v2 framing is look brief pending" |  |
@@ -1019,9 +1032,84 @@ the verifier did not open by hand is stated in its "where" cell (script: quoted 
 
 1001 rows (996 ledger rows: frame 135, content and asset pipeline 281, abilities 295, GPU rules 43, pass marks 242; 5 rows added by the verifier, prefixed X).
 
+Of the 997 confirmed: 743 carry a row-specific "where" cell (written by hand, some in groups, after the cited lines were read; rows whose cell reads "read at ..." name the place read, not a quote), 245 were judged in batch (cited lines read in a block with the document), 9 by the quote script alone (every quoted phrase found at the cited lines).
+
 confirmed 997 · wrong 1 · unsupported 1 · citation off 2 · unverified 0 · pending 0
 
-(findings pending)
+## Findings (ranked)
+
+Rule checks first, then the claims. None changes a decision; all are small text fixes.
+
+**Rule checks (brief §4).**
+- Rule 2 (a number with no source): every number in the ADR was matched by script against the ledgers; one had no row
+  (0.06 s, X1), and it is sourced (Lancer burstInterval). The pass marks' unsourced counts each carry "proposed" or a
+  cited basis (the upgrade-track marks PM-0005-26 to -31 as "AB-8 (proposed there); UPGRADE-SCOPE", the ability
+  section's item 6: "proposed; the research has no mark; reason: UPGRADE-SCOPE"; PM-0005-30's 100 matches is ADR 0004's
+  PM-0004-65). No finding.
+- Rule 3 ("not researched" proposed as the decision): none. ASSET-RESEARCH (a) holds: compression (AS1), the LOD tool
+  (AS2), export checks (AS3), slot renaming (AS4) and the per-unit budgets beyond the two caps (AS5) are open questions
+  marked "not researched" (doc 1616: "All six are **not researched**"); the two caps are arithmetic on R3-CHAR-REC1's
+  and R3-CHAR-REC4's marks, which the ruling allows (R3-CHAR).
+- Rule 4 (trace): every decision part has a Need line; the features with needs outside VISION_V2 §6 are listed in
+  `docs/adr/README.md` lines 252-256; CD-9 drops R1-DATA-REC7's map upload because no §6 item asks for it; seats, the
+  Hammer's leech, the Spy, kill-cams and accounts get only "kept possible". No finding.
+- Rule 5: no GLOSSARY "Retire (exact)" phrase (24 phrases searched); "headroom" does not occur.
+- Rule 6 / condition 9: the asset and GPU parts decide no look (AP-3: "how a class looks is ADR 0003's and Mustafa's";
+  trees wait; families are OQ-0005-AP2 for Mustafa). No finding.
+- Rule 7 / condition 2: N is 48 everywhere (no 54); every pass mark runs at 30 Hz (doc 1967-1968, 2093); AB-10's 60 Hz
+  figure is a note, and the 60 Hz margin is left to ADR 0001. No finding.
+- Condition 12: finding 5 below (one option row weighs what LOOK_V2 §8 settles).
+
+**Claims.**
+1. **G10, wrong (minor).** Doc 1539-1540: "per-instance colour where a mesh is instanced (`instanceColor` on
+   `InstancedMesh` and `BatchedMesh`: r3, Findings Q4, R3-CHAR-F4, F6, lines 452–467 ...)"; the same in the Options row
+   "Per-instance colour (`instanceColor`, R3-CHAR-F4, F6)" (doc 1606). R3-CHAR-F6 (r3:463-467) says only that BatchedMesh
+   "has per-instance colour". Source: threejs.org/docs/pages/BatchedMesh.html has `setColorAt( instanceId, color )` and
+   no `instanceColor`; three.js r186 src/objects/BatchedMesh.js: 0 hits for `instanceColor`, `setColorAt` at line 1109,
+   colours held in `_colorsTexture`. Fix: "`instanceColor` on `InstancedMesh`, `setColorAt` on `BatchedMesh`".
+2. **A246, unsupported (flagged by the frame itself).** Doc 1160 (OQ-0005-AB5): "ADR 0006 cites this." ADR 0006
+   (`docs/adr/0006-infrastructure-operations.md`) has no hit for "unlock" or OQ-0005-AB5; the decision map (line 1208)
+   says "0006 cites it". The frame lists it for the consistency pass (doc 1891). Fix: ADR 0006 part 12 cites
+   OQ-0005-AB5, or AB5 drops the sentence.
+3. **Two section disagreements still in the assembled text (F111, F112).** OQ-0005-1 (AP-2 and CD-13 put presentation
+   references on simulation definitions; CD-6 and AB-3 keep them apart) and OQ-0005-2 (CD-6: "a weapon definition is a
+   weapon type", doc 346, against OQ-0005-AB4's open option (b)). The frame says "each author fixes its own text in the
+   fix round"; the text is unchanged. Not a wrong claim: the frame states it honestly. Fix: the fix round the frame
+   names (engine-architect for AP-2, AP-3, CD-6, CD-13).
+4. **G22, incomplete restatement.** GPU part 4 (doc 1557-1558): "at Low, ≤ 800 draw calls". r3:1133: "≤ 800 without a
+   per-object outline pass at Low; about ≤ 1,100 with one"; ADR 0003 line 307: "≤ 800 with the screen-space ink (part
+   5.b); about ≤ 1,100 if a hull outline runs at Low". Fix: add "(with the screen-space ink; about 1,100 if a hull
+   outline runs at Low, ADR 0003)".
+5. **Condition 12 (settled input weighed).** GPU Options row (doc 1588): "A look baked into each asset by the modelling
+   tool | not researched | – ...". LOOK_V2 §8 step 5 ("the engine applies the comic look") is taken as given by
+   ASSET-RESEARCH (a); plan [C12]: such an option "appears only as 'settled by <code>'; it is not weighed". Fix: write
+   the row as "settled by LOOK_V2 §8 (step 5) and ASSET-RESEARCH (a); not weighed".
+6. **C53, stale line at HEAD.** Doc 239: "the STATUS item SEC-MDL-2, `docs/STATUS.md` line 257". True at 9e7db28 (the
+   section's stated baseline); at HEAD (549490f) SEC-MDL-2 is STATUS line 314. Fix: cite it by name ("STATUS,
+   SEC-MDL-2") or as line 314.
+7. **X2, citation off (misquote).** Doc 1079: the case against scripting rests on "no §6 item asks for a runtime". The
+   research's words (r1:1798, option A3): "Serves §6.3 but adds a runtime no §6 item asks for". Fix: quote r1:1798 as
+   written and cite it.
+8. **F12, citation off (ledger only).** The frame ledger puts the §6.3 quote at VISION_V2:68-69; it is at 69-70. The
+   ADR gives no line for it, so the ADR needs no change.
+9. **Notes (no change needed).** GPU part 4's "(body, headgear and held weapon)" is the author's reading of what a
+   soldier's 4 draws cover (r3:1044-1045 does not list them). The pass marks' "per-event deadline ... (GL lines
+   146–147)" extends GLOSSARY's "one-off deadline (a single event ...)" to repeated events with the max over events, a
+   reasonable reading. The frame says the content and ability spike comes "after the sim core spike"; the map's order
+   (962-965) puts it after the foundation as well; both are true. Ledger rows PTE232-PTE242 cover the test-engineer
+   file's spike entries for `docs/SPIKE_PLAN.md`, which are not placed in this ADR (X5).
+
+**Source checks (condition 16).** Findings outside the verified sets that claims rest on, opened at their source:
+R3-CHAR-F8 (the r186 example: `GLTFLoader`, `models/gltf/Michelle.glb`, `child.isInstancedMesh = true`,
+`instanceCount = 30`, `new THREE.WebGPURenderer`), R3-CHAR-F10 (LOD page: "switched between them at the distances
+specified"; hysteresis "Threshold used to avoid flickering at LOD boundaries"), R3-LOOK-F12 (BloomNode page: "For a
+selective bloom, use the emissive material property ... This can be achieved via MRT."), R3-CHAR-F6 (BatchedMesh page
+and r186 source: per-instance colour through `setColorAt`; see finding 1), R3-CHAR-F1 (SkinnedMesh page: "requires skin
+indices and weights as buffer attributes in its geometry"), R5-RUSTLINT-F12 (clippy indexing_slicing.rs lines 13 and
+20: "Checks for usage of indexing or slicing that may panic at runtime."; "To avoid implicit panics from indexing and
+slicing."): all confirmed. R3-LOOK-F3 is inferred in R3 (no URL); its legacy basis CL4 is confirmed in the code
+(shamble-core.js:279, a new MeshToonMaterial per `toonify` call). Every R1-DATA and R1-ABL finding the ADR cites is in
+R1's verified set (findings-checked.tsv), as are R6-HOST-F3, R5-GATE-F2, R5-LAYOUT-F7, F15. No source was unreadable.
 
 ## Fetch audit
 

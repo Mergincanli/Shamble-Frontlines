@@ -1,17 +1,17 @@
 # Verifier verdicts: the synthesis (ENGINE_OVERVIEW, SPIKE_PLAN, adr/README, GLOSSARY §8), 2026-11-01
 
-Base: the synthesis commit 80a27b3 (drafts as assembled). HEAD at writing: d7f8d9a; since 80a27b3 only
-`docs/adr/0006-infrastructure-operations.md` changed in docs (fix round 09803a9), noted as drift (finding 6).
+Base: the synthesis commit 80a27b3 (drafts as assembled). While this check ran, three fix-round commits changed
+ADR 0006 (09803a9), ADR 0001 (03df0ae) and ADR 0004 (7da03b1); their effect on the synthesis is finding 6 (drift).
 Ledger: `engine-architect-synthesis-claims.md` (rows 1–25, 31–57). Rows X1–X9 are claims in the documents with no
 ledger row (check 1, "both ways"). Line references: E = docs/ENGINE_OVERVIEW.md, SP = docs/SPIKE_PLAN.md,
 RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.md at 80a27b3.
 
 | # | claim (short) | cited | verdict | where and the words | note |
 |---|---|---|---|---|---|
-| 1 | 30 Hz baseline; 60 Hz only with a 60 Hz margin ≥ 25 % | TICK-30; G §8 | confirmed | STATUS:161–163 "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof test shows at least 25 % headroom"; G:788–793 | E:14–15, SP:14, RM:317 |
-| 2 | 48 players, largest mode 24v24 | MODES-3 (a) | confirmed | STATUS:147 (MODES-3 (a): totals, biggest match 24v24); G:386–388 | |
-| 3 | 60 Hz margin: p99 ≤ 6.25 ms vs 8.33 ms; one vCPU of RS; stress scene N = 48, client per soldier; 30-min soak; re-flood; REC6's two shares, P1–P3 | cond. 2; G §8; 0001 part 2, OQ-0001-1 | confirmed | advisor-verdicts.md:21–25 (cond. 2) word for word in substance; G:788–793; SP:132–137; 0001:840 (OQ-0001-1). Arithmetic: 0.75 × 8.333 = 6.25 ms | |
-| 4 | Stress scene: 16v16v16, 15 big vehicles (4 very large), 300 projectiles, ≤ 8 effects/soldier (384), DM_Tri-sized greybox | G §3 | confirmed | G:399–411 ("15 in play … 4 are very large units"; "300"; "N × 8 (384 at N = 48)"; "DM_Tri-sized greybox") | SP:21–25 |
+| 1 | 30 Hz baseline; 60 Hz only with a 60 Hz margin ≥ 25 % | TICK-30; G §8 | confirmed | STATUS:161–163 "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof test shows at least 25 % headroom"; G:783–790 | E:14–15, SP:14, RM:317 |
+| 2 | 48 players, largest mode 24v24 | MODES-3 (a) | confirmed | STATUS:147 (MODES-3 (a): totals, biggest match 24v24); G:386–387 | |
+| 3 | 60 Hz margin: p99 ≤ 6.25 ms vs 8.33 ms; one vCPU of RS; stress scene N = 48, client per soldier; 30-min soak; re-flood; REC6's two shares, P1–P3 | cond. 2; G §8; 0001 part 2, OQ-0001-1 | confirmed | advisor-verdicts.md:21–25 (cond. 2) word for word in substance; G:783–790; SP:132–137; 0001:840 (OQ-0001-1). Arithmetic: 0.75 × 8.333 = 6.25 ms | |
+| 4 | Stress scene: 16v16v16, 15 big vehicles (4 very large), 300 projectiles, ≤ 8 effects/soldier (384), DM_Tri-sized greybox | G §3 | confirmed | G:399–406 ("15 in play … 4 are very large units"; "300"; "N × 8 (384 at N = 48)"; "DM_Tri-sized greybox") | SP:21–25 |
 | 5 | Test-mode list: 24v24, 12v12v12; 16v16v16; 1v1, 4v4, 2v2v2, 6v6v6; N = 64 headroom | G §2 | confirmed | G:378–388 | SP:26–27 |
 | 6 | Sizes S ≈ a day, M 2–4 days, L a week+ | passmark files | confirmed | passmarks-0001:263 (same line in all six files) | SP:17–18 |
 | 7 | Each spike's size | passmark spike entries | confirmed | passmarks-0001:289 (L); -0002:266 (L), :290 (L, six change-sets); -0003:246, :264 (L, L); -0004:247 (L), :270 (S), :281 (S), :294 (M); -0005:260 (L), :282 (S/M), :298 (M), :311 (M); -0006:184 (S, ≥ 2 days), :207 (M), :220 (S) | SP:72–85 and items |
@@ -23,19 +23,19 @@ RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.m
 | 13 | 8 rooms per VM, CCX23 and CX33 | 0006 spike item 2 | confirmed | 0006 (80a27b3) :740–741 "on the CCX23 and on the CX33, 8 rooms of 48 players"; source R6-HOST-F15 spot-checked (findings-checked.tsv:624) | |
 | 14 | PREV-DELETE within 24 h | 0006 part 3 | confirmed | 0006:155 "24 h after a pull request closes"; PM-0006-6 | SP:247 |
 | 15 | 25 MiB largest file | 0006 part 1; R6-HOST-REC1 | confirmed | 0006 spike item 1 "file stays under 25 MiB"; R6-HOST-F3 (r6:72–79, spot-checked r6:1109); re-read at source, fetch audit row 1: "The maximum file size for a single Cloudflare Pages site asset is 25 MiB" | SP:246, :343 |
-| 16 | 384 active effects | G §3 | confirmed | G:404; 48 × 8 = 384; PM-0004-62 "with 384 active effects" | SP:290 |
+| 16 | 384 active effects | G §3 | confirmed | G:405; 48 × 8 = 384; PM-0004-62 "with 384 active effects" | SP:290 |
 | 17 | About 60 marks, seven targets, three machines | passmarks-0004:247–249 | confirmed | passmarks-0004:248 "a determinism suite over seven targets; three machines; about 60 marks" (PM-0004-1 to -61) | SP:185 lists six targets; the seventh (ML Windows browsers) is in PM-0004-19's hardware column (finding 9) |
 | 18 | Three T1 abilities; Molotov and Shield | LOOP_V2 §5; ABL-PREDICT | confirmed | LOOP_V2:58 "T1 class abilities (Molotov, Riot Shield, Banzai blade)"; STATUS:165 | |
-| 19 | 88 OQs (13, 7, 15, 7, 34, 12) | grep of drafts | confirmed | `grep -c '^- \*\*OQ-'` per draft = 13, 7, 15, 7, 34, 12; sum 88; 0005: 8 CD + 13 AB + 3 AP + 6 AS + 4 = 34 | RM:15–22. HEAD 0006 still 12 |
+| 19 | 88 OQs (13, 7, 15, 7, 34, 12) | grep of drafts | confirmed | `grep -c '^- \*\*OQ-'` per draft = 13, 7, 15, 7, 34, 12; sum 88; 0005: 8 CD + 13 AB + 3 AP + 6 AS + 4 = 34 | RM:15–22. At HEAD 0001 has 14 (OQ-0001-14 added by 03df0ae): finding 6 |
 | 20 | 38 DESIGN ids | id table | confirmed | ids.tsv owner DESIGN = 38; RM:108–145 id set equal (diff empty, no duplicates) | |
 | 21 | 28 critic ranks; 72 XT; 30 XU | id table, map f2 | confirmed | RM:176–203 = 28 rank rows holding 72 XT ids = ids.tsv's 72 (diff empty); owners and ranks per row equal ids.tsv; ids.tsv has 30 XU | |
-| 22 | Line numbers in RM rows | drafts at assembly | confirmed | every OQ line in RM:32–103 equals the OQ's line at 80a27b3 (e.g. 0001:840, 846, 856, 861, 867, 881–905; 0002:800, 836, 848, 859; 0003:706–793; 0004:742–784; 0005:583–632, 1095–1226, 1481, 1489, 1624, 1833–1876; 0006:598–701); 0001:161 "(at N = 54, MODES-3 (b))"; 0005:76 ASSET-RESEARCH | drift: 0006 OQ lines moved +15 to +26 after 09803a9 (finding 6); RM:10 warns lines may move |
+| 22 | Line numbers in RM rows | drafts at assembly | confirmed | every OQ line in RM:32–103 equals the OQ's line at 80a27b3 (e.g. 0001:840, 846, 856, 861, 867, 881–905; 0002:800, 836, 848, 859; 0003:706–793; 0004:742–784; 0005:583–632, 1095–1226, 1481, 1489, 1624, 1833–1876; 0006:598–701); 0001:161 "(at N = 54, MODES-3 (b))"; 0005:76 ASSET-RESEARCH | drift: OQ lines moved after the fix rounds (0001 +2, 0004 +6, 0006 +15 to +26; finding 6); RM:10 warns lines may move |
 | 23 | P2 = 100 ms round trip with jitter and loss | OQ-0001-3 | confirmed | 0001:856–857 "P2: 100 ms round trip, ±20 ms jitter, 2 % loss (part 13)"; 0001:392 | RM:34 |
 | 24 | 118 rows "look brief pending" | map LE-H | confirmed | map:921; source LEGACY_INVENTORY.md:23 "Look brief pending on 118 rows" | RM:225 |
 | 25 | GLOSSARY at 9e7db28: 742 newlines, 64,088 bytes, unterminated last line | git show | confirmed | `wc -lc` = 742 64088; `cmp` of the first 64,088 bytes of G with 9e7db28: identical; byte 64,089 = "\n" | process claim; not stated in the documents themselves |
 | 31 | One Rust sim, native per room and Wasm in one Worker; client endpoint online, local server in local play from slice 1 | brief §1; SLICE-ORDER 1; 0002 parts 5–6; 0004 | confirmed | STATUS:140–141 (condition 1); 0002:303–308 (part 6); 0002:182 (`sim-wasm`: client endpoint and local server) | E:8–10 |
 | 32 | Page makes no Wasm call, no network; one command up, one transferred block down (B2; B3 measured) | 0002 part 5 | confirmed | 0002:248–266 (B2 "transferred to the page"; "The SharedArrayBuffer ring (B3) is the spike's measured" alternative; C1 "One command per tick, posted"); 0002:286–287 "never touch the page" | E:49–50, 55–63 |
-| 33 | Crates and dependency rules | 0002 part 3 | unsupported (one clause) | 0002:197–206 confirm every rule; but E:68 "tools (`devtools`, `navbake`, the editor) may depend on everything": 0002:185 `devtools` "anything", 0002:186 `navbake` depends on "`sim`, `content`" | finding 5 |
+| 33 | Crates and dependency rules | 0002 part 3 | unsupported (one clause) | 0002:191–200 confirm every rule; but E:68 "tools (`devtools`, `navbake`, the editor) may depend on everything": 0002:184 `devtools` "anything", 0002:185 `navbake` depends on "`sim`, `content`" | finding 5 |
 | 34 | Per-tick flow | 0001 parts 4–9, 11; 0004 parts 4–19 | confirmed | 0004:161 (tick counter), :253–262 (spread on the authority-only stream, SEC-SPREAD), 0001:369 "bots through the human input path", 0001:214, 285 (parts 6, 9), 0001:266 (part 8, rewind cap) | E:72–84 |
 | 35 | Per-frame flow | 0003 part 10 | confirmed | 0003:373–388 (part 10: newest block, interpolate, animate, draw, events, cursor ray) | ledger's 0003:377 is the part's 5th line; part starts 0003:373 |
 | 36 | State ownership; production pins one content set per match | 0001 "State ownership"; CD-7 | confirmed | 0001:444 "### State ownership"; 0005:358 "CD-7. Reload: production pins one content set per match" | E:90–93 |
@@ -56,7 +56,7 @@ RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.m
 | 51 | WEAPON-UNLOCKS, carry slots, looted ammo, levelling = AB5, AB1, AB2, AB3 | 0005:1095–1148; UPGRADE-SCOPE | confirmed | 0005:1148 "OQ-0005-AB5. WEAPON-UNLOCKS"; 0005:1095, :1107, :1115; inputs/UPGRADE-SCOPE "carry slots, ammo for looted weapons, and how fast tracks level" | |
 | 52 | 38 DESIGN rows, question and why | id table notes; research | confirmed | dispositions equal ids.tsv notes; 21 question texts read (r1:2667, 2721, 2772–2775, 2815; r2:3014, 3018, 3091–3099, 3255; r4:1112–1142; r6:913, 915) | finding 7 for RM:109's "decision map S11" |
 | 53 | Loose-ends rows and where each is resolved | map f1–f3, J2; drafts | citation off (STATUS lines) | CF-1..5 = STATUS:167–182; 0001:161; 0002:120, :339–340, :773; 0003:140, :1182; 0005:282; 0006 part 7 (80a27b3 :214–229); PM-0002-4, PM-0003-20 (LE-B); PM-0006-6. But RM:208–214 and RM:333 cite STATUS:198, 199, 200–201, 202, 257, 262, 273: right at 9e7db28, moved by 549490f; now STATUS:246, 249, 250–251, 252, 314, 319, 330 | finding 2 |
-| 54 | Needs outside VISION_V2 §6, per draft | the drafts' "Need:" lines; map J3 | wrong (incomplete and over-inclusive) | lines checked against every "Need:" line of 0001–0006 at 80a27b3. Missing: R2-BUD-REC4 (the input buffer and the clock), 0001:1358 "need: VISION_V2 §4 only", listed by 0001:1433 (R2-XU-OQ18) with R2-BUD-REC5 and R2-TRN-REC6. Over-inclusive: RM:244 "roof fade: LOOK_V2 §4" (0003:232 "Need: VISION_V2 §6.2; LOOK_V2 §4", and E:99 places part 5.i under §6.2); RM:251 "three damage stages and structure states (part 14): LOOK_V2 §4" (0004:391–392: structure states need §6.2, §6.4, §6.5; "the damage stages: LOOK_V2 §4 only") | finding 3, finding 4 |
+| 54 | Needs outside VISION_V2 §6, per draft | the drafts' "Need:" lines; map J3 | wrong (incomplete and over-inclusive) | lines checked against every "Need:" line of 0001–0006 at 80a27b3. Missing: R2-BUD-REC4 (the input buffer and the clock), 0001:1358 "need: VISION_V2 §4 only", listed by 0001:1433 (R2-XU-OQ18; at HEAD 0001:1442 and OQ-0001-14) with R2-BUD-REC5 and R2-TRN-REC6. Over-inclusive: RM:244 "roof fade: LOOK_V2 §4" (0003:232 "Need: VISION_V2 §6.2; LOOK_V2 §4", and E:99 places part 5.i under §6.2); RM:251 "three damage stages and structure states (part 14): LOOK_V2 §4" (0004:391–392: structure states need §6.2, §6.4, §6.5; "the damage stages: LOOK_V2 §4 only") | finding 3, finding 4 |
 | 55 | Codes the drafts cite | map parts a, c, d, h, j; grep | confirmed | grep of 0001–0006: seams S1, S3, S4, S6, S12; gaps G1–G5, G7–G9, G11, G15; N1, N2, N6, N12, N30, N32, N34, N37, N39–N41, N48; I-1..I-10, I-12..I-21; J1–J6; LE-B = RM:265–337 (I-11 defined but not cited: harmless). Definitions match map:802–822 | |
 | 56 | The drafts replace ADR-001..003 | STATUS; CLAUDE.md | confirmed | STATUS:246 "ADR-001..003 below: the v2 drafts `docs/adr/0001`–`0006` replace them"; CLAUDE.md "they replace ADR-001..003" | |
 | 57 | G §8 quotes equal brief 52–59 and 60–66 | diff | confirmed | every `>` line of G §8 (G:750–757, 768–774), prefix removed, equals DRAFTS_BRIEF.md:52–66 byte for byte (15 lines, `diff` empty). Closing note G:797 equals cond. 3's text byte for byte; G:85 "which does not change" | |
@@ -65,8 +65,8 @@ RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.m
 | X3 | Diagram labels (sim crate: plain typed tables, integer ticks, parry3d, baked navigation; one room per process; hashed bundle) | (none) | confirmed | 0004:125, 161, 295, 320; 0006:178 "one room per process"; CD-8 (0005:379) | E:18–48 |
 | X4 | "The drafts" table: what each decides and its spikes; 0004 has shares in four others | (none) | confirmed | part lists of each draft (row 37's headings); 0004 shares: PM-0004-62–66, -67, -68–70, -71–72 = four spikes | E:113–120 |
 | X5 | "What it rests on": the settled list | (none) | confirmed | STATUS:113–116, 137–165, 207, 235 (MODES-3 (a), TICK-30, SLICE-ORDER, PREVIEW-WALL (a), SEC-SPREAD (a), ABL-PREDICT, BASELINE-WHEN (b), UPGRADE-SCOPE, SPIKE-SCOPE (a), R7-MARKS (a), LOOK_V2 with glTF/GLB) | E:123–128 |
-| X6 | Machines RS, SH, LG, MV (a CX33 with the metrics stack), ML, RD, MAC, MP | (none) | confirmed | 0001:1019 (SH "the shared CX33"; LG); 0006:814–815 "MV, a CX33 in the same location running Prometheus"; 0003:892, 896 (ML, RD) | SP:28–32 |
-| X7 | Network profiles P0–P4, simulator layers L1, L2 | (none) | confirmed | 0001:391–399 (part 13); 0001:1047 (L1, L2; R5-TEST-REC4) | SP:33–34 |
+| X6 | Machines RS, SH, LG, MV (a CX33 with the metrics stack), ML, RD, MAC, MP | (none) | confirmed | 0001:1010 (SH "the shared CX33"; LG beside it); 0006:787–788 at 80a27b3 (814–815 at HEAD) "MV, a CX33 in the same location running Prometheus"; 0003:892, 896 (ML, RD) | SP:28–32 |
+| X7 | Network profiles P0–P4, simulator layers L1, L2 | (none) | confirmed | 0001:391–399 (part 13); 0001:1016, :1037 (L1, L2) | SP:33–34 |
 | X8 | Later milestones list | (none) | confirmed | map:955–960 (same ids and slices); the mode-files line from ADR 0001 (R2-ROOM-REC7) | SP:374–380 |
 | X9 | RM drafts table: titles, authors, status | (none) | confirmed | each draft's line 1 and line 5 (**Author:**, **Status:** Proposed); 0005's three authors | RM:15–20 |
 
@@ -86,7 +86,7 @@ RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.m
 - Rule 6 / condition 9: nothing decided beyond LOOK_V2; the look calls are named as Mustafa's (SP:223–226, RM:56–66).
 - Condition 12: settled inputs listed as "never reopened" (E:122–128); none weighed as an option.
 - Rule 7 / condition 2: SP:14–15 ("Every server number is at the 30 Hz baseline … Where a research mark gives 48 and
-  54, 48 holds"); E:14–15; G §8's definition equals condition 2 (G:788–795).
+  54, 48 holds"); E:14–15; G §8's definition equals condition 2 (G:783–790).
 
 ## Findings (ranked)
 1. **Wrong, E:101 (row 37).** Text: "ADR 0005 AB-6 (the two primitives §6.4 needs: an effect removed when its source
@@ -107,14 +107,20 @@ RM = docs/adr/README.md, G = docs/research/GLOSSARY.md; 000N = docs/adr/000N-*.m
    14): LOOK_V2 §4": structure states need §6.2, §6.4, §6.5; only "the damage stages: LOOK_V2 §4 only" (0004:391–392).
    Fix: drop the roof fade from RM:244 (or add "beside §6.2"); RM:251 "three damage stages (part 14): LOOK_V2 §4 only".
 5. **Unsupported clause, E:68 (row 33).** "tools (`devtools`, `navbake`, the editor) may depend on everything":
-   0002:185 gives `devtools` "anything", but 0002:186 gives `navbake` "`sim`, `content`". Fix: "`devtools` may depend
+   0002:184 gives `devtools` "anything", but 0002:185 gives `navbake` "`sim`, `content`". Fix: "`devtools` may depend
    on anything; `navbake` on `sim` and `content`".
-6. **Drift after the synthesis (rows 22, 50; not an error at 80a27b3).** ADR 0006's fix round 09803a9 moved its OQ
-   lines (now 613, 625, 632, 643, 655, 673, 684, 694, 703, 712, 719, 727) and gave OQ-0006-5's development and staging
-   case to the Advisor ("the development and staging case before the netcode proof test starts (the Advisor, from a
-   short read)"). Fix in the register pass after the fix round: add an OQ-0006-5 row (the Advisor, dev and staging
-   certificates) and re-run the line numbers; RM:10 already warns lines may move. 0006's PM ranges and OQ count are
-   unchanged at HEAD.
+6. **Drift after the synthesis (rows 19, 22, 50, 52; not errors at 80a27b3).** Three fix-round commits landed while
+   this check ran (`git log 80a27b3..HEAD -- docs/`): 09803a9 (ADR 0006), 03df0ae (ADR 0001), 7da03b1 (ADR 0004).
+   (a) ADR 0001 adds **OQ-0001-14** (0001:916 at HEAD, "Is a VISION_V2 §3 or §4 target trace enough for an engine
+   feature?", decider "the Advisor, at the stop"; its Appendix A row R2-XU-OQ18 now reads "open: OQ-0001-14",
+   0001:1442): RM:15 becomes 14 open questions, RM:22 the total 89, and RM:43's trace-reading row should name
+   OQ-0001-14. (b) ADR 0006 gives OQ-0006-5's development and staging case to the Advisor ("the development and
+   staging case before the netcode proof test starts (the Advisor, from a short read)"): RM's decisions table needs an
+   OQ-0006-5 row. (c) ADR 0004 now names one design item "Not yet in that register: whether grenade fragments deal
+   damage per fragment … a rule for Mustafa, with no research id" (0004:814 at HEAD): RM's "Design questions" holds
+   only the 38 DESIGN ids, so it needs one non-id line for it. (d) OQ lines moved: 0001 +2 (842–916), 0004 +6
+   (748–798), 0006 +15 to +26 (613–727); RM:10 already warns lines may move. PM ranges and the OQ counts of 0004 and
+   0006 are unchanged at HEAD; 0001 has 56 marks in the same sections. Fix in the register pass after the fix round.
 7. **Dangling code, RM:109 (row 52).** "(decision map S11)": S11 is a map seam (map:213) that README's seam table
    (RM:290–297) does not define, and the map is deleted before the PR is ready. Fix: cite "SLICE-ORDER condition 1"
    only, or add S11 to the seam table.

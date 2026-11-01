@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 13:56 Amsterdam
+- **Last update:** 2026-11-01 14:00 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -50,7 +50,13 @@ the session assigned to the drafter by mistake: a stale line range replaced by t
 in the report; F1 waits for test-engineer). Prepared: `prompts/fix-passmarks-test-engineer.txt` (the pass-mark rows of
 0001, 0002, 0003, 0004, 0006). 0004's fixes applied (7da03b1: 11 blocks; rows 166, 39, 182, 253, N1, N3, N6; row 38
 refuted, row 20 holds; the per-fragment damage question added "not yet in that register": the README's owner adds it
-at the next synthesis touch). test-engineer launched for the pass-mark rows (about 14:00).
+at the next synthesis touch). test-engineer launched for the pass-mark rows (about 14:00). Verifier 0005 done: PASS
+WITH NOTES (997 of 1,001 confirmed; G10 wrong: BatchedMesh has `setColorAt`, not `instanceColor` (GPU section); A246
+unsupported: AB5's "ADR 0006 cites this" (ability section, or a cite in 0006 part 12); F111/F112: OQ-0005-1/-2, the
+sections' own disagreements; G22: "≤ 800 draw calls" without its hull-at-Low condition; condition 12: the GPU options
+row "a look baked into each asset" should read "settled by LOOK_V2 §8"; C53: STATUS line 257 is now 314 (cite by name);
+X2: a misquote of r1:1798; 8 fetches, all 200). All six drafts are now verified. The completeness critic launched (about
+14:03). The 0005 fix round waits for the consistency critic, so each author gets one batch.
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.

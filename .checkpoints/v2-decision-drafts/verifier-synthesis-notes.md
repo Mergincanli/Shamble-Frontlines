@@ -21,3 +21,7 @@ Next: write verdicts file; then ledger 10, 53-55 spot checks.
 Both-ways: claims with no ledger row given rows X1-X9 (all confirmed).
 Fetch audit: 1 request, developers.cloudflare.com/pages/platform/limits/ 200, 129,246 B, 0.42 s, 13:56:23; "maximum file size for a single Cloudflare Pages site asset is 25 MiB" found.
 Next: write verdicts file.
+14:05 verdicts file written (61 rows: 57 C, 2 W, 1 U, 1 citation off; 9 findings; 1 fetch); line refs re-checked and fixed (G:783-790, G:405, 0006 MV 787-788 at base).
+14:12 Drift found: 03df0ae (0001: new OQ-0001-14, Advisor; total 89) and 7da03b1 (0004: grenade-fragment design item 'not yet in that register'; OQ lines +6) landed during the check; finding 6 rewritten to cover 0001/0004/0006. Line cites re-checked against 80a27b3 bases (.gate/syn_000N_base.md); X6/X7 fixed (0001:1010, 1016, 1037).
+14:16 Verdicts file final: 61 rows (57 confirmed, 2 wrong: 37, 54; 1 unsupported: 33; 1 citation off: 53; 0 unverified; 0 pending); 9 findings ranked; fetch audit 1 row. Verdict PASS WITH NOTES. No commit, no push, no doc edited; scratch only under .gate/ (syn_*).
+DONE
