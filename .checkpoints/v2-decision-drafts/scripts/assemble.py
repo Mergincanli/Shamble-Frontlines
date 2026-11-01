@@ -8,7 +8,7 @@ out = pathlib.Path(sys.argv[2])
 PH = re.compile(r'(^### Pass marks[ \t]*\n)(?:[ \t]*\n)*Written by test-engineer \(plan step 4\)\.[ \t]*\n', re.M)
 if len(sys.argv) > 3:
     pm = pathlib.Path(sys.argv[3]).read_text(encoding='utf8')
-    m = re.search(r'^### Pass marks[ \t]*\n.*?(?=^### Spike entries|\Z)', pm, re.S | re.M)
+    m = re.search(r'^### Pass marks[ \t]*\n.*?(?=^---8<--- the subsection ends|^### Spike entries|\Z)', pm, re.S | re.M)  # stop at the author's cut marker
     if not m: sys.exit('no "### Pass marks" part in the pass-marks file')
     block = m.group(0).rstrip('\n') + '\n\n'
     hits = PH.findall(src)

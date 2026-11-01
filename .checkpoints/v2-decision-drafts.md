@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:04 Amsterdam
+- **Last update:** 2026-11-01 09:08 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,7 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- cf00def · the pass-mark files' cut marker removed from all six drafts (verifier 0006 finding 3); assemble.py fixed.
 - 233f6f7 · ADR 0005 assembled (engine-architect's frame with the four sections byte for byte + PM-0005-1..46), write
   guard PASS. Draft PR #33 opened on it.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
@@ -42,9 +43,14 @@ resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed
 pass marks 0005 (46 marks; its ledger last); ADR 0005 assembled (233f6f7; its four sections byte for byte, checked by
 script); all six drafts now in docs/adr/. Draft PR #33 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/33),
 subscribed to its activity (its head is a [skip ci] checkpoint commit for now: the run's last commit must run CI).
-Pass marks 0005 done with its ledger (242 rows); docs/adr/0005 re-assembled from the final file: identical. Running:
-the synthesis (engine-architect, launched about 09:03; documents due by 10:05), verifiers 0001, 0002, 0004, 0006
-(resumed; source checks allowed now; verdicts due 10:15). Waiting: verifiers 0003, 0005 and the synthesis, the critics,
+Pass marks 0005 done with its ledger (242 rows); docs/adr/0005 re-assembled from the final file: identical. Verifier
+0006 done: FAIL with 3 defects (Sentry's IP note: `userInfo` off is not enough, headers, cookies and query strings need
+deny lists; R6-HOST-OQ4's second trigger "before the goal budget is fixed" dropped; the assembler's cut marker copied
+into the draft) and 11 lower findings; 581 of 588 rows confirmed; 29 source fetches, 28 read (one 403, read from its
+raw copy). The cut marker was in all six drafts: removed (cf00def; assemble.py now stops at it). Running: the synthesis
+(engine-architect, launched about 09:03; documents due by 10:05), verifiers 0001, 0002, 0004 (resumed), 0003
+(launched about 09:08). Waiting: verifier 0005 and the synthesis' verifier, the skeptics for 0006's findings 1–2, the
+critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
 

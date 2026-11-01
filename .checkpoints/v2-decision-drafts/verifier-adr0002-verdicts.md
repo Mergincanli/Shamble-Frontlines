@@ -291,3 +291,256 @@ verified (C16): a REC claim is confirmed (R) and its source check is the finding
 | A4 | (no row) "Its results go into this record before Mustafa accepts it" (spike section) | plan | confirmed (process; matches migration step 1) | doc:1179–1180 | |
 | A5 | (no row) Editor: "a phase 1 track, slice 5; its map document is ADR 0005's" | brief §1; map I-9 | confirmed | DRAFTS_BRIEF:35 "Octopon-3 and Editor v2" (slice 5) | |
 | A6 | (no row) Test table soak row "up to the largest mode's N (48)" vs the test-mode list's N = 64 headroom (PM-0002-76) | GLOSSARY 375–387 | inconsistent wording | GLOSSARY:385 item 5 "the headroom run, N = 64" | note N-5 |
+
+## Test-engineer ledger rows (the "Pass marks" subsection, doc 938–1170)
+
+Doc line = TE ledger's "draft" line for draft lines ≤ 937; the TE ledger's draft lines after 939 map to doc +233.
+"conf." = confirmed; "prop." = a proposed reading, method or number the doc labels proposed with a reason.
+
+| # | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|
+| TE1 | ML: ADR 0003's minimum laptop, Windows 11, Chrome, Edge, Firefox | r3 BUDGET-REC1 | conf. (R3's proposal) | r3:1096–1099 "Windows 11, run on Chrome and Firefox" | Edge added from R1-BND-REC1 mark 3 |
+| TE2 | ML panel 60 Hz unless named | — | conf. (prop.) | — | |
+| TE3 | MAC: latest Safari; model recorded | r1 REC1 m3 | conf. | r1:2263 | |
+| TE4 | MP: RTX 5080 in Brave; never a budget result | r3 1102–1103 | conf. | r3:1101–1102 "Mustafa's RTX 5080 is a headroom and Brave check, never the recommended reference" | |
+| TE5 | CI: ubuntu-24.04, 4 CPUs, 16 GB, no GPU | r5 CI-F17 673–676 | conf. | verifier r5:2155 "ubuntu-24.04 public "4" \| "16 GB""; GPU only under larger runners | ledger tier "source to check" is wrong: F17 is research verified |
+| TE6 | CI gives counts, never hardware times | r3 MEASURE-REC3 | conf. | r3:1203–1206 | |
+| TE7 | BX uses the proof test's throwaway sim | ADR 0001 spike | conf. (cross-draft) | 0001 spike section | |
+| TE8 | Stress-scene counts: 16v16v16, 15 big vehicles, 4 very large, 300 projectiles | GL 397–420 | conf. | GLOSSARY:400–404 | |
+| TE9 | Very large units of 20 parts | GL 438–442 | conf. | GLOSSARY:439–440 "at least 20 parts" | doc's "of 20 parts" = the minimum |
+| TE10 | Scale steps 12/24/36 in three equal teams | GL 400–402 | conf. (prop.) | GLOSSARY:401–402 names the steps only | |
+| TE11 | Scripted movers fill unsimulated sections | — | conf. (prop.) | doc:958–959 reason given | |
+| TE12 | Plain renderer, not the look | plan rules 6, 10 | conf. (prop.) | — | rule 6 respected |
+| TE13 | BX-P padded to 13.3 ms | GL 214–218 | conf. | GLOSSARY:215–216 "13.3 ms at 30 Hz" | |
+| TE14 | 600 s × 30 = 18,000 ticks | arithmetic | conf. | 600 × 30 = 18,000 | |
+| TE15 | Online via the proof test's room and impairment | ADR 0001 | conf. (cross-draft) | — | |
+| TE16 | P0 and P2 values | r2 1987–1990 | conf. | r2:1988 "P0 = 0 ms, no jitter, 0 % loss · … P2 = 100 ms, ±20 ms, 2 %" | |
+| TE17 | H: 3 × 600 after 300 | r3 MEASURE-REC1 | conf. | r3:1183–1184 | |
+| TE18 | `performance.now()`, not rAF (1 ms) | r3 MEASURE-F7 | conf. | r3:641–643 | verified |
+| TE19 | Nearest rank 570th, 17,100th, 17,820th | arithmetic | conf. | ⌈0.95×600⌉ = 570; ⌈0.95×18,000⌉ = 17,100; ⌈0.99×18,000⌉ = 17,820 | |
+| TE20 | V: medians within 3 % | r3 1192–1193 | conf. | r3:1192–1193 "two back-to-back runs … medians within 3 %" | |
+| TE21 | Count mark statistic = run max | — | conf. (prop.) | — | |
+| TE22 | No statistic = p99; one-off = plain limit | GL 141–147 | conf. | GLOSSARY:142, 146–147 | |
+| TE23 | U and P modes | ADR 0003 | conf. (prop., as 0003) | 0003:927 | per-browser switch "not researched" stated |
+| TE24 | 100 µs / 5 µs | r3 F7 | conf. | r3:641–642 | |
+| TE25 | Sub-ms marks on the isolation-flag build | ADR 0003 | conf. (prop.) | — | |
+| TE26 | Shared clock; worker own time origin | r1 REC2 m3; F30 | conf. | r1:2279–2280 | |
+| TE27 | Counting build | — | conf. (prop.) | — | |
+| TE28 | 30 Hz, no 60 Hz mark | TICK-30; map J1 | conf. | STATUS:118–120 | |
+| TE29 | Command shim has no profile (posted messages reliable) | r1 REC3 | conf. (prop. reading) | r1:2290–2291 (posted messages are structured clones, F34) | reliability is the reader's inference |
+| TE30 | "a check without a failing case can't be shown to work" | r5 1727–1728 | conf. | r5:1727–1728 verbatim | |
+| TE31 | Rule B busy-wait | ADR 0003 | conf. (prop.) | — | |
+| TE32 | Mutation fails exactly its check; control passes | r5 1706–1709 | conf. | r5:1707–1709 | |
+| TE33 | ML named with CPU, GPU, RAM, screen; `hardwareConcurrency` | r1 REC1 m1; BND-OQ3 (2727–2730); r3 1114–1116 | conf.; citation off | R1-BND-OQ3 is r1:2728–2731 (doc PM-0002-1 cites 2727–2730) | finding F-13 (low) |
+| TE34 | Displays and commits recorded | — | conf. (prop.) | — | |
+| TE35 | 0 page calls, 0 instantiations | r1 REC1 m2 | conf. | r1:2262 | |
+| TE36 | Bite: page instantiates `sim-wasm` | — | conf. (prop.) | — | |
+| TE37 | Same calls at N = 12 and 48, ≤ 4 | r1 REC1 m2 | conf. | r1:2262–2263 | |
+| TE38 | ≤ 8 for two instances | arithmetic | conf. | 4 × 2 | |
+| TE39 | Glue allocator calls counted, ≤ 4 on control-API calls | — | conf. (prop. reading) | doc:1084–1088 | the reading narrows R1's "Wasm calls"; F-2 |
+| TE40 | 1,800 ticks | arithmetic | conf. | 60 × 30 | |
+| TE41 | Bite: per-soldier accessor | — | conf. (prop.) | — | |
+| TE42 | p95 difference ≤ 1.0 ms at 12/24/36/48 | r1 REC1 m1 | conf. | r1:2259–2261 | |
+| TE43 | Same at N = 48 on BX-P | — | conf. (prop.) | — | |
+| TE44 | Both statistics gate (LE-B) | map LE-B; PM-0003-20 | conf. (cross-draft) | 0003:972 "**Which statistic gates (decision map LE-B): both, each in its own spike**" | |
+| TE45 | Page's cost ≤ 1.0 ms per frame | GL 214–218; r3 1127 | conf. | GLOSSARY:217; r3:1127 | |
+| TE46 | 10 interleaved pairs; median = mean of 5th and 6th | ADR 0003 PM-0003-37 | conf. (prop.) | 0003:989 "10 pairs … the median of the 10 paired differences" | |
+| TE47 | 3 % of 28 ms = 0.84 ms | arithmetic | conf. | 0.03 × 28 = 0.84; r3:1124 median ≤ 28 ms | |
+| TE48 | 1,200 blocks, 40 s | arithmetic | conf. | 40 × 30 = 1,200 | |
+| TE49 | Mode U; rule B | — | conf. (prop.) | — | |
+| TE50 | Four browsers and Brave | r1 REC1 m3 | conf. | r1:2263 | |
+| TE51 | 0 errors, 18,000 ± 1 ticks, one block per tick | — | conf. (prop.) | — | |
+| TE52 | Bite: `console.error` at 2 s | r5 1723 | conf. | r5:1723 | |
+| TE53 | ≤ 1 copy, 0 page copies and per-entity calls | r1 REC2 m1 | conf. | r1:2276–2277 | |
+| TE54 | Exactly 1 message per tick | part 5 | conf. (prop.) | — | |
+| TE55 | Detached-buffer and view-identity checks | r1 F15 | conf. | r1:2290–2291; F15a verified (r1:3413) | |
+| TE56 | Bite: no transfer list | — | conf. (prop.) | — | |
+| TE57 | 0 buffer/typed-array allocations per frame | r1 REC2 m2 | conf. | r1:2277–2278 | |
+| TE58 | Warm-up = first 300 frames | r3 1183–1184 | conf. (prop.) | — | |
+| TE59 | < 0.1 MB/s as allocation rate | r1 REC2 m2 | conf. (number); prop. reading | r1:2278 "heap growth under 0.1 MB/s … (allocation sampling)" | |
+| TE60 | 0.1 × 600 = 60 MB | arithmetic | conf. | | |
+| TE61 | Sampling incl. collected objects (TL15) | tools/perfbots.js 9–10 | conf. (repo) | perfbots.js:9–10 "inspector sampling profile with includeObjectsCollectedByMajorGC/MinorGC" | |
+| TE62 | Chrome only | — | conf. (prop.) | — | |
+| TE63 | CDP for GC and heap | ADR 0003 PM-0003-24 | conf. (prop.; "not researched" there) | 0003:976 | |
+| TE64 | 3 matches; 64-byte bite | PM-0003-29 | conf. (prop.) | 0003:981 | |
+| TE65 | Latency ≤ one frame at p95 | r1 REC2 m3 | conf. | r1:2278–2280 | |
+| TE66 | 17,100th | arithmetic | conf. | | |
+| TE67 | Endpoints defined | — | conf. (prop.) | — | |
+| TE68 | Page loaded to 16 ms/frame | r3 1125 | conf. | r3:1125 "Main-thread CPU per frame … p99 ≤ 16 ms" | |
+| TE69 | Mode P, 3 matches | — | conf. (prop.) | — | |
+| TE70 | Bite: late post | — | conf. (prop.) | — | |
+| TE71 | 0 lost/reordered events at N = 48 | r1 REC2 m4 | conf. | r1:2280–2281 | |
+| TE72 | Event sequence number | — | conf. (prop.) | — | |
+| TE73 | Bite: block returned unread | — | conf. (prop.) | — | |
+| TE74 | Bytes and copy time per layout | r1 BND-OQ6 (2736–2739) | conf.; citation off | OQ6 is r1:2737–2740 | F-13 |
+| TE75 | Writer time beside the copy | r1 RR-OQ6 | conf. | r1:2951–2954 | |
+| TE76 | Critic rank 37 decided here | map | conf. (settled) | — | |
+| TE77 | B3 weighed only if ≥ 0.5 ms or one frame | r1 REC2 m5 | conf. | r1:2282–2284 | |
+| TE78 | "Page time" = handler and binding | — | conf. (prop.) | — | |
+| TE79 | B2 and B3 both on isolated build | r1 REC5; r3 F7 | conf. (prop.) | — | |
+| TE80 | 10 pairs | — | conf. (prop.) | — | |
+| TE81 | 0 lost/doubled over 10,000 | r1 REC3 m1 | conf. | r1:2292–2294 | |
+| TE82 | Releases counted; short presses | r1 REC3 | conf. (prop.) | r1:2287–2288 edge counters | |
+| TE83 | Shim U(0,100 ms), 10 % doubled | — | conf. (prop.) | — | |
+| TE84 | Network press mark is ADR 0001's (R2-SYNC-REC2 at P3) | ADR 0001 | conf. (cross-draft) | 0001:1113, 1357 | |
+| TE85 | Bite: bitmask only | — | conf. (prop.) | — | |
+| TE86 | Key to tick ≤ tick + frame at p95 | r1 REC3 m2 | conf. | r1:2294–2295 | |
+| TE87 | 33.3 + 16.7 = 50.0 ms | arithmetic | conf. | 1000/30 = 33.3; 1000/60 = 16.7 | |
+| TE88 | 9,500th of 10,000 | arithmetic | conf. | | |
+| TE89 | Playwright headed; Safari via safaridriver | r5 F8; TEST-REC2 | conf. | r5:1416–1418 | |
+| TE90 | Bite: frame-callback posting + extra tick | — | conf. (prop.) | — | |
+| TE91 | Ray and view time in the same message | part 5 | conf. (prop.) | — | |
+| TE92 | Zero diff | r1 REC4 m1 | conf. | r1:2304–2305 | |
+| TE93 | Rename and hand edit fail | r5 LAYOUT-REC3 | conf. (R5 prop.) | r5:1203–1204 | |
+| TE94 | Control: rename with regeneration | r5 1716 | conf. | r5:1716 | |
+| TE95 | Layout change fails at build or startup | r1 REC4 m2 | conf. | r1:2305–2306 | |
+| TE96 | Test design | — | conf. (prop.) | — | |
+| TE97 | `tsc --strict` passes | r1 REC4 m3 | conf. | r1:2306 | |
+| TE98 | `erasableSyntaxOnly`; bite: a generated `enum` (the flag rejects one) | r5 TSLINT-OQ3 | conf. (R); source unverified for `enum` | r5:1770–1771 "If ts-rs or wasm-bindgen emit `enum` or `namespace`, the flag rejects them (F12)"; source (fetch G02): the tsconfig page says the flag errors "on most TypeScript-specific constructs that have runtime behavior" and shows only a parameter-property example; R5-TSLINT-F12 itself calls the construct list "general knowledge … (unverified)" | finding F-14 (low) |
+| TE99 | CI fails on CLI/library mismatch | r1 REC4 m4; r5 CI-REC3 | conf. | r1:2306–2307 | |
+| TE100 | CLI one patch off | r5 1716 | conf. | | |
+| TE101 | Two runs byte-identical | r5 1203–1204 | conf. | | |
+| TE102 | 20 runs | r5 LAYOUT-OQ4; TEST-REC6 | conf. (prop.) | r5:1759–1760; r5:1503 | |
+| TE103 | `crossOriginIsolated` with/without flag, three engines, vite and vite preview | r5 LAYOUT-REC5 | conf. | r5:1229–1231 | |
+| TE104 | 12 cases | arithmetic | conf. | 3 × 2 × 2 | |
+| TE105 | Read in the Worker; COOP-only bite | — | conf. (prop.) | — | |
+| TE106 | Conditional: four browsers on a preview; 0 COEP violations | r1 REC5 m | conf. | r1:2321–2324 | |
+| TE107 | `same-origin-allow-popups` recorded | r1 BND-OQ9 (2750–2755) | conf.; citation off | OQ9 is r1:2747–2752 | F-13 |
+| TE108 | Full match = 10-minute match; ReportingObserver | — | conf. (prop.; tool "not researched") | — | |
+| TE109 | 0 network messages on the page | r1 REC6 m1 | conf. | r1:2334–2335 | |
+| TE110 | Online P2; CI at P0; bite | — | conf. (prop.) | — | |
+| TE111 | 100 ms busy loop, no gap | r1 REC6 m2 | conf. | r1:2335–2336 | |
+| TE112 | "No gap" = ≤ two intervals | — | conf. (prop.) | — | |
+| TE113 | 2 × 33.3 = 66.7 ms | arithmetic | conf. | | |
+| TE114 | Gated at P0, reported at P2 | r2 1989 | conf. (prop.) | | |
+| TE115 | Same Wasm and page code | r1 REC6 m3 | conf. | r1:2336–2337 | |
+| TE116 | sha256 from network log | — | conf. (prop.) | — | |
+| TE117 | OQ-0002-3 measures | doc OQ-0002-3 | conf. | doc:833–834 | |
+| TE118 | (b) gated on trap survival | OQ-0002-3; OQ-0004-7 | conf. (prop.) | 0004:792 | |
+| TE119 | S18 numbers | r1 TICK-REC5; ADR 0004 S18 | conf. | r1:2109–2114; 0004:840 | |
+| TE120 | ≤ 7 ticks per frame | ADR 0004 p5 | conf. | 0004:184–185, 192 "⌊0.25 × 30⌋ = 7" | |
+| TE121 | ADR 0004's numbers stand where they differ | map part c | conf. | | |
+| TE122 | "More than 5 minutes" read as 6; R1-BND-OQ2 (2723–2726) | r1 BND-OQ2; XU-OQ12 | conf.; citation off | OQ2 is r1:2724–2727; source of the 5-minute rule checked (fetch F14: "The page has been hidden for more than 5 minutes."; "once per minute") | F-13 |
+| TE123 | "Back in step" = predicted tick's lead within ±1 tick (unless ADR 0004 defines it) | — | superseded (cross-draft) | ADR 0004's PM-0004-70 now defines it: "within 0.5 s of the tab's return the client has applied the server's state and its commands are accepted again" (0004:1012) | finding F-7: two definitions of one mark |
+| TE124 | 120/144 Hz displays attached to ML | — | conf. (prop.); differs from ADR 0004 | PM-0004-69 measures smoothness on "RD: Chrome and Firefox on the displays on hand" (0004:1011) | F-7 |
+| TE125 | 17,820th; 3 hidden trials | arithmetic; prop. | conf.; differs from ADR 0004 | PM-0004-70: "5 hides per duration and browser" | F-7 |
+| TE126 | Bites: no accumulator; simulating the gap | r1 TICK-REC5 | conf. (prop.) | r1:2095–2101 | |
+| TE127 | W3 only if W2 fails | r1 TICK-REC5; XU-OQ4 | conf. | r1:2096–2097 | |
+| TE128 | P2: 13.3 ms p99 in the Worker while 30+ fps on Low | r1 TICK-REC2 P2; ADR 0004 S2 | conf. | r1:2054–2057 | |
+| TE129 | 40 % of 33.3 = 13.3 ms | arithmetic | conf. | 0.4 × 33.33 = 13.33 | |
+| TE130 | 30+ fps = every 1 s window ≥ 30 frames | VISION §4 | conf. (prop.) | — | |
+| TE131 | N from R1-TICK-OQ7 | ADR 0004 S2 | conf. (cross-draft) | 0004:824 | |
+| TE132 | Size settings | r1 RR-OQ5 | conf. | r1:2949 | |
+| TE133 | wasm-opt version recorded | r5 CI-OQ4 | conf. (R) | r5:1833–1834 | |
+| TE134 | Every served file < 25 MiB | r6 642; N37 | conf. | r6:641–642; F3 verified | |
+| TE135 | 25 × 1,048,576 = 26,214,400 | arithmetic | conf. | | |
+| TE136 | First value becomes the first limit | r5 1737–1738 | conf. | | |
+| TE137 | gzip level 9 | — | conf. (prop.) | — | |
+| TE138 | Errors and casts vs three.js types | r5 TSLINT-OQ4 | conf. (R) | r5:1773–1775 | |
+| TE139 | `skipLibCheck` on/off, median of 3 | r5 TSLINT-OQ6 | conf. (R; 3 runs prop.) | r5:1779–1780; source (fetch G02) "Skip type checking of declaration files" | |
+| TE140 | Playwright clock in the Worker | r5 TEST-OQ1 | conf. (R); source checked | r5:1802–1803; fetch F10: the clock page "overrides native global classes and functions related to time"; "worker" appears only in the site menu ("Service Workers") | R5-TEST-F10 confirmed |
+| TE141 | R1-DATA-OQ8 belongs to this spike | map part g; ADR 0005 CD-7 | conf. (cross-draft) but gap | 0005 content section:203 "Vite plugin pushes changed files to the page, which hands them to the Worker … (ADR 0002 places the plugin)"; :519–520 "How files reach the Worker under Vite is settled in the Rust ↔ TypeScript boundary spike (R1-DATA-OQ8)" | ADR 0002's decision and spike items 1–10 never mention the plugin or R1-DATA-OQ8; only PM-0002-31 does. Finding F-5 |
+| TE142 | Page relay route | r1 DATA-REC5 | conf. | r1:2545–2547 "a small Vite plugin pushes changed files (F22) to the page, which hands them to the Wasm worker" | |
+| TE143 | ≤ 1 s, 20 of 20 saves (CD-7) | ADR 0005 CD-7 | conf. (cross-draft; 20 saves prop.) | 0005 content section:516–518 | |
+| TE144 | Editor from `file://`, five browsers | doc OQ-0002-1 | conf. (prop.) | | |
+| TE145 | Wasm trap in Sentry, 4 of 4 | r6 OBS-REC3 | conf. | r6:765–766 | |
+| TE146 | Only if the EU org exists | doc item 10 | conf. | | |
+| TE147 | Mustafa's Brave run with checklist | plan rule 12 | conf. | doc:1136–1157 | |
+| TE148 | Gate passes on `legacy/`; four mutation proofs | r5 LAYOUT-REC6 m | conf. | r5:1243–1245 | |
+| TE149 | Tuning dump byte for byte | r5 1245 | conf. | | |
+| TE150 | 2 runs ("byte-identical over two runs") | r5 1444–1445 | conf. (and at source) | docs/legacy-tuning.json:8 | |
+| TE151 | Fresh clone offline tests | r5 LAYOUT-REC1 m | conf. | r5:1166–1168 | |
+| TE152 | Fresh runner builds from the toolchain file alone | r5 CI-REC2 m1 | conf.; source checked | r5:1532–1533; fetch F02 (rustup overrides): the toolchain file's `targets` "contains a list of platforms to install for" | R5-CI-F12 / LAYOUT-F6 confirmed |
+| TE153 | Network namespace | — | conf. (prop.; "not researched") | — | |
+| TE154 | Versions equal pins in every log | r5 CI-REC2 m3; RUSTLINT-REC6 m; LAYOUT-REC1 m | conf. | r5:1534–1535; r5:1380 | |
+| TE155 | Node, TS and CLI checked too | doc part 2 | conf. (prop.) | | |
+| TE156 | Same lint result a week apart | r5 1380–1381 | conf. | | |
+| TE157 | Deleting the toolchain file fails G0 with exit 2 | r5 1168–1169; 1712 | conf. | | |
+| TE158 | `Cargo.toml` without lock fails first cargo step | r5 CI-REC2 m2 | conf.; source checked | r5:1533–1534; fetch F03 (`--locked`): "Asserts that the exact same dependencies and versions are used as when the existing `Cargo.lock` file was originally generated." | R5-CI-F11 confirmed |
+| TE159 | Missing browser → exit 2 | r5 1704–1705 | conf. | | |
+| TE160 | Control: consistent bump | r5 1712 | conf. | | |
+| TE161 | G1 mutations and control | r5 1713 | conf. | | |
+| TE162 | After `prettier --write`, ESLint 0 problems | r5 1290–1291 | conf. | | |
+| TE163 | Byte-identical Windows/Linux | r5 1372–1373 | conf. | | |
+| TE164 | G2 mutations and controls | r5 1714; RUSTLINT marks | conf. | r5:1714, 1318–1320, 1336–1339, 1351–1352 | |
+| TE165 | Build-flag mutations | doc part 4 | conf. (prop.) | rule is ADR 0004 part 7 (row 85) | |
+| TE166 | Text-scan fallback | doc part 7; OQ1 | conf. | | |
+| TE167 | G3: one per flag and per rule | r5 1261–1263, 1279–1281, 1715 | conf. | | |
+| TE168 | `sim-worker`/`net`, `legacy/`, `spikes/` imports | doc part 3; r5 1268–1269 | conf. | | |
+| TE169 | G4 | r5 1716 | conf. | | |
+| TE170 | G5: transport/tokio/quinn in sim; feature check | r5 1189–1192, 1216–1218, 1717 | conf. | | |
+| TE171 | G5: tokio in room; navbake/server from sim-wasm | doc part 3 | conf. (prop.) | | |
+| TE172 | Wildcard; duplicate outside skip list | r5 1663 | conf. | r5:1663; GATE-F4 verified | |
+| TE173 | G7 and budget-file raise | r5 1718, 1743–1744 | conf. | | |
+| TE174 | G8 dynamic import; control; no editor file | r5 1191–1192, 1231, 1719 | conf. | | |
+| TE175 | G9; one defect per layer except bench | r5 1720; 1407–1409 | conf. | | |
+| TE176 | Three divergences at first tick, field diff | r5 1427–1428 | conf. | | |
+| TE177 | G10 < 3 min | r5 1428–1429 | conf. | | |
+| TE178 | 5 runs | r5 1580 | conf. (prop.) | | |
+| TE179 | L1 identity | r5 1469–1470 | conf. | | |
+| TE180 | Within 5 % relative | r5 1470–1471 | conf. | | |
+| TE181 | 1,000,000 packets | NOTE | conf. (prop., reason shown) | | departs from R5's 100,000 with stated arithmetic |
+| TE182 | SE arithmetic: 0.031 pp; 1.6 SE; ~1 in 9; 0.010 pp; 5 SE | arithmetic | conf. | √(0.01×0.99/100,000) = 0.000315 = 0.031 pp; 0.05/0.0315 = 1.59; P(\|Z\|>1.59) = 0.112 ≈ 1/9; √(0.01×0.99/10⁶) = 0.0099 pp; 0.05/0.00995 = 5.0 | |
+| TE183 | G11 < 2 min | r5 1472–1473 | conf. | | |
+| TE184 | Jitter vs L1's documented distribution | — | conf. (prop.) | | |
+| TE185 | G11 mutations | r5 1722 | conf. | | |
+| TE186 | G12 mutations | r5 1723; 1670 | conf. | | |
+| TE187 | `forceWebGL` run | doc part 9 | conf. (prop.) | | |
+| TE188 | `--prove` rule | r5 1706–1709, 1731 | conf. | | |
+| TE189 | `--prove` < 30 min | r5 1731–1732; GL 146–147 | conf. | | |
+| TE190 | Overflow in four builds; wrapping agrees | r5 1362–1364 | conf. | | |
+| TE191 | No separate overflow-cost limit (draft sets none) | r5 1364 | conf. (reading); gap | r5:1363–1364 "the checks' cost … is reported with method …, and the ADR sets the limit" | ADR 0002 marks R5-RUSTLINT-REC4 "adopted" but sets no limit (it defers to R5-RUSTLINT-OQ4's spike): note N-6 |
+| TE192 | `tsc -b` < 30 s warm | r5 1263–1264 | conf. | | |
+| TE193 | Typed lint < 60 s | r5 1281–1282 | conf. | | |
+| TE194 | Clippy < 30 s warm, < 3 min cold | r5 1319–1320 | conf. | | |
+| TE195 | `--quick` < 60 s; full < 10 min; Linux and Windows; 5 runs | r5 1691–1692, 1703–1704 | conf. | | |
+| TE196 | Linux on the session's machine, Windows on MP | — | conf. (prop.) | | |
+| TE197 | CI ≤ 10 min p50 warm, ≤ 20 cold | r5 1579–1581; N40 | conf. | | |
+| TE198 | 3rd of 5 | arithmetic | conf. | | |
+| TE199 | Cold = each of 3 runs | — | conf. (prop.) | | |
+| TE200 | TS-only PR passes; failing/cancelled turn it red | r5 1579, 1582–1583 | conf. | | |
+| TE201 | Skipped job turns it red | doc part 9; r5 1557–1559 | conf. | r5:1557–1559 | |
+| TE202 | Removing a check fails the aggregate job | r5 1704 | conf. | | |
+| TE203 | Fork PR: no secret, deploy skipped | r5 1582; 1601–1602 | conf. | | |
+| TE204 | Test account for the fork | — | conf. (prop.) | | |
+| TE205 | Warm cache: no dep recompiled; ≤ 8 GB; 3 runs | r5 1518–1521 | conf. | | |
+| TE206 | Warm `npm ci` faster; Playwright vs 57–67 s | r5 1553–1555 | conf. | | |
+| TE207 | CLI install < 30 s over 3 runs | r5 1545–1546 | conf. | | |
+| TE208 | 20 identical verdicts; timing test; retry-only test | r5 1503–1505 | conf. | | |
+| TE209 | Every layer 20 in a row | r5 1409–1410 | conf. | | |
+| TE210 | Hook ≤ 10 s p95 over 20 edits | r5 1299–1301 | conf. | | |
+| TE211 | 19th of 20 | arithmetic | conf. | | |
+| TE212 | Hook in a kit change-set | doc part 7 | conf. | | |
+| TE213 | Types hold in CI | doc phase 2.4 | conf. | | |
+| TE214 | Skeleton counts and milestones | doc phase 2.5 | conf. (cross-draft) | | |
+| TE215 | 1,800 ticks | arithmetic | conf. | | |
+| TE216 | Link ≤ 5 min, median of 5 | r5 1600–1601; N39 | conf. | | |
+| TE217 | Deploy job runs no PR code | r5 1602–1603 | conf. | | |
+| TE218 | Marker in the log | — | conf. (prop.) | | |
+| TE219 | Header check; no COOP/COEP without flag | r5 1636–1640 | conf. | | |
+| TE220 | Isolation on previews in five browsers | r5 1638–1640 | conf. | | |
+| TE221 | Foundation end | GLOSSARY §8 | conf. | | |
+| TE222 | Brave without a login | r5 1648–1650; PREVIEW-WALL | conf. | r5:1649 "a preview link opens in Brave on Windows without a login"; the foundation's previews reach no game server | |
+| TE223 | Boundary marks on slice 1 at N = 12 | doc migration 3 | conf. | | |
+| TE224 | Goldens bite; CS6 20,000/20,000; regeneration; list | r5 1451–1453 | conf. | | |
+| TE225 | G13 pair | doc part 9 | conf. (prop.) | | |
+| TE226 | 30-min bot room at 48, P2, 0/0/0, slope ≤ 1 MB/10 min; planted leak | r5 1487–1489 | conf. | | |
+| TE227 | Tick time only from the reference server | GL 167–172 | conf. | GLOSSARY:168 "on one vCPU of the reference server" | |
+| TE228 | 16.7 ms at 30 Hz | GL 168–169 | conf. | | |
+| TE229 | G12 both backends; multiplayer preview behind the wall | doc migration 5; PREVIEW-WALL | conf. | | |
+| TE230 | Round-trip test covers every kind | doc migration 6; r5 1391 | conf. | | |
+| TE231 | G8 and editor = G13 | doc migration 7 | conf. | | |
+| TE232 | Test-mode list under (a) incl. N = 64 headroom | GL 375–387 | conf. | GLOSSARY:385–389 | |
+| TE233 | 30 min each over L1 at P2; one L2 run; 3-hour soak | r5 1478–1486 | conf. | | |
+| TE234 | Online per-tick calls are 5 or 6 unless batched | doc part 5 | conf. (the inconsistency is real) | doc:265–272, 286–289 | F-2 |
+| TE235 | Glue allocator call when bytes are passed | — | unverified (labelled not researched) | | |
+| TE236 | Failing run never re-run until green | r5 1490–1498 | conf. | | |
+| TE237 | Failed mark returns via Rollback routes | doc Rollback; plan | conf. | | |
+| TE238 | Numbers change only in the owning draft | map part c | conf. | | |
+| TE239 | Failing foundation mark blocks its change-set; budget raise reviewed | CLAUDE.md step 4; r5 1734–1738 | conf. | | |
+| TE240–TE250 | "No measurable mark" lines (OQ-0002-2, part 2, 3, 4, 5, 7, 8, 9, 10, OQ-0002-7, no 60 Hz mark) | doc parts; ADR 0001, 0003, 0004 | conf. | doc:1114–1133 match the parts cited; ADR 0001's R2-ROOM-REC2 mark 6 at 0001:548; PM-0003-36 at 0003:988 | |
+| TE251 | No CI time is a hardware result | r3 F8; doc part 8 | conf. | r3:648–650 | |
+| TE252 | Mustafa's PC far above the minimum: never the budget | r3 1102–1103 | conf. | | |
+| TE253–TE261 | Checklist steps' numbers and expectations (18,000 ticks; 1 and 6 minutes away; ~0.5 s; file://; legacy double-click; required check; no login; isolated yes/no) | as each row | conf. | TE14, TE119, TE122, R1-TICK-REC5 (r1:2113–2114), R5-PREV-REC4 m2 | checklists present with expected results: rule 12 met |
+| TE262–TE270 | Spike entries for SPIKE_PLAN (names, order, decides lists, sizes) | map part g | not in the document | these rows describe `test-engineer-passmarks-0002.md`'s "Spike entries" section, which stays in the notes for plan step 6; the ADR does not contain them | both-ways check: ledger rows outside the doc (expected by plan step 6) |
+| TE271 | P2's "on Low" = ADR 0003's tier | r1 2054–2057 | conf. (prop.) | doc:1031 "(proposed: "on Low" names ADR 0003's tier)" | |
