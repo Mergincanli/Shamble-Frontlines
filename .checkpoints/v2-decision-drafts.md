@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 14:08 Amsterdam
+- **Last update:** 2026-11-01 19:06 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -38,6 +38,13 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+Fourth spend-limit cut, about 14:20 Amsterdam ("resets 5:50pm (UTC)", 18:50 Amsterdam): game-designer's 0005 round,
+engine-architect's 0002 and 0005 rounds, test-engineer's second pass-mark round and the completeness critic failed
+with HTTP 429 (notes kept). Applied before the cut: 0004's second round (8eb2f67; 14 of 16 blocks, F4 and F2-PMtext
+held for test-engineer in `rust-reviewer-fixes-2-held-for-test-engineer.md`), 0003's round and 0005's GPU section
+(b375829; 45 blocks); CI green on every fix commit. Mustafa, 19:06: "Try again". Resumed at about 19:07 (daytime:
+fetching until 22:00, no new agent after 23:00).
+
 Third spend-limit cut at about 09:27 Amsterdam ("your 5-hour limit resets 12:50pm (UTC)", 13:50 Amsterdam): the
 consistency critic, the synthesis' verifier, verifier 0005 and netcode-architect's 0001 fix round failed with HTTP 429
 (their notes hold their progress); verifier 0003 finished first (PASS WITH NOTES: 431 of 440 confirmed; 1 wrong, 4
