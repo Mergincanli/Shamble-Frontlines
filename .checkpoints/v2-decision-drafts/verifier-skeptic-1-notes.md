@@ -10,3 +10,7 @@ Started 09:12 Amsterdam 2026-11-01. 12 findings to judge (0001: F2 F4 F5 F6 F7; 
 - 09:23 N1 upheld low (written). Next: row 253 Pcg32
 - 09:25 row 253 partly (written). Next: 0006 f1 f2
 - 09:30 0006 f1 partly (written); Sentry page in .gate/verifier-skeptic-1-fetch/. Next: 0006 f2
+- 09:33 0006 f2 upheld (written). All 12 judged; writing count.
+- 09:35 count written; DONE
+- Correction: the progress stamps in this file are estimates and run ahead of the clock; real clock: started 09:12, fetches 09:15-09:17, all 12 judged and results written by 09:18 Amsterdam. Nothing committed or pushed; no doc edited.
+DONE

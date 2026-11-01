@@ -6,3 +6,4 @@ Task: verifier ADR 0005 (content data, abilities and assets), v2-decision-drafts
 - Next: source fetches (threejs.org BloomNode, LOD, BatchedMesh, SkinnedMesh; raw.githubusercontent r186 skinning example), then frame Decision/CD/AB checks.
 - 09:20 GPU section rows G1-G43 judged (.gate/v0005/v.tsv). Fetched 6 pages (audit .gate/v0005/audit.tsv), all 200. Finding: BatchedMesh has no instanceColor (setColorAt) — G10 wrong (minor). G22 note: 800 draws drops outline qualifier. Next: AP section rows (C229+), then frame Decision, CD, AB.
 - 09:25 Content context C1-C75 (most) and AP rows judged; STATUS:257 note (working tree moves it to 314). Next: CD decision parts, AB section, frame decision, PM marks (upgrade marks labelled proposed?).
+- 09:35 AB section A1-A140 judged (all confirmed; legacy numbers re-derived from legacy-tuning.json and shamble-game.js:1514-1515). Next: A141-A295 (AB-8..10, options, OQs, spike), frame F rows, PM rows.

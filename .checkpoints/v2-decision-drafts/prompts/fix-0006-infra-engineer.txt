@@ -1,0 +1,44 @@
+# Prepared message (verbatim, saved before sending) · to the infra-engineer agent that wrote ADR 0006 (resumed by SendMessage) · effort xhigh · 2026-11-01 about 09:20 Amsterdam
+Fix round (plan step 9) for your draft, ADR 0006. Your draft is now assembled in the repository at /home/user/Shamble-Frontlines/docs/adr/0006-infrastructure-operations.md (it is the
+master copy from now on; your notes draft is history). The verifier's and the skeptic's results are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-adr0006-verdicts.md and (where named)
+verifier-skeptic-1-results.md. Fix these findings, and only these (each author fixes only its own text; rows in the
+"### Pass marks" table are test-engineer's: leave them, even if a finding names one):
+- Finding 1 (verifier #159, #170, #172, #263; skeptic: partly): `userInfo` off does not stop IP addresses arriving
+  through headers, cookies or query parameters (Sentry's page, fetched 2026-11-01). Fix line 300's claim and "IP off by
+  setting" (about line 469): also set the SDK's deny lists for headers, cookies and query parameters (the skeptic notes
+  that in the browser only Referer and User-Agent are sent and no cookies without the httpClient integration; say it
+  plainly and briefly).
+- Finding 2 (verifier #243, #305, Appendix A row R6-HOST-OQ4; skeptic: upheld): restore r6:862-865's second trigger,
+  read Hetzner's dedicated root servers "before the goal budget (R6-COST-REC1) is fixed", at about lines 426, 601-603
+  and 1065, or mark the disposition "changed" with the reason.
+- Finding 4 (#86): part 5's metrics firewall rule is beyond R6-HOST-REC2's "plus nothing else": label the rule
+  "proposed" and the Appendix A disposition "changed" (with the reason).
+- Finding 7: part 7 names no certificate for the WebSocket fallback on development and staging servers (a WebSocket
+  cannot pin a certificate hash, R2-ROOM-F12): add it to OQ-0006-5.
+- Finding 8 (misquotes): line 77 "and can't be changed"; lines 532-533, the A-2 cut without an ellipsis; line 379
+  "Cloudflare Pages, Edit"; line 1039, which drops "on Windows": quote exactly.
+- Finding 9 (#235): line 422 "1 EUR per extra TB" restores R6's "inferred".
+- Finding 10 (#283): add R5-PREV-REC2 (r5:1607-1609) to that citation.
+- Finding 11 (nit): "inferred" can go at #68, #324 and OQ-0006-4 (Cloudflare's page confirms the access policy covers
+  preview deployments only); keep it if you prefer, but say which.
+- Finding 12 (nit): link the first use of "header sets" (about line 82).
+- Finding 13 (nit): part 2 may cite GLOSSARY's access-wall entry (GLOSSARY.md:623-624) in one clause for the
+  foundation's "private preview links" next to public-unlisted offline previews.
+(The verifier's line numbers predate commit cf00def, which removed two lines after line 927; lines above 927 hold.)
+
+Write /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/infra-engineer-adr0006-fixes.md: one entry per fix, in this exact shape, so the session's script can apply it:
+```
+### FIX <finding id>
+BEFORE:
+<the exact current text in /home/user/Shamble-Frontlines/docs/adr/0006-infrastructure-operations.md, copied, unique in the file; whole lines>
+AFTER:
+<the replacement text>
+END
+```
+Copy each BEFORE from the file byte for byte (sed -n the lines), long enough to be unique, short enough to be clear.
+Keep the plan's rules (citations with lines at 9e7db28, numbers sourced or "proposed" with a reason, glossary terms, no
+new decision: a fix makes the text true to its sources; where a fix would change a decision, write it as a note
+instead and say so). Do not edit /home/user/Shamble-Frontlines/docs/adr/0006-infrastructure-operations.md yourself. The session stops at 11:00 Amsterdam: finish by 10:15. Then end your
+notes with DONE and return at most 10 lines: the fixes written (ids) and any finding you did not fix, with why.
+

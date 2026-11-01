@@ -1,2 +1,3 @@
 Task: engine-architect consistency critic (plan step 8) of the v2 decision drafts; brief prompts/engine-architect-consistency.txt
 Started 09:17 Amsterdam (2026-11-01). Hard stop for DONE: 10:25.
+- 09:30 known items: CD-7 reload -> F1 (H); OQ-0004-5/6 vs AB9/AB10 -> F2 (M); audio voices: 0003:360, :991, README:327 agree with r3:1244-1245 (32 Low/48 High); only the checkpoint map's N48 differs -> consistent (map deleted at ready). R1-TICK-OQ1: 0001:1325 owns, 0004:243 and :1166 cite 0001 -> consistent. R2-INT-OQ5: 0001:1404 owns, measured by 0004 PM-0004-52 -> consistent. TICK-30 four lines (0001:132-144) vs condition 2's three: fourth (r2:2302) needed -> report as deviation, no draft change.

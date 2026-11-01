@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:17 Amsterdam
+- **Last update:** 2026-11-01 09:19 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -64,9 +64,13 @@ docs-keeper done about 09:18: STATUS, ROADMAP, REPO_MAP (549490f); the repo-map 
 spike plan, the drafts' README and the report exist (its four "not in the repository" lines). The synthesis done:
 ENGINE_OVERVIEW (133 lines), SPIKE_PLAN, docs/adr/README.md copied verbatim, GLOSSARY §8 appended after the base's
 unterminated last line (80a27b3); dispositions.py: 521 of 521, each once; repo-map check: only the report missing.
-The synthesis listed 14 cross-draft disagreements (its notes, "For the consistency pass"). Running (5): verifiers 0003,
-0005, the synthesis' verifier (about 09:18), the skeptic for 0001/0004/0006, the consistency critic (about 09:18).
-Waiting: the synthesis' verifier, the skeptic for 0002,
+The synthesis listed 14 cross-draft disagreements (its notes, "For the consistency pass"). The skeptic for 0001/0004/0006
+done (09:18): 9 upheld, 2 partly (0004 row 253, 0006 finding 1), 1 refuted (0004 row 38); results
+`verifier-skeptic-1-results.md`. Fix round (step 9) started: infra-engineer resumed for 0006 (about 09:20,
+`prompts/fix-0006-infra-engineer.txt`; it writes BEFORE/AFTER blocks to `infra-engineer-adr0006-fixes.md`; the session
+applies them with `scripts/apply_fixes.py`); prepared: `prompts/fix-0001-netcode-architect.txt`,
+`prompts/fix-0004-rust-reviewer.txt` (send when slots free). Running (5): verifiers 0003, 0005, the synthesis' verifier,
+the consistency critic, infra-engineer's fixes. Waiting: the synthesis' verifier, the skeptic for 0002,
 0003, 0005's findings, the fix round, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
