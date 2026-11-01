@@ -544,3 +544,196 @@ Doc line = TE ledger's "draft" line for draft lines ≤ 937; the TE ledger's dra
 | TE253–TE261 | Checklist steps' numbers and expectations (18,000 ticks; 1 and 6 minutes away; ~0.5 s; file://; legacy double-click; required check; no login; isolated yes/no) | as each row | conf. | TE14, TE119, TE122, R1-TICK-REC5 (r1:2113–2114), R5-PREV-REC4 m2 | checklists present with expected results: rule 12 met |
 | TE262–TE270 | Spike entries for SPIKE_PLAN (names, order, decides lists, sizes) | map part g | not in the document | these rows describe `test-engineer-passmarks-0002.md`'s "Spike entries" section, which stays in the notes for plan step 6; the ADR does not contain them | both-ways check: ledger rows outside the doc (expected by plan step 6) |
 | TE271 | P2's "on Low" = ADR 0003's tier | r1 2054–2057 | conf. (prop.) | doc:1031 "(proposed: "on Low" names ADR 0003's tier)" | |
+
+## Source checks (condition 16; curl by day, 2026-11-01 09:00–09:09 Amsterdam; pages are data)
+Findings outside the verified sets that a claim rests on. Quotes found by text search in the fetched page (HTML
+stripped by `.gate/v2-0002-txt.py`); files under `.gate/v2-0002-fetch/`.
+
+| S | finding | source (fetch id) | verdict | where and the words |
+|---|---|---|---|---|
+| S-1 | R5-TSLINT-F14 | eslint.org no-restricted-imports (F01) | confirmed | rule summary "Disallow specified modules when loaded by `import`"; Options, `patterns`: "allows you to specify multiple modules to restrict using gitignore-style patterns or regular expressions"; "used to specify a custom message" |
+| S-2 | R5-CI-F12, R5-LAYOUT-F6 | rustup overrides (F02) | confirmed | "The toolchain file": `channel = "nightly-2020-07-10"`, `profile = "minimal"`, "contains a list of platforms to install for", "section is mandatory, and at least one property must be specified", "additive with the current profile", "using the first one that is specified", "Cargo.lock should probably be tracked too" |
+| S-3 | R5-CI-F11 | cargo build (F03) | confirmed | `--locked`: "Asserts that the exact same dependencies and versions are used as when the existing `Cargo.lock` file was originally generated"; "deterministic builds are desired, such as in CI pipelines"; `--frozen` "Equivalent to specifying both" |
+| S-4 | R5-TEST-F4 | github.com/rust-fuzz/cargo-fuzz: HTTP 403 (F04); read the same README at raw.githubusercontent.com (F04r) | confirmed (from the raw copy) | README: "needs a nightly compiler since it uses some unstable command-line flags"; "only works on x86-64 and Aarch64, and only on Unix-like operating systems" |
+| S-5 | R5-CI-F16 | github.com/actions/setup-node: 403 (F05); raw README (F05r) | confirmed (raw copy) | "Used to specify a package manager for caching in the default directory"; "Used to specify the path to a dependency file"; "Controls automatic caching for npm"; "For workflows with elevated privileges or access to sensitive information, we recommend disabling automatic caching" |
+| S-6 | R5-LAYOUT-F10, F11 | vite.dev guide/features (F06) | confirmed | TypeScript: "Vite only performs transpilation on .ts files and does NOT perform type checking"; "tsc --noEmit"; `isolatedModules`; Web Workers: "is the recommended way to create workers"; WebAssembly `?init`: "initialization function that returns a Promise of the" |
+| S-7 | R5-CI-F19 | Cargo book, continuous integration (F07) | confirmed | latest-deps job `continue-on-error: true`, `CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: allow`; "may disable scheduled jobs for repositories that haven’t been touched in a while" |
+| S-8 | R5-TSLINT-F17 | typescript-eslint switch-exhaustiveness-check (F08) | confirmed | "Require switch-case statements to be exhaustive."; option text "a switch statement over a union type that includes a default case is considered exhaustive" |
+| S-9 | R5-CI-F4, F6 | docs.github.com dependency caching (F09) | confirmed (GitHub half of F4; rust-cache's README not fetched: github.com 403) | "can restore caches created in either the current branch or the default branch"; "can only be restored by re-runs of the pull request"; "cannot be restored by the base branch or other pull requests"; F6: "don't store any sensitive information"; "access the contents of a cache"; "forks of a repository can create pull requests on the base branch"; "cache poisoning" |
+| S-10 | R5-TEST-F10 | playwright.dev clock (F10) | confirmed | "overrides native global classes and functions related to time"; `runFor` "Runs the time for a specific duration"; "Fast forwards the time"; workers absent from the page body (only "Service Workers" in the site menu) |
+| S-11 | R5-LAYOUT-F3 | Cargo resolver page (F11) and workspaces page (G03) | confirmed | resolver: "requires Rust 1.84"; "prefer packages with a Rust version that is less than or equal to your own Rust version"; workspaces: "This is called a virtual manifest"; "resolver must be set explicitly in virtual workspaces" |
+| S-12 | R5-LAYOUT-F8 | docs.npmjs.com v11 workspaces (F12) | confirmed | page marked "Legacy"; "will get symlinked to the `node_modules` folder"; "in the context of that specific workspace" |
+| S-13 | R5-CI-F24 | docs.github.com Dependabot for actions (F13) | confirmed | "keep the actions you use updated to the latest versions"; the page never mentions SHA (absence confirmed: R5-CI-OQ6 stands) |
+| S-14 | R1-BND-F31 | developer.chrome.com timer throttling (F14) | confirmed | "The page has been hidden for more than 5 minutes."; "The chain count is 5 or greater."; "silent for at least 30 seconds"; "once per minute"; no mention of workers |
+| S-15 | R3-MEASURE-F9 | docs.github.com larger runners (F15) | confirmed | "GPU-powered runners"; "billed at the per-minute rate" |
+| S-16 | R5-PREV-F9 | github.com/actions/download-artifact: 403 (F16); raw README (F16r) | confirmed (README half); 90-day default unverified (repository settings page not fetched) | "different repository or from a different workflow run"; "actions:read" |
+| S-17 | R5-TSLINT-F2 | TypeScript 6.0 release notes (G01) | confirmed | "strict is now true by default"; "floating target" |
+| S-18 | R5-TSLINT-F6–F12 | typescriptlang.org/tsconfig (G02) | confirmed; F12's construct list unverified | "enables a wide range of type checking behavior"; "will add undefined to any un-declared field in the type"; "stricter rules around how it handles properties on"; "functions which override include the keyword"; "Report errors for fallthrough cases in switch statements"; "check all code paths in a function to ensure they return a value"; "will cause TypeScript to error on most TypeScript-specific constructs that have runtime behavior" (example: a parameter property; enums not named there) |
+| S-19 | R5-RUSTLINT-F4 | Cargo workspaces (G03) | confirmed | "is where you define lint configuration to be inherited by members of a workspace"; "Respected as of 1.74" |
+| S-20 | R5-RUSTLINT-F5, F6 | Clippy configuration (G04) | confirmed | `CARGO_MANIFEST_DIR`; "walk up the directory tree"; "causes Clippy to exit with an error code" |
+| S-21 | R5-RUSTLINT-F12 | raw indexing_slicing.rs (G05) | confirmed | "may panic at runtime"; "To avoid implicit panics from indexing and slicing" |
+| S-22 | R5-TEST-F1 | cargo test (G06) | confirmed | "does not affect how many threads are used when running the tests" |
+| S-23 | R5-TEST-F7 | vitest.dev config retry (G07) | confirmed | "Retry the test specific number of times if it fails" |
+| S-24 | R5-CI-F21; R5-PREV-F3 (secure-use quotes) | docs.github.com secure use (G08) | confirmed | "Pin references to actions to a commit SHA"; "should verify it is from the action's repository"; "must not explicitly check out untrusted code"; "treat artifacts uploaded from other workflows with caution" |
+| S-25 | R5-TSLINT-F18 | typescript-eslint ESLint FAQ (H01) | confirmed | "strongly recommend that you do not use the no-undef lint rule on TypeScript projects"; "already provided by TypeScript without the need for configuration" |
+| S-26 | R5-TSLINT-F19 | eslint.org no-restricted-globals (H02) | confirmed | "Disallow specified global variables"; "considered as a bad practice for a long time" |
+| S-27 | R5-RUSTLINT-F3 | Cargo manifest (G11) | confirmed | "Override the default level of lints from different tools"; "only applies these to the current package and not to dependencies"; `priority` |
+| S-28 | R5-RUSTLINT-F10 | raw floating_point_arithmetic/mod.rs (H03) | confirmed | IMPRECISE_FLOPS "can be expressed using built-in methods to improve accuracy at the cost of performance", `nursery`; SUBOPTIMAL_FLOPS "…to improve both accuracy and performance" (text split across `///` lines); `mul_add` module |
+| S-29 | R5-GATE-F3 (index) | embarkstudios.github.io/cargo-deny (G10) | confirmed | "cargo-deny supports several classes of checks" |
+| S-30 | R5-PREV-F7 | docs.github.com workflow syntax (I01) | confirmed (the API field; the PR-page link stays unverified, as R5 says) | "The URL maps to environment_url in the deployments API" |
+| S-31 | R3-WGPU-F20 | MDN WebGPU API (H04) | confirmed | "available only in a secure context"; "not Baseline" |
+| S-32 | R3-MEASURE-F8 (re-read) | developer.chrome.com web-AI testing (H05) | confirmed | "SwiftShader Device (Subzero)"; "Hardware accelerated but at reduced performance" |
+| S-33 | R5-PREV-F5; R5-CI-F23 | docs.github.com Actions settings (I04) | confirmed | "all first-time contributors require approval to run workflows"; "Require actions to be pinned to a full-length commit SHA"; "only has read access for the contents and packages scopes" |
+| S-34 | R5-GATE-F3 (advisories) | cargo-deny advisories page (I06) | confirmed | "advisory database"; "unmaintained" |
+| S-35 | R6-OBS-F10 | docs.sentry.io data collected (I05) | confirmed (the quotes; the headers/cookies point stays inferred) | "By default, the SDK sends the user's IP address"; `userInfo: false` |
+| S-36 | R5-LAYOUT-F9 | vite.dev guide/build (I02) | confirmed | "specify multiple .html files as entry points" |
+| S-37 | R5-LAYOUT-F13 | TypeScript project references (I03) | confirmed | "must have the new composite setting enabled"; "enforce logical separation between components" |
+
+Not read (pending (time), the doc's claims on them are otherwise confirmed in the research): R5-TSLINT-F3, F20, F24,
+F25; R5-PREV-F8; R6-OBS-F6, F8; rust-cache's README (the second source of R5-CI-F4) and R5-TEST-F11 (turmoil): both on
+github.com, which returns HTTP 403 in this session ("GitHub access to this repository is not enabled for this
+session"); the repository settings page behind R5-PREV-F9's 90-day default.
+
+## Counts
+Claims judged: 538 (engine-architect 261 + added A1–A6 + test-engineer 271).
+- confirmed: 515 (engine-architect 257, added 3, test-engineer 255), of which rest partly on settled inputs,
+  cross-draft text or proposed marks labelled as such; 13 of them carry a nit or rule note (rows 19, 24, 61, 62, 94, 98,
+  133, 186, 204, TE124, TE125, TE141, TE191).
+- wrong: 2 (row 36's CS11 wording; A1, the cut marker left in the assembled ADR).
+- unsupported: 0.
+- citation off: 7 (rows 59, 78, 85; TE33, TE74, TE107, TE122).
+- unverified: 2 (TE98's `enum` under `erasableSyntaxOnly`; TE235, labelled not researched in the doc).
+- other: 1 superseded (TE123), 1 open instruction (A2), 1 inconsistent wording (A6), 9 ledger rows not in the document
+  (TE262–TE270: spike entries kept for SPIKE_PLAN, expected).
+- Source checks: 37 sources read, 37 confirmed (S-4, S-5, S-16 through raw copies; S-16 and S-35 in part); pending
+  (time): 8 findings (list above); unverified (HTTP 403): 2 (R5-TEST-F11, rust-cache README).
+- Both ways: every engine-architect row is in the document; 6 claims had no row (A1–A6); test-engineer rows TE262–TE270
+  describe text that is not in the ADR. Appendix A: 104 ids, identical to the map's owner-0002 list (script diff).
+- Rules: rule 2 (numbers) — no unsourced number found; every pass-mark number is research, arithmetic (all recomputed:
+  rows 8, 149, 231, 259; TE14, TE19, TE38, TE40, TE47, TE48, TE60, TE87, TE88, TE104, TE113, TE120, TE129, TE135,
+  TE182, TE198, TE211, TE215), settled or labelled proposed. Rule 3 — finding F-3. Rule 4 — every part has a "Need";
+  LOOK_V2/EDITOR_V2/foundation-only needs are said so. Rule 5 — 0 hits for the GLOSSARY's "Retire (exact)" phrases
+  (10 extracted); "headroom" only for N = 64 (doc:1081). Rule 6 — no look decision (plain renderer, doc:959–960).
+  Rule 7 / condition 2 — no 54, no 60 Hz tick mark (60 Hz appears only as a display rate; doc:1132). Condition 12 —
+  settled options appear as "settled by GLOSSARY §8, the foundation" (doc:553–554), not weighed.
+
+## Findings (ranked)
+1. **F-1 (medium, fix before the PR leaves draft): assembly artifact.** Doc:1171 reads "---8<--- the subsection ends on
+   the line above ---", followed by two blank lines (doc:1172–1173). It is line 244 of the pass-marks notes file,
+   copied with the subsection. Fix: delete doc:1171 and one blank line (assembly step 5 should copy lines 11–243).
+2. **F-2 (medium): Wasm calls per tick contradict the design, and the ADR carries an open instruction.** Part 5
+   (doc:286–289) has the Worker's host make one call for the received datagrams and one for the outgoing ones, beside
+   the command, the step and the block's pointer and length (doc:270–272); that is 5–6 calls online, while spike item 1
+   (doc:887–888) and PM-0002-3 hold "at most 4" (R1-BND-REC1 mark 2, r1:2262–2263 "(at most 4)"). The note under the
+   table (doc:1084–1088) ends "the drafter confirms the reading, or the design batches its inputs." Fix: either batch
+   (command and datagrams in one input call; pointer and length returned by the step) and say so in part 5, or restate
+   the mark in part 5 and item 1 as "control-API calls ≤ 4, the same at N = 12 and 48; glue calls reported", then delete
+   the note's last sentence.
+3. **F-3 (medium, rule 3: for the Advisor's ruling).** Three proposed choices come from no research Options section:
+   the `room` and `navbake` crates (part 3; Q4's chosen row, doc:579), the multiplayer-preview delivery shape (part 10,
+   doc:511–517) and the field-by-field block writer (F-8). The doc says "no research compared them" (doc:212–213, 516)
+   but proposes them; plan rule 3 says such an option is labelled "not researched" and cannot be the proposed decision.
+   The research itself hands these questions to this record with no answer on one side (r4:1196–1198 R4-XT-OQ5 "Side
+   B: missing answer … Decided by: ADR-0002"; r5:1996–2001 R5-XT-OQ6 "Decided by: ADR-0002 (preview workflow)"). Fix
+   (smallest): label each "not researched (R4-XT-OQ5 / R5-XT-OQ6 ask this record to decide)", keep "the first
+   foundation milestone that builds them is also their test", and list them in `docs/adr/README.md` for the stop
+   review; or the Advisor rules that a delegated question may be answered this way.
+4. **F-5 (medium-low, cross-draft gap).** ADR 0005's CD-7 (content section:203) says "a small Vite plugin pushes changed
+   files to the page, which hands them to the Worker … (ADR 0002 places the plugin)" and that R1-DATA-OQ8 is settled
+   in the boundary spike (:519–520). ADR 0002's parts and spike items 1–10 never mention the plugin or R1-DATA-OQ8; only
+   PM-0002-31 measures it. Fix: one sentence in part 5 or 11 placing the plugin (dev only, `client` package or Vite
+   config) and an item 11 in "What a spike must prove" naming R1-DATA-OQ8.
+5. **F-7 (low-medium, cross-draft).** PM-0002-26 reads "back in step" as "the client's predicted tick back within its
+   lead over the server before hiding, ±1 tick (proposed, unless ADR 0004's pass marks define it)" (doc:1029); ADR
+   0004's PM-0004-70 now defines it as "within 0.5 s of the tab's return the client has applied the server's state and
+   its commands are accepted again" (0004:1012), with 5 hides per duration (doc: 3) and smoothness on "RD … the displays
+   on hand" (0004:1011; doc: 120/144 Hz displays attached to ML). Fix: cite PM-0004-68 to PM-0004-70 for the numbers,
+   definitions and runs, and drop the row's own reading.
+6. **F-6 (low, wrong wording).** Doc:113 "The headless "SIM fence" leaked through comments (row CS11; … lines
+   1176–1178)". r1:1176–1177: "The comment fence leaked: shape data came from the visual recipe and `hasLOS` read a
+   global." Fix: "The headless "SIM fence", a comment fence, leaked (shape data came from the visual recipe, `hasLOS`
+   read a global)".
+7. **F-8 (low).** Part 5 (doc:259–262) and Appendix A (doc:1295) answer R1-RR-OQ6 with a field-by-field block writer;
+   r1:2952–2954 says writing the block "needs a derive that rejects padding, or `unsafe` code with a written invariant
+   and a test. Decides it: rust-reviewer's crate pick in the synthesis." Fix: label the writer "proposed (a third route,
+   R1-RR-OQ6's own reasoning for the hash)" and leave the disposition "answered" only with rust-reviewer's agreement.
+8. **F-9 (low).** Doc:79–80 "`pull_request_target` and `workflow_run` hand secrets and write tokens to runs a pull
+   request triggers (R5-PREV-F1 to F3)". The quote "secrets and write tokens" is F3's, for `workflow_run` (r5:776–777);
+   F2 says `pull_request_target` runs in the base repository's context ("with its trust", r5:770–774). R5-PREV-REC1's
+   reason (r5:1595) has the same wording. Fix: "`pull_request_target` runs pull-request-triggered workflows with the
+   base repository's trust, and `workflow_run` gets secrets and write tokens".
+9. **F-10 (low, citation off).** Doc:231 "(the rule is ADR 0004's, part 9; …)": the build-flag rule is ADR 0004 part 7
+   (0004:237–238). Fix: "part 7".
+10. **F-11 (low, citation off).** Doc:215 "no ECS crate and parry3d rather than Rapier (ADR 0004, part 1)": parry3d and
+    Rapier are ADR 0004 part 10 (0004:295–297). Fix: "parts 1 and 10".
+11. **F-12 (low, citation off).** Doc:172–173 part 2's need "VISION_V2 §6.6 and §6.8": R5-CI-REC2 serves "§6.6 and §3
+    through R1-DET-REC6" (r5:1532); R1-DET-REC6 serves §6.6 and §3 (r1:2236–2237). Fix: "§6.6 and §3".
+12. **F-13 (low, citation off, pass marks).** R1-BND-OQ lines: PM-0002-1 "2727–2730" → 2728–2731 (OQ3); PM-0002-10
+    "2736–2739" → 2737–2740 (OQ6); PM-0002-21 "2750–2755" → 2747–2752 (OQ9); PM-0002-26 "2723–2726" → 2724–2727 (OQ2).
+13. **F-14 (low, unverified at source).** PM-0002-17's bite "a generated `enum` (R5-TSLINT-OQ3: the flag rejects one)":
+    the tsconfig page (S-18) says the flag errors "on most TypeScript-specific constructs that have runtime behavior"
+    and shows a parameter property; R5-TSLINT-F12 calls the enum list general knowledge (unverified). Fix: add
+    "(unverified at source)" or plant a parameter property instead.
+- Notes (no fix needed in the record, or for the stop): N-1 slices 5 and 6 of SLICE-ORDER are only in brief §1
+  (STATUS:94–96 lists 1–4): docs-keeper records them before the brief leaves the branch. N-2 the record cites the
+  decision map (N37, N39, N40, LE-B, I-2…I-21, part g "line 942", J2), a checkpoint file deleted before the PR is
+  marked ready: those citations need a lasting home (`docs/adr/README.md`). N-3 OQ-0002-7's decider is a by-day reading
+  of github.com/wasm-bindgen issue #4533: github.com returned HTTP 403 to curl in this session, so the reading may need
+  another route. N-4 two questions are answered here although R5 named another decider: R5-XQ-OQ2 (r5:1897 "the phase 1
+  restructure plan") and R5-LAYOUT-OQ2 (r5:1754–1755 "after reading wasm-pack's repository"); the doc is open about
+  the second. N-5 the test table's soak row says "up to the largest mode's N (48)" while part 8 and PM-0002-76 run the
+  test-mode list with its N = 64 headroom run. N-6 R5-RUSTLINT-REC4 is "adopted" but its "the ADR sets the limit"
+  (r5:1364) is deferred to R5-RUSTLINT-OQ4's spike (Appendix A); say "adopted; the limit waits for the measurement".
+  N-7 Event names "captures", "drops" (doc:253) are not ADR 0004 part 19's words ("uplink cache events", "pickups"):
+  consistency pass.
+
+## Fetch audit
+All requests: `curl -sSL --max-time 30` through the session's proxy, 2026-11-01, Amsterdam time. Hosts are on the
+WebFetch allow list in `.claude/settings.json`. Raw file: `.gate/v2-0002-fetch/audit.tsv`.
+
+| id | host | URL | HTTP | bytes | time |
+|---|---|---|---|---|---|
+| F01 | eslint.org | https://eslint.org/docs/latest/rules/no-restricted-imports | 200 | 199319 | 09:00:29 |
+| F02 | rust-lang.github.io | https://rust-lang.github.io/rustup/overrides.html | 200 | 31433 | 09:00:30 |
+| F03 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/commands/cargo-build.html | 200 | 48818 | 09:00:30 |
+| F04 | github.com | https://github.com/rust-fuzz/cargo-fuzz | 403 | 378 | 09:00:30 |
+| F05 | github.com | https://github.com/actions/setup-node | 403 | 378 | 09:00:30 |
+| F06 | vite.dev | https://vite.dev/guide/features | 200 | 271731 | 09:00:31 |
+| F07 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/guide/continuous-integration.html | 200 | 33626 | 09:00:31 |
+| F08 | typescript-eslint.io | https://typescript-eslint.io/rules/switch-exhaustiveness-check/ | 200 | 107400 | 09:00:31 |
+| F09 | docs.github.com | https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching | 200 | 477379 | 09:00:32 |
+| F10 | playwright.dev | https://playwright.dev/docs/clock | 200 | 109462 | 09:00:33 |
+| F11 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/reference/resolver.html | 200 | 60647 | 09:00:33 |
+| F12 | docs.npmjs.com | https://docs.npmjs.com/cli/v11/using-npm/workspaces | 200 | 549126 | 09:00:33 |
+| F13 | docs.github.com | https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/keeping-your-actions-up-to-date-with-dependabot | 200 | 574845 | 09:00:33 |
+| F14 | developer.chrome.com | https://developer.chrome.com/blog/timer-throttling-in-chrome-88 | 200 | 117348 | 09:00:34 |
+| F15 | docs.github.com | https://docs.github.com/en/actions/concepts/runners/larger-runners | 200 | 293556 | 09:00:34 |
+| F16 | github.com | https://github.com/actions/download-artifact | 403 | 378 | 09:00:34 |
+| F04r | raw.githubusercontent.com | https://raw.githubusercontent.com/rust-fuzz/cargo-fuzz/main/README.md | 200 | 2115 | 09:02:02 |
+| F05r | raw.githubusercontent.com | https://raw.githubusercontent.com/actions/setup-node/main/README.md | 200 | 14971 | 09:02:02 |
+| F16r | raw.githubusercontent.com | https://raw.githubusercontent.com/actions/download-artifact/main/README.md | 200 | 11492 | 09:02:03 |
+| G01 | www.typescriptlang.org | https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html | 200 | 300790 | 09:02 |
+| G02 | www.typescriptlang.org | https://www.typescriptlang.org/tsconfig/ | 200 | 812109 | 09:02 |
+| G03 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/reference/workspaces.html | 200 | 38056 | 09:02 |
+| G04 | doc.rust-lang.org | https://doc.rust-lang.org/clippy/configuration.html | 200 | 31133 | 09:02 |
+| G05 | raw.githubusercontent.com | https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/indexing_slicing.rs | 200 | 10505 | 09:02 |
+| G06 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/commands/cargo-test.html | 200 | 54883 | 09:02 |
+| G07 | vitest.dev | https://vitest.dev/config/retry | 200 | 80453 | 09:02 |
+| G08 | docs.github.com | https://docs.github.com/en/actions/reference/security/secure-use | 200 | 466560 | 09:02 |
+| G09 | vite.dev | https://vite.dev/config/server-options | 200 | 116507 | 09:02 |
+| G10 | embarkstudios.github.io | https://embarkstudios.github.io/cargo-deny/ | 200 | 14154 | 09:02 |
+| G11 | doc.rust-lang.org | https://doc.rust-lang.org/cargo/reference/manifest.html | 200 | 59809 | 09:02 |
+| H01 | typescript-eslint.io | https://typescript-eslint.io/troubleshooting/faqs/eslint/ | 200 | 48393 | 09:08 |
+| H02 | eslint.org | https://eslint.org/docs/latest/rules/no-restricted-globals | 200 | 98469 | 09:08 |
+| H03 | raw.githubusercontent.com | https://raw.githubusercontent.com/rust-lang/rust-clippy/master/clippy_lints/src/floating_point_arithmetic/mod.rs | 200 | 4078 | 09:08 |
+| H04 | developer.mozilla.org | https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API | 200 | 216210 | 09:08 |
+| H05 | developer.chrome.com | https://developer.chrome.com/blog/supercharge-web-ai-testing | 200 | 124875 | 09:08 |
+| I01 | docs.github.com | https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax | 200 | 2104932 | 09:08 |
+| I02 | vite.dev | https://vite.dev/guide/build | 200 | 161798 | 09:08 |
+| I03 | www.typescriptlang.org | https://www.typescriptlang.org/docs/handbook/project-references.html | 200 | 214717 | 09:08 |
+| I04 | docs.github.com | https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository | 200 | 447665 | 09:08 |
+| I05 | docs.sentry.io | https://docs.sentry.io/platforms/javascript/data-management/data-collected/ | 200 | 281298 | 09:08 |
+| I06 | embarkstudios.github.io | https://embarkstudios.github.io/cargo-deny/checks/advisories/index.html | 200 | 14723 | 09:08 |
+
+42 requests, 13 hosts; 39 HTTP 200, 3 HTTP 403 (github.com: "GitHub access to this repository is not enabled for this
+session"). No page content was followed as an instruction; no URL came from a fetched page.

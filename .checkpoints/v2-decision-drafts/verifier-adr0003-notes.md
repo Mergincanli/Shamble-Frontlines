@@ -23,3 +23,8 @@ Task: verifier for ADR 0003 (rendering and presentation), v2-decision-drafts pla
   WGPU-F19 confirmed (WebKit blog 17333: "is now shipping in Safari 26.0 for macOS, iOS, iPadOS, and visionOS."; supersedes quote; Sonoma). Post date string not found in stripped text (minor).
   WGPU-F14/F15 confirmed (WebGPURenderer docs: outputBufferType HalfFloatType quote; "4 samples are used by default").
   Next: read the ADR body section by section, check claims vs research lines, write verdicts file.
+- 09:2x: ADR lines 1-397 read (header, Context, Decision 1-11). Checked vs r3 Options 774-818, RECs 900-1280, legacy facts 193-205, 513-524, 760-770, INV 97/205, STATUS 94-202, brief line 8: all confirmed so far (rows 1-40 context, 41-163 decision) except notes:
+  N1 (D5b, row 73): "can mark folds inside a shape" attributed to r3 Options Q3 lines 810-813: those lines do not say it (inference from F7, which the ADR elsewhere marks inferred / inner lines not researched) -> unsupported at cited place; fix: add "(inferred)".
+  N2 (D7 draw cap): R3's 786 counts no full-screen post passes (bloom 12 passes F13, edge pass, AO, denoise); margin to 800 is ~14; whether renderer.info counts quad passes is not researched -> note only (R3 calls its counts conservative, r3:1151-1152).
+  RTX 5080: ADR avoids R3's "headroom" word (r3:1101) - good (rule 5).
+Next: r3 OQs 1282-1430, Pointers 1460-1510, then ADR 398-611 (trace table, Options).

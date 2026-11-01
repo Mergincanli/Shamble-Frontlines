@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:10 Amsterdam
+- **Last update:** 2026-11-01 09:12 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -50,9 +50,16 @@ into the draft) and 11 lower findings; 581 of 588 rows confirmed; 29 source fetc
 raw copy). The cut marker was in all six drafts: removed (cf00def; assemble.py now stops at it). Verifier 0001 done:
 PASS WITH NOTES (609 of 629 rows confirmed; 3 wrong, 3 unsupported, 5 citation off, 1 rule breach (F1, "whole tick"),
 1 unverified (the §8 anchors, until step 6); 3 source fetches, all 200; its line numbers are before cf00def, which
-moved lines after 1244 up by 2). Running: the synthesis (engine-architect, launched about 09:03; documents due by
-10:05), verifiers 0002, 0004 (resumed), 0003 (launched about 09:08), 0005 (launched about 09:10). Waiting: the
-synthesis' verifier, the skeptics (0006 findings 1–2; 0001 F2, F4, F5, F6, F7), the fix round, the critics,
+moved lines after 1244 up by 2). Verifier 0004 done: PASS WITH NOTES (657 of 665 confirmed; 4 wrong, 1 unsupported,
+all low; its finding 1 was the cut marker, already removed; 6 fetches, 2 sources unverifiable). Verifier 0002 done:
+PASS WITH NOTES (515 of 538 confirmed; 2 wrong, 7 citation off; F-1 the cut marker (removed), F-2 Wasm calls per tick
+5–6 vs the mark's 4, F-3 rule 3: the `room` and `navbake` crates, the multiplayer-preview delivery shape and the block
+writer proposed with no research option (the research hands them to ADR 0002: needs the Advisor's ruling), F-5 CD-7's
+Vite reload plugin not in 0002; 42 fetches, 39 read, github.com 403 in this session). Running: the synthesis
+(engine-architect, launched about 09:03; documents due by 10:05), verifiers 0003 (launched about 09:08) and 0005
+(about 09:10), the skeptic for twelve findings of 0001, 0004, 0006 (launched about 09:14; `prompts/verifier-skeptic-1.txt`),
+docs-keeper (launched about 09:16; `prompts/docs-keeper.txt`). Waiting: the synthesis' verifier, the skeptic for 0002,
+0003, 0005's findings, the fix round, the critics,
 docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
 docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
 

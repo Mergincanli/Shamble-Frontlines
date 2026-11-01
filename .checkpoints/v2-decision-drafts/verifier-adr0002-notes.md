@@ -10,3 +10,5 @@ Task: verifier ADR 0002 (code structure, build and toolchain), plan step 7, brie
 - 09:12 rows 182-261 and A1-A6 written; Appendix A ids diffed with the map (identical). Fetches done: 16 + 3 raw + 11 (github.com 403 x3). Next: TE rows, then source section, counts, findings, audit.
 - 09:16 TE rows written (TE1-TE271, some grouped: TE240-250, TE253-261, TE262-270). Findings added: F-5 (R1-DATA-OQ8 plugin gap vs ADR 0005 CD-7), F-7 (PM-0002-26 'back in step' and runs vs ADR 0004 PM-0004-68..70), F-13 (R1-BND-OQ line refs off by 1-3 in PM-1/10/21/26), F-14 (enum under erasableSyntaxOnly unverified at source), N-6 (RUSTLINT-REC4 limit). Next: source-check section, counts, findings, audit.
 - 09:15 source checks done for ~35 findings (S-1..S-35); rows updated in place. github.com returns HTTP 403 (proxy: repo access not enabled) -> raw.githubusercontent copies used for cargo-fuzz, setup-node, download-artifact READMEs. Next: write Source checks section, counts, findings, audit; then DONE.
+- 09:14 verdicts file complete: rows, source checks S-1..S-37, counts, findings F-1..F-14 ranked, notes N-1..N-7, fetch audit (42 requests). Verdict: PASS WITH NOTES.
+DONE

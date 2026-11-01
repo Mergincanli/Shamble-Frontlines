@@ -143,3 +143,195 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 | R6-TEL-OQ2 | DESIGN: Mustafa | whether bot matches and private matches count in balance rates is a product rule |
 | R6-TEL-OQ3 | DESIGN: Mustafa with the game-designer | which moments the server recognizes, and their thresholds, are game rules (ADR 0005's OQ-0005-CD6 cites them) |
 | R6-XT-OQ2 | DESIGN: Mustafa and the Advisor | critic rank 15: the offline-play need, as R1-XT-OQ8 |
+
+## Loose-ends register
+Each loose end, with where it is resolved (draft and part) or which open question lists it.
+
+**STATUS's five carry-forwards** (`docs/STATUS.md`, "Next: the decision drafts")
+| Code | Item | Resolved in / listed by |
+|---|---|---|
+| CF-1 | Verify every ADR claim and number, R3–R6 included (research plan condition 9; PR #28 review, finding 4) | every draft's claims ledger, checked by the verifier (plan step 7) and the fix round; a claim whose source is unreadable stays "unverified" and its decision becomes an open question or a spike mark; the report records the result |
+| CF-2 | R2-BUD-REC6's reason (r2:2402–2403) holds at N = 54, not at N = 48; restate for 30 Hz and say what the 60 Hz margin is measured against (PR #28 review, finding 2) | ADR 0001 parts 2 and 3: the budget restated at 30 Hz, the corrected reason with "(at N = 54, MODES-3 (b))" at line 161, the 60 Hz margin as [GLOSSARY §8](../research/GLOSSARY.md#the-60-hz-margin) defines it; its reading is OQ-0001-1 |
+| CF-3 | Use 48 where a mark gives 48 and 54; where a sentence says "until … answers", the answer applies | every draft (each Appendix A notes the answered code); checked in the consistency pass |
+| CF-4 | R6-HOST-REC4 recommends a certificate per hostname; four sentences still call the wildcard R6's proposal | ADR 0006 part 7 (per hostname, BASELINE-WHEN (b)), which lists the four sentences as superseded; the issuance is OQ-0006-5 |
+| CF-5 | No doc defines "the netcode proof test" or "the foundation" | [GLOSSARY §8](../research/GLOSSARY.md#8-phase-1-terms-the-advisor-2026-10-31) (the Advisor's definitions, word for word); ADR 0001 owns the proof test; ADR 0002's migration plan is the foundation; SPIKE_PLAN names the research spikes the proof test subsumes |
+
+**The critic's remaining items and the answered escalations**
+| Code | State | Resolved in / listed by |
+|---|---|---|
+| ABL-PREDICT | open (Mustafa, after a Feel Lab test) | ADR 0001 OQ-0001-4; ADR 0005 AB-9 (the model carries both answers); SPIKE_PLAN item 10, the Feel Lab test, after abilities are playable |
+| PREV-DELETE | a spike item | ADR 0006 part 3; SPIKE_PLAN item 6, the preview hosting check (PM-0006-6) |
+| MODES-3 (a) | answered: totals; largest mode 24v24, N = 48 | applied in every draft; GLOSSARY §2's test-mode list reads (a) |
+| PREVIEW-WALL (a) | answered: previews that reach the staging game server are private from the first one | ADR 0006 part 2 (the access wall); what else it covers is OQ-0006-4 |
+| SEC-SPREAD (a) | answered: server-only spread | ADR 0004 part 8 (the authority-only stream); ADR 0001 (no client-held copy); ADR 0003 (tracers from a cosmetic spread the hit event corrects) |
+| BASELINE-WHEN (b) | answered: listed open in ADR 0006 with interim positions | ADR 0006 part 13 and OQ-0006-6 (the security baseline, its own fresh session before the first online playtest) |
+| XU (30 ids) | settled and open cross-unit questions | each owner draft's Appendix A: answered (where) or an open question with the spike that decides it |
+| PR #28 finding 2 | R2-BUD-REC6's reason | the same item as CF-2 |
+| PR #28 finding 4 | research-plan condition 13 (two branches from one session) | closed: it no longer applies (the research merged in PR #28 and this change-set runs on one branch); the verification half is CF-1 |
+
+**The 28 critic ranks of the cross-topic (XT) questions** (owner from the decision map's id table; each owner's
+Appendix A records how)
+| Rank | Ids | Owner | Resolved in / listed by |
+|---|---|---|---|
+| 2 | R1-XT-OQ1, R2-XT-OQ1, R4-XT-OQ1 | 0001 | ADR 0001 part 5 (the aim point in the command; the cursor ray on the page) |
+| 3 | R1-XT-OQ2, R4-XT-OQ2, R5-XT-OQ1 | 0004 | ADR 0004 part 10 (what assumed Rapier, and what each becomes) |
+| 4 | R1-XT-OQ3, R2-XT-OQ2, R3-XT-OQ1, R5-XT-OQ2 | 0001 (the boundary side: 0002) | ADR 0001 part 7 (the interpolation buffer in the Worker); ADR 0002 part 5; the boundary spike measures it |
+| 7 | R1-XT-OQ4, R2-XT-OQ3 | 0001 | ADR 0001 part 6 |
+| 8 | R2-XT-OQ4, R5-XT-OQ3, R6-XT-OQ1 | 0006 | open: OQ-0006-3 (where the lobby runs) |
+| 12 | R1-XT-OQ5, R2-XT-OQ5 | 0001 | ADR 0001 part 5; its open parts are OQ-0001-6 and OQ-0001-7 |
+| 13 | R1-XT-OQ6, R2-XT-OQ6 | 0001 | ADR 0001 part 6 and the message catalogue |
+| 14 | R1-XT-OQ7, R2-XT-OQ7, R4-XT-OQ3 | 0001 | ADR 0001 part 4 (the prediction scope) |
+| 15 | R1-XT-OQ8, R4-XT-OQ4, R5-XT-OQ4, R6-XT-OQ2 | DESIGN | "Design questions" above (the offline-play need) |
+| 16 | R1-XT-OQ9, R2-XT-OQ8, R3-XT-OQ2 | 0001 (the boundary side: 0002) | ADR 0001 part 6; ADR 0002 part 5 |
+| 18 | R2-XT-OQ9, R5-XT-OQ5, R6-XT-OQ3 | 0006 | ADR 0006 part 13 (the waiting items with interim positions); the baseline is OQ-0006-6 |
+| 20 | R2-XT-OQ10, R5-XT-OQ6, R6-XT-OQ4 | 0002 | ADR 0002 part 10 |
+| 24 | R4-XT-OQ5, R5-XT-OQ7 | 0002 | ADR 0002 parts 3 and 9 (the bake in its own `navbake` crate) |
+| 25 | R1-XT-OQ10, R3-XT-OQ3, R5-XT-OQ8 | 0002 | open: OQ-0002-1 (the editor from `file://`) |
+| 26 | R3-XT-OQ4, R6-XT-OQ5 | 0003 | ADR 0003 part 8 (what the client reports per match; ADR 0006 stores it) |
+| 27 | R1-XT-OQ11, R2-XT-OQ11 | 0001 | ADR 0001 part 6 |
+| 28 | R1-XT-OQ12, R2-XT-OQ12, R6-XT-OQ6 | 0004 | ADR 0004 part 20 (the restart); ADR 0001 (the resync path); ADR 0002 (the panic strategy) |
+| 30 | R2-XT-OQ13, R4-XT-OQ6 | DESIGN | "Design questions" above (do soldiers block each other) |
+| 31 | R1-XT-OQ13, R5-XT-OQ9 | 0005 | ADR 0005 CD-3 |
+| 32 | R2-XT-OQ14, R5-XT-OQ10 | 0001 | ADR 0001 part 13 (every R2 mark against a named profile) |
+| 33 | R3-XT-OQ5, R5-XT-OQ11, R6-XT-OQ7 | 0006 | open: OQ-0006-7 (paid CI runners) |
+| 34 | R5-XT-OQ12, R6-XT-OQ8 | 0002 | ADR 0002 part 9 |
+| 35 | R1-XT-OQ14, R3-XT-OQ6, R4-XT-OQ7 | 0003 | ADR 0003 part 9 (audio occlusion) |
+| 36 | R1-XT-OQ15, R5-XT-OQ13 | 0002 | ADR 0002 part 8 |
+| 37 | R1-XT-OQ16, R3-XT-OQ7 | 0003 | ADR 0003 part 10; the boundary spike measures the implementation side |
+| 38 | R1-XT-OQ17, R6-XT-OQ9 | 0006 | open: OQ-0006-12 |
+| 39 | R2-XT-OQ15, R3-XT-OQ8 | 0003 | ADR 0003 part 5.i |
+| 40 | R1-XT-OQ18, R4-XT-OQ8, R5-XT-OQ14 | 0002 | ADR 0002 part 3 |
+
+**The old ADR entries and STATUS's items for ADR-001**
+| Code | Item | Resolved in / listed by |
+|---|---|---|
+| OLD-ADR | STATUS:198: the v2 drafts replace ADR-001..003 | this index; docs-keeper marks STATUS's three entries replaced |
+| ADR-001 | STATUS:199 (authority, tick, transport, hosting, offline play; its logged inputs) | ADR 0001 (authority, the tick rule, transport, rooms; forged commands refused); ADR 0004 (the tick mechanism, one hit world, phases, random streams, events, sight at 48); ADR 0006 (hosting); ADR 0005 (server-side schema checks); offline play is DESIGN (R1-BND-OQ1) |
+| ADR-002 | STATUS:200–201 (modules, bundler, TypeScript, double-click build; "evidence first via the build spike") | ADR 0002 (the stack is settled; the build spike's role passes to the boundary spike and the foundation; the double-click player build ends with the legacy engine, under "Hard constraints in CLAUDE.md that change"); the editor's double-click rule is OQ-0002-1 |
+| ADR-003 | STATUS:202 (stay on r128 or upgrade) | ADR 0003 part 2 (the latest three.js with WebGPURenderer, pinned, upgraded step by step: R3-WGPU-REC2) |
+| SEC-MDL-2 | STATUS:257 (`__proto__` through `envMerge` / `rulesMerge`) | ADR 0005 CD-2 and CD-9 (content parsed into typed Rust structs by one validating crate, fuzzed with `__proto__` keys; server-side validation); the legacy file stays frozen |
+| CDN-SRI | STATUS:262 (no SRI or CSP on the three.js CDN tag) | ADR 0002 (three.js bundled from npm with Vite: no CDN tag); the CSP is the security baseline's (ADR 0006 part 13, OQ-0006-6) |
+| WALL-CLOCK | STATUS:273 (11 `performance.now` / `Date.now` reads) | ADR 0004 part 4 (the tick counter is the sim's only clock; the step reads no clock); ADR 0002 part 7 (`Instant` and `SystemTime` banned in `crates/sim`); the legacy reads stay in the frozen legacy game |
+
+**The decision map's own loose ends** (the map is a checkpoint file, deleted before the PR is ready)
+| Code | Item | Resolved in / listed by |
+|---|---|---|
+| LE-A | the critic's XT texts put the boundary in ADR 0004 | ranks 2, 4, 16 and 37 read ADR 0002 for the boundary part |
+| LE-B | one budget, two statistics: the page's cost of the sim is a p99 in R3-BUDGET-REC2 and a p95 frame-time difference in R1-BND-REC1 mark 1 | ADR 0003 owns the number (PM-0003-20, in the bench); ADR 0002 gates the p95 in the boundary spike (PM-0002-4) |
+| LE-C, LE-D | R1-TICK-REC4's and REC5's "15 ticks", and "36,000 ticks per run", are 60 Hz forms | ADR 0004: game time and ticks stated together at 30 Hz |
+| LE-E | R2-TRN-REC1 mark 2's load is a 60 Hz placeholder | ADR 0001: restated at 30 Hz |
+| LE-F | brief §2's "100 ms" does not say round trip or one way | OQ-0001-3 |
+| LE-G | does a VISION_V2 §3 or §4 target count as a need | "Decisions the drafts ask for" (trace reading) |
+| LE-H | R7-MARKS (a): 118 inventory rows are "look brief pending" | ADR 0003 and ADR 0005 list the rows their decisions change; `docs/LEGACY_INVENTORY.md` changes only after Mustafa accepts the drafts |
+| LE-I | SLICE-ORDER partly answers the offline-play questions | DESIGN (R1-BND-OQ1, R1-TICK-OQ7); ADR 0002 and ADR 0004 build local play with bots from slice 2 |
+| LE-J | 38 research ids are pure design matters | "Design questions" above |
+| LE-K | the proof test runs before the foundation with a throwaway sim | OQ-0001-2 (TICK-60-SETUP) |
+| LE-L | machines and certificates belong to ADR 0006 | ADR 0006 owns every R6-HOST id, R2-TRN-REC5 and R2-TRN-OQ4; ADR 0001 cites them |
+| LE-M | R2-INT-REC3's visibility pass is ADR 0001's, its 5 % a part of ADR 0004's sim step share | ADR 0001 (the id); ADR 0004 part 6 (the number) |
+| LE-N | the Feel Lab test needs abilities in the engine | SPIKE_PLAN item 10, after slice 4 |
+| LE-O | the stress scene's counts are proposals until caps exist | SPIKE_PLAN "Shared fixtures"; R2-BUD-OQ5 is a design question |
+| LE-P | R1-TICK-REC2's decision rule is replaced by TICK-30 | ADR 0001 part 2 (P1–P3 kept as marks at 30 Hz and for the 60 Hz margin run) |
+
+## Needs outside VISION_V2 §6
+Features a draft proposes whose need is only in LOOP_V2, EDITOR_V2, LOOK_V2, UPGRADE-SCOPE, GLOSSARY §8's foundation or
+a VISION_V2 §3/§4 target (plan rule 4, the advisor's condition 8, and the session's trace reading of 2026-10-31, decision
+map J3), one line each, for the stop review. Each draft's "Need:" line is the source.
+- **ADR 0001:** R2-BUD-REC5 and R2-TRN-REC6 (part 10), the network profiles against which every mark is restated (part 13, R2-XT-OQ14): VISION_V2 §4 only.
+- **ADR 0001:** the server's authority over upgrade tracks, offers, picks, drops and pickups, and their messages (part 12): UPGRADE-SCOPE.
+- **ADR 0002:** the repository restructure (part 1), the pinned toolchains (part 2), the lint set (part 7), CI gate v2 (part 9), the preview build (part 10): GLOSSARY §8, the foundation only (with VISION_V2 §4, §6.6 and §6.8 for the determinism checks).
+- **ADR 0002:** the editor build as its own entry (part 11): EDITOR_V2 §5 only (it also serves §6.7's authoring).
+- **ADR 0003:** the latest-three.js pin and upgrade policy, the WebGL 2 fallback's scope, the quality tiers, the measurement harness and the client's per-match report (parts 2, 1, 7, 8): VISION_V2 §4 only.
+- **ADR 0003:** the look pipeline (part 5): LOOK_V2 §1–§7 only (with VISION_V2 §6.9 for its cost); halftone flashes and line boil: LOOK_V2 §7 only; the concussion shake: LOOK_V2 §2 only; roof fade: LOOK_V2 §4.
+- **ADR 0003:** spatial audio (part 9): LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 only.
+- **ADR 0004:** the server and Worker loops and inputs replayable from day one (part 5): VISION_V2 §4 only and SLICE-ORDER condition 2.
+- **ADR 0004:** the sim step share and its parts (part 6): VISION_V2 §3 and §4 only (a budget, not a feature); identical results across browsers (part 7): VISION_V2 §4 only.
+- **ADR 0004:** bot behaviour in the sim (part 15): VISION_V2 §3 ("Bots fill empty slots") and LOOP_V2 §10, beside §6.2's bots between levels.
+- **ADR 0004:** the player record, weapon drops and pickups, the offers' random stream (parts 8, 18): UPGRADE-SCOPE.
+- **ADR 0004:** map validation with the sim's own integrator (part 21): EDITOR_V2 §3 and LOOP_V2 §9, beside §6.2; active reload (part 16): LOOP_V2 §7.
+- **ADR 0004:** three damage stages and structure states (part 14): LOOK_V2 §4.
+- **ADR 0005:** the feel kit as client content and the Feel Lab's data (CD-14): LOOP_V2 §7 only; development hot reload (CD-7): LOOP_V2 line 8 and §7 only; the quality-tier table (CD-14): VISION_V2 §4 only.
+- **ADR 0005:** the map document as content (CD-11) and format versions with migrations (CD-4): EDITOR_V2 §2 and §4, beside §6.1 and §6.2.
+- **ADR 0005:** the upgrade tracks on the ability model (AB-8, AB-4's two added kinds): UPGRADE-SCOPE.
+- **ADR 0005:** the ability step's cost per tick (AB-10): VISION_V2 §3 and §4 only (a budget, not a feature).
+- **ADR 0005:** the asset pipeline (AP-1 to AP-7) and its GPU rules: LOOK_V2 §8 (with VISION_V2 §4, §6.7 and §6.9 where each part names them); the automated step as a tool outside the player build (AP-6): LOOK_V2 §8 only.
+- **ADR 0006:** preview hosting, privacy and cleanup with PREV-DELETE (parts 1–3): GLOSSARY §8, the foundation only (and PREVIEW-WALL (a); LOOK_V2 §8 for unreleased authored models).
+- **ADR 0006:** the upgrade-track fields in the match record (part 12): UPGRADE-SCOPE only; CI runner costs (part 8, OQ-0006-7): the foundation's CI.
+
+## Codes the drafts cite
+The drafts cite codes from the decision map (`.checkpoints/v2-decision-drafts/engine-architect-decision-map.md`, a
+checkpoint file deleted before the PR is marked ready). Their definitions live here from now on. Decision codes such
+as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY terms in `docs/research/GLOSSARY.md`.
+
+**Interfaces between the drafts** (what crosses each seam; owner defines, the others use)
+| Code | Interface | What crosses | Owner | Used by |
+|---|---|---|---|---|
+| I-1 | Content → sim | typed definitions loaded and validated by the content crate, read by id; tuning converted to ticks at load | 0005 (schema, ids); 0004 (execution) | 0004, 0001 |
+| I-2 | Sim → page | the per-tick output block: header (tick, layout hash, counts), sections per entity kind, the event section | 0002 (layout, versioning, transfer); 0001 (remote entities' fields online); 0004 (writes it) | 0003 |
+| I-3 | Page → Worker, and the local server | one command per tick, posted; the small control API; the local server through the same messages | 0002; 0001 (command fields, the local path) | 0003 |
+| I-4 | Worker ↔ server | the message protocol over WebTransport datagrams and streams, WebSocket fallback | 0001 | 0002, 0005, 0006 |
+| I-5 | Generated types | Rust → `packages/types`: block layout and hash, protocol types, content schema and types | 0002; 0005; 0001 | 0003, the editor |
+| I-6 | Content bundle | the hashed, cached bundle; its immutable cache header; the hash every match records | 0005; 0006 (serving) | 0001, 0006 |
+| I-7 | Modes → rooms | a room = mode id + allowed overrides; the mode file format and validation | 0001 (room); 0005 (file) | 0006 |
+| I-8 | Assets → renderer | glTF/GLB with named material slots, LOD levels, per-unit budgets; no baked look | 0005 | 0003 |
+| I-9 | Map document → sim, bake, renderer, editor | colliders with stable ids, baked navigation, floors, enclosures and portals, structure states, lighting mood | 0005 (schema); 0004 (bake, states) | 0001, 0003, the editor |
+| I-10 | Events → match record → storage | tick-stamped events and moments; the record written at Ended; upload to EU storage | 0004; 0001; 0006 | 0005 |
+| I-11 | Room process ↔ supervisor ↔ lobby | process spawn, host and port, join tokens checked by the room | 0001; 0006 | 0002 |
+| I-12 | Server → monitoring | tick time histogram, overruns, dropped time, per-phase time, sessions, bytes, memory, room starts and crashes | 0006; 0004 and 0001 emit | |
+| I-13 | CI → client host and staging | the built artifact and its header sets; room binary and certificate hash for multiplayer previews | 0002; 0006 | 0001 |
+| I-14 | Budgets as data | every budget as data in the repository, reviewed like code | 0002; each number's owner | all |
+| I-15 | Reference hardware | the reference server and the client reference machines | 0006; 0003 | every spike |
+| I-16 | Test fixtures | the stress scene, the test-mode list, the network profiles, recorded matches | SPIKE_PLAN (scenes, modes); 0001 (profiles); 0004 (recordings) | 0001–0004 |
+| I-17 | Determinism suite → CI and benchmark | recorded matches with per-tick state hashes; the benchmark scene replays one | 0004; 0002 | 0003 |
+| I-18 | Client field data | backend, adapter, frame time per match; crash reports | 0003 (what); 0006 (where stored) | |
+| I-19 | The aim point | cursor ray against what the page draws → a world aim point in the command | 0001 (field); 0002 (crossing); 0004 (ray query) | 0003 |
+| I-20 | Events → feel | hits, deaths, blasts, cosmetic shot events, purchases, moments → VFX, audio, HUD | 0004 (emits); 0001 (delivery online); 0002 (event section) | 0003, 0005 |
+| I-21 | Upgrade picks | the player's picks on the player's slot, as data; sent to their owner; shown on the HUD | 0005 (data); 0004 (state); 0001 (visibility) | 0003 |
+
+**Seams** (cited as "seam S-n"; the map's seams, not ADR 0004's own claim numbers S1–S20)
+| Code | Seam | One side decides | Other side decides |
+|---|---|---|---|
+| S1 | Tick | 0001: the tick rate rule under TICK-30, the 60 Hz margin, the snapshot rate, the server tick budget's total and the server-only share | 0004: the fixed-tick mechanism, the sim step share and its parts, the client's sim share, determinism |
+| S3 | CI and previews | 0002: CI, gate v2, the preview build, the deploy job, header sets, close and sweep jobs | 0006: the host, token scope, access wall, cleanup policy and PREV-DELETE, staging server, runner costs, secrets policy |
+| S4 | Rooms vs machines | 0001: room lifecycle, process model, tokens, reconnect, private rooms, lobby protocol | 0006: VMs, supervisor, firewall, the lobby's hosting and store, production certificates, rooms per VM as cost, monitoring |
+| S6 | Moments and telemetry | 0004 recognizes moments and emits events; 0005 holds moment rules and telemetry ids as data; 0001's room writes the record | 0006: the record's shape, storage, analysis and retention |
+| S12 | Security | 0006: the security baseline listed open, its interim positions and every item waiting on it | 0001, 0002, 0005 cite the baseline item where their design waits on it |
+
+**Research gaps** (no finding in R1–R6; cited as "gap G-n" or "part h, G-n")
+| Code | Gap | What the drafts make of it |
+|---|---|---|
+| G1 | the asset pipeline (compression, LODs, export checks, slot renaming, per-unit budgets) | ADR 0005 OQ-0005-AS1 to AS5, "not researched"; the asset-pipeline research (ASSET-RESEARCH (a)) |
+| G2 | halftone flashes and ink line boil (LOOK_V2 §7) | ADR 0003: built as defaults; technique an open question; cost a look-test mark |
+| G3 | roof fade (LOOK_V2 §4) | ADR 0003 OQ-0003-6; the visibility rule stays R2-INT-OQ1 (design) |
+| G4 | three damage stages (LOOK_V2 §4) | ADR 0004 part 14 extends the research's two states; the third stage's trigger is OQ-0004-4 |
+| G5 | visual effects (fragments, muzzle flashes, tracers, impacts, debris) | ADR 0003 OQ-0003-7; the effects budget row stands |
+| G7 | soft shadows and the lighting model (LOOK_V2 §2, §6.5) | ADR 0003 OQ-0003-4 and OQ-0003-5 |
+| G8 | inner lines thinner than the silhouette ink (LOOK_V2 §6.2) | ADR 0003 OQ-0003-2 |
+| G9 | vegetation, "lush" environments, mesh LOD | ADR 0003 OQ-0003-9 (the tree style stays `[OPEN]`) |
+| G11 | moment recognition (VISION_V2 §6.8) | ADR 0004 part 19 (a sim phase reading the event stream); the rule format is OQ-0005-CD6 |
+| G15 | the Feel Lab tool (LOOP_V2 §7) | ADR 0005 OQ-0005-CD7 |
+
+**Shared numbers** (cited as N-n; each draft states the value with its own source)
+| Code | Number | Owner |
+|---|---|---|
+| N1 | the tick period (1 / tick rate) | 0001 (rate), 0004 (constant) |
+| N2 | the tick rate: 30 Hz; 60 Hz only with a 60 Hz margin of at least 25 % | 0001 |
+| N6 | the server-only share of the server tick budget | 0001 |
+| N12 | the page's cost of the sim per frame (LE-B's two statistics) | 0003 (the row); 0002 cites it |
+| N30 | development and preview certificates (R2-TRN-REC5) | 0006 |
+| N32 | rooms per VM (test load and cost assumption, R2-ROOM-REC2, R6-COST-OQ1) | 0006 |
+| N34 | the reference server (R6-HOST-REC2) | 0006 |
+| N37 | the client host's largest-file limit (R6-HOST-REC1) | 0006; 0002 cites |
+| N39 | preview timing (R5-PREV-REC1, REC3) | 0002 and 0006 |
+| N40 | CI wall time (R5-CI-REC5) | 0002 |
+| N41 | the reference machines (R3-BUDGET-REC1) | 0003 |
+| N48 | audio voices (R3-AUDIO-REC2; ADR 0003 follows the research's two tiers) | 0003 |
+
+**Addendum items** (cited as J-n: the decision map's part j, 2026-10-31)
+| Code | What it holds |
+|---|---|
+| J1 | the 60 Hz margin as a shared number owned by ADR 0001, and the GLOSSARY §8 text (now in the GLOSSARY) |
+| J2 | three register items: the old ADR-001..003 entries, STATUS:257, :262, :273, and PR #28 finding 4's closed condition (all in the loose-ends register above) |
+| J3 | the trace rule and the session's reading (a VISION_V2 §3 or §4 target counts like LOOP_V2); the features listed under "Needs outside VISION_V2 §6"; EDITOR_V2 §2's rules → ADR 0005; EDITOR_V2 §5's two lines → ADR 0002 (DOCS-ALIGN); no feature for `[LATER]` or `[OPEN]` items |
+| J4 | how ADR 0005 is put together (three authors, one frame) and ASSET-RESEARCH (a) |
+| J5 | UPGRADE-SCOPE as Mustafa updated it, and which draft carries each part (0005 data, 0004 the player record and drops, 0001 authority and messages, 0006 telemetry fields, 0003 the UI); carry slots, looted ammo and levelling open for Mustafa; WEAPON-UNLOCKS listed |
+| J6 | part i answered: DESIGN ids in this register; TICK-60-SETUP for the Advisor; the "100 ms" reading; the trace reading; only the netcode proof test's place settled; SPIKE_PLAN owns the stress scene's use; the Feel Lab test after abilities exist; ASSET-RESEARCH (a) and TICK-60-HEADROOM ruled |
