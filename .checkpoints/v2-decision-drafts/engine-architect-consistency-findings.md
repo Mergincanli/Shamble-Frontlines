@@ -9,8 +9,8 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 ## Findings
 
 ### F1 (H). Development reload: ADR 0004 states the mid-match swap as decided; ADR 0005 proposes the next match
-- Documents: docs/adr/0004-simulation-core.md:412–413 (part 6/16 text); docs/adr/0005-content-abilities-assets.md:255,
-  364–370, 525–526, 606–613 (CD-7, OQ-0005-CD4), 1888–1889; docs/adr/0001-multiplayer-netcode.md:488 (`ContentReload`);
+- Documents: docs/adr/0004-simulation-core.md:416–417 (part 6/16 text); docs/adr/0005-content-abilities-assets.md:255,
+  364–370, 525–526, 606–613 (CD-7, OQ-0005-CD4), 1888–1889; docs/adr/0001-multiplayer-netcode.md:489 (`ContentReload`);
   docs/SPIKE_PLAN.md:158 ("hot reload into the Worker").
 - Texts: 0004: "a development reload swaps them between ticks, never inside one (R1-DATA-REC5, ADR 0005's)". 0005 CD-7:
   "simulation numbers apply from the next match (proposed; Mustafa and the Advisor decide, OQ-0005-CD4)"; the swap is
@@ -22,10 +22,10 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   (a) nothing in a running match changes and no message is sent. SPIKE_PLAN:158 says "content files reaching the Worker
   in development (PM-0002-31, R1-DATA-OQ8)" instead of "hot reload into the Worker" under parts 2, 4 and 7 (ADR 0002 has
   no reload text in parts 2, 4, 7; its only reload mark is PM-0002-31, line 1034).
-- Owners: rust-reviewer (0004:412–413); netcode-architect (0001:488's condition); engine-architect synthesis (SPIKE_PLAN:158).
+- Owners: rust-reviewer (0004:416–417); netcode-architect (0001:489's condition); engine-architect synthesis (SPIKE_PLAN:158).
 
 ### F2 (M). Drops, pickups and bot records asked twice, with different options and deciders
-- Documents: docs/adr/0004-simulation-core.md:773–791 (OQ-0004-5, OQ-0004-6), 443, 1039, 1068; docs/adr/0005-content-
+- Documents: docs/adr/0004-simulation-core.md:779–797 (OQ-0004-5, OQ-0004-6), 447, 1047, 1076; docs/adr/0005-content-
   abilities-assets.md:1188–1205 (OQ-0005-AB9, AB10); docs/adr/README.md:69–70 and 82–83 (four rows for two questions).
 - Texts: OQ-0004-5 "who may pick it up (the dead soldier's enemies only, or anyone); how two claims in one tick are
   broken", Decider "Mustafa with the game-designer"; OQ-0005-AB9 "whether only the killer's team, or anyone, may take a
@@ -35,9 +35,9 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 - Outcome: one question each, in ADR 0005 (UPGRADE-SCOPE's data model is 0005's, seam S5; I-21). AB9 absorbs 0004's two
   extra options (the tie rule in one tick; "enemies of the dead soldier" as a third pick-up option beside "the killer's
   team" and "anyone") and takes one decider line: "Mustafa, with the game-designer". AB10 is unchanged. ADR 0004 deletes
-  OQ-0004-5 and OQ-0004-6 and cites "OQ-0005-AB9, AB10" at 443, 1039 and 1068 (the tie rule's mechanism, a fixed
+  OQ-0004-5 and OQ-0004-6 and cites "OQ-0005-AB9, AB10" at 447, 1047 and 1076 (the tie rule's mechanism, a fixed
   deterministic order, stays 0004's part 18). README drops rows 69–70.
-- Also: 0004 part 18 (docs/adr/0004-simulation-core.md:435–436) states a rule the same paragraph then calls open: "When a
+- Also: 0004 part 18 (docs/adr/0004-simulation-core.md:439–440) states a rule the same paragraph then calls open: "When a
   soldier dies, its weapon becomes a pickup entity" pre-empts AB9's options (a)/(b)/(c) and "any death" vs "a death to
   an enemy". Proposed: "When a soldier dies, the weapons the drop rule names (OQ-0005-AB9) become pickup entities".
   ADR 0001 part 12 (docs/adr/0001-multiplayer-netcode.md:386–387) lists the open rules as "carry slots, ammo for looted
@@ -45,11 +45,11 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 - Owners: rust-reviewer (0004); engine-architect and game-designer (0005 AB9); engine-architect synthesis (README). netcode-architect (0001:386–387).
 
 ### F3 (H). The same tick-budget marks at two precisions: a run between them passes one draft and fails the other
-- Documents: docs/adr/0001-multiplayer-netcode.md:125–126 (part 2, "4.2 ms each"), :1134 (PM-0001-39: "sim step time p99
-  and server-only work p99 at most 4.2 ms each; max under 16.7 ms"), :1135 (PM-0001-40: "at most 4.2 ms", "max at most
-  16.7 ms", "p99 at most 6.7 ms"); docs/adr/0004-simulation-core.md:823 (claim S1: "≤ 8.3 ms at 30 Hz (≤ 4.2 ms for the
-  60 Hz margin run)"), :824 (S2: "≤ 13.3 ms"), :942 (PM-0004-3: "≤ 8.33 ms (25 % of 33.33 ms)"), :947 (PM-0004-8:
-  "≤ 13.33 ms"), :1014 (PM-0004-71: "≤ 4.17 ms (25 % of 16.67 ms), max ≤ 16.67 ms", "≤ 6.67 ms"); GLOSSARY §8:783
+- Documents: docs/adr/0001-multiplayer-netcode.md:125–126 (part 2, "4.2 ms each"), :1143 (PM-0001-39: "sim step time p99
+  and server-only work p99 at most 4.2 ms each; max under 16.7 ms"), :1144 (PM-0001-40: "at most 4.2 ms", "max at most
+  16.7 ms", "p99 at most 6.7 ms"); docs/adr/0004-simulation-core.md:831 (claim S1: "≤ 8.3 ms at 30 Hz (≤ 4.2 ms for the
+  60 Hz margin run)"), :832 (S2: "≤ 13.3 ms"), :950 (PM-0004-3: "≤ 8.33 ms (25 % of 33.33 ms)"), :955 (PM-0004-8:
+  "≤ 13.33 ms"), :1022 (PM-0004-71: "≤ 4.17 ms (25 % of 16.67 ms), max ≤ 16.67 ms", "≤ 6.67 ms"); GLOSSARY §8:783
   and condition 2 ("8.33 ms", "6.25 ms").
 - Disagreement: a p99 of 4.18 ms passes 0001's 60 Hz mark and fails 0004's; 8.31 ms passes 0004's S1 claim and fails
   PM-0004-3. ADR 0004 disagrees with itself (S1/S2 vs PM-0004-3/-8/-71). (Synthesis list item 1, widened to the 30 Hz rows.)
@@ -58,13 +58,13 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   Prose and the GLOSSARY's one-decimal sums may keep "about 8.3 ms". The owner of each share states it (N4 and N6:
   0001; N5 and N11: 0004); the other cites.
 - Owners: test-engineer for the PM rows it wrote in 0001 (PM-0001-39, -40, and every 30 Hz row with "8.3"/"16.7") with
-  netcode-architect for part 2's prose; rust-reviewer for 0004's claim table S1, S2 (lines 823–824).
+  netcode-architect for part 2's prose; rust-reviewer for 0004's claim table S1, S2 (lines 831–832).
 
 ### F4 (M). The Mac test machine is defined five ways
 - Documents: docs/SPIKE_PLAN.md:30 ("MAC, a macOS machine with Safari"), :167 ("MAC with the latest Safari");
   docs/adr/0002-code-structure-build-toolchain.md:949 ("with the latest Safari"); docs/adr/0001-multiplayer-netcode.md:
-  1017–1019 ("the stable releases on the day of the run, recorded (R2-TRN-REC1 mark 1 names ... Safari 27"); docs/adr/
-  0003-rendering.md:822, :897, :1143 ("Safari 26"); docs/adr/0004-simulation-core.md:865 ("a macOS machine with Safari
+  1025–1027 ("the stable releases on the day of the run, recorded (R2-TRN-REC1 mark 1 names ... Safari 27"); docs/adr/
+  0003-rendering.md:822, :897, :1143 ("Safari 26"); docs/adr/0004-simulation-core.md:873 ("a macOS machine with Safari
   26"); docs/adr/0005-content-abilities-assets.md:1932 ("Safari 26"); docs/adr/0006-infrastructure-operations.md:817
   ("a macOS machine with Safari").
 - Disagreement: one shared machine (SPIKE_PLAN "Shared fixtures") pinned to Safari 26 in three drafts, "latest" in two,
@@ -77,8 +77,8 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   author (engine-architect) for 0005:1932.
 
 ### F5 (M). A "Retire (exact)" phrase in two pass marks
-- Documents: docs/adr/0001-multiplayer-netcode.md:1097 (PM-0001-4: "the whole tick timed directly on the tick thread"),
-  :1134 (PM-0001-39: "the whole tick timed directly, never summed from its phases"); GLOSSARY "Server tick time",
+- Documents: docs/adr/0001-multiplayer-netcode.md:1106 (PM-0001-4: "the whole tick timed directly on the tick thread"),
+  :1143 (PM-0001-39: "the whole tick timed directly, never summed from its phases"); GLOSSARY "Server tick time",
   Retire (exact) "whole tick" (the session's glossary script, consistency-scripts.txt: exact hits 2).
 - Outcome: "the server tick time measured directly on the tick thread" (PM-0001-4) and "the server tick time measured
   directly, never summed from its phases" (PM-0001-39).
@@ -100,7 +100,7 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 ### F7 (M). Two research marks placed in the sim core spike by SPIKE_PLAN only; no draft owns a row for them
 - Documents: docs/SPIKE_PLAN.md:204–207 ("no draft's table names them ... R2-SYNC-REC6 mark 1 (throws bit-identical on
   Wasm and native) and R5-LAYOUT-REC4 (one feature set for `sim` on every target)"); docs/adr/0004-simulation-core.md:
-  822–843 (spike claims S1–S20) and :940–1016 (PM-0004 rows: neither id); 0001 and 0002 adopt the recommendations.
+  830–851 (spike claims S1–S20) and :948–1024 (PM-0004 rows: neither id); 0001 and 0002 adopt the recommendations.
   Synthesis list item 3.
 - Disagreement: SPIKE_PLAN may place spikes but not write marks ("Pass marks ... are never restated here", SPIKE_PLAN:9);
   as written, the sim core spike carries two marks with no owning pass-mark row, so nobody's table judges them.
@@ -114,19 +114,19 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   fallback present on development and staging servers?"; "A WebSocket cannot pin a certificate hash ... the netcode
   proof test's WebSocket leg needs one first (PM-0006-15)"; Decider "... the development and staging case before the
   netcode proof test starts (the Advisor, from a short read)"), :871 (PM-0006-15: 20 of 20 `wss` sessions from each of
-  the four browsers); docs/adr/0001-multiplayer-netcode.md:334–337 ("development and preview servers use self-signed,
-  pinned certificates valid at most 14 days, whose hash the page fetches"), :946–947 (the spike's certificate mark names
+  the four browsers); docs/adr/0001-multiplayer-netcode.md:335–338 ("development and preview servers use self-signed,
+  pinned certificates valid at most 14 days, whose hash the page fetches"), :955–956 (the spike's certificate mark names
   only the pinned self-signed certificate); docs/SPIKE_PLAN.md:104–110 (item 1 "Depends on": "the development
   certificates (ADR 0006)" only); docs/adr/README.md:94–103 (no OQ-0006-5 row, though it now routes a part to the Advisor).
 - Disagreement: read alone, ADR 0001 and SPIKE_PLAN start the proof test with pinned self-signed certificates on both
   transports; ADR 0006 says the `wss` leg cannot work that way (R2-ROOM-F12, r2:1494–1500) and makes a decision a
   precondition. The first spike would stall on its WebSocket marks (0001's R2-TRN-REC3 leg, PM-0006-15).
-- Outcome: 0001:336 reads "development and preview servers use self-signed, pinned certificates for WebTransport ...
+- Outcome: 0001:337 reads "development and preview servers use self-signed, pinned certificates for WebTransport ...
   (R2-TRN-REC5); the WebSocket fallback cannot pin a hash (R2-ROOM-F12) and presents the certificate ADR 0006's
   OQ-0006-5 names for development and staging". SPIKE_PLAN item 1 "Depends on" adds "OQ-0006-5's development and staging
   answer (the Advisor, before the test starts)". README "Decisions the drafts ask for" adds the OQ-0006-5 row (the
   Advisor for development and staging; security-auditor for production).
-- Owners: netcode-architect (0001:336, and 0001:946 if it should name the `wss` leg's certificate); engine-architect
+- Owners: netcode-architect (0001:337, and 0001:955 if it should name the `wss` leg's certificate); engine-architect
   synthesis (SPIKE_PLAN, README).
 
 ### F9 (M). README's line pointers into ADR 0006 are stale after 0006's fix round
@@ -177,7 +177,7 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   map is deleted before the PR is marked ready.
 - Collisions (synthesis list item 11): bare G-n and S-n are used for four different families: ADR 0002's gate checks
   G1–G13 (0002:433 on, e.g. "G5 | dependency rules"), ADR 0006's option labels G1–G4 (hosting, 0006 Options) and S1–S3
-  (record storage), ADR 0004's spike claims S1–S20 (0004:822–843), and README's gaps G1–G15 and seams S1–S12 (cited
+  (record storage), ADR 0004's spike claims S1–S20 (0004:830–851), and README's gaps G1–G15 and seams S1–S12 (cited
   with "gap"/"seam" in front). "G5" is dependency rules in 0002 and visual effects as "gap G5".
 - Outcome: 0002:318 cites "seam S11" and README adds the S11 row (offline and local play: DESIGN decides whether offline
   ships; 0002 and 0004 build local play from slice 2), or 0002 drops the code and cites R1-BND-OQ1 (DESIGN). 0002's
@@ -188,7 +188,7 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 - Owners: engine-architect (0002), engine-architect synthesis (SPIKE_PLAN, README), graphics-engineer (0003:1275).
 
 ### F13 (L). Terms: the same thing under different words
-- Event names: ADR 0004 part 19 emits the events (I-10, I-20; docs/adr/0004-simulation-core.md:448–452: "hits, deaths
+- Event names: ADR 0004 part 19 emits the events (I-10, I-20; docs/adr/0004-simulation-core.md:452–456: "hits, deaths
   and kills ..., blasts ..., cosmetic shot events, purchases, uplink cache events, harvester deliveries and kills,
   structure kills and stage changes, tech tiers, upgrade picks and pickups"); docs/adr/0001-multiplayer-netcode.md:230
   ("hits, kills, deaths, purchases, captures, tier changes, pick results, ..."), docs/adr/0002-code-structure-build-
@@ -211,9 +211,9 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 ### F14 (L). Small seam and cross-reference slips
 - R5-TEST-OQ2 (the WebTransport crates' interop): docs/adr/0002-code-structure-build-toolchain.md:1351 disposes it as
   "spike: the netcode proof test (... ADR 0001)"; ADR 0001 never names the id (0 hits), though its spike covers
-  interop (0001:404, R2-TRN-REC1 and REC3). Outcome: ADR 0001's "What the proof test decides" (0001:994 on) adds
+  interop (0001:405, R2-TRN-REC1 and REC3). Outcome: ADR 0001's "What the proof test decides" (0001:994 on) adds
   R5-TEST-OQ2. Owner: netcode-architect.
-- OQ-0001-1 option (b) "another reading of TICK-30's '25 % headroom'" (docs/adr/0001-multiplayer-netcode.md:843) names no
+- OQ-0001-1 option (b) "another reading of TICK-30's '25 % headroom'" (docs/adr/0001-multiplayer-netcode.md:845) names no
   reading, while GLOSSARY:30–31 asks a "Depends on" to state every reading, and GLOSSARY §8's entry (:790) states only
   the ruled one (synthesis list item 14). GLOSSARY §8 is the Advisor's text (condition 3) and does not change. Outcome:
   OQ-0001-1 (b) reads "not confirmed: Mustafa and the Advisor name the base, and part 2's mark and GLOSSARY §8 follow".
@@ -232,16 +232,16 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 ## The known items (brief, check 6): one outcome each
 | Item | Outcome | Who changes what |
 |---|---|---|
-| ADR 0005 CD-7 vs ADR 0001 `ContentReload` and ADR 0004 part 16 | F1: OQ-0005-CD4 is the one place; 0004 part 16 conditional on CD4 (b); 0001's row conditional on CD4 (b) | rust-reviewer (0004:412–413), netcode-architect (0001:488), synthesis (SPIKE_PLAN:158) |
+| ADR 0005 CD-7 vs ADR 0001 `ContentReload` and ADR 0004 part 16 | F1: OQ-0005-CD4 is the one place; 0004 part 16 conditional on CD4 (b); 0001's row conditional on CD4 (b) | rust-reviewer (0004:416–417), netcode-architect (0001:489), synthesis (SPIKE_PLAN:158) |
 | OQ-0004-5, OQ-0004-6 vs OQ-0005-AB9, AB10 | F2: one question each, in ADR 0005; 0004 deletes its two and cites; part 18's "its weapon becomes a pickup" made conditional | rust-reviewer, the 0005 ability authors, synthesis (README:69–70) |
 | Audio voices 32 Low / 48 High vs the map's N48 | consistent: ADR 0003:360, :991 and README:327 follow r3:1244–1245; only the checkpoint map said 32 on both tiers, and it is deleted before ready | nobody |
-| R1-TICK-OQ1 and R2-INT-OQ5: 0001 or 0004 | stay in ADR 0001 (0001:1325, :1404); ADR 0004 cites 0001 (0004:243, :1166) and measures the pass (PM-0004-52) | nobody |
+| R1-TICK-OQ1 and R2-INT-OQ5: 0001 or 0004 | stay in ADR 0001 (0001:1334, :1413); ADR 0004 cites 0001 (0004:244, :1174) and measures the pass (PM-0004-52) | nobody |
 | R5-TEST-OQ2 | stays in ADR 0002 (0002:1351) as "spike: the netcode proof test"; ADR 0001 must name it (F14) | netcode-architect |
 | R5-TEST-OQ3 | stays OQ-0002-6 (a design question for the game-designer with Mustafa; README:55); consistent with 0004's reach (PM-0004-59) | nobody |
 | R5-PREV-OQ5, R5-PREV-OQ6 | stay in ADR 0002 as spikes; ADR 0006 decides them (PM-0006-2, PM-0006-10); SPIKE_PLAN:262 agrees | nobody |
 | R5-PREV-REC3 | stays in ADR 0006 (policy); ADR 0002:510, :524 holds the close and sweep jobs and cites 0006 (seam S3) | nobody |
 | R1-RR-OQ7, R5-GATE-OQ4 | stay in ADR 0006 (OQ-0006-6, B1); ADR 0002:472–474 defines the advisories job and cites the baseline (seam S3 holds) | nobody |
-| R2-ROOM-OQ11 | stays in ADR 0006 (OQ-0006-6, interim HttpOnly cookie); ADR 0001:366, :1380 cites 0006 | nobody |
+| R2-ROOM-OQ11 | stays in ADR 0006 (OQ-0006-6, interim HttpOnly cookie); ADR 0001:367, :1389 cites 0006 | nobody |
 | ADR 0001's four replaced lines vs condition 2's three | ADR 0001's four are the consistent text: R2-BUD-REC1's tick half (r2:2302) states the same rule TICK-30 replaces; leaving it would leave a contradicting research line. No draft change; the session's report names it as an addition to condition 2 for the Advisor | the session (report) |
 | Decision-map codes (I-n, S-n, G-n, LE-x, J-n, N-n) | every code the drafts cite has a README row (I-1 to I-21; seams S1, S3, S4, S6, S12; gaps G1–G5, G7–G9, G11, G15; LE-B, LE-N; J1–J6; the twelve N-codes), except "decision map S11" and "part g"/"part h" (F12) | engine-architect (0002), synthesis |
 | ADR 0006's goal cost at two densities | consistent: 0006:260 and :264 (about 361 EUR at 8 rooms per VM, about 534 EUR at 4), :548–551 (why both), :1053 ledger; no other document restates a goal cost; 0001's PM-0001-27 runs the 8-room test both use | nobody |
@@ -261,13 +261,13 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 | Check | What was compared | Result |
 |---|---|---|
 | Shared numbers: network | snapshot cap 1,000 / 1,150 / 1,067 B, 160 / 256 / 48 kbps, interpolation delay, rewind cap, profiles P0–P4 | stated only in ADR 0001; P0–P4 restated with 0001:393's values in 0002:967, 0003:1149, 0005:1970, 0006:835 |
-| Shared numbers: rooms, hosts, CI | 64 MB per room, room start-up under 2 s (0001:1109 and 0006 PM rows), 14-day certificates (0006 only), 25 MiB (0002, 0005 cite 0006), previews 5 min / 24 h / 7 days, CI 10 / 20 min, logs 14 days, metrics 15 days, goal costs | same everywhere, owner states, others cite |
+| Shared numbers: rooms, hosts, CI | 64 MB per room, room start-up under 2 s (0001:1118 and 0006 PM rows), 14-day certificates (0006 only), 25 MiB (0002, 0005 cite 0006), previews 5 min / 24 h / 7 days, CI 10 / 20 min, logs 14 days, metrics 15 days, goal costs | same everywhere, owner states, others cite |
 | Shared numbers: client budgets | 512 MB, 4 draw calls per soldier, draw caps 800 / 1,100 / 1,500, page's cost of the sim (p99 in 0003 PM-0003-20, p95 difference in 0002 PM-0002-4, "both gate" in both) | consistent (LE-B handled the same way in both) |
 | Shared numbers: tick | 30 Hz baseline, 6.25 / 8.33 ms margin, 36,000 ticks = 20 minutes, Worker jitter 4 ms, server jitter 2 ms | consistent except the precision (F3) |
-| Seams S1–S12 | S1 (0001 adds 0004's share, 0001:528, 0004:84, :215); S2 (block: 0002:248–262 vs 0001 fields, 0004 part 19); S3 (0002 jobs, 0006 policy); S4 (0006:88 gives VMs, supervisor, firewall); S5 (except F1, F11); S6 (except the 10 s line, F14); S7 (audio occlusion stays on the page: 0003:366, :1178; 0004 has no audio part); S8 (bots on the input path: 0001 part 11, 0004 part 15); S9 (tree style open); S10 (OQ-0002-1 keeps EDITOR_V2 §5 as option (a)); S11 (DESIGN; local play from slice 2); S12 (baseline cited by 0001, 0002, 0005) | consistent apart from the findings named |
-| Interfaces | crate and package names (0002 part 3 list; 0001, 0004, 0005, ENGINE_OVERVIEW use the same), message names (0005 uses `ContentReload`, `HostCommand`, `JoinAccepted`, `JoinRejected`, all in 0001:481–490), aim point I-19 (0001 part 5, 0002:268, 0003:382, 0004:302), block contents, `packages/types`, OQ-0002-3 with OQ-0004-7 | consistent (event names: F13) |
+| Seams S1–S12 | S1 (0001 adds 0004's share, 0001:529, 0004:84, :216); S2 (block: 0002:248–262 vs 0001 fields, 0004 part 19); S3 (0002 jobs, 0006 policy); S4 (0006:88 gives VMs, supervisor, firewall); S5 (except F1, F11); S6 (except the 10 s line, F14); S7 (audio occlusion stays on the page: 0003:366, :1178; 0004 has no audio part); S8 (bots on the input path: 0001 part 11, 0004 part 15); S9 (tree style open); S10 (OQ-0002-1 keeps EDITOR_V2 §5 as option (a)); S11 (DESIGN; local play from slice 2); S12 (baseline cited by 0001, 0002, 0005) | consistent apart from the findings named |
+| Interfaces | crate and package names (0002 part 3 list; 0001, 0004, 0005, ENGINE_OVERVIEW use the same), message names (0005 uses `ContentReload`, `HostCommand`, `JoinAccepted`, `JoinRejected`, all in 0001:482–491), aim point I-19 (0001 part 5, 0002:268, 0003:382, 0004:302), block contents, `packages/types`, OQ-0002-3 with OQ-0004-7 | consistent (event names: F13) |
 | ENGINE_OVERVIEW | every part reference into 0001 and 0004 (part numbers match the drafts' headings), the data flow, state ownership (vs 0001 "State ownership", 0001:445–466), the §6 table, the settled list | consistent (one word, "captures": F13) |
-| Settled inputs | N = 48 (the 244 "48" hits screened), TICK-30 and the 60 Hz margin (0001 part 2, GLOSSARY §8, 0002:47, 0004:46, 0006:51), SEC-SPREAD (a) (0001:178–181, :450; 0003:50–51, :238; 0004:260–266), PREVIEW-WALL (a) (0002:49–50, :511–512; 0006 part 2 after its fix), BASELINE-WHEN (b), UPGRADE-SCOPE (0001 part 12, 0004 part 18, 0005), ABL-PREDICT open (0001 Q2 option D "ABL-PREDICT decides", 0004:261, 0005:742), LOOK_V2's `[OPEN]` tree style (0003:12, :443, OQ-0003-9) | no settled input weighed as an option; 0004 part 18's drop sentence pre-empts a design question (F2) |
+| Settled inputs | N = 48 (the 244 "48" hits screened), TICK-30 and the 60 Hz margin (0001 part 2, GLOSSARY §8, 0002:47, 0004:46, 0006:51), SEC-SPREAD (a) (0001:178–181, :450; 0003:50–51, :238; 0004:261–267), PREVIEW-WALL (a) (0002:49–50, :511–512; 0006 part 2 after its fix), BASELINE-WHEN (b), UPGRADE-SCOPE (0001 part 12, 0004 part 18, 0005), ABL-PREDICT open (0001 Q2 option D "ABL-PREDICT decides", 0004:261, 0005:742), LOOK_V2's `[OPEN]` tree style (0003:12, :443, OQ-0003-9) | no settled input weighed as an option; 0004 part 18's drop sentence pre-empts a design question (F2) |
 | Open questions | all 112 OQ titles; overlaps: OQ-0002-4 / OQ-0006-12 (split by R1-BND-OQ5, cross-cited), OQ-0002-5 / OQ-0006-7 (jobs vs cost, cross-cited), OQ-0002-3 / OQ-0004-7 (cross-cited), OQ-0005-CD2 vs 0002 (F11), OQ-0004-5/-6 vs AB9/AB10 (F2) | the rest ask distinct questions |
 | Design ids | the 38 DESIGN ids the dispositions script left open | all 38 have a README "Design questions" row |
 | GLOSSARY | 489 in-context hits from glossary-hits-drafts.tsv, all judged: 124 read one by one (tick budget, goal modes, client host, access wall, "always", "its hash", time statistics, single phrases); 244 "48" hits screened by script, the 57 occurrences without a marking word read; 49 "effects", 37 "vehicles", 37 "players" screened, flagged ones read. Wrong: the 2 exact hits (F5), 1 bare "effects" count; marginal: 2 (F13). "headroom": every use is the N = 64 run or a quote of TICK-30 | otherwise right |
