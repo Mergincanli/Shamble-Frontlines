@@ -344,3 +344,10 @@ measurable mark" lines · NBC the "No Brave checklist" paragraph · SE the spike
 | TE296 | ADR 0001's spike section does not name R1-TICK-REC4 | SE | 0001, 915–993 (grep: 0 hits); map 941 | settled (both texts, read 2026-11-01) |
 | TE297 | ADR 0002's item 7 names S18 and R1-TICK-REC2 P2 | SE | 0002, 918–921 | settled |
 | TE298 | R1-TICK-OQ2 and R1-BND-OQ2 are one measurement (R1-XU-OQ12) | SE | draft part 5, 194–195 | proposed (the draft's) |
+
+## Counts
+- Rows: 298 (TE1–TE298), counted by script on this file; every one of PM-0004-1 to PM-0004-72 has at least one row.
+- By first tier (script on this file): research verified 65 · research, source to check 106 · settled 29 · arithmetic
+  9 · design doc 1 · proposed 88 (the draft's 20; test-engineer's 68). Further tiers inside a row are named there.
+- Proposed by test-engineer (method choices, readings, counts and planted defects, each with its reason): 87 rows name
+  it at some tier.
