@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:00 Amsterdam
+- **Last update:** 2026-11-01 09:01 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -13,6 +13,8 @@
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 - d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
+- 233f6f7 · ADR 0005 assembled (engine-architect's frame with the four sections byte for byte + PM-0005-1..46), write
+  guard PASS. Draft PR #33 opened on it.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
@@ -36,9 +38,14 @@ section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assemble
 spike PM-0002-1..34, the foundation's acceptance checks -35..69, later milestones -70..76); ADR 0002 assembled
 (789bedb); pass marks for 0004 (72 marks); ADR 0004 assembled (d321a13). Second spend-limit cut, about 05:30: the
 five running agents (pass marks 0005; verifiers 0001, 0002, 0004, 0006) failed with HTTP 429, "your 5-hour limit
-resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed at about 09:00 (after the reset), in
-priority order for the 11:00 stop: pass marks 0005 → ADR 0005 assembled → the synthesis; the verifiers alongside (from
-08:30 they may fetch sources).
+resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed at about 09:00 (after the reset):
+pass marks 0005 (46 marks; its ledger last); ADR 0005 assembled (233f6f7; its four sections byte for byte, checked by
+script); all six drafts now in docs/adr/. Draft PR #33 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/33),
+subscribed to its activity. Running: the synthesis (engine-architect, launched about 09:03; documents due by 10:05),
+pass marks 0005's ledger (test-engineer), verifiers 0001, 0002, 0006 (resumed; source checks allowed now; verdicts
+due 10:15). Waiting: verifier 0004 (resume when a slot frees), verifiers 0003, 0005 and the synthesis, the critics,
+docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
+docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
