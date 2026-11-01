@@ -69,7 +69,7 @@ recommendation, 32 of them more than 20 lines below the id's heading) were each 
 | TE39 | That a Worker of an isolated page is isolated too is not researched; `crossOriginIsolated` read in the Worker | PRE | none | proposed (test-engineer) |
 | TE40 | L2 client times use the clock estimate, whose error bound is PM-47's | PRE | r2 R2-BUD-REC4 mark, 2378–2380 | research verified |
 | TE41 | Presented frames on a 60 Hz display; no frame-time budget here; one tick (33.3 ms) is two refresh periods | PRE | 1000 ÷ 30 = 33.3 ms; 1000 ÷ 60 = 16.7 ms; 2 × 16.7 = 33.3 | arithmetic; mode P proposed (test-engineer: latency is about what a player sees; the 0003-PM vsync lesson) |
-| TE42 | A timed server mark runs 3 times and every run must meet it | PRE | r1 R1-TICK-REC2 P1 ("3 runs"), 2048 | research verified (P1's count); its use for every timed server mark proposed (test-engineer) |
+| TE42 | A timed server mark runs 3 times and every run must meet it | PRE | r1 R1-TICK-REC2 P1 ("3 runs"), 2047 | research verified (P1's count); its use for every timed server mark proposed (test-engineer) |
 | TE43 | Validity: steal time at most 1 % of the run | PRE | none | proposed (test-engineer: a VM's neighbours show as steal; not researched) |
 | TE44 | Validity: LG's clients sent 30 inputs per second each within 1 % | PRE | draft part 5 (one command per tick), 185 | proposed (test-engineer: a starved load generator lightens the load) |
 | TE45 | A clean reference is the median of 3 clean runs whose p99s lie within 2.5 % of their median | PRE | r2 R2-TRN-REC6 mark 2 (5 %), 2743; 5 % ÷ 2 = 2.5 % | proposed (test-engineer: half the tightest tolerance compared against; the 0003-PM overlay lesson) |
@@ -210,7 +210,7 @@ recommendation, 32 of them more than 20 lines below the id's heading) were each 
 | TE160 | The setup: one vCPU of RS, SS at N = 48 with a client on every soldier, 30-minute soak, re-flood ticks included | PM-39 | map J1 N3, 1055; GLOSSARY §8 text, 1104–1109 | settled |
 | TE161 | P2 in the margin run, as in the 30 Hz soak | PM-39 | r2 R2-SYNC-REC9 mark 1 (P2), 2292–2293 | proposed (test-engineer: the two runs then differ only in the tick rate) |
 | TE162 | Tick 65,536 reached at 18.2 minutes at 60 Hz | PM-39 | 65,536 ÷ 60 ÷ 60 = 18.2; draft 241–242 | arithmetic |
-| TE163 | "In one run" read as: every number of a run from that run; 3 runs, each passes | PM-39 | GL §8 ("measured … in one run (p99s do not add)"), map 1104–1105; r1 R1-TICK-REC2 P1 (3 runs), 2048 | proposed (test-engineer reading) |
+| TE163 | "In one run" read as: every number of a run from that run; 3 runs, each passes | PM-39 | GL §8 ("measured … in one run (p99s do not add)"), map 1104–1105; r1 R1-TICK-REC2 P1 (3 runs), 2047 | proposed (test-engineer reading) |
 | TE164 | A failure keeps 30 Hz | PM-39, FAIL | draft spike item 3, 966–967; Rollback, 1058 | proposed (the draft's) |
 | TE165 | P1 at 60 Hz: sim step p99 ≤ 4.2 ms at N = 48, max ≤ 16.7 ms, 0 overruns, 36,000 ticks, 3 runs | PM-40 | r1 R1-TICK-REC2 P1, 2044–2049; 0004 S1 | research verified; settled (0004's row) |
 | TE166 | P2 at 60 Hz: the client's sim share p99 ≤ 6.7 ms in Wasm on ML while the page holds 30+ fps on Low | PM-40 | r1 R1-TICK-REC2 P2, 2054–2057; GL 214–217 | research verified |
@@ -315,4 +315,6 @@ recommendation, 32 of them more than 20 lines below the id's heading) were each 
 
 ## Counts
 - Rows: 249 (TE1–TE249).
-- By first tier (counted on this file by script): see the closing line of the notes file.
+- By first tier (counted on this file by script): proposed 117 · research verified 84 · settled 29 · arithmetic 12 ·
+  research, source to check 5 · design doc 2.
+- Proposed by test-engineer (method choices, readings, counts and planted defects, each with its reason): 87 rows.

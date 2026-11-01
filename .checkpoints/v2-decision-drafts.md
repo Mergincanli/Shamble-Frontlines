@@ -4,12 +4,13 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 04:19 Amsterdam
+- **Last update:** 2026-11-01 04:27 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
 - 5bdad85 · ADR 0006 assembled (infra-engineer's draft + test-engineer's PM-0006-1..31), write guard PASS.
 - 2a0e5f6 · ADR 0003 assembled (graphics-engineer's draft + PM-0003-1..43), write guard PASS.
+- 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
@@ -28,8 +29,9 @@
 The run (03:55–11:00). Done since 03:55: ADR 0005's frame (engine-architect; record 2,059 lines, the four sections byte
 for byte, 34 open questions, ledger 135 rows; `engine-architect-adr0005-frame-parts/build_draft.py` rebuilds it after
 section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assembled (5bdad85) and ADR 0003 assembled
-(2a0e5f6) into docs/adr/. Running: pass marks for 0001, 0002, 0004, 0005 (test-engineer), verifier for 0006 (research
-checks; source checks pending until 08:30).
+(2a0e5f6) into docs/adr/; pass marks for 0001 (test-engineer; 56 marks, all in the netcode proof test, Mustafa's
+15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de). Running: pass marks for 0002, 0004, 0005
+(test-engineer), verifiers for 0006 and 0001 (research checks; source checks pending until 08:30).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -90,6 +92,14 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   proposed; OQ-0005-CD4), so ADR 0001's `ContentReload` message and ADR 0004 part 16 ("a development reload swaps them
   between ticks") hold only under the mid-match option: consistency pass. Legacy rows ED5 and ED7 (Character Lab, Anim
   Lab) are listed by no draft. Its "For the frame" carries the record-level parts.
+- Pass marks 0001 (test-engineer), for the 0001 author's fix round: the 160 kbps mean rests on R2's estimate with 32
+  live projectiles, the stress scene has 300 (about 162–192 kbps with E3; with E3b the projectiles alone need 1,650 B
+  per snapshot, over the 1,067 B cap), so the Rollback's "E3b about +42 kbps" holds only at 32: the draft must name the
+  scene; "join within 300 ms at P2" needs a start point and a loss rule; "RTT within ±5 ms" is R5-TEST-REC4's at a fixed
+  100 ms, not "at P2"; the throwaway sim has no vehicles, projectiles or effects and nothing sets the portal-change
+  rate (stand-ins proposed); "What a spike must prove" omits R2-SYNC-REC7 mark 3 though Appendix A sends R2-SYNC-OQ5 to
+  the spike; the tick-wrap check runs only at 60 Hz; R2-ROOM-REC2's "rooms of bots" would leave out encoding and
+  transport work.
 - Write guard: condition 1's `cmp - <(head -n 742 GLOSSARY.md)` fails on an unchanged file, because the base GLOSSARY ends
   without a final newline (742 newlines, then an unterminated last line); `scripts/write_guard.sh` checks the exact
   intent instead (the base file is a byte prefix of today's), so §8 can be appended and nothing above it may change.

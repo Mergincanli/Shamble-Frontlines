@@ -87,7 +87,7 @@ another file is named; "the draft" is this record.
   is a frame-time budget, and the one frame-based tolerance (PM-0001-43, one tick = 33.3 ms) is two refresh periods, so
   the frame step cannot hide it.
 - **Runs and validity (V-S).** A timed server mark runs 3 times and every run must meet it (R1-TICK-REC2 P1's "3 runs",
-  r1-simulation-core.md line 2048; proposed for every timed server mark). A run is valid when: the tick thread was alone
+  r1-simulation-core.md line 2047; proposed for every timed server mark). A run is valid when: the tick thread was alone
   on its vCPU (PM-0001-1); the vCPU's steal time stayed at or under 1 % of the run (proposed: a VM's neighbours show as
   steal; not researched); LG's clients sent their 30 inputs per second each within 1 % (proposed: a starved load
   generator lightens the load). A mark compared with "a clean run" uses the median of 3 clean runs whose p99s lie within
