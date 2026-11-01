@@ -2,14 +2,15 @@
 
 Ranks: H (a reader gets a different decision, number or interface depending on which document they read; must change
 before review), M (a seam, owner or term disagrees but the decision itself is the same; change in the fix round),
-L (form: precision, citation form, code collisions). Line numbers are against the files as of 14:40 Amsterdam (ADR 0006
-after its fix round, 09803a9). The ranked index and the known items' outcomes follow the findings.
+L (form: precision, citation form, code collisions). Line numbers are against HEAD 8f3674b (checked about 14:00 Amsterdam): ADR 0001
+after its fix round 03df0ae, ADR 0004 after 7da03b1, ADR 0006 after 09803a9; every finding was re-checked against them.
+The test-engineer's pass-mark fix round, launched after them, may shift PM-row lines again: each finding quotes its text. The ranked index and the known items' outcomes follow the findings.
 Each finding: documents and lines; the texts that disagree; the proposed consistent outcome; the owner who changes it.
 
 ## Findings
 
 ### F1 (H). Development reload: ADR 0004 states the mid-match swap as decided; ADR 0005 proposes the next match
-- Documents: docs/adr/0004-simulation-core.md:416–417 (part 6/16 text); docs/adr/0005-content-abilities-assets.md:255,
+- Documents: docs/adr/0004-simulation-core.md:416–417 (part 16); docs/adr/0005-content-abilities-assets.md:255,
   364–370, 525–526, 606–613 (CD-7, OQ-0005-CD4), 1888–1889; docs/adr/0001-multiplayer-netcode.md:489 (`ContentReload`);
   docs/SPIKE_PLAN.md:158 ("hot reload into the Worker").
 - Texts: 0004: "a development reload swaps them between ticks, never inside one (R1-DATA-REC5, ADR 0005's)". 0005 CD-7:
@@ -129,12 +130,18 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 - Owners: netcode-architect (0001:337, and 0001:955 if it should name the `wss` leg's certificate); engine-architect
   synthesis (SPIKE_PLAN, README).
 
-### F9 (M). README's line pointers into ADR 0006 are stale after 0006's fix round
-- Documents: docs/adr/README.md:94–103. Script check of all 68 "line N" pointers in README against the current drafts:
-  10 miss, all into ADR 0006 (OQ-0006-1 at 598 is now 613; -2 608→625; -3 615→632; -4 626→643; -6 647→673; -7 658→684;
-  -8 668→694; -9 677→703; -10 686→712; -12 701→727). The other 58 hold (four rows that name a decision code with its OQ
-  in brackets match the OQ's line).
-- Outcome: re-point the ten rows after every draft's fix round lands (a last script pass before the PR is marked ready).
+### F9 (M). README's line pointers are stale after the fix rounds, and the trace question has two names
+- Documents: docs/adr/README.md, "Decisions the drafts ask for". A script check of all 68 "line N" pointers against HEAD
+  8f3674b: 24 miss. Into ADR 0001 (03df0ae added lines): README:33–35 and 45–51, OQ-0001-2, -3, -4, -5, -7, -8, -9, -10,
+  -11, -12, each now 2 lines lower (OQ-0001-2 846→848 ... OQ-0001-12 905→907). Into ADR 0004 (7da03b1): README:67–70,
+  OQ-0004-1 742→748, -4 765→771, -5 773→779, -6 784→790. Into ADR 0006 (09803a9): README:94–103, OQ-0006-1 598→613,
+  -2 608→625, -3 615→632, -4 626→643, -6 647→673, -7 658→684, -8 668→694, -9 677→703, -10 686→712, -12 701→727. The
+  other 44 hold.
+- The trace question: ADR 0001's fix round added OQ-0001-14 ("Is a VISION_V2 §3 or §4 target trace enough for an engine
+  feature?", docs/adr/0001-multiplayer-netcode.md:916, Decider: the Advisor, at the stop); README:43 lists the same
+  question as "Trace reading (LE-G; R2-XU-OQ18)", pointing at 0001's Appendix A. Same decider, two names.
+- Outcome: README:43 names OQ-0001-14 and points at its line; every pointer is re-pointed by one script pass after the
+  last fix round lands (the pass-mark round is still running), before the PR is marked ready.
 - Owner: engine-architect synthesis (README).
 
 ### F10 (M). Line citations into STATUS are stale (STATUS was rewritten by 549490f); plan rule C12 says cite the code
@@ -224,6 +231,12 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
 - Telemetry timeline: docs/adr/0004-simulation-core.md:460 states "The timeline is sampled every 10 s of game time", a
   part of the record's shape, which seam S6 gives ADR 0006 (0006:341–342 states the same 10 s). Same value; 0004 should
   cite it ("ADR 0006's record samples ... every 10 s"). Owner: rust-reviewer.
+- Grenade fragments as damage: docs/adr/0004-simulation-core.md:814–816 (added by its fix round: "Not yet in that
+  register: whether grenade fragments deal damage per fragment ... a rule for Mustafa, with no research id") and
+  docs/adr/0003-rendering.md:243, :1076 ("Whether a fragment deals damage is a design question for Mustafa") ask the
+  same question; it has no OQ number and no row in docs/adr/README.md. Outcome: README's "Decisions the drafts ask for"
+  gets one row (decider: Mustafa with the game-designer; LOOK_V2 §3 and §7 bring fragments back as an effect), and both
+  drafts cite it. Owner: engine-architect synthesis (README); rust-reviewer and graphics-engineer cite the row.
 - Author lines: ADR 0001, 0002 and 0006 credit test-engineer for the "Pass marks" table on line 5; ADR 0003, 0004 and
   0005 carry test-engineer's PM rows too but do not credit them (each file's line 5). Outcome: one form on all six,
   "(the 'Pass marks' table: test-engineer, plan step 4)". Owners: graphics-engineer, rust-reviewer, the 0005 frame
@@ -252,10 +265,10 @@ Each finding: documents and lines; the texts that disagree; the proposed consist
   SPIKE_PLAN, README).
 - **M (8):** F2 drops and bots' records asked twice; F4 the Mac machine defined five ways (Safari 26 / 27 / latest);
   F5 "whole tick" (Retire exact) in PM-0001-4, -39; F6 ADR 0003's look proof test omits ADR 0005's share; F7 two marks
-  with no owning row (R2-SYNC-REC6 mark 1, R5-LAYOUT-REC4); F9 README's ten stale pointers into ADR 0006; F10 stale
+  with no owning row (R2-SYNC-REC6 mark 1, R5-LAYOUT-REC4); F9 README's 24 stale line pointers (into 0001, 0004, 0006) and OQ-0001-14 under another name; F10 stale
   STATUS line citations (0001, 0003, README); F11 two procedures for the one `sim-wasm` size budget.
 - **L (3, several items each):** F12 codes without a home and colliding code families; F13 terms (captures, "the proof
-  test", three glossary hits); F14 small slips (R5-TEST-OQ2, OQ-0001-1 (b), AB5, the 10 s timeline, author lines).
+  test", three glossary hits); F14 small slips (R5-TEST-OQ2, OQ-0001-1 (b), AB5, the 10 s timeline, fragment damage without a register row, author lines).
 
 ## Checked and found consistent
 | Check | What was compared | Result |
