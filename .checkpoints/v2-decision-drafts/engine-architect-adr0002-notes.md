@@ -33,3 +33,4 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 - Ids possibly belonging elsewhere (said in return): R5-TEST-OQ3 (a rule question: DESIGN), R5-TEST-OQ2 (decided by the netcode proof test: 0001), R5-PREV-OQ5/OQ6 (decided by 0006's preview hosting check).
 - Not researched/decided on judgement: room + navbake crates; multiplayer-preview delivery shape; CLI over wasm-pack (wasm-pack pages unread); local-match Worker load; Wasm size budget (no number); editor file:// load.
 DONE
+Fix round 2 (2026-11-01, started 14:06 Amsterdam): brief prompts/fix2-engine-architect-0002.txt; output engine-architect-0002-fixes-2.md.

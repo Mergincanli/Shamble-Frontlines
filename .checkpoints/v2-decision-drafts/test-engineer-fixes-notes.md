@@ -21,3 +21,9 @@ Output files: test-engineer-passmarks-000N-fixes.md (N = 1, 2, 3, 4, 6). No memo
   0002 F-13: r1 OQ2 2724-2727, OQ3 2728-2731, OQ6 2737-2740, OQ9 2747-2752 (read r1 today).
   0002 F-14: R5-TSLINT-F12 r5:221-224 (construct list unverified); verifier S-18: tsconfig page example is a parameter property. Bite becomes a parameter property; enum planted too, result recorded, not required. PM-0002-42 carries R5-TSLINT-REC1's own enum (r5:1259-1261): not in brief, reported only.
   0002 F-7: align PM-0002-26 to ADR 0004's PM-0004-68..70 (ADR 0004 part 5 owns S18 and PM-0002-26 already said ADR 0004's stand). Its own bite "timer re-armed, no accumulator" = PM-0004-68's bite; its hidden-gap bite moves to PM-0004-70 (which had none) so both read the same: FIX in the 0004 file.
+- 14:45 fix files written by script (scratchpad make_fixes.py; BEFOREs copied from the files, whole lines):
+  0001: F1 x2 (PM-0001-4, -39). 0002: F-13 x3 (PM-1, -10, -21), F-14 (PM-17), F-7 + F-13 OQ2 (PM-26). 0003: TE44 (PM-4), X7 (PM-12).
+  0004: TE69 (PM-8), F-7 counterpart (PM-0004-70 gains the hidden-gap bite). 0006: finding 5 (PM-17), finding 6 (new "Counts and settings" bullet after "Bites").
+  Checks on scratch copies: apply_fixes.py dry-applied all 13 blocks OK; glossary script exact hits 2 -> 0 (0001), no new in-context hits except one "48" in PM-0006-17's R2 arithmetic (P = 48, as the row already uses); cite_check output unchanged; every PM row still 7 columns; new bullet lines <= 120 chars.
+  Not fixed (outside the brief): PM-0002-42 plants an `enum` from R5-TSLINT-REC1's own mark (r5:1259-1261), same unverified premise; ADR 0001 F4's restated R2-BUD-REC2 precision mark names no PM row (PM-0001-17 checks quantised fidelity only).
+DONE
