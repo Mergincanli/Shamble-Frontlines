@@ -74,12 +74,14 @@ secret and repository setting named below is Mustafa's to create, never a sessio
 4. The research's 8 rooms per 4-vCPU VM is "a density to measure", and "the 4-rooms-per-VM row (one per vCPU) is the
    case to budget unless R2-ROOM-REC2 marks 1 and 2 pass on it" (r6-infrastructure.md, Options §2, assumption A-2,
    lines 516–522).
-5. Sentry's EU storage is chosen when the organization is created "and can't be changed", and its browser SDK sends
+5. Sentry's EU storage is chosen when the organization is created: "once selected, your data storage location can’t be
+   changed", and its browser SDK sends
    the user's IP address by default (r6-infrastructure.md, Findings §3, R6-OBS-F9, F10, lines 318–331).
 
 ### What it takes and what it gives
 - **Takes:** the room process, its lifecycle, join tokens, the guest identity and the lobby protocol (ADR 0001); the
-  CI workflows, the preview build and deploy job, the generated header sets, the Sentry upload job and how a
+  CI workflows, the preview build and deploy job, the generated
+  [header sets](../research/GLOSSARY.md#the-production-header-set-and-the-preview-header-set), the Sentry upload job and how a
   multiplayer preview gets its server binary and certificate hash (ADR 0002; seam S3, critic ranks 20 and 34); what
   client field data is measured (ADR 0003, rank 26); the tick-stamped events and recognized moments (ADR 0004); the
   content hash, the ids and the content bundle (ADR 0005).
@@ -142,13 +144,16 @@ account, payment, secret and repository setting below is Mustafa's to create.
 2. **Preview privacy.** A preview that runs the match offline in the Worker with bots is public but unlisted
    (`noindex` by default, branch-name links), unless it carries unreleased art, which puts it behind
    [the access wall](../research/GLOSSARY.md#the-access-wall) (r5-toolchain-quality.md, Recommendations, Question 6,
-   R5-PREV-REC5, lines 1642–1650). Every multiplayer preview, which talks to [the staging game server](../research/GLOSSARY.md#the-staging-game-server), is behind the
+   R5-PREV-REC5, lines 1642–1650). That is how this record reads the foundation's "private preview links": under every
+   PREVIEW-WALL option, "previews that reach no game server and carry no unreleased art are public but unlisted"
+   (GLOSSARY.md lines 623–624, the access wall). Every multiplayer preview, which talks to [the staging game server](../research/GLOSSARY.md#the-staging-game-server), is behind the
    access wall from the first one (PREVIEW-WALL (a)). The access wall is the client host's access policy, limited to
    Mustafa's Cloudflare account, or Cloudflare Access; Mustafa logs in once per Brave session (R5-PREV-REC5;
    R5-PREV-F12, F14, r5 lines 838–858). Pages' policy restricts "project deployments" as a whole (R5-PREV-F12, r5 lines
    838–844), so from the first multiplayer preview every preview of the project sits behind the wall (proposed interim
    position; whether to split them is OQ-0006-4). The policy covers previews, not the production domain
-   (r6-infrastructure.md, Findings §1, R6-HOST-F4, lines 80–86, inferred), so the game itself stays public.
+   (r6-infrastructure.md, Findings §1, R6-HOST-F4, lines 80–86, inferred there; Cloudflare's preview-deployments page
+   states it, read by the verifier on 2026-11-01), so the game itself stays public.
    *Why:* PREVIEW-WALL (a); a preview holds no secrets, so offline previews need only `noindex`
    (r6-infrastructure.md, R6-HOST-REC1, line 622). *Ids:* PREVIEW-WALL, R5-PREV-REC5, R5-PREV-OQ1, R6-HOST-OQ5.
    *Need:* GLOSSARY §8, the foundation ("private preview links") only; LOOK_V2 §8 (unreleased authored models).
@@ -178,7 +183,9 @@ account, payment, secret and repository setting below is Mustafa's to create.
 5. **Game servers and the reference server.** Hetzner Cloud in one EU location; one room per process (R2-ROOM-REC2,
    ADR 0001's) under a small supervisor per VM; no load balancer on the game path, since the lobby hands out host and
    port; each VM has its own public IPv4 and IPv6 address. The firewall opens one UDP range for WebTransport and one
-   TCP range for the WebSocket fallback (R2-TRN-REC3, as R6-HOST-REC2 says, r6 lines 648–649), plus the one rule part 9's metrics path may need, and nothing
+   TCP range for the WebSocket fallback (R2-TRN-REC3, as R6-HOST-REC2 says, r6 lines 648–649), plus the one rule part 9's metrics path may need
+   (proposed: a change to R6-HOST-REC2's "plus nothing else", r6 line 649, because a Prometheus scrape needs an inbound
+   port while a push needs none, R6-OBS-F4, r6 lines 279–284; spike 2 checks it), and nothing
    else; Hetzner's firewall is stateful, drops all inbound traffic no rule allows and costs nothing
    (r6-infrastructure.md, Findings §1, R6-HOST-F18, lines 169–174). VMs stay up and rooms start and end as processes
    inside them, because billing rounds up to the hour (R6-HOST-F17). The server CPU is x86-64 (the dedicated plans are
@@ -222,7 +229,8 @@ account, payment, secret and repository setting below is Mustafa's to create.
    pinned through `serverCertificateHashes` (R2-TRN-REC5, r2 lines 2700–2703; number N30). Hash pinning in production
    stays out: the VMs stay warm, so they are not the "short-lived ephemeral servers" R2-TRN-REC5 names
    (r6-infrastructure.md, Options §1, Q3, option C3, lines 426–427; r2-netcode.md, R2-TRN-OQ4, lines 3050–3054). The
-   netcode proof test runs on the development certificates; the production form is needed from the first online
+   netcode proof test runs on the development certificates for WebTransport (which certificate its WebSocket fallback
+   presents is OQ-0006-5); the production form is needed from the first online
    playtest, after the security baseline's research. An alert fires when any VM's certificate has under 14 days left
    (proposed in R6-HOST-REC4's mark, r6 lines 697–699).
    *Carry-forward 4, four superseded sentences* (each still calls the wildcard R6's proposal; R6-HOST-REC4 holds):
@@ -297,11 +305,16 @@ account, payment, secret and repository setting below is Mustafa's to create.
    ping": overruns, the server tick budget and the fallback share become visible) (r6 lines 734–735 and 749).
 10. **Crash reports.** In the browser: Sentry's browser SDK with `wasmIntegration` and build ids from `wasm-split`;
     debug files uploaded by CI and never shipped (the upload job is ADR 0002's, critic rank 34); the organization
-    created in Sentry's EU location; `userInfo` off, so the SDK does not send IP addresses. Tab crashes: Reporting API
+    created in Sentry's EU location; `userInfo` off, so the SDK infers no IP address, and its deny lists for HTTP
+    headers, cookies and query parameters set too, because IP addresses can still reach Sentry through them
+    (r6-infrastructure.md, Findings §3, R6-OBS-F10, lines 327–331, "inferred" there; Sentry's data-collected page says it
+    in its own words, read by the verifier on 2026-11-01). In the browser the SDK sends only the Referer and User-Agent
+    headers, and no cookies unless its httpClient integration is on (the same page, read by the skeptic on 2026-11-01),
+    so by default the query parameters in the URLs it sends are the channel left. Tab crashes: Reporting API
     `crash` reports to our own endpoint on the lobby. On the server: panics go to Sentry's Rust SDK from the room
     process, and the supervisor records every abnormal room exit (r6-infrastructure.md, Recommendations §3,
     R6-OBS-REC3, lines 754–768). Mustafa creates the Sentry organization in his own account, choosing the EU location,
-    which "can't be changed" later (R6-OBS-F9, r6 lines 318–326), after he has read Sentry's prices (OQ-0006-8); its upload
+    which "can’t be changed" later (R6-OBS-F9, r6 lines 318–326), after he has read Sentry's prices (OQ-0006-8); its upload
     token is a secret he adds (part 13). Sentry calls its Wasm support "still developing" (R6-OBS-F7, r6 lines 297–306),
     so whether it symbolicates wasm-bindgen Rust (R6-OBS-OQ3) and which browsers send `crash` reports (R6-OBS-OQ4) are
     spike marks: in the boundary spike if the EU organization exists by then, otherwise at the first online playtest's
@@ -376,7 +389,7 @@ account, payment, secret and repository setting below is Mustafa's to create.
     Previews are settled by PREVIEW-WALL (a) (part 2). **Secrets:** every secret lives in a GitHub environment (for
     CI) or in a VM's environment, never in the repository, and Mustafa adds each one; agents never add them
     (r6-infrastructure.md, R6-SEC-OQ1, lines 944–945; r5-toolchain-quality.md, Pointers, lines 2104–2106). The client
-    host's deploy token is an account-scoped "Cloudflare Pages, Edit" API token, the scope the research read
+    host's deploy token is an API token with the scope the research read, "select *Account*, *Cloudflare Pages* and *Edit*"
     (r5-toolchain-quality.md, Findings, Question 6, R5-PREV-F10, lines 823–830; whether it can be narrowed to one
     project was not read), held only by the deploy job's environment `preview` (R5-PREV-REC1, r5 lines 1588–1604; ADR
     0002's job). *Ids:* BASELINE-WHEN, R6-SEC-OQ1, R1-RR-OQ7, R5-GATE-OQ4, R5-TSLINT-OQ5, R2-ROOM-OQ11, R2-XT-OQ9,
@@ -419,11 +432,11 @@ the option serves the same build and does not touch what a player sees.
 
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Effect on the look and feel | Effort from the current code | Pros and cons |
 |---|---|---|---|---|---|---|---|
-| **G1. Hetzner Cloud, dedicated vCPU (CCX23 as the reference server, proposed)** | Medium: our own VMs, a supervisor, a firewall; no load balancer, the lobby hands out host and port | CCX23 86.49 EUR a month (0.1386 an hour), 20 TB included, 1 EUR per extra TB (R6-HOST-F15, F16, r6 lines 150–163) | "highly predictable resources", sold for gaming servers (R6-HOST-F14, r6 lines 144–149) | Firewall filters UDP, stateful, drops what no rule allows (R6-HOST-F18, r6 lines 169–174) | Fair server ticks serve VISION_V2 §4's "fair up to about 100 ms of ping" | From zero | **Pros:** predictable tick; egress free at full load. **Cons:** EU plans showed "currently unavailable" on 2026-10-28 (R6-HOST-F20, r6 lines 180–182); a single provider |
+| **G1. Hetzner Cloud, dedicated vCPU (CCX23 as the reference server, proposed)** | Medium: our own VMs, a supervisor, a firewall; no load balancer, the lobby hands out host and port | CCX23 86.49 EUR a month (0.1386 an hour), 20 TB included, 1 EUR per extra TB (an inferred reading: R6-HOST-F15, F16, r6 lines 150–163) | "highly predictable resources", sold for gaming servers (R6-HOST-F14, r6 lines 144–149) | Firewall filters UDP, stateful, drops what no rule allows (R6-HOST-F18, r6 lines 169–174) | Fair server ticks serve VISION_V2 §4's "fair up to about 100 ms of ping" | From zero | **Pros:** predictable tick; egress free at full load. **Cons:** EU plans showed "currently unavailable" on 2026-10-28 (R6-HOST-F20, r6 lines 180–182); a single provider |
 | **G2. Hetzner Cloud, shared vCPU (CX33, measured beside G1)** | As G1 | CX33 8.99 EUR a month (0.0144 an hour) (F15) | "designed for variable usage patterns rather than sustained high workloads" (F14): server tick [p99](../research/GLOSSARY.md#time-statistics) must be measured | As G1 | Noisy neighbours could break the server tick budget (r6 line 416) | From zero | **Pros:** 9.6 times cheaper. **Cons:** unproven for a fair tick |
 | G3. Fly.io Machines | UDP not read (outside the allow list) | performance-2x 66 USD a month plus 0.02 USD per GB of egress (R6-HOST-F22, r6 lines 186–192) | Dedicated-ness not read | Not read | Not read | From zero | **Cons:** 3.16 GB per 24v24 match-hour makes egress about 369 USD a month per loaded host (r6 lines 461–464) |
 | G4. Amazon GameLift Servers | Managed fleets, not read in detail | c6a.large 0.099 USD an hour on demand, 0.03 on Spot, Ohio; bandwidth free on generation 6 and later; EU rates not read (R6-HOST-F23, r6 lines 193–197) | Managed scaling, not read | Not read | Not read | From zero | **Cons:** lock-in to its server SDK (not read) |
-| Hetzner dedicated root servers; Netcup, OVHcloud, Scaleway | not researched (R6-HOST-OQ1, OQ4, r6 lines 852–855 and 862–865) | not researched | not researched | not researched | not researched | not researched | Read only if OQ-0006-1 rules Hetzner Cloud out |
+| Hetzner dedicated root servers; Netcup, OVHcloud, Scaleway | not researched (R6-HOST-OQ1, OQ4, r6 lines 852–855 and 862–865) | not researched | not researched | not researched | not researched | not researched | Netcup, OVHcloud, Scaleway: read only if OQ-0006-1 rules Hetzner Cloud out; Hetzner's dedicated root servers, "a further candidate at goal scale", are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (R6-HOST-OQ4, r6 lines 863–865) |
 
 ### Q4. The fleet's shape (r6-infrastructure.md, Options §2, K1–K4, lines 502–512)
 
@@ -466,7 +479,7 @@ are the same in all three; security the same; the look and feel differ only thro
 
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Effect on the look and feel | Effort from the current code | Pros and cons |
 |---|---|---|---|---|---|---|---|
-| **Sentry browser SDK with `wasmIntegration`, debug files uploaded at build (C1, proposed)** | Medium: a CI upload job (ADR 0002) | Free tier, then per error (R6-COST-F3, r6 lines 229–235; base prices not read) | Wasm frames with symbols, "still developing" (R6-OBS-F7, r6 lines 297–306) | EU storage chosen at creation; IP off by setting (R6-OBS-F9, F10, r6 lines 318–331); a CI secret | None | From zero | **Pros:** Rust function names in traps. **Cons:** an unproven Wasm path |
+| **Sentry browser SDK with `wasmIntegration`, debug files uploaded at build (C1, proposed)** | Medium: a CI upload job (ADR 0002) | Free tier, then per error (R6-COST-F3, r6 lines 229–235; base prices not read) | Wasm frames with symbols, "still developing" (R6-OBS-F7, r6 lines 297–306) | EU storage chosen at creation; IP off by setting plus deny lists for headers, cookies and query parameters (R6-OBS-F9, F10, r6 lines 318–331; part 10); a CI secret | None | From zero | **Pros:** Rust function names in traps. **Cons:** an unproven Wasm path |
 | **Reporting API `crash` to our own endpoint (C2, proposed beside C1)** | Low | 0 (our server) | Tab crashes JavaScript cannot see (R6-OBS-F8, r6 lines 307–315) | Our own EU store | None | From zero | **Pros:** catches out-of-memory crashes. **Cons:** no stack; browser support varies (F8) |
 | C3. Our own `error` and `unhandledrejection` handler | Medium: symbolication is ours | Our work | Wasm traps as raw offsets | Our own | None | From zero | **Cons:** rebuilds what C1 gives |
 
@@ -514,7 +527,8 @@ Researching it before this record, or leaving it as one shared question: settled
 
 - **The client host (Q1).** Pages wins because it is the one host the research read that meets every need of
   R5-PREV-REC2's list but one, at 0 USD on its Free plan: headers from `_headers`, a link per branch, `noindex` by
-  default, an access policy and deletion through Wrangler (R6-HOST-REC1, r6 lines 627–634). The strongest argument
+  default, an access policy and deletion through Wrangler (R6-HOST-REC1, r6 lines 627–634; r5-toolchain-quality.md,
+  R5-PREV-REC2, lines 1607–1609). The strongest argument
   against it is that very exception: "The latest deployment for a branch cannot be deleted" (R5-PREV-F13), so a
   closed pull request's last link may stay reachable. Under PREVIEW-WALL (a) that link sits behind the wall if the
   preview reached the staging server, and the preview hosting check either settles it or sends the host to Workers
@@ -530,8 +544,9 @@ Researching it before this record, or leaving it as one shared question: settled
   wins on simplicity; against it, K2 would save about 36 % of the goal's game-VM cost (r6 line 503), which is worth
   automating only once real concurrency data shows a peak.
 - **The goal budget at two densities (part 8).** Stating both 361 EUR (8 rooms per VM) and 534 EUR (4 rooms per VM)
-  is less tidy than R6-COST-REC1's single range, but A-2 itself says 8 rooms per VM is "a density to measure, not one
-  the server tick budget guarantees" (r6 lines 516–522): at the server tick budget's ceiling, 50 % of one vCPU per room,
+  is less tidy than R6-COST-REC1's single range, but A-2 itself says 8 rooms per VM is "a density to measure at the tick
+  rate R1-TICK-REC2's rule picks (R2-ROOM-REC2 mark 2), not one the server tick budget guarantees" (r6 lines 516–522;
+  that rate is now TICK-30's 30 Hz): at the server tick budget's ceiling, 50 % of one vCPU per room,
   two rooms fill a vCPU before any [transport runtime time](../research/GLOSSARY.md#transport-runtime-time). The proof test's measurement replaces both figures.
 - **Certificates (Q5).** A certificate per hostname wins as the interim position because it is R2-TRN-REC5's form and
   puts no shared private key on the game VMs; against it, each new VM needs an issuance and either TCP port 80 open or
@@ -599,9 +614,11 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Why it matters:* every native server mark and the netcode proof test run on the reference server; on 2026-10-28
     every EU plan showed "This product is currently unavailable. Please check back later." (R6-HOST-F20, r6 lines 180–182).
   - *Options:* (a) orderable: the reference server stands; (b) a real shortage: read the fallbacks first, Fly.io's UDP
-    page, GameLift's EU prices and server SDK, Hetzner's dedicated root servers, and Netcup, OVHcloud or Scaleway (none
-    read: R6-HOST-OQ1, OQ4, r6 lines 852–855 and 862–865), then name a new reference server, which every draft citing N34
-    follows. The IPv4 price is read at sign-up; it is under 1 EUR per VM either way (R6-HOST-OQ7, r6 lines 875–876).
+    page, GameLift's EU prices and server SDK, and Netcup, OVHcloud or Scaleway (none read: R6-HOST-OQ1, OQ4, r6 lines
+    852–855 and 862–863), then name a new reference server, which every draft citing N34 follows. Whatever the answer,
+    Hetzner's dedicated root servers, "a further candidate at goal scale", are read before part 8's goal budget is fixed
+    (R6-HOST-OQ4, r6 lines 863–865; migration step 1). The IPv4 price is read at sign-up; it is under 1 EUR per VM
+    either way (R6-HOST-OQ7, r6 lines 875–876).
   - *Decider:* Mustafa (a console check in his own account; agents create no account), then a research read if (b).
   - *What decides it:* the console offering both plans in `nbg1` or `hel1` before the netcode proof test is scheduled.
   - *Carries:* R6-HOST-OQ1, R6-HOST-OQ4, R6-HOST-OQ7.
@@ -632,18 +649,27 @@ Researching it before this record, or leaving it as one shared question: settled
     hostname (not researched for Pages; read for Workers previews only, R5-PREV-F14, r5 lines 850–858).
   - *Decider:* Mustafa (convenience against one more project to run).
   - *What decides it:* the preview hosting check shows what the policy covers (every preview, and not the production
-    domain: R6-HOST-F4, r6 lines 80–86, inferred).
+    domain: R6-HOST-F4, r6 lines 80–86, which Cloudflare's page confirms, read by the verifier on 2026-11-01; whether
+    branch-alias links are covered is not stated there).
   - *Carries:* no research id (it follows from PREVIEW-WALL (a)).
-- **OQ-0006-5. How are the per-hostname production certificates issued, and how long do they live?**
+- **OQ-0006-5. How are the per-hostname production certificates issued, how long do they live, and which certificate
+  does the WebSocket fallback present on development and staging servers?**
   - *Why it matters:* every production game VM needs one before the first online playtest, and the challenge decides
-    which port or secret each VM needs.
-  - *Options:* ACME http-01 (TCP port 80 open on each game VM); dns-01 per name (a DNS provider API key, a secret);
-    tls-alpn-01 (RFC 8737: "This connection MUST use TCP port 443."); and, only if the security baseline accepts a
-    shared key, the wildcard certificate (option C2) (R6-HOST-F24, r6 lines 198–204; R6-HOST-OQ6, r6 lines 869–874).
-  - *Decider:* security-auditor in the security baseline, with the port plan of ADR 0001's transport.
+    which port or secret each VM needs. A WebSocket cannot pin a certificate hash: its constructor takes only a URL and
+    sub-protocols (r2-netcode.md, Findings, R2-ROOM-F12, lines 1494–1500), so the fallback's `wss` endpoint on a
+    development or staging server needs a certificate the browsers trust, and the netcode proof test's WebSocket leg
+    needs one first (PM-0006-15).
+  - *Options:* for production, ACME http-01 (TCP port 80 open on each game VM); dns-01 per name (a DNS provider API
+    key, a secret); tls-alpn-01 (RFC 8737: "This connection MUST use TCP port 443."); and, only if the security baseline
+    accepts a shared key, the wildcard certificate (option C2) (R6-HOST-F24, r6 lines 198–204; R6-HOST-OQ6, r6 lines
+    869–874). For the WebSocket fallback on development and staging servers: not researched (R2-TRN-REC5's
+    self-signed, pinned certificates, r2 lines 2700–2703, serve WebTransport only).
+  - *Decider:* security-auditor in the security baseline, with the port plan of ADR 0001's transport; the development
+    and staging case before the netcode proof test starts (the Advisor, from a short read).
   - *What decides it:* a read of the chosen certificate authority's policy (Let's Encrypt's pages were outside the
-    allow list) and the baseline's key-handling rules.
-  - *Carries:* R6-HOST-OQ6.
+    allow list) and the baseline's key-handling rules; for development and staging, a read of how those servers can
+    present a trusted certificate.
+  - *Carries:* R6-HOST-OQ6 (and the verifier's finding 7, which has no research id).
 - **OQ-0006-6. The security baseline: what it decides for each waiting item.**
   - *Why it matters:* part 13's items hold interim positions only; BASELINE-WHEN (b) closes them before the first
     online playtest.
@@ -729,7 +755,8 @@ and 3:
   assets;
 - whether a direct upload counts against Pages' 500 builds a month (R6-HOST-REC1, r6 lines 633–634);
 - with the access policy on: it covers every preview of the project and not the production domain
-  (OQ-0006-4; R6-HOST-F4, inferred), and Mustafa logs in once per Brave session and the link works after that
+  (OQ-0006-4; R6-HOST-F4, confirmed on Cloudflare's page by the verifier on 2026-11-01, but not for branch-alias
+  links), and Mustafa logs in once per Brave session and the link works after that
   (R5-PREV-REC5's mark, r5 lines 1648–1650). **Mustafa judges** this step in Brave on Windows; test-engineer adds the
   Brave checklist.
 - ADR 0002's preview questions ride along (R5-PREV-OQ5: the environment URL on the pull request page; R5-PREV-OQ6:
@@ -935,7 +962,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
    server is orderable, or OQ-0006-1 (b) has named another.
 1. **Spikes (before the foundation):** the netcode proof test with this record's operations marks, and the preview
    hosting check, in parallel. *Milestone:* their marks pass; rooms per VM measured, so part 8's goal budget is one
-   figure; PREV-DELETE settled, or the client host moved to Workers static assets.
+   figure, fixed only after a read of the price and location pages of Hetzner's dedicated root servers (R6-HOST-OQ4,
+   r6 lines 863–865); PREV-DELETE settled, or the client host moved to Workers static assets.
 2. **The foundation:** preview links per pull request on the client host (ADR 0002's deploy job, this record's host
    and token scope), public but unlisted, with the cleanup policy of part 3 live. *Milestone:* "an empty scene runs
    through the full stack in the browser, with CI green and a preview link" ([the foundation](../research/GLOSSARY.md#the-foundation)).
@@ -1034,7 +1062,7 @@ One row per id the decision map gives this record as owner (65 ids; `engine-arch
 | R3-XT-OQ5 | open: OQ-0006-7 | critic rank 33 |
 | R5-PREV-REC2 | adopted | part 1: Cloudflare Pages, with Workers static assets the alternative |
 | R5-PREV-REC3 | adopted | part 3: the cleanup policy (24 h, the weekly sweep, artifacts 7 days); the close and sweep jobs are ADR 0002's; PREV-DELETE in the preview hosting check |
-| R5-PREV-REC5 | changed: PREVIEW-WALL (a) applied | part 2: offline previews public but unlisted unless they carry unreleased art; every multiplayer preview behind the access wall from the first one, so the mark "opens in Brave without a login" holds only until then (OQ-0006-4) |
+| R5-PREV-REC5 | changed: PREVIEW-WALL (a) applied | part 2: offline previews public but unlisted unless they carry unreleased art; every multiplayer preview behind the access wall from the first one, so the mark "a preview link opens in Brave on Windows without a login" (r5 line 1649) holds only until then (OQ-0006-4) |
 | R5-TSLINT-OQ5 | open: OQ-0006-6 | interim: CLAUDE.md's `textContent` rule by review (part 13, B6) |
 | R5-PREV-OQ1 | answered: PREVIEW-WALL (a) | part 2; what the wall covers is OQ-0006-4 |
 | R5-PREV-OQ2 | spike: the preview hosting check (PREV-DELETE) | part 3; What a spike must prove, spike 1 |
@@ -1047,7 +1075,7 @@ One row per id the decision map gives this record as owner (65 ids; `engine-arch
 | R5-XT-OQ5 | answered: part 13 lists the waiting items with interim positions | critic rank 18; the baseline itself is OQ-0006-6 |
 | R5-XT-OQ11 | open: OQ-0006-7 | critic rank 33 |
 | R6-HOST-REC1 | adopted | part 1 |
-| R6-HOST-REC2 | adopted | part 5: a working pick until OQ-0006-1 is answered; its marks restated for N = 48 at 30 Hz (spike 2) |
+| R6-HOST-REC2 | changed: one firewall rule added for part 9's metrics path | part 5: R6-HOST-REC2 opens the two game ranges "plus nothing else" (r6 line 649); a Prometheus scrape needs an inbound port (R6-OBS-F4, r6 lines 279–284), so the rule is proposed and spike 2 tests it; otherwise as recommended: a working pick until OQ-0006-1 is answered; its marks restated for N = 48 at 30 Hz (spike 2) |
 | R6-HOST-REC3 | adopted, with PREVIEW-WALL (a) applied | part 4: the wait at r6-infrastructure.md line 675 ends; multiplayer previews use it from slice 3, behind the access wall |
 | R6-HOST-REC4 | adopted | part 7: the interim position under BASELINE-WHEN (b); the four superseded sentences (carry-forward 4) restated |
 | R6-COST-REC1 | changed: the goal budget stated at both densities | part 8: about 361 or 238 EUR at 8 rooms per VM, about 534 EUR (fixed fleet) at the 4 rooms per VM that A-2 names the case to budget, until the netcode proof test measures it; the start budget unchanged |
@@ -1062,7 +1090,7 @@ One row per id the decision map gives this record as owner (65 ids; `engine-arch
 | R6-HOST-OQ1 | open: OQ-0006-1 | Mustafa's console check |
 | R6-HOST-OQ2 | open: OQ-0006-2 | a round-trip measurement |
 | R6-HOST-OQ3 | answered: no UDP load balancer while the lobby hands out host and port | part 5; revisit when a design routes many rooms through one address (Consequences) |
-| R6-HOST-OQ4 | open: OQ-0006-1 | the fallbacks are read only if Hetzner is ruled out |
+| R6-HOST-OQ4 | open: OQ-0006-1 | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |
 | R6-HOST-OQ5 | answered: PREVIEW-WALL (a) | part 2 |
 | R6-HOST-OQ6 | open: OQ-0006-5 | the challenge and lifetimes of the per-hostname certificates; the wildcard only if the baseline weighs it in |
 | R6-HOST-OQ7 | open: OQ-0006-1 | read at sign-up; under 1 EUR per VM either way |
