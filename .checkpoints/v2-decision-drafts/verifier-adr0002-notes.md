@@ -3,3 +3,4 @@ Task: verifier ADR 0002 (code structure, build and toolchain), plan step 7, brie
 - 04:35 Read brief, plan rev 3, advisor §1, author notes (engine-architect + test-engineer) and the whole doc (1422 lines). Doc = engine-architect draft (lines 1-937 and 1172-1422) + test-engineer pass-mark subsection (doc 938-1171).
 - Early finding S1: doc line 1171 "---8<--- the subsection ends on the line above ---" is a cut marker left in the assembled ADR (assembly artifact; same in 0001/0006).
 - Next: read both ledgers; then findings-checked.tsv + r5/r1 verifier sections; then check rows section by section.
+- 04:55 Context rows 1-38 checked and written. Findings so far: F-6 (CS11 'leaked through comments', wrong wording), F-9 (pull_request_target 'secrets and write tokens' is F3's quote), notes N-1 (slices 5-6 brief-only), N-2 (decision-map citations leave with checkpoint). Next: part 1-2 rows 39-59.

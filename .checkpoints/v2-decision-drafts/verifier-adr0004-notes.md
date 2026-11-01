@@ -1,2 +1,6 @@
 Task: verify ADR 0004 (simulation core) per prompts/verifier-adr0004.txt (plan step 7)
 - 2026-11-01 04:22 started; fresh notes (no prior file). Before 08:30 Amsterdam: no fetching, source checks pending.
+- 04:35 Read brief, plan rev 3, advisor §1, the whole doc (1237 lines). Doc = rust-reviewer draft (parts 1-21, Options Q1-Q11, trade-offs, consequences, OQ-0004-1..7, S1-S20) + test-engineer pass marks (doc 844-1052, PM-0004-1..72) + draft's Migration/Test plan/Rollback/App. A (82 ids)/Sources. Early finding A1: doc:1054 "---8<--- the subsection ends on the line above ---" cut marker left in the assembled ADR (assembly artifact, as in 0001/0006).
+- Next: read both ledgers, then r1/r4/r2/GLOSSARY cited lines, section by section.
+- 04:55 Read both ledgers (RR rows 1-360; TE1-TE298). Ran scripts/cite_check.py -> .gate/verifier-adr0004/cite_check.txt: 0 missing ids, 11 range flags (most are multi-file groups; to judge). Read r1 Options 1626-1730, Recs ecs/tick/det 1884-2248, abl 2340-2480, OQs 2608-2731, 2766-2784, XU/RR 2830-2961, XT 3011-3112: parts 1-9, 16, S1-S8, S15, S17-S19 match their R1 text. Arithmetic ok so far: 5.53 (exact 1.6667 x2; ledger row 95's shown sum 1+0.2+1+1.67+1.67 gives 5.54: ledger nit), 2.80, 3.87/4.17, 7 ticks, 4.5 y, 384, 0.12 %.
+- Next: r1 findings BND-F19, DET-F14, Options 4a line 1653; GLOSSARY lines; r2 cited lines; then r4.
