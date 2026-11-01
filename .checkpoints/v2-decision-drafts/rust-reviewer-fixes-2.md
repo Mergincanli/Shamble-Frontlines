@@ -27,9 +27,11 @@ FILE: docs/adr/0004-simulation-core.md
 BEFORE:
    step time in Wasm in the Worker on the minimum laptop of at most 40 % of the tick period: 13.3 ms at 30 Hz (6.7 ms at
    60 Hz), with Wasm at most 2 × native. It applies wherever the browser runs the whole sim: the local server of slices 1
+   and 2 (SLICE-ORDER), at an N that R1-TICK-OQ7 sets (a design question for Mustafa and the Advisor, in
 AFTER:
    step time in Wasm in the Worker on the minimum laptop of at most 40 % of the tick period: 13.33 ms at 30 Hz (6.67 ms
-   at 60 Hz), with Wasm at most 2 × native. It applies wherever the browser runs the whole sim: the local server of slices 1
+   at 60 Hz), with Wasm at most 2 × native. It applies wherever the browser runs the whole sim: the local server of
+   slices 1 and 2 (SLICE-ORDER), at an N that R1-TICK-OQ7 sets (a design question for Mustafa and the Advisor, in
 END
 
 ### FIX F1
@@ -50,7 +52,8 @@ BEFORE:
     2), the weapon type id, a position settled on the ground with the movement query, and a lifetime in ticks from ADR
 AFTER:
     unit definition (ADR 0005). When a soldier dies, the weapons the drop rule names (OQ-0005-AB9) become pickup entities
-    in the pickup pool, each with an id (part 2), the weapon type id, a position settled on the ground with the movement query, and a lifetime in ticks from ADR
+    in the pickup pool, each with an id (part 2), the weapon type id, a position settled on the ground with the movement
+    query, and a lifetime in ticks from ADR
 END
 
 ### FIX F2-part18-open
@@ -68,8 +71,8 @@ FILE: docs/adr/0004-simulation-core.md
 BEFORE:
     R6-TEL-OQ3), so the moments and the telemetry read the same stream. The timeline is sampled every 10 s of game time.
 AFTER:
-    R6-TEL-OQ3), so the moments and the telemetry read the same stream. ADR 0006's record samples the timeline every 10 s of game time
-    (R6-TEL-REC1); the sim supplies the samples at that cadence (part 4).
+    R6-TEL-OQ3), so the moments and the telemetry read the same stream. ADR 0006's record samples the timeline every 10 s
+    of game time (R6-TEL-REC1); the sim supplies the samples at that cadence (part 4).
 END
 
 ### FIX F2-OQs
@@ -95,10 +98,11 @@ BEFORE:
   - What decides it: the in-match upgrade design session.
   - Research ids: none; UPGRADE-SCOPE; cites R2-ROOM-REC6 (r2-netcode.md, lines 2842–2856).
 AFTER:
-- **OQ-0004-5. Which weapons drop, and who may take them?** Moved: one question, in ADR 0005, OQ-0005-AB9 (UPGRADE-SCOPE's
-  data model is ADR 0005's). This record keeps only the mechanism: two claims on one pickup in one tick resolve in the
-  phase's fixed, deterministic order (part 18); which order is fair, which deaths drop which weapons, how long a drop
-  lies and who may take it (the killer's team, the dead soldier's enemies, or anyone) are OQ-0005-AB9's.
+- **OQ-0004-5. Which weapons drop, and who may take them?** Moved: one question, in ADR 0005, OQ-0005-AB9
+  (UPGRADE-SCOPE's data model is ADR 0005's). This record keeps only the mechanism: two claims on one pickup in one
+  tick resolve in the phase's fixed, deterministic order (part 18); which order is fair, which deaths drop which
+  weapons, how long a drop lies and who may take it (the killer's team, the dead soldier's enemies, or anyone) are
+  OQ-0005-AB9's.
 - **OQ-0004-6. What do bots and slot takeovers do with player records?** Moved: one question, in ADR 0005,
   OQ-0005-AB10. How a bot picks, if bots pick, is bot behaviour (part 15).
 END
