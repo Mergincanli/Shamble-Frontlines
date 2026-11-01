@@ -633,8 +633,123 @@ pending (outside fetch hours). "doc:n" = line n of the assembled ADR.
 | N13 | Appendix A R2-BUD-REC2 "adopted" and R2-BUD-REC1 "marks restated" | rows 359, 330 | unsupported (incomplete) | R2-BUD-REC2's mark "decoded positions within 1 cm and angles within 0.01°" (r2:2341) is in no proof-test mark; 10-bit pitch is 0.18° steps (r2:1748), so the angle part cannot pass as written; R2-BUD-REC1's Shabzon fire-rate mark (r2:2324–2325) is not restated (ADR 0004's S4 covers fire intervals) | finding F4 |
 | N14 | Appendix A dispositions, each against its id's research text | row 359 | confirmed except one | e.g. R2-BUD-OQ2 vs r2:2977; R2-ROOM-OQ2 vs r2:3089–3090; R2-INT-OQ7 vs r2:3029–3030; R1-TICK-OQ1 vs r1:2641–2643 | R2-XU-OQ18 is finding F7 |
 | N15 | Appendix A R2-XU-OQ18 "answered: the drafts' trace reading" | row 169 | unsupported as "answered" | r2:3268 "Left for the Advisor: R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6 (whether the §4 fairness target is trace enough)"; map J3 calls it "the session's reading (2026-10-31)" | finding F7 |
-| N16 | Test plan: "48 per room, 30 minutes at P2 for every mode on the test-mode list" (doc:1291) | row 353 | wrong (as worded) | GL:375–386: the list holds 1v1, 4v4, 2v2v2, 6v6v6 (2 to 18 players); r5:1476–1479 runs each mode at its size | finding F8 |
+| N16 | Test plan: "48 per room, 30 minutes at P2 for every mode on the test-mode list" (doc:1289) | row 353 | wrong (as worded) | GL:375–386: the list holds 1v1, 4v4, 2v2v2, 6v6v6 (2 to 18 players); r5:1476–1479 runs each mode at its size | finding F8 |
 | N17 | Q10 U1 "the catch-up cap equals the redundancy cap" (doc:659) | row 277 | wrong (as worded) | r2:2039–2041 "proposed no larger than the redundancy cap"; doc part 5 (doc:195–196) "no larger than" | finding F10 |
 | N18 | PM text: "by the draft's own Rollback (lines 1056–1068)" (doc:1160) | TE217 | citation off | the Rollback is doc:1305–1317 | finding F2 |
 | N19 | PM-0001-4 and PM-0001-39 "the whole tick timed directly" (doc:1097, 1134) | TE68 | rule 5 breach | GL:120 "Retire (exact): "whole tick" and "p99 whole tick"" | finding F1 |
 | N20 | part 3 restatement of r2:2402–2403 in quotes adds "re-flood ticks included" | row 71 | citation off (quote fidelity) | r2:2402 has no such words; true per GL:76–77 | finding F9 |
+
+## Counts
+629 rows: the netcode ledger's 360, the pass-mark ledger's 249 (TE1–TE249) and 20 rows I added (N1–N20, claims or
+defects with no ledger row of their own, or a doc-level row for a ledger row's problem).
+- confirmed: 609 (of which 4 also against the original source, 37 settled inputs, 97 proposed marks checked as
+  labelled with a reason, 7 with a note)
+- wrong: 3 (N9 the cut marker, N16 "48 per room" for every test mode, N17 "equals")
+- unsupported: 3 (N1 the client's sim share stretched, N13 R2-BUD-REC2's precision mark and the Shabzon mark not disposed,
+  N15 R2-XU-OQ18 shown as answered)
+- citation off: 5 (rows 272 and 276: table B lines; TE217 and N18: the Rollback lines, one defect counted twice; N20 the
+  inserted words in a quote)
+- rule breach: 1 (N19: the retired exact phrase "whole tick", 2 places)
+- unverified: 1 (N10: GLOSSARY §8 anchors, not in GLOSSARY.md until step 6)
+- pending: 0 (the three source checks ran at 09:00, all confirmed)
+- not in this document: 7 (TE243–TE249 are the spike entry for SPIKE_PLAN; the synthesis unit checks them)
+- Both ways: every ledger row's claim is in the document except TE243–TE249; the document's claims with no row are N1–N9
+  (N10–N20 point at defects in ledgered text).
+- Research tiers: no claim is wrong against R1, R2, R3, R4, R5, R6, the GLOSSARY, STATUS, VISION_V2, LOOP_V2, LOOK_V2,
+  EDITOR_V2 or LEGACY_INVENTORY; every number recomputed (worked estimate 583.5 B, 146.1, 286.1, 188.35 kbps; the
+  GLOSSARY tick table; 1,067 B; 22.3 kbps; 200 and 143 B; 7.0 Mbit/s; 3.16 GB; 32^6 = 2^30; wraps 36.4 and 18.2 min;
+  54,000 and 108,000 ticks; nearest-rank p99s; Appendix A 127 = 30 + 7 + 57 + 17 + 16, the same 127 ids as the map).
+
+## Findings (ranked)
+**F1 (rule 5, retired exact phrase).** doc:1097 (PM-0001-4) "the whole tick timed directly on the tick thread" and
+doc:1134 (PM-0001-39) "the whole tick timed directly, never summed from its phases". GLOSSARY:120 retires "whole tick"
+exactly. The glossary script (plan step 8, "0 exact") fails on these two. Fix: "the server tick time measured directly on
+the tick thread, from the start of its work to its end (…)" and "the server tick time measured directly, never summed
+from its phases". Owner: test-engineer.
+
+**F2 (unsupported term use, rule 5 "no new meaning").** doc:802–804, trade-off 5: "that cost is not measured yet and counts
+in the client's sim share, ADR 0004's (the proof test reports it)". GLOSSARY:215 defines the client's sim share as "the sim
+step time in Wasm in the Worker"; the interpolation buffer, the aim ray and the loopback codec are not sim step time.
+Fix: "that cost is not measured yet; the proof test reports it beside the client's sim share (ADR 0004's)". Owner:
+netcode-architect.
+
+**F3 (assembly artefact).** doc:1244 "---8<--- the subsection ends on the line above ---" (the test-engineer file's cut
+marker, test-engineer-passmarks-0001.md:260), followed by two blank lines (doc:1245–1246). Fix: delete doc:1244 and one
+blank line. Owner: the session (assembly).
+
+**F4 (marks neither carried nor disposed).** Appendix A says R2-BUD-REC2 "adopted" and R2-BUD-REC1 "marks restated at 30 Hz
+and against P2 and P3", but (a) R2-BUD-REC2's mark "decoded positions within 1 cm and angles within 0.01° of the server's
+values" (r2:2341) is in no proof-test mark, and its angle part cannot pass with E3's 10-bit pitch, "0.18° steps"
+(r2:1748; doc:218 adopts 10 bits); (b) R2-BUD-REC1's "mean delivered fire rate of the Shabzon within 1 % of 13.9 shots/s"
+(r2:2324–2325) is not restated (ADR 0004's S4, docs/adr/0004-simulation-core.md:826, covers fire intervals under
+R1-TICK-REC1). Fix: Appendix A R2-BUD-REC2: "adopted; its precision mark changed: positions within 1 cm, yaw within
+0.01°, pitch within half its 10-bit step (0.09°), checked in PM-0001-17's runs" (or "dropped: PM-0001-17's hash check
+covers decode fidelity", with that reason); R2-BUD-REC1: add "its Shabzon fire-rate mark is carried by ADR 0004's S4".
+Owner: netcode-architect (with test-engineer for a PM row).
+
+**F5 (disposition shown as answered).** Appendix A R2-XU-OQ18 "answered: the drafts' trace reading (a VISION_V2 §3 or §4
+target counts like LOOP_V2 …)". r2:3268: "Left for the Advisor: R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6 (whether the §4
+fairness target is trace enough)"; the map records the reading as "the session's reading (2026-10-31)" (decision-map J3),
+not the Advisor's. Fix: "open for the Advisor at the stop; meanwhile the drafts apply the session's trace reading (map
+J3) and docs/adr/README.md lists R2-BUD-REC4, REC5 and R2-TRN-REC6 as 'need: VISION_V2 §4 only'". Owner: netcode-architect.
+
+**F6 (wrong as worded).** doc:1289, Test plan: "bots as headless protocol clients, 48 per room, 30 minutes at P2 for every
+mode on the test-mode list". The list holds 1v1, 4v4, 2v2v2 and 6v6v6 too (GLOSSARY:378–386, items 3 and 4), rooms of 2 to 18; R5-TEST-REC5
+runs each mode at its own size (r5:1476–1479). Fix: "a full room of bots at each mode's N (48 at the largest), 30 minutes
+at P2, for every mode on the test-mode list". Owner: netcode-architect.
+
+**F7 (inconsistent with part 5 and the research).** doc:659, Q10 U1: "the catch-up cap equals the redundancy cap". Part 5
+(doc:195–196) and r2:2039–2041 say "no larger than". Fix: "the catch-up cap is no larger than the redundancy cap". Owner:
+netcode-architect.
+
+**F8 (citation off).** doc:1160: "by the draft's own Rollback (lines 1056–1068)". Those are the unassembled draft's lines;
+in this record (doc:1001: "'the draft' is this record") the Rollback is doc:1305–1317. Fix: "(lines 1305–1317)". Owner:
+test-engineer. (The ledger's own draft-line cites, TE18, TE129, TE164, TE217, TE221, are notes, not document text.)
+
+**F9 (quote fidelity).** doc:159–162 restates r2:2402–2403 inside quotation marks but adds "re-flood ticks included" after
+"at 30 Hz"; r2 has no such words (true by GLOSSARY:76–77). Fix: move the words outside the quote, or bracket them:
+"[re-flood ticks included]". Owner: netcode-architect.
+
+**F10 (citation off).** doc:622 (Q6) and doc:647 (Q9) cite "encodings E3 and E3b, lines 1694–1700" and "budgets option table
+B, lines 1694–1700"; rows E3b and E4 are r2:1701–1702. Fix: "lines 1694–1702". Owner: netcode-architect.
+
+Notes (no fix required, for the owners' judgement): row 18, "[DEFAULT]" after "ruins you can enter and roofs that fade"
+belongs to the roof fade only (LOOK_V2 §4: ruins are [DECIDED]); row 117, the generation's bits on entry records are not
+added to the estimate R1-XT-OQ11 asks to recompute (r1:3082–3083); row 218, a room-to-client `Kick` message is the draft's
+addition to r2:2888; N12, the downstream budgets row moves R2-BUD-REC2's mark from the estimate scene (32 projectiles) to
+the stress scene (300) without saying so in the row (PM-0001-12 does say it); TE7, Edge and MAC come from ADR 0003's
+pass marks, not from R3-BUDGET-REC1 (r3:1098–1099 names Chrome and Firefox).
+
+Rules checked with no finding: rule 2 (every number sourced, arithmetic or labelled proposed with a reason); rule 3 (no
+"not researched" option proposed: OQ-0001-6's nudging, OQ-0001-7, Q1 B, Q2 D, Q18 C are not chosen; OQ-0001-2's set-ups
+are the map's assignment J6 (2) for the Advisor); rule 4 (every part has a Need line; §6.4 seats, §6.8 kill-cams,
+§6.10 accounts get nothing built; part 12 "Need: UPGRADE-SCOPE" and part 13 "VISION_V2 §4 only" follow map J3); rule 5
+apart from F1 and F2 ("headroom" appears only in GLOSSARY's sense, doc:21, 500, in the TICK-30 quote, doc:25, 843, and in
+the decision code TICK-60-HEADROOM); rule 6 (nothing on the look decided: the cutaway's look is ADR 0003's); condition 12
+(no settled input reopened: Q8 T4, Q12, Q17 B/D, Q18, Q26 C appear only as settled); rule 7 and condition 2 (48
+throughout; the r2:2402–2403 restatement carries "(at N = 54, MODES-3 (b))"; r1:2029, r2:2415–2416 and GL:85 stated as
+replaced, plus R2-BUD-REC1's tick half; 60 Hz marks as written in PM-0001-39 and PM-0001-40).
+
+## Fetch audit
+All by curl (-sSL --max-time 30, through the session's proxy) on 2026-11-01 between 09:00:24 and 09:00:27 Amsterdam,
+inside fetch hours; every host is on .claude/settings.json's WebFetch list; raw pages kept under
+.gate/verifier-adr0001-fetch/. Pages were read as data only.
+| # | host | URL | HTTP | bytes | time | used for |
+|---|---|---|---|---|---|---|
+| 1 | rustsec.org | https://rustsec.org/packages/quinn-proto.html | 200 | 9,674 | 09:00:24 | S1: 10 advisories, 8 in 2026 |
+| 2 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0338.html | 200 | 9,809 | 09:00:25 | S1: "Patched >=0.11.18" |
+| 3 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0340.html | 200 | 10,896 | 09:00:25 | S1: "Patched >=0.11.18" |
+| 4 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0343.html | 200 | 11,194 | 09:00:25 | S1: "Patched >=0.11.18" |
+| 5 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0346.html | 200 | 10,283 | 09:00:26 | S1: rustls "Patched >=0.23.46" |
+| 6 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0348.html | 200 | 10,359 | 09:00:26 | S1: rustls "Patched >=0.23.46" |
+| 7 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2025-0009.html | 200 | 9,886 | 09:00:26 | S1: ring "Patched >=0.17.12" |
+| 8 | rustsec.org | https://rustsec.org/advisories/RUSTSEC-2026-0384.html | 200 | 10,550 | 09:00:26 | S1: tokio "Patched >=1.54.1" |
+| 9 | cheatsheetseries.owasp.org | https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html | 200 | 157,308 | 09:00:26 | S2: "Use HttpOnly; Secure; SameSite=Strict cookies (preferred)"; HttpOnly "instructs web browsers not to allow scripts … to access the cookies" |
+| 10 | raw.githubusercontent.com | https://raw.githubusercontent.com/id-Software/Quake-III-Arena/master/code/game/g_weapon.c | 200 | 29,233 | 09:00:27 | S3: Bullet_Fire :183 and railgun :465 trace current positions; no rewind in the file |
+
+Source checks: S1 R2-TRN-F40 (version floors; rows 165, TE151) confirmed · S2 R2-ROOM-F19 (guest secret cookie; rows 180,
+300) confirmed · S3 R2-SYNC-F27 (Quake III has no lag compensation; row 271) confirmed for the file read (absence, as R2
+itself says). These were the only findings outside the verified set (condition 16) that a claim of this document rests
+on: R6's facts used (CCX23 specs, 20 TB) rest on R6-HOST-F15, in R6's checked set; R3-MEASURE-F7 is in R3's; R5's and R4's
+recommendations are used only as their own proposals; R6-HOST-F20 (Hetzner "currently unavailable") is not asserted, only
+R6-HOST-OQ1 is named.

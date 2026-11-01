@@ -19,3 +19,5 @@ Task: verifier ADR 0001 (multiplayer and netcode), v2 decision drafts plan step 
 - 09:05 verdict rows 306–360 written. Next TE rows.
 - 09:06 verdict rows TE1–TE136 written.
 - 09:07 verdict rows TE137–TE249 written. Next: N rows, counts, findings, audit.
+- 09:09 counts, findings F1–F10, fetch audit written to the verdicts file. DONE
+DONE
