@@ -39,21 +39,25 @@
 
 ## Current step
 Evening of 2026-11-01 (daytime rules: fetching until 22:00, no new agent after 23:00). Resumed at 19:07 after the
-fourth cut. Applied since: 0002's second round (03645ce: 24 of 25 blocks; the block for the note under the pass-mark
-table is test-engineer's text, held in `engine-architect-0002-fixes-2-held-for-test-engineer.md`), game-designer's
-0005 round (03645ce: F14, F2), test-engineer's second round (57c43c2: 42 blocks in all six drafts, all inside its own
-"Pass marks" sections), engine-architect's 0005 round (57c43c2: 25 blocks; its NOTE X2 goes to game-designer). Checks
-at 57c43c2: guard PASS, dispositions 521 of 521, glossary exact 0. The completeness critic is done: VERDICT GAPS
-(`verifier-completeness-findings.md`, 16 items). Nothing is missing from the drafts themselves; the gaps are in the
-process around them: (1) the fix texts are not re-verified, (2) step 10 has not started, (3) the report, (4) the
-appendix lacks the advisor's verdict and the plan's rules, (5) 18 "look brief pending" inventory rows have no outcome,
-(6) two pass-mark texts, (7) STATUS is stale, (8) 0006:550, (9) the citation flags, (10) pending source checks and
-unlabelled "unverified" claims, (11) 44 glossary hits in the synthesis docs, (12) script outputs not saved, (13) gate
-smoke, (14–16) small. Running since about 19:20: test-engineer round 3 (`prompts/fix3-test-engineer.txt`: PM-0002-3,
-the held note, PM-0002-29, PM-0002-31, 0006's three short "proof test" forms), game-designer X2
-(`fix3-game-designer.txt`), netcode-architect (`fix3-netcode-architect.txt`: 0001:40 and :718, the stack's citation),
-infra-engineer (`fix3-infra-engineer.txt`: 0006:550), and verifier fixcheck-b (`verifier-fixcheck-b.txt`: the fix texts
-of 0002, 0004 and 0005, and first the pending source checks, before 22:00).
+fourth cut. Applied since (each block checked to sit in its author's own text; guard, dispositions 521/521 and
+glossary exact 0 before every commit): 03645ce (0002 round 2, 24 of 25 blocks; game-designer F14, F2), 57c43c2
+(test-engineer round 2, 42 blocks; engine-architect 0005 round 2, 25 blocks), 9ed8d67 (game-designer X2;
+infra-engineer F13 ×2), 81d2a65 (test-engineer round 3: PM-0002-3, -29, -31, 0006 rows; its NOTE deleted the note the
+held engine-architect block would have replaced, so that block is not applied; 0005 inventory rows GW6–GW8, GW11, GE7;
+appendix §2 additions, §3 the advisor's verdict and §4 the plan's rules, word for word, script-checked), aa85bf0
+(netcode-architect: the stack's citations at 0001:40 and :718; the session's blank line under eight tables, 0001 ×5
+and 0002 ×3, formatting only), f0b56e1 (0003 inventory rows ×8), 3c46731 (0004 inventory rows ×4; 0005 GW10: all 18
+rows placed), 9a03999 (test-engineer round 4: 0001's 36 pointers into its own lines now name parts and rows; 0003
+checklist step 29 shows GW5). The completeness critic: VERDICT GAPS, 16 items (`verifier-completeness-findings.md`);
+handled so far: 4 (appendix), 5 (18 rows), 6 (two PM texts), 8 (0006:550), 14 (0001:40/:718; appendix dates); in
+progress: 1 (fixcheck-a/-b), 2 (reviews), 3 (report), 7 (docs-keeper), 9 (citation flags, in the fixchecks), 10
+(fixcheck-b's source checks), 11 and 15 (the synthesis round), 12 (scripts re-run at the end), 13 (gate at the end).
+Running at about 19:31: verifier fixcheck-b (abd52b53795e379d5), verifier fixcheck-a (aca66e0bf178f03c4), the
+synthesis round (a578d816282fbf38b; `prompts/fix2-engine-architect-synthesis.txt` + `-addendum.txt`; base 3c46731),
+review engine-architect (aef73f24d3bbddc99), review security-auditor (ae2858d201b93973c). Waiting: reviews
+infra-engineer, game-designer, perf-auditor (wave 1), then netcode-architect, rust-reviewer, graphics-engineer,
+art-director, test-engineer (wave 2, after the synthesis round): `prompts/review-*.txt`. The report's draft is in
+`docs/reports/2026-11-01-v2-decision-drafts.md` (Outcome, Evidence and Reviews still placeholders).
 
 Earlier (kept for the record):
 Fourth spend-limit cut, about 14:20 Amsterdam ("resets 5:50pm (UTC)", 18:50 Amsterdam): game-designer's 0005 round,
