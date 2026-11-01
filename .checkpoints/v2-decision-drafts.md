@@ -4,13 +4,14 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 04:20 Amsterdam
+- **Last update:** 2026-11-01 04:23 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
 - 5bdad85 · ADR 0006 assembled (infra-engineer's draft + test-engineer's PM-0006-1..31), write guard PASS.
 - 2a0e5f6 · ADR 0003 assembled (graphics-engineer's draft + PM-0003-1..43), write guard PASS.
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
+- 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
@@ -30,8 +31,10 @@ The run (03:55–11:00). Done since 03:55: ADR 0005's frame (engine-architect; r
 for byte, 34 open questions, ledger 135 rows; `engine-architect-adr0005-frame-parts/build_draft.py` rebuilds it after
 section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assembled (5bdad85) and ADR 0003 assembled
 (2a0e5f6) into docs/adr/; pass marks for 0001 (test-engineer; 56 marks, all in the netcode proof test, Mustafa's
-15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de). Running: pass marks for 0002, 0004, 0005
-(test-engineer), verifiers for 0006 and 0001 (research checks; source checks pending until 08:30).
+15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de); pass marks for 0002 (76 marks; the boundary
+spike PM-0002-1..34, the foundation's acceptance checks -35..69, later milestones -70..76); ADR 0002 assembled
+(789bedb). Running: pass marks for 0004 and 0005 (test-engineer), verifiers for 0006, 0001 and 0002 (research checks;
+source checks pending until 08:30).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -100,6 +103,14 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   rate (stand-ins proposed); "What a spike must prove" omits R2-SYNC-REC7 mark 3 though Appendix A sends R2-SYNC-OQ5 to
   the spike; the tick-wrap check runs only at 60 Hz; R2-ROOM-REC2's "rooms of bots" would leave out encoding and
   transport work.
+- Pass marks 0002 (test-engineer), for the 0002 author's fix round: "at most 4 Wasm calls per tick" vs the draft's own
+  5–6 for the online client (gated as control-API calls, glue reported: the drafter confirms the reading); R1-BND-REC1
+  mark 1 needs vsync off and a defined no-sim baseline (fixed in the method); block latency within one frame cannot fail
+  on a light page (page loaded to 16 ms); "heap growth" by allocation sampling measures a rate, Chrome only; R5's L1 mark
+  at P1's 1 % loss misses its 5 % band about 1 seed in 9 at 100,000 packets; server tick time in the nightly soak needs
+  the reference server's vCPU; gaps: R1-DATA-OQ8 had no spike item (PM-0002-31 added), the map lists R1-BND-REC6 under the
+  netcode proof test but 0002's spike item 6 holds it, no limit for the overflow checks' cost, no Mac and no 120/144 Hz
+  displays named, B2 vs B3 only on an isolated build.
 - Write guard: condition 1's `cmp - <(head -n 742 GLOSSARY.md)` fails on an unchanged file, because the base GLOSSARY ends
   without a final newline (742 newlines, then an unterminated last line); `scripts/write_guard.sh` checks the exact
   intent instead (the base file is a byte prefix of today's), so §8 can be appended and nothing above it may change.
