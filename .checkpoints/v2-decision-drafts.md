@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 14:01 Amsterdam
+- **Last update:** 2026-11-01 14:04 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -62,7 +62,15 @@ row 33 unsupported: "tools may depend on everything" vs navbake's sim + content;
 549490f (cite by name); row 54: the needs register misses R2-BUD-REC4 and over-includes the roof fade; drift after the
 fix rounds: OQ-0001-14 (count 89), OQ-0006-5's Advisor part, 0004's fragment question not in the design register; S11
 dangling; SPIKE_PLAN's "seven targets" lists six; OQ-0003-6 listed once of twice). The third skeptic (0005 G10, A246;
-overview 37, 33; README 54) launched about 14:06.
+overview 37, 33; README 54) launched about 14:06. The consistency critic done (14 findings: F1, F3, F8 high; F2, F4–F7,
+F9–F11 medium; F12–F14 low; `engine-architect-consistency-findings.md`, each with owners and a proposed outcome; all
+489 glossary in-context hits judged: 3 wrong (F5's 2 + 1)). The second skeptic done (0002: row 36, F-2 upheld; F-3,
+F-5, F-8 partly; F-9 refuted. 0003: 211, X3, X6, 73 upheld; X5, 100, X2 partly). Second fix round (consistency + the
+skeptics' outcomes), format `prompts/fix-round-2-TEMPLATE.txt` (FIX blocks with a FILE line; NOTE blocks to put to the
+Advisor): sent to netcode-architect (0001) and graphics-engineer (0003 + 0005 GPU) about 14:11; saved for rust-reviewer
+(0004), engine-architect (0002), engine-architect (0005 frame + content), game-designer (0005 abilities), engine-architect
+(synthesis): `prompts/fix2-*.txt`, sent as slots free. test-engineer's pass-mark round (running) also gets the critic's
+F3 (0001 rows: two decimals), F7 (0004 rows) and F13 rows as a follow-up.
 Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
 the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
 critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.

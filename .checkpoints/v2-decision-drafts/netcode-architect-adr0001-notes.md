@@ -51,3 +51,4 @@ DONE
 - Fixes written to netcode-architect-adr0001-fixes.md: F2, F4 (R2-BUD-REC1 and REC2 rows, both "changed"), F5 (Appendix row -> open: OQ-0001-14, plus the new OQ-0001-14 entry after OQ-0001-13), F6, F7, F8 (test-engineer's paragraph, as the brief assigns), F9, F10 (Q6 and Q9 headings). All BEFOREs asserted unique by script. Ledger rows 272/276 updated to 1694–1702 (notes only).
 - Not edited (test-engineer's text): the PM section's list at doc:1184 does not name OQ-0001-14 (an Advisor ruling, no mark needed).
 DONE
+- Fix round 2 (consistency findings) started 14:04 Amsterdam; output netcode-architect-fixes-2.md.

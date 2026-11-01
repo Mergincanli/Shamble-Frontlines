@@ -8,3 +8,4 @@ Findings to judge: 0002 row36, F-2, F-3, F-5, F-8, F-9; 0003 row211, X3, X6, X5,
 - (correction: the 14:12/14:20 stamps above were estimates; real clock at that point 13:59)
 - wrote row211 upheld, X3 upheld, X6 upheld, X5 partly. Left: row 73, row 100, X2.
 - 14:05 wrote row73 upheld, row100 partly, X2 partly. All 13 judged. Next: count line, DONE.
+- 14:03 count line written. DONE

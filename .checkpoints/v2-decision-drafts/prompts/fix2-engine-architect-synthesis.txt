@@ -1,0 +1,43 @@
+# Prepared message (verbatim, saved before sending) · to the engine-architect agent that wrote the synthesis (resumed by SendMessage) · effort xhigh · 2026-11-01 about 14:12 Amsterdam
+Second fix round (plan step 9) for the v2 decision drafts. You are engine-architect, the author of the synthesis (docs/ENGINE_OVERVIEW.md, docs/SPIKE_PLAN.md, docs/adr/README.md). The consistency critic's findings are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-consistency-findings.md: fix every
+finding whose "Owners" line names you, in your own text only (/home/user/Shamble-Frontlines/docs/ENGINE_OVERVIEW.md, /home/user/Shamble-Frontlines/docs/SPIKE_PLAN.md and /home/user/Shamble-Frontlines/docs/adr/README.md (GLOSSARY §8 stays as it is); rows of a "### Pass marks" table are
+test-engineer's, so leave them). Adopt the critic's proposed outcome; where you think it is wrong, write a NOTE block
+(below) with your reason instead of a FIX, so the session can put it to the Advisor. Also fix these:
+- The synthesis verifier's findings (verifier-synthesis-verdicts.md), as verifier-skeptic-3-results.md judges rows 37,
+  33 and 54 (if it has no verdict yet, write them as FIX blocks and say so): row 37 (the second §6.4 primitive is the
+  leech trigger, not marking), row 33 ("tools may depend on everything" vs navbake's sim + content), row 53 (STATUS cited
+  by decision code, not line), row 54 (the needs register: add R2-BUD-REC4, drop the roof fade (its need is §6.2)), the
+  drift (OQ-0001-14 and the README's "Trace reading" are one question: one row; OQ-0006-5's Advisor part gets a row;
+  ADR 0004's grenade-fragment question gets a design-register row; open-question counts and line pointers updated
+  against the current docs: OQ total 89 or as you count it), S11 defined or dropped, SPIKE_PLAN's "seven targets" (name
+  the seventh: the minimum laptop's Chrome and Firefox on Windows), OQ-0003-6 listed the same in both places.
+- The consistency findings naming "engine-architect synthesis": F1 (SPIKE_PLAN:158), F2 (README), F4 (SPIKE_PLAN:30:
+  one Mac definition), F7 (SPIKE_PLAN cites the rows ADR 0004 now owns), F8 (SPIKE_PLAN item 1: the `wss` leg's
+  certificate per OQ-0006-5; a README row for OQ-0006-5), F9 (README's 24 stale pointers), F10, F12 (codes with no home
+  after the checkpoint goes: define them in the README or drop them), F13, F14.
+- Re-run the counts after the authors' fix rounds land (the session tells you the commits), so the README matches the
+  docs as they are at the end.
+
+Write /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-synthesis-fixes-2.md, one block per fix, in this exact shape (the session's script applies it; every BEFORE must occur exactly
+once in the file named on the block's first line):
+```
+### FIX <finding id>
+FILE: <the docs path>
+BEFORE:
+<the exact current text, copied byte for byte (sed -n the lines); whole lines; unique in that file>
+AFTER:
+<the replacement text>
+END
+```
+and, where you disagree:
+```
+### NOTE <finding id>
+<why, in two or three lines, with the source>
+END
+```
+Keep the plan's rules (citations with lines at 9e7db28; cite STATUS by decision code, not line; numbers sourced or
+"proposed" with a reason; glossary terms; no new decision: where a fix would decide something open, make it point to the
+open question instead). Do not edit the docs yourself. Finish by 15:45 Amsterdam. Never commit, push or fetch. Return at
+most 10 lines: the fixes and notes written (ids).
+

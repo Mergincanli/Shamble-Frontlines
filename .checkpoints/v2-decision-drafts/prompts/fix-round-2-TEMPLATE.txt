@@ -1,0 +1,31 @@
+# Message TEMPLATE for the second fix round (plan step 9, after the consistency pass), sent to an author agent; the
+# session fills {WHO}, {DOCS}, {EXTRA}, {OUT} and saves the filled copy as prompts/fix2-<who>.txt before sending.
+
+Second fix round (plan step 9) for the v2 decision drafts. You are {WHO}. The consistency critic's findings are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-consistency-findings.md: fix every
+finding whose "Owners" line names you, in your own text only ({DOCS}; rows of a "### Pass marks" table are
+test-engineer's, so leave them). Adopt the critic's proposed outcome; where you think it is wrong, write a NOTE block
+(below) with your reason instead of a FIX, so the session can put it to the Advisor. Also fix these:
+{EXTRA}
+
+Write {OUT}, one block per fix, in this exact shape (the session's script applies it; every BEFORE must occur exactly
+once in the file named on the block's first line):
+```
+### FIX <finding id>
+FILE: <the docs path>
+BEFORE:
+<the exact current text, copied byte for byte (sed -n the lines); whole lines; unique in that file>
+AFTER:
+<the replacement text>
+END
+```
+and, where you disagree:
+```
+### NOTE <finding id>
+<why, in two or three lines, with the source>
+END
+```
+Keep the plan's rules (citations with lines at 9e7db28; cite STATUS by decision code, not line; numbers sourced or
+"proposed" with a reason; glossary terms; no new decision: where a fix would decide something open, make it point to the
+open question instead). Do not edit the docs yourself. Finish by 15:45 Amsterdam. Never commit, push or fetch. Return at
+most 10 lines: the fixes and notes written (ids).

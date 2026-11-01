@@ -1,0 +1,35 @@
+# Prepared message (verbatim, saved before sending) · to the rust-reviewer agent that wrote ADR 0004 (resumed by SendMessage) · effort xhigh · 2026-11-01 about 14:12 Amsterdam
+Second fix round (plan step 9) for the v2 decision drafts. You are rust-reviewer, the author of ADR 0004. The consistency critic's findings are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-consistency-findings.md: fix every
+finding whose "Owners" line names you, in your own text only (/home/user/Shamble-Frontlines/docs/adr/0004-simulation-core.md; rows of a "### Pass marks" table are
+test-engineer's, so leave them). Adopt the critic's proposed outcome; where you think it is wrong, write a NOTE block
+(below) with your reason instead of a FIX, so the session can put it to the Advisor. Also fix these:
+- Nothing beyond the consistency findings (your first fix round is applied: 7da03b1): F1 (0004:416–417: the development
+  reload swaps between ticks only if OQ-0005-CD4 picks the mid-match option; point to it), F2 (OQ-0004-5 and -6 become
+  pointers to OQ-0005-AB9 and AB10, the one home for those design questions; part 18's drop sentence as the critic
+  proposes), F3 (two decimals: 8.33, not 8.3, in S1 and wherever your text gives a 30 Hz or 60 Hz share), F4 (the Mac:
+  the critic's one definition), F7 (R2-SYNC-REC6 mark 1 and R5-LAYOUT-REC4: name them in your spike section so a draft
+  owns them; test-engineer adds the rows), F14 (the items the critic gives you).
+
+Write /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/rust-reviewer-fixes-2.md, one block per fix, in this exact shape (the session's script applies it; every BEFORE must occur exactly
+once in the file named on the block's first line):
+```
+### FIX <finding id>
+FILE: <the docs path>
+BEFORE:
+<the exact current text, copied byte for byte (sed -n the lines); whole lines; unique in that file>
+AFTER:
+<the replacement text>
+END
+```
+and, where you disagree:
+```
+### NOTE <finding id>
+<why, in two or three lines, with the source>
+END
+```
+Keep the plan's rules (citations with lines at 9e7db28; cite STATUS by decision code, not line; numbers sourced or
+"proposed" with a reason; glossary terms; no new decision: where a fix would decide something open, make it point to the
+open question instead). Do not edit the docs yourself. Finish by 15:45 Amsterdam. Never commit, push or fetch. Return at
+most 10 lines: the fixes and notes written (ids).
+

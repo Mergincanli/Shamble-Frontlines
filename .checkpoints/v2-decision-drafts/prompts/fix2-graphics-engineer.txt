@@ -1,0 +1,42 @@
+# Prepared message (verbatim, saved before sending) · to the graphics-engineer agent that wrote ADR 0003 and ADR 0005's GPU section (resumed by SendMessage) · effort xhigh · 2026-11-01 about 14:10 Amsterdam
+Second fix round (plan step 9) for the v2 decision drafts. You are graphics-engineer, the author of ADR 0003 and of ADR 0005's section "The asset pipeline: GPU rules". The consistency critic's findings are in
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-consistency-findings.md: fix every
+finding whose "Owners" line names you, in your own text only (/home/user/Shamble-Frontlines/docs/adr/0003-rendering.md, and your section inside /home/user/Shamble-Frontlines/docs/adr/0005-content-abilities-assets.md; rows of a "### Pass marks" table are
+test-engineer's, so leave them). Adopt the critic's proposed outcome; where you think it is wrong, write a NOTE block
+(below) with your reason instead of a FIX, so the session can put it to the Advisor. Also fix these:
+- ADR 0003, the verifier's findings as the skeptic judged them (verifier-adr0003-verdicts.md; verifier-skeptic-2-results.md
+  gives the smallest correct texts): row 211 (upheld: split the HUD line by mark; PG2, PG4–PG6, PG11, PG12, PG15, PG20 are
+  redesign); X3 (upheld: r186's toonOutlinePass has one thickness for the whole pass; the per-object weight is our own TSL
+  hull, as legacy CL6); X6 (upheld: R3-GL2-OQ5 "answered: settled by the stack"; keep only the fallback-share question,
+  R3-GL2-OQ2); X5 (partly: add the camera-player cutaway to OQ-0003-15 for Mustafa; checklist step 29 is test-engineer's,
+  leave it); row 73 (label "(inferred from F7; OQ-0003-2)"); row 100 (cite ADR 0004 part 14; debris is a walkable surface
+  there, not a link); rows 95 and X4 (the cutaway quote is r2:2451–2452); X2 (cite R3-MEASURE-F9 for per-minute billing);
+  X8 (OQ-0003-14 and R3-AUDIO-OQ4 may read "answered": the verifier read the Web Audio 1.1 draft; part 9 unchanged).
+- ADR 0005's GPU section (verifier-adr0005-verdicts.md): G22 (give "≤ 800 draw calls at Low" its condition: about
+  1,100 if a hull outline runs at Low, r3:1133); the condition-12 row (the options row "A look baked into each asset"
+  weighs what LOOK_V2 §8 step 5 settles: "settled by LOOK_V2 §8; not weighed"); G10 (BatchedMesh has `setColorAt`, not
+  `instanceColor`): apply it only if verifier-skeptic-3-results.md upholds it; if that file has no verdict on G10 yet when
+  you reach it, write it as a FIX anyway and say so in your return.
+
+Write /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-fixes-2.md, one block per fix, in this exact shape (the session's script applies it; every BEFORE must occur exactly
+once in the file named on the block's first line):
+```
+### FIX <finding id>
+FILE: <the docs path>
+BEFORE:
+<the exact current text, copied byte for byte (sed -n the lines); whole lines; unique in that file>
+AFTER:
+<the replacement text>
+END
+```
+and, where you disagree:
+```
+### NOTE <finding id>
+<why, in two or three lines, with the source>
+END
+```
+Keep the plan's rules (citations with lines at 9e7db28; cite STATUS by decision code, not line; numbers sourced or
+"proposed" with a reason; glossary terms; no new decision: where a fix would decide something open, make it point to the
+open question instead). Do not edit the docs yourself. Finish by 15:45 Amsterdam. Never commit, push or fetch. Return at
+most 10 lines: the fixes and notes written (ids).
+
