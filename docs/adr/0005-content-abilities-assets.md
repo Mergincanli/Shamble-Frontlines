@@ -1085,8 +1085,9 @@ Option E2: nested, self-contained definitions (each unit embeds its weapons and 
   every faction shares (LOOP_V2 §5).
 - **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1), and
   the closest shipped team-shooter precedent, Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case
-  against scripting rests on cost and on "no §6 item asks for a runtime", not on proof that a closed set is enough for
-  a live game. And a closed set means each new mechanic Mustafa designs that lacks an operation waits for a reviewed
+  against scripting rests on cost and on the research's own judgement that A3 "adds a runtime no §6 item asks for"
+  (r1-simulation-core.md, Options §5, Question A, line 1798), not on proof that a closed set is enough for a live game.
+  And a closed set means each new mechanic Mustafa designs that lacks an operation waits for a reviewed
   Rust change. The content and ability spike's marks 1 and 2 test exactly this; OQ-0005-AB13 names the trigger.
 - **Pillars 1 and 2, both sides:** the model takes neither side. Tracks that survive death let a player's power grow
   through a match (pillar 2, power that feels earned); how fast tracks level, and whether a switched-to track catches

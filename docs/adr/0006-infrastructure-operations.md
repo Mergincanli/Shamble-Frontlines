@@ -547,7 +547,7 @@ Researching it before this record, or leaving it as one shared question: settled
   is less tidy than R6-COST-REC1's single range, but A-2 itself says 8 rooms per VM is "a density to measure at the tick
   rate R1-TICK-REC2's rule picks (R2-ROOM-REC2 mark 2), not one the server tick budget guarantees" (r6 lines 516–522;
   that rate is now TICK-30's 30 Hz): at the server tick budget's ceiling, 50 % of one vCPU per room,
-  two rooms fill a vCPU before any [transport runtime time](../research/GLOSSARY.md#transport-runtime-time). The proof test's measurement replaces both figures.
+  two rooms fill a vCPU before any [transport runtime time](../research/GLOSSARY.md#transport-runtime-time). The netcode proof test's measurement replaces both figures.
 - **Certificates (Q5).** A certificate per hostname wins as the interim position because it is R2-TRN-REC5's form and
   puts no shared private key on the game VMs; against it, each new VM needs an issuance and either TCP port 80 open or
   a DNS API key (R6-HOST-F24). The wildcard's gain, "adding a VM a copy, not an issuance" (r6 line 694), is the security
@@ -1037,8 +1037,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
   same `_headers` file (R6-HOST-REC1); only ADR 0002's deploy target changes. If Cloudflare as a whole had to go,
   Netlify is R6-HOST-REC1's named fallback with the same `_headers` file (its prices were not read, r6 lines 624–626).
 - **Game servers:** if the CCX23 cannot be ordered or fails the marks, read OQ-0006-1's fallbacks and re-run the
-  proof test there; every draft that cites the reference server (N34, I-15) follows the new name. If the shared CX33
-  fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the hour with a monthly cap (R6-HOST-F17), so a
+  netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name. If the shared
+  CX33 fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the hour with a monthly cap (R6-HOST-F17), so a
   VM removed stops costing from the next hour (inferred).
 - **Certificates:** the production form can move between a certificate per hostname and the wildcard by the security
   baseline's decision; the development certificates are not affected.
