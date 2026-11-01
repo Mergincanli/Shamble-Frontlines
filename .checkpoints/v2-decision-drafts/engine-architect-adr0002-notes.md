@@ -35,3 +35,6 @@ Task: ADR 0002 (code structure, build and toolchain) draft, engine-architect, pl
 DONE
 Fix round 2 (2026-11-01, started 14:06 Amsterdam): brief prompts/fix2-engine-architect-0002.txt; output engine-architect-0002-fixes-2.md.
 - fix2: read verifier F-list, skeptic-2, consistency F11/F12/F13; chosen: F-2 option (a) batching; writing fixes file now.
+- fix2 resumed 19:07 Amsterdam after spend-limit cut; doc unchanged in my anchors after c70c6d2 (line numbers same).
+- fix2 DONE (about 19:20 Amsterdam): engine-architect-0002-fixes-2.md, 25 FIX blocks, 0 NOTE; all BEFOREs unique and non-overlapping in the current doc (script check). F-2 took option (a) (one input call; step returns where outgoing datagrams and block lie). Follow-ons for others: PM-0002-3 (glue included, at most 4, as R1 wrote it), PM-0002-29 (first value no longer the limit), PM-0002-31's part-g cite, SPIKE_PLAN:176 (R1-RR-OQ6) and :158, README (OQ-0002-8 on the stop list; S11).
+DONE

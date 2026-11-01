@@ -289,7 +289,7 @@
 | 243 | AB5 (WEAPON-UNLOCKS, the map's code): LOOP_V2 §8 third gate quoted; VISION_V2 §1 quoted; UPGRADE-SCOPE quoted | OQ-AB5 | LOOP_V2 §8 line 109; VISION_V2 §1 line 22; UPGRADE-SCOPE bullets 3–4; map J5 (the code) | design doc |
 | 244 | AB5 options (a)–(d) and trade-offs (pillar 7) | OQ-AB5 | LOOP_V2 §8 lines 105–110; VISION_V2 §2 line 39; game-designer's reading | design doc |
 | 245 | AB5: the catalogue `[LATER]`; accounts `[LATER]` | OQ-AB5 | LOOP_V2 §8 line 113; VISION_V2 §6.10 line 81 | design doc |
-| 246 | AB5: ADR 0006 cites this | OQ-AB5 | map J5 ("0006 cites it") | settled |
+| 246 | AB5 (fix round 2, F14 and A246): ADR 0006 builds no account store (accounts `[LATER]`, its legacy row GE15 included), so the unlock catalogue's weapon question is asked only here | docs/adr/0006-infrastructure-operations.md lines 34 and 608 (at the fix round's HEAD); verifier-skeptic-3-results.md (A246 upheld: 0 hits for AB5 or unlock in ADR 0006) | settled |
 | 247 | AB6: LOOP_V2 §12 and DESIGN_NOTES call the team's tiers the answer to in-match progression ("Momentum") | OQ-AB6 | LOOP_V2 §12, lines 164–165; DN lines 19–20 | design doc |
 | 248 | AB6 options (a)–(c) and trade-offs (pillars 1 and 4) | OQ-AB6 | VISION_V2 §2 lines 26, 33–34; AB-5; game-designer's reading | design doc |
 | 249 | AB7: "sophistication, not damage" (decided); "give breadth, never raw power" (decided); the Advisor's not-decided "toward sidegrades over raw power" | OQ-AB7 | DN lines 27–28, 40–41; LOOP_V2 §8 line 105 | design doc |
@@ -349,6 +349,14 @@
 | 295 | The map gave this section seven ids, and all belong here | Frame | engine-architect-decision-map-ids.tsv (owner 0005: R1-ABL-REC1, REC2, REC5, OQ1, OQ2, OQ3, OQ9) | settled |
 
 ## Counts
-295 rows: research verified 90 · research, source to check 66 · settled 60 · design doc 58 · arithmetic 11 · proposed
-mark 10. Final line checks (2026-10-31): three citations corrected in this ledger (row 168: r1:2974–2975; rows 174–175:
+299 rows after fix round 2: research verified 90 · research, source to check 66 · settled 63 · design doc 58 ·
+arithmetic 12 · proposed mark 10. Final line checks (2026-10-31): three citations corrected in this ledger (row 168: r1:2974–2975; rows 174–175:
 GL §1 table line 60); every other range re-opened with `sed -n`.
+
+## Fix round 2 (2026-11-01, F2): rows added for OQ-0005-AB9
+| # | The claim, as written (short) | Section | Citation (file, id, lines) | Tier |
+|---|---|---|---|---|
+| 296 | AB9 is the one place the question is asked; ADR 0004's OQ-0004-5 points here and keeps only the mechanism (two claims in one tick resolve in its phase's fixed, deterministic order) | OQ-AB9 | docs/adr/0004-simulation-core.md lines 782–786 (at the fix round's HEAD); engine-architect-consistency-findings.md F2 | settled |
+| 297 | Options added: which deaths drop (any death, or only a death to an enemy); who may take a drop (the killer's team, any enemy of the dead soldier, or anyone); which of two same-tick claims wins | OQ-AB9 | OQ-0004-5's moved options (0004 lines 782–786); UPGRADE-SCOPE bullet 4 ("killed enemies' drops") | settled |
+| 298 | In three-team modes a dead soldier's enemies are two teams, not one | OQ-AB9 | LOOP_V2 §1 (three teams, line 13); VISION_V2 §3 (three-team modes, lines 43–46); 3 teams − the dead soldier's own = 2 | arithmetic |
+| 299 | Decider: Mustafa, with the game-designer | OQ-AB9 | engine-architect-consistency-findings.md F2 (one decider line) | settled |
