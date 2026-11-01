@@ -22,7 +22,7 @@ fact CD12: "separate files, or separate sections, for what the simulation decide
 r1-simulation-core.md, Findings §6, lines 1600–1602)
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
 |---|---|---|---|---|---|---|
-| a. A presentation section in the simulation definition's own file, typed apart from the simulation part (how AP-2 and CD-13 read today) | Low: one file per unit | none | – | presentation only, if the sim's types leave the section out | a unit's numbers and its model in one file | close to legacy's mixed tables, whose colour fields in unit data are a fault (CD13) |
+| a. A presentation section in the simulation definition's own file, typed apart from the simulation part (how AP-2 and CD-13 read today) | Low: one file per unit | none | – | presentation only, if the sim's types leave the section out | a unit's numbers and its model in one file | close to legacy's mixed tables; CD13's note says "Avoid: bot-only fields mixed into the player class, and a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94) |
 | b. A client definition keyed by the simulation definition's id, as the feel kit is (AB-3, CD-14) | Low: one more file for each definition with a presentation side | files kept in step | – | presentation only; no simulation type holds a presentation field, so CD-6's split holds by kind | an art or feel change touches only client files | new; the feel kit already works this way |
 
 - Both options apply R1-DATA-REC8's simulation and client groups (r1, lines 2596–2598). The map document holds both
@@ -34,7 +34,7 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
 2565–2575)
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
 |---|---|---|---|---|---|---|
-| **a. One hash over the whole content set: simulation content, client content and the asset list** (proposed, as CD-8 and AP-4 write it; R1-DATA-REC6) | Low | one hash | – | the client and the server agree on every byte, art included | an art-only change makes a new hash: clients fetch the new bundle before they join, and the match record starts a new tuning group | new |
+| **a. One hash over the whole content set: simulation content, client content and the asset list** (proposed, as CD-8 and AP-4 write it; R1-DATA-REC6) | Low | one hash; an art-only change makes a new hash, so clients fetch the new bundle before they join and the match record starts a new tuning group | – | the client and the server agree on every byte, art included | none | new |
 | b. A hash of the simulation part for the join check and the match record, beside the bundle's own hash for caching | not researched | – | – | – | – | – |
 
 - **a.** Pros: one number names everything a match used. Cons: pick and win rates split at changes that cannot change
@@ -42,10 +42,10 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   is listed as OQ-0005-3.
 
 ## Trade-off analysis
-- **Why one model:** a unit names its weapons, abilities, track, model and faction; an ability names its effects and
-  tags; a track names its candidates. One content crate checks every one of those links at load, on the server, in the
-  Worker and in the editor alike (CD-2, AB-4, AP-2), so the silent fallbacks legacy shipped (CC9, CL14, GE11) cannot
-  return, and one hash names the numbers every match used (CD-8). The ability model, the upgrade tracks and the asset
+- **Why one model:** a unit names its weapons, abilities and track, and its model (AP-2); a faction names its units
+  and vehicles; an ability names its effects and tags; a track names its candidates. One content crate checks every one
+  of those links at load, on the server, in the Worker and in the editor alike (CD-2, AB-4, AP-2), so the silent
+  fallbacks and unchecked links legacy shipped (CC9, GE11, CL14) cannot return, and one hash names the numbers every match used (CD-8). The ability model, the upgrade tracks and the asset
   list add kinds to that model rather than machinery beside it: the tracks need no new operation (AB-8), and the asset
   part proposes only what R1-DATA, R3-CHAR and R3-BUDGET support (ASSET-RESEARCH (a)).
 - **The strongest argument against:** the joined decision rests on documentation, not on shipped games. No
@@ -76,8 +76,8 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   a new match, not the current one (CD-7); two generators that must agree (CD-3); an asset list kept in step with the
   files (AP-2); every material slot named into a class (OQ-0005-AS4); two drawing paths for buildings and props until
   OQ-0005-AP2 is answered (AP-7).
-- **Revisit when:** the spike's load time or Wasm size misses its budget (OQ-0005-CD2, option D), or garde fails on
-  wasm32 (CD-2); the ability marks 1 or 2 fail (OQ-0005-AB13); track content exists (the stress scene's active effects
+- **Revisit when:** the content and ability spike's load time or Wasm size misses its budget (OQ-0005-CD2, option
+  D), or garde fails on wasm32 (CD-2); the ability marks 1 or 2 fail (OQ-0005-AB13); track content exists (the stress scene's active effects
   per soldier restated with ADR 0004, AB-10); ABL-PREDICT is answered; Mustafa and the Advisor pick the mid-match swap
   (OQ-0005-CD4); the faction design session meets (OQ-0005-CD5); a shipped-game source on mid-match tuning becomes
   readable (OQ-0005-CD3); a need for map upload appears (CD-9); the Spy or the Hammer's leech leaves `[LATER]`, or
@@ -89,9 +89,8 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   - "No external assets (procedural textures, synthesized audio)": stops applying to v2 code under LOOK_V2 §8 ("The
     legacy rule 'no external assets' ends with the legacy engine"). Authored glTF/GLB models enter only through AP-2
     to AP-6 and the GPU section's parts 1 to 7; synthesized audio is ADR 0003's matter.
-  - "Animation is cosmetic … Nothing animated decides a hit": carries into v2 unchanged and widens to every asset: no
-    collider, hit shape, shot origin or part layout is read from a model (AP-1), and cues stay presentation only
-    (AB-1).
+  - "Animation is cosmetic … Nothing animated decides a hit": carries into v2, and AP-1 applies it to every asset: no
+    collider, hit shape, shot origin or part layout is read from a model, and cues stay presentation only (AB-1).
   - "Persistence only through `KVStore`": untouched by this record. Content is not persistence, and the upgrade tracks
     reset every match, so they need none (AB-8); ADR 0001 and ADR 0006 say what changes for the guest secret and the
     server-side stores.
@@ -100,7 +99,8 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
 - **Legacy inventory rows** (R7-MARKS (a); the inventory file is not edited, the change waits for Mustafa's
   acceptance; "pending" is the row's *Look brief pending* note). These are the rows ADR 0003 leaves to this record
   (the building kit, the kit and ground textures and builders, the tree and prop builders and the other asset rows),
-  as the content data and asset pipeline sections' author marks them, plus ED5 and ED7, which no draft had placed:
+  as engine-architect, the author of the content data and asset pipeline sections, marks them, plus ED5 and ED7,
+  which no draft had placed:
 
   | Row id (`LEGACY_INVENTORY.md` line) | Mark now | Proposed mark | Why |
   |---|---|---|---|
@@ -113,9 +113,8 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
   them); GW2 and GE1 (rules as checked data); GW12, GE11, CM1 and ED13 (CD-4, CD-11); CD2 (KVStore stays a client
   port; content does not pass through it); TL11 (the legacy oracle the import's goldens use); CS3 (drop); CC9 (port to
   TypeScript; its sockets join the feel kit, CD-14); GE13 (redesign); GE17 (drop: its dead gun-game ladder is no
-  upgrade track and is not ported). The GPU
-  section's lessons CL4, CL14 and GC16 are ADR 0003's rows, and so are the "look brief pending" notes on GC11, GC14,
-  GC15, CC9 and CC12, which concern presentation.
+  upgrade track and is not ported). The GPU section's lessons CL4, CL14 and GC16 are ADR 0003's rows, and so are the
+  "look brief pending" notes on GC11, GC14, GC15, CC9 and CC12, which concern presentation.
 
 ## Open questions
 Every open question of the four sections, one line each, with its decider and the section that holds its full text
@@ -144,7 +143,7 @@ no pick; where a section proposes an answer, the line says so.
 | OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? (ADR 0004 asks the same as OQ-0004-6) | Mustafa | The ability and effect system |
 | OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa, after sims of each matchup | The ability and effect system |
 | OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (proposed: accept it) | the Advisor | The ability and effect system |
-| OQ-0005-AB13 | When does scripting (option A3) come back? (proposed: only if the spike's ability mark 1 or 2 fails) | the Advisor | The ability and effect system |
+| OQ-0005-AB13 | When does scripting (option A3) come back? (proposed: if the spike's ability mark 1 or 2 fails, or new operations are needed often; the talk is read when a copy appears) | the Advisor | The ability and effect system |
 | OQ-0005-AP1 | Where does the automated step run, what does it write, and where do the files live? | the asset-pipeline research, then the asset spike | The asset pipeline |
 | OQ-0005-AP2 | Which asset families become authored models, and which stay procedural builders? | Mustafa, in the look proof test | The asset pipeline |
 | OQ-0005-AP3 | May an AI-generated draft model ever ship? | Mustafa | The asset pipeline |
@@ -175,15 +174,16 @@ The frame's own questions, in full:
     field to either"; the ability section's unit kind names no model (AB-4), and its feel kit is "a separate client
     definition keyed by the same id" (AB-3).
   - Why it matters: it decides whether CD-6's split holds by kind or only by a rule about fields, and whether a
-    weapon's presentation (feel kit, sockets, model) sits in one place or two.
+    weapon's presentation (feel kit, sockets, model) sits in one place or two. The legacy lesson points the same way:
+    CD13's note says to avoid "a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94).
   - Options: (a) a presentation section in the definition's own file, typed apart from the simulation part; (b) a
     client definition keyed by the simulation definition's id, as the feel kit is (Options considered, Question F2,
     with their trade-offs). The map document keeps both sides in one document either way (EDITOR_V2 §2, rule 1).
   - The frame's lean: (b) for definitions, for the reasons under Question F2.
   - Decider: the Advisor, at the stop review, on the text the authors write in the fix round (engine-architect for
     AP-2, AP-3, CD-6 and CD-13; the game-designer if AB-4's kinds change). What decides it: whether CD-6's split can
-    be checked by type alone. Research ids: none (both options apply R1-DATA-REC8's groups and the legacy fact CD12,
-    r1-simulation-core.md, lines 1600–1602).
+    be checked by type alone. Research ids: none. Both options apply R1-DATA-REC8's groups (r1-simulation-core.md,
+    lines 2596–2598) and the legacy fact CD12 (r1-simulation-core.md, lines 1600–1602).
 - **OQ-0005-2. Is a weapon definition the same thing as a weapon type?**
   - The disagreement: CD-6 says "a weapon definition is a weapon type and names its upgrade track, so progress belongs
     to the type, not to the gun". OQ-0005-AB4 leaves open which definitions share a track, and its option (b) lets
@@ -198,13 +198,16 @@ The frame's own questions, in full:
     so that it leaves AB4 open. Research ids: none (UPGRADE-SCOPE).
 - **OQ-0005-3. What does the content hash cover?**
   - Why it matters: one hash covers simulation content, client content and the asset list (CD-6, CD-8, AP-4), and
-    pick and win rates are grouped by it (CD-8, CD-12; ADR 0006 part 12). A change of art or feel only, which cannot
+    pick and win rates are grouped by it ("always grouped by content hash and mode id", because "pick and win rates are
+    only comparable within one tuning version": r6-infrastructure.md, Recommendations §4, R6-TEL-REC3, lines 828–836,
+    ADR 0006's). A change of art or feel only, which cannot
     change an outcome, then makes a new hash: every client fetches the new bundle before it joins, as with any change,
     and the match record starts a new tuning group although no simulation number changed.
   - Options: (a) one hash over the whole set (proposed, as written; R1-DATA-REC6); (b) a hash of the simulation part
     for the join check and the match record, beside the bundle's own hash for caching (not researched).
-  - Decider: the Advisor, with ADR 0006's owner of the analysis (R6-TEL-REC3). What decides it: whether the analysis
-    can merge tuning groups whose simulation part is identical, or needs the record to say so. Research ids: none.
+  - Decider: the Advisor, with the infra-engineer, whose ADR 0006 owns the analysis (R6-TEL-REC3). What decides it:
+    whether the analysis can merge tuning groups whose simulation part is identical, or needs the record to say so.
+    Research ids: none (R6-TEL-REC3 is ADR 0006's).
 - **OQ-0005-4. What do the Character Lab and the Anim Lab work on once soldiers are authored models?**
   - Why it matters: EDITOR_V2 says "The Character Lab and Anim Lab stay as they are" (lines 4–5). The Character Lab
     drives the procedural character builder (inventory row ED5, line 340), which ADR 0003 proposes to replace with
@@ -226,7 +229,7 @@ OQ-0004-5 and OQ-0004-6 ask Mustafa what OQ-0005-AB9 and AB10 ask, so each is on
 Each section's spike part above stands as written. The test-engineer writes the pass marks below (plan step 4);
 `docs/SPIKE_PLAN.md` names the spikes and places them. Joined, by spike:
 1. **The content and ability spike** (after the sim core spike and before slice 1; decision map, part g): the content
-   data section's items 1 to 10 and the ability section's items 1 to 7. Two pairs rest on one mechanism and may share a
+   data section's items 1 to 9 and the ability section's items 1 to 7. Two pairs rest on one mechanism and may share a
    run, as the test-engineer decides: the fuzz runs (content item 2, R1-DATA-REC2; ability item 3, R1-ABL-REC5, with
    track definitions) and the change that takes effect at the next match (content item 5; the last clause of ability
    item 1).
@@ -249,8 +252,9 @@ Written by test-engineer (plan step 4).
 
 ## Migration plan
 The legacy game stays playable in `legacy/` at every step (ADR 0002); v2 is playable from slice 1. The places in
-SLICE-ORDER are proposed, and the "Done when" lines below slice 1 are proposed too (reason: each names the spike items
-that test what the slice brings, run again on the real crate).
+SLICE-ORDER and the "Done when" lines are proposed (reason: each names the spike items that test what its slice brings,
+run again on the real crate; slice 1's list is the content data section author's, with the map migration item moved to
+slice 2, where the maps migrate).
 1. **The netcode proof test** runs first and needs nothing from this record.
 2. **The foundation:** the `content` crate's place in the workspace; the generated schema and types in
    `packages/types`, diffed by the gate (CD-3; ADR 0002's milestone); the dependency check that keeps glTF readers out
@@ -334,6 +338,7 @@ The frame read, beyond the four sections:
   the legacy fact CD12 (lines 1600–1602); Options §5, Question E (lines 1826–1832) and Options §6, Q2 (lines
   1845–1855); R1-DATA-REC6 (lines 2565–2575) and R1-DATA-REC8 (lines 2596–2606); R1-ABL-OQ1 (lines 2756–2758);
   R1-RR-OQ5 (lines 2946–2950).
+- `docs/research/r6-infrastructure.md`: R6-TEL-REC3 (lines 828–836).
 - `docs/research/GLOSSARY.md`: the entries linked above; §8 (the foundation, the netcode proof test), appended in this
   pull request.
 - `docs/LEGACY_INVENTORY.md`: the marks (lines 1–40) and rows ED5 and ED7 (lines 340 and 342), with the rows the

@@ -8,9 +8,9 @@ This record decides how everything the game runs on is written down as data and 
 abilities, effects, Mustafa's in-match upgrade tracks, modes, maps, rule tables, the feel kit and the list of 3D
 models. All of it is plain JSON files that one Rust program, the content crate, reads and checks in the same way on
 the server, in the browser and in the editor; a file with a mistake is refused with the file and the field named, and
-nothing is quietly replaced by a default. Abilities and weapons are built from a short, fixed list of operations
-written in Rust and combined by data (a cut-down version of Unreal's Gameplay Ability System), so a combo or a counter
-can be tried by changing data, and every hit goes through one damage pipeline. The upgrade tracks ride on the same
+nothing is quietly replaced by a default. Abilities and effects are built from a short, fixed list of operations
+written in Rust and combined by data (a cut-down version of Unreal's Gameplay Ability System); weapons are data too, and
+every hit goes through one damage pipeline, so a combo or a counter can be tried by changing data. The upgrade tracks ride on the same
 system: a track is data, a pick is an effect or a granted ability, and the player's progress lives on the player's
 record, not on the soldier. Authored 3D models (LOOK_V2 §8) enter as listed content: a model decides nothing in the
 simulation, carries no look of its own and must fit per-unit budgets the gate checks; how models are compressed, given
@@ -26,7 +26,7 @@ its options and no pick. Four sections by three authors carry the detail; this f
     abilities are built from data, so combos and counters can emerge and tuning needs no code changes": the ability
     section (AB-1 to AB-7) on the content data section's format and loader (CD-1 to CD-6).
   - §6.1, modes as data, rooms and private matches: the mode file (CD-6) and the private-room overrides (CD-9).
-  - §6.2, one true 3D simulation: the map document holds what the sim, the bake and the renderer read (CD-11), and no
+  - §6.2, a true 3D simulation: the map document holds what the sim, the bake and the renderer read (CD-11), and no
     model decides a collision (AP-1).
   - §6.4, big, multi-part vehicles with their own weapons and abilities: the vehicle kind and the leech and marking
     primitives (AB-4, AB-6); parts drawn from the sim's part records (the GPU section's part 3; AP-1). Seats are
@@ -127,16 +127,18 @@ The parts, each pointing to the section part that decides it:
 2. **What the content set holds:** simulation content and client content, split so that a presentation value cannot
    reach an outcome, with authored seconds converted by ADR 0004 and one top speed per unit type (CD-6); moment rules
    and telemetry ids (CD-12); factions and their variants (CD-13); the feel kit, the Feel Lab's data and the
-   quality-tier table (CD-14). *Need:* VISION_V2 §6.3 to §6.8; the feel kit: LOOP_V2 §7 only.
+   quality-tier table (CD-14). *Need:* VISION_V2 §6.1, §6.3 to §6.8; the feel kit: LOOP_V2 §7 only; the quality-tier
+   table: VISION_V2 §4 only.
 3. **Reload, delivery and trust:** development reload (CD-7, proposed: simulation numbers at the next match); one
    hashed bundle named at join and recorded per match (CD-8); the server checks every payload through the same
-   pipeline (CD-9); the legacy tuning imported once, every key accounted for (CD-10). *Need:* VISION_V2 §6.1, §6.6,
-   §6.7; reload: LOOP_V2 line 8 and §7 only.
+   pipeline (CD-9); the legacy tuning imported once, every key accounted for (CD-10). *Need:* VISION_V2 §6.1, §6.3,
+   §6.5, §6.6, §6.7; reload: LOOP_V2 line 8 and §7 only.
 4. **The map document** as content under EDITOR_V2 §2 (CD-11). *Need:* EDITOR_V2 §2 and §4; VISION_V2 §6.1, §6.2.
 5. **The ability and effect model:** the reduced GAS subset (AB-1); one damage pipeline (AB-2); weapons' own
    bookkeeping (AB-3); one table per kind, linked by validated ids (AB-4); tech tiers as tag gates (AB-5); LOOP_V2's
    abilities written in the model (AB-6); combos and counters as data (AB-7); ABL-PREDICT left open, both answers
-   carried (AB-9); the step's cost mark and a proposed curve (AB-10). *Need:* VISION_V2 §6.3, §6.4, §6.5, §6.7.
+   carried (AB-9); the step's cost mark and a proposed curve (AB-10). *Need:* VISION_V2 §6.3, §6.4, §6.5, §6.7; the
+   cost mark: VISION_V2 §3 and §4 only.
 6. **The upgrade tracks:** the track kind and the drop and pickup values (AB-4); each clause of UPGRADE-SCOPE and who
    carries it (AB-8); weapon and unit definitions name their tracks (AB-4, CD-6). The state, the messages, the
    telemetry fields and the page are ADR 0004 part 18, ADR 0001 part 12, ADR 0006 part 12 and ADR 0003 part 10.
@@ -145,12 +147,12 @@ The parts, each pointing to the section part that decides it:
    checked asset list (AP-2); the material-slot classes are one table (AP-3); asset files are hashed and immutable
    (AP-4); per-unit budgets are reviewed data the gate checks (AP-5); the automated step is a tool outside the player
    build (AP-6); a procedural kit spec and an authored asset sit side by side until OQ-0005-AP2 is answered (AP-7).
-   *Need:* LOOK_V2 §8; VISION_V2 §6.7, §6.9.
+   *Need:* as each part names it: LOOK_V2 §8; VISION_V2 §4, §6.2, §6.4, §6.7, §6.9; EDITOR_V2 §4.
 8. **The asset pipeline, GPU side:** a model carries no look (the GPU section's part 1); slots name a material class
    (part 2); soldiers are skinned and very large units are part groups (part 3); two derived per-unit caps (part 4);
    LOD levels are optional data (part 5); only glTF/GLB (part 6); materials shared, cached and compiled up front (part
-   7); the look proof test's plain exports (part 8); trees wait (part 9). *Need:* LOOK_V2 §8; VISION_V2 §6.4, §6.7,
-   §6.9.
+   7); the look proof test's plain exports (part 8); trees wait (part 9). *Need:* as each part names it: LOOK_V2 §2,
+   §3, §5, §6.4, §8; VISION_V2 §4, §6.4, §6.7, §6.9; EDITOR_V2 §2.
 9. **Its spikes:** the content and ability spike; the asset marks inside ADR 0003's look proof test; the asset spike
    after the asset-pipeline research; the Feel Lab test for ABL-PREDICT once abilities are playable ("What a spike
    must prove", below).
