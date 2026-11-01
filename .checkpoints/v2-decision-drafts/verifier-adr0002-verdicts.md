@@ -205,3 +205,89 @@ verified (C16): a REC claim is confirmed (R) and its source check is the finding
 | 179 | "if ADR-002 moves the project to modules" overtaken; text left to owners (DOCS-ALIGN) | EDITOR_V2:52; map J3; STATUS | confirmed | EDITOR_V2:52; plan step 11 adds it to DOCS-ALIGN (STATUS:146–149 does not list it yet) | |
 | 180 | Part 11 needs | EDITOR_V2 §5; r5 1188 | confirmed | r5:1188 "the editor split serves §6.7" | |
 | 181 | Boundary spike with the proof test, before the foundation | map part g, J6 | confirmed (cross-draft; proposal for SPIKE_PLAN) | doc says "`docs/SPIKE_PLAN.md` gives the spike its final name and place" | |
+| 182 | Bundler other than Vite / other languages settled by GLOSSARY §8, the foundation | GLOSSARY §8 | confirmed (settled; C12 form) | map J1:1071 "the toolchain: a Cargo workspace plus TypeScript with Vite" | |
+| 183 | Q1 options A–C | r5 997–1002 | confirmed (R) | r5:999–1001 cell by cell | |
+| 184 | Q2 npm read (F8), in use (TL17), "(Legacy)" for npm 11; pnpm/Yarn not read, not proposable | r5 1004–1008 | confirmed; source checked (F12 fetch) | r5:1006–1007; npmjs page carries "Legacy" (fetch F12) | rule 3 respected |
+| 185 | Q3 committed vs build-time | r5 1010–1014 | confirmed (R) | r5:1013–1014 | |
+| 186 | Q4 the two crate-list options | r5 1170–1193; R1-BND-F19; R4-XT-OQ5 | confirmed (facts); rule 3 issue on the chosen row | the chosen row is not in any research Options section | F-3 |
+| 187 | Q5 options A–C | r5 1019–1024 | confirmed (R) | r5:1021–1023 | |
+| 188 | Q6 lint configs and formatters | r5 1026–1038 | confirmed (R) | r5:1028–1038; Biome con from r5:1287 "a second linter beside the typed one without type-aware rules on record (F23)" | |
+| 189 | Q7 options A–C | r5 1040–1050 | confirmed (R) | r5:1044–1046 | |
+| 190 | Q8 A1–A3 | r1 1733–1739 | confirmed | r1:1737–1739; A3 "R3 decides"; 0003:383 "OffscreenCanvas was not researched" | |
+| 191 | Q9 B1–B4 | r1 1741–1752 | confirmed | r1:1745–1748 | |
+| 192 | Q10 C1–C2 | r1 1754–1760 | confirmed | r1:1755–1758 | |
+| 193 | Q11 D1–D4 | r1 1762–1769 | confirmed | r1:1766–1769 | |
+| 194 | Q12 E1–E2; no §6 item asks for split ticks | r1 1771–1774 | confirmed | r1:1774 "No VISION_V2 §6 item asks the client to split one tick across cores." | |
+| 195 | Q13 G1–G3: 100 µs / 5 µs timers, CORP, frames, popups | r1 1776–1782 | confirmed | r1:1777–1782 | F30 verified |
+| 196 | Q14 H1–H2 | r1 1784–1788 | confirmed | r1:1785–1788 | |
+| 197 | Q15 test-tool options | r5 1055–1076 | confirmed (R) | r5:1057–1076 | unread options labelled "not proposable" |
+| 198 | Q16 cache, toolchain and CLI options; wasm-pack not proposable | r5 1081–1097; LAYOUT-OQ2; R1-BND-F1 | confirmed (R) | r5:1083–1097 | wasm-pack row is the doc's addition, labelled not proposable |
+| 199 | Q17 G1–G3; free on public repos (F17) | r5 1099–1105 | confirmed | r5:1103–1105; r5:2155 "free and unlimited on public repositories." | |
+| 200 | Q18 gate options and long-check options | r5 1133–1146 | confirmed (R) | r5:1137–1146 | |
+| 201 | Q19 P1–P5 | r5 1110–1118 | confirmed (R) | r5:1114–1118 | |
+| 202 | Client host Cloudflare Pages, Workers static assets alternative; advisor 2026-10-30 (resolution 19) | GLOSSARY 587–603 | confirmed (settled) | GLOSSARY:588–592 "Decided by the advisor, 2026-10-30 (resolution 19)" | |
+| 203 | Legacy fence leaked because nothing checked it; every rule a gate check with a planted defect | r1 CS11; part 9 | confirmed | r1:1176–1178 | |
+| 204 | B2's delivery waits for the message queue, "to be measured" | r1 1746 | confirmed; nit | r1:1746 "Delivery waits for the page's message queue (inferred, to be measured)" | it is R1's option table, not "R1-BND-REC2's option B2" text; R1 marks it inferred |
+| 205 | Local-match Worker load unmeasured; ADR 0001 trade-off 5 counts it in the client's sim share | ADR 0001 | confirmed (cross-draft) | 0001:802–803 "the Worker also encodes and decodes every message for the loopback path; that cost is not measured yet and counts in [the client's sim share]" | |
+| 206 | Strict configs not semver-stable; three.js flag cost unmeasured | r5 TSLINT-F13; OQ4 | confirmed | r5:2128 "not considered "stable" under Semantic Versioning (semver)."; r5:1773–1775 | |
+| 207 | `--prove` rebuilds per mutation; R5 proposes ≤ 30 min | r5 1731–1732; GATE-OQ5 | confirmed | r5:1731–1732 "`--prove` itself takes under 30 minutes (it rebuilds per mutation; proposed)" | |
+| 208 | TS-only work needs the Rust toolchain for G0–G2 | r5 1694–1698; GATE-OQ1 | confirmed | r5:1695–1697 "A and B both need the Rust toolchain (G0 checks it, and `--quick` runs G1–G2's cargo fmt and clippy)" | |
+| 209 | Every check enforces one recommendation of R1, R4 or R5 | r5 1675–1677 | confirmed | r5:1676 "each check enforces one wave 1 or R5 recommendation, so no check is "for later"" | G13 → R4-NAV-REC1 |
+| 210 | Gate machines need pinned Rust, Wasm target, Node, browsers; Mustafa's Windows included | r5 1694–1695; TSLINT-REC4 mark | confirmed | r5:1300 "on Mustafa's Windows machine and on Linux" | |
+| 211 | Hard constraints change for v2 only after acceptance; nothing in CLAUDE.md/.claude changes | SPIKE-SCOPE; plan rule 11 | confirmed (settled) | STATUS:187–188; plan rule 11 | |
+| 212 | Classic scripts → modules and crates; TL2, TL3, TL6, TL8 drop | inventory | confirmed (inventory) | marks at lines 387, 388, 391, 393 | |
+| 213 | Double-click player build ends; HTTPS and localhost are R3-WGPU-REC4's secure contexts; WebTransport needs HTTPS | r3 WGPU-REC4 941–951; r2 F35; map J2 | confirmed | r3:942–943 "the game is served from a secure context (HTTPS, or localhost in development)"; r2:1269 | R3-WGPU-F20 (the secure-context basis) not checked here: pending (time) |
+| 214 | Layering rule → part 3 rules, G5, G8 | CLAUDE.md; TL4, TL7 | confirmed (inventory) | TL4, TL7 marks redesign | |
+| 215 | three.js is ADR 0003's; bundled from npm; no CDN tag | map J2; ADR 0003/0006 | confirmed (cross-draft) | map J2 CDN-SRI "v2 bundles three.js from npm with Vite"; 0003:137 part 2 pin | |
+| 216 | No external assets ends (LOOK_V2 §8); model files under 25 MiB each | LOOK_V2:65; R6-HOST-F3 | confirmed | LOOK_V2:65; r6:75–76 | |
+| 217 | Other constraints are ADR 0003's, 0001's, 0006's and 0004's | other drafts | confirmed (cross-draft, by mention) | `KVStore` in 0001/0004/0005/0006; `LinearEncoding`, `stylizeScene` in 0003/0004/0005; "Animation is cosmetic" in 0001/0003/0004/0005 | the sentence's mapping is loose (ADR 0005 also handles three of them): consistency pass |
+| 218 | Gate step would run gate v2 for v2 code, today's for `legacy/`: a kit change-set | CLAUDE.md protocol step 4 | confirmed (proposed follow-up) | — | |
+| 219 | Inventory: no mark changes; none look-brief-pending; table marks and lines | inventory | confirmed (inventory) | all 26 rows' marks and lines checked (CS11:179; PG1/18/19:359/376/377; TL1–TL17:386–402; KT7:416, KT8:417, KT9:418, KT12:421, KT19:428) | |
+| 220 | `file://` is a secure context on MDN's table (R1-DATA-OQ11's second pass) | r1 2819–2823 | confirmed | r1:2820–2821 "lists "`file:///path/to/resource.html` ✅ Secure (`file` URL)"" | research verified (second verifier pass) |
+| 221 | OQ-0002-1 options; (c) not researched; decider spike then Mustafa | r1 DATA-OQ11; XT-OQ10 | confirmed | r1:3077–3078 "Decided by: ADR-0002 (editor build), or Mustafa if EDITOR_V2 §5's double-click rule must change" | (c) labelled not researched and not proposed: rule 3 OK |
+| 222 | OQ-0002-2 options, decider, what decides it; KT21 | r5 GATE-OQ3; LAYOUT-OQ5; LAYOUT-REC6; KT21:430 | confirmed | r5:1871–1872; r5:1243–1245 | |
+| 223 | OQ-0002-3 options; proposed start (a) | ADR 0001; R1-BND-REC1 m2; F19 | confirmed (proposed start labelled) | 0001:1254 (loopback in protocol crate) | the options are the doc's own (no research option); acceptable for an OQ |
+| 224 | OQ-0002-4 gains and costs; login outside the page unless `same-origin-allow-popups` isolates | r1 REC5; OQ9; OQ5 | confirmed | r1:2316–2320; r1:2747–2752; r1:2734–2736 | |
+| 225 | OQ-0002-5 options; nightly interim per R5-XQ-OQ1 | r5 XQ-OQ1; TEST-REC1; TEST-OQ4 | confirmed | r5:1892–1893 "until then the macOS run can be nightly without breaking either part" | (c) WebdriverIO e2e labelled not researched |
+| 226 | OQ-0002-6 jump 3.07 m vs 2.98 m; decider game-designer with Mustafa | r5 TEST-OQ3 | confirmed | r5:1806–1808 | |
+| 227 | OQ-0002-7: moved in 2025, broke compatibility twice in 2026 (0.2.123, 0.2.128); decider reads #4533 and governance page | r1 BND-OQ7; F1, F2 | confirmed | r1:2741–2744 | note: github.com pages returned HTTP 403 to curl in this session (proxy: repository access not enabled), so the named reading may need another route (see fetch audit F04/F05/F16) |
+| 228 | Spike throwaway in `spikes/`, shares proof test's harness and stand-in sim | SPIKE-SCOPE; map part g | confirmed (settled; cross-draft) | STATUS:187–188 | |
+| 229 | Spike item 1 marks | r1 REC1 2258–2264 | confirmed | r1:2259–2263 | research verified |
+| 230 | Page's cost of the sim: ADR 0003 owns the row, stated as a p99 (LE-B) | r3 1127; map LE-B | confirmed | r3:1127 "sim cost seen by the page … p99 ≤ 1.0 ms"; 0003:972 PM-0003-20 | |
+| 231 | ≤ 4 calls in one instance, ≤ 8 in two (proposed) | arithmetic | confirmed (proposed, labelled) | 4 × 2 = 8 | see F-2 on the online count |
+| 232 | Brave added | r5 PREV-REC4 m2 | confirmed | r5:1639–1640 "in Chrome, Edge, Firefox, Safari and Brave (R1-BND-REC5's pass mark, plus Brave for Mustafa)" | |
+| 233 | Spike item 2 marks | r1 REC2 2276–2285; MODES-3 | confirmed | r1:2276–2284 verbatim, N = 48 per MODES-3 (a) | |
+| 234 | Bytes and copy time per layout; writer's time reported | r1 BND-OQ6; RR-OQ6 | confirmed (report proposed) | r1:2739–2740 | |
+| 235 | Spike item 3 marks | r1 REC3 2292–2296 | confirmed | r1:2292–2295 ("offline" read as local play) | |
+| 236 | Ray and view time in the same message (proposed) | part 5 | confirmed (proposed, labelled) | — | |
+| 237 | Spike item 4 marks incl. `erasableSyntaxOnly`, two runs byte-identical | r1 REC4; r5 LAYOUT-REC3; TSLINT-OQ3; LAYOUT-OQ4 | confirmed (R) | r1:2304–2307; r5:1203–1204; r5:1770–1772; r5:1759–1760 | |
+| 238 | Spike item 5 marks | r5 LAYOUT-REC5 1229–1231; r1 REC5 2321–2324 | confirmed | as cited | |
+| 239 | Spike item 6 marks + OQ-0002-3 measures | r1 REC6 2334–2338 | confirmed | r1:2334–2337 | |
+| 240 | Spike item 7: ADR 0004's S18 and R1-TICK-REC2 P2 here; W3 if pacing fails | ADR 0004 S18; r1 2054–2057 | confirmed (cross-draft) | 0004:840 S18 "the boundary spike (ADR 0002)"; 0004:824 S2 "the sim core spike's sim in the boundary spike's Worker" | |
+| 241 | Spike item 8 measurements; no pass mark; under 25 MiB | r1 RR-OQ5; r5 CI-OQ4, TSLINT-OQ4, OQ6, TEST-OQ1 | confirmed | r5:1833–1834 "The wasm-opt (binaryen) pin. It is not on install-action's list"; r5:1779–1780 | |
+| 242 | Spike item 9: editor from `file://` in five browsers | OQ-0002-1 | confirmed (proposed) | — | |
+| 243 | Spike item 10: optional Sentry trap, 4 browsers | r6 OBS-REC3 765–768 | confirmed (R; proposed mark of R6) | r6:765–766 "arrives in Sentry with Rust function names in Chrome, Edge, Firefox and Safari (4 of 4)" | R6-OBS-F7 verified; F6, F8, F10 pending (time) |
+| 244 | Mustafa runs the spike in Brave; test-engineer adds the checklist | plan rule 12 | confirmed (settled) | plan rule 12 | the checklist is present (doc 1136–1157) |
+| 245 | Foundation is not a spike | map part g | confirmed (cross-draft) | — | |
+| 246 | Migration phase 1 order | SLICE-ORDER cond. 3; map J6 | confirmed | STATUS:101 "The netcode proof test … still runs before the foundation." | |
+| 247 | Phase 2.1 done-when | r5 LAYOUT-REC6 mark | confirmed (R; Brave step proposed) | r5:1243–1245 | |
+| 248 | Phase 2.2 done-when | r5 LAYOUT-REC1 mark; CI-REC2 | confirmed (R) | r5:1166–1169; r5:1533–1534 | |
+| 249 | Phase 2.3 done-when incl. 10/20 min "proposed by R5; VISION_V2 sets no CI target", 8 GB | r5 CI-REC5, CI-REC1, GATE-REC3 | confirmed (R) | r5:1580–1581 "(proposed budget; VISION_V2 sets no CI target; legacy is about 1 min)" | |
+| 250 | Phase 2.5 done-when (ADR 0001, 0003, 0004 milestones) | other drafts | confirmed (cross-draft) | 0001:1257–1258 `Join`, `JoinAccepted`, `Input`, `Snapshot` over loopback with L1 | |
+| 251 | Phase 2.6 done-when | r5 PREV-REC1 m1; PREV-REC4 m1 | confirmed (R) | r5:1600–1601; r5:1636–1637 | |
+| 252 | Foundation done when empty scene, CI green, preview link | GLOSSARY §8 | confirmed | map J1:1077 | |
+| 253 | Slices 1–6 milestones | SLICE-ORDER; r5 TEST-REC5 | confirmed (settled; R; proposed per slice) | r5:1487–1489 | |
+| 254 | Test plan | r5 GATE-REC3, TEST-REC1–6 | confirmed (R) | as rows 133–150 | |
+| 255 | Rollback: B3, W3, C2 behind the flag; page code unchanged | r1 REC2, REC5; XU-OQ4; ADR 0003 p10 | confirmed | 0003:1181 | |
+| 256 | Rollback: second Worker not researched | — | confirmed (labelled) | — | |
+| 257 | Workers static assets take the same `_headers` | GLOSSARY 587–603 | confirmed (settled) | GLOSSARY:588–589 "the alternative that takes the same `_headers` file" | |
+| 258 | After acceptance a superseding ADR (template 0000) | template | confirmed (design doc) | docs/adr/0000-template.md Status line | |
+| 259 | Appendix A: 104 ids in the map's order; 32/7/0/40/11/14 | map ids tsv | confirmed (arithmetic and script) | 104 rows; `diff` against the map's owner-0002 ids: identical, no duplicates; counts adopted 32, changed 7, answered 40, open 11, spike 14 (script) | |
+| 260 | Intro: settled stack; VISION_V2's browsers, laptop, 48; the foundation | brief §1; VISION_V2; GLOSSARY §8 | confirmed | DRAFTS_BRIEF:23–26; VISION:52–53 | "modest laptop" paraphrases "a laptop with integrated graphics" |
+| 261 | Intro summary | parts 1–10 | confirmed (as the parts' rows) | — | |
+| A1 | (no row) Doc line 1171 "---8<--- the subsection ends on the line above ---" | — | wrong (assembly artifact) | doc:1171 is passmarks file line 244, a cut marker; doc:1172–1173 two blank lines | finding F-1 |
+| A2 | (no row) Note under the table: "the drafter confirms the reading, or the design batches its inputs" | NOTE PM-0002-3 | open instruction left in the ADR | doc:1084–1088 | F-2 |
+| A3 | (no row) "R5's working name for the gate v2 is today's path" (OQ-0002-2) | r5 GATE-REC2 | confirmed | r5:1684 "working name `node tools/gate.mjs`, v2 edition" | |
+| A4 | (no row) "Its results go into this record before Mustafa accepts it" (spike section) | plan | confirmed (process; matches migration step 1) | doc:1179–1180 | |
+| A5 | (no row) Editor: "a phase 1 track, slice 5; its map document is ADR 0005's" | brief §1; map I-9 | confirmed | DRAFTS_BRIEF:35 "Octopon-3 and Editor v2" (slice 5) | |
+| A6 | (no row) Test table soak row "up to the largest mode's N (48)" vs the test-mode list's N = 64 headroom (PM-0002-76) | GLOSSARY 375–387 | inconsistent wording | GLOSSARY:385 item 5 "the headroom run, N = 64" | note N-5 |
