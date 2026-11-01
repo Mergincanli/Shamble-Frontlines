@@ -46,3 +46,6 @@ Items: PM-0002-3 (Wasm calls per tick, engine-architect's F-2 wording); the note
   PM-0002-3: engine-architect's reading word for word (one count, glue included, at most 4 / 8; R1-BND-REC1 mark 2 r1:2261-2263 checked, mark 2 sits on 2261-2263); bites: per-soldier accessor, a no-op export called 5 times per tick. The note on PM-0002-3 deleted (moot; heading "Notes on two rows."); engine-architect's held block should not be applied (NOTE). PM-0002-29: part 4's procedure (two inputs, the Advisor sets the first limit; G7 records until then). PM-0002-31: decision map part g -> part 5's text and SPIKE_PLAN item 3. PM-0006-15, -17: "the netcode proof test's" (3 places).
   Checks: dry-applied to 57c43c2 copies and working-tree copies (all 6 ok); PM rows keep 7 columns.
 DONE (round 3)
+
+# Round 4 (prompts/fix4-test-engineer.txt), started 19:28; deadline 20:15; BEFOREs from aa85bf0
+Task: replace pointers into each draft's own lines (in my pass-mark sections) with stable anchors (part + row/item named); research citations stay.

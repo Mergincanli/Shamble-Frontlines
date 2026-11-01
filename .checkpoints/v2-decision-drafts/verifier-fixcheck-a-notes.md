@@ -8,3 +8,7 @@
 - 20:05 NOTE: the working tree moved on during the run (9ed8d67, 81d2a65 change 0002/0005/0006; 0001 fix3 uncommitted). Judge only 57c43c2: snapshots in .gate/fixcheck-a/*@57c43c2.md (0001, 0002, 0003, 0004, 0006, SPIKE_PLAN, STATUS). 0001 lines < 1495 are aligned with the working tree; 0006 use the snapshot.
 - 20:05 0001 rows A1-A39 written to verdicts file.
 - Next: 0003 diff.
+- 19:31 (clock check: earlier time stamps in these notes were estimates; real time 19:31) fetched www.w3.org/TR/webaudio-1.1/ 200 3,087,268 B at 19:29:43: WD 22 Sep 2026, all four OQ-0003-14 quotes confirmed.
+- 0003 checks done so far: r3 171-174, 279-283, 340-366, 395-403, 419-424, 450-468, 612-622, 652-659, 694-710, 808-814, 843-847, 908-916, 1119-1152, 1305-1322; r2 959-975, 2449-2453; INV 115, 205, HUD rows (split correct); STATUS codes; 0004 part 14; 0005@57c43c2 AP2, PM-0005-33..37; SPIKE_PLAN@57c43c2:28-33, 226-236; README codes all present; Appendix A counts 71 = 23+2+0+17+10+19 OK.
+  FINDING (0003): README at 57c43c2 (and HEAD) has NO "fragments as damage" row in "Decisions the drafts ask for"; 0003:247-248, :432 (trace row), checklist step 24 point to it (dangling). Owner: synthesis (engine-architect) adds row, consistency F14.
+  NOTE: SPIKE_PLAN:30 still "MAC, a macOS machine with Safari" (no version rule): 0003's key attributes only the machine, fine.
