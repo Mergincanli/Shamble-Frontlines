@@ -23,3 +23,7 @@ AFTER:
   batches the command and the received datagrams into one input call, and the step returns where the outgoing
   datagrams and the block lie.
 END
+
+## Outcome (the session, 2026-11-01 about 19:21 Amsterdam)
+Not applied. test-engineer (its round 3, NOTE F-2) deleted the note instead: PM-0002-3 now has one count, glue calls
+included, so the note's question is answered by part 5 and the row itself.

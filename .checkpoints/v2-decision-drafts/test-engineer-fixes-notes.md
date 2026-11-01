@@ -42,3 +42,7 @@ DONE (round 2)
 
 # Round 3 (prompts/fix3-test-engineer.txt), started 19:18 Amsterdam; deadline 20:30; BEFOREs from 57c43c2
 Items: PM-0002-3 (Wasm calls per tick, engine-architect's F-2 wording); the note on PM-0002-3 (held block); PM-0002-29 (Wasm size procedure, part 4); PM-0002-31 (decision map part g citation); 0006 PM rows ~882, 884 'the proof test's' -> 'the netcode proof test's'.
+- 19:21 Round 3 written: test-engineer-fixes-3.md, 6 FIX blocks + 2 NOTE blocks (scratchpad make_fixes3.py; BEFOREs from `git show 57c43c2:`, each also unique in the working tree, where another author's uncommitted round touches 0006 outside my rows).
+  PM-0002-3: engine-architect's reading word for word (one count, glue included, at most 4 / 8; R1-BND-REC1 mark 2 r1:2261-2263 checked, mark 2 sits on 2261-2263); bites: per-soldier accessor, a no-op export called 5 times per tick. The note on PM-0002-3 deleted (moot; heading "Notes on two rows."); engine-architect's held block should not be applied (NOTE). PM-0002-29: part 4's procedure (two inputs, the Advisor sets the first limit; G7 records until then). PM-0002-31: decision map part g -> part 5's text and SPIKE_PLAN item 3. PM-0006-15, -17: "the netcode proof test's" (3 places).
+  Checks: dry-applied to 57c43c2 copies and working-tree copies (all 6 ok); PM rows keep 7 columns.
+DONE (round 3)

@@ -1,1 +1,4 @@
 # Task: verifier-fixcheck-a (re-verify fix-round changes in ADR 0001, 0003, 0006; diff 80a27b3..57c43c2), started 2026-11-01 19:19 Amsterdam
+- 19:30 setup: diffs saved in .gate/fixcheck-a/diff-*.txt (0001: 35 hunks, 0003, 0006). Working tree = 57c43c2 for the three docs. Commits in range touching them: 09803a9 (0006 r1), 03df0ae (0001 r1), 45c957f (0001 r2), c70c6d2 (PM r1), b375829 (0003 r1), 57c43c2 (PM r2). fix3 files (netcode/infra) are dated after 57c43c2: out of scope (check whether applied).
+- Read findings: verifier-adr0001 F1-F10; consistency F1-F14; skeptic 1/2/3; completeness items. Fix blocks read: netcode r1 (F2,F4-F10), netcode r2 (F1,F2,F3,F8,F10,F13,F14), TE 0001 r1 (F1), TE r2 0001/0006 blocks.
+- Next: verify 0001 changed lines against research (r2 lines), then 0003, then 0006, then cite_check.
