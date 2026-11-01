@@ -318,9 +318,10 @@ failure rule · NOM the "no measurable mark" lines · SC the spike checklist (st
 | TE268 | R5-LAYOUT-REC4 and R5-TEST-REC2 are the sim core spike's in the map, R5-TEST-REC4 the netcode proof test's | SE | map lines 941, 943 | settled |
 | TE269 | The preview hosting check comes before the preview step | SE | map line 947 | settled (the map's proposal) |
 | TE270 | Sizes: both L | SE | none | proposed (test-engineer: the work each entry lists) |
+| TE271 | P2's "on Low" is ADR 0003's tier: the plain renderer until ADR 0003's renderer runs at Low, then the run repeats with it | PM-28 | r1 R1-TICK-REC2 P2, 2054–2057 ("30+ fps on Low") | proposed (test-engineer reading) |
 
 ## Counts
-- Rows: 270 (TE1–TE270), counted by script on this file; every row has five cells, ids in order.
+- Rows: 271 (TE1–TE271), counted by script on this file; every row has five cells, ids in order.
 - By first-listed tier (script on this file): research verified 41 · research, source to check 9 · arithmetic 21 ·
-  settled 29 · design doc 1 · inventory 1 · cross-draft 6 · proposed 162 (R5's 64, test-engineer's own 61, the
+  settled 29 · design doc 1 · inventory 1 · cross-draft 6 · proposed 163 (R5's 64, test-engineer's own 62, the
   draft's 28, R3's 8, R6's 1).

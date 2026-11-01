@@ -332,7 +332,7 @@ measurable mark" lines · NBC the "No Brave checklist" paragraph · SE the spike
 | TE284 | Part 18's open rules (OQ-0004-5, -6; ADR 0005's three) | NOM | draft 773–791; plan 74–75 | settled; proposed (the draft's) |
 | TE285 | Part 19: the event list is in the state hash | NOM | draft part 19, 452 | proposed (the draft's) |
 | TE286 | S20's content half is ADR 0005's; the suite's CI time under 3 minutes is ADR 0002's | NOM | draft S20, 842; r5 R5-TEST-REC2, 1428–1429 | research, source to check; settled (division) |
-| TE287 | No network outside PM-0004-61 and -70 | NOM | draft test plan, 884–885 | proposed (the draft's) |
+| TE287 | Only PM-0004-61 and -70 name a network profile; PM-0004-67 runs under the proof test's own load | NOM | draft test plan, 884–885 | proposed (the draft's) |
 | TE288 | No claim is judged by a person | NBC | draft 818–819; plan rule 12, 142–147 | settled |
 | TE289 | The netcode proof test's checklist is ADR 0001's; the boundary spike's is ADR 0002's | NBC | 0001 spike item 4, 968–969; 0002, 932–933 | settled (division) |
 | TE290 | Spike names, what each proves, owners | SE | map part g, 941–944 | settled (the map's assignment) |

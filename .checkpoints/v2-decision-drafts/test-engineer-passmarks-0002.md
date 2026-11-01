@@ -25,7 +25,7 @@ phase 1's slices (PM-0002-70 to PM-0002-76). Every number is a research mark (ci
   **CI**, GitHub's standard runner (ubuntu-24.04: 4 CPUs, 16 GB, no GPU: R5-CI-F17, r5 lines 673–676): counts,
   booleans and CI's own wall time only, never a hardware time (R3-MEASURE-REC3, r3 lines 1206–1209).
 - **BX, the boundary scene** (proposed): [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test)'s throwaway sim (movement, hitscan, bots as protocol
-  clients) in the Worker, filling the block at the stress scene's counts ([the stress scene](../research/GLOSSARY.md#the-stress-scene)): N soldiers in
+  clients) in the Worker, filling the block at the counts of [the stress scene](../research/GLOSSARY.md#the-stress-scene): N soldiers in
   three equal teams in one fight (16v16v16 at N = 48; the scale steps N = 12, 24 and 36 the same way), 15 big
   vehicles of which 4 are very large units of 20 parts, 300 live projectiles, and the tick's events. What the stand-in
   does not simulate (vehicles, projectiles) is a scripted mover that fills its section (proposed: the boundary's cost

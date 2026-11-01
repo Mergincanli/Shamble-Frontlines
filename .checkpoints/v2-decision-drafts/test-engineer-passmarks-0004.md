@@ -211,7 +211,8 @@ PM-0004-2, is neither a pass nor a fail.
   its order, and the moment mechanism has no research behind it.
 - S20's content half (zero panics over fuzzed content, R1-RR-OQ3) is ADR 0005's mark; the determinism suite's CI time
   (under 3 minutes, R5-TEST-REC2) is ADR 0002's.
-- No network profile applies outside PM-0004-61 and PM-0004-70: the sim core spike has no network in it.
+- Only PM-0004-61 and PM-0004-70 name a network profile; PM-0004-67 runs under the netcode proof test's own load
+  (ADR 0001's), and every other mark runs the sim with no network.
 
 **No Brave checklist.** No claim of this record is judged by a person (the draft's spike section); Mustafa's checklist
 for the netcode proof test (prediction, reconciliation and lag-compensated hits at P2, beside the confirmed-hit share,
