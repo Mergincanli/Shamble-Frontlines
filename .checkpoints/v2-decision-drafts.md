@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 09:23 Amsterdam
+- **Last update:** 2026-11-01 13:52 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -34,49 +34,14 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
-The run (03:55–11:00). Done since 03:55: ADR 0005's frame (engine-architect; record 2,059 lines, the four sections byte
-for byte, 34 open questions, ledger 135 rows; `engine-architect-adr0005-frame-parts/build_draft.py` rebuilds it after
-section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assembled (5bdad85) and ADR 0003 assembled
-(2a0e5f6) into docs/adr/; pass marks for 0001 (test-engineer; 56 marks, all in the netcode proof test, Mustafa's
-15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de); pass marks for 0002 (76 marks; the boundary
-spike PM-0002-1..34, the foundation's acceptance checks -35..69, later milestones -70..76); ADR 0002 assembled
-(789bedb); pass marks for 0004 (72 marks); ADR 0004 assembled (d321a13). Second spend-limit cut, about 05:30: the
-five running agents (pass marks 0005; verifiers 0001, 0002, 0004, 0006) failed with HTTP 429, "your 5-hour limit
-resets 7:50am (UTC)" (08:50 Amsterdam); their notes hold their progress. Resumed at about 09:00 (after the reset):
-pass marks 0005 (46 marks; its ledger last); ADR 0005 assembled (233f6f7; its four sections byte for byte, checked by
-script); all six drafts now in docs/adr/. Draft PR #33 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/33),
-subscribed to its activity (its head is a [skip ci] checkpoint commit for now: the run's last commit must run CI).
-Pass marks 0005 done with its ledger (242 rows); docs/adr/0005 re-assembled from the final file: identical. Verifier
-0006 done: FAIL with 3 defects (Sentry's IP note: `userInfo` off is not enough, headers, cookies and query strings need
-deny lists; R6-HOST-OQ4's second trigger "before the goal budget is fixed" dropped; the assembler's cut marker copied
-into the draft) and 11 lower findings; 581 of 588 rows confirmed; 29 source fetches, 28 read (one 403, read from its
-raw copy). The cut marker was in all six drafts: removed (cf00def; assemble.py now stops at it). Verifier 0001 done:
-PASS WITH NOTES (609 of 629 rows confirmed; 3 wrong, 3 unsupported, 5 citation off, 1 rule breach (F1, "whole tick"),
-1 unverified (the §8 anchors, until step 6); 3 source fetches, all 200; its line numbers are before cf00def, which
-moved lines after 1244 up by 2). Verifier 0004 done: PASS WITH NOTES (657 of 665 confirmed; 4 wrong, 1 unsupported,
-all low; its finding 1 was the cut marker, already removed; 6 fetches, 2 sources unverifiable). Verifier 0002 done:
-PASS WITH NOTES (515 of 538 confirmed; 2 wrong, 7 citation off; F-1 the cut marker (removed), F-2 Wasm calls per tick
-5–6 vs the mark's 4, F-3 rule 3: the `room` and `navbake` crates, the multiplayer-preview delivery shape and the block
-writer proposed with no research option (the research hands them to ADR 0002: needs the Advisor's ruling), F-5 CD-7's
-Vite reload plugin not in 0002; 42 fetches, 39 read, github.com 403 in this session). Running: the synthesis
-(engine-architect, launched about 09:03; documents due by 10:05), verifiers 0003 (launched about 09:08) and 0005
-(about 09:10), the skeptic for twelve findings of 0001, 0004, 0006 (launched about 09:14; `prompts/verifier-skeptic-1.txt`),
-docs-keeper done about 09:18: STATUS, ROADMAP, REPO_MAP (549490f); the repo-map check passes once the overview, the
-spike plan, the drafts' README and the report exist (its four "not in the repository" lines). The synthesis done:
-ENGINE_OVERVIEW (133 lines), SPIKE_PLAN, docs/adr/README.md copied verbatim, GLOSSARY §8 appended after the base's
-unterminated last line (80a27b3); dispositions.py: 521 of 521, each once; repo-map check: only the report missing.
-The synthesis listed 14 cross-draft disagreements (its notes, "For the consistency pass"). The skeptic for 0001/0004/0006
-done (09:18): 9 upheld, 2 partly (0004 row 253, 0006 finding 1), 1 refuted (0004 row 38); results
-`verifier-skeptic-1-results.md`. Fix round (step 9) started: infra-engineer resumed for 0006 (about 09:20,
-`prompts/fix-0006-infra-engineer.txt`; it writes BEFORE/AFTER blocks to `infra-engineer-adr0006-fixes.md`; the session
-applies them with `scripts/apply_fixes.py`); prepared: `prompts/fix-0001-netcode-architect.txt`,
-`prompts/fix-0004-rust-reviewer.txt` (send when slots free). 0006's fixes applied: 22 blocks, all exact (09803a9);
-glossary 0 exact in 0006; dispositions still 521/521. netcode-architect resumed for 0001's fixes (about 09:24).
-Running (5): verifiers 0003, 0005, the synthesis' verifier, the consistency critic, netcode-architect's fixes. Still
-open for 0006: findings 5 and 6 (pass-mark rows: test-engineer), 14 (ledger only). Waiting: the synthesis' verifier, the skeptic for 0002,
-0003, 0005's findings, the fix round, the critics,
-docs-keeper (`prompts/docs-keeper-TEMPLATE.txt`), the report (appendix started:
-docs/reports/2026-11-01-v2-decision-drafts-appendix.md, not yet committed).
+Third spend-limit cut at about 09:27 Amsterdam ("your 5-hour limit resets 12:50pm (UTC)", 13:50 Amsterdam): the
+consistency critic, the synthesis' verifier, verifier 0005 and netcode-architect's 0001 fix round failed with HTTP 429
+(their notes hold their progress); verifier 0003 finished first (PASS WITH NOTES: 431 of 440 confirmed; 1 wrong, 4
+unsupported, 2 citation off, 2 rule findings; 24 fetches, all 200). The session itself was cut too; the 10:40 wrap-up
+reminder fired at 10:40 but reached the session only at 13:52 and is superseded. Mustafa, 13:52, in the session's
+chat: "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
+His one-off night exception ended at 11:00; the normal rules apply again (daytime: fetching until 22:00, no new agent
+after 23:00). Resumed at about 13:53: the four cut agents, and rust-reviewer for 0004's fixes.
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
