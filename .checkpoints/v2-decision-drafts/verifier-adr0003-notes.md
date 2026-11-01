@@ -28,3 +28,18 @@ Task: verifier for ADR 0003 (rendering and presentation), v2-decision-drafts pla
   N2 (D7 draw cap): R3's 786 counts no full-screen post passes (bloom 12 passes F13, edge pass, AO, denoise); margin to 800 is ~14; whether renderer.info counts quad passes is not researched -> note only (R3 calls its counts conservative, r3:1151-1152).
   RTX 5080: ADR avoids R3's "headroom" word (r3:1101) - good (rule 5).
 Next: r3 OQs 1282-1430, Pointers 1460-1510, then ADR 398-611 (trace table, Options).
+- Trace table (ADR 398-443) vs LOOK_V2: every [DECIDED] and [DEFAULT] item has a row (§1 x4, §2 x9, §3 x6, §4 x3, §5 x2, §6.1-6.5 x7, §7 x3, §8 x3 + [OPEN] tree style with nothing decided). Rule 6 coverage: PASS.
+  Rule-6 notes: N3 (5.i) "and between the camera and the player" ports legacy GW17's camera-player cutaway, a visible behaviour LOOK_V2 does not name (§4 only: roofs fade when the player is inside); not in OQ-0003-15's list of legacy touches LOOK_V2 does not name -> low finding: add it to OQ-0003-15 (keep/change/drop, Mustafa) or mark it as legacy port pending his look check.
+  5.m "never moves the aim": legacy GP4 (INV line 314: "Aim is cast through the stable camera base, so shake ne[ver]...") -> a port of LOOK_V2 §2's kept legacy feel; no finding.
+  OQ section (704-797) read. OQ-0003-14 names the verifier as decider of the Web Audio spec read -> try webaudio spec fetch if time.
+- 09:2x: Options Q1-Q11 (451-611), Trade-off (612-642), Consequences (644-671), inventory table (672-703) read and checked vs r3 774-894 and LEGACY_INVENTORY marks (script over 71 INV lines).
+  F1 WRONG (row 211, inventory table, HUD line): "GP7, GP10, GP12, PG2–PG8, PG10–PG12, PG14–PG16, PG20 (...) | port to TypeScript (pending)": INV marks PG2 (360), PG4 (362), PG5 (363), PG6 (364), PG11 (369), PG12 (370), PG15 (373), PG20 (378) **redesign**, not port. Fix: split the line by mark.
+  All other 63 "Mark now" cells match INV (mark word and Look-brief-pending note present on every row).
+  N3 extra: GW17 inventory row proposes "the roof fade by flag over the player's enclosure" while 5.i adds "and between the camera and the player" -> internal mismatch, ties to rule-6 note N3.
+  N4 (Q6 options row / 5.c): proposed AO variant reads normals from the shared MRT pass; r3's researched row 815 is "normals from depth"; the MRT single-pass variant is R3-LOOK-OQ3/F11's "possible in principle, unmeasured" -> ADR does carry OQ3; note only (say "AO applied after lighting, R3-LOOK-OQ3's variant").
+  Options cells otherwise match r3 rows (C-A..C-G, L-1/2, V-A/B, M-A..D, B-1..3, T-A..C, W-A..D, P-A..D, V-A..C, O-A..C). M-D "rented by the minute" vs r3:846 "a rented GPU" (nit).
+Next: spike section + pass marks (799-1101), then Migration/Test/Rollback/AppA (1102-1276).
+- Spike section (799-883) checked vs r3 marks 910-1280, r1 2259-2262: all confirmed. r1 cites checked: 2094-2116, 2103-2104 (hit-stop), 2111-2112 (smoothness), 2129, 2184-2207 (quote 2192-2193), 2194, 2222, 2259-2262, 2265-2285 (2269 "keeps the latest two blocks"), 2662-2665, 2728-2731, 1739 (A3 "not assessed here") all confirmed.
+  r2 cites: 2437-2439 (INT-REC1 (a)), 2445-2466 (INT-REC2; quote 2451-2452, not 2450-2451: citation off by one line), 3005-3009, 3010-3013, 3220-3225 confirmed.
+  r4: FLOORS-REC2 925-939 confirmed (layer + enclosure area id = R2-INT-REC2's); OBST-REC2 1043-1061 "baked in both states" confirmed; FLOORS-REC1 903-924 = typed links (walk, jump-up, drop-down, gap jump; list is data) but names no planks or debris -> N5 the plank mapping is an inference (no "plank" in r4). r6 OBS-REC4 769-780 confirmed.
+Next: pass marks 884-1101.

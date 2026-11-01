@@ -109,7 +109,7 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 | R1-BND-OQ1 | DESIGN: Mustafa | whether solo play against bots ships offline is a product need VISION_V2 does not state; SLICE-ORDER already gives local play from slice 2 (decision map S11) |
 | R1-ABL-OQ6 | DESIGN: Mustafa | stacking of slows and marks, regeneration, seats and active reload numbers are game rules the ability system carries but does not decide |
 | R1-DATA-OQ10 | DESIGN: Mustafa with the game-designer | which tunables a private match exposes is a rule about what hosts may change |
-| R1-XT-OQ8 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is the same product question as R1-BND-OQ1 |
+| R1-XT-OQ8 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is the same product question as offline play itself (two rows up) |
 | R2-SYNC-OQ7 | DESIGN: Mustafa | seats for several players in a vehicle are VISION_V2 §6.4 `[OPEN]`; the drafts only keep them possible |
 | R2-BUD-OQ5 | DESIGN: the game-designer, with Mustafa | caps on vehicles and live projectiles per team are game rules; until they exist the stress scene's counts stand (GLOSSARY §3) |
 | R2-INT-OQ1 | DESIGN: Mustafa with the game-designer | what a player may see (the camera's view or the character's sight) is a game rule LOOK_V2 does not settle |
@@ -121,28 +121,28 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 | R2-ROOM-OQ4 | DESIGN: Mustafa | whether humans may join a running match, and what the bot does then, is a game rule |
 | R2-ROOM-OQ5 | DESIGN: Mustafa | what a private-room host may set is a product rule (ADR 0001's OQ-0001-11 cites it) |
 | R2-ROOM-OQ6 | DESIGN: Mustafa | what happens when the host leaves is a product rule |
-| R2-ROOM-OQ7 | DESIGN: Mustafa | whether private matches count for Service points and telemetry is a product rule (with R6-TEL-OQ2) |
+| R2-ROOM-OQ7 | DESIGN: Mustafa | whether private matches count for Service points and telemetry is a product rule |
 | R2-XU-OQ17 | DESIGN: Mustafa | whether rooms have spectators or casters is a product feature no §6 item asks for |
 | R2-XT-OQ13 | DESIGN: the game-designer with Mustafa | critic rank 30: whether soldiers block each other is one game rule asked twice |
-| R3-CHAR-OQ5 | DESIGN: Mustafa | camera framing (as R2-INT-OQ2) is not set by LOOK_V2 |
+| R3-CHAR-OQ5 | DESIGN: Mustafa | camera framing is a look and feel choice LOOK_V2 does not set |
 | R4-PHYS-OQ1 | DESIGN: the game-designer with Mustafa | who blocks whom (critic rank 30) is a game rule |
 | R4-NAV-OQ5 | DESIGN: the game-designer with Mustafa | whether soldiers block each other (critic rank 30) is the same game rule |
 | R4-FLOORS-OQ1 | DESIGN: Mustafa | crouching and other stances are a game rule |
 | R4-FLOORS-OQ2 | DESIGN: Mustafa | whether bots drive vehicles and a Juggernaut climbs ramps is a game rule |
 | R4-FLOORS-OQ3 | DESIGN: Mustafa | fall damage and drop height are game rules |
 | R4-LOS-OQ1 | DESIGN: Mustafa with the game-designer | whether soldiers and vehicles block sight and shots is a game rule |
-| R4-LOS-OQ2 | DESIGN: Mustafa with the game-designer | what a player may see is the same question as R2-INT-OQ1 |
+| R4-LOS-OQ2 | DESIGN: Mustafa with the game-designer | what a player may see is a game rule LOOK_V2 does not settle (asked again for the sight pass) |
 | R4-LOS-OQ3 | DESIGN: the game-designer with Mustafa | a field of view for bots is bot design |
 | R4-LOS-OQ4 | DESIGN: the game-designer with Mustafa | whether hedges, fences and smoke block partly is a game rule; the yes-or-no form is a data flag |
 | R4-OBST-OQ1 | DESIGN: the game-designer with Mustafa | what a vehicle does to soldiers in its path (block, push, crush) is a game rule (critic rank 30) |
 | R4-OBST-OQ2 | DESIGN: Mustafa | whether harvesters follow fixed lanes or navigation is a LOOP_V2 §3 rule |
 | R4-OBST-OQ3 | DESIGN: Mustafa | player building exists only if Mustafa adds it to VISION_V2 §6 |
-| R4-XT-OQ4 | DESIGN: Mustafa and the Advisor | critic rank 15: the offline-play need, as R1-XT-OQ8 |
-| R4-XT-OQ6 | DESIGN: the game-designer with Mustafa | critic rank 30: whether soldiers block each other, as R2-XT-OQ13 |
-| R5-XT-OQ4 | DESIGN: Mustafa and the Advisor | critic rank 15: the offline-play need, as R1-XT-OQ8 |
+| R4-XT-OQ4 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is a product question |
+| R4-XT-OQ6 | DESIGN: the game-designer with Mustafa | critic rank 30: whether soldiers block each other is a game rule |
+| R5-XT-OQ4 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is a product question |
 | R6-TEL-OQ2 | DESIGN: Mustafa | whether bot matches and private matches count in balance rates is a product rule |
 | R6-TEL-OQ3 | DESIGN: Mustafa with the game-designer | which moments the server recognizes, and their thresholds, are game rules (ADR 0005's OQ-0005-CD6 cites them) |
-| R6-XT-OQ2 | DESIGN: Mustafa and the Advisor | critic rank 15: the offline-play need, as R1-XT-OQ8 |
+| R6-XT-OQ2 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is a product question |
 
 ## Loose-ends register
 Each loose end, with where it is resolved (draft and part) or which open question lists it.

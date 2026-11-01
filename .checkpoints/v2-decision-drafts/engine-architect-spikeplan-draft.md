@@ -51,7 +51,7 @@ flowchart LR
     LOOK["Look proof test (L)<br/>Mustafa judges"]
     PREV["Preview hosting check (S)"]
   end
-  SIM -- "its sim, if OQ-0001-2 (a)" --> M60["60 Hz margin run<br/>(inside the netcode proof test)"]
+  SIM -->|"its sim, if OQ-0001-2 (a)"| M60["60 Hz margin run<br/>(inside the netcode proof test)"]
   NPT --> M60
   W1 --> F["The foundation<br/>(acceptance checks, not a spike)"]
   F --> W3

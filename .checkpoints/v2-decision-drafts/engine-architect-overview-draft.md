@@ -34,17 +34,17 @@ flowchart TB
   end
   CONTENT["content crate: JSON validated, one hashed bundle (ADR 0005)"]
   SIM["sim crate: plain typed tables, integer ticks, parry3d, baked navigation (ADR 0004)"]
-  IN -- "one command per tick (posted)" --> SW
-  SW -- "one transferred block per tick: header, entity sections, events" --> R
+  IN -->|"one command per tick (posted)"| SW
+  SW -->|"one transferred block per tick: header, entity sections, events"| R
   R --> AU
   R --> HUD
   SW --- WASM
   WASM --- NET
-  NET <-- "commands up; snapshots and events down (ADR 0001 protocol)" --> ROOM
+  NET <-->|"commands up; snapshots and events down (ADR 0001 protocol)"| ROOM
   ROOM --- SUP
-  SIM -. "same code" .-> WASM
-  SIM -. "same code" .-> ROOM
-  CONTENT -. "read by id" .-> SIM
+  SIM -.->|"same code"| WASM
+  SIM -.->|"same code"| ROOM
+  CONTENT -.->|"read by id"| SIM
 ```
 In words: the page posts one command per tick to the Worker and receives one block per tick back; it makes no call
 into Wasm and touches no network (ADR 0002 part 5). The Worker holds the Rust sim as Wasm and owns the connection (ADR
