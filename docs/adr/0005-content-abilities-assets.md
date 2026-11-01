@@ -1157,7 +1157,8 @@ the data model carries every option listed.
     as unlocking a class; narrows pillar 7. (d) An account loadout sets a class's weapon before the match, not when
     buying; keeps the buy step choice-free, but adds a weapon choice UPGRADE-SCOPE's words do not cover.
   - Nothing is built now: the catalogue is `[LATER]` (LOOP_V2 §8) and accounts are `[LATER]` (VISION_V2 §6.10). The
-    data model rules none out (a unit definition names its weapons, AB-4). ADR 0006 cites this.
+    data model rules none out (a unit definition names its weapons, AB-4). ADR 0006 builds no account store (accounts
+    are `[LATER]` there, its legacy row GE15 included), so the unlock catalogue's weapon question is asked only here.
   - Decider: Mustafa, with the Advisor (LOOP_V2 §8 is theirs). What decides it: the unlock catalogue's design session,
     before any weapon unlock is built. Research ids: none.
 - **OQ-0005-AB6. How do the player's tracks sit beside the team's tech tiers?**
@@ -1187,13 +1188,17 @@ the data model carries every option listed.
   - Decider: Mustafa. What decides it: a design session, then the Feel Lab or playtests. Research ids: none.
 - **OQ-0005-AB9. Which drop and pickup rules does UPGRADE-SCOPE leave unstated?**
   - Why it matters: ADR 0004 builds pickups as sim entities that read these values from data; until they exist, the
-    spike uses placeholders.
-  - Options for what a killed enemy drops: (a) its class weapon; (b) the gun in its hands; (c) every weapon it carried.
-    Also Mustafa's, each a value in data: how long a pickup stays; whether a gun a player swaps out becomes a pickup that
-    anyone can take; whether only the killer's team, or anyone, may take a drop; whether a teammate's death drops
-    anything (his words name "killed enemies' drops" only).
-  - Decider: Mustafa. What decides it: a design session, with OQ-0005-AB1. Research ids: none; whether a pickup is
-    predicted is ADR 0001's (Quake III predicts item pickups: R2-SYNC-F17, r2-netcode.md, Findings, lines 230–236).
+    spike uses placeholders. This is the one place the question is asked: ADR 0004's OQ-0004-5 points here and keeps
+    only the mechanism (two claims on one pickup in one tick resolve in its phase's fixed, deterministic order).
+  - Options for which deaths drop: (i) any death; (ii) only a death to an enemy (his words name "killed enemies' drops"
+    only). Options for what a dead soldier drops: (a) its class weapon; (b) the gun in its hands; (c) every weapon it
+    carried. Options for who may take a drop: the killer's team; any enemy of the dead soldier (in three-team modes two
+    teams, not one); or anyone. Also Mustafa's, each a value in data: how long a pickup stays; whether a gun a player
+    swaps out becomes a pickup that anyone can take; which of two claims on one pickup in the same tick wins (ADR 0004
+    keeps the order deterministic whichever is chosen).
+  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1. Research ids: none;
+    whether a pickup is predicted is ADR 0001's (Quake III predicts item pickups: R2-SYNC-F17, r2-netcode.md, Findings,
+    lines 230–236).
 - **OQ-0005-AB10. Do bots have tracks and make picks, and what does a human get when taking a bot's slot?**
   - Why it matters: bots fill empty slots (LOOP_V2 §2 `[DECIDED]`; VISION_V2 §3), and a joining human takes a bot's
     slot (R2-ROOM-REC6, r2-netcode.md, Recommendations, lines 2842–2846, ADR 0001's); tracks are owned by the player.

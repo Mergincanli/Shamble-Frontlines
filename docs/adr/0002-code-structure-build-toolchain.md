@@ -110,10 +110,10 @@ and the R1 and R5 research found one way to build it that is checked by machines
   (row TL11, line 396; r5-toolchain-quality.md, R5-TEST-REC3, lines 1444–1445).
 - Exact pins, a lockfile, `npm ci` and the CI hygiene (SHA-pinned actions, read-only token, `persist-credentials:
   false`, concurrency cancel) are proven here (rows TL17 and KT8, lines 402 and 417).
-- The headless "SIM fence" leaked through comments (row CS11; r1-simulation-core.md, legacy facts, lines 1176–1178),
-  the frame loop stepped the world inside the render loop (rows GP13 and GP14; r1 lines 1159–1164), and the input command
-  was declared but never wired (row CS1; r1 lines 1150–1154): the crate boundary, the Worker and the per-tick command fix
-  these.
+- The headless "SIM fence", a fence made of comments, leaked: shape data came from the visual recipe and `hasLOS` read a
+  global (row CS11; r1-simulation-core.md, legacy facts, lines 1176–1178); the frame loop stepped the world inside the
+  render loop (rows GP13 and GP14; r1 lines 1159–1164); and the input command was declared but never wired (row CS1; r1
+  lines 1150–1154): the crate boundary, the Worker and the per-tick command fix these.
 - At 48 soldiers the legacy JavaScript combat step took 0.80–1.00 ms per update step on the main thread (row GC2;
   r1-simulation-core.md, lines 1168–1171): a scale for what the Worker takes off the page, not a v2 figure.
 - Two hand-synced HTML pages exist only because of classic scripts and `file://` (row PG1, line 359), and the three.js
@@ -170,7 +170,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
      1750–1755, 1766–1769, 1833–1834, 1895–1898; r1-simulation-core.md, R1-BND-F1, lines 886–893; R1-BND-REC4, lines
      2297–2308; R1-BND-OQ7, lines 2741–2744).
    - Need: GLOSSARY §8, the foundation only ("the toolchain"); through R1-DET-REC6's native-against-Wasm comparison,
-     VISION_V2 §6.6 and §6.8 (re-runnable matches).
+     VISION_V2 §6.6 and §3, as R5-CI-REC2 traces it (r5-toolchain-quality.md, line 1532; R1-DET-REC6 serves §6.6 and
+     §3, r1-simulation-core.md lines 2236–2237).
 3. **Crates, packages and who may depend on whom.** The crates, each entering the workspace with the first slice that
    needs it (no crate "for later"):
    | Crate | What it holds | Depends on | Enters | Need |
@@ -210,10 +211,12 @@ built from the tested artifact. Each part says what, why, its research ids and t
      ships in the player's Wasm (the critic's R4-XT-OQ5, r4-physics-navigation.md lines 1195–1200), and the bake runs in
      CI, on map save and in the editor's Test (R4-NAV-REC1, r4 lines 802–810), never in prediction (R4-NAV-REC4, r4
      lines 888–899). Both placements answer questions the critic gave this record; no research compared them with
-     other placements.
-   - The cache question (critic rank 40) is answered by this list: no ECS crate and parry3d rather than Rapier (ADR
-     0004, part 1), quinn and the WebTransport crate the netcode proof test picks (ADR 0001, part 10); the cache is
-     measured on this workspace against R5-CI-REC1's 8 GB mark in the foundation (part 9).
+     other placements. Both are proposed (not researched): no research Options section offers a crate for the room
+     logic or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; whether plan rule 3
+     allows that is OQ-0002-8, for the Advisor at the stop.
+   - The cache question (critic rank 40) is answered by this list: no ECS crate (ADR 0004, part 1) and parry3d rather
+     than Rapier (ADR 0004, part 10), quinn and the WebTransport crate the netcode proof test picks (ADR 0001, part 10);
+     the cache is measured on this workspace against R5-CI-REC1's 8 GB mark in the foundation (part 9).
    - Ids: R5-LAYOUT-REC2 (changed), R5-LAYOUT-REC4, R5-LAYOUT-OQ3, R5-XT-OQ7, R5-XT-OQ14, R1-XT-OQ18, R4-XT-OQ5,
      R4-XT-OQ8 (r5-toolchain-quality.md, Recommendations, lines 1170–1218; Open questions, lines 1756–1758, 2002–2007,
      2033–2036; r1-simulation-core.md lines 3109–3112; r4-physics-navigation.md lines 1195–1200 and 1211–1214).
@@ -228,12 +231,14 @@ built from the tested artifact. Each part says what, why, its research ids and t
    the target's default `-Cpanic=abort` (R1-BND-F19), so a trap ends the sim's instance, and the restart after a trap
    is ADR 0004's (part 20) with ADR 0001's resync path. The server is built for baseline x86-64, never with `+fma`,
    `-C target-cpu=native` or the `relaxed-simd` target feature: the gate reads the build flags of `sim`, `room`,
-   `sim-wasm` and `server` and fails if one appears (the rule is ADR 0004's, part 9; the check is this record's).
+   `sim-wasm` and `server` and fails if one appears (the rule is ADR 0004's, part 7; the check is this record's).
    `unsafe_code` is denied in every crate; an exception needs a written invariant, a test and an `#[allow]` with its
-   reason. The Wasm size budget has no research number: the boundary spike and the sim core spike measure the
-   `sim-wasm` file (raw and gzip, after wasm-opt and without it, `opt-level` "s" against "z", with parry3d), and the
-   budget file (part 9) takes the measured value as its first limit; every served file stays under the client host's
-   25 MiB per-file limit.
+   reason. The Wasm size budget has no research number, and this record owns it (R1-RR-OQ5): the boundary spike and
+   the sim core spike measure the `sim-wasm` file (raw and gzip, after wasm-opt and without it, `opt-level` "s" against
+   "z", with parry3d), the content and ability spike measures the share the `content` crate adds (ADR 0005,
+   OQ-0005-CD2), and the Advisor sets the first limit in the budget file (part 9) from both measurements; until then
+   G7 records the `sim-wasm` size and does not gate it. Every served file stays under the client host's 25 MiB
+   per-file limit.
    - Why: Cargo's dev and release profiles differ on overflow by default (R5-RUSTLINT-F13), and one remote panic must not
      end a 48-player match.
    - Ids: R5-RUSTLINT-REC4, R1-RR-OQ4, R1-RR-OQ5, R5-RUSTLINT-OQ4 (r5-toolchain-quality.md, Recommendations, Question 3,
@@ -249,33 +254,44 @@ built from the tested artifact. Each part says what, why, its research ids and t
      once into a pooled `ArrayBuffer` and transferred to the page. It holds a header (tick, layout hash, counts per
      entity kind), aligned sections per entity kind (soldiers, vehicle parts, projectiles, structures, weapon pickups,
      which are sim entities under UPGRADE-SCOPE, ADR 0004 part 18), one section of owner-only data for the local player
-     (own weapon state, money, upgrade tracks and offers: decision map I-21) and the event section for the tick (hits,
-     deaths, blasts, cosmetic shot events, purchases, captures, pick results, drops, moments: ADR 0004 part 19 emits
-     them, ADR 0001 sets their visibility). Online, remote entities are written at the interpolation delay from the
-     Worker's interpolation buffer and the local player as predicted (ADR 0001 parts 4, 6, 7); the fields of remote
+     (own weapon state, money, upgrade tracks and offers: decision map I-21) and the event section for the tick (the
+     events of ADR 0004 part 19: hits, deaths and kills, blasts, cosmetic shot events, purchases, uplink cache events,
+     harvester deliveries and kills, structure kills and stage changes, tech tiers, upgrade picks and pickups, and the
+     moments its moment phase emits; ADR 0001 sets their visibility). Online, remote entities are written at the
+     interpolation delay from the Worker's interpolation buffer and the local player as predicted (ADR 0001 parts 4,
+     6, 7); the fields of remote
      entities are ADR 0001's snapshot fields in this record's layout. The page binds typed-array views on the block
      with no copy, keeps the two newest blocks to interpolate between ticks (R1-TICK-REC5) and returns older ones to
      the pool. Whether a section is laid out per entity or per field is measured in the boundary spike (bytes per tick
-     and copy time at N = 48); ADR 0003 reads typed arrays either way. The block writer serializes field by field, as
-     [the state hash](../research/GLOSSARY.md#state-hash) already does (R1-DET-REC6), so struct padding never reaches the page and no `unsafe` is needed; if
-     the spike's copy time says otherwise, R1-RR-OQ6's two alternatives (a derive that rejects padding, or `unsafe` with
-     a written invariant and a test) are weighed then. The SharedArrayBuffer ring (B3) is the spike's measured
-     alternative, never the sim's own shared Wasm memory (B4). At the 30 Hz baseline that is 30 blocks a second
+     and copy time at N = 48); ADR 0003 reads typed arrays either way. The block writer serializes field by field
+     (proposed: R1-DET-REC6's method for [the state hash](../research/GLOSSARY.md#state-hash), applied to the block;
+     R1-RR-OQ6's decider, rust-reviewer, confirms at review), so struct padding never reaches the page and no `unsafe`
+     is needed; if the spike's copy time says otherwise, R1-RR-OQ6's two alternatives (a derive that rejects padding,
+     or `unsafe` with a written invariant and a test) are weighed then. The SharedArrayBuffer ring (B3) is the spike's
+     measured alternative, never the sim's own shared Wasm memory (B4). At the 30 Hz baseline that is 30 blocks a second
      (one per tick).
    - **One command per tick, posted** from the page to the Worker (option C1): a sequence number, the move input, the
      held-button bitmask and press and release edge counters (their exact fields are ADR 0001's), plus the camera's
      cursor ray and the view time the page drew; the Worker casts that ray against the state it published and fills the
      network command's aim point (ADR 0001 part 5; decision map I-19), so the aim needs no second message. The Worker
      stamps the tick it applies the command to.
-   - **The small control API** (create, mode flag, load the content bundle, step, the block's pointer and length) is
-     wasm-bindgen's own, with its `.d.ts` (option D1); it is called a constant number of times per tick, never per
-     entity.
+   - **The small control API** (create, mode flag, load the content bundle, one input call per tick, and the step) is
+     wasm-bindgen's own, with its `.d.ts` (option D1). Each tick the Worker's host makes one input call, which carries
+     the page's command and every datagram received since the last tick, and one step call; the step leaves the
+     outgoing datagrams and the block in linear memory and returns where they lie. The Worker's Wasm calls per tick,
+     wasm-bindgen's glue calls included, are meant to stay within R1-BND-REC1 mark 2's four, which the spike counts
+     (item 1); none is made per entity.
    - **Generated types, from three sources, into one committed package** `packages/types`: wasm-bindgen's `.d.ts` and
      glue are build output (ignored); our own small generator writes the block's layout (offsets, strides, element
      types) and its layout hash, which the page checks at startup (option D4); ts-rs writes the protocol and message
      types into `packages/types/src/generated/` on `cargo test`, through `TS_RS_EXPORT_DIR` in `.cargo/config.toml`
      (option D3); content's types land in the same package, from the source ADR 0005 picks (critic rank 31). Not tsify.
      The gate regenerates all of them and fails on any difference or hand edit (G4).
+   - **Content files in development:** a small Vite plugin, in the `client` package's Vite config and never in a
+     production build, pushes changed content files to the page, which posts them to the Worker (R1-DATA-REC5,
+     r1-simulation-core.md lines 2545–2547; ADR 0005, CD-7); whether Vite's hot update reaches the Worker directly is
+     PM-0002-31's to measure (R1-DATA-OQ8). What a running match does with a changed file is ADR 0005's
+     (OQ-0005-CD4).
    - **Cross-origin isolation is off** for v2's start (option G1). [The isolation flag](../research/GLOSSARY.md#preview-isolation-and-the-isolation-flag)
      adds COOP `same-origin` and COEP `require-corp` only to profiling builds, locally or on
      [a preview](../research/GLOSSARY.md#preview) built with it on (option G3); the preview Mustafa checks is built
@@ -284,10 +300,10 @@ built from the tested artifact. Each part says what, why, its research ids and t
      alternative (W3), which needs shared memory, passes it; then the default flips everywhere at once, B3 and posted
      inputs through shared memory (C2) become available, and the cost list of R1-BND-REC5 applies (OQ-0002-4).
    - **The Worker owns the network connection** online (option H2): server snapshots, prediction and reconciliation
-     never touch the page, which sees only the block. The Worker's host hands the tick's received datagrams to Wasm in
-     one call and takes the tick's outgoing ones in one call, so its Wasm calls per tick stay the same at every N
-     (R1-BND-REC1 mark 2), even when a snapshot is split into several datagrams. What flows over the connection is ADR
-     0001's.
+     never touch the page, which sees only the block. The received datagrams ride in the tick's one input call and the
+     outgoing ones come back through the step (the control API above), so the Wasm calls per tick stay the same at
+     every N (R1-BND-REC1 mark 2), even when a snapshot is split into several datagrams. What flows over the connection
+     is ADR 0001's.
    - Why: the tick leaves the render thread; one bounded copy per tick needs neither isolation nor nightly Rust; one
      small message per tick is constant work; the block's layout is the only thing tsify and ts-rs cannot type.
    - Ids: R1-BND-REC1 to R1-BND-REC6, R5-LAYOUT-REC3, R5-LAYOUT-REC5, R1-XU-OQ3, R1-XU-OQ4, R1-BND-OQ4, R1-BND-OQ6,
@@ -315,7 +331,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
      online play, so no code path exists only offline.
    - Ids: R1-BND-REC6, R1-BND-REC1 (the Worker), R5-LAYOUT-REC2 (the packages); cites R2-TRN-REC4 as ADR 0001 changes
      it (the loopback backend), R1-BND-OQ1, R1-XT-OQ8 and R5-XT-OQ4 (offline play as a shipped feature: a design
-     question, decision map S11).
+     question for Mustafa, listed in `docs/adr/README.md`'s design questions).
    - Need: SLICE-ORDER condition 1; GLOSSARY §8, the foundation ("the client + local server skeleton"); VISION_V2 §3
      ("Bots fill empty slots") and §4 (prediction is not delayed by a busy frame), as R1-BND-REC6 traces them (r1
      lines 2330–2332).
@@ -436,7 +452,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | G4 | boundary | generated types, layout and schema regenerate with zero diff; the wasm-bindgen CLI equals the library in `Cargo.lock` |
    | G5 | dependency rules | part 3's rules (cargo-deny bans and `cargo tree`); `multiple-versions` and `wildcards` at deny with a reviewed skip list; the same-feature check for `sim` |
    | G6 | build | native release (`server` once it exists, `devtools`); `sim-wasm` to Wasm; Vite build of both entries |
-   | G7 | budgets | Wasm bytes (raw and gzip) and JS bytes per entry against the committed budget file; fail above it |
+   | G7 | budgets | Wasm bytes (raw and gzip) and JS bytes per entry against the committed budget file; fail above it (the `sim-wasm` size is recorded, not gated, until its first limit is set: part 4) |
    | G8 | player build | walk Vite's manifest from the player entry: no chunk from `editor` |
    | G9 | tests | `cargo test --workspace` (unit, property with the fixed seed, legacy goldens, insta), Wasm tests in Node, Vitest |
    | G10 | determinism | the short recordings: native in two processes, Wasm in Node, Wasm in Chromium, Firefox and WebKit; first mismatch reported |
@@ -576,7 +592,7 @@ is settled by GLOSSARY §8, the foundation ("a Cargo workspace plus TypeScript w
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | R5-LAYOUT-REC2 as written: rooms inside `server`, the bake unplaced | low | – | – | decoders in `protocol` either way | none | new | the smallest list | the local server of SLICE-ORDER condition 1 cannot run in the Worker without `server`'s async runtime and transport, which the default Wasm target cannot carry (R1-BND-F19); where the bake ships stays open (R4-XT-OQ5) |
-| **R5-LAYOUT-REC2 plus an I/O-free `room` crate and a `navbake` crate above `sim` (chosen)** | low–medium: two more crates and two more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; the bake shared by CI, map save and the editor | two placements no research compared with others (the critic's questions only frame them) |
+| **R5-LAYOUT-REC2 plus an I/O-free `room` crate and a `navbake` crate above `sim` (chosen)** | low–medium: two more crates and two more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; the bake shared by CI, map save and the editor | not researched as a placement (no Options section offers a crate for the room logic or the bake; SLICE-ORDER condition 1 and R4-XT-OQ5 leave it to this record): proposed only for the Advisor's ruling at the stop (OQ-0002-8) |
 
 ### Q5. Which TypeScript (r5 lines 1019–1024)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
@@ -725,7 +741,8 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   boundary spike measures it, and OQ-0002-3 picks between one Wasm instance and two.
 - **Two crates beyond R5's list** (`room`, `navbake`) cost two more dependency checks; without them the local server
   cannot run in the Worker, and the bake's generator would risk shipping in the player's Wasm. No research compared
-  other placements, so the first foundation milestone that builds them is also their test.
+  other placements, so the first foundation milestone that builds them is also their test; whether rule 3 allows
+  proposing them at all is OQ-0002-8.
 - **Strict TypeScript and lint, pinned exactly** catch the bugs the boundary invites, at the price of churn: strict
   configs are not semver-stable, so every upgrade is its own change-set, and the cost of the strictest flags against
   three.js's own types is not measured yet (R5-TSLINT-OQ4; the boundary spike counts it).
@@ -874,6 +891,22 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     (VERIFY-FETCH (a)); this draft fetched nothing.
   - What decides it: what those two pages say about maintainers and release policy.
   - Research ids: R1-BND-OQ7.
+- **OQ-0002-8. May this record propose a structure no research Options section offers, when a settled input forces it
+  and the research leaves the question to this record?**
+  - Why it matters: plan rule 3 says an option the research lacks is labelled "not researched" and cannot be the
+    proposed decision. SLICE-ORDER condition 1 runs the local server in the Worker, which needs room logic that builds
+    for Wasm, while R5-LAYOUT-REC2 puts rooms inside `server` (r5-toolchain-quality.md, lines 1173–1174); and the critic's
+    questions hand structure to this record with no answer on one side ("Decided by: ADR-0002": R4-XT-OQ5,
+    r4-physics-navigation.md lines 1195–1200, the bake's place; R5-XT-OQ6, r5 lines 1996–2001, the multiplayer-preview
+    workflow, whose parts part 10 takes from research recommendations).
+  - Options: (a) rule 3 allows it in such cases: the `room` and `navbake` crates stay proposed, labelled "not
+    researched", and the first foundation milestone that builds them is their test; (b) rule 3 holds: both become open
+    questions, a short layout research unit answers them before the foundation, and part 3 keeps R5-LAYOUT-REC2's list
+    until then.
+  - Decider: the Advisor, at the stop.
+  - What decides it: whether rule 3 is meant to cover structure that a settled input forces and the research hands to
+    this record.
+  - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 and R5-XT-OQ7.
 
 ## What a spike must prove
 **The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs with the netcode proof test,
@@ -884,7 +917,8 @@ sets the final table.
    `hardwareConcurrency` recorded), at N = 12, 24, 36 and 48 soldiers, the page's frame time p95 with the sim in the
    Worker is no worse than with no sim by more than 1.0 ms (the page's cost of the sim: ADR 0003 owns the budget row,
    which states it as a p99, decision map LE-B); the page makes zero calls into Wasm; the Worker makes the same number of
-   Wasm calls per tick at N = 12 and N = 48, at most 4 for the online client and for a local match in one instance
+   Wasm calls per tick at N = 12 and N = 48, wasm-bindgen's glue calls included (part 5 batches the command and the
+   received datagrams into one input call), at most 4 for the online client and for a local match in one instance
    (OQ-0002-3 (a)), at most 8 for a local match in two instances (b) (proposed: R1-BND-REC1's 4 per instance stepped,
    times two instances); the same build runs in the latest desktop Chrome, Edge, Firefox and Safari, and in Brave (Mustafa's
    browser).
@@ -915,14 +949,16 @@ sets the final table.
    snapshots (Worker timestamps); the local match and the online client run the same Wasm file and the same page code,
    differing only in the mode flag; the Wasm calls per tick, the Worker's time per tick and the memory of one instance
    against two in a local match (OQ-0002-3).
-7. **The Worker's pacing and the client's sim share** (ADR 0004's marks, measured here as the decision map's part g
-   places them): ADR 0004's S18 (tick start jitter, smoothness on 60, 120 and 144 Hz displays, hidden tabs) and
+7. **The Worker's pacing and the client's sim share** (ADR 0004's marks, measured here as `docs/SPIKE_PLAN.md`
+   places them, item 3): ADR 0004's S18 (tick start jitter, smoothness on 60, 120 and 144 Hz displays, hidden tabs) and
    R1-TICK-REC2's P2 with the stand-in load; if the timer pacing fails its jitter mark, W3 is measured on an isolated
    build (OQ-0002-4).
 8. **Size and tools** (parts 2, 4 and 7): the `sim-wasm` file's size recorded raw and gzipped, with and without
    wasm-opt, at `opt-level` "s" and "z" (R1-RR-OQ5, R5-CI-OQ4); no pass mark (the research has no number): the
-   measurement becomes the budget file's first limit, under the client host's 25 MiB per-file limit; the count of
-   type errors and casts the page needs against three.js's types under the base tsconfig (R5-TSLINT-OQ4); `tsc -b` time
+   measurement is one input to the budget's first limit, which the Advisor sets after the content and ability spike
+   has measured the content crate's share (part 4); every served file stays under the client host's 25 MiB per-file
+   limit; the count of type errors and casts the page needs against three.js's types under the base tsconfig
+   (R5-TSLINT-OQ4); `tsc -b` time
    with `skipLibCheck` on and off (R5-TSLINT-OQ6); whether Playwright's clock reaches the Worker (R5-TEST-OQ1).
 9. **The editor from `file://`** (part 11; OQ-0002-1): the built editor entry, opened from `file://`, loads its module
    Worker and Wasm in Chrome, Edge, Firefox, Safari and Brave, or the failure is recorded per browser.
@@ -932,8 +968,8 @@ sets the final table.
 **Where a person judges:** Mustafa runs the spike's page and a preview link in Brave on his Windows machine (marks 1
 and 9 name Brave); test-engineer adds the Brave checklist with each step's expected result.
 
-**The foundation** is not a spike: its acceptance checks are the milestones of the Migration plan's phase 2 (decision
-map part g, "Not throwaway spikes").
+**The foundation** is not a spike: its acceptance checks are the milestones of the Migration plan's phase 2
+(`docs/SPIKE_PLAN.md`, "The foundation's acceptance checks (not a spike)").
 
 ### Pass marks
 Written by test-engineer (plan step 4). One row per mark: the Rust ↔ TypeScript boundary spike's first (PM-0002-1 to
@@ -1289,18 +1325,18 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R1-XU-OQ3 | spike: the boundary spike (B2 against B3, R1-BND-REC2 mark 5) | part 5; the spike's item 2 |
 | R1-XU-OQ4 | spike: the boundary spike (the timer pacing's jitter; W3 on an isolated build only if it fails) | part 5's rule; the spike's item 7 |
 | R1-RR-OQ4 | answered: overflow checks on for `sim` and `protocol` in every profile; explicit wrapping or checked counters | part 4 |
-| R1-RR-OQ5 | spike: the boundary spike and the sim core spike measure the size; the budget file takes the measurement | part 4; the spike's item 8 |
-| R1-RR-OQ6 | answered: the block writer serializes field by field, as the state hash does; the derive or `unsafe` only if the copy time says so | part 5; the spike's item 2 reports the copy time |
+| R1-RR-OQ5 | spike: the boundary spike and the sim core spike measure the `sim-wasm` size, and the content and ability spike the content crate's share; the Advisor sets the first limit from both | part 4; the spike's item 8 |
+| R1-RR-OQ6 | answered (proposed; rust-reviewer, its named decider, confirms at review): the block writer serializes field by field, as the state hash does; the derive or `unsafe` only if the copy time says so | part 5; the spike's item 2 reports the copy time (PM-0002-10) |
 | R1-XT-OQ10 | open: OQ-0002-1 | part 11 |
 | R1-XT-OQ15 | answered: the tick bench is a mode of the `devtools` replay runner (3 runs per build; mean, p50, p95, p99, max) | part 8 |
 | R1-XT-OQ18 | answered: the crate list follows ADR 0004 (no ECS crate, parry3d) and ADR 0001 (quinn, the proof test's WebTransport crate); the cache is measured on it | part 3 |
 | R2-XT-OQ10 | answered: the binary-delivery job and the hash written into the preview's files; the token's scope waits on the security baseline | part 10 |
 | R3-MEASURE-OQ4 | answered: the isolation flag, for profiling builds only | part 5 |
 | R3-XT-OQ3 | open: OQ-0002-1 | part 11 |
-| R4-XT-OQ5 | answered: the bake in its own `navbake` crate, never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
+| R4-XT-OQ5 | answered: the bake in its own `navbake` crate (proposed, not researched: OQ-0002-8), never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
 | R4-XT-OQ8 | answered: as R1-XT-OQ18 | part 3 |
 | R5-LAYOUT-REC1 | adopted | parts 1 and 2 |
-| R5-LAYOUT-REC2 | changed: the `room` and `navbake` crates added; nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; R4-XT-OQ5 |
+| R5-LAYOUT-REC2 | changed: the `room` and `navbake` crates added (proposed, not researched: OQ-0002-8); nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; R4-XT-OQ5 |
 | R5-LAYOUT-REC3 | adopted | part 5; the spike's item 4 |
 | R5-LAYOUT-REC4 | adopted | part 3 (G5) |
 | R5-LAYOUT-REC5 | adopted | parts 5 and 11; the spike's item 5 |
