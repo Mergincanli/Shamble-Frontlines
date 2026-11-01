@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 04:23 Amsterdam
+- **Last update:** 2026-11-01 04:22 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -12,6 +12,7 @@
 - 2a0e5f6 · ADR 0003 assembled (graphics-engineer's draft + PM-0003-1..43), write guard PASS.
 - 6b175de · ADR 0001 assembled (netcode-architect's draft + PM-0001-1..56), write guard PASS.
 - 789bedb · ADR 0002 assembled (engine-architect's draft + PM-0002-1..76), write guard PASS.
+- d321a13 · ADR 0004 assembled (rust-reviewer's draft + PM-0004-1..72), write guard PASS.
 1. Step 0 (brief §0): `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…) · 6617e25; the brief copied to `inputs/`;
    plan revision 1 written · d6c71e4.
 2. Plan review: the advisor's APPROVE with 19 conditions (about 18:35); folded into plan revision 2 (no second review
@@ -33,8 +34,8 @@ section fixes); pass marks for 0006 (test-engineer; 31 marks); ADR 0006 assemble
 (2a0e5f6) into docs/adr/; pass marks for 0001 (test-engineer; 56 marks, all in the netcode proof test, Mustafa's
 15-step Brave checklist in PM-0001-53); ADR 0001 assembled (6b175de); pass marks for 0002 (76 marks; the boundary
 spike PM-0002-1..34, the foundation's acceptance checks -35..69, later milestones -70..76); ADR 0002 assembled
-(789bedb). Running: pass marks for 0004 and 0005 (test-engineer), verifiers for 0006, 0001 and 0002 (research checks;
-source checks pending until 08:30).
+(789bedb); pass marks for 0004 (72 marks); ADR 0004 assembled (d321a13). Running: pass marks for 0005
+(test-engineer), verifiers for 0006, 0001, 0002 and 0004 (research checks; source checks pending until 08:30).
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):
@@ -111,6 +112,14 @@ Time plan (the session leads it; Mustafa: "decide on when it start and when its 
   the reference server's vCPU; gaps: R1-DATA-OQ8 had no spike item (PM-0002-31 added), the map lists R1-BND-REC6 under the
   netcode proof test but 0002's spike item 6 holds it, no limit for the overflow checks' cost, no Mac and no 120/144 Hz
   displays named, B2 vs B3 only on an isolated build.
+- Pass marks 0004 (test-engineer), for the 0004 author's fix round: "Wasm ≤ 2 × native" names no machine (both measured
+  on the laptop); S7's planted divergences could pass without catching anything (now triggered at a known tick with a
+  known-different value); per-phase times need clock reads S4 forbids inside the sim (phases called one by one from the
+  bench); S2 cannot pass until R1-TICK-OQ7 sets N; the "at 30 and 60 Hz" halves of S3, S4, S9, S11, S13 moved into the
+  60 Hz set (rust-reviewer confirms); S17 placed in the netcode proof test but ADR 0001 never mentions R1-TICK-REC4; the
+  map puts R2-SYNC-REC6 mark 1 and R5-LAYOUT-REC4 in the sim core spike but no draft's table names them (SPIKE_PLAN
+  places them); S9's "largest planned map" read as part 7's 2 km bound; PM-0004-2 checks the stress scene's load every
+  tick; S20's online recovery needs the proof test's server.
 - Write guard: condition 1's `cmp - <(head -n 742 GLOSSARY.md)` fails on an unchanged file, because the base GLOSSARY ends
   without a final newline (742 newlines, then an unterminated last line); `scripts/write_guard.sh` checks the exact
   intent instead (the base file is a byte prefix of today's), so §8 can be appended and nothing above it may change.
