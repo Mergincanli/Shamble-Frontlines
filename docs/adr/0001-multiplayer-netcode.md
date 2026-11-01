@@ -22,7 +22,7 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
   The start modes are 1v1 to 4v4 and 2v2v2 to 6v6v6; the goal is 12v12v12 or 24v24 (VISION_V2 §3). Bots fill empty
   slots (VISION_V2 §3 [DEFAULT], LOOP_V2 §2).
 - **Tick:** TICK-30 (brief §1): "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof
-  test shows at least 25 % headroom on the target hardware" (STATUS.md, "Decisions pending", lines 118–120), read as
+  test shows at least 25 % headroom on the target hardware" (STATUS, TICK-30), read as
   [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) (TICK-60-HEADROOM, the advisor's reading of
   2026-10-31, confirmed by Mustafa and the Advisor at the stop).
 - **Latency and region:** matches feel fair up to about 100 ms of ping; servers start in one EU region (VISION_V2 §4
@@ -41,7 +41,7 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
   MODES-3 (a); TICK-30; SLICE-ORDER and its three conditions (STATUS, "Decisions pending"); SEC-SPREAD (a); ABL-PREDICT
   (waits for a Feel Lab test); BASELINE-WHEN (b); UPGRADE-SCOPE (Mustafa, 2026-10-31); SPIKE-SCOPE (a); PREVIEW-WALL
   (a); [the foundation](../research/GLOSSARY.md#the-foundation) and
-  [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) (GLOSSARY §8; brief §2).
+  [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) (GLOSSARY §8; brief §2; below also "the proof test").
 
 ### The findings the decision turns on
 1. Delta snapshots against each client's last acknowledged snapshot tolerate loss and reordering without stalls, cost
@@ -94,7 +94,7 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
 - GC13 (line 252, rewrite in Rust): the throw preview and the real launch start from different points; one shared
   trajectory function fixes it.
 - GN8 (line 273, port to TypeScript): bot-shot sound is culled beyond 90 m and visuals beyond 50 m, two radii.
-- GC1 (line 240, rewrite in Rust) and STATUS's ADR-001 inputs (STATUS.md line 199): the server must repeat the team
+- GC1 (line 240, rewrite in Rust) and STATUS's ADR-001 inputs (STATUS, the ADR-001 entry): the server must repeat the team
   allow-list, and humans take over bot slots.
 - GP13 (line 323, redesign): a variable step inside `requestAnimationFrame` that freezes the world for pause, shop and
   hit-stop cannot survive multiplayer.
@@ -123,7 +123,7 @@ server in the browser. The parts:
    soldier, over R2-BUD-REC6's 30-minute soak, re-flood ticks included: a p99
    [server tick time](../research/GLOSSARY.md#server-tick-time) of at most 6.25 ms against the server tick budget at
    60 Hz, 8.33 ms (a 60 Hz margin of at least 25 %: 1 − 6.25 ÷ 8.33 = 25 %), and every 60 Hz mark the research sets, as
-   written (R2-BUD-REC6's two shares, 4.2 ms each; R1-TICK-REC2 P1–P3 at 60 Hz). Otherwise the tick stays at 30 Hz.
+   written (R2-BUD-REC6's two shares, 4.17 ms each; R1-TICK-REC2 P1–P3 at 60 Hz). Otherwise the tick stays at 30 Hz.
    Snapshots go out on every tick (30 Hz); inputs are sampled and sent every tick. 60 or 64 Hz is asked only if the
    margin passes (R1-TICK-OQ1). *Why:* at N = 48 the 60 Hz marks leave almost no margin (finding 3), while every legacy
    weapon still fits one shot per tick at 30 Hz and the replay work per correction halves (r1-simulation-core.md,
@@ -142,10 +142,10 @@ server in the browser. The parts:
      at 60 Hz keeps the tick at 30 Hz."
    - "… which does not change" (GLOSSARY.md:85, the Tick period entry) is replaced by GLOSSARY §8's closing note: "30 Hz
      is the baseline, 60 Hz needs a 60 Hz margin of at least 25 %."
-3. **The server tick budget at 30 Hz.** p99 server tick time at most 16.7 ms (50 % of the tick period), max under one
-   tick period (33.3 ms), zero overruns, split into
+3. **The server tick budget at 30 Hz.** p99 server tick time at most 16.67 ms (50 % of the tick period), max under one
+   tick period (33.33 ms), zero overruns, split into
    [the sim step share and the server-only share](../research/GLOSSARY.md#the-sim-step-share-and-the-server-only-share),
-   at most 8.3 ms p99 each, measured separately. The sim step share and its parts are ADR 0004's; this record adds that
+   at most 8.33 ms p99 each, measured separately. The sim step share and its parts are ADR 0004's; this record adds that
    share into the total and never restates its parts. Inside the server-only share (ceilings, a planning check, not a
    bound: [time statistics](../research/GLOSSARY.md#time-statistics)): snapshot encoding at most 50 µs per client per
    snapshot (48 × 50 µs = 2.40 ms); a rewound shot at most 20 µs at 700 shots per second (700 ÷ 30 × 20 µs = 0.47 ms per
@@ -227,7 +227,8 @@ server in the browser. The parts:
    proof test's load uses 1,000 B until that is measured. A snapshot that does not fit splits by entity groups into
    datagrams that each decode alone, deltas against the same baseline, acknowledged per group. The first full state,
    at join and after a resync, goes over a reliable stream; deltas resume once the client acknowledges it. *Events:*
-   tick-stamped gameplay events (hits, kills, deaths, purchases, captures, tier changes, pick results, drops) ride in the
+   tick-stamped gameplay events (the events of ADR 0004 part 19: hits, deaths and kills, purchases, uplink cache
+   events, tech tiers, upgrade picks and pickups) ride in the
    snapshot's event section, filtered per client by visibility class, and are resent until the client's acknowledgement
    covers them; the per-client queue of unacknowledged events is bounded (data), and on overflow the server forces a
    full resync of that client or disconnects it. Cosmetic events (shots, muzzle flashes, sounds) go once. The shooter's
@@ -334,8 +335,11 @@ server in the browser. The parts:
     [the advisories check](../research/GLOSSARY.md#the-advisories-check) (its policy is
     [the security baseline](../research/GLOSSARY.md#the-security-baseline)'s). Certificates are ADR 0006's: in
     production [a certificate per hostname](../research/GLOSSARY.md#game-server-certificate) (R6-HOST-REC4;
-    carry-forward 4); development and preview servers use self-signed, pinned certificates valid at most 14 days, whose
-    hash the page fetches from its own HTTPS origin (R2-TRN-REC5). *Why:* datagrams suit newest-wins data; both crates
+    carry-forward 4); development and preview servers use self-signed, pinned certificates for WebTransport, valid at
+    most 14 days, whose hash the page fetches from its own HTTPS origin (R2-TRN-REC5); the WebSocket fallback cannot
+    pin a hash, since its constructor takes only a URL and sub-protocols (r2-netcode.md, Findings, R2-ROOM-F12, lines
+    1494–1500), and presents the certificate ADR 0006's OQ-0006-5 names for development and staging. *Why:*
+    datagrams suit newest-wins data; both crates
     sit on quinn and the interface keeps a swap cheap; WebSocket reaches networks without QUIC; the loopback backend
     runs the network's own messages from slice 1. *Research:* R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3, R2-TRN-REC4
     (changed: a third backend), R2-TRN-REC6, R2-BUD-REC5, R2-TRN-OQ1, OQ2, OQ3, OQ5, OQ6, OQ7, OQ8, OQ9, R2-XU-OQ10,
@@ -384,7 +388,8 @@ server in the browser. The parts:
     a pickup into existence, and it refuses one it did not place, one already taken, or one outside the pickup rule
     (rule data: ADR 0005). Neither offers, picks nor pickups are predicted (pickups interim: OQ-0001-10). The room writes
     pick and pickup telemetry into the match record (fields: ADR 0006). No rule is decided here: carry slots, ammo for
-    looted weapons and how fast tracks level are Mustafa's (ADR 0005 lists them). *Why:* the tracks belong to the
+    looted weapons, how fast tracks level, the drop rules and bots' records are Mustafa's (ADR 0005 lists them; the
+    last two are OQ-0005-AB9 and OQ-0005-AB10). *Why:* the tracks belong to the
     player, so they are owner data the server holds, and offers that are never predicted need no client copy of the
     random stream that draws them (its kind is ADR 0004's). *Research:* no research id concerns upgrades; the parts used
     are R2-INT-REC5's classes, R2-SYNC-REC2's validation and R2-SYNC-F17 (Quake III's predicted pickups, the
@@ -486,7 +491,7 @@ same messages over the loopback backend.
 | `RoomState` | room → client | control stream | public | on change | phase, countdown, roster (human or bot per slot) | n/a |
 | `HostCommand` | client → room | control stream | n/a | private rooms, before start | start, kick, lock, settings (factions per team, allowed overrides) | sender is the host; values inside the mode's allowed overrides |
 | `PickUpgrade` | client → room | control stream | n/a | when an offer is open | offer id, choice (one of three) | open offer to this player, choice in range, not already picked |
-| `ContentReload` (development builds only) | room → client | control stream | public | on a valid content change | the changed set and the tick it applies from | only if ADR 0005 keeps development reload over the game connection (R1-DATA-REC5) |
+| `ContentReload` (development builds only) | room → client | control stream | public | on a valid content change | the changed set and the tick it applies from | only if OQ-0005-CD4 chooses option (b), the mid-match swap (R1-DATA-REC5); under its option (a) nothing in a running match changes and no message is sent |
 | `RoomEnded` | room → client | control stream | public | at Ended | results | n/a |
 | `Leave` / `Kick` | either way | control stream | owner | once | reason | n/a |
 | Lobby calls (HTTPS) | browser → lobby | HTTPS | n/a | per visit or room | guest create (sets the cookie), private-room create, code lookup, token request | Origin check; rate limits per client, per address and global |
@@ -525,10 +530,10 @@ client on every soldier, over a 30-minute soak, re-flood ticks included, unless 
 
 | Budget | Value | Basis |
 |---|---|---|
-| Server tick time, 30 Hz (the baseline) | p99 ≤ 16.7 ms; max < 33.3 ms; 0 overruns (0 missed ticks) | R2-BUD-REC6 (r2-netcode.md:2398–2416) restated from GLOSSARY §1's 30 Hz column (GLOSSARY.md:53–69, 167–188); R1-TICK-REC2 P1 |
-| Its two shares, 30 Hz | sim step time p99 ≤ 8.3 ms (ADR 0004's parts); server-only work p99 ≤ 8.3 ms, measured separately | R2-BUD-REC6; R2-SYNC-REC9 mark 1; GLOSSARY.md:189–213 |
+| Server tick time, 30 Hz (the baseline) | p99 ≤ 16.67 ms; max < 33.33 ms; 0 overruns (0 missed ticks) | R2-BUD-REC6 (r2-netcode.md:2398–2416) restated from GLOSSARY §1's 30 Hz column (GLOSSARY.md:53–69, 167–188); R1-TICK-REC2 P1 |
+| Its two shares, 30 Hz | sim step time p99 ≤ 8.33 ms (ADR 0004's parts); server-only work p99 ≤ 8.33 ms, measured separately | R2-BUD-REC6; R2-SYNC-REC9 mark 1; GLOSSARY.md:189–213 |
 | Parts of the server-only share | snapshot encode ≤ 50 µs per client per snapshot p99; rewound shot ≤ 20 µs p99 at 700 shots/s; region query ≤ 0.2 ms p99; ranking and packing ≤ 0.5 ms p99; pair test ≤ 0.1 µs per pair p99; re-flood ≤ 1 ms p99 (reported beside the whole, never summed into it) | R2-BUD-REC6; R2-SYNC-REC5 mark 4; R2-INT-REC1 (c); R2-INT-REC4; R2-INT-REC2 (b) |
-| The 60 Hz margin run (decides 60 Hz) | p99 server tick time ≤ 6.25 ms against 8.33 ms; each share ≤ 4.2 ms p99; R1-TICK-REC2 P1–P3 at 60 Hz; one run, same setup | TICK-60-HEADROOM (the advisor's reading, confirmed at the stop); GLOSSARY §8, the 60 Hz margin |
+| The 60 Hz margin run (decides 60 Hz) | p99 server tick time ≤ 6.25 ms against 8.33 ms; each share ≤ 4.17 ms p99; R1-TICK-REC2 P1–P3 at 60 Hz; one run, same setup | TICK-60-HEADROOM (the advisor's reading, confirmed at the stop); GLOSSARY §8, the 60 Hz margin |
 | Prediction replay | 200 ms of game time (6 ticks at 30 Hz) ≤ 1 ms p99, minimum laptop | R1-TICK-REC2 P3 (r1-simulation-core.md:2058–2060) |
 | Transport runtime | ≤ 1 vCPU per process with 48 sessions; p99 send call ≤ 1 ms | R2-TRN-REC1 mark 2 (r2-netcode.md:2565–2615), load restated at 30 Hz: 30 input datagrams per second per session |
 | Downstream per client | mean ≤ 160 kbps and p99 of 1-second windows ≤ 256 kbps, N = 48, everyone in view, 30 Hz, counted at UDP payload + 28 B per datagram; hard cap 256 kbps (proposed); 0 datagrams above the cap rule | R2-BUD-REC2 (r2-netcode.md:2326–2344); R2-BUD-REC3 |
@@ -842,7 +847,8 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
 - **OQ-0001-1. Is TICK-60-HEADROOM's reading confirmed?** The 60 Hz margin is measured against the server tick budget
   at 60 Hz (8.33 ms), so 60 Hz needs a p99 server tick time of at most 6.25 ms in part 2's setup, plus every 60 Hz mark
   the research sets. · *Why it matters:* it decides whether and how 60 Hz can ever be chosen. · *Options:* (a) confirm
-  the advisor's reading as ruled on 2026-10-31; (b) another reading of TICK-30's "25 % headroom". · *Decider:* Mustafa
+  the advisor's reading as ruled on 2026-10-31; (b) not confirmed: Mustafa and the Advisor name the base, and part 2's
+  mark and GLOSSARY §8 follow. · *Decider:* Mustafa
   and the Advisor, "confirm at the stop". · *What decides it:* their confirmation. · *Research ids:* R1-TICK-REC2,
   R2-BUD-REC6, R1-TICK-OQ1.
 - **OQ-0001-2. How does the stress scene's sim load reach the 60 Hz margin run (TICK-60-SETUP)?** · *Why it matters:*
@@ -953,7 +959,9 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
      loss plus 1 percentage point at P2; 0 of 10,000 one-shot actions lost at P3; a 1 MB bulk transfer adds at most 5 ms
      to the control stream's p99 (R2-TRN-REC2 marks 1–4).
    - Development certificates (ADR 0006's): all four browsers connect with a pinned self-signed certificate in 20 of 20
-     attempts, and reject one valid for 15 days (R2-TRN-REC5 marks 1 and 3).
+     attempts, and reject one valid for 15 days (R2-TRN-REC5 marks 1 and 3); the WebSocket leg first needs the
+     certificate OQ-0006-5 names for development and staging (the Advisor, before the test starts; ADR 0006's
+     PM-0006-15).
 2. **48 simulated clients stay within the budgets (parts 2, 3, 6, 11, 14).** The "Budgets for the netcode proof test"
    table above, plus: every decoded snapshot rebuilds the server's quantised state for that client by hash under P0,
    P2, P3 and B1, deltas again within 500 ms after B1, no datagram above the payload cap (R2-SYNC-REC1 marks 1–4); the
@@ -972,7 +980,7 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
    one reference server, each room's p99 within 10 % of one room, and a killed room leaves the others unchanged
    (R2-ROOM-REC2 marks 2 and 4, on the CCX23 and the CX33: R6-HOST-REC2, ADR 0006).
 3. **The 60 Hz margin (part 2):** in one run with part 2's setup, p99 server tick time at most 6.25 ms at a 60 Hz tick,
-   both shares within 4.2 ms, and R1-TICK-REC2 P1–P3 at 60 Hz; how the sim load gets there is OQ-0001-2. A failure
+   both shares within 4.17 ms, and R1-TICK-REC2 P1–P3 at 60 Hz; how the sim load gets there is OQ-0001-2. A failure
    keeps 30 Hz.
 4. **The human client at P2 sees prediction, reconciliation and lag-compensated hits that look correct (parts 4, 7,
    8).** Mustafa judges "look correct" in Brave (test-engineer writes his checklist); the measurable marks beside it:
@@ -991,7 +999,8 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
      at most 20 µs p99 (marks 3 and 4); server hit points within 5 cm of the client-picked point in at least 99.9 % of
      shots at the ground, 2.5 m and 4 m, P0 to P3, and the aim at most 80 bits per command (R2-SYNC-REC8 marks 1–2);
    - feedback: no damage number or kill on another soldier shown before the server's confirmation (R1-ABL-REC4).
-5. **What the proof test decides:** the WebTransport crate (R2-TRN-OQ5); the datagram cap from the measured
+5. **What the proof test decides:** the WebTransport crate (R2-TRN-OQ5), and whether each candidate runs on a custom
+   quinn endpoint so the network simulator's second layer sits under it (R5-TEST-OQ2); the datagram cap from the measured
    `maxDatagramSize` (R2-BUD-OQ3 = R2-TRN-OQ3, R2-XU-OQ5); E3 or E3b (0 desyncs of client-side flight over 1,000 throws,
    R2-BUD-REC2; only if projectiles are in the load); the process model (R2-ROOM-OQ1); the encoding cost per client
    (R2-BUD-OQ9); the controllers' behaviour under 2–5 % loss, server and browser side (R2-BUD-OQ10, R2-TRN-OQ8); each
@@ -1484,7 +1493,7 @@ Line numbers are at commit 9e7db28; the research files do not change in this PR.
   note on TICK-30).
 - `docs/research/README.md` (the answered questions and the shape of a topic).
 - `docs/VISION_V2.md` §1–§6; `docs/LOOP_V2.md` §2–§4, §7–§10; `docs/EDITOR_V2.md` §3; `docs/LOOK_V2.md` §3–§4.
-- `docs/STATUS.md`, "Decisions pending" (lines 93–202): SLICE-ORDER, MODES-3, PREVIEW-WALL, SEC-SPREAD, ABL-PREDICT,
+- `docs/STATUS.md`, "Decisions pending": SLICE-ORDER, MODES-3, PREVIEW-WALL, SEC-SPREAD, ABL-PREDICT,
   BASELINE-WHEN, TICK-30, the five carry-forwards, SPIKE-SCOPE, R7-MARKS and the ADR-001 entry; UPGRADE-SCOPE as
   Mustafa wrote it on 2026-10-31 (recorded in STATUS with that day's decisions).
 - `docs/LEGACY_INVENTORY.md`: the marks and the rows CS1, CS7, CS11, GC1, GC2, GC3, GC5, GC13, GC15, GP2, GP13, GW1,
