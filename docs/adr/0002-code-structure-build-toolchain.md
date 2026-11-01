@@ -184,6 +184,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | `server` | the room process: transport on quinn and the WebSocket fallback, the async runtime, the supervisor hook, metrics (ADR 0001, ADR 0006) | `room`, `protocol`, `sim`, `content` | slice 3 (online) | §6.1, §6.5, §6.6, §6.8 |
    | `devtools` | the replay runner, the hash comparer, the tick bench, the legacy-golden reader | anything | the foundation | §6.6, §6.8 |
    | `navbake` | the navigation bake (ADR 0004's generator), run by CI, on map save and in the editor's Test | `sim`, `content` | slice 2 (bots) | §6.2 (bots between levels) |
+
    The packages: `client` (the player entry: input, camera, HUD, rendering), `editor` (its own entry), `sim-worker`
    (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the browser's two backends of ADR 0001's thin
    transport interface, WebTransport and WebSocket, which R2-TRN-REC4 puts in TypeScript), `types` (generated types, part 5) and `e2e`
@@ -393,6 +394,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | Soak and load | bots as headless Rust protocol clients | a room at every mode of the test-mode list for 30 minutes, up to the largest mode's N (48) | nightly, and before each playtest |
    | Fuzz | cargo-fuzz on every decoder and the content loader | 0 panics, 0 allocations above the size limits | nightly, Linux |
    | Benchmarks | the `devtools` tick bench; ADR 0003's client harness | [sim step time](../research/GLOSSARY.md#sim-step-time) and frame cost, with the method stated | change-sets touching the sim or the render path; never a gate pass or fail |
+
    - **The determinism suite's tools:** a `devtools` replay runner, built as the server builds the sim, plays a
      recorded match and writes one [state hash](../research/GLOSSARY.md#state-hash) per tick; the gate runs it twice in
      two processes and once as Wasm in Node; Playwright opens a replay page that runs the `sim-wasm` Worker in Chromium,
@@ -459,6 +461,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | G11 | network | L1, one minute per profile P0–P4 and B1, with ADR 0001's marks that fit a minute |
    | G12 | end-to-end | Playwright on the built client and a local server: TL9's smoke shape, both transport backends, the backend string on every shot, ADR 0003's render counts against their committed baseline; every outbound request fails the run except to the local test server |
    | G13 | maps | for every committed map document: the navigation bake succeeds and ADR 0004's map checks pass (reachability, the 6 m gap rule) |
+
    - **`--prove`:** a committed mutation suite applies each planted defect in a throwaway worktree and expects exactly
      the named checks to fail and every other check to pass, with at least one mutation and one control per check id
      (R5-GATE-REC3's starting set, plus G13: a map with an unreachable spawn fails G13; a valid map passes). Every

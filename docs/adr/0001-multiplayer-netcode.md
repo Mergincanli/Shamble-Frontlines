@@ -37,10 +37,10 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
   aim help ([OPEN], technical); §8 a match of about 20 minutes; §10 bots across three teams.
 - **LOOK_V2:** §3 interiors and upper floors; §4 ruins you can enter and roofs that fade when the player is inside
   [DEFAULT]. What a player is sent follows the same enclosures; how the cutaway looks is ADR 0003's.
-- **Settled inputs:** the stack (WebTransport with a WebSocket fallback, our own netcode, server authority: brief §1);
-  MODES-3 (a); TICK-30; SLICE-ORDER and its three conditions (STATUS, "Decisions pending"); SEC-SPREAD (a); ABL-PREDICT
-  (waits for a Feel Lab test); BASELINE-WHEN (b); UPGRADE-SCOPE (Mustafa, 2026-10-31); SPIKE-SCOPE (a); PREVIEW-WALL
-  (a); [the foundation](../research/GLOSSARY.md#the-foundation) and
+- **Settled inputs:** the stack (WebTransport with a WebSocket fallback, our own netcode, server authority:
+  STATUS, "Decisions pending"; brief §1); MODES-3 (a); TICK-30; SLICE-ORDER and its three conditions
+  (STATUS, "Decisions pending"); SEC-SPREAD (a); ABL-PREDICT (waits for a Feel Lab test); BASELINE-WHEN (b);
+  UPGRADE-SCOPE (Mustafa, 2026-10-31); SPIKE-SCOPE (a); PREVIEW-WALL (a); [the foundation](../research/GLOSSARY.md#the-foundation) and
   [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) (GLOSSARY §8; brief §2; below also "the proof test").
 
 ### The findings the decision turns on
@@ -708,6 +708,7 @@ Settled by the glossary's resolution 1 (GLOSSARY.md:167–188: the server tick b
 | **B. web-transport-quinn 0.13.x on quinn (a candidate)** | low–medium | crate family | the spike's load mark | inherits quinn's advisories | none | new | mirrors quinn's API | frequent 0.x releases |
 | C. h3 + h3-webtransport | medium | none | unknown | not checked | none | new | hyperium's | "still very experimental", idle since 2025-05: ruled out |
 | D. Our own handshake on quinn | high | upkeep on every draft change | ours | ours | none | new | full control | generic protocol work no §6 item asks for: ruled out |
+
 The netcode proof test picks between A and B (R2-TRN-OQ5).
 
 ### Q17. The fallback when WebTransport fails (transport Q2, lines 1848–1855)
@@ -715,7 +716,8 @@ The netcode proof test picks between A and B (R2-TRN-OQ5).
 |---|---|---|---|---|---|---|---|---|
 | **A. Binary WebSocket (chosen)** | low | mature crates | head-of-line blocking; no unreliable channel | Origin check, `wss`, explicit limits | stalls under loss (the newest-snapshot rule bounds them) | none | everywhere, also in workers | worse under loss |
 | C. qmux over WebSocket | medium | a young crate, draft -02 | still head-of-line blocked | as A | as A | none | one stream and datagram API on both | early draft; revisit only if needed (R2-TRN-OQ6) |
-B (WebTransport over HTTP/2) and D (no fallback): settled by the stack (WebTransport with a WebSocket fallback, brief §1).
+
+B (WebTransport over HTTP/2) and D (no fallback): settled by the stack (WebTransport with a WebSocket fallback: STATUS, "Decisions pending"; brief §1).
 
 ### Q18. One transport interface over both, and the local path (transport Q4, lines 1866–1875; SLICE-ORDER condition 1)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
@@ -723,6 +725,7 @@ B (WebTransport over HTTP/2) and D (no fallback): settled by the stack (WebTrans
 | **A. Our own thin interface, both sides, with a loopback backend for the local server (chosen)** | low | four operations, three backends | none | bounded queues; decoders outside the sim thread | none | CS11's fence becomes a crate boundary | smallest, game-specific; the simulator's L1 plugs in behind it (R5-TEST-REC4) | written twice (Rust, TypeScript) |
 | B. web-transport-trait plus qmux | medium | a fast-moving 0.x family | none | young code | none | none | real streams over WebSocket | ties us to an early draft |
 | C. A WebTransport polyfill over WebSocket | unknown | unknown | unknown | unknown | unknown | none | none | not assessed (the lead was not read) |
+
 A local server reached by direct calls instead of messages: settled by SLICE-ORDER condition 1 ("no offline-only shortcuts").
 
 ### Q19. Congestion control for a real-time stream (transport Q6, lines 1887–1896)
@@ -731,6 +734,7 @@ A local server reached by direct calls instead of messages: settled by SLICE-ORD
 | **A. Choose the server controller in quinn (chosen: NewReno or Cubic by measurement)** | low | none | measured | none | snapshot age under a bottleneck | none | pluggable | BBR experimental |
 | **B. Drop stale data, never queue (chosen)** | low | none | no queue growth | none | fresh snapshots | none | the tick never blocks on a send | lost snapshots |
 | **C. Adapt the rate (chosen)** | medium | none | degrades by priority, then rate | none | fewer updates under pressure | none | stays playable | tuning |
+
 The three combine; they are not alternatives.
 
 ### Q20. Where a room runs (rooms 3.1, lines 1900–1906)
@@ -780,6 +784,7 @@ The three combine; they are not alternatives.
 |---|---|---|---|---|---|---|---|---|
 | **A. An anonymous guest account from the lobby (chosen, secret in an HttpOnly cookie)** | low | a lobby store (ADR 0006) | none | a secret of at least 64 bits no script can read | zero input before play | the guest id may sit in the KVStore successor | reconnect and later linking | needs the lobby |
 | B. No identity | lowest | none | none | none | none | none | simplest | no reconnect across a reload |
+
 C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
 
 ## Trade-off analysis
@@ -1495,9 +1500,11 @@ Line numbers are at commit 9e7db28; the research files do not change in this PR.
   note on TICK-30).
 - `docs/research/README.md` (the answered questions and the shape of a topic).
 - `docs/VISION_V2.md` §1–§6; `docs/LOOP_V2.md` §2–§4, §7–§10; `docs/EDITOR_V2.md` §3; `docs/LOOK_V2.md` §3–§4.
-- `docs/STATUS.md`, "Decisions pending": SLICE-ORDER, MODES-3, PREVIEW-WALL, SEC-SPREAD, ABL-PREDICT,
-  BASELINE-WHEN, TICK-30, the five carry-forwards, SPIKE-SCOPE, R7-MARKS and the ADR-001 entry; UPGRADE-SCOPE as
-  Mustafa wrote it on 2026-10-31 (recorded in STATUS with that day's decisions).
+- `docs/STATUS.md`, "Decisions pending": the stack (the drafts brief's settled inputs), SLICE-ORDER, MODES-3,
+  PREVIEW-WALL, SEC-SPREAD, ABL-PREDICT, BASELINE-WHEN, TICK-30, the five carry-forwards, SPIKE-SCOPE, R7-MARKS and
+  the ADR-001 entry; UPGRADE-SCOPE as Mustafa wrote it on 2026-10-31 (recorded in STATUS with that day's decisions).
+- `CLAUDE.md`, "The v2 rebuild", and `docs/V2_PHASE0_BRIEF.md` §0 (line 9): the stack's netcode part as decided (our
+  own netcode: server authority, WebTransport with a WebSocket fallback).
 - `docs/LEGACY_INVENTORY.md`: the marks and the rows CS1, CS7, CS11, GC1, GC2, GC3, GC5, GC13, GC15, GP2, GP13, GW1,
   GW17, GN4, GN8, CD5 and CD11.
 - `docs/adr/0000-template.md`.
