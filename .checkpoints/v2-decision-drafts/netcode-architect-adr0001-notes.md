@@ -47,3 +47,4 @@ DONE
 
 ## Fix round (plan step 9), 2026-11-01
 - Started 09:23 Amsterdam. Findings F2, F4-F10; output netcode-architect-adr0001-fixes.md.
+- Resumed 13:53 Amsterdam after a spend-limit cut; no fixes file existed; findings read, texts located (doc lines 802-804, 159-161, 659, 1289, 622, 647, 1159-1160, 1356, 1355, 1433, 909-913). Writing fixes now via script.

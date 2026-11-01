@@ -41,7 +41,11 @@ unsupported, 2 citation off, 2 rule findings; 24 fetches, all 200). The session 
 reminder fired at 10:40 but reached the session only at 13:52 and is superseded. Mustafa, 13:52, in the session's
 chat: "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
 His one-off night exception ended at 11:00; the normal rules apply again (daytime: fetching until 22:00, no new agent
-after 23:00). Resumed at about 13:53: the four cut agents, and rust-reviewer for 0004's fixes.
+after 23:00). Resumed at about 13:53: the four cut agents, and rust-reviewer for 0004's fixes (5 running). Prepared:
+`prompts/verifier-skeptic-2.txt` (0002's and 0003's wrong, unsupported and rule findings), launched when a slot frees.
+Then: the fix rounds for 0002 (engine-architect), 0003 (graphics-engineer), 0005 (its authors, after its verifier),
+the pass-mark rows (test-engineer: 0001 F1 "whole tick", 0006 findings 5–6, 0004 TE69, and the rest), the completeness
+critic, the reviews (step 10), docs-keeper's re-check of STATUS, the gate, the report, the PR body.
 
 ## Next steps (the scheduled run, 2026-11-01 03:55–11:00 Amsterdam: Mustafa's one-off exception, below)
 Time plan (the session leads it; Mustafa: "decide on when it start and when its done"):

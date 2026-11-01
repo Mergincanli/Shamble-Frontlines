@@ -16,3 +16,4 @@ FINDING C1: README:208-214, :333 STATUS:198-202/257/262/273 hold at 9e7db28 but 
 DRIFT D1: fix round 09803a9 (after 80a27b3) moved 0006 OQ lines (+15..+26) and gave OQ-0006-5's dev/staging case to the Advisor (README table lacks OQ-0006-5). PM ranges and OQ count of 0006 unchanged at HEAD.
 Source checks: synthesis restates source facts only via drafts; 25 MiB = R6-HOST-F3 (findings-checked: yes/confirmed), CCX23/CX33 = R6-HOST-F15 (confirmed), locations = R6-HOST-F14 (confirmed), 10 GB cache = R5-CI-F5. No fetch needed so far.
 Next: write verdicts file; then ledger 10, 53-55 spot checks.
+13:53 RESUMED after spend-limit cut (coordinator: deadline now 16:00, fetch allowed to 22:00). Verdicts file not yet written; writing it now from the notes above, then ledger 10, 41, 45-55 and the both-ways check.
