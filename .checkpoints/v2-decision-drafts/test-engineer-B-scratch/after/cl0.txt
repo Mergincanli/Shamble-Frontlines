@@ -1,0 +1,12 @@
+Beside it, the measurable marks: each technique's cost (PM-0003-9), the two ink families (PM-0003-12), the frame time
+with the kept look on both reference machines (PM-0003-13) and the pixel-ratio costs (PM-0003-14). His PC is far above
+the recommended class, so what he sees is the look, never the budget; so that he also judges the look the minimum
+class sees, step 31 shows Low's starting row on his PC beside High (Low is the default on every integrated adapter
+and every WebGL 2 player, part 7). Each step names its tier: High, his PC's own, unless the step says Low. Every view
+is at the test view ("How to read the table": legacy's framing, CD5) unless the step names another. Each step: what
+to look at, beside the legacy view at the same framing, and the expected result in LOOK_V2's words. The legacy view
+is legacy itself opened in a second Brave window on his PC (it runs from `index.html`) at the same framing, because
+the session's container has no GPU and its pageshot renders on the CPU, so its multisampling, shadow filtering and
+fonts differ from Brave's (the art review's finding 8); the session's pageshot images serve only to match the
+framing, each labelled with the renderer pageshot prints. He records "achieved" or "not yet" (with a note), or his
+pick where a step offers one.

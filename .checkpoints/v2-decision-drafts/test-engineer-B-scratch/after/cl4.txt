@@ -1,0 +1,5 @@
+4. The two ink families side by side, beside legacy's ink (§2, §6.2; OQ-0003-2): A, screen-space edges (proposed); B,
+   the hull. Expected: thick black outlines, especially strong on buildings; thick ink on silhouettes, thinner lines
+   inside; the ink at the base of buildings, and where soldiers stand, is as heavy as their silhouette (5.b names this
+   contact line as a visible difference between the families). Pick: A or B, and whether the buildings' ink is heavy
+   enough.

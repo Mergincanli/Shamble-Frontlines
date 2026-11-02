@@ -1,0 +1,10 @@
+SUBS = [
+("| every forged command of R2-SYNC-REC2 mark 3's set rejected and counted, with 0 effect beyond the command's valid part (the state hash of a run with the forged set equals that of a run with only their valid parts);",
+ "| every forged command of R2-SYNC-REC2 mark 3's set as part 5 changes it (an aim point off the map stays in it; one beyond the weapon's reach leaves it, and a tick equal to or older than the last command run joins it) rejected and counted, with 0 effect beyond the command's valid part (the state hash of a run with the forged set equals that of a run with only their valid parts); an aim point beyond the weapon's reach clamped, never refused or counted (the state hash of a run with such points equals that of a run with each point moved along its ray to the reach); a client whose clock runs 1.5 times fast for 60 s runs at most the server's ticks in that time plus the lead bound of commands, and moves no further than an honest client on the same inputs plus that many ticks of movement;"),
+("| 1,000 forged commands per kind (proposed); 100 lag-switch bursts (proposed) |",
+ "| 1,000 forged commands per kind (proposed); 1,000 aim points beyond reach per weapon kind the sim has (hitscan, melee, throw where built; proposed); 100 lag-switch bursts (proposed); 10 fast-clock runs of 60 s (proposed), under each of OQ-0001-6's two options |"),
+("Bites: each check removed in turn lets its forged kind through |",
+ "Bites: each check removed in turn lets its forged kind through; the tick check relaxed to \"not older than\" lets the fast clock run the per-tick cap on every tick under OQ-0001-6 (a); a refusal in place of the clamp counts honest far clicks as forged |"),
+("| r2 R2-SYNC-REC2 marks 3–4 (lines 2060–2066); the draft, part 5 (the server's checks on every command) |",
+ "| r2 R2-SYNC-REC2 marks 3–4 (lines 2060–2066), changed by part 5 (the clamp; strictly newer ticks; Appendix A's row); the draft, part 5 (the server's checks on every command); the game-design and security reviews of 2026-11-02 (findings 1 and 8) |"),
+]

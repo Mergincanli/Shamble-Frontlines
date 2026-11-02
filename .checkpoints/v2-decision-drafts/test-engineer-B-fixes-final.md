@@ -244,3 +244,80 @@ run set that fails V is neither a pass nor a fail. An item Mustafa marks "not ye
 way, and the look proof test shows it again.
 END
 
+### FIX AD-2 (the checklist's intro: the Low frame), AD-5 (the test view), AD-8 (legacy views in Brave), the tier per step (routed by graphics-engineer)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+Beside it, the measurable marks: each technique's cost (PM-0003-9), the two ink families (PM-0003-12), the frame time
+with the kept look on both reference machines (PM-0003-13) and the pixel-ratio costs (PM-0003-14). His PC is far above
+the recommended class, so what he sees is the look, never the budget. Each step: what to look at, beside a legacy
+screenshot at the same framing (taken by the session with legacy's pageshot, headed), and the expected result in
+LOOK_V2's words. He records "achieved" or "not yet" (with a note), or his pick where a step offers one.
+AFTER:
+Beside it, the measurable marks: each technique's cost (PM-0003-9), the two ink families (PM-0003-12), the frame time
+with the kept look on both reference machines (PM-0003-13) and the pixel-ratio costs (PM-0003-14). His PC is far above
+the recommended class, so what he sees is the look, never the budget; so that he also judges the look the minimum
+class sees, step 31 shows Low's starting row on his PC beside High (Low is the default on every integrated adapter
+and every WebGL 2 player, part 7). Each step names its tier: High, his PC's own, unless the step says Low. Every view
+is at the test view ("How to read the table": legacy's framing, CD5) unless the step names another. Each step: what
+to look at, beside the legacy view at the same framing, and the expected result in LOOK_V2's words. The legacy view
+is legacy itself opened in a second Brave window on his PC (it runs from `index.html`) at the same framing, because
+the session's container has no GPU and its pageshot renders on the CPU, so its multisampling, shadow filtering and
+fonts differ from Brave's (the art review's finding 8); the session's pageshot images serve only to match the
+framing, each labelled with the renderer pageshot prints. He records "achieved" or "not yet" (with a note), or his
+pick where a step offers one.
+END
+
+### FIX AD-4 (step 4: the ground-contact line; routed by graphics-engineer)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+4. The two ink families side by side, beside legacy's ink (§2, §6.2; OQ-0003-2): A, screen-space edges (proposed); B,
+   the hull. Expected: thick black outlines, especially strong on buildings; thick ink on silhouettes, thinner lines
+   inside. Pick: A or B, and whether the buildings' ink is heavy enough.
+AFTER:
+4. The two ink families side by side, beside legacy's ink (§2, §6.2; OQ-0003-2): A, screen-space edges (proposed); B,
+   the hull. Expected: thick black outlines, especially strong on buildings; thick ink on silhouettes, thinner lines
+   inside; the ink at the base of buildings, and where soldiers stand, is as heavy as their silhouette (5.b names this
+   contact line as a visible difference between the families). Pick: A or B, and whether the buildings' ink is heavy
+   enough.
+END
+
+### FIX AD-5 (step 9: the close and far test views), AD-14 (steps 10 to 12: the soldier at the 4-material cap; routed by graphics-engineer), AD-9 (step 13: the budget LOD picks by importance), AD-12 (step 15: the trees are GW18's builders)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+9. One unit at the closest and at the farthest camera framing (§5). Expected: simple and readable from a distance, real
+   depth up close; never "a block on wheels with a tube".
+10. The new soldier beside legacy's soldier (§3). Expected: slimmer, serious proportions (XIII, Valiant Hearts); no
+    chunky body, no round or goofy head.
+11. A conscript in each faction's colours, beside legacy's conscript (§2). Expected: the round shoulder pieces, the
+    centre stripe and the long trench-coat jacket; the factions told apart by colour.
+12. Weapons and headgear at the game camera (§3, §6.3). Expected: real weapon silhouettes, no plain tubes or
+    cylinders; weapons and headgear read first from above.
+13. A soldier strafing on the full rig, then on the cheaper rig of the budget LOD (§2). Expected: the body reacts to
+    strafing on the full rig; the cheaper rig's difference does not distract at the distance it is used.
+14. Both houses beside legacy's (§2, §3). Expected: the half-timbered house with the brick-tile roof and the plastered
+    house with the silo tower; no thatched roof anywhere.
+15. The lush patch: fields, logs and trees (§1, §2, §4). Expected: lush; logs and trees with variety. The trees are
+    labelled placeholders: the tree style is `[OPEN]` and not judged here.
+AFTER:
+9. One unit at two test views (§5): the test view itself, legacy's only framing, as the far case, and a close view,
+   the same camera at half its distance to the player (proposed: legacy has no zoom range, CD5, and the v2 framing is
+   R2-INT-OQ2's); both are taken again at the v2 framing's own closest and farthest once that question is answered.
+   Expected: simple and readable from a distance, real depth up close; never "a block on wheels with a tube".
+10. The new soldier beside legacy's soldier (§3), built at ADR 0005's cap of 4 materials per pass (its GPU part 4),
+    so the soldier judged is the one the budget allows. Expected: slimmer, serious proportions (XIII, Valiant
+    Hearts); no chunky body, no round or goofy head.
+11. A conscript in each faction's colours, beside legacy's conscript (§2), built at the same cap. Expected: the round
+    shoulder pieces, the centre stripe and the long trench-coat jacket; the factions told apart by colour.
+12. Weapons and headgear at the game camera (§3, §6.3), on the soldier built at the same cap. Expected: real weapon
+    silhouettes, no plain tubes or cylinders; weapons and headgear read first from above.
+13. A soldier strafing on the full rig, then the fight on screen at Low's animation budget, where the budget LOD gives
+    the cheaper rig by importance (own squad, nearest, shooting: part 6), not by distance, so cheaper-rig soldiers
+    stand beside full-rig ones (§2). Expected: the body reacts to strafing on the full rig; on the soldiers the
+    cheaper rig is used for, its difference does not distract.
+14. Both houses beside legacy's (§2, §3). Expected: the half-timbered house with the brick-tile roof and the plastered
+    house with the silo tower; no thatched roof anywhere.
+15. The lush patch: fields, logs and trees (§1, §2, §4). Expected: lush; logs and trees with variety. The trees are
+    legacy's tree builders ported as placeholders (GW18, `LEGACY_INVENTORY.md` line 206), judged for variety and
+    lushness only (§2's `[DECIDED]` "trees with variety"): the tree style is `[OPEN]` (§8) and not judged here.
+END
+
