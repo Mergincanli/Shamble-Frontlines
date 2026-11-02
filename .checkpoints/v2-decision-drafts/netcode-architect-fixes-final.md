@@ -46,9 +46,9 @@ AFTER:
    endpoint, ADR 0002's `client-endpoint` crate (no bindings, transport or clock), which the native headless test
    clients run too. On every snapshot it
    resets the local player (and its vehicle) to the server's state for the last command the server ran and replays
-   the newer commands through the same Rust code (Quake III's method), ADR 0004 part 3's prediction step: only the
+   the newer commands through the same Rust code (Quake III's method), in ADR 0004 part 3's prediction step (only the
    prediction scope's phases, for the local slot and its vehicle, against the static world and the movers as last
-   decoded, drawing from no random stream; it skips the replay when the server's state
+   decoded, drawing from no random stream); it skips the replay when the server's state
    matches the stored prediction. A replay emits no event its first run already emitted: the player's own cues are
    keyed by (entity, weapon, command sequence), so a replayed shot plays its muzzle flash and sound once ("Cues are
    events keyed by (entity, ability or weapon, command sequence)": r1-simulation-core.md, Recommendations, unit
@@ -130,8 +130,8 @@ AFTER:
    endpoint reads no clock itself (std's clock panics on the browser's Wasm target: the Rust review of 2026-11-02,
    reading std's source). The server answers pings on its I/O runtime as they arrive; the client answers the server's
    at its next tick, and its pong carries the hold time, from the ping's arrival to the host's time at that step, which
-   the server subtracts up to one tick period (more would only shrink the client's own RTT; holding a pong longer is
-   the latency faking part 8 accepts). The server keeps a per-client input buffer of 1–3
+   the server subtracts, at most one tick period's worth (a client that misreports it can only shrink its own RTT, or
+   inflate it as part 8's accepted latency faking already allows). The server keeps a per-client input buffer of 1–3
    ticks (proposed), adapted per client; each command is stamped with the server tick it is meant for. When the server
    runs commands and how the client keeps them just in time are the proof test's to decide (OQ-0001-6); sub-tick fire
    stamps are OQ-0001-7. *The aim point:* the page posts its newest input once per drawn frame, with its cursor ray from

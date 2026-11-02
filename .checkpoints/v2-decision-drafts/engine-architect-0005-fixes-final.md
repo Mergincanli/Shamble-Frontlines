@@ -1,5 +1,10 @@
 # engine-architect, ADR 0005's final round (frame, content data, the asset pipeline): fixes on 319d3b6
 
+Prompt: prompts/final-engine-architect-0005.txt, with the session's three routed additions (ADR 0004 part 1's pools,
+b815c85; ADR 0006's archive and OQ-0006-18, 8fa7173; ADR 0002's RR-16). BEFORE blocks are whole lines copied by
+script from docs/adr/0005 at 319d3b6 (= HEAD for 0005); each occurs exactly once, no two overlap, and applying them
+in file order was simulated on the doc. Notes: engine-architect-0005-final-notes.md.
+
 ### FIX FB-11
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:

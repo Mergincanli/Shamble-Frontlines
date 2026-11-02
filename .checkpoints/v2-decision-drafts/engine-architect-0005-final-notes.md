@@ -4,3 +4,13 @@ Task: ADR 0005 final fix round (step 10 reviews), engine-architect frame + Conte
 - 11:55 routes received: infra 8fa7173 (EA-6 archive, OQ-0005-AP1 visibility/OQ-0006-18); ADR 0002 RR-16 (CD-3 derives out of shipped builds)
 - 12:05 all routes in; drafting generator at scratchpad/ea0005-final/gen.py (BEFOREs by line range from 319d3b6 copy). Extra: Appendix A rows R1-DATA-REC2/REC3/REC6 + counts (REC3 -> changed: adopted 5, changed 6); frame Harder 1778-1780; OQ-0005-AP1 1489-1497 + table row 1861
 - 12:15 fixes file written (21 FIX + 6 NOTE); checking preview
+- EA-6: FIX CD-8 (388-389) + I-6 line + App. A REC6 row; routed README I-6 row (synthesis).
+- FB-7, FB-11, FB-13, FC-8: FIX (one-line corrections).
+- PA-11: GE fixed GPU part 4 in 319d3b6; FIX AP-5 points to the ceiling.
+- AD-6 routed: FIX AP-3 example list + Need.
+- Pools route (ADR 0004 b815c85): FIX CD-2 new bullet, frame part 1, I-1, spike item 2, Harder, App. A REC2; routed test-engineer PM-0005-4/-5 leg; rust-reviewer optional.
+- RR-16 route: FIX CD-3, frame part 1, App. A REC3 -> changed (counts adopted 5, changed 6).
+- IE-12/UNRELEASED-ART route: FIX OQ-0005-AP1 + list row; routed README row.
+- GE-1 follow-ons: FIX Easier, Harder, joined spike item 2.
+- 21 FIX + 6 NOTE in engine-architect-0005-fixes-final.md; uniqueness, non-overlap and sequential apply checked on HEAD doc (scratchpad ea0005-final/gen.py, applycheck.py).
+DONE
