@@ -7,3 +7,5 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - blocks 2-3 written: FIX GD-7 parts 1-2 (AB-2 lines 852-858: the immunity rule, a tag in the pipeline's data, one reviewed Rust addition; line 859: its need, LOOP_V2 §2 only)
 - blocks 4-6 written: FIX GD-8/finding 18 (active reload row 908 -> OQ-0001-7); FIX GD-7 part 3 (Javelin row 910 + new spawn-protection row -> OQ-0005-AB14); FIX GD-7 need line 917
 - blocks 7-9 written: AB-8 rows 946 (open offers queue, data, -> OQ-0005-AB8), 952 (record key -> OQ-0004-10), 953 (offer size from data; ADR 0004's authority-only offers stream, part 8)
+- block 10 written: OQ intro 1128-1130 (AB14 added to Mustafa's no-pick list; OQ-0004-11 pointer)
+- block 11 written: OQ-0005-AB8 1219-1224 (full queue options (i)-(iii), no pick)

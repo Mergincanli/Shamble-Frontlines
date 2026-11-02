@@ -56,6 +56,14 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   (ADR 0002 part 10 points to OQ-0006-13).
 - Routed by engine-architect's ADR 0005 frame batch (b88714d): README rows for I-6 (the archive of shipped content
   sets, ADR 0006 part 12) and OQ-0005-AP1 (waits on OQ-0006-18).
+- Routed by netcode-architect's ADR 0001 final batch (75615d1): README rows for OQ-0001-5 and -7 (new titles), new rows
+  OQ-0001-15 (own movement one tick behind; Mustafa by feel with netcode-architect), -16 (the profiles' direction split;
+  the Advisor), -17 (does a host's kick bar the player; Mustafa), -18 (ROOM-CRASH; the Advisor); I-11 "host and both
+  ports"; ENGINE_OVERVIEW lines 37 and 94 (events released when their entity is drawn; the newest input posted each
+  frame); SPIKE_PLAN reads OQ-0001-2 (a)'s stand-ins (ADR 0004 S1: 384 effect rows plus a 1 ms burn at 30 Hz; 1 ms and
+  0.30 ms at 60 Hz).
+- Deferred (optional, noted for the report): ADR 0004 part 20 could name OQ-0001-18 instead of "the Advisor's question
+  in ADR 0001"; the pointer is correct as it stands.
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding

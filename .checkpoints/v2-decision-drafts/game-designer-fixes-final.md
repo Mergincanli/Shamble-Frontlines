@@ -124,3 +124,42 @@ AFTER:
   | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the offer (its size from data, 3) from ADR 0004's authority-only offers stream (part 8): a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a) | a pick that was not offered, or for an offer that is no longer open, is refused |
 END
 
+### FIX GD-7 (the new OQ-0005-AB14) + POOL-FULL (where the proposal sits): the open questions' opening lines
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
+other. None of AB1 to AB11 has a pick here: they are Mustafa's ("list them as open questions, don't decide them"), and
+the data model carries every option listed.
+AFTER:
+The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
+other, and OQ-0005-AB14 is what LOOP_V2 §2's spawn protection leaves open. None of AB1 to AB11 or AB14 has a pick here:
+they are Mustafa's (for the upgrade questions, his own words: "list them as open questions, don't decide them"), and
+the data model carries every option listed, except where an option says it needs a reviewed Rust addition. Which row
+gives way when a pool is full is ADR 0004's OQ-0004-11, with the game-designer's proposal per kind in AB-1 for Mustafa
+to confirm.
+END
+
+### FIX GD-8 (rust-reviewer's routed note: OQ-0005-AB8 says what a full offer queue does)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  - Why it matters: a live fight has no pause. The open offer is state on the player's record (ADR 0004), the answer
+    is a command the authority checks (ADR 0001), and ADR 0003 draws it.
+  - Options: (a) at once, in play, answerable any time (unanswered offers wait, in a queue whose length is data); the
+    fastest power, a distraction mid-fight. (b) Only at the buy terminal, where everyone spawns (LOOP_V2 §2); ties picks
+    to a visit to the barracks. (c) While dead or respawning; gives the respawn wait a use, and picks lag behind levels.
+    With each: are the three candidates always different, and what happens when a track has fewer than three left.
+AFTER:
+  - Why it matters: a live fight has no pause. The open offers are state on the player's record (ADR 0004 part 18: a
+    bounded queue per track, its length and the offer's size both data), the answer is a command the authority checks
+    (ADR 0001), and ADR 0003 draws it.
+  - Options: (a) at once, in play, answerable any time (unanswered offers wait, in a queue whose length is data); the
+    fastest power, a distraction mid-fight. (b) Only at the buy terminal, where everyone spawns (LOOP_V2 §2); ties picks
+    to a visit to the barracks. (c) While dead or respawning; gives the respawn wait a use, and picks lag behind levels.
+    With each: are the candidates always different, and what happens when a track has fewer left than the offer's size
+    (3). Also with each, what a full queue does when the track levels again: (i) the level is kept and its offer drawn
+    once a pick frees a place, so nothing earned is lost and the queue's length only limits what is shown; (ii) the
+    oldest open offer gives way to the new one, so the player loses a choice they earned (pillar 2); (iii) the track
+    stops earning until a pick, a push to pick and lost progress for a player who cannot stop. Under (b) and (c) the
+    queue fills fastest, since offers wait for a visit or a death.
+END
+

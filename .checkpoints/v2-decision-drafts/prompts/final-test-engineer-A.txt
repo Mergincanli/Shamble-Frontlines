@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch) · subagent_type: test-engineer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
 
-You are the author of the drafts' pass marks (unit A of two) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit {SHA}). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+You are the author of the drafts' pass marks (unit A of two) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 75615d1). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
 
 ## Your text
 The "### Pass marks" sections of ADR 0001 (with its netcode checklist) and ADR 0002. Unit B (another test-engineer agent) has the other four drafts' pass marks; where a finding touches both units (PA-5, EA-7/IE-2), write your half and say what the other half must read.
@@ -39,6 +39,10 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   -51, -64, -66, -76, and a reported Worker-budget row (PA-13).
 - Routed by engine-architect's ADR 0002 batch, second part (61e9933): PM-0002-42 (G3: a planted `eval` in `client`),
   PM-0002-44 (G5: a planted git dependency), PM-0002-46 (G8: a planted inline script in the built HTML) need bites.
+- Routed by netcode-architect's ADR 0001 final batch (75615d1; its NOTEs in netcode-architect-fixes-final.md say what
+  each row needs): PM-0001-12, -13, -21 (the clamp; strictly newer ticks), -25, -29, -30, -39, -43, -44, -48, -49 (the
+  completed rewind estimate), -54, and checklist step 10; new rows: own cues play once per shot; a tick-thread panic ends
+  the match; counter wraps from just below their wrap points; 0 corrections from a pick or an effect.
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding
@@ -48,7 +52,7 @@ Each finding's full text, evidence and proposed fix is in the file it names, all
 - Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
 
 ## Write
-/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-A-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at {SHA}, whole lines):
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-A-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 75615d1, whole lines):
 ```
 ### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
 FILE: <docs path>

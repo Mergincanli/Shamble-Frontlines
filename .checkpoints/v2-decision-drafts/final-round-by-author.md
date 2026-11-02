@@ -102,6 +102,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   -51, -64, -66, -76, and a reported Worker-budget row (PA-13).
 - Routed by engine-architect's ADR 0002 batch, second part (61e9933): PM-0002-42 (G3: a planted `eval` in `client`),
   PM-0002-44 (G5: a planted git dependency), PM-0002-46 (G8: a planted inline script in the built HTML) need bites.
+- Routed by netcode-architect's ADR 0001 final batch (75615d1; its NOTEs in netcode-architect-fixes-final.md say what
+  each row needs): PM-0001-12, -13, -21 (the clamp; strictly newer ticks), -25, -29, -30, -39, -43, -44, -48, -49 (the
+  completed rewind estimate), -54, and checklist step 10; new rows: own cues play once per shot; a tick-thread panic ends
+  the match; counter wraps from just below their wrap points; 0 corrections from a pick or an effect.
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -330,4 +334,12 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (ADR 0002 part 10 points to OQ-0006-13).
 - Routed by engine-architect's ADR 0005 frame batch (b88714d): README rows for I-6 (the archive of shipped content
   sets, ADR 0006 part 12) and OQ-0005-AP1 (waits on OQ-0006-18).
+- Routed by netcode-architect's ADR 0001 final batch (75615d1): README rows for OQ-0001-5 and -7 (new titles), new rows
+  OQ-0001-15 (own movement one tick behind; Mustafa by feel with netcode-architect), -16 (the profiles' direction split;
+  the Advisor), -17 (does a host's kick bar the player; Mustafa), -18 (ROOM-CRASH; the Advisor); I-11 "host and both
+  ports"; ENGINE_OVERVIEW lines 37 and 94 (events released when their entity is drawn; the newest input posted each
+  frame); SPIKE_PLAN reads OQ-0001-2 (a)'s stand-ins (ADR 0004 S1: 384 effect rows plus a 1 ms burn at 30 Hz; 1 ms and
+  0.30 ms at 60 Hz).
+- Deferred (optional, noted for the report): ADR 0004 part 20 could name OQ-0001-18 instead of "the Advisor's question
+  in ADR 0001"; the pointer is correct as it stands.
 

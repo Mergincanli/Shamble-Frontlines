@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch) · subagent_type: test-engineer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
 
-You are the author of the drafts' pass marks (unit B of two) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit {SHA}). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+You are the author of the drafts' pass marks (unit B of two) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 75615d1). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
 
 ## Your text
 The "### Pass marks" sections of ADR 0003 (with its look checklist), ADR 0004, ADR 0005 (with its Feel Lab checklist) and ADR 0006. Unit A (another test-engineer agent) has ADR 0001's and 0002's; where a finding touches both units (PA-5, EA-7/IE-2), write your half and say what the other half must read.
@@ -70,6 +70,13 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   projectile lifetime doubled while the report stays the same).
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
+**Timing for ADR 0005:** ADR 0005's ability section is still being fixed by game-designer (its blocks go into
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/game-designer-fixes-final.md as it writes them). Do the rows of
+ADR 0003, 0004 and 0006 first; take ADR 0005's rows last, reading game-designer's fixes file (and the doc, if a newer
+commit has applied it: `git -C /home/user/Shamble-Frontlines log -1 -- docs/adr/0005-content-abilities-assets.md`) for
+what the ability rows must follow. Your BEFOREs sit in "### Pass marks", which no other author touches, so the text at
+75615d1 stays valid for them.
+
 ## What to do with each finding
 - **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
 - **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
@@ -77,7 +84,7 @@ Each finding's full text, evidence and proposed fix is in the file it names, all
 - Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
 
 ## Write
-/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-B-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at {SHA}, whole lines):
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-B-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 75615d1, whole lines):
 ```
 ### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
 FILE: <docs path>
