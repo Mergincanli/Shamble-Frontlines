@@ -21,3 +21,6 @@ DONE (follow-up b)
 - follow-up c (RR-11: no usize in serialized or hashed bytes, part 9) started; output rust-reviewer-fixes-final-c.md from the doc on disk
 - block c written and applies on a copy; DONE (follow-up c)
 - follow-up d (fixcheck-d0 row 9: rem_euclid/div_euclid precision, abs) started
+- block d1 written (abs, copysign: lines 259-260)
+- block d2 written (rem_euclid, div_euclid, %: lines 269-271)
+- follow-up d applies on a copy; DONE (follow-up d)

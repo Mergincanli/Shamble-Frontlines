@@ -92,6 +92,7 @@ topic	line	nearest id	entry	kind	phrase
 0001	1297		Team size and how modes are written	context	players
 0001	1319		The largest mode, and its N	context	48
 0001	1335		Preview isolation and the isolation flag	context	always
+0001	1379		The measuring unit: one vCPU	exact	per core
 0001	1380		Active effect (and visual effect)	context	effects
 0001	1380		Active effect (and visual effect)	context	effects
 0001	1380		Big vehicle and very large unit	context	vehicles
@@ -213,64 +214,64 @@ topic	line	nearest id	entry	kind	phrase
 0003	355		The largest mode, and its N	context	48
 0003	356		The largest mode, and its N	context	48
 0003	366		Active effect (and visual effect)	context	effects
-0003	404		The largest mode, and its N	context	48
-0003	413		Team size and how modes are written	context	players
-0003	419		Team size and how modes are written	context	players
-0003	427		The largest mode, and its N	context	48
-0003	428		Big vehicle and very large unit	context	large units
-0003	431		Team size and how modes are written	context	players
-0003	531		Team size and how modes are written	context	players
-0003	554		Preview isolation and the isolation flag	context	always
-0003	585		Player count (N)	context	characters
-0003	618		The largest mode, and its N	context	48
-0003	651		Preview isolation and the isolation flag	context	always
-0003	660		Preview isolation and the isolation flag	context	always
-0003	677		The largest mode, and its N	context	48
-0003	697		The largest mode, and its N	context	48
-0003	699		The largest mode, and its N	context	48
-0003	721		The largest mode, and its N	context	48
-0003	860		Team size and how modes are written	context	players
-0003	915		Team size and how modes are written	context	players
-0003	921		Team size and how modes are written	context	players
-0003	925		Team size and how modes are written	context	players
-0003	935		The largest mode, and its N	context	48
-0003	949		The largest mode, and its N	context	48
-0003	952		Active effect (and visual effect)	context	effects
-0003	979		Player count (N)	context	characters
-0003	979		The largest mode, and its N	context	48
-0003	985		The largest mode, and its N	context	48
-0003	991		The server tick budget	context	50 %
-0003	1043		The largest mode, and its N	context	48
-0003	1047		The largest mode, and its N	context	48
-0003	1124		Active effect (and visual effect)	context	effects
-0003	1126		Active effect (and visual effect)	context	effects
-0003	1126		The largest mode, and its N	context	48
-0003	1126		The largest mode, and its N	context	48
-0003	1126		The largest mode, and its N	context	48
-0003	1126		The largest mode, and its N	context	48
-0003	1126		The largest mode, and its N	context	48
-0003	1126		The largest mode, and its N	context	48
-0003	1135		The largest mode, and its N	context	48
-0003	1140		The largest mode, and its N	context	48
-0003	1140		The largest mode, and its N	context	48
-0003	1144		The largest mode, and its N	context	48
-0003	1148		The server tick budget	context	50 %
-0003	1154		The largest mode, and its N	context	48
-0003	1158		Active effect (and visual effect)	context	effects
-0003	1249		Active effect (and visual effect)	context	effects
-0003	1276		Team size and how modes are written	context	players
-0003	1296		The largest mode, and its N	context	48
-0003	1298		Active effect (and visual effect)	context	effects
-0003	1299		Active effect (and visual effect)	context	effects
-0003	1308		Preview isolation and the isolation flag	context	always
-0003	1331		The largest mode, and its N	context	48
-0003	1341		The largest mode, and its N	context	48
-0003	1405		The largest mode, and its N	context	48
-0003	1406		The largest mode, and its N	context	48
-0003	1407		The largest mode, and its N	context	48
-0003	1410		The largest mode, and its N	context	48
-0003	1443		The largest mode, and its N	context	48
-0003	1467		The largest mode, and its N	context	48
+0003	405		The largest mode, and its N	context	48
+0003	414		Team size and how modes are written	context	players
+0003	420		Team size and how modes are written	context	players
+0003	428		The largest mode, and its N	context	48
+0003	429		Big vehicle and very large unit	context	large units
+0003	432		Team size and how modes are written	context	players
+0003	539		Team size and how modes are written	context	players
+0003	562		Preview isolation and the isolation flag	context	always
+0003	593		Player count (N)	context	characters
+0003	626		The largest mode, and its N	context	48
+0003	659		Preview isolation and the isolation flag	context	always
+0003	668		Preview isolation and the isolation flag	context	always
+0003	685		The largest mode, and its N	context	48
+0003	705		The largest mode, and its N	context	48
+0003	707		The largest mode, and its N	context	48
+0003	729		The largest mode, and its N	context	48
+0003	868		Team size and how modes are written	context	players
+0003	923		Team size and how modes are written	context	players
+0003	929		Team size and how modes are written	context	players
+0003	933		Team size and how modes are written	context	players
+0003	955		The largest mode, and its N	context	48
+0003	969		The largest mode, and its N	context	48
+0003	972		Active effect (and visual effect)	context	effects
+0003	999		Player count (N)	context	characters
+0003	999		The largest mode, and its N	context	48
+0003	1005		The largest mode, and its N	context	48
+0003	1011		The server tick budget	context	50 %
+0003	1063		The largest mode, and its N	context	48
+0003	1067		The largest mode, and its N	context	48
+0003	1144		Active effect (and visual effect)	context	effects
+0003	1146		Active effect (and visual effect)	context	effects
+0003	1146		The largest mode, and its N	context	48
+0003	1146		The largest mode, and its N	context	48
+0003	1146		The largest mode, and its N	context	48
+0003	1146		The largest mode, and its N	context	48
+0003	1146		The largest mode, and its N	context	48
+0003	1146		The largest mode, and its N	context	48
+0003	1155		The largest mode, and its N	context	48
+0003	1160		The largest mode, and its N	context	48
+0003	1160		The largest mode, and its N	context	48
+0003	1164		The largest mode, and its N	context	48
+0003	1168		The server tick budget	context	50 %
+0003	1174		The largest mode, and its N	context	48
+0003	1178		Active effect (and visual effect)	context	effects
+0003	1269		Active effect (and visual effect)	context	effects
+0003	1296		Team size and how modes are written	context	players
+0003	1316		The largest mode, and its N	context	48
+0003	1318		Active effect (and visual effect)	context	effects
+0003	1319		Active effect (and visual effect)	context	effects
+0003	1328		Preview isolation and the isolation flag	context	always
+0003	1351		The largest mode, and its N	context	48
+0003	1361		The largest mode, and its N	context	48
+0003	1425		The largest mode, and its N	context	48
+0003	1426		The largest mode, and its N	context	48
+0003	1427		The largest mode, and its N	context	48
+0003	1430		The largest mode, and its N	context	48
+0003	1463		The largest mode, and its N	context	48
+0003	1487		The largest mode, and its N	context	48
 0004	23		Active effect (and visual effect)	context	effects
 0004	24		Big vehicle and very large unit	context	vehicles
 0004	31		Big vehicle and very large unit	context	vehicles
@@ -289,86 +290,86 @@ topic	line	nearest id	entry	kind	phrase
 0004	232		The server tick budget	context	25 %
 0004	235		Active effect (and visual effect)	context	effects
 0004	312		Team size and how modes are written	context	players
-0004	343		The largest mode, and its N	context	48
-0004	403		Team size and how modes are written	context	players
-0004	420		Big vehicle and very large unit	context	vehicles
-0004	443		Big vehicle and very large unit	context	vehicles
-0004	453		The largest mode, and its N	context	48
-0004	458		Active effect (and visual effect)	context	effects
-0004	464		The largest mode, and its N	context	48
-0004	514		Preview isolation and the isolation flag	context	always
-0004	534		State hash	context	its hash
-0004	616		The largest mode, and its N	context	48
-0004	681		Big vehicle and very large unit	context	vehicles
-0004	719		Big vehicle and very large unit	context	vehicles
-0004	746		Team size and how modes are written	context	players
-0004	812		The largest mode, and its N	context	48
-0004	836		Preview isolation and the isolation flag	context	always
-0004	952		Big vehicle and very large unit	context	vehicles
-0004	955		Big vehicle and very large unit	context	vehicles
-0004	964		The largest mode, and its N	context	48
-0004	973		The largest mode, and its N	context	48
-0004	973		The largest mode, and its N	context	48
-0004	973		The largest mode, and its N	context	48
-0004	979		The largest mode, and its N	context	48
-0004	981		The largest mode, and its N	context	48
-0004	982		The largest mode, and its N	context	48
-0004	982		The largest mode, and its N	context	48
+0004	347		The largest mode, and its N	context	48
+0004	407		Team size and how modes are written	context	players
+0004	424		Big vehicle and very large unit	context	vehicles
+0004	447		Big vehicle and very large unit	context	vehicles
+0004	457		The largest mode, and its N	context	48
+0004	462		Active effect (and visual effect)	context	effects
+0004	468		The largest mode, and its N	context	48
+0004	518		Preview isolation and the isolation flag	context	always
+0004	538		State hash	context	its hash
+0004	620		The largest mode, and its N	context	48
+0004	685		Big vehicle and very large unit	context	vehicles
+0004	723		Big vehicle and very large unit	context	vehicles
+0004	750		Team size and how modes are written	context	players
+0004	816		The largest mode, and its N	context	48
+0004	840		Preview isolation and the isolation flag	context	always
+0004	956		Big vehicle and very large unit	context	vehicles
+0004	959		Big vehicle and very large unit	context	vehicles
+0004	968		The largest mode, and its N	context	48
+0004	977		The largest mode, and its N	context	48
+0004	977		The largest mode, and its N	context	48
+0004	977		The largest mode, and its N	context	48
+0004	983		The largest mode, and its N	context	48
+0004	985		The largest mode, and its N	context	48
 0004	986		The largest mode, and its N	context	48
-0004	1026		The largest mode, and its N	context	48
-0004	1031		The largest mode, and its N	context	48
-0004	1071		The server tick budget	context	25 %
-0004	1098		Active effect (and visual effect)	context	effects
-0004	1098		The largest mode, and its N	context	48
-0004	1098		The largest mode, and its N	context	48
-0004	1098		The largest mode, and its N	context	48
-0004	1099		The largest mode, and its N	context	48
-0004	1099		The largest mode, and its N	context	48
-0004	1099		The server tick budget	context	25 %
-0004	1100		The largest mode, and its N	context	48
-0004	1100		The largest mode, and its N	context	48
-0004	1100		The largest mode, and its N	context	48
-0004	1101		The largest mode, and its N	context	48
+0004	986		The largest mode, and its N	context	48
+0004	990		The largest mode, and its N	context	48
+0004	1030		The largest mode, and its N	context	48
+0004	1035		The largest mode, and its N	context	48
+0004	1075		The server tick budget	context	25 %
+0004	1102		Active effect (and visual effect)	context	effects
+0004	1102		The largest mode, and its N	context	48
+0004	1102		The largest mode, and its N	context	48
 0004	1102		The largest mode, and its N	context	48
 0004	1103		The largest mode, and its N	context	48
+0004	1103		The largest mode, and its N	context	48
+0004	1103		The server tick budget	context	25 %
 0004	1104		The largest mode, and its N	context	48
+0004	1104		The largest mode, and its N	context	48
+0004	1104		The largest mode, and its N	context	48
+0004	1105		The largest mode, and its N	context	48
+0004	1106		The largest mode, and its N	context	48
+0004	1107		The largest mode, and its N	context	48
 0004	1108		The largest mode, and its N	context	48
-0004	1110		The largest mode, and its N	context	48
+0004	1112		The largest mode, and its N	context	48
 0004	1114		The largest mode, and its N	context	48
-0004	1115		Team size and how modes are written	context	players
-0004	1115		The largest mode, and its N	context	48
-0004	1116		The largest mode, and its N	context	48
-0004	1123		The largest mode, and its N	context	48
+0004	1118		The largest mode, and its N	context	48
+0004	1119		Team size and how modes are written	context	players
+0004	1119		The largest mode, and its N	context	48
+0004	1120		The largest mode, and its N	context	48
 0004	1127		The largest mode, and its N	context	48
-0004	1134		The largest mode, and its N	context	48
-0004	1141		The largest mode, and its N	context	48
-0004	1142		The largest mode, and its N	context	48
-0004	1142		The largest mode, and its N	context	48
-0004	1149		The largest mode, and its N	context	48
-0004	1149		The largest mode, and its N	context	48
-0004	1151		Big vehicle and very large unit	context	vehicles
-0004	1151		Big vehicle and very large unit	context	vehicles
-0004	1154		The largest mode, and its N	context	48
-0004	1161		The largest mode, and its N	context	48
-0004	1163		The largest mode, and its N	context	48
-0004	1166		Active effect (and visual effect)	context	effects
-0004	1166		Active effect (and visual effect)	context	effects
-0004	1166		The largest mode, and its N	context	48
-0004	1166		The largest mode, and its N	context	48
-0004	1166		The largest mode, and its N	context	48
+0004	1131		The largest mode, and its N	context	48
+0004	1138		The largest mode, and its N	context	48
+0004	1145		The largest mode, and its N	context	48
+0004	1146		The largest mode, and its N	context	48
+0004	1146		The largest mode, and its N	context	48
+0004	1153		The largest mode, and its N	context	48
+0004	1153		The largest mode, and its N	context	48
+0004	1155		Big vehicle and very large unit	context	vehicles
+0004	1155		Big vehicle and very large unit	context	vehicles
+0004	1158		The largest mode, and its N	context	48
+0004	1165		The largest mode, and its N	context	48
+0004	1167		The largest mode, and its N	context	48
+0004	1170		Active effect (and visual effect)	context	effects
+0004	1170		Active effect (and visual effect)	context	effects
 0004	1170		The largest mode, and its N	context	48
-0004	1174		The authority	context	server-only
-0004	1174		The server tick budget	context	25 %
-0004	1233		The largest mode, and its N	context	48
-0004	1233		The largest mode, and its N	context	48
-0004	1233		The largest mode, and its N	context	48
-0004	1273		The largest mode, and its N	context	48
-0004	1309		The largest mode, and its N	context	48
-0004	1315		Big vehicle and very large unit	context	vehicles
-0004	1338		The largest mode, and its N	context	48
-0004	1343		The largest mode, and its N	context	48
+0004	1170		The largest mode, and its N	context	48
+0004	1170		The largest mode, and its N	context	48
+0004	1174		The largest mode, and its N	context	48
+0004	1178		The authority	context	server-only
+0004	1178		The server tick budget	context	25 %
+0004	1237		The largest mode, and its N	context	48
+0004	1237		The largest mode, and its N	context	48
+0004	1237		The largest mode, and its N	context	48
+0004	1277		The largest mode, and its N	context	48
+0004	1313		The largest mode, and its N	context	48
+0004	1319		Big vehicle and very large unit	context	vehicles
+0004	1342		The largest mode, and its N	context	48
 0004	1347		The largest mode, and its N	context	48
-0004	1364		The largest mode, and its N	context	48
+0004	1351		The largest mode, and its N	context	48
+0004	1368		The largest mode, and its N	context	48
 0005	7		Big vehicle and very large unit	context	vehicles
 0005	8		Active effect (and visual effect)	context	effects
 0005	11		Active effect (and visual effect)	context	effects
@@ -512,55 +513,54 @@ topic	line	nearest id	entry	kind	phrase
 0006	930		Team size and how modes are written	context	players
 0006	990		The start modes and the goal modes	context	the goal
 0006	997		The start modes and the goal modes	context	the goal
-0006	1008		The largest mode, and its N	context	48
-0006	1008		The largest mode, and its N	context	48
-0006	1011		The client host	context	Cloudflare
-0006	1025		The access wall	context	the access policy
-0006	1026		The client host	context	Cloudflare
-0006	1039		Team size and how modes are written	context	players
-0006	1039		The largest mode, and its N	context	48
-0006	1042		Team size and how modes are written	context	players
-0006	1042		The largest mode, and its N	context	48
-0006	1060		The largest mode, and its N	context	48
-0006	1064		The largest mode, and its N	context	48
-0006	1096		The largest mode, and its N	context	48
-0006	1117		The largest mode, and its N	context	48
-0006	1156		The access wall	context	the access policy
-0006	1158		The access wall	context	the access policy
-0006	1163		The measuring unit: one vCPU	exact	per core
-0006	1165		The largest mode, and its N	context	48
-0006	1165		The largest mode, and its N	context	48
-0006	1166		The largest mode, and its N	context	48
-0006	1166		The largest mode, and its N	context	48
-0006	1166		The start modes and the goal modes	context	the goal
-0006	1169		Big vehicle and very large unit	context	vehicles
-0006	1169		The largest mode, and its N	context	48
-0006	1169		The largest mode, and its N	context	48
-0006	1169		The largest mode, and its N	context	48
-0006	1169		The largest mode, and its N	context	48
-0006	1174		The largest mode, and its N	context	48
-0006	1176		Team size and how modes are written	context	players
-0006	1178		State hash	context	its hash
-0006	1178		The largest mode, and its N	context	48
-0006	1178		The largest mode, and its N	context	48
-0006	1179		State hash	context	its hash
-0006	1209		Game-server certificate	context	a publicly trusted certificate
-0006	1225		The access wall	context	the access policy
-0006	1228		The access wall	context	the access policy
-0006	1232		The client host	context	Cloudflare
-0006	1235		The client host	context	Cloudflare
-0006	1256		The client host	context	Cloudflare
-0006	1286		The largest mode, and its N	context	48
-0006	1287		The start modes and the goal modes	context	the goal
-0006	1288		The largest mode, and its N	context	48
-0006	1288		The start modes and the goal modes	context	the goal
-0006	1295		The largest mode, and its N	context	48
-0006	1309		The largest mode, and its N	context	48
-0006	1320		The largest mode, and its N	context	48
-0006	1333		The client host	context	Cloudflare
-0006	1388		The largest mode, and its N	context	48
-0006	1391		The start modes and the goal modes	context	the goal
-0006	1397		The largest mode, and its N	context	48
+0006	1025		The largest mode, and its N	context	48
+0006	1025		The largest mode, and its N	context	48
+0006	1028		The client host	context	Cloudflare
+0006	1042		The access wall	context	the access policy
+0006	1043		The client host	context	Cloudflare
+0006	1056		Team size and how modes are written	context	players
+0006	1056		The largest mode, and its N	context	48
+0006	1059		Team size and how modes are written	context	players
+0006	1059		The largest mode, and its N	context	48
+0006	1078		The largest mode, and its N	context	48
+0006	1082		The largest mode, and its N	context	48
+0006	1114		The largest mode, and its N	context	48
+0006	1135		The largest mode, and its N	context	48
+0006	1174		The access wall	context	the access policy
+0006	1176		The access wall	context	the access policy
+0006	1183		The largest mode, and its N	context	48
+0006	1183		The largest mode, and its N	context	48
+0006	1184		The largest mode, and its N	context	48
+0006	1184		The largest mode, and its N	context	48
+0006	1184		The start modes and the goal modes	context	the goal
+0006	1187		Big vehicle and very large unit	context	vehicles
+0006	1187		The largest mode, and its N	context	48
+0006	1187		The largest mode, and its N	context	48
+0006	1187		The largest mode, and its N	context	48
+0006	1187		The largest mode, and its N	context	48
+0006	1192		The largest mode, and its N	context	48
+0006	1194		Team size and how modes are written	context	players
+0006	1196		State hash	context	its hash
+0006	1196		The largest mode, and its N	context	48
+0006	1196		The largest mode, and its N	context	48
+0006	1197		State hash	context	its hash
+0006	1227		Game-server certificate	context	a publicly trusted certificate
+0006	1243		The access wall	context	the access policy
+0006	1246		The access wall	context	the access policy
+0006	1250		The client host	context	Cloudflare
+0006	1253		The client host	context	Cloudflare
+0006	1274		The client host	context	Cloudflare
+0006	1304		The largest mode, and its N	context	48
+0006	1305		The start modes and the goal modes	context	the goal
+0006	1306		The largest mode, and its N	context	48
+0006	1306		The start modes and the goal modes	context	the goal
+0006	1313		The largest mode, and its N	context	48
+0006	1327		The largest mode, and its N	context	48
+0006	1338		The largest mode, and its N	context	48
+0006	1351		The client host	context	Cloudflare
+0006	1406		The largest mode, and its N	context	48
+0006	1409		The start modes and the goal modes	context	the goal
+0006	1415		The largest mode, and its N	context	48
 IDX	68		Team size and how modes are written	context	players
 IDX	105		Team size and how modes are written	context	players
 IDX	116		Team size and how modes are written	context	players
