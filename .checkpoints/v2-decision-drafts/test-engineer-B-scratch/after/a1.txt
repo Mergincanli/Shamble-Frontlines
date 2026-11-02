@@ -1,0 +1,3 @@
+Written by test-engineer (plan step 4). One row per mark: the look proof test's first (PM-0003-1 to PM-0003-17), then
+the render budget bench's (PM-0003-18 to PM-0003-42, then PM-0003-44 to PM-0003-47, added at the final round), then
+the check at each later three.js upgrade (PM-0003-43). Every

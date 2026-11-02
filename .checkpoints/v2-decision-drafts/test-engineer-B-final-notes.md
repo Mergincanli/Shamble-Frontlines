@@ -18,3 +18,8 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0003 block 3 done: H/Statistics/V 1049-1061 (tail form 3,000 frames; V-T 10 %; S soaked set -> OQ-0003-20 to add)
 - 0003 PM-0003-2 done (GE-14)
 - 0003 PM-0003-3 done (TE-5)
+- 0003 PM-0003-6 done (GE-9)
+- 0003 PM-0003-7 and -33 done (GE-3)
+- coordinator msg: scratch now in test-engineer-B-scratch/ (mkblock.py helper: copies BEFORE from 75615d1, checks unique, appends FIX; after/*.txt = AFTER texts). r3 at 9e7db28: regenerate by `git show 9e7db28:docs/research/r3-rendering.md`
+- coordinator msg: game-designer batch done; routes PM-0005-18, -25 (3rd leg), -29, -31 (AB8 queue wording), PM-0004-6 (overflow per kind: content-bounded effects reserved; others' effects oldest gives way; projectiles sized to worst case 96 Molotov flames at N=48; pickups oldest gives way). Take 0005 rows after the session's next commit to 0005 (check BEFORE unchanged vs 75615d1)
+- 0003 blocks so far: intro 1022-1023, scenes 1041-1048, H/S/Stats/V 1049-1061, PM-0003-2 (1092), -3 (1093), -6 (1096), -7 (1097), -33 (1124). Next: -9, -12, -16, -19?, -22?, -23, -29?, -36, new rows -44..-47 (before line "| **Later, at each three.js upgrade**"), fail route 1137-1146, no-mark lines, checklist

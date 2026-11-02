@@ -841,9 +841,37 @@ weapon.
     parameterizes operations. It cannot run arbitrary code: every new operation is a reviewed Rust change. The
     aggregation order is fixed and documented per attribute (GAS's default sums its multipliers, a rule designers must
     know). Stacking is an explicit policy per effect, from a short list: no stacking, refresh the duration, add a stack
-    up to a limit, strongest only. Left out: what exists for Unreal's object and replication model (instancing
-    policies, replication modes, ability tasks as a framework), and anything no legacy or LOOP_V2 test case needs.
-  - Why: §6.3 asks for GAS-like data, and the subset covers every legacy ability and weapon and the primitives §6.4
+    up to a limit, strongest only; what a full pool does to a new row sits beside it (the next item). Left out: what
+    exists for Unreal's object and replication model (instancing policies, replication modes, ability tasks as a
+    framework), and anything no legacy or LOOP_V2 test case needs.
+  - When a pool is full (OQ-0004-11: the game-designer proposes per kind, and Mustafa confirms where a player could
+    notice; ADR 0004 part 1 fixes each pool's capacity at match start and counts every overflow; CD-2's whole-set
+    check reports each pool's worst case, or names the missing cap). Proposed, per kind:
+    - Active effects the content bounds on their target (its own picks, its own abilities' and weapon's effects,
+      spawn protection): the whole-set check reserves their worst case in every target's rows, so they never give way.
+      Reason: their count follows from the content alone, and a pick or a pressed ability that silently fails to apply
+      takes away what the player earned (pillar 2).
+    - Active effects that other soldiers, vehicles or structures apply (one row per application under "no stacking", so
+      play sets their count, not the content): they share the rest of the target's rows, up to a cap in data set once
+      AB-10's curve shows what the step can carry; when that share is full, the oldest such row on the target, by start
+      tick and then sequence number (ADR 0004 part 4), ends early (OQ-0004-11's option (b)). Reason: refusing the new
+      row would make a saturated target immune to every further slow or mark, so cheap buffs stacked by teammates could
+      shut out the enemy's answers (pillar 3); ending the oldest keeps every new application landing, at the cost of an
+      older effect ending early, which the overflow counter shows to tuning.
+    - Live projectiles: the pool holds the content's worst case at the mode's N, so honest play cannot fill it. Per
+      shooter that is at most ⌊lifetime ÷ fire interval⌋ + 1 live shots of each projectile weapon it can carry at once
+      (carry slots are OQ-0005-AB1's), times the weapon's pellets; legacy's Molotov (fuse 1.4 s, r1:1373; fire interval
+      1.05 s, LEGACY_TUNING.md, `WEAPONS`, lines 167–203) gives ⌊1.4 ÷ 1.05⌋ + 1 = 2 per thrower, and 2 × 48 = 96 at
+      N = 48 (arithmetic). Refusing the new row (option (a)), counted, stays as the safety net, and a non-zero count is
+      a content or capacity bug, not a rule a player meets. Reason: a shot that never leaves the gun and a projectile
+      that vanishes in flight would both be seen, so the pool is sized never to need either; R2-BUD-OQ5's caps, once
+      set, bound the content (a set whose worst case exceeds them fails the check), not the play.
+    - Weapon pickups: the pickup that has lain longest ends early (option (b)), whatever lifetime OQ-0005-AB9 sets.
+      Reason: UPGRADE-SCOPE makes drops the only source of other weapons, so the drop from the fight just won matters
+      more than one nobody has taken, and refusing it would leave a kill with no drop.
+    - Research: none (no research sizes a pool); R2-BUD-OQ5 (r2-netcode.md, Open questions, Brief question 2, lines
+      2982–2985) for the caps; R1-ABL-REC6's "allocates nothing on the heap in steady state" (r1, Recommendations §5,
+      lines 2471–2472). Need: VISION_V2 §3 and §4 (a budget, not a feature, as AB-10).
     names, with no generic-engine feature.
   - Research: R1-ABL-REC1 (r1-simulation-core.md, Recommendations §5, lines 2342–2363), resting on R1-ABL-F1–F11, F16,
     F19.
@@ -851,12 +879,17 @@ weapon.
 - **AB-2. One damage pipeline: fixed Rust stages, parameterized by data.**
   - What: the stages are the locational multiplier, range falloff, the frontal-arc block, a target-tag multiplier (for
     counters such as "strong against vehicles") and the owner and team rules. Each hit becomes an instant damage effect
-    that passes through them.
+    that passes through them. Beside the owner and team rules sits one rule the research does not list, for spawn
+    protection (LOOP_V2 §2 `[DEFAULT]`; AB-6): a hit on a target that holds the immunity tag the pipeline's data names
+    deals no damage, a blast included (unlike the frontal-arc block, it reads no arc). It is one reviewed Rust addition,
+    like the knockback operation (AB-6). Proposed as a tag, not as a damage scale of 0 on an attribute, so that no
+    modifier order (AB-1's aggregation) can undo it, and with the tag named once in the pipeline's data rather than as
+    a target-tag multiplier in every weapon (two homes, CS3).
   - Why: the outcome logic GAS gives to execution code becomes fixed, reviewed stages, and each number has one home
     (CS3 shows the cost of two homes).
-  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9.
-  - Need: VISION_V2 §6.3 ("combos and counters can emerge").
-- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**
+  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9; the immunity rule: none (no
+    research finding on spawn protection).
+  - Need: VISION_V2 §6.3 ("combos and counters can emerge"); the immunity rule: LOOP_V2 §2 only.
   - What: a weapon definition holds the sim fields only (fire interval, fire mode, magazine, reserve, pellets, the
     spread fields, range, falloff, damage, reload, charge curve, projectile kind). The weapon's state machine is
     per-soldier sim state: timer, ammo, burst count, charge, reload and the active-reload window. The feel kit is a
@@ -889,13 +922,22 @@ weapon.
     UPGRADE-SCOPE.
 - **AB-5. Tech tiers gate abilities and purchases as tags.**
   - What: the team's tier is team state the sim keeps (ADR 0004). An ability requires its tier's tag, and a unit or
-    vehicle is buyable at its tier (its tier and cost are unit data, AB-4). The T1 class abilities require Tech 1
-    (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2 §8: "the
-    team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the minute-5 floor
-    are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses a press or a
-    purchase before its tier; whether the client predicts the press is ABL-PREDICT.
+    vehicle is buyable at its tier (its tier and cost are unit and vehicle data, AB-4). The T1 class abilities require
+    Tech 1 (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2
+    §8: "the team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the
+    minute-5 floor are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses
+    a press or a purchase before its tier; whether the client predicts the press is ABL-PREDICT.
+  - What may be bought is data, and ADR 0001's `Buy{unitId}` (part 12) is checked against it: the faction definition
+    lists the units and vehicles its team can buy (AB-4's faction kind; R1-ABL-REC5: "which units and vehicles"), the
+    mode's rules table may change that per mode (R2-ROOM-REC7), and each unit and vehicle definition holds its tier and
+    its price ($100 for each T1 class, LOOP_V2 §5 `[DECIDED]`). The rise in a team's prices after it loses a power plant
+    (LOOP_V2 §3 `[DEFAULT]`, run by ADR 0004 part 17) and the buy terminal's reach are numbers in the same tables. The
+    Recruit is free and comes with every death (LOOP_V2 §5 `[DEFAULT]`), so its price in data is 0. A purchase gives the
+    unit's own weapons and nothing else (AB-8).
   - Why: R1-ABL-REC1 names "team tech tiers" among the tag gates, and legacy checks no tier (GE4, GC11).
-  - Research: R1-ABL-REC1 (lines 2343–2345).
+  - Research: R1-ABL-REC1 (lines 2343–2345); R1-ABL-REC5 (lines 2448–2452) for the faction's list; R2-ROOM-REC7
+    (r2-netcode.md, Recommendations, lines 2857–2867) for the mode's rules table.
+  - Need: VISION_V2 §6.5; the faction's list: §6.7.
   - Need: VISION_V2 §6.5.
 - **AB-6. LOOP_V2's abilities, written in the model.** Each row uses AB-1 to AB-5; a row that needs a new operation
   says so. The legacy numbers are starting values (LEGACY_TUNING.md; LOOP_V2 line 8), never decisions.
@@ -905,16 +947,17 @@ weapon.
   | Molotov (§5 `[DECIDED]`; locked until Tech 1) | the Conscript's ability: a thrown weapon (AB-3) whose projectile is swept per tick (R4-PHYS-REC3, ADR 0004) and ends in an area blast through the pipeline (radius, falloff, owner and team rules; a blast skips the frontal block, as in legacy) | fuse 1.4 s, building ×1.8; the shared blast is 140 damage in 6.5 m with linear falloff, owner ×0.5 (r1:1373, r1:1375; GC14); no fire area (GC11) | whether it leaves a burning area: legacy has none and LOOP_V2 is silent; an area that lingers would be a new operation |
   | Riot Shield (§5 `[DECIDED]`; Tech 1) | a toggled ability that applies a permanent effect while it is on: a granted tag and a movement modifier; the pipeline's frontal-arc stage reads the tag | block 70 % within arc cos 0.30, move ×0.72 (LEGACY_TUNING.md, `T`, lines 132–135) | how the block meets a one-hit kill (OQ-0005-AB11) |
   | Banzai blade (§5 `[DECIDED]`: "one-hit kill while active"; Tech 1) | a timed ability: a timed effect that grants the melee weapon and a speed modifier, with a cooldown; the kill is the weapon's damage through the pipeline | Katana for 10 s, 45 s cooldown, speed ×1.3 (r1:1373); Katana damage 9999, arc 120°, impact 0.13 s, swing 0.4 s, range 3.6 m (LEGACY_TUNING.md, `WEAPONS`, lines 167–203) | its answer (OQ-0005-AB11); whether melee is judged at the attacker's view time is ADR 0001's (R2-SYNC-OQ9) |
-  | Active reload (§7 `[DECIDED]`: "tap R at the right moment for a faster reload and a short damage boost") | the reload state machine's window (AB-3); a tap inside it shortens the reload and applies a timed effect on the weapon's damage attribute; the authority judges the tap from the command's tick (SLICE-ORDER, condition 2); the timing is own weapon state, inside the prediction scope; the boost is damage, which only the authority applies | none in legacy | the window, the faster reload and the boost's size and length (R1-ABL-OQ6) |
+  | Active reload (§7 `[DECIDED]`: "tap R at the right moment for a faster reload and a short damage boost") | the reload state machine's window (AB-3); a tap inside it shortens the reload and applies a timed effect on the weapon's damage attribute; the authority judges the tap from the command's tick (SLICE-ORDER, condition 2), so near the window's edge the 33.3 ms tick (1000 ÷ 30) decides while the page draws the window every frame, and a tap the bar shows inside can be judged outside: whether the tap carries its moment inside a tick is asked beside shots (OQ-0001-7); the timing is own weapon state, inside the prediction scope; the boost is damage, which only the authority applies | none in legacy | the window, the faster reload and the boost's size and length (R1-ABL-OQ6) |
   | The AMK's rhythm (§7 `[DECIDED]`: "a small magazine, the active reload, or both") | the magazine is a weapon field and active reload is the row above, so each of the three fixes is a data change | magazine 1, reload 3.5 s, interval 0.2 s (`WEAPONS`) | which fix |
   | Javelin (§5 `[DECIDED]`: "strong against vehicles and aircraft, weak against infantry"; knockback `[DEFAULT]`; §7 `[DECIDED]`: "Targets react: flinch and knockback") | a projectile weapon; target-tag multipliers in the pipeline (above 1 against vehicle tags, below 1 against infantry); knockback as one new operation, a velocity change on the target, which the research reads as "a velocity change on the kinematic soldier" (R4-PHYS-REC3, ADR 0004); the flinch is presentation (the feel kit) | none (the Javelin is new; LOOP_V2 §11 leaves it out of the greybox v0) | the numbers |
+  | Spawn protection (§2 `[DEFAULT]`: "3 s of spawn protection"; ADR 0004 part 17 applies it at every spawn) | a timed effect on the new soldier that grants the immunity tag AB-2's immunity rule reads; that rule is one new pipeline rule (a reviewed Rust change, like the knockback); the effect's length is data, and its rows are among those the content bounds (AB-1, full pools) | 3 s (LOOP_V2 §2), 90 ticks at 30 Hz (3 × 30, arithmetic); none in legacy, whose respawn waits 2.0 s (LEGACY_INVENTORY.md, CD4, line 85) | what it covers beyond damage, and what ends it early (OQ-0005-AB14) |
   | The Hammer's leech (§6 `[DECIDED]` `[LATER]`) | not built; kept possible by two primitives VISION_V2 §6.4 needs anyway: an effect removed when its source dies, and a trigger on the last hit or tick that moves the victim's item to the source (R1-ABL-REC1 mark 3, lines 2372–2376) | none | the item and the leech rules |
   | Marking (VISION_V2 §6.4) | an effect that grants a tag (the research's reading, R1-ABL-REC1, lines 2359–2361); who sees the tag is ADR 0001's interest management (R1-ABL-OQ8) | none | what marking does (R1-ABL-OQ6) |
   | The Spy's disguise and hack (§5 `[DECIDED]` `[LATER]`; cost, what breaks the disguise, hack length, the amount stolen and the warnings `[OPEN]`) | not built; kept possible: the disguise as a tag-granting effect whose shown identity differs per team (an enemy client receives the disguise as the identity it sees: R2-INT-REC5, ADR 0001); the hack as a timed ability with cancel tags; the cost as an instant effect on a named attribute, so the player's money and the team's tech both stay possible | none | all of it (R2-INT-OQ8, a design question) |
   | Legacy Bayonet, Torque Bow, health regen (not in LOOP_V2) | the Bayonet and the Torque Bow are test cases only (R1-ABL-REC1 mark 1); regen would be a periodic effect, "a candidate periodic effect" in the research (r1:1380) | Bayonet 1.3 s charge, kills within 2.4 m, 10 s cooldown (r1:1373); Torque Bow fuse 0.55 s (r1:1376); regen after 3.5 s at 16 HP/s (LEGACY_TUNING.md, `T`, lines 126–127) | whether each stays (R1-ABL-OQ6) |
 
   - Research: R1-ABL-REC1, REC2; R4-PHYS-REC3 (r4-physics-navigation.md, Recommendations, lines 747–751).
-  - Need: VISION_V2 §6.3, §6.4; the rows' rules: LOOP_V2 §4–§7.
+  - Need: VISION_V2 §6.3, §6.4; the rows' rules: LOOP_V2 §2 (spawn protection) and §4–§7.
 - **AB-7. Combos and counters as data (pillar 3).** Any effect, tag or weapon can be put on any unit or vehicle by data
   alone (R1-ABL-REC1 mark 2, lines 2369–2371). The ids of AB-4 key the telemetry: every kill names its source weapon or
   ability id (R6-TEL-REC1, ADR 0006's), so counters get tuned on evidence (VISION_V2 §6.6). The counters LOOP_V2 states,
@@ -943,14 +986,14 @@ weapon.
 
   | Mustafa's words | Data (this section) | State and execution (ADR 0004 decides) | Authority, messages, visibility (ADR 0001 decides) |
   |---|---|---|---|
-  | "Every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the player." | a track per unit type and per weapon type (AB-4), listing the candidates it can offer at each level; a candidate is an effect or a granted ability, with optional requirements (tags, the track's level); the offer size is a data value, 3, so no number is hard-coded | the player's record holds, per track, its level, its picks and any open offer | the pick command, and the visibility class of offers and track state (R2-INT-REC5's classes: public, team, owner, spatial) |
+  | "Every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the player." | a track per unit type and per weapon type (AB-4), listing the candidates it can offer at each level; a candidate is an effect or a granted ability, with optional requirements (tags, the track's level); the offer size is a data value, 3, so no number is hard-coded | the player's record holds, per track, its level, its picks and its open offers, in a bounded queue whose length is data (ADR 0004 part 18; when offers appear, how they wait and what a full queue does are OQ-0005-AB8's) | the pick command, and the visibility class of offers and track state (R2-INT-REC5's classes: public, team, owner, spatial) |
   | "Tracks survive death and switching (switch back and the track is still there)." | nothing changes in the definitions | the record, not the soldier, holds every track; on each spawn (as a Recruit, or after a purchase) the picks of that unit type's track apply to the new unit | respawns and purchases are commands the authority checks |
   | "They reset at the start of every match." | nothing is saved: tracks need no persistence (accounts are `[LATER]`, VISION_V2 §6.10) | the record starts empty at every match start (with ADR 0001's room lifecycle) | none |
   | "A class always comes with its own weapon: no weapon choice when buying." | the unit definition names its weapon or weapons (AB-4) | a purchase gives exactly those | the purchase names a unit, never a weapon |
   | "Other weapons come only from killed enemies' drops; dropped weapons are world pickups." | the drop and pickup values (AB-4; OQ-0005-AB9) | a drop is a world pickup entity | the check of who may take what; a pickup the authority did not place is refused; the drops' visibility class |
   | "Progress belongs to the weapon type, not the physical gun: when a gun is lost, its track waits for the next gun of that type." | the weapon definition names its track (AB-4) | the picks of a weapon type's track apply to whichever gun of that type the player holds and leave the gun when the player loses it; a world pickup carries none of its last holder's picks; the track keeps its state while no gun of that type is held | none |
-  | "In Unreal terms, the tracks live on the PlayerState, not the Pawn." | none | the record is per player slot, beside the soldier tables | none |
-  | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the three with a sim random stream; which stream is ADR 0004's (a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a)) | a pick that was not offered, or for an offer that is no longer open, is refused |
+  | "In Unreal terms, the tracks live on the PlayerState, not the Pawn." | none | the record is per player slot, beside the soldier tables; whether a player who rejoins after the grace window gets it back, and so whether it is keyed by slot or by player, is OQ-0004-10 | none |
+  | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the offer (its size from data, 3) from ADR 0004's authority-only offers stream (part 8): a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a) | a pick that was not offered, or for an offer that is no longer open, is refused |
 
   - Telemetry: which pick and track fields the match record holds is ADR 0006's (its record shape, R6-TEL-REC1); they
     are keyed by AB-4's ids.
@@ -1125,9 +1168,12 @@ Option E2: nested, self-contained definitions (each unit embeds its weapons and 
   per mode, separately (VISION_V2 §3: "Two-team and three-team battles are both tested").
 
 ### Open questions (this section)
-The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
-other. None of AB1 to AB11 has a pick here: they are Mustafa's ("list them as open questions, don't decide them"), and
-the data model carries every option listed.
+The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 and AB15 are what his rules and LOOP_V2 leave open
+beside each other, and OQ-0005-AB14 is what LOOP_V2 §2's spawn protection leaves open. None of AB1 to AB11, AB14 or
+AB15 has a pick here: they are Mustafa's (for the upgrade questions, his own words: "list them as open questions, don't
+decide them"), and the data model carries every option listed, except where an option says it needs a reviewed Rust
+addition. Which row gives way when a pool is full is ADR 0004's OQ-0004-11, with the game-designer's proposal per kind
+in AB-1 for Mustafa to confirm.
 
 - **OQ-0005-AB1. Carry slots: how many weapons can a player carry besides the class weapon, and what happens to the
   one in hand when they take a pickup?**
@@ -1214,14 +1260,22 @@ the data model carries every option listed.
     with a weaker sense of earned power. (b) Raw power in small steps, with a cap per track as data (a stacking limit,
     AB-1); a strong pillar 2, a risk to pillar 1 and to counters. (c) Mixed, chosen per track; flexible, the hardest to
     balance.
-  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3. Research ids: none.
+  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3; who may see a
+    player's picks is OQ-0005-AB15, decided with this question, since raw power that nobody can see has no answer.
+    Research ids: none.
 - **OQ-0005-AB8. The offer: when does it appear, and when can the player answer it?**
-  - Why it matters: a live fight has no pause. The open offer is state on the player's record (ADR 0004), the answer
-    is a command the authority checks (ADR 0001), and ADR 0003 draws it.
+  - Why it matters: a live fight has no pause. The open offers are state on the player's record (ADR 0004 part 18: a
+    bounded queue per track, its length and the offer's size both data), the answer is a command the authority checks
+    (ADR 0001), and ADR 0003 draws it.
   - Options: (a) at once, in play, answerable any time (unanswered offers wait, in a queue whose length is data); the
     fastest power, a distraction mid-fight. (b) Only at the buy terminal, where everyone spawns (LOOP_V2 §2); ties picks
     to a visit to the barracks. (c) While dead or respawning; gives the respawn wait a use, and picks lag behind levels.
-    With each: are the three candidates always different, and what happens when a track has fewer than three left.
+    With each: are the candidates always different, and what happens when a track has fewer left than the offer's size
+    (3). Also with each, what a full queue does when the track levels again: (i) the level is kept and its offer drawn
+    once a pick frees a place, so nothing earned is lost and the queue's length only limits what is shown; (ii) the
+    oldest open offer gives way to the new one, so the player loses a choice they earned (pillar 2); (iii) the track
+    stops earning until a pick, a push to pick and lost progress for a player who cannot stop. Under (b) and (c) the
+    queue fills fastest, since offers wait for a visit or a death.
   - Decider: Mustafa. What decides it: a design session, then the Feel Lab or playtests. Research ids: none.
 - **OQ-0005-AB9. Which drop and pickup rules does UPGRADE-SCOPE leave unstated?**
   - Why it matters: ADR 0004 builds pickups as sim entities that read these values from data; until they exist, the
@@ -1232,8 +1286,12 @@ the data model carries every option listed.
     carried. Options for who may take a drop: the killer's team; any enemy of the dead soldier (in three-team modes two
     teams, not one); or anyone. Also Mustafa's, each a value in data: how long a pickup stays; whether a gun a player
     swaps out becomes a pickup that anyone can take; which of two claims on one pickup in the same tick wins (ADR 0004
-    keeps the order deterministic whichever is chosen).
-  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1. Research ids: none;
+    keeps the order deterministic whichever is chosen); and which act a press means where a pickup lies within reach of
+    an uplink or a cache, since a steal is holding E (LOOP_V2 §4 step 4), ADR 0001 part 12 has E place a cache too, and
+    a pickup is asked for through the same button edges: the pickup wins, the steal or the placing wins, or a tap takes
+    the pickup and a hold steals. A full pickup pool follows AB-1's proposal for OQ-0004-11.
+  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1; the press precedence
+    in the uplinks change-set's playtests, where fights cluster at uplinks and drops lie there. Research ids: none;
     whether a pickup is predicted is ADR 0001's (Quake III predicts item pickups: R2-SYNC-F17, r2-netcode.md, Findings,
     lines 230–236).
 - **OQ-0005-AB10. Do bots have tracks and make picks, and what does a human get when taking a bot's slot?**
@@ -1244,7 +1302,12 @@ the data model carries every option listed.
     empty; fair to the joiner, and the team loses the bot's picks at once. (c) Bots have no tracks; simplest, and teams
     with more bots are weaker, which matters in three-team modes with uneven bot counts. How a bot picks is bot
     behaviour (ADR 0004).
-  - Decider: Mustafa. What decides it: a design session, then sims with mixed humans and bots. Research ids: none.
+  - Asked beside it in ADR 0004, both Mustafa's: whether a player who rejoins after ADR 0001's grace window gets their
+    record back, tracks and money included, or the slot's bot keeps it (OQ-0004-10, decided with this question; the
+    record's key, slot or player, follows the answer); and whether bots take world pickups at all (OQ-0004-12), which
+    changes what OQ-0005-AB9's drop rules do to balance when most slots are bots.
+  - Decider: Mustafa. What decides it: a design session, with OQ-0004-10 and OQ-0004-12, then sims with mixed humans
+    and bots (3 runs per build, two-team and three-team modes separately). Research ids: none.
 - **OQ-0005-AB11. Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong
   enough before Tech 1?**
   - Why it matters: pillar 3 ("every strong thing has an answer") and the triangle (LOOP_V2 §5, `[DEFAULT]`: the
@@ -1273,17 +1336,49 @@ the data model carries every option listed.
     first, when a copy turns up (SRC-ACCESS (a)).
   - Proposed: (a), and (b) whenever a copy appears. Decider: the Advisor (the source). What decides it: the content and
     ability spike's marks 1 and 2 (the trigger). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
+- **OQ-0005-AB14. What does spawn protection cover, and what ends it early?**
+  - Why it matters: LOOP_V2 §2 (`[DEFAULT]`) gives "3 s of spawn protection" and no more. AB-2's immunity rule stops
+    damage for the effect's whole length; whether it also stops other effects, and whether firing ends it, decides
+    whether a fresh spawn is merely safe or can fight with no risk. On legacy numbers a Warrior empties its 36-round SMG
+    magazine in 35 × 0.072 = 2.52 s, inside the 3 s, for up to 36 × 8 = 288 damage, nearly two Peacekeepers' worth
+    (2 × 150 = 300) (LEGACY_TUNING.md, `WEAPONS` and `UNIT_TYPES`, lines 167–230; arithmetic), and nothing can answer
+    it while it lasts (pillar 3). Barracks interiors are closed to enemies (LOOP_V2 §2), so this plays out at the
+    openings and against blasts thrown in.
+  - Options for what it covers: (a) damage only (AB-2's rule as written); (b) damage and every effect another team
+    applies (slows, marks, knockback), which needs one more reviewed Rust check: an effect's application refused on a
+    target holding the tag. Options for what ends it early: (i) nothing, the full 3 s; (ii) the player's first shot or
+    ability press, which needs a trigger that removes the effect on the soldier's own fire, of the kind R1-ABL-REC1's
+    examples name ("on kill by source, run effect E", line 2347); (iii) leaving the barracks interior, read from the
+    interior's flag (ADR 0004 parts 11 and 17). The length stays data with every option.
+  - Decider: Mustafa (the 3 s is the Advisor's `[DEFAULT]`; what it covers and what ends it are new rules). What
+    decides it: a design session, then sims (3 runs per build, two-team and three-team modes separately) counting
+    deaths before a soldier leaves its barracks and the damage protected soldiers deal, then playtests. Research ids:
+    none (no research finding on spawn protection).
+- **OQ-0005-AB15. Who sees a player's upgrade picks?** (GD-PICK-VIS)
+  - Why it matters: ADR 0001 part 12 sends track state and picks to their owner only, as its starting class. Teammates
+    plan around each other's power (pillar 4: "Teams must split up and talk"); winners should "feel strong and can see
+    it" (pillar 2); and enemies need to read a strong player to answer it (pillar 3, "every strong thing has an
+    answer").
+  - Options: (a) the owner only (ADR 0001 today); (b) the team too; (c) everyone, through the scoreboard or a visible
+    cue on the soldier. Each is one of R2-INT-REC5's visibility classes (r2-netcode.md, Recommendations, line 2502;
+    ADR 0001's), so the answer changes a class in ADR 0001's state table, not the data model; a visible cue in (c) is
+    also ADR 0003's to draw and LOOK_V2's to style.
+  - Decider: Mustafa. What decides it: a design session, with OQ-0005-AB7 (if picks may add raw power, the answer
+    pillar 3 needs is easier to give when enemies can see them), then playtests. Research ids: none.
 
 ### What a spike must prove (this section's part)
 All in the content and ability spike (a working name: `docs/SPIKE_PLAN.md` names the spikes and places them). The
 test-engineer writes the final pass marks; the candidates below are the research's, or marked proposed with a reason.
 
-1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378, as written):** the test content (AMK, Bagpipe, Shabzon, Retro
-   Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the Juggernaut cannon) runs
-   with no ability-specific Rust code (zero matches for those ids in the sim crate's non-test code); a test-only
+1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378; the first mark's proof proposed):** the test content (AMK,
+   Bagpipe, Shabzon, Retro Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the
+   Juggernaut cannon) runs with no ability-specific Rust code. The proof is behaviour, not a search: a test-only
    combination (the Shield's block on a vehicle, the Banzai speed buff on another class) behaves as its parts, with
-   zero Rust changes; the two §6.4 primitives work in a fixture; one number changed in data changes the next match
-   with zero Rust changes.
+   zero Rust changes, and a scripted scenario over the test content gives the same event log (ids mapped back) with
+   every test id renamed and the definitions reordered in the data alone (proposed: a search for the ids, the
+   research's measure, misses code keyed by an enum variant or by a numeric handle per ability; it stays as a smell
+   check, zero matches for those ids in the sim crate's non-test code). The two §6.4 primitives work in a fixture; one
+   number changed in data changes the next match with zero Rust changes.
 2. **AB-3 (R1-ABL-REC2's mark, lines 2396–2400):** for each of the seven legacy weapons and the Juggernaut cannon,
    per-shot results equal the legacy tables (body-part multipliers; Shabzon falloff at 10, 15, 25, 35 and 50 m; pellets,
    magazine, reload and burst timing), integers exactly and floats within 1e-6 relative (proposed in the research); one
@@ -1297,20 +1392,30 @@ test-engineer writes the final pass marks; the candidates below are the research
    checks no tier (GE4); 1,000 is the count R1-ABL-REC4's cue mark uses (line 2444).
 5. **AB-6, AB-7 (proposed golden cases):** from data alone, the CD13 matchups reproduce: the Warrior kills a Conscript
    in 0.86 s within one tick (R1-ABL-REC3's mark, lines 2416–2418, ADR 0004's); the Peacekeeper kills a Warrior in
-   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The knockback operation
-   moves a target with no Javelin-specific code. Reason: these are the numbers the counter check uses (AB-7).
+   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The triangle's third leg
+   (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up
+   as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit
+   deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181). The knockback
+   operation moves a target with no Javelin-specific code. AB-2's immunity rule: a soldier inside its spawn protection
+   takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz),
+   with no protection-specific code; this holds under every option of OQ-0005-AB14. Reason: these are the numbers the
+   counter check uses (AB-7), and spawn protection (LOOP_V2 §2) is the one pipeline rule the research does not list.
 6. **AB-8 (proposed; the research has no mark; reason: UPGRADE-SCOPE), with test-only tracks that are not game
    content, and 1,000 as the count R1-ABL-REC4 uses:**
-   - u1: no track-specific Rust code (zero matches for the test track ids in the sim crate's non-test code, as mark 1);
+   - u1: no track-specific Rust code, proven as mark 1 is: u2 to u6 pass on test-only tracks written in data alone,
+     and give the same logs with the test track ids renamed and the definitions reordered; zero matches for those ids
+     in the sim crate's non-test code is the smell check;
    - u2, death: with picks on unit type U and weapon type W, the unit dies, respawns as a Recruit and buys U again; the
      new unit and its W carry exactly the same pick effects (compared effect lists) in 100 % of 1,000 scripted cycles;
    - u3, switching: U, then V, then U again: U's track is unchanged, V's is its own;
-   - u4, a lost gun: the player drops W and takes another W from the world, and the player's W picks apply to it; a
-     second player who takes the first gun gets their own W picks and none of the first player's;
+   - u4, a lost gun: the player holds a looted weapon of type X, loses it on death (dropped by the fixture's drop rule,
+     a test rule while OQ-0005-AB9 is open), and takes another X the fixture places, and the player's X picks apply to
+     it; a second player who takes the first gun gets their own X picks and none of the first player's;
    - u5, reset: at the first tick of a new match, every track is empty;
-   - u6, offers: the authority draws three candidates; a pick that was not offered, or for a closed offer, is refused in
-     100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs on two runs (and on
-     native and Wasm wherever the stream is one the client holds, ADR 0004).
+   - u6, offers: the authority draws an offer of the data's size (3); a pick that was not offered, or for a closed
+     offer, is refused in 100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs
+     on two runs, and on native and Wasm: the offers stream is authority-only (ADR 0004 part 8), but in local play the
+     authority is the local server in the browser's Web Worker (ADR 0002, Decision).
 7. **AB-10:** R1-ABL-REC6's mark (ADR 0004's), measured with the method ADR 0002 sets (R1-XT-OQ15); plus the proposed
    curve at 8, 16 and 32 active effects per soldier (AB-10).
 8. **AB-9 (ABL-PREDICT):** no spike before acceptance. The Feel Lab test, once abilities are playable (the spike plan
