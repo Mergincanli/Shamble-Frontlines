@@ -1,3 +1,14 @@
 Task: graphics-engineer domain review of the v2 decision drafts at 47eadd9 (plan step 10, wave 2), prompt prompts/review-graphics-engineer.txt
 
 - 2026-11-02 09:41 Amsterdam: started. No earlier notes, no agent memory found. Docs in scope unchanged 47eadd9..244d8d2 (only docs/reports changed).
+- 09:55 Read: prompt, brief, plan rules, advisor verdict §1, VISION_V2, LOOK_V2, ENGINE_OVERVIEW (all), ADR 0002 header+Decision (1-566), ADR 0003 Decision 1-452 and spike/pass marks/checklists 820-1197, SPIKE_PLAN (all), r3 findings Q1,Q2,Q4,Q6 and r1 R1-TICK-REC5, R1-BND-REC1..6, R1-TICK-F4.
+  Candidate findings so far:
+  F-A (medium) local player drawn by interpolating two newest blocks trails newest predicted state by up to one tick (r1:364-365 inferred), 33.3 ms at 30 Hz; no draft bounds absolute input-to-screen latency; PM-0001-43 only P4-minus-P0 difference; LOOP_V2 §7 [DECIDED] shot feels instant. ADR0003:379-381, ADR0002:265, OVERVIEW:92. Question + reported mark.
+  F-B (medium) ADR0002:494-497 CI "whatever backend each runner gives": GPU-less ubuntu runner -> Chromium Linux WebGPU only Intel Gen12+ (r3 R3-WGPU-F17:159-162), Firefox no Linux (F18:164-169), WebKit Linux ?; so CI likely never runs WebGPU backend; forceWebGL run duplicates; WGSL/validation regressions uncaught. Fix: record backend per CI browser in foundation; if none WebGPU, state gap + try SwiftShader WebGPU flags (not researched) or a reference-machine WebGPU smoke per render change-set.
+  F-C (medium) PM-0003-7 uses renderer.info.memory.programs to prove "no new pipeline"; WebGPU pipeline = shader + state; r3:201-202 "a new blend state can mean a new pipeline on first use" -> programs may not move; bite (roof-fade blend variant) may not bite. Fix: count createRenderPipeline(/Async) calls (WebGPU) and gl.createProgram/linkProgram (WebGL2) via a harness spy.
+  F-D (low-med) Look checklist item 26 judges "shot feels instant / hit feedback on confirmation" in a test with no Worker, no tick, no server (SPIKE_PLAN:238-239 synthetic recording) -> cannot be judged; route timing to ADR 0001 netcode checklist (1245) / slice 1.
+  F-E (low) OVERVIEW:40 "draw the newest block", :92 "take the newest block" vs ADR0003 part 10 two newest.
+  F-F PM-0003-6 600 of 600 frames GPU time > 0 on Chrome WebGL2: disjoint events invalidate queries (ext spec) -> flaky; maybe fetch Khronos registry to cite.
+  F-G draw-call cap 800 leaves 14 draws for post passes (PM-0003-12 says so); ink 1 + bloom 12 + output 1 = 14; AO would exceed. Domain: post passes are cheap draws; cap counts them -> my ADR 0003 part 7 text. Check.
+  F-H 4 draws per soldier per pass vs authored model material slots + weapon + headgear -> check ADR 0005 per-unit material budget.
+  Next: ADR 0005 asset pipeline GPU rules + its pass marks; ADR 0002 options/consequences/OQs/pass marks (boundary rows); README register.

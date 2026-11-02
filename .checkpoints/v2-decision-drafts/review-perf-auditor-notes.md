@@ -25,3 +25,12 @@
   F-c confirmed by PM-0006-17 itself (0006:884): it notes SS's 700 shots/s ~10x R2's 72 and re-evaluates R2's formula at the run's counts for egress; PM-0001-12 gates R2's 160 kbps (set on ES) in SS. R2 formula at SS counts: 583.5 B + (2,800 shots + 240 reliable + 2,170 spawns)/30 = 757 B/snapshot = 181.7 kbps (+13.6 % over 160).
   F-j (med) Density "case to budget" 4 rooms/VM (0006:262-267, A-2) is not implied by ADR 0001's marks: transport runtime <= 1 vCPU per room (PM-0001-11) + tick (<=50 % p99) admit ~2 rooms per CCX23 at the ceilings (ceil(20/2)+1 = 11 x 86.49 = 951 EUR). Fix: a per-room CPU mark consistent with 4/VM (tick mean + transport <= 1 vCPU, proposed) or state the 2/VM case.
 - Next: SPIKE_PLAN, README, OVERVIEW.
+- SPIKE_PLAN, README, OVERVIEW read: they restate no budget numbers except the 60 Hz margin (SPIKE_PLAN:139-140, README:34), which match 0001. OVERVIEW:113 maps §6.9 to 0003 parts 3,6,7 (no dropped-frame mark: F-g).
+- Overlap check: density (F-j) = infra-engineer #8 (review-infra-engineer.md:51) -> cite, do not repeat; PM-0001-27/PM-0006-13 pinning = engine-architect #7; BS Worker load = engine-architect #12 (thermal not covered); 160 kbps in SS = netcode-architect candidate B (shots only, 166.2) -> mine adds spawns/vehicles range 157-182.
+  New: F-m (med) PM-0002-28 reads "30+ fps on Low" as every 1-s window >= 30 presented frames (mode P) while PM-0004-8 reads the same R1-TICK-REC2 P2 as ADR 0003's median<=28/p95<=33.3 (mode U). Same mark, two readings.
+  F-l (med) 0003 p99 rows over 600 frames: p99 = 594th value, 6 frames above; V checks medians only -> tail noise unstated.
+  F-k (med) ML heat-soak: H = 3 x (300+600) frames ~ 30 s each at 30 fps; a 20-min match (LOOP_V2 §8) not represented; PM-0003-24 already loops BS 10 min (cheap to add).
+  F-n (low) 0003:204, :514 per-attachment 16.6 MB is single-sample; 5.n starts at 4x MSAA -> 66.4 MB + 16.6 MB resolve each; question whether renderer.info.memory.total counts backend MSAA textures.
+  F-o (low) triangle row counts shadow pass (reset once per frame): 500k / (48 x 2) = 5.2k per soldier ceiling before world+VLUs -> planning number for OQ-0005-AS5/AS6.
+  F-p (low) PM-0003-19 CPU span excludes style/layout/paint of the DOM HUD (legacy P3).
+- Next: write review-perf-auditor.md.
