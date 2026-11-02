@@ -1,0 +1,8 @@
+  vector, buttons, press counters and view time, about 15–20 B in all (the perf review's estimate, 2026-11-02; the
+  real size is measured, R2-XU-OQ4). With the newest-received acknowledgement (part 5), a datagram carries the
+  commands of one round trip plus up to two ticks of waiting (the snapshot's and the client's): 80–186.7 ms at P2's
+  100 ± 20 ms, so 3 to 6 commands ((80 to 186.7) ÷ 33.3, rounded up; arithmetic). Sent whole (U1), with a header of
+  about 6 B (an assumption) and the 57 B of IPv4 transport overhead (r2-netcode.md, line 1742), at 30 datagrams a
+  second (240 bits a second per byte of datagram), that is (3 × 15 + 63) × 240 ≈ 25.9 to (6 × 20 + 63) × 240 ≈
+  43.9 kbps at P2, and at the cap of 8, reached at P3 and P4 or after a loss, (8 × 15 + 63) × 240 ≈ 43.9 to
+  (8 × 20 + 63) × 240 ≈ 53.5 kbps, against a mark of at most 48 kbps (IPv4: R2-BUD-REC1), 200 B per datagram

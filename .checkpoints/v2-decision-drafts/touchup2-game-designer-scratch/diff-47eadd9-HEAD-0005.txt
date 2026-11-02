@@ -1,0 +1,494 @@
+diff --git a/docs/adr/0005-content-abilities-assets.md b/docs/adr/0005-content-abilities-assets.md
+index 55afc3e..9cfb424 100644
+--- a/docs/adr/0005-content-abilities-assets.md
++++ b/docs/adr/0005-content-abilities-assets.md
+@@ -5 +5 @@
+-**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
++**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) · test-engineer (the "Pass marks" table, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+@@ -98,2 +98,4 @@ It defines the content every other draft reads (decision map, part d): typed def
+-executes them), content's schema and TypeScript types (I-5's content part, in ADR 0002's `packages/types`), the
+-content bundle and its hash (I-6; ADR 0006 serves it, ADR 0001 names it at join), the mode file (I-7; the room is ADR
++executes them and sizes its pools from the whole-set check's report of each pool's worst case, its part 1), content's
++schema and TypeScript types (I-5's content part, in ADR 0002's `packages/types`), the content bundle and its hash (I-6;
++ADR 0006 serves it and archives every content set a match record names, its part 12; ADR 0001 names it at join), the
++mode file (I-7; the room is ADR
+@@ -124,3 +126,4 @@ The parts, each pointing to the section part that decides it:
+-   length bounds on every collection and no panics (CD-2); the schema and content's TypeScript types from the same
+-   Rust types (CD-3); versions and migrations (CD-4); one definition per file, one folder per kind (CD-5). *Need:*
+-   VISION_V2 §6.1, §6.3, §6.5, §6.7.
++   length bounds on every collection, a report of each sim pool's worst case per mode, and no panics (CD-2); the
++   schema and content's TypeScript types from the same Rust types, the generators' derives kept out of the shipped
++   builds (CD-3); versions and migrations (CD-4); one definition per file, one folder per kind (CD-5). *Need:* VISION_V2
++   §6.1, §6.3, §6.5, §6.7; the pools' report: ADR 0004 parts 1 and 6.
+@@ -141 +144,2 @@ The parts, each pointing to the section part that decides it:
+-   cost mark: VISION_V2 §3 and §4 only.
++   cost mark and the full-pool rules: VISION_V2 §3 and §4 only; AB-2's immunity rule for spawn protection: LOOP_V2 §2
++   only.
+@@ -286,0 +291,18 @@ map document is content data under EDITOR_V2 §2's rules.
++  - The pools' worst case (for ADR 0004 part 1, which gives every sim pool a fixed capacity at match start from the
++    mode and the content set, so that the step never grows one and nothing a client sends sizes it): the whole-set
++    check reports, for each mode in the set, the worst case of each pool (live projectiles, active effects, weapon
++    pickups, big vehicles and their parts), from the content's numbers (fire intervals and projectile lifetimes,
++    pellets per shot, effect durations and stack limits, drops per death and pickup lifetimes), the mode's team count
++    and team size, and the game-designer's caps where they exist; the report travels with the frozen set. For active
++    effects it reports per target, in the two shares AB-1 proposes ("When a pool is full"): the reserved worst case of
++    the effects the content bounds on that target (the pick effects of the tracks that can apply to it at once, one
++    per track level; its unit's own ability and weapon effects; spawn protection), which every target's rows reserve;
++    and, for the effects other soldiers, vehicles and structures apply, whose count play sets, the missing cap. Where
++    the content alone sets no bound (those effects, weapon pickups, big vehicles), the report names the pool and the
++    missing cap instead of a number, and nothing fills it with a default: "Caps on vehicles and live projectiles per
++    team are not in VISION_V2 or LOOP_V2", and until the game-designer sets them every topic's stress marks use the
++    stress scene's 15 big vehicles and 300 live projectiles (R2-BUD-OQ5, r2-netcode.md, Open questions, Brief
++    question 2, lines 2982–2985); once those caps are set, a set whose worst case exceeds one fails the check (AB-1).
++    No research sizes a pool, so each pool's arithmetic is written beside its kind and reviewed like the bounds above
++    (proposed); which row gives way when a pool is full is ADR 0004's OQ-0004-11, and AB-1 holds the game-designer's
++    proposal per kind for it.
+@@ -289,2 +311,3 @@ map document is content data under EDITOR_V2 §2's rules.
+-    1340–1352, ADR 0002's).
+-  - Need: VISION_V2 §6.1, §6.3, §6.5, §6.7.
++    1340–1352, ADR 0002's); for the pools, R1-ABL-REC6's rule that the step "allocates nothing on the heap in steady
++    state" (r1, Recommendations §5, lines 2471–2472; ADR 0004 part 6's) and R2-BUD-OQ5.
++  - Need: VISION_V2 §6.1, §6.3, §6.5, §6.7; the pools' report: ADR 0004 parts 1 and 6.
+@@ -292,7 +315,12 @@ map document is content data under EDITOR_V2 §2's rules.
+-  - What: schemars writes JSON Schema 2020-12 for every content type at build time, with ranges and descriptions from
+-    the garde rules and the doc comments. The editor's inspector and the Feel Lab (CD-14) build their fields from it:
+-    minimum and maximum become slider limits, the description becomes the tooltip, default and deprecated are shown.
+-    The authoritative verdict always comes from the Rust validator (CD-2); Ajv is optional, for instant per-field hints
+-    only. Content's TypeScript types come from ts-rs on the same Rust types, the generator R1-BND-REC4 already names
+-    for "content-schema types", not from the JSON Schema. Both outputs are committed in `packages/types`, regenerated
+-    by the gate and diffed (ADR 0002, R5-LAYOUT-REC3).
++  - What: schemars writes JSON Schema 2020-12 for every content type when the gate regenerates the generated files
++    (on `cargo test` or by a tool, never from a shipped build), with ranges and descriptions from the garde rules and
++    the doc comments. The editor's inspector and the Feel Lab (CD-14) build their fields from it: minimum and maximum
++    become slider limits, the description becomes the tooltip, default and deprecated are shown. The authoritative
++    verdict always comes from the Rust validator (CD-2); Ajv is optional, for instant per-field hints only. Content's
++    TypeScript types come from ts-rs on the same Rust types, the generator R1-BND-REC4 already names for
++    "content-schema types", not from the JSON Schema. Both outputs are committed in `packages/types`, regenerated by
++    the gate and diffed (ADR 0002, R5-LAYOUT-REC3). Neither generator's derives reach a shipped build (`server`,
++    `sim-wasm`): schemars and ts-rs are dev-dependencies, their derives behind `cfg_attr(test, …)` or behind a feature
++    that only dev-dependency entries turn on, as ADR 0002 part 5 sets ("Dev-dependencies do not activate features
++    unless building a Cargo target that needs them": R5-LAYOUT-F4, r5 lines 83–91), so the `content` crate the shipped
++    builds compare and measure is the shipped one (proposed by rust-reviewer at the step-10 review).
+@@ -388,2 +416,6 @@ map document is content data under EDITOR_V2 §2's rules.
+-    are grouped by tuning version; the hash must resolve to an archived content set (the mark below), and where shipped
+-    bundles are kept is ADR 0006's storage (I-6). The bundle, like every build file, stays under the client host's
++    are grouped by tuning version; the hash must resolve to an archived content set (the mark below): ADR 0006 part 12
++    archives every content set a match record names, by its content hash, in the match records' bucket, uploaded by
++    the supervisor beside the first record that names it and kept as long as any record does (proposed there; I-6).
++    No research finding stores the sets: R6-TEL-REC2 stores the records (r6-infrastructure.md, Recommendations §4,
++    lines 812–827), while R1-DATA-REC6's mark asks that every record's hash resolve to an archived set (r1, lines
++    2576–2579). The bundle, like every build file, stays under the client host's
+@@ -670 +702,4 @@ the research lacks is marked proposed, with its reason. The test-engineer writes
+-   default depth limit (R1-DATA-OQ4) and runs the same tests with garde on wasm32 (R1-DATA-OQ5).
++   default depth limit (R1-DATA-OQ4) and runs the same tests with garde on wasm32 (R1-DATA-OQ5). Proposed (reason:
++   ADR 0004 part 1 sizes its pools from this report): for each test mode, every pool's reported worst case, and for
++   active effects the reserved share per target, equals a count by hand from the test content's numbers, and every
++   pool the content leaves without a bound is named as such.
+@@ -817,3 +852,31 @@ weapon.
+-    up to a limit, strongest only. Left out: what exists for Unreal's object and replication model (instancing
+-    policies, replication modes, ability tasks as a framework), and anything no legacy or LOOP_V2 test case needs.
+-  - Why: §6.3 asks for GAS-like data, and the subset covers every legacy ability and weapon and the primitives §6.4
++    up to a limit, strongest only; what a full pool does to a new row sits beside it (the next item). Left out: what
++    exists for Unreal's object and replication model (instancing policies, replication modes, ability tasks as a
++    framework), and anything no legacy or LOOP_V2 test case needs.
++  - When a pool is full (OQ-0004-11: the game-designer proposes per kind, and Mustafa confirms where a player could
++    notice; ADR 0004 part 1 fixes each pool's capacity at match start and counts every overflow; CD-2's whole-set
++    check reports each pool's worst case, or names the missing cap). Proposed, per kind:
++    - Active effects the content bounds on their target (its own picks, its own abilities' and weapon's effects,
++      spawn protection): the whole-set check reserves their worst case in every target's rows, so they never give way.
++      Reason: their count follows from the content alone, and a pick or a pressed ability that silently fails to apply
++      takes away what the player earned (pillar 2).
++    - Active effects that other soldiers, vehicles or structures apply (one row per application under "no stacking", so
++      play sets their count, not the content): they share the rest of the target's rows, up to a cap in data set once
++      AB-10's curve shows what the step can carry; when that share is full, the oldest such row on the target, by start
++      tick and then sequence number (ADR 0004 part 4), ends early (OQ-0004-11's option (b)). Reason: refusing the new
++      row would make a saturated target immune to every further slow or mark, so cheap buffs stacked by teammates could
++      shut out the enemy's answers (pillar 3); ending the oldest keeps every new application landing, at the cost of an
++      older effect ending early, which the overflow counter shows to tuning.
++    - Live projectiles: the pool holds the content's worst case at the mode's N, so honest play cannot fill it. Per
++      shooter that is at most ⌊lifetime ÷ fire interval⌋ + 1 live shots of each projectile weapon it can carry at once
++      (carry slots are OQ-0005-AB1's), times the weapon's pellets; legacy's Molotov (fuse 1.4 s, r1:1373; fire interval
++      1.05 s, LEGACY_TUNING.md, `WEAPONS`, lines 167–203) gives ⌊1.4 ÷ 1.05⌋ + 1 = 2 per thrower, and 2 × 48 = 96 at
++      N = 48 (arithmetic). Refusing the new row (option (a)), counted, stays as the safety net, and a non-zero count is
++      a content or capacity bug, not a rule a player meets. Reason: a shot that never leaves the gun and a projectile
++      that vanishes in flight would both be seen, so the pool is sized never to need either; R2-BUD-OQ5's caps, once
++      set, bound the content (a set whose worst case exceeds them fails the check), not the play.
++    - Weapon pickups: the pickup that has lain longest ends early (option (b)), whatever lifetime OQ-0005-AB9 sets.
++      Reason: UPGRADE-SCOPE makes drops the only source of other weapons, so the drop from the fight just won matters
++      more than one nobody has taken, and refusing it would leave a kill with no drop.
++    - Research: none (no research sizes a pool); R2-BUD-OQ5 (r2-netcode.md, Open questions, Brief question 2, lines
++      2982–2985) for the caps; R1-ABL-REC6's "allocates nothing on the heap in steady state" (r1, Recommendations §5,
++      lines 2471–2472). Need: VISION_V2 §3 and §4 (a budget, not a feature, as AB-10).
+@@ -827 +890,6 @@ weapon.
+-    that passes through them.
++    that passes through them. Beside the owner and team rules sits one rule the research does not list, for spawn
++    protection (LOOP_V2 §2 `[DEFAULT]`; AB-6): a hit on a target that holds the immunity tag the pipeline's data names
++    deals no damage, a blast included (unlike the frontal-arc block, it reads no arc). It is one reviewed Rust addition,
++    like the knockback operation (AB-6). Proposed as a tag, not as a damage scale of 0 on an attribute, so that no
++    modifier order (AB-1's aggregation) can undo it, and with the tag named once in the pipeline's data rather than as
++    a target-tag multiplier in every weapon (two homes, CS3).
+@@ -830,3 +898,3 @@ weapon.
+-  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9.
+-  - Need: VISION_V2 §6.3 ("combos and counters can emerge").
+-- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**
++  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9; the immunity rule: none (no
++    research finding on spawn protection).
++  - Need: VISION_V2 §6.3 ("combos and counters can emerge"); the immunity rule: LOOP_V2 §2 only.
+@@ -865,5 +933,12 @@ weapon.
+-    vehicle is buyable at its tier (its tier and cost are unit data, AB-4). The T1 class abilities require Tech 1
+-    (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2 §8: "the
+-    team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the minute-5 floor
+-    are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses a press or a
+-    purchase before its tier; whether the client predicts the press is ABL-PREDICT.
++    vehicle is buyable at its tier (its tier and cost are unit and vehicle data, AB-4). The T1 class abilities require
++    Tech 1 (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2
++    §8: "the team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the
++    minute-5 floor are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses
++    a press or a purchase before its tier; whether the client predicts the press is ABL-PREDICT.
++  - What may be bought is data, and ADR 0001's `Buy{unitId}` (part 12) is checked against it: the faction definition
++    lists the units and vehicles its team can buy (AB-4's faction kind; R1-ABL-REC5: "which units and vehicles"), the
++    mode's rules table may change that per mode (R2-ROOM-REC7), and each unit and vehicle definition holds its tier and
++    its price ($100 for each T1 class, LOOP_V2 §5 `[DECIDED]`). The rise in a team's prices after it loses a power plant
++    (LOOP_V2 §3 `[DEFAULT]`, run by ADR 0004 part 17) and the buy terminal's reach are numbers in the same tables. The
++    Recruit is free and comes with every death (LOOP_V2 §5 `[DEFAULT]`), so its price in data is 0. A purchase gives the
++    unit's own weapons and nothing else (AB-8).
+@@ -871 +946,3 @@ weapon.
+-  - Research: R1-ABL-REC1 (lines 2343–2345).
++  - Research: R1-ABL-REC1 (lines 2343–2345); R1-ABL-REC5 (lines 2448–2452) for the faction's list; R2-ROOM-REC7
++    (r2-netcode.md, Recommendations, lines 2857–2867) for the mode's rules table.
++  - Need: VISION_V2 §6.5; the faction's list: §6.7.
+@@ -881 +958 @@ weapon.
+-  | Active reload (§7 `[DECIDED]`: "tap R at the right moment for a faster reload and a short damage boost") | the reload state machine's window (AB-3); a tap inside it shortens the reload and applies a timed effect on the weapon's damage attribute; the authority judges the tap from the command's tick (SLICE-ORDER, condition 2); the timing is own weapon state, inside the prediction scope; the boost is damage, which only the authority applies | none in legacy | the window, the faster reload and the boost's size and length (R1-ABL-OQ6) |
++  | Active reload (§7 `[DECIDED]`: "tap R at the right moment for a faster reload and a short damage boost") | the reload state machine's window (AB-3); a tap inside it shortens the reload and applies a timed effect on the weapon's damage attribute; the authority judges the tap from the command's tick (SLICE-ORDER, condition 2), so near the window's edge the 33.3 ms tick (1000 ÷ 30) decides while the page draws the window every frame, and a tap the bar shows inside can be judged outside: whether the tap carries its moment inside a tick is asked beside shots (OQ-0001-7); the timing is own weapon state, inside the prediction scope; the boost is damage, which only the authority applies | none in legacy | the window, the faster reload and the boost's size and length (R1-ABL-OQ6) |
+@@ -883,0 +961 @@ weapon.
++  | Spawn protection (§2 `[DEFAULT]`: "3 s of spawn protection"; ADR 0004 part 17 applies it at every spawn) | a timed effect on the new soldier that grants the immunity tag AB-2's immunity rule reads; that rule is one new pipeline rule (a reviewed Rust change, like the knockback); the effect's length is data, and its rows are among those the content bounds (AB-1, full pools) | 3 s (LOOP_V2 §2), 90 ticks at 30 Hz (3 × 30, arithmetic); none in legacy, whose respawn waits 2.0 s (LEGACY_INVENTORY.md, CD4, line 85) | what it covers beyond damage, and what ends it early (OQ-0005-AB14) |
+@@ -890 +968 @@ weapon.
+-  - Need: VISION_V2 §6.3, §6.4; the rows' rules: LOOP_V2 §4–§7.
++  - Need: VISION_V2 §6.3, §6.4; the rows' rules: LOOP_V2 §2 (spawn protection) and §4–§7.
+@@ -919 +997 @@ weapon.
+-  | "Every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the player." | a track per unit type and per weapon type (AB-4), listing the candidates it can offer at each level; a candidate is an effect or a granted ability, with optional requirements (tags, the track's level); the offer size is a data value, 3, so no number is hard-coded | the player's record holds, per track, its level, its picks and any open offer | the pick command, and the visibility class of offers and track state (R2-INT-REC5's classes: public, team, owner, spatial) |
++  | "Every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the player." | a track per unit type and per weapon type (AB-4), listing the candidates it can offer at each level; a candidate is an effect or a granted ability, with optional requirements (tags, the track's level); the offer size is a data value, 3, so no number is hard-coded | the player's record holds, per track, its level, its picks and its open offers, in a bounded queue whose length is data (ADR 0004 part 18; when offers appear, how they wait and what a full queue does are OQ-0005-AB8's) | the pick command, and the visibility class of offers and track state (R2-INT-REC5's classes: public, team, owner, spatial) |
+@@ -925,2 +1003,2 @@ weapon.
+-  | "In Unreal terms, the tracks live on the PlayerState, not the Pawn." | none | the record is per player slot, beside the soldier tables | none |
+-  | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the three with a sim random stream; which stream is ADR 0004's (a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a)) | a pick that was not offered, or for an offer that is no longer open, is refused |
++  | "In Unreal terms, the tracks live on the PlayerState, not the Pawn." | none | the record is per player slot, beside the soldier tables; whether a player who rejoins after the grace window gets it back, and so whether it is keyed by slot or by player, is OQ-0004-10 | none |
++  | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the offer (its size from data, 3) from ADR 0004's authority-only offers stream (part 8): a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a) | a pick that was not offered, or for an offer that is no longer open, is refused |
+@@ -1101,3 +1179,6 @@ Option E2: nested, self-contained definitions (each unit embeds its weapons and
+-The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
+-other. None of AB1 to AB11 has a pick here: they are Mustafa's ("list them as open questions, don't decide them"), and
+-the data model carries every option listed.
++The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 and AB15 are what his rules and LOOP_V2 leave open
++beside each other, and OQ-0005-AB14 is what LOOP_V2 §2's spawn protection leaves open. None of AB1 to AB11, AB14 or
++AB15 has a pick here: they are Mustafa's (for the upgrade questions, his own words: "list them as open questions, don't
++decide them"), and the data model carries every option listed, except where an option says it needs a reviewed Rust
++addition. Which row gives way when a pool is full is ADR 0004's OQ-0004-11, with the game-designer's proposal per kind
++in AB-1 for Mustafa to confirm.
+@@ -1190 +1271,3 @@ the data model carries every option listed.
+-  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3. Research ids: none.
++  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3; who may see a
++    player's picks is OQ-0005-AB15, decided with this question, since raw power that nobody can see has no answer.
++    Research ids: none.
+@@ -1192,2 +1275,3 @@ the data model carries every option listed.
+-  - Why it matters: a live fight has no pause. The open offer is state on the player's record (ADR 0004), the answer
+-    is a command the authority checks (ADR 0001), and ADR 0003 draws it.
++  - Why it matters: a live fight has no pause. The open offers are state on the player's record (ADR 0004 part 18: a
++    bounded queue per track, its length and the offer's size both data), the answer is a command the authority checks
++    (ADR 0001), and ADR 0003 draws it.
+@@ -1197 +1281,6 @@ the data model carries every option listed.
+-    With each: are the three candidates always different, and what happens when a track has fewer than three left.
++    With each: are the candidates always different, and what happens when a track has fewer left than the offer's size
++    (3). Also with each, what a full queue does when the track levels again: (i) the level is kept and its offer drawn
++    once a pick frees a place, so nothing earned is lost and the queue's length only limits what is shown; (ii) the
++    oldest open offer gives way to the new one, so the player loses a choice they earned (pillar 2); (iii) the track
++    stops earning until a pick, a push to pick and lost progress for a player who cannot stop. Under (b) and (c) the
++    queue fills fastest, since offers wait for a visit or a death.
+@@ -1208,2 +1297,6 @@ the data model carries every option listed.
+-    keeps the order deterministic whichever is chosen).
+-  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1. Research ids: none;
++    keeps the order deterministic whichever is chosen); and which act a press means where a pickup lies within reach of
++    an uplink or a cache, since a steal is holding E (LOOP_V2 §4 step 4), ADR 0001 part 12 has E place a cache too, and
++    a pickup is asked for through the same button edges: the pickup wins, the steal or the placing wins, or a tap takes
++    the pickup and a hold steals. A full pickup pool follows AB-1's proposal for OQ-0004-11.
++  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1; the press precedence
++    in the uplinks change-set's playtests, where fights cluster at uplinks and drops lie there. Research ids: none;
+@@ -1220 +1313,6 @@ the data model carries every option listed.
+-  - Decider: Mustafa. What decides it: a design session, then sims with mixed humans and bots. Research ids: none.
++  - Asked beside it in ADR 0004, both Mustafa's: whether a player who rejoins after ADR 0001's grace window gets their
++    record back, tracks and money included, or the slot's bot keeps it (OQ-0004-10, decided with this question; the
++    record's key, slot or player, follows the answer); and whether bots take world pickups at all (OQ-0004-12), which
++    changes what OQ-0005-AB9's drop rules do to balance when most slots are bots.
++  - Decider: Mustafa. What decides it: a design session, with OQ-0004-10 and OQ-0004-12, then sims with mixed humans
++    and bots (3 runs per build, two-team and three-team modes separately). Research ids: none.
+@@ -1248,0 +1347,29 @@ the data model carries every option listed.
++- **OQ-0005-AB14. What does spawn protection cover, and what ends it early?**
++  - Why it matters: LOOP_V2 §2 (`[DEFAULT]`) gives "3 s of spawn protection" and no more. AB-2's immunity rule stops
++    damage for the effect's whole length; whether it also stops other effects, and whether firing ends it, decides
++    whether a fresh spawn is merely safe or can fight with no risk. On legacy numbers a Warrior empties its 36-round SMG
++    magazine in 35 × 0.072 = 2.52 s, inside the 3 s, for up to 36 × 8 = 288 damage, nearly two Peacekeepers' worth
++    (2 × 150 = 300) (LEGACY_TUNING.md, `WEAPONS` and `UNIT_TYPES`, lines 167–230; arithmetic), and nothing can answer
++    it while it lasts (pillar 3). Barracks interiors are closed to enemies (LOOP_V2 §2), so this plays out at the
++    openings and against blasts thrown in.
++  - Options for what it covers: (a) damage only (AB-2's rule as written); (b) damage and every effect another team
++    applies (slows, marks, knockback), which needs one more reviewed Rust check: an effect's application refused on a
++    target holding the tag. Options for what ends it early: (i) nothing, the full 3 s; (ii) the player's first shot or
++    ability press, which needs a trigger that removes the effect on the soldier's own fire, of the kind R1-ABL-REC1's
++    examples name ("on kill by source, run effect E", line 2347); (iii) leaving the barracks interior, read from the
++    interior's flag (ADR 0004 parts 11 and 17). The length stays data with every option.
++  - Decider: Mustafa (the 3 s is the Advisor's `[DEFAULT]`; what it covers and what ends it are new rules). What
++    decides it: a design session, then sims (3 runs per build, two-team and three-team modes separately) counting
++    deaths before a soldier leaves its barracks and the damage protected soldiers deal, then playtests. Research ids:
++    none (no research finding on spawn protection).
++- **OQ-0005-AB15. Who sees a player's upgrade picks?** (GD-PICK-VIS)
++  - Why it matters: ADR 0001 part 12 sends track state and picks to their owner only, as its starting class. Teammates
++    plan around each other's power (pillar 4: "Teams must split up and talk"); winners should "feel strong and can see
++    it" (pillar 2); and enemies need to read a strong player to answer it (pillar 3, "every strong thing has an
++    answer").
++  - Options: (a) the owner only (ADR 0001 today); (b) the team too; (c) everyone, through the scoreboard or a visible
++    cue on the soldier. Each is one of R2-INT-REC5's visibility classes (r2-netcode.md, Recommendations, line 2502;
++    ADR 0001's), so the answer changes a class in ADR 0001's state table, not the data model; a visible cue in (c) is
++    also ADR 0003's to draw and LOOK_V2's to style.
++  - Decider: Mustafa. What decides it: a design session, with OQ-0005-AB7 (if picks may add raw power, the answer
++    pillar 3 needs is easier to give when enemies can see them), then playtests. Research ids: none.
+@@ -1254,3 +1381,3 @@ test-engineer writes the final pass marks; the candidates below are the research
+-1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378, as written):** the test content (AMK, Bagpipe, Shabzon, Retro
+-   Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the Juggernaut cannon) runs
+-   with no ability-specific Rust code (zero matches for those ids in the sim crate's non-test code); a test-only
++1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378; the first mark's proof proposed):** the test content (AMK,
++   Bagpipe, Shabzon, Retro Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the
++   Juggernaut cannon) runs with no ability-specific Rust code. The proof is behaviour, not a search: a test-only
+@@ -1258,2 +1385,5 @@ test-engineer writes the final pass marks; the candidates below are the research
+-   zero Rust changes; the two §6.4 primitives work in a fixture; one number changed in data changes the next match
+-   with zero Rust changes.
++   zero Rust changes, and a scripted scenario over the test content gives the same event log (ids mapped back) with
++   every test id renamed and the definitions reordered in the data alone (proposed: a search for the ids, the
++   research's measure, misses code keyed by an enum variant or by a numeric handle per ability; it stays as a smell
++   check, zero matches for those ids in the sim crate's non-test code). The two §6.4 primitives work in a fixture; one
++   number changed in data changes the next match with zero Rust changes.
+@@ -1273,2 +1403,8 @@ test-engineer writes the final pass marks; the candidates below are the research
+-   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The knockback operation
+-   moves a target with no Javelin-specific code. Reason: these are the numbers the counter check uses (AB-7).
++   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The triangle's third leg
++   (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up
++   as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit
++   deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181). The knockback
++   operation moves a target with no Javelin-specific code. AB-2's immunity rule: a soldier inside its spawn protection
++   takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz),
++   with no protection-specific code; this holds under every option of OQ-0005-AB14. Reason: these are the numbers the
++   counter check uses (AB-7), and spawn protection (LOOP_V2 §2) is the one pipeline rule the research does not list.
+@@ -1277 +1413,3 @@ test-engineer writes the final pass marks; the candidates below are the research
+-   - u1: no track-specific Rust code (zero matches for the test track ids in the sim crate's non-test code, as mark 1);
++   - u1: no track-specific Rust code, proven as mark 1 is: u2 to u6 pass on test-only tracks written in data alone,
++     and give the same logs with the test track ids renamed and the definitions reordered; zero matches for those ids
++     in the sim crate's non-test code is the smell check;
+@@ -1281,2 +1419,3 @@ test-engineer writes the final pass marks; the candidates below are the research
+-   - u4, a lost gun: the player drops W and takes another W from the world, and the player's W picks apply to it; a
+-     second player who takes the first gun gets their own W picks and none of the first player's;
++   - u4, a lost gun: the player holds a looted weapon of type X, loses it on death (dropped by the fixture's drop rule,
++     a test rule while OQ-0005-AB9 is open), and takes another X the fixture places, and the player's X picks apply to
++     it; a second player who takes the first gun gets their own X picks and none of the first player's;
+@@ -1284,3 +1423,4 @@ test-engineer writes the final pass marks; the candidates below are the research
+-   - u6, offers: the authority draws three candidates; a pick that was not offered, or for a closed offer, is refused in
+-     100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs on two runs (and on
+-     native and Wasm wherever the stream is one the client holds, ADR 0004).
++   - u6, offers: the authority draws an offer of the data's size (3); a pick that was not offered, or for a closed
++     offer, is refused in 100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs
++     on two runs, and on native and Wasm: the offers stream is authority-only (ADR 0004 part 8), but in local play the
++     authority is the local server in the browser's Web Worker (ADR 0002, Decision).
+@@ -1392 +1532,2 @@ carries a procedural kit spec and an authored asset side by side until it is ans
+-  - What: the classes the GPU section's part 2 names (for example environment, unit, faction colour, emissive), and
++  - What: the classes the GPU section's part 2 names (for example environment, structure, unit, faction colour,
++    emissive), and
+@@ -1400,2 +1541,2 @@ carries a procedural kit spec and an authored asset side by side until it is ans
+-  - Need: VISION_V2 §6.7; LOOK_V2 §2 (uniform details), §6.1 (the value hierarchy by material class), §6.4 (the glow
+-    language's emissive slots).
++  - Need: VISION_V2 §6.7; LOOK_V2 §2 (uniform details; the ink "especially strong on buildings", which the structure
++    class carries), §6.1 (the value hierarchy by material class), §6.4 (the glow language's emissive slots).
+@@ -1415 +1556,3 @@ carries a procedural kit spec and an authored asset side by side until it is ans
+-    per pass, 200 draw calls ÷ 4 units ÷ 2 passes, r3, lines 1088–1090), the rest once OQ-0005-AS5 sets them. The gate compares each
++    per pass, 200 draw calls ÷ 4 units ÷ 2 passes, r3, lines 1088–1090), the rest once OQ-0005-AS5 sets them; the GPU
++    section's triangle ceiling (about 5.2k triangles per soldier as drawn at Low, its part 4) is a planning input to
++    OQ-0005-AS5 and AS6, not a budget the gate checks. The gate compares each
+@@ -1491 +1634,3 @@ OQ-0005-AS1 to AS5; OQ-0005-AP2 and AP3 are Mustafa's.
+-    processed files need a home.
++    processed files need a home. The repository is public (r5-toolchain-quality.md, Findings, Question 6, legacy
++    facts, lines 913–914), so a model file committed to it can be read by anyone once it is pushed (ADR 0006 part 2):
++    where the files live also decides who can see unreleased art.
+@@ -1495,3 +1640,6 @@ OQ-0005-AS1 to AS5; OQ-0005-AP2 and AP3 are Mustafa's.
+-    a file or trusts its entry; where Spline source files and raw exports are kept.
+-  - Decider: the asset-pipeline research, then the asset spike. What decides it: what the research finds Spline's
+-    export and the tools for step 4 can do. Research ids: none.
++    a file or trusts its entry; where Spline source files and raw exports are kept; and whether the files sit in the
++    public repository or in a private store the build reads with a secret (ADR 0006's OQ-0006-18 (b), not researched).
++  - Decider: the asset-pipeline research, then the asset spike; the files' visibility follows Mustafa's answer to ADR
++    0006's OQ-0006-18 (must unreleased art stay unseen?), due before the first authored model is committed, which may
++    be one of the look proof test's models (the GPU section's part 8). What decides it: what the research finds
++    Spline's export and the tools for step 4 can do, and that answer. Research ids: none.
+@@ -1546,3 +1694,7 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
+-   and no ink. At load the engine gives each slot the shared node toon material of that slot's material class (ADR
+-   0003, part 5.a), one material per slot content and never one per mesh. *Why:* each distinct ramp is a distinct
+-   material, so materials must be shared by content or batching breaks (r3, Findings Q3, R3-LOOK-F3, lines 331–334);
++   and no ink. At load the engine gives each slot a shared node toon material of that slot's material class (ADR
++   0003, part 5.a), one material per slot content and never one per mesh. A slot's content is its class (ramp,
++   colour gain, ink weight), its faction for faction colour slots, and its own base and emissive colour, textures,
++   side and alpha mode, as legacy keys its shared materials by content (CL4, `docs/LEGACY_INVENTORY.md` line 113;
++   `_matSig`, `shamble-core.js` lines 356–359); so an asset keeps its own colours and textures inside a class, and
++   how colour is authored is OQ-0005-AS4's, not a rule. *Why:* each distinct ramp is a distinct material, so
++   materials must be shared by content or batching breaks (r3, Findings Q3, R3-LOOK-F3, lines 331–334);
+@@ -1554 +1706,2 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
+-   example environment, unit, faction colour, emissive); the list and the names are this ADR's content data (interface
++   example environment, structure, unit, faction colour, emissive; the structure class gives buildings their heavier
++   ink, LOOK_V2 §2, ADR 0003 parts 5.b and 5.h); the list and the names are this ADR's content data (interface
+@@ -1571 +1724,4 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
+-     before the ink (R3-CHAR-REC1, lines 1044–1045).
++     before the ink (R3-CHAR-REC1, lines 1044–1045). Each material carries one class ramp (part 1), so at most 4
++     surface kinds (skin, cloth, faction colour, metal, emissive) shade differently on one soldier, where legacy used
++     separate skin, cloth, metal and lacquer ramps (CL2, `docs/LEGACY_INVENTORY.md` line 111); the look proof test's
++     soldier is built at this cap.
+@@ -1574,0 +1731,6 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
++   - *A triangle ceiling, not a budget:* ADR 0003's harness resets `renderer.info` once per frame (its part 8), so the
++     triangle row counts every pass of the frame, the shadow pass included, as the draw-call arithmetic does (assumed:
++     how three.js counts the shadow pass's triangles is not researched). At Low, 500k ÷ (48 soldiers × 2 passes) ≈
++     5.2k triangles per soldier as drawn, if soldiers had the whole row before the world and the very large units
++     take their share (arithmetic on R3-BUDGET-REC2's triangle row, r3 line 1134): a planning input for OQ-0005-AS5
++     and AS6.
+@@ -1587,7 +1749,9 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
+-7. **Materials and textures are shared, cached and compiled up front.** One material per class (and per faction for
+-   faction slots) is created once, cached and reused, "never rebuilt per edit" (EDITOR_V2 §2, rule 3), and never
+-   disposed while shared; every one is compiled in ADR 0003's warm-up, so a unit's first appearance creates no shader
+-   program (r3, Recommendations Q1, R3-WGPU-REC3, lines 928–939). *Need:* VISION_V2 §6.9; EDITOR_V2 §2.
+-8. **The look proof test's models.** ADR 0003's look proof test needs a few authored models (a soldier, a weapon, a
+-   building with an interior, a very large unit, props). They are plain glTF/GLB exports; the test decides nothing
+-   about compression or LODs (ASSET-RESEARCH (a)).
++7. **Materials and textures are shared, cached and compiled up front.** One material per slot content (part 1: the
++   class, the faction for faction slots, and the slot's own colours, textures, side and alpha mode) is created once,
++   cached by that content and reused, "never rebuilt per edit" (EDITOR_V2 §2, rule 3), and never disposed while
++   shared; every one is compiled in ADR 0003's warm-up, so a unit's first appearance creates no shader program (r3,
++   Recommendations Q1, R3-WGPU-REC3, lines 928–939). *Need:* VISION_V2 §6.9; EDITOR_V2 §2.
++8. **The look proof test's models.** ADR 0003's look proof test needs a few authored models (a soldier, a weapon,
++   LOOK_V2 §2's two houses, one of them with an interior and its damage stages, a very large unit, props; ADR 0003
++   part 11 lists them and says where the second house comes from if only one is authored). They are plain glTF/GLB
++   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)).
+@@ -1604 +1768 @@ and the legacy facts it cites; an option the research lacks is marked "not resea
+-| **One shared toon material per slot class, applied at load** (proposed, part 1) | Low | one material per class and faction | materials stay few, so sharing and merging work (R3-LOOK-F3) | presentation only | one look on every asset, set in one place | new; legacy's per-mesh conversion is the lesson (CL4) |
++| **One shared toon material per slot content, applied at load** (proposed, part 1) | Low | one material per distinct slot content (class, faction, the slot's own colours and textures) | materials stay as few as the assets' distinct contents, so sharing and merging work (R3-LOOK-F3) | presentation only | one look on every asset, set in one place; each asset keeps its own colours | new; legacy's per-mesh conversion is the lesson (CL4) |
+@@ -1609,2 +1773,4 @@ and the legacy facts it cites; an option the research lacks is marked "not resea
+-- **Shared per class.** Pros: bounded materials; one place to tune the look. Cons: every slot must be named into a
+-  class (OQ-0005-AS4). **Per mesh.** Pros: no naming rule. Cons: one material per mesh, legacy's measured problem.
++- **Shared per slot content.** Pros: materials bounded by the assets' distinct contents; one place to tune each
++  class's look. Cons: every slot must be named into a class (OQ-0005-AS4); an asset with many distinct colours brings
++  as many materials, and ADR 0003's static merge groups only equal contents. **Per mesh.** Pros: no naming rule.
++  Cons: one material per mesh, legacy's measured problem.
+@@ -1653,3 +1819,6 @@ then proves its answers.
+-  Why it matters: part 1 and part 2 depend on every slot carrying a class. Options: none researched (a manual
+-  convention in the modelling tool, or LOOK_V2 §8's automated step). Decider: the asset-pipeline research. What
+-  decides it: whether Spline's glTF export keeps material names (not researched). Research ids: none.
++  Why it matters: part 1 and part 2 depend on every slot carrying a class; and since part 1 makes one material per
++  slot content, how an asset carries its colours sets how many materials it brings. Options: none researched (a
++  manual convention in the modelling tool, or LOOK_V2 §8's automated step; for colour, each slot's material colour,
++  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether Spline's
++  glTF export keeps material names (not researched), and each colour route's material count against part 4's caps.
++  Research ids: none.
+@@ -1671,2 +1840,3 @@ then proves its answers.
+-  own left in use; the scene holds no more material objects than the distinct (slot class, faction) pairs it shows
+-  (proposed mark; reason: sharing by content, R3-LOOK-F3); the test soldier as drawn meets 4 draw calls per pass and
++  own left in use; the scene holds no more material objects than the distinct slot contents it shows (part 1;
++  proposed mark; reason: sharing by content, R3-LOOK-F3), and two meshes with the same slot content share one
++  material object; the test soldier as drawn meets 4 draw calls per pass and
+@@ -1694 +1864,2 @@ refers to assets")
+-  Wasm size is recorded, not gated, until the spikes have measured it (ADR 0002 part 4; OQ-0005-CD2). **B.** Pros:
++  Wasm size is recorded, not gated, until the Advisor sets the budget's first limit from the spikes' measurements
++  (ADR 0002 part 4; OQ-0005-CD2). **B.** Pros:
+@@ -1752 +1923,2 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+-  slot class, so batching survives authored art (the GPU section's parts 1 and 7).
++  slot content (its class, its faction for faction slots, and its own colours and textures), never one per mesh, so
++  batching survives authored art (the GPU section's parts 1 and 7).
+@@ -1756,3 +1928,5 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+-  reviewed length bound for every collection (CD-2); JSON without comments (OQ-0005-CD1); a simulation number tested in
+-  a new match, not the current one (CD-7); two generators that must agree (CD-3); an asset list kept in step with the
+-  files (AP-2); every material slot named into a class (OQ-0005-AS4); two drawing paths for buildings and props until
++  reviewed length bound for every collection, and each sim pool's worst-case arithmetic beside its kind (CD-2); JSON
++  without comments (OQ-0005-CD1); a simulation number tested in a new match, not the current one (CD-7); two
++  generators that must agree (CD-3); an asset list kept in step with the files (AP-2); every material slot named into
++  a class, and each distinct slot content costing a material of its own (OQ-0005-AS4; the GPU section's part 1); two
++  drawing paths for buildings and props until
+@@ -1760 +1934,2 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+-- **Revisit when:** content's load time misses its budget, or the Wasm file the limit ADR 0002 sets (OQ-0005-CD2, option
++- **Revisit when:** content's load time misses its budget, or content's share takes the Wasm file past the limit ADR
++  0002 sets (OQ-0005-CD2, option
+@@ -1797 +1972 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+-  | GW6, GW8 (194, 196) | redesign (pending) | unchanged: the registries and the placement glue split into the map document (CD-11), the sim's colliders, never read from a model (AP-1), and a per-entity scene on the page (EDITOR_V2 §2 rules 1, 3 and 4); pending becomes "OQ-0005-AP2" for the crates, walls, roads, houses, covers and props, and "the tree style, LOOK_V2 §8 `[OPEN]`" for the trees | LOOK_V2 §8 allows authored models without requiring them and names none of these pieces; the tree style is Mustafa's open item |
++  | GW6, GW8 (194, 196) | redesign (pending) | unchanged: the registries and the placement glue split into the map document (CD-11), the sim's colliders, never read from a model (AP-1), and a per-entity scene on the page (EDITOR_V2 §2 rules 1, 3 and 4); pending becomes "OQ-0005-AP2" for the crates, walls, roads, houses, covers and props, and "the tree style, LOOK_V2 §8 `[OPEN]`" for the trees | LOOK_V2 §8 allows authored models without requiring them; §2 keeps the props ("logs and trees with variety, as a base to build on") and the two houses as `[DECIDED]` directions (LOOK_V2 lines 17, 21–22), and §4 asks for buildings you can enter, but no section says whether any of these pieces is authored or procedural; the tree style is Mustafa's open item |
+@@ -1839 +2014,3 @@ no pick; where a section proposes an answer, the line says so.
+-| OQ-0005-AP1 | Where does the automated step run, what does it write, and where do the files live? | the asset-pipeline research, then the asset spike | The asset pipeline |
++| OQ-0005-AB14 | What does spawn protection cover beyond damage, and what ends it early? | Mustafa | The ability and effect system |
++| OQ-0005-AB15 | Who sees a player's upgrade picks? | Mustafa | The ability and effect system |
++| OQ-0005-AP1 | Where does the automated step run, what does it write, and where do the files live? | the asset-pipeline research, then the asset spike; the files' visibility follows Mustafa's answer to ADR 0006's OQ-0006-18 | The asset pipeline |
+@@ -1931 +2108 @@ Each section's spike part above stands as written. The test-engineer writes the
+-   (slot class, faction) pairs; the two derived caps) and the asset pipeline section's first bullet (every model listed
++   the distinct slot contents shown; the two derived caps) and the asset pipeline section's first bullet (every model listed
+@@ -2029 +2206 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound | 1 run. Bites: a `Vec` field added without a bound | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
++| PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length; and the whole-set check's pool report (CD-2): for each test mode, every pool's reported worst case, and for active effects the reserved worst case per target (the pick effects of the tracks that can apply at once, one per track level; the unit's own ability and weapon effects; spawn protection), equals a count by hand from the test content's numbers in 100 % of cases, and every pool the content leaves without a bound (effects others apply, weapon pickups, big vehicles) is named with its missing cap, never filled with a default (content item 2) | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound; the hand counts written beside the test content before the run (proposed: a count made after the report could copy it) | 1 run. Bites: a `Vec` field added without a bound; a projectile lifetime doubled in the test content while the report stays the same must fail the comparison; a pool given a default cap where the content sets none | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
+@@ -2034 +2211 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-10 | Development reload: checked at once, simulation numbers at the next match, client content live (CD-7; content item 5; shared with PM-0005-21) | each of 20 saves of a weapon's damage change (the Shabzon's 8 → 9) validated on the development server within 1 s of the save (a plain limit, max over the 20), and the next match runs on it; the running match's per-tick state hashes after the save equal a control run with no save (proposed: CD-7's "nothing in a running match's simulation changes"); each of 20 malformed saves leaves the running match on its numbers and shows the error (file, with line and column or field path) within 1 s; each of 20 saved feel-kit changes shows on the page within 1 s, in the running match | ML: the development server native; the page in Chrome, Edge and Firefox | the development server's watcher (notify with a debouncer); a script saves the files on a fixed schedule; validation time from the file's modification time to the server's "valid" or "error" log line on the same clock; the page's arrival time stamped on the same machine (the file's route to the Worker is the boundary spike's, PM-0002-31) | 20 saves of each kind per browser. Bites: a watcher that validates only on the next match start (fails the 1 s); a reload that swaps the numbers inside the running match (fails the hash comparison) | R1-DATA-REC5 marks 1, 4 (lines 2559–2563), restated for CD-7; CD-7 (proposed there: the feel-kit 1 s) |
++| PM-0005-10 | Development reload: checked at once, simulation numbers at the next match, client content live (CD-7; content item 5; shared with PM-0005-21) | each of 20 saves of a weapon's damage change (the Shabzon's 8 → 9) validated on the development server within 1 s of the save (a plain limit, max over the 20), and the next match runs on it; the running match's per-tick state hashes after the save equal a control run with no save (proposed: CD-7's "nothing in a running match's simulation changes"); each of 20 malformed saves leaves the running match on its numbers and shows the error (file, with line and column or field path) within 1 s; each of 20 saved feel-kit changes shows on the page within 1 s, in the running match; and the same in local play, where slices 1 and 2 have no server crate: each of 20 saves pushed to the Worker (PM-0002-31's route) is validated there within 1 s, the next local match runs on it, and the running local match's per-tick hashes equal a control run with no save (CD-7: "on the development server and in local play alike") | ML: the development server native, and the Worker's local play; the page in Chrome, Edge and Firefox | the development server's watcher (notify with a debouncer); a script saves the files on a fixed schedule; validation time from the file's modification time to the server's "valid" or "error" log line on the same clock; the page's arrival time stamped on the same machine (the file's route to the Worker is the boundary spike's, PM-0002-31) | 20 saves of each kind per browser. Bites: a watcher that validates only on the next match start (fails the 1 s); a Worker that applies the pushed numbers to the running local match (fails the hash comparison); a reload that swaps the numbers inside the running match (fails the hash comparison) | R1-DATA-REC5 marks 1, 4 (lines 2559–2563), restated for CD-7; CD-7 (proposed there: the feel-kit 1 s) |
+@@ -2043 +2220 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-18 | The test content runs with no ability-specific Rust code (AB-1; ability item 1) | 0 matches for the test content's ids and legacy names in the sim crate's non-test code; every test content item, fired or pressed in a scripted scenario, produces its expected event log; with every test id replaced by a random string, the scenario's event log is byte-identical after mapping the ids back (proposed: a search for names misses code keyed by a constant spelled otherwise); reported: the list of operations with the test items that use each, for the rust-reviewer | CI | `rg` over the sim crate excluding tests; the scenario in the replay runner; the id rename by script over the test content | 1 run. Bites: a planted `if id == "molotov"`, and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename test sees it) | R1-ABL-REC1 mark 1 (lines 2365–2368); AB-1 |
++| PM-0005-18 | The test content runs with no ability-specific Rust code (AB-1; ability item 1) | 0 matches for the test content's ids and legacy names in the sim crate's non-test code; every test content item, fired or pressed in a scripted scenario, produces its expected event log; with every test id replaced by a random string and the definitions reordered in data, the scenario's event log is byte-identical after mapping the ids back (proposed: a search for names misses code keyed by a constant spelled otherwise); reported: the list of operations with the test items that use each, for the rust-reviewer | CI | `rg` over the sim crate excluding tests; the scenario in the replay runner; the id rename by script over the test content | 1 run. Bites: a planted `if id == "molotov"`, and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename and reorder test sees it, whatever order the handles are given in) | R1-ABL-REC1 mark 1 (lines 2365–2368); AB-1 |
+@@ -2049,2 +2226,2 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-24 | Tech tiers gate abilities and purchases (AB-5; ability item 4) | an ability press before the team's Tech 1, and a T2 purchase before Tech 2, refused by the authority in 1,000 of 1,000 scripted attempts each; the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed) | CI | scripted team state at Tech 0, 1 and 2; the authority's verdict log | 1 run. Bites: an ability with no tier tag | AB-5 (proposed there; LOOP_V2 §4 lines 50–52, `[DECIDED]`; INV GE4, line 290); the count 1,000 from R1-ABL-REC4 (line 2444) |
+-| PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
++| PM-0005-24 | Tech tiers gate abilities and purchases (AB-5; ability item 4) | an ability press before the team's Tech 1, and a T2 purchase before Tech 2, refused by the authority in 1,000 of 1,000 scripted attempts each; the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed); and the minute-5 floor (LOOP_V2 §4 `[DECIDED]`: "Every team reaches Tech 1 by minute 5 at the latest"): a team with no cashout reaches Tech 1 at the floor's tick, read from data (5 × 60 × 30 = 9,000 ticks at 30 Hz: arithmetic), and its presses are refused at tick 8,999 and accepted from tick 9,000 | CI | scripted team state at Tech 0, 1 and 2; the authority's verdict log | 1 run. Bites: an ability with no tier tag; a floor that is never applied (the team without a cashout stays at Tech 0 past tick 9,000) | AB-5 (proposed there; LOOP_V2 §4 lines 50–52, `[DECIDED]`; INV GE4, line 290); the count 1,000 from R1-ABL-REC4 (line 2444) |
++| PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the triangle's third leg (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181, as ability item 5 cites them); AB-2's immunity rule: a soldier inside its spawn protection takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz), under every option of OQ-0005-AB14; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id, or the spawn-protection effect's, in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only; the Shield block applied to blasts as well (the third leg fails); an immunity rule that skips blasts; the protection's length taken from a constant instead of the effect's data (changing the data to 60 ticks must move the end) | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
+@@ -2054 +2231 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-29 | u4: a lost gun's track waits for the next gun of its type (AB-8) | the player drops W and takes another W from the world: the player's W picks apply to it; a second player who takes the first gun gets their own W picks and none of the first player's; 1,000 of 1,000 scripted exchanges (proposed count) | CI | scripted drops and claims (ADR 0004's pickup entities, PM-0004-66) | 1 run. Bites: picks stored on the gun | AB-8 (proposed there); UPGRADE-SCOPE |
++| PM-0005-29 | u4: a lost gun's track waits for the next gun of its type (AB-8) | the player holds a looted weapon of type X and loses it on death (dropped by the fixture's drop rule, a test rule while OQ-0005-AB9 is open; no voluntary drop or swap, which OQ-0005-AB1 and AB9 leave open), then takes another X the fixture places: the player's X picks apply to it; a second player who takes the first gun gets their own X picks and none of the first player's; 1,000 of 1,000 scripted cycles (proposed count) | CI | scripted deaths, fixture drops and claims (ADR 0004's pickup entities, PM-0004-66) | 1 run. Bites: picks stored on the gun | AB-8 (proposed there; ability item 6, u4); UPGRADE-SCOPE |
+@@ -2056 +2233 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-31 | u6: only offered picks count, and offers repeat (AB-8) | every offer holds the data's offer size (3) of distinct candidates whose requirements hold; a pick that was not offered, or for a closed offer, refused in 1,000 of 1,000 forged picks; 1,000 of 1,000 offered picks accepted (a control: proposed); the same seed and inputs give byte-identical offer logs on two runs, and on native and Wasm only if ADR 0004 puts the offers in a stream the client holds | CI | forged pick commands; the offer log written by the authority | 2 runs (the log); 1 run (the counts). Bites: an authority that accepts any candidate of the track; offers drawn from a clock seed | AB-8 (proposed there); UPGRADE-SCOPE; SEC-SPREAD (a)'s reasoning |
++| PM-0005-31 | u6: only offered picks count, and offers repeat (AB-8) | every offer holds the data's offer size (3) of candidates whose requirements hold, distinct or not as the test track's data says (whether candidates are always different, and what a track with fewer left than the offer's size does, are OQ-0005-AB8's: here fixture rules, not game rules), with one test track that has fewer candidates than the offer's size handled as its data says; a pick that was not offered, or for a closed offer, refused in 1,000 of 1,000 forged picks; 1,000 of 1,000 offered picks accepted (a control: proposed); the same seed and inputs give byte-identical offer logs on two runs, and on native and Wasm: the offers stream is authority-only (ADR 0004 part 8), but in local play the authority runs in the browser's Web Worker (ADR 0002) | CI (native; Wasm in Node) | forged pick commands; the offer log written by the authority | 2 runs per target (the log); 1 run (the counts). Bites: an authority that accepts any candidate of the track; offers drawn from a clock seed; an offer size hard-coded as 3 (changing the data to 2 must change every offer) | AB-8 (proposed there; ability item 6, u6); UPGRADE-SCOPE; SEC-SPREAD (a)'s reasoning |
+@@ -2060,2 +2237,2 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than its slot class's shared material (identity against the material cache); 0 model requests other than listed glTF/GLB files, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
+-| PM-0005-35 | Materials are shared by content (GPU section parts 1, 2, 7) | the material objects on listed assets' meshes number at most the distinct (slot class, faction) pairs those meshes show, on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with every test model in each faction's colours; distinct material objects counted by identity, pairs counted from the slots' classes and factions | 1 run per backend (counts repeat, PM-0003-35). Bites: a loader that clones the class material per mesh (legacy's per-mesh conversion, CL4) | the GPU section's spike part (proposed there; R3-LOOK-F3, r3 lines 331–334) |
++| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than the shared material of its slot's content (identity against the material cache, which is keyed by slot content: the class, the faction for faction slots, and the slot's own base and emissive colour, textures, side and alpha mode, GPU part 1); 0 model requests other than listed glTF/GLB files and the buffers and images a listed `.gltf` references, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
++| PM-0005-35 | Materials are shared by content (GPU section parts 1, 2, 7) | the material objects on listed assets' meshes number at most the distinct slot contents those meshes show (GPU part 1's key: the class, the faction for faction slots, and the slot's own base and emissive colour, textures, side and alpha mode), two meshes with the same slot content share one material object, and each mesh's material carries its own slot's base colour and textures (read back and compared with the loaded file), on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with every test model in each faction's colours; distinct material objects counted by identity, distinct slot contents counted from each slot's key fields in the loaded files | 1 run per backend (counts repeat, PM-0003-35). Bites: a loader that clones the class material per mesh (legacy's per-mesh conversion, CL4); a loader that keys materials by (slot class, faction) only, which must fail the colour comparison (two slots of one class with different base colours then share one material) | the GPU section's spike part (proposed there; R3-LOOK-F3, r3 lines 331–334); GPU part 1; legacy's content signature (CL4, `LEGACY_INVENTORY.md` line 113) |
+@@ -2069 +2246 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+-| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to its faction definition's colour value, for every faction and test model; 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour | the GPU section's spike part |
++| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to the faction's colour value in its data (CD-13's client definition), for every faction and test model, read from the materials; and drawn on each backend: in an unlit debug view, a pixel probe at a faction slot of each test model returns that colour within 2/255 per channel (proposed tolerance: reading materials proves the data path, which is the same on both backends, not that each backend draws the colour); 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour; a backend path that drops the slot's colour (the probe must see it while the material still reads right) | the GPU section's spike part |
+@@ -2143 +2320,2 @@ picked where the look proof test shows both forms (see the spike entries); other
+-1. The test building as an authored model and as the ported kit, at the game camera, beside legacy's house (LOOK_V2
++1. The test building as an authored model and as the ported kit, at ADR 0003's test view (legacy's framing, CD5; not a
++   camera decision, R2-INT-OQ2), beside legacy's house (LOOK_V2
+@@ -2149 +2327,2 @@ picked where the look proof test shows both forms (see the spike entries); other
+-4. Trees: not judged; the tree style is LOOK_V2 §8's `[OPEN]` item. Expected: trees shown are labelled placeholders.
++4. Trees: no pick; the trees shown are legacy's tree builders ported as labelled placeholders (GW18), judged in ADR
++   0003's look checklist (step 15) for variety and lushness only; the tree style is LOOK_V2 §8's `[OPEN]` item.
+@@ -2154,3 +2333,8 @@ picked where the look proof test shows both forms (see the spike entries); other
+-1. Each test model with LOD levels at the closest and the farthest camera framing (LOOK_V2 §5). Expected: simple and
+-   readable from a distance, real depth up close; the silhouette kept at the farthest framing.
+-2. A slow zoom through each switch distance and back. Expected: no visible pop or flicker at a switch.
++Every view is at ADR 0003's test view (legacy's framing, CD5: height 40, boom 56.6, field of view 15°, yaw 45°) or a
++named variant of it, never a camera decision: the v2 framing is R2-INT-OQ2's, and both steps are taken again at its
++own closest and farthest once that question is answered.
++1. Each test model with LOD levels at two test views: the test view itself, as the far case, and the same camera at
++   half its distance to the player, as the close case (ADR 0003's look checklist, step 9) (LOOK_V2 §5). Expected:
++   simple and readable from a distance, real depth up close; the silhouette kept at the far view.
++2. The camera moved slowly from the close view out to twice the test view's distance and back (a test path through
++   each switch distance, proposed: legacy has no zoom). Expected: no visible pop or flicker at a switch.
+@@ -2167,2 +2351,4 @@ shuffled by the session and their labels hidden until he has answered (proposed:
+-4. Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per
+-   ability.
++3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both, with
++   no start shown, since the client knows its team's tier (team state goes to the team, ADR 0001) and the ability's
++   required tag (AB-5), so a predicted variant can refuse the press locally. Record: any start that shows, in either
++   variant, as a defect of that variant.
+@@ -2244 +2430 @@ must prove"; in the ability section's rows, "What a spike must prove" n is that
+-Counts: adopted 6 · changed 5 · answered 8 · open 9 · spike 6 · rejected 0 (34 rows).
++Counts: adopted 5 · changed 6 · answered 8 · open 9 · spike 6 · rejected 0 (34 rows).
+@@ -2249,2 +2435,2 @@ Counts: adopted 6 · changed 5 · answered 8 · open 9 · spike 6 · rejected 0
+-| R1-DATA-REC2 | changed: adds a maximum length on every collection (R1-RR-OQ2) and the no-panic loader (R5-RUSTLINT-REC3, R1-RR-OQ3), and refuses a fallback model too; the stages as written | CD-2; spike mark 2 |
+-| R1-DATA-REC3 | adopted | CD-3 (content's TypeScript types come from ts-rs beside it, answering critic rank 31); spike mark 3 |
++| R1-DATA-REC2 | changed: adds a maximum length on every collection (R1-RR-OQ2) and the no-panic loader (R5-RUSTLINT-REC3, R1-RR-OQ3), refuses a fallback model too, and reports each sim pool's worst case per mode for ADR 0004 part 1; the stages as written | CD-2; spike mark 2 |
++| R1-DATA-REC3 | changed: the schema is written when the gate regenerates (on `cargo test` or by a tool), not by the shipped build, and the generators' derives stay out of the shipped builds (ADR 0002 part 5; the rust-reviewer's step-10 review); content's TypeScript types come from ts-rs beside it, answering critic rank 31 | CD-3; spike mark 3 |
+@@ -2253 +2439 @@ Counts: adopted 6 · changed 5 · answered 8 · open 9 · spike 6 · rejected 0
+-| R1-DATA-REC6 | adopted | CD-8; spike mark 6 |
++| R1-DATA-REC6 | adopted | CD-8 (the archive its mark needs is ADR 0006 part 12's); spike mark 6 |

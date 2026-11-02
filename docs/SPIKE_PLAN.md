@@ -248,8 +248,8 @@ and the asset spike before the first authored model, and the Feel Lab test once 
   each look technique's GPU time, draw calls and memory alone, on both reference machines and both backends; both ink
   families at 12, 24 and 48 soldiers on the minimum laptop at Low; one build on both backends in the four browsers with
   the same look; no first-sight shader stutter; the backend reported (and Brave's on Mustafa's PC). For ADR 0005:
-  plain glTF/GLB exports load on both backends with the engine's shared materials per slot class, every model listed
-  by id, a broken link refused at load, and Mustafa's pick per asset family (OQ-0005-AP2).
+  plain glTF/GLB exports load on both backends with the engine's shared materials, one per slot content (ADR 0005 GPU
+  part 1), every model listed by id, a broken link refused at load, and Mustafa's pick per asset family (OQ-0005-AP2).
 - **Pass marks:** PM-0003-1 to PM-0003-17; PM-0005-33 to PM-0005-37.
 - **Who judges what:** Mustafa judges the whole look: the look checklist (ADR 0003, inside PM-0003-17), which names each
   LOOK_V2 item it shows beside a legacy screenshot, and the families checklist (ADR 0005, inside PM-0005-37). He also

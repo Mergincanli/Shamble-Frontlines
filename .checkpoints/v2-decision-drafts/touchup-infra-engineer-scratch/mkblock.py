@@ -31,7 +31,8 @@ if os.path.exists(RANGES):
 for a, b in done:
     assert spec['END'] < a or spec['START'] > b, ('overlaps %d-%d' % (a, b))
 assert before != after
-block = '### FIX %s (%s; lines %d-%d on disk now)\nFILE: docs/adr/0006-infrastructure-operations.md\nBEFORE:\n%s\nAFTER:\n%s\nEND\n\n' % (
+why = spec.get('WHY', '').strip()
+block = (why + '\n\n' if why else '') + '### FIX %s (%s; lines %d-%d on disk now)\nFILE: docs/adr/0006-infrastructure-operations.md\nBEFORE:\n%s\nAFTER:\n%s\nEND\n\n' % (
     spec['ID'], spec['TITLE'], spec['START'], spec['END'], before, after)
 with open(OUT, 'a', encoding='utf-8') as f:
     f.write(block)

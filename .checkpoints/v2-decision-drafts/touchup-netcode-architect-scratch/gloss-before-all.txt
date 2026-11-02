@@ -1,0 +1,12 @@
+entries 37; exact hits 0; in-context hits 605 (quotes and dated records skipped)
+  0001: exact 0, in context 138, header links GLOSSARY.md: False; skipped: 15 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0002: exact 0, in context 59, header links GLOSSARY.md: True; skipped: 1 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0003: exact 0, in context 75, header links GLOSSARY.md: True; skipped: 12 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0004: exact 0, in context 98, header links GLOSSARY.md: True; skipped: 2 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0005: exact 0, in context 93, header links GLOSSARY.md: False; skipped: 11 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  0006: exact 0, in context 98, header links GLOSSARY.md: True; skipped: 4 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  OVW: exact 0, in context 11, header links GLOSSARY.md: False; skipped: 2 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  SPK: exact 0, in context 16, header links GLOSSARY.md: False; skipped: 0 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  IDX: exact 0, in context 17, header links GLOSSARY.md: False; skipped: 1 in quoted text, 0 in dated records; blocks with an unpaired straight quote: 0
+  not searchable (a pattern in words; the step-3d verifiers read for it): The hash-map ban in the sim crate / context: "zero uses of std HashMap or HashSet iteration in … outcome code"
+  not searchable (a pattern in words; the step-3d verifiers read for it): The stress scene / exact: "the worst case (48 players plus vehicles and projectiles …)"
