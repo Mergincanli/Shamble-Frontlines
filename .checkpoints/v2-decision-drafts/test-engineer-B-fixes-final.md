@@ -822,3 +822,118 @@ AFTER:
 | PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the triangle's third leg (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181, as ability item 5 cites them); AB-2's immunity rule: a soldier inside its spawn protection takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz), under every option of OQ-0005-AB14; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id, or the spawn-protection effect's, in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only; the Shield block applied to blasts as well (the third leg fails); an immunity rule that skips blasts; the protection's length taken from a constant instead of the effect's data (changing the data to 60 ticks must move the end) | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
 END
 
+### FIX GD-8 (review-game-designer finding 13; routed by game-designer: PM-0005-29 follows u4, a lost gun)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-29 | u4: a lost gun's track waits for the next gun of its type (AB-8) | the player drops W and takes another W from the world: the player's W picks apply to it; a second player who takes the first gun gets their own W picks and none of the first player's; 1,000 of 1,000 scripted exchanges (proposed count) | CI | scripted drops and claims (ADR 0004's pickup entities, PM-0004-66) | 1 run. Bites: picks stored on the gun | AB-8 (proposed there); UPGRADE-SCOPE |
+AFTER:
+| PM-0005-29 | u4: a lost gun's track waits for the next gun of its type (AB-8) | the player holds a looted weapon of type X and loses it on death (dropped by the fixture's drop rule, a test rule while OQ-0005-AB9 is open; no voluntary drop or swap, which OQ-0005-AB1 and AB9 leave open), then takes another X the fixture places: the player's X picks apply to it; a second player who takes the first gun gets their own X picks and none of the first player's; 1,000 of 1,000 scripted cycles (proposed count) | CI | scripted deaths, fixture drops and claims (ADR 0004's pickup entities, PM-0004-66) | 1 run. Bites: picks stored on the gun | AB-8 (proposed there; ability item 6, u4); UPGRADE-SCOPE |
+END
+
+### FIX GD-5 (PM-0005-31: distinctness left to OQ-0005-AB8), GD-8 (routed by game-designer: an offer of the data's size, equal logs on native and Wasm)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-31 | u6: only offered picks count, and offers repeat (AB-8) | every offer holds the data's offer size (3) of distinct candidates whose requirements hold; a pick that was not offered, or for a closed offer, refused in 1,000 of 1,000 forged picks; 1,000 of 1,000 offered picks accepted (a control: proposed); the same seed and inputs give byte-identical offer logs on two runs, and on native and Wasm only if ADR 0004 puts the offers in a stream the client holds | CI | forged pick commands; the offer log written by the authority | 2 runs (the log); 1 run (the counts). Bites: an authority that accepts any candidate of the track; offers drawn from a clock seed | AB-8 (proposed there); UPGRADE-SCOPE; SEC-SPREAD (a)'s reasoning |
+AFTER:
+| PM-0005-31 | u6: only offered picks count, and offers repeat (AB-8) | every offer holds the data's offer size (3) of candidates whose requirements hold, distinct or not as the test track's data says (whether candidates are always different, and what a track with fewer left than the offer's size does, are OQ-0005-AB8's: here fixture rules, not game rules), with one test track that has fewer candidates than the offer's size handled as its data says; a pick that was not offered, or for a closed offer, refused in 1,000 of 1,000 forged picks; 1,000 of 1,000 offered picks accepted (a control: proposed); the same seed and inputs give byte-identical offer logs on two runs, and on native and Wasm: the offers stream is authority-only (ADR 0004 part 8), but in local play the authority runs in the browser's Web Worker (ADR 0002) | CI (native; Wasm in Node) | forged pick commands; the offer log written by the authority | 2 runs per target (the log); 1 run (the counts). Bites: an authority that accepts any candidate of the track; offers drawn from a clock seed; an offer size hard-coded as 3 (changing the data to 2 must change every offer) | AB-8 (proposed there; ability item 6, u6); UPGRADE-SCOPE; SEC-SPREAD (a)'s reasoning |
+END
+
+### FIX GE-1 (PM-0005-34: the material per slot content; routed by graphics-engineer), GE-10 (a .gltf's external buffers and images)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than its slot class's shared material (identity against the material cache); 0 model requests other than listed glTF/GLB files, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
+AFTER:
+| PM-0005-34 | The models load on both backends and carry no look of their own (GPU section parts 1, 6) | 0 console errors in every start; 0 meshes of a listed asset drawn with a material other than the shared material of its slot's content (identity against the material cache, which is keyed by slot content: the class, the faction for faction slots, and the slot's own base and emissive colour, textures, side and alpha mode, GPU part 1); 0 model requests other than listed glTF/GLB files and the buffers and images a listed `.gltf` references, and 0 requests outside the client's host | ML: Chrome, Edge, Firefox, each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | PM-0003-2's starts; after load, a script walks the scene graph; the page's network log | PM-0003-2's 10 starts per browser and backend. Bites: one slot left with its glTF material | the GPU section's spike part (R3-WGPU-REC1 mark 1, r3 lines 910–912); R5-GATE-REC3's G12 mutation (r5 line 1723) |
+END
+
+### FIX GE-1 (PM-0005-35 counts distinct slot contents; routed by graphics-engineer)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-35 | Materials are shared by content (GPU section parts 1, 2, 7) | the material objects on listed assets' meshes number at most the distinct (slot class, faction) pairs those meshes show, on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with every test model in each faction's colours; distinct material objects counted by identity, pairs counted from the slots' classes and factions | 1 run per backend (counts repeat, PM-0003-35). Bites: a loader that clones the class material per mesh (legacy's per-mesh conversion, CL4) | the GPU section's spike part (proposed there; R3-LOOK-F3, r3 lines 331–334) |
+AFTER:
+| PM-0005-35 | Materials are shared by content (GPU section parts 1, 2, 7) | the material objects on listed assets' meshes number at most the distinct slot contents those meshes show (GPU part 1's key: the class, the faction for faction slots, and the slot's own base and emissive colour, textures, side and alpha mode), two meshes with the same slot content share one material object, and each mesh's material carries its own slot's base colour and textures (read back and compared with the loaded file), on every frame | CI (a count); ML: Chrome on WebGPU and with `forceWebGL` | LS with every test model in each faction's colours; distinct material objects counted by identity, distinct slot contents counted from each slot's key fields in the loaded files | 1 run per backend (counts repeat, PM-0003-35). Bites: a loader that clones the class material per mesh (legacy's per-mesh conversion, CL4); a loader that keys materials by (slot class, faction) only, which must fail the colour comparison (two slots of one class with different base colours then share one material) | the GPU section's spike part (proposed there; R3-LOOK-F3, r3 lines 331–334); GPU part 1; legacy's content signature (CL4, `LEGACY_INVENTORY.md` line 113) |
+END
+
+### FIX FB-12 (PM-0005-42: the faction's colour value in its data, CD-13), GE-11 (a pixel probe per backend)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to its faction definition's colour value, for every faction and test model; 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour | the GPU section's spike part |
+AFTER:
+| PM-0005-42 | Every slot is classed and every faction slot coloured, on both backends (GPU section parts 2, 6) | 0 slots without a class; every faction colour slot's colour equal to the faction's colour value in its data (CD-13's client definition), for every faction and test model, read from the materials; and drawn on each backend: in an unlit debug view, a pixel probe at a faction slot of each test model returns that colour within 2/255 per channel (proposed tolerance: reading materials proves the data path, which is the same on both backends, not that each backend draws the colour); 0 console errors | ML: Chrome, Edge, Firefox on both backends; MAC: Safari | the research's processed test models in LS; colours read back from the materials and compared with the faction data | 10 starts per browser and backend (PM-0003-2's count). Bites: a faction slot given another faction's colour; a backend path that drops the slot's colour (the probe must see it while the material still reads right) | the GPU section's spike part |
+END
+
+### FIX AD-5 (the LOD checklist: the test views, not a camera decision)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+#### The LOD checklist (Mustafa, in Brave, in the asset spike; only with PM-0005-44's condition)
+1. Each test model with LOD levels at the closest and the farthest camera framing (LOOK_V2 §5). Expected: simple and
+   readable from a distance, real depth up close; the silhouette kept at the farthest framing.
+2. A slow zoom through each switch distance and back. Expected: no visible pop or flicker at a switch.
+AFTER:
+#### The LOD checklist (Mustafa, in Brave, in the asset spike; only with PM-0005-44's condition)
+Every view is at ADR 0003's test view (legacy's framing, CD5: height 40, boom 56.6, field of view 15°, yaw 45°) or a
+named variant of it, never a camera decision: the v2 framing is R2-INT-OQ2's, and both steps are taken again at its
+own closest and farthest once that question is answered.
+1. Each test model with LOD levels at two test views: the test view itself, as the far case, and the same camera at
+   half its distance to the player, as the close case (ADR 0003's look checklist, step 9) (LOOK_V2 §5). Expected:
+   simple and readable from a distance, real depth up close; the silhouette kept at the far view.
+2. The camera moved slowly from the close view out to twice the test view's distance and back (a test path through
+   each switch distance, proposed: legacy has no zoom). Expected: no visible pop or flicker at a switch.
+END
+
+### FIX GD-8 (review-game-designer finding 14: Feel Lab step 3, refused with no start shown)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+4. Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per
+   ability.
+AFTER:
+3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both, with
+   no start shown, since the client knows its team's tier (team state goes to the team, ADR 0001) and the ability's
+   required tag (AB-5), so a predicted variant can refuse the press locally. Record: any start that shows, in either
+   variant, as a defect of that variant.
+END
+
+### FIX AD-5 (families step 1: the test view), AD-12 (families step 4: GW18's builders)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+1. The test building as an authored model and as the ported kit, at the game camera, beside legacy's house (LOOK_V2
+   §2, §3). Expected: the half-timbered house with the brick-tile roof reads in both. Pick: authored, kit, or not yet.
+2. The props (barrels, carts, hay bales, logs) as authored models and as the ported kit, beside legacy (LOOK_V2 §2).
+   Pick: authored, kit, or not yet.
+3. The ground and its textures as an authored asset (if shown) and as the ported procedural textures. Pick: authored,
+   kit, or not yet.
+4. Trees: not judged; the tree style is LOOK_V2 §8's `[OPEN]` item. Expected: trees shown are labelled placeholders.
+AFTER:
+1. The test building as an authored model and as the ported kit, at ADR 0003's test view (legacy's framing, CD5; not a
+   camera decision, R2-INT-OQ2), beside legacy's house (LOOK_V2
+   §2, §3). Expected: the half-timbered house with the brick-tile roof reads in both. Pick: authored, kit, or not yet.
+2. The props (barrels, carts, hay bales, logs) as authored models and as the ported kit, beside legacy (LOOK_V2 §2).
+   Pick: authored, kit, or not yet.
+3. The ground and its textures as an authored asset (if shown) and as the ported procedural textures. Pick: authored,
+   kit, or not yet.
+4. Trees: no pick; the trees shown are legacy's tree builders ported as labelled placeholders (GW18), judged in ADR
+   0003's look checklist (step 15) for variety and lushness only; the tree style is LOOK_V2 §8's `[OPEN]` item.
+END
+
+### NOTE ADR 0005's BEFOREs (for the session's script)
+ADR 0005's blocks copy their BEFORE from the doc at 72cfcc3, as the coordinator asked; "### Pass marks" is unchanged
+between 75615d1 and 72cfcc3, so each also occurs once at 75615d1.
+END
+
+### NOTE GE-1 (routed back)
+fixed in PM-0005-34 and -35 (the distinct slot contents, a colour read-back that a (class, faction) key fails). Nothing
+more to route: graphics-engineer's GPU parts 1 and 7 already carry the key.
+END
+
+### NOTE AD-5 (0003 and 0005)
+fixed: ADR 0003's key defines the test view (CD5's framing, not a camera decision), step 9 names its two test views,
+and ADR 0005's families and LOD checklists use them; every step is taken again at the v2 framing once R2-INT-OQ2 is
+answered. routed (optional): graphics-engineer's part 11 may say the look proof test runs at that test view.
+END
+
+### NOTE EA-9, GD-5, FB-12, GE-10, GE-11
+fixed in PM-0005-10 (local-play leg), PM-0005-31 (distinctness left to OQ-0005-AB8, a short track handled as its data
+says), PM-0005-42 (the colour from CD-13's client definition; a pixel probe per backend), PM-0005-34 (a `.gltf`'s
+buffers and images). No routing.
+END
+

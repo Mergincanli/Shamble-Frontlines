@@ -1,0 +1,4 @@
+<<<OLD
+0 meshes of a listed asset drawn with a material other than its slot class's shared material (identity against the material cache); 0 model requests other than listed glTF/GLB files, and 0 requests outside the client's host |
+>>>NEW
+0 meshes of a listed asset drawn with a material other than the shared material of its slot's content (identity against the material cache, which is keyed by slot content: the class, the faction for faction slots, and the slot's own base and emissive colour, textures, side and alpha mode, GPU part 1); 0 model requests other than listed glTF/GLB files and the buffers and images a listed `.gltf` references, and 0 requests outside the client's host |

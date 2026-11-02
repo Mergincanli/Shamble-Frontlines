@@ -61,3 +61,10 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0005 PM-0005-10 done (EA-9)
 - 0005 PM-0005-18 (TE-8) and -24 (GD-8 #9) done
 - 0005 PM-0005-25 done (GD-8 #8, GD-7)
+- 0005 PM-0005-29 (u4) and -31 (GD-5, u6) done
+- 0005 PM-0005-34 (GE-1, GE-10), -35 (GE-1), -42 (FB-12, GE-11) done; next AD-5 0005 checklists + Feel Lab step 3
+- 0005 LOD checklist (AD-5) and Feel Lab step 3 (GD-8 #14) done
+- 0005 families checklist steps 1 & 4 done (AD-5, AD-12)
+- 0005 NOTEs written. Next: apply-check all blocks
+- check.py: all 67 FIX blocks apply in order (0005 at 72cfcc3, others at 75615d1), each BEFORE once; no sentence under a table; 20 NOTEs. DONE
+DONE

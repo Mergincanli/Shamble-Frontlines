@@ -1,0 +1,11 @@
+<<<OLD
+1. The test building as an authored model and as the ported kit, at the game camera, beside legacy's house (LOOK_V2
+>>>NEW
+1. The test building as an authored model and as the ported kit, at ADR 0003's test view (legacy's framing, CD5; not a
+   camera decision, R2-INT-OQ2), beside legacy's house (LOOK_V2
+===
+<<<OLD
+4. Trees: not judged; the tree style is LOOK_V2 §8's `[OPEN]` item. Expected: trees shown are labelled placeholders.
+>>>NEW
+4. Trees: no pick; the trees shown are legacy's tree builders ported as labelled placeholders (GW18), judged in ADR
+   0003's look checklist (step 15) for variety and lushness only; the tree style is LOOK_V2 §8's `[OPEN]` item.

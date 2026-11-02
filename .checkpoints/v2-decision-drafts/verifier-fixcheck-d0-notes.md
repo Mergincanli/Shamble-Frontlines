@@ -7,3 +7,8 @@
 - 20:44 fact 4 done: confirmed (runners page 'free and unlimited on public repositories' + macOS rows; billing page). Next: fact 5 (pull_request uses merge commit's workflow).
 - 20:37 fact 5 done: confirmed (securely-using-pull_request_target 'runs the workflow file from the merge commit'; events page GITHUB_SHA + pull_request_target contrast). Times in lines for facts 1-4 above are estimates (about 20:34-20:36 real). Next: fact 6 (MDN SameSite + Site).
 - 20:37 fact 6 done: confirmed with a note (MDN Set-Cookie Strict quote exact; Glossary Site registrable domain; SameSite rule is schemeful). Next: fact 7 (RFC 4291 2.5.1).
+- 20:38 fact 7 done: confirmed with a note (RFC 4291 2.5.1 and 2.5.4; RFC 6177: homes get more than one /64). Next: fact 8, scan *-fixes-final*.md for web-page citations.
+- 20:39 fact 8 scan done (row 8a): 3 extra web-sourced claims (8b runners private, 8c ADR 0002 paid minutes, 8d std Mutex poisoning). Next: rows 8b-8d.
+- 20:39 rows 8b (confirmed+note), 8c (imprecise wording, change suggested), 8d (confirmed) done. Next: optional extra checks (sqrt/mul_add exactness, RFC 8737 quote) if time, then fetch audit table, then verify line numbers.
+- 20:41 extra row 9 done: ADR 0004 269-272 'no source read here states their precision' is wrong for rem_euclid/div_euclid (std 1.99.1 §Precision); abs has a std 'precise result' line. Next: maybe RFC 8737 quote (research-cited, optional), then fetch audit table + final check.
+- 20:41 extra row 10 done (RFC 8737 quote confirmed). Next: write the fetch audit table into the verdicts file, then final summary and DONE.

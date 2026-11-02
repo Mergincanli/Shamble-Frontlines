@@ -1,0 +1,9 @@
+<<<OLD
+every faction colour slot's colour equal to its faction definition's colour value, for every faction and test model; 0 console errors |
+>>>NEW
+every faction colour slot's colour equal to the faction's colour value in its data (CD-13's client definition), for every faction and test model, read from the materials; and drawn on each backend: in an unlit debug view, a pixel probe at a faction slot of each test model returns that colour within 2/255 per channel (proposed tolerance: reading materials proves the data path, which is the same on both backends, not that each backend draws the colour); 0 console errors |
+===
+<<<OLD
+Bites: a faction slot given another faction's colour |
+>>>NEW
+Bites: a faction slot given another faction's colour; a backend path that drops the slot's colour (the probe must see it while the material still reads right) |

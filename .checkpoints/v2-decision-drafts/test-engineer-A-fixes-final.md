@@ -649,3 +649,109 @@ AFTER:
   condition holds; a reported mark (PM-0002-10, -29, -30, -31, -32, -78, and PM-0002-25's report) when its record is
 END
 
+### NOTE NA-1 (routed: one more wait in the honest rewind, for netcode-architect's part 8)
+Fixed in PM-0001-20 (buffer depth recorded), PM-0001-48 (judged with the cap above every honest rewind of the run;
+acceptance of the view time recorded), PM-0001-49 (per-shot parts; a third cap at the measured p99) and checklist steps
+7, 10 and 11 (step 7 at the measured cap, so its "the shot hits" can hold at P2; steps 10 and 11 compare three caps).
+Routed to netcode-architect (part 8), from my reading of parts 5 and 7 at 75615d1: the estimate (RTT + delay + buffer
+wait + half a tick for the blend) leaves out one more wait. The page posts its newest input once per drawn frame and
+each tick builds the command from the newest post (part 5), so the command leaves 0 to one frame after the frame whose
+view time it carries: up to 16.7 ms on a 60 Hz display, up to 33.3 ms on the minimum laptop at 30 fps, every one of
+them added to the honest rewind (arithmetic: the server's present when the command runs is the drawn frame's present
+plus that wait plus the uplink plus the buffer wait). Against a 33.3 ms tolerance, half a tick of blend error plus
+this wait plus the downlink's jitter can push an honest view time outside the tolerance. Part 8 may add half a frame
+to the estimate, or leave it to the proof test: PM-0001-49 now records this wait per shot, and PM-0001-48 records the
+share of honest view times replaced by the estimate. The budgets row "Prediction replay" may read "6 ticks, and 7 at
+P2's deepest buffer (PM-0001-44)", since PM-0001-44 now forces both (NA-10).
+END
+
+### NOTE GD-3 (routed: part 4's "causes no correction" overstates, for netcode-architect)
+The new row PM-0001-60 tests the own-state section. It cannot test "a pick or an effect that changes move speed or a
+fire interval causes no correction" (part 4) as written: picks and own abilities are never predicted (part 4), so the
+client predicts the ticks between the server applying a change and the snapshot that brings it at the old value, and
+that snapshot corrects by the change times about one round trip plus the buffer wait (arithmetic on parts 4 and 5).
+What the section guarantees is no correction after that snapshot. Part 4 should read "... causes no correction beyond
+the one at the first snapshot that carries it"; PM-0001-60 marks exactly that (at most one, then 0 above 1 mm).
+END
+
+### NOTE EA-1 (the new rows; one routed choice)
+Fixed: PM-0002-9 checks order per timeline (a cross-timeline sequence no longer runs in order by design) and the new
+PM-0001-61 times the drawn result online at P2. Restated: EA-1 asked for "within one frame of its entity's pose"; part
+7 places events per block and the page blends the two newest blocks, so an event played when its block arrives can
+lead its pose by up to one tick; PM-0001-61 marks one tick plus one refresh period (50.00 ms at 60 Hz), never late,
+which the bite (release on arrival, 100–166.7 ms early at P2) fails. Routed to the synthesis (engine-architect, with
+graphics-engineer for ADR 0003 part 10): if the page is to play each event at the frame whose drawn time passes its
+tick, ADR 0003 part 10 (or ADR 0002 part 5) states it, and PM-0001-61 then tightens to one refresh period.
+END
+
+### NOTE EA-7 and IE-2 (aligned with unit B)
+Fixed in the machines key, V-S, PM-0001-1 and PM-0001-27: the rooms-per-VM row runs unpinned under ADR 0006's
+PM-0006-13 (bracket B, 3 sessions at 3 times of day, steal recorded and reported, never a validity condition); "one set
+of runs serves both records". Unit B's PM-0006-13 (test-engineer-B-fixes-final.md, "FIX IE-2, EA-7") reads the same:
+"ADR 0001's PM-0001-27 is this set of runs, read the same way". My V-S keeps its LG clause (30 inputs per second within
+1 %, each LG VM under 80 %) for PM-0001-27, a superset of unit B's "LG's 80 % rule". The synthesis: SPIKE_PLAN:100–101
+("one set of runs, read the same in both tables") now holds as written.
+END
+
+### NOTE PA-5 (aligned with unit B)
+Fixed in PM-0002-28 as unit B's NOTE PA-5 asks: it cites PM-0004-8's one reading (ADR 0003's minimum-laptop frame
+rows, median ≤ 28 ms and p95 ≤ 33.3 ms, mode U), drops "every 1-second window holding at least 30 presented frames"
+and mode P, and sets no number of its own. PM-0001-40's P2 at 60 Hz already says "ADR 0004's row".
+END
+
+### NOTE IE-9/10 (aligned with ADR 0006 at 8fa7173)
+Fixed in the machines key (LG sized by a 5-minute calibration run, each VM under 80 %, its count in the run plan and
+the hours in PM-0006-18; the per-address cap raised on LG's addresses and recorded), V-S (LG's own CPU), PM-0001-25
+(run twice: cap raised, then on as the refusals) and PM-0001-29 (attempts one at a time under the cap). ADR 0006's LG
+key is unit B's to align (the infra NOTE gives its words).
+END
+
+### NOTE SA-13 (with unit B)
+The sequences of decoded control messages driven into `room` live in ADR 0004's PM-0004-60 (unit B's SA-13 fix), once
+`room` exists; PM-0001-34 points there and keeps its decoder fuzzing. One fuzz target, not two.
+END
+
+### NOTE RR-3 (the mark's place)
+The mark is ADR 0001's new PM-0001-59, beside PM-0001-26 (as rust-reviewer's b815c85 routes it), not an ADR 0004 row;
+PM-0001-26 also gains the poisoned-lock bite. If the Advisor picks OQ-0001-18 (b), the row is rewritten for the resume.
+Nothing for unit B.
+END
+
+### NOTE GD-2 (routed by netcode-architect; placed at slice 4)
+A purchase failing each condition is not added to PM-0001-21: the proof test's throwaway sim has movement, hitscan and
+bots only (no money, tiers or buy terminals), so a refusal test there could not fail where the real rule would. The
+no-mark list's Part 12 line now names purchases with picks and pickups, proven at slice 4 by the test plan's forged
+picks, purchases and pickups.
+END
+
+### NOTE RR-8 (routed: the part 4 half, for engine-architect)
+PM-0002-29 now measures `lto` and `codegen-units`, Brotli beside gzip, and the shipped file, and records the panic
+strategy. Part 4 (engine-architect) still has to write the chosen `[profile.release]` settings for `sim-wasm` once
+measured and say that the panic strategy is abort by the target's default (no stable alternative), as RR-8 asks.
+END
+
+### NOTE for the synthesis (engine-architect: SPIKE_PLAN, README)
+New rows: PM-0001-58 to PM-0001-62 (ADR 0001; placed after -57, -26, -42, -46 and -52) and PM-0002-77, PM-0002-78 (ADR
+0002, the boundary spike; placed after -14 and -25). SPIKE_PLAN:75 and :99 ("PM-0001-1 to -57", "PM-0001-1 to
+PM-0001-57") read "-62"; SPIKE_PLAN:77 and :166 ("PM-0002-1 to -34") add "and PM-0002-77, -78". SPIKE_PLAN item 1
+subsumes R1-ABL-REC4's own-weapon half (SPIKE_PLAN:123): its row is now PM-0001-62. No new open question from this
+unit: every new setting is a test setting marked proposed (the cap above the honest rewind in PM-0001-48, the door
+script on encoding ticks at 60 Hz, the direction split as OQ-0001-16 proposes).
+END
+
+### NOTE index (every finding in the prompt, and where it is handled)
+ADR 0001 (all FIX): GD-1 and SA-8 (PM-0001-21); NA-1 (PM-0001-20, -48, -49, checklist 7, 10, 11; NOTE NA-1); NA-2 and
+PA-1 (ES key, PM-0001-2, -12); NA-3 (new PM-0001-62, checklist intro); NA-5 and NA Q2 (profiles key, PM-0001-3, -37);
+NA-6 ("When a mark fails"); NA-10 (PM-0001-44, -56); NA-11 (PM-0001-42); NA-12 (PM-0001-39); PA-2 (PM-0001-54, "When a
+mark fails"); PA-9 (soaks key, PM-0001-2, -39); EA-2 (PM-0001-43, -56); EA-4 (new PM-0002-77, ADR 0002); EA-7 and IE-2
+(machines key, V-S, PM-0001-1, -27); SA-9 and SA-7 (PM-0001-25); SA-13 (PM-0001-34, NOTE); IE-9/10 (machines key, V-S,
+PM-0001-25, -29); IE-7 (PM-0001-29); FC-7 (PM-0001-45); TE-3 (PM-0001-30); TE-4 (new PM-0001-58, soaks key); RR-3 (new
+PM-0001-59, PM-0001-26's bite); GD-3 (new PM-0001-60; NOTE); EA-1 (new PM-0001-61, PM-0002-9; NOTE); NA-4 (PM-0001-33,
+-47); TE-1's follow-up (PM-0001-2's stand-ins); GD-2 (the no-mark list; NOTE).
+ADR 0002 (all FIX): FB-1 (PM-0002-17, -42); FB-3 (PM-0002-45); FB-9 (PM-0002-23); FC-3 (PM-0002-29); FC-10 (PM-0002-3);
+EA-1 (PM-0002-9); SA-1 (PM-0002-65, -66); NA-7 (PM-0002-12, -13, -14, -64); PA-5 (PM-0002-28); RR-1, RR-2, RR-7
+(PM-0002-41); RR-6 (PM-0002-6); RR-8 and RR-7 (PM-0002-29); RR-9 (PM-0002-33); RR-5 (PM-0002-10); EA-8, SA-10, RR-10
+(PM-0002-44); SA-11 (PM-0002-42, -46); GE-2 (PM-0002-51, -64; PM-0003-36 is unit B's); TE-7 (PM-0002-76); PA-13 (new
+PM-0002-78, the row list, "When a mark fails"). Deferred: none.
+END
+

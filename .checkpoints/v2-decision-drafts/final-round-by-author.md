@@ -348,4 +348,11 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - Routed by game-designer's ability batch (d57dc5a): README rows for OQ-0005-AB14 (spawn protection's scope; Mustafa)
   and OQ-0005-AB15 (who sees picks; Mustafa); ADR 0005's row count +2 (AB1–AB15); "Needs outside VISION_V2 §6" gains
   "ADR 0005: AB-2's immunity rule for spawn protection (LOOP_V2 §2 only)"; POOL-FULL is OQ-0004-11 with AB-1's proposal.
+- Routed by test-engineer A and B (final batches, applied 2026-11-02 about 20:40): SPIKE_PLAN:75 and :99 change
+  "PM-0001-1 to -57" to "-62"; :77 and :166 add PM-0002-77 and -78; the new rows PM-0003-44 to -47, PM-0004-75 and
+  PM-0006-32 where SPIKE_PLAN lists a spike's pass marks; README rows for OQ-0003-20 (HEAT-SOAK; the Advisor) and
+  OQ-0006-20 (the spike's bill cap; Mustafa), once their authors adopt them.
+- Deferred (noted for the report): ADR 0002 part 4 writes the chosen `[profile.release]` settings once the boundary
+  spike measures them (RR-8's part 4 half; a future action); ADR 0003 part 10 states event play-time only if EA-1's
+  one-frame bound is wanted (PM-0001-61 is set at one tick plus one frame, 50 ms, a reasoned NOTE).
 

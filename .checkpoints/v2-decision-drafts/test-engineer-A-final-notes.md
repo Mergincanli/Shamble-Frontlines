@@ -36,3 +36,6 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - PM-0002-51, -64, -65 written; next: -66 (SA-1), -76 (TE-7), then NOTEs
 - PM-0002-66 (SA-1), -76 (TE-7) written; next: ADR 0002 intro row list (-77, -78), When a mark fails (-78 reported), then NOTEs
 - ADR 0002 row list and When-a-mark-fails written; all FIX blocks done. next: validate, then NOTEs
+- NOTEs written (NA-1 routed frame wait, GD-3 routed wording, EA-1, EA-7/IE-2, PA-5, IE-9/10, SA-13, RR-3, GD-2, RR-8, synthesis). next: short NOTE list of findings fixed, final validation, return
+- index NOTE written; 66 FIX + 12 NOTE; validated (sequential apply = work copies, column counts OK). DONE
+- follow-up b: FIX for 'whole tick' in PM-0001-48 written to test-engineer-A-fixes-final-b.md; glossary check run on scratch copy

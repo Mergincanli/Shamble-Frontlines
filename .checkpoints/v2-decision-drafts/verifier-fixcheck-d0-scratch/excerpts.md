@@ -82,3 +82,52 @@ Browsers sometimes need to distinguish precisely between different sites. For ex
 For this more precise definition a site is determined by the registrable domain portion of the domain name. The registrable domain consists of an entry in the Public Suffix List plus the portion of the domain name just before it. This means that, for example, theguardian.co.uk, sussex.ac.uk, and bookshop.org are all registrable domains.
 According to this definition, support.mozilla.org and developer.mozilla.org are part of the same site, because mozilla.org is a registrable domain.
 In some contexts, the scheme is also considered when differentiating sites. This would make http://vpl.ca and https://vpl.ca different sites. Including the scheme prevents an insecure (HTTP) site from being treated as the same site as a secure (HTTPS) site. A definition that considers the scheme is sometimes called a schemeful same-site. This stricter definition is applied in the rules for handling SameSite cookies.
+
+## F7 www.rfc-editor.org/rfc/rfc4291.txt (fetched 20:34), section 2.5.1 (page 8, txt lines 399-401) and 2.5.4 (page 10, txt lines 512-513)
+   For all unicast addresses, except those that start with the binary
+   value 000, Interface IDs are required to be 64 bits long and to be
+   constructed in Modified EUI-64 format.
+   000 have a 64-bit interface ID field (i.e., n + m = 64), formatted as
+   described in Section 2.5.1.  Global Unicast addresses that start with
+## F7 www.rfc-editor.org/rfc/rfc6177.txt (fetched 20:37), section 2 (pages 5-6, txt lines 286-289)
+
+   worth of space, by default.  Hence, this document still recommends
+   giving home sites significantly more than a single /64, but does not
+   recommend that every home site be given a /48 either.
+
+## F8a runners page (fetched 20:34), 'Standard GitHub-hosted runners for private repositories', text dump lines 314-318
+Standard GitHub-hosted runners for private repositories
+For private repositories, jobs using the workflow labels shown in the table below will run on virtual machines with the associated specifications. These runners draw from your GitHub account's included compute usage, and are then charged at the per-minute rates. See Actions runner pricing.
+Linux15 GB14 GB x64 
+ ubuntu-slim
+## F8b billing page (fetched 20:34), text dump lines 118, 188, 192
+Your GitHub plan includes a monthly amount of included compute usage. Each product measures usage in its own units and applies its own rate. GitHub calculates the cost of that usage, which counts against the included compute usage. After the included amount is consumed, additional usage is billed to your account. The included amount resets at the start of each billing cycle.
+GitHub Free500 MB$12 USD10 GBNot applicable
+GitHub Enterprise Cloud50 GB$300 USD10 GB150 GB
+## F8c doc.rust-lang.org/std/sync/struct.Mutex.html (rustdoc 1.99.1, fetched 20:39), section Poisoning, text dump lines 56-64
+The mutexes in this module implement a strategy called “poisoning” where a
+mutex becomes poisoned if it recognizes that the thread holding it has
+panicked.
+Once a mutex is poisoned, all other threads are unable to access the data by
+default as it is likely tainted (some invariant is not being upheld). For a
+mutex, this means that the lock and try_lock methods return a
+Result which indicates whether a mutex has been poisoned or not. Most
+usage of a mutex will simply unwrap() these results, propagating panics
+among threads to ensure that a possibly invalid invariant is not witnessed.
+
+## X9 f32 page (1.99.1, fetched 20:34): div_euclid (txt 458-466), rem_euclid (475-489), abs, floor; f64 page same §Precision at div_euclid/rem_euclid (txt 313-339)
+pub fn div_euclid(self, rhs: f32) -> f32
+§Precision
+The result of this operation is guaranteed to be the rounded
+infinite-precision result.
+pub fn rem_euclid(self, rhs: f32) -> f32
+The result of this operation is guaranteed to be the rounded
+infinite-precision result.
+§Examples
+abs: This function always returns the precise result.
+## X9 doc.rust-lang.org/reference/expressions/operator-expr.html (fetched 20:41), txt line 423
+** Rust uses a remainder defined with truncating division. Given remainder = dividend % divisor, the remainder will have the same sign as the dividend.
+
+## X10 www.rfc-editor.org/rfc/rfc8737.txt (fetched 20:41), section 3, txt lines 182-183
+   3.  The ACME server initiates a TLS connection to the chosen IP
+       address.  This connection MUST use TCP port 443.  The ACME server
