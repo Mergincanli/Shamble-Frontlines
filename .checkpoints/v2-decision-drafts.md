@@ -38,6 +38,17 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+Sixth spend-limit cut, 2026-11-02 shortly after 09:48 Amsterdam ("resets 9:10am (UTC)", 10:10 Amsterdam): the reviews
+by test-engineer, art-director, graphics-engineer and rust-reviewer and verifier fixcheck-c failed with HTTP 429 (notes
+kept). Done before the cut, 2026-11-02: fixcheck-b and fixcheck-a (PASS WITH NOTES), skeptic-4 (5 of 5 upheld), the
+synthesis round (47eadd9, 53 blocks; CI green), the reviews by engine-architect (0001 REVISE small), security-auditor
+(0002, 0006 REVISE), infra-engineer (0006 REVISE), game-designer (0001, 0004, one 0005 row REVISE), netcode-architect
+(0001 REVISE small) and perf-auditor (0001, 0003 REVISE small); every finding logged per author in
+`final-round-findings.md`. Resumed about 11:07 Amsterdam: the five cut agents from their notes; then the final fix
+round (`prompts/_final-round-TEMPLATE.txt`, one batch per author), fixcheck-d, docs-keeper (`prompts/docs-keeper-2.txt`),
+the report.
+
+Before this cut (2026-11-02 morning):
 Fifth spend-limit cut, 2026-11-01 about 19:35 Amsterdam ("your 5-hour limit resets 11pm (UTC)", 00:00 Amsterdam): all
 five running agents failed with HTTP 429 (fixcheck-a: 0001 and 0003 done, 0006 left; fixcheck-b: all checks done, its
 verdicts file not yet written; the synthesis round and the reviews by engine-architect and security-auditor barely
