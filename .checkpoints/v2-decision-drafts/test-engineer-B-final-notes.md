@@ -30,3 +30,5 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0003 PM-0003-18, -20, -21 done (S, tail form named in rows); mksub.py helper added
 - 0003 PM-0003-36 done (PA-12, GE-2 record, GE-3, GE-14)
 - 0003 new rows -44..-47 done (anchor line 1134)
+- 0003 fail route 1137-1146 done (AD-1); checklist Low frame = new step 31, busy fight = new step 32
+- coordinator msg 2: CD-2 row (PM-0005-4 or -5) gains a per-target leg: CD-2 reports per target the reserved worst case of content-bounded effects; names missing caps (others' effects, pickups, big vehicles); content spike item 2 checks per-target share; BEFORE from 72cfcc3 (pass marks unchanged)

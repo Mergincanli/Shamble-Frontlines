@@ -12,3 +12,4 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - blocks 5 (soaks: PA-9, TE-4) and 6 (V-S: EA-7/IE-2, IE-9/10) written; next: rows PM-0001-1, -2, -3
 - rows PM-0001-1 (EA-7), -2 (PA-9, TE-1 stand-ins, ES), -3 (NA-5) written; next: PM-0001-7?, -12 (NA-2/PA-1), -13 (PA-3/NA-9)
 - rows PM-0001-12 (NA-2/PA-1), -13 (PA-3/NA-9) written; next: PM-0001-17 + new -58 (TE-4)
+- new row PM-0001-58 (TE-4) written after PM-0001-57; next: PM-0001-20 (NA-1), -21 (GD-1, SA-8)
