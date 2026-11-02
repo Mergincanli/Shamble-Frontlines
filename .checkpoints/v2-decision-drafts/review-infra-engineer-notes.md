@@ -1,2 +1,16 @@
 # Task: review-infra-engineer (plan step 10, wave 1: infra-engineer's domain review of the v2 decision drafts, ADR 0001/0002 asks of 0006 and 0006 Pass marks; launched 2026-11-02)
 - 2026-11-02: read ADR 0006 in full (1160 lines). Next: ADR 0001 rooms/room process/server runtime/transport/certs/ports; ADR 0002 CI gate v2/previews/toolchain in CI.
+- 0001 parts 3, 10, 11, catalogue, budgets, failure modes, PM header + PM-0001-1/-4/-15/-16/-25/-27 read; 0002 parts 1-4, 8-10 read.
+  Candidate findings (to firm up):
+  A (med) cost: transport runtime cap 1 vCPU/process (0001:538) + tick 0.5 vCPU (0001:533) -> 1.5 vCPU/room at ceilings -> 2 rooms per 4-vCPU VM; 0006:262 calls 4/VM "the case to budget" (A-2, r6:516-522); worst case at the marks = ceil(20/2)+1=11 CCX23 = 951.39 EUR (+8.99+6.49 = 966.87). State it.
+  B (med) PM-0001-27 V-S validity (tick thread alone on its vCPU; steal <=1%: 0001:1098-1101) cannot hold for 8 rooms on 4 vCPU and voids SH by its nature; PM-0006-13 "no CPU pinning" + "one set of runs serves both records" (0006:880) -> conflict; also two single-room references (PM-0001-4 pinned vs bracket B) and run counts (1 vs 3 sessions).
+  C (med) LG sizing: one CX33 for 384 QUIC sessions (0006:812-814, :880) vs server transport cap 1 vCPU/48 sessions -> LG likely >80% -> sessions invalid; fix: LG = n VMs sized by calibration, hours into PM-0006-18 plan.
+  D (med) per-IP cap (0001:330-331 "modest cap ... above 1") vs all LG bots from one address: neither doc states the cap setting per run (PM-0001-25 flood meaning depends on it).
+  E (med) cert hash for multiplayer previews: 0002:531-534 writes hash into static preview files; 0006:228 certs <=14 days made at server start; R2-TRN-REC5 mark 2 "new hash within one reload" (r2:2720-2721) cannot hold -> stale after rotation; simpler: staging presents the trusted cert OQ-0006-5 must give wss on both transports.
+  F (med-high) no production deploy/release path for client or server binaries, no client/server version coexistence during deploy, no server rollback (grep: none in 0001/0002/0006); A-5 "one VM for draining during deploys" only.
+  G (med) firewall "nothing else" (0006:185-190; PM-0006-15 "0 other rules") vs needs in its own parts: admin access (SSH), lobby HTTPS (part 6 option a), Reporting API endpoint on lobby (part 10), ACME http-01 TCP 80 (part 7), staging delivery endpoint (0002:531-533). Rules per VM role.
+  H (med) no domain/DNS named anywhere: per-hostname certs, lobby HTTPS, wss trusted cert before netcode proof test (OQ-0006-5), guest cookie same-site (security F-O) all need a domain + DNS; owner/cost/account missing from migration step 0.
+  I (med) lobby<->supervisor half of I-11 (room allocation, port, directory updates, drain) has no text (0001:498 "ADR 0006"; 0006 defines none).
+  J (med, question) public repo (r5:913-914) means unreleased art in git is public whatever the wall (0006:144-146); private repo changes CI cost (R5-CI-F17 private 2 CPU/8 GB, minutes not read). OQ-0005-AP1 "where files live".
+  Security F-I (deploy token reachable by any same-repo branch's workflow edit) is security-auditor's: cross-ref only.
+- Next: 0002 Q16-Q19, consequences, OQs, PM CI rows, migration step 2; README register rows for 0006; SPIKE_PLAN items; then write review file.

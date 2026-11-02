@@ -36,5 +36,5 @@ Tasks: F1 (0002 rows 27/33, erasableSyntaxOnly enum), F3 (0002 PM-0002-45 vs G7)
 - A8: 0001:229-234 vs 0004:454-458; 0001 has no other class for blasts/harvester/structure events; blasts arguably cosmetic -> fix must place them.
 - Next: fetch audit, counts line, DONE.
 - (correction: the 09:40 and 09:33 stamps above were estimates; the real clock was about 09:25 and 09:29)
-- 09:31 fixed line numbers in results (G6 0002:456, G7 0002:457; README 72 data rows :32-103). Fetch audit + counts line written.
+- 09:29 fixed line numbers in results (G6 0002:456, G7 0002:457; README 72 data rows :32-103). Fetch audit + counts line written.
 DONE
