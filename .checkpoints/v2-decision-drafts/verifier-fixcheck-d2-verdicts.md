@@ -295,8 +295,8 @@ Base: the three docs did not change between 47eadd9 and 604a497, so the final ro
 | S1 | ENGINE_OVERVIEW:9–11 | in local play the Worker is the client endpoint and also the local server | ADR 0002 parts 5, 6 | confirmed | 0002:189 `sim-wasm` "around the client endpoint (`client-endpoint`) and the local server (`room` + `sim`)"; 0002:385 "the client endpoint reaches it through the loopback backend" | resolves NA-17 |
 | S2 | ENGINE_OVERVIEW:37–43, 51–52, 66–68, 96–98 | the page posts its newest input each drawn frame (cursor ray, view time); the Worker builds one network command per tick from the newest post | ADR 0001 part 5; ADR 0002 part 5 | confirmed | 0001:235 "the page posts its newest input once per drawn frame, with its cursor ray"; 0002:311–314 "The newest input, posted once per drawn frame … At each tick the Worker takes the newest post" | resolves NA-7 and the routed ADR 0002 lines |
 | S3 | ENGINE_OVERVIEW:41, 52, 96 | interpolate between the two newest blocks | ADR 0003 part 10 | confirmed | 0003:446–447 "take the newest blocks, keeping two … interpolate between the two newest ticks" | resolves FC-5 and GE-12 |
-| S4 | ENGINE_OVERVIEW:58–62 | the block carries owner-only data (own weapon, money, upgrade tracks and offers); a remote entity's spatial events come in the block whose delayed time reaches their tick | ADR 0002 part 5; ADR 0001 part 7 | confirmed | 0002:283–285 "one section of owner-only data for the local player (own weapon state, money, upgrade tracks and offers …)"; 0001:323–325 "into the first block whose delayed time reaches the event's tick" | – |
-| S5 | ENGINE_OVERVIEW:70–75 | `room` and `client-endpoint` build for Wasm and natively with no async runtime, transport or clock; `sim-wasm` holds `client-endpoint`, `room`, `sim`, `protocol`, `content`; the supervisor links no sim code | ADR 0002 part 3 | confirmed | 0002:188–191, 199–203: the supervisor "links no `sim`, `room` or `sim-wasm` code" | – |
+| S4 | ENGINE_OVERVIEW:60–66 | the block carries owner-only data (own weapon, money, upgrade tracks and offers); a remote entity's spatial events come in the block whose delayed time reaches their tick | ADR 0002 part 5; ADR 0001 part 7 | confirmed | 0002:283–285 "one section of owner-only data for the local player (own weapon state, money, upgrade tracks and offers …)"; 0001:323–325 "into the first block whose delayed time reaches the event's tick" | – |
+| S5 | ENGINE_OVERVIEW:72–78 | `room` and `client-endpoint` build for Wasm and natively with no async runtime, transport or clock; `sim-wasm` holds `client-endpoint`, `room`, `sim`, `protocol`, `content`; the supervisor links no sim code | ADR 0002 part 3 | confirmed | 0002:188–191, 199–203: the supervisor "links no `sim`, `room` or `sim-wasm` code" | – |
 | S6 | ENGINE_OVERVIEW:117 (§6.9 row) | part 7's presented-frame count reads "without dropping frames" (PM-0003-44); the share is OQ-0003-17 | ADR 0003 | confirmed | 0003:377–383; PM-0003-44 | PA's note |
 | S7 | SPIKE_PLAN item 1 (pass marks; Depends on; Place; Size) | PM-0001-1 to -62; PM-0001-27 and PM-0006-13 share one set of runs under PM-0006-13's rules; S1's stand-ins at 30 Hz (384 rows, 1 ms burned, 2.80 ms topped up); the client harness built here first, proposed with the order | ADR 0001; ADR 0004 S1; ADR 0006; ADR 0002 spike text | confirmed | counts.py: ADR 0001 has PM-0001-1 to -62; 0001:1357–1361 (V-S exception for PM-0001-27); 0004:982; 0002:1073–1074 "shares its client harness and stand-in sim" | resolves IE-2 and GE-13 (proposed under J6 (5), so not a decision) |
 | S8 | SPIKE_PLAN item 2 | at 60 Hz the stand-ins are 384 rows with 1 ms burned and the remainder topped up to 0.30 ms (4.17 − 3.87); (d) waits for the effect step; (c) is the fallback | ADR 0001 OQ-0001-2; ADR 0004 part 6 | confirmed | 0001:1034–1047; 0004:239 | resolves TE-1; the same numbers as ADR 0001 and ADR 0004 |
@@ -326,7 +326,7 @@ Base: the three docs did not change between 47eadd9 and 604a497, so the final ro
 
 | item | where | same? | note |
 |---|---|---|---|
-| event-release rule | ENGINE_OVERVIEW:61–62, 91–92 against ADR 0001 part 7 and ADR 0002 part 5 | yes | "released on its delayed timeline" / "the block whose delayed time reaches their tick" |
+| event-release rule | ENGINE_OVERVIEW:63–65, 93 against ADR 0001 part 7 and ADR 0002 part 5 | yes | "released on its delayed timeline" / "the block whose delayed time reaches their tick" |
 | 60 Hz stand-ins | SPIKE_PLAN items 1, 2, 4; README TICK-60-SETUP row; ADR 0001 OQ-0001-2; ADR 0004 S1, PM-0004-2 | yes | 1 ms and 0.30 ms at 60 Hz; 1 ms and 2.80 ms at 30 Hz, in all |
 | one material per slot content | SPIKE_PLAN:251 against ADR 0003 5.a, ADR 0005 GPU parts 1 and 7 | no | SF1 |
 | OQ-0006-13, no OQ-0002-9 | all nine docs at 449356c | yes | `grep -c OQ-0002-9` = 0 in each; README's OQ-0006-13 row names the preview token and production |
@@ -360,3 +360,15 @@ Base: the three docs did not change between 47eadd9 and 604a497, so the final ro
 - Current text, SPIKE_PLAN:251: "plain glTF/GLB exports load on both backends with the engine's shared materials per slot class, every model listed by id".
 - What the source says: ADR 0003 5.a (0003:175) "one material per slot content, never one per mesh". ADR 0005 GPU part 1 (0005:1695–1697) defines the content as the class, the faction, and the slot's own colours, textures, side and alpha mode. PM-0005-35 has a bite that keys materials by (class, faction) only and must fail.
 - Smallest fix: "with the engine's shared materials, one per slot content (ADR 0005 GPU part 1)".
+
+## Fetch audit
+
+| time | host | URL | status | note |
+|---|---|---|---|---|
+| – | – | none | – | This unit fetched no web page, as its prompt asks. Web-sourced facts are taken from fixcheck-d0 (verifier-fixcheck-d0-verdicts.md: std 1.99.1 `f32`/`f64` pages, the Rust Reference, std `Mutex`, all fetched there at 20:34–20:41). Still unverified here: the WebGPU specification's error model behind PM-0003-2's device-error events (test-engineer B's NOTE GE-14 asks for it), and std's `Hasher::write_length_prefix` default behind ADR 0004 part 9's `usize` reason (labelled proposed in the draft). |
+
+Other notes:
+- Legacy gate, `node tools/gate.mjs 9e7db28 --no-smoke` on the working tree at 21:0x: checks 1–4 and 5b–5d PASS, symbols +0 −0. 5a was skipped (Chromium for Playwright is missing in this session, as fixcheck-d0 found). No `.js` or `.html` file changed.
+- A process slip of this unit: early on it wrote copies of the nine docs at 604a497 into the session scratchpad under the names 0001.md to 0006.md, EO.md, SP.md and README.md. That may have overwritten files of the same names left there by other agents, and those copies were read-only scratch. All saved scratch of this unit is in verifier-fixcheck-d2-scratch/.
+
+VERDICT for this unit: FAIL. Two structural losses in ADR 0005 must be fixed before the drafts go to the stop review: F1b, the AB-3 heading, and F1a, the Feel Lab steps 3 and 4. Everything else is medium or low.

@@ -527,7 +527,7 @@ built from the tested artifact. Each part says what, why, its research ids and t
      `proptest-regressions` with its fix; simulated time only in sim and network tests; browser tests wait on state
      through a test-hook API and drive page time with Playwright's clock; no shared global state in Rust tests; every
      failure keeps its seed, recording and trace as CI artefacts, for the retention ADR 0006 sets for failure
-     artefacts (part 3; R5 leaves it to infra-engineer, r5 line 2083; until it is set, the 7 days of build artifacts),
+     artefacts (part 3: 30 days, proposed there; R5 leaves it to infra-engineer, r5 line 2083),
      and gets an issue that carries the seed, so the failure still replays after its artefacts expire.
    - **The bench method** (critic rank 36): the tick bench is a mode of the `devtools` replay runner. It replays a
      recording of [the stress scene](../research/GLOSSARY.md#the-stress-scene), times every sim step and every phase
