@@ -175,7 +175,7 @@ AFTER:
 END
 
 d2 F13 holds for PM-0003-17 (0003:1151): the look checklist sets "The legacy view is legacy itself opened in a second
-Brave window" (0003:1223–1224). 0003:960 and 0003:1367 lie outside the pass marks (part 13 and the Test plan, not this
+Brave window" (0003:1223–1224). 0003:960 and 0003:1367 lie outside the pass marks (the draft's "What a spike must prove" and its Test plan, not this
 unit's text): left to their author, graphics-engineer, with the same wording. Same line count.
 
 ### FIX F13 (fixcheck-d2)
