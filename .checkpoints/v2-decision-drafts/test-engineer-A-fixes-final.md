@@ -60,3 +60,15 @@ AFTER:
   on every soldier; PM-0001-2's counter script checks these counts on every ES run (the rates within ±5 %, proposed). **CO**,
 END
 
+### FIX NA-5 and NA Q2 (the key: the profiles' direction split, OQ-0001-16)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+  Latency is the round trip. L1 runs the headless clients; L2 is the impairment layer under quinn's socket (and a
+AFTER:
+  Latency is the round trip, and each direction carries half the profile's latency and a uniform jitter of ± half its
+  jitter, so the round trip keeps the profile's mean and range (part 13; OQ-0001-16, the Advisor's, before the test
+  starts; the half split of latency is R5-TEST-REC4's, r5-toolchain-quality.md lines 1455–1456, proposed there, and
+  the jitter's split and its uniform shape are part 13's proposal): at P2, 50 ± 10 ms each way. A packet's expected
+  arrival is its send time plus that one-way delay, and every lateness in these marks is counted from it. L1 runs the headless clients; L2 is the impairment layer under quinn's socket (and a
+END
+
