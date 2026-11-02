@@ -128,7 +128,15 @@ research ids, and the need it serves.
    and their parts, [live projectiles](../research/GLOSSARY.md#live-projectile), weapon pickups (part 18) and
    [active effects](../research/GLOSSARY.md#active-effect-and-visual-effect) (as rows in an ordered effect pool on their
    target: owner id, definition id, timers, stacks); per-team tables; the player records (part 18); the static colliders
-   with their ids; the random streams' state; the tick counter; the tick's event list. Phases are plain functions called
+   with their ids; the random streams' state; the tick counter; the tick's event list. Every pool has a fixed capacity,
+   set at match start from the mode and the content set and allocated then, so the step never grows one (part 6) and
+   nothing a client sends sizes it: each pool's worst case follows from the content's numbers (fire intervals and
+   projectile lifetimes, pellets per shot, effect durations and stack limits, drops per death and pickup lifetimes)
+   and from the game-designer's caps where they exist (R2-BUD-OQ5), and ADR 0005's whole-set check reports it. A full
+   pool applies one fixed, documented overflow rule, identical on every target, and counts every overflow in a
+   per-pool counter; which rule each kind gets (refuse the new row, or end the oldest early) decides who wins a
+   pile-up, so it is OQ-0004-11's, and until it is answered the spikes refuse the new row as a test fixture, not a
+   rule. Phases are plain functions called
    in one fixed order, starting from the legacy order (GP14). No ECS crate; nothing lives outside the struct (no globals
    or statics in the sim crate). One match runs on one thread: no parallelism inside a match unless the sim core spike
    shows the sim step share cannot hold at N = 48.
@@ -153,11 +161,21 @@ research ids, and the need it serves.
    recorded matches. With no Rapier sets in the state (part 10), R1-ECS-REC4's physics snapshot and R1-ECS-REC1 mark 2's
    separate Rapier count fall away. Whole-world restore and replay (R1-ECS-REC1 mark 3) stays a mark only if ADR 0001's
    prediction scope needs it; under R2-SYNC-REC3's scope (own movement, own weapon state, own vehicle) it is dropped
-   (R1-XT-OQ7 is ADR 0001's).
-   - Why: the client replays its own commands from the server's state on every snapshot, and the suite must show that a
-     restored run continues byte for byte.
+   (R1-XT-OQ7 is ADR 0001's). The sim crate therefore has two entry points over the same phase functions. The
+   authority step runs every phase in the fixed order (each room on the server; the Worker's local server). The
+   prediction step advances one slot under ADR 0001's prediction scope (its part 4: own movement, own weapon state
+   with reload and active reload, the vehicle the player pilots, and the cosmetic shot events these make): it runs
+   only those phases, for that slot and its vehicle, against the static world and the movers as last decoded from the
+   server's snapshot, which it reads and never advances; it runs no bots, navigation, economy, objectives, moments or
+   other soldiers' weapons, and it draws from no random stream (part 8), so a predicting instance holds no
+   authority-only stream's state. The Worker's client endpoint calls it for each replayed and each new own command; a
+   phase joins it only when ADR 0001's scope changes (ABL-PREDICT may add the player's own abilities).
+   - Why: the client replays its own commands from the server's state on every snapshot, the suite must show that a
+     restored run continues byte for byte, and both the replay's agreement with the authority and part 8's stream rule
+     rest on one named prediction step.
    - Ids: R1-ECS-REC1 marks 2–4, R1-ECS-REC4, R1-ECS-OQ2, R1-ECS-OQ5 (r1-simulation-core.md, lines 1932–1945,
-     1993–2005, 2614–2618, 2627–2628); R4-PHYS-REC2 (r4-physics-navigation.md, lines 721–745).
+     1993–2005, 2614–2618, 2627–2628); R4-PHYS-REC2 (r4-physics-navigation.md, lines 721–745); cites R2-SYNC-REC3
+     (r2-netcode.md, Recommendations, lines 2068–2105; ADR 0001's) for the prediction step.
    - Need: VISION_V2 §4 only (fair up to about 100 ms of ping) and SLICE-ORDER condition 2 (replayable from day one).
 4. **One fixed tick, counted in integers, and one time representation.** A `u32` tick counter is the sim's only clock
    (sim time = tick × `dt`); `dt` is one build-time constant, the same on server and client; the step takes no time
@@ -187,10 +205,16 @@ research ids, and the need it serves.
    stall drops the time and records it, and every overrun and dropped interval is a counter for monitoring (ADR 0006,
    I-12). Snapshots go out after the tick (ADR 0001). In the browser, the Worker owns the tick: a `performance.now()`
    accumulator woken by `setTimeout` (W2), with `Atomics.wait` (W3) as the measured alternative if W2 fails the jitter
-   mark (W3 needs shared memory, so cross-origin isolation: ADR 0002's call, R1-XU-OQ4). `requestAnimationFrame` is the
+   mark (W3 needs shared memory, so cross-origin isolation: ADR 0002's call, R1-XU-OQ4). What sets when the next tick
+   is due depends on the mode: in local play, the plain accumulator; online, ADR 0001's rule for keeping commands just
+   in time (OQ-0001-6), which runs the Worker's tick ahead of the server's on the client endpoint's server-time
+   estimate (ADR 0001 part 5). The Worker's step call (ADR 0002 part 5) therefore also returns when its next tick is
+   due, and the Worker's host sets its timer from that, never from a count of its own; the sim's own step still takes
+   no time (part 4). `requestAnimationFrame` is the
    page's render clock only. After a long gap (a hidden tab, a sleeping laptop) the browser does not simulate the gap:
    in local play the match pauses; online the Worker resyncs from the server's state through ADR 0001's path, with
-   catch-up per frame bounded at 7 ticks (the same rule, proposed). Pause, shop and hit-stop never stop the shared tick
+   catch-up per wake of the Worker bounded at 7 ticks (the same rule, proposed; R1-TICK-REC5 says "per frame", and the
+   Worker has no frames). Pause, shop and hit-stop never stop the shared tick
    online; hit-stop is presentation time. The loops read the clock; the step never does (the 11 wall-clock reads STATUS
    lists stay in the frozen legacy game). Whether Worker timers keep their rate in a hidden tab is measured in
    the boundary spike, for 60 s and for more than 5 minutes (R1-TICK-OQ2 and R1-BND-OQ2, stated once: R1-XU-OQ12).
@@ -229,7 +253,8 @@ research ids, and the need it serves.
    and input stream give the same state hash after every tick, on every run of the same build. Identity between Wasm and
    native is a target, tested on every change, that the netcode never depends on: the server is
    [the authority](../research/GLOSSARY.md#the-authority), and the client's prediction is corrected when it differs. No
-   lockstep, no fixed point. Inside the sim: f32 throughout (up to a map 2 km across, R4-PHYS-REC5); only `+ − × ÷`,
+   lockstep, no fixed point. Inside the sim: f32 for every real-valued quantity (up to a map 2 km across,
+   R4-PHYS-REC5), while time, counts and money are integers (parts 4 and 17); only `+ − × ÷`,
    `sqrt`, `floor`, `ceil`, `round`, `trunc`, explicit `mul_add` and `as` casts from core; transcendental maths only
    through the pure-Rust `libm` crate, pinned; no std `sin`, `cos`, `atan2`, `powf` or `exp`, no `algebraic_*`, no
    fast-math, no `relaxed-simd`; Wasm `simd128` off until the suite passes with it on. NaN never enters sim state: every
@@ -252,7 +277,14 @@ research ids, and the need it serves.
      R4-PHYS-REC5 (r4-physics-navigation.md, lines 786–798).
    - Need: VISION_V2 §6.2, §6.3, §6.4; §4 (corrections stay rare at about 100 ms of ping).
 8. **Random streams.** The sim draws only from `rand_chacha`'s `ChaCha8Rng`, pinned, seeded by the authority per match,
-   one stream per purpose. The sim maps raw generator output with its own few sampling functions and pinned test
+   one stream per purpose. Each match's seed comes from the operating system's secure random source on the server
+   (in local play, the Worker's `crypto.getRandomValues`): the host draws it and passes it in at match start, so the sim
+   reads no random source itself. The seed is never sent to a client, never logged and never written into ADR 0006's
+   match record; outside the live state only the recorded match (I-16) keeps it, and no recording reaches a client
+   while its match runs (proposed: the sim crate, and with it the generator, ships in every client's Wasm, so a seed a
+   client could derive, from the match id, the room or the start time, would let it compute the authority-only
+   streams: the spread SEC-SPREAD (a) keeps on the server, and the offers). The sim maps raw generator output with its
+   own few sampling functions and pinned test
    vectors, never rand's distribution functions (R1-DET-OQ5: their outputs carry no stability statement across
    versions, and uniform floats "may equal `high`"). The streams' state (seed, stream, position) is part of the
    authority's state and of the state hash. The kind of each stream
@@ -260,7 +292,7 @@ research ids, and the need it serves.
    stream is authority-only unless ADR 0001's prediction scope makes the client's predicting sim draw from it. Today's
    scope (R2-SYNC-REC3) draws from none, so every stream starts authority-only: match setup, weapon spread (SEC-SPREAD
    (a)), bot decisions, ability procs (shared only if ABL-PREDICT says yes and an own ability draws a proc), and the
-   upgrade offers of three (part 18). Offers are authority-only for SEC-SPREAD's reason: a seed the client holds lets a
+   upgrade offers (part 18). Offers are authority-only for SEC-SPREAD's reason: a seed the client holds lets a
    cheat compute what the stream gives before the server shows it, here the player's next offers (and other players'
    offers, if they share a stream); and an offer is never predicted (it arrives as an owner-only message, ADR 0001), so
    keeping its stream on the authority costs nothing. Presentation randomness (visual effects, sound, camera shake,
@@ -336,9 +368,9 @@ research ids, and the need it serves.
     skips the navigation data. Navigation data changes only with the map: a new bake means a new match. polyanya is not
     used at run time, so its hashbrown maps need no audit unless a later change brings it in (R4-NAV-OQ4).
     - Why: C++ Detour cannot simply be linked into the sim's Wasm build (`wasm32-unknown-unknown` has no C/C++
-      toolchain, R4-NAV-F8, and R4-NAV-REC1 reads linking it as not a supported path), no Rust navigation crate
-      promises determinism, baking once makes generation's floats shared data, and Quake III shipped bots on a
-      precomputed area graph.
+      toolchain, R4-NAV-F8, and R4-NAV-REC1 reads linking it as not a supported path), no Rust navigation crate read
+      promises determinism (R4-NAV-F16), baking once makes generation's floats shared data, and Quake III shipped bots
+      on a precomputed area graph.
     - Ids: R4-NAV-REC1–REC4, R4-NAV-OQ1–OQ4 (r4-physics-navigation.md, lines 802–899, 1099–1107).
     - Need: VISION_V2 §6.2 (bots that move between levels) and §3 ("Bots fill empty slots"); LOOP_V2 §9 and §10;
       EDITOR_V2 §3 (Test, the validation panel).
@@ -399,7 +431,8 @@ research ids, and the need it serves.
     0001's). Their behaviour is a sim phase at its own cadences (part 4) that reads the shared sight pass, the navigation
     queries and the game state, and writes commands. The behaviour set is LOOP_V2 §10's (fights across three teams,
     buying T1 units, escorting and hunting harvesters, carrying, defending and stealing uplinks, a simple per-team role
-    mix); no research covers a bot AI architecture, so its structure is OQ-0004-1. Bots act on the present while humans
+    mix; whether bots also take world pickups, which UPGRADE-SCOPE added after that list, is OQ-0004-12); no research
+    covers a bot AI architecture, so its structure is OQ-0004-1. Bots act on the present while humans
     see about 100 ms of the past (R2-SYNC-OQ13): bot reaction is tuning data the game-designer sets, starting from
     legacy's 0.25 s scan cadence (GN4), and the sim core spike reports bot reaction times at N = 48. A field of view for
     bots is a design question (R4-LOS-OQ3).
@@ -419,34 +452,57 @@ research ids, and the need it serves.
     - Why: the closed set of operations lets combos come from data while the sim stays reviewable and deterministic.
     - Ids: R1-ABL-REC6 (part 6); cites R1-ABL-REC1, R1-ABL-REC2 (r1-simulation-core.md, lines 2342–2400).
     - Need: VISION_V2 §6.3, §6.4; active reload: LOOP_V2 §7.
-17. **Economy and objectives as sim phases.** Money and harvester deliveries, team-funded rebuilds, uplinks (cache,
-    carry, place, countdown, steal, rotation), tech tiers, power-plant pricing and the points race run as sim phases in
-    the fixed order at the cadences of part 4, with their numbers in ADR 0005's tables and their rules exactly as LOOP_V2
-    §3, §4 and §8 state them. Team filtering (who a shot or blast can hurt, GC1) and presence counting for steals (GE8)
-    are sim code. What each team may see of another team's state is ADR 0001's visibility classes. A tier reached or
-    money paid is an event (part 19), never a HUD write from the sim (legacy's `addTech`).
-    - Why: LOOP_V2's economy is server-side and tunable, and its outcomes must replay like everything else.
-    - Ids: none of its own (no research finding on economy phases); cites R1-TICK-REC3 (cadences).
-    - Need: VISION_V2 §6.5.
+17. **Spawning, economy and objectives as sim phases.** Money and harvester deliveries, team-funded rebuilds, uplinks
+    (cache, carry, place, countdown, steal, rotation), tech tiers, power-plant pricing and the points race run as sim
+    phases in the fixed order at the cadences of part 4, with their numbers in ADR 0005's tables and their rules
+    exactly as LOOP_V2 §3, §4 and §8 state them. Money is an integer, never a float (proposed: whole dollars, as every
+    LOOP_V2 §3 and §5 amount is, so a split gives the same shares on every target), and it lives on the player record
+    (part 18), since a death keeps it (LOOP_V2 §5); a rebuild's equal shares (LOOP_V2 §3) are integer divisions whose
+    rounding and remainder rule are data in ADR 0005's tables, applied in a fixed slot order so every target gives the
+    same shares. A steal is holding E for a few seconds (LOOP_V2 §4 step 4), one channel for bots and humans alike,
+    since bots send the same commands (part 15); GE8's presence count (every team's live members in the uplink's
+    circle) is kept as a primitive the steal may read. LOOP_V2 does not say whether a defender inside the circle pauses
+    or blocks a steal, or what happens when two enemy teams steal one uplink at once, so the presence rule is a data
+    switch whose setting is OQ-0004-8's; whether a carried cache's position is public is OQ-0004-9's (its visibility
+    class then ADR 0001's). Spawning runs as LOOP_V2 §2 and §5 state it: everyone spawns inside their own barracks, in
+    front of the buy terminal; spawn protection lasts 3 s (`[DEFAULT]`; an effect in ADR 0005's data); a death
+    respawns the slot as the Recruit (`[DEFAULT]`); a purchase is a command the authority checks (ADR 0001). "Enemies
+    cannot enter a barracks interior" (`[DEFAULT]`) is a team mask on a collider's movement flag (part 13): colliders
+    across a barracks' openings block every soldier but its own team's, and the bake gives the nodes behind them that
+    team's flag (part 11), so no other team's route runs through them. Team filtering (who a shot or blast can hurt,
+    GC1) is sim code. What each team may see of another team's state is ADR 0001's visibility classes. A tier reached
+    or money paid is an event (part 19), never a HUD write from the sim (legacy's `addTech`).
+    - Why: LOOP_V2's economy is server-side and tunable, and its outcomes must replay like everything else; integer
+      money keeps a split identical on every target; one team mask that movement and the bake both read keeps bots and
+      humans under one rule.
+    - Ids: none of its own (no research finding on economy phases or spawning); cites R1-TICK-REC3 (cadences).
+    - Need: VISION_V2 §6.5; spawning, spawn protection, the Recruit respawn and the barracks' team mask: LOOP_V2 §2
+      and §5 only.
 18. **The player record, weapon drops and pickups (UPGRADE-SCOPE).** Each player slot has a player record, the
-    PlayerState, in a table beside the soldier tables and apart from the soldier entity, the Pawn. For the match it
-    holds one track per unit type and one per weapon type (level, picks taken, the pending offer of three), keyed by the
+    PlayerState, in a table beside the soldier tables and apart from the soldier entity, the Pawn; it is keyed by slot,
+    and whether a player who rejoins after ADR 0001's grace window gets it back is OQ-0004-10 (the key follows the
+    answer). For the match it holds the player's money (part 17) and one track per unit type and one per weapon type
+    (level, picks taken, and its open offers: a bounded queue whose length, like the offer's size, is data, so no
+    number is hard-coded; when offers appear, how they wait and what a full queue does are OQ-0005-AB8's), keyed by the
     type ids ADR 0005 defines; what a pick grants is applied through the ability system. The record survives the
     soldier's death and every unit switch: a new soldier entity reads its slot's record. A weapon type's track stays in
     the record while the player holds no gun of that type and applies again with the next gun of that type. The record's
     size is bounded by the content's type counts and allocated at match start; nothing a client sends sizes it. At match
-    start the sim builds every slot's record empty, with the soldier tables, so nothing carries over from a previous
+    start the sim builds every slot's record afresh (every track empty, money at LOOP_V2 §3's starting $300), with the
+    soldier tables, so nothing carries over from a previous
     match (UPGRADE-SCOPE; LOOP_V2 §8); ADR 0001's room lifecycle calls this phase. A class's own weapon comes from the
     unit definition (ADR 0005). When a soldier dies, the weapons the drop rule names (OQ-0005-AB9) become pickup entities
     in the pickup pool, each with an id (part 2), the weapon type id, a position settled on the ground with the movement
     query, and a lifetime in ticks from ADR
     0005's data. A pickup claim is an input command (ADR 0001's field) handled in the phase's fixed order, so two claims
-    on one pickup in one tick always resolve the same way on every machine. The offer of three is drawn on the authority
-    from the authority-only offers stream (part 8) when a track levels; the server refuses a pick it did not offer and a
-    pickup it did not place (ADR 0001). Picks, offers shown, weapons looted and time per weapon type are events for
-    telemetry (part 19; ADR 0006's fields). The rules stay open: carry slots, ammo for looted weapons and how fast tracks
-    level (ADR 0005's open questions); which deaths drop which weapons, how long a drop lies, who may pick it up and
-    which order breaks a tie (OQ-0005-AB9); and what bots and slot takeovers do with records (OQ-0005-AB10).
+    on one pickup in one tick always resolve the same way on every machine. When a track levels, the authority draws an
+    offer (UPGRADE-SCOPE's one of three, its size from data) from the authority-only offers stream (part 8) into that
+    track's queue; the server refuses a pick it did not offer and a pickup it did not place (ADR 0001). Picks, offers
+    shown and weapons looted are tick-stamped events (part 19), from which time per weapon type follows, and ADR 0006's
+    record needs them with their ticks. A full pickup pool follows part 1's overflow rule (OQ-0004-11). The rules stay
+    open: carry slots, ammo for looted weapons and how fast tracks level (ADR 0005's open questions); which deaths drop
+    which weapons, how long a drop lies, who may pick it up and which order breaks a tie (OQ-0005-AB9); what bots and
+    slot takeovers do with records (OQ-0005-AB10); and whether a late rejoiner gets their record back (OQ-0004-10).
     - Why: Mustafa put the tracks on the player, not the unit; a record apart from the soldier is the only place that
       outlives a death and a switch, and pickups as ordinary entities get ids, snapshots and hashes for free.
     - Ids: none (no research finding on upgrades).
@@ -455,7 +511,11 @@ research ids, and the need it serves.
     deaths and kills (killer and victim slot and unit id, the source weapon or ability id, assisting slots), blasts
     (position and strength, for the concussion shake and the fragments ADR 0003 draws), cosmetic shot events,
     purchases, uplink cache events, harvester deliveries and kills, structure kills and stage changes, tech tiers,
-    upgrade picks and pickups. The event list is part of the state and its hash; ADR 0002 places it in the output block,
+    upgrade picks (slot, track, level, choice) and pickups (slot, weapon type). Every event carries its tick, so the
+    match record can place each pick and pickup on the timeline beside the kills, not only count them: OQ-0005-AB3's
+    two measurements (the time to kill between a fully levelled and a fresh player, and how long the way back takes)
+    need each player's levels at each kill (VISION_V2 §6.6: "Snowball and counters get tuned on evidence"). The event
+    list is part of the state and its hash; ADR 0002 places it in the output block,
     ADR 0001 delivers it online with its visibility classes, the room writes the match record at Ended (ADR 0001), and
     ADR 0006 owns the record's shape. A moment phase runs after the outcome phases: it reads the tick's events and the
     state and emits moment events by rules held as data (ADR 0005's format; their thresholds are a design question,
@@ -469,14 +529,28 @@ research ids, and the need it serves.
     data: the sim takes only commands that ADR 0001's decoders validated and content that ADR 0005's loader validated
     (its loader returns errors and is fuzzed with zero panics); inside the sim, values a client or content can set never
     reach an `unwrap`, an unchecked index or a `clamp` with unchecked bounds (`f32::clamp` panics on bad bounds,
-    R1-DET-F14). On the server a panic stops that room's match (each room is its own process, R2-ROOM-REC2); in the
-    browser `-Cpanic=abort` ends the sim's instance. Online, after a trap, the Worker's host starts a fresh instance and
-    rejoins through ADR 0001's resync path, and the trap is reported (R6-OBS-REC3, ADR 0006); the panic strategy is ADR
-    0002's. In local play the trapped instance was the authority; recovery there is not researched (OQ-0004-7).
+    R1-DET-F14). On the server a panic in the tick ends that room's match and its process (each room is its own
+    process, R2-ROOM-REC2). The room keeps `panic = "unwind"`, so that a panic in one connection's work closes only that
+    connection (R2-ROOM-REC2's fix pass); but an uncaught panic ends only its own thread (R2-ROOM-F8), so a tick thread
+    left to die would leave a room that still holds its connections and sends nothing. The room therefore catches a
+    panic at the top of its tick loop (`catch_unwind`, R2-ROOM-F8) and treats it as fatal: it reports it (ADR 0006),
+    tells its clients the match ended where it can (ADR 0001's room lifecycle), and exits non-zero, so the supervisor
+    records the exit and the VM's other rooms run on. The tick thread and the network runtime share only bounded
+    channels, never a lock the tick unwraps (a lock poisoned by a panicking connection would turn that panic into the
+    room's). Whether a room may instead resume from a snapshot is the Advisor's question in ADR 0001. In the browser
+    `-Cpanic=abort` ends the sim's instance, and the trap alone carries no panic message, only `unreachable` and
+    frames; so the Wasm build installs a small panic hook of its own (`std::panic::set_hook`, no extra crate) that
+    writes the message and location into a fixed buffer in linear memory before the abort, and the Worker's host reads
+    it after the trap and attaches it to the report (proposed: a native scratch build on rustc 1.97.0 ran such a hook
+    under `panic = "abort"` and kept the message; the Wasm build is S20's to check). Online, after a trap, the Worker's
+    host starts a fresh instance and rejoins through ADR 0001's resync path, and the trap is reported (R6-OBS-REC3, ADR
+    0006); the panic strategy is ADR 0002's. In local play the trapped instance was the authority; recovery there is
+    not researched (OQ-0004-7).
     - Why: a panic on the server is a denial of service for a whole room, and in the browser it ends the match for that
-      player.
+      player; a room that outlives its tick, or a trap without its message, hides the fault.
     - Ids: R1-RR-OQ3, R1-XT-OQ12, R2-XT-OQ12, R6-XT-OQ6 (r1-simulation-core.md, lines 2936–2940, 3084–3087;
-      r2-netcode.md, lines 3395–3398; r6-infrastructure.md, lines 1021–1024).
+      r2-netcode.md, lines 3395–3398; r6-infrastructure.md, lines 1021–1024); cites R2-ROOM-REC2 and R2-ROOM-F8
+      (r2-netcode.md, lines 2762–2768, 1459–1467).
     - Need: VISION_V2 §4 only (play in four browsers; matches that feel fair).
 21. **Map validation with the sim's own integrator.** The editor's reach value is the sim's movement run at the shipped
     `dt`, never a closed-form formula; the reachability check (every spawn to every goal) and the report of gaps under
@@ -747,8 +821,8 @@ restart).
 | GC11, GC12, GC13, GC15 (class abilities, melee, the charged throw and arc preview, bolts) | rewrite in Rust, look brief pending | rewrite in Rust; look brief pending lifted | LOOK_V2 exists; what a player sees of them is ADR 0003's presentation from the sim's events, and the sim half is unchanged (ADR 0003 may list the same rows for their presentation half) |
 | GN2 (bot roster record and unit assignment, line 267) | redesign, look brief pending | redesign; look brief pending stays, for the head tint only | The roster becomes ADR 0001's slot table (human, bot or empty) over the fixed-slot soldier table, and the record splits: its sim state (health, timers, AI state, target, unit) lives in the sim's tables at the bot's slot index (parts 1 and 2), its view state (`group`, `_aimT`, `_fOn`) on the page; a bot gets its unit as a human does, by buying a T1 unit or respawning as the Recruit (LOOP_V2 §5, §10), since it sends the same commands (part 15), and a random pick draws from part 8's bot decisions stream, never `Math.random`; the sim half shows a player nothing; the head tint (the unit's accent) is the presentation half, ADR 0003's or ADR 0005's |
 | GE4 (team tech meter and eras, line 290) | redesign, look brief pending | redesign; look brief pending stays, for the era HUD and toasts only | LOOP_V2 §4's team tech and tiers run as a sim phase on the per-team tables (parts 1 and 17), their numbers in ADR 0005's tables and the minute-5 floor counted in ticks (part 4); a tier reached is an event (part 19), never a HUD write from the sim (part 17), which ends the debt the row cites (`applyDamage` running `addTech`'s HUD writes); what a team sees of another team's tech is ADR 0001's visibility classes; the x0.5 power-plant tech cut is not in LOOP_V2, so part 17 does not build it, and whether a dead plant slows tech stays Mustafa's question (rows GE4, GE5); the era HUD and toasts are the presentation half, ADR 0003's (part 10) |
-| GE9 (tech boxes, line 295) | redesign, look brief pending | redesign; look brief pending lifted | LOOP_V2 §4 `[DEFAULT]` replaces tech boxes with uplinks, a sim phase (part 17: cache, carry, place, countdown, steal by GE8's presence count, rotation) whose cache events part 19 lists; the two lessons the row names are met: if the next site is drawn at random, the draw comes from a seeded sim stream, never `Math.random` (part 8), and "can't shoot while carrying" binds bots as it binds humans, since bots send the same commands (part 15); the note is lifted because the box's mesh, world bar and HUD go with the box while that `[DEFAULT]` stands, not because LOOK_V2 sets them; the uplink's world marker (GE7, line 293) and its HUD are the presentation half, ADR 0005's and ADR 0003's |
-| GE10 (silos, line 296) | redesign, look brief pending | redesign; look brief pending lifted | LOOP_V2 §4 `[DEFAULT]` removes silos, so no silo rule reaches the sim; the row keeps the presence count (GE8, the steals of part 17) and hands the "income never zero" role to the safe near-base field (LOOP_V2 §3), a money rule of part 17; the note is lifted because the pads and the HUD's silo dots and rate go with the silos while that `[DEFAULT]` stands, not because LOOK_V2 sets them |
+| GE9 (tech boxes, line 295) | redesign, look brief pending | redesign; look brief pending lifted | LOOP_V2 §4 `[DEFAULT]` replaces tech boxes with uplinks, a sim phase (part 17: cache, carry, place, countdown, steal by holding E (LOOP_V2 §4 step 4), with GE8's presence count kept as a primitive whose part in a steal is OQ-0004-8, rotation) whose cache events part 19 lists; the two lessons the row names are met: if the next site is drawn at random, the draw comes from a seeded sim stream, never `Math.random` (part 8), and "can't shoot while carrying", and whatever the steal channel blocks, binds bots as it binds humans, since bots send the same commands (part 15); the note is lifted because the box's mesh, world bar and HUD go with the box while that `[DEFAULT]` stands, not because LOOK_V2 sets them; the uplink's world marker (GE7, line 293) and its HUD are the presentation half, ADR 0005's and ADR 0003's |
+| GE10 (silos, line 296) | redesign, look brief pending | redesign; look brief pending lifted | LOOP_V2 §4 `[DEFAULT]` removes silos, so no silo rule reaches the sim; the row keeps the presence count (GE8, a primitive part 17's steal may read, OQ-0004-8) and hands the "income never zero" role to the safe near-base field (LOOP_V2 §3), a money rule of part 17; the note is lifted because the pads and the HUD's silo dots and rate go with the silos while that `[DEFAULT]` stands, not because LOOK_V2 sets them |
 
 ## Open questions
 
@@ -799,6 +873,62 @@ restart).
   - Decider: the boundary spike with ADR 0002's client + local server skeleton.
   - What decides it: whether the skeleton keeps a copy of state or inputs outside the sim's instance.
   - Research ids: R1-RR-OQ3, partly (r1-simulation-core.md, lines 2936–2940).
+- **OQ-0004-8. How does an uplink steal meet defenders, and two enemy teams?**
+  - Why it matters: LOOP_V2 §4 step 4 (`[DECIDED]`) says only that enemies steal an uplink by holding E for a few
+    seconds. What defenders standing on it do, and who wins when two enemy teams try at once (three-team modes only),
+    decide how safe a lead is (VISION_V2 §2, pillars 1 and 2). Legacy's contest rules belong to the tech boxes and silos
+    that LOOP_V2 §4 replaces (`docs/LEGACY_INVENTORY.md`, row GE8).
+  - Options: (a) holding E only, presence ignored (LOOP_V2's words as written); (b) a defender inside the circle pauses
+    the steal; (c) a defender blocks it and its progress decays (legacy's tech-box rule, GE8). For two enemy teams: the
+    first to finish takes the uplink, or each pauses the other. Part 17 builds the presence rule as a data switch, so
+    each option is data, not code.
+  - Decider: Mustafa, with the game-designer.
+  - What decides it: the uplinks change-set (LOOP_V2 §11, step 5), from sims of (a) and (b), 3 runs each in the
+    three-team mode, reading steals and late steals among LOOP_V2 §11's objective counters.
+  - Research ids: none (a design question).
+- **OQ-0004-9. Is a carried tech cache's position public?**
+  - Why it matters: LOOP_V2 §4 step 1 tells everyone where a cache spawns, not whether its carrier stays visible. A
+    carrier hidden like any soldier ends the chase that makes steals possible; a public carrier, slow and unable to
+    shoot (step 2), may rarely reach an uplink.
+  - Options: (a) public while carried; (b) public at spawn and at placement only.
+  - Decider: Mustafa.
+  - What decides it: a design session, or the uplinks change-set's sims (cashouts and steals per match), with the carry
+    speed as tuning in ADR 0005's tables; the answer sets the carried cache's visibility class in ADR 0001's state
+    table.
+  - Research ids: none (a design question); either answer is one of R2-INT-REC5's classes (r2-netcode.md, line 2502;
+    ADR 0001's).
+- **OQ-0004-10. Does a player who rejoins after the grace window get their player record back?**
+  - Why it matters: UPGRADE-SCOPE says the tracks are owned by the player, but part 18 keys the record by slot. A
+    player who returns after ADR 0001's reconnect grace window joins as a new player, with no claim on the old slot's
+    record, which the bot that took the slot over now holds, its tracks and its money (R2-ROOM-REC4: "after the window
+    the slot follows the bot-fill rule").
+  - Options: (a) the record stays with the slot (part 18 as written); (b) the room keeps a departed player's record by
+    player id until the match ends and restores it on rejoin, the slot's bot starting a record of its own; its cost is
+    one record per departed player, in a table whose capacity is data set at match start, so no client can grow it
+    (part 18's rule).
+  - Decider: Mustafa, with OQ-0005-AB10 (what a human gets on taking a bot's slot).
+  - What decides it: a design session with OQ-0005-AB10; the record's key (slot or player id) follows the answer.
+  - Research ids: none (a design question); it cites R2-ROOM-REC4 (r2-netcode.md, lines 2812–2815; ADR 0001's).
+- **OQ-0004-11. When a pool is full, which row gives way?**
+  - Why it matters: a step with no heap allocation in steady state (part 6) needs a fixed capacity per pool (part 1).
+    When a burst fills one (live projectiles, active effects, weapon pickups), its rule decides who wins a pile-up:
+    whose grenade, whose slow, whose dropped gun gives way. The rule must be the same on every target.
+  - Options: (a) the new row is refused and counted (nothing that already exists changes); (b) the oldest row, by
+    start tick and then sequence number (part 4), ends early. Each kind may take its own: active effects beside ADR
+    0005 AB-1's stacking policy, pickups beside OQ-0005-AB9's lifetime.
+  - Decider: the game-designer proposes per kind; Mustafa confirms where a player could notice.
+  - What decides it: each pool's worst case from the content set (ADR 0005's whole-set check) and the game-designer's
+    caps (R2-BUD-OQ5), after which the stress scene's counts gain pickups; until it is answered the spikes use (a) as
+    a test fixture, not a rule.
+  - Research ids: none (no research sizes a pool); it cites R1-ABL-REC6 (r1-simulation-core.md, lines 2465–2480) and
+    R2-BUD-OQ5 (r2-netcode.md, lines 2982–2985).
+- **OQ-0004-12. Do bots take world pickups?**
+  - Why it matters: bots fill most slots in the start modes (VISION_V2 §3), and LOOP_V2 §10's behaviour list was
+    written before UPGRADE-SCOPE added loot; looting bots change what the drop rules do to balance.
+  - Options: (a) no, bots keep their class weapons; (b) yes, by the human rules.
+  - Decider: Mustafa.
+  - What decides it: the slice 2 plan's behaviour set (OQ-0004-1), revisited with OQ-0005-AB9 and AB10.
+  - Research ids: none (a design question).
 
 Design questions this record cites and does not own (in `docs/adr/README.md`'s register): who blocks whom (R4-PHYS-OQ1,
 R4-NAV-OQ5, R4-OBST-OQ1, R2-XT-OQ13, R4-XT-OQ6; R2-SYNC-OQ5's measurement is ADR 0001's); what a player may see
@@ -823,8 +953,8 @@ person's judgement; the netcode proof test's "look correct" is ADR 0001's.
 
 | # | Claim | Part | Candidate marks (source) | Spike |
 |---|---|---|---|---|
-| S1 | The sim fits the sim step share at N = 48 | 6 | p99 sim step time ≤ 8.33 ms at 30 Hz (≤ 4.17 ms for the 60 Hz margin run); mean, p50, p95, p99 and max reported per N at N = 12, 24, 36, 48 and the N = 64 [headroom](../research/GLOSSARY.md#the-design-point-and-headroom) run; 36,000 ticks per run (20 minutes of game time at 30 Hz, 10 at 60 Hz: arithmetic), 3 runs; each part of the share reported on its own against its ceiling (R1-TICK-REC2 P1, r1-simulation-core.md lines 2044–2053; R1-ECS-REC1 mark 1, lines 1923–1931; GLOSSARY.md lines 53–69) | the sim core spike |
-| S2 | The browser runs the whole sim within the client's sim share | 6 | p99 sim step time ≤ 13.33 ms at 30 Hz in Wasm in a dedicated Worker on the minimum laptop while the page holds 30+ fps on Low for the whole run; Wasm ≤ 2 × native (R1-TICK-REC2 P2, lines 2054–2057; R1-ECS-REC1 mark 1); N for the pass from R1-TICK-OQ7 (a design question), the scale steps reported meanwhile | the sim core spike's sim in the boundary spike's Worker |
+| S1 | The sim fits the sim step share at N = 48 | 6 | p99 sim step time ≤ 8.33 ms at 30 Hz (≤ 4.17 ms for the 60 Hz margin run); mean, p50, p95, p99 and max reported per N at N = 12, 24, 36, 48 and the N = 64 [headroom](../research/GLOSSARY.md#the-design-point-and-headroom) run; 36,000 ticks per run (20 minutes of game time at 30 Hz, 10 at 60 Hz: arithmetic), 3 runs; each part of the share reported on its own against its ceiling (R1-TICK-REC2 P1, r1-simulation-core.md lines 2044–2053; R1-ECS-REC1 mark 1, lines 1923–1931; GLOSSARY.md lines 53–69); the sim core spike builds no ability and effect step (S15 follows it) and no economy, objectives, moments or events (slice 4), so its run stands in for each: 384 rows in the effect pool (so the snapshot, the hash and memory carry them) with the effect step's 1 ms ceiling burned per tick, and the 2.80 ms remainder topped up per tick after the built projectiles and bot decisions, each stand-in named in the run's record and scaled by N / 48 at the other scale steps (proposed: a pass with the stand-ins still holds once the real parts meet their ceilings; a run that fails only through them is reported so, and the share's verdict then waits for S15's step); the built parts are judged against their own ceilings either way; S1 on the real crate is migration phase 8's; the 60 Hz margin run's load is ADR 0001's (OQ-0001-2, TICK-60-SETUP), and at 60 Hz the same two stand-ins would be 1 ms and 0.30 ms (4.17 − 3.87, arithmetic) | the sim core spike |
+| S2 | The browser runs the whole sim within the client's sim share | 6 | p99 sim step time ≤ 13.33 ms at 30 Hz in Wasm in a dedicated Worker on the minimum laptop while the page holds 30+ fps on Low for the whole run; Wasm ≤ 2 × native (R1-TICK-REC2 P2, lines 2054–2057; R1-ECS-REC1 mark 1); N for the pass from R1-TICK-OQ7 (a design question), the scale steps reported meanwhile; the wave-1 run lacks the same parts as S1's, and the client's sim share has no per-part split to burn, so it reports the built sim's time and its pass waits for S15's step as well | the sim core spike's sim in the boundary spike's Worker |
 | S3 | Cadences keep the sim step time flat from tick to tick | 4 | p99 sim step time ≤ 2 × mean at 30 Hz; sight checks per game second per bot at 60 Hz within 1 % of the 30 Hz count, the 60 Hz form only in the 60 Hz margin's test (R1-TICK-REC3, lines 2074–2076) | the sim core spike |
 | S4 | One time representation holds every rate | 4 | with held fire for 60 s of game time, every legacy `fireInterval` and `burstInterval` gives a shot count within 1 shot of 60 / interval at 30 Hz, and the same count within 1 shot at 60 Hz, the 60 Hz form only in the 60 Hz margin's test (R1-TICK-REC1, lines 2023–2024), which also meets R1-ABL-REC3's 1 % for the Shabzon (1 shot in 833 is 0.12 %: arithmetic); CD13's Warrior-kills-Conscript time of 0.86 s within one tick (R1-ABL-REC3, lines 2416–2419); a CI check finds no clock read in the step (no `std::time`, no host time import in the Wasm module: R1-TICK-REC1, line 2027); the units-per-tick figure chosen from the rounding report (proposed: the research gives none) | the sim core spike |
 | S5 | Snapshot and restore are cheap and exact | 3 | 0 heap allocations per snapshot after warm-up (a counting global allocator); ≤ 0.2 ms native and ≤ 0.5 ms Wasm at p99 in the stress scene (R1-ECS-REC1 mark 2, lines 1932–1937); a run snapshotted, restored and continued gives the same per-tick state hash as an uninterrupted run over a 10-minute bot match (18,000 ticks at 30 Hz: arithmetic), and serialize → deserialize → serialize is byte-identical (mark 4, lines 1942–1945); whole-world restore plus k = ⌈0.15 s × 30⌉ = 5 ticks of replay within 8 ms p99 in Wasm on the minimum laptop only if ADR 0001's prediction scope keeps it (mark 3, lines 1938–1941) | the sim core spike |
@@ -838,11 +968,11 @@ person's judgement; the netcode proof test's "look correct" is ADR 0001's.
 | S13 | Changing structures and damage stages flip in one tick | 14 | R4-OBST-REC1 (lines 1037–1041: over 10 minutes at 30 Hz (the 60 Hz form only in the 60 Hz margin's test): 0 bots stuck over 3 s against a vehicle, ≤ 2 replans per bot per second at p99, identical hashes); R4-OBST-REC2 (lines 1058–1061: route, sight and portal change in the same tick with 0 ticks of disagreement over 1,000 destroy and rebuild cycles; 1,000 traversals after a flip; a flip ≤ 0.1 ms native at p99); the same marks with three stages per structure on the two-floor test building, including a plank link that exists only in the ruin stage, and the bake with every stage still within S10's bake-time mark (proposed: LOOK_V2 §4 names three stages and the research tested two) | the sim core spike |
 | S14 | Bots run the stress scene | 15 | the spike's "bots with full AI" is a stated behaviour set (proposed, since no research defines it: the legacy GN rows' combat behaviour ported, meaning target scans, combat movement, gunfire and route following, plus R4-NAV-REC2's carried uplink cache as a moving shared goal); bot reaction times at N = 48 reported (R2-SYNC-OQ13, r2-netcode.md lines 2952–2954; no mark) | the sim core spike |
 | S15 | The ability, effect and weapon step fits its part | 16 | ≤ 1 ms p99 per tick in the stress scene with 384 active effects, on one vCPU of the reference server and on the minimum laptop in Wasm, 0 heap allocations in steady state (R1-ABL-REC6, r1-simulation-core.md lines 2465–2480); a 120 s scripted scenario with every test ability, 3 seeds, gives byte-identical logs on native and Wasm (R1-ABL-REC3, lines 2416–2419) | the content and ability spike (after the sim core spike) |
-| S16 | The player record behaves as UPGRADE-SCOPE says | 18 | no research mark; proposed (UPGRADE-SCOPE's sentences as checks): over scripted deaths and unit switches, 0 track entries lost or changed; a weapon type's track resumes when the next gun of that type is picked up; every record is empty at the start of every match; pickups keep their ids through snapshot and restore; two claims on one pickup in one tick resolve the same way on native and Wasm (the state hash). test-engineer sets the numbers | the content and ability spike |
+| S16 | The player record behaves as UPGRADE-SCOPE says | 18 | no research mark; proposed (UPGRADE-SCOPE's sentences as checks): over scripted deaths and unit switches, 0 track entries lost or changed; a weapon type's track resumes when the next gun of that type is picked up; every record's tracks are empty and its money at the starting amount at the start of every match; pickups keep their ids through snapshot and restore; two claims on one pickup in one tick resolve the same way on native and Wasm (the state hash). test-engineer sets the numbers | the content and ability spike |
 | S17 | The server loop keeps time | 5 | on the reference server (Linux), tick start jitter p99 ≤ 2 ms over 36,000 ticks (20 minutes at 30 Hz); after an injected 200 ms stall, back on schedule within 1 s and never more than 7 ticks in one wake (proposed restatement of the research's 15 at 60 Hz); overrun and dropped-time counters in the metrics (R1-TICK-REC4, r1-simulation-core.md lines 2090–2092) | the netcode proof test (ADR 0001) |
-| S18 | The Worker paces the tick in every browser | 5 | on Chrome, Edge, Firefox and Safari: foreground tick start jitter p99 ≤ 4 ms over 10 minutes; per-frame displacement of a constant-speed unit with a standard deviation ≤ 5 % of its mean on 60, 120 and 144 Hz displays; after 60 s hidden, local play ran no tick and resumes where it stopped, and online the client is back in step within 0.5 s and never runs more than 7 ticks in one frame (proposed restatement of 15 at 60 Hz) (R1-TICK-REC5, lines 2109–2114); the same after more than 5 minutes hidden (R1-BND-OQ2, lines 2724–2727) | the boundary spike (ADR 0002) |
+| S18 | The Worker paces the tick in every browser | 5 | on Chrome, Edge, Firefox and Safari: foreground tick start jitter p99 ≤ 4 ms over 10 minutes, read online against the schedule the server-time estimate sets (part 5); per-frame displacement of a constant-speed unit with a standard deviation ≤ 5 % of its mean on 60, 120 and 144 Hz displays; after 60 s hidden, local play ran no tick and resumes where it stopped, and online the client is back in step within 0.5 s and never runs more than 7 ticks in one wake of the Worker (proposed restatement of 15 at 60 Hz; the research's "per frame") (R1-TICK-REC5, lines 2109–2114); the same after more than 5 minutes hidden (R1-BND-OQ2, lines 2724–2727) | the boundary spike (ADR 0002) |
 | S19 | The editor's reach is the sim's reach | 21 | the editor's reach value equals the measured jump apex plus step-up within 1 mm at the shipped tick for `T.jumpV` 11, `T.gravity` 24, `T.stepUp` 0.55 (R1-TICK-REC6, lines 2124–2125) | the sim core spike |
-| S20 | No panic from input or content; recovery online | 20 | zero panics over the fuzzed content corpus (ADR 0005's mark, R1-RR-OQ3) and over fuzzed commands fed to the sim (proposed: part 20's rule needs its own test, the decoders being ADR 0001's); a trap injected into the client's Worker ends in a fresh instance back in step through ADR 0001's resync mark, and the trap reaches error reporting (R6-OBS-REC3) | the sim core spike with the boundary spike |
+| S20 | No panic from input or content; recovery online | 20 | zero panics over the fuzzed content corpus (ADR 0005's mark, R1-RR-OQ3) and over fuzzed commands fed to the sim (proposed: part 20's rule needs its own test, the decoders being ADR 0001's); a trap injected into the client's Worker ends in a fresh instance back in step through ADR 0001's resync mark, and the trap reaches error reporting with the panic message and location from part 20's hook (R6-OBS-REC3; the hook proposed in part 20) | the sim core spike with the boundary spike |
 | S21 | Throws land the same on Wasm and native | 7, 10 | 10,000 random throws: the trajectory function gives bit-identical points on Wasm and native (R2-SYNC-REC6 mark 1, r2-netcode.md line 2218; the id is ADR 0001's, and the shared trajectory function runs in the sim crate) | the sim core spike |
 | S22 | One feature set builds the sim on every target | 7 | the resolved feature list of every dependency of `sim` (`cargo tree -e features`) is identical for the `server` build and the `sim-wasm` build, and a planted extra feature on a shared dependency in `server` fails the check (R5-LAYOUT-REC4, r5-toolchain-quality.md lines 1216–1218; the id is ADR 0002's, and the foundation re-proves it as a gate check) | the sim core spike |
 
@@ -1076,7 +1206,7 @@ before slice 1. The legacy game stays frozen and playable throughout; v2 work is
 | 3 | Slice 1, move & shoot: soldier table and ids, the tick and its loops, movement on parry3d against a greybox map document, hitscan and weapons from data in integer time, the local server in the Worker; every match input-driven and recorded | S4, S5, S6 and S9 hold on the real crate; the determinism suite is green on slice 1 recordings on every target |
 | 4 | Slice 2, bots and three teams played locally: the bake and the navigation runtime, floors and links, the sight query and pass, avoidance, bot behaviour (after OQ-0004-1), cadences; the Worker runs the whole local match | S2, S3, S10–S12 and S14 hold at the slice's N; reachability on the greybox runs in CI |
 | 5 | Slice 3, online: the native room loop, authority-only streams kept off the client, the restore that ADR 0001's prediction scope uses, recovery after a trap | S17 and S8's last mark on the real crate; S20's online recovery; the netcode proof test's marks rerun on the real sim |
-| 6 | Slice 4, the loop: economy and objective phases, the ability system's execution, player records, pickups and offers (after ADR 0005's upgrade questions, OQ-0005-AB9 and AB10 among them), events and moments, structure states and damage stages (after OQ-0004-4) | S13, S15 and S16 on the real crate; a recorded full match replays with identical per-tick hashes on every target |
+| 6 | Slice 4, the loop: economy and objective phases, the ability system's execution, player records, pickups and offers (after ADR 0005's upgrade questions, OQ-0005-AB9 and AB10 among them), events and moments, structure states and damage stages (after OQ-0004-4) | S13, S15 and S16 on the real crate; a recorded full match replays with identical per-tick hashes on every target; scripted cases for the rules LOOP_V2 §2 to §5 state, held as v2's own snapshots (ADR 0002): the $300 start, a delivery paying every player on the team, a rebuild's integer split and its remainder, power-plant pricing, the minute-5 Tech 1 floor (9,000 ticks at 30 Hz: 5 × 60 × 30, arithmetic), a steal by holding E under each setting of OQ-0004-8's switch, 3 s of spawn protection (90 ticks at 30 Hz: 3 × 30, arithmetic), an enemy stopped at a barracks opening, a death respawning as the Recruit with money kept; GE8's presence count against its legacy golden (ADR 0002) |
 | 7 | Slice 5, Octopon-3 and Editor v2: the bake in the editor's Test and on save; the validation panel's reach, reachability and 6 m gap checks from the sim crate; tiles only if S10's bake time fails | S19 and S10's gap and reachability marks; the panel's results equal CI's on native and Wasm |
 | 8 | Slice 6, scale to 48: the stress scene on the real sim at N = 12, 24, 36, 48 and the N = 64 headroom run; the 60 Hz margin run if ADR 0001 schedules it | S1 on the real crate: p99 sim step time ≤ 8.33 ms at N = 48, 3 runs per build |
 
@@ -1085,7 +1215,10 @@ before slice 1. The legacy game stays frozen and playable throughout; v2 work is
 - **The determinism suite** (part 9) on every sim change, with ADR 0002's tools (R5-TEST-REC2): recorded matches run
   natively twice in separate processes, as Wasm in Node.js, and as Wasm in Chromium, Firefox and WebKit, with real
   Safari through its WebDriver; a small gate set on every change and a nightly 10-minute bot match; the first mismatch
-  reported with a field-level diff; the injected-divergence tests.
+  reported with a field-level diff; the injected-divergence tests, among them one that changes only one event (a kill
+  credited to the wrong slot) and one that changes only one economy value (one player's money, by $1), each caught at
+  the tick it happens (proposed: they show that the state hash covers the event list and the economy, parts 17 and
+  19).
 - **Unit vectors:** every `libm` function the sim uses (at least 10,000 inputs each), every random stream (its first
   10,000 outputs) and the sim's own sampling functions, on the same targets.
 - **Property tests:** ids over random spawn and despawn sequences (10,000 cases); snapshot fidelity (restore and

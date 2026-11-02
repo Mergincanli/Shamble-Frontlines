@@ -5,3 +5,4 @@ Task: infra-engineer final fix round on ADR 0006 (step 10 fix loop), writing inf
 - Plan: new OQ-0006-13 preview token/prod (SA-1, SA Q1); -14 releases (IE-1, EA-5, EA Q2, RELEASE-WINDOW); -15 domain (IE-6, SA-3, DOMAIN); -16 port plan (IE-7); -17 VM access (IE-14, SPIKE-VM-ACCESS); -18 unreleased art (IE-12, UNRELEASED-ART); -19 provisional goal budget (TE-2, TE Q2). New part 15 Releases; new B12. Batch analysis moves off staging (SA-4) -> R6-TEL-REC3 changed.
 - Next: extract BEFORE lines by script, write fixes file region by region.
 - 10:28Z: drafting all FIX texts in scratchpad generator (ie-final/gen.py); BEFOREs taken by line ranges at 47eadd9 (= HEAD for 0006).
+- 10:31Z: generator ok (55 FIX, 23 NOTE, no overlap/uniqueness errors); reviewing applied doc
