@@ -13,3 +13,4 @@ Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 
 - 0006 blocks + TE-B written (F12 PM-0006-32 pass rule). Next: consistency table, rules section, counts, findings, fetch audit.
 - writing consistency/rules next; running legacy gate first
 - consistency, rules, d0 table, gate written. Next: counts, findings ranked, fetch audit; then DONE and hand back.
+- counts, findings (F1-F15 ranked), fetch audit written. DONE

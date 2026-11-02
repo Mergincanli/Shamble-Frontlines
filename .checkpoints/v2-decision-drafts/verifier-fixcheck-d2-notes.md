@@ -13,3 +13,5 @@
 - 21:04: consistency table (drafts) written. Synthesis agent is mid-way (its notes: README table re-pinned, off 0 on preview). Next: findings section draft; then synthesis when committed.
 - 21:05: legacy gate (--no-smoke, base 9e7db28): PASS 1-4, 5b-5d; symbols +0 -0. Findings drafted in notes: ranked F1b, F1a (high), F8, F2 (medium), F5, F6, F4, F7, F9, F10, F12 (PM-0003-19 'measured'), F13 (legacy screenshot wording), F14 ('most slots') low. Waiting for synthesis commit.
 - 21:06: ADR findings section written (F1b, F1a, F8, F2, F5, F6, F4, F7, F9, F10, F12, F13, F14) + rules check. Next: synthesis when committed.
+- 21:10: synthesis landed at 449356c; coordinator: check diff 80a27b3..449356c, finish by 22:15.
+- 21:11: synthesis: all 116 FIX applied (applycheck); counts confirmed (114/112 OQ, 340 PM); draft_pointers 'pointers checked 94: ok 94, off 0'; every new OQ has a README row; review questions mapped (TE Q1 into OQ-0001-2, GE Q2 = OQ-SPIKE-1, SA Q1 into OQ-0006-13). Next: read synthesis diffs for claims.

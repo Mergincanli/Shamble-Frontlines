@@ -437,3 +437,116 @@ Blocks: LG key (IE-9/10), PM-0006-11 (IE-16, IE-17; -b's glossary fix "the numbe
 5a smoke FAIL: Chromium for Playwright is not installed in this session (`/opt/pw-browsers/chromium_headless_shell-1194`
 missing), an environment gap, the same as fixcheck-d0's run. No `.js` or `.html` file differs from 9e7db28 or from
 47eadd9 (docs-only change-set).
+
+## 9. Counts
+
+- Claims checked: 151 rows (ADR 0001 73: N1–N48, A1–A25; ADR 0002 42: E1–E28, T1–T14; ADR 0006 36: I1–I27, B1–B9).
+  138 confirmed (6 of them with fixcheck-d0's optional precision notes, 1 with a quote stitched from two places);
+  3 wrong (N42, I18, I19); 3 unsupported (N12, I21, I24); 1 citation off (A16; I18 also cites ADR 0001 part 6 for
+  part 11); 4 inconsistent or stale against another draft or row (A22, A25, E17, I6); 1 wording imprecise (E25,
+  d0 #8c); 1 unclear pass rule (B9). Every piece of arithmetic in the changed text was recomputed; one sum is wrong (N42).
+- FIX blocks in scope: 269 (netcode-architect 61; test-engineer A 45 for ADR 0001 and 27 for ADR 0002;
+  engine-architect 52; infra-engineer 71; test-engineer B 13 for ADR 0006, of which 1 was held and replaced by
+  infra-engineer c). Rebuilding the three docs from 47eadd9 with the applied blocks gives HEAD exactly (0 lines
+  differ). Every block resolves the finding it names; 12 blocks add a small new problem (N12, F1, F6, F7, F8, F9, F10
+  ×2, F11, F12, I21, I24); two decision-text changes that test-engineer A's NOTEs routed to netcode-architect were not
+  applied and not deferred (F2, F3).
+- NOTE blocks read: about 100 (netcode-architect 39, test-engineer A 12, engine-architect 21, infra-engineer 26,
+  test-engineer B 4 for ADR 0006). Deferrals and disagreements are reasoned (PA-1's no SS-BANDWIDTH question; GD-2's
+  purchase refusals at slice 4; EA-1's one tick plus one frame; OQ-0001-5 (c) not recommended because not researched).
+- Consistency items: 24; 17 consistent, 3 consistent but for one place (F3, F7, F11), 3 inconsistent (F2, F9, F10),
+  1 pending the synthesis (ENGINE_OVERVIEW; SPIKE_PLAN's stand-ins and README's new OQ rows likewise).
+- Rules: rule 2, three review-sourced numbers (low); rule 3, `client-endpoint` openly under OQ-0002-8; rules 4–7, the
+  look, settled inputs, sentences under tables: nothing found.
+
+## 10. Findings, ranked
+
+1. **F10 (medium), ADR 0006 part 15 and OQ-0006-14 describe ADR 0001's old mismatch row.** Text: "As things stand,
+   every room still on the old binary refuses a new client (ADR 0001's `JoinRejected` on a version or content
+   mismatch), and the client's reload fetches the same new bundle, so it cannot recover." (0006:534–535); "routing
+   joins by build is ADR 0001's protocol (part 6)" (0006:539); OQ-0006-14: "its reload fetches the same new bundle
+   (ADR 0001's failure table)" (0006:918) and option (b) "(a field ADR 0001's directory would add)" (0006:925).
+   Source: ADR 0001 at HEAD, part 11 (0001:495–496) "the directory records each room's build, protocol version and
+   content hash, so the lobby can send a client only to rooms that match it"; failure modes (0001:719) "a `JoinRejected`
+   for a mismatch reloads the client once, and only if the lobby names a newer build than its own; otherwise the client
+   shows the reason and returns to the lobby, so a refused client never loops". Smallest fix: part 15's sentence →
+   "As things stand, the lobby sends a client only to rooms of its own build and content hash, and a refused client
+   reloads at most once (ADR 0001 part 11 and its failure table), but with no release model a new client finds no room
+   of its build until rooms on the new binary run."; "(part 6)" → "(part 11)"; OQ-0006-14's "and its reload fetches the
+   same new bundle (ADR 0001's failure table)" → "and the lobby can route it only to rooms of its build (ADR 0001 part
+   11)"; option (b)'s "(a field ADR 0001's directory would add)" → "(the field ADR 0001 part 11's directory carries)".
+   Author: infra-engineer.
+2. **F2 (medium), ADR 0001 part 4 promises what PM-0001-60 cannot test.** Text: "so a pick or an effect that changes
+   move speed or a fire interval causes no correction" (0001:188–189). Source: part 4 itself never predicts picks or own
+   abilities (0001:191–193), so the first snapshot after the server applies a change corrects by about one round trip
+   plus the buffer wait; PM-0001-60 (0001:1428) marks "at most one correction, at the first snapshot that carries the
+   change". test-engineer A's NOTE GD-3 (test-engineer-A-fixes-final.md:668–675) routed the wording; HEAD does not
+   carry it and no NOTE defers it. Smallest fix: "… causes no correction after the first snapshot that carries it".
+   Author: netcode-architect.
+3. **F1 (low–medium), OQ-0001-2's planning-check number is wrong once the stand-ins top up the remainder.** Text: "The
+   30 Hz baseline marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms
+   remainder topped up): on the planning check they leave 7.49 ms." (0001:1045–1047). Source: GLOSSARY:68's 9.18 ms is
+   the sim parts' ceilings (5.53) plus the server-only share (3.64) without the remainder; with the 2.80 ms remainder
+   burned the check is 8.33 + 3.64 = 11.97 of 16.67 ms. Smallest fix: "… on the planning check they leave 4.70 ms
+   (16.67 − 8.33 − 3.64; 3.70 on a re-flood tick)". Author: netcode-architect.
+4. **F3 (low), part 8's honest-rewind estimate leaves out the frame wait the pass marks record.** Text: the estimate
+   "plus the two waits that model has not got: the time this command waited in the server's input buffer … and half a
+   tick for the page's blend" and "233–383 ms once the buffer … and the blend … are added" (0001:344–346, 362–364).
+   Source: part 5 (0001:235–238) posts the newest input once per drawn frame and builds the command at the next tick,
+   so the command leaves 0 to one frame after the frame whose view time it carries (16.7 ms at 60 Hz, 33.3 ms at
+   30 fps); PM-0001-49 (0001:1436) records "the wait from the drawn frame to the tick that sent the command";
+   test-engineer A's NOTE NA-1 routed it. Smallest fix: after "(part 7: 0 to 1 tick, so half a tick centres the
+   estimate; proposed)" add "; the wait from the drawn frame to the tick that sends the command (0 to one frame, part
+   5) is not added and is recorded per shot (PM-0001-49)". Author: netcode-architect.
+5. **F7 (low), ADR 0001's V-S key and PM-0001-27 disagree on LG's clause.** Text: V-S "The first two clauses hold for
+   single-room marks only" (0001:1358–1359), so LG's "30 inputs per second each within 1 %" still binds PM-0001-27;
+   PM-0001-27 "validity is PM-0006-13's (bracket B and LG's 80 % rule), not V-S" (0001:1409). Smallest fix: in
+   PM-0001-27, "(bracket B and LG's 80 % rule)" → "(bracket B and LG's 80 % rule), plus V-S's LG clause". Author:
+   test-engineer (unit A).
+6. **F9 (low), ADR 0002 part 8's retention is stale.** Text: "for the retention ADR 0006 sets for failure artefacts
+   (part 3; … until it is set, the 7 days of build artifacts)" (0002:528–531). Source: ADR 0006 part 3 (0006:171–172)
+   "CI failure artefacts … are kept 30 days". Smallest fix: "until it is set, the 7 days of build artifacts" → "30
+   days". Author: engine-architect.
+7. **F11 (low), ADR 0006 part 6 hands out one port.** Text: "the supervisor answers with the host and a port from the
+   firewall's range (part 5)" (0006:270–271). Source: ADR 0001 part 10 (0001:402–404) one UDP and one TCP port per
+   room; catalogue (0001:643) "the host and the room's ports". Smallest fix: "a port from each of the firewall's two
+   ranges". Author: infra-engineer.
+8. **F8 (low), OQ-0002-5's "paid minutes" (fixcheck-d0 #8c).** Text: "a private repository's runners draw on paid
+   minutes (the same page, read at the step-10 review)" (0002:1030–1031). Source (d0 #8c): the runners page says they
+   "draw from your GitHub account's included compute usage, and are then charged at the per-minute rates". Smallest
+   fix: "draw on the account's included compute usage and are then billed per minute". Author: engine-architect.
+9. **F12 (low), PM-0006-32's pass rule for its third leg.** Text: "3 of 3: … a deploy of the production branch tried
+   with the `preview` environment's token is refused (… if no token scope the check finds can refuse it, the result is
+   recorded as not refused and goes to OQ-0006-13)" (0006:1179). Source: part 13 (0006:509–511) expects the
+   account-scoped token to reach production today. Smallest fix: "3 of 3" → "the first two, 1 of 1 each; the third
+   reported (refused, or not refused and sent to OQ-0006-13)". Author: test-engineer (unit B).
+10. **F6 (low), PM-0001-44 cites part 4 for numbers part 4 does not give.** Text: "part 4 gives 6.5–8.5 ticks at P3 and
+    8–10 at P4" (0001:1430). Source: part 4 (0001:181–183) says only "deeper at P3 and P4"; the figures are the netcode
+    review's (finding 10) and follow from part 4's formula. Smallest fix: "part 4's formula gives (arithmetic: (150 +
+    66.7) ÷ 33.3 to (150 + 133.3) ÷ 33.3; (200 + 66.7) ÷ 33.3 to (200 + 133.3) ÷ 33.3)". Author: test-engineer (unit A).
+11. **F13 (low), numbers taken from reviews' estimates.** Text: "about 15–20 B in all (the perf review's estimate …)"
+    and "a header of about 6 B (an assumption)" (0001:665–669); "perhaps 15 to 30 RS-hours, about 2 to 4 EUR"
+    (0006:1008). Source: review-perf-auditor.md:27 and review-infra-engineer.md:56 state them without a sum. Smallest
+    fix: mark each "(proposed estimate)" or show the sum (10 B of aim point plus the other fields). Authors:
+    netcode-architect; infra-engineer.
+12. **F14 (low), OQ-0006-16's listener claim has no source.** Text: "Only one listener per address can hold TCP 443, so
+    443 needs a front on each VM that routes by path to the room processes, or an address per room." (0006:953).
+    Smallest fix: "(no source read)" after the first clause, or "a TCP 443 connection reaches one listener, which
+    must route it to the right room by path (no source read)". Author: infra-engineer.
+13. **F15 (pending, not this unit's text), the synthesis has not run yet.** ENGINE_OVERVIEW (:37, :40, :51–53, :65,
+    :92–94) still says "per tick: one command, posted", "draw the newest block" and "post the next command" and states
+    no event-release rule; SPIKE_PLAN does not state the 60 Hz stand-ins; docs/adr/README.md has no rows for
+    OQ-0001-15 to -18 or OQ-0006-13 to -20. All are routed to engine-architect's synthesis (final-round-by-author.md
+    lines 290–358).
+
+Optional, from fixcheck-d0 (not findings): d0 #5 (cite GitHub's pull_request_target security page beside R5-PREV-F2,
+ADR 0002:649, ADR 0006:897); d0 #6 ("the registrable domain and the scheme", ADR 0001:489–490, ADR 0006:489, 937);
+d0 #7 (RFC 6177's note, ADR 0001:422–423); d0 #8b (GitHub Free's $12 and $0.006 a Linux minute, ADR 0006:983).
+
+## 11. Fetch audit
+
+This unit fetched nothing (0 requests; it ran after 22:00 Amsterdam). Web facts come from fixcheck-d0
+(verifier-fixcheck-d0-verdicts.md, its 17 fetches, all HTTP 200, 20:34–20:41). Every web-sourced claim in the changed
+text of ADR 0001, 0002 and 0006 is one of d0's facts 1–8d and 10; none is left unverified. Claims the drafts themselves
+mark "not read" (ESLint's `no-eval` and `no-new-func` pages, Cloudflare's token scopes, how a deployment-branch rule
+treats a merge ref, the client host's production rules) stay so and are labelled in the text.
