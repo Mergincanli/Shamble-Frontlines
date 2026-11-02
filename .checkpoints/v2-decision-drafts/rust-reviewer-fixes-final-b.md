@@ -53,3 +53,14 @@ AFTER:
     its process (each room is its own
 END
 
+### NOTE RR-1 (routed; checks)
+Checks: the three blocks apply cleanly to a copy of ADR 0004 at b815c85 (apply_fixes.py: all applied); cite_check.py
+shows the same 12 old flags before and after (0 new). A native scratch run (`.gate/rr-final-helpers`, rustc 1.97.0) of
+the helpers as plain comparisons: min and max on (+0, −0) and (−0, +0) each return their second argument's bits, and a
+clamp with lo 3 and hi 1 returns a bound (1 or 3), with no panic. Routed to test-engineer: PM-0004-23 reads "the build
+fails on any std `f32` or `f64` method outside part 7's allow-list (`powi`, `hypot`, `cbrt`, `to_degrees`,
+`to_radians`, `min`, `max` and `clamp` named), as well as the items listed today"; its bites add `deg.to_radians()`
+and `a.min(b)` in `sim`, each failing G2 (as PM-0002-41's do); its control adds the three helpers and an allowed method
+(`abs`, `fract`) passing. Optional, for PM-0004-22: the helpers' signed-zero results and a reversed clamp join the unit
+vectors on every target.
+END

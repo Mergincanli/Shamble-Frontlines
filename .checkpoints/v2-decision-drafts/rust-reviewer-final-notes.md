@@ -16,3 +16,5 @@ DONE
 - block 1 written: RR-1 part 7 allow-list + helpers (lines 257-259 at b815c85)
 - block 2 written: RR-1 part 7 Why (lines 272-274)
 - block 3 written: RR-1 part 20 clamp (lines 531-532)
+- NOTE RR-1 written (route PM-0004-23; checks: 3 blocks apply at b815c85, 0 new cite flags, helpers checked natively)
+DONE (follow-up b)
