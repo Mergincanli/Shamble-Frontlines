@@ -14,3 +14,7 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - CD5 = LEGACY_INVENTORY line 86 (height 40, boom 56.6, fov 15, yaw base 45); GW18 line 206 (trees); legacy cached setters _sd/_so/_st shamble-game.js:2606-2608; AUDIT_BUGS_PERF.md:27 P3 (~30 DOM writes/frame); LOOP_V2 line 100 (timer about 20 min)
 - plan for 0003: new rows PM-0003-44 (presented frames, PA-4), -45 (teardown, GE-6), -46 (WebGPU smoke, GE-2), -47 (HUD DOM writes, PA-14); new OQ-0003-20 HEAT-SOAK (Advisor); key: H p99 form 3,000 frames + V-T 10 % (PA-6), S soaked set (PA-7), BS Worker load (EA-11), LS test view CD5 (AD-5)
 - 0003 block 1 done: intro lines 1022-1023 (rows -44..-47 named)
+- 0003 block 2 done: scenes 1041-1048 (BS Worker load, LS test view, new test-view bullet)
+- 0003 block 3 done: H/Statistics/V 1049-1061 (tail form 3,000 frames; V-T 10 %; S soaked set -> OQ-0003-20 to add)
+- 0003 PM-0003-2 done (GE-14)
+- 0003 PM-0003-3 done (TE-5)

@@ -359,3 +359,90 @@ AFTER:
      authority is the local server in the browser's Web Worker (ADR 0002, Decision).
 END
 
+### NOTE RR-4 (the 0005 half) + POOL-FULL
+Fixed in AB-1 ("When a pool is full"): the effect pool's overflow points to OQ-0004-11 (no second question), with the
+game-designer's proposal per kind for Mustafa to confirm where a player could notice: active effects the content bounds
+on their target (own picks, own abilities and weapon, spawn protection) are reserved and never give way; active effects
+others apply share the rest up to a cap in data and the oldest gives way (b), because refusing (a) would make a
+saturated target immune to new slows and marks (pillar 3); live projectiles are sized to the content's worst case
+(legacy Molotov: floor(1.4 / 1.05) + 1 = 2 per thrower, 96 at N = 48), so (a) is only a bug net; pickups (b), the
+oldest gives way, because drops are the only source of other weapons (UPGRADE-SCOPE). Routed:
+- ADR 0004 OQ-0004-11 (rust-reviewer): "What decides it" may add "ADR 0005 AB-1 holds the game-designer's proposal per
+  kind"; part 1's "until it is answered the spikes refuse the new row as a test fixture" stays true.
+- ADR 0005 CD-2 (engine-architect): the whole-set check reports, per target, the reserved worst case of content-bounded
+  effects (picks per track level for the tracks that apply at once, the unit's own ability and weapon effects, spawn
+  protection), and names the missing cap for effects from others and for pickups.
+- PM-0004-6 and the PM-0005 rows (test-engineer): once Mustafa confirms, one full-pool row per kind (own effects never
+  refused at a full pool; the oldest other-source row ends early; the projectile overflow counter stays 0 at the
+  content's worst case; the oldest pickup ends early).
+For "Decisions needed" (POOL-FULL, Mustafa confirms): the recommendation is the proposal as written in AB-1.
+END
+
+### NOTE TE-8
+Fixed in ability item 1 and u1: the proof is behaviour (the test-only combination with zero Rust changes, and the same
+event log with every test id renamed and the definitions reordered in data alone); the id search stays as a smell
+check. Routed: PM-0005-18 (test-engineer) already has the rename test; it may also reorder the definitions, so a
+constant keyed on a handle bites whatever order handles are given in; PM-0005-26 follows for the test tracks.
+END
+
+### NOTE GD-7 (spawn protection: rust-reviewer's routed check)
+Checked: AB-1's closed set did not hold it. No AB-2 stage reads a target-side immunity (the target-tag multiplier is
+set per weapon, and the frontal-arc block skips blasts), so spawn protection needs one reviewed Rust addition: AB-2's
+immunity rule (a tag named once in the pipeline's data; a hit on a target holding it deals no damage, blasts included).
+Fixed in AB-2, AB-6 (a new row: a timed effect, 3 s = 90 ticks at 30 Hz), ability item 5 (its golden case), and a new
+open question, OQ-0005-AB14 (what it covers beyond damage, what ends it early; Mustafa). Routed:
+- ADR 0004 part 17 (rust-reviewer): "an effect in ADR 0005's data" may read "an effect in ADR 0005's data (AB-6, read by
+  AB-2's immunity rule; its scope is OQ-0005-AB14)".
+- docs/adr/README.md (engine-architect): the "Needs outside VISION_V2 §6" list gains "ADR 0005: AB-2's immunity rule for
+  spawn protection (LOOP_V2 §2 only)"; register rows for OQ-0005-AB14 (Mustafa) and OQ-0005-AB15 (Mustafa); ADR 0005's
+  row count +2 (AB1–AB15). ADR 0005's frame "Open questions" table (engine-architect) gains the same two rows after
+  OQ-0005-AB13, with "The ability and effect system" as their section.
+- PM-0005-25 (test-engineer): the immunity case as ability item 5 states it (0 damage from a body hit and a blast inside
+  the 90 ticks, full damage after, no protection-specific code).
+For "Decisions needed" (OQ-0005-AB14, Mustafa): recommended (a) damage only, with (ii) ending at the player's first shot
+or ability press. Reason: on legacy numbers a protected Warrior can empty its 36-round SMG (35 × 0.072 = 2.52 s, inside
+3 s; 36 × 8 = 288 damage) with no answer possible (pillar 3); ending at the first shot keeps protection a safety feature,
+not a weapon; (ii) costs one trigger, the same kind as R1-ABL-REC1's "on kill by source, run effect E". Then sims, 3 runs
+per build, two-team and three-team modes separately.
+END
+
+### NOTE GD-PICK-VIS (the coordinator's note)
+Given a number: OQ-0005-AB15 (who sees a player's upgrade picks; Mustafa), after OQ-0005-AB14, with OQ-0005-AB7's decider
+line pointing to it. Routed: ADR 0001 part 12 (netcode-architect): "who else sees picks is GD-PICK-VIS (Mustafa's)" reads
+"who else sees picks is ADR 0005's OQ-0005-AB15 (GD-PICK-VIS, Mustafa's)". For "Decisions needed": recommended (a) the
+owner only to start, decided with OQ-0005-AB7: if picks may add raw power, (c) everyone is the answer pillar 3 needs.
+END
+
+### NOTE GD-2 (the purchase as data; netcode-architect's routed note from 75615d1)
+Fixed in AB-5: what may be bought is the faction's list (AB-4's faction kind), changed per mode by its rules table
+(R2-ROOM-REC7); each unit and vehicle holds its tier and price; the power-plant price rise and the buy terminal's reach
+are numbers in the same tables; the Recruit's price is 0. Routed: ADR 0001 part 12 and the `Buy` row of its message
+catalogue (netcode-architect) may cite "ADR 0005 AB-5" for "the conditions are rule data (ADR 0005)". A low note on the
+same paragraph: "(E also steals and places, LOOP_V2 §4)" cites LOOP_V2 §4 for placing with E, but LOOP_V2 names E only
+for steals (step 4: "holding E"); step 3 names no key for placing. Suggested: "(a steal is holding E, LOOP_V2 §4 step 4,
+and placing a cache is a press too)".
+END
+
+### NOTE GD-8 (the lows of my review that name the game-designer, and rust-reviewer's routed AB8 and AB10 notes)
+Fixed: OQ-0005-AB8 lists what a full offer queue does ((i) to (iii), no pick) and AB-8's rows read the queue and the
+offer's size as data (ADR 0004 part 18) and name ADR 0004's authority-only offers stream (part 8); OQ-0005-AB9 lists
+the E-press precedence (finding 12; netcode-architect's routed note) and points a full pickup pool to AB-1; OQ-0005-AB10
+cites OQ-0004-10 and OQ-0004-12 (findings 15 and 21) and AB-8's PlayerState row names OQ-0004-10 as the key's owner;
+AB-6's active-reload row points to OQ-0001-7, which now names the tap (finding 18, 75615d1); ability item 5 gains the
+triangle's third leg (finding 8: a Molotov blast through the Shield; a Bagpipe pellet at 35 m deals 0, an AMK hit 34);
+u4 tests a lost looted gun, not a voluntary drop (finding 13, as it applies to my own text); u6 draws an offer of the
+data's size and asks for equal offer logs on native and Wasm, since in local play the authority runs in the Worker.
+Routed (test-engineer): PM-0005-25 adds the third leg; PM-0005-29 follows u4; PM-0005-31 reads "an offer of the data's
+size" and asks for equal offer logs on native and Wasm, not "only if ADR 0004 puts the offers in a stream the client
+holds" (the offers stream is authority-only, but the local server draws it in Wasm).
+Not changed: AB-8's "the authority draws ... with a sim random stream" wording beyond the stream's name, and the "three"
+in Mustafa's own quoted words.
+END
+
+### NOTE checks (done before handing back)
+All 21 FIX blocks apply in order to ADR 0005 at b88714d (scripts/apply_fixes.py on a scratch copy: all applied; each
+BEFORE once, whole lines, copied by script). cite_check.py: the same 2 pre-existing range flags before and after
+(R1-ABL-OQ1 at the method note, R1-ABL-REC6 beside the glossary lines), 0 new; ids cited 471 -> 480. Glossary check on
+the copy: exact 0 -> 0; in context 77 -> 85 (active effects, vehicles, "2 × 48 = 96 at N = 48"). No sentence sits
+directly under a table. Not checked: the other authors' texts the routes name, as they stand after their own batches.
+END

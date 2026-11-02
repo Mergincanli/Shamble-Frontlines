@@ -20,3 +20,6 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - blocks 19-21 written: item 5 (1298-1301: third leg + immunity case), u4 (1308-1309: a lost looted X, fixture drop rule), u6 first line (1311: offer of the data's size)
 - block 21 written: u6 (1311-1313): offer of the data's size; offer logs equal on native and Wasm (local play runs the authority in the Worker)
 - 18:10 applied all 21 blocks to a scratch copy of b88714d: all applied; cite_check flags 2 before, same 2 after (pre-existing), ids 471->480; glossary exact 0->0, in context 77->85 (effects/vehicles/48 in context)
+- 18:20 NOTE blocks written (RR-4+POOL-FULL, TE-8, GD-7, GD-PICK-VIS, GD-2, GD-8, checks)
+- final: 21 FIX + 7 NOTE in game-designer-fixes-final.md; applies cleanly to b88714d; new OQs: OQ-0005-AB14 (spawn protection scope; Mustafa), OQ-0005-AB15 (pick visibility, GD-PICK-VIS; Mustafa); routes in the NOTEs (rust-reviewer 0004 part 17 + OQ-0004-11; engine-architect CD-2, README, frame OQ table; netcode-architect 0001 part 12; test-engineer PM-0005-18/-25/-29/-31, PM-0004-6). docs/ untouched by me.
+DONE

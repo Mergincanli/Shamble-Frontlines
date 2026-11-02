@@ -91,14 +91,18 @@ END
 ```
 
 ## Save as you go (Mustafa, 2026-11-02: usage limits cut agents mid-task; lose as little as possible)
+- This applies to every agent of this task, the ones running now and every later wave.
 - Create your output file at the start, then add to it as you go: each FIX or NOTE block (or verdict row) goes into the
   file the moment you have composed it, never held back for the end. The session's background saver commits and pushes
   the checkpoint folder every 5 minutes, so whatever is in your files survives a cut.
 - Keep the file valid as you go: finish each block (its END line) before you start the next one.
 - After each finding or unit of work, add one line to your notes file: what is done, what comes next.
-- On a restart, read your notes and your output file first, and continue after the last complete block. Never redo a
-  finished block, and never start the file again from scratch.
-
+- Scratch files (copies of docs, diffs, scripts, fetched excerpts, applied previews) live in the notes folder, in
+  /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/<your-unit>-scratch/, never in /tmp, a scratchpad or
+  .gate/ (those are not saved). Keep scratch to what you need to resume: for a fetched page, save the excerpt you quote
+  and its audit row, not the whole page.
+- On a restart, read your notes, your output file and your scratch folder first, and continue after the last complete
+  block. Never redo a finished block, and never start the file again from scratch.
 ## Saving your progress
 A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-synthesis-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
 

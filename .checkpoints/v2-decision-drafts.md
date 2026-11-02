@@ -37,6 +37,19 @@
 6. Spend-limit cut (about 19:18) recorded; resumed after the reset (22:52); 0006 and 0005's ability section finished;
    0002 and 0005's content part launched before 23:00 · this commit.
 
+## Rules for the rest of this task (Mustafa, 2026-11-02, in the session's chat)
+About 17:28: "You're halfway usage so you know, make sure to set the agents up in a way that they save their work &
+progress (reduce the chance of losing work when usage is hit)". About 17:38, three additions, word for word:
+"1. for the agents working at a time, including the next waves
+2. Scratch files live in the notes folder (.checkpoints/v2-decision-drafts/<agent>-scratch/), never in a temp folder.
+3. At every checkpoint update, check that the background saver is running, and restart it if it stopped.
+Record these in the checkpoint."
+How the session applies them: `prompts/_save-as-you-go.txt` is in every prompt still to launch and is sent to every
+agent running (each block written the moment it is composed; a notes line after each finding; scratch only in
+`.checkpoints/v2-decision-drafts/<unit>-scratch/`, kept to what a restart needs; on a restart, continue after the last
+complete block); `scripts/saver_check.sh` runs at every checkpoint update, and the saver is restarted
+(`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
+
 ## Current step
 Seventh spend-limit cut, 2026-11-02 about 12:15 Amsterdam ("resets 2:20pm (UTC)", 15:20 Amsterdam): netcode-architect's
 final batch (written, 57 FIX and 39 NOTE, in proofreading), game-designer's (just started) and rust-reviewer's follow-up

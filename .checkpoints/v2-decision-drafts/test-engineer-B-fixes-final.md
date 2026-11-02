@@ -11,3 +11,96 @@ the render budget bench's (PM-0003-18 to PM-0003-42, then PM-0003-44 to PM-0003-
 the check at each later three.js upgrade (PM-0003-43). Every
 END
 
+### FIX EA-11 (routed: BS records the Worker's load), AD-5 (the test view)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+- **Scenes.** **BS**, the benchmark scene (part 8; R3-MEASURE-REC2, lines 1195–1197): a recorded match replayed at the
+  stress scene's fight on screen (N = 48 soldiers in three teams of 16, the 4 very large units of at least 20 parts
+  each, 300 live projectiles with their visual effects), with a scripted camera, started by a URL flag. Until ADR
+  0004's sim core spike gives a recorded match, BS is a synthetic recording at the same counts (the draft's own
+  fallback, the bench's "Needs"). **LS**, the look-test scene ("one look-test scene", R3-LOOK-REC1, line 991): the look
+  proof test's scripted scene with its authored test assets (part 11) at the game camera, at BS's counts wherever a
+  mark asks for the fight on screen. It runs before any recorded match exists, so it is a synthetic recording (one
+  script, one fixed seed).
+AFTER:
+- **Scenes.** **BS**, the benchmark scene (part 8; R3-MEASURE-REC2, lines 1195–1197): a recorded match replayed at the
+  stress scene's fight on screen (N = 48 soldiers in three teams of 16, the 4 very large units of at least 20 parts
+  each, 300 live projectiles with their visual effects), with a scripted camera, started by a URL flag. Until ADR
+  0004's sim core spike gives a recorded match, BS is a synthetic recording at the same counts (the draft's own
+  fallback, the bench's "Needs"). Every BS run records the Worker's load beside its numbers: a replay, a local match or
+  an online client (part 8: a replay runs the whole sim at N = 48, as a local match does, which is heavier than an
+  online client's Worker); a result holds for the load it ran with, and once the boundary spike's online client
+  exists PM-0003-18 runs once more with that load, reported beside it (proposed: the load a networked player's laptop
+  carries). **LS**, the look-test scene ("one look-test scene", R3-LOOK-REC1, line 991): the look proof test's
+  scripted scene with its authored test assets (part 11) at the test view, at BS's counts wherever a mark asks for the
+  fight on screen. It runs before any recorded match exists, so it is a synthetic recording (one script, one fixed
+  seed).
+- **The test view.** Wherever a row or a checklist step says "the game camera", it means legacy's framing as a test
+  view: height 40, boom 56.6, field of view 15° and yaw 45° (CD5, `LEGACY_INVENTORY.md` line 86). It decides no camera:
+  the v2 framing is a design question (R2-INT-OQ2, r2-netcode.md lines 3010–3013), and once it is answered a mark or a
+  step judged at the test view is taken again at the v2 framing (proposed: silhouettes, the ink's width in pixels and
+  LOD all depend on the view).
+END
+
+### FIX PA-6 (the p99 rows' tail form and its validity rule), PA-7 (the soaked set; OQ-0003-20)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+- **H**, a harness run set (part 8; R3-MEASURE-REC1, lines 1181–1185): 3 runs of 600 measured frames after 300
+  warm-up frames, each run labelled as R3-MEASURE-REC1 asks (backend, adapter, browser version, `devicePixelRatio`,
+  resolution, GPU times quantized or not) plus the build's commit, the display's refresh rate, mode U or P, the tier,
+  and mains power with the operating system's power mode (proposed: a laptop's power state moves its numbers). Every
+  one of the 3 runs must meet the mark ("holds … for 3 runs", R3-BUDGET-REC2, lines 1162–1163).
+- **Statistics.** Percentiles by nearest rank over a run's 600 frames: p99 is the 594th smallest value, p95 the 570th,
+  the median the 300th (proposed: one definition, so two people get the same number). A time mark that names no
+  statistic is a p99 ([time statistics](../research/GLOSSARY.md#time-statistics)); p99s are never added, so every
+  total is measured directly. A count mark holds on every frame, so its statistic is the run's max (proposed reading:
+  counts are exact, and the replay repeats them, PM-0003-35).
+- **V**, the validity of a timed run set: its 3 run medians lie within 3 % of each other (R3-MEASURE-REC1's mark,
+  lines 1192–1193, applied to every timed set: proposed). An invalid set is neither a pass nor a fail: its cause is
+  found and written down before it is measured again.
+AFTER:
+- **H**, a harness run set (part 8; R3-MEASURE-REC1, lines 1181–1185): 3 runs of 600 measured frames after 300
+  warm-up frames, each run labelled as R3-MEASURE-REC1 asks (backend, adapter, browser version, `devicePixelRatio`,
+  resolution, GPU times quantized or not) plus the build's commit, the display's refresh rate, mode U or P, the tier,
+  the Worker's load on BS, and mains power with the operating system's power mode (proposed: a laptop's power state
+  moves its numbers). Every one of the 3 runs must meet the mark ("holds … for 3 runs", R3-BUDGET-REC2, lines
+  1162–1163). **H's tail form:** where a mark's number is a p99 of per-frame values from H (PM-0003-11, -19, -20, -21,
+  -26, -27, -30, -33 and -40), each of the 3 runs measures 3,000 frames after the same 300 warm-up frames (proposed: at
+  600 frames a p99 is the 6th-largest frame, so one garbage-collection pause or one operating-system task inside a
+  20-second run decides a 1.0 ms row; at 3,000 frames 30 frames lie above it, and a run takes 100 s at 30 fps). The
+  median and p95 marks keep R3's 600 frames.
+- **S, the soaked set** (ML only): the same run set taken again after at least 15 minutes of BS looping with the
+  Worker's sim running, in one browser session with no restart, mains power and power mode recorded (proposed: a match
+  runs about 20 minutes, LOOP_V2 §8, and in a thin laptop the CPU and the integrated GPU share one power and heat
+  budget, so a run on a cool laptop can fit inside a short boost window; the chosen laptop's boost behaviour is not
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. Which of the two gates is OQ-0003-20; until it is
+  answered the soaked set gates and the cold set is reported beside it (its recommended option, held as the interim).
+- **Statistics.** Percentiles by nearest rank over a run's 600 frames: p99 is the 594th smallest value, p95 the 570th,
+  the median the 300th; over the tail form's 3,000 frames, the 2,970th, 2,850th and 1,500th (⌈q × n⌉, arithmetic;
+  proposed: one definition, so two people get the same number). A time mark that names no
+  statistic is a p99 ([time statistics](../research/GLOSSARY.md#time-statistics)); p99s are never added, so every
+  total is measured directly. A count mark holds on every frame, so its statistic is the run's max (proposed reading:
+  counts are exact, and the replay repeats them, PM-0003-35).
+- **V**, the validity of a timed run set: its 3 run medians lie within 3 % of each other (R3-MEASURE-REC1's mark,
+  lines 1192–1193, applied to every timed set: proposed), and, for a set in the tail form, its 3 run p99s lie within
+  10 % of their median (proposed: the medians cannot see the tail; 10 % is half the smallest p99 change a row here
+  compares, PM-0003-27's 20 %, as ADR 0001's V-S takes half its tightest tolerance). An invalid set is neither a pass
+  nor a fail: its cause is found and written down before it is measured again.
+END
+
+### FIX GE-14 (PM-0003-2: the device's error events counted)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-2 | One build runs on both backends in every target browser (part 1) | 0 console errors in every start | ML: Chrome, Edge and Firefox (Windows), each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | LS played through its whole script; the page's own error hook writes every console error and page error to the results log (no browser driver needed) | the 10 starts of PM-0003-5 per browser and backend; 0 in each. Bites: a `console.error` 2 s after load (R5-GATE-REC3's G12 mutation, r5-toolchain-quality.md line 1723) | R3-WGPU-REC1's mark 1 (lines 910–912) |
+AFTER:
+| PM-0003-2 | One build runs on both backends in every target browser (part 1) | 0 console errors and 0 device errors in every start | ML: Chrome, Edge and Firefox (Windows), each on WebGPU and with `forceWebGL`; MAC: Safari, both backends | LS played through its whole script; the page's own error hook writes every console error and page error to the results log (no browser driver needed), and counts as a device error each `uncapturederror` event of the WebGPU device, its `lost` promise resolving, and each `webglcontextlost` event on the canvas (proposed, not researched: a WebGPU validation error reaches the page through the device's error event rather than as a thrown error, and whether each browser also prints it to the console, as an error, a warning or not at all, was not verified; the spike records how each browser shows the planted one) | the 10 starts of PM-0003-5 per browser and backend; 0 in each. Bites: a `console.error` 2 s after load (R5-GATE-REC3's G12 mutation, r5-toolchain-quality.md line 1723); on the WebGPU backend, a planted bind group on the renderer's device that leaves out one entry of its layout, which must count as a device error whatever the console shows | R3-WGPU-REC1's mark 1 (lines 910–912); the device events proposed (the graphics review's finding 14) |
+END
+
+### FIX TE-5 (PM-0003-3: every kept effect on; routed by graphics-engineer)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-3 | The fallback shows the same look (parts 1, 5; decides R3-GL2-OQ3) | at each of 3 fixed frames, at most 1 % of pixels differ by more than 8/255 in any channel between the two backends (a tolerance the research marks proposed); effects that exist on one backend only are off | ML: Chrome and Firefox, WebGPU against `forceWebGL`; MAC: Safari, the same pair | LS's three fixed frames read from the canvas on each backend, same machine and browser; a pixel-diff script counts the pixels with any channel difference above 8 | 1 capture per frame and backend. Control: the same backend captured twice gives 0 differing pixels (else the scene does not repeat and the set is invalid). Bites: the ink switched off on the WebGL 2 backend only | R3-WGPU-REC1's mark 2 (lines 912–913); R3-GL2-REC1's mark (lines 965–967) |
+AFTER:
+| PM-0003-3 | The fallback shows the same look (parts 1, 5; decides R3-GL2-OQ3) | at each of 3 fixed frames, at most 1 % of pixels differ by more than 8/255 in any channel between the two backends (a tolerance the research marks proposed), with every kept effect on: under F-A no effect exists on one backend only (part 1), and an F-B extra, if one ever enters, is compared through its named fallback | ML: Chrome and Firefox, WebGPU against `forceWebGL`; MAC: Safari, the same pair | LS's three fixed frames read from the canvas on each backend, same machine and browser; a pixel-diff script counts the pixels with any channel difference above 8 | 1 capture per frame and backend. Control: the same backend captured twice gives 0 differing pixels (else the scene does not repeat and the set is invalid). Bites: the ink switched off on the WebGL 2 backend only | R3-WGPU-REC1's mark 2 (lines 912–913), changed: its "post effects that exist on one backend only are switched off" (line 913) would remove the failure part 1 forbids, an effect that silently does not run on WebGL 2; R3-GL2-REC1's mark (lines 965–967) |
+END
+
