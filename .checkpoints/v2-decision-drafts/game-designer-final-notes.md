@@ -12,3 +12,6 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - 17:50 coordinator added: (1) E-press precedence into OQ-0005-AB9 (ADR 0001 75615d1 part 12 points there); (2) purchase rule as data (ADR 0001 Buy{unitId} checks id in mode content, tier, price incl. power-plant pricing, own terminal) -> AB-5; (3) GD-PICK-VIS -> new OQ-0005-AB15 (Mustafa), cross-ref in AB7; block 10 (intro) to be rewritten in place to include AB15
 - block 12 written: OQ-0005-AB9 1233-1238 (E press precedence options; full pickup pool -> AB-1/OQ-0004-11)
 - block 13 written: OQ-0005-AB10 1244-1247 (cites OQ-0004-10, -12; sims 3 runs per mode)
+- block 14 written: AB-5 891-898 (what may be bought: faction list, mode rules table, tier and price per unit/vehicle, power-plant rise and terminal reach as numbers; Recruit price 0)
+- block 15 written: OQ-0005-AB7 decider line 1217 -> OQ-0005-AB15
+- block 16 written: new OQ-0005-AB14 (spawn protection: what it covers (a)/(b), what ends it (i)-(iii); Mustafa) and OQ-0005-AB15 (pick visibility (a)-(c); Mustafa) after AB13 (1274-1275)

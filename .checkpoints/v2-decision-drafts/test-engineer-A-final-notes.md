@@ -2,3 +2,6 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - started 2026-11-02; output file created
 - read ADR 0001 pass marks (lines 1251-1502 at 75615d1); next: review files for each finding
 - read NA review and netcode-architect-fixes-final NOTEs (lines 1177-1474); next: ADR 0001 decision parts 4,5,7,8,10,11,13, OQs, test plan
+- read ADR 0001 parts 1-14, bandwidth, budgets, failure modes, OQ-5/6/15-18, test plan, rollback at 75615d1; next: perf/EA/SA/IE/GD reviews
+- read GD/PA/EA/IE/SA/FB/FC/RR findings; ADR 0002 at 61e9933 (eng-arch batch applied). next: read ADR 0002 pass marks 1141-1370
+- read ADR 0002 spike items and pass marks (1141-1368 at 61e9933); next: engine-architect 0002 routed NOTEs

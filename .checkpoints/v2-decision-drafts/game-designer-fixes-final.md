@@ -204,3 +204,83 @@ AFTER:
     and bots (3 runs per build, two-team and three-team modes separately). Research ids: none.
 END
 
+### FIX GD-2's data half (netcode-architect's routed note from 75615d1: ADR 0001 part 12's Buy{unitId} is checked against rule data; AB-5 says where the data names what may be bought)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  - What: the team's tier is team state the sim keeps (ADR 0004). An ability requires its tier's tag, and a unit or
+    vehicle is buyable at its tier (its tier and cost are unit data, AB-4). The T1 class abilities require Tech 1
+    (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2 §8: "the
+    team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the minute-5 floor
+    are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses a press or a
+    purchase before its tier; whether the client predicts the press is ABL-PREDICT.
+  - Why: R1-ABL-REC1 names "team tech tiers" among the tag gates, and legacy checks no tier (GE4, GC11).
+  - Research: R1-ABL-REC1 (lines 2343–2345).
+AFTER:
+  - What: the team's tier is team state the sim keeps (ADR 0004). An ability requires its tier's tag, and a unit or
+    vehicle is buyable at its tier (its tier and cost are unit and vehicle data, AB-4). The T1 class abilities require
+    Tech 1 (LOOP_V2 §4, `[DECIDED]`); T2 and T3 units and vehicles require their tier (the `[DEFAULT]` ladder; LOOP_V2
+    §8: "the team's tech tier still decides when a unit or vehicle becomes buyable"). The tier thresholds and the
+    minute-5 floor are tuning numbers in data, run by the economy and objective phases (ADR 0004). The authority refuses
+    a press or a purchase before its tier; whether the client predicts the press is ABL-PREDICT.
+  - What may be bought is data, and ADR 0001's `Buy{unitId}` (part 12) is checked against it: the faction definition
+    lists the units and vehicles its team can buy (AB-4's faction kind; R1-ABL-REC5: "which units and vehicles"), the
+    mode's rules table may change that per mode (R2-ROOM-REC7), and each unit and vehicle definition holds its tier and
+    its price ($100 for each T1 class, LOOP_V2 §5 `[DECIDED]`). The rise in a team's prices after it loses a power plant
+    (LOOP_V2 §3 `[DEFAULT]`, run by ADR 0004 part 17) and the buy terminal's reach are numbers in the same tables. The
+    Recruit is free and comes with every death (LOOP_V2 §5 `[DEFAULT]`), so its price in data is 0. A purchase gives the
+    unit's own weapons and nothing else (AB-8).
+  - Why: R1-ABL-REC1 names "team tech tiers" among the tag gates, and legacy checks no tier (GE4, GC11).
+  - Research: R1-ABL-REC1 (lines 2343–2345); R1-ABL-REC5 (lines 2448–2452) for the faction's list; R2-ROOM-REC7
+    (r2-netcode.md, Recommendations, lines 2857–2867) for the mode's rules table.
+  - Need: VISION_V2 §6.5; the faction's list: §6.7.
+END
+
+### FIX GD-PICK-VIS (my review's question; the coordinator's note: a number beside OQ-0005-AB7): AB7 points to the new OQ-0005-AB15
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3. Research ids: none.
+AFTER:
+  - Decider: Mustafa. What decides it: a design session, then the two measurements of OQ-0005-AB3; who may see a
+    player's picks is OQ-0005-AB15, decided with this question, since raw power that nobody can see has no answer.
+    Research ids: none.
+END
+
+### FIX GD-7 (a new open question, OQ-0005-AB14, for what LOOP_V2 §2's spawn protection leaves open) + GD-PICK-VIS (a new open question, OQ-0005-AB15), added after OQ-0005-AB13
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  - Proposed: (a), and (b) whenever a copy appears. Decider: the Advisor (the source). What decides it: the content and
+    ability spike's marks 1 and 2 (the trigger). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
+AFTER:
+  - Proposed: (a), and (b) whenever a copy appears. Decider: the Advisor (the source). What decides it: the content and
+    ability spike's marks 1 and 2 (the trigger). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
+- **OQ-0005-AB14. What does spawn protection cover, and what ends it early?**
+  - Why it matters: LOOP_V2 §2 (`[DEFAULT]`) gives "3 s of spawn protection" and no more. AB-2's immunity rule stops
+    damage for the effect's whole length; whether it also stops other effects, and whether firing ends it, decides
+    whether a fresh spawn is merely safe or can fight with no risk. On legacy numbers a Warrior empties its 36-round SMG
+    magazine in 35 × 0.072 = 2.52 s, inside the 3 s, for up to 36 × 8 = 288 damage, nearly two Peacekeepers' worth
+    (2 × 150 = 300) (LEGACY_TUNING.md, `WEAPONS` and `UNIT_TYPES`, lines 167–230; arithmetic), and nothing can answer
+    it while it lasts (pillar 3). Barracks interiors are closed to enemies (LOOP_V2 §2), so this plays out at the
+    openings and against blasts thrown in.
+  - Options for what it covers: (a) damage only (AB-2's rule as written); (b) damage and every effect another team
+    applies (slows, marks, knockback), which needs one more reviewed Rust check: an effect's application refused on a
+    target holding the tag. Options for what ends it early: (i) nothing, the full 3 s; (ii) the player's first shot or
+    ability press, which needs a trigger that removes the effect on the soldier's own fire, of the kind R1-ABL-REC1's
+    examples name ("on kill by source, run effect E", line 2347); (iii) leaving the barracks interior, read from the
+    interior's flag (ADR 0004 parts 11 and 17). The length stays data with every option.
+  - Decider: Mustafa (the 3 s is the Advisor's `[DEFAULT]`; what it covers and what ends it are new rules). What
+    decides it: a design session, then sims (3 runs per build, two-team and three-team modes separately) counting
+    deaths before a soldier leaves its barracks and the damage protected soldiers deal, then playtests. Research ids:
+    none (no research finding on spawn protection).
+- **OQ-0005-AB15. Who sees a player's upgrade picks?** (GD-PICK-VIS)
+  - Why it matters: ADR 0001 part 12 sends track state and picks to their owner only, as its starting class. Teammates
+    plan around each other's power (pillar 4: "Teams must split up and talk"); winners should "feel strong and can see
+    it" (pillar 2); and enemies need to read a strong player to answer it (pillar 3, "every strong thing has an
+    answer").
+  - Options: (a) the owner only (ADR 0001 today); (b) the team too; (c) everyone, through the scoreboard or a visible
+    cue on the soldier. Each is one of R2-INT-REC5's visibility classes (r2-netcode.md, Recommendations, line 2502;
+    ADR 0001's), so the answer changes a class in ADR 0001's state table, not the data model; a visible cue in (c) is
+    also ADR 0003's to draw and LOOK_V2's to style.
+  - Decider: Mustafa. What decides it: a design session, with OQ-0005-AB7 (if picks may add raw power, the answer
+    pillar 3 needs is easier to give when enemies can see them), then playtests. Research ids: none.
+END
+
