@@ -1,0 +1,9 @@
+<<<OLD
+start with every slot's record empty, field by field
+>>>NEW
+start with every slot's record at its start, field by field: empty tracks and money at its starting amount, $300 (part 18, S16)
+===
+<<<OLD
+Bites: a record table reused without its reset; rule A |
+>>>NEW
+Bites: a record table reused without its reset; money carried from the last match instead of reset to $300; rule A |

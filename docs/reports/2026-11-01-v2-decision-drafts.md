@@ -61,9 +61,14 @@ pass marks of its own draft). Verdicts, then the high findings; every finding is
   stress scene, which costs 157–182 kbps on the research's own sizes.
 - **graphics-engineer:** 0005 REVISE; 0002, 0003's pass marks, the overview and the look proof test APPROVE WITH NOTES.
   High: "one material per class" against "one material per slot content" (one material per content key).
-- **rust-reviewer:** {RR}
-- **art-director:** {AD}
-- **test-engineer:** {TE}
+- **rust-reviewer:** 0002 REVISE (small), 0001, 0005, the boundary spike and 0004's pass marks APPROVE WITH NOTES.
+  Medium: the float lint banned only some non-deterministic methods; nothing stopped `room` reading the clock (it panics
+  in the browser's Wasm); a panic in the tick could leave a zombie room; pools had no capacity or overflow rule.
+- **art-director:** 0003 REVISE; 0005's asset parts and the look proof test APPROVE WITH NOTES. High: a quality tier
+  could switch a LOOK_V2 [DECIDED] item (the ink, soft shadows) off with no look call by Mustafa, and the look checklist
+  never showed the Low frame.
+- **test-engineer** (is it proven): SPIKE_PLAN REVISE, every draft APPROVE WITH NOTES. High: the wave-1 60 Hz margin
+  run's simulation had no ability, economy or objective step, so the tick-rate verdict could pass on a lighter load.
 All of them: {REVIEW_OUTCOME}
 
 ## Decisions and deviations
