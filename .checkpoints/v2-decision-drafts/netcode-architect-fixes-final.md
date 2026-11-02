@@ -3,8 +3,8 @@
 Doc: `docs/adr/0001-multiplayer-netcode.md` at 47eadd9 (unchanged at HEAD; `git diff 47eadd9 HEAD` on it is empty).
 Every BEFORE was copied by script from the doc's whole lines at 47eadd9; each occurs exactly once in the doc, the
 ranges do not overlap, and applying the blocks in file order on a copy succeeds (each BEFORE is still unique when its
-turn comes). No block edits "### Pass marks" (lines 1018–1270), which is test-engineer's. The doc grows by about 150
-lines; pointers into it are anchored to parts and ids. No new sentence sits directly under a table. The NOTE blocks
+turn comes). No block edits "### Pass marks" (lines 1018–1270), which is test-engineer's. The doc grows by 250 lines
+(1,511 to 1,761); pointers into it are anchored to parts and ids. No new sentence sits directly under a table. The NOTE blocks
 after the FIX blocks give, per finding id, what was done, what is deferred and what other authors' text must follow.
 Includes the coordinator's routed items: from rust-reviewer's ADR 0004 batch (b815c85): ROOM-CRASH as OQ-0001-18,
 GD-REJOIN pointing to OQ-0004-10, the uplinks state row naming OQ-0004-9, OQ-0001-2 (a) worded as ADR 0004's S1

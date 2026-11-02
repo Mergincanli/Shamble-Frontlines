@@ -158,6 +158,13 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   production); the seed added to PM-0006-21's canary (never logged or recorded).
 - Routed by engine-architect's ADR 0002 batch: PM-0003-36 (the WebGPU smoke run, GE-2), PM-0004-23 and PM-0004-74 (the
   float lint's allow-list and the same-feature check, RR-1, RR-10); its NOTEs name what each row needs.
+- Routed by rust-reviewer's follow-up b (ADR 0004 at 16e97aa): PM-0004-23 reads "the build fails on any std `f32` or
+  `f64` method outside part 7's allow-list (`powi`, `hypot`, `cbrt`, `to_degrees`, `to_radians`, `min`, `max` and
+  `clamp` named), as well as the items listed today"; its bites add `deg.to_radians()` and `a.min(b)` in `sim`, each
+  failing G2, as in PM-0002-41; its control adds the three helpers and one allowed method (`abs` or `fract`) passing.
+  Optional for PM-0004-22: the helpers' signed-zero results and a reversed clamp in the unit vectors on every target.
+- Routed by engine-architect's ADR 0005 frame batch (b88714d): PM-0005-4 or -5 gains the pool-report leg (bite: a
+  projectile lifetime doubled while the report stays the same).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -321,4 +328,6 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   OQ-0002-5 row (macOS costs time, not money), I-13.
 - Routed by engine-architect's ADR 0002 batch, second part: README rows for OQ-0006-13 and OQ-0006-17; no OQ-0002-9
   (ADR 0002 part 10 points to OQ-0006-13).
+- Routed by engine-architect's ADR 0005 frame batch (b88714d): README rows for I-6 (the archive of shipped content
+  sets, ADR 0006 part 12) and OQ-0005-AP1 (waits on OQ-0006-18).
 

@@ -42,3 +42,36 @@ AFTER:
       lines 2471–2472). Need: VISION_V2 §3 and §4 (a budget, not a feature, as AB-10).
 END
 
+### FIX GD-7 (rust-reviewer's routed note: does AB-1 have an operation for spawn protection?), part 1 of 3: the pipeline's immunity rule (AB-2)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  - What: the stages are the locational multiplier, range falloff, the frontal-arc block, a target-tag multiplier (for
+    counters such as "strong against vehicles") and the owner and team rules. Each hit becomes an instant damage effect
+    that passes through them.
+  - Why: the outcome logic GAS gives to execution code becomes fixed, reviewed stages, and each number has one home
+    (CS3 shows the cost of two homes).
+  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9.
+  - Need: VISION_V2 §6.3 ("combos and counters can emerge").
+AFTER:
+  - What: the stages are the locational multiplier, range falloff, the frontal-arc block, a target-tag multiplier (for
+    counters such as "strong against vehicles") and the owner and team rules. Each hit becomes an instant damage effect
+    that passes through them. Beside the owner and team rules sits one rule the research does not list, for spawn
+    protection (LOOP_V2 §2 `[DEFAULT]`; AB-6): a hit on a target that holds the immunity tag the pipeline's data names
+    deals no damage, a blast included (unlike the frontal-arc block, it reads no arc). It is one reviewed Rust addition,
+    like the knockback operation (AB-6). Proposed as a tag, not as a damage scale of 0 on an attribute, so that no
+    modifier order (AB-1's aggregation) can undo it, and with the tag named once in the pipeline's data rather than as
+    a target-tag multiplier in every weapon (two homes, CS3).
+  - Why: the outcome logic GAS gives to execution code becomes fixed, reviewed stages, and each number has one home
+    (CS3 shows the cost of two homes).
+  - Research: R1-ABL-REC1 (lines 2350–2352), R1-ABL-REC2 (lines 2384–2385); R1-ABL-F9; the immunity rule: none (no
+    research finding on spawn protection).
+END
+
+### FIX GD-7, part 2 of 3: the immunity rule's need (AB-2)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**
+AFTER:
+  - Need: VISION_V2 §6.3 ("combos and counters can emerge"); the immunity rule: LOOP_V2 §2 only.
+END
+
