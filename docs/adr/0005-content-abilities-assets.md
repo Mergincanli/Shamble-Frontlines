@@ -141,7 +141,8 @@ The parts, each pointing to the section part that decides it:
    bookkeeping (AB-3); one table per kind, linked by validated ids (AB-4); tech tiers as tag gates (AB-5); LOOP_V2's
    abilities written in the model (AB-6); combos and counters as data (AB-7); ABL-PREDICT left open, both answers
    carried (AB-9); the step's cost mark and a proposed curve (AB-10). *Need:* VISION_V2 §6.3, §6.4, §6.5, §6.7; the
-   cost mark: VISION_V2 §3 and §4 only.
+   cost mark and the full-pool rules: VISION_V2 §3 and §4 only; AB-2's immunity rule for spawn protection: LOOP_V2 §2
+   only.
 6. **The upgrade tracks:** the track kind and the drop and pickup values (AB-4); each clause of UPGRADE-SCOPE and who
    carries it (AB-8); weapon and unit definitions name their tracks (AB-4, CD-6). The state, the messages, the
    telemetry fields and the page are ADR 0004 part 18, ADR 0001 part 12, ADR 0006 part 12 and ADR 0003 part 10.
@@ -292,13 +293,19 @@ map document is content data under EDITOR_V2 §2's rules.
     check reports, for each mode in the set, the worst case of each pool (live projectiles, active effects, weapon
     pickups, big vehicles and their parts), from the content's numbers (fire intervals and projectile lifetimes,
     pellets per shot, effect durations and stack limits, drops per death and pickup lifetimes), the mode's team count
-    and team size, and the game-designer's caps where they exist; the report travels with the frozen set. Where the
-    content alone sets no bound, the report names the pool and the missing cap instead of a number, and nothing fills
-    it with a default: "Caps on vehicles and live projectiles per team are not in VISION_V2 or LOOP_V2", and until the
-    game-designer sets them every topic's stress marks use the stress scene's 15 big vehicles and 300 live projectiles
-    (R2-BUD-OQ5, r2-netcode.md, Open questions, Brief question 2, lines 2982–2985). No research sizes a pool, so each
-    pool's arithmetic is written beside its kind and reviewed like the bounds above (proposed); which row gives way
-    when a pool is full is ADR 0004's OQ-0004-11.
+    and team size, and the game-designer's caps where they exist; the report travels with the frozen set. For active
+    effects it reports per target, in the two shares AB-1 proposes ("When a pool is full"): the reserved worst case of
+    the effects the content bounds on that target (the pick effects of the tracks that can apply to it at once, one
+    per track level; its unit's own ability and weapon effects; spawn protection), which every target's rows reserve;
+    and, for the effects other soldiers, vehicles and structures apply, whose count play sets, the missing cap. Where
+    the content alone sets no bound (those effects, weapon pickups, big vehicles), the report names the pool and the
+    missing cap instead of a number, and nothing fills it with a default: "Caps on vehicles and live projectiles per
+    team are not in VISION_V2 or LOOP_V2", and until the game-designer sets them every topic's stress marks use the
+    stress scene's 15 big vehicles and 300 live projectiles (R2-BUD-OQ5, r2-netcode.md, Open questions, Brief
+    question 2, lines 2982–2985); once those caps are set, a set whose worst case exceeds one fails the check (AB-1).
+    No research sizes a pool, so each pool's arithmetic is written beside its kind and reviewed like the bounds above
+    (proposed); which row gives way when a pool is full is ADR 0004's OQ-0004-11, and AB-1 holds the game-designer's
+    proposal per kind for it.
   - Research: R1-DATA-REC2 (r1, lines 2500–2516); R1-RR-OQ2 (lines 2933–2935); the loader's side of R1-RR-OQ3
     (lines 2936–2940; the Worker's restart after a trap is ADR 0004's); R5-RUSTLINT-REC3 (r5, Recommendations, lines
     1340–1352, ADR 0002's); for the pools, R1-ABL-REC6's rule that the step "allocates nothing on the heap in steady
@@ -693,8 +700,9 @@ the research lacks is marked proposed, with its reason. The test-engineer writes
    Proposed addition (reason: R1-RR-OQ2): the corpus includes, for every bounded collection, a file one element over
    its bound, refused 100 % of the time. Zero panics is also R1-RR-OQ3's mark for the loader. The spike records the
    default depth limit (R1-DATA-OQ4) and runs the same tests with garde on wasm32 (R1-DATA-OQ5). Proposed (reason:
-   ADR 0004 part 1 sizes its pools from this report): for each test mode, every pool's reported worst case equals a
-   count by hand from the test content's numbers, and every pool the content leaves without a bound is named as such.
+   ADR 0004 part 1 sizes its pools from this report): for each test mode, every pool's reported worst case, and for
+   active effects the reserved share per target, equals a count by hand from the test content's numbers, and every
+   pool the content leaves without a bound is named as such.
 3. **CD-3** (R1-DATA-REC3's mark, lines 2527–2529; R1-BND-REC4 marks 1 and 3, lines 2304–2306; R5-LAYOUT-REC3's
    mark, r5, lines 1203–1204): for 100 % of fields with a garde range, the generated schema carries the same minimum
    and maximum; a value just outside a range is refused by the Rust validator and flagged by the schema-driven field;
@@ -2003,6 +2011,8 @@ no pick; where a section proposes an answer, the line says so.
 | OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa, after sims of each matchup | The ability and effect system |
 | OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (proposed: accept it) | the Advisor | The ability and effect system |
 | OQ-0005-AB13 | When does scripting (option A3) come back? (proposed: if the spike's ability mark 1 or 2 fails, or new operations are needed often; the talk is read when a copy appears) | the Advisor | The ability and effect system |
+| OQ-0005-AB14 | What does spawn protection cover beyond damage, and what ends it early? | Mustafa | The ability and effect system |
+| OQ-0005-AB15 | Who sees a player's upgrade picks? | Mustafa | The ability and effect system |
 | OQ-0005-AP1 | Where does the automated step run, what does it write, and where do the files live? | the asset-pipeline research, then the asset spike; the files' visibility follows Mustafa's answer to ADR 0006's OQ-0006-18 | The asset pipeline |
 | OQ-0005-AP2 | Which asset families become authored models, and which stay procedural builders? | Mustafa, in the look proof test | The asset pipeline |
 | OQ-0005-AP3 | May an AI-generated draft model ever ship? | Mustafa | The asset pipeline |

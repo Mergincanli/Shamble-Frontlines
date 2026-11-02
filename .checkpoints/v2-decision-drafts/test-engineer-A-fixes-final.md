@@ -72,3 +72,99 @@ AFTER:
   arrival is its send time plus that one-way delay, and every lateness in these marks is counted from it. L1 runs the headless clients; L2 is the impairment layer under quinn's socket (and a
 END
 
+### FIX PA-9 (the re-flood's tick parity at 60 Hz), TE-4 (the soak's wrap is a second check)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+- **Soaks.** **S30**: all 48 clients join, a 60 s warm-up starts once the last client has acknowledged its first full
+  state, then 30 minutes are measured: 54,000 ticks at 30 Hz (proposed warm-up: joins and first full states are not the
+  steady state). **S60**: the same at a 60 Hz tick, 108,000 measured ticks. A p99 reads the measured ticks; a max, an
+  overrun count and a dropped-time count read the whole run, joins included (proposed: a real match has its join burst
+  too). The run's tick counter starts 1,800 ticks (1 minute at 30 Hz) below 65,536, so every S30 crosses a 16-bit wrap
+  (proposed: the draft's part 6 (the snapshot header's tick) and its "Failure modes" row "A tick counter wraps"
+  expect it only at 60 Hz). Portal changes are scripted at one
+  per second (doors opening and closing near the fight), which puts re-flood ticks on 3.3 % of ticks at 30 Hz and 1.7 %
+  at 60 Hz (1 ÷ 30, 1 ÷ 60), above the 1 % tail a p99 reads (proposed: "re-flood ticks included" names no rate).
+AFTER:
+- **Soaks.** **S30**: all 48 clients join, a 60 s warm-up starts once the last client has acknowledged its first full
+  state, then 30 minutes are measured: 54,000 ticks at 30 Hz (proposed warm-up: joins and first full states are not the
+  steady state). **S60**: the same at a 60 Hz tick, 108,000 measured ticks. A p99 reads the measured ticks; a max, an
+  overrun count and a dropped-time count read the whole run, joins included (proposed: a real match has its join burst
+  too). The run's tick counter starts 1,800 ticks (1 minute at 30 Hz) below 65,536, so every S30 crosses a 16-bit wrap
+  (proposed: a second check beside PM-0001-58's deterministic wrap test, which the "Failure modes" row "A tick or
+  sequence counter wraps" names; from 0, the 54,000 ticks of an S30 never reach 65,536). Portal changes are scripted at one
+  per second (doors opening and closing near the fight), which puts re-flood ticks on 3.3 % of ticks at 30 Hz and 1.7 %
+  at 60 Hz (1 ÷ 30, 1 ÷ 60), above the 1 % tail a p99 reads (proposed: "re-flood ticks included" names no rate). At
+  60 Hz a snapshot is encoded on every second tick (part 2), and changes 60 ticks apart all land on one parity, all on
+  encoding ticks or none (the perf review of 2026-11-02, finding 9), so the door script is phase-locked to the encoder
+  and every re-flood tick also encodes: the tight case of part 3's restated reason, 8.28 of 8.33 ms on the planning
+  check (GLOSSARY.md:62–75) (proposed: the case a 60 Hz pass must cover). Each re-flood's tick and whether it encoded
+  are logged, and the share is reported.
+END
+
+### FIX EA-7 and IE-2 (V-S: the rooms-per-VM row exempt from the pinning and steal clauses), IE-9/10 (LG's own CPU)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+- **Runs and validity (V-S).** A timed server mark runs 3 times and every run must meet it (R1-TICK-REC2 P1's "3 runs",
+  r1-simulation-core.md line 2047; proposed for every timed server mark). A run is valid when: the tick thread was alone
+  on its vCPU (PM-0001-1); the vCPU's steal time stayed at or under 1 % of the run (proposed: a VM's neighbours show as
+  steal; not researched); LG's clients sent their 30 inputs per second each within 1 % (proposed: a starved load
+  generator lightens the load). A mark compared with "a clean run" uses the median of 3 clean runs whose p99s lie within
+  2.5 % of their median (proposed: half the tightest tolerance compared against, R2-TRN-REC6 mark 2's 5 %, so the
+  comparison can tell a change from noise). An invalid run is neither a pass nor a fail: its cause is found and written
+  down before it is measured again.
+AFTER:
+- **Runs and validity (V-S).** A timed server mark runs 3 times and every run must meet it (R1-TICK-REC2 P1's "3 runs",
+  r1-simulation-core.md line 2047; proposed for every timed server mark). A run is valid when: the tick thread was alone
+  on its vCPU (PM-0001-1); the vCPU's steal time stayed at or under 1 % of the run (proposed: a VM's neighbours show as
+  steal; not researched); LG's clients sent their 30 inputs per second each within 1 %, and each LG VM's CPU use stayed
+  under 80 % in every second (ADR 0006's LG key) (proposed: a starved load generator lightens the load). The first two
+  clauses hold for single-room marks only: the rooms-per-VM row PM-0001-27 runs under ADR 0006's PM-0006-13 rules
+  instead (no pinning, its bracket B, 3 sessions at 3 times of day, steal recorded per second and reported, never a
+  validity condition), since eight tick threads cannot each be alone on four vCPUs and on SH steal is what is measured
+  ("repeated at 3 times of day (shared hosts vary with neighbours)": r6-infrastructure.md, R6-HOST-REC2's mark, lines
+  668–669). A mark compared with "a clean run" uses the median of 3 clean runs whose p99s lie within
+  2.5 % of their median (proposed: half the tightest tolerance compared against, R2-TRN-REC6 mark 2's 5 %, so the
+  comparison can tell a change from noise). An invalid run is neither a pass nor a fail: its cause is found and written
+  down before it is measured again.
+END
+
+### FIX EA-7 and IE-2 (PM-0001-1: the rooms-per-VM row runs unpinned)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+| PM-0001-1 | The rig is named and the measuring unit holds (part 14; a precondition of every server mark) | RS, SH and LG named with plan, CPU model, vCPU count, memory, location and kernel; ML, RD and MAC as ADR 0003 names them; the tick thread's CPU affinity is one vCPU that no other thread of any process uses; steal time recorded per second | RS, SH, LG, ML, RD, MAC | a results-log header per machine, written before the first run; the tick thread's affinity and the other threads' affinities read from the operating system at the start and end of every run | checked before the first run and in every run's log. Bites: a run with a second room's tick thread on the same vCPU is flagged invalid | GLOSSARY, the reference server (lines 225–243) and the measuring unit (lines 244–264); r6 R6-HOST-REC2 (lines 645–650); r3 R3-BUDGET-REC1 (lines 1096–1102) |
+AFTER:
+| PM-0001-1 | The rig is named and the measuring unit holds (part 14; a precondition of every server mark) | RS, SH and LG named with plan, CPU model, vCPU count, memory, location and kernel; ML, RD and MAC as ADR 0003 names them; the tick thread's CPU affinity is one vCPU that no other thread of any process uses, in every run but PM-0001-27's, whose unpinned rooms record each process's affinity instead (ADR 0006's PM-0006-13); steal time recorded per second | RS, SH, LG, ML, RD, MAC | a results-log header per machine, written before the first run; the tick thread's affinity and the other threads' affinities read from the operating system at the start and end of every run | checked before the first run and in every run's log. Bites: a run with a second room's tick thread on the same vCPU is flagged invalid | GLOSSARY, the reference server (lines 225–243) and the measuring unit (lines 244–264); r6 R6-HOST-REC2 (lines 645–650); r3 R3-BUDGET-REC1 (lines 1096–1102) |
+END
+
+### FIX PA-9 and the TE-1 follow-up (PM-0001-2: the door phase at 60 Hz, OQ-0001-2 (a)'s stand-ins), NA-2 (ES's counts)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+| PM-0001-2 | The load is the stress scene (parts 3, 14; the setup of the 60 Hz margin) | on every measured tick: 48 soldiers in three teams of 16, each with a connected snapshot-receiving client; 15 big vehicles, 4 of them very large units of at least 20 parts; 300 live projectiles; up to 8 active effects per soldier where the sim has effects; hitscan fire at 700 shots per second (run mean within ±5 %, proposed); portal changes at 1 per second; for the downstream rows, every client's relevant set holds all 47 other soldiers on at least 99 % of its snapshots ("everyone in view"; proposed share) | RS (counters); LG | the server's own per-tick counters written to the results log and checked by script. A sim that lacks vehicles, projectiles or effects adds stand-in entities that are replicated, hit-tested and filtered by interest at the same counts, their change and spawn rates recorded (proposed: the server-only share must carry the stress scene's load, or its marks cannot fail where the real sim's would) | every run of PM-0001-4 to PM-0001-27 and PM-0001-39. Bites: a load script that stops firing after 10 minutes fails the 700 shots per second | GLOSSARY §3, the stress scene (lines 397–437); R2-BUD-REC6 (line 2412, "a snapshot-receiving client on every soldier"); R2-SYNC-REC5 mark 4 (lines 2186–2187) and R2-SYNC-REC9 (line 2280): 700 shots per second |
+AFTER:
+| PM-0001-2 | The load is the stress scene (parts 3, 14; the setup of the 60 Hz margin) | on every measured tick: 48 soldiers in three teams of 16, each with a connected snapshot-receiving client; 15 big vehicles, 4 of them very large units of at least 20 parts; 300 live projectiles; up to 8 active effects per soldier where the sim has effects; hitscan fire at 700 shots per second (run mean within ±5 %, proposed); portal changes at 1 per second (at 60 Hz on encoding ticks: the key's "Soaks"); for the downstream rows, every client's relevant set holds all 47 other soldiers on at least 99 % of its snapshots ("everyone in view"; proposed share) | RS (counters); LG | the server's own per-tick counters written to the results log and checked by script. A sim that lacks vehicles, projectiles or effects adds stand-in entities that are replicated, hit-tested and filtered by interest at the same counts, their change and spawn rates recorded (proposed: the server-only share must carry the stress scene's load, or its marks cannot fail where the real sim's would); the sim step share's missing parts are stood in as OQ-0001-2 (a) stands them in (ADR 0004's S1: 384 effect rows with the effect step's 1 ms ceiling burned per tick, and the remainder topped up to 2.80 ms at 30 Hz and 0.30 ms at 60 Hz), each stand-in named in the run's record. ES's counts and rates (the key) are checked the same way on every ES run | every run of PM-0001-4 to PM-0001-27 and PM-0001-39. Bites: a load script that stops firing after 10 minutes fails the 700 shots per second | GLOSSARY §3, the stress scene (lines 397–437); R2-BUD-REC6 (line 2412, "a snapshot-receiving client on every soldier"); R2-SYNC-REC5 mark 4 (lines 2186–2187) and R2-SYNC-REC9 (line 2280): 700 shots per second |
+END
+
+### FIX NA-5 and NA Q2 (PM-0001-3: the profiles checked per direction)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+| PM-0001-3 | The network profiles are what they say (part 13) | per profile P1 to P4 and B1, on L1 and on L2: measured loss, mean delay and jitter over 100,000 packets within 5 % (relative) of the profile; on L1, the same seed and profile give an identical packet-fate log on two runs; P0 on L2 is the real path, its delay and jitter recorded; for MP's session, the server-measured RTT median within 100 ± 5 ms at P2, his own base RTT recorded | L1; L2 on RS with LG, ML and MP | the simulator's packet-fate log against the profile; on L2, the injected delay set to the profile's RTT minus the path's measured base RTT (median of 10 s of pings at session start; proposed) | once per profile and layer before any mark under that profile counts, and at the start of every L2 session | r5 R5-TEST-REC4's mark (lines 1469–1473; ADR 0002's simulator, applied here to L2: proposed); r2 profiles (lines 1987–1992); R2-TRN-REC4 mark 2's ±5 ms (line 2694) for MP's RTT (proposed) |
+AFTER:
+| PM-0001-3 | The network profiles are what they say (part 13) | per profile P1 to P4 and B1, on L1 and on L2, in each direction: measured loss, mean one-way delay and jitter over 100,000 packets within 5 % (relative) of the profile's per-direction values (half its latency, a uniform jitter of ± half its jitter: the key's split, OQ-0001-16), and the round trip's mean within 5 % of the profile's latency; on L1, the same seed and profile give an identical packet-fate log on two runs; P0 on L2 is the real path, its delay and jitter recorded; for MP's session, the server-measured RTT median within 100 ± 5 ms at P2, his own base RTT recorded | L1; L2 on RS with LG, ML and MP | the simulator's packet-fate log against the profile; on L2, the injected delay in each direction set to half of the profile's RTT minus the path's measured base RTT (median of 10 s of pings at session start; proposed), each direction's delays logged at the impairment layer | once per profile and layer before any mark under that profile counts, and at the start of every L2 session | r5 R5-TEST-REC4's mark (lines 1469–1473; ADR 0002's simulator, applied here to L2: proposed); r2 profiles (lines 1987–1992); R2-TRN-REC4 mark 2's ±5 ms (line 2694) for MP's RTT (proposed) |
+END
+
+### FIX NA-2 and PA-1 (PM-0001-12: the 160 kbps mean judged in ES, the cap in SS)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+| PM-0001-12 | The downstream fits per client (parts 6, 9) | mean at most 160 kbps; p99 of 1-second windows at most 256 kbps; every 1-second window at most 256 kbps (the hard cap; proposed reading of "hard cap"); 0 datagrams above the cap rule; counted per client at the server's send side, UDP payload plus 28 B per datagram. Reported beside it: the same counts in ES (the scene the research mark was set on) and, if LG reaches RS over IPv6, the IPv6 figure | RS (send-side counters) | SS at P2, everyone in view (PM-0001-2), PM-0001-4's runs; ES for 10 minutes (R2-BUD-REC2's own length) | as PM-0001-4; rule B-N | r2 R2-BUD-REC2 (lines 2339–2344); the draft, the budgets table ("Budgets for the netcode proof test"), row "Downstream per client", and part 6's per-client hard cap; worked estimate (lines 1754–1779, 1784: +4.8 kbps for IPv6) |
+AFTER:
+| PM-0001-12 | The downstream fits per client (parts 6, 9) | in ES, the scene R2-BUD-REC2 set its mark on: mean at most 160 kbps and p99 of 1-second windows at most 256 kbps; in SS, the load the cap must hold: every 1-second window at most 256 kbps (the hard cap; proposed reading of "hard cap") and 0 datagrams above the cap rule, its mean reported beside R2's formula evaluated at the run's own counts (entities in each client's set, shots, spawns and events per second: lines 1764–1766), as ADR 0006's PM-0006-17 evaluates it for egress (SS's 700 shots a second alone add about 20.1 kbps to R2's 146.1: the draft's bandwidth estimate); both counted per client at the server's send side, UDP payload plus 28 B per datagram. Reported beside it: if LG reaches RS over IPv6, the IPv6 figure | RS (send-side counters) | ES at P2 for 10 minutes (R2-BUD-REC2's own length), 3 runs (proposed, as PM-0001-4); SS at P2, everyone in view (PM-0001-2), PM-0001-4's runs | as PM-0001-4, in each scene; rule B-N in each | r2 R2-BUD-REC2 (lines 2339–2344); the draft, the budgets table ("Budgets for the netcode proof test"), row "Downstream per client", and part 6's per-client hard cap; worked estimate (lines 1754–1779, 1784: +4.8 kbps for IPv6); GLOSSARY lines 415–416 ("R2's worked bandwidth estimate is not the stress scene"); the netcode and perf reviews of 2026-11-02 (findings 2 and 1) |
+END
+
+### FIX PA-3 and NA-9 as routed (PM-0001-13: both command forms and the commands per datagram recorded)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+| PM-0001-13 | The upstream fits per client (part 5; measures R2-XU-OQ4) | mean at most 48 kbps per client (IPv4), counted at the UDP payload plus 28 B per datagram (the mean: proposed reading); reported: the p99 of 1-second windows, the largest input datagram and the real command size | RS (receive-side counters) | P2, PM-0001-4's runs; every input datagram's size logged per client | as PM-0001-4; rule B-N | r2 R2-BUD-REC1 (lines 2320–2325), restated against P2 (part 13); the draft, "Bandwidth estimate", the bullet "Upstream per client" |
+AFTER:
+| PM-0001-13 | The upstream fits per client (part 5; measures R2-XU-OQ4) | mean at most 48 kbps per client (IPv4), counted at the UDP payload plus 28 B per datagram (the mean: proposed reading); reported: the p99 of 1-second windows, the largest input datagram, the commands per datagram (median and max; 3 to 6 at P2 by the draft's bandwidth estimate) and the real command size, whole and delta-coded (U1 against U2, part 5), with the same counts at P4, where the redundancy cap of 8 is reached | RS (receive-side counters) | P2, PM-0001-4's runs; P4 for 10 minutes for the report; every input datagram's size and command count logged per client, and each command's size whole and as sent | as PM-0001-4; rule B-N | r2 R2-BUD-REC1 (lines 2320–2325), restated against P2 (part 13); the draft, "Bandwidth estimate", the bullet "Upstream per client" |
+END
+

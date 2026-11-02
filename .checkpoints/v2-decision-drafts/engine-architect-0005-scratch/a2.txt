@@ -1,0 +1,4 @@
+   default depth limit (R1-DATA-OQ4) and runs the same tests with garde on wasm32 (R1-DATA-OQ5). Proposed (reason:
+   ADR 0004 part 1 sizes its pools from this report): for each test mode, every pool's reported worst case, and for
+   active effects the reserved share per target, equals a count by hand from the test content's numbers, and every
+   pool the content leaves without a bound is named as such.

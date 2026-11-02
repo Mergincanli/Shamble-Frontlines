@@ -1,0 +1,6 @@
+SUBS = [
+("  (proposed: the draft's part 6 (the snapshot header's tick) and its \"Failure modes\" row \"A tick counter wraps\"\n  expect it only at 60 Hz). Portal changes are scripted at one",
+ "  (proposed: a second check beside PM-0001-58's deterministic wrap test, which the \"Failure modes\" row \"A tick or\n  sequence counter wraps\" names; from 0, the 54,000 ticks of an S30 never reach 65,536). Portal changes are scripted at one"),
+("  at 60 Hz (1 ÷ 30, 1 ÷ 60), above the 1 % tail a p99 reads (proposed: \"re-flood ticks included\" names no rate).",
+ "  at 60 Hz (1 ÷ 30, 1 ÷ 60), above the 1 % tail a p99 reads (proposed: \"re-flood ticks included\" names no rate). At\n  60 Hz a snapshot is encoded on every second tick (part 2), and changes 60 ticks apart all land on one parity, all on\n  encoding ticks or none (the perf review of 2026-11-02, finding 9), so the door script is phase-locked to the encoder\n  and every re-flood tick also encodes: the tight case of part 3's restated reason, 8.28 of 8.33 ms on the planning\n  check (GLOSSARY.md:62–75) (proposed: the case a 60 Hz pass must cover). Each re-flood's tick and whether it encoded\n  are logged, and the share is reported."),
+]

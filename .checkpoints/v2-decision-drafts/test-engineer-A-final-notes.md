@@ -9,3 +9,6 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - scratch moved to test-engineer-A-scratch/ (blk.py helper: appends a FIX block with BEFORE copied from orig-000N.md at 75615d1; work-000N.md = applied copy). No blocks written yet.
 - block 1 (row list) and block 2 (machines key: EA-7/IE-2 pin exemption, IE-9/10 LG) written; next: scenes key (NA-2/PA-1 ES gated)
 - blocks 3 (ES key, NA-2/PA-1) and 4 (profiles split, NA-5) written; next: soaks key (PA-9), V-S (EA-7, IE-9/10)
+- blocks 5 (soaks: PA-9, TE-4) and 6 (V-S: EA-7/IE-2, IE-9/10) written; next: rows PM-0001-1, -2, -3
+- rows PM-0001-1 (EA-7), -2 (PA-9, TE-1 stand-ins, ES), -3 (NA-5) written; next: PM-0001-7?, -12 (NA-2/PA-1), -13 (PA-3/NA-9)
+- rows PM-0001-12 (NA-2/PA-1), -13 (PA-3/NA-9) written; next: PM-0001-17 + new -58 (TE-4)
