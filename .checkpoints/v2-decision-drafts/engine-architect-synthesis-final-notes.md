@@ -20,3 +20,11 @@
 - items 6 (252-258), 7 (300), 8 (321-322, 330-334) FIX written. Next: OQ-SPIKE-1 section in SPIKE_PLAN; item 8 who judges? ; SPIKE_PLAN 'What this plan does not decide' (390-393) update; then README
 - SPIKE_PLAN 'does not decide' + new '## Open questions' with OQ-SPIKE-1 (390-393) FIX written. Next: SPIKE_PLAN other stale refs check (grep 'one command per tick', OQ-0006-2 wording); then README
 - asset-pipeline research Place FIX written (OQ-SPIKE-1 link). SPIKE_PLAN done. Next: README (counts, header line 10, decisions table rows re-pinned + new rows, Needs outside §6, I-3, I-6, I-11, I-13, CF-2 line 161->162 and other register line pointers)
+- README decisions table (rows 34-106) re-pinned at 604a497 with changed questions/deciders and new rows (gen_readme_table.py)
+- README table: 84 row FIX blocks (gen_readme_table.py); draft_pointers.py on preview: checked 94, ok 94, off 0. Next: README header/counts, Needs outside §6, I-3/I-6/I-11/I-13, CF-2 161->162
+- README needs outside §6: ADR 0003 teardown, ADR 0004 part 17 spawning, ADR 0005 full-pool + AB-2 immunity FIX written. Next: README header line 10, counts 16-25, I-3/I-6/I-11/I-13, CF-2
+- README I-3, I-6, I-11, I-13 FIX written. Next: README CF-2 (157, line 161->162), header line 10, drafts table counts 16-25
+- CF-2 FIX (README:157, part 3, line 162). Next: header line 10, counts 16-25
+- README header (10), drafts table counts (16-21), totals (23-25) FIX written. Next: full verification pass of applied copies (pointers, tables, under-table text, counts by script), then NOTE blocks (PA, deferred items), then final notes DONE
+- glossary check on applied copies: exact 0 in OVW/SPK/IDX; 6 new in-context hits judged correct (IDX:308 'its hash' -> 'its content hash', I-6 rewritten). Next: NOTE blocks, final checks, DONE
+- NOTE blocks written (GE-5, GE-13, TE-1, review questions, IE-2, FC-6, coordinator pointers, deferred, counts). Next: final replay check, DONE

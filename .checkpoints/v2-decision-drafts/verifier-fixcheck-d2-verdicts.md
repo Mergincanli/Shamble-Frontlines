@@ -55,7 +55,7 @@ Base (text before the final round): 47eadd9. HEAD for ADRs: 604a497 (branch clau
 | 47 | 0003:1179 (PM-0003-45) | after each teardown `total`, `texturesSize`, `attributesSize`, `programs`, `renderTargets` equal; heap within 0.5 MB (PM-0003-24's flat rule) | R3-MEASURE-F3 617–622; PM-0003-24 | confirmed | r3 619–620 lists those fields; PM-0003-24 "at most 0.5 MB above" | – |
 | 48 | 0003:1180 (PM-0003-46) | WebGPU on Linux Chrome only on Intel Gen12+; headless Chrome on SwiftShader; the route is ADR 0002 part 9 | R3-WGPU-F17 159–162; R3-MEASURE-F8 648–653; ADR 0002 part 9 | confirmed | r3 160: "Linux (Intel Gen12+ GPUs only)"; r3 650: "SwiftShader Device (Subzero)"; 0002:604–615 | the SwiftShader WebGPU adapter is labelled not researched |
 | 49 | 0003:1181 (PM-0003-47) | legacy's `_sd`, `_so`, `_st` write only on a change (shamble-game.js 2606–2608) | legacy code | confirmed | shamble-game.js:2606–2608: `if(el.style.display!==v)`, `if(el.style.opacity!==s)`, `if(el.textContent!==s)` | – |
-| 50 | 0003:1213–1222 | the legacy view is legacy itself in a second Brave window, since pageshot renders on the CPU | AD-8 | confirmed, with a note | proposed by the art review; consistent with LOOK_V2 §9 only loosely: §9 and PM-0003-17 (0003:1151), part "What a spike must prove" (0003:960) and the Testing line (0003:1367) still say "a legacy screenshot" | low; a screenshot of the live legacy window satisfies both |
+| 50 | 0003:1219–1228 | the legacy view is legacy itself in a second Brave window, since pageshot renders on the CPU | AD-8 | confirmed, with a note | proposed by the art review; consistent with LOOK_V2 §9 only loosely: §9 and PM-0003-17 (0003:1151), part "What a spike must prove" (0003:960) and the Testing line (0003:1367) still say "a legacy screenshot" | low; a screenshot of the live legacy window satisfies both |
 | 51 | 0003:1236–1238 (look step 4) | Expected: the ink at the base of buildings, and where soldiers stand, is as heavy as their silhouette | AD-4's proposal; LOOK_V2 §2 | unsupported as a LOOK_V2 expectation | LOOK_V2 line 16: "thick black outlines, especially strong on buildings"; §6.2 (line 52, `[DEFAULT]`): "thick ink on silhouettes, thinner lines inside"; no LOOK_V2 line names the contact line, and none says the soldiers' contact line is silhouette weight | finding F5 (rule: a look expectation beyond LOOK_V2's words) |
 | 52 | 0003:1287–1290 (look step 26) | timing judged in ADR 0001's netcode checklist step 7 at P2 | ADR 0001 | confirmed | 0001 netcode checklist step 7: "At P2 … The shot (flash, tracer) is instant; the hit marker comes a moment later, when the server confirms" | – |
 | 53 | 0003:1295–1298 (look step 28) | below a `devicePixelRatio` of 1.5 a renderer ratio of 2 is supersampling | R3-BUDGET-F3 (inferred) | confirmed as labelled | inferred, labelled | – |
@@ -117,3 +117,169 @@ Base (text before the final round): 47eadd9. HEAD for ADRs: 604a497 (branch clau
 | 109 | 0005 PM-0005-24 | minute-5 floor 9,000 ticks; refused at 8,999, accepted from 9,000 | LOOP_V2 §4 | confirmed | LOOP_V2 lines 50–52 "Every team reaches Tech 1 by minute 5 at the latest" | – |
 | 110 | 0005 PM-0005-25 | 13 hits, 12 × 0.072 = 0.864 s; 11 × 11 = 121 ≥ 120; 63 shielded hits, 62 leave 1.2 HP; 19 unshielded | LEGACY_TUNING | confirmed (arithmetic) | 13 × 8 = 104 ≥ 100; Bagpipe `damage` 11; Warrior 120 HP; 8 × 0.3 = 2.4, 150 ÷ 2.4 = 62.5 → 63, 62 × 2.4 = 148.8; 150 ÷ 8 = 18.75 → 19 | – |
 | 111 | 0005 Feel Lab checklist, 0005:2350–2355 | step 3: "refused in both, with no start shown" | GD-8 | wrong (structure) | 0005 at 604a497 has two steps numbered 3 (0005:2350–2351, the old "a short start of the ability may show and then undo"; 0005:2352–2355, the new one) and no step 4; the old step 4, "Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per ability", is gone, though PM-0005-46 (0005:2251) needs "his answer recorded" | finding F1a (high), test-engineer B |
+
+Claims rows 1–111 cover every added or changed claim with a source or a number in ADR 0003, 0004 and 0005 between 47eadd9 and 604a497 (diffs kept in verifier-fixcheck-d2-scratch/diff-*.txt). Changed lines that only re-point a cross-reference or reword without a new fact were read and are not listed one by one.
+
+## Blocks table (ADR 0003, 0004, 0005)
+
+Every FIX block of graphics-engineer (final, -b), rust-reviewer (final, -b, -c, -d), engine-architect ADR 0005 (final, -b), game-designer (final) and test-engineer B (final, -b, held) that names one of the three files was checked by script against 604a497 (verifier-fixcheck-d2-scratch/applycheck.py: AFTER present, BEFORE gone; lostcheck.py: structural lines a BEFORE drops). All AFTER texts are present except nine that later blocks of the same round rewrote on purpose (graphics-engineer-fixes-final-b.md for part 7 and OQ-0003-16/-20; rust-reviewer-fixes-final-b.md and -d.md for part 7 and part 20; engine-architect-0005-fixes-final-b.md for CD-2 and the spike item); their content survives in the later text. Two blocks removed lines they did not mean to remove (F1a, F1b).
+
+| block | finding | resolved? | new problem |
+|---|---|---|---|
+| GE: FIX AD-1, GE-4 (part 5; 5.c; 5.f; budget row; part 7; Consequences; Revisit; Rollback ×2; migration 4; Appendix A) | AD-1 high, GE-4: a look floor | yes: every route that could switch a `[DECIDED]` technique off at Low now waits for OQ-0003-16, in parts 5 and 7, the budget row, PM-0003-23, the fail route, Rollback and Revisit (rows 1, 7, 13, 25, 43) | none |
+| GE: FIX GE-1 (5.a; part 6; CL rows; GPU parts 1, 7; options; AS4; spike part) + EA-0005 FIX GE-1 ×3 | GE-1 high: one material per slot content | yes: the key is defined once (0003:175–182, 0005:1694–1700) with legacy's `_matSig` as its source (row 2), and PM-0005-34/-35 test it with a (class, faction) bite | none |
+| GE: FIX AD-4, AD-6, AD-11, AD-1, PA-8 (5.b); FIX AD-4 (OQ-0003-2); FIX AD-6 (5.h; trace; GPU part 2); EA-0005 FIX AD-6 ×2 | AD-4, AD-6, AD-11 | yes: the contact line is named as a visible difference (inference, labelled), a structure class carries the building weight, the width scales with ratio × scale (rows 3, 4, 8) | the routed checklist step 4 sets an expectation LOOK_V2 does not state (F5) |
+| GE: FIX PA-10 (5.d, 5.n, Q5 table) | PA-10 | yes (rows 6, 11) | none |
+| GE: FIX PA-8 (part 7) | PA-8 | yes: the whole frame is counted, 799 to 817 (row 14) | none |
+| GE: FIX PA-4 (part 7) + TE-B FIX PA-4 (PM-0003-44) | PA-4 | yes: a presented-frame count, its share OQ-0003-17 (rows 17, 26, 46) | none |
+| GE: FIX AD-10, REDUCED-MOTION (5.l) + TE-B PM-0003-9, step 27 | AD-10 | yes (rows 9, 39) | none |
+| GE: FIX EA-11 ×4 (parts 6, 8, 9, 10) + TE-B FIX EA-11 (BS) | EA-11 | yes (rows 12, 19, 20, 21) | none |
+| GE: FIX AD-7 (part 11; GPU part 8) | AD-7 | yes: both houses, with the kit fallback (row 23) | none |
+| GE: FIX FC-9 (CC10), FA-L2 (GW17) | FC-9, FA-L2 = B25 | yes: the CC10 outcome no longer reads as LOOK_V2's words; GW17's camera-player half stays pending under OQ-0003-15 | none |
+| GE: FIX AD-14, PA-11 (GPU part 4) + EA-0005 FIX PA-11 (AP-5) | AD-14, PA-11 | yes (rows 104, 105) | none |
+| GE: FIX TE-5 (part "What a spike must prove") + TE-B FIX TE-5 (PM-0003-3) | TE-5 | yes (rows 30, 36) | Appendix A still calls R3-WGPU-REC1 "adopted" while its mark 2 is changed (F6) |
+| GE: FIX new OQ-0003-16 to -19; GE-b FIX OQ-0003-20 | AD-1, GE-4, PA-4, REDUCED-MOTION, COLOUR-TELL, PA-7 | yes: five questions with options, decider and evidence; no pick on the look (rows 25–29) | none |
+| GE-b: FIX GE-6 (part 10 teardown) + TE-B PM-0003-45 | GE-6 | yes (rows 22, 47) | none |
+| GE-b: FIX AD-12 (part 11, trace row) + TE-B step 15, families step 4 | AD-12 | yes (row 24) | none |
+| GE-b: FIX PA-7 (part 8) | PA-7 | yes (row 18) | none |
+| TE-B: FIX PA-6, PA-7 (key: tail form, V, S) | PA-6, PA-7 | partly: the tail form and S are sound (rows 29, 33) | the tail form's own reason miscounts the p99 rank (F4), and its validity reason names PM-0003-27's 20 % as the smallest p99 change while PM-0003-30 compares 3 % (F2) |
+| TE-B: FIX GE-14 (PM-0003-2), GE-9 (-6), GE-3 (-7, -33), PA-12 (-36), GE-2 (-36, -46), PA-14 (-19, -47), GE-8 (-16, step 28), GE-7 (step 26) | as named | yes (rows 35, 37, 38, 41, 42, 44, 45, 48, 49, 52, 53) | GE-14's spec reading is unverified here (no fetch); PM-0003-19 says "measured" for a static scan (row 42, low) |
+| TE-B: FIX AD-2, AD-5, AD-8, AD-9, AD-14, AD-3 (checklist intro, test view, steps 9–13, 31, 32) | AD-2, AD-3, AD-5, AD-8, AD-9, AD-14 | yes (rows 31, 50, 54) | the checklist's legacy view in a second Brave window sits beside "a legacy screenshot" in PM-0003-17 and part "What a spike must prove" (row 50, low); steps 27 and 32 add expectations in the review's words (F5) |
+| TE-B: FIX AD-1, PA-4, PA-7 (fail route) | AD-1 | yes | none |
+| RR: FIX RR-4 + GD-8 + POOL-FULL (part 1); OQ-0004-11; TE-B PM-0004-6, -75 | RR-4, POOL-FULL | yes (rows 55, 76, 79, 82) | none |
+| RR: FIX EA-3 (part 3) + TE-B PM-0004-29 | EA-3 | yes (row 56) | none |
+| RR: FIX NA-8 (part 5, S18) + TE-B PM-0004-68 | NA-8 | yes (rows 57, 58) | none |
+| RR: FIX SA-15 (part 8) + TE-B PM-0004-29 bite | SA-15 | yes (row 62) | none |
+| RR: FIX FB-10 (part 11) | FB-10 | yes (row 64) | none |
+| RR: FIX GD-4 + FC-1 + GD-7 + GD-8 + GD-STEAL + GD-CARRIER (part 17; GE9, GE10) | GD-4, FC-1, GD-7, GD-8 | yes (rows 65–67) | none |
+| RR: FIX GD-8, GD-6, GD-REJOIN (parts 18, 19) + TE-B PM-0004-65 | GD-6, GD-8 | yes (rows 68–70) | none |
+| RR: FIX RR-3 + RR-9 (part 20, S20) + TE-B PM-0004-61 | RR-3, RR-9 | yes (rows 71, 72) | the Wasm half of the hook is S20's to check (stated) |
+| RR: FIX new OQ-0004-8 to -12 | GD-STEAL, GD-CARRIER, GD-REJOIN, POOL-FULL, GD-BOT-LOOT | yes (rows 73–77) | "late steals" (F7, low); "most slots" (row 77, low) |
+| RR: FIX TE-1 (S1, S2) + TE-B PM-0004-2 | TE-1 | yes (row 78) | none |
+| RR: FIX TE-6 (migration phase 6, test plan) + TE-B "no measurable mark" lines | TE-6 | yes (row 83) | none |
+| RR-b: FIX RR-1 ×3 (part 7, Why, part 20) + TE-B PM-0004-22, -23 | RR-1 | yes (rows 59, 60) | none |
+| RR-c: FIX RR-11 (part 9) + TE-B PM-0004-21 | RR-11 | yes (row 63) | none |
+| RR-d: FIX fixcheck-d0-9 ×2 (part 7) | fixcheck-d0 row 9 | yes: word for word as fixcheck-d0 proposed (rows 59, 61) | none |
+| TE-B: FIX PA-5 (PM-0004-8), RR-10 (PM-0004-74), RR-12 (PM-0004-24), RR-13 + SA-13 (PM-0004-60) | as named | yes (rows 80, 81) | none |
+| EA-0005: FIX FB-11 (author line) | FB-11 | yes (row 84) | none |
+| EA-0005: FIX EA-6 (CD-8, I-6, Appendix A) | EA-6 | yes (rows 85, 88) | none |
+| EA-0005: FIX ADR 0004 part 1 routed (CD-2, frame part 1, spike item 2, Harder, Appendix A) + EA-0005-b FIX RR-4 ×2 + TE-B PM-0005-5 | RR-4 (routed) | yes (row 86) | none |
+| EA-0005: FIX RR-16 (CD-3, Appendix A) | RR-16 | yes (row 87); ADR 0002 part 5 carries the matching sentence (0002:350), so the NOTE's condition holds | none |
+| EA-0005: FIX FB-7, FB-13, FC-8, IE-12 (OQ-0005-AP1, list row) | as named | yes (rows 103, 107) | none |
+| EA-0005-b: FIX GD-7, GD-PICK-VIS (frame need line, list rows) | GD-7 | yes | none |
+| GD: FIX RR-4 + POOL-FULL (AB-1 "When a pool is full") | RR-4 (0005 half), POOL-FULL | yes (row 89) | the projectile formula's "times the weapon's pellets" gives 0 for legacy's Molotov (F9, low) |
+| GD: FIX GD-7 (AB-2's immunity rule) | GD-7 | yes (row 91) | none |
+| GD: FIX GD-7 (AB-2's need line) | GD-7 | the need line is added | **its BEFORE was AB-3's heading line, so the heading `AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).` is deleted and AB-3's body now reads as part of AB-2 (F1b, high)** |
+| GD: FIX GD-7 (AB-6 spawn-protection row, need), OQ-0005-AB14 | GD-7 | yes (rows 95, 97) | none |
+| GD: FIX GD-8 (active reload, offer rows, AB8, AB10, u4, u6, item 5) + TE-B PM-0005-25, -29, -31 | GD-8 | yes (rows 94, 99–102, 110) | none |
+| GD: FIX GD-8 (AB9: E for a pickup against E for a steal) | GD-8 finding 12 | the precedence question is added | it states "ADR 0001 part 12 has E place a cache too", which ADR 0001 no longer says (5a24122) and LOOP_V2 never said (F8) |
+| GD: FIX GD-2's data half (AB-5) | GD-2 | yes (row 93) | the old Need line was kept, so AB-5 has two (F10, low) |
+| GD: FIX GD-PICK-VIS (AB7, OQ-0005-AB15) | GD-PICK-VIS | yes (row 98) | none |
+| GD: FIX TE-8 (item 1, u1) + TE-B PM-0005-18 | TE-8 | yes (row 99) | none |
+| TE-B: FIX EA-9 (PM-0005-10), GD-5 (-31), FB-12 + GE-11 (-42), GE-10 (-34), GD-8 finding 9 (-24) | as named | yes (row 109) | none |
+| TE-B: FIX AD-5 (LOD checklist; families step 1), AD-12 (families step 4) | AD-5, AD-12 | yes | none |
+| TE-B: FIX GD-8 finding 14 (Feel Lab step 3) | GD-8 | **no: its BEFORE was step 4, so the old step 3 stays, a second step 3 follows it, and step 4 (the record of his ABL-PREDICT answer) is gone (F1a, high)** | as stated |
+
+NOTEs that defer or disagree, and whether the reason holds:
+- RR NOTE TE-1 disagrees with "half of each at 60 Hz": sound. Part 6 keeps the effect step at 1 ms at both rates, so the 60 Hz remainder is 4.17 − 3.87 = 0.30 ms; half of 2.80 (1.40 ms) would overrun the 4.17 ms share by itself (2.2 + 1.67 + 1.40 = 5.27).
+- RR NOTE RR-9: the Wasm half is not checked (no wasm32 target in the container), and S20 carries it. Sound.
+- RR NOTE RR-3: part 20's pointer to "the Advisor's question in ADR 0001" may take OQ-0001-18's number. Deferred, optional, correct as it stands.
+- RR NOTE TE-6: no S claim for parts 17 and 19, since no spike builds them (slice 4). Sound.
+- GD NOTE GD-2 points out ADR 0001's old "(E also steals and places, LOOP_V2 §4)". Its own AB9 text then repeats the claim (F8).
+- GD NOTE GD-7 recommends (a) with (ii) for OQ-0005-AB14, for "Decisions needed". This is a recommendation, not text in the draft. The OQ stays without a pick, as the section's rule says.
+- EA-0005 NOTE RR-16: conditional on ADR 0002 part 5's sentence, which is present (0002:350). Holds.
+- TE-B NOTE GE-14: the WebGPU error model is not read, so it is marked unverified in the row. Still unverified (no fetch this unit).
+- TE-B NOTE PA-14 and AD-12 (optional routes to graphics-engineer): AD-12 was taken (part 11 names GW18). PA-14's "written only when a value changes" was not added to part 10 step 7. That is optional, and PM-0003-47 carries the rule.
+
+## Consistency table (the drafts at 604a497; the synthesis rows follow in their own section)
+
+| item | where | same everywhere? | note |
+|---|---|---|---|
+| event-release rule | ADR 0001 part 7 (0001:322–328); ADR 0002 part 5 (0002:292); ADR 0003 parts 9, 10 (0003:443–451) | yes | ADR 0001 and 0002: the Worker writes each spatial event into the first block whose delayed time reaches its tick; ADR 0003 plays "the tick's events" from the blocks it receives with remote entities "already delayed in the Worker", which is the same rule seen from the page; PM-0003-41's bite (next block's events, one tick late) fits |
+| aim-point clamp | ADR 0001 parts 5, 8 (0001:218, 241–250), PM-0001-21, Appendix R2-SYNC-REC2 (0001:1664) | yes | "clamped, not refused" in all four; ADR 0003, 0004, 0005 do not restate it |
+| 60 Hz stand-ins 1 ms and 0.30 ms | ADR 0001 OQ-0001-2 (a) (0001:1034–1047); ADR 0004 S1 (0004:982), PM-0004-2 (0004:1107), part 6 (0004:233–239) | yes in the drafts | SPIKE_PLAN at 604a497 has no 60 Hz stand-in text yet (the synthesis adds it); see the synthesis section |
+| one material per slot content | ADR 0003 5.a (0003:175–182), part 6 (0003:313–315), CL rows (0003:775); ADR 0005 GPU parts 1, 7 (0005:1694–1700, 1749–1753), options (0005:1768–1776), spike part (0005:1840–1843), Consequences (0005:1922–1923), PM-0005-34, -35 | yes | the older "one shared material per slot and faction" (0003:499 trace row; 0005:1708 GPU part 2; 0005:1790 the C-B options row) is the same key for a faction slot, not a conflict |
+| OQ-0006-13 as the deploy-job question; no OQ-0002-9 | all nine docs at 604a497 | yes | `grep OQ-0002-9` finds nothing in the six drafts, ENGINE_OVERVIEW, SPIKE_PLAN or README |
+| the look floor | ADR 0003 part 5 (0003:164–170), 5.c, 5.f, budget row, part 7 (0003:391–396), OQ-0003-16, Consequences, Revisit, Rollback, migration 4; PM-0003-23; "When a mark fails"; look steps 31 | yes | the four `[DECIDED]` carriers are named identically in part 5, PM-0003-23 and the fail route (toon materials, ink, sun shadow map, emissive slots' colour); AO, bloom and the comic touches are `[DEFAULT]` everywhere |
+| AB-3 (weapons' own bookkeeping, option B1) | ADR 0005 (12 references) | no | the heading is gone (F1b) |
+| E keys at uplinks and caches | ADR 0001 part 12 (0001:523–524); ADR 0005 OQ-0005-AB9 (0005:1297–1299); LOOP_V2 §4 | no | ADR 0001: "placing a cache … name[s] no key"; ADR 0005: "ADR 0001 part 12 has E place a cache too" (F8) |
+| the offer's size and queue | ADR 0001 part 12 ("three choices by default; the offer's size is data, ADR 0005 AB-8"); ADR 0004 parts 8, 18; ADR 0005 AB-8, OQ-0005-AB8, u6, PM-0005-31 | yes | the size is data (3) everywhere; the queue's length is data; a full queue is OQ-0005-AB8's |
+| money's start | LOOP_V2 §3 ($300); ADR 0004 part 18, S16, PM-0004-65, migration phase 6; ADR 0005 AB-5 | yes | – |
+| spawn protection | LOOP_V2 §2 (3 s, `[DEFAULT]`); ADR 0004 part 17, migration phase 6 (90 ticks); ADR 0005 AB-2, AB-6, item 5, PM-0005-25, OQ-0005-AB14 | yes | – |
+| pool overflow | ADR 0004 part 1, OQ-0004-11, PM-0004-6, -75; ADR 0005 CD-2, AB-1, OQ-0005-AB9 | yes | refusal is a spike fixture until OQ-0004-11 is answered, in each |
+| the test view | ADR 0003 "How to read the table", steps 9, intro; ADR 0005 families step 1, LOD checklist | yes | height 40, boom 56.6, fov 15°, yaw 45° in both |
+| the Feel Lab's ABL-PREDICT answer | ADR 0005 PM-0005-46 (0005:2251); Feel Lab checklist (0005:2342–2355); SPIKE_PLAN:372 | no | PM-0005-46 and SPIKE_PLAN expect the checklist to record his answer; the step that recorded it is gone (F1a) |
+
+## Findings: ADR 0003, 0004, 0005 at 604a497, ranked
+
+**F1b (high). ADR 0005 lost the AB-3 heading.** Author: game-designer (block "FIX GD-7: the immunity rule's need (AB-2)", game-designer-fixes-final.md lines 70–76: its BEFORE is the AB-3 heading line, its AFTER only AB-2's new Need line).
+- Current text, 0005:899–901: `  - Need: VISION_V2 §6.3 ("combos and counters can emerge"); the immunity rule: LOOP_V2 §2 only.` followed directly by `  - What: a weapon definition holds the sim fields only (fire interval, fire mode, magazine, …`
+- What the source says: at 47eadd9 that body sat under `- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**`. ADR 0005 still cites AB-3 twelve times (for example 0005:141 "bookkeeping (AB-3)", 0005:504, 0005:955 "a thrown weapon (AB-3)"), and AB-6 says "Each row uses AB-1 to AB-5". The decision for option B1 now has no heading and reads as a second What/Why/Research/Need set inside AB-2.
+- Smallest fix: insert `- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**` between 0005:900 and 0005:901.
+
+**F1a (high). ADR 0005's Feel Lab checklist has two steps 3 and no step 4.** Author: test-engineer B (block "FIX GD-8 (review-game-designer finding 14: Feel Lab step 3 …)", test-engineer-B-fixes-final.md lines 884–894: its BEFORE is step 4, not step 3).
+- Current text, 0005:2350–2355: `3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both; in the predicted variant a short start of the ability may show and then undo. Record: whether that undo is acceptable.` and then `3. Before his team reaches Tech 1, … Expected: the press is refused in both, with no start shown, …`. Nothing follows.
+- What the source says: PM-0005-46 (0005:2251) needs "every step of the Feel Lab checklist below judged, and his answer recorded". SPIKE_PLAN:372 says "the Feel Lab checklist (ADR 0005, inside PM-0005-46) answers ABL-PREDICT". The deleted step 4 was the one that recorded that answer: "4. Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per ability." The two steps 3 also contradict each other (a start "may show" against "no start shown").
+- Smallest fix: delete 0005:2350–2351 (the old step 3) and restore the old step 4 after the new step 3.
+
+**F8 (medium). ADR 0005 OQ-0005-AB9 says ADR 0001 has E place a cache.** Author: game-designer.
+- Current text, 0005:1297–1299: "since a steal is holding E (LOOP_V2 §4 step 4), ADR 0001 part 12 has E place a cache too, and a pickup is asked for through the same button edges".
+- What the source says: ADR 0001 at 604a497, 0001:523–524: "(a steal is holding E, LOOP_V2 §4 step 4; picking up and placing a cache, steps 2 and 3, name no key)". The old "E also steals and places" was removed in 5a24122, and the game-designer's own NOTE GD-2 pointed out that LOOP_V2 names no key for placing. LOOP_V2 lines 42–43 name none.
+- Smallest fix: "since a steal is holding E (LOOP_V2 §4 step 4), picking up and placing a cache may use the same key (LOOP_V2 steps 2 and 3 name none; ADR 0001 part 12), and a pickup is asked for through the same button edges".
+
+**F2 (medium). ADR 0003's validity rule for the tail form rests on a wrong "smallest p99 change".** Author: test-engineer B.
+- Current text, 0003:1102–1104: "its 3 run p99s lie within 10 % of their median (proposed: the medians cannot see the tail; 10 % is half the smallest p99 change a row here compares, PM-0003-27's 20 %, as ADR 0001's V-S takes half its tightest tolerance)".
+- What the source says: PM-0003-30 (0003:1165), which is on the tail-form list (0003:1084–1085), keeps render bundles "only if they cut the WebGPU backend's frame time (p99) by more than V's 3 %". So the smallest p99 change a row compares is 3 %, not 20 %. With p99s allowed to spread by 10 % between runs, a 3 % p99 cut cannot be told from noise. ADR 0001's V-S analogy is right as such (0001:1364: "half the tightest tolerance compared against, R2-TRN-REC6 mark 2's 5 %").
+- Smallest fix: in PM-0003-30, "by more than V's 3 % on the run medians (proposed: a p99 cut must exceed the tail form's 10 % spread)", or a render-bundle cut of more than 10 % of the p99. Then the reason can keep "PM-0003-27's 20 %" as "the smallest p99 threshold a gated row here sets".
+
+**F5 (low to medium; the look rule). Three look-checklist expectations go beyond LOOK_V2's words.** Author: test-engineer B, from the art review's proposals AD-4, AD-10 and AD-3.
+- Current text: step 4 (0003:1236–1238) "the ink at the base of buildings, and where soldiers stand, is as heavy as their silhouette"; step 27 (0003:1294) "the dotted HUD still reads"; step 32 (0003:1316–1319) "his own soldier, the three factions and a thrown grenade read at a glance; … the glow and the effects do not wash out the units".
+- What the source says: the checklist's own intro (0003:1222–1223) promises "the expected result in LOOK_V2's words". LOOK_V2 line 16 says "thick black outlines, especially strong on buildings", and §6.2 (line 52, `[DEFAULT]`) says "thick ink on silhouettes, thinner lines inside". No LOOK_V2 line names a contact line, sets soldiers' contact ink at silhouette weight, or says "read at a glance" or "wash out".
+- Smallest fix: turn each into something to look at plus a pick. Step 4: "Look at: the ink where buildings and soldiers meet the ground (5.b's visible difference). Pick: … and whether that contact line is heavy enough". Step 27: "Record: whether the dotted HUD still reads". Step 32: keep §6.1's sentence as the Expected line and record the rest as his notes.
+
+**F6 (low). ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted", though its mark 2 is changed.** Author: graphics-engineer (TE-5's fix).
+- Current text, 0003:1415: "| R3-WGPU-REC1 | adopted | part 1 |".
+- What the source says: r3 913 sets "post effects that exist on one backend only are switched off for this test". 0003:976–978 and PM-0003-3 (0003:1137) now compare "with every kept effect on" and call the mark "changed".
+- Smallest fix: "| R3-WGPU-REC1 | changed: mark 2 compares the backends with every kept effect on, not with one-backend effects switched off (F-A, part 1; the test review's TE-5) | part 1 |".
+
+**F4 (low). An off-by-one in the tail form's reason.** Author: test-engineer B.
+- Current text, 0003:1086: "at 600 frames a p99 is the 6th-largest frame".
+- What the source says: 0003:1095 defines p99 as "the 594th smallest value", which is the 7th-largest. Six frames lie above it.
+- Smallest fix: "a p99 is the 7th-largest frame (6 lie above it)".
+
+**F7 (low). ADR 0004 OQ-0004-8 cites "late steals" as a LOOP_V2 §11 counter.** Author: rust-reviewer.
+- Current text, 0004:912–913: "reading steals and late steals among LOOP_V2 §11's objective counters".
+- What the source says: LOOP_V2 §11: "objective counters (cashouts, steals, deliveries, harvester kills)".
+- Smallest fix: "reading steals among LOOP_V2 §11's objective counters, and steals in the countdown's last seconds (proposed)".
+
+**F9 (low). ADR 0005 AB-1's projectile formula gives 0 for its own example.** Author: game-designer.
+- Current text, 0005:870–872: "at most ⌊lifetime ÷ fire interval⌋ + 1 live shots … times the weapon's pellets; legacy's Molotov … gives ⌊1.4 ÷ 1.05⌋ + 1 = 2 per thrower".
+- What the source says: LEGACY_TUNING.md line 180 gives the Molotov `pellets` 0 (as for `katana` and `torque`), so "times the weapon's pellets" yields 0.
+- Smallest fix: "times the weapon's pellets (1 where legacy's `pellets` is 0, as for the Molotov)".
+
+**F10 (low). ADR 0005 AB-5 has its Need line twice.** Author: game-designer (block "FIX GD-2's data half": its BEFORE stopped above the old Need line).
+- Current text: 0005:948 "- Need: VISION_V2 §6.5; the faction's list: §6.7." and 0005:949 "- Need: VISION_V2 §6.5.".
+- Smallest fix: delete 0005:949.
+
+**F12 (low). ADR 0003 PM-0003-19 calls a static scan "measured".** Author: test-engineer B.
+- Current text: "legacy measured about 30 DOM writes per frame as a cost, `docs/AUDIT_BUGS_PERF.md` line 27, P3".
+- What the source says: AUDIT line 27 gives the method as "static scan (L2420–2722)".
+- Smallest fix: "legacy's audit counted about 30 DOM writes per frame (a static scan, …)".
+
+**F13 (low). "Legacy screenshot" against the checklist's live legacy window.** Author: test-engineer B, with graphics-engineer's part "What a spike must prove".
+- Current text: the look checklist (0003:1223–1228) shows legacy live in a second Brave window. PM-0003-17 (0003:1151) and 0003:960 and 0003:1367 still say "a legacy screenshot".
+- Note: a screenshot of that window meets both, and LOOK_V2 §9 asks for screenshots. Smallest fix: "beside the legacy view (legacy in Brave, or its screenshot) at the same framing" in PM-0003-17.
+
+**F14 (low). ADR 0004 OQ-0004-12 says "bots fill most slots".** Author: rust-reviewer.
+- Current text, 0004:952: "bots fill most slots in the start modes (VISION_V2 §3)".
+- What the source says: VISION_V2 line 49: "Bots fill empty slots."
+- Smallest fix: "bots fill empty slots (VISION_V2 §3), so in small start modes many are bots".
+
+Rules check on the changed text (§3 and §4 of the report's appendix):
+- GLOSSARY "Retire (exact)" phrases: 0 in every draft (glossary_check_drafts.py at the working tree, which equals 604a497 for the docs).
+- No sentence sits directly under a table in the three ADRs (script).
+- No option marked "not researched" is proposed as the decision. OQ-0003-18 and -19 carry no pick. The immunity rule (AB-2) and the full-pool rules (AB-1) are game-rule proposals marked "Research: none", for Mustafa to confirm (OQ-0005-AB14, OQ-0004-11).
+- Features traced outside VISION_V2 §6 are flagged as such: spawning, spawn protection and the barracks mask (ADR 0004 part 17), AB-2's immunity rule, and reduced motion's options (b) and (c).
+- No settled input is reopened. LOOP_V2 §4's "holding E" is kept, and OQ-0004-8 asks only what it leaves open.
+- The look: F5 is the only case where text sets a look expectation beyond LOOK_V2. The look floor itself holds LOOK_V2's `[DECIDED]` items until Mustafa answers OQ-0003-16, which decides nothing new.
+- Numbers: every new number is cited, arithmetic (rechecked in the rows) or marked proposed. The exceptions are F2's wrong reason, F4's rank and F9's formula.

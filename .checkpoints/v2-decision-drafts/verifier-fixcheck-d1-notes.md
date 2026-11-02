@@ -9,3 +9,6 @@ Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 
 - TE-A 0001 blocks table written. Next: ADR 0002 engine-architect fix file.
 - 0002 EA claims E1-E28 written; F8 (0002:1030 paid minutes), F9 (0002:530 stale 7 days). Next: 0002 EA blocks table + TE-A 0002 claims/blocks.
 - 0002 blocks + TE-A 0002 written. Next: ADR 0006 (infra-engineer final, b, c; TE-B 0006).
+- 0006 infra claims I1-I27 written; F10 (part 15/OQ-0006-14 stale vs ADR 0001), F11 (a port vs both ports). Next: 0006 blocks (infra + TE-B), then consistency table, rules, counts, findings.
+- 0006 blocks + TE-B written (F12 PM-0006-32 pass rule). Next: consistency table, rules section, counts, findings, fetch audit.
+- writing consistency/rules next; running legacy gate first
