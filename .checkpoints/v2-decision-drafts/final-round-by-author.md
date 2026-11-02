@@ -85,6 +85,14 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - ADR 0006: IE-2 and EA-7 (PM-0006-13: eight tick threads cannot each be alone on a vCPU; with unit A); IE-5 (PM-0006-15's
   "0 other rules"); IE-9/10 (the load generator's calibration); IE-13 (PM-0006-18: the 5 EUR cap vs about 23 reference
   server hours); IE-16 (PM-0006-11: SMT siblings); IE-18, IE-20 (0006:872–873, if your text).
+- From review-graphics-engineer.md: GE-1 (PM-0005-35 enforces one material per class: one per content key); GE-3
+  (PM-0003-7, -33: the `programs` counter cannot see blend or MSAA pipeline variants: count pipeline creations too);
+  GE-6 (0003:681: no mark that GPU memory and render objects return to baseline between matches); GE-7 (checklist step
+  26: "the shot feels instant" cannot be judged with no Worker, tick or server); GE-8 (step 28: record Mustafa's PC's
+  `devicePixelRatio`); GE-9 (PM-0003-6: "GPU time above 0 in 600 of 600 frames" passes on stale values, fails on a
+  disjoint frame); GE-10 (PM-0005-34: a `.gltf` file's external buffers and images); GE-11 (PM-0005-42: reading colours
+  from materials does not prove each backend draws them); GE-14 (PM-0003-2: WebGPU validation errors may not reach the
+  console: a question, unverified).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -114,6 +122,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   part 6); IE-19 (failure artefacts' retention, 0002:426); FB-8 (OQ-0002-8: the ids line adds R5-XT-OQ6; "no answer on
   one side" fits R4-XT-OQ5 only); PA-13 (no budget for the Worker as a whole: its tick, heap and Wasm memory, if ADR
   0002 owns it).
+- From review-graphics-engineer.md: GE-2 medium (0002:494–497: on a runner with no GPU the research puts every CI
+  browser on WebGL 2, r3:159–169, 279–283: CI never runs the WebGPU backend and the `forceWebGL` run repeats the default;
+  state it and add a WebGPU smoke run; with test-engineer's PM-0003-36).
 
 ## engine-architect, ADR 0005: the frame, content data and the asset pipeline
 - Medium: EA-6 (0005:388–389 hands the archive of shipped content sets to ADR 0006, which has none: with
@@ -132,6 +143,11 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - Low: EA-11 (0003:370–374 audio occlusion copies the world onto the page; 928–931 the bench's Worker load; 276–277
   wording; 381 a stale hedge); PA-10 (0003:204, :514: memory per attachment single-sample though MSAA 4× is the start);
   PA-11 (the triangle row counts the shadow pass); FC-9 (0003:704: the CC10 row's outcome reads as LOOK_V2 §3's words).
+- From review-graphics-engineer.md (2026-11-02 about 11:15; ADR 0005 REVISE): GE-1 high (0005:1587–1588 vs 1544–1547:
+  "one material per class (and per faction)" vs "one material per slot content": one material per content key, as
+  legacy shared materials by full content, LEGACY_INVENTORY line 113; with test-engineer's PM-0005-35); GE-4 medium
+  (0003:309, 199: the Low tier may switch shadows and AO off against LOOK_V2 §2's decided soft shadows: its Q1, an open
+  question, decided after the look proof test's per-technique costs).
 
 ## game-designer: ADR 0005's "The ability and effect system"
 - (none yet from the six reviews; the rust-reviewer, graphics-engineer and art-director reviews may add some)
@@ -146,3 +162,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   holds once PA-4 lands).
 - Then: a README row for every new open question the drafts' final batches add that routes to Mustafa or the Advisor,
   and every review question listed below; counts again; draft_pointers.py "off 0".
+- From review-graphics-engineer.md: GE-5 medium (SPIKE_PLAN:235–241: nobody named to make the look test's authored
+  models in wave 1, no route; Spline's skinned glTF export with named slots is not researched: its Q2); GE-12
+  (ENGINE_OVERVIEW:40, :92–94, the same as FC-5); GE-13 (SPIKE_PLAN:174, :238: no one named to build the client harness
+  the three wave-1 spikes share). Questions for README: GE Q1 (does every decided LOOK_V2 item hold at Low?), GE Q2
+  (who makes the look test's models, and by which route?).
+
