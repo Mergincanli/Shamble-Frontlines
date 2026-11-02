@@ -199,3 +199,40 @@ It leaves out what engine-architect (1–4, 8) and security-auditor (6, 8) alrea
 Questions: Q1 (Mustafa and the Advisor, extends OQ-0001-5): the rewind cap with the buffer counted (recommend: set from
 the proof test's measured honest rewind, p99 of PM-0001-49, with run-on-arrival measured beside it); Q2 (the
 Advisor): may the profiles split latency and jitter half each way, uniform, as a proposed value (recommend yes).
+
+## From the step-10 review by perf-auditor (review-perf-auditor.md; 2026-11-02 about 09:47)
+Verdicts: ADR 0001 REVISE (small: three text changes, two rows); ADR 0003 REVISE (small: three pass-mark rules, two
+Decision sentences); ADR 0002, 0004, 0005, 0006, ENGINE_OVERVIEW APPROVE WITH NOTES; SPIKE_PLAN, README APPROVE.
+Nothing measured: arithmetic on the drafts' and the research's own figures. Agrees with infra-engineer #8 and
+engine-architect #7.
+1. High: the 160 kbps mean is gated in the stress scene, but R2 set it on its estimate scene: the stress scene costs
+   157–182 kbps (shots +20.1, spawns +15.7, the 11 big vehicles −24.8) (0001:529, :539; PM-0001-12). Gate the mean in
+   the estimate scene, the 256 kbps cap in the stress scene. Same as netcode-architect #2. test-engineer,
+   netcode-architect. Its SS-BANDWIDTH question.
+2. Medium: the E3b fallback cannot pass the budget it is re-run against (188.3 kbps in the estimate scene; 1,650 B of
+   projectiles per snapshot over the 1,067 B cap); a desync is a bug against PM-0004-73, not a reason to switch
+   (0001:222–223, :1189; PM-0001-54). netcode-architect, test-engineer.
+3. Medium: the upstream 22.3 kbps assumes R2's 8 B commands; part 5's command (an 80-bit aim point, 5–7 repeats at P2,
+   a cap of 8) costs about 37–57 kbps against 48 kbps (0001:513–519 vs 186–190): delta-code the repeats (R2's U2) or
+   lower the cap. netcode-architect.
+4. Medium: VISION_V2 §6.9's "without dropping frames" has no mark; the frame rows are an uncapped p95 (0003:326–329;
+   PM-0003-30): a row counting presented frames with the very large units on screen. test-engineer, graphics-engineer.
+   Its DROPPED-FRAMES question.
+5. Medium: one research mark, two readings: PM-0002-28 (every second 30 presented frames) vs PM-0004-8 (median
+   ≤ 28 ms, p95 ≤ 33.3 ms) (0002:1070; 0004:956). test-engineer.
+6. Medium: the p99 rows rest on 6 frames per 600-frame run; the validity rule checks only medians (0003:941, :946).
+   test-engineer.
+7. Medium: the minimum laptop is measured cold (about 30 s per run) while a match lasts about 20 minutes (LOOP_V2:100):
+   gate a run after 15+ minutes (engineering experience, not researched) (0003:936–939). test-engineer. Its HEAT-SOAK
+   question.
+8. Medium: "about 786, inside 800" leaves out post-processing passes, health bars, VFX pools and projectile kinds
+   (13–31 draws against the 14 left) (0003:318–321). graphics-engineer.
+9–14. Lows: a door every 60 ticks always lands on the same tick parity at 60 Hz (PM-0001-2, -39); memory per
+   attachment stated single-sample though MSAA 4× (0003:204, :514); the triangle row counts the shadow pass (about
+   5.2k triangles per soldier at Low; ADR 0005's per-unit budget questions need it); the per-frame allocation CI check
+   has no method (PM-0003-36); no budget for the Worker as a whole (tick, heap, Wasm memory); the main-thread CPU row
+   leaves out the DOM HUD's layout work (PM-0003-19).
+Questions: DROPPED-FRAMES (the Advisor, confirmed by Mustafa: count presented frames with the very large units on
+screen); SS-BANDWIDTH (the Advisor with netcode-architect: the estimate scene for the mean, the cap in the stress
+scene); EFFECTS-WITH-PICKS (the Advisor after Mustafa's levelling answer: keep 8, gate again at slice 4); HEAT-SOAK
+(the Advisor: the soaked run, the cold one reported).
