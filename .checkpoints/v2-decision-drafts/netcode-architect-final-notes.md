@@ -17,3 +17,6 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 16:39 UTC: proofread upstream, budgets, failure modes, anti-cheat: OK.
 - 16:40 UTC: proofread option rows and trade-off: OK.
 - 16:42 UTC: proofread OQ-0001-2, -5, -6, -7: OK.
+- 16:44 UTC: proofread new OQ-0001-15..18: OK (quote and owners checked).
+- 16:45 UTC: proofread spike items 1, 5 and migration step 1: OK.
+- 16:47 UTC: proofread test plan and rollback: OK.

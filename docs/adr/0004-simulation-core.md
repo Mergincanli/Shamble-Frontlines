@@ -254,8 +254,22 @@ research ids, and the need it serves.
    native is a target, tested on every change, that the netcode never depends on: the server is
    [the authority](../research/GLOSSARY.md#the-authority), and the client's prediction is corrected when it differs. No
    lockstep, no fixed point. Inside the sim: f32 for every real-valued quantity (up to a map 2 km across,
-   R4-PHYS-REC5), while time, counts and money are integers (parts 4 and 17); only `+ − × ÷`,
-   `sqrt`, `floor`, `ceil`, `round`, `trunc`, explicit `mul_add` and `as` casts from core; transcendental maths only
+   R4-PHYS-REC5), while time, counts and money are integers (parts 4 and 17). The float allow-list: `+ − × ÷` and
+   negation; the comparisons and `total_cmp`; `sqrt`, `floor`, `ceil`, `round`, `trunc`, `fract` and explicit
+   `mul_add`, which std specifies exactly (R1-DET-F10, r1-simulation-core.md, Findings, lines 655–660); `abs` and
+   `copysign` (proposed: sign-bit operations, exact by definition); `as` casts (R1-DET-F15, lines 684–692); and the
+   exact non-arithmetic methods the rules themselves use, such as `is_finite`, `is_nan`, `to_bits` and `from_bits`.
+   Every other std `f32` and `f64` method is banned, and ADR 0002's lint is this list's complement. Among them are
+   `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`, which std 1.99.1 marks non-deterministic as it does the
+   transcendental functions (R1-DET-F9, lines 648–654; rust-reviewer read the note on all five at the step-10
+   review), and `min`, `max` and `clamp`, which may return either zero for equal signed zeros, while `clamp` panics on
+   bad bounds (R1-DET-F14, lines 679–683). In their place the sim has three helpers of its own, written as plain
+   comparisons (`if a < b { a } else { b }` and the like): on equal inputs, signed zeros included, each returns one
+   defined argument, the same on every target, and none panics (a clamp whose bounds are the wrong way round returns a
+   bound); a degree value becomes radians by one multiply with a pinned constant. `rem_euclid`, `div_euclid` and the
+   float `%` operator are not on the list: one joins only once PM-0004-22's unit vectors show it bit-identical on every
+   target (proposed: no source read here states their precision; review, not the lint, catches the operator).
+   Transcendental maths only
    through the pure-Rust `libm` crate, pinned; no std `sin`, `cos`, `atan2`, `powf` or `exp`, no `algebraic_*`, no
    fast-math, no `relaxed-simd`; Wasm `simd128` off until the suite passes with it on. NaN never enters sim state: every
    input and data value is checked finite where it enters, and debug and test builds assert finite state each tick. No
@@ -270,7 +284,9 @@ research ids, and the need it serves.
    (R1-XU-OQ11). Whether browsers run a different Wasm float profile matters only if NaN can enter state, which these
    rules forbid; the suite's browser runs check it (R1-DET-OQ4).
    - Why: basic operations, `sqrt` and `mul_add` are exactly specified on every target while std's transcendental
-     functions are not; NaN bits and relaxed SIMD differ by engine; with server authority a divergence costs a
+     functions are not, and neither are `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`; std's `min`, `max` and
+     `clamp` leave signed zero open, which an allow-list and three helpers close where a deny-list of transcendental
+     names would not; NaN bits and relaxed SIMD differ by engine; with server authority a divergence costs a
      correction, not a desync.
    - Ids: R1-DET-REC1, R1-DET-REC2, R1-DET-REC3, R1-DET-REC7, R1-RR-OQ1, R1-ABL-OQ5, R1-XU-OQ11, R1-DET-OQ3,
      R1-DET-OQ4 (r1-simulation-core.md, lines 2129–2183, 2242–2248, 2923–2932, 2770–2771, 2899–2902, 2686–2690);
@@ -528,8 +544,9 @@ research ids, and the need it serves.
 20. **No panic from input or content, and recovery from a trap.** No panic is reachable from network input or content
     data: the sim takes only commands that ADR 0001's decoders validated and content that ADR 0005's loader validated
     (its loader returns errors and is fuzzed with zero panics); inside the sim, values a client or content can set never
-    reach an `unwrap`, an unchecked index or a `clamp` with unchecked bounds (`f32::clamp` panics on bad bounds,
-    R1-DET-F14). On the server a panic in the tick ends that room's match and its process (each room is its own
+    reach an `unwrap` or an unchecked index, and std's `clamp`, which panics on bad bounds (R1-DET-F14), is never
+    called: part 7's clamp helper returns a bound instead. On the server a panic in the tick ends that room's match and
+    its process (each room is its own
     process, R2-ROOM-REC2). The room keeps `panic = "unwind"`, so that a panic in one connection's work closes only that
     connection (R2-ROOM-REC2's fix pass); but an uncaught panic ends only its own thread (R2-ROOM-F8), so a tick thread
     left to die would leave a room that still holds its connections and sends nothing. The room therefore catches a
