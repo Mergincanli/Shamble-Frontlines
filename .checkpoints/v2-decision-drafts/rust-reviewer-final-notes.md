@@ -13,3 +13,6 @@ Task: rust-reviewer final fix round on ADR 0004 (v2 decision drafts, at 47eadd9;
 - ADR 0004 still unchanged at HEAD 2c5e8d9 (cmp with 47eadd9 copy: same); return sent
 DONE
 - follow-up b (RR-1, part 7 allow-list and min/max/clamp helpers) started; output rust-reviewer-fixes-final-b.md from b815c85
+- block 1 written: RR-1 part 7 allow-list + helpers (lines 257-259 at b815c85)
+- block 2 written: RR-1 part 7 Why (lines 272-274)
+- block 3 written: RR-1 part 20 clamp (lines 531-532)
