@@ -9,3 +9,6 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - blocks 7-9 written: AB-8 rows 946 (open offers queue, data, -> OQ-0005-AB8), 952 (record key -> OQ-0004-10), 953 (offer size from data; ADR 0004's authority-only offers stream, part 8)
 - block 10 written: OQ intro 1128-1130 (AB14 added to Mustafa's no-pick list; OQ-0004-11 pointer)
 - block 11 written: OQ-0005-AB8 1219-1224 (full queue options (i)-(iii), no pick)
+- 17:50 coordinator added: (1) E-press precedence into OQ-0005-AB9 (ADR 0001 75615d1 part 12 points there); (2) purchase rule as data (ADR 0001 Buy{unitId} checks id in mode content, tier, price incl. power-plant pricing, own terminal) -> AB-5; (3) GD-PICK-VIS -> new OQ-0005-AB15 (Mustafa), cross-ref in AB7; block 10 (intro) to be rewritten in place to include AB15
+- block 12 written: OQ-0005-AB9 1233-1238 (E press precedence options; full pickup pool -> AB-1/OQ-0004-11)
+- block 13 written: OQ-0005-AB10 1244-1247 (cites OQ-0004-10, -12; sims 3 runs per mode)

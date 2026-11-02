@@ -163,3 +163,44 @@ AFTER:
     queue fills fastest, since offers wait for a visit or a death.
 END
 
+### FIX GD-8 (my review's finding 12, the game-designer's half, and netcode-architect's routed note from 75615d1: E for a pickup against E for a steal joins OQ-0005-AB9's list)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+    teams, not one); or anyone. Also Mustafa's, each a value in data: how long a pickup stays; whether a gun a player
+    swaps out becomes a pickup that anyone can take; which of two claims on one pickup in the same tick wins (ADR 0004
+    keeps the order deterministic whichever is chosen).
+  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1. Research ids: none;
+    whether a pickup is predicted is ADR 0001's (Quake III predicts item pickups: R2-SYNC-F17, r2-netcode.md, Findings,
+    lines 230–236).
+AFTER:
+    teams, not one); or anyone. Also Mustafa's, each a value in data: how long a pickup stays; whether a gun a player
+    swaps out becomes a pickup that anyone can take; which of two claims on one pickup in the same tick wins (ADR 0004
+    keeps the order deterministic whichever is chosen); and which act a press means where a pickup lies within reach of
+    an uplink or a cache, since a steal is holding E (LOOP_V2 §4 step 4), ADR 0001 part 12 has E place a cache too, and
+    a pickup is asked for through the same button edges: the pickup wins, the steal or the placing wins, or a tap takes
+    the pickup and a hold steals. A full pickup pool follows AB-1's proposal for OQ-0004-11.
+  - Decider: Mustafa, with the game-designer. What decides it: a design session, with OQ-0005-AB1; the press precedence
+    in the uplinks change-set's playtests, where fights cluster at uplinks and drops lie there. Research ids: none;
+    whether a pickup is predicted is ADR 0001's (Quake III predicts item pickups: R2-SYNC-F17, r2-netcode.md, Findings,
+    lines 230–236).
+END
+
+### FIX GD-8 (my review's findings 15 and 21, the game-designer's halves) + rust-reviewer's routed note: OQ-0005-AB10 cites OQ-0004-10 and OQ-0004-12
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+    empty; fair to the joiner, and the team loses the bot's picks at once. (c) Bots have no tracks; simplest, and teams
+    with more bots are weaker, which matters in three-team modes with uneven bot counts. How a bot picks is bot
+    behaviour (ADR 0004).
+  - Decider: Mustafa. What decides it: a design session, then sims with mixed humans and bots. Research ids: none.
+AFTER:
+    empty; fair to the joiner, and the team loses the bot's picks at once. (c) Bots have no tracks; simplest, and teams
+    with more bots are weaker, which matters in three-team modes with uneven bot counts. How a bot picks is bot
+    behaviour (ADR 0004).
+  - Asked beside it in ADR 0004, both Mustafa's: whether a player who rejoins after ADR 0001's grace window gets their
+    record back, tracks and money included, or the slot's bot keeps it (OQ-0004-10, decided with this question; the
+    record's key, slot or player, follows the answer); and whether bots take world pickups at all (OQ-0004-12), which
+    changes what OQ-0005-AB9's drop rules do to balance when most slots are bots.
+  - Decider: Mustafa. What decides it: a design session, with OQ-0004-10 and OQ-0004-12, then sims with mixed humans
+    and bots (3 runs per build, two-team and three-team modes separately). Research ids: none.
+END
+
