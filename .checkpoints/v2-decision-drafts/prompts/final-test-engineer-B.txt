@@ -43,6 +43,31 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   legacy's ported tree builders, GW18, judged for variety only); AD-14 (steps 10–12: the soldier shown is built at the
   4-material cap).
 - From review-test-engineer.md: PM-0003-3 follows TE-5 (compare with every kept effect on).
+- Routed by graphics-engineer's final batch (319d3b6; its NOTEs in graphics-engineer-fixes-final.md): PM-0003-3 drops the
+  one-backend exclusion; PM-0003-9: the halftone overlay as frame time, memory per attachment at both sample counts;
+  PM-0003-12 points to part 7's 799 to 817; PM-0003-16 records whether `info.memory.total` counts MSAA textures;
+  PM-0003-23: "1024² (none only under OQ-0003-16)"; a spectacle row for OQ-0003-17 (part 7's presented-frame count);
+  "When a mark fails": a [DECIDED] item's technique leaves Low only under OQ-0003-16; a Low-frame checklist step (steps
+  2, 4, 6, 7, 20), the tier named per step; steps 4 (the contact line), 10–12 (the soldier at the 4-material cap) and 27
+  (the flash over the HUD); BS records the Worker's load; PM-0005-34 and -35 count distinct slot contents.
+- Routed by rust-reviewer's final batch (b815c85): PM-0004-29 names the prediction step (part 3's second entry point);
+  PM-0004-68 reads jitter online against the server-time estimate's schedule; PM-0004-61 checks that the panic message
+  arrives (the hook's fixed buffer); PM-0004-6 gets the pool-burst bite; PM-0004-2 counts the stand-in effect rows (384
+  plus a 1 ms burn at 30 Hz; at 60 Hz 1 ms and 0.30 ms); PM-0004-65 starts money at $300; the "no measurable mark" lines
+  for parts 17 and 19 point to the test plan and migration phase 6.
+- Routed by infra-engineer's final batch (8fa7173): PM-0006-15 checks the firewall rule list per VM role; the LG key
+  (a calibration run sizes the load generator; the cap raised); PM-0006-11 created after PM-0006-12; PM-0006-14 uses the
+  padded stand-in (the sim step padded to 8.33 ms); a new row for spike 1's B9 test (the preview token cannot publish
+  production); the seed added to PM-0006-21's canary (never logged or recorded).
+- Routed by engine-architect's ADR 0002 batch: PM-0003-36 (the WebGPU smoke run, GE-2), PM-0004-23 and PM-0004-74 (the
+  float lint's allow-list and the same-feature check, RR-1, RR-10); its NOTEs name what each row needs.
+- Routed by rust-reviewer's follow-up b (ADR 0004 at 16e97aa): PM-0004-23 reads "the build fails on any std `f32` or
+  `f64` method outside part 7's allow-list (`powi`, `hypot`, `cbrt`, `to_degrees`, `to_radians`, `min`, `max` and
+  `clamp` named), as well as the items listed today"; its bites add `deg.to_radians()` and `a.min(b)` in `sim`, each
+  failing G2, as in PM-0002-41; its control adds the three helpers and one allowed method (`abs` or `fract`) passing.
+  Optional for PM-0004-22: the helpers' signed-zero results and a reversed clamp in the unit vectors on every target.
+- Routed by engine-architect's ADR 0005 frame batch (b88714d): PM-0005-4 or -5 gains the pool-report leg (bite: a
+  projectile lifetime doubled while the report stays the same).
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding

@@ -30,6 +30,15 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   exits non-zero; with unit B if it lands in ADR 0004).
 - From review-test-engineer.md (your own review): PM-0001-30 follows TE-3 (a run counts only when the late-command
   counter is 0); a deterministic counter-wrap row follows TE-4, once netcode-architect writes it.
+- Routed by rust-reviewer's final batch (b815c85): PM-0002-33 checks that the panic message arrives; RR-3's server mark
+  (a panic in the tick ends the match, the process exits non-zero) goes beside PM-0001-26.
+- Routed by infra-engineer's final batch (ADR 0006 at 8fa7173): the PM-0002-66 bite (a test PR that edits the deploy
+  job cannot reach the production token); PM-0001-25 and PM-0001-29 follow ADR 0006's load-generator key (a
+  calibration run; the per-address cap raised for the run).
+- Routed by engine-architect's ADR 0002 batch (its NOTEs name what each row needs): PM-0002-6, -9, -10, -29, -41, -44,
+  -51, -64, -66, -76, and a reported Worker-budget row (PA-13).
+- Routed by engine-architect's ADR 0002 batch, second part (61e9933): PM-0002-42 (G3: a planted `eval` in `client`),
+  PM-0002-44 (G5: a planted git dependency), PM-0002-46 (G8: a planted inline script in the built HTML) need bites.
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding

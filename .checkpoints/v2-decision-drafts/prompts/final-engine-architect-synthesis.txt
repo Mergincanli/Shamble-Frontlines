@@ -33,6 +33,29 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   (ADR 0006 writes "seam S3/S4", so README's rule tells them apart); "… option labels (G1–G4, K1–K4, S1–S5) and its
   baseline items B1–B11 (part 13)"; and "for example" (ADR 0002 has its own option labels, two G1–G3 sets; ADR 0006
   cites ADR 0001's profile B1 beside its baseline item B1).
+- Routed by graphics-engineer's final batch: README rows for OQ-0003-16 (the look floor; Mustafa), OQ-0003-17 (reading
+  "without dropping frames"; the Advisor, confirmed by Mustafa), OQ-0003-18 (reduced motion; Mustafa), OQ-0003-19
+  (telling factions apart by colour; Mustafa); SPIKE_PLAN:236–237 lists both houses; ENGINE_OVERVIEW's §6.9 row (about
+  line 112) names part 7's presented-frame count (OQ-0003-17).
+- Routed by rust-reviewer's final batch (b815c85): README rows for OQ-0004-8 (steals; Mustafa with the game-designer),
+  -9 (is a carried cache public; Mustafa), -10 (a late rejoiner's record; Mustafa, with OQ-0005-AB10), -11 (which row
+  gives way when a pool is full; the game-designer proposes, Mustafa confirms), -12 (do bots take pickups; Mustafa);
+  a "Needs outside VISION_V2 §6" line: spawning, spawn protection, the Recruit respawn and the barracks mask (LOOP_V2 §2
+  and §5 only); SPIKE_PLAN's 60 Hz stand-ins are 1 ms and 0.30 ms.
+- Routed by infra-engineer's final batch (8fa7173): SPIKE_PLAN item 6 revokes the spike's token; README rows for
+  OQ-0006-13 (the preview token and production; the Advisor with security-auditor, Mustafa for a second account), -14
+  (releases; the Advisor for the model, Mustafa for the window), -15 (domain; Mustafa after the Advisor's OQ-0006-5
+  read), -16 (port plan; infra-engineer with netcode-architect, the Advisor confirms), -17 (VMs for spikes and the
+  bench; Mustafa with the Advisor), -18 (unreleased art; Mustafa), -19 (the provisional goal budget; Mustafa on the
+  Advisor's advice); README's I-6, I-13 and lines 47 and 59 as its NOTE says.
+- Routed by engine-architect's ADR 0002 batch: ENGINE_OVERVIEW lines 37 and 94 (the page posts its newest input each
+  frame; the block's events released on the delayed timeline), the new `client-endpoint` crate in the overview's
+  diagram and text, README rows for OQ-0002-9 (closing the deploy-job gap; Mustafa on the Advisor's advice), line 59's
+  OQ-0002-5 row (macOS costs time, not money), I-13.
+- Routed by engine-architect's ADR 0002 batch, second part: README rows for OQ-0006-13 and OQ-0006-17; no OQ-0002-9
+  (ADR 0002 part 10 points to OQ-0006-13).
+- Routed by engine-architect's ADR 0005 frame batch (b88714d): README rows for I-6 (the archive of shipped content
+  sets, ADR 0006 part 12) and OQ-0005-AP1 (waits on OQ-0006-18).
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding
