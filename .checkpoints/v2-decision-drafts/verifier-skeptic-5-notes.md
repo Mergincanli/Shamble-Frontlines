@@ -27,3 +27,5 @@ Parts: (a) G1-G13 vs G0 · (b) S1-S3 vs S1-S5 · (c) B1-B11 called options.
   listed (Q1-Q13, A-E, (i)-(iii), C1-C3 twice: Q5 :454-457 and Q8 :482-484, L1-L2, M1-M3, T1-T2, P1-P2, W1-W3, R-a/R-b,
   N1-N2). 0006:1001 cites ADR 0001's network profile B1 ("profiles (P0–P4, B1)", from 0001:399, :1060) in the same file
   as baseline item B1 (0006:377). So the line, read as a complete list, is incomplete; "for example"/"among others" needed.
+
+Results written to verifier-skeptic-5-results.md (11:13). DONE
