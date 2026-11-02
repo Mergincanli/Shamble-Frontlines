@@ -18,3 +18,5 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - block 10 rewritten in place to include OQ-0005-AB15
 - blocks 17-18 written: TE-8 item 1 (1281-1286: combination + rename-and-reorder test as proof; search = smell check) and u1 (1304)
 - blocks 19-21 written: item 5 (1298-1301: third leg + immunity case), u4 (1308-1309: a lost looted X, fixture drop rule), u6 first line (1311: offer of the data's size)
+- block 21 written: u6 (1311-1313): offer of the data's size; offer logs equal on native and Wasm (local play runs the authority in the Worker)
+- 18:10 applied all 21 blocks to a scratch copy of b88714d: all applied; cite_check flags 2 before, same 2 after (pre-existing), ids 471->480; glossary exact 0->0, in context 77->85 (effects/vehicles/48 in context)

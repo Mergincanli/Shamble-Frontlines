@@ -15,12 +15,12 @@ AFTER:
   - When a pool is full (OQ-0004-11: the game-designer proposes per kind, and Mustafa confirms where a player could
     notice; ADR 0004 part 1 fixes each pool's capacity at match start and counts every overflow; CD-2's whole-set
     check reports each pool's worst case, or names the missing cap). Proposed, per kind:
-    - Effects the content bounds on their target (its own picks, its own abilities' and weapon's effects, spawn
-      protection): the whole-set check reserves their worst case in every target's rows, so they never give way.
+    - Active effects the content bounds on their target (its own picks, its own abilities' and weapon's effects,
+      spawn protection): the whole-set check reserves their worst case in every target's rows, so they never give way.
       Reason: their count follows from the content alone, and a pick or a pressed ability that silently fails to apply
       takes away what the player earned (pillar 2).
-    - Effects that other soldiers, vehicles or structures apply (one row per application under "no stacking", so play
-      sets their count, not the content): they share the rest of the target's rows, up to a cap in data, set once
+    - Active effects that other soldiers, vehicles or structures apply (one row per application under "no stacking", so
+      play sets their count, not the content): they share the rest of the target's rows, up to a cap in data set once
       AB-10's curve shows what the step can carry; when that share is full, the oldest such row on the target, by start
       tick and then sequence number (ADR 0004 part 4), ends early (OQ-0004-11's option (b)). Reason: refusing the new
       row would make a saturated target immune to every further slow or mark, so cheap buffs stacked by teammates could
@@ -42,7 +42,7 @@ AFTER:
       lines 2471–2472). Need: VISION_V2 §3 and §4 (a budget, not a feature, as AB-10).
 END
 
-### FIX GD-7 (rust-reviewer's routed note: does AB-1 have an operation for spawn protection?), part 1 of 3: the pipeline's immunity rule (AB-2)
+### FIX GD-7 (rust-reviewer's routed note: does AB-1 have an operation for spawn protection?): the pipeline's immunity rule (AB-2)
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:
   - What: the stages are the locational multiplier, range falloff, the frontal-arc block, a target-tag multiplier (for
@@ -67,7 +67,7 @@ AFTER:
     research finding on spawn protection).
 END
 
-### FIX GD-7, part 2 of 3: the immunity rule's need (AB-2)
+### FIX GD-7: the immunity rule's need (AB-2)
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:
 - **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**
@@ -83,7 +83,7 @@ AFTER:
   | Active reload (§7 `[DECIDED]`: "tap R at the right moment for a faster reload and a short damage boost") | the reload state machine's window (AB-3); a tap inside it shortens the reload and applies a timed effect on the weapon's damage attribute; the authority judges the tap from the command's tick (SLICE-ORDER, condition 2), so near the window's edge the 33.3 ms tick (1000 ÷ 30) decides while the page draws the window every frame, and a tap the bar shows inside can be judged outside: whether the tap carries its moment inside a tick is asked beside shots (OQ-0001-7); the timing is own weapon state, inside the prediction scope; the boost is damage, which only the authority applies | none in legacy | the window, the faster reload and the boost's size and length (R1-ABL-OQ6) |
 END
 
-### FIX GD-7, part 3 of 3: spawn protection written in the model (a new AB-6 row after the Javelin's)
+### FIX GD-7: spawn protection written in the model (a new AB-6 row after the Javelin's)
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:
   | Javelin (§5 `[DECIDED]`: "strong against vehicles and aircraft, weak against infantry"; knockback `[DEFAULT]`; §7 `[DECIDED]`: "Targets react: flinch and knockback") | a projectile weapon; target-tag multipliers in the pipeline (above 1 against vehicle tags, below 1 against infantry); knockback as one new operation, a velocity change on the target, which the research reads as "a velocity change on the kinematic soldier" (R4-PHYS-REC3, ADR 0004); the flinch is presentation (the feel kit) | none (the Javelin is new; LOOP_V2 §11 leaves it out of the greybox v0) | the numbers |
@@ -355,6 +355,7 @@ BEFORE:
 AFTER:
    - u6, offers: the authority draws an offer of the data's size (3); a pick that was not offered, or for a closed
      offer, is refused in 100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs
-     on two runs (and on native and Wasm wherever the stream is one the client holds, ADR 0004).
+     on two runs, and on native and Wasm: the offers stream is authority-only (ADR 0004 part 8), but in local play the
+     authority is the local server in the browser's Web Worker (ADR 0002, Decision).
 END
 
