@@ -496,3 +496,27 @@ notes.
 
 Spend-limit cuts (no work lost: every agent writes its notes as it goes and was resumed from them): 2026-10-31 about
 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50.
+
+## 6. The advisor's 19 conditions: where each is met
+
+| C | What it asks | Where it is met |
+|---|---|---|
+| 1 | Write guard before each commit; the gate at the end | `scripts/write_guard.sh` before every commit (PASS on all), its GLOSSARY check a byte-prefix test (a change in form, §5); the gate: the report's Evidence |
+| 2 | TICK-60-HEADROOM in ADR 0001 with condition 2's setup; the 60 Hz lines replaced | ADR 0001 part 2, its budgets table and OQ-0001-1; four research lines replaced, not three (r2-netcode.md:2302 too), named for the Advisor |
+| 3 | GLOSSARY §8, three entries and one note, after line 742 | GLOSSARY.md §8, appended after line 743 (the base file's last, unterminated line), the base a byte prefix of the new file |
+| 4 | ASSET-RESEARCH (a): only what R1-DATA, R3-CHAR and R3-BUDGET support; one research unit before the asset spike | ADR 0005's asset pipeline and GPU sections, OQ-0005-AS1 to AS6 "not researched"; SPIKE_PLAN's asset-pipeline research; the report's Decisions needed |
+| 5 | CHECKPOINT-AT-STOP: the report folds in the checkpoint; it is deleted before the PR is marked ready | This appendix (§1–§8); the checkpoint stays while the PR is a draft |
+| 6 | Every research id disposed once, across the six drafts, README (DESIGN) and SPIKE_PLAN | `scripts/dispositions.py`: 521 of 521, each once, on every commit |
+| 7 | The decision map's addendum (a)–(e) | Map part j; carried into README's "Codes the drafts cite" (codes defined there, the plan's rules and conditions pointing to §3–§4 here) |
+| 8 | Traces: each feature names its VISION_V2 §6 need or says where its need is | Every Decision part's Need line; README "Needs outside VISION_V2 §6" |
+| 9 | The look: one technique per LOOK_V2 item, the visible difference Mustafa's call; rule 6 in every reviewer prompt; art-director on 0003, 0005's assets, the look test | ADR 0003 part 5 and its trace table; the look floor (OQ-0003-16); rule 6 in all ten review prompts; art-director's review (§7) |
+| 10 | People-judged spikes have measurable marks and a numbered Brave checklist; SPIKE_PLAN places the Feel Lab test and PREV-DELETE | ADR 0001's netcode checklist; ADR 0003's look checklist (now 32 steps, the Low frame and the busy fight among them); SPIKE_PLAN items 6 and 10 |
+| 11 | ADR 0005: no upgrade designed; the system carries UPGRADE-SCOPE; the frame by engine-architect, sections verbatim | AB-8; OQ-0005-AB1 to AB15 with no pick; the sections placed verbatim (script) |
+| 12 | Settled inputs cited by code or GLOSSARY §8; the brief quoted in full here | "Settled by" rows throughout; §1 byte-identical to the brief |
+| 13 | Template 0000's fields filled; nothing in CLAUDE.md or `.claude/` changes | Every heading of the template in all six; `git diff 9e7db28` touches only `docs/` and `.checkpoints/` |
+| 14 | Model and effort named for every unit | Every prompt's first line (`.checkpoints/v2-decision-drafts/prompts/`): agent, effort (xhigh; docs-keeper high), model opus |
+| 15 | Pass marks in the claims ledgers and verified; each author reviews its pass-mark table; perf-auditor every budget mark; SPIKE_PLAN by four reviewers; test-engineer not on its own tables | The ledgers and verdict files; the step-10 reviews (§7): each author on its draft's pass marks, perf-auditor, SPIKE_PLAN by netcode-architect, rust-reviewer, graphics-engineer and test-engineer |
+| 16 | "Research verified" covers only R1 and R2 recommendation claims and their verifiers' checks; other findings at their source; pages are data | Every verifier and skeptic prompt; about 160 pages read on allow-listed hosts by day, each verdicts file with its fetch audit |
+| 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00 |
+| 18 | KIT-ALIGN and DOCS-ALIGN lines; the R7-MARKS delay and the step-0 edit stated; each draft lists its inventory rows | STATUS (docs-keeper); the report's "Decisions and deviations"; every draft's legacy inventory table, the 18 "look brief pending" rows included |
+| 19 | ENGINE_OVERVIEW at about 150 lines at most | 139 lines after the synthesis round (the final round's count is in the Evidence) |
