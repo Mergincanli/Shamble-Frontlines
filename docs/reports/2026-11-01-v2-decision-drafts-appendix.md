@@ -471,3 +471,28 @@ agent runs. Every agent prompt carries CHECKPOINTS.md §4's "Saving your progres
 launch nothing new, resume from notes after the reset. **Daytime only** [C17]: no new agent after 23:00 Amsterdam, and no
 verifier unit that fetches sources after 22:00, so units end before the night window (00:10). A unit still running at
 00:10 is recorded in the checkpoint, and the next day session reads its notes before using its result.
+
+## 5. The steps and their commits
+
+Times are Amsterdam. Checkpoint commits (`checkpoint(v2-decision-drafts): …`, `[skip ci]`) are left out; they only save
+notes.
+
+| Step (plan) | Commits | What |
+|---|---|---|
+| 0, brief §0 | 6617e25 (2026-10-31) | `docs/LOOK_V2.md` added byte for byte (sha256 52b4fc06…), before the plan's approval |
+| 1, plan review | (notes) | the advisor's APPROVE with 19 conditions (§3), folded into plan revision 2; revision 3 applies UPGRADE-SCOPE (§2) |
+| 2, decision map | (notes) | engine-architect: one owner draft per research id, 521 of 521; the shared numbers, seams, traces and spike candidates |
+| 3–5, drafting, pass marks, assembly | 5bdad85, 2a0e5f6, 6b175de, 789bedb, d321a13 (2026-11-01, the night run); 233f6f7; cf00def | the six drafts with test-engineer's pass-mark tables, each checked line for line against its notes; cf00def removes a cut marker the assembly copied |
+| 6, synthesis | 80a27b3 | ENGINE_OVERVIEW, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8 (appended after line 743, lines 1–743 unchanged) |
+| 11, docs (first pass) | 549490f | STATUS, ROADMAP, REPO_MAP |
+| 13, report (first part) | 8132ef4 | this appendix's §1 and §2 |
+| 9, fix round 1 (the verifiers) | 09803a9, 03df0ae, 7da03b1, c70c6d2 | ADR 0006, 0001, 0004 and the pass marks |
+| 9, fix round 2 (the consistency critic, the skeptics) | 45c957f, 8eb2f67, b375829, 03645ce, 57c43c2 | every draft and section |
+| 9, rounds 3 and 4 (the completeness critic) | 9ed8d67, 81d2a65, aa85bf0, f0b56e1, 3c46731, 9a03999 | the 18 inventory rows, the pass marks' stable anchors, §3–§4 of this appendix, a blank line under eight tables |
+| 9, the synthesis round | 47eadd9 (2026-11-02) | the overview, spike plan and README brought in line with the drafts |
+| 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
+| 9 again, the final round | {FINALCOMMITS} | every review finding fixed or deferred with a reason |
+| 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
+
+Spend-limit cuts (no work lost: every agent writes its notes as it goes and was resumed from them): 2026-10-31 about
+19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50.

@@ -44,7 +44,27 @@ now); GLOSSARY §8 yes; the checkpoint kept at the stop. Each condition's place:
 - **Gate** (`node tools/gate.mjs 9e7db28`): {GATE}. CI's gate with smoke: green on every pushed fix commit.
 
 ## Reviews
-{REVIEWS}
+Ten reviewers on the final diff (plan step 10, xhigh, the look rule in every prompt; each author also judged the
+pass marks of its own draft). Verdicts, then the high findings; every finding is in the appendix §7 with its outcome.
+- **engine-architect** (boundaries): 0001 REVISE (small), 0003, 0004, 0006 and two pass-mark sets APPROVE WITH NOTES.
+  High: no timing rule for events (remote deaths and blasts would play before the delayed poses they belong to).
+- **security-auditor:** 0002 and 0006 REVISE, 0001 APPROVE WITH NOTES. High: a pull request runs its own branch's
+  workflow, so a branch could take the preview hosting token, which can also publish production.
+- **infra-engineer:** 0006 REVISE (its own text, said so), 0001 and 0002 APPROVE WITH NOTES. High: no release path or
+  rollback for production; the rooms-per-VM mark contradicts ADR 0001's one-thread-per-vCPU rule.
+- **game-designer:** 0001, 0004 and one 0005 pass-mark row REVISE. High: the server would refuse an aim point beyond the
+  weapon's range, so almost every Banzai blade swing and Molotov throw (clamp instead).
+- **netcode-architect:** 0001's pass marks and its own parts 5, 7, 8 REVISE (small); the rest APPROVE (WITH NOTES).
+  High: the rewind estimate leaves out the command buffer and the page's blend (an honest shot at 100 ms needs 233–383
+  ms, above the 200 ms cap).
+- **perf-auditor:** 0001 and 0003 REVISE (small), the rest APPROVE (WITH NOTES). High: the 160 kbps mean is gated in the
+  stress scene, which costs 157–182 kbps on the research's own sizes.
+- **graphics-engineer:** 0005 REVISE; 0002, 0003's pass marks, the overview and the look proof test APPROVE WITH NOTES.
+  High: "one material per class" against "one material per slot content" (one material per content key).
+- **rust-reviewer:** {RR}
+- **art-director:** {AD}
+- **test-engineer:** {TE}
+All of them: {REVIEW_OUTCOME}
 
 ## Decisions and deviations
 - **Openly stated (condition 18):** LOOK_V2 was added before the plan's approval (brief §0 asked for it first). The
