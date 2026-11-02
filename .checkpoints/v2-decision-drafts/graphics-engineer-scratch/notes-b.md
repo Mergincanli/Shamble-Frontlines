@@ -1,2 +1,3 @@
 Task: follow-up batch B for ADR 0003 (OQ-0003-20 HEAT-SOAK; optional teardown rule, GW18 in part 11, OQ-0003-16 names step 31). Output graphics-engineer-fixes-final-b.md. Started ~20:45.
 - Read held OQ-0003-20 block; verified LOOP_V2 §8 'about 20 min' (line 100), r3 1162-1164, GW18 at LI line 206, step 31 and PM-0003-45 on disk. Plan: adopt OQ-0003-20 (adapted: no review ref, (a)/(c) marked proposed), part 8 pointer, part 10 teardown rule, part 11 + trace row GW18, OQ-0003-16 and part 7 name step 31.
+- gen_b.py: 7 FIX blocks (part 7 step 31, part 8 soaked-set pointer, part 10 teardown, part 11 GW18, trace row GW18, OQ-0003-16 step 31, OQ-0003-20) + 1 NOTE; fixed a wrong range (part 11 469-470); independent parse OK. DONE

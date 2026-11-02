@@ -30,7 +30,7 @@ fix("GE-6 (part 10: the teardown rule between matches)", 457, 459, """
     display); VISION_V2 §4 for the teardown (the budgets hold match after match).
 """)
 
-fix("AD-12 routing (part 11 names the test's trees: GW18)", 472, 473, """
+fix("AD-12 routing (part 11 names the test's trees: GW18)", 469, 470, """
     Beside them run ADR 0005's ported kit builders, for the asset families OQ-0005-AP2 asks Mustafa to judge
     (authored model or procedural builder). The test's trees are legacy's tree builders ported as placeholders (GW18,
     `LEGACY_INVENTORY.md` line 206), judged for variety and lushness only: the tree style stays `[OPEN]` (OQ-0003-9).

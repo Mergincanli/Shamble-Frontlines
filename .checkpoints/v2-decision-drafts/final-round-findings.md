@@ -244,3 +244,18 @@ text; std's clock calls panicking on the browser's Wasm target (rust-lang/rust l
 page); the merge-commit reading behind SA-1 (a `pull_request` run uses the PR's merge commit's workflow, R5-PREV-F2).
 From rust-reviewer's ADR 0004 batch: R2-ROOM-F8 (r2:1459–1467) for the panic rule; its panic-hook claim was checked
 natively only (Wasm untested).
+
+## From verifier fixcheck-d0 (verifier-fixcheck-d0-verdicts.md; PASS WITH NOTES, 2026-11-02 about 20:50)
+All seven web facts confirmed at their sources (binaryen --fast-math; std's clock calls panicking on
+wasm32-unknown-unknown; std's precision notes and signed-zero min/max/clamp; macOS runners free on public
+repositories; a pull_request run uses the merge commit's workflow; MDN's SameSite; RFC 4291's /64); 17 fetches, all
+200. Notes and their outcomes:
+- Row 9 (wrong): ADR 0004 lines 271–272, "no source read here states their precision" for rem_euclid/div_euclid; std
+  1.99.1 says "guaranteed to be the rounded infinite-precision result". → rust-reviewer, who checks the saved excerpt
+  first (the skeptic step folded into the owner's check, for time: a deviation, stated in the report).
+- 8c (imprecise): ADR 0002 line 1030 "draw on paid minutes" should read "draw on the account's included compute usage
+  and are then billed per minute". Deferred to the revision after the stop review (low; the owner's context is cold;
+  the verifier's replacement text is recorded here).
+- Row 6 (simplification): "a site being the registrable domain"; MDN also counts the scheme for SameSite cookies
+  (ADR 0001 lines 489–490, ADR 0006 lines 489, 936–937). Deferred (optional wording).
+- Row 7: RFC 6177 §2: one customer may hold many /64s; the drafts keep the prefix length as data. No change.
