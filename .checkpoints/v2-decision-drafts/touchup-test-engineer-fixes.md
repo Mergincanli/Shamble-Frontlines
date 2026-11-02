@@ -144,3 +144,45 @@ AFTER:
     OQ-0003-19, whether the three factions read apart by colour alone (his pick among its options).
 END
 
+d2 F4 holds: the statistics key defines p99 as "the 594th smallest value" of 600 (0003:1095), which is the 7th-largest
+(600 − 594 = 6 lie above it). Same line count.
+
+### FIX F4 (fixcheck-d2)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+  1162–1163). **H's tail form:** where a mark's number is a p99 of per-frame values from H (PM-0003-11, -19, -20, -21,
+  -26, -27, -30, -33 and -40), each of the 3 runs measures 3,000 frames after the same 300 warm-up frames (proposed: at
+  600 frames a p99 is the 6th-largest frame, so one garbage-collection pause or one operating-system task inside a
+  20-second run decides a 1.0 ms row; at 3,000 frames 30 frames lie above it, and a run takes 100 s at 30 fps). The
+  median and p95 marks keep R3's 600 frames.
+AFTER:
+  1162–1163). **H's tail form:** where a mark's number is a p99 of per-frame values from H (PM-0003-11, -19, -20, -21,
+  -26, -27, -30, -33 and -40), each of the 3 runs measures 3,000 frames after the same 300 warm-up frames (proposed: at
+  600 frames a p99 is the 7th-largest frame (6 lie above it), so one garbage-collection pause or one operating-system
+  task inside a 20-second run decides a 1.0 ms row; at 3,000 frames 30 frames lie above it, and a run takes 100 s at 30
+  fps). The median and p95 marks keep R3's 600 frames.
+END
+
+d2 F12 holds: `docs/AUDIT_BUGS_PERF.md` line 27 (P3) gives "~30 DOM writes per frame" with the method "static scan
+(L2420–2722)", not a measurement. Same line count.
+
+### FIX F12 (fixcheck-d2)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-19 | The main-thread CPU rows hold (parts 6, 7) | CPU per frame p99 at most 16 ms (ML, Low) and 8 ms (RD, High); of which character animation (posing and bone upload, budget LOD on) p99 at most 1.0 ms (ML) and 2.0 ms (RD) | as PM-0003-18 | H on BS; per frame, `performance.now()` from the animation-loop callback's start to the end of its work, plus that frame's block message handler; animation timed around posing and bone upload, on a build with the isolation flag on. The span cannot see the style, layout and paint the browser runs after the callback for the DOM HUD (legacy measured about 30 DOM writes per frame as a cost, `docs/AUDIT_BUGS_PERF.md` line 27, P3), which show only in frame time (PM-0003-18), so PM-0003-47 counts the HUD's DOM writes beside this row | H in its tail form, V; rule B; S on ML | R3-BUDGET-REC2's rows (lines 1125–1126); R3-CHAR-REC2's mark (lines 1061–1062) |
+AFTER:
+| PM-0003-19 | The main-thread CPU rows hold (parts 6, 7) | CPU per frame p99 at most 16 ms (ML, Low) and 8 ms (RD, High); of which character animation (posing and bone upload, budget LOD on) p99 at most 1.0 ms (ML) and 2.0 ms (RD) | as PM-0003-18 | H on BS; per frame, `performance.now()` from the animation-loop callback's start to the end of its work, plus that frame's block message handler; animation timed around posing and bone upload, on a build with the isolation flag on. The span cannot see the style, layout and paint the browser runs after the callback for the DOM HUD (legacy's audit counted about 30 DOM writes per frame as a cost, by a static scan, `docs/AUDIT_BUGS_PERF.md` line 27, P3), which show only in frame time (PM-0003-18), so PM-0003-47 counts the HUD's DOM writes beside this row | H in its tail form, V; rule B; S on ML | R3-BUDGET-REC2's rows (lines 1125–1126); R3-CHAR-REC2's mark (lines 1061–1062) |
+END
+
+d2 F13 holds for PM-0003-17 (0003:1151): the look checklist sets "The legacy view is legacy itself opened in a second
+Brave window" (0003:1223–1224). 0003:960 and 0003:1367 lie outside the pass marks (part 13 and the Test plan, not this
+unit's text): left to their author, graphics-engineer, with the same wording. Same line count.
+
+### FIX F13 (fixcheck-d2)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-17 | Mustafa's verdict on the look (part 5; part 11; LOOK_V2 §9) | every LOOK_V2 item in the look checklist below judged "achieved", and a pick recorded for each call he makes; 0 items left "not yet" | MP, Brave on Windows | the look checklist below, each view beside a legacy screenshot at the same framing | one session; an item marked "not yet" goes back to the draft and is shown again | LOOK_V2 §9; plan rule 12 |
+AFTER:
+| PM-0003-17 | Mustafa's verdict on the look (part 5; part 11; LOOK_V2 §9) | every LOOK_V2 item in the look checklist below judged "achieved", and a pick recorded for each call he makes; 0 items left "not yet" | MP, Brave on Windows | the look checklist below, each view beside the legacy view (legacy in a second Brave window, or its screenshot) at the same framing | one session; an item marked "not yet" goes back to the draft and is shown again | LOOK_V2 §9; plan rule 12 |
+END
+

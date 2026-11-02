@@ -6,3 +6,4 @@
 - 21:35 d2 F1a FIX written (0005 Feel Lab: old step 3 out, step 4 back, net 0 lines; lines are 2349-2354 on disk). Next: d2 F2 (0003 tail-form 10 % rule vs PM-0003-30 3 %).
 - 21:40 d2 F2 FIX written (PM-0003-30 bundle rule on run medians; V unchanged). Next: d2 F5 (look steps 4, 27, 32), F4, F12, F13.
 - 21:46 d2 F5 FIX written (3 blocks: look steps 4, 27, 32; line counts kept). Next: d2 F4, F12, F13 (0003), then glossary check, DONE.
+- 21:50 d2 F4, F12, F13 FIX written. Next: apply all blocks to scratch copies, glossary check, sentence-under-table check, DONE.
