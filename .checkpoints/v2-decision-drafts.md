@@ -38,6 +38,19 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+Seventh spend-limit cut, 2026-11-02 about 12:15 Amsterdam ("resets 2:20pm (UTC)", 15:20 Amsterdam): netcode-architect's
+final batch (written, 57 FIX and 39 NOTE, in proofreading), game-designer's (just started) and rust-reviewer's follow-up
+b (just started) failed with HTTP 429; the session's worker process also restarted. Mustafa, about 17:28 Amsterdam, in
+the session's chat: "Try again" and "You're halfway usage so you know, make sure to set the agents up in a way that they
+save their work & progress (reduce the chance of losing work when usage is hit)". Done: every remaining prompt and every
+resume message now carries `prompts/_save-as-you-go.txt` (each block written to the output file the moment it is
+composed; a notes line after each finding; on a restart, continue after the last complete block); the background saver
+restarted (every 5 minutes). Applied since the cut: b88714d (ADR 0005's frame and content batch, 21 blocks; ADR 0006's
+follow-up b, 11 blocks). Resumed about 17:30: netcode-architect (finish proofreading), game-designer, rust-reviewer
+follow-up b. Next: test-engineer A (after 0001) and B (after the ability section and 0004 b), the synthesis (last),
+fixcheck-d (two units), docs-keeper, the report.
+
+Before (2026-11-02 midday):
 2026-11-02 about 11:15 Amsterdam. All ten step-10 reviews are in (review-*.md), with fixcheck-a, -b, -c (PASS WITH
 NOTES) and skeptics 4 and 5 (all upheld). REVISE verdicts: 0001 (engine-architect small, game-designer, netcode-
 architect small, perf-auditor small), 0002 (security-auditor, rust-reviewer small), 0003 (perf-auditor small,

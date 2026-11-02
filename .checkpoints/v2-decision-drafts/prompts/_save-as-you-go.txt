@@ -1,0 +1,8 @@
+## Save as you go (Mustafa, 2026-11-02: usage limits cut agents mid-task; lose as little as possible)
+- Create your output file at the start, then add to it as you go: each FIX or NOTE block (or verdict row) goes into the
+  file the moment you have composed it, never held back for the end. The session's background saver commits and pushes
+  the checkpoint folder every 5 minutes, so whatever is in your files survives a cut.
+- Keep the file valid as you go: finish each block (its END line) before you start the next one.
+- After each finding or unit of work, add one line to your notes file: what is done, what comes next.
+- On a restart, read your notes and your output file first, and continue after the last complete block. Never redo a
+  finished block, and never start the file again from scratch.
