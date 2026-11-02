@@ -34,3 +34,6 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - coordinator msg 2: CD-2 row (PM-0005-4 or -5) gains a per-target leg: CD-2 reports per target the reserved worst case of content-bounded effects; names missing caps (others' effects, pickups, big vehicles); content spike item 2 checks per-target share; BEFORE from 72cfcc3 (pass marks unchanged)
 - 0003 checklist intro 1163-1167 done (AD-2/5/8)
 - 0003 checklist step 4 (AD-4) and steps 9-15 (AD-5/14/9/12) done
+- 0003 checklist steps 26-30 + new 31, 32 done (GE-7, AD-10, GE-8, AD-2, AD-3, OQ-0003-18/-19 picks)
+- 0003 OQ-0003-20 added after OQ-0003-19 (lines 928-929). README row needed (engine-architect)
+- 0003 NOTEs written (PA-4, PA-7, GE-6, GE-2, GE-14, AD-12, PA-14, AD-2). 0003 DONE except check. Next: ADR 0004

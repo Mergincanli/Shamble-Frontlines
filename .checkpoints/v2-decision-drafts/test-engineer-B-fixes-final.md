@@ -321,3 +321,125 @@ AFTER:
     lushness only (§2's `[DECIDED]` "trees with variety"): the tree style is `[OPEN]` (§8) and not judged here.
 END
 
+### FIX GE-7 (step 26: the timing half to ADR 0001's checklist), AD-10 (step 27: the flash over the HUD; routed), GE-8 (step 28: MP's devicePixelRatio), AD-2 (new step 31: the Low frame; routed by graphics-engineer), AD-3 (new step 32: the busy fight at day and dusk)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+26. The Imperial Warrior's SMG firing at a target, beside legacy's (§7; LOOP_V2 §7). Expected: punchy: kick, muzzle
+    flash, tracer, impact, hit marker, sound, target flinch and kill confirm; the shot feels instant and the hit
+    feedback comes when the hit is confirmed.
+27. One big moment with the halftone flash and ink line boil (§7; OQ-0003-8). Expected: comic impact touches, used
+    sparingly. Pick: keep or drop each (its cost is in PM-0003-9).
+28. The same frame at pixel ratio 1 and 2, with PM-0003-14's GPU times beside it (OQ-0003-12). Pick: ratio 1 or 2 on
+    Low.
+29. The legacy touches LOOK_V2 does not name, each shown beside legacy (OQ-0003-15): comic words, the kill vignette,
+    the toy-soldier death fall, the skin rim, the camera-player cutaway (structures between the camera and the player
+    fade, beyond LOOK_V2 §4's roofs; walk the player behind a building), and the ground grid, the red arena border and
+    the world text labels. Pick: keep, change or drop each.
+30. Nothing to judge for LOOK_V2 §8: the test assets are plain glTF/GLB exports given the comic look by the engine
+    (steps 2 to 29 show it); compression, LODs and slot renaming are not tested here (ASSET-RESEARCH (a)); the
+    per-unit budgets are counted in PM-0003-15 and PM-0003-22.
+AFTER:
+26. The Imperial Warrior's SMG firing at a target, beside legacy's (§7; LOOP_V2 §7). Expected: punchy: kick, muzzle
+    flash, tracer, impact, hit marker, sound, target flinch and kill confirm, each read for its look and sound. Not
+    judged here: whether the shot feels instant and the hit feedback comes when the hit is confirmed, since LS has no
+    Worker, tick, input path or server to confirm a hit; that timing is judged on the real path, in ADR 0001's
+    netcode checklist (its step 7, at P2) and at slice 1's Brave check.
+27. One big moment with the halftone flash and ink line boil (§7; OQ-0003-8), with the flash over the HUD, which the
+    overlay also dots (5.l). Expected: comic impact touches, used sparingly; the dotted HUD still reads. Pick: keep
+    or drop each (its cost is in PM-0003-9); and, for OQ-0003-18, whether the concussion shake of step 25, the
+    flashes and line boil soften for players who ask for reduced motion (its options).
+28. At Low, the same frame at pixel ratio 1 and 2, with PM-0003-14's GPU times beside it (OQ-0003-12). If MP's
+    `devicePixelRatio` (PM-0003-16) is below 1.5, ratio 2 there is supersampling, not the sharper HiDPI view the
+    question is about (R3-BUDGET-F3, lines 551–555; inferred), so this step is shown on ML's own panel at its default
+    Windows scaling, or on MAC, its ratio recorded. Pick: ratio 1 or 2 on Low.
+29. The legacy touches LOOK_V2 does not name, each shown beside legacy (OQ-0003-15): comic words, the kill vignette,
+    the toy-soldier death fall, the skin rim, the camera-player cutaway (structures between the camera and the player
+    fade, beyond LOOK_V2 §4's roofs; walk the player behind a building), and the ground grid, the red arena border and
+    the world text labels. Pick: keep, change or drop each.
+30. Nothing to judge for LOOK_V2 §8: the test assets are plain glTF/GLB exports given the comic look by the engine
+    (steps 2 to 29, 31 and 32 show it); compression, LODs and slot renaming are not tested here (ASSET-RESEARCH (a));
+    the per-unit budgets are counted in PM-0003-15 and PM-0003-22.
+31. The Low frame (part 7's look floor; OQ-0003-16): Low's starting row (pixel ratio 1, scene resolution scale 0.75,
+    one 1024² sun shadow map, the rest as Low's tier data sets it), shown on his PC beside the same view at High and
+    beside legacy: the whole frame (step 2), the ink families (step 4), the shadows (step 6), the frame with ink and
+    ambient occlusion on, then off (step 7), and the two-floor building's corners (step 20). Expected: every
+    `[DECIDED]` item still reads at Low: cel shading with bold ink, thick outlines especially strong on buildings, soft
+    shadows, emissive accents. Record: achieved or not yet, per item. Pick (OQ-0003-16): per item, whether Low may only
+    lower it or may switch it off, with PM-0003-9's costs on the minimum laptop beside it; and whether AO stays on at
+    Low.
+32. The busy fight: LS at the fight on screen (48 soldiers in three teams, the 4 very large units, 300 projectiles with
+    their visual effects) at High, by day and at dusk (§5, §6.1, §6.4, §6.5). Expected: his own soldier, the three
+    factions and a thrown grenade read at a glance; units, faction colours and effects stay the brightest things on
+    screen, and the glow and the effects do not wash out the units, at day and at dusk. Record: achieved or not yet,
+    for each mood; for OQ-0003-19, whether the three factions read apart by colour alone (his pick among its options).
+END
+
+### FIX PA-7 (new OQ-0003-20, HEAT-SOAK: the Advisor)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+  fight view through a colour-blindness simulation, and Mustafa judges it; (c) faction shape cues, left to a later
+  design session. Decider: Mustafa. What decides it: his judgement in the look proof test. Research ids: none.
+AFTER:
+  fight view through a colour-blindness simulation, and Mustafa judges it; (c) faction shape cues, left to a later
+  design session. Decider: Mustafa. What decides it: his judgement in the look proof test. Research ids: none.
+- **OQ-0003-20. Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop?**
+  Why it matters: a match runs about 20 minutes (LOOP_V2 §8), while one H run takes about 30 s at 30 fps (900 frames;
+  about 110 s in the tail form); in a thin laptop the CPU and the integrated GPU share one power and heat budget, so a
+  cold run can measure a short boost the same laptop no longer holds at minute 15 and pass a row it then fails
+  (engineering experience, not researched: the chosen laptop's boost behaviour is unknown). Options: (a) the soaked
+  set S gates PM-0003-18 to PM-0003-21 on ML, and the cold set is reported beside it; (b) the cold set only, R3's 3
+  runs as written; (c) both must pass. The pass marks hold to (a) until it is answered. Recommendation: (a), the
+  perf review's question HEAT-SOAK. Decider: the Advisor. What decides it: the Advisor's reading of VISION_V2 §4's
+  "30+ fps on Low" over a whole match; the bench's cold and soaked sets, once measured, show how far apart they lie.
+  Research ids: R3-BUDGET-REC2 (lines 1162–1164, its 3 runs; it stays adopted, no new disposition).
+END
+
+### NOTE PA-4 (routed)
+fixed in PM-0003-44 (the presented-frame count, reported until OQ-0003-17 sets the share) and the fail route. routed:
+engine-architect's ENGINE_OVERVIEW §6.9 row and the README's OQ-0003-17 row, as graphics-engineer's NOTE PA-4 already
+asks; nothing more.
+END
+
+### NOTE PA-7 (routed; new question)
+fixed in the key (S, the soaked set), PM-0003-18 to -21 and the fail route; the choice is OQ-0003-20 (HEAT-SOAK,
+decider the Advisor), with (a) held as the interim. routed: engine-architect's docs/adr/README.md lists OQ-0003-20
+under the decisions the drafts ask for (the Advisor); graphics-engineer's part 8 harness bullet may add "and, on the
+minimum laptop, a soaked set after 15 minutes of looping (OQ-0003-20)" (optional: the key already carries it).
+END
+
+### NOTE GE-6 (routed)
+fixed in PM-0003-45 (3 cycles, the counters back to the first teardown's values, the heap within 0.5 MB, a spy on
+shared materials). routed: graphics-engineer's part 7 or part 10 names the teardown rule the row tests ("a match's
+models, textures, render targets and pooled effects are disposed when it ends; shared materials are disposed only when
+no loaded content uses them"), as GE-6's own fix asks.
+END
+
+### NOTE GE-2 (my half; unit A's half)
+fixed in PM-0003-36 (the backend recorded per CI engine) and PM-0003-46 (the WebGPU route: the CI job if the
+boundary spike finds one, else the smoke run on ML per render-path change-set). Unit A's PM-0002-51 and PM-0002-64
+record the same backend per engine and point to PM-0003-46 for the route rather than restating it.
+END
+
+### NOTE GE-14 (a question, kept open)
+fixed as far as it can be without the source: PM-0003-2 counts the device's `uncapturederror` and `lost` events and
+`webglcontextlost` as device errors, with a planted invalid bind group as the bite, and PM-0003-16 records how each
+browser shows it. The WebGPU specification's error model was not read here (this round fetches nothing), so the row
+says "not researched"; the verifier may confirm it against the specification's error-handling section.
+END
+
+### NOTE AD-12 (routed)
+fixed in step 15. routed (optional): graphics-engineer's part 11 may name the lush patch's trees as legacy's ported
+tree builders (GW18), so the test assets and the step agree.
+END
+
+### NOTE PA-14 (routed)
+fixed in PM-0003-19 (what its span cannot see) and PM-0003-47 (the HUD's DOM mutations, 0 in a still stretch).
+routed (optional): graphics-engineer's part 10 step 7 may add "written only when a value changes, as legacy's cached
+setters do (PM-0003-47)".
+END
+
+### NOTE AD-2, OQ-0003-16 (routed)
+the Low frame is look checklist step 31 (appended after step 30, so no step is renumbered). routed: graphics-engineer's
+OQ-0003-16 "What decides it" and its Rollback line may name "the look checklist's step 31".
+END
+
