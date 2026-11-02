@@ -59,3 +59,21 @@ def note(fid, body):
 
 def log(line):
     with open(NOTES, 'a', encoding='utf8') as f: f.write('- ' + line.strip() + '\n')
+
+def rebuild():
+    """Replay every FIX block in OUT onto the snapshots, in order, into applied/ (asserting each BEFORE once)."""
+    src = open(OUT, encoding='utf8').read()
+    docs = {p: snap(p) for p in P}
+    for m in re.finditer(r'^### FIX (.+?)\nFILE: *(\S+)\nBEFORE:\n(.*?)\nAFTER:\n(.*?)\nEND\b', src, re.S | re.M):
+        fid, fil, b, a = m.groups()
+        assert docs[fil].count(b) == 1, ('replay', fid, docs[fil].count(b))
+        docs[fil] = docs[fil].replace(b, a, 1)
+    for p, t in docs.items(): open(_ap(p), 'w', encoding='utf8').write(t)
+    print('rebuilt applied/ from', OUT)
+
+def unfix(fid):
+    """Withdraw a block written in this run (before anything depends on it), then rebuild applied/."""
+    src = open(OUT, encoding='utf8').read()
+    pat = re.compile(r'\n### (FIX|NOTE) ' + re.escape(fid) + r'\n.*?\nEND\n', re.S)
+    assert len(pat.findall(src)) == 1, ('unfix', fid)
+    open(OUT, 'w', encoding='utf8').write(pat.sub('', src, 1)); rebuild()

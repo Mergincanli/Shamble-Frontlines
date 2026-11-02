@@ -83,8 +83,9 @@ All of them: {REVIEW_OUTCOME}
   passed on: rust-reviewer's two blocks (test-engineer wrote its own) and one engine-architect block (superseded).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
   Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching.
-- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00; web fetching kept to 08:30 and later); four
-  spend-limit cuts (2026-10-31 19:18; 2026-11-01 05:30, 09:27, 14:20), each resumed from the agents' notes.
+- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00; web fetching kept to 08:30 and later); eight
+  spend-limit cuts over three days (appendix §5), each resumed from the agents' saved work; from 2026-11-02 Mustafa's
+  save-as-you-go rules (appendix §2).
 
 ## Risks
 1. Pointers into the drafts by line number drift with every fix: README's are re-pinned and checked by

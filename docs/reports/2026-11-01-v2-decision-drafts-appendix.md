@@ -139,6 +139,21 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
 - **The usage resets, 2026-10-31 at about 22:50 and 2026-11-01 at 13:52 Amsterdam** (the same words both times): "I hit
   my usage limit while you were working, but it has reset now. Please continue from where you left off."
 - **2026-11-01 at 19:06 Amsterdam, after the fourth spend-limit cut:** "Try again"
+- **2026-11-02 at about 17:28 Amsterdam, after the seventh cut:** "Try again", then "You're halfway usage so you know,
+  make sure to set the agents up in a way that they save their work & progress (reduce the chance of losing work when
+  usage is hit)".
+- **2026-11-02 at about 17:38 Amsterdam, three additions to that rule, for the rest of this task:**
+  > Three additions to the save-as-you-go rule, for the rest of this task (Mustafa):
+  > 1. for the agents working at a time, including the next waves
+  > 2. Scratch files live in the notes folder (.checkpoints/v2-decision-drafts/<agent>-scratch/), never in a temp folder.
+  > 3. At every checkpoint update, check that the background saver is running, and restart it if it stopped.
+  > Record these in the checkpoint.
+
+  The session applied them: every prompt and every running agent got the "Save as you go" rule (each block written to
+  the output file the moment it is composed; a notes line after each finding; scratch only in the notes folder; on a
+  restart, continue after the last complete block), and `scripts/saver_check.sh` ran at every checkpoint update.
+- **2026-11-02 at about 20:32 Amsterdam, after the eighth cut:** "I hit my usage limit while you were working, but it has
+  reset now. Please continue from where you left off."
 - **The one-off night run, 2026-10-31 between about 23:30 and 23:50:** "the next usage reset is going to be on 03:50 AM,
   so you can maybe tell it to prepare accordingly (starting the task at the right time)" and "Just for today (tonight):
   03:55, it can work until 11:00 because I will not have much time to use claude, so it can work if needed. You can take
@@ -494,8 +509,8 @@ notes.
 | 9 again, the final round | {FINALCOMMITS} | every review finding fixed or deferred with a reason |
 | 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
 
-Spend-limit cuts (no work lost: every agent writes its notes as it goes and was resumed from them): 2026-10-31 about
-19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50.
+Spend-limit cuts, eight (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
+about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15 and 17:50.
 
 ## 6. The advisor's 19 conditions: where each is met
 
