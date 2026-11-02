@@ -5,3 +5,5 @@
 - next: read OQ titles/deciders (oq-604a497.tsv), then fix findings ENGINE_OVERVIEW, SPIKE_PLAN, README
 - FC-2 FIX written (README:268-270; B1-B12, since ADR 0006 part 13 now has B12 at 0006:497). Next: FC-3
 - FC-3 FIX written (SPIKE_PLAN:180-183; R1-RR-OQ5 out of 'It decides', the Advisor sets the limit, ADR 0002 part 4 at 0002:263-266). Next: FC-4
+- FC-3 FIX written (SPIKE_PLAN:180-183; R1-RR-OQ5 moved out of It decides; ADR 0002 part 4, 0002:263-266). Coordinator added: README CF-2 row ADR 0001 line 161 -> 162; check every register line pointer into drafts by script. Next: FC-4
+- FC-4 FIX (SPIKE_PLAN:281-282: ADR 0006 part 13 item B9, OQ-0006-13) and SA-1-routed FIX (item 6 token revoked, 261-263) written. Next: FC-5/GE-12 (ENGINE_OVERVIEW) with the ADR 0002/0001-routed lines 37 and 94 and client-endpoint crate

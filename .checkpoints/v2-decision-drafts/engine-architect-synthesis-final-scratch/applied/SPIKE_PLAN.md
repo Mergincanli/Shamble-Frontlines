@@ -261,8 +261,9 @@ and the asset spike before the first authored model, and the Feel Lab test once 
 - **Who judges what:** the scripts; Mustafa runs the hosting checklist (ADR 0006, inside PM-0006-9) in Brave and in his
   dashboard.
 - **Depends on:** the drafts approved; Mustafa's Cloudflare account with a test project and its deploy token in a
-  `preview` environment (secrets are his to add); a static test page with a module worker, a `.wasm` and a hashed
-  bundle stand-in; throwaway deploy and close workflows; ML and MAC with the four browsers.
+  `preview` environment (secrets are his to add; he revokes the token when the check ends: ADR 0006 part 13, item B9);
+  a static test page with a module worker, a `.wasm` and a hashed bundle stand-in; throwaway deploy and close
+  workflows; ML and MAC with the four browsers.
 - **Place:** wave 1, in parallel with the netcode proof test; it must end before the foundation's preview step (a
   failure of PREV-DELETE with no workaround brings back ADR 0006's alternative, Workers static assets).
 - **Size:** S of session work, with a calendar span of at least two days (a 24 h wait after each close, then a policy
@@ -281,7 +282,9 @@ and the asset spike before the first authored model, and the Feel Lab test once 
 - **Pass marks:** PM-0002-35 to PM-0002-69 (PM-0002-69: the foundation is done); later, at slices 1 to 6, PM-0002-70 to
   PM-0002-76. Mustafa runs the foundation checklist (ADR 0002).
 - **Depends on:** the drafts accepted; the boundary spike's and the netcode proof test's results; the preview hosting
-  check before the preview step; Mustafa's client-host token (ADR 0006 part 1) and branch-protection setting.
+  check before the preview step; Mustafa's client-host deploy token in the `preview` environment (ADR 0006 part 13,
+  item B9; how production stays out of that token's reach is OQ-0006-13, answered before the first client-host token
+  is added) and branch-protection setting.
 - **Size:** L (six change-sets: restructure, toolchain, gate and CI, generated types, skeleton, previews).
 - **Research it carries:** R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4; R5-RUSTLINT-REC1–REC6; R5-TEST-REC1,
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate
