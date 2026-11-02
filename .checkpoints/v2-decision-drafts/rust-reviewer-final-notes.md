@@ -19,3 +19,4 @@ DONE
 - NOTE RR-1 written (route PM-0004-23; checks: 3 blocks apply at b815c85, 0 new cite flags, helpers checked natively)
 DONE (follow-up b)
 - follow-up c (RR-11: no usize in serialized or hashed bytes, part 9) started; output rust-reviewer-fixes-final-c.md from the doc on disk
+- block c written and applies on a copy; DONE (follow-up c)

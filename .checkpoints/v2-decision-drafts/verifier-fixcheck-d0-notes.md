@@ -12,3 +12,5 @@
 - 20:39 rows 8b (confirmed+note), 8c (imprecise wording, change suggested), 8d (confirmed) done. Next: optional extra checks (sqrt/mul_add exactness, RFC 8737 quote) if time, then fetch audit table, then verify line numbers.
 - 20:41 extra row 9 done: ADR 0004 269-272 'no source read here states their precision' is wrong for rem_euclid/div_euclid (std 1.99.1 §Precision); abs has a std 'precise result' line. Next: maybe RFC 8737 quote (research-cited, optional), then fetch audit table + final check.
 - 20:41 extra row 10 done (RFC 8737 quote confirmed). Next: write the fetch audit table into the verdicts file, then final summary and DONE.
+- 20:42 fetch audit table written (17 fetches, all 200); legacy gate run: all PASS except 5a smoke (Chromium missing in this session). DONE.
+DONE

@@ -42,3 +42,7 @@ Verdicts: confirmed (quote, where) · wrong · unsupported · unverified (HTTP s
 | 20:41:34 | www.rfc-editor.org | https://www.rfc-editor.org/rfc/rfc8737.txt | 200 | 19497 | 0.420898 |
 
 All fetches: `curl -sSL --max-time 30` through the session proxy, allow-listed hosts only (raw.githubusercontent.com, doc.rust-lang.org, docs.github.com, developer.mozilla.org, www.rfc-editor.org). No fetch failed; github.com was not used. Raw pages were kept only in the session scratchpad; the quoted excerpts are in verifier-fixcheck-d0-scratch/excerpts.md, the raw audit in verifier-fixcheck-d0-scratch/audit.tsv. Text-dump line numbers in the excerpts refer to the HTML-to-text dumps made by verifier-fixcheck-d0-scratch/html2txt.py, not to the pages.
+
+## Legacy gate (verifier routine, not asked by the prompt)
+
+`node tools/gate.mjs 9e7db28` on the working tree, 20:43: checks 1, 2, 3 (+0 -0), 4, 5b, 5c, 5d PASS; 5a smoke FAIL because Chromium for Playwright is not installed in this session (`/opt/pw-browsers/chromium_headless_shell-1194` missing), an environment gap, not a code fault. No `.js` or `.html` file differs from 9e7db28 (docs-only change-set).
