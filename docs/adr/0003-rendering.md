@@ -389,14 +389,15 @@ judges the look) and the render budget bench (the numbers).
      says how much each may cost" (R3-BUDGET-REC3, lines 1172–1173), so its on/off switch never takes out a technique
      that carries a LOOK_V2 `[DECIDED]` item (part 5) unless Mustafa answers OQ-0003-16 that way. Low's starting row
      is the budget table's (pixel ratio capped at 1, scene scale 0.75–1, one 1024² sun map), and the look checklist
-     shows that frame beside High and legacy, so Mustafa judges the look the minimum class sees (the step is
-     test-engineer's). *Need:* VISION_V2 §4; LOOK_V2 (the floor).
+     shows that frame beside High and legacy, so Mustafa judges the look the minimum class sees (the look
+     checklist's step 31). *Need:* VISION_V2 §4; LOOK_V2 (the floor).
 8. **Measurement.**
    - One client harness: per frame, CPU frame time from `performance.now()`, GPU time from timestamp queries where
      the backend has them (else "not available"), and the `renderer.info` counters reset once per frame; it reports
      median, p95, p99, max and frames over budget for 3 runs of 600 frames after 300 warm-up frames, each labelled with
      backend, adapter, browser version, `devicePixelRatio`, resolution and whether GPU times are quantized
-     (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193).
+     (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193). On the minimum laptop the same run set is also taken
+     after at least 15 minutes of play (the pass marks' soaked set S); which of the two sets gates is OQ-0003-20.
    - A fixed benchmark scene: a recorded match replayed from its inputs (ADR 0004's identical results: r1-simulation-core.md, Recommendations, R1-DET-REC1, lines 2129–2145, and
      R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, [previews](../research/GLOSSARY.md#preview) included
      (R3-MEASURE-REC2, lines 1195–1204). If replay on the client is not identical, the fallback is a scripted bot
@@ -455,8 +456,14 @@ judges the look) and the render budget bench (the numbers).
     and is not proposed. The renderer reads typed arrays whatever the block's layout ("it reads typed arrays either
     way", r3-rendering.md, Pointers Q4, lines 1489–1491), so it sets no per-entity or per-field requirement on
     ADR 0002's layout (*answers* R3-XT-OQ7 and R1-XT-OQ16). Nothing in this flow allocates per frame (R3-CHAR-REC3's
-    mark; R3-MEASURE-REC3 gates it). *Need:* VISION_V2 §6.2 (aiming at height), §6.9; LOOP_V2 §7, §11; UPGRADE-SCOPE
-    (the track display).
+    mark; R3-MEASURE-REC3 gates it). *Between matches:* when a match ends, the page disposes what it loaded for that
+    match (its models with their geometries and textures, and any render target made for it), keeps the visual-effect
+    pools and the renderer, and releases a shared material only once no scene uses it (ADR 0005's GPU part 7: "never
+    disposed while shared"); so GPU memory and the render counters (`renderer.info.memory`, R3-MEASURE-F3, lines
+    617–622) come back to the same baseline after every match in one tab (PM-0003-45). This is the code rule "dispose
+    GPU resources on teardown, never dispose pooled/shared materials" (`CLAUDE.md`, code rules) carried into v2, as
+    the Consequences say. *Need:* VISION_V2 §6.2 (aiming at height), §6.9; LOOP_V2 §7, §11; UPGRADE-SCOPE (the track
+    display); VISION_V2 §4 for the teardown (the budgets hold match after match).
 11. **The spikes.** The look proof test (LOOK_V2 §9) and the render budget bench, set out under "What a spike must
     prove"; `docs/SPIKE_PLAN.md` gives their final names and places. **The look proof test needs authored models:**
     a few plain glTF/GLB exports (one soldier in LOOK_V2 §3's proportions with its faction colour slots, one weapon,
@@ -467,7 +474,8 @@ judges the look) and the render budget bench (the numbers).
     weapon silhouettes cannot be judged on legacy's primitive parts
     (CL10, `LEGACY_INVENTORY.md` line 119). It decides nothing about compression or LODs (ASSET-RESEARCH (a), the advisor's ruling; J4).
     Beside them run ADR 0005's ported kit builders, for the asset families OQ-0005-AP2 asks Mustafa to judge
-    (authored model or procedural builder).
+    (authored model or procedural builder). The test's trees are legacy's tree builders ported as placeholders (GW18,
+    `LEGACY_INVENTORY.md` line 206), judged for variety and lushness only: the tree style stays `[OPEN]` (OQ-0003-9).
     The only glTF evidence in the research is three.js's own example, which loads a glTF skinned mesh into the
     WebGPU renderer (R3-CHAR-F8, lines 476–480).
 
@@ -516,7 +524,7 @@ another file is named.
 | §8 `[DECIDED]` v2 may use authored 3D models | glTF/GLB loaded and given the comic look per material slot (5.a) | R3-CHAR-F8 (476–480) only | the test's authored assets | 0005 (the pipeline) |
 | §8 `[DEFAULT]` the flow: sketch → Spline model → glTF/GLB → automated compress, LODs, slot renaming → the engine applies the look | step 5 is part 5.a; steps 3–4 are ADR 0005's | R3-CHAR-F8 only; steps 3–4 not researched (ADR 0005's asset-pipeline research) | plain glTF/GLB exports, with no compression or LOD step | 0005 (steps 1–4) |
 | §8 `[DEFAULT]` budgets per unit; never Spline's runtime | per-unit budgets derived from this record's totals; no Spline runtime is loaded | R3-BUDGET-REC2 (1118–1164), R3-CHAR-REC1 | test assets counted against the budget rows | 0005 (per-unit budgets) |
-| §8 `[OPEN]` the tree style | nothing decided; the test's trees are labelled placeholders | – | – | Mustafa (OQ-0003-9 lists it) |
+| §8 `[OPEN]` the tree style | nothing decided; the test's trees are legacy's ported tree builders (GW18), labelled placeholders | – | – | Mustafa (OQ-0003-9 lists it) |
 
 ## Options considered
 
@@ -900,8 +908,8 @@ ADR 0005's.
   switch named items off where its budget needs it, listed in the tier table; (c) Mustafa decides item by item in
   the look proof test, on the Low frame beside High and legacy, with each technique's measured cost (PM-0003-9).
   Parts 5 and 7 hold to (a) for the `[DECIDED]` items until he answers. Recommendation: (c), with (a) as the rule
-  meanwhile, since the costs are unknown today. Decider: Mustafa. What decides it: the look checklist's Low
-  frame (test-engineer's step) and PM-0003-9's costs on the minimum laptop. Research ids: R3-BUDGET-REC3,
+  meanwhile, since the costs are unknown today. Decider: Mustafa. What decides it: the look checklist's step 31
+  (the Low frame) and PM-0003-9's costs on the minimum laptop. Research ids: R3-BUDGET-REC3,
   R3-BUDGET-REC2, R3-LOOK-F15 (no new disposition: both recommendations stay adopted in Appendix A).
 - **OQ-0003-17. How is VISION_V2 §6.9's "without dropping frames" read as a mark?**
   Why it matters: the spectacle budget (part 7) is a difference in GPU time and draw calls, and the frame rows are
@@ -927,6 +935,18 @@ ADR 0005's.
   faction colour slots. Options (not researched): (a) colour only, for now; (b) the look proof test also shows the
   fight view through a colour-blindness simulation, and Mustafa judges it; (c) faction shape cues, left to a later
   design session. Decider: Mustafa. What decides it: his judgement in the look proof test. Research ids: none.
+- **OQ-0003-20. Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop?**
+  Why it matters: a match runs about 20 minutes (LOOP_V2 §8), while one H run takes about 30 s at 30 fps (900 frames:
+  300 warm-up and 600 measured; about 110 s in the tail form, 3,300 frames); in a thin laptop the CPU and the
+  integrated GPU share one power and heat budget, so a cold run can measure a short boost the same laptop no longer
+  holds at minute 15 and pass a row it then fails (engineering experience, not researched: the chosen laptop's
+  boost behaviour is unknown). Options: (a) the soaked set S gates PM-0003-18 to PM-0003-21 on ML, and the cold set
+  is reported beside it; (b) the cold set only, R3's 3 runs as written (R3-BUDGET-REC2, lines 1162–1164); (c) both
+  must pass. (a) and (c) go beyond R3's 3 runs: proposed, for the reason above. Part 8 and the pass marks hold to
+  (a) until it is answered. Recommendation: (a), since VISION_V2 §4's "30+ fps on Low" holds over a whole match.
+  Decider: the Advisor. What decides it: the Advisor's reading of VISION_V2 §4's "30+ fps on Low" over a whole
+  match; the bench's cold and soaked sets, once measured, show how far apart they lie. Research ids: R3-BUDGET-REC2
+  (lines 1162–1164, its 3 runs; it stays adopted, no new disposition).
 
 ## What a spike must prove
 

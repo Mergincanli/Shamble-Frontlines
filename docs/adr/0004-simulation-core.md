@@ -256,8 +256,10 @@ research ids, and the need it serves.
    lockstep, no fixed point. Inside the sim: f32 for every real-valued quantity (up to a map 2 km across,
    R4-PHYS-REC5), while time, counts and money are integers (parts 4 and 17). The float allow-list: `+ − × ÷` and
    negation; the comparisons and `total_cmp`; `sqrt`, `floor`, `ceil`, `round`, `trunc`, `fract` and explicit
-   `mul_add`, which std specifies exactly (R1-DET-F10, r1-simulation-core.md, Findings, lines 655–660); `abs` and
-   `copysign` (proposed: sign-bit operations, exact by definition); `as` casts (R1-DET-F15, lines 684–692); and the
+   `mul_add`, which std specifies exactly (R1-DET-F10, r1-simulation-core.md, Findings, lines 655–660); `abs` (std
+   1.99.1's `f32` page: "This function always returns the precise result") and `copysign` (proposed: a sign-bit
+   operation; std warns only of a NaN sign, which this part's no-NaN rule excludes); `as` casts (R1-DET-F15, lines
+   684–692); and the
    exact non-arithmetic methods the rules themselves use, such as `is_finite`, `is_nan`, `to_bits` and `from_bits`.
    Every other std `f32` and `f64` method is banned, and ADR 0002's lint is this list's complement. Among them are
    `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`, which std 1.99.1 marks non-deterministic as it does the
@@ -267,8 +269,11 @@ research ids, and the need it serves.
    comparisons (`if a < b { a } else { b }` and the like): on equal inputs, signed zeros included, each returns one
    defined argument, the same on every target, and none panics (a clamp whose bounds are the wrong way round returns a
    bound); a degree value becomes radians by one multiply with a pinned constant. `rem_euclid`, `div_euclid` and the
-   float `%` operator are not on the list: one joins only once PM-0004-22's unit vectors show it bit-identical on every
-   target (proposed: no source read here states their precision; review, not the lint, catches the operator).
+   float `%` operator are not on the list. std 1.99.1 guarantees `rem_euclid` and `div_euclid` "the rounded
+   infinite-precision result" (its `f32` and `f64` pages, read by the verifier on 2026-11-02), so they may join once
+   PM-0004-22's unit vectors confirm it on every target; no source read states the float `%`'s precision (the Rust
+   Reference defines it only by truncating division and the dividend's sign), and review, not the lint, catches the
+   operator.
    Transcendental maths only
    through the pure-Rust `libm` crate, pinned; no std `sin`, `cos`, `atan2`, `powf` or `exp`, no `algebraic_*`, no
    fast-math, no `relaxed-simd`; Wasm `simd128` off until the suite passes with it on. NaN never enters sim state: every
