@@ -92,3 +92,55 @@ AFTER:
 | PM-0003-30 | The spectacle budget (parts 6, 7; VISION_V2 §6.9) | the 4 very large units add at most 2.0 ms GPU time (p99) and at most 200 draw calls against BS without them, before any ink or AO pre-pass; render bundles stay only if they cut the WebGPU backend's CPU frame time by more than V's 3 % on each run pair's medians (proposed: the research names no statistic, r3 line 1092; V holds the run medians within 3 %, while the tail form lets p99s spread by 10 %, so a p99 cannot show a 3 % cut) | RD at High, Chrome on WebGPU | H on BS with the units, then with them hidden; the difference of p99s per run pair; draw calls per frame | H, V; all 3 pairs within 2.0 ms; draws within 200 on every frame. Bites: each unit drawn with 30 parts (4 × 30 × 2 = 240 draws) | R3-CHAR-REC4's mark (lines 1088–1092): 4 × 20 × 2 = 160 draws, plus margin |
 END
 
+d2 F5 holds: the checklist promises "the expected result in LOOK_V2's words" (0003:1223); LOOK_V2 says "thick black
+outlines, especially strong on buildings" (line 16), "thick ink on silhouettes, thinner lines inside" (line 52), "units,
+faction colours and effects are the brightest things on screen" (lines 50–51), "used sparingly" (line 63), and nowhere
+a contact line at silhouette weight, "still reads", "read at a glance" or "wash out". Each step keeps LOOK_V2's words as
+its Expected line and turns the rest into a look-at, a pick or a record. Same line count in each step (5, 4, 5).
+
+### FIX F5 (fixcheck-d2, look step 4)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+4. The two ink families side by side, beside legacy's ink (§2, §6.2; OQ-0003-2): A, screen-space edges (proposed); B,
+   the hull. Expected: thick black outlines, especially strong on buildings; thick ink on silhouettes, thinner lines
+   inside; the ink at the base of buildings, and where soldiers stand, is as heavy as their silhouette (5.b names this
+   contact line as a visible difference between the families). Pick: A or B, and whether the buildings' ink is heavy
+   enough.
+AFTER:
+4. The two ink families side by side, beside legacy's ink (§2, §6.2; OQ-0003-2): A, screen-space edges (proposed); B,
+   the hull. Expected: thick black outlines, especially strong on buildings; thick ink on silhouettes, thinner lines
+   inside. Look at: the ink where buildings and soldiers meet the ground (5.b names this contact line as a visible
+   difference between the families). Pick: A or B, and whether the buildings' ink and that contact line are heavy
+   enough.
+END
+
+### FIX F5 (fixcheck-d2, look step 27)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+27. One big moment with the halftone flash and ink line boil (§7; OQ-0003-8), with the flash over the HUD, which the
+    overlay also dots (5.l). Expected: comic impact touches, used sparingly; the dotted HUD still reads. Pick: keep
+    or drop each (its cost is in PM-0003-9); and, for OQ-0003-18, whether the concussion shake of step 25, the
+    flashes and line boil soften for players who ask for reduced motion (its options).
+AFTER:
+27. One big moment with the halftone flash and ink line boil (§7; OQ-0003-8), with the flash over the HUD, which the
+    overlay also dots (5.l). Expected: comic impact touches, used sparingly. Record: whether the dotted HUD still reads.
+    Pick: keep or drop each (its cost is in PM-0003-9); and, for OQ-0003-18, whether the concussion shake of step 25,
+    the flashes and line boil soften for players who ask for reduced motion (its options).
+END
+
+### FIX F5 (fixcheck-d2, look step 32)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+32. The busy fight: LS at the fight on screen (48 soldiers in three teams, the 4 very large units, 300 projectiles with
+    their visual effects) at High, by day and at dusk (§5, §6.1, §6.4, §6.5). Expected: his own soldier, the three
+    factions and a thrown grenade read at a glance; units, faction colours and effects stay the brightest things on
+    screen, and the glow and the effects do not wash out the units, at day and at dusk. Record: achieved or not yet,
+    for each mood; for OQ-0003-19, whether the three factions read apart by colour alone (his pick among its options).
+AFTER:
+32. The busy fight: LS at the fight on screen (48 soldiers in three teams, the 4 very large units, 300 projectiles with
+    their visual effects) at High, by day and at dusk (§5, §6.1, §6.4, §6.5). Expected: units, faction colours and
+    effects are the brightest things on screen (§6.1), at day and at dusk. Record: achieved or not yet, for each mood;
+    his notes on how his own soldier, the factions and a thrown grenade stand out, and any glow that hides units; for
+    OQ-0003-19, whether the three factions read apart by colour alone (his pick among its options).
+END
+

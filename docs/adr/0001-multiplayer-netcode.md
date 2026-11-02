@@ -186,13 +186,13 @@ server in the browser. The parts:
    reads for the local soldier and its vehicle: position and velocity, its weapon state, and the active effect rows
    (or the attribute values they produce) that own movement and own weapon state read, upgrade picks and ability
    effects included (ADR 0005 leaves how the predicting sim gets them to this record), so a pick or an effect that
-   changes move speed or a fire interval causes no correction; that section is sent unquantised, or the server
-   quantises its own copy the same way each tick, and like every field it is sent when it changes (its real size is
-   measured, R2-XU-OQ15). Never predicted: damage, deaths and hits on others; the uplink countdown and steals;
-   purchases; upgrade offers and picks; weapon pickups (interim: OQ-0001-10); the player's own abilities
-   until ABL-PREDICT is answered (interim: an ability press waits for the server's confirmation; ADR 0005's ability
-   system carries both answers). SEC-SPREAD (a) applies: weapon spread is known only to the server (in a local match,
-   the Worker's authority sim), drawn from an
+   changes move speed or a fire interval causes no correction after the first snapshot that carries it; that section is
+   sent unquantised, or the server quantises its own copy the same way each tick, and like every field it is sent when
+   it changes (its real size is measured, R2-XU-OQ15). Never predicted: damage, deaths and hits on others; the uplink
+   countdown and steals; purchases; upgrade offers and picks; weapon pickups (interim: OQ-0001-10); the player's own
+   abilities until ABL-PREDICT is answered (interim: an ability press waits for the server's confirmation; ADR 0005's
+   ability system carries both answers). SEC-SPREAD (a) applies: weapon spread is known only to the server (in a local
+   match, the Worker's authority sim), drawn from an
    [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) (ADR 0004); the client draws
    its tracers from a similar-looking cosmetic spread, and the hit event corrects them. *Why:* no input lag for what the
    player controls, no authority given to the client, and no spread a cheat can cancel. *Research:* R2-SYNC-REC3,
@@ -662,14 +662,14 @@ types: they are gameplay events or owner-section fields inside `Snapshot`, each 
 - **Upstream per client:** R2's estimate assumes 8 B commands, newest plus 3 repeats: about 22.3 kbps at 30 sends per
   second (option U1's 44.6 kbps at 60 sends per second, halved; r2-netcode.md, Options, Brief question 2, table C,
   lines 1704–1710). Part 5's command is larger: its aim point alone is up to 80 bits, beside the tick, sequence, move
-  vector, buttons, press counters and view time, about 15–20 B in all (the perf review's estimate, 2026-11-02; the
-  real size is measured, R2-XU-OQ4). With the newest-received acknowledgement (part 5), a datagram carries the
+  vector, buttons, press counters and view time, about 15–20 B in all (proposed: the perf review's estimate, 2026-11-02;
+  the real size is measured, R2-XU-OQ4). With the newest-received acknowledgement (part 5), a datagram carries the
   commands of one round trip plus up to two ticks of waiting (the snapshot's and the client's): 80–186.7 ms at P2's
   100 ± 20 ms, so 3 to 6 commands ((80 to 186.7) ÷ 33.3, rounded up; arithmetic). Sent whole (U1), with a header of
-  about 6 B (an assumption) and the 57 B of IPv4 transport overhead (r2-netcode.md, line 1742), at 30 datagrams a
-  second (240 bits a second per byte of datagram), that is (3 × 15 + 63) × 240 ≈ 25.9 to (6 × 20 + 63) × 240 ≈
-  43.9 kbps at P2, and at the cap of 8, reached at P3 and P4 or after a loss, (8 × 15 + 63) × 240 ≈ 43.9 to
-  (8 × 20 + 63) × 240 ≈ 53.5 kbps, against a mark of at most 48 kbps (IPv4: R2-BUD-REC1), 200 B per datagram
+  about 6 B (proposed: the same estimate) and the 57 B of IPv4 transport overhead (r2-netcode.md, line 1742), at
+  30 datagrams a second (240 bits a second per byte of datagram), that is (3 × 15 + 63) × 240 ≈ 25.9 to
+  (6 × 20 + 63) × 240 ≈ 43.9 kbps at P2, and at the cap of 8, reached at P3 and P4 or after a loss, (8 × 15 + 63) × 240
+  ≈ 43.9 to (8 × 20 + 63) × 240 ≈ 53.5 kbps, against a mark of at most 48 kbps (IPv4: R2-BUD-REC1), 200 B per datagram
   (48,000 ÷ 8 ÷ 30). So the repeats are delta-coded (U2, part 5), and the proof test records the real datagram at P2
   and at the cap; QUIC's acknowledgements riding on input packets add about 1.9 kbps (r2-netcode.md, line 1785:
   about 3.8 kbps at 60 Hz, an assumption there, halved).
@@ -1043,9 +1043,9 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
   the real parts meet their ceilings (the test review's reasoning); (c) is the fallback if the sim core spike's sim
   cannot run the stress scene in time. (b) is weaker because a replayed series loses the link between the sim's load
   and the server-only load in the same fight, and the margin is a tail statistic (our inference). The 30 Hz baseline
-  marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder
-  topped up): on the planning check they leave 7.49 ms. · *Decider:* the Advisor. · *What decides it:* the Advisor's
-  reading of the options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
+  marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder topped
+  up): on the planning check they leave 4.69 ms (16.67 − 9.18 − 2.80). · *Decider:* the Advisor. · *What decides it:*
+  the Advisor's reading of the options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
 - **OQ-0001-3. Is "100 ms of simulated latency" P2?** The proof test's human client runs at P2: 100 ms round trip,
   ±20 ms jitter, 2 % loss (part 13). · *Why it matters:* it sets what "look correct" is judged at. · *Options:* (a) P2,
   the round trip, as VISION_V2 §4's "ping"; (b) 100 ms each way, a 200 ms round trip (P4's latency). · *Decider:* the

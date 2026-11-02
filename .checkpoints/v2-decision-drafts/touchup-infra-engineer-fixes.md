@@ -129,3 +129,6 @@ AFTER:
     443 needs a front on each VM that routes by path to the room processes, or an address per room.
 END
 
+Checks (21:46): apply_fixes.py on a scratch copy applies all 7 blocks, 1485 -> 1485 lines, every heading and OQ line
+at its old number; glossary_check_drafts.py --skip-records on scratch copies: exact 0, in context 98, before and after,
+hit lists identical; no block sits beside a table.

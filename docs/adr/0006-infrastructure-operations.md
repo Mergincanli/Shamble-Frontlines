@@ -267,10 +267,10 @@ interim positions, until its own research before the first online playtest; the 
    *The supervisor's link to the lobby* (ADR 0001 hands the supervisor's calls to this record; proposed, not
    researched): each supervisor opens the link from its VM and registers the VM, its free room slots, and the build and
    protocol version of the room binaries it holds; the lobby asks it to start a room with the room id, the mode id and
-   the overrides (ADR 0001's supervisor calls); the supervisor answers with the host and a port from the firewall's
-   range (part 5); it reports Closed, an abnormal exit and draining. The link is authenticated (how: the security
+   the overrides (ADR 0001's supervisor calls); the supervisor answers with the host and a port from each firewall range
+   (part 5); it reports Closed, an abnormal exit and draining. The link is authenticated (how: the security
    baseline, item B5), and its message format is read with OQ-0006-3, beside ADR 0001's catalogue; routing joins by
-   build is OQ-0006-14's. *Ids:* R2-ROOM-OQ9, R2-XT-OQ4, R5-XT-OQ3, R6-XT-OQ1.
+   build is ADR 0001 part 11's, the release model OQ-0006-14's. *Ids:* R2-ROOM-OQ9, R2-XT-OQ4, R5-XT-OQ3, R6-XT-OQ1.
    *Need:* VISION_V2 §6.1 (rooms and private matches go through it).
 7. **Certificates (interim position, BASELINE-WHEN (b)).** In production every game server presents
    [a certificate per hostname](../research/GLOSSARY.md#game-server-certificate), issued through ACME (RFC 8555)
@@ -531,13 +531,13 @@ interim positions, until its own research before the first online playtest; the 
     must prove". *Need:* as parts 1, 3, 5, 8 and 9.
 15. **Releases (open: OQ-0006-14).** How a new client build, content set or room binary reaches production, how two
     versions meet while rooms run, and how a bad server release is rolled back are not designed, and no topic
-    researched them. As things stand, every room still on the old binary refuses a new client (ADR 0001's `JoinRejected`
-    on a version or content mismatch), and the client's reload fetches the same new bundle, so it cannot recover.
-    OQ-0006-14 decides the model before the first online playtest. Interim position (proposed): a release is made only
-    while no room runs, with the client and every VM's room binary switched together, and the previous room binary stays
-    on each VM, so a bad server release is switched back the same way. The production deploy job is ADR 0002's (part
-    13, B9); routing joins by build is ADR 0001's protocol (part 6). *Need:* VISION_V2 §6.1 (rooms and private matches
-    stay reachable across a release).
+    researched them. As things stand, the lobby sends a client only to rooms of its own build and content hash, and a
+    refused client reloads at most once (ADR 0001 part 11 and its failure table), but with no release model a new client
+    finds no room of its build until rooms on the new binary run. OQ-0006-14 decides the model before the first online
+    playtest. Interim position (proposed): a release is made only while no room runs, with the client and every VM's
+    room binary switched together, and the previous room binary stays on each VM, so a bad server release is switched
+    back the same way. The production deploy job is ADR 0002's (part 13, B9); routing joins by build is ADR 0001's
+    protocol (its part 11). *Need:* VISION_V2 §6.1 (rooms and private matches stay reachable across a release).
 
 ## Options considered
 
@@ -915,14 +915,14 @@ Researching it before this record, or leaving it as one shared question: settled
 - **OQ-0006-14. How do releases reach production while rooms run, and how is a bad server release rolled back?**
   - *Why it matters:* the client host switches production at once (inferred), while rooms still run the previous room binary
     and content; under ADR 0001's version rule ("a message change is a version bump") every old room refuses a new
-    client with `JoinRejected`, and its reload fetches the same new bundle (ADR 0001's failure table), so from the
+    client with `JoinRejected`, and the lobby sends it only to rooms of its build (ADR 0001 part 11), so from the
     first online playtest every release is something players feel (part 15). R6 sizes the goal fleet with "one VM for
     draining during deploys" (A-5, r6 lines 482–483) and designs no deploy; R2 notes that "WT_DRAIN_SESSION can drain a
     session before a server shuts down" (r2-netcode.md, Pointers between the R2 units, R2-TRN-F37, lines 3439–3440).
   - *Options* (not researched): (a) a release window: rooms drained, then the client and every VM's room binary
     switched together (the simplest; no player can join during it); (b) live releases: the new room binary installed
     beside the old one on every VM, the lobby's room directory carrying each room's build and content hash and sending
-    a client only to rooms of its own build (a field ADR 0001's directory would add), old rooms finishing, then the
+    a client only to rooms of its own build (as ADR 0001 part 11's directory does), old rooms finishing, then the
     client switched, with the previous hashed bundle still served. With either, the previous room binary stays on each
     VM for a rollback; how the client host puts a previous deployment back was not read.
   - *Decider:* the Advisor for the model (the engine-architect review asks for this open question now, answered
@@ -950,8 +950,8 @@ Researching it before this record, or leaving it as one shared question: settled
     and the firewall opens a range of each kind (part 5); R6 leaves tls-alpn-01's TCP 443 to "the port plan"
     (R6-HOST-OQ6, r6 lines 873–874), and ADR 0001's transport names no port. The fallback serves "all four browsers, on
     all networks" (r2 line 2661), yet a TCP port other than 443 may be blocked on the same strict networks that block
-    QUIC (a question; no source read). Only one listener per address can hold TCP 443, so 443 needs a front on each VM
-    that routes by path to the room processes, or an address per room.
+    QUIC (a question; no source read). A connection to an address's TCP 443 reaches one listener (no source read), so
+    443 needs a front on each VM that routes by path to the room processes, or an address per room.
   - *Options* (not researched): (a) a UDP range and a TCP range, one port of each per room; (b) the fallback on TCP
     443 through a front per VM that routes by path; (c) an address per room.
   - *Decider:* infra-engineer with netcode-architect (ADR 0001's transport), confirmed by the Advisor.
@@ -1005,9 +1005,9 @@ Researching it before this record, or leaving it as one shared question: settled
     but the pass marks now plan far more: on RS alone about 23 hours for this record's rows (the infra review's
     arithmetic on the rows' run plans: PM-0006-14 about 14.3 h, PM-0006-13 3 × 1.1 h, PM-0006-17 about 2.2 h, the soak
     and logging rows about 3 h; 14.3 + 3.3 + 2.2 + 3 ≈ 23), 23 × 0.1386 = 3.19 EUR, before ADR 0001's 3-run rows
-    (perhaps 15 to 30 RS-hours, about 2 to 4 EUR) and the CX33 hours of SH, MV and the load generators (as many as
-    spike 2's calibration run asks); so a 5 EUR cap over everything would send the plan back to the draft at its
-    planning check.
+    (perhaps 15 to 30 RS-hours, proposed: the infra review's guess, which the run plan replaces with a sum;
+    15 to 30 × 0.1386 = 2.08 to 4.16 EUR) and the CX33 hours of SH, MV and the load generators (as many as spike 2's
+    calibration run asks); so a 5 EUR cap over everything would send the plan back to the draft at its planning check.
   - *Options:* (a) 5 EUR for this record's own operations runs (R6's scope), with ADR 0001's runs on their own line
     of the run plan; (b) one cap set from the run plan, written as arithmetic at R6-HOST-F15's hourly prices (0.1386
     EUR a CCX23-hour, 0.0144 a CX33-hour) before the first session; (c) 5 EUR over everything, as written before.
