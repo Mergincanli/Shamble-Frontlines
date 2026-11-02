@@ -27,3 +27,11 @@
   Q (med) bench/spike VM access: PM-0006-11 "Mustafa creates the VMs or the API token that creates them"; phase-1 tick bench on RS (0002:427-433; PM-0002-72 "never from CI") has no access path/owner/cost line; a Hetzner API token is a secret not in B9; CLAUDE.md forbids agents reading secrets -> question.
   R (med) 0001 rollback "a message change is a version bump" (0001:1340-1342) + JoinRejected-reload; no lobby rule routes clients by protocol version during a deploy -> part of F.
 - Next: README register rows for 0006 + decisions asked; ENGINE_OVERVIEW quick check of infra parts; then write review file.
+- More: S (med) port plan: OQ-0006-5 decider "with the port plan of ADR 0001's transport" (0006:667) but 0001 part 10 (310-347) names no port; one port per room (r2:3441, R2-ROOM-F18); fallback serves "all networks" (r2:2662); TCP 443 front? unowned.
+  T (low) one alert named (0006:234); no alert route/receiver anywhere.
+  U (low) failure artefacts' retention (0002:426) unset vs 7-day build artifacts (0006:162).
+  V (low) PREV-DELETE: a tombstone deploy as first workaround (not researched).
+  Verdicts planned: 0001 APPROVE WITH NOTES; 0002 APPROVE WITH NOTES; 0006 REVISE (my own text: firewall, release path, macOS cost, domain, port plan, worst-case budget); 0006 Pass marks REVISE (B, C, D, G, M small fixes).
+- Writing review file now (10:00 Amsterdam).
+- 10:15 review file written: review-infra-engineer.md (verdicts, 20 findings, 5 questions, not-checked list, source S1). Citations re-checked (README:59 fixed).
+DONE

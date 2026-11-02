@@ -100,3 +100,40 @@ recommends yes.
 - fixcheck-a A8 / L1 (0001 part 6's event list): upheld; three part-19 events have no class (blasts; harvester
   deliveries and kills; structure kills and stage changes). → netcode-architect: give them a class, and say whether
   blasts are resent or sent once (ADR 0004 gives blasts only presentation uses).
+
+## From the step-10 review by infra-engineer (review-infra-engineer.md; 2026-11-02 about 09:38)
+Verdicts: ADR 0001 and 0002 APPROVE WITH NOTES; ADR 0006 decision text REVISE (its own text: it says so); ADR 0006
+pass marks REVISE. Cross-references security-auditor's F-I, F-C′, F-O, F-Q (not repeated).
+1. High: no release path to production, no two versions during a deploy, no rollback of a bad server release
+   (0006:259–260; 0001:1340–1341, :560). Same as engine-architect's #5. infra-engineer, netcode-architect.
+2. High: PM-0006-13 (8 tick threads) vs PM-0001-27 and its validity rule (one thread alone per vCPU; the 1 % steal cap
+   voids shared-host runs) (0006:880; 0001:1146, 1098–1101); SPIKE_PLAN:100–101 "read the same" while the reference,
+   run count and pinning differ. Same as engine-architect's #7. test-engineer; the synthesis for SPIKE_PLAN.
+3. Medium: macOS runners are standard and free on a public repository (GitHub's runner page, read 2026-11-02): real
+   Safari costs time, not money (0006:523, OQ-0006-7; OQ-0002-5). infra-engineer, engine-architect (0002).
+4. Medium: a certificate hash written into a static preview goes stale at every restart or rotation (0002:530–534;
+   0006:228–229; r2:3441, :2720–2721): staging presents its trusted certificate on both transports.
+5. Medium: "nothing else" / "0 other rules" vs TCP 80, the lobby's HTTPS, staging delivery, admin access: list the rules
+   per VM role (0006:185–190; PM-0006-15).
+6. Medium: no domain or DNS provider named (0006:221–235, OQ-0006-5, migration step 0): its DOMAIN question.
+7. Medium: OQ-0006-5 waits on ADR 0001's port plan, which names no port: does the fallback need TCP 443? (0006:667;
+   0001:310–347). netcode-architect, infra-engineer.
+8. Medium: at the marks' ceilings a room may use 1.5 vCPU → 2 rooms per VM; the goal fleet is then about 967 EUR, not
+   534: state it as a floor (0006:262–265; 0001:538).
+9–10. Medium: one 4-vCPU load generator for 384 sessions, all from one address that meets the per-address cap: size it
+   by a calibration run; the cap per run; PM-0001-25 with the cap off and on (0006:812–814, :880; 0001:330–331).
+11. Medium: how the lobby asks a VM for a room and learns its port (0001:498; 0006:208–220; README:285).
+12. Medium: the repository is public, so committed unreleased art is public (0006:144–149): its UNRELEASED-ART question.
+13. Medium: the 5 EUR bill cap (r6:716–717) was for "a few hours of one or two VMs": about 23 reference-server hours
+   (3.19 EUR) for ADR 0006's own rows (PM-0006-18, 0006:885).
+14. Medium-low: the phase-1 tick bench has no access path or cost line; the Hetzner API token missing from B9
+   (0006:878, :385; 0002:427–433).
+15–20. Low: no alert route (0006:234); SMT siblings (PM-0006-11); location before the reference server (0006:811); the
+   500-builds follow-up (0006:873); failure artefacts' retention (0002:426); a tombstone workaround for PREV-DELETE
+   (0006:872).
+Questions: UNRELEASED-ART (Mustafa: (a) a login is enough, recommended until a model needs hiding, with
+ASSET-RESEARCH); ROOMS-COUNT-RULE (the Advisor with test-engineer: count rooms by "inside the tick budget" only,
+recommended, the 10 % share reported beside); SPIKE-VM-ACCESS (Mustafa: (b) a separate Hetzner project with its own
+token, recommended); RELEASE-WINDOW (Mustafa: (a) a release window while playtests are scheduled, recommended);
+DOMAIN (Mustafa after the Advisor's OQ-0006-5 read: (a) a private test CA for the proof test, a domain before slice 3,
+recommended).
