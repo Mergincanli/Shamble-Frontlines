@@ -3,3 +3,7 @@ Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 
 - read prompt, d0 verdicts, by-author, rules/conditions; made scratch newsent.py and new-*.tsv (new sentences per ADR). Next: glossary script, under-table check, apply-check of fix blocks.
 - provenance done (all HEAD changes = fix blocks; TE-B OQ-0006-20 held, infra-c version applied); glossary exact 0; under-table 0. Next: read the new-sentence lists for 0001 (netcode-architect unit), check claims; then blocks.
 - 0001 claims N1-N15 written (parts 4, 5, bandwidth). Next: netcode fix file lines 159-400 (parts 6-11).
+- 0001 netcode claims N16-N44 written; F1 found (0001:1047 7.49 should be 4.70 with the remainder). Next: netcode NOTE blocks + remaining FIX blocks (spike items, test plan, migration, Appendix A), then blocks table.
+- 0001 netcode blocks table written. Next: test-engineer A's ADR 0001 pass-mark blocks.
+- TE-A 0001 claims A1-A25 written. Findings so far: F1 (0001:1047 7.49->4.70), F2 (part 4 'causes no correction' vs PM-0001-60), F3 (part 8 frame wait, routed, not applied), F6 (PM-0001-44 'part 4 gives'), F7 (V-S vs PM-0001-27). Next: TE-A 0001 blocks table, then 0002 (engine-architect).
+- TE-A 0001 blocks table written. Next: ADR 0002 engine-architect fix file.

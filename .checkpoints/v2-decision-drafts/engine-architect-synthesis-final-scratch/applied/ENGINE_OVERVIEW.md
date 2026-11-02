@@ -48,35 +48,32 @@ flowchart TB
   SIM -.->|"same code"| ROOM
   CONTENT -.->|"read by id"| SIM
 ```
-In words: each drawn frame the page posts its newest input, with the cursor ray, to the Worker, and it receives one
-block per tick back; it makes no call into Wasm and touches no network (ADR 0002 part 5). Per frame, the page
-interpolates between the two newest blocks, animates and draws, and plays the block's events as sound and HUD feedback
-(ADR 0003 part 10). The Worker holds the Rust sim as Wasm, with the client endpoint in its own crate, and owns the
-connection (ADR 0002 parts 3 and 5); it releases a remote entity's spatial events on that entity's drawn timeline
-(ADR 0001 part 7). Online, the Worker talks to the room process over WebTransport, or WebSocket when that fails (ADR
-0001 part 10); in local play the same Worker also runs the room and the sim as the local server, which its client
-endpoint reaches through the loopback with the same messages (SLICE-ORDER condition 1; ADR 0002 part 6). The sim crate
-and the content crate sit below everything. Each part's label names the main VISION_V2 §6 items it serves; the table
-below gives every draft and part.
+In words: the page posts its newest input to the Worker each drawn frame and receives one block per tick back; it
+makes no call into Wasm and touches no network (ADR 0002 part 5). Per frame it interpolates between the two newest
+blocks, animates, draws, and plays the block's events as sound and HUD feedback (ADR 0003 part 10). The Worker holds
+the Rust sim as Wasm (the client endpoint is its own crate) and owns the connection (ADR 0002 parts 3 and 5). Online
+it talks to the room process over WebTransport, or WebSocket when that fails (ADR 0001 part 10); in local play the
+same Worker also runs the room and the sim as the local server, reached through the loopback with the same messages
+(SLICE-ORDER condition 1; ADR 0002 part 6). The sim crate and the content crate sit below everything. Each part's
+label names the main VISION_V2 §6 items it serves; the table below gives every draft and part.
 
 **The Rust ↔ TypeScript boundary** (ADR 0002 part 5; interfaces I-2, I-3, I-5 in [the register](adr/README.md#codes-the-drafts-cite)):
-- **Down (Worker → page):** one transferred output block per tick (B2), with a header (tick, layout hash, counts),
-  sections per entity kind, the local player's owner-only data (own weapon, money, upgrade tracks and offers) and an
-  event section (the events of ADR 0004 part 19, such as hits, deaths and kills, blasts, purchases, uplink cache
-  events, tech tiers, upgrade picks and pickups, and moments, each in the block its entity's drawn time reaches); the
-  SharedArrayBuffer ring (B3) is measured against it in the boundary spike. The fields of remote entities online are
-  ADR 0001's; the layout is ADR 0002's.
-- **Up (page → Worker):** the newest input, posted once per drawn frame with the cursor ray and the view time; each
-  tick the Worker takes the newest post (running press totals lose no press) and fills the tick's one network command,
-  world aim point included (interface I-19; ADR 0001 part 5; ADR 0002 part 5); a small control API (start, mode flag,
-  content bundle).
+- **Down (Worker → page):** one transferred output block per tick (B2): a header (tick, layout hash, counts), sections
+  per entity kind, the local player's owner-only data (own weapon, money, upgrade tracks and offers) and an event
+  section (ADR 0004 part 19's events, such as hits, deaths and kills, blasts, purchases, uplink cache events, tech
+  tiers, upgrade picks and pickups, and moments; a remote entity's spatial events come in the block whose delayed time
+  reaches their tick, ADR 0001 part 7); the SharedArrayBuffer ring (B3) is measured against it in the boundary spike.
+  Remote entities' fields online are ADR 0001's; the layout is ADR 0002's.
+- **Up (page → Worker):** the newest input once per drawn frame, with the cursor ray and view time; each tick the
+  Worker fills its one network command from the newest post, aim point included (I-19; ADR 0001 part 5; ADR 0002
+  part 5); a small control API (start, mode flag, content bundle).
 - **Types:** generated from Rust into `packages/types`: the block layout and its hash, the protocol types, the content
   schema and types (ADR 0002 part 5; ADR 0005 CD-3). No call per entity per frame crosses the boundary.
 
 **Dependencies point one way** (ADR 0002 part 3, each a gate check): `sim` depends on `content` only, with no
 transport, no async runtime and no clock; `room` and `client-endpoint` build for Wasm and natively with no async
-runtime, no transport and no clock; `protocol` uses `sim` and `content` types; `sim-wasm` = `client-endpoint` + `room`
-+ `sim` + `protocol` + `content`, never `navbake` or `server`; `server` adds the transport and the runtime; the
+runtime, no transport and no clock; `protocol` uses `sim` and `content` types; `sim-wasm` holds `client-endpoint`,
+`room`, `sim`, `protocol` and `content`, never `navbake` or `server`; `server` adds the transport and the runtime; the
 `supervisor` links no sim code; `client` never reaches `editor`. Among the tools, `devtools` may depend on any
 workspace crate and `navbake` on `sim` and `content`; the editor uses `client` code and the `navbake` and `sim` Wasm;
 nothing imports `legacy/` or `spikes/`. Each crate enters with the first slice that needs it.
@@ -92,13 +89,14 @@ nothing imports `legacy/` or `spikes/`. Each crate enters with the first slice t
 3. Snapshots and events: the room encodes, per client, a delta snapshot of what that client may see, plus events with
    visibility classes (ADR 0001 parts 6 and 9); the match record collects tick-stamped events (ADR 0004 part 19;
    ADR 0006 part 12).
-4. Client: the Worker predicts the local player's movement and own weapon, reconciles with each snapshot, and
-   interpolates remote entities; a shot is judged on the server against what the shooter saw, within a cap (ADR 0001
-   parts 4, 7, 8; the abilities' prediction waits for ABL-PREDICT).
+4. Client: the Worker predicts the local player's movement and own weapon, reconciles with each snapshot, interpolates
+   remote entities and releases their spatial events on its delayed timeline; a shot is judged on the server against
+   what the shooter saw, within a cap (ADR 0001 parts 4, 7, 8; the abilities' prediction waits for ABL-PREDICT).
 
-**Per frame (the page; ADR 0003 part 10):** take the newest block; interpolate and animate (procedural touches, budget
-LOD); draw with the look pipeline (ADR 0003 part 5); play events as VFX, sound and HUD feedback (hit feedback on
-confirmation, LOOP_V2 §7); post the next command. Presentation randomness stays on the page (ADR 0004 part 8).
+**Per frame (the page; ADR 0003 part 10):** keep the two newest blocks; interpolate between them and animate (procedural
+touches, budget LOD); draw with the look pipeline (ADR 0003 part 5); play the block's events as VFX, sound and HUD
+feedback (hit feedback on confirmation, LOOP_V2 §7); post the newest input with its cursor ray and view time (ADR 0002
+part 5). Presentation randomness stays on the page (ADR 0004 part 8).
 
 **Who owns which state:** the authority owns all game state (soldiers, vehicles, projectiles, effects, money, tech,
 player records with their upgrade tracks); the Worker owns predicted local state and the interpolation buffer; the page
@@ -116,7 +114,7 @@ match (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
 | 6 | Balance telemetry | ADR 0004 part 19 (events); ADR 0001 part 11 (the room writes the record at Ended); ADR 0006 part 12 (shape, storage, analysis); ADR 0005 CD-12 (telemetry ids) and CD-8 (the content hash every match records) |
 | 7 | A faction content pipeline as data | ADR 0005 CD-13 (faction variants) and AP-3 (faction colour slots); ADR 0003 part 6 (per-instance faction colour) |
 | 8 | Moments recognized by the server | ADR 0004 part 19 (recognition in a sim phase); ADR 0005 CD-12 (rules as data); ADR 0006 part 12 (stored with the record). `[LATER]` kill-cams, replays, highlights: no feature; recorded matches and per-tick state hashes (ADR 0004 parts 7–9) keep them possible |
-| 9 | A spectacle budget: a few very large units without dropping frames | ADR 0003 parts 3, 6, 7 (no first-sight stutter, very large units, budgets); ADR 0002 part 5 (the sim off the page's thread); ADR 0004 (its share: the very large units are in the stress scene its sim is measured in, GLOSSARY §3) |
+| 9 | A spectacle budget: a few very large units without dropping frames | ADR 0003 parts 3, 6, 7 (no first-sight stutter, very large units, budgets; part 7's presented-frame count reads "without dropping frames", PM-0003-44, and how many such frames a run may hold is OQ-0003-17); ADR 0002 part 5 (the sim off the page's thread); ADR 0004 (its share: the very large units are in the stress scene its sim is measured in, GLOSSARY §3) |
 | 10 | `[LATER]` Accounts | no feature; ADR 0001 part 11 (guest identity) and ADR 0006 part 6 (the lobby's store, OQ-0006-3) keep it possible |
 
 Features whose need lies outside §6 (LOOP_V2, EDITOR_V2, LOOK_V2, UPGRADE-SCOPE, GLOSSARY §8's foundation, VISION_V2

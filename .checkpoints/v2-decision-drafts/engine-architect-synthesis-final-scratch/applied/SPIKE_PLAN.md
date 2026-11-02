@@ -72,15 +72,15 @@ and the asset spike before the first authored model, and the Feel Lab test once 
 
 | # | Spike | Size | Place | Pass marks |
 |---|---|---|---|---|
-| 1 | The netcode proof test | L (+ M for ADR 0006's operations marks) | wave 1, first | PM-0001-1 to -57; PM-0004-67; PM-0006-11 to -27 |
+| 1 | The netcode proof test | L (+ M for ADR 0006's operations marks) | wave 1, first | PM-0001-1 to -62; PM-0004-67; PM-0006-11 to -27 |
 | 2 | The 60 Hz margin run | inside 1 | wave 1, after its sim load is settled | PM-0001-39, -40; PM-0004-71, -72 |
-| 3 | The Rust ↔ TypeScript boundary spike | L (+ M ADR 0004's share; + S ADR 0006's, optional) | wave 1 | PM-0002-1 to -34; PM-0004-8, -28, -61, -68 to -70; PM-0006-28 to -31 (optional) |
+| 3 | The Rust ↔ TypeScript boundary spike | L (+ M ADR 0004's share; + S ADR 0006's, optional) | wave 1 | PM-0002-1 to -34, -77, -78; PM-0004-8, -28, -61, -68 to -70; PM-0006-28 to -31 (optional) |
 | 4 | The sim core spike | L, the largest | wave 1 | PM-0004-1 to -61, -73, -74 |
 | 5 | The look proof test | L (+ S or M for ADR 0005's share) | wave 1 | PM-0003-1 to -17; PM-0005-33 to -37 |
-| 6 | The preview hosting check | S (calendar: at least 2 days) | wave 1; ends before the foundation's preview step | PM-0006-1 to -10 |
+| 6 | The preview hosting check | S (calendar: at least 2 days) | wave 1; ends before the foundation's preview step | PM-0006-1 to -10, -32 |
 | – | The foundation's acceptance checks (not a spike) | L (six change-sets) | step 2 | PM-0002-35 to -69; later PM-0002-70 to -76 |
-| 7 | The content and ability spike | L | wave 3 | PM-0005-1 to -32; PM-0004-62 to -66 |
-| 8 | The render budget bench | L | wave 3 | PM-0003-18 to -42 (PM-0003-1 again); PM-0003-43 at each later upgrade |
+| 7 | The content and ability spike | L | wave 3 | PM-0005-1 to -32; PM-0004-62 to -66, -75 |
+| 8 | The render budget bench | L | wave 3 | PM-0003-18 to -42, -44 to -47 (PM-0003-1 again); PM-0003-43 at each later upgrade |
 | – | The asset-pipeline research (a research unit, not a spike) | one daytime session | before 9 | its own marks, appended to 9 |
 | 9 | The asset spike | M (resized after the research) | before the first authored model | PM-0005-38 to -44, plus the research's marks |
 | 10 | The Feel Lab test (ABL-PREDICT) | M | after abilities are playable (slice 4) | PM-0005-45, -46 |
@@ -96,22 +96,29 @@ and the asset spike before the first authored model, and the Feel Lab test once 
   tick from elapsed time) and ADR 0006 parts 5, 7, 8 and 9 (rooms per VM on both machine types, the firewall, egress per
   match-hour, the spike's own bill, logging cost, metrics, the development certificates for WebTransport, and the
   WebSocket leg's `wss` sessions on the certificate OQ-0006-5 names, PM-0006-15).
-- **Pass marks:** PM-0001-1 to PM-0001-57 (PM-0001-39 and -40 belong to the 60 Hz margin run below; PM-0001-54 and -55
-  only when their condition holds); PM-0004-67; PM-0006-11 to PM-0006-27 (PM-0006-13 shares its runs with ADR 0001's
-  R2-ROOM-REC2 marks: one set of runs, read the same in both tables). Its server also serves the online halves of
-  PM-0004-61 and PM-0004-70.
+- **Pass marks:** PM-0001-1 to PM-0001-62 (PM-0001-39 and -40 belong to the 60 Hz margin run below; PM-0001-54 and -55
+  only when their condition holds); PM-0004-67; PM-0006-11 to PM-0006-27 (PM-0006-13 and ADR 0001's PM-0001-27, the
+  R2-ROOM-REC2 marks, share one set of runs under PM-0006-13's rules: no CPU pinning, its bracket B, 3 sessions at
+  3 times of day, steal recorded and never a validity condition; so both tables read the same runs). Its server also
+  serves the online halves of PM-0004-61 and PM-0004-70.
 - **Who judges what:** the scripts judge every measured mark. Mustafa judges "look correct": the netcode checklist
   (ADR 0001, inside PM-0001-53), at the profile OQ-0001-3 confirms, beside the measured correction, interpolation and
   hit-registration marks. He also runs the operations checklist (ADR 0006, inside PM-0006-12 and PM-0006-18).
 - **Depends on:** the drafts approved; OQ-0006-1 answered (the CCX23 and CX33 orderable in one EU location, in
-  Mustafa's Hetzner account) and LG and MV beside them; ML, RD and MAC named (OQ-0003-1); a throwaway sim with movement,
-  hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles at the stress
-  scene's counts (PM-0001-2); the link simulator's L1 and L2 (ADR 0002's design), built here first; a DM_Tri-sized
-  greybox with enterable buildings and the target course; the development certificates for WebTransport (ADR 0006);
-  for the WebSocket leg, OQ-0006-5's development and staging answer (the Advisor, from a short read, before the test
-  starts), since a WebSocket cannot pin a certificate hash (ADR 0006, OQ-0006-5); the Advisor's readings of OQ-0001-3
-  before the checklist; Mustafa's session in Brave; the spike's run plan under its bill mark (PM-0006-18) before the
-  first VM.
+  Mustafa's Hetzner account), with the location measured before RS is created (OQ-0006-2), the way sessions get VMs
+  without holding a secret (OQ-0006-17), and LG and MV beside them; ML, RD and MAC named (OQ-0003-1); a throwaway sim
+  with movement, hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles
+  at the stress scene's counts (PM-0001-2); its 30 Hz marks may add ADR 0004's S1 stand-ins (384 effect rows with the
+  effect step's 1 ms burned per tick, the 2.80 ms remainder topped up: ADR 0001, OQ-0001-2), and its density runs pad
+  its sim step to the sim step share's ceiling, so rooms per VM is a lower bound and the goal budget provisional until
+  slice 6 (ADR 0006 spike item 2; OQ-0006-19, read before those runs); the link simulator's L1 and L2 (ADR 0002's
+  design), built here first, once the Advisor has read how each profile splits over the two directions (OQ-0001-16);
+  a DM_Tri-sized greybox with enterable buildings and the target course; the port ranges (OQ-0006-16) and the
+  development certificates for WebTransport (ADR 0006); for the WebSocket leg, OQ-0006-5's development and staging
+  answer (the Advisor, from a short read, before the test starts), since a WebSocket cannot pin a certificate hash
+  (ADR 0006, OQ-0006-5), and a domain first if OQ-0006-15 picks (b); the Advisor's readings of OQ-0001-3 before the
+  checklist; Mustafa's session in Brave; the spike's run plan under its bill mark (PM-0006-18) and the cost Mustafa
+  allows (OQ-0006-20) before the first VM.
 - **Place:** wave 1, first in priority: before the foundation (SLICE-ORDER condition 3). It shares its client harness
   with the boundary spike.
 - **Size:** L. Two transports on four browsers, two simulator layers, a room server with interest, encoding and lag
@@ -129,7 +136,7 @@ and the asset spike before the first authored model, and the Feel Lab test once 
 - **It decides:** R2-TRN-OQ1, OQ2, OQ3, OQ5, OQ8; R2-BUD-OQ3, OQ7, OQ9, OQ10; R2-SYNC-OQ3 (through OQ-0001-6), OQ5 (if
   vehicles move), OQ12; R2-ROOM-OQ1; R2-XU-OQ2, OQ4, OQ5, OQ6, OQ7, OQ15; OQ-0001-6, OQ-0001-7; R5-TEST-OQ2 (the
   WebTransport crates' interop); R6-COST-OQ1; it feeds OQ-0006-2 and gives Mustafa and the Advisor the numbers for
-  OQ-0001-5.
+  OQ-0001-5, and Mustafa the input-to-screen numbers for OQ-0001-15.
 
 ### 2. The 60 Hz margin run (TICK-60-HEADROOM; TICK-60-SETUP)
 - **Defined in:** [GLOSSARY §8, the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin). Owner: ADR 0001 part 2. A
@@ -145,9 +152,16 @@ and the asset spike before the first authored model, and the Feel Lab test once 
 - **Who judges what:** the scripts. Before the run, Mustafa and the Advisor confirm TICK-60-HEADROOM's reading
   (OQ-0001-1) and the Advisor picks how the stress scene's sim load reaches the run (TICK-60-SETUP, OQ-0001-2).
 - **Depends on:** OQ-0001-1 and OQ-0001-2 answered. Under OQ-0001-2's recommended option (a), the sim core spike's sim
-  runs inside the proof-test server, so the run waits until that sim runs the stress scene; under (c), the fallback,
-  the check waits until the real sim runs the stress scene (slice 6) and the tick stays at 30 Hz until then.
-- **Place:** wave 1, inside the netcode proof test, after the sim core spike's sim runs the stress scene (option (a)).
+  runs inside the proof-test server, so the run waits until that sim runs the stress scene; the parts of the sim step
+  share it does not build are stood in as ADR 0004's S1 stands them in, each named in the run's record: the ability
+  and effect step (it arrives only with the content and ability spike, wave 3) as 384 rows in the effect pool with its
+  1 ms ceiling burned per tick, and economy, objectives, moments and events (slice 4) as the remainder topped up per
+  tick to 0.30 ms at 60 Hz (4.17 − 3.87, arithmetic on ADR 0004 part 6), so a pass still holds once the real parts
+  meet their ceilings. Under (d) the run waits instead until the content and ability spike's effect step has joined
+  that sim; under (c), the fallback, the check waits until the real sim runs the stress scene (slice 6) and the tick
+  stays at 30 Hz until then.
+- **Place:** wave 1, inside the netcode proof test, after the sim core spike's sim runs the stress scene (option (a));
+  under (d), after the content and ability spike (wave 3).
 - **Size:** part of the netcode proof test's L (the soaks repeated at 60 Hz).
 - **Research spikes it subsumes:** R1-TICK-REC2 P1 at 60 Hz (ADR 0004's share), P2 at 60 Hz, P3 at 60 Hz; R2-BUD-REC6's
   60 Hz shares. **It decides:** carry-forward 2 (the 60 Hz margin); R1-TICK-OQ1 only if the margin passes (then ADR

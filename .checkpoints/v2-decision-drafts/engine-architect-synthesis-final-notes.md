@@ -9,3 +9,7 @@
 - FC-4 FIX (SPIKE_PLAN:281-282: ADR 0006 part 13 item B9, OQ-0006-13) and SA-1-routed FIX (item 6 token revoked, 261-263) written. Next: FC-5/GE-12 (ENGINE_OVERVIEW) with the ADR 0002/0001-routed lines 37 and 94 and client-endpoint crate
 - NA-17 FIX (OVW:8-10), client-endpoint label FIX (OVW:28), FC-5/GE-12/NA-7 diagram FIX (OVW:37-42) written. Next: OVW words 51-57, boundary 59-66, deps 70-75, steps 88-94, §6.9 row 112
 - OVW words 51-57, boundary 60-66, deps 70-75 FIX written. Next: OVW step 4 (88-90), per frame (92-94), §6.9 row (112)
+- OVW step 4 (88-90), per frame (92-94), §6.9 row (112) FIX written; OVW now ~145 lines. Next: check OVW length and render; then SPIKE_PLAN TE-1 (60 Hz run's missing parts, stand-ins)
+- SPIKE_PLAN table 75-83 (new PM rows) and item 1 pass marks 99-102 (IE-2, -62) FIX written. Next: item 1 Depends on (106-114), item 2 (TE-1), item 4 What it proves (TE-1), FC-6
+- item 1 Depends on (106-114) FIX written. Next: item 1 It decides (129-132: OQ-0001-15 numbers), item 2 (TE-1, 147-150), item 4 (TE-1; FC-6)
+- item 1 It decides (131-132) and item 2 Depends on/Place (147-150, TE-1) FIX written. Next: item 3 pass marks (166-170, -77/-78) and GE-13 harness (item 1 place 115-116, item 3 depends 172-175, size 177), item 4 (TE-1 at 188-190, FC-6 191-192)
