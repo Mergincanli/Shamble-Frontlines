@@ -283,3 +283,80 @@ Rules check on the changed text (§3 and §4 of the report's appendix):
 - No settled input is reopened. LOOP_V2 §4's "holding E" is kept, and OQ-0004-8 asks only what it leaves open.
 - The look: F5 is the only case where text sets a look expectation beyond LOOK_V2. The look floor itself holds LOOK_V2's `[DECIDED]` items until Mustafa answers OQ-0003-16, which decides nothing new.
 - Numbers: every new number is cited, arithmetic (rechecked in the rows) or marked proposed. The exceptions are F2's wrong reason, F4's rank and F9's formula.
+
+## The synthesis at 449356c (ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md)
+
+Base: the three docs did not change between 47eadd9 and 604a497, so the final round's diff is 604a497..449356c (= 47eadd9..449356c), the text engine-architect-synthesis-fixes-final.md's BEFOREs were copied from. The coordinator's range 80a27b3..449356c also takes in the second fix round (47eadd9), which fixcheck-a/-b/-c verified. The drafts are unchanged between 604a497 and 449356c (`git diff --stat` is empty for the six drafts, LOOK_V2, LOOP_V2, VISION_V2 and docs/research). Diffs: verifier-fixcheck-d2-scratch/diff-syn-*.txt.
+
+### Claims (synthesis)
+
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| S1 | ENGINE_OVERVIEW:9–11 | in local play the Worker is the client endpoint and also the local server | ADR 0002 parts 5, 6 | confirmed | 0002:189 `sim-wasm` "around the client endpoint (`client-endpoint`) and the local server (`room` + `sim`)"; 0002:385 "the client endpoint reaches it through the loopback backend" | resolves NA-17 |
+| S2 | ENGINE_OVERVIEW:37–43, 51–52, 66–68, 96–98 | the page posts its newest input each drawn frame (cursor ray, view time); the Worker builds one network command per tick from the newest post | ADR 0001 part 5; ADR 0002 part 5 | confirmed | 0001:235 "the page posts its newest input once per drawn frame, with its cursor ray"; 0002:311–314 "The newest input, posted once per drawn frame … At each tick the Worker takes the newest post" | resolves NA-7 and the routed ADR 0002 lines |
+| S3 | ENGINE_OVERVIEW:41, 52, 96 | interpolate between the two newest blocks | ADR 0003 part 10 | confirmed | 0003:446–447 "take the newest blocks, keeping two … interpolate between the two newest ticks" | resolves FC-5 and GE-12 |
+| S4 | ENGINE_OVERVIEW:58–62 | the block carries owner-only data (own weapon, money, upgrade tracks and offers); a remote entity's spatial events come in the block whose delayed time reaches their tick | ADR 0002 part 5; ADR 0001 part 7 | confirmed | 0002:283–285 "one section of owner-only data for the local player (own weapon state, money, upgrade tracks and offers …)"; 0001:323–325 "into the first block whose delayed time reaches the event's tick" | – |
+| S5 | ENGINE_OVERVIEW:70–75 | `room` and `client-endpoint` build for Wasm and natively with no async runtime, transport or clock; `sim-wasm` holds `client-endpoint`, `room`, `sim`, `protocol`, `content`; the supervisor links no sim code | ADR 0002 part 3 | confirmed | 0002:188–191, 199–203: the supervisor "links no `sim`, `room` or `sim-wasm` code" | – |
+| S6 | ENGINE_OVERVIEW:117 (§6.9 row) | part 7's presented-frame count reads "without dropping frames" (PM-0003-44); the share is OQ-0003-17 | ADR 0003 | confirmed | 0003:377–383; PM-0003-44 | PA's note |
+| S7 | SPIKE_PLAN item 1 (pass marks; Depends on; Place; Size) | PM-0001-1 to -62; PM-0001-27 and PM-0006-13 share one set of runs under PM-0006-13's rules; S1's stand-ins at 30 Hz (384 rows, 1 ms burned, 2.80 ms topped up); the client harness built here first, proposed with the order | ADR 0001; ADR 0004 S1; ADR 0006; ADR 0002 spike text | confirmed | counts.py: ADR 0001 has PM-0001-1 to -62; 0001:1357–1361 (V-S exception for PM-0001-27); 0004:982; 0002:1073–1074 "shares its client harness and stand-in sim" | resolves IE-2 and GE-13 (proposed under J6 (5), so not a decision) |
+| S8 | SPIKE_PLAN item 2 | at 60 Hz the stand-ins are 384 rows with 1 ms burned and the remainder topped up to 0.30 ms (4.17 − 3.87); (d) waits for the effect step; (c) is the fallback | ADR 0001 OQ-0001-2; ADR 0004 part 6 | confirmed | 0001:1034–1047; 0004:239 | resolves TE-1; the same numbers as ADR 0001 and ADR 0004 |
+| S9 | SPIKE_PLAN item 3 | the newest input per drawn frame; PM-0002-1 to -34, -77, -78; the measurement harness's CPU side built here first (proposed) | ADR 0002 | confirmed | counts.py: PM-0002 runs to -78 | – |
+| S10 | SPIKE_PLAN item 4 | determinism "on seven targets (native, Node, three browser engines, real Safari on MAC, and Windows on the minimum laptop, in Chrome and Firefox: PM-0004-19)" | ADR 0004 PM-0004-19 | confirmed with the wording | the synthesis NOTE FC-6 counts Windows on ML as one target; 1 + 1 + 3 + 1 + 1 = 7 | resolves FC-6 |
+| S11 | SPIKE_PLAN item 4 (It decides) | the `sim-wasm` size for R1-RR-OQ5, "whose first limit the Advisor sets" | ADR 0002 part 4 | confirmed | 0002:263–266 | resolves FC-3 |
+| S12 | SPIKE_PLAN item 5 (What it proves) | each `[DECIDED]` and `[DEFAULT]` item judged; ADR 0005's models load "with the engine's shared materials per slot class" | ADR 0003 5.a; ADR 0005 GPU part 1 | wrong (stale) | 0003:175 "one material per slot content, never one per mesh"; 0005:1695–1697 "one material per slot content … A slot's content is its class …, its faction …, and its own base and emissive colour, textures, side and alpha mode" | finding SF1 |
+| S13 | SPIKE_PLAN item 5 (Depends on, Size) | LOOK_V2 §2's two houses, the second authored or by the ported kit; who makes the models is OQ-SPIKE-1; OQ-0006-18 before the first commit | ADR 0003 part 11; ADR 0005 OQ-0005-AP1; ADR 0006 OQ-0006-18 | confirmed | 0003:469–475; 0005:1640–1643; 0006:975–987 | resolves AD-7 and GE-5 |
+| S14 | SPIKE_PLAN items 6, 7, 8 | PM-0006-32 added; PM-0004-75 once OQ-0004-11 is answered; PM-0003-44 to -47, -44 reported until OQ-0003-17; the client-host token revoked when the check ends (B9) | the drafts | confirmed | counts.py (PM-0006 to -32, PM-0004 to -75, PM-0003 to -47); 0004:1175; 0003:1178–1181 | resolves FC-4 (part 13, item B9) |
+| S15 | SPIKE_PLAN "Open questions", OQ-SPIKE-1 | LOOK_V2 §8's flow models in Spline ("AI-generated for drafts, or a clean model built by Claude"); whether the export carries a skin and named slots is not researched (gap G1; OQ-0005-AS3, AS4) | LOOK_V2 §8; README gap G1 | confirmed | LOOK_V2 line 69; README:338 G1 "the asset pipeline (compression, LODs, export checks, slot renaming, per-unit budgets)"; 0005:1814 OQ-0005-AS3 "Which checks does an export pass …" | options and recommendation (a) are the graphics review's; decider Mustafa and the Advisor |
+| S16 | README:10–11, 15–25 | per-draft OQ counts 18, 8, 20, 12 (10 open), 36, 20; total 114 numbered, 112 open, plus OQ-SPIKE-1; pass marks 62, 78, 47, 75, 46, 32 (340) | the drafts | confirmed (by script) | verifier-fixcheck-d2-scratch/counts.py at 449356c: OQ 18/8/20/12/36/20 = 114; PM rows 62/78/47/75/46/32 = 340, no gaps in any numbering | – |
+| S17 | README "Codes the drafts cite" | "ADR 0002's gate checks G0–G13, ADR 0004's spike claims S1–S22, ADR 0006's option labels (G1–G4, K1–K4, S1–S5) and its baseline items B1–B12 (part 13)" | the drafts | confirmed | ADR 0002 uses G0 to G13; ADR 0006 K1–K4 and B10–B12 present | resolves FC-2 as skeptic-5 upheld it |
+| S18 | README "Needs outside VISION_V2 §6" | ADR 0003 part 10's teardown: VISION_V2 §4 only; ADR 0004 part 17's spawning: LOOP_V2 §2 and §5 only; ADR 0005 AB-10 and AB-1: §3 and §4 only, AB-2's immunity rule: LOOP_V2 §2 only | the drafts' Need lines | confirmed | 0003:464–466 "VISION_V2 §4 for the teardown"; 0004:504–505; 0005 AB-1's and AB-2's Need lines | – |
+| S19 | README I-3, I-6, I-11, I-13 | I-6: every content set a record names, archived by its content hash beside the records (ADR 0006 part 12) | ADR 0006 | confirmed | 0006:461–464 | I-3, I-11, I-13 match ADR 0001, 0002 and 0006 as d1's scope reads them; not re-read line by line here |
+
+### Blocks (synthesis)
+- All 116 FIX blocks in engine-architect-synthesis-fixes-final.md are applied at 449356c (applycheck.py: every AFTER present, every BEFORE gone).
+- lostcheck.py lists only lines rewritten on purpose: the Up bullet, three Size lines, the pass-mark line, two re-pinned rows. Each item still has its Size and Pass-marks lines.
+- Each finding the by-author list routes to the synthesis is resolved, as rows S1–S19 show: FC-2 to FC-6, IE-2, NA-17, PA's note, GE-5, GE-12, GE-13, AD-7, AD-13, TE-1, TE Q1 and TE Q2, and every routed README row.
+- The NOTEs that defer are sound:
+  - GE-5 becomes OQ-SPIKE-1 instead of a decision.
+  - GE-13's builders are proposed with the order.
+  - The deferred items stay with their drafts.
+- New problem: SF1 (S12). The paragraph was rewritten in this round but kept "per slot class".
+
+### Consistency (synthesis against the drafts)
+
+| item | where | same? | note |
+|---|---|---|---|
+| event-release rule | ENGINE_OVERVIEW:61–62, 91–92 against ADR 0001 part 7 and ADR 0002 part 5 | yes | "released on its delayed timeline" / "the block whose delayed time reaches their tick" |
+| 60 Hz stand-ins | SPIKE_PLAN items 1, 2, 4; README TICK-60-SETUP row; ADR 0001 OQ-0001-2; ADR 0004 S1, PM-0004-2 | yes | 1 ms and 0.30 ms at 60 Hz; 1 ms and 2.80 ms at 30 Hz, in all |
+| one material per slot content | SPIKE_PLAN:251 against ADR 0003 5.a, ADR 0005 GPU parts 1 and 7 | no | SF1 |
+| OQ-0006-13, no OQ-0002-9 | all nine docs at 449356c | yes | `grep -c OQ-0002-9` = 0 in each; README's OQ-0006-13 row names the preview token and production |
+| the look floor | SPIKE_PLAN item 5 (OQ-0003-16 "the look floor on the Low frame"); README OQ-0003-16 row | yes | – |
+| both houses | SPIKE_PLAN item 5; ADR 0003 part 11; ADR 0005 GPU part 8 | yes | – |
+
+### Counts and pointers
+- Open questions: 18, 8, 20, 12 numbered (10 open), 36, 20. That is 114 numbered and 112 open, and SPIKE_PLAN adds OQ-SPIKE-1. README states the same.
+- Pass marks: 62, 78, 47, 75, 46, 32 = 340. README states the same.
+- `python3 .checkpoints/v2-decision-drafts/scripts/draft_pointers.py` at 449356c prints "pointers checked 94: ok 94, off 0".
+- New open questions that route to Mustafa or the Advisor each have exactly one README decisions row:
+  - OQ-0001-15 to -18 (-18 as ROOM-CRASH).
+  - OQ-0003-16 to -20.
+  - OQ-0004-8 to -12.
+  - OQ-0005-AB14, AB15 and AP1.
+  - OQ-0006-13 to -20.
+  - OQ-SPIKE-1 (as "Look test models").
+- Review questions the round did not turn into a draft's open question are listed:
+  - GE Q2 is OQ-SPIKE-1's row.
+  - TE Q1 is folded into OQ-0001-2's row, which gives options (a) to (d).
+  - SA Q1 is folded into OQ-0006-13 (infra-engineer-fixes-final.md line 13).
+  - The rest became draft OQs, and README writes the reviews' names in brackets: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL, HEAT-SOAK, POOL-FULL, DOMAIN, SPIKE-VM-ACCESS, UNRELEASED-ART, ROOM-CRASH.
+- Other checks at 449356c:
+  - GLOSSARY "Retire (exact)": 0 in ENGINE_OVERVIEW, SPIKE_PLAN and README.
+  - No sentence sits directly under a table in the three docs.
+  - ENGINE_OVERVIEW is 144 lines (condition 19: about 150 at most).
+
+### Finding (synthesis)
+
+**SF1 (low). SPIKE_PLAN still says "shared materials per slot class".** Author: engine-architect (the synthesis).
+- Current text, SPIKE_PLAN:251: "plain glTF/GLB exports load on both backends with the engine's shared materials per slot class, every model listed by id".
+- What the source says: ADR 0003 5.a (0003:175) "one material per slot content, never one per mesh". ADR 0005 GPU part 1 (0005:1695–1697) defines the content as the class, the faction, and the slot's own colours, textures, side and alpha mode. PM-0005-35 has a bite that keys materials by (class, faction) only and must fail.
+- Smallest fix: "with the engine's shared materials, one per slot content (ADR 0005 GPU part 1)".
