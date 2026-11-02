@@ -1,3 +1,4 @@
 Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 0006 (diff 47eadd9..604a497) against sources, fix blocks, consistency, rules; output verifier-fixcheck-d1-verdicts.md.
 - started; output file created (skeleton). Next: diff, d0 verdicts, by-author file.
 - read prompt, d0 verdicts, by-author, rules/conditions; made scratch newsent.py and new-*.tsv (new sentences per ADR). Next: glossary script, under-table check, apply-check of fix blocks.
+- provenance done (all HEAD changes = fix blocks; TE-B OQ-0006-20 held, infra-c version applied); glossary exact 0; under-table 0. Next: read the new-sentence lists for 0001 (netcode-architect unit), check claims; then blocks.
