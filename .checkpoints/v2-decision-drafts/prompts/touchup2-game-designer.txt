@@ -1,0 +1,43 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: game-designer · effort: xhigh · model: opus · the last touch-ups after fixcheck-d2 · 2026-11-02, saved about 21:14 Amsterdam
+
+You are the author of ADR 0005's section "The ability and effect system" in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se; the docs as they are on disk). The final verifier, fixcheck-d2, found problems in your own text. Its findings are in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-fixcheck-d2-verdicts.md: F1b (high: the AB-3 heading lost; restore it), F8 (OQ-0005-AB9 says ADR 0001 has E place a cache), F9 (AB-1's formula multiplies by "pellets", which is 0 for legacy's Molotov), F10 (AB-5's Need line appears twice), in its section "Findings: ADR 0003, 0004, 0005". Each has the current text, what the source says and the smallest fix. This is notes only: you edit no doc, and you never commit, push or fetch.
+
+For each finding:
+1. Check it against the cited lines first. You act as its skeptic: the plan sends every "wrong" verdict to a skeptic, and tonight the owner checks instead, for time.
+2. If it holds, write one exact FIX block. Keep each fix's line count the same as its BEFORE where you can, because README points into the drafts by line number. A restored heading or step must add its line: say so in your return.
+3. If it does not hold, write a NOTE with your evidence.
+
+Keep the plan's rules: cite what a claim rests on; no GLOSSARY "Retire (exact)" phrase (check with `python3 /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/scripts/glossary_check_drafts.py` on a scratch copy); never a sentence directly under a table.
+
+Write the blocks into /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/touchup2-game-designer-fixes.md, every BEFORE copied by script from the file on disk, whole lines, occurring exactly once:
+### FIX <finding id>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the new text>
+END
+For a finding you reject:
+### NOTE <finding id>
+<why, with the evidence>
+END
+
+## Save as you go (Mustafa, 2026-11-02: usage limits cut agents mid-task; lose as little as possible)
+- This applies to every agent of this task, the ones running now and every later wave.
+- Create your output file at the start, then add to it as you go: each FIX or NOTE block (or verdict row) goes into the
+  file the moment you have composed it, never held back for the end. The session's background saver commits and pushes
+  the checkpoint folder every 5 minutes, so whatever is in your files survives a cut.
+- Keep the file valid as you go: finish each block (its END line) before you start the next one.
+- After each finding or unit of work, add one line to your notes file: what is done, what comes next.
+- Scratch files (copies of docs, diffs, scripts, fetched excerpts, applied previews) live in the notes folder, in
+  /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/<your-unit>-scratch/, never in /tmp, a scratchpad or
+  .gate/ (those are not saved). Keep scratch to what you need to resume: for a fetched page, save the excerpt you quote
+  and its audit row, not the whole page.
+- On a restart, read your notes, your output file and your scratch folder first, and continue after the last complete
+  block. Never redo a finished block, and never start the file again from scratch.
+
+## Saving your progress
+Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/touchup2-game-designer-notes.md (look there first; if they end with DONE, answer from them). Scratch only in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/touchup2-game-designer-scratch/. End with DONE. Finish by 21:50 Amsterdam.
+
+## Return
+At most 5 lines: each finding's outcome, any change in a file's line count, and your file's path.

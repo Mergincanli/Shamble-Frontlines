@@ -596,3 +596,11 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
   one tick plus one frame, 50 ms, a reasoned note).
 - ADR 0002's halves of SA-10 and SA-11 (npm advisories and a strict-CSP-ready build) wait for the security baseline
   (BASELINE-WHEN (b)); ADR 0006 carries them.
+- From the final re-checks (fixcheck-d1, -d2), low: ADR 0001 part 8's rewind estimate may add the 0-to-one-frame wait
+  (d1 F3, measured by PM-0001-49; changing the 233–383 ms figure now would ripple into the README and other drafts);
+  ADR 0002 OQ-0002-5's "paid minutes" (d1 F8, as above); ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted" though
+  its mark 2 is changed (d2 F6); ADR 0004's "late steals" is not one of LOOP_V2 §11's counters (d2 F7) and "most
+  slots" stands where VISION_V2 §3 says "Bots fill empty slots" (d2 F14). Wording only; for the revision after the
+  stop review.
+- Not read at their sources (no fetch after 22:00): the WebGPU specification's error model behind PM-0003-2, and std's
+  `write_length_prefix` default behind ADR 0004 part 9 (both stay "unverified" in the verdict files).
