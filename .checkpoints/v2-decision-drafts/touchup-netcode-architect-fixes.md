@@ -22,3 +22,17 @@ AFTER:
    match, the Worker's authority sim), drawn from an
 END
 
+### FIX F1
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+  and the server-only load in the same fight, and the margin is a tail statistic (our inference). The 30 Hz baseline
+  marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder
+  topped up): on the planning check they leave 7.49 ms. · *Decider:* the Advisor. · *What decides it:* the Advisor's
+  reading of the options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
+AFTER:
+  and the server-only load in the same fight, and the margin is a tail statistic (our inference). The 30 Hz baseline
+  marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder topped
+  up): on the planning check they leave 4.69 ms (16.67 − 9.18 − 2.80). · *Decider:* the Advisor. · *What decides it:*
+  the Advisor's reading of the options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
+END
+
