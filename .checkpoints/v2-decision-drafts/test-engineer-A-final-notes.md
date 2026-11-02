@@ -7,3 +7,4 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - read ADR 0002 spike items and pass marks (1141-1368 at 61e9933); next: engine-architect 0002 routed NOTEs
 - read ADR 0002 parts 4-7, 10; eng-arch NOTEs (927-1061); infra NOTEs (LG key, PM-0002-66); unit B notes. Plan: new rows PM-0001-58..62, PM-0002-77..78. next: r2 estimate lines, then write blocks
 - scratch moved to test-engineer-A-scratch/ (blk.py helper: appends a FIX block with BEFORE copied from orig-000N.md at 75615d1; work-000N.md = applied copy). No blocks written yet.
+- block 1 (row list) and block 2 (machines key: EA-7/IE-2 pin exemption, IE-9/10 LG) written; next: scenes key (NA-2/PA-1 ES gated)

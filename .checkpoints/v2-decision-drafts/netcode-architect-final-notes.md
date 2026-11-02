@@ -23,3 +23,4 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 16:50 UTC: proofread Appendix rows; independent check: the fixes file parsed (57 FIX), every BEFORE unique in HEAD's ADR 0001 (= 47eadd9), sequential apply equals the applied copy (1,761 lines), Pass marks untouched. Header's growth figure corrected (+250 lines).
 - Result file: netcode-architect-fixes-final.md (57 FIX, 39 NOTE). New OQs: OQ-0001-15 (own movement one tick behind: Mustafa with netcode-architect), -16 (profiles' direction split: the Advisor), -17 (kick bars the player: Mustafa), -18 (ROOM-CRASH: the Advisor). Port plan -> OQ-0006-16 (no ADR 0001 question). GD-REJOIN -> OQ-0004-10; GD-CARRIER -> OQ-0004-9.
 DONE
+- 16:55 UTC: follow-up batch b written (netcode-architect-fixes-final-b.md: 4 FIX: OQ-0005-AB15 pointer, AB-5 cites in part 12 and the Buy row, LOOP_V2 §4 key wording); verified on 75615d1. DONE

@@ -509,17 +509,19 @@ server in the browser. The parts:
     of one offer. It counts a malformed pick (an offer id it never issued, a choice out of range) like a forged
     command, and a stale or repeated one (a double click, or a pick in flight when the offer closed) apart, so honest
     races are not counted with cheats. Track state (levels and picks per unit type and per weapon type) is owner class
-    and is sent to the owner when it changes; owner is the starting class, and who else sees picks is GD-PICK-VIS
-    (Mustafa's); what a pick changes inside the prediction scope reaches the owner in the own-state section (part 4).
+    and is sent to the owner when it changes; owner is the starting class, and who else sees picks is ADR 0005's
+    OQ-0005-AB15 (GD-PICK-VIS, Mustafa's); what a pick changes inside the prediction scope reaches the owner in the
+    own-state section (part 4).
     A purchase is `Buy{unitId}` on the control stream, for a unit or a vehicle ("the purchase names a unit, never a
     weapon": ADR 0005 AB-8's table); the authority applies it at its next tick only if the id exists in the
     mode's content, the team has reached its tier (ADR 0005 AB-5), the player can pay the price (personal money,
     LOOP_V2 §3, power-plant pricing included) and stands at the team's own buy terminal (LOOP_V2 §2, §5), these
-    conditions being rule data (ADR 0005); it reports the result to the owner as an event, counts refusals as it
+    conditions being rule data (ADR 0005 AB-5); it reports the result to the owner as an event, counts refusals as it
     counts picks, and never predicts a purchase. A dropped weapon is a sim entity (ADR 0004) replicated like any
     spatial entity: relevant through the region and the enclosure test, and sent from the tick it becomes relevant to
     a client. A pickup is asked for through the command's existing button edges, with no message of its own; which act
-    a press means where a pickup lies within reach of an uplink or a cache (E also steals and places, LOOP_V2 §4) is
+    a press means where a pickup lies within reach of an uplink or a cache (a steal is holding E, LOOP_V2 §4 step 4;
+    picking up and placing a cache, steps 2 and 3, name no key) is
     rule data (ADR 0005, OQ-0005-AB9's list). The authority picks the pickup from its own state, so a command can never
     name a pickup into existence, and it refuses one it did not place, one already taken, or one outside the pickup
     rule (rule data: ADR 0005). Neither offers, picks, purchases nor pickups are predicted (pickups interim:
@@ -632,7 +634,7 @@ same messages over the loopback backend.
 | `RoomState` | room → client | control stream | public | on change | phase, countdown, roster (human or bot per slot) | n/a |
 | `HostCommand` | client → room | control stream | n/a | private rooms, before start | start, kick, lock, settings (factions per team, allowed overrides) | sender is the host; values inside the mode's allowed overrides |
 | `PickUpgrade` | client → room | control stream | n/a | when an offer is open | offer id, choice (an index into the offer; the offer's size is data) | open offer to this player, choice in range, not already picked; malformed picks counted like forged commands, stale or repeated ones apart (part 12) |
-| `Buy` | client → room | control stream | n/a | when the player buys | unit or vehicle id | the id exists in the mode's content; the team has its tier; the player can pay the price; the player stands at the team's own buy terminal (part 12; the conditions are rule data, ADR 0005); refusals counted as for picks |
+| `Buy` | client → room | control stream | n/a | when the player buys | unit or vehicle id | the id exists in the mode's content; the team has its tier; the player can pay the price; the player stands at the team's own buy terminal (part 12; the conditions are rule data, ADR 0005 AB-5); refusals counted as for picks |
 | `ContentReload` (development builds only) | room → client | control stream | public | on a valid content change | the changed set and the tick it applies from | only if OQ-0005-CD4 chooses option (b), the mid-match swap (R1-DATA-REC5); under its option (a) nothing in a running match changes and no message is sent |
 | `RoomEnded` | room → client | control stream | public | at Ended | results | n/a |
 | `Leave` / `Kick` | either way | control stream | owner | once | reason | n/a |

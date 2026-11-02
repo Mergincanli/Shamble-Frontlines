@@ -1,0 +1,4 @@
+<<<OLD
+| H, V; rule B | R3-BUDGET-REC2's row (line 1127)
+>>>NEW
+| H in its tail form, V; rule B; S on ML | R3-BUDGET-REC2's row (line 1127)

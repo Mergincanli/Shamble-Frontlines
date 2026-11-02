@@ -27,3 +27,5 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0003 PM-0003-12 done (PA-8 routed)
 - 0003 PM-0003-16 done (PA-10, GE-8, GE-14)
 - 0003 PM-0003-19 (PA-14) and -23 (AD-1/GE-4 floor) done
+- 0003 PM-0003-18, -20, -21 done (S, tail form named in rows); mksub.py helper added
+- 0003 PM-0003-36 done (PA-12, GE-2 record, GE-3, GE-14)

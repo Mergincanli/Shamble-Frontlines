@@ -1,0 +1,4 @@
+<<<OLD
+| H, V; rule B (an extra full-screen pass) |
+>>>NEW
+| H in its tail form, V; rule B (an extra full-screen pass); S on ML |
