@@ -1,0 +1,4 @@
+<<<OLD
+| CI (nightly, Linux) | cargo-fuzz on a target that feeds decoded command values into a running sim (R5-TEST-REC4's fuzz targets) | nightly.
+>>>NEW
+| CI (nightly, Linux) | cargo-fuzz on a target that feeds decoded command values into a running sim (R5-TEST-REC4's fuzz targets), in a small scene: a 1v1 on LB (proposed: coverage comes from the command values, not from the crowd; at the stress scene 10 million ticks would take about 23 hours, 10,000,000 × 8.33 ms = 83,300 s, arithmetic); the corpus is kept between nights, so the 10 million accumulate within a nightly budget of 60 minutes (proposed), the running total recorded. Sequences of decoded control messages into the `room` crate (a pick on a closing offer, a host kicking itself, settings floods, join, leave and reconnect races) are fuzzed beside it once `room` exists, in ADR 0001's pass marks (beside PM-0001-34), since a panic there ends the match too (part 20) | nightly.

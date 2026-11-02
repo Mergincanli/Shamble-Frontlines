@@ -45,3 +45,4 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - resumed 20:33 Amsterdam after spend-limit cut; deadline 21:15; continuing 0004 from PM-0004-24
 - 0004 PM-0004-24 (RR-12) and -29 (EA-3, SA-15 bite) done
 - 0004 PM-0004-65 (GD-8) and -68 (NA-8) done
+- 0004 PM-0004-60 (RR-13, SA-13), -61 (RR-9), -74 (RR-10) done

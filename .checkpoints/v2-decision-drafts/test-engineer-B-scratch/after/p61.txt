@@ -1,0 +1,9 @@
+<<<OLD
+the trap reaches error reporting (Sentry with Rust function names if ADR 0006's EU organisation exists by then, else the page's own error log) |
+>>>NEW
+the trap reaches error reporting (Sentry with Rust function names if ADR 0006's EU organisation exists by then, else the page's own error log), carrying the panic message the hook wrote into its fixed buffer (part 20), which the Worker's host reads after the trap: 20 of 20 messages arrive whole, each naming the planted panic's file and line |
+===
+<<<OLD
+Bites: a host that does not restart the instance |
+>>>NEW
+Bites: a host that does not restart the instance; a host that reports the trap without reading the hook's buffer (the message must be missing from the report, so the check can fail) |

@@ -1,0 +1,9 @@
+<<<OLD
+| the resolved feature list of every dependency of `sim` (`cargo tree -e features`) identical for the `server` build and the `sim-wasm` build: 0 differences |
+>>>NEW
+| the resolved feature list of every dependency of `sim` (`cargo tree -e features`) identical for every build that runs the sim (`server`, `devtools`, `navbake` and `sim-wasm`), each resolved by the exact command CI and the release use: 0 differences |
+===
+<<<OLD
+Bites: a planted extra feature on a shared dependency in `server` makes the check fail (R5-LAYOUT-REC4's own) |
+>>>NEW
+Bites: a planted extra feature on a shared dependency in `server` makes the check fail (R5-LAYOUT-REC4's own); control: a dev-only feature on `devtools` that touches no `sim` dependency passes |
