@@ -5,3 +5,5 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - Key numbers: Molotov fuse 1.4 s (r1:1373), interval 1.05 s (WEAPONS) -> floor(1.4/1.05)+1 = 2 live per thrower, 96 at N=48; Shabzon 36 mag x 8 = 288 dmg, 35 x 0.072 = 2.52 s < 3 s; 3 s = 90 ticks at 30 Hz; AMK dmg 34 range 300, Bagpipe range 34 (LEGACY_TUNING 173, 181).
 - block 1 written: FIX RR-4 + POOL-FULL (AB-1, lines 843-846 at b88714d): proposal per kind (own-bounded effects reserved; others' effects (b) oldest ends early, cap in data; projectiles sized to worst case, (a) as safety net; pickups (b))
 - blocks 2-3 written: FIX GD-7 parts 1-2 (AB-2 lines 852-858: the immunity rule, a tag in the pipeline's data, one reviewed Rust addition; line 859: its need, LOOP_V2 §2 only)
+- blocks 4-6 written: FIX GD-8/finding 18 (active reload row 908 -> OQ-0001-7); FIX GD-7 part 3 (Javelin row 910 + new spawn-protection row -> OQ-0005-AB14); FIX GD-7 need line 917
+- blocks 7-9 written: AB-8 rows 946 (open offers queue, data, -> OQ-0005-AB8), 952 (record key -> OQ-0004-10), 953 (offer size from data; ADR 0004's authority-only offers stream, part 8)
