@@ -1,0 +1,62 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: rust-reviewer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
+
+You are the author of ADR 0004 (the simulation core) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 47eadd9). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+
+## Your text
+ADR 0004, `docs/adr/0004-simulation-core.md`: everything except its "### Pass marks" section.
+Only your own text. In each draft, the "### Pass marks" section is test-engineer's; in ADR 0005, "The ability and effect system" is game-designer's and "The asset pipeline: GPU rules" is graphics-engineer's; ENGINE_OVERVIEW, SPIKE_PLAN and docs/adr/README.md are engine-architect's (the synthesis). Where a fix needs another author's text to follow, say what it must read in your return, and the session routes it.
+
+## The findings against your text
+- Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
+  0004:151–156, :977); GD-4 and FC-1 (0004:425, 750, 751: "steal by GE8's presence count" drops LOOP_V2 §4's decided
+  "holding E"; two enemy teams at one uplink: an open question, GD-STEAL); GD-6 (part 19: picks recorded with their
+  tick, so OQ-0005-AB3's snowball measurements can be made; with infra-engineer's part 12); GD-7 (spawn protection,
+  barracks interiors closed to enemies, the Recruit respawn: a home in ADR 0004, 0004:422–427).
+- Low: SA-15 (the authority-only seed's source: the OS random source, never sent; 0004:254); FB-10 (0004:339–340 "no
+  Rust navigation crate read promises determinism"); NA-8 (online, the Worker's pacer follows the server-clock
+  estimate; 0004:188–193); GD-8's 0004 items (the pending offer of three hard-codes "three", 0004:433, 444–445; the
+  upgrade record keyed by slot loses a late rejoiner's tracks, 0004:431; money's unit and the rebuild-split remainder;
+  the pickup pool's capacity and full-pool rule).
+- Questions: GD-STEAL, GD-REJOIN, GD-CARRIER, GD-BOT-LOOT (Mustafa's; open questions where ADR 0004 holds the rule).
+- Plus the findings of your own step-10 review against ADR 0004's pass marks go to test-engineer, not you.
+- From review-rust-reviewer.md (your own review of other drafts; these touch your text): RR-3's 0004 half (0004:472:
+  a panic in the tick ends the match); RR-4 medium (0004:126–131: no pool (projectiles, active effects, pickups) has a
+  capacity or an overflow rule, yet the sim must not allocate in steady state: capacities from the mode and content at
+  match start, one overflow rule on every target; with game-designer's 0005:816–817); RR-9 low (0004:473–474: a trap
+  carries no panic message: a small panic hook writes it where the host can read it). Question POOL-FULL (Mustafa,
+  through game-designer: refuse the new item with a counter, recommended, or end the oldest early).
+- From review-test-engineer.md: TE-1's 0004 part (0004:826, S1: PM-0004-2 demands 384 active effects, which no wave-1 S1
+  run has: the missing parts burn their ceilings, or say which wave-1 runs are valid); TE-6 low (0004:422, :454–458:
+  parts 17 and 19 have no spike claim, test plan line or milestone: planted divergences that change only an event and
+  only an economy value).
+Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
+
+## What to do with each finding
+- **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
+- **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
+- Keep the plan's rules: every claim cites its research file, section and id with lines at 9e7db28; every number is sourced, arithmetic on sourced numbers (shown), or "proposed" with a reason; use the glossary's terms; no feature without a VISION_V2 §6 trace (or the need named); no decision on the look beyond docs/LOOK_V2.md; no settled input reopened. The rules are in the report's appendix §4 (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), "Rules every author follows".
+- Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/rust-reviewer-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 47eadd9, whole lines):
+```
+### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the replacement>
+END
+```
+and, where you defer or disagree:
+```
+### NOTE <finding id>
+<deferred: reason / disagree: reason and evidence / routed: what another author's text must read>
+END
+```
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/rust-reviewer-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
+
+## Return
+At most 15 lines: per finding id, FIX or NOTE (deferred, disagree, routed) in a few words; the new open questions' numbers and deciders; what other authors' text must follow.

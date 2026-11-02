@@ -1,0 +1,67 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: graphics-engineer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
+
+You are the author of ADR 0003 (rendering) and of ADR 0005's GPU section in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 47eadd9). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+
+## Your text
+ADR 0003, `docs/adr/0003-rendering.md`: everything except its "### Pass marks" section (the look checklist is in it: test-engineer's); and in ADR 0005, `docs/adr/0005-content-abilities-assets.md`, the section "The asset pipeline: GPU rules (graphics-engineer)". You research and judge techniques; you never decide the look beyond docs/LOOK_V2.md.
+Only your own text. In each draft, the "### Pass marks" section is test-engineer's; in ADR 0005, "The ability and effect system" is game-designer's and "The asset pipeline: GPU rules" is graphics-engineer's; ENGINE_OVERVIEW, SPIKE_PLAN and docs/adr/README.md are engine-architect's (the synthesis). Where a fix needs another author's text to follow, say what it must read in your return, and the session routes it.
+
+## The findings against your text
+- Medium: PA-4 (0003:326–329: VISION_V2 §6.9 "without dropping frames" needs a mark; with test-engineer's row); PA-8
+  (0003:318–321: "about 786, inside 800" leaves out the post-processing passes, health bars, VFX pools and projectile
+  kinds); FA-L2 = B25 (0003:707: GW17 "pending removed" while its camera-player half is Mustafa's call under
+  OQ-0003-15).
+- Low: EA-11 (0003:370–374 audio occlusion copies the world onto the page; 928–931 the bench's Worker load; 276–277
+  wording; 381 a stale hedge); PA-10 (0003:204, :514: memory per attachment single-sample though MSAA 4× is the start);
+  PA-11 (the triangle row counts the shadow pass); FC-9 (0003:704: the CC10 row's outcome reads as LOOK_V2 §3's words).
+- From review-graphics-engineer.md (2026-11-02 about 11:15; ADR 0005 REVISE): GE-1 high (0005:1587–1588 vs 1544–1547:
+  "one material per class (and per faction)" vs "one material per slot content": one material per content key, as
+  legacy shared materials by full content, LEGACY_INVENTORY line 113; with test-engineer's PM-0005-35); GE-4 medium
+  (0003:309, 199: the Low tier may switch shadows and AO off against LOOK_V2 §2's decided soft shadows: its Q1, an open
+  question, decided after the look proof test's per-technique costs).
+- From review-art-director.md (2026-11-02 about 11:22; ADR 0003 REVISE; 0005's asset parts and the look test APPROVE
+  WITH NOTES): AD-1 high (0003 Rollback, about :1193–1194 "a tier change in data moves it to High only", with :163–164,
+  :191, :212/:309, :665: the ink and soft shadows, LOOK_V2 [DECIDED], could drop out of the default Low tier with no
+  look call by Mustafa: a look floor, lower them but never switch them off, or an open question LOOK-FLOOR for Mustafa;
+  with GE-4 and test-engineer's fail route); AD-4 medium (0003:177–179, 187–190: screen-space ink finds no depth jump
+  where buildings and boots meet the ground, so that line comes out at the thin inner weight: name it as a visible
+  difference; an inference, not research); AD-6 medium (0003:220 with 0005:1553–1554: no material class for buildings,
+  so the heaviest building ink has no input: a structure class or an ink-weight field per asset); AD-7 medium (0003:398,
+  0005:1591–1592: the test assets hold one building while checklist step 14 shows both [DECIDED] houses); AD-10 low
+  (0003:250–253: the halftone overlay's cost is invisible to GPU timers and it also dots the HUD, ART_DIRECTION.md:121);
+  AD-11 low (0003:189, :316: ink width scales with pixel ratio × resolution scale); AD-14 low (0005:1569–1571: the cap of
+  4 materials per soldier bounds its surface kinds). Questions: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL (Mustafa's).
+- From review-test-engineer.md: TE-5 medium (0003:845: "effects on one backend only are off for this test" contradicts
+  part 1, 0003:125, one feature set on both backends: compare with every kept effect on; test-engineer's PM-0003-3
+  follows).
+Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
+
+## What to do with each finding
+- **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
+- **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
+- Keep the plan's rules: every claim cites its research file, section and id with lines at 9e7db28; every number is sourced, arithmetic on sourced numbers (shown), or "proposed" with a reason; use the glossary's terms; no feature without a VISION_V2 §6 trace (or the need named); no decision on the look beyond docs/LOOK_V2.md; no settled input reopened. The rules are in the report's appendix §4 (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), "Rules every author follows".
+- Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 47eadd9, whole lines):
+```
+### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the replacement>
+END
+```
+and, where you defer or disagree:
+```
+### NOTE <finding id>
+<deferred: reason / disagree: reason and evidence / routed: what another author's text must read>
+END
+```
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/graphics-engineer-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
+
+## Return
+At most 15 lines: per finding id, FIX or NOTE (deferred, disagree, routed) in a few words; the new open questions' numbers and deciders; what other authors' text must follow.

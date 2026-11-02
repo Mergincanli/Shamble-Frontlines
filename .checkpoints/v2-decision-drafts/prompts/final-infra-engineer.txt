@@ -1,0 +1,66 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: infra-engineer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
+
+You are the author of ADR 0006 (infrastructure and operations) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 47eadd9). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+
+## Your text
+ADR 0006, `docs/adr/0006-infrastructure-operations.md`: everything except its "### Pass marks" section.
+Only your own text. In each draft, the "### Pass marks" section is test-engineer's; in ADR 0005, "The ability and effect system" is game-designer's and "The asset pipeline: GPU rules" is graphics-engineer's; ENGINE_OVERVIEW, SPIKE_PLAN and docs/adr/README.md are engine-architect's (the synthesis). Where a fix needs another author's text to follow, say what it must read in your return, and the session routes it.
+
+## The findings against your text
+- High: SA-1 (the preview token: production deploys only from main with its own environment and token; a required
+  reviewer on `preview` until the baseline; revoke the spike's token; 0006:385, 389–394; with engine-architect's ADR
+  0002 part 10); IE-1 and EA-5 (a release path: how a client and servers reach production, two versions during a
+  deploy, rollback of a bad server release; EA Q2 and IE RELEASE-WINDOW: an open question for the Advisor and Mustafa).
+- Medium: SA-2 (0006:565, the access-wall claim: staging tokens from a walled endpoint, a separate staging key); SA-3
+  (the guest cookie's registrable domain, 0006:380, with IE-6's DOMAIN question); SA-4 (room processes vs the VM's
+  secrets: a new item B12); SA-5 (the aim log's store and retention, 0006:300–301, with netcode-architect); EA-6 (the
+  archive of shipped content sets ADR 0005 hands to 0006, 0006:1022); IE-3 (macOS runners are standard and free on a
+  public repository: 0006:523, OQ-0006-7); IE-4 (a certificate hash in a static preview goes stale: staging presents
+  its trusted certificate on both transports; 0006:228–229); IE-5 (the firewall rules per VM role, 0006:185–190); IE-6
+  (no domain or DNS provider named: OQ-0006-5, migration step 0; its DOMAIN question); IE-7 (OQ-0006-5 waits on a port
+  plan ADR 0001 lacks); IE-8 (at the marks' ceilings two rooms per VM: the goal fleet about 967 EUR as a floor;
+  0006:262–265); IE-9/10 (one load generator for 384 sessions from one address: size it by a calibration run, the cap
+  per run; 0006:812–814); IE-11 (how the lobby asks a VM for a room, 0006:208–220); IE-12 (a public repository makes
+  committed unreleased art public, 0006:144–149: its UNRELEASED-ART question); IE-14 (the tick bench's access path and
+  cost; the Hetzner API token missing from B9; 0006:385); GD-6 (the match record keeps picks as totals with no tick:
+  0006:342–350, with rust-reviewer's part 19); EA-10 (the endpoint for client field data and crash reports, 0006:321).
+- Low: SA-10 (npm advisories; cargo-deny's `sources`; 0006:377); SA-11 (a strict-CSP-ready build, 0006:379); SA-14 (the
+  crash endpoint's body cap, rate limit and retention, 0006:313–314); SA-16 (local-match records never in the store,
+  part 12); IE-15 (an alert route, 0006:234); IE-17 (the location before the reference server, 0006:811); IE-18 and
+  IE-20 where they are your text (0006:872–873).
+- Questions: IE's UNRELEASED-ART, SPIKE-VM-ACCESS, RELEASE-WINDOW, DOMAIN; SA Q1 (read item B9 before the foundation's
+  preview step?).
+- From review-test-engineer.md: TE-2 medium (0006:764–772: rooms per VM measured on the proof test's stand-in sim
+  "fixes part 8's goal budget"; a lighter sim overstates density: the stand-in burns the sim step share's ceiling, and
+  the budget stays provisional until slice 6; its Q2 for Mustafa on the Advisor's advice).
+Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
+
+## What to do with each finding
+- **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
+- **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
+- Keep the plan's rules: every claim cites its research file, section and id with lines at 9e7db28; every number is sourced, arithmetic on sourced numbers (shown), or "proposed" with a reason; use the glossary's terms; no feature without a VISION_V2 §6 trace (or the need named); no decision on the look beyond docs/LOOK_V2.md; no settled input reopened. The rules are in the report's appendix §4 (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), "Rules every author follows".
+- Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/infra-engineer-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 47eadd9, whole lines):
+```
+### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the replacement>
+END
+```
+and, where you defer or disagree:
+```
+### NOTE <finding id>
+<deferred: reason / disagree: reason and evidence / routed: what another author's text must read>
+END
+```
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/infra-engineer-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
+
+## Return
+At most 15 lines: per finding id, FIX or NOTE (deferred, disagree, routed) in a few words; the new open questions' numbers and deciders; what other authors' text must follow.

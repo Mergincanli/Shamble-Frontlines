@@ -38,6 +38,19 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+2026-11-02 about 11:15 Amsterdam. All ten step-10 reviews are in (review-*.md), with fixcheck-a, -b, -c (PASS WITH
+NOTES) and skeptics 4 and 5 (all upheld). REVISE verdicts: 0001 (engine-architect small, game-designer, netcode-
+architect small, perf-auditor small), 0002 (security-auditor, rust-reviewer small), 0003 (perf-auditor small,
+art-director), 0004 (game-designer small), 0005 (graphics-engineer; one ability pass-mark row, game-designer), 0006
+(security-auditor, infra-engineer), SPIKE_PLAN (test-engineer); everything else APPROVE or APPROVE WITH NOTES. Every
+finding is sorted by author in `final-round-by-author.md`. The final round (one batch per author; prompts
+`prompts/final-*.txt` from `_final-round-TEMPLATE.txt`): wave 1 running since about 11:14 (netcode-architect
+ac406e7aab2effb19, infra-engineer ad9e6818495220536, rust-reviewer a9ed1c468597c7711, engine-architect 0002
+a9eb5c3cc8af03805, graphics-engineer aa8bf97f5e6ca4e8d; all base 47eadd9); next engine-architect 0005 and
+game-designer (base 47eadd9), then test-engineer A and B (base: the commit after wave 1), then the synthesis (last),
+then fixcheck-d, docs-keeper (`prompts/docs-keeper-2.txt`), the report.
+
+Before (2026-11-02 morning, the sixth cut):
 Sixth spend-limit cut, 2026-11-02 shortly after 09:48 Amsterdam ("resets 9:10am (UTC)", 10:10 Amsterdam): the reviews
 by test-engineer, art-director, graphics-engineer and rust-reviewer and verifier fixcheck-c failed with HTTP 429 (notes
 kept). Done before the cut, 2026-11-02: fixcheck-b and fixcheck-a (PASS WITH NOTES), skeptic-4 (5 of 5 upheld), the

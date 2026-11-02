@@ -32,6 +32,14 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   in the tick leaves a zombie room: the match ends and the process exits non-zero; the tick and network threads share
   only channels; with rust-reviewer's 0004:472). Question ROOM-CRASH (the Advisor: the match ends, recommended, or the
   room resumes from a snapshot, a generic feature for later).
+- From review-test-engineer.md (2026-11-02 about 11:24): TE-1 high's 0001 part (0001:859–869, OQ-0001-2 (a): the sim
+  feeding the wave-1 60 Hz margin run has no ability or effect step, economy, objectives or moments: each missing part
+  burns its time ceiling in the same run, or the verdict waits for the real effect step; its Q1 for the Advisor; with
+  rust-reviewer's S1 and the synthesis's SPIKE_PLAN); TE-3 medium (0001:955–956: "one recorded input replay drives both
+  transports to identical server state hashes" depends on timing while OQ-0001-6 is open: a run counts only when the
+  late-command counter is 0); TE-4 medium (0001:561, :192: only the 60 Hz soak proves counter wraps; the 30 Hz soak's
+  54,000 ticks never reach 65,536; the sequence-number wrap has no proof: a deterministic gate test that starts the
+  counters just below their wrap points).
 
 ## infra-engineer: ADR 0006, all but "### Pass marks"
 - High: SA-1 (the preview token: production deploys only from main with its own environment and token; a required
@@ -57,6 +65,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   IE-20 where they are your text (0006:872–873).
 - Questions: IE's UNRELEASED-ART, SPIKE-VM-ACCESS, RELEASE-WINDOW, DOMAIN; SA Q1 (read item B9 before the foundation's
   preview step?).
+- From review-test-engineer.md: TE-2 medium (0006:764–772: rooms per VM measured on the proof test's stand-in sim
+  "fixes part 8's goal budget"; a lighter sim overstates density: the stand-in burns the sim step share's ceiling, and
+  the budget stays provisional until slice 6; its Q2 for Mustafa on the Advisor's advice).
 
 ## test-engineer, unit A: the "### Pass marks" sections of ADR 0001 and ADR 0002 (and the netcode checklist)
 - ADR 0001: GD-1 (PM-0001-21: drop "beyond weapon range" from the forged set; the point is clamped); NA-1 (PM-0001-20,
@@ -80,6 +91,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   a bite for a stale view of Wasm memory after growth); RR-8 (PM-0002-29: measure link-time optimization and
   `codegen-units`, Brotli beside gzip); RR-3's mark (one pass mark: a panic in the tick ends the match and the process
   exits non-zero; with unit B if it lands in ADR 0004).
+- From review-test-engineer.md (your own review): PM-0001-30 follows TE-3 (a run counts only when the late-command
+  counter is 0); a deterministic counter-wrap row follows TE-4, once netcode-architect writes it.
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -117,6 +130,7 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (step 13: the animation LOD picks soldiers by importance, not distance); AD-12 low (0003:1084–1085: the trees are
   legacy's ported tree builders, GW18, judged for variety only); AD-14 (steps 10–12: the soldier shown is built at the
   4-material cap).
+- From review-test-engineer.md: PM-0003-3 follows TE-5 (compare with every kept effect on).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -137,6 +151,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   match start, one overflow rule on every target; with game-designer's 0005:816–817); RR-9 low (0004:473–474: a trap
   carries no panic message: a small panic hook writes it where the host can read it). Question POOL-FULL (Mustafa,
   through game-designer: refuse the new item with a counter, recommended, or end the oldest early).
+- From review-test-engineer.md: TE-1's 0004 part (0004:826, S1: PM-0004-2 demands 384 active effects, which no wave-1 S1
+  run has: the missing parts burn their ceilings, or say which wave-1 runs are valid); TE-6 low (0004:422, :454–458:
+  parts 17 and 19 have no spike claim, test plan line or milestone: planted divergences that change only an event and
+  only an economy value).
 
 ## engine-architect, ADR 0002, all but "### Pass marks"
 - High: SA-1 (part 10: the preview job holds no token a branch can rewrite; production deploys only from main, in its
@@ -169,6 +187,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   same-feature check covers `devtools` and `navbake`); RR-14 low (0002:365–366: the "indices come from its own pools"
   reason is wrong for client-sent ids); RR-15 low (0002:138, 151: a dated nightly for the fuzz jobs); RR-16 low
   (0002:287–289: ts-rs and schemars derives kept out of the shipped builds).
+- From review-test-engineer.md: TE-7 low (0002:416–421 vs :435: the nightly soak on shared CI runners is "measured …
+  against the server tick budget", which the draft's own reason rules out; PM-0002-72 limits that mark to the reference
+  server; say so in the decision text; name the machine of the 3-hour soak before each playtest).
 
 ## engine-architect, ADR 0005: the frame, content data and the asset pipeline
 - Medium: EA-6 (0005:388–389 hands the archive of shipped content sets to ADR 0006, which has none: with
@@ -204,11 +225,16 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (0003:250–253: the halftone overlay's cost is invisible to GPU timers and it also dots the HUD, ART_DIRECTION.md:121);
   AD-11 low (0003:189, :316: ink width scales with pixel ratio × resolution scale); AD-14 low (0005:1569–1571: the cap of
   4 materials per soldier bounds its surface kinds). Questions: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL (Mustafa's).
+- From review-test-engineer.md: TE-5 medium (0003:845: "effects on one backend only are off for this test" contradicts
+  part 1, 0003:125, one feature set on both backends: compare with every kept effect on; test-engineer's PM-0003-3
+  follows).
 
 ## game-designer: ADR 0005's "The ability and effect system"
 - (none yet from the six reviews; the rust-reviewer, graphics-engineer and art-director reviews may add some)
 - From review-rust-reviewer.md: RR-4's 0005 half (0005:816–817: the active-effect pool's capacity and overflow rule;
   with rust-reviewer's 0004 part; POOL-FULL is Mustafa's question).
+- From review-test-engineer.md: TE-8 low (0005:1256, :1277: searching the code for the ability ids is a weak proxy; the
+  real proof is the test-only combination that works with zero Rust changes).
 
 ## engine-architect, the synthesis: ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (last, after the drafts' batches)
 - FC-2 (README:269–270: G0; ADR 0006's S1–S5 collide with seam S4; B1–B11 are baseline items: skeptic-5 first); FC-3
@@ -228,4 +254,13 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - From review-art-director.md: AD-7 (SPIKE_PLAN:236–237: the look test's assets list one building; step 14 shows both
   houses); AD-13 (SPIKE_PLAN:222: "each [DECIDED] item" leaves out the [DEFAULT] items the checklist also judges).
   Questions for README: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL (Mustafa's).
+- From review-test-engineer.md (SPIKE_PLAN REVISE): TE-1 high (SPIKE_PLAN:205–206, :147–150: the wave-1 60 Hz margin
+  run's sim lacks the ability and effect step, economy, objectives and moments, which arrive with the wave-3 content and
+  ability spike, SPIKE_PLAN:303: follow ADR 0001's and 0004's new text, each missing part burning its ceiling or the
+  verdict waiting); README rows for TE Q1 (the Advisor: burn the ceilings, recommended, or wait) and TE Q2 (Mustafa on
+  the Advisor's advice: the rooms-per-VM budget provisional until slice 6, recommended).
+- From verifier-skeptic-5-results.md (FC-2 upheld in all three parts, low): README:269–270 reads "G0–G13"; "S1–S5"
+  (ADR 0006 writes "seam S3/S4", so README's rule tells them apart); "… option labels (G1–G4, K1–K4, S1–S5) and its
+  baseline items B1–B11 (part 13)"; and "for example" (ADR 0002 has its own option labels, two G1–G3 sets; ADR 0006
+  cites ADR 0001's profile B1 beside its baseline item B1).
 

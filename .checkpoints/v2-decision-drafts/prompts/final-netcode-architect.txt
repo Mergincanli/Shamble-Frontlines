@@ -1,0 +1,73 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: netcode-architect · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
+
+You are the author of ADR 0001 (multiplayer and netcode) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 47eadd9). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+
+## Your text
+ADR 0001, `docs/adr/0001-multiplayer-netcode.md`: everything except its "### Pass marks" section.
+Only your own text. In each draft, the "### Pass marks" section is test-engineer's; in ADR 0005, "The ability and effect system" is game-designer's and "The asset pipeline: GPU rules" is graphics-engineer's; ENGINE_OVERVIEW, SPIKE_PLAN and docs/adr/README.md are engine-architect's (the synthesis). Where a fix needs another author's text to follow, say what it must read in your return, and the session routes it.
+
+## The findings against your text
+- High: EA-1 (no timing rule for events: release spatial events at the delayed time; R2-SYNC-REC6, r2:2210); GD-1
+  (clamp the aim point to the weapon's range instead of refusing it); NA-1 (the rewind estimate leaves out the command
+  buffer and the page's blend; "server time" in part 7 undefined; its Q1 extends OQ-0001-5).
+- Medium: FA-L1 = A8 (SK4 upheld: part 6's event list leaves out blasts, harvester deliveries and kills, structure
+  kills and stage changes; say whether blasts are resent or sent once); EA-2 (the 30 Hz input cost: the local player
+  drawn one tick behind its prediction; its Q1); EA-5 and IE-1 (the release model: with infra-engineer, 0001:560,
+  1340–1341); GD-2 (a buy message for units and vehicles); GD-3 (what the own-state section carries); NA-3 (own-weapon
+  cues on prediction replays; the server's echo of the shooter's own shots); PA-2 (the E3b fallback cannot pass its
+  budget); PA-3 (the upstream cost of part 5's command: delta-code repeats or lower the cap); SA-3 (the SameSite cookie
+  needs one registrable domain); SA-5 (the per-command aim log's volume: with infra-engineer); SA-6 (the RTT claim
+  overstated; log quinn's RTT beside the ping RTT); SA-7 (IPv6 /64 for per-address limits); SA-8 (each command's tick
+  strictly newer); IE-7 (does the fallback need TCP 443: name the ports); IE-11 (how the lobby asks a VM for a room).
+- Low: SA-9 (the WebSocket path's accept, TLS and upgrade deadline); SA-12 (display names); EA-10 (the endpoint for
+  client field data and crash reports, with infra-engineer); GD-8's 0001 items (the hard-coded "three": 0001:382–383,
+  493; honest double clicks counted as forged: 0001:383; E for pickup vs E for steals: 0001:386–387; OQ-0001-7 covers
+  shots, not the active-reload tap); NA-9 (5–7 repeated commands at P2: a "newest received" ack); NA-12 (the 60 Hz run's
+  snapshot rate); NA-13 (a client resync message); NA-14 (a generation change as removal + addition); NA-16 ("seated
+  players"); the optional FA note (0001:809–811 could cite PM-0002-25).
+- Questions to carry as open questions where they are yours: NA Q1 (the rewind cap), NA Q2 (the profiles' direction
+  split), EA Q1 (own-movement delay at 30 Hz), SA Q2 (does a host's kick bar the player for the match), GD-REJOIN.
+- From review-rust-reviewer.md: RR-2's 0001 half (0001:348–349: room timers count ticks; no clock read inside `room`
+  or the client endpoint); RR-3 medium (0001:352–353, 554: with the sim on its own thread and `panic = "unwind"`, a panic
+  in the tick leaves a zombie room: the match ends and the process exits non-zero; the tick and network threads share
+  only channels; with rust-reviewer's 0004:472). Question ROOM-CRASH (the Advisor: the match ends, recommended, or the
+  room resumes from a snapshot, a generic feature for later).
+- From review-test-engineer.md (2026-11-02 about 11:24): TE-1 high's 0001 part (0001:859–869, OQ-0001-2 (a): the sim
+  feeding the wave-1 60 Hz margin run has no ability or effect step, economy, objectives or moments: each missing part
+  burns its time ceiling in the same run, or the verdict waits for the real effect step; its Q1 for the Advisor; with
+  rust-reviewer's S1 and the synthesis's SPIKE_PLAN); TE-3 medium (0001:955–956: "one recorded input replay drives both
+  transports to identical server state hashes" depends on timing while OQ-0001-6 is open: a run counts only when the
+  late-command counter is 0); TE-4 medium (0001:561, :192: only the 60 Hz soak proves counter wraps; the 30 Hz soak's
+  54,000 ticks never reach 65,536; the sequence-number wrap has no proof: a deterministic gate test that starts the
+  counters just below their wrap points).
+Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
+
+## What to do with each finding
+- **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
+- **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
+- Keep the plan's rules: every claim cites its research file, section and id with lines at 9e7db28; every number is sourced, arithmetic on sourced numbers (shown), or "proposed" with a reason; use the glossary's terms; no feature without a VISION_V2 §6 trace (or the need named); no decision on the look beyond docs/LOOK_V2.md; no settled input reopened. The rules are in the report's appendix §4 (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), "Rules every author follows".
+- Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/netcode-architect-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 47eadd9, whole lines):
+```
+### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the replacement>
+END
+```
+and, where you defer or disagree:
+```
+### NOTE <finding id>
+<deferred: reason / disagree: reason and evidence / routed: what another author's text must read>
+END
+```
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/netcode-architect-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
+
+## Return
+At most 15 lines: per finding id, FIX or NOTE (deferred, disagree, routed) in a few words; the new open questions' numbers and deciders; what other authors' text must follow.

@@ -1,0 +1,63 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: test-engineer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
+
+You are the author of the drafts' pass marks (unit A of two) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit {SHA}). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+
+## Your text
+The "### Pass marks" sections of ADR 0001 (with its netcode checklist) and ADR 0002. Unit B (another test-engineer agent) has the other four drafts' pass marks; where a finding touches both units (PA-5, EA-7/IE-2), write your half and say what the other half must read.
+Only your own text. In each draft, the "### Pass marks" section is test-engineer's; in ADR 0005, "The ability and effect system" is game-designer's and "The asset pipeline: GPU rules" is graphics-engineer's; ENGINE_OVERVIEW, SPIKE_PLAN and docs/adr/README.md are engine-architect's (the synthesis). Where a fix needs another author's text to follow, say what it must read in your return, and the session routes it.
+
+## The findings against your text
+- ADR 0001: GD-1 (PM-0001-21: drop "beyond weapon range" from the forged set; the point is clamped); NA-1 (PM-0001-20,
+  -48, -49 and checklist step 10 with the rewind arithmetic, once netcode-architect's part 7 lands: follow its text);
+  NA-2 and PA-1 (PM-0001-12: gate the 160 kbps mean in R2's estimate scene, the 256 kbps cap in the stress scene); NA-3
+  (a row for own-weapon cues on prediction replays, R1-ABL-REC4); NA-5 (PM-0001-37, -3: "late" and the direction split;
+  NA Q2); NA-6 (0001:1186–1190: which failures send parts 2 and 3 back); NA-10 (PM-0001-44's 6-tick replay); NA-11
+  (PM-0001-42 depends on soldier collision); NA-12 (PM-0001-39's snapshot rate); PA-2 (PM-0001-54, the E3b fallback);
+  PA-9 (PM-0001-2, -39: a door every 60 ticks lands on one tick parity); EA-2 (an absolute input-to-screen measurement);
+  EA-4 (the aim-ray seam: a row that checks the Worker's cast against what the page drew); EA-7 and IE-2 (PM-0001-27 vs
+  PM-0006-13: one tick thread alone per vCPU, the steal cap; align with unit B); SA-8 (a fast-clock row in PM-0001-21);
+  SA-9 (PM-0001-25: the WebSocket deadline); SA-13 (fuzz control-message sequences, PM-0001-34); IE-9/10 (PM-0001-25
+  with the per-address cap off and on); FC-7 (PM-0001-45's anchor leaves out the extrapolation sentence).
+- ADR 0002: FB-1 (PM-0002-17, -42: the `enum` bite required again; SK4 upheld; an ambient `enum` not claimed); FB-3
+  (PM-0002-45: a limit planted in the budget file for the run; SK4 upheld); FB-9 (PM-0002-23: "(2 × 1000 / 30 =
+  66.67 ms)"); FC-3 (PM-0002-29's header still says a spike "decides R1-RR-OQ5"); FC-10 (PM-0002-3: the glue's allocator
+  calls as instance exports has no source); EA-1's follow (PM-0002-9, once part 5 lands); SA-1's follow (PM-0002-66: a
+  bite with a test PR that edits the deploy job); NA-7 (PM-0002-13 vs -64: when the page posts its command); PA-5
+  (PM-0002-28 vs PM-0004-8: one reading of "30+ fps"; align with unit B).
+- From review-rust-reviewer.md: RR-1's bite (PM-0002-41: a planted `powi` or `min` on signed zero); RR-6 (PM-0002-6:
+  a bite for a stale view of Wasm memory after growth); RR-8 (PM-0002-29: measure link-time optimization and
+  `codegen-units`, Brotli beside gzip); RR-3's mark (one pass mark: a panic in the tick ends the match and the process
+  exits non-zero; with unit B if it lands in ADR 0004).
+- From review-test-engineer.md (your own review): PM-0001-30 follows TE-3 (a run counts only when the late-command
+  counter is 0); a deterministic counter-wrap row follows TE-4, once netcode-architect writes it.
+Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
+
+## What to do with each finding
+- **High and medium:** fix it with an exact FIX block. Where you think the finding is wrong, write a NOTE with your reason and the evidence instead. Where the fix would decide something that is Mustafa's or the Advisor's (a rule, a look, a cost, a policy), do not decide it: add a numbered open question to your draft's "Open questions" (the question, why it matters, the options, the decider, what decides it, the research ids), and make the decision text point to it.
+- **Low:** fix it when it is a one- or two-line correction. Otherwise write a NOTE "deferred: <reason>" (for example: wording only, or it belongs to the revision after the stop review).
+- Keep the plan's rules: every claim cites its research file, section and id with lines at 9e7db28; every number is sourced, arithmetic on sourced numbers (shown), or "proposed" with a reason; use the glossary's terms; no feature without a VISION_V2 §6 trace (or the need named); no decision on the look beyond docs/LOOK_V2.md; no settled input reopened. The rules are in the report's appendix §4 (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), "Rules every author follows".
+- Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-A-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at {SHA}, whole lines):
+```
+### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
+FILE: <docs path>
+BEFORE:
+<the exact current text>
+AFTER:
+<the replacement>
+END
+```
+and, where you defer or disagree:
+```
+### NOTE <finding id>
+<deferred: reason / disagree: reason and evidence / routed: what another author's text must read>
+END
+```
+
+## Saving your progress
+A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/test-engineer-A-final-notes.md (you may always write there). Look there first: if the notes end with DONE, answer from them; otherwise go on from where they stop. Start a new file with one line naming your task. After each finding you handle, add a line. End with DONE. Never commit or push.
+
+## Return
+At most 15 lines: per finding id, FIX or NOTE (deferred, disagree, routed) in a few words; the new open questions' numbers and deciders; what other authors' text must follow.
