@@ -1,0 +1,4 @@
+<<<OLD
+`sqrt` also equals a correctly rounded reference;
+>>>NEW
+`sqrt` also equals a correctly rounded reference; part 7's `min`, `max` and `clamp` helpers give the same bits on every target for equal signed zeros, (+0, −0) and (−0, +0), and a clamp with its bounds the wrong way round returns a bound with no panic (part 7: one defined argument on equal inputs);

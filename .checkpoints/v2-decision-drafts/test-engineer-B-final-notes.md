@@ -41,3 +41,4 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0004 PM-0004-6 done (RR-4 burst); full-pool per-kind row to add as PM-0004-75 (conditional on OQ-0004-11)
 - 0004 PM-0004-8 done (PA-5 my half)
 - 0004 PM-0004-21 done (RR-11); route part 9 clause to rust-reviewer
+- 0004 PM-0004-22 (optional helpers) and -23 (RR-1) done
