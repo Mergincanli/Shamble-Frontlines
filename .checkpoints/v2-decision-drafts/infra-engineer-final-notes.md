@@ -7,3 +7,6 @@ Task: infra-engineer final fix round on ADR 0006 (step 10 fix loop), writing inf
 - 10:28Z: drafting all FIX texts in scratchpad generator (ie-final/gen.py); BEFOREs taken by line ranges at 47eadd9 (= HEAD for 0006).
 - 10:31Z: generator ok (55 FIX, 23 NOTE, no overlap/uniqueness errors); reviewing applied doc
 - 10:34Z: coordinator message (b815c85: ADR 0004 parts 18-19 emit picks/pickups with ticks; seed never stored/sent/logged, SA-15) folded into GD-6 block (now 347-350) and part 9 block (287-288); 3 wording fixes
+- Written: infra-engineer-fixes-final.md (57 FIX, 24 NOTE; generator re-checked: every BEFORE once, no overlaps, none in Pass marks, order-independent; no text under a table; no retired phrase added). Generator and applied preview in scratchpad ie-final/.
+- Every assigned finding handled: high SA-1, IE-1/EA-5 FIX + OQ-0006-13/-14; mediums all FIX (IE-9/10 and IE-17 partly routed to test-engineer); lows SA-10, SA-11, SA-14, SA-16, IE-15, IE-17, IE-18, IE-20 FIX; coordinator's SA-15/GD-6 item FIX (parts 9, 12).
+DONE

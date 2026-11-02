@@ -92,8 +92,12 @@ fix("EA-8 (part 3, the change from R5-LAYOUT-REC2)", 207, 217, """
 """)
 
 # ---------------------------------------------------------------- part 4
-fix("RR-7, EA-8 (part 4, the build-flag check)", 233, 235, """
-   is ADR 0004's (part 20) with ADR 0001's resync path. The server is built for baseline x86-64, never with `+fma`,
+fix("RR-7, EA-8, routed-b815c85 (part 4, the trap's message and the build-flag check)", 232, 235, """
+   the target's default `-Cpanic=abort` (R1-BND-F19), so a trap ends the sim's instance, and the restart after a trap
+   is ADR 0004's (part 20) with ADR 0001's resync path. A trap carries no panic message, so the Wasm build's panic
+   hook (ADR 0004 part 20, S20) writes the message and location into a fixed buffer in linear memory, and when the
+   instance traps the Worker's host reads that buffer, through a fresh view of the memory (part 5), and attaches it to
+   the trap's report. The server is built for baseline x86-64, never with `+fma`,
    `-C target-cpu=native` or the `relaxed-simd` target feature: the gate reads the build flags of `sim`, `room`,
    `client-endpoint`, `sim-wasm` and `server` and fails if one appears (the rule is ADR 0004's, part 7; the check is
    this record's). If wasm-opt is kept (R5-CI-OQ4), the check reads its command line too, because wasm-opt optimizes
@@ -153,7 +157,7 @@ fix("NA-7 (part 5, the input)", 274, 278, """
      page's work stays one small message per frame.
 """)
 
-fix("NA-4, RR-2, RR-6, NA-8 (part 5, the control API)", 279, 284, """
+fix("NA-4, RR-2, RR-6, NA-8, routed-b815c85 (part 5, the control API)", 279, 284, """
    - **The small control API** (create, mode flag, load the content bundle, one input call per tick, and the step) is
      wasm-bindgen's own, with its `.d.ts` (option D1). Each tick the Worker's host makes one input call and one step
      call. The input call carries the page's newest input; every datagram received since the last tick, each with the
@@ -162,13 +166,15 @@ fix("NA-4, RR-2, RR-6, NA-8 (part 5, the control API)", 279, 284, """
      reads no clock of its own (part 7). Without arrival times every clock and jitter sample of ADR 0001 parts 5 and 7
      would carry up to one tick period of false jitter (0 to 1000 / 30 = 33.33 ms at 30 Hz); those samples use the
      stamps, and how a ping answered at the next tick reports its hold time is ADR 0001's (part 5). The step leaves the
-     outgoing datagrams and the block in linear memory and returns where they lie and, online, when the next tick is
-     due by the client endpoint's clock estimate, which the host's pacer follows (ADR 0004 part 5; the rule that keeps
-     commands just in time is ADR 0001's OQ-0001-6). The host reads them through a fresh view of the instance's
-     `memory.buffer` after every call, never a cached one, since growth makes an old view stale (proposed: R1-BND-REC2
-     names re-binding on growth as a cost of B4, r1 lines 2273–2274). The Worker's Wasm calls per tick, wasm-bindgen's
-     glue calls included, are meant to stay within R1-BND-REC1 mark 2's four, which the spike counts (item 1); none is
-     made per entity.
+     outgoing datagrams and the block in linear memory and returns where they lie and when the next tick is due: in
+     local play from the plain accumulator, online from the client endpoint's server-time estimate, since online the
+     Worker's tick runs ahead of the server's by ADR 0001's rule for keeping commands just in time (OQ-0001-6). The
+     host sets its timer from that, never from a count of its own, and the catch-up it allows is counted per wake of
+     the Worker, at most 7 ticks (ADR 0004 part 5, S18). The host reads the step's output through a fresh view of the
+     instance's `memory.buffer` after every call, never a cached one, since growth makes an old view stale (proposed:
+     R1-BND-REC2 names re-binding on growth as a cost of B4, r1 lines 2273–2274). The Worker's Wasm calls per tick,
+     wasm-bindgen's glue calls included, are meant to stay within R1-BND-REC1 mark 2's four, which the spike counts
+     (item 1); none is made per entity.
 """)
 
 fix("RR-16 (part 5, generated types)", 285, 290, """
@@ -193,13 +199,14 @@ fix("NA-7 (part 5, why)", 308, 309, """
 """)
 
 # ---------------------------------------------------------------- part 6
-fix("NA-15, NA-7, PA-13 (part 6)", 327, 330, """
+fix("NA-15, NA-7, PA-13, routed-b815c85 (part 6)", 327, 330, """
    running, is measured in the boundary spike (OQ-0002-3). The Worker's host (TypeScript) receives the page's inputs,
    paces the tick (ADR 0004 part 5), steps the instance or instances, and posts each block; the inputs it forwards
    pass through it, outside the Wasm instance, which is what OQ-0004-7's recovery options need to know. In a local
    match one Worker step runs in this order: the client endpoint builds tick T's command from the newest input (its
-   aim cast included) and predicts T; the command reaches the local server through the loopback; the local server
-   runs tick T with every slot's command (the bots' through the same input path) and encodes T's snapshot and events;
+   aim cast included) and predicts T with the sim's prediction step (ADR 0004 part 3); the command reaches the local
+   server through the loopback; the local server runs tick T with the authority step and every slot's command (the
+   bots' through the same input path) and encodes T's snapshot and events;
    the client endpoint decodes them, reconciles and writes the block. So the command for tick T reaches the local
    server before it runs T, and a local input never waits an extra step (the spike's item 3); with two instances
    (OQ-0002-3 (b)) the host makes its calls in the same order. The Worker as a whole has no budget in the research:
@@ -491,6 +498,12 @@ fix("PA-13 (spike item 6)", 953, 954, """
    of a match.
 """)
 
+fix("routed-b815c85 (spike item 7)", 956, 956, """
+   places them, item 3): ADR 0004's S18 (tick start jitter, read online against the schedule the step returns, part 5;
+   smoothness on 60, 120 and 144 Hz displays; hidden tabs, with catch-up counted per wake) and
+""")
+
+
 # ---------------------------------------------------------------- migration plan, test plan
 fix("EA-8 (migration, the toolchain)", 1219, 1220, """
    2. *The toolchain.* The two workspaces and the pins (part 2), the first crates (`sim`, `protocol`, `room`,
@@ -601,10 +614,13 @@ cursor ray" reads "newest input + cursor ray, each frame". The synthesis (mine):
 same. test-engineer: PM-0002-64 "every tick runs the newest posted input" in place of "commands posted equal ticks
 run"; PM-0002-13 holds as written.
 """)
-note("NA-8 (not in this round's list; its ADR 0002 half fixed)", """
-fixed in part 5's control API (the step also returns, online, when the next tick is due by the client endpoint's
-clock estimate, which the host's pacer follows); its ADR 0004 half (part 5's pacing online; "per frame" becomes
-"per wake") is rust-reviewer's.
+note("NA-8 and the routed ADR 0004 items (b815c85: part 5 with S18, part 20 with S20)", """
+fixed: part 5's control API now says the step returns when the next tick is due (local play: the plain accumulator;
+online: the client endpoint's server-time estimate under OQ-0001-6), the host sets its timer from that, and catch-up
+is counted per wake, at most 7 ticks (ADR 0004 part 5, S18); spike item 7 reads S18 online against that schedule.
+Part 4 now says the host reads the panic hook's fixed buffer when the instance traps (ADR 0004 part 20, S20). Part 6's
+local order names ADR 0004 part 3's two entry points (the prediction step and the authority step). NA-8's ADR 0004
+half landed in b815c85 (rust-reviewer).
 """)
 note("NA-15", """
 fixed: part 6 states the order of one local Worker step (command for T, through the loopback, the local server runs
@@ -682,7 +698,7 @@ for (s1, e1, f1), (s2, e2, f2) in zip(ranges, ranges[1:]):
     assert e1 < s2, f"overlap: {f1} ({s1}-{e1}) and {f2} ({s2}-{e2})"
 out = []
 out.append("# ADR 0002: the final fix round (plan step 10's fix loop), engine-architect, 2026-11-02\n")
-out.append("Fixes against `docs/adr/0002-code-structure-build-toolchain.md` at 47eadd9 (identical at HEAD 1e0b0c2). Every")
+out.append("Fixes against `docs/adr/0002-code-structure-build-toolchain.md` at 47eadd9 (unchanged through HEAD 208af0d). Every")
 out.append("BEFORE is copied by script (engine-architect-0002-fixes-final-gen.py) from that file by line range, occurs exactly")
 out.append("once there, and no two overlap; applying them in file order was checked. The \"### Pass marks\" section is not")
 out.append("touched (test-engineer's); what its rows must follow is in the NOTE blocks. Findings that touch the same lines")
@@ -708,5 +724,5 @@ open(OUT, "w", encoding="utf-8").write("\n".join(out))
 new = lines[:]
 for fid, s, e, after in sorted(FIXES, key=lambda f: -f[1]):
     new[s - 1:e] = after.split("\n")
-open(OUT + ".applied.md", "w", encoding="utf-8").write("\n".join(new))
+open(sys.argv[3] if len(sys.argv) > 3 else OUT + ".applied.md", "w", encoding="utf-8").write("\n".join(new))
 print(len(FIXES), "fixes,", len(NOTES), "notes; ok")

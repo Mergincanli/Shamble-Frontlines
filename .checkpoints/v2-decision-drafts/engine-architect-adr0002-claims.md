@@ -288,3 +288,35 @@ pass, plan step 8, not against the research), and `inventory` marks a legacy fac
   (the W3 isolation trigger), 110 (datagram batching), 114 (one instance), 141 (the replay runner as the bench tool),
   146, 151 (G13 and its pair), 162 (the `forceWebGL` run), 165, 166 (Sentry off in test builds; the upload job's
   shape), 173 (the multiplayer-preview delivery shape), 177, 218, 221, 223, 231, 234, 236, 239, 242, 247, 253, 256.
+
+## Final round additions (2026-11-02, step 10's fix loop; engine-architect-0002-fixes-final.md)
+New or changed claims the final fix blocks bring in. Lines at 9e7db28. `review-read` marks a fact a step-10 reviewer
+read at an official source that the research does not hold (the verifier checks it at that source).
+
+| # | the claim, as written (short) | section | citation (file, id, lines) | tier |
+|---|---|---|---|---|
+| F1 | cargo-fuzz needs a nightly compiler | part 1 | r5 R5-TEST-F4, lines 430–434 | research, source to check |
+| F2 | a toolchain file can pin a dated nightly channel | part 1 | r5 R5-CI-F12, lines 632–639 (`nightly-2020-07-10`) | research, source to check |
+| F3 | Cargo unifies features over one build; dev-dependencies activate features only for targets that need them | parts 3, 5 | r5 R5-LAYOUT-F4, lines 83–91 | research verified |
+| F4 | the supervisor per VM | part 3 | r6 R6-HOST-REC2, lines 645–647 | research, source to check |
+| F5 | the `client-endpoint` crate, its rules and its need | part 3, Q4, OQ-0002-8 | none (proposed; ADR 0001's headless L1 rows) | proposed mark |
+| F6 | binaryen's `--fast-math` text "Optimize floats without handling corner cases of NaNs, rounding, and negative zero" | part 4 | review-rust-reviewer.md finding 7 (binaryen `src/tools/optimization-options.h`) | review-read |
+| F7 | a trap carries no panic message; the panic hook's fixed buffer | part 4 | ADR 0004 part 20, S20 (b815c85) | cross-draft |
+| F8 | blasts "played on the timeline of the entity they hit" | part 5 | r2 R2-SYNC-REC6, line 2210 | research verified |
+| F9 | the writer's trigger: 5 % of the client's sim share, 0.05 × 13.33 = 0.67 ms | part 5, item 2, App. A | GLOSSARY lines 214–218 (13.3 ms at 30 Hz); proposed by rust-reviewer | arithmetic; proposed mark |
+| F10 | a post per block can wait 2 × 1000 / 30 = 66.67 ms against mark 2's 33.33 + 16.67 = 50.00 ms | part 5, App. A | r1 R1-BND-REC3, lines 2286–2296 | arithmetic |
+| F11 | false jitter 0 to 1000 / 30 = 33.33 ms without arrival stamps | part 5 | review-netcode-architect.md finding 4 | arithmetic |
+| F12 | re-binding on growth as a cost of B4 | part 5 | r1 R1-BND-REC2, lines 2273–2274 | research verified |
+| F13 | catch-up per wake at most 7 ticks; the step returns when the next tick is due | part 5, item 7 | ADR 0004 part 5, S18 (b815c85) | cross-draft |
+| F14 | `powi`, `hypot`, `cbrt` carry std's precision note (inferred in R1); confirmed with `to_degrees`, `to_radians` on std 1.99.1 | part 7 | r1 R1-DET-F9, lines 648–654; review-rust-reviewer.md finding 1 | research, source to check; review-read |
+| F15 | `min`, `max`, `clamp` return either signed zero; `clamp` panics on bad bounds | part 7 | r1 R1-DET-F14, lines 679–683 | research verified |
+| F16 | ADR 0004 part 7's float rule is an allow-list | part 7 | r1 R1-DET-REC2, lines 2146–2150 | research verified |
+| F17 | std's `Instant::now`/`SystemTime::now` panic on `wasm32-unknown-unknown` | part 7 | review-rust-reviewer.md finding 2 (std `library/std/src/sys/time/`) | review-read |
+| F18 | Chrome on Linux WebGPU only Intel Gen12+; Firefox not on Linux; fallback without an adapter; headless Chrome on SwiftShader | part 9 | r3 R3-WGPU-F17 159–162, F18 164–169, R3-GL2-F12 279–283, R3-MEASURE-F8 648–653 | research, source to check |
+| F19 | a `pull_request` run takes its workflow from the merge commit | part 10, OQ-0002-9 | r5 R5-PREV-F2, lines 770–774 (the contrast; the security review's reading) | research, source to check (inferred) |
+| F20 | the client-host token is account-scoped; the deploy's `branch` option | part 10, OQ-0002-9 | r5 R5-PREV-F10, lines 823–830 | research, source to check |
+| F21 | required reviewers hold secrets until approval; deployment-branch rules on public repositories | part 10, OQ-0002-9 | r5 R5-PREV-F6, lines 796–804 | research, source to check |
+| F22 | the repository is public | part 10, OQ-0002-9 | r5 Question 5 legacy facts, lines 752–754 | research, source to check |
+| F23 | "when wanted, a reviewer gate" | OQ-0002-9 | r5 R5-PREV-REC1, lines 1588–1604 | research verified |
+| F24 | staging certificates are self-signed, made at start, at most 14 days; mark 2 asks for the new hash within one reload; production uses a trusted certificate | part 10 | r2 R2-TRN-REC5, lines 2700–2704, 2720–2721 | research verified |
+| F25 | macOS standard runners are free on a public repository; private repositories pay per minute | OQ-0002-5 | review-infra-engineer.md S1 (GitHub's runner reference, read 2026-11-02); r5 R5-CI-F17, lines 673–678 | review-read |
