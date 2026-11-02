@@ -28,3 +28,7 @@
 - README header (10), drafts table counts (16-21), totals (23-25) FIX written. Next: full verification pass of applied copies (pointers, tables, under-table text, counts by script), then NOTE blocks (PA, deferred items), then final notes DONE
 - glossary check on applied copies: exact 0 in OVW/SPK/IDX; 6 new in-context hits judged correct (IDX:308 'its hash' -> 'its content hash', I-6 rewritten). Next: NOTE blocks, final checks, DONE
 - NOTE blocks written (GE-5, GE-13, TE-1, review questions, IE-2, FC-6, coordinator pointers, deferred, counts). Next: final replay check, DONE
+- final: engine-architect-synthesis-fixes-final.md = 116 FIX + 9 NOTE; replayed with apply_fixes.py onto 604a497 copies (replay3/): all applied, equal to applied/ byte for byte; draft_pointers.py on it: checked 94, ok 94, off 0; ENGINE_OVERVIEW 144 lines; glossary exact 0; dispositions 521/521, 38 DESIGN (unchanged)
+- new open question: OQ-SPIKE-1 (SPIKE_PLAN "Open questions"; who makes the look test's models and by which route; Mustafa and the Advisor with ASSET-RESEARCH's timing); README rows added: OQ-SPIKE-1, OQ-0001-15..18, OQ-0003-16..20, OQ-0004-8..12, OQ-0005-AB14, AB15, AP1, OQ-0006-13..20
+- optional routes for other authors: graphics-engineer ADR 0003 part 11 -> OQ-SPIKE-1 and part 8's builders; ADR 0002 spike section -> the measurement harness's CPU side built in the boundary spike
+DONE

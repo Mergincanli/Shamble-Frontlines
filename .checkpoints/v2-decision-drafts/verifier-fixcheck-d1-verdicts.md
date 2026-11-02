@@ -359,3 +359,81 @@ Blocks: all 27 resolve their findings (FC-10, RR-6, EA-1, RR-5, NA-7 ×4, EA-4, 
 | B9 | 0006:1179 | PM-0006-32 (new): "3 of 3" incl. "a deploy of the production branch tried with the `preview` environment's token is refused (… if no token scope the check finds can refuse it, the result is recorded as not refused and goes to OQ-0006-13)" | part 13 B9; R5-PREV-F10 | unclear pass rule | part 13 (0006:509–511) says the account-scoped token "can then deploy the production player build too"; so the third leg is expected to fail today, and the row does not say whether "recorded as not refused" passes or fails the row | Finding F12 (low): "3 of 3" → "2 of 2 for the first two; the third reported (refused, or not refused and sent to OQ-0006-13)" |
 
 Blocks: LG key (IE-9/10), PM-0006-11 (IE-16, IE-17; -b's glossary fix "the number of threads on each core"), PM-0006-13 (IE-2, EA-7), PM-0006-14 (TE-2, IE-2), PM-0006-15 (IE-5), OQ-0006-20 (held, replaced by infra-engineer c), PM-0006-18 (IE-13), PM-0006-21 (SA-15), PM-0006-6 (IE-20), PM-0006-7 (IE-18), PM-0006-32 and the intro (SA-1): each resolves its finding; new problem only B9 (F12).
+
+## 5. Consistency across the drafts after the round
+
+| item | where | verdict | note |
+|---|---|---|---|
+| event-release rule | ADR 0001 part 7 (0001:319–327), client tick (0001:585–587), `Snapshot` row; ADR 0002 part 5 (0002:291–296); PM-0001-61 (0001:1433); PM-0002-9 (0002:1215) | consistent in the drafts | both: remote spatial events at the delayed time (the first block whose delayed time reaches the tick / "when its interpolation clock reaches the event's tick"), own, predicted and owner events at once, online and local alike |
+| the same in ENGINE_OVERVIEW | ENGINE_OVERVIEW:37, :40, :51–53, :65, :92–94 | not yet consistent: pending the synthesis | still "per tick: one command, posted", "draw the newest block", "post the next command", and no release rule; the synthesis (engine-architect, the last author round) carries these routed items (final-round-by-author.md:332–333, 342–345); ENGINE_OVERVIEW is unchanged since 47eadd9 |
+| the aim point's clamp | ADR 0001 part 5 (0001:218, 241–247), Appendix A R2-SYNC-REC2 (0001:1664), PM-0001-21 (0001:1402) | consistent | off-map refused, beyond reach clamped, never counted; no other draft states a range refusal |
+| the 60 Hz stand-ins, 1 ms and 0.30 ms | ADR 0001 OQ-0001-2 (a) (0001:1033–1037), PM-0001-2 (0001:1380); ADR 0004 S1 (0004:982), PM-0004-2 (0004:1107) | consistent | 384 rows + 1 ms burn; remainder 2.80 ms at 30 Hz, 0.30 ms at 60 Hz (4.17 − 3.87). SPIKE_PLAN does not state them yet (pending the synthesis, routed) |
+| one material per slot content | ADR 0003 part 5 (0003:175, 314), CL row (0003:775); ADR 0005 GPU parts 1 and 7 (0005:1695, 1749, 1768), PM-0005-35 (0005:2238) | consistent | two option-table rows keep the older "per slot and faction" (0003:499, 0005:1790), the same thing when only the faction varies; a nit |
+| OQ-0006-13 is the deploy-job question; no OQ-0002-9 | ADR 0002 part 10 (0002:656, 658, 687), revisit (0002:928), PM-0002-66; ADR 0006 B9, Secrets, OQ-0006-13 (0006:896), PM-0006-32 | consistent | `grep -rn OQ-0002-9 docs/` → 0 hits. docs/adr/README.md has no OQ-0006-13 row yet (pending the synthesis) |
+| the look floor | ADR 0003 part 7 (0003:388–393), fail route (0003:1192–1196), PM-0003-23 (0003:1158), checklist step 31 (0003:1308) | consistent | Low's row: pixel ratio 1, scale 0.75 (to 1), one 1024² sun map; a [DECIDED] technique leaves Low only on Mustafa's answer to OQ-0003-16 |
+| the aim side file | ADR 0001 part 8 (0001:351–360); ADR 0006 part 9 (0006:362–371), part 11 | consistent | 1,728,000 entries; 518 MB as lines; 27.6 MB at 16 B; keyed by slot; 14 days |
+| per-address keys | ADR 0001 part 10 (0001:421–424), lobby row, anti-cheat; ADR 0006 part 10 (0006:398–403) | consistent | IPv4 /32, IPv6 /64, the length as data |
+| one registrable domain | ADR 0001 part 11 (0001:487–492); ADR 0006 part 6, B4 (0006:489), OQ-0006-15 | consistent | d0 #6's optional "and the scheme" applies to all three |
+| the ports | ADR 0001 part 10 (0001:400–406: one UDP and one TCP port per room, OQ-0006-16 (a)), catalogue (0001:643 "the room's ports"); ADR 0006 part 5, OQ-0006-16 (a) | consistent, except ADR 0006 part 6 | 0006:270–271 "the host and a port from the firewall's range" (F11) |
+| releases and version mismatch | ADR 0001 part 11 directory (0001:495–499), failure modes (0001:719), Rollback; ADR 0006 part 15 (0006:532–540), OQ-0006-14 (0006:915–932) | inconsistent | ADR 0006 still describes ADR 0001's 47eadd9 row (a reload that cannot recover) and calls the directory's build field one "ADR 0001's directory would add"; ADR 0001 now has both (F10) |
+| failure artefacts' retention | ADR 0002 part 8 (0002:528–531); ADR 0006 part 3 (0006:171–175) | inconsistent (stale conditional) | ADR 0002 "until it is set, the 7 days of build artifacts"; ADR 0006 sets 30 days (F9) |
+| the bench and the playtest soak | ADR 0002 part 8 (0002:539–543); ADR 0006 part 8 (0006:348–352), B9 (d), OQ-0006-17, migration step 0 | consistent | 20 × 0.1386 = 2.77 EUR; the soak on the same path, its bots on a CX33 |
+| the preview reviewer and the production environment | ADR 0002 part 10, Sentry job, PM-0002-65, -66; ADR 0006 B9, Secrets (a)–(d), OQ-0006-13, PM-0006-32 | consistent | the same quotes of R5-PREV-F6 at r5 796–804 in every place |
+| the staging certificate | ADR 0001 part 10; ADR 0002 part 10, Appendix A R2-XT-OQ10; ADR 0006 part 4, part 7, OQ-0006-5 (A)/(B) | consistent | |
+| rooms-per-VM validity | PM-0001-27 (0001:1409) and PM-0006-13 (0006:1183) | consistent with each other | but ADR 0001's own V-S key (0001:1358–1360) still applies its LG clause (30 inputs a second within 1 %) to PM-0001-27, which the row now drops (F7) |
+| own-state corrections | ADR 0001 part 4 (0001:188–189) and PM-0001-60 (0001:1428) | inconsistent | part 4 "causes no correction"; the row "at most one correction, at the first snapshot that carries the change" (F2) |
+| the rewind estimate | ADR 0001 part 8 (0001:341–347, 362–366), trade-off 1, OQ-0001-5; PM-0001-48, -49 | consistent in its numbers | PM-0001-49 records a sixth part, the 0–1 frame wait from the drawn frame to the command's tick, which part 8's estimate and its 233–383 ms leave out (F3) |
+| the 60 Hz snapshot rate | ADR 0001 part 2; PM-0001-39 | consistent | 30 a second, every second tick |
+| commands per datagram | ADR 0001 bandwidth estimate (0001:667–668); PM-0001-13 | consistent | 3 to 6 at P2 |
+| the "30+ fps" reading | PM-0002-28; PM-0004-8 | consistent | one reading, ADR 0003's frame rows, mode U |
+| the clock ban | ADR 0001 parts 5, 11; ADR 0002 part 3 rules, part 7; PM-0002-41 | consistent | `room`, `protocol`, `client-endpoint`, `sim-wasm`; only `server` reads `Instant` |
+| LG sizing and the per-address cap | ADR 0001 machines key; ADR 0006 LG key, spike 2 | consistent | |
+
+## 6. The rules, on the changed text only
+
+- Rule 2 (a number with no source): three numbers rest on a review's estimate rather than research, arithmetic, a
+  settled input or "proposed": ADR 0001's command size "about 15–20 B" and header "about 6 B (an assumption)"
+  (0001:665–669, N12; review-perf-auditor.md:27), and ADR 0006's "perhaps 15 to 30 RS-hours" (0006:1008, I24). Each is
+  labelled with its review and only sizes a question or an estimate the proof test measures; low.
+- Rule 3 (a "not researched" option proposed as the decision): `client-endpoint` joins `room` and `navbake` as
+  "proposed (not researched)" crates in ADR 0002's chosen structure (0002:216–219, Q4 row, Appendix A), openly, with the
+  rule question already routed to the Advisor (OQ-0002-8). No other unresearched Options row became a proposal; ADR
+  0001's OQ-0001-5 (c), -15 (b) and -18 (b) are not recommended because they are not researched (N43). ADR 0006's
+  "proposed, not researched" items (the supervisor's link, the staging certificate's rotation, the tombstone, the
+  CSP-ready build, the firewall per role) are design details no Options table offers, each labelled, as earlier
+  fix-checks read rule 3.
+- Rule 4 (trace): new features carry needs: `Buy` (VISION_V2 §6.5), `Resync` (§4 through R1-TICK-REC5), the lobby ↔
+  supervisor link (§6.1), part 15's releases (§6.1), `client-endpoint` (§6.2, §6.9, §4; §3, §6.1, §6.6 through the
+  headless clients). OQ-0001-18 (b) is kept out by the trace rule, as it says. None missing.
+- Rule 5 (glossary): exact hits 0 in all nine documents (scripts/glossary_check_drafts.py at HEAD); "headroom" only in
+  its own meaning (0002:1286); the "worst case (48 players …)" pattern absent.
+- Rule 6 (the look): nothing in the changed text of ADR 0001, 0002 or 0006 decides the look.
+- Settled inputs: none reopened (TICK-30, N = 48, the stack and the transports, SLICE-ORDER, PREVIEW-WALL (a),
+  BASELINE-WHEN (b), UPGRADE-SCOPE: the offer's size is data with UPGRADE-SCOPE's three as the default).
+- Rule 7 (open questions): OQ-0001-15 to -18 and OQ-0006-13 to -20 each have the question, why it matters, options
+  (labelled "not researched" where so), a decider, what decides it and the ids they carry.
+- A sentence directly under a table: none (base and HEAD scanned; the one hit is inside ADR 0001's diagram code block).
+
+## 7. The facts fixcheck-d0 checked (task 5)
+
+| d0 | verdict there | in the drafts at HEAD |
+|---|---|---|
+| #1 binaryen `--fast-math` | confirmed | ADR 0002:256–261 as quoted; nothing to change |
+| #2 std's clock panics on wasm32-unknown-unknown | confirmed | ADR 0001:228, 448; ADR 0002:451–455; nothing to change |
+| #3 std's precision notes and signed zeros | confirmed | ADR 0002:436–443; ADR 0004 part 7; nothing to change |
+| #4 macOS standard runners free on a public repository | confirmed | ADR 0002:1020–1025; ADR 0006:338–346, 661, OQ-0006-7; nothing to change |
+| #5 `pull_request` runs the merge commit's workflow | confirmed | ADR 0002:645–651; ADR 0006:504–508, 897; optional: cite GitHub's "Securely using pull_request_target" sentence beside R5-PREV-F2 (not applied; optional) |
+| #6 SameSite and "site" | confirmed, with a note | ADR 0001:489–490, ADR 0006:489, 937 still say "a site is the registrable domain"; optional precision "the registrable domain and the scheme (https here)" not applied; the conclusion holds |
+| #7 IPv6 /64 | confirmed, with a note | ADR 0001:421–424, ADR 0006:401–403; optional RFC 6177 note (a home often gets more than one /64) not applied; the prefix length as data covers it |
+| #8b private-repository runners | confirmed, with a note | ADR 0006:983 keeps "prices not read"; optional update (GitHub Free's $12 a month, $0.006 a Linux minute) not applied |
+| #8c "draw on paid minutes" | confirmed in substance, wording imprecise | ADR 0002:1030 unchanged: report the sentence (F8) |
+| #8d std `Mutex` poisoning | confirmed | ADR 0001:455–457; ADR 0004:555–557; nothing to change |
+| #9 `rem_euclid`, `div_euclid`, `abs` | wrong in part (draft) | applied in 604a497: ADR 0004:259–261 cites std for `abs`; 0004:271–275 states std's guarantee for the two and keeps them off the list until PM-0004-22; resolved |
+| #10 RFC 8737 port 443 | confirmed | ADR 0006:596, 815; nothing to change |
+
+## 8. Legacy gate (verifier routine)
+
+`node tools/gate.mjs 9e7db28` (working tree = HEAD 604a497), this unit: checks 1, 2, 3 (+0 −0), 4, 5b, 5c, 5d PASS;
+5a smoke FAIL: Chromium for Playwright is not installed in this session (`/opt/pw-browsers/chromium_headless_shell-1194`
+missing), an environment gap, the same as fixcheck-d0's run. No `.js` or `.html` file differs from 9e7db28 or from
+47eadd9 (docs-only change-set).

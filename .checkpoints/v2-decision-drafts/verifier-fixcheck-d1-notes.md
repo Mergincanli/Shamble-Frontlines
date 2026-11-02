@@ -12,3 +12,4 @@ Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 
 - 0006 infra claims I1-I27 written; F10 (part 15/OQ-0006-14 stale vs ADR 0001), F11 (a port vs both ports). Next: 0006 blocks (infra + TE-B), then consistency table, rules, counts, findings.
 - 0006 blocks + TE-B written (F12 PM-0006-32 pass rule). Next: consistency table, rules section, counts, findings, fetch audit.
 - writing consistency/rules next; running legacy gate first
+- consistency, rules, d0 table, gate written. Next: counts, findings ranked, fetch audit; then DONE and hand back.
