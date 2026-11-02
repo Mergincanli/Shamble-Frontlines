@@ -15,3 +15,5 @@
 - ADR 0005 spike parts read (656-700, 1250-1290, 1514-1525, 1668-1677, 1921-1941): sound; low note AB-1 id-grep proxy weak (real proof is the zero-Rust-change combination).
 - ADR 0006 spike read (736-796): F-c confirmed: item 2 rooms per VM "fixes part 8's goal budget (R6-COST-OQ1)" (:774-775) on the proof test's stand-in sim (ADR 0001:868-869 OQ-0001-2 "30 Hz baseline marks may use a stand-in"; PM-0001-2 throwaway sim) -> density overstated; fix: stand-in burns the share's ceiling, or figure provisional till slice 6.
 - Next: ENGINE_OVERVIEW, README grep; ADR 0002 nightly soak machine; then write review file.
+- 11:15 review file written: review-test-engineer.md (8 findings: 1 high, 4 medium, 3 low; 2 questions; verdicts: SPIKE_PLAN REVISE, others APPROVE WITH NOTES, ENGINE_OVERVIEW APPROVE). Line numbers spot-checked and corrected.
+DONE

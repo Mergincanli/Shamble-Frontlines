@@ -106,6 +106,17 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   burst bite (PM-0004-6: fill a pool past its capacity); RR-11 (PM-0004-21: the state hash and serializer must not
   depend on `usize` width); RR-12 (PM-0004-24: the finite-state check works on the release builds it rides on); RR-13
   (PM-0004-60: name a small scene; at the stress scene 10 million ticks take about 23 hours).
+- From review-art-director.md (the look checklist and the fail route are yours): AD-1's fail route (0003:1028–1030:
+  never "move it to High only" for a [DECIDED] item: follow graphics-engineer's floor or LOOK-FLOOR); AD-2 high
+  (0003:1051–1052: the checklist runs only on Mustafa's PC at High: a step showing the Low frame, ratio 1, scale 0.75,
+  1024² shadows or none, AO off, beside High and legacy); AD-3 medium (no step shows the busy fight: 48 soldiers, 3
+  teams, 4 very large units, 300 projectiles, at day and at dusk); AD-4 (aim step 4 at the ground-contact line); AD-5
+  medium (0003:1052–1053, steps 2, 8, 9; 0005:2153–2156: "the game camera" and the closest/farthest framing undefined
+  while the framing is open, R2-INT-OQ2: use legacy's camera as the test view, height 40, boom 56.6, fov 15, yaw 45°);
+  AD-8 low (0003:1053: legacy screenshots taken in Brave on Mustafa's PC, not on the container's CPU renderer); AD-9 low
+  (step 13: the animation LOD picks soldiers by importance, not distance); AD-12 low (0003:1084–1085: the trees are
+  legacy's ported tree builders, GW18, judged for variety only); AD-14 (steps 10–12: the soldier shown is built at the
+  4-material cap).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -181,6 +192,18 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   legacy shared materials by full content, LEGACY_INVENTORY line 113; with test-engineer's PM-0005-35); GE-4 medium
   (0003:309, 199: the Low tier may switch shadows and AO off against LOOK_V2 §2's decided soft shadows: its Q1, an open
   question, decided after the look proof test's per-technique costs).
+- From review-art-director.md (2026-11-02 about 11:22; ADR 0003 REVISE; 0005's asset parts and the look test APPROVE
+  WITH NOTES): AD-1 high (0003 Rollback, about :1193–1194 "a tier change in data moves it to High only", with :163–164,
+  :191, :212/:309, :665: the ink and soft shadows, LOOK_V2 [DECIDED], could drop out of the default Low tier with no
+  look call by Mustafa: a look floor, lower them but never switch them off, or an open question LOOK-FLOOR for Mustafa;
+  with GE-4 and test-engineer's fail route); AD-4 medium (0003:177–179, 187–190: screen-space ink finds no depth jump
+  where buildings and boots meet the ground, so that line comes out at the thin inner weight: name it as a visible
+  difference; an inference, not research); AD-6 medium (0003:220 with 0005:1553–1554: no material class for buildings,
+  so the heaviest building ink has no input: a structure class or an ink-weight field per asset); AD-7 medium (0003:398,
+  0005:1591–1592: the test assets hold one building while checklist step 14 shows both [DECIDED] houses); AD-10 low
+  (0003:250–253: the halftone overlay's cost is invisible to GPU timers and it also dots the HUD, ART_DIRECTION.md:121);
+  AD-11 low (0003:189, :316: ink width scales with pixel ratio × resolution scale); AD-14 low (0005:1569–1571: the cap of
+  4 materials per soldier bounds its surface kinds). Questions: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL (Mustafa's).
 
 ## game-designer: ADR 0005's "The ability and effect system"
 - (none yet from the six reviews; the rust-reviewer, graphics-engineer and art-director reviews may add some)
@@ -202,4 +225,7 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (ENGINE_OVERVIEW:40, :92–94, the same as FC-5); GE-13 (SPIKE_PLAN:174, :238: no one named to build the client harness
   the three wave-1 spikes share). Questions for README: GE Q1 (does every decided LOOK_V2 item hold at Low?), GE Q2
   (who makes the look test's models, and by which route?).
+- From review-art-director.md: AD-7 (SPIKE_PLAN:236–237: the look test's assets list one building; step 14 shows both
+  houses); AD-13 (SPIKE_PLAN:222: "each [DECIDED] item" leaves out the [DEFAULT] items the checklist also judges).
+  Questions for README: LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL (Mustafa's).
 
