@@ -20,3 +20,5 @@
 - 0006 PM key "Counts and settings" checked against PM-0006-3/4/6/7/8/12/22: consistent (10/500 = 2 %, 1/100 = 1 %, minute 20 of 30). Next: write C rows, fix table.
 - 09:35 C rows C1-C27 written. Extra 0006 finding: 0006:884 PM-0006-17 (changed by TE r1 fix 5) adds the short form "the proof test's load" (consistency F13: full name outside ADR 0001); owner test-engineer (low). 0006 has no one-decimal tick numbers left. Next: cite_check.
 - 09:45 cite_check on the 57c43c2 snapshots: 1,217 ids, 0 missing; 21 range flags (0001: 3, 0006: 18), all judged SCRIPT ARTIFACTS (each id sits at its own range in its own file: r2 2302, 2565, 2639, 2699, 3050, 2775-2782; r6 60, 72, 87, 476, 499-500, 645/667-671, 703, 765-768, 869, 970; r5 838, 845, 1605, 1616/1622, 673, 913-914, 1873, 2104-2106; r1 2955). No real flag. Next: write fix table, flags table, counts, findings, fetch audit; then DONE.
+- 09:55 verdicts file complete: fix table (114 blocks: GE has 41 for 0003, not 40), rules, flags (21 artifacts), counts, findings M1, M2, L1-L3, notes N-a..N-f, fetch audit (3 fetches). Cut markers: 0 in 0001 and 0006 at 57c43c2.
+DONE

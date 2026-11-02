@@ -18,3 +18,17 @@ Collected from fixcheck-a, -b, -c, the skeptics and the step-10 reviews; one rou
 - For the report: R5-TSLINT-F12's construct list (frozen in r5 as "general knowledge, unverified") is now confirmed at the
   source (typescriptlang.org/tsconfig, "Erasable Syntax Only"); the six pending source checks are confirmed; of the five
   claims on unread sources, four confirmed and 0004 row 138 supported (Unsafe Code Guidelines glossary).
+
+## From verifier fixcheck-a (verifier-fixcheck-a-verdicts.md; PASS WITH NOTES, 2026-11-02 about 09:35)
+109 rows (0001 39, 0003 43, 0006 27): 104 confirmed, 0 wrong, 4 unsupported (A8; B14, B18, B38), 1 stale (B25), 1 rule
+(L3); 114 blocks, 109 resolved, 5 partly; the fix files applied in commit order to 80a27b3 give 57c43c2 byte for byte;
+21 citation flags (0001 3, 0006 18), all script artifacts; 3 fetches, all 200.
+- netcode-architect: L1 = A8 (0001:230–231 says "the events of ADR 0004 part 19" but leaves out blasts, harvester
+  deliveries and kills, structure kills and stage changes; skeptic-4 first). Optional note: 0001:809–811 could cite
+  PM-0002-25 as the row reporting the Worker's extra cost.
+- graphics-engineer: L2 = B25 (0003:707, GW17 "pending removed", while its camera-player half is now Mustafa's open
+  call under OQ-0003-15; the other OQ-0003-15 rows keep a pending note).
+- test-engineer: L3 (0006:884 "the proof test's load"): fixed in round 3 (81d2a65); fixcheck-c confirms.
+- The synthesis (sent about 09:36, queued): M1 (the fragments row), M2 (README:63 OQ-0003-11's old question; OQ-0006-5
+  row; SPIKE_PLAN item 1 "Depends on" OQ-0006-5; SPIKE_PLAN:74 and :97 "PM-0001-1 to -56" → -57).
+- Skeptic-4 (added about 09:36): A8; B14/B18/B38.

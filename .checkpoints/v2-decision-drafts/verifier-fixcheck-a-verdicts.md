@@ -128,3 +128,265 @@ rule. I edited nothing; scratch in `.gate/fixcheck-a/`.
 | C25 | 0006:1076 | R5-PREV-REC5's mark: "a preview link opens in Brave on Windows without a login" (r5 line 1649) | r5:1649 | confirmed | r5:1649 word for word | fixes finding 8 |
 | C26 | 0006:1089 | R6-HOST-REC2 changed: one firewall rule added for part 9's metrics path | r6:649; r6:279–284 | confirmed | as C5 | — |
 | C27 | 0006:1104 | R6-HOST-OQ4: fallbacks only on a shortage; root servers before the goal budget, whatever OQ-0006-1's answer | r6:862–865 | confirmed | as C12 | Appendix A has no counts line in 0006, so the adopted → changed move leaves no stale total |
+
+## 2. Did each fix do what its finding asked?
+Method: the 80a27b3 copies of the three docs, with the fix files applied in commit order by `scripts/apply_fixes.py`
+(scratch `.gate/fixcheck-a/replay/`), are byte-identical to 57c43c2: every changed line comes from one of the 114
+blocks below, and nothing else changed. rust-reviewer-fixes-2-held-for-test-engineer.md holds only ADR 0004 blocks
+(test-engineer took both over for 0004): none touches these three docs.
+
+| block | finding | resolved? | new problem |
+|---|---|---|---|
+| netcode r1 F2 (trade-off 5) | verifier 0001 F2; skeptic-1 | yes: the cost is outside the client's sim share | "It is reported beside" names no row; the report is ADR 0002's PM-0002-25 (note N-a) |
+| netcode r1 F4 (R2-BUD-REC1, REC2 rows) | verifier F4 (N13); skeptic-1 | yes: precision restated (carried by PM-0001-57), Shabzon mark disposed to S4 | S4 runs without R2's network profile and the row does not say so (note N-b) |
+| netcode r1 F5 (Appendix A R2-XU-OQ18) | verifier F5 (N15); skeptic-1 | yes: "open: OQ-0001-14" | none |
+| netcode r1 F5 (OQ-0001-14) | verifier F5 | yes | none in 0001 (README names it only as "Trace reading": consistency F9, synthesis) |
+| netcode r1 F6 (load and soak) | verifier F6 (N16); skeptic-1 | yes | none |
+| netcode r1 F7 (Q10 U1) | verifier F7 (N17) | yes | none |
+| netcode r1 F8 ("When a mark fails") | verifier F8 (TE217, N18) | yes | the paragraph is test-engineer's (the verifier named it owner); content right. Its "PM-0001-4 to PM-0001-27" leaves out the later PM-0001-57, which falls to "every other failure" (note N-d) |
+| netcode r1 F9 (the restated reason) | verifier F9 (N20) | yes: the words left the quote; the fact is stated beside it with GLOSSARY.md:69, 76–77 | none |
+| netcode r1 F10 (Q6) | verifier F10 (rows 272, 276) | yes | none |
+| netcode r1 F10 (Q9) | verifier F10 | yes | none |
+| netcode r2 F1 (`ContentReload`) | consistency F1 | yes | none |
+| netcode r2 F2 (part 12's open rules) | consistency F2 | yes | none |
+| netcode r2 F3 (part 2) | consistency F3 | yes | none |
+| netcode r2 F3 (part 3) | consistency F3 | yes | none |
+| netcode r2 F3 (budgets table) | consistency F3 | yes | none |
+| netcode r2 F3 (spike item 3) | consistency F3 | yes | none |
+| netcode r2 F8 (part 10) | consistency F8 | yes (0001's half) | SPIKE_PLAN item 1 and README still lack OQ-0006-5 (the critic's synthesis half): M2 |
+| netcode r2 F8 (spike item 1) | consistency F8 | yes | as above |
+| netcode r2 F10 (Context, Tick) | consistency F10 | yes | none |
+| netcode r2 F10 (legacy) | consistency F10 | yes | none |
+| netcode r2 F10 (Sources) | consistency F10 | yes | none |
+| netcode r2 F13 (event names) | consistency F13 | partly: "captures" gone, 0004's words used | the list, presented as part 19's, omits blasts, harvester deliveries and kills, structure kills and stage changes: L1 |
+| netcode r2 F13 (the proof test) | consistency F13 | yes | none |
+| netcode r2 F14 (R5-TEST-OQ2) | consistency F14 | yes | none |
+| netcode r2 F14 (OQ-0001-1 (b)) | consistency F14 | yes | none |
+| TE r1 0001 F1 (PM-0001-4) | verifier F1; consistency F5 | yes (glossary script: 0 exact hits) | none |
+| TE r1 0001 F1 (PM-0001-39) | verifier F1; consistency F5 | yes | none |
+| TE r2 F3 (0001 key) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-4) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-5) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-39) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-40) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-43) | consistency F3 | yes | none |
+| TE r2 F3 (PM-0001-50) | consistency F3 | yes | none |
+| TE r2 R2-BUD-REC2 (order note) | verifier F4 (a) | yes | SPIKE_PLAN:74, :97 "PM-0001-1 to -56": M2 |
+| TE r2 R2-BUD-REC2 (PM-0001-57) | verifier F4 (a); skeptic-1 | yes: the hash does not bound quantising error, the new row does | none (the pitch bound is one step, note N-c) |
+| TE r1 0003 TE44 (PM-0003-4) | verifier 0003 finding 9 | yes | none |
+| TE r1 0003 X7 (PM-0003-12) | verifier 0003 finding 10 | yes | none |
+| GE r2 F13 (author line) | consistency F14 (author lines) | yes | none |
+| GE r2 F12 (the map's codes) | consistency F12 | yes: every code 0003 uses has a README row | none |
+| GE r2 F10 (carry-forward 3) | consistency F10 | yes | none |
+| GE r2 F10 (SLICE-ORDER) | consistency F10 | yes | none |
+| GE r2 F10 (SEC-SPREAD) | consistency F10 | yes | none |
+| GE r2 F10 (TICK-30) | consistency F10 | yes | none |
+| GE r2 F10 (UPGRADE-SCOPE) | consistency F10 | yes | none |
+| GE r2 F10 (SPIKE-SCOPE) | consistency F10 | yes | none |
+| GE r2 F10 (R7-MARKS) | consistency F10 | yes | none |
+| GE r2 F10 (ADR-003 entry, part 2) | consistency F10 | yes | none |
+| GE r2 row 73 (5.b) | verifier 0003 finding 5; skeptic-2 | yes | none |
+| GE r2 X5, rows 95, X4 (5.i) | findings 4, 7; skeptic-2 | yes | none |
+| GE r2 row 100 (5.j) | finding 6; skeptic-2 (debris nit) | yes | none |
+| GE r2 F13 (fragments, 5.k) | consistency F14 (fragment damage) | partly | points to a README row that does not exist: M1 |
+| GE r2 G10 (part 6) | skeptic-3 G10 | yes | none |
+| GE r2 F6 (part 11) | consistency F6 | yes | none |
+| GE r2 F13 (fragments, trace row) | consistency F14 | partly | M1 |
+| GE r2 X6 (Q3 bullet) | finding 3; skeptic-2 | yes in 0003 | README:63 keeps the old question: M2 |
+| GE r2 row 73 (Q5 cell) | finding 5 | yes | none |
+| GE r2 X3 (Q5 hulls) | finding 2; skeptic-2 | yes | none |
+| GE r2 X2 (M-D cost) | finding 8; skeptic-2 | yes | none |
+| GE r2 X3 (trade-off) | finding 2 | yes | none (CL6 weights characters; "for buildings" is the same mechanism, skeptic-2's text) |
+| GE r2 X6 (revisit when) | finding 3 | yes | none |
+| GE r2 X5 (GW17 row) | finding 4; skeptic-2 | partly | "pending removed" although the camera-player half is now Mustafa's open call: L2 |
+| GE r2 row 211 (HUD split) | finding 1; skeptic-2 | yes (script over INV) | none |
+| GE r2 X3 (OQ-0003-2) | finding 2 | yes | none |
+| GE r2 X6 (OQ-0003-11) | finding 3 | yes | README:63: M2 |
+| GE r2 X8 (OQ-0003-14) | finding 11 | yes, confirmed at source today | none |
+| GE r2 X5 (OQ-0003-15) | finding 4 | yes | none |
+| GE r2 F4 (look test: MAC) | consistency F4 | yes | none |
+| GE r2 F6 (look test: ADR 0005's share) | consistency F6 | yes | none |
+| GE r2 F4 (test plan: MAC) | consistency F4 | yes | none |
+| GE r2 X4 (Appendix R2-XT-OQ15) | finding 7 | yes | none |
+| GE r2 F10 (Appendix R3-WGPU-REC2) | consistency F10 | yes | none |
+| GE r2 X6 (Appendix R3-GL2-OQ2) | finding 3 | yes | none |
+| GE r2 X6 (Appendix R3-GL2-OQ5) | finding 3 | yes | none |
+| GE r2 X8 (Appendix R3-AUDIO-OQ4) | finding 11 | yes | none |
+| GE r2 X6 and X8 (counts) | — | yes (recounted: 71) | none |
+| GE r2 F12 (Sources: GLOSSARY §8) | consistency F12 | yes | none |
+| GE r2 F10 (Sources: STATUS) | consistency F10 | yes | none |
+| GE r2 F12 (Sources: the map) | consistency F12 | yes | none |
+| TE r2 F4 (0003 key, MAC) | consistency F4 | yes | SPIKE_PLAN:30 itself has not taken the version rule (note N-e) |
+| TE r2 F4 (PM-0003-2) | consistency F4 | yes | none |
+| TE r2 F4 (PM-0003-3) | consistency F4 | yes | none |
+| TE r2 F4 (PM-0003-5) | consistency F4 | yes | none |
+| TE r2 F4 (PM-0003-6) | consistency F4 | yes | none |
+| TE r2 F4 (PM-0003-41) | consistency F4 | yes | none |
+| TE r2 F14 (checklist step 24) | consistency F14 | partly | M1 |
+| TE r2 X5 (checklist step 29) | completeness item 6; skeptic-2 X5 | yes | none |
+| infra r1 1 (part 10) | verifier 0006 finding 1; skeptic-1 | yes, confirmed at source today | none |
+| infra r1 1 (Q8) | finding 1 | yes | none |
+| infra r1 2 (Q3) | finding 2; skeptic-1 | yes | none |
+| infra r1 2 (OQ-0006-1) | finding 2 | yes | none |
+| infra r1 2 (migration step 1) | finding 2 | yes | none |
+| infra r1 2 (Appendix R6-HOST-OQ4) | finding 2 | yes | none |
+| infra r1 4 (part 5) | finding 4 | yes | none |
+| infra r1 4 (Appendix R6-HOST-REC2) | finding 4 | yes ("changed") | none |
+| infra r1 7 (part 7) | finding 7 | yes | none |
+| infra r1 7 (OQ-0006-5) | finding 7 | yes | README has no OQ-0006-5 row although its dev/staging case now goes to the Advisor before the proof test: M2 |
+| infra r1 8 (Context) | finding 8 | yes | none |
+| infra r1 8 (part 10, apostrophe) | finding 8 | yes | none |
+| infra r1 8 (trade-off, A-2) | finding 8 | yes | none (note N-f) |
+| infra r1 8 (part 13, token scope) | finding 8 | yes | none |
+| infra r1 8 (Appendix R5-PREV-REC5) | finding 8 | yes | none |
+| infra r1 9 (G1) | finding 9 | yes | none |
+| infra r1 10 (trade-off) | finding 10 | yes | none |
+| infra r1 11 (part 2) | finding 11 | yes, confirmed at source today | none |
+| infra r1 11 (OQ-0006-4) | finding 11 | yes | none |
+| infra r1 11 (spike 1) | finding 11 | yes | none |
+| infra r1 12 (Context link) | finding 12 | yes | none |
+| infra r1 13 (part 2) | finding 13 | yes | none |
+| TE r1 0006 5 (PM-0006-17) | finding 5 (TE140) | yes | adds the short form "the proof test's load" outside ADR 0001: L3 |
+| TE r1 0006 6 (counts and settings) | finding 6 | yes | none |
+| TE r2 F3 and F13 (PM-0006-13) | consistency F3, F13 | yes | none |
+| TE r2 F3 (PM-0006-23) | consistency F3 | yes | none |
+| TE r2 F13 (PM-0006-17) | consistency F13 | yes ("V = 15 vehicles", R2's own word) | the short forms in the same row stay (L3) |
+
+Findings the range leaves open on these docs (not blocks, for the record): verifier 0001 F3 and 0006 N1 (cut markers:
+the session's assembly, outside these blocks; `grep -c '8<' ` on both docs at 57c43c2 is 0, so they are gone too);
+consistency F13's short "proof test" at 0006:550 and 0006:1040 (infra-engineer's round 3, after 57c43c2).
+
+## 3. The rules on the changed text
+- Rule 2 (a number with no source): none. Every new number is research (r2:2341, 1748, 2263; r6:518, 863–865), arithmetic
+  shown (16.67, 33.33, 8.33, 4.17, 6.67; 14 and 42 draws; 2 %, 1 %; 2.52–3.79 GB; 0.088°, 0.70°), or labelled proposed
+  with a reason (PM-0001-57's pitch step; 0006's counts and settings; PM-0006-17's reference; the metrics rule).
+- Rule 3 (a "not researched" option proposed): none. OQ-0006-5's WebSocket case is "not researched" and left to the
+  Advisor; OQ-0003-2's MRT weight stays an option, not the proposal.
+- Rule 4 (a feature with no trace): none new. The metrics firewall rule serves part 9 (monitoring); OQ-0001-14 asks the
+  trace question itself and changes no feature.
+- Rule 5: glossary script over the drafts (working tree; 0001, 0003, 0006 equal 57c43c2 apart from later rounds):
+  0 exact hits. "headroom" on changed lines: only the TICK-30 quote (0001:25) and the code TICK-60-HEADROOM (0001:536,
+  1154). Term use: L3 (the short "proof test" in 0006's PM-0006-17).
+- Rule 6 (the look): nothing decided. The camera-player cutaway goes to Mustafa (OQ-0003-15, step 29); "if the look
+  brief keeps it" (PM-0003-12) and AP2's families stay his.
+- Condition 12 (a settled input reopened): fixed in 0003 (WebGPU required is "settled by the stack", not weighed);
+  nothing new reopened. README:63 still asks the old question (M2, outside these docs).
+
+## 4. The citation script's line-range flags
+`python3 scripts/cite_check.py docs/research <0001 at 57c43c2> <0006 at 57c43c2>` (run on the snapshots, since the
+working tree has later rounds): 1,217 ids cited, 0 missing; 21 range flags (0001: 3, 0006: 18). All 21 are script
+artifacts (a group with two ranges or two files, read against one; or an id more than 20 lines above its own mark):
+
+| # | doc:line | flag | verdict | where the cited lines and the id are |
+|---|---|---|---|---|
+| 1 | 0001:52–54 | R2-BUD-REC1 not within r2 1770–1790 | script artifact | R2-BUD-REC1 is the group's second range, r2:2302–2325 (r2:2302 its heading); 1770–1790 hold the estimate's results (146.1 kbps r2:1775, 286.1 kbps r2:1778, Fiedler's 256 kbit/s r2:1789) |
+| 2 | 0001:62–64 | R2-TRN-REC3 not within r2 2565–2615 | script artifact | R2-TRN-REC3 is at its own range, r2:2639 |
+| 3 | 0001:62–64 | R2-TRN-REC1 not within r2 2639–2671 | script artifact | R2-TRN-REC1 is at its own range, r2:2565 |
+| 4 | 0006:66 | R5-PREV-F12 not within r6 60–65 | script artifact | R5-PREV-F12 is r5's (r5:838); r6:60 R6-HOST-F1, r6:72 F3 |
+| 5 | 0006:66 | R6-HOST-F1 not within 838–849 (read in r6) | script artifact | 838–849 are r5's: R5-PREV-F12 r5:838, F13 r5:845; R6-HOST-F1 at r6:60 |
+| 6 | 0006:66 | R5-PREV-F12 not within r6 838–849 | script artifact | as 5: r5:838 |
+| 7 | 0006:136–138 | r6 lines 1605–1615 out of range | script artifact | the range is r5's: R5-PREV-REC2, r5:1605–1615 |
+| 8 | 0006:141 | R6-HOST-F5 not within r6 476 | script artifact | r6:476 is the start scenario's Pages row; R6-HOST-F5 at its own range, r6:87 |
+| 9 | 0006:222–223 | r6 lines 2699–2723 out of range | script artifact | r2's: R2-TRN-REC5, r2:2699 |
+| 10 | 0006:231 | r6 lines 3050–3054 out of range | script artifact | r2's: R2-TRN-OQ4, r2:3050 |
+| 11 | 0006:269–270 | R6-COST-REC1 not within r6 499–500 | script artifact | 499–500 are the "Scaling rule (arithmetic)"; R6-COST-REC1 at its own range, r6:703 |
+| 12 | 0006:275–276 | R5-CI-F17 not within r5 913–914 | script artifact | r5:913 "Repository visibility. Public"; R5-CI-F17 at r5:673, F5 at r5:583 |
+| 13 | 0006:391 | r6 lines 2104–2106 out of range | script artifact | r5's: r5:2104 "For Mustafa (settings he owns, never changed by agents)" (under r5:2091 "From R5-CI and R5-PREV"); R6-SEC-OQ1 r6:926–945 |
+| 14 | 0006:450 | R6-HOST-OQ6 not within r6 420–427 | script artifact | r6:420 "Q3. Production certificates"; R6-HOST-OQ6 at its own range, r6:869 |
+| 15 | 0006:530 | R6-HOST-REC1 not within 627–634 (read in r5) | script artifact | "r6 lines 627–634" (the script does not read the short "r6"); R6-HOST-REC1 runs from r6:619, so 627–634 are inside it. This group is changed text: confirmed (C14) |
+| 16 | 0006:530 | R5-PREV-REC2 not within 627–634 (read in r5) | script artifact | its own range is r5:1607–1609 (R5-PREV-REC2 from r5:1605) |
+| 17 | 0006:677 | r6 lines 2955–2961 out of range | script artifact | r1's: R1-RR-OQ7, r1:2955–2961; R5-GATE-OQ4 r5:1873 |
+| 18 | 0006:753 | r6 lines 1622–1624 out of range | script artifact | r5's: R5-PREV-REC3 (r5:1616), its mark at r5:1622–1624; PREV-DELETE r6:970 |
+| 19 | 0006:769 | R6-HOST-REC2 not within r6 667–671 | script artifact | r6:667 "*Spike must prove (proposed):* R2-ROOM-REC2's marks on both CCX23 and CX33" is REC2's mark; its heading r6:645 is 22 lines up |
+| 20 | 0006:769 | r6 lines 2775–2782 out of range | script artifact | r2's: R2-ROOM-REC2's marks, r2:2775–2782 (mark 2 at r2:2777) |
+| 21 | 0006:792–793 | R6-OBS-OQ3 not within r6 765–768 | script artifact | r6:765–768 are R6-OBS-REC3's mark (a Wasm trap in Sentry with Rust names); OQ3 is named as what the mark answers, not as located there |
+
+## 5. Counts
+- Changed-text rows: 109 (0001: 39, 0003: 43, 0006: 27). Confirmed 104 (6 of them also at the original source today:
+  B29, C4, C7, C8, C17, C19) · wrong 0 · unsupported 4 (A8; B14, B18, B38, one defect in three places) · citation off 0 ·
+  stale 1 (B25) · rule 1 (L3, rule 5's term use, on the changed line of C22).
+- Fix blocks: 114 (0001: 36, 0003: 51, of them 41 graphics-engineer's, 0006: 27): resolved 109, partly 5 (netcode r2 F13 events; GE r2 F13 ×2 and
+  TE r2 F14, the README pointer; GE r2 X5 GW17 row); with a new problem 1 (TE r1 0006 fix 5, L3), plus 2 that leave
+  synthesis work undone (M2). Replay: byte-identical to 57c43c2.
+- Citation flags: 21 (0001: 3, 0006: 18): real 0, script artifacts 21.
+- Findings: 2 medium (M1, M2), 3 low (L1–L3); notes N-a to N-f.
+
+## 6. Findings (ranked)
+**M1 (unsupported: a dangling pointer). ADR 0003 cites a README row that does not exist.** 0003:247–248 (5.k):
+"Whether a fragment deals damage is a design question for Mustafa (`docs/adr/README.md`, "Decisions the drafts ask
+for": fragments as damage)"; 0003:432 (trace row): "damage per fragment is a design question (`docs/adr/README.md`,
+"Decisions the drafts ask for")"; 0003:1097–1098 (checklist step 24): "a design question for Mustafa with the
+game-designer (`docs/adr/README.md`, "Decisions the drafts ask for": fragments as damage)". README at 57c43c2 (and in
+the working tree at 213dfb6): "Decisions the drafts ask for" (README.md:25–104) has no fragment row; the only
+"fragment" is gap G5 (README.md:306). Consistency F14's outcome gave the row to the synthesis. Smallest fix: README adds
+"| Fragments as damage | Does each grenade fragment deal damage, or only the blast? (LOOK_V2 §3, §7 bring fragments
+back as an effect) | Mustafa, with the game-designer | ADR 0003 part 5.k; ADR 0004 |". Author: engine-architect
+(synthesis, README); if the row is not added, graphics-engineer (5.k, trace row) and test-engineer (step 24) drop the
+pointer.
+
+**M2 (stale across documents). README and SPIKE_PLAN lag behind this range's changes.** (a) README.md:63 still reads
+"OQ-0003-11 | Should v2 one day drop the WebGL 2 fallback, and how many players use it? | Mustafa | … line 771", the
+option condition 12 forbids weighing; 0003:784 now asks "How many players use the WebGL 2 fallback?" (b) README has
+no OQ-0006-5 row, though 0006:667–668 and 0001:962–964 now route its development and staging case to the Advisor
+before the netcode proof test (consistency F8 asked for the row). (c) SPIKE_PLAN item 1 "Depends on"
+(SPIKE_PLAN.md:104–110) names "the development certificates (ADR 0006)" only, not OQ-0006-5's answer (consistency F8).
+(d) SPIKE_PLAN.md:74 "PM-0001-1 to -56" and :97 "PM-0001-1 to PM-0001-56", while 0001:1130 adds PM-0001-57 to the
+proof test. Smallest fix: README:63 "How many players use the WebGL 2 fallback? | Mustafa, on client field data";
+README adds "| OQ-0006-5 (development and staging) | Which certificate does the WebSocket fallback present on
+development and staging servers? | the Advisor, before the netcode proof test | ADR 0006 OQ-0006-5 |"; SPIKE_PLAN item 1
+adds "OQ-0006-5's development and staging answer (the Advisor, before the test starts)"; SPIKE_PLAN:74, :97 "-57".
+All four still hold in the working tree at 213dfb6 (the synthesis round is running). Author: engine-architect
+(synthesis).
+
+**L1 (unsupported: an incomplete list). ADR 0001 part 6's event list.** 0001:230–231: "tick-stamped gameplay events
+(the events of ADR 0004 part 19: hits, deaths and kills, purchases, uplink cache events, tech tiers, upgrade picks and
+pickups)". ADR 0004:454–458 lists also "blasts (position and strength, for the concussion shake and the fragments ADR
+0003 draws)", "harvester deliveries and kills, structure kills and stage changes" (cosmetic shot events go once,
+0001:234). As written, a structure kill or a harvester delivery is not among the events resent until acknowledged.
+Smallest fix: "(the gameplay events of ADR 0004 part 19: hits, deaths and kills, blasts, purchases, uplink cache
+events, harvester deliveries and kills, structure kills and stage changes, tech tiers, upgrade picks and pickups)".
+Author: netcode-architect.
+
+**L2 (stale: a new inconsistency). ADR 0003's GW17 row.** 0003:707: "port to TypeScript: the roof fade by flag over
+the player's enclosure and the camera-player cutaway (OQ-0003-15), precompiled blend variant, ink masked (part 5.i);
+pending removed". The other OQ-0003-15 items keep a pending note naming Mustafa's call (0003:703 CL12/GW3, :705 GA14,
+:714 GP9), and the camera-player half is now his open call (0003:810–812, step 29). Smallest fix: "…; pending stays
+for the camera-player cutaway: "Mustafa's call: LOOK_V2 §4 names only roofs (OQ-0003-15)"". Author: graphics-engineer.
+
+**L3 (rule 5, term use). ADR 0006's PM-0006-17 adds the short "proof test".** 0006:884, added by test-engineer's
+fix 5: "the proof test's load need not have them"; the same row keeps "only if the proof test's sim has the interest
+filter". Consistency F13: GLOSSARY §8 marks the term only as "the netcode proof test", and outside ADR 0001 the full
+name is used (completeness item 8 names these rows as test-engineer's). Smallest fix: "the netcode proof test's load",
+"the netcode proof test's sim" (and PM-0006-15's "the proof test's client page", 0006:882, in the same pass). Author:
+test-engineer.
+
+**Notes (no fix required; for the authors' judgement).**
+- N-a. 0001:809–811 "It is reported beside the client's sim share": the row that reports it is ADR 0002's PM-0002-25
+  (0002:1064, local match); adding "(ADR 0002's PM-0002-25)" would close skeptic-1's "no row behind it" (netcode-architect).
+- N-b. 0001:1375: R2-BUD-REC1's Shabzon mark sits under a network profile (r2:2320–2321: 100 ms RTT, ±10 ms jitter,
+  2 % loss); S4 runs in the sim only. PM-0001-20 bounds the network half (≤ 0.1 % missing inputs at 5 % loss), so the
+  substance holds; "(in the sim; the network half is PM-0001-20's)" would say it (netcode-architect).
+- N-c. PM-0001-57's pitch bound is one 0.18° step; a rounding quantiser errs by half a step (0.09°), so the mark also
+  passes a truncating one. Labelled proposed with its reason; tighten to 0.09° only if wanted (test-engineer).
+- N-d. 0001:1182–1183 "a 30 Hz baseline mark (PM-0001-4 to PM-0001-27)": PM-0001-57 falls to "Every other failure goes
+  back to the drafts" (part 6), which is the right handling (test-engineer).
+- N-e. SPIKE_PLAN.md:30 still defines MAC as "a macOS machine with Safari"; the version rule (stable Safari, WebGPU
+  from 26.0, WebTransport from 26.4) lives in the drafts' keys (0003:916–919), not in the shared fixture (consistency F4's
+  synthesis half; engine-architect).
+- N-f. 0006:549 "that rate is now TICK-30's 30 Hz": TICK-30 makes 30 Hz the baseline and keeps 60 Hz possible on the
+  60 Hz margin; "the 30 Hz baseline (TICK-30)" would be exact (infra-engineer).
+
+## 7. Fetch audit
+All with `curl -sSL --max-time 30` through the session's proxy; hosts on `.claude/settings.json`'s WebFetch list;
+pages saved under `.gate/fixcheck-a/fetch/` and read as data only (no instruction in them was followed).
+| time (Amsterdam) | host | URL | status | bytes | used for |
+|---|---|---|---|---|---|
+| 2026-11-01 19:29:43 | www.w3.org | https://www.w3.org/TR/webaudio-1.1/ | 200 | 3,087,268 | B29 (OQ-0003-14's four quotes, the draft's date) |
+| 2026-11-02 09:16:54 | developers.cloudflare.com | https://developers.cloudflare.com/pages/configuration/preview-deployments/ | 200 | 127,307 | C4, C17, C19 (the access policy's scope; no word on branch aliases) |
+| 2026-11-02 09:16:55 | docs.sentry.io | https://docs.sentry.io/platforms/javascript/data-management/data-collected/ | 200 | 281,298 | C7, C8 (IP, headers, cookies in the browser) |
+
+## Not verified
+- Text after 57c43c2 (9ed8d67 to 9a03999 and the uncommitted round in the working tree): a later unit's.
+- README and SPIKE_PLAN were read only where this range's changes point at them (M1, M2, N-e).
+- skeptic-2's three.js r186 source read (ToonOutlinePassNode.js) was not re-fetched; B21 rests on r3:343–350 and the
+  skeptic's saved copy.
