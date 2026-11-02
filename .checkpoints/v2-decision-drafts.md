@@ -38,6 +38,16 @@
    0002 and 0005's content part launched before 23:00 · this commit.
 
 ## Current step
+Fifth spend-limit cut, 2026-11-01 about 19:35 Amsterdam ("your 5-hour limit resets 11pm (UTC)", 00:00 Amsterdam): all
+five running agents failed with HTTP 429 (fixcheck-a: 0001 and 0003 done, 0006 left; fixcheck-b: all checks done, its
+verdicts file not yet written; the synthesis round and the reviews by engine-architect and security-auditor barely
+started). The session was idle through the night window (00:10–08:30: no agent). CI green on every commit pushed that
+evening (03645ce, 57c43c2, 9ed8d67, 81d2a65, aa85bf0, 3c46731, 9a03999: seven check-suite notifications, read
+2026-11-02 09:14). Resumed 2026-11-02 at about 09:15 Amsterdam (daytime: fetching 08:30–22:00, no new agent after
+23:00): the five cut agents, each from its notes. The report's draft (`docs/reports/2026-11-01-v2-decision-drafts.md`)
+was not yet committed at the cut; committed with the next batch.
+
+Before the cut (2026-11-01 evening):
 Evening of 2026-11-01 (daytime rules: fetching until 22:00, no new agent after 23:00). Resumed at 19:07 after the
 fourth cut. Applied since (each block checked to sit in its author's own text; guard, dispositions 521/521 and
 glossary exact 0 before every commit): 03645ce (0002 round 2, 24 of 25 blocks; game-designer F14, F2), 57c43c2
