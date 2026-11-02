@@ -27,7 +27,21 @@ now); GLOSSARY §8 yes; the checkpoint kept at the stop. Each condition's place:
   report and its appendix. Symbols +0 −0 (gate check 3); no code, no spike.
 
 ## Evidence
-{EVIDENCE}
+- **Against the research** (plan step 7; one fresh verifier per draft and one for the synthesis): 3,922 claims, 3,847
+  confirmed (98.1 %). Verdicts: 0001, 0002, 0003, 0004, 0005 and the synthesis PASS WITH NOTES; 0006 FAIL (3 defects),
+  then fixed. Every "wrong" or "unsupported" verdict went to a skeptic first (four rounds): 24 upheld, 9 partly, 2
+  refuted. Source checks: about 140 pages read with curl, allow-listed hosts only, by day. github.com answers 403 here,
+  so its pages were read from raw.githubusercontent.com. Each verdicts file holds its fetch audit.
+- **Against each other** (step 8): the consistency critic, 14 findings (3 high), all fixed by their owners; 489
+  in-context glossary hits judged in the drafts and 44 in the synthesis. The completeness critic: GAPS, 16 items, all
+  handled (appendix §5).
+- **The fixes re-checked** (step 9): {FIXCOUNT} exact fix blocks in {ROUNDS} rounds, each applied only inside its
+  author's own text. Verifiers fixcheck-a and fixcheck-b: PASS WITH NOTES (211 changed claims: 201 confirmed). Applying
+  the fix files in commit order to the verified text gives the next commit byte for byte. fixcheck-c: {FIXC}.
+- **Scripts at {HEAD}:** dispositions 521 of 521 research ids, each exactly once; glossary exact hits 0 in all nine
+  documents; README's pointers into the drafts 69 of 69 on target; no line directly under a table; ENGINE_OVERVIEW
+  139 lines; the write guard (only allowed paths; research files and LEGACY_INVENTORY unchanged) PASS on every commit.
+- **Gate** (`node tools/gate.mjs 9e7db28`): {GATE}. CI's gate with smoke: green on every pushed fix commit.
 
 ## Reviews
 {REVIEWS}
