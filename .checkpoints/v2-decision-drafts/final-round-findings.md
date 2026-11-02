@@ -88,3 +88,15 @@ findings 2–5); synthesis docs APPROVE WITH NOTES. Its README pointer note is f
 Questions: Q1 (the Advisor) read item B9 before the foundation's preview step? It recommends no: keep BASELINE-WHEN (b)
 and adopt finding 1's interim fix. Q2 (Mustafa) does a host's kick bar the player for the rest of the match? It
 recommends yes.
+
+## From skeptic-4 (verifier-skeptic-4-results.md; 2026-11-02 about 09:31): all five upheld, none refuted
+- fixcheck-b finding 1 (PM-0002-17, -42): upheld; the tsconfig entry names `enum` twice; the TypeScript 5.8 release
+  notes tie the flag to the same list. Not verified: an ambient `enum` (`declare enum`, `.d.ts`); three repository
+  files returned 404. → test-engineer: the `enum` bite required again (an ambient `enum` not claimed).
+- fixcheck-b finding 3 (PM-0002-45): upheld (R5's own G7 row had "(its size is set once REC4's budget exists)", which the
+  ADR dropped). → test-engineer: a test limit planted in the budget file for the run.
+- fixcheck-b finding 5 (0004:805–807) and fixcheck-a M1 (0003's three pointers): upheld as the text stood; the synthesis
+  row "Fragments as damage" (applied in 47eadd9) makes all four true. → fixcheck-c confirms; no author fix.
+- fixcheck-a A8 / L1 (0001 part 6's event list): upheld; three part-19 events have no class (blasts; harvester
+  deliveries and kills; structure kills and stage changes). → netcode-architect: give them a class, and say whether
+  blasts are resent or sent once (ADR 0004 gives blasts only presentation uses).
