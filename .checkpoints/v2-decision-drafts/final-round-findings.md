@@ -32,3 +32,28 @@ Collected from fixcheck-a, -b, -c, the skeptics and the step-10 reviews; one rou
 - The synthesis (sent about 09:36, queued): M1 (the fragments row), M2 (README:63 OQ-0003-11's old question; OQ-0006-5
   row; SPIKE_PLAN item 1 "Depends on" OQ-0006-5; SPIKE_PLAN:74 and :97 "PM-0001-1 to -56" → -57).
 - Skeptic-4 (added about 09:36): A8; B14/B18/B38.
+
+## From the step-10 review by engine-architect (review-engine-architect.md; 2026-11-02 about 09:45)
+Verdicts: ADR 0001 REVISE (small: one high gap); 0003, 0004, 0006, 0002's pass marks, 0005's CD/AP pass-mark rows:
+APPROVE WITH NOTES. Findings (its numbering; owners as the review names them):
+1. High: no timing rule for events (0001:445, 255–262; 0002:258–262): spatial events play ahead of the delayed poses;
+   R2-SYNC-REC6 (r2:2210, blasts "on the timeline of the entity they hit") is marked adopted but not carried. Fix: a
+   part 7 rule (the Worker releases spatial events at the delayed time); ADR 0002 part 5 and PM-0002-9 follow.
+   Owners: netcode-architect, engine-architect (0002), test-engineer.
+2. Medium: the 30 Hz input cost understated (0001:649, 807–808, 1165): the local player is drawn one tick behind its
+   prediction; no mark measures input-to-screen. Its Q1 (decision).
+3. Medium: the client's prediction step is not defined as a sim crate entry point (0004:151–156, :977). rust-reviewer.
+4. Medium: the aim-ray seam is untested (0002:1056, 0001:1170). test-engineer.
+5. Medium: no production release model (ADR 0006 with 0001:560): a refused client reloads the same bundle and loops.
+   Its Q2 (decision: an open question in 0006 now).
+6. Medium: ADR 0005 hands the archive of shipped content sets to ADR 0006, which has none (0005:388–389, 0006:1022).
+7. Medium: the 8-rooms-per-VM mark contradicts PM-0001-1 (one tick thread per vCPU) and PM-0006-13 (0001:1118, 1146;
+   0006:880). test-engineer.
+8. Medium: the client endpoint lives only in `sim-wasm`, while ADR 0001's tests run native headless clients (0002:183,
+   its own text). engine-architect (0002).
+9. Low: PM-0005-10 tests only the native dev server (0005:2034). 10. Low: no endpoint named for client field data or
+   crash reports (0006:321, 0001:497). 11. Lows in ADR 0003 (370–374 audio occlusion, 928–931 bench Worker load,
+   276–277 wording, 381 stale hedge). 12. Lows in ADR 0002, its own text (191–192 supervisor crate; 255–262 the block's
+   owner section omits the floor layer and area id of 0004:387–388).
+Questions: Q1 own-movement delay at 30 Hz (Mustafa by feel after the netcode proof test; add the absolute measurement
+now); Q2 the release model (an open question in 0006 now; decider the Advisor).
