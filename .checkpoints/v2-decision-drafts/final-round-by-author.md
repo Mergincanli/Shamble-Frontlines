@@ -196,6 +196,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - Follow-up (routed by engine-architect's ADR 0002 batch): RR-1's ADR 0004 half: part 7's allow-list of float methods
   grows to what ADR 0002's lint now allows, and the sim gets helpers for `min`, `max` and `clamp` (signed zero); not in
   b815c85. A small batch: rust-reviewer-fixes-final-b.md, BEFORE at b815c85.
+- Deferred (optional wording; correct as they stand), routed by game-designer's ability batch: OQ-0004-11's "What decides
+  it" may add "ADR 0005 AB-1 holds the game-designer's proposal per kind"; part 17's "an effect in ADR 0005's data" may
+  read "… (AB-6, read by AB-2's immunity rule; its scope is OQ-0005-AB14)". For the revision after the stop review.
 
 ## engine-architect, ADR 0002, all but "### Pass marks"
 - High: SA-1 (part 10: the preview job holds no token a branch can rewrite; production deploys only from main, in its
@@ -342,4 +345,7 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   0.30 ms at 60 Hz).
 - Deferred (optional, noted for the report): ADR 0004 part 20 could name OQ-0001-18 instead of "the Advisor's question
   in ADR 0001"; the pointer is correct as it stands.
+- Routed by game-designer's ability batch (d57dc5a): README rows for OQ-0005-AB14 (spawn protection's scope; Mustafa)
+  and OQ-0005-AB15 (who sees picks; Mustafa); ADR 0005's row count +2 (AB1–AB15); "Needs outside VISION_V2 §6" gains
+  "ADR 0005: AB-2's immunity rule for spawn protection (LOOP_V2 §2 only)"; POOL-FULL is OQ-0004-11 with AB-1's proposal.
 

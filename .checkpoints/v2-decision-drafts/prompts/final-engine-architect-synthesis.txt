@@ -64,6 +64,9 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   0.30 ms at 60 Hz).
 - Deferred (optional, noted for the report): ADR 0004 part 20 could name OQ-0001-18 instead of "the Advisor's question
   in ADR 0001"; the pointer is correct as it stands.
+- Routed by game-designer's ability batch (d57dc5a): README rows for OQ-0005-AB14 (spawn protection's scope; Mustafa)
+  and OQ-0005-AB15 (who sees picks; Mustafa); ADR 0005's row count +2 (AB1–AB15); "Needs outside VISION_V2 §6" gains
+  "ADR 0005: AB-2's immunity rule for spawn protection (LOOP_V2 §2 only)"; POOL-FULL is OQ-0004-11 with AB-1's proposal.
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding
