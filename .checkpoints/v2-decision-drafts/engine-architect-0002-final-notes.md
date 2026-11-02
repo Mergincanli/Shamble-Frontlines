@@ -1,2 +1,15 @@
 Task: ADR 0002 final fix round (step 10 fix loop), write engine-architect-0002-fixes-final.md from findings at 47eadd9
 - 2026-11-02: read ADR 0002 (unchanged 47eadd9..HEAD), all review findings (SA-1, EA-1/8/12(=13,16), NA-4/7/15, IE-3/4/14/19, FB-8, PA-13, GE-2, RR-1/2/5/6/7/10/14/15/16, TE-7) and the research lines they cite. Plan: FIX blocks grouped by region so no two BEFOREs overlap; new OQ-0002-9 (SA-1 guard, Mustafa); new crate client-endpoint (EA-8); supervisor crate row (EA-12); per-frame input posting (NA-7). Writing engine-architect-0002-fixes-final.md next.
+- SA-1: FIX part 10 (production job on main in env `production`; the merge-commit gap; OQ-0002-9 new, decider Mustafa on the Advisor's advice; interim (a) required reviewer), part 9 Sentry, migration 2.6, revisit-when, App. A R5-PREV-REC1; routed B9 (infra), PM-0002-66 (test), README row (synthesis).
+- EA-1: FIX part 5 block (events released on their entity's timeline), item 2, App. A R1-BND-REC2; routed ADR 0001 part 7, PM-0002-9.
+- EA-8: FIX new crate `client-endpoint` (table, rules, change list, Q4, trade-off, OQ-0002-8, migration 2.2, App. A); routed ENGINE_OVERVIEW/SPIKE_PLAN.
+- EA-12: FIX supervisor crate row (slice 3, R6-HOST-REC2), lobby sentence, migration slice 3; floor layer + area id in owner-only section.
+- NA-4: FIX control API (arrival stamps, send time, host time as values); routed ADR 0001 parts 5, 7.
+- NA-7: FIX newest input posted once per drawn frame (summary, Decision opening, part 5, why, part 6, Q10, trade-off, items 1 and 3, migration 2.5, App. A R1-BND-REC3); routed ADR 0001 part 5, ENGINE_OVERVIEW:37/:94, PM-0002-64.
+- NA-15: FIX part 6 local step order. NA-8 (unlisted): fixed with the coordinator's routed b815c85 items (step returns next due time; catch-up per wake; panic hook buffer read on trap in part 4; item 7).
+- IE-3: FIX OQ-0002-5 (cost 0 on public repo; wall time decides). IE-4: FIX part 10 (two shapes, OQ-0006-5 decides), App. A R2-XT-OQ10. IE-14: FIX part 8 bench (VM path is ADR 0006's). IE-19: FIX flakes (retention ADR 0006 part 3; issue carries seed).
+- FB-8: FIX OQ-0002-8. PA-13: FIX part 6 + item 6. GE-2: FIX part 9, test plan, App. A R5-CI-OQ5.
+- RR-1, RR-2, RR-14: FIX part 7. RR-5: FIX part 5, item 2, App. A. RR-6: FIX control API. RR-7: FIX part 4, part 8 tools, G10. RR-10: FIX part 3 rules, G5. RR-15: FIX parts 1, 2. RR-16: FIX part 5 (routed 0005 CD-3 to my 0005 batch). TE-7: FIX part 8 soak.
+- SA-10, SA-11 0002 halves (unlisted): NOTE deferred.
+- Output: engine-architect-0002-fixes-final.md (50 FIX, 21 NOTE), generator engine-architect-0002-fixes-final-gen.py; verified: each BEFORE once, no overlap, sequential apply equals line-range apply, Pass marks untouched. Claims ledger rows F1-F25 appended to engine-architect-adr0002-claims.md.
+DONE
