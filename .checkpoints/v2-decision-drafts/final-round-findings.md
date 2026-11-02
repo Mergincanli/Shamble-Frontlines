@@ -137,3 +137,33 @@ recommended, the 10 % share reported beside); SPIKE-VM-ACCESS (Mustafa: (b) a se
 token, recommended); RELEASE-WINDOW (Mustafa: (a) a release window while playtests are scheduled, recommended);
 DOMAIN (Mustafa after the Advisor's OQ-0006-5 read: (a) a private test CA for the proof test, a domain before slice 3,
 recommended).
+
+## From the step-10 review by game-designer (review-game-designer.md; 2026-11-02 about 09:42)
+Verdicts: ADR 0001 REVISE; ADR 0004 REVISE (small: wording and one new open question); ADR 0005's ability pass-mark
+rows REVISE (one row). Every golden number in the ability rows checks out.
+1. High: the server refuses an aim point "beyond weapon range" (0001:193–194; PM-0001-21, 0001:1140; r2:2062), but a
+   top-down cursor reaches about 28 m (44 m with the ADS pan, r2:847–851), and legacy ranges are Katana 3.6 m, Molotov
+   0, Bagpipe 34 m (LEGACY_TUNING:181): almost every blade swing and Molotov throw would be refused. Fix: clamp the
+   point to the weapon's range; drop "beyond weapon range" from the forged set. netcode-architect, test-engineer.
+2. Medium: no command or message names what a player buys, while ADR 0005 relies on the purchase naming a unit
+   (0001:484, 482–498; 0005:868–869, 920, 922): a buy message checked against money, tier and terminal.
+   netcode-architect.
+3. Medium: track state sends "levels" only; the own-state section's contents are unstated (0001:383–384, 174; 0005
+   AB-8, 930–931): effects of picks, the Shield's slow, the Banzai's speed must reach the predicting client.
+   netcode-architect.
+4. Medium: "steal by GE8's presence count" contradicts LOOP_V2 §4 [DECIDED] "holding E" (0004:425, 750, 751;
+   LEGACY_INVENTORY:294); no draft asks about two enemy teams at one uplink. rust-reviewer (its GD-STEAL question).
+5. Medium: PM-0005-31 requires "distinct candidates", which OQ-0005-AB8 leaves open (0005:2056, 1197). test-engineer.
+6. Medium: the match record keeps picks only as per-player totals, no tick (0004:446, 454–458 → 0006:342–350), so
+   OQ-0005-AB3's snowball measurements cannot be made from telemetry. infra-engineer, rust-reviewer.
+7. Low–medium: spawn protection, barracks interiors closed to enemies and the Recruit respawn (LOOP_V2 §2, §5) have no
+   home in ADR 0004 (0004:422–427; 0005:1799). rust-reviewer.
+8. Lows: PM-0005-25 lacks "Conscript beats Peacekeeper"; PM-0005-24 lacks the minute-5 Tech 1 floor (9,000 ticks);
+   "the pending offer of three" blocks AB8's queue option and "three" is hard-coded (0004:433, 444–445; 0001:382–383,
+   493); honest double clicks counted as forged (0001:383); E for pickup vs E for steals (0001:386–387); PM-0005-29
+   assumes a voluntary drop; Feel Lab step 3 (0005:2165–2166); the upgrade record keyed by slot loses a late
+   rejoiner's tracks (0004:431, 0005:925); money's unit and the rebuild-split remainder; the pickup pool's capacity;
+   OQ-0001-7 covers shots, not the active-reload tap.
+Questions: GD-STEAL (presence rule as a data switch, decided in the uplinks change-set from 3 sim runs each);
+GD-REJOIN (yes, keyed by player); GD-PICK-VIS (owner only to start, with OQ-0005-AB7); GD-CARRIER (yes, public, carry
+speed from sims); GD-BOT-LOOT (no, for the slice 2 greybox). All Mustafa's.
