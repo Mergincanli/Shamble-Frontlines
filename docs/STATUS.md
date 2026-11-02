@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-11-01; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) and docs-after-31 (PR #32, 9e7db28, 2026-10-31) merged. In flight: the v2 decision drafts (draft PR #33). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-02; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) and docs-after-31 (PR #32, 9e7db28, 2026-10-31) merged. In flight: the v2 decision drafts (draft PR #33). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
@@ -12,9 +12,10 @@ only; the v2 day session's handover).
 **In flight: the decision drafts** (draft PR #33, from the Advisor's drafts brief, 2026-10-31): `docs/ENGINE_OVERVIEW.md`,
 `docs/adr/0001`–`0006` (Status: Proposed), `docs/SPIKE_PLAN.md`, `docs/adr/README.md` (the index and the loose-ends
 register), GLOSSARY §8 (the phase 1 terms) and `docs/LOOK_V2.md` (the look brief, Mustafa and the Advisor, added
-2026-10-31). Next: the stop for Mustafa and the Advisor; then, once they approve the drafts, the spikes in SPIKE_PLAN's
-order (the netcode proof test before the foundation); then phase 1 and the playable slices (SLICE-ORDER, below). The
-legacy game is frozen (critical fixes only).
+2026-10-31). Next: the stop for Mustafa and the Advisor (draft PR #33; they answer the report's "Decisions needed");
+then, once they approve the drafts, the spikes in SPIKE_PLAN's order, the netcode proof test first (SPIKE_PLAN item 1,
+before the foundation); then phase 1 and the playable slices (SLICE-ORDER, below). The legacy game is frozen (critical
+fixes only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
@@ -47,7 +48,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), draft PR #33 | the six drafts assembled in `docs/adr/`; verification under way (2026-11-01 about 09:10: 0001 PASS WITH NOTES, 0006 FAIL with 3 defects, 0002–0005 running); two spend-limit cuts, no work lost | the steps not done (the checkpoint lists them): the synthesis (overview, spike plan, register, GLOSSARY §8), the rest of verification, skeptics, consistency and completeness critics, the fix round, source checks, reviews on the final diff, the gate, the report; then Mustafa's and the Advisor's review of the drafts at the stop |
+| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), draft PR #33 | all deliverables in; verified against the research (one verifier per draft and one for the synthesis; 0006's FAIL fixed), checked for consistency and completeness, the fixes re-checked; ten domain reviewers on the final diff (plan step 10), every finding fixed or deferred with a reason in a final fix round; the last verifiers are re-checking that round (2026-11-02). Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix | Mustafa's and the Advisor's review of the drafts at the stop (the report's "Decisions needed") |
 | docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
 | **docs-after-v2-research** (docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's "merge #31" after the advisor's APPROVE of 1c687d1 | done; the report is PR #31's body | none |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
@@ -115,7 +116,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     ABL-PREDICT, BASELINE-WHEN, UPGRADE-SCOPE; SPIKE-SCOPE; the look is `docs/LOOK_V2.md`, and authored 3D models
     (glTF/GLB) are allowed in v2.
 - **Taken by the advisor agent 2026-10-31, about 18:35 (its plan review of v2-decision-drafts, APPROVE with 19 conditions;
-  verbatim in the checkpoint's `advisor-verdicts.md` §1):**
+  verbatim in `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3):**
   - ASSET-RESEARCH (a): ADR 0005's asset part takes LOOK_V2 §8's flow as given and proposes only what R1-DATA, R3-CHAR
     and R3-BUDGET support; the rest are "not researched" open questions, grouped as one "asset-pipeline research" unit
     (graphics-engineer, its own daytime session) that SPIKE_PLAN places before the asset spike.
@@ -164,21 +165,18 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - **Waiting (from R1–R6; the full wording is in each topic's "Shared open questions" and the v2-research report):**
   - ABL-PREDICT (Mustafa, after a Feel Lab test that compares both ways on the Molotov and the Shield): does the client
     predict the player's own abilities?
-- **The five carry-forwards into the decision drafts** (state 2026-11-01; `docs/adr/README.md`'s loose-ends register
-  lists them as CF-1 to CF-5):
-  1. Verify every ADR claim and number, R3–R6's included (PR #28 review, finding 4). State: in progress, every draft's
-     claims ledger checked by the verifier (0001 PASS WITH NOTES, 0006 FAIL with 3 defects, 0002–0005 running), then
-     the fix round.
-  2. R2-BUD-REC6's reason (r2-netcode.md:2402-2403) holds at N = 54, not 48 (8.28 of 8.33 ms; PR #28 review, finding
-     2). State: handled in ADR 0001 parts 2 and 3 (marks restated at 30 Hz; the reason marked "(at N = 54, MODES-3
-     (b))"; the 60 Hz margin per GLOSSARY §8); the reading is OQ-0001-1, confirmed at the stop.
-  3. Use 48 where a mark gives 48 and 54; where a sentence says "until … answers", the answer applies. State: applied in
-     every draft (each Appendix A); checked in the consistency pass (not yet run).
-  4. R6-HOST-REC4's certificate per hostname over the wildcard sentences. State: handled in ADR 0006 part 7, which lists
-     the four sentences as superseded; issuance is OQ-0006-5.
-  5. No doc defined "the netcode proof test" or "the foundation". State: the Advisor's definitions go into GLOSSARY §8
-     (being appended); ADR 0001 owns the proof test, ADR 0002's migration plan is the foundation, SPIKE_PLAN names the
-     research spikes the proof test covers.
+- **The five carry-forwards into the decision drafts** (final state 2026-11-02; each line's row in
+  `docs/adr/README.md`'s loose-ends register):
+  1. Verify every ADR claim and number, R3–R6's included. Done: every draft and the synthesis verified against the
+     research, 0006's FAIL fixed, the fixes re-checked; claims on unreadable sources stay "unverified" (row CF-1).
+  2. R2-BUD-REC6's reason holds at N = 54, not 48. Done: ADR 0001 parts 2 and 3 (restated at 30 Hz, "(at N = 54,
+     MODES-3 (b))", the 60 Hz margin per GLOSSARY §8); its reading, OQ-0001-1, is confirmed at the stop (row CF-2).
+  3. Use 48 where a mark gives 48 and 54; "until … answers" takes the answer. Done: every draft's Appendix A; checked in
+     the consistency pass (row CF-3).
+  4. A certificate per hostname over the wildcard sentences. Done: ADR 0006 part 7 lists the four as superseded;
+     issuance is OQ-0006-5 (row CF-4).
+  5. Define "the netcode proof test" and "the foundation". Done: GLOSSARY §8 (appended); ADR 0001 owns the proof test,
+     ADR 0002's migration plan is the foundation (row CF-5).
 - **Open, KIT-ALIGN** (rules files the 2026-10-31 answers left stale; a kit change-set after PR #30 aligns them, with
   Mustafa's go): `CLAUDE.md:7-8` and `.claude/agents/netcode-architect.md:17-19` (the per-team reading of VISION_V2
   §3); `CLAUDE.md:192`, `.claude/agents/security-auditor.md:14` and `.claude/agents/infra-engineer.md:29-30` (the
@@ -280,8 +278,9 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
 
 ## Open bugs and risks
 - **v2-decision-drafts** (draft PR #33; the report `docs/reports/2026-11-01-v2-decision-drafts.md` has the details):
-  1. Two spend-limit cuts (2026-10-31 about 19:18; 2026-11-01 about 05:30): agents stopped with HTTP 429 and resumed
-     from their notes after the reset; no work lost (notes first).
+  1. Eight spend-limit cuts (2026-10-31 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20, 19:35; 2026-11-02 about
+     09:50, 12:15, 17:50), each resumed from the agents' notes, no work lost (every agent writes as it goes; Mustafa's
+     save-as-you-go rules of 2026-11-02); the report has the details.
   2. The asset pipeline is not researched (the research has one glTF mention, R3-CHAR-F8): ADR 0005 lists its parts as
      "not researched" open questions for the asset-pipeline research unit (ASSET-RESEARCH (a)).
   3. Several LOOK_V2 items rest on techniques not researched (in ADR 0003: the ink's inner lines and per-class weight, the
@@ -311,12 +310,12 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
 - Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed and merged (PR #8, b5f4ecf; Mustafa confirmed Ctrl+Z in Brave). Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
 - Maps saved on older builds after an undo may contain duplicate trees and props: map-dedupe-on-load drops exact duplicates on Load (PR #10, merged, Brave check passed). Limit: on an old stacked save, Cabana trees and props that the map had deleted or moved come back once. They are single entries, so they stay; Mustafa removes them by hand. Measured on the edited fixture: 69 / 35 intended, 71 / 37 after dedupe
 - Deferred (map-dedupe-on-load): prefabs saved by marquee over a stacked area can stamp exact stacks again. Exposure is small: prefabs could only be saved since dbe24f8 (2026-10-14). The next map Save and Load drops them. Follow-up: dedupe on prefab load or stamp with the same key
-- Deferred, info, older (SEC-MDL-2): `envMerge` / `rulesMerge` use `Object.assign`, so a stored `__proto__` key swaps the prototype of that local env/rules sub-object (`Object.prototype` stays clean). Belongs with the server-side map-def validation (ADR-001)
+- Deferred, info, older (SEC-MDL-2): `envMerge` / `rulesMerge` use `Object.assign`, so a stored `__proto__` key swaps the prototype of that local env/rules sub-object (`Object.prototype` stays clean). Belongs with the server-side map-def validation (ADR-001; in v2: ADR 0005 CD-2 and CD-9, README register row SEC-MDL-2)
 - Editor bugs reported by Mustafa (2026-10-15, editor.html on main): placed trees can't be deleted; rotation does nothing when the slider changes; the editor lags after a few placements. Fixed by editor-hotfix (PR #13, 8f4c3b6, merged after Mustafa's Brave check): delete, rotation, inspector selection capture; the lag needed no code fix, PR #8 and PR #10 removed its causes
 - N1 (found in 3a): the editor's Play never rebuilds the nav grid; a one-line change-set, Night queue item 1 (APPROVED), next after the 3a merge [verified: `editorPlay` sets mode='game' itself and never calls `deploy()`, where `navBuild()` runs]
 - Deferred, low (editor-undo-ground PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
-- Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)
+- Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001; in v2: ADR 0002, three.js bundled with no CDN tag, and ADR 0006 part 13 for the CSP, README register row CDN-SRI)
 - GitHub branch protection on `main` is on (Mustafa, 2026-10-17, in the implementer session's chat: "PROTECT-MAIN is done, main is protected"). Rules, read with the GitHub REST API on 2026-10-17 (`gh api repos/Mergincanli/Shamble-Frontlines/rules/branches/main`): "Shamble Ruleset 1" (active, targets the default branch `main`) blocks deleting and force-pushing `main`, requires a pull request (0 approvals) and requires the `gate` and `smoke` checks; a branch behind `main` may still merge (not strict); no classic protection rule. The `.claude/settings.json` deny rules stay a second layer (fragile by design). Decision PROTECT-MAIN: done (recommended option (a), plus a required pull request)
 - Fixed (PR #22 review, finding 5): CLAUDE.md's merge sentence now says the go comes after the APPROVE of the PR's current head and a later push needs a new review and go, as advisor.md:98–105 does (kit-v2-2, PR #23, 48ffb51)
 - Deferred, low (kit-v2-1): `tools/gate.mjs:333` and `tools/README.md:34` still call `gate-globals.json` "reviewed data, not a gate tool", which contradicts kit-v2-1's category 3 (gate files need Mustafa's go). It errs on the safe side; fix the wording when gate.mjs is next touched
@@ -327,7 +326,7 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
 - Bot nav, editor-made layouts (R1, tracked per the Advisor): rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check; new maps keep walkable gaps at least 6 m wide
 - Bot nav, navSteer "replan storm" (old; bot-poplar-wedge PERF-2): a bot whose straight line flickers clear/blocked replans every few frames; the wedge fix hits it more on Romania (budget-limited frames 0.9% -> 1.8%). Advisor: its own change-set in the greybox phase (bot-replan-storm)
 - Bot nav, A* gives up after 8000 nodes (old): a few far-corner routes fail and fall back to a straight line
-- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run. Tracked as an input for ADR-001 (deterministic shared simulation)
+- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run. Tracked as an input for ADR-001 (deterministic shared simulation; in v2: ADR 0004 part 4 and ADR 0002 part 7, README register row WALL-CLOCK)
 
 ## Health (latest measurements)
 | Metric | Value | When | Source |

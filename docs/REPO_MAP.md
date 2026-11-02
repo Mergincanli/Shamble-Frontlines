@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-01.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-02.
 
 ## Top level
 | Path | What it is |
@@ -37,7 +37,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/EDITOR_V2.md` | The map editor rebuild (draft spec) |
 | `docs/LOOK_V2.md` | The v2 look brief (Mustafa and the Advisor, 2026-10-31): the input of ADR 0003 and of ADR 0005's asset pipeline |
 | `docs/ENGINE_OVERVIEW.md` | The v2 engine on one page: the parts, the Rust ↔ TypeScript boundary, the data flow per tick and per frame, where each VISION_V2 §6 need lives |
-| `docs/SPIKE_PLAN.md` | Every v2 spike: its pass marks, its place in the order, its rough size |
+| `docs/SPIKE_PLAN.md` | Every v2 spike the drafts ask for (Proposed): what it proves, which pass marks judge it (by id; the numbers live in the drafts), who judges, its place in the order, its rough size; the foundation's acceptance checks and the asset-pipeline research |
 | `docs/EDITOR_V1_INVENTORY.md` | Every legacy map-editor feature with a keep / drop / improve mark |
 | `docs/LEGACY_INVENTORY.md` | Every legacy system: what, where, evidence, and a port / rewrite / redesign / drop mark (R7) |
 | `docs/LEGACY_TUNING.md` | Every legacy tuning table and constant, rendered from `legacy-tuning.json` (R7) |
@@ -51,7 +51,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/ROADMAP.md` | History and plan, terse |
 | `docs/ui_theme_mockup.html` | The war-room UI mockup (legacy UI source of truth) |
 | `docs/adr/` | Decision records; `0000-template.md` is the format; the v2 drafts 0001–0006 (Status: Proposed): netcode, code structure and toolchain, rendering, simulation core, content and abilities and assets, infrastructure |
-| `docs/adr/README.md` | The index of the v2 drafts and the register: decision codes, DESIGN-owned research ids, features whose need is outside VISION_V2 §6, loose ends |
+| `docs/adr/README.md` | The index of the v2 drafts and the register: the decisions the drafts ask for, DESIGN-owned research ids, features whose need is outside VISION_V2 §6, the loose ends, the codes the drafts cite |
 | `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape, the owners and each topic's status |
 | `docs/research/r1-simulation-core.md` | R1: the simulation core (ECS, tick, determinism, the Rust ↔ TypeScript boundary, abilities, data and hot reload) |
 | `docs/research/r2-netcode.md` | R2: netcode (transport, sync and prediction, interest, rooms, bandwidth budgets) |
@@ -65,8 +65,8 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/reports/` | One advisor report per change-set (`YYYY-MM-DD-<slug>.md`): the decision trail |
 | `docs/reports/2026-10-31-v2-research.md` | The R1–R6 research report (PR #28): outcome, evidence, risks, decisions needed |
 | `docs/reports/2026-10-31-v2-research-appendix.md` | Its appendix: coverage table, the 12 resolutions and the advisor's rulings, fetch audit, check outputs |
-| `docs/reports/2026-11-01-v2-decision-drafts.md` | The v2 decision drafts report (draft PR #33): outcome, evidence, risks, decisions needed |
-| `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full, Mustafa's decisions word for word, the records the report cites |
+| `docs/reports/2026-11-01-v2-decision-drafts.md` | The v2 decision drafts report (draft PR #33): outcome, evidence, reviews, risks, decisions needed |
+| `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full; Mustafa's decisions, the advisor's plan review and the plan's rules and steps, word for word; the steps and their commits; where each of the advisor's conditions is met; verification, the reviews and the final round |
 
 ## .claude/
 | Path | What it is |
