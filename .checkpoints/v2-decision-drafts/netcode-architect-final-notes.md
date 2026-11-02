@@ -1,1 +1,5 @@
 Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netcode-architect-fixes-final.md
+- 10:20 UTC: read the whole of ADR 0001 at 47eadd9 (= HEAD, 1511 lines) and every review named (EA, NA, SA, IE, GD, PA, RR, TE, fixcheck-a A8 / skeptic-4).
+- Plan: FIX blocks built by a script (scratchpad gen script) from line ranges at 47eadd9, so every BEFORE is whole lines copied; applied in order on a copy to test uniqueness.
+- Also handling items the reviews name against my text but the prompt's list omits: NA-4 (0001 parts 5, 7 arrival stamps), SA-2 (key per environment, part 11), SA-13 (test plan line), PA-1 (budgets table downstream row: mean in ES), GD-19/20 (pointers GD-PICK-VIS, GD-CARRIER).
+- New OQs planned: OQ-0001-15 own-movement display delay (EA Q1; Mustafa), -16 port plan (IE-7; the Advisor), -17 profiles' direction split (NA Q2; the Advisor), -18 kick bars the player (SA Q2; Mustafa), -19 ROOM-CRASH (the Advisor). NA Q1 extends OQ-0001-5; TE Q1 extends OQ-0001-2. GD-REJOIN: routed (ADR 0004 / AB10) + pointer in part 11.

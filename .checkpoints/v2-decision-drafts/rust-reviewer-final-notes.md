@@ -1,2 +1,6 @@
 Task: rust-reviewer final fix round on ADR 0004 (v2 decision drafts, at 47eadd9; output rust-reviewer-fixes-final.md)
 - started 2026-11-02; ADR 0004 unchanged between 47eadd9 and HEAD 1e0b0c2 (git diff empty)
+- read: findings in review-engine-architect (3), review-game-designer (4, 6, 7, 10, 15, 16, 17, 20, 21 = "GD-8" lows + questions), fixcheck-c F1 (=FC-1), fixcheck-b F10 (=FB-10), review-security-auditor 15, review-netcode-architect 8, review-rust-reviewer 3/4/9 + Q1 POOL-FULL, review-test-engineer 1/6 + Q1
+- check (native, .gate/rr-final-panichook, rustc 1.97.0): a std::panic::set_hook hook runs under panic = "abort", writes "panicked at src/main.rs:35:21: index out of bounds..." (83 bytes) into a fixed 256-byte static buffer with no allocation, then the process aborts (exit 134). Wasm not tested (no wasm32 target installed): PM-0004-61 must check the message arrives
+- source for RR-3: R2-ROOM-F8 (r2-netcode.md, Findings, lines 1459-1467: an uncaught panic ends only its own thread; "abort" terminates the process); R2-ROOM-REC2 (r2:2762-2769) keeps panic = "unwind"
+- TE-1 arithmetic check: at 60 Hz the abilities part stays 1 ms (part 6 sets it in ms) and the remainder is 4.17 - 3.87 = 0.30 ms, so TE-1's "half of each at 60 Hz" (0.5 ms, 1.40 ms) is wrong: route to engine-architect (SPIKE_PLAN) and netcode-architect (OQ-0001-2)
