@@ -32,8 +32,8 @@ BEFORE:
 AFTER:
 1. **Format, loader and checks:** JSON with one canonical writer (CD-1); one content crate with a whole-set check,
    length bounds on every collection, a report of each sim pool's worst case per mode, and no panics (CD-2); the
-   schema and content's TypeScript types from the same Rust types, their generators kept out of the shipped builds
-   (CD-3); versions and migrations (CD-4); one definition per file, one folder per kind (CD-5). *Need:* VISION_V2
+   schema and content's TypeScript types from the same Rust types, the generators' derives kept out of the shipped
+   builds (CD-3); versions and migrations (CD-4); one definition per file, one folder per kind (CD-5). *Need:* VISION_V2
    §6.1, §6.3, §6.5, §6.7; the pools' report: ADR 0004 parts 1 and 6.
 END
 
@@ -201,8 +201,8 @@ AFTER:
   reviewed length bound for every collection, and each sim pool's worst-case arithmetic beside its kind (CD-2); JSON
   without comments (OQ-0005-CD1); a simulation number tested in a new match, not the current one (CD-7); two
   generators that must agree (CD-3); an asset list kept in step with the files (AP-2); every material slot named into
-  a class, and every distinct slot content one more material (OQ-0005-AS4; the GPU section's part 1); two drawing
-  paths for buildings and props until
+  a class, and each distinct slot content costing a material of its own (OQ-0005-AS4; the GPU section's part 1); two
+  drawing paths for buildings and props until
 END
 
 ### FIX FB-7

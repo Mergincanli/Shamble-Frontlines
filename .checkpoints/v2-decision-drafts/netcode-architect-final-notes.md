@@ -10,3 +10,4 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 11:30 UTC: generator parts 1-3 done incl. coordinator items; writing notes.py and build.py run next.
 - 11:45 UTC: coordinator routed infra (8fa7173: OQ-0006-14 releases, -15 domain, -16 port plan; aim side file 16 B/27.6 MB, 14 days) and engine-architect 0002 items (arrival stamps + ping hold time, newest input per frame, client-endpoint crate, staging certs per OQ-0006-5, timers). Plan: drop my port OQ (use OQ-0006-16), renumber new OQs to -15..-18.
 - 12:00 UTC: build.py run (see result); fixes file written.
+- 12:10 UTC: build clean (57 FIX, 39 NOTE, no long lines added, no text under tables). Proofreading applied copy next.

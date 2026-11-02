@@ -14,3 +14,5 @@ Task B (follow-up, ~11:40 Amsterdam): ADR 0006 FIXes routed from engine-architec
 - Task B written: infra-engineer-fixes-final-b.md (11 FIX, 2 NOTE; BEFOREs by line range at 8fa7173, each once, no overlap, none in Pass marks). OQ-0006-13 narrowed (guard = OQ-0002-9). Q13/OQ-0006-7 split already in 8fa7173 (NOTE).
 DONE (task B)
 - Task B correction (coordinator): no OQ-0002-9 (OQ-0006-13 keeps the guard); R5-PREV-F6 is r5 796-804 (3 cites: 505, 891, 968). Rewriting batch b.
+- Task B corrected and rewritten: 11 FIX, 2 NOTE; OQ-0006-13 keeps the guard (folds in the delivery and Sentry environments and the self-approval question), B9 names OQ-0006-13 and `production`; R5-PREV-F6 cited at r5 796-804 in all 3 places.
+DONE (task B, corrected)
