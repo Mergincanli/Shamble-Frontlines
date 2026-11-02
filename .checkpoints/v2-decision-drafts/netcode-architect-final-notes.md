@@ -14,3 +14,6 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 16:31 UTC (17:31 Amsterdam): resumed after the spend limit; ADR 0001 still = 47eadd9; scratchpad generator intact; continuing proofreading from part 12.
 - 16:35 UTC: proofread parts 2-13 and the diagram: OK (fixes already in the file from the last build).
 - 16:37 UTC: proofread state table, catalogue, downstream bullet: OK.
+- 16:39 UTC: proofread upstream, budgets, failure modes, anti-cheat: OK.
+- 16:40 UTC: proofread option rows and trade-off: OK.
+- 16:42 UTC: proofread OQ-0001-2, -5, -6, -7: OK.
