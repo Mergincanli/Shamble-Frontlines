@@ -127,8 +127,8 @@ END
 ### FIX AD-6 (routed by graphics-engineer: AP-3's need)
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:
+  - Need: VISION_V2 §6.7; LOOK_V2 §2 (uniform details), §6.1 (the value hierarchy by material class), §6.4 (the glow
     language's emissive slots).
-- **AP-4. Asset files are served like the content bundle.**
 AFTER:
   - Need: VISION_V2 §6.7; LOOK_V2 §2 (uniform details; the ink "especially strong on buildings", which the structure
     class carries), §6.1 (the value hierarchy by material class), §6.4 (the glow language's emissive slots).

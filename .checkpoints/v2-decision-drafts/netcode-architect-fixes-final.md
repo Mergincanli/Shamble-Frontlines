@@ -64,8 +64,8 @@ AFTER:
    effects included (ADR 0005 leaves how the predicting sim gets them to this record), so a pick or an effect that
    changes move speed or a fire interval causes no correction; that section is sent unquantised, or the server
    quantises its own copy the same way each tick, and like every field it is sent when it changes (its real size is
-   measured, R2-XU-OQ15). Never predicted: damage, deaths and hits on others; the uplink
-   countdown and steals; purchases; upgrade offers and picks; weapon pickups (interim: OQ-0001-10); the player's own abilities
+   measured, R2-XU-OQ15). Never predicted: damage, deaths and hits on others; the uplink countdown and steals;
+   purchases; upgrade offers and picks; weapon pickups (interim: OQ-0001-10); the player's own abilities
 END
 
 ### FIX GD-1, SA-8, NA-9, PA-3, NA-4 (its 0001 half), RR-2 (part 5)
@@ -374,7 +374,8 @@ AFTER:
     handshakes in progress; a modest cap on connections per address (above 1), where an address is an IPv4 /32 or an
     IPv6 /64 (the prefix length is data: an IPv6 interface id is 64 bits, so one subnet gives a client 2^64
     addresses: RFC 4291 §2.5.1, read by the security review on 2026-11-02, not in the research), and every
-    per-address limit of parts 10 and 11 keys the same way; new sessions rate-limited, with quinn's retry or refusal under load and
+    per-address limit of parts 10 and 11 keys the same way; new sessions rate-limited, with quinn's retry or
+    refusal under load and
 END
 
 ### FIX IE-4 as routed from ADR 0002 (part 10, the staging certificate)
@@ -457,9 +458,10 @@ AFTER:
     The room, not the client, assigns team and squad. *Reconnect:* slot, team and squad are held for a grace window
     (data, proposed 60 s); the client fetches a fresh token; the newest connection for a player id wins and the older
     one is closed; whether a player who returns after the window gets their record (tracks, money) back is ADR 0004's
-    OQ-0004-10 (GD-REJOIN: Mustafa's, with OQ-0005-AB10; the record is ADR 0004's). *Private rooms:* a short code that only locates the
-    room, from a secure random source, with lookups limited per client, per address and globally and guest creation
-    limited per address (addresses keyed as in part 10); the creator is the host, and the room checks every host
+    OQ-0004-10 (GD-REJOIN: Mustafa's, with OQ-0005-AB10; the record is ADR 0004's). *Private rooms:* a short code
+    that only locates the room, from a secure random source, with lookups limited per client, per address and
+    globally and guest creation limited per address (addresses keyed as in part 10); the creator is the host, and the
+    room checks every host
     command (start, kick, lock, team and faction settings) against the host's player id (whether a kick also bars that
     player for the rest of the match is OQ-0001-17); settings are fixed at start and carry a faction per team
     (VISION_V2 §3 [DECIDED]). *Bots:* the slot table marks each slot human, bot or empty; bots per team = team size −
@@ -862,9 +864,9 @@ AFTER:
   arrives with the content and ability spike (wave 3), as 384 rows in the effect pool (8 per soldier at N = 48) with
   its 1 ms ceiling burned per tick, and economy, objectives, moments and events as the remainder topped up per tick
   after the built projectiles and bot decisions, to 0.30 ms at 60 Hz (4.17 − 3.87, arithmetic on ADR 0004 part 6;
-  2.80 ms at 30 Hz); (b) a stand-in burns, tick by tick, the step times the sim core spike recorded; (c) the 60 Hz check waits
-  until the real sim runs the stress scene (slice 6), and the tick stays at 30 Hz until then; (d) the 60 Hz check
-  waits until the content and ability spike's effect step has joined the sim core spike's sim. **Recommended: (a)**
+  2.80 ms at 30 Hz); (b) a stand-in burns, tick by tick, the step times the sim core spike recorded; (c) the 60 Hz
+  check waits until the real sim runs the stress scene (slice 6), and the tick stays at 30 Hz until then; (d) the
+  60 Hz check waits until the content and ability spike's effect step has joined the sim core spike's sim. **Recommended: (a)**
   with its burns: it keeps the single run, delays nothing and errs toward 30 Hz, since a pass still holds once the
   real parts meet their ceilings (the test review's reasoning); (c) is the fallback if the sim core spike's sim
   cannot run the stress scene in time. (b) is weaker because a replayed series loses the link between the sim's load
@@ -1075,8 +1077,9 @@ BEFORE:
 AFTER:
 - **After acceptance:** the protocol carries its version in `protocols` and in `Join`, so a message change is a
   version bump; the lobby can send each client only to rooms of its own build (part 11), and whether two versions run
-  side by side during a release, old rooms finishing while new ones start, is OQ-0006-14 (WT_DRAIN_SESSION can drain a session before a server shuts down: r2-netcode.md, R2-TRN-F37, lines 3439–3440); the
-  frozen legacy game stays the playable build until v2 replaces it.
+  side by side during a release, old rooms finishing while new ones start, is OQ-0006-14 (WT_DRAIN_SESSION can drain
+  a session before a server shuts down: r2-netcode.md, R2-TRN-F37, lines 3439–3440); the frozen legacy game stays
+  the playable build until v2 replaces it.
 END
 
 ### FIX NA-3 (Appendix A: R1-ABL-REC4)

@@ -100,6 +100,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   calibration run; the per-address cap raised for the run).
 - Routed by engine-architect's ADR 0002 batch (its NOTEs name what each row needs): PM-0002-6, -9, -10, -29, -41, -44,
   -51, -64, -66, -76, and a reported Worker-budget row (PA-13).
+- Routed by engine-architect's ADR 0002 batch, second part (61e9933): PM-0002-42 (G3: a planted `eval` in `client`),
+  PM-0002-44 (G5: a planted git dependency), PM-0002-46 (G8: a planted inline script in the built HTML) need bites.
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -317,4 +319,6 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   frame; the block's events released on the delayed timeline), the new `client-endpoint` crate in the overview's
   diagram and text, README rows for OQ-0002-9 (closing the deploy-job gap; Mustafa on the Advisor's advice), line 59's
   OQ-0002-5 row (macOS costs time, not money), I-13.
+- Routed by engine-architect's ADR 0002 batch, second part: README rows for OQ-0006-13 and OQ-0006-17; no OQ-0002-9
+  (ADR 0002 part 10 points to OQ-0006-13).
 

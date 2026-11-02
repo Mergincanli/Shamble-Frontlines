@@ -3,3 +3,4 @@ Task: ADR 0005 final fix round (step 10 reviews), engine-architect frame + Conte
 - 11:45 planned FIX set: FB-11(l5), EA-6+pools frame (97-99), pools frame part 1 (123-126), CD-2 pools (286-290), EA-6 CD-8 (388-389), spike item 2 (670), AP-3 (1392, 1401-1402), PA-11 AP-5 (1415), FB-13 (1716), GE-1 follow-ons (1773-1774, 1780, 1952-1953), FB-7 (1782), FC-8 (1819). New route: infra 8fa7173 (archive in records' bucket; OQ-0006-18 unreleased art -> OQ-0005-AP1).
 - 11:55 routes received: infra 8fa7173 (EA-6 archive, OQ-0005-AP1 visibility/OQ-0006-18); ADR 0002 RR-16 (CD-3 derives out of shipped builds)
 - 12:05 all routes in; drafting generator at scratchpad/ea0005-final/gen.py (BEFOREs by line range from 319d3b6 copy). Extra: Appendix A rows R1-DATA-REC2/REC3/REC6 + counts (REC3 -> changed: adopted 5, changed 6); frame Harder 1778-1780; OQ-0005-AP1 1489-1497 + table row 1861
+- 12:15 fixes file written (21 FIX + 6 NOTE); checking preview
