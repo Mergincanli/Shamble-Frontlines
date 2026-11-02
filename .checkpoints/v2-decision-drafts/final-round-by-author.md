@@ -93,6 +93,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   exits non-zero; with unit B if it lands in ADR 0004).
 - From review-test-engineer.md (your own review): PM-0001-30 follows TE-3 (a run counts only when the late-command
   counter is 0); a deterministic counter-wrap row follows TE-4, once netcode-architect writes it.
+- Routed by rust-reviewer's final batch (b815c85): PM-0002-33 checks that the panic message arrives; RR-3's server mark
+  (a panic in the tick ends the match, the process exits non-zero) goes beside PM-0001-26.
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -138,6 +140,11 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   "When a mark fails": a [DECIDED] item's technique leaves Low only under OQ-0003-16; a Low-frame checklist step (steps
   2, 4, 6, 7, 20), the tier named per step; steps 4 (the contact line), 10–12 (the soldier at the 4-material cap) and 27
   (the flash over the HUD); BS records the Worker's load; PM-0005-34 and -35 count distinct slot contents.
+- Routed by rust-reviewer's final batch (b815c85): PM-0004-29 names the prediction step (part 3's second entry point);
+  PM-0004-68 reads jitter online against the server-time estimate's schedule; PM-0004-61 checks that the panic message
+  arrives (the hook's fixed buffer); PM-0004-6 gets the pool-burst bite; PM-0004-2 counts the stand-in effect rows (384
+  plus a 1 ms burn at 30 Hz; at 60 Hz 1 ms and 0.30 ms); PM-0004-65 starts money at $300; the "no measurable mark" lines
+  for parts 17 and 19 point to the test plan and migration phase 6.
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -244,6 +251,11 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   with rust-reviewer's 0004 part; POOL-FULL is Mustafa's question).
 - From review-test-engineer.md: TE-8 low (0005:1256, :1277: searching the code for the ability ids is a weak proxy; the
   real proof is the test-only combination that works with zero Rust changes).
+- Routed by rust-reviewer's final batch (ADR 0004 at b815c85): AB-1's effect overflow points to OQ-0004-11 (which row
+  gives way when a pool is full; POOL-FULL: you propose, Mustafa confirms); AB8 says what a full offer queue does (offer
+  size and queue are now data in ADR 0004); AB10 cites OQ-0004-10 (a late rejoiner's record) and OQ-0004-12 (do bots
+  take pickups); check that AB-1 has an operation for spawn protection (ADR 0004 part 17 now gives 3 s of protection as
+  an effect).
 
 ## engine-architect, the synthesis: ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (last, after the drafts' batches)
 - FC-2 (README:269–270: G0; ADR 0006's S1–S5 collide with seam S4; B1–B11 are baseline items: skeptic-5 first); FC-3
@@ -276,4 +288,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   "without dropping frames"; the Advisor, confirmed by Mustafa), OQ-0003-18 (reduced motion; Mustafa), OQ-0003-19
   (telling factions apart by colour; Mustafa); SPIKE_PLAN:236–237 lists both houses; ENGINE_OVERVIEW's §6.9 row (about
   line 112) names part 7's presented-frame count (OQ-0003-17).
+- Routed by rust-reviewer's final batch (b815c85): README rows for OQ-0004-8 (steals; Mustafa with the game-designer),
+  -9 (is a carried cache public; Mustafa), -10 (a late rejoiner's record; Mustafa, with OQ-0005-AB10), -11 (which row
+  gives way when a pool is full; the game-designer proposes, Mustafa confirms), -12 (do bots take pickups; Mustafa);
+  a "Needs outside VISION_V2 §6" line: spawning, spawn protection, the Recruit respawn and the barracks mask (LOOP_V2 §2
+  and §5 only); SPIKE_PLAN's 60 Hz stand-ins are 1 ms and 0.30 ms.
 

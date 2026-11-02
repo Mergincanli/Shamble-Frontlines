@@ -12,6 +12,11 @@ Only your own text. In each draft, the "### Pass marks" section is test-engineer
   with rust-reviewer's 0004 part; POOL-FULL is Mustafa's question).
 - From review-test-engineer.md: TE-8 low (0005:1256, :1277: searching the code for the ability ids is a weak proxy; the
   real proof is the test-only combination that works with zero Rust changes).
+- Routed by rust-reviewer's final batch (ADR 0004 at b815c85): AB-1's effect overflow points to OQ-0004-11 (which row
+  gives way when a pool is full; POOL-FULL: you propose, Mustafa confirms); AB8 says what a full offer queue does (offer
+  size and queue are now data in ADR 0004); AB10 cites OQ-0004-10 (a late rejoiner's record) and OQ-0004-12 (do bots
+  take pickups); check that AB-1 has an operation for spawn protection (ADR 0004 part 17 now gives 3 s of protection as
+  an effect).
 Each finding's full text, evidence and proposed fix is in the file it names, all in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/. The session's tracking file, final-round-findings.md, lists them all by author.
 
 ## What to do with each finding

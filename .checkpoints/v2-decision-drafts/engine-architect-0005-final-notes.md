@@ -1,1 +1,2 @@
 Task: ADR 0005 final fix round (step 10 reviews), engine-architect frame + Content data + asset pipeline sections; output engine-architect-0005-fixes-final.md
+- 11:30 read EA-6, FB-7/11/13, FC-8, PA-11 (GE fixed GPU part 4 at 319d3b6, lines 1583-1588), AD-6 route; infra-engineer drafting 0006 part 12 archive (scratchpad ie-final/fixes_b.py); new route from coordinator: ADR 0004 part 1 pool capacities (b815c85) -> CD-2 reports each pool's worst case
