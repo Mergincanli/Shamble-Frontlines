@@ -15,3 +15,6 @@ Task: game-designer final fix round (step 10) on ADR 0005's ability section (319
 - block 14 written: AB-5 891-898 (what may be bought: faction list, mode rules table, tier and price per unit/vehicle, power-plant rise and terminal reach as numbers; Recruit price 0)
 - block 15 written: OQ-0005-AB7 decider line 1217 -> OQ-0005-AB15
 - block 16 written: new OQ-0005-AB14 (spawn protection: what it covers (a)/(b), what ends it (i)-(iii); Mustafa) and OQ-0005-AB15 (pick visibility (a)-(c); Mustafa) after AB13 (1274-1275)
+- block 10 rewritten in place to include OQ-0005-AB15
+- blocks 17-18 written: TE-8 item 1 (1281-1286: combination + rename-and-reorder test as proof; search = smell check) and u1 (1304)
+- blocks 19-21 written: item 5 (1298-1301: third leg + immunity case), u4 (1308-1309: a lost looted X, fixture drop rule), u6 first line (1311: offer of the data's size)

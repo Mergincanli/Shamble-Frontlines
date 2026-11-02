@@ -124,19 +124,19 @@ AFTER:
   | "pick one of three" (the offer) | the candidates a track offers at a level, and their requirements | the authority draws the offer (its size from data, 3) from ADR 0004's authority-only offers stream (part 8): a [shared stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream) would let the owner's client foresee its next offers, the reasoning that kept weapon spread in an authority-only stream, SEC-SPREAD (a) | a pick that was not offered, or for an offer that is no longer open, is refused |
 END
 
-### FIX GD-7 (the new OQ-0005-AB14) + POOL-FULL (where the proposal sits): the open questions' opening lines
+### FIX GD-7 (the new OQ-0005-AB14) + GD-PICK-VIS (the new OQ-0005-AB15) + POOL-FULL (where the proposal sits): the open questions' opening lines
 FILE: docs/adr/0005-content-abilities-assets.md
 BEFORE:
 The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
 other. None of AB1 to AB11 has a pick here: they are Mustafa's ("list them as open questions, don't decide them"), and
 the data model carries every option listed.
 AFTER:
-The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 are what his rules and LOOP_V2 leave open beside each
-other, and OQ-0005-AB14 is what LOOP_V2 §2's spawn protection leaves open. None of AB1 to AB11 or AB14 has a pick here:
-they are Mustafa's (for the upgrade questions, his own words: "list them as open questions, don't decide them"), and
-the data model carries every option listed, except where an option says it needs a reviewed Rust addition. Which row
-gives way when a pool is full is ADR 0004's OQ-0004-11, with the game-designer's proposal per kind in AB-1 for Mustafa
-to confirm.
+The first three are the ones Mustafa named; OQ-0005-AB4 to AB11 and AB15 are what his rules and LOOP_V2 leave open
+beside each other, and OQ-0005-AB14 is what LOOP_V2 §2's spawn protection leaves open. None of AB1 to AB11, AB14 or
+AB15 has a pick here: they are Mustafa's (for the upgrade questions, his own words: "list them as open questions, don't
+decide them"), and the data model carries every option listed, except where an option says it needs a reviewed Rust
+addition. Which row gives way when a pool is full is ADR 0004's OQ-0004-11, with the game-designer's proposal per kind
+in AB-1 for Mustafa to confirm.
 END
 
 ### FIX GD-8 (rust-reviewer's routed note: OQ-0005-AB8 says what a full offer queue does)
@@ -282,5 +282,79 @@ AFTER:
     also ADR 0003's to draw and LOOK_V2's to style.
   - Decider: Mustafa. What decides it: a design session, with OQ-0005-AB7 (if picks may add raw power, the answer
     pillar 3 needs is easier to give when enemies can see them), then playtests. Research ids: none.
+END
+
+### FIX TE-8 (ability item 1: the proof is behaviour; the id search is a smell check)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378, as written):** the test content (AMK, Bagpipe, Shabzon, Retro
+   Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the Juggernaut cannon) runs
+   with no ability-specific Rust code (zero matches for those ids in the sim crate's non-test code); a test-only
+   combination (the Shield's block on a vehicle, the Banzai speed buff on another class) behaves as its parts, with
+   zero Rust changes; the two §6.4 primitives work in a fixture; one number changed in data changes the next match
+   with zero Rust changes.
+AFTER:
+1. **AB-1, AB-2 (R1-ABL-REC1's marks, lines 2364–2378; the first mark's proof proposed):** the test content (AMK,
+   Bagpipe, Shabzon, Retro Lancer, Beam Katana, Torque Bow, frag grenade, Molotov, Riot Shield, Banzai, Bayonet, the
+   Juggernaut cannon) runs with no ability-specific Rust code. The proof is behaviour, not a search: a test-only
+   combination (the Shield's block on a vehicle, the Banzai speed buff on another class) behaves as its parts, with
+   zero Rust changes, and a scripted scenario over the test content gives the same event log (ids mapped back) with
+   every test id renamed and the definitions reordered in the data alone (proposed: a search for the ids, the
+   research's measure, misses code keyed by an enum variant or by a numeric handle per ability; it stays as a smell
+   check, zero matches for those ids in the sim crate's non-test code). The two §6.4 primitives work in a fixture; one
+   number changed in data changes the next match with zero Rust changes.
+END
+
+### FIX TE-8 (u1, the same as mark 1)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+   - u1: no track-specific Rust code (zero matches for the test track ids in the sim crate's non-test code, as mark 1);
+AFTER:
+   - u1: no track-specific Rust code, proven as mark 1 is: u2 to u6 pass on test-only tracks written in data alone,
+     and give the same logs with the test track ids renamed and the definitions reordered; zero matches for those ids
+     in the sim crate's non-test code is the smell check;
+END
+
+### FIX GD-8 (my review's finding 8, the game-designer's half: the triangle's third leg) + GD-7 (the immunity rule's case), ability item 5
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+5. **AB-6, AB-7 (proposed golden cases):** from data alone, the CD13 matchups reproduce: the Warrior kills a Conscript
+   in 0.86 s within one tick (R1-ABL-REC3's mark, lines 2416–2418, ADR 0004's); the Peacekeeper kills a Warrior in
+   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The knockback operation
+   moves a target with no Javelin-specific code. Reason: these are the numbers the counter check uses (AB-7).
+AFTER:
+5. **AB-6, AB-7 (proposed golden cases):** from data alone, the CD13 matchups reproduce: the Warrior kills a Conscript
+   in 0.86 s within one tick (R1-ABL-REC3's mark, lines 2416–2418, ADR 0004's); the Peacekeeper kills a Warrior in
+   0.85 s when 11 of 16 pellets land; a Peacekeeper behind the Shield takes 63 SMG body hits. The triangle's third leg
+   (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up
+   as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit
+   deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181). The knockback
+   operation moves a target with no Javelin-specific code. AB-2's immunity rule: a soldier inside its spawn protection
+   takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz),
+   with no protection-specific code; this holds under every option of OQ-0005-AB14. Reason: these are the numbers the
+   counter check uses (AB-7), and spawn protection (LOOP_V2 §2) is the one pipeline rule the research does not list.
+END
+
+### FIX GD-8 (my review's finding 13, as it applies to my own u4: a lost gun, not a voluntary drop, OQ-0005-AB1 and AB9 open)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+   - u4, a lost gun: the player drops W and takes another W from the world, and the player's W picks apply to it; a
+     second player who takes the first gun gets their own W picks and none of the first player's;
+AFTER:
+   - u4, a lost gun: the player holds a looted weapon of type X, loses it on death (dropped by the fixture's drop rule,
+     a test rule while OQ-0005-AB9 is open), and takes another X the fixture places, and the player's X picks apply to
+     it; a second player who takes the first gun gets their own X picks and none of the first player's;
+END
+
+### FIX GD-8 (the hard-coded three, in u6)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+   - u6, offers: the authority draws three candidates; a pick that was not offered, or for a closed offer, is refused in
+     100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs on two runs (and on
+     native and Wasm wherever the stream is one the client holds, ADR 0004).
+AFTER:
+   - u6, offers: the authority draws an offer of the data's size (3); a pick that was not offered, or for a closed
+     offer, is refused in 100 % of 1,000 forged picks; the same seed and the same inputs give byte-identical offer logs
+     on two runs (and on native and Wasm wherever the stream is one the client holds, ADR 0004).
 END
 
