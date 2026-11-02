@@ -7,3 +7,5 @@
 - FC-3 FIX written (SPIKE_PLAN:180-183; R1-RR-OQ5 out of 'It decides', the Advisor sets the limit, ADR 0002 part 4 at 0002:263-266). Next: FC-4
 - FC-3 FIX written (SPIKE_PLAN:180-183; R1-RR-OQ5 moved out of It decides; ADR 0002 part 4, 0002:263-266). Coordinator added: README CF-2 row ADR 0001 line 161 -> 162; check every register line pointer into drafts by script. Next: FC-4
 - FC-4 FIX (SPIKE_PLAN:281-282: ADR 0006 part 13 item B9, OQ-0006-13) and SA-1-routed FIX (item 6 token revoked, 261-263) written. Next: FC-5/GE-12 (ENGINE_OVERVIEW) with the ADR 0002/0001-routed lines 37 and 94 and client-endpoint crate
+- NA-17 FIX (OVW:8-10), client-endpoint label FIX (OVW:28), FC-5/GE-12/NA-7 diagram FIX (OVW:37-42) written. Next: OVW words 51-57, boundary 59-66, deps 70-75, steps 88-94, §6.9 row 112
+- OVW words 51-57, boundary 60-66, deps 70-75 FIX written. Next: OVW step 4 (88-90), per frame (92-94), §6.9 row (112)

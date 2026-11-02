@@ -6,13 +6,13 @@ nothing of its own; every detail links to its draft. The spikes are in [SPIKE_PL
 
 ## The engine in one paragraph
 One Rust simulation decides everything that counts. The same code runs natively in each room process on the match
-server and as WebAssembly in one Web Worker in the browser, where it is the client endpoint online (prediction and
-reconciliation) and the local server in local play, from slice 1 (SLICE-ORDER, condition 1). The page is TypeScript on
-three.js `WebGPURenderer` with its WebGL 2 fallback; it draws, animates and plays sound from one block of data per tick
-and never decides a hit, a death or a purchase. Content (units, vehicles, weapons, abilities, effects, upgrade tracks,
-modes, maps, tuning) is JSON that one Rust content crate validates the same way on the server, in the Worker and in the
-editor. The server ticks at 30 Hz (TICK-30) for up to N = 48 players (the largest mode, 24v24: MODES-3 (a)); 60 Hz
-only with [the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin).
+server and as WebAssembly in one Web Worker in the browser, where it is the client endpoint (prediction and
+reconciliation) online and in local play, and in local play also the local server, from slice 1 (SLICE-ORDER,
+condition 1). The page is TypeScript on three.js `WebGPURenderer` with its WebGL 2 fallback; it draws, animates and
+plays sound from one block of data per tick and never decides a hit, a death or a purchase. Content (units, vehicles,
+weapons, abilities, effects, upgrade tracks, modes, maps, tuning) is JSON that one Rust content crate validates the
+same way on the server, in the Worker and in the editor. The server ticks at 30 Hz (TICK-30) for up to N = 48 players
+(the largest mode, 24v24: MODES-3 (a)); 60 Hz only with [the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin).
 
 ## The parts and the boundary
 ```mermaid
@@ -25,7 +25,7 @@ flowchart TB
   end
   subgraph WK["Web Worker (ADR 0002 part 5, part 6)"]
     SW["sim-worker: paces the tick"]
-    WASM["sim-wasm (Rust as Wasm)<br/>client endpoint: prediction, reconciliation, interpolation<br/>local server: room + sim"]
+    WASM["sim-wasm (Rust as Wasm)<br/>client-endpoint: prediction, reconciliation, interpolation, aim cast, block writer<br/>local server: room + sim"]
     NET["net: WebTransport, WebSocket fallback"]
   end
   subgraph SRV["Match server: native Rust (ADR 0001, ADR 0006)"]
@@ -34,12 +34,12 @@ flowchart TB
   end
   CONTENT["content crate: JSON validated, one hashed bundle (ADR 0005)<br/>§6.1 modes · §6.3 abilities and effects · §6.7 factions"]
   SIM["sim crate: plain typed tables, integer ticks, parry3d, baked navigation (ADR 0004)<br/>§6.2 the 3D sim · §6.3 · §6.4 vehicles · §6.5 economy · §6.8 moments"]
-  IN -->|"per tick: one command, posted"| SW
-  SW -->|"per tick: one transferred block: header, entity sections, events"| R
+  IN -->|"per frame: the newest input and cursor ray, posted"| SW
+  SW -->|"per tick: one transferred block: header, entity sections, owner-only data, events"| R
   IN -->|"per frame: camera"| R
-  R -->|"per frame: interpolate, animate, draw the newest block"| R
+  R -->|"per frame: interpolate between the two newest blocks, animate, draw"| R
   R -->|"per frame: events as sound"| AU
-  R -->|"per frame: events as HUD feedback"| HUD
+  R -->|"per frame: events and owner-only data as HUD"| HUD
   SW --- WASM
   WASM --- NET
   NET <-->|"per tick: commands up; snapshots and events down (ADR 0001 protocol)"| ROOM
@@ -48,31 +48,38 @@ flowchart TB
   SIM -.->|"same code"| ROOM
   CONTENT -.->|"read by id"| SIM
 ```
-In words: the page posts one command per tick to the Worker and receives one block per tick back; it makes no call
-into Wasm and touches no network (ADR 0002 part 5). Per frame, the page interpolates, animates and draws the newest
-block and plays its events as sound and HUD feedback (ADR 0003 part 10). The Worker holds the Rust sim as Wasm and
-owns the connection (ADR 0002 part 6). Online, the Worker talks to the room process over WebTransport, or WebSocket
-when that fails (ADR 0001 part 10); in local play the same Worker runs the room and the sim itself, behind the same
-messages (SLICE-ORDER condition 1; ADR 0002 part 6). The sim crate and the content crate sit below everything. Each
-part's label names the VISION_V2 §6 items it serves; the table below gives the draft and part.
+In words: each drawn frame the page posts its newest input, with the cursor ray, to the Worker, and it receives one
+block per tick back; it makes no call into Wasm and touches no network (ADR 0002 part 5). Per frame, the page
+interpolates between the two newest blocks, animates and draws, and plays the block's events as sound and HUD feedback
+(ADR 0003 part 10). The Worker holds the Rust sim as Wasm, with the client endpoint in its own crate, and owns the
+connection (ADR 0002 parts 3 and 5); it releases a remote entity's spatial events on that entity's drawn timeline
+(ADR 0001 part 7). Online, the Worker talks to the room process over WebTransport, or WebSocket when that fails (ADR
+0001 part 10); in local play the same Worker also runs the room and the sim as the local server, which its client
+endpoint reaches through the loopback with the same messages (SLICE-ORDER condition 1; ADR 0002 part 6). The sim crate
+and the content crate sit below everything. Each part's label names the main VISION_V2 §6 items it serves; the table
+below gives every draft and part.
 
 **The Rust ↔ TypeScript boundary** (ADR 0002 part 5; interfaces I-2, I-3, I-5 in [the register](adr/README.md#codes-the-drafts-cite)):
 - **Down (Worker → page):** one transferred output block per tick (B2), with a header (tick, layout hash, counts),
-  sections per entity kind and an event section (the events of ADR 0004 part 19, such as hits, deaths and kills,
-  blasts, purchases, uplink cache events, tech tiers, upgrade picks and pickups, and moments); the SharedArrayBuffer
-  ring (B3) is measured against it in the boundary spike. The fields of remote entities online are ADR 0001's; the
-  layout is ADR 0002's.
-- **Up (page → Worker):** one command per tick, posted, including the world aim point from the page's cursor ray
-  (interface I-19; ADR 0001 part 5); a small control API (start, mode flag, content bundle).
+  sections per entity kind, the local player's owner-only data (own weapon, money, upgrade tracks and offers) and an
+  event section (the events of ADR 0004 part 19, such as hits, deaths and kills, blasts, purchases, uplink cache
+  events, tech tiers, upgrade picks and pickups, and moments, each in the block its entity's drawn time reaches); the
+  SharedArrayBuffer ring (B3) is measured against it in the boundary spike. The fields of remote entities online are
+  ADR 0001's; the layout is ADR 0002's.
+- **Up (page → Worker):** the newest input, posted once per drawn frame with the cursor ray and the view time; each
+  tick the Worker takes the newest post (running press totals lose no press) and fills the tick's one network command,
+  world aim point included (interface I-19; ADR 0001 part 5; ADR 0002 part 5); a small control API (start, mode flag,
+  content bundle).
 - **Types:** generated from Rust into `packages/types`: the block layout and its hash, the protocol types, the content
   schema and types (ADR 0002 part 5; ADR 0005 CD-3). No call per entity per frame crosses the boundary.
 
 **Dependencies point one way** (ADR 0002 part 3, each a gate check): `sim` depends on `content` only, with no
-transport, no async runtime and no clock; `room` builds for Wasm with no async runtime; `protocol` uses `sim` and
-`content` types; `sim-wasm` = `sim` + `room` + `protocol` + `content`, never `navbake` or `server`; `server` adds the
-transport and the runtime; `client` never reaches `editor`. Among the tools, `devtools` may depend on any workspace
-crate and `navbake` on `sim` and `content`; the editor uses `client` code and the `navbake` and `sim` Wasm; nothing
-imports `legacy/` or `spikes/`. Each crate enters with the first slice that needs it.
+transport, no async runtime and no clock; `room` and `client-endpoint` build for Wasm and natively with no async
+runtime, no transport and no clock; `protocol` uses `sim` and `content` types; `sim-wasm` = `client-endpoint` + `room`
++ `sim` + `protocol` + `content`, never `navbake` or `server`; `server` adds the transport and the runtime; the
+`supervisor` links no sim code; `client` never reaches `editor`. Among the tools, `devtools` may depend on any
+workspace crate and `navbake` on `sim` and `content`; the editor uses `client` code and the `navbake` and `sim` Wasm;
+nothing imports `legacy/` or `spikes/`. Each crate enters with the first slice that needs it.
 
 ## The data flow
 **Per tick (30 Hz; ADR 0004 parts 4–5, ADR 0001 parts 2–9):**
