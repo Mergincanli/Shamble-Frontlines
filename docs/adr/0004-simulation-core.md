@@ -328,7 +328,11 @@ research ids, and the need it serves.
    written reason, for a lookup-only map outside the serialized state (the lint is ADR 0002's, R5-RUSTLINT-REC2). After
    each tick the sim writes a canonical serialization of its whole state (fixed field order, floats by `to_bits`, the
    streams' state, the tick counter), field by field and never as raw struct bytes (padding bytes are uninitialised,
-   R1-RR-OQ6), and hashes it with a fixed, unseeded hash function: the state hash (which function is picked in the sim
+   R1-RR-OQ6), with every integer, every length and every index at a fixed width and little-endian, and no `usize`
+   in the serialized or hashed bytes (proposed: `usize` is 32 bits on wasm32 and 64 bits on x86-64, so a length
+   written as `usize`, or a hasher fed through `std::hash::Hasher`, whose derived `Hash` writes slice lengths with
+   `write_usize`, would differ by target at tick 0; PM-0004-21 checks it). It hashes those bytes as one byte string
+   with a fixed, unseeded hash function: the state hash (which function is picked in the sim
    core spike; the research names none). The determinism suite runs on every sim change: a recorded match (the seed, the
    map and mode data, the content data's hash and the per-tick inputs) runs natively twice in separate processes, as Wasm
    in Node.js, and as Wasm in Chrome and Edge, Firefox and Safari; it reports the first mismatching tick with a

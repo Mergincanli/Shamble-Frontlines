@@ -1,1 +1,2 @@
 Task: follow-up batch B for ADR 0003 (OQ-0003-20 HEAT-SOAK; optional teardown rule, GW18 in part 11, OQ-0003-16 names step 31). Output graphics-engineer-fixes-final-b.md. Started ~20:45.
+- Read held OQ-0003-20 block; verified LOOP_V2 §8 'about 20 min' (line 100), r3 1162-1164, GW18 at LI line 206, step 31 and PM-0003-45 on disk. Plan: adopt OQ-0003-20 (adapted: no review ref, (a)/(c) marked proposed), part 8 pointer, part 10 teardown rule, part 11 + trace row GW18, OQ-0003-16 and part 7 name step 31.

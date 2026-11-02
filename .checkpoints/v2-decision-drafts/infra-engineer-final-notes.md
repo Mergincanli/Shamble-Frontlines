@@ -17,3 +17,4 @@ DONE (task B)
 - Task B corrected and rewritten: 11 FIX, 2 NOTE; OQ-0006-13 keeps the guard (folds in the delivery and Sentry environments and the self-approval question), B9 names OQ-0006-13 and `production`; R5-PREV-F6 cited at r5 796-804 in all 3 places.
 DONE (task B, corrected)
 Task C (~20:42 Amsterdam): adopt OQ-0006-20 (test-engineer's held block) and spike item 2's cap wording -> infra-engineer-fixes-final-c.md; BEFOREs from disk now
+- Task C written: infra-engineer-fixes-final-c.md (3 FIX: OQ-0006-20 adopted with Carries fixed to 'changed', spike 2 cap, Appendix R6-COST-REC1). DONE (task C)
