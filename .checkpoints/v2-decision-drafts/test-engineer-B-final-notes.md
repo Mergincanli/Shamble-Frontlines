@@ -25,3 +25,5 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0003 blocks so far: intro 1022-1023, scenes 1041-1048, H/S/Stats/V 1049-1061, PM-0003-2 (1092), -3 (1093), -6 (1096), -7 (1097), -33 (1124). Next: -9, -12, -16, -19?, -22?, -23, -29?, -36, new rows -44..-47 (before line "| **Later, at each three.js upgrade**"), fail route 1137-1146, no-mark lines, checklist
 - 0003 PM-0003-9 done (AD-10, PA-10)
 - 0003 PM-0003-12 done (PA-8 routed)
+- 0003 PM-0003-16 done (PA-10, GE-8, GE-14)
+- 0003 PM-0003-19 (PA-14) and -23 (AD-1/GE-4 floor) done
