@@ -27,6 +27,11 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   players"); the optional FA note (0001:809–811 could cite PM-0002-25).
 - Questions to carry as open questions where they are yours: NA Q1 (the rewind cap), NA Q2 (the profiles' direction
   split), EA Q1 (own-movement delay at 30 Hz), SA Q2 (does a host's kick bar the player for the match), GD-REJOIN.
+- From review-rust-reviewer.md: RR-2's 0001 half (0001:348–349: room timers count ticks; no clock read inside `room`
+  or the client endpoint); RR-3 medium (0001:352–353, 554: with the sim on its own thread and `panic = "unwind"`, a panic
+  in the tick leaves a zombie room: the match ends and the process exits non-zero; the tick and network threads share
+  only channels; with rust-reviewer's 0004:472). Question ROOM-CRASH (the Advisor: the match ends, recommended, or the
+  room resumes from a snapshot, a generic feature for later).
 
 ## infra-engineer: ADR 0006, all but "### Pass marks"
 - High: SA-1 (the preview token: production deploys only from main with its own environment and token; a required
@@ -71,6 +76,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   calls as instance exports has no source); EA-1's follow (PM-0002-9, once part 5 lands); SA-1's follow (PM-0002-66: a
   bite with a test PR that edits the deploy job); NA-7 (PM-0002-13 vs -64: when the page posts its command); PA-5
   (PM-0002-28 vs PM-0004-8: one reading of "30+ fps"; align with unit B).
+- From review-rust-reviewer.md: RR-1's bite (PM-0002-41: a planted `powi` or `min` on signed zero); RR-6 (PM-0002-6:
+  a bite for a stale view of Wasm memory after growth); RR-8 (PM-0002-29: measure link-time optimization and
+  `codegen-units`, Brotli beside gzip); RR-3's mark (one pass mark: a panic in the tick ends the match and the process
+  exits non-zero; with unit B if it lands in ADR 0004).
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -93,6 +102,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   disjoint frame); GE-10 (PM-0005-34: a `.gltf` file's external buffers and images); GE-11 (PM-0005-42: reading colours
   from materials does not prove each backend draws them); GE-14 (PM-0003-2: WebGPU validation errors may not reach the
   console: a question, unverified).
+- From review-rust-reviewer.md (its ADR 0004 pass-mark review, APPROVE WITH NOTES): RR-1's bite (PM-0004-23); RR-4's
+  burst bite (PM-0004-6: fill a pool past its capacity); RR-11 (PM-0004-21: the state hash and serializer must not
+  depend on `usize` width); RR-12 (PM-0004-24: the finite-state check works on the release builds it rides on); RR-13
+  (PM-0004-60: name a small scene; at the stress scene 10 million ticks take about 23 hours).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -107,6 +120,12 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   the pickup pool's capacity and full-pool rule).
 - Questions: GD-STEAL, GD-REJOIN, GD-CARRIER, GD-BOT-LOOT (Mustafa's; open questions where ADR 0004 holds the rule).
 - Plus the findings of your own step-10 review against ADR 0004's pass marks go to test-engineer, not you.
+- From review-rust-reviewer.md (your own review of other drafts; these touch your text): RR-3's 0004 half (0004:472:
+  a panic in the tick ends the match); RR-4 medium (0004:126–131: no pool (projectiles, active effects, pickups) has a
+  capacity or an overflow rule, yet the sim must not allocate in steady state: capacities from the mode and content at
+  match start, one overflow rule on every target; with game-designer's 0005:816–817); RR-9 low (0004:473–474: a trap
+  carries no panic message: a small panic hook writes it where the host can read it). Question POOL-FULL (Mustafa,
+  through game-designer: refuse the new item with a counter, recommended, or end the oldest early).
 
 ## engine-architect, ADR 0002, all but "### Pass marks"
 - High: SA-1 (part 10: the preview job holds no token a branch can rewrite; production deploys only from main, in its
@@ -125,6 +144,20 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - From review-graphics-engineer.md: GE-2 medium (0002:494–497: on a runner with no GPU the research puts every CI
   browser on WebGL 2, r3:159–169, 279–283: CI never runs the WebGPU backend and the `forceWebGL` run repeats the default;
   state it and add a WebGPU smoke run; with test-engineer's PM-0003-36).
+- From review-rust-reviewer.md (2026-11-02 about 11:20; ADR 0002 REVISE, small): RR-1 medium (0002:356–358: the float
+  lint bans only "transcendental" methods; std 1.99.1 calls `powi`, `hypot`, `cbrt`, `to_degrees`, `to_radians`
+  non-deterministic and `min`/`max`/`clamp` may return either signed zero: ban every method outside ADR 0004 part 7's
+  allow-list, sim helpers for min/max/clamp); RR-2 medium (0002:182, 193–196: nothing stops `room` or the client
+  endpoint from reading the clock; std's `Instant::now` panics on the browser's Wasm target: timers count ticks, the
+  host passes time in as a value, the lint covers `room`, `protocol` and `sim-wasm`; with netcode-architect's
+  0001:348–349); RR-5 low (0002:267–271: R1-RR-OQ6 confirmed by rust-reviewer: field by field, no `unsafe`, on three
+  conditions: one layout table drives the writer, the generated offsets and the layout hash; fixed-width little-endian
+  integers; alternatives only if the writer's p99 exceeds 0.67 ms in Wasm on the minimum laptop, proposed); RR-6 low
+  (0002:281–282: a fresh view of Wasm memory after every call); RR-7 low (0002:238, 460: determinism runs use the shipped
+  file after wasm-opt; the build-flag check fails on binaryen's `--fast-math`); RR-10 low (0002:200–203: the
+  same-feature check covers `devtools` and `navbake`); RR-14 low (0002:365–366: the "indices come from its own pools"
+  reason is wrong for client-sent ids); RR-15 low (0002:138, 151: a dated nightly for the fuzz jobs); RR-16 low
+  (0002:287–289: ts-rs and schemars derives kept out of the shipped builds).
 
 ## engine-architect, ADR 0005: the frame, content data and the asset pipeline
 - Medium: EA-6 (0005:388–389 hands the archive of shipped content sets to ADR 0006, which has none: with
@@ -151,6 +184,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 
 ## game-designer: ADR 0005's "The ability and effect system"
 - (none yet from the six reviews; the rust-reviewer, graphics-engineer and art-director reviews may add some)
+- From review-rust-reviewer.md: RR-4's 0005 half (0005:816–817: the active-effect pool's capacity and overflow rule;
+  with rust-reviewer's 0004 part; POOL-FULL is Mustafa's question).
 
 ## engine-architect, the synthesis: ENGINE_OVERVIEW, SPIKE_PLAN, docs/adr/README.md (last, after the drafts' batches)
 - FC-2 (README:269–270: G0; ADR 0006's S1–S5 collide with seam S4; B1–B11 are baseline items: skeptic-5 first); FC-3

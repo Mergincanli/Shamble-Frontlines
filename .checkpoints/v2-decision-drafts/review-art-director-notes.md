@@ -32,3 +32,5 @@ Task: art-director review of the v2 decision drafts (plan step 10, wave 2), comm
 - Next: grep README/ENGINE_OVERVIEW for look decisions; write review file.
 - README/ENGINE_OVERVIEW grep: no look decision beyond LOOK_V2 found; README:247 lists the look features as LOOK_V2-only traces; R2-INT-OQ2 camera DESIGN (README:119).
 - Writing review-art-director.md now (verdicts: 0003 REVISE; 0005 asset+GPU APPROVE WITH NOTES; SPIKE_PLAN look APPROVE WITH NOTES).
+- Review file written: .checkpoints/v2-decision-drafts/review-art-director.md (3 verdicts, 14 findings, 3 questions, not-checked). Counts corrected (38 trace rows).
+DONE
