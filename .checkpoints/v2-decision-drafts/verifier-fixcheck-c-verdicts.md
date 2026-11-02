@@ -236,9 +236,10 @@ Real: 0. Script artifacts: 38.
 - Claims, rounds 3 and 4 (A1–A67): 66 confirmed (4 of them with a wording note: A30, A49, A57, A61), 1 unsupported
   (A43), 0 wrong, 0 citation off. ADR 0001's anchors: 35 old pointers (36 blocks with the wrap) resolved in NA-draft,
   35 of 35 name the row or part the old line meant. Inventory rows: 18 of 18 with id, line, mark and pending note
-  matching `docs/LEGACY_INVENTORY.md`; 14 LOOK_V2 section citations, 14 match `docs/LOOK_V2.md`.
-- Claims, synthesis (B1–B28): 25 confirmed (3 with a nit: B2, B3, B10), 1 partly wrong (B25), 1 citation off (B13),
-  plus B11's old neighbour (Findings 3).
+  matching `docs/LEGACY_INVENTORY.md`; 10 LOOK_V2 section citations and 5 "LOOK_V2 names none of it" claims, all
+  matching `docs/LOOK_V2.md`.
+- Claims, synthesis (B1–B28): 26 confirmed (3 with a nit: B2, B3, B10), 1 partly wrong (B25), 1 citation off (B13);
+  B11's unchanged neighbour is Findings 3.
 - Blocks: rounds 3 and 4, 13 groups covering 60 FIX: 12 resolved, 1 partly (PM-0002-29's header); synthesis, 53 FIX
   and 4 NOTE: 53 resolved, 5 with a small new problem (blocks 2, 3, 20, 26, 48). The synthesis fix file replays to
   47eadd9 byte for byte.
@@ -315,4 +316,5 @@ drafts, STATUS, LOOK_V2, LOOP_V2, EDITOR_V2, VISION_V2, LEGACY_INVENTORY, the re
   container; the syntax is standard Mermaid flowchart syntax.
 - A43 (wasm-bindgen's exported allocator) at its source: not fetched, as no mark rests on it.
 - The gate (`node tools/gate.mjs`) was not run: this unit is docs-only fix verification, and the earlier units and CI
-  cover the gate; no source file changed in 57c43c2..47eadd9 (`git diff --stat` lists docs and checkpoint files only).
+  cover the gate; no source file changed in 57c43c2..47eadd9 (`git diff --name-only`: 0 files outside `docs/` and
+  `.checkpoints/`).

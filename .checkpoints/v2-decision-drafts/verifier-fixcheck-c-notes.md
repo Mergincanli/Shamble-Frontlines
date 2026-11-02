@@ -10,4 +10,6 @@ Task: verifier-fixcheck-c (re-verify fix rounds 3-4 of the v2 decision drafts af
 - 11:05 cite_check 0002: 38 flags in 13 groups (doc lines 60,63,65,110,169,173,209,222,245,311,437,514,541,902); classifying pair by pair. Scratch: .gate/fixcheck-c/cite0002*.txt
 - 11:15 cite flags: all 38 script artifacts (pairs checked: 0 real; R5-TEST-REC3's cited r5:1444-1445 is its Reason, id at r5:1431; R1-DET-REC6's r1:2236-2237 its Serves line, id at r1:2222). Next: write blocks table, flags table, counts, findings.
 - 11:25 round 3/4 fix files: 60 FIX, 58 AFTER texts at HEAD; the 2 others (0005 inventory fixes-3) are superseded by fixes-3b, whose BEFORE is their AFTER. Writing verdicts sections 1b–6 now.
-- 11:40 verdicts sections 2–4 written. Next: counts, findings, fetch audit, not verified; then DONE and report.
+- (about 11:00; earlier stamps after 09:50 are estimates, the run was cut 09:50–10:10) verdicts sections 2–4 written. Next: counts, findings, fetch audit, not verified; then DONE and report.
+- 11:08 verdicts file complete (sections 1, 1b, 2, 3, 4, Counts, Findings 1–10, Fetch audit (none), Not verified). VERDICT: PASS WITH NOTES.
+DONE

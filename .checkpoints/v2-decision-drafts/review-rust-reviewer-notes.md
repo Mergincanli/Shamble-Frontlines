@@ -18,3 +18,5 @@ Task: rust-reviewer review of the v2 decision drafts at 47eadd9 (plan step 10, w
   F9 (low) panic message lost on trap; a tiny panic hook writing message to a buffer the host reads (no console_error_panic_hook dep).
   F10 (low) G5 same-feature check: server vs sim-wasm only; devtools/navbake natively also run the sim (reference hashes, bench). Include them.
   Next: 0004 pass marks domain notes; README register for my items; ENGINE_OVERVIEW skim; write review file.
+- 11:06 Resumed after the spend-limit cut (about 09:50); docs unchanged at 47eadd9. binaryen --fast-math fetch failed at the cut: retry once, else a question.
+- 11:09 binaryen optimization-options.h (main) --fast-math/-ffm: 'Optimize floats without handling corner cases of NaNs, rounding, and negative zero'. F11 (low-med): G10 must run the shipped post-wasm-opt artifact; build-flag check bans -ffm.

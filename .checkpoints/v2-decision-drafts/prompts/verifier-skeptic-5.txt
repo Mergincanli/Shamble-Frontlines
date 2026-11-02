@@ -1,0 +1,14 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: verifier (a fresh one, as the skeptic, plan step 7) · effort: xhigh · model: opus · 2026-11-02, saved about 11:07 Amsterdam
+
+You are the skeptic of plan step 7 for the v2 decision drafts of SHAMBLE FRONTLINES. Verifier fixcheck-c marked the finding below "partly wrong". Try to REFUTE it: show the document's text is right, or right enough. Read the documents at commit 47eadd9 (branch claude/laughing-lovelace-ox61se). Default to "upheld" only when the evidence supports it. You edit no doc; notes under /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/ only. The verifier's file: verifier-fixcheck-c-verdicts.md in that folder (its finding 2). Nothing here needs a web page.
+
+The finding: docs/adr/README.md lines 269–270 list the draft-local codes. The verifier says three parts of that list are wrong. (a) It says "G1–G13", but ADR 0002 also has a G0 (0002:450). (b) It says "S1–S3", but ADR 0006 runs S1–S5 (0006:503–506), so ADR 0006's S4 collides with the seam code S4. (c) It calls B1–B11 options, while they are part 13's baseline items. Judge each part.
+
+## Write
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-skeptic-5-results.md: one row per part, `| part | upheld / refuted / partly | the evidence (quote and place) | the smallest correct text, if upheld |`.
+
+## Saving your progress
+Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-skeptic-5-notes.md (look there first; end with DONE). Never commit or push. Finish by 12:15 Amsterdam.
+
+## Return
+At most 5 lines: each part's outcome, and your file's path.
