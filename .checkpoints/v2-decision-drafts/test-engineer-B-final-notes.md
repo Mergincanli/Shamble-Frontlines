@@ -42,3 +42,5 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0004 PM-0004-8 done (PA-5 my half)
 - 0004 PM-0004-21 done (RR-11); route part 9 clause to rust-reviewer
 - 0004 PM-0004-22 (optional helpers) and -23 (RR-1) done
+- resumed 20:33 Amsterdam after spend-limit cut; deadline 21:15; continuing 0004 from PM-0004-24
+- 0004 PM-0004-24 (RR-12) and -29 (EA-3, SA-15 bite) done

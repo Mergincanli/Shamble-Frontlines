@@ -1,0 +1,9 @@
+<<<OLD
+| the client-mode instance built as ADR 0001's prediction scope makes it;
+>>>NEW
+| the prediction step (part 3's second entry point, which draws from no stream) on a client-mode instance, as ADR 0001's prediction scope uses it;
+===
+<<<OLD
+Bites: the spread stream copied into the client's state |
+>>>NEW
+Bites: the spread stream copied into the client's state; a match seed derived from the room id (which a client knows) instead of drawn from the operating system's random source by the host (part 8) must be found by the search |

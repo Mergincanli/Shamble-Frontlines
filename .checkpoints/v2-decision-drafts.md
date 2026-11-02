@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Eighth spend-limit cut, 2026-11-02 about 17:50 Amsterdam ("resets 7:30pm (UTC)", 20:30 Amsterdam): test-engineer A (29
+FIX written) and B (30 FIX, 8 NOTE written) failed with HTTP 429; the saver had stopped (rule 3: restarted). Mustafa,
+about 20:32, in the session's chat: "I hit my usage limit while you were working, but it has reset now. Please
+continue from where you left off." Applied before the cut: d57dc5a (ADR 0005's ability section, 21 blocks), 5a24122
+(ADR 0001 follow-up b), 72cfcc3 (ADR 0005 frame follow-up b): all decision text final; CI green on every one. Resumed
+about 20:33: test-engineer A and B (deadline 21:15); launched: fixcheck-d0 (the final round's web facts, fetches before
+22:00). Next: the synthesis (last author round, after A and B), fixcheck-d1 and -d2 (no fetching), docs-keeper, the
+report and the PR body. No new agent after 23:00.
+
+Before (2026-11-02 late afternoon):
 Seventh spend-limit cut, 2026-11-02 about 12:15 Amsterdam ("resets 2:20pm (UTC)", 15:20 Amsterdam): netcode-architect's
 final batch (written, 57 FIX and 39 NOTE, in proofreading), game-designer's (just started) and rust-reviewer's follow-up
 b (just started) failed with HTTP 429; the session's worker process also restarted. Mustafa, about 17:28 Amsterdam, in

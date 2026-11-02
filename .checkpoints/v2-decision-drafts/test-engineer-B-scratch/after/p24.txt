@@ -1,0 +1,4 @@
+<<<OLD
+with the finite-state assertion on (debug and test builds);
+>>>NEW
+read by the replay runner itself on the release builds those runs use (it already reads every float by `to_bits` for the state hash, part 9, so it flags any non-finite value with no sim feature, which PM-0004-74 would show as a difference), with the finite-state assertion on in debug and test builds;
