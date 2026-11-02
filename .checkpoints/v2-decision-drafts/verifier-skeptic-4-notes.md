@@ -30,3 +30,11 @@ Tasks: F1 (0002 rows 27/33, erasableSyntaxOnly enum), F3 (0002 PM-0002-45 vs G7)
 ## 09:40 F1 row and F3 row written (both upheld)
 - F3: part 4 0002:237-241, G7 :455, item 8 :960-962, PM-29 :1071, App A :1326, SPIKE_PLAN :81/:299/:57-58, PM-52 :1095, R5 G7 row r5:1718 "(its size is set once REC4's budget exists)".
 - Next: F5 (0004:805-807 vs README), then A8 (0001 vs 0004 part 19), then B14/B18/B38 (0003 vs README).
+
+## 09:33 rows F5, B14/B18/B38, A8 written (all upheld; F5 and B-rows true once synthesis FIX at fixes-2.md:537 lands)
+- README at 4de24d2: Decisions 25-104, no fragment row; G5 at :306 under Codes (:260). Planned row fixes-2.md:537 sits before "The design questions" row (README:44), inside Decisions.
+- A8: 0001:229-234 vs 0004:454-458; 0001 has no other class for blasts/harvester/structure events; blasts arguably cosmetic -> fix must place them.
+- Next: fetch audit, counts line, DONE.
+- (correction: the 09:40 and 09:33 stamps above were estimates; the real clock was about 09:25 and 09:29)
+- 09:31 fixed line numbers in results (G6 0002:456, G7 0002:457; README 72 data rows :32-103). Fetch audit + counts line written.
+DONE

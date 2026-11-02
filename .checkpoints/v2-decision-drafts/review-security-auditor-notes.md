@@ -35,3 +35,5 @@ Review of the v2 decision drafts, security-auditor, plan step 10 wave 1 (prompt:
   F-R (low) kick without a kick list: HostCommand kick (0001:365) + reconnect with fresh token (0001:361-362) -> kicked player rejoins with a new token (code known). Fix: room keeps kicked player ids for its life.
   PSL check for pages.dev not completed (file truncated) - not asserted.
 - 10:50 next: write review file.
+- 11:20 review file written (16 findings: 1 high, 7 medium, 8 low; coverage table; Q1 B9 timing, Q2 kick list; not-checked; sources). Line refs spot-checked (fixed PM-0001-33, r2:2654-2661).
+DONE

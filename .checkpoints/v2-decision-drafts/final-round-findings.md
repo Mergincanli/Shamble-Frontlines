@@ -57,3 +57,34 @@ APPROVE WITH NOTES. Findings (its numbering; owners as the review names them):
    owner section omits the floor layer and area id of 0004:387–388).
 Questions: Q1 own-movement delay at 30 Hz (Mustafa by feel after the netcode proof test; add the absolute measurement
 now); Q2 the release model (an open question in 0006 now; decider the Advisor).
+
+## From the step-10 review by security-auditor (review-security-auditor.md; 2026-11-02 about 09:30)
+Verdicts: ADR 0001 APPROVE WITH NOTES; ADR 0002 REVISE (finding 1); ADR 0006 REVISE (finding 1's interim position B9,
+findings 2–5); synthesis docs APPROVE WITH NOTES. Its README pointer note is fixed by 47eadd9 (69 of 69 on target).
+1. High: the preview token is "held only by the deploy job", but a `pull_request` run uses the branch's own workflow
+   (R5-PREV-F2, r5:770–774), so a branch can rewrite the deploy job and take the account-wide Pages token (0002:519–525;
+   0006:385, 389–394). Fix: production deploys only from main, own environment and token; a required reviewer on
+   `preview` until the baseline (R5-PREV-F6); revoke the spike's token; a bite in PM-0002-66. Owners: engine-architect
+   (0002), infra-engineer (0006), test-engineer (PM-0002-66).
+2. Medium: 0006:565 "no player reaches a game server … except through a multiplayer preview behind the access wall" is
+   unsupported (the wall guards the page; staging is public). Fix: staging tokens only from a walled endpoint, a
+   separate staging key. infra-engineer.
+3. Medium: the SameSite=Strict guest cookie needs page and lobby on one registrable domain; none decided (0001:369–371,
+   0006:380). netcode-architect, infra-engineer.
+4. Medium: room processes not separated from the VM's secrets (0006:179, 386, 355, 635, 455). Fix: a new item B12.
+   infra-engineer.
+5. Medium: the per-command aim log is 1,728,000 lines per 20-minute match, 8,640 × the 0.8 GB/month log budget
+   (0001:279–280 vs 0006:300–301); no store or retention. netcode-architect, infra-engineer.
+6. Medium: "the server's own RTT stops a client from buying extra rewind" overstated (0001:570–571): log quinn's RTT
+   beside the ping RTT; state the accepted risk. netcode-architect.
+7. Medium: per-address limits need an IPv6 /64 rule (0001:330–331, 363–364, 497). netcode-architect.
+8. Medium: "not older than the last command run" allows several commands per tick (0001:191–197). Fix: strictly newer,
+   a fast-clock row in PM-0001-21. netcode-architect, test-engineer.
+9–16. Lows: WebSocket accept/TLS/upgrade deadline (0001:330, PM-0001-25); npm advisories and cargo-deny `sources`
+   (GLOSSARY:691 is research text, frozen: the fix goes in 0006:377); a strict-CSP-ready build (0006:379); display-name
+   validation (0001:355); fuzzing control-message sequences (PM-0001-34, PM-0004-60); the crash endpoint's caps
+   (0006:313–314); the authority-only seed's source (0004:254, rust-reviewer); local-match records never in the store
+   (0006 part 12).
+Questions: Q1 (the Advisor) read item B9 before the foundation's preview step? It recommends no: keep BASELINE-WHEN (b)
+and adopt finding 1's interim fix. Q2 (Mustafa) does a host's kick bar the player for the rest of the match? It
+recommends yes.
