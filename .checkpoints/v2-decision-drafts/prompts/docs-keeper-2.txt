@@ -1,0 +1,23 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: docs-keeper · effort: high · model: opus · plan step 11, the re-check at the end · 2026-11-02, saved about 09:16 Amsterdam
+
+You re-check the docs at the end of the change-set v2-decision-drafts (SHAMBLE FRONTLINES), plan step 11: docs/STATUS.md, docs/ROADMAP.md and docs/REPO_MAP.md only, then the repo-map check. You edit no other file. Branch claude/laughing-lovelace-ox61se (standing in for cs/v2-decision-drafts), draft PR #33; name the PR, not a SHA, in the docs. Your first pass (2026-11-01, commit 549490f; notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-notes.md) wrote the change-set's rows; since then the drafts went through verification, a consistency pass, a completeness check and four fix rounds. Read the checkpoint (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts.md: "Current step", "Steps done"), the report (docs/reports/2026-11-01-v2-decision-drafts.md) and its appendix (docs/reports/2026-11-01-v2-decision-drafts-appendix.md), and the completeness critic's item 7 (/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/verifier-completeness-findings.md).
+
+## STATUS (docs/STATUS.md)
+1. The change-set's "In flight" row: its state now. The deliverables are in, verified against the research, checked for consistency and completeness, and fixed. Name the step-10 reviews' state as the report gives it. It waits on Mustafa's and the Advisor's review of the drafts (the report's "Decisions needed").
+2. The five carry-forwards (CF-1 to CF-5, under "Next: the decision drafts"): each gets its final state in one line, pointing to its row in docs/adr/README.md's loose-ends register. Today's lines are stale (for example CF-1 "0006 FAIL…, 0002–0005 running", CF-3 "consistency pass (not yet run)", CF-5 "being appended").
+3. The three lines that still name only "ADR-001" (SEC-MDL-2 at about line 314; no SRI/CSP on the three.js CDN tag at about 319; the 11 wall-clock reads at about 330): add, beside each, the v2 draft that now carries it, as README's register rows SEC-MDL-2, CDN-SRI and WALL-CLOCK say. Change nothing else in those lines.
+4. Pointers into the checkpoint folder, which leaves the branch before the PR is marked ready. Line 118 says "verbatim in the checkpoint's `advisor-verdicts.md` §1": point it to the report's appendix §3 instead. Point any other STATUS line that cites a file under .checkpoints/ to the appendix section that now holds the text (§1 the brief, §2 Mustafa's words, §3 the advisor's plan review, §4 the plan's rules and steps).
+5. "Open bugs and risks": the five spend-limit cuts of this change-set (2026-10-31 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35), with no work lost (notes first). Use one line, pointing to the report.
+6. "Next": the stop for Mustafa and the Advisor (draft PR #33; the report's "Decisions needed"); then, once they approve, the spikes in SPIKE_PLAN's order, the netcode proof test first.
+
+## ROADMAP (docs/ROADMAP.md)
+Update the change-set's entry in a few words: verified, consistency-checked, fixed; the reviews' state; the stop. Keep the file's own rules.
+
+## REPO_MAP (docs/REPO_MAP.md)
+The report and its appendix now exist: check their rows, and every row this change-set added. Then run `node .claude/scripts/repo-map-check.mjs` from the repository root; it must print "repo map OK".
+
+## Rules
+Plain words; decimals with periods; dates as YYYY-MM-DD. Claim nothing you did not read in the files above. Never edit the Advisor's documents, rules files, research files or code. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-2-notes.md (look there first; end with DONE). Never commit or push.
+
+## Return
+At most 12 lines: each file's changes (one line each), and the repo-map check's output.
