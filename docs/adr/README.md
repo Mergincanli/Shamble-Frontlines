@@ -7,20 +7,22 @@ cite. It decides nothing. The engine on one page: [ENGINE_OVERVIEW](../ENGINE_OV
 [SPIKE_PLAN](../SPIKE_PLAN.md); the template: [0000](0000-template.md).
 
 The drafts replace the legacy entries ADR-001, ADR-002 and ADR-003 (`docs/STATUS.md`, "ADR-001..003 below"; see the
-loose-ends register). Line numbers below are the drafts' at assembly (2026-11-01); the fix round may move them.
+loose-ends register). Line numbers below are the drafts' at commit 9a03999, after the fix rounds; a later edit may move
+them, so each row also names its OQ id or part.
 
 ## The drafts
 | ADR | Title | Author(s) | Status | Its spikes ([SPIKE_PLAN](../SPIKE_PLAN.md)) | Open questions |
 |---|---|---|---|---|---|
-| [0001](0001-multiplayer-netcode.md) | Multiplayer and netcode | netcode-architect; pass marks: test-engineer | Proposed | the netcode proof test; the 60 Hz margin run | 13 (OQ-0001-1 to -13) |
-| [0002](0002-code-structure-build-toolchain.md) | Code structure, build and toolchain | engine-architect; pass marks: test-engineer | Proposed | the Rust ↔ TypeScript boundary spike; the foundation's acceptance checks (not a spike) | 7 (OQ-0002-1 to -7) |
+| [0001](0001-multiplayer-netcode.md) | Multiplayer and netcode | netcode-architect; pass marks: test-engineer | Proposed | the netcode proof test; the 60 Hz margin run | 14 (OQ-0001-1 to -14) |
+| [0002](0002-code-structure-build-toolchain.md) | Code structure, build and toolchain | engine-architect; pass marks: test-engineer | Proposed | the Rust ↔ TypeScript boundary spike; the foundation's acceptance checks (not a spike) | 8 (OQ-0002-1 to -8) |
 | [0003](0003-rendering.md) | Rendering and presentation | graphics-engineer; pass marks: test-engineer | Proposed | the look proof test; the render budget bench | 15 (OQ-0003-1 to -15) |
-| [0004](0004-simulation-core.md) | The simulation core | rust-reviewer; pass marks: test-engineer | Proposed | the sim core spike; shares in the netcode proof test, the boundary spike and the content and ability spike | 7 (OQ-0004-1 to -7) |
+| [0004](0004-simulation-core.md) | The simulation core | rust-reviewer; pass marks: test-engineer | Proposed | the sim core spike; shares in the netcode proof test, the boundary spike and the content and ability spike | 7 numbered (OQ-0004-1 to -7), 5 open: -5 and -6 moved to OQ-0005-AB9 and AB10 |
 | [0005](0005-content-abilities-assets.md) | Content data, abilities and assets | engine-architect (frame, content data, asset pipeline); game-designer (ability and effect system); graphics-engineer (the asset pipeline's GPU rules); pass marks: test-engineer | Proposed | the content and ability spike; a share of the look proof test; the asset spike (after the asset-pipeline research); the Feel Lab test | 34 (CD1–CD8, AB1–AB13, AP1–AP3, AS1–AS6, OQ-0005-1 to -4) |
 | [0006](0006-infrastructure-operations.md) | Infrastructure and operations | infra-engineer; pass marks: test-engineer | Proposed | the preview hosting check; operations marks in the netcode proof test; an optional share of the boundary spike | 12 (OQ-0006-1 to -12) |
 
-Total: 88 open questions. None of the drafts is signed off; no spike starts before Mustafa and the Advisor approve them
-(the drafts brief, §4).
+Total: 90 numbered open questions, 88 of them open (OQ-0004-5 and -6 point to ADR 0005). Pass marks: 57, 76, 43, 74, 46
+and 31 rows (327). None of the drafts is signed off; no spike starts before Mustafa and the Advisor approve them (the
+drafts brief, §4).
 
 ## Decisions the drafts ask for
 Every decision code and open question the drafts route to Mustafa or the Advisor, one row each. The first rows are the
@@ -29,84 +31,85 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 
 | Code or OQ | The question, in plain words | Decider | Where |
 |---|---|---|---|
-| TICK-60-HEADROOM (OQ-0001-1) | Is the 60 Hz margin measured against the 60 Hz server tick budget (8.33 ms), so 60 Hz needs a p99 server tick time of at most 6.25 ms plus every 60 Hz research mark? | Mustafa and the Advisor (confirm at the stop) | [ADR 0001](0001-multiplayer-netcode.md) part 2, line 840; [GLOSSARY §8](../research/GLOSSARY.md#the-60-hz-margin) |
-| TICK-60-SETUP (OQ-0001-2) | How does the stress scene's sim load reach the 60 Hz margin run: (a) the sim core spike's sim inside the proof-test server (recommended), (b) a stand-in replaying measured step times, (c) wait until the real sim runs the stress scene? | the Advisor | [ADR 0001](0001-multiplayer-netcode.md) line 846; SPIKE_PLAN item 2 |
-| "100 ms" reading (OQ-0001-3) | Does the netcode proof test's "100 ms of simulated latency" mean profile P2 (100 ms round trip, with P2's jitter and loss), or 100 ms each way? | the Advisor (who wrote the definition) | [ADR 0001](0001-multiplayer-netcode.md) line 856 |
-| ABL-PREDICT (OQ-0001-4) | Does the client predict the player's own abilities? Decided after the Feel Lab test on the Molotov and the Shield. | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 861; [ADR 0005](0005-content-abilities-assets.md) AB-9; SPIKE_PLAN item 10 |
+| TICK-60-HEADROOM (OQ-0001-1) | Is the 60 Hz margin measured against the 60 Hz server tick budget (8.33 ms), so 60 Hz needs a p99 server tick time of at most 6.25 ms plus every 60 Hz research mark? | Mustafa and the Advisor (confirm at the stop) | [ADR 0001](0001-multiplayer-netcode.md) part 2, line 852; [GLOSSARY §8](../research/GLOSSARY.md#the-60-hz-margin) |
+| TICK-60-SETUP (OQ-0001-2) | How does the stress scene's sim load reach the 60 Hz margin run: (a) the sim core spike's sim inside the proof-test server (recommended), (b) a stand-in replaying measured step times, (c) wait until the real sim runs the stress scene? | the Advisor | [ADR 0001](0001-multiplayer-netcode.md) line 859; SPIKE_PLAN item 2 |
+| "100 ms" reading (OQ-0001-3) | Does the netcode proof test's "100 ms of simulated latency" mean profile P2 (100 ms round trip, with P2's jitter and loss), or 100 ms each way? | the Advisor (who wrote the definition) | [ADR 0001](0001-multiplayer-netcode.md) line 869 |
+| ABL-PREDICT (OQ-0001-4) | Does the client predict the player's own abilities? Decided after the Feel Lab test on the Molotov and the Shield. | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 874; [ADR 0005](0005-content-abilities-assets.md) AB-9; SPIKE_PLAN item 10 |
 | ASSET-RESEARCH (timing) | The asset-pipeline research runs before the asset spike; should it run earlier (for example beside the first spikes) so art production can start sooner? | Mustafa and the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 76 and the asset pipeline part; SPIKE_PLAN, "The asset-pipeline research" |
-| WEAPON-UNLOCKS (OQ-0005-AB5) | How does an account-unlocked weapon reach a match (LOOP_V2 §8, VISION_V2 §1), when buying offers no weapon choice and other weapons come only from drops? | Mustafa, with the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 1148 |
-| UPGRADE-SCOPE: carry slots (OQ-0005-AB1) | How many weapons can a player carry besides the class weapon, and what happens to the one in hand on a pickup? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1095 |
-| UPGRADE-SCOPE: looted ammo (OQ-0005-AB2) | What does a looted gun come with, and can it be refilled? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1107 |
-| UPGRADE-SCOPE: levelling (OQ-0005-AB3) | What earns a level, how fast, and does a track the player switches to catch up? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1115 |
-| Reference machines (OQ-0003-1) | Which laptop (the minimum) and which desktop (the recommended) are bought or borrowed as the two reference machines? | Mustafa and the Advisor (money and availability) | [ADR 0003](0003-rendering.md) line 706 |
-| Spike order (decision map J6 (5)) | Only the netcode proof test's place is settled (before the foundation); is SPIKE_PLAN's proposed order of the rest accepted? | Mustafa and the Advisor | [SPIKE_PLAN](../SPIKE_PLAN.md), "The spikes, in the proposed order" |
-| Trace reading (LE-G; R2-XU-OQ18) | Does a VISION_V2 §3 or §4 target count as a feature's need like LOOP_V2 does (written "need: VISION_V2 §4 only" and listed below)? The session read it so on 2026-10-31. | the Advisor | [ADR 0001](0001-multiplayer-netcode.md) Appendix A (R2-XU-OQ18); "Needs outside VISION_V2 §6" below |
+| WEAPON-UNLOCKS (OQ-0005-AB5) | How does an account-unlocked weapon reach a match (LOOP_V2 §8, VISION_V2 §1), when buying offers no weapon choice and other weapons come only from drops? | Mustafa, with the Advisor (LOOP_V2 §8 is theirs) | [ADR 0005](0005-content-abilities-assets.md) line 1158 |
+| UPGRADE-SCOPE: carry slots (OQ-0005-AB1) | How many weapons can a player carry besides the class weapon, and what happens to the one in hand on a pickup? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1105 |
+| UPGRADE-SCOPE: looted ammo (OQ-0005-AB2) | What does a looted gun come with, and can it be refilled? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1117 |
+| UPGRADE-SCOPE: levelling (OQ-0005-AB3) | What earns a level, how fast, and does a track the player switches to catch up? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1125 |
+| Reference machines (OQ-0003-1) | Which laptop (the minimum) and which desktop (the recommended) are bought or borrowed as the two reference machines? | Mustafa and the Advisor (money and availability) | [ADR 0003](0003-rendering.md) line 723 |
+| Spike order (J6 (5)) | Only the netcode proof test's place is settled (before the foundation); is SPIKE_PLAN's proposed order of the rest accepted? | Mustafa and the Advisor | [SPIKE_PLAN](../SPIKE_PLAN.md), "The spikes, in the proposed order" |
+| Trace reading (OQ-0001-14; LE-G, R2-XU-OQ18) | Is a VISION_V2 §3 or §4 target trace enough for an engine feature (written "need: VISION_V2 §4 only" and listed below)? The session read it so on 2026-10-31. | the Advisor, at the stop | [ADR 0001](0001-multiplayer-netcode.md) line 927; "Needs outside VISION_V2 §6" below |
+| Structure without a research option (OQ-0002-8) | May a record propose a structure no research Options section offers, when a settled input forces it and the research leaves the question to that record (the `room` and `navbake` crates)? | the Advisor, at the stop | [ADR 0002](0002-code-structure-build-toolchain.md) line 897 |
+| The `wss` certificate on development and staging (OQ-0006-5) | Which certificate does the WebSocket fallback present on development and staging servers, since a WebSocket cannot pin a certificate hash? The netcode proof test's WebSocket leg needs the answer first. | the Advisor, from a short read, before the netcode proof test starts (production issuance: security-auditor, in the security baseline) | [ADR 0006](0006-infrastructure-operations.md) line 655; SPIKE_PLAN item 1 |
+| Fragments as damage | Do grenade fragments deal damage per fragment? LOOK_V2 §3 and §7 bring fragmentation back as a visible effect, which ADR 0003 draws from the blast event; any rule beyond that is a design question (no research id). | Mustafa with the game-designer | [ADR 0004](0004-simulation-core.md) "Open questions", closing paragraph; [ADR 0003](0003-rendering.md) part 5.k, OQ-0003-7 and the look checklist step 24 |
 | The design questions | The 38 research questions below that are pure design matters | Mustafa, or a later design session | "Design questions" below |
-| OQ-0001-5 | The rewind cap: 200 or 250 ms, and the victim's side? | Mustafa and the Advisor | [ADR 0001](0001-multiplayer-netcode.md) line 867 |
-| OQ-0001-7 | Do shots carry their moment inside a tick at 30 Hz? | the netcode proof test, then Mustafa in the Feel Lab if it fails or feels late | [ADR 0001](0001-multiplayer-netcode.md) line 881 |
-| OQ-0001-8 | How far does a new projectile move forward on spawn? | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 886 |
-| OQ-0001-9 | What else does lag compensation cover? | the netcode proof test for cover; for melee, a design call by Mustafa with the game-designer | [ADR 0001](0001-multiplayer-netcode.md) line 890 |
-| OQ-0001-10 | Are weapon pickups predicted? | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 896 |
-| OQ-0001-11 | Room codes: length, alphabet and access. | Mustafa (what a host may set, R2-ROOM-OQ5) with the security review's options | [ADR 0001](0001-multiplayer-netcode.md) line 900 |
-| OQ-0001-12 | Do far sound events reveal too much? | Mustafa with the game-designer | [ADR 0001](0001-multiplayer-netcode.md) line 905 |
-| OQ-0002-1 | Does the v2 editor still open by double-clicking its HTML file? | the boundary spike (does it load?), then Mustafa if EDITOR_V2 §5's rule must change | [ADR 0002](0002-code-structure-build-toolchain.md) line 800 |
-| OQ-0002-4 | Does production ever turn on cross-origin isolation, and can a later login popup live with it? | the boundary spike's results, then this record; for embeds and the login flow under isolation, Mustafa with ADR 0006 (R1-BND-OQ5, only if is | [ADR 0002](0002-code-structure-build-toolchain.md) line 836 |
-| OQ-0002-5 | Does real Safari run on pull requests, and does the end-to-end suite need it? | infra-engineer's reading of the macOS runner's time and cost (ADR 0006 for costs; Mustafa for any paid plan), then this record | [ADR 0002](0002-code-structure-build-toolchain.md) line 848 |
-| OQ-0002-6 | Which jump reach do the golden tests pin? | the game-designer with Mustafa, from the loop slice on (a rule question) | [ADR 0002](0002-code-structure-build-toolchain.md) line 859 |
-| OQ-0003-2 | The ink's width, its inner lines and its weight on buildings. | Mustafa, in the look proof test, with its measured cost; the family in part 5.b follows his pick | [ADR 0003](0003-rendering.md) line 714 |
-| OQ-0003-3 | Which colour output: authored colour as shown, or a tone-mapped output? | Mustafa, in the look proof test, side by side with legacy | [ADR 0003](0003-rendering.md) line 722 |
-| OQ-0003-4 | Is one sun shadow map enough, or are cascades or another setup needed? | the look proof test (softness, Mustafa) and the render budget bench (the shadow row) | [ADR 0003](0003-rendering.md) line 728 |
-| OQ-0003-5 | How are "warm sun with cool shadows" and moods per map lit? | Mustafa, in the look proof test, with each option's GPU time | [ADR 0003](0003-rendering.md) line 734 |
-| OQ-0003-8 | How is ink line boil drawn? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 753 |
-| OQ-0003-9 | How are vegetation and the lush countryside drawn, and in which tree style? | Mustafa (the style, a later design session); the render budget bench (the technique) | [ADR 0003](0003-rendering.md) line 758 |
-| OQ-0003-10 | Does the frame rate follow a 120 or 144 Hz screen, or is it capped? | Mustafa (feel), on the render budget bench's numbers | [ADR 0003](0003-rendering.md) line 765 |
-| OQ-0003-11 | Should v2 one day drop the WebGL 2 fallback, and how many players use it? | Mustafa | [ADR 0003](0003-rendering.md) line 771 |
-| OQ-0003-12 | Is the pixel ratio capped at 1 on Low for HiDPI laptops? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 777 |
-| OQ-0003-13 | Where does the audio listener sit under the v2 camera? | the camera framing first (R2-INT-OQ2, a design question), then Mustafa's listening check | [ADR 0003](0003-rendering.md) line 782 |
-| OQ-0003-15 | The legacy look touches LOOK_V2 does not name: keep, change or drop each? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 793 |
-| OQ-0004-1 | How is bot behaviour structured? | a bot research unit, or the slice 2 plan, with the game-designer; Mustafa for the behaviour set | [ADR 0004](0004-simulation-core.md) line 742 |
-| OQ-0004-4 | What moves a building through its damage stages? | Mustafa, with the game-designer (rule 6: no rule beyond LOOK_V2 is designed here) | [ADR 0004](0004-simulation-core.md) line 765 |
-| OQ-0004-5 | Which weapons drop, and who may take them? | Mustafa with the game-designer; ADR 0005 holds the answers as data | [ADR 0004](0004-simulation-core.md) line 773 |
-| OQ-0004-6 | What do bots and slot takeovers do with player records? | Mustafa with the game-designer | [ADR 0004](0004-simulation-core.md) line 784 |
-| OQ-0005-CD1 | Do hand-edited content files need comments? | Mustafa, after a short trial in the content and ability spike | [ADR 0005](0005-content-abilities-assets.md) line 583 |
-| OQ-0005-CD2 | What load time and Wasm size may content cost, and is JSON fast and small enough? | the content and ability spike's measurement, then the Advisor sets the budgets | [ADR 0005](0005-content-abilities-assets.md) line 589 |
-| OQ-0005-CD3 | May production ever change numbers in the middle of a match? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 598 |
-| OQ-0005-CD4 | In development, do simulation numbers apply at the next match, or inside a running match? | Mustafa and the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 606 |
-| OQ-0005-CD5 | Faction variants: full definitions that reference shared ones, or overrides of a base? | the faction design session (VISION_V2 §7, faction asymmetry; Mustafa) | [ADR 0005](0005-content-abilities-assets.md) line 618 |
-| OQ-0005-CD6 | How are moment rules written? | the moment design session (Mustafa with the game-designer, with R6-TEL-OQ3's thresholds), then ADR 0004 | [ADR 0005](0005-content-abilities-assets.md) line 624 |
-| OQ-0005-CD7 | What is the Feel Lab tool? | a later design session with Mustafa, before the feel pass (LOOP_V2 §11 leaves the feel pass out of the greybox v0); ADR 0003 for its screen | [ADR 0005](0005-content-abilities-assets.md) line 632 |
-| OQ-0005-AB4 | What is one track: which definitions share one? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1135 |
-| OQ-0005-AB6 | How do the player's tracks sit beside the team's tech tiers? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1163 |
-| OQ-0005-AB7 | May a pick add raw power (more damage, more health), or only change how a unit or weapon plays? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1171 |
-| OQ-0005-AB8 | The offer: when does it appear, and when can the player answer it? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1180 |
-| OQ-0005-AB9 | Which drop and pickup rules does UPGRADE-SCOPE leave unstated? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1188 |
-| OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1197 |
-| OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1206 |
-| OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? | the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 1217 |
-| OQ-0005-AB13 | When does scripting (option A3) come back? | the Advisor (the source) | [ADR 0005](0005-content-abilities-assets.md) line 1226 |
-| OQ-0005-AP2 | Which asset families become authored models, and which stay procedural builders? | Mustafa, in the look proof test (how each looks, beside legacy screenshots, LOOK_V2 §9), with the asset-pipeline research's cost and tooling | [ADR 0005](0005-content-abilities-assets.md) line 1481 |
-| OQ-0005-AP3 | May an AI-generated draft model ever ship? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1489 |
-| OQ-0005-AS2 | Which tool builds the LOD levels, and how many levels? | the asset-pipeline research, then the asset spike and Mustafa (silhouettes kept) | [ADR 0005](0005-content-abilities-assets.md) line 1624 |
-| OQ-0005-1 | Do presentation references sit on the simulation definitions, or in client definitions keyed by the same id? | the Advisor, at the stop review, on the text the authors write in the fix round (engine-architect for AP-2, AP-3, CD-6 and CD-13; the game-d | [ADR 0005](0005-content-abilities-assets.md) line 1833 |
-| OQ-0005-2 | Is a weapon definition the same thing as a weapon type? | Mustafa answers OQ-0005-AB4; the content data section's author aligns CD-6's wording in the fix round, so that it leaves AB4 open. Research | [ADR 0005](0005-content-abilities-assets.md) line 1852 |
-| OQ-0005-3 | What does the content hash cover? | the Advisor, with the infra-engineer, whose ADR 0006 owns the analysis (R6-TEL-REC3) | [ADR 0005](0005-content-abilities-assets.md) line 1864 |
-| OQ-0005-4 | What do the Character Lab and the Anim Lab work on once soldiers are authored models? | Mustafa with the Advisor (EDITOR_V2 is theirs) | [ADR 0005](0005-content-abilities-assets.md) line 1876 |
-| OQ-0006-1 | Can Mustafa order Hetzner's CCX23 and CX33 in an EU location? | Mustafa (a console check in his own account; agents create no account), then a research read if (b) | [ADR 0006](0006-infrastructure-operations.md) line 598 |
-| OQ-0006-2 | Which EU location: Nuremberg, Helsinki, or Falkenstein if offered? | a measurement (the netcode proof test's setup or a small check before it), confirmed by Mustafa | [ADR 0006](0006-infrastructure-operations.md) line 608 |
-| OQ-0006-3 | Where does the lobby run, and what stores guest ids and the room directory? | the Advisor, from a short lobby read done with the security baseline (its key storage is item B5); Mustafa for any paid service. ADR 0001 ke | [ADR 0006](0006-infrastructure-operations.md) line 615 |
-| OQ-0006-4 | Once the access wall is on, does it cover every preview, or only multiplayer previews and previews with unreleased art? | Mustafa (convenience against one more project to run) | [ADR 0006](0006-infrastructure-operations.md) line 626 |
-| OQ-0006-6 | The security baseline: what it decides for each waiting item. | security-auditor, in its own fresh session (BASELINE-WHEN (b)); the Advisor and Mustafa for the policy calls | [ADR 0006](0006-infrastructure-operations.md) line 647 |
-| OQ-0006-7 | Will any CI runner be paid for: GPU, macOS, self-hosted reference machines, or a cache above 10 GB? | Mustafa for any paid plan; ADR 0002 says which jobs need one; the security baseline weighs (c) | [ADR 0006](0006-infrastructure-operations.md) line 658 |
-| OQ-0006-8 | What do Sentry and Grafana really cost, and how do logs and metrics reach Grafana Cloud? | Mustafa, with a read of sentry.io/pricing before he creates the Sentry organization; a read of Grafana's ingestion docs if M2 is wanted | [ADR 0006](0006-infrastructure-operations.md) line 668 |
-| OQ-0006-9 | What does EU data-protection law require of us, and how long are match records kept? | Mustafa | [ADR 0006](0006-infrastructure-operations.md) line 677 |
-| OQ-0006-10 | How many players, and when; which VAT and currency; is included traffic per VM, pooled or prorated? | Mustafa (his plans, his billing address, the first invoice) | [ADR 0006](0006-infrastructure-operations.md) line 686 |
-| OQ-0006-12 | If production isolation is ever adopted: embeds, cross-origin popups, CORP and the login flow. | Mustafa with this record, only if production isolation is adopted (R1-BND-REC2 mark 5's test) | [ADR 0006](0006-infrastructure-operations.md) line 701 |
+| OQ-0001-5 | The rewind cap: 200 or 250 ms, and the victim's side? | Mustafa and the Advisor | [ADR 0001](0001-multiplayer-netcode.md) line 880 |
+| OQ-0001-7 | Do shots carry their moment inside a tick at 30 Hz? | the netcode proof test, then Mustafa in the Feel Lab if it fails or feels late | [ADR 0001](0001-multiplayer-netcode.md) line 894 |
+| OQ-0001-8 | How far does a new projectile move forward on spawn? | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 899 |
+| OQ-0001-9 | What else does lag compensation cover? | the netcode proof test for cover; for melee, a design call by Mustafa with the game-designer | [ADR 0001](0001-multiplayer-netcode.md) line 903 |
+| OQ-0001-10 | Are weapon pickups predicted? | Mustafa | [ADR 0001](0001-multiplayer-netcode.md) line 909 |
+| OQ-0001-11 | Room codes: length, alphabet and access. | Mustafa (what a host may set, R2-ROOM-OQ5) with the security review's options | [ADR 0001](0001-multiplayer-netcode.md) line 913 |
+| OQ-0001-12 | Do far sound events reveal too much? | Mustafa with the game-designer | [ADR 0001](0001-multiplayer-netcode.md) line 918 |
+| OQ-0002-1 | Does the v2 editor still open by double-clicking its HTML file? | the boundary spike (does it load?), then Mustafa if EDITOR_V2 §5's rule must change | [ADR 0002](0002-code-structure-build-toolchain.md) line 820 |
+| OQ-0002-4 | Does production ever turn on cross-origin isolation, and can a later login popup live with it? | the boundary spike's results, then this record; for embeds and the login flow under isolation, Mustafa with ADR 0006 (R1-BND-OQ5, only if isolation is adopted) | [ADR 0002](0002-code-structure-build-toolchain.md) line 856 |
+| OQ-0002-5 | Does real Safari run on pull requests, and does the end-to-end suite need it? | infra-engineer's reading of the macOS runner's time and cost (ADR 0006 for costs; Mustafa for any paid plan), then this record | [ADR 0002](0002-code-structure-build-toolchain.md) line 868 |
+| OQ-0002-6 | Which jump reach do the golden tests pin? | the game-designer with Mustafa, from the loop slice on (a rule question) | [ADR 0002](0002-code-structure-build-toolchain.md) line 879 |
+| OQ-0003-2 | The ink's width, its inner lines and its weight on buildings. | Mustafa, in the look proof test, with its measured cost; the family in part 5.b follows his pick | [ADR 0003](0003-rendering.md) line 731 |
+| OQ-0003-3 | Which colour output: authored colour as shown, or a tone-mapped output? | Mustafa, in the look proof test, side by side with legacy | [ADR 0003](0003-rendering.md) line 740 |
+| OQ-0003-4 | Is one sun shadow map enough, or are cascades or another setup needed? | the look proof test (softness, Mustafa) and the render budget bench (the shadow row) | [ADR 0003](0003-rendering.md) line 746 |
+| OQ-0003-5 | How are "warm sun with cool shadows" and moods per map lit? | Mustafa, in the look proof test, with each option's GPU time | [ADR 0003](0003-rendering.md) line 752 |
+| OQ-0003-8 | How is ink line boil drawn? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 771 |
+| OQ-0003-9 | How are vegetation and the lush countryside drawn, and in which tree style? | Mustafa (the style, a later design session); the render budget bench (the technique) | [ADR 0003](0003-rendering.md) line 776 |
+| OQ-0003-10 | Does the frame rate follow a 120 or 144 Hz screen, or is it capped? | Mustafa (feel), on the render budget bench's numbers | [ADR 0003](0003-rendering.md) line 783 |
+| OQ-0003-11 | How many players use the WebGL 2 fallback? | Mustafa, on client field data after launch | [ADR 0003](0003-rendering.md) line 789 |
+| OQ-0003-12 | Is the pixel ratio capped at 1 on Low for HiDPI laptops? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 796 |
+| OQ-0003-13 | Where does the audio listener sit under the v2 camera? | the camera framing first (R2-INT-OQ2, a design question), then Mustafa's listening check | [ADR 0003](0003-rendering.md) line 801 |
+| OQ-0003-15 | The legacy look touches LOOK_V2 does not name: keep, change or drop each? | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 812 |
+| OQ-0004-1 | How is bot behaviour structured? | a bot research unit, or the slice 2 plan, with the game-designer; Mustafa for the behaviour set | [ADR 0004](0004-simulation-core.md) line 755 |
+| OQ-0004-4 | What moves a building through its damage stages? | Mustafa, with the game-designer (rule 6: no rule beyond LOOK_V2 is designed here) | [ADR 0004](0004-simulation-core.md) line 778 |
+| OQ-0005-CD1 | Do hand-edited content files need comments? | Mustafa, after a short trial in the content and ability spike | [ADR 0005](0005-content-abilities-assets.md) line 587 |
+| OQ-0005-CD2 | What load time may content cost, how much of the Wasm file is content's, and is JSON fast and small enough? | for load time, the content and ability spike's measurement, then the Advisor sets the budget; for size, ADR 0002 part 4: the Advisor sets the first `sim-wasm` limit from the boundary and sim core spikes' measurements and this spike's content share, and until then the size is recorded, not gated | [ADR 0005](0005-content-abilities-assets.md) line 593 |
+| OQ-0005-CD3 | May production ever change numbers in the middle of a match? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 606 |
+| OQ-0005-CD4 | In development, do simulation numbers apply at the next match, or inside a running match? | Mustafa and the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 614 |
+| OQ-0005-CD5 | Faction variants: full definitions that reference shared ones, or overrides of a base? | the faction design session (VISION_V2 §7, faction asymmetry; Mustafa) | [ADR 0005](0005-content-abilities-assets.md) line 626 |
+| OQ-0005-CD6 | How are moment rules written? | the moment design session (Mustafa with the game-designer, with R6-TEL-OQ3's thresholds), then ADR 0004 | [ADR 0005](0005-content-abilities-assets.md) line 632 |
+| OQ-0005-CD7 | What is the Feel Lab tool? | a later design session with Mustafa, before the feel pass (LOOP_V2 §11 leaves the feel pass out of the greybox v0); ADR 0003 for its screen | [ADR 0005](0005-content-abilities-assets.md) line 640 |
+| OQ-0005-AB4 | What is one track: which definitions share one? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1145 |
+| OQ-0005-AB6 | How do the player's tracks sit beside the team's tech tiers? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1174 |
+| OQ-0005-AB7 | May a pick add raw power (more damage, more health), or only change how a unit or weapon plays? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1182 |
+| OQ-0005-AB8 | The offer: when does it appear, and when can the player answer it? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1191 |
+| OQ-0005-AB9 | Which drop and pickup rules does UPGRADE-SCOPE leave unstated? | Mustafa, with the game-designer | [ADR 0005](0005-content-abilities-assets.md) line 1199 |
+| OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1212 |
+| OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1221 |
+| OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? | the Advisor | [ADR 0005](0005-content-abilities-assets.md) line 1232 |
+| OQ-0005-AB13 | When does scripting (option A3) come back? | the Advisor (the source) | [ADR 0005](0005-content-abilities-assets.md) line 1241 |
+| OQ-0005-AP2 | Which asset families become authored models, and which stay procedural builders? | Mustafa, in the look proof test (how each looks, beside legacy screenshots, LOOK_V2 §9), with the asset-pipeline research's cost and tooling. Trees wait for the tree style (LOOK_V2 §8 `[OPEN]`) | [ADR 0005](0005-content-abilities-assets.md) line 1498 |
+| OQ-0005-AP3 | May an AI-generated draft model ever ship? | Mustafa | [ADR 0005](0005-content-abilities-assets.md) line 1506 |
+| OQ-0005-AS2 | Which tool builds the LOD levels, and how many levels? | the asset-pipeline research, then the asset spike and Mustafa (silhouettes kept) | [ADR 0005](0005-content-abilities-assets.md) line 1643 |
+| OQ-0005-1 | Do presentation references sit on the simulation definitions, or in client definitions keyed by the same id? | the Advisor, at the stop review (the game-designer changes AB-4's kinds if the answer needs it) | [ADR 0005](0005-content-abilities-assets.md) line 1860 |
+| OQ-0005-2 | Is a weapon definition the same thing as a weapon type? | Mustafa answers OQ-0005-AB4; the question stays open for the Advisor until then | [ADR 0005](0005-content-abilities-assets.md) line 1880 |
+| OQ-0005-3 | What does the content hash cover? | the Advisor, with the infra-engineer, whose ADR 0006 owns the analysis (R6-TEL-REC3) | [ADR 0005](0005-content-abilities-assets.md) line 1891 |
+| OQ-0005-4 | What do the Character Lab and the Anim Lab work on once soldiers are authored models? | Mustafa with the Advisor (EDITOR_V2 is theirs) | [ADR 0005](0005-content-abilities-assets.md) line 1903 |
+| OQ-0006-1 | Can Mustafa order Hetzner's CCX23 and CX33 in an EU location? | Mustafa (a console check in his own account; agents create no account), then a research read if (b) | [ADR 0006](0006-infrastructure-operations.md) line 613 |
+| OQ-0006-2 | Which EU location: Nuremberg, Helsinki, or Falkenstein if offered? | a measurement (the netcode proof test's setup or a small check before it), confirmed by Mustafa | [ADR 0006](0006-infrastructure-operations.md) line 625 |
+| OQ-0006-3 | Where does the lobby run, and what stores guest ids and the room directory? | the Advisor, from a short lobby read done with the security baseline (its key storage is item B5); Mustafa for any paid service. ADR 0001 keeps the protocol, ADR 0002 the crate | [ADR 0006](0006-infrastructure-operations.md) line 632 |
+| OQ-0006-4 | Once the access wall is on, does it cover every preview, or only multiplayer previews and previews with unreleased art? | Mustafa (convenience against one more project to run) | [ADR 0006](0006-infrastructure-operations.md) line 643 |
+| OQ-0006-6 | The security baseline: what it decides for each waiting item. | security-auditor, in its own fresh session (BASELINE-WHEN (b)); the Advisor and Mustafa for the policy calls | [ADR 0006](0006-infrastructure-operations.md) line 673 |
+| OQ-0006-7 | Will any CI runner be paid for: GPU, macOS, self-hosted reference machines, or a cache above 10 GB? | Mustafa for any paid plan; ADR 0002 says which jobs need one; the security baseline weighs (c) | [ADR 0006](0006-infrastructure-operations.md) line 684 |
+| OQ-0006-8 | What do Sentry and Grafana really cost, and how do logs and metrics reach Grafana Cloud? | Mustafa, with a read of sentry.io/pricing before he creates the Sentry organization; a read of Grafana's ingestion docs if M2 is wanted | [ADR 0006](0006-infrastructure-operations.md) line 694 |
+| OQ-0006-9 | What does EU data-protection law require of us, and how long are match records kept? | Mustafa | [ADR 0006](0006-infrastructure-operations.md) line 703 |
+| OQ-0006-10 | How many players, and when; which VAT and currency; is included traffic per VM, pooled or prorated? | Mustafa (his plans, his billing address, the first invoice) | [ADR 0006](0006-infrastructure-operations.md) line 712 |
+| OQ-0006-12 | If production isolation is ever adopted: embeds, cross-origin popups, CORP and the login flow. | Mustafa with this record, only if production isolation is adopted (R1-BND-REC2 mark 5's test) | [ADR 0006](0006-infrastructure-operations.md) line 727 |
 
 ## Design questions (DESIGN-owned research ids)
 | id | disposition | why |
 |---|---|---|
 | R1-TICK-OQ7 | DESIGN: Mustafa and the Advisor | whether offline play at the largest mode must run on the minimum laptop is a product promise, not an engine choice (it sets N for P2) |
-| R1-BND-OQ1 | DESIGN: Mustafa | whether solo play against bots ships offline is a product need VISION_V2 does not state; SLICE-ORDER already gives local play from slice 2 (decision map S11) |
+| R1-BND-OQ1 | DESIGN: Mustafa | whether solo play against bots ships offline is a product need VISION_V2 does not state; SLICE-ORDER already gives local play from slice 2 (seam S11) |
 | R1-ABL-OQ6 | DESIGN: Mustafa | stacking of slows and marks, regeneration, seats and active reload numbers are game rules the ability system carries but does not decide |
 | R1-DATA-OQ10 | DESIGN: Mustafa with the game-designer | which tunables a private match exposes is a rule about what hosts may change |
 | R1-XT-OQ8 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is the same product question as offline play itself (two rows up) |
@@ -147,12 +150,12 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 ## Loose-ends register
 Each loose end, with where it is resolved (draft and part) or which open question lists it.
 
-**STATUS's five carry-forwards** (`docs/STATUS.md`, "Next: the decision drafts")
+**STATUS's five carry-forwards** (`docs/STATUS.md`, "The five carry-forwards into the decision drafts")
 | Code | Item | Resolved in / listed by |
 |---|---|---|
 | CF-1 | Verify every ADR claim and number, R3–R6 included (research plan condition 9; PR #28 review, finding 4) | every draft's claims ledger, checked by the verifier (plan step 7) and the fix round; a claim whose source is unreadable stays "unverified" and its decision becomes an open question or a spike mark; the report records the result |
 | CF-2 | R2-BUD-REC6's reason (r2:2402–2403) holds at N = 54, not at N = 48; restate for 30 Hz and say what the 60 Hz margin is measured against (PR #28 review, finding 2) | ADR 0001 parts 2 and 3: the budget restated at 30 Hz, the corrected reason with "(at N = 54, MODES-3 (b))" at line 161, the 60 Hz margin as [GLOSSARY §8](../research/GLOSSARY.md#the-60-hz-margin) defines it; its reading is OQ-0001-1 |
-| CF-3 | Use 48 where a mark gives 48 and 54; where a sentence says "until … answers", the answer applies | every draft (each Appendix A notes the answered code); checked in the consistency pass |
+| CF-3 | Use N = 48 where a mark gives N = 48 and N = 54; where a sentence says "until … answers", the answer applies | every draft (each Appendix A notes the answered code); checked in the consistency pass |
 | CF-4 | R6-HOST-REC4 recommends a certificate per hostname; four sentences still call the wildcard R6's proposal | ADR 0006 part 7 (per hostname, BASELINE-WHEN (b)), which lists the four sentences as superseded; the issuance is OQ-0006-5 |
 | CF-5 | No doc defines "the netcode proof test" or "the foundation" | [GLOSSARY §8](../research/GLOSSARY.md#8-phase-1-terms-the-advisor-2026-10-31) (the Advisor's definitions, word for word); ADR 0001 owns the proof test; ADR 0002's migration plan is the foundation; SPIKE_PLAN names the research spikes the proof test subsumes |
 
@@ -163,7 +166,7 @@ Each loose end, with where it is resolved (draft and part) or which open questio
 | PREV-DELETE | a spike item | ADR 0006 part 3; SPIKE_PLAN item 6, the preview hosting check (PM-0006-6) |
 | MODES-3 (a) | answered: totals; largest mode 24v24, N = 48 | applied in every draft; GLOSSARY §2's test-mode list reads (a) |
 | PREVIEW-WALL (a) | answered: previews that reach the staging game server are private from the first one | ADR 0006 part 2 (the access wall); what else it covers is OQ-0006-4 |
-| SEC-SPREAD (a) | answered: server-only spread | ADR 0004 part 8 (the authority-only stream); ADR 0001 (no client-held copy); ADR 0003 (tracers from a cosmetic spread the hit event corrects) |
+| SEC-SPREAD (a) | answered: "server-only spread" (the spread is known only to the authority) | ADR 0004 part 8 (the authority-only stream); ADR 0001 (no client-held copy); ADR 0003 (tracers from a cosmetic spread the hit event corrects) |
 | BASELINE-WHEN (b) | answered: listed open in ADR 0006 with interim positions | ADR 0006 part 13 and OQ-0006-6 (the security baseline, its own fresh session before the first online playtest) |
 | XU (30 ids) | settled and open cross-unit questions | each owner draft's Appendix A: answered (where) or an open question with the spike that decides it |
 | PR #28 finding 2 | R2-BUD-REC6's reason | the same item as CF-2 |
@@ -205,13 +208,13 @@ Appendix A records how)
 **The old ADR entries and STATUS's items for ADR-001**
 | Code | Item | Resolved in / listed by |
 |---|---|---|
-| OLD-ADR | STATUS:198: the v2 drafts replace ADR-001..003 | this index; docs-keeper marks STATUS's three entries replaced |
-| ADR-001 | STATUS:199 (authority, tick, transport, hosting, offline play; its logged inputs) | ADR 0001 (authority, the tick rule, transport, rooms; forged commands refused); ADR 0004 (the tick mechanism, one hit world, phases, random streams, events, sight at 48); ADR 0006 (hosting); ADR 0005 (server-side schema checks); offline play is DESIGN (R1-BND-OQ1) |
-| ADR-002 | STATUS:200–201 (modules, bundler, TypeScript, double-click build; "evidence first via the build spike") | ADR 0002 (the stack is settled; the build spike's role passes to the boundary spike and the foundation; the double-click player build ends with the legacy engine, under "Hard constraints in CLAUDE.md that change"); the editor's double-click rule is OQ-0002-1 |
-| ADR-003 | STATUS:202 (stay on r128 or upgrade) | ADR 0003 part 2 (the latest three.js with WebGPURenderer, pinned, upgraded step by step: R3-WGPU-REC2) |
-| SEC-MDL-2 | STATUS:257 (`__proto__` through `envMerge` / `rulesMerge`) | ADR 0005 CD-2 and CD-9 (content parsed into typed Rust structs by one validating crate, fuzzed with `__proto__` keys; server-side validation); the legacy file stays frozen |
-| CDN-SRI | STATUS:262 (no SRI or CSP on the three.js CDN tag) | ADR 0002 (three.js bundled from npm with Vite: no CDN tag); the CSP is the security baseline's (ADR 0006 part 13, OQ-0006-6) |
-| WALL-CLOCK | STATUS:273 (11 `performance.now` / `Date.now` reads) | ADR 0004 part 4 (the tick counter is the sim's only clock; the step reads no clock); ADR 0002 part 7 (`Instant` and `SystemTime` banned in `crates/sim`); the legacy reads stay in the frozen legacy game |
+| OLD-ADR | STATUS, "ADR-001..003 below": the v2 drafts replace ADR-001..003 | this index; docs-keeper marks STATUS's three entries replaced |
+| ADR-001 | STATUS, "ADR-001 Multiplayer architecture" (authority, tick, transport, hosting, offline play; its logged inputs) | ADR 0001 (authority, the tick rule, transport, rooms; forged commands refused); ADR 0004 (the tick mechanism, one hit world, phases, random streams, events, sight at N = 48); ADR 0006 (hosting); ADR 0005 (server-side schema checks); offline play is DESIGN (R1-BND-OQ1) |
+| ADR-002 | STATUS, "ADR-002 Code structure & build" (modules, bundler, TypeScript, double-click build; "evidence first via the build spike") | ADR 0002 (the stack is settled; the build spike's role passes to the boundary spike and the foundation; the double-click player build ends with the legacy engine, under "Hard constraints in CLAUDE.md that change"); the editor's double-click rule is OQ-0002-1 |
+| ADR-003 | STATUS, "ADR-003 Three.js version" (stay on r128 or upgrade) | ADR 0003 part 2 (the latest three.js with WebGPURenderer, pinned, upgraded step by step: R3-WGPU-REC2) |
+| SEC-MDL-2 | STATUS, "Open bugs and risks", SEC-MDL-2 (`__proto__` through `envMerge` / `rulesMerge`) | ADR 0005 CD-2 and CD-9 (content parsed into typed Rust structs by one validating crate, fuzzed with `__proto__` keys; server-side validation); the legacy file stays frozen |
+| CDN-SRI | STATUS, "Open bugs and risks", the item deferred from the gate-check-5 reviews (no SRI or CSP on the three.js CDN tag) | ADR 0002 (three.js bundled from npm with Vite: no CDN tag); the CSP is the security baseline's (ADR 0006 part 13, OQ-0006-6) |
+| WALL-CLOCK | STATUS, "Open bugs and risks", the wall-clock item (11 `performance.now` / `Date.now` reads) | ADR 0004 part 4 (the tick counter is the sim's only clock; the step reads no clock); ADR 0002 part 7 (`Instant` and `SystemTime` banned in `crates/sim`); the legacy reads stay in the frozen legacy game |
 
 **The decision map's own loose ends** (the map is a checkpoint file, deleted before the PR is ready)
 | Code | Item | Resolved in / listed by |
@@ -222,10 +225,10 @@ Appendix A records how)
 | LE-E | R2-TRN-REC1 mark 2's load is a 60 Hz placeholder | ADR 0001: restated at 30 Hz |
 | LE-F | brief §2's "100 ms" does not say round trip or one way | OQ-0001-3 |
 | LE-G | does a VISION_V2 §3 or §4 target count as a need | "Decisions the drafts ask for" (trace reading) |
-| LE-H | R7-MARKS (a): 118 inventory rows are "look brief pending" | ADR 0003 and ADR 0005 list the rows their decisions change; `docs/LEGACY_INVENTORY.md` changes only after Mustafa accepts the drafts |
+| LE-H | R7-MARKS (a): 118 inventory rows are "look brief pending" | ADR 0003, ADR 0004 and ADR 0005 list the rows their decisions change, each in its "Legacy inventory rows" table; the 18 rows no draft had listed (CL5, CC10, GW5–GW8, GW10, GW11, GN2, GE3, GE4, GE7, GE9, GE10, GE14, GE16, GP8, KT5) are now there; `docs/LEGACY_INVENTORY.md` changes only after Mustafa accepts the drafts |
 | LE-I | SLICE-ORDER partly answers the offline-play questions | DESIGN (R1-BND-OQ1, R1-TICK-OQ7); ADR 0002 and ADR 0004 build local play with bots from slice 2 |
 | LE-J | 38 research ids are pure design matters | "Design questions" above |
-| LE-K | the proof test runs before the foundation with a throwaway sim | OQ-0001-2 (TICK-60-SETUP) |
+| LE-K | the netcode proof test runs before the foundation with a throwaway sim | OQ-0001-2 (TICK-60-SETUP) |
 | LE-L | machines and certificates belong to ADR 0006 | ADR 0006 owns every R6-HOST id, R2-TRN-REC5 and R2-TRN-OQ4; ADR 0001 cites them |
 | LE-M | R2-INT-REC3's visibility pass is ADR 0001's, its 5 % a part of ADR 0004's sim step share | ADR 0001 (the id); ADR 0004 part 6 (the number) |
 | LE-N | the Feel Lab test needs abilities in the engine | SPIKE_PLAN item 10, after slice 4 |
@@ -236,19 +239,19 @@ Appendix A records how)
 Features a draft proposes whose need is only in LOOP_V2, EDITOR_V2, LOOK_V2, UPGRADE-SCOPE, GLOSSARY §8's foundation or
 a VISION_V2 §3/§4 target (plan rule 4, the advisor's condition 8, and the session's trace reading of 2026-10-31, decision
 map J3), one line each, for the stop review. Each draft's "Need:" line is the source.
-- **ADR 0001:** R2-BUD-REC5 and R2-TRN-REC6 (part 10), the network profiles against which every mark is restated (part 13, R2-XT-OQ14): VISION_V2 §4 only.
+- **ADR 0001:** R2-BUD-REC4 (the input buffer and the clock, parts 5 and 7), R2-BUD-REC5 and R2-TRN-REC6 (part 10), the network profiles against which every mark is restated (part 13, R2-XT-OQ14): VISION_V2 §4 only.
 - **ADR 0001:** the server's authority over upgrade tracks, offers, picks, drops and pickups, and their messages (part 12): UPGRADE-SCOPE.
 - **ADR 0002:** the repository restructure (part 1), the pinned toolchains (part 2), the lint set (part 7), CI gate v2 (part 9), the preview build (part 10): GLOSSARY §8, the foundation only (with VISION_V2 §4, §6.6 and §6.8 for the determinism checks).
 - **ADR 0002:** the editor build as its own entry (part 11): EDITOR_V2 §5 only (it also serves §6.7's authoring).
 - **ADR 0003:** the three.js pin and upgrade policy (part 2), the backend report (part 4), the reference machines and quality tiers (part 7), the measurement harness and the client's per-match report (part 8): VISION_V2 §4 only.
-- **ADR 0003:** the look pipeline (part 5): LOOK_V2 §1–§7 only (with VISION_V2 §6.9 for its cost); halftone flashes and line boil: LOOK_V2 §7 only; the concussion shake: LOOK_V2 §2 only; roof fade: LOOK_V2 §4.
+- **ADR 0003:** the look pipeline (part 5): LOOK_V2 §1–§7 only (with VISION_V2 §6.9 for its cost); halftone flashes and line boil: LOOK_V2 §7 only; the concussion shake: LOOK_V2 §2 only; roof fade (5.i): LOOK_V2 §4, beside §6.2.
 - **ADR 0003:** spatial audio (part 9): LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 only.
 - **ADR 0004:** snapshot and restore for re-simulation (part 3): VISION_V2 §4 only and SLICE-ORDER condition 2 (replayable from day one).
 - **ADR 0004:** the sim step share and its parts (part 6): VISION_V2 §3 and §4 only (a budget, not a feature); no panic from input or content, and recovery from a trap (part 20): VISION_V2 §4 only.
 - **ADR 0004:** bot behaviour in the sim (part 15): VISION_V2 §3 ("Bots fill empty slots") and LOOP_V2 §10, beside §6.2's bots between levels.
 - **ADR 0004:** the player record, weapon drops and pickups, the offers' random stream (parts 8, 18): UPGRADE-SCOPE.
 - **ADR 0004:** map validation with the sim's own integrator (part 21): EDITOR_V2 §3 and LOOP_V2 §9, beside §6.2; active reload (part 16): LOOP_V2 §7.
-- **ADR 0004:** three damage stages and structure states (part 14): LOOK_V2 §4.
+- **ADR 0004:** three damage stages (part 14): LOOK_V2 §4 only (the structure states themselves serve §6.2, §6.4 and §6.5).
 - **ADR 0005:** the feel kit as client content and the Feel Lab's data (CD-14): LOOP_V2 §7 only; development hot reload (CD-7): LOOP_V2 line 8 and §7 only; the quality-tier table (CD-14): VISION_V2 §4 only.
 - **ADR 0005:** the map document as content (CD-11): EDITOR_V2 §2 (rules 1, 2 and 5) and §4, beside §6.1 and §6.2; EDITOR_V2 §2 rules 3 and 4 are left to EDITOR_V2's own architecture plan (decision map J3).
 - **ADR 0005:** the upgrade tracks on the ability model (AB-8, AB-4's two added kinds): UPGRADE-SCOPE.
@@ -261,6 +264,10 @@ map J3), one line each, for the stop review. Each draft's "Need:" line is the so
 The drafts cite codes from the decision map (`.checkpoints/v2-decision-drafts/engine-architect-decision-map.md`, a
 checkpoint file deleted before the PR is marked ready). Their definitions live here from now on. Decision codes such
 as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY terms in `docs/research/GLOSSARY.md`.
+Plan rules, plan steps and the advisor's conditions ("plan rule n", "plan step n", "condition n"): the report's
+appendix, `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3–§4, quotes them word for word. Codes local to one
+draft are not register codes: ADR 0002's gate checks G1–G13, ADR 0004's spike claims S1–S22 and ADR 0006's option
+labels (G1–G4, S1–S3, K1–K4, B1–B11); a register code always carries its word ("gap G5", "seam S1").
 
 **Interfaces between the drafts** (what crosses each seam; owner defines, the others use)
 | Code | Interface | What crosses | Owner | Used by |
@@ -276,7 +283,7 @@ as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY term
 | I-9 | Map document → sim, bake, renderer, editor | colliders with stable ids, baked navigation, floors, enclosures and portals, structure states, lighting mood | 0005 (schema); 0004 (bake, states) | 0001, 0003, the editor |
 | I-10 | Events → match record → storage | tick-stamped events and moments; the record written at Ended; upload to EU storage | 0004; 0001; 0006 | 0005 |
 | I-11 | Room process ↔ supervisor ↔ lobby | process spawn, host and port, join tokens checked by the room | 0001; 0006 | 0002 |
-| I-12 | Server → monitoring | tick time histogram, overruns, dropped time, per-phase time, sessions, bytes, memory, room starts and crashes | 0006; 0004 and 0001 emit | |
+| I-12 | Server → monitoring | server tick time histogram, overruns, dropped time, per-phase time, sessions, bytes, memory, room starts and crashes | 0006; 0004 and 0001 emit | |
 | I-13 | CI → client host and staging | the built artifact and its header sets; room binary and certificate hash for multiplayer previews | 0002; 0006 | 0001 |
 | I-14 | Budgets as data | every budget as data in the repository, reviewed like code | 0002; each number's owner | all |
 | I-15 | Reference hardware | the reference server and the client reference machines | 0006; 0003 | every spike |
@@ -287,13 +294,14 @@ as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY term
 | I-20 | Events → feel | hits, deaths, blasts, cosmetic shot events, purchases, moments → VFX, audio, HUD | 0004 (emits); 0001 (delivery online); 0002 (event section) | 0003, 0005 |
 | I-21 | Upgrade picks | the player's picks on the player's slot, as data; sent to their owner; shown on the HUD | 0005 (data); 0004 (state); 0001 (visibility) | 0003 |
 
-**Seams** (cited as "seam S-n"; the map's seams, not ADR 0004's own claim numbers S1–S20)
+**Seams** (cited as "seam S-n"; the map's seams, not ADR 0004's own claim numbers S1–S22)
 | Code | Seam | One side decides | Other side decides |
 |---|---|---|---|
 | S1 | Tick | 0001: the tick rate rule under TICK-30, the 60 Hz margin, the snapshot rate, the server tick budget's total and the server-only share | 0004: the fixed-tick mechanism, the sim step share and its parts, the client's sim share, determinism |
 | S3 | CI and previews | 0002: CI, gate v2, the preview build, the deploy job, header sets, close and sweep jobs | 0006: the host, token scope, access wall, cleanup policy and PREV-DELETE, staging server, runner costs, secrets policy |
 | S4 | Rooms vs machines | 0001: room lifecycle, process model, tokens, reconnect, private rooms, lobby protocol | 0006: VMs, supervisor, firewall, the lobby's hosting and store, production certificates, rooms per VM as cost, monitoring |
 | S6 | Moments and telemetry | 0004 recognizes moments and emits events; 0005 holds moment rules and telemetry ids as data; 0001's room writes the record | 0006: the record's shape, storage, analysis and retention |
+| S11 | Offline and local play | DESIGN: whether offline play ships, and at the largest mode on the minimum laptop (R1-BND-OQ1, R1-TICK-OQ7, critic rank 15) | 0002 and 0004: the local server from slice 1 and local play with bots in slice 2 (SLICE-ORDER), whatever the answer |
 | S12 | Security | 0006: the security baseline listed open, its interim positions and every item waiting on it | 0001, 0002, 0005 cite the baseline item where their design waits on it |
 
 **Research gaps** (no finding in R1–R6; cited as "gap G-n" or "part h, G-n")
@@ -303,7 +311,7 @@ as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY term
 | G2 | halftone flashes and ink line boil (LOOK_V2 §7) | ADR 0003: built as defaults; technique an open question; cost a look-test mark |
 | G3 | roof fade (LOOK_V2 §4) | ADR 0003 OQ-0003-6; the visibility rule stays R2-INT-OQ1 (design) |
 | G4 | three damage stages (LOOK_V2 §4) | ADR 0004 part 14 extends the research's two states; the third stage's trigger is OQ-0004-4 |
-| G5 | visual effects (fragments, muzzle flashes, tracers, impacts, debris) | ADR 0003 OQ-0003-7; the effects budget row stands |
+| G5 | visual effects (fragments, muzzle flashes, tracers, impacts, debris) | ADR 0003 OQ-0003-7; the visual-effects budget row stands |
 | G7 | soft shadows and the lighting model (LOOK_V2 §2, §6.5) | ADR 0003 OQ-0003-4 and OQ-0003-5 |
 | G8 | inner lines thinner than the silhouette ink (LOOK_V2 §6.2) | ADR 0003 OQ-0003-2 |
 | G9 | vegetation, "lush" environments, mesh LOD | ADR 0003 OQ-0003-9 (the tree style stays `[OPEN]`) |
@@ -330,7 +338,7 @@ as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY term
 | Code | What it holds |
 |---|---|
 | J1 | the 60 Hz margin as a shared number owned by ADR 0001, and the GLOSSARY §8 text (now in the GLOSSARY) |
-| J2 | three register items: the old ADR-001..003 entries, STATUS:257, :262, :273, and PR #28 finding 4's closed condition (all in the loose-ends register above) |
+| J2 | three register items: the old ADR-001..003 entries, STATUS's SEC-MDL-2, CDN-tag and wall-clock items, and PR #28 finding 4's closed condition (all in the loose-ends register above) |
 | J3 | the trace rule and the session's reading (a VISION_V2 §3 or §4 target counts like LOOP_V2); the features listed under "Needs outside VISION_V2 §6"; EDITOR_V2 §2's rules → ADR 0005; EDITOR_V2 §5's two lines → ADR 0002 (DOCS-ALIGN); no feature for `[LATER]` or `[OPEN]` items |
 | J4 | how ADR 0005 is put together (three authors, one frame) and ASSET-RESEARCH (a) |
 | J5 | UPGRADE-SCOPE as Mustafa updated it, and which draft carries each part (0005 data, 0004 the player record and drops, 0001 authority and messages, 0006 telemetry fields, 0003 the UI); carry slots, looted ammo and levelling open for Mustafa; WEAPON-UNLOCKS listed |

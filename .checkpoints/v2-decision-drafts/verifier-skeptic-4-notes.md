@@ -26,3 +26,7 @@ Tasks: F1 (0002 rows 27/33, erasableSyntaxOnly enum), F3 (0002 PM-0002-45 vs G7)
 - Tried TS repo test/baseline/checker on raw.githubusercontent main: all 404 (URLs mine, not from a page). Stopped guessing.
 - r5:221-224 F12 (general knowledge, unverified) and r5:1262 REC1 "an `enum`" confirmed; research unchanged 9e7db28..4de24d2 except GLOSSARY.
 - F1 verdict leaning: UPHELD (doc wrong): "names no enum" false; flag tie explicit in 5.8 notes. Residual: "most" = a hedge only tsc closes; ambient (.d.ts) enum not covered by either source.
+
+## 09:40 F1 row and F3 row written (both upheld)
+- F3: part 4 0002:237-241, G7 :455, item 8 :960-962, PM-29 :1071, App A :1326, SPIKE_PLAN :81/:299/:57-58, PM-52 :1095, R5 G7 row r5:1718 "(its size is set once REC4's budget exists)".
+- Next: F5 (0004:805-807 vs README), then A8 (0001 vs 0004 part 19), then B14/B18/B38 (0003 vs README).

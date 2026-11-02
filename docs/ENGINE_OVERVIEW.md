@@ -11,15 +11,15 @@ reconciliation) and the local server in local play, from slice 1 (SLICE-ORDER, c
 three.js `WebGPURenderer` with its WebGL 2 fallback; it draws, animates and plays sound from one block of data per tick
 and never decides a hit, a death or a purchase. Content (units, vehicles, weapons, abilities, effects, upgrade tracks,
 modes, maps, tuning) is JSON that one Rust content crate validates the same way on the server, in the Worker and in the
-editor. The server ticks at 30 Hz (TICK-30) for up to 48 players (MODES-3 (a)); 60 Hz only with
-[the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin).
+editor. The server ticks at 30 Hz (TICK-30) for up to N = 48 players (the largest mode, 24v24: MODES-3 (a)); 60 Hz
+only with [the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin).
 
 ## The parts and the boundary
 ```mermaid
 flowchart TB
   subgraph PAGE["Browser page: TypeScript (ADR 0003, ADR 0002)"]
-    IN["Input and camera<br/>packages: client"]
-    R["three.js WebGPURenderer, WebGL 2 fallback<br/>TSL materials, the look, VFX"]
+    IN["Input and camera<br/>packages: client<br/>§6.2 the aim point"]
+    R["three.js WebGPURenderer, WebGL 2 fallback<br/>TSL materials, the look, VFX<br/>§6.7 faction colour · §6.9 the spectacle budget"]
     AU["Web Audio"]
     HUD["HUD and menus (DOM)"]
   end
@@ -29,32 +29,37 @@ flowchart TB
     NET["net: WebTransport, WebSocket fallback"]
   end
   subgraph SRV["Match server: native Rust (ADR 0001, ADR 0006)"]
-    ROOM["server: one room per process<br/>room + sim, interest, encoding, lag compensation"]
-    SUP["supervisor, lobby, metrics, match record"]
+    ROOM["server: one room per process<br/>room + sim, interest, encoding, lag compensation<br/>§6.1 rooms and private matches"]
+    SUP["supervisor, lobby, metrics, match record<br/>§6.6 telemetry · §6.8 moments stored · §6.10 kept possible"]
   end
-  CONTENT["content crate: JSON validated, one hashed bundle (ADR 0005)"]
-  SIM["sim crate: plain typed tables, integer ticks, parry3d, baked navigation (ADR 0004)"]
-  IN -->|"one command per tick (posted)"| SW
-  SW -->|"one transferred block per tick: header, entity sections, events"| R
-  R --> AU
-  R --> HUD
+  CONTENT["content crate: JSON validated, one hashed bundle (ADR 0005)<br/>§6.1 modes · §6.3 abilities and effects · §6.7 factions"]
+  SIM["sim crate: plain typed tables, integer ticks, parry3d, baked navigation (ADR 0004)<br/>§6.2 the 3D sim · §6.3 · §6.4 vehicles · §6.5 economy · §6.8 moments"]
+  IN -->|"per tick: one command, posted"| SW
+  SW -->|"per tick: one transferred block: header, entity sections, events"| R
+  IN -->|"per frame: camera"| R
+  R -->|"per frame: interpolate, animate, draw the newest block"| R
+  R -->|"per frame: events as sound"| AU
+  R -->|"per frame: events as HUD feedback"| HUD
   SW --- WASM
   WASM --- NET
-  NET <-->|"commands up; snapshots and events down (ADR 0001 protocol)"| ROOM
+  NET <-->|"per tick: commands up; snapshots and events down (ADR 0001 protocol)"| ROOM
   ROOM --- SUP
   SIM -.->|"same code"| WASM
   SIM -.->|"same code"| ROOM
   CONTENT -.->|"read by id"| SIM
 ```
 In words: the page posts one command per tick to the Worker and receives one block per tick back; it makes no call
-into Wasm and touches no network (ADR 0002 part 5). The Worker holds the Rust sim as Wasm and owns the connection (ADR
-0002 part 6). Online, the Worker talks to the room process over WebTransport, or WebSocket when that fails (ADR 0001
-part 10); in local play the same Worker runs the room and the sim itself, behind the same messages (SLICE-ORDER
-condition 1; ADR 0002 part 6). The sim crate and the content crate sit below everything.
+into Wasm and touches no network (ADR 0002 part 5). Per frame, the page interpolates, animates and draws the newest
+block and plays its events as sound and HUD feedback (ADR 0003 part 10). The Worker holds the Rust sim as Wasm and
+owns the connection (ADR 0002 part 6). Online, the Worker talks to the room process over WebTransport, or WebSocket
+when that fails (ADR 0001 part 10); in local play the same Worker runs the room and the sim itself, behind the same
+messages (SLICE-ORDER condition 1; ADR 0002 part 6). The sim crate and the content crate sit below everything. Each
+part's label names the VISION_V2 §6 items it serves; the table below gives the draft and part.
 
 **The Rust ↔ TypeScript boundary** (ADR 0002 part 5; interfaces I-2, I-3, I-5 in [the register](adr/README.md#codes-the-drafts-cite)):
 - **Down (Worker → page):** one transferred output block per tick (B2), with a header (tick, layout hash, counts),
-  sections per entity kind and an event section (hits, deaths, purchases, captures, moments); the SharedArrayBuffer
+  sections per entity kind and an event section (the events of ADR 0004 part 19, such as hits, deaths and kills,
+  blasts, purchases, uplink cache events, tech tiers, upgrade picks and pickups, and moments); the SharedArrayBuffer
   ring (B3) is measured against it in the boundary spike. The fields of remote entities online are ADR 0001's; the
   layout is ADR 0002's.
 - **Up (page → Worker):** one command per tick, posted, including the world aim point from the page's cursor ray
@@ -65,8 +70,9 @@ condition 1; ADR 0002 part 6). The sim crate and the content crate sit below eve
 **Dependencies point one way** (ADR 0002 part 3, each a gate check): `sim` depends on `content` only, with no
 transport, no async runtime and no clock; `room` builds for Wasm with no async runtime; `protocol` uses `sim` and
 `content` types; `sim-wasm` = `sim` + `room` + `protocol` + `content`, never `navbake` or `server`; `server` adds the
-transport and the runtime; `client` never reaches `editor`; tools (`devtools`, `navbake`, the editor) may depend on
-everything. Each crate enters with the first slice that needs it.
+transport and the runtime; `client` never reaches `editor`. Among the tools, `devtools` may depend on any workspace
+crate and `navbake` on `sim` and `content`; the editor uses `client` code and the `navbake` and `sim` Wasm; nothing
+imports `legacy/` or `spikes/`. Each crate enters with the first slice that needs it.
 
 ## The data flow
 **Per tick (30 Hz; ADR 0004 parts 4–5, ADR 0001 parts 2–9):**
@@ -98,7 +104,7 @@ match (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
 | 1 | Modes as data: 2 or 3 teams of any size, one faction per team, rooms and private matches | ADR 0001 part 11 (rooms, private rooms, a room as a mode id plus overrides, bots fill slots); ADR 0005 CD-6 (mode files, factions as data); ADR 0006 parts 5–6 (hosting rooms, the lobby) |
 | 2 | A true 3D sim: floors, interiors, ledges, sight across heights; bots between levels; aiming at height | ADR 0004 parts 10–13 (collision queries, baked navigation, floors and typed links, sight); ADR 0001 parts 5 and 9 (the aim point in the command; enclosures in interest); ADR 0002 part 5 (the aim point across the boundary); ADR 0003 part 10 (the cursor ray hits the drawn state) and part 5.i (roof fade) |
 | 3 | A data-driven ability and effect system | ADR 0005 AB-1 to AB-10 (a reduced GAS subset as data, upgrades included); ADR 0004 part 16 (execution and its cost); ADR 0001 part 4 (the prediction scope) |
-| 4 | Vehicles as first-class: big, multi-part, own weapons and abilities | ADR 0004 parts 10 and 14 (compound bodies, vehicles as obstacles); ADR 0001 parts 6 and 9 (parts in snapshots and interest); ADR 0003 part 6 (very large units); ADR 0005 AB-6 (the two primitives §6.4 needs: an effect removed when its source dies, and marking). `[OPEN]` seats: no feature; R2-SYNC-OQ7 stays a design question |
+| 4 | Vehicles as first-class: big, multi-part, own weapons and abilities | ADR 0004 parts 10 and 14 (compound bodies, vehicles as obstacles); ADR 0001 parts 6 and 9 (parts in snapshots and interest); ADR 0003 part 6 (very large units); ADR 0005 AB-6 (leech: an effect removed when its source dies and a last-hit trigger that moves the victim's item to the source; marking: an effect that grants a tag). `[OPEN]` seats: no feature; R2-SYNC-OQ7 stays a design question |
 | 5 | Economy and objectives, server-side and tunable | ADR 0004 part 17 (sim phases); ADR 0005 CD-6, CD-10 (tuning tables); ADR 0001 part 9 (visibility classes) |
 | 6 | Balance telemetry | ADR 0004 part 19 (events); ADR 0001 part 11 (the room writes the record at Ended); ADR 0006 part 12 (shape, storage, analysis); ADR 0005 CD-12 (telemetry ids) and CD-8 (the content hash every match records) |
 | 7 | A faction content pipeline as data | ADR 0005 CD-13 (faction variants) and AP-3 (faction colour slots); ADR 0003 part 6 (per-instance faction colour) |
