@@ -34,3 +34,5 @@
   F-o (low) triangle row counts shadow pass (reset once per frame): 500k / (48 x 2) = 5.2k per soldier ceiling before world+VLUs -> planning number for OQ-0005-AS5/AS6.
   F-p (low) PM-0003-19 CPU span excludes style/layout/paint of the DOM HUD (legacy P3).
 - Next: write review-perf-auditor.md.
+- Wrote review-perf-auditor.md (verdicts, 14 findings, agreements, checks, 4 questions, not-checked). Citation lines re-verified and corrected (0001:224-225, 509-510, 1069/1077-1078, 199-200; 0003:338, 990/996-999, 993; 0002:1067; 0005:1656-1667).
+DONE

@@ -167,3 +167,35 @@ rows REVISE (one row). Every golden number in the ability rows checks out.
 Questions: GD-STEAL (presence rule as a data switch, decided in the uplinks change-set from 3 sim runs each);
 GD-REJOIN (yes, keyed by player); GD-PICK-VIS (owner only to start, with OQ-0005-AB7); GD-CARRIER (yes, public, carry
 speed from sims); GD-BOT-LOOT (no, for the slice 2 greybox). All Mustafa's.
+
+## From the step-10 review by netcode-architect (review-netcode-architect.md; 2026-11-02 about 09:44)
+Verdicts: ADR 0001's pass marks and netcode checklist REVISE (small); ADR 0001 parts 5, 7, 8 (its own text,
+self-review) REVISE (small); ADR 0002, 0004, ENGINE_OVERVIEW, SPIKE_PLAN items 1–2 APPROVE WITH NOTES; README APPROVE.
+It leaves out what engine-architect (1–4, 8) and security-auditor (6, 8) already raise.
+1. High: the rewind estimate "RTT + interpolation delay" (Source's model) leaves out part 5's 1–3 tick command buffer
+   and the page's one-tick blend: an honest shot at P2 needs 233–383 ms of rewind, above the 200 ms cap (and 250 ms
+   but at the low end); PM-0001-20 implies a 3-tick buffer; PM-0001-48 fails by design; "server time" in part 7
+   undefined (0001:199–200, 272–276, 280–282, 803–806; OQ-0001-5, -6; PM-0001-20, -48, -49; checklist step 10).
+   netcode-architect, test-engineer. Its Q1 (the cap).
+2. Medium: PM-0001-12's 160 kbps downstream mean is judged in the stress scene, but the research set it on a normal
+   48-player bot match (r2:2339; GLOSSARY:415–416): 700 shots/s alone give 166.2 kbps. test-engineer.
+3. Medium: no rule or mark stops own-weapon cues replaying on every prediction replay, or the server echoing the
+   shooter's own shots (0001:166–168, 234; 0005:2113; SPIKE_PLAN:123; R1-ABL-REC4 handed to 0001, no row).
+   netcode-architect, test-engineer.
+4. Medium: received datagrams reach Rust once per tick with no arrival time: 0–33 ms of false jitter against the
+   ±5 ms marks PM-0001-33, -47 (0002:280–282). engine-architect (0002).
+5. Medium: "late" = more than 66.7 ms after sending, only 16.7 ms above P2's 50 ms one-way; the profiles never split
+   latency and jitter by direction: 8.3 % late against a 3 % mark (PM-0001-37, -3). test-engineer. Its Q2.
+6. Medium: any failure in PM-0001-4 to -27 sends parts 2 and 3 back, but only -4 to -11 time the tick; the sentence
+   contradicts itself on -15, -16 (0001:1186–1190). test-engineer.
+7. Medium: when the page posts its command is unstated; once per tick can delay an input by up to 66.7 ms past
+   PM-0002-13's 50 ms; every frame meets it but PM-0002-64 forbids it (0002:274; PM-0002-64, -13; ENGINE_OVERVIEW:37,
+   :94). engine-architect (0002), test-engineer.
+8–17. Lows: the Worker's pacer and the server-clock estimate (0004:188–193); 5–7 repeated commands at P2, not 4: a
+   "newest received" ack (0001:513–518); PM-0001-44's 6-tick replay; PM-0001-42 depends on soldier collision; the 60 Hz
+   run's snapshot rate (0001:127, PM-0001-39); no client resync message (0001:489, 556–557); a generation change as
+   removal + addition (0001:241–242); client and local server order in one Worker step (0002 part 6); "seated
+   players" (0001:240, 302); ENGINE_OVERVIEW:9–10 wording.
+Questions: Q1 (Mustafa and the Advisor, extends OQ-0001-5): the rewind cap with the buffer counted (recommend: set from
+the proof test's measured honest rewind, p99 of PM-0001-49, with run-on-arrival measured beside it); Q2 (the
+Advisor): may the profiles split latency and jitter half each way, uniform, as a proposed value (recommend yes).
