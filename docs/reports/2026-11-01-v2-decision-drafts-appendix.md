@@ -520,3 +520,64 @@ Spend-limit cuts (no work lost: every agent writes its notes as it goes and was 
 | 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00 |
 | 18 | KIT-ALIGN and DOCS-ALIGN lines; the R7-MARKS delay and the step-0 edit stated; each draft lists its inventory rows | STATUS (docs-keeper); the report's "Decisions and deviations"; every draft's legacy inventory table, the 18 "look brief pending" rows included |
 | 19 | ENGINE_OVERVIEW at about 150 lines at most | 139 lines after the synthesis round (the final round's count is in the Evidence) |
+
+## 7. Verification, the reviews and the final round
+
+### 7.1 Verification (plan steps 7–9)
+| Unit | Verdict | Claims | Confirmed | Other |
+|---|---|---|---|---|
+| ADR 0001 | PASS WITH NOTES | 629 | 609 | 3 wrong, 3 unsupported, 5 citation off, 1 rule |
+| ADR 0002 | PASS WITH NOTES | 538 | 515 | 2 wrong, 7 citation off; 37 sources read |
+| ADR 0003 | PASS WITH NOTES | 440 | 431 | 1 wrong, 4 unsupported, 2 citation off, 2 rule |
+| ADR 0004 | PASS WITH NOTES | 665 | 657 | 4 wrong, 1 unsupported, 2 citation off |
+| ADR 0005 | PASS WITH NOTES | 1,001 | 997 | 1 wrong, 1 unsupported, 2 citation off |
+| ADR 0006 | FAIL (3 defects), then fixed | 588 | 581 | 3 wrong (fixed in 09803a9), 2 citation off |
+| Synthesis | PASS WITH NOTES | 61 | 57 | 2 wrong, 1 unsupported, 1 citation off |
+| Fix rounds 1–2 (fixcheck-a, -b) | PASS WITH NOTES | 211 | 201 | 3 wrong, 4 unsupported, stale lines; all to a skeptic, then fixed |
+| Rounds 3–4 and the synthesis round (fixcheck-c) | PASS WITH NOTES | 95 | 92 | 1 partly wrong (skeptic upheld), 1 citation off, nits; fixed in the final round |
+| The final round's web facts (fixcheck-d0) | PASS WITH NOTES | 10 | 9 | 1 wrong (ADR 0004's precision line; its owner checked the saved excerpt and fixed it) |
+| The final round (fixcheck-d1, -d2) | {D1D2} | | | |
+
+Skeptics (a fresh verifier asked to refute each "wrong" or "unsupported" verdict before it went to its owner), five
+rounds: 30 upheld, 9 partly, 2 refuted. The consistency critic: 14 findings (3 high), all fixed by their owners, 489
+glossary in-context hits judged in the drafts (3 wrong, fixed) and 44 in the synthesis. The completeness critic:
+GAPS, 16 items, all handled (the 18 inventory rows, the pass marks' anchors, §3–§4 of this appendix, the fixcheck units,
+the reviews, this report). Each verdicts file holds its fetch audit; github.com answers 403 in this session, so its
+pages were read from raw.githubusercontent.com.
+
+### 7.2 The ten reviews on the final diff (plan step 10)
+| Reviewer | Verdicts | High findings, and their outcome |
+|---|---|---|
+| engine-architect | 0001 REVISE (small); 0003, 0004, 0006, 0002's and 0005's pass marks APPROVE WITH NOTES | No timing rule for events: fixed (ADR 0001 part 7; ADR 0002 part 5; PM-0001-61) |
+| security-auditor | 0002, 0006 REVISE; 0001 APPROVE WITH NOTES | A pull request's own workflow could take the preview token: fixed (production deploys only from main, own environment and token; a required reviewer on `preview`; OQ-0006-13; PM-0002-66, PM-0006-32) |
+| infra-engineer | 0006 REVISE (its own text); 0001, 0002 APPROVE WITH NOTES | No release path or rollback: an interim position and OQ-0006-14; the rooms-per-VM mark vs one thread per vCPU: fixed (PM-0001-27 is PM-0006-13's runs) |
+| game-designer | 0001, 0004, one 0005 pass-mark row REVISE | Aim beyond weapon range refused: fixed (clamped; PM-0001-21) |
+| netcode-architect | 0001's pass marks and parts 5, 7, 8 REVISE (small); the rest APPROVE (WITH NOTES) | The rewind estimate left out the command buffer and the page's blend: fixed (part 8; PM-0001-48, -49; OQ-0001-5 keeps the cap open until the proof test) |
+| perf-auditor | 0001, 0003 REVISE (small); the rest APPROVE (WITH NOTES) | The 160 kbps mean gated in the wrong scene: fixed (R2's estimate scene for the mean, the 256 kbps cap in the stress scene) |
+| rust-reviewer | 0002 REVISE (small); the rest APPROVE WITH NOTES | (mediums) the float lint, clock reads in `room`, a panic in the tick, pool capacities: all fixed |
+| graphics-engineer | 0005 REVISE; the rest APPROVE WITH NOTES | One material per class vs per slot content: fixed (one per slot content) |
+| art-director | 0003 REVISE; 0005's assets and the look test APPROVE WITH NOTES | A tier could switch a LOOK_V2 [DECIDED] item off; Low never shown: fixed (the look floor, OQ-0003-16; checklist step 31) |
+| test-engineer | SPIKE_PLAN REVISE; every draft APPROVE WITH NOTES | The 60 Hz run's sim lacked abilities, economy and objectives: fixed (stand-ins that burn their ceilings, ADR 0004 S1; OQ-0001-2) |
+
+### 7.3 The final round (step 9 once more): every finding fixed or deferred
+Each author got one batch with every finding against its own text (`final-round-by-author.md`); each block was
+checked to sit in its author's text before it was applied; a fix that belonged to another author went to that author.
+Blocks applied in the final round: ADR 0001 61, ADR 0002 52, ADR 0003 53 (and 0005's GPU section), ADR 0004 28, ADR
+0005's frame and content 25, its ability section 21, ADR 0006 71, the pass marks 138 (units A and B), the synthesis
+{SYNTH}. Twenty-four new open questions, each routed to Mustafa or the Advisor: OQ-0001-15 to -18, OQ-0003-16 to -20,
+OQ-0004-8 to -12, OQ-0005-AB14 and AB15, OQ-0006-13 to -20.
+Deferred, each with its reason (to the drafts' revision after the stop review):
+- ADR 0004 OQ-0004-11's "What decides it" and part 17's immunity pointer could name ADR 0005 AB-1 and AB-6 (optional;
+  correct as they stand). ADR 0004 part 20 could name OQ-0001-18 (the pointer is correct as it stands).
+- ADR 0002 line about 1030: "draw on paid minutes" should read "draw on the account's included compute usage and are
+  then billed per minute" (fixcheck-d0 8c; low wording).
+- ADR 0001 and 0006: "a site being the registrable domain" simplifies MDN, which also counts the scheme for SameSite
+  cookies (fixcheck-d0 row 6; optional).
+- ADR 0001 part 8's rewind estimate may add the wait from the drawn frame to the tick that sends the command (0 to one
+  frame); PM-0001-49 now measures it per shot. Part 4's "causes no correction" may read "no correction beyond the one
+  at the first snapshot that carries it". The budgets row "Prediction replay" may add "7 at P2's deepest buffer".
+- ADR 0002 part 4 writes the chosen `[profile.release]` settings once the boundary spike measures them (a future
+  action); ADR 0003 part 10 states event play-time only if the one-frame bound of EA-1 is wanted (PM-0001-61 is set at
+  one tick plus one frame, 50 ms, a reasoned note).
+- ADR 0002's halves of SA-10 and SA-11 (npm advisories and a strict-CSP-ready build) wait for the security baseline
+  (BASELINE-WHEN (b)); ADR 0006 carries them.

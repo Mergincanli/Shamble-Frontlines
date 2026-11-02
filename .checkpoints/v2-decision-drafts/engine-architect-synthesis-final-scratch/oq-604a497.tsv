@@ -1,0 +1,114 @@
+0001	1022	OQ-0001-1	Is TICK-60-HEADROOM's reading confirmed?	Mustafa and the Advisor, "confirm at the stop"
+0001	1029	OQ-0001-2	How does the stress scene's sim load reach the 60 Hz margin run (TICK-60-SETUP)?	the Advisor
+0001	1049	OQ-0001-3	Is "100 ms of simulated latency" P2?	the Advisor, who wrote the definition
+0001	1054	OQ-0001-4	Does the client predict the player's own abilities (ABL-PREDICT)?	Mustafa
+0001	1060	OQ-0001-5	The rewind cap: which value, and the victim's side?	Mustafa and the Advisor
+0001	1074	OQ-0001-6	When does the server run each client's commands, and how does the client keep them just in time?	the netcode proof test
+0001	1084	OQ-0001-7	Do shots and the active-reload tap carry their moment inside a tick at 30 Hz?	for shots, the netcode proof test, then Mustafa in the Feel Lab if it fails or feels late; for the reload tap, Mustafa in the Feel Lab
+0001	1092	OQ-0001-8	How far does a new projectile move forward on spawn?	Mustafa
+0001	1096	OQ-0001-9	What else does lag compensation cover?	the netcode proof test for cover; for melee, a design call by Mustafa with the game-designer
+0001	1102	OQ-0001-10	Are weapon pickups predicted?	Mustafa
+0001	1106	OQ-0001-11	Room codes: length, alphabet and access.	Mustafa (what a host may set, R2-ROOM-OQ5) with the security review's options
+0001	1111	OQ-0001-12	Do far sound events reveal too much?	Mustafa with the game-designer
+0001	1115	OQ-0001-13	What do real players' networks show?	connection telemetry from the first online playtest (ADR 0006's monitoring)
+0001	1120	OQ-0001-14	Is a VISION_V2 §3 or §4 target trace enough for an engine feature?	the Advisor, at the stop
+0001	1127	OQ-0001-15	Is the local player drawn from the blend of the two newest blocks, one tick behind its prediction?	Mustafa, by feel, with netcode-architect
+0001	1138	OQ-0001-16	How does each network profile split its latency and jitter over the two directions?	the Advisor
+0001	1148	OQ-0001-17	Does a host's kick bar that player from the room for the rest of the match?	Mustafa (what a host may do, with R2-ROOM-OQ5)
+0001	1155	OQ-0001-18	When a room's simulation panics mid-match, does the match end (ROOM-CRASH)?	the Advisor
+0002	971	OQ-0002-1	Does the v2 editor still open by double-clicking its HTML file?	the boundary spike (does it load?), then Mustafa if EDITOR_V2 §5's rule must change. -
+0002	983	OQ-0002-2	Where do the legacy gate and tools live after the move, and where does the gate v2's script live?	the phase 1 restructure plan (the main session with docs-keeper), as R5 names it. -
+0002	993	OQ-0002-3	In a local match, do the local server and the client endpoint share one Wasm instance?	the boundary spike, with ADR 0001 (the interface) and ADR 0004 (OQ-0004-7). -
+0002	1007	OQ-0002-4	Does production ever turn on cross-origin isolation, and can a later login popup live with it?	the boundary spike's results, then this record; for embeds and the login flow under isolation, Mustafa with ADR 0006 (R1-BND-OQ5, only if isolation is adopted). -
+0002	1019	OQ-0002-5	Does real Safari run on pull requests, and does the end-to-end suite need it?	this record, from the macOS job's wall time, which infra-engineer measures in the foundation; ADR 0006 and Mustafa only if the repository stops being public, since a private repository's runners draw on paid minutes (the same page, read at the step-10 review). -
+0002	1035	OQ-0002-6	Which jump reach do the golden tests pin?	the game-designer with Mustafa, from the loop slice on (a rule question). -
+0002	1044	OQ-0002-7	Is wasm-bindgen's new home healthy for a multi-year project?	a by-day reading of its maintenance issue (#4533) and the guide's governance page, both on the allow list (VERIFY-FETCH (a)); this draft fetched nothing. -
+0002	1053	OQ-0002-8	May this record propose a structure no research Options section offers, when a settled input forces it and the research leaves the question to this record?	the Advisor, at the stop. -
+0003	800	OQ-0003-1	Which laptop and which desktop are the two reference machines?	Mustafa and the Advisor (money and availability)
+0003	808	OQ-0003-2	The ink's width, its inner lines and its weight on buildings.	Mustafa, in the look proof test, with its measured cost; the family in part 5.b follows his pick
+0003	819	OQ-0003-3	Which colour output: authored colour as shown, or a tone-mapped output?	Mustafa, in the look proof test, side by side with legacy
+0003	825	OQ-0003-4	Is one sun shadow map enough, or are cascades or another setup needed?	the look proof test (softness, Mustafa) and the render budget bench (the shadow row)
+0003	831	OQ-0003-5	How are "warm sun with cool shadows" and moods per map lit?	Mustafa, in the look proof test, with each option's GPU time
+0003	837	OQ-0003-6	How does the roof fade render, and how is the ink masked on it?	the look proof test
+0003	844	OQ-0003-7	Which technique draws fragments, muzzle flashes, tracers, impacts and debris?	the look proof test (look) and the render budget bench (cost)
+0003	850	OQ-0003-8	How is ink line boil drawn?	Mustafa, in the look proof test
+0003	855	OQ-0003-9	How are vegetation and the lush countryside drawn, and in which tree style?	Mustafa (the style, a later design session); the render budget bench (the technique)
+0003	862	OQ-0003-10	Does the frame rate follow a 120 or 144 Hz screen, or is it capped?	Mustafa (feel), on the render budget bench's numbers
+0003	868	OQ-0003-11	How many players use the WebGL 2 fallback?	Mustafa, on client field data after launch
+0003	875	OQ-0003-12	Is the pixel ratio capped at 1 on Low for HiDPI laptops?	Mustafa, in the look proof test
+0003	880	OQ-0003-13	Where does the audio listener sit under the v2 camera?	the camera framing first (R2-INT-OQ2, a design question), then Mustafa's listening check
+0003	885	OQ-0003-14	Do the Web Audio specification's PannerNode and spatialization sections change part 9?	
+0003	891	OQ-0003-15	The legacy look touches LOOK_V2 does not name: keep, change or drop each?	Mustafa, in the look proof test
+0003	898	OQ-0003-16	The look floor: which LOOK_V2 items may a quality tier switch off on the minimum laptop?	Mustafa
+0003	914	OQ-0003-17	How is VISION_V2 §6.9's "without dropping frames" read as a mark?	the Advisor, confirmed by Mustafa at the stop review (VISION_V2 is theirs)
+0003	923	OQ-0003-18	Do the concussion shake, the halftone flashes and line boil soften for players who ask for reduced motion?	Mustafa, in the look proof test (parts 5.l, 5.m)
+0003	932	OQ-0003-19	Are the three factions told apart by colour alone?	Mustafa
+0003	938	OQ-0003-20	Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop?	the Advisor
+0004	855	OQ-0004-1	How is bot behaviour structured?	a bot research unit, or the slice 2 plan, with the game-designer; Mustafa for the behaviour set. -
+0004	863	OQ-0004-2	Will the entity kinds stay few?	the game-designer's roster and ability lists, then this record's revisit. -
+0004	871	OQ-0004-3	What shape is the ground?	ADR 0005's map format with the editor work (EDITOR_V2 §3: plateaus, ramps, cliff edges; terrain sculpting is `[LATER]`), checked by the sim core spike. -
+0004	878	OQ-0004-4	What moves a building through its damage stages?	Mustafa, with the game-designer (rule 6: no rule beyond LOOK_V2 is designed here). -
+0004	886	OQ-0004-5	Which weapons drop, and who may take them?	
+0004	891	OQ-0004-6	What do bots and slot takeovers do with player records?	
+0004	893	OQ-0004-7	How does local play recover when its own authority traps?	the boundary spike with ADR 0002's client + local server skeleton. -
+0004	902	OQ-0004-8	How does an uplink steal meet defenders, and two enemy teams?	Mustafa, with the game-designer. -
+0004	915	OQ-0004-9	Is a carried tech cache's position public?	Mustafa. -
+0004	926	OQ-0004-10	Does a player who rejoins after the grace window get their player record back?	Mustafa, with OQ-0005-AB10 (what a human gets on taking a bot's slot). -
+0004	938	OQ-0004-11	When a pool is full, which row gives way?	the game-designer proposes per kind; Mustafa confirms where a player could notice. -
+0004	951	OQ-0004-12	Do bots take world pickups?	Mustafa. -
+0005	619	OQ-0005-CD1	Do hand-edited content files need comments?	Mustafa, after a short trial in the content and ability spike
+0005	625	OQ-0005-CD2	What load time may content cost, how much of the Wasm file is content's, and is JSON fast and small enough?	for load time, the content and ability spike's measurement, then the Advisor sets the budget; for size, ADR 0002 part 4: the Advisor sets the first `sim-wasm` limit from the boundary and sim core spikes' measurements and this spike's content share, and until then the size is recorded, not gated
+0005	638	OQ-0005-CD3	May production ever change numbers in the middle of a match?	Mustafa
+0005	646	OQ-0005-CD4	In development, do simulation numbers apply at the next match, or inside a running match?	Mustafa and the Advisor
+0005	658	OQ-0005-CD5	Faction variants: full definitions that reference shared ones, or overrides of a base?	the faction design session (VISION_V2 §7, faction asymmetry; Mustafa)
+0005	664	OQ-0005-CD6	How are moment rules written?	the moment design session (Mustafa with the game-designer, with R6-TEL-OQ3's thresholds), then ADR 0004
+0005	672	OQ-0005-CD7	What is the Feel Lab tool?	a later design session with Mustafa, before the feel pass (LOOP_V2 §11 leaves the feel pass out of the greybox v0); ADR 0003 for its screen
+0005	678	OQ-0005-CD8	How does a unit's top speed stay true when effects or upgrade picks add speed?	ADR 0004 with the game-designer, before track content with speed picks exists
+0005	1186	OQ-0005-AB1	Carry slots: how many weapons can a player carry besides the class weapon, and what happens to the one in hand when they take a pickup?	Mustafa
+0005	1198	OQ-0005-AB2	Ammo for looted weapons: what does a looted gun come with, and can it be refilled?	Mustafa
+0005	1206	OQ-0005-AB3	How fast tracks level: what earns a level, how fast, and does a track the player switches to catch up?	Mustafa
+0005	1226	OQ-0005-AB4	What is one track: which definitions share one?	Mustafa
+0005	1239	OQ-0005-AB5	WEAPON-UNLOCKS: how does an account-unlocked weapon reach a match, when buying offers no weapon choice and other weapons come only from drops?	Mustafa, with the Advisor (LOOP_V2 §8 is theirs)
+0005	1255	OQ-0005-AB6	How do the player's tracks sit beside the team's tech tiers?	Mustafa
+0005	1263	OQ-0005-AB7	May a pick add raw power (more damage, more health), or only change how a unit or weapon plays?	Mustafa
+0005	1274	OQ-0005-AB8	The offer: when does it appear, and when can the player answer it?	Mustafa
+0005	1288	OQ-0005-AB9	Which drop and pickup rules does UPGRADE-SCOPE leave unstated?	Mustafa, with the game-designer
+0005	1305	OQ-0005-AB10	Do bots have tracks and make picks, and what does a human get when taking a bot's slot?	Mustafa
+0005	1319	OQ-0005-AB11	Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1?	Mustafa
+0005	1330	OQ-0005-AB12	Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first?	the Advisor
+0005	1339	OQ-0005-AB13	When does scripting (option A3) come back?	the Advisor (the source)
+0005	1347	OQ-0005-AB14	What does spawn protection cover, and what ends it early?	Mustafa (the 3 s is the Advisor's `[DEFAULT]`; what it covers and what ends it are new rules)
+0005	1365	OQ-0005-AB15	Who sees a player's upgrade picks?	Mustafa
+0005	1632	OQ-0005-AP1	Where does the automated step run, what does it write, and where do the files live?	the asset-pipeline research, then the asset spike; the files' visibility follows Mustafa's answer to ADR 0006's OQ-0006-18 (must unreleased art stay unseen?), due before the first authored model is committed, which may be one of the look proof test's models (the GPU section's part 8)
+0005	1646	OQ-0005-AP2	Which asset families become authored models, and which stay procedural builders?	Mustafa, in the look proof test (how each looks, beside legacy screenshots, LOOK_V2 §9), with the asset-pipeline research's cost and tooling. Trees wait for the tree style (LOOK_V2 §8 `[OPEN]`)
+0005	1654	OQ-0005-AP3	May an AI-generated draft model ever ship?	Mustafa
+0005	1805	OQ-0005-AS1	Which compression formats for textures and meshes?	the asset-pipeline research, then the asset spike
+0005	1809	OQ-0005-AS2	Which tool builds the LOD levels, and how many levels?	the asset-pipeline research, then the asset spike and Mustafa (silhouettes kept)
+0005	1814	OQ-0005-AS3	Which checks does an export pass before it enters the game?	the asset-pipeline research
+0005	1818	OQ-0005-AS4	How are a model's materials renamed into the slot classes and faction colour slots?	the asset-pipeline research
+0005	1825	OQ-0005-AS5	What are the per-unit budgets beyond the two derived caps?	the asset-pipeline research, then the render budget bench with real models
+0005	1831	OQ-0005-AS6	How many vertices and bones does the authored soldier have?	the character model's author (LOOK_V2 §3, §8), then the render budget bench
+0005	2037	OQ-0005-1	Do presentation references sit on the simulation definitions, or in client definitions keyed by the same id?	the Advisor, at the stop review (the game-designer changes AB-4's kinds if the answer needs it)
+0005	2057	OQ-0005-2	Is a weapon definition the same thing as a weapon type?	Mustafa answers OQ-0005-AB4; the question stays open for the Advisor until then
+0005	2068	OQ-0005-3	What does the content hash cover?	the Advisor, with the infra-engineer, whose ADR 0006 owns the analysis (R6-TEL-REC3)
+0005	2080	OQ-0005-4	What do the Character Lab and the Anim Lab work on once soldiers are authored models?	Mustafa with the Advisor (EDITOR_V2 is theirs)
+0006	762	OQ-0006-1	Can Mustafa order Hetzner's CCX23 and CX33 in an EU location?	Mustafa (a console check in his own account; agents create no account), then a research read if (b)
+0006	774	OQ-0006-2	Which EU location: Nuremberg, Helsinki, or Falkenstein if offered?	a measurement made before the reference server is created (a small check at the start of the netcode proof test's setup), confirmed by Mustafa; the reference server is then created in the location it picks
+0006	782	OQ-0006-3	Where does the lobby run, and what stores guest ids and the room directory?	the Advisor, from a short lobby read done with the security baseline (its key storage is item B5); Mustafa for any paid service. ADR 0001 keeps the protocol, ADR 0002 the crate
+0006	795	OQ-0006-4	Once the access wall is on, does it cover every preview, or only multiplayer previews and previews with unreleased art?	Mustafa (convenience against one more project to run)
+0006	807	OQ-0006-5	How are the per-hostname production certificates issued, how long do they live, and which certificate does the WebSocket fallback present on development and staging servers?	security-auditor in the security baseline, with the port plan (OQ-0006-16); the development and staging case before the netcode proof test starts (the Advisor, from a short read)
+0006	833	OQ-0006-6	The security baseline: what it decides for each waiting item.	security-auditor, in its own fresh session (BASELINE-WHEN (b)); the Advisor and Mustafa for the policy calls
+0006	844	OQ-0006-7	Will any CI runner be paid for: GPU, self-hosted reference machines, or a cache above 10 GB?	Mustafa for any paid plan; ADR 0002 says which jobs need one; the security baseline weighs (c)
+0006	854	OQ-0006-8	What do Sentry and Grafana really cost, and how do logs and metrics reach Grafana Cloud?	Mustafa, with a read of sentry.io/pricing before he creates the Sentry organization; a read of Grafana's ingestion docs if M2 is wanted
+0006	863	OQ-0006-9	What does EU data-protection law require of us, and how long are match records kept?	Mustafa
+0006	873	OQ-0006-10	How many players, and when; which VAT and currency; is included traffic per VM, pooled or prorated?	Mustafa (his plans, his billing address, the first invoice)
+0006	880	OQ-0006-11	How many matches before a rate means something, and how do shipped games do it?	test-engineer and the game-designer, before the first tuning pass
+0006	888	OQ-0006-12	If production isolation is ever adopted: embeds, cross-origin popups, CORP and the login flow.	Mustafa with this record, only if production isolation is adopted (R1-BND-REC2 mark 5's test)
+0006	896	OQ-0006-13	How is the production player build kept out of the preview deploy token's reach?	the Advisor, with security-auditor; Mustafa for a second account and for the approvals (a) asks of him
+0006	915	OQ-0006-14	How do releases reach production while rooms run, and how is a bad server release rolled back?	the Advisor for the model (the engine-architect review asks for this open question now, answered beside the security baseline); Mustafa for when players may be refused (the infra review recommends (a) while playtests are scheduled, and (b) once players arrive unscheduled)
+0006	934	OQ-0006-15	Which domain do the client host, the lobby and the game servers use, and when is it registered?	Mustafa (an account and a cost), after the Advisor's OQ-0006-5 read; the infra review recommends (a)
+0006	947	OQ-0006-16	The port plan: which UDP and TCP ports do rooms listen on, and must the WebSocket fallback be reachable on TCP 443?	infra-engineer with netcode-architect (ADR 0001's transport), confirmed by the Advisor
+0006	962	OQ-0006-17	How do sessions get VMs for the spikes, the tick bench and the 3-hour soak before each playtest without holding a secret?	Mustafa (his account), with the Advisor; the infra review recommends (b)
+0006	975	OQ-0006-18	Must unreleased art stay unseen, or is a preview behind a login enough?	Mustafa, with ADR 0005's OQ-0005-AP1 (where model files live), before the first authored model is committed; the infra review recommends (a) until the first model that must stay unseen
+0006	990	OQ-0006-19	Is the goal budget provisional until slice 6 measures rooms per VM with the real sim?	Mustafa (money), on the Advisor's advice; the test review recommends (a)
+0006	1003	OQ-0006-20	What may the netcode proof test's VMs cost?	Mustafa (money)
