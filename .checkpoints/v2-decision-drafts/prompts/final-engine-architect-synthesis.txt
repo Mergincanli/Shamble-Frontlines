@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
 
-You are the author of the synthesis (docs/ENGINE_OVERVIEW.md, docs/SPIKE_PLAN.md, docs/adr/README.md) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit {SHA}). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+You are the author of the synthesis (docs/ENGINE_OVERVIEW.md, docs/SPIKE_PLAN.md, docs/adr/README.md) in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 604a497). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
 
 ## Your text
 `docs/ENGINE_OVERVIEW.md`, `docs/SPIKE_PLAN.md` and `docs/adr/README.md`. GLOSSARY §8 stays as it is. You run last: the drafts' final batches are applied before you start, so README's rows, counts and pointers follow the drafts as they then stand (run scripts/draft_pointers.py; it must print "off 0").
@@ -76,7 +76,7 @@ Each finding's full text, evidence and proposed fix is in the file it names, all
 - Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
 
 ## Write
-/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-synthesis-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at {SHA}, whole lines):
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/engine-architect-synthesis-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 604a497, whole lines):
 ```
 ### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
 FILE: <docs path>
