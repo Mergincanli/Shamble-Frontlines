@@ -77,3 +77,18 @@ AFTER:
    ability.
 END
 
+d2 F2 holds: PM-0003-30 is on the tail-form list (0003:1084–1085) and keeps render bundles only for a p99 cut "by more
+than V's 3 %" (0003:1165), so V's reason "the smallest p99 change a row here compares, PM-0003-27's 20 %"
+(0003:1103–1104) is wrong, and with p99s allowed to spread 10 % a 3 % p99 cut is noise. The fix moves the bundle rule
+to the run medians (V holds them within 3 %; the research names no statistic, r3 line 1092), and names the CPU frame
+time R3-CHAR-REC4 and part 7 name (r3 line 1092; 0003:1008). V's reason then holds as written: the smallest p99 change
+compared is PM-0003-27's 20 % (PM-0003-11: 40 %, -33: 50 %). Same line count.
+
+### FIX F2 (fixcheck-d2)
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-30 | The spectacle budget (parts 6, 7; VISION_V2 §6.9) | the 4 very large units add at most 2.0 ms GPU time (p99) and at most 200 draw calls against BS without them, before any ink or AO pre-pass; render bundles stay only if they cut the WebGPU backend's frame time (p99) by more than V's 3 % (proposed: a smaller cut is noise) | RD at High, Chrome on WebGPU | H on BS with the units, then with them hidden; the difference of p99s per run pair; draw calls per frame | H, V; all 3 pairs within 2.0 ms; draws within 200 on every frame. Bites: each unit drawn with 30 parts (4 × 30 × 2 = 240 draws) | R3-CHAR-REC4's mark (lines 1088–1092): 4 × 20 × 2 = 160 draws, plus margin |
+AFTER:
+| PM-0003-30 | The spectacle budget (parts 6, 7; VISION_V2 §6.9) | the 4 very large units add at most 2.0 ms GPU time (p99) and at most 200 draw calls against BS without them, before any ink or AO pre-pass; render bundles stay only if they cut the WebGPU backend's CPU frame time by more than V's 3 % on each run pair's medians (proposed: the research names no statistic, r3 line 1092; V holds the run medians within 3 %, while the tail form lets p99s spread by 10 %, so a p99 cannot show a 3 % cut) | RD at High, Chrome on WebGPU | H on BS with the units, then with them hidden; the difference of p99s per run pair; draw calls per frame | H, V; all 3 pairs within 2.0 ms; draws within 200 on every frame. Bites: each unit drawn with 30 parts (4 × 30 × 2 = 240 draws) | R3-CHAR-REC4's mark (lines 1088–1092): 4 × 20 × 2 = 160 draws, plus margin |
+END
+

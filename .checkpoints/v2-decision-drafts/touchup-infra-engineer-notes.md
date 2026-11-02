@@ -6,3 +6,6 @@
 - 21:31 F11 block written (lines 270-271, 2->2). Next: F10 part 6 line 273, F10 OQ-0006-14 lines 917-918 and 925.
 - 21:33 F10 (part 6) block written (line 273, 1->1). Next: F10 OQ-0006-14.
 - 21:36 F10 OQ-0006-14 blocks written (lines 918, 925; 1->1 each). F10 complete (4 blocks). Next: F13 line 1007-1010, F14 lines 952-954.
+- 21:40 F13 block written (lines 1007-1010, 4->4). Next: F14 lines 952-954 (no local man pages; no fetch: mark no source read).
+- 21:42 F14 block written (lines 953-954, 2->2). Next: dry-run apply on a scratch copy, glossary check, sentence-under-table check.
+- 21:46 dry run: all 7 blocks apply, 1485 -> 1485 lines, headings and OQ lines unchanged; glossary check exact 0 / in context 98 before and after, hits identical; no table near any block. DONE
