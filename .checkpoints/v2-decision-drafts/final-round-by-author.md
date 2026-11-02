@@ -95,6 +95,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   counter is 0); a deterministic counter-wrap row follows TE-4, once netcode-architect writes it.
 - Routed by rust-reviewer's final batch (b815c85): PM-0002-33 checks that the panic message arrives; RR-3's server mark
   (a panic in the tick ends the match, the process exits non-zero) goes beside PM-0001-26.
+- Routed by infra-engineer's final batch (ADR 0006 at 8fa7173): the PM-0002-66 bite (a test PR that edits the deploy
+  job cannot reach the production token); PM-0001-25 and PM-0001-29 follow ADR 0006's load-generator key (a
+  calibration run; the per-address cap raised for the run).
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -145,6 +148,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   arrives (the hook's fixed buffer); PM-0004-6 gets the pool-burst bite; PM-0004-2 counts the stand-in effect rows (384
   plus a 1 ms burn at 30 Hz; at 60 Hz 1 ms and 0.30 ms); PM-0004-65 starts money at $300; the "no measurable mark" lines
   for parts 17 and 19 point to the test plan and migration phase 6.
+- Routed by infra-engineer's final batch (8fa7173): PM-0006-15 checks the firewall rule list per VM role; the LG key
+  (a calibration run sizes the load generator; the cap raised); PM-0006-11 created after PM-0006-12; PM-0006-14 uses the
+  padded stand-in (the sim step padded to 8.33 ms); a new row for spike 1's B9 test (the preview token cannot publish
+  production); the seed added to PM-0006-21's canary (never logged or recorded).
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -293,4 +300,10 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   gives way when a pool is full; the game-designer proposes, Mustafa confirms), -12 (do bots take pickups; Mustafa);
   a "Needs outside VISION_V2 §6" line: spawning, spawn protection, the Recruit respawn and the barracks mask (LOOP_V2 §2
   and §5 only); SPIKE_PLAN's 60 Hz stand-ins are 1 ms and 0.30 ms.
+- Routed by infra-engineer's final batch (8fa7173): SPIKE_PLAN item 6 revokes the spike's token; README rows for
+  OQ-0006-13 (the preview token and production; the Advisor with security-auditor, Mustafa for a second account), -14
+  (releases; the Advisor for the model, Mustafa for the window), -15 (domain; Mustafa after the Advisor's OQ-0006-5
+  read), -16 (port plan; infra-engineer with netcode-architect, the Advisor confirms), -17 (VMs for spikes and the
+  bench; Mustafa with the Advisor), -18 (unreleased art; Mustafa), -19 (the provisional goal budget; Mustafa on the
+  Advisor's advice); README's I-6, I-13 and lines 47 and 59 as its NOTE says.
 
