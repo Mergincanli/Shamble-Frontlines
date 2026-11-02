@@ -1,6 +1,6 @@
 # Prepared prompt (verbatim, saved before launch) · subagent_type: game-designer · effort: xhigh · model: opus · plan step 10's fix loop (step 9 once more) · 2026-11-02, saved about 11:12 Amsterdam
 
-You are the author of ADR 0005's ability section in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 47eadd9). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
+You are the author of ADR 0005's ability section in the v2 decision drafts of SHAMBLE FRONTLINES (branch claude/laughing-lovelace-ox61se, at commit 319d3b6). The step-10 reviews on the final diff are in, with the last verifier checks. This is the final fix round: every finding against your text is either fixed or explicitly deferred with a reason (CLAUDE.md, the change-set protocol, step 5). It is notes only: you edit no doc, and you never commit, push or fetch.
 
 ## Your text
 In ADR 0005, `docs/adr/0005-content-abilities-assets.md`: the section "The ability and effect system (game-designer)". Design no upgrade, and decide none of UPGRADE-SCOPE's open questions: they are Mustafa's.
@@ -21,7 +21,7 @@ Each finding's full text, evidence and proposed fix is in the file it names, all
 - Keep line counts in mind: pointers into the drafts are now anchored to ids and parts, so adding lines is fine, but never put a sentence directly under a table without a blank line.
 
 ## Write
-/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/game-designer-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 47eadd9, whole lines):
+/home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/game-designer-fixes-final.md, in this form (the session's script applies it; every BEFORE must occur exactly once in the file its FILE line names, copied by script from the doc at 319d3b6, whole lines):
 ```
 ### FIX <finding id, e.g. EA-1, SA-8, GD-1, fixcheck-b-9>
 FILE: <docs path>

@@ -131,6 +131,13 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   legacy's ported tree builders, GW18, judged for variety only); AD-14 (steps 10–12: the soldier shown is built at the
   4-material cap).
 - From review-test-engineer.md: PM-0003-3 follows TE-5 (compare with every kept effect on).
+- Routed by graphics-engineer's final batch (319d3b6; its NOTEs in graphics-engineer-fixes-final.md): PM-0003-3 drops the
+  one-backend exclusion; PM-0003-9: the halftone overlay as frame time, memory per attachment at both sample counts;
+  PM-0003-12 points to part 7's 799 to 817; PM-0003-16 records whether `info.memory.total` counts MSAA textures;
+  PM-0003-23: "1024² (none only under OQ-0003-16)"; a spectacle row for OQ-0003-17 (part 7's presented-frame count);
+  "When a mark fails": a [DECIDED] item's technique leaves Low only under OQ-0003-16; a Low-frame checklist step (steps
+  2, 4, 6, 7, 20), the tier named per step; steps 4 (the contact line), 10–12 (the soldier at the 4-material cap) and 27
+  (the flash over the HUD); BS records the Worker's load; PM-0005-34 and -35 count distinct slot contents.
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -199,6 +206,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   limit", as ADR 0002 says); FC-8 (0005:1797: LOOK_V2 §2 names props and houses; "§8 names none" is true of §8 only);
   PA-11 (the triangle row counts the shadow pass: about 5.2k triangles per soldier at Low, an input to the per-unit
   budget questions OQ-0005-AS*).
+- Routed by graphics-engineer's final batch: AP-3's example list of material classes gains "structure" (the GPU
+  section's part 2 now has a structure class, AD-6).
 
 ## graphics-engineer: ADR 0003, all but "### Pass marks", and ADR 0005's "The asset pipeline: GPU rules"
 - Medium: PA-4 (0003:326–329: VISION_V2 §6.9 "without dropping frames" needs a mark; with test-engineer's row); PA-8
@@ -263,4 +272,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (ADR 0006 writes "seam S3/S4", so README's rule tells them apart); "… option labels (G1–G4, K1–K4, S1–S5) and its
   baseline items B1–B11 (part 13)"; and "for example" (ADR 0002 has its own option labels, two G1–G3 sets; ADR 0006
   cites ADR 0001's profile B1 beside its baseline item B1).
+- Routed by graphics-engineer's final batch: README rows for OQ-0003-16 (the look floor; Mustafa), OQ-0003-17 (reading
+  "without dropping frames"; the Advisor, confirmed by Mustafa), OQ-0003-18 (reduced motion; Mustafa), OQ-0003-19
+  (telling factions apart by colour; Mustafa); SPIKE_PLAN:236–237 lists both houses; ENGINE_OVERVIEW's §6.9 row (about
+  line 112) names part 7's presented-frame count (OQ-0003-17).
 
