@@ -1,0 +1,3 @@
+- Part 17 (economy and objectives): no spike mark; they arrive in slice 4, where a recorded full match replaying with
+  identical per-tick hashes on every target is their check, with the test plan's planted divergence that changes only
+  one economy value, caught at its tick, and migration phase 6's scripted cases for LOOP_V2 §2 to §5's rules.

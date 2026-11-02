@@ -547,3 +547,278 @@ AFTER:
 | PM-0004-74 | One feature set builds the sim on every target (S22; part 7; the id is ADR 0002's) | the resolved feature list of every dependency of `sim` (`cargo tree -e features`) identical for every build that runs the sim (`server`, `devtools`, `navbake` and `sim-wasm`), each resolved by the exact command CI and the release use: 0 differences | CI | `cargo tree -e features` run for `sim` in each build's target and features; the two lists sorted and compared by script | 1 run; the foundation re-proves it as a gate check (ADR 0002). Bites: a planted extra feature on a shared dependency in `server` makes the check fail (R5-LAYOUT-REC4's own); control: a dev-only feature on `devtools` that touches no `sim` dependency passes | R5-LAYOUT-REC4 (r5 lines 1216–1218); the draft's S22 |
 END
 
+### FIX RR-4, POOL-FULL (the intro: PM-0004-75 named)
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+Written by test-engineer (plan step 4). One row per mark, grouped by the spike that runs it: the sim core spike
+(PM-0004-1 to PM-0004-61, then PM-0004-73 and PM-0004-74, added at the fix round), the content and ability spike
+(PM-0004-62 to PM-0004-66), the netcode proof test (PM-0004-67), the boundary spike (PM-0004-68 to PM-0004-70), and
+AFTER:
+Written by test-engineer (plan step 4). One row per mark, grouped by the spike that runs it: the sim core spike
+(PM-0004-1 to PM-0004-61, then PM-0004-73 and PM-0004-74, added at the fix round), the content and ability spike
+(PM-0004-62 to PM-0004-66, then PM-0004-75, added at the final round), the netcode proof test (PM-0004-67), the
+boundary spike (PM-0004-68 to PM-0004-70), and
+END
+
+### FIX RR-4, POOL-FULL (new PM-0004-75: the overflow rule per kind, once OQ-0004-11 is answered; routed by rust-reviewer and game-designer)
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+| **The netcode proof test** | | | | | | |
+AFTER:
+| PM-0004-75 | Each pool's overflow rule holds, per kind, as OQ-0004-11 answers it (parts 1, 16, 18; ADR 0005 AB-1's proposal) | only once Mustafa confirms OQ-0004-11; for the proposal as ADR 0005 AB-1 writes it: an effect the content bounds on its target (its own picks, its own ability's and weapon's effects, spawn protection) is never refused or ended at a full pool, 0 in 1,000 scripted pile-ups (proposed count, as PM-0004-66); when the share of effects others apply is full, the oldest such row on the target, by start tick and then sequence number (part 4), ends early, in 1,000 of 1,000 pile-ups on native and Wasm alike; the projectile pool's overflow counter stays 0 at the content's worst case at N = 48 (for legacy's Molotov, ⌊1.4 ÷ 1.05⌋ + 1 = 2 per thrower, 96 at N = 48: AB-1's arithmetic); a drop into a full pickup pool ends the pickup that has lain longest | CI | scripted pile-ups (48 sources on one target; every thrower throwing at its fire interval; deaths into a full pickup pool) on the replay runner, natively and in Node; equal per-tick state hashes and overflow counters on both targets | 1 run per kind (deterministic). Bites: a pool that refuses a content-bounded effect; a full effect share that ends the newest row instead of the oldest; a projectile pool sized from the stress scene's 300 instead of the content's worst case, which must count overflows | OQ-0004-11; ADR 0005 AB-1 ("When a pool is full"); part 1; R1-ABL-REC6 (lines 2471–2472: no heap allocation in steady state) |
+| **The netcode proof test** | | | | | | |
+END
+
+### FIX RR-4 (the fail route: PM-0004-75 conditional)
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+**When a mark fails.** A spike passes when every mark that applies passes: a conditional mark (PM-0004-14, -26, -71,
+-72) only when its condition holds; a "reported" mark (PM-0004-4, -44, -58) when every cell holds a number; a decision
+AFTER:
+**When a mark fails.** A spike passes when every mark that applies passes: a conditional mark (PM-0004-14, -26, -71,
+-72, and PM-0004-75 until OQ-0004-11 is answered) only when its condition holds; a "reported" mark (PM-0004-4, -44,
+-58) when every cell holds a number; a decision
+END
+
+### FIX TE-6 (routed by rust-reviewer: part 17's line points to the test plan and migration phase 6)
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+- Part 17 (economy and objectives): no spike mark; they arrive in slice 4, where a recorded full match replaying with
+  identical per-tick hashes on every target is their check (the draft's migration phase 6).
+AFTER:
+- Part 17 (economy and objectives): no spike mark; they arrive in slice 4, where a recorded full match replaying with
+  identical per-tick hashes on every target is their check, with the test plan's planted divergence that changes only
+  one economy value, caught at its tick, and migration phase 6's scripted cases for LOOP_V2 §2 to §5's rules.
+END
+
+### FIX TE-6 (part 19's line points to the test plan's event divergence)
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+- Part 19 (events, moments, telemetry): no spike mark; the event list is in the state hash, so PM-0004-18 and -19 cover
+  its order, and the moment mechanism has no research behind it.
+AFTER:
+- Part 19 (events, moments, telemetry): no spike mark; the event list is in the state hash, so PM-0004-18 and -19 cover
+  its order, the test plan's planted divergence that changes only one event is caught at its tick, and the moment
+  mechanism has no research behind it.
+END
+
+### NOTE PA-5 (my half; unit A's half)
+fixed in PM-0004-8: ADR 0003's minimum-laptop frame rows (median ≤ 28 ms, p95 ≤ 33.3 ms, mode U) are the drafts' one
+reading of R1-TICK-REC2 P2's "30+ fps on Low". Unit A's PM-0002-28 must read: "ADR 0004's PM-0004-8, measured here
+(its reading of '30+ fps on Low', mode U)", dropping its own "every 1-second window holding at least 30 presented
+frames" and its mode P.
+END
+
+### NOTE RR-11 (routed)
+fixed in PM-0004-21 (a digest and a serialization vector on native x86-64 and wasm32; a planted `usize` field as the
+bite). routed: rust-reviewer's part 9 adds the clause its finding asks for: "integers at fixed width, little-endian; no
+`usize` in serialized state or in the bytes the hash reads".
+END
+
+### NOTE SA-13 (routed; the row is ADR 0001's)
+PM-0004-60 points to it; the target itself needs `room`, which no ADR 0004 spike builds. Unit A adds it beside
+PM-0001-34: a cargo-fuzz target that drives `room` with random sequences of decoded control messages (a pick on a
+closing offer, a host kicking itself, settings floods, join, leave and reconnect races): 0 panics, the same count as
+PM-0001-34; bite: a planted `.unwrap()` on a departed slot's record. netcode-architect's test plan lists it.
+END
+
+### NOTE RR-4, POOL-FULL (routed)
+fixed in PM-0004-6 (the burst past capacity, under part 1's test fixture) and the new conditional PM-0004-75 (the rule
+per kind as ADR 0005 AB-1 proposes it, run once Mustafa confirms OQ-0004-11). Nothing more to route.
+END
+
+### FIX IE-9, IE-10 (the LG key: a calibration run sizes the load generator; the per-address cap raised; routed by infra-engineer)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  same location. **LG**, the load generator: a separate VM in the same location that runs every bot client, never the
+  VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure); a CX33 unless
+  its own CPU use (recorded every second) passes 80 % in a run, which makes that run invalid (proposed). **MV**, a
+AFTER:
+  same location. **LG**, the load generator: one or more separate VMs in the same location that run every bot client,
+  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
+  (or a larger plan), as many as a 5-minute calibration run at the session's load shows keep each under 80 % of its
+  CPU, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
+  encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
+  spend up to 1 vCPU per 48 sessions, ADR 0001); their count goes into the run plan and PM-0006-18. On LG's addresses
+  the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is recorded
+  (What a spike must prove, item 2). **MV**, a
+END
+
+### FIX IE-16 (PM-0006-11: SMT siblings), IE-17 (routed by infra-engineer: created after PM-0006-12)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`; recorded for each: type, location, CPU model, vCPU count, memory, kernel; the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs or the API token that creates them (his account); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+AFTER:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and `lscpu`'s threads per core with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs or the API token that creates them (his account); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+END
+
+### FIX IE-2, EA-7 (PM-0006-13: the rooms-per-VM runs' own validity, steal reported; with unit A)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on each machine (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) | RS and SH, each with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions per machine at the 3 times of day; every valid session passes. **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
+AFTER:
+| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on each machine (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) | RS and SH, each with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions per machine at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, and on SH steal time is what the mark measures, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
+END
+
+### FIX TE-2 (routed by infra-engineer: PM-0006-14 uses the padded stand-in, OQ-0006-19), IE-2
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on each machine and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). The figure counts as the goal budget's density only if each room's sim step time p99 in the run is at least the sim core spike's figure for the stress scene at that N (proposed: a stand-in cheaper than the real sim would overstate k); otherwise it is labelled "on the stand-in" and part 8 keeps both densities until slice 6 re-measures (the draft's migration step 7) | RS and SH, each with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
+AFTER:
+| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on each machine and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS and SH, each with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
+END
+
+### FIX IE-5 (routed by infra-engineer: PM-0006-15 checks the rule list per VM role)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list holds the UDP range, the TCP range and part 9's metrics rule (PM-0006-16), and 0 other rules. The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: the draft names none for development, and the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bite: a rule added for the probed TCP port makes the probe connect (the negative test can fail) | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+AFTER:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: the draft names none for development, and the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+END
+
+### FIX IE-13 (new OQ-0006-20: the spike's bill, Mustafa)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  - *Carries:* no research id (the test review's finding 2 and its question 2; R6-COST-OQ1 stays with the netcode
+    proof test).
+AFTER:
+  - *Carries:* no research id (the test review's finding 2 and its question 2; R6-COST-OQ1 stays with the netcode
+    proof test).
+- **OQ-0006-20. What may the netcode proof test's VMs cost?**
+  - *Why it matters:* R6 sized "the spike's own bill (a few hours of one or two VMs) under 5 EUR" (r6 lines 716–717),
+    but the pass marks now plan far more: on RS alone about 23 hours for this record's rows (the infra review's
+    arithmetic on the rows' run plans: PM-0006-14 about 14.3 h, PM-0006-13 3 × 1.1 h, PM-0006-17 about 2.2 h, the soak
+    and logging rows about 3 h), 23 × 0.1386 = 3.19 EUR, before ADR 0001's 3-run rows (perhaps 15 to 30 RS-hours,
+    about 2 to 4 EUR) and the CX33 hours of SH, LG and MV; so a 5 EUR cap over everything would send the plan back to
+    the draft at its planning check.
+  - *Options:* (a) 5 EUR for this record's own operations runs (R6's scope), with ADR 0001's runs on their own line
+    of the run plan; (b) one cap set from the run plan, written as arithmetic at R6-HOST-F15's prices before the first
+    session; (c) 5 EUR over everything, as written. Until it is answered, PM-0006-18's planning check writes the run
+    plan's cost and the plan goes to Mustafa before any VM is created. The test review recommends (b): both records'
+    runs bill to one Hetzner project.
+  - *Decider:* Mustafa (money).
+  - *What decides it:* the run plan's hours (PM-0006-14 writes it before the first session) at the hourly prices.
+  - *Carries:* R6-COST-REC1's mark (r6 lines 716–717; it stays adopted, no new disposition); R6-HOST-F15 (r6 lines
+    150–159).
+END
+
+### FIX IE-13 (PM-0006-18: the cap points to OQ-0006-20)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-18 | The spike's own hosting bill (part 8) | under 5 EUR excluding VAT for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0144 EUR (CX33) an hour sum under 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran), else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone) | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
+AFTER:
+| PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated VMs counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0144 EUR (CX33) an hour, the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
+END
+
+### FIX SA-15 (routed by infra-engineer: the match seed in PM-0006-21's canary)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-21 | Logs keep no secrets or addresses (parts 9, 11) | 0 matches in a 30-minute soak's logs for every join token, every guest secret and every client address the soak used, and 0 matches for an IPv4 or IPv6 address pattern other than the VMs' own | RS, LG | the soak of PM-0006-22; the spike logs each token, secret and client address it creates into a canary file on LG (never on RS); a grep script searches every log line the supervisor shipped | 1 soak. Bite: a planted log line that prints one client's address and one token must be found | R6-OBS-REC1's mark (r6 lines 737–738); R2-ROOM-REC3 mark 3 (r2 lines 2807–2809) |
+AFTER:
+| PM-0006-21 | Logs keep no secrets or addresses (parts 9, 11) | 0 matches in a 30-minute soak's logs for every join token, every guest secret and every client address the soak used, and for each match's random seed (ADR 0004 part 8: never sent, logged or recorded; parts 9 and 12), and 0 matches for an IPv4 or IPv6 address pattern other than the VMs' own | RS, LG | the soak of PM-0006-22; the spike logs each token, secret and client address it creates into a canary file on LG (never on RS), and the supervisor's test build writes each match's seed into a canary file on RS's local disk outside the shipped log path (proposed: the grep needs the value it must not find); a grep script searches every log line the supervisor shipped | 1 soak. Bite: a planted log line that prints one client's address and one token must be found | R6-OBS-REC1's mark (r6 lines 737–738); R2-ROOM-REC3 mark 3 (r2 lines 2807–2809) |
+END
+
+### FIX IE-20 (routed by infra-engineer: PM-0006-6 tries the tombstone first)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-6 | PREV-DELETE: a closed pull request's build is gone from every link (part 3; decides PREV-DELETE, R5-PREV-OQ2) | 24 h after each test pull request closes (a plain deadline, GLOSSARY §1), none of its URLs (the branch alias and the hash URL of every deployment it ever had) answers HTTP 200 with that build's marker; an answer of HTTP 404, any other response without the marker, or [the access wall](../research/GLOSSARY.md#the-access-wall) counts as gone. Run with the access policy **off** (proposed: with it on, every leftover link sits behind the wall and the mark could not fail; off is the state of slices 1 and 2) | CF, TR; the probe runs from ML | four test pull requests on TR, closed by the spike's throwaway close workflow (`wrangler pages deployment delete … --force` per deployment, R5-PREV-REC3): (a) branch `cs/pd-one`, 1 deployment, closed without merge, branch kept (the `/` becomes `-` in the alias, R5-PREV-F12); (b) `cs/pd-three`, 3 deployments, merged, branch deleted; control (c), an open pull request; bite (d), a closed one with the close workflow switched off. A cookie-less probe reads every URL every hour from the close to 24 h after | 1 run per case (a one-off deadline). Control: (c)'s URLs serve its build at every probe. Bite: (d) is reported as still serving at 24 h. The hourly probes record when each URL stopped serving | R5-PREV-REC3's mark (r5 lines 1622–1624); PREV-DELETE (r6 lines 970–976); R5-PREV-F13 (r5 lines 845–849); R6-HOST-F4: a hash URL per deployment plus a branch alias (r6 lines 80–86) |
+AFTER:
+| PM-0006-6 | PREV-DELETE: a closed pull request's build is gone from every link (part 3; decides PREV-DELETE, R5-PREV-OQ2) | 24 h after each test pull request closes (a plain deadline, GLOSSARY §1), none of its URLs (the branch alias and the hash URL of every deployment it ever had) answers HTTP 200 with that build's marker; an answer of HTTP 404, any other response without the marker, or [the access wall](../research/GLOSSARY.md#the-access-wall) counts as gone. Run with the access policy **off** (proposed: with it on, every leftover link sits behind the wall and the mark could not fail; off is the state of slices 1 and 2) | CF, TR; the probe runs from ML | four test pull requests on TR, closed by the spike's throwaway close workflow (`wrangler pages deployment delete … --force` per deployment, R5-PREV-REC3): (a) branch `cs/pd-one`, 1 deployment, closed without merge, branch kept (the `/` becomes `-` in the alias, R5-PREV-F12); (b) `cs/pd-three`, 3 deployments, merged, branch deleted; control (c), an open pull request; bite (d), a closed one with the close workflow switched off. A cookie-less probe reads every URL every hour from the close to 24 h after | 1 run per case (a one-off deadline); if a case fails, part 3's first workaround, a tombstone page with no build marker deployed as the branch's last deployment before the rest are deleted, is tried in the same spike, and the mark is read again on it. Control: (c)'s URLs serve its build at every probe. Bite: (d) is reported as still serving at 24 h. The hourly probes record when each URL stopped serving | R5-PREV-REC3's mark (r5 lines 1622–1624); PREV-DELETE (r6 lines 970–976); R5-PREV-F13 (r5 lines 845–849); R6-HOST-F4: a hash URL per deployment plus a branch alias (r6 lines 80–86) |
+END
+
+### FIX IE-18 (routed by infra-engineer: PM-0006-7's result has a stated consequence)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-7 | Whether a direct upload counts against Pages' 500 builds a month (part 1; R6-HOST-REC1's question for the spike) | reported, no pass number: the project's monthly build count before and after 10 direct uploads; counts if it rose by 10, does not if by 0, anything else recorded as read | CF; MP (Mustafa reads the count in his own dashboard) | 10 deployments by the throwaway deploy workflow between two readings (the hosting checklist, step 4) | one pair of readings; passes when both are recorded | R6-HOST-REC1 (r6 lines 633–634); R6-HOST-F3 (r6 lines 72–79) |
+AFTER:
+| PM-0006-7 | Whether a direct upload counts against Pages' 500 builds a month (part 1; R6-HOST-REC1's question for the spike) | reported, no pass number: the project's monthly build count before and after 10 direct uploads; counts if it rose by 10, does not if by 0, anything else recorded as read; if uploads count, part 1's consequence follows (only the newest push per pull request is deployed, and the month's deploys are counted) | CF; MP (Mustafa reads the count in his own dashboard) | 10 deployments by the throwaway deploy workflow between two readings (the hosting checklist, step 4) | one pair of readings; passes when both are recorded | R6-HOST-REC1 (r6 lines 633–634); R6-HOST-F3 (r6 lines 72–79) |
+END
+
+### FIX SA-1 (routed by infra-engineer: a new row, PM-0006-32, for spike 1's B9 test)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| **The operations marks inside the netcode proof test** (ADR 0001's spike) | | | | | | |
+AFTER:
+| PM-0006-32 | B9's interim position holds: a pull request cannot reach a deploy secret or production (part 13, B9; spike 1; with ADR 0002's PM-0002-66) | 3 of 3: a test pull request on TR whose deploy job is edited to print a marker gets no secret until the `preview` environment's required reviewer approves it (the job prints only whether the secret is set, never its value); a job in a pull request that names the `production` environment is refused by its `main`-only deployment-branch rule; a deploy of the production branch tried with the `preview` environment's token is refused (the preview token cannot publish production; if no token scope the check finds can refuse it, the result is recorded as not refused and goes to OQ-0006-13); recorded: how the branch rule treats a pull request's merge ref (not read), and Mustafa's revocation of the test token when the check ends | TR, CF; MP (Mustafa approves or withholds the review, and revokes the token) | three throwaway workflow runs on TR; each run's log and the environment's deployment history pasted into the results log | 1 run per case. Control: after the reviewer approves, the same job reports the secret set. Bite: with the required reviewer removed, the edited job must report the secret set (the check can fail) | the draft's spike 1, B9's bullet (proposed there, from the security review's finding 1); part 13, B9; R5-PREV-REC1 (the deploy token held only by its job, as part 13 cites it) |
+| **The operations marks inside the netcode proof test** (ADR 0001's spike) | | | | | | |
+END
+
+### FIX SA-1 (the intro: PM-0006-32 named)
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+Written by test-engineer (plan step 4). One row per mark: the preview hosting check's first (PM-0006-1 to PM-0006-10),
+then this record's operations marks inside the netcode proof test (PM-0006-11 to PM-0006-27), then the crash-report
+marks that run only if the EU Sentry organization exists (PM-0006-28 to PM-0006-31). Every number is a research mark
+AFTER:
+Written by test-engineer (plan step 4). One row per mark: the preview hosting check's first (PM-0006-1 to PM-0006-10,
+then PM-0006-32, added at the final round), then this record's operations marks inside the netcode proof test
+(PM-0006-11 to PM-0006-27), then the crash-report marks that run only if the EU Sentry organization exists (PM-0006-28
+to PM-0006-31). Every number is a research mark
+END
+
+### NOTE IE-2, EA-7 (my half; unit A's half)
+fixed in PM-0006-13 and -14: their validity is bracket B and LG's 80 % rule, with steal recorded per second and
+reported, never ADR 0001's V-S. Unit A's PM-0001-27 must read: "8 rooms as 8 processes: this is PM-0006-13's set of
+runs, read the same way (no pinning, bracket B against the single-room figure, 3 sessions on SH, each process's CPU
+recorded, steal reported); V-S's 'alone on its vCPU' and steal clauses do not apply", and PM-0001-1's bite exempts
+the rooms-per-VM rows (PM-0001-27, PM-0006-13, -14). engine-architect's SPIKE_PLAN line ("one set of runs, read the
+same in both tables") then holds as written.
+END
+
+### NOTE IE-9/10 (unit A's half)
+fixed in ADR 0006's LG key. Unit A's ADR 0001 LG (its key) follows the same sentence, and PM-0001-25 runs twice: the
+per-address cap off for LG (the never-`Join` flood), then on, as a bite (the second connection over the cap from one
+address is refused).
+END
+
+### NOTE IE-13 (new question; routed)
+the 5 EUR cap is a cost, so it is not decided here: OQ-0006-20 (Mustafa), and PM-0006-18 points to it. routed:
+infra-engineer's spike item 2 ("the spike's own hosting bill under 5 EUR") reads "under the cap OQ-0006-20 sets";
+engine-architect's docs/adr/README.md lists OQ-0006-20 (Mustafa, money).
+END
+
+### NOTE IE-16
+fixed in PM-0006-11 (`lscpu`'s threads per core and the sibling map; the transport kept off the tick's sibling). Unit A's
+PM-0001-1 records the same and pins the same way.
+END
+
+### FIX engine-architect's ADR 0005 frame batch (b88714d) and follow-up (72cfcc3): PM-0005-5's pool-report leg, per target
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound | 1 run. Bites: a `Vec` field added without a bound | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
+AFTER:
+| PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length; and the whole-set check's pool report (CD-2): for each test mode, every pool's reported worst case, and for active effects the reserved worst case per target (the pick effects of the tracks that can apply at once, one per track level; the unit's own ability and weapon effects; spawn protection), equals a count by hand from the test content's numbers in 100 % of cases, and every pool the content leaves without a bound (effects others apply, weapon pickups, big vehicles) is named with its missing cap, never filled with a default (content item 2) | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound; the hand counts written beside the test content before the run (proposed: a count made after the report could copy it) | 1 run. Bites: a `Vec` field added without a bound; a projectile lifetime doubled in the test content while the report stays the same must fail the comparison; a pool given a default cap where the content sets none | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
+END
+
+### FIX EA-9 (PM-0005-10: the local-play leg)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-10 | Development reload: checked at once, simulation numbers at the next match, client content live (CD-7; content item 5; shared with PM-0005-21) | each of 20 saves of a weapon's damage change (the Shabzon's 8 → 9) validated on the development server within 1 s of the save (a plain limit, max over the 20), and the next match runs on it; the running match's per-tick state hashes after the save equal a control run with no save (proposed: CD-7's "nothing in a running match's simulation changes"); each of 20 malformed saves leaves the running match on its numbers and shows the error (file, with line and column or field path) within 1 s; each of 20 saved feel-kit changes shows on the page within 1 s, in the running match | ML: the development server native; the page in Chrome, Edge and Firefox | the development server's watcher (notify with a debouncer); a script saves the files on a fixed schedule; validation time from the file's modification time to the server's "valid" or "error" log line on the same clock; the page's arrival time stamped on the same machine (the file's route to the Worker is the boundary spike's, PM-0002-31) | 20 saves of each kind per browser. Bites: a watcher that validates only on the next match start (fails the 1 s); a reload that swaps the numbers inside the running match (fails the hash comparison) | R1-DATA-REC5 marks 1, 4 (lines 2559–2563), restated for CD-7; CD-7 (proposed there: the feel-kit 1 s) |
+AFTER:
+| PM-0005-10 | Development reload: checked at once, simulation numbers at the next match, client content live (CD-7; content item 5; shared with PM-0005-21) | each of 20 saves of a weapon's damage change (the Shabzon's 8 → 9) validated on the development server within 1 s of the save (a plain limit, max over the 20), and the next match runs on it; the running match's per-tick state hashes after the save equal a control run with no save (proposed: CD-7's "nothing in a running match's simulation changes"); each of 20 malformed saves leaves the running match on its numbers and shows the error (file, with line and column or field path) within 1 s; each of 20 saved feel-kit changes shows on the page within 1 s, in the running match; and the same in local play, where slices 1 and 2 have no server crate: each of 20 saves pushed to the Worker (PM-0002-31's route) is validated there within 1 s, the next local match runs on it, and the running local match's per-tick hashes equal a control run with no save (CD-7: "on the development server and in local play alike") | ML: the development server native, and the Worker's local play; the page in Chrome, Edge and Firefox | the development server's watcher (notify with a debouncer); a script saves the files on a fixed schedule; validation time from the file's modification time to the server's "valid" or "error" log line on the same clock; the page's arrival time stamped on the same machine (the file's route to the Worker is the boundary spike's, PM-0002-31) | 20 saves of each kind per browser. Bites: a watcher that validates only on the next match start (fails the 1 s); a Worker that applies the pushed numbers to the running local match (fails the hash comparison); a reload that swaps the numbers inside the running match (fails the hash comparison) | R1-DATA-REC5 marks 1, 4 (lines 2559–2563), restated for CD-7; CD-7 (proposed there: the feel-kit 1 s) |
+END
+
+### FIX TE-8 (routed by game-designer: PM-0005-18 also reorders the definitions)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-18 | The test content runs with no ability-specific Rust code (AB-1; ability item 1) | 0 matches for the test content's ids and legacy names in the sim crate's non-test code; every test content item, fired or pressed in a scripted scenario, produces its expected event log; with every test id replaced by a random string, the scenario's event log is byte-identical after mapping the ids back (proposed: a search for names misses code keyed by a constant spelled otherwise); reported: the list of operations with the test items that use each, for the rust-reviewer | CI | `rg` over the sim crate excluding tests; the scenario in the replay runner; the id rename by script over the test content | 1 run. Bites: a planted `if id == "molotov"`, and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename test sees it) | R1-ABL-REC1 mark 1 (lines 2365–2368); AB-1 |
+AFTER:
+| PM-0005-18 | The test content runs with no ability-specific Rust code (AB-1; ability item 1) | 0 matches for the test content's ids and legacy names in the sim crate's non-test code; every test content item, fired or pressed in a scripted scenario, produces its expected event log; with every test id replaced by a random string and the definitions reordered in data, the scenario's event log is byte-identical after mapping the ids back (proposed: a search for names misses code keyed by a constant spelled otherwise); reported: the list of operations with the test items that use each, for the rust-reviewer | CI | `rg` over the sim crate excluding tests; the scenario in the replay runner; the id rename by script over the test content | 1 run. Bites: a planted `if id == "molotov"`, and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename and reorder test sees it, whatever order the handles are given in) | R1-ABL-REC1 mark 1 (lines 2365–2368); AB-1 |
+END
+
+### FIX GD-8 (review-game-designer finding 9: PM-0005-24's minute-5 Tech 1 floor)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-24 | Tech tiers gate abilities and purchases (AB-5; ability item 4) | an ability press before the team's Tech 1, and a T2 purchase before Tech 2, refused by the authority in 1,000 of 1,000 scripted attempts each; the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed) | CI | scripted team state at Tech 0, 1 and 2; the authority's verdict log | 1 run. Bites: an ability with no tier tag | AB-5 (proposed there; LOOP_V2 §4 lines 50–52, `[DECIDED]`; INV GE4, line 290); the count 1,000 from R1-ABL-REC4 (line 2444) |
+AFTER:
+| PM-0005-24 | Tech tiers gate abilities and purchases (AB-5; ability item 4) | an ability press before the team's Tech 1, and a T2 purchase before Tech 2, refused by the authority in 1,000 of 1,000 scripted attempts each; the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed); and the minute-5 floor (LOOP_V2 §4 `[DECIDED]`: "Every team reaches Tech 1 by minute 5 at the latest"): a team with no cashout reaches Tech 1 at the floor's tick, read from data (5 × 60 × 30 = 9,000 ticks at 30 Hz: arithmetic), and its presses are refused at tick 8,999 and accepted from tick 9,000 | CI | scripted team state at Tech 0, 1 and 2; the authority's verdict log | 1 run. Bites: an ability with no tier tag; a floor that is never applied (the team without a cashout stays at Tech 0 past tick 9,000) | AB-5 (proposed there; LOOP_V2 §4 lines 50–52, `[DECIDED]`; INV GE4, line 290); the count 1,000 from R1-ABL-REC4 (line 2444) |
+END
+
+### FIX GD-8 (review-game-designer finding 8: PM-0005-25's third leg), GD-7 (routed by game-designer: the immunity case)
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
+AFTER:
+| PM-0005-25 | The counters reproduce from data alone (AB-6, AB-7; ability item 5) | from the imported tables: the Warrior kills a Conscript in 0.86 s within one tick (13 SMG body hits, 12 × 0.072 = 0.864 s); the Peacekeeper kills a Warrior in 0.85 s within one tick when 11 of its 16 pellets land over two shots (11 × 11 = 121 ≥ 120 HP), and 10 of 16 leave it alive (a control: proposed); a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the triangle's third leg (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181, as ability item 5 cites them); AB-2's immunity rule: a soldier inside its spawn protection takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz), under every option of OQ-0005-AB14; the knockback operation changes a target's velocity by the test weapon's value within 1e-6 relative, with 0 matches for the test weapon's id, or the spawn-protection effect's, in the sim's non-test code | CI | scripted duels on the converted data (the pellet hits scripted, since spread draws from an [authority-only stream](../research/GLOSSARY.md#shared-stream-and-authority-only-stream)); the times from the sim's events; the knockback weapon is test-only (the Javelin's numbers are Mustafa's) | 1 run (deterministic). Bites: the Shield block applied to blasts only; the Shield block applied to blasts as well (the third leg fails); an immunity rule that skips blasts; the protection's length taken from a constant instead of the effect's data (changing the data to 60 ticks must move the end) | AB-6, AB-7 (proposed there); R1-ABL-REC3's mark (lines 2416–2418: the 0.86 s, ADR 0004's, PM-0004-9); INV CD13 (line 94); arithmetic in AB-7 |
+END
+

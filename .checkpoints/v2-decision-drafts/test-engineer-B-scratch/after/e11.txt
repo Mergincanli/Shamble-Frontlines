@@ -1,0 +1,4 @@
+<<<OLD
+| a CCX23 and a CX33 created in `nbg1` or `hel1`; recorded for each: type, location, CPU model, vCPU count, memory, kernel;
+>>>NEW
+| a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and `lscpu`'s threads per core with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched);

@@ -25,3 +25,14 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - new PM-0001-61 (EA-1) after -46, PM-0001-47 bite (NA-4) written; next: -48, -49, -50 (NA-1, SA-6)
 - PM-0001-48, -49, -50 (NA-1, SA-6) written; next: -52 + new -62 (NA-3), -53, -54 (PA-2), -56, When a mark fails (NA-6), checklist
 - PM-0001-52 + new -62 (NA-3), -53, -54 (PA-2), -56 written; next: When a mark fails (NA-6, PA-2), no-mark list (purchases), checklist (NA-1)
+- When a mark fails (NA-6, PA-2) written; next: no-mark list purchases (GD-2 NOTE), checklist intro + steps 7, 10, 11 (NA-1)
+- checklist intro, steps 7, 10, 11 (NA-1, EA-1, NA-3) written; ADR 0001 FIX blocks done. next: ADR 0002 rows (-3, -6, -9, -10, -12..-14, new -77, -17, -23, -25 + new -78, -28, -29, -33, -41, -42, -44, -45, -46, -51, -64, -65, -66, -76)
+- ADR 0002: PM-0002-3 (FC-10), -6 (RR-6), -9 (EA-1), -10 (RR-5) written; next: -12..-14 + new -77 (NA-7, EA-4), -17 (FB-1), -23 (FB-9)
+- PM-0002-12, -13 (NA-7), -14 + new -77 (EA-4) written; next: -17 (FB-1), -23 (FB-9), -25 + new -78 (PA-13), -28 (PA-5), -29
+- PM-0002-17, -42 (FB-1, SA-11), -23 (FB-9) written; next: -25 + new -78 (PA-13), -28 (PA-5), -29 (FC-3, RR-8, RR-7), -33 (RR-9)
+- PM-0002-25 + new -78 (PA-13), -28 (PA-5, aligned with unit B's PM-0004-8) written; next: -29 (FC-3, RR-8, RR-7), -33 (RR-9), -41 (RR-1, RR-2, RR-7), -44, -45, -46
+- PM-0002-29 (FC-3, RR-8, RR-7), -33 (RR-9) written; next: -41, -44, -45, -46, -51, -64, -65, -66, -76
+- PM-0002-41 (RR-1/2/7), -44 (EA-8, SA-10, RR-10), -45 (FB-3), -46 (SA-11) written; next: -51 (GE-2), -64 (NA-7, GE-2), -65, -66 (SA-1), -76 (TE-7), then NOTEs
+- PM-0002-51, -64, -65 written; next: -66 (SA-1), -76 (TE-7), then NOTEs
+- PM-0002-66 (SA-1), -76 (TE-7) written; next: ADR 0002 intro row list (-77, -78), When a mark fails (-78 reported), then NOTEs
+- ADR 0002 row list and When-a-mark-fails written; all FIX blocks done. next: validate, then NOTEs

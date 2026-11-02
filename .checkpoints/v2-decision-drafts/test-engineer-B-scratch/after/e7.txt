@@ -1,0 +1,4 @@
+<<<OLD
+counts if it rose by 10, does not if by 0, anything else recorded as read |
+>>>NEW
+counts if it rose by 10, does not if by 0, anything else recorded as read; if uploads count, part 1's consequence follows (only the newest push per pull request is deployed, and the month's deploys are counted) |

@@ -1,0 +1,9 @@
+<<<OLD
+with every test id replaced by a random string, the scenario's event log is byte-identical after mapping the ids back
+>>>NEW
+with every test id replaced by a random string and the definitions reordered in data, the scenario's event log is byte-identical after mapping the ids back
+===
+<<<OLD
+and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename test sees it) |
+>>>NEW
+and a planted constant `FIREBOMB` keyed on the Molotov's handle (only the rename and reorder test sees it, whatever order the handles are given in) |

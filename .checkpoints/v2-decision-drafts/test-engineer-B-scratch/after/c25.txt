@@ -1,0 +1,14 @@
+<<<OLD
+a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it;
+>>>NEW
+a Peacekeeper behind the Shield takes exactly 63 SMG body hits (62 leave 1.2 HP) and 19 without it; the triangle's third leg (the Conscript beats the Peacekeeper, AB-7): a Molotov blast deals a Peacekeeper the same damage with the Shield up as with it down (a blast skips the frontal block, GC7), and at 35 m a Bagpipe pellet deals 0 while an AMK body hit deals 34 (ranges 34 m and 300 m, AMK damage 34: LEGACY_TUNING.md, `WEAPONS`, lines 173 and 181, as ability item 5 cites them); AB-2's immunity rule: a soldier inside its spawn protection takes 0 damage from a body hit and from a blast, and full damage once the effect's 90 ticks end (3 × 30 at 30 Hz), under every option of OQ-0005-AB14;
+===
+<<<OLD
+with 0 matches for the test weapon's id in the sim's non-test code |
+>>>NEW
+with 0 matches for the test weapon's id, or the spawn-protection effect's, in the sim's non-test code |
+===
+<<<OLD
+Bites: the Shield block applied to blasts only |
+>>>NEW
+Bites: the Shield block applied to blasts only; the Shield block applied to blasts as well (the third leg fails); an immunity rule that skips blasts; the protection's length taken from a constant instead of the effect's data (changing the data to 60 ticks must move the end) |

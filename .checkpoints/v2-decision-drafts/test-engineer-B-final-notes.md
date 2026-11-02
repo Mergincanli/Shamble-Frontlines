@@ -46,3 +46,18 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0004 PM-0004-24 (RR-12) and -29 (EA-3, SA-15 bite) done
 - 0004 PM-0004-65 (GD-8) and -68 (NA-8) done
 - 0004 PM-0004-60 (RR-13, SA-13), -61 (RR-9), -74 (RR-10) done
+- 0004 intro 997-999, new PM-0004-75 (anchor 1165), fail route 1175-1176 done
+- 0004 no-mark lines 17 & 19 done (TE-6). 0004 rows all done; next NOTEs 0004 then 0006
+- 0004 NOTEs written (PA-5, RR-11, SA-13, RR-4). 0004 DONE. Next: 0006
+- 0006 LG key 1090-1092 done (IE-9/10)
+- 0006 PM-0006-11 (IE-16, IE-17), -13 (IE-2/EA-7) done
+- 0006 PM-0006-14 done (TE-2 padded)
+- 0006 PM-0006-15 done (IE-5)
+- 0006 OQ-0006-20 added (after line 1002) and PM-0006-18 done (IE-13)
+- 0006 PM-0006-21 (SA-15), -6 (IE-20), -7 (IE-18) done; next: B9 row (new PM-0006-32) 
+- 0006 PM-0006-32 (B9, anchor 1155) and intro 1076-1078 done; next NOTEs 0006, then 0005
+- 0006 NOTEs written. 0006 DONE. Next 0005
+- 0005 PM-0005-5 done (pool report leg + per-target). NOTE: 0005 BEFOREs from 72cfcc3 (COMMIT env in helpers)
+- 0005 PM-0005-10 done (EA-9)
+- 0005 PM-0005-18 (TE-8) and -24 (GD-8 #9) done
+- 0005 PM-0005-25 done (GD-8 #8, GD-7)

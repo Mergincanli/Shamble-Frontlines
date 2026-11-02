@@ -1,0 +1,18 @@
+  - *Carries:* no research id (the test review's finding 2 and its question 2; R6-COST-OQ1 stays with the netcode
+    proof test).
+- **OQ-0006-20. What may the netcode proof test's VMs cost?**
+  - *Why it matters:* R6 sized "the spike's own bill (a few hours of one or two VMs) under 5 EUR" (r6 lines 716–717),
+    but the pass marks now plan far more: on RS alone about 23 hours for this record's rows (the infra review's
+    arithmetic on the rows' run plans: PM-0006-14 about 14.3 h, PM-0006-13 3 × 1.1 h, PM-0006-17 about 2.2 h, the soak
+    and logging rows about 3 h), 23 × 0.1386 = 3.19 EUR, before ADR 0001's 3-run rows (perhaps 15 to 30 RS-hours,
+    about 2 to 4 EUR) and the CX33 hours of SH, LG and MV; so a 5 EUR cap over everything would send the plan back to
+    the draft at its planning check.
+  - *Options:* (a) 5 EUR for this record's own operations runs (R6's scope), with ADR 0001's runs on their own line
+    of the run plan; (b) one cap set from the run plan, written as arithmetic at R6-HOST-F15's prices before the first
+    session; (c) 5 EUR over everything, as written. Until it is answered, PM-0006-18's planning check writes the run
+    plan's cost and the plan goes to Mustafa before any VM is created. The test review recommends (b): both records'
+    runs bill to one Hetzner project.
+  - *Decider:* Mustafa (money).
+  - *What decides it:* the run plan's hours (PM-0006-14 writes it before the first session) at the hourly prices.
+  - *Carries:* R6-COST-REC1's mark (r6 lines 716–717; it stays adopted, no new disposition); R6-HOST-F15 (r6 lines
+    150–159).

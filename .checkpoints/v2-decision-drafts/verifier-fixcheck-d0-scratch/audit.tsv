@@ -1,0 +1,13 @@
+20:34:03	raw.githubusercontent.com	https://raw.githubusercontent.com/WebAssembly/binaryen/main/src/tools/optimization-options.h	200	19350	0.471637
+20:34:03	raw.githubusercontent.com	https://raw.githubusercontent.com/rust-lang/rust/master/library/std/src/sys/time/unsupported.rs	200	1477	0.375708
+20:34:04	raw.githubusercontent.com	https://raw.githubusercontent.com/rust-lang/rust/master/library/std/src/sys/time/mod.rs	200	1033	0.219722
+20:34:04	doc.rust-lang.org	https://doc.rust-lang.org/std/primitive.f32.html	200	346838	0.536202
+20:34:04	doc.rust-lang.org	https://doc.rust-lang.org/std/primitive.f64.html	200	338196	0.251894
+20:34:05	docs.github.com	https://docs.github.com/en/billing/concepts/product-billing/github-actions	200	234050	0.160222
+20:34:05	docs.github.com	https://docs.github.com/en/actions/reference/runners/github-hosted-runners	200	437615	0.583221
+20:34:06	docs.github.com	https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows	200	1076298	0.204755
+20:34:06	developer.mozilla.org	https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie	200	234722	0.444231
+20:34:06	developer.mozilla.org	https://developer.mozilla.org/en-US/docs/Glossary/Site	200	185704	0.397779
+20:34:07	www.rfc-editor.org	https://www.rfc-editor.org/rfc/rfc4291.txt	200	52897	0.246947
+20:36:38	docs.github.com	https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow	200	572929	1.083444
+20:36:39	docs.github.com	https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target	200	346720	0.689918

@@ -1,0 +1,4 @@
+<<<OLD
+| 1 run per case (a one-off deadline). Control: (c)'s URLs serve its build at every probe.
+>>>NEW
+| 1 run per case (a one-off deadline); if a case fails, part 3's first workaround, a tombstone page with no build marker deployed as the branch's last deployment before the rest are deleted, is tried in the same spike, and the mark is read again on it. Control: (c)'s URLs serve its build at every probe.

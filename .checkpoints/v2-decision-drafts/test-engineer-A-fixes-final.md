@@ -373,3 +373,279 @@ AFTER:
 | PM-0001-56 | The proof test's records are complete (part 14, item 5) | recorded: both crates' results on PM-0001-11, -25, -28, -35 and their pick, with its reason (R2-TRN-OQ5: the draft names no rule beyond the marks); each browser's negotiated draft and its behaviour with UDP blocked (R2-TRN-OQ1, OQ2); the real record sizes per entity kind and the command size (R2-XU-OQ15, OQ4); NewReno against Cubic (PM-0001-24) and each browser's received snapshot rate and age at P2 to P4 (R2-BUD-OQ10, R2-TRN-OQ8); the smoothness of a remote soldier sprinting straight and turning, drawn with linear interpolation (the standard deviation of its per-frame displacement as a share of the mean, R1-TICK-REC5's measure) beside Mustafa's step 5 (R2-SYNC-OQ12); OQ-0001-6's two command-timing options, each run with PM-0001-42's correction share, PM-0001-48's registration and PM-0001-49's honest rewind at P2 to P4; the absolute input-to-screen delay at P0 (PM-0001-43's report, for OQ-0001-15); the replay depth per profile (PM-0001-44); Brave's transport and version on MP | as each row names | read once per item and written to the results log | passes when every item has a number or a value | the draft, "What a spike must prove" item 5; r1 R1-TICK-REC5's measure (lines 2111–2112); OQ-0001-6 |
 END
 
+### FIX NA-6, PA-2 ("When a mark fails": only server-time marks reopen parts 2 and 3; E3b per kind)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+Rollback section: a 30 Hz baseline mark (PM-0001-4 to PM-0001-27) that fails sends part 2 and part 3 back to
+the drafts with the measured numbers; PM-0001-39 or PM-0001-40 failing changes nothing, and the tick stays at 30 Hz; a
+WebTransport crate failing PM-0001-28, -11 or -25 is replaced by the other behind the thin interface, and both failing
+goes back to the drafts, where Mustafa and the Advisor decide (the transport is a settled input); PM-0001-54 failing
+selects E3b; PM-0001-15 or PM-0001-16 failing selects many rooms per process (option B); a correction, interpolation or
+hit-registration mark (PM-0001-41 to PM-0001-52) failing is retried once with its data values changed (the delays, the
+AFTER:
+Rollback section: a server-time mark at the 30 Hz baseline (the times of PM-0001-4 to PM-0001-10) that fails sends
+part 2 and part 3 back to the drafts with the measured numbers (the Rollback's "the 30 Hz baseline fails at N = 48"),
+while every other baseline row (PM-0001-11 to PM-0001-27, -57, -58, -59) goes back through the decision part it
+names, unless a route below names it (the netcode review of 2026-11-02, finding 6: a downstream or a memory failure
+is not a tick-rate failure); PM-0001-39 or PM-0001-40 failing changes nothing, and the tick stays at 30 Hz; a
+WebTransport crate failing PM-0001-28, -11 or -25 is replaced by the other behind the thin interface, and both failing
+goes back to the drafts, where Mustafa and the Advisor decide (the transport is a settled input); PM-0001-54 failing
+sends the desync to the shared trajectory function first (ADR 0004's PM-0004-73), and only a kind that still desyncs
+takes E3b for itself, never whole E3b (part 6; the perf review of 2026-11-02, finding 2); PM-0001-15 or PM-0001-16 failing selects many rooms per process (option B); a correction, interpolation or
+hit-registration mark (PM-0001-41 to PM-0001-52, PM-0001-60 to PM-0001-62) failing is retried once with its data values changed (the delays, the
+END
+
+### FIX GD-2 as routed (the no-mark list: purchases' refusals at slice 4)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+- Part 12 (upgrades, drops, pickups) is proven at slice 4 by the refusal tests (migration step 6).
+AFTER:
+- Part 12 (upgrades, purchases, drops, pickups) is proven at slice 4 by the refusal tests (migration step 6; the test
+  plan's forged picks, purchases and pickups): the proof test's throwaway sim has no economy, offers or pickups.
+END
+
+### FIX EA-1, NA-3 (the checklist's list of measurable marks beside it)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+Beside it, the measurable marks at the same profile: corrections (PM-0001-41, PM-0001-42), input-to-screen latency
+(PM-0001-43), extrapolation and placement (PM-0001-45, PM-0001-46), hit registration and the cap's clipped share
+(PM-0001-48, PM-0001-49), aiming at height (PM-0001-51) and the order of hit feedback (PM-0001-52). The scene: a proof
+AFTER:
+Beside it, the measurable marks at the same profile: corrections (PM-0001-41, PM-0001-42), input-to-screen latency
+(PM-0001-43), extrapolation and placement (PM-0001-45, PM-0001-46), remote events with their poses (PM-0001-61), hit
+registration and the cap's clipped share (PM-0001-48, PM-0001-49), aiming at height (PM-0001-51), the order of hit
+feedback (PM-0001-52) and own cues played once (PM-0001-62). The scene: a proof
+END
+
+### FIX NA-1 as routed (checklist step 7: run at the measured cap, so its expectation can hold)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+7. At P2, shoot the sprinting target for two minutes. Expected: when his crosshair is on the target as he sees it, the
+AFTER:
+7. At P2, with the rewind cap at the honest rewind's p99 the proof test measured at P2 (PM-0001-49; the overlay names
+   it, so the cap clips almost no honest shot), shoot the sprinting target for two minutes. Expected: when his crosshair is on the target as he sees it, the
+END
+
+### FIX NA-1 as routed (checklist steps 10 and 11: a third cap at the measured honest rewind)
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+10. At P2, repeat step 7 with the rewind cap at 200 ms, then at 250 ms (the overlay names the cap). Expected: either no
+    difference, or shots with the 200 ms cap that looked like hits but missed. Record: what he noticed with each cap
+    (for OQ-0001-5's later Feel Lab weighing; no pick here).
+11. At P2, run from open ground into cover while bots shoot at him, 10 runs with each cap. Expected: being hit after
+    reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair with each cap
+    (OQ-0001-5, the victim's side).
+AFTER:
+10. At P2, repeat step 7 with the rewind cap at 200 ms, then at 250 ms, then again at step 7's measured cap (the overlay
+    names the cap). Expected: with 200 and 250 ms, shots that looked like hits but missed, since at P2 an honest shot
+    needs 233–383 ms of rewind (part 8) and both caps clip most of them; with the measured cap, hits as in step 7. Record: what he noticed with each cap
+    (for OQ-0001-5's later Feel Lab weighing; no pick here).
+11. At P2, run from open ground into cover while bots shoot at him, 10 runs with each of step 10's three caps. Expected: being hit after
+    reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair with each cap
+    (OQ-0001-5, the victim's side).
+END
+
+### FIX FC-10 (PM-0002-3: the glue's allocator reason marked proposed)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-3 | The Worker's calls per tick do not grow with N (part 5; part 6; OQ-0002-3) | the same number of Wasm calls per tick at N = 12 and N = 48 on every tick, with wasm-bindgen's glue calls included and no separate reading (the glue's allocator calls are exports of the instance, so the counting build counts them): at most 4 for the online client and for a local match in one instance (OQ-0002-3 (a)), at most 8 in two instances (b) | CI (counts); ML: Chrome | BX at N = 12 and N = 48, local mode and online at P2, 1,800 ticks each (one minute, proposed); the counting build logs every tick's calls per export, glue included | 1 run per N and mode (counts repeat). Bites: a per-soldier accessor (one call per soldier per tick: the count grows with N); a no-op export called 5 times per tick (over 4) | R1-BND-REC1 mark 2 as written (r1, 2261–2263: "the worker makes the same number of Wasm calls per tick at N = 12 and N = 48 (at most 4)"); part 5 (one input call per tick carries the command and the received datagrams; the step returns where the outgoing datagrams and the block lie); 8 = 4 per instance × 2 instances (the draft's proposal, spike item 1) |
+AFTER:
+| PM-0002-3 | The Worker's calls per tick do not grow with N (part 5; part 6; OQ-0002-3) | the same number of Wasm calls per tick at N = 12 and N = 48 on every tick, with wasm-bindgen's glue calls included and no separate reading (proposed: wasm-bindgen's glue passes bytes through the instance's exported allocator, so the counting build counts those calls): at most 4 for the online client and for a local match in one instance (OQ-0002-3 (a)), at most 8 in two instances (b) | CI (counts); ML: Chrome | BX at N = 12 and N = 48, local mode and online at P2, 1,800 ticks each (one minute, proposed); the counting build logs every tick's calls per export, glue included | 1 run per N and mode (counts repeat). Bites: a per-soldier accessor (one call per soldier per tick: the count grows with N); a no-op export called 5 times per tick (over 4) | R1-BND-REC1 mark 2 as written (r1, 2261–2263: "the worker makes the same number of Wasm calls per tick at N = 12 and N = 48 (at most 4)"); part 5 (one input call per tick carries the command and the received datagrams; the step returns where the outgoing datagrams and the block lie); 8 = 4 per instance × 2 instances (the draft's proposal, spike item 1) |
+END
+
+### FIX RR-6 (PM-0002-6: a planted memory.grow, and a bite for a stale view)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-6 | One copy per tick, none on the page (part 5: B2) | per tick: at most 1 block copy in the Worker, 0 copies and 0 per-entity calls on the page, exactly 1 message from the Worker to the page | CI: Chromium, Firefox, WebKit (counts); ML: Chrome | the 10-minute match; the Worker's copy routine counts its calls; after each `postMessage` the Worker checks that the sent buffer is detached (`byteLength` 0: a transfer, not a clone); the page checks that every typed-array view's `buffer` is the received buffer and counts messages per tick; per-entity calls are 0 by PM-0002-2 | every tick of 1 match per browser. Bites: the block posted without its transfer list (a structured clone) | R1-BND-REC2 mark 1 (r1, 2276–2277) |
+AFTER:
+| PM-0002-6 | One copy per tick, none on the page (part 5: B2) | per tick: at most 1 block copy in the Worker, 0 copies and 0 per-entity calls on the page, exactly 1 message from the Worker to the page; after a planted `memory.grow` between two ticks, the next tick's block equal byte for byte to the same tick's block in a run without it (part 5: the host takes a fresh view of `memory.buffer` after every call) | CI: Chromium, Firefox, WebKit (counts); ML: Chrome | the 10-minute match; the Worker's copy routine counts its calls; after each `postMessage` the Worker checks that the sent buffer is detached (`byteLength` 0: a transfer, not a clone); the page checks that every typed-array view's `buffer` is the received buffer and counts messages per tick; per-entity calls are 0 by PM-0002-2 | every tick of 1 match per browser. Bites: the block posted without its transfer list (a structured clone); a host that caches its view of `memory.buffer` across calls (after the grow the old view is detached and reads zero bytes) | R1-BND-REC2 mark 1 (r1, 2276–2277); the draft, part 5 (the fresh view); the Rust review of 2026-11-02, finding 6 |
+END
+
+### FIX EA-1 as routed (PM-0002-9: order per timeline)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-9 | No event is lost or reordered (part 5) | 0 lost and 0 reordered events over the 10-minute match at N = 48 | CI: Chromium, Firefox, WebKit (counts); ML: Chrome, Edge, Firefox; MAC: Safari | every event carries a per-match sequence number (a field of the spike's event section, proposed); the page checks that each block's events continue the sequence; the Worker's emitted total equals the page's received total at the end | 1 match per browser. Bites: the page returning a block to the pool unread when two blocks arrive between frames | R1-BND-REC2 mark 4 (r1, 2280–2281); N = 48 (MODES-3 (a)) |
+AFTER:
+| PM-0002-9 | No event is lost or reordered (part 5) | over the 10-minute match at N = 48: 0 lost and 0 doubled events, and 0 released out of order on their entity's timeline (part 5): within each timeline (the local player's own, predicted and owner events; each remote entity's) events arrive in tick order, each remote spatial event in the first block whose delayed time reaches its tick, and own, predicted and owner events in the block of the tick that emitted them | CI: Chromium, Firefox, WebKit (counts); ML: Chrome, Edge, Firefox; MAC: Safari | every event carries a per-match sequence number, its tick and its timeline (fields of the spike's event section, proposed); the page checks each sequence number arrives exactly once and, per timeline, in tick order, and logs each block's delayed time beside the events it carries; the Worker's emitted total equals the page's received total at the end (a sequence across all timelines no longer runs in order: remote events wait for the delayed time) | 1 match per browser. Bites: the page returning a block to the pool unread when two blocks arrive between frames; remote events released on arrival, into the newest block, instead of at their delayed time | R1-BND-REC2 mark 4 (r1, 2280–2281); N = 48 (MODES-3 (a)); the draft, part 5 (the event section's timing, ADR 0001 part 7's rule); the engine review of 2026-11-02, finding 1 (ADR 0001's PM-0001-61 times the drawn result) |
+END
+
+### FIX RR-5 as routed (PM-0002-10: the writer's 0.67 ms decision rule)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-10 | What the block weighs and what one copy costs (part 5; decides R1-BND-OQ6 and R1-RR-OQ6; critic rank 37) | reported, no pass number: bytes per tick (median and max) and the Worker's copy time (median, p95, p99) at N = 48, for a per-entity and a per-field layout of every section; the field-by-field writer's time beside the copy; passes when every cell holds a number | ML: Chrome, Edge, Firefox; MAC: Safari | BX at N = 48, a 10-minute match per layout, on the isolation-flag build (5 µs timers); `performance.now()` around the writer and around the copy | 1 match per layout and browser | R1-BND-OQ6 (r1, 2737–2740); R1-RR-OQ6 (r1, 2951–2954); the draft's part 5 and spike item 2 |
+AFTER:
+| PM-0002-10 | What the block weighs and what one copy costs (part 5; decides R1-BND-OQ6 and R1-RR-OQ6; critic rank 37) | reported, no pass number: bytes per tick (median and max) and the Worker's copy time (median, p95, p99) at N = 48, for a per-entity and a per-field layout of every section; the field-by-field writer's time beside the copy, read against part 5's trigger: the derive or `unsafe` is weighed only if the writer's p99 in Wasm on ML exceeds 0.67 ms (5 % of 13.33 ms, proposed by rust-reviewer); passes when every cell holds a number | ML: Chrome, Edge, Firefox; MAC: Safari | BX at N = 48, a 10-minute match per layout, on the isolation-flag build (5 µs timers); `performance.now()` around the writer and around the copy | 1 match per layout and browser | R1-BND-OQ6 (r1, 2737–2740); R1-RR-OQ6 (r1, 2951–2954); the draft's part 5 and spike item 2 |
+END
+
+### FIX NA-7 as it lands in part 5 (PM-0002-12: a bite for the newest post)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-12 | Presses are never lost or doubled (part 5: one command per tick, C1) | 0 lost and 0 doubled presses, and 0 lost and 0 doubled releases, over 10,000 scripted presses, some shorter than one tick | CI: Chromium, Firefox, WebKit under Playwright (counts) | a seeded shim on the page's posting side delays each command by a time drawn uniformly from 0 to 100 ms and sends 10 % of commands twice, which reorders most neighbours (proposed: a spread wider than one 33.33 ms tick; R1 gives no amounts); the shim logs how many it delayed, doubled and reordered (each above 0, or the run is invalid); the Worker counts the presses and releases it applies through the edge counters. No profile: the network's own press mark is ADR 0001's (R2-SYNC-REC2 at P3) | 1 run per engine (counts). Bites: a Worker that reads only the held-button bitmask and ignores the edge counters | R1-BND-REC3 mark 1 (r1, 2292–2294) |
+AFTER:
+| PM-0002-12 | Presses are never lost or doubled (part 5: one command per tick, C1) | 0 lost and 0 doubled presses, and 0 lost and 0 doubled releases, over 10,000 scripted presses, some shorter than one tick | CI: Chromium, Firefox, WebKit under Playwright (counts) | a seeded shim on the page's posting side delays each command by a time drawn uniformly from 0 to 100 ms and sends 10 % of commands twice, which reorders most neighbours (proposed: a spread wider than one 33.33 ms tick; R1 gives no amounts); the shim logs how many it delayed, doubled and reordered (each above 0, or the run is invalid); the Worker counts the presses and releases it applies through the edge counters. No profile: the network's own press mark is ADR 0001's (R2-SYNC-REC2 at P3) | 1 run per engine (counts). Bites: a Worker that reads only the held-button bitmask and ignores the edge counters; a Worker that takes the last post to arrive rather than the newest by sequence number (a reordered older post rolls the running totals back) | R1-BND-REC3 mark 1 (r1, 2292–2294) |
+END
+
+### FIX NA-7 (PM-0002-13: the bite follows the per-frame post)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-13 | A press reaches the sim quickly in local play (part 5) | from the key event's `timeStamp` to the start of the tick that applies it, at most one tick plus one frame, 33.33 + 16.67 = 50.00 ms, at p95 (the 9,500th of 10,000) | ML on its 60 Hz panel: Chrome, Edge, Firefox; MAC: Safari (reported) | local mode, BX at N = 48, mode P, the page loaded as in PM-0002-8; 10,000 key events sent through Playwright, headed, so `timeStamp` is the event's own (Safari through safaridriver); the Worker stamps each tick's start on the shared clock | 1 run per browser. Bites: commands posted only from the frame callback plus one extra tick of buffering in the Worker | R1-BND-REC3 mark 2 (r1, 2294–2295); TICK-30 (1000 / 30 = 33.33 ms); a 60 Hz display (1000 / 60 = 16.67 ms) |
+AFTER:
+| PM-0002-13 | A press reaches the sim quickly in local play (part 5) | from the key event's `timeStamp` to the start of the tick that applies it, at most one tick plus one frame, 33.33 + 16.67 = 50.00 ms, at p95 (the 9,500th of 10,000) | ML on its 60 Hz panel: Chrome, Edge, Firefox; MAC: Safari (reported) | local mode, BX at N = 48, mode P, the page loaded as in PM-0002-8; 10,000 key events sent through Playwright, headed, so `timeStamp` is the event's own (Safari through safaridriver); the Worker stamps each tick's start on the shared clock | 1 run per browser. Bites: the page posting once per block instead of once per drawn frame (part 5's arithmetic: up to two tick periods less the block's delivery), plus one extra tick of buffering in the Worker | R1-BND-REC3 mark 2 (r1, 2294–2295); the draft, part 5 (the newest input posted once per drawn frame); the netcode review of 2026-11-02, finding 7; TICK-30 (1000 / 30 = 33.33 ms); a 60 Hz display (1000 / 60 = 16.67 ms) |
+END
+
+### FIX NA-7 (PM-0002-14: posts per frame), EA-4 (the new row PM-0002-77: the aim cast against the drawn frame)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-14 | Aim travels in the same message (part 5) | 10,000 of 10,000 commands carry the cursor ray and the view time; the Worker receives 0 messages of any other kind from the page during play | CI (counts) | PM-0002-12's run without the shim; the Worker counts message kinds | 1 run. Bites: a separate aim message | the draft's part 5 (proposed in its spike item 3: part 5 sends no second message) |
+AFTER:
+| PM-0002-14 | Aim travels in the same message (part 5) | 10,000 of 10,000 posts carry the cursor ray and the view time of the frame drawn, and every network command its aim point from the newest post; the Worker receives 0 messages of any other kind from the page during play | CI (counts) | PM-0002-12's run without the shim; the Worker counts message kinds | 1 run. Bites: a separate aim message | the draft's part 5 (proposed in its spike item 3: part 5 sends no second message) |
+| PM-0002-77 | The Worker casts the aim against what the page drew (part 5; decision map I-19: the cursor ray against what the page draws) | for 1,000 of 1,000 commands whose page-side ray hits a remote soldier's hit volume at least 5 cm inside its edge (proposed margin: at the edge either side may win by rounding), the Worker's cast names the same entity, and its hit point lies within 1 cm of the page's (proposed: the protocol's position step, ADR 0001 part 6) | CI: Chromium (counts and distances); ML: Chrome | a test build: the page also casts each posted ray against the hit volumes at the instance transforms of the frame it drew (three.js maths on the page, never Wasm), and logs the entity and point with the post's sequence number; the Worker logs its cast per command with the sequence number of the post it used; a scripted cursor rests on a remote soldier sprinting at 9 m/s (ADR 0001's target course), in local mode and online at P2 | 1 run per mode. Bites: the Worker casting against the newest block instead of the view time's blend (up to one tick off, about 0.3 m at 9 m/s) | the draft, part 5 (the post's view time; the cast against the state published for it); decision map I-19; ADR 0001 part 5 (the aim point); the engine review of 2026-11-02, finding 4 (PM-0002-14 counts the message, ADR 0001's PM-0001-48 and -51 judge hits against the Worker's own state, so neither sees this seam) |
+END
+
+### FIX FB-1 (PM-0002-17: the enum bite required again; an ambient enum not claimed)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-17 | Generated code passes the strict base (parts 5 and 7) | 0 errors from `tsc -b` on `packages/types` with the base tsconfig (`strict`, `erasableSyntaxOnly` included) | CI | `tsc -b` on the generated package | 1 run. Bites: a generated `.ts` file with a class that has a parameter property (proposed: the construct the tsconfig page R5-TSLINT-F12 read gives as the flag's example). A generated `enum` is planted too, its result recorded for R5-TSLINT-OQ3 but not required: that the flag rejects an `enum` is unverified at the source (the tsconfig page names no `enum`, and R5-TSLINT-F12 calls its list of constructs general knowledge, unverified) | R1-BND-REC4 mark 3 (r1, 2306); R5-TSLINT-OQ3 (r5, 1770–1772); R5-TSLINT-F12 (r5, 221–224) |
+AFTER:
+| PM-0002-17 | Generated code passes the strict base (parts 5 and 7) | 0 errors from `tsc -b` on `packages/types` with the base tsconfig (`strict`, `erasableSyntaxOnly` included) | CI | `tsc -b` on the generated package | 1 run. Bites, each required: a generated `.ts` file with a class that has a parameter property, and one with an `enum` declaration (R5-TSLINT-REC1's plant, r5 lines 1261–1263; the tsconfig page's `erasableSyntaxOnly` entry lists `enum` declarations and parameter properties among the constructs it rejects: verifier source check, 2026-11-01). An ambient `enum` (`declare enum`, or one in a `.d.ts`) is not claimed either way: its result is recorded for R5-TSLINT-OQ3 (the skeptic check of 2026-11-02 read nothing on it) | R1-BND-REC4 mark 3 (r1, 2306); R5-TSLINT-OQ3 (r5, 1770–1772); R5-TSLINT-F12 (r5, 221–224), its list now confirmed at the source (typescriptlang.org/tsconfig, "Erasable Syntax Only"; the fixcheck-b verifier, finding 1) |
+END
+
+### FIX FB-1, SA-11 as routed (PM-0002-42: the enum required; a planted eval in client)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-42 | G3 bites (parts 3 and 7: TypeScript) | each fails G3 only: one violation per strict flag (an unchecked index read, `x = undefined` into an optional field, a missing `override`, a fall-through `case`, a path without `return`, a class with a parameter property for `erasableSyntaxOnly`, a value import used only as a type; proposed in place of R5-TSLINT-REC1's `enum`: the tsconfig page R5-TSLINT-F12 read gives the parameter property as the flag's example, while that the flag rejects an `enum` is unverified at the source, as in PM-0002-17; the `enum` is planted too, its result recorded, not required); an unawaited promise; a switch over a generated union missing one kind while having a `default`; an import of `editor` from `client`; a bare `event`; rendering or DOM code imported by `sim-worker` or `net`; an import from `legacy/` or `spikes/`; control: `import type` from `types` in `editor` passes; the clean tree has 0 errors and 0 warnings | CI | `--prove` | every `--prove` run | R5-TSLINT-REC1's mark (r5, 1261–1263); R5-TSLINT-F12 (r5, 221–224); R5-TSLINT-REC2's mark (r5, 1279–1281); R5-GATE-REC3's G3 row (r5, 1715); the draft's parts 3 and 7 |
+AFTER:
+| PM-0002-42 | G3 bites (parts 3 and 7: TypeScript) | each fails G3 only: one violation per strict flag (an unchecked index read, `x = undefined` into an optional field, a missing `override`, a fall-through `case`, a path without `return`, a class with a parameter property and an `enum` declaration, each for `erasableSyntaxOnly` (both required, as in PM-0002-17: R5-TSLINT-REC1's `enum` and the construct the tsconfig page gives as the flag's example), a value import used only as a type); an `eval(…)` call and a `new Function(…)` in `client` (ESLint's core `no-eval` and `no-new-func`, part 7's CSP-ready build); an unawaited promise; a switch over a generated union missing one kind while having a `default`; an import of `editor` from `client`; a bare `event`; rendering or DOM code imported by `sim-worker` or `net`; an import from `legacy/` or `spikes/`; control: `import type` from `types` in `editor` passes; the clean tree has 0 errors and 0 warnings | CI | `--prove` | every `--prove` run | R5-TSLINT-REC1's mark (r5, 1261–1263); R5-TSLINT-F12 (r5, 221–224); R5-TSLINT-REC2's mark (r5, 1279–1281); R5-GATE-REC3's G3 row (r5, 1715); the draft's parts 3 and 7 (`no-eval` and `no-new-func`: the security review of 2026-11-02, finding 11, through ADR 0006's interim position for B3) |
+END
+
+### FIX FB-9 (PM-0002-23: the product shown exactly)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-23 | A busy page does not stall the connection (part 5: H2) | with a 100 ms busy loop injected on the page once every 3 s (100 loops), no interval between two snapshots the Worker processes, among those overlapping a busy loop, longer than two snapshot intervals (2 × 33.33 = 66.67 ms) at P0; the same reported at P2 | ML: Chrome, Edge, Firefox | online; the Worker stamps every processed snapshot; the page logs each busy loop's start and end on the shared clock (proposed reading of "no gap": a path through the page would show the whole 100 ms) | 1 run per browser and profile. Bites: snapshots relayed through the page | R1-BND-REC6 mark 2 (r1, 2335–2336); P0 and P2 (r2, 1989); 30 Hz snapshots (TICK-30) |
+AFTER:
+| PM-0002-23 | A busy page does not stall the connection (part 5: H2) | with a 100 ms busy loop injected on the page once every 3 s (100 loops), no interval between two snapshots the Worker processes, among those overlapping a busy loop, longer than two snapshot intervals (2 × 1000 / 30 = 66.67 ms) at P0; the same reported at P2 | ML: Chrome, Edge, Firefox | online; the Worker stamps every processed snapshot; the page logs each busy loop's start and end on the shared clock (proposed reading of "no gap": a path through the page would show the whole 100 ms) | 1 run per browser and profile. Bites: snapshots relayed through the page | R1-BND-REC6 mark 2 (r1, 2335–2336); P0 and P2 (r2, 1989); 30 Hz snapshots (TICK-30) |
+END
+
+### FIX PA-13 as routed (the new row PM-0002-78: the Worker's whole cost, reported)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-25 | One Wasm instance or two in a local match (part 6; decides OQ-0002-3) | reported for (a) one instance and (b) two: calls per tick at N = 12 and 48 against PM-0002-3's marks; the Worker's time per tick (median, p95, p99) beside the client's sim share (13.33 ms at 30 Hz); each instance's Wasm memory after 10 minutes; for (b), gated: a trap planted in the client endpoint leaves [the authority](../research/GLOSSARY.md#the-authority)'s tick advancing and its [state hash](../research/GLOSSARY.md#state-hash) stream unbroken (proposed: the reason (b) exists, OQ-0004-7) | ML: Chrome; CI (counts) | BX in local mode, a 10-minute match per layout at N = 12 and 48; the Worker's time from `performance.now()` around each tick's Wasm work; memory from each instance's `memory.buffer.byteLength` | 1 match per layout and N; the trap test 1 of 1 | the draft's OQ-0002-3 ("What decides it"); R1-BND-REC1 mark 2 (r1, 2261–2263); GLOSSARY, the client's sim share (lines 214–218) |
+AFTER:
+| PM-0002-25 | One Wasm instance or two in a local match (part 6; decides OQ-0002-3) | reported for (a) one instance and (b) two: calls per tick at N = 12 and 48 against PM-0002-3's marks; the Worker's time per tick (median, p95, p99) beside the client's sim share (13.33 ms at 30 Hz); each instance's Wasm memory after 10 minutes; for (b), gated: a trap planted in the client endpoint leaves [the authority](../research/GLOSSARY.md#the-authority)'s tick advancing and its [state hash](../research/GLOSSARY.md#state-hash) stream unbroken (proposed: the reason (b) exists, OQ-0004-7) | ML: Chrome; CI (counts) | BX in local mode, a 10-minute match per layout at N = 12 and 48; the Worker's time from `performance.now()` around each tick's Wasm work; memory from each instance's `memory.buffer.byteLength` | 1 match per layout and N; the trap test 1 of 1 | the draft's OQ-0002-3 ("What decides it"); R1-BND-REC1 mark 2 (r1, 2261–2263); GLOSSARY, the client's sim share (lines 214–218) |
+| PM-0002-78 | What the Worker costs as a whole (part 6: reported, no limit until these numbers exist) | reported, no pass number: the Worker's busy time per tick (all its work: the host's message handling, its Wasm calls and the block's post; median, p95, p99) at N = 48, online at P2 and in a local match; its JS heap and each instance's Wasm memory at minutes 5 and 10, the heap read after a forced garbage collection and set beside ADR 0003's PM-0003-24 flat rule (at most 0.5 MB of growth from minute 5 to 10), for reading, not as a pass; passes when every cell holds a number | ML: Chrome | BX at N = 48: a 10-minute match in local mode and a 10-minute online session at P2; busy time from `performance.now()` at the start and end of each of the Worker's tasks (its message handlers and its timer callback); the heap through the Chrome DevTools Protocol on the Worker's target (proposed tool, not researched), Wasm memory from `memory.buffer.byteLength` | 1 run per mode | the draft, part 6 (the Worker as a whole has no research budget; this record sets any limit from these numbers) and spike item 6; GLOSSARY, the client's sim share (lines 214–218: the step only); ADR 0003's PM-0003-24; the perf review of 2026-11-02, finding 13 |
+END
+
+### FIX PA-5 (PM-0002-28: cites PM-0004-8's one reading of 30+ fps, sets none of its own)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-28 | The sim fits the client's sim share in this Worker (ADR 0004's S2; R1-TICK-REC2 P2) | ADR 0004's numbers, measured here: p99 [sim step time](../research/GLOSSARY.md#sim-step-time) at most 13.33 ms at 30 Hz in Wasm in this Worker on ML while the page holds 30+ fps on Low for the whole run, read as every 1-second window holding at least 30 presented frames (proposed reading); N for the pass from R1-TICK-OQ7 (a design question), the scale steps 12, 24, 36 and 48 reported meanwhile; with the stand-in sim: reported only | ML: Chrome, Firefox | the sim core spike's sim in this Worker once it exists; step time from the Worker's `performance.now()` around the step; mode P; the page draws with the plain renderer until ADR 0003's renderer runs at Low, and the run repeats with it then (proposed: "on Low" names ADR 0003's tier); run length and count as ADR 0004's pass marks set them | as ADR 0004's S2 | R1-TICK-REC2 P2 (r1, 2054–2057); GLOSSARY lines 214–218 (40 % of 33.33 ms = 13.33 ms); ADR 0004 S2 |
+AFTER:
+| PM-0002-28 | The sim fits the client's sim share in this Worker (ADR 0004's S2; R1-TICK-REC2 P2) | ADR 0004's PM-0004-8, measured here once for both records: its numbers, its one reading of "holds 30+ fps on Low" (ADR 0003's minimum-laptop frame rows, median at most 28 ms and p95 at most 33.3 ms, mode U), its machines, runs and bites stand, and this row sets none of its own (as PM-0002-26 does for pacing). Restated: p99 [sim step time](../research/GLOSSARY.md#sim-step-time) at most 13.33 ms at 30 Hz in Wasm in this Worker on ML while the page meets that frame row for the whole run; N for the pass from R1-TICK-OQ7 (a design question), the scale steps 12, 24, 36 and 48 reported meanwhile; with the stand-in sim: reported only | ML: Chrome, Firefox | the sim core spike's sim in this Worker once it exists; step time from the Worker's `performance.now()` around the step; frame times in mode U (PM-0004-8's); the page draws with the plain renderer until ADR 0003's renderer runs at Low, and the run repeats with it then (proposed: "on Low" names ADR 0003's tier); run length and count as ADR 0004's pass marks set them | as ADR 0004's S2 | R1-TICK-REC2 P2 (r1, 2054–2057); GLOSSARY lines 214–218 (40 % of 33.33 ms = 13.33 ms); ADR 0004 S2 and PM-0004-8; the perf review of 2026-11-02, finding 5 (one mark, one reading) |
+END
+
+### FIX FC-3, RR-8, RR-7 as routed (PM-0002-29: an input to R1-RR-OQ5; lto, codegen-units, Brotli; the shipped file)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-29 | What the Wasm file weighs (part 4; with the sim core spike, decides R1-RR-OQ5; feeds R5-CI-OQ4) | reported, no pass number: the `sim-wasm` file's bytes raw and gzipped, with and without wasm-opt, at `opt-level` "s" and "z", with parry3d once the sim core spike's sim is in; the wasm-opt version recorded; gated: every served file under 25 MiB (26,214,400 bytes). This measurement and the content and ability spike's share of the `content` crate (ADR 0005, OQ-0005-CD2) are the two inputs from which the Advisor sets the budget file's first limit (part 4); until then G7 records the `sim-wasm` size and does not gate it | CI | the spike's release builds; sizes read from the files, gzip at level 9 (proposed) | 1 build per setting (sizes repeat) | R1-RR-OQ5 (r1, 2946–2950); R5-CI-OQ4 (r5, 1833–1834); R6-HOST-REC1's mark (r6, 642; decision map N37); R5-GATE-REC4 (r5, 1737–1738); the draft's part 4 and spike item 8; 25 × 1,048,576 = 26,214,400 |
+AFTER:
+| PM-0002-29 | What the Wasm file weighs (part 4; with the sim core spike, an input to R1-RR-OQ5, which the Advisor decides; feeds R5-CI-OQ4) | reported, no pass number: the `sim-wasm` file's bytes raw and gzipped, with and without wasm-opt, at `opt-level` "s" and "z", with `lto` off and `"fat"` and `codegen-units` at its default and at 1, with parry3d once the sim core spike's sim is in, Brotli beside gzip; the shipped file measured as shipped (after the wasm-opt step the release keeps, its command line recorded for part 4's flag check); the wasm-opt version and the panic strategy (abort, the target's default) recorded; gated: every served file under 25 MiB (26,214,400 bytes). This measurement and the content and ability spike's share of the `content` crate (ADR 0005, OQ-0005-CD2) are the two inputs from which the Advisor sets the budget file's first limit (part 4); until then G7 records the `sim-wasm` size and does not gate it | CI | the spike's release builds; sizes read from the files, gzip at level 9 and Brotli at level 11 (proposed: what the client host serves a Brotli-capable browser was not read) | 1 build per setting (sizes repeat) | R1-RR-OQ5 (r1, 2946–2950); R5-CI-OQ4 (r5, 1833–1834); R6-HOST-REC1's mark (r6, 642; decision map N37); R5-GATE-REC4 (r5, 1737–1738); the draft's part 4 and spike item 8; 25 × 1,048,576 = 26,214,400; the Rust review of 2026-11-02, findings 7 and 8; the fixcheck-c verifier, finding 3 |
+END
+
+### FIX RR-9 as routed (PM-0002-33: the panic message arrives)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-33 | A Wasm trap reaches error reporting (part 9; only if Mustafa has created the EU Sentry organisation) | a deliberate Wasm trap in the Worker arrives in Sentry with Rust function names in Chrome, Edge, Firefox and Safari (4 of 4) | ML: Chrome, Edge, Firefox; MAC: Safari | a trap triggered by a test command; the Sentry event read in its web view | 1 trap per browser; conditional | R6-OBS-REC3's mark (r6, 765–766) |
+AFTER:
+| PM-0002-33 | A Wasm trap reaches error reporting with its panic message (parts 4 and 9; the Sentry half only if Mustafa has created the EU Sentry organisation) | a deliberate panic in the Worker's sim, with a known message: the trap's report carries the panic hook's message and location (ADR 0004 part 20's fixed buffer, read through a fresh view: part 4), in the page's own error log in Chrome, Edge, Firefox and Safari (4 of 4), always; and the report arrives in Sentry with Rust function names and that message (4 of 4), when Sentry exists | ML: Chrome, Edge, Firefox; MAC: Safari | a trap triggered by a test command; the Sentry event read in its web view | 1 trap per browser; the Sentry half conditional. Bites: a host that reads the hook's buffer through a view taken before the instance's memory grew (it reads zero bytes) | R6-OBS-REC3's mark (r6, 765–766); the draft, part 4 (the hook's buffer read after a trap); the Rust review of 2026-11-02, finding 9 |
+END
+
+### FIX RR-1, RR-2, RR-7 as routed (PM-0002-41: powi, to_radians and min bites; the clock in room; -ffm)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-41 | G2 bites (parts 4 and 7: Rust lint) | each fails G2 only, with the reason in the message: a `HashMap` field in `sim`; `map.values().sum()` over a std map in `sim`; `Instant::now()` in a tick function; `x.sin()` on an `f32` in `sim` (clippy, or the reviewed text scan if clippy cannot name it); `.unwrap()` and `buf[i]` in a decoder; a planted correctness bug; a planted `style` warning; an `unsafe` block; a crate without `[lints] workspace = true`; `+fma`, `-C target-cpu=native` or `relaxed-simd` in the build flags of `sim`, `room`, `sim-wasm` or `server`; controls pass: `Instant::now()` and a `HashMap` in `server`, `.unwrap()` in a `#[test]` | CI | `--prove` | every `--prove` run | R5-GATE-REC3's G2 row (r5, 1714); R5-RUSTLINT-REC1's mark (r5, 1318–1320), REC2's (1336–1339), REC3's (1351–1352); the draft's part 4 (the build-flag check) |
+AFTER:
+| PM-0002-41 | G2 bites (parts 4 and 7: Rust lint) | each fails G2 only, with the reason in the message: a `HashMap` field in `sim`; `map.values().sum()` over a std map in `sim`; `Instant::now()` in a tick function; `x.sin()` on an `f32` in `sim` (clippy, or the reviewed text scan if clippy cannot name it); `x.powi(2)`, `deg.to_radians()` and `a.min(b)` in `sim`, each failing on its own (methods outside ADR 0004 part 7's allow-list, which std marks non-deterministic or which may return either signed zero); `Instant::now()` in `room` and in `client-endpoint` (the clock ban there: part 7); `.unwrap()` and `buf[i]` in a decoder; a planted correctness bug; a planted `style` warning; an `unsafe` block; a crate without `[lints] workspace = true`; `+fma`, `-C target-cpu=native` or `relaxed-simd` in the build flags of `sim`, `room`, `client-endpoint`, `sim-wasm` or `server`, and `-ffm` (`--fast-math`) in the wasm-opt step's command line (part 4); controls pass: `Instant::now()` and a `HashMap` in `server`, `.unwrap()` in a `#[test]`, and in `sim` the three min, max and clamp helpers and the allowed `abs` and `fract` | CI | `--prove` | every `--prove` run | R5-GATE-REC3's G2 row (r5, 1714); R5-RUSTLINT-REC1's mark (r5, 1318–1320), REC2's (1336–1339), REC3's (1351–1352); the draft's part 4 (the build-flag and wasm-opt checks) and part 7 (the float allow-list's complement, the clock ban in four crates); the Rust review of 2026-11-02, findings 1, 2 and 7 |
+END
+
+### FIX EA-8, SA-10, RR-10 as routed (PM-0002-44: client-endpoint's deps, a git dependency, the four-build feature check)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-44 | G5 bites (part 3: who may depend on whom) | each fails G5 only: `use` of the transport crate in `sim`; `tokio` or `quinn` added to `sim`; `tokio` added to `room`; `navbake` or `server` reachable from `sim-wasm` (each when that crate enters); a wildcard version; a second version of a crate outside the reviewed skip list; a server-only feature on a maths dependency shared with `sim` (the resolved feature lists from `cargo tree -e features` then differ between the `server` and `sim-wasm` builds); control: proptest as a dev-dependency of `sim` passes | CI | `--prove` | every `--prove` run | R5-LAYOUT-REC2's mark (r5, 1189–1192); R5-LAYOUT-REC4's mark (r5, 1216–1218); R5-GATE-REC3's G5 row (r5, 1717); the draft's part 3 |
+AFTER:
+| PM-0002-44 | G5 bites (part 3: who may depend on whom) | each fails G5 only: `use` of the transport crate in `sim`; `tokio` or `quinn` added to `sim`; `tokio` added to `room`; `navbake` or `server` reachable from `sim-wasm` (each when that crate enters); wasm-bindgen or a transport crate added to `client-endpoint`; a git dependency in any crate (cargo-deny's `sources` at deny, crates.io only: part 3); a wildcard version; a second version of a crate outside the reviewed skip list; a server-only feature on a maths dependency shared with `sim` (the resolved feature lists from `cargo tree -e features` then differ between any two of the `server`, `devtools`, `navbake` and `sim-wasm` builds); controls pass: proptest as a dev-dependency of `sim`, and a dev-only feature on `devtools` that touches no `sim` dependency | CI | `--prove` | every `--prove` run | R5-LAYOUT-REC2's mark (r5, 1189–1192); R5-LAYOUT-REC4's mark (r5, 1216–1218); R5-GATE-REC3's G5 row (r5, 1717); the draft's part 3 (the `client-endpoint` crate; `sources`; the same-feature check across four builds); the engine, security and Rust reviews of 2026-11-02 (EA-8, SA-10, RR-10) |
+END
+
+### FIX FB-3 (PM-0002-45: a limit planted in the budget file for the run)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-45 | G7 bites (parts 4 and 9: budgets as data) | a constant table that pushes the Wasm build over the committed budget fails G7; raising a budget without changing the budget file fails G7; a change inside the budget passes; the file's history shows every raise with its reason | CI | `--prove`; `git log` of the budget file | every `--prove` run | R5-GATE-REC3's G7 row (r5, 1718); R5-GATE-REC4's mark (r5, 1743–1744) |
+AFTER:
+| PM-0002-45 | G7 bites (parts 4 and 9: budgets as data) | a constant table that pushes the Wasm build over a limit planted in the budget file for the run fails G7 (the `sim-wasm` limit itself is set later, by the Advisor: part 4; until then G7 records that size and gates the rest of the file); raising a budget without changing the budget file fails G7; a change inside the budget passes; the file's history shows every raise with its reason | CI | `--prove`; `git log` of the budget file | every `--prove` run | R5-GATE-REC3's G7 row (r5, 1718; "its size is set once REC4's budget exists"); R5-GATE-REC4's mark (r5, 1743–1744); the fixcheck-b verifier, finding 3, upheld by the skeptic |
+END
+
+### FIX SA-11 as routed (PM-0002-46: a planted inline script in the built HTML)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-46 | G8 bites (parts 3 and 11: the player build) | a dynamic `import()` of the editor from `client` fails G8; control: the editor entry importing `client` code passes; the built player page loads no file from `editor` | CI | `--prove`; Vite's manifest walked from the player entry through `imports` and `dynamicImports` | every `--prove` run | R5-LAYOUT-REC2's mark (r5, 1191–1192: "only the manifest walk sees a path built at run time"); R5-LAYOUT-REC5's mark (r5, 1231); R5-GATE-REC3's G8 row (r5, 1719) |
+AFTER:
+| PM-0002-46 | G8 bites (parts 3 and 11: the player build) | a dynamic `import()` of the editor from `client` fails G8; an inline `<script>` (and an inline style) in the built HTML, and a Worker or the Wasm loaded from a `blob:` or `data:` URL, each fail G8 (part 7's CSP-ready build); controls: the editor entry importing `client` code passes, and the Worker and the Wasm loaded as files pass; the built player page loads no file from `editor` | CI | `--prove`; Vite's manifest walked from the player entry through `imports` and `dynamicImports` | every `--prove` run | R5-LAYOUT-REC2's mark (r5, 1191–1192: "only the manifest walk sees a path built at run time"); R5-LAYOUT-REC5's mark (r5, 1231); R5-GATE-REC3's G8 row (r5, 1719); the draft, part 7 (the CSP-ready build, checked in G8); the security review of 2026-11-02, finding 11 |
+END
+
+### FIX GE-2 as routed (PM-0002-51: the backend per CI engine recorded)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-51 | G12 bites (parts 6 and 9: end-to-end) | each fails G12 only: a throw in the deploy path; a console error 2 s after load; an outbound request to an external host; the WebSocket backend broken (from slice 3); a 20 % rise in draw calls against ADR 0003's committed baseline; control: an endless CSS animation on a button passes; G12 also runs once with `forceWebGL` and names the backend on every shot | CI (headless; counts only) | `--prove` | every `--prove` run | R5-GATE-REC3's G12 row (r5, 1723); R5-GATE-REC1's G12 (r5, 1670); ADR 0003's PM-0003-36 |
+AFTER:
+| PM-0002-51 | G12 bites (parts 6 and 9: end-to-end) | each fails G12 only: a throw in the deploy path; a console error 2 s after load; an outbound request to an external host; the WebSocket backend broken (from slice 3); a 20 % rise in draw calls against ADR 0003's committed baseline; control: an endless CSS animation on a button passes; G12 also runs once with `forceWebGL` and names the backend on every shot, and records the backend each CI engine got (or none); whether any CI engine gets WebGPU, and the WebGPU smoke run if none does, are ADR 0003's PM-0003-36 (the graphics review of 2026-11-02, finding 2) | CI (headless; counts only) | `--prove` | every `--prove` run | R5-GATE-REC3's G12 row (r5, 1723); R5-GATE-REC1's G12 (r5, 1670); ADR 0003's PM-0003-36 |
+END
+
+### FIX NA-7, GE-2 as routed (PM-0002-64: every tick runs the newest post; the backend per engine)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-64 | The skeleton: one command and one block per tick (part 6; phase 2.5) | in a 1-minute local match (1,800 ticks; proposed: G12's time budget) in G12's three engines: commands posted equal ticks run and blocks received equal ticks run, each within 1 at start and stop; the page makes 0 Wasm calls and handles 0 network messages (PM-0002-2's and PM-0002-22's stubs); the empty scene names its backend; ADR 0001's loopback milestone and ADR 0004's first-recording milestone pass | CI: Chromium, Firefox, WebKit (counts) | G12 with the test-hook API's counters | every gate run | the draft's phase 2.5; R1-BND-REC1 mark 2 (r1, 2261–2262); R1-BND-REC6 mark 1 (r1, 2334–2335) |
+AFTER:
+| PM-0002-64 | The skeleton: one command and one block per tick (part 6; phase 2.5) | in a 1-minute local match (1,800 ticks; proposed: G12's time budget) in G12's three engines: every tick runs the newest posted input (the command built from the newest post by sequence number), the page posts at most once per drawn frame, and blocks received equal ticks run within 1 at start and stop; the page makes 0 Wasm calls and handles 0 network messages (PM-0002-2's and PM-0002-22's stubs); the empty scene names its backend, recorded per engine (none if the engine gets no adapter); ADR 0001's loopback milestone and ADR 0004's first-recording milestone pass | CI: Chromium, Firefox, WebKit (counts) | G12 with the test-hook API's counters | every gate run | the draft's phase 2.5 and part 5 (the newest input, posted once per drawn frame); R1-BND-REC1 mark 2 (r1, 2261–2262); R1-BND-REC6 mark 1 (r1, 2334–2335); the netcode review of 2026-11-02, finding 7, and the graphics review, finding 2 |
+END
+
+### FIX SA-1 as routed (PM-0002-65: timed from the approval while the reviewer holds)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-65 | The preview link arrives quickly (part 10; phase 2.6) | for a same-repository pull request, the link exists within 5 minutes after the build job ends, median of 5 runs | CI | the build job's end and the link comment's time, from GitHub's records | 5 runs | R5-PREV-REC1 mark 1 (r5, 1600–1601); decision map N39 |
+AFTER:
+| PM-0002-65 | The preview link arrives quickly (part 10; phase 2.6) | for a same-repository pull request, the link exists within 5 minutes after the build job ends, or, while `preview`'s required reviewer holds (part 10, ADR 0006's interim for B9), after the reviewer's approval, median of 5 runs | CI | the build job's end (or the approval's time) and the link comment's time, from GitHub's records | 5 runs | R5-PREV-REC1 mark 1 (r5, 1600–1601); decision map N39 |
+END
+
+### FIX SA-1 as routed (PM-0002-66: a test PR that edits the deploy job gets no secret and no production token)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-66 | The deploy job never runs pull-request code (part 10) | the deploy job holds no checkout of the pull request's head and no `npm ci` or `cargo` step; a test pull request that changes `package.json` scripts never runs them in the deploy job | CI | a review of the workflow file; a test pull request whose changed script would print a marker in the deploy job's log (proposed) | 1 of 1 | R5-PREV-REC1 mark 3 (r5, 1602–1603) |
+AFTER:
+| PM-0002-66 | The deploy job never runs pull-request code, and a rewritten job reaches no production token (part 10) | the deploy job holds no checkout of the pull request's head and no `npm ci` or `cargo` step; a test pull request that changes `package.json` scripts never runs them in the deploy job; a test pull request that edits the deploy job itself to print a marker and whether its token is set ("present" or "absent", never the value) gets no secret while `preview`'s required reviewer has not approved (the job waits); a job on a pull-request branch that names the `production` environment is refused by its deployment-branch rule and prints "absent" even when approved | CI (the test repository, ADR 0006's TR, for the edited-job tests; proposed: never against the game's own production) | a review of the workflow file; test pull requests whose changed script or edited job would print a marker in the deploy job's log (proposed) | 1 of 1 each. Bites: on the test repository, `production` without its deployment-branch rule (the `production` test must then print "present", or the check is not shown to work) | R5-PREV-REC1 mark 3 (r5, 1602–1603); R5-PREV-F2 (r5, 770–774: a `pull_request` run takes the pull request's own workflow) and R5-PREV-F6 (r5, 796–804: required reviewers; deployment branches); the draft, part 10 (production from `main` alone; the reviewer on `preview`); ADR 0006's B9 interim and OQ-0006-13; the security review of 2026-11-02, finding 1 |
+END
+
+### FIX TE-7 as routed (PM-0002-76: the 3-hour soak on the reference server)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-76 | Scale to 48 (slice 6; part 8) | PM-0002-72's soak marks for every mode of [the test-mode list](../research/GLOSSARY.md#the-test-mode-list) (1v1, 4v4, 2v2v2, 6v6v6, 12v12v12, 16v16v16, 24v24, and N = 64 labelled headroom) over L1 at P2, 30 minutes each, with one L2 run of 4 real browser clients among the bots; before each playtest one 3-hour soak with 0 panics, 0 hangs and 0 desyncs | CI (nightly); the reference server for tick times | the soak harness | 1 run per mode, nightly | R5-TEST-REC5 (r5, 1475–1489); GLOSSARY lines 375–387; the draft's part 8 and migration plan, step 8 |
+AFTER:
+| PM-0002-76 | Scale to 48 (slice 6; part 8) | PM-0002-72's soak marks for every mode of [the test-mode list](../research/GLOSSARY.md#the-test-mode-list) (1v1, 4v4, 2v2v2, 6v6v6, 12v12v12, 16v16v16, 24v24, and N = 64 labelled headroom) over L1 at P2, 30 minutes each, with one L2 run of 4 real browser clients among the bots; before each playtest one 3-hour soak with 0 panics, 0 hangs and 0 desyncs, on the reference server, so its tick times count (part 8: the bench's path, a CCX23 per session, OQ-0006-17) | CI (nightly); the reference server for tick times | the soak harness | 1 run per mode, nightly | R5-TEST-REC5 (r5, 1475–1489); GLOSSARY lines 375–387; the draft's part 8 and migration plan, step 8 |
+END
+
+### FIX EA-4, PA-13 (the section's row list names PM-0002-77 and -78)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+Written by test-engineer (plan step 4). One row per mark: the Rust ↔ TypeScript boundary spike's first (PM-0002-1 to
+PM-0002-34), then the foundation's own acceptance checks (PM-0002-35 to PM-0002-69), then the later milestones of
+AFTER:
+Written by test-engineer (plan step 4). One row per mark: the Rust ↔ TypeScript boundary spike's first (PM-0002-1 to
+PM-0002-34, with PM-0002-77 after PM-0002-14 and PM-0002-78 after PM-0002-25), then the foundation's own acceptance checks (PM-0002-35 to PM-0002-69), then the later milestones of
+END
+
+### FIX PA-13 ("When a mark fails": PM-0002-78 is a reported mark)
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+  condition holds; a reported mark (PM-0002-10, -29, -30, -31, -32, and PM-0002-25's report) when its record is
+AFTER:
+  condition holds; a reported mark (PM-0002-10, -29, -30, -31, -32, -78, and PM-0002-25's report) when its record is
+END
+

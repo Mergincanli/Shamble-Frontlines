@@ -1,0 +1,9 @@
+<<<OLD
+The figure counts as the goal budget's density only if each room's sim step time p99 in the run is at least the sim core spike's figure for the stress scene at that N (proposed: a stand-in cheaper than the real sim would overstate k); otherwise it is labelled "on the stand-in" and part 8 keeps both densities until slice 6 re-measures (the draft's migration step 7) |
+>>>NEW
+In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid |
+===
+<<<OLD
+the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case).
+>>>NEW
+the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S).

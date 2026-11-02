@@ -1,0 +1,8 @@
+  same location. **LG**, the load generator: one or more separate VMs in the same location that run every bot client,
+  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
+  (or a larger plan), as many as a 5-minute calibration run at the session's load shows keep each under 80 % of its
+  CPU, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
+  encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
+  spend up to 1 vCPU per 48 sessions, ADR 0001); their count goes into the run plan and PM-0006-18. On LG's addresses
+  the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is recorded
+  (What a spike must prove, item 2). **MV**, a

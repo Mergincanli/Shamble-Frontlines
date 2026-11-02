@@ -1,0 +1,3 @@
+- Part 19 (events, moments, telemetry): no spike mark; the event list is in the state hash, so PM-0004-18 and -19 cover
+  its order, the test plan's planted divergence that changes only one event is caught at its tick, and the moment
+  mechanism has no research behind it.
