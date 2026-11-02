@@ -127,8 +127,8 @@ AFTER:
      ≤ 3 ms p99; High: ≤ 2 ms; line 1129), using `PCFShadowMap`, which r186 made soft (R3-WGPU-F3, lines 78–83), with legacy's
      texel-snapped frustum that follows the player (GW4; `LEGACY_INVENTORY.md` line 192). Cascades and other setups
      were not researched (R3-BUDGET-OQ6, lines 1375–1378): OQ-0003-4. Soft shadows are LOOK_V2 §2 `[DECIDED]`, so the
-     row's "or off" is used only if Mustafa answers OQ-0003-16 that way; until then Low keeps one 1024² map, inside
-     the row's 3 ms.
+     row's "or off" is used only if Mustafa answers OQ-0003-16 that way; until then Low keeps one 1024² map, measured
+     against the row's 3 ms.
 END
 
 ### FIX AD-6 (5.h: a structure class carries the buildings' ink weight)
@@ -211,7 +211,8 @@ AFTER:
      per pass × 48 soldiers = 192 per pass; a shadow and a main pass make 384; the merged world about 202; four very
      large units up to 200; about 786. The research's sum stops there, but the same frame draws more: the health
      bars (at most 2, R3-CHAR-REC3's mark, lines 1074–1075); the 5 pooled visual-effect kinds of 5.k at one draw each
-     (proposed: one instanced mesh per kind, in the main pass only); the live projectiles' 4 kinds (bolt, grenade,
+     (assumed for the count: one draw per kind in the main pass, as one instanced pool per kind would give; the
+     technique is OQ-0003-7); the live projectiles' 4 kinds (bolt, grenade,
      Molotov, rocket, as GLOSSARY §3 lists them) in the main pass, 8 draws if they also cast shadows; and the
      full-screen post passes, from 2 (the ink and the output, inferred) to 16 (with the glow's twelve, 5.d, and the
      AO pass and its denoise, 5.c), if `drawCalls` counts them (not researched: PM-0003-12 reports their share). That
@@ -277,7 +278,7 @@ AFTER:
      match with a fixed seed, less exact (r3-rendering.md, Pointers Q6, lines 1504–1505). Each run records the
      Worker's load (a replay, a local match or an online client), because a replay runs the whole sim at N = 48, as a
      local match does, which is heavier than an online client's Worker, and on an integrated laptop the CPU shares
-     power and heat with the GPU (engine-architect's step-10 review; an inference, not researched).
+     power and heat with the GPU (an inference, not researched).
 END
 
 ### FIX EA-11 (engine-architect #11: the copied world is O-B's cost; the Worker-side variant)
@@ -347,11 +348,12 @@ BEFORE:
 - **Easier:** one shader language for both backends; every look technique has a tier switch from the start, so Low
   is a data change; the budget rows are data in the repository (ADR 0002's I-14), so a regression shows in CI as a
   count; per-unit asset budgets derive from one table (ADR 0005); legacy's draw-call problem is designed out (4 draws
+  per soldier per pass against about 120).
 AFTER:
 - **Easier:** one shader language for both backends; every look technique has a tier switch from the start, so Low
   is a data change inside the look floor (part 7; OQ-0003-16); the budget rows are data in the repository (ADR
   0002's I-14), so a regression shows in CI as a count; per-unit asset budgets derive from one table (ADR 0005);
-  legacy's draw-call problem is designed out (4 draws
+  legacy's draw-call problem is designed out (4 draws per soldier per pass against about 120).
 END
 
 ### FIX AD-1 (Revisit when: what a missed frame-time mark may change)
@@ -359,11 +361,16 @@ FILE: docs/adr/0003-rendering.md
 BEFORE:
 - **Revisit when:** the look proof test fails a frame-time mark on the minimum laptop (drop a technique to High only,
   or change family); a three.js upgrade changes a pass's cost by more than R3-WGPU-REC2's 5 %; client field data shows
+  the fallback share (R3-GL2-OQ2), which may allow F-B extras; the camera
+  framing is decided (R2-INT-OQ2), which re-decides distance LOD and the listener's place; Mustafa picks the hull
+  family.
 AFTER:
 - **Revisit when:** the look proof test fails a frame-time mark on the minimum laptop (lower a technique in the tier
   data, change family, or move a `[DEFAULT]` item's technique to High only; a technique that carries a `[DECIDED]`
   item leaves Low only on Mustafa's answer to OQ-0003-16); a three.js upgrade changes a pass's cost by more than
-  R3-WGPU-REC2's 5 %; client field data shows
+  R3-WGPU-REC2's 5 %; client field data shows the fallback share (R3-GL2-OQ2), which may allow F-B extras; the
+  camera framing is decided (R2-INT-OQ2), which re-decides distance LOD and the listener's place; Mustafa picks the
+  hull family.
 END
 
 ### FIX GE-1 (legacy rows CL2, CL4, CL8, CL14: one material per slot content)
@@ -418,8 +425,8 @@ AFTER:
   samples), while the `[DEFAULT]` items (AO, the glow's bloom, the comic touches) may be off on Low; (b) Low may
   switch named items off where its budget needs it, listed in the tier table; (c) Mustafa decides item by item in
   the look proof test, on the Low frame beside High and legacy, with each technique's measured cost (PM-0003-9).
-  Parts 5 and 7 hold to (a) for the `[DECIDED]` items until he answers; the step-10 reviews (art-director,
-  graphics-engineer) recommend (c), with (a) meanwhile. Decider: Mustafa. What decides it: the look checklist's Low
+  Parts 5 and 7 hold to (a) for the `[DECIDED]` items until he answers. Recommendation: (c), with (a) as the rule
+  meanwhile, since the costs are unknown today. Decider: Mustafa. What decides it: the look checklist's Low
   frame (test-engineer's step) and PM-0003-9's costs on the minimum laptop. Research ids: R3-BUDGET-REC3,
   R3-BUDGET-REC2, R3-LOOK-F15 (no new disposition: both recommendations stay adopted in Appendix A).
 - **OQ-0003-17. How is VISION_V2 §6.9's "without dropping frames" read as a mark?**

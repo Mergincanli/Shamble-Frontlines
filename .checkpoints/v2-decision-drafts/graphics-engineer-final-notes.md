@@ -8,3 +8,20 @@ Task: final fix round (step 10 / step 9 once more) for ADR 0003 (minus Pass mark
 - Verified: _matSig at shamble-core.js:356-359 keys type, colour, emissive, map, gradientMap, side, alpha settings, nature gain; ADR 0001 part 5 (line 203) Worker casts the aim ray; part 7 (line 256) buffer in the Worker; GLOSSARY live projectile kinds (bolt, grenade, Molotov, rocket).
 - Approach: generator script in scratchpad pulls BEFORE by line range from 47eadd9 (exact), AFTER hand-written; then check uniqueness + no overlap + apply to scratch copy.
 - Line ranges confirmed against 47eadd9 snapshot (scratchpad 0003.md/0005.md). Writing generator gen_final.py in scratchpad next.
+- gen_final.py ran: 46 FIX blocks, 14 NOTE blocks; all BEFOREs unique, no overlaps; fixes file written. Next: review applied diff (0003.after.md, 0005.after.md) for reading, tables, numbers.
+- Refined: 5.f wording, VFX count assumption (not pre-empting OQ-0003-7), Consequences and Revisit reflowed; regenerated.
+- Independent parse of the fixes file: 46 FIX blocks apply in file order against 47eadd9 (each BEFORE once, no overlap), result identical to the generator's; changed table rows keep their column counts; nothing in either "### Pass marks" or other authors' sections is touched (0003 ranges outside 908-1129; 0005 ranges inside 1527-1678).
+- PA-4: FIX part 7 spectacle (presented-frame count, proposed) + OQ-0003-17 (Advisor, confirmed by Mustafa); routed TE row, ENGINE_OVERVIEW §6.9 row, README.
+- PA-8: FIX part 7 sum 799-817 (hull 1,071-1,089), cap stays 800, about 820 weighed vs leaner Low; routed PM-0003-12 note.
+- FA-L2/B25: FIX GW17 row (pending stays for camera-player cutaway).
+- EA-11: FIX part 6 wording, part 8 Worker load, part 9 O-B cost + Worker-side variant (not researched), part 10 hedge; routed BS.
+- PA-10: FIX 5.d, 5.n (199.2 MB at 1080p, ~112 MB at 0.75), Q5 row; routed PM-0003-16.
+- PA-11: FIX 0005 part 4 triangle ceiling 5.2k.
+- FC-9: FIX CC10 row.
+- GE-1: FIX 0003 5.a/part 6/CL row; 0005 parts 1, 7, option row, pros/cons, OQ-0005-AS4 body, spike part; routed PM-0005-34/-35.
+- GE-4 + AD-1 (+AD-2's part-7 half): FIX part 5 intro, 5.b, 5.c, 5.f, table row, tiers, trade-off, consequences, revisit, migration 4, rollback x2, appendix REC3; OQ-0003-16 (Mustafa); routed fail route, PM-0003-23, Low-frame checklist step.
+- AD-4: FIX 5.b, OQ-0003-2 options, trace row; routed step 4. AD-6: FIX 5.h, 5.b, trace row, 0005 part 2; routed AP-3. AD-7: FIX part 11, 0005 part 8; routed SPIKE_PLAN. AD-10: FIX 5.l; routed PM-0003-9, step 27. AD-11: FIX in 5.b. AD-14: FIX 0005 part 4; routed steps 10-12.
+- REDUCED-MOTION -> OQ-0003-18 (Mustafa); COLOUR-TELL -> OQ-0003-19 (Mustafa); README rows routed.
+- TE-5: FIX 0003:844-845; routed PM-0003-3.
+- Output: graphics-engineer-fixes-final.md (46 FIX, 14 NOTE). Generator: scratchpad gen_final.py.
+DONE

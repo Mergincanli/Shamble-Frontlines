@@ -4,3 +4,4 @@ Task: infra-engineer final fix round on ADR 0006 (step 10 fix loop), writing inf
 - Arithmetic: IE-8 1.5 vCPU/room -> 2/VM -> 11 CCX23 = 951.39 + 8.99 + 6.49 = 966.87 EUR. SA-5 48x30=1,440/s; x1,200 s = 1,728,000/match; /200 = 8,640; x300 B = 518.4 MB; x13,000 = 6.74 TB; at 16 B (proposed) 27.6 MB/match, 359 GB/month, 14 d of 30 = 168 GB. IE-14 20 h x 0.1386 = 2.77 EUR.
 - Plan: new OQ-0006-13 preview token/prod (SA-1, SA Q1); -14 releases (IE-1, EA-5, EA Q2, RELEASE-WINDOW); -15 domain (IE-6, SA-3, DOMAIN); -16 port plan (IE-7); -17 VM access (IE-14, SPIKE-VM-ACCESS); -18 unreleased art (IE-12, UNRELEASED-ART); -19 provisional goal budget (TE-2, TE Q2). New part 15 Releases; new B12. Batch analysis moves off staging (SA-4) -> R6-TEL-REC3 changed.
 - Next: extract BEFORE lines by script, write fixes file region by region.
+- 10:28Z: drafting all FIX texts in scratchpad generator (ie-final/gen.py); BEFOREs taken by line ranges at 47eadd9 (= HEAD for 0006).

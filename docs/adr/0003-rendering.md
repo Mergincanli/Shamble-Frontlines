@@ -161,13 +161,23 @@ judges the look) and the render budget bench (the numbers).
    effects read (depth and normals for the ink and the ambient occlusion, emissive for the glow). Effects that only
    read buffers never re-render the scene; a second geometry pass is a planned, counted extra; every effect has a
    quality-tier switch (off, or a lower resolution scale) from the start (R3-LOOK-REC2, Recommendations Q3, lines
-   1002–1017). Every technique below is measured alone in the look proof test: GPU time per pass and memory per
-   target, on both reference machines and both backends (R3-LOOK-REC1, lines 991–1000, now serving LOOK_V2's items).
+   1002–1017). The "off" setting has a floor: "Which effects exist at all is the look brief's call; the tier table
+   only says how much each may cost" (R3-BUDGET-REC3, Recommendations Q5, lines 1172–1173). So no tier switches off
+   a technique that carries a LOOK_V2 `[DECIDED]` item (the toon materials, 5.a; the ink, 5.b; the sun shadow map,
+   5.f; the emissive slots' colour, 5.d) unless Mustafa answers OQ-0003-16 that way; until he does, a tier may only
+   lower it (resolution scale, map size, samples). Every technique below is measured alone in the look proof test:
+   GPU time per pass and memory per target, on both reference machines and both backends (R3-LOOK-REC1, lines
+   991–1000, now serving LOOK_V2's items).
    The table after this list traces every LOOK_V2 item to its part. *Need:* LOOK_V2 §1–§7 only, and VISION_V2 §6.9
    for the budget.
    - **a. Toon materials, applied by the engine.** At load, each material slot of an asset (slot names are ADR 0005's,
-     decision map I-8) gets the shared node toon material of its material class (`MeshToonNodeMaterial`, R3-LOOK-F1,
-     lines 318–321) with that class's ramp; one material per slot content, never one per mesh. *Why:* the ramp is one
+     decision map I-8) gets a shared node toon material of its material class (`MeshToonNodeMaterial`, R3-LOOK-F1,
+     lines 318–321) with that class's ramp; one material per slot content, never one per mesh. A slot's content is
+     its class (ramp, colour gain, ink weight: 5.b, 5.h), its faction for faction colour slots, and the slot's own
+     base and emissive colour, textures, side and alpha mode, as legacy keys its shared materials by content (CL4,
+     `LEGACY_INVENTORY.md` line 113; `_matSig`, `shamble-core.js` lines 356–359). Two slots share a material only
+     when all of these match, so an asset keeps its own colours and textures inside a class; how colour is authored
+     (material colour, vertex colour or an atlas) is ADR 0005's OQ-0005-AS4, not a rule here. *Why:* the ramp is one
      texture lookup inside lighting, no extra pass, on both backends; each distinct ramp is a distinct material, so
      materials are shared by content (R3-LOOK-F2, F3, lines 323–334; legacy CL4's lesson). The toon model reads only
      the ramp's red channel (`return vec3( gradientMap.r );`, R3-LOOK-F2), so colour in shade comes from the lights
@@ -177,32 +187,45 @@ judges the look) and the render budget bench (the numbers).
    - **b. The ink: screen-space edges, proposed.** Edges from depth and normals, a custom TSL node over the shared
      pass's MRT outputs (R3-LOOK-F7, lines 360–364): depth edges carry the silhouette ink, normal edges the inner
      lines, so LOOK_V2 §6.2's two weights can map onto two edge kinds (inferred from F7; inner lines are not
-     researched: OQ-0003-2). The weight per material class (buildings heaviest, LOOK_V2 §2) needs a per-pixel class
-     value in an MRT output (not researched: OQ-0003-2). *Why this family, on cost and robustness:* its cost is one
-     full-screen pass whatever the number of soldiers (R3-LOOK-F8, lines 366–370), it shares the normal output with
-     the ambient occlusion (5.c), and it keeps the Low draw-call cap at 800 at N = 48, where the hull family needs
-     about 1,100 (R3-BUDGET-REC2's arithmetic, lines 1142–1148). *The measured alternative:* the inverted hull,
-     legacy's family (three.js's `toonOutlinePass`, R3-LOOK-F4, F5, lines 337–350, or our own TSL hull in world
-     units with legacy's ground contact line, CL6, `LEGACY_INVENTORY.md` line 115). The look proof test measures both families at 12, 24 and 48
+     researched: OQ-0003-2). The weight per material class (buildings heaviest, LOOK_V2 §2, through the structure
+     class, 5.h) needs a per-pixel class value in an MRT output (not researched: OQ-0003-2). The width is set in CSS
+     pixels and scaled by the pixel ratio × the scene resolution scale, so a tier changes the ink's cost, never its
+     weight on screen (proposed: the weight is Mustafa's pick, OQ-0003-2, and must not move with the tier). *Why this
+     family, on cost and robustness:* its cost is one full-screen pass whatever the number of soldiers (R3-LOOK-F8,
+     lines 366–370), it shares the normal output with the ambient occlusion (5.c), and it keeps the Low draw-call cap
+     at 800 at N = 48 (tightly: part 7's arithmetic), where the hull family needs about 1,100 (R3-BUDGET-REC2's
+     arithmetic, lines 1142–1148). *The measured alternative:* the inverted hull, legacy's family (three.js's
+     `toonOutlinePass`, R3-LOOK-F4, F5, lines 337–350, or our own TSL hull in world units with legacy's ground
+     contact line, CL6, `LEGACY_INVENTORY.md` line 115). The look proof test measures both families at 12, 24 and 48
      soldiers on screen on the minimum laptop at Low (R3-LOOK-REC3, lines 1019–1028). *The visible difference is
      Mustafa's call:* the hull draws a line of even width around each object, with legacy's ink contact line where
      objects meet the ground (CL6); the screen-space pass draws a line in pixels from depth and normal changes, can
-     mark folds inside a shape (inferred from R3-LOOK-F7; OQ-0003-2), and must be masked where the roof fade hides structures (r3-rendering.md, Options Q3,
-     lines 810–813). If he picks the hull, the Low cap becomes about 1,100 (proposed) or the hull a High-only setting
-     (R3-BUDGET-REC2, lines 1146–1148). Its known failures: threshold tuning and thin lines that alias (line 813).
+     mark folds inside a shape (inferred from R3-LOOK-F7; OQ-0003-2), and must be masked where the roof fade hides
+     structures (r3-rendering.md, Options Q3, lines 810–813). Where a wall or a pair of boots meets the ground, the
+     depth runs on and only the surface direction turns, so this pass draws that contact line at the thin inner
+     weight, and the base of a building gets a thinner line than its silhouette (an inference from F7's two edge
+     kinds, not research); an edge where the per-pixel class value changes, structure against ground, could draw it
+     at the silhouette weight (not researched: OQ-0003-2). If he picks the hull, the Low cap becomes about 1,100
+     (proposed) or the hull a High-only setting (R3-BUDGET-REC2, lines 1146–1148), and what Low draws then is his
+     call too (OQ-0003-16). Its known failures: threshold tuning and thin lines that alias (line 813), more so at
+     Low's lower render resolution (inferred).
    - **c. Ambient occlusion in corners.** GTAO (three.js's node, R3-LOOK-F9, lines 373–377) at half resolution ("a
      value of `0.5` should be sufficient for most scenes", R3-LOOK-F10, lines 379–384), reading depth and normals
      from the shared pass instead of the documented pre-pass, so the scene is not drawn twice (R3-LOOK-F11, lines
      386–389), and denoised with `DenoiseNode` rather than TAA, whose documented "ghosting and temporal
      instabilities" (R3-LOOK-F10) would show on fast-moving soldiers (inferred). Whether single-pass AO is good
      enough is R3-LOOK-OQ3 (lines 1328–1329), which the look proof test decides; the documented pre-pass stays a High-only fallback
-     whose extra draws are counted (R3-LOOK-REC2). Low may switch AO off (tier data, part 7).
+     whose extra draws are counted (R3-LOOK-REC2). Low may switch AO off (tier data, part 7): AO is LOOK_V2 §6.5's
+     `[DEFAULT]`, but the trace table also uses it for §2's `[DECIDED]` "geometry that reads clearly", so OQ-0003-16
+     asks Mustafa whether that switch holds.
    - **d. Emissive glow, selective.** Bloom from an emissive MRT output, so only emissive slots glow ("use the
      `emissive` material property to control which objects should contribute to bloom", R3-LOOK-F12, lines 392–395).
      Full-image bloom is not proposed: it makes whatever is bright glow ("Washes bright UI-like colours", Options Q3,
      line 817), against LOOK_V2 §6.4's list and §6.1's value hierarchy. *Cost:* twelve full-screen passes at falling
-     resolution (R3-LOOK-F13, lines 397–402) plus one emissive attachment, 16.6 MB at 1920 × 1080 in half float
-     (R3-LOOK-F14, lines 405–409).
+     resolution (R3-LOOK-F13, lines 397–402) plus one emissive attachment: 16.6 MB at 1920 × 1080 in half float
+     single-sampled, and with 5.n's 4× MSAA 66.4 MB multisampled (4 × 16.6) plus a 16.6 MB single-sample resolve that
+     the bloom reads (R3-LOOK-F14, lines 405–409: 4 × MSAA "multiplies the multisampled attachments by four"; the
+     resolve is inferred).
    - **e. Colour output: shown both ways, not proposed.** The render pipeline tone-maps and converts colour space by
      default, and the switch `outputColorTransform` reaches either output (R3-WGPU-F12, lines 133–137); legacy's rule
      is "authored hex = on-screen colour" with no tone mapping (CD15). The research has no options section on the
@@ -212,13 +235,16 @@ judges the look) and the render budget bench (the numbers).
    - **f. Soft shadows.** One sun shadow map, as R3-BUDGET-REC2's shadow row budgets it (Low: one map, 1024² or off,
      ≤ 3 ms p99; High: ≤ 2 ms; line 1129), using `PCFShadowMap`, which r186 made soft (R3-WGPU-F3, lines 78–83), with legacy's
      texel-snapped frustum that follows the player (GW4; `LEGACY_INVENTORY.md` line 192). Cascades and other setups
-     were not researched (R3-BUDGET-OQ6, lines 1375–1378): OQ-0003-4.
+     were not researched (R3-BUDGET-OQ6, lines 1375–1378): OQ-0003-4. Soft shadows are LOOK_V2 §2 `[DECIDED]`, so the
+     row's "or off" is used only if Mustafa answers OQ-0003-16 that way; until then Low keeps one 1024² map, measured
+     against the row's 3 ms.
    - **g. Lighting and moods.** The sun, fill and sky light colours and intensities, the fog and the mood come from
      the map document (ADR 0005, I-9) and are applied at load, so a map can be at dusk (LOOK_V2 §6.5). Whether the
      toon material with coloured lights reaches "warm sun with cool shadows", or a custom TSL lighting model is needed,
      was not researched: OQ-0003-5, decided in the look proof test.
-   - **h. The value hierarchy.** Each material class (environment, units, faction colours, visual effects) carries a
-     colour gain held as tuning data, so the environment can sit one step calmer (LOOK_V2 §6.1); legacy's nature gain
+   - **h. The value hierarchy.** Each material class (environment, structures, units, faction colours, visual
+     effects) carries a colour gain and an ink weight held as tuning data, so the environment can sit one step calmer
+     (LOOK_V2 §6.1) and buildings, as the structure class, carry the heaviest ink (LOOK_V2 §2; 5.b); legacy's nature gain
      on environment materials (CL4, 1.56; `LEGACY_INVENTORY.md` line 113) is the precedent. The values are tuning in
      the look proof test, not decisions; nothing beyond the legacy precedent was researched.
    - **i. The roof fade.** Port legacy's cutaway (GW17) as a fade of any structure carrying a fade flag (the
@@ -249,8 +275,12 @@ judges the look) and the render budget bench (the numbers).
      part only draws fragments. *Need:* LOOK_V2 §3, §7; LOOP_V2 §7.
    - **l. Comic impact touches, sparingly.** Halftone flashes as legacy's DOM overlay (CD16: a CSS multiply layer,
      "not a render pass", `LEGACY_INVENTORY.md` line 97), triggered by big-moment events; ink line boil's technique
-     was not researched (OQ-0003-8). Both are built as defaults and costed in the look proof test against the
-     post-processing row. *Need:* LOOK_V2 §7 only.
+     was not researched (OQ-0003-8). Both are built as defaults and costed in the look proof test: line boil against
+     the post-processing row, the overlay as frame time with it and without it, since the browser composites a CSS
+     layer outside the renderer's timestamp queries (inferred from CD16's "not a render pass"). The overlay also dots
+     the HUD ("a screen-space CSS overlay also dots the HUD/UI", `docs/ART_DIRECTION.md` line 121), so the look
+     checklist shows it over the HUD. Whether the flashes, line boil and the concussion (5.m) soften for players who
+     ask for reduced motion is OQ-0003-18. *Need:* LOOK_V2 §7 only.
    - **m. The grenade concussion.** Port legacy's spring camera kick and concussion (CD9, GP4;
      `LEGACY_INVENTORY.md` lines 90, 314) as a camera effect on the page, driven by the blast event's position and
      strength (ADR 0004 emits it, I-20): it tilts away from the blast and grows stronger closer in, draws its
@@ -258,7 +288,12 @@ judges the look) and the render budget bench (the numbers).
      variety) uses its own client-side generator", r1-simulation-core.md, Recommendations, R1-DET-REC4, lines 2184–2207, quote at 2192–2193), and never
      moves the aim. *Need:* LOOK_V2 §2 only.
    - **n. Anti-aliasing.** The look proof test starts from the renderer's built-in MSAA ("4 samples are used by
-     default", R3-WGPU-F15, lines 150–152), which multiplies the multisampled MRT attachments' memory (R3-LOOK-F14, lines 405–409).
+     default", R3-WGPU-F15, lines 150–152), which multiplies the multisampled MRT attachments' memory by four
+     (R3-LOOK-F14, lines 405–409): colour, normals and emissive in half float come to 3 × 66.4 = 199.2 MB multisampled
+     at 1920 × 1080 before their resolves, depth, bloom, AO and the shadow map (arithmetic; each attachment's real
+     format is unmeasured, F14), and about 112 MB at Low's scale of 0.75 if Low keeps 4× (199.2 × 0.75²), against
+     ≤ 512 MB at Low and ≤ 1 GB at High (part 7). Whether `renderer.info.memory.total` counts the multisampled
+     textures is not researched; the look proof test records it.
      Post-process anti-aliasing was not researched as an option (R3-LOOK-OQ6, lines 1335–1340); the look proof test
      decides after a reading of three.js's anti-aliasing nodes.
 6. **Characters, crowds and very large units.**
@@ -273,10 +308,11 @@ judges the look) and the render budget bench (the numbers).
      490–493) only if the camera's framing spreads soldiers over a wide range of distances; the framing is a design
      question LOOK_V2 does not settle (r2-netcode.md, Open questions, R2-INT-OQ2, lines 3010–3013;
      r3-rendering.md, Open questions Q4, R3-CHAR-OQ5, lines 1355–1356).
-   - Per-instance data (transform, faction colour, hit flash, health bar) is written from the per-tick block into
-     preallocated typed arrays, never by traversing scene objects; health bars and flashes are instanced or
-     per-instance attributes (R3-CHAR-REC3, lines 1065–1075). Faction colour comes from the faction colour slots
-     (ADR 0005, I-8): one shared material per slot and faction, or per-instance colour where meshes are instanced
+   - Per-instance data (transform, faction colour, hit flash, health bar) is written from the blocks, interpolated
+     each frame (part 10), into preallocated typed arrays, never by traversing scene objects; health bars and
+     flashes are instanced or per-instance attributes (R3-CHAR-REC3, lines 1065–1075). Faction colour comes from the
+     faction colour slots (ADR 0005, I-8): one shared material per slot content, the faction included (5.a), or
+     per-instance colour where meshes are instanced
      (`instanceColor` on `InstancedMesh`, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour,
      R3-CHAR-F6, lines 463–467).
    - Very large units: parts as separate meshes under one group (option V-A), each part's transform from the sim's
@@ -306,7 +342,7 @@ judges the look) and the render budget bench (the numbers).
      | of which: character animation (posing and bone upload, with the budget LOD), p99 | ≤ 1.0 ms | ≤ 2.0 ms |
      | of which: [the page's cost of the sim](../research/GLOSSARY.md#the-clients-sim-share), p99 | ≤ 1.0 ms | ≤ 1.0 ms |
      | GPU time, total, p99 | ≤ 25 ms | ≤ 12 ms |
-     | of which: shadow pass | ≤ 3 ms (one map, 1024² or off) | ≤ 2 ms |
+     | of which: shadow pass | ≤ 3 ms (one map, 1024²; the research's "or off" only on Mustafa's answer to OQ-0003-16) | ≤ 2 ms |
      | of which: main scene pass | ≤ 16 ms | ≤ 6 ms |
      | of which: post-processing (ink, AO, glow, comic touches) | ≤ 4 ms | ≤ 3 ms |
      | of which: visual effects, sprites, HUD in the 3D view | ≤ 2 ms | ≤ 1 ms |
@@ -318,21 +354,43 @@ judges the look) and the render budget bench (the numbers).
 
      The arithmetic behind the Low draw-call cap, at N = 48 (R3-BUDGET-REC2, lines 1142–1152): 4 draws per soldier
      per pass × 48 soldiers = 192 per pass; a shadow and a main pass make 384; the merged world about 202; four very
-     large units up to 200; about 786, inside 800. A hull outline adds one draw per outlined object: 192 for the
-     soldiers and about 80 for the very large units' parts, about 1,060. The research's N = 54 sum (about 834) no
-     longer applies (MODES-3 (a); it supersedes r3-rendering.md lines 1144–1145, "at N = 54, MODES-3 (b), … about
-     834, over 800"). The triangle and memory rows are the loosest: no source gives them (R3-BUDGET-F7, lines
-     575–577; R3-BUDGET-OQ5, lines 1373–1374). *Need:* VISION_V2 §6.9; §4.
+     large units up to 200; about 786. The research's sum stops there, but the same frame draws more: the health
+     bars (at most 2, R3-CHAR-REC3's mark, lines 1074–1075); the 5 pooled visual-effect kinds of 5.k at one draw each
+     (assumed for the count: one draw per kind in the main pass, as one instanced pool per kind would give; the
+     technique is OQ-0003-7); the live projectiles' 4 kinds (bolt, grenade,
+     Molotov, rocket, as GLOSSARY §3 lists them) in the main pass, 8 draws if they also cast shadows; and the
+     full-screen post passes, from 2 (the ink and the output, inferred) to 16 (with the glow's twelve, 5.d, and the
+     AO pass and its denoise, 5.c), if `drawCalls` counts them (not researched: PM-0003-12 reports their share). That
+     is 786 + 2 + 5 + (4 to 8) + (2 to 16) = 799 to 817. So 800 holds only with the leanest post chain and
+     unshadowed projectiles. The Low cap stays 800 (proposed: the research's number), the render budget bench counts
+     the whole frame (PM-0003-12, PM-0003-22), and if the Low tier's kept effects do not fit, the draft weighs a cap
+     of about 820 (817 rounded up, proposed) against a leaner Low tier, where switching an effect off follows
+     OQ-0003-16. A hull outline adds one draw per outlined object: 192 for the soldiers and about 80 for the very
+     large units' parts, about 1,060 (1,058), or 1,071 to 1,089 with the items above, inside 1,100. The research's
+     N = 54 sum (about 834) no longer applies (MODES-3 (a); it supersedes r3-rendering.md lines 1144–1145, "at N =
+     54, MODES-3 (b), … about 834, over 800"). The triangle and memory rows are the loosest: no source gives them
+     (R3-BUDGET-F7, lines 575–577; R3-BUDGET-OQ5, lines 1373–1374). *Need:* VISION_V2 §6.9; §4.
    - *The spectacle budget* (VISION_V2 §6.9): the stress scene's four very large units on screen with its soldiers add
      at most 2.0 ms (p99) GPU time and at most 200 draw calls against the scene without them, before any ink or AO
      pre-pass, on the recommended machine at High (4 units × 20 parts × 2 passes = 160 draws, plus margin;
      R3-CHAR-REC4, lines 1088–1092); their visual effects sit inside the visual-effects row, and their first
-     appearance compiles nothing (part 3).
+     appearance compiles nothing (part 3). Those are differences, and the frame rows are p95s, which let 30 of 600
+     frames (5 %) run over, so §6.9's "without dropping frames" also gets a presented-frame count (proposed): on the
+     recommended machine at High, Chrome on WebGPU, with the four units and their visual effects on screen and normal
+     vsync on a 60 Hz display, the frames whose interval passes 1.5 refresh periods are counted (the loop follows the
+     display, R3-BUDGET-F2, lines 545–549, so such a frame missed at least one refresh); the same count is reported
+     on the minimum laptop at Low against a 33.3 ms period. How many such frames a run may hold (0 of 600, or a small
+     share) is OQ-0003-17; the pass-mark row is test-engineer's.
    - *Quality tiers as data* (R3-BUDGET-REC3, lines 1166–1177): one table holds, per tier (Low, Medium, High), the
      pixel-ratio cap, the scene resolution scale, MSAA samples, shadow map size and distance, each post effect's
      on/off and resolution scale, the animation budget and the visual-effect caps. Low is the default when the adapter
      is integrated or the backend is WebGL 2. Dynamic resolution (option B-3) is a measured option, not the start. The
-     table's file format is ADR 0005's content data; its rows are this record's. *Need:* VISION_V2 §4 only.
+     table's file format is ADR 0005's content data; its rows are this record's. *The look floor:* the table "only
+     says how much each may cost" (R3-BUDGET-REC3, lines 1172–1173), so its on/off switch never takes out a technique
+     that carries a LOOK_V2 `[DECIDED]` item (part 5) unless Mustafa answers OQ-0003-16 that way. Low's starting row
+     is the budget table's (pixel ratio capped at 1, scene scale 0.75–1, one 1024² sun map), and the look checklist
+     shows that frame beside High and legacy, so Mustafa judges the look the minimum class sees (the step is
+     test-engineer's). *Need:* VISION_V2 §4; LOOK_V2 (the floor).
 8. **Measurement.**
    - One client harness: per frame, CPU frame time from `performance.now()`, GPU time from timestamp queries where
      the backend has them (else "not available"), and the `renderer.info` counters reset once per frame; it reports
@@ -342,7 +400,10 @@ judges the look) and the render budget bench (the numbers).
    - A fixed benchmark scene: a recorded match replayed from its inputs (ADR 0004's identical results: r1-simulation-core.md, Recommendations, R1-DET-REC1, lines 2129–2145, and
      R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, [previews](../research/GLOSSARY.md#preview) included
      (R3-MEASURE-REC2, lines 1195–1204). If replay on the client is not identical, the fallback is a scripted bot
-     match with a fixed seed, less exact (r3-rendering.md, Pointers Q6, lines 1504–1505).
+     match with a fixed seed, less exact (r3-rendering.md, Pointers Q6, lines 1504–1505). Each run records the
+     Worker's load (a replay, a local match or an online client), because a replay runs the whole sim at N = 48, as a
+     local match does, which is heavier than an online client's Worker, and on an integrated laptop the CPU shares
+     power and heat with the GPU (an inference, not researched).
    - CI gates only hardware-independent numbers (zero console errors, draw calls, triangles, programs, GPU memory
      totals, zero per-frame allocation in the render path); frame and GPU times come only from the reference machines,
      recorded per run in a results log; a headless frame rate is never reported as a hardware result
@@ -372,13 +433,17 @@ judges the look) and the render budget bench (the numbers).
      against a client copy of the map's static geometry, as legacy keeps one for explosions (GW15; r3-rendering.md,
      Findings Q7, legacy facts, lines 769–770), with the floor and height data of the map document (ADR 0004, I-9),
      because the page makes no call into the sim (r1-simulation-core.md, Recommendations, R1-BND-REC1 mark 2, lines 2261–2262).
+     That copy is O-B's cost: a second collision world, in TypeScript, tied to the map document's collider format. A
+     Worker-side variant keeps one world: the Worker casts the rays, as it already casts the aim ray (ADR 0001 part
+     5), and writes an occlusion factor per audible event into the block's event section. It was not researched, and
+     it is weighed beside O-B if O-B is ever proposed.
      *Answers* R3-XT-OQ6, R1-XT-OQ14, R4-XT-OQ7 and R3-AUDIO-OQ5.
    - Sounds start on the page from the per-tick event section and interpolated positions, never from the sim; the
      AudioContext starts suspended and resumes on the first input, as legacy does (R3-AUDIO-REC4, lines 1271–1280).
    - *Ids:* R3-AUDIO-REC1–REC4. *Need:* LOOP_V2 §7 (sound in the feel kit) and LOOK_V2 §7 only.
 10. **The per-frame flow on the page.** Each frame (`setAnimationLoop`, R3-WGPU-F9, lines 115–119): (1) take the
     newest blocks, keeping two (r1-simulation-core.md, Recommendations, R1-BND-REC2, lines 2265–2285); (2) interpolate between the two
-    newest ticks (r1-simulation-core.md, Recommendations, R1-TICK-REC5, lines 2094–2116), remote entities on ADR 0001's delay wherever its buffer lives
+    newest ticks (r1-simulation-core.md, Recommendations, R1-TICK-REC5, lines 2094–2116), remote entities already delayed in the Worker (ADR 0001 part 7)
     (R3-XT-OQ1, r3-rendering.md lines 1424–1430, owner 0001); (3) write per-instance data into preallocated arrays (part 6); (4) animate within the
     budget LOD; (5) render the shared scene pass and the post chain; (6) start sounds (part 9) and visual effects
     (5.k) from the tick's events, the shot's own feedback at once and hit feedback only on confirmed hits (LOOP_V2 §7);
@@ -395,8 +460,11 @@ judges the look) and the render budget bench (the numbers).
 11. **The spikes.** The look proof test (LOOK_V2 §9) and the render budget bench, set out under "What a spike must
     prove"; `docs/SPIKE_PLAN.md` gives their final names and places. **The look proof test needs authored models:**
     a few plain glTF/GLB exports (one soldier in LOOK_V2 §3's proportions with its faction colour slots, one weapon,
-    one two-floor building with an interior and its damage stages, one very large unit of at least 20 parts, a few
-    props), because LOOK_V2 §3's proportions and weapon silhouettes cannot be judged on legacy's primitive parts
+    LOOK_V2 §2's two houses, one very large unit of at least 20 parts, a few props): the half-timbered house with the
+    brick-tile roof as the two-floor building with an interior and its damage stages, and the plastered house with
+    the silo tower, authored too or, if only one building is authored, drawn by ADR 0005's ported kit builders, which
+    drop the thatched roof (ADR 0005's CM7 row). Authored models are needed because LOOK_V2 §3's proportions and
+    weapon silhouettes cannot be judged on legacy's primitive parts
     (CL10, `LEGACY_INVENTORY.md` line 119). It decides nothing about compression or LODs (ASSET-RESEARCH (a), the advisor's ruling; J4).
     Beside them run ADR 0005's ported kit builders, for the asset families OQ-0005-AP2 asks Mustafa to judge
     (authored model or procedural builder).
@@ -418,7 +486,7 @@ another file is named.
 | §2 `[DECIDED]` vibrant, beautiful colours | the output transform switch (5.e), half-float buffer | R3-WGPU-F12 (133–137), F14 (144–148), R3-WGPU-OQ4 (1296–1298): OQ-0003-3 | the same frame with both outputs beside legacy | – |
 | §2 `[DECIDED]` soft shadows | one sun map with `PCFShadowMap`, texel-snapped and following the player (5.f) | R3-WGPU-F3 (78–83); R3-BUDGET-REC2's shadow row (1129); beyond one map not researched: OQ-0003-4 | shadow softness beside legacy; the shadow pass's GPU time | – |
 | §2 `[DECIDED]` geometry that reads clearly | ink (5.b), toon bands (5.a), AO in corners (5.c), value hierarchy (5.h) | R3-LOOK-REC2, REC3 | the frame read at the game camera, ink and AO on and off | – |
-| §2 `[DECIDED]` thick black outlines, especially strong on buildings | ink weight per material class, buildings heaviest (5.b) | R3-LOOK-REC3, R3-LOOK-OQ2 (1326–1327); a per-class weight in screen space not researched: OQ-0003-2 | buildings' ink beside legacy's, in both families | 0005 (material classes in the slots) |
+| §2 `[DECIDED]` thick black outlines, especially strong on buildings | ink weight per material class, the structure class heaviest (5.b, 5.h) | R3-LOOK-REC3, R3-LOOK-OQ2 (1326–1327); a per-class weight in screen space not researched: OQ-0003-2 | buildings' ink beside legacy's, in both families, at their silhouettes and where they meet the ground | 0005 (material classes in the slots) |
 | §2 `[DECIDED]` props: logs and trees with variety | instanced or batched props with per-instance transform and colour; static merging by material (part 6) | R3-CHAR-F4, F6 (452–467), R3-CHAR-REC4; `BatchedMesh` or `InstancedMesh` is R3-CHAR-OQ4 (the render budget bench) | a prop field with variety within the draw-call row | 0005 (prop assets) |
 | §2 `[DECIDED]` uniform details as faction identity | authored models with faction colour slots; one shared material per slot and faction, or per-instance colour (part 6) | R3-CHAR-REC1 (1032–1048), REC3 (1065–1075) | a conscript in each faction's colours beside legacy's | 0005 (models, slots, faction variants) |
 | §2 `[DECIDED]` small movement touches (the body reacting to strafing) | procedural animation on the page (legacy GA rows ported), the full rig for important soldiers under the budget LOD (part 6) | R3-CHAR-REC2 (1050–1063); legacy GA15 | strafing on the full rig; what the cheaper rig drops | – |
@@ -511,7 +579,7 @@ holds and changes nothing [the authority](../research/GLOSSARY.md#the-authority)
 | Inverted hull, three.js `toonOutlinePass` (F4, F5) | Low: shipped | one extra draw per outlined object | scales with outlined objects and vertices; Low cap about 1,100 draws (R3-BUDGET-REC2) | presentation only | width constant on screen; only toon materials; gaps at hard corners without smoothed normals (CL7) | new; legacy's GLSL hull does not carry over |
 | Inverted hull, own TSL (world-unit width, ground clamp as CL6) | Medium: own code | the same extra draw per object | as above | presentation only | legacy's look: even world-unit width with the ink contact line | the outline-normal algorithm ports (CL7, `LEGACY_INVENTORY.md` line 116); the shader is new |
 | Screen-space Sobel on colour (F6) | Low: shipped node | one full-screen pass, 9 samples per pixel | scales with pixels only | presentation only | picks up texture detail; misses edges between same-coloured surfaces | new |
-| **Screen-space depth and normal edges** (proposed, 5.b; F7) | Medium: a custom TSL node | one full-screen pass plus one normal attachment, about 16.6 MB at 1080p (F14) | scales with pixels only; Low stays at 800 draws | presentation only | lines in pixels; can mark folds inside a shape (inferred: OQ-0003-2); threshold tuning; thin lines alias; needs masking for the roof fade | new |
+| **Screen-space depth and normal edges** (proposed, 5.b; F7) | Medium: a custom TSL node | one full-screen pass plus one normal attachment, about 16.6 MB at 1080p single-sampled, 66.4 MB multisampled at 4× MSAA plus its resolve (F14) | scales with pixels only; Low stays at 800 draws | presentation only | lines in pixels; can mark folds inside a shape (inferred: OQ-0003-2); threshold tuning; thin lines alias; needs masking for the roof fade | new |
 
 - **The hulls.** Pros: legacy's proven look (our own TSL hull); in our own hull a per-object weight is a plain
   thickness value, as legacy's CL6 does (characters 0.8×); the shipped pass takes one thickness for all objects (F5),
@@ -634,7 +702,7 @@ open questions (OQ-0003-3, OQ-0003-4), not proposals.
   pass, R3-LOOK-F5), while the screen-space pass is our own TSL node with
   thresholds to tune, aliasing, a mask for the roof fade, and a per-class weight that is not researched. That is why
   both families are measured, and why the look call is Mustafa's: if he prefers the hull, the record keeps it at the
-  measured cost (about 1,100 draws at Low, or High only).
+  measured cost (about 1,100 draws at Low, or High only, with what Low draws then his call too: OQ-0003-16).
 - **Half-resolution GTAO on the shared pass** wins because the documented pre-pass doubles every draw (R3-LOOK-F11).
   *Against:* nothing documents that single-pass AO looks good enough (R3-LOOK-OQ3); the look proof test decides, and
   the pre-pass stays a High-only fallback.
@@ -655,18 +723,19 @@ open questions (OQ-0003-3, OQ-0003-4), not proposals.
 ## Consequences
 
 - **Easier:** one shader language for both backends; every look technique has a tier switch from the start, so Low
-  is a data change; the budget rows are data in the repository (ADR 0002's I-14), so a regression shows in CI as a
-  count; per-unit asset budgets derive from one table (ADR 0005); legacy's draw-call problem is designed out (4 draws
-  per soldier per pass against about 120).
+  is a data change inside the look floor (part 7; OQ-0003-16); the budget rows are data in the repository (ADR
+  0002's I-14), so a regression shows in CI as a count; per-unit asset budgets derive from one table (ADR 0005);
+  legacy's draw-call problem is designed out (4 draws per soldier per pass against about 120).
 - **Harder:** TSL is new to the team and three.js's API moves each release (R3-WGPU-F3); the screen-space ink and the
   instanced-skinning candidates are our own TSL code; the fallback rule (F-A) keeps GPU particles and compute culling
   out until a measured need; frame times need two physical machines and someone to run them; Mustafa must judge the
   look in a dedicated session before any art production.
-- **Revisit when:** the look proof test fails a frame-time mark on the minimum laptop (drop a technique to High only,
-  or change family); a three.js upgrade changes a pass's cost by more than R3-WGPU-REC2's 5 %; client field data shows
-  the fallback share (R3-GL2-OQ2), which may allow F-B extras; the camera
-  framing is decided (R2-INT-OQ2), which re-decides distance LOD and the listener's place; Mustafa picks the hull
-  family.
+- **Revisit when:** the look proof test fails a frame-time mark on the minimum laptop (lower a technique in the tier
+  data, change family, or move a `[DEFAULT]` item's technique to High only; a technique that carries a `[DECIDED]`
+  item leaves Low only on Mustafa's answer to OQ-0003-16); a three.js upgrade changes a pass's cost by more than
+  R3-WGPU-REC2's 5 %; client field data shows the fallback share (R3-GL2-OQ2), which may allow F-B extras; the
+  camera framing is decided (R2-INT-OQ2), which re-decides distance LOD and the listener's place; Mustafa picks the
+  hull family.
 - **Hard constraints in CLAUDE.md that change:** none in this PR: nothing in `CLAUDE.md` or `.claude/` changes. Once
   Mustafa accepts the drafts, under SPIKE-SCOPE (a) the legacy constraints apply to `legacy/` only, so for v2 code:
   "Three.js r128 UMD (no CapsuleGeometry). No addons, no post-processing (under review)." stops applying (this record
@@ -695,19 +764,19 @@ ADR 0005's.
 | CD5 (86) | port to TypeScript (look brief pending) | unchanged; pending becomes "camera framing pending (R2-INT-OQ2)" | LOOK_V2 does not set the camera |
 | CD9, GP4 (90, 314) | port to TypeScript (pending) | port to TypeScript: the spring kick and concussion from the blast event (part 5.m); pending removed | LOOK_V2 §2 keeps the concussion feel |
 | CL1, CL6, CL7 (110, 115, 116) | redesign (look brief pending) | redesign: the ink pass in TSL (part 5.b); the hull family is measured as the alternative, and CL7's outline-normal algorithm ports only if Mustafa picks the hull | LOOK_V2 §2, §6.2 keep thick ink; the GLSL hull does not carry over (R3-WGPU-F6) |
-| CL2, CL4, CL8, CL14 (111, 113, 117, 123) | redesign (look brief pending) | redesign: shared node toon materials per material class, applied by the engine to each asset's slots at load (part 5.a); no runtime conversion of authored materials | LOOK_V2 §1, §8 step 5; CL4's one-material-per-mesh lesson |
+| CL2, CL4, CL8, CL14 (111, 113, 117, 123) | redesign (look brief pending) | redesign: shared node toon materials, one per slot content (the slot's class with its ramp, its faction, its own colours and textures: part 5.a), applied by the engine to each asset's slots at load; no runtime conversion of authored materials | LOOK_V2 §1, §8 step 5; CL4's one-material-per-mesh lesson and its content signature |
 | CL3 (112) | redesign (look brief pending) | redesign in TSL only if kept: LOOK_V2 names no skin rim, so whether one stays is Mustafa's call in the look proof test | the rim was GLSL injection (R3-WGPU-F6) |
 | CL5 (114) | drop (look brief pending) | unchanged (drop; Mustafa still picks the mark, as the row says): a variant look is an asset's own palette in its faction colour slots, given the toon look at load (part 5.a), and a glowing part is an emissive slot (5.d), never a post-pass over toon materials; pending removed | LOOK_V2 §8 (authored models; step 5, "the engine applies the comic look"); the row's own lesson; no game caller since D6 |
 | CL9 (118) | port to TypeScript (pending) | port to TypeScript: static merging by material content on both backends (part 6); pending removed | the appearance is unaffected (pixel-identical) |
 | CL10, CC1–CC5 (119, 131–135) | port to TypeScript (pending) | redesign: soldiers become authored, skinned models (part 6; ADR 0005's pipeline); the slot, role and palette schema ports as the faction colour slots | LOOK_V2 §3 (slimmer, serious proportions), §8 |
 | CC6, CC8, CC9, CC11, CC12, GC6 (136–138, 140, 141, 245) | port to TypeScript (pending) | port to TypeScript: kit data, sockets, IK and props port; the gun and prop shapes become authored models (ADR 0005); pending removed | LOOK_V2 §3 (real weapon silhouettes) |
-| CC10 (139) | port to TypeScript (pending) | port to TypeScript as the row says: the arm-mode enum in the animation state, the rest pose folded into the animation port on the authored, skinned soldier (part 6); pose values are tuning; pending removed | LOOK_V2 §3 (slimmer, serious proportions: soldiers become authored, skinned models, as for CL10, CC1–CC5); §2 keeps small movement touches |
+| CC10 (139) | port to TypeScript (pending) | port to TypeScript as the row says: the arm-mode enum in the animation state, the rest pose folded into the animation port on the authored, skinned soldier (part 6); pose values are tuning; pending removed | LOOK_V2 §3 (slimmer, serious proportions), so soldiers become authored, skinned models (part 6, as for CL10, CC1–CC5); §2 keeps small movement touches |
 | CL12, GW3 (121, 191) | port to TypeScript (pending) | unchanged; pending becomes "Mustafa's call: LOOK_V2 §7 names halftone flashes and line boil, not comic words" | LOOK_V2 does not mention onomatopoeia |
 | GA1–GA15 (217–231) | port to TypeScript (pending) | port to TypeScript; pending removed; GA15 adds the budget LOD (part 6) | LOOK_V2 §2 keeps small movement touches |
 | GA14 (230) | port to TypeScript (pending) | port to TypeScript; pending becomes "Mustafa's call: whether the toy-soldier death fall fits LOOK_V2 §3's adult audience" | LOOK_V2 §3 |
 | GW4 (192) | port to TypeScript (pending) | port to TypeScript: the texel-snapped sun frustum (part 5.f); pending removed | LOOK_V2 §2 soft shadows |
 | GW5 (193) | port to TypeScript (pending) | unchanged: the ground grid, the red arena border and the world labels are drawn on the page, the labels' textures cached if kept; the bounds are map data (ADR 0005, CD-11) that the sim enforces (both from the row's note); pending becomes "Mustafa's call: keep, change or drop each (OQ-0003-15)" | LOOK_V2 names none of the three |
-| GW17 (205) | port to TypeScript (pending) | port to TypeScript: the roof fade by flag over the player's enclosure and the camera-player cutaway (OQ-0003-15), precompiled blend variant, ink masked (part 5.i); pending removed | LOOK_V2 §4 `[DEFAULT]` roofs fade |
+| GW17 (205) | port to TypeScript (pending) | port to TypeScript: the roof fade by flag over the player's enclosure and the camera-player cutaway (OQ-0003-15), precompiled blend variant, ink masked (part 5.i); pending stays for the camera-player cutaway: "Mustafa's call: LOOK_V2 §4 names only roofs (OQ-0003-15)" | LOOK_V2 §4 `[DEFAULT]` roofs fade |
 | GP1, GN8, GC8 (311, 273, 247) | port to TypeScript (pending) | port to TypeScript: pools per kind with caps as tier data, spawned from events (part 5.k); pending removed | LOOK_V2 §3, §7 |
 | GN1 (266) | port to TypeScript (pending) | port to TypeScript: instanced health bars and a per-instance flash (part 6); pending removed | R3-CHAR-REC3 |
 | GC16 (255) | port to TypeScript (pending) | redesign: very large units as authored multi-part models in one group (part 6, option V-A) | LOOK_V2 §5 (never "a block on wheels with a tube") |
@@ -733,7 +802,9 @@ ADR 0005's.
   Options: width in world units (legacy CL6), constant on screen (three.js's hull, R3-LOOK-F5), or in pixels
   (screen-space); inner lines from normal edges (screen-space) or none beyond the silhouette (hull); the building
   weight as a per-pixel class value in an MRT output (screen-space, not researched) or a per-object thickness (our own TSL hull, as CL6; the
-  shipped pass has one thickness for all objects, R3-LOOK-F5).
+  shipped pass has one thickness for all objects, R3-LOOK-F5); the contact line where buildings and soldiers meet
+  the ground from an edge where the class value changes (screen-space, not researched: 5.b), or the hull's ground
+  clamp (CL6).
   Decider: Mustafa, in the look proof test, with its measured cost; the family in part 5.b follows his pick.
   What decides it: side-by-side frames with legacy at the game camera. Research ids: R3-LOOK-OQ2 (lines 1326–1327);
   the decision map's gap G8.
@@ -816,6 +887,46 @@ ADR 0005's.
   `LEGACY_INVENTORY.md` line 205), and the ground grid, the red arena border and the world text labels (GW5, line 193).
   Options per item: keep, change or drop. Decider: Mustafa, in the look proof test. What decides it: his judgement,
   side by side with legacy. Research ids: none (legacy rows only).
+- **OQ-0003-16. The look floor: which LOOK_V2 items may a quality tier switch off on the minimum laptop?**
+  Why it matters: Low is the default on every integrated adapter and every WebGL 2 player (part 7), so the whole
+  minimum class sees it. The research's tier table has an on/off switch per effect (R3-BUDGET-REC3, lines
+  1166–1168) and its shadow row reads "1024² or off" (R3-BUDGET-REC2, line 1129), while "Which effects exist at all
+  is the look brief's call" (R3-BUDGET-REC3, lines 1172–1173), and LOOK_V2 decides cel-shaded rendering with bold
+  ink and emissive accents (§1), soft shadows and thick outlines (§2). No source gives any technique's GPU time
+  (R3-LOOK-F15, lines 411–413), so whether the floor fits Low's budget is unknown until the look proof test
+  measures it. Options: (a) no `[DECIDED]` item is switched off at any tier: the toon materials (5.a), the ink
+  (5.b), one sun shadow map (5.f) and the emissive slots' colour may only be lowered (resolution scale, map size,
+  samples), while the `[DEFAULT]` items (AO, the glow's bloom, the comic touches) may be off on Low; (b) Low may
+  switch named items off where its budget needs it, listed in the tier table; (c) Mustafa decides item by item in
+  the look proof test, on the Low frame beside High and legacy, with each technique's measured cost (PM-0003-9).
+  Parts 5 and 7 hold to (a) for the `[DECIDED]` items until he answers. Recommendation: (c), with (a) as the rule
+  meanwhile, since the costs are unknown today. Decider: Mustafa. What decides it: the look checklist's Low
+  frame (test-engineer's step) and PM-0003-9's costs on the minimum laptop. Research ids: R3-BUDGET-REC3,
+  R3-BUDGET-REC2, R3-LOOK-F15 (no new disposition: both recommendations stay adopted in Appendix A).
+- **OQ-0003-17. How is VISION_V2 §6.9's "without dropping frames" read as a mark?**
+  Why it matters: the spectacle budget (part 7) is a difference in GPU time and draw calls, and the frame rows are
+  p95s, so with the very large units on screen 30 of 600 frames (5 %) may run over one 60 Hz refresh, each a
+  dropped frame once presented. Options: (a) the presented-frame count part 7 proposes: on the recommended machine
+  at High, with the four units and their visual effects on screen, at most a stated number of frames per 600 whose
+  interval passes 1.5 refresh periods (0, or a small proposed share); (b) the p95 rows as written. Decider: the
+  Advisor, confirmed by Mustafa at the stop review (VISION_V2 is theirs). What decides it: their reading of §6.9,
+  then the render budget bench's counts. Research ids: R3-CHAR-REC4 (lines 1088–1092; it stays adopted, no new
+  disposition).
+- **OQ-0003-18. Do the concussion shake, the halftone flashes and line boil soften for players who ask for reduced
+  motion?**
+  Why it matters: LOOK_V2 §2 makes the concussion shake a decided feel and §7 the flashes a default, and legacy
+  honours the system's `prefers-reduced-motion` only in the war-room menus (`shamble-game.js` line 3039,
+  `index.html` line 321), never for the camera shake. Options (not researched): (a) as legacy, menus only; (b) a
+  setting that softens the shake and switches the flashes and line boil off; (c) follow the system setting by
+  default. Each leaves every `[DECIDED]` item as it is for players who keep the default; (b) or (c) would trace to
+  LOOK_V2 §2 and §7 only (no VISION_V2 §6 item). Decider: Mustafa, in the look proof test (parts 5.l, 5.m). What
+  decides it: his judgement. Research ids: none.
+- **OQ-0003-19. Are the three factions told apart by colour alone?**
+  Why it matters: in a three-team fight, players with a colour-vision deficiency may not tell the teams apart;
+  LOOK_V2 §2 makes uniform details the seed of faction identity, and part 6 carries faction colour through the
+  faction colour slots. Options (not researched): (a) colour only, for now; (b) the look proof test also shows the
+  fight view through a colour-blindness simulation, and Mustafa judges it; (c) faction shape cues, left to a later
+  design session. Decider: Mustafa. What decides it: his judgement in the look proof test. Research ids: none.
 
 ## What a spike must prove
 
@@ -829,7 +940,8 @@ and measured with the harness of part 8 on the two reference machines, never hea
   by side with a legacy screenshot at the same framing; the test-engineer's Brave checklist names each item with its
   expected result. Mustafa also makes the calls this record leaves to him: the ink family and its weights
   (OQ-0003-2), the colour output (OQ-0003-3), the lighting (OQ-0003-5), the roof fade's look (OQ-0003-6), line boil
-  (OQ-0003-8), the pixel-ratio cap (OQ-0003-12) and the legacy touches (OQ-0003-15). The test also records which
+  (OQ-0003-8), the pixel-ratio cap (OQ-0003-12), the legacy touches (OQ-0003-15), the look floor on Low
+  (OQ-0003-16), reduced motion (OQ-0003-18) and telling the factions apart (OQ-0003-19). The test also records which
   backend Brave runs on his machine (R3-WGPU-OQ1, lines 1286–1289).
 - **Each technique alone (part 5):** a table with GPU ms (median and p95 over 600 frames) at 1920 × 1080 on the
   minimum and the recommended machine, extra draw calls and extra render-target memory, each measured with only that
@@ -842,7 +954,8 @@ and measured with the harness of part 8 on the two reference machines, never hea
 - **Both backends (1):** the benchmark scene renders on the WebGPU backend in Chrome, Edge, Firefox on Windows and
   Safari on MAC (`docs/SPIKE_PLAN.md`, shared fixtures), and on the WebGL 2 backend (`forceWebGL`) in the same browsers, with zero console errors; the two
   backends' screenshots of the same frame differ in at most 1 % of pixels by more than 8/255 per channel (a proposed
-  tolerance; effects on one backend only are off for this test); the WebGPU backend's median CPU frame time is no
+  tolerance), with every kept effect on: under F-A no effect exists on one backend only (part 1), and an F-B extra
+  is compared through its named fallback; the WebGPU backend's median CPU frame time is no
   worse than 1.1 × the WebGL 2 backend's on the same machine (R3-WGPU-REC1, lines 910–915). The fallback shows the
   same features and meets the minimum budget on the minimum machine (R3-GL2-REC1, lines 965–967).
 - **No first-sight stutter (3):** `renderer.info.memory.programs` is the same 5 s after deploy and at the end of a
@@ -1136,14 +1249,14 @@ Each phase ends on a milestone that proves it done; the legacy game stays playab
 1. **Drafts approved** by Mustafa and the Advisor; the two reference machines named (OQ-0003-1).
 2. **The look proof test**, in parallel with the netcode proof test (no shared dependency). *Milestone:* the
    technique table and both ink families measured on both machines; Mustafa's verdict on every LOOK_V2 item and on
-   OQ-0003-2, -3, -5, -6, -8, -12 and -15, recorded in this ADR.
+   OQ-0003-2, -3, -5, -6, -8, -12, -15, -16, -18 and -19, recorded in this ADR.
 3. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation); ADR 0002). This record's share: the
    renderer starts with `await renderer.init()`, reports its backend in the overlay and in every test screenshot, and
    CI gates the render counts (W-A). *Milestone:* an empty scene runs through the full stack, CI green, and the
    preview link names its backend.
 4. **The render budget bench**, after the look proof test and ADR 0002's boundary spike, before slice 1's renderer
    work. *Milestone:* every row of the budget table on both machines, or a recorded change of tier for each technique
-   that misses.
+   that misses, inside the look floor (part 7; OQ-0003-16).
 5. **Slice 1, move & shoot:** one skinned soldier, the toon materials and ink kept in step 2, the feel kit's visual
    effects and voices for the slice's weapons, split feedback. *Milestone:* programs constant over a match, zero
    per-frame allocation in the render path, Mustafa's Brave check.
@@ -1187,13 +1300,17 @@ Each phase ends on a milestone that proves it done; the legacy game stays playab
   backend everywhere (`forceWebGL`), which stays within the settled renderer. If WebGPURenderer itself fails, the
   renderer is a settled input: the question goes to Mustafa and the Advisor; option C is not taken silently.
 - **The screen-space ink fails** (its cost, aliasing or Mustafa's look): switch to the hull family, already measured;
-  the Low cap becomes about 1,100 draws or the hull a High-only setting.
-- **Single-pass AO fails:** the documented pre-pass on High only, AO off on Low.
+  the Low cap becomes about 1,100 draws, or the hull a High-only setting with what Low draws then Mustafa's call
+  (OQ-0003-16).
+- **Single-pass AO fails:** the documented pre-pass on High only, AO off on Low (a `[DEFAULT]` item; OQ-0003-16 asks
+  whether that holds).
 - **C-B misses the character marks:** tighten the budget LOD first; then the instanced candidate that measured best
   (C-E on both backends, or C-D on WebGPU with C-B as its fallback).
 - **A three.js upgrade regresses:** stay on the previous pin (V1).
 - **HRTF or occlusion costs too much:** equal power only; zones or none.
-- **Any technique misses on Low:** a tier change in data moves it to High only, with no code change.
+- **Any technique misses on Low:** a tier change in data lowers it (resolution scale, map size, samples) or, for a
+  `[DEFAULT]` item's technique, moves it to High only, with no code change; a technique that carries a LOOK_V2
+  `[DECIDED]` item leaves Low only on Mustafa's answer to OQ-0003-16, given on the Low frame with the measured costs.
 
 ## Appendix A: research dispositions
 
@@ -1223,7 +1340,7 @@ research file's at 9e7db28.
 | R3-CHAR-REC4 | adopted | part 6 and part 7's spectacle budget |
 | R3-BUDGET-REC1 | adopted | part 7; the models are OQ-0003-1 |
 | R3-BUDGET-REC2 | adopted (N = 48) | part 7; the N = 54 sum (lines 1144–1145) no longer applies; the Low draw cap is read through part 5.b's ink |
-| R3-BUDGET-REC3 | adopted | part 7 |
+| R3-BUDGET-REC3 | adopted | part 7; its own reason, "Which effects exist at all is the look brief's call" (lines 1172–1173), is the look floor (OQ-0003-16) |
 | R3-MEASURE-REC1 | adopted | part 8 |
 | R3-MEASURE-REC2 | adopted | part 8, with the fixed-seed fallback (Pointers Q6, lines 1504–1505) |
 | R3-MEASURE-REC3 | adopted | part 8 |
@@ -1305,3 +1422,6 @@ Read for this record (lines at 9e7db28; the topic files do not change in this PR
 - `docs/adr/README.md`, "Codes the drafts cite" (the decision map's codes this record uses: I-n, gaps, LE-B, J4,
   N12) and "Decisions the drafts ask for"; ASSET-RESEARCH (a), the advisor's ruling, as STATUS "Decisions pending"
   records it.
+- `docs/ART_DIRECTION.md` line 121 (the halftone overlay dots the HUD); legacy code read for two facts:
+  `shamble-core.js` lines 356–359 (`_matSig`, the content signature) and `shamble-game.js` line 3039 with
+  `index.html` line 321 (reduced motion in the menus only).

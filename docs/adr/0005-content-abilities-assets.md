@@ -1543,15 +1543,20 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
 ### What this section decides
 1. **An imported model carries no look; the engine applies it.** A model brings geometry, its skin (joints and
    weights) where it moves, UVs and textures where it has them, and named material slots. It brings no baked lighting
-   and no ink. At load the engine gives each slot the shared node toon material of that slot's material class (ADR
-   0003, part 5.a), one material per slot content and never one per mesh. *Why:* each distinct ramp is a distinct
-   material, so materials must be shared by content or batching breaks (r3, Findings Q3, R3-LOOK-F3, lines 331–334);
+   and no ink. At load the engine gives each slot a shared node toon material of that slot's material class (ADR
+   0003, part 5.a), one material per slot content and never one per mesh. A slot's content is its class (ramp,
+   colour gain, ink weight), its faction for faction colour slots, and its own base and emissive colour, textures,
+   side and alpha mode, as legacy keys its shared materials by content (CL4, `docs/LEGACY_INVENTORY.md` line 113;
+   `_matSig`, `shamble-core.js` lines 356–359); so an asset keeps its own colours and textures inside a class, and
+   how colour is authored is OQ-0005-AS4's, not a rule. *Why:* each distinct ramp is a distinct material, so
+   materials must be shared by content or batching breaks (r3, Findings Q3, R3-LOOK-F3, lines 331–334);
    legacy converted per mesh and got one material per mesh, which defeated its first merge attempt (CL4,
    `docs/LEGACY_INVENTORY.md` line 113); and a model's own shader code could not run anyway, since custom GLSL and
    `onBeforeCompile` are "not supported in WebGPURenderer" (r3, Findings Q1, R3-WGPU-F6, lines 97–102). *Need:*
    LOOK_V2 §8 (step 5) only.
 2. **Material slots name a material class.** Every slot's name maps to one class from a small fixed list (for
-   example environment, unit, faction colour, emissive); the list and the names are this ADR's content data (interface
+   example environment, structure, unit, faction colour, emissive; the structure class gives buildings their heavier
+   ink, LOOK_V2 §2, ADR 0003 parts 5.b and 5.h); the list and the names are this ADR's content data (interface
    I-8 in `docs/adr/README.md`), consumed by ADR 0003. Faction colour slots take the faction's colour at load, as one shared material per
    slot and faction, or as per-instance colour where a mesh is instanced (`instanceColor` on
    `InstancedMesh`: r3, Findings Q4, R3-CHAR-F4, lines 452–455; `BatchedMesh` also carries per-instance colour:
@@ -1568,10 +1573,19 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
 4. **The derived per-unit caps.** Two caps follow from ADR 0003's totals by arithmetic; the rest are open (OQ-0005-AS5):
    - *A soldier as drawn* (body, headgear and held weapon) uses at most 4 materials per pass: option C-B draws "one
      per material per soldier" (r3, Options Q4, line 825) and ADR 0003 caps a soldier at 4 draw calls per pass
-     before the ink (R3-CHAR-REC1, lines 1044–1045).
+     before the ink (R3-CHAR-REC1, lines 1044–1045). Each material carries one class ramp (part 1), so at most 4
+     surface kinds (skin, cloth, faction colour, metal, emissive) shade differently on one soldier, where legacy used
+     separate skin, cloth, metal and lacquer ramps (CL2, `docs/LEGACY_INVENTORY.md` line 111); the look proof test's
+     soldier is built at this cap.
    - *A very large unit* draws at most 25 parts × materials per pass: ADR 0003 allows the four very large units 200
      draw calls over the shadow and the main pass (R3-CHAR-REC4, lines 1088–1090), and 200 ÷ 4 units ÷ 2 passes = 25.
      R3's own test load, 20 parts each with one material, fits (4 × 20 × 2 = 160, lines 1089–1090).
+   - *A triangle ceiling, not a budget:* ADR 0003's harness resets `renderer.info` once per frame (its part 8), so the
+     triangle row counts every pass of the frame, the shadow pass included, as the draw-call arithmetic does (assumed:
+     how three.js counts the shadow pass's triangles is not researched). At Low, 500k ÷ (48 soldiers × 2 passes) ≈
+     5.2k triangles per soldier as drawn, if soldiers had the whole row before the world and the very large units
+     take their share (arithmetic on R3-BUDGET-REC2's triangle row, r3 line 1134): a planning input for OQ-0005-AS5
+     and AS6.
    - The frame totals every asset shares stay ADR 0003's (r3, R3-BUDGET-REC2, lines 1121–1137): at Low, ≤ 800 draw
      calls (without a per-object outline pass; about 1,100 with one, r3 line 1133), ≤ 500k triangles, ≤ 512 MB of GPU memory; at High, ≤ 1,500, ≤ 1.5M, ≤ 1 GB.
    *Need:* VISION_V2 §4, §6.9; LOOK_V2 §8 (budgets per unit).
@@ -1584,13 +1598,15 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
    a distance, depth up close).
 6. **Only glTF/GLB, never Spline's runtime.** The game loads models as glTF/GLB files through three.js's loader on
    both backends; it never loads Spline's own runtime (LOOK_V2 §8). *Need:* LOOK_V2 §8 only.
-7. **Materials and textures are shared, cached and compiled up front.** One material per class (and per faction for
-   faction slots) is created once, cached and reused, "never rebuilt per edit" (EDITOR_V2 §2, rule 3), and never
-   disposed while shared; every one is compiled in ADR 0003's warm-up, so a unit's first appearance creates no shader
-   program (r3, Recommendations Q1, R3-WGPU-REC3, lines 928–939). *Need:* VISION_V2 §6.9; EDITOR_V2 §2.
-8. **The look proof test's models.** ADR 0003's look proof test needs a few authored models (a soldier, a weapon, a
-   building with an interior, a very large unit, props). They are plain glTF/GLB exports; the test decides nothing
-   about compression or LODs (ASSET-RESEARCH (a)).
+7. **Materials and textures are shared, cached and compiled up front.** One material per slot content (part 1: the
+   class, the faction for faction slots, and the slot's own colours, textures, side and alpha mode) is created once,
+   cached by that content and reused, "never rebuilt per edit" (EDITOR_V2 §2, rule 3), and never disposed while
+   shared; every one is compiled in ADR 0003's warm-up, so a unit's first appearance creates no shader program (r3,
+   Recommendations Q1, R3-WGPU-REC3, lines 928–939). *Need:* VISION_V2 §6.9; EDITOR_V2 §2.
+8. **The look proof test's models.** ADR 0003's look proof test needs a few authored models (a soldier, a weapon,
+   LOOK_V2 §2's two houses, one of them with an interior and its damage stages, a very large unit, props; ADR 0003
+   part 11 lists them and says where the second house comes from if only one is authored). They are plain glTF/GLB
+   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)).
 9. **Trees wait.** The tree style is LOOK_V2 §8's `[OPEN]` item; tree assets wait for Mustafa's answer (ADR 0003,
    OQ-0003-9). Nothing here decides it.
 
@@ -1601,13 +1617,15 @@ and the legacy facts it cites; an option the research lacks is marked "not resea
 **How an imported model gets the look**
 | Option | Complexity | Cost (money, time, usage) | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort from the current code |
 |---|---|---|---|---|---|---|
-| **One shared toon material per slot class, applied at load** (proposed, part 1) | Low | one material per class and faction | materials stay few, so sharing and merging work (R3-LOOK-F3) | presentation only | one look on every asset, set in one place | new; legacy's per-mesh conversion is the lesson (CL4) |
+| **One shared toon material per slot content, applied at load** (proposed, part 1) | Low | one material per distinct slot content (class, faction, the slot's own colours and textures) | materials stay as few as the assets' distinct contents, so sharing and merging work (R3-LOOK-F3) | presentation only | one look on every asset, set in one place; each asset keeps its own colours | new; legacy's per-mesh conversion is the lesson (CL4) |
 | Convert each mesh's material at load (legacy's `toonify`) | Low | one material per mesh | defeats batching and merging (CL4) | presentation only | the same look | ports, then fails the draw-call budget |
 
 - A look baked into each asset by the modelling tool: settled by LOOK_V2 §8 (step 5, "the engine applies the comic
   look"); not weighed.
-- **Shared per class.** Pros: bounded materials; one place to tune the look. Cons: every slot must be named into a
-  class (OQ-0005-AS4). **Per mesh.** Pros: no naming rule. Cons: one material per mesh, legacy's measured problem.
+- **Shared per slot content.** Pros: materials bounded by the assets' distinct contents; one place to tune each
+  class's look. Cons: every slot must be named into a class (OQ-0005-AS4); an asset with many distinct colours brings
+  as many materials, and ADR 0003's static merge groups only equal contents. **Per mesh.** Pros: no naming rule.
+  Cons: one material per mesh, legacy's measured problem.
 
 **How a very large unit is built** (r3, Options Q4, lines 834–836)
 | Option | Complexity | Cost | Scalability / performance | Security & anti-cheat | Effect on the look and feel | Effort |
@@ -1650,9 +1668,12 @@ then proves its answers.
   unchecked tags did (CL14, `docs/LEGACY_INVENTORY.md` line 123). Options: none researched. Decider: the
   asset-pipeline research. What decides it: the failures the asset spike can plant and catch. Research ids: none.
 - **OQ-0005-AS4. How are a model's materials renamed into the slot classes and faction colour slots?**
-  Why it matters: part 1 and part 2 depend on every slot carrying a class. Options: none researched (a manual
-  convention in the modelling tool, or LOOK_V2 §8's automated step). Decider: the asset-pipeline research. What
-  decides it: whether Spline's glTF export keeps material names (not researched). Research ids: none.
+  Why it matters: part 1 and part 2 depend on every slot carrying a class; and since part 1 makes one material per
+  slot content, how an asset carries its colours sets how many materials it brings. Options: none researched (a
+  manual convention in the modelling tool, or LOOK_V2 §8's automated step; for colour, each slot's material colour,
+  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether Spline's
+  glTF export keeps material names (not researched), and each colour route's material count against part 4's caps.
+  Research ids: none.
 - **OQ-0005-AS5. What are the per-unit budgets beyond the two derived caps?**
   Why it matters: LOOK_V2 §8 asks for triangles, materials and textures per unit; only the soldier's 4 materials per
   pass and a very large unit's 25 draws per pass follow from the research (part 4). Options: split ADR 0003's frame
@@ -1668,8 +1689,9 @@ then proves its answers.
 ### What a spike must prove (this section's part)
 - **In ADR 0003's look proof test** (plain glTF/GLB exports, no compression or LODs): every test model loads on both
   backends with zero console errors and is drawn with the engine's toon materials per slot, with no material of its
-  own left in use; the scene holds no more material objects than the distinct (slot class, faction) pairs it shows
-  (proposed mark; reason: sharing by content, R3-LOOK-F3); the test soldier as drawn meets 4 draw calls per pass and
+  own left in use; the scene holds no more material objects than the distinct slot contents it shows (part 1;
+  proposed mark; reason: sharing by content, R3-LOOK-F3), and two meshes with the same slot content share one
+  material object; the test soldier as drawn meets 4 draw calls per pass and
   the test very large unit 25 (part 4's arithmetic, on R3-CHAR-REC1 and R3-CHAR-REC4).
 - **In the asset spike**, after the asset-pipeline research: the pipeline's answers to OQ-0005-AS1 to AS5 (its marks
   come from that research and are not set here); the loader on both backends; every slot classed and every faction
