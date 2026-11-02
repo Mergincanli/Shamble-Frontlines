@@ -12,3 +12,4 @@ Task: rust-reviewer final fix round on ADR 0004 (v2 decision drafts, at 47eadd9;
 - final file written: rust-reviewer-fixes-final.md (22 FIX, 14 NOTE); applies cleanly to 47eadd9 (apply_fixes.py all applied; each BEFORE once; no overlaps); docs/ untouched by me
 - ADR 0004 still unchanged at HEAD 2c5e8d9 (cmp with 47eadd9 copy: same); return sent
 DONE
+- follow-up b (RR-1, part 7 allow-list and min/max/clamp helpers) started; output rust-reviewer-fixes-final-b.md from b815c85

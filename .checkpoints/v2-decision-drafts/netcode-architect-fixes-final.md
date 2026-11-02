@@ -866,10 +866,10 @@ AFTER:
   after the built projectiles and bot decisions, to 0.30 ms at 60 Hz (4.17 − 3.87, arithmetic on ADR 0004 part 6;
   2.80 ms at 30 Hz); (b) a stand-in burns, tick by tick, the step times the sim core spike recorded; (c) the 60 Hz
   check waits until the real sim runs the stress scene (slice 6), and the tick stays at 30 Hz until then; (d) the
-  60 Hz check waits until the content and ability spike's effect step has joined the sim core spike's sim. **Recommended: (a)**
-  with its burns: it keeps the single run, delays nothing and errs toward 30 Hz, since a pass still holds once the
-  real parts meet their ceilings (the test review's reasoning); (c) is the fallback if the sim core spike's sim
-  cannot run the stress scene in time. (b) is weaker because a replayed series loses the link between the sim's load
+  60 Hz check waits until the content and ability spike's effect step has joined the sim core spike's sim.
+  **Recommended: (a)** with its burns: it keeps the single run, delays nothing and errs toward 30 Hz, since a pass
+  still holds once the real parts meet their ceilings (the test review's reasoning); (c) is the fallback if the sim
+  core spike's sim cannot run the stress scene in time. (b) is weaker because a replayed series loses the link between the sim's load
   and the server-only load in the same fight, and the margin is a tail statistic (our inference). The 30 Hz baseline
   marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder
   topped up): on the planning check they leave 7.49 ms. · *Decider:* the Advisor. · *What decides it:*
