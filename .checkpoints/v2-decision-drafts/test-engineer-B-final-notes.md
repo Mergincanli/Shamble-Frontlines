@@ -37,3 +37,7 @@ test-engineer unit B, final fix round (step 10): pass marks of ADR 0003, 0004, 0
 - 0003 checklist steps 26-30 + new 31, 32 done (GE-7, AD-10, GE-8, AD-2, AD-3, OQ-0003-18/-19 picks)
 - 0003 OQ-0003-20 added after OQ-0003-19 (lines 928-929). README row needed (engine-architect)
 - 0003 NOTEs written (PA-4, PA-7, GE-6, GE-2, GE-14, AD-12, PA-14, AD-2). 0003 DONE except check. Next: ADR 0004
+- 0004 PM-0004-2 done (TE-1 routed)
+- 0004 PM-0004-6 done (RR-4 burst); full-pool per-kind row to add as PM-0004-75 (conditional on OQ-0004-11)
+- 0004 PM-0004-8 done (PA-5 my half)
+- 0004 PM-0004-21 done (RR-11); route part 9 clause to rust-reviewer

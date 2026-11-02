@@ -18,3 +18,7 @@ test-engineer unit A, final fix round: Pass marks of ADR 0001 (+ netcode checkli
 - PM-0001-26 bite + new PM-0001-59 (RR-3) written; next: -27 (EA-7/IE-2)
 - PM-0001-27 (EA-7/IE-2) written; next: -29 (IE-7, cap), -30 (TE-3), -31, -33, -34 (SA-13), -37 (NA-5)
 - PM-0001-29 (IE-7, cap), -30 (TE-3), -33 (NA-4 hold time) written; next: -34 (SA-13), -37 (NA-5), -39 (NA-12, PA-9)
+- PM-0001-34 (SA-13), -37 (NA-5) written; next: -39 (NA-12, PA-9), -43 (EA-2), -44 (NA-10), -42 + new -60
+- PM-0001-39 (NA-12, PA-9) written (line cite fixed to r2:1778); next: -42 + new -60 (GD-3), -43 (EA-2), -44 (NA-10)
+- PM-0001-42 (NA-11) + new PM-0001-60 (GD-3) written; next: -43 (EA-2), -44 (NA-10), -45 (FC-7), -46 + new -61 (EA-1)
+- PM-0001-43 (EA-2), -44 (NA-10), -45 (FC-7) written; next: -46 + new -61 (EA-1), -47 (NA-4 bite), -48/-49/-50 (NA-1, SA-6)

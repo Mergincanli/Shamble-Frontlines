@@ -1,0 +1,9 @@
+<<<OLD
+8 active effects per soldier (384 at N = 48); every bot logs
+>>>NEW
+8 active effects per soldier (384 at N = 48; in the sim core spike these are S1's 384 stand-in rows in the effect pool, which count as the stress scene's effects, with the effect step's 1 ms ceiling burned and the 2.80 ms remainder topped up on every tick, scaled by N / 48 at the other scale steps, and at 60 Hz 1 ms and 0.30 ms; the run's record names each stand-in and its per-tick log shows each ran); every bot logs
+===
+<<<OLD
+Bites: a build where dead soldiers stay dead fails it within its first minute |
+>>>NEW
+Bites: a build where dead soldiers stay dead fails it within its first minute; a run with the effect step's stand-in burn switched off fails it on its first tick |
