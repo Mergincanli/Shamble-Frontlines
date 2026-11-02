@@ -13,3 +13,10 @@
 - SPIKE_PLAN table 75-83 (new PM rows) and item 1 pass marks 99-102 (IE-2, -62) FIX written. Next: item 1 Depends on (106-114), item 2 (TE-1), item 4 What it proves (TE-1), FC-6
 - item 1 Depends on (106-114) FIX written. Next: item 1 It decides (129-132: OQ-0001-15 numbers), item 2 (TE-1, 147-150), item 4 (TE-1; FC-6)
 - item 1 It decides (131-132) and item 2 Depends on/Place (147-150, TE-1) FIX written. Next: item 3 pass marks (166-170, -77/-78) and GE-13 harness (item 1 place 115-116, item 3 depends 172-175, size 177), item 4 (TE-1 at 188-190, FC-6 191-192)
+- GE-13 FIX items 1 (115-119) and 3 (172-177); item 3 pass marks (166-167, -77/-78) FIX. Next: item 4 TE-1 (188-190) + FC-6 (191-192); item 5 AD-13 (222), who judges (230-234), depends/place/size (235-244: AD-7, GE-5, GE-13, OQ-0006-18), It decides (245-248); then OQ-SPIKE-1 section
+- item 3 What it proves (158-165: newest input per frame, aim cast, connection in part 5, Worker cost) FIX written. Next: item 4 TE-1/FC-6 (188-192)
+- item 4 What it proves (188-195: FC-6 + TE-1 stand-ins) and Size (205-207) FIX written. Next: item 5 (AD-13 222; who judges 230-234; depends/place/size 235-244; It decides 245-248)
+- item 5 Depends/Place/Size (235-244: AD-7, GE-5, GE-13, OQ-0006-18) and It decides (247-248) FIX written. Next: add OQ-SPIKE-1 section to SPIKE_PLAN (before 'What this plan does not decide', 390-393); item 6 PM-0006-32 (258); item 7 PM-0004-75 (300); item 8 PM-0003-44..47 (321-322) + OQ-0003-17/-20 (334-335)
+- items 6 (252-258), 7 (300), 8 (321-322, 330-334) FIX written. Next: OQ-SPIKE-1 section in SPIKE_PLAN; item 8 who judges? ; SPIKE_PLAN 'What this plan does not decide' (390-393) update; then README
+- SPIKE_PLAN 'does not decide' + new '## Open questions' with OQ-SPIKE-1 (390-393) FIX written. Next: SPIKE_PLAN other stale refs check (grep 'one command per tick', OQ-0006-2 wording); then README
+- asset-pipeline research Place FIX written (OQ-SPIKE-1 link). SPIKE_PLAN done. Next: README (counts, header line 10, decisions table rows re-pinned + new rows, Needs outside §6, I-3, I-6, I-11, I-13, CF-2 line 161->162 and other register line pointers)

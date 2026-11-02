@@ -7,3 +7,5 @@ Task: verifier fixcheck-d1 — re-verify the final fix round of ADR 0001, 0002, 
 - 0001 netcode blocks table written. Next: test-engineer A's ADR 0001 pass-mark blocks.
 - TE-A 0001 claims A1-A25 written. Findings so far: F1 (0001:1047 7.49->4.70), F2 (part 4 'causes no correction' vs PM-0001-60), F3 (part 8 frame wait, routed, not applied), F6 (PM-0001-44 'part 4 gives'), F7 (V-S vs PM-0001-27). Next: TE-A 0001 blocks table, then 0002 (engine-architect).
 - TE-A 0001 blocks table written. Next: ADR 0002 engine-architect fix file.
+- 0002 EA claims E1-E28 written; F8 (0002:1030 paid minutes), F9 (0002:530 stale 7 days). Next: 0002 EA blocks table + TE-A 0002 claims/blocks.
+- 0002 blocks + TE-A 0002 written. Next: ADR 0006 (infra-engineer final, b, c; TE-B 0006).

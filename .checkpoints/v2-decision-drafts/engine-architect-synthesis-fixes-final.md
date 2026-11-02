@@ -297,3 +297,296 @@ AFTER:
 - **Place:** wave 1, inside the netcode proof test, after the sim core spike's sim runs the stress scene (option (a));
   under (d), after the content and ability spike (wave 3).
 END
+
+### FIX GE-13 (SPIKE_PLAN item 1: it builds the shared client harness first)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Place:** wave 1, first in priority: before the foundation (SLICE-ORDER condition 3). It shares its client harness
+  with the boundary spike.
+- **Size:** L. Two transports on four browsers, two simulator layers, a room server with interest, encoding and lag
+  compensation at 48 clients, a load generator, repeated 30-minute soaks, 8 rooms on two machine types, planted defects,
+  Mustafa's session; ADR 0006's operations marks add M; ADR 0004's share is S.
+AFTER:
+- **Place:** wave 1, first in priority: before the foundation (SLICE-ORDER condition 3). It builds first the client
+  harness the boundary spike shares (the page with its Worker host and a plain renderer, on the throwaway sim: ADR
+  0002's spike text), proposed with the order (J6 (5)).
+- **Size:** L, the client harness included. Two transports on four browsers, two simulator layers, a room server with
+  interest, encoding and lag compensation at 48 clients, a load generator, repeated 30-minute soaks, 8 rooms on two
+  machine types, planted defects, Mustafa's session; ADR 0006's operations marks add M; ADR 0004's share is S.
+END
+
+### FIX GE-13 (SPIKE_PLAN item 3: it builds the measurement harness's CPU side first)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Depends on:** the drafts approved; ML named and on hand (OQ-0003-1), MAC, and displays at
+  120 and 144 Hz; the netcode proof test's throwaway sim, client harness and room process (it runs beside it); ADR
+  0003's frame-time method (its part 8); the sim core spike's sim for PM-0002-28 and PM-0004-8, -28 (a stand-in until
+  then); Mustafa's session in Brave.
+- **Place:** wave 1, beside the netcode proof test; its result fixes the skeleton the foundation builds.
+- **Size:** L (ADR 0002's part); ADR 0004's share M; ADR 0006's optional share S.
+AFTER:
+- **Depends on:** the drafts approved; ML named and on hand (OQ-0003-1), MAC, and displays at 120 and 144 Hz; the
+  netcode proof test's throwaway sim, client harness and room process (it runs beside it); the sim core spike's sim
+  for PM-0002-28 and PM-0004-8, -28 (a stand-in until then); Mustafa's session in Brave.
+- **Place:** wave 1, beside the netcode proof test; its result fixes the skeleton the foundation builds. It builds
+  first, on the shared client harness, the CPU side of ADR 0003 part 8's measurement harness (frame time, the
+  renderer's counters, the run sets and their labels), which the look proof test and the render budget bench then use
+  (proposed with the order, J6 (5); the graphics review's finding 13).
+- **Size:** L (ADR 0002's part, the measurement harness's CPU side included); ADR 0004's share M; ADR 0006's optional
+  share S.
+END
+
+### FIX NA-7 routed (SPIKE_PLAN item 3: the newest input per frame, one network command per tick; the connection is part 5)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **What it proves:** ADR 0002 part 5 (one module Worker; the page makes no Wasm call and touches no network; one
+  transferred block per tick, B2, with the SharedArrayBuffer ring, B3, measured against it; one command per tick; the
+  Worker's calls per tick constant in N; the page's frame time with the sim within its budget at N = 12 to 48 on the
+  minimum laptop; the generated types and the layout hash; the isolation flag), part 6 (the Worker owns the connection;
+  the client + local server skeleton; one Wasm instance or two in a local match, OQ-0002-3), parts 2, 4 and 7 (Wasm
+  size and tools), part 11 (the editor from `file://`, OQ-0002-1); ADR 0004 part 5 (S18: the
+  Worker's pacing, smooth motion on 60, 120 and 144 Hz displays, hidden tabs), part 6 (S2: the client's sim share) and
+  part 20 (S20: recovery after a trap); ADR 0005's content files reaching the Worker (PM-0002-31, R1-DATA-OQ8).
+AFTER:
+- **What it proves:** ADR 0002 part 5 (one module Worker; the page makes no Wasm call and touches no network; one
+  transferred block per tick, B2, with the SharedArrayBuffer ring, B3, measured against it; the newest input posted
+  once per drawn frame and one network command per tick built from it, its aim cast against what the page drew; the
+  Worker owns the connection; the Worker's calls per tick constant in N; the page's frame time with the sim within its
+  budget at N = 12 to 48 on the minimum laptop; the generated types and the layout hash; the isolation flag), part 6
+  (the client + local server skeleton and the Worker's whole cost, reported; one Wasm instance or two in a local
+  match, OQ-0002-3), parts 2, 4 and 7 (Wasm size and tools), part 11 (the editor from `file://`, OQ-0002-1); ADR 0004
+  part 5 (S18: the Worker's pacing, smooth motion on 60, 120 and 144 Hz displays, hidden tabs), part 6 (S2: the
+  client's sim share) and part 20 (S20: recovery after a trap); ADR 0005's content files reaching the Worker
+  (PM-0002-31, R1-DATA-OQ8).
+END
+
+### FIX test-engineer B routed (SPIKE_PLAN item 3: PM-0002-77 and -78)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Pass marks:** PM-0002-1 to PM-0002-34 (PM-0002-21, -27 and -33 conditional; PM-0002-28 gates once the sim core
+  spike's sim runs in the Worker); PM-0004-8, PM-0004-28, PM-0004-68 to PM-0004-70, and PM-0004-61 with the netcode proof
+  test's server; optional, only if Mustafa has created the EU Sentry organisation (OQ-0006-8): PM-0006-28 to PM-0006-31
+  (otherwise they move to the first online playtest's milestone). ADR 0003's PM-0003-20 (the p99 of the page's own sim
+  work) is measured on this spike's Worker and block in the render budget bench.
+AFTER:
+- **Pass marks:** PM-0002-1 to PM-0002-34, PM-0002-77 and PM-0002-78 (PM-0002-21, -27 and -33 conditional; PM-0002-78
+  reported; PM-0002-28 gates once the sim core spike's sim runs in the Worker); PM-0004-8, PM-0004-28, PM-0004-68 to
+  PM-0004-70, and PM-0004-61 with the netcode proof test's server; optional, only if Mustafa has created the EU Sentry
+  organisation (OQ-0006-8): PM-0006-28 to PM-0006-31 (otherwise they move to the first online playtest's milestone).
+  ADR 0003's PM-0003-20 (the p99 of the page's own sim work) is measured on this spike's Worker and block in the render
+  budget bench.
+END
+
+### FIX FC-6, TE-1 (SPIKE_PLAN item 4: seven targets named as seven; S1's stand-ins for the parts it does not build)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **What it proves:** ADR 0004 parts 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20 and 21: the Rust sim on one vCPU
+  of the reference server and in Wasm on the minimum laptop, in the stress scene at N = 48 at 30 Hz (the sim step share
+  and its parts, the scale steps and the N = 64 headroom run); snapshots, exact restore and stable ids; same-build and
+  cross-target identity by per-tick state hashes on seven targets (native, Node, three browser engines, real Safari on
+  MAC, and Chrome and Firefox on the minimum laptop's Windows: PM-0004-19), with a suite
+  that catches each planted divergence at its tick; parry3d with our own movement; both navigation generators, the path
+  queue, avoidance, floors and typed links; sight; big vehicles as obstacles, structure states and three damage stages;
+  the editor's reach checks; no panic from commands.
+AFTER:
+- **What it proves:** ADR 0004 parts 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20 and 21: the Rust sim on one vCPU
+  of the reference server and in Wasm on the minimum laptop, in the stress scene at N = 48 at 30 Hz (the sim step share
+  and its parts, the parts it does not build stood in as S1 says: 384 effect rows with the effect step's 1 ms ceiling
+  burned per tick and the 2.80 ms remainder topped up, each named in the run's record; the scale steps and the N = 64
+  headroom run); snapshots, exact restore and stable ids; same-build and cross-target identity by per-tick state
+  hashes on seven targets (native, Node, three browser engines, real Safari on MAC, and Windows on the minimum laptop,
+  in Chrome and Firefox: PM-0004-19), with a suite that catches each planted divergence at its tick; parry3d with our
+  own movement; both navigation generators, the path queue, avoidance, floors and typed links; sight; big vehicles as
+  obstacles, structure states and three damage stages; the editor's reach checks; no panic from commands.
+END
+
+### FIX TE-1 (SPIKE_PLAN item 4 size: S1's stand-ins in the throwaway sim)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Size:** L, the largest spike (a throwaway sim with movement, the vehicle sweep, two navigation generators, bots,
+  sight and structure states; a determinism suite over seven targets; three machines; about 60 marks, most of them
+  scripted checks that can join CI afterwards).
+AFTER:
+- **Size:** L, the largest spike (a throwaway sim with movement, the vehicle sweep, two navigation generators, bots,
+  sight and structure states, and S1's stand-ins for the effect step and the remainder; a determinism suite over seven
+  targets; three machines; about 60 marks, most of them scripted checks that can join CI afterwards).
+END
+
+### FIX GE Q1, AD questions, OQ-0003-16, -18, -19 routed by graphics-engineer (SPIKE_PLAN item 5: the calls Mustafa makes in the test)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Who judges what:** Mustafa judges the whole look: the look checklist (ADR 0003, inside PM-0003-17), which names each
+  LOOK_V2 item it shows beside a legacy screenshot, and the families checklist (ADR 0005, inside PM-0005-37). He also
+  makes the calls ADR 0003 leaves to him (OQ-0003-2, -3, -5, -8, -12, -15; the ink family); OQ-0003-6 (the roof fade)
+  is the test's to decide, with his look among what decides it. The scripts judge the frame-time and GPU marks on ML
+  and RD.
+AFTER:
+- **Who judges what:** Mustafa judges the whole look: the look checklist (ADR 0003, inside PM-0003-17), which names each
+  LOOK_V2 item it shows beside a legacy screenshot, and the families checklist (ADR 0005, inside PM-0005-37). He also
+  makes the calls ADR 0003 leaves to him (OQ-0003-2, -3, -5, -8, -12, -15; the ink family; the look floor on the Low
+  frame, OQ-0003-16; reduced motion, OQ-0003-18; whether colour alone tells the factions apart, OQ-0003-19); OQ-0003-6
+  (the roof fade) is the test's to decide, with his look among what decides it. The scripts judge the frame-time and
+  GPU marks on ML and RD.
+END
+
+### FIX AD-13 (SPIKE_PLAN item 5: the [DEFAULT] items are judged too, and a veto is recorded)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **What it proves:** how each `[DECIDED]` item of [LOOK_V2](LOOK_V2.md) looks, judged by Mustafa in Brave beside legacy
+  screenshots at the same framing; each look technique's GPU time, draw calls and memory alone, on both reference
+  machines and both backends; both ink families at 12, 24 and 48 soldiers on the minimum laptop at Low; one build on
+  both backends in the four browsers with the same look; no first-sight shader stutter; the backend reported (and
+  Brave's on Mustafa's PC). For ADR 0005: plain glTF/GLB exports load on both backends with the engine's shared
+  materials per slot class, every model listed by id, a broken link refused at load, and Mustafa's pick per asset
+  family (OQ-0005-AP2).
+AFTER:
+- **What it proves:** how each `[DECIDED]` and `[DEFAULT]` item of [LOOK_V2](LOOK_V2.md) looks (a `[DEFAULT]` stands
+  unless vetoed, so a veto is recorded), judged by Mustafa in Brave beside legacy screenshots at the same framing;
+  each look technique's GPU time, draw calls and memory alone, on both reference machines and both backends; both ink
+  families at 12, 24 and 48 soldiers on the minimum laptop at Low; one build on both backends in the four browsers with
+  the same look; no first-sight shader stutter; the backend reported (and Brave's on Mustafa's PC). For ADR 0005:
+  plain glTF/GLB exports load on both backends with the engine's shared materials per slot class, every model listed
+  by id, a broken link refused at load, and Mustafa's pick per asset family (OQ-0005-AP2).
+END
+
+### FIX AD-7, GE-5, GE-13 and OQ-0006-18 routed (SPIKE_PLAN item 5: both houses, who makes the models, the harness, unreleased art)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Depends on:** the drafts approved; ML and RD named and on hand (OQ-0003-1), MAC; a few authored test
+  assets as plain glTF/GLB exports with named material slots and no compression or LOD step (ASSET-RESEARCH (a): one
+  soldier with faction colour slots, one weapon, one two-floor building with its damage stages, one very large unit,
+  a few props); legacy screenshots at the same framing; the measurement harness of ADR 0003 part 8, built here first; a
+  synthetic recording for the scene; the content crate's whole-set check (a minimal loader, since the content and
+  ability spike comes later); for OQ-0005-AP2, the ported kit builders beside the authored models (ADR 0005's share; ADR
+  0003's own asset list names only authored assets).
+- **Place:** wave 1, in parallel with the netcode proof test (they share nothing); before any art production and before
+  slice 1's renderer.
+- **Size:** L; ADR 0005's share S, or M if the kit builders are ported for the families' comparison.
+AFTER:
+- **Depends on:** the drafts approved; ML and RD named and on hand (OQ-0003-1), MAC; a few authored test assets as plain
+  glTF/GLB exports with named material slots and no compression or LOD step (ASSET-RESEARCH (a); ADR 0003 part 11):
+  one soldier in LOOK_V2 §3's proportions with faction colour slots, one weapon, LOOK_V2 §2's two houses (the
+  half-timbered house with the brick-tile roof as the two-floor building with an interior and its damage stages, and
+  the plastered house with the silo tower, authored too or drawn by ADR 0005's ported kit builders), one very large
+  unit of at least 20 parts, a few props; who makes these models and by which route is OQ-SPIKE-1 (below), and whether
+  a committed model may be seen by anyone is OQ-0006-18 (with OQ-0005-AP1), both answered before the first model is
+  committed; legacy screenshots at the same framing; ADR 0003 part 8's measurement harness, whose CPU side the boundary
+  spike builds first and to which this test adds the GPU timestamp queries (its timed marks wait for it, its look work
+  does not); a synthetic recording for the scene; the content crate's whole-set check (a minimal loader, since the
+  content and ability spike comes later); for OQ-0005-AP2, the ported kit builders beside the authored models (ADR
+  0005's share; ADR 0003 part 11).
+- **Place:** wave 1, in parallel with the netcode proof test (they share nothing but the boundary spike's measurement
+  harness); before any art production and before slice 1's renderer.
+- **Size:** L, without making the models, which is sized once OQ-SPIKE-1 is answered; ADR 0005's share S, or M if the
+  kit builders are ported for the families' comparison.
+END
+
+### FIX GE Q1, AD questions routed (SPIKE_PLAN item 5: it gives Mustafa what he needs for OQ-0003-16, -18, -19)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+  R3-GL2-OQ1 and R3-LOOK-OQ6 after their source readings; it gives Mustafa what he needs for OQ-0003-2, -3, -5, -6, -8,
+  -12 and -15, and OQ-0005-AP2.
+AFTER:
+  R3-GL2-OQ1 and R3-LOOK-OQ6 after their source readings; it gives Mustafa what he needs for OQ-0003-2, -3, -5, -6, -8,
+  -12, -15, -16, -18 and -19, and OQ-0005-AP2.
+END
+
+### FIX test-engineer B and infra-engineer routed (SPIKE_PLAN item 6: B9's interim position, PM-0006-32)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **What it proves:** ADR 0006 parts 1, 2 and 3: the client host serves the production and preview header sets as
+  generated, on branch aliases and hash URLs; `crossOriginIsolated` follows the isolation flag in Chrome, Edge, Firefox,
+  Safari and Brave; the content bundle is cached immutably; every file fits the host's 25 MiB limit; **PREV-DELETE:** a
+  closed pull request's build is gone from every link within 24 h; what the access wall covers, with one login per
+  Brave session; whether direct uploads count against the host's build allowance; whether GitHub shows the environment
+  URL.
+- **Pass marks:** PM-0006-1 to PM-0006-10.
+AFTER:
+- **What it proves:** ADR 0006 parts 1, 2 and 3: the client host serves the production and preview header sets as
+  generated, on branch aliases and hash URLs; `crossOriginIsolated` follows the isolation flag in Chrome, Edge, Firefox,
+  Safari and Brave; the content bundle is cached immutably; every file fits the host's 25 MiB limit; **PREV-DELETE:** a
+  closed pull request's build is gone from every link within 24 h; what the access wall covers, with one login per
+  Brave session; whether direct uploads count against the host's build allowance; whether GitHub shows the environment
+  URL; and part 13's B9 interim position: a pull request reaches no deploy secret and no production (OQ-0006-13).
+- **Pass marks:** PM-0006-1 to PM-0006-10, PM-0006-32.
+END
+
+### FIX test-engineer A routed (SPIKE_PLAN item 7: PM-0004-75, conditional until OQ-0004-11 is answered)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Pass marks:** PM-0005-1 to PM-0005-32 (PM-0005-11 only if OQ-0005-CD4 picks option (b)); PM-0004-62 to PM-0004-66.
+AFTER:
+- **Pass marks:** PM-0005-1 to PM-0005-32 (PM-0005-11 only if OQ-0005-CD4 picks option (b)); PM-0004-62 to PM-0004-66,
+  and PM-0004-75 once OQ-0004-11 is answered (which row gives way when a pool is full).
+END
+
+### FIX test-engineer A routed (SPIKE_PLAN item 8: PM-0003-44 to -47)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Pass marks:** PM-0003-18 to PM-0003-42 (PM-0003-40 only if occlusion rays are ever proposed), PM-0003-1 checked
+  again; PM-0003-43 at each later upgrade.
+AFTER:
+- **Pass marks:** PM-0003-18 to PM-0003-42 (PM-0003-40 only if occlusion rays are ever proposed), PM-0003-44 to
+  PM-0003-47 (PM-0003-44 reported until OQ-0003-17 sets its share), PM-0003-1 checked again; PM-0003-43 at each later
+  upgrade.
+END
+
+### FIX OQ-0003-17 and OQ-0003-20 routed (SPIKE_PLAN item 8: the counts and the soaked set it gives the Advisor)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Research spikes it subsumes:** R3-CHAR-REC1 to REC4; R3-BUDGET-REC2, REC3; R3-GL2-REC2; R3-MEASURE-REC1 to REC4
+  (ADR 0003 places REC1 and REC4
+  here); R3-AUDIO-REC1 to REC4; R3-WGPU-REC2 (later). **It decides:** R3-CHAR-OQ1, OQ2, OQ4 (OQ6 only if the draw-call
+  cap is still missed); R3-BUDGET-OQ5, and R3-BUDGET-OQ6 with OQ-0003-4; R3-AUDIO-OQ1, OQ2 (OQ6 only if the built-in
+  panners miss PM-0003-38); it gives Mustafa the numbers for OQ-0003-10.
+AFTER:
+- **Research spikes it subsumes:** R3-CHAR-REC1 to REC4; R3-BUDGET-REC2, REC3; R3-GL2-REC2; R3-MEASURE-REC1 to REC4
+  (ADR 0003 places REC1 and REC4 here); R3-AUDIO-REC1 to REC4; R3-WGPU-REC2 (later). **It decides:** R3-CHAR-OQ1, OQ2,
+  OQ4 (OQ6 only if the draw-call cap is still missed); R3-BUDGET-OQ5, and R3-BUDGET-OQ6 with OQ-0003-4; R3-AUDIO-OQ1,
+  OQ2 (OQ6 only if the built-in panners miss PM-0003-38); it gives Mustafa the numbers for OQ-0003-10, and the Advisor
+  the dropped-frame counts for OQ-0003-17 and the cold and soaked sets for OQ-0003-20.
+END
+
+### FIX GE-5, GE Q2 (SPIKE_PLAN: OQ-SPIKE-1, who makes the look test's models); TE Q1, TE Q2 and the new spike-gating questions in the list
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+## What this plan does not decide
+The order after the netcode proof test, TICK-60-HEADROOM (OQ-0001-1), TICK-60-SETUP (OQ-0001-2), the "100
+ms" reading (OQ-0001-3), the reference machines (OQ-0003-1), the server location (OQ-0006-1, OQ-0006-2) and
+ASSET-RESEARCH's timing are listed for Mustafa and the Advisor in `docs/adr/README.md`, "Decisions the drafts ask for".
+AFTER:
+## What this plan does not decide
+The order after the netcode proof test (J6 (5), with the harness builders it proposes), TICK-60-HEADROOM (OQ-0001-1),
+TICK-60-SETUP (OQ-0001-2: the stand-ins, or wait), the "100 ms" reading (OQ-0001-3), the profiles' split over the two
+directions (OQ-0001-16), the reference machines (OQ-0003-1), the server location (OQ-0006-1, OQ-0006-2), the spikes'
+VMs and their cost (OQ-0006-17, OQ-0006-20), the provisional goal budget (OQ-0006-19), ASSET-RESEARCH's timing and
+OQ-SPIKE-1 below are listed for Mustafa and the Advisor in `docs/adr/README.md`, "Decisions the drafts ask for".
+
+## Open questions
+- **OQ-SPIKE-1. Who makes the look proof test's authored models, and by which route?** *Why it matters:* the look proof
+  test runs in wave 1, before the asset-pipeline research, and needs as glTF/GLB with named material slots a skinned
+  soldier with faction colour slots, the two-floor house with its damage stages and a very large unit of at least 20
+  parts (ADR 0003 part 11); without them the look checklist cannot judge the soldier, the buildings or the very large
+  unit. LOOK_V2 §8's flow makes a model in Spline ("AI-generated for drafts, or a clean model built by Claude") and
+  exports glTF/GLB, but whether that export carries a skin and named slots is not researched (gap G1; OQ-0005-AS3,
+  AS4), and making the models is in no spike's size (the graphics review of 2026-11-02, finding 5 and its question
+  2). *Options:* (a) the slice of the asset-pipeline research that answers OQ-0005-AS3 and AS4 for skinned and
+  multi-part models runs first, and the models are made by the route it finds; (b) the test's own session makes
+  throwaway models by a route the test names, and the research follows later; (c) the test starts without the skinned
+  soldier and leaves its steps for later. *Recommendation:* (a), the graphics review's: a small slice of research, and
+  the look test does not decide the pipeline by accident. *Decider:* Mustafa and the Advisor, with ASSET-RESEARCH's
+  timing. *What decides it:* their reading, before the look proof test starts; the making is sized once it is
+  answered. *Research ids:* none (gap G1).
+END
+
+### FIX GE-5 (SPIKE_PLAN, the asset-pipeline research: its timing now also answers OQ-SPIKE-1)
+FILE: docs/SPIKE_PLAN.md
+BEFORE:
+- **Place:** before the asset spike. **Timing is a decision for Mustafa and the Advisor** (ASSET-RESEARCH in
+  `docs/adr/README.md`): they may move it earlier, for example beside wave 1, if art production should start sooner.
+AFTER:
+- **Place:** before the asset spike. **Timing is a decision for Mustafa and the Advisor** (ASSET-RESEARCH in
+  `docs/adr/README.md`): they may move it earlier, for example beside wave 1, if art production should start sooner;
+  under OQ-SPIKE-1's option (a), its slice on export checks and slot renaming (OQ-0005-AS3, AS4) runs before the look
+  proof test.
+END

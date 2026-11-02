@@ -189,3 +189,87 @@ d0 did not read). Line numbers are HEAD's.
 | no-mark list | GD-2 | yes, purchases at slice 4 (reasoned NOTE: the throwaway sim has no economy) | none |
 | checklist intro, steps 7, 10, 11 | EA-1, NA-3, NA-1 | yes (A24) | none |
 | NOTEs (12) | NA-1 frame wait, GD-3 wording, EA-1 one-frame bound, EA-7/IE-2, PA-5, IE-9/10, SA-13, RR-3, GD-2, RR-8, synthesis, index | sound; two route decision-text changes to netcode-architect (NA-1's frame wait, GD-3's "no correction") that HEAD does not carry and no NOTE of netcode-architect defers | F2, F3 |
+
+## 3. ADR 0002, engine-architect's text (engine-architect-0002-fixes-final.md, 52 FIX)
+
+### 3a. Claims
+
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| E1 | 0002:140–142 | cargo-fuzz needs a nightly (R5-TEST-F4, r5 430–434); one dated nightly in `rust-toolchain.toml` (R5-CI-F12, r5 632–639) | r5 | confirmed | r5:430–432 "needs a nightly compiler since it uses some unstable command-line flags"; r5:633 `channel = "nightly-2020-07-10"` | |
+| E2 | 0002:207–211 | cargo-deny's `sources` class (R5-GATE-F3, r5 954–960), its options not read | r5 | confirmed | r5:957–958 "(advisories, bans, licenses, sources in the chapter list)" | honest about the unread options |
+| E3 | 0002:215–216 | Cargo unifies features over everything one command builds (R5-LAYOUT-F4) | r5 83–91 | confirmed | r5:85 "Cargo will use the union of all features enabled on that dependency" | |
+| E4 | 0002:219–226 | `std::thread::spawn` panics on the default Wasm target (R1-BND-F19, r1 1019–1025); R2-TRN-REC4 (r2 2673–2698); R4-XT-OQ5 (r4 1195–1200); R4-NAV-REC1 (802–810); R4-NAV-REC4 (888–899) | r1, r2, r4 | confirmed | r1:1020 "`std::thread::spawn` will panic"; r4:1195–1196 "Where the bake code lives decides whether the generator ships in the player's Wasm"; r4:888 "Client prediction never runs it" | |
+| E5 | 0002:256–261 | binaryen `--fast-math` (`-ffm`) "Optimize floats without handling corner cases of NaNs, rounding, and negative zero" | binaryen's options, read by rust-reviewer | confirmed (d0 #1) | d0 #1: `src/tools/optimization-options.h` lines 311–318, word for word | |
+| E6 | 0002:261–262 | R1-BND-F19's default feature list (r1 1019–1025) | r1 | confirmed | r1:1023–1025 "multivalue, mutable-globals, reference-types, sign-ext, nontrapping-fptoint …, bulk-memory" | |
+| E7 | 0002:269–303 | block sections incl. weapon pickups (ADR 0004 part 18), floor layer and enclosure area id (ADR 0004 part 14), the event list of ADR 0004 part 19; spatial events released when the interpolation clock reaches their tick (ADR 0001 part 7; R2-SYNC-REC6 line 2210) | ADR 0004; ADR 0001; r2 | confirmed | 0004:443–445 "the local player's floor layer and enclosure area id, written into the output block"; 0004:535–539 the event list; 0001 part 7 at :319–327 | consistent with ADR 0001 part 7 (see consistency table) |
+| E8 | 0002:303–308 | writer trigger 0.05 × 13.33 = 0.67 ms (proposed by rust-reviewer) | arithmetic | confirmed | 0.6665 ms; 13.33 ms is GLOSSARY's client's sim share at 30 Hz | |
+| E9 | 0002:317–322 | a post per block can leave a press up to 2 × 1000 / 30 = 66.67 ms; R1-BND-REC3 mark 2's one tick plus one frame (33.33 + 16.67 = 50.00 ms; r1 2286–2296) | r1; arithmetic | confirmed | r1:2294–2295 "at most one tick plus one frame at p95" | |
+| E10 | 0002:327–330 | without arrival times, up to one tick period of false jitter (0 to 33.33 ms) | arithmetic (NA-4) | confirmed | 1000 ÷ 30 | |
+| E11 | 0002:334–335 | catch-up counted per wake, at most 7 ticks (ADR 0004 part 5, S18) | ADR 0004 | confirmed | 0004:998 S17 "never more than 7 ticks in one wake" | the "at most 7" is S17's (the server loop) restated for the Worker; S18 (the Worker) carries the per-wake reading. Fine |
+| E12 | 0002:336–338 | a fresh view after every call, since growth makes an old view stale (proposed: R1-BND-REC2 names re-binding on growth as a cost of B4, r1 2273–2274) | r1 | confirmed | r1:2273–2274 "B4's zero copies cost … re-binding on growth" | |
+| E13 | 0002:346–349 | "Dev-dependencies do not activate features unless building a Cargo target that needs them" (R5-LAYOUT-F4, r5 83–91) | r5 | confirmed | r5:89 the quoted words | |
+| E14 | 0002:397–400 | the client's sim share covers the sim step only (GLOSSARY lines 214–218) | GLOSSARY | confirmed (as cited in the drafts throughout) | | |
+| E15 | 0002:436–443 | float ban as the allow-list's complement (R1-DET-REC2, r1 2146–2150); `powi`, `hypot`, `cbrt` (R1-DET-F9, r1 648–654, inferred there) and `to_degrees`, `to_radians` carry std's note (std 1.99.1, read by rust-reviewer); `min`/`max`/`clamp` signed zeros, `clamp` panics (R1-DET-F14, r1 679–683) | r1; std via the Rust review | confirmed (d0 #3) | r1:652–653 "that the same note sits on … `powi`, `hypot`, `cbrt` … is inferred"; r1:679–683 the min/max/clamp quotes; d0 #3: std 1.99.1 pages carry "§Unspecified precision" on all five | allow-list matches ADR 0004 part 7 (0004:257–263: `abs`, `fract`, `copysign` allowed) |
+| E16 | 0002:451–455 | std's clock calls panic on `wasm32-unknown-unknown` (std's source, read by rust-reviewer); `-Cpanic=abort` makes it a trap (R1-BND-F19) | std; r1 1019–1025 | confirmed (d0 #2) | d0 #2 `unsupported.rs` lines 12–14, 34–36; r1:1021–1022 "compiled with `-Cpanic=abort`" | |
+| E17 | 0002:528–531 | failure artefacts kept for the retention ADR 0006 sets (part 3; R5 leaves it to infra-engineer, r5 line 2083); "until it is set, the 7 days of build artifacts" | r5 2083; ADR 0006 part 3 | r5 confirmed; the conditional is stale | r5:2083 "infra-engineer: … artefact retention for failures (REC6)"; ADR 0006 part 3 (0006:171–175) now sets it: "CI failure artefacts … are kept 30 days" | Finding F9 (low): "until it is set, the 7 days of build artifacts" → "30 days (ADR 0006 part 3)" |
+| E18 | 0002:539–543 | bench on a CCX23 per session, 20 bench hours a month, 20 × 0.1386 = 2.77 EUR (R6-HOST-F15, r6 150–158) | r6; arithmetic | confirmed | r6:153–154 "CCX23 4 vCPU / 16 GB 86.49 (0.1386)"; 20 × 0.1386 = 2.772 | |
+| E19 | 0002:606–613 | Chrome on Linux WebGPU only on Intel Gen12+ (R3-WGPU-F17, r3 159–162); Firefox not on Linux (F18, 164–169); no adapter falls back (R3-GL2-F12, 279–283); headless Chrome "SwiftShader Device (Subzero)" (R3-MEASURE-F8, 648–653) | r3 | confirmed | r3:160 "Supported on ChromeOS, macOS, Windows, and Linux (Intel Gen12+ GPUs only)"; r3:279–280 "Firefox on Linux … ('Does not support Linux.')"; r3:649 "a 'SwiftShader Device (Subzero)' GPU" | the SwiftShader WebGPU job is labelled not researched |
+| E20 | 0002:645–651 | a `pull_request` run takes its workflow from the PR's merge commit (the contrast R5-PREV-F2 draws, r5 770–774; the security review's reading) | r5; the security review | confirmed (d0 #5) | r5:771–772 "rather than in the context of the merge commit"; d0 #5: GitHub's "Securely using pull_request_target" page: "it runs the workflow file from the merge commit of the pull request" | optional (d0): cite that page's sentence beside R5-PREV-F2 |
+| E21 | 0002:651–653 | the token is account-scoped and the `branch` option lets a deploy name any branch (R5-PREV-F10, r5 823–830); reaching production "an inference" | r5 | confirmed | r5:824–827 "an account-scoped 'Pages Edit' API token"; "unless you add a `branch` option" | inference labelled |
+| E22 | 0002:655–663 | "a job cannot access environment secrets until one of the required reviewers approves it"; "Deployment branches and tags are available for all public repositories" (R5-PREV-F6, r5 796–804); the repository is public (r5 752–754) | r5 | confirmed | r5:798–799 both quotes; r5:752 "The repository is public" | |
+| E23 | 0002:672–678 | a self-signed certificate lives at most 14 days (R2-TRN-REC5, r2 2700–2703); mark 2: new connections succeed with the new hash within one reload (r2 2720–2721); production a trusted certificate (r2 2704) | r2 | confirmed | r2:2700 "valid ≤ 14 days"; r2:2720–2721 "within one reload"; r2:2704 "a publicly trusted certificate per game server hostname" | the supervisor-held rotation is "proposed, not researched", as labelled |
+| E24 | 0002:1020–1025 | macOS runners standard and "free and unlimited on public repositories" (the page R5-CI-F17 read, r5 673–678, which quoted only ubuntu rows; macOS rows read by infra-engineer) | r5; d0 #4 | confirmed (d0 #4) | r5:673–677 (ubuntu rows only); d0 #4: "macOS 3 (M1) … macos-latest" in the standard runners' table | |
+| E25 | 0002:1029–1031 | "a private repository's runners draw on paid minutes (the same page, read at the step-10 review)" | GitHub's runners page | confirmed in substance, wording imprecise (d0 #8c) | d0 #8c: the page says they "draw from your GitHub account's included compute usage, and are then charged at the per-minute rates" | Finding F8 (low): "draw on paid minutes" → "draw on the account's included compute usage and are then billed per minute" |
+| E26 | 0002:1055–1062 | R5-LAYOUT-REC2 puts rooms inside `server` (r5 1173–1174); R4-XT-OQ5 (r4 1195–1200, no answer on one side); R5-XT-OQ6 names both sides (r5 1996–2001); R4-XT-OQ5 = R5-XT-OQ7 | r5; r4 | confirmed | r5:1173 "`server` (the binary with transport and rooms …)"; r4:1197–1198 "Side B: missing answer"; r5:1998–1999 "Side A: R6-HOST-REC3; R2-TRN-REC5. Side B: R5-PREV-REC1"; r5:2002 R5-XT-OQ7 asks the same question | |
+| E27 | 0002 Appendix A, R5-PREV-REC1 | the reviewer gate the REC allows "when wanted" | r5 1597 | confirmed | r5:1597 "and, when wanted, a reviewer gate (F6)" | |
+| E28 | 0002:1057–1060, 645–664, Q4 row | the three new crates are "proposed (not researched)" with OQ-0002-8 for the Advisor | rule 3 | rule kept | the chosen Q4 row says "not researched as a placement … proposed only for the Advisor's ruling at the stop (OQ-0002-8)" | an unresearched option is the proposed structure, but openly and with the rule question routed to the Advisor; not a new breach (it predates the round; the round adds `client-endpoint` under the same label) |
+
+### 3b. Blocks (engine-architect 0002, 52 FIX, 21 NOTE)
+
+| block | finding | resolved? | new problem |
+|---|---|---|---|
+| NA-7 (summary, Decision opening, part 5 input and why, Q10 C1, trade-off, spike item 3, migration skeleton, Appendix A R1-BND-REC3) | the page's posting cadence | yes: newest input once per drawn frame, the Worker builds one command per tick (E9) | none |
+| RR-15 (parts 1, 2) | a dated nightly for fuzz | yes (E1) | none |
+| EA-8, RR-2, EA-12 (crate table, rules, R5-LAYOUT change, Q4, trade-off, migration, Appendix A) | `client-endpoint` crate; no clock in `room`/`client-endpoint`; supervisor crate; lobby crate waits | yes (E4, E28) | E28: `client-endpoint` joins the "proposed, not researched" crates under OQ-0002-8 (rule 3 routed, not new in kind) |
+| RR-10, SA-10 (rules; G5) | same-feature check over four builds; cargo-deny `sources` | yes (E2, E3) | none |
+| RR-7, EA-8, routed b815c85 (part 4) | trap message; `-ffm` in the flag check; shipped file | yes (E5, E6) | none |
+| EA-1, EA-12, RR-5 (part 5, the block) | events on their entity's timeline; floor layer and area id; R1-RR-OQ6 confirmed with three conditions | yes (E7, E8) | none |
+| NA-4, RR-2, RR-6, NA-8, routed b815c85 (control API) | arrival stamps; time as values; fresh memory view; next-tick time; per-wake catch-up | yes (E10–E12) | none |
+| RR-16 (generated types) | derives kept out of shipped builds | yes (E13) | none |
+| NA-15, NA-7, PA-13, routed b815c85 (part 6) | order inside one Worker step; Worker as a whole reported | yes | none |
+| SA-11 (part 7 TS; G8) | CSP-ready build | yes, "proposed, not researched", ESLint pages not read (said) | none |
+| RR-1, RR-2, RR-14 (part 7 Rust) | allow-list complement; clock ban in four crates; client-sent ids through checked lookups | yes (E15, E16) | none |
+| RR-7 (part 8 tools; G10) | determinism on the shipped file | yes | none |
+| TE-7, EA-8 (soak and load) | tick times judged only on the reference server | yes | none |
+| IE-19 (flakes) | failure artefacts' retention | yes in substance | F9: "until it is set, the 7 days" is stale now that ADR 0006 part 3 sets 30 days (E17) |
+| IE-14 (bench method) | the bench's access path and cost | yes (E18), OQ-0006-17 | none |
+| GE-2 (WebGPU in CI; test plan; Appendix A R5-CI-OQ5) | CI never runs WebGPU | yes (E19); the SwiftShader WebGPU job is labelled not researched; the fallback is a reference-machine smoke run | none |
+| SA-1 (Sentry job; part 10; revisit; migration previews; Appendix A R5-PREV-REC1) | production only from `main`; required reviewer on `preview` | yes (E20–E22); points to OQ-0006-13, no OQ-0002-9 | d0 #5's optional citation only |
+| IE-4 (part 10; Appendix A R2-XT-OQ10) | stale hash in a static preview | yes (E23), both shapes, OQ-0006-5 | none |
+| IE-3 (OQ-0002-5) | macOS free on a public repository | yes (E24) | F8: "paid minutes" is imprecise (d0 #8c) |
+| FB-8, EA-8 (OQ-0002-8) | ids line; "no answer on one side" fits R4-XT-OQ5 only | yes (E26) | none |
+| NA-4/NA-7 (spike item 1), EA-1/RR-5 (item 2), PA-13 (item 6), b815c85 (item 7) | spike items follow | yes | none |
+| EA-12 (slice 3) | supervisor enters with `server` | yes | none |
+| NOTEs (21) | routings and alignments | sound; IE-19's routed retention landed in ADR 0006 part 3 (30 days) but ADR 0002 part 8 was not updated to it (F9) | F9 |
+
+### 3c. Claims and blocks (test-engineer A, ADR 0002: 25 FIX in the final file, 2 in -c)
+
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| T1 | PM-0002-3 | "the same number of Wasm calls per tick at N = 12 and N = 48 (at most 4)"; 8 = 4 × 2 | R1-BND-REC1 mark 2, r1 2261–2263 | confirmed | r1:2262–2263 "(at most 4)" | the glue-allocator reason now "proposed" (FC-10) |
+| T2 | PM-0002-6, -9, -12, -13, -23 | R1-BND-REC2 marks 1, 4 (r1 2276–2277, 2280–2281); R1-BND-REC3 marks 1–2 (2292–2295); R1-BND-REC6 mark 2 (2335–2336); p95 = 9,500th of 10,000; 2 × 1000 / 30 = 66.67 | r1; arithmetic | confirmed | r1:2276 "at most one block copy in the worker"; r1:2281 "zero lost or reordered events over a 10-minute match"; r1:2335–2336 "a 100 ms busy loop injected on the page leaves no gap" | PM-0002-9's per-timeline order matches ADR 0002 part 5 and ADR 0001 part 7 |
+| T3 | PM-0002-10 | 0.67 ms = 5 % of 13.33 ms; R1-BND-OQ6 (2737–2740), R1-RR-OQ6 (2951–2954) | r1 | confirmed | | |
+| T4 | PM-0002-77 (new) | the Worker's cast against the newest block is up to one tick off, about 0.3 m at 9 m/s | arithmetic | confirmed | 0.0333 × 9 = 0.30 m | EA-4 resolved |
+| T5 | PM-0002-17, -42 | `enum` bite required; R5-TSLINT-REC1 (r5 1261–1263), R5-TSLINT-F12 (221–224), R5-TSLINT-OQ3 (1770–1772) | r5 | confirmed | r5:1770 "Do the generated types pass `erasableSyntaxOnly`? If ts-rs or wasm-bindgen emit `enum`" | FB-1 resolved; the ambient-enum case honestly left unclaimed |
+| T6 | PM-0002-28 | cites PM-0004-8's one reading (median ≤ 28 ms, p95 ≤ 33.3 ms, mode U); 40 % of 33.33 = 13.33 ms | ADR 0004 PM-0004-8 | confirmed | 0004:1113 "frame time median ≤ 28 ms and p95 ≤ 33.3 ms, mode U … ADR 0002's PM-0002-28 cites this row and sets none of its own" | PA-5 aligned both ways |
+| T7 | PM-0002-29 | 25 × 1,048,576 = 26,214,400; R6-HOST-REC1's 25 MiB (r6 642); R1-RR-OQ5 (2946–2950) | r6; r1 | confirmed | r6:642 "the largest build file stays under 25 MiB" | FC-3: "an input to R1-RR-OQ5, which the Advisor decides" |
+| T8 | PM-0002-33 | trap report with the hook's message; R6-OBS-REC3 (r6 765–766) | r6 | confirmed | r6:765–766 "a deliberate Wasm trap … arrives in Sentry with Rust function names in Chrome, Edge, Firefox and Safari (4 of 4)" | |
+| T9 | PM-0002-41 | `powi`, `to_radians`, `min` bites; `Instant::now()` in `room` and `client-endpoint`; `-ffm`; controls `abs` and `fract` | ADR 0004 part 7; R5-GATE-REC3 G2 (r5 1714) | confirmed | 0004:257–261 allow-list holds `fract` and `abs`; r5:1714 the G2 row | |
+| T10 | PM-0002-44, -45, -46, -51 | G5, G7, G8, G12 rows (r5 1717, 1718 "its size is set once REC4's budget exists", 1719, 1723); R5-LAYOUT-REC2's mark (1191–1192 "only the manifest walk sees a path built at run time") | r5 | confirmed | each line holds the quoted words | |
+| T11 | PM-0002-64 | 1,800 ticks = 1 minute; "every tick runs the newest posted input" | arithmetic; part 5 | confirmed | | NA-7 resolved |
+| T12 | PM-0002-65, -66 | link within 5 min after the build or after the approval (R5-PREV-REC1 mark 1, r5 1600–1601); no checkout or `npm ci` (mark 3, 1602–1603); a production job from a branch refused | r5; part 10 | confirmed | r5:1600 "within 5 min after the build job ends (median of 5 runs)"; r5:1602–1603 | SA-1 resolved; matches ADR 0006's PM-0006-32 (TR) |
+| T13 | PM-0002-76 | 3-hour soak on the reference server; R5-TEST-REC5 (r5 1475–1489) | r5; part 8 | confirmed | | TE-7 resolved |
+| T14 | PM-0002-78 (new) | the Worker's whole cost, reported; heap beside PM-0003-24's 0.5 MB flat rule "for reading, not as a pass" | ADR 0003 PM-0003-24 | confirmed | | PA-13 resolved; "proposed tool, not researched" for the CDP heap read |
+
+Blocks: all 27 resolve their findings (FC-10, RR-6, EA-1, RR-5, NA-7 ×4, EA-4, FB-1 ×2, FB-9, PA-13 ×3, PA-5, FC-3/RR-8/RR-7, RR-9, RR-1/2/7, EA-8/SA-10/RR-10, FB-3, SA-11, GE-2 ×2, SA-1 ×2, TE-7); follow-up c points PM-0002-51 and -64 to PM-0003-46, which exists (0003:1180). New problems: none.
