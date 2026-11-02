@@ -6,3 +6,4 @@ Task: infra-engineer final fix round on ADR 0006 (step 10 fix loop), writing inf
 - Next: extract BEFORE lines by script, write fixes file region by region.
 - 10:28Z: drafting all FIX texts in scratchpad generator (ie-final/gen.py); BEFOREs taken by line ranges at 47eadd9 (= HEAD for 0006).
 - 10:31Z: generator ok (55 FIX, 23 NOTE, no overlap/uniqueness errors); reviewing applied doc
+- 10:34Z: coordinator message (b815c85: ADR 0004 parts 18-19 emit picks/pickups with ticks; seed never stored/sent/logged, SA-15) folded into GD-6 block (now 347-350) and part 9 block (287-288); 3 wording fixes

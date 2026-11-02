@@ -6,3 +6,4 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 10:45 UTC: all findings mapped to ~55 FIX blocks (parts 2,4-13, data flow, state table, catalogue, bandwidth, budgets, failure modes, anti-cheat, Q5/Q6/Q8/Q9/Q10, trade-off, OQ-2/5/6/7, new OQ-15..19, spike items 1 and 5, migration, test plan, rollback, Appendix rows). Writing generator /tmp scratchpad gen_fixes.py next.
 - 10:55 UTC: gen_part1.py written (parts 2,4,5,6,7,8,9f,10,11,12,13). Next: gen_part2.py (data flow to Appendix).
 - 11:05 UTC: gen_part2.py written (data flow .. Revisit when). Next gen_part3.py (OQs, spike, migration, test plan, rollback, appendix) then the apply/verify script.
+- 11:20 UTC: coordinator's routed items from rust-reviewer (b815c85): ROOM-CRASH OQ number (have OQ-0001-19), GD-REJOIN -> OQ-0004-10, uplinks row -> OQ-0004-9, OQ-0001-2 (a) wording per S1, optional part 4 names ADR 0004's prediction step. Folding in now.
