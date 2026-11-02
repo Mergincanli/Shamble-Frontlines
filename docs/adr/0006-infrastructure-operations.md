@@ -168,7 +168,12 @@ interim positions, until its own research before the first online playtest; the 
 3. **Preview cleanup.** 24 h after a pull request closes, its preview link no longer serves the build (HTTP 404, or the
    access wall), or the remaining case is written down with the reason; a weekly sweep leaves 0 previews of closed pull
    requests older than 7 days; build artifacts are kept 7 days, not the default 90 (r5-toolchain-quality.md,
-   Recommendations, Question 6, R5-PREV-REC3, lines 1616–1624). The policy is this record's; the close and sweep jobs
+   Recommendations, Question 6, R5-PREV-REC3, lines 1616–1624). CI failure artefacts (each failure's seed, recording
+   and trace, ADR 0002 part 8) are kept 30 days, and each failure's issue carries its seed, so the run can be repeated
+   after the artefacts expire (proposed: a nightly failure triaged a week later must still have its trace, and 30 days
+   stays far under the default 90 that R5-PREV-REC3 cuts so a public repository keeps little lying around; R5 hands
+   this retention here, r5-toolchain-quality.md, Pointers, line 2083). The policy is this record's; the close and sweep
+   jobs
    are ADR 0002's workflows (seam S3). On Pages "The latest deployment for a branch cannot be deleted" (R5-PREV-F13,
    r5 lines 845–849), so whether a closed pull request's last link really disappears stays a spike item, PREV-DELETE, in
    the preview hosting check (part 14). The first workaround the check tries is a tombstone: a page with no build is
@@ -340,10 +345,12 @@ interim positions, until its own research before the first online playtest; the 
      proposed: the GPU runner's price was not read (R5-CI-OQ5, r5 lines 1835–1837), and self-hosted runners are "a cost
      and security question" (r3-rendering.md, Open questions, R3-MEASURE-OQ2, lines 1384–1385); reference-machine runs
      stay by hand until Mustafa decides (OQ-0006-7).
-   - *The tick bench (proposed):* ADR 0002's tick bench runs on one vCPU of the reference server from slice 1, when no
-     game server is budgeted. A CCX23 is created per bench session and deleted after it, billed by the hour (R6-HOST-F17,
-     r6 lines 164–168) at 0.1386 EUR (R6-HOST-F15), so 20 bench hours a month, a placeholder, cost 20 × 0.1386 =
-     2.77 EUR; who creates and deletes it is OQ-0006-17.
+   - *The tick bench and the playtest soak (proposed):* ADR 0002's tick bench runs on one vCPU of the reference server
+     from slice 1, when no game server is budgeted. A CCX23 is created per bench session and deleted after it, billed
+     by the hour (R6-HOST-F17, r6 lines 164–168) at 0.1386 EUR (R6-HOST-F15), so 20 bench hours a month, a placeholder,
+     cost 20 × 0.1386 = 2.77 EUR. ADR 0002's 3-hour soak before each playtest takes the same path, with its bot clients
+     on a CX33 beside the reference server, never on it (as spike 2's load generators): 3 × (0.1386 + 0.0144) =
+     0.46 EUR a playtest. Who creates and deletes these VMs is OQ-0006-17.
    *Why:* compute dominates and is flat per VM; egress, the cost that grows with players, is zero on Hetzner inside the
    20 TB and about 0.063 USD per room-hour on a per-GB host (r6 lines 706–709). *Ids:* R6-COST-REC1, R6-COST-REC2,
    R6-COST-OQ1, R6-COST-OQ3, OQ4, OQ5, R3-MEASURE-OQ2, R3-XT-OQ5, R5-XT-OQ11, R6-XT-OQ7. *Need:* VISION_V2 §6.1 (rooms
@@ -484,7 +491,7 @@ interim positions, until its own research before the first online playtest; the 
     | B6 | The `textContent` rule (R5-TSLINT-OQ5) | which lint rule enforces it | CLAUDE.md's code rule ("Dynamic or player-provided text: `textContent`, never `innerHTML`") holds by review | 0002 |
     | B7 | Anti-cheat basics: the view-time offset and aim log (R2-SYNC-REC5), Origin-less requests tagged (R2-TRN-REC1), the reader-client and byte-audit tests (R2-INT-REC2, REC5) | the detection policy | built as ADR 0001 designs them; no detection policy | 0001 |
     | B8 | R1-DATA-REC7's allow list and fuzz corpus, with the server-side map validation the STATUS item SEC-MDL-2 asks for (`__proto__` through `envMerge`); COOP as an XS-Leaks guard (R1-BND-REC5) | whether they suffice | as ADR 0005 and ADR 0002 design them (SEC-MDL-2 is ADR 0005's: decision map part j, J2); production non-isolated at the start, so the isolation-only items wait (OQ-0006-12) | 0005; 0002 |
-    | B9 | The tokens CI holds (the client host's deploy tokens, for previews and for production; the Sentry upload token, "a token: Mustafa's secret", r6 line 1082), a multiplayer preview's binary delivery (R6-XT-OQ4), and the Hetzner API token the spikes and the tick bench need (OQ-0006-17) | their scope and handling | each held only by the job that needs it, in a GitHub environment, as R5-PREV-REC1 does for the deploy token (proposed for the others); production deployed only from `main`, in its own environment with its own token; a required reviewer on `preview`; the preview hosting check's token revoked when the check ends; the Hetzner token in a project of its own; all added by Mustafa (below; OQ-0006-13) | 0002 (the jobs); 0006 (the scope) |
+    | B9 | The tokens CI holds (the client host's deploy tokens, for previews and for production; the Sentry upload token, "a token: Mustafa's secret", r6 line 1082), a multiplayer preview's binary delivery (R6-XT-OQ4), and the Hetzner API token the spikes, the tick bench and the 3-hour soak before each playtest need (OQ-0006-17) | their scope and handling | each held only by the job that needs it, in a GitHub environment, as R5-PREV-REC1 does for the deploy token (proposed for the others); production deployed only from `main`, in its own environment `production` with a `main`-only deployment-branch rule and its own token (ADR 0002 part 10); a required reviewer on `preview`, OQ-0006-13's proposed interim (what keeps a rewritten deploy job from the token); the preview hosting check's token revoked when the check ends; the Hetzner token in a project of its own; all added by Mustafa (below; OQ-0006-13) | 0002 (the jobs); 0006 (the scope; OQ-0006-13) |
     | B10 | The staging VM runs pull-request-built native code (R6-XT-OQ4, "PR-built native code on a VM") beside the Prometheus store (part 9) | whether they share a VM | Prometheus shares it, since it holds no secret (if M2 later pushes to Grafana Cloud, its key moves Prometheus off this VM); the batch analysis and every store key stay off it (parts 4 and 12). Fork pull requests get no preview (R5-PREV-REC1), but any branch of this repository can change its own workflow (B9), so that code is treated as untrusted | 0006 |
     | B11 | Self-hosted CI runners (R3-MEASURE-OQ2) | whether any is allowed | none (part 8) | 0006 |
     | B12 | Privilege separation on the VMs: room processes parse hostile network input, and the staging VM runs pull-request-built native code (the security review, finding 4) | how processes and keys are separated, and how far store keys can be scoped | each room process runs as its own unprivileged OS user that cannot read the supervisor's, the lobby's (OQ-0006-3 (a)) or the analysis job's credentials; the staging VM holds no secret beyond its rooms' certificate key (part 4); store keys scoped per bucket, put-only for uploads and read-only for the analysis, where the provider allows (not researched); a dns-01 key, if OQ-0006-5 picks dns-01, on no VM that runs rooms (proposed: a job elsewhere hands each VM its own certificate); while Prometheus runs on the staging VM, the metrics port is the one port of a production VM that pull-request-built code can reach (part 5) | 0006 |
@@ -494,20 +501,22 @@ interim positions, until its own research before the first online playtest; the 
     (r6-infrastructure.md, R6-SEC-OQ1, lines 944–945; r5-toolchain-quality.md, Pointers, lines 2104–2106). The client
     host's deploy token is an API token with the scope the research read, "select *Account*, *Cloudflare Pages* and *Edit*"
     (r5-toolchain-quality.md, Findings, Question 6, R5-PREV-F10, lines 823–830; whether it can be narrowed to one
-    project was not read), held only by the deploy job's environment `preview` (R5-PREV-REC1, r5 lines 1588–1604; ADR
-    0002's job). That environment alone does not keep the token from a branch: a `pull_request` run takes its workflow
+    project was not read), held only by the deploy jobs' environments, `preview` and `production` (R5-PREV-REC1, r5
+    lines 1588–1604; ADR 0002's jobs). The `preview` environment alone does not keep its token from a branch: a
+    `pull_request` run takes its workflow
     from the pull request's merge commit, unlike `pull_request_target`, which "runs in the context of the default branch
     of the base repository, rather than in the context of the merge commit" (R5-PREV-F2, r5 lines 770–774), so any
     branch of this repository (sessions push them) can rewrite the deploy job and use the token, and an
     account-scoped token can then deploy the production player build too (the security review's inference, finding 1).
     **Interim position until the security baseline** (proposed, from that review): (a) production is deployed only by
     its own job on pushes to `main`, in its own environment `production`, limited to `main` by a deployment-branch rule
-    ("Deployment branches and tags are available for all public repositories", R5-PREV-F6, r5 lines 795–803), with its
+    ("Deployment branches and tags are available for all public repositories", R5-PREV-F6, r5 lines 796–804), with its
     own token; (b) `preview` has a required reviewer ("a job cannot access environment secrets until one of the
     required reviewers approves it", the same finding), so each preview deploy waits for Mustafa's approval, unless
     OQ-0006-13 puts production where the preview token cannot reach it; (c) the preview hosting check's token is revoked
-    when the check ends (part 14); (d) the Hetzner API token for the spikes and the tick bench belongs to a Hetzner
-    project of its own, never the production project (a project's token presumably reaches all its VMs: not read;
+    when the check ends (part 14); (d) the Hetzner API token for the spikes, the tick bench and the 3-hour soak before
+    each playtest belongs to a Hetzner project of its own, never the production project (a project's token presumably
+    reaches all its VMs: not read;
     OQ-0006-17). Whether a session, which posts on GitHub as Mustafa's account (CLAUDE.md), could approve a pending
     deploy, and how a deployment-branch rule treats a pull request's merge ref, were not read: the preview hosting
     check tests the second (What a spike must prove, item 1) and OQ-0006-13 carries the first. *Ids:* BASELINE-WHEN,
@@ -809,10 +818,12 @@ Researching it before this record, or leaving it as one shared question: settled
     servers (not researched; R2-TRN-REC5's self-signed, pinned certificates, r2 lines 2700–2703, serve WebTransport
     only): (i) a publicly trusted certificate for a real hostname, which needs the domain (OQ-0006-15); (ii) a private
     test certificate authority installed on the test machines, which needs no domain, but whose key can sign for any
-    name, so the security baseline rules on its handling. For the staging game server, also: whether it presents that
-    trusted certificate on WebTransport too, so multiplayer previews carry no hash and no rotation (part 4); that would
-    depart from R2-TRN-REC5's development and preview certificates and from GLOSSARY §5's definition of the staging
-    game server, which would follow.
+    name, so the security baseline rules on its handling. For the staging game server, ADR 0002 part 10's two shapes:
+    (A) it presents that trusted certificate on both transports, so multiplayer previews pin no hash and the delivery
+    job hands over only the binary; this departs from R2-TRN-REC5's development and preview certificates and from
+    GLOSSARY §5's definition of the staging game server, which would follow; (B) it keeps pinning: the supervisor keeps
+    one certificate per VM across restarts and makes the next one ahead, and the preview's file lists both hashes (part
+    4's interim position). Part 4 states which one the staging game server presents once this is answered.
   - *Decider:* security-auditor in the security baseline, with the port plan (OQ-0006-16); the development and
     staging case before the netcode proof test starts (the Advisor, from a short read).
   - *What decides it:* a read of the chosen certificate authority's policy (Let's Encrypt's pages were outside the
@@ -887,16 +898,19 @@ Researching it before this record, or leaving it as one shared question: settled
     lines 770–774), so any branch of this repository can rewrite the deploy job and use its token, and the Pages token
     is account-scoped as far as was read (R5-PREV-F10, r5 lines 823–830), so it may deploy production too. The first
     such token arrives with the preview hosting check, months before the security baseline (BASELINE-WHEN (b)).
-  - *Options:* (a) a required reviewer on `preview` (part 13's interim position): Mustafa approves each preview
-    deploy (R5-PREV-F6, r5 lines 795–803); whether a session, which posts as his account (CLAUDE.md), could approve
-    one was not read; (b) production in a second Cloudflare account with its own token, so the preview token cannot
-    reach it, and `preview` without a reviewer (not researched; 0 USD if it stays on the Free plan, inferred as in part
-    1); (c) a token limited to the preview project, if Cloudflare offers one (not read). Beside them, the security
-    review's question 1: whether B9's part of the security baseline is read before the foundation's preview step; that
-    review recommends not, since the interim position needs no new research.
+  - *Options:* (a) a required reviewer on `preview`, and on the delivery and Sentry jobs' environments when they run
+    for a preview (part 13's interim position): Mustafa approves each preview deploy ("a job cannot access environment
+    secrets until one of the required reviewers approves it", R5-PREV-F6, r5 lines 796–804); who approves when
+    sessions push and post as his account (CLAUDE.md), and whether GitHub can stop an account approving a run it
+    started, were not read; (b) production in a second Cloudflare account with its own token, so the preview token
+    cannot reach it, and `preview` without a reviewer (not researched; 0 USD if it stays on the Free plan, inferred as
+    in part 1); (c) a token limited to the preview project, if Cloudflare offers one (not read). Beside them, the
+    security review's question 1: whether B9's part of the security baseline is read before the foundation's preview
+    step; that review recommends not, since the interim position needs no new research. ADR 0002 part 10 points here.
   - *Decider:* the Advisor, with security-auditor; Mustafa for a second account and for the approvals (a) asks of him.
   - *What decides it:* a read of GitHub's rules for reviewing pending deployments and of Cloudflare's token scopes,
-    before the foundation's preview step; the preview hosting check's B9 marks (What a spike must prove, item 1).
+    and the approvals' cost per pull request; before the first client-host token is added to this repository; the
+    preview hosting check's B9 marks (What a spike must prove, item 1).
   - *Carries:* no research id (the security review's finding 1 and its question 1).
 - **OQ-0006-14. How do releases reach production while rooms run, and how is a bad server release rolled back?**
   - *Why it matters:* the client host switches production at once (inferred), while rooms still run the previous room binary
@@ -945,8 +959,10 @@ Researching it before this record, or leaving it as one shared question: settled
     measures; the ranges before the netcode proof test (its firewall marks name them), the 443 question before slice 3.
   - *Carries:* no research id (the infra review's finding 7; it is the port plan R6-HOST-OQ6 names, which OQ-0006-5
     carries).
-- **OQ-0006-17. How do sessions get VMs for the spikes and the tick bench without holding a secret?**
-  - *Why it matters:* the netcode proof test and the tick bench (part 8) create VMs and delete them after each
+- **OQ-0006-17. How do sessions get VMs for the spikes, the tick bench and the 3-hour soak before each playtest
+  without holding a secret?**
+  - *Why it matters:* the netcode proof test, the tick bench and the playtest soak (part 8) create VMs and delete them
+    after each
     session, since billing rounds up to the hour (R6-HOST-F17, r6 lines 164–168); a Hetzner API token can do that, and
     presumably reach every other VM of its project (not read), while sessions never read secrets (CLAUDE.md). The SSH
     key of part 5's admin rule raises the same question.
@@ -965,7 +981,7 @@ Researching it before this record, or leaving it as one shared question: settled
     private: standard runners on a private repository "draw from your GitHub account's included compute usage, and are
     then charged at the per-minute rates" (the runners page, read by the infra review on 2026-11-02), on 2-CPU, 8 GB
     Linux runners (R5-CI-F17, r5 lines 673–678), prices not read; and environment reviewers are "only available for
-    public repositories" on the Free, Pro and Team plans (R5-PREV-F6, r5 lines 795–803), so B9's reviewer would need a
+    public repositories" on the Free, Pro and Team plans (R5-PREV-F6, r5 lines 796–804), so B9's reviewer would need a
     paid plan.
   - *Decider:* Mustafa, with ADR 0005's OQ-0005-AP1 (where model files live), before the first authored model is
     committed; the infra review recommends (a) until the first model that must stay unseen.
@@ -1232,7 +1248,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
 
 0. **Before any spike (Mustafa's steps):** the drafts approved; a Cloudflare account with a test project and its
    token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account, the console check
-   of OQ-0006-1 and a Hetzner project of its own for the spikes and the tick bench (OQ-0006-17); a domain, only if
+   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks (OQ-0006-17); a
+   domain, only if
    OQ-0006-15 picks one before the netcode proof test. *Milestone:* the reference server is orderable, or OQ-0006-1
    (b) has named another.
 1. **Spikes (before the foundation):** the netcode proof test with this record's operations marks, and the preview
