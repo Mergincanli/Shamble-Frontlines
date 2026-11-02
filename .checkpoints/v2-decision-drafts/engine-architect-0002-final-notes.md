@@ -1,1 +1,2 @@
 Task: ADR 0002 final fix round (step 10 fix loop), write engine-architect-0002-fixes-final.md from findings at 47eadd9
+- 2026-11-02: read ADR 0002 (unchanged 47eadd9..HEAD), all review findings (SA-1, EA-1/8/12(=13,16), NA-4/7/15, IE-3/4/14/19, FB-8, PA-13, GE-2, RR-1/2/5/6/7/10/14/15/16, TE-7) and the research lines they cite. Plan: FIX blocks grouped by region so no two BEFOREs overlap; new OQ-0002-9 (SA-1 guard, Mustafa); new crate client-endpoint (EA-8); supervisor crate row (EA-12); per-frame input posting (NA-7). Writing engine-architect-0002-fixes-final.md next.

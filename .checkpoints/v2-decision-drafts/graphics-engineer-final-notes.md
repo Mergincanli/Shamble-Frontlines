@@ -5,3 +5,6 @@ Task: final fix round (step 10 / step 9 once more) for ADR 0003 (minus Pass mark
 - PA-8 arithmetic: 786 + 2 bars + 5 VFX kinds + 4..8 projectile kinds + 2..16 post passes = 799..817; hull 1,058+13..31 = 1,071..1,089 (inside 1,100).
 - PA-10: 4 x 16.6 = 66.4 MB multisampled + 16.6 resolve; 3 attachments x 66.4 = 199.2 MB at 1080p; x0.5625 at scale 0.75 = 112 MB.
 - PA-11: 500k / (48 x 2) = 5,208 ~ 5.2k.
+- Verified: _matSig at shamble-core.js:356-359 keys type, colour, emissive, map, gradientMap, side, alpha settings, nature gain; ADR 0001 part 5 (line 203) Worker casts the aim ray; part 7 (line 256) buffer in the Worker; GLOSSARY live projectile kinds (bolt, grenade, Molotov, rocket).
+- Approach: generator script in scratchpad pulls BEFORE by line range from 47eadd9 (exact), AFTER hand-written; then check uniqueness + no overlap + apply to scratch copy.
+- Line ranges confirmed against 47eadd9 snapshot (scratchpad 0003.md/0005.md). Writing generator gen_final.py in scratchpad next.
