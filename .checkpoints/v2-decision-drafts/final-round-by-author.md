@@ -98,6 +98,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
 - Routed by infra-engineer's final batch (ADR 0006 at 8fa7173): the PM-0002-66 bite (a test PR that edits the deploy
   job cannot reach the production token); PM-0001-25 and PM-0001-29 follow ADR 0006's load-generator key (a
   calibration run; the per-address cap raised for the run).
+- Routed by engine-architect's ADR 0002 batch (its NOTEs name what each row needs): PM-0002-6, -9, -10, -29, -41, -44,
+  -51, -64, -66, -76, and a reported Worker-budget row (PA-13).
 
 ## test-engineer, unit B: the "### Pass marks" sections of ADR 0003, 0004, 0005 and 0006 (the look and Feel Lab checklists)
 - ADR 0003: PA-4 (a row for VISION_V2 §6.9's "without dropping frames": count presented frames with the very large
@@ -152,6 +154,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   (a calibration run sizes the load generator; the cap raised); PM-0006-11 created after PM-0006-12; PM-0006-14 uses the
   padded stand-in (the sim step padded to 8.33 ms); a new row for spike 1's B9 test (the preview token cannot publish
   production); the seed added to PM-0006-21's canary (never logged or recorded).
+- Routed by engine-architect's ADR 0002 batch: PM-0003-36 (the WebGPU smoke run, GE-2), PM-0004-23 and PM-0004-74 (the
+  float lint's allow-list and the same-feature check, RR-1, RR-10); its NOTEs name what each row needs.
 
 ## rust-reviewer: ADR 0004, all but "### Pass marks"
 - Medium: EA-3 (the client's prediction step as a sim crate entry point: which phases, on what state, no random stream;
@@ -176,6 +180,9 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   run has: the missing parts burn their ceilings, or say which wave-1 runs are valid); TE-6 low (0004:422, :454–458:
   parts 17 and 19 have no spike claim, test plan line or milestone: planted divergences that change only an event and
   only an economy value).
+- Follow-up (routed by engine-architect's ADR 0002 batch): RR-1's ADR 0004 half: part 7's allow-list of float methods
+  grows to what ADR 0002's lint now allows, and the sim gets helpers for `min`, `max` and `clamp` (signed zero); not in
+  b815c85. A small batch: rust-reviewer-fixes-final-b.md, BEFORE at b815c85.
 
 ## engine-architect, ADR 0002, all but "### Pass marks"
 - High: SA-1 (part 10: the preview job holds no token a branch can rewrite; production deploys only from main, in its
@@ -306,4 +313,8 @@ upheld). The full text, evidence and proposed fix of each is in its file.
   read), -16 (port plan; infra-engineer with netcode-architect, the Advisor confirms), -17 (VMs for spikes and the
   bench; Mustafa with the Advisor), -18 (unreleased art; Mustafa), -19 (the provisional goal budget; Mustafa on the
   Advisor's advice); README's I-6, I-13 and lines 47 and 59 as its NOTE says.
+- Routed by engine-architect's ADR 0002 batch: ENGINE_OVERVIEW lines 37 and 94 (the page posts its newest input each
+  frame; the block's events released on the delayed timeline), the new `client-endpoint` crate in the overview's
+  diagram and text, README rows for OQ-0002-9 (closing the deploy-job gap; Mustafa on the Advisor's advice), line 59's
+  OQ-0002-5 row (macOS costs time, not money), I-13.
 

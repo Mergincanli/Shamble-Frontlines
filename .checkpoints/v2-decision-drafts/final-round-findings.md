@@ -236,3 +236,11 @@ Questions: DROPPED-FRAMES (the Advisor, confirmed by Mustafa: count presented fr
 screen); SS-BANDWIDTH (the Advisor with netcode-architect: the estimate scene for the mean, the cap in the stress
 scene); EFFECTS-WITH-PICKS (the Advisor after Mustafa's levelling answer: keep 8, gate again at slice 4); HEAT-SOAK
 (the Advisor: the soaked run, the cold one reported).
+
+## For fixcheck-d: facts the final round cites to the step-10 reviews, not to the research (check them at their sources)
+From engine-architect's ADR 0002 batch (engine-architect-adr0002-claims.md rows F1–F25): binaryen's `--fast-math` help
+text; std's clock calls panicking on the browser's Wasm target (rust-lang/rust library/std/src/sys/time/unsupported.rs);
+`to_degrees`/`to_radians` carrying std's precision note; macOS runners free on a public repository (GitHub's runner
+page); the merge-commit reading behind SA-1 (a `pull_request` run uses the PR's merge commit's workflow, R5-PREV-F2).
+From rust-reviewer's ADR 0004 batch: R2-ROOM-F8 (r2:1459–1467) for the panic rule; its panic-hook claim was checked
+natively only (Wasm untested).

@@ -10,3 +10,4 @@ Task: infra-engineer final fix round on ADR 0006 (step 10 fix loop), writing inf
 - Written: infra-engineer-fixes-final.md (57 FIX, 24 NOTE; generator re-checked: every BEFORE once, no overlaps, none in Pass marks, order-independent; no text under a table; no retired phrase added). Generator and applied preview in scratchpad ie-final/.
 - Every assigned finding handled: high SA-1, IE-1/EA-5 FIX + OQ-0006-13/-14; mediums all FIX (IE-9/10 and IE-17 partly routed to test-engineer); lows SA-10, SA-11, SA-14, SA-16, IE-15, IE-17, IE-18, IE-20 FIX; coordinator's SA-15/GD-6 item FIX (parts 9, 12).
 DONE
+Task B (follow-up, ~11:40 Amsterdam): ADR 0006 FIXes routed from engine-architect's ADR 0002 batch, BEFOREs at 8fa7173 -> infra-engineer-fixes-final-b.md
