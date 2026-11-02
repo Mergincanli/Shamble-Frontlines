@@ -8,3 +8,5 @@ Task: final fix round (step 10) for ADR 0001 netcode-architect text; write netco
 - 11:05 UTC: gen_part2.py written (data flow .. Revisit when). Next gen_part3.py (OQs, spike, migration, test plan, rollback, appendix) then the apply/verify script.
 - 11:20 UTC: coordinator's routed items from rust-reviewer (b815c85): ROOM-CRASH OQ number (have OQ-0001-19), GD-REJOIN -> OQ-0004-10, uplinks row -> OQ-0004-9, OQ-0001-2 (a) wording per S1, optional part 4 names ADR 0004's prediction step. Folding in now.
 - 11:30 UTC: generator parts 1-3 done incl. coordinator items; writing notes.py and build.py run next.
+- 11:45 UTC: coordinator routed infra (8fa7173: OQ-0006-14 releases, -15 domain, -16 port plan; aim side file 16 B/27.6 MB, 14 days) and engine-architect 0002 items (arrival stamps + ping hold time, newest input per frame, client-endpoint crate, staging certs per OQ-0006-5, timers). Plan: drop my port OQ (use OQ-0006-16), renumber new OQs to -15..-18.
+- 12:00 UTC: build.py run (see result); fixes file written.

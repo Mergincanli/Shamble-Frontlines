@@ -55,7 +55,7 @@ fix("EA-12 (part 3, the lobby's crate)", 191, 192, """
    binary or as its own service); until then no lobby crate is created.
 """)
 
-fix("EA-8, RR-2, RR-10 (part 3, the rules)", 193, 203, """
+fix("EA-8, RR-2, RR-10, SA-10 (part 3, the rules)", 193, 203, """
    The rules, each a gate check (G5, G8, part 9): `sim` depends on `content` only, with no transport, no async runtime
    and no clock, checked with cargo-deny's `deny` plus `wrappers` and with `cargo tree`; `room` and `client-endpoint`
    build for `wasm32-unknown-unknown` and natively, with no async runtime, no transport crate and no wasm-bindgen (the
@@ -64,7 +64,10 @@ fix("EA-8, RR-2, RR-10 (part 3, the rules)", 193, 203, """
    nor the server's I/O (`cargo tree` on the `sim-wasm` build); `client` never reaches `editor`, checked twice: an
    ESLint `no-restricted-imports` rule and a walk of Vite's manifest from the player entry through `imports` and
    `dynamicImports`; `sim-worker` and `net` never import rendering or DOM packages; nothing imports `legacy/` or
-   `spikes/`. `sim` is built with one feature set on every target: it exposes no feature that changes maths, the
+   `spikes/`; every Rust dependency comes from crates.io, checked by cargo-deny's `sources` class at deny (proposed:
+   R5-GATE-F3 lists the class, r5 lines 954–960, but its options were not read; the security review's finding 10),
+   so a git or other-registry dependency fails G5. `sim` is built with one feature set on every target: it exposes no
+   feature that changes maths, the
    maths-relevant features of the dependencies it shares with `server` are set once in `[workspace.dependencies]`,
    and the gate compares the resolved feature list of every `sim` dependency (`cargo tree -e features`) across every
    build that runs the sim (`server`, `devtools`, `navbake` and `sim-wasm`), each made by the exact command CI and the
@@ -217,6 +220,16 @@ fix("NA-15, NA-7, PA-13, routed-b815c85 (part 6)", 327, 330, """
 """)
 
 # ---------------------------------------------------------------- part 7
+fix("SA-11 (part 7, TypeScript: a CSP-ready build)", 349, 351, """
+     `packages/**` and the root config files (not `docs/`, not `legacy/`), in check mode in the gate. The rule
+     "dynamic or player-provided text: `textContent`, never `innerHTML`" holds by review until the security baseline
+     names its lint rule (ADR 0006, part 13, item B6). So that a strict content security policy stays possible, the
+     build is CSP-ready, as ADR 0006's interim position for B3 asks (proposed, not researched; the security review's
+     finding 11): ESLint's core `no-eval` and `no-new-func` are on at error (their pages were not read), the built HTML
+     holds no inline script or style, and the Worker and the Wasm load as files, never from `blob:` or `data:` URLs
+     (checked in G8).
+""")
+
 fix("RR-1, RR-2, RR-14 (part 7, Rust)", 352, 368, """
    - **Rust:** one workspace lint table every crate opts into (`[lints] workspace = true`, itself a gate check):
      `unsafe_code = "deny"`, clippy's `all` at warn, and the gate runs `cargo clippy --workspace --all-targets --locked
@@ -281,22 +294,28 @@ fix("TE-7, EA-8 (part 8, soak and load)", 416, 421, """
 
 fix("IE-19 (part 8, flakes)", 425, 426, """
      through a test-hook API and drive page time with Playwright's clock; no shared global state in Rust tests; every
-     failure keeps its seed, recording and trace as CI artefacts, for the retention ADR 0006 sets for them (part 3), and
-     gets an issue that carries the seed, so the failure still replays after its artefacts expire.
+     failure keeps its seed, recording and trace as CI artefacts, for the retention ADR 0006 sets for failure
+     artefacts (part 3; R5 leaves it to infra-engineer, r5 line 2083; until it is set, the 7 days of build artifacts),
+     and gets an issue that carries the seed, so the failure still replays after its artefacts expire.
 """)
 
 fix("IE-14 (part 8, the bench method)", 432, 433, """
      natively and in Wasm in the Worker on the minimum laptop, as R1-TICK-REC2's P1 and P2 ask. It reports; it never
      passes or fails the gate. The bench needs the reference server from slice 1, before ADR 0006's fleet exists, and CI
-     holds no token for it (timings on shared runners are not hardware results): how a session gets that VM for a bench
-     run without reading a secret, whether it is made and deleted per run, and its cost line are ADR 0006's (part 8 and
-     part 13, item B9); the 3-hour soak before each playtest uses the same path. No bench crate, coverage tool or
-     cargo-nextest is adopted: none was read.
+     holds no token for it (timings on shared runners are not hardware results): it runs on a CCX23 created per bench
+     session in the spikes' own Hetzner project and deleted after it, ADR 0006 part 8's cost line (proposed there: 20
+     bench hours a month, 20 × 0.1386 = 2.77 EUR, R6-HOST-F15, r6 lines 150–158), and who creates and deletes it
+     without a session reading a secret is OQ-0006-17; the 3-hour soak before each playtest uses the same path. No
+     bench crate, coverage tool or cargo-nextest is adopted: none was read.
 """)
 
 # ---------------------------------------------------------------- part 9
-fix("RR-10 (part 9, G5)", 455, 455, """
-   | G5 | dependency rules | part 3's rules (cargo-deny bans and `cargo tree`); `multiple-versions` and `wildcards` at deny with a reviewed skip list; the same-feature check for `sim` across `server`, `devtools`, `navbake` and `sim-wasm`, each built by the command CI and the release use |
+fix("RR-10, SA-10 (part 9, G5)", 455, 455, """
+   | G5 | dependency rules | part 3's rules (cargo-deny bans and `cargo tree`); `multiple-versions` and `wildcards` at deny with a reviewed skip list; the same-feature check for `sim` across `server`, `devtools`, `navbake` and `sim-wasm`, each built by the command CI and the release use; cargo-deny's `sources` at deny (crates.io only) |
+""")
+
+fix("SA-11 (part 9, G8)", 458, 458, """
+   | G8 | player build | walk Vite's manifest from the player entry: no chunk from `editor`; the built HTML of both entries holds no inline script or style, and no Worker or Wasm loads from a `blob:` or `data:` URL (part 7's CSP-ready build) |
 """)
 
 fix("RR-7 (part 9, G10)", 460, 460, """
@@ -326,8 +345,8 @@ fix("SA-1 (part 9, the Sentry upload job)", 503, 505, """
      trap runs in the boundary spike, not in the gate. The job that uploads debug files for Sentry (R6-OBS-REC3) runs
      only on builds that are deployed, in its own GitHub environment that holds the Sentry token, with no checkout of
      pull-request code, shaped like the deploy job it follows and under that job's guard (part 10: `production`'s
-     `main`-only branch rule, or the guard of OQ-0002-9 for a preview); its token scope is ADR 0006's (part 13, item
-     B9).
+     `main`-only branch rule, or `preview`'s required reviewer for a preview); its token scope is ADR 0006's (part 13,
+     item B9).
 """)
 
 # ---------------------------------------------------------------- part 10
@@ -343,11 +362,14 @@ fix("SA-1, IE-4 (part 10)", 519, 539, """
     security review's reading at step 10), so any branch of this repository, which agent sessions push, can rewrite
     the deploy job and use its token. That token is account-scoped (R5-PREV-F10, r5 lines 823–830), and the deploy
     command's `branch` option that finding quotes lets one deploy name any branch, so the token can probably reach
-    production too (an inference; the client host's production rules were not read). What closes the gap until the
-    security baseline rules on CI tokens (ADR 0006, part 13, item B9) is OQ-0002-9; its proposed interim is a required
-    reviewer on `preview` ("a job cannot access environment secrets until one of the required reviewers approves it":
-    R5-PREV-F6, r5 lines 796–804). **Production** is deployed only by its own job, on pushes to `main`, from the
-    artifact `main`'s CI built and tested, in its own environment `production` that holds its own client-host token
+    production too (an inference; the client host's production rules were not read). Until the security baseline
+    rules on CI tokens, ADR 0006's interim position for B9 (part 13) closes the gap: `preview` has a required reviewer,
+    so each preview deploy waits for Mustafa's approval ("a job cannot access environment secrets until one of the
+    required reviewers approves it": R5-PREV-F6, r5 lines 796–804), unless OQ-0006-13 puts production where the preview
+    token cannot reach it; whether a session, which posts as Mustafa's account (CLAUDE.md), could approve a pending
+    deploy was not read and is part of OQ-0006-13. **Production** is deployed only by its own job, on pushes to
+    `main`, from the artifact `main`'s CI built and tested, in its own environment `production` that holds its own
+    client-host token
     behind a deployment-branch rule admitting `main` alone ("Deployment branches and tags are available for all public
     repositories": R5-PREV-F6; the repository is public: r5 lines 752–754); when a release goes out beside running
     rooms is ADR 0006's. The build generates the `_headers` file for
@@ -357,22 +379,24 @@ fix("SA-1, IE-4 (part 10)", 519, 539, """
     a header is missing. The close job and the weekly sweep that delete previews are workflows here; the policy (24 h,
     7 days) and PREV-DELETE are ADR 0006's. **Multiplayer previews** (from slice 3; behind the access wall under
     PREVIEW-WALL (a)): CI's native job builds the room binary like any other artifact; a delivery job shaped like the
-    deploy job, in its own environment under the same guard as `preview` (OQ-0002-9), hands that binary to the staging
-    game server's supervisor (ADR 0006). How the page trusts the staging server is OQ-0006-5's, and a certificate hash
-    written into a preview's static files does not survive a restart: the staging server makes a new self-signed
-    certificate at each start, valid at most 14 days (R2-TRN-REC5, r2-netcode.md, Recommendations, Brief question 4,
-    lines 2700–2703), while R2-TRN-REC5 mark 2 asks that new connections succeed with the new hash within one reload
-    (r2 lines 2720–2721), which a static file cannot give. So either the staging server presents, on both transports,
-    the browser-trusted certificate OQ-0006-5 gives its `wss` endpoint (the kind R2-TRN-REC5 gives production, r2 line
-    2704), and a multiplayer preview pins no hash, the delivery job then handing over only the binary; or, if staging
-    keeps pinning, the supervisor keeps one certificate per VM across restarts and makes the next one ahead, and the
-    preview's file, fetched from its own HTTPS origin (ADR 0001, part 10), lists both hashes. Both shapes are proposed,
-    not researched; the delivery token's scope, and whether pull-request-built native code may run on the staging game
-    server, wait for the security baseline (ADR 0006, part 13, item B9).
+    deploy job, in its own environment with the same required reviewer as `preview` (B9's interim position), hands
+    that binary to the staging game server's supervisor and receives the current and the next certificate hash; the
+    preview deploy job writes both into the preview's own files, which the page fetches from its own HTTPS origin (ADR
+    0001, part 10). One hash would go stale: a self-signed certificate lives at most 14 days (R2-TRN-REC5,
+    r2-netcode.md, Recommendations, Brief question 4, lines 2700–2703), and R2-TRN-REC5 mark 2 asks that new
+    connections succeed with the new hash within one reload (r2 lines 2720–2721), which a static file cannot give. So
+    on the staging VM the supervisor, not each room process, holds the certificate, rotates it every 7 days and makes
+    the next one a full period ahead, and a preview older than one rotation is redeployed (ADR 0006, part 4; proposed,
+    not researched). If OQ-0006-5 instead gives the staging server, on both transports, the browser-trusted certificate
+    its `wss` endpoint needs anyway (the kind R2-TRN-REC5 gives production, r2 line 2704), a multiplayer preview pins
+    no hash and the delivery job hands over only the binary. The delivery token's scope, and whether
+    pull-request-built native code may run on the staging game server, wait for the security baseline (ADR 0006, part
+    13, item B9).
     - Why: a fork run gets no secrets, and the two triggers that hand them out are avoided; splitting build and deploy
       keeps the token away from every build script and dependency; deploying the artifact CI tested means the link shows
       the tested build; a production job on `main` alone keeps every release behind `main`'s review and gate, and the
-      one path left to the preview token, a rewritten job on a branch, is what OQ-0002-9's guard closes.
+      one path left to the preview token, a rewritten job on a branch, is what the required reviewer closes until the
+      baseline (ADR 0006, B9; OQ-0006-13).
 """)
 
 # ---------------------------------------------------------------- options, trade-offs
@@ -401,7 +425,8 @@ fix("EA-8 (trade-off, the crates)", 745, 748, """
 
 fix("SA-1 (consequences, revisit when)", 777, 778, """
   ADR 0006 decides where the lobby runs (its crate); the cache passes 8 GB; ADR 0006 picks Arm hosts (an arm64
-  determinism leg); Mustafa answers OQ-0002-1; the security baseline rules on CI tokens (OQ-0002-9's interim ends).
+  determinism leg); Mustafa answers OQ-0002-1; the security baseline rules on CI tokens, or OQ-0006-13 is answered
+  (B9's interim position ends).
 """)
 
 # ---------------------------------------------------------------- open questions
@@ -414,7 +439,8 @@ fix("IE-3 (OQ-0002-5)", 868, 878, """
     the step-10 review). What is not known is the macOS job's wall time against CI's 10-minute mark (PM-0002-56).
   - Options: (a) on pull requests that touch `client`, `net`, `sim-worker` or `sim` (R5-TEST-REC1); (b) nightly only;
     (c) also an end-to-end suite in real Safari through WebdriverIO (not researched).
-  - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the macOS job's wall time is known.
+  - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the macOS job's wall time is known; the
+    cost is not what holds it back.
   - Decider: this record, from the macOS job's wall time, which infra-engineer measures in the foundation; ADR 0006 and
     Mustafa only if the repository stops being public, since a private repository's runners draw on paid minutes (the
     same page, read at the step-10 review).
@@ -423,7 +449,7 @@ fix("IE-3 (OQ-0002-5)", 868, 878, """
   - Research ids: R5-XQ-OQ1, R5-TEST-OQ4.
 """)
 
-fix("FB-8, EA-8 (OQ-0002-8), SA-1 (new OQ-0002-9)", 897, 912, """
+fix("FB-8, EA-8 (OQ-0002-8)", 897, 912, """
 - **OQ-0002-8. May this record propose a structure no research Options section offers, when a settled input forces it
   and the research leaves the question to this record?**
   - Why it matters: plan rule 3 says an option the research lacks is labelled "not researched" and cannot be the
@@ -442,29 +468,6 @@ fix("FB-8, EA-8 (OQ-0002-8), SA-1 (new OQ-0002-9)", 897, 912, """
     this record.
   - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 (the same question as R5-XT-OQ7)
     and R5-XT-OQ6.
-- **OQ-0002-9. Until the security baseline rules on CI tokens, what keeps a rewritten deploy job from the client-host
-  token?**
-  - Why it matters: a `pull_request` run takes its workflow from the pull request's merge commit (part 10; R5-PREV-F2,
-    r5 lines 770–774), so any branch of this repository, which agent sessions push, can rewrite the preview deploy job
-    and use its account-scoped token (R5-PREV-F10, r5 lines 823–830), which can probably reach production too (an
-    inference). The first such token arrives with ADR 0006's preview hosting check and the foundation's preview step,
-    months before the baseline (BASELINE-WHEN (b)); the binary-delivery and Sentry tokens of parts 9 and 10 face the
-    same path.
-  - Options: (a) a required reviewer on `preview` and on the delivery and Sentry jobs' environments when they run for a
-    preview, so a job gets its token only after a person approves that run ("a job cannot access environment secrets
-    until one of the required reviewers approves it", and reviewers are on the Free plan for public repositories:
-    R5-PREV-F6, r5 lines 796–804; the repository is public, r5 lines 752–754): one approval per preview deploy; who
-    approves, when sessions push and post as Mustafa's account (CLAUDE.md), and whether GitHub can stop an account
-    approving a run it started, were not read; (b) production in a client-host account the preview token cannot reach
-    (not researched: a second account, Mustafa's); (c) both.
-  - Proposed interim: (a), the guard the research read (R5-PREV-REC1: "The environment gives one place for the secret
-    and, when wanted, a reviewer gate", r5 lines 1588–1604), until the baseline rules; (b) only if Mustafa finds the
-    approvals too costly, after a read of the client host's account rules.
-  - Decider: Mustafa (the approvals are his time; a second account is his), on the Advisor's advice, with ADR 0006,
-    part 13, item B9 (the tokens' scope); answered before the first client-host token is added to this repository.
-  - What decides it: the approvals' cost per pull request; a read of GitHub's reviewer rules for an account that
-    started the run, and of whether the client-host token narrows to one project.
-  - Research ids: none of its own; it concerns R5-PREV-REC1 and R6-XT-OQ4 (the delivery token, ADR 0006's B9).
 """)
 
 # ---------------------------------------------------------------- what a spike must prove
@@ -517,9 +520,10 @@ fix("NA-7 (migration, the skeleton)", 1237, 1237, """
 """)
 
 fix("SA-1 (migration, previews)", 1240, 1242, """
-   6. *Previews.* After ADR 0006's preview hosting check, with OQ-0002-9's guard in place: the build, deploy, close and
-      sweep workflows and the generated header sets. *Done when:* a same-repository pull request has its link within 5
-      minutes after the build job ends, or after the reviewer's approval while OQ-0002-9's interim (a) holds
+   6. *Previews.* After ADR 0006's preview hosting check, with B9's interim position in place (ADR 0006, part 13): the
+      build, deploy, close and sweep workflows, the production deploy job and the generated header sets. *Done when:* a
+      same-repository pull request has its link within 5 minutes after the build job ends, or after the reviewer's
+      approval while `preview` requires one
       (median of 5 runs, R5-PREV-REC1 mark 1); the deploy job's header check passes and fails when a header is removed
 """)
 
@@ -549,7 +553,7 @@ fix("RR-5 (Appendix A, R1-RR-OQ6)", 1327, 1327, """
 """)
 
 fix("IE-4, SA-1 (Appendix A, R2-XT-OQ10)", 1331, 1331, """
-| R2-XT-OQ10 | answered: the binary-delivery job; a certificate hash in a preview's static files goes stale, so whether a multiplayer preview pins one is OQ-0006-5's, with part 10's two shapes; the token's scope waits on the security baseline, its guard on OQ-0002-9 | part 10 |
+| R2-XT-OQ10 | answered: the binary-delivery job; a certificate hash in a preview's static files goes stale, so the supervisor gives the current and the next hash and an older preview is redeployed (ADR 0006 part 4), unless OQ-0006-5 gives staging a trusted certificate and previews pin none; the token's scope waits on the security baseline, its guard is B9's interim reviewer | part 10 |
 """)
 
 fix("EA-8, EA-12 (Appendix A, R5-LAYOUT-REC2)", 1337, 1337, """
@@ -557,7 +561,7 @@ fix("EA-8, EA-12 (Appendix A, R5-LAYOUT-REC2)", 1337, 1337, """
 """)
 
 fix("SA-1 (Appendix A, R5-PREV-REC1)", 1363, 1363, """
-| R5-PREV-REC1 | changed: a second client-host token, production's, in its own environment on `main` alone; the reviewer gate the REC allows "when wanted" proposed until the security baseline (OQ-0002-9) | part 10: a branch of this repository can rewrite the deploy job (R5-PREV-F2's contrast) |
+| R5-PREV-REC1 | changed: a second client-host token, production's, in its own environment on `main` alone; the reviewer gate the REC allows "when wanted" on `preview` until the security baseline (ADR 0006, B9; OQ-0006-13) | part 10: a branch of this repository can rewrite the deploy job (R5-PREV-F2's contrast) |
 """)
 
 fix("RR-1 (Appendix A, R5-RUSTLINT-OQ1)", 1379, 1379, """
@@ -572,16 +576,14 @@ NOTES = []
 def note(fid, body):
     NOTES.append((fid, body.strip("\n")))
 
-note("SA-1 (routed)", """
-routed: (1) infra-engineer, ADR 0006 part 13, B9's interim position for the deploy token should name OQ-0002-9 (a
-required reviewer on `preview` proposed until the baseline), the `production` environment with its `main`-only branch
-rule and its own token (ADR 0002 part 10), and the revocation of the spike's test-project token after the preview
-hosting check (0006 part 14); B9's "held only by the deploy job's environment `preview`" (0006:389-394) then reads
-"`preview` and `production`". (2) test-engineer: PM-0002-66 gains SA-1's bite (a test pull request that edits the
-deploy job to print a marker gets no secret before approval), and the preview-link time row (R5-PREV-REC1 mark 1) is
-timed from the reviewer's approval while OQ-0002-9 (a) holds, as migration step 2.6 now says. (3) the synthesis
-(mine, later): a README row for OQ-0002-9 (decider Mustafa, on the Advisor's advice); SPIKE_PLAN item 6's token
-follows B9.
+note("SA-1 (aligned with ADR 0006 at 8fa7173)", """
+fixed in part 10, the Sentry job, migration step 2.6, "Revisit when" and Appendix A: production deploys only from
+`main`, in its own environment `production` with its own token; `preview` and the delivery job's environment have a
+required reviewer under B9's interim position. ADR 0006 already carries the open question (OQ-0006-13, the Advisor with
+security-auditor; Mustafa for a second account and the approvals), so ADR 0002 adds none and points there.
+test-engineer: PM-0002-66 gains the bite (a test pull request that edits the deploy job to print a marker gets no
+secret), and the preview-link time (R5-PREV-REC1 mark 1) is timed from the approval while the reviewer holds.
+infra-engineer (next revision, a nit): ADR 0006 cites R5-PREV-F6 at r5 lines 795–803; at 9e7db28 it is 796–804.
 """)
 note("EA-1 (routed)", """
 routed: netcode-architect, ADR 0001 part 7 states the rule ADR 0002 part 5 now points to: the Worker releases a
@@ -626,30 +628,28 @@ note("NA-15", """
 fixed: part 6 states the order of one local Worker step (command for T, through the loopback, the local server runs
 T, encodes, the client endpoint decodes, reconciles and writes the block).
 """)
-note("IE-3 (routed)", """
-routed: infra-engineer's ADR 0006 Q13 and OQ-0006-7 split macOS (standard, free on a public repository) from GPU
-larger runners; the synthesis (mine): README:59's OQ-0002-5 row reads "the macOS job's wall time" in place of "cost".
+note("IE-3 (aligned with ADR 0006 at 8fa7173)", """
+fixed in OQ-0002-5 as infra-engineer's note asks (cost 0 while the repository is public; the macOS job's wall time
+against PM-0002-56's 10 minutes, measured in the foundation, decides; the interim may stay nightly). The synthesis
+(mine): README line 59's row follows.
 """)
-note("IE-4 (routed)", """
-routed: infra-engineer, OQ-0006-5 names the multiplayer preview's certificate among its consequences, with ADR 0002
-part 10's two shapes (staging presents the trusted `wss` certificate on both transports and previews pin no hash; or
-one certificate per VM kept across restarts, the next made ahead, both hashes listed), and ADR 0006 part 4 says which
-the staging server presents. netcode-architect: ADR 0001 part 10's hash fetched from the page's own origin holds for
-development and the proof test; staging follows OQ-0006-5. The synthesis (mine): README's I-13 row qualifies
-"certificate hash".
+note("IE-4 (aligned with ADR 0006 part 4 at 8fa7173)", """
+fixed in part 10 and Appendix A as ADR 0006 part 4 now reads: the supervisor holds the staging VM's certificate,
+rotates it every 7 days and gives the current and the next hash, the preview lists both, a preview older than one
+rotation is redeployed; if OQ-0006-5 gives staging a trusted certificate on both transports, previews pin no hash.
+The synthesis (mine): README's I-13 row reads "certificate hash, unless OQ-0006-5 gives staging a trusted certificate".
 """)
-note("IE-14 (routed)", """
-routed: infra-engineer, ADR 0006 part 8 (a cost line for the bench's reference-server hours) and part 13, B9 (the
-Hetzner API token, never the production project's), with IE's SPIKE-VM-ACCESS question for Mustafa; ADR 0002 part 8
-now points there for the bench and the 3-hour soak.
+note("IE-14 (aligned with ADR 0006 part 8 at 8fa7173)", """
+fixed in part 8: the bench runs on a CCX23 created per session in the spikes' Hetzner project (ADR 0006 part 8's
+cost line), and who creates it is OQ-0006-17; the 3-hour soak uses the same path.
 """)
 note("IE-19 (routed)", """
-routed: infra-engineer, ADR 0006 part 3 sets the failure artefacts' retention (IE proposes 30 days); ADR 0002 part 8
-now points to it and makes the issue carry the seed.
+fixed in part 8 (the issue carries the seed; the artefacts' retention is ADR 0006 part 3's, the 7 days of build
+artifacts until it sets one). routed: infra-engineer's next revision of ADR 0006 part 3 sets the failure artefacts'
+retention (the infra review proposes 30 days; R5 gives it to infra-engineer, r5 line 2083); 8fa7173 does not yet.
 """)
 note("FB-8", """
-fixed in OQ-0002-8 (folded into the same block as EA-8's wording and the new OQ-0002-9, since they touch the same
-lines).
+fixed in OQ-0002-8 (folded into the same block as EA-8's wording, since they touch the same lines).
 """)
 note("PA-13 (routed)", """
 fixed in part 6 (this record owns the Worker as a whole; reported, no limit until the spike's numbers) and spike item
@@ -684,12 +684,12 @@ schema generator follows the same rule (ADR 0005, CD-3)".
 note("TE-7 (routed)", """
 fixed in part 8; routed: test-engineer's PM-0002-76 names the reference server for the 3-hour soak's tick times.
 """)
-note("SA-10, SA-11 (not in this round's list; their ADR 0002 halves)", """
-deferred: SA-10's G5 half (cargo-deny's `sources` class at deny, crates.io only) rests on a class the research only
-lists (R5-GATE-F3, r5:954-960), so the rule belongs with the security baseline's B1 (infra-engineer's row) and joins
-G5 when it rules. SA-11's part 7 half (`no-eval`, `no-new-func`) is deferred by part 7's own rule that lints whose
-sources were not read are not added; B3's "CSP-ready build" (infra-engineer) can name them, and part 7 follows the
-baseline.
+note("SA-10, SA-11 (routed by ADR 0006 at 8fa7173)", """
+fixed: G5 and part 3's rules add cargo-deny's `sources` class at deny, crates.io only (proposed; R5-GATE-F3 lists the
+class, its options not read); part 7 adds ESLint's `no-eval` and `no-new-func` and the CSP-ready build (no inline
+script or style, the Worker and the Wasm as files), checked in G8, as B3's interim position asks. test-engineer:
+PM-0002-42 (G3), PM-0002-44 (G5) and PM-0002-46 (G8) gain the matching bites (an `eval` in `client`; a git
+dependency; an inline script in the built HTML).
 """)
 
 # ---------------------------------------------------------------- checks and output
@@ -698,7 +698,7 @@ for (s1, e1, f1), (s2, e2, f2) in zip(ranges, ranges[1:]):
     assert e1 < s2, f"overlap: {f1} ({s1}-{e1}) and {f2} ({s2}-{e2})"
 out = []
 out.append("# ADR 0002: the final fix round (plan step 10's fix loop), engine-architect, 2026-11-02\n")
-out.append("Fixes against `docs/adr/0002-code-structure-build-toolchain.md` at 47eadd9 (unchanged through HEAD 208af0d). Every")
+out.append("Fixes against `docs/adr/0002-code-structure-build-toolchain.md` at 47eadd9 (unchanged through HEAD 81e992e; aligned with ADR 0004 at b815c85 and ADR 0006 at 8fa7173). Every")
 out.append("BEFORE is copied by script (engine-architect-0002-fixes-final-gen.py) from that file by line range, occurs exactly")
 out.append("once there, and no two overlap; applying them in file order was checked. The \"### Pass marks\" section is not")
 out.append("touched (test-engineer's); what its rows must follow is in the NOTE blocks. Findings that touch the same lines")

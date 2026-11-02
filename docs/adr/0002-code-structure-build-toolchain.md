@@ -9,9 +9,10 @@ simulation and the TypeScript page runs. One repository holds a Cargo workspace 
 (the TypeScript packages, built with Vite), with every tool pinned to an exact version; the legacy game moves to
 `legacy/` and stays playable by double-click; throwaway spikes live in `spikes/`. The simulation depends on nothing
 above it, and a gate check proves that. In the browser the simulation runs in one Web Worker, which also runs the local
-server from slice 1 and owns the network connection online; the page gets one block of data per tick and posts one
-command per tick, so no call crosses the boundary per entity or per frame. TypeScript types are generated from the Rust
-code. One command, the gate v2, runs the same checks locally and in CI and proves itself with planted defects; every
+server from slice 1 and owns the network connection online; the page gets one block of data per tick, posts its newest
+input once per drawn frame and never calls into Wasm, so nothing crosses the boundary per entity. TypeScript types are
+generated from the Rust code. One command, the gate v2, runs the same checks locally and in CI and proves itself with
+planted defects; every
 pull request from this repository gets a [preview](../research/GLOSSARY.md#preview) link. The reason: the settled stack runs one Rust simulation natively on the server and as Wasm in the
 browser, and VISION_V2 asks for four desktop browsers on a modest laptop and 48 players; [the foundation](../research/GLOSSARY.md#the-foundation) the Advisor defined is exactly this structure,
 and the R1 and R5 research found one way to build it that is checked by machines rather than by memory.
@@ -123,8 +124,9 @@ and the R1 and R5 research found one way to build it that is checked by machines
 
 One repository, two pinned workspaces (Cargo for Rust, npm with Vite for TypeScript), and a list of crates and packages
 in which the simulation depends on nothing above it, proven by gate checks. In the browser the simulation runs in one
-module Web Worker that also runs the local server and owns the network connection; the page and the Worker exchange one
-command per tick one way and one transferred block per tick the other way, so nothing crosses per entity or per frame.
+module Web Worker that also runs the local server and owns the network connection; the page posts its newest input to
+the Worker once per drawn frame and the Worker sends the page one transferred block per tick, so nothing crosses per
+entity and the page never calls into Wasm.
 Types that cross the boundary are generated from Rust. One gate command runs the same checks locally and in CI and
 proves itself with planted defects; budgets live as data. Every pull request from this repository gets a preview link
 built from the tested artifact. Each part says what, why, its research ids and the need it serves. Lines are at commit
@@ -135,7 +137,9 @@ built from the tested artifact. Each part says what, why, its research ids and t
    `legacy/`, which keeps their relative paths, so `legacy/index.html` still runs by double-click; the legacy hard
    constraints then apply to `legacy/` only (SPIKE-SCOPE (a)). Beside it at the root: `Cargo.toml` (a virtual
    workspace) with `crates/*`, `package.json` (npm workspaces) with `packages/*`, `spikes/` for throwaway spikes,
-   `fuzz/` (outside the workspace's default members, because cargo-fuzz needs a nightly compiler), and `docs/`.
+   `fuzz/` (outside the workspace's default members, because cargo-fuzz needs a nightly compiler: R5-TEST-F4, r5 lines
+   430–434; it carries its own `rust-toolchain.toml` that pins one dated nightly, a channel form R5-CI-F12 quotes, r5
+   lines 632–639, so the fuzz jobs' compiler is pinned like every other: part 2), and `docs/`.
    Nothing in `crates/` or `packages/` imports from `legacy/` (R5-TSLINT-REC2's import rule) or from `spikes/` (the
    same rule; spikes are throwaway). Today's gate and the legacy oracle (`tools/preview.js`, `sim.js`, `battery.js`,
    `tuning-dump.js`) keep working on `legacy/`, so critical fixes stay guarded and golden values can still be captured
@@ -160,7 +164,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
    compared with the lock before bindings are generated; we use the wasm-bindgen CLI directly, not wasm-pack, because
    the CLI is what R5-CI-REC3 pins and checks, and wasm-pack sits among the rustwasm repositories that were to be
    archived or handed to their maintainers (R1-BND-F1; wasm-pack's own pages were not read). Each toolchain bump
-   (Rust, clippy and rustfmt, Node, TypeScript, wasm-bindgen) is its own change-set that reports the new warnings.
+   (Rust, clippy and rustfmt, the fuzz jobs' dated nightly, Node, TypeScript, wasm-bindgen) is its own change-set that
+   reports the new warnings.
    A weekly job tests the latest dependency versions without blocking (`continue-on-error`).
    - Why: one file pins local, CI and agent builds; the identical-results check between native and Wasm means
      something only when both come from one compiler; typed lint needs TypeScript below 6.1.
@@ -179,42 +184,55 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | `sim` | the simulation: state, phases, tick, the navigation runtime (ADR 0004) | `content` only (and its maths dependencies, ADR 0004); no transport, no async runtime, no clock | the foundation | §6.1–§6.5 |
    | `content` | loads and validates content data (ADR 0005) | nothing above it | slice 1 (weapons are data) | §6.3, §6.7 |
    | `protocol` | message types, the codec, decoders that never panic, the Rust side of the thin transport interface with its loopback backend (ADR 0001) | `sim` and `content` types only, as ADR 0001 needs them; no transport crate, no async runtime (it builds for Wasm) | the foundation | §6.1 |
-   | `room` | the room's match logic with no I/O and no async runtime: the slot table, bots filling slots through the input path, per-client command queues, per-client snapshot and event encoding through `protocol` (ADR 0001 decides what it does) | `sim`, `protocol`, `content` | the foundation | §6.1; SLICE-ORDER condition 1 |
-   | `sim-wasm` | the wasm-bindgen bindings the Worker loads: the client endpoint (prediction, snapshot decoding, the block writer) and the local server (`room` + `sim`) | `sim`, `room`, `protocol`, `content` | the foundation | §6.2, §6.9 |
+   | `room` | the room's match logic with no I/O, no async runtime and no clock (its timers count ticks): the slot table, bots filling slots through the input path, per-client command queues, per-client snapshot and event encoding through `protocol` (ADR 0001 decides what it does) | `sim`, `protocol`, `content` | the foundation | §6.1; SLICE-ORDER condition 1 |
+   | `client-endpoint` | the client endpoint, with no bindings, no transport, no async runtime and no clock: prediction and reconciliation, the interpolation buffer, snapshot decoding through `protocol`, the aim cast, the block writer and the block's layout table (part 5); built for Wasm inside `sim-wasm` and natively for the headless clients of part 8 | `sim`, `protocol`, `content` | the foundation | §6.2, §6.9 and §4, as `sim-wasm`, whose code it holds; §3, §6.1 and §6.6 through the headless clients (R5-TEST-REC4, REC5) |
+   | `sim-wasm` | the wasm-bindgen bindings the Worker loads, and nothing else: around the client endpoint (`client-endpoint`) and the local server (`room` + `sim`) | `client-endpoint`, `room`, `sim`, `protocol`, `content` | the foundation | §6.2, §6.9 |
    | `server` | the room process: transport on quinn and the WebSocket fallback, the async runtime, the supervisor hook, metrics (ADR 0001, ADR 0006) | `room`, `protocol`, `sim`, `content` | slice 3 (online) | §6.1, §6.5, §6.6, §6.8 |
-   | `devtools` | the replay runner, the hash comparer, the tick bench, the legacy-golden reader | anything | the foundation | §6.6, §6.8 |
+   | `supervisor` | the small supervisor on every game VM (R6-HOST-REC2, r6-infrastructure.md lines 645–647; ADR 0006 part 5): it starts, watches and ends room processes; what else it does is ADR 0006's | what ADR 0006 gives it; it runs room processes as programs and links no `sim`, `room` or `sim-wasm` code | slice 3 (online) | §6.1 |
+   | `devtools` | the replay runner, the hash comparer, the tick bench, the legacy-golden reader, the headless protocol clients of the network and soak layers (part 8) | anything | the foundation | §6.6, §6.8; the headless clients: §3, §6.1 (R5-TEST-REC5) |
    | `navbake` | the navigation bake (ADR 0004's generator), run by CI, on map save and in the editor's Test | `sim`, `content` | slice 2 (bots) | §6.2 (bots between levels) |
 
    The packages: `client` (the player entry: input, camera, HUD, rendering), `editor` (its own entry), `sim-worker`
    (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the browser's two backends of ADR 0001's thin
    transport interface, WebTransport and WebSocket, which R2-TRN-REC4 puts in TypeScript), `types` (generated types, part 5) and `e2e`
-   (Playwright tests). The lobby and the room supervisor get a crate when ADR 0006 decides where the lobby runs
-   (OQ-0006-3: the supervisor's binary or its own service); until then no crate is created for them.
+   (Playwright tests). The lobby gets a crate when ADR 0006 decides where it runs (OQ-0006-3: inside the supervisor's
+   binary or as its own service); until then no lobby crate is created.
    The rules, each a gate check (G5, G8, part 9): `sim` depends on `content` only, with no transport, no async runtime
-   and no clock, checked with cargo-deny's `deny` plus `wrappers` and with `cargo tree`; `room` builds for
-   `wasm32-unknown-unknown` with no async runtime and no transport crate (the same two tools); `content` depends on
+   and no clock, checked with cargo-deny's `deny` plus `wrappers` and with `cargo tree`; `room` and `client-endpoint`
+   build for `wasm32-unknown-unknown` and natively, with no async runtime, no transport crate and no wasm-bindgen (the
+   same two tools), and read no clock (part 7's clock ban); `content` depends on
    nothing above it; `sim-wasm` never depends on `navbake` or `server`, so the player's Wasm carries neither the bake
    nor the server's I/O (`cargo tree` on the `sim-wasm` build); `client` never reaches `editor`, checked twice: an
    ESLint `no-restricted-imports` rule and a walk of Vite's manifest from the player entry through `imports` and
    `dynamicImports`; `sim-worker` and `net` never import rendering or DOM packages; nothing imports `legacy/` or
-   `spikes/`. `sim` is built with one feature set on every target: it exposes no feature that changes maths, the
+   `spikes/`; every Rust dependency comes from crates.io, checked by cargo-deny's `sources` class at deny (proposed:
+   R5-GATE-F3 lists the class, r5 lines 954–960, but its options were not read; the security review's finding 10),
+   so a git or other-registry dependency fails G5. `sim` is built with one feature set on every target: it exposes no
+   feature that changes maths, the
    maths-relevant features of the dependencies it shares with `server` are set once in `[workspace.dependencies]`,
-   and the gate compares the resolved feature list of every `sim` dependency (`cargo tree -e features`) between the
-   `server` build and the `sim-wasm` build.
+   and the gate compares the resolved feature list of every `sim` dependency (`cargo tree -e features`) across every
+   build that runs the sim (`server`, `devtools`, `navbake` and `sim-wasm`), each made by the exact command CI and the
+   release use, since Cargo unifies features over everything one command builds (R5-LAYOUT-F4).
    - Why: a mechanical check is the only kind that holds the boundaries R1 and R2 ask for (the legacy fence leaked,
      row CS11); Cargo unifies features over everything built together (R5-LAYOUT-F4), so the server could change the
      native sim's maths.
-   - Changed from R5-LAYOUT-REC2 (r5 lines 1170–1193): two crates are added and none removed. `room`, because
+   - Changed from R5-LAYOUT-REC2 (r5 lines 1170–1193): three crates are added and none removed. `room`, because
      SLICE-ORDER condition 1 runs the local server in the Worker, and the Worker cannot carry the server's async
      runtime and transport (on the default Wasm target `std::thread::spawn` panics: R1-BND-F19, r1 lines 1019–1025;
      the simulation depends on no I/O: R2-TRN-REC4, r2-netcode.md lines 2673–2698); R5-LAYOUT-REC2 predates
      SLICE-ORDER and puts rooms inside `server`. `navbake`, because where the bake lives decides whether the generator
      ships in the player's Wasm (the critic's R4-XT-OQ5, r4-physics-navigation.md lines 1195–1200), and the bake runs in
      CI, on map save and in the editor's Test (R4-NAV-REC1, r4 lines 802–810), never in prediction (R4-NAV-REC4, r4
-     lines 888–899). Both placements answer questions the critic gave this record; no research compared them with
-     other placements. Both are proposed (not researched): no research Options section offers a crate for the room
-     logic or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; whether plan rule 3
-     allows that is OQ-0002-8, for the Advisor at the stop.
+     lines 888–899). `client-endpoint`, because ADR 0001's network marks run the client endpoint's Rust code natively
+     and headless, and so do the soak and load layers (part 8), while R5-LAYOUT-REC2 names no crate for that code but
+     the bindings crate: the headless clients would otherwise need a native build of a bindings crate or a second copy
+     of the endpoint. The code is the same; only its crate is new. The first two answer questions the critic gave this
+     record and the third follows from ADR 0001's headless tests; no research compared them with other placements. All
+     three are proposed (not researched): no research Options section offers a crate for the room logic, the client
+     endpoint or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; whether plan rule 3
+     allows that is OQ-0002-8, for the Advisor at the stop. The supervisor's crate (slice 3) is beyond R5's list too,
+     but the research asks for it: R6-HOST-REC2 puts a small supervisor on every VM (r6-infrastructure.md lines
+     645–647), which ADR 0006 part 5 adopts.
    - The cache question (critic rank 40) is answered by this list: no ECS crate (ADR 0004, part 1) and parry3d rather
      than Rapier (ADR 0004, part 10), quinn and the WebTransport crate the netcode proof test picks (ADR 0001, part 10);
      the cache is measured on this workspace against R5-CI-REC1's 8 GB mark in the foundation (part 9).
@@ -230,9 +248,17 @@ built from the tested artifact. Each part says what, why, its research ids and t
    overflow. The panic strategy: the server's room process keeps Rust's default `panic = "unwind"`, with each
    connection's work isolated from the room's tick and decoders that never panic (R2-ROOM-REC2); the Wasm build keeps
    the target's default `-Cpanic=abort` (R1-BND-F19), so a trap ends the sim's instance, and the restart after a trap
-   is ADR 0004's (part 20) with ADR 0001's resync path. The server is built for baseline x86-64, never with `+fma`,
+   is ADR 0004's (part 20) with ADR 0001's resync path. A trap carries no panic message, so the Wasm build's panic
+   hook (ADR 0004 part 20, S20) writes the message and location into a fixed buffer in linear memory, and when the
+   instance traps the Worker's host reads that buffer, through a fresh view of the memory (part 5), and attaches it to
+   the trap's report. The server is built for baseline x86-64, never with `+fma`,
    `-C target-cpu=native` or the `relaxed-simd` target feature: the gate reads the build flags of `sim`, `room`,
-   `sim-wasm` and `server` and fails if one appears (the rule is ADR 0004's, part 7; the check is this record's).
+   `client-endpoint`, `sim-wasm` and `server` and fails if one appears (the rule is ADR 0004's, part 7; the check is
+   this record's). If wasm-opt is kept (R5-CI-OQ4), the check reads its command line too, because wasm-opt optimizes
+   the shipped Wasm after rustc: it fails on binaryen's `--fast-math` (`-ffm`, "Optimize floats without handling
+   corner cases of NaNs, rounding, and negative zero" in binaryen's own options, read by rust-reviewer at the step-10
+   review; not in the research) and on any feature flag beyond the target's defaults (R1-BND-F19's list, r1 lines
+   1019–1025), `relaxed-simd` above all.
    `unsafe_code` is denied in every crate; an exception needs a written invariant, a test and an `#[allow]` with its
    reason. The Wasm size budget has no research number, and this record owns it (R1-RR-OQ5): the boundary spike and
    the sim core spike measure the `sim-wasm` file (raw and gzip, after wasm-opt and without it, `opt-level` "s" against
@@ -255,38 +281,73 @@ built from the tested artifact. Each part says what, why, its research ids and t
      once into a pooled `ArrayBuffer` and transferred to the page. It holds a header (tick, layout hash, counts per
      entity kind), aligned sections per entity kind (soldiers, vehicle parts, projectiles, structures, weapon pickups,
      which are sim entities under UPGRADE-SCOPE, ADR 0004 part 18), one section of owner-only data for the local player
-     (own weapon state, money, upgrade tracks and offers: decision map I-21) and the event section for the tick (the
+     (own weapon state, money, upgrade tracks and offers: decision map I-21; the floor layer and enclosure area id the
+     roof fade needs: ADR 0004 part 14) and the event section (the
      events of ADR 0004 part 19: hits, deaths and kills, blasts, cosmetic shot events, purchases, uplink cache events,
      harvester deliveries and kills, structure kills and stage changes, tech tiers, upgrade picks and pickups, and the
      moments its moment phase emits; ADR 0001 sets their visibility). Online, remote entities are written at the
      interpolation delay from the Worker's interpolation buffer and the local player as predicted (ADR 0001 parts 4,
      6, 7); the fields of remote
-     entities are ADR 0001's snapshot fields in this record's layout. The page binds typed-array views on the block
-     with no copy, keeps the two newest blocks to interpolate between ticks (R1-TICK-REC5) and returns older ones to
-     the pool. Whether a section is laid out per entity or per field is measured in the boundary spike (bytes per tick
-     and copy time at N = 48); ADR 0003 reads typed arrays either way. The block writer serializes field by field
-     (proposed: R1-DET-REC6's method for [the state hash](../research/GLOSSARY.md#state-hash), applied to the block;
-     R1-RR-OQ6's decider, rust-reviewer, confirms at review), so struct padding never reaches the page and no `unsafe`
-     is needed; if the spike's copy time says otherwise, R1-RR-OQ6's two alternatives (a derive that rejects padding,
-     or `unsafe` with a written invariant and a test) are weighed then. The SharedArrayBuffer ring (B3) is the spike's
+     entities are ADR 0001's snapshot fields in this record's layout. The event section holds the events due at that
+     block, each on the timeline of the entity it belongs to: the Worker releases a remote entity's spatial event (an
+     action start, a death, a blast on the entity it hit) when its interpolation clock reaches the event's tick, and
+     the local player's own, predicted and owner events at once; a local match does the same, since its client
+     endpoint is the same code (the rule is ADR 0001 part 7's; r2-netcode.md, Recommendations, Brief question 1,
+     R2-SYNC-REC6, line 2210: blasts "played on the timeline of the entity they hit"). The page binds typed-array views
+     on the block with no copy, keeps the two newest blocks to interpolate between ticks (R1-TICK-REC5) and returns
+     older ones to the pool. Whether a section is laid out per entity or per field is measured in the boundary spike
+     (bytes per tick and copy time at N = 48); ADR 0003 reads typed arrays either way. The block writer serializes
+     field by field (R1-DET-REC6's method for [the state hash](../research/GLOSSARY.md#state-hash), applied to the
+     block), so struct padding never reaches the page and no `unsafe` is needed. R1-RR-OQ6's decider, rust-reviewer,
+     confirmed this at the step-10 review on three conditions: one layout table in Rust drives the writer, the
+     generated offsets and the layout hash, so the three cannot drift; every integer is written at a fixed width (never
+     `usize`) and little-endian (`to_le_bytes`); each section is aligned to its largest element type, so the page's
+     typed-array views bind with no copy. R1-RR-OQ6's two alternatives (a derive that rejects padding, or `unsafe` with
+     a written invariant and a test) are weighed only if the writer's p99 in Wasm on the minimum laptop exceeds 5 % of
+     the client's sim share at 30 Hz (0.05 × 13.33 = 0.67 ms; proposed by rust-reviewer: below that the writer cannot
+     decide that mark). The SharedArrayBuffer ring (B3) is the spike's
      measured alternative, never the sim's own shared Wasm memory (B4). At the 30 Hz baseline that is 30 blocks a second
      (one per tick).
-   - **One command per tick, posted** from the page to the Worker (option C1): a sequence number, the move input, the
-     held-button bitmask and press and release edge counters (their exact fields are ADR 0001's), plus the camera's
-     cursor ray and the view time the page drew; the Worker casts that ray against the state it published and fills the
-     network command's aim point (ADR 0001 part 5; decision map I-19), so the aim needs no second message. The Worker
-     stamps the tick it applies the command to.
+   - **The newest input, posted once per drawn frame,** from the page to the Worker (option C1, changed in its cadence):
+     a sequence number, the move input, the held-button bitmask and press and release edge counters kept as running
+     totals (their exact fields are ADR 0001's), plus the camera's cursor ray and the view time of the frame the page
+     drew. At each tick the Worker takes the newest post (the running totals mean a superseded post loses no press),
+     casts its ray against the state it published for that view time and fills the tick's one network command, aim
+     point included (ADR 0001 part 5; decision map I-19), so the aim needs no second message. The Worker stamps the
+     tick it applies the input to. Why per frame: the page has no tick clock (its only tick signal is the block), so a
+     post per block can leave a press waiting up to two tick periods less the block's delivery before a tick applies it
+     (2 × 1000 / 30 = 66.67 ms at 30 Hz), against R1-BND-REC3 mark 2's one tick plus one frame (33.33 + 16.67 =
+     50.00 ms with a 60 Hz display; r1-simulation-core.md, Recommendations, unit boundary-worker, R1-BND-REC3, lines
+     2286–2296); a post per frame bounds the wait by one frame plus one tick plus the message's delivery, and the
+     page's work stays one small message per frame.
    - **The small control API** (create, mode flag, load the content bundle, one input call per tick, and the step) is
-     wasm-bindgen's own, with its `.d.ts` (option D1). Each tick the Worker's host makes one input call, which carries
-     the page's command and every datagram received since the last tick, and one step call; the step leaves the
-     outgoing datagrams and the block in linear memory and returns where they lie. The Worker's Wasm calls per tick,
+     wasm-bindgen's own, with its `.d.ts` (option D1). Each tick the Worker's host makes one input call and one step
+     call. The input call carries the page's newest input; every datagram received since the last tick, each with the
+     time it arrived (the host's `performance.now()` in that datagram's own message event, never the tick's time); the
+     time the host sent the previous step's datagrams; and the host's current time, all as plain values, since Rust
+     reads no clock of its own (part 7). Without arrival times every clock and jitter sample of ADR 0001 parts 5 and 7
+     would carry up to one tick period of false jitter (0 to 1000 / 30 = 33.33 ms at 30 Hz); those samples use the
+     stamps, and how a ping answered at the next tick reports its hold time is ADR 0001's (part 5). The step leaves the
+     outgoing datagrams and the block in linear memory and returns where they lie and when the next tick is due: in
+     local play from the plain accumulator, online from the client endpoint's server-time estimate, since online the
+     Worker's tick runs ahead of the server's by ADR 0001's rule for keeping commands just in time (OQ-0001-6). The
+     host sets its timer from that, never from a count of its own, and the catch-up it allows is counted per wake of
+     the Worker, at most 7 ticks (ADR 0004 part 5, S18). The host reads the step's output through a fresh view of the
+     instance's `memory.buffer` after every call, never a cached one, since growth makes an old view stale (proposed:
+     R1-BND-REC2 names re-binding on growth as a cost of B4, r1 lines 2273–2274). The Worker's Wasm calls per tick,
      wasm-bindgen's glue calls included, are meant to stay within R1-BND-REC1 mark 2's four, which the spike counts
      (item 1); none is made per entity.
    - **Generated types, from three sources, into one committed package** `packages/types`: wasm-bindgen's `.d.ts` and
      glue are build output (ignored); our own small generator writes the block's layout (offsets, strides, element
-     types) and its layout hash, which the page checks at startup (option D4); ts-rs writes the protocol and message
+     types) and its layout hash from the layout table the writer uses (above), and the page checks the hash at startup
+     (option D4); ts-rs writes the protocol and message
      types into `packages/types/src/generated/` on `cargo test`, through `TS_RS_EXPORT_DIR` in `.cargo/config.toml`
      (option D3); content's types land in the same package, from the source ADR 0005 picks (critic rank 31). Not tsify.
+     The generators' derives never reach a shipped build: ts-rs is a dev-dependency, and its derives sit behind
+     `cfg_attr(test, …)` or, where one crate's types nest another's, behind a feature that only dev-dependency entries
+     turn on ("Dev-dependencies do not activate features unless building a Cargo target that needs them": R5-LAYOUT-F4,
+     r5 lines 83–91), so the builds part 3 compares and G7 measures are the shipped ones (proposed by rust-reviewer at
+     the step-10 review); content's schema generator follows the same rule (ADR 0005, CD-3).
      The gate regenerates all of them and fails on any difference or hand edit (G4).
    - **Content files in development:** a small Vite plugin, in the `client` package's Vite config and never in a
      production build, pushes changed content files to the page, which posts them to the Worker (R1-DATA-REC5,
@@ -306,7 +367,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
      every N (R1-BND-REC1 mark 2), even when a snapshot is split into several datagrams. What flows over the connection
      is ADR 0001's.
    - Why: the tick leaves the render thread; one bounded copy per tick needs neither isolation nor nightly Rust; one
-     small message per tick is constant work; the block's layout is the only thing tsify and ts-rs cannot type.
+     small message per frame is constant work and keeps a press within one tick plus one frame of the tick that applies
+     it; the block's layout is the only thing tsify and ts-rs cannot type.
    - Ids: R1-BND-REC1 to R1-BND-REC6, R5-LAYOUT-REC3, R5-LAYOUT-REC5, R1-XU-OQ3, R1-XU-OQ4, R1-BND-OQ4, R1-BND-OQ6,
      R1-BND-OQ9, R1-RR-OQ6, R3-MEASURE-OQ4, R5-XQ-OQ3 (r1-simulation-core.md, Recommendations, unit boundary-worker,
      lines 2252–2338; Options, lines 1731–1788; Open questions, lines 2732–2733, 2737–2740, 2747–2752, 2854–2865,
@@ -324,10 +386,20 @@ built from the tested artifact. Each part says what, why, its research ids and t
    the same encoded messages (ADR 0001 part 10; its migration plan puts the loopback in the protocol crate). The page never handles a network packet and cannot tell the two modes
    apart. The local server and the client endpoint share one Wasm instance, so the loopback's bytes never leave linear
    memory; whether a second instance is worth its cost, so that a trap in the client endpoint leaves the authority
-   running, is measured in the boundary spike (OQ-0002-3). The Worker's host (TypeScript) receives the page's commands, paces the tick (ADR 0004 part 5), steps
-   the instance or instances, and posts each block; the commands it forwards pass through it, outside the Wasm
-   instance, which is what OQ-0004-7's recovery options need to know. The foundation's skeleton ends with an empty
-   scene drawn from blocks that came through this whole path (Migration plan, phase 2).
+   running, is measured in the boundary spike (OQ-0002-3). The Worker's host (TypeScript) receives the page's inputs,
+   paces the tick (ADR 0004 part 5), steps the instance or instances, and posts each block; the inputs it forwards
+   pass through it, outside the Wasm instance, which is what OQ-0004-7's recovery options need to know. In a local
+   match one Worker step runs in this order: the client endpoint builds tick T's command from the newest input (its
+   aim cast included) and predicts T with the sim's prediction step (ADR 0004 part 3); the command reaches the local
+   server through the loopback; the local server runs tick T with the authority step and every slot's command (the
+   bots' through the same input path) and encodes T's snapshot and events;
+   the client endpoint decodes them, reconciles and writes the block. So the command for tick T reaches the local
+   server before it runs T, and a local input never waits an extra step (the spike's item 3); with two instances
+   (OQ-0002-3 (b)) the host makes its calls in the same order. The Worker as a whole has no budget in the research:
+   the client's sim share covers the sim step only (GLOSSARY, the client's sim share, lines 214–218), so the boundary
+   spike reports the Worker's busy time per tick in both modes and its JS heap and Wasm memory over a match (item 6),
+   and this record sets any limit on them from those numbers. The foundation's skeleton ends with an empty scene drawn
+   from blocks that came through this whole path (Migration plan, phase 2).
    - Why: SLICE-ORDER condition 1 asks for exactly this, and one boundary then serves local play, prediction and
      online play, so no code path exists only offline.
    - Ids: R1-BND-REC6, R1-BND-REC1 (the Worker), R5-LAYOUT-REC2 (the packages); cites R2-TRN-REC4 as ADR 0001 changes
@@ -348,22 +420,48 @@ built from the tested artifact. Each part says what, why, its research ids and t
      list (legacy's TL6 lesson: `event`, `name`, `status` and the rest), and `no-undef` off. Prettier formats
      `packages/**` and the root config files (not `docs/`, not `legacy/`), in check mode in the gate. The rule
      "dynamic or player-provided text: `textContent`, never `innerHTML`" holds by review until the security baseline
-     names its lint rule (ADR 0006, part 13, item B6).
+     names its lint rule (ADR 0006, part 13, item B6). So that a strict content security policy stays possible, the
+     build is CSP-ready, as ADR 0006's interim position for B3 asks (proposed, not researched; the security review's
+     finding 11): ESLint's core `no-eval` and `no-new-func` are on at error (their pages were not read), the built HTML
+     holds no inline script or style, and the Worker and the Wasm load as files, never from `blob:` or `data:` URLs
+     (checked in G8).
    - **Rust:** one workspace lint table every crate opts into (`[lints] workspace = true`, itself a gate check):
      `unsafe_code = "deny"`, clippy's `all` at warn, and the gate runs `cargo clippy --workspace --all-targets --locked
      -- -D warnings` once for the host and once for `wasm32-unknown-unknown`; `pedantic` at warn on `sim`, `protocol`
      and `content` only. [The hash-map ban](../research/GLOSSARY.md#the-hash-map-ban-in-the-sim-crate) and the clock and
      float bans live in `crates/sim/clippy.toml` (`disallowed-types`: std `HashMap`, `HashSet`, `Instant`,
-     `SystemTime`; `disallowed-methods`: `Instant::now`, `SystemTime::now`, std's transcendental float methods and the
-     `algebraic_*` methods), at deny, with `iter_over_hash_type` as a backstop; `suboptimal_flops` and
+     `SystemTime`; `disallowed-methods`: `Instant::now`, `SystemTime::now`, the `algebraic_*` methods and every std
+     `f32` and `f64` method outside ADR 0004 part 7's allow-list and the exact methods the rules themselves use, such as
+     `is_finite`, `is_nan`, `to_bits` and `total_cmp`), at deny, with `iter_over_hash_type` as a backstop. The float
+     ban is written as the allow-list's complement because ADR 0004 part 7 is an allow-list (R1-DET-REC2,
+     r1-simulation-core.md, Recommendations, lines 2146–2150): it names every other method on the pinned std's `f32`
+     and `f64` pages and is read again at every Rust bump (part 2). So it catches more than the transcendental
+     functions: `powi`, `hypot` and `cbrt` carry std's note that their precision varies by platform and Rust version
+     (R1-DET-F9, r1 lines 648–654, inferred there; rust-reviewer confirmed the note for these three and for
+     `to_degrees` and `to_radians` on std 1.99.1's `f32` page at the step-10 review), and `min`, `max` and `clamp` may
+     return either zero for equal signed zeros, while `clamp` panics on bad bounds (R1-DET-F14, r1 lines 679–683). The
+     sim uses three helpers of its own for those three, written as plain comparisons, with one defined result for
+     equal zeros and no panic (proposed). `suboptimal_flops` and
      `imprecise_flops` are allowed with a comment, and `cargo clippy --fix` never runs on `sim`; the same set covers the
      parts of `content` the sim calls. The only escape from
-     the ban is a reviewed `#[allow]` with a written reason for a map that is only looked up and lies outside the
-     serialized sim state (resolution 29). Map types from the sim's dependencies join `disallowed-types` from a list
+     the hash-map ban is a reviewed `#[allow]` with a written reason for a map that is only looked up and lies outside
+     the serialized sim state (resolution 29). Map types from the sim's dependencies join `disallowed-types` from a list
      rust-reviewer makes from `cargo tree` of `sim` once ADR 0004's dependencies are fixed. If clippy cannot name std's
-     float methods, a reviewed text scan of `sim` for those method names is the fallback check (R5-RUSTLINT-OQ1). In
+     float methods, a reviewed text scan of `sim` for those method names is the fallback check (R5-RUSTLINT-OQ1). The
+     clock ban (`Instant::now` and `SystemTime::now` in `disallowed-methods`, at deny) also lives in the `clippy.toml`
+     of `room`, `protocol`, `client-endpoint` and `sim-wasm`, for two reasons: these crates run in the Worker, where
+     std's clock calls panic on `wasm32-unknown-unknown` (std's own source, read by rust-reviewer at the step-10
+     review; not in the research) and the target's `-Cpanic=abort` makes that panic a trap (R1-BND-F19, r1 lines
+     1019–1025), which native tests never see; and a timer counted in ticks replays exactly, as SLICE-ORDER's
+     replayable matches need. So room timers count ticks, with their lengths in data; the client endpoint takes time
+     only as the values the host passes in (part 5); only `server` reads `Instant`. Which timers are tick-counted in
+     `room` and which run on wall time in `server` (such as the join deadline and the per-connection rate limits) is
+     ADR 0001's (parts 5 and 11). In
      `protocol`'s decoders and `content`'s loader, `unwrap_used`, `expect_used` and `indexing_slicing` are at deny,
-     allowed in tests; the sim does not enable them, since its indices come from its own pools. rustfmt runs with stable
+     allowed in tests. In the sim they are at deny in the module that applies commands, where values a client or
+     content can set enter (an offer and its choice, a purchase's unit id, a team or slot setting), so those values
+     reach the rest of the sim only through checked lookups (ADR 0004 part 20; PM-0004-60 fuzzes it); elsewhere the
+     sim's indices come from its own pools. rustfmt runs with stable
      options only (`edition` and `style_edition` 2024, `newline_style = "Unix"`), in check mode in the gate. The
      `panic` and `arithmetic_side_effects` lints are not added: their sources were not read.
    - **The per-edit hook** checks only what changed (`tsc -b` on the touched project and ESLint on the file; `cargo
@@ -398,7 +496,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
    - **The determinism suite's tools:** a `devtools` replay runner, built as the server builds the sim, plays a
      recorded match and writes one [state hash](../research/GLOSSARY.md#state-hash) per tick; the gate runs it twice in
      two processes and once as Wasm in Node; Playwright opens a replay page that runs the `sim-wasm` Worker in Chromium,
-     Firefox and WebKit and returns the hash stream; a comparer reports the first mismatching tick and a field-level
+     Firefox and WebKit and returns the hash stream; every Wasm run uses the exact file G6 ships and G7 measures (after
+     wasm-bindgen and wasm-opt, checked by its hash); a comparer reports the first mismatching tick and a field-level
      diff. The gate's set is three short recordings (two teams, three teams, bots only); nightly adds a 10-minute bot
      match at the largest mode's N (48) and every recording added since. The rules and the recordings are ADR 0004's.
    - **Golden tests against legacy:** one fixture per kept behaviour, captured once by a harness snippet on the real
@@ -413,24 +512,35 @@ built from the tested artifact. Each part says what, why, its research ids and t
      way, proposed by R5; latency, jitter, loss, reordering, duplication, a rate limit, and a packet-fate log), running
      the real server code and headless bot clients in one process; L2, an impairment wrapper around the server's UDP
      socket under the real quinn endpoint for real browsers over WebTransport, with a delaying TCP proxy for WebSocket.
-   - **Soak and load:** bots as headless Rust clients that speak the real protocol; one nightly run per mode of
+   - **Soak and load:** bots as headless Rust clients that speak the real protocol (on `client-endpoint`, part 3); one
+     nightly run per mode of
      [the test-mode list](../research/GLOSSARY.md#the-test-mode-list) over L1 at P2, 30 minutes each, and one L2 run with
-     4 real browser clients among the bots; measured: [server tick time](../research/GLOSSARY.md#server-tick-time) p50,
-     [p99](../research/GLOSSARY.md#time-statistics) and max against [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) (ADR 0001's), bytes per
-     client per second, the resident-memory slope, queue lengths, desyncs, panics and hangs, plus legacy TL13's match
-     metrics; before each playtest one 3-hour soak.
+     4 real browser clients among the bots. On CI's shared runners a run is judged only by what needs no particular
+     machine: desyncs, panics and hangs, the resident-memory slope, queue lengths, bytes per client per second, plus
+     legacy TL13's match metrics; [server tick time](../research/GLOSSARY.md#server-tick-time) p50,
+     [p99](../research/GLOSSARY.md#time-statistics) and max is reported there, and judged against
+     [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) (ADR 0001's) only from a run on one vCPU
+     of the reference server (PM-0002-72), since timings on shared runners are not hardware results. Before each
+     playtest one 3-hour soak runs on the reference server, so its tick times count (its VM: the bench's path below).
    - **Flakes:** no retries (`retry: 0`, `retries: 0` written out; `failOnFlakyTests` and `forbidOnly` on in CI); one
      committed fixed `PROPTEST_RNG_SEED` in the gate, fresh seeds nightly with every failure committed to
      `proptest-regressions` with its fix; simulated time only in sim and network tests; browser tests wait on state
      through a test-hook API and drive page time with Playwright's clock; no shared global state in Rust tests; every
-     failure keeps its seed, recording and trace as CI artefacts and gets an issue.
+     failure keeps its seed, recording and trace as CI artefacts, for the retention ADR 0006 sets for failure
+     artefacts (part 3; R5 leaves it to infra-engineer, r5 line 2083; until it is set, the 7 days of build artifacts),
+     and gets an issue that carries the seed, so the failure still replays after its artefacts expire.
    - **The bench method** (critic rank 36): the tick bench is a mode of the `devtools` replay runner. It replays a
      recording of [the stress scene](../research/GLOSSARY.md#the-stress-scene), times every sim step and every phase
      with the host's monotonic clock outside the sim (the sim itself reads no clock), and reports mean, p50, p95, p99 and
      max per phase and in total over 3 runs per build, on
      [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of [the reference server](../research/GLOSSARY.md#the-reference-server)
      natively and in Wasm in the Worker on the minimum laptop, as R1-TICK-REC2's P1 and P2 ask. It reports; it never
-     passes or fails the gate. No bench crate, coverage tool or cargo-nextest is adopted: none was read.
+     passes or fails the gate. The bench needs the reference server from slice 1, before ADR 0006's fleet exists, and CI
+     holds no token for it (timings on shared runners are not hardware results): it runs on a CCX23 created per bench
+     session in the spikes' own Hetzner project and deleted after it, ADR 0006 part 8's cost line (proposed there: 20
+     bench hours a month, 20 × 0.1386 = 2.77 EUR, R6-HOST-F15, r6 lines 150–158), and who creates and deletes it
+     without a session reading a secret is OQ-0006-17; the 3-hour soak before each playtest uses the same path. No
+     bench crate, coverage tool or cargo-nextest is adopted: none was read.
    - Why: each tool is the option the research read for its layer; a retry or a random seed hides a defect; timings on
      shared CI runners are not hardware results.
    - Ids: R5-TEST-REC1 to R5-TEST-REC6, R5-TEST-OQ1, R5-TEST-OQ2, R5-TEST-OQ3, R5-TEST-OQ5, R5-TEST-OQ6, R5-TEST-OQ7,
@@ -452,12 +562,12 @@ built from the tested artifact. Each part says what, why, its research ids and t
    | G2 | Rust lint | clippy `-D warnings` on the host and on `wasm32-unknown-unknown`; the determinism and panic lint sets; every crate opts into the workspace lints; the build-flag check of part 4 |
    | G3 | TypeScript | `tsc -b`; ESLint typed lint with `--max-warnings 0` |
    | G4 | boundary | generated types, layout and schema regenerate with zero diff; the wasm-bindgen CLI equals the library in `Cargo.lock` |
-   | G5 | dependency rules | part 3's rules (cargo-deny bans and `cargo tree`); `multiple-versions` and `wildcards` at deny with a reviewed skip list; the same-feature check for `sim` |
+   | G5 | dependency rules | part 3's rules (cargo-deny bans and `cargo tree`); `multiple-versions` and `wildcards` at deny with a reviewed skip list; the same-feature check for `sim` across `server`, `devtools`, `navbake` and `sim-wasm`, each built by the command CI and the release use; cargo-deny's `sources` at deny (crates.io only) |
    | G6 | build | native release (`server` once it exists, `devtools`); `sim-wasm` to Wasm; Vite build of both entries |
    | G7 | budgets | Wasm bytes (raw and gzip) and JS bytes per entry against the committed budget file; fail above it (the `sim-wasm` size is recorded, not gated, until its first limit is set: part 4) |
-   | G8 | player build | walk Vite's manifest from the player entry: no chunk from `editor` |
+   | G8 | player build | walk Vite's manifest from the player entry: no chunk from `editor`; the built HTML of both entries holds no inline script or style, and no Worker or Wasm loads from a `blob:` or `data:` URL (part 7's CSP-ready build) |
    | G9 | tests | `cargo test --workspace` (unit, property with the fixed seed, legacy goldens, insta), Wasm tests in Node, Vitest |
-   | G10 | determinism | the short recordings: native in two processes, Wasm in Node, Wasm in Chromium, Firefox and WebKit; first mismatch reported |
+   | G10 | determinism | the short recordings: native in two processes, Wasm in Node, Wasm in Chromium, Firefox and WebKit, each Wasm run on the exact file G6 ships (after wasm-opt, checked by its hash); first mismatch reported |
    | G11 | network | L1, one minute per profile P0–P4 and B1, with ADR 0001's marks that fit a minute |
    | G12 | end-to-end | Playwright on the built client and a local server: TL9's smoke shape, both transport backends, the backend string on every shot, ADR 0003's render counts against their committed baseline; every outbound request fails the run except to the local test server |
    | G13 | maps | for every committed map document: the navigation bake succeeds and ADR 0004's map checks pass (reachability, the 6 m gap rule) |
@@ -494,15 +604,28 @@ built from the tested artifact. Each part says what, why, its research ids and t
    - **WebGPU in CI:** standard runners have no GPU and headless Chromium renders on SwiftShader, so CI gates only
      counts (ADR 0003, R3-MEASURE-REC3) on whatever backend each runner gives, prints that backend on every shot, and
      runs the end-to-end suite once more with three.js's `forceWebGL` so the WebGL 2 fallback is always covered; frame
-     and GPU times come only from the reference machines (ADR 0003). No GPU runner is proposed (a paid larger runner;
-     ADR 0006 and Mustafa for any paid plan).
+     and GPU times come only from the reference machines (ADR 0003). By the research's own findings every CI browser
+     probably gets no WebGPU adapter and falls back to WebGL 2: Chrome on Linux offers WebGPU only on Intel Gen12+ GPUs
+     (R3-WGPU-F17, r3-rendering.md lines 159–162), Firefox not on Linux (R3-WGPU-F18, r3 lines 164–169), any browser
+     with no adapter falls back (R3-GL2-F12, r3 lines 279–283), and headless Chrome renders on "SwiftShader Device
+     (Subzero)" (R3-MEASURE-F8, r3 lines 648–653); Playwright's WebKit on Linux, and whether headless Firefox and
+     WebKit get WebGL 2 at all, were not researched. Then the default run repeats the `forceWebGL` run and CI never
+     runs the WebGPU backend, so a shader that fails to build for WebGPU, a WebGPU validation error or a pipeline made
+     mid-match only on WebGPU would pass CI. The foundation therefore records, per CI engine, the backend it gets (or
+     none). If none gets WebGPU, the boundary spike tries a Chromium job with SwiftShader's WebGPU adapter turned on by
+     flags, for counts and errors only (not researched; R3-MEASURE-F8 names GPU flags only for hardware runs); until a
+     CI route works, every change-set that touches the render path carries a WebGPU smoke run (console errors, ADR
+     0003's counts, the backend string) on a reference machine of ADR 0003 as stated evidence. No GPU runner is
+     proposed (a paid larger runner; ADR 0006 and Mustafa for any paid plan).
    - **No arm64 leg** in the determinism job: the first fleet is x86-64 (ADR 0006, part 5), and native AArch64 joins the
      hash test before ADR 0006 may pick Arm hosts (ADR 0004).
    - **Crash reporting and the end-to-end network rule** (critic rank 34): test builds carry no crash-reporting
      endpoint, so G12's rule (only the local test server) holds unchanged; the optional Sentry check of a planted Wasm
      trap runs in the boundary spike, not in the gate. The job that uploads debug files for Sentry (R6-OBS-REC3) runs
      only on builds that are deployed, in its own GitHub environment that holds the Sentry token, with no checkout of
-     pull-request code, shaped like the preview deploy job (part 10); its token scope is ADR 0006's (part 13, item B9).
+     pull-request code, shaped like the deploy job it follows and under that job's guard (part 10: `production`'s
+     `main`-only branch rule, or `preview`'s required reviewer for a preview); its token scope is ADR 0006's (part 13,
+     item B9).
    - Why: one command keeps the conventions that make today's gate a real guard; one aggregate required check survives
      jobs being added or renamed, and a skipped dependent job could otherwise let a failing pull request merge;
      caching from `main` keeps fork-written caches out of what other runs restore.
@@ -518,25 +641,50 @@ built from the tested artifact. Each part says what, why, its research ids and t
      panel's reachability and 6 m gap rule).
 10. **The preview build.** Shape P1: the ordinary `pull_request` workflow builds with no secret and uploads `dist` as
     an artifact (kept 7 days, the retention ADR 0006 sets); a separate deploy job (`needs: build`) runs in a GitHub
-    environment named `preview`, holds the only client-host token, never checks out or runs pull-request code, runs
-    only for pull requests from this repository, has the permissions `contents: read`, `actions: read`,
+    environment named `preview`, holds the client-host token for previews, never checks out or runs pull-request
+    code, runs only for pull requests from this repository, has the permissions `contents: read`, `actions: read`,
     `deployments: write` and `pull-requests: write`, turns automatic package caching off, sets the environment's URL to
     the preview link and posts or updates one comment with it. Fork pull requests get the full CI and no preview. No
-    `pull_request_target`, no `workflow_run`. The build generates the `_headers` file for
+    `pull_request_target`, no `workflow_run`. One gap remains: a `pull_request` run takes its workflow from the pull
+    request's own merge commit (the contrast R5-PREV-F2 draws with `pull_request_target`, r5 lines 770–774; the
+    security review's reading at step 10), so any branch of this repository, which agent sessions push, can rewrite
+    the deploy job and use its token. That token is account-scoped (R5-PREV-F10, r5 lines 823–830), and the deploy
+    command's `branch` option that finding quotes lets one deploy name any branch, so the token can probably reach
+    production too (an inference; the client host's production rules were not read). Until the security baseline
+    rules on CI tokens, ADR 0006's interim position for B9 (part 13) closes the gap: `preview` has a required reviewer,
+    so each preview deploy waits for Mustafa's approval ("a job cannot access environment secrets until one of the
+    required reviewers approves it": R5-PREV-F6, r5 lines 796–804), unless OQ-0006-13 puts production where the preview
+    token cannot reach it; whether a session, which posts as Mustafa's account (CLAUDE.md), could approve a pending
+    deploy was not read and is part of OQ-0006-13. **Production** is deployed only by its own job, on pushes to
+    `main`, from the artifact `main`'s CI built and tested, in its own environment `production` that holds its own
+    client-host token
+    behind a deployment-branch rule admitting `main` alone ("Deployment branches and tags are available for all public
+    repositories": R5-PREV-F6; the repository is public: r5 lines 752–754); when a release goes out beside running
+    rooms is ADR 0006's. The build generates the `_headers` file for
     [the client host](../research/GLOSSARY.md#the-client-host): [the production header set](../research/GLOSSARY.md#the-production-header-set-and-the-preview-header-set)
     for production and the preview header set for previews (`X-Robots-Tag: noindex`), with COOP and COEP only in a
     build made with the isolation flag on; after deploying, the job fetches the preview's HTML and `.wasm` and fails if
     a header is missing. The close job and the weekly sweep that delete previews are workflows here; the policy (24 h,
     7 days) and PREV-DELETE are ADR 0006's. **Multiplayer previews** (from slice 3; behind the access wall under
     PREVIEW-WALL (a)): CI's native job builds the room binary like any other artifact; a delivery job shaped like the
-    deploy job, in its own environment, hands that binary to the staging game server's supervisor (ADR 0006) and
-    receives its current development-certificate hash; the preview deploy job writes the hash into the preview's own
-    files, which the page fetches from its own HTTPS origin (ADR 0001, part 10; R2-TRN-REC5). That shape is proposed:
-    no research compared it with another; the delivery token's scope, and whether pull-request-built native code may run
-    on the staging game server, wait for the security baseline (ADR 0006, part 13, item B9).
+    deploy job, in its own environment with the same required reviewer as `preview` (B9's interim position), hands
+    that binary to the staging game server's supervisor and receives the current and the next certificate hash; the
+    preview deploy job writes both into the preview's own files, which the page fetches from its own HTTPS origin (ADR
+    0001, part 10). One hash would go stale: a self-signed certificate lives at most 14 days (R2-TRN-REC5,
+    r2-netcode.md, Recommendations, Brief question 4, lines 2700–2703), and R2-TRN-REC5 mark 2 asks that new
+    connections succeed with the new hash within one reload (r2 lines 2720–2721), which a static file cannot give. So
+    on the staging VM the supervisor, not each room process, holds the certificate, rotates it every 7 days and makes
+    the next one a full period ahead, and a preview older than one rotation is redeployed (ADR 0006, part 4; proposed,
+    not researched). If OQ-0006-5 instead gives the staging server, on both transports, the browser-trusted certificate
+    its `wss` endpoint needs anyway (the kind R2-TRN-REC5 gives production, r2 line 2704), a multiplayer preview pins
+    no hash and the delivery job hands over only the binary. The delivery token's scope, and whether
+    pull-request-built native code may run on the staging game server, wait for the security baseline (ADR 0006, part
+    13, item B9).
     - Why: a fork run gets no secrets, and the two triggers that hand them out are avoided; splitting build and deploy
       keeps the token away from every build script and dependency; deploying the artifact CI tested means the link shows
-      the tested build.
+      the tested build; a production job on `main` alone keeps every release behind `main`'s review and gate, and the
+      one path left to the preview token, a rewritten job on a branch, is what the required reviewer closes until the
+      baseline (ADR 0006, B9; OQ-0006-13).
     - Ids: R5-PREV-REC1, R5-PREV-REC4, R5-PREV-OQ5, R5-PREV-OQ6, R5-XT-OQ6, R2-XT-OQ10, R6-XT-OQ4
       (r5-toolchain-quality.md, Recommendations, Question 6, lines 1588–1604 and 1625–1641; Open questions, lines
       1858–1862, 1996–2001; r2-netcode.md lines 3384–3389; r6-infrastructure.md lines 1009–1014); cites R5-PREV-REC2,
@@ -595,7 +743,7 @@ is settled by GLOSSARY §8, the foundation ("a Cargo workspace plus TypeScript w
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | R5-LAYOUT-REC2 as written: rooms inside `server`, the bake unplaced | low | – | – | decoders in `protocol` either way | none | new | the smallest list | the local server of SLICE-ORDER condition 1 cannot run in the Worker without `server`'s async runtime and transport, which the default Wasm target cannot carry (R1-BND-F19); where the bake ships stays open (R4-XT-OQ5) |
-| **R5-LAYOUT-REC2 plus an I/O-free `room` crate and a `navbake` crate above `sim` (chosen)** | low–medium: two more crates and two more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; the bake shared by CI, map save and the editor | not researched as a placement (no Options section offers a crate for the room logic or the bake; SLICE-ORDER condition 1 and R4-XT-OQ5 leave it to this record): proposed only for the Advisor's ruling at the stop (OQ-0002-8) |
+| **R5-LAYOUT-REC2 plus an I/O-free `room` crate, a `client-endpoint` crate with no bindings and a `navbake` crate above `sim` (chosen)** | low–medium: three more crates and three more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; one client endpoint for the Worker and the headless clients; the bake shared by CI, map save and the editor | not researched as a placement (no Options section offers a crate for the room logic, the client endpoint or the bake; SLICE-ORDER condition 1 and R4-XT-OQ5 leave it to this record): proposed only for the Advisor's ruling at the stop (OQ-0002-8) |
 
 ### Q5. Which TypeScript (r5 lines 1019–1024)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
@@ -639,7 +787,7 @@ is settled by GLOSSARY §8, the foundation ("a Cargo workspace plus TypeScript w
 ### Q10. How inputs go in (r1 lines 1754–1760)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
-| **C1. A small message per tick (chosen)** | low | one message per tick | constant work | – | edge counters keep a press from being lost or doubled (row GP2) | the never-wired command (row CS1) gets wired | works without isolation | one message per tick |
+| **C1. A small message per tick (chosen, posted once per drawn frame with the newest input: part 5)** | low | one message per tick (per frame as chosen) | constant work | – | edge counters keep a press from being lost or doubled (row GP2) | the never-wired command (row CS1) gets wired | works without isolation | one message per tick (per frame as chosen) |
 | C2. An input slot in a SharedArrayBuffer | medium | – | saves a message | needs isolation | as C1 | – | no message | isolation |
 
 ### Q11. Generated TypeScript types (r1 lines 1762–1769)
@@ -731,9 +879,10 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   its generated TypeScript and the page that reads it), and because the version pins R1 needs (the CLI equal to the
   library; one compiler for native and Wasm) hold only inside one lockfile. The legacy fence leaked because nothing
   checked it (row CS11); here every rule is a gate check with a planted defect that proves it (G5, G8, `--prove`).
-- **A Worker, one block out and one command in per tick** wins over the main thread and over shared memory because the
-  tick leaves the render thread, the work per tick is constant in N, and nothing needs cross-origin isolation, nightly
-  Rust or a fixed memory maximum. The strongest argument against it: one copy per tick and a block whose delivery waits
+- **A Worker, one block out per tick and the newest input in per frame** wins over the main thread and over shared
+  memory because the tick leaves the render thread, the work per tick is constant in N, and nothing needs cross-origin
+  isolation, nightly Rust or a fixed memory maximum. The strongest argument against it: one copy per tick and a block
+  whose delivery waits
   for the page's message queue, which no source measured (R1-BND-REC2's option B2 notes it as "to be measured"); the
   boundary spike measures it against R1-BND-REC2's marks 2 and 3, and the SharedArrayBuffer ring is the measured
   alternative.
@@ -742,10 +891,11 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   the Worker runs the authority's sim step, the loopback encoding and decoding, and the client endpoint's prediction
   and block writing, a load no research measured (ADR 0001, trade-off 5, counts it in [the client's sim share](../research/GLOSSARY.md#the-clients-sim-share)); the
   boundary spike measures it, and OQ-0002-3 picks between one Wasm instance and two.
-- **Two crates beyond R5's list** (`room`, `navbake`) cost two more dependency checks; without them the local server
-  cannot run in the Worker, and the bake's generator would risk shipping in the player's Wasm. No research compared
-  other placements, so the first foundation milestone that builds them is also their test; whether rule 3 allows
-  proposing them at all is OQ-0002-8.
+- **Three crates beyond R5's list** (`room`, `client-endpoint`, `navbake`) cost three more dependency checks; without
+  them the local server cannot run in the Worker, the headless clients of ADR 0001's network marks and of the soaks
+  would need a native build of the bindings crate or a second copy of the client endpoint, and the bake's generator
+  would risk shipping in the player's Wasm. No research compared other placements, so the first foundation milestone
+  that builds them is also their test; whether rule 3 allows proposing them at all is OQ-0002-8.
 - **Strict TypeScript and lint, pinned exactly** catch the bugs the boundary invites, at the price of churn: strict
   configs are not semver-stable, so every upgrade is its own change-set, and the cost of the strictest flags against
   three.js's own types is not measured yet (R5-TSLINT-OQ4; the boundary spike counts it).
@@ -775,7 +925,8 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   first month of CI times (deliberate skips, path selection, the Safari run); the security baseline is researched
   (the advisories policy, the CSP in the header sets, the preview and Sentry token scopes, the `textContent` lint);
   ADR 0006 decides where the lobby runs (its crate); the cache passes 8 GB; ADR 0006 picks Arm hosts (an arm64
-  determinism leg); Mustafa answers OQ-0002-1.
+  determinism leg); Mustafa answers OQ-0002-1; the security baseline rules on CI tokens, or OQ-0006-13 is answered
+  (B9's interim position ends).
 - **Hard constraints in CLAUDE.md that change** (for v2 code only, once Mustafa accepts the drafts; spikes are exempt
   now under SPIKE-SCOPE (a); the legacy constraints keep applying to `legacy/`; nothing in `CLAUDE.md` or `.claude/`
   changes in this PR):
@@ -867,13 +1018,18 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   - Research ids: R1-BND-OQ9.
 - **OQ-0002-5. Does real Safari run on pull requests, and does the end-to-end suite need it?**
   - Why it matters: Playwright's WebKit is not Safari (R5-TEST-F8), so a Safari-only bug reaches players unless real
-    Safari runs somewhere; the macOS runner's time and cost are not known.
+    Safari runs somewhere. While the repository is public the macOS runner costs nothing: GitHub's runner reference
+    lists macOS among the standard runners, whose use "is free and unlimited on public repositories" (the page
+    R5-CI-F17 read, r5 lines 673–678, which quoted only its ubuntu rows; its macOS rows were read by infra-engineer at
+    the step-10 review). What is not known is the macOS job's wall time against CI's 10-minute mark (PM-0002-56).
   - Options: (a) on pull requests that touch `client`, `net`, `sim-worker` or `sim` (R5-TEST-REC1); (b) nightly only;
     (c) also an end-to-end suite in real Safari through WebdriverIO (not researched).
-  - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the cost is known.
-  - Decider: infra-engineer's reading of the macOS runner's time and cost (ADR 0006 for costs; Mustafa for any paid
-    plan), then this record.
-  - What decides it: the macOS runner's time and price for a public repository; whether WebKit on macOS misses a Safari
+  - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the macOS job's wall time is known; the
+    cost is not what holds it back.
+  - Decider: this record, from the macOS job's wall time, which infra-engineer measures in the foundation; ADR 0006 and
+    Mustafa only if the repository stops being public, since a private repository's runners draw on paid minutes (the
+    same page, read at the step-10 review).
+  - What decides it: the macOS job's wall time against PM-0002-56's 10 minutes; whether WebKit on macOS misses a Safari
     bug that a playtest or Mustafa's checks find.
   - Research ids: R5-XQ-OQ1, R5-TEST-OQ4.
 - **OQ-0002-6. Which jump reach do the golden tests pin?**
@@ -898,18 +1054,20 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   and the research leaves the question to this record?**
   - Why it matters: plan rule 3 says an option the research lacks is labelled "not researched" and cannot be the
     proposed decision. SLICE-ORDER condition 1 runs the local server in the Worker, which needs room logic that builds
-    for Wasm, while R5-LAYOUT-REC2 puts rooms inside `server` (r5-toolchain-quality.md, lines 1173–1174); and the critic's
-    questions hand structure to this record with no answer on one side ("Decided by: ADR-0002": R4-XT-OQ5,
-    r4-physics-navigation.md lines 1195–1200, the bake's place; R5-XT-OQ6, r5 lines 1996–2001, the multiplayer-preview
-    workflow, whose parts part 10 takes from research recommendations).
-  - Options: (a) rule 3 allows it in such cases: the `room` and `navbake` crates stay proposed, labelled "not
-    researched", and the first foundation milestone that builds them is their test; (b) rule 3 holds: both become open
-    questions, a short layout research unit answers them before the foundation, and part 3 keeps R5-LAYOUT-REC2's list
-    until then.
+    for Wasm, while R5-LAYOUT-REC2 puts rooms inside `server` (r5-toolchain-quality.md, lines 1173–1174); ADR 0001's
+    network marks run the client endpoint natively and headless, which needs it outside the bindings crate (part 3);
+    and the critic's questions hand structure to this record ("Decided by: ADR-0002"): R4-XT-OQ5, with no answer on
+    one side (r4-physics-navigation.md lines 1195–1200, the bake's place), and R5-XT-OQ6, which names both sides (r5
+    lines 1996–2001, the multiplayer-preview workflow, whose parts part 10 takes from research recommendations).
+  - Options: (a) rule 3 allows it in such cases: the `room`, `client-endpoint` and `navbake` crates stay proposed,
+    labelled "not researched", and the first foundation milestone that builds them is their test; (b) rule 3 holds:
+    the three become open questions, a short layout research unit answers them before the foundation, and part 3
+    keeps R5-LAYOUT-REC2's list until then.
   - Decider: the Advisor, at the stop.
   - What decides it: whether rule 3 is meant to cover structure that a settled input forces and the research hands to
     this record.
-  - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 and R5-XT-OQ7.
+  - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 (the same question as R5-XT-OQ7)
+    and R5-XT-OQ6.
 
 ## What a spike must prove
 **The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs with the netcode proof test,
@@ -920,8 +1078,9 @@ sets the final table.
    `hardwareConcurrency` recorded), at N = 12, 24, 36 and 48 soldiers, the page's frame time p95 with the sim in the
    Worker is no worse than with no sim by more than 1.0 ms (the page's cost of the sim: ADR 0003 owns the budget row,
    which states it as a p99, decision map LE-B); the page makes zero calls into Wasm; the Worker makes the same number of
-   Wasm calls per tick at N = 12 and N = 48, wasm-bindgen's glue calls included (part 5 batches the command and the
-   received datagrams into one input call), at most 4 for the online client and for a local match in one instance
+   Wasm calls per tick at N = 12 and N = 48, wasm-bindgen's glue calls included (part 5 batches the newest input and
+   the received datagrams, with their arrival times, into one input call), at most 4 for the online client and for a
+   local match in one instance
    (OQ-0002-3 (a)), at most 8 for a local match in two instances (b) (proposed: R1-BND-REC1's 4 per instance stepped,
    times two instances); the same build runs in the latest desktop Chrome, Edge, Firefox and Safari, and in Brave (Mustafa's
    browser).
@@ -929,14 +1088,16 @@ sets the final table.
    copies and zero per-entity calls on the page; after warm-up no buffer or typed-array allocation per frame on the
    page, and boundary-caused heap growth under 0.1 MB/s over a 10-minute match (allocation sampling); tick T's block
    readable on the page at most one display frame (16.7 ms at 60 Hz) after the Worker finishes tick T, at p95, on a
-   shared clock (`performance.timeOrigin + performance.now()` on both sides); zero lost or reordered events over a
+   shared clock (`performance.timeOrigin + performance.now()` on both sides); zero lost events, and zero released out
+   of order on their entity's timeline (part 5), over a
    10-minute match at the largest mode's N (48); bytes per tick and copy time at N = 48 for a per-entity and a per-field
    layout (R1-BND-OQ6); B2 against B3 on the four browsers: B3 is weighed only if it saves at least 0.5 ms of page time
-   per frame or one frame of latency at p95 on the minimum laptop. The field-by-field writer's copy time is reported
-   beside the copy (R1-RR-OQ6).
+   per frame or one frame of latency at p95 on the minimum laptop. The field-by-field writer's time is reported beside
+   the copy and read against part 5's trigger, a p99 above 0.67 ms in Wasm on the minimum laptop (R1-RR-OQ6).
 3. **The command** (part 5; R1-BND-REC3, r1 lines 2286–2296): with injected delay, duplication and reordering of
    commands, zero lost and zero doubled presses over 10,000 scripted presses; in local play, from the key event's
-   timestamp to the tick that applies it, at most one tick plus one frame at p95; the cursor ray and view time reach the
+   timestamp to the tick that applies it, at most one tick plus one frame at p95, with the page posting its newest
+   input once per drawn frame and every tick running the newest post (part 5); the cursor ray and view time reach the
    Worker in the same message (proposed: part 5 sends no second message).
 4. **Generated types** (part 5; R1-BND-REC4, r1 lines 2297–2308; R5-LAYOUT-REC3, r5 lines 1194–1205): CI regenerates
    every type with zero diff against the committed output; a Rust layout change without regeneration fails at build or
@@ -951,9 +1112,12 @@ sets the final table.
    messages (a counter); a 100 ms busy loop injected on the page leaves no gap in the Worker's processing of server
    snapshots (Worker timestamps); the local match and the online client run the same Wasm file and the same page code,
    differing only in the mode flag; the Wasm calls per tick, the Worker's time per tick and the memory of one instance
-   against two in a local match (OQ-0002-3).
+   against two in a local match (OQ-0002-3); and, reported with no limit (the research sets none: part 6), the Worker's
+   busy time per tick (p99) online and in a local match at N = 48, and its JS heap and Wasm memory at minutes 5 and 10
+   of a match.
 7. **The Worker's pacing and the client's sim share** (ADR 0004's marks, measured here as `docs/SPIKE_PLAN.md`
-   places them, item 3): ADR 0004's S18 (tick start jitter, smoothness on 60, 120 and 144 Hz displays, hidden tabs) and
+   places them, item 3): ADR 0004's S18 (tick start jitter, read online against the schedule the step returns, part 5;
+   smoothness on 60, 120 and 144 Hz displays; hidden tabs, with catch-up counted per wake) and
    R1-TICK-REC2's P2 with the stand-in load; if the timer pacing fails its jitter mark, W3 is measured on an isolated
    build (OQ-0002-4).
 8. **Size and tools** (parts 2, 4 and 7): the `sim-wasm` file's size recorded raw and gzipped, with and without
@@ -1217,7 +1381,8 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
       tools/tuning-dump.js` reproduces `docs/legacy-tuning.json` byte for byte (R5-LAYOUT-REC6, r5 lines 1243–1245), and
       Mustafa starts a match from `legacy/index.html` by double-click in Brave.
    2. *The toolchain.* The two workspaces and the pins (part 2), the first crates (`sim`, `protocol`, `room`,
-      `sim-wasm`, `devtools`) and packages (`client`, `sim-worker`, `net`, `types`, `e2e`). *Done when:* from a fresh
+      `client-endpoint`, `sim-wasm`, `devtools`) and packages (`client`, `sim-worker`, `net`, `types`, `e2e`). *Done
+      when:* from a fresh
       clone on the CI runner, `cargo test --workspace --locked` and `npm ci && npm test --workspaces` pass with no
       network access after the install steps; `rustc --version` in CI equals the pin; deleting the toolchain file fails
       G0 with exit 2 (R5-LAYOUT-REC1, r5 lines 1166–1169); a pull request that edits `Cargo.toml` without `Cargo.lock`
@@ -1234,11 +1399,14 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
       in CI.
    5. *The client + local server skeleton.* *Done when:* the Worker's client endpoint and local server exchange
       `Join`, `JoinAccepted`, `Input` and `Snapshot` over the loopback backend with L1 behind it in CI (ADR 0001's
-      milestone); the page posts one command per tick, receives one block per tick and draws an empty scene from it,
+      milestone); the page posts its newest input each frame, every tick runs on the newest post, and the page receives
+      one block per tick and draws an empty scene from it,
       naming its backend (ADR 0003's milestone); the page makes zero Wasm calls; the first recording's per-tick hashes
       match natively twice and in Wasm (ADR 0004's milestone).
-   6. *Previews.* After ADR 0006's preview hosting check: the build, deploy, close and sweep workflows and the generated
-      header sets. *Done when:* a same-repository pull request has its link within 5 minutes after the build job ends
+   6. *Previews.* After ADR 0006's preview hosting check, with B9's interim position in place (ADR 0006, part 13): the
+      build, deploy, close and sweep workflows, the production deploy job and the generated header sets. *Done when:* a
+      same-repository pull request has its link within 5 minutes after the build job ends, or after the reviewer's
+      approval while `preview` requires one
       (median of 5 runs, R5-PREV-REC1 mark 1); the deploy job's header check passes and fails when a header is removed
       (R5-PREV-REC4 mark 1); Mustafa opens the link in Brave and sees the empty scene (his Brave check).
    *The foundation is done when* an empty scene runs through the full stack in the browser, with CI green and a preview
@@ -1251,7 +1419,8 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
 4. **Slice 2, bots and three teams, played locally:** `navbake` enters; G13 runs on the first committed map; bots fill
    slots in the local server; nightly soaks over L1. *Done when:* G13 and its `--prove` pair pass, and a nightly
    30-minute bot room at N = 48 over L1 runs with 0 panics, 0 hangs and 0 desyncs (R5-TEST-REC5's mark).
-5. **Slice 3, online:** `server` enters; L2 in the nightly run; G12 over both transport backends; the first multiplayer
+5. **Slice 3, online:** `server` and `supervisor` enter; L2 in the nightly run; G12 over both transport backends; the
+   first multiplayer
    preview behind the access wall, with the binary-delivery job once the security baseline has set its token's scope
    (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up. *Done when:* G12
    passes on both backends and a multiplayer preview plays against the staging game server.
@@ -1280,7 +1449,8 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
   nightly, and a 3-hour soak before each playtest (R5-TEST-REC5).
 - **Renders and real pages:** Playwright on the built client and a local server, the backend named on every shot, once
   with three.js's `forceWebGL`, and once with and once without the isolation flag; ADR 0003's counts against their
-  baseline (G12).
+  baseline (G12); the WebGPU backend through part 9's route (a CI job if the boundary spike finds one, otherwise a
+  smoke run on a reference machine for every change-set that touches the render path).
 - **Flakes:** the gate's whole suite 20 times on one commit gives 20 identical verdicts (R5-TEST-REC6).
 - **Playtests and Brave checks:** Mustafa's checks on preview links, starting with the empty scene of phase 2.
 
@@ -1310,8 +1480,8 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | id | disposition | where or why |
 |---|---|---|
 | R1-BND-REC1 | adopted | part 5; the spike's item 1 |
-| R1-BND-REC2 | changed: two sections added (weapon pickups; the local player's owner-only data), remote entities written at ADR 0001's interpolation delay, and mark 4 at N = 48 (MODES-3 (a)) | part 5: UPGRADE-SCOPE's pickups and the I-21 upgrade data must reach the page; ADR 0001 put the interpolation buffer in the Worker; the spike's item 2 |
-| R1-BND-REC3 | changed: the per-tick message also carries the cursor ray and the view time | part 5: ADR 0001 part 5 has the Worker cast the aim ray (I-19); the fields are ADR 0001's; the spike's item 3 |
+| R1-BND-REC2 | changed: two sections added (weapon pickups; the local player's owner-only data, with the floor layer and enclosure area id of ADR 0004 part 14), remote entities written at ADR 0001's interpolation delay with their spatial events released on the same timeline, and mark 4 at N = 48 (MODES-3 (a)) | part 5: UPGRADE-SCOPE's pickups and the I-21 upgrade data must reach the page; ADR 0001 put the interpolation buffer in the Worker, and R2-SYNC-REC6 plays blasts on the timeline of the entity they hit; the spike's item 2 |
+| R1-BND-REC3 | changed: the page posts its newest input once per drawn frame, and each tick the Worker builds the one command from the newest post; the message also carries the cursor ray and the view time | part 5: the page has no tick clock, so a post per block can miss the REC's own mark 2 (2 × 1000 / 30 = 66.67 ms against 50.00 ms); ADR 0001 part 5 has the Worker cast the aim ray (I-19); the fields are ADR 0001's; the spike's item 3 |
 | R1-BND-REC4 | adopted | part 5 (content's source is ADR 0005's, critic rank 31); the spike's item 4 |
 | R1-BND-REC5 | changed: a second trigger for production isolation, the timer pacing failing its jitter mark while W3 passes | part 5: R1-XU-OQ4 reads the pacing and the block together; OQ-0002-4 |
 | R1-BND-REC6 | adopted ("offline" reads "local play", SLICE-ORDER) | parts 5 and 6; the spike's item 6 |
@@ -1324,17 +1494,17 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R1-XU-OQ4 | spike: the boundary spike (the timer pacing's jitter; W3 on an isolated build only if it fails) | part 5's rule; the spike's item 7 |
 | R1-RR-OQ4 | answered: overflow checks on for `sim` and `protocol` in every profile; explicit wrapping or checked counters | part 4 |
 | R1-RR-OQ5 | spike: the boundary spike and the sim core spike measure the `sim-wasm` size, and the content and ability spike the content crate's share; the Advisor sets the first limit from both | part 4; the spike's item 8 |
-| R1-RR-OQ6 | answered (proposed; rust-reviewer, its named decider, confirms at review): the block writer serializes field by field, as the state hash does; the derive or `unsafe` only if the copy time says so | part 5; the spike's item 2 reports the copy time (PM-0002-10) |
+| R1-RR-OQ6 | answered: confirmed by rust-reviewer, its named decider, at the step-10 review: the block writer serializes field by field, as the state hash does, with one layout table for the writer, the offsets and the hash, fixed-width little-endian integers and aligned sections; the derive or `unsafe` only if the writer's p99 exceeds 0.67 ms (proposed) | part 5; the spike's item 2 reports the writer's time (PM-0002-10) |
 | R1-XT-OQ10 | open: OQ-0002-1 | part 11 |
 | R1-XT-OQ15 | answered: the tick bench is a mode of the `devtools` replay runner (3 runs per build; mean, p50, p95, p99, max) | part 8 |
 | R1-XT-OQ18 | answered: the crate list follows ADR 0004 (no ECS crate, parry3d) and ADR 0001 (quinn, the proof test's WebTransport crate); the cache is measured on it | part 3 |
-| R2-XT-OQ10 | answered: the binary-delivery job and the hash written into the preview's files; the token's scope waits on the security baseline | part 10 |
+| R2-XT-OQ10 | answered: the binary-delivery job; a certificate hash in a preview's static files goes stale, so the supervisor gives the current and the next hash and an older preview is redeployed (ADR 0006 part 4), unless OQ-0006-5 gives staging a trusted certificate and previews pin none; the token's scope waits on the security baseline, its guard is B9's interim reviewer | part 10 |
 | R3-MEASURE-OQ4 | answered: the isolation flag, for profiling builds only | part 5 |
 | R3-XT-OQ3 | open: OQ-0002-1 | part 11 |
 | R4-XT-OQ5 | answered: the bake in its own `navbake` crate (proposed, not researched: OQ-0002-8), never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
 | R4-XT-OQ8 | answered: as R1-XT-OQ18 | part 3 |
 | R5-LAYOUT-REC1 | adopted | parts 1 and 2 |
-| R5-LAYOUT-REC2 | changed: the `room` and `navbake` crates added (proposed, not researched: OQ-0002-8); nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; R4-XT-OQ5 |
+| R5-LAYOUT-REC2 | changed: the `room`, `client-endpoint` and `navbake` crates added (proposed, not researched: OQ-0002-8), and the supervisor's crate at slice 3 (R6-HOST-REC2's supervisor, ADR 0006 part 5); nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; ADR 0001's network marks run the client endpoint natively; R4-XT-OQ5 |
 | R5-LAYOUT-REC3 | adopted | part 5; the spike's item 4 |
 | R5-LAYOUT-REC4 | adopted | part 3 (G5) |
 | R5-LAYOUT-REC5 | adopted | parts 5 and 11; the spike's item 5 |
@@ -1360,7 +1530,7 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R5-CI-REC3 | adopted | part 2 |
 | R5-CI-REC4 | adopted (the cache keys on the root lockfile) | part 9 |
 | R5-CI-REC5 | adopted | part 9 |
-| R5-PREV-REC1 | adopted | part 10 |
+| R5-PREV-REC1 | changed: a second client-host token, production's, in its own environment on `main` alone; the reviewer gate the REC allows "when wanted" on `preview` until the security baseline (ADR 0006, B9; OQ-0006-13) | part 10: a branch of this repository can rewrite the deploy job (R5-PREV-F2's contrast) |
 | R5-PREV-REC4 | adopted | part 10 (the CSP waits on the security baseline) |
 | R5-GATE-REC1 | changed: G13 (maps) added; G2 also reads the build flags and the workspace-lints opt-in; G12 names its network rule | part 9: R4-XT-OQ5 found R4's checks missing; ADR 0004's flag rule needs a check |
 | R5-GATE-REC2 | adopted | part 9 (its path: OQ-0002-2) |
@@ -1376,7 +1546,7 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R5-TSLINT-OQ3 | spike: the boundary spike (`tsc --strict` on the generated package) | the spike's item 4 |
 | R5-TSLINT-OQ4 | spike: the boundary spike (errors and casts against three.js's types) | the spike's item 8 |
 | R5-TSLINT-OQ6 | spike: the boundary spike (`tsc -b` time with `skipLibCheck` on and off) | the spike's item 8 |
-| R5-RUSTLINT-OQ1 | answered: the method ban, with a reviewed text scan of `sim` as the fallback; G2's planted `x.sin()` proves which | part 7 |
+| R5-RUSTLINT-OQ1 | answered: the method ban, written as the complement of ADR 0004 part 7's allow-list (every other std `f32` and `f64` method), with sim helpers for `min`, `max` and `clamp`, and a reviewed text scan of `sim` as the fallback; G2's planted `x.sin()` proves which | part 7 |
 | R5-RUSTLINT-OQ2 | answered: not added (their sources were not read); REC3's lints and fuzzing cover panics, REC4 overflow | part 7 |
 | R5-RUSTLINT-OQ3 | answered: rust-reviewer lists the map types of `sim`'s dependency tree, which join `disallowed-types` | part 7 |
 | R5-RUSTLINT-OQ4 | spike: the sim core spike reports the overflow checks' cost with part 8's method; the limit is set from it | part 4 |
@@ -1393,7 +1563,7 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R5-CI-OQ2 | answered: no sccache at the start; weighed again only from measured dependency rebuild times | part 9 |
 | R5-CI-OQ3 | answered: SHA pins and Dependabot until workflow lockfiles are generally available on Mustafa's plan | part 9 |
 | R5-CI-OQ4 | spike: the boundary spike measures with and without wasm-opt; if kept, the foundation pins it like the CLI | part 2; the spike's item 8 |
-| R5-CI-OQ5 | answered: CI gates counts on whatever backend the runner gives, plus a `forceWebGL` run; no GPU runner | part 9 |
+| R5-CI-OQ5 | answered: CI gates counts on whatever backend the runner gives, plus a `forceWebGL` run, and records the backend each CI engine gets (probably WebGL 2 everywhere on a GPU-less runner); the WebGPU route is part 9's (a SwiftShader WebGPU job if the boundary spike finds one, else a smoke run on a reference machine); no GPU runner | part 9 |
 | R5-CI-OQ6 | answered: a trial on one action in the foundation | part 9 |
 | R5-CI-OQ7 | answered: no arm64 leg while the fleet is x86-64 | part 9 |
 | R5-PREV-OQ5 | spike: the preview hosting check (ADR 0006) | part 10 |
