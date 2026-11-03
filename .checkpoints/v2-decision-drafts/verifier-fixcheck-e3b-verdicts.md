@@ -48,3 +48,23 @@ Method: grep of each topic's terms over the nine files, then each hit read in co
 | ROOM-CRASH "marked crashed" | 0001:487, :747, :1223-1226, PM-0001-59; 0006:479-481, :1408; README:70 | consistent | none |
 | OQ-0005-1's presented kinds | 0005:319-329 (CD-2), :723, :1562-1567, :1580, :1938-1944, :2089, :2119-2120, PM-0005-4 (:2273); README:120; SPIKE_PLAN:383-386 | DISAGREES (1) | ADR 0005 CD-2 (:321-328) lists the presented kinds as unit, vehicle, weapon and faction, and says: "building parts and props are entities in it, not kinds of their own (AP-7)". ADR 0005 PM-0005-4 (:2273): "the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons, factions, building parts and props)". Finding 2 |
 END TASK 2
+## Task 3: SPIKE_PLAN's own count statements against the script counts
+Scripts: e3's count_oq2.py (re-run at c74a2e5), my scratch/pmcover.py (every PM id the table and items name, ranges
+expanded), and a row count of each draft's "| PM-000N-k |" rows.
+
+| statement in SPIKE_PLAN | its count | script | verdict |
+|---|---|---|---|
+| table :88-101 and items: pass marks placed per draft | ids 1-63, 1-78, 1-47, 1-75, 1-46, 1-32 all placed, none beyond | rows 63, 78, 47, 75, 46, 32 = 341; highest ids the same | confirmed: no id missing, none invented |
+| item 2 and table row 2: the 60 Hz group PM-0001-39, -40, -63; PM-0004-71, -72 | 5 ids | the rows exist (0001:1516-1518; 0004:1194-1195) | confirmed |
+| numbered spikes (### 1 to 10; table rows 1 to 10, plus two "–" rows that aren't spikes) | 10 | 10 headings "### N." | confirmed |
+| "Open questions": OQ-SPIKE-1, its only one (README: "SPIKE_PLAN adds one of its own") | 1 | 1 "- **OQ-SPIKE" entry | confirmed |
+| "What this plan does not decide" (:495-500): still open OQ-0003-1, OQ-0006-1, -2, -15 (in part), -19, -20 (in part); answered OQ-0001-1, -2, -3, -16, OQ-0006-17 | as listed | count_oq2: open 98 (12, 7, 17, 10, 33, 19) of 114; OQ-0001-1, -2, -3, -16 and OQ-0006-17 among the answered; OQ-0003-1, OQ-0006-15, -20 marked "answered in part" and counted open | confirmed |
+| foundation "L (six change-sets)" (:96) | 6 | ADR 0002 migration phase 2 has steps 1 to 6 (:1397-1430) | confirmed |
+| sim core spike "about 60 marks" (:278) | about 60 | PM-0004-1 to -61, -73, -74 = 63 | confirmed (approximate, stated as such) |
+SPIKE_PLAN states no total of open questions or pass marks of its own (the 114, 98 and 341 totals are README's, checked
+by e3 and matching the scripts).
+END TASK 3
+
+Correction to Task 1 row 2's note: "as blockouts" is judged faithful (he makes them, and blockouts are enough); no
+finding is raised for it.
+

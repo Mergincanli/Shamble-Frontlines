@@ -43,3 +43,65 @@ HEAD c74a2e5 · base 4374a1c · e2 checked C1, C2 (OQ-0005-1 and AB13 quotes)
 | X3 | 0005:2540 (App A, R1-ABL-OQ9) | AB13's answer sets when A3 returns | AB13 | confirmed | | |
 | X4 | 0005:2504 (App A counts, unchanged) | "answered 8 · open 9" | count | wrong (medium) | recount of the 34 rows at HEAD: adopted 5, changed 6, answered 10, open 7, spike 6 (R1-ABL-OQ1, OQ2 moved open → answered) | finding F2 |
 | X5 | 0005:384-386 (CD-6 client content, unchanged) and 2284 (PM-0005-15) | client content lists feel kit, quality tiers, asset list, slot classes, look values | OQ-0005-1 consistency | note (low) | the client entries now decided (CD-2, CD-13, AP-2: model ids, faction colours) are client content but not in CD-6's list or PM-0005-15's changed values | finding F7 |
+
+## Rules and consistency checks
+- Glossary: `glossary_check_drafts.py` exact hits 0 (0005: exact 0).
+- New prose lines (135 added lines, scratch/rules.py): none over 120 characters.
+- Tables: every row has its header's cell count (0 mismatches); PM rows 7 cells; no text line directly under a table.
+- PM rows 46 at base and HEAD (OQ-0005-1 is a bite on PM-0005-4, no new row: condition 6). OQ table rows 36 and 36.
+- Options kept: AB12 (a)(b), AB13 (a)(b), Question F2 rows a and b, OQ-0005-1 (a)(b), AS4's routes.
+- AB13 triggers: "needed often" survives only in AB13's option (a) text (0005:1378, a weighed option) and in its
+  Decided line saying it is no longer a trigger (0005:1384); "many fail" and "marks 1 or 2 fail" are gone from the
+  Rollback, "Revisit when", the frame's table, "When a mark fails" and Appendix A.
+- LOOK_V2.md: unchanged since 4374a1c. SPIKE-ORDER: 0005 says nothing that runs a heavy spike alongside another; its
+  spike list (0005:2169-2185) and Migration step 1 (netcode proof test first) agree with the answer.
+- Header: condition 4's wording exact.
+END CHECKS
+
+## Findings (ranked)
+- F1 (medium, inconsistent, test-engineer, Pass marks) 0005:2273, PM-0005-4: current text "the presented kinds as
+  CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons, factions, building parts and props)". CD-2
+  (0005:321-328, engine-architect, with game-designer's NOTE C9-2) names units, vehicles, weapons and factions, and says
+  "building parts and props are entities in it, not kinds of their own (AP-7)"; CD-6 has no building or prop kind. So
+  the row's corpus "for every presented kind" asks for two kinds that do not exist. Same row: the controls say "a
+  tuning table" where CD-2 and CD-6 say "rule tables". Smallest fix: "...: units, vehicles, weapons and factions)" and
+  "(a mode, a rule table)" / "sets whose mode and rule table have no entry". (Also found by unit e3b, Task 2.)
+- F2 (medium, count, engine-architect, Appendix A) 0005:2504: current text "Counts: adopted 5 · changed 6 · answered
+  8 · open 9 · spike 6 · rejected 0 (34 rows)." After FIX blocks moved R1-ABL-OQ1 and R1-ABL-OQ2 from open to answered
+  (0005:2537-2538), a script recount of the 34 rows gives adopted 5 · changed 6 · answered 10 · open 7 · spike 6.
+  Smallest fix: "answered 10 · open 7".
+- F3 (low, unmarked reading, engine-architect, frame) 0005:2089 (OQ table row) and 0005:1942-1944 (Question F2):
+  current text "(answered by the Advisor, 2026-11-03: client definitions keyed by the same id; an id of a presented kind
+  with no client entry fails the content check, CD-2)" and "the answer adds one whole-set check, an id of a presented
+  kind with no client entry fails (CD-2 names the kinds)". The words: "the content check fails if a simulation id has
+  no client entry"; the narrowing to presented kinds is ruling q10, marked at 0005:321 and 0005:2120 but given here as
+  the answer. Smallest fix: add "(the advisor's reading, 2026-11-03)" after "fails the content check" and after "with no
+  client entry fails".
+- F4 (low, unsupported, game-designer, ability section) 0005:1371-1373, OQ-0005-AB12 Decided: "The specific claims a
+  record relies on are checked against Epic's documentation once it can be read". The answer is recorded word for word,
+  but no list of those specific claims exists, so the later check has nothing named to check; AB-1 relies on at least
+  one ("GAS's default sums its multipliers", 0005:876). Smallest fix: one clause naming them, e.g. "The specific claims
+  this record relies on: GAS's default aggregation sums multipliers (AB-1)". (The verdict r4 has no AB12 ruling; the
+  task's "specific claims listed" is the expectation checked here.)
+- F5 (low, over-read, engine-architect, asset pipeline) 0005:1498-1500: current text "Blender as the route for the
+  look proof test's models, which Mustafa makes with AI help as blockouts with a skin, named colour slots and LOOK_V2's
+  proportions." The words: "I make the test models with AI help in Blender; blockouts with a skin, named colour slots
+  and LOOK_V2's proportions are enough" (a bar; ruling q8 "each object may be a blockout"). Smallest fix: "which
+  Mustafa makes with AI help, where blockouts with a skin, named colour slots and LOOK_V2's proportions are enough."
+- F6 (low, rule, engine-architect, Appendix A) 0005:2538: current text "(the advisor's reading)". Condition 2's mark is
+  "(the advisor's reading, 2026-11-03)". Smallest fix: add ", 2026-11-03".
+- F7 (low, inconsistent, engine-architect, content data; test-engineer, PM-0005-15) 0005:384-386 (CD-6 client content)
+  and 0005:2284 (PM-0005-15): CD-6's client content lists "the feel kit per weapon and the quality-tier table (CD-14),
+  the asset list and the material-slot classes ..., and the look values", and PM-0005-15 changes "the feel kit, the
+  asset list, the material-slot classes, the look values"; neither names the client entries OQ-0005-1 now decides (a
+  unit's, vehicle's or weapon's model id and a faction's colours and uniform models, CD-2, CD-13, AP-2). Unchanged
+  lines, so not a regression of this round. Smallest fix: add "the client entries keyed by simulation ids (CD-2)" to
+  CD-6's client content and to PM-0005-15's list of changed values.
+END FINDINGS
+
+## Result
+FAIL: 39 claims judged (rows H1-X5), 32 confirmed (A3 with a note: finding F4), 7 not confirmed (P1, F2, T6, M2, X2,
+X4, X5: findings F1-F3, F5-F7).
+Two medium findings (F1 pass-mark kinds contradict CD-2; F2 stale Appendix A count) need a one-phrase fix each before
+the PR is marked ready; five low.
+END RESULT
