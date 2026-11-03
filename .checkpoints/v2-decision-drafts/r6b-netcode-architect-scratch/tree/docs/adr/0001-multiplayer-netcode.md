@@ -460,10 +460,11 @@ server in the browser. The parts:
     staging server that multiplayer previews use presents such a pinned certificate or the browser-trusted one on both
     transports (a hash written into a static preview goes stale) is OQ-0006-5's, with ADR 0002 part 10's two shapes; the
     WebSocket fallback cannot pin a hash, since its constructor takes only a URL and sub-protocols (r2-netcode.md,
-    Findings, R2-ROOM-F12, lines 1494–1500), so in the proof test it presents a browser-trusted certificate on a domain
-    Mustafa registers ("for the WebSocket leg, a domain I register": SPIKE-MACHINES, 2026-11-03), OQ-0006-5's
-    development case (i), issued by a method the proof test's plan sets with security-auditor (the advisor's reading,
-    2026-11-03). *Why:*
+    Findings, R2-ROOM-F12, lines 1494–1500), so in the proof test it presents a browser-trusted certificate on
+    shamblefrontlines.com, registered (Mustafa, 2026-11-03: "DOMAIN: done. shamblefrontlines.com is registered at
+    Cloudflare."; his earlier words, SPIKE-MACHINES, 2026-11-03: "for the WebSocket leg, a domain I register"),
+    OQ-0006-5's development case (i), issued by a method the proof test's plan sets with security-auditor (the
+    advisor's reading, 2026-11-03). *Why:*
     datagrams suit newest-wins data; both crates
     sit on quinn and the interface keeps a swap cheap; WebSocket reaches networks without QUIC; the loopback backend
     runs the network's own messages from slice 1. *Research:* R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3, R2-TRN-REC4
@@ -753,7 +754,7 @@ client on every soldier, over a 30-minute soak, re-flood ticks included, unless 
 | Version or content mismatch | the lobby can send a client only to rooms of its own build and content hash (part 11); a `JoinRejected` for a mismatch reloads the client once, and only if the lobby names a newer build than its own; otherwise the client shows the reason and returns to the lobby, so a refused client never loops (proposed) | R1-DATA-REC6's mark (ADR 0005); the release path is OQ-0006-14 |
 | A tick or sequence counter wraps | wire ticks are 32-bit in the header, 16-bit offsets elsewhere; sequence numbers wrap, handled (part 5) | a deterministic L1 gate test that starts every counter just below its wrap (Test plan); the soaks are a second check |
 | Certificate expiry | ADR 0006's alert and renewal | ADR 0006 |
-| No Hetzner capacity in the EU | the reference server cannot be ordered | R6-HOST-OQ1 (ADR 0006) |
+| No Hetzner capacity in the EU | the reference server or a load generator's CAX21 cannot be created in `fsn1` on a run day: both are created fresh each run day ("They'll be created fresh on run day": Mustafa, 2026-11-03), so his console check does not promise that day's capacity (the advisor's reading, 2026-11-03); that run waits for capacity (proposed), and a lasting shortage takes OQ-0006-1's option (b) route, the fallbacks read and a new reference server named | OQ-0006-1, answered by his check, and its option (b) (ADR 0006; R6-HOST-OQ1) |
 
 ### Anti-cheat implications
 - Server authority: the client's sim online is a predicting copy, never the authority; no hit, state or RTT a client
@@ -1271,9 +1272,9 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
    - Development certificates (ADR 0006's): all four browsers connect with a pinned self-signed certificate in 20 of 20
      attempts, and reject one valid for 15 days (R2-TRN-REC5 marks 1 and 3), the "private hash-pinned certificate for
      WebTransport" Mustafa set (SPIKE-MACHINES, 2026-11-03); the WebSocket leg first needs a browser-trusted certificate
-     on the domain he registers ("for the WebSocket leg, a domain I register"), OQ-0006-5's development case (i), issued
-     by a method the proof test's plan sets with security-auditor (the advisor's reading, 2026-11-03; ADR 0006's
-     PM-0006-15).
+     on the domain, registered (Mustafa, 2026-11-03; his earlier words: "for the WebSocket leg, a domain I register"),
+     OQ-0006-5's development case (i), issued by a method the proof test's plan sets with security-auditor (the
+     advisor's reading, 2026-11-03; ADR 0006's PM-0006-15).
 2. **48 simulated clients stay within the budgets (parts 2, 3, 6, 11, 14).** The "Budgets for the netcode proof test"
    table above, plus: every decoded snapshot rebuilds the server's quantised state for that client by hash under P0,
    P2, P3 and B1, deltas again within 500 ms after B1, no datagram above the payload cap (R2-SYNC-REC1 marks 1–4); the
@@ -1290,7 +1291,7 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
    and memory under the ceiling, and a wrong origin gets 403 on all four browsers (R2-TRN-REC1 mark 4); a panic in one
    connection's handler closes only that connection (R2-ROOM-REC2 mark 6). For rooms per VM: 8 rooms as 8 processes on
    one reference server, each room's p99 within 10 % of one room, and a killed room leaves the others unchanged
-   (R2-ROOM-REC2 marks 2 and 4, on the CCX23 and the CX33: R6-HOST-REC2, ADR 0006).
+   (R2-ROOM-REC2 marks 2 and 4, on the CCX23 (ADR 0006)).
 3. **The 60 Hz margin (part 2):** in one run with part 2's setup, p99 server tick time at most 6.25 ms at a 60 Hz tick,
    both shares within 4.17 ms, and R1-TICK-REC2 P1–P3 at 60 Hz, with the rooms per VM at 60 Hz counted and the goal
    budget checked at that count (PM-0001-63; Mustafa's addition, OQ-0001-1). In wave 1 this run is an early signal only,
@@ -1332,6 +1333,17 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
    (R2-SYNC-OQ12); command timing (OQ-0001-6); whether shots need sub-tick stamps (OQ-0001-7). Reported, not judged:
    the egress per 48-player match-hour and the spike's own bill (R6-COST-REC1, ADR 0006), and the absolute delay from
    input to screen at P0, p50 and p99 on ML and RD (OQ-0001-15).
+
+**LG's clients on Arm: where a client's result is judged.** LG's headless bot clients (the key below names LG, RS and
+L1) run on Hetzner CAX21s, Arm64 VMs ("a CAX21 for the 48 simulated players", "so their build targets aarch64":
+Mustafa, 2026-11-03), while RS is x86-64. No pass mark's verdict rests on native aarch64 agreeing with x86-64 or Wasm.
+That agreement is unproven: ADR 0004's PM-0004-73 checks the trajectory function on CI's native x86-64 build and on
+Wasm only, and its PM-0004-26 adds native AArch64 only before ADR 0006 may pick Arm hosts; ADR 0004 part 7's float
+rules are not enough on their own. So every row that compares a result an LG client computes with the server's
+(PM-0001-17, -19, -48 and -54) names one of two ways: (i) its verdict comes from L1, an x86-64 client or a browser
+(Wasm), with LG's clients as load only; or (ii) a mismatch seen on LG counts only if the same inputs, replayed on L1 on
+x86-64, show it too. A mismatch that shows only on aarch64 is reported as a cross-architecture finding and decides
+nothing. The rule holds whatever LG turns out to be, and it adds no row (the advisor's reading, 2026-11-03).
 
 ### Pass marks
 Written by test-engineer (plan step 4). One row per mark, in the order of "What a spike must prove": three

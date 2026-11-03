@@ -8,3 +8,9 @@
 - 23:00 blocks 01-07 written (117-120, 188-190, 242-255, 288-290, 301, 324-328, 331-332). Next: 352-355, 372-374, 562, 607, Q6 632-635, 711-715, 748, 757-762, 766-768, OQ-1, OQ-2...
 - 23:07 blocks 08-16 written (352-355, 372-374, 562-564, 607, 631-635, 711-715, 748, 757-762, 766-768). Next: OQ-0006-1 799-810, OQ-0006-2 811-818, OQ-5 846-848, OQ-15 982-984, OQ-20 1073-1074, OQ-22 new, 1132-1139, 1361-1371, 1435-1436, 1446-1448, appendix rows; NOTES.
 - 23:13 blocks 17-23 written (OQ-1 799-800 & 809, OQ-2 811, OQ-5 846-847, OQ-15 982-984, OQ-20 1073-1074, OQ-22 after 1097). Next: 1132-1139, 1361-1371, 1435-1436, 1446-1448, appendix 1499/1510-1517, NOTES, dry run.
+- 23:19 blocks 24-31 written (1132-1139, 1361-1371, 1435-1436, 1446-1448, 1499, 1510-1512, 1514, 1517). Next: NOTE blocks, then dry run + glossary check.
+- 23:23 NOTEs N1-N8 written. Next: N9-N13, dry run, glossary check.
+- 23:26 NOTEs N9-N13 written; dry run: 31 fix blocks all applied. Next: glossary check, line checks.
+- 23:31 glossary: exact 0 base and applied; in-context 645 -> 644. Next: 0006 line, OQ count, forbidden-word checks.
+- 23:35 structure checks pass (22 OQs, 32 PM rows unchanged, no long lines, cells kept). Next: quote check, return.
+- 23:38 quotes checked (all in inputs or already in the doc). 31 FIX + 13 NOTE. DONE

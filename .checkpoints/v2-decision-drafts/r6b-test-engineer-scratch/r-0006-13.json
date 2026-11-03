@@ -1,0 +1,7 @@
+[["| Rooms per VM: 8 rooms at N = 48 on each machine (part 5;", "| Rooms per VM: 8 rooms at N = 48 on RS (part 5;"],
+ ["| each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) |", "| each of 8 rooms' server tick p99 at most 1.10 × the single-room figure (R2-ROOM-REC2 marks 1 and 5 on RS are ADR 0001's) |"],
+ ["| RS and SH, each with LG |", "| RS with LG |"],
+ ["(384 bot clients on LG)", "(384 bot clients on LG, on as many CAX21s as its calibration shows: the key)"],
+ ["| 3 sessions per machine at the 3 times of day; every valid session passes.", "| 3 sessions at the 3 times of day; every valid session passes."],
+ ["cannot each be alone on a vCPU, and on SH steal time is what the mark measures, so each vCPU's steal", "cannot each be alone on a vCPU, so each vCPU's steal"],
+ [" **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record.", ""]]

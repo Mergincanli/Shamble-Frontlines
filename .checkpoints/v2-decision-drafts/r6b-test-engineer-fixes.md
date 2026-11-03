@@ -242,3 +242,172 @@ part 7 (r6b-rust-reviewer-fixes.md, R6B-RR-1), so the key gains none (it would r
 pass marks names no CX33, SH, MV, location or address (grep).
 END
 
+### FIX F-0006-KEY-RIG
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  x86-64 AMD) in the location OQ-0006-2 picks (`nbg1` or `hel1`). **SH**, the shared CX33 (4 vCPU, 8 GB) beside it,
+  same location. **LG**, the load generator: one or more separate VMs in the same location that run every bot client,
+  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
+  ("the CX33 runs the simulated clients": SPIKE-MACHINES, Mustafa, 2026-11-03), as many as a 5-minute calibration run
+  at the session's load shows keep each under 80 % of its
+  CPU, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
+  encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
+  spend up to 1 vCPU per 48 sessions, ADR 0001); their count goes into the run plan and PM-0006-18. On LG's addresses
+  the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is recorded
+  (What a spike must prove, item 2). **MV**, a
+  CX33 in the same location running Prometheus, standing in for the staging game server, which exists only from slice 3
+  (proposed). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the minimum laptop (Windows 11:
+  Chrome, Edge, Firefox); MAC, a macOS machine with Safari. They carry no budget row here: every client mark in this
+  record is a yes-or-no or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own
+  accounts.
+AFTER:
+  x86-64 AMD) in Falkenstein (`fsn1`): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game
+  server and a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03; OQ-0006-2, answered). Every server row runs
+  on RS ("the rig is just the CCX23 and the CAX21": the option he chose, in the session's wording, 2026-11-03), and
+  no shared host is measured beside it: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits
+  (part 8). **LG**, the load generator: "a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03), Arm64 (4 vCPU,
+  8 GB), "so their build targets aarch64" (Mustafa, 2026-11-03, his console check), created in `fsn1` on the run day;
+  it runs every bot client, never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs
+  the marks measure). A 5-minute calibration run at the session's load shows each LG VM under 80 % of its CPU, each
+  one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384 encrypted
+  sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may spend up
+  to 1 vCPU per 48 sessions, ADR 0001). A run whose bots one CAX21 cannot carry under 80 % adds as many CAX21s as its
+  5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run (LG-COUNT, the option he chose,
+  2026-11-03); their count goes into the run plan and PM-0006-18, and the plan names which CAX21 carries MV. On LG's
+  addresses the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is
+  recorded (What a spike must prove, item 2). **MV**, the metrics role: Prometheus on LG's CAX21, never on RS, inside
+  LG's 80 % rule, standing in for the staging game server (the advisor's reading, 2026-11-03), which exists only from
+  slice 3; the calibration run includes it. **The day's addresses:** the VMs are new at every run ("I created both
+  once to try the console and deleted them right away. They'll be created fresh on run day, so their IP addresses will
+  be new then.": Mustafa, 2026-11-03), so no address is written here and each run records its own with its results,
+  and every setting bound to one is made on the run day (the connection cap on LG's addresses; any firewall rule that
+  names a source, as PM-0006-15's SSH and metrics rules and PM-0006-16's; the WebSocket leg's DNS record on
+  shamblefrontlines.com, set before its certificate is issued), while the new SSH host keys' check goes to the proof
+  test's plan with security-auditor and the WebTransport certificate is pinned by hash, not by address, and made per
+  run (the advisor's reading, 2026-11-03). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the
+  minimum laptop (Windows 11: Chrome, Edge, Firefox); MAC, a macOS machine with Safari, or for the netcode proof
+  test's yes-or-no and count rows a GitHub macOS runner, under the step, checks and limits ADR 0001's MAC key sets
+  (MACHINES-TIMING, Mustafa, 2026-11-03). They carry no budget row here: every client mark in this record is a
+  yes-or-no or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own accounts.
+END
+
+### FIX F-PM-0006-11
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+AFTER:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; the precondition; OQ-0006-1, answered by Mustafa, 2026-11-03) | the CCX23 created in `fsn1` on the run day (the key); recorded: type, location, its address of the day, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+END
+
+### FIX F-PM-0006-12
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-12 | The round trip to each candidate location (part 5; feeds OQ-0006-2) | reported, no pass number: per location, the mean and the max round trip and the loss of 100 ICMP echoes, as Windows' `ping` prints them | one throwaway CX33 per offered location (`nbg1`, `hel1`, `fsn1` if offered), ICMP allowed on these only, deleted after; from ML and from MP | `ping -n 100 <address>` per location from each machine (MP: the operations checklist, step 1); the outputs pasted into the results log | 1 run per machine and location; a second run at another time of day if two locations differ by under 5 ms (proposed) | OQ-0006-2; R6-HOST-OQ2 (r6 lines 856–858); R6-HOST-F18: the firewall filters ICMP (r6 lines 169–174) |
+AFTER:
+| PM-0006-12 | The round trip to the test servers' location (part 5; a check) | reported, no pass number: the mean and the max round trip and the loss of 100 ICMP echoes to `fsn1`, as Windows' `ping` prints them, set beside VISION_V2 §4's "about 100 ms"; it decides nothing, and a surprise goes to Mustafa (the advisor's reading, 2026-11-03) | one of the run's CAX21s in `fsn1` (LG's, created on the run day), with ICMP allowed on it only, never on RS; from ML and from MP | `ping -n 100 <address>` to that CAX21's address of the day from each machine (MP: the operations checklist, step 1); the outputs pasted into the results log | 1 run per machine | OQ-0006-2, answered (Mustafa, 2026-11-03); VISION_V2 §4 ("about 100 ms of ping"); R6-HOST-OQ2 (r6 lines 856–858; the playtesters' round trips stay open); R6-HOST-F18: the firewall filters ICMP (r6 lines 169–174) |
+END
+
+### FIX F-PM-0006-13
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on each machine (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) | RS and SH, each with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions per machine at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, and on SH steal time is what the mark measures, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
+AFTER:
+| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on RS (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure (R2-ROOM-REC2 marks 1 and 5 on RS are ADR 0001's) | RS with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG, on as many CAX21s as its calibration shows: the key); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
+END
+
+### FIX F-PM-0006-14
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on each machine and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS and SH, each with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
+AFTER:
+| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on RS and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
+END
+
+### FIX F-PM-0006-15
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on the domain Mustafa registers (SPIKE-MACHINES, Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+AFTER:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV's address of the day as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on shamblefrontlines.com, the domain Mustafa registered ("DOMAIN: done. shamblefrontlines.com is registered at Cloudflare.": Mustafa, 2026-11-03; earlier, SPIKE-MACHINES: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03), its DNS record set to RS's address of the day before the certificate is issued (the key); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+END
+
+### FIX F-PM-0006-16
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-16 | The metrics path works with only the rule it needs (part 9) | every metric of PM-0006-22 reaches Prometheus on MV; if part 9 picks the scrape: the exporter's port answers MV's address only and drops every other source (the PM-0006-15 probe from ML gets no answer); if it picks the push gateway: no inbound rule for metrics | RS, MV; a probe from ML | the path is configured as part 9 picks it; the rule names MV's address as its only source (proposed: the narrowest rule that serves a scrape) | 1 probe from ML; the metrics as PM-0006-22. Bite: the rule opened to every source makes ML's probe connect | the draft's spike 2 (proposed there: the negative test extended); R6-OBS-F4: scrape or push (r6 lines 279–284) |
+AFTER:
+| PM-0006-16 | The metrics path works with only the rule it needs (part 9) | every metric of PM-0006-22 reaches Prometheus on MV; if part 9 picks the scrape: the exporter's port answers MV's address of the day only (the CAX21 that carries MV) and drops every other source (the PM-0006-15 probe from ML gets no answer); if it picks the push gateway: no inbound rule for metrics | RS, MV; a probe from ML | the path is configured as part 9 picks it; the rule names that CAX21's address of the day as its only source, set on the run day (proposed: the narrowest rule that serves a scrape) | 1 probe from ML; the metrics as PM-0006-22. Bite: the rule opened to every source makes ML's probe connect | the draft's spike 2 (proposed there: the negative test extended); R6-OBS-F4: scrape or push (r6 lines 279–284) |
+END
+
+### FIX F-PM-0006-18
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated VMs counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0144 EUR (CX33) an hour, the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
+AFTER:
+| PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated CAX21s counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0176 EUR (CAX21) an hour (R6-HOST-F15, excluding VAT), the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
+END
+
+### FIX F-0006-FAILS-SH
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+PM-0006-17's interest figure) only when its condition holds; a reported mark (PM-0006-7, -10, -12, -14) when its record
+is complete; an adoption mark (PM-0006-13 on SH, PM-0006-14 on SH) never fails the spike: its result only keeps or
+admits K3. A failing run is never re-run until green: its data, build commit, host and time are kept, and its cause is
+AFTER:
+PM-0006-17's interest figure) only when its condition holds; a reported mark (PM-0006-7, -10, -12, -14) when its record
+is complete. No mark here is an adoption mark: no shared host is measured (the key), so K3 waits (part 8). A failing
+run is never re-run until green: its data, build commit, host and time are kept, and its cause is
+END
+
+### FIX F-0006-OPS-STEP1
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+1. Open a Windows terminal and run `ping -n 100 <address>` for each address the session sends (one per candidate
+   location). Expected: each run ends with a "Packets" line and an "Approximate round trip times" line; paste both into
+   the chat (PM-0006-12).
+AFTER:
+1. Open a Windows terminal and run `ping -n 100 <address>` for the address the session sends (that day's address of
+   one of the run's CAX21s in `fsn1`). Expected: the run ends with a "Packets" line and an "Approximate round trip
+   times" line; paste both into the chat (PM-0006-12).
+END
+
+### NOTE N-0006-MV-ROWS
+FILE: docs/adr/0006-infrastructure-operations.md
+no change: PM-0006-22, -23 and -24 (lines 1278–1280: "present on MV", "RS with LG and MV", "RS, MV") keep MV as AMENDMENT
+condition 9 says: MV is now the metrics role F-0006-KEY-RIG defines ("the metrics role: Prometheus on LG's CAX21,
+never on RS, inside LG's 80 % rule, standing in for the staging game server", the advisor's reading, 2026-11-03), so
+"on MV" means on that role's CAX21 and no cell changes; the plan names which CAX21 carries it when LG has more than one
+(the key). PM-0006-17, -19 and -20 ("RS with LG", "RS") name no SH, MV, CX33 or location.
+END
+
+### NOTE N-0006-ADDRESS-ROWS
+FILE: docs/adr/0006-infrastructure-operations.md
+no change: the client-address rows PM-0006-21 (line 1277: "every client address the soak used ... other than the VMs' own") and
+PM-0006-31 (line 1288: "the lab clients' public addresses") check logs and crash reports for addresses; they hold
+whatever the day's addresses are (the run records them, F-0006-KEY-RIG), so no word changes. Line 1214 ("Every server
+mark runs at the 30 Hz baseline") is about the tick rate, not the machine: no change. The "Results log" entry (every
+row names "the host or machine, its type, location and CPU model") stands; the day's addresses are recorded by the
+key's new sentence and PM-0006-11 / PM-0001-1.
+END
+
+### NOTE N-0006-STAYS
+FILE: docs/adr/0006-infrastructure-operations.md
+no change: line 1300 ("the reference server not orderable or failing: OQ-0006-1 (b) and a new reference server") stays live: VMs
+created fresh on the run day mean capacity on the day is not guaranteed, and OQ-0006-1's option (b) route stays the
+fallback (AMENDMENT, HZ-OQ1, the advisor's reading, 2026-11-03). The bracket's "Times of day" reason ("a shared host's
+neighbours follow the day", line 1233) stays: the 3 times of day are R6-HOST-REC2's mark ("3 times of day", r6 line
+669) and RS's dedicated vCPUs still sit on a shared physical host; it names no SH. The "Counts and settings" entry's
+"PM-0006-12's 100 echoes" stays (the row still pings 100 times; its dropped second run had no entry there). "What has
+no measurable mark here" (part 4, the staging game server, slice 3) stays: OQ-0006-22 (infra-engineer's) asks its plan
+and adds no mark.
+END
+
+### NOTE N-OTHER-ADRS
+FILE: docs/adr/0003-rendering.md
+no change: ADR 0002, 0003 and 0005's pass-mark sections name no CX33, SH, MV, CCX13, DS, Nuremberg, nbg1, Helsinki, hel1 or
+fixed address (the work list's script found none there). ADR 0003's key keeps MAC as the borrowed MacBook Air and "the
+actual machines, named by Mustafa before the look proof test" (line 1095–1096): under MACHINES-TIMING the look proof
+test's Safari rows stay on the borrowed Mac in either branch (AMENDMENT 2's limits), so no change there; ADR 0006's
+MAC entry points to ADR 0001's MAC sentence (F-0006-KEY-RIG), as AMENDMENT 2 routes it.
+END
+

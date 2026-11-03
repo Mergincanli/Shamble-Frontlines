@@ -1,0 +1,3 @@
+PM-0006-17's interest figure) only when its condition holds; a reported mark (PM-0006-7, -10, -12, -14) when its record
+is complete. No mark here is an adoption mark: no shared host is measured (the key), so K3 waits (part 8). A failing
+run is never re-run until green: its data, build commit, host and time are kept, and its cause is

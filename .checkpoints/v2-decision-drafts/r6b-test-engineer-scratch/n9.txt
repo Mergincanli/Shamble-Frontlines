@@ -1,0 +1,8 @@
+line 1300 ("the reference server not orderable or failing: OQ-0006-1 (b) and a new reference server") stays live: VMs
+created fresh on the run day mean capacity on the day is not guaranteed, and OQ-0006-1's option (b) route stays the
+fallback (AMENDMENT, HZ-OQ1, the advisor's reading, 2026-11-03). The bracket's "Times of day" reason ("a shared host's
+neighbours follow the day", line 1233) stays: the 3 times of day are R6-HOST-REC2's mark ("3 times of day", r6 line
+669) and RS's dedicated vCPUs still sit on a shared physical host; it names no SH. The "Counts and settings" entry's
+"PM-0006-12's 100 echoes" stays (the row still pings 100 times; its dropped second run had no entry there). "What has
+no measurable mark here" (part 4, the staging game server, slice 3) stays: OQ-0006-22 (infra-engineer's) asks its plan
+and adds no mark.

@@ -428,6 +428,76 @@ BEFORE:
 | R6-HOST-OQ1 | open: OQ-0006-1 | Mustafa's console check |
 | R6-HOST-OQ2 | open: OQ-0006-2 | a round-trip measurement |
 AFTER:
+| R6-TEL-REC3 | changed: the batch analysis runs off the staging VM | part 12 and B12: the staging VM runs pull-request-built code, so it holds no store key; the analysis runs on a production game VM while no room runs, and the mark's 10 minutes is read on the staging VM's plan (OQ-0006-22) |
+| R6-HOST-OQ1 | answered: OQ-0006-1 (Mustafa, 2026-11-03) | his console check: the CCX23 and the CAX21 can be ordered in `fsn1`, the CX33 cannot (part 5) |
+| R6-HOST-OQ2 | open: carried by OQ-0006-2, which Mustafa answered for the test servers (2026-11-03) | playtesters' round trips to `fsn1` against VISION_V2 §4's "about 100 ms"; the first production fleet starts there unless they say otherwise (part 5) |
+END
 
+### FIX R6B-IE-30
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| R6-HOST-OQ4 | open: OQ-0006-1 | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |
+AFTER:
+| R6-HOST-OQ4 | open: carried by OQ-0006-1, whose console check is answered; this id keeps its own trigger | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |
+END
+
+### FIX R6B-IE-31
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| R6-HOST-OQ7 | open: OQ-0006-1 | read at sign-up; under 1 EUR per VM either way |
+AFTER:
+| R6-HOST-OQ7 | open: carried by OQ-0006-1, whose console check is answered; this id keeps its own trigger | read at sign-up; under 1 EUR per VM either way |
+END
+
+### NOTE R6B-IE-N1
+no change: 91 (Gives: the reference server every server mark is measured on), 246 (kept word for word inside R6B-IE-03), 753 (every server mark measured on one named machine) and 1103 (every server mark at 30 Hz): true again, since every server row runs on the CCX23 (AMENDMENT, DS dropped; condition 2).
+END
+
+### NOTE R6B-IE-N2
+no change: 267 (part 6) and 825 (OQ-0006-3 (b)): the lobby's "for example a CX33 at 8.99 EUR a month" is a labelled placeholder example, which HZ-STAGING keeps as an example.
+END
+
+### NOTE R6B-IE-N3
+no change: 606 (G1's dated finding "currently unavailable" on 2026-10-28, a record), 610 (the root servers, Netcup, OVHcloud, Scaleway row: read only if OQ-0006-1 rules Hetzner Cloud out, consistent with its answer (a)) and 618 (K3's option row, the record; its trigger now reads in part 8, R6B-IE-08): option tables keep what was weighed.
+END
+
+### NOTE R6B-IE-N4
+no change: 801-808 and 810 (OQ-0006-1's Why it matters, Options with R6-HOST-OQ1 at 803, Decider and Carries): kept as the record of what was weighed; the answer line (R6B-IE-17) says (a) holds and that R6-HOST-OQ4 and OQ7 stay open with their own triggers; 809 is R6B-IE-18.
+END
+
+### NOTE R6B-IE-N5
+no change: 812-818 (OQ-0006-2's Why it matters, Options with `nbg1`, `hel1`, `fsn1` at 813, Decider, What decides it with R6-HOST-OQ2 at 817, Carries at 818): the record HZ-LOCATION keeps, under the answer line of R6B-IE-19; its title at 811 is the question asked, kept.
+END
+
+### NOTE R6B-IE-N6
+no change: 981 (OQ-0006-15's title, "when is it registered?", the question asked) and 988-999 (its Why it matters, Options, Decider, What decides it, Carries, with "a domain before the netcode proof test" at 993 and 997): the record the answer line keeps ("The options below stay as the record of what was weighed"); the answer is R6B-IE-21.
+END
+
+### NOTE R6B-IE-N7
+no change: 1032 (OQ-0006-17's "What decides it", with OQ-0006-1's console check): a field of an answered entry, kept as its record; the check itself is now answered (R6B-IE-17).
+END
+
+### NOTE R6B-IE-N8
+no change: 1075-1077 (OQ-0006-20's options (a) to (c) with "0.0144 a CX33-hour" and the interim): the record keeps its words, as AMENDMENT condition 9 rules; its one pointer is at 1074 (R6B-IE-22).
+END
+
+### NOTE R6B-IE-N9
+no change: 1146-1149 (spike item 2: bot clients on load-generator VMs, never the VM under test, as many as a short calibration run shows; the connection cap raised on their addresses and recorded): already LG-COUNT's rule (the option he chose) and address-neutral; LG's CAX21, the day's addresses and the host keys are the pass marks' key (test-engineer, AMENDMENT condition 11).
+END
+
+### NOTE R6B-IE-N10
+no change: 1300, and 1189-1199 and 1267-1280 (the advisor's list): inside the Pass marks section, test-engineer's text (AMENDMENT condition 13). 1300's route (the reference server not orderable or failing: OQ-0006-1 (b) and a new reference server) stays valid as the fallback for a run day without capacity (the advisor's reading, 2026-11-03, HZ-OQ1).
+END
+
+### NOTE R6B-IE-N11
+no change: 360-368 (part 8's CI runners: macOS is a standard runner, free while the repository is public): it already reads the runner's price, as AMENDMENT 2 rules (no change, or at most one pointer); the runner standing in as MAC is ADR 0001's key (test-engineer), to which ADR 0006's key points.
+END
+
+### NOTE R6B-IE-N12
+no change: 214, 396, 643, 731 and 1455 (Prometheus on the staging VM, M1): the production design; in the proof test MV, the metrics role on LG's CAX21, stands in for it (the pass marks' key, test-engineer).
+END
+
+### NOTE R6B-IE-N13
+no change: 1513, 1515 and 1516 (Appendix A rows R6-HOST-OQ3, OQ5, OQ6, inside the advisor's 1510-1517): none rests on the CX33, the location or OQ-0006-1; 1511, 1512, 1514 and 1517 are R6B-IE-29 to -31.
 END
 
