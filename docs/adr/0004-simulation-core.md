@@ -259,22 +259,22 @@ research ids, and the need it serves.
    `mul_add`, which std specifies exactly (R1-DET-F10, r1-simulation-core.md, Findings, lines 655–660); `abs` (std
    1.99.1's `f32` page: "This function always returns the precise result") and `copysign` (proposed: a sign-bit
    operation; std warns only of a NaN sign, which this part's no-NaN rule excludes); `as` casts (R1-DET-F15, lines
-   684–692); and the
-   exact non-arithmetic methods the rules themselves use, such as `is_finite`, `is_nan`, `to_bits` and `from_bits`.
-   Every other std `f32` and `f64` method is banned, and ADR 0002's lint is this list's complement. Among them are
-   `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`, which std 1.99.1 marks non-deterministic as it does the
-   transcendental functions (R1-DET-F9, lines 648–654; rust-reviewer read the note on all five at the step-10
+   684–692); and the exact non-arithmetic methods the rules themselves use, such as `is_finite`, `is_nan`, `to_bits` and
+   `from_bits`. Every other std `f32` and `f64` method is banned, and ADR 0002's lint is this list's complement. Among
+   them are `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`, which std 1.99.1 marks non-deterministic as it does
+   the transcendental functions (R1-DET-F9, lines 648–654; rust-reviewer read the note on all five at the step-10
    review), and `min`, `max` and `clamp`, which may return either zero for equal signed zeros, while `clamp` panics on
    bad bounds (R1-DET-F14, lines 679–683). In their place the sim has three helpers of its own, written as plain
    comparisons (`if a < b { a } else { b }` and the like): on equal inputs, signed zeros included, each returns one
    defined argument, the same on every target, and none panics (a clamp whose bounds are the wrong way round returns a
    bound); a degree value becomes radians by one multiply with a pinned constant. `rem_euclid`, `div_euclid` and the
-   float `%` operator are not on the list. std 1.99.1 guarantees `rem_euclid` and `div_euclid` "the rounded
-   infinite-precision result" (its `f32` and `f64` pages, read by the verifier on 2026-11-02), so they may join once
-   PM-0004-22's unit vectors confirm it on every target; no source read states the float `%`'s precision (the Rust
-   Reference defines it only by truncating division and the dividend's sign), and review, not the lint, catches the
-   operator.
-   Transcendental maths only
+   float `%` operator are not on the list. std's pages promise both methods "the rounded infinite-precision result"
+   (1.99.1's, read by the verifier on 2026-11-02, and 1.97.0's), yet 1.97.0's `div_euclid` gives 3, not 2, for
+   (3 + 2^-22) ÷ (1 + 2^-23) in `f32`, as does its `f64` analogue (verifiers fixcheck-d3a and skeptic-6, 2026-11-03). A
+   shared error passes a same-bits check, all determinism needs; correct rounding is a separate claim, so both may join
+   only once fixed inputs, those cases and their sign mirrors included, equal an exact reference on every target
+   (PM-0004-22, extended); no source read states `%`'s precision (the Rust Reference defines it only by truncating
+   division and the dividend's sign), and review, not the lint, catches the operator. Transcendental maths only
    through the pure-Rust `libm` crate, pinned; no std `sin`, `cos`, `atan2`, `powf` or `exp`, no `algebraic_*`, no
    fast-math, no `relaxed-simd`; Wasm `simd128` off until the suite passes with it on. NaN never enters sim state: every
    input and data value is checked finite where it enters, and debug and test builds assert finite state each tick. No
