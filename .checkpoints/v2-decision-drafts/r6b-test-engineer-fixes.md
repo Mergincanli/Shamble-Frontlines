@@ -54,18 +54,18 @@ FILE: docs/adr/0001-multiplayer-netcode.md
 BEFORE:
   judges, never a measured result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). Mustafa
 AFTER:
-  judges, never a measured result, and nothing stands in for RD, nor for MAC beyond the macOS runner below (the
-  advisor's reading, 2026-11-03). For the netcode proof test's Safari rows, Mustafa put one step first (MACHINES-TIMING,
-  2026-11-03): its plan checks "whether GitHub's macOS runners (real Safari, free while the repository is public) have
-  a Safari new enough for WebTransport and can reach the test servers"; if they can, "that is the Safari check" (if
-  not, "I borrow the Mac before the netcode proof test"), and a runner stands as MAC once the run's results record (i)
-  the runner image's Safari version on the day, at least 26.4 (R2-TRN-F7), (ii) real Safari driven through
-  safaridriver, not a WebKit build, and (iii) from the runner, one WebTransport session to RS that opens and carries
-  datagrams and one WebSocket session on the domain, and then only in yes-or-no and count rows (PM-0001-28's
-  four-browser path and library pick, its server then RS, since a runner sits on no local network of ours; PM-0001-14;
-  PM-0001-25's Origin; ADR 0006's PM-0006-15), while a row whose limit is a time and ADR 0003's look proof test stay on
-  the borrowed Mac, and the runner's workflow is the proof test's plan's, reviewed by security-auditor and
-  infra-engineer (the limits: the advisor's reading, 2026-11-03). Mustafa
+  judges, never a measured result, and nothing stands in for RD, nor for MAC beyond the macOS runner below
+  (the advisor's reading, 2026-11-03). For the netcode proof test's Safari rows, Mustafa put one step first
+  (MACHINES-TIMING, 2026-11-03): its plan checks "whether GitHub's macOS runners (real Safari, free while the
+  repository is public) have a Safari new enough for WebTransport and can reach the test servers"; if they can, "that
+  is the Safari check" (if not, "I borrow the Mac before the netcode proof test"), and a runner stands as MAC once the
+  run's results record (i) the runner image's Safari version on the day, at least 26.4 (R2-TRN-F7), (ii) real Safari
+  driven through safaridriver, not a WebKit build, and (iii) from the runner, one WebTransport session to RS that
+  opens and carries datagrams and one WebSocket session on the domain, and then only in yes-or-no and count rows
+  (PM-0001-28's four-browser path and library pick, its server then RS, since a runner sits on no local network of
+  ours; PM-0001-14; PM-0001-25's Origin; ADR 0006's PM-0006-15), while a row whose limit is a time and ADR 0003's
+  look proof test stay on the borrowed Mac and the runner's workflow is the proof test's plan's, reviewed by
+  security-auditor and infra-engineer (the advisor's reading, 2026-11-03). Mustafa
 END
 
 ### FIX F-0001-VALIDITY-SH
