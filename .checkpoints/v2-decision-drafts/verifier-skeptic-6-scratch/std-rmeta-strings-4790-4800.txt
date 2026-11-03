@@ -1,0 +1,11 @@
+fmaf
+fusedMultiplyAdd
+:B_<
+E Calculates Euclidean division, the matching method for `rem_euclid`.
+( This computes the integer `n` such that
+) `self = n * rhs + self.rem_euclid(rhs)`.
+F In other words, the result is `self / rhs` rounded to the integer `n`
+ such that `self >= n * rhs`.
+ infinite-precision result.
+ let a: f32 = 7.0;
+ let b = 4.0;

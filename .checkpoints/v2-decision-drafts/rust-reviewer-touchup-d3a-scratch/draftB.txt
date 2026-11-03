@@ -1,0 +1,8 @@
+float `%` operator are not on the list. std's `f32` and `f64` pages promise both "the rounded infinite-precision
+result" (std 1.99.1's, read by the verifier on 2026-11-02; 1.97.0's too), but rustc 1.97.0's `div_euclid` gives 3 for
+(3 + 2^-22) ÷ (1 + 2^-23), whose exact quotient is 2, in `f32` and `f64` (the verifier's fixcheck-d3a and skeptic-6
+runs, 2026-11-03). Determinism needs the same bits on every target, which a shared error passes; correct rounding is a
+separate claim, so both may join only once fixed inputs, that case and its sign mirrors among them, give the same bits
+on every target and equal an exact Euclidean reference (PM-0004-22, extended to them); no source read states the float
+`%`'s precision (the Rust Reference defines it only by truncating division and the dividend's sign), and review, not
+the lint, catches the operator. Transcendental maths only
