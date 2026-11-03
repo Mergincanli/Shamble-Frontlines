@@ -51,6 +51,15 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 18:50: the advisor approved plan revision 6 with 13 conditions (advisor-verdict-r6.md); the round launched on
+it (wf_aa306e26-720, wf_e7032fc9-6f4) was stopped before any block was written, because Mustafa corrected again
+(18:48: both test servers in Falkenstein, the CCX23 and the CAX21, created once and deleted, new addresses on run day)
+and dropped the CCX13 (18:49). Words saved (inputs/HETZNER-CORRECTION-2-…, HETZNER-ANSWERS-2-…; appendix §2); plan
+addendum 2; the advisor resumed to amend its verdict (an AMENDMENT section). Next: relaunch the round as units r6b-*
+from the amended conditions (the empty r6-* files are superseded), apply, scripts (quotes against all eight inputs
+files), gate, docs-keeper, the report, the close.
+
+Before that:
 At 18:35: Mustafa's Hetzner check (about 18:26), his correction (18:32) and his answers to the session's two
 questions (18:38: the CCX13 for development and "does it work" runs; Nuremberg) saved verbatim in inputs/HETZNER-*.md
 and in appendix §2; the close is on hold. Plan revision 6 (`plan-r6-hetzner-check.md`, with its addendum) is with the

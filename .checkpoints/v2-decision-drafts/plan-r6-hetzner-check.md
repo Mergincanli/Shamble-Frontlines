@@ -129,3 +129,25 @@ plan as follows (each for the advisor to confirm):
    Arm64 ("Limited availability"), so a CX33 may be orderable there (to be checked like the client VM).
 5. **Costs:** the cap per run comes from its planned hours on the server its plan names (SPIKE-COST), so the CCX13's
    hours replace the CCX23's in every run that measures nothing.
+
+## Addendum 2 (about 18:50): his second correction and his answer on the CCX13
+Verbatim: `inputs/HETZNER-CORRECTION-2-mustafa-2026-11-03.md` (about 18:48: "both test servers will be in Falkenstein, not
+Nuremberg: a CCX23 for the game server and a CAX21 for the 48 simulated players. I created both once to try the console
+and deleted them right away. They'll be created fresh on run day, so their IP addresses will be new then.") and
+`inputs/HETZNER-ANSWERS-2-mustafa-2026-11-03.md` (the CCX13 dropped; the option he chose, in the session's wording:
+"Every server run uses the CCX23 (the measurement-only rule goes); the rig is just the CCX23 and the CAX21."). The round
+launched at about 18:47 was stopped before any block was written (its files hold none). What changes, for the advisor:
+1. **The location is Falkenstein (`fsn1`)**, in his words; OQ-0006-2 answered by them (not by the option text).
+2. **OQ-0006-1:** both machines were created there ("I created both once to try the console and deleted them right
+   away"): the CCX23 and the CAX21 can be ordered in Falkenstein; the CX33 cannot (his first check). Answered?
+3. **No DS:** every server run uses the CCX23 (RS); his correction's "used only for the measurement runs" and the CCX13
+   are superseded by his later answer; nothing of DS goes into the drafts.
+4. **SH:** the CX33 cannot be ordered in Falkenstein, so by HZ-SH SH leaves the proof test and K3 waits (no shared x86
+   plan is checked there unless the advisor asks for one).
+5. **MV:** "the rig is just the CCX23 and the CAX21" (the option he chose): no separate metrics VM; where the metrics
+   stack runs (never on RS) is the proof test plan's? 
+6. **New addresses each run day:** the run records RS's and the client VMs' addresses on the day (the per-address
+   connection cap raised on LG's addresses, the firewall's sources, the WebSocket leg's DNS record and certificate);
+   each author checks that no sentence assumes a fixed address.
+7. **Counts:** if OQ-0006-1 and -2 are both answered: 115 numbered, 95 open (ADR 0006: 21 numbered, 16 open); pass
+   marks 341.
