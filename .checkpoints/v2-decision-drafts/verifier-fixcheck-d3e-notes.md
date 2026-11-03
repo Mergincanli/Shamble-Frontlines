@@ -15,3 +15,4 @@
 - fact 2 verdict block written (5/5 confirmed; D3E-1 optional: 1.99.1 same steps). Next: fact 3 (Hasher, Hash pages and core/hash source, 1.99.1).
 - fact 3 verdict block written (4 judged, 3 confirmed, 3c wasm32 width not read at a source). Next: fetch audit table, G1 summary, G5 part 5 (not-read list), counts, final.
 - 08:36 wasm32 page read twice: no width stated; 3c stays not read at a source. Audit rows added. Next: G1 summary, G5 part 5, counts and verdict.
+- G1 summary and G5 part 5 written. Next: counts, findings list, verdict, DONE.

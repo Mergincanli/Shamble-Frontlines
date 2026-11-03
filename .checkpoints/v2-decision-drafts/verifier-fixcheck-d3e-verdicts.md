@@ -226,3 +226,28 @@ excerpts.md W6-W8. Local behaviour: d3d scratch hasher_probe.out (1.97.0).
 - Result: fact 3 CONFIRMED (4 claims judged; 3 confirmed at the source, 1 in part: wasm32's width is not read at a
   source). No finding. Appendix §7.3's "Not read at their sources" bullet can drop `write_length_prefix`.
 END G1 fact 3
+
+## G1 summary: unit d's three facts, judged at their sources
+- Fact 1 (PM-0003-2): 5 judged, 5 confirmed (WebGPU CRD 2026-09-15 §22.1-22.4 and createBindGroup; MDN). Notes N1 (the
+  `uncapturederror` event is fired "If the user agent chooses") and N2 (`destroy()` resolves `lost` with "destroyed"):
+  low, optional.
+- Fact 2 (ADR 0004 part 7, PM-0004-22): 5 judged, 5 confirmed (1.99.1 f64 page, the 1.99.1 std and core source, the
+  1.97.0 f32 page). 1.99.1 takes 1.97.0's steps, so the pin gives 3 too. D3E-1 (low, optional): say so in part 7.
+- Fact 3 (ADR 0004 part 9, PM-0004-21): 4 judged, 3 confirmed at the source; 3c's wasm32 width confirmed nowhere
+  read (the target page has no line on it; the draft labels it "proposed").
+- No "wrong" or "unsupported" verdict, so nothing goes to a skeptic. The f64 Precision lines are saved (excerpts.md W3).
+- G1 CLOSED: unit d's work is done at its sources, after 08:30, allow-listed hosts only, each read in the fetch audit.
+END G1 summary
+
+## G5 part 5: the not-read list (appendix:612-613)
+- Text: "Not read at their sources (no fetch after 22:00): the WebGPU specification's error model behind PM-0003-2, and
+  std's `write_length_prefix` default behind ADR 0004 part 9 (both stay "unverified" in the verdict files)".
+- At HEAD it omits rustc 1.99.1's `div_euclid` (G1). After this unit, all three facts are read. The bullet is now
+  out of date rather than incomplete. Smallest fix (main session): "Read at their sources by fixcheck-d3e
+  (2026-11-03, 08:30-08:36): PM-0003-2's WebGPU error model (WebGPU, W3C CRD 15 September 2026, §22), rustc 1.99.1's
+  `div_euclid` (the same trunc-then-correct steps as 1.97.0, core/num/f32.rs and f64.rs) and std's
+  `write_length_prefix` default (core/hash/mod.rs): all confirmed. Not read at a source: that `usize` is 32 bits on
+  wasm32 (ADR 0004 part 9, labelled proposed)."
+- Result: G5 is a verifier pass, done. It found two wrong items (part 1: the skeptic count; part 2: the skeptic-coverage
+  wording) and confirmed {TOUCHN} and E1-E4 and E6. E5 is D3C-4. The placeholders and this bullet wait for the session.
+END G5 part 5
