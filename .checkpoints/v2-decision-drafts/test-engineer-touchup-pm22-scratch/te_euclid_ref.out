@@ -1,0 +1,9 @@
+f32 a=+a b=+b x/y=3.0 exact_q=2 exact_r=8388608*2^-23 (= 1.0) emul197_q=3.0 emul197_r=1.0 q_ok=False r_ok=True
+f32 a=-a b=+b x/y=-3.0 exact_q=-3 exact_r=1*2^-23 (= 1.1920928955078125e-07) emul197_q=-4.0 emul197_r=1.1920928955078125e-07 q_ok=False r_ok=True
+f32 a=+a b=-b x/y=-3.0 exact_q=-2 exact_r=8388608*2^-23 (= 1.0) emul197_q=-3.0 emul197_r=1.0 q_ok=False r_ok=True
+f32 a=-a b=-b x/y=3.0 exact_q=3 exact_r=1*2^-23 (= 1.1920928955078125e-07) emul197_q=4.0 emul197_r=1.1920928955078125e-07 q_ok=False r_ok=True
+f64 a=+a b=+b x/y=3.0 exact_q=2 exact_r=4503599627370496*2^-52 (= 1.0) emul197_q=3.0 emul197_r=1.0 q_ok=False r_ok=True
+f64 a=-a b=+b x/y=-3.0 exact_q=-3 exact_r=1*2^-52 (= 2.220446049250313e-16) emul197_q=-4.0 emul197_r=2.220446049250313e-16 q_ok=False r_ok=True
+f64 a=+a b=-b x/y=-3.0 exact_q=-2 exact_r=4503599627370496*2^-52 (= 1.0) emul197_q=-3.0 emul197_r=1.0 q_ok=False r_ok=True
+f64 a=-a b=-b x/y=3.0 exact_q=3 exact_r=1*2^-52 (= 2.220446049250313e-16) emul197_q=4.0 emul197_r=2.220446049250313e-16 q_ok=False r_ok=True
+f32 rem_euclid-like(-2^-30, 1): emul=1.0 exact=1073741823/1073741824 (= 1 - 2^-30) exact_rounded_to_f32=1.0 equals_exact=False equals_rounded=True
