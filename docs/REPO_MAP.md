@@ -66,7 +66,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/reports/2026-10-31-v2-research.md` | The R1–R6 research report (PR #28): outcome, evidence, risks, decisions needed |
 | `docs/reports/2026-10-31-v2-research-appendix.md` | Its appendix: coverage table, the 12 resolutions and the advisor's rulings, fetch audit, check outputs |
 | `docs/reports/2026-11-01-v2-decision-drafts.md` | The v2 decision drafts report (PR #33): outcome, evidence, reviews, risks, decisions needed |
-| `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full; Mustafa's decisions, the advisor's plan review and the plan's rules and steps, word for word; the steps and their commits; where each of the advisor's conditions is met; verification, the reviews and the final round; after the stop (2026-11-03): where each answer landed, and the advisor's reviews of plan revisions 4 and 5 |
+| `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full; Mustafa's decisions, the advisor's plan review and the plan's rules and steps, word for word; the steps and their commits; where each of the advisor's conditions is met; verification, the reviews and the final round; after the stop (2026-11-03): where each answer landed, and the advisor's reviews of plan revisions 4, 5 and 6; Mustafa's ten inputs files, byte for byte |
 
 ## .claude/
 | Path | What it is |

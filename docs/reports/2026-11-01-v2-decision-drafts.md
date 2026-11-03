@@ -23,14 +23,16 @@ Mustafa's UPGRADE-SCOPE update. Each condition's place: appendix §6. Rulings: A
 as "the 60 Hz margin" (confirmed at the stop, with Mustafa's addition); GLOSSARY §8 yes; the checkpoint kept at the
 stop. Revision 4 (2026-11-03: record the stop's answers, close the change-set) → the advisor's APPROVE WITH CONDITIONS,
 12 conditions, word for word in appendix §10. Revision 5 (2026-11-03: his design answers, his answers to the
-escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS, 10 conditions, appendix §11.
+escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS, 10 conditions, appendix §11. Revision 6
+(2026-11-03: his Hetzner check, its corrections and his last answers) → APPROVE WITH CONDITIONS, amended twice as his
+messages came in (16 conditions, then MACHINES-TIMING, LG-COUNT and the domain), appendix §12.
 
 ## What changed
 - `docs/ENGINE_OVERVIEW.md` (147 lines; the diagram shows the parts, the boundary, the per-tick and per-frame flow and
   VISION_V2 §6's places) · `docs/SPIKE_PLAN.md` (10 spikes and the asset-pipeline research: order, sizes, pass marks;
   wave 1 one heavy spike at a time) · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design
   questions, the loose-ends register; its pointers name OQ ids and parts, no line numbers).
-- `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 115 numbered open questions (97 open after
+- `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 116 numbered open questions (96 open after
   the stop's answers and Mustafa's later ones) plus one in SPIKE_PLAN, each with options and a decider, and 341 pass
   marks. Authors: netcode-architect, engine-architect, graphics-engineer, rust-reviewer, engine-architect +
   game-designer + graphics-engineer, infra-engineer; pass marks by test-engineer.
@@ -71,6 +73,15 @@ escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS,
   Advisor on 2026-11-03, each found word for word in his three messages (two with their inner quotes made single, as
   quotes inside a quote), the other hits section names and labels; the labels as the advisor set them; README's 114
   pointers carry no line number and name ids and parts that exist. Appendix §7.4.
+- **The Hetzner round (plan revision 6, 4dc30bc), scripts only (his stop):** 79 exact FIX blocks and 37 NOTEs from six
+  authors, each placed by script inside its author's own text; a work list by script (107 places plus the advisor's
+  list), each place given a FIX or a reasoned NOTE. After it: the write guard passes; 521 of 521 research ids; 0
+  retired glossary phrases; tables clean, 341 pass-mark rows of 7 cells; no new prose line over 120 characters; 116
+  numbered open questions, 96 open (ADR 0006: 22 and 17); 179 quotes credited to Mustafa or the Advisor on 2026-11-03
+  found word for word in his ten messages (the misses are the NET-PROFILES nesting, section names, labels and two
+  phrases quoted from Hetzner's pages); no CCX13 or DS role, no SH in any machine column or key, `nbg1`, `hel1`,
+  Nuremberg and Helsinki only in OQ-0006-2's recorded options and his quoted words, every remaining CX33 a labelled
+  placeholder, a record, an example or a "cannot be ordered in Falkenstein" note, and no address written as fixed.
 - **Gate** (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a smoke cannot start here (Playwright
   wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: 77 runs on
   this branch before the final commit, 70 passed, 7 cancelled when a newer push replaced them, 0 failed (`[skip ci]`
@@ -127,6 +138,16 @@ a new open question in ADR 0006 (OQ-0006-21), the door kept open; and his stop o
 Commit: 0aa262f (every author's blocks; appendix §9). Counts after it: 115 numbered open questions, 97 open; pass marks
 341.
 
+That evening (appendix §2, plan revision 6): his Hetzner console check, two corrections and four answers. The rig is
+"a CCX23 for the game server and a CAX21 for the 48 simulated players", both in Falkenstein (`fsn1`), created fresh on
+each run day; OQ-0006-1 and OQ-0006-2 are answered; the shared CX33 cannot be ordered in Falkenstein, so it is not
+measured and a shared fleet (K3) waits; the metrics role runs on the CAX21, never on the game server; a run adds
+CAX21s as its calibration needs, inside his cost cap (LG-COUNT); no pass mark's verdict rests on the Arm clients
+agreeing with x86-64 or Wasm (ADR 0001); MACHINES-TIMING (c), with GitHub's macOS runners checked first as the netcode
+proof test's Safari check; shamblefrontlines.com registered; a new open question, OQ-0006-22 (the staging server's x86
+plan, before slice 3). Commit: 4dc30bc (every author's blocks). Counts after it: 116 numbered open questions, 96
+open; pass marks 341.
+
 ## Decisions and deviations
 - **Openly stated (condition 18):** LOOK_V2 was added before the plan's approval (brief §0 asked for it first). The
   plan delays R7-MARKS's "changed when their ADR draft comes up" until the drafts are accepted; each draft lists its
@@ -162,7 +183,8 @@ did. What the authors flagged and left, each for the drafts' next revision unles
 2. PM-0006-18's "until it is answered the plan's cost goes to Mustafa" now describes the time before his SPIKE-COST
    answer (infra-engineer; the row is test-engineer's, unchanged).
 3. SPIKE_PLAN item 6, the preview hosting check, needs ML and MAC with the four browsers (as PM-0006-1 to -6 and -8 do)
-   and may run before the machines are named: it belongs with MACHINES-TIMING (engine-architect).
+   and may run before the machines are named; his MACHINES-TIMING answer settles only the netcode proof test's Safari
+   check, so each later spike's plan decides its own Safari rows (engine-architect; the advisor's amendment 2).
 4. COMMUNITY-SERVERS' "the game's version" is read as the protocol version that `Join` carries (the advisor's ruling);
    `Join` carries no build version, and adding one would be a new field, for later (netcode-architect).
 5. The design answers are in README and STATUS only. ADR 0005, ADR 0001 part 12 (AB15's visibility) and ADR 0003 (the
@@ -170,6 +192,10 @@ did. What the authors flagged and left, each for the drafts' next revision unles
    change with them (the advisor's DRAFT-ENTRIES (a); engine-architect).
 6. Two older notes stand (appendix §8): GLOSSARY's base text (lines 707–712) still gives the WebSocket leg a pinned
    self-signed certificate; OQ-0006-13 times its call "before the first client-host token".
+7. GLOSSARY's base text (lines 227–228, 260 and 605, research, not edited) still names the shared CX33 measured beside
+   the reference server, R6-HOST-OQ1 as open and a staging CX33; the drafts now say otherwise (plan revision 6).
+8. The branch's checkpoint commits are unsigned ("Unverified" on GitHub): the checkpoint script does not sign, and
+   amending one was refused as a destructive git action. The squash merge keeps them out of main.
 
 ## Risks
 1. Size: about 11,000 lines of drafts. README's "Decisions the drafts ask for" is the way in.
@@ -178,27 +204,20 @@ did. What the authors flagged and left, each for the drafts' next revision unles
 3. PR #33's history holds 31 MB of a skeptic's build output (294b3cf): the squash merge keeps it out of main.
 
 ## Proposed next step
-After the merge: the netcode proof test (SPIKE_PLAN item 1), as its own change-set branched from main, plan first; it
-waits on the items in "For Mustafa" and, for its own plan with security-auditor, on the certificate method and how a
-session holds its SSH key.
+After the merge: the netcode proof test (SPIKE_PLAN item 1), as its own change-set branched from main, plan first. Its
+plan checks GitHub's macOS runners as the Safari check first (MACHINES-TIMING) and puts its cost cap to Mustafa; with
+security-auditor it settles the certificate method, how a session holds its SSH key, and how a session checks the
+fresh VMs' host keys each run day.
 
 ## Decisions needed
-- **MACHINES-TIMING** (the advisor's, at plan revision 5) · You name the laptop, desktop and Mac before the look proof
-  test, but three earlier spikes measure on them: should they wait for the machines, or run first and be judged later?
-  The netcode proof test needs the Mac for Safari (its four-browser claim and the WebTransport library choice); the sim
-  core spike and the boundary spike measure on the laptop and the desktop · Until those machines exist, those rows are
-  rough checks only, and a row judged later costs a short re-run, with VM hours and a session · (a) borrow the Mac
-  before the netcode proof test, and the laptop and desktop before the sim core spike; (b) keep your timing: rough
-  checks first, a short re-run judges them once the machines are named, the library choice waits for Safari; (c) a mix:
-  the Mac early, the laptop and desktop on your timing · Recommend (c): Safari is the one browser where WebTransport is
-  new, so the library choice should see it.
+None open from this PR: MACHINES-TIMING ((c), with the GitHub macOS runner check first) and LG-COUNT (a run adds
+CAX21s as its calibration needs, inside your cost cap) are answered. OQ-0006-22, the staging server's x86 plan, is
+yours (money) with the Advisor, but only before slice 3.
 
 ## For Mustafa
-1. In your Hetzner console: can a CCX23 and a CX33 be ordered in an EU location (OQ-0006-1)? Still open.
-2. Register shamblefrontlines.com at Cloudflare before the netcode proof test.
-3. Borrow and name the laptop, desktop and Mac: at the latest before the look proof test, earlier as MACHINES-TIMING
-   says.
-4. OK each run's cost cap when its plan reaches you.
-5. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
+1. Borrow and name the laptop and the desktop: rough checks run first, then a short re-run once they're named. Whether
+   you borrow the Mac before the netcode proof test or only for the look proof test depends on the GitHub runner check.
+2. OK each run's cost cap when its plan reaches you.
+3. Approve the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository.
+4. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
    session's chat; it merges by squash only. Nothing to check in Brave: nothing a player sees changes.
-

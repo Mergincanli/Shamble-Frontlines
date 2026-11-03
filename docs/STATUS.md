@@ -9,7 +9,7 @@ docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inv
 docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only);
 docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only); docs-after-31 (PR #32, 9e7db28, 2026-10-31; docs
 only; the v2 day session's handover).
-**In flight: the decision drafts** (draft PR #33, from the Advisor's drafts brief, 2026-10-31): `docs/ENGINE_OVERVIEW.md`,
+**In flight: the decision drafts** (PR #33, from the Advisor's drafts brief, 2026-10-31): `docs/ENGINE_OVERVIEW.md`,
 `docs/adr/0001`–`0006` (Status: Proposed), `docs/SPIKE_PLAN.md`, `docs/adr/README.md` (the index and the loose-ends
 register), GLOSSARY §8 (the phase 1 terms) and `docs/LOOK_V2.md` (the look brief, Mustafa and the Advisor, added
 2026-10-31). **The stop is answered** (Mustafa and the Advisor, 2026-11-03; Decisions pending, below): the six drafts
@@ -18,10 +18,14 @@ Mustafa signs it off after its spikes report); the answers are recorded in the d
 it merges by squash only, on Mustafa's go after the advisor approves its final head.
 **Next:** the netcode proof test, its own change-set, branched from main after PR #33 merges, plan first. Wave 1 runs
 one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
-proof test once its models exist; the preview hosting check alongside any. The proof test still waits on: Mustafa's
-Hetzner console check (OQ-0006-1); shamblefrontlines.com registered at Cloudflare before it (OQ-0006-15, answered); each
-run's cost cap in its plan for his OK (OQ-0006-20, answered); the Mac for Safari if MACHINES-TIMING (c) is taken; and,
-for its own plan with security-auditor, the certificate method and how a session holds its SSH key. Two later steps:
+proof test once its models exist; the preview hosting check alongside any. The proof test still waits on: his OK of each
+run's cost cap, in its plan (OQ-0006-20, answered); the GitHub macOS runner check for its Safari leg, then the Mac only
+if that fails (MACHINES-TIMING, answered); and, for its own plan with security-auditor, the certificate method, how a
+session holds its SSH key, and how it checks the new VMs' host keys. "Decisions needed" from PR #33: none open
+(MACHINES-TIMING and LG-COUNT answered); OQ-0006-22 is a later item (before slice 3). For Mustafa: borrow and name the
+laptop and desktop (rough checks first, then a short re-run), the Mac as the runner check decides; OK each run's cost
+cap; the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository; his go for the
+merge after the advisor approves PR #33's final head (squash only). Two later steps:
 LOOK_V2 §8 reads "Spline or Blender" once the asset research's export part reports (that part's change-set makes the
 edit, and it goes to Mustafa for the merge); the drafts take up the design answers at their next revision. Then phase 1
 and the playable slices (SLICE-ORDER, below). The legacy game is frozen (critical fixes only).
@@ -57,7 +61,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), PR #33 (ready for review, not merged) | all deliverables in; verified against the research, checked for consistency and completeness, ten domain reviewers on the final diff, every finding fixed or deferred. The stop is answered (Mustafa and the Advisor, 2026-11-03): the six drafts are signed off as the basis for the spikes, not yet accepted (Status Proposed); the answers, his design answers and his answers to the escalations are recorded (plan revisions 4 and 5, the advisor's APPROVE WITH CONDITIONS on each). Verification stopped after the last fix round, as Mustafa asked; what is left goes into the PR's report as notes. Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed) | the PR marked ready; the advisor's APPROVE of its final head; then Mustafa's go; merge by squash only |
+| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), PR #33 (ready for review, not merged) | all deliverables in; verified against the research, checked for consistency and completeness, ten domain reviewers on the final diff, every finding fixed or deferred. The stop is answered (Mustafa and the Advisor, 2026-11-03): the six drafts are signed off as the basis for the spikes, not yet accepted (Status Proposed); the answers, his design answers and his answers to the escalations are recorded (plan revisions 4 and 5, the advisor's APPROVE WITH CONDITIONS on each). Verification stopped after the last fix round, as Mustafa asked; what is left goes into the PR's report as notes. Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed). Since then (plan revision 6, the advisor's APPROVE WITH CONDITIONS, amended twice; the drafts' blocks in 4dc30bc): his Hetzner check and later answers recorded (Decisions pending) | the advisor's APPROVE of its final head; then Mustafa's go; merge by squash only |
 | docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
 | **docs-after-v2-research** (docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's "merge #31" after the advisor's APPROVE of 1c687d1 | done; the report is PR #31's body | none |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
@@ -115,6 +119,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     beyond the cap, the victim's view wins."
   - SPIKE-MACHINES, Mustafa: "a separate Hetzner project"; "sessions get SSH access only and no Hetzner token until the
     security baseline. VMs exist only during a run."; "Test PC: my own, in Brave; the CX33 runs the simulated clients."
+    Beside it, since his Hetzner check (below): the simulated players run on a CAX21, the game server on a CCX23.
   - LOOK-TEST-INPUTS, Mustafa: the asset research's export and slot-naming part runs before the look proof test;
     "Route: Blender"; "blockouts with a skin, named colour slots and LOOK_V2's proportions are enough."
   - TOY-BOX, Mustafa: "reword both to point at LOOK_V2, in a small kit change-set after PR #30 is updated, together
@@ -148,17 +153,36 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     the Advisor's pencil, which he may veto; what it covers stays open.
   - Fragments as damage: "visual only for now."
   - Still open: "faction asymmetry (Mustafa works on the unit list first) and the war around the matches."
-  - Counts after the round (by script): 115 numbered open questions, 97 open; pass marks 341.
+  - Counts after that round (by script): 115 numbered open questions, 97 open; pass marks 341 (now: below).
 - **The stop's four escalations, answered by Mustafa, 2026-11-03** (about 17:31; appendix §2):
   - REF-MACHINES (OQ-0003-1, answered in part): the classes, "All borrowed"; he names the actual machines before the
     look proof test; until then his laptop's integrated graphics "stands in for the minimum, for rough checks only."
   - LOOK_V2-§8: kept, "with Blender for the test models only".
   - SPIKE-COST (OQ-0006-20, answered): "one cap per run, from its planned hours, written in that run's plan for my OK."
-  - DOMAIN (OQ-0006-15, answered): "shamblefrontlines.com, which I register at Cloudflare."
+  - DOMAIN (OQ-0006-15, answered): "shamblefrontlines.com, which I register at Cloudflare." (registered since: below).
   - COMMUNITY-SERVERS: a new open question, OQ-0006-21 (ADR 0006 and README): the door kept open, not designed.
-  - Open for Mustafa: **MACHINES-TIMING** (the Advisor's): three spikes before the look proof test measure on the
-    laptop, desktop or Mac; wait for the machines, or run first and be judged later? Recommendation (c): the Mac early
-    (Safari, for the netcode proof test), the laptop and desktop on his timing.
+  - MACHINES-TIMING (the Advisor's question, from its review of plan revision 5: three spikes before the look proof
+    test measure on the laptop, desktop or Mac): answered by Mustafa later that day (below).
+- **The Hetzner check and Mustafa's later answers, 2026-11-03** (about 18:26 to 19:04, in the decision-drafts session's
+  chat; plan revision 6, the advisor's APPROVE WITH CONDITIONS, amended twice; the drafts' blocks in 4dc30bc):
+  - The rig (OQ-0006-1 and OQ-0006-2, answered): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for
+    the game server and a CAX21 for the 48 simulated players"; "I created both once to try the console and deleted
+    them right away. They'll be created fresh on run day, so their IP addresses will be new then."
+  - The CCX13 dropped: his choice of the session's option "the rig is just the CCX23 and the CAX21" (the session's
+    wording).
+  - The shared CX33 is not measured: "in Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its
+    Arm64 version can." (his first note). K3 (a shared fleet) waits for a later measurement of a shared x86 plan.
+  - LG-COUNT, answered: he chose the session's option "The run's plan adds as many CAX21s as its 5-minute calibration
+    shows are needed, inside the cost cap you OK for that run." (the session's wording).
+  - MACHINES-TIMING, answered: "(c), with one step first. For the netcode proof test's Safari leg, check whether
+    GitHub's macOS runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport
+    and can reach the test servers. If they can, that is the Safari check, and I borrow the Mac only for the look proof
+    test. If they can't, I borrow the Mac before the netcode proof test. The laptop and desktop stay on my timing: rough
+    checks first, then a short re-run once they're named."
+  - DOMAIN: "DOMAIN: done. shamblefrontlines.com is registered at Cloudflare."
+  - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
+    ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.
+  - Counts now: 116 numbered open questions, 96 open; pass marks 341.
 - **Follow-ups:** TOY-BOX's small kit change-set after PR #30 is updated, with the checkpoint anti-waste rules
   (Mustafa, 2026-11-03); LATER's design session after the netcode proof test, with the twelve LATER questions and the
   38 design questions on its agenda (the advisor's ruling).
