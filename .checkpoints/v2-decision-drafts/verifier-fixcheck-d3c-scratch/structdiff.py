@@ -78,4 +78,11 @@ for d in DOCS:
                 for h in find_blocks(d, x[3]): print(f'           <- {h[0]}:{h[1]} FIX {h[2]} [{h[3]}]')
         if op == 'replace':
             for x in b[j1:j2]: print(f'    now  {new}:{x[2]}: {x[3].strip()[:120]}')
+print('\n=== multiset check: keys whose count fell from old to new (a copy lost even though the key survives)')
+for d in DOCS:
+    a, b = struct(show(old, d)), struct(show(new, d))
+    ca = collections.Counter(x[0] + x[1] for x in a); cb = collections.Counter(x[0] + x[1] for x in b)
+    for k, n in ca.items():
+        if cb[k] < n and cb[k] > 0:
+            tot_lost += 0; print(f'  {d}: {k[:100]!r} x{n} at {old}, x{cb[k]} at {new}')
 print(f'\nTOTAL structural lines at {old}: {tot_old}; without the same key at {new}: lost {tot_lost}, changed {tot_changed}')

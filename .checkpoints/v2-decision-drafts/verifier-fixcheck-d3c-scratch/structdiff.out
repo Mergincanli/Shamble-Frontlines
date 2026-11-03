@@ -163,4 +163,6 @@
   ADDED  HEAD:132: | OQ-0006-20 | What may the netcode proof test's VMs cost? | Mustafa (money) | [ADR 0006](0006-infrastructure-operations
   ADDED  HEAD:281: - **ADR 0004:** spawning, spawn protection, the Recruit respawn and the barracks' team mask (part 17): LOOP_V2 §2 and §5
 
+=== multiset check: keys whose count fell from old to new (a copy lost even though the key survives)
+
 TOTAL structural lines at 47eadd9: 3225; without the same key at HEAD: lost 0, changed 21
