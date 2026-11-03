@@ -319,3 +319,115 @@ AFTER:
     plan back to the draft at its planning check.
 END
 
+### FIX R6B-IE-23
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+    rates, part 12). Progression lives under VISION_V2 §6.10 `[LATER]` (the advisor's reading, 2026-11-03).
+AFTER:
+    rates, part 12). Progression lives under VISION_V2 §6.10 `[LATER]` (the advisor's reading, 2026-11-03).
+- **OQ-0006-22. Which x86 plan runs the staging game server, now that the proposed CX33 cannot be ordered in
+  Falkenstein?**
+  - *Why it matters:* the staging VM runs the room server (part 4), and an Arm plan is an Arm host (ADR 0004's
+    PM-0004-26 first); part 8's lean case rests on the CX33's price, and Mustafa's check (2026-11-03) found "in
+    Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its Arm64 version can."
+  - *Options:* (a) a CX33 (8.99 EUR a month) only where it can be ordered; (b) a CCX13 (43.49, R6-HOST-F15) if it can
+    be ordered in the fleet's location; (c) a shared x86 "Regular Performance" plan (CPX32 35.99, R6-HOST-F15), whose
+    locations are not researched. Prices excluding VAT, read 2026-10-28 (r6-infrastructure.md, Findings §1, lines
+    150–159). Until it is answered, part 8 and PM-0001-63 carry 8.99 as the staging VM's placeholder price.
+  - *Decider:* Mustafa (money), with the Advisor.
+  - *What decides it:* his choice before slice 3 (online), when the staging game server is first created (part 4).
+  - *Carries:* no research id (the advisor's ruling HZ-STAGING, 2026-11-03, on his Hetzner check).
+END
+
+### FIX R6B-IE-24
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+**2. This record's operations marks inside the netcode proof test** (ADR 0001's spike, on the reference server; its
+precondition is OQ-0006-1). They prove parts 5, 7, 8 and 9:
+- rooms per VM: on the CCX23 and on the CX33, 8 rooms of 48 players (bots) as 8 processes, each room's server tick p99
+  within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day on the shared host
+  (r6-infrastructure.md, R6-HOST-REC2's mark, lines 667–671; R2-ROOM-REC2 mark 2, r2-netcode.md lines 2775–2782, ADR
+  0001's test); and rooms per VM measured on both machines at 48, 36 and 18 players (R6-COST-REC1's mark, r6 lines
+  714–717), counted as the most rooms for which R2-ROOM-REC2 marks 1 and 2 still hold (the counting rule is proposed
+  here, so the figure means the same on both machines). This replaces A-2 for part 8's goal budget (R6-COST-OQ1),
+AFTER:
+**2. This record's operations marks inside the netcode proof test** (ADR 0001's spike, on the reference server, a
+CCX23 in `fsn1`; its precondition, OQ-0006-1, is answered). They prove parts 5, 7, 8 and 9:
+- rooms per VM: on the CCX23, 8 rooms of 48 players (bots) as 8 processes, each room's server tick p99
+  within 10 % of the single-room figure, over 20 minutes
+  (r6-infrastructure.md, R6-HOST-REC2's mark, lines 667–671; R2-ROOM-REC2 mark 2, r2-netcode.md lines 2775–2782, ADR
+  0001's test); and rooms per VM measured at 48, 36 and 18 players (R6-COST-REC1's mark, r6 lines
+  714–717), counted as the most rooms for which R2-ROOM-REC2 marks 1 and 2 still hold (the counting rule is proposed
+  here); the shared host's half of R6-HOST-REC2's mark (3 times of day) waits with K3 (part 8). This replaces A-2 for
+  part 8's goal budget (R6-COST-OQ1),
+END
+
+### FIX R6B-IE-25
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+0. **Before any spike (Mustafa's steps):** the drafts signed off as the basis for the spikes (2026-11-03,
+   SPIKE-ORDER (b)); a Cloudflare account with a test project and its
+   token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account, the console check
+   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks, in which he
+   creates and deletes the VMs himself for each run, with SSH access only and no Hetzner token for sessions until the
+   security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03; the bench and the soaks:
+   the advisor's reading, 2026-11-03); shamblefrontlines.com, which he registers at Cloudflare for the netcode proof
+   test's WebSocket leg (OQ-0006-15, answered by Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register" and
+   "shamblefrontlines.com, which I register at Cloudflare"; before the netcode proof test:
+   the advisor's reading, 2026-11-03). *Milestone:* the reference server is orderable, or OQ-0006-1 (b) has named
+   another.
+AFTER:
+0. **Before any spike (Mustafa's steps):** the drafts signed off as the basis for the spikes (2026-11-03,
+   SPIKE-ORDER (b)); a Cloudflare account with a test project and its
+   token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account (its console check
+   done: OQ-0006-1, answered by Mustafa, 2026-11-03) and a Hetzner project of its own for the spikes, the tick bench
+   and the playtest soaks, in which he creates the VMs fresh for each run and deletes them himself, with SSH access
+   only and no Hetzner token for sessions until the security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03;
+   the bench and the soaks: the advisor's reading, 2026-11-03); shamblefrontlines.com for the netcode proof test's
+   WebSocket leg (OQ-0006-15, answered by Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register" and
+   "shamblefrontlines.com, which I register at Cloudflare"), registered (Mustafa, 2026-11-03). *Milestone:* the
+   reference server is orderable (OQ-0006-1, answered), or OQ-0006-1 (b) has named another.
+END
+
+### FIX R6B-IE-26
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  match count, and a month of goal-scale records (about 13,000) is analysed in under 10 minutes on a CX33, the staging
+  VM's plan, though the analysis itself runs off the staging VM (part 12)
+AFTER:
+  match count, and a month of goal-scale records (about 13,000) is analysed in under 10 minutes on the staging VM's
+  plan (OQ-0006-22), though the analysis itself runs off the staging VM (part 12)
+END
+
+### FIX R6B-IE-27
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+- **Game servers:** if the CCX23 cannot be ordered or fails the marks, read OQ-0006-1's fallbacks and re-run the
+  netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name. If the shared
+  CX33 fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the hour with a monthly cap (R6-HOST-F17), so a
+AFTER:
+- **Game servers:** if the CCX23 cannot be ordered on a run day or fails the marks, read OQ-0006-1's fallbacks and
+  re-run the netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name.
+  A shared-vCPU fleet (K3) comes only after a later measurement of a shared x86 plan that can be ordered in the
+  fleet's location passes; until then, or if it fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the
+  hour with a monthly cap (R6-HOST-F17), so a
+END
+
+### FIX R6B-IE-28
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| R6-HOST-REC2 | changed: the firewall's rules listed per VM role | part 5: R6-HOST-REC2 opens the two game ranges "plus nothing else" (r6 line 649); this record's own parts need more (a Prometheus scrape needs an inbound port, R6-OBS-F4, r6 lines 279–284; SSH from named addresses; the staging delivery path; TCP 443 for the lobby; TCP 80 only for http-01), so the rules are proposed and spike 2 tests them; otherwise as recommended: a working pick until OQ-0006-1 is answered; its marks restated for N = 48 at 30 Hz (spike 2) |
+AFTER:
+| R6-HOST-REC2 | changed: the firewall's rules listed per VM role; the shared CX33 not measured | part 5: R6-HOST-REC2 opens the two game ranges "plus nothing else" (r6 line 649); this record's own parts need more (a Prometheus scrape needs an inbound port, R6-OBS-F4, r6 lines 279–284; SSH from named addresses; the staging delivery path; TCP 443 for the lobby; TCP 80 only for http-01), so the rules are proposed and spike 2 tests them; the CX33 it measures beside the reference server cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits for a later measurement of a shared x86 plan (part 8); otherwise as recommended: the CCX23 stands as the reference server, in `fsn1` (OQ-0006-1 and OQ-0006-2, answered by Mustafa, 2026-11-03); its marks restated for N = 48 at 30 Hz (spike 2) |
+END
+
+### FIX R6B-IE-29
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| R6-TEL-REC3 | changed: the batch analysis runs off the staging VM | part 12 and B12: the staging VM runs pull-request-built code, so it holds no store key; the analysis runs on a production game VM while no room runs, and the mark's 10 minutes is read on a CX33, the staging VM's plan |
+| R6-HOST-OQ1 | open: OQ-0006-1 | Mustafa's console check |
+| R6-HOST-OQ2 | open: OQ-0006-2 | a round-trip measurement |
+AFTER:
+
+END
+

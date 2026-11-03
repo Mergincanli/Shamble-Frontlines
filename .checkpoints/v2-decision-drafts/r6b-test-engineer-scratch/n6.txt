@@ -1,0 +1,4 @@
+the A64 key (line 1042), S7 and PM-0004-26 stay as AMENDMENT condition 6 rules (an Arm load generator is not "an ARM
+host" in part 7's sense, the advisor's reading, 2026-11-03); condition 6's one sentence is rust-reviewer's and sits in
+part 7 (r6b-rust-reviewer-fixes.md, R6B-RR-1), so the key gains none (it would repeat it). The rest of ADR 0004's
+pass marks names no CX33, SH, MV, location or address (grep).

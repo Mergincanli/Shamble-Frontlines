@@ -1,0 +1,8 @@
+- **Machines.** **RS**, [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of
+  [the reference server](../research/GLOSSARY.md#the-reference-server): a Hetzner CCX23 (4 dedicated vCPU, 16 GB,
+  x86-64 AMD), Linux, in Falkenstein (`fsn1`) (R6-HOST-REC2, r6 lines 645–650; GL lines 225–230; R6-HOST-OQ1
+  answered by Mustafa's console check, 2026-11-03, OQ-0006-1; ADR 0006's RS key quotes his words), with no other room
+  on that vCPU (GL lines 244–250); the bench process is pinned to one vCPU and the VM is otherwise idle (proposed: a
+  neighbour on the same VM moves a p99; the pinning tool is the harness's to document). The shared CX33 is not
+  measured: it cannot be ordered in Falkenstein (Mustafa, 2026-11-03). **ML**, the minimum laptop, and **RD**, the
+  recommended desktop: ADR 0003's machines (R3-BUDGET-REC1, r3 lines

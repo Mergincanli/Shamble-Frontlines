@@ -1,3 +1,5 @@
-    15 to 30 × 0.1386 = 2.08 to 4.16 EUR) and the CX33 hours of SH, MV and the load generators (as many as spike 2's
-    calibration run asks; the rig is now the CCX23 and CAX21s, part 5); so a 5 EUR cap over everything would send the
-    plan back to the draft at its planning check.
+- **Game servers:** if the CCX23 cannot be ordered on a run day or fails the marks, read OQ-0006-1's fallbacks and
+  re-run the netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name.
+  A shared-vCPU fleet (K3) comes only after a later measurement of a shared x86 plan that can be ordered in the
+  fleet's location passes; until then, or if it fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the
+  hour with a monthly cap (R6-HOST-F17), so a

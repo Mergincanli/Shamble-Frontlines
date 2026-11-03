@@ -111,3 +111,41 @@ AFTER:
      advisor's reading, 2026-11-03; ADR 0006's PM-0006-15).
 END
 
+### NOTE budgets-719
+no change: ADR 0001 lines 719-720, "Every server mark is measured on one vCPU of the reference server (R6-HOST-REC2's
+CCX23; ADR 0006)", is true again: every server row runs on RS, the CCX23 (AMENDMENT condition 2; DS dropped and SH
+leaves the proof test, so no server row runs anywhere else), and the rooms-per-VM rows that run unpinned are covered
+by the same sentence's "unless the row says otherwise" (line 721). The sentence names no location and no address.
+END
+
+### NOTE cap-clause-for-test-engineer
+no change in my text: AMENDMENT condition 11 gives netcode-architect at most one clause in ADR 0001's key, at the
+connection cap on LG's addresses, but that key (lines 1360-1361, "on LG's addresses the per-address connection cap
+(part 10) is raised to the run's session count and recorded") is test-engineer's text (the work list gives lines
+1360, 1361 and 1363 to test-engineer). The clause I propose, for test-engineer to write there: "on LG's addresses,
+new each run day ("They'll be created fresh on run day, so their IP addresses will be new then.": Mustafa,
+2026-11-03), the per-address connection cap (part 10) is raised on the run day to the run's session count and
+recorded" (that the cap is set on the run day is the advisor's reading, 2026-11-03). Part 10 (lines 444-450, my
+text) keys the cap by IPv4 /32 and IPv6 /64 and names no machine address, so it needs no change.
+END
+
+### NOTE other-hits-0001
+no change: the other hits of the amended search in my text (script over lines 1-1335 and 1654-1918): line 34 ("one
+EU region": VISION_V2 §4, a requirement); lines 448, 509, 777, 1219 and 1716 (addresses as the per-address limits'
+IPv4 /32 and IPv6 /64 keys, not machine addresses); line 520 ("the domain is OQ-0006-15": a correct pointer, since
+OQ-0006-15 is answered with shamblefrontlines.com in infra-engineer's entry, ADR 0006 lines 981-985); line 677 ("the
+supervisor registers": not the domain); line 720 (RS as the CCX23: true); line 1312 (hits that "register on the
+server"); line 1813 (Appendix A, R2-ROOM-REC8's registrable domain). No CX33, CCX13, DS, SH, MV, CAX, nbg1, hel1,
+fsn1, Falkenstein, Nuremberg, Helsinki, OQ-0006-1, OQ-0006-2 or R6-HOST-OQ2 occurs in my text; R6-HOST-OQ1 only at
+line 756 (FIX capacity-756). The Test plan's "Load and soak" (lines 1710-1713) stays: which VM carries a playtest
+soak's bots is named when the first soak is planned, and if it is Arm its desyncs follow the arm-rule (AMENDMENT
+condition 7, engine-architect (a), ADR 0002).
+END
+
+### NOTE routed-to-test-engineer
+no change in my text: the advisor's list names for ADR 0001 also 1350-1357 (the RS, SH and LG key), PM-0001-1, -16,
+-27 and -63, and condition 8 has those rows and the key lose SH; with lines 1354-1363 and 1462-1464 ("on SH steal is
+what is measured") they lie in the "Pass marks" section, test-engineer's text (AMENDMENT condition 13), and PM-0001-48
+and -54 take the arm-rule's way as NOTE rows-for-test-engineer gives it. The arm-rule names SH nowhere.
+END
+

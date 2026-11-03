@@ -1,0 +1,1 @@
+| R6-HOST-OQ2 | open: carried by OQ-0006-2, which Mustafa answered for the test servers (2026-11-03) | playtesters' round trips to `fsn1` against VISION_V2 §4's "about 100 ms"; the first production fleet starts there unless they say otherwise (part 5) |

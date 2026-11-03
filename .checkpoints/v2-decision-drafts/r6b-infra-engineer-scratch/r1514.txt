@@ -1,0 +1,1 @@
+| R6-HOST-OQ4 | open: carried by OQ-0006-1, whose console check is answered; this id keeps its own trigger | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |

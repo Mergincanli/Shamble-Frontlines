@@ -6,3 +6,5 @@
 - 22:44 F-0001-KEY-MAC, F-0001-VALIDITY-SH, F-PM-0001-1/-16/-27/-63 done. Next: PM-0001-48, -54 (way ii), then ADR 0004.
 - 22:55 ADR 0001 rows -17,-19,-48,-54 (way ii) done; key Arm sentence names 4 rows. Next: NOTEs for 0001, then ADR 0004.
 - 22:59 ADR 0001 NOTEs done. Next: ADR 0004 key + PM-0004-1, -4.
+- 23:04 ADR 0004 done (key, -1, -4, 2 NOTEs). Next: ADR 0006 key block.
+- (clock check 22:35: the times 22:55/22:59/23:04 above were estimates; real times are earlier)

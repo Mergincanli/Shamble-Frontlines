@@ -1,0 +1,4 @@
+[["| How the cost grows with N, and on the cheaper host (S1; part 1's one thread per match; decides R1-ECS-OQ4 and R1-TICK-OQ5) |", "| How the cost grows with N (S1; part 1's one thread per match; decides R1-ECS-OQ4 and R1-TICK-OQ5, both from RS alone) |"],
+ ["and the N = 64 headroom run, each part beside the total; the same at N = 48 on CX33; legacy's", "and the N = 64 headroom run, each part beside the total; legacy's"],
+ ["| RS; CX33 |", "| RS |"],
+ ["; R1-TICK-OQ5 (lines 2658–2660); R6-HOST-REC2 (CX33 beside) |", "; R1-TICK-OQ5 (lines 2658–2660) |"]]

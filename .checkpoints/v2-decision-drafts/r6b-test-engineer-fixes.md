@@ -187,3 +187,58 @@ on the same local network" cannot hold for a runner, so on a runner that row's s
 the borrowed Mac keeps its local server. Every time-limited row on MAC and ADR 0003's rows stay on the borrowed Mac.
 END
 
+### FIX F-0004-KEY-RS-CX33
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+- **Machines.** **RS**, [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of
+  [the reference server](../research/GLOSSARY.md#the-reference-server): a Hetzner CCX23 (4 dedicated vCPU, 16 GB,
+  x86-64 AMD), Linux, one EU location (R6-HOST-REC2, r6 lines 645–650; GL lines 225–230; a working pick while
+  R6-HOST-OQ1 is open), with no other room on that vCPU (GL lines 244–250); the bench process is pinned to one vCPU and
+  the VM is otherwise idle (proposed: a neighbour on the same VM moves a p99; the pinning tool is the harness's to
+  document). **CX33**, the shared-vCPU CX33, measured beside RS where a row says so (R6-HOST-REC2): reported, never
+  gated. **ML**, the minimum laptop, and **RD**, the recommended desktop: ADR 0003's machines (R3-BUDGET-REC1, r3 lines
+AFTER:
+- **Machines.** **RS**, [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of
+  [the reference server](../research/GLOSSARY.md#the-reference-server): a Hetzner CCX23 (4 dedicated vCPU, 16 GB,
+  x86-64 AMD), Linux, in Falkenstein (`fsn1`) (R6-HOST-REC2, r6 lines 645–650; GL lines 225–230; R6-HOST-OQ1
+  answered by Mustafa's console check, 2026-11-03, OQ-0006-1; ADR 0006's RS key quotes his words), with no other room
+  on that vCPU (GL lines 244–250); the bench process is pinned to one vCPU and the VM is otherwise idle (proposed: a
+  neighbour on the same VM moves a p99; the pinning tool is the harness's to document). The shared CX33 is not
+  measured: it cannot be ordered in Falkenstein (Mustafa, 2026-11-03). **ML**, the minimum laptop, and **RD**, the
+  recommended desktop: ADR 0003's machines (R3-BUDGET-REC1, r3 lines
+END
+
+### FIX F-PM-0004-1
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+| PM-0004-1 | The machines exist, and every result names its machine (a precondition of every spike here) | RS, CX33 and MAC recorded (model, CPU as the operating system reports it, cores, RAM, operating system); ML and RD as PM-0003-1 names them; the session's build machine for PM-0004-33 | RS, CX33, ML, RD, MAC | a results-log header per machine, written before the first run; every later log row names its machine and build | checked before the first run of each spike that uses the machine | R6-HOST-REC2 (r6 lines 645–650); R3-BUDGET-REC1's mark (r3 lines 1114–1116); R1-TICK-OQ6 (lines 2662–2666) |
+AFTER:
+| PM-0004-1 | The machines exist, and every result names its machine (a precondition of every spike here) | RS and MAC recorded (model, CPU as the operating system reports it, cores, RAM, operating system); ML and RD as PM-0003-1 names them; the session's build machine for PM-0004-33 | RS, ML, RD, MAC | a results-log header per machine, written before the first run; every later log row names its machine and build | checked before the first run of each spike that uses the machine | R6-HOST-REC2 (r6 lines 645–650); R3-BUDGET-REC1's mark (r3 lines 1114–1116); R1-TICK-OQ6 (lines 2662–2666) |
+END
+
+### FIX F-PM-0004-4
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+| PM-0004-4 | How the cost grows with N, and on the cheaper host (S1; part 1's one thread per match; decides R1-ECS-OQ4 and R1-TICK-OQ5) | reported, no pass number: mean, p50, p95, p99 and max at N = 12, 24, 36, 48 and the N = 64 headroom run, each part beside the total; the same at N = 48 on CX33; legacy's JavaScript step (0.80–1.00 ms mean at 48 soldiers) beside them as a reference, not a prediction. Passes when every cell holds a number. Parallelism inside a match is weighed only if PM-0004-3 fails | RS; CX33 | T on SS at each N | T, V per N | R1-TICK-REC2 P1 (lines 2044–2050); R1-ECS-REC1 mark 1 (lines 1930–1931); R1-ECS-OQ4 (lines 2622–2626); R1-TICK-OQ5 (lines 2658–2660); R6-HOST-REC2 (CX33 beside) |
+AFTER:
+| PM-0004-4 | How the cost grows with N (S1; part 1's one thread per match; decides R1-ECS-OQ4 and R1-TICK-OQ5, both from RS alone) | reported, no pass number: mean, p50, p95, p99 and max at N = 12, 24, 36, 48 and the N = 64 headroom run, each part beside the total; legacy's JavaScript step (0.80–1.00 ms mean at 48 soldiers) beside them as a reference, not a prediction. Passes when every cell holds a number. Parallelism inside a match is weighed only if PM-0004-3 fails | RS | T on SS at each N | T, V per N | R1-TICK-REC2 P1 (lines 2044–2050); R1-ECS-REC1 mark 1 (lines 1930–1931); R1-ECS-OQ4 (lines 2622–2626); R1-TICK-OQ5 (lines 2658–2660) |
+END
+
+### NOTE N-0004-OQ4-OQ5
+FILE: docs/adr/0004-simulation-core.md
+no change: R1-ECS-OQ4 and R1-TICK-OQ5 are still decided from RS alone (AMENDMENT condition 6 asks the author to say so):
+R1-ECS-OQ4 is "Decided by: REC1 mark 1's native sim step time against the sim step share ... and R6's hosting cost
+per match" (r1-simulation-core.md lines 2622–2626), both on the reference server, and R1-TICK-OQ5 is "Decided by:
+REC2's P1–P3" (lines 2658–2660), run on RS; PM-0004-4's CX33 half was "reported" beside them and decided neither, so
+F-PM-0004-4 drops it and its title says "both from RS alone". Neither stays open. Appendix A's rows for them (lines
+1329 and 1334) name the sim core spike, unchanged.
+END
+
+### NOTE N-0004-A64
+FILE: docs/adr/0004-simulation-core.md
+no change: the A64 key (line 1042), S7 and PM-0004-26 stay as AMENDMENT condition 6 rules (an Arm load generator is not "an ARM
+host" in part 7's sense, the advisor's reading, 2026-11-03); condition 6's one sentence is rust-reviewer's and sits in
+part 7 (r6b-rust-reviewer-fixes.md, R6B-RR-1), so the key gains none (it would repeat it). The rest of ADR 0004's
+pass marks names no CX33, SH, MV, location or address (grep).
+END
+

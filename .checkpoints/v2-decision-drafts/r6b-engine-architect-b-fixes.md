@@ -293,8 +293,29 @@ and the Advisor in `docs/adr/README.md`, "Decisions the drafts ask for". The sto
 the netcode proof test, with the harness builders it names (J6 (5), SPIKE-ORDER (b)), TICK-60-HEADROOM (OQ-0001-1),
 TICK-60-SETUP (OQ-0001-2), the "100 ms" reading (OQ-0001-3), the profiles' split over the two directions (OQ-0001-16),
 the spikes' VMs (OQ-0006-17), ASSET-RESEARCH's timing and OQ-SPIKE-1 (below); Mustafa's answers to the escalations,
-later that day, answered the spikes' cost (OQ-0006-20) and the domain (OQ-0006-15), and his Hetzner check and later
-answers answered the servers and their location (OQ-0006-1, OQ-0006-2) and when each machine is needed (Machines,
-above); the register records each answer.
+later that day, answered the spikes' cost (OQ-0006-20) and the domain (OQ-0006-15), and his Hetzner check and his later
+answers settled the servers and their location (OQ-0006-1, OQ-0006-2) and when each machine is needed (Machines, above);
+the register records each answer.
+END
+
+### NOTE SPK-N1
+FILE: docs/SPIKE_PLAN.md
+no change: SPIKE_PLAN:274 (item 4's "real Safari on MAC", PM-0004-19), :321 (item 5, "ML, RD and MAC named and on
+hand": the Mac is borrowed for the look proof test under both of his branches), :352 and :362 (the preview hosting
+check's Safari and "ML and MAC with the four browsers") and :410 (the content and ability spike's "MAC (PM-0005-2)")
+stay: the machines paragraph (SPK-1) says the later spikes' Safari rows are each spike's own plan's, in the same way
+as the netcode proof test's (AMENDMENT 2). SPIKE_PLAN:30 to 45, 112 to 119, 129 to 154, 160 to 162, 175 to 176, 244 to
+247, 281 to 284 and 512 to 518 are SPK-1 to SPK-8. No CX33, SH, `nbg1`, `hel1` or fixed address is left in
+SPIKE_PLAN; "Nuremberg" appears only inside his quoted words (SPK-1). No pass-mark row and no open question is added
+(OQ-SPIKE-1 stays answered).
+END
+
+### NOTE OVW-N1
+FILE: docs/ENGINE_OVERVIEW.md
+no change: no line of ENGINE_OVERVIEW becomes untrue. It names no machine, location, plan, price or address (grep for
+CX33, CAX21, CCX23, SH, MV, Hetzner, Falkenstein, `fsn1`, Nuremberg, address, Safari, MAC: no hit); it gives no count
+of open questions (its "Open, for Mustafa and the Advisor" section points to the register, which IDX-1 to IDX-8
+update); its 0006 row ("game servers, ... costs, ...") and the diagram's server node stay true with the rig of two
+machines.
 END
 
