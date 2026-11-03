@@ -1,0 +1,18 @@
+blocks 10
+-engine-arch D3C-2          docs/adr/README.md                            before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-engine-arch D3C-4a         docs/adr/README.md                            before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-engine-arch D3C-4b         docs/adr/README.md                            before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-engine-arch D3C-3          docs/adr/README.md                            before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-engine-arch D3C-3b         docs/adr/README.md                            before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-engine-arch D3C-1          docs/adr/0002-code-structure-build-toolchain.md before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-rust-review D3B-2+D3E-1    docs/adr/0004-simulation-core.md              before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-test-engine D3E-2+D3E-3    docs/adr/0003-rendering.md                    before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-test-engine D3C-1          docs/adr/0001-multiplayer-netcode.md          before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+-test-engine D3C-1b         docs/adr/0001-multiplayer-netcode.md          before_in_base=1 before_in_cur=1 after_in_head=1 before_in_head=0
+docs/adr/README.md applied == fd8c6f8: True
+docs/adr/0002-code-structure-build-toolchain.md applied == fd8c6f8: True
+docs/adr/0004-simulation-core.md applied == fd8c6f8: True
+docs/adr/0003-rendering.md applied == fd8c6f8: True
+docs/adr/0001-multiplayer-netcode.md applied == fd8c6f8: True
+changed docs: ['docs/adr/0001-multiplayer-netcode.md', 'docs/adr/0002-code-structure-build-toolchain.md', 'docs/adr/0003-rendering.md', 'docs/adr/0004-simulation-core.md', 'docs/adr/README.md']
+changed but no block: []

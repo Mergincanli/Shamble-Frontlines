@@ -1,1 +1,2 @@
 - 09:08 started; files created. Next: read fix blocks and findings, diff 882cfa6..fd8c6f8.
+- 09:15 blocks_apply.py: 10 blocks, each BEFORE once at 882cfa6, AFTER once at fd8c6f8; applied = fd8c6f8 byte for byte, 5 docs, no other change. worddiff.py: re-wraps 0 word changes. Next: S5/S9/S10 vs map 207/211/212 and drafts.
