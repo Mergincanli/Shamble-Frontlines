@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 17:23 Amsterdam
+- **Last update:** 2026-11-03 17:31 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,17 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Mustafa's design answers, about 17:28 (verbatim: `inputs/DESIGN-ANSWERS-mustafa-2026-11-03.md`): DOMAIN
+(shamblefrontlines.com at Cloudflare), reference machines (classes, borrowed), carry slots, levelling, the name
+"amplifications", AB11, upgrade visibility, AB14 (3 s), fragments visual only; leaning: WEAPON-UNLOCKS; still open:
+looted ammo, faction asymmetry, the war around the matches. Record in README and STATUS (in PR #33). Plan revision 5:
+`plan-r5-design-answers.md`; the advisor reviewing it (17:31, wf_c32107c2-a9a). Also running: fixcheck-e2b
+(wf_58154963-540, ADR 0005) and e3b (wf_fba530ed-2f3). fixcheck-e1, e2, e3 done: findings to route (TE: 0002
+PM-0002-49, 0006 key :1200-1204, 0003 key S :1122-1123; GE: 0003 part 8 :404-405; IE: 0006 :520, :753-757,
+:1340-1347; EA-a: 0002 :1086-1087; RR: 0004 :1245). Next: one fix round (with README's design answers by
+engine-architect), docs-keeper-4 (with the design answers), fixcheck-f, the report, the close.
+
+Before that:
 Tenth spend-limit cut, 2026-11-03 about 13:55 Amsterdam ("resets 4:20pm (UTC)", 17:20 Amsterdam): fixcheck-e's three
 units failed with their notes saved (e1 at 0004's findings, e2 at 0006's claims, e3 at SPIKE_PLAN item 5); the saver
 had reached its time limit (rule 3: restarted, bvtk7pt7e). Mustafa, about 17:22, in the session's chat: "I hit my

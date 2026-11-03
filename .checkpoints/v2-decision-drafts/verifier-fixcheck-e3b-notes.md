@@ -4,3 +4,8 @@
 - 17:40 task1 quotes: 6 quotes item5+ all word for word; attributions checked. Next: check OQ-0003-20, PM-0001-39/40/63, CD-2 in ADRs.
 - 17:48 task 1 block written (21 rows, 19 confirmed, 2 unmarked reading 'not a session's'). Next: task 2 consistency.
 - 17:55 task2 P2: consistent in all 9 docs (values, half split, 2 % each way). Next: 60 Hz rule.
+- 18:05 task2 60 Hz rule: consistent (0002/0004/0006 TICK-30 restatements = necessary condition, allowed by ruling; 0001:13 points to part 2). Next: rewind cap.
+- 18:12 task2 rewind cap: consistent (p99 at P2, whole tick, no value; 0001:1006 Mustafa's words only, no disagreement). Next: wave 1 order.
+- 18:22 task2 wave1 order: consistent except ADR 0004 migration phase 1 puts content and ability spike among the spikes before phase 2 foundation (SPIKE_PLAN: wave 3 after foundation); author rust-reviewer (S14-1). OQ-SPIKE-1 why-it-matters stale (low). Next: ENGINE_OVERVIEW order, headers.
+- 18:28 task2 headers: all nine identical per cond 4. Next: ref machines, ROOM-CRASH, OQ-0005-1 kinds; then task 3.
+- 18:40 task 2 block written: 2 disagreements (0004:1246 content spike before foundation; PM-0005-4 building parts/props vs CD-2), 1 label (OQ-0003-1), 1 stale (OQ-SPIKE-1 why). Next: task 3 counts.
