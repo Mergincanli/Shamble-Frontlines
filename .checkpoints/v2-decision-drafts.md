@@ -57,7 +57,9 @@ remaining units (as his one-off night run of 2026-11-01 set condition 17 aside);
 The 08:31 wake-up was deleted (trig_01QUmBkBLA9dvbttWn4E75FF). Running: workflow wf_0c35d4e2-382 (about 07:16;
 script copied to `prompts/workflow-gd-touchup.js`): game-designer writes its blocks (F1b, F8, F9, F10, AB-1's Why line,
 the 0005:883 dangle), then a fresh verifier dry-runs and judges each block before the session applies it (up to 3
-rounds; verdicts `verifier-gdcheck-verdicts.md`). Next: apply; re-pin if pointers are off; fixcheck-d3 as a workflow
+rounds; verdicts `verifier-gdcheck-verdicts.md`). Also running: workflow wf_6c0e9508-f3b (`prompts/workflow-fixcheck-d3a.js`):
+fixcheck-d3 unit a, ADR 0001, 0002, 0006 touch-ups and the four owner-checked verdicts, then a skeptic per wrong or
+unsupported verdict (`verifier-fixcheck-d3a-verdicts.md`, `verifier-skeptic-6-d3a-<n>.md`). Next: apply; re-pin if pointers are off; fixcheck-d3 as a workflow
 (units by draft group, a skeptic for every "wrong" or "unsupported" verdict, the web facts after 08:30);
 docs-keeper-3; the report; the PR body; the final commit that runs CI.
 
