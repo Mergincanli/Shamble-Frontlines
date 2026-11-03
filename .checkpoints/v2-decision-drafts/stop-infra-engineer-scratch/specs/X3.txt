@@ -1,0 +1,2 @@
+- **VISION_V2 §3 and §4** (counted like LOOP_V2, by the Advisor's answer to OQ-0001-14 (2026-11-03): "yes, a
+  VISION_V2 §3 or §4 trace counts, marked as such"; decision map part j, J3): the start

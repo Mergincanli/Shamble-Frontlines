@@ -1,0 +1,7 @@
+    when the check ends (part 14); (d) no session holds a Hetzner API token until the security baseline: Mustafa
+    creates and deletes the VMs for the spikes, the tick bench and the 3-hour soak before each playtest himself, in a
+    Hetzner project of its own, never the production project (a project's token presumably reaches all its VMs: not
+    read; OQ-0006-17, answered by Mustafa, 2026-11-03: "a separate Hetzner project. I create and delete the VMs myself
+    for each run; sessions get SSH access only and no Hetzner token until the security baseline"; the bench and the
+    soaks: the advisor's reading, 2026-11-03). Whether a session, which posts on GitHub as Mustafa's account
+    (CLAUDE.md), could approve a pending

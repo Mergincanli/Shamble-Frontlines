@@ -1,0 +1,4 @@
+where wave 1's 60 Hz margin run needs it (ADR 0001 owns that run and how the sim's load reaches it: OQ-0001-2 (a), the
+sim core spike's sim with S1's stand-ins). That run is "an early signal only" (TICK-60-SETUP, the Advisor, 2026-11-03);
+the final 60 Hz call is measured again with the real sim at slice 6 (migration phase 8). Three claims belong to other
+spikes, named in the table. Every mark below is the research's (cited; all proposed there),

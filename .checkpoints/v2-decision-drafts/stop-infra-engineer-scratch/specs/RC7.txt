@@ -1,0 +1,6 @@
+    schema version in every record and a Parquet compaction job only once a query needs it; a crashed room leaves a stub
+    record marked crashed, one word with ADR 0001 part 11 and PM-0001-59 (R6-TEL-REC2 calls it "a stub record marked
+    incomplete"; r6-infrastructure.md, Recommendations §4, R6-TEL-REC2, lines 812–827). That stub record and the crash
+    report (part 10) are written and kept under part 11's proposed retention, with no new period: OQ-0001-18, answered
+    by the Advisor (2026-11-03): "end the match, as proposed, and keep the crash and match records" (what "keep" means:
+    the advisor's reading, 2026-11-03). Only records a

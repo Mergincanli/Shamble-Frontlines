@@ -1,0 +1,40 @@
+798c798,800
+<   1185–1189; R1-ABL-OQ1, lines 2756–2758).
+---
+>   1185–1189; R1-ABL-OQ1, lines 2756–2758). The Advisor's answer to OQ-0005-AB12 (2026-11-03): the write-up "is
+>   accepted for concepts", and "any specific claim a record relies on is checked against Epic's documentation once it
+>   can be read".
+1166,1167c1168,1170
+< - **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1), and
+<   the closest shipped team-shooter precedent, Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case
+---
+> - **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1; the
+>   Advisor accepted it "for concepts" on 2026-11-03, OQ-0005-AB12), and the closest shipped team-shooter precedent,
+>   Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case
+1171c1174,1177
+<   Rust change. The content and ability spike's marks 1 and 2 test exactly this; OQ-0005-AB13 names the trigger.
+---
+>   Rust change. The content and ability spike's marks 1 and 2 test exactly this. When scripting comes back is
+>   OQ-0005-AB13's answer (the Advisor, 2026-11-03): "scripting comes back only when a designed ability can't be built
+>   from data." A new reviewed generic operation still counts as built from data, so it takes one designed ability that
+>   needs ability-specific code no operation can express (the advisor's reading, 2026-11-03).
+1339,1340c1345,1349
+<   - Proposed: (a), with (b) as a cheap check if the kit adds the domain. Decider: the Advisor. What decides it: whether
+<     the next kit PR adds Epic's domain. Research ids: R1-ABL-OQ1.
+---
+>   - Answered by the Advisor (2026-11-03): "tranek's write-up is accepted for concepts; any specific claim a record
+>     relies on is checked against Epic's documentation once it can be read."
+>   - Decided: (a), for concepts. The specific claims a record relies on are checked against Epic's documentation once
+>     it can be read (SRC-ACCESS (a) lets a kit PR add official-docs domains such as Epic's). Decider: the Advisor.
+>     Research ids: R1-ABL-OQ1.
+1347,1348c1356,1362
+<   - Proposed: (a), and (b) whenever a copy appears. Decider: the Advisor (the source). What decides it: the content and
+<     ability spike's marks 1 and 2 (the trigger). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
+---
+>   - Answered by the Advisor (2026-11-03): "scripting comes back only when a designed ability can't be built from
+>     data."
+>   - Decided (the advisor's reading, 2026-11-03): a new reviewed generic operation counts as built from data, as AB-1
+>     and AB-6 already have it ("every new operation is a reviewed Rust change"), so scripting comes back when one
+>     designed ability needs ability-specific code that no operation can express. New operations being "needed often"
+>     is no longer a trigger, and (b), reading the talk, stays a weighed option that nothing schedules. Decider: the
+>     Advisor (the source). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.

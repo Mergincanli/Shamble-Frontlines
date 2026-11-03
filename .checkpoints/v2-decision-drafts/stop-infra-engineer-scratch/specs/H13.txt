@@ -1,0 +1,4 @@
+  budget stays provisional until slice 6 measures the real sim (migration step 7). The count at 60 Hz and its
+  goal-budget check (TICK-60-HEADROOM's addition, part 8) are not marks of this item: they are ADR 0001's PM-0001-63,
+  on this counting rule, in wave 1's 60 Hz run after the sim core spike (SPIKE-ORDER (b)) and again at slice 6. The
+  bot clients run on

@@ -1,0 +1,4 @@
+    (ADR 0001, part 3); a lighter stand-in overstates the density, so it understates the monthly cost, and the
+    real-sim run comes only at slice 6 (migration step 7). Since 2026-11-03 the 60 Hz rule reads this goal budget too
+    (TICK-60-HEADROOM's addition, part 8): at slice 6, the 60 Hz goal-budget check (ADR 0001's PM-0001-63) is judged
+    against the figure this question fixes (the advisor's reading, 2026-11-03).

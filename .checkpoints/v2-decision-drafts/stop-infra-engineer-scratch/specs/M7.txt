@@ -1,0 +1,9 @@
+- **OQ-0006-5. How are the per-hostname production certificates issued, how long do they live, and which certificate
+  does the WebSocket fallback present on development and staging servers?**
+  - Answered in part by Mustafa (2026-11-03): "Certificates: a private hash-pinned certificate for WebTransport; for
+    the WebSocket leg, a domain I register." So the netcode proof test's WebSocket leg takes the development case (i)
+    below, a trusted certificate on his domain (the advisor's reading, 2026-11-03); still open: how that certificate is
+    issued on a spike VM (http-01 and tls-alpn-01 need an open port, dns-01 a secret, and OQ-0006-16's port plan
+    applies), decided in the netcode proof test's own plan with security-auditor; the staging case, shapes (A) and (B)
+    below, decided by the Advisor; and the production certificates, decided by security-auditor in the security
+    baseline.

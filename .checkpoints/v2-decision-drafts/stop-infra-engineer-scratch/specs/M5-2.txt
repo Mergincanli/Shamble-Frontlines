@@ -1,0 +1,5 @@
+- **Harder:** Mustafa holds accounts with Cloudflare and Hetzner before the first spikes (a test project on
+  Cloudflare Pages and a Hetzner console check), and later with Sentry and Grafana; until the security baseline he
+  creates and deletes every VM of the spikes, the tick bench and the playtest soaks himself (OQ-0006-17), and he
+  registers a domain before the netcode proof test (OQ-0006-15; both 2026-11-03); every multiplayer preview needs his
+  login once per

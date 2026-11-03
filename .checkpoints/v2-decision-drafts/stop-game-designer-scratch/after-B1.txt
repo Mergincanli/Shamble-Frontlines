@@ -1,0 +1,7 @@
+  - Answered by the Advisor (2026-11-03): "scripting comes back only when a designed ability can't be built from
+    data."
+  - Decided (the advisor's reading, 2026-11-03): a new reviewed generic operation counts as built from data, as AB-1
+    and AB-6 already have it ("every new operation is a reviewed Rust change"), so scripting comes back when one
+    designed ability needs ability-specific code that no operation can express. New operations being "needed often"
+    is no longer a trigger, and (b), reading the talk, stays a weighed option that nothing schedules. Decider: the
+    Advisor (the source). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.

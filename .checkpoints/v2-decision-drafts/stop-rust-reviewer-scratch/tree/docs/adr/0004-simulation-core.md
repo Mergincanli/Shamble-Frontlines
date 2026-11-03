@@ -2,7 +2,9 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** rust-reviewer (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** rust-reviewer (the "Pass marks" table: test-engineer, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
 
 This record decides how the game's rules run. There is one Rust simulation: the same code runs natively on the match
 server and as WebAssembly in the browser's Web Worker. Its state is plain typed tables in one struct (no ECS crate),
@@ -43,8 +45,11 @@ and SLICE-ORDER asks that movement and shooting be input-driven and replayable f
   replayable from day one; [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) runs before
   [the foundation](../research/GLOSSARY.md#the-foundation).
 - TICK-30 (STATUS "Decisions pending"): 30 Hz is the baseline; 60 Hz only with
-  [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) of at least 25 %, which ADR 0001 owns and measures in
-  the netcode proof test.
+  [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) of at least 25 %, which ADR 0001 owns and measures
+  twice: early, in wave 1's 60 Hz run after the sim core spike (SPIKE-ORDER (b)), and finally at slice 6 with the real
+  sim (TICK-60-SETUP, the Advisor, 2026-11-03: "(a), as an early signal only. The final 60 Hz call is measured again
+  with the real sim at slice 6."). The full rule is ADR 0001's part 2, with Mustafa's addition (TICK-60-HEADROOM,
+  2026-11-03; PM-0001-63): "60 Hz also needs the goal budget to hold at the rooms per VM measured at 60 Hz".
 - MODES-3 (a): the largest mode is 24v24, N = 48. SEC-SPREAD (a): weapon spread is known only to the server ("server-only
   spread"). ABL-PREDICT: open until a Feel Lab test.
 - UPGRADE-SCOPE (Mustafa, 2026-10-31; recorded in STATUS with the day's decisions): every unit and every weapon type has
@@ -563,15 +568,16 @@ research ids, and the need it serves.
     tells its clients the match ended where it can (ADR 0001's room lifecycle), and exits non-zero, so the supervisor
     records the exit and the VM's other rooms run on. The tick thread and the network runtime share only bounded
     channels, never a lock the tick unwraps (a lock poisoned by a panicking connection would turn that panic into the
-    room's). Whether a room may instead resume from a snapshot is the Advisor's question in ADR 0001. In the browser
-    `-Cpanic=abort` ends the sim's instance, and the trap alone carries no panic message, only `unreachable` and
-    frames; so the Wasm build installs a small panic hook of its own (`std::panic::set_hook`, no extra crate) that
-    writes the message and location into a fixed buffer in linear memory before the abort, and the Worker's host reads
-    it after the trap and attaches it to the report (proposed: a native scratch build on rustc 1.97.0 ran such a hook
-    under `panic = "abort"` and kept the message; the Wasm build is S20's to check). Online, after a trap, the Worker's
-    host starts a fresh instance and rejoins through ADR 0001's resync path, and the trap is reported (R6-OBS-REC3, ADR
-    0006); the panic strategy is ADR 0002's. In local play the trapped instance was the authority; recovery there is
-    not researched (OQ-0004-7).
+    room's). Whether a room may instead resume from a snapshot was the Advisor's question in ADR 0001 (OQ-0001-18); the
+    Advisor answered it on 2026-11-03: "end the match, as proposed, and keep the crash and match records", so a room
+    never resumes. In the browser `-Cpanic=abort` ends the sim's instance, and the trap alone carries no panic message,
+    only `unreachable` and frames; so the Wasm build installs a small panic hook of its own (`std::panic::set_hook`, no
+    extra crate) that writes the message and location into a fixed buffer in linear memory before the abort, and the
+    Worker's host reads it after the trap and attaches it to the report (proposed: a native scratch build on rustc
+    1.97.0 ran such a hook under `panic = "abort"` and kept the message; the Wasm build is S20's to check). Online,
+    after a trap, the Worker's host starts a fresh instance and rejoins through ADR 0001's resync path, and the trap is
+    reported (R6-OBS-REC3, ADR 0006); the panic strategy is ADR 0002's. In local play the trapped instance was the
+    authority; recovery there is not researched (OQ-0004-7).
     - Why: a panic on the server is a denial of service for a whole room, and in the browser it ends the match for that
       player; a room that outlives its tick, or a trap without its message, hides the fault.
     - Ids: R1-RR-OQ3, R1-XT-OQ12, R2-XT-OQ12, R6-XT-OQ6 (r1-simulation-core.md, lines 2936–2940, 3084–3087;
@@ -822,8 +828,9 @@ restart).
   VISION_V2 §6 item asks for dynamics (R4-PHYS-OQ5); the suite finds a divergence that cannot be removed and corrections
   break VISION_V2 §4's fairness (R1-DET-REC7); ChaCha8's cost shows in the profile (R1-DET-OQ11); a full bake is too slow
   for the editor's Test (R4-OBST-REC3); Mustafa adds player building to VISION_V2 §6 (R4-OBST-OQ3); ABL-PREDICT says
-  yes (an ability-proc stream may become shared); the 60 Hz margin unlocks 60 Hz (re-convert durations, re-bake links,
-  re-run the parity marks).
+  yes (an ability-proc stream may become shared); the tick moves to 60 Hz at slice 6's call (ADR 0001 part 2: the 60 Hz
+  margin, and the goal budget holding at the rooms per VM measured at 60 Hz, PM-0001-63; re-convert durations, re-bake
+  links, re-run the parity marks).
 - **Hard constraints in CLAUDE.md that change** (for v2 code only, under SPIKE-SCOPE (a), once Mustafa accepts the
   drafts; nothing in CLAUDE.md or `.claude/` changes in this PR):
   - "Classic scripts sharing globals in a fixed load order; the game runs by double-clicking index.html (file://)" does
@@ -972,14 +979,16 @@ Most claims are for one throwaway spike, called here **the sim core spike** (wor
 the final names): the sim on one vCPU of the reference server and in Wasm on the minimum laptop, in the stress scene at
 N = 48 (three teams, 16v16v16: 15 big vehicles, 4 of them very large units, 300 live projectiles, up to 8 active
 effects per soldier, one DM_Tri-sized 3D greybox; GLOSSARY.md, §3, lines 397–437), at 30 Hz, with the 60 Hz form run
-where the 60 Hz margin run needs it (ADR 0001 owns that run and how the sim's load reaches it: TICK-60-SETUP). Three
-claims belong to other spikes, named in the table. Every mark below is the research's (cited; all proposed there),
+where wave 1's 60 Hz margin run needs it (ADR 0001 owns that run and how the sim's load reaches it: OQ-0001-2 (a), the
+sim core spike's sim with S1's stand-ins). That run is "an early signal only" (TICK-60-SETUP, the Advisor, 2026-11-03);
+the final 60 Hz call is measured again with the real sim at slice 6 (migration phase 8). Three claims belong to other
+spikes, named in the table. Every mark below is the research's (cited; all proposed there),
 restated for 30 Hz where the research wrote the 60 Hz form, or marked "proposed" with its reason. No claim here needs a
 person's judgement; the netcode proof test's "look correct" is ADR 0001's.
 
 | # | Claim | Part | Candidate marks (source) | Spike |
 |---|---|---|---|---|
-| S1 | The sim fits the sim step share at N = 48 | 6 | p99 sim step time ≤ 8.33 ms at 30 Hz (≤ 4.17 ms for the 60 Hz margin run); mean, p50, p95, p99 and max reported per N at N = 12, 24, 36, 48 and the N = 64 [headroom](../research/GLOSSARY.md#the-design-point-and-headroom) run; 36,000 ticks per run (20 minutes of game time at 30 Hz, 10 at 60 Hz: arithmetic), 3 runs; each part of the share reported on its own against its ceiling (R1-TICK-REC2 P1, r1-simulation-core.md lines 2044–2053; R1-ECS-REC1 mark 1, lines 1923–1931; GLOSSARY.md lines 53–69); the sim core spike builds no ability and effect step (S15 follows it) and no economy, objectives, moments or events (slice 4), so its run stands in for each: 384 rows in the effect pool (so the snapshot, the hash and memory carry them) with the effect step's 1 ms ceiling burned per tick, and the 2.80 ms remainder topped up per tick after the built projectiles and bot decisions, each stand-in named in the run's record and scaled by N / 48 at the other scale steps (proposed: a pass with the stand-ins still holds once the real parts meet their ceilings; a run that fails only through them is reported so, and the share's verdict then waits for S15's step); the built parts are judged against their own ceilings either way; S1 on the real crate is migration phase 8's; the 60 Hz margin run's load is ADR 0001's (OQ-0001-2, TICK-60-SETUP), and at 60 Hz the same two stand-ins would be 1 ms and 0.30 ms (4.17 − 3.87, arithmetic) | the sim core spike |
+| S1 | The sim fits the sim step share at N = 48 | 6 | p99 sim step time ≤ 8.33 ms at 30 Hz (≤ 4.17 ms for the 60 Hz margin run); mean, p50, p95, p99 and max reported per N at N = 12, 24, 36, 48 and the N = 64 [headroom](../research/GLOSSARY.md#the-design-point-and-headroom) run; 36,000 ticks per run (20 minutes of game time at 30 Hz, 10 at 60 Hz: arithmetic), 3 runs; each part of the share reported on its own against its ceiling (R1-TICK-REC2 P1, r1-simulation-core.md lines 2044–2053; R1-ECS-REC1 mark 1, lines 1923–1931; GLOSSARY.md lines 53–69); the sim core spike builds no ability and effect step (S15 follows it) and no economy, objectives, moments or events (slice 4), so its run stands in for each: 384 rows in the effect pool (so the snapshot, the hash and memory carry them) with the effect step's 1 ms ceiling burned per tick, and the 2.80 ms remainder topped up per tick after the built projectiles and bot decisions, each stand-in named in the run's record and scaled by N / 48 at the other scale steps (proposed: a pass with the stand-ins still holds once the real parts meet their ceilings; a run that fails only through them is reported so, and the share's verdict then waits for S15's step); the built parts are judged against their own ceilings either way; S1 on the real crate is migration phase 8's; the 60 Hz margin run's load is ADR 0001's: in wave 1's run, an early signal only, it is this sim with these stand-ins (OQ-0001-2 (a), TICK-60-SETUP, the Advisor, 2026-11-03), so at 60 Hz the same two stand-ins are 1 ms and 0.30 ms (4.17 − 3.87, arithmetic); at slice 6 the run is on the real crate (migration phase 8) | the sim core spike |
 | S2 | The browser runs the whole sim within the client's sim share | 6 | p99 sim step time ≤ 13.33 ms at 30 Hz in Wasm in a dedicated Worker on the minimum laptop while the page holds 30+ fps on Low for the whole run; Wasm ≤ 2 × native (R1-TICK-REC2 P2, lines 2054–2057; R1-ECS-REC1 mark 1); N for the pass from R1-TICK-OQ7 (a design question), the scale steps reported meanwhile; the wave-1 run lacks the same parts as S1's, and the client's sim share has no per-part split to burn, so it reports the built sim's time and its pass waits for S15's step as well | the sim core spike's sim in the boundary spike's Worker |
 | S3 | Cadences keep the sim step time flat from tick to tick | 4 | p99 sim step time ≤ 2 × mean at 30 Hz; sight checks per game second per bot at 60 Hz within 1 % of the 30 Hz count, the 60 Hz form only in the 60 Hz margin's test (R1-TICK-REC3, lines 2074–2076) | the sim core spike |
 | S4 | One time representation holds every rate | 4 | with held fire for 60 s of game time, every legacy `fireInterval` and `burstInterval` gives a shot count within 1 shot of 60 / interval at 30 Hz, and the same count within 1 shot at 60 Hz, the 60 Hz form only in the 60 Hz margin's test (R1-TICK-REC1, lines 2023–2024), which also meets R1-ABL-REC3's 1 % for the Shabzon (1 shot in 833 is 0.12 %: arithmetic); CD13's Warrior-kills-Conscript time of 0.86 s within one tick (R1-ABL-REC3, lines 2416–2419); a CI check finds no clock read in the step (no `std::time`, no host time import in the Wasm module: R1-TICK-REC1, line 2027); the units-per-tick figure chosen from the rounding report (proposed: the research gives none) | the sim core spike |
@@ -1232,14 +1241,14 @@ before slice 1. The legacy game stays frozen and playable throughout; v2 work is
 | Phase | Work | Verifiable milestone |
 |---|---|---|
 | 0 | Mustafa and the Advisor approve the drafts | the sign-off line of this record |
-| 1 | Spikes, throwaway in `spikes/` (SPIKE-SCOPE (a)): the netcode proof test first; the sim core spike in parallel with it, its sim or its measured step times feeding the 60 Hz margin run as ADR 0001 sets (TICK-60-SETUP); the boundary spike; then the content and ability spike | S1–S14, S19 and S20 recorded in this record; S17 from the netcode proof test; S18 from the boundary spike; S15 and S16 from the content and ability spike; option C or B, the navigation generator, the units per tick and the hash function chosen from the numbers |
+| 1 | Spikes, throwaway in `spikes/` (SPIKE-SCOPE (a)), in the order Mustafa accepted (SPIKE-ORDER (b), 2026-11-03: "wave 1 runs one heavy spike at a time"): the netcode proof test first; then the sim core spike; then the 60 Hz margin run, with the sim core spike's sim and S1's stand-ins (OQ-0001-2 (a)), an early signal only (TICK-60-SETUP, the Advisor, 2026-11-03); then the boundary spike; then the content and ability spike | S1–S14, S19 and S20 recorded in this record; S17 from the netcode proof test; S18 from the boundary spike; S15 and S16 from the content and ability spike; option C or B, the navigation generator, the units per tick and the hash function chosen from the numbers |
 | 2 | The foundation (ADR 0002 builds it): the sim crate in the workspace with the hash-map ban and the float rules as lints, a replay runner, and the first recording in CI | an empty scene runs through the full stack; its per-tick hashes match natively twice and in Wasm |
 | 3 | Slice 1, move & shoot: soldier table and ids, the tick and its loops, movement on parry3d against a greybox map document, hitscan and weapons from data in integer time, the local server in the Worker; every match input-driven and recorded | S4, S5, S6 and S9 hold on the real crate; the determinism suite is green on slice 1 recordings on every target |
 | 4 | Slice 2, bots and three teams played locally: the bake and the navigation runtime, floors and links, the sight query and pass, avoidance, bot behaviour (after OQ-0004-1), cadences; the Worker runs the whole local match | S2, S3, S10–S12 and S14 hold at the slice's N; reachability on the greybox runs in CI |
 | 5 | Slice 3, online: the native room loop, authority-only streams kept off the client, the restore that ADR 0001's prediction scope uses, recovery after a trap | S17 and S8's last mark on the real crate; S20's online recovery; the netcode proof test's marks rerun on the real sim |
 | 6 | Slice 4, the loop: economy and objective phases, the ability system's execution, player records, pickups and offers (after ADR 0005's upgrade questions, OQ-0005-AB9 and AB10 among them), events and moments, structure states and damage stages (after OQ-0004-4) | S13, S15 and S16 on the real crate; a recorded full match replays with identical per-tick hashes on every target; scripted cases for the rules LOOP_V2 §2 to §5 state, held as v2's own snapshots (ADR 0002): the $300 start, a delivery paying every player on the team, a rebuild's integer split and its remainder, power-plant pricing, the minute-5 Tech 1 floor (9,000 ticks at 30 Hz: 5 × 60 × 30, arithmetic), a steal by holding E under each setting of OQ-0004-8's switch, 3 s of spawn protection (90 ticks at 30 Hz: 3 × 30, arithmetic), an enemy stopped at a barracks opening, a death respawning as the Recruit with money kept; GE8's presence count against its legacy golden (ADR 0002) |
 | 7 | Slice 5, Octopon-3 and Editor v2: the bake in the editor's Test and on save; the validation panel's reach, reachability and 6 m gap checks from the sim crate; tiles only if S10's bake time fails | S19 and S10's gap and reachability marks; the panel's results equal CI's on native and Wasm |
-| 8 | Slice 6, scale to 48: the stress scene on the real sim at N = 12, 24, 36, 48 and the N = 64 headroom run; the 60 Hz margin run if ADR 0001 schedules it | S1 on the real crate: p99 sim step time ≤ 8.33 ms at N = 48, 3 runs per build |
+| 8 | Slice 6, scale to 48: the stress scene on the real sim at N = 12, 24, 36, 48 and the N = 64 headroom run; the 60 Hz margin run on the real sim, which makes the final 60 Hz call (TICK-60-SETUP, the Advisor, 2026-11-03: "The final 60 Hz call is measured again with the real sim at slice 6."), run whatever wave 1's early signal showed (the advisor's reading, 2026-11-03; ADR 0001 owns the run and the call) | S1 on the real crate: p99 sim step time ≤ 8.33 ms at N = 48, 3 runs per build; PM-0004-71 and PM-0004-72 in the 60 Hz margin run, where they decide (the pass marks' key) |
 
 ## Test plan
 

@@ -1,0 +1,5 @@
+- **OQ-0006-15. Which domain do the client host, the lobby and the game servers use, and when is it registered?**
+  - Answered in part by Mustafa (2026-11-03): "for the WebSocket leg, a domain I register." So (b) is decided for the
+    netcode proof test: a domain he registers before it, for its WebSocket leg (the advisor's reading, 2026-11-03);
+    still open: which domain, which registrar and which DNS host, and whether production uses it later, decided by
+    Mustafa. The options below stay as the record of what was weighed.

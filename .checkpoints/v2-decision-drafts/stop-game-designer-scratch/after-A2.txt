@@ -1,0 +1,5 @@
+- Every GAS fact R1 uses comes from one community write-up (tranek's GASDocumentation, current with UE 5.3); Epic's
+  own documentation and the engine source were not read (r1-simulation-core.md, Findings §5, method note, lines
+  1185–1189; R1-ABL-OQ1, lines 2756–2758). The Advisor's answer to OQ-0005-AB12 (2026-11-03): the write-up "is
+  accepted for concepts", and "any specific claim a record relies on is checked against Epic's documentation once it
+  can be read".

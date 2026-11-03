@@ -1,0 +1,4 @@
+   per-hostname certificate needs a domain and a DNS zone, and no draft names one yet: Mustafa registers one for the
+   netcode proof test's WebSocket leg ("for the WebSocket leg, a domain I register": Mustafa, 2026-11-03,
+   SPIKE-MACHINES), and which domain, registrar and DNS host, and whether production uses it later, stay open
+   (OQ-0006-15, answered in part; the registrar, the DNS provider and their prices are not researched). Development
