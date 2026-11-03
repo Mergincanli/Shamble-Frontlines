@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 13:39 Amsterdam
+- **Last update:** 2026-11-03 17:23 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,17 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Tenth spend-limit cut, 2026-11-03 about 13:55 Amsterdam ("resets 4:20pm (UTC)", 17:20 Amsterdam): fixcheck-e's three
+units failed with their notes saved (e1 at 0004's findings, e2 at 0006's claims, e3 at SPIKE_PLAN item 5); the saver
+had reached its time limit (rule 3: restarted, bvtk7pt7e). Mustafa, about 17:22, in the session's chat: "I hit my
+usage limit while you were working, but it has reset now. Please continue from where you left off." Resumed at
+17:23: wf_30f1279c-530 (e1, e2) and wf_9313e5bc-dda (e3) with resumeFromRunId; each unit reads its notes first.
+Done before the cut: 03ef222 (the answers recorded), 59d41e0 (ADR 0002's pass marks), 7f945b0 (appendix §2, §8–§10,
+placeholders {LASTCKPT}, {STOPBLOCKS}, {OPENFINDINGS}, {STOPFIXCOMMITS}); docs-keeper-4's prompt saved. Next:
+fixcheck-e's findings to their owners; docs-keeper-4; the report's "At the stop"; stop the saver; the deletion
+commit; ready (needs-mustafa); the advisor on the final head; Mustafa's go.
+
+Before that:
 At 13:39: all eight units' blocks checked (each inside its author's text, each BEFORE once) and applied as 03ef222:
 netcode-architect 42, test-engineer 40, rust-reviewer 8, game-designer 5, engine-architect 41 + 176 (README's line
 pointers dropped), infra-engineer 20, graphics-engineer 16. Checks: guard PASS, 521/521, glossary exact 0, glued 0,

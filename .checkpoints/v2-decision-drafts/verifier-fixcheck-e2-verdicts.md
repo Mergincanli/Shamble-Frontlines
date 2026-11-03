@@ -49,3 +49,22 @@ HEAD 59d41e0 · base 4374a1c
 | I25 | 0006:1300-1302 (Test plan) | no mark here at 60 Hz; margin and PM-0001-63 are ADR 0001's | ruling q2 | confirmed | | |
 | I26 | 0006:1340-1347 (Migration 0) | signed off as the basis; project with his VMs, SSH only, no token (OQ-0006-17, Mustafa); domain quote (OQ-0006-15 in part) | SPIKE-ORDER, SPIKE-MACHINES | confirmed, note | quotes word for word; "for the spikes, the tick bench and the playtest soaks, in which he creates and deletes the VMs himself": bench/soak coverage unmarked | finding F3 |
 | I27 | 0006:1408-1409 (slice 4 marks) | stub record "marked crashed" (part 12); R6's mark says "marked incomplete" | ruling q12 | confirmed | r6 line 826 | |
+
+## Rebuild
+All four files rebuilt from 4374a1c with apply_fixes.py in the session's order (0003: test-engineer, graphics-engineer; 0005: test-engineer, game-designer, engine-architect-a, graphics-engineer; 0006: test-engineer, infra-engineer; GLOSSARY: engine-architect-a): byte for byte the same as HEAD 59d41e0 (and docs of these four unchanged since, to HEAD 5bd2849). write_guard.sh GUARD PASS; glossary_check_drafts.py exact hits 0.
+
+## Findings (ranked)
+- F2 (medium, unmarked reading, infra-engineer) 0006:1200-1204 key, Profile: "the profile's loss on each" credited to OQ-0001-16 (the Advisor). The Advisor's words: "Latency and jitter split half each way; loss as P2 defines it". 2 % each direction is ruling q6, so it needs the mark. Fix: add "(the advisor's reading, 2026-11-03)" after "loss on each".
+- F3 (low, unmarked reading, infra-engineer) 0006:520 (B9), 0006:753-757 (Harder), 0006:1340-1347 (Migration 0): bench and soak coverage of "no Hetzner token" / "he creates the VMs", and "registers a domain before the netcode proof test", are the advisor's readings (q7(b); For Mustafa 2), marked at 0006:548, 977-979, 1012-1015 but unmarked here. Fix: add the reading mark at each of the three places.
+- F1 (low, unmarked reading, graphics-engineer) 0003:404-405 (part 8) and 0003:1122-1123 (key, S): "the cold set is reported beside it" / "its option (a)" maps the Advisor's answer to OQ-0003-20 (a) without the mark the OQ entry (0003:974-975) gives the same mapping. Fix: add "(the advisor's reading, 2026-11-03)" at both places.
+
+## Not judged
+- ADR 0005 changed lines (diff saved at verifier-fixcheck-e2-scratch/0005.diff): the rebuild matches byte for byte, but the claims (OQ-0005-1 presented kinds, OQ-0005-AB12, AB13's trigger, LATER, TOY-BOX) were not checked line by line: the unit ran out of time (17:30 Amsterdam) after a usage-limit cut.
+END
+
+## Late spot-check (0005, two rows only)
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| C1 | 0005:319-321, 2273 | OQ-0005-1 quote; binds the presented kinds (marked) | OQ-0005-1 (Advisor) | confirmed | inputs line 14, word for word | rest of 0005 not judged |
+| C2 | 0005:1199-1201, 2077 | AB13 quote; new reviewed operation counts as data (marked) | OQ-0005-AB13 (Advisor) | confirmed | inputs line 15, word for word | |
+END
