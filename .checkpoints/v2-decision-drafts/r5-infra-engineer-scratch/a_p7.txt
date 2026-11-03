@@ -1,0 +1,6 @@
+   per-hostname certificate needs a domain and a DNS zone. Mustafa registers one for the netcode proof test's
+   WebSocket leg ("for the WebSocket leg, a domain I register": Mustafa, 2026-11-03, SPIKE-MACHINES), and names it:
+   "shamblefrontlines.com, which I register at Cloudflare" (Mustafa, 2026-11-03, DOMAIN; OQ-0006-15, answered).
+   Production uses the same domain, since it is the game's name and part 6 needs one registrable domain
+   (the advisor's reading, 2026-11-03). Which DNS host serves it, and what the domain and the DNS host cost, are not
+   researched. Development

@@ -8,3 +8,11 @@
 - 18:40 SPK-1..SPK-12 written; SPIKE_PLAN dry-run next/done. Next: NOTEs (SPK item 6, OVW), full apply in scratch tree, glossary, quote check, label grep.
 - 18:45 NOTE SPK-N1, SPK-N2, OVW-N1 written. Next: full apply in scratch tree, glossary, quote check, label grep, cell counts, line lengths.
 - 19:00 redid IDX-2, IDX-3, SPK-3 (each label attached to its own id, for the label grep); added IDX-16 rewording (no "players" in-context hit), IDX-17 (row 57 OQ-0006-15 mention). Next: full re-apply in scratch, glossary, quotes, cells, labels; then return.
+- 19:15 checks on the scratch tree with all blocks applied: apply_fixes dry-run on the real docs 29 of 29 FIX blocks
+  applied (README 17, SPIKE_PLAN 12; ENGINE_OVERVIEW none, NOTE OVW-N1); glossary exact 0 (in context 643, as before:
+  IDX 23, SPK 20, OVW 12; no unpaired quote); quote_check.py 34 new quotes verbatim in the three inputs files, 2 others
+  are a section title and the drafts' "not researched" label; tables keep cell counts, no line under a table; prose
+  lines <= 120 chars; label grep: no "stands in for none", "still to be named", "not a session's", "cannot start
+  without"; OQ-0006-15/-20 labelled answered; OQ-0003-1 "answered in part" in every SPIKE_PLAN place and README rows
+  18, 53; dispositions 521 of 521, unchanged. Blocks: IDX-1..17, SPK-1..12, NOTE IDX-N1..N3, SPK-N1, SPK-N2, OVW-N1.
+DONE

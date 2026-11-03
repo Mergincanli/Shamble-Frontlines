@@ -1,0 +1,6 @@
+   security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03; the bench and the soaks:
+   the advisor's reading, 2026-11-03); shamblefrontlines.com, which he registers at Cloudflare for the netcode proof
+   test's WebSocket leg (OQ-0006-15, answered by Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register" and
+   "shamblefrontlines.com, which I register at Cloudflare"; before the netcode proof test:
+   the advisor's reading, 2026-11-03). *Milestone:* the reference server is orderable, or OQ-0006-1 (b) has named
+   another.

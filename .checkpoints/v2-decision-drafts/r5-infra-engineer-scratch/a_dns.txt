@@ -1,0 +1,2 @@
+  down (once the game's domain is registered, OQ-0006-15), names stop resolving as cached records expire, so new joins
+  fail while running rooms go on.

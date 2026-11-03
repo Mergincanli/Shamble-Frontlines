@@ -1,0 +1,10 @@
+  - Answered by Mustafa (2026-11-03): "for the WebSocket leg, a domain I register." (SPIKE-MACHINES) and
+    "shamblefrontlines.com, which I register at Cloudflare." (DOMAIN). So (b) is decided for the netcode proof test: a
+    domain he registers before it, for its WebSocket leg (the advisor's reading, 2026-11-03). Production uses the same
+    domain, since it is the game's name and part 6 needs one registrable domain (the advisor's reading, 2026-11-03).
+    Which DNS host serves it, and what the domain and the DNS host cost, are not researched. The options below stay as
+    the record of what was weighed.
+  - *Why it matters:* until this answer no draft named a domain, and none names a DNS provider; yet each per-hostname
+    certificate (part 7), the lobby's HTTPS endpoint (part 6), a dns-01 key and the guest cookie need a domain:
+    SameSite=Strict sends the cookie only within the site that set it, and a site is the registrable domain (part 13,
+    B4). Before the netcode proof test, its `wss` endpoint needs a certificate the browsers trust (OQ-0006-5).

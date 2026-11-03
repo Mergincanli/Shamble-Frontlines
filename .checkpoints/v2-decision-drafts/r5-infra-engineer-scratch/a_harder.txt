@@ -1,0 +1,7 @@
+  creates and deletes every VM of the spikes, the tick bench and the playtest soaks himself (OQ-0006-17, Mustafa,
+  2026-11-03; the bench and the soaks: the advisor's reading, 2026-11-03) and gives his OK to each run's cost cap in
+  that run's plan (OQ-0006-20, Mustafa, 2026-11-03); he registers shamblefrontlines.com at Cloudflare (OQ-0006-15,
+  Mustafa, 2026-11-03) before the netcode proof test (the advisor's reading, 2026-11-03); every multiplayer preview
+  needs his login once per Brave session; each production game VM needs a certificate issuance path (OQ-0006-5) and a
+  domain (OQ-0006-15); the lobby still has no place in the budget (OQ-0006-3); until OQ-0006-13 is answered, every
+  preview deploy waits for his approval (B9); releases wait on OQ-0006-14.
