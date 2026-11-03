@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 18:24: the r5 fix round applied as 0aa262f (59 FIX, 21 NOTE, every block inside its author's text);
+the scripts clean (guard PASS, 521/521, glossary exact 0, glued 0, 341 PM rows of 7 cells without gaps, 115/97,
+172 credited quotes word for word, labels per conditions 3–5, 114 README pointers); gate 1–4 and 5b–5d PASS (5a
+cannot start here); docs-keeper-4 done (STATUS, ROADMAP, REPO_MAP; repo map OK), the session's one-phrase fix of the
+PR state in STATUS; the report and appendix filled (§7.4, §9 r5 table, notes left): b52ec12. Next (r4 conditions
+7–9): stop the saver; the deletion commit (fills {LASTCKPT} with the last commit holding these notes); PR body (first
+line "Merge by squash only (Mustafa, 2026-11-03)"); ready; label needs-mustafa; the advisor on the final head;
+Mustafa's "merge #33"; squash with the head SHA, a session-written message, keep the branch.
+
+Before that:
 Mustafa, about 17:31 (verbatim: `inputs/ANSWERS-2-mustafa-2026-11-03.md`): the four escalations answered
 (REF-MACHINES, LOOK_V2-§8, SPIKE-COST, DOMAIN = shamblefrontlines.com at Cloudflare), COMMUNITY-SERVERS (a new open
 question in ADR 0006 and README, the door kept open), and "after e2b, e3b and their fix round, stop. No further
