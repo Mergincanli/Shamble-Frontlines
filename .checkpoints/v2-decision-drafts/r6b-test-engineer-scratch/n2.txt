@@ -1,0 +1,11 @@
+condition 5's row reading, against netcode-architect's NOTE rows-for-test-engineer
+(r6b-netcode-architect-fixes.md). Agreed: PM-0001-17 and -19 (the decode and the client-held state's hash, whose bite
+plants a client quantiser, so float work), -54 (the shared trajectory function) and -48 (the shooter's ray test) are
+covered; PM-0001-18 (a time per client and burst; it compares no LG-computed value), -49, -42 and -61 (LG load only)
+and the other LG rows are not, so they keep their text. One difference: for PM-0001-48 its NOTE suggests way (i) (the
+L2 shooter in ML's Chrome or an x86-64 client); F-PM-0001-48 takes way (ii) (LG's shooter logs each shot's ray and the
+target's interpolated pose; a shot against the mark counts only once the same view test replayed on x86-64 agrees),
+because ML is judged only once named (the key: "like every row on ML, RD or MAC it is judged only on a named machine")
+and no x86-64 client machine is in the rig ("the rig is just the CCX23 and the CAX21"), so way (i) would hold the
+row's L2 verdict back; its NOTE leaves "(ii) stays open to the row". The four rows say their way in their runs cell
+(no row added) and the key's LG entry states the rule once, pointing to them.

@@ -7,5 +7,4 @@
    `dt` does not matter for identity: `dt` is one constant with the same bits on every target, and timers count integer
    units (part 4); whether 64 Hz is worth it is R1-TICK-OQ1, ADR 0001's (R1-XU-OQ11). Whether browsers run a different
    Wasm float profile matters only if NaN can enter state, which these rules forbid; the suite's browser runs check it
-   (R1-DET-OQ4). - Why: basic operations, `sqrt` and `mul_add` are exactly specified on every target while std's
-   transcendental
+   (R1-DET-OQ4).

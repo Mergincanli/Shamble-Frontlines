@@ -26,8 +26,7 @@ AFTER:
 END
 
 ### NOTE EA-A-3
-FILE: docs/adr/0002-code-structure-build-toolchain.md
-no change: the rest of ADR 0002's own text, checked against his answers (line numbers on disk, before EA-A-1 and
+no change: (docs/adr/0002-code-structure-build-toolchain.md) the rest of ADR 0002's own text, checked against his answers (line numbers on disk, before EA-A-1 and
 EA-A-2), stays true. (1) 519-528, the soak: "Before each playtest one 3-hour soak runs on the reference server ... (its
 VM: the bench's path below)": still true; its bot VM gets the one sentence of EA-A-1 at the arm64 leg, so 519-528 gain
 none (condition 7: at most one sentence). (2) 540-548, the bench: "a CCX23 created per bench session in the spikes' own
@@ -46,8 +45,7 @@ registration or "the development server" for a Hetzner machine.
 END
 
 ### NOTE EA-A-4
-FILE: docs/adr/0002-code-structure-build-toolchain.md
-no change (test-engineer's text, the pass marks; named here, no change asked): 1159-1170, the key's MAC ("a macOS
+no change: (docs/adr/0002-code-structure-build-toolchain.md; test-engineer's text, the pass marks; named here, no change asked) 1159-1170, the key's MAC ("a macOS
 machine with the latest Safari, for the rows that name Safari; the draft names none, so its model is recorded with each
 result"): true, since a GitHub macOS runner stands as MAC for the netcode proof test's Safari rows only, and the later
 spikes' Safari rows (the boundary spike's among them) are each spike's own plan's (AMENDMENT 2, the advisor's reading,
@@ -59,8 +57,7 @@ the CX33, a location, an address, SH, MV or DS.
 END
 
 ### NOTE EA-A-5
-FILE: docs/adr/0005-content-abilities-assets.md
-no change: ADR 0005's text outside the ability section and its GPU rules (the frame, "Content data", "The asset
+no change: (docs/adr/0005-content-abilities-assets.md) ADR 0005's text outside the ability section and its GPU rules (the frame, "Content data", "The asset
 pipeline") names no Hetzner machine. Greps over ADR 0005 on disk: 0 hits for CX33, CCX13, CAX21, nbg1, hel1, fsn1,
 Falkenstein, Nuremberg, Helsinki, arm64, aarch64, OQ-0006-1, OQ-0006-2, R6-HOST-OQ1, R6-HOST-OQ2, "register",
 shamblefrontlines and the machines SH, MV, DS and LG; "Hetzner" and "CCX23" only at 2206 (test-engineer's key, EA-A-6).
@@ -72,8 +69,7 @@ it. 1053 ("the reference server", game-designer's ability section) names no plan
 END
 
 ### NOTE EA-A-6
-FILE: docs/adr/0005-content-abilities-assets.md
-no change (test-engineer's text, the pass-mark key; named here, no change asked): 2204-2213. RS, "a Hetzner CCX23,
+no change: (docs/adr/0005-content-abilities-assets.md; test-engineer's text, the pass-mark key; named here, no change asked) 2204-2213. RS, "a Hetzner CCX23,
 Linux, one EU location": true, the CCX23 in Falkenstein (`fsn1`) being one EU location ("both test servers will be in
 Falkenstein, not Nuremberg: a CCX23 for the game server and a CAX21 for the 48 simulated players", HETZNER-CORRECTION-2);
 naming `fsn1` there is test-engineer's choice, not needed for truth. MAC, "SPIKE_PLAN's macOS machine: the stable

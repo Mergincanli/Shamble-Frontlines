@@ -287,15 +287,16 @@ research ids, and the need it serves.
    targets: Rust never fuses on its own, so the risk is a dependency's SIMD path (wide's `mul_add` fuses only where
    the target has FMA); the server therefore builds for baseline x86-64, never with `+fma` or `-C target-cpu=native`,
    glam's `scalar-math` is on if the sim uses glam itself, and native AArch64 joins the native-against-Wasm hash
-   test before ADR 0006 may pick ARM hosts (the build flags are ADR 0002's). The netcode proof test's ARM load generator
-   (ADR 0001's LG) is not an ARM host in this sense, since it serves no player and runs no room (the advisor's reading,
-   2026-11-03), and under ADR 0001's rule for the rows that compare an LG client's result with the server's, no verdict
-   of those rows rests on native AArch64 agreeing with x86-64 or Wasm. parry3d's own `enhanced-determinism` flag
-   is on for both targets (critic rank 3). Attribute maths (ADR 0005's data model) runs in f32 under these rules with
-   a fixed, documented aggregation order per attribute (R1-ABL-OQ5). An exactly representable `dt` does not matter for
-   identity: `dt` is one constant with the same bits on every target, and timers count integer units (part 4); whether
-   64 Hz is worth it is R1-TICK-OQ1, ADR 0001's (R1-XU-OQ11). Whether browsers run a different Wasm float profile
-   matters only if NaN can enter state, which these rules forbid; the suite's browser runs check it (R1-DET-OQ4).
+   test before ADR 0006 may pick ARM hosts (the build flags are ADR 0002's). An ARM load generator, such as the netcode
+   proof test's (ADR 0001's LG), is not an ARM host in this sense, since it serves no player and runs no room (the
+   advisor's reading, 2026-11-03), and under ADR 0001's rule for the rows that compare an LG client's result with the
+   server's, no verdict of those rows rests on native AArch64 agreeing with x86-64 or Wasm. parry3d's own
+   `enhanced-determinism` flag is on for both targets (critic rank 3). Attribute maths (ADR 0005's data model) runs in
+   f32 under these rules with a fixed, documented aggregation order per attribute (R1-ABL-OQ5). An exactly representable
+   `dt` does not matter for identity: `dt` is one constant with the same bits on every target, and timers count integer
+   units (part 4); whether 64 Hz is worth it is R1-TICK-OQ1, ADR 0001's (R1-XU-OQ11). Whether browsers run a different
+   Wasm float profile matters only if NaN can enter state, which these rules forbid; the suite's browser runs check it
+   (R1-DET-OQ4).
    - Why: basic operations, `sqrt` and `mul_add` are exactly specified on every target while std's transcendental
      functions are not, and neither are `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`; std's `min`, `max` and
      `clamp` leave signed zero open, which an allow-list and three helpers close where a deny-list of transcendental

@@ -1,0 +1,5 @@
+ADR 0001 line 1274 (the domain, AMENDMENT 2) is item 1 of "What a spike must prove" (lines 1236–1335), not a pass-mark
+key, row or checklist, so it is netcode-architect's text, not mine: its "on the domain he registers" becomes
+"registered" there (author: netcode-architect). Lines 719 ("Every server mark is measured on one ..."), 756 (the
+failure row "No Hetzner capacity in the EU", which stays live: AMENDMENT, HZ-OQ1) and 1293 ("on the CCX23 and the
+CX33") are netcode-architect's too (AMENDMENT condition 13).

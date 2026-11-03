@@ -1,0 +1,5 @@
+the rows a GitHub macOS runner may serve as MAC under branch 1 (AMENDMENT 2: PM-0001-28, PM-0001-14, PM-0001-25's
+Origin; ADR 0006's PM-0006-15) keep "MAC" in their machine cells: F-0001-KEY-MAC defines when a runner stands as MAC,
+its checks (i) to (iii) and its limits, so no row's cell changes. One consequence it states: PM-0001-28's "the server
+on the same local network" cannot hold for a runner, so on a runner that row's server is RS (recorded); PM-0001-28 on
+the borrowed Mac keeps its local server. Every time-limited row on MAC and ADR 0003's rows stay on the borrowed Mac.
