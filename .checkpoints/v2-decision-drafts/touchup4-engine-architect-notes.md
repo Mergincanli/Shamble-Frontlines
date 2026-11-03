@@ -11,3 +11,5 @@
 - 07:53Z: FIX D3C-3 written (README codes paragraph, one sentence, +4 lines). Next: D3C-3b HEAT-SOAK, D3C-1
 - 07:53Z: FIX D3C-3b (README:81 perf review's HEAT-SOAK) and D3C-1 (0002 step 5 rewrap, -1 line) written. Next: dry runs, glossary, pointers, line lengths in scratch tree
 - 07:54Z: glossary in scratch: exact 0 all nine; one new in-context hit 'its hash' (State hash) in S5 row -> reworded 'its content hash'. Re-running checks
+- 07:56Z: checks on scratch tree done: dry runs all ok; pointers 94 ok off 0; glossary exact 0 all nine, in-context 604 (=before); tables 0 glued, 0 cell mismatches; counts all OK; dispositions 521/521; refs only adds the 12 codes in the new sentence. Next: final read of fixes file, structured output
+- 07:56Z: NOTE D3C-residue written. All blocks done and checked. DONE

@@ -74,3 +74,17 @@ AFTER:
    token's scope (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up.
    *Done when:* G12 passes on both backends and a multiplayer preview plays against the staging game server.
 END
+
+### NOTE D3C-residue (what these blocks leave to others, by the task's scope)
+- D3C-3b is new: found while checking D3C-3. README:81 said "the test review's HEAT-SOAK", but the code is the perf
+  review's (review-perf-auditor.md:86, "Q4. HEAT-SOAK (finding 7)"; final-round-by-author.md:113, "PA HEAT-SOAK");
+  test-engineer B only wrote OQ-0003-20 from it (test-engineer-B-fixes-final.md:392, "perf review's question
+  HEAT-SOAK"). Without D3C-3b, the new sentence in D3C-3 would send a reader to the wrong review file.
+- README:87 "the reviews' POOL-FULL": the code is the Rust review's Q1 (review-rust-reviewer.md:72), passed to
+  game-designer; not wrong, left as it is.
+- D3C-4: the report's line 26 "(112 open)" is the session's text (fixcheck-d3c, task 3): it becomes "(111 open)".
+- D3C-3's other half, the decision map's parts a and g (0005:2103 "decision map, part g"; 0005:2500 "the decision
+  map's parts a, d, g and j"): not changed, since the task keeps D3C-3 to one sentence. 0005:2500 already says these
+  process inputs "leave the branch with the checkpoint", and part g's spikes now live in SPIKE_PLAN.
+- D3C-1's other half (0001:1518, 156 characters) is test-engineer A's text.
+END

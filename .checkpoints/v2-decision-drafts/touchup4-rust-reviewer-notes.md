@@ -6,3 +6,5 @@
 - 09:12 fit problem: greedy re-wrap of 273-290 absorbs only ~56 added chars (rewrap.py); D3E-1 clause of ~100 chars adds a line. Pin is ADR 0002 part 2 (0002:155), not part 4 as the task says. Next: shorter wording via fit.py.
 - 09:30 chosen wording q2 (cands3.py): "yet 1.97.0's and the pinned 1.99.1's `div_euclid` give 3 ... as do their `f64` analogues (verifiers fixcheck-d3a and skeptic-6, and for 1.99.1 fixcheck-d3e, 2026-11-03)", "a correctly rounded reference", drop ", extended" for room; greedy fits 19->19 from 272. Next: DP wrap keeping original breaks (minwrap.py), then write FIX.
 - 09:40 FIX D3B-2+D3E-1 written to touchup4-rust-reviewer-fixes.md (q3s: "a rounded exact reference", keeps ", extended"; 272-290 re-wrapped 19->19). Next: dry run, apply in scratch tree, pointers, glossary, line lengths.
+- 09:50 checks: dry run ok (19->19), applied in tree/, draft_pointers off 0 (94 ok, same as HEAD), glossary exact 0 and identical outputs before/after (skip-records and default), max line 119, 1410 lines, only 272-290 differ. Next: return result.
+- 09:52 DONE. Result: 1 FIX (D3B-2+D3E-1, ADR 0004 272-290, line delta 0); checks as above.
