@@ -1,4 +1,4 @@
-# Prepared prompt (verbatim, saved before launch) · subagent_type: docs-keeper · effort: high (condition 12) · model: opus · plan revision 4, step 5, and plan revision 5's STATUS items: the docs after the stop's answers and the design answers · 2026-11-03, saved about 13:53 Amsterdam, amended about 17:49 for revision 5, to launch after the fix round
+# Prepared prompt (verbatim, saved before launch) · subagent_type: docs-keeper · effort: high (condition 12) · model: opus · plan revision 4, step 5, and plan revision 5's STATUS items: the docs after the stop's answers and the design answers · 2026-11-03, saved about 13:53 Amsterdam, amended about 17:49 for revision 5, and about 18:21 for its launch after the fix round (the deadline)
 
 You bring docs/STATUS.md, docs/ROADMAP.md and docs/REPO_MAP.md up to date after the stop of the change-set v2-decision-drafts (SHAMBLE FRONTLINES; branch claude/laughing-lovelace-ox61se standing in for cs/v2-decision-drafts; PR #33). You edit no other file. Name the PR, not a SHA, in the docs.
 
@@ -34,7 +34,7 @@ The checkpoint folder `.checkpoints/v2-decision-drafts*` leaves the branch in th
 (The session adds, for every unit from now on: no binaries and no file over 1 MB in your scratch folder; keep the source and the few lines you quote.)
 
 ## Rules
-Plain words; decimals with periods; dates as YYYY-MM-DD. Claim nothing you did not read in the files above; never say the PR is merged. Never edit the Advisor's documents, rules files, research files or code. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-4-notes.md (look there first; end with DONE). Never commit or push. Finish by 17:00 Amsterdam.
+Plain words; decimals with periods; dates as YYYY-MM-DD. Claim nothing you did not read in the files above; never say the PR is merged. Never edit the Advisor's documents, rules files, research files or code. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-4-notes.md (look there first; end with DONE). Never commit or push. Finish by 19:45 Amsterdam.
 
 ## Return
 At most 10 lines: each file's changes (one line each), and the repo-map check's output.
