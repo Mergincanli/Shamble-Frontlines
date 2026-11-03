@@ -1,0 +1,1 @@
+R	| A panic on the room's tick thread | the match ends: `RoomEnded` with a crash reason where possible, the match record marked crashed, the process exits non-zero and the supervisor records the exit (part 11; OQ-0001-18, answered (a) by the Advisor, 2026-11-03) | the process gone within 1 s and every client told or closed (PM-0001-59) |

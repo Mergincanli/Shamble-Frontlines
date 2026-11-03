@@ -1,3 +1,4 @@
 # test-engineer stop-answers notes (2026-11-03)
 - 13:05 started; output file created. Next: read inputs, verdict, map, plan.
 - 13:15 read inputs, verdict, plan, map; read ADR 0001 key (1253-1375), PM-0001-1..3, -25..27, -59, 36..40, 48, 49, 52..56, fail rule (1448-1466), checklist (1489-1545). Next: read 0003/0004/0005/0006 places, then compose ADR 0001 blocks.
+- 13:35 read all my places (0001 key/rows/fail rule/checklist; 0003 key S, PM-0003-44, fail rule; 0004 key, PM-0004-71/72; 0005 key, PM-0005-4/23/33, fail rule, Feel Lab; 0006 key, PM-0006-11/14/15/18/25/27, no-mark list; part 8 formula). Decisions: PM-0001-63 on RS at N=48, PM-0006-14 counting at 60 Hz, part 8 formula; OQ-0005-1 bite on PM-0005-4; checklist step 10 removed and 11-15 renumbered. Next: sweep my sections for missed refs, then write blocks.
