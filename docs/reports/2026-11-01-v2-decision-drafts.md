@@ -89,7 +89,7 @@ revision after this stop, each with its reason (appendix §7.3).
   exact quotient is 2 (a shared error, so a same-bits test passes it); both stay off the float list until PM-0004-22's
   new correctly-rounded-reference clause passes.
 - **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00), and his "You can continue" (2026-11-03 07:14), which
-  let this morning's last units start before 08:30 (fetching still from 08:30); nine spend-limit cuts over three days,
+  let this morning's last units start before 08:30 (fetching still from 08:30); ten spend-limit cuts over four days,
   each resumed from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
 
 ## Risks

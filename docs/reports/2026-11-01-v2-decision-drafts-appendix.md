@@ -184,6 +184,8 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
   the lead in ensuring things get done accordingly, decide on when it start and when its done. Remember: just for today
   (upcoming session)". It set aside, for the run of 2026-11-01 03:55–11:00 only, the brief's "daytime only" and the
   advisor's condition 17; the session kept web fetching to 08:30 and later.
+- **2026-11-03 at about 17:22 Amsterdam, after the tenth cut:** "I hit my usage limit while you were working, but it has
+  reset now. Please continue from where you left off."
 
 ## 3. The advisor's plan review: APPROVE with 19 conditions (word for word)
 
@@ -534,8 +536,9 @@ notes.
 | 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d, 7cc6942, b513483, 882cfa6, ac252f8, bd68d59, fd8c6f8 (2026-11-03) | fixcheck-d1's, -d2's and -d3's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3, -d4) |
 | 11, 12, 13 | 03fe138, b011372 (docs-keeper); the final commit (the gate, this report; it runs CI) | docs-keeper's re-check and last touch, the gate, the report |
 
-Spend-limit cuts, nine (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
-about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15, 17:50 and 21:20.
+Spend-limit cuts, ten (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
+about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15, 17:50 and 21:20; 2026-11-03
+about 13:55.
 
 ## 6. The advisor's 19 conditions: where each is met
 
