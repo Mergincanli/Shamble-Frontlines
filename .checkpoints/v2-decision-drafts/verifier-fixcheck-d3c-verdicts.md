@@ -72,3 +72,69 @@ Task 1 result: 3225 structural lines checked; 0 lost, 21 reworded on purpose, 0 
   ("it, so the cap clips almost no honest shot), shoot the sprinting target for two minutes. Expected: when his crosshair
   is on the target as he sees it, the"). Smallest fix: rewrap at 120. Cosmetic only.
 END
+
+## Task 2: dangling references at HEAD (78ccee8), all nine documents
+
+Scripts: verifier-fixcheck-d3c-scratch/refs.py (ids, codes, parts, research ids, links), steps.py (checklist and
+migration-plan steps). Outputs: refs-HEAD.out, steps-HEAD.out. Definitions read by refs.py: 115 OQ ids (114 numbered +
+OQ-SPIKE-1, SPIKE_PLAN:436), 340 PM rows, ADR 0005's 31 part codes (CD-1..14, AB-1..10, AP-1..7), its GPU section's
+parts 1-9, each ADR's Decision parts (0001: 1-14, 0002: 1-12, 0003: 1-11 with 0003 part 5's sub-items a-n, 0004: 1-21,
+0005: 1-9, 0006: 1-15), README's 106 decision-table codes, its register (I-1..21; seams S1, S3, S4, S6, S11, S12; gaps G1,
+G2, G3, G4, G5, G7, G8, G9, G11, G15; N-n 12 rows; J1-J6), STATUS's codes, the research's 1,198 defined ids at 9e7db28.
+
+Output (refs.py HEAD), checked / resolved per class:
+    0005code 556/556 · I-n 109/109 · J-n 36/36 · N-n 9/9 · OQ 1161/1160 · PM 1165/1165 · code 812/774 · gap 18/18 ·
+    link 370/370 · part 1905/1880 · research 4094/4094 · seam 10/10 · TOTAL 10245, 10181 resolved, 64 unresolved
+steps.py HEAD: checklist steps 17/17 resolve (each cited step's text matches what the citing sentence says);
+migration-plan steps 15/15 resolve (each to the slice the citing sentence names).
+
+The 64 unresolved, read one by one:
+- OQ (1): 0002:1625 "ADR 0004 (parts 1, 5, 9, 18-20, OQ-0004-7, S18)": the script read "S18" as OQ shorthand; it is ADR
+  0004's spike claim S18 (0004:999). Resolves. No finding.
+- part (25): all resolver misses, each read and resolved by hand: "ADR 0004's (part 20)" 0002:251; "ADR 0006's (part 13"
+  0002:627, :654; "ADR 0004 (parts 1, 5, 9, 18-20" 0002:1625; "ADR 0004's (its part 14" 0003:264; "ADR 0006 ... its part
+  12" 0005:100; "ADR 0001 / part 12" 0005:104, :941; "ADR / 0003, part 5.a" 0005:1697; "ADR 0003 / part 11" 0005:1758;
+  "ADR 0003 (its part 5.g)" 0005:1977; "ADR 0004 / part 16" 0005:2094; "ADR 0004 parts 18 and 19 ... (part 18" 0006:448,
+  :1478; SPIKE_PLAN:177-179 (ADR 0002 parts 6, 2, 4, 7, 11, under "What it proves: ADR 0002 part 5"); SPIKE_PLAN:288
+  ("part 13's B9", ADR 0006 part 13, the preview hosting check); README:66 (OQ-0003-2's row, ADR 0003 part 5.b), README:79
+  (OQ-0003-18's row, ADR 0003 parts 5.l, 5.m), README:272 (the ADR 0003 bullet, part 10). All exist. No finding.
+- code (38): V-S, B-S, B-N (0001:1354, 1370, 1372 define them in bold; 0003:1104 and 0006:1183-1184 cite "ADR 0001's V-S"),
+  and LE-D (README:250, the "LE-C, LE-D" row): resolve; the script's local-definition pattern missed them. The other 15
+  occurrences name review codes no repository file defines (D3C-3 below).
+Beyond the script: seams cited as "the decision map's S5 ..., S9 ... and S10" resolve to no register row (D3C-2 below).
+
+### D3C-2 (medium, dangling reference): three seam codes the register does not hold
+- Where: docs/adr/0005-content-abilities-assets.md:106-107 (engine-architect, the frame's "Where this record sits among
+  the drafts"). Current text: "Its seams are the decision map's S5 (content, execution and drawing), S6 / (moments and
+  telemetry), S9 (the look and the asset rules) and S10 (the editor)."
+- What should resolve: README "Codes the drafts cite" says the map is "a checkpoint file deleted before the PR is marked
+  ready. Their definitions live here from now on", but its Seams table (README:325-333) holds S1, S3, S4, S6, S11 and S12
+  only. S5, S9 and S10 are defined only in .checkpoints/v2-decision-drafts/engine-architect-decision-map.md:207, 211, 212,
+  so they dangle once the checkpoint is deleted. Present at 47eadd9 too (not a fix-block loss).
+- Smallest fix (engine-architect, README is the synthesis's): add three rows to README's Seams table from the map's lines
+  207, 211 and 212 (S5 content vs execution vs drawing: 0005 / 0004 and 0003; S9 the look vs the asset rules: 0003 /
+  0005; S10 the editor: 0002 / 0005, 0004). Or, in 0005:106, drop the three codes and keep the glosses.
+END
+
+### D3C-3 (low, dangling reference): review codes and review finding numbers resolve only in checkpoint files
+- Review codes cited in the documents and defined in no repository file outside .checkpoints/ (all authored as
+  provenance labels beside an id that does resolve):
+  - 0001:478 "OQ-0004-10 (GD-REJOIN: Mustafa's, ...)"; 0001:513 "OQ-0005-AB15 (GD-PICK-VIS, Mustafa's)"; 0001:604
+    "OQ-0004-9, GD-CARRIER: Mustafa's" (netcode-architect); 0005:1367 "(GD-PICK-VIS)" (game-designer, OQ-0005-AB15).
+  - 0002:1253, PM-0002-44's source cell: "the engine-architect, security and Rust reviews of 2026-11-02 (EA-8, SA-10,
+    RR-10)" (test-engineer A, pass marks).
+  - 0006:932-933 "the infra review's finding / 1 and its question RELEASE-WINDOW" (infra-engineer, OQ-0006-14).
+  - README:77, 79, 80, 81, 87: "the art review's LOOK-FLOOR", "REDUCED-MOTION", "COLOUR-TELL", "the test review's
+    HEAT-SOAK", "the reviews' POOL-FULL" (engine-architect, synthesis; each row's question text is self-contained).
+- Review finding numbers: 35 pointers of the form "the X review, finding n" / "review's question n" (0001 2, 0002 3, 0003
+  5, 0004 1, 0006 21, SPIKE_PLAN 1, README 2); the reviews live in .checkpoints/v2-decision-drafts/review-*.md, deleted
+  before the PR is marked ready (CHECKPOINTS.md §9); the report appendix §7.2 keeps only each review's verdicts and high
+  findings. Also "decision map, part d" (0005:97, :224), "part g" (0005:2103), "parts a, d, g and j" (0005:2500): parts
+  d, h and j have README homes (interfaces, gaps, J-n); parts a and g do not.
+- Smallest fix: one sentence in README's "Codes the drafts cite": review codes (GD-REJOIN, GD-PICK-VIS, GD-CARRIER,
+  RELEASE-WINDOW, LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL, HEAT-SOAK, POOL-FULL, EA-8, SA-10, RR-10) and "the X review,
+  finding n" name the step-10 reviews of 2026-11-02 and the decision map's parts, kept in the branch's history under
+  .checkpoints/v2-decision-drafts/ at the last commit before their deletion (name the SHA). No draft text needs to change.
+END
+Task 2 result: 10,245 references checked plus 32 steps; every id, code, part, research id, link and step resolves
+except D3C-2 (3 seam codes) and D3C-3 (12 review codes in 15 places, 35 review finding numbers, map parts a and g).

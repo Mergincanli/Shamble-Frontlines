@@ -1,0 +1,8 @@
+&[u32] len 3                 write_usize(3), write(12 bytes)
+Vec<u32> len 3               write_usize(3), write(12 bytes)
+[u32; 2] (array)             write_usize(2), write(8 bytes)
+derive S{a,v:len2,s:[_;2]}   write_u32(1), write_usize(2), write(8 bytes), write_usize(2), write(8 bytes)
+usize 5                      write_usize(5)
+str "ab"                     write(2 bytes), write(1 bytes)
+size_of::<usize>() = 8 on this target
+rustc 1.97.0 (2d8144b78 2026-07-07)

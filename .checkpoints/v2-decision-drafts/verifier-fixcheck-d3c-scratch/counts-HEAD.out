@@ -1,0 +1,24 @@
+0001: OQ numbered 18 (groups -1..18), duplicates [], gaps {}, moved [], open 18 | PM rows 62, distinct 62, max 62, duplicates [], gaps []
+0002: OQ numbered 8 (groups -1..8), duplicates [], gaps {}, moved [], open 8 | PM rows 78, distinct 78, max 78, duplicates [], gaps []
+0003: OQ numbered 20 (groups -1..20), duplicates [], gaps {}, moved [], open 20 | PM rows 47, distinct 47, max 47, duplicates [], gaps []
+0004: OQ numbered 12 (groups -1..12), duplicates [], gaps {}, moved ['OQ-0004-5', 'OQ-0004-6'], open 10 | PM rows 75, distinct 75, max 75, duplicates [], gaps []
+0005: OQ numbered 36 (groups CD1..8, AB1..15, AP1..3, AS1..6, -1..4), duplicates [], gaps {}, moved [], open 36 | PM rows 46, distinct 46, max 46, duplicates [], gaps []
+0006: OQ numbered 20 (groups -1..20), duplicates [], gaps {}, moved [], open 20 | PM rows 32, distinct 32, max 32, duplicates [], gaps []
+TOTAL OQ numbered 114, open 112; PM 340
+SPIKE_PLAN OQ ids defined: ['OQ-SPIKE-1']
+SPIKE_PLAN spike table numbered rows: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] ; not-a-spike rows: 2
+README drafts row [0001] -> 18 (OQ-0001-1 to -18)
+README drafts row [0002] -> 8 (OQ-0002-1 to -8)
+README drafts row [0003] -> 20 (OQ-0003-1 to -20)
+README drafts row [0004] -> 12 numbered (OQ-0004-1 to -12), 10 open: -5 and -6 moved to OQ-0005-AB9 and AB10
+README drafts row [0005] -> 36 (CD1–CD8, AB1–AB15, AP1–AP3, AS1–AS6, OQ-0005-1 to -4)
+README drafts row [0006] -> 20 (OQ-0006-1 to -20)
+README> Total: 114 numbered open questions, 112 of them open (OQ-0004-5 and -6 point to ADR 0005); SPIKE_PLAN adds one of its
+README design questions: 38 rows, distinct 38
+  decision map ids owned by DESIGN: 38; in README not DESIGN: []; DESIGN not in README: []
+README decisions table: 99 rows; OQ ids in first cells 95, distinct 95, twice []
+  rows whose first cell is a code (not a bare OQ id): 18
+  drafts' open OQs with a Decider naming Mustafa or the Advisor: 88; not in a first cell: []; of those cited elsewhere in the table: []
+  OQs where the script found no "*Decider:*" field: 3 ['OQ-0003-14', 'OQ-0004-5', 'OQ-0004-6']
+  README rows whose OQ names neither Mustafa nor the Advisor as Decider: [('OQ-0002-4', "the boundary spike's results, then this record; for embeds and the login flow un"), ('OQ-0002-5', "this record, from the macOS job's wall time, which infra-engineer measures in th"), ('OQ-0005-AP1', "the asset-pipeline research, then the asset spike; the files' visibility follows"), ('OQ-0006-16', "infra-engineer with netcode-architect (ADR 0001's transport), confirmed by the A"), ('OQ-0006-2', 'a measurement made before the reference server is created (a small check at the '), ('OQ-0006-5', 'security-auditor in the security baseline, with the port plan (OQ-0006-16); the ')]
+ENGINE_OVERVIEW lines: 144

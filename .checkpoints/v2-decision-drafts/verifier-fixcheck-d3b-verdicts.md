@@ -70,3 +70,46 @@ Method: verifier-fixcheck-d3b-scratch/blocks_check.py: every block's AFTER occur
 | test-engineer PM22-EUCLID (0004:1127) | D3A-1's extension (skeptic-6's point (a)) | yes: the clause names the methods, the fixed cases, both checks (same bits, then by value against a correctly rounded reference), the expected values and two bites that a same-bits check alone would miss; today's pass does not wait on it | none |
 | test-engineer NOTE PM22-EVIDENCE | the owner's check | sound: points 1–3 confirmed by own runs (quotients, remainders; (−2^-30).rem_euclid(1.0) = 1.0; signed zeros); point 4's reason for planting 1.97.0's steps rather than naming the toolchain holds (ADR 0002 pins 1.99.1); point 6 is D3B-2 | none |
 | engine-architect RP-1 to RP-23 (README) | the +2 shift from the game-designer's touch-up (gdcheck's note) | yes: 23 re-pinned, each to the same text (pin_check.py) | none |
+
+## The two losses in ADR 0005
+
+- **AB-3's heading (d2 F1b): back.** 0005:903 `- **AB-3. Weapons keep their own bookkeeping and share the damage pipeline (option B1).**` is byte-identical to 47eadd9:832 and stands where it stood there: after AB-2's Need (0005:902; 47eadd9:831) and before AB-3's What (0005:904; 47eadd9:833). The AB headings run AB-1 to AB-10 once each, in order (845, 889, 903, 916, 934, 952, 971, 993, 1014, 1019). "AB-3" occurs 13 times: the heading plus 12 references (0005:141, 504, 957, 960, 1109, 1231, 1392, 1878, 2045, 2226, 2371, 2463), each now resolving to it; AB-6's "Each row uses AB-1 to AB-5" (952) covers it too. A second loss in the same section, AB-1's Why line, is also back (0005:884–885 = 47eadd9:819–820).
+- **The Feel Lab checklist (d2 F1a): steps 1 to 4, each number once.** 0005:2348 step 1, 2349–2350 step 2, 2351–2354 step 3 ("the press is refused in both, with no start shown … Record: any start that shows, in either variant, as a defect of that variant"), 2355–2356 step 4 ("Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per ability", word for word 47eadd9's). The old step 3 ("a short start of the ability may show and then undo") is gone, so no step contradicts another: step 3 sets one expectation for both variants, step 4 only records. PM-0005-46 (0005:2253: "every step of the Feel Lab checklist below judged, and his answer recorded") is served: step 4 records the answer. SPIKE_PLAN:410 ("the Feel Lab checklist (ADR 0005, inside PM-0005-46) answers ABL-PREDICT") is served by step 4. (d2 cited SPIKE_PLAN:372; the line is 410 at 449356c and at HEAD: a verifier record, not draft text.)
+
+## d2's findings no block fixed
+
+| finding | still stands at HEAD | in §7.3 with a reason? | deferral right? |
+|---|---|---|---|
+| F6 (R3-WGPU-REC1 "adopted") | 0003:1415 "| R3-WGPU-REC1 | adopted | part 1 |" | yes (appendix §7.3, "From the final re-checks" bullet: "ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted" though its mark 2 is changed (d2 F6) … Wording only") | yes: part 1 and PM-0003-3 say "changed" where the mark lives; "wording only" understates it a little, since it is a rule 8 disposition kind, but no count moves |
+| F7 ("late steals" as a LOOP_V2 §11 counter) | 0004:913 | yes (same bullet) | yes: wording; LOOP_V2:153 lists "cashouts, steals, deliveries, harvester kills" |
+| F14 ("bots fill most slots") | 0004:952 | yes (same bullet) | yes: wording; VISION_V2:49 "Bots fill empty slots." |
+| F13's other places ("legacy screenshot(s)") | 0003:960, 993, 1367; also SPIKE_PLAN:247, 255, 267 | **no**: §7.3 names neither F13 nor these lines (grep "F13", "screenshot" in the appendix: only §4's rule 12, lines 221 and 372) | the substance is right to leave (LOOK_V2:78 "side by side with screenshots of the legacy game" and rule 12 use these words, and a screenshot of the live window meets both, as d2 noted), but the deferral is not recorded: D3B-1 |
+
+## Rules on the changed text (appendix §4, rules 1–12)
+
+- Numbers with no source: none. Every number on the changed lines is cited (LEGACY_TUNING:175, :180; r1:1373; AUDIT:27; V's 3 % and 10 %; r3:1092), arithmetic (rows 3, 9, 16, 22) or an own-run fact with its record (rows 3, 4).
+- "Not researched" option proposed as the decision: none. PM-0003-30's median rule is a proposed test rule with its reason; OQ-0005-AB9's options stay open.
+- GLOSSARY "Retire (exact)": `python3 -I .checkpoints/v2-decision-drafts/scripts/glossary_check_drafts.py` from the root at HEAD 78ccee8 (docs): exact 0 in every draft, OVW, SPK and IDX (output: verifier-fixcheck-d3b-scratch/gl_head.json, gl_head_hits.tsv). In-context hits on changed lines: 4, none carrying the term's meaning: 0003:1296 "players who ask for reduced motion" (reflowed, unchanged words), 0003:1318 "effects" (LOOK_V2:51's own word for visual effects, in its quote), 0005:873 "48" twice ("2 × 48 = 96 at N = 48", marked as N).
+- Settled input reopened: none. ABL-PREDICT stays open until the Feel Lab test (step 4 records his answer); LOOP_V2 §4's "holding E" is kept; part 7 keeps `rem_euclid`, `div_euclid` and `%` off the list.
+- Sentence directly under a table: none in the six docs (script: a non-blank, non-table line right after a `|` line: 0 in each).
+- The look (rule 6): steps 4, 27 and 32's Expected lines are LOOK_V2's words (rows 29, 31, 32); the contact line, the HUD and the readability notes are Look at, Record or Pick, so nothing decides the look beyond LOOK_V2.
+- Line length: no changed non-table line over 120 characters (character count).
+
+## Findings, ranked
+
+**D3B-1 (low; the report's appendix). d2 F13's other places are left as they are, but §7.3 does not record the deferral.** Author: the main session (the appendix §7.3); the test-engineer's F13 block (touchup-test-engineer-fixes.md, "d2 F13 holds for PM-0003-17 …") left 0003:960 and 0003:1367 "to their author, graphics-engineer, with the same wording", and no later block or commit took them up.
+- Current text: §7.3's "From the final re-checks (fixcheck-d1, -d2), low:" bullet names d2 F6, F7 and F14 and nothing of F13. ADR 0003 keeps "side by side with a legacy screenshot at the same framing" (0003:959–960), "legacy screenshots at the same framing" (0003:993) and "LOOK_V2 items side by side with legacy screenshots" (0003:1367); SPIKE_PLAN keeps the same words at 247, 255 and 267.
+- What the source says: the look checklist (0003:1223–1224) shows "legacy itself opened in a second Brave window", and PM-0003-17 (0003:1151) now says "beside the legacy view (legacy in a second Brave window, or its screenshot)". LOOK_V2:78 and rule 12 say "screenshots of the legacy game" / "legacy screenshots", so the lines are not wrong in substance (a screenshot of the live window meets both, as d2 noted); the deferral is right, but the task's rule is that each one is listed with its reason.
+- Smallest fix: add to that §7.3 bullet: "ADR 0003 lines 960, 993 and 1367 (and SPIKE_PLAN 247, 255 and 267) keep LOOK_V2 §9's "legacy screenshots" beside the checklist's live legacy window (d2 F13's other places: a screenshot of that window meets both)."
+
+**D3B-2 (low, optional; ADR 0004 part 7). Part 7 asks for "an exact reference" where PM-0004-22 defines a correctly rounded one.** Author: rust-reviewer (7cc6942); raised and left open by the test-engineer (NOTE PM22-EVIDENCE, point 6).
+- Current text, 0004:275: "both may join only once fixed inputs, those cases and their sign mirrors included, equal an exact reference on every target (PM-0004-22, extended)".
+- What the source says: PM-0004-22 (0004:1127): "a correctly rounded Euclidean reference, the exact quotient and remainder by integer or rational arithmetic rounded once to the type". An exact Euclidean remainder need not fit the type: rustc 1.97.0's `(−2^-30f32).rem_euclid(1.0)` is 1.0, the correct rounding of 1 − 2^-30 (own run, verifier-fixcheck-d3b-scratch/zero_round_d3b.out; std's doc allows `r == rhs.abs()`), so a literally exact reference would fail a correct method. Part 7's pointer to the row carries the right meaning; the two sentences in one ADR use different words for one test.
+- Smallest fix: 0004:275 "equal an exact reference" → "equal a rounded exact reference" (the line goes from 112 to 119 characters; part 7 keeps its 16 lines).
+
+No finding at medium or high. Every block resolves its finding and adds nothing wrong; both of ADR 0005's losses are restored; the rules hold on the changed text.
+
+## Verdict: PASS WITH NOTES
+
+Claims judged 33, confirmed 33 (row 5 confirmed with the wording note that is D3B-2). Blocks checked: 42 FIX blocks (8 test-engineer for ADR 0003 and 0005, 5 game-designer, 1 engine-architect synthesis, 1 rust-reviewer, 1 test-engineer PM-0004-22, 23 README re-pins) and 3 NOTE blocks; all applied as written, all resolve their findings. Findings: D3B-1 (low), D3B-2 (low, optional).
+Not verified: rustc 1.99.1's `div_euclid` code and a Wasm run (no fetch, no wasm32 target, nothing installed); std 1.99.1's page is taken from fixcheck-d0's fetched excerpt (excerpts.md, X9), not re-read.

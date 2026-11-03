@@ -108,9 +108,9 @@ for d in DOCS:
         if m.group(1) == 'N' and not re.search(r'(shared number|\(|; |, )$', t[max(0, m.start()-16):m.start()]): continue
         chk(m.group(1) + '-n', m.group(1) + m.group(2), m.group(2) in REG[m.group(1)], d, lineno(t, m.start()), t[max(0, m.start()-50):m.end()+20])
     # research ids, with shorthand
-    for m in re.finditer(r'\b(R[1-6]-[A-Z0-9]+-)([A-Z]*)(\d+)((?:(?:,| and| or|–| to|, and) (?:[A-Z]+\d+)\b)*)', t):
+    for m in re.finditer(r'\b(R[1-6]-[A-Z0-9]+-)([A-Z]*)(\d+)((?:(?:,| and| or|–| to|, and) (?:[A-Z]+\d+)\b(?!-))*)', t):
         base = m.group(1); keys = [base + m.group(2) + m.group(3)]
-        keys += [base + s for s in re.findall(r'(?:,| and| or|–| to|, and) ([A-Z]+\d+)', m.group(4))]
+        keys += [base + s for s in re.findall(r'(?:,| and| or|–| to|, and) ([A-Z]+\d+)\b(?!-)', m.group(4))]
         for k in keys:
             chk('research', k, k in D_RID, d, lineno(t, m.start()), t[max(0, m.start()-30):m.end()+10])
     # parts
