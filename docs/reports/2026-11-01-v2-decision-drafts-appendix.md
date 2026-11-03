@@ -511,8 +511,8 @@ notes.
 | 9, the synthesis round | 47eadd9 (2026-11-02) | the overview, spike plan and README brought in line with the drafts |
 | 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
 | 9 again, the final round | 319d3b6, b815c85, 8fa7173, 61e9933, b88714d, 16e97aa, 75615d1, d57dc5a, 5a24122, 72cfcc3, d1f7e13, 8a149bc, 604a497, 449356c (2026-11-02) | every review finding fixed or deferred with a reason |
-| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d, 7cc6942, b513483, 882cfa6, ac252f8, bd68d59, fd8c6f8 (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
-| 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
+| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d, 7cc6942, b513483, 882cfa6, ac252f8, bd68d59, fd8c6f8 (2026-11-03) | fixcheck-d1's, -d2's and -d3's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3, -d4) |
+| 11, 12, 13 | 03fe138, b011372 (docs-keeper); the final commit (the gate, this report; it runs CI) | docs-keeper's re-check and last touch, the gate, the report |
 
 Spend-limit cuts, nine (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15, 17:50 and 21:20.
@@ -560,18 +560,22 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | The final round, ADR 0003, 0004, 0005, the synthesis (fixcheck-d2) | FAIL (two lines lost in ADR 0005), then fixed | 130 | 122 | 7 wrong (2 in part or in one word), 1 unsupported, 1 confirmed with one phrase unsupported; fix blocks had dropped the AB-3 heading and the Feel Lab's step 4 |
 | The touch-ups to ADR 0001, 0002, 0006 and four owner-checked verdicts (fixcheck-d3a) | PASS WITH NOTES | 19 | 18 | 14 blocks, none with a problem; D3A-1 (`div_euclid`; its skeptic: partly) fixed in 7cc6942 and b513483; D3A-2 (this appendix) fixed |
 | The touch-ups to ADR 0003, 0004, 0005 and the synthesis (fixcheck-d3b) | PASS WITH NOTES | 33 | 33 | 42 blocks, none with a problem; both lost lines back; D3B-1 (§7.3) and D3B-2 (ADR 0004 part 7) fixed |
-| All nine documents swept (fixcheck-d3c) | PASS WITH NOTES | 13,513 | 13,494 | structural lines and references: 0 of 3,225 structural lines lost; D3C-1 to D3C-4 (wraps; seams S5, S9, S10 missing from README; review codes; 111 open, not 112) fixed in ac252f8 and fd8c6f8 |
+| All nine documents swept (fixcheck-d3c) | PASS WITH NOTES | 13,513 | 13,494 | structural lines and references: 0 of 3,225 structural lines lost; D3C-1 to D3C-4 (wraps; seams S5, S9, S10 missing from README; review codes; 111 open, not 112) fixed in ac252f8 and fd8c6f8, D3C-3 in part (the decision map's part g, cited at ADR 0005 line 2103, is deferred, §7.3) |
 | The critic's gaps and three web facts (fixcheck-d3d fetched nothing before 08:30; fixcheck-d3e) | PASS WITH NOTES | 26 | 19 | 13 of 14 web facts confirmed (WebGPU §22, rustc 1.99.1's `div_euclid`, std's `Hasher`; not read at a source: `usize` on wasm32, labelled proposed); 6 of 11 of this report's numbers confirmed, 5 wrong, fixed; D3E-1 to -3 fixed in bd68d59 and fd8c6f8 |
+| The last touch-ups and this report (fixcheck-d4) | PASS WITH NOTES | 68 | 59 | touch-up 4's ten blocks right, rebuilt byte for byte; 9 slips in this report and appendix (one medium: the Feel Lab line had no verifier before it was applied), fixed with the skeptics' corrected words, not re-checked again; F4 (a section number in PM-0003-2) deferred, §7.3 |
 
 Skeptics (a fresh verifier asked to refute each "wrong" or "unsupported" verdict before it went to its owner), five
 rounds: 27 upheld, 9 partly, 2 refuted (the results files' own rows, recounted by fixcheck-d3e; an earlier "30 upheld"
 was a miscount); a sixth round on 2026-11-03: D3A-1 and D3E-5, both partly. Not sent to a skeptic: four assembly
-cut-marker rows the session fixed itself (cf00def), fixcheck-c's nit A43, and the wrong and unsupported verdicts of
-fixcheck-d0, -d1 and -d2, which their owners checked (the report's "Decisions and deviations"). The consistency critic: 14 findings (3 high), all fixed by their owners, 489
-glossary in-context hits judged in the drafts (3 wrong, fixed) and 44 in the synthesis. The completeness critic:
-GAPS, 16 items, all handled (the 18 inventory rows, the pass marks' anchors, §3–§4 of this appendix, the fixcheck units,
-the reviews, this report). Each verdicts file holds its fetch audit; github.com answers 403 in this session, so its
-pages were read from raw.githubusercontent.com.
+cut-marker rows the session fixed itself (cf00def), fixcheck-c's nit A43, the wrong and unsupported verdicts of
+fixcheck-d0, -d1 and -d2 (their owners checked them, but d2's F7 and F14, which were deferred; the report's "Decisions
+and deviations"), and fixcheck-d3's other than D3A-1 and D3E-5 (D3C-4, D3E-4 and D3E-6, fixed; the ledger row, stated as
+superseded; d3a C15, labelled "no source read" in the draft). A seventh round on fixcheck-d4: F1 and F2 upheld, F6 and
+F8 partly. The consistency critic: 14 findings (3 high), all fixed by their owners, 489 glossary in-context hits judged
+in the drafts (3 wrong, fixed) and 44 in the synthesis. The completeness critic: GAPS, 16 items, all handled (the 18
+inventory rows, the pass marks' anchors, §3–§4 of this appendix, the fixcheck units, the reviews, this report). Each
+verdicts file holds its fetch audit; github.com answers 403 in this session, so its pages were read from
+raw.githubusercontent.com.
 
 ### 7.2 The ten reviews on the final diff (plan step 10)
 | Reviewer | Verdicts | High findings, and their outcome |
@@ -612,7 +616,7 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
 - The touch-ups after the final re-checks: 63 exact fix blocks, each in its author's own text (test-engineer 15,
   engine-architect 31, of them 23 pointer re-pins, infra-engineer 7, game-designer 5, netcode-architect 3,
   rust-reviewer 2), 5 NOTE blocks; the game-designer's blocks were dry-run and judged by a fresh verifier before they
-  were applied, and fixcheck-d3 judged them all after.
+  were applied, and fixcheck-d3 judged the first 53 after, fixcheck-d4 the last 10.
 - From the final re-checks (fixcheck-d1, -d2), low: ADR 0001 part 8's rewind estimate may add the 0-to-one-frame wait
   (d1 F3, measured by PM-0001-49; changing the 233–383 ms figure now would ripple into the README and other drafts);
   ADR 0002 OQ-0002-5's "paid minutes" (d1 F8, as above); ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted" though
@@ -621,10 +625,16 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
   stop review. ADR 0003 lines 960, 993 and 1367 (and SPIKE_PLAN 247, 255 and 267) keep LOOK_V2 §9's "legacy
   screenshots" beside the look checklist's live legacy window (d2 F13's other places: a screenshot of that window
   meets both).
-- The claims ledgers (plan rule 9) were not updated from the final round on (last change 8fa7173): the verifiers'
-  claim tables (fixcheck-d1 §1a–4c, d2's claims table, d3a §1, d3b's claims) stand in for them; ledger row 307's
-  7.49 ms is superseded by ADR 0001's 4.69 ms (fixcheck-d3's critic, G3).
-- Read at their sources by fixcheck-d3e (2026-11-03, 08:30–08:36; the final round could not read them after 22:00):
-  PM-0003-2's WebGPU error model (W3C Candidate Recommendation Draft of 15 September 2026, §22), rustc 1.99.1's
-  `div_euclid` (the same steps as 1.97.0) and std's `write_length_prefix` default: all confirmed. Not read at a
+- Only two claims ledgers (plan rule 9) got the final round's new claims, rust-reviewer's ADR 0004 (rows 367–384) and
+  engine-architect's ADR 0002 (F1–F17); none changed after 8fa7173, early in that round. For the rest the verifiers'
+  claim tables (fixcheck-d1 §1a–4c, d2's claims table, d3a §1, d3b's claims, d4's) stand in; ledger row 307's 7.49 ms
+  is superseded by ADR 0001's 4.69 ms (fixcheck-d3's critic, G3; fixcheck-d4 F8).
+- ADR 0005 line 2103 cites the decision map's part g, which leaves the branch with the checkpoint (D3C-3 in part,
+  fixcheck-d4 F7): SPIKE_PLAN now holds the spikes' order, so the pointer is provenance only; for the revision after
+  the stop review. PM-0003-2's "WebGPU §22.1" for the `destroy()` step could read "WebGPU `destroy()` and §22.1"
+  (fixcheck-d4 F4, optional: the row's source cell names both).
+- Read at their sources by fixcheck-d3e (2026-11-03, 08:30–08:36): PM-0003-2's WebGPU error model (W3C Candidate
+  Recommendation Draft of 15 September 2026, §22) and std's `write_length_prefix` default, which the final round could
+  not read after 22:00, and rustc 1.99.1's `div_euclid` (the same steps as 1.97.0), which fixcheck-d3a raised: all
+  confirmed. Not read at a
   source: that `usize` is 32 bits on wasm32 (ADR 0004 part 9, labelled proposed).

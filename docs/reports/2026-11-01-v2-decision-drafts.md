@@ -32,24 +32,30 @@ as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at
 ## Evidence
 - **Against the research:** 3,922 claims, 3,847 confirmed (98.1 %); 0006's first verdict FAIL, fixed. A skeptic
   re-checked first every "wrong" or "unsupported" verdict that the drafts' verifiers and fixcheck-a to -c sent to an
-  owner (five rounds: 27 upheld, 9 partly, 2 refuted; a sixth on 2026-11-03: 2 partly). About 160
-  source pages read, allow-listed hosts only, by day, each with a fetch audit.
+  owner (five rounds: 27 upheld, 9 partly, 2 refuted); on 2026-11-03 six later verdicts got skeptics too (fixcheck-d3's
+  D3A-1 and D3E-5, fixcheck-d4's F1, F2, F6 and F8: 2 upheld, 4 partly; the appendix §7.1 lists the ones that did not).
+  About 160 source pages read, allow-listed hosts only, by day, each with a fetch audit.
 - **Against each other:** the consistency critic's 14 findings, all fixed; the completeness critic's 16 gaps, all
   closed (the 18 legacy inventory rows, the pass marks' anchors, the appendix's §3–§4, the re-checks, the reviews).
-- **The fixes re-checked:** 901 exact fix blocks in five rounds and 63 in the touch-ups after them, each applied only
+- **The fixes re-checked:** 901 exact fix blocks in six rounds and 63 in the touch-ups after them, each applied only
   inside its author's own text (a block in another author's text went to that author). Re-checks: fixcheck-a, -b, -c and
   -d1 PASS WITH NOTES (d1: rebuilding ADR 0001, 0002 and 0006 from the blocks gives the commit exactly; its three medium
   items fixed); d0, the final round's web facts: 9 of 10 confirmed, the tenth fixed; d2 FAIL, as fix blocks had dropped
-  ADR 0005's AB-3 heading and a Feel Lab step (both restored; a fresh verifier dry-ran every restoring block first); d3,
-  on every touch-up: PASS WITH NOTES in all its units (0 of 3,225 structural lines lost across the nine documents; the
-  three web facts the final round could not read, confirmed at their sources; each finding fixed by its author or
-  deferred with a reason, appendix §7.3); a last check of those fixes and of this report's numbers: {D4}.
+  ADR 0005's AB-3 heading and a Feel Lab step (both restored; a fresh verifier dry-ran the AB-3 block before it was
+  applied, and fixcheck-d3b judged both after); d3, on every touch-up: PASS WITH NOTES in units a, b, c and e (unit d
+  ran at 08:07, before the fetch window, and judged none of its three facts; e read them; 0 of 3,225 structural lines
+  lost across the nine documents; the two web facts the final round could not read and a third d3a raised, confirmed at
+  their sources; each finding fixed by its author or deferred with a reason, appendix §7.3); a last check of those fixes
+  and of this report's numbers: PASS WITH NOTES (fixcheck-d4: 68 claims, 59 confirmed; the ten newest blocks right; nine
+  slips in this report and its appendix, one medium, fixed with its skeptics' corrected words and not re-checked again;
+  one optional section number deferred).
 - **Scripts at fd8c6f8 (the drafts' last change):** 521 of 521 research ids disposed exactly once; 0 retired glossary
   phrases in all nine documents; README's 94 pointers into the drafts on target; no line glued under a table; the write
   guard passes.
 - **Gate** (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a smoke cannot start here (Playwright
-  wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: {CI}.
-  Repo-map check: OK.
+  wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: 77 runs on
+  this branch before the final commit, 70 passed, 7 cancelled when a newer push replaced them, 0 failed (`[skip ci]`
+  commits skip it; the final commit runs it, and its result is in the PR). Repo-map check: OK.
 
 ## Reviews
 Ten reviewers on the final diff, the look rule in every prompt; each author also judged its own draft's pass marks.
@@ -57,7 +63,7 @@ REVISE verdicts: 0001 (four reviewers), 0002 (two), 0003 (two), 0004, 0005, 0006
 APPROVE (WITH NOTES). Every high finding is fixed. Among them: remote events now play on their entity's timeline, the
 aim point is clamped instead of refused, the rewind estimate counts the input buffer, the preview token can no longer
 reach production, a look floor stops any quality tier switching a LOOK_V2 [DECIDED] item off, and the 60 Hz run burns
-the time of the sim parts it lacks. The final round added 25 open questions; a few low items are deferred to the
+the time of the sim parts it lacks. The final round added 24 open questions; a few low items are deferred to the
 revision after this stop, each with its reason (appendix §7.3).
 
 ## Decisions and deviations
@@ -65,9 +71,10 @@ revision after this stop, each with its reason (appendix §7.3).
   plan delays R7-MARKS's "changed when their ADR draft comes up" until the drafts are accepted; each draft lists its
   rows instead, the "look brief pending" rows included.
 - **In form:** the write guard checks the GLOSSARY base as a byte prefix (the base file has no final newline); the
-  session put a blank line under eight tables (formatting only; GitHub would show the line as a table row). From the
-  final round on, the claims ledgers (plan rule 9) were not updated (last change 8fa7173): the verifiers' claim tables
-  (fixcheck-d1, -d2, -d3) stand in for them, and ledger row 307's 7.49 ms is superseded by ADR 0001's 4.69 ms.
+  session put a blank line under eight tables (formatting only; GitHub would show the line as a table row). In the final
+  round only two claims ledgers (plan rule 9) got its new claims, ADR 0004's and ADR 0002's (last change 8fa7173, early
+  in that round); the others were not updated in it: the verifiers' claim tables (fixcheck-d1, -d2, -d3, -d4) stand in
+  for them, and ledger row 307's 7.49 ms is superseded by ADR 0001's 4.69 ms.
 - **Slips and hand-overs:** one citation in test-engineer's text went to netcode-architect by mistake (kept, a stale
   line range replaced by the section's name). Blocks touching another author's text were held and handed on. At the end,
   for time, the owners checked the wrong and unsupported verdicts of fixcheck-d0, -d1 and -d2 against their sources
@@ -79,8 +86,8 @@ revision after this stop, each with its reason (appendix §7.3).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
   Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching. ADR
   0004 part 7: std documents `div_euclid` as exactly rounded, but rustc 1.97.0 and the pinned 1.99.1 return 3 where the
-  exact quotient is 2 (a shared error, so a same-bits test passes it); it stays off the float list until PM-0004-22's
-  new exact-reference clause passes.
+  exact quotient is 2 (a shared error, so a same-bits test passes it); both stay off the float list until PM-0004-22's
+  new correctly-rounded-reference clause passes.
 - **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00), and his "You can continue" (2026-11-03 07:14), which
   let this morning's last units start before 08:30 (fetching still from 08:30); nine spend-limit cuts over three days,
   each resumed from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
