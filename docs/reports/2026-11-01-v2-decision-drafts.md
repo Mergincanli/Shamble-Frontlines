@@ -36,17 +36,20 @@ as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at
   source pages read, allow-listed hosts only, by day, each with a fetch audit.
 - **Against each other:** the consistency critic's 14 findings, all fixed; the completeness critic's 16 gaps, all
   closed (the 18 legacy inventory rows, the pass marks' anchors, the appendix's §3–§4, the re-checks, the reviews).
-- **The fixes re-checked:** 901 exact fix blocks in five rounds and {TOUCHN} in the touch-ups after them, each applied
-  only inside its author's own text (a block in another author's text went to that author). Re-checks: fixcheck-a,
-  -b, -c and -d1 PASS WITH NOTES (d1: rebuilding ADR 0001, 0002 and 0006 from the blocks gives the commit exactly;
-  its three medium items fixed); d0, the final round's web facts: 9 of 10 confirmed, the tenth fixed; d2 FAIL, as fix
-  blocks had dropped ADR 0005's AB-3 heading and a Feel Lab step (both restored; a fresh verifier dry-ran every
-  restoring block first); d3, on every touch-up: {D3}.
-- **Scripts at {HEAD}:** 521 of 521 research ids disposed exactly once; 0 retired glossary phrases in all nine
-  documents; README's 94 pointers into the drafts on target; no line glued under a table; the write guard passes.
+- **The fixes re-checked:** 901 exact fix blocks in five rounds and 63 in the touch-ups after them, each applied only
+  inside its author's own text (a block in another author's text went to that author). Re-checks: fixcheck-a, -b, -c and
+  -d1 PASS WITH NOTES (d1: rebuilding ADR 0001, 0002 and 0006 from the blocks gives the commit exactly; its three medium
+  items fixed); d0, the final round's web facts: 9 of 10 confirmed, the tenth fixed; d2 FAIL, as fix blocks had dropped
+  ADR 0005's AB-3 heading and a Feel Lab step (both restored; a fresh verifier dry-ran every restoring block first); d3,
+  on every touch-up: PASS WITH NOTES in all its units (0 of 3,225 structural lines lost across the nine documents; the
+  three web facts the final round could not read, confirmed at their sources; each finding fixed by its author or
+  deferred with a reason, appendix §7.3); a last check of those fixes and of this report's numbers: {D4}.
+- **Scripts at fd8c6f8 (the drafts' last change):** 521 of 521 research ids disposed exactly once; 0 retired glossary
+  phrases in all nine documents; README's 94 pointers into the drafts on target; no line glued under a table; the write
+  guard passes.
 - **Gate** (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a smoke cannot start here (Playwright
-  wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: green on
-  every pushed commit. Repo-map check: OK.
+  wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: {CI}.
+  Repo-map check: OK.
 
 ## Reviews
 Ten reviewers on the final diff, the look rule in every prompt; each author also judged its own draft's pass marks.
@@ -66,18 +69,18 @@ revision after this stop, each with its reason (appendix §7.3).
   final round on, the claims ledgers (plan rule 9) were not updated (last change 8fa7173): the verifiers' claim tables
   (fixcheck-d1, -d2, -d3) stand in for them, and ledger row 307's 7.49 ms is superseded by ADR 0001's 4.69 ms.
 - **Slips and hand-overs:** one citation in test-engineer's text went to netcode-architect by mistake (kept, a stale
-  line range replaced by the section's name). Blocks touching another author's text were held and handed on. At the
-  end, for time, the owners checked the wrong and unsupported verdicts of fixcheck-d0, -d1 and -d2 against their
-  sources instead of a fresh skeptic (1, 6 and 7 rows; d2's other two, F7 and F14, wording, were deferred, appendix
-  §7.3); fixcheck-d3 then judged every fixed text and both deferrals against their sources, and four of those verdicts
-  on their own (d0 row 9; d1 F1, F2, F10): every verdict holds, and every fix is right but d0 row 9's wording, which
-  leaned on a precision promise the toolchain breaks (D3A-1, fixed after a skeptic). One skeptic's scratch put 31 MB of build output into a checkpoint commit (gone from the tree; history is
-  never rewritten).
+  line range replaced by the section's name). Blocks touching another author's text were held and handed on. At the end,
+  for time, the owners checked the wrong and unsupported verdicts of fixcheck-d0, -d1 and -d2 against their sources
+  instead of a fresh skeptic (1, 6 and 7 rows; d2's other two, F7 and F14, wording, were deferred, appendix §7.3);
+  fixcheck-d3 then judged every fixed text and both deferrals against their sources, and four of those verdicts on their
+  own (d0 row 9; d1 F1, F2, F10): every verdict holds, and every fix is right but d0 row 9's wording, which leaned on a
+  precision promise the toolchain breaks (D3A-1, fixed after a skeptic). One skeptic's scratch put 31 MB of build output
+  into a checkpoint commit (gone from the tree; history is never rewritten).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
-  Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching.
-  ADR 0004 part 7: std documents `div_euclid` as exactly rounded, but rustc 1.97.0 returns 3 where the exact quotient
-  is 2 (a shared error, so a same-bits test passes it); it stays off the float list until PM-0004-22's new
-  exact-reference clause passes.
+  Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching. ADR
+  0004 part 7: std documents `div_euclid` as exactly rounded, but rustc 1.97.0 and the pinned 1.99.1 return 3 where the
+  exact quotient is 2 (a shared error, so a same-bits test passes it); it stays off the float list until PM-0004-22's
+  new exact-reference clause passes.
 - **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00), and his "You can continue" (2026-11-03 07:14), which
   let this morning's last units start before 08:30 (fetching still from 08:30); nine spend-limit cuts over three days,
   each resumed from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).

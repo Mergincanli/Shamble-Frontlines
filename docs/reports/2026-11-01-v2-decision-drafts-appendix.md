@@ -511,7 +511,7 @@ notes.
 | 9, the synthesis round | 47eadd9 (2026-11-02) | the overview, spike plan and README brought in line with the drafts |
 | 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
 | 9 again, the final round | 319d3b6, b815c85, 8fa7173, 61e9933, b88714d, 16e97aa, 75615d1, d57dc5a, 5a24122, 72cfcc3, d1f7e13, 8a149bc, 604a497, 449356c (2026-11-02) | every review finding fixed or deferred with a reason |
-| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d{MORECOMMITS} (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
+| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d, 7cc6942, b513483, 882cfa6, ac252f8, bd68d59, fd8c6f8 (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
 | 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
 
 Spend-limit cuts, nine (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
@@ -555,10 +555,13 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | Synthesis | PASS WITH NOTES | 61 | 57 | 2 wrong, 1 unsupported, 1 citation off |
 | Fix rounds 1–2 (fixcheck-a, -b) | PASS WITH NOTES | 211 | 201 | 3 wrong, 4 unsupported, stale lines; all to a skeptic, then fixed |
 | Rounds 3–4 and the synthesis round (fixcheck-c) | PASS WITH NOTES | 95 | 92 | 1 partly wrong (skeptic upheld), 1 citation off, nits; fixed in the final round |
-| The final round's web facts (fixcheck-d0) | PASS WITH NOTES | 10 | 9 | 1 wrong (ADR 0004's precision line; its owner checked the saved excerpt and fixed it) |
+| The final round's web facts (fixcheck-d0) | PASS WITH NOTES | 10 | 9 | 1 wrong (ADR 0004's precision line; its owner checked the saved excerpt and fixed it; fixcheck-d3a then found the new words leaned on a promise rustc breaks, D3A-1, fixed) |
 | The final round, ADR 0001, 0002, 0006 (fixcheck-d1) | PASS WITH NOTES | 151 | 138 | 3 wrong, 3 unsupported, 1 citation off, 4 stale against another draft, 1 wording, 1 unclear pass rule; rebuilding the three drafts from the blocks gives the commit exactly |
 | The final round, ADR 0003, 0004, 0005, the synthesis (fixcheck-d2) | FAIL (two lines lost in ADR 0005), then fixed | 130 | 122 | 7 wrong (2 in part or in one word), 1 unsupported, 1 confirmed with one phrase unsupported; fix blocks had dropped the AB-3 heading and the Feel Lab's step 4 |
-| The touch-ups after d1 and d2 (fixcheck-d3) | {D3} | | | |
+| The touch-ups to ADR 0001, 0002, 0006 and four owner-checked verdicts (fixcheck-d3a) | PASS WITH NOTES | 19 | 18 | 14 blocks, none with a problem; D3A-1 (`div_euclid`; its skeptic: partly) fixed in 7cc6942 and b513483; D3A-2 (this appendix) fixed |
+| The touch-ups to ADR 0003, 0004, 0005 and the synthesis (fixcheck-d3b) | PASS WITH NOTES | 33 | 33 | 42 blocks, none with a problem; both lost lines back; D3B-1 (§7.3) and D3B-2 (ADR 0004 part 7) fixed |
+| All nine documents swept (fixcheck-d3c) | PASS WITH NOTES | 13,513 | 13,494 | structural lines and references: 0 of 3,225 structural lines lost; D3C-1 to D3C-4 (wraps; seams S5, S9, S10 missing from README; review codes; 111 open, not 112) fixed in ac252f8 and fd8c6f8 |
+| The critic's gaps and three web facts (fixcheck-d3d fetched nothing before 08:30; fixcheck-d3e) | PASS WITH NOTES | 26 | 19 | 13 of 14 web facts confirmed (WebGPU §22, rustc 1.99.1's `div_euclid`, std's `Hasher`; not read at a source: `usize` on wasm32, labelled proposed); 6 of 11 of this report's numbers confirmed, 5 wrong, fixed; D3E-1 to -3 fixed in bd68d59 and fd8c6f8 |
 
 Skeptics (a fresh verifier asked to refute each "wrong" or "unsupported" verdict before it went to its owner), five
 rounds: 27 upheld, 9 partly, 2 refuted (the results files' own rows, recounted by fixcheck-d3e; an earlier "30 upheld"
@@ -606,6 +609,10 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
   one tick plus one frame, 50 ms, a reasoned note).
 - ADR 0002's halves of SA-10 and SA-11 (npm advisories and a strict-CSP-ready build) wait for the security baseline
   (BASELINE-WHEN (b)); ADR 0006 carries them.
+- The touch-ups after the final re-checks: 63 exact fix blocks, each in its author's own text (test-engineer 15,
+  engine-architect 31, of them 23 pointer re-pins, infra-engineer 7, game-designer 5, netcode-architect 3,
+  rust-reviewer 2), 5 NOTE blocks; the game-designer's blocks were dry-run and judged by a fresh verifier before they
+  were applied, and fixcheck-d3 judged them all after.
 - From the final re-checks (fixcheck-d1, -d2), low: ADR 0001 part 8's rewind estimate may add the 0-to-one-frame wait
   (d1 F3, measured by PM-0001-49; changing the 233–383 ms figure now would ripple into the README and other drafts);
   ADR 0002 OQ-0002-5's "paid minutes" (d1 F8, as above); ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted" though
