@@ -558,3 +558,73 @@ Nothing in Brave: nothing a player sees changes.
 END AMENDMENT
 
 Status: DONE (amended)
+
+## AMENDMENT 2 (verbatim)
+
+### Notes (amendment 2)
+- 22:25 read ANSWERS-3 (his words, about 19:04), LG-COUNT (about 18:56; option text the session's) and the plan's Addendum 3. Grep "register": ADR 0001:464, :1274; ADR 0006:289-290, 301, 761, 847, 982-984, 1367-1369; README:145; SPIKE_PLAN:148-149. macOS runners: ADR 0002 OQ-0002-5 (1027-1031: free while public, R5-CI-F17 + infra-engineer's read), ADR 0006 part 8 (360-363), Q13 (694), :890. Short on time (deadline 22:38): rulings first.
+
+### Rulings (amendment 2; everything in AMENDMENT stands unless changed here)
+- **MACHINES-TIMING: answered by his words (c, "with one step first").** Quote in full, from ANSWERS-3, in SPIKE_PLAN's
+  machines paragraph (engine-architect b); the other places point to it.
+  - **The step:** the netcode proof test's plan first checks "whether GitHub's macOS runners (real Safari, free while
+    the repository is public) have a Safari new enough for WebTransport and can reach the test servers".
+  - **Branch 1 (they can):** "that is the Safari check, and I borrow the Mac only for the look proof test".
+  - **Branch 2 (they can't):** "I borrow the Mac before the netcode proof test."
+  - **Laptop and desktop:** "rough checks first, then a short re-run once they're named". These words replace the
+    advisor's reading in SPIKE_PLAN items 1, 3 and 4 where it says the same thing. Each spike's plan still lists the rows
+    that run before the machines are named. Nothing is judged on a rough check.
+- **May a GitHub macOS runner stand as MAC?** Yes, for the netcode proof test's Safari rows only, under branch 1 (his
+  words). It must show first, recorded in the run's results:
+  - (i) the runner image's Safari version on the day, at least the version R2-TRN-F7 gives for WebTransport (26.4);
+  - (ii) real Safari driven through safaridriver, not a WebKit build;
+  - (iii) from the runner: one WebTransport session to RS that opens and carries datagrams, and one WebSocket session on
+    the domain.
+
+  Limits (the advisor's reading, 2026-11-03):
+  - The runner stands in only for yes-or-no and count rows (PM-0001-28's four-browser path and library pick, PM-0001-14,
+    PM-0001-25's Origin, PM-0006-15). A row whose limit is a time, or which ADR 0003's look proof test needs, stays on
+    the borrowed Mac.
+  - The workflow that runs it is part of the proof test's plan: security-auditor and infra-engineer review it, and any
+    `.github/` change in this repository goes to Mustafa (escalation category 3).
+  - The later spikes' Safari rows are each spike's own plan's, in the same way.
+  - Where it goes: ADR 0001's key, at MAC (test-engineer), one sentence with the step, (i) to (iii) and the limits;
+    ADR 0006's key points to it (test-engineer).
+  - ADR 0002 OQ-0002-5 and ADR 0006 part 8 already read the runner's price (free while public): no change, or at most
+    one pointer (engine-architect a; infra-engineer). OQ-0002-5 stays open: it asks about pull requests, not the spike.
+- **Counts:** unchanged. MACHINES-TIMING was a decision in the report, not a numbered question. OQ-0003-1 stays "answered
+  in part" (the actual machines are still to be named). 116 numbered, 96 open; ADR 0006: 22 and 17; 341.
+- **DOMAIN: registered.** His words: "DOMAIN: done. shamblefrontlines.com is registered at Cloudflare."
+  - His earlier quotes ("a domain I register", "which I register at Cloudflare") stay as his words where they are
+    quoted, with one pointer to "registered (Mustafa, 2026-11-03)".
+  - Live sentences ("he registers …", "the domain he registers", "before it" / "before the netcode proof test") become
+    "registered".
+  - Who writes what:
+    - ADR 0006:289–290, 301, 761, 847, 982–984 and 1367–1369 (infra-engineer). The milestone at 1367–1370 loses the
+      registration as a to-do.
+    - ADR 0001:464 (netcode-architect) and :1274 (its author: test-engineer if in the checklist or key).
+    - README:145 and SPIKE_PLAN:148–149 (engine-architect b).
+    - STATUS and the report (docs-keeper): "For Mustafa" loses the registration.
+  - The DNS record and certificate for each run day stay as AMENDMENT condition 11 says.
+- **LG-COUNT: answered.** He chose the session's option "Add as needed (Recommended)", whose text is the session's
+  wording: "The run's plan adds as many CAX21s as its 5-minute calibration shows are needed, inside the cost cap you OK
+  for that run." AMENDMENT condition 4's last sentence now reads: "A run whose bots one CAX21 cannot carry under 80 %
+  adds as many CAX21s as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run
+  (LG-COUNT, the option he chose, 2026-11-03)." When the run has more than one CAX21, its plan says which one carries MV
+  (AMENDMENT, HZ-MV).
+- **Inputs:** now ten files for the quote check (STOP, DESIGN, ANSWERS-2, HETZNER-CHECK, HETZNER-CORRECTION,
+  HETZNER-ANSWERS, HETZNER-CORRECTION-2, HETZNER-ANSWERS-2, LG-COUNT, ANSWERS-3). The option texts in HETZNER-ANSWERS,
+  HETZNER-ANSWERS-2 and LG-COUNT are the session's. The appendix carries all ten files' Hetzner and answer texts byte
+  for byte (the new two included).
+- **"Decisions needed" after this:** none open from PR #33. MACHINES-TIMING and LG-COUNT are answered and leave it.
+  OQ-0006-22 (the staging server's plan: Mustafa, money, before slice 3) is listed as a later item, not a decision now.
+- **"For Mustafa" after this:**
+  1. Borrow and name the laptop and desktop (rough checks first, then a short re-run); the Mac as branch 1 or 2 decides.
+  2. OK each run's cost cap.
+  3. The `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository.
+  4. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
+     session's chat (squash only).
+- Routing: these items join AMENDMENT condition 13 for the same authors. One round, xhigh; docs-keeper at high.
+END AMENDMENT 2
+
+Status: DONE (amended twice)
