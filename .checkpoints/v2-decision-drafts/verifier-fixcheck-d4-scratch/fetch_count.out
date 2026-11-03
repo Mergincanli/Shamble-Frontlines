@@ -1,0 +1,16 @@
+verifier-adr0001-verdicts.md                  audit rows 10
+verifier-adr0002-verdicts.md                  audit rows 41
+verifier-adr0003-verdicts.md                  audit rows 24
+verifier-adr0004-verdicts.md                  audit rows 6
+verifier-adr0005-verdicts.md                  audit rows 8
+verifier-adr0006-verdicts.md                  audit rows 29
+verifier-fixcheck-a-verdicts.md               audit rows 3
+verifier-fixcheck-b-verdicts.md               audit rows 10
+verifier-fixcheck-d0-verdicts.md              audit rows 17
+verifier-fixcheck-d2-verdicts.md              audit rows 1
+verifier-fixcheck-d3d-verdicts.md             audit rows 1
+verifier-fixcheck-d3e-verdicts.md             audit rows 19
+verifier-skeptic-4-results.md                 audit rows 5
+verifier-synthesis-verdicts.md                audit rows 1
+d3e fetch-audit.txt lines 19
+total audit rows 194 ; distinct URLs (where the row names one) 152
