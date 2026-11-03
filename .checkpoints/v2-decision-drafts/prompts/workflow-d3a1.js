@@ -1,4 +1,4 @@
-// Workflow script (verbatim, copied after launch, run wf_267dcff8-48e, 2026-11-03 about 07:33 Amsterdam): verifier then rust-reviewer, effort xhigh, model: the session's (Opus 5.5); args: the D3A-1 finding
+// Workflow script (verbatim, copied after launch, run wf_267dcff8-48e, 2026-11-03 about 07:30 Amsterdam): verifier then rust-reviewer, effort xhigh, model: the session's (Opus 5.5); args: the D3A-1 finding
 export const meta = {
   name: 'v2-drafts-d3a1',
   description: "fixcheck-d3a's finding D3A-1 (ADR 0004 part 7: std's precision claim for div_euclid, which the local toolchain breaks): a fresh skeptic first, then rust-reviewer's fix block if it holds",
