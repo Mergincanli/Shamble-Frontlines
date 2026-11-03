@@ -15,14 +15,14 @@ them, so each row also names its OQ id or part.
 |---|---|---|---|---|---|
 | [0001](0001-multiplayer-netcode.md) | Multiplayer and netcode | netcode-architect; pass marks: test-engineer | Proposed | the netcode proof test; the 60 Hz margin run | 18 (OQ-0001-1 to -18) |
 | [0002](0002-code-structure-build-toolchain.md) | Code structure, build and toolchain | engine-architect; pass marks: test-engineer | Proposed | the Rust ↔ TypeScript boundary spike; the foundation's acceptance checks (not a spike) | 8 (OQ-0002-1 to -8) |
-| [0003](0003-rendering.md) | Rendering and presentation | graphics-engineer; pass marks: test-engineer | Proposed | the look proof test; the render budget bench | 20 (OQ-0003-1 to -20) |
+| [0003](0003-rendering.md) | Rendering and presentation | graphics-engineer; pass marks: test-engineer | Proposed | the look proof test; the render budget bench | 20 numbered (OQ-0003-1 to -20), 19 open: -14 answered by its decider, the verifier |
 | [0004](0004-simulation-core.md) | The simulation core | rust-reviewer; pass marks: test-engineer | Proposed | the sim core spike; shares in the netcode proof test, the boundary spike and the content and ability spike | 12 numbered (OQ-0004-1 to -12), 10 open: -5 and -6 moved to OQ-0005-AB9 and AB10 |
 | [0005](0005-content-abilities-assets.md) | Content data, abilities and assets | engine-architect (frame, content data, asset pipeline); game-designer (ability and effect system); graphics-engineer (the asset pipeline's GPU rules); pass marks: test-engineer | Proposed | the content and ability spike; a share of the look proof test; the asset spike (after the asset-pipeline research); the Feel Lab test | 36 (CD1–CD8, AB1–AB15, AP1–AP3, AS1–AS6, OQ-0005-1 to -4) |
 | [0006](0006-infrastructure-operations.md) | Infrastructure and operations | infra-engineer; pass marks: test-engineer | Proposed | the preview hosting check; operations marks in the netcode proof test; an optional share of the boundary spike | 20 (OQ-0006-1 to -20) |
 
-Total: 114 numbered open questions, 112 of them open (OQ-0004-5 and -6 point to ADR 0005); SPIKE_PLAN adds one of its
-own, OQ-SPIKE-1. Pass marks: 62, 78, 47, 75, 46 and 32 rows (340). None of the drafts is signed off; no spike starts
-before Mustafa and the Advisor approve them (the drafts brief, §4).
+Total: 114 numbered open questions, 111 of them open (OQ-0004-5 and -6 point to ADR 0005; OQ-0003-14 is answered);
+SPIKE_PLAN adds one of its own, OQ-SPIKE-1. Pass marks: 62, 78, 47, 75, 46 and 32 rows (340). None of the drafts is
+signed off; no spike starts before Mustafa and the Advisor approve them (the drafts brief, §4).
 
 ## Decisions the drafts ask for
 Every decision code and open question the drafts route to Mustafa or the Advisor, one row each. The first rows are the
@@ -78,7 +78,7 @@ by an agent, are in the drafts and in [SPIKE_PLAN](../SPIKE_PLAN.md), not here.
 | OQ-0003-17 | How is VISION_V2 §6.9's "without dropping frames" read as a mark: how many of 600 presented frames may miss a refresh with the very large units on screen, or the p95 rows as written? | the Advisor, confirmed by Mustafa at the stop review (VISION_V2 is theirs) | [ADR 0003](0003-rendering.md) line 914 |
 | OQ-0003-18 | Do the concussion shake, the halftone flashes and line boil soften for players who ask for reduced motion? (the art review's REDUCED-MOTION) | Mustafa, in the look proof test (parts 5.l, 5.m) | [ADR 0003](0003-rendering.md) line 923 |
 | OQ-0003-19 | Are the three factions told apart by colour alone? (the art review's COLOUR-TELL) | Mustafa, in the look proof test | [ADR 0003](0003-rendering.md) line 932 |
-| OQ-0003-20 | Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop? (the test review's HEAT-SOAK) | the Advisor | [ADR 0003](0003-rendering.md) line 938 |
+| OQ-0003-20 | Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop? (the perf review's HEAT-SOAK) | the Advisor | [ADR 0003](0003-rendering.md) line 938 |
 | OQ-0004-1 | How is bot behaviour structured? | a bot research unit, or the slice 2 plan, with the game-designer; Mustafa for the behaviour set | [ADR 0004](0004-simulation-core.md) line 855 |
 | OQ-0004-4 | What moves a building through its damage stages? | Mustafa, with the game-designer (rule 6: no rule beyond LOOK_V2 is designed here) | [ADR 0004](0004-simulation-core.md) line 878 |
 | OQ-0004-8 | How does an uplink steal meet defenders, and two enemy teams? | Mustafa, with the game-designer | [ADR 0004](0004-simulation-core.md) line 902 |
@@ -292,10 +292,14 @@ The drafts cite codes from the decision map (`.checkpoints/v2-decision-drafts/en
 checkpoint file deleted before the PR is marked ready). Their definitions live here from now on. Decision codes such
 as TICK-30, SLICE-ORDER or UPGRADE-SCOPE live in `docs/STATUS.md`; GLOSSARY terms in `docs/research/GLOSSARY.md`.
 Plan rules, plan steps and the advisor's conditions ("plan rule n", "plan step n", "condition n"): the report's
-appendix, `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3–§4, quotes them word for word. Codes local to one
-draft are not register codes, for example ADR 0002's gate checks G0–G13, ADR 0004's spike claims S1–S22, ADR 0006's
-option labels (G1–G4, K1–K4, S1–S5) and its baseline items B1–B12 (part 13); a register code always carries its word
-("gap G5", "seam S1").
+appendix, `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3–§4, quotes them word for word. Review codes
+(GD-REJOIN, GD-PICK-VIS, GD-CARRIER, RELEASE-WINDOW, LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL, HEAT-SOAK, POOL-FULL,
+EA-8, SA-10, RR-10) and "the X review, finding n" (X a reviewer's short name, as in "the art review" or "the Rust
+review") point into the ten reviews on the final diff (plan step 10, 2026-11-02): the same appendix's §7.2 summarizes
+each, and their files stay readable in the branch's history (`.checkpoints/v2-decision-drafts/review-*.md`). Codes local
+to one draft are not register codes, for example ADR 0002's gate checks G0–G13, ADR 0004's spike claims S1–S22, ADR
+0006's option labels (G1–G4, K1–K4, S1–S5) and its baseline items B1–B12 (part 13); a register code always carries its
+word ("gap G5", "seam S1").
 
 **Interfaces between the drafts** (what crosses each seam; owner defines, the others use)
 | Code | Interface | What crosses | Owner | Used by |
@@ -328,7 +332,10 @@ option labels (G1–G4, K1–K4, S1–S5) and its baseline items B1–B12 (part 
 | S1 | Tick | 0001: the tick rate rule under TICK-30, the 60 Hz margin, the snapshot rate, the server tick budget's total and the server-only share | 0004: the fixed-tick mechanism, the sim step share and its parts, the client's sim share, determinism |
 | S3 | CI and previews | 0002: CI, gate v2, the preview build, the deploy job, header sets, close and sweep jobs | 0006: the host, token scope, access wall, cleanup policy and PREV-DELETE, staging server, runner costs, secrets policy |
 | S4 | Rooms vs machines | 0001: room lifecycle, process model, tokens, reconnect, private rooms, lobby protocol | 0006: VMs, supervisor, firewall, the lobby's hosting and store, production certificates, rooms per VM as cost, monitoring |
+| S5 | Content vs execution vs drawing | 0005: the definitions, their schema, validation, versions and hot reload, the bundle and its content hash, the ability data model and in-match upgrades, the asset pipeline and per-unit budgets | 0004: running them in the sim step (order, integer time, attribute maths, damage, the player record that holds the upgrade tracks); 0003: drawing them (materials in TSL, LOD switching at run time, faction colour as per-instance data) |
 | S6 | Moments and telemetry | 0004 recognizes moments and emits events; 0005 holds moment rules and telemetry ids as data; 0001's room writes the record | 0006: the record's shape, storage, analysis and retention |
+| S9 | The look vs the asset rules | 0003: how every LOOK_V2 item is achieved on screen | 0005: what an asset must carry for it (authored silhouettes and proportions, material slot names, faction colour and emissive slots, LOD levels, per-unit budgets) |
+| S10 | The editor | 0002: the editor package, its entry and the double-click question (OQ-0002-1) | 0005: the map document as content data (schema, versions, migration); 0004: the reach checks and the navigation bake the editor's validation panel runs |
 | S11 | Offline and local play | DESIGN: whether offline play ships, and at the largest mode on the minimum laptop (R1-BND-OQ1, R1-TICK-OQ7, critic rank 15) | 0002 and 0004: the local server from slice 1 and local play with bots in slice 2 (SLICE-ORDER), whatever the answer |
 | S12 | Security | 0006: the security baseline listed open, its interim positions and every item waiting on it | 0001, 0002, 0005 cite the baseline item where their design waits on it |
 

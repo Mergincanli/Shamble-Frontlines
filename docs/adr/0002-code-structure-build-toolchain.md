@@ -1422,10 +1422,9 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
    slots in the local server; nightly soaks over L1. *Done when:* G13 and its `--prove` pair pass, and a nightly
    30-minute bot room at N = 48 over L1 runs with 0 panics, 0 hangs and 0 desyncs (R5-TEST-REC5's mark).
 5. **Slice 3, online:** `server` and `supervisor` enter; L2 in the nightly run; G12 over both transport backends; the
-   first multiplayer
-   preview behind the access wall, with the binary-delivery job once the security baseline has set its token's scope
-   (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up. *Done when:* G12
-   passes on both backends and a multiplayer preview plays against the staging game server.
+   first multiplayer preview behind the access wall, with the binary-delivery job once the security baseline has set its
+   token's scope (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up.
+   *Done when:* G12 passes on both backends and a multiplayer preview plays against the staging game server.
 6. **Slice 4, the loop:** the owner-only section carries upgrade tracks and offers, and the pickups section carries
    world pickups (UPGRADE-SCOPE; ADR 0004 part 18, ADR 0005). *Done when:* the boundary layer's round-trip test covers
    every new message and section.
