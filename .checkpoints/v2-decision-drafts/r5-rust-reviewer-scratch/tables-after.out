@@ -1,0 +1,10 @@
+0001-mul PM rows 63 not 7 cells 0
+0002-cod PM rows 78 not 7 cells 0
+0003-ren PM rows 47 not 7 cells 0
+0004-sim PM rows 75 not 7 cells 0
+0005-con PM rows 46 not 7 cells 0
+0006-inf PM rows 32 not 7 cells 0
+PM total 341
+0004 tables 17 uneven [] sentence directly under a table at []
+migration rows 9 pipes [4]
+prose lines over 120 in 0004: 29 [(28, 126), (42, 121), (53, 121), (83, 129), (88, 125)]

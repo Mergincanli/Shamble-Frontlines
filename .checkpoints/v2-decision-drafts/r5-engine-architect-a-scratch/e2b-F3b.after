@@ -1,0 +1,1 @@
+| OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? (answered by the Advisor, 2026-11-03: client definitions keyed by the same id; an id of a presented kind with no client entry fails the content check (the advisor's reading, 2026-11-03), CD-2) | the Advisor, at the stop review | this frame |

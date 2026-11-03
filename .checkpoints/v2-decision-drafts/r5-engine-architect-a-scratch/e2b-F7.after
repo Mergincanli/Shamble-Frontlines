@@ -1,0 +1,4 @@
+  - What, *client content* (presentation only; the sim never reads it): the client entries keyed by simulation ids
+    (CD-2; a weapon's feel kit is part of its entry, CD-14); the quality-tier table (CD-14); the asset list and the
+    material-slot classes (the asset pipeline section, AP-2 and AP-3); and the look values ADR 0003 tunes in its look
+    proof test (CD-10).

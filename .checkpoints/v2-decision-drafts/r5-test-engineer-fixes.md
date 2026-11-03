@@ -1,2 +1,76 @@
 # r5 test-engineer fixes (plan r5, last fix round)
 
+### FIX e1-F1
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+BEFORE:
+| PM-0002-49 | L1 is exact and true to its profiles (part 8: the network simulator; G11) | the same seed and profile give an identical packet-fate log and identical per-tick state hashes on two runs; over 1,000,000 packets per profile in each direction, measured loss, mean one-way delay and jitter each within 5 % (relative) of the per-direction values of P0–P4 and B1, as part 8 splits them (as PM-0001-3 reads them; proposed count: see the note under the table); G11's one-minute run per profile takes under 2 minutes in total (a plain limit) | CI | L1 headless in Rust; loss, delay and jitter computed from the fate log; jitter read against the distribution L1's own documentation states (proposed: R2 names none) | 2 runs for the identity; 1 per profile for the statistics; G11's time over 5 runs | R5-TEST-REC4's mark (r5, 1469–1473); profiles (r2, 1987–1990); the split each way: part 8 and ADR 0001 part 13 (OQ-0001-16, answered by the Advisor, 2026-11-03) |
+AFTER:
+| PM-0002-49 | L1 is exact and true to its profiles (part 8: the network simulator; G11) | the same seed and profile give an identical packet-fate log and identical per-tick state hashes on two runs; over 1,000,000 packets per profile in each direction, measured loss, mean one-way delay and jitter each within 5 % (relative) of the per-direction values of P0–P4 and B1, as part 8 splits latency and jitter and ADR 0001 part 13 reads the loss (the advisor's reading, 2026-11-03), as PM-0001-3 reads them (proposed count: see the note under the table); G11's one-minute run per profile takes under 2 minutes in total (a plain limit) | CI | L1 headless in Rust; loss, delay and jitter computed from the fate log; jitter read against the distribution L1's own documentation states (proposed: R2 names none) | 2 runs for the identity; 1 per profile for the statistics; G11's time over 5 runs | R5-TEST-REC4's mark (r5, 1469–1473); profiles (r2, 1987–1990); the split each way: part 8 and ADR 0001 part 13 (OQ-0001-16, answered by the Advisor, 2026-11-03) |
+END
+
+### FIX e2-F2
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  2026-11-03; decision map part j, J6 (3)), injected on LG in both directions, half the round trip and ± half the
+  jitter each way and the profile's loss on each (OQ-0001-16, answered by the Advisor, 2026-11-03; R5-TEST-REC4's
+  per-direction rule, r5 lines 1455–1456), never on
+AFTER:
+  2026-11-03; decision map part j, J6 (3)), injected on LG in both directions, half the round trip and ± half the
+  jitter each way (OQ-0001-16, answered by the Advisor, 2026-11-03; R5-TEST-REC4's per-direction rule, r5 lines
+  1455–1456) and the profile's loss on each (the advisor's reading, 2026-11-03), never on
+END
+
+### FIX e2-F1-keyS
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. The soaked set gates and the cold set is reported
+  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"; its option (a)).
+AFTER:
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. The soaked set gates and the cold set is reported
+  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"): OQ-0003-20's
+  option (a) (the advisor's reading, 2026-11-03).
+END
+
+### FIX e2b-F1
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3; OQ-0005-1's whole-set rule) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. A content set in which an id of a presented kind has no client entry is refused at the whole-set stage, naming the kind and the id, while an id of a kind with nothing to present (a mode, a tuning table) is accepted with none (OQ-0005-1, answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a simulation id has no client entry"; it binds the kinds the client presents: the advisor's reading, 2026-11-03), the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons, factions, building parts and props). Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); the client-entry class: valid content sets with one id's client entry removed, for every presented kind, and as controls sets whose mode and tuning table have no entry (proposed: at least 500 sets, as every defect class); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id; the client-entry check left out of the whole-set stage (a unit id with no client entry then loads) | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2; OQ-0005-1 (answered by the Advisor, 2026-11-03) |
+AFTER:
+| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3; OQ-0005-1's whole-set rule) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. A content set in which an id of a presented kind has no client entry is refused at the whole-set stage, naming the kind and the id, while an id of a kind with nothing to present (a mode, a rule table) is accepted with none (OQ-0005-1, answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a simulation id has no client entry"; it binds the kinds the client presents: the advisor's reading, 2026-11-03), the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons and factions). Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); the client-entry class: valid content sets with one id's client entry removed, for every presented kind, and as controls sets whose mode and rule table have no entry (proposed: at least 500 sets, as every defect class); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id; the client-entry check left out of the whole-set stage (a unit id with no client entry then loads) | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2; OQ-0005-1 (answered by the Advisor, 2026-11-03) |
+END
+
+### FIX e2b-F7-PM15
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-15 | Presentation cannot reach an outcome (CD-6; AP-1) | changing every client-content value (the feel kit, the asset list, the material-slot classes, the look values) to other valid values leaves the per-tick state hashes of a 120 s scripted scenario identical, on native and Wasm (proposed: CD-6's "a presentation value cannot reach an outcome" has no mark of its own) | CI | the scenario of PM-0004-63 run twice, the second time with a seeded random valid change to every client-content file | 3 seeds. Bites: a planted read of a feel-kit value in the sim (a weapon's recoil feeding its spread) | CD-6, AP-1 (the draft's rules; the mark proposed here) |
+AFTER:
+| PM-0005-15 | Presentation cannot reach an outcome (CD-6; AP-1) | changing every client-content value (the feel kit, the asset list, the material-slot classes, the look values, and the client entries keyed by simulation ids, CD-2) to other valid values leaves the per-tick state hashes of a 120 s scripted scenario identical, on native and Wasm (proposed: CD-6's "a presentation value cannot reach an outcome" has no mark of its own) | CI | the scenario of PM-0004-63 run twice, the second time with a seeded random valid change to every client-content file | 3 seeds. Bites: a planted read of a feel-kit value in the sim (a weapon's recoil feeding its spread) | CD-6, AP-1 (the draft's rules; the mark proposed here) |
+END
+
+### FIX c3-c4-0001-key
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+  findings 9 and 10). **ML, RD, MAC** as ADR 0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines 1096–1102; the models
+  are OQ-0003-1): ML, the minimum laptop, runs Chrome, Edge and Firefox on Windows 11; RD, the recommended desktop,
+  Chrome; MAC runs Safari, the fourth target browser (VISION_V2 §4). **MP**, Mustafa's PC in Brave on Windows, the
+  proof test's test PC (SPIKE-MACHINES, Mustafa, 2026-11-03: "Test PC: my own, in Brave"): only what he judges, and
+  the transport Brave uses; never a measured result, so it stands in for none of ML, RD and MAC (the advisor's
+  reading, 2026-11-03). **L1**: the link simulator on simulated time, any
+AFTER:
+  findings 9 and 10). **ML, RD, MAC** as ADR 0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines
+  1096–1102): ML, the minimum laptop, runs Chrome, Edge and Firefox on Windows 11; RD, the recommended desktop,
+  Chrome; MAC runs Safari, the fourth target browser (VISION_V2 §4). Their models are OQ-0003-1, answered in part by
+  Mustafa (2026-11-03): "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a
+  mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES).
+  Still open: the actual machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES,
+  Mustafa, 2026-11-03): "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the
+  minimum, for rough checks only." A rough check is reported, never judged against a pass mark. MP stays what he
+  judges, never a measured result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). Mustafa
+  on the proof test (REF-MACHINES, 2026-11-03): "the netcode proof test doesn't measure client frames". It reads: no
+  client frame-time budget is judged in the proof test; PM-0001-43 times input-to-screen latency through presented
+  frames on ML and RD, and like every row on ML, RD or MAC it is judged only on a named machine
+  (the advisor's reading, 2026-11-03). **MP**, Mustafa's PC in Brave on Windows, the proof test's test PC
+  (SPIKE-MACHINES, Mustafa, 2026-11-03: "Test PC: my own, in Brave"): only what he judges, and the transport Brave
+  uses; never a measured result. **L1**: the link simulator on simulated time, any
+END
+
