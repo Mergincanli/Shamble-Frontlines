@@ -10,3 +10,4 @@
 - 18:28 task2 headers: all nine identical per cond 4. Next: ref machines, ROOM-CRASH, OQ-0005-1 kinds; then task 3.
 - 18:40 task 2 block written: 2 disagreements (0004:1246 content spike before foundation; PM-0005-4 building parts/props vs CD-2), 1 label (OQ-0003-1), 1 stale (OQ-SPIKE-1 why). Next: task 3 counts.
 - 18:50 task 3 block written: all count statements confirmed (PM coverage 341/341, 10 spikes, 1 OQ-SPIKE, open/answered lists). Next: findings block, then structured result.
+- 18:58 findings, not-read and summary written. DONE

@@ -68,3 +68,56 @@ END TASK 3
 Correction to Task 1 row 2's note: "as blockouts" is judged faithful (he makes them, and blockouts are enough); no
 finding is raised for it.
 
+## Findings (ranked)
+1. **medium, inconsistent: OQ-0005-1's presented kinds** (author: test-engineer, PM-0005-4).
+   - Current text, ADR 0005:2273 (PM-0005-4): "the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units,
+     vehicles, weapons, factions, building parts and props)".
+   - CD-2 (ADR 0005:321-328), which the row says it follows: the presented kinds are a unit, a vehicle, a weapon and a
+     faction, and "building parts and props are entities in it, not kinds of their own (AP-7)". The ruling (q10) has
+     engine-architect name the kinds in CD-2, so CD-2 is the reference.
+   - Smallest fix: "(from AP-2, CD-13 and AB-3: units, vehicles, weapons and factions)".
+2. **medium, inconsistent: wave order in ADR 0004's migration plan** (author: rust-reviewer, FIX S14-1).
+   - Current text, ADR 0004:1246, phase 1 "Spikes", which comes before phase 2 "The foundation": "in the order Mustafa
+     accepted (SPIKE-ORDER (b), ...): the netcode proof test first; then the sim core spike; then the 60 Hz margin run,
+     ...; then the boundary spike; then the content and ability spike".
+   - SPIKE_PLAN:397 places the content and ability spike in "wave 3, after the sim core spike and the foundation, before
+     slice 1" (also its mermaid :64-68 and ADR 0005:2169). The phase-1 list predates this round, but the round's edit
+     now calls it Mustafa's accepted order.
+   - Smallest fix: replace "; then the content and ability spike" with "; after the foundation (wave 3), the content and
+     ability spike", or move that spike to a row after phase 2.
+3. **low, unmarked reading: "not a session's"** (author: engine-architect, stop-engine-architect-b; from map row L1).
+   - Current text, SPIKE_PLAN:327-328: "which is Mustafa's own work in Blender (OQ-SPIKE-1, answered), not a session's",
+     and SPIKE_PLAN:520: "Making the models is his own work, not a session's, so no spike's size carries it."
+   - His words (inputs:11): "I make the test models with AI help in Blender". "AI help" could be a session's help, and
+     no verdict ruling says "not a session's". Neither place is marked as a reading.
+   - Smallest fix: drop ", not a session's" in both places, or mark it "(the advisor's reading, 2026-11-03)" if the
+     advisor confirms it.
+4. **low, inconsistent label: OQ-0003-1** (author: engine-architect, README:53 and SPIKE_PLAN; graphics-engineer, ADR
+   0003).
+   - ADR 0003:821: "Answered in part by Mustafa (2026-11-03): "Test PC: my own, in Brave"", and ADR 0003:1366:
+     "(OQ-0003-1, answered in part: still open, Mustafa's)". The count script reads it as answered in part.
+   - README:53: "Still open after the stop: ..."; SPIKE_PLAN:129: "(OQ-0003-1, still open)"; SPIKE_PLAN:495: "(OQ-0003-1:
+     ML, RD and MAC still to be named)".
+   - All agree in substance: open, and MP stands in for none. The ruling (SPIKE-MACHINES (d)) says "unchanged in
+     substance", and COUNTS says a partly answered question is marked "answered in part".
+   - Smallest fix: README:53 "Answered in part, still open after the stop: ..."; SPIKE_PLAN:129 "(OQ-0003-1, answered
+     in part, still open)". Or drop "answered in part" from ADR 0003, if the advisor reads "unchanged in substance" as
+     not answered at all.
+5. **low, stale question text: OQ-SPIKE-1** (author: engine-architect).
+   - Current text, SPIKE_PLAN:504-505: "*Why it matters:* the look proof test runs in wave 1, before the asset-pipeline
+     research". Since the answer, the research's export part runs before the look test (SPIKE_PLAN:439-445). The
+     answer is appended at the end of the entry (:517).
+   - Smallest fix: "*Why it matters (as asked):*", or "was to run in wave 1, before the asset-pipeline research".
+END FINDINGS
+
+## Not read
+- Nothing of the three items left. Out of scope, not re-checked: quotes and attribution inside the six ADRs (units e1,
+  e2), README's quotes (e3), the map's dispositions (e3).
+
+## Summary
+PASS WITH NOTES. 36 claims judged, 31 confirmed. Task 1: 21 rows, 19 confirmed, 2 unmarked readings (finding 3); every
+quote word for word (6 of 6); attribution matches condition 2; the named rulings are applied. Task 2: 8 topics, 5
+consistent throughout; 2 disagreements (findings 1, 2); 1 label difference (finding 4); plus 1 stale question text
+(finding 5). Task 3: 7 count statements, all confirmed (341 of 341 pass marks placed; 10 spikes; 1 OQ-SPIKE; the open
+and answered lists match 114 numbered, 98 open).
+DONE
