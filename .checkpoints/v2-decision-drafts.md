@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 17:31 Amsterdam
+- **Last update:** 2026-11-03 17:34 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,15 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Mustafa, about 17:31 (verbatim: `inputs/ANSWERS-2-mustafa-2026-11-03.md`): the four escalations answered
+(REF-MACHINES, LOOK_V2-§8, SPIKE-COST, DOMAIN = shamblefrontlines.com at Cloudflare), COMMUNITY-SERVERS (a new open
+question in ADR 0006 and README, the door kept open), and "after e2b, e3b and their fix round, stop. No further
+re-check rounds; anything left goes into the PR as notes." e3b PASS WITH NOTES (36/31; PM-0005-4, ADR 0004 phase 1,
+SPIKE_PLAN labels); e2b FAIL (39/32; PM-0005-4, Appendix A counts, five lows). Plan revision 5 rewritten for all of it;
+the advisor reviewing it (17:34, wf_f32d92bc-247; the earlier review was stopped). Next: the fix round (two workflows,
+every author, xhigh), then the scripts and the gate only (no re-check rounds), docs-keeper-4, the report, the close.
+
+Before that:
 Mustafa's design answers, about 17:28 (verbatim: `inputs/DESIGN-ANSWERS-mustafa-2026-11-03.md`): DOMAIN
 (shamblefrontlines.com at Cloudflare), reference machines (classes, borrowed), carry slots, levelling, the name
 "amplifications", AB11, upgrade visibility, AB14 (3 s), fragments visual only; leaning: WEAPON-UNLOCKS; still open:
