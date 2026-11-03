@@ -140,3 +140,46 @@ AFTER:
      2026-11-03). The pass-mark row is test-engineer's (PM-0003-44).
 END
 
+### FIX Q1
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+  must pass. (a) and (c) go beyond R3's 3 runs: proposed, for the reason above. Part 8 and the pass marks hold to
+  (a) until it is answered. Recommendation: (a), since VISION_V2 §4's "30+ fps on Low" holds over a whole match.
+  Decider: the Advisor. What decides it: the Advisor's reading of VISION_V2 §4's "30+ fps on Low" over a whole
+  match; the bench's cold and soaked sets, once measured, show how far apart they lie. Research ids: R3-BUDGET-REC2
+  (lines 1162–1164, its 3 runs; it stays adopted, no new disposition).
+AFTER:
+  must pass. (a) and (c) go beyond R3's 3 runs: proposed, for the reason above. Part 8 and the pass marks held to
+  (a) until it was answered. Recommendation: (a), since VISION_V2 §4's "30+ fps on Low" holds over a whole match.
+  Decider: the Advisor. What decides it: the Advisor's reading of VISION_V2 §4's "30+ fps on Low" over a whole
+  match; the bench's cold and soaked sets, once measured, show how far apart they lie. Research ids: R3-BUDGET-REC2
+  (lines 1162–1164, its 3 runs; it stays adopted, no new disposition).
+  Answered by the Advisor (2026-11-03): "judge after 15 minutes of play." That is option (a): the soaked set S gates
+  PM-0003-18 to PM-0003-21 on ML, and the cold set is reported beside it (the advisor's reading, 2026-11-03).
+END
+
+### FIX Q2
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+     (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193). On the minimum laptop the same run set is also taken
+     after at least 15 minutes of play (the pass marks' soaked set S); which of the two sets gates is OQ-0003-20.
+AFTER:
+     (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193). On the minimum laptop the same run set is also taken
+     after at least 15 minutes of play (the pass marks' soaked set S); the soaked set gates and the cold set is
+     reported beside it (OQ-0003-20, answered by the Advisor, 2026-11-03: "judge after 15 minutes of play").
+END
+
+### FIX L10
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in its own daytime session), which
+`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31).
+AFTER:
+unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in its own daytime session), which
+`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31), except
+its export and slot-naming part (OQ-0005-AS3, AS4), which runs before ADR 0003's look proof test (LOOK-TEST-INPUTS,
+Mustafa, 2026-11-03). The look proof test's models are made in Blender: "Route: Blender (Spline's skins and named
+slots are unproven)" (Mustafa, the same answer). Blender is also that research part's export route, and LOOK_V2
+§8's flow stays as written (the advisor's reading, 2026-11-03).
+END
+

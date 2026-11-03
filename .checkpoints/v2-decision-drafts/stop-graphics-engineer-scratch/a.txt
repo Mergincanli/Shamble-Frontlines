@@ -1,8 +1,6 @@
-     frames (5 %) run over, so §6.9's "without dropping frames" also gets a presented-frame count (OQ-0003-17's
-     option (a), decided): on the recommended machine at High, Chrome on WebGPU, with the four units and their visual
-     effects on screen and normal vsync on a 60 Hz display, the frames whose interval passes 1.5 refresh periods are
-     counted (the loop follows the display, R3-BUDGET-F2, lines 545–549, so such a frame missed at least one
-     refresh); the same count is reported on the minimum laptop at Low against a 33.3 ms period. A run may hold at
-     most 6 of 600 such frames (OQ-0003-17, answered by the Advisor, confirmed by Mustafa, 2026-11-03); the p95
-     frame rows stay as diagnostics for this reading and keep gating their own needs (the advisor's reading,
-     2026-11-03). The pass-mark row is test-engineer's (PM-0003-44).
+unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in its own daytime session), which
+`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31), except
+its export and slot-naming part (OQ-0005-AS3, AS4), which runs before ADR 0003's look proof test (LOOK-TEST-INPUTS,
+Mustafa, 2026-11-03). The look proof test's models are made in Blender: "Route: Blender (Spline's skins and named
+slots are unproven)" (Mustafa, the same answer). Blender is also that research part's export route, and LOOK_V2
+§8's flow stays as written (the advisor's reading, 2026-11-03).
