@@ -1,0 +1,18 @@
+---
+129: Sourcefn write_length_prefix(&mut self, len: usize)
+130: 🔬This is a nightly-only experimental API. (hasher_prefixfree_extras #96762)
+131: Writes a length prefix into this hasher, as part of being prefix-free.
+132: If you’re implementing Hash for a custom collection, call this before
+133: writing its contents to this Hasher. That way
+134: (collection![1, 2, 3], collection![4, 5]) and
+135: (collection![1, 2], collection![3, 4, 5]) will provide different
+136: sequences of values to the Hasher
+137: The impl<T> Hash for [T] includes a call to this method, so if you’re
+138: hashing a slice (or array or vector) via its Hash::hash method,
+139: you should not call this yourself.
+140: This method is only for providing domain separation. If you want to
+141: hash a usize that represents part of the data, then it’s important
+142: that you pass it to Hasher::write_usize instead of to this method.
+143: §Examples
+144: #![feature(hasher_prefixfree_extras)]
+145: use std::hash::{Hash, Hasher};

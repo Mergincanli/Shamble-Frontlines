@@ -1,0 +1,60 @@
+---
+2018: 2014 /// let b = 4.0;
+2019: 2015 /// assert_eq!(f64::math::div_euclid(a, b), 1.0); // 7.0 > 4.0 * 1.0
+2020: 2016 /// assert_eq!(f64::math::div_euclid(-a, b), -2.0); // -7.0 >= 4.0 * -2.0
+2021: 2017 /// assert_eq!(f64::math::div_euclid(a, -b), -1.0); // 7.0 >= -4.0 * -1.0
+2022: 2018 /// assert_eq!(f64::math::div_euclid(-a, -b), 2.0); // -7.0 >= -4.0 * 2.0
+2023: 2019 /// ```
+2024: 2020 ///
+2025: 2021 /// _This standalone function is for testing only.
+2026: 2022 /// It will be stabilized as an inherent method._
+2027: 2023 ///
+2028: 2024 /// [`f64::div_euclid`]: ../../../std/primitive.f64.html#method.div_euclid
+2029: 2025 #[inline]
+2030: 2026 #[unstable(feature = "core_float_math", issue = "137578")]
+2031: 2027 #[must_use = "method returns a new number and does not mutate the original value"]
+2032: 2028 pub fn div_euclid(x: f64, rhs: f64) -> f64 {
+2033: 2029 let q = trunc(x / rhs);
+2034: 2030 if x % rhs < 0.0 {
+2035: 2031 return if rhs > 0.0 { q - 1.0 } else { q + 1.0 };
+2036: 2032 }
+2037: 2033 q
+2038: 2034 }
+2039: 2035
+2040: 2036 /// Experimental version of `rem_euclid` in `core`. See [`f64::rem_euclid`] for details.
+2041: 2037 ///
+2042: 2038 /// # Examples
+2043: 2039 ///
+2044: 2040 /// ```
+2045: 2041 /// #![feature(core_float_math)]
+2046: 2042 ///
+---
+2053: 2049 /// assert_eq!(f64::math::rem_euclid(a, -b), 3.0);
+2054: 2050 /// assert_eq!(f64::math::rem_euclid(-a, -b), 1.0);
+2055: 2051 /// // limitation due to round-off error
+2056: 2052 /// assert!(f64::math::rem_euclid(-f64::EPSILON, 3.0) != 0.0);
+2057: 2053 /// ```
+2058: 2054 ///
+2059: 2055 /// _This standalone function is for testing only.
+2060: 2056 /// It will be stabilized as an inherent method._
+2061: 2057 ///
+2062: 2058 /// [`f64::rem_euclid`]: ../../../std/primitive.f64.html#method.rem_euclid
+2063: 2059 #[inline]
+2064: 2060 #[doc(alias = "modulo", alias = "mod")]
+2065: 2061 #[unstable(feature = "core_float_math", issue = "137578")]
+2066: 2062 #[must_use = "method returns a new number and does not mutate the original value"]
+2067: 2063 pub fn rem_euclid(x: f64, rhs: f64) -> f64 {
+2068: 2064 let r = x % rhs;
+2069: 2065 if r < 0.0 { r + rhs.abs() } else { r }
+2070: 2066 }
+2071: 2067
+2072: 2068 /// Experimental version of `powi` in `core`. See [`f64::powi`] for details.
+2073: 2069 ///
+2074: 2070 /// # Examples
+2075: 2071 ///
+2076: 2072 /// ```
+2077: 2073 /// #![feature(core_float_math)]
+2078: 2074 ///
+2079: 2075 /// use core::f64;
+2080: 2076 ///
+2081: 2077 /// let x = 2.0_f64;

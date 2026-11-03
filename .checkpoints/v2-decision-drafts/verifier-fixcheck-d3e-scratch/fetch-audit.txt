@@ -2,3 +2,17 @@
 08:30:32|www.w3.org|https://www.w3.org/TR/webgpu/ (2nd read, wider context)|200|4521455|0.536915
 08:30:47|www.w3.org|https://www.w3.org/TR/webgpu/ (3rd read: status, §22.2)|200|4521455|0.551854
 08:31:01|www.w3.org|https://www.w3.org/TR/webgpu/ (4th read: §22.2 validation steps)|200|4521455|0.603261
+08:31:09|developer.mozilla.org|https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextlost_event|200|152239|0.346239
+08:32:10|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/primitive.f64.html|200|338196|0.720361
+08:32:20|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/primitive.f64.html (2nd read, wider context)|200|338196|0.201705
+08:32:29|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/primitive.f64.html (3rd read, rem_euclid)|200|338196|0.217476
+08:32:38|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/std/num/f64.rs.html|200|111910|0.364166
+08:32:46|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/core/num/f64.rs.html|200|207758|0.753804
+08:32:50|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/core/num/f32.rs.html|200|210556|0.474558
+08:33:03|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/std/num/f32.rs.html|200|111897|0.803323
+08:33:39|doc.rust-lang.org|https://doc.rust-lang.org/1.97.0/std/primitive.f32.html|200|346388|0.643677
+08:34:42|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/hash/trait.Hasher.html|200|34736|0.548827
+08:34:45|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/hash/trait.Hash.html|200|84430|0.390484
+08:34:56|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/hash/trait.Hasher.html (2nd read, write_length_prefix text)|200|34736|0.573408
+08:34:58|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/core/hash/mod.rs.html|200|92048|0.332074
+08:35:44|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/rustc/platform-support/wasm32-unknown-unknown.html|200|38081|0.474268

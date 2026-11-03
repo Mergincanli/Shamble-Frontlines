@@ -1,0 +1,54 @@
+---
+1: HTMLCanvasElement: webglcontextlost event - Web APIs | MDN
+2: Skip to main content
+3: Skip to search
+---
+119: Web APIs
+120: HTMLCanvasElement
+121: webglcontextlost
+122: Theme
+123: OS default
+---
+133: Русский
+134: 中文 (简体)
+135: HTMLCanvasElement: webglcontextlost event
+136: Baseline
+137: Widely available
+---
+139: See full compatibility
+140: Learn more
+141: The webglcontextlost event of the WebGL API is fired if the user agent detects that the drawing buffer associated with a WebGLRenderingContext object has been lost.
+142: This event does not bubble.
+143: In this article
+---
+151: Use the event name in addEventListener():
+152: js
+153: addEventListener("webglcontextlost", (event) => { })
+154: Alternatively, assign to the event handler property of the interface:
+155: js
+156: onwebglcontextlost = (event) => { }
+157: Event type
+158: A WebGLContextEvent. Inherits from Event.
+---
+160: WebGLContextEvent
+161: Example
+162: With the help of the WEBGL_lose_context extension, you can simulate the webglcontextlost event:
+163: js
+164: const canvas = document.getElementById("canvas");
+165: const gl = canvas.getContext("webgl");
+166: canvas.addEventListener("webglcontextlost", (event) => {
+167: console.log(event);
+168: });
+169: gl.getExtension("WEBGL_lose_context").loseContext();
+170: // "webglcontextlost" event is logged.
+171: Specifications
+172: Specification
+---
+197: toDataURL()
+198: transferControlToOffscreen()
+199: Eventscontextlost
+200: contextrestored
+201: webglcontextcreationerror
+202: webglcontextlost
+203: webglcontextrestored
+204: InheritanceHTMLElement

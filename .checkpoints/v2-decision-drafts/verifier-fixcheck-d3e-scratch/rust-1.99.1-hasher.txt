@@ -1,0 +1,57 @@
+---
+33: fn finish(&self) -> u64;
+34: fn write(&mut self, bytes: &[u8]);
+35: // Provided methods
+36: fn write_u8(&mut self, i: u8) { ... }
+37: fn write_u16(&mut self, i: u16) { ... }
+38: fn write_u32(&mut self, i: u32) { ... }
+39: fn write_u64(&mut self, i: u64) { ... }
+40: fn write_u128(&mut self, i: u128) { ... }
+41: fn write_usize(&mut self, i: usize) { ... }
+42: fn write_i8(&mut self, i: i8) { ... }
+43: fn write_i16(&mut self, i: i16) { ... }
+44: fn write_i32(&mut self, i: i32) { ... }
+45: fn write_i64(&mut self, i: i64) { ... }
+46: fn write_i128(&mut self, i: i128) { ... }
+47: fn write_isize(&mut self, i: isize) { ... }
+48: fn write_length_prefix(&mut self, len: usize) { ... }
+49: fn write_str(&mut self, s: &str) { ... }
+50: }
+51: Expand descriptionA trait for hashing an arbitrary stream of bytes.
+52: Instances of Hasher usually represent state that is changed while hashing
+53: data.
+54: Hasher provides a fairly basic interface for retrieving the generated hash
+55: (with finish), and writing integers as well as slices of bytes into an
+56: instance (with write and write_u8 etc.). Most of the time, Hasher
+---
+107: 1.3.0 · Sourcefn write_u16(&mut self, i: u16)
+108: Writes a single u16 into this hasher.
+109: 1.3.0 · Sourcefn write_u32(&mut self, i: u32)
+110: Writes a single u32 into this hasher.
+111: 1.3.0 · Sourcefn write_u64(&mut self, i: u64)
+112: Writes a single u64 into this hasher.
+113: 1.26.0 · Sourcefn write_u128(&mut self, i: u128)
+114: Writes a single u128 into this hasher.
+115: 1.3.0 · Sourcefn write_usize(&mut self, i: usize)
+116: Writes a single usize into this hasher.
+117: 1.3.0 · Sourcefn write_i8(&mut self, i: i8)
+118: Writes a single i8 into this hasher.
+119: 1.3.0 · Sourcefn write_i16(&mut self, i: i16)
+120: Writes a single i16 into this hasher.
+121: 1.3.0 · Sourcefn write_i32(&mut self, i: i32)
+122: Writes a single i32 into this hasher.
+123: 1.3.0 · Sourcefn write_i64(&mut self, i: i64)
+124: Writes a single i64 into this hasher.
+125: 1.26.0 · Sourcefn write_i128(&mut self, i: i128)
+126: Writes a single i128 into this hasher.
+127: 1.3.0 · Sourcefn write_isize(&mut self, i: isize)
+128: Writes a single isize into this hasher.
+129: Sourcefn write_length_prefix(&mut self, len: usize)
+130: 🔬This is a nightly-only experimental API. (hasher_prefixfree_extras #96762)
+131: Writes a length prefix into this hasher, as part of being prefix-free.
+132: If you’re implementing Hash for a custom collection, call this before
+133: writing its contents to this Hasher. That way
+134: (collection![1, 2, 3], collection![4, 5]) and
+135: (collection![1, 2], collection![3, 4, 5]) will provide different
+136: sequences of values to the Hasher
+137: The impl<T> Hash for [T] includes a call to this method, so if you’re

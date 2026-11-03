@@ -1,0 +1,18 @@
+---
+254: 250 #[must_use = "method returns a new number and does not mutate the original value"]
+255: 251 #[inline]
+256: 252 #[stable(feature = "euclidean_division", since = "1.38.0")]
+257: 253 pub fn div_euclid(self, rhs: f64) -> f64 {
+258: 254 core::f64::math::div_euclid(self, rhs)
+259: 255 }
+260: 256
+261: 257 /// Calculates the least nonnegative remainder of `self` when divided by
+---
+292: 288 #[must_use = "method returns a new number and does not mutate the original value"]
+293: 289 #[inline]
+294: 290 #[stable(feature = "euclidean_division", since = "1.38.0")]
+295: 291 pub fn rem_euclid(self, rhs: f64) -> f64 {
+296: 292 core::f64::math::rem_euclid(self, rhs)
+297: 293 }
+298: 294
+299: 295 /// Raises a number to an integer power.

@@ -1,0 +1,42 @@
+---
+283: the target architecture has a dedicated fma CPU instruction. However,
+284: this is not always true, and will be heavily dependant on designing
+285: algorithms with specific target hardware in mind.
+286: §Precision
+287: The result of this operation is guaranteed to be the rounded
+288: infinite-precision result. It is specified by IEEE 754 as
+289: fusedMultiplyAdd and guaranteed not to change.
+290: §Examples
+291: let m = 10.0_f64;
+292: let x = 4.0_f64;
+293: let b = 60.0_f64;
+294: assert_eq!(m.mul_add(x, b), 100.0);
+295: assert_eq!(m * x + b, 100.0);
+296: let one_plus_eps = 1.0_f64 + f64::EPSILON;
+297: let one_minus_eps = 1.0_f64 - f64::EPSILON;
+298: let minus_one = -1.0_f64;
+299: // The exact result (1 + eps) * (1 - eps) = 1 - eps * eps.
+300: assert_eq!(one_plus_eps.mul_add(one_minus_eps, minus_one), -f64::EPSILON * f64::EPSILON);
+301: // Different rounding with the non-fused multiply and add.
+302: assert_eq!(one_plus_eps * one_minus_eps + minus_one, 0.0);
+303: 1.38.0 · Sourcepub fn div_euclid(self, rhs: f64) -> f64
+304: Calculates Euclidean division, the matching method for rem_euclid.
+305: This computes the integer n such that
+306: self = n * rhs + self.rem_euclid(rhs).
+307: In other words, the result is self / rhs rounded to the integer n
+308: such that self >= n * rhs.
+309: §Precision
+310: The result of this operation is guaranteed to be the rounded
+311: infinite-precision result.
+312: §Examples
+313: let a: f64 = 7.0;
+314: let b = 4.0;
+315: assert_eq!(a.div_euclid(b), 1.0); // 7.0 > 4.0 * 1.0
+316: assert_eq!((-a).div_euclid(b), -2.0); // -7.0 >= 4.0 * -2.0
+317: assert_eq!(a.div_euclid(-b), -1.0); // 7.0 >= -4.0 * -1.0
+318: assert_eq!((-a).div_euclid(-b), 2.0); // -7.0 >= -4.0 * 2.0
+319: 1.38.0 · Sourcepub fn rem_euclid(self, rhs: f64) -> f64
+320: Calculates the least nonnegative remainder of self when divided by
+321: rhs.
+322: In particular, the return value r satisfies 0.0 <= r < rhs.abs() in
+323: most cases. However, due to a floating point round-off error it can

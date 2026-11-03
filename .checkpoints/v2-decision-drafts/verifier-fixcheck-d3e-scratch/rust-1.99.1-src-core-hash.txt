@@ -1,0 +1,86 @@
+---
+393: 389 /// Writes a single `usize` into this hasher.
+394: 390 #[inline]
+395: 391 #[stable(feature = "hasher_write", since = "1.3.0")]
+396: 392 fn write_usize(&mut self, i: usize) {
+397: 393 self.write(&i.to_ne_bytes())
+398: 394 }
+399: 395
+---
+442: 438 /// `(collection![1, 2], collection![3, 4, 5])` will provide different
+443: 439 /// sequences of values to the `Hasher`
+444: 440 ///
+445: 441 /// The `impl<T> Hash for [T]` includes a call to this method, so if you're
+446: 442 /// hashing a slice (or array or vector) via its `Hash::hash` method,
+447: 443 /// you should **not** call this yourself.
+448: 444 ///
+---
+469: 465 /// use std::hash::{Hash, Hasher};
+470: 466 /// impl<T: Hash> Hash for MyCollection<T> {
+471: 467 /// fn hash<H: Hasher>(&self, state: &mut H) {
+472: 468 /// state.write_length_prefix(self.len());
+473: 469 /// for elt in self {
+474: 470 /// elt.hash(state);
+475: 471 /// }
+---
+484: 480 /// of the `len` provided in the name of increased performance.
+485: 481 #[inline]
+486: 482 #[unstable(feature = "hasher_prefixfree_extras", issue = "96762")]
+487: 483 fn write_length_prefix(&mut self, len: usize) {
+488: 484 self.write_usize(len);
+489: 485 }
+490: 486
+---
+512: 508 /// # impl std::hash::Hasher for Foo {
+513: 509 /// # fn finish(&self) -> u64 { unimplemented!() }
+514: 510 /// # fn write(&mut self, _bytes: &[u8]) { unimplemented!() }
+515: 511 /// fn write_str(&mut self, s: &str) {
+516: 512 /// self.write_length_prefix(s.len());
+517: 513 /// self.write(s.as_bytes());
+518: 514 /// }
+---
+535: 531 /// # impl std::hash::Hasher for Foo {
+536: 532 /// # fn finish(&self) -> u64 { unimplemented!() }
+537: 533 /// # fn write(&mut self, _bytes: &[u8]) { unimplemented!() }
+538: 534 /// fn write_str(&mut self, s: &str) {
+539: 535 /// self.write(s.as_bytes());
+540: 536 /// self.write_u8(0xff);
+541: 537 /// }
+---
+551: 547 /// end up hashing the same sequence of things, introducing conflicts.
+552: 548 #[inline]
+553: 549 #[unstable(feature = "hasher_prefixfree_extras", issue = "96762")]
+554: 550 fn write_str(&mut self, s: &str) {
+555: 551 self.write(s.as_bytes());
+556: 552 self.write_u8(0xff);
+557: 553 }
+---
+580: 576 fn write_u128(&mut self, i: u128) {
+581: 577 (**self).write_u128(i)
+582: 578 }
+583: 579 fn write_usize(&mut self, i: usize) {
+584: 580 (**self).write_usize(i)
+585: 581 }
+586: 582 fn write_i8(&mut self, i: i8) {
+---
+601: 597 fn write_isize(&mut self, i: isize) {
+602: 598 (**self).write_isize(i)
+603: 599 }
+604: 600 fn write_length_prefix(&mut self, len: usize) {
+605: 601 (**self).write_length_prefix(len)
+606: 602 }
+607: 603 fn write_str(&mut self, s: &str) {
+608: 604 (**self).write_str(s)
+609: 605 }
+610: 606}
+---
+932: 928 impl_hash_tuple! { T B C D E F G H I J K L }
+933: 929
+934: 930 #[stable(feature = "rust1", since = "1.0.0")]
+935: 931 impl<T: Hash> Hash for [T] {
+936: 932 #[inline]
+937: 933 fn hash<H: Hasher>(&self, state: &mut H) {
+938: 934 state.write_length_prefix(self.len());
+939: 935 Hash::hash_slice(self, state)
+940: 936 }
+941: 937 }

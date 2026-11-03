@@ -8,3 +8,9 @@
 - G5 part 3 (placeholders open; TOUCHN 53 FIX + 3 NOTE confirmed by own rebuild) written. Next: G1 fetches.
 - G5 part 4 (E1-E5: 4 confirmed, E5 = D3C-4) written. Next: G1 fetches at >= 08:30; then G5 part 5 (not-read list).
 - 08:28 G1 prep: d3d's draft texts re-read at HEAD (0003:1136, 0004:270-278, 0004:334-341 unchanged since 9e54015, no doc commit after). extract.py in scratch. Next: fetch at 08:30.
+- 08:31 fact 1 fetched (W3C WebGPU CRD 2026-09-15 x4 reads, MDN webglcontextlost); excerpts.md W1, W2 saved. Next: fact 1 verdict block.
+- fact 1 verdict block written (5/5 confirmed; N1 event optional per spec, N2 destroy resolves lost). Next: fact 2 (rust 1.99.1 f64 page + source).
+- 08:33 fact 2 fetched: 1.99.1 f64 page (3 reads; Precision lines for div_euclid txt 309-311, rem_euclid 330-332), std/num/f64.rs (delegates to core::f64::math), core/num/f64.rs and f32.rs (trunc-then-correct). Next: excerpts W3-W5 and fact 2 block.
+- 08:34 excerpts W3-W5 saved; euclid_alg.py/.out (1.99.1 steps in IEEE doubles: f64 case 3, mirrors -4,-3,4). Next: fact 2 block.
+- fact 2 verdict block written (5/5 confirmed; D3E-1 optional: 1.99.1 same steps). Next: fact 3 (Hasher, Hash pages and core/hash source, 1.99.1).
+- fact 3 verdict block written (4 judged, 3 confirmed, 3c wasm32 width not read at a source). Next: fetch audit table, G1 summary, G5 part 5 (not-read list), counts, final.

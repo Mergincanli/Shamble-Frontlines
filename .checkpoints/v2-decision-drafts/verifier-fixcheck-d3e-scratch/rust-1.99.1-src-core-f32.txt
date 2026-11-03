@@ -1,0 +1,60 @@
+---
+2038: 2034 /// let b = 4.0;
+2039: 2035 /// assert_eq!(f32::math::div_euclid(a, b), 1.0); // 7.0 > 4.0 * 1.0
+2040: 2036 /// assert_eq!(f32::math::div_euclid(-a, b), -2.0); // -7.0 >= 4.0 * -2.0
+2041: 2037 /// assert_eq!(f32::math::div_euclid(a, -b), -1.0); // 7.0 >= -4.0 * -1.0
+2042: 2038 /// assert_eq!(f32::math::div_euclid(-a, -b), 2.0); // -7.0 >= -4.0 * 2.0
+2043: 2039 /// ```
+2044: 2040 ///
+2045: 2041 /// _This standalone function is for testing only.
+2046: 2042 /// It will be stabilized as an inherent method._
+2047: 2043 ///
+2048: 2044 /// [`f32::div_euclid`]: ../../../std/primitive.f32.html#method.div_euclid
+2049: 2045 #[inline]
+2050: 2046 #[unstable(feature = "core_float_math", issue = "137578")]
+2051: 2047 #[must_use = "method returns a new number and does not mutate the original value"]
+2052: 2048 pub fn div_euclid(x: f32, rhs: f32) -> f32 {
+2053: 2049 let q = trunc(x / rhs);
+2054: 2050 if x % rhs < 0.0 {
+2055: 2051 return if rhs > 0.0 { q - 1.0 } else { q + 1.0 };
+2056: 2052 }
+2057: 2053 q
+2058: 2054 }
+2059: 2055
+2060: 2056 /// Experimental version of `rem_euclid` in `core`. See [`f32::rem_euclid`] for details.
+2061: 2057 ///
+2062: 2058 /// # Examples
+2063: 2059 ///
+2064: 2060 /// ```
+2065: 2061 /// #![feature(core_float_math)]
+2066: 2062 ///
+---
+2073: 2069 /// assert_eq!(f32::math::rem_euclid(a, -b), 3.0);
+2074: 2070 /// assert_eq!(f32::math::rem_euclid(-a, -b), 1.0);
+2075: 2071 /// // limitation due to round-off error
+2076: 2072 /// assert!(f32::math::rem_euclid(-f32::EPSILON, 3.0) != 0.0);
+2077: 2073 /// ```
+2078: 2074 ///
+2079: 2075 /// _This standalone function is for testing only.
+2080: 2076 /// It will be stabilized as an inherent method._
+2081: 2077 ///
+2082: 2078 /// [`f32::rem_euclid`]: ../../../std/primitive.f32.html#method.rem_euclid
+2083: 2079 #[inline]
+2084: 2080 #[doc(alias = "modulo", alias = "mod")]
+2085: 2081 #[unstable(feature = "core_float_math", issue = "137578")]
+2086: 2082 #[must_use = "method returns a new number and does not mutate the original value"]
+2087: 2083 pub fn rem_euclid(x: f32, rhs: f32) -> f32 {
+2088: 2084 let r = x % rhs;
+2089: 2085 if r < 0.0 { r + rhs.abs() } else { r }
+2090: 2086 }
+2091: 2087
+2092: 2088 /// Experimental version of `powi` in `core`. See [`f32::powi`] for details.
+2093: 2089 ///
+2094: 2090 /// # Examples
+2095: 2091 ///
+2096: 2092 /// ```
+2097: 2093 /// #![feature(core_float_math)]
+2098: 2094 ///
+2099: 2095 /// use core::f32;
+2100: 2096 ///
+2101: 2097 /// let x = 2.0_f32;
