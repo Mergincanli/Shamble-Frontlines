@@ -2,10 +2,11 @@
 
 infra-engineer, ADR 0006 only, outside its "Pass marks" section and the two checklists (test-engineer's, not touched).
 Docs at 4374a1c (unchanged on disk; base main 9e7db28). Every BEFORE was copied by script from the file on disk, whole
-lines, each occurring once. "-2" ids are second places for a row that the map did not list: RC7-2 (the Test plan's
-stub-record mark, the same one word), M4-2 (part 13's table, row B9: the Hetzner token), M5-2 (Consequences, "Harder":
-Mustafa's VMs and his domain), H16-2 (OQ-0006-10 keeps open, with the pointer condition 1 asks for). FIX M5 also
-carries migration step 0's "the drafts approved" under SPIKE-ORDER (b). PM-0001-63 is cited as test-engineer's new
+lines, each occurring once. "-2" ids are second places for a row that the map did not list: M8-2 (part 7's second
+sentence: the proof test's two certificates), M4-2 (part 13's table, row B9: the Hetzner token), M5-2 (Consequences,
+"Harder": Mustafa's VMs and his domain), H16-2 (OQ-0006-10 stays open, with the pointer condition 1 asks for), RC7-2
+(the Test plan's stub-record mark, the same one word). FIX M5 also carries migration step 0's "the drafts approved"
+under SPIKE-ORDER (b). PM-0001-63 is cited as test-engineer's new
 row in ADR 0001's 60 Hz group (rooms per VM at 60 Hz with the goal-budget check).
 
 ### FIX O15
@@ -323,7 +324,8 @@ no change: by the ruling on LATER, the drafts' own entries for the twelve LATER 
 OQ-0006-13 (ADR 0006:896), OQ-0006-14 (:915) and OQ-0006-18 (:975); they keep their deciders and timings as written,
 and README carries the design-session marker (engine-architect). For the report: the ruling times OQ-0006-13 "before
 the foundation's client-host token", while the entry says "before the first client-host token is added to this
-repository", which is the preview hosting check's token (spike item 1); B9's interim (each preview deploy waits for
-Mustafa's approval) covers that check, so nothing conflicts in practice, but the two wordings differ.
+repository", which is the preview hosting check's token (spike item 1). The ruling's later timing governs, with B9's
+interim (each preview deploy waits for Mustafa's approval) covering the check until then; by LA3 the entry's wording
+stays, so the report should name the difference.
 END
 

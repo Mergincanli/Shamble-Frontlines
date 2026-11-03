@@ -13,3 +13,4 @@
 - Q1 done (OQ-0003-20, 945-949). Next: Q2 (part 8 399-400).
 - Q2 done (part 8, 399-400). Next: ADR 0005 L8 (AS3/AS4 1816-1826), L10 (intro 1683-1691), L10-2 (OQ intro 1803-1805), L10-3 (part 8 1753-1756).
 - L10 done (GPU intro 1690-1691). Next: L10-2 (OQ intro 1803-1805).
+- L10-2 done (OQ intro 1803-1805). Next: L8 (AS3 1814-1817? AS4 1818-1824).

@@ -183,3 +183,16 @@ slots are unproven)" (Mustafa, the same answer). Blender is also that research p
 §8's flow stays as written (the advisor's reading, 2026-11-03).
 END
 
+### FIX L10-2
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+All six are **not researched**. AS1 to AS5 form one research unit, the asset-pipeline research (graphics-engineer,
+verified like R3, its own daytime session), which `docs/SPIKE_PLAN.md` places before the asset spike; the asset spike
+then proves its answers.
+AFTER:
+All six are **not researched**. AS1 to AS5 form one research unit, the asset-pipeline research (graphics-engineer,
+verified like R3, its own daytime session), which `docs/SPIKE_PLAN.md` places before the asset spike, its export and
+slot-naming part (AS3, AS4) before ADR 0003's look proof test (LOOK-TEST-INPUTS, Mustafa, 2026-11-03); the asset
+spike then proves its answers.
+END
+
