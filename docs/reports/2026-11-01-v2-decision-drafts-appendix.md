@@ -211,6 +211,20 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
   > - DOMAIN: shamblefrontlines.com, which I register at Cloudflare.
   > - COMMUNITY-SERVERS (new; keep the door open, don't design it): players may one day host their own servers, possibly with revenue such as official private servers they rent. Add it as an open question to ADR 0006 and the README. The drafts must not lock it out: the room server stays one self-contained program with a config file (players, length, rules), checks the game's version and content hash, and marks each match as official or community, so progression can count on official servers only.
   > - Verification: after e2b, e3b and their fix round, stop. No further re-check rounds; anything left goes into the PR as notes. The spikes are the real test, and we've had ten usage cuts.
+- **2026-11-03 at about 18:26 Amsterdam, the Hetzner console check** (saved word for word in
+  `inputs/HETZNER-CHECK-mustafa-2026-11-03.md` before any edit; plan revision 6):
+  > Hetzner check (Mustafa, 2026-11-03): in Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its Arm64 version can. Use a CAX21 (Arm64, 4 vCPU, 8 GB, about €0.020/h incl. VAT) for the simulated clients instead of the CX33, so their build targets aarch64. The game server stays a CCX23 (dedicated, x86) in Falkenstein; I checked it can be ordered there. Update SPIKE-MACHINES and every place the drafts name the CX33.
+- **2026-11-03 at about 18:32 Amsterdam, his correction to the Hetzner note** (saved word for word in
+  `inputs/HETZNER-CORRECTION-mustafa-2026-11-03.md`, with the session's description of the screenshot he attached):
+  > Correction to my Hetzner note (Mustafa, 2026-11-03): the game server is a CCX23 for development and "does it work" runs. The CCX23 (dedicated) is used only for the measurement runs: tick timing, the 60 Hz margin and rooms per VM. Each run's plan says which server it needs.
+- **2026-11-03 at about 18:38 Amsterdam, his answers to the session's two questions on it** (the question tool's
+  record, word for word in `inputs/HETZNER-ANSWERS-mustafa-2026-11-03.md`; the option texts are the session's wording,
+  which he chose):
+  > Question 1 (the session's): Your Hetzner correction says "the game server is a CCX23 for development and 'does it work' runs", then "The CCX23 (dedicated) is used only for the measurement runs". Which machine did you mean for the development and "does it work" runs? (The measurement runs stay on the CCX23.)
+  > His answer: "CCX13 (Recommended)", the option described as: "Dedicated x86, 2 vCPU, 8 GB, €0.083/h in your screenshot: the same x86 server build as the CCX23, so no second build target for the room server."
+  >
+  > Question 2 (the session's): Your first Hetzner note puts the CCX23 game server in Falkenstein; the screenshot's order summary shows "Nuremberg" selected. Which location should the drafts give the game servers and the simulated clients (they sit in the same location)?
+  > His answer: "Nuremberg (nbg1)", the option described as: "As your screenshot shows; whether the CAX21 (or another client VM) can be ordered there is then checked in the proof test's plan."
 
 ## 3. The advisor's plan review: APPROVE with 19 conditions (word for word)
 
