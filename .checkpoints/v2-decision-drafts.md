@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 08:46 Amsterdam
+- **Last update:** 2026-11-03 09:08 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 09:08: touch-up 4 (wf_c38a2d32-525) applied as ac252f8 (engine-architect: README seams S5, S9, S10, 111 open, the
+review codes' sentence, HEAT-SOAK credit; ADR 0002 step 5 re-wrapped), bd68d59 (rust-reviewer: ADR 0004 part 7,
+1.99.1 too; a rounded exact reference), fd8c6f8 (test-engineer: PM-0003-2's bite and count; ADR 0001 checklist
+re-wraps). Checks: guard PASS, 521/521, glossary exact 0, glued 0, 340 PM rows, pointers 94/94. The report and
+appendix filled (63 touch-up blocks; d3's rows; the skeptic tally 27/9/2 plus a sixth round; 111 open; deferrals)
+at 65f2149; placeholders left: {D4}, {CI}, {ENDCOMMITS}. Running: wf_7d619266-6c2 (`prompts/workflow-fixcheck-d4.js`):
+fixcheck-d4 on touch-up 4 and on the report's and appendix's numbers, skeptics, then docs-keeper-3. Next: route any
+upheld finding; fill the placeholders; the gate; the PR body; the final commit that runs CI; the report to Mustafa.
+
+Before that:
 At 08:46: wf_cb775012-8de done. fixcheck-d3b PASS WITH NOTES (33/33; D3B-1 §7.3 lacks d2 F13's other places, D3B-2
 0004 part 7 'exact' vs PM-0004-22's 'rounded'); d3c PASS WITH NOTES (3,225 structural lines, 0 lost; 10,245 references;
 D3C-2 medium: seams S5, S9, S10 missing from README; D3C-4: 111 open, not 112; D3C-3 review codes; D3C-1 wraps);
