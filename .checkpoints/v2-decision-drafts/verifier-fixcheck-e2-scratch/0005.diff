@@ -1,0 +1,377 @@
+diff --git a/docs/adr/0005-content-abilities-assets.md b/docs/adr/0005-content-abilities-assets.md
+index fce7555..1b41ccf 100644
+--- a/docs/adr/0005-content-abilities-assets.md
++++ b/docs/adr/0005-content-abilities-assets.md
+@@ -3,5 +3,8 @@
+ **Status:** Proposed
+ **Date:** 2026-10-31
+-**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect system) · graphics-engineer (the asset pipeline's GPU rules) · test-engineer (the "Pass marks" table, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
++**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect
++system) · graphics-engineer (the asset pipeline's GPU rules) · test-engineer (the "Pass marks" table, plan step 4) ·
++**Reviewed by:** (filled in at review) ·
++**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
+ 
+ This record decides how everything the game runs on is written down as data and checked: units, vehicles, weapons,
+@@ -78,5 +81,11 @@ its options and no pick. Four sections by three authors carry the detail; this f
+   material-slot renaming step and the per-unit budget numbers are open questions marked "not researched", grouped
+   under one research unit, the asset-pipeline research (graphics-engineer, verified like R3, in its own daytime
+-  session), which `docs/SPIKE_PLAN.md` places before the asset spike.
++  session), which `docs/SPIKE_PLAN.md` places before the asset spike; its export and slot-naming part (OQ-0005-AS3,
++  AS4) runs earlier, before the look proof test (LOOK-TEST-INPUTS, below).
++- **LOOK-TEST-INPUTS** (Mustafa, 2026-11-03): "yes, the asset research's export and slot-naming part runs before the
++  look proof test. Route: Blender (Spline's skins and named slots are unproven). I make the test models with AI help
++  in Blender; blockouts with a skin, named colour slots and LOOK_V2's proportions are enough." LOOK_V2 §8's flow is
++  unchanged; Blender is the route for the look proof test's models and for that research part's export (the
++  advisor's reading, 2026-11-03).
+ - **GLOSSARY §8:** [the foundation](../research/GLOSSARY.md#the-foundation) includes "TypeScript types generated from
+   the Rust code"; [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) runs before the foundation
+@@ -92,5 +101,5 @@ options, trade-offs, open questions and spike part. This frame adds the joined d
+ sections, the consequences, every open question in one list, the joined spike, migration, test and rollback plans, and
+ one Appendix A. Where two sections disagreed, the frame asks the question (OQ-0005-1, OQ-0005-2); after the fix
+-round no section answers either, and each points to it.
++round no section answered either, and each points to it. The Advisor answered OQ-0005-1 at the stop (2026-11-03).
+ 
+ ### Where this record sits among the drafts
+@@ -274,6 +283,7 @@ map document is content data under EDITOR_V2 §2's rules.
+     the format and version read, then migrated (CD-4) → the typed load with `deny_unknown_fields`, checked newtypes
+     and internally tagged kinds (never `untagged`; never `flatten` where unknown keys must fail) → garde rules →
+-    whole-set checks (every reference resolves; every objective a mode needs is in its map; no fallback map, weapon or
+-    model) → a frozen content set with its hash. Errors name the file, with line and column for bad syntax and the
++    whole-set checks (every reference resolves; every objective a mode needs is in its map; every id of a presented
++    kind has its client entry, below; no fallback map, weapon or model) → a frozen content set with its hash. Errors
++    name the file, with line and column for bad syntax and the
+     field path for wrong data. Two additions: every collection carries a maximum length in its schema, so no file or
+     payload sizes an allocation past a reviewed bound (R1-RR-OQ2); and the loader returns errors and never panics,
+@@ -307,4 +317,15 @@ map document is content data under EDITOR_V2 §2's rules.
+     (proposed); which row gives way when a pool is full is ADR 0004's OQ-0004-11, and AB-1 holds the game-designer's
+     proposal per kind for it.
++  - The client entries (OQ-0005-1, answered by the Advisor, 2026-11-03: "the client's data, keyed by the same id; the
++    content check fails if a simulation id has no client entry"): the rule binds the kinds the client presents (the
++    advisor's reading, 2026-11-03). Each id of a presented kind needs a client definition keyed by that id, or the
++    whole-set check fails, naming the file: a unit (its model, AP-2); a vehicle (its model, AP-2); a weapon (its feel
++    kit and sockets, AB-3 and CD-14, and its model, AP-2); a faction (its colours and its uniform models, CD-13 and
++    AP-2). Kinds with nothing to present need no entry: of the ability section's kinds (AB-4), the tag registry, the
++    attribute sets, effects, abilities, upgrade tracks and the drop and pickup values; and modes, the rule tables, the
++    movement data and the moment rules (CD-6, CD-12). A map needs none either: the map document holds both sides
++    itself, its references to assets included (CD-11; EDITOR_V2 §2, rule 1), and building parts and props are
++    entities in it, not kinds of their own (AP-7). A kind that gains a presentation side joins the first list in the
++    same change.
+   - Research: R1-DATA-REC2 (r1, lines 2500–2516); R1-RR-OQ2 (lines 2933–2935); the loader's side of R1-RR-OQ3
+     (lines 2936–2940; the Worker's restart after a trap is ADR 0004's); R5-RUSTLINT-REC3 (r5, Recommendations, lines
+@@ -490,7 +511,8 @@ map document is content data under EDITOR_V2 §2's rules.
+     soldiers are dressed by (faction, class) as data (CC6's note, `docs/LEGACY_INVENTORY.md` line 136), its uniform
+     models are assets named by id (AP-2), and its colours reach the assets' faction colour slots (AP-3; the GPU
+-    section's part 2). Where its colours and model ids sit is OQ-0005-1: proposed, pending it, in a client definition
+-    keyed by the faction's id, as the feel kit is keyed by the weapon's (CD-14), so the faction's simulation definition
+-    holds no presentation field. A faction variant is a full definition of its own that references shared definitions
++    section's part 2). Its colours and model ids sit in a client definition keyed by the faction's id, as the feel kit
++    is keyed by the weapon's (CD-14), so the faction's simulation definition holds no presentation field (OQ-0005-1,
++    answered by the Advisor, 2026-11-03), and a faction without that entry fails the whole-set check (CD-2). A faction
++    variant is a full definition of its own that references shared definitions
+     by id (proposed: no `extends` and no merge, so the merge rules SEC-MDL-2 came from do not return); whether variants
+     may override a base definition is OQ-0005-CD5, for the faction design session. Team colours never change
+@@ -699,5 +721,7 @@ the research lacks is marked proposed, with its reason. The test-engineer writes
+    error path on both for 100 % of files; every error names the file and either line and column or a field path.
+    Proposed addition (reason: R1-RR-OQ2): the corpus includes, for every bounded collection, a file one element over
+-   its bound, refused 100 % of the time. Zero panics is also R1-RR-OQ3's mark for the loader. The spike records the
++   its bound, refused 100 % of the time. Proposed (reason: OQ-0005-1's answer, 2026-11-03): for each presented kind
++   CD-2 names, a set with one definition whose client entry is missing, refused 100 % of the time. Zero panics is also
++   R1-RR-OQ3's mark for the loader. The spike records the
+    default depth limit (R1-DATA-OQ4) and runs the same tests with garde on wasm32 (R1-DATA-OQ5). Proposed (reason:
+    ADR 0004 part 1 sizes its pools from this report): for each test mode, every pool's reported worst case, and for
+@@ -796,5 +820,7 @@ Short citations: r1, r2 and r4 are `docs/research/r1-simulation-core.md`, `r2-ne
+ - Every GAS fact R1 uses comes from one community write-up (tranek's GASDocumentation, current with UE 5.3); Epic's
+   own documentation and the engine source were not read (r1-simulation-core.md, Findings §5, method note, lines
+-  1185–1189; R1-ABL-OQ1, lines 2756–2758).
++  1185–1189; R1-ABL-OQ1, lines 2756–2758). The Advisor's answer to OQ-0005-AB12 (2026-11-03): the write-up "is
++  accepted for concepts", and "any specific claim a record relies on is checked against Epic's documentation once it
++  can be read".
+ - Weapons: Fortnite "does its own bookkeeping for weapon firing rates"; with cooldowns as effects that the server
+   overwrites, Paragon's "Higher latency connections would have a lower ROF with basic attacks" (r1-simulation-core.md,
+@@ -1164,10 +1190,14 @@ Option E2: nested, self-contained definitions (each unit embeds its weapons and
+   the latency problem Paragon had out of the weapons (F17). E1 keeps one definition, and so one track id, for a class
+   every faction shares (LOOP_V2 §5).
+-- **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1), and
+-  the closest shipped team-shooter precedent, Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case
++- **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1; the
++  Advisor accepted it "for concepts" on 2026-11-03, OQ-0005-AB12), and the closest shipped team-shooter precedent,
++  Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case
+   against scripting rests on cost and on the research's own judgement that A3 "adds a runtime no §6 item asks for"
+   (r1-simulation-core.md, Options §5, Question A, line 1798), not on proof that a closed set is enough for a live game.
+   And a closed set means each new mechanic Mustafa designs that lacks an operation waits for a reviewed
+-  Rust change. The content and ability spike's marks 1 and 2 test exactly this; OQ-0005-AB13 names the trigger.
++  Rust change. The content and ability spike's marks 1 and 2 test exactly this. When scripting comes back is
++  OQ-0005-AB13's answer (the Advisor, 2026-11-03): "scripting comes back only when a designed ability can't be built
++  from data." A new reviewed generic operation still counts as built from data, so it takes one designed ability that
++  needs ability-specific code no operation can express (the advisor's reading, 2026-11-03).
+ - **Pillars 1 and 2, both sides:** the model takes neither side. Tracks that survive death let a player's power grow
+   through a match (pillar 2, power that feels earned); how fast tracks level, and whether a switched-to track catches
+@@ -1337,6 +1367,9 @@ in AB-1 for Mustafa to confirm.
+     for one verifier pass before acceptance (SRC-ACCESS (a): official-docs domains such as Epic's can be added in the
+     next kit PR).
+-  - Proposed: (a), with (b) as a cheap check if the kit adds the domain. Decider: the Advisor. What decides it: whether
+-    the next kit PR adds Epic's domain. Research ids: R1-ABL-OQ1.
++  - Answered by the Advisor (2026-11-03): "tranek's write-up is accepted for concepts; any specific claim a record
++    relies on is checked against Epic's documentation once it can be read."
++  - Decided: (a), for concepts. The specific claims a record relies on are checked against Epic's documentation once
++    it can be read (SRC-ACCESS (a) lets a kit PR add official-docs domains such as Epic's). Decider: the Advisor.
++    Research ids: R1-ABL-OQ1.
+ - **OQ-0005-AB13. When does scripting (option A3) come back?**
+   - Why it matters: A3 is set aside on cost and need; the shipped precedent (Overwatch's "Networking Scripted Weapons
+@@ -1345,6 +1378,11 @@ in AB-1 for Mustafa to confirm.
+     code, or a combination needs a Rust change), or if new operations turn out to be needed often; (b) read the talk
+     first, when a copy turns up (SRC-ACCESS (a)).
+-  - Proposed: (a), and (b) whenever a copy appears. Decider: the Advisor (the source). What decides it: the content and
+-    ability spike's marks 1 and 2 (the trigger). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
++  - Answered by the Advisor (2026-11-03): "scripting comes back only when a designed ability can't be built from
++    data."
++  - Decided (the advisor's reading, 2026-11-03): a new reviewed generic operation counts as built from data, as AB-1
++    and AB-6 already have it ("every new operation is a reviewed Rust change"), so scripting comes back when one
++    designed ability needs ability-specific code that no operation can express. New operations being "needed often"
++    is no longer a trigger, and (b), reading the talk, stays a weighed option that nothing schedules. Decider: the
++    Advisor (the source). Research ids: R1-ABL-OQ2, R1-ABL-OQ9.
+ - **OQ-0005-AB14. What does spawn protection cover, and what ends it early?**
+   - Why it matters: LOOP_V2 §2 (`[DEFAULT]`) gives "3 s of spawn protection" and no more. AB-2's immunity rule stops
+@@ -1457,5 +1495,8 @@ what R1-DATA, R3-CHAR and R3-BUDGET support; compression formats, the LOD tool,
+ renaming step and the per-unit budget numbers are open questions marked "not researched", grouped under one research
+ unit, the asset-pipeline research (graphics-engineer, verified like R3, in its own daytime session), which
+-`docs/SPIKE_PLAN.md` places before the asset spike. SPIKE-SCOPE (a).
++`docs/SPIKE_PLAN.md` places before the asset spike, with its export and slot-naming part before the look proof test.
++LOOK-TEST-INPUTS (Mustafa, 2026-11-03; the frame's Settled inputs quote it): that timing, and Blender as the route for
++the look proof test's models, which Mustafa makes with AI help as blockouts with a skin, named colour slots and
++LOOK_V2's proportions. SPIKE-SCOPE (a).
+ 
+ **The findings it turns on.**
+@@ -1517,13 +1558,14 @@ carries a procedural kit spec and an authored asset side by side until it is ans
+     cosmetic … Nothing animated decides a hit" carries into v2 unchanged.
+ - **AP-2. Definitions name assets by id; the asset list is content.**
+-  - What: each unit, vehicle, weapon, faction uniform, building part and prop names its model by an asset id. Where
+-    that id sits is OQ-0005-1: proposed, pending it, in a client definition keyed by the simulation definition's id,
+-    as the feel kit is (CD-14), so no simulation definition holds an asset id (CD-6); the map document holds its own
+-    references either way (CD-11). One asset list in the content set (client content, CD-6) holds for each asset: its
+-    id; its file name with its hash; its material slots, each with its class (AP-3); its LOD levels, if it has any (the
+-    GPU section's part 5); and its counts of triangles, materials and textures, which the budget check reads (AP-5).
+-    The loader's whole-set checks (CD-2) refuse a reference to an asset the list does not hold, and a slot whose class
+-    is not in the class list, naming the file and the field; nothing falls back to a default model. Who writes the
+-    list (the automated step or a person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.
++  - What: each unit, vehicle, weapon, faction uniform, building part and prop names its model by an asset id. For a
++    definition, that id sits in a client definition keyed by the simulation definition's id, as the feel kit is
++    (CD-14), so no simulation definition holds an asset id (CD-6; OQ-0005-1, answered by the Advisor, 2026-11-03); the
++    map document holds its own references (CD-11). One asset list in the content set (client content, CD-6) holds for
++    each asset: its id; its file name with its hash; its material slots, each with its class (AP-3); its LOD levels, if
++    it has any (the GPU section's part 5); and its counts of triangles, materials and textures, which the budget check
++    reads (AP-5). The loader's whole-set checks (CD-2) refuse a reference to an asset the list does not hold, a slot
++    whose class is not in the class list, and an id of a presented kind with no client entry (OQ-0005-1's rule), naming
++    the file and the field; nothing falls back to a default model. Who writes the list (the automated step or a
++    person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.
+   - Why: the same verdict for assets as for every other reference; CC9's silent fallback and CL14's unchecked tags
+     are the legacy failures, and R1-DATA-REC2's cross-reference stage and R1-ABL-REC5's validated ids already remove
+@@ -1536,6 +1578,7 @@ carries a procedural kit spec and an authored asset side by side until it is ans
+     the slot names that map to each, are one client-content table (CD-6), validated like all content and read by ADR
+     0003 (interface I-8). Adding a class is a content change reviewed together with the ADR 0003 material it needs. A
+-    faction's colours reach its faction colour slots from the faction's data (CD-13; where those colours sit is
+-    OQ-0005-1). The table says which slots exist; how a class looks is ADR 0003's and Mustafa's (LOOK_V2).
++    faction's colours reach its faction colour slots from the faction's client definition (CD-13; OQ-0005-1, answered
++    by the Advisor, 2026-11-03). The table says which slots exist; how a class looks is ADR 0003's and Mustafa's
++    (LOOK_V2).
+   - Why: the GPU section makes the list "this ADR's content data"; one table keeps the asset side and the renderer on
+     the same names.
+@@ -1646,4 +1689,8 @@ OQ-0005-AS1 to AS5; OQ-0005-AP2 and AP3 are Mustafa's.
+     be one of the look proof test's models (the GPU section's part 8). What decides it: what the research finds
+     Spline's export and the tools for step 4 can do, and that answer. Research ids: none.
++  - Since LOOK-TEST-INPUTS (Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)"),
++    the look proof test's models are made in Blender, so the source files this question places include their Blender
++    files; Blender is also the route for the research's export part (the advisor's reading, 2026-11-03). This
++    question keeps its place, with the rest of the research, before the asset spike.
+ - **OQ-0005-AP2. Which asset families become authored models, and which stay procedural builders?**
+   - Why it matters: LOOK_V2 §8 allows authored models without requiring them; legacy builds buildings, props, the
+@@ -1689,5 +1736,9 @@ glTF mention is three.js's own example, which loads a glTF skinned mesh into the
+ R3-CHAR-F8, lines 476–480). Everything else is an open question marked "not researched", grouped under one research
+ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in its own daytime session), which
+-`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31).
++`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31), with
++its export and slot-naming part (OQ-0005-AS3, AS4) earlier, before ADR 0003's look proof test (LOOK-TEST-INPUTS,
++Mustafa, 2026-11-03). The look proof test's models are made in Blender: "Route: Blender (Spline's skins and named
++slots are unproven)" (Mustafa, the same answer). Blender is also that research part's export route, and LOOK_V2
++§8's flow stays as written (the advisor's reading, 2026-11-03).
+ 
+ ### What this section decides
+@@ -1757,5 +1808,8 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
+    LOOK_V2 §2's two houses, one of them with an interior and its damage stages, a very large unit, props; ADR 0003
+    part 11 lists them and says where the second house comes from if only one is authored). They are plain glTF/GLB
+-   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)).
++   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)). Mustafa makes them with AI help
++   in Blender, and "blockouts with a skin, named colour slots and LOOK_V2's proportions are enough"
++   (LOOK-TEST-INPUTS, 2026-11-03); the list stays, and each model on it may be a blockout at that bar (the advisor's
++   reading, 2026-11-03).
+ 9. **Trees wait.** The tree style is LOOK_V2 §8's `[OPEN]` item; tree assets wait for Mustafa's answer (ADR 0003,
+    OQ-0003-9). Nothing here decides it.
+@@ -1802,6 +1856,7 @@ export checks and the slot-renaming step have no options in the research: they a
+ ### Open questions
+ All six are **not researched**. AS1 to AS5 form one research unit, the asset-pipeline research (graphics-engineer,
+-verified like R3, its own daytime session), which `docs/SPIKE_PLAN.md` places before the asset spike; the asset spike
+-then proves its answers.
++verified like R3, its own daytime session), which `docs/SPIKE_PLAN.md` places before the asset spike, its export and
++slot-naming part (AS3, AS4) before ADR 0003's look proof test (LOOK-TEST-INPUTS, Mustafa, 2026-11-03); the asset
++spike then proves its answers.
+ 
+ - **OQ-0005-AS1. Which compression formats for textures and meshes?**
+@@ -1818,11 +1873,16 @@ then proves its answers.
+   unchecked tags did (CL14, `docs/LEGACY_INVENTORY.md` line 123). Options: none researched. Decider: the
+   asset-pipeline research. What decides it: the failures the asset spike can plant and catch. Research ids: none.
++  Timing: this question and AS4 are "the asset research's export and slot-naming part", which "runs before the look
++  proof test" (LOOK-TEST-INPUTS, Mustafa, 2026-11-03), on Blender's export, the route of that test's models (the
++  advisor's reading, 2026-11-03).
+ - **OQ-0005-AS4. How are a model's materials renamed into the slot classes and faction colour slots?**
+   Why it matters: part 1 and part 2 depend on every slot carrying a class; and since part 1 makes one material per
+   slot content, how an asset carries its colours sets how many materials it brings. Options: none researched (a
+   manual convention in the modelling tool, or LOOK_V2 §8's automated step; for colour, each slot's material colour,
+-  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether Spline's
+-  glTF export keeps material names (not researched), and each colour route's material count against part 4's caps.
+-  Research ids: none.
++  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether the glTF
++  export keeps material names (not researched), Blender's for the look proof test's models (LOOK-TEST-INPUTS,
++  Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)") and Spline's while LOOK_V2
++  §8's flow names it (the advisor's reading, 2026-11-03), and each colour route's material count against part 4's
++  caps. Research ids: none.
+ - **OQ-0005-AS5. What are the per-unit budgets beyond the two derived caps?**
+   Why it matters: LOOK_V2 §8 asks for triangles, materials and textures per unit; only the soldier's 4 materials per
+@@ -1876,10 +1936,11 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+ |---|---|---|---|---|---|---|
+ | a. A presentation section in the simulation definition's own file, typed apart from the simulation part (how AP-2 and CD-13 read before the fix round) | Low: one file per unit | none | – | presentation only, if the sim's types leave the section out | a unit's numbers and its model in one file | close to legacy's mixed tables; CD13's note says "Avoid: bot-only fields mixed into the player class, and a colour (accent) in sim data" (`docs/LEGACY_INVENTORY.md` line 94) |
+-| **b. A client definition keyed by the simulation definition's id, as the feel kit is (AB-3, CD-14)** (proposed, pending OQ-0005-1) | Low: one more file for each definition with a presentation side | files kept in step | – | presentation only; no simulation type holds a presentation field, so CD-6's split holds by kind | an art or feel change touches only client files | new; the feel kit already works this way |
++| **b. A client definition keyed by the simulation definition's id, as the feel kit is (AB-3, CD-14)** (chosen: OQ-0005-1, answered by the Advisor, 2026-11-03) | Low: one more file for each definition with a presentation side | files kept in step | – | presentation only; no simulation type holds a presentation field, so CD-6's split holds by kind | an art or feel change touches only client files | new; the feel kit already works this way |
+ 
+ - Both options apply R1-DATA-REC8's simulation and client groups (r1, lines 2596–2598). The map document holds both
+-  sides in one document either way (EDITOR_V2 §2, rule 1). Proposed: (b) for definitions, because the feel kit already
+-  takes it and a weapon's presentation (feel kit, sockets, model) then sits in one place. The question stays open for
+-  the Advisor as OQ-0005-1; AP-2, AP-3 and CD-13 state (b) as the proposal pending it and decide nothing.
++  sides in one document either way (EDITOR_V2 §2, rule 1). Decided: (b) for definitions (the Advisor's answer to
++  OQ-0005-1, 2026-11-03), as proposed before the stop, because the feel kit already takes it and a weapon's
++  presentation (feel kit, sockets, model) then sits in one place; the answer adds one whole-set check, an id of a
++  presented kind with no client entry fails (CD-2 names the kinds), and AP-2, AP-3 and CD-13 state (b) as decided.
+ 
+ **Question F3: what the content hash covers** (r1-simulation-core.md, Recommendations §6, R1-DATA-REC6, lines
+@@ -1895,6 +1956,6 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+ 
+ ## Trade-off analysis
+-- **Why one model:** a unit names its weapons, abilities and track, and its model is named under the unit's id (AP-2;
+-  where that reference sits is OQ-0005-1); a faction names its units
++- **Why one model:** a unit names its weapons, abilities and track, and its model is named under the unit's id (AP-2:
++  in the unit's client definition, OQ-0005-1); a faction names its units
+   and vehicles; an ability names its effects and tags; a track names its candidates. One content crate checks every one
+   of those links at load, on the server, in the Worker and in the editor alike (CD-2, AB-4, AP-2), so the silent
+@@ -1935,7 +1996,7 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+   OQ-0005-AP2 is answered (AP-7).
+ - **Revisit when:** content's load time misses its budget, or content's share takes the Wasm file past the limit ADR
+-  0002 sets (OQ-0005-CD2, option
+-  D), or garde fails on wasm32 (CD-2); the ability marks 1 or 2 fail (OQ-0005-AB13); track content exists (the stress scene's active effects
+-  per soldier restated with ADR 0004, AB-10); ABL-PREDICT is answered; Mustafa and the Advisor pick the mid-match swap
++  0002 sets (OQ-0005-CD2, option D), or garde fails on wasm32 (CD-2); a designed ability can't be built from data
++  (OQ-0005-AB13, answered by the Advisor, 2026-11-03); track content exists (the stress scene's active effects per
++  soldier restated with ADR 0004, AB-10); ABL-PREDICT is answered; Mustafa and the Advisor pick the mid-match swap
+   (OQ-0005-CD4); the faction design session meets (OQ-0005-CD5); a shipped-game source on mid-match tuning becomes
+   readable (OQ-0005-CD3); a need for map upload appears (CD-9); the Spy or the Hammer's leech leaves `[LATER]`, or
+@@ -1989,5 +2050,6 @@ r1-simulation-core.md, Findings §6, lines 1600–1602)
+ Every open question of the four sections, one line each, with its decider and the section that holds its full text
+ (the question, why it matters, the options and the research ids), then the frame's own four. Mustafa's questions carry
+-no pick; where a section proposes an answer, the line says so.
++no pick; where a section proposes an answer, the line says so, and an answered question names who answered it and
++when.
+ 
+ | OQ | The question, in one line | Decider | Where |
+@@ -2012,6 +2074,6 @@ no pick; where a section proposes an answer, the line says so.
+ | OQ-0005-AB10 | Do bots have tracks and make picks, and what does a human get when taking a bot's slot? (the one home of these questions: ADR 0004's OQ-0004-6 moved here) | Mustafa | The ability and effect system |
+ | OQ-0005-AB11 | Does the Riot Shield answer the Banzai blade, and is the Peacekeeper's side of the triangle strong enough before Tech 1? | Mustafa, after sims of each matchup | The ability and effect system |
+-| OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (proposed: accept it) | the Advisor | The ability and effect system |
+-| OQ-0005-AB13 | When does scripting (option A3) come back? (proposed: if the spike's ability mark 1 or 2 fails, or new operations are needed often; the talk is read when a copy appears) | the Advisor | The ability and effect system |
++| OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (answered by the Advisor, 2026-11-03: "tranek's write-up is accepted for concepts; any specific claim a record relies on is checked against Epic's documentation once it can be read") | the Advisor | The ability and effect system |
++| OQ-0005-AB13 | When does scripting (option A3) come back? (answered by the Advisor, 2026-11-03: "scripting comes back only when a designed ability can't be built from data"; a new reviewed operation counts as built from data, and reading the talk stays a weighed option with nothing scheduling it: the advisor's reading, 2026-11-03) | the Advisor | The ability and effect system |
+ | OQ-0005-AB14 | What does spawn protection cover beyond damage, and what ends it early? | Mustafa | The ability and effect system |
+ | OQ-0005-AB15 | Who sees a player's upgrade picks? | Mustafa | The ability and effect system |
+@@ -2025,5 +2087,5 @@ no pick; where a section proposes an answer, the line says so.
+ | OQ-0005-AS5 | What are the per-unit budgets beyond the two derived caps? | the asset-pipeline research, then the render budget bench | The asset pipeline: GPU rules |
+ | OQ-0005-AS6 | How many vertices and bones does the authored soldier have? | the model's author, then the render budget bench | The asset pipeline: GPU rules |
+-| OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? (proposed: client definitions) | the Advisor, at the stop review | this frame |
++| OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? (answered by the Advisor, 2026-11-03: client definitions keyed by the same id; an id of a presented kind with no client entry fails the content check, CD-2) | the Advisor, at the stop review | this frame |
+ | OQ-0005-2 | Is a weapon definition the same thing as a weapon type? | Mustafa (through OQ-0005-AB4); open for the Advisor until then | this frame |
+ | OQ-0005-3 | What does the content hash cover? | the Advisor | this frame |
+@@ -2044,6 +2106,6 @@ The frame's own questions, in full:
+     outcome", and says of the weapon and unit definitions "This section adds no field to either"; the ability section's
+     unit kind names no model (AB-4), and its feel kit is "a separate client definition keyed by the same id" (AB-3).
+-    Before the fix round AP-2 and CD-13 put these references on the simulation definitions; now AP-2, AP-3 and CD-13
+-    state option (b) as a proposal pending this question and decide nothing.
++    Before the fix round AP-2 and CD-13 put these references on the simulation definitions; the fix round made AP-2,
++    AP-3 and CD-13 state option (b) as a proposal pending this question, deciding nothing.
+   - Why it matters: it decides whether CD-6's split holds by kind or only by a rule about fields, and whether a
+     weapon's presentation (feel kit, sockets, model) sits in one place or two. The legacy lesson points the same way:
+@@ -2052,5 +2114,9 @@ The frame's own questions, in full:
+     client definition keyed by the simulation definition's id, as the feel kit is (Options considered, Question F2,
+     with their trade-offs). The map document keeps both sides in one document either way (EDITOR_V2 §2, rule 1).
+-  - Proposed: (b) for definitions, for the reasons under Question F2, pending this question.
++  - Answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a
++    simulation id has no client entry."
++  - Decided: (b) for definitions, as proposed before the stop for the reasons under Question F2; AP-2, AP-3 and CD-13
++    now state it as decided. The answer adds one whole-set check (CD-2), which binds the kinds the client presents;
++    kinds with nothing to present need no entry (the advisor's reading, 2026-11-03). CD-2 names both lists.
+   - Decider: the Advisor, at the stop review (the game-designer changes AB-4's kinds if the answer needs it). What
+     decides it: whether CD-6's split can be checked by type alone. Research ids: none. Both options apply
+@@ -2180,5 +2246,5 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+   1 s burst of 100 % loss: r2 lines 1987–1990), injected by ADR 0002's network simulator (R5-TEST-REC4, r5 lines
+   1454–1460: L1 in one process, L2 under real browsers). P2 is VISION_V2 §4's "about 100 ms of ping" (decision map
+-  J6 (3); OQ-0001-3). Every other mark runs in one process or on localhost (P0).
++  J6 (3); OQ-0001-3, answered by the Advisor, 2026-11-03). Every other mark runs in one process or on localhost (P0).
+ - **Labels and controls.** A mark that counts refusals also counts acceptances of valid input (a control), because a
+   check that refuses everything passes "0 accepted invalid" (proposed). Every file of C carries the verdict its
+@@ -2205,5 +2271,5 @@ numbers (shown), a settled input, or marked proposed with its reason. Line numbe
+ | PM-0005-2 | Every side reads the same numbers (CD-1; content item 1) | 100 % of doubles parse to the same 64-bit pattern in native Rust, in Rust on Wasm and in `JSON.parse` | CI (native, Wasm, `JSON.parse` in Node and the three engines); MAC: Safari (`JSON.parse`) | the corpus: every number in `docs/legacy-tuning.json` (2,038, counted by script at 9e7db28) plus 10,000 generated doubles, 5,000 from uniform random 64-bit patterns with NaN and the infinities left out (JSON cannot carry them) and 5,000 decimals of up to 17 significant digits inside the legacy file's range (proposed: the first half reaches subnormals and extreme exponents, the second the values content holds), plus −0 and the largest and smallest finite doubles; each side writes each value's bits as 16 hex digits; a script compares | 1 run per target (exact). Bites: a parser that rounds through `f32` on one side | R1-DATA-REC1 mark 1 (lines 2494–2496); CD-1 |
+ | PM-0005-3 | One canonical writer, the same text everywhere (CD-1; content item 1) | 100 % of the PM-0005-2 corpus written back as the same text as its input (the research's mark); the canonical writer's output byte-identical on native and Wasm, and idempotent (write, parse, write gives the same bytes and the same bits); an integer above 2^53 (9,007,199,254,740,993) in a content file refused at load with the file and field named | CI | the writer of CD-1 run over the corpus on every target; byte comparison by script. Recorded: every number whose canonical text differs from `JSON.stringify`'s text for the same double (not researched: the two writers' number formats may differ for integral doubles and exponent forms, which would fail the research's mark as written; if any TypeScript code writes content, it must give the canonical text or write through the Wasm writer) | 1 run per target. Bites: a writer that prints 15 significant digits; a planted 2^53 + 1 in a weapon file | R1-DATA-REC1 mark 1 (lines 2494–2496) and "no finding" (lines 2491–2492); CD-1 ("Content integers stay within the range a double holds exactly") |
+-| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2 |
++| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3; OQ-0005-1's whole-set rule) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. A content set in which an id of a presented kind has no client entry is refused at the whole-set stage, naming the kind and the id, while an id of a kind with nothing to present (a mode, a tuning table) is accepted with none (OQ-0005-1, answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a simulation id has no client entry"; it binds the kinds the client presents: the advisor's reading, 2026-11-03), the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons, factions, building parts and props). Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); the client-entry class: valid content sets with one id's client entry removed, for every presented kind, and as controls sets whose mode and tuning table have no entry (proposed: at least 500 sets, as every defect class); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id; the client-entry check left out of the whole-set stage (a unit id with no client entry then loads) | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2; OQ-0005-1 (answered by the Advisor, 2026-11-03) |
+ | PM-0005-5 | No file sizes an allocation past a reviewed bound (CD-2; content item 2) | for every bounded collection, a file one element over its bound refused (100 %) and a file at exactly its bound accepted (100 %, a control: proposed); 0 collections in the content types without a maximum length; and the whole-set check's pool report (CD-2): for each test mode, every pool's reported worst case, and for active effects the reserved worst case per target (the pick effects of the tracks that can apply at once, one per track level; the unit's own ability and weapon effects; spawn protection), equals a count by hand from the test content's numbers in 100 % of cases, and every pool the content leaves without a bound (effects others apply, weapon pickups, big vehicles) is named with its missing cap, never filled with a default (content item 2) | CI | the bound of every collection read from the generated schema (`maxItems`, `maxProperties`) by script; a file per bound added to C; the schema scan lists any collection with no bound; the hand counts written beside the test content before the run (proposed: a count made after the report could copy it) | 1 run. Bites: a `Vec` field added without a bound; a projectile lifetime doubled in the test content while the report stays the same must fail the comparison; a pool given a default cap where the content sets none | R1-RR-OQ2 (lines 2933–2935); CD-2 (proposed there: "one element over its bound") |
+ | PM-0005-6 | The loader never panics (CD-2; content item 2) | the panic lints at deny in `content`'s loader: a planted `.unwrap()` and a planted `buf[i]` fail clippy, the same in a `#[test]` pass; cargo-fuzz on the loader: 0 panics and 0 allocations above the fuzz run's allocation limit over 10 million inputs (proposed count: ADR 0001's per-message-type decoder fuzz, R2-TRN-REC4 mark 4) | CI; CI nightly, Linux (fuzz) | the gate's G2 step on the planted lines; a cargo-fuzz target that feeds bytes to the loader's entry; the allocation limit set to the largest reviewed bound times its element size (proposed; the fuzzer's option is not researched) | the lint bite 1 of 1; the fuzz nightly, fresh seeds. Bites: as listed; a planted `.unwrap()` on a parsed id is found within the fuzz run | R5-RUSTLINT-REC3's mark (r5 lines 1351–1352); R5-TEST-REC1's fuzz row (r5 line 1399); R1-RR-OQ3 (lines 2936–2940); R2-TRN-REC4 mark 4 (r2 line 2696) |
+@@ -2261,5 +2327,8 @@ game-designer for AB parts and u1–u6; graphics-engineer for the GPU section's
+ Rollback: the binary runtime format if load time or size misses its budget (option D, OQ-0005-CD2); checked newtypes
+ if garde fails on wasm32 (CD-2); OQ-0005-CD4's option (b) if reload at the next match proves too slow; a new reviewed
+-operation for one mechanic that fails PM-0005-18 to -21, option A4 with E1's tables if many fail (OQ-0005-AB13); track
++operation for a mechanic that fails PM-0005-18 to -21, and scripting (option A3) back only when a designed ability
++needs ability-specific code that no operation can express (OQ-0005-AB13, answered by the Advisor, 2026-11-03:
++"scripting comes back only when a designed ability can't be built from data"; a new reviewed operation counts as
++built from data: the advisor's reading, 2026-11-03); track
+ operations of their own if u1 fails (PM-0005-26); new asset-list fields if the research needs them; the ported
+ procedural kit for a family that fails the look proof test (AP-7). The revised part returns to the advisor and to
+@@ -2386,7 +2455,8 @@ slice 2, where the maps migrate).
+    7); content's load time and its share of the Wasm size measured again on the full content (OQ-0005-CD2; content
+    item 9; the size limit is ADR 0002's, part 4).
+-- **Assets:** the look proof test uses plain glTF/GLB exports (the GPU section's part 8); the asset-pipeline research,
+-  then the asset spike, come before the first authored model enters the game (AP-1 to AP-6); until OQ-0005-AP2 is
+-  answered, buildings and props keep the ported kit beside authored assets (AP-7).
++- **Assets:** the look proof test uses plain glTF/GLB exports (the GPU section's part 8) of the models Mustafa makes in
++  Blender, after the asset-pipeline research's export and slot-naming part (LOOK-TEST-INPUTS); the rest of that
++  research, then the asset spike, come before the first authored model enters the game (AP-1 to AP-6); until
++  OQ-0005-AP2 is answered, buildings and props keep the ported kit beside authored assets (AP-7).
+ 
+ ## Test plan
+@@ -2414,6 +2484,8 @@ No spike starts before approval, and spikes are throwaway (SPIKE-SCOPE (a)), so
+ - Reload at the next match proves too slow for tuning: OQ-0005-CD4's option (b) is R1-DATA-REC5 as written, and ADR
+   0001's message catalogue already holds its message.
+-- The ability items 1 or 2 fail for one mechanic: it becomes a new reviewed operation; if many fail, those mechanics
+-  fall back to option A4 with E1's tables kept, and OQ-0005-AB13 reopens scripting.
++- The ability items 1 or 2 fail for a mechanic: it becomes a new reviewed operation, which still counts as built from
++  data (the advisor's reading, 2026-11-03; AB-6). Scripting (option A3) comes back only when a designed ability can't
++  be built from data (OQ-0005-AB13, answered by the Advisor, 2026-11-03): one designed ability that needs
++  ability-specific code no operation can express (the advisor's reading, 2026-11-03).
+ - Picks cannot be written as effects and granted abilities (ability item 6, u1, fails): tracks get their own
+   operations, a reviewed Rust change.
+@@ -2463,8 +2535,8 @@ Counts: adopted 5 · changed 6 · answered 8 · open 9 · spike 6 · rejected 0
+ | R1-ABL-REC2 | adopted | AB-3; its mark is "What a spike must prove" 2 |
+ | R1-ABL-REC5 | changed: for UPGRADE-SCOPE (Mustafa, 2026-10-31, after the research), two kinds are added (the upgrade track; the drop and pickup values) and the unit kind names its class's own weapons; the rest as written | AB-4, AB-8; "What a spike must prove" 3 |
+-| R1-ABL-OQ1 | open: OQ-0005-AB12 | the Advisor decides the reference |
+-| R1-ABL-OQ2 | open: OQ-0005-AB13 | the source, or the spike's trigger |
++| R1-ABL-OQ1 | answered: OQ-0005-AB12 (the Advisor, 2026-11-03) | tranek's write-up is accepted for concepts; any specific claim a record relies on is checked against Epic's documentation once it can be read |
++| R1-ABL-OQ2 | answered: OQ-0005-AB13 (the Advisor, 2026-11-03) | scripting comes back only when a designed ability can't be built from data; reading the talk stays a weighed option, unscheduled (the advisor's reading) |
+ | R1-ABL-OQ3 | spike: the cue-once rule is tested where a replay happens: own weapon cues in [the netcode proof test](../research/GLOSSARY.md#the-netcode-proof-test) (the prediction scope), own ability cues in the Feel Lab test if ABL-PREDICT says yes; the mark is R1-ABL-REC4's (1,000 scripted presses), ADR 0001's | AB-9 |
+-| R1-ABL-OQ9 | answered: it matters only if option A3 returns; A3 is not adopted (AB-1), and OQ-0005-AB13 names the trigger | AB-1; Options, Question A |
++| R1-ABL-OQ9 | answered: it matters only if option A3 returns; A3 is not adopted (AB-1), and OQ-0005-AB13's answer sets when it returns: only when a designed ability can't be built from data (the Advisor, 2026-11-03) | AB-1; Options, Question A |
+ | R3-CHAR-OQ3 | open: OQ-0005-AS6 | the authored soldier (LOOK_V2 §3, §8) sets the vertex and bone counts; the render budget bench measures them against ADR 0003's rows |
+ 

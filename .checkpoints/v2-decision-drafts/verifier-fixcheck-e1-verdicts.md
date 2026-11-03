@@ -65,3 +65,56 @@ END REBUILD
 | 45 | 0001:1721-1724 | rollback: margin fails or goal budget does not hold; early fail closes nothing (reading) | TICK-60-* | confirmed | | H11 |
 | 46 | 0001:1746-1750, 1782, 1798, 1806, 1816-1817, 1843, 1857 | Appendix A rows: R1-TICK-REC2, R1-TICK-OQ1, R2-BUD-REC4, R2-ROOM-REC2, R2-SYNC-OQ2 (in part), -OQ14, -OQ15 (answered), R2-XU-OQ1 (in part), R2-XU-OQ18 (answered) | various | confirmed | rulings; attributions per condition 2 | S9, RC5, RW13, X2 |
 END CLAIMS 0001
+
+## Claims, ADR 0002 (HEAD line numbers)
+
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| 47 | 0002:3-7 | header per condition 4 | SPIKE-ORDER (b) | confirmed | byte for byte condition 4's wording | O15 |
+| 48 | 0002:49-50 | TICK-30 restatement "60 Hz only with the 60 Hz margin ... (ADR 0001 owns it)" unchanged | TICK-60-HEADROOM | confirmed (no change) | ruling q2: restatements linking §8 state a necessary condition and may stay | H23 |
+| 49 | 0002:233-235 | part 3: rule 3 allows the three crates (OQ-0002-8 (a), the Advisor) | OQ-0002-8 | confirmed | inputs: "OQ-0002-8 (Advisor): (a)." | E2 |
+| 50 | 0002:512-518 | part 8 simulator: latency and jitter half each way, loss as the profile defines it (the Advisor's answer, OQ-0001-16) | NET-PROFILES | confirmed | paraphrase of the words, no over-reading in this line (see finding F1 on PM-0002-49) | N8 |
+| 51 | 0002:544-549 | part 8 bench: who creates/deletes answered, quote; covering bench and 3-hour soaks is the advisor's reading | SPIKE-MACHINES | confirmed | quote exact; ruling (b) | M22 |
+| 52 | 0002:715-717 | part 12: boundary spike in wave 1 after proof test, sim core spike and 60 Hz run, one heavy spike at a time | SPIKE-ORDER | confirmed | inputs: "the netcode proof test first, then the sim core spike (then the 60 Hz run), then the boundary spike" | O18 |
+| 53 | 0002:752 | Options table chosen row: "proposed, and allowed by the Advisor's ruling at the stop (OQ-0002-8 (a))" | OQ-0002-8 | confirmed | map E5 said "no change needed"; the change only replaces the pending wording; option rows kept | E5 |
+| 54 | 0002:904-906 | trade-off: rule 3 allows proposing them | OQ-0002-8 | confirmed | | E3 |
+| 55 | 0002:1074-1076 | OQ-0002-8: "Answered by the Advisor (2026-11-03): "(a)."", option (a)'s text restated; options kept | OQ-0002-8 | confirmed | quote exact; (a)'s text at 0002:1069-1070 matches | E1 |
+| 56 | 0002:1084-1089 | spike text: wave 1 after the three; shares harness and stand-in sim; sim core spike's sim serves "the marks that need the real sim" (reading) | SPIKE-ORDER | confirmed in substance | ruling SPIKE-ORDER bullet 2 ("now uses the sim core spike's sim"); wording, see finding F2 | O18 |
+| 57 | 0002:1133-1135 | spike item 7: P2 with the sim core spike's sim, which runs before this spike | SPIKE-ORDER | confirmed | | |
+| 58 | 0002:1177-1180 | key BX: Worker padded to 13.33 ms; sim core spike's sim also runs in this Worker, BX rows again | SPIKE-ORDER | confirmed | ruling: "stand-in until then" clause may go | |
+| 59 | 0002:1250 | PM-0002-28: "with the stand-in sim: reported only" goes; sim core spike's sim runs before (7 cells) | SPIKE-ORDER | confirmed | ruling SPIKE-ORDER bullet 2 | |
+| 60 | 0002:1272 | PM-0002-49: in each direction; per-direction values "as part 8 splits them (as PM-0001-3 reads them)"; source adds OQ-0001-16 answered (7 cells) | NET-PROFILES | confirmed with a note | part 8 (0002:512-518) splits latency and jitter only; loss per direction is the advisor's reading, marked only in ADR 0001 (finding F1) | N9 |
+| 61 | 0002:1346-1349 | note: no mark at 60 Hz; wave-1 run after sim core spike an early signal; slice 6 decides; quote | TICK-60-SETUP | confirmed | quote exact | |
+| 62 | 0002:1392-1396 | migration 0: signed off as basis; step 1: one heavy spike at a time, order | SPIKE-ORDER | confirmed | | O18 |
+| 63 | 0002:1524, 1527 | Appendix A R4-XT-OQ5, R5-LAYOUT-REC2: allowed by OQ-0002-8 (a), the Advisor | OQ-0002-8 | confirmed | | E4 |
+END CLAIMS 0002
+
+## Claims, ADR 0004 (HEAD line numbers)
+
+| # | doc:line | claim (short) | cited | verdict | where and the words | note |
+|---|---|---|---|---|---|---|
+| 64 | 0004:3-7 | header per condition 4 | SPIKE-ORDER (b) | confirmed | condition 4's wording | O15 |
+| 65 | 0004:47-53 | TICK-30: ADR 0001 measures twice (wave-1 early, slice 6 final); TICK-60-SETUP quote; full rule part 2 with Mustafa's addition quoted | TICK-60-* | confirmed | both quotes exact; ruling q2 lists 0004:45-47 among the lines that change | S10, H23 |
+| 66 | 0004:182, 612 (HEAD) | "60 Hz only with the 60 Hz margin" restatements unchanged | TICK-60-HEADROOM | confirmed (no change) | ruling q2: necessary condition, may stay | H23 |
+| 67 | 0004:570-574 | part 20: OQ-0001-18 answered by the Advisor, quote; a room never resumes | ROOM-CRASH | confirmed | quote exact | RC6 |
+| 68 | 0004:830-832 | Revisit when: tick moves to 60 Hz at slice 6's call (margin and goal budget, PM-0001-63) | TICK-60-* | confirmed | | |
+| 69 | 0004:981-985 | spike intro: wave 1's run, OQ-0001-2 (a) with S1's stand-ins; "an early signal only"; final call at slice 6 | TICK-60-SETUP | confirmed | "an early signal only" is a substring of the words | S11 |
+| 70 | 0004:991 | S1 row: 60 Hz load in wave 1 = this sim with these stand-ins, early signal; slice 6 on the real crate; numbers unchanged | TICK-60-SETUP | confirmed | | S12 |
+| 71 | 0004:1093-1097 | key Tick: 60 Hz set read from each of ADR 0001's two 60 Hz runs; wave 1 decides nothing; slice 6 decides (reading); TICK-60-HEADROOM confirmed | TICK-60-* | confirmed | "as an early signal only" exact; ruling q3 ("PM-0004-71 and -72 run with each 60 Hz run but decide only at slice 6") | S13, H17 |
+| 72 | 0004:1101 | key Network: OQ-0001-3 answered by the Advisor | NET-PROFILES | confirmed | | N10 |
+| 73 | 0004:1124 | PM-0004-8: presented-frame count on ML at Low is PM-0003-44, reported there, gating on RD at High; OQ-0003-17 the Advisor's, confirmed by Mustafa | OQ-0003-17 | confirmed | words: "(recommended desktop, High)"; ML at Low reported is PM-0003-44's text since 4374a1c; attribution per condition 2 | |
+| 74 | 0004:1194-1195 | PM-0004-71/72: with each of ADR 0001's 60 Hz runs, deciding only at slice 6; wave 1 sim = sim core spike's sim + S1 stand-ins; slice 6 real crate (7 cells) | TICK-60-SETUP | confirmed | ruling q3 | S13 |
+| 75 | 0004:1246 | migration 1: order quoted ("wave 1 runs one heavy spike at a time"); proof test, sim core spike, 60 Hz run (early signal), boundary, content; "or its measured step times" gone | SPIKE-ORDER, TICK-60-SETUP | confirmed | quote exact; order matches the words | S14, O20 |
+| 76 | 0004:1253 | migration 8: 60 Hz run on the real sim makes the final call, quote; runs whatever (reading); PM-0004-71/72 decide there | TICK-60-SETUP | confirmed | quote exact | S14 |
+| 77 | 0004 OQ entries (LA3: :902-:951 at base) | the LATER questions' own entries not edited | LATER | confirmed (no change) | ruling LATER: "The drafts' own entries for these questions are not edited (LA3)"; diff has no hunk there | LA3 |
+END CLAIMS 0004
+
+## Rules (task 5)
+- glossary_check_drafts.py (repo root): entries 37; exact hits 0 (0001: 0, 0002: 0, 0004: 0).
+- Script verifier-fixcheck-e1-scratch/rules.py on every changed line (250 in 0001, 49 in 0002, 37 in 0004): 0 prose
+  lines over 120 characters; 0 PM rows with other than 7 cells; 0 sentences directly under a table.
+- PM rows: 0001 62 -> 63 (PM-0001-63 added, condition 6), 0002 78, 0004 75 (README:23 says 63, 78, 75: matches).
+- Open questions (script on each "## Open questions"): 0001 18, answered -1, -2, -3, -14, -16, -18, in part -5
+  (open 12); 0002 8, answered -8 (open 7); 0004 12, none answered (open 12).
+- Options kept: every answered OQ keeps its Options list (OQ-0001-1, -2, -3, -5, -14, -16, -18; OQ-0002-8 read).
+END RULES

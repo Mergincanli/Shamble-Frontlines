@@ -5,3 +5,6 @@
 - 14:05 overview diff read: header (cond 4) ok, :15-17 60 Hz rule ok, row 9 ok. Line lengths ok, no sentence under a table in my 3 files. Next: README diff.
 - 14:10 README :1-75 read: quotes match for TICK-60-HEADROOM, SETUP, 100ms, ASSET-RESEARCH, OQ-SPIKE-1, J6, OQ-0001-14, OQ-0002-8, OQ-0006-5, OQ-0001-5, -16, -18. To check: OQ-0003-1 README 'Still open' vs ADR 0003 'answered in part'; OQ-0002-8 option (a) text. Next README :76-160.
 - 14:15 README :76-140 read: quotes ok (OQ-0003-17, -20, AB12, AB13, OQ-0005-1, OQ-0006-15, -17). To check: ADR 0005 CD-2 names presented kinds. Next README :141-end.
+- 14:20 README read fully. Next: pointer check (d) by script.
+- 14:25 (d) README pointers: 112 links scanned (scratch/pointers.py); no draft line numbers; OQ ids all exist; parts 0001 p2, 0003 p5/p11 exist as list items; sections exist. Next SPIKE_PLAN diff.
+- 14:32 SPIKE_PLAN :1-290 read and checked (header, rules, machines, order, mermaid, table, items 1-4). Next SPIKE_PLAN diff from item 5 on.
