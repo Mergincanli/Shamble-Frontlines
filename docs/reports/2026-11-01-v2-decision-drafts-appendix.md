@@ -511,7 +511,7 @@ notes.
 | 9, the synthesis round | 47eadd9 (2026-11-02) | the overview, spike plan and README brought in line with the drafts |
 | 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
 | 9 again, the final round | 319d3b6, b815c85, 8fa7173, 61e9933, b88714d, 16e97aa, 75615d1, d57dc5a, 5a24122, 72cfcc3, d1f7e13, 8a149bc, 604a497, 449356c (2026-11-02) | every review finding fixed or deferred with a reason |
-| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, {GDCOMMIT} (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
+| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d{MORECOMMITS} (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
 | 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
 
 Spend-limit cuts, nine (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
@@ -596,8 +596,8 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
 - ADR 0001 and 0006: "a site being the registrable domain" simplifies MDN, which also counts the scheme for SameSite
   cookies (fixcheck-d0 row 6; optional).
 - ADR 0001 part 8's rewind estimate may add the wait from the drawn frame to the tick that sends the command (0 to one
-  frame); PM-0001-49 now measures it per shot. Part 4's "causes no correction" may read "no correction beyond the one
-  at the first snapshot that carries it". The budgets row "Prediction replay" may add "7 at P2's deepest buffer".
+  frame); PM-0001-49 now measures it per shot. The budgets row "Prediction replay" may add "7 at P2's deepest buffer".
+  (Part 4's "causes no correction" was fixed instead: fixcheck-d1 F2, 7858762.)
 - ADR 0002 part 4 writes the chosen `[profile.release]` settings once the boundary spike measures them (a future
   action); ADR 0003 part 10 states event play-time only if the one-frame bound of EA-1 is wanted (PM-0001-61 is set at
   one tick plus one frame, 50 ms, a reasoned note).
