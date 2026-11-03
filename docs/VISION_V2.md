@@ -40,7 +40,8 @@ What players should say after a match, in Mustafa's words:
 8. **Spectacle.** Big, readable, awe-inspiring units that new players remember.
 
 ## 3. Modes and scale
-- `[DECIDED]` **Start small:** two teams with 2–8 players, and three teams with 6–18 players.
+- `[DECIDED]` **Start small:** two teams with 2–8 players, and three teams with 6–18 players (in total: 1v1 to 4v4,
+  and 2v2v2 to 6v6v6; MODES-3 (a), Mustafa, 2026-10-31).
 - `[DECIDED]` **The goal:** 12v12v12 or 24v24. Two-team and three-team battles are both tested, and maps are designed
   per mode.
 - `[DECIDED]` **Faction choice for organized play:** a clan or guild can deliberately fight another faction in a

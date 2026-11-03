@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-10-27.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-03.
 
 ## Top level
 | Path | What it is |
@@ -35,6 +35,9 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/V2_PHASE0_BRIEF.md` | v2 phase 0: order of work, kit-v3-0, routines, research topics R1–R7, decision drafts |
 | `docs/LOOP_V2.md` | The v2 core loop (living spec; status tags DECIDED / DEFAULT / OPEN / LATER) |
 | `docs/EDITOR_V2.md` | The map editor rebuild (draft spec) |
+| `docs/LOOK_V2.md` | The v2 look brief (Mustafa and the Advisor, 2026-10-31): the input of ADR 0003 and of ADR 0005's asset pipeline |
+| `docs/ENGINE_OVERVIEW.md` | The v2 engine on one page: the parts, the Rust ↔ TypeScript boundary, the data flow per tick and per frame, where each VISION_V2 §6 need lives |
+| `docs/SPIKE_PLAN.md` | Every v2 spike the drafts ask for (Proposed): what it proves, which pass marks judge it (by id; the numbers live in the drafts), who judges, its place in the order, its rough size; the foundation's acceptance checks and the asset-pipeline research |
 | `docs/EDITOR_V1_INVENTORY.md` | Every legacy map-editor feature with a keep / drop / improve mark |
 | `docs/LEGACY_INVENTORY.md` | Every legacy system: what, where, evidence, and a port / rewrite / redesign / drop mark (R7) |
 | `docs/LEGACY_TUNING.md` | Every legacy tuning table and constant, rendered from `legacy-tuning.json` (R7) |
@@ -47,10 +50,23 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/UNITS.md` | Planned unit roster (not built) |
 | `docs/ROADMAP.md` | History and plan, terse |
 | `docs/ui_theme_mockup.html` | The war-room UI mockup (legacy UI source of truth) |
-| `docs/adr/` | Decision records; `0000-template.md` is the format (v2 drafts 0001–0006 land here) |
-| `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape and the owners |
+| `docs/adr/` | Decision records; `0000-template.md` is the format; the v2 drafts 0001–0006 (Status: Proposed): netcode, code structure and toolchain, rendering, simulation core, content and abilities and assets, infrastructure |
+| `docs/adr/README.md` | The index of the v2 drafts and the register: the decisions the drafts ask for, DESIGN-owned research ids, features whose need is outside VISION_V2 §6, the loose ends, the codes the drafts cite |
+| `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape, the owners and each topic's status |
+| `docs/research/r1-simulation-core.md` | R1: the simulation core (ECS, tick, determinism, the Rust ↔ TypeScript boundary, abilities, data and hot reload) |
+| `docs/research/r2-netcode.md` | R2: netcode (transport, sync and prediction, interest, rooms, bandwidth budgets) |
+| `docs/research/r3-rendering.md` | R3: rendering and presentation (WebGPU and the WebGL 2 fallback, characters, budgets, look techniques, audio; never decides the look) |
+| `docs/research/r4-physics-navigation.md` | R4: physics and navigation (physics engine, navigation, floors, line of sight, obstacles placed mid-match) |
+| `docs/research/r5-toolchain-quality.md` | R5: toolchain and quality (repository layout, lint, tests, CI, previews per PR, the v2 gate) |
+| `docs/research/r6-infrastructure.md` | R6: infrastructure (hosting, costs, monitoring, telemetry); the security baseline goes into the ADR 0006 draft as open and is researched before the first online playtest (BASELINE-WHEN (b)) |
+| `docs/research/GLOSSARY.md` | One definition per term the six topics share, starting with the tick budgets; §8 the phase 1 terms (the foundation, the netcode proof test, the 60 Hz margin) |
+| `docs/research/UNREAD_SOURCES.md` | Every source R1–R6 could not read, with what each was needed for |
 | `docs/reference/` | Renegade X and Kane's Wrath reference: inspiration, not what's built |
 | `docs/reports/` | One advisor report per change-set (`YYYY-MM-DD-<slug>.md`): the decision trail |
+| `docs/reports/2026-10-31-v2-research.md` | The R1–R6 research report (PR #28): outcome, evidence, risks, decisions needed |
+| `docs/reports/2026-10-31-v2-research-appendix.md` | Its appendix: coverage table, the 12 resolutions and the advisor's rulings, fetch audit, check outputs |
+| `docs/reports/2026-11-01-v2-decision-drafts.md` | The v2 decision drafts report (PR #33): outcome, evidence, reviews, risks, decisions needed |
+| `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full; Mustafa's decisions, the advisor's plan review and the plan's rules and steps, word for word; the steps and their commits; where each of the advisor's conditions is met; verification, the reviews and the final round; after the stop (2026-11-03): where each answer landed, and the advisor's reviews of plan revisions 4, 5 and 6; Mustafa's ten inputs files, byte for byte |
 
 ## .claude/
 | Path | What it is |
@@ -66,7 +82,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/agents/docs-keeper.md` | STATUS, ROADMAP, this map, doc drift |
 | `.claude/agents/art-director.md` | The legacy look and UI; v2 rendering research, never choosing the look |
 | `.claude/agents/perf-auditor.md` | Frame time, allocation, draw calls; v2 budgets |
-| `.claude/agents/security-auditor.md` | Security and anti-cheat; R6 security baseline |
+| `.claude/agents/security-auditor.md` | Security and anti-cheat; the security baseline (open in the ADR 0006 draft, researched before the first online playtest: BASELINE-WHEN (b)) |
 | `.claude/agents/netcode-architect.md` | Authority, tick, prediction, lag compensation, protocol; R2 |
 | `.claude/agents/engine-architect.md` | Module boundaries, the Rust ↔ TypeScript boundary; R1, R4, the synthesis |
 | `.claude/agents/graphics-engineer.md` | WebGPU and TSL, the render pipeline, GPU budget; R3 |
