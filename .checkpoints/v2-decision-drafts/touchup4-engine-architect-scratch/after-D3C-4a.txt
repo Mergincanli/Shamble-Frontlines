@@ -1,0 +1,1 @@
+| [0003](0003-rendering.md) | Rendering and presentation | graphics-engineer; pass marks: test-engineer | Proposed | the look proof test; the render budget bench | 20 numbered (OQ-0003-1 to -20), 19 open: -14 answered by its decider, the verifier |

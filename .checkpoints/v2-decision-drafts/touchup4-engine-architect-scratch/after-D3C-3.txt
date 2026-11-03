@@ -1,0 +1,8 @@
+appendix, `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3–§4, quotes them word for word. Review codes
+(GD-REJOIN, GD-PICK-VIS, GD-CARRIER, RELEASE-WINDOW, LOOK-FLOOR, REDUCED-MOTION, COLOUR-TELL, HEAT-SOAK, POOL-FULL,
+EA-8, SA-10, RR-10) and "the X review, finding n" (X a reviewer's short name, as in "the art review" or "the Rust
+review") point into the ten reviews on the final diff (plan step 10, 2026-11-02): the same appendix's §7.2 summarizes
+each, and their files stay readable in the branch's history (`.checkpoints/v2-decision-drafts/review-*.md`). Codes local
+to one draft are not register codes, for example ADR 0002's gate checks G0–G13, ADR 0004's spike claims S1–S22, ADR
+0006's option labels (G1–G4, K1–K4, S1–S5) and its baseline items B1–B12 (part 13); a register code always carries its
+word ("gap G5", "seam S1").

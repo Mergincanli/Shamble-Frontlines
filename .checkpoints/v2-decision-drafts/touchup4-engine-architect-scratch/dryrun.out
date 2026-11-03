@@ -1,0 +1,16 @@
+== docs/adr/README.md
+ok   D3C-2: 2 line(s) -> 5
+ok   D3C-4a: 1 line(s) -> 1
+ok   D3C-4b: 3 line(s) -> 3
+ok   D3C-3: 4 line(s) -> 8
+ok   D3C-3b: 1 line(s) -> 1
+6 fix blocks in the file (blocks for other files skipped); all applied
+== docs/adr/0002-code-structure-build-toolchain.md
+ok   D3C-1: 5 line(s) -> 4
+6 fix blocks in the file (blocks for other files skipped); all applied
+== docs/adr/0005-content-abilities-assets.md
+6 fix blocks in the file (blocks for other files skipped); all applied
+== docs/ENGINE_OVERVIEW.md
+6 fix blocks in the file (blocks for other files skipped); all applied
+== docs/SPIKE_PLAN.md
+6 fix blocks in the file (blocks for other files skipped); all applied
