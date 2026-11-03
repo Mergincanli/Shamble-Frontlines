@@ -22,14 +22,15 @@ Plan revision 1 → the advisor's APPROVE with 19 conditions (2026-10-31), folde
 Mustafa's UPGRADE-SCOPE update. Each condition's place: appendix §6. Rulings: ASSET-RESEARCH (a); TICK-60-HEADROOM read
 as "the 60 Hz margin" (confirmed at the stop, with Mustafa's addition); GLOSSARY §8 yes; the checkpoint kept at the
 stop. Revision 4 (2026-11-03: record the stop's answers, close the change-set) → the advisor's APPROVE WITH CONDITIONS,
-12 conditions, word for word in appendix §10.
+12 conditions, word for word in appendix §10. Revision 5 (2026-11-03: his design answers, his answers to the
+escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS, 10 conditions, appendix §11.
 
 ## What changed
 - `docs/ENGINE_OVERVIEW.md` (147 lines; the diagram shows the parts, the boundary, the per-tick and per-frame flow and
   VISION_V2 §6's places) · `docs/SPIKE_PLAN.md` (10 spikes and the asset-pipeline research: order, sizes, pass marks;
   wave 1 one heavy spike at a time) · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design
   questions, the loose-ends register; its pointers name OQ ids and parts, no line numbers).
-- `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 114 numbered open questions (98 open after
+- `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 115 numbered open questions (97 open after
   the stop's answers) plus one in SPIKE_PLAN, each with options and a decider, and 341 pass marks. Authors:
   netcode-architect, engine-architect, graphics-engineer, rust-reviewer, engine-architect + game-designer +
   graphics-engineer, infra-engineer; pass marks by test-engineer.
@@ -105,6 +106,14 @@ The advisor's readings, marked "(the advisor's reading, 2026-11-03)" where they 
   keep their own timing.
 - Counts: a partly answered question stays open (OQ-0001-5 among them), so 98 are open.
 
+Later the same day (appendix §2, plan revision 5): Mustafa's design answers, recorded in README and STATUS as he
+asked (carry slots, levelling, Banzai vs Riot Shield, upgrade visibility, spawn protection in part, fragments visual
+only, the name "amplifications", a lean for weapon unlocks; still open: looted ammo, faction asymmetry, the war
+around the matches); his answers to the four escalations (the reference machines answered in part, LOOK_V2 §8 kept
+with Blender for the test models only, one cost cap per run, shamblefrontlines.com at Cloudflare); COMMUNITY-SERVERS,
+a new open question in ADR 0006 (OQ-0006-21), the door kept open; and his stop on verification after this round.
+Commits: {R5COMMITS}. Counts after it: 115 numbered open questions, 97 open; pass marks 341.
+
 ## Decisions and deviations
 - **Openly stated (condition 18):** LOOK_V2 was added before the plan's approval (brief §0 asked for it first). The
   plan delays R7-MARKS's "changed when their ADR draft comes up" until the drafts are accepted; each draft lists its
@@ -143,25 +152,22 @@ waits on the items in "For Mustafa" and, for its own plan with security-auditor,
 session holds its SSH key.
 
 ## Decisions needed
-Escalated by the advisor at the stop (appendix §10); none blocks this PR.
-- **REF-MACHINES** (OQ-0003-1) · Which laptop is the minimum (ML), which desktop the recommended (RD), and which Mac
-  (MAC)? · About 22 of the proof test's marks are measured on ML or RD, and your PC (MP) is never a measured result ·
-  (a) name, buy or borrow ML, RD and MAC before the proof test's plan; (b) your PC as RD for the proof test only, which
-  changes MP's rule; (c) start the rows that need neither · Recommend (a) for ML and RD; MAC may follow.
-- **LOOK_V2-§8** · You chose Blender for the look test's models, while LOOK_V2 §8 says Spline: does §8 change? · Agents
-  read §8 as the production art flow · (a) keep §8, Blender for the test models only; (b) change §8, in a change-set by
-  you and the Advisor · Recommend (a), until the asset research's export part reports.
-- **SPIKE-COST** (OQ-0006-20) · What may the proof test's VMs cost? · With no cap, each run plan's cost comes to you
-  before you create its VMs · (a) 5 EUR for ADR 0006's own runs; (b) one cap from the run plan's hours; (c) 5 EUR for
-  everything · Recommend (b).
-- **DOMAIN** (OQ-0006-15) · Which domain, registrar and DNS host for the WebSocket leg, and will production use it? ·
-  The WebSocket leg needs a trusted certificate on a real hostname before the proof test · a spike-only domain, or the
-  game's future one · Recommend the game's future domain if you know it; if not, a cheap spike-only one.
+- **MACHINES-TIMING** (the advisor's, at plan revision 5) · You name the laptop, desktop and Mac before the look proof
+  test, but three earlier spikes measure on them: should they wait for the machines, or run first and be judged later?
+  The netcode proof test needs the Mac for Safari (its four-browser claim and the WebTransport library choice); the sim
+  core spike and the boundary spike measure on the laptop and the desktop · Until those machines exist, those rows are
+  rough checks only, and a row judged later costs a short re-run, with VM hours and a session · (a) borrow the Mac
+  before the netcode proof test, and the laptop and desktop before the sim core spike; (b) keep your timing: rough
+  checks first, a short re-run judges them once the machines are named, the library choice waits for Safari; (c) a mix:
+  the Mac early, the laptop and desktop on your timing · Recommend (c): Safari is the one browser where WebTransport is
+  new, so the library choice should see it.
 
 ## For Mustafa
 1. In your Hetzner console: can a CCX23 and a CX33 be ordered in an EU location (OQ-0006-1)? Still open.
-2. Register the domain for the WebSocket leg before the netcode proof test (DOMAIN above).
-3. Name the reference machines (REF-MACHINES above).
-4. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
+2. Register shamblefrontlines.com at Cloudflare before the netcode proof test.
+3. Borrow and name the laptop, desktop and Mac: at the latest before the look proof test, earlier as MACHINES-TIMING
+   says.
+4. OK each run's cost cap when its plan reaches you.
+5. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
    session's chat; it merges by squash only. Nothing to check in Brave: nothing a player sees changes.
 
