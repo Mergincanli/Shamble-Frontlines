@@ -2346,12 +2346,12 @@ shuffled by the session and their labels hidden until he has answered (proposed:
 1. Throw the Molotov ten times with A, then with B. Expected: he can say which one feels right for a throw.
 2. Raise and lower the Riot Shield ten times with A, then with B, while moving. Expected: he can say which one feels
    right; whether the slow when the Shield goes up feels late in either.
-3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both; in
-   the predicted variant a short start of the ability may show and then undo. Record: whether that undo is acceptable.
 3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both, with
    no start shown, since the client knows its team's tier (team state goes to the team, ADR 0001) and the ability's
    required tag (AB-5), so a predicted variant can refuse the press locally. Record: any start that shows, in either
    variant, as a defect of that variant.
+4. Record: his answer to ABL-PREDICT (does the client predict the player's own abilities), and whether it differs per
+   ability.
 
 
 ## Migration plan
