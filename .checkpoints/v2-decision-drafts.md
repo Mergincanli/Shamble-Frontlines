@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 07:47 Amsterdam
+- **Last update:** 2026-11-03 07:31 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,7 +51,7 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
-Since about 07:45: workflow wf_0c35d4e2-382 done (game-designer 5 blocks, the pre-apply verifier PASS WITH NOTES, no
+Since about 07:30: workflow wf_0c35d4e2-382 done (game-designer 5 blocks, the pre-apply verifier PASS WITH NOTES, no
 line lost, net +2 lines) → applied as 361b61d (AB-3's heading and AB-1's Why line back; checks: guard PASS, 521/521,
 glossary exact 0, glued 0, 340 PM rows; pointers off 23, all into ADR 0005 from 1186, +2). Workflow wf_6c0e9508-f3b
 (fixcheck-d3a) done: PASS WITH NOTES, 19 claims, 18 confirmed, 14 blocks with no problem; the four owner-checked
