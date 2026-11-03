@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 13:04 Amsterdam
+- **Last update:** 2026-11-03 13:39 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,15 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 13:39: all eight units' blocks checked (each inside its author's text, each BEFORE once) and applied as 03ef222:
+netcode-architect 42, test-engineer 40, rust-reviewer 8, game-designer 5, engine-architect 41 + 176 (README's line
+pointers dropped), infra-engineer 20, graphics-engineer 16. Checks: guard PASS, 521/521, glossary exact 0, glued 0,
+341 PM rows of 7 cells, 0 line pointers left; 98 of 114 open (0001 6 answered, 0002 1, 0003 3, 0005 3, 0006 1; in part:
+OQ-0001-5, OQ-0003-1, OQ-0006-5, -15, -20). Running: wf_edc68814-282, test-engineer on ADR 0002's pass marks (H23-2,
+O18-5). Next: apply it; fixcheck-e (three units, high; skeptics); docs-keeper; the report and appendix (condition 8);
+stop the saver; the deletion commit; ready, labelled needs-mustafa; the advisor on the final head; Mustafa's go.
+
+Before that:
 At 13:04: wf_7663bb31-6ca done. Map: 205 rows (126 places; `stop-answers-map.md`). The advisor: APPROVE WITH
 CONDITIONS (12 conditions; rulings on STATUS-FIELD (b), POINTERS (b), GLOSSARY §8's 60 Hz entry amended, every
 mapper question; escalations for Mustafa: REF-MACHINES (OQ-0003-1), LOOK_V2-§8, SPIKE-COST (OQ-0006-20), DOMAIN
