@@ -234,6 +234,17 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
   chose):
   > Question (the session's): Your latest note names two test servers in Falkenstein: a CCX23 for the game server and a CAX21 for the 48 simulated players. Earlier you chose a CCX13 for development and "does it work" runs, with the CCX23 used only for the measurement runs (tick timing, the 60 Hz margin, rooms per VM). Does the CCX13 still stand?
   > His answer: "No, drop the CCX13", the option described as: "Every server run uses the CCX23 (the measurement-only rule goes); the rig is just the CCX23 and the CAX21."
+- **2026-11-03 at about 18:56 Amsterdam, his answer to LG-COUNT** (the advisor's question in its amended verdict on plan
+  revision 6; the question tool's record, word for word in `inputs/LG-COUNT-mustafa-2026-11-03.md`; the option text is
+  the session's wording, which he chose):
+  > Question (the session's, from the advisor's amended verdict on plan revision 6): You named "a CAX21 for the 48 simulated players". Some netcode proof test rows run 8 rooms of 48 bots at once (384 simulated players, the rooms-per-VM rows). If one CAX21 can't carry a run's bots under 80 % CPU (an overloaded load generator makes the run invalid), may that run add CAX21s (about 0.0176 EUR an hour each, excluding VAT)?
+  > His answer: "Add as needed (Recommended)", the option described as: "The run's plan adds as many CAX21s as its 5-minute calibration shows are needed, inside the cost cap you OK for that run."
+- **2026-11-03 at about 19:04 Amsterdam, answers to MACHINES-TIMING and the domain** (saved word for word in
+  `inputs/ANSWERS-3-mustafa-2026-11-03.md` before any edit):
+  > Answers (Mustafa, 2026-11-03):
+  > - MACHINES-TIMING: (c), with one step first. For the netcode proof test's Safari leg, check whether GitHub's macOS runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport and can reach the test servers. If they can, that is the Safari check, and I borrow the Mac only for the look proof test. If they can't, I borrow the Mac before the netcode proof test. The laptop and desktop stay on my timing: rough checks first, then a short re-run once they're named.
+  > - DOMAIN: done. shamblefrontlines.com is registered at Cloudflare.
+  > - Relaunch the authors' round from the checkpoint.
 
 ## 3. The advisor's plan review: APPROVE with 19 conditions (word for word)
 
