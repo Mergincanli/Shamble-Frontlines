@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 07:48 Amsterdam
+- **Last update:** 2026-11-03 07:57 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,15 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 07:57: wf_9d6ea220-1f3 done and applied: b513483 (test-engineer: PM-0004-22's conditional Euclidean clause and
+bite; same line count) and 882cfa6 (engine-architect: README's 23 pointers into ADR 0005 re-pinned; off 0). Checks:
+guard PASS, 521/521, glossary exact 0, glued 0, 340 PM rows of 7 cells, pointers 94/94. Running: wf_cb775012-8de
+(`prompts/workflow-fixcheck-d3bcd.js`): fixcheck-d3 units b (ADR 0003–0005 and synthesis touch-ups), c (lost lines,
+dangling references, counts, scripts, all nine docs) and d (three web facts, fetching from 08:30 only), a skeptic per
+wrong or unsupported verdict, a completeness critic, one follow-up unit for its gaps. Next: route any upheld finding to
+its author; docs-keeper-3; the report's placeholders; the gate; the PR body; the final commit that runs CI.
+
+Before that:
 At 07:48: D3A-1's workflow (wf_267dcff8-48e) done: the skeptic PARTLY (facts hold; the fix named vectors PM-0004-22
 does not define); rust-reviewer's block applied as 7cc6942 (part 7: std promises correct rounding, rustc 1.97.0's
 div_euclid breaks it; both stay off the list and may join only once fixed inputs equal an exact reference, PM-0004-22
