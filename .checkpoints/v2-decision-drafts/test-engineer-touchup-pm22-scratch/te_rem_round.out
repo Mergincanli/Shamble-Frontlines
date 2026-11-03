@@ -1,0 +1,4 @@
+f32 rem_euclid(-2^-30, 1) = 1.0 bits=3f800000 r==|b|:true exact 1-2^-30 rounds to 1.0
+f32 div_euclid(-2^-30, 1) = -1.0 (exact -1)
+f32 div_euclid(3+2^-22, 1+2^-23) = 3.0 rem_euclid = 1.0
+rustc 1.97.0 (2d8144b78 2026-07-07)
