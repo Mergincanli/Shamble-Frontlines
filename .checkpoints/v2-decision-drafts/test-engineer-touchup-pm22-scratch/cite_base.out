@@ -1,0 +1,15 @@
+ids cited: 595; citation groups with a research file: 104
+ids not found anywhere in docs/research: 0
+line-range problems: 12
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-DET-REC5 not within lines 2146-2169 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-DET-REC2 not within lines 2208-2221 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'R4-PHYS-F1 not within lines 589-604 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'R4-OBST-REC1 not within lines 721-745 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 1930-1931 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'lines 3022-3029 out of range (file has 1543)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r4-physics-navigation.md', 'lines 1963-1970 out of range (file has 1543)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 2044-2053 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 1923-1931 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-TICK-REC2 not within lines 53-69 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r1-simulation-core.md', 'R1-ECS-REC1 not within lines 53-69 (±20)')
+  RANGE ('test-engineer-touchup-pm22-scratch/docs/adr/0004-simulation-core.md', 'r2-netcode.md', 'R2-SYNC-REC6 not within lines 2218-2218 (±20)')
