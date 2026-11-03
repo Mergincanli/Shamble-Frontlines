@@ -8,3 +8,6 @@
 - 14:25 FIX M1 (OQ-0006-17 answered), H16 (OQ-0006-19 pointer), M9 (OQ-0006-20 in part) written. Next: H13 (1065), M5 (1274-1279), RC7-2 (1339-1340); then NOTES RC8 H23 S15 O21 M10 M13 X5 LA3; then checks.
 - 14:35 FIX H13 (spike item 2 -> PM-0001-63), M5 (step 0 incl. drafts signed off), RC7-2 (test plan stub 'marked crashed') written. Next: NOTES RC8 H23 S15 O21 M10 M13 X5 LA3; update preface (-2 ids incl. M8-2); then checks.
 - 14:45 NOTES RC8 H23 S15 O21 M10 M13 X5 LA3 written. Next: fix preface (-2 ids incl. M8-2), dry run, glossary, cells, lengths, quotes, word review.
+- 14:55 dry run 20/20 ok; combined with test-engineer's 7 ADR 0006 blocks ok; glossary exact 0 (context 98->101: 'the goal' x2 = goal budget, '48' x1 = N = 48); quotes all verified (inputs or r6); no prose >120; B9 row 6 pipes; no line under table. M3 reworded. Next: final review of word diff, re-run checks, return.
+- 15:05 final: 20 FIX + 8 NOTE; dry run 20/20 on a fresh copy; with test-engineer's 0006 blocks, both orders apply (27/27); glossary exact 0 (context 98->101, all 'the goal budget' / 'N = 48'); unpaired quotes 0; no new prose line >120 chars; B9 row 6 pipes; no line under a table; Status Proposed; PM-0006 rows 32 unchanged; Pass marks section untouched. DONE
+- finished 13:35 Amsterdam (the clock times above were estimates; read the lines as step order).

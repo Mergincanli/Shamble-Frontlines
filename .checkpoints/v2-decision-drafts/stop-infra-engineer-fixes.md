@@ -97,8 +97,8 @@ BEFORE:
 AFTER:
      0.46 EUR a playtest. Mustafa creates and deletes these VMs himself, and sessions get SSH access only and no
      Hetzner token, until the security baseline: OQ-0006-17's answer (Mustafa, 2026-11-03) covers the bench and the
-     soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so each
-     bench session (20 hours a month, the placeholder above) and each soak waits for him to create its VMs.
+     soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so every
+     bench session and every soak waits for him to create its VMs (at the placeholder, 20 bench hours a month).
 END
 
 ### FIX RC7

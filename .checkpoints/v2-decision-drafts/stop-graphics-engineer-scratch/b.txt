@@ -1,5 +1,5 @@
-2. **The look proof test**, fourth in wave 1, which runs "one heavy spike at a time": after the netcode proof test,
-   the sim core spike (then the 60 Hz run) and the boundary spike, "once its models exist" (SPIKE-ORDER (b), Mustafa,
-   2026-11-03); the asset research's export and slot-naming part runs before it (LOOK-TEST-INPUTS, part 11).
-   *Milestone:* the technique table and both ink families measured on both machines; Mustafa's verdict on every
-   LOOK_V2 item and on OQ-0003-2, -3, -5, -6, -8, -12, -15, -16, -18 and -19, recorded in this ADR.
+  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether the glTF
+  export keeps material names (not researched), Blender's for the look proof test's models (LOOK-TEST-INPUTS,
+  Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)") and Spline's while LOOK_V2
+  §8's flow names it (the advisor's reading, 2026-11-03), and each colour route's material count against part 4's
+  caps. Research ids: none.

@@ -1,0 +1,15 @@
+      1 0003	Big vehicle and very large unit	context	large units
+      1 0003	Big vehicle and very large unit	context	vehicles
+      1 topic	entry	kind	phrase
+      2 0003	The server tick budget	context	50 %
+      3 0003	Player count (N)	context	characters
+      4 0003	Preview isolation and the isolation flag	context	always
+      4 0005	Team size and how modes are written	context	players
+      9 0003	Active effect (and visual effect)	context	effects
+      9 0005	Preview isolation and the isolation flag	context	always
+     10 0003	Team size and how modes are written	context	players
+     11 0005	The largest mode, and its N	context	48
+     12 0005	State hash	context	its hash
+     18 0005	Big vehicle and very large unit	context	vehicles
+     39 0005	Active effect (and visual effect)	context	effects
+     44 0003	The largest mode, and its N	context	48

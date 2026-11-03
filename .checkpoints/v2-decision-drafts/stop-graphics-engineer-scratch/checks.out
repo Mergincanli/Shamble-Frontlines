@@ -1,0 +1,7 @@
+blocks 16
+docs/adr/0003-rendering.md lines 1516 -> 1548 | new lines over 120: []
+  text directly under a table: before 0 after 0
+  table rows: 272 -> 272 | cell-count profile same: True
+docs/adr/0005-content-abilities-assets.md lines 2502 -> 2515 | new lines over 120: []
+  text directly under a table: before 0 after 0
+  table rows: 268 -> 268 | cell-count profile same: True

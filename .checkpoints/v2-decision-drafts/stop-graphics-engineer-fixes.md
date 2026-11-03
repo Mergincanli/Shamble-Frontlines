@@ -47,8 +47,8 @@ AFTER:
   Answered in part by Mustafa (2026-11-03): "Test PC: my own, in Brave" (SPIKE-MACHINES). That PC is MP, which the
   pass marks' key defines as what he judges and never a budget result, so it stands in for none of ML, RD or MAC
   (the advisor's reading, 2026-11-03); still open: which laptop (ML) and which desktop (RD), and which Mac (MAC) for
-  the rows that name Safari, decided by Mustafa (the advisor's reading, 2026-11-03, escalates it to him: about 22 of
-  the netcode proof test's 62 marks are measured on ML or RD).
+  the rows that name Safari, decided by Mustafa (escalated to him, since the netcode proof test's marks on ML or RD
+  cannot run without them: the advisor's reading, 2026-11-03).
 END
 
 ### FIX M21-2
@@ -115,9 +115,9 @@ AFTER:
   disposition).
   Answered by the Advisor, confirmed by Mustafa (2026-11-03): the Advisor, "at most 6 of 600 presented frames may
   miss a refresh with the very large units on screen (recommended desktop, High); the p95 rows stay as
-  diagnostics"; Mustafa, "I confirm this reading". That is option (a), with the share at 6 of 600 (1 %), and (b) is
-  not chosen. The p95 frame rows are diagnostics for this reading and keep gating their own needs, as PM-0003-18 to
-  -21 do, and the minimum laptop's count stays reported (the advisor's reading, 2026-11-03).
+  diagnostics"; Mustafa, "I confirm this reading". That is option (a) at 6 of 600 (1 %), not (b); the p95 frame rows
+  are diagnostics for this reading and keep gating their own needs, as PM-0003-18 to -21 do, and the minimum
+  laptop's count stays reported (the advisor's reading, 2026-11-03).
 END
 
 ### FIX F2
@@ -194,5 +194,56 @@ All six are **not researched**. AS1 to AS5 form one research unit, the asset-pip
 verified like R3, its own daytime session), which `docs/SPIKE_PLAN.md` places before the asset spike, its export and
 slot-naming part (AS3, AS4) before ADR 0003's look proof test (LOOK-TEST-INPUTS, Mustafa, 2026-11-03); the asset
 spike then proves its answers.
+END
+
+### FIX L8
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  asset-pipeline research. What decides it: the failures the asset spike can plant and catch. Research ids: none.
+AFTER:
+  asset-pipeline research. What decides it: the failures the asset spike can plant and catch. Research ids: none.
+  Timing: this question and AS4 are "the asset research's export and slot-naming part", which "runs before the look
+  proof test" (LOOK-TEST-INPUTS, Mustafa, 2026-11-03), on Blender's export, the route of that test's models (the
+  advisor's reading, 2026-11-03).
+END
+
+### FIX L8-2
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether Spline's
+  glTF export keeps material names (not researched), and each colour route's material count against part 4's caps.
+  Research ids: none.
+AFTER:
+  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether the glTF
+  export keeps material names (not researched), Blender's for the look proof test's models (LOOK-TEST-INPUTS,
+  Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)") and Spline's while LOOK_V2
+  §8's flow names it (the advisor's reading, 2026-11-03), and each colour route's material count against part 4's
+  caps. Research ids: none.
+END
+
+### FIX L10-3
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)).
+AFTER:
+   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)). Mustafa makes them with AI help
+   in Blender, and "blockouts with a skin, named colour slots and LOOK_V2's proportions are enough"
+   (LOOK-TEST-INPUTS, 2026-11-03); the list stays, and each model on it may be a blockout at that bar (the advisor's
+   reading, 2026-11-03).
+END
+
+### NOTE X5
+no change: my need lines that trace to VISION_V2 §4 alone already read "*Need:* VISION_V2 §4 only" (ADR 0003:143,
+:159, :329, :411, :421), and the Advisor's answer to OQ-0001-14 (2026-11-03: "yes, a VISION_V2 §3 or §4 trace
+counts, marked as such") asks only that they be marked so; ADR 0005's GPU section has no such line (each of its
+need lines names a VISION_V2 §6 item or LOOK_V2).
+END
+
+### NOTE LA3
+no change: my entry among the twelve LATER questions is OQ-0003-16 (ADR 0003:898, the look floor). By the advisor's
+ruling on LATER the drafts' own entries are not edited (LA3), and OQ-0003-16 keeps its own timing, in the look proof
+test, which the entry already gives (option (c), recommended: Mustafa decides "in the look proof test, on the Low
+frame"; what decides it: "the look checklist's step 31 (the Low frame) and PM-0003-9's costs on the minimum
+laptop"); README carries the design session's sentence and marker (engine-architect).
 END
 

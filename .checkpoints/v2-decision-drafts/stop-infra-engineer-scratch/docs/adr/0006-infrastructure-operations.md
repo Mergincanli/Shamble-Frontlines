@@ -371,8 +371,8 @@ interim positions, until its own research before the first online playtest; the 
      on a CX33 beside the reference server, never on it (as spike 2's load generators): 3 × (0.1386 + 0.0144) =
      0.46 EUR a playtest. Mustafa creates and deletes these VMs himself, and sessions get SSH access only and no
      Hetzner token, until the security baseline: OQ-0006-17's answer (Mustafa, 2026-11-03) covers the bench and the
-     soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so each
-     bench session (20 hours a month, the placeholder above) and each soak waits for him to create its VMs.
+     soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so every
+     bench session and every soak waits for him to create its VMs (at the placeholder, 20 bench hours a month).
    *Why:* compute dominates and is flat per VM; egress, the cost that grows with players, is zero on Hetzner inside the
    20 TB and about 0.063 USD per room-hour on a per-GB host (r6 lines 706–709). *Ids:* R6-COST-REC1, R6-COST-REC2,
    R6-COST-OQ1, R6-COST-OQ3, OQ4, OQ5, R3-MEASURE-OQ2, R3-XT-OQ5, R5-XT-OQ11, R6-XT-OQ7. *Need:* VISION_V2 §6.1 (rooms

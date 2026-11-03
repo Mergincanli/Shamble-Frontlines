@@ -14,3 +14,13 @@
 - Q2 done (part 8, 399-400). Next: ADR 0005 L8 (AS3/AS4 1816-1826), L10 (intro 1683-1691), L10-2 (OQ intro 1803-1805), L10-3 (part 8 1753-1756).
 - L10 done (GPU intro 1690-1691). Next: L10-2 (OQ intro 1803-1805).
 - L10-2 done (OQ intro 1803-1805). Next: L8 (AS3 1814-1817? AS4 1818-1824).
+- L8 (AS3 timing, 1819), L8-2 (AS4 what decides, 1824-1826) done. Next: L10-3 (GPU part 8 1753-1756), then NOTEs X5, LA3; then checks.
+- L10-3 done (GPU part 8, 1756). Next: NOTEs X5, LA3; then dry runs and checks.
+- L10-3 redone on the right line (1759; first try hit the heading line, removed). Next: NOTEs X5, LA3; then dry runs and checks.
+- reworded M21 (no stale 22/62 count) and F1 (one reading mark). Next: NOTEs X5, LA3; dry runs; glossary; checks.
+- X5, LA3 NOTEs done. Next: verify X5 claim about 0005 GPU need lines; dry runs; glossary; checks.
+- dry runs: 16/16 blocks apply (11 on 0003, 5 on 0005). Next: apply in scratch tree, glossary check, line/cell checks.
+- glossary: exact 0 before and after (0003, 0005); in-context per phrase unchanged (74, 93); quoted-skip 12->13 in 0003. Next: line lengths, tables, under-table check.
+- checks: no new line >120; no text under tables (0 before/after); table rows 272/268 same cell profile; every BEFORE once. Next: overlap check vs other authors' blocks.
+- final dry run: 16/16 apply. FIX 16, NOTE 4 (L13, T3, X5, LA3), 20 END lines.
+DONE (12:40 UTC): blocks O15, O19, O19-2, M21, M21-2, L11, L11-2, F1, F2, Q1, Q2 (0003); L10, L10-2, L8, L8-2, L10-3 (0005); NOTEs L13, T3, X5, LA3. Checks: dry runs ok; glossary exact 0 before/after, in-context per phrase unchanged; no new line >120; no text under tables; table cells unchanged; quotes word for word.
