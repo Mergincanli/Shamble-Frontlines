@@ -9,3 +9,6 @@
 - 13:50 SPIKE-ORDER (O1-O23), SPIKE-MACHINES (M1-M24) written. Next: LOOK-TEST-INPUTS, TOY-BOX, OQ-0002-8, OQ-0005-1.
 - 13:58 TOY-BOX: no place in the nine docs (README has no TOY-BOX row; plan's table wrong). Next: write LOOK-TEST-INPUTS + TOY-BOX + LATER tables; then OQ-0002-8, OQ-0005-1.
 - 14:10 LOOK-TEST-INPUTS (L1-L14), TOY-BOX (T1-T4), OQ-0002-8 (E1-E6), OQ-0005-1 (C1-C11) written. Next: OQ-0001-14, OQ-0003-17, -20, AB12, AB13, LATER, counts.
+- 14:22 OQ-0001-14, OQ-0003-17, -20, AB12, AB13, LATER, COUNTS written. Next: advisor-questions block, then return.
+- 14:27 questions block written. DONE (all answer tables, counts, questions complete).
+DONE

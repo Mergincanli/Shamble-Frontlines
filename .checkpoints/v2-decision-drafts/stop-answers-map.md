@@ -282,3 +282,116 @@ client definition keyed by the same id; AB-4's unit kind names no model).
 | C11 | docs/SPIKE_PLAN.md:269-270 (look test: "the content crate's whole-set check (a minimal loader ...)") | engine-architect | the whole-set check | Optional: the minimal loader runs the new client-entry rule too (with C8). | no |
 END OQ-0005-1
 
+## OQ-0001-14, the Advisor: "yes, a VISION_V2 §3 or §4 trace counts, marked as such."
+Settles OQ-0001-14 as (a). The drafts already mark each such need "VISION_V2 §4 only" (or "§3 and §4 only") and list
+them in README's "Needs outside VISION_V2 §6": no "need" line changes; only "the session's reading" becomes the ruling.
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| X1 | docs/adr/0001-multiplayer-netcode.md:1120-1126 (OQ-0001-14) | netcode-architect | "(the reading these drafts use until the ruling) ... Decider: the Advisor, at the stop" | "Answered by the Advisor (2026-11-03): yes ..., marked as such." (a) decided. | yes |
+| X2 | docs/adr/0001-multiplayer-netcode.md:1752 (Appendix A, R2-XU-OQ18: "open: OQ-0001-14 ...; until the Advisor rules, these drafts use the session's trace reading") | netcode-architect | open | "answered: OQ-0001-14 (a)". | no |
+| X3 | docs/adr/0006-infrastructure-operations.md:36 ("counted like LOOP_V2 under the session's trace reading, decision map part j, J3") | infra-engineer | the session's reading | "under the Advisor's ruling (OQ-0001-14, 2026-11-03)". | no |
+| X4 | docs/adr/README.md:46 (Trace reading row), :253 (LE-G), :264-268 ("Needs outside VISION_V2 §6" intro: "the session's trace reading of 2026-10-31, decision map J3"), :377 (J3) | engine-architect | open; "the session's reading" | Row answered; LE-G "answered (a)"; the intro cites the ruling. | yes ("README 'Needs outside VISION_V2 §6', J3") |
+| X5 | the "§4 only" need lines (for example docs/adr/0001-multiplayer-netcode.md:444, :547; docs/adr/0003-rendering.md:143, :159, :329, :411, :421; docs/adr/0004-simulation-core.md:179, :251, :580; docs/adr/0005-content-abilities-assets.md:134, :144, :514, :1034) | each section's author | "Need: VISION_V2 §4 only" | No change: already "marked as such". | no (none needed) |
+END OQ-0001-14
+
+## OQ-0003-17, the Advisor, confirmed by Mustafa: "at most 6 of 600 presented frames may miss a refresh with the very large units on screen (recommended desktop, High); the p95 rows stay as diagnostics; I confirm this reading."
+Settles OQ-0003-17 as (a) with the share 6 of 600 (1 %); PM-0003-44 becomes a gate on RD at High. Partial reading:
+"the p95 rows stay as diagnostics" most likely means the p95 rows are not §6.9's reading (option (b) not chosen); read
+literally it could turn the p95 frame rows into reported rows (see the advisor questions). PM-0003-44's bite (10 of
+600 counted) still exceeds 6, so it still bites.
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| F1 | docs/adr/0003-rendering.md:914-922 (OQ-0003-17) | graphics-engineer | "at most a stated number of frames per 600 ... (0, or a small proposed share) ... Decider: the Advisor, confirmed by Mustafa at the stop review" | "Answered by the Advisor, confirmed by Mustafa (2026-11-03): ..." quoted; (a) at 6 of 600. | yes |
+| F2 | docs/adr/0003-rendering.md:377-383 (part 7: "How many such frames a run may hold (0 of 600, or a small share) is OQ-0003-17") | graphics-engineer | open | "at most 6 of 600 (OQ-0003-17)"; ML's count stays reported. | yes ("part 7") |
+| F3 | docs/adr/0003-rendering.md:1178 (PM-0003-44: "Gated at the share OQ-0003-17 sets; until it is answered, reported, with 0 of 600 as the proposed reading") | test-engineer | reported | "Gated: at most 6 of 600 on RD at High; ML at Low reported." | yes |
+| F4 | docs/adr/0003-rendering.md:1186-1187 ("When a mark fails": "a 'reported' mark (... and PM-0003-44 until OQ-0003-17 sets its share)") | test-engineer | reported until answered | Drop PM-0003-44 from the reported list. | no |
+| F5 | docs/SPIKE_PLAN.md:356-357 ("PM-0003-44 reported until OQ-0003-17 sets its share") and :370 ("the Advisor the dropped-frame counts for OQ-0003-17") | engine-architect | open | "PM-0003-44 gated at 6 of 600"; drop the OQ-0003-17 hand-off. | no |
+| F6 | docs/ENGINE_OVERVIEW.md:117 (row 9: "how many such frames a run may hold is OQ-0003-17") | engine-architect | open | "at most 6 of 600 (OQ-0003-17)". | no ("only where a line states what an answer changes": this line does) |
+| F7 | docs/adr/README.md:78 (OQ-0003-17 row) | engine-architect | open | Answered. | yes (implicit) |
+END OQ-0003-17
+
+## OQ-0003-20 (HEAT-SOAK), the Advisor: "judge after 15 minutes of play."
+Settles OQ-0003-20 as (a): the soaked set S gates PM-0003-18 to -21 on ML; the cold set stays reported beside it (as
+(a) says; the words do not drop it).
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| Q1 | docs/adr/0003-rendering.md:938-950 (OQ-0003-20) | graphics-engineer | "Part 8 and the pass marks hold to (a) until it is answered ... Decider: the Advisor" | "Answered by the Advisor (2026-11-03): judge after 15 minutes of play" (a). | yes |
+| Q2 | docs/adr/0003-rendering.md:396-400 (part 8: "which of the two sets gates is OQ-0003-20") | graphics-engineer | open | "the soaked set gates (OQ-0003-20)". | yes ("part 7"; the text is in part 8) |
+| Q3 | docs/adr/0003-rendering.md:1089-1094 (Pass marks key, S: "Which of the two gates is OQ-0003-20; until it is answered the soaked set gates ... (held as the interim)") | test-engineer | interim | Decided; "interim" goes. | yes ("the soaked set's rows") |
+| Q4 | docs/adr/0003-rendering.md:1187-1188 ("the cold set of PM-0003-18 to -21 is reported beside the soaked set that gates until OQ-0003-20 is answered") | test-engineer | until answered | Drop "until OQ-0003-20 is answered". | no |
+| Q5 | docs/SPIKE_PLAN.md:370 ("the cold and soaked sets for OQ-0003-20") | engine-architect | hand-off to the Advisor | Drop the OQ-0003-20 hand-off. | no |
+| Q6 | docs/adr/README.md:81 (OQ-0003-20 row) | engine-architect | open | Answered. | yes (implicit) |
+END OQ-0003-20
+
+## OQ-0005-AB12, the Advisor: "tranek's write-up is accepted for concepts; any specific claim a record relies on is checked against Epic's documentation once it can be read."
+Settles AB12 as (a) for concepts, with (b) deferred: a check against Epic's documentation once it can be read (the
+kit PR that adds the domain, SRC-ACCESS). Partial: which specific claims a record relies on (none listed yet) and who
+lists them (game-designer, for its section) are not said.
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| A1 | docs/adr/0005-content-abilities-assets.md:1332-1340 (OQ-0005-AB12) | game-designer | "Proposed: (a), with (b) as a cheap check if the kit adds the domain. Decider: the Advisor." | "Answered by the Advisor (2026-11-03): ..." quoted. | yes |
+| A2 | docs/adr/0005-content-abilities-assets.md:796-798 (ability section, findings: "Epic's own documentation and the engine source were not read") | game-designer | not read | Add: accepted for concepts; specific claims checked once Epic's docs can be read (AB12). | no |
+| A3 | docs/adr/0005-content-abilities-assets.md:1166 (ability section, strongest argument against) | game-designer | "every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1)" | Optional pointer to AB12's answer. | no |
+| A4 | docs/adr/0005-content-abilities-assets.md:2014 (frame's open-question table row) and :2465 (Appendix A, R1-ABL-OQ1 "open: OQ-0005-AB12") | engine-architect (frame) | open | Answered. | no |
+| A5 | docs/adr/README.md:103 (row) | engine-architect | open | Answered. | no |
+END OQ-0005-AB12
+
+## OQ-0005-AB13, the Advisor: "scripting comes back only when a designed ability can't be built from data."
+Settles AB13's trigger, in words that differ from option (a): one designed ability that cannot be built from data
+(not the spike's marks 1 or 2, not "needed often"). Partial: whether a new reviewed Rust operation (the Rollback's
+one-mechanic path, :2416) still counts as "built from data", and whether (b), reading the Overwatch talk when a copy
+turns up, stays, are not said (the Advisor).
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| B1 | docs/adr/0005-content-abilities-assets.md:1341-1348 (OQ-0005-AB13) | game-designer | "(a) only if the content and ability spike's mark 1 or 2 fails ..., or if new operations turn out to be needed often; (b) read the talk first ... Proposed: (a), and (b) whenever a copy appears" | "Answered by the Advisor (2026-11-03): ..." quoted; options kept. | yes |
+| B2 | docs/adr/0005-content-abilities-assets.md:1166-1171 (ability section: "OQ-0005-AB13 names the trigger") | game-designer | the spike's marks as the trigger | The trigger as the Advisor words it. | no |
+| B3 | docs/adr/0005-content-abilities-assets.md:2415-2417 (Rollback: "if many fail, those mechanics fall back to option A4 ..., and OQ-0005-AB13 reopens scripting") | engine-architect (frame) | many failures reopen it | Align with "a designed ability that can't be built from data" (one is enough, if no data path exists). | no |
+| B4 | docs/adr/0005-content-abilities-assets.md:1936-1938 (Consequences, Revisit when: "the ability marks 1 or 2 fail (OQ-0005-AB13)") and :2263 (Pass marks, failure rule: "option A4 with E1's tables if many fail (OQ-0005-AB13)") | engine-architect (frame); test-engineer (:2263) | the marks as trigger | Align with the answer. | no |
+| B5 | docs/adr/0005-content-abilities-assets.md:2015 (frame table row "(proposed: if the spike's ability mark 1 or 2 fails, or new operations are needed often; ...)") and :2466, :2468 (Appendix A, R1-ABL-OQ2, R1-ABL-OQ9) | engine-architect (frame) | proposed trigger | The Advisor's trigger. | no |
+| B6 | docs/SPIKE_PLAN.md:347-348 (item 7: "the Advisor OQ-0005-AB13's trigger") | engine-architect | the spike gives the trigger | "the evidence for OQ-0005-AB13's rule (a designed ability that cannot be built from data)". | no |
+| B7 | docs/adr/README.md:104 (row) | engine-architect | open | Answered. | no |
+END OQ-0005-AB13
+
+## LATER, Mustafa: "a design session after the netcode proof test."
+Sets when the deferred questions are decided; answers none of them. The report's LATER list maps to these README
+rows: steals OQ-0004-8 (:84), carried caches OQ-0004-9 (:85), rejoins OQ-0004-10 (:86), full pools OQ-0004-11 (:87),
+bots and pickups OQ-0004-12 (:88), spawn protection OQ-0005-AB14 (:105), who sees picks OQ-0005-AB15 (:106),
+UPGRADE-SCOPE's three OQ-0005-AB1 to AB3 (:41-43), the look's tier floor OQ-0003-16 (:77), the deploy-job guard
+OQ-0006-13 (:125), releases OQ-0006-14 (:126), unreleased art OQ-0006-18 (:130). Partial: three of them carry their
+own timing in the drafts that may clash: OQ-0003-16 is Mustafa's "in the look proof test, on the Low frame and the
+techniques' measured costs" (the look test now runs fourth, after the session); OQ-0006-18 is due "before the first
+authored model is committed" (Mustafa's Blender blockouts); OQ-0006-13 is due "before the first client-host token is
+added" (SPIKE_PLAN:315; the preview hosting check may run alongside the proof test).
+| # | Place | Author | Current (short) | Change the answer asks for | In plan |
+|---|---|---|---|---|---|
+| LA1 | docs/adr/README.md:41-43, 77, 84-88, 105-106, 125-126, 130 (the twelve rows above) | engine-architect | deciders named, no session | Each row (or one sentence above the table) names "a design session after the netcode proof test (LATER, Mustafa, 2026-11-03)"; deciders unchanged. | yes ("README's later rows") |
+| LA2 | docs/adr/README.md:50 ("The design questions | The 38 research questions below that are pure design matters | Mustafa, or a later design session") | engine-architect | "a later design session" | The report's LATER list does not name the 38 DESIGN ids; whether they join that session is not said (advisor question). | no |
+| LA3 | the drafts' own OQ entries for the twelve (ADR 0004 :902, :915, :926, :938, :951; ADR 0005 :1188, :1200, :1208, :1349, :1367; ADR 0003 :898; ADR 0006 :896, :915, :975, at README's line pointers) | rust-reviewer; game-designer; graphics-engineer; infra-engineer | deciders and timings as written | Optional per rule 1: only if the plan wants each entry to carry the session; the words give timing, not answers. | no |
+| LA4 | STATUS (docs-keeper) | docs-keeper | none | The session after the netcode proof test. | yes |
+END LATER
+
+## Counts after the answers (for fixcheck-e; arithmetic on README:16-24, not re-verified by script)
+Fully answered numbered OQs: OQ-0001-1, -2, -3, -14, -16, -18 (6), OQ-0002-8 (1), OQ-0003-17, -20 (2), OQ-0005-1, AB12,
+AB13 (3), OQ-0006-17 (1), and OQ-SPIKE-1 (SPIKE_PLAN's own). Answered in part (they stay open, with what is left):
+OQ-0001-5 (value pending), OQ-0003-1, OQ-0006-5 (development case), OQ-0006-15, OQ-0006-20. If only fully answered
+ones leave the open count: README:23's "111 of them open" becomes 111 − 13 = 98 (OQ-SPIKE-1 counted apart); ADR 0001
+open 18 − 6 = 12; ADR 0002 8 − 1 = 7; ADR 0003 19 − 2 = 17; ADR 0005 36 − 3 = 33; ADR 0006 20 − 1 = 19; ADR 0004 10
+unchanged. Whether OQ-0001-5 counts as answered (rule decided, value pending) is the plan's call; if it does, 97.
+END COUNTS
+
+## Questions for the advisor (what the plan should ask before step 3)
+1. GLOSSARY §8 "The 60 Hz margin" (docs/research/GLOSSARY.md:782-797) is contradicted twice: it lists the margin and the research marks as all a 60 Hz tick needs (TICK-60-HEADROOM adds the goal budget at 60 Hz rooms per VM), and it says the margin "is measured in the netcode proof test" (TICK-60-SETUP makes that an early signal; slice 6 decides). A NOTE for the Advisor, or does the Advisor amend §8?
+2. TICK-60-HEADROOM's addition: which goal-budget figure must "hold" (ADR 0006 part 8 states two provisional ones, 361 and 534 EUR, and OQ-0006-19 and OQ-0006-10 are open), and which record owns the new 60 Hz rooms-per-VM mark: ADR 0001's 60 Hz group (beside PM-0001-39, -40) or a 60 Hz form of ADR 0006's PM-0006-14 (whose key says "none runs at 60 Hz")?
+3. TICK-60-SETUP: does a failing early signal still run the slice-6 measurement, and may a passing one start anything 60 Hz before slice 6 (PM-0004-72's 60 Hz builds; R1-TICK-OQ1's 60 or 64 Hz)?
+4. SPIKE-ORDER: the 60 Hz run now follows the sim core spike, so it runs after the netcode proof test ends. Does SPIKE_PLAN keep it as a run of the proof test (its server and harness kept, a new VM session), and does the proof test's "Done when" (ADR 0001 migration step 1, "with the tick rate") close without it?
+5. REWIND-CAP: which statistic is "the honest rewind the proof test measures at P2" (option (c) and PM-0001-49 say the p99; PM-0001-48 sizes its cap from the run's largest rewind), and rounded up to what (PM-0001-48 rounds to whole ticks)? Does "the smallest input buffer that holds" steer OQ-0001-6 (still the proof test's) toward a minimal 1-3 tick buffer, or include option (a), run on arrival? Do the checklist's 200/250 ms steps (10, 11) and the later Feel Lab weighing of the cap stay?
+6. NET-PROFILES: "loss as P2 defines it": 2 % on each direction (as PM-0001-3 already measures), so about 4 % of round trips lose a packet? The prose never states loss per direction.
+7. SPIKE-MACHINES: (a) does "sessions get SSH access only" mean a session holds an SSH key for spike VMs (OQ-0006-17 says the SSH key "raises the same question", and sessions never read secrets)? (b) Does the answer cover the tick bench (from slice 1) and the 3-hour soaks, which OQ-0006-17 also asks about? (c) "the CX33 runs the simulated clients": LG as one CX33 only (the drafts size LG by a calibration run, "one or more"), and does SH, the shared CX33 measured for rooms per VM, stay? (d) "Test PC: my own": does his PC stand in for ML or RD in the proof test's rows that name them (about 22 of 62 rows by grep), or is it MP only, with ML and RD still to be named (OQ-0003-1)? (e) OQ-0006-5: the WebSocket leg's trusted certificate on his domain still needs an issuance method on a spike VM (http-01 needs TCP 80 open, dns-01 a secret, tls-alpn-01 TCP 443), which touches the firewall marks and OQ-0006-16: the Advisor's short read?
+8. LOOK-TEST-INPUTS vs LOOK_V2 §8 (docs/LOOK_V2.md:69, "a 3D model in Spline: AI-generated for drafts, or a clean model built by Claude"): the drafts record Blender for the look test's models only and leave LOOK_V2 untouched; does §8 change (the plan's LOOK_V2-§8 item)? And do blockouts still carry ADR 0003 part 11's list (the two-floor house's interior and damage stages, the very large unit's 20 parts, the weapon, the second house), and which look-checklist steps can judge a blockout?
+9. OQ-0003-17: does "the p95 rows stay as diagnostics" mean only that they are not §6.9's reading (option (b) not chosen), or that the frame-time p95 rows (PM-0003-18 to -21) stop gating? The second would be a large change the words do not clearly make.
+10. OQ-0005-1: "a simulation id" literally covers every simulation kind (effects, abilities, modes, tuning tables); is the client-entry rule for the kinds that carry presentation only (units, vehicles, weapons, faction uniforms, building parts, props; factions for colours)?
+11. OQ-0005-AB13: does a new reviewed Rust operation still count as "built from data" (the Rollback's one-mechanic path), and does option (b), reading the Overwatch talk, stay?
+12. ROOM-CRASH: "keep the crash and match records": a retention period, or only "written, not lost"? And the drafts word the record two ways (ADR 0001 part 11 and PM-0001-59: "marked crashed"; ADR 0006 part 12: "a stub record marked incomplete"): one word?
+13. LATER: do the 38 DESIGN ids (README:50, "a later design session") join the session after the netcode proof test, and do OQ-0003-16 (decided in the look proof test, now after the session), OQ-0006-18 (before the first authored model) and OQ-0006-13 (before the first client-host token; the preview hosting check may run alongside the proof test) keep their own timings?
+14. Plan table corrections: TOY-BOX has no README row (nothing in the nine documents to edit); ENGINE_OVERVIEW changes at :3-4 (header), :15 (the 60 Hz rule) and :117 (OQ-0003-17); ADR 0006 needs rows for TICK-60-HEADROOM (part 8, spike item 2, PM-0006-14, key :1133/:1235) and OQ-0006-5's development case; README:47 names two crates where ADR 0002 names three.
+END QUESTIONS
