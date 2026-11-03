@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 07:31 Amsterdam
+- **Last update:** 2026-11-03 07:48 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 07:48: D3A-1's workflow (wf_267dcff8-48e) done: the skeptic PARTLY (facts hold; the fix named vectors PM-0004-22
+does not define); rust-reviewer's block applied as 7cc6942 (part 7: std promises correct rounding, rustc 1.97.0's
+div_euclid breaks it; both stay off the list and may join only once fixed inputs equal an exact reference, PM-0004-22
+extended; same line count). The skeptic's 31 MB of build output went into 294b3cf before it removed them (fe0f7be);
+note in `verifier-skeptic-6-scratch/REMOVED-LARGE-FILES.md`; every later prompt forbids binaries and files over 1 MB.
+Running: workflow wf_9d6ea220-1f3 (`prompts/workflow-pm22-repin.js`): test-engineer's PM-0004-22 extension
+(rust-reviewer's NOTE D3A-1-PM22) and engine-architect's re-pin of README's 23 pointers into ADR 0005. Next: apply
+both; then fixcheck-d3 units b, c, d (skeptics, a critic); docs-keeper-3; the report; the PR body; the final commit.
+
+Before that:
 Since about 07:30: workflow wf_0c35d4e2-382 done (game-designer 5 blocks, the pre-apply verifier PASS WITH NOTES, no
 line lost, net +2 lines) → applied as 361b61d (AB-3's heading and AB-1's Why line back; checks: guard PASS, 521/521,
 glossary exact 0, glued 0, 340 PM rows; pointers off 23, all into ADR 0005 from 1186, +2). Workflow wf_6c0e9508-f3b
