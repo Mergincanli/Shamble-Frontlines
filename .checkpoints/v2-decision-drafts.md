@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-01 19:06 Amsterdam
+- **Last update:** 2026-11-03 06:25 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,22 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Ninth spend-limit cut, 2026-11-02 about 21:20 Amsterdam ("resets 12:30am (UTC)", 01:30 Amsterdam): the touch-ups
+after fixcheck-d2 were running; game-designer's touch2 (agent a62575dec0f1fe2c5) failed at 21:19 with its notes saying
+F1b, F8, F9, F10 all hold, plus two lost lines of its own (AB-1's "Why" line, dropped by its RR-4 block; 0005:883's
+dangling "names, with no generic-engine feature."), and no block written yet; test-engineer's touch-up had written all
+11 blocks, only its final checks were missing. Mustafa, 2026-11-03 about 06:14 Amsterdam, in the session's chat:
+"Continue, usage was reached". The saver was restarted (rule 3). Done since: 750d46d, the test-engineer touch-up's 11
+blocks (fixcheck-d1 F6, F7, F12; fixcheck-d2 F1a, F2, F4, F5 ×3, F12, F13), each checked by the session against its
+source (LOOK_V2 lines 16, 50–52, 63; `docs/AUDIT_BUGS_PERF.md` line 27; the arithmetic) and inside "### Pass marks";
+checks after it: write guard PASS, 521/521 disposed, glossary exact 0, pointers 94/94, glued 0, 340 PM rows of 7 cells.
+No agent runs inside the night window (condition 17: units end before 00:10; the window ends 08:30). Next, at 08:30:
+resume game-designer's touch2 (F1b, F8, F9, F10, AB-1's "Why" line, the 0005:883 dangle); apply; if 0005's line count
+changes, the synthesis author re-pins README's pointers into 0005 (draft_pointers.py "off 0"); then a short re-check
+of the touch-ups (fixcheck-d3: 750d46d, the game-designer's commit, the re-pin; no fetching), the gate, the report's
+and appendix's placeholders, the PR body, and a final commit that runs CI.
+
+Before (2026-11-02 evening):
 Eighth spend-limit cut, 2026-11-02 about 17:50 Amsterdam ("resets 7:30pm (UTC)", 20:30 Amsterdam): test-engineer A (29
 FIX written) and B (30 FIX, 8 NOTE written) failed with HTTP 429; the saver had stopped (rule 3: restarted). Mustafa,
 about 20:32, in the session's chat: "I hit my usage limit while you were working, but it has reset now. Please
