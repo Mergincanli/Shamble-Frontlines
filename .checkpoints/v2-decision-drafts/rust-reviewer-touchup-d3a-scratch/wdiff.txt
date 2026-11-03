@@ -1,0 +1,6 @@
+   float `%` operator are not on the list. [-std 1.99.1 guarantees `rem_euclid` and `div_euclid`-]{+std's pages promise both methods+} "the rounded infinite-precision result"
+   [-(its `f32` and `f64` pages,-]{+(1.99.1's,+} read by the verifier on [-2026-11-02),-]{+2026-11-02, and 1.97.0's), yet 1.97.0's `div_euclid` gives 3, not 2, for+}
+{+   (3 + 2^-22) ÷ (1 + 2^-23) in `f32`, as does its `f64` analogue (verifiers fixcheck-d3a and skeptic-6, 2026-11-03). A+}
+{+   shared error passes a same-bits check, all determinism needs; correct rounding is a separate claim,+} so [-they-]{+both+} may join
+   {+only+} once [-PM-0004-22's unit vectors confirm it-]{+fixed inputs, those cases and their sign mirrors included, equal an exact reference+} on every [-target;-]{+target+}
+{+   (PM-0004-22, extended);+} no source read states[-the float-] `%`'s precision (the Rust Reference defines it only by truncating

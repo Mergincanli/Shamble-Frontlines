@@ -1,0 +1,18 @@
+   684–692); and the
+   exact non-arithmetic methods the rules themselves use, such as `is_finite`, `is_nan`, `to_bits` and `from_bits`.
+   Every other std `f32` and `f64` method is banned, and ADR 0002's lint is this list's complement. Among them are
+   `powi`, `hypot`, `cbrt`, `to_degrees` and `to_radians`, which std 1.99.1 marks non-deterministic as it does the
+   transcendental functions (R1-DET-F9, lines 648–654; rust-reviewer read the note on all five at the step-10
+   review), and `min`, `max` and `clamp`, which may return either zero for equal signed zeros, while `clamp` panics on
+   bad bounds (R1-DET-F14, lines 679–683). In their place the sim has three helpers of its own, written as plain
+   comparisons (`if a < b { a } else { b }` and the like): on equal inputs, signed zeros included, each returns one
+   defined argument, the same on every target, and none panics (a clamp whose bounds are the wrong way round returns a
+   bound); a degree value becomes radians by one multiply with a pinned constant. `rem_euclid`, `div_euclid` and the
+float `%` operator are not on the list. std's pages promise both "the rounded infinite-precision result" (1.99.1's,
+read by the verifier on 2026-11-02, and 1.97.0's), yet rustc 1.97.0's `div_euclid` gives 3 for (3 + 2^-22) ÷ (1 +
+2^-23) in `f32`, whose Euclidean quotient is 2, and its `f64` analogue errs too (verifier runs fixcheck-d3a and
+skeptic-6, 2026-11-03). A shared error passes a same-bits check, all determinism needs; correct rounding is a separate
+claim, so both may join only once fixed inputs, those cases and their sign mirrors among them, equal an exact
+reference on every target (PM-0004-22, extended); no source read states the float `%`'s precision (the Rust Reference
+defines it only by truncating division and the dividend's sign), and review, not the lint, catches the operator.
+Transcendental maths only
