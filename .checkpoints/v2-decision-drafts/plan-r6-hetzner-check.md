@@ -151,3 +151,24 @@ launched at about 18:47 was stopped before any block was written (its files hold
    each author checks that no sentence assumes a fixed address.
 7. **Counts:** if OQ-0006-1 and -2 are both answered: 115 numbered, 95 open (ADR 0006: 21 numbered, 16 open); pass
    marks 341.
+
+## Addendum 3 (about 19:06): his answers to MACHINES-TIMING and the domain, and "relaunch the round"
+Verbatim: `inputs/ANSWERS-3-mustafa-2026-11-03.md` (about 19:04). Also, earlier: `inputs/LG-COUNT-mustafa-2026-11-03.md`
+(about 18:56; the option he chose, in the session's wording: the run's plan adds as many CAX21s as its calibration
+needs, inside his cost cap). Proposed, for the advisor, folded into the same round (each author on its own text):
+1. **MACHINES-TIMING (c), with his step first.** The netcode proof test's Safari leg first checks "whether GitHub's macOS
+   runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport and can reach
+   the test servers"; if they can, "that is the Safari check", and the Mac is borrowed only for the look proof test; if
+   not, the Mac is borrowed before the netcode proof test. The laptop and desktop: "rough checks first, then a short
+   re-run once they're named". Places: SPIKE_PLAN's machines paragraph (MAC) and item 1's "Depends on" (the machines
+   clause of r5's condition 4), items 3 and 4's "Depends on" (the laptop and desktop: his words replace the advisor's
+   reading where they say the same); ADR 0001's key (MAC for the proof test's rows; test-engineer); ADR 0002's OQ-0002-5
+   and ADR 0006 part 8 already read the macOS runners' price from R5-CI-F17 (free on a public repository): a pointer at
+   most. Safari's WebTransport version is R2-TRN-F7's (from 26.4); the check reads the runner image's Safari on the day.
+2. **DOMAIN: registered.** Every "which I register" / "he registers … before the netcode proof test" becomes registered
+   (Mustafa, 2026-11-03: "shamblefrontlines.com is registered at Cloudflare."): ADR 0006 :290, :761, :983, :1367–1369
+   (infra-engineer); README :145 and SPIKE_PLAN :149 (engine-architect b); STATUS and the report: "For Mustafa" loses the
+   registration.
+3. **LG-COUNT answered:** the advisor's condition 4 sentence with his answer: a run whose bots one CAX21 cannot carry
+   under 80 % adds as many CAX21s as its 5-minute calibration shows, inside the cost cap he OKs for that run (the option
+   he chose, the session's wording). "Decisions needed" loses LG-COUNT and MACHINES-TIMING.
