@@ -70,3 +70,72 @@ END G4
   claims table, d3a section 1, d3b's claims) stand in for them, and ledger row 307's 7.49 ms is superseded by ADR
   0001:1047's 4.69 ms." After the edit, re-check: grep "ledger" in the report.
 END G3
+
+## G5 part 1: the skeptic tally (report:34; appendix:563-564)
+- Text: "five rounds: 30 upheld, 9 partly, 2 refuted".
+- Recount (scratch skeptic_tally.py and .out; every outcome row of each results file):
+  | Round | File | Upheld | Partly | Refuted | Its own count line |
+  |---|---|---|---|---|---|
+  | 1 | verifier-skeptic-1-results.md | 9 | 2 | 1 | :18 "9 upheld ... 2 partly ... 1 refuted" |
+  | 2 | verifier-skeptic-2-results.md | 6 | 6 | 1 | none; session checkpoint:231-232 lists the same 6/6/1 |
+  | 3 | verifier-skeptic-3-results.md | 4 | 1 | 0 | :15 "4 upheld ..., 1 partly ... None refuted" |
+  | 4 | verifier-skeptic-4-results.md | 5 | 0 | 0 | :16 "5 upheld, 0 refuted, 0 partly" |
+  | 5 | verifier-skeptic-5-results.md | 3 | 0 | 0 | parts (a)-(c), each "upheld" |
+  | 6 | verifier-skeptic-6-d3a-1.md | 0 | 1 | 0 | :46 "Verdict on D3A-1: PARTLY" |
+  Rounds 1-5 give 27 upheld, 9 partly and 2 refuted. With round 6: six rounds, 27 upheld, 10 partly and 2 refuted.
+- 30 cannot be rebuilt from the files. Counting skeptic-4's grouped rows one by one ("rows 27 and 33", "rows B14, B18,
+  B38") gives 30, but counting skeptic-2's "rows 110, A2, TE234" the same way gives 32. No counting rule yields 30.
+- Verdict: WRONG (count). Smallest fix, at report:34 and appendix:563-564: "six rounds: 27 upheld, 10 partly, 2
+  refuted". If the session prefers to count rounds 1-5 only, "five rounds: 27 upheld, 9 partly, 2 refuted", plus a
+  note that skeptic-6 judged D3A-1 (PARTLY).
+END G5 part 1
+
+## G5 part 2: "a skeptic re-checked every wrong or unsupported verdict" (report:33-34) and the deviation (report:66-68)
+- Text: report:33-34 "A skeptic re-checked every "wrong" or "unsupported" verdict first"; report:66-68 "for time, the
+  owner checked four "wrong" verdicts against their sources instead of a fresh skeptic (fixcheck-d0 row 9; fixcheck-d1
+  F1, F2, F10)".
+- The verdict files (rows read):
+  - fixcheck-d0: 1 "wrong in part", row 9 (d0 verdicts:19).
+  - fixcheck-d1, count line d1 verdicts:445: "3 wrong (N42, I18, I19); 3 unsupported (N12, I21, I24)". F1 is N42
+    (d1:104), F10 is I18 and I19 (d1:334), F2 is part 4's "no correction" (d1:175). N12 (d1:41) "unsupported (a review's
+    estimate, its parts not shown)"; I21 (d1:303) "the last unsupported"; I24 (d1:306) "the 15–30 hours unsupported (a
+    review's guess)".
+  - fixcheck-d2: rows 32 "wrong in part", 34 "wrong", 51 "unsupported as a LOOK_V2 expectation", 73 "confirmed, one
+    phrase unsupported", 77 "wrong in one word", 92 and 111 "wrong (structure)", 96 and S12 "wrong (stale)" (d2
+    verdicts:40, 42, 59, 81, 85, 100, 119, 104, 306): 9 rows.
+  - Skeptic rounds 1-5 all came before d0 (skeptic-5 judged fixcheck-c's B25). Skeptic-6 judged only D3A-1. So none of
+    d1's 3 unsupported rows and none of d2's 9 rows had a fresh skeptic. verifier-gdcheck dry-ran the game-designer's
+    fix blocks, which is a different check.
+- Verdict: WRONG (undercount), as the critic said. Substance: d3a and d3b judged every resulting fixed text against its
+  source (d3a section 3; d3b's claims), so no unchecked text results.
+- Smallest fix: report:33-34 "A skeptic re-checked every "wrong" or "unsupported" verdict of the drafts' verifiers and
+  of fixcheck-a to -c first"; report:66-68 "for time, the owners checked the wrong and unsupported verdicts of
+  fixcheck-d0, -d1 and -d2 (1, 6 and 9 rows) against their sources instead of a fresh skeptic; fixcheck-d3 then judged
+  every fixed text against its source, and skeptic-6 tested D3A-1".
+END G5 part 2
+
+## G5 part 3: the placeholders and the touch-up count
+- report:38 "{TOUCHN} in the touch-ups after them", report:43 "d3, on every touch-up: {D3}", report:44 "Scripts at
+  {HEAD}", appendix:561 "| The touch-ups after d1 and d2 (fixcheck-d3) | {D3} | | | |": all four still placeholders at
+  HEAD 100ce01. They are for the session to fill, not findings.
+- {TOUCHN}, own run (scratch rebuild_all.py, the critic's script with its output path moved to this scratch; output
+  rebuild_all.out): the nine touch-up fix files changed after 449356c (`git diff --name-only 449356c HEAD`: exactly
+  these nine) hold 53 FIX blocks (repin 23, test-engineer 11, infra 7, game-designer 5, netcode 3, and 1 each for
+  engine-architect 0002, synthesis, rust-reviewer and test-engineer PM22) and 3 NOTE blocks (rust-reviewer 2,
+  test-engineer PM22 1). Applying the 53 to 449356c in commit order gives HEAD byte for byte for all 8 changed docs,
+  with 0 BEFORE problems. Value: "53 fix blocks (and 3 notes)". CONFIRMED.
+- {D3}, for appendix:561 and report:43, from the five unit files: d3a PASS WITH NOTES (19 claims, 18 confirmed, 1
+  unsupported and labelled); d3b PASS WITH NOTES (33 / 33); d3c PASS WITH NOTES (sweeps, D3C-1 to -4); d3d 0 of 3 facts (no fetch);
+  this unit's G1 verdicts below. The session composes the line.
+END G5 part 3
+
+## G5 part 4: other Evidence numbers and D3C-4's count in the report
+| # | Report text | Checked against | Verdict |
+|---|---|---|---|
+| E1 | report:33 "3,922 claims, 3,847 confirmed (98.1 %)" | appendix §7.1 rows 549-555 (the six ADRs and the synthesis): 629+538+440+665+1,001+588+61 = 3,922; 609+515+431+657+997+581+57 = 3,847; 3,847 / 3,922 = 98.09 % | confirmed (the first verification only; the fix rounds' rows 556-560 are counted apart, as the report's next lines say) |
+| E2 | report:44 "521 of 521 research ids disposed exactly once" | verifier-fixcheck-d3c-scratch/dispositions.out "ids: 521; disposed: 521; missing: 0; more than once: 0" | confirmed (d3c's run at 78ccee8; no doc changed since, see G2) |
+| E3 | report:45 "README's 94 pointers into the drafts on target" | d3c-scratch/draft_pointers.out "pointers checked 94: ok 94, off 0" | confirmed (as E2) |
+| E4 | report:45 "the write guard passes" | d3c-scratch/write_guard.out "GUARD PASS" | confirmed (as E2) |
+| E5 | report:26 "114 numbered open questions (112 open)" | OQ-0003-14 answered (0003:885-886); d3c counts-HEAD | wrong (count): 111 open. This is D3C-4; it stands at HEAD (G4) |
+| E6 | report:68-70 "fixcheck-d3 then judged the four on their own: every verdict holds, and every fix is right but d0 row 9's wording ... (D3A-1, fixed after a skeptic)" | d3a verdicts:210-211 "Owner-checked verdicts: 4; all 4 hold; the fixes for d1 F1, F2 and F10 are right; d0 row 9's fix is right in its decision, its wording passes on a std claim the toolchain breaks (D3A-1)"; skeptic-6:46 PARTLY; 7cc6942 and b513483 | confirmed |
+END G5 part 4

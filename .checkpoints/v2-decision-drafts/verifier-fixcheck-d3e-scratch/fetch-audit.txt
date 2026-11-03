@@ -1,0 +1,4 @@
+08:30:06|www.w3.org|https://www.w3.org/TR/webgpu/|200|4521455|0.660864
+08:30:32|www.w3.org|https://www.w3.org/TR/webgpu/ (2nd read, wider context)|200|4521455|0.536915
+08:30:47|www.w3.org|https://www.w3.org/TR/webgpu/ (3rd read: status, §22.2)|200|4521455|0.551854
+08:31:01|www.w3.org|https://www.w3.org/TR/webgpu/ (4th read: §22.2 validation steps)|200|4521455|0.603261

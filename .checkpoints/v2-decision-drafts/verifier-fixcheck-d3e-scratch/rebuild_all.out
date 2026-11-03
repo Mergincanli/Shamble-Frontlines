@@ -1,0 +1,19 @@
+blocks 53 problems 0
+Counter({'touchup3-engine-architect-repin-fixes.md': 23, 'touchup-test-engineer-fixes.md': 11, 'touchup-infra-engineer-fixes.md': 7, 'touchup2-game-designer-fixes.md': 5, 'touchup-netcode-architect-fixes.md': 3, 'touchup-engine-architect-0002-fixes.md': 1, 'touchup2-engine-architect-synthesis-fixes.md': 1, 'rust-reviewer-touchup-d3a-fixes.md': 1, 'test-engineer-touchup-pm22-fixes.md': 1})
+docs/SPIKE_PLAN.md identical to HEAD
+docs/adr/0001-multiplayer-netcode.md identical to HEAD
+docs/adr/0002-code-structure-build-toolchain.md identical to HEAD
+docs/adr/0003-rendering.md identical to HEAD
+docs/adr/0004-simulation-core.md identical to HEAD
+docs/adr/0005-content-abilities-assets.md identical to HEAD
+docs/adr/0006-infrastructure-operations.md identical to HEAD
+docs/adr/README.md identical to HEAD
+touchup-engine-architect-0002-fixes.md FIX=1 NOTE=0
+touchup-netcode-architect-fixes.md FIX=3 NOTE=0
+touchup-infra-engineer-fixes.md FIX=7 NOTE=0
+touchup2-engine-architect-synthesis-fixes.md FIX=1 NOTE=0
+touchup-test-engineer-fixes.md FIX=11 NOTE=0
+touchup2-game-designer-fixes.md FIX=5 NOTE=0
+rust-reviewer-touchup-d3a-fixes.md FIX=1 NOTE=2
+test-engineer-touchup-pm22-fixes.md FIX=1 NOTE=1
+touchup3-engine-architect-repin-fixes.md FIX=23 NOTE=0
