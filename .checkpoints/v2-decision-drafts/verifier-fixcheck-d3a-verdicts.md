@@ -89,3 +89,136 @@ d1 findings no block fixed, against the appendix §7.3 deferred list
 - Stale in the list: lines 599–600 still defer "Part 4's 'causes no correction' may read 'no correction beyond the
   one at the first snapshot that carries it'", which FIX F2 applied in 7858762 (0001:189). Finding D3A-2.
 
+README's line pointers into ADR 0001, 0002 and 0006 (32 rows): all 32 still land on their OQ heading (script check).
+
+## 3. The four owner-checked verdicts
+
+**fixcheck-d0 row 9 (ADR 0004 part 7, the precision of `rem_euclid`, `div_euclid` and the float `%`).**
+- Original verdict: "wrong in part (rem_euclid, div_euclid); abs can now cite std": the draft's reason "no source read
+  here states their precision" is overtaken, since std 1.99.1's `f32` and `f64` pages state "§Precision The result of
+  this operation is guaranteed to be the rounded infinite-precision result" for both; the Reference states nothing for
+  `%`. Proposed fix: quote std, keep both off the list until PM-0004-22 confirms.
+- Owner's check (rust-reviewer-fixes-final-d.md:3): read d0's excerpt (X9), noted the `rem_euclid` excerpt is abridged
+  (heading elided), "matches the std source as I know it", and applied d0's words (ADR 0004:259–262, 271–277; commit
+  604a497). fixcheck-d2 confirmed the applied text against d0's row (d2 rows 59, 61), not against the code.
+- The source: verifier-fixcheck-d0-scratch/excerpts.md:118–127 holds the `f32` lines (div_euclid with "§Precision",
+  rem_euclid's sentence without its heading, `abs`) and the Reference's `%` line; the `f64` page's lines (d0's "txt
+  313–339") were not saved, so the `f64` half rests on d0's word. Fetch audit: audit.tsv rows 4–5, HTTP 200.
+- Skeptic test (no fetch: the local toolchain, rustc 1.97.0 of 2026-07-07; source and output in
+  verifier-fixcheck-d3a-scratch/div_euclid_check.rs and .out): `a = 3 + 2^-22`, `b = 1 + 2^-23` (both exact in f32);
+  `a = 2b + 1` exactly with `0 ≤ 1 < b`, so the Euclidean quotient is exactly 2 (representable). rustc 1.97.0 gives
+  `a.div_euclid(b) = 3` and `a.rem_euclid(b) = 1`, so `q·b + r ≠ a`; the f64 analogue (`3 + 2^-51`, `1 + 2^-52`) gives 3
+  too. Cause: `self / rhs` rounds up to 3.0 before the truncation. So on 1.97.0 `div_euclid` is not the rounded
+  infinite-precision result; whether 1.99.1 changed the code behind its new §Precision line is unverified (no fetch).
+  `rem_euclid` matched the exact remainder here (it is one rounding of an exact sum).
+- Verdict holds: yes. As a reading of the source it is right: the std page states the guarantee, so "no source read
+  here states their precision" was overtaken.
+- Fix right: in its decision, yes (both stay off the allow-list until a test says otherwise, and determinism needs
+  only that a composition of `/`, `trunc`, `%` and `±` agree across targets). In its wording, not quite: "std 1.99.1
+  guarantees `rem_euclid` and `div_euclid` 'the rounded infinite-precision result' … so they may join once PM-0004-22's
+  unit vectors confirm it" (ADR 0004:272–274) passes on std's claim for `div_euclid` as fact, while the toolchain one
+  release earlier breaks it on a 2-line input; PM-0004-22 compares outputs across targets (`to_bits`) and only `sqrt`
+  against a correctly rounded reference, so its unit vectors would not catch this unless they are told to. Finding
+  D3A-1 (low, outside this unit's three ADRs; author rust-reviewer, words fixcheck-d0's).
+
+**fixcheck-d1 F1 (ADR 0001 OQ-0001-2, the planning-check figure with S1's stand-ins).**
+- Original verdict: 7.49 ms is the check without the 2.80 ms remainder; with it, 8.33 + 3.64 = 11.97, so 4.70 ms.
+- Owner's check (touchup-netcode-architect-notes.md, 21:20 and 21:33): holds; read ADR 0004 S1 (0004:982) and
+  PM-0004-2 (0004:1107): the remainder is topped up every tick; 4.69, not 4.70 (unrounded 16.6667 − 8.3333 − 3.6435).
+- The source: GLOSSARY:53–69 (sim share 5.53 of 8.33; server-only 3.64; sum 9.18 of 16.67 at 30 Hz); ADR 0004:982
+  "the 2.80 ms remainder topped up per tick"; ADR 0001:1036–1039.
+- Recomputed: 3.6435 = 2.40 + 0.4667 (700 × 20 µs ÷ 30) + 0.70 + 0.0768; with the top-up the sim share is its whole
+  8.3333; 16.6667 − 11.9768 = 4.6899. 16.67 − 9.18 − 2.80 = 4.69.
+- Verdict holds: yes. Fix right: yes, and 4.69 is the better figure; the expression shown evaluates to it exactly.
+
+**fixcheck-d1 F2 (ADR 0001 part 4, "causes no correction").**
+- Original verdict: part 4 never predicts picks or own abilities, so the first snapshot after a server-side change
+  corrects; PM-0001-60 marks "at most one correction, at the first snapshot that carries the change".
+- Owner's check (touchup-netcode-architect-notes.md, 21:20): holds (0001:191–193; 0001:1428).
+- The source: 0001:190–193 at HEAD lists "upgrade offers and picks" and "the player's own abilities until ABL-PREDICT
+  is answered" under "Never predicted"; PM-0001-60 (0001:1429) as quoted, and its own source cell: "while picks and own
+  abilities are never predicted (part 4), the first snapshot after a change corrects, so the mark is none after it".
+- Verdict holds: yes. Fix right: yes (0001:189 "no correction after the first snapshot that carries it"). Stale
+  leftover: the appendix still defers this wording (D3A-2).
+
+**fixcheck-d1 F10 (ADR 0006 part 15 and OQ-0006-14 describe ADR 0001's old mismatch row).**
+- Original verdict: "every room still on the old binary refuses a new client … the client's reload fetches the same
+  new bundle, so it cannot recover" and "(part 6)" no longer match ADR 0001 part 11 (routing by build) and its failure
+  table (one reload, only for a newer build); option (b)'s "a field ADR 0001's directory would add" is stale.
+- Owner's check (touchup-infra-engineer-fixes.md:7–13, 64–75): holds; read 0001:495–496 and :719 at 449356c;
+  "(part 6)" points at ADR 0001's snapshots; found one more stale place, part 6's "routing joins by build is
+  OQ-0006-14's" (0006:272–273).
+- The source: ADR 0001 at HEAD (unchanged at these lines since 604a497): 0001:494–498 "the directory records each
+  room's build, protocol version and content hash, so the lobby can send a client only to rooms that match it (needed
+  if releases run live, harmless in a release window: how releases reach running rooms is OQ-0006-14)"; 0001:719
+  "a `JoinRejected` for a mismatch reloads the client once, and only if the lobby names a newer build than its own;
+  otherwise the client shows the reason and returns to the lobby, so a refused client never loops"; 0001:255 part 6
+  is "Snapshots, encoding and events", 0001:445 part 11 "Rooms, the lobby and bots".
+- Verdict holds: yes. Fix right: yes, all four blocks (and part 6's fifth place was needed); no stale wording left in
+  docs/ (grep "cannot recover", "same new bundle", "directory would add", "reload fetches": the one hit, 0006:205, is
+  the staging certificate's reload, another topic).
+
+## 4. The rules, on the changed text only
+
+- Glossary (`python3 .checkpoints/v2-decision-drafts/scripts/glossary_check_drafts.py`, from the repository root, at
+  HEAD): exact hits 0 in every draft (0001: in context 138; 0002: 59; 0006: 98, the counts the owners reported before
+  and after). On the 41 changed lines one in-context hit: 0001:672 "48" in "at most 48 kbps" (a bandwidth, not the
+  largest mode's N; the line was only rewrapped). Output: verifier-fixcheck-d3a-scratch/glossary-head.txt and
+  glossary-hits-head.tsv.
+- Rule 2, a number with no source: none left. The 15–20 B, the 6 B and the 15–30 RS-hours now carry "proposed" with
+  their source (the perf and infra reviews), as d1 F13 asked; 4.69, the four replay depths and 2.08–4.16 EUR are shown
+  arithmetic on cited numbers.
+- Rule 3, a "not researched" option proposed as the decision: none in the changed words. (Part 15's "Interim position
+  (proposed)" is OQ-0006-14's option (a), unchanged words only rewrapped by FIX F10; the question stays open.)
+- Rule 6, the look: nothing in the changed text touches it.
+- A settled input reopened: none (4.69 ms and the V-S key are TICK-30's 30 Hz figures; nothing reweighs 60 Hz).
+- A sentence directly under a table: none (0001:1431 and 0006:1179 are rows inside their tables; the V-S key is a list).
+- Cross-draft: no other doc quotes the old 7.49 ms for the stand-in case (0001:963's 7.49 is the check without them);
+  docs/reports/2026-10-31-v2-research-appendix.md:192 already gives 4.69 ms (3.69 on a re-flood tick) at 30 Hz, which
+  agrees.
+
+## 5. Findings, ranked
+
+1. **D3A-1 (low; ADR 0004, outside this unit's three ADRs; the d0 row 9 fix), `div_euclid`'s "guarantee" is
+   contradicted by the toolchain.** Current text (ADR 0004:272–274): "std 1.99.1 guarantees `rem_euclid` and
+   `div_euclid` "the rounded infinite-precision result" (its `f32` and `f64` pages, read by the verifier on 2026-11-02),
+   so they may join once PM-0004-22's unit vectors confirm it on every target". Source: the quote matches std's page
+   (d0 excerpts.md:118–124), but on rustc 1.97.0 (local, 2026-07-07) `(3 + 2^-22).div_euclid(1 + 2^-23)` returns 3,
+   while `3 + 2^-22 = 2 × (1 + 2^-23) + 1` exactly, so the Euclidean quotient is 2 and `q·b + r ≠ a`
+   (verifier-fixcheck-d3a-scratch/div_euclid_check.rs and .out; f64 the same). Whether 1.99.1's code differs is
+   unverified (no fetch). PM-0004-22 checks outputs across targets by `to_bits` and only `sqrt` against a correctly
+   rounded reference, so "confirm it" would not catch this by default. The decision (both off the list for now) is
+   safe. Smallest fix: "std 1.99.1's pages state that `rem_euclid` and `div_euclid` return "the rounded
+   infinite-precision result" (…), but rustc 1.97.0's `div_euclid` returns 3 for (3 + 2^-22) ÷ (1 + 2^-23), whose
+   exact quotient is 2 (verifier fixcheck-d3a), so they may join only once PM-0004-22's unit vectors, that case among
+   them, match an exact reference on every target". Author: rust-reviewer (the applied words are fixcheck-d0's).
+2. **D3A-2 (low; the report's appendix), a deferral that is now done.** Current text
+   (docs/reports/2026-11-01-v2-decision-drafts-appendix.md:599–600): "Part 4's "causes no correction" may read "no
+   correction beyond the one at the first snapshot that carries it"." Source: ADR 0001:189 at HEAD, "causes no
+   correction after the first snapshot that carries it" (FIX F2, commit 7858762). Smallest fix: delete that sentence
+   from the bullet (or end it "(done: fixcheck-d1 F2, 7858762)"). Author: the main session (the appendix's writer).
+
+No finding in the changed text of ADR 0001, 0002 or 0006: 0 wrong, 0 citation off, 0 inconsistent, 0 rule breaches.
+
+## 6. Counts and verdict
+
+- Claims judged: 19 (ADR 0001 6, ADR 0002 1, ADR 0006 12); confirmed 18; unsupported but labelled "(no source read)"
+  as the rules ask 1 (C15); wrong 0; citation off 0. Arithmetic recomputed: 4 groups, all right.
+- Blocks judged: 14 (netcode-architect 3, infra-engineer 7, engine-architect 1, test-engineer 3); every one resolves
+  its finding; 0 add a problem; rebuilt from 449356c they give HEAD exactly.
+- d1 findings no block fixed: F3 and F8 deferred with reasons in the appendix §7.3; F15 done by the synthesis at 449356c.
+- Owner-checked verdicts: 4; all 4 hold; the fixes for d1 F1, F2 and F10 are right; d0 row 9's fix is right in its
+  decision, its wording passes on a std claim the toolchain breaks (D3A-1).
+- Verdict: **PASS WITH NOTES** (two low findings, neither in the three ADRs' changed text).
+
+## 7. Fetch audit and not verified
+
+- This unit fetched nothing (0 requests). Web facts rest on fixcheck-d0's excerpts (verifier-fixcheck-d0-scratch/).
+- Not verified: the `f64` page's §Precision lines (d0's text dump lines 313–339 were not saved; d0's word); whether
+  rustc 1.99.1's `div_euclid` differs from 1.97.0's (no fetch, no 1.99.1 toolchain); SO_REUSEPORT's behaviour behind
+  C15 (socket(7) not read; the text no longer depends on it).
+
+- HEAD moved to 5c74e7c during the check (cda0577, 5c74e7c: checkpoint autosaves); `git diff f9ec6c8 HEAD -- docs/` is
+  empty, so every verdict above holds at 5c74e7c.
+
+DONE
