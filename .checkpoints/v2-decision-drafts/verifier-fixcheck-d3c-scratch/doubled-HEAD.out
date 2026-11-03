@@ -1,0 +1,34 @@
+=== docs/adr/0001-multiplayer-netcode.md (1804 lines): 0 item(s)
+=== docs/adr/0002-code-structure-build-toolchain.md (1627 lines): 0 item(s)
+=== docs/adr/0003-rendering.md (1516 lines): 0 item(s)
+=== docs/adr/0004-simulation-core.md (1411 lines): 0 item(s)
+=== docs/adr/0005-content-abilities-assets.md (2502 lines): 23 item(s)
+  (1) heading x3 at lines [176, 755, 1441]: ### Context (this section)
+  (1) heading x3 at lines [251, 836, 1495]: ### Decision (this section's parts)
+  (1) heading x3 at lines [516, 1036, 1590]: ### Options considered (this section)
+  (1) heading x3 at lines [597, 1160, 1619]: ### Trade-off analysis (this section)
+  (1) heading x3 at lines [618, 1180, 1630]: ### Open questions (this section)
+  (1) heading x4 at lines [688, 1379, 1664, 1839]: ### What a spike must prove (this section's part)
+  (2) bold item id CD-1 (indent 0) x2 at lines [261, 693]
+  (2) bold item id CD-2 (indent 0) x2 at lines [272, 696]
+  (2) bold item id CD-3 (indent 0) x2 at lines [314, 706]
+  (2) bold item id CD-4 (indent 0) x2 at lines [336, 714]
+  (2) bold item id CD-7 (indent 0) x2 at lines [387, 717]
+  (2) bold item id CD-8 (indent 0) x2 at lines [408, 723]
+  (2) bold item id CD-9 (indent 0) x2 at lines [428, 728]
+  (2) bold item id CD-10 (indent 0) x2 at lines [441, 732]
+  (2) bold item id OQ-0005-CD2 (indent 0) x2 at lines [625, 736]
+  (2) bold item id AB-1 (indent 0) x2 at lines [845, 1383]
+  (2) bold item id AB-3 (indent 0) x2 at lines [903, 1392]
+  (2) bold item id AB-4 (indent 0) x2 at lines [916, 1396]
+  (2) bold item id AB-5 (indent 0) x2 at lines [934, 1400]
+  (2) bold item id AB-6 (indent 0) x2 at lines [952, 1403]
+  (2) bold item id AB-8 (indent 0) x2 at lines [993, 1413]
+  (2) bold item id AB-9 (indent 0) x2 at lines [1014, 1431]
+  (2) bold item id AB-10 (indent 0) x2 at lines [1019, 1429]
+=== docs/adr/0006-infrastructure-operations.md (1486 lines): 0 item(s)
+=== docs/ENGINE_OVERVIEW.md (145 lines): 0 item(s)
+=== docs/SPIKE_PLAN.md (450 lines): 1 item(s)
+  (3) table first cell x2 in one table at lines [81, 84]: |–|
+=== docs/adr/README.md (374 lines): 0 item(s)
+TOTAL 24
