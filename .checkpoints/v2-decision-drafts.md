@@ -51,6 +51,19 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 22:28: Mustafa answered MACHINES-TIMING ((c) with the GitHub macOS runner step first), the domain
+(registered) and asked to relaunch (inputs/ANSWERS-3-…, about 19:04; the limit cut him at about 19:10, reset 22:20).
+The advisor's AMENDMENT 2 (advisor-verdict-r6.md) rules on them: the runner may stand as MAC only for the proof test's
+yes-or-no Safari rows after checks (i)-(iii); counts unchanged (116/96; ADR 0006 22/17; 341); no decisions left open
+from PR #33. The authors' round runs as units r6b-* in three workflows, all six started at about 22:28 (before 23:00):
+wf_517aa847-e81 (infra-engineer, test-engineer), wf_cf759706-250 (netcode-architect, engine-architect b),
+wf_6ed90fe4-766 (rust-reviewer, engine-architect a); resume each with resumeFromRunId if cut. Next: ownership checks,
+apply in order (per doc: test-engineer first, then the section owner), commit; scripts (quotes against the ten inputs;
+amended condition 14's greps; counts 116/96, 22/17, 341); the gate; docs-keeper (high; no new agent after 23:00: if
+the round ends after 23:00, docs-keeper waits for the morning or the session writes STATUS's lines itself after
+asking); the report; the close.
+
+Before that:
 At 18:56 (Mustafa: 98 % usage, save; he continues soon): the advisor AMENDED its verdict on plan revision 6
 (advisor-verdict-r6.md, its "AMENDMENT (verbatim)" section: 16 conditions that replace 1-13): Falkenstein (`fsn1`)
 everywhere; OQ-0006-1 and -2 answered; DS and the CCX13 dropped; SH leaves the proof test, K3 waits; MV becomes a role
