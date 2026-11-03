@@ -3,3 +3,4 @@
 - 0001 done: 46 claims confirmed, no findings yet. next: 0002 diff
 - 0002 done: 17 claims; F1 (PM-0002-49 per-direction loss via part 8), F2 ("the real sim" wording at 0002:1087) to write. next: write findings, then 0004
 - 0004 done: 14 claims confirmed. F3 (0004 migration row 0 wording). rules done. next: findings block, final
+- findings F1-F3 written, result written. DONE

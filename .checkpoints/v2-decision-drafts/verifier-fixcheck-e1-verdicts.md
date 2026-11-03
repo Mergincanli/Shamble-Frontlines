@@ -118,3 +118,35 @@ END CLAIMS 0004
   (open 12); 0002 8, answered -8 (open 7); 0004 12, none answered (open 12).
 - Options kept: every answered OQ keeps its Options list (OQ-0001-1, -2, -3, -5, -14, -16, -18; OQ-0002-8 read).
 END RULES
+
+## Findings (ranked; all low; HEAD 5bd2849, my three files unchanged since 59d41e0)
+
+F1 (low, unmarked reading, test-engineer: stop-test-engineer-0002-fixes.md) 0002:1272 PM-0002-49
+- Current: "within 5 % (relative) of the per-direction values of P0–P4 and B1, as part 8 splits them (as PM-0001-3
+  reads them; ...)".
+- The words / ruling: NET-PROFILES (the Advisor) splits latency and jitter half each way; part 8 (0002:514-515) says
+  "loss is as the profile defines it". The 2 % per direction is the advisor's reading, marked so only in ADR 0001
+  part 13; PM-0002-49 attributes the per-direction loss to part 8's split.
+- Smallest fix: "... as part 8 splits latency and jitter and ADR 0001 part 13 reads the loss (the advisor's reading,
+  2026-11-03) ...".
+END F1
+
+F2 (low, over-read in wording, engine-architect-a: stop-engine-architect-a-fixes.md) 0002:1086-1087
+- Current: "the sim core spike's sim, which exists by then, serves the marks that need the real sim (the advisor's
+  reading, 2026-11-03)".
+- The ruling: SPIKE-ORDER bullet 2: "The boundary spike now uses the sim core spike's sim". "The real sim" elsewhere
+  (verdict :77, :160) is slice 6's real crate; the spike's sim is a throwaway spike sim.
+- Smallest fix: "serves the marks that need a sim beyond the stand-in".
+END F2
+
+F3 (low, inconsistent, rust-reviewer: stop-rust-reviewer-fixes.md; not on the map's list) 0004:1245 migration phase 0
+- Current: "| 0 | Mustafa and the Advisor approve the drafts | the sign-off line of this record |" (unchanged).
+- The words: STATUS-FIELD (b), condition 4: signed off "as the basis for the spikes (2026-11-03, SPIKE-ORDER (b))";
+  0002:1391 and 0001:1649 record step 0 as done; 0004 still reads as a future approval.
+- Smallest fix: "| 0 | The drafts signed off by Mustafa as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)) | the
+  sign-off line of this record |".
+END F3
+
+## Result
+PASS WITH NOTES: 77 claims judged, 77 confirmed (2 with a note: #56, #60); rebuild identical; rules clean; 3 low findings.
+END RESULT

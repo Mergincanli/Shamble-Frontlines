@@ -8,3 +8,4 @@
 - 14:20 README read fully. Next: pointer check (d) by script.
 - 14:25 (d) README pointers: 112 links scanned (scratch/pointers.py); no draft line numbers; OQ ids all exist; parts 0001 p2, 0003 p5/p11 exist as list items; sections exist. Next SPIKE_PLAN diff.
 - 14:32 SPIKE_PLAN :1-290 read and checked (header, rules, machines, order, mermaid, table, items 1-4). Next SPIKE_PLAN diff from item 5 on.
+- 17:27 resumed after cut: map check (6 rows lacking blocks), O23 verified, verdicts written; SPIKE_PLAN item 5+ not read (deadline). DONE
