@@ -1,0 +1,10 @@
+# Advisor verdict: plan revision 6 (Mustafa's Hetzner console check), v2-decision-drafts
+
+Status: IN PROGRESS (notes first, verdict below once written)
+
+## Notes
+- 18:32 started: no r6 verdict existed. Read plan r6, HETZNER-CHECK words file, verdict r5 (cond. 8, COUNTS 115/97, 0006 21/18), verdict r4 (SPIKE-MACHINES (c) "LG is a CX33 as written"; cond. 7-9). Branch tip 898ba05 (autosave). Next: his earlier words files, then grep CX33 over the nine docs.
+- 18:34 grep CX33 over the nine docs: 0001 x4 (1293, 1354, 1356, 1527=PM-0001-63), 0004 x3 (1032, 1117=PM-0004-1, 1120=PM-0004-4), 0006 x27, README x1 (133), SPIKE_PLAN x3 (32, 33, 129), 0002/0003/0005/ENGINE_OVERVIEW 0. Plan's map misses as listed places: 0006:1268 (PM-0006-12's machine "one throwaway CX33 per offered location": the ping-target role, a role the plan doesn't name) and 0006:1274 (PM-0006-18's planning price "0.0144 EUR (CX33) an hour"); both routed to test-engineer but not in the map. GLOSSARY:227, :605 base text (CX33).
+- R6-HOST-REC2 (r6:645-655): "Arm (CAX) stays an option only after R1-DET-REC6's matrix includes it" (server CPU); "Shared CX33 is 9.6 times cheaper". F13: verifier's re-read "NBG1 HEL1" (no FSN1) for CX33, CAX21, CCX23... unverified. F15: CAX21 10.99 (0.0176), CPX32 35.99 (0.0577), excl. VAT.
+- 18:33 COURSE CORRECTION from the session: HETZNER-CORRECTION file read (his words: "the game server is a CCX23 for development and "does it work" runs. The CCX23 (dedicated) is used only for the measurement runs: tick timing, the 60 Hz margin and rooms per VM. Each run's plan says which server it needs."). Sentence 1 contradicts sentence 2 (session asks him). Screenshot (session's description): order summary "Nuremberg" (his note says Falkenstein; session asks). Session's 86.49 x 1.21 = 104.65 is its arithmetic, matches the TOTAL incl. IPv4 line, VAT rate not on the page: never written as fact.
+- Key insight: if the location turns out to be Nuremberg, his CX33 finding ("in Falkenstein") may not hold there, so SH/MV/staging may stay CX33 (research's x86 pick): HZ-SH depends on the location answer. Ask him in the same question.

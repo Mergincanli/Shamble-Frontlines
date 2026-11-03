@@ -51,6 +51,15 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 18:35: Mustafa's Hetzner check (about 18:26), his correction (18:32) and his answers to the session's two
+questions (18:38: the CCX13 for development and "does it work" runs; Nuremberg) saved verbatim in inputs/HETZNER-*.md
+and in appendix §2; the close is on hold. Plan revision 6 (`plan-r6-hetzner-check.md`, with its addendum) is with the
+advisor (xhigh; verdict to advisor-verdict-r6.md; both later messages sent to it). Next: on APPROVE, one author round
+(xhigh: infra-engineer, test-engineer, netcode-architect, rust-reviewer, engine-architect a and b), ownership checks,
+apply, the scripts (all four Hetzner inputs in the quote check; a CX33 grep), the gate, docs-keeper (STATUS), the
+report (the Hetzner rows, For Mustafa without the console check), then the close (r4 conditions 7–9).
+
+Before that:
 At 18:24: the r5 fix round applied as 0aa262f (59 FIX, 21 NOTE, every block inside its author's text);
 the scripts clean (guard PASS, 521/521, glossary exact 0, glued 0, 341 PM rows of 7 cells without gaps, 115/97,
 172 credited quotes word for word, labels per conditions 3–5, 114 README pointers); gate 1–4 and 5b–5d PASS (5a
