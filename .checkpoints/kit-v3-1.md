@@ -9,7 +9,7 @@
   task (Mustafa: "From now on you're the only session on this task"; his PC session is closed). Its main folder
   `/home/user/Shamble-Frontlines` stays on `claude/sleepy-tesla-ofsxsr` = main and is never switched; the build runs in
   the worktree `<scratchpad>/kit-v3-1` on local `cs/kit-v3-1`.
-- **Last update:** 2026-11-04 00:20 Amsterdam
+- **Last update:** 2026-11-04 00:16 Amsterdam
 
 ## Steps done
 1. Context recovered; plan revision 1 (frozen session) read and verified against live code.
@@ -33,19 +33,27 @@
    hits are dated records (STATUS:230, LEGACY_INVENTORY KT14 (the advisor's 2026-10-28 nit), reports).
    On af0c5dc: routine-guard 192/192, settings 82/82, checkpoint 25/25, repo map OK (113 entries / 100 paths); gate vs
    origin/main e4d8b22 (`--no-smoke`, GATE-SETUP (a)): 1–4 and 5b–5d PASS, symbols +0 −0.
+9. **Steps 2–3, the GUARD-FILE fix: 537c7a8**, pushed. `.claude/settings.json`: the three guard handlers run
+   `node -e <BOOT> ${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs`; BOOT byte-identical to plan revision 2's text (C3,
+   checked by script), the three handlers identical (C2). `settings.test.mjs`: the registration test also checks the
+   `-e` + BOOT shape (no `$ " \` & | < > ^ %` in BOOT); 16 new tests (handlers identical; guard.mjs removed × 3 events ×
+   {day, night-shift, pr-advisor, not-a-role}; the routine's stderr; a syntax-error guard.mjs; guard.mjs present through
+   the bootstrap: day `git checkout main` deny, routine `curl` deny, routine ConfigChange block, day `git status` no
+   decision). `guard.mjs`: header comment only; code lines identical to 5be7d37 (C7). `routine-guard.mjs` identical to
+   5be7d37 (C6). Results on 537c7a8: settings 98/98, routine-guard 192/192, checkpoint 25/25; gate (`--no-smoke`) PASS,
+   symbols +0 −0. **Defect proof (C1):** the same test file against 5be7d37's settings.json: 92/98, failing exactly the
+   registration test's bootstrap shape, the three "removed, day session" cases, the stderr case and the syntax-error
+   case; the nine "removed, routine" cases and the "present" case pass on both (routines were always blocked).
 
 ## Current step
-Step 2, the GUARD-FILE fix (settings.json three handlers → `-e` + the exact promise-only BOOT of plan revision 2, C3;
-settings.test.mjs tests a–d with the defect proof, C1/C2; guard.mjs header comment, C7). A scratch draft of the tests
-(this session, written against the revision-1 BOOT) already showed old settings 6 fails / new settings 99/99; it is
-re-done on the revision-2 BOOT in the worktree.
+Step 4, docs: docs-keeper on STATUS, ROADMAP and REPO_MAP (C5, F1, F2), then my "Update" section in #30's report (C6,
+F4, F5).
 
 ## Next steps
-1. Step 2 fix → commit, push. 2. Step 3 gate (`--no-smoke`) + tests; defect proof on 5be7d37's settings recorded.
-3. Step 4 docs-keeper (C5 + F1–F3), my report section (C6 + F4, F5). 4. Step 5 security-auditor on the fix (Q3/C6, F5,
-F6 in its brief) → address findings → advisor on the whole PR from main's advisor.md (C8). 5. Step 6: delete
-checkpoint (CI runs), PR body, ready, keep needs-mustafa, CI gate+smoke green (C9; smoke from CI per GATE-SETUP (a)),
-wait for Mustafa's go.
+1. Step 4 docs → commit, push; gate. 2. Step 5: security-auditor on the fix (diff 31e8871..537c7a8; Q3/C6, F5, F6 in its
+brief; workflow with an adversarial check of each finding) → address findings → report's review lines. 3. Step 6: delete
+the checkpoint (last commit, CI runs) → the advisor on the whole PR at that head from main's advisor.md (C8) → PR body,
+ready, keep needs-mustafa, CI gate+smoke green (C9; smoke from CI per GATE-SETUP (a)), wait for Mustafa's go.
 
 ## Advisor conditions (C1–C9) — must all be satisfied
 - C1 keep the defect-proof test (fails on 5be7d37 old args, passes on fix). C2 three handlers byte-identical; BOOT
