@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 07:57 Amsterdam
+- **Last update:** 2026-11-03 08:46 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,19 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 08:46: wf_cb775012-8de done. fixcheck-d3b PASS WITH NOTES (33/33; D3B-1 §7.3 lacks d2 F13's other places, D3B-2
+0004 part 7 'exact' vs PM-0004-22's 'rounded'); d3c PASS WITH NOTES (3,225 structural lines, 0 lost; 10,245 references;
+D3C-2 medium: seams S5, S9, S10 missing from README; D3C-4: 111 open, not 112; D3C-3 review codes; D3C-1 wraps);
+d3d read nothing (08:07, before 08:30); the critic's 5 gaps went to d3e PASS WITH NOTES (the three web facts read
+08:30–08:36 and confirmed; 1.99.1 has the same div_euclid steps; G3 the claims ledgers stale since 8fa7173, row 307;
+D3E-4 skeptic tally 27/9/2, not 30; D3E-5 the report's skeptic-coverage wording, its skeptic PARTLY with corrected
+wording; D3E-6 the not-read bullet; D3E-1/2/3 optional draft wording). Session's own: D3B-1, G3, D3E-4, D3E-5, D3E-6,
+111 in the report. Running: wf_c38a2d32-525 (`prompts/workflow-touchup4.js`): engine-architect (D3C-2, -3, -4,
+0002's wrap), rust-reviewer (D3B-2, D3E-1), test-engineer (D3E-2, D3E-3, 0001's wrap). Saver restarted 08:36 with a
+2-hour limit (b6za9pjrq). Next: apply; a last verifier on these lines and the report's Evidence and Deviations (G5);
+docs-keeper-3; the gate; the PR body; the final commit that runs CI.
+
+Before that:
 At 07:57: wf_9d6ea220-1f3 done and applied: b513483 (test-engineer: PM-0004-22's conditional Euclidean clause and
 bite; same line count) and 882cfa6 (engine-architect: README's 23 pointers into ADR 0005 re-pinned; off 0). Checks:
 guard PASS, 521/521, glossary exact 0, glued 0, 340 PM rows of 7 cells, pointers 94/94. Running: wf_cb775012-8de
