@@ -21,32 +21,32 @@ BEFORE:
   encrypted sessions, and the cap would refuse most sessions from one address: the infra review of 2026-11-02,
   findings 9 and 10). **ML, RD, MAC** as ADR 0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines
 AFTER:
-- **Machines.** **RS**, the reference server: a Hetzner Cloud CCX23 (4 dedicated vCPU, 16 GB, x86-64 AMD) in
-  Falkenstein (`fsn1`), "a CCX23 for the game server" (Mustafa, 2026-11-03; ADR 0006's RS key quotes his words), the
-  machine every server row runs on (r6-infrastructure.md, R6-HOST-REC2, lines 645–650;
-  [the reference server](../research/GLOSSARY.md#the-reference-server));
-  every server time mark is the work's elapsed time on one vCPU of it with no other room on that vCPU
+- **Machines.** **RS**, the reference server: a Hetzner Cloud CCX23 (4 dedicated vCPU, 16 GB, x86-64 AMD) in Falkenstein
+  (`fsn1`), "a CCX23 for the game server" (Mustafa, 2026-11-03; ADR 0006's RS key quotes his words), the machine every
+  server row runs on (r6-infrastructure.md, R6-HOST-REC2, lines 645–650;
+  [the reference server](../research/GLOSSARY.md#the-reference-server)); every server time mark is the work's elapsed
+  time on one vCPU of it with no other room on that vCPU
   ([the measuring unit](../research/GLOSSARY.md#the-measuring-unit-one-vcpu)): the room's tick thread is pinned alone to
   one vCPU and the transport runtime runs on the other three (proposed placement, so the measured vCPU holds only the
-  tick), in every server time mark but the rooms-per-VM rows PM-0001-27 and PM-0001-63, which run unpinned as ADR
-  0006's PM-0006-13 sets it (eight tick threads cannot each be alone on one of four vCPUs). No shared host is measured
-  beside RS: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03). **LG**, the load generator: "a CAX21 for
-  the 48 simulated players" (Mustafa, 2026-11-03), Arm64, "so their build targets aarch64" (Mustafa, 2026-11-03, his
-  console check), created in `fsn1` on the run day, running the headless bot clients, which speak the real protocol
-  (r5-toolchain-quality.md, R5-TEST-REC5, lines 1475–1480), never on RS; a 5-minute calibration run at the session's
-  load shows each CAX21 under 80 % of its CPU (ADR 0006's LG key). A run whose bots one CAX21 cannot carry under 80 %
-  adds as many CAX21s as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run
-  (LG-COUNT, the option he chose, 2026-11-03); their count goes into the run plan, which names the CAX21 that carries
-  MV (ADR 0006's metrics role), and their hours into the spike's bill (ADR 0006's spike item 2 and its LG key,
+  tick), in every server time mark but the rooms-per-VM rows PM-0001-27 and PM-0001-63, which run unpinned as ADR 0006's
+  PM-0006-13 sets it (eight tick threads cannot each be alone on one of four vCPUs). No shared host is measured beside
+  RS: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03). **LG**, the load generator: "a CAX21 for the 48
+  simulated players" (Mustafa, 2026-11-03), Arm64, "so their build targets aarch64" (Mustafa, 2026-11-03, his console
+  check), created in `fsn1` on the run day, running the headless bot clients, which speak the real protocol
+  (r5-toolchain-quality.md, R5-TEST-REC5, lines 1475–1480), never on RS; each CAX21 stays under 80 % of its CPU, as a
+  5-minute calibration run at the session's load shows first (ADR 0006's LG key). A run whose bots one CAX21 cannot
+  carry under 80 % adds as many CAX21s as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for
+  that run (LG-COUNT, the option he chose, 2026-11-03); their count goes into the run plan, which names the CAX21 that
+  carries MV (ADR 0006's metrics role), and their hours into the spike's bill (ADR 0006's spike item 2 and its LG key,
   PM-0006-18); on LG's addresses, the day's (the VMs are new at every run: ADR 0006's key), the per-address connection
-  cap (part 10) is raised to the run's session count and recorded, except in PM-0001-25's run with the cap on
-  (proposed: clients on RS would take CPU from the measured work; one 4-vCPU VM may not carry 384 encrypted sessions,
-  and the cap would refuse most sessions from one address: the infra review of 2026-11-02, findings 9 and 10). LG's
-  clients are native aarch64 builds, so no mark's verdict rests on them agreeing with x86-64 or Wasm: in the rows
-  whose client side does float work (PM-0001-17, -19, -48 and -54), a mismatch seen on LG counts only once the same
-  inputs, replayed on x86-64 (L1 on CI's x86-64 runner), mismatch too, and one that shows only on aarch64 is reported
-  as a cross-architecture finding and decides nothing (the advisor's reading, 2026-11-03). **ML, RD, MAC** as ADR
-  0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines
+  cap (part 10) is raised to the run's session count and recorded, except in PM-0001-25's run with the cap on (proposed:
+  clients on RS would take CPU from the measured work; one 4-vCPU VM may not carry 384 encrypted sessions, and the cap
+  would refuse most sessions from one address: the infra review of 2026-11-02, findings 9 and 10). LG's clients are
+  native aarch64 builds, so no mark's verdict rests on them agreeing with x86-64 or Wasm: in the rows whose client side
+  does float work (PM-0001-17, -19, -48 and -54), a mismatch seen on LG counts only once the same inputs, replayed on
+  x86-64 (L1 on CI's x86-64 runner), mismatch too, and one that shows only on aarch64 is reported as a
+  cross-architecture finding and decides nothing (the advisor's reading, 2026-11-03). **ML, RD, MAC** as ADR 0003's pass
+  marks name them (r3-rendering.md, R3-BUDGET-REC1, lines
 END
 
 ### FIX F-0001-KEY-MAC
@@ -262,33 +262,33 @@ BEFORE:
   accounts.
 AFTER:
   x86-64 AMD) in Falkenstein (`fsn1`): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game
-  server and a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03; OQ-0006-2, answered). Every server row runs
-  on RS ("the rig is just the CCX23 and the CAX21": the option he chose, in the session's wording, 2026-11-03), and
-  no shared host is measured beside it: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits
+  server and a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03; OQ-0006-2, answered). Every server row runs on
+  RS ("the rig is just the CCX23 and the CAX21": the option he chose, in the session's wording, 2026-11-03), and no
+  shared host is measured beside it: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits
   (part 8). **LG**, the load generator: "a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03), Arm64 (4 vCPU,
-  8 GB), "so their build targets aarch64" (Mustafa, 2026-11-03, his console check), created in `fsn1` on the run day;
-  it runs every bot client, never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs
-  the marks measure). A 5-minute calibration run at the session's load shows each LG VM under 80 % of its CPU, each
-  one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384 encrypted
-  sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may spend up
-  to 1 vCPU per 48 sessions, ADR 0001). A run whose bots one CAX21 cannot carry under 80 % adds as many CAX21s as its
-  5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run (LG-COUNT, the option he chose,
-  2026-11-03); their count goes into the run plan and PM-0006-18, and the plan names which CAX21 carries MV. On LG's
-  addresses the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is
+  8 GB), "so their build targets aarch64" (Mustafa, 2026-11-03, his console check), created in `fsn1` on the run day; it
+  runs every bot client, never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the
+  marks measure). Each LG VM stays under 80 % of its CPU, as a 5-minute calibration run at the session's load shows
+  first, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
+  encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
+  spend up to 1 vCPU per 48 sessions, ADR 0001). A run whose bots one CAX21 cannot carry under 80 % adds as many CAX21s
+  as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run (LG-COUNT, the option he
+  chose, 2026-11-03); their count goes into the run plan and PM-0006-18, and the plan names which CAX21 carries MV. On
+  LG's addresses the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is
   recorded (What a spike must prove, item 2). **MV**, the metrics role: Prometheus on LG's CAX21, never on RS, inside
   LG's 80 % rule, standing in for the staging game server (the advisor's reading, 2026-11-03), which exists only from
-  slice 3; the calibration run includes it. **The day's addresses:** the VMs are new at every run ("I created both
-  once to try the console and deleted them right away. They'll be created fresh on run day, so their IP addresses will
-  be new then.": Mustafa, 2026-11-03), so no address is written here and each run records its own with its results,
-  and every setting bound to one is made on the run day (the connection cap on LG's addresses; any firewall rule that
-  names a source, as PM-0006-15's SSH and metrics rules and PM-0006-16's; the WebSocket leg's DNS record on
+  slice 3; the calibration run includes it. **The day's addresses:** the VMs are new at every run ("I created both once
+  to try the console and deleted them right away. They'll be created fresh on run day, so their IP addresses will be new
+  then.": Mustafa, 2026-11-03), so no address is written here and each run records its own with its results, and every
+  setting bound to one is made on the run day (the connection cap on LG's addresses; any firewall rule that names a
+  source, as PM-0006-15's SSH and metrics rules and PM-0006-16's; the WebSocket leg's DNS record on
   shamblefrontlines.com, set before its certificate is issued), while the new SSH host keys' check goes to the proof
-  test's plan with security-auditor and the WebTransport certificate is pinned by hash, not by address, and made per
-  run (the advisor's reading, 2026-11-03). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the
-  minimum laptop (Windows 11: Chrome, Edge, Firefox); MAC, a macOS machine with Safari, or for the netcode proof
-  test's yes-or-no and count rows a GitHub macOS runner, under the step, checks and limits ADR 0001's MAC key sets
-  (MACHINES-TIMING, Mustafa, 2026-11-03). They carry no budget row here: every client mark in this record is a
-  yes-or-no or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own accounts.
+  test's plan with security-auditor and the WebTransport certificate is pinned by hash, not by address, and made per run
+  (the advisor's reading, 2026-11-03). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the minimum
+  laptop (Windows 11: Chrome, Edge, Firefox); MAC, a macOS machine with Safari, or for the netcode proof test's
+  yes-or-no and count rows a GitHub macOS runner, under the step, checks and limits ADR 0001's MAC key sets
+  (MACHINES-TIMING, Mustafa, 2026-11-03). They carry no budget row here: every client mark in this record is a yes-or-no
+  or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own accounts.
 END
 
 ### FIX F-PM-0006-11
