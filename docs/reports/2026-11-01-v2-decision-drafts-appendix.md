@@ -217,7 +217,7 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
 - **2026-11-03 at about 18:32 Amsterdam, his correction to the Hetzner note** (saved word for word in
   `inputs/HETZNER-CORRECTION-mustafa-2026-11-03.md`, with the session's description of the screenshot he attached):
   > Correction to my Hetzner note (Mustafa, 2026-11-03): the game server is a CCX23 for development and "does it work" runs. The CCX23 (dedicated) is used only for the measurement runs: tick timing, the 60 Hz margin and rooms per VM. Each run's plan says which server it needs.
-- **2026-11-03 at about 18:38 Amsterdam, his answers to the session's two questions on it** (the question tool's
+- **2026-11-03 at about 18:34 Amsterdam, his answers to the session's two questions on it** (the question tool's
   record, word for word in `inputs/HETZNER-ANSWERS-mustafa-2026-11-03.md`; the option texts are the session's wording,
   which he chose):
   > Question 1 (the session's): Your Hetzner correction says "the game server is a CCX23 for development and 'does it work' runs", then "The CCX23 (dedicated) is used only for the measurement runs". Which machine did you mean for the development and "does it work" runs? (The measurement runs stay on the CCX23.)
@@ -225,6 +225,15 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
   >
   > Question 2 (the session's): Your first Hetzner note puts the CCX23 game server in Falkenstein; the screenshot's order summary shows "Nuremberg" selected. Which location should the drafts give the game servers and the simulated clients (they sit in the same location)?
   > His answer: "Nuremberg (nbg1)", the option described as: "As your screenshot shows; whether the CAX21 (or another client VM) can be ordered there is then checked in the proof test's plan."
+- **2026-11-03 at about 18:48 Amsterdam, his second correction** (saved word for word in
+  `inputs/HETZNER-CORRECTION-2-mustafa-2026-11-03.md`; the round launched on the advisor's first verdict was stopped
+  before any block was written):
+  > Correction again (Mustafa, 2026-11-03): both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game server and a CAX21 for the 48 simulated players. I created both once to try the console and deleted them right away. They'll be created fresh on run day, so their IP addresses will be new then.
+- **2026-11-03 at about 18:49 Amsterdam, his answer to the session's question on the CCX13** (the question tool's record,
+  word for word in `inputs/HETZNER-ANSWERS-2-mustafa-2026-11-03.md`; the option text is the session's wording, which he
+  chose):
+  > Question (the session's): Your latest note names two test servers in Falkenstein: a CCX23 for the game server and a CAX21 for the 48 simulated players. Earlier you chose a CCX13 for development and "does it work" runs, with the CCX23 used only for the measurement runs (tick timing, the 60 Hz margin, rooms per VM). Does the CCX13 still stand?
+  > His answer: "No, drop the CCX13", the option described as: "Every server run uses the CCX23 (the measurement-only rule goes); the rig is just the CCX23 and the CAX21."
 
 ## 3. The advisor's plan review: APPROVE with 19 conditions (word for word)
 
