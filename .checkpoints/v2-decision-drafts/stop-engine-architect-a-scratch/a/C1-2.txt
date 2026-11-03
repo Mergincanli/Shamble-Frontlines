@@ -1,5 +1,0 @@
-  - Proposed: (b) for definitions, for the reasons under Question F2, pending this question.
-  - Answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a
-    simulation id has no client entry." Option (b) is decided, and AP-2, AP-3 and CD-13 now state it as decided. The
-    answer adds one whole-set check (CD-2), which binds the kinds the client presents; kinds with nothing to present
-    need no entry (the advisor's reading, 2026-11-03). CD-2 names both lists.

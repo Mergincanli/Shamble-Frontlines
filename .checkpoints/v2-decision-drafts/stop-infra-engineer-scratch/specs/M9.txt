@@ -1,4 +1,0 @@
-- **OQ-0006-20. What may the netcode proof test's VMs cost?**
-  - Answered in part by Mustafa (2026-11-03): "VMs exist only during a run." It sets no cap (the advisor's reading,
-    2026-11-03); still open: the cost cap, decided by Mustafa (money). He creates each run's VMs himself (OQ-0006-17),
-    so under the interim below each run plan's cost reaches him before its VMs exist.

@@ -1,1 +1,0 @@
-W	{sp}{sp}{sp}{sp}	{sp}{sp}{sp}{sp}	`spikes/` (SPIKE-SCOPE (a)), now that Mustafa has signed the drafts off as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)), first in wave 1: "wave 1 runs one heavy spike at a time: the netcode proof test first". It takes in the research spikes of

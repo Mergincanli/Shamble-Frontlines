@@ -1,5 +1,0 @@
-- **Game servers:** if the CCX23 cannot be ordered on a run day or fails the marks, read OQ-0006-1's fallbacks and
-  re-run the netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name.
-  A shared-vCPU fleet (K3) comes only after a later measurement of a shared x86 plan that can be ordered in the
-  fleet's location passes; until then, or if it fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the
-  hour with a monthly cap (R6-HOST-F17), so a

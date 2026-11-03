@@ -1,6 +1,0 @@
-   float `%` operator are not on the list. std 1.99.1 guarantees `rem_euclid` and `div_euclid` "the rounded
-   infinite-precision result" (its `f32` and `f64` pages, read by the verifier on 2026-11-02), so they may join once
-   PM-0004-22's unit vectors confirm it on every target; no source read states the float `%`'s precision (the Rust
-   Reference defines it only by truncating division and the dividend's sign), and review, not the lint, catches the
-   operator.
-   Transcendental maths only

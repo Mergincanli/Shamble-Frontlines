@@ -1,9 +1,0 @@
-<<<OLD
-| 0 matches in a 30-minute soak's logs for every join token, every guest secret and every client address the soak used,
->>>NEW
-| 0 matches in a 30-minute soak's logs for every join token, every guest secret and every client address the soak used, and for each match's random seed (ADR 0004 part 8: never sent, logged or recorded; parts 9 and 12),
-===
-<<<OLD
-the spike logs each token, secret and client address it creates into a canary file on LG (never on RS);
->>>NEW
-the spike logs each token, secret and client address it creates into a canary file on LG (never on RS), and the supervisor's test build writes each match's seed into a canary file on RS's local disk outside the shipped log path (proposed: the grep needs the value it must not find);

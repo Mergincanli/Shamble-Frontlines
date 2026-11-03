@@ -1,7 +1,0 @@
-ok   arm-rule: 1 line(s) -> 12
-ok   sh-1293: 1 line(s) -> 1
-ok   capacity-756: 1 line(s) -> 1
-ok   domain-464: 4 line(s) -> 5
-ok   domain-1274: 3 line(s) -> 3
-5 fix blocks in the file (blocks for other files skipped); all applied
-written r6b-netcode-architect-scratch/tree/docs/adr/0001-multiplayer-netcode.md

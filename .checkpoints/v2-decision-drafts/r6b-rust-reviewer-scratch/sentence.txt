@@ -1,1 +1,0 @@
-An ARM load generator, such as the netcode proof test's (ADR 0001's LG), is not an ARM host in this sense, since it serves no player and runs no room (the advisor's reading, 2026-11-03), and under ADR 0001's rule for the rows that compare an LG client's result with the server's, no verdict of those rows rests on native AArch64 agreeing with x86-64 or Wasm.

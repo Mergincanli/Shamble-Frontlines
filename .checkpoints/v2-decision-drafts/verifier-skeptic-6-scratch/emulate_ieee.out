@@ -1,2 +1,0 @@
-f32 emu: exact? true true div_euclid = 3 rem = 1
-f64 emu: div_euclid = 3 rem = 1

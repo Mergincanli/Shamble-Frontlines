@@ -1,3 +1,0 @@
-12. **Its spike: the Rust ↔ TypeScript boundary spike**, in wave 1 after the netcode proof test, the sim core spike and
-    the 60 Hz run, one heavy spike at a time (SPIKE-ORDER (b), Mustafa, 2026-11-03), and before the foundation, since
-    its result fixes the skeleton the foundation builds; what it must prove is below. The foundation itself is this

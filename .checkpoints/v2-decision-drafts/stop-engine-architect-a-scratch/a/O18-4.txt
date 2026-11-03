@@ -1,2 +1,0 @@
-   R1-TICK-REC2's P2 with the sim core spike's sim, which runs before this spike (SPIKE-ORDER (b)); if the timer
-   pacing fails its jitter mark, W3 is measured on an isolated build (OQ-0002-4).

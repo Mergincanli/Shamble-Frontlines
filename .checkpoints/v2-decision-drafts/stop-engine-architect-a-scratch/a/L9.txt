@@ -1,5 +1,0 @@
-    Spline's export and the tools for step 4 can do, and that answer. Research ids: none.
-  - Since LOOK-TEST-INPUTS (Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)"),
-    the look proof test's models are made in Blender, so the source files this question places include their Blender
-    files; Blender is also the route for the research's export part (the advisor's reading, 2026-11-03). This
-    question keeps its place, with the rest of the research, before the asset spike.

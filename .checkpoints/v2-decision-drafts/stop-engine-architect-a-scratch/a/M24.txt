@@ -1,7 +1,0 @@
-no change: docs/research/GLOSSARY.md:707-712 ("Game-server certificate": "Development and preview servers use
-self-signed, pinned certificates valid at most 14 days") is base text in lines 1-743, which keep their bytes (the
-write guard's prefix check), and the verdict keeps it a NOTE (condition 3, last item; ruling GLOSSARY-8): "The older
-entry at lines 707-712 (map M24) stays a NOTE in the report's open findings". What differs since SPIKE-MACHINES
-(Mustafa, 2026-11-03: "Certificates: a private hash-pinned certificate for WebTransport; for the WebSocket leg, a
-domain I register"): the netcode proof test's WebSocket leg, on a development server, presents a trusted certificate
-on that domain, not a self-signed pinned one. For the report's open findings (the session); for the Advisor.

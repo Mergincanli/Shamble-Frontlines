@@ -1,6 +1,0 @@
-     needs none, R6-OBS-F4, r6 lines 279–284; spike 2 checks it); and SSH, by key only, from named source addresses only
-     (proposed: without an admin path no one can install a room binary or read the logs part 9 keeps on the VM; on the
-     spike VMs sessions get SSH access, OQ-0006-17, answered by Mustafa (2026-11-03): "sessions get SSH access only and
-     no Hetzner token until the security baseline", and how a session's key is made and held without it reading a
-     secret it did not make is for the netcode proof test's own plan, with security-auditor and the advisor: the
-     advisor's reading, 2026-11-03);

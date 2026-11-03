@@ -1,4 +1,0 @@
-   exports; the test decides nothing about compression or LODs (ASSET-RESEARCH (a)). Mustafa makes them with AI help
-   in Blender, and "blockouts with a skin, named colour slots and LOOK_V2's proportions are enough"
-   (LOOK-TEST-INPUTS, 2026-11-03); the list stays, and each model on it may be a blockout at that bar (the advisor's
-   reading, 2026-11-03).

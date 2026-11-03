@@ -1,9 +1,0 @@
-<<<OLD
-reported: the hash function picked, and its cost per tick (mean, p99) |
->>>NEW
-reported: the hash function picked, and its cost per tick (mean, p99); and neither the hash nor the serializer depends on the target's word size: the picked function gives the same digest for a committed byte string on native x86-64 and on wasm32, and one committed state serializes to the same bytes on both (proposed: `usize` is 32 bits on wasm32 and 64 bits on x86-64, so a length or index written as `usize`, or a hasher fed through `write_usize`, would make PM-0004-19 fail on its first tick for no game reason) |
-===
-<<<OLD
-| 1 run per injection. Control: a presentation draw outside the sim passes (R5-GATE-REC3's G10 row, r5 line 1721) |
->>>NEW
-| 1 run per injection; the digest and serialization vectors join the unit vectors (20 identical verdicts). Control: a presentation draw outside the sim passes (R5-GATE-REC3's G10 row, r5 line 1721). Bites (the word size): a planted `usize` field in the serialized state must change the bytes between the two targets |

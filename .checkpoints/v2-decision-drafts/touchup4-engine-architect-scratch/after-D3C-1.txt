@@ -1,4 +1,0 @@
-5. **Slice 3, online:** `server` and `supervisor` enter; L2 in the nightly run; G12 over both transport backends; the
-   first multiplayer preview behind the access wall, with the binary-delivery job once the security baseline has set its
-   token's scope (BASELINE-WHEN (b): before the first online playtest); the Sentry upload job if Sentry is set up.
-   *Done when:* G12 passes on both backends and a multiplayer preview plays against the staging game server.

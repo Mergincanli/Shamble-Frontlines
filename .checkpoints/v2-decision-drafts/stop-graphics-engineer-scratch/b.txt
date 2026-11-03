@@ -1,5 +1,0 @@
-  vertex colours, or one texture atlas). Decider: the asset-pipeline research. What decides it: whether the glTF
-  export keeps material names (not researched), Blender's for the look proof test's models (LOOK-TEST-INPUTS,
-  Mustafa, 2026-11-03: "Route: Blender (Spline's skins and named slots are unproven)") and Spline's while LOOK_V2
-  §8's flow names it (the advisor's reading, 2026-11-03), and each colour route's material count against part 4's
-  caps. Research ids: none.

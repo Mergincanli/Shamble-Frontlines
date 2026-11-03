@@ -1,1 +1,0 @@
-| R4-XT-OQ5 | answered: the bake in its own `navbake` crate (proposed, not researched; allowed by OQ-0002-8 (a), the Advisor, 2026-11-03), never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |

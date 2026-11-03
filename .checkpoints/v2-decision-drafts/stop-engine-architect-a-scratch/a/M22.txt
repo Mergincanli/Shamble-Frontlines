@@ -1,7 +1,0 @@
-     holds no token for it (timings on shared runners are not hardware results): it runs on a CCX23 created per bench
-     session in the spikes' own Hetzner project and deleted after it, ADR 0006 part 8's cost line (proposed there: 20
-     bench hours a month, 20 × 0.1386 = 2.77 EUR, R6-HOST-F15, r6 lines 150–158). Who creates and deletes it is
-     answered (SPIKE-MACHINES, Mustafa, 2026-11-03; OQ-0006-17): "I create and delete the VMs myself for each run;
-     sessions get SSH access only and no Hetzner token until the security baseline"; that this covers the bench and the
-     3-hour soaks as well as the spikes is the advisor's reading (2026-11-03). The 3-hour soak before each playtest uses
-     the same path. No bench crate, coverage tool or cargo-nextest is adopted: none was read.

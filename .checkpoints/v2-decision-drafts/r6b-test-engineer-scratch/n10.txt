@@ -1,5 +1,0 @@
-ADR 0002, 0003 and 0005's pass-mark sections name no CX33, SH, MV, CCX13, DS, Nuremberg, nbg1, Helsinki, hel1 or
-fixed address (the work list's script found none there). ADR 0003's key keeps MAC as the borrowed MacBook Air and "the
-actual machines, named by Mustafa before the look proof test" (line 1095–1096): under MACHINES-TIMING the look proof
-test's Safari rows stay on the borrowed Mac in either branch (AMENDMENT 2's limits), so no change there; ADR 0006's
-MAC entry points to ADR 0001's MAC sentence (F-0006-KEY-RIG), as AMENDMENT 2 routes it.

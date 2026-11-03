@@ -1,3 +1,0 @@
-  would risk shipping in the player's Wasm. No research compared other placements, so the first foundation milestone
-  that builds them is also their test; rule 3 allows proposing them (OQ-0002-8, answered (a) by the Advisor,
-  2026-11-03).

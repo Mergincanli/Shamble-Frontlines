@@ -1,8 +1,0 @@
-  never a budget result. The models are OQ-0003-1, answered in part by Mustafa (2026-11-03): "minimum: a typical
-  student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a
-  MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual machines, named by
-  Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03): "Until then, my
-  laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough checks only." A
-  rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured result, and
-  nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless runner (W-A):
-  counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).

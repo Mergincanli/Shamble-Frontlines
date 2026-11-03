@@ -1,9 +1,0 @@
-#### The LOD checklist (Mustafa, in Brave, in the asset spike; only with PM-0005-44's condition)
-Every view is at ADR 0003's test view (legacy's framing, CD5: height 40, boom 56.6, field of view 15°, yaw 45°) or a
-named variant of it, never a camera decision: the v2 framing is R2-INT-OQ2's, and both steps are taken again at its
-own closest and farthest once that question is answered.
-1. Each test model with LOD levels at two test views: the test view itself, as the far case, and the same camera at
-   half its distance to the player, as the close case (ADR 0003's look checklist, step 9) (LOOK_V2 §5). Expected:
-   simple and readable from a distance, real depth up close; the silhouette kept at the far view.
-2. The camera moved slowly from the close view out to twice the test view's distance and back (a test path through
-   each switch distance, proposed: legacy has no zoom). Expected: no visible pop or flicker at a switch.

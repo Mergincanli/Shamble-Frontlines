@@ -1,2 +1,0 @@
-[["RS, SH and LG named with plan, CPU model, vCPU count, memory, location and kernel;", "RS and LG named with plan, CPU model, vCPU count, memory, location, kernel and the day's address (the VMs are created fresh on the run day: ADR 0006's key);"],
- ["| RS, SH, LG, ML, RD, MAC |", "| RS, LG, ML, RD, MAC |"]]

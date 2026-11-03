@@ -1,6 +1,0 @@
-the client-address rows PM-0006-21 (line 1277: "every client address the soak used ... other than the VMs' own") and
-PM-0006-31 (line 1288: "the lab clients' public addresses") check logs and crash reports for addresses; they hold
-whatever the day's addresses are (the run records them, F-0006-KEY-RIG), so no word changes. Line 1214 ("Every server
-mark runs at the 30 Hz baseline") is about the tick rate, not the machine: no change. The "Results log" entry (every
-row names "the host or machine, its type, location and CPU model") stands; the day's addresses are recorded by the
-key's new sentence and PM-0006-11 / PM-0001-1.

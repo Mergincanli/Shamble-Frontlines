@@ -1,5 +1,0 @@
-no change: docs/adr/0002-code-structure-build-toolchain.md:47-48 ("60 Hz only with the 60 Hz margin of at least 25 %
-(ADR 0001 owns it)", linking GLOSSARY §8) states a necessary condition. The advisor's ruling on TICK-60-HEADROOM
-(advisor-verdict-r4.md, Rulings, question 2): restatements that say "60 Hz only with the 60 Hz margin" and link §8
-(0002:47 named) may stay once §8 is amended; FIX H24 and FIX S23 amend that entry, which now states the full rule and
-points to ADR 0001 part 2. The other places in H23 are rust-reviewer's (0004) and infra-engineer's (0006).

@@ -1,4 +1,0 @@
-  Rust change. The content and ability spike's marks 1 and 2 test exactly this. When scripting comes back is
-  OQ-0005-AB13's answer (the Advisor, 2026-11-03): "scripting comes back only when a designed ability can't be built
-  from data." A new reviewed generic operation still counts as built from data, so it takes one designed ability that
-  needs ability-specific code no operation can express (the advisor's reading, 2026-11-03).

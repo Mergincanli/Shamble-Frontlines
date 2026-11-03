@@ -1,6 +1,0 @@
-     simulator on simulated time behind the thin transport interface (latency, jitter, loss, reordering, duplication, a
-     rate limit, and a packet-fate log; per direction, latency and jitter split half each way and loss is as the
-     profile defines it, ADR 0001 part 13: the Advisor's answer to OQ-0001-16, NET-PROFILES, 2026-11-03, where R5 had
-     proposed the round trip's half split), running the real server code and headless bot clients in one process; L2,
-     an impairment wrapper around the server's UDP socket under the real quinn endpoint for real browsers over
-     WebTransport, with a delaying TCP proxy for WebSocket.

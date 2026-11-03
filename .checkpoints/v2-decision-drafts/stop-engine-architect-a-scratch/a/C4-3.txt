@@ -1,4 +1,0 @@
-   Proposed addition (reason: R1-RR-OQ2): the corpus includes, for every bounded collection, a file one element over
-   its bound, refused 100 % of the time. Proposed (reason: OQ-0005-1's answer, 2026-11-03): for each presented kind
-   CD-2 names, a set with one definition whose client entry is missing, refused 100 % of the time. Zero panics is also
-   R1-RR-OQ3's mark for the loader. The spike records the

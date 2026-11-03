@@ -1,5 +1,0 @@
-PM-0006-22, -23 and -24 (lines 1278–1280: "present on MV", "RS with LG and MV", "RS, MV") keep MV as AMENDMENT
-condition 9 says: MV is now the metrics role F-0006-KEY-RIG defines ("the metrics role: Prometheus on LG's CAX21,
-never on RS, inside LG's 80 % rule, standing in for the staging game server", the advisor's reading, 2026-11-03), so
-"on MV" means on that role's CAX21 and no cell changes; the plan names which CAX21 carries it when LG has more than one
-(the key). PM-0006-17, -19 and -20 ("RS with LG", "RS") name no SH, MV, CX33 or location.

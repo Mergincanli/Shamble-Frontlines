@@ -1,8 +1,0 @@
-f32 a=40400001 b=3f800001 a/b=3 div_euclid=3 exact_q=2 rem_euclid=1 exact_r=8388608 (x2^-23) q_ok=false r_ok=true
-f32 a=c0400001 b=3f800001 a/b=-3 div_euclid=-4 exact_q=-3 rem_euclid=0.00000011920929 exact_r=1 (x2^-23) q_ok=false r_ok=true
-f32 a=40400001 b=bf800001 a/b=-3 div_euclid=-3 exact_q=-2 rem_euclid=1 exact_r=8388608 (x2^-23) q_ok=false r_ok=true
-f32 a=c0400001 b=bf800001 a/b=3 div_euclid=4 exact_q=3 rem_euclid=0.00000011920929 exact_r=1 (x2^-23) q_ok=false r_ok=true
-f64 a=4008000000000001 b=3ff0000000000001 a/b=3 div_euclid=3 exact_q=2 rem_euclid=1e0 exact_r=4503599627370496 (x2^-52) q_ok=false r_ok=true
-f64 a=c008000000000001 b=3ff0000000000001 a/b=-3 div_euclid=-4 exact_q=-3 rem_euclid=2.220446049250313e-16 exact_r=1 (x2^-52) q_ok=false r_ok=true
-f64 a=4008000000000001 b=bff0000000000001 a/b=-3 div_euclid=-3 exact_q=-2 rem_euclid=1e0 exact_r=4503599627370496 (x2^-52) q_ok=false r_ok=true
-f64 a=c008000000000001 b=bff0000000000001 a/b=3 div_euclid=4 exact_q=3 rem_euclid=2.220446049250313e-16 exact_r=1 (x2^-52) q_ok=false r_ok=true

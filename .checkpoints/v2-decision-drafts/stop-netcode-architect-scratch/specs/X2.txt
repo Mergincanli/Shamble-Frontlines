@@ -1,1 +1,0 @@
-R	| R2-XU-OQ18 | answered: OQ-0001-14 (a), by the Advisor (2026-11-03), whom r2-netcode.md:3268 left it to: a VISION_V2 §3 or §4 target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in docs/adr/README.md, for R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6; R2-BUD-REC3 traces to §6.1; R2-INT-REC7 is not built | parts 7, 10; Open questions |

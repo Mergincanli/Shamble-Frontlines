@@ -1,6 +1,0 @@
-f32 (0.5, -1.0): div_euclid -0.0 bits 80000000; rem_euclid 0.5 bits 3f000000
-f32 (-1.0, 1.0): div_euclid -1.0 bits bf800000; rem_euclid -0.0 bits 80000000
-f32 (-1.0, -1.0): div_euclid 1.0 bits 3f800000; rem_euclid -0.0 bits 80000000
-f32 (-0.0, 1.0): div_euclid -0.0 bits 80000000; rem_euclid -0.0 bits 80000000
-f32 (1.0, -1.0): div_euclid -1.0 bits bf800000; rem_euclid 0.0 bits 00000000
-rustc 1.97.0 (2d8144b78 2026-07-07)

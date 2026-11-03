@@ -1,4 +1,0 @@
-div_euclid ../src/std/num/f64.rs.html#253-255
-div_euclid ../src/std/num/f64.rs.html#291-293
-rem_euclid ../src/std/num/f64.rs.html#291-293
-rem_euclid ../src/std/num/f64.rs.html#325-327

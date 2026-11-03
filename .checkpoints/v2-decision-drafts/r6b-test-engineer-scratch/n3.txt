@@ -1,6 +1,0 @@
-the "address" hits in ADR 0001's rows: PM-0001-25 (line 1508: the per-address cap raised "on LG's addresses", then
-on) and PM-0001-29 (line 1514: the cap's setting recorded) set the cap per run on whatever addresses LG has that day;
-the key's LG entry (F-0001-KEY-RS-LG) now says those are the day's addresses, new at every run (AMENDMENT condition 11,
-the clause written by the key's owner, as the computed task routes it), so the rows need no word changed. The
-RS sentence at 1348–1353 keeps "every server time mark ... on one vCPU of it": true again, since every server row runs
-on RS (AMENDMENT, DS dropped); F-0001-KEY-RS-LG changes only its location, his words and SH.

@@ -1,3 +1,0 @@
-Total: 114 numbered open questions, 111 of them open (OQ-0004-5 and -6 point to ADR 0005; OQ-0003-14 is answered);
-SPIKE_PLAN adds one of its own, OQ-SPIKE-1. Pass marks: 62, 78, 47, 75, 46 and 32 rows (340). None of the drafts is
-signed off; no spike starts before Mustafa and the Advisor approve them (the drafts brief, §4).

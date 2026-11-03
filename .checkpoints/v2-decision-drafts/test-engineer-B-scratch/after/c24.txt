@@ -1,9 +1,0 @@
-<<<OLD
-the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed) |
->>>NEW
-the same presses and purchases after the tier accepted in 1,000 of 1,000 (a control: proposed); and the minute-5 floor (LOOP_V2 §4 `[DECIDED]`: "Every team reaches Tech 1 by minute 5 at the latest"): a team with no cashout reaches Tech 1 at the floor's tick, read from data (5 × 60 × 30 = 9,000 ticks at 30 Hz: arithmetic), and its presses are refused at tick 8,999 and accepted from tick 9,000 |
-===
-<<<OLD
-Bites: an ability with no tier tag |
->>>NEW
-Bites: an ability with no tier tag; a floor that is never applied (the team without a cashout stays at Tech 0 past tick 9,000) |

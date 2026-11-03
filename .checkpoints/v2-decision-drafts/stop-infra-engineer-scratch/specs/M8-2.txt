@@ -1,5 +1,0 @@
-   netcode proof test runs on the development certificates for WebTransport, "a private hash-pinned certificate for
-   WebTransport" as Mustafa set for the spikes (2026-11-03, SPIKE-MACHINES); its WebSocket fallback presents a
-   browser-trusted certificate on the domain he registers, OQ-0006-5's development case (i), issued by a method the
-   proof test's own plan sets with security-auditor (the advisor's reading, 2026-11-03); the production form is needed
-   from the first online

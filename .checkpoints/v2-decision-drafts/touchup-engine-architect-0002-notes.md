@@ -1,6 +1,0 @@
-# touchup-engine-architect-0002 notes
-
-- 21:12 started; output file created; next: read F9 in verifier-fixcheck-d1-verdicts.md and ADR 0002 part 8, ADR 0006 part 3.
-- 21:20 F9 checked: holds. ADR 0006 part 3 (0006:171-175) sets "CI failure artefacts (each failure's seed, recording and trace, ADR 0002 part 8) are kept 30 days" (proposed there, with its reason); ADR 0002:530 still says "until it is set, the 7 days of build artifacts". Only place in 0002 (grep "artefact", "7 days", "retention": 0002:643 and :668 are the preview build's 7 days, correct per 0006 part 3). R5 line 2083 checked (infra-engineer: artefact retention for failures). FIX F9 written (one line, 0002:530). Glossary check on scratch copies orig/fixed: exact 0 both, hits identical. Not under a table. Next: final verify of file, DONE.
-- 21:22 verified: FIX F9's BEFORE occurs exactly once on disk. Out of scope noted: F8 (OQ-0002-5 'paid minutes') is also listed as engine-architect's in the verdicts but is not in this brief; left untouched. DONE
-- 21:26 coordinator asked for the same line count: FIX F9 is 1 line to 1 line (scratch orig and fixed both 1626 lines; ## Open questions at 970 and every OQ-0002 heading keep their line numbers). No change to the fixes file needed. DONE

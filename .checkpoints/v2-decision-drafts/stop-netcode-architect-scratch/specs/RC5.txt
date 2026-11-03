@@ -1,1 +1,0 @@
-R	| R2-ROOM-REC2 | adopted; a panic on the tick thread ends the match and exits the process non-zero (OQ-0001-18, answered (a) by the Advisor, 2026-11-03) | part 11 |

@@ -1,9 +1,0 @@
-<<<OLD
-the firewall's rule list holds the UDP range, the TCP range and part 9's metrics rule (PM-0006-16), and 0 other rules.
->>>NEW
-the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them).
-===
-<<<OLD
-Bite: a rule added for the probed TCP port makes the probe connect (the negative test can fail) |
->>>NEW
-Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison |

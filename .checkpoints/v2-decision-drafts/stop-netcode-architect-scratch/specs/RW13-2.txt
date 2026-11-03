@@ -1,1 +1,0 @@
-R	| R2-SYNC-OQ2 | answered in part: the cap follows OQ-0001-5's rule (Mustafa, 2026-11-03), not a fixed 200 or 250 ms; its value is set when the proof test reports | part 8 |

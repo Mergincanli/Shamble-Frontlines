@@ -1,2 +1,0 @@
-  yes (an ability-proc stream may become shared); the tick moves to 60 Hz at slice 6's call (ADR 0001 part 2: the
-  60 Hz margin, with the goal budget holding; re-convert durations, re-bake links, re-run the parity marks).

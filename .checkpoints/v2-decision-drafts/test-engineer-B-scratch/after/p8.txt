@@ -1,4 +1,0 @@
-<<<OLD
-(frame time median ≤ 28 ms and p95 ≤ 33.3 ms: the reading of "holds 30+ fps on Low", since R1-TICK-REC2 P2 leaves the render budget to R3);
->>>NEW
-(frame time median ≤ 28 ms and p95 ≤ 33.3 ms, mode U: the reading of "holds 30+ fps on Low", since R1-TICK-REC2 P2 leaves the render budget to R3; it is the drafts' one reading of P2's "30+ fps", so ADR 0002's PM-0002-28 cites this row and sets none of its own, and a presented-frame count on ML, if OQ-0003-17 asks for one, is ADR 0003's PM-0003-44);

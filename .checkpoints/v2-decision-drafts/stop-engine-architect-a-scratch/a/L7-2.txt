@@ -1,9 +1,0 @@
-**Settled inputs.** LOOK_V2 (authored glTF/GLB models allowed; brief §1). ASSET-RESEARCH (a), the advisor's ruling of
-2026-10-31 (plan, "Rulings"; decision map, part j, J4): this part takes LOOK_V2 §8's flow as given and proposes only
-what R1-DATA, R3-CHAR and R3-BUDGET support; compression formats, the LOD tool, export checks, the material-slot
-renaming step and the per-unit budget numbers are open questions marked "not researched", grouped under one research
-unit, the asset-pipeline research (graphics-engineer, verified like R3, in its own daytime session), which
-`docs/SPIKE_PLAN.md` places before the asset spike, with its export and slot-naming part before the look proof test.
-LOOK-TEST-INPUTS (Mustafa, 2026-11-03; the frame's Settled inputs quote it): that timing, and Blender as the route for
-the look proof test's models, which Mustafa makes with AI help as blockouts with a skin, named colour slots and
-LOOK_V2's proportions. SPIKE-SCOPE (a).

@@ -4,7 +4,7 @@ The records the report (`docs/reports/2026-11-01-v2-decision-drafts.md`) cites, 
 it. The working notes were in `.checkpoints/v2-decision-drafts/` on the branch, and the last commit before the PR was
 marked ready deletes them (CHECKPOINTS.md §9.2–9.3). Every commit id cited here is one of PR #33's commits: after the
 squash merge they stay reachable through the PR and its kept branch, not in main's history. The last commit that holds
-the notes is {LASTCKPT}; the notes, prompts, scripts and verdict files named below are read there.
+the notes is e5a7f08; the notes, prompts, scripts and verdict files named below are read there.
 
 ## 1. The drafts brief, in full (the advisor's condition 12)
 

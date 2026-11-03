@@ -1,9 +1,0 @@
-<<<OLD
-each of 20 saved feel-kit changes shows on the page within 1 s, in the running match | ML: the development server native; the page in Chrome, Edge and Firefox |
->>>NEW
-each of 20 saved feel-kit changes shows on the page within 1 s, in the running match; and the same in local play, where slices 1 and 2 have no server crate: each of 20 saves pushed to the Worker (PM-0002-31's route) is validated there within 1 s, the next local match runs on it, and the running local match's per-tick hashes equal a control run with no save (CD-7: "on the development server and in local play alike") | ML: the development server native, and the Worker's local play; the page in Chrome, Edge and Firefox |
-===
-<<<OLD
-Bites: a watcher that validates only on the next match start (fails the 1 s);
->>>NEW
-Bites: a watcher that validates only on the next match start (fails the 1 s); a Worker that applies the pushed numbers to the running local match (fails the hash comparison);

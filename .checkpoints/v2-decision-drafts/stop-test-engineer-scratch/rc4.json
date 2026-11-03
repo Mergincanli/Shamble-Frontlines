@@ -1,4 +1,0 @@
-[["| A panic on the tick thread ends the match and the process (part 11; OQ-0001-18) |", "| A panic on the tick thread ends the match and the process (part 11; OQ-0001-18, answered (a) by the Advisor, 2026-11-03) |"],
- ["the match record is written and marked crashed; the supervisor's", "the match record is written and marked crashed, and it and the crash report are kept (ROOM-CRASH, the Advisor, 2026-11-03: \"end the match, as proposed, and keep the crash and match records\"; kept under ADR 0006 part 11's retention: the advisor's reading, 2026-11-03); the supervisor's"],
- ["each client's last message and close from LG's log |", "each client's last message and close from LG's log; the match record and the crash report read back after the last injection |"],
- ["the Rust review of 2026-11-02, finding 3; if OQ-0001-18 picks its option (b), this row is rewritten for the resume |", "the Rust review of 2026-11-02, finding 3; OQ-0001-18 (a) |"]]

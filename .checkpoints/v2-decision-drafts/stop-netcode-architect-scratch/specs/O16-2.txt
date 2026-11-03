@@ -1,1 +1,0 @@
-W			It runs before the foundation (SLICE-ORDER condition 3), throwaway, in `spikes/` (SPIKE-SCOPE (a)), now that Mustafa has signed the drafts off as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)), as the first of wave 1's heavy spikes, which run one at a time. Its sim is a throwaway one with movement, hitscan and bots as protocol

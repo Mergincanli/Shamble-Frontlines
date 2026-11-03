@@ -1,5 +1,0 @@
-Task: ADR 0001 fix round 3 — replace 'brief §1'-only stack citations (doc ~40, ~718) with the lasting STATUS "Decisions pending" citation; FIX blocks to netcode-architect-fixes-3.md
-- unit: located both sites (40-42, 718); 'brief' = drafts brief (appendix §1); STATUS line 113 names 'the stack'; self-refs + docs/adr/README.md cite ADR 0001 lines 840-905 => FIX 1 and FIX 2 must keep line counts
-- unit: drafted FIX 1 (40-43, 4->4 lines), FIX 2 (718, 1->1 line), FIX 3 (Sources 1498-1500 + stack-wording source); NOTEs: pre-existing stale line refs (README OQ-0001 rows +7/+8; self-refs +6/+8) and 5 note lines directly under tables (711, 718, 726, 734, 783)
-- unit: wrote netcode-architect-fixes-3.md (FIX 1-3, NOTE A-C); dry-applied with scripts/apply_fixes.py on a scratch copy: all applied, lines 840-1200 unchanged; doc untouched
-DONE

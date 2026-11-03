@@ -1,4 +1,0 @@
-Written by test-engineer (plan step 4). One row per mark, grouped by the spike that runs it: the sim core spike
-(PM-0004-1 to PM-0004-61, then PM-0004-73 and PM-0004-74, added at the fix round), the content and ability spike
-(PM-0004-62 to PM-0004-66, then PM-0004-75, added at the final round), the netcode proof test (PM-0004-67), the
-boundary spike (PM-0004-68 to PM-0004-70), and

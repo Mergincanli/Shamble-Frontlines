@@ -1,4 +1,0 @@
-     three are proposed (not researched): no research Options section offers a crate for the room logic, the client
-     endpoint or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; plan rule 3 allows
-     that (OQ-0002-8, answered (a) by the Advisor, 2026-11-03). The supervisor's crate (slice 3) is beyond R5's list
-     too, but the research asks for it: R6-HOST-REC2 puts a small supervisor on every VM (r6-infrastructure.md lines

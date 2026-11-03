@@ -1,4 +1,0 @@
-- **Assets:** the look proof test uses plain glTF/GLB exports (the GPU section's part 8) of the models Mustafa makes in
-  Blender, after the asset-pipeline research's export and slot-naming part (LOOK-TEST-INPUTS); the rest of that
-  research, then the asset spike, come before the first authored model enters the game (AP-1 to AP-6); until
-  OQ-0005-AP2 is answered, buildings and props keep the ported kit beside authored assets (AP-7).

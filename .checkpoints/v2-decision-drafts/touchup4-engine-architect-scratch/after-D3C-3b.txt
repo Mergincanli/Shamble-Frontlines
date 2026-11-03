@@ -1,1 +1,0 @@
-| OQ-0003-20 | Is the minimum laptop's budget judged after 15 minutes of play, or on a cold laptop? (the perf review's HEAT-SOAK) | the Advisor | [ADR 0003](0003-rendering.md) line 938 |

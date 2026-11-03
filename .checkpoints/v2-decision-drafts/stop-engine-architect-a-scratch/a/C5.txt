@@ -1,5 +1,0 @@
-    models are assets named by id (AP-2), and its colours reach the assets' faction colour slots (AP-3; the GPU
-    section's part 2). Its colours and model ids sit in a client definition keyed by the faction's id, as the feel kit
-    is keyed by the weapon's (CD-14), so the faction's simulation definition holds no presentation field (OQ-0005-1,
-    answered by the Advisor, 2026-11-03), and a faction without that entry fails the whole-set check (CD-2). A faction
-    variant is a full definition of its own that references shared definitions

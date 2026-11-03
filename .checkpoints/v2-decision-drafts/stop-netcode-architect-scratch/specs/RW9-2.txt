@@ -1,1 +1,0 @@
-W	{sp}{sp}{sp}	{sp}{sp}{sp}	command runs, with each shot's RTT, delay, buffer wait and blend (R2-XU-OQ2), and from it the rewind cap by OQ-0001-5's rule (Mustafa, 2026-11-03): the honest rewind's p99 at P2, rounded up to a whole number of ticks, the run's largest rewind reported beside it (the advisor's reading, 2026-11-03); the

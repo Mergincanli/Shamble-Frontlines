@@ -1,1 +1,0 @@
-W	- 	{sp}{sp}	**OQ-0001-14. Is a VISION_V2 §3 or §4 target trace enough for an engine feature?** Answered by the Advisor (2026-11-03): "yes, a VISION_V2 §3 or §4 trace counts, marked as such." So (a) is decided: the needs written "VISION_V2 §4 only" and listed in `docs/adr/README.md` stand as written. The question as asked: R2-BUD-REC4, R2-BUD-REC5 and

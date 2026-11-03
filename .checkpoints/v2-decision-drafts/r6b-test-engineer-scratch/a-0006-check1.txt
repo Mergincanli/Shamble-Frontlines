@@ -1,3 +1,0 @@
-1. Open a Windows terminal and run `ping -n 100 <address>` for the address the session sends (that day's address of
-   one of the run's CAX21s in `fsn1`). Expected: the run ends with a "Packets" line and an "Approximate round trip
-   times" line; paste both into the chat (PM-0006-12).

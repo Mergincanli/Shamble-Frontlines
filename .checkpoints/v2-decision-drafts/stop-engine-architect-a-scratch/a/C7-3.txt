@@ -1,2 +1,0 @@
-- **Why one model:** a unit names its weapons, abilities and track, and its model is named under the unit's id (AP-2:
-  in the unit's client definition, OQ-0005-1); a faction names its units

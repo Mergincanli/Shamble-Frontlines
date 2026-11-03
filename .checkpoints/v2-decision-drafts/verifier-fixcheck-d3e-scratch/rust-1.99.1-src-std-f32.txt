@@ -1,8 +1,0 @@
----
-256: 252 #[stable(feature = "euclidean_division", since = "1.38.0")]
-257: 253 pub fn div_euclid(self, rhs: f32) -> f32 {
-258: 254 core::f32::math::div_euclid(self, rhs)
----
-294: 290 #[stable(feature = "euclidean_division", since = "1.38.0")]
-295: 291 pub fn rem_euclid(self, rhs: f32) -> f32 {
-296: 292 core::f32::math::rem_euclid(self, rhs)

@@ -1,9 +1,0 @@
-<<<OLD
-| foreground Worker tick start jitter p99 ≤ 4 ms over 18,000 ticks (10 minutes at 30 Hz) |
->>>NEW
-| foreground Worker tick start jitter p99 ≤ 4 ms over 18,000 ticks (10 minutes at 30 Hz), read against the Worker's own schedule: in local play the accumulator's, online the schedule the step returns from the client endpoint's server-time estimate (part 5, S18), with the estimate's changes over the run recorded |
-===
-<<<OLD
-Bites: ticks counted per timer callback instead of from elapsed time |
->>>NEW
-Bites: ticks counted per timer callback instead of from elapsed time; online, a Worker that keeps its local schedule and ignores the server-time estimate must fail the jitter read against that schedule under P2 |

@@ -1,4 +1,0 @@
-<<<OLD
-| H, V; rule B | R3-BUDGET-REC2's rows (lines 1123–1124) and its mark
->>>NEW
-| H, V; rule B; S on ML | R3-BUDGET-REC2's rows (lines 1123–1124) and its mark

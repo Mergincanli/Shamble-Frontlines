@@ -1,2 +1,0 @@
-  alone on four vCPUs (the 3 times of day: r6-infrastructure.md, R6-HOST-REC2's mark, lines 668–669). A mark
-  compared with "a clean run" uses the median of 3 clean runs whose p99s lie within

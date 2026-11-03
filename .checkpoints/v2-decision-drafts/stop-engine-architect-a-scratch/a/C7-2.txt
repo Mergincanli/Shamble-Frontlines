@@ -1,5 +1,0 @@
-- Both options apply R1-DATA-REC8's simulation and client groups (r1, lines 2596–2598). The map document holds both
-  sides in one document either way (EDITOR_V2 §2, rule 1). Proposed: (b) for definitions, because the feel kit already
-  takes it and a weapon's presentation (feel kit, sockets, model) then sits in one place. Chosen: (b), the Advisor's
-  answer to OQ-0005-1 (2026-11-03), with one more whole-set check: an id of a presented kind with no client entry
-  fails (CD-2 names the kinds); AP-2, AP-3 and CD-13 state (b) as decided.

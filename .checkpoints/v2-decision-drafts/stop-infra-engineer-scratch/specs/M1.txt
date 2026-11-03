@@ -1,8 +1,0 @@
-- **OQ-0006-17. How do sessions get VMs for the spikes, the tick bench and the 3-hour soak before each playtest
-  without holding a secret?**
-  - Answered by Mustafa (2026-11-03): "a separate Hetzner project. I create and delete the VMs myself for each run;
-    sessions get SSH access only and no Hetzner token until the security baseline. VMs exist only during a run." So
-    (a) is decided, in (b)'s project of its own but with no token; (b)'s token and (c) stay below as the record of
-    what was weighed. The security baseline comes before the first online playtest, so this covers the tick bench and
-    the 3-hour soaks too; how a session's SSH key is made and held without it reading a secret it did not make is for
-    the netcode proof test's own plan, with security-auditor and the advisor (the advisor's reading, 2026-11-03).

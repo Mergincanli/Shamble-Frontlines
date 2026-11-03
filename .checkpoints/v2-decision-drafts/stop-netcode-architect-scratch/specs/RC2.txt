@@ -1,1 +1,0 @@
-W	{sp}{sp}{sp}{sp}	{sp}{sp}{sp}{sp}	connections and sends nothing (ADR 0004 part 20 says the same). A match never resumes instead: OQ-0001-18, answered by the Advisor (2026-11-03): "end the match, as proposed, and keep the crash and match records", both written and kept under ADR 0006 part 11's proposed retention (the advisor's reading, 2026-11-03). *Join:* a

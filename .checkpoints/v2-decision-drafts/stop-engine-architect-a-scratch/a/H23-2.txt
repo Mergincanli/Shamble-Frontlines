@@ -1,7 +1,0 @@
-no change: not my text. docs/adr/0002-code-structure-build-toolchain.md:1332-1333 sits in "Pass marks" (test-engineer's
-text): "No mark here is set at 60 Hz: TICK-30's baseline is 30 Hz, and the 60 Hz margin is ADR 0001's, measured in one
-run of the netcode proof test." Not in the map. By TICK-60-SETUP (the Advisor, 2026-11-03: "(a), as an early signal
-only. The final 60 Hz call is measured again with the real sim at slice 6.") and the verdict's ruling ("Every line
-that says the proof test measures or decides the 60 Hz call changes"), the clause after the comma needs, for example:
-"the 60 Hz margin is ADR 0001's: an early signal in wave 1, and the run that decides at slice 6 on the real sim". For
-test-engineer.

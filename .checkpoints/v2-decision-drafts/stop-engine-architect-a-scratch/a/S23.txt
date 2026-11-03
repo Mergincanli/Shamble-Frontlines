@@ -1,6 +1,0 @@
-- **Definition:** 1 − (p99 server tick time at a 60 Hz tick ÷ the server tick budget at 60 Hz, 8.33 ms). Each
-  measurement is one run (p99s do not add: see time statistics): on one vCPU of the reference server, in the stress
-  scene at N = 48 with a snapshot-receiving client on every soldier, over R2-BUD-REC6's 30-minute soak, re-flood ticks
-  included. It is measured in wave 1, after the sim core spike (SPIKE-ORDER, Mustafa, 2026-11-03), as an early signal
-  only, and again at slice 6 on the real sim, the run that decides (TICK-60-SETUP, the Advisor, 2026-11-03: "(a), as
-  an early signal only. The final 60 Hz call is measured again with the real sim at slice 6.").

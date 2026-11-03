@@ -1,5 +1,0 @@
-# Notes: touchup2-engine-architect-synthesis
-
-- 21:15 started; output and scratch created. Next: read fixcheck-d2 verdicts (SF1, row S12).
-- 21:2x SF1 checked as skeptic: holds. SPIKE_PLAN:251 says "shared materials per slot class"; ADR 0003:174-175 (5.a) "one material per slot content, never one per mesh"; ADR 0005:1695-1697 (GPU part 1) defines the content (class, faction, own colours, textures, side, alpha mode); GPU part 7 (0005:1749) repeats it; PM-0005-35 (0005:2238) bites a loader keyed by (slot class, faction) only. FIX SF1 written: 2 lines to 2 lines (117, 118 chars), SPIKE_PLAN stays 449 lines. BEFORE occurs once (script). Glossary on scratch orig/fixed: exact 0 both, output identical. Inside a bullet, not under a table. Checked SPIKE_PLAN:390 (item 9, "every slot classed and every faction slot coloured"): about classing slots, not the material key, so out of scope and not wrong. Next: final check, DONE.
-- 21:3x final check: FIX SF1 BEFORE occurs once on disk as whole lines, 2 -> 2 lines; SPIKE_PLAN:390 confirmed against PM-0005-42 (0005:2246) "Every slot is classed and every faction slot coloured, on both backends". DONE

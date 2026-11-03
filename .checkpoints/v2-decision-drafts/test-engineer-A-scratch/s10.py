@@ -1,8 +1,0 @@
-SUBS = [
-("| mean at most 160 kbps; p99 of 1-second windows at most 256 kbps; every 1-second window at most 256 kbps (the hard cap; proposed reading of \"hard cap\"); 0 datagrams above the cap rule; counted per client at the server's send side, UDP payload plus 28 B per datagram. Reported beside it: the same counts in ES (the scene the research mark was set on) and, if LG reaches RS over IPv6, the IPv6 figure |",
- "| in ES, the scene R2-BUD-REC2 set its mark on: mean at most 160 kbps and p99 of 1-second windows at most 256 kbps; in SS, the load the cap must hold: every 1-second window at most 256 kbps (the hard cap; proposed reading of \"hard cap\") and 0 datagrams above the cap rule, its mean reported beside R2's formula evaluated at the run's own counts (entities in each client's set, shots, spawns and events per second: lines 1764–1766), as ADR 0006's PM-0006-17 evaluates it for egress (SS's 700 shots a second alone add about 20.1 kbps to R2's 146.1: the draft's bandwidth estimate); both counted per client at the server's send side, UDP payload plus 28 B per datagram. Reported beside it: if LG reaches RS over IPv6, the IPv6 figure |"),
-("| SS at P2, everyone in view (PM-0001-2), PM-0001-4's runs; ES for 10 minutes (R2-BUD-REC2's own length) | as PM-0001-4; rule B-N |",
- "| ES at P2 for 10 minutes (R2-BUD-REC2's own length), 3 runs (proposed, as PM-0001-4); SS at P2, everyone in view (PM-0001-2), PM-0001-4's runs | as PM-0001-4, in each scene; rule B-N in each |"),
-("worked estimate (lines 1754–1779, 1784: +4.8 kbps for IPv6) |",
- "worked estimate (lines 1754–1779, 1784: +4.8 kbps for IPv6); GLOSSARY lines 415–416 (\"R2's worked bandwidth estimate is not the stress scene\"); the netcode and perf reviews of 2026-11-02 (findings 2 and 1) |"),
-]

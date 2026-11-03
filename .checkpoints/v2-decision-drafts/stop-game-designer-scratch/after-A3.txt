@@ -1,3 +1,0 @@
-- **The strongest argument against:** every GAS fact behind AB-1 comes from one community write-up (R1-ABL-OQ1; the
-  Advisor accepted it "for concepts" on 2026-11-03, OQ-0005-AB12), and the closest shipped team-shooter precedent,
-  Overwatch's scripted abilities, was not read (R1-ABL-OQ2). So the case

@@ -1,6 +1,0 @@
-R1-ECS-OQ4 and R1-TICK-OQ5 are still decided from RS alone (AMENDMENT condition 6 asks the author to say so):
-R1-ECS-OQ4 is "Decided by: REC1 mark 1's native sim step time against the sim step share ... and R6's hosting cost
-per match" (r1-simulation-core.md lines 2622–2626), both on the reference server, and R1-TICK-OQ5 is "Decided by:
-REC2's P1–P3" (lines 2658–2660), run on RS; PM-0004-4's CX33 half was "reported" beside them and decided neither, so
-F-PM-0004-4 drops it and its title says "both from RS alone". Neither stays open. Appendix A's rows for them (lines
-1329 and 1334) name the sim core spike, unchanged.

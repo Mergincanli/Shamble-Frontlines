@@ -1,4 +1,0 @@
-exact a/b - 3 = -1.1920927533992823e-07 ; midpoint 3 - 2^-23 = -1.1920928955078125e-07 ; above midpoint: True
-f32(a/b) = 3.0
-trunc = 3  a % b = 1.0
-div_euclid = 3  rem_euclid = 1.0  correct quotient = 2

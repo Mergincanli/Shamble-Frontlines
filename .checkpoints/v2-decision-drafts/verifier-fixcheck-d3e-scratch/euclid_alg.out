@@ -1,6 +1,0 @@
-2b+1 == a exactly: True
-a/b = 3.0  div_euclid = 3.0  rem_euclid = 1.0
-(True, True) div_euclid 3.0 rem_euclid 1.0
-(False, True) div_euclid -4.0 rem_euclid 2.220446049250313e-16
-(True, False) div_euclid -3.0 rem_euclid 1.0
-(False, False) div_euclid 4.0 rem_euclid 2.220446049250313e-16

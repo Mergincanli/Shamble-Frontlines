@@ -1,4 +1,0 @@
-3. Before his team reaches Tech 1, press each ability with A and with B. Expected: the press is refused in both, with
-   no start shown, since the client knows its team's tier (team state goes to the team, ADR 0001) and the ability's
-   required tag (AB-5), so a predicted variant can refuse the press locally. Record: any start that shows, in either
-   variant, as a defect of that variant.

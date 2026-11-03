@@ -1,1 +1,0 @@
-R	| R1-TICK-OQ1 | spike: only if slice 6's 60 Hz run passes (part 2; the advisor's reading, 2026-11-03); then ADR 0004's determinism suite and ADR 0002's Worker smoothness test decide | part 2 |

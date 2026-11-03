@@ -1,8 +1,0 @@
-0. **Before any spike (Mustafa's steps):** the drafts signed off as the basis for the spikes (2026-11-03,
-   SPIKE-ORDER (b)); a Cloudflare account with a test project and its
-   token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account, the console check
-   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks, in which he
-   creates and deletes the VMs himself for each run, with SSH access only and no Hetzner token for sessions until the
-   security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03); a domain he registers for the netcode proof
-   test's WebSocket leg ("for the WebSocket leg, a domain I register": OQ-0006-15, answered in part). *Milestone:* the
-   reference server is orderable, or OQ-0006-1 (b) has named another.

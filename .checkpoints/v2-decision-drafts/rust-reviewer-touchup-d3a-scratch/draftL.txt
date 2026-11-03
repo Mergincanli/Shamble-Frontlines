@@ -1,8 +1,0 @@
-float `%` operator are not on the list. std's pages promise the two methods "the rounded infinite-precision result"
-(1.99.1's, read by the verifier on 2026-11-02, and 1.97.0's), yet rustc 1.97.0's `div_euclid` gives 3, not 2, for
-(3 + 2^-22) ÷ (1 + 2^-23) in `f32`, and its `f64` analogue errs too (verifiers fixcheck-d3a and skeptic-6,
-2026-11-03). An error every target shares passes a same-bits check, all determinism needs; correct rounding is a
-separate claim, so both may join only once fixed inputs, those cases and their sign mirrors included, equal an exact
-reference on every target (PM-0004-22, extended); no source read states the float `%`'s precision (the Rust
-Reference defines it only by truncating division and the dividend's sign), and review, not the lint, catches the
-operator. Transcendental maths only

@@ -1,7 +1,0 @@
-  A 60 Hz tick needs, in the run that decides, a 60 Hz margin of at least 25 % (a p99 server tick time of at most
-  6.25 ms), every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3), and the
-  goal budget (ADR 0006 part 8) holding at the rooms per VM measured at 60 Hz (PM-0001-63; ADR 0001 part 2 states the
-  full rule); otherwise the tick stays at 30 Hz.
-- **Depends on:** TICK-60-HEADROOM (the advisor's reading of 2026-10-31: TICK-30's 25 % is measured against the
-  server tick budget at 60 Hz, 8.33 ms), confirmed by Mustafa (2026-11-03) with one addition, in his words: "60 Hz
-  also needs the goal budget to hold at the rooms per VM measured at 60 Hz."
