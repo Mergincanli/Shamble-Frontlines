@@ -8,3 +8,4 @@
 - 18:11 FIX e2b-F1 written (PM-0005-4: kinds units, vehicles, weapons and factions; both tuning table -> rule table). Next: e2b-F7 PM-0005-15.
 - 18:12 FIX e2b-F7-PM15 written (PM-0005-15 adds the client entries keyed by simulation ids, CD-2). Next: condition 3+4, ADR 0001 key (1364-1369), then ADR 0003 key (1078-1090).
 - 18:18 FIX c3-c4-0001-key written (ADR 0001 key: OQ-0003-1 answered in part, classes quoted, still open, stand-in for ML + reading, client-frames quote + reading; 'stands in for none' gone). Next: ADR 0003 key (1078-1090).
+- 18:22 FIX c3-0003-key written (ADR 0003 key: classes quoted after MP, class text untouched, still open, stand-in + reading). Next: dry-run all, glossary check in tree, quote verbatim check, label grep.
