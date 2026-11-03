@@ -559,7 +559,10 @@ notes.
 | 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
 | 9 again, the final round | 319d3b6, b815c85, 8fa7173, 61e9933, b88714d, 16e97aa, 75615d1, d57dc5a, 5a24122, 72cfcc3, d1f7e13, 8a149bc, 604a497, 449356c (2026-11-02) | every review finding fixed or deferred with a reason |
 | 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, 361b61d, 7cc6942, b513483, 882cfa6, ac252f8, bd68d59, fd8c6f8 (2026-11-03) | fixcheck-d1's, -d2's and -d3's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3, -d4) |
-| 11, 12, 13 | 03fe138, b011372 (docs-keeper); the final commit (the gate, this report; it runs CI) | docs-keeper's re-check and last touch, the gate, the report |
+| 11, 12, 13 | 03fe138, b011372 (docs-keeper); 4374a1c, the final commit at the stop (the gate, this report; it runs CI) | docs-keeper's re-check and last touch, the gate, the report |
+| the stop, plan revision 4 | 03ef222, 59d41e0 (2026-11-03) | the stop's answers recorded by every author (§9); ADR 0002's pass marks |
+| the stop, plan revision 5 | 0aa262f (2026-11-03) | Mustafa's later answers, COMMUNITY-SERVERS and fixcheck-e's findings, by every author (§7.4, §9) |
+| 11 and 13 after the stop | the commit that carries this report | docs-keeper-4 (STATUS, ROADMAP, REPO_MAP), this report and appendix; the last commit deletes the checkpoint (CHECKPOINTS.md §9) |
 
 Spend-limit cuts, ten (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15, 17:50 and 21:20; 2026-11-03
@@ -687,6 +690,46 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
   confirmed. Not read at a
   source: that `usize` is 32 bits on wasm32 (ADR 0004 part 9, labelled proposed).
 
+### 7.4 Recording the stop's answers (plan revisions 4 and 5): fixcheck-e, its skeptics and the last fix round
+
+Five fresh verifiers (effort high) judged every changed line of the nine documents against the deciders' words (§2),
+the advisor's rulings (§10) and the landing map, and each rebuilt its documents from 4374a1c with the authors' blocks:
+
+| Unit | Documents | Verdict | Claims | Findings |
+|---|---|---|---|---|
+| fixcheck-e1 | ADR 0001, 0002, 0004 | PASS WITH NOTES | 77 judged, 77 confirmed (2 with a note) | 3 low: PM-0002-49's reading mark (F1); ADR 0002's "the real sim" (F2, an over-read; its skeptic upheld it); ADR 0004 phase 0's sign-off (F3) |
+| fixcheck-e2 | ADR 0003, 0005, 0006, GLOSSARY §8 | PASS WITH NOTES | 47 judged, 47 confirmed; ADR 0005's changed lines not judged one by one (time, after a cut) | 1 medium: ADR 0006's key gives the loss on each direction without the reading mark (F2); 2 low: three reading marks in ADR 0006 (F3); ADR 0003's option (a) without the mark, two places (F1) |
+| fixcheck-e3 | README, SPIKE_PLAN, ENGINE_OVERVIEW; checks across all nine | PASS WITH NOTES | 6 rows (19 quotes among them) and five cross-document checks | 1 low: six map rows, the session's own, had no written disposition (N7, O23, L14, T2, T4, LA4; the session's NOTEs, §9); SPIKE_PLAN from item 5 on not read (deadline) |
+| fixcheck-e2b | ADR 0005's changed lines (what e2 did not judge) | FAIL | 39 judged, 32 confirmed | 2 medium: PM-0005-4's kinds against CD-2 (F1); Appendix A's count (F2); 5 low: two reading marks (F3); AB12's claims (F4; its skeptic: partly); "as blockouts" (F5; its skeptic upheld it); a mark's date (F6); the client entries' key (F7) |
+| fixcheck-e3b | SPIKE_PLAN from item 5 on; consistency across the documents | PASS WITH NOTES | 36 judged, 31 confirmed | 2 medium: PM-0005-4's kinds (as e2b F1); ADR 0004's phase-1 order against SPIKE_PLAN's waves; 3 low: "not a session's" unmarked; OQ-0003-1's labels; OQ-SPIKE-1's "Why it matters" left stale |
+
+Across the units: every rebuild was byte for byte the commit; the write guard passed; 0 retired glossary phrases;
+521 of 521 research ids disposed once; the counts (114 numbered, 98 open; 341 pass marks) as the documents state them;
+README's 112 pointers name ids and parts that exist, with no line numbers.
+
+The last fix round (plan revision 5, the advisor's conditions 3 to 7): each author's exact blocks for its own text, 59
+FIX and 21 NOTE (test-engineer 7 and 3; engine-architect 37 and 8; infra-engineer 9 and 6; graphics-engineer 3 and 2;
+rust-reviewer 2 and 1; game-designer 1 and 0; netcode-architect 0 and 1), each placed by the session's script inside its
+author's text, dry-run, and applied in the session's order in 0aa262f. Every finding of e1, e2, e2b and e3b is fixed as
+the advisor's conditions 3 to 7 set it; e3's six map rows have the session's NOTEs (§9). COMMUNITY-SERVERS: OQ-0006-21
+and part 12's one pointer; ADR 0001, 0002, 0004 and 0005 checked by their authors and ADR 0003 and 0004 by the session,
+no change.
+
+Mustafa then stopped verification ("after e2b, e3b and their fix round, stop. No further re-check rounds; anything left
+goes into the PR as notes."), so no verifier re-checked that round's blocks. The session ran the scripts instead (the
+verdict's condition 8): the write guard passes; 521 of 521 research ids disposed once; 0 retired glossary phrases; no
+line glued under a table and every pass-mark row 7 cells; new prose lines at most 120 characters; 115 numbered open
+questions, 97 open (12, 7, 17, 10, 33, 18), and 341 pass marks (63, 78, 47, 75, 46, 32), numbered without gaps; 172
+quotes credited to Mustafa or the Advisor on 2026-11-03 in the changed rows and paragraphs, each found word for word in
+his three messages (the Advisor's NET-PROFILES answer twice with its inner quotes made single, as quotes inside a quote;
+the script's 20 other hits are section names, labels and checklist terms); no "answered in part" left on OQ-0006-15 or
+-20, OQ-0003-1 "answered in part" wherever it is labelled, no "stands in for none", no "tuning table" in PM-0005-4, and
+"doesn't measure client frames" once, in ADR 0001's key; README's 114 pointers carry no line number and name ids and
+parts that exist. The gate (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a cannot start here, as
+before; CI runs it with smoke.
+
+Notes left: the report's "Notes left after verification" (six items).
+
 ## 8. The checkpoint, folded in (CHECKPOINTS.md §9.1)
 
 - **Steps with their commits:** §5. **Decisions:** Mustafa's words (§2), the advisor's plan reviews (§3, §10), the
@@ -694,14 +737,17 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
 - **Key numbers:** research ids at 9e7db28: 533 rows, 521 unique (REC 165, OQ 241, RR 7, XU 30, XT 72, 6 shared codes,
   18 copies), each disposed exactly once across the six drafts, README's register and SPIKE_PLAN (`dispositions.py`,
   521 of 521 at every commit checked). Claims verified: 3,922, 3,847 confirmed. Fix blocks: 901 in six rounds, 63 in
-  the touch-ups after them, {STOPBLOCKS} in recording the stop's answers. At the stop's answers: 114 numbered open
+  the touch-ups after them, 352 in recording the stop's answers and 59 in the last round after them (with 52 and 21
+  reasoned notes, and the session's six). At the stop's answers: 114 numbered open
   questions, 98 open (ADR 0001 12, 0002 7, 0003 17, 0004 10, 0005 33, 0006 19) plus OQ-SPIKE-1 in SPIKE_PLAN; pass
-  marks 63, 78, 47, 75, 46 and 32 (341).
+  marks 63, 78, 47, 75, 46 and 32 (341). After the last round: 115 numbered, 97 open (12, 7, 17, 10, 33, 18); the pass
+  marks unchanged.
 - **Open findings at the end:** the deferred items of §7.3; GLOSSARY lines 707–712 (base text, before §8) still describe
   the proof test's WebSocket leg with a pinned self-signed certificate, where Mustafa's answer gives it a trusted
   certificate on his domain (a NOTE for the Advisor: the base text is not edited); ADR 0006's OQ-0006-13 times its call
   "before the first client-host token" where the advisor's LATER ruling says "before the foundation's client-host token"
-  (infra-engineer's flag; the entry is not edited by that ruling); {OPENFINDINGS}
+  (infra-engineer's flag; the entry is not edited by that ruling); and what the last round left, the report's "Notes
+  left after verification".
 - **Not carried over:** the checkpoint's earlier open findings were each settled in a fix round (§7) or are in §7.3; the
   running-work notes end with the stop.
 
@@ -709,8 +755,9 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
 
 Recorded under plan revision 4 (the advisor's APPROVE WITH CONDITIONS, §10), from engine-architect's landing map (205
 rows; each got a FIX block or a reasoned "no change" from its own author). Commits: 03ef222 (all eight authors' blocks),
-59d41e0 (ADR 0002's pass marks, test-engineer){STOPFIXCOMMITS}. A reading of the advisor's, not the deciders' words, is
-marked "(the advisor's reading, 2026-11-03)" where it stands; the report's "At the stop" lists them.
+59d41e0 (ADR 0002's pass marks, test-engineer), and 0aa262f (fixcheck-e's findings, plan revision 5, §7.4). A reading of
+the advisor's, not the deciders' words, is marked "(the advisor's reading, 2026-11-03)" where it stands; the report's
+"At the stop" lists them.
 
 | Answer | Whose | Where it is recorded | Still open |
 |---|---|---|---|
@@ -719,8 +766,8 @@ marked "(the advisor's reading, 2026-11-03)" where it stands; the report's "At t
 | TICK-60-SETUP (a), an early signal only | the Advisor | ADR 0001 OQ-0001-2, part 2, migration steps 1 and 8; ADR 0004's stand-ins; ADR 0002's pass marks; GLOSSARY §8; SPIKE_PLAN; README | — |
 | NET-PROFILES | the Advisor | ADR 0001 OQ-0001-3, OQ-0001-16, part 13; ADR 0002 part 8 and PM-0002-49; README; SPIKE_PLAN | — |
 | REWIND-CAP | Mustafa | ADR 0001 OQ-0001-5 (answered in part: the rule), parts 5 and 8, OQ-0001-6's guide, the netcode checklist, Revisit; SPIKE_PLAN items 1 and 10; README | the cap's value, from the proof test |
-| SPIKE-MACHINES | Mustafa | ADR 0006 OQ-0006-17 (answered), OQ-0006-5, -15, -20 (in part), parts 7 and 8, the spike items, the load generator on CX33s; ADR 0001 part 10 (certificates) and spike item 1; ADR 0002 part 8 (the bench path); SPIKE_PLAN item 1; README | OQ-0006-1 (his console check); OQ-0006-15 (which domain); OQ-0006-20 (a cost cap); OQ-0003-1 (the reference machines); the SSH key and the certificate method (the proof test's plan, with security-auditor) |
-| LOOK-TEST-INPUTS | Mustafa | ADR 0005's settled inputs (LOOK-TEST-INPUTS) and OQ-0005-AP1; ADR 0003 part 11; SPIKE_PLAN (the asset research's export and slot-naming part before the look proof test; OQ-SPIKE-1 answered); README | LOOK_V2 §8 (escalated; LOOK_V2 not edited) |
+| SPIKE-MACHINES | Mustafa | ADR 0006 OQ-0006-17 (answered), OQ-0006-5, -15, -20 (in part), parts 7 and 8, the spike items, the load generator on CX33s; ADR 0001 part 10 (certificates) and spike item 1; ADR 0002 part 8 (the bench path); SPIKE_PLAN item 1; README | OQ-0006-1 (his console check); OQ-0003-1's actual machines (named before the look proof test); the SSH key and the certificate method (the proof test's plan, with security-auditor); OQ-0006-15 and -20 answered later that day (below) |
+| LOOK-TEST-INPUTS | Mustafa | ADR 0005's settled inputs (LOOK-TEST-INPUTS) and OQ-0005-AP1; ADR 0003 part 11; SPIKE_PLAN (the asset research's export and slot-naming part before the look proof test; OQ-SPIKE-1 answered); README | LOOK_V2 §8: answered later that day (below); LOOK_V2 not edited |
 | TOY-BOX | Mustafa | nothing in the nine documents; STATUS and the report: a kit change-set after PR #30, with the checkpoint anti-waste rules | — |
 | OQ-0002-8 (a) | the Advisor | ADR 0002 OQ-0002-8, part 3, the trade-off, the options table, Appendix A; README names the three crates | — |
 | OQ-0005-1 | the Advisor | ADR 0005 OQ-0005-1, CD-2 (the presented kinds that need a client entry, and those with nothing to present), CD-13, AP-2, AP-3, question F2, the frame's table; a bite on a CD-2 pass mark; README | — |
@@ -743,6 +790,29 @@ these, word for word from its notes):
 | T2 | the session | no change in this PR: TOY-BOX rewords CLAUDE.md line 4 and the art-director's file line 10 in a small kit change-set after PR #30 is updated (Mustafa's words); the plan excludes CLAUDE.md and `.claude/`. STATUS and the report record it. |
 | T4 | the session | docs-keeper's and the session's: STATUS records TOY-BOX's kit change-set (docs-keeper-4, item 4); the report's "At the stop" and the appendix §9 record it. |
 | LA4 | the session | docs-keeper's: STATUS records the design session after the netcode proof test, with the twelve LATER questions and the 38 design questions on its agenda (docs-keeper-4, item 4; the verdict's LATER ruling). |
+
+Recorded under plan revision 5 (the advisor's APPROVE WITH CONDITIONS, §11), in 0aa262f. The design answers go in
+README and STATUS only, as Mustafa asked; the drafts take them up at their next revision (the verdict's DRAFT-ENTRIES
+(a)). The answers to the escalations close questions the drafts' own entries carry, so the drafts take those.
+
+| Answer | Whose | Where it is recorded | Still open |
+|---|---|---|---|
+| Carry slots (OQ-0005-AB1) | Mustafa | README's row (answered, with his "Assumed, to confirm: the class's own abilities stay."); STATUS | his "Assumed, to confirm" |
+| Looted ammo (OQ-0005-AB2) | still open; the lean is the Advisor's | README's row (open, his three options in his words; the lean marked as the Advisor's, never as an answer; LATER kept); STATUS | the answer |
+| Levelling (OQ-0005-AB3) | Mustafa | README's row; STATUS | — |
+| The name "amplifications" ("amps") | Mustafa | README's one sentence; STATUS | — |
+| WEAPON-UNLOCKS (OQ-0005-AB5) | Mustafa, "Not final" | README's row (open, his lean); STATUS | the answer |
+| Banzai vs Riot Shield (OQ-0005-AB11) | Mustafa | README's row; STATUS | the Peacekeeper's strength before Tech 1, left to his "numbers tuned later" (the advisor's reading) |
+| Upgrade visibility (OQ-0005-AB15) | Mustafa | README's row (placing it at AB15: the advisor's reading); STATUS | how enemies see it (the scoreboard or a cue) |
+| Spawn protection (OQ-0005-AB14) | Mustafa: 3 s; the Advisor's pencil: firing ends it early | README's row (answered in part); STATUS | what it covers (ADR 0005's options (a) and (b)); the pencil, which Mustafa may veto |
+| Fragments as damage | Mustafa | README's sentence; STATUS | — |
+| Faction asymmetry; the war around the matches | Mustafa: still open | README (asymmetry beside OQ-0005-CD5; the war quoted, no id); STATUS | both |
+| REF-MACHINES (OQ-0003-1) | Mustafa | ADR 0001's and ADR 0003's keys (test-engineer); ADR 0003's OQ-0003-1 and its migration line (graphics-engineer); README; SPIKE_PLAN's machines paragraph, items 1, 3, 4 and 5 and its open list (engine-architect) | the actual machines, named before the look proof test |
+| LOOK_V2-§8 | Mustafa | ADR 0005's settled inputs (LOOK-TEST-INPUTS); SPIKE_PLAN's asset-pipeline research; STATUS (a later step) | §8 reads "Spline or Blender" once the export part reports (that part's change-set) |
+| SPIKE-COST (OQ-0006-20) | Mustafa | ADR 0006 OQ-0006-20 (answered); README; SPIKE_PLAN (the proof test's "Depends on") | each run's cap, in its plan, for his OK |
+| DOMAIN (OQ-0006-15) | Mustafa | ADR 0006 OQ-0006-15 (answered); README; SPIKE_PLAN | the registration, before the netcode proof test |
+| COMMUNITY-SERVERS | Mustafa | ADR 0006 OQ-0006-21 (new) and part 12's pointer; README's row; ADR 0001, 0002, 0004 and 0005 checked by their authors (no change), ADR 0003 and 0004 by the session (no change) | the whole question, kept open, not designed |
+| Verification stop | Mustafa | no fixcheck-f; the scripts and the gate (§7.4); notes left in the report | — |
 
 ## 10. The advisor's review of plan revision 4, at the stop (word for word)
 

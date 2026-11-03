@@ -31,9 +31,9 @@ escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS,
   wave 1 one heavy spike at a time) · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design
   questions, the loose-ends register; its pointers name OQ ids and parts, no line numbers).
 - `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 115 numbered open questions (97 open after
-  the stop's answers) plus one in SPIKE_PLAN, each with options and a decider, and 341 pass marks. Authors:
-  netcode-architect, engine-architect, graphics-engineer, rust-reviewer, engine-architect + game-designer +
-  graphics-engineer, infra-engineer; pass marks by test-engineer.
+  the stop's answers and Mustafa's later ones) plus one in SPIKE_PLAN, each with options and a decider, and 341 pass
+  marks. Authors: netcode-architect, engine-architect, graphics-engineer, rust-reviewer, engine-architect +
+  game-designer + graphics-engineer, infra-engineer; pass marks by test-engineer.
 - `docs/LOOK_V2.md` (byte copy) · `docs/research/GLOSSARY.md` §8 (appended; its 60 Hz entry amended at the stop) ·
   STATUS, ROADMAP, REPO_MAP · this report and its appendix. Symbols +0 −0 (gate check 3); no code, no spike.
 
@@ -57,9 +57,20 @@ escalations, COMMUNITY-SERVERS, the last fix round) → APPROVE WITH CONDITIONS,
   and of this report's numbers: PASS WITH NOTES (fixcheck-d4: 68 claims, 59 confirmed; the ten newest blocks right; nine
   slips in this report and its appendix, one medium, fixed with its skeptics' corrected words and not re-checked again;
   one optional section number deferred).
-- **Scripts at fd8c6f8 (the drafts' last change):** 521 of 521 research ids disposed exactly once; 0 retired glossary
-  phrases in all nine documents; README's 94 pointers into the drafts on target; no line glued under a table; the write
-  guard passes.
+- **Scripts at fd8c6f8 (the drafts' last change before the stop):** 521 of 521 research ids disposed exactly once; 0
+  retired glossary phrases in all nine documents; README's 94 pointers into the drafts on target; no line glued under a
+  table; the write guard passes.
+- **The stop's answers re-checked (2026-11-03):** five fresh verifiers judged every changed line against the words and
+  the advisor's rulings, and rebuilt each document from the authors' blocks (byte for byte the commit): fixcheck-e1,
+  -e2, -e3 and -e3b PASS WITH NOTES, -e2b FAIL (two medium items in ADR 0005: PM-0005-4's kinds against CD-2, and
+  Appendix A's count); 205 claims judged, 193 confirmed; skeptics on three verdicts (two upheld, one partly). Every
+  finding went to its own author in the last fix round (0aa262f, with Mustafa's later answers), and then verification
+  stopped, as he asked. The session's scripts at 0aa262f: the write guard passes; 521 of 521 research ids; 0 retired
+  glossary phrases; no line glued under a table, every pass-mark row 7 cells, new prose lines at most 120 characters;
+  115 numbered open questions, 97 open, and 341 pass marks, numbered without gaps; 172 quotes credited to Mustafa or the
+  Advisor on 2026-11-03, each found word for word in his three messages (two with their inner quotes made single, as
+  quotes inside a quote), the other hits section names and labels; the labels as the advisor set them; README's 114
+  pointers carry no line number and name ids and parts that exist. Appendix §7.4.
 - **Gate** (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a smoke cannot start here (Playwright
   wants a browser revision this container lacks, and installing one is not allowed); CI's gate with smoke: 77 runs on
   this branch before the final commit, 70 passed, 7 cancelled when a newer push replaced them, 0 failed (`[skip ci]`
@@ -75,7 +86,7 @@ the time of the sim parts it lacks. The final round added 24 open questions; a f
 revision after this stop, each with its reason (appendix §7.3).
 
 ## At the stop (2026-11-03)
-Mustafa's answers, word for word: appendix §2; where each landed, by commit: appendix §9 (03ef222, 59d41e0{STOPFIX}).
+Mustafa's answers, word for word: appendix §2; where each landed, by commit: appendix §9 (03ef222, 59d41e0, 0aa262f).
 Mustafa's: SPIKE-ORDER (b), wave 1 one heavy spike at a time; TICK-60-HEADROOM confirmed, with the goal budget holding
 at the rooms per VM measured at 60 Hz (new mark PM-0001-63); REWIND-CAP's rule (no value yet); SPIKE-MACHINES;
 LOOK-TEST-INPUTS (Blender); TOY-BOX (a kit change-set after PR #30); LATER (a design session after the netcode proof
@@ -93,7 +104,8 @@ The advisor's readings, marked "(the advisor's reading, 2026-11-03)" where they 
   and the Feel Lab's weighing of the cap go; "the smallest input buffer that holds" guides OQ-0001-6.
 - P2's loss: 2 % on each direction, independently.
 - Machines: "no token until the security baseline" covers the tick bench and the 3-hour soaks; the load generator is
-  CX33s; "Test PC: my own" is MP and stands in for no reference machine; the WebSocket leg uses a trusted certificate
+  CX33s; "Test PC: my own" is MP, never a measured result (plan revision 5 adds his stand-in for ML, for rough checks
+  only; nothing stands in for RD or MAC); the WebSocket leg uses a trusted certificate
   on his domain, the method in the proof test's plan.
 - The look test: blockouts may stand for part 11's objects; no checklist edit now; Blender for the models and the
   export route.
@@ -112,7 +124,8 @@ only, the name "amplifications", a lean for weapon unlocks; still open: looted a
 around the matches); his answers to the four escalations (the reference machines answered in part, LOOK_V2 §8 kept
 with Blender for the test models only, one cost cap per run, shamblefrontlines.com at Cloudflare); COMMUNITY-SERVERS,
 a new open question in ADR 0006 (OQ-0006-21), the door kept open; and his stop on verification after this round.
-Commits: {R5COMMITS}. Counts after it: 115 numbered open questions, 97 open; pass marks 341.
+Commit: 0aa262f (every author's blocks; appendix §9). Counts after it: 115 numbered open questions, 97 open; pass marks
+341.
 
 ## Decisions and deviations
 - **Openly stated (condition 18):** LOOK_V2 was added before the plan's approval (brief §0 asked for it first). The
@@ -139,6 +152,24 @@ Commits: {R5COMMITS}. Counts after it: 115 numbered open questions, 97 open; pas
 - **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00), and his "You can continue" (2026-11-03 07:14), which
   let this morning's last units start before 08:30 (fetching still from 08:30); ten spend-limit cuts over four days,
   each resumed from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
+
+## Notes left after verification
+Mustafa: "anything left goes into the PR as notes." No verifier re-checked the last round's blocks; the scripts above
+did. What the authors flagged and left, each for the drafts' next revision unless it says otherwise:
+1. ADR 0003's look proof test needs "both reference machines (OQ-0003-1)" and names no Mac, though its rows PM-0003-1,
+   -2, -3, -5, -6 and -16 name MAC for Safari; his answer puts the Mac among the machines he names before that test
+   (graphics-engineer).
+2. PM-0006-18's "until it is answered the plan's cost goes to Mustafa" now describes the time before his SPIKE-COST
+   answer (infra-engineer; the row is test-engineer's, unchanged).
+3. SPIKE_PLAN item 6, the preview hosting check, needs ML and MAC with the four browsers (as PM-0006-1 to -6 and -8 do)
+   and may run before the machines are named: it belongs with MACHINES-TIMING (engine-architect).
+4. COMMUNITY-SERVERS' "the game's version" is read as the protocol version that `Join` carries (the advisor's ruling);
+   `Join` carries no build version, and adding one would be a new field, for later (netcode-architect).
+5. The design answers are in README and STATUS only. ADR 0005, ADR 0001 part 12 (AB15's visibility) and ADR 0003 (the
+   fragments) take them up at their next revision, and README's interface I-21 ("sent to their owner") and code J5
+   change with them (the advisor's DRAFT-ENTRIES (a); engine-architect).
+6. Two older notes stand (appendix §8): GLOSSARY's base text (lines 707–712) still gives the WebSocket leg a pinned
+   self-signed certificate; OQ-0006-13 times its call "before the first client-host token".
 
 ## Risks
 1. Size: about 11,000 lines of drafts. README's "Decisions the drafts ask for" is the way in.
