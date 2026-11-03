@@ -2,8 +2,13 @@
 // Guard hook launcher (kit-v3-1). Registered in .claude/settings.json for PreToolUse, PermissionRequest and
 // ConfigChange with "onFailure": "block". It stays small and rarely changes: it loads the rules in routine-guard.mjs
 // and prints their decision as JSON. If the rules can't load or throw, a routine (SHAMBLE_ROLE set) is refused and a day
-// session goes on (plan R3c), so a broken rules file never locks a day session out of fixing it. Always exits 0: a
-// decision travels as JSON, and any other exit code would count as a hook failure.
+// session goes on (plan R3c), so a broken rules file never locks a day session out of fixing it. Whenever this file
+// runs, it exits 0: a decision travels as JSON, and any other exit code would count as a hook failure.
+// settings.json does not run this file directly: each handler runs a one-line bootstrap (`node -e`, GUARD-FILE,
+// Mustafa 2026-11-03) that imports it. A session keeps the hook settings it loaded while a branch switch changes the
+// files on disk, so this file itself can be missing or broken under a live hook; the bootstrap then applies the R3c
+// rule one level up: a day session exits 0 with no output (no decision: the call, and any settings reload, go on), a
+// routine exits 1, a hook failure that "onFailure": "block" turns into a block. Only the bootstrap ever exits non-zero.
 import { readFileSync } from 'node:fs';
 
 const role = process.env.SHAMBLE_ROLE || '';
