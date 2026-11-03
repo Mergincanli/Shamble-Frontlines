@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shamble Frontlines — UI theme: War-room dossier</title>
+<style>
+:root{
+  --paper:#e5d9c5; --paper-2:#d6c8b0; --manila:#d8bf8a; --manila-2:#c7aa6e;
+  --olive:#4b5320; --olive-2:#5f6a2b; --brass:#b5a642; --red:#a51e1e; --red-2:#8b0000;
+  --ink:#11121a; --kit:#262c1a; --kit-2:#323a22; --desk:#1c2014;
+  --stencil:"Arial Black","Impact","Helvetica Neue",Arial,sans-serif;
+  --type:"Courier New",Courier,"Nimbus Mono PS",monospace;
+  --hand:"Segoe Print","Bradley Hand","Chalkboard SE","Comic Sans MS",cursive;
+  --shadow:10px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --desk:#1c2014; } }
+:root[data-theme="dark"]{ --desk:#1c2014; }
+*,*::before,*::after{ box-sizing:border-box; }
+html{ height:100%; scroll-padding-top:env(safe-area-inset-top,0px); }
+body{ margin:0; min-height:100%; background:var(--desk); color:var(--ink); font:15px/1.55 var(--type); overflow-x:hidden; }
+
+/* ---- the desk: dark olive felt, a faint contour map of the island, a lamp pool, halftone in the corners ---- */
+.desk{ position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 55% at 48% 42%, rgba(229,217,197,.13), transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%, transparent 0 34px, rgba(181,166,66,.07) 34px 35px),
+    repeating-radial-gradient(circle at 22% 78%, transparent 0 28px, rgba(181,166,66,.06) 28px 29px),
+    linear-gradient(rgba(181,166,66,.05) 1px, transparent 1px) 0 0/80px 80px,
+    linear-gradient(90deg, rgba(181,166,66,.05) 1px, transparent 1px) 0 0/80px 80px,
+    var(--desk); }
+.desk::after{ content:""; position:absolute; inset:0;
+  background:radial-gradient(rgba(0,0,0,.55) 1.1px, transparent 1.4px) 0 0/7px 7px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, #000 100%); mask-image:radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, #000 100%); }
+.grain{ position:fixed; inset:0; z-index:40; pointer-events:none; opacity:.09; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* ---- board chrome (design-review only, not part of the game UI) ---- */
+.board{ position:sticky; top:0; z-index:30; display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:10px 16px;
+  background:rgba(17,18,26,.86); color:var(--paper); font:13px/1 var(--type); border-bottom:2px solid var(--ink); }
+.board b{ font-family:var(--stencil); letter-spacing:.06em; color:var(--brass); margin-right:8px; }
+.board button{ font:13px var(--type); color:var(--paper); background:transparent; border:1px solid rgba(229,217,197,.3); padding:6px 10px; cursor:pointer; }
+.board button[aria-pressed="true"]{ background:var(--paper); color:var(--ink); border-color:var(--paper); }
+.board .sp{ flex:1; }
+
+main{ position:relative; z-index:1; display:grid; place-items:center; min-height:calc(100vh - 52px); padding:40px 20px 60px; }
+.screen{ display:none; width:100%; max-width:980px; }
+.screen.on{ display:block; }
+
+/* ---- the comic sheet: inked outline + hard cel shadow filled with halftone dots (the game's Living Comic look) ---- */
+.sheet{ position:relative; background:var(--paper); border:3px solid var(--ink); }
+.sheet::before{ content:""; position:absolute; inset:-3px; transform:translate(var(--shadow),var(--shadow)); z-index:-1;
+  background:radial-gradient(var(--ink) 1.3px, transparent 1.6px) 0 0/6px 6px, rgba(17,18,26,.35); border:3px solid var(--ink); }
+.sheet .fibres{ position:absolute; inset:0; pointer-events:none; opacity:.35;
+  background:repeating-linear-gradient(8deg, transparent 0 11px, rgba(120,96,60,.08) 11px 12px); }
+
+.stencil{ font-family:var(--stencil); font-weight:900; text-transform:uppercase; letter-spacing:.02em; line-height:.92;
+  -webkit-mask-image:repeating-linear-gradient(90deg,#000 0 .47em, transparent .47em .52em); mask-image:repeating-linear-gradient(90deg,#000 0 .47em, transparent .47em .52em); }
+.hand{ font-family:var(--hand); }
+
+/* ---- main menu: manila folder, dossier sheet, index tabs ---- */
+.folder{ position:relative; display:grid; grid-template-columns:1fr auto; align-items:start; }
+.folder-back{ position:absolute; inset:-18px 60px -14px -14px; background:var(--manila); border:3px solid var(--ink); z-index:-2; }
+.folder-back::after{ content:"Operation Cabana"; position:absolute; top:-34px; left:26px; padding:6px 18px 8px; background:var(--manila);
+  border:3px solid var(--ink); border-bottom:0; font:700 13px var(--type); letter-spacing:.08em; }
+.dossier{ padding:44px 48px 40px; min-height:460px; }
+.fileno{ margin:0 0 18px; font-size:13px; color:#5a5140; }
+.title{ margin:0; font-size:clamp(46px,8vw,96px); color:var(--ink); }
+.title .l2{ display:block; color:var(--red); }
+.brief{ max-width:34em; margin:26px 0 30px; font-size:16px; min-height:5.2em; }
+.brief .cur{ display:inline-block; width:.55em; background:var(--ink); animation:blink 1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+.note{ position:absolute; right:36px; bottom:26px; transform:rotate(-4deg); color:#4a4436; font-size:17px; }
+
+.stamp{ position:absolute; font-family:var(--stencil); text-transform:uppercase; color:var(--red); border:4px solid var(--red); padding:6px 14px 8px;
+  letter-spacing:.06em; pointer-events:none; mix-blend-mode:multiply; opacity:.85;
+  -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='60'><filter id='r'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.7'/></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>");
+  mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='60'><filter id='r'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.7'/></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>"); }
+.stamp.classified{ top:34px; right:40px; transform:rotate(9deg); font-size:22px; }
+.stamp.slam{ animation:slam .38s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes slam{ 0%{ opacity:0; transform:scale(2.2) rotate(var(--r,-8deg)); } 60%{ opacity:.95; } 100%{ opacity:.85; transform:scale(1) rotate(var(--r,-8deg)); } }
+.splat{ position:absolute; width:120px; height:120px; pointer-events:none; mix-blend-mode:multiply; opacity:0;
+  background:radial-gradient(circle, rgba(165,30,30,.55) 0 3px, transparent 4px) 0 0/18px 18px; -webkit-mask-image:radial-gradient(circle, #000 20%, transparent 70%); mask-image:radial-gradient(circle, #000 20%, transparent 70%); }
+.splat.go{ animation:splat .5s ease-out both; }
+@keyframes splat{ 0%{ opacity:.8; transform:scale(.4); } 100%{ opacity:0; transform:scale(1.4); } }
+
+.deploy{ position:relative; font:900 30px/1 var(--stencil); text-transform:uppercase; letter-spacing:.04em; color:var(--paper);
+  background:var(--olive); border:3px solid var(--ink); padding:18px 34px 20px; cursor:pointer; box-shadow:6px 6px 0 var(--ink); transition:transform .08s, box-shadow .08s; }
+.deploy:hover{ background:var(--olive-2); }
+.deploy:active{ transform:translate(6px,6px); box-shadow:0 0 0 var(--ink); }
+
+.tabs{ display:flex; flex-direction:column; gap:10px; margin-top:70px; margin-left:-3px; }
+.tab{ position:relative; font:700 15px var(--type); text-align:left; color:var(--ink); background:var(--manila); border:3px solid var(--ink); border-left:0;
+  padding:14px 26px 14px 20px; cursor:pointer; min-width:190px; transition:transform .12s; }
+.tab:nth-child(2){ background:#e0c998; } .tab:nth-child(3){ background:#cfb47c; }
+.tab:hover{ transform:translateX(6px); }
+.tab[aria-current="true"]{ background:var(--paper); transform:translateX(0); }
+.circle{ position:absolute; inset:-8px -10px; width:calc(100% + 20px); height:calc(100% + 16px); pointer-events:none; overflow:visible; }
+.circle path{ fill:none; stroke:var(--red); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:420; stroke-dashoffset:420; transition:stroke-dashoffset .45s ease-out; }
+.tab:hover .circle path, .order:hover .circle path, .tab:focus-visible .circle path, .order:focus-visible .circle path{ stroke-dashoffset:0; }
+
+/* ---- pause: clipboard of field orders ---- */
+.clip-wrap{ max-width:620px; margin:0 auto; }
+.clipboard{ padding:62px 44px 36px; background:var(--paper); }
+.clipboard .clamp{ position:absolute; top:-26px; left:50%; width:170px; height:52px; transform:translateX(-50%); background:linear-gradient(#9aa0a6,#6e747a); border:3px solid var(--ink); border-radius:8px 8px 14px 14px; }
+.clipboard .clamp::after{ content:""; position:absolute; left:50%; top:10px; width:46px; height:14px; transform:translateX(-50%); background:var(--ink); border-radius:7px; }
+.orders{ list-style:none; margin:18px 0 26px; padding:0; }
+.order{ position:relative; display:flex; gap:14px; align-items:center; width:100%; font:700 18px var(--type); text-align:left; color:var(--ink); background:none; border:0; border-bottom:2px dashed rgba(17,18,26,.25); padding:13px 4px; cursor:pointer; }
+.order .box{ width:22px; height:22px; border:3px solid var(--ink); flex:none; }
+.order:hover .box{ background:var(--olive); }
+.opts{ display:grid; grid-template-columns:auto 1fr; gap:10px 18px; align-items:center; font-size:15px; margin-bottom:26px; }
+.tick{ display:inline-flex; gap:8px; }
+.tick button{ font:700 14px var(--type); padding:6px 12px; border:2px solid var(--ink); background:transparent; cursor:pointer; }
+.tick button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); }
+.keys{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px 18px; font-size:14px; }
+.keys kbd{ display:inline-block; min-width:34px; text-align:center; font:700 12px var(--type); border:2px solid var(--ink); border-bottom-width:4px; padding:2px 6px; margin-right:8px; background:var(--paper-2); }
+
+/* ---- service record: personnel file ---- */
+.record{ display:grid; grid-template-columns:200px 1fr; gap:34px; padding:44px 46px 40px; }
+.photo{ position:relative; height:240px; background:var(--paper-2); border:3px solid var(--ink); display:grid; place-items:end center; overflow:hidden; }
+.photo .helm{ width:120px; height:62px; background:var(--olive); border:3px solid var(--ink); border-radius:60px 60px 8px 8px; margin-bottom:108px; position:relative; }
+.photo .face{ position:absolute; bottom:0; left:50%; width:132px; height:118px; transform:translateX(-50%); background:#c9a37f; border:3px solid var(--ink); border-radius:50% 50% 0 0; }
+.photo .paperclip{ position:absolute; top:-14px; right:18px; width:18px; height:62px; border:3px solid #7c8288; border-radius:9px; }
+.tag{ margin-top:20px; background:linear-gradient(135deg,#d7cf8c,#a99a45); border:3px solid var(--ink); border-radius:12px 12px 12px 30px; padding:12px 14px; font:700 13px/1.35 var(--type); box-shadow:4px 4px 0 var(--ink); }
+.fields{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 26px; margin-top:22px; }
+.field{ display:flex; gap:6px; align-items:baseline; font-size:15px; padding:8px 0; border-bottom:2px dotted rgba(17,18,26,.35); }
+.field span{ color:#5a5140; } .field b{ margin-left:auto; font-size:17px; }
+.xp{ margin-top:14px; height:18px; border:3px solid var(--ink); background:var(--paper-2); position:relative; }
+.xp i{ position:absolute; inset:0 auto 0 0; width:32%; background:repeating-linear-gradient(135deg, var(--olive) 0 8px, var(--olive-2) 8px 16px); }
+.stamp.promoted{ right:34px; top:30px; transform:rotate(-7deg); font-size:20px; color:var(--olive); border-color:var(--olive); }
+
+/* ---- armory (in-game family): dark field-kit crate lid with paper requisition slips ---- */
+.kit{ position:relative; max-width:640px; margin:0 auto; padding:28px 28px 22px; color:var(--paper); border:3px solid var(--ink);
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 2px, transparent 2px 4px), repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 5px), var(--kit); }
+.kit::before{ content:""; position:absolute; inset:-3px; transform:translate(var(--shadow),var(--shadow)); z-index:-1; background:radial-gradient(#000 1.3px, transparent 1.6px) 0 0/6px 6px, rgba(0,0,0,.4); border:3px solid var(--ink); }
+.kit .rivets{ position:absolute; inset:8px; pointer-events:none; background:radial-gradient(circle, #8a8f78 3px, var(--ink) 4px, transparent 5px) 0 0/100% 100% no-repeat; }
+.kit .rivets::before,.kit .rivets::after{ content:""; position:absolute; width:10px; height:10px; border-radius:50%; background:#8a8f78; border:2px solid var(--ink); }
+.kit .rivets::before{ top:-2px; right:-2px; } .kit .rivets::after{ bottom:-2px; left:-2px; }
+.kit h2{ margin:0 0 4px; font-size:44px; color:var(--brass); }
+.kit .credits{ font-size:15px; margin:0 0 18px; color:#d8cfae; } .kit .credits b{ color:var(--brass); font-size:18px; }
+.slip{ display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; background:var(--paper); color:var(--ink); border:3px solid var(--ink); padding:10px 14px; margin:10px 0; transform:rotate(var(--t,0deg)); box-shadow:4px 4px 0 var(--ink); }
+.slip .n{ font:700 16px var(--type); } .slip .m{ font-size:13px; color:#5a5140; }
+.act{ font:900 14px var(--stencil); text-transform:uppercase; letter-spacing:.04em; padding:8px 14px; border:3px solid var(--ink); background:var(--olive); color:var(--paper); cursor:pointer; }
+.act.issued{ background:transparent; color:var(--olive); border-color:var(--olive); transform:rotate(-4deg); cursor:default; }
+.act.locked{ background:transparent; color:var(--red); border-color:var(--red); cursor:not-allowed; }
+.kit .foot{ display:flex; justify-content:flex-end; margin-top:14px; font-size:13px; color:#d8cfae; }
+
+/* ---- end of round: field telegram + verdict stamp ---- */
+.telegram{ max-width:640px; margin:0 auto; padding:34px 40px 40px; background:#efe4cc; }
+.telegram .strip{ font:700 13px var(--type); letter-spacing:.12em; background:var(--ink); color:var(--paper); display:inline-block; padding:4px 10px; margin-bottom:22px; }
+.telegram .msg{ font-size:20px; line-height:1.5; min-height:4.6em; }
+.telegram .again{ margin-top:26px; }
+.stamp.verdict{ position:relative; display:inline-block; margin-top:24px; font-size:clamp(46px,9vw,84px); border-width:7px; padding:8px 26px 14px; --r:-6deg; transform:rotate(-6deg); }
+.stamp.verdict.win{ color:var(--olive); border-color:var(--olive); }
+
+.shake{ animation:shake .32s both; }
+@keyframes shake{ 20%{ transform:translate(-5px,3px); } 40%{ transform:translate(4px,-3px); } 60%{ transform:translate(-3px,2px); } 80%{ transform:translate(2px,-1px); } }
+:focus-visible{ outline:3px dashed var(--red); outline-offset:5px; }
+
+@media (max-width:760px){
+  .folder{ grid-template-columns:1fr; } .folder-back{ inset:-14px -8px -14px -8px; }
+  .tabs{ flex-direction:row; flex-wrap:wrap; margin:18px 0 0; } .tab{ border-left:3px solid var(--ink); min-width:0; flex:1 1 140px; }
+  .dossier{ padding:34px 24px 60px; } .stamp.classified{ top:14px; right:14px; font-size:16px; }
+  .record{ grid-template-columns:1fr; } .photo{ height:190px; } .fields{ grid-template-columns:1fr; }
+  .clipboard,.telegram{ padding-left:22px; padding-right:22px; }
+}
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation:none!important; transition:none!important; } }
+
+/* ---- polish pass (review 1) ---- */
+/* pen marks: four variants, one shown per hover (picked on leave, so the next draw starts from zero); ease-in-out like a real pen */
+.circle path{ display:none; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .1s ease-in; }
+[data-v="1"] .circle .v1,[data-v="2"] .circle .v2,[data-v="3"] .circle .v3,[data-v="4"] .circle .v4{ display:inline; }
+.tab:hover .circle path,.order:hover .circle path,.tab:focus-visible .circle path,.order:focus-visible .circle path{ stroke-dashoffset:0; transition:stroke-dashoffset .34s cubic-bezier(.65,0,.35,1); }
+.stamp.slam{ animation-duration:.24s; animation-timing-function:cubic-bezier(.15,1.9,.35,1); }
+.shake{ animation-duration:.2s; }
+.field span{ color:#4a4335; }
+.photo{ display:block; height:auto; padding:8px 8px 24px; background:#efe7d6; overflow:visible; box-shadow:4px 4px 0 var(--ink); transform:rotate(-1.5deg); }
+.photo svg.portrait{ display:block; width:100%; height:auto; border:2px solid var(--ink); }
+.photo .cap{ position:absolute; left:10px; bottom:4px; font:700 11px var(--type); color:#5a5140; }
+.tags{ position:relative; height:150px; margin-top:30px; }
+.tags svg.chain{ position:absolute; left:0; top:-40px; width:200px; height:140px; overflow:visible; pointer-events:none; }
+.dogtag{ position:absolute; width:178px; height:96px; border:3px solid var(--ink); border-radius:22px; padding:14px 12px 10px 42px;
+  background:linear-gradient(160deg,rgba(255,255,255,.6),transparent 42%,rgba(0,0,0,.2)), repeating-linear-gradient(90deg,#c4c8cd 0 2px,#b0b4ba 2px 3px,#cacdd2 3px 5px);
+  box-shadow:4px 4px 0 var(--ink); font:700 12.5px/1.42 var(--type); color:#50555b; letter-spacing:.05em;
+  text-shadow:1px 1px 0 rgba(255,255,255,.75),-1px -1px 0 rgba(0,0,0,.35); }
+.dogtag::before{ content:""; position:absolute; left:12px; top:50%; width:13px; height:13px; margin-top:-7px; border-radius:50%; background:var(--paper); border:3px solid var(--ink); box-shadow:inset 1px 1px 2px rgba(0,0,0,.45); }
+.dogtag.back{ left:18px; top:14px; transform:rotate(-10deg); filter:brightness(.9); }
+.dogtag.front{ left:0; top:40px; transform:rotate(5deg); }
+.kit h2{ font-size:60px; }
+.kit .credits{ display:inline-block; background:var(--brass); color:var(--ink); border:3px solid var(--ink); padding:4px 12px; box-shadow:3px 3px 0 var(--ink); font-weight:700; }
+.kit .credits b{ color:var(--ink); }
+.slip{ position:relative; overflow:hidden; transition:transform .08s, box-shadow .08s; }
+.slip:hover{ transform:translate(-3px,-3px) rotate(var(--t,0deg)); box-shadow:8px 8px 0 var(--ink); }
+.slip .gun{ position:absolute; right:92px; top:50%; width:60%; height:140%; transform:translateY(-50%) rotate(-3deg); color:var(--olive); opacity:.2; pointer-events:none; transition:transform .12s, opacity .12s; }
+.slip:hover .gun{ opacity:.34; transform:translateY(-50%) translateX(-10px) rotate(-3deg); }
+.slip>div,.slip>button{ position:relative; }
+.act:hover{ filter:brightness(1.15); } .act:active{ transform:translate(2px,2px); }
+</style>
+</head>
+<body>
+<div class="desk" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="board" aria-label="Mockup screens">
+  <b>UI theme mockup</b>
+  <button data-s="menu" aria-pressed="true">Main menu</button>
+  <button data-s="pause" aria-pressed="false">Pause</button>
+  <button data-s="record" aria-pressed="false">Service record</button>
+  <button data-s="armory" aria-pressed="false">Armory (in-game)</button>
+  <button data-s="win" aria-pressed="false">Victory</button>
+  <button data-s="lose" aria-pressed="false">Defeat</button>
+  <span class="sp"></span>
+  <button id="snd" aria-pressed="true">Sound on</button>
+</nav>
+
+<main>
+  <!-- MAIN MENU -->
+  <section class="screen on" id="s-menu" aria-label="Main menu">
+    <div class="folder">
+      <div class="folder-back" aria-hidden="true"></div>
+      <article class="sheet dossier" id="dossier">
+        <div class="fibres" aria-hidden="true"></div>
+        <p class="fileno">File no. 1944-07 — base-assault skirmish</p>
+        <h1 class="stencil title">Shamble<span class="l2">Frontlines</span></h1>
+        <div class="stamp classified slam" style="--r:9deg" aria-hidden="true">Top secret</div>
+        <p class="brief" id="brief"></p>
+        <button class="deploy" id="deploy">Deploy</button>
+        <p class="note hand" aria-hidden="true">aim high for headshots!</p>
+      </article>
+      <nav class="tabs" aria-label="Menu">
+        <button class="tab" aria-current="true">Deploy<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button>
+        <button class="tab" data-go="record">Service record<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button>
+        <button class="tab" data-go="pause">Field manual<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- PAUSE -->
+  <section class="screen" id="s-pause" aria-label="Pause">
+    <div class="clip-wrap">
+      <article class="sheet clipboard">
+        <div class="clamp" aria-hidden="true"></div>
+        <h2 class="stencil" style="font-size:52px;margin:0">Standing by</h2>
+        <p style="margin:6px 0 0;color:#5a5140">The round is paused. Pick your next order.</p>
+        <ul class="orders">
+          <li><button class="order"><span class="box"></span>Resume the fight<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button></li>
+          <li><button class="order" data-go="record"><span class="box"></span>Open service record<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button></li>
+          <li><button class="order"><span class="box"></span>Restart the round<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button></li>
+          <li><button class="order" data-go="menu"><span class="box"></span>Return to the menu<svg class="circle" viewBox="0 0 220 64" preserveAspectRatio="none"><path class="v1" pathLength="1" d="M18 34 C 20 8, 190 4, 206 26 C 218 50, 60 62, 22 50 C 8 44, 12 30, 30 22"/><path class="v2" pathLength="1" d="M12 55 C 60 50, 118 59, 168 53 C 186 51, 198 50, 212 42"/><path class="v3" pathLength="1" d="M14 52 C 70 48, 140 56, 208 50 M34 60 C 92 57, 150 62, 198 58"/><path class="v4" pathLength="1" d="M12 13 C 80 8, 150 10, 210 9 C 211 26, 209 42, 207 57 C 140 59, 70 58, 13 58 C 11 42, 12 28, 14 12"/></svg></button></li>
+        </ul>
+        <div class="opts">
+          <span>Aim</span><span class="tick"><button aria-pressed="true">Hold</button><button aria-pressed="false">Toggle</button></span>
+          <span>Audio</span><span class="tick"><button aria-pressed="true">On</button><button aria-pressed="false">Off</button></span>
+        </div>
+        <div class="keys">
+          <span><kbd>WASD</kbd>Move</span><span><kbd>Shift</kbd>Sprint</span><span><kbd>LMB</kbd>Fire</span><span><kbd>RMB</kbd>Aim</span>
+          <span><kbd>R</kbd>Reload</span><span><kbd>1/3</kbd>Weapon, special</span><span><kbd>F</kbd>Ability</span><span><kbd>G</kbd>Frag</span>
+          <span><kbd>E</kbd>Use, Armory</span><span><kbd>Tab</kbd>Scoreboard</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SERVICE RECORD -->
+  <section class="screen" id="s-record" aria-label="Service record">
+    <article class="sheet record">
+      <div class="fibres" aria-hidden="true"></div>
+      <div>
+        <div class="photo" aria-hidden="true"><span class="paperclip"></span>
+<svg class="portrait" viewBox="0 0 200 240"><defs>
+ <radialGradient id="bg" cx="60%" cy="35%" r="75%"><stop offset="0" stop-color="#cfc3a8"/><stop offset="1" stop-color="#8f8670"/></radialGradient>
+ <pattern id="ht" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".7" fill="#11121a" opacity=".35"/></pattern>
+ <pattern id="net" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0H7M0 0V7" stroke="#11121a" stroke-width=".7" opacity=".45"/></pattern>
+ <pattern id="stub" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r=".55" fill="#3b2c1f" opacity=".55"/></pattern>
+ <clipPath id="dome"><path d="M66 112 C62 64 138 64 134 112 Z"/></clipPath><clipPath id="jaw"><path d="M80 134 C82 150 90 160 100 162 C110 160 118 150 120 134 C112 140 88 140 80 134 Z"/></clipPath></defs>
+ <rect width="200" height="240" fill="url(#bg)"/>
+ <path d="M6 240 L12 206 C20 190 46 178 70 174 L130 174 C154 178 180 190 188 206 L194 240 Z" fill="#5a573a" stroke="#11121a" stroke-width="2.6"/>
+ <path d="M20 240 L26 210 C32 196 48 186 66 182 L60 240 Z" fill="#45432c"/>
+ <path d="M60 240 L96 190 L106 190 L72 240 Z" fill="#7a6648" stroke="#11121a" stroke-width="2"/>
+ <path d="M86 150 L84 178 L100 194 L116 178 L114 150 Z" fill="#b38e6c" stroke="#11121a" stroke-width="2"/>
+ <path d="M86 150 L85 174 L96 186 L94 156 Z" fill="#8f6e50"/><path d="M86 154 C92 166 108 166 114 154 L114 162 C108 170 92 170 86 162 Z" fill="#7d5f45"/>
+ <path d="M70 174 L92 194 L86 216 L60 184 Z" fill="#6a6745" stroke="#11121a" stroke-width="2"/>
+ <path d="M130 174 L108 194 L114 216 L140 184 Z" fill="#6a6745" stroke="#11121a" stroke-width="2"/>
+ <circle cx="124" cy="198" r="4.2" fill="#b5a642" stroke="#11121a" stroke-width="1.4"/>
+ <path d="M72 120 C66 120 66 134 74 136" fill="#b08a68" stroke="#11121a" stroke-width="1.8"/><path d="M128 120 C134 120 134 134 126 136" fill="#c29d7b" stroke="#11121a" stroke-width="1.8"/>
+ <path d="M75 112 C75 88 125 88 125 112 L123 132 C121 148 111 160 100 162 C89 160 79 148 77 132 Z" fill="#c29d7b" stroke="#11121a" stroke-width="2.4"/>
+ <path d="M76 112 L88 112 C86 130 88 150 98 161 C86 158 79 146 77 132 Z" fill="#9b795a"/>
+ <rect x="76" y="132" width="48" height="32" fill="url(#stub)" clip-path="url(#jaw)"/>
+ <path d="M76 106 L124 106 L123 121 C112 125 88 125 77 121 Z" fill="#241c12" opacity=".8"/><path d="M83 112 C88 110 94 110 97 113 M104 113 C107 110 113 110 118 112" fill="none" stroke="#11121a" stroke-width="1.6" stroke-linecap="round"/>
+ <path d="M86 117 C88 115.6 92 115.6 94 117 C92 118.2 88 118.2 86 117 Z" fill="#cdbfa4"/><path d="M107 117 C109 115.6 113 115.6 115 117 C113 118.2 109 118.2 107 117 Z" fill="#cdbfa4"/><circle cx="90.4" cy="117" r="1.15" fill="#11121a"/><circle cx="111.4" cy="117" r="1.15" fill="#11121a"/>
+ <path d="M101 119 L95 133 L99 135 L103 134" fill="none" stroke="#11121a" stroke-width="1.7" stroke-linejoin="round"/><path d="M100 120 L94 132 L99 134 Z" fill="#8a6a4d"/><path d="M82 127 C84 135 86 141 90 145" fill="none" stroke="#11121a" stroke-width="1" opacity=".55"/>
+ <path d="M91 147 C97 145.6 104 145.6 110 147.4" fill="none" stroke="#11121a" stroke-width="1.9" stroke-linecap="round"/><path d="M95 151 C99 152 102 152 105 151" fill="none" stroke="#11121a" stroke-width="1" opacity=".4"/>
+ <path d="M71 114 C73 132 81 150 93 158" fill="none" stroke="#3a3520" stroke-width="3.2"/><path d="M129 114 C127 132 119 150 107 158" fill="none" stroke="#3a3520" stroke-width="3.2"/>
+ <path d="M66 112 C62 64 138 64 134 112 Z" fill="#4e5330" stroke="#11121a" stroke-width="2.6"/>
+ <g clip-path="url(#dome)"><path d="M60 112 C58 70 92 60 100 64 C80 72 72 92 74 112 Z" fill="#3c4024"/><path d="M114 76 C124 84 128 96 129 108" fill="none" stroke="#727a48" stroke-width="3" stroke-linecap="round"/><rect x="60" y="60" width="80" height="54" fill="url(#net)"/></g>
+ <path d="M58 112 C70 104 130 104 142 112 C134 120 66 120 58 112 Z" fill="#43482a" stroke="#11121a" stroke-width="2.4"/>
+ <rect width="200" height="240" fill="url(#ht)"/>
+</svg><span class="cap">Pvt. 1944-0703</span></div>
+        <div class="tags" aria-hidden="true"><svg class="chain" viewBox="0 0 200 140"><path d="M70 0 C60 60 50 70 44 88 M70 0 C46 50 34 78 28 108" fill="none" stroke="#11121a" stroke-width="6.4" stroke-dasharray="0 7" stroke-linecap="round"/><path d="M70 0 C60 60 50 70 44 88 M70 0 C46 50 34 78 28 108" fill="none" stroke="#b9bec3" stroke-width="4" stroke-dasharray="0 7" stroke-linecap="round"/></svg>
+<div class="dogtag back">FRONTLINES<br>S. 44-0703<br>T1 INFANTRY</div><div class="dogtag front">RECRUIT<br>LEVEL 03<br>SN 44-0703 T1</div></div>
+      </div>
+      <div>
+        <h2 class="stencil" style="font-size:48px;margin:0">Service record</h2>
+        <p style="margin:6px 0 0;color:#5a5140">235 of 740 XP to level 4.</p>
+        <div class="xp" aria-label="XP progress"><i></i></div>
+        <div class="fields">
+          <div class="field"><span>Kills</span><b>21</b></div>
+          <div class="field"><span>Deaths</span><b>1</b></div>
+          <div class="field"><span>Kills per death</span><b>21.00</b></div>
+          <div class="field"><span>Headshots</span><b>13 (62%)</b></div>
+          <div class="field"><span>Favourite weapon</span><b>AMK Rifle I</b></div>
+          <div class="field"><span>Rank</span><b>Recruit</b></div>
+        </div>
+        <div class="stamp promoted" aria-hidden="true">Promoted</div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ARMORY (in-game family) -->
+  <section class="screen" id="s-armory" aria-label="Armory">
+    <article class="kit">
+      <div class="rivets" aria-hidden="true"></div>
+      <h2 class="stencil">Armory</h2>
+      <p class="credits">Credits <b>1009</b></p>
+      <div class="slip" style="--t:-.6deg"><svg class="gun" viewBox="0 0 300 80" aria-hidden="true" fill="currentColor" stroke="currentColor"><path d="M8 50 L58 38 L66 48 L20 64 Z"/><path d="M58 38 L98 34 L100 45 L66 48 Z"/><rect x="96" y="30" width="24" height="16"/><rect x="118" y="31" width="150" height="7"/><path d="M266 28 L292 16 L292 54 L266 42 Z"/><rect x="120" y="41" width="120" height="3"/><path d="M102 46 q8 14 18 0" fill="none" stroke-width="3"/></svg><div><div class="n">Conscript</div><div class="m">AMK Rifle, Molotov, 100 HP</div></div><button class="act issued">Issued</button></div>
+      <div class="slip" style="--t:.5deg"><svg class="gun" viewBox="0 0 300 80" aria-hidden="true" fill="currentColor" stroke="currentColor"><path d="M8 46 L60 36 L66 50 L16 62 Z"/><rect x="64" y="30" width="30" height="20"/><rect x="92" y="25" width="120" height="9"/><rect x="92" y="37" width="120" height="9"/><path d="M210 21 L234 12 L234 35 L210 34 Z"/><path d="M210 36 L234 35 L234 56 L210 47 Z"/><ellipse cx="140" cy="60" rx="36" ry="14"/></svg><div><div class="n">Peacekeeper</div><div class="m">Bagpipe, round shield, 150 HP</div></div><button class="act">Equip</button></div>
+      <div class="slip" style="--t:-.3deg"><svg class="gun" viewBox="0 0 300 80" aria-hidden="true" fill="currentColor" stroke="currentColor"><path d="M8 48 L54 40 L60 52 L14 62 Z"/><rect x="58" y="32" width="60" height="18"/><rect x="116" y="30" width="80" height="13"/><rect x="194" y="33" width="20" height="6"/><circle cx="94" cy="62" r="18"/><rect x="70" y="25" width="6" height="7"/></svg><div><div class="n">Imperial Warrior</div><div class="m">Shabzon, Banzai katana, 120 HP</div></div><button class="act">Equip</button></div>
+      <div class="slip" style="--t:.7deg"><svg class="gun" viewBox="0 0 300 80" aria-hidden="true" fill="currentColor" stroke="currentColor"><path d="M8 46 L54 36 L60 50 L14 62 Z"/><rect x="58" y="30" width="70" height="18"/><rect x="128" y="32" width="50" height="14"/><rect x="176" y="35" width="62" height="6"/><path d="M86 48 L100 48 L106 74 L92 74 Z"/><path d="M180 44 L290 46 L180 51 Z"/><rect x="70" y="23" width="8" height="7"/></svg><div><div class="n">Officer</div><div class="m">Retro Lancer, bayonet charge, 1250 credits</div></div><button class="act locked" aria-disabled="true">Tier 2</button></div>
+      <div class="slip" style="--t:-.5deg"><svg class="gun" viewBox="0 0 300 80" aria-hidden="true" fill="currentColor" stroke="currentColor"><path d="M8 46 L54 38 L60 50 L14 62 Z"/><rect x="58" y="36" width="150" height="8"/><rect x="196" y="30" width="18" height="20"/><path d="M205 30 C230 10 250 6 264 4" fill="none" stroke-width="6"/><path d="M205 50 C230 70 250 74 264 76" fill="none" stroke-width="6"/><path d="M264 4 L226 40 L264 76" fill="none" stroke-width="1.6"/><rect x="118" y="31" width="122" height="4"/><path d="M240 27 L258 33 L240 39 Z"/></svg><div><div class="n">Torque Bow</div><div class="m">Special weapon, key 3, 500 credits</div></div><button class="act">Buy</button></div>
+      <div class="foot">Close with E</div>
+    </article>
+  </section>
+
+  <!-- END OF ROUND -->
+  <section class="screen" id="s-win" aria-label="Victory">
+    <article class="sheet telegram">
+      <span class="strip">Field telegram</span>
+      <div class="msg" data-msg="Enemy HQ destroyed. The Cabana Republic holds. Well fought, soldier. Stop."></div>
+      <div class="stamp verdict win" aria-hidden="true">Victory</div>
+      <div class="again"><button class="deploy" data-go="menu">Fight again</button></div>
+    </article>
+  </section>
+  <section class="screen" id="s-lose" aria-label="Defeat">
+    <article class="sheet telegram">
+      <span class="strip">Field telegram</span>
+      <div class="msg" data-msg="Our HQ has fallen. Regroup at the barracks and take it back. Stop."></div>
+      <div class="stamp verdict" aria-hidden="true">Defeat</div>
+      <div class="again"><button class="deploy" data-go="menu">Fight again</button></div>
+    </article>
+  </section>
+</main>
+
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let AC=null, soundOn=true;
+  function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+  // synthesized SFX (no audio files): a stamp thud (low sine + noise burst) and a typewriter key tick
+  function thud(){ const a=soundOn&&ac(); if(!a) return; const t=a.currentTime;
+    const o=a.createOscillator(), g=a.createGain(); o.type='sine'; o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(42,t+.18);
+    g.gain.setValueAtTime(.55,t); g.gain.exponentialRampToValueAtTime(.001,t+.25); o.connect(g).connect(a.destination); o.start(t); o.stop(t+.26);
+    const n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*.08,a.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const ng=a.createGain(); ng.gain.value=.35; n.buffer=b; n.connect(ng).connect(a.destination); n.start(t); }
+  function tick(){ const a=soundOn&&ac(); if(!a) return; const t=a.currentTime, n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*.018,a.sampleRate), d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length); const g=a.createGain(); g.gain.value=.12; n.buffer=b; n.connect(g).connect(a.destination); n.start(t); }
+
+  function typeInto(el, text){ el.textContent=''; if(reduce){ el.textContent=text; return; }
+    const cur=document.createElement('span'); cur.className='cur'; cur.innerHTML='&nbsp;'; el.appendChild(cur); let i=0;
+    (function step(){ if(i>=text.length) return; cur.insertAdjacentText('beforebegin', text[i]); if(text[i]!==' '&&AC) tick(); i++; setTimeout(step, 22+Math.random()*30); })(); }
+
+  function slamStamp(stamp){ stamp.classList.remove('slam'); void stamp.offsetWidth; stamp.classList.add('slam'); thud();
+    const host=stamp.closest('.screen'); if(host&&!reduce){ host.classList.remove('shake'); void host.offsetWidth; host.classList.add('shake'); } }
+
+  const screens={ menu:'s-menu', pause:'s-pause', record:'s-record', armory:'s-armory', win:'s-win', lose:'s-lose' };
+  function show(k){ for(const id of Object.values(screens)) document.getElementById(id).classList.remove('on');
+    const s=document.getElementById(screens[k]); s.classList.add('on');
+    document.querySelectorAll('.board [data-s]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.s===k?'true':'false'));
+    if(k==='menu') typeInto(document.getElementById('brief'),"Base assault on the Cabana Republic. Pick your class at the Armory inside your barracks, hold the silos, and destroy the enemy HQ.");
+    if(k==='win'||k==='lose'){ const m=s.querySelector('.msg'); typeInto(m, m.dataset.msg); const v=s.querySelector('.verdict'); v.style.visibility='hidden';
+      setTimeout(()=>{ v.style.visibility='visible'; slamStamp(v); }, reduce?0:1700); }
+    if(k==='record'){ const p=s.querySelector('.promoted'); setTimeout(()=>slamStamp(p), reduce?0:350); }
+  }
+  document.querySelectorAll('.board [data-s]').forEach(b=>b.addEventListener('click',()=>{ ac(); show(b.dataset.s); }));
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{ ac(); show(b.dataset.go); }));
+  document.getElementById('snd').addEventListener('click',e=>{ soundOn=!soundOn; e.currentTarget.textContent=soundOn?'Sound on':'Sound off'; e.currentTarget.setAttribute('aria-pressed',soundOn?'true':'false'); });
+  document.querySelectorAll('.tick').forEach(g=>g.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false')); tick(); })));
+
+  // DEPLOY: the juice moment — a red "Deployed" stamp slams where you clicked, ink splats, the sheet jolts
+  document.getElementById('deploy').addEventListener('click',e=>{ ac(); const sheet=document.getElementById('dossier'), r=sheet.getBoundingClientRect();
+    const st=document.createElement('div'); st.className='stamp'; st.textContent='Deployed'; st.style.fontSize='34px';
+    const rot=(Math.random()*16-8).toFixed(1)+'deg'; st.style.setProperty('--r',rot); st.style.transform='rotate('+rot+')';
+    st.style.left=Math.max(10,Math.min(r.width-230,e.clientX-r.left-110))+'px'; st.style.top=Math.max(10,Math.min(r.height-70,e.clientY-r.top-80))+'px';
+    sheet.appendChild(st); slamStamp(st);
+    const sp=document.createElement('div'); sp.className='splat go'; sp.style.left=(parseFloat(st.style.left)+50)+'px'; sp.style.top=(parseFloat(st.style.top)-20)+'px'; sheet.appendChild(sp);
+    setTimeout(()=>sp.remove(),600); });
+
+  // pen marks: start on the circle, then a different random variant after every hover
+  document.querySelectorAll('.tab,.order').forEach(el=>{ el.dataset.v='1'; const next=()=>{ let v; do{ v=String(1+Math.floor(Math.random()*4)); }while(v===el.dataset.v); el.dataset.v=v; };
+    el.addEventListener('pointerleave',next); el.addEventListener('blur',next); });
+  show('menu');
+})();
+</script>
+</body>
+</html>

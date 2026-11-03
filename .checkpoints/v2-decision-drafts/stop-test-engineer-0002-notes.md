@@ -10,3 +10,8 @@
 - 14:20 written NOTE O18-7. Next: FIX N9-2 (PM-0002-49 per direction).
 - 14:25 written FIX N9-2 (PM-0002-49 per direction; supersedes earlier unit's NOTE N9, written when 0002 was out of scope). Next: NOTE P2 (key 1180-1183, -23, -50), NOTE machines, NOTE other answers.
 - 14:30 written NOTE P2-1. Next: NOTE machines (M-1), NOTE other answers (X-1), then checks.
+- 14:40 written NOTE M-1, NOTE X-1. Next: verify cited line numbers, dry run, glossary, line lengths, quotes.
+- 14:45 N9-2 AFTER: '1,000,000 packets per profile in each direction' so the note's arithmetic (1301-1308) holds per statistic.
+- 14:55 checks: dry run 4/4 FIX apply (1640 -> 1643 lines); glossary exact 0 before/after, in-context 59 = 59 with the same entry/phrase counts; PM rows 7 cells; no prose line >120; quotes checked word for word (inputs and ADR); NOTE O18-7 BX quote reworded (link markup). Next: final fresh dry run, return.
+- 15:00 tidied blank lines between blocks; fresh dry run 4/4 ok. DONE.
+DONE

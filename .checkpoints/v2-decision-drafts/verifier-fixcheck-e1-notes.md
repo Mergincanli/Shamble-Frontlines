@@ -1,0 +1,2 @@
+- started 2026-11-03; HEAD 59d41e0; next: read inputs, verdict, map, diff
+- rebuild done: all three identical to HEAD. next: read diffs per file, 0001 first
