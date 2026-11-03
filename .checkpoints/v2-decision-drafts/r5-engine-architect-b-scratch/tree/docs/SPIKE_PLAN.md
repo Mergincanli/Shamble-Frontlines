@@ -31,12 +31,18 @@ session work. A share of another spike is sized as the part it adds.
   OQ-0006-1; [GLOSSARY: the reference server](research/GLOSSARY.md#the-reference-server)); LG, the load generator, a
   CX33 running the simulated clients (Mustafa, 2026-11-03: "the CX33 runs the simulated clients"; how many comes from
   the calibration run: the advisor's reading, 2026-11-03), and MV, a CX33 running the metrics stack (ADR 0006); ML, the
-  minimum laptop, and RD, the recommended desktop (ADR 0003, OQ-0003-1: the models are not named yet); MAC, a macOS
-  machine with the stable Safari on the day of the run, its version recorded (WebGPU from Safari 26.0: r3-rendering.md,
-  R3-WGPU-F19, lines 171–174; WebTransport from 26.4: r2-netcode.md, R2-TRN-F7, lines 959–975); MP, Mustafa's PC in
-  Brave, for what he judges only ("Test PC: my own, in Brave", 2026-11-03; it stands in for none of ML, RD and MAC: the
-  advisor's reading, 2026-11-03). The VMs sit in a separate Hetzner project; Mustafa creates and deletes them himself
-  for each run, and they exist only during a run (OQ-0006-17, answered by Mustafa, 2026-11-03).
+  minimum laptop, RD, the recommended desktop, and MAC, the Mac for Safari, with the stable Safari on the day of the
+  run, its version recorded (WebGPU from Safari 26.0: r3-rendering.md, R3-WGPU-F19, lines 171–174; WebTransport from
+  26.4: r2-netcode.md, R2-TRN-F7, lines 959–975). Which machines they are is OQ-0003-1 (ADR 0003), answered in part by
+  Mustafa (2026-11-03): "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a
+  mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed."; still open: the
+  actual machines, named by Mustafa before the look proof test. Until they are named, his laptop is the stand-in for ML,
+  in his words: “Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum,
+  for rough checks only.” MP, Mustafa's PC in Brave, is for what he judges only ("Test PC: my own, in Brave",
+  2026-11-03). A rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured
+  result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). The VMs sit in a separate Hetzner
+  project; Mustafa creates and deletes them himself for each run, and they exist only during a run (OQ-0006-17, answered
+  by Mustafa, 2026-11-03).
 - **Network profiles** P0–P4 and the two link-simulator layers L1 and L2: ADR 0001 part 13 (profiles) and ADR 0002 (the
   simulator's design, R5-TEST-REC4). The netcode proof test builds them first, throwaway.
 - **Recorded matches** and per-tick state hashes: ADR 0004 (the sim core spike makes the first ones); until one exists,
@@ -126,7 +132,9 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline. VMs exist
   only during a run."), LG and MV beside RS and SH; the session's SSH key, made and held without the session reading
   a secret it did not make, as this test's own plan sets it with security-auditor and the advisor (the advisor's
-  reading, 2026-11-03); ML, RD and MAC named (OQ-0003-1, still open); a throwaway sim
+  reading, 2026-11-03); the machines its rows name (OQ-0003-1, answered in part: Mustafa names them before the look
+  proof test; until then the stand-in for ML, for rough checks only); this spike's own plan lists its rows that run
+  before they are named, and none of them is judged on the stand-in (the advisor's reading, 2026-11-03); a throwaway sim
   with movement, hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles
   at the stress scene's counts (PM-0001-2); its 30 Hz marks may add ADR 0004's S1 stand-ins (384 effect rows with the
   effect step's 1 ms burned per tick, the 2.80 ms remainder topped up: ADR 0001, OQ-0001-2), and its density runs pad
@@ -137,11 +145,13 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   reading, 2026-11-03); a DM_Tri-sized greybox with enterable buildings and the target course; the port ranges
   (OQ-0006-16) and the development certificate for WebTransport, private and hash-pinned (ADR 0006; Mustafa,
   2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate on "a domain I
-  register" (Mustafa, 2026-11-03; OQ-0006-5's development case (i) by the advisor's reading, and OQ-0006-15, both
-  answered in part), the domain registered before the test starts and the certificate's issuance method chosen in this
-  test's own plan with security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's
-  run plan under its bill mark (PM-0006-18) and the cost Mustafa allows (OQ-0006-20, still open; answered in part: "VMs
-  exist only during a run.") before the first VM.
+  register" (Mustafa, 2026-11-03; OQ-0006-5's development case (i) by the advisor's reading, answered in part),
+  shamblefrontlines.com (OQ-0006-15, answered by Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at
+  Cloudflare."), the domain registered before the test starts and the certificate's issuance method chosen in this
+  test's own plan with security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run
+  plan under its bill mark (PM-0006-18), with each run's cost cap, from its planned hours, written in that run's plan
+  for Mustafa's OK (OQ-0006-20, answered by Mustafa, 2026-11-03: "one cap per run, from its planned hours, written in
+  that run's plan for my OK. I create and delete the VMs myself.").
 - **Place:** wave 1, first (SPIKE-ORDER (b)): before the foundation (SLICE-ORDER condition 3). It builds first the
   client harness the boundary spike shares (the page with its Worker host and a plain renderer, on the throwaway sim:
   ADR 0002's spike text), accepted with the order (J6 (5)). It closes at 30 Hz: the 60 Hz margin run follows the sim
@@ -231,10 +241,12 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   ADR 0003's PM-0003-20 (the p99 of the page's own sim work) is measured on this spike's Worker and block in the render
   budget bench.
 - **Who judges what:** the scripts; Mustafa runs the spike checklist (ADR 0002, inside PM-0002-34) in Brave.
-- **Depends on:** the drafts approved; ML named and on hand (OQ-0003-1), MAC, and displays at 120 and 144 Hz; the
-  netcode proof test's throwaway sim, client harness and room process (it runs after it); the sim core spike's sim
-  for PM-0002-28 and PM-0004-8, -28 (it runs after that spike, so the sim is there: the advisor's reading,
-  2026-11-03); Mustafa's session in Brave.
+- **Depends on:** the drafts approved; the machines its rows name (OQ-0003-1, answered in part: Mustafa names them
+  before the look proof test; until then the stand-in for ML, for rough checks only); this spike's own plan lists its
+  rows that run before they are named, and none of them is judged on the stand-in (the advisor's reading, 2026-11-03);
+  displays at 120 and 144 Hz; the netcode proof test's throwaway sim, client harness and room process (it runs after
+  it); the sim core spike's sim for PM-0002-28 and PM-0004-8, -28 (it runs after that spike, so the sim is there: the
+  advisor's reading, 2026-11-03); Mustafa's session in Brave.
 - **Place:** wave 1, third of the heavy spikes, after the sim core spike and the 60 Hz margin run (SPIKE-ORDER (b));
   its result fixes the skeleton the foundation builds. It builds first, on the shared client harness, the CPU side of
   ADR 0003 part 8's measurement harness (frame time, the renderer's counters, the run sets and their labels), which
@@ -266,11 +278,13 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
 - **Pass marks:** PM-0004-1 to PM-0004-61, PM-0004-73 and PM-0004-74 (PM-0004-8 and -28 in the boundary spike's
   Worker; PM-0004-61 with the netcode proof test's server).
 - **Who judges what:** the scripts; no mark here needs a person's judgement.
-- **Depends on:** the drafts approved; RS orderable (OQ-0006-1), ML and RD named (OQ-0003-1), MAC; the
-  scenes built in the spike (the DM_Tri-sized greybox for the stress scene, the Octopon-3 greybox, the two-floor test
-  building with three stages, the ledge block, the box-only parity scenes); a stated bot set for "full AI" (ADR 0004's
-  S14; OQ-0004-1 stays open); legacy golden fixtures captured from the legacy oracle (R5-TEST-REC3); a throwaway replay
-  runner and tick bench in ADR 0002's shape; ADR 0001's prediction scope.
+- **Depends on:** the drafts approved; RS orderable (OQ-0006-1); the machines its rows name (OQ-0003-1, answered in
+  part: Mustafa names them before the look proof test; until then the stand-in for ML, for rough checks only); this
+  spike's own plan lists its rows that run before they are named, and none of them is judged on the stand-in (the
+  advisor's reading, 2026-11-03); the scenes built in the spike (the DM_Tri-sized greybox for the stress scene, the
+  Octopon-3 greybox, the two-floor test building with three stages, the ledge block, the box-only parity scenes); a
+  stated bot set for "full AI" (ADR 0004's S14; OQ-0004-1 stays open); legacy golden fixtures captured from the legacy
+  oracle (R5-TEST-REC3); a throwaway replay runner and tick bench in ADR 0002's shape; ADR 0001's prediction scope.
 - **Place:** wave 1, second of the heavy spikes, after the netcode proof test (SPIKE-ORDER (b)); its sim (OQ-0001-2
   (a), answered by the Advisor, 2026-11-03) feeds the 60 Hz margin run that follows it.
 - **Size:** L, the largest spike (a throwaway sim with movement, the vehicle sweep, two navigation generators, bots,
@@ -304,27 +318,28 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   frame, OQ-0003-16; reduced motion, OQ-0003-18; whether colour alone tells the factions apart, OQ-0003-19); OQ-0003-6
   (the roof fade) is the test's to decide, with his look among what decides it. The scripts judge the frame-time and
   GPU marks on ML and RD.
-- **Depends on:** the drafts approved; ML and RD named and on hand (OQ-0003-1), MAC; a few authored test assets as plain
+- **Depends on:** the drafts approved; ML, RD and MAC named and on hand (OQ-0003-1, answered in part: Mustafa names them
+  before the look proof test); a few authored test assets as plain
   glTF/GLB exports with named material slots and no compression or LOD step (ASSET-RESEARCH (a); ADR 0003 part 11):
   one soldier in LOOK_V2 §3's proportions with faction colour slots, one weapon, LOOK_V2 §2's two houses (the
   half-timbered house with the brick-tile roof as the two-floor building with an interior and its damage stages, and
   the plastered house with the silo tower, authored too or drawn by ADR 0005's ported kit builders), one very large
-  unit of at least 20 parts, a few props; Mustafa makes them himself with AI help in Blender, as blockouts with a
-  skin, named colour slots and LOOK_V2's proportions (OQ-SPIKE-1, answered by Mustafa, 2026-11-03, below); each object
-  of the list may be a blockout at his bar, and the asset-pipeline research's export and slot-naming part reaches him
-  with its export and slot rules before he makes them (the advisor's reading, 2026-11-03); whether a committed model
-  may be seen by anyone is OQ-0006-18 (with OQ-0005-AP1), answered before the first model is committed, and if that
-  comes before the design session after the netcode proof test, it goes to Mustafa then (the advisor's reading,
-  2026-11-03); legacy screenshots at the same framing; ADR 0003 part 8's measurement harness, whose CPU side the
-  boundary spike builds first and to which this test adds the GPU timestamp queries (its timed marks wait for it, its
-  look work does not); a synthetic recording for the scene; the content crate's whole-set check (a minimal loader,
+  unit of at least 20 parts, a few props; Mustafa makes them himself with AI help in Blender, where blockouts with a
+  skin, named colour slots and LOOK_V2's proportions are enough (OQ-SPIKE-1, answered by Mustafa, 2026-11-03, below);
+  each object of the list may be a blockout at his bar, and the asset-pipeline research's export and slot-naming part
+  reaches him with its export and slot rules before he makes them (the advisor's reading, 2026-11-03); whether a
+  committed model may be seen by anyone is OQ-0006-18 (with OQ-0005-AP1), answered before the first model is committed,
+  and if that comes before the design session after the netcode proof test, it goes to Mustafa then (the advisor's
+  reading, 2026-11-03); legacy screenshots at the same framing; ADR 0003 part 8's measurement harness, whose CPU side
+  the boundary spike builds first and to which this test adds the GPU timestamp queries (its timed marks wait for it,
+  its look work does not); a synthetic recording for the scene; the content crate's whole-set check (a minimal loader,
   since the content and ability spike comes later); for OQ-0005-AP2, the ported kit builders beside the authored
   models (ADR 0005's share; ADR 0003 part 11).
 - **Place:** wave 1, last of the heavy spikes: after the boundary spike, whose measurement harness it uses, once its
   models exist (SPIKE-ORDER (b): "then the look proof test once its models exist"); before any art production and
   before slice 1's renderer.
-- **Size:** L, without making the models, which is Mustafa's own work in Blender (OQ-SPIKE-1, answered), not a
-  session's; ADR 0005's share S, or M if the kit builders are ported for the families' comparison.
+- **Size:** L, without making the models, which is Mustafa's own work in Blender (OQ-SPIKE-1, answered); ADR 0005's
+  share S, or M if the kit builders are ported for the families' comparison.
 - **Research spikes it subsumes:** R3-LOOK-REC1, REC2, REC3; R3-WGPU-REC1, REC3, REC4; R3-GL2-REC1, REC3; R3-BUDGET-REC1
   (the machines named). **It decides:** R3-WGPU-OQ1, OQ2, OQ3; R3-GL2-OQ3; R3-LOOK-OQ1, OQ3, OQ4; R3-MEASURE-OQ1, OQ3;
   R3-GL2-OQ1 and R3-LOOK-OQ6 after their source readings; it gives Mustafa what he needs for OQ-0003-2, -3, -5, -6, -8,
@@ -438,11 +453,13 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   before that spike starts.
 - **Place:** its export and slot-naming part (OQ-0005-AS3, AS4) runs before the look proof test (Mustafa, 2026-11-03,
   LOOK-TEST-INPUTS: "yes, the asset research's export and slot-naming part runs before the look proof test. Route:
-  Blender (Spline's skins and named slots are unproven)."); Blender is the route for the look test's models and for
-  this part's export, and LOOK_V2 is not edited. The part is agent research, not a heavy spike, so it runs alongside
-  none: it sits between two wave-1 spikes, early enough that its export and slot rules reach Mustafa before he makes
-  the models (recommended: right after the netcode proof test); both are the advisor's reading, 2026-11-03. The rest of
-  the research runs before the asset spike.
+  Blender (Spline's skins and named slots are unproven)."); Blender is the route for the look test's models and for this
+  part's export, and LOOK_V2 is not edited; Mustafa (2026-11-03, LOOK_V2-§8): “yes, keep it as it is, with Blender for
+  the test models only. When the asset research's export part reports, §8 says "Spline or Blender".” That edit belongs
+  to that part's change-set and goes to Mustafa for the merge (the advisor's reading, 2026-11-03). The part is agent
+  research, not a heavy spike, so it runs alongside none: it sits between two wave-1 spikes, early enough that its
+  export and slot rules reach Mustafa before he makes the models (recommended: right after the netcode proof test); both
+  are the advisor's reading, 2026-11-03. The rest of the research runs before the asset spike.
 
 ### 9. The asset spike
 - **Owner:** ADR 0005 ("What a spike must prove", item 3: the GPU section's and the asset-pipeline section's second
@@ -492,21 +509,21 @@ makes the final 60 Hz call whatever the wave-1 early signal showed (TICK-60-SETU
 2026-11-03), with PM-0001-39, -40, -63 and PM-0004-71, -72 deciding there (the advisor's reading, 2026-11-03).
 
 ## What this plan does not decide
-The reference machines (OQ-0003-1: ML, RD and MAC still to be named), the server location (OQ-0006-1, OQ-0006-2), the
-spikes' cost (OQ-0006-20, answered in part), the domain itself (OQ-0006-15, answered in part) and the provisional goal
-budget (OQ-0006-19) are listed for Mustafa and the Advisor in `docs/adr/README.md`, "Decisions the drafts ask for".
-The stop of 2026-11-03 answered the order after the netcode proof test, with the harness builders it names (J6 (5),
-SPIKE-ORDER (b)), TICK-60-HEADROOM (OQ-0001-1), TICK-60-SETUP (OQ-0001-2), the "100 ms" reading (OQ-0001-3), the
-profiles' split over the two directions (OQ-0001-16), the spikes' VMs (OQ-0006-17), ASSET-RESEARCH's timing and
-OQ-SPIKE-1 (below); the register records each answer.
+The reference machines ML, RD and MAC (OQ-0003-1, answered in part: Mustafa names them before the look proof test), the
+server location (OQ-0006-1, OQ-0006-2) and the provisional goal budget (OQ-0006-19) are listed for Mustafa and the
+Advisor in `docs/adr/README.md`, "Decisions the drafts ask for". The stop of 2026-11-03 answered the order after the
+netcode proof test, with the harness builders it names (J6 (5), SPIKE-ORDER (b)), TICK-60-HEADROOM (OQ-0001-1),
+TICK-60-SETUP (OQ-0001-2), the "100 ms" reading (OQ-0001-3), the profiles' split over the two directions (OQ-0001-16),
+the spikes' VMs (OQ-0006-17), ASSET-RESEARCH's timing and OQ-SPIKE-1 (below); Mustafa's answers to the escalations,
+later that day, answered the spikes' cost (OQ-0006-20) and the domain (OQ-0006-15); the register records each answer.
 
 ## Open questions
-- **OQ-SPIKE-1. Who makes the look proof test's authored models, and by which route?** *Why it matters:* the look proof
-  test runs in wave 1, before the asset-pipeline research, and needs as glTF/GLB with named material slots a skinned
-  soldier with faction colour slots, the two-floor house with its damage stages and a very large unit of at least 20
-  parts (ADR 0003 part 11); without them the look checklist cannot judge the soldier, the buildings or the very large
-  unit. LOOK_V2 §8's flow makes a model in Spline ("AI-generated for drafts, or a clean model built by Claude") and
-  exports glTF/GLB, but whether that export carries a skin and named slots is not researched (gap G1; OQ-0005-AS3,
+- **OQ-SPIKE-1. Who makes the look proof test's authored models, and by which route?** *Why it matters (as asked):* the
+  look proof test runs in wave 1, before the asset-pipeline research, and needs as glTF/GLB with named material slots a
+  skinned soldier with faction colour slots, the two-floor house with its damage stages and a very large unit of at
+  least 20 parts (ADR 0003 part 11); without them the look checklist cannot judge the soldier, the buildings or the very
+  large unit. LOOK_V2 §8's flow makes a model in Spline ("AI-generated for drafts, or a clean model built by Claude")
+  and exports glTF/GLB, but whether that export carries a skin and named slots is not researched (gap G1; OQ-0005-AS3,
   AS4), and making the models is in no spike's size (the graphics review of 2026-11-02, finding 5 and its question
   2). *Options:* (a) the slice of the asset-pipeline research that answers OQ-0005-AS3 and AS4 for skinned and
   multi-part models runs first, and the models are made by the route it finds; (b) the test's own session makes
@@ -517,7 +534,7 @@ OQ-SPIKE-1 (below); the register records each answer.
   answered. *Research ids:* none (gap G1). Answered by Mustafa (2026-11-03): "yes, the asset research's export and
   slot-naming part runs before the look proof test. Route: Blender (Spline's skins and named slots are unproven). I
   make the test models with AI help in Blender; blockouts with a skin, named colour slots and LOOK_V2's proportions
-  are enough." Making the models is his own work, not a session's, so no spike's size carries it. LOOK_V2 is not
+  are enough." Making the models is his own work, so no spike's size carries it. LOOK_V2 is not
   edited: Blender is the route for the look test's models and for the research part's export. Part 11's list of
   objects stays, each object may be a blockout at his bar, and which look-checklist steps a blockout can judge is for
   the look test's own plan (graphics-engineer, test-engineer), any visual call being Mustafa's (the advisor's reading,
