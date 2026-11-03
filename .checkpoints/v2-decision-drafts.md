@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 07:17 Amsterdam
+- **Last update:** 2026-11-03 07:47 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+Since about 07:45: workflow wf_0c35d4e2-382 done (game-designer 5 blocks, the pre-apply verifier PASS WITH NOTES, no
+line lost, net +2 lines) → applied as 361b61d (AB-3's heading and AB-1's Why line back; checks: guard PASS, 521/521,
+glossary exact 0, glued 0, 340 PM rows; pointers off 23, all into ADR 0005 from 1186, +2). Workflow wf_6c0e9508-f3b
+(fixcheck-d3a) done: PASS WITH NOTES, 19 claims, 18 confirmed, 14 blocks with no problem; the four owner-checked
+verdicts all hold (d0 row 9's fix decides right but words std's guarantee, which rustc 1.97.0 breaks: D3A-1); D3A-2,
+the appendix listing d1 F2 as deferred though 7858762 fixed it: fixed by the session. Running: workflow
+wf_267dcff8-48e, D3A-1's skeptic, then rust-reviewer's block for ADR 0004 part 7. Next: apply it; re-pin README's
+pointers (0005, and 0004 if its line count moves); then fixcheck-d3 units b, c, d with skeptics and a critic.
+
+Earlier this morning:
 2026-11-03 about 07:14 Amsterdam, Mustafa in the session's chat, after the session said it would wait for 08:30: "You
 can continue" (with ultracode on). Read as his go to run agents now, inside the night window, for this morning's
 remaining units (as his one-off night run of 2026-11-01 set condition 17 aside); web fetching still waits for 08:30.
