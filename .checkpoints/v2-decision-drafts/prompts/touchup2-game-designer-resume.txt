@@ -1,0 +1,11 @@
+# Prepared resume message (verbatim, saved before sending) · to game-designer agent a62575dec0f1fe2c5 (SendMessage), with prompts/touchup2-game-designer.txt · effort xhigh · model opus · 2026-11-03, saved about 06:40 Amsterdam, to send at 08:30 (no agent runs inside the night window, condition 17)
+
+A usage limit cut you off on 2026-11-02 at about 21:19 Amsterdam; it has reset. Continue your touch-up (prompts/touchup2-game-designer.txt, the same task and rules) from your notes: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/touchup2-game-designer-notes.md says F1b, F8, F9, F10 all hold, plus two lost lines of your own (AB-1's "Why" line, dropped by your RR-4 block; the dangling "names, with no generic-engine feature." near 0005:883), and that your next step was to scan the ability section for other lost lines, then write the blocks. Your fixes file has no block yet.
+
+What changed on disk since you stopped: commit 750d46d applied test-engineer's touch-up. In ADR 0005 it touched only the pass marks (Feel Lab steps 3 and 4, fixcheck-d2 F1a), outside your section. Copy every BEFORE by script from the file on disk as it is now (`git -C /home/user/Shamble-Frontlines log -1 --format=%h` names HEAD), whole lines, each occurring exactly once.
+
+Line count: README points into ADR 0005 by line number, 23 times at line 1186 or later, so a change in your section's net line count moves them. Where it is natural, keep the net count unchanged (for example, the restored AB-3 heading adds one line and the duplicated AB-5 Need line takes one away), but never bend the text to do it: say the net change per block and in total in your return, and the session has README's pointers re-pinned.
+
+Save as you go, as your prompt says: each block into the fixes file the moment it is composed, a notes line after each finding, scratch only in your scratch folder. Fetch nothing. Finish by 09:30 Amsterdam, then end your notes with DONE.
+
+Return at most 6 lines: each finding's outcome (F1b, F8, F9, F10, AB-1's Why line, the 0005:883 dangle, and any other lost line you found), the net line change, and your file's path.
