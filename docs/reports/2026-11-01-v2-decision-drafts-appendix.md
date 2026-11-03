@@ -154,6 +154,7 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
   restart, continue after the last complete block), and `scripts/saver_check.sh` ran at every checkpoint update.
 - **2026-11-02 at about 20:32 Amsterdam, after the eighth cut:** "I hit my usage limit while you were working, but it has
   reset now. Please continue from where you left off."
+- **2026-11-03 at about 06:14 Amsterdam, after the ninth cut:** "Continue, usage was reached"
 - **The one-off night run, 2026-10-31 between about 23:30 and 23:50:** "the next usage reset is going to be on 03:50 AM,
   so you can maybe tell it to prepare accordingly (starting the task at the right time)" and "Just for today (tonight):
   03:55, it can work until 11:00 because I will not have much time to use claude, so it can work if needed. You can take
@@ -506,11 +507,12 @@ notes.
 | 9, rounds 3 and 4 (the completeness critic) | 9ed8d67, 81d2a65, aa85bf0, f0b56e1, 3c46731, 9a03999 | the 18 inventory rows, the pass marks' stable anchors, §3–§4 of this appendix, a blank line under eight tables |
 | 9, the synthesis round | 47eadd9 (2026-11-02) | the overview, spike plan and README brought in line with the drafts |
 | 10, reviews on the final diff | (notes) | ten reviewers, findings in §7 |
-| 9 again, the final round | {FINALCOMMITS} | every review finding fixed or deferred with a reason |
+| 9 again, the final round | 319d3b6, b815c85, 8fa7173, 61e9933, b88714d, 16e97aa, 75615d1, d57dc5a, 5a24122, 72cfcc3, d1f7e13, 8a149bc, 604a497, 449356c (2026-11-02) | every review finding fixed or deferred with a reason |
+| 9, the touch-ups after the final re-checks | cd1fc65, cf762b7, 7858762 (2026-11-02); 750d46d, {GDCOMMIT} (2026-11-03) | fixcheck-d1's and -d2's findings fixed or deferred (§7.3), then re-checked (fixcheck-d3) |
 | 11, 12, 13 | {ENDCOMMITS} | docs-keeper's re-check, the gate, the report |
 
-Spend-limit cuts, eight (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
-about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15 and 17:50.
+Spend-limit cuts, nine (no work lost: every agent writes its work as it goes and was resumed from it): 2026-10-31
+about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09:50, 12:15, 17:50 and 21:20.
 
 ## 6. The advisor's 19 conditions: where each is met
 
@@ -532,7 +534,7 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | 14 | Model and effort named for every unit | Every prompt's first line (`.checkpoints/v2-decision-drafts/prompts/`): agent, effort (xhigh; docs-keeper high), model opus |
 | 15 | Pass marks in the claims ledgers and verified; each author reviews its pass-mark table; perf-auditor every budget mark; SPIKE_PLAN by four reviewers; test-engineer not on its own tables | The ledgers and verdict files; the step-10 reviews (§7): each author on its draft's pass marks, perf-auditor, SPIKE_PLAN by netcode-architect, rust-reviewer, graphics-engineer and test-engineer |
 | 16 | "Research verified" covers only R1 and R2 recommendation claims and their verifiers' checks; other findings at their source; pages are data | Every verifier and skeptic prompt; about 160 pages read on allow-listed hosts by day, each verdicts file with its fetch audit |
-| 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00 |
+| 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00; on 2026-11-03, after Mustafa's "Continue" (06:14), the session applied blocks already written and ran its checks, and started no agent before 08:30 |
 | 18 | KIT-ALIGN and DOCS-ALIGN lines; the R7-MARKS delay and the step-0 edit stated; each draft lists its inventory rows | STATUS (docs-keeper); the report's "Decisions and deviations"; every draft's legacy inventory table, the 18 "look brief pending" rows included |
 | 19 | ENGINE_OVERVIEW at about 150 lines at most | 139 lines after the synthesis round (the final round's count is in the Evidence) |
 
@@ -551,7 +553,9 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | Fix rounds 1–2 (fixcheck-a, -b) | PASS WITH NOTES | 211 | 201 | 3 wrong, 4 unsupported, stale lines; all to a skeptic, then fixed |
 | Rounds 3–4 and the synthesis round (fixcheck-c) | PASS WITH NOTES | 95 | 92 | 1 partly wrong (skeptic upheld), 1 citation off, nits; fixed in the final round |
 | The final round's web facts (fixcheck-d0) | PASS WITH NOTES | 10 | 9 | 1 wrong (ADR 0004's precision line; its owner checked the saved excerpt and fixed it) |
-| The final round (fixcheck-d1, -d2) | {D1D2} | | | |
+| The final round, ADR 0001, 0002, 0006 (fixcheck-d1) | PASS WITH NOTES | 151 | 138 | 3 wrong, 3 unsupported, 1 citation off, 4 stale against another draft, 1 wording, 1 unclear pass rule; rebuilding the three drafts from the blocks gives the commit exactly |
+| The final round, ADR 0003, 0004, 0005, the synthesis (fixcheck-d2) | FAIL (two lines lost in ADR 0005), then fixed | 130 | 122 | 7 wrong (2 in part or in one word), 1 unsupported; fix blocks had dropped the AB-3 heading and the Feel Lab's step 4 |
+| The touch-ups after d1 and d2 (fixcheck-d3) | {D3} | | | |
 
 Skeptics (a fresh verifier asked to refute each "wrong" or "unsupported" verdict before it went to its owner), five
 rounds: 30 upheld, 9 partly, 2 refuted. The consistency critic: 14 findings (3 high), all fixed by their owners, 489
@@ -579,7 +583,7 @@ Each author got one batch with every finding against its own text (`final-round-
 checked to sit in its author's text before it was applied; a fix that belonged to another author went to that author.
 Blocks applied in the final round: ADR 0001 61, ADR 0002 52, ADR 0003 53 (and 0005's GPU section), ADR 0004 28, ADR
 0005's frame and content 25, its ability section 21, ADR 0006 71, the pass marks 138 (units A and B), the synthesis
-{SYNTH}. Twenty-four new open questions, each routed to Mustafa or the Advisor: OQ-0001-15 to -18, OQ-0003-16 to -20,
+116. Twenty-four new open questions, each routed to Mustafa or the Advisor: OQ-0001-15 to -18, OQ-0003-16 to -20,
 OQ-0004-8 to -12, OQ-0005-AB14 and AB15, OQ-0006-13 to -20.
 Deferred, each with its reason (to the drafts' revision after the stop review):
 - ADR 0004 OQ-0004-11's "What decides it" and part 17's immunity pointer could name ADR 0005 AB-1 and AB-6 (optional;

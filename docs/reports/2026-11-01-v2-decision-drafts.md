@@ -1,4 +1,4 @@
-# Advisor report: v2-decision-drafts (2026-11-02, branch claude/laughing-lovelace-ox61se, base main 9e7db28)
+# Advisor report: v2-decision-drafts (2026-11-03, branch claude/laughing-lovelace-ox61se, base main 9e7db28)
 Draft PR [#33](https://github.com/Mergincanli/Shamble-Frontlines/pull/33). The branch stands in for
 `cs/v2-decision-drafts` (this cloud session is limited to it). The details are in the appendix,
 `2026-11-01-v2-decision-drafts-appendix.md`: the brief, Mustafa's words, the advisor's plan review and the plan's rules
@@ -66,7 +66,7 @@ revision after this stop, each with its reason (appendix §7.3).
   row 9; fixcheck-d1 F1, F2, F10).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
   Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching.
-- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00); eight spend-limit cuts over three days, each resumed
+- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00); nine spend-limit cuts over three days, each resumed
   from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
 
 ## Risks
