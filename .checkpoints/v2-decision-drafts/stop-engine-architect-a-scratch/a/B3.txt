@@ -1,0 +1,4 @@
+- The ability items 1 or 2 fail for a mechanic: it becomes a new reviewed operation, which still counts as built from
+  data (the advisor's reading, 2026-11-03; AB-6). Scripting (option A3) comes back only when a designed ability can't
+  be built from data (OQ-0005-AB13, answered by the Advisor, 2026-11-03): one designed ability that needs
+  ability-specific code no operation can express (the advisor's reading, 2026-11-03).

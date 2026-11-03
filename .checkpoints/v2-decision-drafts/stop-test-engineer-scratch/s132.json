@@ -1,0 +1,4 @@
+[["| inside ADR 0001's one 60 Hz run (its setup and R2-BUD-REC6's 30-minute soak):", "| inside each of ADR 0001's 60 Hz runs (its setup and R2-BUD-REC6's 30-minute soak):"],
+ ["(the sim inside the proof-test server: OQ-0001-2 (a)), never added", "(the sim inside the proof-test server: in wave 1 the sim core spike's sim with S1's stand-ins, OQ-0001-2 (a), answered; at slice 6 the real crate), never added"],
+ ["| only if ADR 0001 schedules the 60 Hz margin's run |", "| with each of ADR 0001's 60 Hz runs; it decides only at slice 6 (the key) |"],
+ ["| CI; RS | the same scripts at 60 Hz | only with the 60 Hz margin's test; each as its 30 Hz row |", "| CI; RS | the same scripts at 60 Hz | with each of ADR 0001's 60 Hz runs, deciding only at slice 6 (the key); each as its 30 Hz row |"]]

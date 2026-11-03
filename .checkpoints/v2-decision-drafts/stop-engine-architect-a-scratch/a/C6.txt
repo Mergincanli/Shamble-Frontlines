@@ -1,0 +1,10 @@
+  - What: each unit, vehicle, weapon, faction uniform, building part and prop names its model by an asset id. For a
+    definition, that id sits in a client definition keyed by the simulation definition's id, as the feel kit is
+    (CD-14), so no simulation definition holds an asset id (CD-6; OQ-0005-1, answered by the Advisor, 2026-11-03); the
+    map document holds its own references (CD-11). One asset list in the content set (client content, CD-6) holds for
+    each asset: its id; its file name with its hash; its material slots, each with its class (AP-3); its LOD levels, if
+    it has any (the GPU section's part 5); and its counts of triangles, materials and textures, which the budget check
+    reads (AP-5). The loader's whole-set checks (CD-2) refuse a reference to an asset the list does not hold, a slot
+    whose class is not in the class list, and an id of a presented kind with no client entry (OQ-0005-1's rule), naming
+    the file and the field; nothing falls back to a default model. Who writes the list (the automated step or a
+    person), and whether the gate recounts a file or trusts its entry, is OQ-0005-AP1.

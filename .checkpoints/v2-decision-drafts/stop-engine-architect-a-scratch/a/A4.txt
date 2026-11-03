@@ -1,0 +1,1 @@
+| OQ-0005-AB12 | Is tranek's write-up accepted as the GAS reference, or does a verifier read Epic's documentation first? (answered by the Advisor, 2026-11-03: "tranek's write-up is accepted for concepts; any specific claim a record relies on is checked against Epic's documentation once it can be read") | the Advisor | The ability and effect system |

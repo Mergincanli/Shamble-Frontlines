@@ -1,0 +1,476 @@
+diff --git a/home/user/Shamble-Frontlines/docs/adr/0001-multiplayer-netcode.md b/docs/adr/0001-multiplayer-netcode.md
+index 134dcea..5f7baac 100644
+--- a/home/user/Shamble-Frontlines/docs/adr/0001-multiplayer-netcode.md
++++ b/docs/adr/0001-multiplayer-netcode.md
+@@ -2,14 +2,18 @@
+
+**Status:** Proposed
+**Date:** 2026-10-31
+**Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4)[-·-]
+**Reviewed by:** (filled in at review)[-·-]
+**Signed off by Mustafa:** [-no-]{+as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted+}
+
+This record decides how v2 plays online. One match server decides everything that counts; players send only their
+inputs, one command per tick; the server sends each player a compressed picture of what that player may see, 30 times
+a second. A player's own movement and own gun react at once on their screen and are corrected smoothly when the server
+disagrees; everyone else is drawn about 100 ms in the past; a shot is judged against what the shooter saw, within a
+cap. The server ticks at 30 [-Hz, and-]{+Hz; it moves to+} 60 Hz only if the {+60 Hz margin passes and the goal budget holds at the rooms+}
+{+per VM measured at 60 Hz, both judged at slice 6 on the real sim, with the+} netcode proof [-test shows the-]{+test's+} 60 Hz [-margin.-]{+run as an early+}
+{+signal only (part 2).+} The record also sets the budgets [-that-]{+the netcode proof+} test is judged against, the message catalogue,
+the transport (WebTransport with a WebSocket fallback
+behind one interface, plus a local backend so the game runs as a client plus a local server from slice 1), rooms,
+private matches and bots on the server. The reason: VISION_V2 asks for matches of up to 48 players that feel fair to
+about 100 ms of ping, and the R2 research found one path that shipped games use.
+@@ -23,8 +27,10 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
+  slots (VISION_V2 §3 [DEFAULT], LOOP_V2 §2).
+- **Tick:** TICK-30 (brief §1): "a 30 Hz server tick is the baseline for 48 players; 60 Hz only if the netcode proof
+  test shows at least 25 % headroom on the target hardware" (STATUS, TICK-30), read as
+  [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) (TICK-60-HEADROOM, the advisor's reading of [-2026-10-31,-]{+2026-10-31),+}
+  confirmed by Mustafa [-and-]{+(2026-11-03) "with one addition: 60 Hz also needs the goal budget to hold at+} the [-Advisor-]{+rooms per VM+}
+{+  measured at 60 Hz" (OQ-0001-1). The final 60 Hz call is measured+} at {+slice 6 with the real sim; the netcode proof+}
+{+  test's 60 Hz run is an early signal only (TICK-60-SETUP,+} the [-stop).-]{+Advisor, 2026-11-03: OQ-0001-2; part 2).+}
+- **Latency and region:** matches feel fair up to about 100 ms of ping; servers start in one EU region (VISION_V2 §4
+  [DEFAULT]). Desktop Chrome, Edge, Firefox and Safari (VISION_V2 §4 [DECIDED]).
+- **VISION_V2 §6 items served:** 6.1 (rooms and private matches, modes as data), 6.2 (aiming at height; what is hidden
+@@ -73,8 +79,9 @@ about 100 ms of ping, and the R2 research found one path that shipped games use.
+  Worker, the per-tick output block's layout, the page-to-Worker posting, the generated types, the network simulator
+  and the load harness; from ADR 0005, the content bundle and its hash, the mode file format, unit data, the ability
+  data model and the upgrade tracks as data; from ADR 0006, the reference server, the VMs and their supervisor, the
+  firewall, the lobby's hosting and store, the certificates, the staging game [-server-]{+server, the monitoring+} and the [-monitoring;-]{+goal budget+}
+{+  of its part 8, which this record's 60 Hz rule reads (part 2; OQ-0001-1, 2026-11-03);+} from ADR 0003, the client
+  reference machines and everything drawn or played on the page.
+- **Gives:** the tick rate rule and the 60 Hz margin; the server tick budget's total and its server-only share; the
+  message protocol between the Worker and the server, and on the local server path; the command's fields, including
+  the aim point; the snapshot fields the output block is filled from online; the visibility classes; the network
+@@ -116,17 +123,28 @@ server in the browser. The parts:
+   authority leak: r2-netcode.md, Options, Brief question 1, lines 1647–1653). *Need:* VISION_V2 §6.1, §6.5 ("all
+   server-side").
+2. **The tick rate rule (TICK-30).** The server ticks at 30 Hz ([the tick period](../research/GLOSSARY.md#tick-period)
+   33.3 ms). It moves to 60 Hz only if [-the netcode proof test-]{+one run+} shows all of this,[-in one run-] on
+   [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of
+   [the reference server](../research/GLOSSARY.md#the-reference-server), in
+   [the stress scene](../research/GLOSSARY.md#the-stress-scene) at N = 48 with a snapshot-receiving client on every
+   soldier, over R2-BUD-REC6's 30-minute soak, re-flood ticks included: a p99
+   [server tick time](../research/GLOSSARY.md#server-tick-time) of at most 6.25 ms against the server tick budget at
+   60 Hz, 8.33 ms (a 60 Hz margin of at least 25 %: 1 − 6.25 ÷ 8.33 = 25 %), and every 60 Hz mark the research sets, as
+   written (R2-BUD-REC6's two shares, 4.17 ms each; R1-TICK-REC2 P1–P3 at 60 [-Hz).-]{+Hz); and only if the goal budget holds at+}
+{+   the rooms per VM measured at 60 Hz, Mustafa's addition (2026-11-03, OQ-0001-1): "60 Hz also needs the goal budget to+}
+{+   hold at the rooms per VM measured at 60 Hz". The goal budget is ADR 0006 part 8's as it stands when the call is made,+}
+{+   at slice 6 the figure OQ-0006-19 fixes, and it holds when the fleet the goal modes need at the rooms per VM measured+}
+{+   at 60 Hz (part 8's formula, the same machine, N = 48) costs no more than that figure (the advisor's reading,+}
+{+   2026-11-03; PM-0001-63).+} Otherwise the tick stays at 30 Hz. {+The run that decides is slice 6's, with the real sim,+}
+{+   whatever the early signal showed (migration step 8). The wave-1 60 Hz run, on the netcode proof test's kept server+}
+{+   and harness after the sim core spike (SPIKE-ORDER (b)), with the sim core spike's sim and ADR 0004's S1 stand-ins+}
+{+   (OQ-0001-2 (a)), is an early signal only (TICK-60-SETUP, the Advisor, 2026-11-03: "(a), as an early signal only. The+}
+{+   final 60 Hz call is measured again with the real sim at slice 6."): it decides nothing, its rooms-per-VM cost is+}
+{+   reported beside part 8's provisional figures, a pass starts no 60 Hz work before slice 6 and a fail closes nothing+}
+{+   (the advisor's reading, 2026-11-03).+} Snapshots go out 30 times a second: on every tick at 30 Hz, and on every second
+   tick in [-the-]{+each+} 60 Hz margin run (R2-BUD-REC1's snapshot half, below); inputs are sampled and sent every tick. 60 or
+   64 Hz is asked only if [-the-]
+[-   margin-]{+slice 6's 60 Hz run+} passes [-(R1-TICK-OQ1).-]{+(R1-TICK-OQ1; the advisor's reading, 2026-11-03).+} *Why:* at N = 48
+   the 60 Hz marks leave almost no margin (finding 3), while every legacy
+   weapon still fits one shot per tick at 30 Hz and the replay work per correction halves (r1-simulation-core.md,
+   Recommendations, unit tick, R1-TICK-REC2, lines 2029–2064). *Research:* R1-TICK-REC2 (changed), R2-BUD-REC1
+   (changed), R1-TICK-OQ1. *Need:* VISION_V2 §6.2 and §6.4 (movement, jumps and big vehicles step with the tick) and
+@@ -229,10 +247,13 @@ server in the browser. The parts:
+   reading std's source). The server answers pings on its I/O runtime as they arrive; the client answers the server's
+   at its next tick, and its pong carries the hold time, from the ping's arrival to the host's time at that step, which
+   the server subtracts, at most one tick period's worth (a client that misreports it can only shrink its own RTT, or
+   inflate it as part 8's accepted latency faking already allows). The server keeps a per-client input buffer of
+   1–3 ticks (proposed), adapted per client; each command is stamped with the server tick it is meant for. When the
+   server runs commands and how the client keeps them just in time are the proof test's to decide [-(OQ-0001-6);-]{+(OQ-0001-6), aiming+}
+{+   for "the smallest input buffer that holds" (Mustafa, 2026-11-03, REWIND-CAP): of the options that pass its marks+}
+{+   (corrections, fairness, the fast-clock bound), the smallest buffer, with commands run on arrival counting as none+}
+{+   (the advisor's reading, 2026-11-03);+} sub-tick fire stamps are OQ-0001-7. *The aim point:* the page posts its newest
+   input once per drawn frame, with its cursor ray from
+   the camera and the view time of the frame it drew (ADR 0002 part 5), and each tick the Worker builds the one network
+   command from the newest post (running press totals, so a superseded post loses no press); it casts that ray with the
+   sim crate's ray query (ADR 0004) against the static world and the interpolated remote entities it published for that view
+@@ -347,8 +368,11 @@ server in the browser. The parts:
+   `rtt()`, or over WebSocket the lowest recent sample of the server's own pings. Neither holds against a cheat: a
+   client can delay its replies (r2-netcode.md, lines 2150–2152) or, outside a browser, its QUIC acknowledgements, and
+   so claim rewind up to the cap, an accepted risk. The cap bounds the final rewind on every path: data, its value
+   [-OQ-0001-5;-]{+so claim rewind up to the cap, an accepted risk. The cap bounds the final rewind on every path: data, its value set+}
+{+   by Mustafa's rule (2026-11-03, OQ-0001-5): "the cap covers the honest rewind the proof test measures at P2, rounded+}
+{+   up; beyond the cap, the victim's view wins", read as the honest rewind's p99 at P2, rounded up to a whole number of+}
+{+   ticks at the run's tick rate (the advisor's reading, 2026-11-03), its value recorded when the proof test reports;+}
+   beyond it, shooters lead by the excess. The history keeps the cap plus a margin (data), at most 1 MB[-for the stress scene. Filters: targets the shooter could hit (friendly fire from mode data), targets sent to and-]
+   acknowledged by the shooter, targets within the ray's reach; a target that died or teleported stops at that record.
+   Bots shoot at present state, with no rewind. For cheat detection later (detection is the security baseline's, ADR
+   0006), the server records each player's view-time offset and aim per command, and each client's quinn `rtt()`
+@@ -359,11 +383,12 @@ server in the browser. The parts:
+   raw entry (a slot, a tick, a view-time offset and a two-axis aim point: ADR 0006 part 9's scale figure; arithmetic).
+   Raw entries, not per-player summaries (proposed: until the detection policy, item B7 of ADR 0006, says what it
+   needs, nothing is summarised away); ADR 0006 part 9 uploads the file with the record and keeps it 14 days. On the
+   round-trip reading of R2's profiles, a P2 player with a 100–150 ms delay needs a rewind of 200–250 ms by R2's formula
+   (R2-SYNC-REC5's arithmetic), and 233–383 ms once the buffer (33.3–100 ms at 1–3 ticks) and the blend (0–33.3 ms) are
+   added (arithmetic), so a 200 ms cap [-clips-]{+would clip+} every honest shot at the latency VISION_V2 §4 names, and a 250 ms cap
+   all but those with the shortest buffer and blend; the {+cap instead follows the measured honest rewind (OQ-0001-5's+}
+{+   rule): the+} proof test records each shot's RTT, delay, buffer [-wait-]{+wait, blend+} and [-blend,-]{+rewind,+} and {+sets+} the[-share each candidate-] cap [-clips (OQ-0001-5).-]{+from them.+}
+   *Why:* without it, a 100 ms player
+   leads a sprinting soldier by about 1.8 m; with it, the shooter's view is the truth up to the cap.
+   *Research:* R2-SYNC-REC5 (changed: the estimate adds the buffer wait and the blend), R2-BUD-REC4 (changed: history
+   and cap follow R2-SYNC-REC5), R2-XU-OQ1, R2-XU-OQ2, R2-XU-OQ7, R2-SYNC-OQ2, R2-SYNC-OQ8, R2-SYNC-OQ9, R2-SYNC-OQ15.
+@@ -430,12 +455,15 @@ server in the browser. The parts:
+    [the security baseline](../research/GLOSSARY.md#the-security-baseline)'s). Certificates are ADR 0006's: in
+    production [a certificate per hostname](../research/GLOSSARY.md#game-server-certificate) (R6-HOST-REC4;
+    carry-forward 4); development servers and the netcode proof test use self-signed, pinned certificates for
+    WebTransport, valid at most 14 days, whose hash the page fetches from its own HTTPS origin [-(R2-TRN-REC5);-]{+(R2-TRN-REC5), as Mustafa+}
+{+    set for the spikes (2026-11-03, SPIKE-MACHINES): "a private hash-pinned certificate for WebTransport";+} whether the
+    staging server that multiplayer previews use presents such a pinned certificate or the browser-trusted one on both
+    transports (a hash written into a static preview goes stale) is OQ-0006-5's, with ADR 0002 part 10's two shapes; the
+    WebSocket fallback cannot pin a hash, since its constructor takes only a URL and sub-protocols (r2-netcode.md,
+    Findings, R2-ROOM-F12, lines 1494–1500), [-and presents-]{+so in+} the {+proof test it presents a browser-trusted+} certificate [-ADR 0006's OQ-0006-5 names for-]{+on a domain+}
+{+    Mustafa registers ("for the WebSocket leg, a domain I register": SPIKE-MACHINES, 2026-11-03), OQ-0006-5's+}
+    development [-and staging.-]{+case (i), issued by a method the proof test's plan sets with security-auditor (the advisor's reading,+}
+{+    2026-11-03).+} *Why:*
+    datagrams suit newest-wins data; both crates
+    sit on quinn and the interface keeps a swap cheap; WebSocket reaches networks without QUIC; the loopback backend
+    runs the network's own messages from slice 1. *Research:* R2-TRN-REC1, R2-TRN-REC2, R2-TRN-REC3, R2-TRN-REC4
+@@ -459,8 +487,9 @@ server in the browser. The parts:
+    `RoomEnded` with a crash reason where it can, marks the match record as crashed and exits the process non-zero, so
+    the supervisor records the exit and the VM's other rooms go on; under `unwind` an uncaught panic "ends only its
+    own thread" (r2-netcode.md, Findings, R2-ROOM-F8, lines 1459–1462) and would leave a room that holds its
+    connections and sends nothing (ADR 0004 part 20 says the [-same; whether a-]{+same). A+} match [-should ever resume instead is-]
+[-    OQ-0001-18).-]{+never resumes instead: OQ-0001-18, answered+}
+{+    by the Advisor (2026-11-03): "end the match, as proposed, and keep the crash and match records", both written and+}
+{+    kept under ADR 0006 part 11's proposed retention (the advisor's reading, 2026-11-03).+} *Join:* a
+    short-lived token from the lobby, checked by the room offline (claims: player id, guest flag, display name, room id
+    as audience, team or slot if pre-assigned, expiry 30 s after issue with at most 5 s of leeway, a unique id), sent
+    in the first message of the control stream and never in a URL. The lobby validates display names, and the room
+@@ -537,17 +566,22 @@ server in the browser. The parts:
+13. **The network profiles.** One named set for every network mark, latency as the round trip, every run also
+    reordering: P0 = 0 ms, no jitter, 0 % loss; P1 = 50 ms, ±10 ms, 1 %; P2 = 100 ms, ±20 ms, 2 %; P3 = 150 ms,
+    ±30 ms, 5 %; P4 = 200 ms, ±40 ms, 5 %; B1 = P2 plus one burst of 1 s at 100 % loss (r2-netcode.md, Recommendations,
+    Brief question 1, lines 1987–1992). Each direction carries half the profile's latency and a uniform jitter of ± half
+    its jitter, so the round trip keeps the profile's mean and [-range (proposed; OQ-0001-16).-]{+range, and each direction loses packets at the profile's+}
+{+    loss rate, independently (at P2, 2 % each way, so about 4 % of round trips lose a packet) (decided: OQ-0001-16,+}
+{+    answered by the Advisor, 2026-11-03: "Latency and jitter split half each way; loss as P2 defines it"; the loss per+}
+{+    direction is the advisor's reading, 2026-11-03, as PM-0001-3 measures it).+} Every R2 mark is restated against one:
+    the budgets unit's "100 ms RTT, ±10 ms jitter, 2 % loss" becomes P2; the interest unit's "0, 50, 100 and 200 ms
+    latency with ±20 ms jitter and 0–5 % loss" becomes P0, P1, P2 and P4; the rooms unit's "0-200 ms simulated latency"
+    with 0–5 % loss becomes P0 to P4. The netcode proof test's "100 ms of simulated latency" is[-read as-] P2, VISION_V2 §4's
+    "about 100 ms of [-ping";-]{+ping" (OQ-0001-3, answered by+} the [-Advisor-]
+[-    confirms the reading (OQ-0001-3).-]{+Advisor, 2026-11-03: "yes", P2 is "100 ms round trip, ±20 ms+}
+{+    jitter, 2 % loss").+} The simulator that runs the profiles is ADR 0002's. *Research:* R2-XU-OQ12,
+    R2-XT-OQ14 = R5-XT-OQ10. *Need:* VISION_V2 §4 only.
+14. **The netcode proof test and its budgets.** The netcode proof test is judged against the budgets below
+    ("Budgets for the netcode proof test"). It runs before the foundation (SLICE-ORDER condition 3), throwaway, in
+    `spikes/` (SPIKE-SCOPE (a)), [-once-]{+now that+} Mustafa [-and-]{+has signed+} the [-Advisor approve-]{+drafts off as+} the [-drafts.-]{+basis for the spikes (2026-11-03,+}
+{+    SPIKE-ORDER (b)), first in wave 1: "wave 1 runs one heavy spike at a time: the netcode proof test first".+} It takes
+    in the research spikes of
+    R2-BUD-REC6 (the server tick budget in the stress scene with a snapshot-receiving client on every soldier),
+    R2-SYNC-REC9 (48 clients for 30 minutes), R2-TRN-REC1 and R2-TRN-REC3 (both transports: interop, load, hostile
+    input), R2-ROOM-REC2 (a room holds its tick; memory per room) and R1-TICK-REC2's P1 and P3, with R2-SYNC-REC3's and
+@@ -691,7 +725,7 @@ client on every soldier, over a 30-minute soak, re-flood ticks included, unless
+| Server tick time, 30 Hz (the baseline) | p99 ≤ 16.67 ms; max < 33.33 ms; 0 overruns (0 missed ticks) | R2-BUD-REC6 (r2-netcode.md:2398–2416) restated from GLOSSARY §1's 30 Hz column (GLOSSARY.md:53–69, 167–188); R1-TICK-REC2 P1 |
+| Its two shares, 30 Hz | sim step time p99 ≤ 8.33 ms (ADR 0004's parts); server-only work p99 ≤ 8.33 ms, measured separately | R2-BUD-REC6; R2-SYNC-REC9 mark 1; GLOSSARY.md:189–213 |
+| Parts of the server-only share | snapshot encode ≤ 50 µs per client per snapshot p99; rewound shot ≤ 20 µs p99 at 700 shots/s; region query ≤ 0.2 ms p99; ranking and packing ≤ 0.5 ms p99; pair test ≤ 0.1 µs per pair p99; re-flood ≤ 1 ms p99 (reported beside the whole, never summed into it) | R2-BUD-REC6; R2-SYNC-REC5 mark 4; R2-INT-REC1 (c); R2-INT-REC4; R2-INT-REC2 (b) |
+| The 60 Hz margin run [-(decides-]{+(an early signal in wave 1; slice 6's run with the real sim decides+} 60 Hz) | p99 server tick time ≤ 6.25 ms against 8.33 ms; each share ≤ 4.17 ms p99; R1-TICK-REC2 P1–P3 at 60 Hz; one run, same [-setup-]{+setup; the rooms per VM at 60 Hz counted (N = 48, the machine of ADR 0006 part 8's formula) and the goal budget holding at that count (PM-0001-63; in wave 1 that cost is reported beside part 8's provisional figures and decides nothing)+} | TICK-60-HEADROOM (the advisor's reading, confirmed [-at-]{+by Mustafa on 2026-11-03 with his addition,+} the [-stop);-]{+goal budget); TICK-60-SETUP (the Advisor, 2026-11-03);+} GLOSSARY §8, the 60 Hz margin |
+| Prediction replay | 200 ms of game time (6 ticks at 30 Hz) ≤ 1 ms p99, minimum laptop | R1-TICK-REC2 P3 (r1-simulation-core.md:2058–2060) |
+| Transport runtime | ≤ 1 vCPU per process with 48 sessions; p99 send call ≤ 1 ms | R2-TRN-REC1 mark 2 (r2-netcode.md:2565–2615), load restated at 30 Hz: 30 input datagrams per second per session |
+| Downstream per client | in R2's estimate scene, where R2-BUD-REC2 set the mark (48 soldiers and 15 big vehicles all in view, a 10-minute bot match): mean ≤ 160 kbps and p99 of 1-second windows ≤ 256 kbps, 30 Hz, counted at UDP payload + 28 B per datagram; in the stress scene: every 1-second window ≤ 256 kbps (the hard cap, proposed) and 0 datagrams above the cap rule, its mean reported (its shots alone add about 20.1 kbps to R2's 146.1: the bandwidth estimate) | R2-BUD-REC2 (r2-netcode.md:2326–2344; its scene, lines 2339–2340); R2-BUD-REC3; GLOSSARY.md:415–416 |
+@@ -710,7 +744,7 @@ client on every soldier, over a 30-minute soak, re-flood ticks included, unless
+| A client never acknowledges events | its event queue stops at the cap; resync or disconnect | R2-BUD-REC2's mark |
+| Server tick overrun | catch-up bounded, dropped time recorded (ADR 0004's loop) | 0 overruns in the soak; counters (ADR 0006) |
+| A panic in one connection's handler | that connection closes; the room's tick and other connections go on (connections share only bounded channels with the tick, never a lock it unwraps: part 11) | R2-ROOM-REC2 mark 6 |
+| A panic on the room's tick thread | the match ends: `RoomEnded` with a crash reason where possible, the match record marked crashed, the process exits non-zero and the supervisor records the exit (part 11; [-OQ-0001-18)-]{+OQ-0001-18, answered (a) by the Advisor, 2026-11-03)+} | the process gone within 1 s and every client told or closed [-(proposed: a mark beside PM-0001-26, test-engineer's)-]{+(PM-0001-59)+} |
+| A room process dies | that match ends; other rooms on the VM are unaffected | R2-ROOM-REC2 mark 4 |
+| A trap in the client's Wasm sim | the Worker restarts (ADR 0004) and asks for a `FullState` with `Resync` | the join mark (What a spike must prove, item 2) |
+| A hidden tab or a sleeping laptop | online, the client does not simulate the gap; it resyncs (`Resync`) | back in step within 0.5 s (R1-TICK-REC5, ADR 0004) |
+@@ -966,10 +1000,13 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+- **The strongest arguments against.**
+  1. *Fairness against the rewind cap.* At P2 (100 ms round trip) a 30 Hz client with a 100–150 ms delay needs a
+     rewind of 200–250 ms by R2's formula, and 233–383 ms once the server's input buffer (1–3 ticks) and the page's
+     blend (0–1 tick) are counted (part 8), so the security review's 200 ms cap [-clips-]{+would clip+} every honest shot at the very
+     latency VISION_V2 §4 names and 250 ms nearly every one, while a longer cap lengthens the victim's "hit behind
+     cover" window, which no source measures. Running commands on arrival (OQ-0001-6 (a)) would remove the buffer's
+     term. This is a feel trade-off, not an engineering [-one (OQ-0001-5).-]{+one, and Mustafa's rule settles the value (OQ-0001-5,+}
+{+     2026-11-03): the cap covers the honest rewind the proof test measures at P2, rounded up, and beyond it the victim's+}
+{+     view wins; the "hit behind cover" window inside the cap is recorded (the netcode checklist) and weighed by feel+}
+{+     when he checks the measured cap in Brave (the advisor's reading, 2026-11-03).+}
+  2. *Coarser input at 30 Hz.* About +25 ms from input to screen against 60 Hz on average: +8.3 ms of input wait
+     (half of each tick period: 16.7 − 8.3) and +16.7 ms of display, since the page draws the local player between the
+     two newest blocks, one tick behind its newest prediction (33.3 against 16.7 ms; R1-TICK-REC5,
+@@ -996,8 +1033,10 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  field with a visibility class; the local player's code must be replayable; the Worker carries the interpolation
+  buffer, the aim ray and, in local matches, the loopback codec; testing needs the network simulator, soaks and real
+  browsers; players on the WebSocket fallback see head-of-line stalls under loss.
+- **Revisit when:** the netcode proof test reports (the[-tick rate, the-] WebTransport crate, the rewind cap's [-clipped-]
+[-  share,-]{+value by OQ-0001-5's rule,+}
+  any per-kind E3b, the process model, the datagram cap); {+Mustafa checks the measured cap's feel in Brave (the advisor's+}
+{+  reading, 2026-11-03); slice 6's 60 Hz run reports (the tick rate: part 2);+} a browser moves to a new WebTransport
+  draft; connection
+  telemetry shows the fallback share (OQ-0001-13); Mustafa decides seats (§6.4 [OPEN]), spectators (R2-XU-OQ17) or the
+  line-of-sight rule (R2-INT-OQ1); ABL-PREDICT is answered; the real sim's step times at slice 6 differ from the proof
+  test's; the security baseline is researched (BASELINE-WHEN (b)).
+@@ -1019,14 +1058,23 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+| GN8 (bot-shot effects and sound cull, line 273) | port to TypeScript; look brief pending | split: the per-event-type radii (sound 90 m, visuals 50 m) become the server's event interest radii as data, rewrite in Rust; the client's cosmetic cull stays port to TypeScript; how the effects look is ADR 0003's | part 9 (f): events filtered by a radius per type on the server (R2-INT-REC6) |
+
+## Open questions
+- **OQ-0001-1. Is TICK-60-HEADROOM's reading confirmed?** {+Answered by Mustafa (2026-11-03): "confirm, with one addition:+}
+{+  60 Hz also needs the goal budget to hold at the rooms per VM measured at 60 Hz." So (a) is decided, with his addition:+}
+{+  part 2 holds the goal-budget condition and its reading, and PM-0001-63 counts the rooms per VM at 60 Hz with the+}
+{+  goal-budget check.+} The {+question as asked: the+} 60 Hz margin is measured against the server tick budget
+  at 60 Hz (8.33 ms), so 60 Hz needs a p99 server tick time of at most 6.25 ms in part 2's setup, plus every 60 Hz mark
+  the research sets. · *Why it matters:* it decides whether and how 60 Hz can ever be chosen. · *Options:* (a) confirm
+  the advisor's reading as ruled on 2026-10-31; (b) not confirmed: Mustafa and the Advisor name the base, and part 2's
+  mark and GLOSSARY §8 follow. · *Decider:* Mustafa
+  and the Advisor, "confirm at the stop". · *What decides it:* their confirmation. · *Research ids:* R1-TICK-REC2,
+  R2-BUD-REC6, R1-TICK-OQ1.
+- **OQ-0001-2. How does the stress scene's sim load reach the 60 Hz margin run (TICK-60-SETUP)?** {+Answered by the+}
+{+  Advisor (2026-11-03): "(a), as an early signal only. The final 60 Hz call is measured again with the real sim at+}
+{+  slice 6." So (a) is decided for the wave-1 run, which decides nothing: slice 6 runs the final 60 Hz measurement on the+}
+{+  real sim, whatever the early signal shows; a pass starts no 60 Hz work before slice 6 (PM-0004-71 and -72 run with+}
+{+  each 60 Hz run but decide only at slice 6, and R1-TICK-OQ1 is asked only after slice 6 passes), and a fail closes+}
+{+  nothing (the advisor's reading, 2026-11-03). The options below stay as the record of what was weighed, (c) and (d)+}
+{+  included.+} · *Why it matters:*
+  the proof test runs before the foundation with a throwaway sim, and the margin must be measured in one run, since
+  p99s do not add; at 60 Hz the parts' ceilings already take 3.87 of 4.17 ms (ADR 0004 part 6), so a part the run
+  leaves out can decide the tick rate, and the wave-1 sim has no ability and effect step, economy, objectives or
+@@ -1046,7 +1094,10 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  marks may use a stand-in (with S1's stand-ins at 30 Hz: 384 effect rows and a 1 ms burn, the 2.80 ms remainder topped
+  up): on the planning check they leave 4.69 ms (16.67 − 9.18 − 2.80). · *Decider:* the Advisor. · *What decides it:*
+  the Advisor's reading of the options and the sim core spike's readiness. · *Research ids:* R2-BUD-REC6, R1-TICK-REC2.
+- **OQ-0001-3. Is "100 ms of simulated latency" P2?** {+Answered by the Advisor (2026-11-03): "yes. '100 ms' is P2: 100 ms+}
+{+  round trip, ±20 ms jitter, 2 % loss (VISION_V2 §4's 'about 100 ms of ping'). Latency and jitter split half each way;+}
+{+  loss as P2 defines it." So (a) is decided (its last sentence answers OQ-0001-16).+} The proof test's human client runs
+  at P2: 100 ms round trip,
+  ±20 ms jitter, 2 % loss (part 13). · *Why it matters:* it sets what "look correct" is judged at. · *Options:* (a) P2,
+  the round trip, as VISION_V2 §4's "ping"; (b) 100 ms each way, a 200 ms round trip (P4's latency). · *Decider:* the
+  Advisor, who wrote the definition. · *What decides it:* the Advisor's reading. · *Research ids:* R2-XU-OQ12,
+@@ -1057,20 +1108,29 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  server's confirmation (the interim). · *Decider:* Mustafa. · *What decides it:* a Feel Lab test that compares both
+  ways on the Molotov and the Riot Shield, once abilities are playable. · *Research ids:* ABL-PREDICT, R2-SYNC-OQ10,
+  R1-ABL-OQ4, R1-ABL-REC4.
+- **OQ-0001-5. The rewind cap: which value, and the victim's side?** {+Answered in part by Mustafa (2026-11-03): "no value+}
+{+  now. Rule: the cap covers the honest rewind the proof test measures at P2, rounded up; beyond the cap, the victim's+}
+{+  view wins. Aim for the smallest input buffer that holds." The rule is decided, in option (c)'s shape: the honest+}
+{+  rewind is its p99 at P2, as option (c) and the stop report's recommendation he answered define it, with the run's+}
+{+  largest rewind reported beside it; rounded up means to a whole number of ticks at the run's tick rate, as PM-0001-48+}
+{+  rounds; the one-interval tolerance and part 8's anti-cheat text are unchanged; the victim's side is decided, since+}
+{+  beyond the cap the victim's view wins (shooters lead by the excess); the buffer aim guides OQ-0001-6 (the advisor's+}
+{+  reading, 2026-11-03). Still open: the cap's value, decided by the proof test's measured honest rewind at P2 under that+}
+{+  rule and recorded when the proof test reports.+} · *Why it matters:* at P2 a 30 Hz client needs 200–250 ms of rewind by
+  R2's formula and 233–383 ms once the input buffer and the page's blend are counted (part 8), so both candidate caps
+  clip honest shots at VISION_V2 §4's latency, while a longer cap lengthens the window in which a victim is hit just
+  after reaching cover; the cap is also the most rewind a client faking its latency can claim (part 8). · *Options:* (a)
+  200 ms (the default principles; the security review prefers it, with a tolerance of one snapshot interval); (b) 250 ms
+  (the sync unit's proposal); (c) a cap set from the proof test's measured honest rewind (the p99 at P2), the
+  one-interval tolerance unchanged (not researched: the research weighs 200 and 250 ms only); (d) run commands on
+  arrival (OQ-0001-6 (a), Source's model), which removes the buffer's term from every rewind; (e) start the
+  interpolation delay at 2 intervals instead of 3, at the cost of more extrapolation under loss (part 7). ·
+  *Recommendation:* none until the proof test reports; the netcode review leans to (c) with (d) measured beside it,
+  but (c) is not researched, so choosing it is the deciders' call. · *Decider:* Mustafa and the Advisor. · *What decides
+  it:* the {+value: the+} proof test's [-numbers-]{+measured honest rewind+} at P2[-and P3-] (each shot's measured [-rewind, the share of shots each cap-]
+[-  clips,-]{+rewind), with+} the "hit after
+  cover" [-window), then-]{+window inside the cap recorded beside it; the share each candidate cap clips and+} a {+later+} Feel Lab [-weighing.-]{+weighing no+}
+{+  longer decide anything, since no candidates are left to weigh (the advisor's reading, 2026-11-03).+} · *Research ids:*
+  R2-XU-OQ1, R2-SYNC-OQ2, R2-SYNC-OQ15, R2-XU-OQ2.
+- **OQ-0001-6. When does the server run each client's commands, and how does the client keep them just in time?** ·
+  *Why it matters:* arrival order affects corrections, fairness and speed-hack exposure, and the choice sets the
+  honest rewind: a buffered command waits 1–3 ticks before it runs, which adds 33.3–100 ms to every rewind (part 8),
+@@ -1079,8 +1139,10 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  clock (part 5); (b) buffer them and run exactly one per client per tick, repeating the last on a miss, late commands
+  dropped and catch-up limited to the redundancy window; for the client, nudging its tick pace or re-aligning by
+  skipping or repeating a tick (not researched). · *Decider:* the netcode proof test. · *What decides it:* correction
+  rates, fairness and the measured rewind under P2 to [-P4.-]{+P4, aiming for "the smallest input buffer that holds" (Mustafa,+}
+{+  2026-11-03, REWIND-CAP): of the options that pass the proof test's marks (corrections, fairness, the fast-clock+}
+{+  bound), the smallest buffer, with (a), run on arrival, counting as none; the options stay (the advisor's reading,+}
+{+  2026-11-03).+} · *Research ids:* R2-SYNC-OQ3, R1-TICK-OQ8, R1-XT-OQ5 = R2-XT-OQ5 (the time-sync part).
+- **OQ-0001-7. Do shots and the active-reload tap carry their moment inside a tick at 30 Hz?** · *Why it matters:* a
+  33 ms tick quantises when a click happens; for LOOP_V2 §7's Gears-style active reload ([DECIDED]) the page draws the
+  window at the display's rate while the authority judges the tap by its tick, so near the window's edge the bar can
+@@ -1117,7 +1179,10 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  how often reconnect runs (not its design). · *Options:* none (measurements). · *Decider:* connection telemetry from
+  the first online playtest (ADR 0006's monitoring). · *What decides it:* the measured shares. · *Research ids:*
+  R2-TRN-OQ7, R2-BUD-OQ11, R2-ROOM-OQ8.
+- **OQ-0001-14. Is a VISION_V2 §3 or §4 target trace enough for an engine feature?** {+Answered by the Advisor+}
+{+  (2026-11-03): "yes, a VISION_V2 §3 or §4 trace counts, marked as such." So (a) is decided: the needs written+}
+{+  "VISION_V2 §4 only" and listed in `docs/adr/README.md` stand as written. The question as asked:+} R2-BUD-REC4,
+  R2-BUD-REC5 and
+  R2-TRN-REC6 serve only VISION_V2 §4's "matches feel fair up to about 100 ms of ping". · *Why it matters:* the trace
+  rule admits a feature only with its need, and these three carry the fairness target. · *Options:* (a) yes: a §3 or §4
+  target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in `docs/adr/README.md` (the reading these
+@@ -1135,7 +1200,10 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  from the start (the engine review's). · *Decider:* Mustafa, by feel, with netcode-architect. · *What decides it:*
+  the proof test's absolute input-to-screen p50 and p99 at P0 on ML and RD (reported), then his check. · *Research
+  ids:* none carried (R1-TICK-REC5 is ADR 0004's; option (b) is not researched).
+- **OQ-0001-16. How does each network profile split its latency and jitter over the two directions?** {+Answered by the+}
+{+  Advisor (2026-11-03): "Latency and jitter split half each way; loss as P2 defines it." So (a) is decided, and each+}
+{+  direction loses packets at the profile's loss rate, independently: at P2, 2 % each way, as PM-0001-3 measures it, so+}
+{+  about 4 % of round trips lose a packet (the advisor's reading, 2026-11-03).+} Part 13 gives
+  the round trip only ("the injected latency is round-trip time": r2-netcode.md, lines 1987–1988) and proposes half
+  the latency and a uniform ± half the jitter each way. · *Why it matters:* several marks pass or fail on the split:
+  at P2 a snapshot is late if it arrives more than two intervals (66.7 ms) after sending, and with ±20 ms on the
+@@ -1152,7 +1220,11 @@ C (login required): contradicts VISION_V2 §5 [DECIDED] "guest play first".
+  part 10); (b) no: a kick is only a disconnect, and the host uses the lock. · *Recommendation:* (a) (the security
+  review's). · *Decider:* Mustafa (what a host may do, with R2-ROOM-OQ5). · *What decides it:* his call. · *Research
+  ids:* none carried.
+- **OQ-0001-18. When a room's simulation panics mid-match, does the match end (ROOM-CRASH)?** {+Answered by the Advisor+}
+{+  (2026-11-03): "end the match, as proposed, and keep the crash and match records." So (a) is decided: the match ends,+}
+{+  and the crash report and the match record are written and kept under ADR 0006 part 11's proposed retention, with no+}
+{+  new period, the record marked crashed as part 11 and PM-0001-59 word it (the advisor's reading, 2026-11-03). The+}
+{+  options below stay as the record of what was weighed.+} Part 11's proposal: the
+  match ends, the crash is reported, clients get `RoomEnded` with a crash reason, and the process exits non-zero. ·
+  *Why it matters:* it sets what players see when the server's sim fails, and what the supervisor and the match record
+  handle. · *Options:* (a) the match ends (proposed): no VISION_V2 §6 item asks for resuming, and a tick that stopped
+@@ -1172,8 +1244,9 @@ The spike is the netcode proof test (GLOSSARY §8; brief §2), in the Advisor's
+>   - one human client at 100 ms of simulated latency sees prediction, reconciliation and lag-compensated hits that look
+>     correct.
+
+It runs before the foundation (SLICE-ORDER condition 3), throwaway, in `spikes/` (SPIKE-SCOPE (a)), [-only after-]{+now that+} Mustafa [-and-]{+has+}
+{+signed the drafts off as+} the [-Advisor approve-]{+basis for+} the [-drafts.-]{+spikes (2026-11-03, SPIKE-ORDER (b)), as the first of wave 1's heavy spikes,+}
+{+which run one at a time.+} Its sim is a throwaway one with movement, hitscan and bots as protocol
+clients, native and Wasm. It takes in the research spikes named in part 14. What it must prove, by decision part, with
+candidate marks from the research (all proposed there; restated at 30 Hz and against part 13's profiles):
+
+@@ -1196,8 +1269,10 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
+     loss plus 1 percentage point at P2; 0 of 10,000 one-shot actions lost at P3; a 1 MB bulk transfer adds at most 5 ms
+     to the control stream's p99 (R2-TRN-REC2 marks 1–4).
+   - Development certificates (ADR 0006's): all four browsers connect with a pinned self-signed certificate in 20 of 20
+     attempts, and reject one valid for 15 days (R2-TRN-REC5 marks 1 and [-3);-]{+3), the "private hash-pinned certificate for+}
+{+     WebTransport" Mustafa set (SPIKE-MACHINES, 2026-11-03);+} the WebSocket leg first needs [-the-]{+a browser-trusted+} certificate
+     [-OQ-0006-5 names for-]{+on the domain he registers ("for the WebSocket leg, a domain I register"), OQ-0006-5's+} development [-and staging (the Advisor, before-]{+case (i), issued+}
+{+     by a method+} the [-test starts;-]{+proof test's plan sets with security-auditor (the advisor's reading, 2026-11-03;+} ADR 0006's
+     PM-0006-15).
+2. **48 simulated clients stay within the budgets (parts 2, 3, 6, 11, 14).** The "Budgets for the netcode proof test"
+   table above, plus: every decoded snapshot rebuilds the server's quantised state for that client by hash under P0,
+@@ -1217,8 +1292,13 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
+   one reference server, each room's p99 within 10 % of one room, and a killed room leaves the others unchanged
+   (R2-ROOM-REC2 marks 2 and 4, on the CCX23 and the CX33: R6-HOST-REC2, ADR 0006).
+3. **The 60 Hz margin (part 2):** in one run with part 2's setup, p99 server tick time at most 6.25 ms at a 60 Hz tick,
+   both shares within 4.17 ms, and R1-TICK-REC2 P1–P3 at 60 [-Hz; how-]{+Hz, with+} the [-sim load gets there-]{+rooms per VM at 60 Hz counted and the goal+}
+{+   budget checked at that count (PM-0001-63; Mustafa's addition, OQ-0001-1). In wave 1 this run+} is [-OQ-0001-2. A-]{+an early signal only,+}
+{+   on the netcode proof test's kept server and harness, in its own VM session after the sim core spike+}
+{+   (SPIKE-ORDER (b)), with the sim core spike's sim and ADR 0004's S1 stand-ins (OQ-0001-2 (a), the Advisor,+}
+{+   2026-11-03): it reports separately and decides nothing, and the proof test closes at 30 Hz without it (the advisor's+}
+{+   reading, 2026-11-03). Slice 6 runs it again with the real sim and decides the tick rate (migration step 8); a+} failure
+   {+there+} keeps 30 Hz.
+4. **The human client at P2 sees prediction, reconciliation and lag-compensated hits that look correct (parts 4, 7,
+   8).** Mustafa judges "look correct" in Brave (test-engineer writes his checklist); the measurable marks beside it:
+   - corrections: 0 larger than 1 mm whenever every command arrived in time, P0 to P4; in a brawl of 48 at P3,
+@@ -1231,7 +1311,8 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
+     against the simulator's true clock (R2-BUD-REC4);
+   - hits: shots whose ray hits the target in the shooter's view register on the server in at least 99 % of cases up to
+     P2 and 95 % at P3, false hits below 0.5 %, against a strafing, sprinting target at 9 m/s (R2-SYNC-REC5 mark 1); no
+     shot rewound beyond the cap,[-and-] the[-share each candidate-] cap [-clips recorded-]{+set by OQ-0001-5's rule from the measured honest rewind at P2+} (mark [-6, OQ-0001-5);-]{+6; the+}
+{+     rule is Mustafa's, 2026-11-03);+} a cheat client at
+     the edge of the tolerance gains no more rewind than the tolerance (mark 5); history at most 1 MB and a rewound shot
+     at most 20 µs p99 (marks 3 and 4); server hit points within 5 cm of the client-picked point in at least 99.9 % of
+     shots at the ground, 2.5 m and 4 m, P0 to P3, and the aim at most 80 bits per command (R2-SYNC-REC8 marks 1–2);
+@@ -1244,7 +1325,9 @@ candidate marks from the research (all proposed there; restated at 30 Hz and aga
+   encoding cost per client (R2-BUD-OQ9); the controllers' behaviour under 2–5 % loss, server and browser side
+   (R2-BUD-OQ10, R2-TRN-OQ8); each browser's negotiated draft and its behaviour with UDP blocked (R2-TRN-OQ1,
+   R2-TRN-OQ2); the honest rewind, by measuring how far behind the server's present the client's view is when its
+   command runs, with each shot's RTT, delay, buffer wait and blend [-(R2-XU-OQ2;-]{+(R2-XU-OQ2), and from it+} the {+rewind+} cap [-itself is OQ-0001-5's);-]{+by+}
+{+   OQ-0001-5's rule (Mustafa, 2026-11-03): the honest rewind's p99 at P2, rounded up to a whole number of ticks, the+}
+{+   run's largest rewind reported beside it (the advisor's reading, 2026-11-03);+} the
+   real record and command sizes, whole and delta-coded (R2-XU-OQ15, R2-XU-OQ4); linear against Hermite
+   (R2-SYNC-OQ12); command timing (OQ-0001-6); whether shots need sub-tick stamps (OQ-0001-7). Reported, not judged:
+   the egress per 48-player match-hour and the spike's own bill (R6-COST-REC1, ADR 0006), and the absolute delay from
+@@ -1547,11 +1630,13 @@ profile's latency (PM-0001-3). Each step: what to do, the expected result, and w
+## Migration plan
+In the slice order (SLICE-ORDER). The legacy game stays playable, frozen, until v2 replaces it (it moves to `legacy/`
+in the foundation).
+1. **The netcode proof test** (before the foundation): [-run after-]{+first in wave 1, now that Mustafa has signed+} the drafts [-are approved, beside-]{+off as+}
+{+   the basis for+} the[-other phase 0-] spikes [-`docs/SPIKE_PLAN.md` orders.-]{+(2026-11-03, SPIKE-ORDER (b)); wave 1 runs one heavy spike at a time, in+}
+{+   `docs/SPIKE_PLAN.md`'s order.+} *Done when:* the pass marks {+outside the 60 Hz group+} are met and recorded in this
+   record, [-with the tick-]
+[-   rate (30 Hz unless-]{+at+} the [-60-]{+30+} Hz [-margin passes),-]{+baseline, with+} the WebTransport crate, E3 and any per-kind E3b, the process [-model-]
+[-   and-]{+model,+} the datagram
+   cap {+and the rewind cap (OQ-0001-5's rule)+} named; Mustafa's Brave checklist passed. {+The 60 Hz early signal runs later,+}
+{+   on this test's kept server and harness in its own VM session after the sim core spike, and reports separately: it+}
+{+   decides nothing, and the tick stays at 30 Hz until slice 6 (part 2; the advisor's reading, 2026-11-03).+}
+2. **The foundation** (ADR 0002 carries it): the protocol crate (message types, the codec, the thin transport interface
+   with its loopback backend) goes into the client + local server skeleton, its types generated for TypeScript. *Done
+   when:* an empty scene runs through the full stack in the browser with CI green and a preview link (GLOSSARY §8), and
+@@ -1571,15 +1656,18 @@ in the foundation).
+   and the byte-level audit (R2-INT-REC5) pass, and Mustafa's first online playtest is run.
+6. **Slice 4, the loop:** economy and objectives with their visibility classes (team-private state as Mustafa decides,
+   R2-INT-OQ3), the uplink countdown never predicted, the match record written at Ended, upgrade offers, picks, drops
+   and pickups (part 12), and the Feel Lab tests (OQ-0001-4,[--5,-] -8, [--10).-]{+-10; the rewind cap's feel is Mustafa's Brave check of+}
+{+   the measured cap, not a Feel Lab weighing, under REWIND-CAP: the advisor's reading, 2026-11-03).+} *Done when:* the
+   refusal tests of part 12 and R2-ROOM-REC1 mark 3 pass, and Mustafa has answered the Feel Lab questions.
+7. **Slice 5, Octopon-3 and Editor v2:** enclosure areas and portals from the map document (ADR 0004, ADR 0005); the
+   editor's Test plays the map with bots through the local server (EDITOR_V2 §3). *Done when:* the downstream mean is at
+   most 100 kbps with interest on the Octopon-3 greybox (R2-BUD-REC2) and R2-INT-REC1 (a) and R2-INT-REC2 (c) show 0
+   pop-in frames there.
+8. **Slice 6, scale to 48:** the budgets again with the real sim in the stress scene, 8 rooms per VM (with ADR 0006),
+   the soaks on the test-mode list, and the {+final+} 60 Hz margin run {+with the real sim, which runs+} here [-if OQ-0001-2 chose (c).-]{+whatever the+}
+{+   wave-1 early signal showed, with the rooms per VM at 60 Hz counted and the goal budget checked at that count (part 2;+}
+{+   PM-0001-63; TICK-60-SETUP, the Advisor, 2026-11-03).+} *Done when:* the budgets table passes with the real [-sim-]{+sim, the+}
+{+   tick rate is set by part 2's rule,+} and R5-TEST-REC5's soak passes for every mode on
+   [the test-mode list](../research/GLOSSARY.md#the-test-mode-list).
+
+## Test plan
+@@ -1616,7 +1704,9 @@ in the foundation).
+
+## Rollback
+- **The 30 Hz baseline fails at N = 48:** back to the drafts with the measured numbers (part 2's restated rule).
+- **The 60 Hz margin [-fails:**-]{+fails, or the goal budget does not hold at the rooms per VM measured at 60 Hz:**+} nothing to undo;
+  the tick stays at 30 Hz. {+A failing early signal in wave 1 closes nothing: slice 6 runs the final 60 Hz measurement+}
+{+  with the real sim all the same (part 2; the advisor's reading, 2026-11-03).+}
+- **One WebTransport crate fails:** the other one, behind the thin interface (a swap touches only the transport module,
+  R2-TRN-REC1 mark 3). **Both fail:** back to the drafts; the transport is a settled input, so Mustafa and the Advisor
+  decide.
+@@ -1638,10 +1728,10 @@ One row per id the decision map gives this record (127).
+
+| id | disposition | where or why |
+|---|---|---|
+| R1-TICK-REC2 | changed: TICK-30 replaces its rule (r1-simulation-core.md:2029, 2061–2062); 30 Hz is the baseline, 60 Hz only with the 60 Hz [-margin;-]{+margin and the goal budget holding at the rooms per VM measured at 60 Hz, decided at slice 6 on the real sim (part 2; OQ-0001-1, OQ-0001-2, answered 2026-11-03);+} P1–P3 stay marks at 30 Hz and, for the margin [-run,-]{+runs,+} at 60 Hz; P1 and P2 are ADR 0004's, P3 this record's | parts 2, 4; budgets table |
+| R1-ABL-REC4 | adopted: the player's own weapon state is predicted, damage never; own cues are keyed by (entity, weapon, command sequence), so a replay never plays one twice, and the server never sends a client its own shots; its ability half waits for ABL-PREDICT | part 4; OQ-0001-4 |
+| R1-ECS-OQ3 | answered: only the local soldier and the vehicle it drives are replayed, no whole-world replay | part 4 |
+| R1-TICK-OQ1 | spike: only if [-the-]{+slice 6's+} 60 Hz [-margin passes;-]{+run passes (part 2; the advisor's reading, 2026-11-03);+} then ADR 0004's determinism suite and ADR 0002's Worker smoothness test decide | part 2 |
+| R1-TICK-OQ3 | answered: TICK-30 sets the rate; the shipped rates stay unread and no decision here rests on them | part 2 |
+| R1-TICK-OQ4 | open: OQ-0001-7 | part 5 |
+| R1-TICK-OQ8 | open: OQ-0001-6 | part 5 |
+@@ -1674,7 +1764,7 @@ One row per id the decision map gives this record (127).
+| R2-BUD-REC1 | changed: the snapshot half (30 Hz) stands; the tick half is replaced by TICK-30; inputs repeat every unacknowledged command up to the cap (R2-SYNC-REC2) instead of 3, delta-coded (its U2, adopted at once, since part 5's command is about twice its 8 B input); marks restated at 30 Hz and against P2 and P3; its Shabzon mark (mean delivered fire rate within 1 % of 13.9 shots/s at the chosen tick, r2-netcode.md:2324–2325) is a sim mark, carried by ADR 0004's mark S4 (one time representation holds every rate, which meets R1-ABL-REC3's 1 % for the Shabzon) | parts 2, 5; budgets table; ADR 0004 |
+| R2-BUD-REC2 | changed: its precision mark "decoded positions within 1 cm and angles within 0.01° of the server's values" (r2-netcode.md:2341) cannot pass for pitch, sent in 10 bits of 0.18° steps (line 1748); restated as positions within 1 cm, yaw within 0.01° (a 16-bit step is about 0.0055°, line 2263) and pitch within one 0.18° step (proposed: the field's own resolution); the hard cap proposed at 256 kbps; its mean and p99 are judged in R2's estimate scene, where it set them (lines 2339–2340), and the stress scene is held by the cap | part 6; budgets table |
+| R2-BUD-REC3 | adopted, with one cap rule (R2-XU-OQ5) | part 6 |
+| R2-BUD-REC4 | changed: the interpolation bound follows R2-SYNC-REC4 (R2-XU-OQ3); the rewind cap [-is OQ-0001-5-]{+follows OQ-0001-5's rule (Mustafa, 2026-11-03: the honest rewind the proof test measures at P2, rounded up; its value from the proof test)+} and the history keeps the cap plus a margin, not 1 s (R2-XU-OQ7); the input buffer and the clock are adopted; need: VISION_V2 §4 only | parts 5, 7, 8 |
+| R2-BUD-REC5 | adopted; need: VISION_V2 §4 only | part 10 |
+| R2-BUD-REC6 | changed: restated at 30 Hz, its reason corrected (r2-netcode.md:2402–2403, carry-forward 2), its "the rule does not change" replaced by TICK-30 | parts 2, 3; budgets table |
+| R2-INT-REC1 | adopted | part 9 (a) |
+@@ -1690,7 +1780,7 @@ One row per id the decision map gives this record (127).
+| R2-TRN-REC4 | changed: a third, loopback backend for the local server (SLICE-ORDER condition 1) | part 10 |
+| R2-TRN-REC6 | adopted; need: VISION_V2 §4 only | part 10 |
+| R2-ROOM-REC1 | adopted; the fresh sim per match also resets the player records (UPGRADE-SCOPE) | part 11 |
+| R2-ROOM-REC2 | adopted; a panic on the tick thread ends the match and exits the process non-zero [-(OQ-0001-18)-]{+(OQ-0001-18, answered (a) by the Advisor, 2026-11-03)+} | part 11 |
+| R2-ROOM-REC3 | adopted, with R2-ROOM-OQ2's signature scheme | part 11 |
+| R2-ROOM-REC4 | adopted | part 11 |
+| R2-ROOM-REC5 | adopted; code length and access stay open | part 11; OQ-0001-11 |
+@@ -1698,7 +1788,7 @@ One row per id the decision map gives this record (127).
+| R2-ROOM-REC7 | adopted; the file format and validation are ADR 0005's | part 11 |
+| R2-ROOM-REC8 | adopted; where the secret finally lives is R2-ROOM-OQ11 (ADR 0006); the SameSite=Strict cookie needs the client host and the lobby on one registrable domain (ADR 0006) | part 11 |
+| R2-SYNC-OQ1 | answered: TICK-30 and part 2 (30 Hz tick and snapshots); the marks are restated at 30 Hz | parts 2, 6–8 |
+| R2-SYNC-OQ2 | [-open: OQ-0001-5-]{+answered in part: the cap follows OQ-0001-5's rule (Mustafa, 2026-11-03), not a fixed 200 or 250 ms; its value is set when the proof test reports+} | part 8 |
+| R2-SYNC-OQ3 | open: OQ-0001-6 | part 5 |
+| R2-SYNC-OQ4 | answered: independent entity-group datagrams, deltas against one baseline, acknowledged per group | part 6 |
+| R2-SYNC-OQ5 | spike: the netcode proof test measures corrections next to movers (R2-SYNC-REC7 mark 3); the collision rule itself is a design question (R2-XT-OQ13) | What a spike must prove |
+@@ -1708,8 +1798,8 @@ One row per id the decision map gives this record (127).
+| R2-SYNC-OQ10 | open: OQ-0001-4 | part 4 |
+| R2-SYNC-OQ11 | answered: SEC-SPREAD (a) | part 4 |
+| R2-SYNC-OQ12 | spike: the netcode proof test (linear first; Hermite only on artefacts) | part 7 |
+| R2-SYNC-OQ14 | answered: no recommendation rests on the unread Valve pages; the victim's side is [-OQ-0001-5-]{+answered by OQ-0001-5's rule (Mustafa, 2026-11-03: beyond the cap, the victim's view wins)+} | part 8 |
+| R2-SYNC-OQ15 | [-open: OQ-0001-5-]{+answered: beyond the cap, the victim's view wins (OQ-0001-5, Mustafa, 2026-11-03); inside it the proof test records the "hit after cover" window (the netcode checklist)+} | part 8 |
+| R2-BUD-OQ1 | answered: TICK-30 sets the rate; the unread shipped rates decide nothing here | part 2 |
+| R2-BUD-OQ2 | answered: no recommendation rests on the unread Source defaults | part 7 |
+| R2-BUD-OQ3 | spike: the netcode proof test records each browser's `maxDatagramSize` | part 6 |
+@@ -1735,7 +1825,7 @@ One row per id the decision map gives this record (127).
+| R2-ROOM-OQ2 | answered: the security review's scheme (asymmetric signature, one pinned algorithm, token type, key id, signature before the cache, a bounded cache), accepted with this record; key storage waits on the security baseline (ADR 0006) | part 11 |
+| R2-ROOM-OQ8 | open: OQ-0001-13 | Open questions |
+| R2-ROOM-OQ10 | open: OQ-0001-11 | part 11 |
+| R2-XU-OQ1 | [-open: OQ-0001-5-]{+answered in part: the cap follows OQ-0001-5's rule (Mustafa, 2026-11-03), not a fixed 200 or 250 ms; its value is set when the proof test reports+} | part 8 |
+| R2-XU-OQ2 | spike: the netcode proof test measures how far behind the server's present the client's view is when its command runs, with each shot's RTT, delay, buffer wait and blend | part 8 |
+| R2-XU-OQ3 | answered: 2 to 5 intervals, starting at 3, with R2-SYNC-REC4's marks | part 7 |
+| R2-XU-OQ4 | answered: every unacknowledged command up to a cap of 8 (data), the repeats delta-coded, within 48 kbps; the real size is measured by the proof test | part 5; bandwidth estimate |
+@@ -1749,7 +1839,7 @@ One row per id the decision map gives this record (127).
+| R2-XU-OQ13 | answered: MODES-3 (a) | Context |
+| R2-XU-OQ15 | spike: the netcode proof test measures the record sizes | bandwidth estimate |
+| R2-XU-OQ16 | answered: Fiedler's articles are cited as practitioner articles, behind specifications and shipped-game code (the README's order); the one rule here resting on them, three intervals of interpolation, is measured by the proof test | part 7 |
+| R2-XU-OQ18 | [-open:-]{+answered:+} OQ-0001-14 [-(r2-netcode.md:3268 leaves it to the Advisor); until-]{+(a), by+} the Advisor [-rules, these drafts use the session's trace reading (a-]{+(2026-11-03), whom r2-netcode.md:3268 left it to: a+} VISION_V2 §3 or §4 target counts like LOOP_V2, written "need: VISION_V2 §4 only" and listed in [-docs/adr/README.md)-]{+docs/adr/README.md,+} for R2-BUD-REC4, R2-BUD-REC5 and R2-TRN-REC6; R2-BUD-REC3 traces to §6.1; R2-INT-REC7 is not built | parts 7, 10; Open questions |
+| R2-XT-OQ1 | answered (= R1-XT-OQ1) | part 5 |
+| R2-XT-OQ2 | answered (= R1-XT-OQ3) | part 7 |
+| R2-XT-OQ3 | answered (= R1-XT-OQ4) | part 6 |

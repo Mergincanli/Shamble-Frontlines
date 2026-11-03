@@ -1,0 +1,4 @@
+Every open question of the four sections, one line each, with its decider and the section that holds its full text
+(the question, why it matters, the options and the research ids), then the frame's own four. Mustafa's questions carry
+no pick; where a section proposes an answer, the line says so, and an answered question names who answered it and
+when.

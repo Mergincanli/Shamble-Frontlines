@@ -11,3 +11,16 @@
 - 13:59 LA1 (+LA1-2..7), LA2, H19 x2, NOTE T1, RISK3 written. README non-pointer blocks done. Next: SPIKE_PLAN blocks (O11 header, O11-2, M17, O1, O2, L3, O3, O4, S17, O4-2, L3-2, N14, M18, O5, RW14, O6, H20, S18, O6-2, S18-2, O7, O8, O9, L4, L4-2, C11, O10, B6, F5, Q5, L2, RW15, S17-2, O12, L1).
 - 14:04 SPIKE_PLAN O11, O11-2, M17, O1 written. Next: O2 (mermaid), L3, O3, O4, S17, O4-2, L3-2.
 - 14:09 O2, L3, O3 written. Next: O4, S17, O4-2, L3-2 (table).
+- 14:12 O4, S17, O4-2, L3-2 written. Next: item 1 (N14, M18, O5, RW14).
+- 14:17 N14, M18 written. Next: O5, RW14, then item 2 (O6, H20, S18, O6-2, S18-2).
+- 14:21 O5, RW14 written. Next: item 2 (O6, H20, S18, O6-2, S18-2).
+- 14:25 O6, H20 written. Next: S18, O6-2, S18-2.
+- 14:28 S18, O6-2, S18-2 written. Next: O7 (item 3), O8, NOTE S19, O9, L4, C11, L4-2, O10.
+- 14:32 O7, O8, NOTE S19, O9 written. Next: L4, C11, L4-2, O10, B6, F5, Q5, L2, RW15, S17-2, O12 + notes, L1.
+- 14:37 L4, L4-2, C11 (at item 7 What it proves) written. Next: O10, B6, F5, Q5, L2, RW15, S17-2, O12 + notes, L1.
+- 14:42 L4 (265-271), C11 (329-333) rewritten within 120 chars. Next: O10, B6, F5, Q5, L2, RW15, S17-2, O12 + notes, L1.
+- 14:46 O10, B6, F5, Q5 written. Next: L2, RW15, S17-2, O12 + notes (H21 S20 N15 M20 L5), L1.
+- 14:51 L2, L2-2, RW15, S17-2 written. Next: O12 + notes (H21 S20 N15 M20 L5), L1.
+- 14:56 O12 + NOTEs H21 S20 N15 M20 L5 written. Next: L1 (OQ-SPIKE-1), then OVERVIEW (O15, H22, S22, F6), NOTE M19, then dry runs, then pointer step.
+- 14:58 L1 written. Next: OVERVIEW (O15, H22, S22, F6), NOTE M19, then dry runs, then pointer step.
+- 15:01 OVERVIEW O15, H22, F6, S22 and NOTE M19 written. All non-pointer blocks done. Next: dry runs on scratch tree, glossary, cells, lengths; then pointer step.

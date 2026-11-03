@@ -219,3 +219,278 @@ AFTER:
   spike; the server loop's jitter and catch-up
 END
 
+### FIX RW12
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+7. At P2, with the rewind cap at the honest rewind's p99 the proof test measured at P2 (PM-0001-49; the overlay names
+   it, so the cap clips almost no honest shot), shoot the sprinting target for two minutes. Expected: when his crosshair
+   is on the target as he sees it, the shot hits; when it is off, it misses. The shot (flash, tracer) is instant; the
+   hit marker comes a moment later, when the server confirms ("the shot feels instant; hit feedback arrives when the hit
+   is confirmed", LOOP_V2 §7).
+AFTER:
+7. At P2, with the rewind cap that OQ-0001-5's rule sets (the honest rewind's p99 the proof test measured at P2,
+   rounded up to a whole number of ticks: PM-0001-49; the overlay names it, so the cap clips almost no honest shot),
+   shoot the sprinting target for two minutes. Expected: when his crosshair is on the target as he sees it, the shot
+   hits; when it is off, it misses. The shot (flash, tracer) is instant; the hit marker comes a moment later, when the
+   server confirms ("the shot feels instant; hit feedback arrives when the hit is confirmed", LOOP_V2 §7).
+END
+
+### FIX RW12-2
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+10. At P2, repeat step 7 with the rewind cap at 200 ms, then at 250 ms, then again at step 7's measured cap (the overlay
+    names the cap). Expected: with 200 and 250 ms, shots that looked like hits but missed, since at P2 an honest shot
+    needs 233–383 ms of rewind (part 8) and both caps clip most of them; with the measured cap, hits as in step 7.
+    Record: what he noticed with each cap (for OQ-0001-5's later Feel Lab weighing; no pick here).
+11. At P2, run from open ground into cover while bots shoot at him, 10 runs with each of step 10's three caps. Expected:
+    being hit after reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair
+    with each cap (OQ-0001-5, the victim's side).
+12. At P2, while he moves, trigger the one-second loss burst (B1) from the overlay. Expected: during the burst the
+    other soldiers stop where they are (held, not flying off) and his own soldier keeps responding; within half a
+    second after it, the world catches up. His own soldier may be corrected once, because the repeated commands cover
+    only 8 ticks (267 ms) of the second: a glide back, or a jump if the error is over 2 m, and then nothing more.
+13. Set P3 (150 ms), then P4 (200 ms), two minutes each in the brawl and at the target course. Expected: still
+    playable; his own soldier and gun still respond at once; others move a little less smoothly and hits land a little
+    less often at P3. P4 is not held to P2's feel (P3 and P4 test that play degrades gracefully, r2-netcode.md line
+    1991).
+14. With the WebSocket fallback forced (UDP blocked) at P2, repeat steps 3, 5 and 7 briefly. Expected: playing within
+    3 s; it plays like those steps, except that other soldiers may stall for a moment when a packet is lost (the
+    fallback's known cost, the draft's Consequences).
+15. The verdict at P2 on WebTransport. Record: "achieved" or "not yet" for each of prediction (steps 3 and 4),
+    reconciliation (steps 4 and 12) and lag-compensated hits (steps 7 to 9).
+AFTER:
+10. At P2, run from open ground into cover while bots shoot at him, 10 runs with step 7's cap. Expected: being hit
+    after reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair (the window
+    inside the cap; beyond the cap the victim's view wins: OQ-0001-5's rule, answered by Mustafa, 2026-11-03).
+11. At P2, while he moves, trigger the one-second loss burst (B1) from the overlay. Expected: during the burst the
+    other soldiers stop where they are (held, not flying off) and his own soldier keeps responding; within half a
+    second after it, the world catches up. His own soldier may be corrected once, because the repeated commands cover
+    only 8 ticks (267 ms) of the second: a glide back, or a jump if the error is over 2 m, and then nothing more.
+12. Set P3 (150 ms), then P4 (200 ms), two minutes each in the brawl and at the target course. Expected: still
+    playable; his own soldier and gun still respond at once; others move a little less smoothly and hits land a little
+    less often at P3. P4 is not held to P2's feel (P3 and P4 test that play degrades gracefully, r2-netcode.md line
+    1991).
+13. With the WebSocket fallback forced (UDP blocked) at P2, repeat steps 3, 5 and 7 briefly. Expected: playing within
+    3 s; it plays like those steps, except that other soldiers may stall for a moment when a packet is lost (the
+    fallback's known cost, the draft's Consequences).
+14. The verdict at P2 on WebTransport. Record: "achieved" or "not yet" for each of prediction (steps 3 and 4),
+    reconciliation (steps 4 and 11) and lag-compensated hits (steps 7 to 9).
+END
+
+### FIX Q3
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. Which of the two gates is OQ-0003-20; until it is
+  answered the soaked set gates and the cold set is reported beside it (its recommended option, held as the interim).
+AFTER:
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. The soaked set gates and the cold set is reported
+  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"; its option (a)).
+END
+
+### FIX F3
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+| PM-0003-44 | The very large units drop no frame (part 7's presented-frame count; VISION_V2 §6.9; feeds OQ-0003-17) | per run of 600 presented frames with the four very large units and their visual effects on screen: the frames whose interval passes 1.5 refresh periods, 25 ms on a 60 Hz display (1.5 × 16.7), counted. Gated at the share OQ-0003-17 sets; until it is answered, reported, with 0 of 600 as the proposed reading. On ML at Low the same count reported against a 33.3 ms period (intervals over 1.5 × 33.3 = 50 ms) | RD at High, Chrome on WebGPU, on a 60 Hz display (its rate recorded); ML at Low, Chrome on WebGPU (reported) | BS with the units and their effects on screen, mode P (normal vsync); each frame's interval from successive animation-frame timestamps (the loop follows the display, R3-BUDGET-F2, lines 545–549; that timestamp has "a minimal precision of 1 millisecond", R3-MEASURE-F7, lines 641–646, well inside the 8.3 ms between one refresh period and 1.5) | H (presented), V. Bites: a 20 ms busy-wait on every 60th frame must be counted 10 of 10 per 600 frames | R3-CHAR-REC4 (lines 1088–1092; it stays adopted); part 7's spectacle budget; OQ-0003-17 |
+AFTER:
+| PM-0003-44 | The very large units miss a refresh on at most 6 of 600 frames (part 7's presented-frame count; VISION_V2 §6.9; OQ-0003-17's reading) | per run of 600 presented frames with the four very large units and their visual effects on screen: the frames whose interval passes 1.5 refresh periods, 25 ms on a 60 Hz display (1.5 × 16.7), counted. Gated: at most 6 of 600 such frames per run (OQ-0003-17, answered by the Advisor and confirmed by Mustafa (2026-11-03): "at most 6 of 600 presented frames may miss a refresh with the very large units on screen (recommended desktop, High); the p95 rows stay as diagnostics"); the p95 frame rows are diagnostics for this reading and keep gating their own needs (the advisor's reading, 2026-11-03). On ML at Low the same count reported against a 33.3 ms period (intervals over 1.5 × 33.3 = 50 ms) | RD at High, Chrome on WebGPU, on a 60 Hz display (its rate recorded); ML at Low, Chrome on WebGPU (reported) | BS with the units and their effects on screen, mode P (normal vsync); each frame's interval from successive animation-frame timestamps (the loop follows the display, R3-BUDGET-F2, lines 545–549; that timestamp has "a minimal precision of 1 millisecond", R3-MEASURE-F7, lines 641–646, well inside the 8.3 ms between one refresh period and 1.5) | H (presented), V. Bites: a 20 ms busy-wait on every 60th frame must be counted 10 of 10 per 600 frames, which fails the 6 of 600 | R3-CHAR-REC4 (lines 1088–1092; it stays adopted); part 7's spectacle budget; OQ-0003-17 (answered by the Advisor, confirmed by Mustafa, 2026-11-03) |
+END
+
+### FIX F4+Q4
+FILE: docs/adr/0003-rendering.md
+BEFORE:
+its condition holds; a "reported" mark (PM-0003-9, -14, -16, -31, -42, and PM-0003-44 until OQ-0003-17 sets its
+share) when its record is complete; the cold set of PM-0003-18 to -21 is reported beside the soaked set that gates
+until OQ-0003-20 is answered. A failing run is
+AFTER:
+its condition holds; a "reported" mark (PM-0003-9, -14, -16, -31, -42) when its record is complete; the cold set of
+PM-0003-18 to -21 is reported beside the soaked set that gates (OQ-0003-20, answered). A failing run is
+END
+
+### FIX S13+H17
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+  with [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin)'s test, as TICK-60-HEADROOM rules (plan; GL §8):
+  the sim's share there is read from ADR 0001's one 60 Hz run (OQ-0001-2), never summed from parts. No 60 Hz result is
+  needed for the 30 Hz pass.
+AFTER:
+  with [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin)'s test, as TICK-60-HEADROOM rules (plan; GL §8;
+  confirmed by Mustafa, 2026-11-03): the sim's share there is read from the same run, never summed from parts, in each
+  of ADR 0001's two 60 Hz runs: wave 1's early signal on the sim core spike's sim with S1's stand-ins (OQ-0001-2 (a),
+  answered by the Advisor, 2026-11-03: "as an early signal only"), which decides nothing, and the run at slice 6 on the
+  real crate, which decides (the advisor's reading, 2026-11-03). No 60 Hz result is needed for the 30 Hz pass.
+END
+
+### FIX N10
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+  VISION_V2 §4's "about 100 ms of ping" (decision map J6 (3); OQ-0001-3).
+AFTER:
+  VISION_V2 §4's "about 100 ms of ping" (decision map J6 (3); OQ-0001-3, answered by the Advisor, 2026-11-03).
+END
+
+### FIX F3-2
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+| PM-0004-8 | The browser runs the whole sim within [the client's sim share](../research/GLOSSARY.md#the-clients-sim-share) (S2; part 6) | p99 sim step time ≤ 13.33 ms (40 % of 33.33 ms) in Wasm in a dedicated Worker at the N that R1-TICK-OQ7 sets, while the page meets ADR 0003's minimum-laptop row over the whole run (frame time median ≤ 28 ms and p95 ≤ 33.3 ms, mode U: the reading of "holds 30+ fps on Low", since R1-TICK-REC2 P2 leaves the render budget to R3; it is the drafts' one reading of P2's "30+ fps", so ADR 0002's PM-0002-28 cites this row and sets none of its own, and a presented-frame count on ML, if OQ-0003-17 asks for one, is ADR 0003's PM-0003-44); until R1-TICK-OQ7 is answered: reported at N = 12, 24, 36 and 48, no pass | ML: Chrome and Firefox on Windows 11 (Edge reported; Safari on MAC reported, no budget row) | T on SS in the boundary spike's Worker with the sim core spike's sim; the page draws the sim's output at Low (ADR 0003's renderer if it exists by then, else the boundary spike's page: recorded which); step times from the Worker's timer around the step, isolation flag on; frame times from the page's harness, mode U (ADR 0003: vsync off) | T, V; rule B | R1-TICK-REC2 P2 (lines 2054–2057); R1-TICK-OQ7 (lines 2667–2670); R3-BUDGET-REC2's frame rows (r3 lines 1123–1124); GL lines 214–218 |
+AFTER:
+| PM-0004-8 | The browser runs the whole sim within [the client's sim share](../research/GLOSSARY.md#the-clients-sim-share) (S2; part 6) | p99 sim step time ≤ 13.33 ms (40 % of 33.33 ms) in Wasm in a dedicated Worker at the N that R1-TICK-OQ7 sets, while the page meets ADR 0003's minimum-laptop row over the whole run (frame time median ≤ 28 ms and p95 ≤ 33.3 ms, mode U: the reading of "holds 30+ fps on Low", since R1-TICK-REC2 P2 leaves the render budget to R3; it is the drafts' one reading of P2's "30+ fps", so ADR 0002's PM-0002-28 cites this row and sets none of its own, and the presented-frame count on ML at Low is ADR 0003's PM-0003-44, reported there, which gates on RD at High (OQ-0003-17, answered by the Advisor, confirmed by Mustafa, 2026-11-03)); until R1-TICK-OQ7 is answered: reported at N = 12, 24, 36 and 48, no pass | ML: Chrome and Firefox on Windows 11 (Edge reported; Safari on MAC reported, no budget row) | T on SS in the boundary spike's Worker with the sim core spike's sim; the page draws the sim's output at Low (ADR 0003's renderer if it exists by then, else the boundary spike's page: recorded which); step times from the Worker's timer around the step, isolation flag on; frame times from the page's harness, mode U (ADR 0003: vsync off) | T, V; rule B | R1-TICK-REC2 P2 (lines 2054–2057); R1-TICK-OQ7 (lines 2667–2670); R3-BUDGET-REC2's frame rows (r3 lines 1123–1124); GL lines 214–218 |
+END
+
+### FIX S13-2
+FILE: docs/adr/0004-simulation-core.md
+BEFORE:
+| PM-0004-71 | The sim step share at 60 Hz, for the 60 Hz margin only (S1, S2; part 6; TICK-60-HEADROOM) | inside ADR 0001's one 60 Hz run (its setup and R2-BUD-REC6's 30-minute soak): p99 sim step time ≤ 4.17 ms (25 % of 16.67 ms), max ≤ 16.67 ms, zero overruns; navigation and the visibility pass p99 ≤ 0.83 ms each (5 % of 16.67 ms); the client's sim share at 60 Hz, p99 ≤ 6.67 ms in Wasm (40 % of 16.67 ms) | RS (that run's tick thread); ML (the client share) | the sim's phase times read from that same run (the sim inside the proof-test server: OQ-0001-2 (a)), never added to a separately measured server-only share; the client share as PM-0004-8 on a 60 Hz build | only if ADR 0001 schedules the 60 Hz margin's run | R1-TICK-REC2 P1, P2 (lines 2047–2049, 2054–2056); GL lines 53–60; GL §8 (the 60 Hz margin); ADR 0001's spike item 3 |
+| PM-0004-72 | The time mechanism and the movement checks hold at 60 Hz (S3, S4, S9, S11, S13; parts 4, 10, 12, 14) | with PM-0004-71's 60 Hz build (durations re-converted, links re-baked): every legacy interval gives the same shot count at 30 and 60 Hz within 1 shot; sight checks per game second per bot equal within 1 % at 30 and 60 Hz; PM-0004-37's tunnelling, PM-0004-38, PM-0004-48 (in the research's form: 2.9 m kept, 3.0 and 3.1 m rejected if the measured reach stays near legacy's 2.98 m) and PM-0004-55, each at 60 Hz | CI; RS | the same scripts at 60 Hz | only with the 60 Hz margin's test; each as its 30 Hz row | R1-TICK-REC1 (lines 2023–2024); R1-TICK-REC3 (lines 2075–2076); R4-PHYS-REC3, REC4 (r4 lines 758–759, 779–784); R4-FLOORS-REC1 (r4 lines 919–921); R4-OBST-REC1 (r4 lines 1037–1038) |
+AFTER:
+| PM-0004-71 | The sim step share at 60 Hz, for the 60 Hz margin only (S1, S2; part 6; TICK-60-HEADROOM) | inside each of ADR 0001's 60 Hz runs (its setup and R2-BUD-REC6's 30-minute soak): p99 sim step time ≤ 4.17 ms (25 % of 16.67 ms), max ≤ 16.67 ms, zero overruns; navigation and the visibility pass p99 ≤ 0.83 ms each (5 % of 16.67 ms); the client's sim share at 60 Hz, p99 ≤ 6.67 ms in Wasm (40 % of 16.67 ms) | RS (that run's tick thread); ML (the client share) | the sim's phase times read from that same run (the sim inside the proof-test server: in wave 1 the sim core spike's sim with S1's stand-ins, OQ-0001-2 (a), answered; at slice 6 the real crate), never added to a separately measured server-only share; the client share as PM-0004-8 on a 60 Hz build | with each of ADR 0001's 60 Hz runs; it decides only at slice 6 (the key) | R1-TICK-REC2 P1, P2 (lines 2047–2049, 2054–2056); GL lines 53–60; GL §8 (the 60 Hz margin); ADR 0001's spike item 3 |
+| PM-0004-72 | The time mechanism and the movement checks hold at 60 Hz (S3, S4, S9, S11, S13; parts 4, 10, 12, 14) | with PM-0004-71's 60 Hz build (durations re-converted, links re-baked): every legacy interval gives the same shot count at 30 and 60 Hz within 1 shot; sight checks per game second per bot equal within 1 % at 30 and 60 Hz; PM-0004-37's tunnelling, PM-0004-38, PM-0004-48 (in the research's form: 2.9 m kept, 3.0 and 3.1 m rejected if the measured reach stays near legacy's 2.98 m) and PM-0004-55, each at 60 Hz | CI; RS | the same scripts at 60 Hz | with each of ADR 0001's 60 Hz runs, deciding only at slice 6 (the key); each as its 30 Hz row | R1-TICK-REC1 (lines 2023–2024); R1-TICK-REC3 (lines 2075–2076); R4-PHYS-REC3, REC4 (r4 lines 758–759, 779–784); R4-FLOORS-REC1 (r4 lines 919–921); R4-OBST-REC1 (r4 lines 1037–1038) |
+END
+
+### FIX N11
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+  J6 (3); OQ-0001-3). Every other mark runs in one process or on localhost (P0).
+AFTER:
+  J6 (3); OQ-0001-3, answered by the Advisor, 2026-11-03). Every other mark runs in one process or on localhost (P0).
+END
+
+### FIX C8
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2 |
+AFTER:
+| PM-0005-4 | One crate gives one verdict everywhere (CD-2; content item 2; shared with ability item 3; OQ-0005-1's whole-set rule) | over C: 0 crashes (no panic natively, no trap in Wasm), 0 accepted invalid files, 100 % of valid control files accepted, and for 100 % of files the same verdict and the same error record (stage, file, line and column or field path, error kind) natively and in Wasm; every error names the file and either line and column (syntax) or a field path (data), and the path named is the path the generator changed in 100 % of data errors; the 50 MB files refused at the byte-size stage and the 10,000-deep files at the depth stage. A content set in which an id of a presented kind has no client entry is refused at the whole-set stage, naming the kind and the id, while an id of a kind with nothing to present (a mode, a tuning table) is accepted with none (OQ-0005-1, answered by the Advisor (2026-11-03): "the client's data, keyed by the same id; the content check fails if a simulation id has no client entry"; it binds the kinds the client presents: the advisor's reading, 2026-11-03), the presented kinds as CD-2 names them (from AP-2, CD-13 and AB-3: units, vehicles, weapons, factions, building parts and props). Recorded: the default depth limit's value (R1-DATA-OQ4) and whether garde builds and runs on wasm32 (R1-DATA-OQ5; if not, CD-2's fallback is built and this row runs on it) | CI | C: 10,000 files from a seeded generator (regenerated byte for byte from its seed: proposed, so a failure reproduces) mutating valid seeds of every content kind (the imported set of PM-0005-14, the two maps of PM-0005-9, two modes, test track definitions); every defect class of the research at least 500 files (proposed), except the 50 MB class, 10 files generated in the run and not committed (proposed: their size adds time, not cases); 1,000 unmutated or validly mutated controls (proposed); the client-entry class: valid content sets with one id's client entry removed, for every presented kind, and as controls sets whose mode and tuning table have no entry (proposed: at least 500 sets, as every defect class); a trap in Wasm counts as a crash and the instance is recreated | 1 run per target; joins the gate (20 identical verdicts). Bites: a planted `serde(flatten)` that lets an unknown key through; a planted fallback weapon on a dangling id; the client-entry check left out of the whole-set stage (a unit id with no client entry then loads) | R1-DATA-REC2 marks 1–2 (lines 2513–2516); R1-DATA-OQ4 (lines 2799–2800), OQ5 (lines 2801–2803); CD-2; OQ-0005-1 (answered by the Advisor, 2026-11-03) |
+END
+
+### FIX B4
+FILE: docs/adr/0005-content-abilities-assets.md
+BEFORE:
+operation for one mechanic that fails PM-0005-18 to -21, option A4 with E1's tables if many fail (OQ-0005-AB13); track
+AFTER:
+operation for a mechanic that fails PM-0005-18 to -21, and scripting (option A3) back only when a designed ability
+needs ability-specific code that no operation can express (OQ-0005-AB13, answered by the Advisor, 2026-11-03:
+"scripting comes back only when a designed ability can't be built from data"; a new reviewed operation counts as
+built from data: the advisor's reading, 2026-11-03); track
+END
+
+### FIX M11
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
+  (or a larger plan), as many as a 5-minute calibration run at the session's load shows keep each under 80 % of its
+AFTER:
+  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
+  ("the CX33 runs the simulated clients": SPIKE-MACHINES, Mustafa, 2026-11-03), as many as a 5-minute calibration run
+  at the session's load shows keep each under 80 % of its
+END
+
+### FIX H14
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  (TICK-30); none runs at 60 Hz: [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) is ADR 0001's run.
+AFTER:
+  (TICK-30); none runs at 60 Hz: [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) is ADR 0001's, and so
+  is the rooms-per-VM count at 60 Hz with its goal-budget check (PM-0001-63, on PM-0006-14's counting rule).
+END
+
+### FIX S16
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  for [the stress scene](../research/GLOSSARY.md#the-stress-scene) as OQ-0001-2 sets it) at N = 48 (MODES-3 (a))
+AFTER:
+  for [the stress scene](../research/GLOSSARY.md#the-stress-scene) as OQ-0001-2 (a) sets it, answered by the Advisor,
+  2026-11-03) at N = 48 (MODES-3 (a))
+END
+
+### FIX N13
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+  1987–1990; the reading of "100 ms of simulated latency" ADR 0001 states, decision map part j, J6 (3)), injected on LG
+  in both directions, half the round trip each way (R5-TEST-REC4's per-direction rule, r5 lines 1455–1456), never on
+AFTER:
+  1987–1990; the reading of "100 ms of simulated latency" ADR 0001 states, OQ-0001-3, answered by the Advisor,
+  2026-11-03; decision map part j, J6 (3)), injected on LG in both directions, half the round trip and ± half the
+  jitter each way and the profile's loss on each (OQ-0001-16, answered by the Advisor, 2026-11-03; R5-TEST-REC4's
+  per-direction rule, r5 lines 1455–1456), never on
+END
+
+### FIX M11-2
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs or the API token that creates them (his account); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+AFTER:
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+END
+
+### FIX M12
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: the draft names none for development, and the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+AFTER:
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on the domain Mustafa registers (SPIKE-MACHINES, Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+END
+
+### FIX H14-2
+FILE: docs/adr/0006-infrastructure-operations.md
+BEFORE:
+- No mark here runs at 60 Hz: the 60 Hz margin is ADR 0001's run. The netcode proof test's "look correct" checklist and
+  its measurable marks (hits the server confirms, correction sizes, prediction error at P2) are ADR 0001's pass marks.
+AFTER:
+- No mark here runs at 60 Hz: the 60 Hz margin and the rooms per VM at 60 Hz with their goal-budget check (PM-0001-63)
+  are ADR 0001's. The netcode proof test's "look correct" checklist and its measurable marks (hits the server confirms,
+  correction sizes, prediction error at P2) are ADR 0001's pass marks.
+END
+
+### NOTE H15
+no change: by the advisor's ruling on TICK-60-HEADROOM the rooms-per-VM count at 60 Hz lives in ADR 0001's 60 Hz
+group as PM-0001-63, which runs PM-0006-14's counting rule at a 60 Hz tick; PM-0006-14 stays the 30 Hz count, and ADR
+0006's "none runs at 60 Hz" lines stay true (FIX H14 and H14-2 point them to PM-0001-63).
+END
+
+### NOTE N9
+no change: PM-0002-49 is in ADR 0002, outside this unit's files, and the map marks the change optional. The row
+checks L1 against its profiles' values; how L1 applies them per direction is ADR 0002 part 8's (map N8,
+engine-architect), and ADR 0001's PM-0001-3 already measures loss, delay and jitter per direction on L1 and L2 before
+any mark under a profile counts.
+END
+
+### NOTE N12
+no change: the Feel Lab checklist's "P2 (100 ms round trip, ±20 ms, 2 % loss)" (ADR 0005:2345-2346) is the Advisor's
+P2 value for value.
+END
+
+### NOTE M13
+no change at my places: PM-0006-25 and -27 (ADR 0006:1195, :1197) already test a pinned self-signed certificate for
+WebTransport, which is Mustafa's "a private hash-pinned certificate for WebTransport". Spike item 2 (:1081) is
+infra-engineer's place in this row.
+END
+
+### NOTE M21
+no change at my place (ADR 0003's Pass marks key, Machines, :1049, "the models are OQ-0003-1"): by the advisor's
+ruling (d) on SPIKE-MACHINES, "Test PC: my own, in Brave" is MP as the key already defines it (:1058-1059: only what he
+judges, never a budget result), so OQ-0003-1 is unchanged in substance and goes to Mustafa as REF-MACHINES. OQ-0003-1
+itself (:800-807) and migration step 1 (:1337) are graphics-engineer's.
+END
+
+### NOTE L12
+no change: the advisor's ruling on LOOK-TEST-INPUTS: which look-checklist steps a blockout can judge is for the look
+proof test's own plan (graphics-engineer, test-engineer), any visual call is Mustafa's, and the checklist is not edited
+now.
+END
+
+### NOTE T3
+no change at my place (ADR 0003:1302, the look checklist's "the toy-soldier death fall"): it is the legacy animation
+item for OQ-0003-15 (GA14), not TOY-BOX's subject, and by the advisor's ruling TOY-BOX changes nothing in the nine
+documents.
+END
+
+### NOTE C8-2
+no change beyond FIX C8: engine-architect's CD-2 text naming them (verdict ruling on OQ-0005-1) was not on disk when FIX C8
+was written, so FIX C8 names them itself, from AP-2 (units, vehicles, weapons, faction uniforms, building parts and
+props name their models by id), CD-13 (a faction's colours and uniform models, keyed by the faction's id) and AB-3 (a
+weapon's feel kit, keyed by the weapon's id): units, vehicles, weapons, factions, building parts and props; modes and
+tuning tables are the kinds with nothing to present, as the ruling names them. The row cites "the presented kinds as
+CD-2 names them": if engine-architect's list differs (for example ability kinds, which game-designer confirms), CD-2's
+list governs and the bracket in PM-0005-4 follows it in fixcheck-e's round.
+END
+

@@ -1,0 +1,2 @@
+    Before the fix round AP-2 and CD-13 put these references on the simulation definitions; the fix round made AP-2,
+    AP-3 and CD-13 state option (b) as a proposal pending this question, deciding nothing.

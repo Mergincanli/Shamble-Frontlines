@@ -1,0 +1,24 @@
+ok   H8: 1 line(s) -> 1
+ok   PM-0001-63-2: 2 line(s) -> 3
+ok   M16: 1 line(s) -> 2
+ok   M16-2: 2 line(s) -> 4
+ok   S6: 3 line(s) -> 5
+ok   N4: 4 line(s) -> 6
+ok   N5: 2 line(s) -> 2
+ok   PM-0001-63-3: 3 line(s) -> 4
+ok   PM-0001-63-4: 1 line(s) -> 1
+ok   PM-0001-63-5: 1 line(s) -> 1
+ok   N6: 1 line(s) -> 1
+ok   RC4: 1 line(s) -> 1
+ok   H7: 3 line(s) -> 3
+ok   PM-0001-63: 1 line(s) -> 2
+ok   RW10: 1 line(s) -> 1
+ok   RW11: 1 line(s) -> 1
+ok   N5-2: 1 line(s) -> 1
+ok   S7: 2 line(s) -> 6
+ok   H9: 2 line(s) -> 4
+ok   RW11-2: 2 line(s) -> 4
+ok   PM-0001-63-6: 2 line(s) -> 3
+ok   RW12: 5 line(s) -> 5
+ok   RW12-2: 20 line(s) -> 16
+40 fix blocks in the file (blocks for other files skipped); all applied

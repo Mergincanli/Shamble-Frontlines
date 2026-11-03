@@ -1,0 +1,16 @@
+10. At P2, run from open ground into cover while bots shoot at him, 10 runs with step 7's cap. Expected: being hit
+    after reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair (the window
+    inside the cap; beyond the cap the victim's view wins: OQ-0001-5's rule, answered by Mustafa, 2026-11-03).
+11. At P2, while he moves, trigger the one-second loss burst (B1) from the overlay. Expected: during the burst the
+    other soldiers stop where they are (held, not flying off) and his own soldier keeps responding; within half a
+    second after it, the world catches up. His own soldier may be corrected once, because the repeated commands cover
+    only 8 ticks (267 ms) of the second: a glide back, or a jump if the error is over 2 m, and then nothing more.
+12. Set P3 (150 ms), then P4 (200 ms), two minutes each in the brawl and at the target course. Expected: still
+    playable; his own soldier and gun still respond at once; others move a little less smoothly and hits land a little
+    less often at P3. P4 is not held to P2's feel (P3 and P4 test that play degrades gracefully, r2-netcode.md line
+    1991).
+13. With the WebSocket fallback forced (UDP blocked) at P2, repeat steps 3, 5 and 7 briefly. Expected: playing within
+    3 s; it plays like those steps, except that other soldiers may stall for a moment when a packet is lost (the
+    fallback's known cost, the draft's Consequences).
+14. The verdict at P2 on WebTransport. Record: "achieved" or "not yet" for each of prediction (steps 3 and 4),
+    reconciliation (steps 4 and 11) and lag-compensated hits (steps 7 to 9).

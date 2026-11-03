@@ -1,0 +1,4 @@
+no change: docs/adr/0005-content-abilities-assets.md:2364-2365 ("The netcode proof test runs first; it needs none of
+this record's machinery") agrees with SPIKE-ORDER (b) (Mustafa, 2026-11-03: "the netcode proof test first"). This
+record's own spikes are not in wave 1: the content and ability spike runs after the sim core spike and before slice
+1 (0005:2103), and the look proof test's asset share follows ADR 0003's place, so no other migration line moves.

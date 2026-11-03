@@ -1,0 +1,4 @@
+- **Revisit when:** content's load time misses its budget, or content's share takes the Wasm file past the limit ADR
+  0002 sets (OQ-0005-CD2, option D), or garde fails on wasm32 (CD-2); a designed ability can't be built from data
+  (OQ-0005-AB13, answered by the Advisor, 2026-11-03); track content exists (the stress scene's active effects per
+  soldier restated with ADR 0004, AB-10); ABL-PREDICT is answered; Mustafa and the Advisor pick the mid-match swap

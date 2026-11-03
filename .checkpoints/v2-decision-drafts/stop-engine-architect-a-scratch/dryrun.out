@@ -1,0 +1,47 @@
+== docs/adr/0002-code-structure-build-toolchain.md
+ok   N8: 4 line(s) -> 6
+ok   O15: 1 line(s) -> 3
+ok   O18: 2 line(s) -> 3
+ok   O18-2: 4 line(s) -> 6
+ok   O18-3: 4 line(s) -> 6
+ok   O18-4: 2 line(s) -> 2
+ok   M22: 5 line(s) -> 7
+ok   E1: 1 line(s) -> 4
+ok   E3: 2 line(s) -> 3
+ok   E2: 4 line(s) -> 4
+ok   E4: 1 line(s) -> 1
+ok   E4-2: 1 line(s) -> 1
+ok   E5: 1 line(s) -> 1
+41 fix blocks in the file (blocks for other files skipped); all applied
+== docs/adr/0005-content-abilities-assets.md
+ok   O15-2: 1 line(s) -> 4
+ok   L7: 5 line(s) -> 11
+ok   L7-2: 6 line(s) -> 9
+ok   L7-3: 3 line(s) -> 4
+ok   L9: 1 line(s) -> 5
+ok   C1: 2 line(s) -> 2
+ok   C1-2: 1 line(s) -> 5
+ok   C3: 2 line(s) -> 2
+ok   C4: 2 line(s) -> 3
+ok   C4-2: 2 line(s) -> 13
+ok   C4-3: 2 line(s) -> 4
+ok   C5: 4 line(s) -> 5
+ok   C2: 1 line(s) -> 1
+ok   C2-2: 3 line(s) -> 4
+ok   C6: 9 line(s) -> 10
+ok   C6-2: 3 line(s) -> 4
+ok   C7: 1 line(s) -> 1
+ok   C7-2: 4 line(s) -> 5
+ok   C7-3: 2 line(s) -> 2
+ok   A4: 1 line(s) -> 1
+ok   A4-2: 1 line(s) -> 1
+ok   B3: 2 line(s) -> 4
+ok   B4: 4 line(s) -> 4
+ok   B5: 1 line(s) -> 1
+ok   B5-2: 1 line(s) -> 1
+ok   B5-3: 1 line(s) -> 1
+41 fix blocks in the file (blocks for other files skipped); all applied
+== docs/research/GLOSSARY.md
+ok   H24: 4 line(s) -> 7
+ok   S23: 4 line(s) -> 6
+41 fix blocks in the file (blocks for other files skipped); all applied

@@ -1,0 +1,1 @@
+| OQ-0005-AB13 | When does scripting (option A3) come back? (answered by the Advisor, 2026-11-03: "scripting comes back only when a designed ability can't be built from data"; a new reviewed operation counts as built from data, and reading the talk stays a weighed option with nothing scheduling it: the advisor's reading, 2026-11-03) | the Advisor | The ability and effect system |

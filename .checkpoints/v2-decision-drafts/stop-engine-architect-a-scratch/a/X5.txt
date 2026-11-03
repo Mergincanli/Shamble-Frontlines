@@ -1,0 +1,6 @@
+no change: OQ-0001-14 is answered (the Advisor, 2026-11-03: "yes, a VISION_V2 §3 or §4 trace counts, marked as
+such"), and my need lines that rest on §3 or §4 alone are already marked so: ADR 0005 :134 ("the quality-tier table:
+VISION_V2 §4 only"), :144 ("VISION_V2 §3 and §4 only"), :514 ("VISION_V2 §4 only (ADR 0003's)"). ADR 0002's need
+lines that name §3 or §4 (:275, :408, :477, :639) pair them with a §6 item, GLOSSARY §8's foundation or SLICE-ORDER,
+so none rests on §3 or §4 alone. The verdict's ruling (OQ-0001-14 (a)): "No need line changes." 0005:1034 is
+game-designer's.

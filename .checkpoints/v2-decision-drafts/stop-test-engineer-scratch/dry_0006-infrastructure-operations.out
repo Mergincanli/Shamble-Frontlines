@@ -1,0 +1,8 @@
+ok   M11: 2 line(s) -> 3
+ok   H14: 1 line(s) -> 2
+ok   S16: 1 line(s) -> 2
+ok   N13: 2 line(s) -> 4
+ok   M11-2: 1 line(s) -> 1
+ok   M12: 1 line(s) -> 1
+ok   H14-2: 2 line(s) -> 3
+40 fix blocks in the file (blocks for other files skipped); all applied

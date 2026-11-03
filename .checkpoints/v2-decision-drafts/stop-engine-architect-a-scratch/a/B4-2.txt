@@ -1,0 +1,7 @@
+no change: not my text. docs/adr/0005-content-abilities-assets.md:2263 sits in "Pass marks" (test-engineer's): its
+failure rule reads "a new reviewed operation for one mechanic that fails PM-0005-18 to -21, option A4 with E1's tables
+if many fail (OQ-0005-AB13)". The Advisor's answer ("scripting comes back only when a designed ability can't be built
+from data") and the verdict's ruling ("'Needed often' and 'many fail' are no longer triggers: align the rollback") ask
+that "option A4 with E1's tables if many fail" go, for example: "a new reviewed operation for a mechanic that fails
+PM-0005-18 to -21; scripting only when a designed ability can't be built from data (OQ-0005-AB13)". FIX B3 aligns the
+frame's Rollback and FIX B4 its "Revisit when". For test-engineer.

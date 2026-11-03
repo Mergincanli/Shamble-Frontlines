@@ -1,0 +1,3 @@
+    whole-set checks (every reference resolves; every objective a mode needs is in its map; every id of a presented
+    kind has its client entry, below; no fallback map, weapon or model) → a frozen content set with its hash. Errors
+    name the file, with line and column for bad syntax and the

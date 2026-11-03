@@ -2,7 +2,9 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** engine-architect (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** engine-architect (the "Pass marks" table: test-engineer, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
 
 This record decides how the v2 code is laid out, built, checked and shipped, and where the line between the Rust
 simulation and the TypeScript page runs. One repository holds a Cargo workspace (the Rust crates) and npm workspaces
@@ -229,9 +231,9 @@ built from the tested artifact. Each part says what, why, its research ids and t
      of the endpoint. The code is the same; only its crate is new. The first two answer questions the critic gave this
      record and the third follows from ADR 0001's headless tests; no research compared them with other placements. All
      three are proposed (not researched): no research Options section offers a crate for the room logic, the client
-     endpoint or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; whether plan rule 3
-     allows that is OQ-0002-8, for the Advisor at the stop. The supervisor's crate (slice 3) is beyond R5's list too,
-     but the research asks for it: R6-HOST-REC2 puts a small supervisor on every VM (r6-infrastructure.md lines
+     endpoint or the bake, and SLICE-ORDER condition 1 and R4-XT-OQ5 leave them to this record; plan rule 3 allows
+     that (OQ-0002-8, answered (a) by the Advisor, 2026-11-03). The supervisor's crate (slice 3) is beyond R5's list
+     too, but the research asks for it: R6-HOST-REC2 puts a small supervisor on every VM (r6-infrastructure.md lines
      645–647), which ADR 0006 part 5 adopts.
    - The cache question (critic rank 40) is answered by this list: no ECS crate (ADR 0004, part 1) and parry3d rather
      than Rapier (ADR 0004, part 10), quinn and the WebTransport crate the netcode proof test picks (ADR 0001, part 10);
@@ -508,10 +510,12 @@ built from the tested artifact. Each part says what, why, its research ids and t
      artefact such as the frame-rate-dependent jump (GW14; which jump v2 keeps is OQ-0002-6). v2's own outputs use insta
      snapshots, which CI never rewrites.
    - **The network simulator** in two layers, with ADR 0001's profiles P0–P4 and B1 by name: L1, our seeded link
-     simulator on simulated time behind the thin transport interface (per direction, half the profile's round trip each
-     way, proposed by R5; latency, jitter, loss, reordering, duplication, a rate limit, and a packet-fate log), running
-     the real server code and headless bot clients in one process; L2, an impairment wrapper around the server's UDP
-     socket under the real quinn endpoint for real browsers over WebTransport, with a delaying TCP proxy for WebSocket.
+     simulator on simulated time behind the thin transport interface (latency, jitter, loss, reordering, duplication, a
+     rate limit, and a packet-fate log; per direction, latency and jitter split half each way and loss is as the
+     profile defines it, ADR 0001 part 13: the Advisor's answer to OQ-0001-16, NET-PROFILES, 2026-11-03, where R5 had
+     proposed the round trip's half split), running the real server code and headless bot clients in one process; L2,
+     an impairment wrapper around the server's UDP socket under the real quinn endpoint for real browsers over
+     WebTransport, with a delaying TCP proxy for WebSocket.
    - **Soak and load:** bots as headless Rust clients that speak the real protocol (on `client-endpoint`, part 3); one
      nightly run per mode of
      [the test-mode list](../research/GLOSSARY.md#the-test-mode-list) over L1 at P2, 30 minutes each, and one L2 run with
@@ -538,9 +542,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
      passes or fails the gate. The bench needs the reference server from slice 1, before ADR 0006's fleet exists, and CI
      holds no token for it (timings on shared runners are not hardware results): it runs on a CCX23 created per bench
      session in the spikes' own Hetzner project and deleted after it, ADR 0006 part 8's cost line (proposed there: 20
-     bench hours a month, 20 × 0.1386 = 2.77 EUR, R6-HOST-F15, r6 lines 150–158), and who creates and deletes it
-     without a session reading a secret is OQ-0006-17; the 3-hour soak before each playtest uses the same path. No
-     bench crate, coverage tool or cargo-nextest is adopted: none was read.
+     bench hours a month, 20 × 0.1386 = 2.77 EUR, R6-HOST-F15, r6 lines 150–158). Who creates and deletes it is
+     answered (SPIKE-MACHINES, Mustafa, 2026-11-03; OQ-0006-17): "I create and delete the VMs myself for each run;
+     sessions get SSH access only and no Hetzner token until the security baseline"; that this covers the bench and the
+     3-hour soaks as well as the spikes is the advisor's reading (2026-11-03). The 3-hour soak before each playtest uses
+     the same path. No bench crate, coverage tool or cargo-nextest is adopted: none was read.
    - Why: each tool is the option the research read for its layer; a retry or a random seed hides a defect; timings on
      shared CI runners are not hardware results.
    - Ids: R5-TEST-REC1 to R5-TEST-REC6, R5-TEST-OQ1, R5-TEST-OQ2, R5-TEST-OQ3, R5-TEST-OQ5, R5-TEST-OQ6, R5-TEST-OQ7,
@@ -707,7 +713,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
       r3-rendering.md lines 1437–1440; r5-toolchain-quality.md lines 2008–2011); cites R5-LAYOUT-REC5.
     - Need: EDITOR_V2 §5 only; the editor entry serves VISION_V2 §6.7 (the faction content pipeline is authored there,
       R5-LAYOUT-REC2, r5 line 1188).
-12. **Its spike: the Rust ↔ TypeScript boundary spike**, with the netcode proof test and before the foundation, since
+12. **Its spike: the Rust ↔ TypeScript boundary spike**, in wave 1 after the netcode proof test, the sim core spike and
+    the 60 Hz run, one heavy spike at a time (SPIKE-ORDER (b), Mustafa, 2026-11-03), and before the foundation, since
     its result fixes the skeleton the foundation builds; what it must prove is below. The foundation itself is this
     record's migration plan (phase 2). `docs/SPIKE_PLAN.md` gives the spike its final name and place.
     - Need: GLOSSARY §8, the foundation (the skeleton it fixes); VISION_V2 §6.2, §6.9 and §4 through parts 5 and 6.
@@ -743,7 +750,7 @@ is settled by GLOSSARY §8, the foundation ("a Cargo workspace plus TypeScript w
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
 |---|---|---|---|---|---|---|---|---|
 | R5-LAYOUT-REC2 as written: rooms inside `server`, the bake unplaced | low | – | – | decoders in `protocol` either way | none | new | the smallest list | the local server of SLICE-ORDER condition 1 cannot run in the Worker without `server`'s async runtime and transport, which the default Wasm target cannot carry (R1-BND-F19); where the bake ships stays open (R4-XT-OQ5) |
-| **R5-LAYOUT-REC2 plus an I/O-free `room` crate, a `client-endpoint` crate with no bindings and a `navbake` crate above `sim` (chosen)** | low–medium: three more crates and three more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; one client endpoint for the Worker and the headless clients; the bake shared by CI, map save and the editor | not researched as a placement (no Options section offers a crate for the room logic, the client endpoint or the bake; SLICE-ORDER condition 1 and R4-XT-OQ5 leave it to this record): proposed only for the Advisor's ruling at the stop (OQ-0002-8) |
+| **R5-LAYOUT-REC2 plus an I/O-free `room` crate, a `client-endpoint` crate with no bindings and a `navbake` crate above `sim` (chosen)** | low–medium: three more crates and three more dependency checks | – | the player's Wasm carries neither the bake nor the server's I/O | the same decoders and room checks run locally and online | none | new | one room logic for the local server and the room process; one client endpoint for the Worker and the headless clients; the bake shared by CI, map save and the editor | not researched as a placement (no Options section offers a crate for the room logic, the client endpoint or the bake; SLICE-ORDER condition 1 and R4-XT-OQ5 leave it to this record): proposed, and allowed by the Advisor's ruling at the stop (OQ-0002-8 (a), 2026-11-03) |
 
 ### Q5. Which TypeScript (r5 lines 1019–1024)
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Look and feel | Effort from the current code | Pros | Cons |
@@ -895,7 +902,8 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   them the local server cannot run in the Worker, the headless clients of ADR 0001's network marks and of the soaks
   would need a native build of the bindings crate or a second copy of the client endpoint, and the bake's generator
   would risk shipping in the player's Wasm. No research compared other placements, so the first foundation milestone
-  that builds them is also their test; whether rule 3 allows proposing them at all is OQ-0002-8.
+  that builds them is also their test; rule 3 allows proposing them (OQ-0002-8, answered (a) by the Advisor,
+  2026-11-03).
 - **Strict TypeScript and lint, pinned exactly** catch the bugs the boundary invites, at the price of churn: strict
   configs are not semver-stable, so every upgrade is its own change-set, and the cost of the strictest flags against
   three.js's own types is not measured yet (R5-TSLINT-OQ4; the boundary spike counts it).
@@ -1064,16 +1072,21 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     the three become open questions, a short layout research unit answers them before the foundation, and part 3
     keeps R5-LAYOUT-REC2's list until then.
   - Decider: the Advisor, at the stop.
+  - Answered by the Advisor (2026-11-03): "(a)." Option (a) is decided: rule 3 allows it in such cases, so the
+    `room`, `client-endpoint` and `navbake` crates stay proposed, labelled "not researched", and the first foundation
+    milestone that builds them is their test.
   - What decides it: whether rule 3 is meant to cover structure that a settled input forces and the research hands to
     this record.
   - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 (the same question as R5-XT-OQ7)
     and R5-XT-OQ6.
 
 ## What a spike must prove
-**The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs with the netcode proof test,
-before the foundation, and shares its client harness and stand-in sim. Its results go into this record before Mustafa
-accepts it. The candidate marks below are the research's (cited) or are marked proposed with the reason; test-engineer
-sets the final table.
+**The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs in wave 1, one heavy spike
+at a time, after the netcode proof test, the sim core spike and the 60 Hz run (SPIKE-ORDER (b), Mustafa, 2026-11-03),
+and before the foundation. It shares the netcode proof test's client harness and stand-in sim, and the sim core
+spike's sim, which exists by then, serves the marks that need the real sim (the advisor's reading, 2026-11-03). Its
+results go into this record before Mustafa accepts it. The candidate marks below are the research's (cited) or are
+marked proposed with the reason; test-engineer sets the final table.
 1. **The Worker** (part 5; R1-BND-REC1, r1 lines 2252–2264): on the minimum laptop named in ADR 0003 (its
    `hardwareConcurrency` recorded), at N = 12, 24, 36 and 48 soldiers, the page's frame time p95 with the sim in the
    Worker is no worse than with no sim by more than 1.0 ms (the page's cost of the sim: ADR 0003 owns the budget row,
@@ -1118,8 +1131,8 @@ sets the final table.
 7. **The Worker's pacing and the client's sim share** (ADR 0004's marks, measured here as `docs/SPIKE_PLAN.md`
    places them, item 3): ADR 0004's S18 (tick start jitter, read online against the schedule the step returns, part 5;
    smoothness on 60, 120 and 144 Hz displays; hidden tabs, with catch-up counted per wake) and
-   R1-TICK-REC2's P2 with the stand-in load; if the timer pacing fails its jitter mark, W3 is measured on an isolated
-   build (OQ-0002-4).
+   R1-TICK-REC2's P2 with the sim core spike's sim, which runs before this spike (SPIKE-ORDER (b)); if the timer
+   pacing fails its jitter mark, W3 is measured on an isolated build (OQ-0002-4).
 8. **Size and tools** (parts 2, 4 and 7): the `sim-wasm` file's size recorded raw and gzipped, with and without
    wasm-opt, at `opt-level` "s" and "z" (R1-RR-OQ5, R5-CI-OQ4); no pass mark (the research has no number): the
    measurement is one input to the budget's first limit, which the Advisor sets after the content and ability spike
@@ -1372,9 +1385,11 @@ or "not yet" (with a note) for each step.
 ## Migration plan
 In the slice order (SLICE-ORDER), with the netcode proof test first and the foundation before slice 1. The legacy game
 stays playable throughout: frozen, critical fixes only, guarded by today's gate, in `legacy/` from phase 2 on.
-0. **The drafts approved** by Mustafa and the Advisor; ADR 0003 names the minimum laptop.
-1. **The spikes before the foundation** (`docs/SPIKE_PLAN.md` orders them): the netcode proof test (ADR 0001) and,
-   beside it, this record's boundary spike, sharing the client harness. *Done when:* the boundary spike's marks are
+0. **The drafts signed off** by Mustafa as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); ADR 0003 names the
+   minimum laptop.
+1. **The spikes before the foundation** (`docs/SPIKE_PLAN.md` orders them), one heavy spike at a time (SPIKE-ORDER (b),
+   Mustafa, 2026-11-03): the netcode proof test (ADR 0001) first, then the sim core spike and the 60 Hz run, then this
+   record's boundary spike, which shares the proof test's client harness. *Done when:* the boundary spike's marks are
    recorded in this record, OQ-0002-3 is answered, and OQ-0002-1 and OQ-0002-4 have their spike results.
 2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
    1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
@@ -1502,10 +1517,10 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R2-XT-OQ10 | answered: the binary-delivery job; a certificate hash in a preview's static files goes stale, so the supervisor gives the current and the next hash and an older preview is redeployed (ADR 0006 part 4), unless OQ-0006-5 gives staging a trusted certificate and previews pin none; the token's scope waits on the security baseline, its guard is B9's interim reviewer | part 10 |
 | R3-MEASURE-OQ4 | answered: the isolation flag, for profiling builds only | part 5 |
 | R3-XT-OQ3 | open: OQ-0002-1 | part 11 |
-| R4-XT-OQ5 | answered: the bake in its own `navbake` crate (proposed, not researched: OQ-0002-8), never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
+| R4-XT-OQ5 | answered: the bake in its own `navbake` crate (proposed, not researched; allowed by OQ-0002-8 (a), the Advisor, 2026-11-03), never linked into `sim-wasm`; the map checks as G13 | parts 3 and 9 |
 | R4-XT-OQ8 | answered: as R1-XT-OQ18 | part 3 |
 | R5-LAYOUT-REC1 | adopted | parts 1 and 2 |
-| R5-LAYOUT-REC2 | changed: the `room`, `client-endpoint` and `navbake` crates added (proposed, not researched: OQ-0002-8), and the supervisor's crate at slice 3 (R6-HOST-REC2's supervisor, ADR 0006 part 5); nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; ADR 0001's network marks run the client endpoint natively; R4-XT-OQ5 |
+| R5-LAYOUT-REC2 | changed: the `room`, `client-endpoint` and `navbake` crates added (proposed, not researched; allowed by OQ-0002-8 (a), the Advisor, 2026-11-03), and the supervisor's crate at slice 3 (R6-HOST-REC2's supervisor, ADR 0006 part 5); nothing imports `spikes/` | part 3: SLICE-ORDER condition 1 runs the local server in the Worker; ADR 0001's network marks run the client endpoint natively; R4-XT-OQ5 |
 | R5-LAYOUT-REC3 | adopted | part 5; the spike's item 4 |
 | R5-LAYOUT-REC4 | adopted | part 3 (G5) |
 | R5-LAYOUT-REC5 | adopted | parts 5 and 11; the spike's item 5 |

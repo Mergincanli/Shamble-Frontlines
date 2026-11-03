@@ -1,0 +1,4 @@
+**Author:** engine-architect (frame, content data, the asset pipeline) · game-designer (the ability and effect
+system) · graphics-engineer (the asset pipeline's GPU rules) · test-engineer (the "Pass marks" table, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted

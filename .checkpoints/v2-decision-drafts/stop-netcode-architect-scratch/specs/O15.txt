@@ -1,3 +1,3 @@
-R	**Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4)
-R	**Reviewed by:** (filled in at review)
+R	**Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4) ·
+R	**Reviewed by:** (filled in at review) ·
 R	**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted

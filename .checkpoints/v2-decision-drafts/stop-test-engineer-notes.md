@@ -6,3 +6,9 @@
 - 14:05 written H8, PM-0001-63-2, M16, M16-2, S6, N4, N5. Next: PM-0001-63-3 (V-S), -4 (PM-0001-1), -5 (PM-0001-2), N6, RC4.
 - 14:20 written PM-0001-63-3/-4/-5, N6, RC4, H7, PM-0001-63 (new row, before 1426). Next: RW10, RW11, N5-2, S7, H9, RW11-2, PM-0001-63-6, RW12, RW12-2.
 - 14:30 written RW10, RW11, N5-2, S7; H9 first written on wrong lines (1455-1456), removed, rewritten on 1456-1457. Next: RW11-2 + PM-0001-63-6 (no-mark bullets 1484-1488), RW12 (step 7), RW12-2 (steps 10-15).
+- 14:40 written RW11-2, PM-0001-63-6, RW12, RW12-2: ADR 0001 complete (22 blocks). Dry run done (see next line). Next: ADR 0003 blocks (Q3, F3, F4+Q4), then 0004, 0005, 0006, NOTES.
+- 14:55 ADR 0003 (Q3, F3, F4+Q4) and ADR 0004 (S13+H17, N10, F3-2, S13-2) written; dry runs ok. Next: ADR 0005 (N11, C8, B4), ADR 0006 (M11, M11-2, H14, S16, N13, M12, H14-2), then NOTES.
+- 15:10 ADR 0005 (N11, C8, B4) and ADR 0006 (M11, H14, S16, N13, M11-2, M12, H14-2) written; dry runs ok. Next: NOTES (H14? no: H15, M13, M21, L12, T3, N9, N12, OQ-0005-1 kinds), then checks.
+- 15:20 NOTES written: H15, N9, N12, M13, M21, L12, T3, C8-2. M12 reworded. Next: apply all blocks in scratch tree, glossary check, cell counts, line lengths, sentence-under-table check, quote check.
+- 15:35 checks: all 40 FIX apply in tree (0001 1804->1819, 0003 -1, 0004 +2, 0005 +3, 0006 +6); glossary exact 0 in all 9 (in-context +10: 'the goal' x7 = goal budget, '48' x2 = N = 48, 'vehicles' x1 kind list: all correct uses); unpaired quotes 0; PM rows 7 cells; 0001 PM rows 62->63; no new prose >120; no sentence under a table; quotes word for word (research quotes r2:2776, r6:518 verified). Next: final fresh dry runs, return result.
+- 15:45 NOTE C8-2 reworded; final fresh dry runs: 40/40 FIX apply (0001 23, 0003 3, 0004 4, 0005 3, 0006 7); PM rows all drafts 340 -> 341 (expected 341). DONE.

@@ -1,0 +1,4 @@
+    0003 (interface I-8). Adding a class is a content change reviewed together with the ADR 0003 material it needs. A
+    faction's colours reach its faction colour slots from the faction's client definition (CD-13; OQ-0005-1, answered
+    by the Advisor, 2026-11-03). The table says which slots exist; how a class looks is ADR 0003's and Mustafa's
+    (LOOK_V2).

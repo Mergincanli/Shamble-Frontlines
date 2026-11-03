@@ -1,12 +1,20 @@
 # stop-netcode-architect fixes (ADR 0001, stop answers 2026-11-03)
 
+netcode-architect, ADR 0001 only (its "Pass marks" section and the netcode checklist are test-engineer's and are not
+touched). Docs at 4374a1c (unchanged on disk, base main 9e7db28). Every BEFORE was copied by script from the file on
+disk, whole lines, each occurring once. A block named by two or three row ids ("H2, S2") is one place that both rows
+change. "-2" ids are second places for a row: H2-2 (the Takes list now names ADR 0006's goal budget), O16-2 (the spike
+section's start), RW1-2 (migration step 6 drops OQ-0001-5 from the Feel Lab tests, as the REWIND-CAP ruling drops that
+weighing), RW9-2 (spike item 5), S8-2 (migration step 8), S9-2 (R1-TICK-OQ1), RW13-2 to -5 (Appendix A rows). PM-0001-63
+is cited as test-engineer's new 60 Hz-group row (rooms per VM at 60 Hz with the goal-budget check).
+
 ### FIX O15
 FILE: docs/adr/0001-multiplayer-netcode.md
 BEFORE:
 **Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
 AFTER:
-**Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4)
-**Reviewed by:** (filled in at review)
+**Author:** netcode-architect (the "Pass marks" table: test-engineer, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
 **Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
 END
 
@@ -99,14 +107,14 @@ END
 ### FIX RW2
 FILE: docs/adr/0001-multiplayer-netcode.md
 BEFORE:
+   so claim rewind up to the cap, an accepted risk. The cap bounds the final rewind on every path: data, its value
    OQ-0001-5; beyond it, shooters lead by the excess. The history keeps the cap plus a margin (data), at most 1 MB
-   for the stress scene. Filters: targets the shooter could hit (friendly fire from mode data), targets sent to and
 AFTER:
    so claim rewind up to the cap, an accepted risk. The cap bounds the final rewind on every path: data, its value set
    by Mustafa's rule (2026-11-03, OQ-0001-5): "the cap covers the honest rewind the proof test measures at P2, rounded
-   up; beyond the cap, the victim's view wins", read as the honest rewind's p99 at P2, rounded up to a whole tick at the
-   run's tick rate (the advisor's reading, 2026-11-03), its value recorded when the proof test reports; beyond it,
-   shooters lead by the excess. The history keeps the cap plus a margin (data), at most 1 MB
+   up; beyond the cap, the victim's view wins", read as the honest rewind's p99 at P2, rounded up to a whole number of
+   ticks at the run's tick rate (the advisor's reading, 2026-11-03), its value recorded when the proof test reports;
+   beyond it, shooters lead by the excess. The history keeps the cap plus a margin (data), at most 1 MB
 END
 
 ### FIX RW3
@@ -175,7 +183,7 @@ BEFORE:
 AFTER:
     Brief question 1, lines 1987–1992). Each direction carries half the profile's latency and a uniform jitter of ± half
     its jitter, so the round trip keeps the profile's mean and range, and each direction loses packets at the profile's
-    loss rate, independently (at P2, 2 % each way, so about 4 % of round trips lose a packet) (decided: OQ-0001-16,
+    loss rate, independently: at P2, 2 % each way, so about 4 % of round trips lose a packet (decided: OQ-0001-16,
     answered by the Advisor, 2026-11-03: "Latency and jitter split half each way; loss as P2 defines it"; the loss per
     direction is the advisor's reading, 2026-11-03, as PM-0001-3 measures it). Every R2 mark is restated against one:
     the budgets unit's "100 ms RTT, ±10 ms jitter, 2 % loss" becomes P2; the interest unit's "0, 50, 100 and 200 ms
@@ -262,9 +270,9 @@ BEFORE:
 AFTER:
 - **OQ-0001-2. How does the stress scene's sim load reach the 60 Hz margin run (TICK-60-SETUP)?** Answered by the
   Advisor (2026-11-03): "(a), as an early signal only. The final 60 Hz call is measured again with the real sim at
-  slice 6." So (a) is decided for the wave-1 run, which decides nothing: slice 6 always runs the final 60 Hz measurement
-  on the real sim, whatever the early signal shows; a pass starts no 60 Hz work before slice 6 (PM-0004-71 and -72 run
-  with each 60 Hz run but decide only at slice 6, and R1-TICK-OQ1 is asked only after slice 6 passes), and a fail closes
+  slice 6." So (a) is decided for the wave-1 run, which decides nothing: slice 6 runs the final 60 Hz measurement on the
+  real sim, whatever the early signal shows; a pass starts no 60 Hz work before slice 6 (PM-0004-71 and -72 run with
+  each 60 Hz run but decide only at slice 6, and R1-TICK-OQ1 is asked only after slice 6 passes), and a fail closes
   nothing (the advisor's reading, 2026-11-03). The options below stay as the record of what was weighed, (c) and (d)
   included. · *Why it matters:*
 END
@@ -302,21 +310,21 @@ AFTER:
   now. Rule: the cap covers the honest rewind the proof test measures at P2, rounded up; beyond the cap, the victim's
   view wins. Aim for the smallest input buffer that holds." The rule is decided, in option (c)'s shape: the honest
   rewind is its p99 at P2, as option (c) and the stop report's recommendation he answered define it, with the run's
-  largest rewind reported beside it; rounded up means to a whole tick at the run's tick rate, as PM-0001-48 rounds; the
-  one-interval tolerance and part 8's anti-cheat text are unchanged; the victim's side is decided, since beyond the cap
-  the victim's view wins (shooters lead by the excess); the buffer aim guides OQ-0001-6 (the advisor's reading,
-  2026-11-03). Still open: the cap's value, decided by the proof test's measured honest rewind at P2 under that rule and
-  recorded when the proof test reports. · *Why it matters:* at P2 a 30 Hz client needs 200–250 ms of rewind by R2's
-  formula and 233–383 ms once the input buffer and the page's blend are counted (part 8), so both candidate caps clip
-  honest shots at VISION_V2 §4's latency, while a longer cap lengthens the window in which a victim is hit just after
-  reaching cover; the cap is also the most rewind a client faking its latency can claim (part 8). · *Options:* (a)
+  largest rewind reported beside it; rounded up means to a whole number of ticks at the run's tick rate, as PM-0001-48
+  rounds; the one-interval tolerance and part 8's anti-cheat text are unchanged; the victim's side is decided, since
+  beyond the cap the victim's view wins (shooters lead by the excess); the buffer aim guides OQ-0001-6 (the advisor's
+  reading, 2026-11-03). Still open: the cap's value, decided by the proof test's measured honest rewind at P2 under that
+  rule and recorded when the proof test reports. · *Why it matters:* at P2 a 30 Hz client needs 200–250 ms of rewind by
+  R2's formula and 233–383 ms once the input buffer and the page's blend are counted (part 8), so both candidate caps
+  clip honest shots at VISION_V2 §4's latency, while a longer cap lengthens the window in which a victim is hit just
+  after reaching cover; the cap is also the most rewind a client faking its latency can claim (part 8). · *Options:* (a)
   200 ms (the default principles; the security review prefers it, with a tolerance of one snapshot interval); (b) 250 ms
   (the sync unit's proposal); (c) a cap set from the proof test's measured honest rewind (the p99 at P2), the
   one-interval tolerance unchanged (not researched: the research weighs 200 and 250 ms only); (d) run commands on
   arrival (OQ-0001-6 (a), Source's model), which removes the buffer's term from every rewind; (e) start the
   interpolation delay at 2 intervals instead of 3, at the cost of more extrapolation under loss (part 7). ·
-  *Recommendation:* none until the proof test reports; the netcode review leans to (c) with (d) measured beside it, but
-  (c) is not researched, so choosing it is the deciders' call. · *Decider:* Mustafa and the Advisor. · *What decides
+  *Recommendation:* none until the proof test reports; the netcode review leans to (c) with (d) measured beside it,
+  but (c) is not researched, so choosing it is the deciders' call. · *Decider:* Mustafa and the Advisor. · *What decides
   it:* the value: the proof test's measured honest rewind at P2 (each shot's measured rewind), with the "hit after
   cover" window inside the cap recorded beside it; the share each candidate cap clips and a later Feel Lab weighing no
   longer decide anything, since no candidates are left to weigh (the advisor's reading, 2026-11-03). · *Research ids:*
@@ -428,8 +436,8 @@ BEFORE:
    command runs, with each shot's RTT, delay, buffer wait and blend (R2-XU-OQ2; the cap itself is OQ-0001-5's); the
 AFTER:
    command runs, with each shot's RTT, delay, buffer wait and blend (R2-XU-OQ2), and from it the rewind cap by
-   OQ-0001-5's rule (Mustafa, 2026-11-03): the honest rewind's p99 at P2, rounded up to a whole tick, the run's largest
-   rewind reported beside it (the advisor's reading, 2026-11-03); the
+   OQ-0001-5's rule (Mustafa, 2026-11-03): the honest rewind's p99 at P2, rounded up to a whole number of ticks, the
+   run's largest rewind reported beside it (the advisor's reading, 2026-11-03); the
 END
 
 ### FIX H10, S8, O17
@@ -470,10 +478,10 @@ BEFORE:
    [the test-mode list](../research/GLOSSARY.md#the-test-mode-list).
 AFTER:
 8. **Slice 6, scale to 48:** the budgets again with the real sim in the stress scene, 8 rooms per VM (with ADR 0006),
-   the soaks on the test-mode list, and the final 60 Hz margin run with the real sim, which always runs here whatever
-   the wave-1 early signal showed, with the rooms per VM at 60 Hz counted and the goal budget checked at that count
-   (part 2; PM-0001-63; TICK-60-SETUP, the Advisor, 2026-11-03). *Done when:* the budgets table passes with the real
-   sim, the tick rate is set by part 2's rule, and R5-TEST-REC5's soak passes for every mode on
+   the soaks on the test-mode list, and the final 60 Hz margin run with the real sim, which runs here whatever the
+   wave-1 early signal showed, with the rooms per VM at 60 Hz counted and the goal budget checked at that count (part 2;
+   PM-0001-63; TICK-60-SETUP, the Advisor, 2026-11-03). *Done when:* the budgets table passes with the real sim, the
+   tick rate is set by part 2's rule, and R5-TEST-REC5's soak passes for every mode on
    [the test-mode list](../research/GLOSSARY.md#the-test-mode-list).
 END
 
@@ -561,5 +569,16 @@ END
 
 ### NOTE X5
 no change: ADR 0001's need lines (part 10's congestion handling and part 13: "VISION_V2 §4 only"; R2-BUD-REC4's "need: VISION_V2 §4 only" in Appendix A) are already "marked as such", which is what the Advisor's answer to OQ-0001-14 asks; the verdict rules "OQ-0001-14: (a). No need line changes." The other drafts' need lines belong to their authors.
+END
+
+### FIX H2-2
+FILE: docs/adr/0001-multiplayer-netcode.md
+BEFORE:
+  firewall, the lobby's hosting and store, the certificates, the staging game server and the monitoring; from ADR 0003,
+  the client reference machines and everything drawn or played on the page.
+AFTER:
+  firewall, the lobby's hosting and store, the certificates, the staging game server, the monitoring and the goal budget
+  of its part 8, which this record's 60 Hz rule reads (part 2; OQ-0001-1, 2026-11-03); from ADR 0003, the client
+  reference machines and everything drawn or played on the page.
 END
 
