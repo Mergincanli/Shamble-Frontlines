@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 09:34 Amsterdam
+- **Last update:** 2026-11-03 12:34 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+After the stop (2026-11-03): Mustafa's answers to the stop arrived at about 12:28 Amsterdam (verbatim in
+`inputs/STOP-ANSWERS-mustafa-2026-11-03.md`): SPIKE-ORDER (b), wave 1 one heavy spike at a time; TICK-60-HEADROOM
+confirmed plus rooms per VM at 60 Hz; the Advisor's TICK-60-SETUP (a) as an early signal, NET-PROFILES P2, OQ-0002-8
+(a), OQ-0005-1, OQ-0001-14, ROOM-CRASH, OQ-0003-17, -20, OQ-0005-AB12, AB13; REWIND-CAP's rule; SPIKE-MACHINES;
+LOOK-TEST-INPUTS (Blender); TOY-BOX later in a kit change-set; LATER after the proof test. Next he asks: record
+them, mark PR #33 ready, squash-merge once approved. The saver restarted (bvmw1fsvr, 2-hour limit). Plan revision 4:
+`plan-r4-stop-answers.md`. Running (12:34): wf_7663bb31-6ca (`prompts/workflow-stop-plan.js`): engine-architect's
+landing map (`stop-answers-map.md`), then the advisor's review (`advisor-verdict-r4.md`). No doc edit before APPROVE.
+
+At the stop (before the answers):
 AT THE STOP (2026-11-03 09:34 Amsterdam). wf_7d619266-6c2 done: fixcheck-d4 PASS WITH NOTES (68 claims, 59 confirmed;
 touch-up 4's ten blocks right, rebuilt byte for byte; nine slips in the report and appendix, F1 medium, fixed with the
 skeptics' corrected words at f956327, not re-checked again; F4 deferred, §7.3); its skeptics: F1, F2 upheld, F6, F8
