@@ -1,3 +1,0 @@
-  - Answered by Mustafa (2026-11-03): "one cap per run, from its planned hours, written in that run's plan for my
-    OK. I create and delete the VMs myself." (SPIKE-COST), after "VMs exist only during a run." (SPIKE-MACHINES). The
-    options below, the interim among them, stay as the record of what was weighed.

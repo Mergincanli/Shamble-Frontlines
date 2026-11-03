@@ -14,3 +14,4 @@
 - 18:36 NOTEs OQ21-part4, -part5, -part6, -part12-rest, PM-0006-18, OQ15-OQ20-rest written. Next: dry-run, tree apply, glossary, rules checks.
 - 18:44 dry-run 9/9 ok on disk copy; tree applied; glossary exact 0 (in context +2: 'Cloudflare' as the registrar, not a client-host product); rules.py clean. Next: read the diff once, final checks, DONE.
 - 18:48 bug found and fixed: OQ21-entry BEFORE was 1074-1075 (dropped OQ-20's 'What decides it'); now 1075-1076. Next: re-run dry-run, tree, glossary, rules.
+- 18:55 final: dry-run 9/9 on disk copy (base = disk); after test-engineer's 0006 block too (session order) 9/9; glossary exact 0; rules clean (no long prose, cells same, nothing under a table, PM 32 = 32, quotes found, no 'answered in part' on -15/-20, 21 numbered / 18 open). The fixes file is authoritative (a_*.txt drafts removed). DONE
