@@ -1378,18 +1378,18 @@ another file is named; "the draft" is this record.
   Still open: the actual machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES,
   Mustafa, 2026-11-03): "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the
   minimum, for rough checks only." A rough check is reported, never judged against a pass mark. MP stays what he
-  judges, never a measured result, and nothing stands in for RD, nor for MAC beyond the macOS runner below (the
-  advisor's reading, 2026-11-03). For the netcode proof test's Safari rows, Mustafa put one step first (MACHINES-TIMING,
-  2026-11-03): its plan checks "whether GitHub's macOS runners (real Safari, free while the repository is public) have
-  a Safari new enough for WebTransport and can reach the test servers"; if they can, "that is the Safari check" (if
-  not, "I borrow the Mac before the netcode proof test"), and a runner stands as MAC once the run's results record (i)
-  the runner image's Safari version on the day, at least 26.4 (R2-TRN-F7), (ii) real Safari driven through
-  safaridriver, not a WebKit build, and (iii) from the runner, one WebTransport session to RS that opens and carries
-  datagrams and one WebSocket session on the domain, and then only in yes-or-no and count rows (PM-0001-28's
-  four-browser path and library pick, its server then RS, since a runner sits on no local network of ours; PM-0001-14;
-  PM-0001-25's Origin; ADR 0006's PM-0006-15), while a row whose limit is a time and ADR 0003's look proof test stay on
-  the borrowed Mac, and the runner's workflow is the proof test's plan's, reviewed by security-auditor and
-  infra-engineer (the limits: the advisor's reading, 2026-11-03). Mustafa
+  judges, never a measured result, and nothing stands in for RD, nor for MAC beyond the macOS runner below
+  (the advisor's reading, 2026-11-03). For the netcode proof test's Safari rows, Mustafa put one step first
+  (MACHINES-TIMING, 2026-11-03): its plan checks "whether GitHub's macOS runners (real Safari, free while the
+  repository is public) have a Safari new enough for WebTransport and can reach the test servers"; if they can, "that
+  is the Safari check" (if not, "I borrow the Mac before the netcode proof test"), and a runner stands as MAC once the
+  run's results record (i) the runner image's Safari version on the day, at least 26.4 (R2-TRN-F7), (ii) real Safari
+  driven through safaridriver, not a WebKit build, and (iii) from the runner, one WebTransport session to RS that
+  opens and carries datagrams and one WebSocket session on the domain, and then only in yes-or-no and count rows
+  (PM-0001-28's four-browser path and library pick, its server then RS, since a runner sits on no local network of
+  ours; PM-0001-14; PM-0001-25's Origin; ADR 0006's PM-0006-15), while a row whose limit is a time and ADR 0003's
+  look proof test stay on the borrowed Mac and the runner's workflow is the proof test's plan's, reviewed by
+  security-auditor and infra-engineer (the advisor's reading, 2026-11-03). Mustafa
   on the proof test (REF-MACHINES, 2026-11-03): "the netcode proof test doesn't measure client frames". It reads: no
   client frame-time budget is judged in the proof test; PM-0001-43 times input-to-screen latency through presented
   frames on ML and RD, and like every row on ML, RD or MAC it is judged only on a named machine
