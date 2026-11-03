@@ -14,3 +14,17 @@ Scratch: .checkpoints/v2-decision-drafts/verifier-skeptic-6-scratch/
   comments are in std/core .rmeta (strings dump in scratch/std-rmeta-strings.txt:4793-4799): 1.97.0's f32 div_euclid doc
   already carries "infinite-precision result." after its description. Next: decode the rmeta bytes to see the full
   Precision lines (symbols are deduplicated by offset), then my own test.
+- 07:45 rustc 1.97.0's own std carries the same Precision lines (decoded from libstd-ca8536218e109c03.rmeta with
+  scratch/rmeta_docs.py; outputs scratch/div_euclid_f32_doc_1.97.txt, rem_euclid_f32_doc_1.97.txt,
+  f64_euclid_docs_1.97.txt): for div_euclid and rem_euclid, f32 and f64: "# Precision" / "The result of this operation
+  is guaranteed to be the rounded" / "infinite-precision result." So the claim is not new in 1.99.1: 1.97.0 states it
+  and (per d3a's test) breaks it for div_euclid. Arithmetic by hand: b = 1 + 2^-23 exact (ulp 2^-23 in [1,2)); 2b + 1 =
+  3 + 2^-22 exact (ulp 2^-22 in [2,4)); 3b = 3 + 1.5 * 2^-22 > a, so the Euclidean quotient is 2, r = 1, 0 <= 1 < b;
+  a/b exact = 3 - 2^-23/(1 + 2^-23), less than half an ulp (2^-23) below 3, so f32 a / b rounds to 3.0 and trunc gives 3.
+  Same for f64 with 2^-52, 2^-51. Upheld so far on (1). Next: own test (fixed case + exact-reference sweep), disassembly.
+- 07:52 own test (scratch/euclid_test.rs, built rustc 1.97.0 -O, x86_64-unknown-linux-gnu; raw output euclid_test.raw;
+  exact checker euclid_ref.py with Fractions; summary euclid_ref.out). FIX lines: f32 a=40400001 b=3f800001 a/b=3
+  div_euclid=3 rem_euclid=1 2*b+1==a:true q*b+r==a:false; f64 a=4008000000000001 b=3ff0000000000001: the same (3, 1).
+  Mirrors (exact -3, -2, 3): got -4, -3, 4 (all off by one); rem_euclid right in all four. Sweep: f32 200,000 pairs
+  (|a| in [1, 2^13), |b| in [1, 2)): div_euclid wrong in 8 (+4 mirrors = 12/200,004, 0.006%), rem_euclid wrong in 0;
+  f64 200,000 pairs: 0 wrong for both (rarer at 53 bits; the fixed f64 case still fails). Upheld on (2).

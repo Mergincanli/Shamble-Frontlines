@@ -1,0 +1,28 @@
+=== needle at 2722189
+STR ' Calculates the least nonnegative remainder of `self` when divided by'
+STR ' `rhs`.'
+PRE 774
+STR ' In particular, the return value `r` satisfies `0.0 <= r < rhs.abs()` in'
+STR ' most cases. However, due to a floating point round-off error it can'
+STR ' result in `r == rhs.abs()`, violating the mathematical definition, if'
+STR ' `self` is much smaller than `rhs.abs()` in magnitude and `self < 0.0`.'
+STR " This result is not an element of the function's codomain, but it is the"
+STR ' closest floating point number in the real numbers and thus fulfills the'
+STR ' property `self == self.div_euclid(rhs) * rhs + self.rem_euclid(rhs)`'
+STR ' approximately.'
+PRE 774
+OFF ' # Precision'
+PRE 774
+OFF ' The result of this operation is guaranteed to be the rounded'
+OFF ' infinite-precision result.'
+PRE 774
+OFF ' # Examples'
+PRE 774
+OFF ' ```'
+OFF ' let a: f32 = 7.0;'
+OFF ' let b = 4.0;'
+STR ' assert_eq!(a.rem_euclid(b), 3.0);'
+STR ' assert_eq!((-a).rem_euclid(b), 1.0);'
+STR ' assert_eq!(a.rem_euclid(-b), 3.0);'
+STR ' assert_eq!((-a).rem_euclid(-b), 1.0);'
+STR ' // limitation due to round-off error'

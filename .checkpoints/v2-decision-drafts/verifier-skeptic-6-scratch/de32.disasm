@@ -1,0 +1,35 @@
+0000000000015500 <euclid_test::de32>:
+   15500:	sub    $0x18,%rsp
+   15504:	movss  %xmm1,0xc(%rsp)
+   1550a:	movss  %xmm0,0x10(%rsp)
+   15510:	divss  %xmm1,%xmm0
+   15514:	call   *0x465f6(%rip)        # 5bb10 <_DYNAMIC+0x230>
+   1551a:	movss  %xmm0,0x14(%rsp)
+   15520:	movss  0x10(%rsp),%xmm0
+   15526:	movss  0xc(%rsp),%xmm1
+   1552c:	call   *0x465e6(%rip)        # 5bb18 <_DYNAMIC+0x238>
+   15532:	xorps  %xmm1,%xmm1
+   15535:	ucomiss %xmm0,%xmm1
+   15538:	movss  0x14(%rsp),%xmm0
+   1553e:	jbe    15560 <euclid_test::de32+0x60>
+   15540:	movss  0xc(%rsp),%xmm2
+   15546:	ucomiss %xmm1,%xmm2
+   15549:	jbe    15558 <euclid_test::de32+0x58>
+   1554b:	addss  -0x10503(%rip),%xmm0        # 5050 <__abi_tag+0x4d54>
+   15553:	add    $0x18,%rsp
+   15557:	ret
+   15558:	addss  -0x1053c(%rip),%xmm0        # 5024 <__abi_tag+0x4d28>
+   15560:	add    $0x18,%rsp
+   15564:	ret
+   15565:	int3
+   15566:	int3
+   15567:	int3
+   15568:	int3
+   15569:	int3
+   1556a:	int3
+   1556b:	int3
+   1556c:	int3
+   1556d:	int3
+   1556e:	int3
+   1556f:	int3
+

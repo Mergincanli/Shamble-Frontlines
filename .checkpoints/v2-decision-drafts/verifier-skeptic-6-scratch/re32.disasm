@@ -1,0 +1,20 @@
+0000000000015dc0 <euclid_test::re32>:
+   15dc0:	sub    $0x18,%rsp
+   15dc4:	movaps %xmm1,(%rsp)
+   15dc8:	call   *0x45d4a(%rip)        # 5bb18 <_DYNAMIC+0x238>
+   15dce:	movaps (%rsp),%xmm1
+   15dd2:	andps  -0x10bb9(%rip),%xmm1        # 5220 <__abi_tag+0x4f24>
+   15dd9:	addss  %xmm0,%xmm1
+   15ddd:	movaps %xmm1,%xmm3
+   15de0:	xorps  %xmm2,%xmm2
+   15de3:	movaps %xmm0,%xmm1
+   15de6:	cmpltss %xmm2,%xmm1
+   15deb:	movaps %xmm1,%xmm2
+   15dee:	andnps %xmm0,%xmm2
+   15df1:	andps  %xmm3,%xmm1
+   15df4:	orps   %xmm2,%xmm1
+   15df7:	movaps %xmm1,%xmm0
+   15dfa:	add    $0x18,%rsp
+   15dfe:	ret
+   15dff:	int3
+

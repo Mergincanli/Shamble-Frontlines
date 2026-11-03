@@ -1,0 +1,3 @@
+S32: 200004 pairs; div_euclid != exact: 12 (0.006%); rem_euclid != correctly rounded exact remainder: 0
+S64: 200000 pairs; div_euclid != exact: 0 (0.000%); rem_euclid != correctly rounded exact remainder: 0
+(32, 'q') first 5: [('40400001', '3f800001', 3.0, 2.0), ('c0400001', '3f800001', -4.0, -3.0), ('40400001', 'bf800001', -3.0, -2.0), ('c0400001', 'bf800001', 4.0, 3.0), ('c5a98494', '3fe08fd6', -3093.0, -3092.0)]
