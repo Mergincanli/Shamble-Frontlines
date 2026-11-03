@@ -16,3 +16,4 @@
 08:34:56|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/std/hash/trait.Hasher.html (2nd read, write_length_prefix text)|200|34736|0.573408
 08:34:58|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/src/core/hash/mod.rs.html|200|92048|0.332074
 08:35:44|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/rustc/platform-support/wasm32-unknown-unknown.html|200|38081|0.474268
+08:35:57|doc.rust-lang.org|https://doc.rust-lang.org/1.99.1/rustc/platform-support/wasm32-unknown-unknown.html (2nd read, broader terms)|200|38081|0.351516

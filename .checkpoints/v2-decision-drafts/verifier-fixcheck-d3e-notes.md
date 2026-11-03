@@ -14,3 +14,4 @@
 - 08:34 excerpts W3-W5 saved; euclid_alg.py/.out (1.99.1 steps in IEEE doubles: f64 case 3, mirrors -4,-3,4). Next: fact 2 block.
 - fact 2 verdict block written (5/5 confirmed; D3E-1 optional: 1.99.1 same steps). Next: fact 3 (Hasher, Hash pages and core/hash source, 1.99.1).
 - fact 3 verdict block written (4 judged, 3 confirmed, 3c wasm32 width not read at a source). Next: fetch audit table, G1 summary, G5 part 5 (not-read list), counts, final.
+- 08:36 wasm32 page read twice: no width stated; 3c stays not read at a source. Audit rows added. Next: G1 summary, G5 part 5, counts and verdict.
