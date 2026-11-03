@@ -7,3 +7,4 @@
 - 18:25 NOTE IDX-N1..N3 written; README dry-run all 16 ok. Next: SPIKE_PLAN blocks SPK-1..SPK-12.
 - 18:40 SPK-1..SPK-12 written; SPIKE_PLAN dry-run next/done. Next: NOTEs (SPK item 6, OVW), full apply in scratch tree, glossary, quote check, label grep.
 - 18:45 NOTE SPK-N1, SPK-N2, OVW-N1 written. Next: full apply in scratch tree, glossary, quote check, label grep, cell counts, line lengths.
+- 19:00 redid IDX-2, IDX-3, SPK-3 (each label attached to its own id, for the label grep); added IDX-16 rewording (no "players" in-context hit), IDX-17 (row 57 OQ-0006-15 mention). Next: full re-apply in scratch, glossary, quotes, cells, labels; then return.

@@ -144,8 +144,8 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   (OQ-0001-16, answered by the Advisor, 2026-11-03), 2 % on each direction, applied independently (the advisor's
   reading, 2026-11-03); a DM_Tri-sized greybox with enterable buildings and the target course; the port ranges
   (OQ-0006-16) and the development certificate for WebTransport, private and hash-pinned (ADR 0006; Mustafa,
-  2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate on "a domain I
-  register" (Mustafa, 2026-11-03; OQ-0006-5's development case (i) by the advisor's reading, answered in part),
+  2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate (OQ-0006-5, answered in
+  part: its development case (i) by the advisor's reading) on "a domain I register" (Mustafa, 2026-11-03),
   shamblefrontlines.com (OQ-0006-15, answered by Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at
   Cloudflare."), the domain registered before the test starts and the certificate's issuance method chosen in this
   test's own plan with security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run

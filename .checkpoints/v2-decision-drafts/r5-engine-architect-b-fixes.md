@@ -13,7 +13,7 @@ FILE: docs/adr/README.md
 BEFORE:
 | [0006](0006-infrastructure-operations.md) | Infrastructure and operations | infra-engineer; pass marks: test-engineer | Proposed. Signed off by Mustafa: as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted | the preview hosting check; operations marks in the netcode proof test; an optional share of the boundary spike | 20 numbered (OQ-0006-1 to -20), 19 open: -17 answered at the stop (2026-11-03); -5, -15 and -20 answered in part |
 AFTER:
-| [0006](0006-infrastructure-operations.md) | Infrastructure and operations | infra-engineer; pass marks: test-engineer | Proposed. Signed off by Mustafa: as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted | the preview hosting check; operations marks in the netcode proof test; an optional share of the boundary spike | 21 numbered (OQ-0006-1 to -21; -21, COMMUNITY-SERVERS, added 2026-11-03), 18 open: -17 answered at the stop (2026-11-03); -15 and -20 answered by Mustafa (2026-11-03); -5 answered in part |
+| [0006](0006-infrastructure-operations.md) | Infrastructure and operations | infra-engineer; pass marks: test-engineer | Proposed. Signed off by Mustafa: as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted | the preview hosting check; operations marks in the netcode proof test; an optional share of the boundary spike | 21 numbered (OQ-0006-1 to -21; -21, COMMUNITY-SERVERS, added 2026-11-03), 18 open: -5 answered in part; -17 answered at the stop (2026-11-03); -15 and -20 answered by Mustafa (2026-11-03) |
 END
 
 ### FIX IDX-3
@@ -25,9 +25,9 @@ adds one of its own, OQ-SPIKE-1, answered by Mustafa (2026-11-03). Pass marks: 6
 ADR 0001's PM-0001-63 joined its 60 Hz group at the stop). Status of every draft: Proposed. Signed off by Mustafa: as
 the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted. His words: "(b) accept with one change. The
 AFTER:
-Total: 115 numbered open questions, 97 of them open (OQ-0004-5 and -6 point to ADR 0005; OQ-0003-14 is answered; 13 were
-answered at the stop, 2026-11-03, and OQ-0006-15 and -20 by Mustafa's answers to the escalations later that day;
-OQ-0006-21 is new; a question answered in part stays open, marked "answered in part"); SPIKE_PLAN adds one of its own,
+Total: 115 numbered open questions, 97 of them open (OQ-0004-5 and -6 point to ADR 0005; OQ-0003-14 is answered; a
+question answered in part stays open, marked "answered in part"; 13 were answered at the stop, 2026-11-03, OQ-0006-15
+and -20 by Mustafa's answers to the escalations later that day, and OQ-0006-21 is new); SPIKE_PLAN adds one of its own,
 OQ-SPIKE-1, answered by Mustafa (2026-11-03). The open counts follow the drafts' own entries: this register records
 Mustafa's design answers of 2026-11-03 for OQ-0005-AB1, AB3, AB11 and AB15, AB14 in part, his lean for AB5 and the
 fragments as damage (rows in "Decisions the drafts ask for" below); ADR 0005 takes them up at its next revision, and so
@@ -167,8 +167,8 @@ advisor's COUNTS ruling: ADR 0005 stays 33 under DRAFT-ENTRIES (a); REF-MACHINES
 README:47 (ASSET-RESEARCH) and :48 (OQ-SPIKE-1) keep their text: the ruling puts Mustafa's LOOK_V2-§8 answer in ADR
 0005's Settled inputs (engine-architect a) and SPIKE_PLAN's research section (FIX SPK-9), and row 48's "LOOK_V2 is
 not edited: Blender is the route for the look test's models" agrees with "keep it as it is, with Blender for the test
-models only". README:57 (OQ-0006-5) stays answered in part; its "a trusted certificate there needs a domain
-(OQ-0006-15)" stays true now that the domain is named. README:124 (OQ-0006-1) stays open (his console check).
+models only". README:57 (OQ-0006-5) stays answered in part; only its mention of OQ-0006-15 changes (FIX IDX-17).
+README:124 (OQ-0006-1) stays open (his console check).
 END
 
 ### FIX SPK-1
@@ -215,8 +215,8 @@ BEFORE:
   run plan under its bill mark (PM-0006-18) and the cost Mustafa allows (OQ-0006-20, still open; answered in part: "VMs
   exist only during a run.") before the first VM.
 AFTER:
-  2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate on "a domain I
-  register" (Mustafa, 2026-11-03; OQ-0006-5's development case (i) by the advisor's reading, answered in part),
+  2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate (OQ-0006-5, answered in
+  part: its development case (i) by the advisor's reading) on "a domain I register" (Mustafa, 2026-11-03),
   shamblefrontlines.com (OQ-0006-15, answered by Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at
   Cloudflare."), the domain registered before the test starts and the certificate's issuance method chosen in this
   test's own plan with security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run
@@ -392,5 +392,13 @@ ADR 0006 deciding costs). Its server box (:36, "supervisor, lobby, metrics, matc
 parts and does not make a room need the supervisor or the lobby to start, so nothing there reads as closing the
 door on COMMUNITY-SERVERS (condition 6). Its "Open, for Mustafa and the Advisor" section points to the register,
 which carries the answers (FIX IDX-1 to IDX-16).
+END
+
+### FIX IDX-17
+FILE: docs/adr/README.md
+BEFORE:
+| The `wss` certificate on development and staging (OQ-0006-5) | How are the per-hostname production certificates issued, how long do they live, and which certificate does the WebSocket fallback present on development and staging servers, since a WebSocket cannot pin a certificate hash? The netcode proof test's WebSocket leg needs the development and staging answer first, and a trusted certificate there needs a domain (OQ-0006-15). Answered in part by Mustafa (2026-11-03): "Certificates: a private hash-pinned certificate for WebTransport; for the WebSocket leg, a domain I register." The WebSocket leg uses the development case (i), a trusted certificate on his domain (the advisor's reading, 2026-11-03); still open: how that certificate is issued on a spike VM (http-01 and tls-alpn-01 need an open port, dns-01 a secret; OQ-0006-16's port plan applies), decided in the netcode proof test's own plan with security-auditor; the staging case, decided by the Advisor; and the production certificates, decided by security-auditor in the security baseline. | security-auditor in the security baseline, with the port plan (OQ-0006-16); the development and staging case before the netcode proof test starts (the Advisor, from a short read) | [ADR 0006](0006-infrastructure-operations.md) OQ-0006-5; SPIKE_PLAN item 1 |
+AFTER:
+| The `wss` certificate on development and staging (OQ-0006-5) | How are the per-hostname production certificates issued, how long do they live, and which certificate does the WebSocket fallback present on development and staging servers, since a WebSocket cannot pin a certificate hash? The netcode proof test's WebSocket leg needs the development and staging answer first, and a trusted certificate there needs a domain (OQ-0006-15, answered by Mustafa, 2026-11-03). Answered in part by Mustafa (2026-11-03): "Certificates: a private hash-pinned certificate for WebTransport; for the WebSocket leg, a domain I register." The WebSocket leg uses the development case (i), a trusted certificate on his domain (the advisor's reading, 2026-11-03); still open: how that certificate is issued on a spike VM (http-01 and tls-alpn-01 need an open port, dns-01 a secret; OQ-0006-16's port plan applies), decided in the netcode proof test's own plan with security-auditor; the staging case, decided by the Advisor; and the production certificates, decided by security-auditor in the security baseline. | security-auditor in the security baseline, with the port plan (OQ-0006-16); the development and staging case before the netcode proof test starts (the Advisor, from a short read) | [ADR 0006](0006-infrastructure-operations.md) OQ-0006-5; SPIKE_PLAN item 1 |
 END
 
