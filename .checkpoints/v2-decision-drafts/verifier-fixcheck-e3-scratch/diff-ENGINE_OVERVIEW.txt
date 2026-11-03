@@ -1,0 +1,45 @@
+diff --git a/docs/ENGINE_OVERVIEW.md b/docs/ENGINE_OVERVIEW.md
+index 04aa863..7477929 100644
+--- a/docs/ENGINE_OVERVIEW.md
++++ b/docs/ENGINE_OVERVIEW.md
+@@ -1,8 +1,9 @@
+ # ENGINE_OVERVIEW: the v2 engine on one page
+ 
+ **Status:** Proposed, with the six decision drafts · **Date:** 2026-11-01 · **Author:** engine-architect (the
+-synthesis) · **Signed off by Mustafa:** no. This page joins what [ADR 0001–0006](adr/README.md) propose and decides
+-nothing of its own; every detail links to its draft. The spikes are in [SPIKE_PLAN](SPIKE_PLAN.md).
++synthesis) · **Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted.
++This page joins what [ADR 0001–0006](adr/README.md) propose and decides nothing of its own; every detail links to its
++draft. The spikes are in [SPIKE_PLAN](SPIKE_PLAN.md).
+ 
+ ## The engine in one paragraph
+ One Rust simulation decides everything that counts. The same code runs natively in each room process on the match
+@@ -12,7 +13,9 @@ condition 1). The page is TypeScript on three.js `WebGPURenderer` with its WebGL
+ plays sound from one block of data per tick and never decides a hit, a death or a purchase. Content (units, vehicles,
+ weapons, abilities, effects, upgrade tracks, modes, maps, tuning) is JSON that one Rust content crate validates the
+ same way on the server, in the Worker and in the editor. The server ticks at 30 Hz (TICK-30) for up to N = 48 players
+-(the largest mode, 24v24: MODES-3 (a)); 60 Hz only with [the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin).
++(the largest mode, 24v24: MODES-3 (a)); 60 Hz only with [the 60 Hz margin](research/GLOSSARY.md#the-60-hz-margin),
++every 60 Hz research mark and the goal budget holding at the rooms per VM measured at 60 Hz, as slice 6's run on the
++real sim shows; the netcode proof test's 60 Hz run is an early signal only (ADR 0001 part 2).
+ 
+ ## The parts and the boundary
+ ```mermaid
+@@ -114,7 +117,7 @@ match (ADR 0005 CD-7). Details: ADR 0001 "State ownership".
+ | 6 | Balance telemetry | ADR 0004 part 19 (events); ADR 0001 part 11 (the room writes the record at Ended); ADR 0006 part 12 (shape, storage, analysis); ADR 0005 CD-12 (telemetry ids) and CD-8 (the content hash every match records) |
+ | 7 | A faction content pipeline as data | ADR 0005 CD-13 (faction variants) and AP-3 (faction colour slots); ADR 0003 part 6 (per-instance faction colour) |
+ | 8 | Moments recognized by the server | ADR 0004 part 19 (recognition in a sim phase); ADR 0005 CD-12 (rules as data); ADR 0006 part 12 (stored with the record). `[LATER]` kill-cams, replays, highlights: no feature; recorded matches and per-tick state hashes (ADR 0004 parts 7–9) keep them possible |
+-| 9 | A spectacle budget: a few very large units without dropping frames | ADR 0003 parts 3, 6, 7 (no first-sight stutter, very large units, budgets; part 7's presented-frame count reads "without dropping frames", PM-0003-44, and how many such frames a run may hold is OQ-0003-17); ADR 0002 part 5 (the sim off the page's thread); ADR 0004 (its share: the very large units are in the stress scene its sim is measured in, GLOSSARY §3) |
++| 9 | A spectacle budget: a few very large units without dropping frames | ADR 0003 parts 3, 6, 7 (no first-sight stutter, very large units, budgets; part 7's presented-frame count reads "without dropping frames", PM-0003-44: at most 6 of 600 presented frames may miss a refresh with the very large units on screen, on the recommended desktop at High, OQ-0003-17, answered 2026-11-03); ADR 0002 part 5 (the sim off the page's thread); ADR 0004 (its share: the very large units are in the stress scene its sim is measured in, GLOSSARY §3) |
+ | 10 | `[LATER]` Accounts | no feature; ADR 0001 part 11 (guest identity) and ADR 0006 part 6 (the lobby's store, OQ-0006-3) keep it possible |
+ 
+ Features whose need lies outside §6 (LOOP_V2, EDITOR_V2, LOOK_V2, UPGRADE-SCOPE, GLOSSARY §8's foundation, VISION_V2
+@@ -123,7 +126,7 @@ Features whose need lies outside §6 (LOOP_V2, EDITOR_V2, LOOK_V2, UPGRADE-SCOPE
+ ## The drafts
+ | ADR | Decides | Its spikes |
+ |---|---|---|
+-| [0001](adr/0001-multiplayer-netcode.md) | authority, the tick rule, budgets, prediction, snapshots, lag compensation, interest, transport, rooms, upgrades' network side | the netcode proof test; the 60 Hz margin run |
++| [0001](adr/0001-multiplayer-netcode.md) | authority, the tick rule, budgets, prediction, snapshots, lag compensation, interest, transport, rooms, upgrades' network side | the netcode proof test; the 60 Hz margin run (an early signal; slice 6's run on the real sim makes the call) |
+ | [0002](adr/0002-code-structure-build-toolchain.md) | repository, toolchains, crates and dependency rules, the boundary, the skeleton, lint, tests, CI gate v2, previews, the editor build | the Rust ↔ TypeScript boundary spike; the foundation's checks |
+ | [0003](adr/0003-rendering.md) | the renderer and fallback, how each LOOK_V2 item is achieved, characters and crowds, client budgets, measurement, audio, the per-frame flow | the look proof test; the render budget bench |
+ | [0004](adr/0004-simulation-core.md) | plain typed tables, ids, snapshots, the tick, identical results, random streams, physics, navigation, floors, sight, bots, the player record | the sim core spike (and shares in four others) |

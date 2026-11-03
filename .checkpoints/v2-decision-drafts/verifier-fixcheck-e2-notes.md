@@ -3,3 +3,4 @@
 - Rebuild done: 0003 (test-engineer, graphics-engineer), 0005 (test-engineer, game-designer, engine-architect-a, graphics-engineer), 0006 (test-engineer, infra-engineer), GLOSSARY (engine-architect-a): all blocks applied, all four byte-identical to HEAD 59d41e0. Scratch: verifier-fixcheck-e2-scratch/rebuild/.
 - write_guard.sh: GUARD PASS (note: the script itself runs `git fetch -q origin main`; it ran once because the task named it). glossary_check_drafts.py: exact hits 0.
 - Next: read the diff per file (GLOSSARY first, then 0003, 0006, 0005), claims table rows.
+- 0003 claims R1-R13 saved; dispositions: all 0003 map rows have FIX or NOTE (O15,O19,M21,L11-L13,T3,F1-F4,Q1-Q4,X5,LA3). Next: 0006 diff.

@@ -1,0 +1,39 @@
+# Prepared prompt (verbatim, saved before launch) · subagent_type: docs-keeper · effort: high (condition 12) · model: opus · plan revision 4, step 5: the docs after the stop's answers · 2026-11-03, saved about 13:53 Amsterdam, to launch after fixcheck-e
+
+You bring docs/STATUS.md, docs/ROADMAP.md and docs/REPO_MAP.md up to date after the stop of the change-set v2-decision-drafts (SHAMBLE FRONTLINES; branch claude/laughing-lovelace-ox61se standing in for cs/v2-decision-drafts; PR #33). You edit no other file. Name the PR, not a SHA, in the docs.
+
+Read first: Mustafa's answers to the stop, word for word: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/inputs/STOP-ANSWERS-mustafa-2026-11-03.md; the advisor's verdict on plan revision 4 (its conditions 9–11, its rulings, its "Decisions needed" and "For Mustafa"): /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/advisor-verdict-r4.md; the report's appendix §9 (where each answer landed) and §10: docs/reports/2026-11-01-v2-decision-drafts-appendix.md. Your last notes: /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-3-notes.md.
+
+## STATUS (docs/STATUS.md)
+1. Line 3's date: 2026-11-03 (already); the "In flight" paragraph and the change-set's row: the stop is answered (Mustafa and the Advisor, 2026-11-03): the six drafts are signed off as the basis for the spikes, not yet accepted (Status stays Proposed; a draft becomes Accepted only when Mustafa signs it off after its spikes report); the answers are recorded in the drafts; PR #33 is ready for review and merges by squash only, on Mustafa's go after the advisor approves its final head.
+2. A decisions entry in the file's own style ("Taken by Mustafa and the Advisor at the stop, 2026-11-03"): one short line per answer (SPIKE-ORDER (b); TICK-60-HEADROOM with his addition; TICK-60-SETUP (a); NET-PROFILES; REWIND-CAP's rule; SPIKE-MACHINES; LOOK-TEST-INPUTS; TOY-BOX; OQ-0002-8 (a); OQ-0005-1; OQ-0001-14; ROOM-CRASH; OQ-0003-17; OQ-0003-20; OQ-0005-AB12; OQ-0005-AB13; LATER), marked as Mustafa's or the Advisor's exactly as the message marks them (the verdict's condition 2), pointing to the appendix §2 for the words and §9 for where each landed. Quote nothing you have not copied from the inputs file.
+3. "Next": the netcode proof test, its own change-set, branched from main after PR #33 merges, plan first (condition 11); wave 1 runs one heavy spike at a time (the netcode proof test, the sim core spike, then the 60 Hz run, the boundary spike, the look proof test once its models exist; the preview hosting check alongside any). What the proof test still waits on (condition 10): Mustafa's Hetzner console check (OQ-0006-1), the domain for the WebSocket leg registered before the proof test (OQ-0006-15), the reference machines (REF-MACHINES, OQ-0003-1), the VMs' cost (OQ-0006-20), and, for the proof test's own plan with security-auditor, the certificate method and how a session holds its SSH key.
+4. The follow-ups: TOY-BOX's small kit change-set after PR #30 is updated, with the checkpoint anti-waste rules (Mustafa, 2026-11-03); LATER's design session after the netcode proof test (the twelve questions and the 38 design questions on its agenda, the advisor's ruling); the four escalations open for Mustafa (REF-MACHINES, LOOK_V2-§8, SPIKE-COST, DOMAIN), each in one line.
+5. "Open bugs and risks", the change-set's items: one line that PR #33's history holds 31 MB of a skeptic's build output (commit 294b3cf), which the squash merge keeps out of main.
+
+## ROADMAP (docs/ROADMAP.md)
+The change-set's entry: the stop answered (2026-11-03), the drafts signed off as the basis for the spikes and not yet accepted, PR #33 ready, merging by squash. "v2, next": the netcode proof test after the merge, wave 1 one heavy spike at a time. Keep the file's own rules.
+
+## REPO_MAP (docs/REPO_MAP.md)
+The checkpoint folder `.checkpoints/v2-decision-drafts*` leaves the branch in the PR's last commit: remove or reword any row that names it as present. Check every row this change-set added. Then run `node .claude/scripts/repo-map-check.mjs` from the repository root; it must print "repo map OK".
+
+## Save as you go (Mustafa, 2026-11-02: usage limits cut agents mid-task; lose as little as possible)
+- This applies to every agent of this task, the ones running now and every later wave.
+- Create your output file at the start, then add to it as you go: each FIX or NOTE block (or verdict row) goes into the
+  file the moment you have composed it, never held back for the end. The session's background saver commits and pushes
+  the checkpoint folder every 5 minutes, so whatever is in your files survives a cut.
+- Keep the file valid as you go: finish each block (its END line) before you start the next one.
+- After each finding or unit of work, add one line to your notes file: what is done, what comes next.
+- Scratch files (copies of docs, diffs, scripts, fetched excerpts, applied previews) live in the notes folder, in
+  /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/<your-unit>-scratch/, never in /tmp, a scratchpad or
+  .gate/ (those are not saved). Keep scratch to what you need to resume: for a fetched page, save the excerpt you quote
+  and its audit row, not the whole page.
+- On a restart, read your notes, your output file and your scratch folder first, and continue after the last complete
+  block. Never redo a finished block, and never start the file again from scratch.
+(The session adds, for every unit from now on: no binaries and no file over 1 MB in your scratch folder; keep the source and the few lines you quote.)
+
+## Rules
+Plain words; decimals with periods; dates as YYYY-MM-DD. Claim nothing you did not read in the files above; never say the PR is merged. Never edit the Advisor's documents, rules files, research files or code. Keep notes in /home/user/Shamble-Frontlines/.checkpoints/v2-decision-drafts/docs-keeper-4-notes.md (look there first; end with DONE). Never commit or push. Finish by 17:00 Amsterdam.
+
+## Return
+At most 10 lines: each file's changes (one line each), and the repo-map check's output.
