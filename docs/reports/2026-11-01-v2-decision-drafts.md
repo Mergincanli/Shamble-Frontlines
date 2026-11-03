@@ -1,5 +1,5 @@
 # Advisor report: v2-decision-drafts (2026-11-03, branch claude/laughing-lovelace-ox61se, base main 9e7db28)
-Draft PR [#33](https://github.com/Mergincanli/Shamble-Frontlines/pull/33). The branch stands in for
+PR [#33](https://github.com/Mergincanli/Shamble-Frontlines/pull/33), ready for review. The branch stands in for
 `cs/v2-decision-drafts` (this cloud session is limited to it). The details are in the appendix,
 `2026-11-01-v2-decision-drafts-appendix.md`: the brief, Mustafa's words, the advisor's plan review and the plan's rules
 (word for word), the commits, the 19 conditions, and every verification, review, finding and outcome.
