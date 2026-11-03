@@ -1,6 +1,9 @@
-- 09:08 started; files created. Next: read fix blocks and findings, diff 882cfa6..fd8c6f8.
-- 09:15 blocks_apply.py: 10 blocks, each BEFORE once at 882cfa6, AFTER once at fd8c6f8; applied = fd8c6f8 byte for byte, 5 docs, no other change. worddiff.py: re-wraps 0 word changes. Next: S5/S9/S10 vs map 207/211/212 and drafts.
-- 09:35 claims rows 1-20 (the ten blocks) written. Next: rules scripts (glossary, pointers, tables), then blocks table.
-- 09:42 rules scripts (glossary 0 exact, pointers off 0, tables 0/0/0/0, gate PASS) and blocks table done. Next: part 2, report and appendix diff 449356c..HEAD.
-- 09:50 part 2 started: report.diff and appendix.diff saved in scratch. Next: What changed counts, Evidence, Deviations, then appendix rows.
-- 10:15 checked report E1-E11 mostly; found: report 'a fresh verifier dry-ran every restoring block first' wrong for F1a (750d46d 06:18, gdcheck 07:25 only game-designer's 5); appendix §7.3 'fixcheck-d3 judged them all after' wrong for touch-up 4's 10. Next: 31 MB commit, ledgers 8fa7173, row 307, §7.3 lines, line lengths, then write rows.
+- (times: the run started 09:08 Amsterdam; step lines below carry no clock time)
+- started; files created. Next: read fix blocks and findings, diff 882cfa6..fd8c6f8.
+- blocks_apply.py: 10 blocks, each BEFORE once at 882cfa6, AFTER once at fd8c6f8; applied = fd8c6f8 byte for byte, 5 docs, no other change. worddiff.py: re-wraps 0 word changes. Next: S5/S9/S10 vs map 207/211/212 and drafts.
+- claims rows 1-20 (the ten blocks) written. Next: rules scripts (glossary, pointers, tables), then blocks table.
+- rules scripts (glossary 0 exact, pointers off 0, tables 0/0/0/0, gate PASS) and blocks table done. Next: part 2, report and appendix diff 449356c..HEAD.
+- part 2 started: report.diff and appendix.diff saved in scratch. Next: What changed counts, Evidence, Deviations, then appendix rows.
+- checked report E1-E11 mostly; found: report 'a fresh verifier dry-ran every restoring block first' wrong for F1a (750d46d 06:18, gdcheck 07:25 only game-designer's 5); appendix §7.3 'fixcheck-d3 judged them all after' wrong for touch-up 4's 10. Next: 31 MB commit, ledgers 8fa7173, row 307, §7.3 lines, line lengths, then write rows.
+- claims rows 21-68 (report and appendix) written. Next: findings ranked, verdict, return.
+- findings F1-F10 and the verdict written. DONE
