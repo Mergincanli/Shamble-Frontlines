@@ -1,0 +1,5 @@
+tables 139, rows 2072, PM rows 340
+(1) sentences directly under a table: 0
+    other blocks directly under a table (they end a GFM table): 0
+(2) PM rows without exactly 7 cells: 0
+    rows whose cell count differs from their header (any table): 0

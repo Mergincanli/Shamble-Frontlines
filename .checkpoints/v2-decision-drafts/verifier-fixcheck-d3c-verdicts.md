@@ -138,3 +138,93 @@ END
 END
 Task 2 result: 10,245 references checked plus 32 steps; every id, code, part, research id, link and step resolves
 except D3C-2 (3 seam codes) and D3C-3 (12 review codes in 15 places, 35 review finding numbers, map parts a and g).
+
+## Task 3: counts at HEAD (78ccee8), against README and the report's "What changed"
+
+Script: verifier-fixcheck-d3c-scratch/counts.py; output counts-HEAD.out.
+    0001: OQ numbered 18 (1..18), duplicates [], gaps {}, moved [], open 18 | PM rows 62, distinct 62, max 62, duplicates [], gaps []
+    0002: OQ numbered 8 (1..8), ..., open 8 | PM rows 78, distinct 78, max 78, duplicates [], gaps []
+    0003: OQ numbered 20 (1..20), ..., open 20 | PM rows 47, distinct 47, max 47, duplicates [], gaps []
+    0004: OQ numbered 12 (1..12), moved ['OQ-0004-5', 'OQ-0004-6'], open 10 | PM rows 75, distinct 75, max 75, gaps []
+    0005: OQ numbered 36 (CD1..8, AB1..15, AP1..3, AS1..6, -1..4), gaps {}, open 36 | PM rows 46, distinct 46, max 46, gaps []
+    0006: OQ numbered 20 (1..20), open 20 | PM rows 32, distinct 32, max 32, gaps []
+    TOTAL OQ numbered 114, open 112 (moved only); PM 340
+    SPIKE_PLAN OQ ids defined: ['OQ-SPIKE-1']; spike table rows 1..10, plus 2 not-a-spike rows
+    README design questions: 38 rows, distinct 38; the decision map's DESIGN-owned ids: 38, the same set both ways
+    README decisions table: 99 rows; OQ ids in first cells 95, distinct 95, none twice; 18 rows led by a code
+      the drafts' open OQs whose Decider names Mustafa or the Advisor: 88, every one in a first cell
+      6 README rows whose Decider is first an agent or a measurement (OQ-0002-4, -5, OQ-0005-AP1, OQ-0006-2, -5, -16):
+      each names Mustafa or the Advisor further on (read by hand), so each belongs in the table
+    ENGINE_OVERVIEW lines: 144 (condition 19: about 150 at most; the report says 144)
+    No PM row stands outside its own draft.
+| Count | Stated | At HEAD | Verdict |
+|---|---|---|---|
+| OQs per draft | 18, 8, 20, 12 numbered with 10 open, 36, 20 (README drafts table; totals line) | 18, 8, 20, 12/10, 36, 20 | confirmed |
+| OQs total | 114 numbered, 112 open, plus OQ-SPIKE-1 (README:23-24; report "What changed") | 114 numbered; 112 not moved; but OQ-0003-14 is answered | 114 confirmed; "112 open" off by one (D3C-4) |
+| PMs per draft | 62, 78, 47, 75, 46, 32 = 340 | the same; each id once; 1..n, no gaps | confirmed |
+| Design questions | 38 (README; report) | 38 rows = the map's 38 DESIGN ids | confirmed |
+| Decisions list | "every decision code and open question the drafts route to Mustafa or the Advisor, one row each" | 99 rows; all 88 routed open OQs present; none twice | confirmed |
+| ENGINE_OVERVIEW | 144 lines; at most about 150 | 144 | confirmed |
+| SPIKE_PLAN | 10 spikes and the asset-pipeline research | rows 1-10 plus the research row (and the foundation's not-a-spike row) | confirmed |
+| New OQs in the final round | report "Reviews": 25; appendix §7.3: "Twenty-four new open questions" (the drafts') | 47eadd9 -> HEAD adds 24 draft OQs + OQ-SPIKE-1 = 25 | both hold; the two counts differ only by OQ-SPIKE-1 (no finding) |
+
+### D3C-4 (low, count): OQ-0003-14 is answered, yet counted as open
+- Where: docs/adr/README.md:23-24 (engine-architect, synthesis): "Total: 114 numbered open questions, 112 of them open
+  (OQ-0004-5 and -6 point to ADR 0005)"; README:18, the 0003 row's cell "20 (OQ-0003-1 to -20)"; the report
+  docs/reports/2026-11-01-v2-decision-drafts.md:26, "114 numbered open questions (112 open)" (the session).
+- What the draft says: docs/adr/0003-rendering.md, OQ-0003-14: "Answered by its decider, the verifier (plan step 7,
+  2026-11-01), ... Part 9 is unchanged." So 111 are open, not 112 (the same at 47eadd9: "90 numbered, 88 open").
+- Smallest fix: README:23 "112 of them open (OQ-0004-5 and -6 point to ADR 0005)" -> "111 of them open (OQ-0004-5 and -6
+  point to ADR 0005; OQ-0003-14 is answered)"; README:18 0003 cell -> "20 numbered (OQ-0003-1 to -20), 19 open: -14
+  answered"; the report's "(112 open)" -> "(111 open)". Or keep 112 and say the count includes one answered question.
+END
+- Report placeholders: docs/reports/2026-11-01-v2-decision-drafts.md:38, 43, 44 still hold "{TOUCHN}", "{D3}" and "{HEAD}"
+  (the Evidence section, for the session to fill once fixcheck-d3 ends). Not a finding; listed so it is not forgotten.
+
+## Task 4: the scripts at HEAD (78ccee8), run from the repository root
+
+| Script | Output (saved in verifier-fixcheck-d3c-scratch/) | Expected | Verdict |
+|---|---|---|---|
+| `python3 .../scripts/draft_pointers.py` | "pointers checked 94: ok 94, off 0" (draft_pointers.out) | off 0 | PASS |
+| `python3 .../scripts/dispositions.py .../inputs/research-ids.tsv .../engine-architect-decision-map-ids.tsv docs/adr/000[1-6]-*.md docs/adr/README.md docs/SPIKE_PLAN.md` | "ids: 521; disposed: 521; missing: 0; more than once: 0; not where the map puts them: 0; unknown ids: 0"; rows per place 0001 127, 0002 104, 0003 71, 0004 82, 0005 34, 0006 65, DESIGN 38 (dispositions.out) | 521 of 521, each once | PASS |
+| `python3 .../scripts/glossary_check_drafts.py` | "entries 37; exact hits 0; in-context hits 604 (quotes skipped)"; exact 0 in 0001, 0002, 0003, 0004, 0005, 0006, OVW, SPK, IDX (glossary.out) | exact 0 in all nine | PASS |
+| `bash .../scripts/write_guard.sh` | "GUARD PASS" (write_guard.out) | PASS | PASS |
+| tables.py (written for this unit) | "tables 139, rows 2072, PM rows 340"; sentences directly under a table 0; other blocks directly under a table 0; PM rows without exactly 7 cells 0; rows whose cell count differs from their header 0 (tables-HEAD.out). Calibrated on a synthetic file: it catches a glued sentence, a list straight under a table, an 8-cell PM row (an unescaped pipe in a code span) and a 3-cell row under a 2-cell header | 0 and 0 | PASS |
+| legacy gate `node tools/gate.mjs 9e7db28 --no-smoke` | 1-4 and 5b-5d PASS, symbols +0 -0, "GATE PASS (5a smoke skipped)" (gate.out) | PASS | PASS (5a not run: no browser here) |
+
+## Task 1, addendum: labels lost inside an item, 47eadd9 against HEAD
+
+Script: verifier-fixcheck-d3c-scratch/labels.py (per item, the count of each label: What, Why, Why it matters,
+Research, Research ids, Need, Options, Decider, What decides it, Carries; output labels-47eadd9-HEAD.out).
+Calibration (47eadd9 -> 604a497): it reports AB-3's What, Why, Research and Need and AB-1's Why as fallen.
+At HEAD: 15 (item, label) pairs fell, all in four items renamed on purpose (task 1 rows 1, 5, 6 and 16): ADR 0001 part
+12 (Why, Research, Need), OQ-0001-5 and OQ-0001-7 (Why it matters, Options, Decider, What decides it, Research ids each),
+ADR 0004 part 17 (Why, Need). Each label reappears, once, under the renamed item ("gained 0->1"). No label lost.
+END
+
+## Verdict
+
+PASS WITH NOTES. Every structural line of 47eadd9 survives at HEAD (3,225 checked: 0 lost, 21 reworded on purpose by
+the block named, 0 doubled, 0 labels lost); the two losses fixcheck-d2 found are repaired, and the method catches both
+when run against 604a497. 10,245 references and 32 checklist and migration steps checked: all resolve except three seam
+codes the register lacks (D3C-2, medium) and twelve review codes plus review finding numbers that live only in
+checkpoint files (D3C-3, low). Counts hold except "112 open", which counts the answered OQ-0003-14 (D3C-4, low). The
+scripts: pointers off 0; dispositions 521 of 521, each once; glossary exact 0 in all nine; write guard PASS; tables 0
+glued sentences, 340 PM rows of 7 cells; legacy gate PASS (no smoke).
+
+| Id | Severity | Kind | Where | Author | Smallest fix |
+|---|---|---|---|---|---|
+| D3C-2 | medium | dangling reference | 0005:106-107 cites seams S5, S9, S10; README's Seams table has S1, S3, S4, S6, S11, S12 | engine-architect (0005 frame; README) | add rows S5, S9, S10 to README's Seams table (decision map lines 207, 211, 212), or drop the three codes in 0005:106 |
+| D3C-3 | low | dangling reference | 12 review codes in 15 places (0001:478, 513, 604; 0002:1253; 0005:1367; 0006:933; README:77-87), 35 "review, finding n" pointers, decision map parts a and g (0005:97, 2103, 2500) | netcode-architect, test-engineer A, game-designer, infra-engineer, engine-architect | one sentence in README "Codes the drafts cite" naming where the reviews and the map stay readable (the branch history, the last SHA before the checkpoint's deletion) |
+| D3C-4 | low | count | README:23 "112 of them open"; README:18 0003 cell; report:26 "(112 open)" | engine-architect (README); the session (report) | 111 open, "OQ-0003-14 is answered"; 0003's cell "20 numbered, 19 open" |
+| D3C-1 | low | other | 0002:1424-1425 a two-word line "first multiplayer" mid-step; 0001:1518 a 156-character line | engine-architect (0002 migration); test-engineer A (0001 checklist step 7) | rewrap both |
+
+Not verified: nothing fetched (as asked); the gate's 5a smoke (no browser in this container); whether every bare
+"part n" means the part it names (the script checks the part exists in the draft named or in its own draft, and the 25
+it could not place were read by hand); review files' content (provenance only).
+END
+
+Re-check at 09:20: HEAD moved to 88fec25 (checkpoint commits and 54d3fa0, the report's evidence); the nine documents are
+unchanged since 78ccee8 (`git diff --stat 78ccee8 88fec25 -- docs/` lists only the report), so every result above holds
+at 88fec25. The report's line 26 still reads "(112 open)" (D3C-4) and lines 38, 43, 44 still hold {TOUCHN}, {D3}, {HEAD}.
+END
