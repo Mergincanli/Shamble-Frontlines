@@ -23,3 +23,5 @@
 - RP-21 done (README:112 OQ-0005-2 2057->2059); next RP-22
 - RP-22 done (README:113 OQ-0005-3 2068->2070); next RP-23
 - RP-23 done (README:114 OQ-0005-4 2080->2082); next RP-24
+- checks on scratch tree: apply_fixes dry-run 23/23 ok; draft_pointers 'pointers checked 94: ok 94, off 0'; glossary exact hits 0 (all docs exact 0, same as repo); README 373 lines before and after
+DONE
