@@ -115,9 +115,10 @@ secret and repository setting named below is Mustafa's to create, never a sessio
 ## Decision
 
 Serve the player build and every preview link from Cloudflare Pages, and run game servers on Hetzner Cloud in one EU
-location, one room per process under a small supervisor per VM, on a dedicated-vCPU CCX23 named as the reference
-server, with the shared CX33 measured beside it. Keep the budget flat and small at the start (about 18 to 102 EUR a
-month) and state the goal budget at both room densities until the netcode proof test measures how many rooms fit one
+location (Falkenstein, `fsn1`, to start: part 5), one room per process under a small supervisor per VM, on a
+dedicated-vCPU CCX23 named as the reference server; a shared-vCPU fleet (K3) waits for a later measurement (part 5).
+Keep the budget flat and small at the start (about 18 to 102 EUR a month; the lean end rests on the CX33's price,
+part 8) and state the goal budget at both room densities until the netcode proof test measures how many rooms fit one
 VM, a figure that stays provisional until slice 6 measures the real sim (OQ-0006-19). Log, measure and report crashes
 with small, EU-only tools that keep no personal data. Write one balance record per match inside the room, store it as
 JSON lines in EU object storage, and analyse it in batches per content hash. List the security baseline as open, with
@@ -185,9 +186,10 @@ interim positions, until its own research before the first online playtest; the 
    (r6-infrastructure.md, Shared open questions, PREV-DELETE, lines 970–976). A closed pull request's room binary on the
    staging game server is gone within 24 h (R6-HOST-REC3's mark, r6 lines 681–683). *Ids:* R5-PREV-REC3, R5-PREV-OQ2,
    PREV-DELETE. *Need:* GLOSSARY §8, the foundation only (R5-PREV-REC3 serves no §6 item, r5 line 1622).
-4. **The staging game server.** Previews share one small VM,
+4. **The staging game server.** Previews share one small VM, never one VM per pull request:
    [the staging game server](../research/GLOSSARY.md#the-staging-game-server), proposed a CX33 (4 vCPU, 8 GB, 8.99 EUR
-   a month: r6-infrastructure.md, Findings §1, R6-HOST-F15, lines 150–159), never one VM per pull request. Its
+   a month: r6-infrastructure.md, Findings §1, R6-HOST-F15, lines 150–159), which cannot be ordered in Falkenstein
+   (Mustafa, 2026-11-03), so its x86 plan is OQ-0006-22. Its
    supervisor starts the room binary of the build a preview names; it presents development certificates (part 7);
    production servers refuse preview origins, and a preview never connects to a production server
    (r6-infrastructure.md, Recommendations §1, R6-HOST-REC3, lines 672–683). PREVIEW-WALL (a) ends the wait in "Until
@@ -241,18 +243,24 @@ interim positions, until its own research before the first online playtest; the 
    VMs stay up and rooms start and end as processes
    inside them, because billing rounds up to the hour (R6-HOST-F17). The server CPU is x86-64 (the dedicated plans are
    AMD), which answers R1-DET-OQ7 for the first fleet; Arm waits until R1-DET-REC6's matrix includes it. **The
-   reference server** is a CCX23 (4 dedicated vCPU, 16 GB, x86-64 AMD), and the shared CX33 (4 vCPU, 8 GB) is measured
-   beside it (r6-infrastructure.md, Recommendations §1, R6-HOST-REC2, lines 645–671); this answers R2-XU-OQ9
-   (r2-netcode.md, Cross-unit open questions, R2-XU-OQ9, lines 3197–3202), and every native server mark is measured on
-   [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of it. It is a working pick, not a settled one:
-   every EU plan showed "currently unavailable" on 2026-10-28 (R6-HOST-F20, r6 lines 180–182), so Mustafa checks capacity
-   in the Hetzner console with his own account before the netcode proof test is scheduled (OQ-0006-1). The location is
-   Nuremberg (`nbg1`) or Helsinki (`hel1`), Falkenstein (`fsn1`) only if the plans are offered there, picked by a
-   round-trip measurement (r6-infrastructure.md, Options §1, Q4, lines 429–432; OQ-0006-2).
+   reference server** is a CCX23 (4 dedicated vCPU, 16 GB, x86-64 AMD) (r6-infrastructure.md, Recommendations §1,
+   R6-HOST-REC2, lines 645–671); this answers R2-XU-OQ9 (r2-netcode.md, Cross-unit open questions, R2-XU-OQ9, lines
+   3197–3202), and every native server mark is measured on
+   [one vCPU](../research/GLOSSARY.md#the-measuring-unit-one-vcpu) of it. Every EU plan showed "currently unavailable"
+   on 2026-10-28 (R6-HOST-F20, r6 lines 180–182); Mustafa's console check answered OQ-0006-1 and his correction
+   answered OQ-0006-2: the test servers are in Falkenstein (`fsn1`), "a CCX23 for the game server and a CAX21 for the
+   48 simulated players. I created both once to try the console and deleted them right away. They'll be created fresh
+   on run day, so their IP addresses will be new then." (Mustafa, 2026-11-03). So every server row runs on the CCX23,
+   and the CAX21 (Arm64) carries only bot clients and the run's metrics (the pass marks' key, LG and MV); no address
+   is fixed. The first production fleet starts in the test servers' location unless playtesters' round trips
+   (R6-HOST-OQ2, open) say otherwise (the advisor's reading, 2026-11-03). The shared CX33 that R6-HOST-REC2 measures
+   beside the reference server cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so it is not measured: a shared
+   fleet (K3) waits for a later measurement of a shared x86 plan that can be ordered in the fleet's location (part 8).
    *Why:* dedicated vCPUs are sold for "highly predictable resources" and name gaming servers, which the fair tick of
    VISION_V2 §4 and [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) need; 20 TB of egress per
-   VM is included; the shared CX33 is 9.6 times cheaper (8.99 against 86.49 EUR), so it is measured, not assumed
-   (r6 lines 656–659; R6-HOST-F14, F15, r6 lines 144–159). *Ids:* R6-HOST-REC2, R2-XU-OQ9, R1-DET-OQ7, R6-HOST-OQ3 (answered:
+   VM is included; the shared CX33 is 9.6 times cheaper (8.99 against 86.49 EUR), which is why a shared plan is
+   measured before a fleet uses it, never assumed (r6 lines 656–659; R6-HOST-F14, F15, r6 lines 144–159). *Ids:*
+   R6-HOST-REC2, R2-XU-OQ9, R1-DET-OQ7, R6-HOST-OQ3 (answered:
    no UDP load balancer while the lobby hands out host and port, r6 lines 859–861). *Need:* VISION_V2 §6.1, §6.5, §6.6 and
    §6.8 (rooms, economy, records and moments on the server) and VISION_V2 §4 (one EU region, fair to about 100 ms)
    (r6 lines 665–666).
@@ -285,9 +293,10 @@ interim positions, until its own research before the first online playtest; the 
    private key sits on every VM) is an option the security baseline weighs. Which ACME challenge issues the
    per-hostname certificates (http-01 needs TCP port 80 on each game VM; dns-01 per name needs a DNS provider's API key,
    a secret) and how long they live is OQ-0006-5 (R6-HOST-F24, r6 lines 198–204; R6-HOST-OQ6, r6 lines 869–874). Every
-   per-hostname certificate needs a domain and a DNS zone. Mustafa registers one for the netcode proof test's
-   WebSocket leg ("for the WebSocket leg, a domain I register": Mustafa, 2026-11-03, SPIKE-MACHINES), and names it:
-   "shamblefrontlines.com, which I register at Cloudflare" (Mustafa, 2026-11-03, DOMAIN; OQ-0006-15, answered).
+   per-hostname certificate needs a domain and a DNS zone. The netcode proof test's WebSocket leg has one ("for the
+   WebSocket leg, a domain I register": Mustafa, 2026-11-03, SPIKE-MACHINES), named
+   "shamblefrontlines.com, which I register at Cloudflare" (Mustafa, 2026-11-03, DOMAIN; OQ-0006-15, answered), and
+   registered (Mustafa, 2026-11-03).
    Production uses the same domain, since it is the game's name and part 6 needs one registrable domain
    (the advisor's reading, 2026-11-03). Which DNS host serves it, and what the domain and the DNS host cost, are not
    researched. Development
@@ -298,7 +307,7 @@ interim positions, until its own research before the first online playtest; the 
    (r6-infrastructure.md, Options §1, Q3, option C3, lines 426–427; r2-netcode.md, R2-TRN-OQ4, lines 3050–3054). The
    netcode proof test runs on the development certificates for WebTransport, "a private hash-pinned certificate for
    WebTransport" as Mustafa set for the spikes (2026-11-03, SPIKE-MACHINES); its WebSocket fallback presents a
-   browser-trusted certificate on the domain he registers, OQ-0006-5's development case (i), issued by a method the
+   browser-trusted certificate on the registered domain, OQ-0006-5's development case (i), issued by a method the
    proof test's own plan sets with security-auditor (the advisor's reading, 2026-11-03); the production form is needed
    from the first online
    playtest, after the security baseline's research. An alert fires when any VM's certificate has under 14 days left
@@ -323,13 +332,17 @@ interim positions, until its own research before the first online playtest; the 
 8. **Costs** (prices read 2026-10-28, excluding VAT; [the start modes and the goal modes](../research/GLOSSARY.md#the-start-modes-and-the-goal-modes)).
    - *Start* (MODES-3 (a); assumption A-4: up to 2 rooms at once, 18 humans each, playtests about 4 hours a day, servers
      on all month): about 18 EUR a month lean (production CX33 8.99 + staging CX33 8.99 = 17.98 EUR, 0 USD) to about
-     102 EUR + 5 USD reference (production CCX23 86.49 + staging CX33 8.99 + match records on Hetzner Object Storage
-     6.49 = 101.97 EUR; 5 USD only if Worker code is needed); egress about 137 GB, inside the 20 TB
-     (r6-infrastructure.md, Options §2, start scenario, lines 466–480).
+     102 EUR + 5 USD reference (production CCX23 86.49 + staging 8.99 + match records on Hetzner Object Storage
+     6.49 = 101.97 EUR, where 8.99 is the staging VM's placeholder price (the CX33's, R6-HOST-F15); its plan is
+     OQ-0006-22; 5 USD only if Worker code is needed); egress about 137 GB, inside the 20 TB
+     (r6-infrastructure.md, Options §2, start scenario, lines 466–480). The lean case rests on the CX33's price for
+     production (K3) and staging; the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so it holds only
+     where a shared x86 plan can be ordered in the fleet's location and K3 passes (the advisor's reading, 2026-11-03).
    - *Goal* (12v12v12 or 24v24; A-5: a peak of 20 rooms of 48 humans, an average of 6 rooms, the fleet sized to the peak
      plus one VM for draining): at R6's 8 rooms per VM, about 361 EUR (a fixed CCX23 fleet of 4 VMs) or about 238 EUR
-     (a fixed base plus VMs added by the hour, K2), each + 19–24 USD + Sentry's paid plan, match records included (r6 lines
-     482–494). **Changed from R6-COST-REC1:** at the 4 rooms per VM that A-2 names "the case to budget" until
+     (a fixed base plus VMs added by the hour, K2), each + 19–24 USD + Sentry's paid plan, match records and the staging
+     VM at its placeholder 8.99 included here and below (r6 lines 482–494; OQ-0006-22). **Changed from R6-COST-REC1:**
+     at the 4 rooms per VM that A-2 names "the case to budget" until
      R2-ROOM-REC2 marks 1 and 2 pass (r6 lines 516–522), the fixed fleet is ceil(20 ÷ 4) + 1 = 6 CCX23, 6 × 86.49 = 518.94
      EUR, so about 534 EUR with the staging VM and the match records (518.94 + 8.99 + 6.49 = 534.42 EUR) + 19–24 USD +
      Sentry. Neither density is a bound: at the marks' own ceilings a room may take 0.5 vCPU for the server tick (p99
@@ -349,10 +362,11 @@ interim positions, until its own research before the first online playtest; the 
      provisional figures above and decides nothing (the advisor's reading, 2026-11-03; ADR 0001 part 2). Egress stays
      inside the included traffic at either density: at 4 rooms, 4 × 3.156 GB × 730 h ≈ 9.2 TB per VM, under 20 TB
      (arithmetic on r6 lines 461–463).
-   - *Fleet shape:* a fixed fleet (K1) first; K2 only once real concurrency data shows a clear peak; the shared CX33
-     fleet (K3) only if the shared-vCPU measurement passes; each extra room of peak capacity costs 86.49 ÷ 8 ≈ 10.81 EUR
-     a month at 8 rooms per VM, 21.62 EUR at 4 (r6-infrastructure.md, Recommendations §2, R6-COST-REC1, lines 703–717;
-     scaling rule, lines 499–500).
+   - *Fleet shape:* a fixed fleet (K1) first; K2 only once real concurrency data shows a clear peak; a shared-vCPU
+     fleet (K3) only after a later measurement of a shared x86 plan that can be ordered in the fleet's location passes
+     (the shared CX33 cannot be ordered in Falkenstein, Mustafa, 2026-11-03: part 5); each extra room of peak capacity
+     costs 86.49 ÷ 8 ≈ 10.81 EUR a month at 8 rooms per VM, 21.62 EUR at 4 (r6-infrastructure.md, Recommendations §2,
+     R6-COST-REC1, lines 703–717; scaling rule, lines 499–500).
    - *Cost per match:* every match record carries its room-hours and bytes sent, and a monthly bill check compares VM
      hours and traffic against the 20 TB included per VM (r6-infrastructure.md, Recommendations §2, R6-COST-REC2, lines
      718–725); Mustafa reads the invoice in his own account.
@@ -370,8 +384,9 @@ interim positions, until its own research before the first online playtest; the 
      from slice 1, when no game server is budgeted. A CCX23 is created per bench session and deleted after it, billed
      by the hour (R6-HOST-F17, r6 lines 164–168) at 0.1386 EUR (R6-HOST-F15), so 20 bench hours a month, a placeholder,
      cost 20 × 0.1386 = 2.77 EUR. ADR 0002's 3-hour soak before each playtest takes the same path, with its bot clients
-     on a CX33 beside the reference server, never on it (as spike 2's load generators): 3 × (0.1386 + 0.0144) =
-     0.46 EUR a playtest. Mustafa creates and deletes these VMs himself, and sessions get SSH access only and no
+     on a client VM beside the reference server, never on it (as spike 2's load generators): 3 × (0.1386 + 0.0176) =
+     0.47 EUR a playtest (0.0176 a CAX21-hour, R6-HOST-F15). Mustafa creates and deletes these VMs himself, and
+     sessions get SSH access only and no
      Hetzner token, until the security baseline: OQ-0006-17's answer (Mustafa, 2026-11-03) covers the bench and the
      soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so every
      bench session and every soak waits for him to create its VMs (at the placeholder, 20 bench hours a month).
@@ -559,9 +574,9 @@ interim positions, until its own research before the first online playtest; the 
 14. **Its spike and its operations marks.** The preview hosting check (small, on a test project in Mustafa's
     Cloudflare account, before the foundation's preview step) proves part 1, PREV-DELETE and B9's interim position, and
     its token is revoked when it ends; the netcode proof test
-    (ADR 0001's) carries this record's operations marks: rooms per VM on both machines, egress per match-hour, the
-    spike's own bill, logging cost, the metrics and their path, and the firewall. Both are listed under "What a spike
-    must prove". *Need:* as parts 1, 3, 5, 8 and 9.
+    (ADR 0001's) carries this record's operations marks: rooms per VM on the reference server, egress per match-hour,
+    the spike's own bill, logging cost, the metrics and their path, and the firewall. Both are listed under "What a
+    spike must prove". *Need:* as parts 1, 3, 5, 8 and 9.
 15. **Releases (open: OQ-0006-14).** How a new client build, content set or room binary reaches production, how two
     versions meet while rooms run, and how a bad server release is rolled back are not designed, and no topic
     researched them. As things stand, the lobby sends a client only to rooms of its own build and content hash, and a
@@ -604,7 +619,7 @@ the option serves the same build and does not touch what a player sees.
 | Option | Complexity | Cost | Scalability and performance | Security and anti-cheat | Effect on the look and feel | Effort from the current code | Pros and cons |
 |---|---|---|---|---|---|---|---|
 | **G1. Hetzner Cloud, dedicated vCPU (CCX23 as the reference server, proposed)** | Medium: our own VMs, a supervisor, a firewall; no load balancer, the lobby hands out host and port | CCX23 86.49 EUR a month (0.1386 an hour), 20 TB included, 1 EUR per extra TB (an inferred reading: R6-HOST-F15, F16, r6 lines 150–163) | "highly predictable resources", sold for gaming servers (R6-HOST-F14, r6 lines 144–149) | Firewall filters UDP, stateful, drops what no rule allows (R6-HOST-F18, r6 lines 169–174) | Fair server ticks serve VISION_V2 §4's "fair up to about 100 ms of ping" | From zero | **Pros:** predictable tick; egress free at full load. **Cons:** EU plans showed "currently unavailable" on 2026-10-28 (R6-HOST-F20, r6 lines 180–182); a single provider |
-| **G2. Hetzner Cloud, shared vCPU (CX33, measured beside G1)** | As G1 | CX33 8.99 EUR a month (0.0144 an hour) (F15) | "designed for variable usage patterns rather than sustained high workloads" (F14): server tick [p99](../research/GLOSSARY.md#time-statistics) must be measured | As G1 | Noisy neighbours could break the server tick budget (r6 line 416) | From zero | **Pros:** 9.6 times cheaper. **Cons:** unproven for a fair tick |
+| **G2. Hetzner Cloud, shared vCPU (CX33, measured beside G1)** | As G1 | CX33 8.99 EUR a month (0.0144 an hour) (F15) | "designed for variable usage patterns rather than sustained high workloads" (F14): server tick [p99](../research/GLOSSARY.md#time-statistics) must be measured | As G1 | Noisy neighbours could break the server tick budget (r6 line 416) | From zero | **Pros:** 9.6 times cheaper. **Cons:** unproven for a fair tick; not measured after all: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits (part 5) |
 | G3. Fly.io Machines | UDP not read (outside the allow list) | performance-2x 66 USD a month plus 0.02 USD per GB of egress (R6-HOST-F22, r6 lines 186–192) | Dedicated-ness not read | Not read | Not read | From zero | **Cons:** 3.16 GB per 24v24 match-hour makes egress about 369 USD a month per loaded host (r6 lines 461–464) |
 | G4. Amazon GameLift Servers | Managed fleets, not read in detail | c6a.large 0.099 USD an hour on demand, 0.03 on Spot, Ohio; bandwidth free on generation 6 and later; EU rates not read (R6-HOST-F23, r6 lines 193–197) | Managed scaling, not read | Not read | Not read | From zero | **Cons:** lock-in to its server SDK (not read) |
 | Hetzner dedicated root servers; Netcup, OVHcloud, Scaleway | not researched (R6-HOST-OQ1, OQ4, r6 lines 852–855 and 862–865) | not researched | not researched | not researched | not researched | not researched | Netcup, OVHcloud, Scaleway: read only if OQ-0006-1 rules Hetzner Cloud out; Hetzner's dedicated root servers, "a further candidate at goal scale", are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (R6-HOST-OQ4, r6 lines 863–865) |
@@ -629,10 +644,12 @@ the option serves the same build and does not touch what a player sees.
 | tls-alpn-01 (RFC 8737: "This connection MUST use TCP port 443.") | not researched beyond that quote (r6 lines 871–874) | not researched | not researched | not researched | not researched | not researched | Named for OQ-0006-5 and the port plan (OQ-0006-16) |
 
 ### Q6. The starting location (r6-infrastructure.md, Options §1, Q4, lines 429–432)
-Nuremberg (`nbg1`) or Helsinki (`hel1`), in Hetzner's one EU zone; Falkenstein (`fsn1`) only if the plans are offered
-there (their product pages list "NBG1 HEL1", R6-HOST-F13, r6 lines 136–143). No latency source was read for any of them,
-so the table's columns are equal but for latency, which a measurement decides (OQ-0006-2): complexity, cost and effort
-are the same in all three; security the same; the look and feel differ only through round-trip time.
+R6 weighed three locations in Hetzner's one EU zone (OQ-0006-2's options, kept there as the record); the product pages
+it read listed two of them and not Falkenstein (R6-HOST-F13, r6 lines 136–143), and no latency source was read for any
+of them, so the columns are equal but for latency: complexity, cost and effort are the same in all three; security the
+same; the look and feel differ only through round-trip time. Mustafa answered it for the test servers: "both test
+servers will be in Falkenstein, not Nuremberg: a CCX23 for the game server and a CAX21 for the 48 simulated players"
+(Mustafa, 2026-11-03; OQ-0006-2); playtesters' round trips to `fsn1` (R6-HOST-OQ2) check it for production (part 5).
 
 ### Q7. Logs, metrics and traces (r6-infrastructure.md, Options §3, Q1–Q3, lines 532–549)
 
@@ -710,9 +727,12 @@ Researching it before this record, or leaving it as one shared question: settled
   once per Brave session for every check (R5-PREV-REC5). OQ-0006-4 lets him weigh a split.
 - **Game servers (Q3, Q4).** Dedicated vCPUs win because the fair tick needs "highly predictable resources", and
   Hetzner's included 20 TB makes egress, the cost that grows with players, zero even at full load (R6-HOST-F14, F15;
-  r6 lines 461–464). The shared CX33 is measured beside it because it is 9.6 times cheaper. The strongest argument against
+  r6 lines 461–464). A shared plan, 9.6 times cheaper in the CX33's case, waits for a later measurement (K3; the CX33
+  cannot be ordered in Falkenstein, Mustafa, 2026-11-03). The strongest argument against
   Hetzner is that its EU plans showed "currently unavailable" on 2026-10-28 (R6-HOST-F20) and that it is a single
-  provider: OQ-0006-1 makes that a check before the netcode proof test, not a surprise during it. A fixed fleet (K1)
+  provider: OQ-0006-1's console check answered the first before the netcode proof test, and since its VMs are created
+  fresh on each run day, capacity on the day stays ADR 0001's failure row, with OQ-0006-1 (b) as the fallback (the
+  advisor's reading, 2026-11-03). A fixed fleet (K1)
   wins on simplicity; against it, K2 would save about 36 % of the goal's game-VM cost (r6 line 503), which is worth
   automating only once real concurrency data shows a peak.
 - **The goal budget at two densities (part 8).** Stating both 361 EUR (8 rooms per VM) and 534 EUR (4 rooms per VM)
@@ -745,7 +765,7 @@ Researching it before this record, or leaving it as one shared question: settled
   or preview loads; Hetzner Cloud down, no online match runs, while local play with bots still runs in the Worker
   (SLICE-ORDER condition 1); object storage down, records wait on the VM's disk and upload later (R6-TEL-REC2, r6 lines
   817–818); Sentry or Grafana down, reports and metrics are lost for that time and the game runs on; the DNS provider
-  down (once the game's domain is registered, OQ-0006-15), names stop resolving as cached records expire, so new joins
+  down (the game's domain is registered, OQ-0006-15), names stop resolving as cached records expire, so new joins
   fail while running rooms go on.
 
 ## Consequences
@@ -755,17 +775,20 @@ Researching it before this record, or leaving it as one shared question: settled
   not a guess (R6-COST-REC2); balance work starts from one versioned record per match, comparable within a content
   hash (R6-TEL-REC3).
 - **Harder:** Mustafa holds accounts with Cloudflare and Hetzner before the first spikes (a test project on
-  Cloudflare Pages and a Hetzner console check), and later with Sentry and Grafana; until the security baseline he
+  Cloudflare Pages and a Hetzner project; his console check is done, OQ-0006-1), and later with Sentry and Grafana;
+  until the security baseline he
   creates and deletes every VM of the spikes, the tick bench and the playtest soaks himself (OQ-0006-17, Mustafa,
   2026-11-03; the bench and the soaks: the advisor's reading, 2026-11-03) and gives his OK to each run's cost cap in
-  that run's plan (OQ-0006-20, Mustafa, 2026-11-03); he registers shamblefrontlines.com at Cloudflare (OQ-0006-15,
-  Mustafa, 2026-11-03) before the netcode proof test (the advisor's reading, 2026-11-03); every multiplayer preview
+  that run's plan (OQ-0006-20, Mustafa, 2026-11-03); he holds shamblefrontlines.com at Cloudflare (OQ-0006-15),
+  registered (Mustafa, 2026-11-03); every multiplayer preview
   needs his login once per Brave session; each production game VM needs a certificate issuance path (OQ-0006-5) and a
   domain (OQ-0006-15); the lobby still has no place in the budget (OQ-0006-3); until OQ-0006-13 is answered, every
   preview deploy waits for his approval (B9); releases wait on OQ-0006-14.
-- **Revisit when:** Hetzner's EU plans are not orderable (OQ-0006-1); PREV-DELETE fails on Pages (move to Workers
+- **Revisit when:** Hetzner's plans cannot be ordered in `fsn1` on a run day (OQ-0006-1 (b)); PREV-DELETE fails on
+  Pages (move to Workers
   static assets); the netcode proof test measures rooms per VM (a provisional goal budget) and slice 6 re-measures it
-  on the real sim (the goal budget fixed, OQ-0006-19); the shared CX33 passes (K3) or
+  on the real sim (the goal budget fixed, OQ-0006-19); a shared x86 plan that can be ordered in the fleet's location
+  passes a later measurement (K3) or
   real concurrency data shows a peak (K2); the security baseline lands (certificates, CSP, the advisories policy, the
   guest secret, key storage); a later design routes many rooms through one address (a UDP load balancer, R6-HOST-OQ3,
   r6 lines 859–861); production isolation is adopted (OQ-0006-12); Mustafa's data-protection read is done (OQ-0006-9);
@@ -797,6 +820,15 @@ Researching it before this record, or leaving it as one shared question: settled
 ## Open questions
 
 - **OQ-0006-1. Can Mustafa order Hetzner's CCX23 and CX33 in an EU location?**
+  - Answered by Mustafa (2026-11-03): "in Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its
+    Arm64 version can." (his Hetzner check) and "a CCX23 for the game server and a CAX21 for the 48 simulated players.
+    I created both once to try the console and deleted them right away. They'll be created fresh on run day, so their
+    IP addresses will be new then." (his correction). So (a) holds: the reference server stands, a CCX23 in `fsn1`
+    (part 5); the CX33 is not measured (K3 waits, part 8), and the staging VM's plan is OQ-0006-22. VMs created fresh
+    on each run day mean capacity on the day is not guaranteed, so ADR 0001's failure row on Hetzner capacity and
+    (b)'s route stay the fallback (the advisor's reading, 2026-11-03). R6-HOST-OQ4 and R6-HOST-OQ7, which this entry
+    carries, stay open, each with its own trigger as written under *Options*. The options below stay as the record of
+    what was weighed.
   - *Why it matters:* every native server mark and the netcode proof test run on the reference server; on 2026-10-28
     every EU plan showed "This product is currently unavailable. Please check back later." (R6-HOST-F20, r6 lines 180–182).
   - *Options:* (a) orderable: the reference server stands; (b) a real shortage: read the fallbacks first, Fly.io's UDP
@@ -806,9 +838,13 @@ Researching it before this record, or leaving it as one shared question: settled
     (R6-HOST-OQ4, r6 lines 863–865; migration step 1). The IPv4 price is read at sign-up; it is under 1 EUR per VM
     either way (R6-HOST-OQ7, r6 lines 875–876).
   - *Decider:* Mustafa (a console check in his own account; agents create no account), then a research read if (b).
-  - *What decides it:* the console offering both plans in `nbg1` or `hel1` before the netcode proof test is scheduled.
+  - *What decides it:* the console offering both plans in an EU location before the netcode proof test is scheduled.
   - *Carries:* R6-HOST-OQ1, R6-HOST-OQ4, R6-HOST-OQ7.
 - **OQ-0006-2. Which EU location: Nuremberg, Helsinki, or Falkenstein if offered?**
+  - Answered by Mustafa (2026-11-03): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game
+    server and a CAX21 for the 48 simulated players" (his correction). So both test servers are created in `fsn1` on
+    each run day, and the first production fleet starts there unless playtesters' round trips (R6-HOST-OQ2, still
+    open) say otherwise (the advisor's reading, 2026-11-03). The options below stay as the record of what was weighed.
   - *Why it matters:* VISION_V2 §4 asks for matches that feel fair up to about 100 ms of ping from one EU region.
   - *Options:* `nbg1`, `hel1`; `fsn1` only if the plans are offered there (R6-HOST-F13, r6 lines 136–143).
   - *Decider:* a measurement made before the reference server is created (a small check at the start of the netcode
@@ -844,7 +880,8 @@ Researching it before this record, or leaving it as one shared question: settled
 - **OQ-0006-5. How are the per-hostname production certificates issued, how long do they live, and which certificate
   does the WebSocket fallback present on development and staging servers?**
   - Answered in part by Mustafa (2026-11-03): "Certificates: a private hash-pinned certificate for WebTransport; for
-    the WebSocket leg, a domain I register." So the netcode proof test's WebSocket leg takes the development case (i)
+    the WebSocket leg, a domain I register." (the domain: registered (Mustafa, 2026-11-03), OQ-0006-15). So the netcode
+    proof test's WebSocket leg takes the development case (i)
     below, a trusted certificate on his domain (the advisor's reading, 2026-11-03); still open: how that certificate is
     issued on a spike VM (http-01 and tls-alpn-01 need an open port, dns-01 a secret, and OQ-0006-16's port plan
     applies), decided in the netcode proof test's own plan with security-auditor; the staging case, shapes (A) and (B)
@@ -980,8 +1017,9 @@ Researching it before this record, or leaving it as one shared question: settled
     1 and its question RELEASE-WINDOW).
 - **OQ-0006-15. Which domain do the client host, the lobby and the game servers use, and when is it registered?**
   - Answered by Mustafa (2026-11-03): "for the WebSocket leg, a domain I register." (SPIKE-MACHINES) and
-    "shamblefrontlines.com, which I register at Cloudflare." (DOMAIN). So (b) is decided for the netcode proof test: a
-    domain he registers before it, for its WebSocket leg (the advisor's reading, 2026-11-03). Production uses the same
+    "shamblefrontlines.com, which I register at Cloudflare." (DOMAIN); registered (Mustafa, 2026-11-03): "DOMAIN: done.
+    shamblefrontlines.com is registered at Cloudflare." So (b) is decided for the netcode proof test: the registered
+    domain serves its WebSocket leg (the advisor's reading, 2026-11-03). Production uses the same
     domain, since it is the game's name and part 6 needs one registrable domain (the advisor's reading, 2026-11-03).
     Which DNS host serves it, and what the domain and the DNS host cost, are not researched. The options below stay as
     the record of what was weighed.
@@ -1071,7 +1109,8 @@ Researching it before this record, or leaving it as one shared question: settled
     and logging rows about 3 h; 14.3 + 3.3 + 2.2 + 3 ≈ 23), 23 × 0.1386 = 3.19 EUR, before ADR 0001's 3-run rows
     (perhaps 15 to 30 RS-hours, proposed: the infra review's guess, which the run plan replaces with a sum;
     15 to 30 × 0.1386 = 2.08 to 4.16 EUR) and the CX33 hours of SH, MV and the load generators (as many as spike 2's
-    calibration run asks); so a 5 EUR cap over everything would send the plan back to the draft at its planning check.
+    calibration run asks; the rig is now the CCX23 and CAX21s, part 5); so a 5 EUR cap over everything would send the
+    plan back to the draft at its planning check.
   - *Options:* (a) 5 EUR for this record's own operations runs (R6's scope), with ADR 0001's runs on their own line
     of the run plan; (b) one cap set from the run plan, written as arithmetic at R6-HOST-F15's hourly prices (0.1386
     EUR a CCX23-hour, 0.0144 a CX33-hour) before the first session; (c) 5 EUR over everything, as written before.
@@ -1095,6 +1134,18 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Carries:* no research id. Related open design questions it does not answer: R2-ROOM-OQ7 (whether private
     matches count for Service points and telemetry) and R6-TEL-OQ2 (whether bot and private matches count in balance
     rates, part 12). Progression lives under VISION_V2 §6.10 `[LATER]` (the advisor's reading, 2026-11-03).
+- **OQ-0006-22. Which x86 plan runs the staging game server, now that the proposed CX33 cannot be ordered in
+  Falkenstein?**
+  - *Why it matters:* the staging VM runs the room server (part 4), and an Arm plan is an Arm host (ADR 0004's
+    PM-0004-26 first); part 8's lean case rests on the CX33's price, and Mustafa's check (2026-11-03) found "in
+    Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its Arm64 version can."
+  - *Options:* (a) a CX33 (8.99 EUR a month) only where it can be ordered; (b) a CCX13 (43.49, R6-HOST-F15) if it can
+    be ordered in the fleet's location; (c) a shared x86 "Regular Performance" plan (CPX32 35.99, R6-HOST-F15), whose
+    locations are not researched. Prices excluding VAT, read 2026-10-28 (r6-infrastructure.md, Findings §1, lines
+    150–159). Until it is answered, part 8 and PM-0001-63 carry 8.99 as the staging VM's placeholder price.
+  - *Decider:* Mustafa (money), with the Advisor.
+  - *What decides it:* his choice before slice 3 (online), when the staging game server is first created (part 4).
+  - *Carries:* no research id (the advisor's ruling HZ-STAGING, 2026-11-03, on his Hetzner check).
 
 ## What a spike must prove
 
@@ -1129,14 +1180,15 @@ before the foundation's preview step). It proves parts 1, 2 and 3, and B9's inte
   `production` environment is refused by its deployment-branch rule (how that rule treats a pull request's merge ref
   was not read); ADR 0002's PM-0002-66 bite is the same test.
 
-**2. This record's operations marks inside the netcode proof test** (ADR 0001's spike, on the reference server; its
-precondition is OQ-0006-1). They prove parts 5, 7, 8 and 9:
-- rooms per VM: on the CCX23 and on the CX33, 8 rooms of 48 players (bots) as 8 processes, each room's server tick p99
-  within 10 % of the single-room figure, over 20 minutes, repeated at 3 times of day on the shared host
+**2. This record's operations marks inside the netcode proof test** (ADR 0001's spike, on the reference server, a
+CCX23 in `fsn1`; its precondition, OQ-0006-1, is answered). They prove parts 5, 7, 8 and 9:
+- rooms per VM: on the CCX23, 8 rooms of 48 players (bots) as 8 processes, each room's server tick p99
+  within 10 % of the single-room figure, over 20 minutes
   (r6-infrastructure.md, R6-HOST-REC2's mark, lines 667–671; R2-ROOM-REC2 mark 2, r2-netcode.md lines 2775–2782, ADR
-  0001's test); and rooms per VM measured on both machines at 48, 36 and 18 players (R6-COST-REC1's mark, r6 lines
+  0001's test); and rooms per VM measured at 48, 36 and 18 players (R6-COST-REC1's mark, r6 lines
   714–717), counted as the most rooms for which R2-ROOM-REC2 marks 1 and 2 still hold (the counting rule is proposed
-  here, so the figure means the same on both machines). This replaces A-2 for part 8's goal budget (R6-COST-OQ1),
+  here); the shared host's half of R6-HOST-REC2's mark (3 times of day) waits with K3 (part 8). This replaces A-2 for
+  part 8's goal budget (R6-COST-OQ1),
   provisionally: the netcode proof test's sim is a stand-in that may cost less than the real one, so in these density
   runs its sim step is padded, by a busy-wait, to the sim step share's ceiling of 8.33 ms (ADR 0001, part 3), which
   makes the figure a lower bound on rooms per VM for any sim inside its share (proposed interim, OQ-0006-19), and the
@@ -1186,21 +1238,34 @@ to PM-0006-31). Every number is a research mark
   id into its HTML as the build marker. **TR**, the repository that holds the test pull requests and the spike's
   throwaway deploy and close workflows (Mustafa names it and adds its `preview` environment and token). **RS**,
   [the reference server](../research/GLOSSARY.md#the-reference-server): a Hetzner CCX23 (4 dedicated vCPU, 16 GB,
-  x86-64 AMD) in the location OQ-0006-2 picks (`nbg1` or `hel1`). **SH**, the shared CX33 (4 vCPU, 8 GB) beside it,
-  same location. **LG**, the load generator: one or more separate VMs in the same location that run every bot client,
-  never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
-  ("the CX33 runs the simulated clients": SPIKE-MACHINES, Mustafa, 2026-11-03), as many as a 5-minute calibration run
-  at the session's load shows keep each under 80 % of its
-  CPU, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
+  x86-64 AMD) in Falkenstein (`fsn1`): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game
+  server and a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03; OQ-0006-2, answered). Every server row runs on
+  RS ("the rig is just the CCX23 and the CAX21": the option he chose, in the session's wording, 2026-11-03), and no
+  shared host is measured beside it: the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits
+  (part 8). **LG**, the load generator: "a CAX21 for the 48 simulated players" (Mustafa, 2026-11-03), Arm64 (4 vCPU,
+  8 GB), "so their build targets aarch64" (Mustafa, 2026-11-03, his console check), created in `fsn1` on the run day; it
+  runs every bot client, never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the
+  marks measure). Each LG VM stays under 80 % of its CPU, as a 5-minute calibration run at the session's load shows
+  first, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
   encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
-  spend up to 1 vCPU per 48 sessions, ADR 0001); their count goes into the run plan and PM-0006-18. On LG's addresses
-  the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is recorded
-  (What a spike must prove, item 2). **MV**, a
-  CX33 in the same location running Prometheus, standing in for the staging game server, which exists only from slice 3
-  (proposed). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the minimum laptop (Windows 11:
-  Chrome, Edge, Firefox); MAC, a macOS machine with Safari. They carry no budget row here: every client mark in this
-  record is a yes-or-no or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own
-  accounts.
+  spend up to 1 vCPU per 48 sessions, ADR 0001). A run whose bots one CAX21 cannot carry under 80 % adds as many CAX21s
+  as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run (LG-COUNT, the option he
+  chose, 2026-11-03); their count goes into the run plan and PM-0006-18, and the plan names which CAX21 carries MV. On
+  LG's addresses the per-address connection cap (ADR 0001) is raised to the run's session count, and the raised value is
+  recorded (What a spike must prove, item 2). **MV**, the metrics role: Prometheus on LG's CAX21, never on RS, inside
+  LG's 80 % rule, standing in for the staging game server (the advisor's reading, 2026-11-03), which exists only from
+  slice 3; the calibration run includes it. **The day's addresses:** the VMs are new at every run ("I created both once
+  to try the console and deleted them right away. They'll be created fresh on run day, so their IP addresses will be new
+  then.": Mustafa, 2026-11-03), so no address is written here and each run records its own with its results, and every
+  setting bound to one is made on the run day (the connection cap on LG's addresses; any firewall rule that names a
+  source, as PM-0006-15's SSH and metrics rules and PM-0006-16's; the WebSocket leg's DNS record on
+  shamblefrontlines.com, set before its certificate is issued), while the new SSH host keys' check goes to the proof
+  test's plan with security-auditor and the WebTransport certificate is pinned by hash, not by address, and made per run
+  (the advisor's reading, 2026-11-03). **ML** and **MAC**, the client machines of ADR 0003's pass marks: ML, the minimum
+  laptop (Windows 11: Chrome, Edge, Firefox); MAC, a macOS machine with Safari, or for the netcode proof test's
+  yes-or-no and count rows a GitHub macOS runner, under the step, checks and limits ADR 0001's MAC key sets
+  (MACHINES-TIMING, Mustafa, 2026-11-03). They carry no budget row here: every client mark in this record is a yes-or-no
+  or a count. **MP**, Mustafa's PC, Brave on Windows: only what he judges or reads in his own accounts.
 - **Browsers by script.** Chrome, Edge, Firefox and Safari are the shipped (branded) browsers, driven through
   WebdriverIO, which Vitest's browser mode uses to drive those four (R5-TEST-F6, r5 lines 443–448); Playwright
   cannot drive branded Safari or Firefox (R5-TEST-F8, r5 lines 454–462). Brave is Mustafa's checklist. Every result
@@ -1264,14 +1329,14 @@ to PM-0006-31). Every number is a research mark
 | PM-0006-10 | Whether GitHub shows the environment URL on the pull request page (decides R5-PREV-OQ5) | recorded: yes or no, with a screenshot of the page | TR | the throwaway deploy workflow sets its environment's `url` to the preview link (R5-PREV-REC1); the pull request page is read after a deploy | once; passes when recorded | R5-PREV-OQ5 (r5 lines 1858–1859) |
 | PM-0006-32 | B9's interim position holds: a pull request cannot reach a deploy secret or production (part 13, B9; spike 1; with ADR 0002's PM-0002-66) | 2 of 2: a test pull request on TR whose deploy job is edited to print a marker gets no secret until the `preview` environment's required reviewer approves it (the job prints only whether the secret is set, never its value); a job in a pull request that names the `production` environment is refused by its `main`-only deployment-branch rule; reported, not a pass condition: whether a deploy of the production branch tried with the `preview` environment's token is refused (part 13 expects the account-scoped token to reach production; if no token scope the check finds can refuse it, the result is recorded as not refused and goes to OQ-0006-13); recorded: how the branch rule treats a pull request's merge ref (not read), and Mustafa's revocation of the test token when the check ends | TR, CF; MP (Mustafa approves or withholds the review, and revokes the token) | three throwaway workflow runs on TR; each run's log and the environment's deployment history pasted into the results log | 1 run per case. Control: after the reviewer approves, the same job reports the secret set. Bite: with the required reviewer removed, the edited job must report the secret set (the check can fail) | the draft's spike 1, B9's bullet (proposed there, from the security review's finding 1); part 13, B9; R5-PREV-REC1 (the deploy token held only by its job, as part 13 cites it) |
 | **The operations marks inside the netcode proof test** (ADR 0001's spike) | | | | | | |
-| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
-| PM-0006-12 | The round trip to each candidate location (part 5; feeds OQ-0006-2) | reported, no pass number: per location, the mean and the max round trip and the loss of 100 ICMP echoes, as Windows' `ping` prints them | one throwaway CX33 per offered location (`nbg1`, `hel1`, `fsn1` if offered), ICMP allowed on these only, deleted after; from ML and from MP | `ping -n 100 <address>` per location from each machine (MP: the operations checklist, step 1); the outputs pasted into the results log | 1 run per machine and location; a second run at another time of day if two locations differ by under 5 ms (proposed) | OQ-0006-2; R6-HOST-OQ2 (r6 lines 856–858); R6-HOST-F18: the firewall filters ICMP (r6 lines 169–174) |
-| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on each machine (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) | RS and SH, each with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions per machine at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, and on SH steal time is what the mark measures, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
-| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on each machine and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS and SH, each with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
-| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on the domain Mustafa registers (SPIKE-MACHINES, Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
-| PM-0006-16 | The metrics path works with only the rule it needs (part 9) | every metric of PM-0006-22 reaches Prometheus on MV; if part 9 picks the scrape: the exporter's port answers MV's address only and drops every other source (the PM-0006-15 probe from ML gets no answer); if it picks the push gateway: no inbound rule for metrics | RS, MV; a probe from ML | the path is configured as part 9 picks it; the rule names MV's address as its only source (proposed: the narrowest rule that serves a scrape) | 1 probe from ML; the metrics as PM-0006-22. Bite: the rule opened to every source makes ML's probe connect | the draft's spike 2 (proposed there: the negative test extended); R6-OBS-F4: scrape or push (r6 lines 279–284) |
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; the precondition; OQ-0006-1, answered by Mustafa, 2026-11-03) | the CCX23 created in `fsn1` on the run day (the key); recorded: type, location, its address of the day, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+| PM-0006-12 | The round trip to the test servers' location (part 5; a check) | reported, no pass number: the mean and the max round trip and the loss of 100 ICMP echoes to `fsn1`, as Windows' `ping` prints them, set beside VISION_V2 §4's "about 100 ms"; it decides nothing, and a surprise goes to Mustafa (the advisor's reading, 2026-11-03) | one of the run's CAX21s in `fsn1` (LG's, created on the run day), with ICMP allowed on it only, never on RS; from ML and from MP | `ping -n 100 <address>` to that CAX21's address of the day from each machine (MP: the operations checklist, step 1); the outputs pasted into the results log | 1 run per machine | OQ-0006-2, answered (Mustafa, 2026-11-03); VISION_V2 §4 ("about 100 ms of ping"); R6-HOST-OQ2 (r6 lines 856–858; the playtesters' round trips stay open); R6-HOST-F18: the firewall filters ICMP (r6 lines 169–174) |
+| PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on RS (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure (R2-ROOM-REC2 marks 1 and 5 on RS are ADR 0001's) | RS with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG, on as many CAX21s as its calibration shows: the key); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
+| PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on RS and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV's address of the day as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on shamblefrontlines.com, the domain Mustafa registered ("DOMAIN: done. shamblefrontlines.com is registered at Cloudflare.": Mustafa, 2026-11-03; earlier, SPIKE-MACHINES: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03), its DNS record set to RS's address of the day before the certificate is issued (the key); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+| PM-0006-16 | The metrics path works with only the rule it needs (part 9) | every metric of PM-0006-22 reaches Prometheus on MV; if part 9 picks the scrape: the exporter's port answers MV's address of the day only (the CAX21 that carries MV) and drops every other source (the PM-0006-15 probe from ML gets no answer); if it picks the push gateway: no inbound rule for metrics | RS, MV; a probe from ML | the path is configured as part 9 picks it; the rule names that CAX21's address of the day as its only source, set on the run day (proposed: the narrowest rule that serves a scrape) | 1 probe from ML; the metrics as PM-0006-22. Bite: the rule opened to every source makes ML's probe connect | the draft's spike 2 (proposed there: the negative test extended); R6-OBS-F4: scrape or push (r6 lines 279–284) |
 | PM-0006-17 | Egress per 24v24 match-hour matches R2's estimate (part 8) | bytes sent from RS's network interface in one room-hour within ±20 % of R2's E3 estimate at the counts that ran (R2's formula, r2 lines 1764–1766, evaluated in the results with the run's P, V, shots and projectile spawns, the arithmetic shown; proposed, in place of R6-COST-REC1's fixed 3.16 GB, which holds only at R2's counts: the netcode proof test's load need not have them, since it stands in for the stress scene, whose 700 shots per second (ADR 0001's PM-0001-2) are almost ten times R2's 72, 1.5 per player per second × 48, r2 line 1759); at R2's own counts (P = 48, V = 15 vehicles, 0.44 projectile spawns per player per second, every entity in view) that is 3.156 GB, so 2.52 to 3.79 GB. Beside it, the room's own bytes-sent metric agrees with the interface counter within 5 % (proposed: R6-COST-REC2's tolerance, a check that the counter measures the room). With interest management on: the figure reported, only if the netcode proof test's sim has the interest filter | RS with LG; one room alone | 48 bot clients over IPv4 (R2's case), all in view; three 20-minute matches back to back, joins and full states included (proposed: a room-hour as a real room spends it); the interface's transmitted-byte counter read at the start and end | 1 room-hour per setting; P2 on LG. Bite: snapshots sent twice per tick (about 2 × the reference) must fail | R6-COST-REC1's mark (r6 lines 716–717); the egress table (r6 lines 438–446: 146.1 kbps × 48 = 7.01 Mbit/s; × 3,600 s ÷ 8 = 3.156 GB); R2's estimate (r2 lines 1759–1762, 1775); A-1 (r6 line 515) |
-| PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated VMs counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0144 EUR (CX33) an hour, the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
+| PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated CAX21s counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0176 EUR (CAX21) an hour (R6-HOST-F15, excluding VAT), the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
 | PM-0006-19 | Logging costs the tick almost nothing (part 9) | server tick p99 with logging at its production level at most 1.02 × with logging off | RS with LG; one room alone, one vCPU ([the measuring unit](../research/GLOSSARY.md#the-measuring-unit-one-vcpu)) | 6 runs of 10 measured minutes (after the warm-up), each a fresh process, alternating off, on, off, on, off, on; one recorded input replay drives all six (proposed: the same work in each); the mark compares the pooled p99 of the 3 "on" runs (54,000 ticks) with that of the 3 "off" runs | valid only if each "off" run's p99 lies within 1 % of the pooled "off" p99 (proposed: half the mark; a 2 % difference may sit inside run-to-run noise, so noise is checked first); an invalid set is neither pass nor fail. Bite: a planted 50 µs busy-wait in each logged event | R6-OBS-REC1's mark (r6 lines 736–737) |
 | PM-0006-20 | Logging allocates nothing on the hot path (part 9) | on every tick after the warm-up, the tick thread's allocation count with logging at its production level equals the count with logging off | RS; one room | a counting global allocator in the room binary (Rust's `GlobalAlloc`; proposed tool) records allocations per tick on the tick thread; both runs driven by the same recorded input replay, so the sim's own allocations repeat tick for tick | 2 runs (on, off) of 10 measured minutes; compared tick by tick. Bite: a `format!` planted in a per-tick log call | R6-OBS-REC1's mark (r6 line 737); R6-OBS-F1 (r6 lines 262–269) |
 | PM-0006-21 | Logs keep no secrets or addresses (parts 9, 11) | 0 matches in a 30-minute soak's logs for every join token, every guest secret and every client address the soak used, and for each match's random seed (ADR 0004 part 8: never sent, logged or recorded; parts 9 and 12), and 0 matches for an IPv4 or IPv6 address pattern other than the VMs' own | RS, LG | the soak of PM-0006-22; the spike logs each token, secret and client address it creates into a canary file on LG (never on RS), and the supervisor's test build writes each match's seed into a canary file on RS's local disk outside the shipped log path (proposed: the grep needs the value it must not find); a grep script searches every log line the supervisor shipped | 1 soak. Bite: a planted log line that prints one client's address and one token must be found | R6-OBS-REC1's mark (r6 lines 737–738); R2-ROOM-REC3 mark 3 (r2 lines 2807–2809) |
@@ -1289,8 +1354,8 @@ to PM-0006-31). Every number is a research mark
 
 **When a mark fails.** A spike passes when every mark that applies passes: a conditional mark (PM-0006-28 to -31,
 PM-0006-17's interest figure) only when its condition holds; a reported mark (PM-0006-7, -10, -12, -14) when its record
-is complete; an adoption mark (PM-0006-13 on SH, PM-0006-14 on SH) never fails the spike: its result only keeps or
-admits K3. A failing run is never re-run until green: its data, build commit, host and time are kept, and its cause is
+is complete. No mark here is an adoption mark: no shared host is measured (the key), so K3 waits (part 8). A failing
+run is never re-run until green: its data, build commit, host and time are kept, and its cause is
 found and written down (R5-TEST-REC6, r5 lines 1490–1498). PM-0006-6 has three outcomes: every link gone (pass); a link
 still serving with a workaround that passes the mark in the same spike (pass, the workaround written down); a link still
 serving and no workaround (fail). "The remaining case is written down with the reason" (R5-PREV-REC3) is how a fail is
@@ -1346,9 +1411,9 @@ hides what PREV-DELETE must see.
    lasts is recorded, not judged).
 
 #### The operations checklist (Mustafa, on his Windows PC, during the netcode proof test)
-1. Open a Windows terminal and run `ping -n 100 <address>` for each address the session sends (one per candidate
-   location). Expected: each run ends with a "Packets" line and an "Approximate round trip times" line; paste both into
-   the chat (PM-0006-12).
+1. Open a Windows terminal and run `ping -n 100 <address>` for the address the session sends (that day's address of
+   one of the run's CAX21s in `fsn1`). Expected: the run ends with a "Packets" line and an "Approximate round trip
+   times" line; paste both into the chat (PM-0006-12).
 2. After the session says the last VM is deleted, open the spike's project in the Hetzner console and read its costs.
    Expected: one amount in EUR before VAT, written down (PM-0006-18).
 
@@ -1360,15 +1425,14 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
 
 0. **Before any spike (Mustafa's steps):** the drafts signed off as the basis for the spikes (2026-11-03,
    SPIKE-ORDER (b)); a Cloudflare account with a test project and its
-   token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account, the console check
-   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks, in which he
-   creates and deletes the VMs himself for each run, with SSH access only and no Hetzner token for sessions until the
-   security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03; the bench and the soaks:
-   the advisor's reading, 2026-11-03); shamblefrontlines.com, which he registers at Cloudflare for the netcode proof
-   test's WebSocket leg (OQ-0006-15, answered by Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register" and
-   "shamblefrontlines.com, which I register at Cloudflare"; before the netcode proof test:
-   the advisor's reading, 2026-11-03). *Milestone:* the reference server is orderable, or OQ-0006-1 (b) has named
-   another.
+   token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account (its console check
+   done: OQ-0006-1, answered by Mustafa, 2026-11-03) and a Hetzner project of its own for the spikes, the tick bench
+   and the playtest soaks, in which he creates the VMs fresh for each run and deletes them himself, with SSH access
+   only and no Hetzner token for sessions until the security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03;
+   the bench and the soaks: the advisor's reading, 2026-11-03); shamblefrontlines.com for the netcode proof test's
+   WebSocket leg (OQ-0006-15, answered by Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register" and
+   "shamblefrontlines.com, which I register at Cloudflare"), registered (Mustafa, 2026-11-03). *Milestone:* the
+   reference server is orderable (OQ-0006-1, answered), or OQ-0006-1 (b) has named another.
 1. **Spikes (before the foundation):** the netcode proof test with this record's operations marks, and the preview
    hosting check, in parallel. *Milestone:* their marks pass; rooms per VM measured, so part 8's goal budget is one
    provisional figure (OQ-0006-19), set only after a read of the price and location pages of Hetzner's dedicated root
@@ -1432,8 +1496,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
   mid-match leaves a stub record marked crashed (part 12; R6-TEL-REC2's mark says "marked incomplete", r6 lines
   824–827); the analysis script reproduces
   the hand-counted cashouts, steals, deliveries and harvester kills of 3 matches exactly, every output row carries its
-  match count, and a month of goal-scale records (about 13,000) is analysed in under 10 minutes on a CX33, the staging
-  VM's plan, though the analysis itself runs off the staging VM (part 12)
+  match count, and a month of goal-scale records (about 13,000) is analysed in under 10 minutes on the staging VM's
+  plan (OQ-0006-22), though the analysis itself runs off the staging VM (part 12)
   (R6-TEL-REC3's mark, r6 lines 840–842).
 - **People:** Mustafa's Brave checks of preview links (one login per session once the wall is on); test-engineer
   writes the checklist.
@@ -1443,9 +1507,11 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
 - **The client host:** if PREV-DELETE or a header mark fails on Pages, move to Workers static assets, which takes the
   same `_headers` file (R6-HOST-REC1); only ADR 0002's deploy target changes. If Cloudflare as a whole had to go,
   Netlify is R6-HOST-REC1's named fallback with the same `_headers` file (its prices were not read, r6 lines 624–626).
-- **Game servers:** if the CCX23 cannot be ordered or fails the marks, read OQ-0006-1's fallbacks and re-run the
-  netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name. If the shared
-  CX33 fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the hour with a monthly cap (R6-HOST-F17), so a
+- **Game servers:** if the CCX23 cannot be ordered on a run day or fails the marks, read OQ-0006-1's fallbacks and
+  re-run the netcode proof test there; every draft that cites the reference server (N34, I-15) follows the new name.
+  A shared-vCPU fleet (K3) comes only after a later measurement of a shared x86 plan that can be ordered in the
+  fleet's location passes; until then, or if it fails, the fleet stays on dedicated vCPUs (K1). VMs are billed by the
+  hour with a monthly cap (R6-HOST-F17), so a
   VM removed stops costing from the next hour (inferred).
 - **A bad release:** not designed (part 15, OQ-0006-14); under the interim position the previous room binary stays on
   every VM, and the client and the servers are switched back together while no room runs; how the client host puts a
@@ -1496,7 +1562,7 @@ One row per id the decision map gives this record as owner (65 ids; `engine-arch
 | R5-XT-OQ5 | answered: part 13 lists the waiting items with interim positions | critic rank 18; the baseline itself is OQ-0006-6 |
 | R5-XT-OQ11 | open: OQ-0006-7 | critic rank 33 |
 | R6-HOST-REC1 | adopted | part 1 |
-| R6-HOST-REC2 | changed: the firewall's rules listed per VM role | part 5: R6-HOST-REC2 opens the two game ranges "plus nothing else" (r6 line 649); this record's own parts need more (a Prometheus scrape needs an inbound port, R6-OBS-F4, r6 lines 279–284; SSH from named addresses; the staging delivery path; TCP 443 for the lobby; TCP 80 only for http-01), so the rules are proposed and spike 2 tests them; otherwise as recommended: a working pick until OQ-0006-1 is answered; its marks restated for N = 48 at 30 Hz (spike 2) |
+| R6-HOST-REC2 | changed: the firewall's rules listed per VM role; the shared CX33 not measured | part 5: R6-HOST-REC2 opens the two game ranges "plus nothing else" (r6 line 649); this record's own parts need more (a Prometheus scrape needs an inbound port, R6-OBS-F4, r6 lines 279–284; SSH from named addresses; the staging delivery path; TCP 443 for the lobby; TCP 80 only for http-01), so the rules are proposed and spike 2 tests them; the CX33 it measures beside the reference server cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so K3 waits for a later measurement of a shared x86 plan (part 8); otherwise as recommended: the CCX23 stands as the reference server, in `fsn1` (OQ-0006-1 and OQ-0006-2, answered by Mustafa, 2026-11-03); its marks restated for N = 48 at 30 Hz (spike 2) |
 | R6-HOST-REC3 | adopted, with PREVIEW-WALL (a) applied | part 4: the wait at r6-infrastructure.md line 675 ends; multiplayer previews use it from slice 3, behind the access wall; its rooms admit only staging tokens, and it holds no store key (B12) |
 | R6-HOST-REC4 | adopted | part 7: the interim position under BASELINE-WHEN (b); the four superseded sentences (carry-forward 4) restated |
 | R6-COST-REC1 | changed: the goal budget stated at both densities, with the bound the marks allow | part 8: about 361 or 238 EUR at 8 rooms per VM, about 534 EUR (fixed fleet) at the 4 rooms per VM that A-2 names the case to budget, about 967 EUR at the 2 rooms per VM the marks' ceilings allow, until the netcode proof test measures it, and that figure provisional until slice 6 (OQ-0006-19); the start budget unchanged; a tick bench line added; its 5 EUR bill mark, sized for "a few hours of one or two VMs", becomes the cap OQ-0006-20 sets (spike 2; PM-0006-18) |
@@ -1507,14 +1573,14 @@ One row per id the decision map gives this record as owner (65 ids; `engine-arch
 | R6-OBS-REC4 | adopted | part 11; the legal side is OQ-0006-9 |
 | R6-TEL-REC1 | changed: the per-slot section adds the upgrade-track fields, and the events add upgrade picks and weapon pickups | part 12: picks per track and level, offers shown, looted weapons, time per weapon type, and the picks and pickups with their ticks (decision map part j, J5; need: UPGRADE-SCOPE, VISION_V2 §6.6; no research finding); marks at N = 48 only (MODES-3 (a)) |
 | R6-TEL-REC2 | adopted | part 12; added: only records a production supervisor uploads enter the store, and the content sets they name are archived beside them (ADR 0005's hand-off) |
-| R6-TEL-REC3 | changed: the batch analysis runs off the staging VM | part 12 and B12: the staging VM runs pull-request-built code, so it holds no store key; the analysis runs on a production game VM while no room runs, and the mark's 10 minutes is read on a CX33, the staging VM's plan |
-| R6-HOST-OQ1 | open: OQ-0006-1 | Mustafa's console check |
-| R6-HOST-OQ2 | open: OQ-0006-2 | a round-trip measurement |
+| R6-TEL-REC3 | changed: the batch analysis runs off the staging VM | part 12 and B12: the staging VM runs pull-request-built code, so it holds no store key; the analysis runs on a production game VM while no room runs, and the mark's 10 minutes is read on the staging VM's plan (OQ-0006-22) |
+| R6-HOST-OQ1 | answered: OQ-0006-1 (Mustafa, 2026-11-03) | his console check: the CCX23 and the CAX21 can be ordered in `fsn1`, the CX33 cannot (part 5) |
+| R6-HOST-OQ2 | open: carried by OQ-0006-2, which Mustafa answered for the test servers (2026-11-03) | playtesters' round trips to `fsn1` against VISION_V2 §4's "about 100 ms"; the first production fleet starts there unless they say otherwise (part 5) |
 | R6-HOST-OQ3 | answered: no UDP load balancer while the lobby hands out host and port | part 5; revisit when a design routes many rooms through one address (Consequences) |
-| R6-HOST-OQ4 | open: OQ-0006-1 | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |
+| R6-HOST-OQ4 | open: carried by OQ-0006-1, whose console check is answered; this id keeps its own trigger | Fly.io, GameLift, Netcup, OVHcloud and Scaleway are read only if Hetzner Cloud is ruled out; Hetzner's dedicated root servers are read before part 8's goal budget is fixed, whatever OQ-0006-1's answer (r6 lines 862–865; migration step 1) |
 | R6-HOST-OQ5 | answered: PREVIEW-WALL (a) | part 2 |
 | R6-HOST-OQ6 | open: OQ-0006-5 | the challenge and lifetimes of the per-hostname certificates; the wildcard only if the baseline weighs it in |
-| R6-HOST-OQ7 | open: OQ-0006-1 | read at sign-up; under 1 EUR per VM either way |
+| R6-HOST-OQ7 | open: carried by OQ-0006-1, whose console check is answered; this id keeps its own trigger | read at sign-up; under 1 EUR per VM either way |
 | R6-COST-OQ1 | spike: the netcode proof test (this record's operations marks) | parts 8 and 14; spike 2 |
 | R6-COST-OQ2 | open: OQ-0006-8 | Sentry's prices and retention, Grafana's usage |
 | R6-COST-OQ3 | open: OQ-0006-10 | player numbers |

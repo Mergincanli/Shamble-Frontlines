@@ -27,22 +27,43 @@ session work. A share of another spike is sized as the part it adds.
   the server-only share puts a snapshot-receiving client on every soldier (GLOSSARY §3).
 - **The test-mode list:** [GLOSSARY §2](research/GLOSSARY.md#the-test-mode-list): 24v24 and 12v12v12; 16v16v16;
   1v1, 4v4, 2v2v2 and 6v6v6; the N = 64 run, labelled headroom.
-- **Machines** (named in each draft's pass-mark key): RS, the reference server, and SH, its shared neighbour (ADR 0006,
-  OQ-0006-1; [GLOSSARY: the reference server](research/GLOSSARY.md#the-reference-server)); LG, the load generator, a
-  CX33 running the simulated clients (Mustafa, 2026-11-03: "the CX33 runs the simulated clients"; how many comes from
-  the calibration run: the advisor's reading, 2026-11-03), and MV, a CX33 running the metrics stack (ADR 0006); ML, the
-  minimum laptop, RD, the recommended desktop, and MAC, the Mac for Safari, with the stable Safari on the day of the
-  run, its version recorded (WebGPU from Safari 26.0: r3-rendering.md, R3-WGPU-F19, lines 171–174; WebTransport from
-  26.4: r2-netcode.md, R2-TRN-F7, lines 959–975). Which machines they are is OQ-0003-1 (ADR 0003), answered in part by
-  Mustafa (2026-11-03): "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a
-  mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed."; still open: the
-  actual machines, named by Mustafa before the look proof test. Until they are named, his laptop is the stand-in for ML,
-  in his words: “Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum,
-  for rough checks only.” MP, Mustafa's PC in Brave, is for what he judges only ("Test PC: my own, in Brave",
-  2026-11-03). A rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured
-  result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). The VMs sit in a separate Hetzner
-  project; Mustafa creates and deletes them himself for each run, and they exist only during a run (OQ-0006-17, answered
-  by Mustafa, 2026-11-03).
+- **Machines** (named in each draft's pass-mark key): RS, the reference server, the CCX23 (x86-64 AMD), on which every
+  server row runs, and LG, the load generator, a CAX21 (Arm64) running the simulated clients, "so their build targets
+  aarch64" (Mustafa's Hetzner check, 2026-11-03), both created in Falkenstein (`fsn1`) on the run day (ADR 0006,
+  OQ-0006-1 and OQ-0006-2, answered by Mustafa, 2026-11-03: "both test servers will be in Falkenstein, not Nuremberg: a
+  CCX23 for the game server and a CAX21 for the 48 simulated players"; [GLOSSARY: the reference
+  server](research/GLOSSARY.md#the-reference-server)); a run whose bots one CAX21 cannot carry under 80 % adds as many
+  CAX21s as its 5-minute calibration shows are needed, inside the cost cap Mustafa OKs for that run (LG-COUNT, the
+  option he chose, 2026-11-03); MV, the metrics role: Prometheus on LG's CAX21, never on RS, inside LG's 80 % rule,
+  standing in for the staging game server, and a run with more than one CAX21 says in its plan which one carries it (ADR
+  0006; the advisor's reading, 2026-11-03); ML, the minimum laptop, RD, the recommended desktop, and MAC, the Mac for
+  Safari, with the stable Safari on the day of the run, its version recorded (WebGPU from Safari 26.0: r3-rendering.md,
+  R3-WGPU-F19, lines 171–174; WebTransport from 26.4: r2-netcode.md, R2-TRN-F7, lines 959–975). Which machines they are
+  is OQ-0003-1 (ADR 0003), answered in part by Mustafa (2026-11-03): "minimum: a typical student laptop with integrated
+  graphics; recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for
+  Safari. All borrowed."; still open: the actual machines, named by Mustafa before the look proof test. When each
+  machine is needed, in his words (Mustafa, 2026-11-03): "For the netcode proof test's Safari leg, check whether
+  GitHub's macOS runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport
+  and can reach the test servers. If they can, that is the Safari check, and I borrow the Mac only for the look proof
+  test. If they can't, I borrow the Mac before the netcode proof test. The laptop and desktop stay on my timing: rough
+  checks first, then a short re-run once they're named." Under his first branch a GitHub macOS runner stands as MAC for
+  the netcode proof test's Safari rows only, once the run's results record (i) the runner image's Safari version on the
+  day, at least the 26.4 that R2-TRN-F7 gives for WebTransport, (ii) real Safari driven through safaridriver, not a
+  WebKit build, and (iii) from the runner, one WebTransport session to RS that opens and carries datagrams and one
+  WebSocket session on the domain; it stands in only for yes-or-no and count rows (PM-0001-28's four-browser path and
+  library pick, PM-0001-14, PM-0001-25's Origin, PM-0006-15), and a row whose limit is a time, or which ADR 0003's look
+  proof test needs, stays on the borrowed Mac; the workflow that runs it is part of the proof test's plan, reviewed by
+  security-auditor and infra-engineer, and any `.github/` change in this repository goes to Mustafa; the later spikes'
+  Safari rows are each spike's own plan's, in the same way (the advisor's reading, 2026-11-03). Until they are named,
+  his laptop is the stand-in for ML, in his words: “Until then, my laptop's integrated graphics (Brave set to "Power
+  saving") stands in for the minimum, for rough checks only.” MP, Mustafa's PC in Brave, is for what he judges only
+  ("Test PC: my own, in Brave", 2026-11-03). A rough check is reported, never judged against a pass mark. MP stays what
+  he judges, never a measured result, and nothing else stands in for RD or MAC (the advisor's reading, 2026-11-03). The
+  VMs sit in a separate Hetzner project; Mustafa creates and deletes them himself for each run, and they exist only
+  during a run (OQ-0006-17, answered by Mustafa, 2026-11-03), in his words: "I created both once to try the console and
+  deleted them right away. They'll be created fresh on run day, so their IP addresses will be new then." No draft writes
+  an address: each run records the day's addresses with its results, and makes the settings bound to them, and its check
+  of the new SSH host keys, on that day (ADR 0006's key; the advisor's reading, 2026-11-03).
 - **Network profiles** P0–P4 and the two link-simulator layers L1 and L2: ADR 0001 part 13 (profiles) and ADR 0002 (the
   simulator's design, R5-TEST-REC4). The netcode proof test builds them first, throwaway.
 - **Recorded matches** and per-tick state hashes: ADR 0004 (the sim core spike makes the first ones); until one exists,
@@ -114,8 +135,8 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   ADR 0001's budgets at the 30 Hz baseline: server tick time and its shares, bandwidth per client both ways, memory per
   room, rooms per VM, under loss, bursts and hostile input); parts 4, 7 and 8 (one human client at P2 sees prediction,
   reconciliation and lag-compensated hits that look correct). Also ADR 0004 part 5 (S17: the server loop keeps a 30 Hz
-  tick from elapsed time) and ADR 0006 parts 5, 7, 8 and 9 (rooms per VM on both machine types, the firewall, egress per
-  match-hour, the spike's own bill, logging cost, metrics, the development certificates for WebTransport, and the
+  tick from elapsed time) and ADR 0006 parts 5, 7, 8 and 9 (rooms per VM on the reference server, the firewall, egress
+  per match-hour, the spike's own bill, logging cost, metrics, the development certificates for WebTransport, and the
   WebSocket leg's `wss` sessions on the certificate OQ-0006-5 names, PM-0006-15).
 - **Pass marks:** PM-0001-1 to PM-0001-62 (PM-0001-39 and -40 belong to the 60 Hz margin run below; PM-0001-54 and -55
   only when their condition holds); PM-0004-67; PM-0006-11 to PM-0006-27 (PM-0006-13 and ADR 0001's PM-0001-27, the
@@ -126,40 +147,43 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   (ADR 0001, inside PM-0001-53), at P2 (OQ-0001-3, answered by the Advisor, 2026-11-03), beside the measured
   correction, interpolation and hit-registration marks. He also runs the operations checklist (ADR 0006, inside
   PM-0006-12 and PM-0006-18).
-- **Depends on:** the drafts approved; OQ-0006-1 answered (the CCX23 and CX33 orderable in one EU location, in
-  Mustafa's Hetzner account; still open after the stop), with the location measured before RS is created (OQ-0006-2);
-  the VMs as OQ-0006-17's answer sets them (Mustafa, 2026-11-03: "a separate Hetzner project. I create and delete the
-  VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline. VMs exist
-  only during a run."), LG and MV beside RS and SH; the session's SSH key, made and held without the session reading
-  a secret it did not make, as this test's own plan sets it with security-auditor and the advisor (the advisor's
-  reading, 2026-11-03); the machines its rows name (OQ-0003-1, answered in part: Mustafa names them before the look
-  proof test; until then the stand-in for ML, for rough checks only); this spike's own plan lists its rows that run
-  before they are named, and none of them is judged on the stand-in (the advisor's reading, 2026-11-03); a throwaway sim
-  with movement, hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles
-  at the stress scene's counts (PM-0001-2); its 30 Hz marks may add ADR 0004's S1 stand-ins (384 effect rows with the
-  effect step's 1 ms burned per tick, the 2.80 ms remainder topped up: ADR 0001, OQ-0001-2), and its density runs pad
-  its sim step to the sim step share's ceiling, so rooms per VM is a lower bound and the goal budget provisional until
-  slice 6 (ADR 0006 spike item 2; OQ-0006-19, read before those runs); the link simulator's L1 and L2 (ADR 0002's
-  design), built here first, each profile's latency and jitter split half each way and its loss as P2 defines it
-  (OQ-0001-16, answered by the Advisor, 2026-11-03), 2 % on each direction, applied independently (the advisor's
-  reading, 2026-11-03); a DM_Tri-sized greybox with enterable buildings and the target course; the port ranges
-  (OQ-0006-16) and the development certificate for WebTransport, private and hash-pinned (ADR 0006; Mustafa,
-  2026-11-03); for the WebSocket leg, which cannot pin a certificate hash, a trusted certificate (OQ-0006-5, answered in
-  part: its development case (i) by the advisor's reading) on "a domain I register" (Mustafa, 2026-11-03),
-  shamblefrontlines.com (OQ-0006-15, answered by Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at
-  Cloudflare."), the domain registered before the test starts and the certificate's issuance method chosen in this
-  test's own plan with security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run
-  plan under its bill mark (PM-0006-18), with each run's cost cap, from its planned hours, written in that run's plan
-  for Mustafa's OK (OQ-0006-20, answered by Mustafa, 2026-11-03: "one cap per run, from its planned hours, written in
-  that run's plan for my OK. I create and delete the VMs myself.").
+- **Depends on:** the drafts approved; OQ-0006-1 and OQ-0006-2, answered by Mustafa (2026-11-03): RS and LG, the CCX23
+  and the CAX21, created in `fsn1` on the run day (Machines, above); the VMs as OQ-0006-17's answer sets them (Mustafa,
+  2026-11-03: "a separate Hetzner project. I create and delete the VMs myself for each run; sessions get SSH access only
+  and no Hetzner token until the security baseline. VMs exist only during a run."), LG, with MV's role on it, beside RS;
+  the session's SSH key, made and held without the session reading a secret it did not make, as this test's own plan
+  sets it with security-auditor and the advisor (the advisor's reading, 2026-11-03); the machines its rows name
+  (OQ-0003-1, answered in part: Mustafa names them before the look proof test), the laptop and desktop on his timing:
+  "rough checks first, then a short re-run once they're named" (Mustafa, 2026-11-03), the rough checks on the stand-in
+  for ML; this spike's own plan lists its rows that run before they are named, and nothing is judged on a rough check
+  (the advisor's reading, 2026-11-03); its Safari leg starts with the check Mustafa set on GitHub's macOS runners, and
+  the Mac is borrowed before this test only if they cannot pass it (Machines, above); a throwaway sim with movement,
+  hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles at the stress
+  scene's counts (PM-0001-2); its 30 Hz marks may add ADR 0004's S1 stand-ins (384 effect rows with the effect step's 1
+  ms burned per tick, the 2.80 ms remainder topped up: ADR 0001, OQ-0001-2), and its density runs pad its sim step to
+  the sim step share's ceiling, so rooms per VM is a lower bound and the goal budget provisional until slice 6 (ADR 0006
+  spike item 2; OQ-0006-19, read before those runs); the link simulator's L1 and L2 (ADR 0002's design), built here
+  first, each profile's latency and jitter split half each way and its loss as P2 defines it (OQ-0001-16, answered by
+  the Advisor, 2026-11-03), 2 % on each direction, applied independently (the advisor's reading, 2026-11-03); a
+  DM_Tri-sized greybox with enterable buildings and the target course; the port ranges (OQ-0006-16) and the development
+  certificate for WebTransport, private and hash-pinned (ADR 0006; Mustafa, 2026-11-03); for the WebSocket leg, which
+  cannot pin a certificate hash, a trusted certificate (OQ-0006-5, answered in part: its development case (i) by the
+  advisor's reading) on "a domain I register" (Mustafa, 2026-11-03), shamblefrontlines.com (OQ-0006-15, answered by
+  Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at Cloudflare."), the domain registered (Mustafa,
+  2026-11-03: "shamblefrontlines.com is registered at Cloudflare."), its DNS record set on each run day to that day's
+  address before the certificate is issued, and the certificate's issuance method chosen in this test's own plan with
+  security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run plan under its bill
+  mark (PM-0006-18), with each run's cost cap, from its planned hours, written in that run's plan for Mustafa's OK
+  (OQ-0006-20, answered by Mustafa, 2026-11-03: "one cap per run, from its planned hours, written in that run's plan for
+  my OK. I create and delete the VMs myself.").
 - **Place:** wave 1, first (SPIKE-ORDER (b)): before the foundation (SLICE-ORDER condition 3). It builds first the
   client harness the boundary spike shares (the page with its Worker host and a plain renderer, on the throwaway sim:
   ADR 0002's spike text), accepted with the order (J6 (5)). It closes at 30 Hz: the 60 Hz margin run follows the sim
   core spike on this test's kept server and harness, in its own VM session, and reports separately (item 2; the
   advisor's reading, 2026-11-03).
 - **Size:** L, the client harness included. Two transports on four browsers, two simulator layers, a room server with
-  interest, encoding and lag compensation at 48 clients, a load generator, repeated 30-minute soaks, 8 rooms on two
-  machine types, planted defects, Mustafa's session; ADR 0006's operations marks add M; ADR 0004's share is S.
+  interest, encoding and lag compensation at 48 clients, a load generator, repeated 30-minute soaks, 8 rooms on the
+  reference server, planted defects, Mustafa's session; ADR 0006's operations marks add M; ADR 0004's share is S.
 - **Research spikes it subsumes:** R2-BUD-REC6 (the server tick budget in the stress scene), R2-SYNC-REC9 (48
   clients), R2-TRN-REC1 and R2-TRN-REC3 (both transports: interop, load, hostile input), R2-ROOM-REC2 (a room holds its
   tick; memory; rooms per VM), R1-TICK-REC2's P1 at 30 Hz through the total, and P3; with them R2-SYNC-REC1 to REC5 and
@@ -173,7 +197,8 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   vehicles move), OQ12; R2-ROOM-OQ1; R2-XU-OQ2, OQ4, OQ5, OQ6, OQ7, OQ15; OQ-0001-6 (Mustafa, 2026-11-03: "Aim for the
   smallest input buffer that holds."; of the options that pass its marks, the smallest buffer, run on arrival counting
   as none: the advisor's reading, 2026-11-03), OQ-0001-7; R5-TEST-OQ2 (the WebTransport crates' interop); R6-COST-OQ1;
-  it feeds OQ-0006-2; it sets the rewind cap's value by OQ-0001-5's rule (Mustafa, 2026-11-03: "the cap covers the
+  it reports the round trip to `fsn1` (PM-0006-12), which decides nothing now that OQ-0006-2 is answered; it sets the
+  rewind cap's value by OQ-0001-5's rule (Mustafa, 2026-11-03: "the cap covers the
   honest rewind the proof test measures at P2, rounded up; beyond the cap, the victim's view wins."), its p99 at P2
   rounded up to a whole number of ticks at the run's tick rate (the advisor's reading, 2026-11-03); and it gives Mustafa
   the input-to-screen numbers for OQ-0001-15.
@@ -242,9 +267,10 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   budget bench.
 - **Who judges what:** the scripts; Mustafa runs the spike checklist (ADR 0002, inside PM-0002-34) in Brave.
 - **Depends on:** the drafts approved; the machines its rows name (OQ-0003-1, answered in part: Mustafa names them
-  before the look proof test; until then the stand-in for ML, for rough checks only); this spike's own plan lists its
-  rows that run before they are named, and none of them is judged on the stand-in (the advisor's reading, 2026-11-03);
-  displays at 120 and 144 Hz; the netcode proof test's throwaway sim, client harness and room process (it runs after
+  before the look proof test), the laptop and desktop on his timing: "rough checks first, then a short re-run once
+  they're named" (Mustafa, 2026-11-03), the rough checks on the stand-in for ML; this spike's own plan lists its rows
+  that run before they are named, and nothing is judged on a rough check (the advisor's reading, 2026-11-03); displays
+  at 120 and 144 Hz; the netcode proof test's throwaway sim, client harness and room process (it runs after
   it); the sim core spike's sim for PM-0002-28 and PM-0004-8, -28 (it runs after that spike, so the sim is there: the
   advisor's reading, 2026-11-03); Mustafa's session in Brave.
 - **Place:** wave 1, third of the heavy spikes, after the sim core spike and the 60 Hz margin run (SPIKE-ORDER (b));
@@ -278,10 +304,12 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
 - **Pass marks:** PM-0004-1 to PM-0004-61, PM-0004-73 and PM-0004-74 (PM-0004-8 and -28 in the boundary spike's
   Worker; PM-0004-61 with the netcode proof test's server).
 - **Who judges what:** the scripts; no mark here needs a person's judgement.
-- **Depends on:** the drafts approved; RS orderable (OQ-0006-1); the machines its rows name (OQ-0003-1, answered in
-  part: Mustafa names them before the look proof test; until then the stand-in for ML, for rough checks only); this
-  spike's own plan lists its rows that run before they are named, and none of them is judged on the stand-in (the
-  advisor's reading, 2026-11-03); the scenes built in the spike (the DM_Tri-sized greybox for the stress scene, the
+- **Depends on:** the drafts approved; RS, the CCX23 in `fsn1` (OQ-0006-1 and OQ-0006-2, answered by Mustafa,
+  2026-11-03); the machines its rows name (OQ-0003-1, answered in part: Mustafa names them before the look proof test),
+  the laptop and desktop on his timing: "rough checks first, then a short re-run once they're named" (Mustafa,
+  2026-11-03), the rough checks on the stand-in for ML; this spike's own plan lists its rows that run before they are
+  named, and nothing is judged on a rough check (the advisor's reading, 2026-11-03); the scenes built in the spike (the
+  DM_Tri-sized greybox for the stress scene, the
   Octopon-3 greybox, the two-floor test building with three stages, the ledge block, the box-only parity scenes); a
   stated bot set for "full AI" (ADR 0004's S14; OQ-0004-1 stays open); legacy golden fixtures captured from the legacy
   oracle (R5-TEST-REC3); a throwaway replay runner and tick bench in ADR 0002's shape; ADR 0001's prediction scope.
@@ -510,12 +538,14 @@ makes the final 60 Hz call whatever the wave-1 early signal showed (TICK-60-SETU
 
 ## What this plan does not decide
 The reference machines ML, RD and MAC (OQ-0003-1, answered in part: Mustafa names them before the look proof test), the
-server location (OQ-0006-1, OQ-0006-2) and the provisional goal budget (OQ-0006-19) are listed for Mustafa and the
-Advisor in `docs/adr/README.md`, "Decisions the drafts ask for". The stop of 2026-11-03 answered the order after the
-netcode proof test, with the harness builders it names (J6 (5), SPIKE-ORDER (b)), TICK-60-HEADROOM (OQ-0001-1),
+provisional goal budget (OQ-0006-19) and the staging server's plan (OQ-0006-22, before slice 3) are listed for Mustafa
+and the Advisor in `docs/adr/README.md`, "Decisions the drafts ask for". The stop of 2026-11-03 answered the order after
+the netcode proof test, with the harness builders it names (J6 (5), SPIKE-ORDER (b)), TICK-60-HEADROOM (OQ-0001-1),
 TICK-60-SETUP (OQ-0001-2), the "100 ms" reading (OQ-0001-3), the profiles' split over the two directions (OQ-0001-16),
 the spikes' VMs (OQ-0006-17), ASSET-RESEARCH's timing and OQ-SPIKE-1 (below); Mustafa's answers to the escalations,
-later that day, answered the spikes' cost (OQ-0006-20) and the domain (OQ-0006-15); the register records each answer.
+later that day, answered the spikes' cost (OQ-0006-20) and the domain (OQ-0006-15), and his Hetzner check and his later
+answers settled the servers and their location (OQ-0006-1, OQ-0006-2) and when each machine is needed (Machines, above);
+the register records each answer.
 
 ## Open questions
 - **OQ-SPIKE-1. Who makes the look proof test's authored models, and by which route?** *Why it matters (as asked):* the

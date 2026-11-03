@@ -624,7 +624,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
      0003's counts, the backend string) on a reference machine of ADR 0003 as stated evidence. No GPU runner is
      proposed (a paid larger runner; ADR 0006 and Mustafa for any paid plan).
    - **No arm64 leg** in the determinism job: the first fleet is x86-64 (ADR 0006, part 5), and native AArch64 joins the
-     hash test before ADR 0006 may pick Arm hosts (ADR 0004).
+     hash test before ADR 0006 may pick Arm hosts (ADR 0004). The netcode proof test's room server runs on the x86-64
+     reference server and its only Arm machine is the load generator (ADR 0001's LG, CAX21 VMs), so the bot clients'
+     aarch64 build is that spike's own; the playtest soak's bot VM is named when the first soak is planned, and if it
+     is Arm, `devtools` gains an aarch64 build target then (a build, not a determinism leg), with the soak's desyncs
+     judged by ADR 0001's rule that no pass mark's verdict rests on native aarch64 agreeing with x86-64 or Wasm.
    - **Crash reporting and the end-to-end network rule** (critic rank 34): test builds carry no crash-reporting
      endpoint, so G12's rule (only the local test server) holds unchanged; the optional Sentry check of a planted Wasm
      trap runs in the boundary spike, not in the gate. The job that uploads debug files for Sentry (R6-OBS-REC3) runs
@@ -1029,7 +1033,10 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     Safari runs somewhere. While the repository is public the macOS runner costs nothing: GitHub's runner reference
     lists macOS among the standard runners, whose use "is free and unlimited on public repositories" (the page
     R5-CI-F17 read, r5 lines 673–678, which quoted only its ubuntu rows; its macOS rows were read by infra-engineer at
-    the step-10 review). What is not known is the macOS job's wall time against CI's 10-minute mark (PM-0002-56).
+    the step-10 review). What is not known is the macOS job's wall time against CI's 10-minute mark (PM-0002-56). The
+    netcode proof test first checks whether those runners' Safari is new enough for WebTransport and reaches the test
+    servers (Mustafa's answer to MACHINES-TIMING, 2026-11-03, in SPIKE_PLAN's machines paragraph); that check is the
+    spike's own and leaves this question open, since it asks about pull requests.
   - Options: (a) on pull requests that touch `client`, `net`, `sim-worker` or `sim` (R5-TEST-REC1); (b) nightly only;
     (c) also an end-to-end suite in real Safari through WebdriverIO (not researched).
   - Proposed interim: (b), which R5-XQ-OQ1 says breaks neither part, until the macOS job's wall time is known; the
