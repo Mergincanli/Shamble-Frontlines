@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 09:08 Amsterdam
+- **Last update:** 2026-11-03 09:34 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,18 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+AT THE STOP (2026-11-03 09:34 Amsterdam). wf_7d619266-6c2 done: fixcheck-d4 PASS WITH NOTES (68 claims, 59 confirmed;
+touch-up 4's ten blocks right, rebuilt byte for byte; nine slips in the report and appendix, F1 medium, fixed with the
+skeptics' corrected words at f956327, not re-checked again; F4 deferred, §7.3); its skeptics: F1, F2 upheld, F6, F8
+partly; docs-keeper-3: STATUS and ROADMAP at b011372 (repo map OK). The report final (no placeholder left; 24 new open
+questions; CI 77 runs, 70 passed, 7 cancelled, 0 failed before the final commit). Final checks: guard PASS, 521/521,
+glossary exact 0, glued 0, 340 PM rows of 7 cells, pointers 94/94, repo map OK, ENGINE_OVERVIEW 144 lines; the gate
+1–4 and 5b–5d PASS, symbols +0 −0, 5a cannot start here. Next: the final commit (runs CI), PR #33's body = the report
+(the PR stays a draft), the report to Mustafa in chat; then stop for Mustafa and the Advisor. The checkpoint stays
+on the branch while the PR is a draft (CHECKPOINT-AT-STOP); it is folded into the report and deleted before the PR
+is marked ready.
+
+Before that:
 At 09:08: touch-up 4 (wf_c38a2d32-525) applied as ac252f8 (engine-architect: README seams S5, S9, S10, 111 open, the
 review codes' sentence, HEAT-SOAK credit; ADR 0002 step 5 re-wrapped), bd68d59 (rust-reviewer: ADR 0004 part 7,
 1.99.1 too; a rounded exact reference), fd8c6f8 (test-engineer: PM-0003-2's bite and count; ADR 0001 checklist
