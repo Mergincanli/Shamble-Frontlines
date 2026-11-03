@@ -51,6 +51,29 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 18:56 (Mustafa: 98 % usage, save; he continues soon): the advisor AMENDED its verdict on plan revision 6
+(advisor-verdict-r6.md, its "AMENDMENT (verbatim)" section: 16 conditions that replace 1-13): Falkenstein (`fsn1`)
+everywhere; OQ-0006-1 and -2 answered; DS and the CCX13 dropped; SH leaves the proof test, K3 waits; MV becomes a role
+(Prometheus on LG's CAX21, never on RS); new OQ-0006-22 (the staging server's x86 plan; Mustafa with the Advisor before
+slice 3); counts 116 numbered, 96 open (ADR 0006: 22, 17); pass marks 341; new addresses each run day (one sentence in
+ADR 0006's key, one clause in ADR 0001's key: route it to test-engineer, the key's owner). LG-COUNT asked and answered
+(about 18:56, inputs/LG-COUNT-mustafa-2026-11-03.md: (a) the run's plan adds as many CAX21s as its calibration needs,
+inside his cost cap; the option text is the session's wording). Inputs files now nine (STOP, DESIGN, ANSWERS-2,
+HETZNER-CHECK, -CORRECTION, -ANSWERS, -CORRECTION-2, -ANSWERS-2, LG-COUNT). Work list by script: r6b-worklist.md (107
+lines + the advisor's list). The first round's files r6-* (no blocks) are superseded; its scripts are copied to
+prompts/r6-round-*-superseded.js.
+Next (resume here): 1. add LG-COUNT's words to appendix §2; 2. launch the round as units r6b-* in two workflows built
+like prompts/r6-round-*-superseded.js (common prompt + per-author items) but from the AMENDED conditions and
+r6b-worklist.md, every author at xhigh: A = infra-engineer, and netcode-architect then test-engineer (test-engineer reads
+netcode's NOTE rows-for-test-engineer first); B = engine-architect b (README incl. a new OQ-0006-22 row and the counts;
+SPIKE_PLAN 30-33, 129-130, 176, 281, 513), rust-reviewer (condition 6's sentence), engine-architect a (condition 7);
+quotes only from the nine inputs files; 3. ownership checks, apply in order, commit; 4. scripts (quote check against
+the nine inputs; the greps of amended condition 14; counts 116/96, 22/17, 341) and the gate; 5. docs-keeper (high),
+STATUS per amended condition 15; 6. the report (Hetzner rows in §9, §7.4 note, notes left, Decisions needed:
+MACHINES-TIMING only, LG-COUNT answered; For Mustafa without the console check; the appendix carries the Hetzner
+inputs files and verdict r6 with its amendment byte for byte); 7. the close (r4 conditions 7-9).
+
+Before that:
 At 18:50: the advisor approved plan revision 6 with 13 conditions (advisor-verdict-r6.md); the round launched on
 it (wf_aa306e26-720, wf_e7032fc9-6f4) was stopped before any block was written, because Mustafa corrected again
 (18:48: both test servers in Falkenstein, the CCX23 and the CAX21, created once and deleted, new addresses on run day)
