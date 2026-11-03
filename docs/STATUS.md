@@ -1,21 +1,34 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-10-31; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31) and docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) merged. `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-03; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) and docs-after-31 (PR #32, 9e7db28, 2026-10-31) merged. In flight: the v2 decision drafts (PR #33; the stop answered 2026-11-03; ready for review, not merged). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
 `docs/V2_PHASE0_BRIEF.md`, added 2026-10-24). Done: kit-v3-0, the process upgrades (PR #26, f2ccc13, 2026-10-25);
 docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27);
 docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only);
-docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only).
-Next: the decision drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), planned in a fresh session that Mustafa
-starts with the Advisor's drafts brief (DRAFTS-SESSION (a)), starting from the 2026-10-31 decisions
-under "Decisions pending"; then a stop for Mustafa and the Advisor; then phase 1 and the playable slices in the new
-order (SLICE-ORDER, Mustafa and the Advisor: 1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4
-the loop), with, in their words (Mustafa and the Advisor): "The netcode proof test (48
-simulated players over WebTransport) still runs before the foundation." The v2 day session
-(session_0173vVo5q59ameR6cnN9BENg) handed over and stopped on 2026-10-31. The legacy game is frozen (critical fixes
-only).
+docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only); docs-after-31 (PR #32, 9e7db28, 2026-10-31; docs
+only; the v2 day session's handover).
+**In flight: the decision drafts** (PR #33, from the Advisor's drafts brief, 2026-10-31): `docs/ENGINE_OVERVIEW.md`,
+`docs/adr/0001`–`0006` (Status: Proposed), `docs/SPIKE_PLAN.md`, `docs/adr/README.md` (the index and the loose-ends
+register), GLOSSARY §8 (the phase 1 terms) and `docs/LOOK_V2.md` (the look brief, Mustafa and the Advisor, added
+2026-10-31). **The stop is answered** (Mustafa and the Advisor, 2026-11-03; Decisions pending, below): the six drafts
+are signed off as the basis for the spikes, not yet accepted (Status stays Proposed; a draft becomes Accepted only when
+Mustafa signs it off after its spikes report); the answers are recorded in the drafts. PR #33 is ready for review, not merged;
+it merges by squash only, on Mustafa's go after the advisor approves its final head.
+**Next:** the netcode proof test, its own change-set, branched from main after PR #33 merges, plan first. Wave 1 runs
+one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
+proof test once its models exist; the preview hosting check alongside any. The proof test still waits on: his OK of each
+run's cost cap, in its plan (OQ-0006-20, answered); the GitHub macOS runner check for its Safari leg, then the Mac only
+if that fails (MACHINES-TIMING, answered); and, for its own plan with security-auditor, the certificate method, how a
+session holds its SSH key, and how it checks the new VMs' host keys. "Decisions needed" from PR #33: none open
+(MACHINES-TIMING and LG-COUNT answered); OQ-0006-22 is a later item (before slice 3). For Mustafa: borrow and name the
+laptop and desktop (rough checks first, then a short re-run), the Mac as the runner check decides; OK each run's cost
+cap; the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository; his go for the
+merge after the advisor approves PR #33's final head (squash only). Two later steps:
+LOOK_V2 §8 reads "Spline or Blender" once the asset research's export part reports (that part's change-set makes the
+edit, and it goes to Mustafa for the merge); the drafts take up the design answers at their next revision. Then phase 1
+and the playable slices (SLICE-ORDER, below). The legacy game is frozen (critical fixes only).
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
@@ -48,7 +61,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| docs-after-31 (this change-set; docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | `cs/docs-after-31`, PR #32 | plan approved by the advisor with 5 conditions | the advisor's review of its final head, then Mustafa's go |
+| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), PR #33 (ready for review, not merged) | all deliverables in; verified against the research, checked for consistency and completeness, ten domain reviewers on the final diff, every finding fixed or deferred. The stop is answered (Mustafa and the Advisor, 2026-11-03): the six drafts are signed off as the basis for the spikes, not yet accepted (Status Proposed); the answers, his design answers and his answers to the escalations are recorded (plan revisions 4 and 5, the advisor's APPROVE WITH CONDITIONS on each). Verification stopped after the last fix round, as Mustafa asked; what is left goes into the PR's report as notes. Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed). Since then (plan revision 6, the advisor's APPROVE WITH CONDITIONS, amended twice; the drafts' blocks in 4dc30bc): his Hetzner check and later answers recorded (Decisions pending) | the advisor's APPROVE of its final head; then Mustafa's go; merge by squash only |
+| docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
 | **docs-after-v2-research** (docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's "merge #31" after the advisor's APPROVE of 1c687d1 | done; the report is PR #31's body | none |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
 | docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
@@ -91,6 +105,130 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Taken by Mustafa and the Advisor at the stop, 2026-11-03** (about 12:28, in the decision-drafts session's chat;
+  whose each answer is follows his message's marks; the words in full: the appendix
+  `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §2; where each landed: §9):
+  - SPIKE-ORDER (b), Mustafa: the six drafts are the basis for the spikes, in SPIKE_PLAN's order, "but wave 1 runs one
+    heavy spike at a time"; "The preview hosting check may run alongside any of them."
+  - TICK-60-HEADROOM, Mustafa: confirmed, "with one addition: 60 Hz also needs the goal budget to hold at the rooms per
+    VM measured at 60 Hz."
+  - TICK-60-SETUP (a), the Advisor: "as an early signal only. The final 60 Hz call is measured again with the real sim
+    at slice 6."
+  - NET-PROFILES, the Advisor: "100 ms" is P2: "100 ms round trip, ±20 ms jitter, 2 % loss".
+  - REWIND-CAP, Mustafa: "no value now"; "the cap covers the honest rewind the proof test measures at P2, rounded up;
+    beyond the cap, the victim's view wins."
+  - SPIKE-MACHINES, Mustafa: "a separate Hetzner project"; "sessions get SSH access only and no Hetzner token until the
+    security baseline. VMs exist only during a run."; "Test PC: my own, in Brave; the CX33 runs the simulated clients."
+    Beside it, since his Hetzner check (below): the simulated players run on a CAX21, the game server on a CCX23.
+  - LOOK-TEST-INPUTS, Mustafa: the asset research's export and slot-naming part runs before the look proof test;
+    "Route: Blender"; "blockouts with a skin, named colour slots and LOOK_V2's proportions are enough."
+  - TOY-BOX, Mustafa: "reword both to point at LOOK_V2, in a small kit change-set after PR #30 is updated, together
+    with the checkpoint anti-waste rules."
+  - OQ-0002-8, the Advisor: "(a)".
+  - OQ-0005-1, the Advisor: "the client's data, keyed by the same id; the content check fails if a simulation id has no
+    client entry."
+  - OQ-0001-14, the Advisor: "yes, a VISION_V2 §3 or §4 trace counts, marked as such."
+  - ROOM-CRASH, the Advisor: "end the match, as proposed, and keep the crash and match records."
+  - OQ-0003-17, the Advisor, confirmed by Mustafa: "at most 6 of 600 presented frames may miss a refresh with the very
+    large units on screen (recommended desktop, High); the p95 rows stay as diagnostics".
+  - OQ-0003-20, the Advisor: "judge after 15 minutes of play."
+  - OQ-0005-AB12, the Advisor: "tranek's write-up is accepted for concepts"; specific claims are checked against
+    Epic's documentation "once it can be read."
+  - OQ-0005-AB13, the Advisor: "scripting comes back only when a designed ability can't be built from data."
+  - LATER, Mustafa: "a design session after the netcode proof test."
+- **Design answers, Mustafa, 2026-11-03** (about 17:28; word for word in the appendix §2; recorded in
+  `docs/adr/README.md` and here; "They don't change the spike order."; the drafts take them up at their next revision):
+  - Carry slots (OQ-0005-AB1), answered: "a looted weapon replaces the main (class) weapon; the sidearm stays as backup.
+    Assumed, to confirm: the class's own abilities stay."
+  - Looted ammo (OQ-0005-AB2), "still open (infinite, limited, or supply lines by an engineer class)"; the Advisor's
+    lean, not an answer: "limited but generous, refilled at the barracks and supply points."
+  - Levelling (OQ-0005-AB3), answered: "XP from kills, assists and objective work while using that unit or weapon; fast
+    early levels; a track that's behind the player's best levels faster."
+  - Name: "the in-match picks are "amplifications" ("amps")" (the drafts still say "picks").
+  - Weapon unlocks (OQ-0005-AB5), open: "leaning towards class variants, with more variants added over time. Not final."
+  - Banzai vs Riot Shield (OQ-0005-AB11), answered for the Shield and the blade: "a tall, slightly curved Riot Shield
+    blocks the Banzai blade from the front, so the Warrior must flank"; "numbers tuned later".
+  - Upgrade visibility (OQ-0005-AB15, the advisor's reading): "enemies can see a player's build."; how is not said.
+  - Spawn protection (OQ-0005-AB14), answered in part: "3 s, against spawn killing." is his; "Firing ends it early" is
+    the Advisor's pencil, which he may veto; what it covers stays open.
+  - Fragments as damage: "visual only for now."
+  - Still open: "faction asymmetry (Mustafa works on the unit list first) and the war around the matches."
+  - Counts after that round (by script): 115 numbered open questions, 97 open; pass marks 341 (now: below).
+- **The stop's four escalations, answered by Mustafa, 2026-11-03** (about 17:31; appendix §2):
+  - REF-MACHINES (OQ-0003-1, answered in part): the classes, "All borrowed"; he names the actual machines before the
+    look proof test; until then his laptop's integrated graphics "stands in for the minimum, for rough checks only."
+  - LOOK_V2-§8: kept, "with Blender for the test models only".
+  - SPIKE-COST (OQ-0006-20, answered): "one cap per run, from its planned hours, written in that run's plan for my OK."
+  - DOMAIN (OQ-0006-15, answered): "shamblefrontlines.com, which I register at Cloudflare." (registered since: below).
+  - COMMUNITY-SERVERS: a new open question, OQ-0006-21 (ADR 0006 and README): the door kept open, not designed.
+  - MACHINES-TIMING (the Advisor's question, from its review of plan revision 5: three spikes before the look proof
+    test measure on the laptop, desktop or Mac): answered by Mustafa later that day (below).
+- **The Hetzner check and Mustafa's later answers, 2026-11-03** (about 18:26 to 19:04, in the decision-drafts session's
+  chat; plan revision 6, the advisor's APPROVE WITH CONDITIONS, amended twice; the drafts' blocks in 4dc30bc):
+  - The rig (OQ-0006-1 and OQ-0006-2, answered): "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for
+    the game server and a CAX21 for the 48 simulated players"; "I created both once to try the console and deleted
+    them right away. They'll be created fresh on run day, so their IP addresses will be new then."
+  - The CCX13 dropped: his choice of the session's option "the rig is just the CCX23 and the CAX21" (the session's
+    wording).
+  - The shared CX33 is not measured: "in Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its
+    Arm64 version can." (his first note). K3 (a shared fleet) waits for a later measurement of a shared x86 plan.
+  - LG-COUNT, answered: he chose the session's option "The run's plan adds as many CAX21s as its 5-minute calibration
+    shows are needed, inside the cost cap you OK for that run." (the session's wording).
+  - MACHINES-TIMING, answered: "(c), with one step first. For the netcode proof test's Safari leg, check whether
+    GitHub's macOS runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport
+    and can reach the test servers. If they can, that is the Safari check, and I borrow the Mac only for the look proof
+    test. If they can't, I borrow the Mac before the netcode proof test. The laptop and desktop stay on my timing: rough
+    checks first, then a short re-run once they're named."
+  - DOMAIN: "DOMAIN: done. shamblefrontlines.com is registered at Cloudflare."
+  - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
+    ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.
+  - Counts now: 116 numbered open questions, 96 open; pass marks 341.
+- **Follow-ups:** TOY-BOX's small kit change-set after PR #30 is updated, with the checkpoint anti-waste rules
+  (Mustafa, 2026-11-03); LATER's design session after the netcode proof test, with the twelve LATER questions and the
+  38 design questions on its agenda (the advisor's ruling).
+- **Taken by Mustafa 2026-10-31, about 18:41 (in the decision-drafts session's chat, session_0173vVo6CEsV7ckERUa6TtEd;
+  it replaces the drafts brief's upgrade note), in his words:**
+  > UPGRADE-SCOPE, a settled input for ADR 0005 (record it in STATUS with today's decisions):
+  > - Every unit and every weapon has its own roguelike upgrade track (pick one of three per level), owned by the player.
+  > - Tracks survive death and switching (switch back and the track is still there). They reset at the start of every match.
+  > - A class always comes with its own weapon: no weapon choice when buying.
+  > - Other weapons come only from killed enemies' drops; dropped weapons are world pickups.
+  > - Progress belongs to the weapon type, not the physical gun: when a gun is lost, its track waits for the next gun of that type.
+  > - In Unreal terms, the tracks live on the PlayerState, not the Pawn.
+  >
+  > Still open; list them as open questions, don't decide them: carry slots, ammo for looted weapons, and how fast tracks level (including catch-up when switching).
+- **The drafts brief (Mustafa and the Advisor, 2026-10-31; quoted in full in `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §1):**
+  - Its two definitions, now [GLOSSARY §8](research/GLOSSARY.md): **the foundation** (phase 1's work before slice 1's
+    gameplay: the restructure into `legacy/`, the toolchain (a Cargo workspace plus TypeScript with Vite), CI gate v2 and
+    private preview links, TypeScript types generated from the Rust code, the client + local server skeleton; it ends
+    when an empty scene runs through the full stack in the browser, with CI green and a preview link) and **the netcode
+    proof test** (a throwaway spike: the Rust simulation native as a server and as Wasm in the client, over WebTransport
+    with the WebSocket fallback; 48 simulated clients at a 30 Hz tick within ADR 0001's budgets; one human client at
+    100 ms of simulated latency sees prediction, reconciliation and lag-compensated hits that look correct).
+  - Its settled inputs (never reopened): the stack; the biggest match 24v24, 48 players (MODES-3); TICK-30; SLICE-ORDER
+    with its conditions, the order now running to 5 Octopon-3 and Editor v2 → 6 scale to 48; PREVIEW-WALL, SEC-SPREAD,
+    ABL-PREDICT, BASELINE-WHEN, UPGRADE-SCOPE; SPIKE-SCOPE; the look is `docs/LOOK_V2.md`, and authored 3D models
+    (glTF/GLB) are allowed in v2.
+- **Taken by the advisor agent 2026-10-31, about 18:35 (its plan review of v2-decision-drafts, APPROVE with 19 conditions;
+  verbatim in `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §3):**
+  - ASSET-RESEARCH (a): ADR 0005's asset part takes LOOK_V2 §8's flow as given and proposes only what R1-DATA, R3-CHAR
+    and R3-BUDGET support; the rest are "not researched" open questions, grouped as one "asset-pipeline research" unit
+    (graphics-engineer, its own daytime session) that SPIKE_PLAN places before the asset spike.
+  - TICK-60-HEADROOM: TICK-30's 25 % is the 60 Hz margin, measured against the server tick budget at 60 Hz (8.33 ms): a
+    60 Hz tick needs a p99 server tick time of at most 6.25 ms in the netcode proof test (one vCPU of the reference
+    server, the stress scene at N = 48 with a snapshot-receiving client on every soldier, R2-BUD-REC6's 30-minute soak,
+    re-flood ticks included) plus every 60 Hz mark the research sets; otherwise 30 Hz. Confirmed by Mustafa at the stop
+    (2026-11-03, OQ-0001-1), with his addition and TICK-60-SETUP's early-signal reading (above).
+  - GLOSSARY-8: yes, an append-only §8 with three entries (the foundation, the netcode proof test, the 60 Hz margin) and
+    one note.
+  - CHECKPOINT-AT-STOP: keep; the report folds in the checkpoint, which is deleted before the PR is marked ready.
+- **Mustafa's one-off night run (2026-10-31, between about 23:30 and 23:50; this run only), in his words:** "the next
+  usage reset is going to be on 03:50 AM, so you can maybe tell it to prepare accordingly (starting the task at the right
+  time)" and "Just for today (tonight): 03:55, it can work until 11:00 because I will not have much time to use claude,
+  so it can work if needed. You can take the lead in ensuring things get done accordingly, decide on when it start and
+  when its done. Remember: just for today (upcoming session)". It set aside the brief's "daytime only" and the advisor's
+  condition 17 for the run of 2026-11-01 03:55–11:00 only; web fetching stayed at 08:30 and later. After it, the normal
+  rules apply.
 - **Taken by Mustafa and the Advisor 2026-10-31 (relayed by Mustafa in the v2 day session's chat):** SLICE-ORDER, the
   order of the v2 playable slices: "1 move & shoot → 2 bots and three teams (played locally) → 3 online → 4 the loop".
   Their conditions, for the decision drafts:
@@ -121,32 +259,35 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - **Waiting (from R1–R6; the full wording is in each topic's "Shared open questions" and the v2-research report):**
   - ABL-PREDICT (Mustafa, after a Feel Lab test that compares both ways on the Molotov and the Shield): does the client
     predict the player's own abilities?
-- **Next: the decision drafts** (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`), starting from the decisions above.
-  They carry forward:
-  1. The synthesis verifies every ADR claim and number, R3–R6's included (research plan condition 9; the advisor's #28
-     review, finding 4).
-  2. R2-BUD-REC6's reason (r2-netcode.md:2402-2403) says the marks fit the 50 % server tick budget at 60 Hz on every
-     tick but one that both encodes a snapshot and re-floods; that holds at N = 54 (8.99 of 8.33 ms), but at N = 48
-     that tick fits by 0.05 ms (8.28 of 8.33 ms) while its server-only share is 0.24 ms over its own 25 % (4.41 of
-     4.17 ms) (GLOSSARY.md:62-75, lines at b6effde). Under TICK-30 the drafts restate these marks for the 30 Hz baseline and say what the
-     25 % headroom for 60 Hz is measured against (the advisor's #28 review, finding 2).
-  3. Where a research mark gives values for 48 and 54, the drafts use 48; where a research sentence says "until
-     Mustafa answers …", the answer applies.
-  4. R6-HOST-REC4 now recommends a certificate per hostname (C23.b1–b3); four sentences still describe the wildcard as
-     R6's proposal (r2-netcode.md:2703-2705, r6-infrastructure.md:47, 938-940 and 1056, lines at b6effde): the drafts
-     follow REC4.
-  5. No doc defines SLICE-ORDER's "netcode proof test" or "the foundation" yet: the drafts' plan names the research
-     spike the proof test is and what the foundation is, for the Advisor to confirm.
+- **The five carry-forwards into the decision drafts** (final state 2026-11-02; each line's row in
+  `docs/adr/README.md`'s loose-ends register):
+  1. Verify every ADR claim and number, R3–R6's included. Done: every draft and the synthesis verified against the
+     research, 0006's FAIL fixed, the fixes re-checked; claims on unreadable sources stay "unverified" (row CF-1).
+  2. R2-BUD-REC6's reason holds at N = 54, not 48. Done: ADR 0001 parts 2 and 3 (restated at 30 Hz, "(at N = 54,
+     MODES-3 (b))", the 60 Hz margin per GLOSSARY §8); its reading, OQ-0001-1, is confirmed at the stop (row CF-2).
+  3. Use 48 where a mark gives 48 and 54; "until … answers" takes the answer. Done: every draft's Appendix A; checked in
+     the consistency pass (row CF-3).
+  4. A certificate per hostname over the wildcard sentences. Done: ADR 0006 part 7 lists the four as superseded;
+     issuance is OQ-0006-5 (row CF-4).
+  5. Define "the netcode proof test" and "the foundation". Done: GLOSSARY §8 (appended); ADR 0001 owns the proof test,
+     ADR 0002's migration plan is the foundation (row CF-5).
 - **Open, KIT-ALIGN** (rules files the 2026-10-31 answers left stale; a kit change-set after PR #30 aligns them, with
   Mustafa's go): `CLAUDE.md:7-8` and `.claude/agents/netcode-architect.md:17-19` (the per-team reading of VISION_V2
   §3); `CLAUDE.md:192`, `.claude/agents/security-auditor.md:14` and `.claude/agents/infra-engineer.md:29-30` (the
   security baseline as part of R6); `.claude/agents/infra-engineer.md:23-26` and `.claude/agents/security-auditor.md:46`
   (preview privacy, costs at the starting scale); optional: `.claude/agents/netcode-architect.md:37` and
-  `.claude/agents/security-auditor.md:30` (server-only spread as a rule).
+  `.claude/agents/security-auditor.md:30` (server-only spread as a rule). Added 2026-11-01 (v2-decision-drafts; flagged
+  for Mustafa, not changed): the "look is not decided" lines, now that `docs/LOOK_V2.md` exists: `CLAUDE.md:5`,
+  `CLAUDE.md:23-24`, `.claude/agents/art-director.md:16`, `.claude/agents/graphics-engineer.md:19`; and the "toy-box"
+  lines `CLAUDE.md:4` ("Red Alert 3 toy-box look") and `.claude/agents/art-director.md:10` ("a joyful, readable, toy-box
+  battlefield"), which may clash with LOOK_V2 §3 ("The audience is adults. It must not look like a children's game.");
+  TOY-BOX (Mustafa, 2026-11-03, above) rewords both in the kit change-set after PR #30.
 - **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md` §1 ("Then:
   playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the security
   baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
-  `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES).
+  `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES);
+  `docs/EDITOR_V2.md:51` (§5: "It still runs by double-clicking editor.html") and `docs/EDITOR_V2.md:52` (§5: "if
+  ADR-002 moves the project to modules"): ADR 0002 now decides the structure (added 2026-11-01).
 - Taken by the Advisor 2026-10-30 (relayed by Mustafa): VERIFY-FETCH (a), research may read allow-listed pages with
   curl by day (read-only, the host audit in each report); the night shift stays on WebFetch until kit-v3-1 is merged.
   The unread sources go in `docs/research/UNREAD_SOURCES.md`; the critic's 12 contradictions are resolved before the
@@ -195,7 +336,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 - Taken by the Advisor 2026-10-14: gl advisories accepted for now (drop gl for Playwright-only renders if it won't
   install natively on Windows); hook path (`$CLAUDE_PROJECT_DIR`) waits for the Windows run; check 5 is its own
   change-set after the prefab fix; standing permissions granted (see CLAUDE.md)
-- ADR-001..003 below: the v2 drafts `docs/adr/0001`–`0006` replace them (CLAUDE.md, "Decisions pending").
+- ADR-001..003 below: the v2 drafts `docs/adr/0001`–`0006` replace them (CLAUDE.md, "Decisions pending"). Since
+  2026-11-01 each is covered by a Proposed draft (`docs/adr/README.md`'s register: ADR-001 → 0001, 0004, 0005, 0006;
+  ADR-002 → 0002; ADR-003 → 0003); they count as replaced once Mustafa accepts the drafts.
 - **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started. Inputs logged so far: the 11 wall-clock reads (performance.now / Date.now) that make same-seed matches differ; no SRI/CSP on the three.js CDN tag; server-side map-def validation (SEC-MDL-2: `__proto__` key through `envMerge` / `rulesMerge`). Added by 3a: one hit world for every shooter is a multiplayer invariant (K1: bots still use `_botFireWorld`, a view of SIM without ramp slots, until ramps become slopes in SIM); `update()` must become phased (today's real order is in TECHNICAL §4a, K4); the server must repeat the team allow-list (`teamOf`); boot-time `Math.random` draws per slot (`bootGame` soldier loop, `enemyFire` spread, strafe and respawn type); three.js UUIDs draw from the shared `Math.random`; the bot-shot FX cull makes the shared `Math.random` sequence camera-dependent (cosmetic effects need their own RNG stream); `applyDamage` runs `addTech`, whose HUD writes and era toasts should become an event; humans take over bot slots; the LOS budget is sized for 12 soldiers (480 checks/s caps demand from about 24 soldiers in combat; fair since the review fix); map data needs a full schema check server-side (`placeObjectives` checks only the objective keys; `version:1` is written but never read) [verified in code: no `.version` read in shamble-*.js]
 - **ADR-002 Code structure & build** (modules, bundler, TypeScript, double-click build): under discussion with Mustafa;
   evidence first via the build spike
@@ -229,6 +372,15 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
   nothing merges without Mustafa's "merge #<n>".
 
 ## Open bugs and risks
+- **v2-decision-drafts** (PR #33; the report `docs/reports/2026-11-01-v2-decision-drafts.md` has the details):
+  1. Ten spend-limit cuts (2026-10-31 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20, 19:35; 2026-11-02 about
+     09:50, 12:15, 17:50, 21:20; 2026-11-03 about 13:55), each resumed from the agents' notes, no work lost (every agent writes as it goes; Mustafa's
+     save-as-you-go rules of 2026-11-02); the report has the details.
+  2. The asset pipeline is not researched (the research has one glTF mention, R3-CHAR-F8): ADR 0005 lists its parts as
+     "not researched" open questions for the asset-pipeline research unit (ASSET-RESEARCH (a)).
+  3. Several LOOK_V2 items rest on techniques not researched (in ADR 0003: the ink's inner lines and per-class weight, the
+     sun shadow setup, the lighting model, the roof fade, particles, line boil, vegetation; OQ-0003-2 and -4 to -9): the look proof test decides them.
+  4. PR #33's history holds 31 MB of a skeptic's build output (commit 294b3cf); the squash merge keeps it out of main.
 - **R1–R6 research** (its report, "Risks"):
   1. Closed 2026-10-31 by MODES-3 (a): the largest mode is 48 players, so the three marks that failed only at 54 are no
      longer at risk. At 48 and 60 Hz the re-flood tick still has almost no margin (carry-forward 2), and the Advisor
@@ -254,12 +406,12 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
 - Editor: Ctrl+Z (undo) changes the ground textures (old, reported by Mustafa): fixed and merged (PR #8, b5f4ecf; Mustafa confirmed Ctrl+Z in Brave). Root cause: `stylizeScene` runs only at boot, so rebuilt roads / crates / buildings / barracks / terminal lost toon + ink; also `clearMap` never cleared trees / props, so every undo / redo / reset / load stacked another copy of all 70 trees and 36 props, also into snapshots and saved maps
 - Maps saved on older builds after an undo may contain duplicate trees and props: map-dedupe-on-load drops exact duplicates on Load (PR #10, merged, Brave check passed). Limit: on an old stacked save, Cabana trees and props that the map had deleted or moved come back once. They are single entries, so they stay; Mustafa removes them by hand. Measured on the edited fixture: 69 / 35 intended, 71 / 37 after dedupe
 - Deferred (map-dedupe-on-load): prefabs saved by marquee over a stacked area can stamp exact stacks again. Exposure is small: prefabs could only be saved since dbe24f8 (2026-10-14). The next map Save and Load drops them. Follow-up: dedupe on prefab load or stamp with the same key
-- Deferred, info, older (SEC-MDL-2): `envMerge` / `rulesMerge` use `Object.assign`, so a stored `__proto__` key swaps the prototype of that local env/rules sub-object (`Object.prototype` stays clean). Belongs with the server-side map-def validation (ADR-001)
+- Deferred, info, older (SEC-MDL-2): `envMerge` / `rulesMerge` use `Object.assign`, so a stored `__proto__` key swaps the prototype of that local env/rules sub-object (`Object.prototype` stays clean). Belongs with the server-side map-def validation (ADR-001; in v2: ADR 0005 CD-2 and CD-9, README register row SEC-MDL-2)
 - Editor bugs reported by Mustafa (2026-10-15, editor.html on main): placed trees can't be deleted; rotation does nothing when the slider changes; the editor lags after a few placements. Fixed by editor-hotfix (PR #13, 8f4c3b6, merged after Mustafa's Brave check): delete, rotation, inspector selection capture; the lag needed no code fix, PR #8 and PR #10 removed its causes
 - N1 (found in 3a): the editor's Play never rebuilds the nav grid; a one-line change-set, Night queue item 1 (APPROVED), next after the 3a merge [verified: `editorPlay` sets mode='game' itself and never calls `deploy()`, where `navBuild()` runs]
 - Deferred, low (editor-undo-ground PERF-2): `_disposeObj3D` disposes the shared cached BK textures (houses / covers already did on base; trees / props add the well roof `tile`). r128 re-uploads them next frame, nothing breaks. Follow-up: skip `BK._tex` textures in `_disposeObj3D`
 - Pre-existing, low (art review): `serializeMap` rounds to 0.1 m, so the resupply terminal snaps about 2 cm on a rebuild; the editor playtest camera clips into the barracks roof (no roof cutaway in playtest)
-- Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)
+- Deferred from gate-check-5 reviews: no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001; in v2: ADR 0002, three.js bundled with no CDN tag, and ADR 0006 part 13 for the CSP, README register row CDN-SRI)
 - GitHub branch protection on `main` is on (Mustafa, 2026-10-17, in the implementer session's chat: "PROTECT-MAIN is done, main is protected"). Rules, read with the GitHub REST API on 2026-10-17 (`gh api repos/Mergincanli/Shamble-Frontlines/rules/branches/main`): "Shamble Ruleset 1" (active, targets the default branch `main`) blocks deleting and force-pushing `main`, requires a pull request (0 approvals) and requires the `gate` and `smoke` checks; a branch behind `main` may still merge (not strict); no classic protection rule. The `.claude/settings.json` deny rules stay a second layer (fragile by design). Decision PROTECT-MAIN: done (recommended option (a), plus a required pull request)
 - Fixed (PR #22 review, finding 5): CLAUDE.md's merge sentence now says the go comes after the APPROVE of the PR's current head and a later push needs a new review and go, as advisor.md:98–105 does (kit-v2-2, PR #23, 48ffb51)
 - Deferred, low (kit-v2-1): `tools/gate.mjs:333` and `tools/README.md:34` still call `gate-globals.json` "reviewed data, not a gate tool", which contradicts kit-v2-1's category 3 (gate files need Mustafa's go). It errs on the safe side; fix the wording when gate.mjs is next touched
@@ -270,7 +422,7 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
 - Bot nav, editor-made layouts (R1, tracked per the Advisor): rotated colliders at odd angles keep up to 0.34 m of solid inside free nav cells, and wall gaps of about 3-5.4 m can close for bots depending on grid alignment (built-in maps unaffected). Recommendation: an editor-side reachability check; new maps keep walkable gaps at least 6 m wide
 - Bot nav, navSteer "replan storm" (old; bot-poplar-wedge PERF-2): a bot whose straight line flickers clear/blocked replans every few frames; the wedge fix hits it more on Romania (budget-limited frames 0.9% -> 1.8%). Advisor: its own change-set in the greybox phase (bot-replan-storm)
 - Bot nav, A* gives up after 8000 nodes (old): a few far-corner routes fail and fall back to a straight line
-- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run. Tracked as an input for ADR-001 (deterministic shared simulation)
+- The game reads performance.now()/Date.now() in 11 places, so matches with the same seed differ run to run. Tracked as an input for ADR-001 (deterministic shared simulation; in v2: ADR 0004 part 4 and ADR 0002 part 7, README register row WALL-CLOCK)
 
 ## Health (latest measurements)
 | Metric | Value | When | Source |
