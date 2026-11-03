@@ -274,3 +274,287 @@ Nothing in Brave: nothing a player sees changes.
 END VERDICT
 
 Status: DONE
+
+## AMENDMENT (verbatim)
+
+### Notes (amendment)
+- 18:49 read HETZNER-CORRECTION-2 (his words, about 18:48) and HETZNER-ANSWERS-2 (about 18:49; "No, drop the CCX13", option text the session's: "Every server run uses the CCX23 (the measurement-only rule goes); the rig is just the CCX23 and the CAX21."), and the plan's Addendum 2 (7 points). The round launched on the first verdict wrote no block (session's word).
+- His "a CAX21 for the 48 simulated players" is singular and says 48; the rooms-per-VM rows run 8 rooms at N = 48 (384 bot sessions: PM-0001-27, PM-0006-13, -14, -22, -24) and the 0006 key already says 384 sessions "may need more than one 4-vCPU VM" (proposed). Money, his: routed through each run's cap (SPIKE-COST). Non-blocking escalation LG-COUNT.
+- Rows with SH, MV or CX33 in the machine column (script): 0001 PM-0001-1, -16, -27; 0004 PM-0004-1, -4; 0006 PM-0006-11, -12 (CX33 throwaways), -13, -14 (SH); -16, -22, -23, -24 (MV). None runs on SH or MV alone, so no row drops: 341 stays.
+- OQ-0006-1 "Carries: R6-HOST-OQ1, R6-HOST-OQ4, R6-HOST-OQ7": closing it must not orphan OQ4 (root servers before the goal budget) and OQ7 (IPv4 price); Appendix A rows 1514, 1517 say "open: OQ-0006-1".
+- With the CX33 not orderable in Falkenstein, part 8's lean case (production CX33 + staging CX33) and the staging VM's proposed CX33 rest on a machine his check found unorderable in the test servers' location: a money choice for later (before slice 3), so a numbered open question is the honest home, not a label.
+- VMs created fresh each run day: new addresses AND new SSH host keys; capacity on the day is not guaranteed (ADR 0001:756's failure row stays live).
+- 18:53 composing the amendment.
+
+### AMENDED VERDICT: APPROVE WITH CONDITIONS (replaces the rulings and conditions above where they differ; read alone)
+
+Plan revision 6 with Addendum and Addendum 2, v2-decision-drafts, PR #33 (draft), branch tip 898ba05, base main
+9e7db28. Advisor agent, 2026-11-03, about 19:00.
+
+**Why, in one line:** his second correction and answer simplify the rig to two machines in Falkenstein, a CCX23 and a
+CAX21. So DS goes, SH and the separate metrics VM go, and OQ-0006-1 and -2 are answered. Three things still need care
+in the drafts: the staging server and the lean budget now rest on a machine that can't be ordered there, "a CAX21 for
+the 48 simulated players" is singular while some rows run 384 bot sessions, and every run day brings new addresses and
+host keys.
+
+**TL;DR**
+- The rig is RS (the CCX23) and LG (the CAX21), both in Falkenstein (`fsn1`), in his words. Every server row runs on
+  RS. No DS, no SH, no separate MV.
+- OQ-0006-1 and OQ-0006-2 are answered. One new open question, OQ-0006-22: the staging server's x86 plan (money,
+  Mustafa, before slice 3). Counts: 116 numbered, 96 open (ADR 0006: 22 and 17). Pass marks stay at 341.
+- The Arm rules for LG stand (ADR 0001's condition 5, ADR 0004, ADR 0002).
+- The drafts assume no fixed address. Every address-bound setting is made on the run day.
+- One non-blocking question for Mustafa (LG-COUNT), answered when the first run's plan reaches him.
+
+### What I checked myself (amendment)
+- Both new inputs files, read in full. In HETZNER-ANSWERS-2, his words are his choice; the option text is the
+  session's.
+- The plan's Addendum 2.
+- By script, the rows whose machine column names SH, MV or CX33:
+  - ADR 0001: PM-0001-1, -16, -27;
+  - ADR 0004: PM-0004-1, -4;
+  - ADR 0006: PM-0006-11, -12, -13, -14, -16, -22, -23, -24.
+
+  None of them runs on SH or MV alone, so no row drops.
+- OQ-0006-1's "Carries" field (0006:810) and Appendix A at 1511–1517.
+- PM-0006-13 and -14: 8 rooms at N = 48.
+- The 0006 key's 384-session note (1194–1196).
+- ADR 0001:756, the failure row "No Hetzner capacity in the EU".
+- Not run: the gate (nothing edited). Not checked: the console. Both machines being orderable is his statement.
+
+### Amended rulings (all mine or settled by his words; one non-blocking escalation, LG-COUNT)
+- **HZ-LOCATION (OQ-0006-2): answered by his words.**
+  - Quote: "both test servers will be in Falkenstein, not Nuremberg: a CCX23 for the game server and a CAX21 for the
+    48 simulated players". Label: "Answered by Mustafa (2026-11-03)".
+  - `fsn1` in every live place.
+  - "Nuremberg" stays only in OQ-0006-2's options (the record) and inside his quoted words. "Helsinki" and `hel1`
+    likewise.
+  - His answer to the session's question 2 ("Nuremberg (nbg1)") is superseded. It is never quoted in the drafts; the
+    appendix carries it.
+  - Production: part 5 says the first fleet starts in the test servers' location unless playtesters' round trips
+    (R6-HOST-OQ2, still open) say otherwise (the advisor's reading, 2026-11-03). His words name only the test servers.
+- **HZ-OQ1 (OQ-0006-1): answered** (not "in part": nothing is left to check).
+  - His words: "I created both once to try the console and deleted them right away", and, from his first note, "in
+    Falkenstein the cost-optimized x86 line (CX33) can't be ordered; only its Arm64 version can."
+  - Option (a) holds: the reference server stands.
+  - The entry keeps carrying R6-HOST-OQ4 (the root servers, read before part 8's goal budget is fixed) and R6-HOST-OQ7
+    (the IPv4 price), each still open with its own trigger as written. Appendix A's status cells say so; they don't say
+    "answered" for OQ4 and OQ7.
+  - "Created fresh on run day" means capacity on the day isn't guaranteed. ADR 0001:756's failure row and OQ-0006-1's
+    option (b) route stay as the fallback (the advisor's reading, 2026-11-03).
+- **DS: dropped.** It is his choice ("No, drop the CCX13"; the option text, the session's wording: "Every server run
+  uses the CCX23 (the measurement-only rule goes); the rig is just the CCX23 and the CAX21.").
+  - Nothing of DS goes into the drafts: no code, no CCX13, no key sentence, no re-run rule.
+  - PM-0006-11's mark "the machine every server row ran on" stays: it is true again. Part 5's "every native server mark
+    is measured on one vCPU of it" stays.
+  - His first correction ("used only for the measurement runs") and his CCX13 answer are not quoted in the drafts. The
+    appendix carries both, with the later answer that superseded them.
+- **HZ-SH: SH leaves the proof test; K3 waits.** His check makes the CX33 unorderable in Falkenstein, and "the rig is
+  just the CCX23 and the CAX21" (the option he chose).
+  - Never a CAX21 as SH (ADR 0004 part 7; R6-HOST-REC2).
+  - No other shared x86 plan is checked now. K3 (a shared fleet) waits for a later measurement of a shared x86 plan
+    that can be ordered in the fleet's location.
+  - G2's option row stays as weighed, with one pointer.
+- **HZ-MV: no separate VM.** MV becomes a role on the CAX21, never on RS: Prometheus runs on LG's VM, inside LG's 80 %
+  CPU rule (the calibration run includes it).
+  - It still stands in for the staging game server.
+  - The proof test's plan reads Prometheus's Arm64 build from its own release page. The drafts make no claim about it.
+  - If LG-COUNT gives LG more than one CAX21, the plan says which one carries MV.
+  - The firewall rule of PM-0006-16 opens the exporter's port to that VM's address of the day only.
+- **HZ-STAGING: new open question OQ-0006-22** (infra-engineer).
+  - The question: which x86 plan runs the staging game server, now that the proposed CX33 cannot be ordered in
+    Falkenstein (Mustafa's check, 2026-11-03)?
+  - Why it matters: staging runs the room server, and an Arm plan is an Arm host (PM-0004-26 first). Part 8's lean case
+    rests on the CX33's price.
+  - Options:
+    - a CX33 (8.99) only where it can be ordered;
+    - a CCX13 (43.49, R6-HOST-F15) if it can be ordered in the fleet's location;
+    - a shared x86 "Regular Performance" plan (CPX32 35.99, R6-HOST-F15), whose locations are not researched.
+  - Decider: Mustafa (money), with the Advisor. When: before slice 3.
+  - Part 4 points to it. Part 8's lean case is labelled: it "rests on the CX33's price for production (K3) and staging;
+    the CX33 cannot be ordered in Falkenstein (Mustafa, 2026-11-03), so it holds only where a shared x86 plan can be
+    ordered in the fleet's location and K3 passes" (the advisor's reading, 2026-11-03).
+  - The reference case and PM-0001-63's formula keep 8.99, labelled "the staging VM's placeholder price (the CX33's,
+    R6-HOST-F15); its plan is OQ-0006-22".
+  - 0006:1435 reads "on the staging VM's plan (OQ-0006-22)".
+  - The lobby's "for example a CX33" stays in OQ-0006-3, an example.
+- **PM-0006-12: a check, without DS or a throwaway VM.**
+  - Target: the run's CAX21 in `fsn1`, with ICMP allowed on it only (never on RS), pinged from ML and MP.
+  - Reported against VISION_V2 §4's "about 100 ms". It decides nothing; a surprise goes to Mustafa.
+  - The row stays; its title loses "each candidate location" and "feeds OQ-0006-2".
+- **New addresses each run day (his words: "They'll be created fresh on run day, so their IP addresses will be new
+  then.").**
+  - The drafts write no address and assume none is fixed. The run records the day's addresses with its results.
+  - Every address-bound setting is made on the run day:
+    - the per-address connection cap raised on LG's addresses;
+    - any firewall rule that names a source (PM-0006-16's scrape);
+    - the WebSocket leg's DNS record on shamblefrontlines.com, set before its certificate is issued.
+  - New VMs also bring new SSH host keys. How a session checks a host key before trusting it is the proof test's plan's,
+    with security-auditor (r4's SPIKE-MACHINES (a)).
+  - The WebTransport certificate is pinned by hash, not by address, and is made per run.
+  - This is the advisor's reading, 2026-11-03, written as at most one sentence in ADR 0006's key and one in ADR 0001's.
+- **HZ-PRICE:**
+  - Prices excluding VAT come from R6-HOST-F15 only: CCX23 0.1386 and CAX21 0.0176 an hour. The CX33's 0.0144 appears
+    only in records and placeholders.
+  - His "about €0.020/h incl. VAT" is quoted as his.
+  - The screenshot's figures and the option texts are the session's. No VAT rate.
+- **HZ-RECORD:** as ruled above.
+- **HZ-COUNTS:** 116 numbered, 96 open; ADR 0006: 22 numbered (OQ-0006-1 to -22), 17 open (-1 and -2 answered; -22
+  new). Pass marks: 341 (rows lose their SH, MV and CX33 parts; none drops).
+- **HZ-VERIFY:** his stop holds; no verifier and no skeptic (condition 11). Quotes are checked against all eight
+  inputs files.
+END AMENDED RULINGS
+
+### Amended conditions (complete; they replace conditions 1 to 13 above)
+1. **The work list comes from a script.**
+   - The search covers the nine documents for: CX33; CCX13; `DS` (expected 0); SH and MV in machine columns and keys;
+     OQ-0006-1; OQ-0006-2; R6-HOST-OQ1; R6-HOST-OQ2; Nuremberg|nbg1|Helsinki|hel1|Falkenstein|fsn1; "every server
+     row|every native server mark|every server mark"; and "address" in the machine keys and the operations checklist.
+   - Each hit gets a disposition from its author: a FIX, or "no change: <reason>". The report's §9 gets a row for each
+     place.
+   - It must include:
+     - ADR 0006: 119, 189, 244–254, 267, 325–326, 352, 373, 607, 632–634, 713, 715, 753, 768, 799–816, 825, 1073–1077,
+       1133–1134, 1189–1199, 1267–1280, 1300, 1364–1370, 1435, 1446–1448, 1499 and 1510–1517;
+     - ADR 0001: 1293, 1350–1357, PM-0001-1, -16, -27 and -63;
+     - ADR 0004: 1030–1032, PM-0004-1 and -4;
+     - README: 21, 23–25, 133 and 134;
+     - SPIKE_PLAN: 31–33, 129–130, 176, 281 and 513.
+2. **The rig: two machines, his words.**
+   - Quote "a CCX23 for the game server and a CAX21 for the 48 simulated players" and "I created both once to try the
+     console and deleted them right away. They'll be created fresh on run day, so their IP addresses will be new then."
+   - RS: the CCX23 (x86-64 AMD) in `fsn1`. Every server row runs on it.
+   - No DS and no CCX13 anywhere.
+   - Not quoted in the drafts: his first correction's sentences and his answers to the session's questions 1 and 2.
+3. **Location:** `fsn1` in every live place, as HZ-LOCATION rules.
+   - OQ-0006-2's options stay as the record, labelled answered.
+   - Nothing keeps "nbg1 or hel1", "Falkenstein … only if offered" or "picked by a round-trip measurement" as a live
+     rule.
+   - Production follows the test servers' location unless R6-HOST-OQ2's playtester round trips say otherwise (the
+     advisor's reading, 2026-11-03).
+4. **LG:** "a CAX21 for the 48 simulated players" (his words), with "so their build targets aarch64" (his first note).
+   - Created in `fsn1` on the run day.
+   - The calibration run's 80 % rule stays.
+   - A run whose sessions one CAX21 cannot carry under 80 % (the 8-room rows, 384 sessions) names the extra CAX21s in
+     its plan, for his OK with that run's cost cap (LG-COUNT below). Until he answers, the drafts say exactly that.
+   - The order-check note and the CX33 client-VM note from the first verdict go.
+5. **Arm in ADR 0001** (netcode-architect; test-engineer writes the row text). Unchanged.
+   - No pass mark's verdict rests on native aarch64 agreeing with x86-64 or Wasm.
+   - It covers PM-0001-54 and -48, and -17, -18 and -19 if their client side does float work.
+   - Each such row picks one of two ways:
+     - (i) it takes its verdict from L1, an x86-64 client or a browser, with LG as load only;
+     - (ii) a mismatch seen on LG is replayed on x86-64 before it counts. An aarch64-only mismatch is reported and
+       decides nothing.
+   - No row is added.
+6. **ADR 0004** (rust-reviewer and test-engineer).
+   - An Arm load generator is not "an ARM host" in part 7's sense (the advisor's reading, 2026-11-03). S7, PM-0004-26
+     and the A64 key stay; at most one sentence pointing to condition 5.
+   - The CX33 code leaves the key, which says instead: "the shared CX33 is not measured: it cannot be ordered in
+     Falkenstein (Mustafa, 2026-11-03)".
+   - PM-0004-1 drops CX33. PM-0004-4 drops "and on the cheaper host" and its N = 48 CX33 part. Its author states
+     whether R1-ECS-OQ4 and R1-TICK-OQ5 are still decided from RS alone, or whether either stays open.
+   - The RS key (1030): `fsn1`, and R6-HOST-OQ1 answered.
+7. **ADR 0002** (engine-architect a).
+   - "No arm64 leg" stays: every room server runs on x86-64 RS, and the rig's only Arm machine is LG.
+   - At most one sentence: the bot clients' aarch64 build is the netcode proof test's own. The playtest soak's bot VM
+     is named when the first soak is planned; if it is Arm, `devtools` gains an aarch64 build target then (a build, not
+     a determinism leg), and the soak's desyncs follow condition 5.
+   - 0006:373 (infra-engineer): "on a client VM beside the reference server, never on it (as spike 2's load
+     generators)", 3 × (0.1386 + 0.0176) = 0.47 EUR.
+8. **SH leaves, and the rows and texts that carried it change.**
+   - ADR 0001: PM-0001-1, -16 and -27 lose SH. 0001:1293 reads "on the CCX23 (ADR 0006)". The key drops SH.
+   - ADR 0006:
+     - PM-0006-11 creates "the CCX23 … in `fsn1`" and records it; there is no SH.
+     - PM-0006-13 and -14 run on RS only, and -13's SH-only bite goes.
+     - The key drops SH.
+     - 119, 244, 254 and 713 no longer measure a shared CX33 beside RS. They say K3 waits, with one pointer to his check.
+     - K3 at 352, 768 and 1448 waits for a later measurement of a shared x86 plan in the fleet's location.
+     - G2's row stays as weighed, with one pointer.
+   - SPIKE_PLAN:30–31: "SH, its shared neighbour" goes.
+9. **MV and the metrics.**
+   - MV is defined in ADR 0006's key as "the metrics role: Prometheus on LG's CAX21, never on RS, inside LG's 80 %
+     rule, standing in for the staging game server" (the advisor's reading, 2026-11-03).
+   - PM-0006-16, -22, -23 and -24 keep MV as that role. PM-0006-16's firewall rule names the day's address of that VM.
+   - SPIKE_PLAN:33 says the same.
+   - 0006:1073–1077 (OQ-0006-20's options and interim): the record keeps its words and gains one pointer.
+10. **Staging and budgets:** OQ-0006-22 as HZ-STAGING rules (infra-engineer: the entry, part 4's pointer, part 8's
+    labels, 1435). README gets its row (engine-architect b). PM-0001-63's label: test-engineer.
+11. **PM-0006-12 and new addresses**, as the rulings say.
+    - test-engineer: PM-0006-12, and one sentence in ADR 0006's key: the day's addresses, the settings bound to them,
+      the host keys going to the proof test's plan.
+    - netcode-architect: at most one clause in ADR 0001's key, at the connection cap on LG's addresses.
+12. **His words.**
+    - They come only from the eight inputs files.
+    - The option texts in both HETZNER-ANSWERS files are the session's wording. Superseded words (the first
+      correction's rule, the CCX13, Nuremberg) are never quoted in the drafts.
+    - The screenshot description is never presented as his.
+    - Every reading is labelled "(the advisor's reading, 2026-11-03)".
+    - Times come from the inputs files: about 18:26, 18:32, 18:34, 18:48 and 18:49.
+13. **Routing** (one round, every author on its own text):
+    - infra-engineer: ADR 0006's places outside the pass marks, OQ-0006-1, -2 and -22, and Appendix A.
+    - test-engineer: the keys and rows of ADR 0001 (PM-0001-1, -16, -27, -63, and -48 and -54 as netcode-architect
+      answers), ADR 0004 (PM-0004-1, -4, the keys) and ADR 0006 (PM-0006-11 to -14, -16, -18, -22 to -24, the key).
+    - netcode-architect: 0001:1293, condition 5, condition 11's clause.
+    - rust-reviewer: condition 6's sentence.
+    - engine-architect (a): condition 7.
+    - engine-architect (b): README (rows OQ-0006-1, -2 and -22; counts at 21 and 23–25) and SPIKE_PLAN (31–33, 129–130,
+      176, 281, 513).
+    - Then docs-keeper and the report.
+14. **Verification (his stop).** No fixcheck and no skeptic. The session runs:
+    - the write guard, dispositions, glossary, tables and counts;
+    - quotes against the eight inputs files;
+    - greps: no CCX13, no `DS`, no SH in any machine column or key;
+    - no live `nbg1`, `hel1`, Nuremberg or Helsinki (only OQ-0006-2's options and his quoted words);
+    - every CX33 left is his words, a record, a NOTE or a labelled placeholder;
+    - no address written as fixed;
+    - counts 116/96, ADR 0006 22/17, 341;
+    - the gate.
+
+    My final-head review is the merge rule's review, not a round.
+15. **Close as r4's conditions 7 to 9 and r5's condition 9.**
+    - The appendix carries byte for byte: the five Hetzner inputs files (CHECK, CORRECTION with the session's
+      screenshot description marked as the session's, ANSWERS, CORRECTION-2, ANSWERS-2) and this verdict with its
+      amendment.
+    - docs-keeper (high) updates STATUS: the check, both corrections and the answers; the counts; "For Mustafa" without
+      the console check; STATUS:117's record kept, with his new words beside it.
+    - The report's "Decisions needed" holds MACHINES-TIMING (r5) and LG-COUNT.
+16. **Models and effort:** Opus for every agent. The authors at xhigh, docs-keeper at high.
+END AMENDED CONDITIONS
+
+### Amended findings (ranked)
+1. Part 8's lean case and the staging VM rest on the CX33, which can't be ordered in Falkenstein: a money choice for
+   later, now OQ-0006-22.
+2. "A CAX21 for the 48 simulated players" against rows of 384 bot sessions (LG-COUNT).
+3. Run-day VMs bring new addresses and host keys, and capacity on the day isn't guaranteed (condition 11; ADR 0001:756
+   stays).
+4. Closing OQ-0006-1 must not orphan R6-HOST-OQ4 and OQ7.
+5. The SH and MV parts of 13 rows, which the plan's map doesn't list.
+6. The first verdict's Arm findings stand (conditions 5 to 7).
+END AMENDED FINDINGS
+
+### Decisions needed (for the report; none blocks this round)
+- **LG-COUNT**
+  - The question: you named "a CAX21 for the 48 simulated players". Some proof-test rows run 8 rooms of 48 bots, which
+    is 384 simulated players. If one CAX21 can't carry them under 80 % CPU, may that run add CAX21s?
+  - Why it matters: an overloaded load generator makes the run invalid. Each extra CAX21 costs about 0.0176 EUR an hour
+    (excluding VAT, R6-HOST-F15).
+  - Options:
+    - (a) the run's plan adds as many CAX21s as the 5-minute calibration needs, inside the cost cap you OK;
+    - (b) one CAX21 only, and the 8-room rows run with as many bots as it carries (they would no longer test 8 rooms of
+      48);
+    - (c) decide when the calibration reports.
+  - Recommendation: (a). The decision lands in the run's plan, with its cost cap, which reaches you anyway. The round
+    proceeds with the drafts saying so.
+- OQ-0006-22 (the staging server's plan) is yours (money), but not now: before slice 3.
+
+### For Mustafa
+1. Nothing to do for this round. The console check is done and leaves the list.
+2. LG-COUNT above, when the first run's plan and its cost cap reach you.
+3. Still from r5: register shamblefrontlines.com at Cloudflare before the netcode proof test; borrow and name the
+   laptop, desktop and Mac; OK each run's cost cap.
+4. Once I have approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this session's chat.
+   It merges by squash only.
+
+Nothing in Brave: nothing a player sees changes.
+END AMENDMENT
+
+Status: DONE (amended)
