@@ -64,7 +64,12 @@ No agent runs inside the night window (condition 17: units end before 00:10; the
 resume game-designer's touch2 (F1b, F8, F9, F10, AB-1's "Why" line, the 0005:883 dangle); apply; if 0005's line count
 changes, the synthesis author re-pins README's pointers into 0005 (draft_pointers.py "off 0"); then a short re-check
 of the touch-ups (fixcheck-d3: 750d46d, the game-designer's commit, the re-pin; no fetching), the gate, the report's
-and appendix's placeholders, the PR body, and a final commit that runs CI.
+and appendix's placeholders, the PR body, and a final commit that runs CI. Prepared and saved (06:20–06:25):
+`prompts/touchup2-game-designer-resume.txt`, `prompts/touchup3-engine-architect-repin.txt` (only if pointers are off),
+`prompts/verifier-fixcheck-d3.txt` (also reads the two facts left unread at 22:00: WebGPU's error model, std's
+`Hasher`), `prompts/docs-keeper-3.txt` (after d3's verdict). Filled already: the appendix's {SYNTH} (116), the d1 and
+d2 rows, the final round's commits, nine cuts (§2, §5), condition 17's row (4b76636). A scheduled task wakes the session
+at 08:31 Amsterdam (send_later trig_01QUmBkBLA9dvbttWn4E75FF).
 
 Before (2026-11-02 evening):
 Eighth spend-limit cut, 2026-11-02 about 17:50 Amsterdam ("resets 7:30pm (UTC)", 20:30 Amsterdam): test-engineer A (29

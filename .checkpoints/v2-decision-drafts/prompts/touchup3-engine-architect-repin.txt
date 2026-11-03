@@ -1,4 +1,4 @@
-# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: high · model: opus · the synthesis author re-pins README's pointers into ADR 0005, only if the game-designer's touch-up moved them · 2026-11-03, saved about 07:00 Amsterdam (not before 08:30)
+# Prepared prompt (verbatim, saved before launch) · subagent_type: engine-architect · effort: high · model: opus · the synthesis author re-pins README's pointers into ADR 0005, only if the game-designer's touch-up moved them · 2026-11-03, saved about 06:25 Amsterdam (not before 08:30)
 
 You are the author of the synthesis of the v2 decision drafts of SHAMBLE FRONTLINES (docs/ENGINE_OVERVIEW.md, docs/SPIKE_PLAN.md, docs/adr/README.md; branch claude/laughing-lovelace-ox61se; the docs as they are on disk). The game-designer's last touch-up of ADR 0005's ability section (fixcheck-d2 F1b, F8, F9, F10; the session names its commit when it launches you) changed that draft's line count, so some of README's "[ADR 0005](…) line L" pointers no longer land on their open question. This is notes only: you edit no doc, and you never commit, push or fetch.
 
