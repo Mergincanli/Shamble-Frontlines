@@ -10,24 +10,31 @@ spike plan and the loose ends, all checked against the research, then a stop for
 changes for players: these documents decide how v2 gets built.
 
 ## Outcome
-DONE, at the stop. Every deliverable is in. Each was verified against the research, checked for consistency and
-completeness, and reviewed by ten domain reviewers, and every finding was fixed or deferred with a reason. The PR stays
-a draft.
+DONE, and past the stop. Every deliverable is in; each was verified against the research, checked for consistency and
+completeness, and reviewed by ten domain reviewers, and every finding was fixed or deferred with a reason. On
+2026-11-03 Mustafa and the Advisor answered the stop: the six drafts are signed off as the basis for the spikes, not
+yet accepted (Status stays Proposed; a draft becomes Accepted only when Mustafa signs it off after its spikes report).
+Their answers are recorded in the drafts. The PR is ready for review; it merges by squash only, on Mustafa's go after
+the advisor approves its final head.
 
 ## Plan and approval
 Plan revision 1 → the advisor's APPROVE with 19 conditions (2026-10-31), folded into revision 2; revision 3 applies
 Mustafa's UPGRADE-SCOPE update. Each condition's place: appendix §6. Rulings: ASSET-RESEARCH (a); TICK-60-HEADROOM read
-as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at the stop.
+as "the 60 Hz margin" (confirmed at the stop, with Mustafa's addition); GLOSSARY §8 yes; the checkpoint kept at the
+stop. Revision 4 (2026-11-03: record the stop's answers, close the change-set) → the advisor's APPROVE WITH CONDITIONS,
+12 conditions, word for word in appendix §10.
 
 ## What changed
-- `docs/ENGINE_OVERVIEW.md` (144 lines; the diagram shows the parts, the boundary, the per-tick and per-frame flow and
-  VISION_V2 §6's places) · `docs/SPIKE_PLAN.md` (10 spikes and the asset-pipeline research: order, sizes, pass marks)
-  · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design questions, the loose-ends register).
-- `docs/adr/0001`–`0006` (Proposed): 114 numbered open questions (111 open) plus one in SPIKE_PLAN, each with options
-  and a decider, and 340 pass marks. Authors: netcode-architect, engine-architect, graphics-engineer, rust-reviewer,
-  engine-architect + game-designer + graphics-engineer, infra-engineer; pass marks by test-engineer.
-- `docs/LOOK_V2.md` (byte copy) · `docs/research/GLOSSARY.md` §8 (appended) · STATUS, ROADMAP, REPO_MAP · this report
-  and its appendix. Symbols +0 −0 (gate check 3); no code, no spike.
+- `docs/ENGINE_OVERVIEW.md` (147 lines; the diagram shows the parts, the boundary, the per-tick and per-frame flow and
+  VISION_V2 §6's places) · `docs/SPIKE_PLAN.md` (10 spikes and the asset-pipeline research: order, sizes, pass marks;
+  wave 1 one heavy spike at a time) · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design
+  questions, the loose-ends register; its pointers name OQ ids and parts, no line numbers).
+- `docs/adr/0001`–`0006` (Proposed; signed off as the basis for the spikes): 114 numbered open questions (98 open after
+  the stop's answers) plus one in SPIKE_PLAN, each with options and a decider, and 341 pass marks. Authors:
+  netcode-architect, engine-architect, graphics-engineer, rust-reviewer, engine-architect + game-designer +
+  graphics-engineer, infra-engineer; pass marks by test-engineer.
+- `docs/LOOK_V2.md` (byte copy) · `docs/research/GLOSSARY.md` §8 (appended; its 60 Hz entry amended at the stop) ·
+  STATUS, ROADMAP, REPO_MAP · this report and its appendix. Symbols +0 −0 (gate check 3); no code, no spike.
 
 ## Evidence
 - **Against the research:** 3,922 claims, 3,847 confirmed (98.1 %); 0006's first verdict FAIL, fixed. A skeptic
@@ -66,6 +73,38 @@ reach production, a look floor stops any quality tier switching a LOOK_V2 [DECID
 the time of the sim parts it lacks. The final round added 24 open questions; a few low items are deferred to the
 revision after this stop, each with its reason (appendix §7.3).
 
+## At the stop (2026-11-03)
+Mustafa's answers, word for word: appendix §2; where each landed, by commit: appendix §9 (03ef222, 59d41e0{STOPFIX}).
+Mustafa's: SPIKE-ORDER (b), wave 1 one heavy spike at a time; TICK-60-HEADROOM confirmed, with the goal budget holding
+at the rooms per VM measured at 60 Hz (new mark PM-0001-63); REWIND-CAP's rule (no value yet); SPIKE-MACHINES;
+LOOK-TEST-INPUTS (Blender); TOY-BOX (a kit change-set after PR #30); LATER (a design session after the netcode proof
+test). The Advisor's: TICK-60-SETUP (a), an early signal only, slice 6 deciding; NET-PROFILES (P2); OQ-0002-8 (a);
+OQ-0005-1; OQ-0001-14; ROOM-CRASH; OQ-0003-20; OQ-0005-AB12; AB13; and OQ-0003-17, confirmed by Mustafa.
+
+The advisor's readings, marked "(the advisor's reading, 2026-11-03)" where they stand; each can be overturned:
+- 60 Hz: "the goal budget" is ADR 0006 part 8's figure at the call (OQ-0006-19's at slice 6; in wave 1 reported only);
+  "holds" means the goal-mode fleet at the rooms per VM measured at 60 Hz costs no more; slice 6 always runs the final
+  measurement, and a pass in wave 1 starts no 60 Hz work.
+- Spike order: the 60 Hz run uses the proof test's kept server and harness after the sim core spike; the proof test
+  closes at 30 Hz without it; the boundary spike uses the sim core spike's sim; the asset research's export part runs
+  between two wave-1 spikes (recommended: right after the proof test).
+- The rewind cap: the honest rewind is its p99 at P2, rounded up to a whole tick; the checklist's 200/250 ms comparisons
+  and the Feel Lab's weighing of the cap go; "the smallest input buffer that holds" guides OQ-0001-6.
+- P2's loss: 2 % on each direction, independently.
+- Machines: "no token until the security baseline" covers the tick bench and the 3-hour soaks; the load generator is
+  CX33s; "Test PC: my own" is MP and stands in for no reference machine; the WebSocket leg uses a trusted certificate
+  on his domain, the method in the proof test's plan.
+- The look test: blockouts may stand for part 11's objects; no checklist edit now; Blender for the models and the
+  export route.
+- OQ-0003-17 and -20: the narrow reading (the frame rows keep gating; PM-0003-44 gated on RD at High); the soaked set
+  gates on ML.
+- OQ-0005-1: the presented kinds that need a client entry are unit, vehicle, weapon and faction; AB13: a new reviewed
+  operation still counts as built from data.
+- ROOM-CRASH: "keep" means under ADR 0006 part 11's proposed retention; one word, "marked crashed".
+- LATER: the twelve questions and the 38 design questions go to that session; OQ-0003-16, OQ-0006-18 and OQ-0006-13
+  keep their own timing.
+- Counts: a partly answered question stays open (OQ-0001-5 among them), so 98 are open.
+
 ## Decisions and deviations
 - **Openly stated (condition 18):** LOOK_V2 was added before the plan's approval (brief §0 asked for it first). The
   plan delays R7-MARKS's "changed when their ADR draft comes up" until the drafts are accepted; each draft lists its
@@ -94,46 +133,35 @@ revision after this stop, each with its reason (appendix §7.3).
 
 ## Risks
 1. Size: about 11,000 lines of drafts. README's "Decisions the drafts ask for" is the way in.
-2. Line pointers into the drafts move with every edit: re-pin them with `scripts/draft_pointers.py` after any change.
-3. The asset pipeline has no research yet (compression, LOD tool, export checks, budgets): open until ASSET-RESEARCH.
+2. The asset pipeline has no research yet (compression, LOD tool, export checks, budgets): open until ASSET-RESEARCH,
+   whose export and slot-naming part runs before the look proof test.
+3. PR #33's history holds 31 MB of a skeptic's build output (294b3cf): the squash merge keeps it out of main.
 
 ## Proposed next step
-After Mustafa's and the Advisor's review: the netcode proof test (SPIKE_PLAN item 1), as its own change-set, plan first.
+After the merge: the netcode proof test (SPIKE_PLAN item 1), as its own change-set branched from main, plan first; it
+waits on the items in "For Mustafa" and, for its own plan with security-auditor, on the certificate method and how a
+session holds its SSH key.
 
 ## Decisions needed
-These start the first spike; README's "Decisions the drafts ask for" holds every other one, each with its options.
-- **SPIKE-ORDER** · Accept the six drafts as the basis for the spikes, and SPIKE_PLAN's order? · Phase 0 allows spikes
-  only after you both approve (CLAUDE.md) · (a) accept; (b) accept with changes; (c) send back · Recommend (a).
-- **TICK-60-HEADROOM** (OQ-0001-1) · Confirm: 60 Hz only if the p99 server tick time stays at or below 6.25 ms against
-  8.33 ms (the 60 Hz margin, 25 %), with 48 players, one vCPU of the reference server, 30 minutes? · Decides whether v2
-  ever ticks at 60 Hz · confirm, or another base for the 25 % · Recommend confirm.
-- **TICK-60-SETUP** (OQ-0001-2, the Advisor) · Where does the 60 Hz run get its sim load before the real sim exists? ·
-  (a) the sim core spike's sim plus stand-ins that burn the time of the parts it lacks; (b) replayed step times; (c)
-  wait for the real sim · Recommend (a): it keeps the one-run rule and errs towards 30 Hz.
-- **NET-PROFILES** (OQ-0001-3 and -16, the Advisor) · Is "100 ms of simulated latency" research profile P2 (100 ms round
-  trip with P2's jitter and loss), and does each profile split latency and jitter half each way? · They set the proof
-  test's hardest case · Recommend P2, split half each way (proposed values).
-- **REWIND-CAP** (OQ-0001-5) · With the input buffer counted, an honest shot at P2 needs 233–383 ms of rewind, above
-  the 200 ms cap · Fixes how far the server rewinds · Recommend no value now: set it from the proof test's p99.
-- **SPIKE-MACHINES** (OQ-0006-1, -17, -20; OQ-0003-1; OQ-0006-15) · The proof test needs Hetzner VMs. Who creates
-  them, under what bill cap, and with which reference PCs and certificate? · Nothing runs without them · Recommend a
-  separate Hetzner project with its own token, a cap you set, and a private test certificate authority until a domain.
-- **LOOK-TEST-INPUTS** (ASSET-RESEARCH timing; OQ-SPIKE-1) · Run the asset research's export and slot-naming slice
-  before the look proof test, and name who makes its models? · Art waits on it · Recommend yes, before the look test.
-- **TOY-BOX** · CLAUDE.md line 4 ("Red Alert 3 toy-box look") and the art-director's file line 10 may clash with LOOK_V2
-  §3 ("It must not look like a children's game") · Agents read them as the look · keep, reword, remove · Recommend
-  reword to point at LOOK_V2, in a small kit change-set.
-- **OQ-0002-8** (the Advisor) · May ADR 0002 propose the `room`, `navbake` and `client-endpoint` crates, which no
-  research option offers but a settled input forces (labelled "not researched")? · (a) yes, the foundation tests them;
-  (b) a layout research first · Recommend (a).
-- **OQ-0005-1** (the Advisor) · Do model ids and faction colours sit in the sim's definitions, or in client definitions
-  keyed by the same id? · It decides what the sim's Wasm carries · Recommend client definitions.
-- **LATER** · Game rules (steals, carried caches, rejoins, full pools, bots and pickups, spawn protection, who sees
-  picks; UPGRADE-SCOPE's three), the look's tier floor, the deploy-job guard, releases, unreleased art · None blocks the
-  proof test · Recommend a design session after it; README gives each its options and a recommendation.
+Escalated by the advisor at the stop (appendix §10); none blocks this PR.
+- **REF-MACHINES** (OQ-0003-1) · Which laptop is the minimum (ML), which desktop the recommended (RD), and which Mac
+  (MAC)? · About 22 of the proof test's marks are measured on ML or RD, and your PC (MP) is never a measured result ·
+  (a) name, buy or borrow ML, RD and MAC before the proof test's plan; (b) your PC as RD for the proof test only, which
+  changes MP's rule; (c) start the rows that need neither · Recommend (a) for ML and RD; MAC may follow.
+- **LOOK_V2-§8** · You chose Blender for the look test's models, while LOOK_V2 §8 says Spline: does §8 change? · Agents
+  read §8 as the production art flow · (a) keep §8, Blender for the test models only; (b) change §8, in a change-set by
+  you and the Advisor · Recommend (a), until the asset research's export part reports.
+- **SPIKE-COST** (OQ-0006-20) · What may the proof test's VMs cost? · With no cap, each run plan's cost comes to you
+  before you create its VMs · (a) 5 EUR for ADR 0006's own runs; (b) one cap from the run plan's hours; (c) 5 EUR for
+  everything · Recommend (b).
+- **DOMAIN** (OQ-0006-15) · Which domain, registrar and DNS host for the WebSocket leg, and will production use it? ·
+  The WebSocket leg needs a trusted certificate on a real hostname before the proof test · a spike-only domain, or the
+  game's future one · Recommend the game's future domain if you know it; if not, a cheap spike-only one.
 
 ## For Mustafa
-1. Read `docs/adr/README.md`, "Decisions the drafts ask for", and answer the decisions above in this chat.
-2. In your Hetzner console: can you order a CCX23 and a CX33 in an EU location (SPIKE-MACHINES)?
-3. Nothing to check in Brave (nothing a player sees changes) and nothing to merge: the PR stays a draft for your and
-   the Advisor's review.
+1. In your Hetzner console: can a CCX23 and a CX33 be ordered in an EU location (OQ-0006-1)? Still open.
+2. Register the domain for the WebSocket leg before the netcode proof test (DOMAIN above).
+3. Name the reference machines (REF-MACHINES above).
+4. Once the advisor has approved PR #33's final head and gate and smoke are green on it, say "merge #33" in this
+   session's chat; it merges by squash only. Nothing to check in Brave: nothing a player sees changes.
+
