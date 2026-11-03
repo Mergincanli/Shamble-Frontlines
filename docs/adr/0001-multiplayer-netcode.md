@@ -1361,12 +1361,21 @@ another file is named; "the draft" is this record.
   per-address connection cap (part 10) is raised to the run's session count and recorded, except in PM-0001-25's run
   with the cap on (proposed: clients on RS would take CPU from the measured work; one 4-vCPU VM may not carry 384
   encrypted sessions, and the cap would refuse most sessions from one address: the infra review of 2026-11-02,
-  findings 9 and 10). **ML, RD, MAC** as ADR 0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines 1096–1102; the models
-  are OQ-0003-1): ML, the minimum laptop, runs Chrome, Edge and Firefox on Windows 11; RD, the recommended desktop,
-  Chrome; MAC runs Safari, the fourth target browser (VISION_V2 §4). **MP**, Mustafa's PC in Brave on Windows, the
-  proof test's test PC (SPIKE-MACHINES, Mustafa, 2026-11-03: "Test PC: my own, in Brave"): only what he judges, and
-  the transport Brave uses; never a measured result, so it stands in for none of ML, RD and MAC (the advisor's
-  reading, 2026-11-03). **L1**: the link simulator on simulated time, any
+  findings 9 and 10). **ML, RD, MAC** as ADR 0003's pass marks name them (r3-rendering.md, R3-BUDGET-REC1, lines
+  1096–1102): ML, the minimum laptop, runs Chrome, Edge and Firefox on Windows 11; RD, the recommended desktop,
+  Chrome; MAC runs Safari, the fourth target browser (VISION_V2 §4). Their models are OQ-0003-1, answered in part by
+  Mustafa (2026-11-03): "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a
+  mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES).
+  Still open: the actual machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES,
+  Mustafa, 2026-11-03): "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the
+  minimum, for rough checks only." A rough check is reported, never judged against a pass mark. MP stays what he
+  judges, never a measured result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). Mustafa
+  on the proof test (REF-MACHINES, 2026-11-03): "the netcode proof test doesn't measure client frames". It reads: no
+  client frame-time budget is judged in the proof test; PM-0001-43 times input-to-screen latency through presented
+  frames on ML and RD, and like every row on ML, RD or MAC it is judged only on a named machine
+  (the advisor's reading, 2026-11-03). **MP**, Mustafa's PC in Brave on Windows, the proof test's test PC
+  (SPIKE-MACHINES, Mustafa, 2026-11-03: "Test PC: my own, in Brave"): only what he judges, and the transport Brave
+  uses; never a measured result. **L1**: the link simulator on simulated time, any
   machine or CI: logic marks only (counts, shares, hashes), never a time mark. Browser versions: the stable releases on
   the day of the run, recorded (R2-TRN-REC1 mark 1 names Chrome 156, Edge 156, Firefox 158 and Safari 27 on macOS,
   line 2586).

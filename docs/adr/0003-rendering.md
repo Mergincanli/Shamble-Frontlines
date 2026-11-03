@@ -402,7 +402,8 @@ judges the look) and the render budget bench (the numbers).
      backend, adapter, browser version, `devicePixelRatio`, resolution and whether GPU times are quantized
      (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193). On the minimum laptop the same run set is also taken
      after at least 15 minutes of play (the pass marks' soaked set S); the soaked set gates and the cold set is
-     reported beside it (OQ-0003-20, answered by the Advisor, 2026-11-03: "judge after 15 minutes of play").
+     reported beside it (OQ-0003-20, answered by the Advisor, 2026-11-03: "judge after 15 minutes of play"), its
+     option (a) (the advisor's reading, 2026-11-03).
    - A fixed benchmark scene: a recorded match replayed from its inputs (ADR 0004's identical results: r1-simulation-core.md, Recommendations, R1-DET-REC1, lines 2129–2145, and
      R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, [previews](../research/GLOSSARY.md#preview) included
      (R3-MEASURE-REC2, lines 1195–1204). If replay on the client is not identical, the fallback is a scripted bot
@@ -818,11 +819,14 @@ ADR 0005's.
   (R3-BUDGET-REC1's mark, lines 1114–1116) and `hardwareConcurrency` (R1-BND-OQ3, r1-simulation-core.md lines
   2728–2731). Research ids: R3-BUDGET-OQ1 (lines 1364–1365), R1-TICK-OQ6 (r1-simulation-core.md lines 2662–2665),
   R1-BND-OQ3.
-  Answered in part by Mustafa (2026-11-03): "Test PC: my own, in Brave" (SPIKE-MACHINES). That PC is MP, which the
-  pass marks' key defines as what he judges and never a budget result, so it stands in for none of ML, RD or MAC
-  (the advisor's reading, 2026-11-03); still open: which laptop (ML) and which desktop (RD), and which Mac (MAC) for
-  the rows that name Safari, decided by Mustafa (escalated to him, since the netcode proof test's marks on ML or RD
-  cannot run without them: the advisor's reading, 2026-11-03).
+  Answered in part by Mustafa (2026-11-03): "minimum: a typical student laptop with integrated graphics;
+  recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari.
+  All borrowed." (REF-MACHINES). Still open: the actual machines, named by Mustafa before the look proof test. The
+  stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03): "Until then, my laptop's integrated graphics (Brave set to
+  "Power saving") stands in for the minimum, for rough checks only." Mustafa's "Test PC: my own, in Brave"
+  (SPIKE-MACHINES, 2026-11-03, at the stop) is MP. A rough check is reported, never judged against a pass mark.
+  MP stays what he judges, never a measured result, and nothing stands in for RD or MAC
+  (the advisor's reading, 2026-11-03).
 - **OQ-0003-2. The ink's width, its inner lines and its weight on buildings.**
   Why it matters: LOOK_V2 §2 asks for ink "especially strong on buildings" and §6.2 for thinner lines inside.
   Options: width in world units (legacy CL6), constant on screen (three.js's hull, R3-LOOK-F5), or in pixels
@@ -1086,8 +1090,14 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
   r2-netcode.md lines 959–975), for the marks that name Safari; the draft names none, so its model is recorded with
   each result, and it carries no budget row. **MP**, Mustafa's PC (RTX
   5080, Windows) in Brave: only what he judges, and the record of Brave's backend (R3-WGPU-OQ1, lines 1286–1289);
-  never a budget result. **CI**, the gate v2's headless runner (W-A): counts only, never a time (R3-MEASURE-REC3, lines
-  1206–1209).
+  never a budget result. The models of ML, RD and MAC are OQ-0003-1, answered in part by Mustafa (2026-11-03):
+  "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX
+  3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual
+  machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03):
+  "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough
+  checks only." A rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured
+  result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless
+  runner (W-A): counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).
 - **Scenes.** **BS**, the benchmark scene (part 8; R3-MEASURE-REC2, lines 1195–1197): a recorded match replayed at the
   stress scene's fight on screen (N = 48 soldiers in three teams of 16, the 4 very large units of at least 20 parts
   each, 300 live projectiles with their visual effects), with a scripted camera, started by a URL flag. Until ADR
@@ -1120,7 +1130,8 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
   runs about 20 minutes, LOOP_V2 §8, and in a thin laptop the CPU and the integrated GPU share one power and heat
   budget, so a run on a cool laptop can fit inside a short boost window; the chosen laptop's boost behaviour is not
   researched). PM-0003-18 to -21 run S on ML beside their cold set. The soaked set gates and the cold set is reported
-  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"; its option (a)).
+  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"): OQ-0003-20's
+  option (a) (the advisor's reading, 2026-11-03).
 - **Statistics.** Percentiles by nearest rank over a run's 600 frames: p99 is the 594th smallest value, p95 the 570th,
   the median the 300th; over the tail form's 3,000 frames, the 2,970th, 2,850th and 1,500th (⌈q × n⌉, arithmetic;
   proposed: one definition, so two people get the same number). A time mark that names no
@@ -1363,7 +1374,14 @@ The netcode proof test runs first, before the foundation (SLICE-ORDER, condition
 Each phase ends on a milestone that proves it done; the legacy game stays playable in `legacy/` throughout (ADR 0002).
 
 1. **Drafts signed off as the basis for the spikes** by Mustafa (2026-11-03, SPIKE-ORDER (b); this record stays
-   Proposed, not yet accepted); the two reference machines named (OQ-0003-1, answered in part: still open, Mustafa's).
+   Proposed, not yet accepted); the two reference machines named.
+   OQ-0003-1 is answered in part by Mustafa (2026-11-03): "minimum: a typical student laptop with integrated
+   graphics; recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a MacBook Air, M1 or newer, for
+   Safari. All borrowed." (REF-MACHINES). Still open: the actual machines, named by Mustafa before the look proof
+   test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03): "Until then, my laptop's integrated graphics (Brave
+   set to "Power saving") stands in for the minimum, for rough checks only." A rough check is reported, never judged
+   against a pass mark. MP stays what he judges, never a measured result, and nothing stands in for RD or MAC
+   (the advisor's reading, 2026-11-03).
 2. **The look proof test**, fourth in wave 1, which runs "one heavy spike at a time": after the netcode proof test,
    the sim core spike (then the 60 Hz run) and the boundary spike, "once its models exist" (SPIKE-ORDER (b), Mustafa,
    2026-11-03); the asset research's export and slot-naming part runs before it (LOOK-TEST-INPUTS, part 11).
