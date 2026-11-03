@@ -1,0 +1,3 @@
+a=3.0000002e0 b=1.0000001e0 a/b=3 div_euclid=3 rem_euclid=1 q*b+r==a? false
+check 2*b+1 == a exactly in f64: true
+f64: a/b=3 div_euclid=3 rem_euclid=1 exact quotient 2: 2*b+1==a? true
