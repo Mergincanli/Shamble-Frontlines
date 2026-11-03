@@ -23,7 +23,7 @@ as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at
 - `docs/ENGINE_OVERVIEW.md` (144 lines; the diagram shows the parts, the boundary, the per-tick and per-frame flow and
   VISION_V2 §6's places) · `docs/SPIKE_PLAN.md` (10 spikes and the asset-pipeline research: order, sizes, pass marks)
   · `docs/adr/README.md` (index, every decision the drafts ask for, 38 design questions, the loose-ends register).
-- `docs/adr/0001`–`0006` (Proposed): 114 numbered open questions (112 open) plus one in SPIKE_PLAN, each with options
+- `docs/adr/0001`–`0006` (Proposed): 114 numbered open questions (111 open) plus one in SPIKE_PLAN, each with options
   and a decider, and 340 pass marks. Authors: netcode-architect, engine-architect, graphics-engineer, rust-reviewer,
   engine-architect + game-designer + graphics-engineer, infra-engineer; pass marks by test-engineer.
 - `docs/LOOK_V2.md` (byte copy) · `docs/research/GLOSSARY.md` §8 (appended) · STATUS, ROADMAP, REPO_MAP · this report
@@ -31,7 +31,8 @@ as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at
 
 ## Evidence
 - **Against the research:** 3,922 claims, 3,847 confirmed (98.1 %); 0006's first verdict FAIL, fixed. A skeptic
-  re-checked every "wrong" or "unsupported" verdict first (five rounds: 30 upheld, 9 partly, 2 refuted). About 160
+  re-checked first every "wrong" or "unsupported" verdict that the drafts' verifiers and fixcheck-a to -c sent to an
+  owner (five rounds: 27 upheld, 9 partly, 2 refuted; a sixth on 2026-11-03: 2 partly). About 160
   source pages read, allow-listed hosts only, by day, each with a fetch audit.
 - **Against each other:** the consistency critic's 14 findings, all fixed; the completeness critic's 16 gaps, all
   closed (the 18 legacy inventory rows, the pass marks' anchors, the appendix's §3–§4, the re-checks, the reviews).
@@ -61,13 +62,16 @@ revision after this stop, each with its reason (appendix §7.3).
   plan delays R7-MARKS's "changed when their ADR draft comes up" until the drafts are accepted; each draft lists its
   rows instead, the "look brief pending" rows included.
 - **In form:** the write guard checks the GLOSSARY base as a byte prefix (the base file has no final newline); the
-  session put a blank line under eight tables (formatting only; GitHub would show the line as a table row).
+  session put a blank line under eight tables (formatting only; GitHub would show the line as a table row). From the
+  final round on, the claims ledgers (plan rule 9) were not updated (last change 8fa7173): the verifiers' claim tables
+  (fixcheck-d1, -d2, -d3) stand in for them, and ledger row 307's 7.49 ms is superseded by ADR 0001's 4.69 ms.
 - **Slips and hand-overs:** one citation in test-engineer's text went to netcode-architect by mistake (kept, a stale
   line range replaced by the section's name). Blocks touching another author's text were held and handed on. At the
-  end, for time, the owner checked four "wrong" verdicts against their sources instead of a fresh skeptic (fixcheck-d0
-  row 9; fixcheck-d1 F1, F2, F10); fixcheck-d3 then judged the four on their own: every verdict holds, and every fix is
-  right but d0 row 9's wording, which leaned on a precision promise the toolchain breaks (D3A-1, fixed after a
-  skeptic). One skeptic's scratch put 31 MB of build output into a checkpoint commit (gone from the tree; history is
+  end, for time, the owners checked the wrong and unsupported verdicts of fixcheck-d0, -d1 and -d2 against their
+  sources instead of a fresh skeptic (1, 6 and 7 rows; d2's other two, F7 and F14, wording, were deferred, appendix
+  §7.3); fixcheck-d3 then judged every fixed text and both deferrals against their sources, and four of those verdicts
+  on their own (d0 row 9; d1 F1, F2, F10): every verdict holds, and every fix is right but d0 row 9's wording, which
+  leaned on a precision promise the toolchain breaks (D3A-1, fixed after a skeptic). One skeptic's scratch put 31 MB of build output into a checkpoint commit (gone from the tree; history is
   never rewritten).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
   Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching.

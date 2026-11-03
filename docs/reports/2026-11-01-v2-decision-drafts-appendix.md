@@ -557,11 +557,14 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | Rounds 3–4 and the synthesis round (fixcheck-c) | PASS WITH NOTES | 95 | 92 | 1 partly wrong (skeptic upheld), 1 citation off, nits; fixed in the final round |
 | The final round's web facts (fixcheck-d0) | PASS WITH NOTES | 10 | 9 | 1 wrong (ADR 0004's precision line; its owner checked the saved excerpt and fixed it) |
 | The final round, ADR 0001, 0002, 0006 (fixcheck-d1) | PASS WITH NOTES | 151 | 138 | 3 wrong, 3 unsupported, 1 citation off, 4 stale against another draft, 1 wording, 1 unclear pass rule; rebuilding the three drafts from the blocks gives the commit exactly |
-| The final round, ADR 0003, 0004, 0005, the synthesis (fixcheck-d2) | FAIL (two lines lost in ADR 0005), then fixed | 130 | 122 | 7 wrong (2 in part or in one word), 1 unsupported; fix blocks had dropped the AB-3 heading and the Feel Lab's step 4 |
+| The final round, ADR 0003, 0004, 0005, the synthesis (fixcheck-d2) | FAIL (two lines lost in ADR 0005), then fixed | 130 | 122 | 7 wrong (2 in part or in one word), 1 unsupported, 1 confirmed with one phrase unsupported; fix blocks had dropped the AB-3 heading and the Feel Lab's step 4 |
 | The touch-ups after d1 and d2 (fixcheck-d3) | {D3} | | | |
 
 Skeptics (a fresh verifier asked to refute each "wrong" or "unsupported" verdict before it went to its owner), five
-rounds: 30 upheld, 9 partly, 2 refuted. The consistency critic: 14 findings (3 high), all fixed by their owners, 489
+rounds: 27 upheld, 9 partly, 2 refuted (the results files' own rows, recounted by fixcheck-d3e; an earlier "30 upheld"
+was a miscount); a sixth round on 2026-11-03: D3A-1 and D3E-5, both partly. Not sent to a skeptic: four assembly
+cut-marker rows the session fixed itself (cf00def), fixcheck-c's nit A43, and the wrong and unsupported verdicts of
+fixcheck-d0, -d1 and -d2, which their owners checked (the report's "Decisions and deviations"). The consistency critic: 14 findings (3 high), all fixed by their owners, 489
 glossary in-context hits judged in the drafts (3 wrong, fixed) and 44 in the synthesis. The completeness critic:
 GAPS, 16 items, all handled (the 18 inventory rows, the pass marks' anchors, §3–§4 of this appendix, the fixcheck units,
 the reviews, this report). Each verdicts file holds its fetch audit; github.com answers 403 in this session, so its
@@ -608,6 +611,13 @@ Deferred, each with its reason (to the drafts' revision after the stop review):
   ADR 0002 OQ-0002-5's "paid minutes" (d1 F8, as above); ADR 0003 Appendix A still marks R3-WGPU-REC1 "adopted" though
   its mark 2 is changed (d2 F6); ADR 0004's "late steals" is not one of LOOP_V2 §11's counters (d2 F7) and "most
   slots" stands where VISION_V2 §3 says "Bots fill empty slots" (d2 F14). Wording only; for the revision after the
-  stop review.
-- Not read at their sources (no fetch after 22:00): the WebGPU specification's error model behind PM-0003-2, and std's
-  `write_length_prefix` default behind ADR 0004 part 9 (both stay "unverified" in the verdict files).
+  stop review. ADR 0003 lines 960, 993 and 1367 (and SPIKE_PLAN 247, 255 and 267) keep LOOK_V2 §9's "legacy
+  screenshots" beside the look checklist's live legacy window (d2 F13's other places: a screenshot of that window
+  meets both).
+- The claims ledgers (plan rule 9) were not updated from the final round on (last change 8fa7173): the verifiers'
+  claim tables (fixcheck-d1 §1a–4c, d2's claims table, d3a §1, d3b's claims) stand in for them; ledger row 307's
+  7.49 ms is superseded by ADR 0001's 4.69 ms (fixcheck-d3's critic, G3).
+- Read at their sources by fixcheck-d3e (2026-11-03, 08:30–08:36; the final round could not read them after 22:00):
+  PM-0003-2's WebGPU error model (W3C Candidate Recommendation Draft of 15 September 2026, §22), rustc 1.99.1's
+  `div_euclid` (the same steps as 1.97.0) and std's `write_length_prefix` default: all confirmed. Not read at a
+  source: that `usize` is 32 bits on wasm32 (ADR 0004 part 9, labelled proposed).
