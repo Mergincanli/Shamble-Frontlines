@@ -35,10 +35,12 @@ as "the 60 Hz margin" (to confirm now); GLOSSARY §8 yes; the checkpoint kept at
   source pages read, allow-listed hosts only, by day, each with a fetch audit.
 - **Against each other:** the consistency critic's 14 findings, all fixed; the completeness critic's 16 gaps, all
   closed (the 18 legacy inventory rows, the pass marks' anchors, the appendix's §3–§4, the re-checks, the reviews).
-- **The fixes re-checked:** {FIXCOUNT} exact fix blocks in five rounds, each applied only inside its author's own text
-  (a block in another author's text went to that author). Re-checks: fixcheck-a, -b, -c and -d1 PASS WITH NOTES (d1:
-  rebuilding ADR 0001, 0002 and 0006 from the blocks gives the commit exactly; its three medium items fixed); d0, the
-  final round's web facts, all confirmed; {D2}.
+- **The fixes re-checked:** 901 exact fix blocks in five rounds and {TOUCHN} in the touch-ups after them, each applied
+  only inside its author's own text (a block in another author's text went to that author). Re-checks: fixcheck-a,
+  -b, -c and -d1 PASS WITH NOTES (d1: rebuilding ADR 0001, 0002 and 0006 from the blocks gives the commit exactly;
+  its three medium items fixed); d0, the final round's web facts: 9 of 10 confirmed, the tenth fixed; d2 FAIL, as fix
+  blocks had dropped ADR 0005's AB-3 heading and a Feel Lab step (both restored; a fresh verifier dry-ran every
+  restoring block first); d3, on every touch-up: {D3}.
 - **Scripts at {HEAD}:** 521 of 521 research ids disposed exactly once; 0 retired glossary phrases in all nine
   documents; README's 94 pointers into the drafts on target; no line glued under a table; the write guard passes.
 - **Gate** (`node tools/gate.mjs 9e7db28`): 1–4 and 5b–5d PASS, symbols +0 −0; 5a smoke cannot start here (Playwright
@@ -63,11 +65,18 @@ revision after this stop, each with its reason (appendix §7.3).
 - **Slips and hand-overs:** one citation in test-engineer's text went to netcode-architect by mistake (kept, a stale
   line range replaced by the section's name). Blocks touching another author's text were held and handed on. At the
   end, for time, the owner checked four "wrong" verdicts against their sources instead of a fresh skeptic (fixcheck-d0
-  row 9; fixcheck-d1 F1, F2, F10).
+  row 9; fixcheck-d1 F1, F2, F10); fixcheck-d3 then judged the four on their own: every verdict holds, and every fix is
+  right but d0 row 9's wording, which leaned on a precision promise the toolchain breaks (D3A-1, fixed after a
+  skeptic). One skeptic's scratch put 31 MB of build output into a checkpoint commit (gone from the tree; history is
+  never rewritten).
 - **For the Advisor:** ADR 0001 replaces four research lines under TICK-30, not three (r2-netcode.md:2302 too).
   Mustafa's UPGRADE-SCOPE update answers brief §3's "how a pick applies after a switch": tracks survive switching.
-- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00); nine spend-limit cuts over three days, each resumed
-  from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
+  ADR 0004 part 7: std documents `div_euclid` as exactly rounded, but rustc 1.97.0 returns 3 where the exact quotient
+  is 2 (a shared error, so a same-bits test passes it); it stays off the float list until PM-0004-22's new
+  exact-reference clause passes.
+- **Time:** Mustafa's one-off night run (2026-11-01 03:55–11:00), and his "You can continue" (2026-11-03 07:14), which
+  let this morning's last units start before 08:30 (fetching still from 08:30); nine spend-limit cuts over three days,
+  each resumed from the agents' saved work; from 2026-11-02 his save-as-you-go rules (appendix §2).
 
 ## Risks
 1. Size: about 11,000 lines of drafts. README's "Decisions the drafts ask for" is the way in.
