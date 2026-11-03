@@ -1,0 +1,8 @@
+Task: bypass-hunter A1 - adversarial check of GUARD-FILE fix 537c7a8 in PR #30 (kit-v3-1)
+- Unit 1 done: read diff 31e8871..537c7a8, guard.mjs, decide(); built scratch harness /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/bypass-hunter/{mk.mjs,matrix.mjs}, output /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/bypass-hunter/matrix-out.txt (16 file states x old/new settings x day/night-shift x 3 events).
+- FOUND (introduced by fix): unsettled top-level await in guard.mjs or anything it awaits (tlaguard, tlarg, cycle = routine-guard.mjs gains "import './guard.mjs'", tladecide) -> old: exit 13 = block; new: exit 0 no output = routine passes all 3 hooks.
+- Pre-existing (same old/new): empty or truncated guard.mjs -> routine passes; async throw / exit1 / "{bad json" / hang -> day session blocked. missing/syntax/dir/conflict -> fix works (day 0, routine 1). Special-char project dir OK.
+- Next: test candidate bootstrap with beforeExit fail-closed; NODE_OPTIONS ideas; other refs still carrying old handler.
+- Unit 2 done: candidate bootstrap (adds process.on('beforeExit') -> routine exit 1) in /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/bypass-hunter/settings-cand.json (mkcand.mjs): closes TLA regression AND pre-existing empty/truncated fail-open; no day-session change; passes the test's forbidden-char regex. NODE_OPTIONS (--input-type=module, --experimental-default-type=module, --no-experimental-require-module): no change vs plain. No ref in the worktree still carries the 5be7d37 direct handler. Existing tests 290/290 pass at worktree head (none covers unsettled TLA).
+- Next: write answer.
+DONE

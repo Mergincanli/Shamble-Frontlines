@@ -46,8 +46,11 @@
    case; the nine "removed, routine" cases and the "present" case pass on both (routines were always blocked).
 
 ## Current step
-Step 4, docs: docs-keeper on STATUS, ROADMAP and REPO_MAP (C5, F1, F2), then my "Update" section in #30's report (C6,
-F4, F5).
+Steps 4 and 5 together, in one workflow (Running work): docs-keeper on STATUS, ROADMAP and REPO_MAP (C5, F1, F2, Q3)
+then an independent verifier of its diff; in parallel, security-auditor on the fix (diff 31e8871..537c7a8, with Q3/C6,
+F5, F6 in its brief) and an adversarial bypass hunter, each finding checked by one skeptic. After it: my "Update"
+section in #30's report (C6, F4, F5, MANAGED (b) context), only once the docs verifier is done (it checks that only the
+three docs changed).
 
 ## Next steps
 1. Step 4 docs → commit, push; gate. 2. Step 5: security-auditor on the fix (diff 31e8871..537c7a8; Q3/C6, F5, F6 in its
@@ -98,4 +101,8 @@ ready, keep needs-mustafa, CI gate+smoke green (C9; smoke from CI per GATE-SETUP
   gate runs without smoke; smoke comes from CI before the merge · Mustafa · 2026-11-04.
 
 ## Running work
-- none
+- Workflow run `wf_dadc7576-164` · script as launched: `.checkpoints/kit-v3-1/a1-docs-and-security-review-run1.js` ·
+  args: `.checkpoints/kit-v3-1/a1-docs-and-security-review-run1.args.json` · notes: `.checkpoints/kit-v3-1/`
+  (docs-keeper-a1, verifier-a1-docs, security-auditor-a1, bypass-hunter-a1, skeptic-a1-*) · launched 2026-11-04 00:24
+  Amsterdam · status: running. On a cut-off: resume with `resumeFromRunId` and that copy of the script.
+- Background saver (`checkpoint.mjs watch kit-v3-1`), started 00:23 Amsterdam, stops by itself after 110 minutes.
