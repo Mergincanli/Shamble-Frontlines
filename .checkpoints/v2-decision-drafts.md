@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 06:25 Amsterdam
+- **Last update:** 2026-11-03 07:17 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,17 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+2026-11-03 about 07:14 Amsterdam, Mustafa in the session's chat, after the session said it would wait for 08:30: "You
+can continue" (with ultracode on). Read as his go to run agents now, inside the night window, for this morning's
+remaining units (as his one-off night run of 2026-11-01 set condition 17 aside); web fetching still waits for 08:30.
+The 08:31 wake-up was deleted (trig_01QUmBkBLA9dvbttWn4E75FF). Running: workflow wf_0c35d4e2-382 (about 07:16;
+script copied to `prompts/workflow-gd-touchup.js`): game-designer writes its blocks (F1b, F8, F9, F10, AB-1's Why line,
+the 0005:883 dangle), then a fresh verifier dry-runs and judges each block before the session applies it (up to 3
+rounds; verdicts `verifier-gdcheck-verdicts.md`). Next: apply; re-pin if pointers are off; fixcheck-d3 as a workflow
+(units by draft group, a skeptic for every "wrong" or "unsupported" verdict, the web facts after 08:30);
+docs-keeper-3; the report; the PR body; the final commit that runs CI.
+
+Before (2026-11-03 early morning):
 Ninth spend-limit cut, 2026-11-02 about 21:20 Amsterdam ("resets 12:30am (UTC)", 01:30 Amsterdam): the touch-ups
 after fixcheck-d2 were running; game-designer's touch2 (agent a62575dec0f1fe2c5) failed at 21:19 with its notes saying
 F1b, F8, F9, F10 all hold, plus two lost lines of its own (AB-1's "Why" line, dropped by its RR-4 block; 0005:883's
