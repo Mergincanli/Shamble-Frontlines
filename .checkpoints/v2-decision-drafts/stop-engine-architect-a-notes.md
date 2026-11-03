@@ -11,3 +11,10 @@
 - 14:25 C2, C2-2, C6, C6-2, C7, C7-2, C7-3, A4, A4-2, B3, B4, NOTE B4-2, B5, B5-2, B5-3 written. Next: NOTE X5, NOTE M24, then all checks.
 - 14:30 NOTE X5, NOTE M24 written. All map rows have blocks. Next: checks (dry runs on all three docs, glossary, tables, line lengths, write guard prefix), final read.
 - 14:45 reworked C1-2 (Proposed line -> Answered + Decided) and C7-2 (Proposed -> Decided) per rule 2; NOTE X5 made precise. Next: re-run all checks on a fresh scratch tree.
+- 14:55 checks on a fresh scratch tree (stop-engine-architect-a-scratch/tree): dry runs 41/41 ok on 0002, 0005, GLOSSARY
+  (dryrun.out); glossary exact 0 in all nine (in-context 604 -> 605: "effects" as a kind name in C4-2's list, as CD-6
+  uses it; glossary-applied.out); tables 0 glued, 0 cell mismatches, PM rows 340 (tables-applied.out); new lines 139,
+  0 over 120; GLOSSARY base 9e7db28 a byte prefix and lines 1-743 identical; dispositions 521/521
+  (dispositions-applied.out). 41 FIX, 7 NOTE (H23, H23-2, O18-5, O22, B4-2, X5, M24). For others: test-engineer
+  (H23-2 0002:1332-1333; O18-5 PM-0002-28/BX-P; B4-2 0005:2263), game-designer confirms the ability kinds listed in C4-2.
+DONE

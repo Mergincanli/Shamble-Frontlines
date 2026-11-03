@@ -1,0 +1,5 @@
+    room's). Whether a room may instead resume from a snapshot was the Advisor's question in ADR 0001 (OQ-0001-18); the
+    Advisor answered it on 2026-11-03: "end the match, as proposed, and keep the crash and match records", so a room
+    never resumes. In the browser `-Cpanic=abort` ends the sim's instance, and the trap alone carries no panic message,
+    only `unreachable` and frames; so the Wasm build installs a small panic hook of its own (`std::panic::set_hook`, no
+    extra crate) that

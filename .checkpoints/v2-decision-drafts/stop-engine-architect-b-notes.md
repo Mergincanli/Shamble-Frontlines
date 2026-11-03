@@ -24,3 +24,15 @@
 - 14:56 O12 + NOTEs H21 S20 N15 M20 L5 written. Next: L1 (OQ-SPIKE-1), then OVERVIEW (O15, H22, S22, F6), NOTE M19, then dry runs, then pointer step.
 - 14:58 L1 written. Next: OVERVIEW (O15, H22, S22, F6), NOTE M19, then dry runs, then pointer step.
 - 15:01 OVERVIEW O15, H22, F6, S22 and NOTE M19 written. All non-pointer blocks done. Next: dry runs on scratch tree, glossary, cells, lengths; then pointer step.
+- 15:10 checks on applied scratch tree: dry runs all ok (79 blocks); glossary exact 0 all nine, in-context 604->615 (the goal x8 'the goal budget/modes', 48 x2, always x1: not misuses); cells ok, no glued text, no prose >120. Next: pointer step (generate from tree README).
+- 15:16 pointer blocks POINTERS-01 (README:10-11 sentence) and POINTERS-02..97 (96 lines: 95 pointers + CF-2's '(line 162 at 604a497)') written last. Next: full dry run from disk copies, re-run glossary/cells/lengths, pointer check.
+- 15:22 tree2 (fresh copies, all 176 FIX blocks): dry runs ok; glossary exact 0 (in-context 615); cells/glued/length 0 problems; pointers: 0 line numbers left into drafts (LOOP_V2 line 8 kept), every ADR link names OQ/part/section; dispositions 521/521. Next: final read of applied docs.
+- 15:31 M18 rewrapped (line 141 was 125 chars); all checks 0 problems on tree2. Next: proofread README applied, then structured output.
+- 15:36 final: 176 FIX blocks (79 for map rows and RISK3, then POINTERS-01..97 last) and 10 NOTEs (S21-3, X4-4, T1,
+  S19, H21, S20, N15, M20, L5, M19). Checks on fresh copies (scratch tree2): all blocks apply; glossary exact 0 (in
+  context 604 -> 615, none a misuse); cells, glued text, prose > 120: 0; no draft line numbers left in README (LOOP_V2
+  line 8 kept); dispositions 521/521. Docs on disk untouched (git diff docs empty). Shared-line rows: RC10 carries the
+  Status column (O14), O14 carries the total (RC10) and OQ-SPIKE-1's count (L6), O12 carries H21 S20 N15 M20 L5, O8
+  carries S19, M18 carries N14's :115/:119-120, Q5 carries F5's :370, O2/O3 carry S17's mermaid/words, H22 carries
+  S22's slice-6 clause. N16's quote uses curly outer quotes (the answer holds straight quotes).
+DONE
