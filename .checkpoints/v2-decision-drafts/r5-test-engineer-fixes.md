@@ -80,13 +80,38 @@ BEFORE:
   never a budget result. **CI**, the gate v2's headless runner (W-A): counts only, never a time (R3-MEASURE-REC3, lines
   1206–1209).
 AFTER:
-  never a budget result. The models are OQ-0003-1, answered in part by Mustafa (2026-11-03): "minimum: a typical
-  student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a
-  MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual machines, named by
-  Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03): "Until then, my
-  laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough checks only." A
-  rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured result, and
-  nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless runner (W-A):
-  counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).
+  never a budget result. The models of ML, RD and MAC are OQ-0003-1, answered in part by Mustafa (2026-11-03):
+  "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX
+  3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual
+  machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03):
+  "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough
+  checks only." A rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured
+  result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless
+  runner (W-A): counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).
+END
+
+### NOTE n1-0003-oq-entry
+FILE: docs/adr/0003-rendering.md
+no change: not my text. OQ-0003-1's entry (0003:821-825) still says MP "stands in for none of ML, RD or MAC" and
+"which Mac (MAC) ... decided by Mustafa (escalated to him, since the netcode proof test's marks on ML or RD cannot run
+without them ...)", which his "the netcode proof test doesn't measure client frames" no longer bears out (the
+advisor's ruling: "It no longer blocks the netcode proof test"); condition 3 routes the entry and its migration line
+(0003:1366) to graphics-engineer. My key (FIX c3-0003-key) uses condition 3's wording, so the entry can match it.
+END
+
+### NOTE n2-other-keys
+FILE: docs/adr/0002-code-structure-build-toolchain.md
+no change: ADR 0002's key (0002:1163-1167) says "the model is OQ-0003-1" and MAC "the draft names none, so its model
+is recorded with each result"; ADR 0004's (0004:1033), ADR 0005's (0005:2200-2203) and ADR 0006's (0006:1179) keys
+point to ADR 0003's machines. None labels OQ-0003-1 or says "stands in for none", and no model is named yet, so they
+stay true; condition 3 lists only ADR 0001's and ADR 0003's keys among my places.
+END
+
+### NOTE n3-no-rows
+FILE: docs/adr/0001-multiplayer-netcode.md
+no change: condition 4, no pass-mark row changes. ADR 0001's rows on ML, RD or MAC count rendered frames for
+correctness (PM-0001-42, -45, -46, -61) or time input-to-screen latency (PM-0001-43); none is a client frame-time
+budget, so the reading in FIX c3-c4-0001-key holds without a row edit. Totals by script on the applied tree: 0001 63,
+0002 78, 0003 47, 0004 75, 0005 46, 0006 32 = 341.
 END
 

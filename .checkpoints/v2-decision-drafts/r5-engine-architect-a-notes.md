@@ -8,3 +8,8 @@
 - 18:12 FIX e2b-F5 written (0005:1499-1500, the verifier's smallest fix word for word). Next: e2b F6 (2538).
 - 18:14 FIX e2b-F6 written (0005:2538, mark dated; cells kept). Next: e2b F7 CD-6 half (0005:384-386).
 - 18:20 FIX e2b-F7 written (0005:384-386 CD-6 client content names the client entries keyed by simulation ids, CD-2; PM-0005-15 half is test-engineer's). Next: COMMUNITY-SERVERS check (0002 server/supervisor rows; 0005 mode, content hash, record).
+- 18:34 NOTE COMMUNITY-SERVERS-0002 written (no change). Next: NOTE COMMUNITY-SERVERS-0005, then dry-run + glossary + rules checks.
+- 18:38 NOTE COMMUNITY-SERVERS-0005 written (no change). Next: dry-run, glossary, rules checks.
+- 18:50 dry-run: 0002 1/1 ok, 0005 7/7 ok; applied in scratch tree: glossary exact 0 (643 in context, unchanged); tables/cells ok, no text under tables, new prose <=120, PM rows 78/46 unchanged. NOTE 0002 wording refined. Next: final review, return.
+- 18:55 final dry-run on fresh scratch copies: all applied (0002: 1, 0005: 7); 8 FIX + 2 NOTE blocks, all END-closed. DONE.
+- (correction) the clock times on the lines above after 17:49 were estimates; the real finish is 17:58 Amsterdam (date).

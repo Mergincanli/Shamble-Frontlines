@@ -1086,14 +1086,14 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
   r2-netcode.md lines 959–975), for the marks that name Safari; the draft names none, so its model is recorded with
   each result, and it carries no budget row. **MP**, Mustafa's PC (RTX
   5080, Windows) in Brave: only what he judges, and the record of Brave's backend (R3-WGPU-OQ1, lines 1286–1289);
-  never a budget result. The models are OQ-0003-1, answered in part by Mustafa (2026-11-03): "minimum: a typical
-  student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX 3060/4060 class); Mac: a
-  MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual machines, named by
-  Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03): "Until then, my
-  laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough checks only." A
-  rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured result, and
-  nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless runner (W-A):
-  counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).
+  never a budget result. The models of ML, RD and MAC are OQ-0003-1, answered in part by Mustafa (2026-11-03):
+  "minimum: a typical student laptop with integrated graphics; recommended: a desktop with a mid-range card (RTX
+  3060/4060 class); Mac: a MacBook Air, M1 or newer, for Safari. All borrowed." (REF-MACHINES). Still open: the actual
+  machines, named by Mustafa before the look proof test. The stand-in for ML (REF-MACHINES, Mustafa, 2026-11-03):
+  "Until then, my laptop's integrated graphics (Brave set to "Power saving") stands in for the minimum, for rough
+  checks only." A rough check is reported, never judged against a pass mark. MP stays what he judges, never a measured
+  result, and nothing stands in for RD or MAC (the advisor's reading, 2026-11-03). **CI**, the gate v2's headless
+  runner (W-A): counts only, never a time (R3-MEASURE-REC3, lines 1206–1209).
 - **Scenes.** **BS**, the benchmark scene (part 8; R3-MEASURE-REC2, lines 1195–1197): a recorded match replayed at the
   stress scene's fight on screen (N = 48 soldiers in three teams of 16, the 4 very large units of at least 20 parts
   each, 300 live projectiles with their visual effects), with a scripted camera, started by a URL flag. Until ADR

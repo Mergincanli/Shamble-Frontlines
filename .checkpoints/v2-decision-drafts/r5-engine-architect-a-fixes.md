@@ -85,3 +85,36 @@ AFTER:
     proof test (CD-10).
 END
 
+### NOTE COMMUNITY-SERVERS-0002
+no change: (docs/adr/0002-code-structure-build-toolchain.md) ADR 0002 makes the room process need neither the
+supervisor nor the lobby to start, so no sentence reads as closing the door and no pointer to OQ-0006-21 goes in. The
+`server` crate (0002:192) is "the room process", and its "Depends on" cell names `room`, `protocol`, `sim` and
+`content`, no supervisor or lobby crate; its "supervisor hook" is the room's side of ADR 0001's supervisor calls
+(0001:676: spawn, health check, exit, record upload), which the supervisor drives, not a condition for starting. The
+`supervisor` row (0002:193) "runs room processes as programs and links no `sim`, `room` or `sim-wasm` code", so a room
+started from a config file is the same program started a second way (the advisor's ruling (1) on COMMUNITY-SERVERS,
+verdict r5). ADR 0002's own gate already runs a local server with neither: G12 (0002:578) and the browser end-to-end
+layer (0002:489) run Playwright "with the built client and a local server" over both transport backends, and name no
+supervisor or lobby. No lobby crate exists until ADR 0006 decides where the lobby runs (0002:200-201). The certificate
+the supervisor holds (0002:682) is the multiplayer preview's arrangement on the staging VM only. Outside this record:
+ADR 0001's catalogue passes "the lobby's public key" at spawn (0001:676); that text is netcode-architect's to check
+under condition 6.
+END
+
+### NOTE COMMUNITY-SERVERS-0005
+no change: (docs/adr/0005-content-abilities-assets.md) ADR 0005's mode, content-hash and record text locks none of
+his three points out, so no pointer to OQ-0006-21 goes in. (1) "one self-contained program with a config file
+(players, length, rules)": a room is "a mode id plus allowed overrides" (0005:241, 0005:1977; R2-ROOM-REC7, ADR
+0001's); a mode is one content definition whose fields include team size, the rules table and match length (CD-6,
+0005:379-381; I-7, 0005:110); a private room's overrides name tunables from an allow list with the schema's ranges
+(CD-9, 0005:450-451). The text says that ADR 0001's `HostCommand` carries the overrides, not that nothing else may,
+and what the allow list holds stays a design question (R1-DATA-OQ10). (2) "checks the game's version and content
+hash": CD-8 (0005:430-433) has the room name the hash at join and the Worker refuse a mismatch, wherever the room
+runs; the version is ADR 0001's `Join`. (3) "marks each match as official or community": CD-8 and CD-12 (0005:436,
+0005:499-500) say every match record carries the content hash and the mode id and leave the record's shape to ADR
+0006 (R6-TEL-REC1), so such a field is ADR 0006's to add later (OQ-0006-21, infra-engineer). The archive of content
+sets follows the records the supervisor uploads (CD-8, 0005:437-439), and only records a production supervisor
+uploads enter the store (ADR 0006:1485), which fits "progression can count on official servers only" (the advisor's
+ruling on COMMUNITY-SERVERS, verdict r5: "official-only storage keys fit").
+END
+
