@@ -1,0 +1,4 @@
+  - Decider: the Advisor, at the stop.
+  - Answered by the Advisor (2026-11-03): "(a)." Option (a) is decided: rule 3 allows it in such cases, so the
+    `room`, `client-endpoint` and `navbake` crates stay proposed, labelled "not researched", and the first foundation
+    milestone that builds them is their test.

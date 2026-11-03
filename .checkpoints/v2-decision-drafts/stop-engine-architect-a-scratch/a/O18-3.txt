@@ -1,0 +1,6 @@
+0. **The drafts signed off** by Mustafa as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); ADR 0003 names the
+   minimum laptop.
+1. **The spikes before the foundation** (`docs/SPIKE_PLAN.md` orders them), one heavy spike at a time (SPIKE-ORDER (b),
+   Mustafa, 2026-11-03): the netcode proof test (ADR 0001) first, then the sim core spike and the 60 Hz run, then this
+   record's boundary spike, which shares the proof test's client harness. *Done when:* the boundary spike's marks are
+   recorded in this record, OQ-0002-3 is answered, and OQ-0002-1 and OQ-0002-4 have their spike results.

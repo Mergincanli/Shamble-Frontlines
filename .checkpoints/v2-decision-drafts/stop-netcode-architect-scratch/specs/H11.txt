@@ -1,0 +1,1 @@
+W	- 	{sp}{sp}	**The 60 Hz margin fails, or the goal budget does not hold at the rooms per VM measured at 60 Hz:** nothing to undo; the tick stays at 30 Hz. A failing early signal in wave 1 closes nothing: slice 6 runs the final 60 Hz measurement with the real sim all the same (part 2; the advisor's reading, 2026-11-03).

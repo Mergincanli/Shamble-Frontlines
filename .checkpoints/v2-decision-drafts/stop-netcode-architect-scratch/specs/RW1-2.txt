@@ -1,0 +1,1 @@
+W	{sp}{sp}{sp}	{sp}{sp}{sp}	and pickups (part 12), and the Feel Lab tests (OQ-0001-4, -8, -10; the rewind cap's feel is Mustafa's Brave check of the measured cap, not a Feel Lab weighing, under REWIND-CAP: the advisor's reading, 2026-11-03). *Done when:* the refusal tests of part 12 and R2-ROOM-REC1 mark 3 pass, and Mustafa has answered the Feel Lab questions.

@@ -1,0 +1,6 @@
+no change: not my text. In ADR 0002's "Pass marks" (test-engineer's), two clauses assume the boundary spike may run
+before the sim core spike's sim exists: PM-0002-28 (0002:1236) "the sim core spike's sim in this Worker once it
+exists" and "with the stand-in sim: reported only", and the BX-P key (0002:1164-1166) "the real sim's cost is unknown
+until ADR 0004's sim core spike; once that sim runs in this Worker, the BX rows run again with it". Under SPIKE-ORDER
+(b) the sim core spike runs before the boundary spike, so the sim exists by then (the advisor's reading, 2026-11-03:
+"its 'stand-in until then' clause may go"). Optional, for test-engineer; FIX O18-2 and O18-4 say so in my text.

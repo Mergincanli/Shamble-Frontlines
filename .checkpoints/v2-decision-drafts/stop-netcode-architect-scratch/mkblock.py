@@ -31,6 +31,8 @@ for u in pathlib.Path(spec).read_text(encoding='utf8').rstrip('\n').split('\n'):
         t = re.sub(r'\[[^\]]*\]\([^)]*\)', prot, text)
         t = re.sub(r'(?<![\w.])(\d[\d.,]*|one|two|half a) (ms|Hz|%|kbps|B|s|MB|EUR|m|µs|tick|ticks|interval|intervals|minutes)\b', prot, t)
         t = re.sub(r'\b(N|P\d) = \d+', prot, t)
+        t = re.sub(r'\b(slice|step|steps|part|parts|item|mark|marks|row|ADR|wave) \d+\b', prot, t)
+        t = re.sub(r'[\w-]+ \([a-e]\)', prot, t)
         t = re.sub(r'(\d) ([−+÷×]) (\d)', prot, t)
         out += [l.replace('\x00', ' ') for l in w.wrap(t)]
     else:

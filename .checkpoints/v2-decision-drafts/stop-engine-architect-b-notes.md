@@ -1,3 +1,13 @@
 # stop-engine-architect-b notes
 - 13:05 started; created fixes file and scratch. Next: read inputs.
 - 13:08 read inputs, verdict, plan, map. Next: read README, SPIKE_PLAN, ENGINE_OVERVIEW; write blocks.
+- 13:25 plan of blocks made (README rows, SPIKE_PLAN items, OVERVIEW :3-5,:15,:117,:126); shared-line rows get NOTE 'carried by FIX X'. Next: grep refs, then write blocks in order.
+- 13:30 RC9, RC10 written. Next: O14 (README 23-25), H18, S21, N16, RW16.
+- 13:36 O14, H18, S21, S21-2, NOTE S21-3 written. Next: N16 x3, RW16, O13, M23 x6.
+- 13:40 N16 x3, RW16, O13 written. Next: M23 x6, L6 x2, E6, C10, X4, F7, Q6, A5, B7.
+- 13:44 M23 x6 written. Next: L6 x2, E6, C10, X4 x3 + NOTE, F7, Q6, A5, B7, RC9 done.
+- 13:48 L6 x2, E6, C10 written. Next: X4 x3 + NOTE X4-4, F7, Q6, A5, B7.
+- 13:53 X4 x3 + NOTE X4-4, F7, Q6, A5, B7 written. Next: H19 x2, LA1 (intro + 6 markers), LA2, T1, RISK3.
+- 13:59 LA1 (+LA1-2..7), LA2, H19 x2, NOTE T1, RISK3 written. README non-pointer blocks done. Next: SPIKE_PLAN blocks (O11 header, O11-2, M17, O1, O2, L3, O3, O4, S17, O4-2, L3-2, N14, M18, O5, RW14, O6, H20, S18, O6-2, S18-2, O7, O8, O9, L4, L4-2, C11, O10, B6, F5, Q5, L2, RW15, S17-2, O12, L1).
+- 14:04 SPIKE_PLAN O11, O11-2, M17, O1 written. Next: O2 (mermaid), L3, O3, O4, S17, O4-2, L3-2.
+- 14:09 O2, L3, O3 written. Next: O4, S17, O4-2, L3-2 (table).
