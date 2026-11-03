@@ -2,7 +2,9 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** graphics-engineer (the "Pass marks" table: test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** graphics-engineer (the "Pass marks" table: test-engineer, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
 
 This record decides how SHAMBLE FRONTLINES v2 draws and plays its game in the browser: one three.js WebGPURenderer
 with every material and screen effect written once in TSL, which falls back to WebGL 2 by itself; how each item of the
@@ -375,12 +377,14 @@ judges the look) and the render budget bench (the numbers).
      pre-pass, on the recommended machine at High (4 units × 20 parts × 2 passes = 160 draws, plus margin;
      R3-CHAR-REC4, lines 1088–1092); their visual effects sit inside the visual-effects row, and their first
      appearance compiles nothing (part 3). Those are differences, and the frame rows are p95s, which let 30 of 600
-     frames (5 %) run over, so §6.9's "without dropping frames" also gets a presented-frame count (proposed): on the
-     recommended machine at High, Chrome on WebGPU, with the four units and their visual effects on screen and normal
-     vsync on a 60 Hz display, the frames whose interval passes 1.5 refresh periods are counted (the loop follows the
-     display, R3-BUDGET-F2, lines 545–549, so such a frame missed at least one refresh); the same count is reported
-     on the minimum laptop at Low against a 33.3 ms period. How many such frames a run may hold (0 of 600, or a small
-     share) is OQ-0003-17; the pass-mark row is test-engineer's.
+     frames (5 %) run over, so §6.9's "without dropping frames" also gets a presented-frame count (OQ-0003-17's
+     option (a), decided): on the recommended machine at High, Chrome on WebGPU, with the four units and their visual
+     effects on screen and normal vsync on a 60 Hz display, the frames whose interval passes 1.5 refresh periods are
+     counted (the loop follows the display, R3-BUDGET-F2, lines 545–549, so such a frame missed at least one
+     refresh); the same count is reported on the minimum laptop at Low against a 33.3 ms period. A run may hold at
+     most 6 of 600 such frames (OQ-0003-17, answered by the Advisor, confirmed by Mustafa, 2026-11-03); the p95
+     frame rows stay as diagnostics for this reading and keep gating their own needs (the advisor's reading,
+     2026-11-03). The pass-mark row is test-engineer's (PM-0003-44).
    - *Quality tiers as data* (R3-BUDGET-REC3, lines 1166–1177): one table holds, per tier (Low, Medium, High), the
      pixel-ratio cap, the scene resolution scale, MSAA samples, shadow map size and distance, each post effect's
      on/off and resolution scale, the animation budget and the visual-effect caps. Low is the default when the adapter
@@ -397,7 +401,8 @@ judges the look) and the render budget bench (the numbers).
      median, p95, p99, max and frames over budget for 3 runs of 600 frames after 300 warm-up frames, each labelled with
      backend, adapter, browser version, `devicePixelRatio`, resolution and whether GPU times are quantized
      (R3-MEASURE-REC1, Recommendations Q6, lines 1181–1193). On the minimum laptop the same run set is also taken
-     after at least 15 minutes of play (the pass marks' soaked set S); which of the two sets gates is OQ-0003-20.
+     after at least 15 minutes of play (the pass marks' soaked set S); the soaked set gates and the cold set is
+     reported beside it (OQ-0003-20, answered by the Advisor, 2026-11-03: "judge after 15 minutes of play").
    - A fixed benchmark scene: a recorded match replayed from its inputs (ADR 0004's identical results: r1-simulation-core.md, Recommendations, R1-DET-REC1, lines 2129–2145, and
      R1-DET-REC6, lines 2222–2241) at the stress scene, with a scripted camera path, started by a URL flag on any build, [previews](../research/GLOSSARY.md#preview) included
      (R3-MEASURE-REC2, lines 1195–1204). If replay on the client is not identical, the fallback is a scripted bot
@@ -473,6 +478,14 @@ judges the look) and the render budget bench (the numbers).
     drop the thatched roof (ADR 0005's CM7 row). Authored models are needed because LOOK_V2 §3's proportions and
     weapon silhouettes cannot be judged on legacy's primitive parts
     (CL10, `LEGACY_INVENTORY.md` line 119). It decides nothing about compression or LODs (ASSET-RESEARCH (a), the advisor's ruling; J4).
+    Mustafa makes them (LOOK-TEST-INPUTS, 2026-11-03): "Route: Blender (Spline's skins and named slots are
+    unproven). I make the test models with AI help in Blender; blockouts with a skin, named colour slots and
+    LOOK_V2's proportions are enough." The list above stays, and each model on it may be a blockout at that bar;
+    which look checklist steps a blockout can judge is for the look proof test's own plan (graphics-engineer,
+    test-engineer), and any visual call is Mustafa's (the advisor's reading, 2026-11-03). The same answer says "the
+    asset research's export and slot-naming part runs before the look proof test": that part is ADR 0005's
+    OQ-0005-AS3 and AS4, and it works on Blender's export, so that its export and slot rules reach Mustafa before he
+    makes the models (the advisor's reading, 2026-11-03).
     Beside them run ADR 0005's ported kit builders, for the asset families OQ-0005-AP2 asks Mustafa to judge
     (authored model or procedural builder). The test's trees are legacy's tree builders ported as placeholders (GW18,
     `LEGACY_INVENTORY.md` line 206), judged for variety and lushness only: the tree style stays `[OPEN]` (OQ-0003-9).
@@ -805,6 +818,11 @@ ADR 0005's.
   (R3-BUDGET-REC1's mark, lines 1114–1116) and `hardwareConcurrency` (R1-BND-OQ3, r1-simulation-core.md lines
   2728–2731). Research ids: R3-BUDGET-OQ1 (lines 1364–1365), R1-TICK-OQ6 (r1-simulation-core.md lines 2662–2665),
   R1-BND-OQ3.
+  Answered in part by Mustafa (2026-11-03): "Test PC: my own, in Brave" (SPIKE-MACHINES). That PC is MP, which the
+  pass marks' key defines as what he judges and never a budget result, so it stands in for none of ML, RD or MAC
+  (the advisor's reading, 2026-11-03); still open: which laptop (ML) and which desktop (RD), and which Mac (MAC) for
+  the rows that name Safari, decided by Mustafa (escalated to him, since the netcode proof test's marks on ML or RD
+  cannot run without them: the advisor's reading, 2026-11-03).
 - **OQ-0003-2. The ink's width, its inner lines and its weight on buildings.**
   Why it matters: LOOK_V2 §2 asks for ink "especially strong on buildings" and §6.2 for thinner lines inside.
   Options: width in world units (legacy CL6), constant on screen (three.js's hull, R3-LOOK-F5), or in pixels
@@ -920,6 +938,11 @@ ADR 0005's.
   Advisor, confirmed by Mustafa at the stop review (VISION_V2 is theirs). What decides it: their reading of §6.9,
   then the render budget bench's counts. Research ids: R3-CHAR-REC4 (lines 1088–1092; it stays adopted, no new
   disposition).
+  Answered by the Advisor, confirmed by Mustafa (2026-11-03): the Advisor, "at most 6 of 600 presented frames may
+  miss a refresh with the very large units on screen (recommended desktop, High); the p95 rows stay as
+  diagnostics"; Mustafa, "I confirm this reading". That is option (a) at 6 of 600 (1 %), not (b); the p95 frame rows
+  are diagnostics for this reading and keep gating their own needs, as PM-0003-18 to -21 do, and the minimum
+  laptop's count stays reported (the advisor's reading, 2026-11-03).
 - **OQ-0003-18. Do the concussion shake, the halftone flashes and line boil soften for players who ask for reduced
   motion?**
   Why it matters: LOOK_V2 §2 makes the concussion shake a decided feel and §7 the flashes a default, and legacy
@@ -942,16 +965,20 @@ ADR 0005's.
   holds at minute 15 and pass a row it then fails (engineering experience, not researched: the chosen laptop's
   boost behaviour is unknown). Options: (a) the soaked set S gates PM-0003-18 to PM-0003-21 on ML, and the cold set
   is reported beside it; (b) the cold set only, R3's 3 runs as written (R3-BUDGET-REC2, lines 1162–1164); (c) both
-  must pass. (a) and (c) go beyond R3's 3 runs: proposed, for the reason above. Part 8 and the pass marks hold to
-  (a) until it is answered. Recommendation: (a), since VISION_V2 §4's "30+ fps on Low" holds over a whole match.
+  must pass. (a) and (c) go beyond R3's 3 runs: proposed, for the reason above. Part 8 and the pass marks held to
+  (a) until it was answered. Recommendation: (a), since VISION_V2 §4's "30+ fps on Low" holds over a whole match.
   Decider: the Advisor. What decides it: the Advisor's reading of VISION_V2 §4's "30+ fps on Low" over a whole
   match; the bench's cold and soaked sets, once measured, show how far apart they lie. Research ids: R3-BUDGET-REC2
   (lines 1162–1164, its 3 runs; it stays adopted, no new disposition).
+  Answered by the Advisor (2026-11-03): "judge after 15 minutes of play." That is option (a): the soaked set S gates
+  PM-0003-18 to PM-0003-21 on ML, and the cold set is reported beside it (the advisor's reading, 2026-11-03).
 
 ## What a spike must prove
 
-Two spikes, throwaway and in `spikes/` (SPIKE-SCOPE (a)); none starts before Mustafa and the Advisor approve the
-drafts. `docs/SPIKE_PLAN.md` gives their final names, order and sizes. Every candidate mark below is proposed in the
+Two spikes, throwaway and in `spikes/` (SPIKE-SCOPE (a)). "The six drafts are the basis for the spikes" (Mustafa,
+2026-11-03, SPIKE-ORDER (b)), and wave 1 runs "one heavy spike at a time": the look proof test comes fourth there,
+"once its models exist" (Migration plan, step 2); the render budget bench comes later, before slice 1 (step 4).
+`docs/SPIKE_PLAN.md` gives their final names, order and sizes. Every candidate mark below is proposed in the
 research (r3-rendering.md, line 46: "Every pass mark and every reference machine is proposed"), restated at N = 48,
 and measured with the harness of part 8 on the two reference machines, never headless.
 
@@ -989,8 +1016,10 @@ and measured with the harness of part 8 on the two reference machines, never hea
 - **ADR 0005's share runs in the same test:** its asset marks PM-0005-33 to PM-0005-37 and the families checklist for
   OQ-0005-AP2 (which asset families become authored models and which stay procedural builders: Mustafa's pick).
 - **Needs:** LOOK_V2; both reference machines (OQ-0003-1); Mustafa's time in Brave; a few authored test assets as
-  plain glTF/GLB exports (part 11), with ADR 0005's ported kit builders beside them and a minimal content loader that
-  runs the content crate's whole-set check (ADR 0005); legacy screenshots at the same framing.
+  plain glTF/GLB exports, the models Mustafa makes in Blender, blockouts at his bar allowed (part 11;
+  LOOK-TEST-INPUTS), after the asset research's export and slot-naming part, with ADR 0005's ported kit builders
+  beside them and a minimal content loader that runs the content crate's whole-set check (ADR 0005); legacy
+  screenshots at the same framing.
 
 ### The render budget bench (parts 6, 7, 8 and 9)
 - **Every budget row** holds on its machine in the benchmark scene, for 3 runs of 600 measured frames after 300
@@ -1090,8 +1119,8 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
   Worker's sim running, in one browser session with no restart, mains power and power mode recorded (proposed: a match
   runs about 20 minutes, LOOP_V2 §8, and in a thin laptop the CPU and the integrated GPU share one power and heat
   budget, so a run on a cool laptop can fit inside a short boost window; the chosen laptop's boost behaviour is not
-  researched). PM-0003-18 to -21 run S on ML beside their cold set. Which of the two gates is OQ-0003-20; until it is
-  answered the soaked set gates and the cold set is reported beside it (its recommended option, held as the interim).
+  researched). PM-0003-18 to -21 run S on ML beside their cold set. The soaked set gates and the cold set is reported
+  beside it (OQ-0003-20, answered by the Advisor (2026-11-03): "judge after 15 minutes of play"; its option (a)).
 - **Statistics.** Percentiles by nearest rank over a run's 600 frames: p99 is the 594th smallest value, p95 the 570th,
   the median the 300th; over the tail form's 3,000 frames, the 2,970th, 2,850th and 1,500th (⌈q × n⌉, arithmetic;
   proposed: one definition, so two people get the same number). A time mark that names no
@@ -1175,7 +1204,7 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
 | PM-0003-40 | Occlusion rays, only if O-B is ever proposed (part 9) | at most 1 ray per voice per 100 ms; all rays at most 0.2 ms (p99) per frame at the voice cap; 4 of 5 testers tell an occluded source from an open one in a blind test | ML at Low | H on BS with O-B on; a blind listening test with 5 testers | not run while part 9 proposes zones or none | R3-AUDIO-REC3's mark (lines 1267–1269) |
 | PM-0003-41 | Sound in step with the picture (part 9) | sound onset after the drawn event at most one rendered frame plus the output latency, p99 over 100 shots (the 99th by nearest rank); 0 autoplay warnings in the console on all four browsers | ML: Chrome, Edge, Firefox; MAC: Safari; mode P | 100 shots in BS; per shot, the time the muzzle flash is drawn against the time the sound leaves the output, mapped with the AudioContext's output timestamp and output latency (proposed tools; not researched) | 1 run of 100 shots per browser (the mark's count). Bites: sounds started from the next block's events (one tick late) | R3-AUDIO-REC4's mark (lines 1279–1280) |
 | PM-0003-42 | Frame pacing and power for the frame-rate cap (part 7; feeds OQ-0003-10) | reported, no pass number: per option (a 60 fps cap; follow the display; a cap per tier), R1-TICK-REC5's smoothness (the standard deviation of a steady unit's per-frame displacement as a share of its mean) on 60, 120 and 144 Hz displays; on ML, battery drain over 10 minutes per option (proposed method) | RD on the displays available (each recorded); ML on battery | BS, mode P | 1 run per option and display | R3-BUDGET-OQ2 (lines 1366–1367); R1-TICK-REC5's mark (r1-simulation-core.md, lines 2111–2112) |
-| PM-0003-44 | The very large units drop no frame (part 7's presented-frame count; VISION_V2 §6.9; feeds OQ-0003-17) | per run of 600 presented frames with the four very large units and their visual effects on screen: the frames whose interval passes 1.5 refresh periods, 25 ms on a 60 Hz display (1.5 × 16.7), counted. Gated at the share OQ-0003-17 sets; until it is answered, reported, with 0 of 600 as the proposed reading. On ML at Low the same count reported against a 33.3 ms period (intervals over 1.5 × 33.3 = 50 ms) | RD at High, Chrome on WebGPU, on a 60 Hz display (its rate recorded); ML at Low, Chrome on WebGPU (reported) | BS with the units and their effects on screen, mode P (normal vsync); each frame's interval from successive animation-frame timestamps (the loop follows the display, R3-BUDGET-F2, lines 545–549; that timestamp has "a minimal precision of 1 millisecond", R3-MEASURE-F7, lines 641–646, well inside the 8.3 ms between one refresh period and 1.5) | H (presented), V. Bites: a 20 ms busy-wait on every 60th frame must be counted 10 of 10 per 600 frames | R3-CHAR-REC4 (lines 1088–1092; it stays adopted); part 7's spectacle budget; OQ-0003-17 |
+| PM-0003-44 | The very large units miss a refresh on at most 6 of 600 frames (part 7's presented-frame count; VISION_V2 §6.9; OQ-0003-17's reading) | per run of 600 presented frames with the four very large units and their visual effects on screen: the frames whose interval passes 1.5 refresh periods, 25 ms on a 60 Hz display (1.5 × 16.7), counted. Gated: at most 6 of 600 such frames per run (OQ-0003-17, answered by the Advisor and confirmed by Mustafa (2026-11-03): "at most 6 of 600 presented frames may miss a refresh with the very large units on screen (recommended desktop, High); the p95 rows stay as diagnostics"); the p95 frame rows are diagnostics for this reading and keep gating their own needs (the advisor's reading, 2026-11-03). On ML at Low the same count reported against a 33.3 ms period (intervals over 1.5 × 33.3 = 50 ms) | RD at High, Chrome on WebGPU, on a 60 Hz display (its rate recorded); ML at Low, Chrome on WebGPU (reported) | BS with the units and their effects on screen, mode P (normal vsync); each frame's interval from successive animation-frame timestamps (the loop follows the display, R3-BUDGET-F2, lines 545–549; that timestamp has "a minimal precision of 1 millisecond", R3-MEASURE-F7, lines 641–646, well inside the 8.3 ms between one refresh period and 1.5) | H (presented), V. Bites: a 20 ms busy-wait on every 60th frame must be counted 10 of 10 per 600 frames, which fails the 6 of 600 | R3-CHAR-REC4 (lines 1088–1092; it stays adopted); part 7's spectacle budget; OQ-0003-17 (answered by the Advisor, confirmed by Mustafa, 2026-11-03) |
 | PM-0003-45 | Nothing outlives its match (parts 3, 7, 10; "disposal carries over as a v2 rule", Consequences; ADR 0005's GPU part 7) | after each of 3 cycles (BS with one faction set, torn down to an empty page with the renderer kept, as a return to the menu will be; then LS with the other factions and its own test assets, torn down again): `renderer.info.memory`'s `total`, `texturesSize`, `attributesSize`, `programs` and `renderTargets` equal to the first cycle's values after the same teardown, and the JS heap after a forced garbage collection within 0.5 MB of it (proposed: an empty page holds only what the renderer itself keeps, the same every cycle, while the heap varies; 0.5 MB is PM-0003-24's flat rule); 0 shared materials disposed while a scene still uses them | CI (counts); ML: Chrome on WebGPU and with `forceWebGL` (the counts and the heap) | the cycle script; the counters read after each teardown (R3-MEASURE-F3, lines 617–622); the heap through the Chrome DevTools Protocol, as PM-0003-24; a spy on `dispose()` of every cached material (proposed) | 1 run of 3 cycles per backend (counts repeat, PM-0003-35). Bites: one cycle's soldier model left undisposed must raise the next teardown's counts; a teardown that disposes a shared material the next scene uses must be caught by the spy | the graphics review's finding 6 (proposed there); the Consequences' disposal rule; ADR 0005 GPU part 7 ("never disposed while shared") |
 | PM-0003-46 | The WebGPU backend is exercised on every change to the render path (parts 1, 8; ADR 0002 part 9) | recorded on every CI run: the backend each CI engine gets, or none (PM-0003-36). If one gets WebGPU (the Chromium job with SwiftShader's WebGPU adapter that ADR 0002's boundary spike tries; not researched), PM-0003-36's checks also run on it; if none does, every change-set that touches the render path carries a WebGPU smoke run: BS for 60 s on ML (Chrome on WebGPU) with 0 console and device errors (PM-0003-2's hook), PM-0003-36's counts within the committed baseline, and the overlay naming "WebGPU" | CI; otherwise ML | the CI job, or the smoke script on ML with its log attached to the change-set's report (a stated review step, ADR 0002 part 9) | from the render budget bench on, every change-set that touches the render path. Bites: a planted shader node that builds for WebGL 2 and fails only on WebGPU (proposed) fails the route in use, 1 of 1 | ADR 0002 part 9 (the route and the smoke run); R3-WGPU-F17 (lines 159–162: Chrome on Linux has WebGPU only on Intel Gen12+ GPUs); R3-MEASURE-F8 (lines 648–653: headless Chrome on SwiftShader) |
 | PM-0003-47 | The HUD touches the DOM only when a value changes (part 10, step 7; legacy's lesson) | reported: the HUD's DOM mutations per frame in BS (median and max), beside PM-0003-19; gated: 0 HUD mutations in a scripted 5 s stretch of BS with the match timer hidden and no change of score, ammo, health or kill feed (proposed: a write only when the value changed, as legacy's cached setters do) | CI (a count) | BS with the HUD the spike has (its elements recorded); a `MutationObserver` on the HUD's root (child lists, attributes, text, subtree) counts the records per frame (proposed tool, its own cost not researched); legacy's `_sd`, `_so` and `_st`, which write only on a change (`shamble-game.js` lines 2606–2608), are the model | 1 run (counts repeat, PM-0003-35). Bites: one HUD element whose `textContent` is set every frame to its own value (the setter replaces the text node, so the observer sees it) | `docs/AUDIT_BUGS_PERF.md` line 27 (P3: about 30 DOM writes per frame, most unconditional, so style and layout work each frame); the perf review's finding 14 |
@@ -1183,9 +1212,8 @@ numbers are r3-rendering.md's at 9e7db28 unless another file is named.
 | PM-0003-43 | An upgrade changes no cost without a reason (part 2) | p95 GPU time and p95 frame time in BS change by at most 5 % from one pinned release to the next, unless the upgrade's report explains the cause | ML at Low and RD at High: Chrome on WebGPU | H on BS before and after the step, mode U; the change read between the medians of the 3 runs' p95s (proposed) | H, V on both sides. Bites: a planted 6 % slowdown (a busy-wait) | R3-WGPU-REC2's mark (lines 925–926) |
 
 **When a mark fails.** A spike passes when every mark that applies passes: a conditional mark (PM-0003-40) only when
-its condition holds; a "reported" mark (PM-0003-9, -14, -16, -31, -42, and PM-0003-44 until OQ-0003-17 sets its
-share) when its record is complete; the cold set of PM-0003-18 to -21 is reported beside the soaked set that gates
-until OQ-0003-20 is answered. A failing run is
+its condition holds; a "reported" mark (PM-0003-9, -14, -16, -31, -42) when its record is complete; the cold set of
+PM-0003-18 to -21 is reported beside the soaked set that gates (OQ-0003-20, answered). A failing run is
 never re-run until green: its data, build commit, machine, browser and backend are kept, and its cause is found and
 written down (R5-TEST-REC6, r5-toolchain-quality.md lines 1490–1498). A failed mark goes back to the draft:
 graphics-engineer revises the decision part the row names, by the draft's own Rollback and "Revisit when" routes (for
@@ -1334,10 +1362,13 @@ Beside it: PM-0003-42 (frame pacing and power per option), PM-0003-38 and PM-000
 The netcode proof test runs first, before the foundation (SLICE-ORDER, condition 3); it needs no part of this record.
 Each phase ends on a milestone that proves it done; the legacy game stays playable in `legacy/` throughout (ADR 0002).
 
-1. **Drafts approved** by Mustafa and the Advisor; the two reference machines named (OQ-0003-1).
-2. **The look proof test**, in parallel with the netcode proof test (no shared dependency). *Milestone:* the
-   technique table and both ink families measured on both machines; Mustafa's verdict on every LOOK_V2 item and on
-   OQ-0003-2, -3, -5, -6, -8, -12, -15, -16, -18 and -19, recorded in this ADR.
+1. **Drafts signed off as the basis for the spikes** by Mustafa (2026-11-03, SPIKE-ORDER (b); this record stays
+   Proposed, not yet accepted); the two reference machines named (OQ-0003-1, answered in part: still open, Mustafa's).
+2. **The look proof test**, fourth in wave 1, which runs "one heavy spike at a time": after the netcode proof test,
+   the sim core spike (then the 60 Hz run) and the boundary spike, "once its models exist" (SPIKE-ORDER (b), Mustafa,
+   2026-11-03); the asset research's export and slot-naming part runs before it (LOOK-TEST-INPUTS, part 11).
+   *Milestone:* the technique table and both ink families measured on both machines; Mustafa's verdict on every
+   LOOK_V2 item and on OQ-0003-2, -3, -5, -6, -8, -12, -15, -16, -18 and -19, recorded in this ADR.
 3. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation); ADR 0002). This record's share: the
    renderer starts with `await renderer.init()`, reports its backend in the overlay and in every test screenshot, and
    CI gates the render counts (W-A). *Milestone:* an empty scene runs through the full stack, CI green, and the

@@ -780,14 +780,19 @@ with a re-flood) against 8.33.
   `docs/SPIKE_PLAN.md` use it.
 
 ### The 60 Hz margin
-- **Definition:** 1 − (p99 server tick time at a 60 Hz tick ÷ the server tick budget at 60 Hz, 8.33 ms). It is measured
-  in the netcode proof test, in one run (p99s do not add: see time statistics): on one vCPU of the reference server, in
-  the stress scene at N = 48 with a snapshot-receiving client on every soldier, over R2-BUD-REC6's 30-minute soak,
-  re-flood ticks included. A 60 Hz tick needs a 60 Hz margin of at least 25 % (a p99 server tick time of at most
-  6.25 ms) and every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3);
-  otherwise the tick stays at 30 Hz.
+- **Definition:** 1 − (p99 server tick time at a 60 Hz tick ÷ the server tick budget at 60 Hz, 8.33 ms). Each
+  measurement is one run (p99s do not add: see time statistics): on one vCPU of the reference server, in the stress
+  scene at N = 48 with a snapshot-receiving client on every soldier, over R2-BUD-REC6's 30-minute soak, re-flood ticks
+  included. It is measured in wave 1, after the sim core spike (SPIKE-ORDER, Mustafa, 2026-11-03), as an early signal
+  only, and again at slice 6 on the real sim, the run that decides (TICK-60-SETUP, the Advisor, 2026-11-03: "(a), as
+  an early signal only. The final 60 Hz call is measured again with the real sim at slice 6.").
+  A 60 Hz tick needs, in the run that decides, a 60 Hz margin of at least 25 % (a p99 server tick time of at most
+  6.25 ms), every 60 Hz mark the research sets, as written (R2-BUD-REC6's two shares, R1-TICK-REC2 P1–P3), and the
+  goal budget (ADR 0006 part 8) holding at the rooms per VM measured at 60 Hz (PM-0001-63; ADR 0001 part 2 states the
+  full rule); otherwise the tick stays at 30 Hz.
 - **Depends on:** TICK-60-HEADROOM (the advisor's reading of 2026-10-31: TICK-30's 25 % is measured against the
-  server tick budget at 60 Hz, 8.33 ms), confirmed by Mustafa and the Advisor at the stop.
+  server tick budget at 60 Hz, 8.33 ms), confirmed by Mustafa (2026-11-03) with one addition, in his words: "60 Hz
+  also needs the goal budget to hold at the rooms per VM measured at 60 Hz."
 - **Marked by:** "the 60 Hz margin".
 - **Retire (exact):** none.
 - **Retire (in context):** "headroom" where TICK-30's 25 % is meant. TICK-30's own word "headroom" appears only in

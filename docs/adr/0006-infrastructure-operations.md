@@ -2,7 +2,9 @@
 
 **Status:** Proposed
 **Date:** 2026-10-31
-**Author:** infra-engineer (pass marks by test-engineer, plan step 4) · **Reviewed by:** (filled in at review) · **Signed off by Mustafa:** no
+**Author:** infra-engineer (pass marks by test-engineer, plan step 4) ·
+**Reviewed by:** (filled in at review) ·
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
 
 This record decides where SHAMBLE FRONTLINES v2 runs and how it is watched. The player build and every pull request's
 [preview link](../research/GLOSSARY.md#preview) are served by [Cloudflare Pages](../research/GLOSSARY.md#the-client-host); previews that reach a game server sit behind a login from the first one.
@@ -33,7 +35,8 @@ secret and repository setting named below is Mustafa's to create, never a sessio
   and highlights are `[LATER]`: nothing is built for them here (part 12 says what keeps them possible).
 - **VISION_V2 §6.10, accounts,** `[LATER]`: no account store is built; the lobby's guest identity keeps it possible
   (part 6).
-- **VISION_V2 §3 and §4** (counted like LOOP_V2 under the session's trace reading, decision map part j, J3): the start
+- **VISION_V2 §3 and §4** (counted like LOOP_V2, by the Advisor's answer to OQ-0001-14 (2026-11-03): "yes, a
+  VISION_V2 §3 or §4 trace counts, marked as such"; decision map part j, J3): the start
   modes and the goal modes ([the start modes and the goal modes](../research/GLOSSARY.md#the-start-modes-and-the-goal-modes)),
   "Desktop browsers first: Chrome, Edge, Firefox and Safari", "Matches feel fair up to about 100 ms of ping. Servers
   start in one EU region." VISION_V2 §5: "Guest play first".
@@ -225,8 +228,11 @@ interim positions, until its own research before the first online playtest; the 
      fallback (R2-TRN-REC3, as R6-HOST-REC2 says), their ports set by the port plan (OQ-0006-16); the one rule part 9's
      metrics path may need, with the Prometheus host as its only source (a scrape needs an inbound port while a push
      needs none, R6-OBS-F4, r6 lines 279–284; spike 2 checks it); and SSH, by key only, from named source addresses only
-     (proposed: without an admin path no one can install a room binary or read the logs part 9 keeps on the VM; who
-     holds the key is OQ-0006-17);
+     (proposed: without an admin path no one can install a room binary or read the logs part 9 keeps on the VM; on the
+     spike VMs sessions get SSH access, OQ-0006-17, answered by Mustafa (2026-11-03): "sessions get SSH access only and
+     no Hetzner token until the security baseline", and how a session's key is made and held without it reading a
+     secret it did not make is for the netcode proof test's own plan, with security-auditor and the advisor: the
+     advisor's reading, 2026-11-03);
    - *the staging game server, also:* the path ADR 0002's delivery job hands the room binary through (its form not
      researched);
    - *the lobby's host (OQ-0006-3):* TCP 443 for its HTTPS endpoint;
@@ -279,15 +285,20 @@ interim positions, until its own research before the first online playtest; the 
    private key sits on every VM) is an option the security baseline weighs. Which ACME challenge issues the
    per-hostname certificates (http-01 needs TCP port 80 on each game VM; dns-01 per name needs a DNS provider's API key,
    a secret) and how long they live is OQ-0006-5 (R6-HOST-F24, r6 lines 198–204; R6-HOST-OQ6, r6 lines 869–874). Every
-   per-hostname certificate needs a domain and a DNS zone, and no draft names one yet (OQ-0006-15; the registrar, the
-   DNS provider and their prices are not researched). Development
+   per-hostname certificate needs a domain and a DNS zone, and no draft names one yet: Mustafa registers one for the
+   netcode proof test's WebSocket leg ("for the WebSocket leg, a domain I register": Mustafa, 2026-11-03,
+   SPIKE-MACHINES), and which domain, registrar and DNS host, and whether production uses it later, stay open
+   (OQ-0006-15, answered in part; the registrar, the DNS provider and their prices are not researched). Development
    and preview servers use self-signed ECDSA P-256 certificates valid at most 14 days, made by the server at start and
    pinned through `serverCertificateHashes` (R2-TRN-REC5, r2 lines 2700–2703; number N30); on the staging game server
    its supervisor makes and rotates them, one per VM (part 4). Hash pinning in production
    stays out: the VMs stay warm, so they are not the "short-lived ephemeral servers" R2-TRN-REC5 names
    (r6-infrastructure.md, Options §1, Q3, option C3, lines 426–427; r2-netcode.md, R2-TRN-OQ4, lines 3050–3054). The
-   netcode proof test runs on the development certificates for WebTransport (which certificate its WebSocket fallback
-   presents is OQ-0006-5); the production form is needed from the first online
+   netcode proof test runs on the development certificates for WebTransport, "a private hash-pinned certificate for
+   WebTransport" as Mustafa set for the spikes (2026-11-03, SPIKE-MACHINES); its WebSocket fallback presents a
+   browser-trusted certificate on the domain he registers, OQ-0006-5's development case (i), issued by a method the
+   proof test's own plan sets with security-auditor (the advisor's reading, 2026-11-03); the production form is needed
+   from the first online
    playtest, after the security baseline's research. An alert fires when any VM's certificate has under 14 days left
    (proposed in R6-HOST-REC4's mark, r6 lines 697–699); where alerts go is part 9.
    *Carry-forward 4, four superseded sentences* (each still calls the wildcard R6's proposal; R6-HOST-REC4 holds):
@@ -326,8 +337,16 @@ interim positions, until its own research before the first online playtest; the 
      match records (951.39 + 8.99 + 6.49 = 966.87 EUR) + 19–24 USD + Sentry: the most the marks allow, not a forecast.
      The goal budget is stated at both densities until the netcode proof test measures rooms per VM, and that figure
      stays provisional until slice 6 measures the real sim (OQ-0006-19; R6-COST-OQ1, r6 lines 880–882; R2-ROOM-REC2
-     mark 2 is ADR 0001's test). Egress stays inside the included traffic at
-     either density: at 4 rooms, 4 × 3.156 GB × 730 h ≈ 9.2 TB per VM, under 20 TB (arithmetic on r6 lines 461–463).
+     mark 2 is ADR 0001's test). These densities and figures are at the 30 Hz baseline (TICK-30). A 60 Hz tick also
+     needs this goal budget to hold at the rooms per VM measured at 60 Hz: TICK-60-HEADROOM, confirmed by Mustafa
+     (2026-11-03) "with one addition: 60 Hz also needs the goal budget to hold at the rooms per VM measured at 60 Hz".
+     That count and its cost are ADR 0001's PM-0001-63, on this part's fixed-fleet formula
+     (ceil(20 ÷ rooms per VM) + 1 CCX23, plus the staging VM and the match records), the same machine and N = 48. The
+     budget holds when that fleet costs no more than the goal budget as it stands when the call is made: at slice 6,
+     the figure OQ-0006-19 fixes; in wave 1's 60 Hz run, an early signal only, the cost is reported beside the
+     provisional figures above and decides nothing (the advisor's reading, 2026-11-03; ADR 0001 part 2). Egress stays
+     inside the included traffic at either density: at 4 rooms, 4 × 3.156 GB × 730 h ≈ 9.2 TB per VM, under 20 TB
+     (arithmetic on r6 lines 461–463).
    - *Fleet shape:* a fixed fleet (K1) first; K2 only once real concurrency data shows a clear peak; the shared CX33
      fleet (K3) only if the shared-vCPU measurement passes; each extra room of peak capacity costs 86.49 ÷ 8 ≈ 10.81 EUR
      a month at 8 rooms per VM, 21.62 EUR at 4 (r6-infrastructure.md, Recommendations §2, R6-COST-REC1, lines 703–717;
@@ -350,7 +369,10 @@ interim positions, until its own research before the first online playtest; the 
      by the hour (R6-HOST-F17, r6 lines 164–168) at 0.1386 EUR (R6-HOST-F15), so 20 bench hours a month, a placeholder,
      cost 20 × 0.1386 = 2.77 EUR. ADR 0002's 3-hour soak before each playtest takes the same path, with its bot clients
      on a CX33 beside the reference server, never on it (as spike 2's load generators): 3 × (0.1386 + 0.0144) =
-     0.46 EUR a playtest. Who creates and deletes these VMs is OQ-0006-17.
+     0.46 EUR a playtest. Mustafa creates and deletes these VMs himself, and sessions get SSH access only and no
+     Hetzner token, until the security baseline: OQ-0006-17's answer (Mustafa, 2026-11-03) covers the bench and the
+     soaks too, since the baseline comes before the first online playtest (the advisor's reading, 2026-11-03), so every
+     bench session and every soak waits for him to create its VMs (at the placeholder, 20 bench hours a month).
    *Why:* compute dominates and is flat per VM; egress, the cost that grows with players, is zero on Hetzner inside the
    20 TB and about 0.063 USD per room-hour on a per-GB host (r6 lines 706–709). *Ids:* R6-COST-REC1, R6-COST-REC2,
    R6-COST-OQ1, R6-COST-OQ3, OQ4, OQ5, R3-MEASURE-OQ2, R3-XT-OQ5, R5-XT-OQ11, R6-XT-OQ7. *Need:* VISION_V2 §6.1 (rooms
@@ -455,7 +477,11 @@ interim positions, until its own research before the first online playtest; the 
     thresholds are a design question (R6-TEL-OQ3) (seam S6). Records are stored as compressed JSON-lines files in
     Hetzner Object Storage in the game servers' location, uploaded by the supervisor after the room exits, with a
     schema version in every record and a Parquet compaction job only once a query needs it; a crashed room leaves a stub
-    record marked incomplete (r6-infrastructure.md, Recommendations §4, R6-TEL-REC2, lines 812–827). Only records a
+    record marked crashed, one word with ADR 0001 part 11 and PM-0001-59 (R6-TEL-REC2 calls it "a stub record marked
+    incomplete"; r6-infrastructure.md, Recommendations §4, R6-TEL-REC2, lines 812–827). That stub record and the crash
+    report (part 10) are written and kept under part 11's proposed retention, with no new period: OQ-0001-18, answered
+    by the Advisor (2026-11-03): "end the match, as proposed, and keep the crash and match records" (what "keep" means:
+    the advisor's reading, 2026-11-03). Only records a
     production supervisor uploads enter the store: a local match's record (the room code as the local authority in the
     Worker, ADR 0002 part 6) and the staging game server's records never do (proposed: the first is player-controlled
     data, the second comes from pull-request-built code; the security review, finding 16). Every content set a record
@@ -491,7 +517,7 @@ interim positions, until its own research before the first online playtest; the 
     | B6 | The `textContent` rule (R5-TSLINT-OQ5) | which lint rule enforces it | CLAUDE.md's code rule ("Dynamic or player-provided text: `textContent`, never `innerHTML`") holds by review | 0002 |
     | B7 | Anti-cheat basics: the view-time offset and aim log (R2-SYNC-REC5), Origin-less requests tagged (R2-TRN-REC1), the reader-client and byte-audit tests (R2-INT-REC2, REC5) | the detection policy | built as ADR 0001 designs them; no detection policy | 0001 |
     | B8 | R1-DATA-REC7's allow list and fuzz corpus, with the server-side map validation the STATUS item SEC-MDL-2 asks for (`__proto__` through `envMerge`); COOP as an XS-Leaks guard (R1-BND-REC5) | whether they suffice | as ADR 0005 and ADR 0002 design them (SEC-MDL-2 is ADR 0005's: decision map part j, J2); production non-isolated at the start, so the isolation-only items wait (OQ-0006-12) | 0005; 0002 |
-    | B9 | The tokens CI holds (the client host's deploy tokens, for previews and for production; the Sentry upload token, "a token: Mustafa's secret", r6 line 1082), a multiplayer preview's binary delivery (R6-XT-OQ4), and the Hetzner API token the spikes, the tick bench and the 3-hour soak before each playtest need (OQ-0006-17) | their scope and handling | each held only by the job that needs it, in a GitHub environment, as R5-PREV-REC1 does for the deploy token (proposed for the others); production deployed only from `main`, in its own environment `production` with a `main`-only deployment-branch rule and its own token (ADR 0002 part 10); a required reviewer on `preview`, OQ-0006-13's proposed interim (what keeps a rewritten deploy job from the token); the preview hosting check's token revoked when the check ends; the Hetzner token in a project of its own; all added by Mustafa (below; OQ-0006-13) | 0002 (the jobs); 0006 (the scope; OQ-0006-13) |
+    | B9 | The tokens CI holds (the client host's deploy tokens, for previews and for production; the Sentry upload token, "a token: Mustafa's secret", r6 line 1082), a multiplayer preview's binary delivery (R6-XT-OQ4), and a Hetzner API token for the spikes, the tick bench and the 3-hour soak before each playtest, which no session gets before the baseline (OQ-0006-17, answered by Mustafa, 2026-11-03) | their scope and handling | each held only by the job that needs it, in a GitHub environment, as R5-PREV-REC1 does for the deploy token (proposed for the others); production deployed only from `main`, in its own environment `production` with a `main`-only deployment-branch rule and its own token (ADR 0002 part 10); a required reviewer on `preview`, OQ-0006-13's proposed interim (what keeps a rewritten deploy job from the token); the preview hosting check's token revoked when the check ends; no Hetzner token: Mustafa creates and deletes those VMs himself, in a Hetzner project of its own (OQ-0006-17); all added by Mustafa (below; OQ-0006-13) | 0002 (the jobs); 0006 (the scope; OQ-0006-13) |
     | B10 | The staging VM runs pull-request-built native code (R6-XT-OQ4, "PR-built native code on a VM") beside the Prometheus store (part 9) | whether they share a VM | Prometheus shares it, since it holds no secret (if M2 later pushes to Grafana Cloud, its key moves Prometheus off this VM); the batch analysis and every store key stay off it (parts 4 and 12). Fork pull requests get no preview (R5-PREV-REC1), but any branch of this repository can change its own workflow (B9), so that code is treated as untrusted | 0006 |
     | B11 | Self-hosted CI runners (R3-MEASURE-OQ2) | whether any is allowed | none (part 8) | 0006 |
     | B12 | Privilege separation on the VMs: room processes parse hostile network input, and the staging VM runs pull-request-built native code (the security review, finding 4) | how processes and keys are separated, and how far store keys can be scoped | each room process runs as its own unprivileged OS user that cannot read the supervisor's, the lobby's (OQ-0006-3 (a)) or the analysis job's credentials; the staging VM holds no secret beyond its rooms' certificate key (part 4); store keys scoped per bucket, put-only for uploads and read-only for the analysis, where the provider allows (not researched); a dns-01 key, if OQ-0006-5 picks dns-01, on no VM that runs rooms (proposed: a job elsewhere hands each VM its own certificate); while Prometheus runs on the staging VM, the metrics port is the one port of a production VM that pull-request-built code can reach (part 5) | 0006 |
@@ -514,10 +540,13 @@ interim positions, until its own research before the first online playtest; the 
     own token; (b) `preview` has a required reviewer ("a job cannot access environment secrets until one of the
     required reviewers approves it", the same finding), so each preview deploy waits for Mustafa's approval, unless
     OQ-0006-13 puts production where the preview token cannot reach it; (c) the preview hosting check's token is revoked
-    when the check ends (part 14); (d) the Hetzner API token for the spikes, the tick bench and the 3-hour soak before
-    each playtest belongs to a Hetzner project of its own, never the production project (a project's token presumably
-    reaches all its VMs: not read;
-    OQ-0006-17). Whether a session, which posts on GitHub as Mustafa's account (CLAUDE.md), could approve a pending
+    when the check ends (part 14); (d) no session holds a Hetzner API token until the security baseline: Mustafa
+    creates and deletes the VMs for the spikes, the tick bench and the 3-hour soak before each playtest himself, in a
+    Hetzner project of its own, never the production project (a project's token presumably reaches all its VMs: not
+    read; OQ-0006-17, answered by Mustafa, 2026-11-03: "a separate Hetzner project. I create and delete the VMs myself
+    for each run; sessions get SSH access only and no Hetzner token until the security baseline"; the bench and the
+    soaks: the advisor's reading, 2026-11-03). Whether a session, which posts on GitHub as Mustafa's account
+    (CLAUDE.md), could approve a pending
     deploy, and how a deployment-branch rule treats a pull request's merge ref, were not read: the preview hosting
     check tests the second (What a spike must prove, item 1) and OQ-0006-13 carries the first. *Ids:* BASELINE-WHEN,
     R6-SEC-OQ1, R1-RR-OQ7, R5-GATE-OQ4, R5-TSLINT-OQ5, R2-ROOM-OQ11, R2-XT-OQ9,
@@ -721,8 +750,11 @@ Researching it before this record, or leaving it as one shared question: settled
   per pull request reaches Mustafa's Brave from the foundation on; cost per match is a query over the match records,
   not a guess (R6-COST-REC2); balance work starts from one versioned record per match, comparable within a content
   hash (R6-TEL-REC3).
-- **Harder:** Mustafa holds accounts with Cloudflare and Hetzner before the first spikes (a test project on Cloudflare Pages
-  and a Hetzner console check), and later with Sentry and Grafana; every multiplayer preview needs his login once per
+- **Harder:** Mustafa holds accounts with Cloudflare and Hetzner before the first spikes (a test project on
+  Cloudflare Pages and a Hetzner console check), and later with Sentry and Grafana; until the security baseline he
+  creates and deletes every VM of the spikes, the tick bench and the playtest soaks himself (OQ-0006-17), and he
+  registers a domain before the netcode proof test (OQ-0006-15; both 2026-11-03); every multiplayer preview needs his
+  login once per
   Brave session; each production game VM needs a certificate issuance path (OQ-0006-5) and a domain (OQ-0006-15); the
   lobby still has no place in the budget (OQ-0006-3); until OQ-0006-13 is answered, every preview deploy waits for his
   approval (B9); releases wait on OQ-0006-14.
@@ -806,6 +838,13 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Carries:* no research id (it follows from PREVIEW-WALL (a)).
 - **OQ-0006-5. How are the per-hostname production certificates issued, how long do they live, and which certificate
   does the WebSocket fallback present on development and staging servers?**
+  - Answered in part by Mustafa (2026-11-03): "Certificates: a private hash-pinned certificate for WebTransport; for
+    the WebSocket leg, a domain I register." So the netcode proof test's WebSocket leg takes the development case (i)
+    below, a trusted certificate on his domain (the advisor's reading, 2026-11-03); still open: how that certificate is
+    issued on a spike VM (http-01 and tls-alpn-01 need an open port, dns-01 a secret, and OQ-0006-16's port plan
+    applies), decided in the netcode proof test's own plan with security-auditor; the staging case, shapes (A) and (B)
+    below, decided by the Advisor; and the production certificates, decided by security-auditor in the security
+    baseline.
   - *Why it matters:* every production game VM needs one before the first online playtest, and the challenge decides
     which port or secret each VM needs. A WebSocket cannot pin a certificate hash: its constructor takes only a URL and
     sub-protocols (r2-netcode.md, Findings, R2-ROOM-F12, lines 1494–1500), so the fallback's `wss` endpoint on a
@@ -871,7 +910,10 @@ Researching it before this record, or leaving it as one shared question: settled
     list), or advice, before any public playtest (R6-OBS-OQ1, r6 lines 896–899; R6-TEL-OQ4, r6 lines 917–919).
   - *Carries:* R6-OBS-OQ1, R6-TEL-OQ4.
 - **OQ-0006-10. How many players, and when; which VAT and currency; is included traffic per VM, pooled or prorated?**
-  - *Why it matters:* the start and goal budgets rest on placeholder player counts (A-4, A-5) and exclude VAT.
+  - *Why it matters:* the start and goal budgets rest on placeholder player counts (A-4, A-5) and exclude VAT. Since
+    2026-11-03 a 60 Hz tick also needs the goal budget to hold at the rooms per VM measured at 60 Hz (TICK-60-HEADROOM's
+    addition, part 8; ADR 0001's PM-0001-63), and that check sizes its fleet from A-5's peak of 20 rooms, so this
+    question's answer bears on it too.
   - *Options:* the placeholders until playtest data replaces them.
   - *Decider:* Mustafa (his plans, his billing address, the first invoice).
   - *What decides it:* playtest data in the match records (R6-COST-REC2) and the provider's invoice and terms
@@ -932,6 +974,10 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Carries:* no research id (the engine-architect review's finding 5 and its question 2; the infra review's finding
     1 and its question RELEASE-WINDOW).
 - **OQ-0006-15. Which domain do the client host, the lobby and the game servers use, and when is it registered?**
+  - Answered in part by Mustafa (2026-11-03): "for the WebSocket leg, a domain I register." So (b) is decided for the
+    netcode proof test: a domain he registers before it, for its WebSocket leg (the advisor's reading, 2026-11-03);
+    still open: which domain, which registrar and which DNS host, and whether production uses it later, decided by
+    Mustafa. The options below stay as the record of what was weighed.
   - *Why it matters:* no draft names a domain or a DNS provider, yet each per-hostname certificate (part 7), the
     lobby's HTTPS endpoint (part 6), a dns-01 key and the guest cookie need one: SameSite=Strict sends the cookie only
     within the site that set it, and a site is the registrable domain (part 13, B4). Before the netcode proof test, its
@@ -961,6 +1007,12 @@ Researching it before this record, or leaving it as one shared question: settled
     carries).
 - **OQ-0006-17. How do sessions get VMs for the spikes, the tick bench and the 3-hour soak before each playtest
   without holding a secret?**
+  - Answered by Mustafa (2026-11-03): "a separate Hetzner project. I create and delete the VMs myself for each run;
+    sessions get SSH access only and no Hetzner token until the security baseline. VMs exist only during a run." So
+    (a) is decided, in (b)'s project of its own but with no token; (b)'s token and (c) stay below as the record of
+    what was weighed. The security baseline comes before the first online playtest, so this covers the tick bench and
+    the 3-hour soaks too; how a session's SSH key is made and held without it reading a secret it did not make is for
+    the netcode proof test's own plan, with security-auditor and the advisor (the advisor's reading, 2026-11-03).
   - *Why it matters:* the netcode proof test, the tick bench and the playtest soak (part 8) create VMs and delete them
     after each
     session, since billing rounds up to the hour (R6-HOST-F17, r6 lines 164–168); a Hetzner API token can do that, and
@@ -991,7 +1043,9 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Why it matters:* the netcode proof test measures rooms per VM on its throwaway sim, a stand-in for the stress
     scene (ADR 0001, OQ-0001-2), and the sim step share may take up to 8.33 ms of the server tick budget's 16.67 ms
     (ADR 0001, part 3); a lighter stand-in overstates the density, so it understates the monthly cost, and the
-    real-sim run comes only at slice 6 (migration step 7).
+    real-sim run comes only at slice 6 (migration step 7). Since 2026-11-03 the 60 Hz rule reads this goal budget too
+    (TICK-60-HEADROOM's addition, part 8): at slice 6, the 60 Hz goal-budget check (ADR 0001's PM-0001-63) is judged
+    against the figure this question fixes (the advisor's reading, 2026-11-03).
   - *Options:* (a) in the density runs the stand-in's sim step is padded to the sim step share's ceiling (or replays
     the step times the sim core spike recorded, OQ-0001-2's option (b) shape), so the figure is a lower bound on rooms
     per VM for any sim inside its share, and the goal budget is provisional until slice 6 (the interim position: part
@@ -1001,6 +1055,9 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Carries:* no research id (the test review's finding 2 and its question 2; R6-COST-OQ1 stays with the netcode
     proof test).
 - **OQ-0006-20. What may the netcode proof test's VMs cost?**
+  - Answered in part by Mustafa (2026-11-03): "VMs exist only during a run." It sets no cap (the advisor's reading,
+    2026-11-03); still open: the cost cap, decided by Mustafa (money). He creates each run's VMs himself (OQ-0006-17),
+    so under the interim below each run plan's cost reaches him before its VMs exist.
   - *Why it matters:* R6 sized "the spike's own bill (a few hours of one or two VMs) under 5 EUR" (r6 lines 716–717),
     but the pass marks now plan far more: on RS alone about 23 hours for this record's rows (the infra review's
     arithmetic on the rows' run plans: PM-0006-14 about 14.3 h, PM-0006-13 3 × 1.1 h, PM-0006-17 about 2.2 h, the soak
@@ -1062,7 +1119,10 @@ precondition is OQ-0006-1). They prove parts 5, 7, 8 and 9:
   provisionally: the netcode proof test's sim is a stand-in that may cost less than the real one, so in these density
   runs its sim step is padded, by a busy-wait, to the sim step share's ceiling of 8.33 ms (ADR 0001, part 3), which
   makes the figure a lower bound on rooms per VM for any sim inside its share (proposed interim, OQ-0006-19), and the
-  budget stays provisional until slice 6 measures the real sim (migration step 7). The bot clients run on
+  budget stays provisional until slice 6 measures the real sim (migration step 7). The count at 60 Hz and its
+  goal-budget check (TICK-60-HEADROOM's addition, part 8) are not marks of this item: they are ADR 0001's PM-0001-63,
+  on this counting rule, in wave 1's 60 Hz run after the sim core spike (SPIKE-ORDER (b)) and again at slice 6. The
+  bot clients run on
   load-generator VMs, never on the VM under test, as many as a short calibration run at the session's load shows keep
   each under its CPU limit, their hours counted in the spike's bill; on their addresses the per-address connection cap
   (ADR 0001) is raised to the run's session count and recorded (proposed; the infra review, findings 9 and 10);
@@ -1108,7 +1168,8 @@ to PM-0006-31). Every number is a research mark
   x86-64 AMD) in the location OQ-0006-2 picks (`nbg1` or `hel1`). **SH**, the shared CX33 (4 vCPU, 8 GB) beside it,
   same location. **LG**, the load generator: one or more separate VMs in the same location that run every bot client,
   never the VM under test (proposed: bot clients on the VM under test would spend the vCPUs the marks measure): CX33s
-  (or a larger plan), as many as a 5-minute calibration run at the session's load shows keep each under 80 % of its
+  ("the CX33 runs the simulated clients": SPIKE-MACHINES, Mustafa, 2026-11-03), as many as a 5-minute calibration run
+  at the session's load shows keep each under 80 % of its
   CPU, each one's CPU use recorded every second, and a run in which any LG VM passes 80 % is invalid (proposed: 384
   encrypted sessions each receiving 30 snapshots a second may need more than one 4-vCPU VM; the server side alone may
   spend up to 1 vCPU per 48 sessions, ADR 0001); their count goes into the run plan and PM-0006-18. On LG's addresses
@@ -1130,13 +1191,17 @@ to PM-0006-31). Every number is a research mark
   (ceil(0.99 × 36,000)), the max the 36,000th (proposed, as in ADR 0003's pass marks: one definition, so two people get
   the same number). A time mark that names no statistic is a p99, and p99s are never added
   ([time statistics](../research/GLOSSARY.md#time-statistics)). Every server mark runs at the 30 Hz baseline
-  (TICK-30); none runs at 60 Hz: [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) is ADR 0001's run.
+  (TICK-30); none runs at 60 Hz: [the 60 Hz margin](../research/GLOSSARY.md#the-60-hz-margin) is ADR 0001's, and so
+  is the rooms-per-VM count at 60 Hz with its goal-budget check (PM-0001-63, on PM-0006-14's counting rule).
 - **The load.** ADR 0001's netcode proof test load (its throwaway sim with movement, hitscan and bots; the stand-in
-  for [the stress scene](../research/GLOSSARY.md#the-stress-scene) as OQ-0001-2 sets it) at N = 48 (MODES-3 (a))
+  for [the stress scene](../research/GLOSSARY.md#the-stress-scene) as OQ-0001-2 (a) sets it, answered by the Advisor,
+  2026-11-03) at N = 48 (MODES-3 (a))
   unless a row names another N, with one snapshot-receiving bot client per soldier, run on LG as headless protocol
   clients (R5-TEST-REC5, r5 lines 1475–1478). **Profile:** P2 (100 ms round trip, ±20 ms jitter, 2 % loss: r2 lines
-  1987–1990; the reading of "100 ms of simulated latency" ADR 0001 states, decision map part j, J6 (3)), injected on LG
-  in both directions, half the round trip each way (R5-TEST-REC4's per-direction rule, r5 lines 1455–1456), never on
+  1987–1990; the reading of "100 ms of simulated latency" ADR 0001 states, OQ-0001-3, answered by the Advisor,
+  2026-11-03; decision map part j, J6 (3)), injected on LG in both directions, half the round trip and ± half the
+  jitter each way and the profile's loss on each (OQ-0001-16, answered by the Advisor, 2026-11-03; R5-TEST-REC4's
+  per-direction rule, r5 lines 1455–1456), never on
   the VM under test (proposed: the impairment would spend the measured vCPUs). Marks over a real path (the firewall,
   the certificates, round trips) run with no injected profile and record the path's round trip.
 - **B, the bracket** for a mark that compares rooms with a single room: each session runs one room alone (20 minutes)
@@ -1178,11 +1243,11 @@ to PM-0006-31). Every number is a research mark
 | PM-0006-10 | Whether GitHub shows the environment URL on the pull request page (decides R5-PREV-OQ5) | recorded: yes or no, with a screenshot of the page | TR | the throwaway deploy workflow sets its environment's `url` to the preview link (R5-PREV-REC1); the pull request page is read after a deploy | once; passes when recorded | R5-PREV-OQ5 (r5 lines 1858–1859) |
 | PM-0006-32 | B9's interim position holds: a pull request cannot reach a deploy secret or production (part 13, B9; spike 1; with ADR 0002's PM-0002-66) | 2 of 2: a test pull request on TR whose deploy job is edited to print a marker gets no secret until the `preview` environment's required reviewer approves it (the job prints only whether the secret is set, never its value); a job in a pull request that names the `production` environment is refused by its `main`-only deployment-branch rule; reported, not a pass condition: whether a deploy of the production branch tried with the `preview` environment's token is refused (part 13 expects the account-scoped token to reach production; if no token scope the check finds can refuse it, the result is recorded as not refused and goes to OQ-0006-13); recorded: how the branch rule treats a pull request's merge ref (not read), and Mustafa's revocation of the test token when the check ends | TR, CF; MP (Mustafa approves or withholds the review, and revokes the token) | three throwaway workflow runs on TR; each run's log and the environment's deployment history pasted into the results log | 1 run per case. Control: after the reviewer approves, the same job reports the secret set. Bite: with the required reviewer removed, the edited job must report the secret set (the check can fail) | the draft's spike 1, B9's bullet (proposed there, from the security review's finding 1); part 13, B9; R5-PREV-REC1 (the deploy token held only by its job, as part 13 cites it) |
 | **The operations marks inside the netcode proof test** (ADR 0001's spike) | | | | | | |
-| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs or the API token that creates them (his account); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
+| PM-0006-11 | The reference server exists and is the machine every server row ran on (part 5; OQ-0006-1, the precondition) | a CCX23 and a CX33 created in `nbg1` or `hel1`, after PM-0006-12's round trips and OQ-0006-2's pick of the location; recorded for each: type, location, CPU model, vCPU count, memory, kernel, and the number of threads on each core that `lscpu` reports, with the map of which vCPUs are SMT siblings (if a core carries 2 threads, the transport runtime of ADR 0001's pinned rows is kept off the tick thread's sibling, and that placement is recorded: proposed, since a sibling shares the physical core and "one vCPU with no other room on it" would not isolate the tick; the CCX23's topology is not researched); the CPU model read again at every session (a change is recorded and named in the results) | RS, SH | Mustafa creates the VMs himself for each run, in a separate Hetzner project, and deletes them after it; sessions get SSH access only and no Hetzner token (SPIKE-MACHINES, Mustafa, 2026-11-03: "I create and delete the VMs myself for each run; sessions get SSH access only and no Hetzner token until the security baseline"; OQ-0006-17); a script reads `/proc/cpuinfo` and the plan at each session start | every session | R6-HOST-REC2 (r6 lines 645–650); R6-HOST-F20 (r6 lines 180–182); GLOSSARY, the reference server (lines 225–231) |
 | PM-0006-12 | The round trip to each candidate location (part 5; feeds OQ-0006-2) | reported, no pass number: per location, the mean and the max round trip and the loss of 100 ICMP echoes, as Windows' `ping` prints them | one throwaway CX33 per offered location (`nbg1`, `hel1`, `fsn1` if offered), ICMP allowed on these only, deleted after; from ML and from MP | `ping -n 100 <address>` per location from each machine (MP: the operations checklist, step 1); the outputs pasted into the results log | 1 run per machine and location; a second run at another time of day if two locations differ by under 5 ms (proposed) | OQ-0006-2; R6-HOST-OQ2 (r6 lines 856–858); R6-HOST-F18: the firewall filters ICMP (r6 lines 169–174) |
 | PM-0006-13 | Rooms per VM: 8 rooms at N = 48 on each machine (part 5; with ADR 0001's R2-ROOM-REC2 marks 1 and 2: one set of runs serves both records) | each of 8 rooms' server tick p99 at most 1.10 × the single-room figure; on SH also R2-ROOM-REC2 mark 1 for every room (p99 at most 16.67 ms, max under 33.33 ms, 0 overruns: [the server tick budget](../research/GLOSSARY.md#the-server-tick-budget) at 30 Hz) and every room start-up (process spawn to Open) under 2 s (R6-HOST-REC2 names both machines; the RS half of marks 1 and 5 is ADR 0001's) | RS and SH, each with LG | 8 room processes under the supervisor, no CPU pinning (as production would run them; recorded); the load at N = 48 (384 bot clients on LG); bracket B; each room process's CPU share of one vCPU per second also recorded (it holds the [transport runtime time](../research/GLOSSARY.md#transport-runtime-time)) | 3 sessions per machine at the 3 times of day; every valid session passes. Validity is bracket B's and LG's 80 % rule, not ADR 0001's V-S: eight tick threads on 4 vCPUs cannot each be alone on a vCPU, and on SH steal time is what the mark measures, so each vCPU's steal is recorded per second and reported, never a validity condition (proposed; the infra review's finding 2). ADR 0001's PM-0001-27 is this set of runs, read the same way. **On SH it is an adoption mark:** a fail, or an invalid session, keeps the fleet on dedicated vCPUs (K1) and K3 out, as part 8 says; it is not a fail of this record. Bite: a busy-wait of 20 % of the single-room p99 planted in every tick of one room must fail that room's row (proposed) | R6-HOST-REC2's mark (r6 lines 667–671); R2-ROOM-REC2 marks 1, 2, 5 (r2 lines 2774–2780); A-2 (r6 lines 516–522); N32 (0006 the figure, 0001 the test) |
 | PM-0006-14 | Rooms per VM counted, the figure that replaces A-2 (parts 5, 8; decides R6-COST-OQ1) | reported, no pass number: on each machine and at N = 48, 36 and 18, the most rooms k for which every room meets R2-ROOM-REC2 marks 1 and 2 (the draft's counting rule). In these runs the stand-in's sim step is padded by a busy-wait to the sim step share's ceiling, 8.33 ms per tick (ADR 0001 part 3), or replays the step times the sim core spike recorded, so the figure is a lower bound on rooms per VM for any sim inside its share, labelled "a lower bound, provisional until slice 6" (OQ-0006-19's option (a), the interim; proposed: a stand-in cheaper than the real sim would overstate k); slice 6 re-measures on the real sim (the draft's migration step 7). Each room's padded step time p99 is recorded, so a run whose padding fell short is invalid | RS and SH, each with LG | per N, in one session with bracket B: k = 4 (A-2's case to budget, one room per vCPU), then 6, 8 and up by 2 until a k fails, then the odd k between the last pass and the first fail; if k = 4 fails, 3, 2, 1. Then the count and count + 1 again at the other 2 times of day. The load as PM-0006-13 with N set to 48, 36 and 18 (the goal modes and the three-team start mode's upper end) | the figure is the lowest count of the 3 sessions (proposed: a budget takes the worst case); validity as PM-0006-13 (bracket B, LG's 80 % rule, steal reported, never ADR 0001's V-S). A run plan with every session's VM-hours is written before the first session (it feeds PM-0006-18) | R6-COST-REC1's mark (r6 lines 714–716); the counting rule (draft, spike 2, proposed there); R6-COST-OQ1 (r6 lines 880–882); J6 (2) and OQ-0001-2 (the stand-in's load) |
-| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: the draft names none for development, and the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
+| PM-0006-15 | The firewall lets both game transports in and nothing else (part 5) | from each of the four browsers, 20 of 20 WebTransport sessions over UDP and 20 of 20 WebSocket sessions over TCP (`wss`) reach a room on RS; with no rule for a port, a probe to a listening service on that port gets no answer (a TCP connect times out, never "refused"; a UDP probe gets no reply); the firewall's rule list for each VM role equals part 5's list for that role, with no rule outside it and every source limited as listed (the game VM under test: the UDP range, the TCP range, part 9's metrics rule with MV as its only source, PM-0006-16, and SSH by key from the named source addresses only; staging's delivery path and TCP 80 for http-01 only where part 5 names them). The `wss` endpoint presents a certificate the four browsers accept with no warning, and which one is recorded: a trusted certificate on the domain Mustafa registers (SPIKE-MACHINES, Mustafa, 2026-11-03: "for the WebSocket leg, a domain I register"; OQ-0006-5's development case (i): the advisor's reading, 2026-11-03); the WebSocket constructor takes only a URL and sub-protocols (R2-ROOM-F12, r2 lines 1494–1500), so a self-signed certificate cannot be pinned for `wss` | RS; ML: Chrome, Edge, Firefox; MAC: Safari; a probe from ML | WebdriverIO opens the netcode proof test's client page with the transport forced by a URL flag; an attempt succeeds when the session is ready and one datagram or message echoes back; the probe opens a TCP connection and sends a UDP datagram to one closed port of each kind, with a test listener on each; the rule list is read from Hetzner's console or API and pasted into the results | 20 attempts per browser and transport (proposed: R2-TRN-REC5's count); 1 probe pair. Bites: a rule added for the probed TCP port makes the probe connect (the negative test can fail); an SSH rule opened to every source fails the list comparison | R6-HOST-REC2's mark (r6 lines 669–671); part 5 ("and nothing else"); R6-HOST-F18 (r6 lines 169–174); R2-TRN-REC3 (r2 lines 2639–2659) |
 | PM-0006-16 | The metrics path works with only the rule it needs (part 9) | every metric of PM-0006-22 reaches Prometheus on MV; if part 9 picks the scrape: the exporter's port answers MV's address only and drops every other source (the PM-0006-15 probe from ML gets no answer); if it picks the push gateway: no inbound rule for metrics | RS, MV; a probe from ML | the path is configured as part 9 picks it; the rule names MV's address as its only source (proposed: the narrowest rule that serves a scrape) | 1 probe from ML; the metrics as PM-0006-22. Bite: the rule opened to every source makes ML's probe connect | the draft's spike 2 (proposed there: the negative test extended); R6-OBS-F4: scrape or push (r6 lines 279–284) |
 | PM-0006-17 | Egress per 24v24 match-hour matches R2's estimate (part 8) | bytes sent from RS's network interface in one room-hour within ±20 % of R2's E3 estimate at the counts that ran (R2's formula, r2 lines 1764–1766, evaluated in the results with the run's P, V, shots and projectile spawns, the arithmetic shown; proposed, in place of R6-COST-REC1's fixed 3.16 GB, which holds only at R2's counts: the netcode proof test's load need not have them, since it stands in for the stress scene, whose 700 shots per second (ADR 0001's PM-0001-2) are almost ten times R2's 72, 1.5 per player per second × 48, r2 line 1759); at R2's own counts (P = 48, V = 15 vehicles, 0.44 projectile spawns per player per second, every entity in view) that is 3.156 GB, so 2.52 to 3.79 GB. Beside it, the room's own bytes-sent metric agrees with the interface counter within 5 % (proposed: R6-COST-REC2's tolerance, a check that the counter measures the room). With interest management on: the figure reported, only if the netcode proof test's sim has the interest filter | RS with LG; one room alone | 48 bot clients over IPv4 (R2's case), all in view; three 20-minute matches back to back, joins and full states included (proposed: a room-hour as a real room spends it); the interface's transmitted-byte counter read at the start and end | 1 room-hour per setting; P2 on LG. Bite: snapshots sent twice per tick (about 2 × the reference) must fail | R6-COST-REC1's mark (r6 lines 716–717); the egress table (r6 lines 438–446: 146.1 kbps × 48 = 7.01 Mbit/s; × 3,600 s ÷ 8 = 3.156 GB); R2's estimate (r2 lines 1759–1762, 1775); A-1 (r6 line 515) |
 | PM-0006-18 | The spike's own hosting bill (part 8) | under the cap OQ-0006-20 sets, excluding VAT, for every Hetzner VM-hour and traffic block the netcode proof test creates (all its marks, ADR 0001's included, LG's calibrated VMs counted); planning check before any VM is created: the run plan's hours at 0.1386 EUR (CCX23) and 0.0144 EUR (CX33) an hour, the arithmetic shown, sum under that cap, else the plan goes back to the draft first (proposed: a bill found too high afterwards cannot be undone). R6's 5 EUR (5 ÷ 0.1386 = 36 CCX23-hours if nothing else ran) predates the run counts: the rows' own plans come to about 23 RS-hours for this record alone (OQ-0006-20), so until it is answered the plan's cost goes to Mustafa before the first session | the Hetzner project of the spike; MP (Mustafa reads the bill) | VMs are created per session and deleted after it (billing rounds up to the hour, R6-HOST-F17); Mustafa reads the project's costs (the operations checklist, step 2) | 1 reading after the last session | R6-COST-REC1's mark (r6 lines 716–717); R6-HOST-F15 hourly prices (r6 lines 150–159); R6-HOST-F17 (r6 lines 164–168); prices exclude VAT (r6 lines 40–41) |
@@ -1232,8 +1297,9 @@ the same way (part 2, OQ-0006-4).
   online playtest; in the spikes only PM-0006-21, -24 and -31 touch it.
 - Part 12 (balance telemetry): slice 4 (R6-TEL-REC1 to REC3's marks, r6 lines 807–811, 824–827, 840–842).
 - Part 13 (the security baseline): open by BASELINE-WHEN (b); no mark before its research.
-- No mark here runs at 60 Hz: the 60 Hz margin is ADR 0001's run. The netcode proof test's "look correct" checklist and
-  its measurable marks (hits the server confirms, correction sizes, prediction error at P2) are ADR 0001's pass marks.
+- No mark here runs at 60 Hz: the 60 Hz margin and the rooms per VM at 60 Hz with their goal-budget check (PM-0001-63)
+  are ADR 0001's. The netcode proof test's "look correct" checklist and its measurable marks (hits the server confirms,
+  correction sizes, prediction error at P2) are ADR 0001's pass marks.
 
 #### The hosting checklist (Mustafa, in Brave on his Windows PC)
 Beside it, the measurable marks: the header sets (PM-0006-2), isolation in the four other browsers (PM-0006-3),
@@ -1271,12 +1337,14 @@ hides what PREV-DELETE must see.
 Phases in the slice order (SLICE-ORDER), the netcode proof test before the foundation, the foundation before slice 1.
 Each milestone is checked by its marks (What a spike must prove; Test plan).
 
-0. **Before any spike (Mustafa's steps):** the drafts approved; a Cloudflare account with a test project and its
+0. **Before any spike (Mustafa's steps):** the drafts signed off as the basis for the spikes (2026-11-03,
+   SPIKE-ORDER (b)); a Cloudflare account with a test project and its
    token in a GitHub environment, revoked after the preview hosting check (B9); a Hetzner account, the console check
-   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks (OQ-0006-17); a
-   domain, only if
-   OQ-0006-15 picks one before the netcode proof test. *Milestone:* the reference server is orderable, or OQ-0006-1
-   (b) has named another.
+   of OQ-0006-1 and a Hetzner project of its own for the spikes, the tick bench and the playtest soaks, in which he
+   creates and deletes the VMs himself for each run, with SSH access only and no Hetzner token for sessions until the
+   security baseline (OQ-0006-17, answered by Mustafa, 2026-11-03); a domain he registers for the netcode proof
+   test's WebSocket leg ("for the WebSocket leg, a domain I register": OQ-0006-15, answered in part). *Milestone:* the
+   reference server is orderable, or OQ-0006-1 (b) has named another.
 1. **Spikes (before the foundation):** the netcode proof test with this record's operations marks, and the preview
    hosting check, in parallel. *Milestone:* their marks pass; rooms per VM measured, so part 8's goal budget is one
    provisional figure (OQ-0006-19), set only after a read of the price and location pages of Hetzner's dedicated root
@@ -1337,7 +1405,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
   0 allocations per tick after warm-up; a 24v24 record is at most 1 MB uncompressed (R6-TEL-REC1's mark, r6 lines
   807–811, at N = 48); with object storage unreachable for 1 hour, 0 records are lost and all upload within 10 minutes
   of recovery; a record of schema version n is read by the script for version n + 1; a room killed with SIGKILL
-  mid-match leaves a stub record marked incomplete (R6-TEL-REC2's mark, r6 lines 824–827); the analysis script reproduces
+  mid-match leaves a stub record marked crashed (part 12; R6-TEL-REC2's mark says "marked incomplete", r6 lines
+  824–827); the analysis script reproduces
   the hand-counted cashouts, steals, deliveries and harvester kills of 3 matches exactly, every output row carries its
   match count, and a month of goal-scale records (about 13,000) is analysed in under 10 minutes on a CX33, the staging
   VM's plan, though the analysis itself runs off the staging VM (part 12)
