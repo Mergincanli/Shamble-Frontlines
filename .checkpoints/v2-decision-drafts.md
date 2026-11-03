@@ -4,7 +4,7 @@
   and the Advisor · plan: `v2-decision-drafts/plan.md` (revision 3: the advisor's APPROVE of revision 1 with 19 conditions folded in revision 2, verdict verbatim in `advisor-verdicts.md` §1; revision 3 applies Mustafa's UPGRADE-SCOPE update)
 - **Branch:** claude/laughing-lovelace-ox61se (the session's branch, standing in for cs/v2-decision-drafts) ·
   **Base:** origin/main 9e7db28 (PR #32's merge)
-- **Last update:** 2026-11-03 12:34 Amsterdam
+- **Last update:** 2026-11-03 13:04 Amsterdam
 
 ## Steps done
 (Earlier steps below; the run of 2026-11-01:)
@@ -51,6 +51,17 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 13:04: wf_7663bb31-6ca done. Map: 205 rows (126 places; `stop-answers-map.md`). The advisor: APPROVE WITH
+CONDITIONS (12 conditions; rulings on STATUS-FIELD (b), POINTERS (b), GLOSSARY §8's 60 Hz entry amended, every
+mapper question; escalations for Mustafa: REF-MACHINES (OQ-0003-1), LOOK_V2-§8, SPIKE-COST (OQ-0006-20), DOMAIN
+(OQ-0006-15); `advisor-verdict-r4.md`). The merge: his go only after the advisor's APPROVE of the final SHA, gate and
+smoke green; squash with that SHA, a session-written message, the branch kept; PR labelled needs-mustafa. Running:
+wf_c88e880c-a17 (A: netcode-architect, test-engineer, rust-reviewer, game-designer) and wf_d9bbfb18-41c (B:
+engine-architect a and b, infra-engineer, graphics-engineer), fixes files `stop-<unit>-fixes.md`. Next: apply after the
+ownership checks; fixcheck-e (high); docs-keeper (high); the report and appendix (condition 8); stop the saver; the
+deletion commit; ready; the advisor on the final head; Mustafa's go.
+
+Before that:
 After the stop (2026-11-03): Mustafa's answers to the stop arrived at about 12:28 Amsterdam (verbatim in
 `inputs/STOP-ANSWERS-mustafa-2026-11-03.md`): SPIKE-ORDER (b), wave 1 one heavy spike at a time; TICK-60-HEADROOM
 confirmed plus rooms per VM at 60 Hz; the Advisor's TICK-60-SETUP (a) as an early signal, NET-PROFILES P2, OQ-0002-8
