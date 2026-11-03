@@ -176,8 +176,8 @@ unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in i
 `docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31).
 AFTER:
 unit, the **asset-pipeline research** (graphics-engineer, verified like R3, in its own daytime session), which
-`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31), except
-its export and slot-naming part (OQ-0005-AS3, AS4), which runs before ADR 0003's look proof test (LOOK-TEST-INPUTS,
+`docs/SPIKE_PLAN.md` places before the asset spike (ASSET-RESEARCH (a), the advisor's ruling of 2026-10-31), with
+its export and slot-naming part (OQ-0005-AS3, AS4) earlier, before ADR 0003's look proof test (LOOK-TEST-INPUTS,
 Mustafa, 2026-11-03). The look proof test's models are made in Blender: "Route: Blender (Spline's skins and named
 slots are unproven)" (Mustafa, the same answer). Blender is also that research part's export route, and LOOK_V2
 §8's flow stays as written (the advisor's reading, 2026-11-03).

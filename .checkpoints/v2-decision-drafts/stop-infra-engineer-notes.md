@@ -7,3 +7,4 @@
 - 14:15 FIX M5-2, M7 (OQ-0006-5 in part), H16-2 (OQ-0006-10 pointer), M6 (OQ-0006-15 in part) written. Next: M1 (OQ-0006-17), H16 (OQ-0006-19), M9 (OQ-0006-20), H13, M5, RC7-2; then NOTES.
 - 14:25 FIX M1 (OQ-0006-17 answered), H16 (OQ-0006-19 pointer), M9 (OQ-0006-20 in part) written. Next: H13 (1065), M5 (1274-1279), RC7-2 (1339-1340); then NOTES RC8 H23 S15 O21 M10 M13 X5 LA3; then checks.
 - 14:35 FIX H13 (spike item 2 -> PM-0001-63), M5 (step 0 incl. drafts signed off), RC7-2 (test plan stub 'marked crashed') written. Next: NOTES RC8 H23 S15 O21 M10 M13 X5 LA3; update preface (-2 ids incl. M8-2); then checks.
+- 14:45 NOTES RC8 H23 S15 O21 M10 M13 X5 LA3 written. Next: fix preface (-2 ids incl. M8-2), dry run, glossary, cells, lengths, quotes, word review.

@@ -273,3 +273,57 @@ AFTER:
   824–827); the analysis script reproduces
 END
 
+### NOTE RC8
+no change: part 11 (ADR 0006:419-425) already caps every store the answer keeps (crash reports at our endpoint 14
+days, proposed; match records while their content hash is still analysed; Sentry's crash-report cap open). By the
+advisor's ruling on ROOM-CRASH, "keep" means written and kept under part 11's proposed retention, with no new period;
+FIX RC7 says so at part 12's stub record, so part 11 itself needs nothing.
+END
+
+### NOTE H23
+no change: ADR 0006:50-51 (TICK-30, a settled input: "60 Hz only with the 60 Hz margin of at least 25 % (ADR 0001
+owns the rule and its marks)") links GLOSSARY §8 and states a necessary condition; by the advisor's ruling on
+TICK-60-HEADROOM such restatements may stay once §8 is amended (condition 3, engine-architect's entry). ADR 0001 owns
+the rule and its marks, PM-0001-63 included, and part 8 (FIX H12) states the addition in this record.
+END
+
+### NOTE S15
+no change: OQ-0006-19 option (a)'s "OQ-0001-2's option (b) shape" (ADR 0006:996) names a padding method for the
+30 Hz density runs, which stays a weighed option of OQ-0006-19 (still open). OQ-0001-2's answer, (a) as an early
+signal only, is about the 60 Hz margin run's sim load and is recorded in ADR 0001 (netcode-architect); it does not
+change what this option describes. The key's "as OQ-0001-2 sets it" (S16) is test-engineer's.
+END
+
+### NOTE O21
+no change: migration step 1 (ADR 0006:1280-1281: "the netcode proof test with this record's operations marks, and the
+preview hosting check, in parallel") already matches Mustafa's SPIKE-ORDER (b): "The preview hosting check may run
+alongside any of them." This record runs no other heavy spike; wave 1's order is SPIKE_PLAN's (engine-architect) and
+ADR 0001's step 1 (netcode-architect).
+END
+
+### NOTE M10
+no change: OQ-0006-1 (ADR 0006:762-773) stays open. No answer gives his console check, and "a separate Hetzner
+project" does not say whether a CCX23 and a CX33 can be ordered in an EU location; it stays in "For Mustafa" (the
+verdict's item 1).
+END
+
+### NOTE M13
+no change at my place: spike item 2's "the development certificates: all four browsers connect with a pinned
+self-signed certificate" (ADR 0006:1081) is Mustafa's "a private hash-pinned certificate for WebTransport"; the
+WebSocket leg's certificate is stated in part 7 (FIX M8-2). PM-0006-25 and -27 are test-engineer's (its NOTE M13).
+END
+
+### NOTE X5
+no change: ADR 0006 has no "VISION_V2 §4 only" need line (grep: none); its §4 traces sit beside §6 traces (parts 5, 7,
+9 and 10), and "What it serves" marks §3 and §4 as such, now under the Advisor's answer to OQ-0001-14 (FIX X3).
+END
+
+### NOTE LA3
+no change: by the ruling on LATER, the drafts' own entries for the twelve LATER questions are not edited. Mine are
+OQ-0006-13 (ADR 0006:896), OQ-0006-14 (:915) and OQ-0006-18 (:975); they keep their deciders and timings as written,
+and README carries the design-session marker (engine-architect). For the report: the ruling times OQ-0006-13 "before
+the foundation's client-host token", while the entry says "before the first client-host token is added to this
+repository", which is the preview hosting check's token (spike item 1); B9's interim (each preview deploy waits for
+Mustafa's approval) covers that check, so nothing conflicts in practice, but the two wordings differ.
+END
+
