@@ -51,6 +51,16 @@ complete block); `scripts/saver_check.sh` runs at every checkpoint update, and t
 (`checkpoint.mjs watch v2-decision-drafts --every 5`, in the background) whenever it reports "NOT running".
 
 ## Current step
+At 22:47: plan revision 6 done: the authors' blocks in 4dc30bc (79 FIX, 37 NOTE; scripts clean: guard PASS,
+521/521, glossary 0, tables clean, 116/96 and 341, quotes against the ten inputs, the amended condition 14 greps),
+gate 1-4 and 5b-5d PASS; docs-keeper's STATUS and the report and appendix (§7.5, §9's block table, §12, §13) in
+d5d6578. The saver is stopped. Next: the deletion commit (this folder and file leave the branch; the appendix's
+{LASTCKPT} names the commit that saves this text), push, CI; PR #33's body (first line "Merge by squash only
+(Mustafa, 2026-11-03)", the report, the footer), ready, label needs-mustafa; the advisor's final-head review (resume
+its agent); then Mustafa's "merge #33" for that head; squash with the head SHA, a session-written message, keep
+the branch.
+
+Before that:
 At 22:28: Mustafa answered MACHINES-TIMING ((c) with the GitHub macOS runner step first), the domain
 (registered) and asked to relaunch (inputs/ANSWERS-3-…, about 19:04; the limit cut him at about 19:10, reset 22:20).
 The advisor's AMENDMENT 2 (advisor-verdict-r6.md) rules on them: the runner may stand as MAC only for the proof test's
