@@ -1515,19 +1515,20 @@ profile's latency (PM-0001-3). Each step: what to do, the expected result, and w
 6. At P2, watch bots die and respawn. Expected: a respawned soldier appears at its new spot; nothing slides across the
    map.
 7. At P2, with the rewind cap at the honest rewind's p99 the proof test measured at P2 (PM-0001-49; the overlay names
-   it, so the cap clips almost no honest shot), shoot the sprinting target for two minutes. Expected: when his crosshair is on the target as he sees it, the
-   shot hits; when it is off, it misses. The shot (flash, tracer) is instant; the hit marker comes a moment later, when
-   the server confirms ("the shot feels instant; hit feedback arrives when the hit is confirmed", LOOP_V2 §7).
+   it, so the cap clips almost no honest shot), shoot the sprinting target for two minutes. Expected: when his crosshair
+   is on the target as he sees it, the shot hits; when it is off, it misses. The shot (flash, tracer) is instant; the
+   hit marker comes a moment later, when the server confirms ("the shot feels instant; hit feedback arrives when the hit
+   is confirmed", LOOP_V2 §7).
 8. At P2, fight and kill bots in the brawl. Expected: no damage number and no kill is shown before its hit marker.
 9. At P2, shoot the static targets on the ground, at 2.5 m and at 4 m. Expected: every shot lands where he clicked, at
    every height.
 10. At P2, repeat step 7 with the rewind cap at 200 ms, then at 250 ms, then again at step 7's measured cap (the overlay
     names the cap). Expected: with 200 and 250 ms, shots that looked like hits but missed, since at P2 an honest shot
-    needs 233–383 ms of rewind (part 8) and both caps clip most of them; with the measured cap, hits as in step 7. Record: what he noticed with each cap
-    (for OQ-0001-5's later Feel Lab weighing; no pick here).
-11. At P2, run from open ground into cover while bots shoot at him, 10 runs with each of step 10's three caps. Expected: being hit after
-    reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair with each cap
-    (OQ-0001-5, the victim's side).
+    needs 233–383 ms of rewind (part 8) and both caps clip most of them; with the measured cap, hits as in step 7.
+    Record: what he noticed with each cap (for OQ-0001-5's later Feel Lab weighing; no pick here).
+11. At P2, run from open ground into cover while bots shoot at him, 10 runs with each of step 10's three caps. Expected:
+    being hit after reaching cover on his own screen is rare, and never long after. Record: how often it felt unfair
+    with each cap (OQ-0001-5, the victim's side).
 12. At P2, while he moves, trigger the one-second loss burst (B1) from the overlay. Expected: during the burst the
     other soldiers stop where they are (held, not flying off) and his own soldier keeps responding; within half a
     second after it, the world catches up. His own soldier may be corrected once, because the repeated commands cover
