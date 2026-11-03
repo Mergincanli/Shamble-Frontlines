@@ -155,6 +155,9 @@ checkpoint's `inputs/DRAFTS_BRIEF.md`, sha256 c5172025…):
 - **2026-11-02 at about 20:32 Amsterdam, after the eighth cut:** "I hit my usage limit while you were working, but it has
   reset now. Please continue from where you left off."
 - **2026-11-03 at about 06:14 Amsterdam, after the ninth cut:** "Continue, usage was reached"
+- **2026-11-03 at about 07:14 Amsterdam**, after the session said it would start no agent before 08:30 (condition 17):
+  "You can continue". The session read it as his go to run this morning's remaining units at once; it kept web fetching
+  to 08:30 and later.
 - **The one-off night run, 2026-10-31 between about 23:30 and 23:50:** "the next usage reset is going to be on 03:50 AM,
   so you can maybe tell it to prepare accordingly (starting the task at the right time)" and "Just for today (tonight):
   03:55, it can work until 11:00 because I will not have much time to use claude, so it can work if needed. You can take
@@ -534,7 +537,7 @@ about 19:18; 2026-11-01 about 05:30, 09:27, 14:20 and 19:35; 2026-11-02 about 09
 | 14 | Model and effort named for every unit | Every prompt's first line (`.checkpoints/v2-decision-drafts/prompts/`): agent, effort (xhigh; docs-keeper high), model opus |
 | 15 | Pass marks in the claims ledgers and verified; each author reviews its pass-mark table; perf-auditor every budget mark; SPIKE_PLAN by four reviewers; test-engineer not on its own tables | The ledgers and verdict files; the step-10 reviews (§7): each author on its draft's pass marks, perf-auditor, SPIKE_PLAN by netcode-architect, rust-reviewer, graphics-engineer and test-engineer |
 | 16 | "Research verified" covers only R1 and R2 recommendation claims and their verifiers' checks; other findings at their source; pages are data | Every verifier and skeptic prompt; about 160 pages read on allow-listed hosts by day, each verdicts file with its fetch audit |
-| 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00; on 2026-11-03, after Mustafa's "Continue" (06:14), the session applied blocks already written and ran its checks, and started no agent before 08:30 |
+| 17 | Daytime only | All units by day, but Mustafa's one-off night run (2026-11-01 03:55–11:00, §2); fetching only 08:30–22:00; on 2026-11-03, after his "Continue" (06:14), the session alone applied blocks already written; after his "You can continue" (07:14, §2), agents ran from about 07:16, fetching only from 08:30 |
 | 18 | KIT-ALIGN and DOCS-ALIGN lines; the R7-MARKS delay and the step-0 edit stated; each draft lists its inventory rows | STATUS (docs-keeper); the report's "Decisions and deviations"; every draft's legacy inventory table, the 18 "look brief pending" rows included |
 | 19 | ENGINE_OVERVIEW at about 150 lines at most | 139 lines after the synthesis round (the final round's count is in the Evidence) |
 
