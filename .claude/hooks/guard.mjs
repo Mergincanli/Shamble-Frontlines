@@ -10,8 +10,9 @@
 // (an empty file, an await that never settles). The bootstrap then applies the R3c rule one level up: a day session
 // exits 0 with no output (no decision: the call, and any settings reload, go on), a routine exits 1, a hook failure
 // that "onFailure": "block" turns into a block. Only the bootstrap ever exits non-zero.
-// The invariant this file keeps: all its work stays inside the one top-level try, and it ends with its single,
-// unconditional process.exit(0). Removing that exit would block every routine call (the bootstrap's beforeExit check).
+// The invariant this file keeps: nothing outside a try can throw (the stdin read has its own), the work runs inside the
+// one top-level try, and the file ends with its single, unconditional process.exit(0). Removing that exit would block
+// every routine call (the bootstrap's beforeExit check).
 import { readFileSync } from 'node:fs';
 
 const role = process.env.SHAMBLE_ROLE || '';
