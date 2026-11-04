@@ -44,7 +44,7 @@ Mustafa" 2–5; details in Routines, below): 1. both role environments exist (`S
 be started by hand ("Run now", as B2 was) or through the API, and is never started by pull-request events; its GitHub
 pull-request trigger and its connectors are removed; 3. TEST-RUN passed (Mustafa accepted parts A and B): part A, B1
 (13:20 UTC, second try) and B2 (the routine reviewed and merged PR #34 on its own); 4. the PR Advisor is back on:
-Mustafa un-paused it, and the routines API (list_triggers, read about 14:02 UTC and again at 14:36 UTC) shows it
+Mustafa un-paused it, and the routines API (list_triggers, read about 14:02 UTC, again at 14:36 and 14:47 UTC) shows it
 `enabled: true`, updated 14:01:31 UTC, next run 18:45 UTC (19:45 Amsterdam). V2_PHASE0_BRIEF §3 (step 2, the
 routines: "effort high", lines 103 and 108; "Keep its triggers", line 108) is outdated by these facts and rulings; the
 brief itself is not edited.
@@ -80,7 +80,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/docs-after-kit-v3-1`), PR #35 (draft) | plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; plan revision 2 (0099b3c) adds Mustafa's answers; built (c70132f, 603f53b) and reviewed once on the final diff (security-auditor, engine-architect, infra-engineer, the verifier and a completeness critic, each finding checked by a skeptic: 30 of 31 upheld, each fixed in the last docs commit) | the advisor's APPROVE of the final head with CI `gate` and `smoke` green; Mustafa's go (`needs-mustafa`: it changes `CLAUDE.md` and `.claude/`) |
+| **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/docs-after-kit-v3-1`), PR #35 (draft) | plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; plan revision 2 (0099b3c) adds Mustafa's answers; built (c70132f, 603f53b) and reviewed once on the final diff (security-auditor, engine-architect, infra-engineer, the verifier and a completeness critic, each finding checked by a skeptic: 30 of 31 upheld, each fixed in 884d33b; the verifier's fix check: PASS WITH NOTES, its notes fixed in the last commit) | the advisor's APPROVE of the final head with CI `gate` and `smoke` green; Mustafa's go (`needs-mustafa`: it changes `CLAUDE.md` and `.claude/`) |
 | part-b-test (docs only: the kit-v3-1 report's corrections, the advisor's #30 findings 1 and 2, 822aaa4; the PR that TEST-RUN B2 reviewed and merged) | merged: PR #34, 868e165, 2026-11-04 13:35:00 UTC (`merged_at`; the merge commit is dated 13:34:59), by the PR Advisor routine itself with `expectedHeadSha` a432692ff3800b23dc186051b8b1590778183bed | done: TEST-RUN B2, the routine's first unattended merge under the guard (Routines) | none |
 | **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revisions 3 to 6, each with the advisor's APPROVE with conditions) | merged: PR #33, e4d8b22, 2026-11-03 21:57 UTC, by squash | done: verified against the research, ten domain reviewers on the final diff; the stop answered (2026-11-03): signed off as the basis for the spikes, Status Proposed (Decisions pending). Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed) | none |
 | docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
@@ -126,7 +126,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
-- **Taken by Mustafa, 2026-11-04** (his words: PR #35's body, the report, "Mustafa's answers"):
+- **Taken by Mustafa, 2026-11-04** (his words: `docs/reports/2026-11-04-docs-after-kit-v3-1.md`, "Mustafa's words"):
   - The routine shell list names `date` (CLAUDE.md, "Models and effort"; the guard already allows it,
     `routine-guard.mjs:446`).
   - TEST-RUN: "Part B accepted as passed" (part A too); the PR Advisor routine un-paused (07:45, 13:45, 19:45), the
@@ -398,8 +398,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 
 ## Routines
 _Read with the routines API (list_triggers) on 2026-11-04 at about 14:02 UTC by the docs-after-kit-v3-1 session
-(session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 UTC, before this pass's last docs commit: unchanged. Both
-routines run on the role environments (`SHAMBLE_ROLE=night-shift`, `SHAMBLE_ROLE=pr-advisor`)
+(session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right before this pass's final
+commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`, `SHAMBLE_ROLE=pr-advisor`)
 under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since 2026-10-31._
 - **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh): `CRON_TZ=Europe/Amsterdam 10 0-7
   * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt. Its first night
@@ -427,7 +427,8 @@ under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, sinc
     and the gate job logs; review comment 6632017016 naming the full head, label `ready-to-merge`, head and checks
     re-checked at 13:34:46, merged at 13:35:00 as 868e165 with `expectedHeadSha` a432692…; no permission prompt; all 7
     `permission_denials` are guard refusals (`echo`, `ls`, 4 × `actions_get`, `git rev-list`).
-- **"Guard test B1"** (trig_01XmLByUmTibCu5XXQR7iN26): deleted by Mustafa (gone from the 14:02 and 14:36 listings).
+- **"Guard test B1"** (trig_01XmLByUmTibCu5XXQR7iN26): deleted by Mustafa (gone from the 14:02, 14:36 and 14:47
+  listings).
 - **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): stays disabled until it is deleted;
   Mustafa deletes it after one good night of the new routine (deleting it also deletes its session).
 - **The old PR Advisor session from the PR #26 event** (stuck since 2026-10-25): stopped at step 0 with the role

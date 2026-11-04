@@ -65,8 +65,8 @@ Copy this template. Keep it short: it is a handoff, not a log.
   absolute path their prompt gives, so the saver sees them.
 - **Agents without a write tool:** the advisor writes its notes with Bash, under `.checkpoints/` only, in a day session;
   in a routine the guard refuses shell file tools, so the advisor returns its notes in its report (advisor.md, "Your
-  notes"; a known limit until A3, the guard's follow-ups). The built-in
-  Explore and Plan agents can't write: give them single-unit work only, and they return their result whole.
+  notes"; a known limit until A3, the guard's follow-ups). The built-in Explore and Plan agents can't write: give them
+  single-unit work only, and they return their result whole.
 - **The format:** the first line names the task. After each finished unit, a line or two: what is done, what was
   found and where (file:line, URL, command), what comes next. `DONE` on the last line when the work is finished.
 - **Look first.** An agent started on a task reads its notes file before anything else:
