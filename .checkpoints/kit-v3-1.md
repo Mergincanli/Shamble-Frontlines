@@ -9,7 +9,7 @@
   task (Mustafa: "From now on you're the only session on this task"; his PC session is closed). Its main folder
   `/home/user/Shamble-Frontlines` stays on `claude/sleepy-tesla-ofsxsr` = main and is never switched; the build runs in
   the worktree `<scratchpad>/kit-v3-1` on local `cs/kit-v3-1`.
-- **Last update:** 2026-11-04 10:07 Amsterdam
+- **Last update:** 2026-11-04 10:30 Amsterdam
 
 ## Steps done
 1. Context recovered; plan revision 1 (frozen session) read and verified against live code.
@@ -98,20 +98,25 @@
     - **AM1-C4:** against 537c7a8's settings, 104/122, failing exactly the 18 new routine cases, each with exit 0
       (expected 1). Against 5be7d37's, 95/122 (the original day-session cases still caught, C1).
 
+14. **security-auditor on the AM1 delta (deded41): PASS WITH NOTES** (`security-auditor-am1.md`).
+    - AM1-C6 met: it re-ran the bypass hunter's matrix on the final settings, over 29 states. Day sessions match the
+      fix in 29 of 29; routines differ only toward a block; with guard.mjs present, 275 of 275 runs are identical.
+    - Mutations all caught.
+    - Its notes:
+      - N1, the guard.mjs:13 comment wording: fixed in 04da817.
+      - N2, a guard written to fail open: a limit.
+      - N3, a broken state loses the PermissionRequest `interrupt`: noted.
+      - N4, stderr delivery outside Linux: not verified.
+      - AM1 also closes two fail-opens under NODE_OPTIONS `--unhandled-rejections=none` and `=warn`.
+15. **04da817**, pushed: the report's "Update, 2026-11-04" section (the AM1-C7 table measured on deded41 with Node
+    v22.23.4, the defect proofs, limits, reviews, decisions, steps). The docs wording: L1, AM1, 122/122. The guard.mjs
+    comment (N1). Checks: 122, 192 and 25 tests; repo map OK; gate PASS; C6 and C7 hold; STATUS row 77 keeps 4 columns.
+
 ## Current step
-security-auditor on the A1-AM1 delta (`git diff 537c7a8 deded41`), with AM1-C6.
+Step 6: this checkpoint's final state, then its deletion in the head commit (CI runs).
 
 ## Next steps
-1. security-auditor on the delta → address its findings.
-2. Docs and report in one commit, from the draft `scratchpad/report-update-draft.md`. The draft needs:
-   - the reviews; the old / fix / AM1 table measured on the final head with the Node version (AM1-C7); the AM1-C4
-     counts;
-   - L1's note on routine-guard.mjs:601; the 600 s limit line.
-   The docs need:
-   - STATUS:77 and ROADMAP:89: "merges fail closed while the guard loads"; the AM1 sentence; 122/122 and 40 new.
-   - STATUS:387: "missing or can't load".
-   - REPO_MAP:107 and :110: the AM1 case.
-3. Step 6:
+1. Step 6:
    - Delete the checkpoint (the last commit; CI runs).
    - The advisor reviews the whole PR at that head, from main's advisor.md (C8).
    - Update the PR body; mark it ready; keep needs-mustafa.
