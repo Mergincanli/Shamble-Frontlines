@@ -361,8 +361,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
      [a preview](../research/GLOSSARY.md#preview) built with it on (option G3); the preview Mustafa checks is built
      with it off. Production turns isolation on only if the boundary spike's B2-against-B3 test passes R1-BND-REC2's
      mark 5, or if the Worker's timer pacing (W2, ADR 0004 part 5) fails its jitter mark and the `Atomics.wait`
-     alternative (W3), which needs shared memory, passes it; then the default flips everywhere at once, B3 and posted
-     inputs through shared memory (C2) become available, and the cost list of R1-BND-REC5 applies (OQ-0002-4).
+     alternative (W3), which needs shared memory, passes it; then the default flips at once everywhere the client runs
+     isolated, B3 and posted inputs through shared memory (C2) become available, and the cost list of R1-BND-REC5
+     applies (OQ-0002-4). The client must keep working inside a third-party iframe, such as a web portal's, so a design
+     that needs isolation (B3, C2 or W3, as OQ-0002-9 reads his rule) is picked only if a non-isolated fallback stays
+     available (PORTAL-EMBED, Mustafa 2026-11-04; OQ-0002-9).
    - **The Worker owns the network connection** online (option H2): server snapshots, prediction and reconciliation
      never touch the page, which sees only the block. The received datagrams ride in the tick's one input call and the
      outgoing ones come back through the step (the control API above), so the Wasm calls per tick stay the same at
@@ -1021,8 +1024,9 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     `Atomics.wait` pacing (W3) available, and it costs a CORP header on every cross-origin `no-cors` resource and cuts
     cross-origin popups off from their opener (R1-BND-REC5, r1 lines 2309–2325).
   - Options: (a) stay non-isolated (G1); (b) isolate production (G2) when part 5's rule fires (B3 passes R1-BND-REC2
-    mark 5, or the timer pacing fails its jitter mark and W3 passes); the login VISION_V2 §5 plans then needs a page or
-    a redirect outside the isolated game page, unless `same-origin-allow-popups` gives isolation (R1-BND-OQ9).
+    mark 5, or the timer pacing fails its jitter mark and W3 passes), with the non-isolated path kept for a third-party
+    iframe (PORTAL-EMBED, OQ-0002-9); the login VISION_V2 §5 plans then needs a page or a redirect outside the isolated
+    game page, unless `same-origin-allow-popups` gives isolation (R1-BND-OQ9).
   - Decider: the boundary spike's results, then this record; for embeds and the login flow under isolation, Mustafa with
     ADR 0006 (R1-BND-OQ5, only if isolation is adopted).
   - What decides it: R1-BND-REC2 mark 5 and ADR 0004's jitter mark for the timer pacing; for the popup, a test of
@@ -1086,6 +1090,24 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     this record.
   - Research ids: none of its own; it concerns R5-LAYOUT-REC2 (changed), R4-XT-OQ5 (the same question as R5-XT-OQ7)
     and R5-XT-OQ6.
+- **OQ-0002-9. Could the client run inside a web portal's iframe, and what must this record keep possible for it?**
+  - Mustafa (2026-11-04), word for word: "PORTAL-EMBED (new, keep the door open; don't design it): the game may also
+    launch on web portals such as CrazyGames and Poki, inside their iframe, sharing our servers and player pool. Add it
+    as an open question to the README (and ADR 0002 and 0006) in the docs pass. The client must keep working inside a
+    third-party iframe, so the boundary spike may only pick a design that needs cross-origin isolation (the
+    SharedArrayBuffer ring, B3) if a non-isolated fallback stays available."
+  - Why it matters: his rule binds the boundary spike now (part 5, the isolation bullet). It is read as covering every
+    design part 5 can bring in that needs isolation: the ring (B3), inputs through shared memory (C2) and the
+    `Atomics.wait` pacing (W3) (the advisor's reading, 2026-11-04, of "a design that needs cross-origin isolation"). For
+    W3 the only non-isolated fallback ADR 0004 part 5 keeps is the timer pacing (W2), whose failed jitter mark is what
+    would bring W3 in (ADR 0004 part 5, PM-0004-68); if that happens, the question returns to Mustafa with the spike's
+    numbers.
+  - Options: none weighed ("keep the door open; don't design it").
+  - Decider: Mustafa.
+  - What decides it: no timing is set.
+  - Research ids: none of its own. Related: OQ-0002-4 (whether production ever turns isolation on); R1-BND-OQ5 and
+    ADR 0006's OQ-0006-12 (the other direction: third-party content inside the game page); ADR 0006's OQ-0006-23 (the
+    web-portal side: launches that share the servers and the player pool).
 
 ## What a spike must prove
 **The Rust ↔ TypeScript boundary spike** (throwaway, in `spikes/`, SPIKE-SCOPE (a)) runs in wave 1, one heavy spike
@@ -1484,9 +1506,10 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
 - **Before acceptance:** the record is a draft; if the boundary spike fails, Mustafa and the Advisor reject or revise
   it, and nothing is built.
 - **The block or the pacing fails its marks:** the measured alternatives take over behind the isolation flag, which
-  then becomes production's default (OQ-0002-4): the SharedArrayBuffer ring (B3) for the block, `Atomics.wait` (W3) for
-  the pacing, inputs through shared memory (C2), with R1-BND-REC5's costs. The page code that reads typed arrays does
-  not change (part 5).
+  then becomes production's default wherever the client runs isolated (OQ-0002-4): the SharedArrayBuffer ring (B3) for
+  the block, `Atomics.wait` (W3) for the pacing, inputs through shared memory (C2), with R1-BND-REC5's costs. Inside a
+  third-party iframe the non-isolated path stays available (PORTAL-EMBED, OQ-0002-9, which sends the pacing case back
+  to Mustafa). The page code that reads typed arrays does not change (part 5).
 - **The local match overloads the Worker:** OQ-0002-3's other layout; running the local server in a second Worker was
   not researched and would need its own spike.
 - **A crate placement fails** (for example `room` does not build for Wasm with a dependency the server needs): the

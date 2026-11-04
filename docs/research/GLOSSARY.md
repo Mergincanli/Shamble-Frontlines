@@ -638,8 +638,8 @@ with a re-flood) against 8.33.
   `same-origin` and COEP `require-corp` (R1-BND-REC5), to a build's header set. It is off by default everywhere:
   local development, previews and production. It is on only for profiling builds, in local development or on a
   preview built with it on (R1-BND-REC5's option G3: "allow it in development and previews for profiling"). Preview
-  isolation is a preview built with the flag on. Production turns it on only if R1-BND-REC2 mark 5's B2-against-B3
-  test leads the ADR to adopt isolation; then the default flips everywhere at once.
+  isolation is a preview built with the flag on. Production turns it on only under ADR 0002 part 5's rule (OQ-0002-4;
+  PORTAL-EMBED, OQ-0002-9).
 - **Marked by:** "the isolation flag", "an isolated preview", "a preview built with the isolation flag on".
 - **Retire (exact):** none.
 - **Retire (in context):** "COOP and COEP on preview hostnames only" for every preview (R5-PREV-REC4);

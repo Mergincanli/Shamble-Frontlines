@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-11-03; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31) and docs-after-31 (PR #32, 9e7db28, 2026-10-31) merged. In flight: the v2 decision drafts (PR #33; the stop answered 2026-11-03; ready for review, not merged). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-04; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC) and part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) merged. In flight: docs-after-kit-v3-1 (PR #35, draft). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
@@ -8,15 +8,24 @@ _Last updated: 2026-11-03; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (P
 docs-after-kit-v2-2 (PR #25, 4c24d07, 2026-10-27; docs only); R7, the legacy inventory (PR #27, 07ab240, 2026-10-27);
 docs-after-r7 (PR #29, e9f11be, 2026-10-27; docs only); R1–R6 research (PR #28, b6effde, 2026-10-31; docs only);
 docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31; docs only); docs-after-31 (PR #32, 9e7db28, 2026-10-31; docs
-only; the v2 day session's handover).
-**In flight: the decision drafts** (PR #33, from the Advisor's drafts brief, 2026-10-31): `docs/ENGINE_OVERVIEW.md`,
-`docs/adr/0001`–`0006` (Status: Proposed), `docs/SPIKE_PLAN.md`, `docs/adr/README.md` (the index and the loose-ends
-register), GLOSSARY §8 (the phase 1 terms) and `docs/LOOK_V2.md` (the look brief, Mustafa and the Advisor, added
-2026-10-31). **The stop is answered** (Mustafa and the Advisor, 2026-11-03; Decisions pending, below): the six drafts
-are signed off as the basis for the spikes, not yet accepted (Status stays Proposed; a draft becomes Accepted only when
-Mustafa signs it off after its spikes report); the answers are recorded in the drafts. PR #33 is ready for review, not merged;
-it merges by squash only, on Mustafa's go after the advisor approves its final head.
-**Next:** the netcode proof test, its own change-set, branched from main after PR #33 merges, plan first. Wave 1 runs
+only; the v2 day session's handover); **the decision drafts** (PR #33, e4d8b22, 2026-11-03 21:57 UTC, by squash):
+`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006` (Status: Proposed), `docs/SPIKE_PLAN.md`, `docs/adr/README.md` (the
+index and the loose-ends register), GLOSSARY §8 (the phase 1 terms) and `docs/LOOK_V2.md` (the look brief, Mustafa and
+the Advisor, added 2026-10-31); the six drafts are signed off as the basis for the spikes, not yet accepted (Status
+stays Proposed; a draft becomes Accepted only when Mustafa signs it off after its spikes report; the stop's answers:
+Decisions pending, below); kit-v3-1, the routine guard (PR #30, e2b5799, 2026-11-04 10:21:56 UTC, `merged_at`; the
+merge commit is dated 10:21:55; on Mustafa's "merge #30" after the advisor's APPROVE of 7a23132); part-b-test
+(PR #34, 868e165, 2026-11-04 13:35 UTC; docs only; merged by the PR Advisor routine itself: TEST-RUN B2).
+**In flight:** docs-after-kit-v3-1 (PR #35, draft; this pass). **Queue** (Mustafa's lists of 2026-11-03 and
+2026-11-04; one change-set at a time, plan first): this docs pass; then his 2026-11-04 design decisions into LOOP_V2
+and UNITS.md (B3 on his list); kit-v3-2 (A2 on his list: the CHECKPOINTS.md rules and the TOY-BOX rewording); the
+guard's follow-ups (A3 on his list, right after A2; Open bugs and risks); the review policy (A4 on his list, after A3:
+risk tiers mapped onto today's ready and needs-mustafa classes, a review budget, a revert-first rollback rule,
+per-tier checklists in advisor.md, and foundation notes: fast checks on save, one-click rollback of client deploys
+and server versions, browser error reports and telemetry from the first playtests); the EDITOR_V2 plan-view note; the
+VISION_V2 community-servers note.
+**Next (v2):** the netcode proof test, its own change-set, branched from main, plan first (no longer waiting on PR
+#33). Wave 1 runs
 one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
 proof test once its models exist; the preview hosting check alongside any. The proof test still waits on: his OK of each
 run's cost cap, in its plan (OQ-0006-20, answered); the GitHub macOS runner check for its Safari leg, then the Mac only
@@ -24,18 +33,21 @@ if that fails (MACHINES-TIMING, answered); and, for its own plan with security-a
 session holds its SSH key, and how it checks the new VMs' host keys. "Decisions needed" from PR #33: none open
 (MACHINES-TIMING and LG-COUNT answered); OQ-0006-22 is a later item (before slice 3). For Mustafa: borrow and name the
 laptop and desktop (rough checks first, then a short re-run), the Mac as the runner check decides; OK each run's cost
-cap; the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository; his go for the
-merge after the advisor approves PR #33's final head (squash only). Two later steps:
+cap; the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository. Two later steps:
 LOOK_V2 §8 reads "Spline or Blender" once the asset research's export part reports (that part's change-set makes the
 edit, and it goes to Mustafa for the merge); the drafts take up the design answers at their next revision. Then phase 1
 and the playable slices (SLICE-ORDER, below). The legacy game is frozen (critical fixes only).
-**After PR #30 merges** (kit-v3-1; Mustafa's setup steps, from `docs/reports/2026-10-27-kit-v3-1.md`, "For Mustafa"
-2–5): 1. two routine-only environments that set `SHAMBLE_ROLE=night-shift` and `SHAMBLE_ROLE=pr-advisor`, pinning
-Claude Code ≥ v2.1.295, with the Night shift and PR Advisor routines pointed at them (the night-shift cron
-`CRON_TZ=Europe/Amsterdam 10 0-7 * * *`); 2. the PR-HOME setup script for the PR Advisor environment, reviewed before
-use; 3. the TEST-RUN: a routine refuses a disallowed action (a push to main, a `cat` of a file) and allows the
-legitimate ones; 4. the PR Advisor routine back on once the test run passes. Until the environments exist, the guard
-is inert and the routines stop at their own first check (the report's Risks, 1).
+**Kit-v3-1's setup steps, done 2026-11-04** (Mustafa's steps from `docs/reports/2026-10-27-kit-v3-1.md`, "For
+Mustafa" 2–5; details in Routines, below): 1. both role environments exist (`SHAMBLE_ROLE=night-shift` and
+`SHAMBLE_ROLE=pr-advisor`) and both routines point at them (Mustafa); 2. PR-HOME replaced, with no setup script
+(PR-HOME-REPLACE (a)): the PR Advisor has a schedule trigger only, `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *`, can also
+be started by hand ("Run now", as B2 was) or through the API, and is never started by pull-request events; its GitHub
+pull-request trigger and its connectors are removed; 3. TEST-RUN passed (Mustafa accepted parts A and B): part A, B1
+(13:20 UTC, second try) and B2 (the routine reviewed and merged PR #34 on its own); 4. the PR Advisor is back on:
+Mustafa un-paused it, and the routines API (list_triggers, read about 14:02 UTC, again at 14:36 and 14:47 UTC) shows it
+`enabled: true`, updated 14:01:31 UTC, next run 18:45 UTC (19:45 Amsterdam). V2_PHASE0_BRIEF §3 (step 2, the
+routines: "effort high", lines 103 and 108; "Keep its triggers", line 108) is outdated by these facts and rulings; the
+brief itself is not edited.
 **Legacy phase 0 (environment): environment + green baseline**: merged (PR #2, 2d30e4a, 2026-10-14, Advisor APPROVE; CS-1 / PR #1 approved
 after the fact). Status stays **PARTIAL** until Mustafa's Windows run ("Check a new machine" in tools/README.md: npm ci,
 gate, headed RTX renders, headless-gl, `/permissions`, syntax-hook test); Windows-only fixes become a small follow-up
@@ -68,13 +80,14 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revision 3, the advisor's APPROVE with 19 conditions) | `claude/laughing-lovelace-ox61se` (stands in for `cs/v2-decision-drafts`), PR #33 (ready for review, not merged) | all deliverables in; verified against the research, checked for consistency and completeness, ten domain reviewers on the final diff, every finding fixed or deferred. The stop is answered (Mustafa and the Advisor, 2026-11-03): the six drafts are signed off as the basis for the spikes, not yet accepted (Status Proposed); the answers, his design answers and his answers to the escalations are recorded (plan revisions 4 and 5, the advisor's APPROVE WITH CONDITIONS on each). Verification stopped after the last fix round, as Mustafa asked; what is left goes into the PR's report as notes. Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed). Since then (plan revision 6, the advisor's APPROVE WITH CONDITIONS, amended twice; the drafts' blocks in 4dc30bc): his Hetzner check and later answers recorded (Decisions pending) | the advisor's APPROVE of its final head; then Mustafa's go; merge by squash only |
-| docs-after-33 (docs only: STATUS and ROADMAP record PR #33's merge, e4d8b22, 2026-11-03; the advisor's ruling Q2 kept it out of A1) | none yet | not started | its own docs pass |
+| **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/docs-after-kit-v3-1`), PR #35 (draft) | plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; plan revision 2 (0099b3c) adds Mustafa's answers; built (c70132f, 603f53b) and reviewed once on the final diff (security-auditor, engine-architect, infra-engineer, the verifier and a completeness critic, each finding checked by a skeptic: 30 of 31 upheld, each fixed in 884d33b; the verifier's fix check: PASS WITH NOTES, its notes fixed in the last commit) | the advisor's APPROVE of the final head with CI `gate` and `smoke` green; Mustafa's go (`needs-mustafa`: it changes `CLAUDE.md` and `.claude/`) |
+| part-b-test (docs only: the kit-v3-1 report's corrections, the advisor's #30 findings 1 and 2, 822aaa4; the PR that TEST-RUN B2 reviewed and merged) | merged: PR #34, 868e165, 2026-11-04 13:35:00 UTC (`merged_at`; the merge commit is dated 13:34:59), by the PR Advisor routine itself with `expectedHeadSha` a432692ff3800b23dc186051b8b1590778183bed | done: TEST-RUN B2, the routine's first unattended merge under the guard (Routines) | none |
+| **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revisions 3 to 6, each with the advisor's APPROVE with conditions) | merged: PR #33, e4d8b22, 2026-11-03 21:57 UTC, by squash | done: verified against the research, ten domain reviewers on the final diff; the stop answered (2026-11-03): signed off as the basis for the spikes, Status Proposed (Decisions pending). Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed) | none |
 | docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
 | **docs-after-v2-research** (docs only, symbols +0 −0: STATUS, ROADMAP, the research folder and VISION_V2 §3 catch up with PR #28's merge and the 2026-10-31 decisions; the research files carry the answers, 39 exact edits in af2560c; VISION_V2 §3 gets the totals reading, VISION-LINE (a)) | merged: PR #31, 2f5b52e, 2026-10-31, on Mustafa's "merge #31" after the advisor's APPROVE of 1c687d1 | done; the report is PR #31's body | none |
 | **R1–R6 research** (six topic files in `docs/research/`, docs only, symbols +0 −0. Labels: R1 and R2 "verified (every recommendation claim)"; R3 "spot-checked (45 of 77 key claims)", R4 "spot-checked (50 of 52 key claims)", R5 "spot-checked (61 of 115 key claims)", R6 "spot-checked (21 of 42 key claims)". Shared: `GLOSSARY.md` (34 terms, starting with the tick budgets) and `UNREAD_SOURCES.md` (180 sources not read, with what each was needed for). The consistency critic's 12 contradictions: 7 resolved, 1 aligned into one shared question, 4 escalated (see Decisions pending). Report `docs/reports/2026-10-31-v2-research.md` and its appendix) | merged: PR #28, b6effde, 2026-10-31, on Mustafa's "merge #28" after the advisor's APPROVE of 854d42f | done; report `docs/reports/2026-10-31-v2-research.md` | none |
 | docs-after-r7 (docs only: STATUS and ROADMAP catch up with v2 phase 0 and the Advisor's 2026-10-27 decisions) | merged: PR #29, e9f11be, 2026-10-27, on Mustafa's go after the advisor's APPROVE of d973b3f | done | none |
-| **kit-v3-1** (routine guard for the two cloud routines. New `.claude/hooks/`: `routine-guard.mjs` (rules: `decide`), `guard.mjs` (launcher, fails closed for routines), `routine-guard.test.mjs`, `settings.test.mjs`. In a routine the shell runs only git, gh, `npm ci` and node on main's scripts (reading/searching via the Read/Grep/Glob tools); routines never read the web, can't push to main or force-push or edit `.claude/`/`CLAUDE.md`, merges fail closed while the guard loads, nothing is ask-first. Day sessions unchanged. Also `.claude/settings.json` (empty ask, allow/deny, `effortLevel: "high"`, guard on PreToolUse/PermissionRequest/ConfigChange), procedures in NIGHT_SHIFT.md / CHECKPOINTS.md / advisor.md / CLAUDE.md / the 11 agent files (memory: local). Plus the GUARD-FILE (a) fix (Mustafa, 2026-11-03, after a day session froze when `guard.mjs` vanished under loaded hook settings): the three guard handlers start `guard.mjs` through a one-line `node -e` bootstrap; when `guard.mjs` is missing or can't load, a day session goes on and a routine is blocked; a routine is also blocked when `guard.mjs` ends without its own exit (amendment A1-AM1). No game code, symbols +0 −0) | `cs/kit-v3-1`, PR #30 (a draft while A1 runs; label `needs-mustafa`) | A1 (Mustafa, 2026-11-03; plan revision 2, the advisor's APPROVE with conditions C1–C9): updated onto main e4d8b22 (af0c5dc, 2026-11-04) and the GUARD-FILE (a) fix (537c7a8) with its amendment A1-AM1 (deded41, the advisor's APPROVE; `settings.test.mjs` 122/122, 40 new, including the hook command run with `guard.mjs` removed, broken, unfinished and present; `routine-guard.test.mjs` 192/192 on Linux, unchanged). Re-review: security-auditor PASS WITH NOTES on the fix and on the amendment, then the advisor on the whole PR | the advisor's APPROVE of the final head with CI `gate` and `smoke` green, then Mustafa's go ("merge #30"); after the merge, his setup steps (Phase, "After PR #30 merges") |
+| **kit-v3-1** (routine guard for the two cloud routines. New `.claude/hooks/`: `routine-guard.mjs` (rules: `decide`), `guard.mjs` (launcher, fails closed for routines), `routine-guard.test.mjs`, `settings.test.mjs`. In a routine the shell runs only git, gh, `npm ci` and node on main's scripts (reading/searching via the Read/Grep/Glob tools) [verified 2026-11-04 in `routine-guard.mjs`: also `date`, and python on main's tracked scripts (:445–446); the PR Advisor runs no scripts (:458)]; routines never read the web, can't push to main or force-push or edit `.claude/`/`CLAUDE.md`, merges fail closed while the guard loads, nothing is ask-first. Day sessions unchanged. Also `.claude/settings.json` (empty ask, allow/deny, `effortLevel: "high"`, guard on PreToolUse/PermissionRequest/ConfigChange), procedures in NIGHT_SHIFT.md / CHECKPOINTS.md / advisor.md / CLAUDE.md / the 11 agent files (memory: local). Plus the GUARD-FILE (a) fix (Mustafa, 2026-11-03, after a day session froze when `guard.mjs` vanished under loaded hook settings): the three guard handlers start `guard.mjs` through a one-line `node -e` bootstrap; when `guard.mjs` is missing or can't load, a day session goes on and a routine is blocked; a routine is also blocked when `guard.mjs` ends without its own exit (amendment A1-AM1). No game code, symbols +0 −0) | merged: PR #30, e2b5799, 2026-11-04 10:21:56 UTC (`merged_at`; the merge commit is dated 10:21:55), on Mustafa's "merge #30" after the advisor's APPROVE of 7a23132 | done. A1 (Mustafa, 2026-11-03; plan revision 2, the advisor's APPROVE with conditions C1–C9): updated onto main e4d8b22 (af0c5dc, 2026-11-04) and the GUARD-FILE (a) fix (537c7a8) with its amendment A1-AM1 (deded41, the advisor's APPROVE; `settings.test.mjs` 122/122, 40 new, including the hook command run with `guard.mjs` removed, broken, unfinished and present; `routine-guard.test.mjs` 192/192 on Linux, unchanged); security-auditor PASS WITH NOTES on the fix and on the amendment. Report `docs/reports/2026-10-27-kit-v3-1.md`. His setup steps and TEST-RUN: done (Phase; Routines) | none |
 | **R7 legacy inventory** (`docs/LEGACY_INVENTORY.md`: 247 systems, each with a recommended mark: rewrite in Rust 45 · port to TypeScript 74 · redesign 96 · drop 32; 118 rows "look brief pending"; `docs/LEGACY_TUNING.md` and `docs/legacy-tuning.json`: 60 tuning tables; read-only `tools/tuning-dump.js`; symbols +0 −0) | merged: PR #27, 07ab240, 2026-10-27, by the R7 session on Mustafa's go after the advisor's APPROVE of head 63be6f6 | done; report `docs/reports/2026-10-27-r7-legacy-inventory.md` | none |
 | docs-after-kit-v2-2 (docs only: kit-v2-2's and #24's merges and main's branch protection recorded) | merged: PR #25, 4c24d07, 2026-10-27 | done | none |
 | **kit-v3-0** (v2 process upgrades: VISION_V2.md and V2_PHASE0_BRIEF.md, CLAUDE.md's v2 rules, checkpoints, REPO_MAP.md, six new agents, the web allow list; no game code, symbols +0 −0) | merged: PR #26, f2ccc13, 2026-10-25, on Mustafa's "merge #26" after the advisor's APPROVE of its final head | done; report `docs/reports/2026-10-24-kit-v3-0.md` | none |
@@ -113,6 +126,29 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Taken by Mustafa, 2026-11-04** (his words: `docs/reports/2026-11-04-docs-after-kit-v3-1.md`, "Mustafa's words"):
+  - The routine shell list names `date` (CLAUDE.md, "Models and effort"; the guard already allows it,
+    `routine-guard.mjs:446`).
+  - TEST-RUN: "Part B accepted as passed" (part A too); the PR Advisor routine un-paused (07:45, 13:45, 19:45), the
+    "Guard test B1" routine deleted (Routines).
+  - PR-HOME-REPLACE (a): no setup script; the PR Advisor has a schedule trigger only, can also be started by hand
+    ("Run now") or through the API, and is never started by pull-request events (Routines).
+  - PROBE-FILE (c): the Stop hook is Claude Code on the web's own, recorded as known noise (Routines).
+  - KIT-FOLLOWUPS (a), answered: "a small A3 right after A2 for the guard's follow-ups: ask before kit and gate edits in
+    day sessions; the sk- key after %20, %2C or %3A; and read-only GitHub Actions tools (such as actions_get) for
+    pr-advisor, which B2 showed it needs for CI details. security-auditor reviews A3. GitHub secret scanning and push
+    protection are now on." (A2 is kit-v3-2; A3's list: Open bugs and risks.)
+  - EFFORT-SOURCE (a), answered: he asked it as "ROUTINE-EFFORT", but that code is the Advisor's decided (b) of
+    2026-10-25 (below), so it is renamed here. His words: "(a). The PR Advisor at max is my deliberate choice (quality
+    over cost), so it stays. The question is only whether the night shift really runs at Extra, as its routine says,
+    and what controls that." The answer, from the session records: yes, xhigh, set on the routine (Routines, Effort).
+  - PORTAL-EMBED: a new open question, OQ-0002-9 (ADR 0002) and OQ-0006-23 (ADR 0006), in `docs/adr/README.md`'s
+    register: the game may also launch on web portals such as CrazyGames and Poki, inside their iframe, sharing our
+    servers and player pool; the door kept open, not designed. His rule: the client must keep working inside a
+    third-party iframe, so the boundary spike may pick a design that needs cross-origin isolation only if a
+    non-isolated fallback stays available.
+  - Counts after this pass: 118 numbered open questions, 98 open (`docs/adr/README.md`; the headings counted: 9 in
+    ADR 0002, 23 in ADR 0006).
 - **Taken by Mustafa and the Advisor at the stop, 2026-11-03** (about 12:28, in the decision-drafts session's chat;
   whose each answer is follows his message's marks; the words in full: the appendix
   `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §2; where each landed: §9):
@@ -190,8 +226,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - DOMAIN: "DOMAIN: done. shamblefrontlines.com is registered at Cloudflare."
   - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
     ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.
-  - Counts now: 116 numbered open questions, 96 open; pass marks 341.
-- **Follow-ups:** TOY-BOX's small kit change-set after PR #30 is updated, with the checkpoint anti-waste rules
+  - Counts then: 116 numbered open questions, 96 open; pass marks 341.
+- **Follow-ups:** TOY-BOX's small kit change-set (now kit-v3-2, A2 on Mustafa's list: Phase, Queue), with the checkpoint anti-waste rules
   (Mustafa, 2026-11-03); LATER's design session after the netcode proof test, with the twelve LATER questions and the
   38 design questions on its agenda (the advisor's ruling).
 - **Taken by Mustafa 2026-10-31, about 18:41 (in the decision-drafts session's chat, session_0173vVo6CEsV7ckERUa6TtEd;
@@ -332,7 +368,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - KV3-MERGE (a): the session merged kit-v3-0 on Mustafa's own 'merge #26', given after the advisor approved its
     final head, not on his earlier advance go.
   - ROUTINE-EFFORT (b): night code changes go through a high-effort builder agent; the night's main session only
-    orchestrates.
+    orchestrates. Since 2026-11-04 its premise, that a routine's main session runs at medium, no longer holds (the
+    night shift runs at xhigh and the PR Advisor at max: Routines, Effort); the (b) rule stays.
   - SPIKE-SCOPE (a): once the drafts are approved, the legacy constraints apply to `legacy/` only and `spikes/` is
     throwaway.
   - WRITE-GUARD (a): write limits for kit and gate files, enforced in settings (rules that ask first, or deny rules if
@@ -360,24 +397,54 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   aiming at height with ledges (decide in octopon-3-greybox); Octopon-3 map size (start near Cabana, adjust with the scale test)
 
 ## Routines
-_NS-2 (c) (the night shift starts a fresh session on every run) carried out 2026-10-31. These facts are the v2 day
-session's read-backs with the routines API at 13:54 UTC and again at about 14:06 UTC; docs-keeper could not check them [assumed]._
-- **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh), created by Mustafa on the Routines
-  page at 13:50 UTC: a fresh session on every run (no persistent session), the repository attached, Opus 5.5, the same
-  one-line prompt. Its schedule reads `CRON_TZ=Europe/Amsterdam 10 0 * * *` (once a night, 00:10) until Mustafa sets
-  `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` on its page (the API refuses agents' edits to routines they did not
-  create). Its test run at 13:51 UTC read `.claude/NIGHT_SHIFT.md` from main and stopped silently, outside the window;
-  it has not yet posted on issue #16 (tomorrow morning's comment is the first proof it can post). Until kit-v3-1 is
-  merged, it takes only items that need no web access, and a stop at a permission prompt is listed in its morning
-  report. Research runs in the daytime only.
-- **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): switched off by the v2 day session
-  (session_0173vVo5q59ameR6cnN9BENg) at 13:54 UTC, when the night shift moved to a fresh session on every run (NS-2 (c)). Mustafa deletes it after one good night of the new
-  routine (deleting it also deletes its session).
-- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ; fires on pull request events): off since 2026-10-27 (Mustafa
-  switched it off, after an agent's switch-off was refused; the routine reads enabled false at 21:35 UTC). The advisor
-  agent reviewed PRs in the v2 day session (session_0173vVo5q59ameR6cnN9BENg) until its handover on 2026-10-31; while
-  the routine is off, the session that opens a PR runs the advisor agent on it (CLAUDE.md protocol steps 2 and 6), and
-  nothing merges without Mustafa's "merge #<n>".
+_Read with the routines API (list_triggers) on 2026-11-04 at about 14:02 UTC by the docs-after-kit-v3-1 session
+(session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right before this pass's final
+commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`, `SHAMBLE_ROLE=pr-advisor`)
+under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since 2026-10-31._
+- **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh): `CRON_TZ=Europe/Amsterdam 10 0-7
+  * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt. Its first night
+  under the guard starts 2026-11-05 00:10 Amsterdam. Under the guard it never reads the web; research runs in the
+  daytime only (NIGHT-RESEARCH (a)).
+- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): no setup script; it has a schedule trigger only,
+  `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *` (07:45, 13:45, 19:45 Amsterdam), can also be started by hand ("Run now",
+  as B2 was) or through the API, and is never started by pull-request events (PR-HOME-REPLACE (a), Mustafa,
+  2026-11-04: its GitHub pull-request trigger and its connectors are removed). `enabled: true` (Mustafa un-paused it;
+  updated 14:01:31 UTC; next run 18:45 UTC, 19:45 Amsterdam), model `claude-opus-5-5`, no MCP connections. Its stored
+  prompt, verbatim: "You are the PR Advisor for SHAMBLE FRONTLINES. Read .claude/agents/advisor.md from the default
+  branch and follow its PR review procedure exactly, together with CLAUDE.md, for every open pull request in this
+  repository, oldest first. Stay on the default branch: read each pull request only through git, naming its head SHA,
+  and the GitHub tools."
+- **TEST-RUN, passed** (Mustafa accepted parts A and B, 2026-11-04):
+  - Part A: the "Guard test" routine on the night-shift environment: `git status` and the Read tool ran; `echo`, `cat`,
+    `curl` and `git push --dry-run origin HEAD:main` were refused, each with the right message.
+  - B1: 13:20 UTC, second try (the first failed on a typo, `SHAMBLE_ROLE=pr-adviso`, an unknown role, refused as
+    designed); steps 1–7 ran with HEAD = origin/main = e2b5799, steps 8–14 were refused with exactly the expected
+    messages, and the PR Advisor can read CI's gate job log (session_0173vVo6XGr8xapun6WUNTpM).
+  - B2: "Run now", 13:26:48–13:35:54 UTC (session_0173vVo7uY6BfxLBnYjEBJLV; 57 turns, 3.36 USD, effort max), checked
+    row by row from its transcript: it started on main (HEAD e2b5799 on the harness's own container-only branch
+    `claude/quirky-bohr-k7scly`, clean, then `git switch --detach origin/main`); every guard refusal names
+    `routine (pr-advisor)`; it read #34 only through git and the GitHub tools and ran no programs; CI from the 4 checks
+    and the gate job logs; review comment 6632017016 naming the full head, label `ready-to-merge`, head and checks
+    re-checked at 13:34:46, merged at 13:35:00 as 868e165 with `expectedHeadSha` a432692…; no permission prompt; all 7
+    `permission_denials` are guard refusals (`echo`, `ls`, 4 × `actions_get`, `git rev-list`).
+- **"Guard test B1"** (trig_01XmLByUmTibCu5XXQR7iN26): deleted by Mustafa (gone from the 14:02, 14:36 and 14:47
+  listings).
+- **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): stays disabled until it is deleted;
+  Mustafa deletes it after one good night of the new routine (deleting it also deletes its session).
+- **The old PR Advisor session from the PR #26 event** (stuck since 2026-10-25): stopped at step 0 with the role
+  unset, changed nothing; Mustafa archived it.
+- **Effort (EFFORT-SOURCE, answered 2026-11-04):** a routine runs at the effort set on the routine, not at
+  `.claude/settings.json`'s `effortLevel: "high"`: the night shift's last run (06:11 UTC,
+  session_0173vVo8bhZGeK4bVFXQQEtM) records `session_context.effort_level: "xhigh"` (its page's "Extra"), and B2
+  records `effort_level: "max"` (Mustafa's choice for the PR Advisor). A cloud day session's launch records
+  (session_0173vVo7FcYUpbWgRW8oQyHU: `/tmp/env-manager.log` "Added gateway arg to command"; `/tmp/claude-command` and
+  `/tmp/claude-code.log` read `--effort max`; `CLAUDE_EFFORT=max`) show the harness passing the effort as `--effort`,
+  the likely route for routines too. The next record to read: tonight's first night-shift run (2026-11-05 00:10).
+- **Known noise (PROBE-FILE (c), Mustafa, 2026-11-04):** the Stop hook is Claude Code on the web's own
+  (`~/.claude/stop-hook-git-check.sh`, registered by the harness; the repository defines none). It asks a session to
+  commit and push uncommitted changes, untracked files that are not ignored, and unpushed or unsigned commits. B1's
+  probe (`.checkpoints/part-b/probe.md`) set it off; the guard refused the push, and the hook asks only once per stop.
+  B2 left no files and did not set it off.
 
 ## Open bugs and risks
 - **kit-v3-1** (PR #30): 1. The Q3 follow-up (advisor condition C6, its own change-set): `routine-guard.test.mjs` fails
@@ -385,7 +452,26 @@ session's read-backs with the routines API at 13:54 UTC and again at about 14:06
   routines run), and CI does not run the hook tests (`.github/workflows/gate.yml` runs only `tools/gate.mjs` and
   smoke); the fix: separator-agnostic path handling in `routine-guard.mjs`, and the hook tests in CI. 2. By GUARD-FILE
   (a), a day session whose `guard.mjs` is missing or can't load runs with no guard checks at all (git option forms and
-  the merge check included), so "merges fail closed" holds while the guard loads.
+  the merge check included), so "merges fail closed" holds while the guard loads. (Both stand after the merge, PR #30,
+  2026-11-04.)
+- **The guard's follow-ups** (A3 on Mustafa's list, right after kit-v3-2; KIT-FOLLOWUPS (a), Decisions pending;
+  security-auditor reviews it). His three items:
+  1. Asking before kit and gate edits: done for routines by #30 (the guard's protected writes); day sessions have none.
+  2. The URL-escaped secret gap: `checkpoint.mjs`'s generic `sk-` pattern handles only `%3D` before `sk-`, so a key
+     after any other percent-escape is missed: every `%XX` ends in a hex digit, which the pattern's class
+     `[^A-Za-z0-9-]` never matches (`%20`, `%2C` and `%3A` as Mustafa named, and also `%22`, `%26`, `%2F`, `%0A`…)
+     [verified 2026-11-04: `checkpoint.mjs:30`, tested by security-auditor]; Anthropic `sk-ant-` keys are caught
+     (`:29`). GitHub secret scanning and push protection are on (Mustafa).
+  3. Read-only GitHub Actions tools (such as `actions_get`) for pr-advisor: B2 met `actions_get` four times, and the
+     guard's read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool [verified: `routine-guard.mjs:594`];
+     until A3, the PR Advisor reads CI from the PR's check runs and the jobs' logs.
+  Also for A3's plan to weigh (found by B2 and the plan review): `git rev-list` is refused; the guard allows python on
+  main's tracked scripts for the night shift [verified: `routine-guard.mjs:445`], while CLAUDE.md, NIGHT_SHIFT.md and
+  the guard's own refusal messages don't mention it [verified on main 868e165 and after PR #35: CLAUDE.md names node,
+  not python]; the advisor agent has no Write tool (frontmatter: Read, Grep, Glob, Bash), so a routine's advisor
+  subagent returns its notes in its report.
+- B2, not the guard: the GitHub tool that reads labels by number fails for a PR ("Could not resolve to an Issue with
+  the number of 34"); labelling still worked.
 - **v2-decision-drafts** (PR #33; the report `docs/reports/2026-11-01-v2-decision-drafts.md` has the details):
   1. Ten spend-limit cuts (2026-10-31 about 19:18; 2026-11-01 about 05:30, 09:27, 14:20, 19:35; 2026-11-02 about
      09:50, 12:15, 17:50, 21:20; 2026-11-03 about 13:55), each resumed from the agents' notes, no work lost (every agent writes as it goes; Mustafa's
