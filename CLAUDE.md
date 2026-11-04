@@ -128,16 +128,19 @@ never counts as his go; every comment they write ends with the Claude Code foote
 - **Sonnet 5.5 only for purely mechanical chores, and only when genuinely necessary:** file moves, formatting, link
   checks, summarizing logs. Opus remains the preference even there. No other model.
 - **Routines** run Opus 5.5 at the effort set on each routine, not at `.claude/settings.json`'s `effortLevel: "high"`:
-  the night shift at Extra (`xhigh`), the PR Advisor at max (Mustafa's choice, 2026-11-04: quality over cost). Each
-  run's session record shows that level, and a cloud day session's launch log shows the harness passing it to Claude
-  Code as `--effort` (EFFORT-SOURCE; the evidence is in STATUS, "Routines"). The agents they start follow the rules
-  above. A routine runs under the routine guard (`.claude/hooks/guard.mjs`): its shell is limited to git, gh, `npm ci`,
-  node on main's scripts and `date` (the PR Advisor installs nothing and runs no scripts; reading and searching go
-  through the Read/Grep/Glob tools), it never reads the web, it can't push to main or force-push or edit
-  `.claude/`/`CLAUDE.md`, and nothing it meets is ask-first.
+  the night shift at Extra (`xhigh`), the PR Advisor at max (Mustafa's choice, 2026-11-04: quality over cost). One
+  run's session record per routine shows that level, and a cloud day session's launch log shows the harness passing
+  that session's effort to Claude Code as `--effort`, the likely route for routines too (EFFORT-SOURCE; the evidence is
+  in STATUS, "Routines"). The agents they start follow the rules above. A routine runs under the routine guard
+  (`.claude/hooks/guard.mjs`): its shell is limited to git, gh, `npm ci`, node on main's scripts and `date` (the PR
+  Advisor installs nothing and runs no scripts; reading and searching go through the Read/Grep/Glob tools), it never
+  reads the web, it can't push to main or force-push or edit `.claude/`/`CLAUDE.md`, and nothing it meets is
+  ask-first.
 - **The PR Advisor routine** has a schedule trigger only (its times are in STATUS, "Routines"). It can also be started
-  by hand ("Run now") or through the API, and never by pull-request events (Mustafa, 2026-11-04), so every run starts
-  on main's rules: a pull-request start could load the PR head's settings and hooks before step 0 switches to main.
+  by hand ("Run now") or through the API, and never by pull-request events (Mustafa, 2026-11-04), so a run starts on
+  main's rules (seen in TEST-RUN B1 and B2, both started by hand): a pull-request start could load the PR head's
+  settings and hooks, and a session keeps the hook settings it loaded even after step 0 switches to main (the
+  `guard.mjs` header).
 
 ## Checkpoints (never lose work to a usage limit)
 The full rules are in `.claude/CHECKPOINTS.md`. In short:

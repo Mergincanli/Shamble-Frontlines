@@ -364,8 +364,8 @@ built from the tested artifact. Each part says what, why, its research ids and t
      alternative (W3), which needs shared memory, passes it; then the default flips at once everywhere the client runs
      isolated, B3 and posted inputs through shared memory (C2) become available, and the cost list of R1-BND-REC5
      applies (OQ-0002-4). The client must keep working inside a third-party iframe, such as a web portal's, so a design
-     that needs isolation (B3, C2 or W3) is picked only if a non-isolated fallback stays available (PORTAL-EMBED,
-     Mustafa 2026-11-04; OQ-0002-9).
+     that needs isolation (B3, C2 or W3, as OQ-0002-9 reads his rule) is picked only if a non-isolated fallback stays
+     available (PORTAL-EMBED, Mustafa 2026-11-04; OQ-0002-9).
    - **The Worker owns the network connection** online (option H2): server snapshots, prediction and reconciliation
      never touch the page, which sees only the block. The received datagrams ride in the tick's one input call and the
      outgoing ones come back through the step (the control API above), so the Wasm calls per tick stay the same at
@@ -1097,10 +1097,11 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     third-party iframe, so the boundary spike may only pick a design that needs cross-origin isolation (the
     SharedArrayBuffer ring, B3) if a non-isolated fallback stays available."
   - Why it matters: his rule binds the boundary spike now (part 5, the isolation bullet). It is read as covering every
-    design in this record that needs isolation: the ring (B3), inputs through shared memory (C2) and the
+    design part 5 can bring in that needs isolation: the ring (B3), inputs through shared memory (C2) and the
     `Atomics.wait` pacing (W3) (the advisor's reading, 2026-11-04, of "a design that needs cross-origin isolation"). For
-    W3 the only non-isolated fallback is the timer pacing (W2), whose failed jitter mark is what would bring W3 in
-    (ADR 0004 part 5, PM-0004-68); if that happens, the question returns to Mustafa with the spike's numbers.
+    W3 the only non-isolated fallback ADR 0004 part 5 keeps is the timer pacing (W2), whose failed jitter mark is what
+    would bring W3 in (ADR 0004 part 5, PM-0004-68); if that happens, the question returns to Mustafa with the spike's
+    numbers.
   - Options: none weighed ("keep the door open; don't design it").
   - Decider: Mustafa.
   - What decides it: no timing is set.

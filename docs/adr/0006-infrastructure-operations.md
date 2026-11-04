@@ -1153,15 +1153,16 @@ Researching it before this record, or leaving it as one shared question: settled
     as an open question to the README (and ADR 0002 and 0006) in the docs pass. The client must keep working inside a
     third-party iframe, so the boundary spike may only pick a design that needs cross-origin isolation (the
     SharedArrayBuffer ring, B3) if a non-isolated fallback stays available."
-  - *Why it matters:* his words above: web-portal launches would reach the same client host, game servers and player
-    pool. Nothing about them is researched.
+  - *Why it matters:* his words above: web-portal launches would share our servers and player pool. Nothing about them
+    is researched, including where a web portal serves the client from.
   - *Options:* none weighed ("keep the door open; don't design it").
   - *Decider:* Mustafa.
   - *What decides it:* no timing is set.
   - *Carries:* no research id. Related: OQ-0006-12 (the other direction: third-party content inside the game page,
     only if isolation is adopted); OQ-0006-21 (community servers, another way players would reach a game server);
-    OQ-0006-3 (what stores guest ids) and OQ-0006-15 (the domains); ADR 0002's OQ-0002-9 (the client side: the
-    boundary spike's isolation rule).
+    OQ-0006-3 (what stores guest ids) and OQ-0006-15 (the domains); OQ-0006-6 (the security baseline's waiting items,
+    among them part 13's B3, the content security policy, and B4, where the guest secret lives); ADR 0002's OQ-0002-9
+    (the client side: the boundary spike's isolation rule).
 
 ## What a spike must prove
 
