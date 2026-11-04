@@ -30,6 +30,10 @@
   what B2 tests. No day-session advisor reviews the PR first, so the routine's review is the first and independent.
 - **Checkpoint:** this file is deleted in the last commit before the PR is marked ready (it runs CI).
 
+## Steps done
+1. Plan revision 1 (3d2e15c); the advisor: APPROVE with 7 conditions (`part-b-test/advisor-plan-verdict.md`).
+2. The report corrections, conditions 1–3 (the next commit after this one's parent); gate `--no-smoke` PASS (1–4, 5b–5d, symbols +0 −0); repo map OK.
+
 ## Current step
 Advisor plan check (revision 1).
 
