@@ -12,9 +12,8 @@ Steps: 73d546f (plan revisions 1 and 2, his answers), 6a09137 (build, docs-keepe
   2026-11-04)". (7) "Bears on" ids were checked one by one; 7 were dropped (below). (8) No engine-architect. (9) His
   bot sentence stays whole. (10) Notes are in `.checkpoints/`; no Night queue entry (B3 ran by day). (11) See rev 2 (7).
 - **Revision 2 (his answers): APPROVE with 10 conditions**, all met (2, 4 and 6 partly through this report: see
-  Deviations). (1) The Tech-2 note is in LOOP_V2 §5 and in "For
-  Mustafa". (2) The deviations are listed below, E1 and E2 cover his answers, and the appendix has the questions as
-  sent. (3) The HQ tension is in Risks. (4) Line 112 reads as given, and the line-105 risk is in Risks. (5) LOOP_V2
+  Deviations). (1) The Tech-2 note is in LOOP_V2 §5 and in "For Mustafa". (2) The deviations are listed below, E1
+  and E2 cover his answers, and the appendix has the questions as sent. (3) The HQ tension is in Risks. (4) Line 112 reads as given, and the line-105 risk is in Risks. (5) LOOP_V2
   §12 points to ADR 0005:1263 and 1278-1283; `docs/research/r1-simulation-core.md:1386` ("sidegrade variants") is left
   as a research record. (6, 7) Pointers are replaced: "Open since" is 0, with 4 answered (B3-Q1 to B3-Q3). (8) The
   AB5 and CD5 clauses are in. (9) #35's follow-ups (below). (10) Revision 1's conditions stand.
@@ -27,12 +26,10 @@ Steps: 73d546f (plan revisions 1 and 2, his answers), 6a09137 (build, docs-keepe
 ## Evidence
 - E1 (his words byte for byte): the verifier's 45 checks on the docs all PASS (its notes; `.gate/` is scratch).
   Rerun on the appendix: 43 pieces (his 33 sentences, 10 answer clauses), each found once there, byte for byte: 0
-  failing.
-  The three appendix blocks are identical to their sources (diff).
+  failing. The three appendix blocks are identical to their sources (diff).
 - E2-E6 and E10, the builder's script rerun after the fixes (its base was bfaf142; the verifier checked the counts
-  against main 4893ab6): `PASS: 0 failing checks`. E3: the 9 replaced strings
-  appear only in §12. `[OPEN]`: LOOP_V2 6 (4 before), UNITS 0, DESIGN_NOTES 1. `[IDEA]`: 2 and 4. `[DEFAULT]` tags:
-  20 → 20. The raw string count rises 22 → 26 only because §12 quotes four (two old lines, two ADR lines).
+  against main 4893ab6): `PASS: 0 failing checks`. E3: the 9 replaced strings appear only in §12. `[OPEN]`: LOOP_V2
+  6 (4 before), UNITS 0, DESIGN_NOTES 1. `[IDEA]`: 2 and 4. `[DEFAULT]` tags: 20 → 20. The raw string count rises 22 → 26 only because §12 quotes four (two old lines, two ADR lines).
 - E7: 7 docs files and this report; no code. `node tools/gate.mjs --no-smoke`: GATE PASS, [1]-[4] and
   [5b]-[5d] PASS, symbols +0 −0, 5a skipped (CI runs it). `repo-map-check.mjs`: "repo map OK: 113 entries".
 - **The fix round** was checked by the verifier: PASS WITH NOTES; its five report nits are fixed in the last commit.
