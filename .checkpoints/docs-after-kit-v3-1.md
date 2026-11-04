@@ -71,7 +71,34 @@
   `node tools/gate.mjs --no-smoke` PASS with symbols +0 −0; smoke from CI.
 
 ## Step log
-1. Plan revision 1, 381471d; the advisor's APPROVE with 16 conditions (2026-11-04 ~14:00 UTC).
+1. Plan revision 1, 381471d; the advisor's APPROVE with 16 conditions (2026-11-04 ~14:00 UTC); revision 2, 0099b3c.
+2. Build:
+   - c70132f, main session (A, C, D):
+     - CLAUDE.md and advisor.md;
+     - ADR 0002 in four places, with OQ-0002-9;
+     - ADR 0006's OQ-0006-23;
+     - the ADR index: two drafts rows, the total 118/98, two register rows (the README's "one row each" rule, not one
+       combined row);
+     - SPIKE_PLAN §3 and ENGINE_OVERVIEW citing OQ-0002-9;
+     - D1 (job logs re-read: push run 09:30:25–41, PR run 09:30:23–38) and D2.
+   - 603f53b, docs-keeper (B), in its own worktree docs-pass-b and cherry-picked from 62d2864. Its notes are in
+     `.checkpoints/docs-after-kit-v3-1/docs-keeper-b.md`. I replaced its [assumed] counts tag with the counted headings.
+   - Local checks on 603f53b:
+     - `node tools/gate.mjs --no-smoke` GATE PASS, symbols +0 −0 (`npm ci --prefix tools --ignore-scripts` here,
+       condition 12);
+     - repo-map-check OK (113/100);
+     - hook and checkpoint tests 339/339;
+     - no old trigger wording left in live docs.
+3. Reviews: workflow wf_213e499a-b4d, running (five reviewers, each with a skeptic). Its notes go to
+   `.checkpoints/docs-after-kit-v3-1/<reviewer>-review.md`.
+
+## Next steps
+1. Weigh the reviews: fix the upheld findings, or defer each in writing.
+2. Re-read the routines API (condition 15) before the last docs commit.
+3. The report becomes the PR body (/advisor-report). Fold this checkpoint in and delete `.checkpoints/docs-after-kit-v3-1*`
+   in the last commit, which must not be `[skip ci]`, so CI runs on the final head.
+4. Mark the PR ready. The advisor's final-head review (a general agent reading main's advisor.md) checks the 16
+   conditions. Then Mustafa's go ("merge #35"), and the merge with the head as `expectedHeadSha`.
 
 ## Goal
 Bring the rules and docs in line with what happened since PR #33:
