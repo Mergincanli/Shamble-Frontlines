@@ -124,7 +124,7 @@ Copy this template. Keep it short: it is a handoff, not a log.
   .gate/<task-slug>/. This folder is pushed to a public repository: never put a secret, token, environment value,
   request header, cookie or raw payload in it, whether in a note, a script or a script's output; the saver's secret
   check only knows a few token formats and cannot read archives or binaries. End with DONE, then give your answer
-  from your notes alone, without opening any file again. Never commit or push.
+  from your notes alone, opening no other file. Never commit or push.
   ```
 
 ## 5. The background saver (brief 2b rules 1 and 2)
