@@ -8,7 +8,14 @@
   1. ask before kit and gate edits in day sessions;
   2. the `sk-` key after `%20`, `%2C` or `%3A` (checkpoint.mjs's secret check);
   3. read-only GitHub Actions tools (such as `actions_get`) for pr-advisor.
-  security-auditor reviews A3.
+  security-auditor reviews A3. His two additions (2026-11-04, after PR #37's merge):
+  4. the worktree rule from the freeze, into the rules: never switch a session's main folder to another branch, a
+     PR's head or an old commit; use a separate worktree (`git worktree add`). Why: switching loads that branch's
+     `.claude/settings.json` and hooks into the running session;
+  5. the deferred points and everything in the session's scratchpad queue file into the repo, in STATUS's
+     follow-ups, alongside A3's plan. The queue files are now in `.checkpoints/kit-v3-3/queue/`: docs-pass-items.md
+     (the queue file), a4-spec-2026-11-04.md (A4 in his words), mustafa-2026-11-03-list.md (his list: B.1 and B.2
+     still queued) and a2-items.md (where A3's items came from).
 - **For the plan to weigh** (STATUS "Open bugs and risks", A3's entry; the advisor's deferred F-1 from PR #37):
   - `git rev-list` refused for routines;
   - python allowed on main's tracked scripts but missing from the docs;
@@ -18,7 +25,8 @@
   Out of scope unless the plan argues otherwise: the kit-v3-1 Windows test follow-up (its own change-set, advisor
   condition C6).
 - **Current step:** 1, plan revision 1 (a workflow: three readers, a planner, a critic, then the advisor), at most 3
-  agents at a time.
+  agents at a time. The first run (wf_d8f3b3e4-0f7) was stopped a few minutes in, to widen it to items 4 and 5;
+  it resumes from the readers' notes.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
