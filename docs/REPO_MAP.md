@@ -73,7 +73,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 |---|---|
 | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit |
 | `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
-| `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"`, the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
+| `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |
 | `.claude/agents/` | The crew (one file each, below) |
