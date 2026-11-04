@@ -9,7 +9,7 @@
   task (Mustafa: "From now on you're the only session on this task"; his PC session is closed). Its main folder
   `/home/user/Shamble-Frontlines` stays on `claude/sleepy-tesla-ofsxsr` = main and is never switched; the build runs in
   the worktree `<scratchpad>/kit-v3-1` on local `cs/kit-v3-1`.
-- **Last update:** 2026-11-04 09:59 Amsterdam
+- **Last update:** 2026-11-04 10:07 Amsterdam
 
 ## Steps done
 1. Context recovered; plan revision 1 (frozen session) read and verified against live code.
@@ -78,22 +78,40 @@
     - guard.mjs present: decisions identical (a routine's curl is denied, a day session's checkout is denied); 39 ms
       per call for both.
 
+12. **The advisor: APPROVE of A1-AM1** (2026-11-04, about 10:10), word for word in `advisor-am1-verdict.md`.
+    - C3' is the exact 451-character BOOT'.
+    - Conditions AM1-C1 to C7. Every disposition upheld, plus one line for the limits text: a hang holds a day session
+      up to the default 600 s per call.
+    - The review path is confirmed: security-auditor on the delta, with AM1-C6 (re-run the bypass hunter's matrix,
+      confirm no normal path reaches `beforeExit`), then the advisor's whole-PR review.
+13. **A1-AM1 built: deded41**, pushed.
+    - settings.json: only the three args lines change (AM1-C1). BOOT' is byte-identical to the approved text on all
+      three handlers (C2, C3').
+    - settings.test.mjs: `withProject`'s change callback also receives the hooks folder. 24 new tests: an import cycle
+      and an empty guard.mjs, across three events, with a day session and every role in ROUTINES; each routine case
+      matches `/ended without a decision.*fails closed/` (AM1-C2). The "present" test adds an allowed routine
+      `git status` that must pass (AM1-C3).
+    - guard.mjs: header comment with the invariant (AM1-C5, C7); its code lines are identical to 5be7d37.
+    - routine-guard.mjs unchanged (C6).
+    - Results: settings 122/122, routine-guard 192/192, checkpoint 25/25 (Node 22.23.4). Gate (`--no-smoke`) PASS,
+      symbols +0 −0.
+    - **AM1-C4:** against 537c7a8's settings, 104/122, failing exactly the 18 new routine cases, each with exit 0
+      (expected 1). Against 5be7d37's, 95/122 (the original day-session cases still caught, C1).
+
 ## Current step
-The candidate changes BOOT, which C3 pins, so the advisor rules first on amending C3 (plan amendment A1-AM1). Then
-build it, and have security-auditor review only that delta (Mustafa's GUARD-FILE: the auditor reviews the change). The
-advisor's whole-PR review comes after that.
+security-auditor on the A1-AM1 delta (`git diff 537c7a8 deded41`), with AM1-C6.
 
 ## Next steps
-1. Advisor ruling on A1-AM1:
-   - BOOT gains a `beforeExit` fail-closed for routines (BH-1, BH-2).
-   - New tests: an unsettled TLA and an empty guard.mjs, day 0 and routine 1.
-   - guard.mjs header wording ("can't load or ends without a decision"; L3).
-   - The docs wording on merges (L1).
-   - Dispositions: L2, L3, N1–N4 and BH-3 as stated limits and follow-ups.
-2. Build A1-AM1 (if approved) → tests, defect proof, gate → commit, push.
-3. security-auditor on the delta.
-4. My report section (draft: `scratchpad/report-update-draft.md`).
-5. Step 6:
+1. security-auditor on the delta → address its findings.
+2. Docs and report in one commit, from the draft `scratchpad/report-update-draft.md`. The draft needs:
+   - the reviews; the old / fix / AM1 table measured on the final head with the Node version (AM1-C7); the AM1-C4
+     counts;
+   - L1's note on routine-guard.mjs:601; the 600 s limit line.
+   The docs need:
+   - STATUS:77 and ROADMAP:89: "merges fail closed while the guard loads"; the AM1 sentence; 122/122 and 40 new.
+   - STATUS:387: "missing or can't load".
+   - REPO_MAP:107 and :110: the AM1 case.
+3. Step 6:
    - Delete the checkpoint (the last commit; CI runs).
    - The advisor reviews the whole PR at that head, from main's advisor.md (C8).
    - Update the PR body; mark it ready; keep needs-mustafa.
