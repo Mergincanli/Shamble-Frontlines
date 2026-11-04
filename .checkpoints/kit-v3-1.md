@@ -9,7 +9,7 @@
   task (Mustafa: "From now on you're the only session on this task"; his PC session is closed). Its main folder
   `/home/user/Shamble-Frontlines` stays on `claude/sleepy-tesla-ofsxsr` = main and is never switched; the build runs in
   the worktree `<scratchpad>/kit-v3-1` on local `cs/kit-v3-1`.
-- **Last update:** 2026-11-04 00:16 Amsterdam
+- **Last update:** 2026-11-04 09:59 Amsterdam
 
 ## Steps done
 1. Context recovered; plan revision 1 (frozen session) read and verified against live code.
@@ -45,18 +45,60 @@
    registration test's bootstrap shape, the three "removed, day session" cases, the stderr case and the syntax-error
    case; the nine "removed, routine" cases and the "present" case pass on both (routines were always blocked).
 
+10. **Workflow `wf_dadc7576-164`** (00:24–00:35 Amsterdam; 14 agents: 5 done, 9 failed). The 9 failures were all the
+    skeptics, cut by the org's spend limit ("your 5-hour limit resets 2:20am (UTC)"). They are not re-run: the main
+    session reproduced the one finding that matters itself (below).
+    - **docs-keeper:** 8 edits. **The docs verifier: PASS** (9 of 9 checks; notes: the Windows 9/192 count is from the
+      plan, not reproduced here; docs-keeper also folded "Docs after 3a" into Build history under its 12-entry rule).
+    - **Step 4 docs committed: af9f255**, pushed.
+    - **security-auditor: PASS WITH NOTES** on 537c7a8 (`security-auditor-a1.md`). No Critical, High or Medium findings.
+      - L1 F5 (introduced, accepted): qualify "merges fail closed" in STATUS:77, ROADMAP:89 and the report.
+      - L2 EPIPE on hook input over about 64 KB with guard.mjs missing (pre-existing; host behaviour; no A1 change).
+      - L3 a guard.mjs that loads and then crashes asynchronously still blocks a day session (pre-existing). The header
+        comment should say "can't load", not "broken".
+      - N1 CI runs no hook tests (the Q3 follow-up). N2 the routine side rests on onFailure (v2.1.295 or later).
+      - N3 an argument starting with "-" (cannot happen in practice). N4 an empty guard.mjs lets a routine through
+        (pre-existing).
+      - Its mutation run: the new tests catch 5 kinds of regression.
+    - **bypass hunter: FAIL**, BH-1 (Medium, **introduced by the fix**). An unsettled top-level await in guard.mjs or its
+      rules (for example an import cycle, `import './guard.mjs'` in routine-guard.mjs) exits 13 (a block) in the old
+      form. In the new form the import() stays pending and node exits 0, so a **routine passes** all three hooks.
+      - BH-2 (Low, pre-existing): an empty or truncated guard.mjs lets a routine through.
+      - BH-3 (Low, pre-existing, outside GUARD-FILE): a guard.mjs that loads and then crashes or hangs still blocks a
+        day session.
+      - Candidate fix: put `process.on('beforeExit', …routine exit 1…)` in front of BOOT; it closes BH-1 and BH-2.
+11. **BH-1 reproduced independently** by the main session (its own harness, `scratchpad/verify-bh1/run.mjs`; old,
+    new and candidate args; 3 events; day and routine):
+    - The import cycle and an unsettled TLA after the `#!` line: old = exit 13, block; new = the routine **passes**
+      (exit 0, no output); candidate = the routine is blocked (exit 1, "guard.mjs ended without a decision: a routine
+      fails closed").
+    - An empty guard.mjs: old and new let the routine pass; the candidate blocks it.
+    - Day sessions: identical in every state, for all three forms' intended behaviour (PASS when guard.mjs can't
+      finish).
+    - guard.mjs present: decisions identical (a routine's curl is denied, a day session's checkout is denied); 39 ms
+      per call for both.
+
 ## Current step
-Steps 4 and 5 together, in one workflow (Running work): docs-keeper on STATUS, ROADMAP and REPO_MAP (C5, F1, F2, Q3)
-then an independent verifier of its diff; in parallel, security-auditor on the fix (diff 31e8871..537c7a8, with Q3/C6,
-F5, F6 in its brief) and an adversarial bypass hunter, each finding checked by one skeptic. After it: my "Update"
-section in #30's report (C6, F4, F5, MANAGED (b) context), only once the docs verifier is done (it checks that only the
-three docs changed).
+The candidate changes BOOT, which C3 pins, so the advisor rules first on amending C3 (plan amendment A1-AM1). Then
+build it, and have security-auditor review only that delta (Mustafa's GUARD-FILE: the auditor reviews the change). The
+advisor's whole-PR review comes after that.
 
 ## Next steps
-1. Step 4 docs → commit, push; gate. 2. Step 5: security-auditor on the fix (diff 31e8871..537c7a8; Q3/C6, F5, F6 in its
-brief; workflow with an adversarial check of each finding) → address findings → report's review lines. 3. Step 6: delete
-the checkpoint (last commit, CI runs) → the advisor on the whole PR at that head from main's advisor.md (C8) → PR body,
-ready, keep needs-mustafa, CI gate+smoke green (C9; smoke from CI per GATE-SETUP (a)), wait for Mustafa's go.
+1. Advisor ruling on A1-AM1:
+   - BOOT gains a `beforeExit` fail-closed for routines (BH-1, BH-2).
+   - New tests: an unsettled TLA and an empty guard.mjs, day 0 and routine 1.
+   - guard.mjs header wording ("can't load or ends without a decision"; L3).
+   - The docs wording on merges (L1).
+   - Dispositions: L2, L3, N1–N4 and BH-3 as stated limits and follow-ups.
+2. Build A1-AM1 (if approved) → tests, defect proof, gate → commit, push.
+3. security-auditor on the delta.
+4. My report section (draft: `scratchpad/report-update-draft.md`).
+5. Step 6:
+   - Delete the checkpoint (the last commit; CI runs).
+   - The advisor reviews the whole PR at that head, from main's advisor.md (C8).
+   - Update the PR body; mark it ready; keep needs-mustafa.
+   - CI gate and smoke green (C9; smoke from CI per GATE-SETUP (a)).
+   - Wait for Mustafa's go.
 
 ## Advisor conditions (C1–C9) — must all be satisfied
 - C1 keep the defect-proof test (fails on 5be7d37 old args, passes on fix). C2 three handlers byte-identical; BOOT
@@ -99,10 +141,14 @@ ready, keep needs-mustafa, CI gate+smoke green (C9; smoke from CI per GATE-SETUP
   2026-11-04 00:05.
 - GATE-SETUP (a): documented `npm ci --prefix tools --ignore-scripts --no-audit --no-fund` in A1's worktree; the local
   gate runs without smoke; smoke comes from CI before the merge · Mustafa · 2026-11-04.
+- MODEL-4.8 (a): keep plan revision 2 and its APPROVE (both signed "Co-Authored-By: Claude Opus 4.8" by the PC session);
+  the advisor's whole-PR review in this session, on Opus 5.5 (confirmed with get_session), checks every condition before
+  his go · Mustafa ("A") · 2026-11-04.
 
 ## Running work
 - Workflow run `wf_dadc7576-164` · script as launched: `.checkpoints/kit-v3-1/a1-docs-and-security-review-run1.js` ·
   args: `.checkpoints/kit-v3-1/a1-docs-and-security-review-run1.args.json` · notes: `.checkpoints/kit-v3-1/`
   (docs-keeper-a1, verifier-a1-docs, security-auditor-a1, bypass-hunter-a1, skeptic-a1-*) · launched 2026-11-04 00:24
-  Amsterdam · status: running. On a cut-off: resume with `resumeFromRunId` and that copy of the script.
-- Background saver (`checkpoint.mjs watch kit-v3-1`), started 00:23 Amsterdam, stops by itself after 110 minutes.
+  Amsterdam · status: **done** (5 of 14 agents returned; the 9 skeptics failed on the spend limit and are not re-run,
+  see step 10).
+- Background saver: stopped (it ended by itself after the run).
