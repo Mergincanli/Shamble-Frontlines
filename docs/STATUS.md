@@ -275,7 +275,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - Counts then: 116 numbered open questions, 96 open; pass marks 341.
 - **Follow-ups:** TOY-BOX's small kit change-set (kit-v3-2, A2 on Mustafa's list, with the checkpoint anti-waste
   rules: in flight, PR #37, draft); PR #36's final review: the B3 report's "Changes to his words" lacks plan rev 1
-  §3's approved deviations, and its body runs 83 lines (both a later report edit); LATER's design session after the netcode proof test, with the
+  §3's approved deviations, and its body runs 83 lines (both a later report edit); LATER's design session after the
+  netcode proof test, with the
   twelve LATER questions and the 38 design questions on its agenda (the advisor's ruling).
 - **Taken by Mustafa 2026-10-31, about 18:41 (in the decision-drafts session's chat, session_0173vVo6CEsV7ckERUa6TtEd;
   it replaces the drafts brief's upgrade note), in his words:**
@@ -373,8 +374,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   (server-only spread as a rule). The look lines added 2026-11-01 (the four "look is not decided" lines and the two
   "toy-box" lines, against LOOK_V2 §3: "The audience is adults. It must not look like a children's game.") are taken by
   kit-v3-2 (A2, PR #37, draft): TOY-BOX and LOOK-LINES (B), Decisions pending. Left for a later docs pass: "toy-box" in
-  `README.md:4` and `docs/GAME_DESIGN.md:17` [verified] (outside A2's files).
-- **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md` §1 ("Then:
+  `README.md:4`, `docs/GAME_DESIGN.md:14`, `:17`, `:28` and `:50-51`, and `docs/ROADMAP.md:10` ("bright toybox
+  palette") [verified] (outside A2's files).
+- **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md:113`
+  ("running in parallel", against kit-v3-2's cap of 3 agents at a time); `docs/V2_PHASE0_BRIEF.md` §1 ("Then:
   playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the security
   baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
   `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES);
@@ -507,7 +510,9 @@ night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
 ## Open bugs and risks
 - **kit-v3-2** (PR #37, draft; from its plan and the advisor's plan review): 1. the agent cap and the scratch rule are
   written rules, enforced by nothing (a size or binary check in the saver would be code: a possible later item); 2. that
-  a workflow script can hold its `agent()` calls to 3 at a time is not yet shown: the first workflow after A2 shows it.
+  a workflow script can hold its `agent()` calls to 3 at a time is not yet shown: the first workflow after A2 shows it;
+  3. scripts in the notes folder ask before they run in day sessions, and routines refuse them: an allow-list entry for
+  `node .checkpoints/*` is a possible later item, with security-auditor.
 - **kit-v3-1** (PR #30): 1. The Q3 follow-up (advisor condition C6, its own change-set): `routine-guard.test.mjs` fails
   9 of 192 on Windows (pre-existing: the credential checks match forward-slash paths only; 192/192 on Linux, where the
   routines run), and CI does not run the hook tests (`.github/workflows/gate.yml` runs only `tools/gate.mjs` and

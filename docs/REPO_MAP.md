@@ -21,7 +21,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/` | Agents, skills, rules, hooks, scripts and settings for Claude Code (below) |
 | `.github/` | CI (below) |
 | `.gitattributes` | LF line endings everywhere |
-| `.gitignore` | node_modules; `.gate/`: generated output (renders, exports, builds) goes under `.gate/` (gitignored); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory |
+| `.gitignore` | node_modules; `.gate/` (generated output: renders, exports, builds); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory |
 
 ## docs/
 | Path | What it is · when to read it |

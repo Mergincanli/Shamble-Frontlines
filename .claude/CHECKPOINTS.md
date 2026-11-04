@@ -91,7 +91,8 @@ Copy this template. Keep it short: it is a handoff, not a log.
 - **Scratch files** (Mustafa, 2026-11-03) live in the notes folder, `.checkpoints/<task-slug>/`: text and small
   scripts only (a list, a draft, a short harness; as a guide, under 100 KB a file). Never build output or binaries
   there (compiled code, Wasm, renders and screenshots, archives, whole-run logs, copies of the tree): the saver pushes
-  the notes folder to the public repository, and a file stays in its history even after the folder is deleted.
+  the notes folder to the public repository (no secrets, §1), and a file stays in its history even after the folder
+  is deleted.
   Builds and binaries go to the temp folder `.gate/<task-slug>/` (gitignored, never committed), or where a tool puts
   its own output (the gate's temporary folder; `/render-ab`'s `.gate/base` and `.gate/renders/`). In a routine a script
   in the notes folder is a record only: routines run only main's tracked scripts (`.claude/hooks/routine-guard.mjs`,
@@ -115,7 +116,10 @@ Copy this template. Keep it short: it is a handoff, not a log.
   written). Write each finished block to its file at once. Add a notes line for each finding as you find it (what,
   where), and one after each finished block (done, what comes next). Redo a block the notes don't mark done, written
   over, never appended. Scratch files go in <path>/: text and small scripts only; builds and binaries go under
-  .gate/<task-slug>/. End with DONE, then give your answer. Never commit or push.
+  .gate/<task-slug>/. This folder is pushed to a public repository: never put a secret, token, environment value,
+  request header, cookie or raw payload in it, whether in a note, a script or a script's output; the saver's secret
+  check only knows a few token formats and cannot read archives or binaries. End with DONE, then give your answer.
+  Never commit or push.
   ```
 
 ## 5. The background saver (brief 2b rules 1 and 2)
@@ -132,9 +136,15 @@ the agents' notes reach the remote even if the whole session is cut off:
   - running: the harness has not reported its background task as ended, and its first line (`watching .checkpoints/
     on <branch> every 10 min for 110 min`, with its time) is less than 110 minutes old;
   - working: the latest lines of its output (read the output file the Bash call named, with the Read tool: routines
-    have no `cat`) say `saved and pushed` or `nothing to save`. A line with `NOT pushed`, `push refused`, `push
-    failed`, `NOT committed` or `WARNING` is dealt with now (push with `save`, or fix the flagged note) and goes under
-    "Open findings";
+    have no `cat`) say `saved and pushed` or `nothing to save`. Any other line is dealt with now and goes under "Open
+    findings":
+    - `NOT pushed` (unpushed commits outside `.checkpoints/`): push only once those commits are ready to publish (gate
+      run, diff read for secrets: the saver scans notes only), then run `save`;
+    - `push refused`: leave it alone (below); fetch and look at what moved on the remote; never force, rebase or reset;
+    - `push failed`: run `save` once more;
+    - `NOT committed`: fix or remove the flagged note; under "Open findings" name the file and the kind only, never the
+      value;
+    - `WARNING`: do what its line says (the index's `.checkpoints/` entries are behind HEAD);
   - stopped with `time is up`, `interrupted` or `terminated`: start it again with the same command, on the task's
     branch. Stopped because the branch changed or the checkpoint is gone: find out why first; a finished task's saver
     stays stopped;
