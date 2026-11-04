@@ -104,14 +104,15 @@ function runGuardHook(ev, projectDir, input, role) {
   if (role) env.SHAMBLE_ROLE = role;
   return spawnSync(process.execPath, args, { input: JSON.stringify(input), env, encoding: 'utf8', timeout: 30000 });
 }
-// A throwaway project with a copy of the guard's two files; change(guardFile) then removes or breaks guard.mjs.
+// A throwaway project with a copy of the guard's two files; change(guardFile, hooksDir) then removes or breaks
+// guard.mjs, or edits the copy of routine-guard.mjs (never the real one).
 function withProject(change, fn) {
   const dir = mkdtempSync(join(tmpdir(), 'guard-file-'));
   try {
     const hooks = join(dir, '.claude', 'hooks');
     mkdirSync(hooks, { recursive: true });
     for (const f of ['guard.mjs', 'routine-guard.mjs']) copyFileSync(join(HERE, f), join(hooks, f));
-    change(join(hooks, 'guard.mjs'));
+    change(join(hooks, 'guard.mjs'), hooks);
     return fn(dir);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }
@@ -162,4 +163,36 @@ test('guard.mjs present: the real guard runs through the bootstrap', () => {
   const status = runGuardHook('PreToolUse', root, bash('git status'), '');
   assert.equal(status.status, 0, status.stderr);
   assert.equal(status.stdout, '', 'git status in a day session: no decision');
+  const allowed = runGuardHook('PreToolUse', root, bash('git status'), 'night-shift');
+  assert.equal(allowed.status, 0, allowed.stderr);
+  assert.equal(allowed.stdout, '', 'an allowed routine call (git status): no decision, so not blocked');
 });
+
+// A1-AM1 (BH-1, BH-2): a guard.mjs that never finishes, or finishes without its own exit, blocks a routine as well.
+// The bootstrap's beforeExit handler runs only when the event loop empties with no explicit exit; guard.mjs always ends
+// with process.exit(0), so no normal path reaches it (the allowed routine call above passes).
+const UNFINISHED = {
+  'in an import cycle (an await that never settles)': (guard, hooks) => {
+    const rules = join(hooks, 'routine-guard.mjs');
+    writeFileSync(rules, "import './guard.mjs';\n" + readFileSync(rules, 'utf8'));
+  },
+  empty: (guard) => writeFileSync(guard, ''),
+};
+for (const [state, change] of Object.entries(UNFINISHED)) {
+  for (const ev of Object.keys(GUARD_EVENTS)) {
+    test(`guard.mjs ${state}, ${ev}: a day session goes on (exit 0, no decision)`, () => withProject(change, (dir) => {
+      const r = runGuardHook(ev, dir, GUARD_EVENTS[ev], '');
+      assert.equal(r.status, 0, r.stderr);
+      assert.equal(r.stdout, '');
+    }));
+    for (const role of ROUTINES) {
+      test(`guard.mjs ${state}, ${ev}: a routine (${role}) is blocked (exit 1, ended without a decision)`, () =>
+        withProject(change, (dir) => {
+          const r = runGuardHook(ev, dir, GUARD_EVENTS[ev], role);
+          assert.equal(r.status, 1, r.stderr);
+          assert.equal(r.stdout, '');
+          assert.match(r.stderr, /ended without a decision.*fails closed/);
+        }));
+    }
+  }
+}

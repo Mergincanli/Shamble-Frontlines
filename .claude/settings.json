@@ -267,7 +267,7 @@
         "matcher": "*",
         "hooks": [
           { "type": "command", "command": "node",
-            "args": ["-e", "import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
+            "args": ["-e", "process.on('beforeExit',function(){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs ended without a decision: a routine fails closed');process.exit(1)}});import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
             "onFailure": "block" }
         ]
       }
@@ -277,7 +277,7 @@
         "matcher": "*",
         "hooks": [
           { "type": "command", "command": "node",
-            "args": ["-e", "import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
+            "args": ["-e", "process.on('beforeExit',function(){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs ended without a decision: a routine fails closed');process.exit(1)}});import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
             "onFailure": "block" }
         ]
       }
@@ -286,7 +286,7 @@
       {
         "hooks": [
           { "type": "command", "command": "node",
-            "args": ["-e", "import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
+            "args": ["-e", "process.on('beforeExit',function(){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs ended without a decision: a routine fails closed');process.exit(1)}});import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.stderr.write('guard.mjs could not load ('+String(e?e.message:e).slice(0,300)+'): a routine fails closed');process.exit(1)}process.exit(0)})", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"],
             "onFailure": "block" }
         ]
       }
