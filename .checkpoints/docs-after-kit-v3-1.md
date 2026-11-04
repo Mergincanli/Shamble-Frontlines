@@ -89,8 +89,16 @@
      - repo-map-check OK (113/100);
      - hook and checkpoint tests 339/339;
      - no old trigger wording left in live docs.
-3. Reviews: workflow wf_213e499a-b4d, running (five reviewers, each with a skeptic). Its notes go to
-   `.checkpoints/docs-after-kit-v3-1/<reviewer>-review.md`.
+3. Reviews: workflow wf_213e499a-b4d (10 agents; notes in `.checkpoints/docs-after-kit-v3-1/<reviewer>-review.md`).
+   - Verdicts: security-auditor, engine-architect, infra-engineer, the verifier and the completeness critic all PASS
+     WITH NOTES.
+   - Findings: 31 (3 major, 13 minor, 15 nits). The skeptics upheld 30 and refuted INFRA-2, whose pointer was still
+     added without a claim.
+   - Fixed in 884d33b; gate PASS, repo map OK, tests 339/339.
+   - Routines API re-read at 14:36:38 UTC: unchanged (condition 15).
+   - A4 (the review policy, Mustafa 2026-11-04) is queued in STATUS after A3.
+4. Next: a fix check on 884d33b (each upheld finding resolved, no new defects); the report as the PR body; the last
+   commit deletes `.checkpoints/docs-after-kit-v3-1*` (not `[skip ci]`); mark ready; the advisor's final-head review.
 
 ## Next steps
 1. Weigh the reviews: fix the upheld findings, or defer each in writing.
