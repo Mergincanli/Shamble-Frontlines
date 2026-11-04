@@ -5,11 +5,16 @@
   branch `kit-v3-2`, from main 8bcc65e (PR #36 merged). The push is a fast-forward from a32e4c0. Checkpoint commits
   are made by hand, marked `[skip ci]`.
 - **Mustafa's words** (2026-11-03, item A.2), word for word: `.checkpoints/kit-v3-2/mustafa-2026-11-03-list.md`.
-- **Current step:** 1, the plan.
+- **Current step:** 2, the build (his answers given).
   - Plan revision 1: `.checkpoints/kit-v3-2/plan-rev1.md`; its writer's notes: `plan-rev1-notes.md`.
   - The advisor: APPROVE with 11 conditions, in `.checkpoints/kit-v3-2/advisor-plan-rev1.md`. "Build only after
     Mustafa answers the four decisions (or says 'recommendations')."
-  - **Waiting on Mustafa:** AGENT-CAP, SCRATCH-HOME, SAVER-CHECK, LOOK-LINES.
+  - **Mustafa's answer (2026-11-04 ~20:25 UTC), word for word:** "recommendations” in V3." Read as: all four
+    recommended options, given in this session (Planner V3): AGENT-CAP (A), every running agent in a session,
+    workflow agents included; SCRATCH-HOME (A), notes folder for text and small scripts, `.gate/<task-slug>/` for
+    builds and binaries; SAVER-CHECK (A), at every checkpoint update while agents or a workflow run; LOOK-LINES (B),
+    the four "look not decided" lines reworded too, pointers only. The plan was written for these options.
+  - From now on this session runs at most 3 agents at a time (AGENT-CAP A), before A2 merges too.
 - **Agents:** all Opus 5.5 at high, at most 3 at a time (the plan's own rule, under AGENT-CAP A).
 
 ## Next steps
