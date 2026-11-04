@@ -4,7 +4,55 @@ Source rosters for rebuilding the arsenal from scratch. Order of build: **infant
 
 > **Status (migration):** The **faction lens is decided** — three RA3-style factions (Soviet / Allies / Empire) exist as a **visual identity layer** (uniform palettes via a material-role system; see GAME_DESIGN §7.5 + TECHNICAL §5). The **art direction is locked** — "Living Comic" (see `ART_DIRECTION.md`). The **implemented roster** is the four classes in GAME_DESIGN §7 (Conscript, Peacekeeper, Imperial Warrior, Officer), the **Empire elite** enemy and the **Juggernaut** vehicle — all faction-dressed on the gameplay spawns (`buildSoldier` + `SOLDIER_KIT` / `ELITE_KIT`). This file remains the **planned** expansion source.
 >
+> **v2 (2026-11-04):** Mustafa's roster decisions and ideas for v2 are in §0. Where they differ from this block (here:
+> factions as a visual identity layer only), §0 holds.
+>
 > **Empire elite — the "villain" (IMPLEMENTED):** a separate spawnable elite enemy with the Wolfenstein-menace material — near-black lacquered armour, a single specular glint band, a **purple** silhouette outline (`0x7B2FD6`, so it reads against the dark armour) and a glowing **violet** visor (`0xc24bff`); 200 HP. Its weapon/role can still grow from the Empire archetypes below. See `ART_DIRECTION.md` §7.
+
+---
+
+## 0) v2: Mustafa's roster decisions and ideas (2026-11-04)
+
+From Mustafa's design walk of 2026-11-04, in his words. Status tags as in [`LOOP_V2.md`](LOOP_V2.md): `[DECIDED]`
+Mustafa decided it · `[IDEA]` Mustafa's idea, a sketch to iterate: not decided. The rules these units play by are in
+LOOP_V2 (§5 units, §7 combat feel, §13 amps, loot and ammo). The reference rosters in §1-§5 below are unchanged.
+
+### Factions
+- `[DECIDED]` Factions: the counter triangle and tier one stay shared; the differences grow with tech (tier-two
+  specialists and vehicles are unique). Personalities: Soviets heavy and brutal, Allies precise and technical, Empire
+  fast and tricky. (2026-11-04)
+  - Shared or per faction: decided unit by unit in the unit list, with two fixed rules: LOOP_V2 §5 (Mustafa,
+    2026-11-04).
+
+### Tier-one weapons and their amp ladders
+- `[DECIDED]` Tier-one weapon ladders (first sketch, to iterate): (2026-11-04)
+  - Conscript AMK (bolt action): L1 faster reload; L2 incendiary rounds (a small fire on hit). Suppression parked; if
+    ever, a small screen-edge effect that doesn't stack.
+  - Peacekeeper shotgun (shells load one by one): L1 faster reload (two shells at a time); L2 a choice of buckshot or
+    slugs (slugs hit hard and fire slowly, and still lose a long-range duel to the rifle); L3 fork: buckshot leads to a
+    sawed-off (lighter, faster), slugs to a longer barrel (steadier aim).
+  - Imperial Warrior SMG (high recoil, strong close, falls off at mid range): L1 faster sprint-to-fire; L2 hollow
+    points (harder close, even faster falloff); L3 drum mag. Dual-wield parked for a tier-two SMG or a variant. Its amps
+    never add range.
+  - Whether amps may add raw power is OQ-0005-AB7 in docs/adr/README.md (Mustafa's); these ladders bear on it: faster
+    reloads, a drum mag, and hollow points and slugs, whose damage gain comes with a cost.
+  - How many cards each level offers: see LOOP_V2 §13's pointer to OQ-0005-AB8.
+
+### Infiltrators (tier two)
+- `[DECIDED]` Infiltrators (tier two, every faction): one shared core, where entering an enemy building does the same
+  for every faction (power plant: cuts their power; refinery: steals money; tech building: steals tech), plus a faction
+  verb: the Allies' Spy disguises; the Empire's Shinobi is stealthy and fast, and sabotages; the Soviets' KGB agent
+  interrogates a downed enemy to briefly reveal the enemy team on the map. (2026-11-04)
+  - The tech building is the HQ, and "downed" is a short window on a fresh body: LOOP_V2 §5 (Mustafa, 2026-11-04).
+
+### Faction ideas (sketches to iterate)
+- `[IDEA]` Soviets: a crewed walker; the pilot's leap stuns infantry and the gunners finish them (every seat has a
+  verb). (2026-11-04)
+- `[IDEA]` Allies: a tier-two Cryo specialist: the freeze builds up visibly, then it leaps and shatters the target;
+  it's exposed while it channels. An IFV whose turret weapon depends on the passenger's class (Red Alert 3's
+  Multigunner as the reference). (2026-11-04)
+- `[IDEA]` Empire: a hover skimmer as its first vehicle (fast, crosses water, sideways dash, rides just above the
+  ground; no true flight under the top-down camera), and a disguise transport at tier two. (2026-11-04)
 
 ---
 
@@ -134,7 +182,7 @@ Iconic guns & their hook:
 
 Across all four games the same **infantry archetypes** recur. These should become our era-gated classes/weapons:
 
-1. **Rifleman / basic** — Conscript, Imperial Warrior, Rifleman, GDI Soldier → AR (Lancer feel, active reload, melee built in).
+1. **Rifleman / basic** — Conscript, Imperial Warrior, Rifleman, GDI Soldier → AR (Lancer feel, active reload, melee built in). *(v2, 2026-11-04: the Conscript's gun is the AMK, bolt action, and the Imperial Warrior's an SMG; see §0.)*
 2. **Anti-armor** — Javelin, Tankbuster, Missile Squad, Rocket Officer, Mobius → rockets / charge-beam (Torque Bow / Embar feel).
 3. **Anti-air** — Flak Trooper, Archer Maiden, Missile Squad → flak / lock-on.
 4. **Shotgun / breach** — Peacekeeper (+ shield!), Shotgun Trooper, Gnasher → close shotgun; pairs with our existing **Round Shield**.
@@ -146,6 +194,6 @@ Across all four games the same **infantry archetypes** recur. These should becom
 10. **Commando / hero** — Tanya, Natasha, Yuriko, Havoc, Raveshaw → premium single-purchase, ramjet/PIC/railgun, building-deleting C4.
 11. **Exotic / mind-control / swarm** — Yuriko, Mastermind, Cultists, Buzzers, Dropshot, Buzzkill → the "weird tier" for flavor.
 
-**Era mapping idea (4 tiers):** T1 basics (rifle/shotgun/engineer) → T2 specialists (AT, flame, sniper) → T3 shock/stealth (Tesla/Zone, cloak) → T4 commandos + exotics (PIC/railgun/mind-control). Slots map onto the existing `WEAPONS` array with `era` + `minLevel` gates already in place.
+**Era mapping idea (4 tiers):** T1 basics (rifle/shotgun/engineer) → T2 specialists (AT, flame, sniper) → T3 shock/stealth (Tesla/Zone, cloak) → T4 commandos + exotics (PIC/railgun/mind-control). Slots map onto the existing `WEAPONS` array with `era` + `minLevel` gates already in place. *(v2, 2026-11-04: the infiltrators, the Empire's stealthy Shinobi among them, are tier two; see §0.)*
 
-> Next step: the wardrobe is already on the gameplay spawns (done). Infantry guns go **tier by tier** (T1 basics → T4 commandos/exotics), replacing the placeholder AMK/Bagpipe/Shabzon/etc. — **held until the progression design is decided** (see ROADMAP). Slots map onto the existing `WEAPONS` array with `era` + `minLevel` gates.
+> Next step: the wardrobe is already on the gameplay spawns (done). Infantry guns go **tier by tier** (T1 basics → T4 commandos/exotics), replacing the placeholder AMK/Bagpipe/Shabzon/etc. — **held until the progression design is decided** (see ROADMAP). Slots map onto the existing `WEAPONS` array with `era` + `minLevel` gates. *(v2, 2026-11-04: the tier-one guns, the AMK still the Conscript's, and their first amp ladders are in §0.)*

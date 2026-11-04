@@ -33,7 +33,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/TECHNICAL.md` | How the legacy engine works, in depth |
 | `docs/VISION_V2.md` | v2 north star, pillars, modes and scale, targets, what the engine must support (§6) |
 | `docs/V2_PHASE0_BRIEF.md` | v2 phase 0: order of work, kit-v3-0, routines, research topics R1–R7, decision drafts |
-| `docs/LOOP_V2.md` | The v2 core loop (living spec; status tags DECIDED / DEFAULT / OPEN / LATER) |
+| `docs/LOOP_V2.md` | The v2 core loop (living spec; status tags DECIDED / DEFAULT / OPEN / LATER / IDEA; §13: amps, loot and ammo) |
 | `docs/EDITOR_V2.md` | The map editor rebuild (draft spec) |
 | `docs/LOOK_V2.md` | The v2 look brief (Mustafa and the Advisor, 2026-10-31): the input of ADR 0003 and of ADR 0005's asset pipeline |
 | `docs/ENGINE_OVERVIEW.md` | The v2 engine on one page: the parts, the Rust ↔ TypeScript boundary, the data flow per tick and per frame, where each VISION_V2 §6 need lives |
@@ -47,7 +47,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/ART_DIRECTION.md` | The locked "Living Comic" look of the legacy build |
 | `docs/ANIMATION_PLAN.md` | Legacy animation system (ANIM v2) and its metrics |
 | `docs/AUDIT_BUGS_PERF.md` | The 2026-09-26 bug and performance audit: methods and what was kept on purpose |
-| `docs/UNITS.md` | Planned unit roster (not built) |
+| `docs/UNITS.md` | Planned unit roster (not built); §0: Mustafa's v2 roster decisions and ideas (2026-11-04) |
 | `docs/ROADMAP.md` | History and plan, terse |
 | `docs/ui_theme_mockup.html` | The war-room UI mockup (legacy UI source of truth) |
 | `docs/adr/` | Decision records; `0000-template.md` is the format; the v2 drafts 0001–0006 (Status: Proposed): netcode, code structure and toolchain, rendering, simulation core, content and abilities and assets, infrastructure |
