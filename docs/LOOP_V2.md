@@ -101,7 +101,8 @@ first (or leads when time runs out) wins. Winning converts part of the match's t
   - `[OPEN]` Mustafa's idea is that it costs tech. The Advisor recommends gating it behind Tech 3 and charging money,
     so one player can't spend the team's shared tech. (2026-11-04: infiltrators are tier two, so the Tech 3 gate no
     longer fits; the cost, tech or money, stays open.)
-  - Also open: what breaks the disguise, how long the hack takes, how much it steals, and how defenders are warned.
+  - Also open: what breaks the disguise, what reveals the Shinobi's stealth, what its sabotage does, how long the hack
+    takes, how much it steals, and how defenders are warned.
 
 ## 6. Vehicles
 - `[DECIDED]` The **Juggernaut** stays as the shared heavy walker.
@@ -215,8 +216,11 @@ structures, multiplayer.
     area blast", no fire area) meets the fire patch (§5). ADR 0005 AB-3's "active reload's short damage boost" meets
     "little or no damage bonus" (§7). ADR 0005's OQ-0005-AB4 and AB5 (lines 1263 and 1278-1283) quote §8's "sidegrade
     variants", and AB5's options weigh unlocking classes ("the catalogue grows in classes", "as unlocking a class");
-    account progression now gives class variants and cosmetics only (§8). The register (docs/adr/README.md) points
-    each open question his words touch.
+    account progression now gives class variants and cosmetics only (§8). ADR 0004 part 17's spawn protection
+    (`[DEFAULT]`, line 502) and ADR 0005's spawn protection row (line 991) meet §2's `[DECIDED]` rule; ADR 0004 part
+    18's "one track per unit type" (line 518) meets §13's weapons only; ADR 0005's LOOP_V2 inputs (lines 796-797: the
+    counter triangle `[DEFAULT]`, the Spy alone) and its Spy row (line 994) meet §5's shared triangle and tier one and
+    its three infiltrators. The register (docs/adr/README.md) points each open question his words touch.
 
 ## 13. Weapons in the match: amps, loot and ammo
 Added 2026-11-04. Mustafa's rules for the weapons a player holds in a match, in his words: his frame of 2026-10-31
