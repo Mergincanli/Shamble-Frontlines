@@ -62,7 +62,9 @@ Calls column counts every tool call, the final hand-back included.
 | rfresh2 | D | read, fresh | 6 | plan first; one call per block (out mtimes 22:01:15, :18, :21); nothing shown at the end | PASS |
 - Fix E, after the verifier's fix check (N2-1: "without opening any file again" would also stop an agent rereading
   its own notes): the last sentence ends "from your notes alone, opening no other file." Run as a workflow
-  (wf_ca5fc22b-214, 22:11 UTC), at most 3 agents at a time; a workflow agent returns its text with no hand-back call.
+  (wf_ca5fc22b-214, 22:11 UTC) in two waves, 3 then 2 (plain `parallel()` calls); the runner itself ran at most 2 at
+  once (this container has 4 CPUs; the runner allows CPUs - 2), and wave 2 began only after wave 1 ended (22:11:38.7,
+  22:11:39.4). A workflow agent returns its text with no hand-back call.
 
 | Run | Text | Toy, case | Calls | What the tool calls show | Result |
 |---|---|---|---|---|---|
