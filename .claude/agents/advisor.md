@@ -56,8 +56,8 @@ Check each of these:
 - The evidence matches the change type (`CLAUDE.md`, protocol step 4).
 - The risks are honest, and the right reviewers are named.
 - Player-facing changes come with a Brave checklist.
-- Multi-step work keeps a checkpoint (`.claude/CHECKPOINTS.md`), and its agents' model and effort follow `CLAUDE.md`
-  "Models and effort".
+- Multi-step work keeps a checkpoint (`.claude/CHECKPOINTS.md`), runs at most 3 agents at a time (§4), and its agents'
+  model and effort follow `CLAUDE.md` "Models and effort".
 
 Answer with one of three verdicts, plus any conditions as a numbered list:
 - **APPROVE**

@@ -16,9 +16,9 @@ Sources: docs/VISION_V2.md (§4 targets, §6.9 the spectacle budget), docs/V2_PH
 docs/LEGACY_INVENTORY.md (R7, once it lands) and docs/ART_DIRECTION.md (what the legacy renderer does and why), the
 three.js docs, examples and release notes, the WebGPU and WGSL specifications.
 
-**The look is not decided.** Mustafa and the Advisor are writing the look brief. You find out what each technique can
-and can't do, what it costs and how it fails; you never choose the look. Candidate techniques for a comic look: toon
-ramps, screen-space outlines, ambient occlusion, emissive bloom. Write them as options.
+**The look brief is docs/LOOK_V2.md** (Mustafa's and the Advisor's). You find out what each technique can and can't do
+toward it, what it costs and how it fails; you never choose the look. Candidate techniques for a comic look: toon ramps,
+screen-space outlines, ambient occlusion, emissive bloom. Write them as options.
 
 Your areas:
 - The pipeline: passes, render targets, post-processing in TSL, the outline pass, and what the WebGL 2 fallback loses.
