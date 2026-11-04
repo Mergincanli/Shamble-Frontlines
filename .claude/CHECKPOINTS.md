@@ -73,8 +73,10 @@ Copy this template. Keep it short: it is a handoff, not a log.
   summary, a reviewed file, a test group's result, a section of a deliverable). Then:
   - **each finished block goes to disk at once,** into its file (the notes, or the deliverable), never held for the end;
   - **a notes line after each finding,** as soon as it is found: what, and where (file:line, URL, command);
-  - **a restart continues after the last complete block.** A block is complete when its notes line says so; a block
-    without one is redone whole and written over the partial one, never appended (§6).
+  - **a restart continues after the last complete block.** A block is complete when its notes line says so. A restart
+    trusts complete blocks and never rereads, rechecks or redoes them: that would spend the saved work again (a later
+    block may still read a file it needs). A block without a done line is redone whole and written over the partial
+    one, never appended (§6).
   Example: a research agent writes each source's summary (URL, what it says, how sure) as soon as it has read the
   source, then a notes line naming that source done.
 - **Agents write; they never commit or push.** One committer at a time avoids git lock races: the session commits the
@@ -99,27 +101,30 @@ Copy this template. Keep it short: it is a handoff, not a log.
   `interpreter`).
 - **The format:** the first line names the task; the plan follows, one line per block. Then, as the work goes: a
   line for each finding (what, where), and after each finished block a line naming it done and what comes next.
-  `DONE` on the last line when the work is finished.
+  `DONE` on the last line when the work is finished; the answer is then given from the notes alone.
 - **Look first.** An agent started on a task reads its notes file before anything else:
   - the first line names another task: move the file into `old/` beside it and start fresh;
   - the notes end with `DONE`: give the answer from the notes without redoing the work;
   - otherwise: go on after the last block the notes mark done, following the plan at the top; redo a block they
     don't mark done, written over, never appended.
+  In both of the last two cases, trust the blocks the notes mark done: never reread, recheck or redo them (a later
+  block may still read a file it needs).
 - **Paste this block into every agent prompt** (fill in <path> and <task-slug>):
   ```
   ## Saving your progress
   A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in
   <path>/<agent>-<part>.md (make the folder; you may always write there). Look there first: if the first line names
   another task, move the file into <path>/old/ and start fresh; if the notes end with DONE, write your answer from
-  them; otherwise go on after the last block they mark done. Start a new file with one line naming your task, then
+  them; otherwise go on after the last block they mark done. Trust the blocks they mark done: never reread, recheck
+  or redo them (a later block may still read a file it needs). Start a new file with one line naming your task, then
   your plan: the blocks you will do, in order (a block: a source read, a file reviewed, a test group run, a section
   written). Write each finished block to its file at once. Add a notes line for each finding as you find it (what,
   where), and one after each finished block (done, what comes next). Redo a block the notes don't mark done, written
   over, never appended. Scratch files go in <path>/: text and small scripts only; builds and binaries go under
   .gate/<task-slug>/. This folder is pushed to a public repository: never put a secret, token, environment value,
   request header, cookie or raw payload in it, whether in a note, a script or a script's output; the saver's secret
-  check only knows a few token formats and cannot read archives or binaries. End with DONE, then give your answer.
-  Never commit or push.
+  check only knows a few token formats and cannot read archives or binaries. End with DONE, then give your answer
+  from your notes alone, without opening any file again. Never commit or push.
   ```
 
 ## 5. The background saver (brief 2b rules 1 and 2)
