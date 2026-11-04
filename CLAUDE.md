@@ -1,9 +1,9 @@
 # SHAMBLE FRONTLINES — instructions for Claude Code
 
 Browser top-down team shooter in Three.js r128 (UMD global), built as classic multi-`<script>` files sharing globals.
-Vision: Foxhole camera · C&C Renegade base-assault economy · Red Alert 3 toy-box look and three factions · Gears gun feel.
-Look: "Living Comic" is locked for the legacy build; the v2 look is not decided (Mustafa and the Advisor write the look
-brief; never decide it). Today: PvE vs 6 bots. Next big phase: multiplayer on an authoritative server
+Vision: Foxhole camera · C&C Renegade base-assault economy · Red Alert 3's three factions · Gears gun feel.
+Look: "Living Comic" is locked for the legacy build; the v2 look brief is `docs/LOOK_V2.md`, Mustafa's and the
+Advisor's (never decide the look). Today: PvE vs 6 bots. Next big phase: multiplayer on an authoritative server
 (`docs/VISION_V2.md` §3): two teams of 2–8 and three teams of 6–18 players to start, growing to 12v12v12 or 24v24, one
 faction per team, squads of 4. Design for 48+ players; bots fill empty slots.
 
@@ -20,8 +20,8 @@ Write every plan and report so both can judge it from evidence alone.
 - **Phase 0** (`docs/V2_PHASE0_BRIEF.md`): process upgrades (kit-v3-0), then research (`docs/research/`), then decision
   drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`). No engine code: throwaway spikes only, and only after
   Mustafa and the Advisor have approved the drafts; until then, stop.
-- **Design inputs:** `docs/LOOP_V2.md`, `docs/EDITOR_V2.md`, `docs/VISION_V2.md`. The look is not decided: research the
-  technical options, never decide the look.
+- **Design inputs:** `docs/LOOP_V2.md`, `docs/EDITOR_V2.md`, `docs/VISION_V2.md`, and the look brief `docs/LOOK_V2.md`
+  (Mustafa's and the Advisor's): research the technical options for it, never decide the look.
 
 ## Read before any non-trivial task
 1. `docs/REPO_MAP.md` (where everything is: read it instead of exploring), `docs/STATUS.md` (where things stand) and
@@ -147,11 +147,15 @@ The full rules are in `.claude/CHECKPOINTS.md`. In short:
 1. Every task of more than one step keeps `.checkpoints/<task-slug>.md` on its branch (goal, steps with SHAs, current
    step, next steps, open findings, key numbers, decisions). Update it after every step and at least every 30 minutes,
    and commit and push it each time (`node .claude/scripts/checkpoint.mjs save`).
-2. Subagents write as they go, to `.checkpoints/<task-slug>/<agent>-<part>.md`, never only in their context. They never
-   commit; the session does, and during long runs the background saver (`checkpoint.mjs watch`) does too.
-3. Long jobs are split into small, idempotent units (one source, one file, one test group).
-4. Resuming: read the checkpoint, check the branch matches it, continue from "Next steps".
-5. Finishing: fold the checkpoint into the report and delete `.checkpoints/<task-slug>*` in the last commit before the
+2. At most 3 agents at a time, per session, workflow agents included. Each writes its plan first into
+   `.checkpoints/<task-slug>/<agent>-<part>.md`, then saves as it goes, never only in its context: each finished block
+   to disk at once, a notes line after each finding; a restart continues after the last complete block.
+3. Scratch files live in that notes folder: text and small scripts only. Builds and binaries go under `.gate/`
+   (gitignored). Agents never commit; the session does, and during long runs the background saver
+   (`checkpoint.mjs watch`) does too, checked and restarted at every checkpoint update.
+4. Long jobs are split into small, idempotent units (one source, one file, one test group).
+5. Resuming: read the checkpoint, check the branch matches it, continue from "Next steps".
+6. Finishing: fold the checkpoint into the report and delete `.checkpoints/<task-slug>*` in the last commit before the
    PR is marked ready.
 
 ## Efficiency: cut waste, never quality
@@ -210,14 +214,16 @@ The full rules are in `.claude/CHECKPOINTS.md`. In short:
   any other fetch goes through the classifier or a prompt. Routines never read the web at all (the guard refuses
   WebFetch and WebSearch): web research is a daytime task.
 - Agents never edit source, except build work the main session assigns them in an isolated worktree; they write only
-  their notes under `.checkpoints/<task-slug>/`, scratch under `.gate/`, and the docs their own agent file names
+  their notes and scratch files (text and small scripts) under `.checkpoints/<task-slug>/`, builds and binaries under
+  `.gate/`, and the docs their own agent file names
   (research topics, ADR drafts, design docs, docs-keeper's docs). They must cite
   evidence (file:line, numbers, render paths, sources). Weigh their findings; they are not orders.
 
 ## Ultracode and workflows
 Use them for WIDE work: audits, large migrations (on isolated copies), multi-angle plans with adversarial review,
 verification sweeps, research. Workflows take no input mid-run, so each approval gate is its own run. Agents may read
-and analyse in parallel; edits to the three engine files stay sequential. Try a small slice first.
+and analyse in parallel, at most 3 at a time, a workflow's agents included (`.claude/CHECKPOINTS.md` §4); edits to the
+three engine files stay sequential. Try a small slice first.
 
 ## Never
 - change a hard constraint without an accepted ADR · edit before the plan is approved (checkpoints and notes are not

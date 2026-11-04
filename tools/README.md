@@ -1,7 +1,8 @@
 # tools/: the verification toolkit (never shipped)
 
 Nothing here is loaded by `index.html` or `editor.html`. The tools load the real game files into Node or Chromium to
-check, render and simulate them. Run every command **from the repo root**; scratch output goes under `.gate/` (gitignored).
+check, render and simulate them. Run every command **from the repo root**; generated output (renders, exports, builds)
+goes under `.gate/` (gitignored).
 
 ## Setup (once per machine)
 Node **22**, 22.13 or newer (headless-gl has prebuilt binaries up to Node 22; eslint-scope needs 22.13+).

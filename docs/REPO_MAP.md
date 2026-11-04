@@ -8,7 +8,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 ## Top level
 | Path | What it is |
 |---|---|
-| `CLAUDE.md` | The rules for Claude Code: v2 phase 0, protocol, models, checkpoints, reporting, agents, never-list |
+| `CLAUDE.md` | The rules for Claude Code: v2 phase 0 (the look brief is `docs/LOOK_V2.md`), protocol, models, checkpoints (at most 3 agents at a time), reporting, agents, never-list |
 | `README.md` | The project in one page, for people |
 | `FIRST_PROMPTS.md` | The first prompts Mustafa used (Phase 0, scale test, build spike, ADR run): history |
 | `index.html` | Legacy player build: three.js r128 → core → game → `bootGame();` |
@@ -21,7 +21,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/` | Agents, skills, rules, hooks, scripts and settings for Claude Code (below) |
 | `.github/` | CI (below) |
 | `.gitattributes` | LF line endings everywhere |
-| `.gitignore` | node_modules, `.gate/` scratch, `.env*`, local Claude settings |
+| `.gitignore` | node_modules; `.gate/`: generated output (renders, exports, builds) goes under `.gate/` (gitignored); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory |
 
 ## docs/
 | Path | What it is · when to read it |
@@ -71,27 +71,27 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 ## .claude/
 | Path | What it is |
 |---|---|
-| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit |
+| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked and restarted at every update (§3, §5) |
 | `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
 | `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |
 | `.claude/agents/` | The crew (one file each, below) |
-| `.claude/agents/advisor.md` | Plan and PR reviews, merges by the PR Advisor routine, escalations to Mustafa |
+| `.claude/agents/advisor.md` | Plan and PR reviews (a plan's checkpoint, the 3-agent cap, models and effort), merges by the PR Advisor routine, escalations to Mustafa |
 | `.claude/agents/verifier.md` | The gate plus change-type evidence; research claim spot-checks |
 | `.claude/agents/docs-keeper.md` | STATUS, ROADMAP, this map, doc drift |
-| `.claude/agents/art-director.md` | The legacy look and UI; v2 rendering research, never choosing the look |
+| `.claude/agents/art-director.md` | The legacy look (Living Comic) and UI; v2 rendering work against the look brief `docs/LOOK_V2.md`, never choosing the look |
 | `.claude/agents/perf-auditor.md` | Frame time, allocation, draw calls; v2 budgets |
 | `.claude/agents/security-auditor.md` | Security and anti-cheat; the security baseline (open in the ADR 0006 draft, researched before the first online playtest: BASELINE-WHEN (b)) |
 | `.claude/agents/netcode-architect.md` | Authority, tick, prediction, lag compensation, protocol; R2 |
 | `.claude/agents/engine-architect.md` | Module boundaries, the Rust ↔ TypeScript boundary; R1, R4, the synthesis |
-| `.claude/agents/graphics-engineer.md` | WebGPU and TSL, the render pipeline, GPU budget; R3 |
+| `.claude/agents/graphics-engineer.md` | WebGPU and TSL, the render pipeline, GPU budget, techniques toward `docs/LOOK_V2.md` (never choosing the look); R3 |
 | `.claude/agents/rust-reviewer.md` | Rust safety, speed, identical results on Wasm and native, Wasm size |
 | `.claude/agents/test-engineer.md` | Test strategy, golden tests, network and load tests, gate v2; R5 |
 | `.claude/agents/infra-engineer.md` | CI, preview links, hosting, monitoring, telemetry, costs; R6 |
 | `.claude/agents/game-designer.md` | Rules against LOOP_V2 and VISION_V2, balance math, tuning tables |
 | `.claude/skills/` | Slash commands (below) |
-| `.claude/skills/changeset/` | `/changeset`: one change-set end to end |
+| `.claude/skills/changeset/` | `/changeset`: one change-set end to end (reviewers at most 3 at a time) |
 | `.claude/skills/gate/` | `/gate`: the legacy verification gate |
 | `.claude/skills/render-ab/` | `/render-ab`: before/after renders |
 | `.claude/skills/advisor-report/` | `/advisor-report`: the end-of-change-set report |

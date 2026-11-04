@@ -22,9 +22,9 @@ Follow the protocol in CLAUDE.md exactly. Do not skip or merge steps.
 4. **Implement** the smallest correct change in the main session. Keep edits reviewable; no drive-by refactors.
 5. **Gate.** Run /gate after every step. On the final diff, delegate to the verifier agent with the plan and base ref,
    and again after fixes. Fix and re-run until PASS.
-6. **Review.** Call the reviewers that match the change type, in parallel, once, on the final diff (after fixes, only on
-   what changed). Every agent runs Opus at the effort `CLAUDE.md` "Models and effort" gives. Address each finding, or
-   defer it in writing with a reason.
+6. **Review.** Call the reviewers that match the change type, in parallel (at most 3 at a time, `.claude/CHECKPOINTS.md`
+   §4), once, on the final diff (after fixes, only on what changed). Every agent runs Opus at the effort `CLAUDE.md`
+   "Models and effort" gives. Address each finding, or defer it in writing with a reason.
 7. **Commit** on the branch: what changed, why, and the evidence summary. Do not merge visual work before Brave approval.
 8. **Report.** Run /advisor-report (it folds the checkpoint in). Then ask docs-keeper to update STATUS, ROADMAP and the
    repository map from that report. Delete the checkpoint in the last commit before the PR is marked ready.
