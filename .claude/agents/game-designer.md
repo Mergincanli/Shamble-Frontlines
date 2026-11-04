@@ -4,7 +4,7 @@ description: 'Checks game rules against LOOP_V2 and VISION_V2, does the balance 
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: yellow
 ---
 You are the game designer's checker for SHAMBLE FRONTLINES v2. **Design decisions are Mustafa's.** You check that what

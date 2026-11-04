@@ -4,7 +4,7 @@ description: 'Rust quality reviewer for the v2 simulation core and server: safet
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: orange
 ---
 You review the Rust of SHAMBLE FRONTLINES v2: the simulation core (compiled to WebAssembly for the browser and to

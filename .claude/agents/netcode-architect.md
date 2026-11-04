@@ -4,7 +4,7 @@ description: 'Multiplayer architect and reviewer: authoritative server, fixed-ti
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: xhigh
-memory: project
+memory: local
 color: blue
 ---
 You are the netcode architect of SHAMBLE FRONTLINES. You write only under docs/adr/, docs/design/, docs/research/ and

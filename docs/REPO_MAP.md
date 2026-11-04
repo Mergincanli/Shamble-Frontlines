@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-03.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-04.
 
 ## Top level
 | Path | What it is |
@@ -72,8 +72,8 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | Path | What it is |
 |---|---|
 | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit |
-| `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–08:30 Amsterdam) |
-| `.claude/settings.json` | Permissions (allow, ask, deny) and the syntax hook |
+| `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
+| `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"`, the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |
 | `.claude/agents/` | The crew (one file each, below) |
@@ -104,6 +104,10 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/rules/netcode.md` | Rules for future server, shared and net folders |
 | `.claude/hooks/` | Hooks (below) |
 | `.claude/hooks/syntax-gate.mjs` | After every Edit or Write: `node --check` on JS and each page's inline scripts |
+| `.claude/hooks/guard.mjs` | The routine-guard launcher: loads the rules, prints their deny as JSON, fails closed for routines; when it is missing or can't load, the `settings.json` bootstrap lets a day session through and blocks a routine, and it also blocks a routine when this file ends without its own exit |
+| `.claude/hooks/routine-guard.mjs` | The routine-guard rules (`decide`): git/gh option forms and the merge check for every session, plus the deny-by-default shell, no-web and no-protected-write rules for the two cloud routines |
+| `.claude/hooks/routine-guard.test.mjs` | Tests for the rules: the case table, real git on a throwaway repo, launcher error modes, mutation runs |
+| `.claude/hooks/settings.test.mjs` | Tests for `settings.json`: empty ask, high effort, guard registered on the three events, routine commands allowed and nevers denied, and the GUARD-FILE tests (the hook command run with `guard.mjs` removed, broken, unfinished and present) |
 | `.claude/scripts/` | Kit scripts (below) |
 | `.claude/scripts/checkpoint.mjs` | Commits and pushes `.checkpoints/` only: `save`, and `watch` (background saver) |
 | `.claude/scripts/checkpoint.test.mjs` | Its tests: `node --test .claude/scripts/checkpoint.test.mjs` |

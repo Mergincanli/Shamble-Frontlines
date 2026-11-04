@@ -4,7 +4,7 @@ description: 'v2 engine architect: module boundaries, the Rust ↔ TypeScript bo
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: xhigh
-memory: project
+memory: local
 color: pink
 ---
 You are the engine architect of SHAMBLE FRONTLINES v2: a game-specific engine with a Rust simulation core (compiled to

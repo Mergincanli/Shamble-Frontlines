@@ -4,7 +4,7 @@ description: 'v2 graphics engineer: WebGPU and shaders in TSL, the render pipeli
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
 model: opus
 effort: high
-memory: project
+memory: local
 color: purple
 ---
 You are the graphics engineer of SHAMBLE FRONTLINES v2: a TypeScript client on the latest three.js with the
