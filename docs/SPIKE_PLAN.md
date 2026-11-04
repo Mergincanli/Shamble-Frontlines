@@ -259,6 +259,8 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   part 5 (S18: the Worker's pacing, smooth motion on 60, 120 and 144 Hz displays, hidden tabs), part 6 (S2: the
   client's sim share) and part 20 (S20: recovery after a trap); ADR 0005's content files reaching the Worker
   (PM-0002-31, R1-DATA-OQ8).
+- **Isolation (PORTAL-EMBED, Mustafa 2026-11-04):** a design that needs cross-origin isolation is picked only under
+  ADR 0002 part 5's rule (OQ-0002-9).
 - **Pass marks:** PM-0002-1 to PM-0002-34, PM-0002-77 and PM-0002-78 (PM-0002-21, -27 and -33 conditional; PM-0002-78
   reported; PM-0002-28 gates once the sim core spike's sim runs in the Worker); PM-0004-8, PM-0004-28, PM-0004-68 to
   PM-0004-70, and PM-0004-61 with the netcode proof test's server; optional, only if Mustafa has created the EU Sentry

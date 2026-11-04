@@ -1146,6 +1146,22 @@ Researching it before this record, or leaving it as one shared question: settled
   - *Decider:* Mustafa (money), with the Advisor.
   - *What decides it:* his choice before slice 3 (online), when the staging game server is first created (part 4).
   - *Carries:* no research id (the advisor's ruling HZ-STAGING, 2026-11-03, on his Hetzner check).
+- **OQ-0006-23. Could the game launch on web portals inside their iframe, sharing our servers and player pool, and
+  what must the drafts keep possible for it?**
+  - Mustafa (2026-11-04), word for word: "PORTAL-EMBED (new, keep the door open; don't design it): the game may also
+    launch on web portals such as CrazyGames and Poki, inside their iframe, sharing our servers and player pool. Add it
+    as an open question to the README (and ADR 0002 and 0006) in the docs pass. The client must keep working inside a
+    third-party iframe, so the boundary spike may only pick a design that needs cross-origin isolation (the
+    SharedArrayBuffer ring, B3) if a non-isolated fallback stays available."
+  - *Why it matters:* his words above: web-portal launches would reach the same client host, game servers and player
+    pool. Nothing about them is researched.
+  - *Options:* none weighed ("keep the door open; don't design it").
+  - *Decider:* Mustafa.
+  - *What decides it:* no timing is set.
+  - *Carries:* no research id. Related: OQ-0006-12 (the other direction: third-party content inside the game page,
+    only if isolation is adopted); OQ-0006-21 (community servers, another way players would reach a game server);
+    OQ-0006-3 (what stores guest ids) and OQ-0006-15 (the domains); ADR 0002's OQ-0002-9 (the client side: the
+    boundary spike's isolation rule).
 
 ## What a spike must prove
 

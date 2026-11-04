@@ -65,7 +65,8 @@ label names the main VISION_V2 §6 items it serves; the table below gives every 
   per entity kind, the local player's owner-only data (own weapon, money, upgrade tracks and offers) and an event
   section (ADR 0004 part 19's events, such as hits, deaths and kills, blasts, purchases, uplink cache events, tech
   tiers, upgrade picks and pickups, and moments; a remote entity's spatial events come in the block whose delayed time
-  reaches their tick, ADR 0001 part 7); the SharedArrayBuffer ring (B3) is measured against it in the boundary spike.
+  reaches their tick, ADR 0001 part 7); the SharedArrayBuffer ring (B3) is measured against it in the boundary spike,
+  under ADR 0002's isolation rule (OQ-0002-9, PORTAL-EMBED).
   Remote entities' fields online are ADR 0001's; the layout is ADR 0002's.
 - **Up (page → Worker):** the newest input once per drawn frame, with the cursor ray and view time; each tick the
   Worker fills its one network command from the newest post, aim point included (I-19; ADR 0001 part 5; ADR 0002
