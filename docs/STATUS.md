@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-11-04; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC) and part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) merged. In flight: docs-after-kit-v3-1 (PR #35, draft). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-04; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC) part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) and docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC) merged. In flight: B3, Mustafa's design walk (PR #36, draft). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
@@ -15,15 +15,16 @@ the Advisor, added 2026-10-31); the six drafts are signed off as the basis for t
 stays Proposed; a draft becomes Accepted only when Mustafa signs it off after its spikes report; the stop's answers:
 Decisions pending, below); kit-v3-1, the routine guard (PR #30, e2b5799, 2026-11-04 10:21:56 UTC, `merged_at`; the
 merge commit is dated 10:21:55; on Mustafa's "merge #30" after the advisor's APPROVE of 7a23132); part-b-test
-(PR #34, 868e165, 2026-11-04 13:35 UTC; docs only; merged by the PR Advisor routine itself: TEST-RUN B2).
-**In flight:** docs-after-kit-v3-1 (PR #35, draft; this pass). **Queue** (Mustafa's lists of 2026-11-03 and
-2026-11-04; one change-set at a time, plan first): this docs pass; then his 2026-11-04 design decisions into LOOP_V2
-and UNITS.md (B3 on his list); kit-v3-2 (A2 on his list: the CHECKPOINTS.md rules and the TOY-BOX rewording); the
-guard's follow-ups (A3 on his list, right after A2; Open bugs and risks); the review policy (A4 on his list, after A3:
-risk tiers mapped onto today's ready and needs-mustafa classes, a review budget, a revert-first rollback rule,
-per-tier checklists in advisor.md, and foundation notes: fast checks on save, one-click rollback of client deploys
-and server versions, browser error reports and telemetry from the first playtests); the EDITOR_V2 plan-view note; the
-VISION_V2 community-servers note.
+(PR #34, 868e165, 2026-11-04 13:35 UTC; docs only; merged by the PR Advisor routine itself: TEST-RUN B2);
+docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC; rules and docs; on Mustafa's go after the advisor's APPROVE
+of 76c35bf). **In flight:** B3 (the item on Mustafa's list, not the SharedArrayBuffer ring or ADR 0006 part 13's B3
+row): his 2026-11-04 design decisions into LOOP_V2 and UNITS.md (PR #36, draft; this pass). **Queue** (Mustafa's lists
+of 2026-11-03 and 2026-11-04; one change-set at a time, plan first): kit-v3-2 (A2 on his list: the CHECKPOINTS.md
+rules and the TOY-BOX rewording); the guard's follow-ups (A3 on his list, right after A2; Open bugs and risks); the
+review policy (A4 on his list, after A3: risk tiers mapped onto today's ready and needs-mustafa classes, a review
+budget, a revert-first rollback rule, per-tier checklists in advisor.md, and foundation notes: fast checks on save,
+one-click rollback of client deploys and server versions, browser error reports and telemetry from the first
+playtests); the EDITOR_V2 plan-view note; the VISION_V2 community-servers note.
 **Next (v2):** the netcode proof test, its own change-set, branched from main, plan first (no longer waiting on PR
 #33). Wave 1 runs
 one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
@@ -44,7 +45,7 @@ Mustafa" 2–5; details in Routines, below): 1. both role environments exist (`S
 be started by hand ("Run now", as B2 was) or through the API, and is never started by pull-request events; its GitHub
 pull-request trigger and its connectors are removed; 3. TEST-RUN passed (Mustafa accepted parts A and B): part A, B1
 (13:20 UTC, second try) and B2 (the routine reviewed and merged PR #34 on its own); 4. the PR Advisor is back on:
-Mustafa un-paused it, and the routines API (list_triggers, read about 14:02 UTC, again at 14:36 and 14:47 UTC) shows it
+Mustafa un-paused it, and the routines API (list_triggers, first read 14:03 UTC, again at 14:36 and 14:47 UTC) shows it
 `enabled: true`, updated 14:01:31 UTC, next run 18:45 UTC (19:45 Amsterdam). V2_PHASE0_BRIEF §3 (step 2, the
 routines: "effort high", lines 103 and 108; "Keep its triggers", line 108) is outdated by these facts and rulings; the
 brief itself is not edited.
@@ -80,7 +81,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/docs-after-kit-v3-1`), PR #35 (draft) | plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; plan revision 2 (0099b3c) adds Mustafa's answers; built (c70132f, 603f53b) and reviewed once on the final diff (security-auditor, engine-architect, infra-engineer, the verifier and a completeness critic, each finding checked by a skeptic: 30 of 31 upheld, each fixed in 884d33b; the verifier's fix check: PASS WITH NOTES, its notes fixed in the last commit) | the advisor's APPROVE of the final head with CI `gate` and `smoke` green; Mustafa's go (`needs-mustafa`: it changes `CLAUDE.md` and `.claude/`) |
+| **B3, Mustafa's design walk** (b3-design-walk; B3 is the item on his list. Docs only, symbols +0 −0: his 2026-11-04 decisions and ideas, word for word, tagged `[DECIDED]` or `[IDEA]` (a new tag) in LOOP_V2 (§2 spawn protection, §4–§5 factions and infiltrators, §7 active reload and sprint-to-fire, §8 account progression, §10 bots, new §13 amps, loot and ammo) and UNITS.md §0 (factions, the tier-one amp ladders, infiltrators, faction ideas); his answers B3-Q1 to B3-Q3; pointers in DESIGN_NOTES; "bears on" clauses in `docs/adr/README.md`'s register, no ADR edited, no new open question; plus #35's final-review follow-ups in STATUS and ROADMAP) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/b3-design-walk`), PR #36 (draft) | plan revision 1, the advisor's APPROVE with 11 conditions; plan revision 2 adds Mustafa's answers, the advisor's APPROVE with 10 conditions; the edits made in the worktree, not yet committed when this was written (the builder's notes: its checks PASS, `gate.mjs --no-smoke` PASS, symbols +0 −0 [assumed: not re-run by docs-keeper]); next: reviews on the final diff (game-designer, the verifier, a completeness critic, each with a skeptic), the report | the advisor's APPROVE of the final head with CI `gate` and `smoke` green; Mustafa's reconfirmation (`needs-mustafa` likely: rule text in the core loop; no Brave check) |
+| **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | merged: PR #35, 4893ab6, 2026-11-04 15:50:40 UTC (`merged_at`; the merge commit is dated 15:50:39), on Mustafa's go ("Merge $35", read as #35) after the advisor's APPROVE of 76c35bf | done: plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; revision 2 (0099b3c) adds Mustafa's answers; reviewed once on the final diff (five reviewers, a skeptic per finding: 30 of 31 upheld and fixed); report `docs/reports/2026-11-04-docs-after-kit-v3-1.md`. Its final-review follow-ups are taken by B3 (PR #36) | none |
 | part-b-test (docs only: the kit-v3-1 report's corrections, the advisor's #30 findings 1 and 2, 822aaa4; the PR that TEST-RUN B2 reviewed and merged) | merged: PR #34, 868e165, 2026-11-04 13:35:00 UTC (`merged_at`; the merge commit is dated 13:34:59), by the PR Advisor routine itself with `expectedHeadSha` a432692ff3800b23dc186051b8b1590778183bed | done: TEST-RUN B2, the routine's first unattended merge under the guard (Routines) | none |
 | **v2-decision-drafts** (docs only, symbols +0 −0: ENGINE_OVERVIEW, ADR 0001–0006 Proposed, SPIKE_PLAN, `docs/adr/README.md`, GLOSSARY §8, LOOK_V2.md; plan revisions 3 to 6, each with the advisor's APPROVE with conditions) | merged: PR #33, e4d8b22, 2026-11-03 21:57 UTC, by squash | done: verified against the research, ten domain reviewers on the final diff; the stop answered (2026-11-03): signed off as the basis for the spikes, Status Proposed (Decisions pending). Report `docs/reports/2026-11-01-v2-decision-drafts.md` and its appendix (§9: where each answer landed) | none |
 | docs-after-31 (docs only: STATUS and ROADMAP after #31's merge, and the v2 day session's handover) | merged: PR #32, 9e7db28, 2026-10-31 | done | none |
@@ -126,6 +128,29 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Taken by Mustafa, 2026-11-04, B3 on his list** (his design walk and his answers, word for word in B3's report,
+  PR #36; recorded in LOOP_V2 §2, §4–§5, §7, §8, §10, §13 and UNITS.md §0, each line tagged `[DECIDED]` or `[IDEA]`):
+  - The walk: looting keeps the class ability; spawn protection 3 s, firing ends it early; ammo limited but generous,
+    refilled at the barracks and supply points; rejoining keeps amp tracks, bots loot weapons and pick amps; amps on
+    weapons only, no class perks; gentle active reload on every gun; a sprint-to-fire delay; amp cards picked with
+    Alt+1/2/3 (fallback hold B + 1/2/3); the Molotov a fire patch; the tier-one amp ladders (first sketch); factions
+    shared at tier one, differing with tech; infiltrators at tier two in every faction. Ideas, not decided: the
+    faction vehicles and specialists, weapon weight setting speed. Open: the war around the matches, in its own
+    design session.
+  - B3-Q1 (c): "unit by unit when I write the unit list, with two fixed rules: every faction has an anti-vehicle
+    answer from tech 1; and a role every faction has (anti-vehicle, infiltration) shares one core with a faction twist
+    on top, like the infiltrators." (Today the only listed anti-vehicle unit, the Javelin, is Tech 2: noted for his
+    unit list, LOOP_V2 §5.)
+  - B3-Q2 (a): "Account progression gives class variants and cosmetics only. New classes come through the team's tech
+    in the match, so nobody is ever missing a counter."
+  - B3-Q3: "(i) no new building: the HQ holds the team's tech, so infiltrating the HQ steals tech; "cuts their power"
+    works like a destroyed power plant for a set time. (ii) a short window on a fresh body, no downed state; the
+    reveal shows only that enemy's team."
+  - What it changes below (pointers only; the drafts take it up at their next revision): UPGRADE-SCOPE's "every unit
+    and every weapon" track now holds for weapons only; the ammo lean (OQ-0005-AB2) and "Firing ends it early"
+    (OQ-0005-AB14) are his decisions now; carry slots' "Assumed, to confirm" is confirmed; faction asymmetry is
+    answered in part. Counts unchanged: 118 numbered open questions, 98 open [verified: `docs/adr/README.md` line 23,
+    not in B3's diff].
 - **Taken by Mustafa, 2026-11-04** (his words: `docs/reports/2026-11-04-docs-after-kit-v3-1.md`, "Mustafa's words"):
   - The routine shell list names `date` (CLAUDE.md, "Models and effort"; the guard already allows it,
     `routine-guard.mjs:446`).
@@ -147,7 +172,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     servers and player pool; the door kept open, not designed. His rule: the client must keep working inside a
     third-party iframe, so the boundary spike may pick a design that needs cross-origin isolation only if a
     non-isolated fallback stays available.
-  - Counts after this pass: 118 numbered open questions, 98 open (`docs/adr/README.md`; the headings counted: 9 in
+  - Counts after PR #35: 118 numbered open questions, 98 open (`docs/adr/README.md`; the headings counted: 9 in
     ADR 0002, 23 in ADR 0006).
 - **Taken by Mustafa and the Advisor at the stop, 2026-11-03** (about 12:28, in the decision-drafts session's chat;
   whose each answer is follows his message's marks; the words in full: the appendix
@@ -227,9 +252,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
     ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.
   - Counts then: 116 numbered open questions, 96 open; pass marks 341.
-- **Follow-ups:** TOY-BOX's small kit change-set (now kit-v3-2, A2 on Mustafa's list: Phase, Queue), with the checkpoint anti-waste rules
-  (Mustafa, 2026-11-03); LATER's design session after the netcode proof test, with the twelve LATER questions and the
-  38 design questions on its agenda (the advisor's ruling).
+- **Follow-ups:** TOY-BOX's small kit change-set (now kit-v3-2, A2 on Mustafa's list: Phase, Queue), with the
+  checkpoint anti-waste rules (Mustafa, 2026-11-03); LATER's design session after the netcode proof test, with the
+  twelve LATER questions and the 38 design questions on its agenda (the advisor's ruling).
 - **Taken by Mustafa 2026-10-31, about 18:41 (in the decision-drafts session's chat, session_0173vVo6CEsV7ckERUa6TtEd;
   it replaces the drafts brief's upgrade note), in his words:**
   > UPGRADE-SCOPE, a settled input for ADR 0005 (record it in STATUS with today's decisions):
@@ -389,18 +414,23 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   evidence first via the build spike
 - **ADR-003 Three.js version** (stay on r128 vs upgrade): deferred until after ADR-002
 - **Design: progression:** LOOP_V2 §8 now settles the shape: team tech tiers in the match; Service points plus
-  WARDOGS-style three-gate unlocks on the account; the unlock catalogue is [LATER]. Affects what the server must persist
+  WARDOGS-style three-gate unlocks on the account; the unlock catalogue is [LATER]; since 2026-11-04 the account gives
+  class variants and cosmetics only (B3-Q2 (a)) [verified: LOOP_V2 §8]. Affects what the server must persist
 - **Three-teams plan: APPROVED** with D1-D16 plus three tweaks: D6 (the 200 HP Empire elite leaves the bot roster, done in 3a [verified: `spawnEnemyMesh(_fac,false)`, `elite:false`]; its kit code
   stays for a possible Tier 3 or hero unit), D11 (your own HQ down = you lose; the win and loss rules stay placeholders until
   win-and-scoring) and DM_Tri (`?map=tri` follows LOOP_V2 §9's 6 m gap rule and gets the bot reachability check)
-- **LOOP_V2 [OPEN] items:** Spy cost and rules (tech or money, disguise break, hack time, steal amount, warning);
+- **LOOP_V2 [OPEN] items:** the infiltrators' cost (tech or money) and the Spy's rules (disguise break, hack time,
+  steal amount, warning) [verified: LOOP_V2 §5];
   aiming at height with ledges (decide in octopon-3-greybox); Octopon-3 map size (start near Cabana, adjust with the scale test)
 
 ## Routines
-_Read with the routines API (list_triggers) on 2026-11-04 at about 14:02 UTC by the docs-after-kit-v3-1 session
-(session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right before this pass's final
-commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`, `SHAMBLE_ROLE=pr-advisor`)
-under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since 2026-10-31._
+_Read with the routines API (list_triggers) on 2026-11-04 at 14:03 UTC (the first read after the un-pause) by the
+docs-after-kit-v3-1 session (session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right
+before PR #35's final commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`,
+`SHAMBLE_ROLE=pr-advisor`) under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since
+2026-10-31. The next proof of the routine rules: the PR Advisor's first scheduled run (2026-11-04 18:45 UTC) and the
+night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); neither had run when B3's docs pass was written
+(16:10 UTC), so nothing is recorded from them yet._
 - **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh): `CRON_TZ=Europe/Amsterdam 10 0-7
   * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt. Its first night
   under the guard starts 2026-11-05 00:10 Amsterdam. Under the guard it never reads the web; research runs in the
@@ -427,7 +457,7 @@ under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, sinc
     and the gate job logs; review comment 6632017016 naming the full head, label `ready-to-merge`, head and checks
     re-checked at 13:34:46, merged at 13:35:00 as 868e165 with `expectedHeadSha` a432692…; no permission prompt; all 7
     `permission_denials` are guard refusals (`echo`, `ls`, 4 × `actions_get`, `git rev-list`).
-- **"Guard test B1"** (trig_01XmLByUmTibCu5XXQR7iN26): deleted by Mustafa (gone from the 14:02, 14:36 and 14:47
+- **"Guard test B1"** (trig_01XmLByUmTibCu5XXQR7iN26): deleted by Mustafa (gone from the 14:03, 14:36 and 14:47
   listings).
 - **Old "Night shift"** (trig_019LtRqmAdzddyk6K3e3kDJz, one persistent session): stays disabled until it is deleted;
   Mustafa deletes it after one good night of the new routine (deleting it also deletes its session).
