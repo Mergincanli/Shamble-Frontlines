@@ -8,9 +8,70 @@
   commits marked `[skip ci]`.
 - **Started:** 2026-11-04, after TEST-RUN part B passed (B1: Mustafa, 13:20 UTC; B2: the PR Advisor's "Run now",
   13:26:48–13:35:54 UTC, checked row by row from its transcript, session_0173vVo7uY6BfxLBnYjEBJLV).
-- **Current step:** 1. Plan revision 1 is written. Next: the advisor's review. It runs as a general agent reading
-  main's `.claude/agents/advisor.md`, because this session started before that file last changed (PR #30) and this
-  branch changes it.
+- **Current step:** 2, the build. Plan revision 1 (381471d) got the advisor's **APPROVE with 16 conditions** (its words in
+  `.checkpoints/docs-after-kit-v3-1/advisor-plan-rev1.md`); with Mustafa's answers below they make plan revision 2. The
+  advisor checks the conditions on the final diff (no second plan round).
+
+## Mustafa's answers (2026-11-04, after plan revision 1), word for word
+- "KIT-FOLLOWUPS: (a), a small A3 right after A2 for the guard's follow-ups: ask before kit and gate edits in day
+  sessions; the sk- key after %20, %2C or %3A; and read-only GitHub Actions tools (such as actions_get) for pr-advisor,
+  which B2 showed it needs for CI details. security-auditor reviews A3. GitHub secret scanning and push protection are
+  now on."
+- "ROUTINE-EFFORT: (a). The PR Advisor at max is my deliberate choice (quality over cost), so it stays. The question is
+  only whether the night shift really runs at Extra, as its routine says, and what controls that."
+- "Part B accepted as passed. The PR Advisor routine is un-paused (07:45, 13:45, 19:45), and the Guard test B1 routine
+  is deleted."
+- Earlier the same day: "TEST-RUN B2 passed … Docs pass: record parts A and B and #34's merge."
+
+## Plan revision 2: what changes from revision 1
+- **Names (conditions 1 and 16):** the effort question is EFFORT-SOURCE (ROUTINE-EFFORT is the Advisor's decided code of
+  2026-10-25, STATUS line 334); his read-only Actions item belongs to **A3, the guard's follow-ups** (his KIT-FOLLOWUPS
+  answer), never "A2". In this file A1/A2 below still mean the CLAUDE.md and advisor.md edits.
+- **EFFORT-SOURCE, answered with evidence (2026-11-04):**
+  - the night shift's last run (06:11 UTC, session_0173vVo8bhZGeK4bVFXQQEtM) has `session_context.effort_level: "xhigh"`,
+    its page's "Extra" (Mustafa);
+  - TEST-RUN B2 (session_0173vVo7uY6BfxLBnYjEBJLV) has `effort_level: "max"`, his choice;
+  - this day session (session_0173vVo7FcYUpbWgRW8oQyHU): record `effort_level: "max"`, `flag_settings.effortLevel: "max"`;
+    its launch log `/tmp/env-manager.log` "Added gateway arg to command" (flag `--effort`); `/tmp/claude-command` and
+    `/tmp/claude-code.log` read `--effort max`; `CLAUDE_EFFORT=max`.
+  - So the effort is the one set on the routine (or session), passed by the cloud harness as `--effort`; neither run
+    used `.claude/settings.json`'s `high`. Tonight's first night-shift run (00:10) is the next record to read.
+- **A1 (CLAUDE.md):** the effort sentence says the above, without a general precedence rule (condition 2); the shell
+  list adds `date` and "(the PR Advisor runs no program at all)" and no longer claims to match the guard, which also
+  allows python on main's tracked scripts for the night shift (condition 4: a gap for A3's plan); the trigger sentence
+  gives the known reason only (condition 3): "so every run starts on main's rules; a pull-request start could load the
+  PR head's settings and hooks before step 0 switches to main"; one wording everywhere: it has a schedule trigger only,
+  can also be started by hand ("Run now", as B2 was) or through the API, and never by pull-request events.
+- **A2 (advisor.md):** known limits name every `actions_*` tool (B2 met `actions_get` four times; the read pattern
+  `^(get_|list_|search_)|_read$` refuses `actions_list` too) and hold until A3 decides; "Your notes" fixed (no file
+  tool in a routine's shell; the routine's session writes notes with Write under `.checkpoints/`; the advisor agent has
+  no Write tool, so as a routine's subagent it returns its notes in its report; a known limit for A3); the heading says
+  what the stored prompt says ("every open pull request …, oldest first"), as "every open PR that step 1 does not skip,
+  oldest first" (condition 5).
+- **C (PORTAL-EMBED):** "web portal", never a bare "portal" (condition 8); ADR 0002 says one thing in four places: part 5
+  (the new sentence and "flips everywhere at once" qualified), the failure-mode bullet (lines 1486–1489) and OQ-0002-4
+  option (b) (line 1023), each with a short qualifier pointing at OQ-0002-9 and nothing on how a fallback is built
+  (condition 6); OQ-0002-9 marks the widening to B3, C2 and W3 as the advisor's reading and records W3's one
+  consequence (W2 is its only non-isolated fallback; if W2 fails its jitter mark, the question returns to Mustafa with
+  the spike's numbers) (condition 7); OQ-0006-23 also names OQ-0006-3 and OQ-0006-15, with no storage or cookie claims
+  (condition 9); C5 and C6 cite OQ-0002-9 rather than restate the rule.
+- **B (STATUS, ROADMAP):** the API state as read, with its time (condition 15: PR Advisor `enabled: true`, updated
+  14:01:31 UTC, next run 18:45 UTC; "Guard test B1" gone; read 2026-11-04 about 14:02 UTC, re-read before the last docs
+  commit); KIT-FOLLOWUPS (a) and A3's list (his three items, plus three B2 found for A3's plan to weigh: `git rev-list`,
+  the python gap, the advisor agent's notes without Write); EFFORT-SOURCE's answer; one line next to ROUTINE-EFFORT (b):
+  its premise (a routine's main session at medium) no longer holds, the (b) rule stays (condition 1); one clause that
+  V2_PHASE0_BRIEF §3 step 2 ("effort high", "Keep its triggers") is outdated by the 2026-11-04 facts and rulings, the
+  brief not edited (condition 10).
+- **D:** D1 names each run and extends the correction note "(PR #34; PR #35: the second run's times)" (condition 13);
+  D2 is in, dated, citing NIGHT_SHIFT.md lines 2–3 and 16 (condition 14).
+- **Agents (condition 11):** all Opus 5.5; engine-architect xhigh (frontmatter); infra-engineer passed `effort: "xhigh"`
+  (ADR text); docs-keeper, security-auditor and the verifier high (frontmatter). docs-keeper edits B in its own
+  worktree (CLAUDE.md: parallel implementation only in isolated worktrees), merged here after.
+- **Gate (condition 12):** `npm ci` in `tools/` in this worktree (GATE-SETUP (a) precedent), then
+  `node tools/gate.mjs --no-smoke` PASS with symbols +0 −0; smoke from CI.
+
+## Step log
+1. Plan revision 1, 381471d; the advisor's APPROVE with 16 conditions (2026-11-04 ~14:00 UTC).
 
 ## Goal
 Bring the rules and docs in line with what happened since PR #33:
