@@ -28,7 +28,13 @@
   agents at a time. The first run (wf_d8f3b3e4-0f7) was stopped a few minutes in, to widen it to items 4 and 5;
   it resumes from the readers' notes. The resumed run (23:13 UTC) failed in full on the org's usage limit ("monthly
   spend limit"; the 5-hour limit reset at 23:50 UTC): no agent finished; reader-secrets had done blocks 1-2 and
-  reader-askfirst its plan. Resumed again after the reset, with a stop after any failed stage.
+  reader-askfirst its plan. Resumed again after the reset, with a stop after any failed stage. That run (23:53 UTC)
+  finished the three readers (notes end with DONE; their results are in the workflow's journal) and was cut by a
+  container restart at ~00:10 UTC while the planner wrote plan-rev1.md (its notes: block 8 not marked done).
+  Resumed again: the readers replay from the journal; the planner redoes block 8, written over.
+  reader-secrets's test harnesses are in `.gate/kit-v3-3/` (gitignored), not the notes folder: the reader brief said
+  so, against CHECKPOINTS.md §4; the build moves their cases into checkpoint.test.mjs, with test strings split so
+  the repo's own secret check does not match the source.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
