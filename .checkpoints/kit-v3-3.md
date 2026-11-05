@@ -46,9 +46,18 @@
     A second automated review of 2e82216 (`security-review-auto-2.md`): findings 5 (CDPATH set in the line) and 6
     (a switch target read as its branch), fixed in step 4c: bbcb96b. Docs-keeper's step 8 pass: 442fbf7. Full
     gate with smoke PASS (`gate-step8.md`); tests 555/555; CI green on 2e82216.
-  - Now: the reviews on 442fbf7 (wf_f5f87ff2-e86): security-auditor and the verifier, then a skeptic per finding.
-  - Next: fixes, then a fix check of only what changed; step 9 (WT-NIGHT) waits for Mustafa; step 10 (the report,
-    ready, the advisor's final review, needs-mustafa, his go).
+  - Done: the reviews on 442fbf7 (wf_f5f87ff2-e86, a3dfef2): security-auditor FAIL on SA-1 (a regression from S-4:
+    a lost folder checked relative writes against the project folder); SA-2 (origin/main forgeable; on main
+    already); SA-3, SA-4 minor; nits SA-5 to SA-10. The verifier PASS WITH NOTES (E1-E9 pass); F-b minor; nits F-c,
+    N-1 to N-3. Skeptics: SA-1 to SA-4 and F-b upheld, F-a refuted. A third automated review (bbcb96b): findings 7
+    and 8 (`security-review-auto-3.md`).
+  - The advisor's fix-round ruling (`advisor-fix-round.md`): PROCEED. The cd tracking redesigned by construction
+    (R-a to R-e: an unknown folder makes both checks ask); SA-2's routine half fixed in A3; F-b, SA-5, SA-6, SA-8
+    fixed; limits L1, L4, L9 widened and L12-L15 added; follow-ups listed; PC-SETUP gains question (4).
+  - Now: the fix round (wf_9120ac05-de5): builder-fix1 (the cd redesign), builder-fix2 (SA-2 and the small
+    fixes, the full gate), docs-keeper (the limits and follow-ups).
+  - Next: commit; the automated review of the fix commit; security-auditor and the verifier on the fix diff only;
+    step 9 (WT-NIGHT) after Mustafa's answer; step 10 (the report, ready, the advisor's final review).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 - **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
   org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.
