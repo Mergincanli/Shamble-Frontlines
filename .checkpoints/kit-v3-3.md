@@ -110,6 +110,11 @@
   - Now: the same workflow resumed with Day C rewritten (D-ASK, P3-7, C-PLAIN rerun, no-looser diff, movers, full gate;
     notes `builder-pass3-day2.md`) and docs-keeper's brief updated (his words, D-ASK, L16, FU-P3a, the kit freeze);
     then the gate and commits; then pass 4.
+  - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
+    until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
+    scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor
+    principle) go into EDITOR_V2 with the plan view, marked as he marked them. A3's final docs pass copies both into
+    STATUS's "Queued, in Mustafa's words". After A3: B.1, then B.2 (docs, each its own change-set, plan first).
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
