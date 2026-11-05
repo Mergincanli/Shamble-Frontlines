@@ -29,8 +29,13 @@
   - E10 (`e10-docs.md`): the core claims confirmed verbatim; five wording contradictions stopped the build (C1).
   - The advisor's E10 ruling (`advisor-e10.md`): PROCEED with E10-1 to E10-9; `memory: local` kept; PC-SETUP (three
     information questions) replaces PC-MODE; WT-NIGHT unchanged, still Mustafa's.
-  - Next: build part 2 (steps 3-5: the guard code), commit; part 3 (steps 6-7: the secret check, the rule texts),
-    commit; then the gate, E1-E9, E11a, the reviews.
+  - Done: plan revision 2 (`plan-rev2.md`: rev 1 + C1-C12 + the E10 ruling, with a condition table in §0); build
+    step 2, docs-keeper (`docs-keeper-step2.md`): STATUS's follow-ups and "Queued, in Mustafa's words" (A4, B.1,
+    B.2; diffed identical), PR #37 marked merged: 93b9a07.
+  - Now: build part 2, workflow wf_99ae356e-07e (steps 3-5, the guard code; one builder per step;
+    `builder-step3.md` to `builder-step5.md`).
+  - Next: commit part 2; part 3 (steps 6-7: the secret check, the rule texts), commit; step 8 (gate, E1-E7, E9,
+    E11a, docs-keeper, security-auditor and the verifier, fixes); step 9 (WT-NIGHT) waits for Mustafa.
   - Plan revision 1, with the critic's points folded in: `plan-rev1.md` (the draft before the critic:
     `plan-rev1-draft.md`; the critic's notes: `critic.md`; the reviser's: `reviser.md`).
   - The advisor's verdict: APPROVE with conditions C1-C12 (`advisor-plan-rev1.md`, 2026-11-05 ~00:40 UTC). Two
