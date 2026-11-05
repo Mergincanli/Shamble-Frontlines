@@ -19,3 +19,15 @@ APIs, WebSocket upgrades, client-mTLS, certificate-pinned clients ..., non-443 H
 What it can do: HTTPS (443) to public hosts, through the egress gateway, which re-terminates TLS. So it cannot be a
 WebSocket or WebTransport client of the test servers either (WebSocket upgrades unsupported; QUIC is UDP).
 Not yet done: the same probe against the real RS/LG on a run day (only if Mustafa wants it confirmed on a real VM).
+
+## Second pass (2026-11-05 21:45 UTC): HTTPS breadth and the domain
+| Probe | Result |
+|---|---|
+| HTTPS to unrelated public hosts (nasa.gov, ikea.com, bbc.co.uk, rust-lang.org, docs.hetzner.com) | 200 / 301: the policy lets this session read any public HTTPS host on 443 |
+| Let's Encrypt ACME directory (`acme-v02.api.letsencrypt.org/directory`) | 200 |
+| `shamblefrontlines.com` over DNS-over-HTTPS (cloudflare-dns.com) | NS = cora.ns.cloudflare.com, steven.ns.cloudflare.com; A, AAAA, CAA: none (only the SOA). So the earlier 502 is "no address yet", not a policy denial |
+
+**Reading for the route:** a test host with a browser-trusted certificate on TCP 443 (for example `https://<host>.shamblefrontlines.com/`)
+would be readable by this session through the gateway (the gateway re-terminates TLS and checks the host's certificate,
+so a self-signed one would fail). That makes "the VM publishes its results over HTTPS and this session reads them" a
+possible route, alongside cloud-init and Claude Code on Mustafa's PC.

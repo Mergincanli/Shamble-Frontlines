@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (to write)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-05 22:35 Amsterdam
+- **Last update:** 2026-11-05 22:40 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -39,4 +39,8 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- (none yet)
+- Workflow `wf_1ae38d53-da9` (npt-plan-digests: 3 digest agents, xhigh) · script as launched:
+  `.checkpoints/netcode-proof-test/npt-plan-digests-run1.js` (no args) · notes: `.checkpoints/netcode-proof-test/` ·
+  launched 22:38 · running. Resume: Workflow({scriptPath: <that copy>, resumeFromRunId: "wf_1ae38d53-da9"}).
+- Saver: background task `btpf0ptzw` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/btpf0ptzw.output`
+  · started 22:37 · stops by 00:27 (110 min) · last check 22:40: started.
