@@ -1,0 +1,44 @@
+// skeptic SD-2 probe (kit-v3-3, ed3ea8c). Real git under the given scratch dir; prints row labels and decision kinds only.
+// usage: node skeptic-sd2-probe.mjs <a3 worktree> <scratch dir>
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, rmSync, writeFileSync, existsSync, copyFileSync, realpathSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+const [wt, scratch] = process.argv.slice(2);
+const root = join(scratch, 'sd2'); rmSync(root, { recursive: true, force: true }); mkdirSync(root, { recursive: true });
+const R = realpathSync(root), O = join(R, 'o.git'), P = join(R, 'proj');
+const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+delete env.SHAMBLE_ROLE;
+const g = (...a) => spawnSync('git', a, { cwd: P, env, encoding: 'utf8' });
+spawnSync('git', ['init', '-q', '--bare', '-b', 'main', O], { env });
+mkdirSync(join(P, '.claude', 'hooks'), { recursive: true }); mkdirSync(join(P, 'docs'), { recursive: true });
+writeFileSync(join(P, 'CLAUDE.md'), 'rules\n');
+writeFileSync(join(P, '.claude', 'settings.json'), '{"a":1}\n');
+for (const f of ['guard.mjs', 'routine-guard.mjs']) copyFileSync(join(wt, '.claude', 'hooks', f), join(P, '.claude', 'hooks', f));
+g('init', '-q', '-b', 'main'); g('add', '-A'); g('commit', '-q', '-m', 'base'); g('remote', 'add', 'origin', O); g('push', '-q', 'origin', 'main'); g('fetch', '-q', 'origin');
+const mk = (name, edit) => { g('switch', '-q', '-c', name, 'origin/main'); edit(); g('add', '-A'); g('commit', '-q', '-m', name); g('switch', '-q', 'main'); };
+mk('cs/ren', () => g('mv', '.claude/hooks/routine-guard.mjs', 'docs/old-guard.mjs'));
+mk('cs/del', () => g('rm', '-q', '.claude/hooks/routine-guard.mjs'));
+mk('cs/ren2', () => g('mv', 'CLAUDE.md', 'docs/CLAUDE-old.md'));
+const { decide, realIo } = await import(pathToFileURL(join(wt, '.claude', 'hooks', 'routine-guard.mjs')).href);
+process.env.CLAUDE_PROJECT_DIR = P;
+const kind = (d) => (d ? (d.ask !== undefined && d.deny === undefined ? 'ask' : 'deny') : 'null');
+const run = async (role, command) => kind(await decide({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command }, cwd: P }, { ...realIo(), env: role ? { SHAMBLE_ROLE: role } : {} }));
+console.log('day git switch cs/del (control, deletes guard):', await run('', 'git switch cs/del'));
+console.log('day git switch cs/ren (renames guard away):', await run('', 'git switch cs/ren'));
+console.log('day git switch cs/ren2 (renames CLAUDE.md away):', await run('', 'git switch cs/ren2'));
+console.log('day git switch --detach cs/ren:', await run('', 'git switch --detach cs/ren'));
+console.log('raw name-only main..cs/ren:', JSON.stringify(g('diff', '--name-only', 'refs/remotes/origin/main', 'cs/ren', '--').stdout));
+console.log('fixed name-only -z --no-renames --no-relative:', JSON.stringify(g('diff', '--name-only', '-z', '--no-renames', '--no-relative', 'refs/remotes/origin/main', 'cs/ren', '--').stdout));
+// end to end: switch for real, then run the settings.json bootstrap on a day kit write
+g('switch', '-q', 'cs/ren');
+console.log('after switch, routine-guard.mjs exists:', existsSync(join(P, '.claude', 'hooks', 'routine-guard.mjs')));
+const boot = "process.on('beforeExit',function(){if(process.env.SHAMBLE_ROLE){process.stderr.write('x');process.exit(1)}});import('node:url').then(function(u){return import(u.pathToFileURL(process.argv[1]).href)}).catch(function(e){if(process.env.SHAMBLE_ROLE){process.exit(1)}process.exit(0)})";
+const inp = JSON.stringify({ hook_event_name: 'PreToolUse', tool_name: 'Write', tool_input: { file_path: join(P, 'CLAUDE.md'), content: 'x' }, cwd: P });
+const b = spawnSync('node', ['-e', boot, join(P, '.claude', 'hooks', 'guard.mjs')], { input: inp, env: { ...env, CLAUDE_PROJECT_DIR: P }, encoding: 'utf8' });
+console.log('day Write CLAUDE.md after switch: exit', b.status, 'stdout bytes', b.stdout.length);
+g('switch', '-q', 'main');
+const b2 = spawnSync('node', ['-e', boot, join(P, '.claude', 'hooks', 'guard.mjs')], { input: inp, env: { ...env, CLAUDE_PROJECT_DIR: P }, encoding: 'utf8' });
+console.log('control on main, day Write CLAUDE.md: exit', b2.status, 'decision', (JSON.parse(b2.stdout || '{}').hookSpecificOutput || {}).permissionDecision);
+console.log('git', spawnSync('git', ['--version'], { encoding: 'utf8' }).stdout.trim());
+rmSync(root, { recursive: true, force: true });

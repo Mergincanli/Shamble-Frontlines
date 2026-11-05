@@ -1,0 +1,12 @@
+git git version 2.43.0
+S0 control: switch cs/evil, no tag: DENY - routine (night-shift): cs/evil's rules, CI or gate files differ from main's (.claude/settings.json);
+S1 control: switch cs/ok, no tag: allow
+push tag to origin: 0
+F1 guard on plain fetch: allow
+  real plain fetch exit 0; tag present after plain fetch: true
+F2 guard on fetch --tags: allow
+  tag present: true; local branch cs/evil: false
+  rev-parse refs/heads/cs/evil^{commit} = ok (the tag)
+S2 guard on switch cs/evil, tag present: allow
+  real switch exit 0; HEAD = evil commit; changes vs origin/main: .claude/settings.json
+fix check: show-ref --verify refs/heads/cs/evil exit 128 (no branch); refs/remotes/origin/cs/evil = evil

@@ -1,0 +1,18 @@
+git git version 2.43.0 | bash GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+bash GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+C0 switch in main folder [day]: ASK - the main folder stays on main's reviewed rules: git switch would move it (cs/evil's .claud
+C1 cd <wt> && switch [day]: allow
+C1b cd <wt>; cd <proj>; switch [day]: ASK - the main folder stays on main's reviewed rules: git switch would move it (cs/evil's .claud
+C1c cd <wt>; true; cd <proj>; switch [day]: ASK - the main folder stays on main's reviewed rules: git switch would move it (cs/evil's .claud
+P1a function f { [day]: allow
+  bash P1a: ends in <base>/proj
+P1a2 function f newline [day]: ASK - the main folder stays on main's reviewed rules: git switch would move it (cs/evil's .claud
+P1a3 f () { (space) [day]: ASK - the main folder stays on main's reviewed rules: git switch would move it (cs/evil's .claud
+P1b trap DEBUG [day]: allow
+  bash P1b: ends in <base>/proj
+P1c alias [day]: allow
+  bash P1c: ends in <base>/proj
+P1d cd /; function; echo > CLAUDE.md [day]: allow
+P1e cd /; trap; echo > CLAUDE.md [day]: allow
+P1f control f() { [day]: ASK - kit and gate files ask first in a day session: a redirect writes CLAUDE.md after a cd the 
+P1g agent cd /; function; echo > CLAUDE.md [day]: allow

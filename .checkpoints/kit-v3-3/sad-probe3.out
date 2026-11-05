@@ -1,0 +1,27 @@
+SA-1 | (cd .claude && sed -i s/a/b/ settings.json) -> ask
+SA-1 | cd .claude && sed -i s/a/b/ settings.json && git status | cat -> ask
+R-b | cd .claude && echo x > settings.json -> ask
+R-b | cd <R>/proj/.claude && echo x > settings.json -> ask
+R-b control | cd <R>/proj/docs && echo x > a.md -> null
+R-e | source /dev/null; echo x > CLAUDE.md -> ask
+SA-5 | sed --in-pla=.b s/a/b/ CLAUDE.md -> ask
+SA-5 | sed -s -i s/a/b/ CLAUDE.md -> ask
+SA-5 | sed -E -i'' -es/a/b/ CLAUDE.md -> ask
+SA-5 | sed --expr s/a/b/ -i CLAUDE.md -> ask
+SA-8 | export GIT_DIR=/x; git status -> ask
+SA-8 | env GIT_WORK_TREE=/x git status -> ask
+SA-8 | declare -x GIT_INDEX_FILE=/x; git add a -> ask
+F-b | git worktree add .claude/wt -> ask
+F-b | git worktree add --lock --reason r -b cs/q .claude/wt2 -> ask
+F-b | git clone <R>/proj tools/x -> null
+F-b | git clone <R>/proj .claude -> ask
+F-b control | git clone <R>/proj <R>/elsewhere -> null
+SA-6 | rm -rf docs -> ask
+SA-6 | rm -rf <R> -> ask
+SA-6 | mv docs /tmp/ -> ask
+SA-6 control | rm -rf docs/a.md -> null
+C7 glob | sed -i 's/a/b/' *.md -> ask
+C7 glob | rm -f CLAUDE.m? -> ask
+C7 glob | cp docs/a.md .claud?/settings.json -> ask
+C7 brace | tee CLAUDE.{md,x} < docs/a.md -> ask
+C7 quoted control | sed -i 's/a/b/' 'CLAUDE.md' -> ask
