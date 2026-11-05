@@ -1,0 +1,50 @@
+- **kit-v3-3** (A3, PR #38, a draft; built except WT-NIGHT; KIT-FOLLOWUPS (a), Decisions pending; security-auditor
+  reviews it). What it closes, once merged (In flight has the steps and commits):
+  1. Asking before kit and gate edits: routines had it since #30; day sessions now ask too (file tools and shell
+     writes), and an agent's or teammate's kit edit is refused [verified: `routine-guard.mjs:525`, `:600`, `:655`].
+  2. The URL-escaped secret gap: the saver's `sk-`, AWS and Slack patterns now accept a key behind `%XX` and other
+     escapes [verified: `checkpoint.mjs:29-40`]; before A3 only `%3D` worked (main's `checkpoint.mjs:30`). Anthropic
+     `sk-ant-` keys were already caught. GitHub secret scanning and push protection are on (Mustafa).
+  3. Read-only GitHub Actions tools for pr-advisor: `actions_get` (get_workflow, get_workflow_run, get_workflow_job,
+     get_workflow_run_usage) and `actions_list` (its four list methods), this repository only; the night shift and
+     every other method stay refused [verified: `routine-guard.mjs:920-943`]. Until A3 merges, routines run main's
+     guard, whose read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool (`routine-guard.mjs:594`), so
+     the PR Advisor reads CI from the PR's check runs and the jobs' logs.
+  Also: `git rev-list` for routines and `--output` refused for rev-list, diff, log and show [verified:
+  `routine-guard.mjs:259`, `:282`, `:286`]; the docs and the guard's refusals name python beside node (`:669`); the
+  advisor's tools reworded (E10-2: `memory: local` also turns on Read, Write and Edit, `advisor.md:8`, `:155`).
+  **Stated limits** (plan revision 2 §2; the ask is a seatbelt in a watched session, not a wall: the PR review and
+  Mustafa's go remain the wall):
+  - L1, scripts: a `node`/`python` script and inline code (`node -e`, `python -c`) are not inspected, so a kit edit
+    made by a script gets no ask (`node .gate/*.mjs|*.js` runs without a prompt, `settings.json:49-50`).
+  - L2, other writers: `install`, `dd of=`, `git config --file`, `git format-patch -o`, `git archive -o`,
+    `find -exec`/`-delete`, `xargs`, `patch`, `tar`/`unzip` extraction, `perl -pi` with other bundled flags; paths
+    built at run time.
+  - L3, user settings: `~/.claude/settings.json` and `settings.local.json` (where `disableAllHooks` would switch the
+    guard off) are not kit paths for the day ask.
+  - L4, patch-applying commands: `git cherry-pick`, `am`, `apply`, `revert`, `read-tree -u`, `stash apply|pop`, in any
+    folder, the main folder included.
+  - L5, auto mode and `.claude/` (E10-1): Claude Code's own classifier may refuse a `.claude/` edit before the prompt;
+    if it approves, the call "normally still goes to the prompt" (hooks page). Never a silent edit; make such edits in
+    Accept edits or Manual mode.
+  - L6, the advisor's memory tools (E10-2): `memory: local` gives the advisor Write and Edit, which the page does not
+    limit to its memory folder; the guard holds it in routines (pr-advisor writes only `.checkpoints/`, `.gate/` and
+    agent memory) and refuses its kit edits in day sessions, but in a cloud day session its Write to a game file runs
+    without a prompt (cloud sessions pre-approve file edits): only its own rules stop it (`advisor.md:168`).
+  - L7, mods (E10-4): a mod that handles `tool.check` answers after the PreToolUse hooks and, without managed settings
+    or a Team or Enterprise login, can approve a call a hook blocked or would ask for (permissions page). The guard
+    cannot see or stop this, day ask and routine guard alike; mainly the PC (PC-SETUP, Decisions pending).
+  - L8, sessions without repository hooks (E10-5): a cloud thread in a project, or a cloud session with several
+    repositories, loads none of the repository's hooks (settings page, "Settings in cloud sessions"): no day ask, no
+    routine guard. So each routine is one repository outside a project (Routines; CLAUDE.md:140).
+  - L9, Windows Git Bash `/c/…` spellings of a path.
+  - L10, routines may still read other repositories through `search_*`, `get_job_logs` and `gh … -R/--repo`; only the
+    new Actions reads are scoped to this repository (follow-up F4).
+  - L11, worktrees other than the main folder: the main-folder checks do not apply there; the kit-edit ask does.
+  - E11a (`.checkpoints/kit-v3-3/e11a.md`, a nested `claude -p` in the worktree): the ask stopped a Write to a kit file
+    outside Claude Code's protected paths (`docs/probe/CLAUDE.md`) in default, acceptEdits and auto modes; an
+    untrusted workspace ignored the project's 145 allow entries but still ran its hooks. Not shown: a real prompt
+    reaching Mustafa, a cloud session, his PC (E11 after merge).
+  - Also (plan revision 2 §9): a day session reloads changed settings, so a `.claude/settings.json` write that slips
+    past the ask (L1-L4) applies at once (E10-3); a guard error in a day session is "no decision", so no ask
+    (`guard.mjs`); kit change-sets now prompt at every kit edit in day sessions.

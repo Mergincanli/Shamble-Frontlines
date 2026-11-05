@@ -1,0 +1,12 @@
+git git version 2.43.0; origin/main f6f9005, tag dup f6f9005, branch dup 0fd2e31, short name dup reads f6f9005
+base 546d5a7: git switch dup -> goes on
+base 546d5a7: git switch --detach dup -> goes on
+base 546d5a7: git switch main -> goes on
+step 4c: git switch dup -> ask: the main folder stays on main's reviewed rules: git switch would move it (the guard can't compare dup with origin/main (
+step 4c: git switch --detach dup -> goes on
+step 4c: git switch main -> goes on
+git switch dup lands on 0fd2e31 (the branch is 0fd2e31)
+bash in here/: cd w2 && pwd -> <p>/here/w2
+bash in here/: CDPATH=<p>/elsewhere cd w2 >/dev/null && pwd -> <p>/elsewhere/w2
+bash in here/: export CDPATH=<p>/elsewhere; cd w2 >/dev/null && pwd -> <p>/elsewhere/w2
+bash in here/: export CDPATH=<p>/elsewhere; cd ./w2 && pwd -> <p>/here/w2
