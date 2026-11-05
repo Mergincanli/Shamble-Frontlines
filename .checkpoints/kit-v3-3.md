@@ -36,6 +36,8 @@
   so, against CHECKPOINTS.md §4; the build moves their cases into checkpoint.test.mjs, with test strings split so
   the repo's own secret check does not match the source.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
+- **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
+  org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.
 
 ## Next steps
 1. Plan revision 1; the advisor's plan review (a general agent reading main's advisor.md).
