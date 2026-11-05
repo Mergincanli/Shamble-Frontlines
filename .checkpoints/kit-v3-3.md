@@ -57,11 +57,15 @@
   - Done: the fix round (wf_9120ac05-de5): the cd tracking by construction (R-a to R-e), SA-2's routine half (plus
     SA-2b, symbolic-ref), F-b, SA-5, SA-6, SA-8: 2acfbbc (notes ee32690); docs-keeper's pass: 22f2480. Tests
     716/716; every mutant killed; gate with smoke PASS.
-  - Now: step 9, WT-NIGHT (a) (wf_d7a5441c-cfa, `builder-step9.md`): switchTargetCheck, the Never exception
-    clause, NIGHT_SHIFT.md:27, CHECKPOINTS.md section 8's night clause, tests T15-T16c and T20.
-  - Next: commit; one delta review (security-auditor and the verifier on 442fbf7..head, skeptics), plus any finding
-    of the automated reviews of 2acfbbc and step 9; fixes; then step 10 (the report, ready, the advisor's
-    final-head review, needs-mustafa, his go).
+  - Done: step 9, WT-NIGHT (a) (wf_d7a5441c-cfa): the night switch check, the Never exception clause, NIGHT_SHIFT.md
+    step 4, CHECKPOINTS.md section 8's night clause: ed3ea8c (notes 3b3b788). Tests 768/768; 13 mutants killed; gate
+    with smoke PASS. Reported only: F9-1 (the existing push and commit checks read plain diff output).
+  - A fourth automated review (2acfbbc): findings 9 (SA-6 reads the index only), 10 (an assembled variable name),
+    11 (git clone's option list) (`security-review-auto-4.md`).
+  - Now: the delta review of 442fbf7..ed3ea8c (wf_8875d77e-6a9): security-auditor and the verifier, then skeptics;
+    findings 9-11 and F9-1 weighed against L1's floor (a deliberate day bypass through inline code is allowed).
+  - Next: the advisor's ruling on the delta findings; the fix pass; a fix check; docs-keeper's final pass; step 10
+    (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
   (thinking about it); an Enterprise login (university); Windows itself (PowerShell), not WSL. So L7 (mods) does not
