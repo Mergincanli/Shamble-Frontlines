@@ -14,10 +14,10 @@
 // refusal for routines and into "no decision" for day sessions (R3c), so a guard bug never locks a day session out of
 // fixing it.
 // io: { env, projectDir, home, git(args, cwd) -> { code, out }, gh(args) -> { code, out }, exists(p), realpath(p),
-//       readFile(p), gitLongOptions(sub) -> string[], platform? }. realIo() builds the real one. Node 22, no
-//       dependencies.
+//       readFile(p), gitLongOptions(sub) -> string[], platform?, isDir?(p) }. realIo() builds the real one (a fake
+//       without isDir answers it with exists). Node 22, no dependencies.
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { accessSync, constants, existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { homedir } from 'node:os';
 
@@ -107,13 +107,22 @@ export function kitPath(p, cwd, io) {
   return prel !== null && protectedFold(prel, io) ? prel : null;
 }
 // A write target that is a folder holding kit files: the worktree's top, .claude, .github or tools, or a folder with a
-// CLAUDE.md in it.
+// CLAUDE.md in it; and (fix round SA-6, by construction) an existing folder that is the project folder's top or an
+// ancestor of it, or whose tracked files (git ls-files -z, run from its worktree's top) name a kit path. If git cannot
+// list them, the folder asks.
 function kitDir(p, cwd, io) {
   const abs = realOf(isAbsolute(p) ? p : resolve(cwd, p), io);
   const g = gitPlace(abs, io);
   const rel = g ? relIn(fold(g.top, io), fold(abs, io)) : null;
   if (rel === '.' || rel === '.claude' || rel === '.github' || rel === 'tools') return rel;
-  return io.exists(join(abs, 'CLAUDE.md')) ? `${p}/CLAUDE.md` : null;
+  if (io.exists(join(abs, 'CLAUDE.md'))) return `${p}/CLAUDE.md`;
+  if (!(io.isDir ? io.isDir(abs) : io.exists(abs))) return null;
+  if (relIn(fold(abs, io), fold(realOf(io.projectDir, io), io)) !== null) return `${p} (it holds the project folder)`;
+  if (!g) return null;
+  const ls = io.git(['ls-files', '-z', '--', relIn(g.top, abs) ?? rel], g.top);
+  if (ls.code !== 0) return `${p} (the guard could not list its files)`;
+  const hit = ls.out.split('\0').find((f) => f && protectedFold(f, io));
+  return hit ? `${p} (it holds ${hit})` : null;
 }
 
 // ---------- shell ----------
@@ -135,7 +144,14 @@ export function parseShell(src) {
       else if (pendingRedirect) { redirects.push(word); pendingRedirect = false; } else argv.push(word);
       word = null;
     };
-    const endCmd = () => { endWord(); if (argv.length || redirects.length || reads.length) cmds.push({ argv, redirects, reads, expand: cmdExpand }); argv = []; redirects = []; reads = []; cmdExpand = false; };
+    // sep: the operator before the command ('||' marks one that runs only when the one before it failed; day cd tracking)
+    let sep = null;
+    const endCmd = (next = ';') => {
+      endWord();
+      if (argv.length || redirects.length || reads.length) { cmds.push({ argv, redirects, reads, expand: cmdExpand, sep }); sep = next; }
+      else if (next === '||' || sep === null) sep = next;
+      argv = []; redirects = []; reads = []; cmdExpand = false;
+    };
     const sub = (open, close) => { // returns index after the matching close
       let depth = 1, j = i + open.length, q = null;
       for (; j < s.length; j++) {
@@ -190,8 +206,8 @@ export function parseShell(src) {
         heredocs.push({ delim: d, strip: dash });
         continue;
       }
-      if (c === '&' && s[i + 1] === '&') { endCmd(); i += 2; continue; }
-      if (c === '|' && s[i + 1] === '|') { endCmd(); i += 2; continue; }
+      if (c === '&' && s[i + 1] === '&') { endCmd('&&'); i += 2; continue; }
+      if (c === '|' && s[i + 1] === '|') { endCmd('||'); i += 2; continue; }
       if (c === '|' || c === '(' || c === ')' || (c === '&' && s[i + 1] !== '>')) forks = true;
       if (c === '|') { endCmd(); i += s[i + 1] === '&' ? 2 : 1; continue; }
       if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }
@@ -224,6 +240,7 @@ export function unwrap(argv) {
   for (let guard = 0; guard < 20 && a.length; guard++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) { a = a.slice(1); continue; }
     const prog = basename(a[0]);
+    if (prog === 'command') { a = a.slice(1); while (/^-[pvV]+$|^--$/.test(a[0] ?? '')) a = a.slice(1); continue; } // fix round R-c
     if (WRAPPERS.has(a[0]) || WRAPPERS.has(prog)) { a = a.slice(1); continue; }
     if (prog === 'env') { a = a.slice(1); while (a.length && (a[0].startsWith('-') || /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0]))) a = a.slice(1); continue; }
     if (prog === 'timeout') { // timeout [-s SIG | -k DUR | --opt[=v]]... DURATION command
@@ -462,6 +479,8 @@ function npmCheck(argv, vcwd, role, io) {
     for (const d of [io.projectDir, join(io.projectDir, 'tools'), io.home]) {
       if (io.exists(join(d, '.npmrc'))) return deny(`routine (night-shift): ${join(d, '.npmrc')} exists; npm config can change what installs`);
     }
+    const shadow = originMainCheck(io.projectDir, io, role); // SA-2
+    if (shadow) return deny(shadow);
     const same = io.git(['diff', '--quiet', 'origin/main', '--', 'tools/package.json', 'tools/package-lock.json'], io.projectDir);
     return same.code === 0 ? null : deny("routine (night-shift): the toolkit's manifest differs from main's; install only main's lockfile");
   }
@@ -473,25 +492,34 @@ async function bash(command, cwd, role, io, input) {
   if (role && subs) return deny(`routine (${role}): no command substitution ($(...), backticks); run the commands one by one`);
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd, dayAsk = null;
-  const dirs = { stack: [], lost: false }; // day sessions: the line's pushd stack (S-4)
-  if (!role) dirs.cdpath = lineSetsCdpath(command, cmds); // and whether the line may set CDPATH itself (finding 5)
+  // day sessions (fix round SA-8): a line that names GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR or GIT_INDEX_FILE in its
+  // raw text or in any word once quotes are removed (a prefix, an export, a GIT''_DIR= spelling) asks: git then reads
+  // another folder or index, and the guard cannot follow it. The scan goes on, so a later deny in the line still wins.
+  if (!role && (GIT_PLACE_VARS.test(command) || cmds.some((c) => [...c.argv, ...c.redirects, ...c.reads].some((w) => GIT_PLACE_VARS.test(w))))) {
+    dayAsk = ask('kit and gate files ask first in a day session: the line names GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR or ' +
+      'GIT_INDEX_FILE, which point git at another folder or index, and the guard cannot follow it');
+  }
+  // day sessions (fix round R-a..R-e): known false is the unknown ("lost") folder, a state, not a folder; lead stays
+  // true while the line has run nothing but cd, pushd and popd; stack is the line's pushd stack (null: an unknown entry)
+  const dirs = { stack: [], known: true, lead: true };
   for (const c of cmds) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
     if (role) { const u = unwrapRole(c.argv, role); if (u.deny) return deny(u.deny); argv = u.argv; }
     else argv = unwrap(c.argv);
     if (!role) { // day sessions (kit-v3-3): a kit write asks; the scan goes on, so a later deny in the line still wins
-      const w = dayShellWrites(c, argv, vcwd, io, input);
+      const w = dayShellWrites(c, argv, dirs.known ? vcwd : null, io, input);
       if (w?.deny) return w;
       dayAsk ??= w;
+    }
+    if (!role) { // where the next command runs (R-a..R-e); the checks below read an unknown folder as the project folder
+      vcwd = dayFolder(c, argv, vcwd, dirs, subs || forks, io);
+      if (!dirs.known) vcwd = io.projectDir;
     }
     if (!argv.length) continue;
     const rawProg = argv[0];
     const prog = basename(rawProg);
-    if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) {
-      vcwd = dayCd(prog, argv.slice(1), vcwd, dirs, subs || forks, io);
-      continue;
-    }
+    if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) continue;
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run
       const target = argv[1] && argv[1] !== '-' ? resolve(vcwd, argv[1].replace(/^~(?=\/|$)/, io.home)) : io.home;
       if (role && projectRel(target, vcwd, io) === null && !insideDir(target, input.scratchpad_dir, vcwd, io)) {
@@ -523,6 +551,15 @@ async function bash(command, cwd, role, io, input) {
 // limits L1-L4); the PR review and Mustafa's go remain the wall. A subagent (agent_id set; agent_type alone is also set
 // in a session started with --agent, so it is never checked: E10-6) is refused where the main session is asked.
 const KIT_AGENT = 'kit and gate files are edited by the main session, which asks Mustafa first';
+const GIT_PLACE_VARS = /GIT_(DIR|WORK_TREE|COMMON_DIR|INDEX_FILE)/; // fix round SA-8
+// git clone's options that take the next word as their value (F-b: so the URL and the folder are found)
+const CLONE_VALUE = new Set(['-o', '--origin', '-b', '--branch', '-u', '--upload-pack', '--reference', '--reference-if-able',
+  '--depth', '--shallow-since', '--shallow-exclude', '-c', '--config', '--template', '-j', '--jobs', '--filter',
+  '--bundle-uri', '--server-option', '--ref-format']);
+// the folder git clone makes when none is given: the URL's last part without a trailing / or /.git, and without .git
+// or .bundle (as git's own guess)
+const cloneDir = (url) => url.replace(/\/+$/, '').replace(/\/\.git$/, '').replace(/\/+$/, '').split(/[/:\\]/).pop()
+  .replace(/\.(git|bundle)$/, '');
 // The paths a writer command writes (its targets), as the words it was given.
 function writtenBy(argv) {
   const prog = basename(argv[0] ?? '');
@@ -553,34 +590,55 @@ function writtenBy(argv) {
     return tdir !== null ? [...pos, tdir] : pos;
   }
   if (prog === 'git' && (a[0] === 'rm' || a[0] === 'mv')) return words(a.slice(1)).pos;
-  if (prog === 'sed' || prog === 'perl') { // sed -i / --in-place[=SUF]; perl -i / -pi / -pi.bak
-    const inPlace = prog === 'sed' ? (w) => /^-[^-]*i/.test(w) || /^--in-place(=|$)/.test(w) : (w) => /^-p?i/.test(w);
-    let edits = false, script = false; const pos = [];
+  if (prog === 'git' && a[0] === 'worktree' && a[1] === 'add') { // F-b: git worktree add [opts] <path> [<commit-ish>]
+    for (let i = 2; i < a.length; i++) {
+      const w = a[i];
+      if (w === '--') return a[i + 1] === undefined ? [] : [a[i + 1]];
+      if (w === '-b' || w === '-B' || w === '--reason') { i++; continue; }
+      if (w.startsWith('-') && w.length > 1) continue;
+      return [w];
+    }
+    return [];
+  }
+  if (prog === 'git' && a[0] === 'clone') { // F-b: git clone [opts] <url> [<dir>]; --separate-git-dir writes there too
+    const pos = [], gitDir = [];
+    for (let i = 1; i < a.length; i++) {
+      const w = a[i];
+      if (w === '--') { pos.push(...a.slice(i + 1)); break; }
+      if (w === '--separate-git-dir') { gitDir.push(a[++i] ?? ''); continue; }
+      if (w.startsWith('--separate-git-dir=')) { gitDir.push(w.slice(19)); continue; }
+      if (CLONE_VALUE.has(w)) { i++; continue; }
+      if (w.startsWith('-') && w.length > 1) continue;
+      pos.push(w);
+    }
+    const dir = pos.length > 1 ? pos[1] : pos.length ? cloneDir(pos[0]) : '';
+    return [...(dir ? [dir] : []), ...gitDir];
+  }
+  if (prog === 'sed' || prog === 'perl') { // sed -i / --in-place[=SUF] (any prefix from --i: SA-5); perl -i / -pi / -pi.bak
+    const inPlace = prog === 'sed' ? (w) => /^-[^-]*i/.test(w) || (w.split('=')[0].length >= 3 && '--in-place'.startsWith(w.split('=')[0]))
+      : (w) => /^-p?i/.test(w);
+    // every word that is not an option or an option's value is a target (fix round, by construction): a script given
+    // as a word of its own (no -e) is read as a path too, which only asks more; an attached -es/a/b/ or an abbreviated
+    // --expr= no longer makes the first file look like the script
+    let edits = false; const pos = [];
     const valueOpts = prog === 'sed' ? ['-e', '-f', '-l', '--expression', '--file', '--line-length'] : ['-e', '-E'];
     for (let i = 0; i < a.length; i++) {
       const w = a[i];
       if (w === '--') { pos.push(...a.slice(i + 1)); break; }
       if (w.startsWith('-') && w.length > 1) {
         if (inPlace(w)) edits = true;
-        if (valueOpts.includes(w)) { if (/^-[eEf]$|^--(expression|file)$/.test(w)) script = true; i++; }
-        else if (/^--(expression|file)=/.test(w)) script = true;
-        else if (prog === 'perl' && /^-[pnl]*e$/.test(w)) { script = true; i++; }
+        if (valueOpts.includes(w) || (prog === 'perl' && /^-[pnl]*e$/.test(w))) i++;
         continue;
       }
       pos.push(w);
     }
-    return edits ? (script ? pos : pos.slice(1)) : [];
+    return edits ? pos : [];
   }
   return [];
 }
 function dayShellWrites(c, argv, vcwd, io, input) {
   const agent = !!input.agent_id;
   let first = null;
-  const prefix = c.argv.slice(0, c.argv.length - argv.length);
-  if (prefix.some((w) => /^GIT_(DIR|WORK_TREE)=/.test(w))) {
-    first = ask('kit and gate files ask first in a day session: a GIT_DIR= or GIT_WORK_TREE= prefix points git at ' +
-      'another folder, and the guard cannot follow it');
-  }
   const prog = basename(argv[0] ?? '');
   const writer = prog === 'git' ? `git ${argv[1]}` : prog;
   const targets = [...c.redirects.map((t) => ['a redirect', t]), ...writtenBy(argv).map((t) => [writer, t])];
@@ -594,55 +652,71 @@ function dayShellWrites(c, argv, vcwd, io, input) {
       continue;
     }
     const t = raw.replace(/^~(?=\/|$)/, io.home);
-    const rel = kitPath(t, vcwd, io) ?? kitDir(t, vcwd, io);
+    if (vcwd === null && !isAbsolute(t)) { // R-a: a relative target while the folder is unknown is unresolvable too
+      if (agent) return deny(`${KIT_AGENT}; after a cd the guard cannot follow, an agent's ${what} cannot write the ` +
+        `relative ${raw} (${UNKNOWN_FIX})`);
+      first ??= ask(`kit and gate files ask first in a day session: ${what} writes ${raw} after a cd the guard ` +
+        `cannot follow, so it cannot tell which folder that is (${UNKNOWN_FIX})`);
+      continue;
+    }
+    const rel = kitPath(t, vcwd ?? io.projectDir, io) ?? kitDir(t, vcwd ?? io.projectDir, io);
     if (rel === null) continue;
     if (agent) return deny(`${KIT_AGENT}: ${rel}`);
     first ??= ask(`kit and gate files ask first in a day session: ${rel} (${what})`);
   }
   return first;
 }
-// cd, pushd and popd in a day session (S-4): the folder later commands run in. A move the guard cannot follow is read
-// as the project folder, so the main-folder check runs: cd -, a target with a variable, glob or ~user, a bare relative
-// target under CDPATH, +N/-N or another option, an empty stack, a relative move after such a loss, and every move in a
-// line with a subshell, pipe, background job or substitution (it may run in a child shell and not carry over).
-function dayCd(prog, args, vcwd, dirs, forked, io) {
-  const lost = () => { dirs.lost = true; return io.projectDir; };
-  if (forked) return lost();
-  let a = args.slice();
-  if (prog === 'cd') while (/^-[LPe@]+$/.test(a[0] ?? '')) a = a.slice(1);
+// Where the next command of a day line runs (fix round R-a..R-e, after S-4 and findings 5-8). The folder is known only
+// where the line's text fixes it; anything else makes it unknown (dirs.known false), and an unknown folder makes both
+// checks ask: a relative write target asks (an agent is refused), and the main-folder check reads the project folder.
+// Followed (R-b, R-c, R-d): a cd, pushd or popd in the line's leading run (before any other command), spelled as the
+// bare word, reached only through `if`, `{`, `!`, `time`, `builtin` or `command` (-p, --), not after `||`, in a line
+// with no subshell, pipe, background job or substitution; its target absolute, `.`, `..`, or starting with `./` or
+// `../`, with no option but `-L` (cd) and `--`, and a folder that exists and can be entered now (so the cd cannot
+// fail); pushd and popd on a stack of known entries. Unknown by construction: bare names (CDPATH, cdable_vars), `~`,
+// no target (HOME), `-`, variables and globs; a cd behind then/else/elif/do/while/until (a branch or loop may skip or
+// repeat it), behind `command -v`/`-V` (it does not run), a program wrapper, exec or a VAR= prefix, or spelled as a
+// path. R-e: after source, `.`, eval, exec, or a program word that starts with `-` or holds `$` or a backtick, the
+// folder is unknown (only shell builtins move the shell's folder).
+const UNKNOWN_FIX = 'write to an absolute path, or put the cd first in the line';
+const CD_REACH = new Set(['if', '{', '!', 'time', 'builtin', 'command', '-p', '--']);
+function dayFolder(c, argv, vcwd, dirs, forked, io) {
+  const unknown = () => { dirs.known = false; return vcwd; };
+  const prefix = c.argv.slice(0, c.argv.length - argv.length);
+  const prog = argv.length ? basename(argv[0]) : '';
+  if (prog !== 'cd' && prog !== 'pushd' && prog !== 'popd') {
+    // a bare keyword (`}`, `fi`, `done`) runs nothing; every other command ends the leading run
+    if (!argv.length && !c.redirects.length && !c.reads.length && prefix.every((w) => WRAPPERS.has(w))) return vcwd;
+    dirs.lead = false;
+    if (prefix.includes('exec') || ['source', '.', 'eval'].includes(prog) || /^-|[$`]/.test(argv[0] ?? '')) return unknown();
+    return vcwd;
+  }
+  const here = dirs.known ? vcwd : null;
+  if (!dirs.lead || forked || c.sep === '||' || argv[0] !== prog || !prefix.every((w) => CD_REACH.has(w))) {
+    dirs.lead = false; // no later cd, pushd or popd is followed, so the stack is not read again
+    return unknown();
+  }
+  let a = argv.slice(1);
+  if (prog === 'cd') while (/^-L+$/.test(a[0] ?? '')) a = a.slice(1);
   if (a[0] === '--') a = a.slice(1);
-  if (prog === 'popd') return a.length || !dirs.stack.length ? lost() : dirs.stack.shift();
-  if (prog === 'pushd' && !a.length) {
-    if (!dirs.stack.length) return lost();
+  if (prog === 'popd' || (prog === 'pushd' && !a.length)) { // popd, or pushd alone (swaps the top two)
+    if (a.length || !dirs.stack?.length) { dirs.stack = null; return unknown(); }
     const top = dirs.stack.shift();
-    dirs.stack.unshift(vcwd);
+    if (prog === 'pushd') dirs.stack.unshift(here);
+    if (top === null) return unknown();
+    dirs.known = true;
     return top;
   }
-  if (!a.length) return io.home;
   const t = a[0];
-  if (a.length > 1 || /^[-+]/.test(t) || /[$`*?[{]/.test(t) || /^~[^/]/.test(t)) return lost();
-  const absolute = isAbsolute(t) || /^~(\/|$)/.test(t);
-  // CDPATH set in the line itself (finding 5) counts as an inherited one
-  if (!absolute && dirs.cdpath && !/^\.\.?(\/|$)/.test(t)) return lost();
-  if (!absolute && (dirs.lost || (io.env.CDPATH && !/^\.\.?(\/|$)/.test(t)))) return lost();
-  if (prog === 'pushd') dirs.stack.unshift(vcwd);
-  return resolve(vcwd, t.replace(/^~(?=\/|$)/, io.home));
-}
-// A line that may set CDPATH itself (finding 5): its text names CDPATH anywhere (a CDPATH=... prefix on the cd or
-// pushd, export, declare, a bare assignment, ${CDPATH:=...}) or holds an indirect expansion ${!V:=...}, or it runs a
-// command that can set a variable whose name the guard does not see (eval, source, export or declare with a quoted or
-// $V name, read, printf -v, a trap, a command named by $X). A bare relative cd in such a line is lost, as under an
-// inherited CDPATH. Not every bare relative target is lost: `cd .gate/x && ...` into a worktree stays followed, and a
-// lost folder reads later relative writes against the project folder.
-const VAR_SETTERS = new Set(['eval', 'source', '.', 'export', 'declare', 'typeset', 'local', 'readonly', 'read', 'mapfile',
-  'readarray', 'let', 'getopts', 'trap', 'enable']);
-function lineSetsCdpath(command, cmds) {
-  if (/CDPATH|\$\{!/.test(command)) return true;
-  return cmds.some((c) => {
-    const a = unwrap(c.argv);
-    const prog = a.length ? basename(a[0]) : '';
-    return VAR_SETTERS.has(prog) || /[$`]/.test(a[0] ?? '') || (prog === 'printf' && a.some((w) => w.startsWith('-v')));
-  });
+  const fixed = a.length === 1 && (isAbsolute(t) || /^\.\.?(\/|$)/.test(t)) && !/[$`*?[{]/.test(t);
+  const to = fixed && (here !== null || isAbsolute(t)) ? resolve(here ?? '/', t) : null;
+  if (to === null || !(io.isDir ? io.isDir(to) : io.exists(to))) {
+    if (prog === 'pushd') dirs.stack = null;
+    return unknown();
+  }
+  if (prog === 'pushd') dirs.stack?.unshift(here);
+  dirs.known = true;
+  return to;
 }
 // The file tools on a kit path (kit-v3-3 item 1): the main session is asked, a subagent (agent_id) refused.
 function dayEdit(tool, ti, cwd, io, input) {
@@ -687,6 +761,8 @@ function interpreter(prog, argv, vcwd, role, io) {
   if (DENIED_SCRIPTS.has(rel) || rel.startsWith('.gate/')) return deny(`routine (${role}): ${rel} runs code from the tree; not in routines in phase 0`);
   const root = io.projectDir;
   if (io.git(['ls-files', '--error-unmatch', '--', rel], root).code !== 0) return deny(`routine (${role}): ${rel} is not a tracked file`);
+  const shadow = originMainCheck(root, io, role); // SA-2: the next line's origin/main is refs/remotes/origin/main's commit
+  if (shadow) return deny(shadow);
   if (io.git(['diff', '--quiet', 'origin/main', '--', rel], root).code !== 0) return deny(`routine (${role}): ${rel} differs from main's copy`);
   // checkpoint.mjs pushes the branch in a child process the guard never sees: check what it would publish first.
   if (rel === '.claude/scripts/checkpoint.mjs' && /^(save|watch)$/.test(argv[i + 1] ?? '')) {
@@ -747,6 +823,21 @@ async function git(argv, vcwd, role, io, input = {}) {
   }
   if (sub === 'ls-remote' && role && rest.some((r) => /::|^file:|^\.|^\//.test(r))) return deny(`routine (${role}): ls-remote only on origin`);
   if (sub === 'switch' && role === 'pr-advisor' && !(args[0] === '--detach' && args[1] === 'origin/main' && args.length === 2)) return deny('routine (pr-advisor): the only switch is git switch --detach origin/main');
+  if (sub === 'switch' && role === 'pr-advisor') { const s = originMainCheck(vcwd, io, role); if (s) return deny(s); } // SA-2
+  if (role) { // SA-2 (fix round): what could repoint origin/main or main, or redirect the next fetch, is refused
+    if ((sub === 'fetch' || sub === 'pull') && args.some((w) => w.includes(':') || w.startsWith('+') || /^--refmap(=|$)/.test(w))) {
+      return deny(`routine (${role}): git ${sub} names no refspec with ':' or '+' and no --refmap (they can repoint origin/main); fetch as git fetch origin <branch>`);
+    }
+    const bad = newBranchNames(sub, args).find((n) => /^(origin\/|refs\/|remotes\/)/.test(n) || n === 'HEAD' || n === 'main');
+    if (bad !== undefined) return deny(`routine (${role}): no new branch named ${bad} (origin/, refs/ and remotes/ names, HEAD and main would shadow origin/main or main)`);
+    if (sub === 'symbolic-ref' && !(rest.length === 1 && rest[0] === 'HEAD' && args.every((w) => w === 'HEAD' || /^(-q|--quiet|--short|--no-short|--recurse|--no-recurse)$/.test(w)))) {
+      return deny(`routine (${role}): git symbolic-ref only reads HEAD here (git symbolic-ref [--short] HEAD); a symbolic ref can repoint origin/main`);
+    }
+    if (sub === 'remote' && !(args.length === 0 || (args.length === 1 && /^(-v|--verbose)$/.test(args[0])) || /^(get-url|show)$/.test(args[0]))) {
+      return deny(`routine (${role}): git remote only reads here (git remote -v, git remote get-url origin); its other forms write the remote's config`);
+    }
+    if (sub === 'branch' && args.includes('--edit-description')) return deny(`routine (${role}): git branch --edit-description writes git config and waits for an editor`);
+  }
   if (sub === 'commit' && role === 'night-shift') {
     const staged = io.git(['diff', '--cached', '--name-only'], vcwd).out.split('\n');
     const all = args.some((a) => a === '-a' || a === '--all' || /^-[A-Za-z]*a/.test(a)) ? io.git(['diff', '--name-only'], vcwd).out.split('\n') : [];
@@ -780,6 +871,8 @@ function protectedHit(range, vcwd, io) {
   return hit ? { hit } : null;
 }
 function protectedInBranch(vcwd, io) {
+  const shadow = originMainCheck(vcwd, io, 'night-shift'); // SA-2
+  if (shadow) return shadow;
   const h = protectedHit(['origin/main...HEAD'], vcwd, io);
   if (h?.failed) return "routine (night-shift): can't compare the branch with origin/main; fetch it first";
   if (!h) return null;
@@ -803,6 +896,40 @@ function commitOf(ref, vcwd, io) {
 function isOriginMain(ref, vcwd, io) {
   const o = commitOf(ORIGIN_MAIN, vcwd, io);
   return o !== null && commitOf(ref, vcwd, io) === o;
+}
+// SA-2 (fix round), routines: the word origin/main (in the guard's own git calls, and in the routine's, such as
+// `node tools/gate.mjs origin/main` or `git switch --detach origin/main`) must name the commit of the full ref
+// refs/remotes/origin/main: a local branch or tag of that name at another commit is refused, and so is a full ref git
+// cannot resolve. Returns the refusal's reason, or null.
+function originMainCheck(vcwd, io, role) {
+  const full = commitOf(ORIGIN_MAIN, vcwd, io);
+  if (full === null) return `routine (${role}): can't resolve ${ORIGIN_MAIN}; fetch it first (git fetch origin main)`;
+  return commitOf('origin/main', vcwd, io) === full ? null
+    : `routine (${role}): origin/main does not name ${ORIGIN_MAIN}'s commit (a local branch or tag of that name?); refused`;
+}
+// SA-2 (fix round), routines: the names a git command would give a new branch. git branch <name> [<start>] (not in a
+// list or upstream mode); git switch -c/--create and --orphan, and a plain git switch <name> (git may create it from a
+// remote branch of that name); git worktree add -b/-B, or with neither (and no --detach) the path's last part.
+function newBranchNames(sub, args) {
+  const pos = [], names = [];
+  let mode = false, detach = false, made = false;
+  for (let i = 0; i < args.length; i++) {
+    const t = args[i];
+    if (t === '--') { pos.push(...args.slice(i + 1)); break; }
+    if (sub === 'branch' && (/^--(list|all|remotes|contains|no-contains|merged|no-merged|points-at|show-current|set-upstream-to|unset-upstream|edit-description)(=|$)/.test(t) || /^-[^-]*[laru]/.test(t))) mode = true;
+    if (sub === 'switch' && /^(-c|--create|--orphan)$/.test(t)) { names.push(args[++i] ?? ''); made = true; continue; }
+    if (sub === 'switch' && (/^-c./.test(t) || /^--(create|orphan)=/.test(t))) { names.push(t.startsWith('-c') ? t.slice(2) : t.slice(t.indexOf('=') + 1)); made = true; continue; }
+    if (sub === 'worktree' && /^-[bB]$/.test(t)) { names.push(args[++i] ?? ''); made = true; continue; }
+    if (sub === 'worktree' && /^-[bB]./.test(t)) { names.push(t.slice(2)); made = true; continue; }
+    if (sub === 'worktree' && t === '--reason') { i++; continue; }
+    if (t === '--detach' || (sub === 'switch' && t === '-d')) detach = true;
+    if (t.startsWith('-') && t !== '-') continue;
+    pos.push(t);
+  }
+  if (sub === 'branch') return mode || !pos.length ? [] : [pos[0]];
+  if (sub === 'switch') return made || detach || !/^(origin\/|refs\/|remotes\/)/.test(pos[0] ?? '') ? names : [pos[0]];
+  if (sub === 'worktree') return pos[0] !== 'add' ? [] : made || detach || pos.length !== 2 ? names : [basename(pos[1])];
+  return [];
 }
 // git switch <name> moves to the branch refs/heads/<name> (finding 6), while rev-parse reads a tag or another ref of the
 // same name first: the branch's own commit, and only when the short name names that branch alone (an ambiguous name
@@ -1029,6 +1156,8 @@ export function realIo() {
     git: (args, cwd) => run('git', args, cwd || projectDir),
     gh: (args) => run('gh', args, projectDir),
     exists: (p) => existsSync(p),
+    // a folder a cd can enter now (fix round R-b)
+    isDir: (p) => { try { accessSync(p, constants.X_OK); return statSync(p).isDirectory(); } catch { return false; } },
     realpath: (p) => realpathSync(p),
     readFile: (p) => readFileSync(p, 'utf8'),
     gitLongOptions: (sub) => {
