@@ -474,6 +474,7 @@ async function bash(command, cwd, role, io, input) {
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd, dayAsk = null;
   const dirs = { stack: [], lost: false }; // day sessions: the line's pushd stack (S-4)
+  if (!role) dirs.cdpath = lineSetsCdpath(command, cmds); // and whether the line may set CDPATH itself (finding 5)
   for (const c of cmds) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
@@ -621,9 +622,27 @@ function dayCd(prog, args, vcwd, dirs, forked, io) {
   const t = a[0];
   if (a.length > 1 || /^[-+]/.test(t) || /[$`*?[{]/.test(t) || /^~[^/]/.test(t)) return lost();
   const absolute = isAbsolute(t) || /^~(\/|$)/.test(t);
+  // CDPATH set in the line itself (finding 5) counts as an inherited one
+  if (!absolute && dirs.cdpath && !/^\.\.?(\/|$)/.test(t)) return lost();
   if (!absolute && (dirs.lost || (io.env.CDPATH && !/^\.\.?(\/|$)/.test(t)))) return lost();
   if (prog === 'pushd') dirs.stack.unshift(vcwd);
   return resolve(vcwd, t.replace(/^~(?=\/|$)/, io.home));
+}
+// A line that may set CDPATH itself (finding 5): its text names CDPATH anywhere (a CDPATH=... prefix on the cd or
+// pushd, export, declare, a bare assignment, ${CDPATH:=...}) or holds an indirect expansion ${!V:=...}, or it runs a
+// command that can set a variable whose name the guard does not see (eval, source, export or declare with a quoted or
+// $V name, read, printf -v, a trap, a command named by $X). A bare relative cd in such a line is lost, as under an
+// inherited CDPATH. Not every bare relative target is lost: `cd .gate/x && ...` into a worktree stays followed, and a
+// lost folder reads later relative writes against the project folder.
+const VAR_SETTERS = new Set(['eval', 'source', '.', 'export', 'declare', 'typeset', 'local', 'readonly', 'read', 'mapfile',
+  'readarray', 'let', 'getopts', 'trap', 'enable']);
+function lineSetsCdpath(command, cmds) {
+  if (/CDPATH|\$\{!/.test(command)) return true;
+  return cmds.some((c) => {
+    const a = unwrap(c.argv);
+    const prog = a.length ? basename(a[0]) : '';
+    return VAR_SETTERS.has(prog) || /[$`]/.test(a[0] ?? '') || (prog === 'printf' && a.some((w) => w.startsWith('-v')));
+  });
 }
 // The file tools on a kit path (kit-v3-3 item 1): the main session is asked, a subagent (agent_id) refused.
 function dayEdit(tool, ti, cwd, io, input) {
@@ -785,8 +804,16 @@ function isOriginMain(ref, vcwd, io) {
   const o = commitOf(ORIGIN_MAIN, vcwd, io);
   return o !== null && commitOf(ref, vcwd, io) === o;
 }
-function switchWords(args) { // git switch: { create, pos, odd }
-  let create = null, odd = false; const pos = [];
+// git switch <name> moves to the branch refs/heads/<name> (finding 6), while rev-parse reads a tag or another ref of the
+// same name first: the branch's own commit, and only when the short name names that branch alone (an ambiguous name
+// gets no full name from rev-parse). null otherwise, so the switch asks.
+function branchCommit(name, vcwd, io) {
+  if (!name || name.startsWith('-')) return null;
+  const full = io.git(['rev-parse', '--verify', '--symbolic-full-name', '--end-of-options', name], vcwd);
+  return full.code === 0 && full.out.trim() === `refs/heads/${name}` ? commitOf(`refs/heads/${name}`, vcwd, io) : null;
+}
+function switchWords(args) { // git switch: { create, pos, odd, detach }
+  let create = null, odd = false, detach = false; const pos = [];
   for (let i = 0; i < args.length; i++) {
     const t = args[i];
     if (t === '--') { pos.push(...args.slice(i + 1)); break; }
@@ -794,10 +821,12 @@ function switchWords(args) { // git switch: { create, pos, odd }
     if (/^-c./.test(t)) { create = t.slice(2); continue; }
     if (t.startsWith('--create=')) { create = t.slice(9); continue; }
     if (t === '--orphan' || t.startsWith('--orphan=')) { odd = true; continue; }
+    if (t === '--detach' || t === '-d') { detach = true; continue; }
+    if (t.startsWith('--no-d')) { odd = true; continue; } // --no-detach (or a short form of it) undoes a --detach
     if (t.startsWith('-') && t !== '-') continue;
     pos.push(t);
   }
-  return { create, pos, odd };
+  return { create, pos, odd, detach };
 }
 function mainFolderMove(sub, args, vcwd, io, input) {
   if (!['switch', 'merge', 'pull', 'bisect', 'pr checkout'].includes(sub)) return null;
@@ -805,7 +834,7 @@ function mainFolderMove(sub, args, vcwd, io, input) {
   const say = sub === 'pr checkout' ? 'gh pr checkout' : `git ${sub}`;
   let why = null, ref = '<ref>';
   if (sub === 'switch') {
-    const { create, pos, odd } = switchWords(args);
+    const { create, pos, odd, detach } = switchWords(args);
     if (odd || pos[0] === '-') why = 'the guard cannot tell what it switches to';
     else if (create !== null) {
       if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {
@@ -821,9 +850,11 @@ function mainFolderMove(sub, args, vcwd, io, input) {
       ref = pos[0];
       // no name is exempt: a stale local main is an old commit. Only the target's SHA reaches git (S-1), and `--` makes
       // git read it as a commit, never a path.
-      const sha = commitOf(pos[0], vcwd, io);
+      // Without --detach, git switches to the branch refs/heads/<name> (finding 6); --detach takes the general resolve.
+      const sha = detach ? commitOf(pos[0], vcwd, io) : branchCommit(pos[0], vcwd, io);
       const h = sha ? protectedHit([ORIGIN_MAIN, sha, '--'], vcwd, io) : { failed: true };
-      if (h) why = h.failed ? `the guard can't compare ${pos[0]} with origin/main`
+      if (h) why = h.failed ? `the guard can't compare ${pos[0]} with origin/main` +
+        (detach ? '' : ` (as the branch refs/heads/${pos[0]}, a name no tag or other ref shares)`)
         : `${pos[0]}'s ${h.hit} differs from origin/main's`;
     }
   } else if (sub === 'merge') {

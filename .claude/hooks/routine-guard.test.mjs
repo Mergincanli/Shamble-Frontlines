@@ -573,8 +573,13 @@ const WT = { '/p': '/p/.git', '/w': '/p/.git', '/p/.gate/x': '/p/.git', '/p/.cla
 const CLAUDE_MD = new Set(['/p/CLAUDE.md', '/w/CLAUDE.md', '/p/.gate/x/CLAUDE.md', '/p/.claude/worktrees/a1/CLAUDE.md',
   '/p/docs/sub/CLAUDE.md']);
 function dayIo(o = {}) {
-  const { role = '', diffs = {}, platform, threeDot = '', shadow = false, calls, cdpath } = o;
+  const { role = '', diffs = {}, platform, threeDot = '', shadow = false, calls, cdpath, tags = [] } = o;
   const names = new Map(Object.keys(diffs).map((n) => [shaOf(n), n]));
+  // step 4c (finding 6): a ref named in diffs is a branch refs/heads/<name>; tags names tags, each at its own commit
+  // with no protected difference. A name both a branch and a tag is ambiguous: rev-parse reads the tag first, and
+  // --symbolic-full-name prints nothing (exit 0), as git 2.43 does.
+  const tagSha = (n) => shaOf(`tag ${n}`);
+  const tagShas = new Set(tags.map(tagSha));
   const links = { '/p/link': '/p/.claude' };
   const topOf = (cwd) => Object.keys(WT).filter((t) => cwd === t || cwd.startsWith(t + '/')).sort((a, b) => b.length - a.length)[0];
   return {
@@ -589,6 +594,19 @@ function dayIo(o = {}) {
       if (a === 'rev-parse --show-toplevel') return top ? { code: 0, out: `${top}\n` } : { code: 128, out: '' };
       if (a === 'rev-parse --git-common-dir') return top ? { code: 0, out: `${WT[top]}\n` } : { code: 128, out: '' };
       if (args[0] === 'diff' && args.some((x) => x.startsWith('--output'))) return { code: 0, out: '' };
+      if (args.length === 5 && args.slice(0, 4).join(' ') === 'rev-parse --verify --symbolic-full-name --end-of-options') {
+        const n = args[4], branch = n in diffs && n !== 'HEAD';
+        if (branch && tags.includes(n)) return { code: 0, out: '' };
+        return branch ? { code: 0, out: `refs/heads/${n}\n` } : tags.includes(n) ? { code: 0, out: `refs/tags/${n}\n` } : { code: 128, out: '' };
+      }
+      if (args.length === 4 && args.slice(0, 3).join(' ') === 'rev-parse --verify --end-of-options' && args[3].endsWith('^{commit}')) {
+        const r = args[3].slice(0, -'^{commit}'.length);
+        if (r.startsWith('refs/heads/') && r !== 'refs/heads/HEAD') {
+          return r.slice(11) in diffs ? { code: 0, out: `${shaOf(r.slice(11))}\n` } : { code: 128, out: '' };
+        }
+        if (tags.includes(r) || (r.startsWith('refs/tags/') && tags.includes(r.slice(10)))) return { code: 0, out: `${tagSha(r.replace(/^refs\/tags\//, ''))}\n` };
+      }
+      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'refs/remotes/origin/main' && tagShas.has(args[3])) return { code: 0, out: '' };
       if (args.length === 4 && args.slice(0, 3).join(' ') === 'rev-parse --verify --end-of-options' && args[3].endsWith('^{commit}')) {
         const r = args[3].slice(0, -'^{commit}'.length);
         if (r === 'refs/remotes/origin/main') return { code: 0, out: `${shaOf('origin/main')}\n` };
@@ -752,6 +770,38 @@ export const DAY_CASES = [
   ['S-4 cd to a worktree is still followed', dsh('cd /w && git switch cs/other'), null, { diffs: OTHER }],
   ['S-4 cd -P to a worktree is followed', dsh('cd -P /w && git switch cs/other'), null, { diffs: OTHER }],
   ['S-4 a relative cd into a worktree is followed', dsh('cd .gate/x && git switch cs/other'), null, { diffs: OTHER }],
+  // step 4c, finding 5: CDPATH set in the line itself; a bare relative cd then counts as lost (the project folder)
+  ['F5 a CDPATH= prefix on the cd: ask', dsh('CDPATH=/ cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 a CDPATH= prefix on pushd: ask', dsh('CDPATH=/ pushd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 export CDPATH earlier in the line: ask', dsh('export CDPATH=/; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 declare -x CDPATH: ask', dsh('declare -x CDPATH=/ && cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 a bare CDPATH= assignment: ask', dsh('CDPATH=/; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 ${CDPATH:=...}: ask', dsh(': ${CDPATH:=/}; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 an indirect ${!V:=...}: ask', dsh(': ${!V:=/}; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 export with a quoted name: ask', dsh('export CD"PATH"=/; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 eval: ask', dsh('eval "$S"; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 source (.): ask', dsh('. ./env.sh; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 printf -v: ask', dsh('printf -v "$V" /; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 a command named by a variable: ask', dsh('$SET CD$P=/; cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['F5 a later relative move after the lost one: ask', dsh('export CDPATH=/; cd w2 && cd ../w && git switch cs/other', { cwd: '/w' }),
+    ASK, { diffs: OTHER }],
+  ['F5 ./ is not looked up in CDPATH: followed', dsh('export CDPATH=/; cd ./.gate/x && git switch cs/other'), null, { diffs: OTHER }],
+  ['F5 an absolute target is followed', dsh('export CDPATH=/; cd /w && git switch cs/other'), null, { diffs: OTHER }],
+  ['F5 printf without -v sets nothing: followed', dsh('printf x; cd .gate/x && git switch cs/other'), null, { diffs: OTHER }],
+  ['F5 an ordinary day line: cd docs, then a write', dsh('cd docs && echo x > notes.md'), null],
+  ['F5 an ordinary day line: cd .claude, then a kit write still asks', dsh('cd .claude && echo x > settings.json'), ASK, {},
+    /\.claude\/settings\.json/],
+  // step 4c, finding 6: git switch <name> moves to the branch refs/heads/<name>; a name a tag shares asks
+  ['F6 git switch dup, a same-name tag at a clean commit: ask', dsh('git switch dup'), ASK,
+    { diffs: { dup: '.claude/settings.json\n' }, tags: ['dup'] }, /refs\/heads\/dup/],
+  ['F6 git switch dup, ambiguous even when the branch is clean: ask', dsh('git switch dup'), ASK, { diffs: { dup: '' }, tags: ['dup'] }],
+  ['F6 git switch v1, a tag and no branch: ask', dsh('git switch v1'), ASK, { tags: ['v1'] }],
+  ['F6 git switch --detach dup: the tag, as git reads it', dsh('git switch --detach dup'), null,
+    { diffs: { dup: '.claude/settings.json\n' }, tags: ['dup'] }],
+  ['F6 git switch -d dup: the same', dsh('git switch -d dup'), null, { diffs: { dup: '.claude/settings.json\n' }, tags: ['dup'] }],
+  ['F6 git switch --detach --no-detach dup: ask', dsh('git switch --detach --no-detach dup'), ASK,
+    { diffs: { dup: '.claude/settings.json\n' }, tags: ['dup'] }],
+  ['F6 a subagent switches to an ambiguous name: deny', dsh('git switch dup', { agent_id: 'a1' }), DENY, { diffs: { dup: '' }, tags: ['dup'] }],
 ];
 for (const [name, input, want, opts, re] of DAY_CASES) {
   test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -863,6 +913,23 @@ const DAY_MUTANTS = [
     "if (prog === 'popd') return dirs.stack.shift() ?? vcwd;"],
   ['S-4 a relative move after a loss', 'if (!absolute && (dirs.lost || (io.env.CDPATH', 'if (!absolute && ((io.env.CDPATH'],
   ['S-4 CDPATH', '(io.env.CDPATH && !/^', '(false && !/^'],
+  // step 4c
+  ['F5 the line flag in dayCd', 'if (!absolute && dirs.cdpath && !/^\\.\\.?(\\/|$)/.test(t)) return lost();', ''],
+  ['F5 ./ and ../ skip the line flag', 'if (!absolute && dirs.cdpath && !/^\\.\\.?(\\/|$)/.test(t)) return lost();',
+    'if (!absolute && dirs.cdpath) return lost();'],
+  ['F5 the flag is set', 'if (!role) dirs.cdpath = lineSetsCdpath(command, cmds);', 'if (!role) dirs.cdpath = false;'],
+  ['F5 the text names CDPATH', 'if (/CDPATH|\\$\\{!/.test(command)) return true;', 'if (/\\$\\{!/.test(command)) return true;'],
+  ['F5 an indirect ${!V}', 'if (/CDPATH|\\$\\{!/.test(command)) return true;', 'if (/CDPATH/.test(command)) return true;'],
+  ['F5 the variable setters', 'return VAR_SETTERS.has(prog) ||', 'return false ||'],
+  ['F5 a command named by $X', "/[$`]/.test(a[0] ?? '')", 'false'],
+  ['F5 printf -v', "(prog === 'printf' && a.some((w) => w.startsWith('-v')))", "(prog === 'printf')"],
+  ['F6 switch resolves refs/heads/<name>', 'const sha = detach ? commitOf(pos[0], vcwd, io) : branchCommit(pos[0], vcwd, io);',
+    'const sha = commitOf(pos[0], vcwd, io);'],
+  ['F6 --detach keeps the general resolve', 'const sha = detach ? commitOf(pos[0], vcwd, io) : branchCommit(pos[0], vcwd, io);',
+    'const sha = branchCommit(pos[0], vcwd, io);'],
+  ['F6 the short name must name the branch alone', 'full.code === 0 && full.out.trim() === `refs/heads/${name}` ?', 'true ?'],
+  ['F6 --detach and -d', "if (t === '--detach' || t === '-d') { detach = true; continue; }", ''],
+  ['F6 --no-detach cannot be told', "if (t.startsWith('--no-d')) { odd = true; continue; }", ''],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -936,6 +1003,51 @@ test('real git (step 4b): `--` after the ref (fix 1), no file written (S-1), ori
       assert.equal(kindOf(await day(c)), ASK, `${c}: a local origin/main elsewhere asks`);
     }
     assert.equal(await day('git merge --ff-only refs/remotes/origin/main'), null, 'the fully qualified ref goes on');
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- step 4c (kit-v3-3): the second security review of 2e82216, finding 6, on real git ---
+// A branch and a tag share the name dup. The tag is at origin/main's commit, the branch one commit on, with CLAUDE.md
+// changed. git reads the short name as the tag (rev-parse), but `git switch dup` moves to the branch.
+test('real git (step 4c, finding 6): git switch <name> is checked as the branch refs/heads/<name>, never a same-name tag', async () => {
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'guard-git-4c-')));
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const g = (...a) => spawnSync('git', a, { cwd: dir, env, encoding: 'utf8' });
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  try {
+    g('init', '-q', '-b', 'main');
+    writeFileSync(join(dir, 'CLAUDE.md'), 'x\n');
+    writeFileSync(join(dir, 'shamble-game.js'), 'a\n');
+    g('add', '-A');
+    g('commit', '-q', '-m', 'one');
+    g('update-ref', 'refs/remotes/origin/main', 'HEAD');
+    g('tag', 'dup');
+    g('switch', '-q', '-c', 'dup');
+    writeFileSync(join(dir, 'CLAUDE.md'), 'y\n');
+    g('commit', '-q', '-am', 'two: a kit file');
+    g('switch', '-q', 'main');
+    g('switch', '-q', '-c', 'cs/g');
+    writeFileSync(join(dir, 'shamble-game.js'), 'b\n');
+    g('commit', '-q', '-am', 'three: a game file');
+    g('switch', '-q', 'main');
+    const rev = (r) => g('rev-parse', '--verify', '--end-of-options', `${r}^{commit}`).stdout.trim();
+    assert.equal(rev('dup'), rev('refs/remotes/origin/main'), 'setup: the short name dup reads as the tag, at origin/main');
+    assert.notEqual(rev('refs/heads/dup'), rev('dup'), 'setup: the branch dup is at another commit');
+    process.env.CLAUDE_PROJECT_DIR = dir;
+    const io = { ...realIo(), env: {} };
+    const day = (command) => decide(dsh(command, { cwd: dir }), io);
+    const d = await day('git switch dup');
+    assert.equal(kindOf(d), ASK, `git switch dup asks: ${JSON.stringify(d)}`);
+    assert.match(d.ask, /refs\/heads\/dup/);
+    assert.equal(await day('git switch --detach dup'), null, '--detach dup reads the tag, as git does: no kit difference');
+    assert.equal(await day('git switch cs/g'), null, 'a branch alone, game files only: goes on');
+    assert.equal(await day('git switch main'), null, 'main, a branch alone at origin/main: goes on');
+    // what the guard checked is where git goes: the switch lands on the branch's commit, not the tag's
+    assert.equal(g('switch', '-q', 'dup').status, 0);
+    assert.equal(rev('HEAD'), rev('refs/heads/dup'), 'git switch dup moved to the branch');
   } finally {
     if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
     rmSync(dir, { recursive: true, force: true });
