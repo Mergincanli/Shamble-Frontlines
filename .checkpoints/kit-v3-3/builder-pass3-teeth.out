@@ -1,0 +1,5 @@
+none                                 C-PLAIN passes
+tab is no blank                      C-PLAIN fails (1859 lines differ)
+a digit word before > stays a word   C-PLAIN fails (1284 lines differ)
+single quotes kept in the word       C-PLAIN fails (1921 lines differ)
+&> not a redirect                    C-PLAIN fails (1290 lines differ)
