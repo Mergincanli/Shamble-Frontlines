@@ -69,12 +69,18 @@
     (SD-1 + A-3: a night switch, commit or push line holds that one command alone, pr-advisor exempt; V-3: exact
     show-ref lookups; SD-2: -z --no-renames --no-relative in protectedHit and the commit check, a named C6 edit);
     day fixes SD-3, SD-4, SD-5, SD-6, V-1; limits L9 and L11 widened, L16-L18 new; follow-up A-4; D-1 docs-keeper.
-  - Now: fix pass 2 (wf_6ad69a99-cc0: the routine builder, then the day builder, then docs-keeper; notes
-    `builder-pass2-routine.md`, `builder-pass2-day.md`, `docs-keeper-pass2.md`), then the gate and commits (notes,
-    code, docs; docs-keeper writes "fix pass 2 (commit pending)" where the code commit's SHA goes).
-  - Next: pass 3 (security-auditor and the verifier on the pass-2 diff only, plus the automated review; skeptics
-    only for a major); step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review,
-    needs-mustafa, his go).
+  - Done: fix pass 2 (wf_6ad69a99-cc0): code c8cbb1a, docs 01b158c (notes 66222f2, ae4a344; `builder-pass2-routine.md`,
+    `builder-pass2-day.md`, `docs-keeper-pass2.md`). Routines: SD-1 + A-3 (a night switch, commit or push alone on its
+    line), V-3 (exactCommit: show-ref --verify), SD-2 (DIFF_NAMES; a commit whose lists git can't give is refused, the
+    builder's own stricter addition). Day: SD-3, SD-4, SD-5, SD-6, V-1. NIGHT_SHIFT.md step 4 fetch-first text. Tests
+    864/864 (710, 127, 27); every new mutant killed (in-suite and real-git); no existing expected value moved (A3-own
+    mutant retargets named); main's file 180/192 (3 pre-existing, 8 rev-parse scaffold, 1 SD-2 key scaffold: "refused:
+    night: commit a staged rules file"); gate with smoke PASS (the main session, at the working tree). Docs: D-1 stale
+    lines, L9 and L11 widened, L16-L18, follow-up A-4, the closed line (SD-4). CI on 01b158c started.
+  - Now: the automated review of the fix commit (when it comes), then pass 3 (security-auditor and the verifier on only
+    the pass-2 diff ed3ea8c..01b158c; routine paths at full depth, day paths ordinary and accidental only; skeptics only
+    for a major; a minor day finding becomes a limit or follow-up, not a pass 4).
+  - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
   (thinking about it); an Enterprise login (university); Windows itself (PowerShell), not WSL. So L7 (mods) does not
