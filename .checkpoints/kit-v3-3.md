@@ -77,7 +77,8 @@
     mutant retargets named); main's file 180/192 (3 pre-existing, 8 rev-parse scaffold, 1 SD-2 key scaffold: "refused:
     night: commit a staged rules file"); gate with smoke PASS (the main session, at the working tree). Docs: D-1 stale
     lines, L9 and L11 widened, L16-L18, follow-up A-4, the closed line (SD-4). CI on 01b158c started.
-  - Now: the automated review of the fix commit (when it comes), then pass 3 (security-auditor and the verifier on only
+  - Now (pass 3: wf_4c636903-c6d; notes `security-auditor-pass3.md`, `verifier-pass3.md`, `skeptic-pass3-*.md`): the
+    automated review of the fix commit (when it comes), and pass 3 (security-auditor and the verifier on only
     the pass-2 diff ed3ea8c..01b158c; routine paths at full depth, day paths ordinary and accidental only; skeptics only
     for a major; a minor day finding becomes a limit or follow-up, not a pass 4).
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
