@@ -124,8 +124,18 @@
     routine line looser, main's file 180/192, gate with smoke PASS; lows P4-V2 to P4-V4; the C6 move described). The
     automated review of 9589bfb: finding 14 MEDIUM, day (`security-review-auto-6.md`). CI green on 60ae124. No routine
     text uses a wrapper as a command (the session's grep), so one rule may close S1, S2, S3, S5.
-  - Now: the advisor's pass-4 ruling (`advisor-pass4.md`): where, the fix shapes, the check after (his review budget),
-    C6, the follow-up lines.
+  - Done: the advisor's pass-4 ruling (`advisor-pass4.md`; probe `adv4-cd*.out`): PROCEED with fix pass 4 inside A3,
+    checked by the verifier alone. New High A4-1 (a failed cd then `;`: the next redirect is checked in the wrong
+    folder; on main too). R-PROG (a clause of R-PLAIN: every routine command starts with git, gh, npm, node, python,
+    python3 or date by bare name, after only TZ=, LC_ALL=, LANG=, LANGUAGE=, NO_COLOR=; redirects after the program)
+    closes P4-S1, -S2, -S3, -S5 and A4-1; the worktree path rule (kitName at the commit check and protectedHit;
+    kitPath in the routines' writePath and writeTarget) closes P4-S4; S3's second layer moves the role redirect loops
+    above `if (!argv.length) continue`. C6 accepted (plus a `git status > 'a*b'` row). Follow-ups FU-P4a, FU-P4b,
+    FU-P4c (after the kit freeze). No night-window drift on main: this session's loaded CLAUDE.md is kit-v3-0's
+    (3f07223), older than main's; read main's copies before relying on it.
+  - Now: fix pass 4 (a builder, Agent tool; notes `builder-pass4.md`), then the main session's checks and commits, the
+    final docs pass (sections 5 and 6 texts, the A4 and B.1 words, P4-V3), then the verifier's check of the
+    fix-pass-4 diff.
   - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
     until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
     scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor
