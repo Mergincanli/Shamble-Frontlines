@@ -107,9 +107,17 @@
   - Fix pass 3 so far (wf_8d8f9764-ff3, stopped at Day C's start, before any edit; its notes in `old/`): routine A done
     (R-PLAIN, C-PLAIN 212 + 2,000 lines, dateCheck, P3-4, NIGHT_SHIFT.md step 7; 967/967), routine B done (the night
     commit allowlist, P3-6; main's file 180/192, the same 12; gate --no-smoke PASS). Uncommitted in the worktree.
-  - Now: the same workflow resumed with Day C rewritten (D-ASK, P3-7, C-PLAIN rerun, no-looser diff, movers, full gate;
-    notes `builder-pass3-day2.md`) and docs-keeper's brief updated (his words, D-ASK, L16, FU-P3a, the kit freeze);
-    then the gate and commits; then pass 4.
+  - Done: fix pass 3 (wf_8d8f9764-ff3 resumed; notes `builder-pass3-routine-a.md`, `-routine-b.md`, `-day2.md`,
+    `docs-keeper-pass3.md`): code 9589bfb, docs 60ae124 (notes ec68c2c). R-PLAIN (plus five narrowings the builder
+    found), C-PLAIN (212 + 2,000 lines), dateCheck, P3-4, the night commit allowlist (P3-5), P3-6, D-ASK (the five
+    forms ask; an agent refused; no new parsing), P3-7, NIGHT_SHIFT.md step 7. Tests 1084/1084 (930, 127, 27); every
+    mutant killed; no routine line looser (1,260 decisions); main's file 180/192 (the same 12); gate with smoke PASS
+    (the main session too). To name for the advisor (C6): four rows moved out of main's mutation table into
+    PLAIN_BEHIND_MUTANTS (R-PLAIN refuses every row they guard). Older drift found by docs-keeper (not A3's): the
+    night window differs between NIGHT_SHIFT.md:3 (07:10), :17 and REPO_MAP:75 (07:30) and CLAUDE.md (08:30).
+  - Now: pass 4, the one final review (security-auditor and the verifier, Agent tool, on 01b158c..60ae124 only; his
+    review budget: below Critical or High becomes a STATUS follow-up, not another pass; skeptics only for Critical or
+    High); the automated review of 9589bfb if it comes.
   - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
     until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
     scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor
