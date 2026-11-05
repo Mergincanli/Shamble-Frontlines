@@ -1,9 +1,9 @@
 # Checkpoint: netcode-proof-test
 - **Goal:** start the netcode proof test (SPIKE_PLAN item 1) as its own change-set; this step is the PLAN only, for the
-  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (to write)
+  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 1 written)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-05 23:25 Amsterdam
+- **Last update:** 2026-11-05 23:40 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -16,15 +16,17 @@
    (reordering at P3, packet count, loopback LAN, x86-64 replays, L2 delay formula, OQ-0001-9 cover, stand-in
    conditions, bites, runner list, ML close, ports, cert method, metrics path, host keys) and 2 for Mustafa (route
    and its machine; Safari timed rows).
+3. Plan revision 1 · this commit · 699 lines: item 1 (no SSH; route (a) hybrid recommended, laptop), scope, layout
+   `spikes/netcode-proof/`, components E1-E22, symbols, pins (Rust 1.99.1), mark map (every PM-0001-1..62 but the 60 Hz
+   group, PM-0004-67, PM-0006-11..27), sessions VS1-VS8 (39 RS-h, 84 LG-h, EUR 6.88 planned, caps EUR 8.60) + VS9 later,
+   ports UDP 30001-30032 / TCP 31000-31032, DNS `A rs.nt` DNS only, http-01 on RS, the Safari workflow as W-PR,
+   readings R-1..R-24 for the advisor, decisions ROUTE and SAFARI-TIME for Mustafa.
 
 ## Current step
-3. Writing the plan (revision 1) from the digests: `.checkpoints/netcode-proof-test/plan.md`.
+4. Plan review round (one workflow, 3 agents at xhigh): security-auditor, engine-architect, the verifier. Notes:
+   `.checkpoints/netcode-proof-test/<agent>-plan-review.md`.
 
 ## Next steps
-3. Write the plan from the digests: `.checkpoints/netcode-proof-test/plan.md`.
-4. Plan review round (at most 3 agents): security-auditor (SSH key, certificates, firewall, cloud-init, the Safari
-   workflow), engine-architect (spikes/ layout, the harness shared with the boundary spike), a completeness critic
-   (every pass mark covered).
 5. Fix, then the advisor's plan review (APPROVE / REVISE / ESCALATE); iterate on REVISE.
 6. Push, open the draft PR, report to Mustafa (Decisions needed, For Mustafa).
 
