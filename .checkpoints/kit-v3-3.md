@@ -40,10 +40,15 @@
     (`security-review-auto.md`): S-1 (high), a switch target after `--` reaches the guard's own git diff (the guard
     could write a file); S-2, an origin/main name ambiguity; S-3, no case folding on darwin; S-4, pushd/popd not
     tracked. Fixed in step 4b, each with a test.
-  - Now: build part 3 (wf_3dad6479-df3): step 4b (R1-R4, the Edit-tool ask, S-1 to S-4), step 6 (the secret
-    check), step 7 (the rule texts, without the WT-NIGHT parts).
-  - Next: commit part 3; step 8 (gate with smoke, E1-E7, E9, E11a, docs-keeper, security-auditor and the verifier,
-    fixes); step 9 (WT-NIGHT) waits for Mustafa; step 10 (the report, ready, the advisor's final review).
+  - Done: build part 3 (wf_3dad6479-df3): step 4b (R1-R4, the Edit-tool ask, S-1 to S-4), step 6 (the secret
+    check; E3 0 new false positives), step 7 (the rule texts, no WT-NIGHT parts); python in the refusals (the main
+    session): 2e82216. E11a (`e11a.md`): the guard's ask stops a kit-file Write in default, acceptEdits and auto.
+    A second automated review of 2e82216 (`security-review-auto-2.md`): findings 5 (CDPATH set in the line) and 6
+    (a switch target read as its branch), fixed in step 4c: bbcb96b. Docs-keeper's step 8 pass: 442fbf7. Full
+    gate with smoke PASS (`gate-step8.md`); tests 555/555; CI green on 2e82216.
+  - Now: the reviews on 442fbf7 (wf_f5f87ff2-e86): security-auditor and the verifier, then a skeptic per finding.
+  - Next: fixes, then a fix check of only what changed; step 9 (WT-NIGHT) waits for Mustafa; step 10 (the report,
+    ready, the advisor's final review, needs-mustafa, his go).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 - **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
   org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.
