@@ -368,16 +368,18 @@ test('a merge whose check cannot complete fails closed, even for a day session',
 
 test('a refusal names what to use instead', async () => {
   const msg = async (command) => (await decide(sh(command), fakeIo({ role: NIGHT })))?.deny ?? '';
-  assert.match(await msg('cat docs/a.md'), /Read, Grep/);
-  assert.match(await msg('curl https://example.com'), /web|daytime/);
+  // fix pass 4 moved the next two (named): R-PROG answers cat and curl first, and names the programs to use
+  assert.match(await msg('cat docs/a.md'), PROG('cat is not a routine program'));
+  assert.match(await msg('curl https://example.com'), PROG('curl is not a routine program'));
   assert.match(await msg('git -C /tmp status'), /without -C/);
   assert.match(await msg('git checkout main'), /git switch/);
 });
 
 test('a refusal names python beside node (kit-v3-3: routines run python on main\'s tracked scripts)', async () => {
   const msg = async (command) => (await decide(sh(command), fakeIo({ role: NIGHT })))?.deny ?? '';
-  assert.match(await msg('cat docs/a.md'), /node or python \(main's tracked scripts\)/);
-  assert.match(await msg('bash -c "echo x"'), /node or python on main's tracked scripts/);
+  // fix pass 4 moved both (named): R-PROG answers cat and bash first; its reason names python beside node
+  assert.match(await msg('cat docs/a.md'), PROG('cat is not a routine program'));
+  assert.match(await msg('bash -c "echo x"'), PROG('bash is not a routine program'));
 });
 
 test('PermissionRequest in a routine denies and interrupts', async () => {
@@ -489,21 +491,21 @@ const MUTANTS = [
   ['the merge checks', "if (rs.some((r) => !['success', 'skipped', 'neutral'].includes(r.conclusion)) || !rs.some((r) => r.conclusion === 'success')) return deny(", 'if (false) return deny('],
   ['merge fails closed', 'catch (e) { return deny(`merge: the check could not complete', 'catch (e) { return null && deny(`merge: the check could not complete'],
   ['protected files in a merge (PR Advisor)', 'if (hit) return deny(`routine (pr-advisor): the PR changes', 'if (false) return deny(`routine (pr-advisor): the PR changes'],
-  ['protected writes (Edit/Write tool)', 'if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change', 'if (false) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change'],
+  // fix pass 4: 'protected writes (Edit/Write tool)' moved to KIT_BEHIND_MUTANTS (kitPath refuses its rows too)
   ["the PR Advisor's notes-only writes", "if (role === 'pr-advisor' && !/^(\\.checkpoints|\\.gate|\\.claude\\/agent-memory-local)(\\/|$)/.test(rel)) {", 'if (false) {'],
-  ['protected redirect targets', 'if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel}', 'if (false) return deny(`routine (${role}): ${what} on ${rel}'],
+  // fix pass 4: 'protected redirect targets' moved to KIT_BEHIND_MUTANTS (kitPath refuses its rows too)
   ['a write outside the project', 'return deny(`routine (${role}): ${what} must write inside the project or the scratchpad', 'return null && deny(`routine (${role}): ${what} must write inside the project or the scratchpad'],
   // fix pass 3: 'no expansion in a redirect target' moved to PLAIN_BEHIND_MUTANTS (R-PLAIN refuses its rows first)
-  ['the fixed shell set (catch-all)', 'return deny(`routine (${role}): the shell runs only git, gh, npm ci, node', 'return null && deny(`routine (${role}): the shell runs only git, gh, npm ci, node'],
-  ['a program by a path', 'if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name', 'if (false) return deny(`routine (${role}): run ${prog} by name'],
+  // fix pass 4: 'the fixed shell set (catch-all)' and 'a program by a path' moved to PLAIN_BEHIND_MUTANTS (R-PROG
+  // refuses their rows first)
   ['date reads the clock only', 'return deny(`routine (${role}): date reads the clock only', 'return null && deny(`routine (${role}): date reads the clock only'],
   ['tracked scripts only', "if (io.git(['ls-files', '--error-unmatch', '--', rel], root).code !== 0) return deny(", 'if (false) return deny('],
   ["main's copy only", "if (io.git(['diff', '--quiet', 'origin/main', '--', rel], root).code !== 0) return deny(", 'if (false) return deny('],
   ['.gate and preview scripts denied', "if (DENIED_SCRIPTS.has(rel) || rel.startsWith('.gate/')) return deny(", 'if (false) return deny('],
   ['no interpreter for the PR Advisor', "if (role === 'pr-advisor') return deny(\"routine (pr-advisor): the PR Advisor runs no program", "if (false) return deny(\"routine (pr-advisor): the PR Advisor runs no program"],
   ['the exact npm form', "if (role === 'night-shift' && argv.join(' ') === NIGHT_NPM) {", "if (role === 'night-shift') {"],
-  ['environment set on a command', 'if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): only ${okList} may be set', 'if (false) return { deny: `routine (${role}): only ${okList} may be set'],
-  ['re-exec wrappers', "if (b === 'command' || b === 'builtin' || b === 'exec' || b === 'time' || b === 'nohup') return { deny:", 'if (false) return { deny:'],
+  // fix pass 4: 'environment set on a command' and 're-exec wrappers' moved to PLAIN_BEHIND_MUTANTS (R-PROG refuses
+  // their rows first)
   // fix pass 3: 'no command substitution', 'unquoted expansion (git add *)' and 'an unterminated here-document' moved
   // to PLAIN_BEHIND_MUTANTS (R-PLAIN refuses their rows first)
   ['read-redirect targets are checked', 'for (const r of c.reads) {', 'for (const r of []) {'],
@@ -1988,7 +1990,11 @@ const ALONE = (sub) => new RegExp(`^routine \\(night-shift\\): git ${sub} runs a
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const PLAIN = (found, role = NIGHT) => new RegExp(`^${reEsc(`routine (${role}): write the command plainly (${found}): one command ` +
   'per line or joined with && ; values in quotes; no comments, $, backslashes, here-documents, braces, brackets or parentheses')}$`);
-const FOREGROUND = /^routine \(night-shift\): routines run git in the foreground \(no background & or run_in_background on a line with git\)$/;
+// fix pass 4 (R-PROG): its reason, word for word, with what it found
+const PROG = (found, role = NIGHT) => new RegExp(`^${reEsc(`routine (${role}): start each command with its program by name ` +
+  `(${found}): git, gh, npm, node, python, python3 or date, after only TZ=, LC_ALL=, LANG=, LANGUAGE= or NO_COLOR=; ` +
+  'redirects after the program; no cd, wrappers or shell keywords')}$`);
+const FOREGROUND =/^routine \(night-shift\): routines run git in the foreground \(no background & or run_in_background on a line with git\)$/;
 const nightFake = (o = {}) => fakeIo({ role: NIGHT, ...o });
 const OK_X = () => nightIo({ kit: { 'cs/ok': KIT('docs/a.md'), 'cs/x': KIT('docs/a.md') } });
 export const PASS2_ROUTINE_CASES = [
@@ -1999,19 +2005,24 @@ export const PASS2_ROUTINE_CASES = [
     () => nightIo({ kit: { 'cs/n': '', 'origin/cs/evil': KIT('.claude/settings.json') } }), ALONE('switch')],
   ['SD-1 night: git switch cs/ok; git status', dsh('git switch cs/ok; git status'), DENY, OK_X, ALONE('switch')],
   // fix pass 3 moved the next three reasons (named): a background & with git is P3-4's; parentheses are R-PLAIN's
-  ['SD-1 night: git switch cs/ok & x', dsh('git switch cs/ok & x'), DENY, OK_X, FOREGROUND],
+  // fix pass 4 moved this reason (named): x is not a routine program (R-PROG answers before P3-4)
+  ['SD-1 night: git switch cs/ok & x', dsh('git switch cs/ok & x'), DENY, OK_X, PROG('x is not a routine program')],
   ['SD-1 night: git switch cs/ok & (a background job, one command)', dsh('git switch cs/ok &'), DENY, OK_X, FOREGROUND],
   ['SD-1 night: (git switch cs/ok) (a subshell, one command)', dsh('(git switch cs/ok)'), DENY, OK_X, PLAIN('a parenthesis, brace or bracket (()')],
   // added in fix pass 3: the one plain line left that is one command with a fork (it keeps "no pipe ..." needed)
   ['SD-1 night: git switch cs/ok | (a trailing pipe, one command)', dsh('git switch cs/ok |'), DENY, OK_X, ALONE('switch')],
-  ['SD-1 night: git switch cs/ok | cat (a pipe)', dsh('git switch cs/ok | cat'), DENY, OK_X, ALONE('switch')],
-  ['SD-1 night: cd <project> && git switch cs/ok (a cd counts)', dsh('cd /p && git switch cs/ok'), DENY, OK_X, ALONE('switch')],
+  // fix pass 4 moved the next two reasons and the push pipe's below (named): cat and cd are not routine programs (R-PROG);
+  // the rows after each keep the night line rule's reason on a plain line
+  ['SD-1 night: git switch cs/ok | cat (a pipe)', dsh('git switch cs/ok | cat'), DENY, OK_X, PROG('cat is not a routine program')],
+  ['SD-1 night: git switch cs/ok | git status (a pipe, fix pass 4)', dsh('git switch cs/ok | git status'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: cd <project> && git switch cs/ok (a cd counts)', dsh('cd /p && git switch cs/ok'), DENY, OK_X, PROG('cd is not a routine program')],
   ['SD-1 night: git add f && git commit -m m', sh('git add f && git commit -m m'), DENY, () => nightFake(),
     /^routine \(night-shift\): git commit runs alone, the only command of its call \(the guard checks what it commits before the line runs\): run git add in its own call first, then git commit alone$/],
   ['SD-1 night: git commit -m m && git push origin cs/x', sh('git commit -m m && git push origin cs/x'), DENY, () => nightFake(), ALONE('commit')],
   ['SD-1 night: git status && git push origin cs/x', sh('git status && git push origin cs/x'), DENY, () => nightFake(),
     /^routine \(night-shift\): git push runs alone, the only command of its call \(the guard checks what it pushes before the line runs\): run git commit in its own call first, then git push alone$/],
-  ['SD-1 night: git push origin cs/x | cat', sh('git push origin cs/x | cat'), DENY, () => nightFake(), ALONE('push')],
+  ['SD-1 night: git push origin cs/x | cat', sh('git push origin cs/x | cat'), DENY, () => nightFake(), PROG('cat is not a routine program')],
+  ['SD-1 night: git push origin cs/x | git status (fix pass 4)', sh('git push origin cs/x | git status'), DENY, () => nightFake(), ALONE('push')],
   // SD-1: as before
   ['SD-1 night: git switch cs/ok alone goes on', dsh('git switch cs/ok'), null, OK_X],
   ['SD-1 night: git switch cs/ok; (parseShell drops the empty command after the ;) goes on', dsh('git switch cs/ok;'), null, OK_X],
@@ -2072,8 +2083,9 @@ const PASS2_ROUTINE_MUTANTS = [
   ['SD-1 push is covered', "  push: ['checks what it pushes',", "  nope: ['checks what it pushes',"],
   ['SD-1 night only (pr-advisor and day unchanged)', "if (role === 'night-shift' && NIGHT_ALONE[sub] && !line.alone) {", 'if (NIGHT_ALONE[sub] && !line.alone) {'],
   ['SD-2 protectedHit lists with DIFF_NAMES', "const d = io.git(['diff', ...DIFF_NAMES, ...range], vcwd);", "const d = io.git(['diff', '--name-only', ...range], vcwd);"],
-  ["SD-2 protectedHit splits on NUL", "const hit = d.out.split('\\0').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));",
-    "const hit = d.out.split('\\n').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));"],
+  // fix pass 4 (P4-S4, a named scaffold edit): protectedHit tests a name with kitName now
+  ["SD-2 protectedHit splits on NUL", "const hit = d.out.split('\\0').filter(Boolean).find((f) => kitName(f, top, vcwd, io));",
+    "const hit = d.out.split('\\n').filter(Boolean).find((f) => kitName(f, top, vcwd, io));"],
   ['SD-2 the staged list uses DIFF_NAMES', "io.git(['diff', '--cached', ...DIFF_NAMES], vcwd)", "io.git(['diff', '--cached', '--name-only'], vcwd)"],
   ['SD-2 the -a list uses DIFF_NAMES', "lists.push(io.git(['diff', ...DIFF_NAMES], vcwd));", "lists.push(io.git(['diff', '--name-only'], vcwd));"],
   ["SD-2 the commit's lists split on NUL", "lists.flatMap((d) => d.out.split('\\0'))", "lists.flatMap((d) => d.out.split('\\n'))"],
@@ -2463,7 +2475,8 @@ export const PASS3_ROUTINE_CASES = [
   ["R-PLAIN night: date +'%Y-%m-%d %H:%M' goes on", sh("date +'%Y-%m-%d %H:%M'"), null, nightFake],
   ['R-PLAIN night: git status 2>&1 goes on', sh('git status 2>&1'), null, nightFake],
   ['R-PLAIN night: git status >&2 goes on', sh('git status >&2'), null, nightFake],
-  ['R-PLAIN night: 2>&1 git status goes on', sh('2>&1 git status'), null, nightFake],
+  // fix pass 4 moved this row (named, null to deny): R-PROG puts redirects after the program
+  ['R-PLAIN night: 2>&1 git status goes on', sh('2>&1 git status'), DENY, nightFake, PROG('a redirect before the program')],
   ['R-PLAIN night: git status, a newline, git log -1 goes on', sh('git status\ngit log -1'), null, nightFake],
   ["R-PLAIN night: git log --grep '#x' goes on", sh("git log --grep '#x'"), null, nightFake],
   // moved by D-ASK (Mustafa's scope stop): a day comment asks, with D-ASK's reason, not R-PLAIN's (was null)
@@ -2558,11 +2571,32 @@ test('mutation runs (fix pass 3, routine side A): every new rule and refused cla
 // R-PLAIN refuses every role line that four of section 4's rules guarded (a substitution, an unquoted glob, a
 // here-document, an expanding redirect target), so those mutants moved here: each must still be caught by the case
 // table with R-PLAIN switched off too (the parser's checks stay a second layer under R-PLAIN).
+// fix pass 4 (P4-S3): the guard's text from the moved block to the program checks, and the same text in its old order
+// (the two role loops after the cd branch again, as at 60ae124)
+const P4_S3_SRC = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+const P4_S3_AT = P4_S3_SRC.indexOf('    if (role) { // fix pass 4 (P4-S3');
+const P4_S3_LAYER = P4_S3_AT < 0 ? '' : P4_S3_SRC.slice(P4_S3_AT, P4_S3_SRC.indexOf('      if (rawProg !== prog)', P4_S3_AT));
+const P4_S3_OLD = ((lines) => [...lines.slice(4), ...lines.slice(1, 3)].join(''))(P4_S3_LAYER.split(/(?<=\n)/));
 const PLAIN_BEHIND_MUTANTS = [
   ['no expansion in a redirect target', 'if (/[$`*?[{]/.test(p) || /^~/.test(p)) return deny(', 'if (false) return deny('],
   ['no command substitution', 'if (role && subs) return deny(', 'if (false) return deny('],
   ['unquoted expansion (git add *)', 'if (role && c.expand) return deny(', 'if (false) return deny('],
   ['an unterminated here-document', 'if (role && unterminated) return deny(', 'if (false) return deny('],
+  // fix pass 4 (advisor-pass4 §4, the same treatment for the rows R-PROG adds): main's rows, byte for byte; R-PROG
+  // refuses every role row of CASES that kills them, so with R-PLAIN on no CASES row can
+  ['the fixed shell set (catch-all)', 'return deny(`routine (${role}): the shell runs only git, gh, npm ci, node', 'return null && deny(`routine (${role}): the shell runs only git, gh, npm ci, node'],
+  ['a program by a path', 'if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name', 'if (false) return deny(`routine (${role}): run ${prog} by name'],
+  ['environment set on a command', 'if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): only ${okList} may be set', 'if (false) return { deny: `routine (${role}): only ${okList} may be set'],
+  ['re-exec wrappers', "if (b === 'command' || b === 'builtin' || b === 'exec' || b === 'time' || b === 'nohup') return { deny:", 'if (false) return { deny:'],
+  // fix pass 4 (P4-S3, the second layer): the role redirect and read checks back after `if (!argv.length) continue;`
+  ['P4-S3 the second layer back in its old order', P4_S3_LAYER, P4_S3_OLD],
+];
+// fix pass 4: rows the runner below adds to CASES (same shape), so the S3 second layer has killers with R-PLAIN off
+const PLAIN_BEHIND_CASES = [
+  ['P4-S3 night: >CLAUDE.md (no program)', NIGHT, sh('>CLAUDE.md'), true],
+  ['P4-S3 pr-advisor: TZ=x >.claude/settings.json (no program)', PRA, sh('TZ=x >.claude/settings.json'), true],
+  ['P4-S3 night: git status; >.claude/settings.json', NIGHT, sh('git status; >.claude/settings.json'), true],
+  ['P4-S3 night: >docs/x.md (no program, a docs file: R-PLAIN off lets it through)', NIGHT, sh('>docs/x.md'), false],
 ];
 test('mutation runs (fix pass 3): the role checks R-PLAIN now covers are still needed with R-PLAIN off', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -2573,7 +2607,7 @@ test('mutation runs (fix pass 3): the role checks R-PLAIN now covers are still n
   try {
     writeFileSync(join(dir, 'off.mjs'), off);
     const base = await import(pathToFileURL(join(dir, 'off.mjs')).href);
-    for (const [name, role, input, refused, opts] of CASES) {
+    for (const [name, role, input, refused, opts] of [...CASES, ...PLAIN_BEHIND_CASES]) { // fix pass 4: + PLAIN_BEHIND_CASES
       assert.equal(!!(await base.decide(input, fakeIo({ role, ...opts }))), refused, `R-PLAIN off, unmutated: ${name}`);
     }
     for (const [i, [label, from, to]] of PLAIN_BEHIND_MUTANTS.entries()) {
@@ -2582,7 +2616,7 @@ test('mutation runs (fix pass 3): the role checks R-PLAIN now covers are still n
       writeFileSync(file, off.replace(from, () => to));
       const m = await import(pathToFileURL(file).href);
       let caught = false;
-      for (const [, role, input, refused, opts] of CASES) {
+      for (const [, role, input, refused, opts] of [...CASES, ...PLAIN_BEHIND_CASES]) {
         let d;
         try { d = await m.decide(input, fakeIo({ role, ...opts })); } catch { d = 'threw'; }
         if (!!d !== refused) { caught = true; break; }
@@ -2689,8 +2723,9 @@ function plainLine(r, n) {
   const target = () => { files++; return pick([`f${n}x${files}`, `'f ${files}'`, `"g'${files}"`]); };
   const command = () => {
     const parts = [];
-    if (r() < 0.2) parts.push(pick(['TZ=x', "A_1='v w'", 'B="p q"']));
-    parts.push(pick(['git', 'gh', 'date', 'node', 'npm']));
+    // fix pass 4 (R-PROG): settings from ROLE_ENV_OK, the program from the seven
+    if (r() < 0.2) parts.push(pick(['TZ=x', "LC_ALL='v w'", 'LANG="p q"', 'LANGUAGE=x', 'NO_COLOR=1']));
+    parts.push(pick(['git', 'gh', 'date', 'node', 'npm', 'python', 'python3']));
     for (let k = Math.floor(r() * 5); k > 0; k--) parts.push(word());
     for (let k = Math.floor(r() * 3); k > 0; k--) {
       const to = target();
@@ -2730,8 +2765,11 @@ test('C-PLAIN (fix pass 3): on the plain form, parseShell reads what bash runs a
     for (const [, role, input] of ROUTINE_FIX_CASES) add(role, input);
     for (const [, input] of NIGHT_SWITCH_CASES) add(NIGHT, input);
     for (const [, input, , io] of [...PASS2_ROUTINE_CASES, ...PASS3_ROUTINE_CASES]) add(io().env.SHAMBLE_ROLE, input);
+    for (const [, input, , io] of PASS4_ROUTINE_CASES) add(io().env.SHAMBLE_ROLE, input); // fix pass 4
     const accepted = [...lines].filter((l) => plainForm(l) === null);
-    const names = new Set(['git', 'gh', 'date', 'node', 'npm']);
+    // fix pass 4: the lines R-PROG refuses (R-PLAIN's other clauses accept them) leave the corpus, each named
+    const progLeft = [...lines].filter((l) => plainForm(l)?.prog).map((l) => `${JSON.stringify(l)}: ${plainForm(l).prog}`);
+    const names = new Set(['git', 'gh', 'date', 'node', 'npm', 'python', 'python3']);
     for (const l of accepted) for (const c of parseShell(l).cmds) { const p = program(c.argv)[0]; if (p && /^[A-Za-z0-9_.+-]+$/.test(p)) names.add(p); }
     const typeOf = new Map(spawnSync(BASH, ['--norc', '--noprofile', '-c', `PATH=/nonexistent; for n in ${[...names].join(' ')}; do echo "$n $(type -t "$n")"; done`],
       { encoding: 'utf8' }).stdout.trim().split('\n').map((s) => s.split(' ')));
@@ -2809,6 +2847,7 @@ test('C-PLAIN (fix pass 3): on the plain form, parseShell reads what bash runs a
     t.diagnostic(`C-PLAIN: ${corpus.length} corpus lines (of ${accepted.length} that R-PLAIN accepts) and ${random.length} random lines, ` +
       `${[...ran.values()].reduce((n, g) => n + g.length, 0)} commands run, in ${Date.now() - started} ms`);
     for (const l of left) t.diagnostic(`left out of the corpus: ${l}`);
+    for (const l of progLeft) t.diagnostic(`left out of the corpus (R-PROG refuses it): ${l}`);
     assert.deepEqual(bad.slice(0, 5), [], `${bad.length} lines where parseShell and bash differ`);
     assert.equal(ran.size, items.length, 'every line ran');
   } finally { rmSync(root, { recursive: true, force: true }); }
@@ -3273,6 +3312,294 @@ test('real git and bash (fix pass 3, D-ASK): the day rows hide a command or a wr
       assert.deepEqual([branchNow(), settings(), rules()], ['main', '{"a":1}\n', 'rules\n'], `reset after ${label}`);
     }
     for (const line of controls) assert.equal(kindOf(await decide(dsh(line, { cwd: P }), io)), null, `control ${JSON.stringify(line)}`);
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(root, { recursive: true, force: true });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ---------- 9. fix pass 4 (advisor-pass4 §3): R-PROG, the S3 second layer, the worktree path rule ----------
+// R-PROG (a clause of R-PLAIN): every routine command starts with settings from ROLE_ENV_OK and then git, gh, npm, node,
+// python, python3 or date, unquoted and by its bare name; redirects come after the program; a command with no program is
+// refused. The rows: the auditor's P4-S1, P4-S2, P4-S3 and P4-S5 lines, the Advisor's A4-1, the wrappers and keywords,
+// and the routines' own lines (nulls). Each row runs for the night shift and the PR Advisor unless its name says one.
+const NOT_PROG = (w) => `${w} is not a routine program`;
+const NO_PROG = 'a command with no program', REDIR_FIRST = 'a redirect before the program';
+const roleRows = (name, command, want, found, roles = [NIGHT, PRA]) => roles.map((role) => [`${name} (${role})`,
+  typeof command === 'string' ? sh(command) : command, want, role === NIGHT ? nightFake : praFake,
+  found === undefined ? undefined : found instanceof RegExp ? found : PROG(found, role)]);
+const SAVE_LINE = `node .claude/scripts/checkpoint.mjs save kit-v3-3 -m "step 2: what's next" ${SESSION_TRAILER}`;
+const WATCH_LINE = `node .claude/scripts/checkpoint.mjs watch kit-v3-3 ${SESSION_TRAILER}`;
+export const PASS4_ROUTINE_CASES = [
+  // P4-S1: a wrapper or keyword name given by a path, a program by a path, a quoted program
+  ...roleRows('P4-S1 docs/do git status', 'docs/do git status', DENY, NOT_PROG('docs/do')),
+  ...roleRows('P4-S1 ./docs/timeout 5 git status', './docs/timeout 5 git status', DENY, NOT_PROG('./docs/timeout')),
+  ...roleRows('P4-S1 docs/env git status', 'docs/env git status', DENY, NOT_PROG('docs/env')),
+  ...roleRows('P4-S1 docs/then git status', 'docs/then git status', DENY, NOT_PROG('docs/then')),
+  ...roleRows('P4-S1 .gate/w/docs/do git status', '.gate/w/docs/do git status', DENY, NOT_PROG('.gate/w/docs/do')),
+  ...roleRows('P4-S1 /usr/bin/git status', '/usr/bin/git status', DENY, NOT_PROG('/usr/bin/git')),
+  ...roleRows('P4-S1 "git" status', '"git" status', DENY, NOT_PROG('"git"')),
+  // P4-S2: a shell keyword is no routine program (a quoted NAME= after it no longer passes)
+  ...roleRows('P4-S2 if "TZ=./x" date; then date; fi', 'if "TZ=./x" date; then date; fi', DENY, NOT_PROG('if')),
+  ...roleRows('P4-S2 while "TZ=x" date; do date; done', 'while "TZ=x" date; do date; done', DENY, NOT_PROG('while')),
+  ...roleRows("P4-S2 'do' git status", "'do' git status", DENY, NOT_PROG("'do'")),
+  ...roleRows('P4-S2 if git status; then date; fi', 'if git status; then date; fi', DENY, NOT_PROG('if')),
+  // P4-S3: a command with no program, a redirect before the program
+  ...roleRows('P4-S3 >CLAUDE.md', '>CLAUDE.md', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 TZ=x >CLAUDE.md', 'TZ=x >CLAUDE.md', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 git status; >.claude/settings.json', 'git status; >.claude/settings.json', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 TZ=x >.claude/settings.json', 'TZ=x >.claude/settings.json', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 TZ=x alone', 'TZ=x', DENY, NO_PROG),
+  ...roleRows('P4-S3 TZ=x, a newline, git status', 'TZ=x\ngit status', DENY, NO_PROG),
+  ...roleRows('P4-S3 TZ=x; git status', 'TZ=x; git status', DENY, NO_PROG),
+  ...roleRows('P4-S3 >docs/x.md', '>docs/x.md', DENY, REDIR_FIRST, [NIGHT]),
+  ...roleRows('P4-S3 2>&1 git status', '2>&1 git status', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 >docs/x.md git status', '>docs/x.md git status', DENY, REDIR_FIRST),
+  ...roleRows('P4-S3 control: git status > docs/x.md goes on', 'git status > docs/x.md', null, undefined, [NIGHT]),
+  // P4-S5: xvfb-run is not a routine program
+  ...roleRows('P4-S5 xvfb-run -a -f .claude/settings.json git status', 'xvfb-run -a -f .claude/settings.json git status', DENY,
+    NOT_PROG('xvfb-run')),
+  ...roleRows('P4-S5 xvfb-run -a -e CLAUDE.md git status', 'xvfb-run -a -e CLAUDE.md git status', DENY, NOT_PROG('xvfb-run')),
+  ...roleRows('P4-S5 xvfb-run -a git status', 'xvfb-run -a git status', DENY, NOT_PROG('xvfb-run')),
+  // wrappers and keywords (R-PROG answers each; PATH= by R-PROG's settings check, before unwrapRole's ROLE_ENV_OK text)
+  ...['timeout 5 git status', 'nice git status', 'env TZ=x date', 'stdbuf -oL git log -1', 'nohup git status', 'time git status',
+    'command git status', 'exec git status', 'noglob git status', 'nodejs x.js']
+    .flatMap((l) => roleRows(`wrapper or keyword: ${l}`, l, DENY, NOT_PROG(l.split(' ')[0]))),
+  ...roleRows('PATH=x git status (R-PROG answers)', 'PATH=x git status', DENY, 'PATH= may not be set'),
+  // A4-1: no cd (a failed cd followed by ; would move the guard's folder, not bash's)
+  ...roleRows('A4-1 cd .gate/nonexist; git status > .claude/settings.json', 'cd .gate/nonexist; git status > .claude/settings.json',
+    DENY, NOT_PROG('cd')),
+  ...roleRows('A4-1 cd docs && git status', 'cd docs && git status', DENY, NOT_PROG('cd')),
+  ...roleRows('A4-1 pushd docs', 'pushd docs', DENY, NOT_PROG('pushd')),
+  // C6 nuance (advisor-pass4 §4): a quoted glob in a redirect target is refused by writeTarget with R-PLAIN on
+  ...roleRows("C6 git status > 'a*b'", "git status > 'a*b'", DENY,
+    /^routine \(night-shift\): no variable, glob, brace or ~ in a write path \(a\*b\)$/, [NIGHT]),
+  // nulls: the routines' own lines, unchanged
+  ...roleRows("pr-advisor's step-0 line goes on", 'git fetch -q origin main && git switch --detach origin/main', null, undefined, [PRA]),
+  ...roleRows('NIGHT_NPM goes on', NIGHT_NPM_CMD, null, undefined, [NIGHT]),
+  ...roleRows('the checkpoint save line goes on', SAVE_LINE, null, undefined, [NIGHT]),
+  ...roleRows('the checkpoint watch line (run_in_background) goes on', bgSh(WATCH_LINE), null, undefined, [NIGHT]),
+  ...roleRows('TZ=Europe/Amsterdam date +%H:%M goes on', 'TZ=Europe/Amsterdam date +%H:%M', null),
+  ...roleRows('TZ="Europe/Amsterdam" date goes on', 'TZ="Europe/Amsterdam" date', null),
+  ...roleRows('LC_ALL=C git log -1 --oneline goes on', 'LC_ALL=C git log -1 --oneline', null),
+  ...roleRows('git status 2>&1 goes on', 'git status 2>&1', null),
+  ...roleRows('git log -1 >&2 goes on', 'git log -1 >&2', null),
+  ...roleRows('git status; git log -1 goes on', 'git status; git log -1', null),
+  ...roleRows('git status, a newline, git log -1 goes on', 'git status\ngit log -1', null),
+  ...roleRows('git status; (a trailing ;) goes on', 'git status;', null),
+  ...roleRows('git commit -q -m "fix #16: it\'s done" goes on', 'git commit -q -m "fix #16: it\'s done"', null, undefined, [NIGHT]),
+];
+for (const [name, input, want, io, re] of PASS4_ROUTINE_CASES) {
+  test(`routine (fix pass 4) ${want ?? 'goes on'}: ${name}`, async () => {
+    const d = await decide(input, io());
+    assert.equal(kindOf(d), want, `${name}: ${JSON.stringify(d)}`);
+    if (re) assert.match(d.ask ?? d.deny, re);
+  });
+}
+test("fix pass 4: R-PROG's reason, word for word; day sessions unchanged", async () => {
+  assert.equal((await decide(sh('cd docs && git status'), praFake())).deny, 'routine (pr-advisor): start each command with its program by name (cd is not a routine program): git, gh, npm, node, python, python3 or date, after only TZ=, LC_ALL=, LANG=, LANGUAGE= or NO_COLOR=; redirects after the program; no cd, wrappers or shell keywords');
+  for (const l of ['cd docs && git status', 'timeout 5 git status', '2>&1 git status', 'docs/do git status']) {
+    assert.equal(kindOf(await decide(sh(l), dayFake())), null, `day: ${l}`);
+  }
+});
+const PASS4_ROUTINE_MUTANTS = [
+  ['R-PROG removed', 'return prog === null ? null : { prog };', 'return null;'],
+  ["R-PROG's no-program end check removed", "const cmdEnd = () => { if (seen && atCmd) prog ??= 'a command with no program'; seen = false; };",
+    'const cmdEnd = () => { seen = false; };'],
+  ["R-PROG's redirect-before-the-program check removed (an operator)",
+    "if (redirect) { seen = true; if (atCmd) prog ??= 'a redirect before the program'; } else cmdEnd();",
+    'if (redirect) { seen = true; } else cmdEnd();'],
+  ["R-PROG's redirect-before-the-program check removed (>& and its number)",
+    "if (atCmd) prog ??= 'a redirect before the program'; // R-PROG (>& and its number)", ''],
+  ['cd added to the list', "const ROUTINE_PROGS = new Set(['git', 'gh', 'npm', 'node', 'python', 'python3', 'date']);",
+    "const ROUTINE_PROGS = new Set(['git', 'gh', 'npm', 'node', 'python', 'python3', 'date', 'cd']);"],
+  ['a quoted program word allowed', 'if (!ROUTINE_PROGS.has(w)) prog ??=', "if (!ROUTINE_PROGS.has(w.replace(/['\"]/g, ''))) prog ??="],
+  ['the program list check removed', 'if (!ROUTINE_PROGS.has(w)) prog ??=', 'if (false) prog ??='],
+  ['the settings name check removed', "if (!ROLE_ENV_OK.has(w.slice(0, w.indexOf('=')))) prog ??=", 'if (false) prog ??='],
+  ['a newline ends the command (R-PROG)', "if (c === '\\n') cmdEnd();", ''],
+  ['a separator ends the command (R-PROG)', '} else cmdEnd(); // R-PROG', '} // R-PROG'],
+  ["R-PROG's reason of its own (progReason)", 'found.prog ? progReason(role, found.prog) : plainText(role, found)',
+    'plainText(role, found.prog ?? found)'],
+  ["the quoted-glob rule (no expansion in a redirect target), with R-PLAIN on", 'if (/[$`*?[{]/.test(p) || /^~/.test(p)) return deny(',
+    'if (false) return deny('],
+];
+test('mutation runs (fix pass 4, R-PROG and C6): every new rule is needed by some case (kind and reason)', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass4-'));
+  const survivors = [];
+  const right = (d, want, re) => kindOf(d) === want && (!re || re.test(d.ask ?? d.deny));
+  for (const [name, input, want, io, re] of PASS4_ROUTINE_CASES) assert.ok(right(await decide(input, io()), want, re), `unmutated rules: ${name}`);
+  try {
+    for (const [i, [label, from, to]] of PASS4_ROUTINE_MUTANTS.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `p${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [, input, want, io, re] of PASS4_ROUTINE_CASES) {
+        let d;
+        try { d = await m.decide(input, io()); } catch { caught = true; break; }
+        if (!right(d, want, re)) { caught = true; break; }
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no fix pass 4 case catches: ${survivors.join('; ')}`);
+});
+// The worktree path rule's kitPath checks (writePath, writeTarget) refuse every path the project-relative check refuses
+// (kitPath reads a path in the project folder by its project-relative place too), so main's two mutants of that check
+// moved here, byte for byte: with the kitPath checks switched off, the case table must still catch each of them.
+const KIT_OFF = [['const k = kitPath(p, cwd, io);', 'const k = null;'], ['const kit = kitPath(p, vcwd, io);', 'const kit = null;']];
+const KIT_BEHIND_MUTANTS = [
+  ['protected writes (Edit/Write tool)', 'if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change', 'if (false) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change'],
+  ['protected redirect targets', 'if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel}', 'if (false) return deny(`routine (${role}): ${what} on ${rel}'],
+];
+test('mutation runs (fix pass 4): the project-relative kit checks are still needed with the kitPath checks off', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  for (const [from] of KIT_OFF) assert.equal(src.split(from).length - 1, 1, `the kitPath line ${from} occurs exactly once`);
+  const off = KIT_OFF.reduce((s, [from, to]) => s.replace(from, () => to), src);
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass4-kit-'));
+  const survivors = [];
+  try {
+    writeFileSync(join(dir, 'off.mjs'), off);
+    const base = await import(pathToFileURL(join(dir, 'off.mjs')).href);
+    for (const [name, role, input, refused, opts] of CASES) {
+      assert.equal(!!(await base.decide(input, fakeIo({ role, ...opts }))), refused, `kitPath off, unmutated: ${name}`);
+    }
+    for (const [i, [label, from, to]] of KIT_BEHIND_MUTANTS.entries()) {
+      assert.equal(off.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `k${i}.mjs`);
+      writeFileSync(file, off.replace(from, to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [, role, input, refused, opts] of CASES) {
+        let d;
+        try { d = await m.decide(input, fakeIo({ role, ...opts })); } catch { d = 'threw'; }
+        if (!!d !== refused) { caught = true; break; }
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no case catches with the kitPath checks off: ${survivors.join('; ')}`);
+});
+// P4-S4, real git: realOrigin's project P with a tracked .claude/scripts/checkpoint.mjs; a worktree W = .gate/w on cs/wt
+// from origin/main, a docs worktree D = .gate/d on cs/d, and a worktree S of this repository in the scratchpad. Each row
+// is decided by the rules with the real io, and by each real mutant in a copy; a mutant is killed when every row named for
+// it goes through. With the commit and push mutants, real git then commits or pushes the kit change.
+test('real git (fix pass 4, P4-S4): a worktree under .gate/ or the scratchpad cannot carry a kit change into a write, commit or push', async () => {
+  const { root, O, P, g } = realOrigin('guard-git-pass4-');
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const bashIn = (cwd, line) => spawnSync('bash', ['--norc', '--noprofile', '-c', line], { cwd, env, encoding: 'utf8' });
+  const gIn = (cwd, ...a) => spawnSync('git', a, { cwd, env, encoding: 'utf8' });
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass4-real-'));
+  const SP = join(root, 'scratch');
+  const W = join(P, '.gate', 'w'), D = join(P, '.gate', 'd'), S = join(SP, 'w');
+  try {
+    process.env.CLAUDE_PROJECT_DIR = P;
+    mkdirSync(join(P, '.claude', 'scripts'), { recursive: true });
+    writeFileSync(join(P, '.claude', 'scripts', 'checkpoint.mjs'), 'process.exit(0)\n');
+    writeFileSync(join(P, '.gitignore'), '.gate/\n');
+    g('add', '-A'); g('commit', '-q', '-m', 'script'); g('push', '-q', 'origin', 'main'); g('fetch', '-q', 'origin');
+    mkdirSync(SP);
+    assert.equal(g('worktree', 'add', '-q', '-b', 'cs/wt', W, 'origin/main').status, 0);
+    assert.equal(g('worktree', 'add', '-q', '-b', 'cs/d', D, 'origin/main').status, 0);
+    assert.equal(g('worktree', 'add', '-q', '-b', 'cs/sw', S, 'origin/main').status, 0);
+    const ioFor = (role) => ({ ...realIo(), env: { SHAMBLE_ROLE: role } });
+    const ask = async (m, role, tool, ti, cwd) => m.decide({ hook_event_name: 'PreToolUse', tool_name: tool, tool_input: ti, cwd, scratchpad_dir: SP }, ioFor(role));
+    const write = (tool, f) => (tool === 'Write' ? { file_path: f, content: 'x' } : { file_path: f, old_string: 'a', new_string: 'b' });
+    const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+    const real = { decide };
+    const muts = {
+      M1: ['the commit check reads only the project path (the tree-path half removed)', '      .find((f) => kitName(f, top, vcwd, io));',
+        '      .find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));'],
+      M2: ["protectedHit reads only the project path (the tree-path half removed)", "const hit = d.out.split('\\0').filter(Boolean).find((f) => kitName(f, top, vcwd, io));",
+        "const hit = d.out.split('\\0').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));"],
+      M3: ['kitPath removed from writePath', 'const k = kitPath(p, cwd, io);', 'const k = null;'],
+      M4: ['kitPath removed from writeTarget', 'const kit = kitPath(p, vcwd, io);', 'const kit = null;'],
+    };
+    const mod = {};
+    for (const [key, [label, from, to]] of Object.entries(muts)) {
+      assert.equal(src.split(from).length - 1, 1, `real mutant ${key} (${label}): its target text occurs exactly once`);
+      writeFileSync(join(dir, `${key}.mjs`), src.replace(from, () => to));
+      mod[key] = await import(pathToFileURL(join(dir, `${key}.mjs`)).href);
+    }
+    const WP = (role, p, k) => new RegExp(`^${reEsc(`routine (${role}): ${p} is ${k} in a worktree of this repository (a rules, CI or gate file); those change only in a daytime kit change-set`)}$`);
+    const WT_REDIR = (p, k) => new RegExp(`^${reEsc(`routine (night-shift): a redirect on ${p} (${k} in a worktree of this repository: a rules, CI or gate file) is not allowed`)}$`);
+    const COMMIT_KIT = /^routine \(night-shift\): the commit would change \.claude\/settings\.json \(a rules, CI or gate file\)$/;
+    const BRANCH_KIT = /^routine \(night-shift\): the branch changes \.claude\/settings\.json \(a rules, CI or gate file\); it can't be pushed at night$/;
+    const SAVE = `node ${join(P, '.claude', 'scripts', 'checkpoint.mjs')} save wt -m "step 1"`;
+    // the writes: [label, role, tool, input, cwd, reason, killed by]
+    const writes = [
+      ['Write .gate/w/.claude/settings.json', NIGHT, 'Write', write('Write', join(W, '.claude', 'settings.json')), W,
+        WP(NIGHT, join(W, '.claude', 'settings.json'), '.claude/settings.json'), 'M3'],
+      ['Edit .gate/w/.claude/settings.json', NIGHT, 'Edit', write('Edit', join(W, '.claude', 'settings.json')), W,
+        WP(NIGHT, join(W, '.claude', 'settings.json'), '.claude/settings.json'), 'M3'],
+      ['Write .gate/w/.github/workflows/ci.yml', NIGHT, 'Write', write('Write', join(W, '.github', 'workflows', 'ci.yml')), W,
+        WP(NIGHT, join(W, '.github', 'workflows', 'ci.yml'), '.github/workflows/ci.yml'), 'M3'],
+      ['Edit .gate/w/.github/workflows/ci.yml', NIGHT, 'Edit', write('Edit', join(W, '.github', 'workflows', 'ci.yml')), W,
+        WP(NIGHT, join(W, '.github', 'workflows', 'ci.yml'), '.github/workflows/ci.yml'), 'M3'],
+      ['pr-advisor Write .gate/w/.claude/settings.json', PRA, 'Write', write('Write', join(W, '.claude', 'settings.json')), P,
+        WP(PRA, join(W, '.claude', 'settings.json'), '.claude/settings.json'), 'M3'],
+      ['Write <scratchpad>/w/.claude/settings.json (a scratchpad worktree)', NIGHT, 'Write', write('Write', join(S, '.claude', 'settings.json')), P,
+        WP(NIGHT, join(S, '.claude', 'settings.json'), '.claude/settings.json'), 'M3'],
+      ['redirect git status > .gate/w/.claude/settings.json', NIGHT, 'Bash', { command: 'git status > .gate/w/.claude/settings.json' }, P,
+        WT_REDIR('.gate/w/.claude/settings.json', '.claude/settings.json'), 'M4'],
+    ];
+    for (const [label, role, tool, ti, cwd, re, key] of writes) {
+      const d = await ask(real, role, tool, ti, cwd);
+      assert.equal(kindOf(d), DENY, `rules: ${label}: ${JSON.stringify(d)}`);
+      assert.match(d.deny, re, `rules: ${label}`);
+      assert.equal(kindOf(await ask(mod[key], role, tool, ti, cwd)), null, `real mutant ${key} lets ${label} through`);
+    }
+    // the controls next to them: a docs file in the worktrees and the scratchpad, the main folder's kit files (old reasons)
+    for (const [label, tool, f] of [['Write .gate/w/docs/a.md', 'Write', join(W, 'docs', 'a.md')], ['Write <scratchpad>/w/docs/a.md', 'Write', join(S, 'docs', 'a.md')],
+      ['Write <scratchpad>/notes.md', 'Write', join(SP, 'notes.md')]]) {
+      assert.equal(kindOf(await ask(real, NIGHT, tool, write(tool, f), P)), null, `control: ${label}`);
+    }
+    assert.match((await ask(real, NIGHT, 'Write', write('Write', join(P, '.claude', 'settings.json')), P)).deny,
+      /^routine \(night-shift\): \.claude\/settings\.json is a rules, CI or gate file; those change only in a daytime kit change-set$/);
+    assert.match((await ask(real, NIGHT, 'Bash', { command: 'git status > .claude/settings.json' }, P)).deny,
+      /^routine \(night-shift\): a redirect on \.claude\/settings\.json \(a rules, CI or gate file\) is not allowed$/);
+    // the commit from W: the kit files changed outside the guard (as a checkout would) and staged
+    writeFileSync(join(W, '.claude', 'settings.json'), '{"a":9}\n');
+    mkdirSync(join(W, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(W, '.github', 'workflows', 'ci.yml'), 'on: push\n');
+    assert.equal(gIn(W, 'add', '.claude/settings.json', '.github/workflows/ci.yml').status, 0);
+    const commit = 'git commit -q -m "notes"';
+    const dc = await ask(real, NIGHT, 'Bash', { command: commit }, W);
+    assert.match(dc?.deny ?? '', COMMIT_KIT, `rules: the commit from .gate/w: ${JSON.stringify(dc)}`);
+    assert.equal(kindOf(await ask(mod.M1, NIGHT, 'Bash', { command: commit }, W)), null, 'real mutant M1 lets the .gate/w commit through');
+    assert.equal(bashIn(W, commit).status, 0);
+    assert.match(gIn(W, 'show', '--name-only', '--format=', 'HEAD').stdout, /\.claude\/settings\.json/, 'real git: M1\'s commit holds the kit file');
+    assert.equal(gIn(W, 'reset', '-q', '--soft', 'HEAD~1').status, 0);
+    // the push and checkpoint save from W: the kit commit made outside the guard
+    assert.equal(gIn(W, 'commit', '-q', '-m', 'kit').status, 0);
+    const push = 'git push -q origin cs/wt';
+    const dp = await ask(real, NIGHT, 'Bash', { command: push }, W);
+    assert.match(dp?.deny ?? '', BRANCH_KIT, `rules: the push from .gate/w: ${JSON.stringify(dp)}`);
+    assert.equal(gIn(P, 'ls-remote', O, 'cs/wt').stdout.trim(), '', 'origin has no cs/wt');
+    const ds = await ask(real, NIGHT, 'Bash', { command: SAVE }, W);
+    assert.match(ds?.deny ?? '', BRANCH_KIT, `rules: checkpoint save from .gate/w: ${JSON.stringify(ds)}`);
+    assert.equal(kindOf(await ask(mod.M2, NIGHT, 'Bash', { command: SAVE }, W)), null, 'real mutant M2 lets checkpoint save through');
+    assert.equal(kindOf(await ask(mod.M2, NIGHT, 'Bash', { command: push }, W)), null, 'real mutant M2 lets the push through');
+    assert.equal(bashIn(W, push).status, 0);
+    assert.match(gIn(O, 'diff', '--name-only', 'main', 'cs/wt').stdout, /\.claude\/settings\.json/, 'real git: M2\'s push publishes the kit file');
+    assert.equal(gIn(P, 'push', '-q', 'origin', '--delete', 'cs/wt').status, 0);
+    // the control: a docs-only change in D commits and pushes
+    writeFileSync(join(D, 'docs', 'a.md'), 'd\n');
+    assert.equal(gIn(D, 'add', 'docs/a.md').status, 0);
+    assert.equal(kindOf(await ask(real, NIGHT, 'Bash', { command: commit }, D)), null, 'control: the docs commit from .gate/d');
+    assert.equal(bashIn(D, commit).status, 0);
+    assert.equal(kindOf(await ask(real, NIGHT, 'Bash', { command: 'git push -q origin cs/d' }, D)), null, 'control: the docs push from .gate/d');
+    assert.equal(bashIn(D, 'git push -q origin cs/d').status, 0);
+    assert.notEqual(gIn(P, 'ls-remote', O, 'cs/d').stdout.trim(), '', 'control: origin has cs/d');
+    // the control: the main folder's commit check (its reason unchanged)
+    assert.equal(g('switch', '-q', '-c', 'cs/m', 'origin/main').status, 0);
+    writeFileSync(join(P, '.claude', 'settings.json'), '{"a":7}\n');
+    g('add', '.claude/settings.json');
+    assert.match((await ask(real, NIGHT, 'Bash', { command: commit }, P))?.deny ?? '', COMMIT_KIT, 'control: the main folder commit');
   } finally {
     if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
     rmSync(root, { recursive: true, force: true });

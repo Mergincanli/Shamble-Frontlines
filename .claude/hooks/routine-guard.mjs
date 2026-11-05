@@ -405,6 +405,15 @@ function writePath(p, cwd, role, io, input) {
   const rel = projectRel(p, cwd, io); // follows symlinks, so a link into the project resolves here (F4)
   if (rel !== null) {
     if (protectedRel(rel)) return deny(`routine (${role}): ${rel} is a rules, CI or gate file; those change only in a daytime kit change-set`);
+  }
+  // fix pass 4 (P4-S4, the worktree path rule): a path is also read by its place in its own worktree (kitPath: a
+  // worktree of this repository under .gate/ or the scratchpad), before the PR Advisor's and scratchpad's allowances
+  const k = kitPath(p, cwd, io);
+  if (k !== null) {
+    return deny(`routine (${role}): ${p} is ${k} in a worktree of this repository (a rules, CI or gate file); those ` +
+      'change only in a daytime kit change-set');
+  }
+  if (rel !== null) {
     if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate|\.claude\/agent-memory-local)(\/|$)/.test(rel)) {
       return deny('routine (pr-advisor): the PR Advisor writes only its notes (.checkpoints/, .gate/)');
     }
@@ -445,6 +454,7 @@ function unwrapRole(argv, role) {
       if (!ROLE_ENV_OK.has(name)) return { deny: `routine (${role}): only ${okList} may be set on a command; ${name}= can change what an allowed program runs` };
       a = a.slice(1); continue;
     }
+    // fix pass 4 (R-PROG in plainForm): the wrapper and keyword branches below are dead code for routines
     if (b === 'env') {
       a = a.slice(1);
       while (a.length) {
@@ -489,6 +499,13 @@ function writeTarget(what, p, vcwd, role, io, input) {
   const rel = projectRel(p, vcwd, io);
   if (rel !== null) {
     if (protectedRel(rel)) return deny(`routine (${role}): ${what} on ${rel} (a rules, CI or gate file) is not allowed`);
+  }
+  const kit = kitPath(p, vcwd, io); // fix pass 4 (P4-S4): the path's place in its own worktree, as writePath reads it
+  if (kit !== null) {
+    return deny(`routine (${role}): ${what} on ${p} (${kit} in a worktree of this repository: a rules, CI or gate ` +
+      'file) is not allowed');
+  }
+  if (rel !== null) {
     if (role === 'pr-advisor' && !/^(\.checkpoints|\.gate)(\/|$)/.test(rel)) return deny(`routine (pr-advisor): ${what} on ${rel}; the PR Advisor writes only its notes (.checkpoints/, .gate/)`);
     return null;
   }
@@ -529,6 +546,12 @@ function npmCheck(argv, vcwd, role, io) {
 // bash read this form differently: no <& (parseShell reads its & as a background &), no quoted word right before a <
 // or > (bash passes '2'>x's 2 as an argument), no quoted NAME= before a command's program (bash runs "TZ=x" as a
 // program, not as an assignment), and no ;; or ;& (case tokens). Returns what it found, or null.
+// R-PROG (fix pass 4), a clause of R-PLAIN: every command (what a newline, ; & && || | or |& ends) is zero or more
+// settings NAME=value with NAME unquoted and in ROLE_ENV_OK, then its program word, unquoted and one of ROUTINE_PROGS,
+// then its arguments and redirects; a redirect (a descriptor number with it) comes only after the program, and a
+// command with a word or a redirect but no program is refused. So no cd, wrapper, shell keyword, quoted program or
+// program by a path. An R-PLAIN finding is returned at once; R-PROG's first finding is returned as { prog } at the end.
+const ROUTINE_PROGS = new Set(['git', 'gh', 'npm', 'node', 'python', 'python3', 'date']);
 const PLAIN_CHAR = /[A-Za-z0-9 \t\n_\-.\/:=@%+,^]/;
 const PLAIN_CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
 const PLAIN_DQ = /[$`\\]/;
@@ -540,16 +563,26 @@ export function plainForm(src) {
   // start: where the current word starts; quoted: it holds a quote so far; atCmd: the command has no program word yet
   // (NAME=value words only); target: the next word is a redirect's target
   let start = 0, quoted = false, atCmd = true, target = false;
+  // R-PROG: seen: the command has a word or a redirect so far; prog: R-PROG's first finding
+  let seen = false, prog = null;
   const word = (k, fdOp) => { // the word that ends at k (a blank, an operator or the end); fdOp: a > or < follows
     const w = src.slice(start, k);
     start = k; quoted = false;
+    if (w) seen = true;
     if (!w || (fdOp && /^\d+$/.test(w))) return null; // nothing, or a file-descriptor number of the redirect
     if (target) { target = false; return null; }
-    if (!atCmd || NAME_EQ.test(w)) return null;
+    if (!atCmd) return null;
+    if (NAME_EQ.test(w)) { // a setting before the program (R-PROG: its name is one of ROLE_ENV_OK)
+      if (!ROLE_ENV_OK.has(w.slice(0, w.indexOf('=')))) prog ??= `${w.slice(0, w.indexOf('='))}= may not be set`;
+      return null;
+    }
     if (/['"]/.test(w) && NAME_EQ.test(w.replace(/['"]/g, ''))) return 'a quoted NAME= before the program';
+    if (!ROUTINE_PROGS.has(w)) prog ??= `${w} is not a routine program`; // R-PROG: unquoted, by its bare name
     atCmd = false;
     return null;
   };
+  // R-PROG: a newline or a separator ends the command; one with a word or a redirect needs its program
+  const cmdEnd = () => { if (seen && atCmd) prog ??= 'a command with no program'; seen = false; };
   for (let i = 0; i < src.length;) {
     const c = src[i];
     if (c === "'" || c === '"') {
@@ -563,6 +596,7 @@ export function plainForm(src) {
     if (c === ' ' || c === '\t' || c === '\n') {
       const f = word(i);
       if (f) return f;
+      if (c === '\n') cmdEnd();
       if (c === '\n') atCmd = true;
       i = start = i + 1; continue;
     }
@@ -586,6 +620,8 @@ export function plainForm(src) {
       if (!m || !PLAIN_END.test(src.slice(i + 2 + m[0].length))) return 'a >& before a word that is not a number or -';
       const f = word(i, true);
       if (f) return f;
+      seen = true;
+      if (atCmd) prog ??= 'a redirect before the program'; // R-PROG (>& and its number)
       i = start = i + 2 + m[0].length; continue;
     }
     const op = ['&&', '&>>', '&>', '||', '|&', '>>', '>|'].find((o) => src.startsWith(o, i))
@@ -594,6 +630,7 @@ export function plainForm(src) {
       const redirect = /[<>]/.test(op);
       const f = word(i, redirect && op[0] !== '&');
       if (f) return f;
+      if (redirect) { seen = true; if (atCmd) prog ??= 'a redirect before the program'; } else cmdEnd(); // R-PROG
       if (redirect) target = true; else { atCmd = true; target = false; }
       i = start = i + op.length; continue;
     }
@@ -601,9 +638,17 @@ export function plainForm(src) {
     if (!PLAIN_CHAR.test(c)) return `the character ${shownChar(c)}`;
     i++;
   }
-  return word(src.length);
+  const f = word(src.length);
+  if (f) return f;
+  cmdEnd();
+  return prog === null ? null : { prog };
 }
-const plainReason = (role, found) => `routine (${role}): write the command plainly (${found}): ` +
+// what plainForm found: R-PROG's { prog } gets a reason of its own (progReason), anything else R-PLAIN's (plainText)
+const plainReason = (role, found) => (found.prog ? progReason(role, found.prog) : plainText(role, found));
+const progReason = (role, found) => `routine (${role}): start each command with its program by name (${found}): ` +
+  'git, gh, npm, node, python, python3 or date, after only TZ=, LC_ALL=, LANG=, LANGUAGE= or NO_COLOR=; ' +
+  'redirects after the program; no cd, wrappers or shell keywords';
+const plainText = (role, found) => `routine (${role}): write the command plainly (${found}): ` +
   'one command per line or joined with && ; values in quotes; no comments, $, backslashes, here-documents, braces, ' +
   'brackets or parentheses';
 
@@ -653,6 +698,10 @@ async function bash(command, cwd, role, io, input) {
       vcwd = dayFolder(c, argv, vcwd, dirs, subs || forks, io);
       if (!dirs.known) vcwd = io.projectDir;
     }
+    if (role) { // fix pass 4 (P4-S3, a second layer under R-PROG): a command with no program has its redirects checked
+      for (const r of c.redirects) { const d = writeTarget('a redirect', r, vcwd, role, io, input); if (d) return d; }
+      for (const r of c.reads) { const d = credentialDeny(r, vcwd, role, io); if (d) return d; }
+    }
     if (!argv.length) continue;
     const rawProg = argv[0];
     const prog = basename(rawProg);
@@ -666,8 +715,6 @@ async function bash(command, cwd, role, io, input) {
       continue;
     }
     if (role) {
-      for (const r of c.redirects) { const d = writeTarget('a redirect', r, vcwd, role, io, input); if (d) return d; }
-      for (const r of c.reads) { const d = credentialDeny(r, vcwd, role, io); if (d) return d; }
       if (rawProg !== prog) return deny(`routine (${role}): run ${prog} by name, not by a path (${rawProg})`);
       if ((prog === 'git' || prog === 'gh') && argv.some((t) => t.includes('$') || t.includes('`'))) {
         return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
@@ -1050,7 +1097,7 @@ async function git(argv, vcwd, role, io, input = {}, line = {}) {
     }
     const top = gitTop(vcwd, io);
     const hit = lists.flatMap((d) => d.out.split('\0')).filter(Boolean)
-      .find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
+      .find((f) => kitName(f, top, vcwd, io));
     if (hit) return deny(`routine (night-shift): the commit would change ${hit} (a rules, CI or gate file)`);
   }
   if ((sub === 'rm' || sub === 'mv' || sub === 'add') && role) {
@@ -1068,6 +1115,9 @@ const gitTop = (vcwd, io) => io.git(['rev-parse', '--show-toplevel'], vcwd).out.
 function worktreeRel(f, top, vcwd, io) {
   return projectRel(join(top, f), vcwd, io) ?? f;
 }
+// fix pass 4 (P4-S4, the worktree path rule): a name git printed is a kit path by its place in its own worktree (the
+// tree path, what a commit or push publishes) or by its place in the project; the hit reported stays the tree path
+const kitName = (f, top, vcwd, io) => protectedRel(f) || protectedRel(worktreeRel(f, top, vcwd, io));
 // fix pass 2 (SD-2): how the guard has git list changed files: NUL-separated (-z: a non-ASCII name is not quoted),
 // renames off (a kit file moved away still names its old path) and relative output off (diff.relative), so every
 // name is relative to the worktree's top. fix pass 3 (P3-6): submodules never hidden (a branch's .gitmodules
@@ -1079,7 +1129,7 @@ function protectedHit(range, vcwd, io) {
   const d = io.git(['diff', ...DIFF_NAMES, ...range], vcwd);
   if (d.code !== 0) return { failed: true };
   const top = gitTop(vcwd, io);
-  const hit = d.out.split('\0').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
+  const hit = d.out.split('\0').filter(Boolean).find((f) => kitName(f, top, vcwd, io));
   return hit ? { hit } : null;
 }
 function protectedInBranch(vcwd, io) {
