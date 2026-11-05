@@ -69,7 +69,9 @@
     (SD-1 + A-3: a night switch, commit or push line holds that one command alone, pr-advisor exempt; V-3: exact
     show-ref lookups; SD-2: -z --no-renames --no-relative in protectedHit and the commit check, a named C6 edit);
     day fixes SD-3, SD-4, SD-5, SD-6, V-1; limits L9 and L11 widened, L16-L18 new; follow-up A-4; D-1 docs-keeper.
-  - Now: fix pass 2 (the routine builder, then the day builder, then docs-keeper), then the gate and commits.
+  - Now: fix pass 2 (wf_6ad69a99-cc0: the routine builder, then the day builder, then docs-keeper; notes
+    `builder-pass2-routine.md`, `builder-pass2-day.md`, `docs-keeper-pass2.md`), then the gate and commits (notes,
+    code, docs; docs-keeper writes "fix pass 2 (commit pending)" where the code commit's SHA goes).
   - Next: pass 3 (security-auditor and the verifier on the pass-2 diff only, plus the automated review; skeptics
     only for a major); step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review,
     needs-mustafa, his go).
