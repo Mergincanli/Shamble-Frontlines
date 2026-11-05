@@ -32,18 +32,18 @@
   - Done: plan revision 2 (`plan-rev2.md`: rev 1 + C1-C12 + the E10 ruling, with a condition table in §0); build
     step 2, docs-keeper (`docs-keeper-step2.md`): STATUS's follow-ups and "Queued, in Mustafa's words" (A4, B.1,
     B.2; diffed identical), PR #37 marked merged: 93b9a07.
-  - Now: build part 2, workflow wf_99ae356e-07e (steps 3-5, the guard code; one builder per step;
-    `builder-step3.md` to `builder-step5.md`).
-  - Next: commit part 2; part 3 (steps 6-7: the secret check, the rule texts), commit; step 8 (gate, E1-E7, E9,
-    E11a, docs-keeper, security-auditor and the verifier, fixes); step 9 (WT-NIGHT) waits for Mustafa.
-  - Plan revision 1, with the critic's points folded in: `plan-rev1.md` (the draft before the critic:
-    `plan-rev1-draft.md`; the critic's notes: `critic.md`; the reviser's: `reviser.md`).
-  - The advisor's verdict: APPROVE with conditions C1-C12 (`advisor-plan-rev1.md`, 2026-11-05 ~00:40 UTC). Two
-    decisions for Mustafa: WT-NIGHT (the night shift's exception to his worktree rule; recommendation (a)) and
-    PC-MODE (information only). C2: WT-NIGHT is built last, after his answer; everything else is built first.
-  - Mustafa (2026-11-05, before he went to sleep): "continue with the work (take the lead)".
-  - The planning runs: wf_d8f3b3e4-0f7 (stopped once to widen it to items 4 and 5, once by the usage limit, once by
-    a container restart; resumed each time from the notes and the journal).
+  - Done: build part 2 (wf_99ae356e-07e): steps 3-5 built, committed f22c4df (notes d3d73a6). Tests: routine-guard
+    317/317, settings 124/124, checkpoint 25/25, 0 existing lines changed; gate --no-smoke PASS, symbols +0 -0.
+    Step 4 could not build the Edit-tool ask and the strict merge rule: two old cases (:130, :110) asserted the old
+    behaviour. The advisor ruled (`advisor-build-step4.md`): PROCEED with R1-R4.
+  - An automated security review of f22c4df found four issues in step 4's new day code
+    (`security-review-auto.md`): S-1 (high), a switch target after `--` reaches the guard's own git diff (the guard
+    could write a file); S-2, an origin/main name ambiguity; S-3, no case folding on darwin; S-4, pushd/popd not
+    tracked. Fixed in step 4b, each with a test.
+  - Now: build part 3 (wf_3dad6479-df3): step 4b (R1-R4, the Edit-tool ask, S-1 to S-4), step 6 (the secret
+    check), step 7 (the rule texts, without the WT-NIGHT parts).
+  - Next: commit part 3; step 8 (gate with smoke, E1-E7, E9, E11a, docs-keeper, security-auditor and the verifier,
+    fixes); step 9 (WT-NIGHT) waits for Mustafa; step 10 (the report, ready, the advisor's final review).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 - **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
   org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.
