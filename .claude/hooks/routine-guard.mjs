@@ -5,12 +5,16 @@
 //     no dangerous option or bundled short flag, no option before the git subcommand) and the merge check
 //     (expectedHeadSha, same repository, gate and smoke green on that SHA);
 //   routines (SHAMBLE_ROLE = night-shift or pr-advisor, set only by the routine-only cloud environments): the role rules
-//     below as well.
-// decide(input, io) returns null (no decision: the normal permission flow goes on) or { deny, interrupt }. It never
-// allows anything: this guard only takes away. guard.mjs turns an exception into a refusal for routines and into "no
-// decision" for day sessions (R3c), so a guard bug never locks a day session out of fixing it.
+//     below as well;
+//   day sessions only (no SHAMBLE_ROLE; kit-v3-3): shell writes to kit and gate files ask first, and so do the git and
+//     gh commands that would move the main folder off main's reviewed rules; a subagent (agent_id set) is refused both.
+// decide(input, io) returns null (no decision: the normal permission flow goes on), { deny, interrupt } or, in a day
+// session only, { ask }. It never allows anything: this guard only takes away. guard.mjs turns an exception into a
+// refusal for routines and into "no decision" for day sessions (R3c), so a guard bug never locks a day session out of
+// fixing it.
 // io: { env, projectDir, home, git(args, cwd) -> { code, out }, gh(args) -> { code, out }, exists(p), realpath(p),
-//       readFile(p), gitLongOptions(sub) -> string[] }. realIo() builds the real one. Node 22, no dependencies.
+//       readFile(p), gitLongOptions(sub) -> string[], platform? }. realIo() builds the real one. Node 22, no
+//       dependencies.
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
@@ -55,6 +59,58 @@ function insideDir(p, dir, cwd, io) {
   if (!dir) return false;
   const rel = relative(realOf(dir, io), realOf(isAbsolute(p) ? p : resolve(cwd, p), io));
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+// ---- day sessions (kit-v3-3): kit paths in any worktree of this repository ----
+const isWin = (io) => (io.platform ?? process.platform) === 'win32';
+const fold = (s, io) => (isWin(io) ? s.toLowerCase() : s);
+// On win32 a path's case does not matter, so a segment that matches a protected name in another case is read as it.
+const CANON = new Map(['CLAUDE.md', '.npmrc', '.mcp.json', '.github', '.git', '.claude', 'agent-memory-local',
+  'worktrees', 'tools', ...[...GATE_FILES].map((f) => f.slice(6))].map((s) => [s.toLowerCase(), s]));
+const protectedFold = (rel, io) =>
+  protectedRel(isWin(io) ? rel.split('/').map((s) => CANON.get(s.toLowerCase()) ?? s).join('/') : rel);
+const relIn = (top, abs) => {
+  const rel = relative(top, abs);
+  return rel === '' ? '.' : (rel.startsWith('..') || isAbsolute(rel)) ? null : rel.split('\\').join('/');
+};
+// The worktree top and git common dir of the nearest existing folder at or above abs (a file's own path fails as a
+// cwd, so its parent answers), or null outside any repository.
+function gitPlace(abs, io) {
+  for (let d = abs; ; d = dirname(d)) {
+    if (io.exists(d)) {
+      const t = io.git(['rev-parse', '--show-toplevel'], d);
+      if (t.code === 0 && t.out.trim()) {
+        const c = io.git(['rev-parse', '--git-common-dir'], d);
+        const common = c.code === 0 && c.out.trim() ? fold(realOf(resolve(d, c.out.trim()), io), io) : '';
+        return { top: realOf(t.out.trim(), io), common };
+      }
+    }
+    if (dirname(d) === d) return null;
+  }
+}
+const projectCommon = new WeakMap();
+// The protected path relative to its worktree, or null. The path's own git top comes first (a worktree under the
+// project's .gate/ or a scratchpad: critic C-1), when its common dir is this repository's; then, for a path in the
+// project folder itself, the project-relative path as the routines read it.
+export function kitPath(p, cwd, io) {
+  const abs = realOf(isAbsolute(p) ? p : resolve(cwd, p), io);
+  const g = gitPlace(abs, io);
+  if (!projectCommon.has(io)) projectCommon.set(io, gitPlace(realOf(io.projectDir, io), io)?.common ?? '');
+  const pc = projectCommon.get(io);
+  if (g && pc && g.common === pc) {
+    const rel = relIn(fold(g.top, io), fold(abs, io));
+    if (rel !== null && protectedFold(rel, io)) return rel;
+  }
+  const prel = relIn(fold(realOf(io.projectDir, io), io), fold(abs, io));
+  return prel !== null && protectedFold(prel, io) ? prel : null;
+}
+// A write target that is a folder holding kit files: the worktree's top, .claude, .github or tools, or a folder with a
+// CLAUDE.md in it.
+function kitDir(p, cwd, io) {
+  const abs = realOf(isAbsolute(p) ? p : resolve(cwd, p), io);
+  const g = gitPlace(abs, io);
+  const rel = g ? relIn(fold(g.top, io), fold(abs, io)) : null;
+  if (rel === '.' || rel === '.claude' || rel === '.github' || rel === 'tools') return rel;
+  return io.exists(join(abs, 'CLAUDE.md')) ? `${p}/CLAUDE.md` : null;
 }
 
 // ---------- shell ----------
@@ -194,6 +250,11 @@ const GIT_LONG_DANGER = {
   'ls-remote': ['--upload-pack', '--exec'],
   grep: ['--open-files-in-pager'],
   archive: ['--remote', '--exec'],
+  // --output=<file> writes a file (abbreviations such as --outp are refused by the abbreviation rule)
+  'rev-list': ['--output'],
+  diff: ['--output'],
+  log: ['--output'],
+  show: ['--output'],
 };
 const GIT_SHORT_DANGER = { push: 'fd', branch: 'dDfmMcC', switch: 'fC', 'ls-remote': 'u', grep: 'O', clone: 'cu' };
 // Short options whose value is the next word (so a value starting with '-' is not read as flags).
@@ -212,11 +273,12 @@ const GIT_NEVER = {
 // The routines' git: anything else is refused for them.
 const GIT_ROUTINE = new Set(['status', 'diff', 'log', 'show', 'fetch', 'branch', 'switch', 'add', 'commit', 'push',
   'worktree', 'merge-base', 'rev-parse', 'ls-tree', 'cat-file', 'for-each-ref', 'remote', 'ls-remote', 'rm', 'mv',
-  'reset', 'config', 'ls-files', 'blame', 'shortlog', 'describe', 'grep', 'version', 'help', 'symbolic-ref']);
+  'reset', 'config', 'ls-files', 'blame', 'shortlog', 'describe', 'grep', 'version', 'help', 'symbolic-ref',
+  'rev-list']);
 const GIT_CONFIG_READ = new Set(['user.name', 'user.email']);
 const GIT_READ = new Set(['status', 'diff', 'log', 'show', 'fetch', 'branch', 'switch', 'merge-base', 'rev-parse',
   'ls-tree', 'cat-file', 'for-each-ref', 'remote', 'ls-remote', 'ls-files', 'blame', 'shortlog', 'describe', 'grep',
-  'version', 'help', 'symbolic-ref']);
+  'version', 'help', 'symbolic-ref', 'rev-list']);
 
 function gitArgsCheck(sub, args, io) {
   const danger = GIT_LONG_DANGER[sub] || [];
@@ -249,6 +311,8 @@ function gitArgsCheck(sub, args, io) {
 
 // ---------- the decision ----------
 const deny = (reason, interrupt = false) => ({ deny: reason, interrupt });
+// day sessions only (kit-v3-3); guard.mjs prints an ask anywhere else as a deny (C5)
+const ask = (reason) => ({ ask: reason });
 
 export async function decide(input, io) {
   const event = input.hook_event_name;
@@ -403,12 +467,17 @@ async function bash(command, cwd, role, io, input) {
   const { cmds, subs, unterminated } = parseShell(command);
   if (role && subs) return deny(`routine (${role}): no command substitution ($(...), backticks); run the commands one by one`);
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
-  let vcwd = cwd;
+  let vcwd = cwd, dayAsk = null;
   for (const c of cmds) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
     if (role) { const u = unwrapRole(c.argv, role); if (u.deny) return deny(u.deny); argv = u.argv; }
     else argv = unwrap(c.argv);
+    if (!role) { // day sessions (kit-v3-3): a kit write asks; the scan goes on, so a later deny in the line still wins
+      const w = dayShellWrites(c, argv, vcwd, io, input);
+      if (w?.deny) return w;
+      dayAsk ??= w;
+    }
     if (!argv.length) continue;
     const rawProg = argv[0];
     const prog = basename(rawProg);
@@ -429,12 +498,95 @@ async function bash(command, cwd, role, io, input) {
       }
     }
     let r = null;
-    if (prog === 'git') r = await git(argv, vcwd, role, io);
-    else if (prog === 'gh') r = await gh(argv, role, io);
+    if (prog === 'git') r = await git(argv, vcwd, role, io, input);
+    else if (prog === 'gh') r = await gh(argv, role, io, vcwd, input);
     else if (role) r = await routineProgram(prog, argv, vcwd, role, io);
+    if (!role && r?.ask) { dayAsk ??= r; continue; }
     if (r) return r;
   }
-  return null;
+  return dayAsk;
+}
+
+// ---------- day sessions: kit writes and main-folder moves (kit-v3-3) ----------
+// A seatbelt in a watched session, not a wall: scripts, inline code and the other writers are not inspected (stated
+// limits L1-L4); the PR review and Mustafa's go remain the wall. A subagent (agent_id set; agent_type alone is also set
+// in a session started with --agent, so it is never checked: E10-6) is refused where the main session is asked.
+const KIT_AGENT = 'kit and gate files are edited by the main session, which asks Mustafa first';
+// The paths a writer command writes (its targets), as the words it was given.
+function writtenBy(argv) {
+  const prog = basename(argv[0] ?? '');
+  const words = (a, valueOpts = []) => { // positional words and the -t/--target-directory folder
+    const pos = []; let tdir = null;
+    for (let i = 0; i < a.length; i++) {
+      const w = a[i];
+      if (w === '--') { pos.push(...a.slice(i + 1)); break; }
+      if (w === '-t' || w === '--target-directory') { tdir = a[++i] ?? ''; continue; }
+      if (w.startsWith('--target-directory=')) { tdir = w.slice(19); continue; }
+      if (/^-t./.test(w) && ['cp', 'mv', 'ln'].includes(prog)) { tdir = w.slice(2); continue; }
+      if (w.startsWith('-') && w.length > 1) { if (valueOpts.includes(w)) i++; continue; }
+      pos.push(w);
+    }
+    return { pos, tdir };
+  };
+  const a = argv.slice(1);
+  if (prog === 'tee' || prog === 'rm') return words(a).pos;
+  if (prog === 'touch') return words(a, ['-r', '-d', '--reference', '--date']).pos;
+  if (prog === 'truncate') return words(a, ['-s', '-r', '--size', '--reference']).pos;
+  if (prog === 'cp' || prog === 'ln') {
+    const { pos, tdir } = words(a, ['-S', '--suffix']);
+    if (tdir !== null) return [tdir];
+    return pos.length > 1 ? [pos[pos.length - 1]] : prog === 'ln' && pos.length === 1 ? [basename(pos[0])] : [];
+  }
+  if (prog === 'mv') {
+    const { pos, tdir } = words(a, ['-S', '--suffix']);
+    return tdir !== null ? [...pos, tdir] : pos;
+  }
+  if (prog === 'git' && (a[0] === 'rm' || a[0] === 'mv')) return words(a.slice(1)).pos;
+  if (prog === 'sed' || prog === 'perl') { // sed -i / --in-place[=SUF]; perl -i / -pi / -pi.bak
+    const inPlace = prog === 'sed' ? (w) => /^-[^-]*i/.test(w) || /^--in-place(=|$)/.test(w) : (w) => /^-p?i/.test(w);
+    let edits = false, script = false; const pos = [];
+    const valueOpts = prog === 'sed' ? ['-e', '-f', '-l', '--expression', '--file', '--line-length'] : ['-e', '-E'];
+    for (let i = 0; i < a.length; i++) {
+      const w = a[i];
+      if (w === '--') { pos.push(...a.slice(i + 1)); break; }
+      if (w.startsWith('-') && w.length > 1) {
+        if (inPlace(w)) edits = true;
+        if (valueOpts.includes(w)) { if (/^-[eEf]$|^--(expression|file)$/.test(w)) script = true; i++; }
+        else if (/^--(expression|file)=/.test(w)) script = true;
+        else if (prog === 'perl' && /^-[pnl]*e$/.test(w)) { script = true; i++; }
+        continue;
+      }
+      pos.push(w);
+    }
+    return edits ? (script ? pos : pos.slice(1)) : [];
+  }
+  return [];
+}
+function dayShellWrites(c, argv, vcwd, io, input) {
+  const agent = !!input.agent_id;
+  let first = null;
+  const prefix = c.argv.slice(0, c.argv.length - argv.length);
+  if (prefix.some((w) => /^GIT_(DIR|WORK_TREE)=/.test(w))) {
+    first = ask('kit and gate files ask first in a day session: a GIT_DIR= or GIT_WORK_TREE= prefix points git at ' +
+      'another folder, and the guard cannot follow it');
+  }
+  const prog = basename(argv[0] ?? '');
+  const writer = prog === 'git' ? `git ${argv[1]}` : prog;
+  const targets = [...c.redirects.map((t) => ['a redirect', t]), ...writtenBy(argv).map((t) => [writer, t])];
+  for (const [what, raw] of targets) {
+    if (raw === '/dev/null' || /^\/dev\/(stdout|stderr|tty|fd\/\d+)$/.test(raw)) continue;
+    if (/[$`*?[{]/.test(raw)) {
+      first ??= ask(`kit and gate files ask first in a day session: ${what} writes ${raw}, which the guard cannot ` +
+        'resolve (a variable, substitution or glob)');
+      continue;
+    }
+    const t = raw.replace(/^~(?=\/|$)/, io.home);
+    const rel = kitPath(t, vcwd, io) ?? kitDir(t, vcwd, io);
+    if (rel === null) continue;
+    if (agent) return deny(`${KIT_AGENT}: ${rel}`);
+    first ??= ask(`kit and gate files ask first in a day session: ${rel} (${what})`);
+  }
+  return first;
 }
 
 // The routine shell is a FIXED set: git, gh, `npm ci`, node/python on main's scripts, and date (the clock). Everything
@@ -478,7 +630,7 @@ function interpreter(prog, argv, vcwd, role, io) {
   return null;
 }
 
-async function git(argv, vcwd, role, io) {
+async function git(argv, vcwd, role, io, input = {}) {
   let i = 1;
   if (argv[1] === '--version' || argv[1] === '--help' || argv.length === 1) return null;
   if (argv[1]?.startsWith('-')) return deny('git: no option before the subcommand (run git from the folder, without -C, -c or --git-dir)');
@@ -543,6 +695,7 @@ async function git(argv, vcwd, role, io) {
       if (rel !== null && protectedRel(rel) && sub !== 'add') return deny(`routine (${role}): git ${sub} ${rel} (a rules, CI or gate file)`);
     }
   }
+  if (!role) return mainFolderMove(sub, args, vcwd, io, input);
   return null;
 }
 // A path git printed relative to its top level, as a project-relative path (worktrees under .claude/worktrees/ map
@@ -551,15 +704,81 @@ const gitTop = (vcwd, io) => io.git(['rev-parse', '--show-toplevel'], vcwd).out.
 function worktreeRel(f, top, vcwd, io) {
   return projectRel(join(top, f), vcwd, io) ?? f;
 }
-function protectedInBranch(vcwd, io) {
-  const d = io.git(['diff', '--name-only', 'origin/main...HEAD'], vcwd);
-  if (d.code !== 0) return "routine (night-shift): can't compare the branch with origin/main; fetch it first";
+// The first protected file `git diff --name-only <range...>` names: { hit }, { failed: true } when git can't compare,
+// or null.
+function protectedHit(range, vcwd, io) {
+  const d = io.git(['diff', '--name-only', ...range], vcwd);
+  if (d.code !== 0) return { failed: true };
   const top = gitTop(vcwd, io);
   const hit = d.out.split('\n').map((f) => f.trim()).filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
-  return hit ? `routine (night-shift): the branch changes ${hit} (a rules, CI or gate file); it can't be pushed at night` : null;
+  return hit ? { hit } : null;
+}
+function protectedInBranch(vcwd, io) {
+  const h = protectedHit(['origin/main...HEAD'], vcwd, io);
+  if (h?.failed) return "routine (night-shift): can't compare the branch with origin/main; fetch it first";
+  if (!h) return null;
+  return `routine (night-shift): the branch changes ${h.hit} (a rules, CI or gate file); it can't be pushed at night`;
+}
+// WT-DAY and WT-UPDATE (kit-v3-3), day sessions only: the main folder (the project folder's own worktree) stays on
+// main's reviewed rules, because its hooks and rules are the ones this session runs. What would move it to another
+// branch, a PR's head or an old commit asks; the updates from origin/main stay free. Other worktrees are ordinary
+// branch work (L11); patch-applying commands are not inspected (L4).
+const sameDir = (a, b, io) => fold(realOf(a, io), io) === fold(realOf(b, io), io);
+function switchWords(args) { // git switch: { create, pos, odd }
+  let create = null, odd = false; const pos = [];
+  for (let i = 0; i < args.length; i++) {
+    const t = args[i];
+    if (t === '--') { pos.push(...args.slice(i + 1)); break; }
+    if (t === '-c' || t === '--create') { create = args[++i] ?? ''; continue; }
+    if (/^-c./.test(t)) { create = t.slice(2); continue; }
+    if (t.startsWith('--create=')) { create = t.slice(9); continue; }
+    if (t === '--orphan' || t.startsWith('--orphan=')) { odd = true; continue; }
+    if (t.startsWith('-') && t !== '-') continue;
+    pos.push(t);
+  }
+  return { create, pos, odd };
+}
+function mainFolderMove(sub, args, vcwd, io, input) {
+  if (!['switch', 'merge', 'pull', 'bisect', 'pr checkout'].includes(sub)) return null;
+  if (!sameDir(gitTop(vcwd, io), io.projectDir, io)) return null;
+  const say = sub === 'pr checkout' ? 'gh pr checkout' : `git ${sub}`;
+  let why = null, ref = '<ref>';
+  if (sub === 'switch') {
+    const { create, pos, odd } = switchWords(args);
+    if (odd || pos[0] === '-') why = 'the guard cannot tell what it switches to';
+    else if (create !== null) {
+      if (pos[0] && pos[0] !== 'origin/main') {
+        why = `it starts ${create} from ${pos[0]}, not origin/main`;
+        ref = pos[0];
+      }
+      else if (!pos[0]) {
+        const h = protectedHit(['origin/main', 'HEAD', '--'], vcwd, io);
+        if (h) why = h.failed ? "the guard can't compare HEAD with origin/main"
+          : `HEAD's ${h.hit} differs from origin/main's`;
+      }
+    } else if (pos[0]) {
+      ref = pos[0];
+      // no name is exempt: a stale local main is an old commit; `--` makes git read the target as a commit, never a path
+      const h = protectedHit(['origin/main', pos[0], '--'], vcwd, io);
+      if (h) why = h.failed ? `the guard can't compare ${pos[0]} with origin/main`
+        : `${pos[0]}'s ${h.hit} differs from origin/main's`;
+    }
+  } else if (sub === 'merge') {
+    const a = args.join(' ');
+    if (a !== '--ff-only origin/main' && a !== 'origin/main') why = 'only origin/main merges into the main folder';
+  } else if (sub === 'pull') {
+    if (args.join(' ') !== '--ff-only origin main') why = 'only git pull --ff-only origin main updates the main folder';
+  } else why = sub === 'bisect' ? 'bisect checks out old commits' : "it checks out a PR's head";
+  if (!why) return null;
+  const stale = ref === 'main' || ref === 'master'
+    ? '; for a stale local main, start from origin/main (git switch -c <new> origin/main) or, when the folder is ' +
+      'already on main, git fetch origin main, then git merge --ff-only origin/main' : '';
+  const reason = `the main folder stays on main's reviewed rules: ${say} would move it (${why}). Work there in a ` +
+    `worktree instead: git worktree add .gate/<slug> ${ref}${stale}`;
+  return input.agent_id ? deny(`${reason}. A subagent never moves the main folder`) : ask(reason);
 }
 
-async function gh(argv, role, io) {
+async function gh(argv, role, io, vcwd = io.projectDir, input = {}) {
   const sub = argv[1] ?? '', sub2 = argv[2] ?? '';
   if (['auth', 'secret', 'variable', 'ssh-key', 'gpg-key', 'extension', 'codespace'].includes(sub)) return deny(`gh ${sub} is not allowed here`);
   if (sub === 'repo' && /^(edit|delete|rename|archive|unarchive|fork|set-default|sync|deploy-key)$/.test(sub2)) return deny(`gh repo ${sub2} is not allowed here`);
@@ -586,12 +805,32 @@ async function gh(argv, role, io) {
     if ((sub === 'pr' || sub === 'issue') && /^(view|list|status|diff|checks)$/.test(sub2)) return null;
     return deny(`routine (${role}): gh ${sub}${sub2 ? ' ' + sub2 : ''}: routines use only gh api (read), gh pr/issue view|list|status|diff|checks, and the GitHub MCP tools`);
   }
+  // day sessions (kit-v3-3): gh pr checkout (and gh's built-in alias gh co) moves the folder it runs in
+  if ((sub === 'pr' && sub2 === 'checkout') || sub === 'co') return mainFolderMove('pr checkout', [], vcwd, io, input);
   return null;
 }
 
 // ---------- MCP ----------
 const REMOTE_READ = /^(list_|get_|read_documentation$|check_repo_access$)/;
 const GITHUB_READ = /^(get_|list_|search_)|_read$/;
+// kit-v3-3 (C7): the PR Advisor's read-only GitHub Actions methods, on this repository only. Left out on purpose:
+// download_workflow_run_artifact (bytes the PR's code produced) and get_workflow_run_logs_url (get_job_logs already
+// gives one job's logs). Any other method, or none, is refused; the night shift gets none of them.
+const ACTIONS_READ = {
+  actions_get: ['get_workflow', 'get_workflow_run', 'get_workflow_job', 'get_workflow_run_usage'],
+  actions_list: ['list_workflows', 'list_workflow_runs', 'list_workflow_jobs', 'list_workflow_run_artifacts'],
+};
+function actionsRead(name, ti, role) {
+  const [owner, repo] = REPO.toLowerCase().split('/');
+  if (String(ti.owner ?? '').toLowerCase() !== owner || String(ti.repo ?? '').toLowerCase() !== repo) {
+    return deny(`routine (${role}): GitHub reads only on ${REPO}`);
+  }
+  if (role !== 'pr-advisor') return deny(`routine (${role}): ${name} is not on the night shift's GitHub list`);
+  const ok = ACTIONS_READ[name];
+  if (ok.includes(ti.method)) return null;
+  const got = String(ti.method ?? 'none').slice(0, 40);
+  return deny(`routine (pr-advisor): ${name} runs only the methods ${ok.join(', ')} (got ${got})`);
+}
 
 async function mcp(tool, ti, role, io) {
   const m = /^mcp__(.+?)__(.+)$/.exec(tool);
@@ -600,6 +839,7 @@ async function mcp(tool, ti, role, io) {
     if (name === 'enable_pr_auto_merge') return deny('auto-merge skips the expected-head check; merge with the MCP merge tool instead');
     // merge fails closed for every session (K1): if the check can't complete, refuse rather than let it through
     if (name === 'merge_pull_request') { try { return await mergeCheck(ti, role, io); } catch (e) { return deny(`merge: the check could not complete (${String(e?.message ?? e).slice(0, 80)}); refused`); } }
+    if (role && Object.hasOwn(ACTIONS_READ, name)) return actionsRead(name, ti, role);
     if (!role || GITHUB_READ.test(name)) return null;
     if (`${ti.owner}/${ti.repo}`.toLowerCase() !== REPO.toLowerCase()) return deny(`routine (${role}): GitHub writes only on ${REPO}`);
     return githubWrite(name, ti, role, io);

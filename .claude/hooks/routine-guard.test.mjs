@@ -10,6 +10,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -271,6 +272,76 @@ export const CASES = [
   ['advisor: merge a green docs PR', PRA, merge(), false],
   ['advisor: merge a rules PR', PRA, merge(), true, { prFiles: 'docs/a.md\n.claude/settings.json\n' }],
 
+  // --- rev-list and --output (kit-v3-3): rev-list is a read; --output=<file> writes a file, refused in every session ---
+  ['advisor: rev-list --count', PRA, sh('git rev-list --count origin/main..HEAD'), false],
+  ['night: rev-list --count', NIGHT, sh('git rev-list --count origin/main..HEAD'), false],
+  ['advisor: rev-list --output', PRA, sh('git rev-list --output=x HEAD'), true],
+  ['advisor: rev-list --outp (abbreviated)', PRA, sh('git rev-list --outp=x HEAD'), true],
+  ['advisor: log --output', PRA, sh('git log --output=x -1'), true],
+  ['advisor: diff --output', PRA, sh('git diff --output=x'), true],
+  ['advisor: show --output', PRA, sh('git show --output=x'), true],
+  ['night: rev-list --output', NIGHT, sh('git rev-list --output=x HEAD'), true],
+  ['night: log --outp (abbreviated)', NIGHT, sh('git log --outp=x -1'), true],
+  ['day: rev-list --output', DAY, sh('git rev-list --output=x HEAD'), true],
+  ['day: log --output', DAY, sh('git log --output=x -1'), true],
+  ['day: log --outp (abbreviated)', DAY, sh('git log --outp=x -1'), true],
+  ['day: diff --output', DAY, sh('git diff --output=x'), true],
+  ['day: show --output', DAY, sh('git show --output=x'), true],
+  ['day: show --outp (abbreviated)', DAY, sh('git show --outp=x'), true],
+  ['day: diff --output-indicator-new is not --output', DAY, sh('git diff --output-indicator-new=+'), false],
+
+  // --- Actions reads (kit-v3-3, item 3, C7): the PR Advisor reads CI on this repository; the listed methods only ---
+  ['advisor: actions_get get_workflow', PRA, gw('actions_get', { method: 'get_workflow', resource_id: 'gate.yml' }), false],
+  ['advisor: actions_get get_workflow_run', PRA, gw('actions_get', { method: 'get_workflow_run', resource_id: '1' }), false],
+  ['advisor: actions_get get_workflow_job', PRA, gw('actions_get', { method: 'get_workflow_job', resource_id: '1' }), false],
+  ['advisor: actions_get get_workflow_run_usage', PRA,
+    gw('actions_get', { method: 'get_workflow_run_usage', resource_id: '1' }), false],
+  ['advisor: actions_list list_workflows', PRA, gw('actions_list', { method: 'list_workflows' }), false],
+  ['advisor: actions_list list_workflow_runs', PRA, gw('actions_list', { method: 'list_workflow_runs' }), false],
+  ['advisor: actions_list list_workflow_jobs', PRA,
+    gw('actions_list', { method: 'list_workflow_jobs', resource_id: '1' }), false],
+  ['advisor: actions_list list_workflow_run_artifacts', PRA,
+    gw('actions_list', { method: 'list_workflow_run_artifacts', resource_id: '1' }), false],
+  ['advisor: actions_get download_workflow_run_artifact', PRA,
+    gw('actions_get', { method: 'download_workflow_run_artifact', resource_id: '1' }), true],
+  ['advisor: actions_get get_workflow_run_logs_url', PRA,
+    gw('actions_get', { method: 'get_workflow_run_logs_url', resource_id: '1' }), true],
+  ['advisor: actions_get unknown method', PRA, gw('actions_get', { method: 'x', resource_id: '1' }), true],
+  ['advisor: actions_list unknown method', PRA, gw('actions_list', { method: 'x' }), true],
+  ['advisor: actions_get no method', PRA, gw('actions_get', { resource_id: '1' }), true],
+  ['advisor: actions_list no method', PRA, gw('actions_list', {}), true],
+  ['advisor: actions_get a list method (wrong tool)', PRA, gw('actions_get', { method: 'list_workflows' }), true],
+  ['advisor: actions_get another repo', PRA,
+    ev('mcp__github__actions_get', { owner: 'x', repo: 'y', method: 'get_workflow_run', resource_id: '1' }), true],
+  ['advisor: actions_list another repo', PRA,
+    ev('mcp__github__actions_list', { owner: 'x', repo: 'y', method: 'list_workflow_runs' }), true],
+  ['advisor: actions_get another repo of the same owner', PRA,
+    gw('actions_get', { repo: 'other', method: 'get_workflow_run', resource_id: '1' }), true],
+  ['advisor: actions_get owner holding the slash', PRA,
+    gw('actions_get', { owner: 'Mergincanli/Shamble-Frontlines', repo: '', method: 'get_workflow_run', resource_id: '1' }), true],
+  ['advisor: actions_get no owner or repo', PRA,
+    ev('mcp__github__actions_get', { method: 'get_workflow_run', resource_id: '1' }), true],
+  ['advisor: actions_get owner in another case', PRA,
+    gw('actions_get', { owner: 'mergincanli', method: 'get_workflow_run', resource_id: '1' }), false],
+  ['advisor: actions_run_trigger run_workflow', PRA,
+    gw('actions_run_trigger', { method: 'run_workflow', workflow_id: 'gate.yml', ref: 'main' }), true],
+  ['advisor: actions_run_trigger rerun_workflow_run', PRA, gw('actions_run_trigger', { method: 'rerun_workflow_run', run_id: 1 }), true],
+  ['advisor: actions_run_trigger rerun_failed_jobs', PRA, gw('actions_run_trigger', { method: 'rerun_failed_jobs', run_id: 1 }), true],
+  ['advisor: actions_run_trigger cancel_workflow_run', PRA,
+    gw('actions_run_trigger', { method: 'cancel_workflow_run', run_id: 1 }), true],
+  ['advisor: actions_run_trigger delete_workflow_run_logs', PRA,
+    gw('actions_run_trigger', { method: 'delete_workflow_run_logs', run_id: 1 }), true],
+  ['night: actions_get get_workflow_run', NIGHT, gw('actions_get', { method: 'get_workflow_run', resource_id: '1' }), true],
+  ['night: actions_list list_workflow_runs', NIGHT, gw('actions_list', { method: 'list_workflow_runs' }), true],
+  ['night: actions_run_trigger run_workflow', NIGHT,
+    gw('actions_run_trigger', { method: 'run_workflow', workflow_id: 'gate.yml', ref: 'main' }), true],
+  ['day: actions_run_trigger run_workflow (unchanged: day sessions ask)', DAY,
+    gw('actions_run_trigger', { method: 'run_workflow', workflow_id: 'gate.yml', ref: 'main' }), false],
+  ['day: actions_get download_workflow_run_artifact (unchanged)', DAY,
+    gw('actions_get', { method: 'download_workflow_run_artifact', resource_id: '1' }), false],
+  ['day: actions_get another repo (unchanged)', DAY,
+    ev('mcp__github__actions_get', { owner: 'x', repo: 'y', method: 'get_workflow_run', resource_id: '1' }), false],
+
   // --- an unknown role is refused outright ---
   ['unknown role', 'nightshift', sh('git status'), true],
 ];
@@ -316,6 +387,29 @@ test('real git accepts the abbreviations the guard refuses (throwaway repo, no n
     assert.notEqual(g('rev-parse', 'HEAD').stdout.trim(), before, 'git commit --am amended');
     for (const c of ['git branch --del cs/a', 'git commit --am --allow-empty -m two', 'git reset --ha']) {
       assert.ok(await decide(sh(c), fakeIo()), `the guard refuses: ${c}`);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+// --output=<file> really writes a file (rev-list, log, show, diff), and the guard refuses it in every session. The
+// abbreviation --outp is refused too; git 2.43 itself rejects it (ambiguous or unrecognised), which may change, so
+// git's answer to --outp is not asserted.
+test('real git writes a file with --output (rev-list, log, show, diff); the guard refuses it and --outp', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'guard-git-out-'));
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const g = (...a) => spawnSync('git', a, { cwd: dir, env, encoding: 'utf8' });
+  try {
+    g('init', '-q', '-b', 'main');
+    g('commit', '-q', '--allow-empty', '-m', 'one');
+    const forms = [['rev-list', 'HEAD'], ['log', '-1'], ['show'], ['diff', 'HEAD', 'HEAD']];
+    for (const [i, [sub, ...rest]] of forms.entries()) {
+      const full = [sub, `--output=o${i}`, ...rest];
+      assert.equal(g(...full).status, 0, `git ${full.join(' ')} runs`);
+      assert.ok(existsSync(join(dir, `o${i}`)), `git ${full.join(' ')} wrote a file`);
+      for (const role of [DAY, NIGHT, PRA]) {
+        for (const a of [full, [sub, `--outp=p${i}`, ...rest]]) {
+          assert.ok(await decide(sh(`git ${a.join(' ')}`), fakeIo({ role })), `the guard refuses (${role || 'day'}): git ${a.join(' ')}`);
+        }
+      }
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
@@ -407,7 +501,28 @@ const MUTANTS = [
   ['parentheses separate commands', "if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }", "if (c === ';') { endCmd(); i++; continue; }"],
   ['PermissionRequest', "return role ? deny(`routine (${rawRole}): this would have waited", "return false ? deny(`routine (${rawRole}): this would have waited"],
   ['ConfigChange', "return role && ['project_settings', 'local_settings', 'skills', 'user_settings'].includes(input.source)", 'return false'],
+  ["rev-list's --output", "  'rev-list': ['--output'],\n", ''],
+  ["diff's --output", "  diff: ['--output'],\n", ''],
+  ["log's --output", "  log: ['--output'],\n", ''],
+  ["show's --output", "  show: ['--output'],\n", ''],
+  ['the Actions reads reach their check', 'if (role && Object.hasOwn(ACTIONS_READ, name)) return actionsRead(name, ti, role);', ''],
+  ['the Actions reads are for routines only', 'if (role && Object.hasOwn(ACTIONS_READ, name))', 'if (Object.hasOwn(ACTIONS_READ, name))'],
+  ['the Actions owner/repo check', 'return deny(`routine (${role}): GitHub reads only on ${REPO}`);', 'return null;'],
+  ['no Actions reads at night', "if (role !== 'pr-advisor') return deny(`routine (${role}): ${name} is not on the night", 'if (false) return deny(`'],
+  ['the Actions method check', 'if (ok.includes(ti.method)) return null;', 'return null;'],
+  ['the Actions method list (logs URL)', "'get_workflow_run_usage'],", "'get_workflow_run_usage', 'get_workflow_run_logs_url'],"],
 ];
+test('Actions reads: a refusal names the repository or the listed methods', async () => {
+  const io = fakeIo({ role: PRA });
+  const other = await decide(ev('mcp__github__actions_get', { owner: 'x', repo: 'y', method: 'get_workflow_run' }), io);
+  assert.match(other.deny, /GitHub reads only on Mergincanli\/Shamble-Frontlines/);
+  const art = await decide(gw('actions_get', { method: 'download_workflow_run_artifact', resource_id: '1' }), io);
+  assert.match(art.deny, /get_workflow, get_workflow_run, get_workflow_job, get_workflow_run_usage/);
+  const none = await decide(gw('actions_list', {}), io);
+  assert.match(none.deny, /list_workflows, list_workflow_runs, list_workflow_jobs, list_workflow_run_artifacts \(got none\)/);
+  const night = await decide(gw('actions_get', { method: 'get_workflow_run' }), fakeIo({ role: NIGHT }));
+  assert.match(night.deny, /not on the night shift's GitHub list/);
+});
 test('mutation runs: every rule is needed by some case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
   const dir = mkdtempSync(join(tmpdir(), 'guard-mut-'));
@@ -432,4 +547,225 @@ test('mutation runs: every rule is needed by some case', async () => {
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
   assert.deepEqual(survivors, [], `mutants no case catches: ${survivors.join('; ')}`);
+});
+
+// --- 5. day sessions (kit-v3-3): kit writes ask first (item 1) and the main folder stays on main's rules (item 4) ---
+// A fake io with a project /p, a worktree /w of the same repository, worktrees under /p/.gate/x and
+// /p/.claude/worktrees/a1, and another repository /o. diffs answers `git diff --name-only origin/main <ref>`; a ref it
+// does not name fails, as git does for a ref it can't resolve.
+const WT = { '/p': '/p/.git', '/w': '/p/.git', '/p/.gate/x': '/p/.git', '/p/.claude/worktrees/a1': '/p/.git', '/o': '/o/.git' };
+const CLAUDE_MD = new Set(['/p/CLAUDE.md', '/w/CLAUDE.md', '/p/.gate/x/CLAUDE.md', '/p/.claude/worktrees/a1/CLAUDE.md',
+  '/p/docs/sub/CLAUDE.md']);
+function dayIo(o = {}) {
+  const { role = '', diffs = {}, platform } = o;
+  const links = { '/p/link': '/p/.claude' };
+  const topOf = (cwd) => Object.keys(WT).filter((t) => cwd === t || cwd.startsWith(t + '/')).sort((a, b) => b.length - a.length)[0];
+  return {
+    env: role ? { SHAMBLE_ROLE: role } : {},
+    projectDir: '/p',
+    home: '/home/u',
+    platform,
+    gitLongOptions,
+    git: (args, cwd) => {
+      const a = args.join(' '), top = topOf(cwd ?? '/p');
+      if (a === 'rev-parse --show-toplevel') return top ? { code: 0, out: `${top}\n` } : { code: 128, out: '' };
+      if (a === 'rev-parse --git-common-dir') return top ? { code: 0, out: `${WT[top]}\n` } : { code: 128, out: '' };
+      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'origin/main' && args[4] === '--' && args.length === 5) {
+        return args[3] in diffs ? { code: 0, out: diffs[args[3]] } : { code: 128, out: '' };
+      }
+      return { code: 0, out: '' };
+    },
+    gh: () => ({ code: 1, out: '' }),
+    exists: (p) => (basename(p) === 'CLAUDE.md' ? CLAUDE_MD.has(p) : true),
+    realpath: (p) => { for (const [l, t] of Object.entries(links)) if (p === l || p.startsWith(l + '/')) return t + p.slice(l.length); return p; },
+    readFile: () => '{}',
+  };
+}
+const dsh = (command, extra = {}) => ({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command }, cwd: '/p', scratchpad_dir: SCRATCH, ...extra });
+const kindOf = (d) => (d ? (d.ask !== undefined && d.deny === undefined ? 'ask' : 'deny') : null);
+const ASK = 'ask', DENY = 'deny';
+const OTHER = { 'cs/other': 'tools/gate.mjs\n' };
+// [name, input, expected kind, dayIo options, reason pattern]
+export const DAY_CASES = [
+  // group "day ask-first (item 1)", through the shell (the Edit-tool forms A1-A11, A22, A25 and A36 wait: see the report)
+  ['A4s docs/STATUS.md', dsh('echo x > docs/STATUS.md'), null],
+  ['A5s agent memory', dsh('echo x > .claude/agent-memory-local/x'), null],
+  ['A6s .checkpoints', dsh('echo x > .checkpoints/x.md'), null],
+  ['A7s worktree /w .claude/settings.json', dsh('echo x > /w/.claude/settings.json'), ASK, {}, /\.claude\/settings\.json/],
+  ['A8s worktree /w game file', dsh('echo x > /w/shamble-game.js'), null],
+  ['A9s .claude/worktrees/a1/CLAUDE.md', dsh('echo x > /p/.claude/worktrees/a1/CLAUDE.md'), ASK],
+  ['A9b-s .gate/x worktree .claude/settings.json', dsh('echo x > /p/.gate/x/.claude/settings.json'), ASK],
+  ['A9c-s .gate/x worktree tools/gate.mjs', dsh('cp /tmp/x /p/.gate/x/tools/gate.mjs'), ASK],
+  ['A9d-s .gate/x worktree game file', dsh('echo x > /p/.gate/x/shamble-core.js'), null],
+  ['A10s a symlink to .claude', dsh('echo x > link/settings.json'), ASK],
+  ["A11s another repository's .claude", dsh('echo x > /o/.claude/settings.json'), null],
+  ['A12 redirect to .claude/settings.json', dsh('echo x > .claude/settings.json'), ASK, {}, /ask first.*\.claude\/settings\.json/],
+  ['A13 sed -i CLAUDE.md', dsh('sed -i s/a/b/ CLAUDE.md'), ASK],
+  ['A14 cp onto tools/gate.mjs', dsh('cp /tmp/x tools/gate.mjs'), ASK],
+  ['A15 mv a workflow away', dsh('mv .github/workflows/gate.yml /tmp/'), ASK],
+  ['A16 tee -a .claude/rules/x.md', dsh('tee -a .claude/rules/x.md'), ASK],
+  ['A17 ln -s into .claude/hooks', dsh('ln -s /tmp/x .claude/hooks/x.mjs'), ASK],
+  ['A18 cat CLAUDE.md', dsh('cat CLAUDE.md'), null],
+  ['A19 git show into CLAUDE.md', dsh('git show origin/main:CLAUDE.md > CLAUDE.md'), ASK],
+  ['A20 a redirect to $F', dsh('echo x > $F'), ASK, {}, /cannot resolve/],
+  ['A21 an ask, then a force push: deny', dsh('echo x > .claude/a && git push -f origin cs/x'), DENY],
+  ['A22s a subagent writes a kit file: deny', dsh('echo x > .claude/settings.json', { agent_id: 'a1' }), DENY, {}, /main session/],
+  ['A22b-s agent_type without agent_id: ask, not deny', dsh('echo x > .claude/settings.json', { agent_type: 'advisor' }), ASK],
+  ['A27 perl -pi -e on CLAUDE.md', dsh('perl -pi -e s/a/b/ CLAUDE.md'), ASK],
+  ['A28 sed -i.bak', dsh('sed -i.bak s/a/b/ CLAUDE.md'), ASK],
+  ['A28 sed --in-place=.b', dsh('sed --in-place=.b s/a/b/ CLAUDE.md'), ASK],
+  ['A28 sed without -i only reads', dsh('sed -n p CLAUDE.md'), null],
+  ['A29 git rm a hook', dsh('git rm .claude/hooks/guard.mjs'), ASK],
+  ['A29 git mv the gate', dsh('git mv tools/gate.mjs x'), ASK],
+  ['A30 rm -r tools', dsh('rm -r tools'), ASK],
+  ['A30 mv .claude away', dsh('mv .claude x'), ASK],
+  ['A30 cp -r into the top', dsh('cp -r /tmp/x/. .'), ASK],
+  ['A30 rm -r docs/research', dsh('rm -r docs/research'), null],
+  ['A30b rm -r a folder holding a CLAUDE.md', dsh('rm -r docs/sub'), ASK],
+  ['A33 GIT_DIR= prefix (git switch main)', dsh('GIT_DIR=/x git switch main'), ASK],
+  ['A33b GIT_DIR= prefix (git status)', dsh('GIT_DIR=/x git status'), ASK, {}, /GIT_DIR/],
+  ['A35 deny beats ask inside git', dsh('git rm CLAUDE.md && git push --force origin cs/x'), DENY],
+  ['A36s win32: claude.MD is CLAUDE.md', dsh('echo x > claude.MD'), ASK, { platform: 'win32' }],
+  ['A36s linux: claude.MD is another file', dsh('echo x > claude.MD'), null, { platform: 'linux' }],
+  ['/dev/null is no target', dsh('git status > /dev/null 2>&1'), null],
+  // group "main-folder moves (item 4)"
+  ['T1 git switch cs/other in the main folder', dsh('git switch cs/other'), ASK, { diffs: OTHER }, /worktree add/],
+  ['T2 git switch --detach an old commit', dsh('git switch --detach 4def8d2'), ASK, { diffs: { '4def8d2': 'CLAUDE.md\n' } }],
+  ['T3 gh pr checkout', dsh('gh pr checkout 38'), ASK],
+  ['T3b gh co (the built-in alias)', dsh('gh co 38'), ASK],
+  ['T4 git merge cs/other', dsh('git merge cs/other'), ASK],
+  ['T5 git merge --ff-only origin/main', dsh('git merge --ff-only origin/main'), null],
+  ['T5b git merge origin/main (as the existing day case)', dsh('git merge origin/main'), null],
+  ['T6 git switch -c cs/new origin/main', dsh('git switch -c cs/new origin/main'), null],
+  ['T6b git switch -c cs/new cs/other', dsh('git switch -c cs/new cs/other'), ASK],
+  ['T7 git switch -c cs/new, HEAD equals origin/main', dsh('git switch -c cs/new'), null, { diffs: { HEAD: 'shamble-game.js\n' } }],
+  ['T8 git switch cs/other in a worktree', dsh('git switch cs/other', { cwd: '/w' }), null, { diffs: OTHER }],
+  ['T9 git worktree add', dsh('git worktree add .gate/x 4def8d2'), null],
+  ['T10 cd into the main folder, then switch', dsh('cd /p && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['T11 git pull', dsh('git pull'), ASK],
+  ['T12 a subagent switches the main folder: deny', dsh('git switch cs/other', { agent_id: 'a1' }), DENY, { diffs: OTHER }],
+  ['T13 git checkout main (unchanged)', dsh('git checkout main'), DENY],
+  ['T14 git show into a worktree file', dsh('git show origin/main:CLAUDE.md > /w/x.md'), null],
+  ['T16d git switch to a branch that changes only game files', dsh('git switch cs/other'), null, { diffs: { 'cs/other': 'shamble-game.js\n' } }],
+  ['T18 git switch to a stale main', dsh('git switch main'), ASK, { diffs: { main: '.claude/hooks/guard.mjs\n' } }, /merge --ff-only origin\/main/],
+  ['T19 git switch main, no protected difference', dsh('git switch main'), null, { diffs: { main: '' } }],
+  ['T22 gh pr checkout in a worktree', dsh('gh pr checkout 38', { cwd: '/w' }), null],
+  ['T23 git pull --ff-only origin main', dsh('git pull --ff-only origin main'), null],
+  ['T23 git pull origin cs/x', dsh('git pull origin cs/x'), ASK],
+  ['T24 git switch -c cs/new, HEAD differs in protected files', dsh('git switch -c cs/new'), ASK, { diffs: { HEAD: '.claude/hooks/guard.mjs\n' } }],
+  ['T25 git bisect start', dsh('git bisect start'), ASK],
+  ['T26 git switch - (cannot tell)', dsh('git switch -'), ASK],
+  ['T26 git switch --orphan', dsh('git switch --orphan x'), ASK],
+  ['T27 git switch, compare fails: ask', dsh('git switch cs/gone'), ASK, {}, /can't compare/],
+];
+for (const [name, input, want, opts, re] of DAY_CASES) {
+  test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
+    const d = await decide(input, dayIo(opts));
+    assert.equal(kindOf(d), want, `${name}: ${JSON.stringify(d)}`);
+    if (re) assert.match(d.ask ?? d.deny, re);
+  });
+}
+test('T17 pr-advisor git switch --detach origin/main goes on (unchanged)', async () => {
+  assert.equal(await decide(dsh('git switch --detach origin/main'), dayIo({ role: PRA })), null);
+});
+test("A23 every role, A1-A3 (Edit/Write a kit file): today's deny reasons", async () => {
+  for (const role of [NIGHT, PRA]) {
+    for (const [tool, f] of [['Edit', '/p/.claude/hooks/guard.mjs'], ['Write', '/p/CLAUDE.md'], ['Edit', '/p/tools/gate.mjs']]) {
+      const d = await decide({ hook_event_name: 'PreToolUse', tool_name: tool, tool_input: { file_path: f }, cwd: '/p' }, dayIo({ role }));
+      assert.match(d?.deny ?? '', /is a rules, CI or gate file; those change only in a daytime kit change-set/, `${role} ${tool} ${f}`);
+    }
+  }
+});
+test('A24 PermissionRequest in a day session: no decision', async () => {
+  assert.equal(await decide({ hook_event_name: 'PermissionRequest', tool_name: 'Bash', tool_input: {} }, dayIo()), null);
+});
+test('A26 with a role set, decide() never returns an ask (every case of both tables, each role)', async () => {
+  for (const role of [NIGHT, PRA, 'nightshift']) {
+    for (const [name, input, , opts] of DAY_CASES) {
+      const d = await decide(input, dayIo({ ...opts, role }));
+      assert.equal(d?.ask, undefined, `${role}: ${name}`);
+    }
+    for (const [name, , input, , opts] of CASES) {
+      const d = await decide(input, fakeIo({ ...opts, role }));
+      assert.equal(d?.ask, undefined, `${role}: ${name}`);
+    }
+  }
+});
+
+// A37 (C5): guard.mjs prints an ask only on PreToolUse with no role. Seam: a copy of the real guard.mjs beside a fake
+// routine-guard.mjs whose decide() always answers { ask } (the launcher() helper of section 3).
+const ASKING = 'export const decide = () => ({ ask: "fake ask" }); export const realIo = () => ({});';
+const A37_CHECKS = (run) => {
+  const day = JSON.parse(run(ASKING, preTool, '').stdout).hookSpecificOutput;
+  assert.deepEqual([day.permissionDecision, day.permissionDecisionReason], ['ask', 'fake ask'], 'day PreToolUse: an ask');
+  for (const role of [PRA, NIGHT]) {
+    const r = JSON.parse(run(ASKING, preTool, role).stdout).hookSpecificOutput;
+    assert.deepEqual([r.permissionDecision, r.permissionDecisionReason], ['deny', 'fake ask'], `${role}: an ask fails closed as a deny`);
+  }
+  const cfg = JSON.parse(run(ASKING, JSON.stringify({ hook_event_name: 'ConfigChange', source: 'project_settings' }), '').stdout);
+  assert.deepEqual([cfg.decision, cfg.reason], ['block', 'fake ask'], 'ConfigChange, no role: not an ask');
+  const perm = JSON.parse(run(ASKING, JSON.stringify({ hook_event_name: 'PermissionRequest', tool_name: 'Bash', tool_input: {} }), '').stdout);
+  assert.equal(perm.hookSpecificOutput.decision.behavior, 'deny', 'PermissionRequest, no role: not an ask');
+};
+test('A37 launcher: an ask prints as an ask only on PreToolUse with no role; otherwise a deny (C5)', () => A37_CHECKS(launcher));
+function launcherWith(guardSrc, rules, stdin, role) {
+  const dir = mkdtempSync(join(tmpdir(), 'guard-launch-m-'));
+  try {
+    writeFileSync(join(dir, 'guard.mjs'), guardSrc);
+    writeFileSync(join(dir, 'routine-guard.mjs'), rules);
+    const env = { ...process.env, CLAUDE_PROJECT_DIR: dir };
+    if (role) env.SHAMBLE_ROLE = role; else delete env.SHAMBLE_ROLE;
+    return spawnSync(process.execPath, [join(dir, 'guard.mjs')], { input: stdin, env, encoding: 'utf8' });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
+test("mutation: guard.mjs's fail-closed ask is needed by A37", () => {
+  const src = readFileSync(join(HERE, 'guard.mjs'), 'utf8');
+  const from = "print(d.ask, false, event === 'PreToolUse' && !role)";
+  assert.equal(src.split(from).length - 1, 1, 'the target text occurs exactly once');
+  const mutated = src.replace(from, "print(d.ask, false, event === 'PreToolUse')");
+  assert.throws(() => A37_CHECKS((rules, stdin, role) => launcherWith(mutated, rules, stdin, role)), /fails closed/);
+});
+
+// Mutation runs for section 5: each day rule, switched off in a copy, makes at least one day case fail.
+const DAY_MUTANTS = [
+  ['the day ask (shell writes)', 'first ??= ask(`kit and gate files ask first in a day session: ${rel} (${what})`);', ''],
+  ['the agent deny keys on agent_id (agent_type instead)', 'const agent = !!input.agent_id;', 'const agent = !!input.agent_type;'],
+  ["kitPath: the path's own git top first (projectRel first instead)", 'const g = gitPlace(abs, io);\n  if (!projectCommon',
+    '{ const pr0 = projectRel(p, cwd, io); if (pr0 !== null) return protectedRel(pr0) ? pr0 : null; }\n  const g = gitPlace(abs, io);\n  if (!projectCommon'],
+  ['folder targets', "if (rel === '.' || rel === '.claude' || rel === '.github' || rel === 'tools') return rel;", ''],
+  ['unresolvable targets ask', "if (/[$`*?[{]/.test(raw)) {", 'if (false) {'],
+  ['a GIT_DIR= prefix asks', 'if (prefix.some((w) => /^GIT_(DIR|WORK_TREE)=/.test(w))) {', 'if (false) {'],
+  ['the scan goes on after an ask', 'dayAsk ??= w;', 'if (w) return w;'],
+  ['win32 folds case', "const isWin = (io) => (io.platform ?? process.platform) === 'win32';", 'const isWin = () => false;'],
+  ['the main folder only', 'if (!sameDir(gitTop(vcwd, io), io.projectDir, io)) return null;', ''],
+  ['switch: no name exempt (a stale main)', "const h = protectedHit(['origin/main', pos[0], '--'], vcwd, io);",
+    "const h = pos[0] === 'main' ? null : protectedHit(['origin/main', pos[0], '--'], vcwd, io);"],
+  ['switch -c: the start point', "if (pos[0] && pos[0] !== 'origin/main') {", 'if (false) {'],
+  ["switch -c: HEAD's protected files", "const h = protectedHit(['origin/main', 'HEAD', '--'], vcwd, io);", 'const h = null;'],
+  ['merge forms', "if (a !== '--ff-only origin/main' && a !== 'origin/main') why =", 'if (false) why ='],
+  ['pull form', "if (args.join(' ') !== '--ff-only origin main') why =", 'if (false) why ='],
+  ['gh pr checkout', "if ((sub === 'pr' && sub2 === 'checkout') || sub === 'co') return mainFolderMove(", 'if (false) return mainFolderMove('],
+  ['the agent deny on a move', 'return input.agent_id ? deny(', 'return false ? deny('],
+];
+test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-day-'));
+  const survivors = [];
+  for (const [name, input, want, opts] of DAY_CASES) assert.equal(kindOf(await decide(input, dayIo(opts))), want, `unmutated rules: ${name}`);
+  try {
+    for (const [i, [label, from, to]] of DAY_MUTANTS.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `d${i}.mjs`);
+      writeFileSync(file, src.replace(from, to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [, input, want, opts] of DAY_CASES) {
+        let d;
+        try { d = await m.decide(input, dayIo(opts)); } catch { d = 'threw'; }
+        if ((d === 'threw' ? 'threw' : kindOf(d)) !== want) { caught = true; break; }
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no day case catches: ${survivors.join('; ')}`);
 });

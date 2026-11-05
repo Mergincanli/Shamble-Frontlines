@@ -52,6 +52,7 @@ const NEVER = [
   'npm run build', 'bash -c "git push -f"', 'eval "git status"', 'gh pr merge 27', 'gh auth token',
   'gh api -X DELETE repos/x/git/refs/heads/y', 'git config --list', 'git config --get http.x.extraheader',
 ];
+NEVER.push('git rev-list --output=x HEAD'); // kit-v3-3: --output=<file> writes a file
 
 test('the ask list is empty (every ask would stall a routine)', () => assert.deepEqual(ask, []));
 test('effortLevel is high (ROUTINE-EFFORT)', () => assert.equal(settings.effortLevel, 'high'));
@@ -196,3 +197,21 @@ for (const [state, change] of Object.entries(UNFINISHED)) {
     }
   }
 }
+
+// kit-v3-3 (S2-S5): the real guard through the bootstrap prints an ask in a day session and a deny for a routine. The
+// repository root is the project folder here, so it is the main folder too. Nothing runs: the guard only decides.
+// (S1 is the ask-list test above. S2 and S3 use a shell write: the Edit-tool form waits, see the step 4 report.)
+test('S2-S5 the real guard: a day kit write or main-folder move asks, a routine is refused, a worktree add goes on', () => {
+  const root = join(HERE, '..', '..');
+  const bash = (command) => ({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command }, cwd: root });
+  const out = (r) => { assert.equal(r.status, 0, r.stderr); return r.stdout ? JSON.parse(r.stdout).hookSpecificOutput : null; };
+  const s2 = out(runGuardHook('PreToolUse', root, bash('echo x > .claude/settings.json'), ''));
+  assert.equal(s2?.permissionDecision, 'ask', 'S2 day: a redirect onto .claude/settings.json asks');
+  assert.match(s2.permissionDecisionReason, /ask first.*\.claude\/settings\.json/, 'S2: the ask names the file');
+  const s3 = out(runGuardHook('PreToolUse', root, bash('echo x > .claude/settings.json'), 'night-shift'));
+  assert.equal(s3?.permissionDecision, 'deny', 'S3 night-shift: the same write is refused');
+  const s4 = out(runGuardHook('PreToolUse', root, bash('git switch cs/x'), ''));
+  assert.equal(s4?.permissionDecision, 'ask', 'S4 day: git switch in the main folder asks');
+  assert.match(s4.permissionDecisionReason, /worktree add/, 'S4: the ask names the worktree way');
+  assert.equal(out(runGuardHook('PreToolUse', root, bash('git worktree add .gate/x origin/main'), '')), null, 'S5 day: worktree add, no output');
+});

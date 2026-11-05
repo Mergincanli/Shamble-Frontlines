@@ -175,6 +175,7 @@
       "Bash(git diff *--output*)",
       "Bash(git log *--output*)",
       "Bash(git show *--output*)",
+      "Bash(git rev-list *--output*)",
       "Bash(git reset --hard)",
       "Bash(git reset --hard *)",
       "Bash(git reset --soft*)",
