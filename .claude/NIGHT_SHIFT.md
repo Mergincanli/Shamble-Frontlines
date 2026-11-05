@@ -44,11 +44,13 @@ WHILE WORKING
    checkpoint on the branch is the handoff if a limit cuts you off; the comment only points to it.
 7. Work the unchecked items from top to bottom, each on its own cs/<slug> branch with its own checkpoint: commit and
    push the checkpoint after every step (CHECKPOINTS.md §3; during long agent runs the background saver, checked at
-   every update, §5; at most 3 agents at a time, §4). Only approved work runs: an item marked NEEDS PLAN gets a written
-   plan, reviewed by the `advisor` agent: if it approves, build it; if it asks for changes, fix the plan and ask once
-   more; if it escalates or still doesn't approve, list it under Decisions needed and move on. Never guess a decision
-   the plan doesn't cover. No v2 spike runs until Mustafa and the Advisor have approved the decision drafts
-   (V2_PHASE0_BRIEF §4).
+   every update, §5; at most 3 agents at a time, §4). Write shell commands plainly, one per line or joined with `&&`,
+   values in quotes: no comments, `$`, backslashes, here-documents, braces or parentheses (the guard refuses them).
+   Commit with `git add <files>` in its own call, then `git commit -m "<message>"` alone; run git in the foreground.
+   Only approved work runs: an item marked NEEDS PLAN gets a written plan, reviewed by the `advisor` agent: if it
+   approves, build it; if it asks for changes, fix the plan and ask once more; if it escalates or still doesn't approve,
+   list it under Decisions needed and move on. Never guess a decision the plan doesn't cover. No v2 spike runs until
+   Mustafa and the Advisor have approved the decision drafts (V2_PHASE0_BRIEF §4).
    Focused agents per item type (model and effort: CLAUDE.md "Models and effort"):
    - research → NOT at night: web research is a daytime task (the guard refuses the web). Leave a research item for the day.
    - build → the main session builds, then the matching reviewers check the final diff;

@@ -137,9 +137,20 @@ function kitDir(p, cwd, io) {
 // ;, |, |&, & and newlines separate commands; $(...), `...`, <(...) and >(...) are parsed as commands of their own
 // (subs: true marks a line that had them). A here-document's body is skipped. forks: true marks a line with a
 // subshell ( ), a pipe or a background &, whose commands run in a child shell (a cd there does not carry over).
+// background: true marks a line with a background & (fix pass 3, P3-4), apart from forks.
+// unreadable (fix pass 3, D-ASK, Mustafa's scope stop: the reader learns no new syntax) names the first of five forms
+// it does not read, found where its reading still agrees with bash's: a comment, a line continuation, $'...', a
+// here-document delimiter that is not a plain word, >& or <& before a file name; null when there is none.
 export function parseShell(src) {
   const cmds = [];
-  let subs = false, unterminated = false, forks = false;
+  let subs = false, unterminated = false, forks = false, background = false, unreadable = null;
+  const odd = (form) => { unreadable ??= form; };
+  const FD_END = /[\s;&|<>()]/;
+  const fdOnly = (s, k) => { // after >& or <&: digits or -, then the word ends
+    let e = k;
+    while (/\d|-/.test(s[e] ?? '')) e++;
+    return e > k && (e === s.length || FD_END.test(s[e]));
+  };
   const walk = (s) => {
     let argv = [], redirects = [], reads = [], word = null, i = 0, pendingRedirect = false, wordExpand = false, cmdExpand = false;
     const heredocs = [];
@@ -188,11 +199,15 @@ export function parseShell(src) {
         continue;
       }
       if (c === ' ' || c === '\t') { endWord(); i++; continue; }
+      if (c === '\\' && s[i + 1] === '\n') odd('a line continuation');
       if (c === '\\') { word = (word ?? '') + (s[i + 1] ?? ''); i += 2; continue; }
+      if (c === '#' && word === null) odd('a comment');
+      if (c === '$' && s[i + 1] === "'") odd("ANSI-C quoting ($'...')");
       if (c === "'") { const j = s.indexOf("'", i + 1); word = (word ?? '') + s.slice(i + 1, j < 0 ? s.length : j); i = j < 0 ? s.length : j + 1; continue; }
       if (c === '"') {
         let j = i + 1, w = '';
         for (; j < s.length && s[j] !== '"'; j++) {
+          if (s[j] === '\\' && s[j + 1] === '\n') odd('a line continuation');
           if (s[j] === '\\' && j + 1 < s.length) { w += s[++j]; continue; }
           if (s.startsWith('$(', j)) { const save = i; i = j; j = sub('$(', ')') - 1; i = save; w += '$()'; continue; }
           if (s[j] === '`') { const save = i; i = j; j = sub('`', '`') - 1; i = save; w += '``'; continue; }
@@ -209,7 +224,9 @@ export function parseShell(src) {
         i += dash ? 3 : 2;
         while (s[i] === ' ') i++;
         let d = '';
+        const from = i;
         while (i < s.length && !/[\s;&|<>]/.test(s[i])) { if (s[i] !== "'" && s[i] !== '"' && s[i] !== '\\') d += s[i]; i++; }
+        if (!PLAIN_DELIM.test(s.slice(from, i))) odd('a here-document delimiter that is not a plain word');
         heredocs.push({ delim: d, strip: dash });
         continue;
       }
@@ -219,15 +236,19 @@ export function parseShell(src) {
       if (c === '|') { endCmd(); i += s[i + 1] === '&' ? 2 : 1; continue; }
       if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }
       if (c === '&' && s[i + 1] === '>') { endWord(); pendingRedirect = true; i += s[i + 2] === '>' ? 3 : 2; continue; }
-      if (c === '&') { endCmd(); i++; continue; }
+      if (c === '&') { background = true; endCmd(); i++; continue; }
       if (c === '>' || (c === '<' && s[i + 1] !== '<')) {
         // a digit right before (2>, 1>>) belongs to the operator, not to a word
         if (word !== null && /^\d+$/.test(word)) word = null; else endWord();
         if (c === '>') {
           i += s[i + 1] === '>' || s[i + 1] === '|' ? 2 : 1;
+          if (s[i] === '&' && !fdOnly(s, i + 1)) odd('>& or <& before a file name');
           if (s[i] === '&') { i++; while (/\d|-/.test(s[i] ?? '')) i++; continue; } // >&2 duplicates a descriptor
           pendingRedirect = true;
-        } else { i++; pendingRedirect = 'read'; }
+        } else {
+          if (s[i + 1] === '&' && !fdOnly(s, i + 2)) odd('>& or <& before a file name');
+          i++; pendingRedirect = 'read';
+        }
         continue;
       }
       if (c === '*' || c === '?') wordExpand = true; // unquoted; the shell would expand it
@@ -236,8 +257,10 @@ export function parseShell(src) {
     endCmd();
   };
   walk(src);
-  return { cmds, subs, unterminated, forks };
+  return { cmds, subs, unterminated, forks, background, unreadable };
 }
+// a here-document delimiter the reader reads as bash does: a plain word, quoted whole or led by one backslash (D-ASK)
+const PLAIN_DELIM = /^(?:[A-Za-z0-9_.-]+|'[A-Za-z0-9_.-]+'|"[A-Za-z0-9_.-]+"|\\[A-Za-z0-9_.-]+)$/;
 // Leading VAR=value words, wrappers that run the rest (timeout, nice, env, xvfb-run, ...): stripped before matching.
 // Shell keywords in front of a command ({ ... }, if/then/do ..., !) are stripped too.
 const WRAPPERS = new Set(['time', 'nohup', 'command', 'builtin', 'noglob', 'exec', '!', '{', '}', 'if', 'then', 'else',
@@ -472,10 +495,13 @@ function writeTarget(what, p, vcwd, role, io, input) {
   if (insideDir(p, input.scratchpad_dir, vcwd, io)) return null;
   return deny(`routine (${role}): ${what} must write inside the project or the scratchpad (${p})`);
 }
-// date reads the clock only: no -s (set), no file (-f / -r), no operand. `date`, `date -u`, `date +FORMAT` pass.
+// date reads the clock only: no -s (set), no file (-f / -r), no operand. `date`, `date -u`, `date +FORMAT` pass; FORMAT
+// (the word after quote removal) holds only letters, digits and % : _ space . , / - (fix pass 3, P3-3: a date word
+// cannot carry a separator, even inside quotes).
 function dateCheck(args, role) {
   for (const a of args) {
-    if (a === '-u' || a === '--utc' || a === '--universal' || a === '-R' || a === '--rfc-email' || a.startsWith('+')) continue;
+    if (a === '-u' || a === '--utc' || a === '--universal' || a === '-R' || a === '--rfc-email') continue;
+    if (/^\+[A-Za-z0-9%:_ .,\/-]*$/.test(a)) continue;
     return deny(`routine (${role}): date reads the clock only (date, date -u, date +FORMAT)`);
   }
   return null;
@@ -494,8 +520,98 @@ function npmCheck(argv, vcwd, role, io) {
   return deny(`routine (${role}): npm only as "${NIGHT_NPM}" (night shift; the PR Advisor installs nothing)`);
 }
 
+// R-PLAIN (fix pass 3), routines only: a routine's Bash line must be in a plain form that parseShell splits exactly as
+// bash does, or it is refused. It is checked on the raw text before parseShell, in a function of its own, so a parser
+// slip cannot turn it off. Outside quotes: ASCII letters and digits, space, tab, newline, _ - . / : = @ % + , ^, a ~
+// that does not start a word or follow = or :, and the operators && || ; | |& & > >> >| < &> &>> (a redirect may
+// follow a file-descriptor number) and >& before a number or -. Inside single quotes: no control character but
+// newline; inside double quotes: no $, backtick or backslash either. Every quote closed. Narrowed where parseShell and
+// bash read this form differently: no <& (parseShell reads its & as a background &), no quoted word right before a <
+// or > (bash passes '2'>x's 2 as an argument), no quoted NAME= before a command's program (bash runs "TZ=x" as a
+// program, not as an assignment), and no ;; or ;& (case tokens). Returns what it found, or null.
+const PLAIN_CHAR = /[A-Za-z0-9 \t\n_\-.\/:=@%+,^]/;
+const PLAIN_CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
+const PLAIN_DQ = /[$`\\]/;
+const PLAIN_END = /^$|^[ \t\n;&|<>]/; // what may follow >& and its number
+const NAME_EQ = /^[A-Za-z_][A-Za-z0-9_]*=/;
+const shownChar = (c) => (/[\x21-\x7e]/.test(c) ? c
+  : `U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
+export function plainForm(src) {
+  // start: where the current word starts; quoted: it holds a quote so far; atCmd: the command has no program word yet
+  // (NAME=value words only); target: the next word is a redirect's target
+  let start = 0, quoted = false, atCmd = true, target = false;
+  const word = (k, fdOp) => { // the word that ends at k (a blank, an operator or the end); fdOp: a > or < follows
+    const w = src.slice(start, k);
+    start = k; quoted = false;
+    if (!w || (fdOp && /^\d+$/.test(w))) return null; // nothing, or a file-descriptor number of the redirect
+    if (target) { target = false; return null; }
+    if (!atCmd || NAME_EQ.test(w)) return null;
+    if (/['"]/.test(w) && NAME_EQ.test(w.replace(/['"]/g, ''))) return 'a quoted NAME= before the program';
+    atCmd = false;
+    return null;
+  };
+  for (let i = 0; i < src.length;) {
+    const c = src[i];
+    if (c === "'" || c === '"') {
+      const j = src.indexOf(c, i + 1);
+      if (j < 0) return 'an unclosed quote';
+      const body = src.slice(i + 1, j);
+      if (PLAIN_CONTROL.test(body)) return `a control character (${shownChar(body.match(PLAIN_CONTROL)[0])}) in quotes`;
+      if (c === '"' && PLAIN_DQ.test(body)) return `a ${body.match(PLAIN_DQ)[0]} inside double quotes`;
+      quoted = true; i = j + 1; continue;
+    }
+    if (c === ' ' || c === '\t' || c === '\n') {
+      const f = word(i);
+      if (f) return f;
+      if (c === '\n') atCmd = true;
+      i = start = i + 1; continue;
+    }
+    if (c === '#') return 'a comment (#)';
+    if (c === '$') return 'a $';
+    if (c === '`') return 'a backtick';
+    if (c === '\\') return 'a backslash';
+    if ('(){}[]'.includes(c)) return `a parenthesis, brace or bracket (${c})`;
+    if ('!*?'.includes(c)) return `a ${c}`;
+    if (c === '~') {
+      if (i === start || src[i - 1] === '=' || src[i - 1] === ':') return 'a ~ that starts a word or follows = or :';
+      i++; continue;
+    }
+    if (src.startsWith('<<', i)) return 'a here-document or here-string (<<)';
+    if (src.startsWith('<>', i)) return 'a <> redirect';
+    if (src.startsWith('<&', i)) return 'a <& redirect';
+    if (src.startsWith(';;', i) || src.startsWith(';&', i)) return `a ${src.slice(i, i + 2)}`;
+    if ((c === '<' || c === '>') && quoted) return 'a quoted word right before a redirect';
+    if (src.startsWith('>&', i)) {
+      const m = /^(\d+-?|-)/.exec(src.slice(i + 2));
+      if (!m || !PLAIN_END.test(src.slice(i + 2 + m[0].length))) return 'a >& before a word that is not a number or -';
+      const f = word(i, true);
+      if (f) return f;
+      i = start = i + 2 + m[0].length; continue;
+    }
+    const op = ['&&', '&>>', '&>', '||', '|&', '>>', '>|'].find((o) => src.startsWith(o, i))
+      ?? ('&|;<>'.includes(c) ? c : '');
+    if (op) {
+      const redirect = /[<>]/.test(op);
+      const f = word(i, redirect && op[0] !== '&');
+      if (f) return f;
+      if (redirect) target = true; else { atCmd = true; target = false; }
+      i = start = i + op.length; continue;
+    }
+    if (PLAIN_CONTROL.test(c)) return `a control character (${shownChar(c)})`;
+    if (!PLAIN_CHAR.test(c)) return `the character ${shownChar(c)}`;
+    i++;
+  }
+  return word(src.length);
+}
+const plainReason = (role, found) => `routine (${role}): write the command plainly (${found}): ` +
+  'one command per line or joined with && ; values in quotes; no comments, $, backslashes, here-documents, braces, ' +
+  'brackets or parentheses';
+
 async function bash(command, cwd, role, io, input) {
-  const { cmds, subs, unterminated, forks } = parseShell(command);
+  if (role) { const found = plainForm(command); if (found) return deny(plainReason(role, found)); } // R-PLAIN, first
+  const { cmds, subs, unterminated, forks, background, unreadable } = parseShell(command);
+  // P3-4 (fix pass 3): git on a line with a background &, or in a call run in the background, is refused below
+  const bgCall = input.tool_input?.run_in_background === true;
   if (role && subs) return deny(`routine (${role}): no command substitution ($(...), backticks); run the commands one by one`);
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd, dayAsk = null;
@@ -505,6 +621,16 @@ async function bash(command, cwd, role, io, input) {
   if (!role && (GIT_PLACE_VARS.test(command) || cmds.some((c) => [...c.argv, ...c.redirects, ...c.reads].some((w) => GIT_PLACE_VARS.test(w))))) {
     dayAsk = ask('kit and gate files ask first in a day session: the line names GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR or ' +
       'GIT_INDEX_FILE, which point git at another folder or index, and the guard cannot follow it');
+  }
+  // day sessions (fix pass 3, D-ASK): a line holding a form the guard does not read (parseShell's unreadable) asks, and
+  // an agent is refused; the scan goes on, so a later deny in the line still wins. Routines: R-PLAIN refuses it first.
+  if (!role && unreadable) {
+    if (input.agent_id) {
+      return deny(`${KIT_AGENT}; an agent writes its shell lines without ${unreadable} ` +
+        "(the guard can't fully read them)");
+    }
+    dayAsk ??= ask("kit and gate files ask first in a day session: the guard can't fully read this line " +
+      `(${unreadable}), so it asks instead of guessing; write it without ${unreadable}, or approve it`);
   }
   // day sessions (fix round R-a..R-e): known false is the unknown ("lost") folder, a state, not a folder; lead stays
   // true while the line has run nothing but cd, pushd and popd; stack is the line's pushd stack (null: an unknown entry)
@@ -547,6 +673,10 @@ async function bash(command, cwd, role, io, input) {
         return deny(`routine (${role}): write values out in ${prog} commands (no variables or substitutions)`);
       }
     }
+    if (role && prog === 'git' && (background || bgCall)) {
+      return deny(`routine (${role}): routines run git in the foreground ` +
+        '(no background & or run_in_background on a line with git)');
+    }
     let r = null;
     if (prog === 'git') { r = await git(argv, vcwd, role, io, input, line); line.gitBefore = true; }
     else if (prog === 'gh') r = await gh(argv, role, io, vcwd, input);
@@ -567,6 +697,12 @@ const GIT_PLACE_VARS = /GIT_(DIR|WORK_TREE|COMMON_DIR|INDEX_FILE)/; // fix round
 const CLONE_VALUE = new Set(['-o', '--origin', '-b', '--branch', '-u', '--upload-pack', '--reference', '--reference-if-able',
   '--depth', '--shallow-since', '--shallow-exclude', '-c', '--config', '--template', '-j', '--jobs', '--filter',
   '--bundle-uri', '--server-option', '--ref-format', '--revision']);
+// git 2.43's documented clone flags that take no value (fix pass 3, P3-7): any other option word is unknown
+const CLONE_FLAGS = new Set(['-q', '--quiet', '-v', '--verbose', '--progress', '-n', '--no-checkout', '--bare',
+  '--mirror', '-l', '--local', '--no-local', '--no-hardlinks', '-s', '--shared', '--dissociate', '--recursive',
+  '--recurse-submodules', '--single-branch', '--no-single-branch', '--no-tags', '--tags', '--shallow-submodules',
+  '--no-shallow-submodules', '--remote-submodules', '--no-remote-submodules', '--sparse', '--reject-shallow',
+  '--no-reject-shallow', '--also-filter-submodules']);
 // the folder git clone makes when none is given: the URL's last part without a trailing / or /.git, and without .git
 // or .bundle (as git's own guess)
 const cloneDir = (url) => url.replace(/\/+$/, '').replace(/\/\.git$/, '').replace(/\/+$/, '').split(/[/:\\]/).pop()
@@ -613,19 +749,22 @@ function writtenBy(argv) {
   }
   if (prog === 'git' && a[0] === 'clone') { // F-b: git clone [opts] <url> [<dir>]; --separate-git-dir writes there too
     const pos = [], gitDir = [];
+    let unknown = false; // fix pass 3 (P3-7): an option the guard does not know, which may take the next word
     for (let i = 1; i < a.length; i++) {
       const w = a[i];
       if (w === '--') { pos.push(...a.slice(i + 1)); break; }
       if (w === '--separate-git-dir') { gitDir.push(a[++i] ?? ''); continue; }
       if (w.startsWith('--separate-git-dir=')) { gitDir.push(w.slice(19)); continue; }
       if (CLONE_VALUE.has(w)) { i++; continue; }
-      if (w.startsWith('-') && w.length > 1) continue;
+      if (w.startsWith('-') && w.length > 1) { if (!w.includes('=') && !CLONE_FLAGS.has(w)) unknown = true; continue; }
       pos.push(w);
     }
     // fix pass 2 (SD-5): every positional word after the first (an option the guard does not know may take a value,
-    // which shifts the URL and the folder) and the folder git would make from each positional word (leaving out the
-    // results . and .., which name no new folder: git clone . <dir>)
-    const made = pos.map(cloneDir).filter((d) => d && d !== '.' && d !== '..');
+    // which shifts the URL and the folder); fix pass 3 (P3-7): the folder git would make from the URL only where a word
+    // can be the URL with no folder after it: the only positional word, and, after an unknown option, the second one
+    // (leaving out the results . and .., which name no new folder: git clone . <dir>)
+    const made = [...(pos.length === 1 ? [pos[0]] : []), ...(unknown && pos.length > 1 ? [pos[1]] : [])]
+      .map(cloneDir).filter((d) => d && d !== '.' && d !== '..');
     return [...pos.slice(1), ...made, ...gitDir];
   }
   if (prog === 'sed' || prog === 'perl') { // sed -i / --in-place[=SUF] (any prefix from --i: SA-5); perl -i / -pi / -pi.bak
@@ -803,6 +942,26 @@ const NIGHT_ALONE = {
   commit: ['checks what it commits', 'run git add in its own call first, then git commit alone'],
   push: ['checks what it pushes', 'run git commit in its own call first, then git push alone'],
 };
+// fix pass 3 (P3-5), the night shift: a git commit takes only a message and the flags -a, -q, -s and --allow-empty, so
+// git commits exactly the staged list (and the unstaged list with -a) and no path or pathspec option reaches git
+const NIGHT_COMMIT_FLAG = /^(-a|--all|-q|--quiet|-s|--signoff|--allow-empty)$/;
+const NIGHT_COMMIT_ONLY = 'routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] ' +
+  '-m <message>; stage files with git add in its own call first';
+// true when every word after `commit` is on the list and a message is given (-m, --message, a bundle of a, q, s with
+// m last: the message attached, or the next word)
+function nightCommitPlain(args) {
+  let message = false;
+  for (let i = 0; i < args.length; i++) {
+    const t = args[i];
+    if (NIGHT_COMMIT_FLAG.test(t) || /^-[aqs]+$/.test(t)) continue;
+    if (t.startsWith('--message=')) { message = true; continue; }
+    const m = t === '--message' ? [t, ''] : /^-[aqs]*m([^]*)$/.exec(t);
+    if (!m) return false;
+    if (m[1] === '' && ++i >= args.length) return false;
+    message = true;
+  }
+  return message;
+}
 // line: what bash() knows of the whole line ({ alone }); missing, a night switch, commit or push is refused
 async function git(argv, vcwd, role, io, input = {}, line = {}) {
   let i = 1;
@@ -828,6 +987,7 @@ async function git(argv, vcwd, role, io, input = {}, line = {}) {
     return deny(`routine (night-shift): git ${sub} runs alone, the only command of its call (the guard ${checks} ` +
       `before the line runs): ${fix}`);
   }
+  if (sub === 'commit' && role === 'night-shift' && !nightCommitPlain(args)) return deny(NIGHT_COMMIT_ONLY);
   const rest = gitArgsCheck(sub, args, io);
   if (typeof rest === 'string') return deny(rest);
   if (sub === 'reset') { // only unstaging: [HEAD] [-- <path>...]; anything that could name another commit is refused
@@ -880,16 +1040,16 @@ async function git(argv, vcwd, role, io, input = {}, line = {}) {
   if (night) return deny(night);
   if (sub === 'commit' && role === 'night-shift') {
     // fix pass 2 (SD-2): git's lists read as DIFF_NAMES gives them (NUL-separated, untrimmed); a list git can't give
-    // is refused; the paths named after -- are the command's own words, trimmed as before
+    // is refused. fix pass 3 (P3-5): the command names no path (nightCommitPlain), so these lists are all it commits
+    // (-a also counts in a message word such as -m -am: a longer list, never a shorter one)
     const lists = [io.git(['diff', '--cached', ...DIFF_NAMES], vcwd)];
     const all = args.some((a) => a === '-a' || a === '--all' || /^-[A-Za-z]*a/.test(a));
     if (all) lists.push(io.git(['diff', ...DIFF_NAMES], vcwd));
     if (lists.some((d) => d.code !== 0)) {
       return deny("routine (night-shift): git can't list what the commit would change; run git status, then commit");
     }
-    const named = (rest.includes('--') ? rest.slice(rest.indexOf('--') + 1) : []).map((f) => f.trim());
     const top = gitTop(vcwd, io);
-    const hit = [...lists.flatMap((d) => d.out.split('\0')), ...named].filter(Boolean)
+    const hit = lists.flatMap((d) => d.out.split('\0')).filter(Boolean)
       .find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
     if (hit) return deny(`routine (night-shift): the commit would change ${hit} (a rules, CI or gate file)`);
   }
@@ -910,8 +1070,9 @@ function worktreeRel(f, top, vcwd, io) {
 }
 // fix pass 2 (SD-2): how the guard has git list changed files: NUL-separated (-z: a non-ASCII name is not quoted),
 // renames off (a kit file moved away still names its old path) and relative output off (diff.relative), so every
-// name is relative to the worktree's top.
-const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative'];
+// name is relative to the worktree's top. fix pass 3 (P3-6): submodules never hidden (a branch's .gitmodules
+// `ignore = all` or diff.ignoreSubmodules would leave out a gitlink added at a kit path). Every caller uses this list.
+const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative', '--ignore-submodules=none'];
 // The first protected file `git diff <DIFF_NAMES> <range...>` names: { hit }, { failed: true } when git can't compare,
 // or null.
 function protectedHit(range, vcwd, io) {
@@ -971,7 +1132,7 @@ function switchTargetCheck(args, vcwd, io) {
   const main = commitOf(ORIGIN_MAIN, vcwd, io);
   if (sha === null) return `${R}: can't resolve ${target} to a commit; fetch it first (git fetch origin <branch>), ` +
     `or ${stop}`;
-  const d = io.git(['diff', '--name-only', '-z', '--no-renames', '--no-relative', main, sha, '--'], vcwd);
+  const d = io.git(['diff', ...DIFF_NAMES, main, sha, '--'], vcwd);
   if (d.code !== 0) return `${R}: can't compare ${target} with origin/main; fetch it first (git fetch origin main), ` +
     `or ${stop}`;
   const hit = d.out.split('\0').filter(Boolean).find((f) => protectedRel(f));
