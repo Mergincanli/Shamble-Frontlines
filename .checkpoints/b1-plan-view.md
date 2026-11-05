@@ -12,7 +12,14 @@
 - **Scope:** docs only (EDITOR_V2, STATUS, ROADMAP, the A3 report's two Low notes; REPO_MAP if needed). It also does
   the docs after PR #38's merge (af8393e, 2026-11-05 21:25 UTC, merge commit, on his go after the advisor's APPROVE
   of 8b7cfb3, comment 6669362242).
-- **Current step:** 1, plan revision 1 (`plan-rev1.md`) and the advisor's plan review.
+- **Done:** plan revision 1 (`plan-rev1.md`); the advisor's APPROVE with 14 conditions (`advisor-plan-rev1.md`):
+  P-TAG (a) `[DECIDED]` with his marks in his words; PLACE a dated block in §3 (his eight lines in his order,
+  the Principle last; a pointer only under the intro); the plan view with its own date (2026-11-03); OVERLAP pointers
+  (Select and transform, Test, the validation panel, §2 rule 4, the `[LATER]` prefab library; a neutral §6 pointer;
+  none on interiors); SCALE a STATUS follow-up naming ADR 0004, 0005 and 0003; OQ-0005-CD4's register row gains
+  "Mustafa (2026-11-05) bears on it"; E1-E3 as conditioned ([DECIDED] 2 -> 11); one review round, one fix pass.
+- **Current step:** 2, the build (a builder: EDITOR_V2, the ADR register clause, the A3 report's corrections and the
+  E1-E3 scripts; then docs-keeper: STATUS, ROADMAP, REPO_MAP).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
