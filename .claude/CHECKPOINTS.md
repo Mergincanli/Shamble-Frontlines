@@ -81,15 +81,16 @@ Copy this template. Keep it short: it is a handoff, not a log.
   source, then a notes line naming that source done.
 - **Agents write; they never commit or push.** One committer at a time avoids git lock races: the session commits the
   notes with its next checkpoint, and during long runs the background saver does (§5).
-- **Worktree agents** (`isolation: worktree`) write their notes to the main checkout's `.checkpoints/` folder, by the
-  absolute path their prompt gives, so the saver sees them.
+- **Worktree agents** (`isolation: worktree`) write their notes to the `.checkpoints/` folder of the session's own
+  checkout (its worktree, when the session works in one), by the absolute path their prompt gives, so the saver sees
+  them.
 - **Agents without a write tool:** the advisor writes its notes with Bash, under `.checkpoints/` only, in a day session;
   in a routine the guard refuses shell file tools, so the advisor returns its notes in its report (advisor.md, "Your
-  notes"; a known limit until A3, the guard's follow-ups). The built-in Explore and Plan agents can't write: give them
-  single-unit work only, and they return their result whole. Plan first holds for them too: the advisor writes its
-  plan as the first lines of its notes (with Bash, in a day session) or as the first part of its report (in a
-  routine, where the routine's own session saves it with the Write tool); for Explore and Plan, the caller's prompt is
-  the plan, and the caller saves the result to the notes as soon as it comes back.
+  notes"; when its `memory: local` gives it Write, it writes them as it goes; A3). The built-in Explore and Plan agents
+  can't write: give them single-unit work only, and they return their result whole. Plan first holds for them too:
+  the advisor writes its plan as the first lines of its notes (with Bash, in a day session) or as the first part of
+  its report (in a routine, where the routine's own session saves it with the Write tool); for Explore and Plan, the
+  caller's prompt is the plan, and the caller saves the result to the notes as soon as it comes back.
 - **Scratch files** (Mustafa, 2026-11-03) live in the notes folder, `.checkpoints/<task-slug>/`: text and small
   scripts only (a list, a draft, a short harness; as a guide, under 100 KB a file). Never build output or binaries
   there (compiled code, Wasm, renders and screenshots, archives, whole-run logs, copies of the tree): the saver pushes
@@ -186,7 +187,11 @@ the agents' notes reach the remote even if the whole session is cut off:
 ## 8. Resuming (brief 2b rule 4)
 1. Read the checkpoint on the task's branch. It is the authority on where the work stands; the approved plan or verdict
    is the authority on what may be done. A status comment or a message only points to it.
-2. Check the branch matches it: `git log --oneline -5` shows the last SHA it records (or a later checkpoint commit).
+2. Get onto the branch without moving the main folder: if it is not already on the branch, resume in a worktree
+   (`git worktree prune` first, since a worktree under a lost scratchpad stays registered; then
+   `git worktree add .gate/<slug>-wt <branch>`, and run the saver from there; CLAUDE.md, Never; the night shift
+   switches instead when the guard accepts the branch, NIGHT_SHIFT.md step 4). Check the branch matches it:
+   `git log --oneline -5` shows the last SHA it records (or a later checkpoint commit).
    For code, run the gate.
 3. Continue from "Next steps". Never restart a task from scratch when a checkpoint exists.
 4. If the checkpoint is missing or doesn't match the branch, stop that task and write it under "Decisions needed";

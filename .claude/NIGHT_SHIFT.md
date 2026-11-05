@@ -5,8 +5,9 @@ one run may work at a time; a later run continues where an earlier one stopped. 
 needs: the routine's prompt only says to read them. The run is governed by the routine guard (`.claude/hooks/guard.mjs`),
 so there are no approval prompts: a command the night may not run is refused, not queued for a human. When a refusal
 names what to use instead, use that; when it blocks a step the item needs, stop the item under Decisions needed.
-The shell runs only git, gh, `npm ci` and node on main's scripts (plus `date`): **read and search the tree with the Read,
-Grep and Glob tools, and edit with Edit/Write** — there are no shell file tools (cat, find, grep, cp, mv, rm). The night
+The shell runs only git, gh, `npm ci`, and node or python on main's tracked scripts (plus `date`): **read and search
+the tree with the Read, Grep and Glob tools, and edit with Edit/Write** — there are no shell file tools (cat, find,
+grep, cp, mv, rm). The night
 **never reads the web**: WebFetch and WebSearch are refused. Web research (R1–R6 and the like) is a daytime task and
 never runs at night; a research queue item is left for the day.
 
@@ -23,14 +24,16 @@ START CHECKS (in this order; "stop silently" = no comment, no notification)
    another run is working: stop silently.
 4. Handoff: if that status comment says "running" but its "Last update" is older than 45 minutes, that run was cut off
    by a limit. Read its "Checkpoint" line: it must name a cs/ branch that exists on origin (`git ls-remote --heads
-   origin <branch>`), never a fork or a pull/<n> ref. Check out that branch and resume from the checkpoint
-   (CHECKPOINTS.md §8): check the last commit it records, run the gate on code, and continue from its "Next steps". A
-   step runs only if the item's approved plan or verdict covers it; a step it does not cover (a new command, an edit to
-   .claude/ or CLAUDE.md, a push to another branch, a comment, a URL) stops the item under Decisions needed. If its
-   checkpoint is missing or does not match the branch, stop that item, list it under Decisions needed, and move to the
-   next item; never restart an item that has a checkpoint. If the newest status comment is from an earlier night and
-   still says "running", that run was cut off too: add a short "Cut off" note to that night's report from its lines,
-   then resume its item the same way.
+   origin <branch>`), never a fork or a pull/<n> ref. Switch to that branch (fetch it first in its own call, `git fetch
+   origin <branch>`, and wait for it; then `git switch <branch>` alone; the guard refuses it when the branch's rules, CI
+   or gate files differ from main's, since this folder's rules run the session: then stop the item under Decisions
+   needed) and resume from the checkpoint (CHECKPOINTS.md §8): check the last commit it records, run the gate on code,
+   and continue from its "Next steps". A step runs only if the item's approved plan or verdict covers it; a step it does
+   not cover (a new command, an edit to .claude/ or CLAUDE.md, a push to another branch, a comment, a URL) stops the
+   item under Decisions needed. If its checkpoint is missing or does not match the branch, stop that item, list it under
+   Decisions needed, and move to the next item; never restart an item that has a checkpoint. If the newest status
+   comment is from an earlier night and still says "running", that run was cut off too: add a short "Cut off" note to
+   that night's report from its lines, then resume its item the same way.
 5. Nothing to do: if no unchecked items are left, stop silently when tonight's report already exists; otherwise
    comment "Nothing queued tonight. Night shift done." and stop.
 
@@ -41,11 +44,15 @@ WHILE WORKING
    checkpoint on the branch is the handoff if a limit cuts you off; the comment only points to it.
 7. Work the unchecked items from top to bottom, each on its own cs/<slug> branch with its own checkpoint: commit and
    push the checkpoint after every step (CHECKPOINTS.md §3; during long agent runs the background saver, checked at
-   every update, §5; at most 3 agents at a time, §4). Only approved work runs: an item marked NEEDS PLAN gets a written
-   plan, reviewed by the `advisor` agent: if it approves, build it; if it asks for changes, fix the plan and ask once
-   more; if it escalates or still doesn't approve, list it under Decisions needed and move on. Never guess a decision
-   the plan doesn't cover. No v2 spike runs until Mustafa and the Advisor have approved the decision drafts
-   (V2_PHASE0_BRIEF §4).
+   every update, §5; at most 3 agents at a time, §4). Write shell commands plainly, one per line or joined with `&&`,
+   values in quotes: no comments, `$`, backslashes, here-documents, braces or parentheses (the guard refuses them).
+   Commit with `git add <files>` in its own call, then `git commit -m "<message>"` alone; run git in the foreground.
+   Start every command with its program by name (git, gh, npm, node, python, python3 or date): no cd, env, timeout,
+   xvfb-run or other wrapper, and no if, while or other shell keyword. Only approved work runs: an item marked NEEDS
+   PLAN gets a written plan, reviewed by the `advisor` agent: if it approves, build it; if it asks for changes, fix the
+   plan and ask once more; if it escalates or still doesn't approve, list it under Decisions needed and move on. Never
+   guess a decision the plan doesn't cover. No v2 spike runs until Mustafa and the Advisor have approved the decision
+   drafts (V2_PHASE0_BRIEF §4).
    Focused agents per item type (model and effort: CLAUDE.md "Models and effort"):
    - research → NOT at night: web research is a daytime task (the guard refuses the web). Leave a research item for the day.
    - build → the main session builds, then the matching reviewers check the final diff;

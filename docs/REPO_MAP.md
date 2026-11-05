@@ -104,8 +104,8 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/rules/netcode.md` | Rules for future server, shared and net folders |
 | `.claude/hooks/` | Hooks (below) |
 | `.claude/hooks/syntax-gate.mjs` | After every Edit or Write: `node --check` on JS and each page's inline scripts |
-| `.claude/hooks/guard.mjs` | The routine-guard launcher: loads the rules, prints their deny as JSON, fails closed for routines; when it is missing or can't load, the `settings.json` bootstrap lets a day session through and blocks a routine, and it also blocks a routine when this file ends without its own exit |
-| `.claude/hooks/routine-guard.mjs` | The routine-guard rules (`decide`): git/gh option forms and the merge check for every session, plus the deny-by-default shell, no-web and no-protected-write rules for the two cloud routines |
+| `.claude/hooks/guard.mjs` | The routine-guard launcher: loads the rules, prints their deny as JSON (or an ask, for a day session's PreToolUse), fails closed for routines; when it is missing or can't load, the `settings.json` bootstrap lets a day session through and blocks a routine, and it also blocks a routine when this file ends without its own exit |
+| `.claude/hooks/routine-guard.mjs` | The routine-guard rules (`decide`): git/gh option forms and the merge check for every session, plus the deny-by-default shell, no-web and no-protected-write rules for the two cloud routines, and in day sessions the ask before kit and gate edits and main-folder switches (an agent's kit edit refused) |
 | `.claude/hooks/routine-guard.test.mjs` | Tests for the rules: the case table, real git on a throwaway repo, launcher error modes, mutation runs |
 | `.claude/hooks/settings.test.mjs` | Tests for `settings.json`: empty ask, high effort, guard registered on the three events, routine commands allowed and nevers denied, and the GUARD-FILE tests (the hook command run with `guard.mjs` removed, broken, unfinished and present) |
 | `.claude/scripts/` | Kit scripts (below) |

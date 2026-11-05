@@ -24,16 +24,20 @@ const DIR = '.checkpoints/';
 const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
 const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
+// An escape that can stand just before a key in pasted text: %XX (also %25-chained: %252C), %uXXXX, quoted-printable
+// =XX, and backslash escapes (JSON's \b \f \n \r \t, \v \0, \xXX, \uXXXX). The patterns with a left boundary accept it
+// there, so "q=%20sk-..." or "a\nAKIA..." is still caught. Declared before SECRETS, which uses it at load.
+const ESC = String.raw`%(?:25)*(?:[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4})|=[0-9A-F]{2}|\\(?:[bfnrtv0]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4})`;
 const SECRETS = [
   ['GitHub token', /(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})/],
   ['Anthropic key', /sk-ant-[A-Za-z0-9_-]{20,}/],
-  ['API key', /(?:^|[^A-Za-z0-9-]|%3[Dd])sk-(proj-|svcacct-)?[A-Za-z0-9_-]{32,}/],
+  ['API key', new RegExp(String.raw`(?:^|[^A-Za-z0-9-]|${ESC})sk-(proj-|svcacct-)?[A-Za-z0-9_-]{32,}`)],
   ['JWT', /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/],
   ['npm token', /npm_[A-Za-z0-9]{36}/],
   ['Google key', /AIza[0-9A-Za-z_-]{35}/],
-  ['AWS key', /\b(AKIA|ASIA)[0-9A-Z]{16}\b/],
+  ['AWS key', new RegExp(String.raw`(?:^|[^A-Za-z0-9_]|${ESC})(AKIA|ASIA)[0-9A-Z]{16}\b`)],
   ['private key', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
-  ['Slack token', /\bxox[abprs]-[A-Za-z0-9-]{10,}/],
+  ['Slack token', new RegExp(String.raw`(?:^|[^A-Za-z0-9_]|${ESC})xox[abprs]-[A-Za-z0-9-]{10,}`)],
   ['credentials in a URL', /[a-z][a-z0-9+.-]*:\/\/[^\s/:@]+:[^\s/@]+@/i],
 ];
 // The values of this process's secret-looking environment variables, matched exactly (names only are ever printed).

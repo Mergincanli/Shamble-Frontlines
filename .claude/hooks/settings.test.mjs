@@ -43,6 +43,7 @@ const NEEDED = [
   'npm ci --prefix tools --ignore-scripts --no-audit --no-fund', 'gh pr view 27', 'gh pr diff 27',
   'gh api repos/Mergincanli/Shamble-Frontlines/pulls/27',
 ];
+NEEDED.push('git rev-list --count origin/main..HEAD'); // kit-v3-3: the PR Advisor's read (TEST-RUN B2)
 // Command forms the routines must never run that a STATIC deny catches (the routine-only nevers are the guard's job).
 const NEVER = [
   'git push --force origin cs/x', 'git push -f origin cs/x', 'git push origin main', 'git push origin :cs/x',
@@ -52,6 +53,7 @@ const NEVER = [
   'npm run build', 'bash -c "git push -f"', 'eval "git status"', 'gh pr merge 27', 'gh auth token',
   'gh api -X DELETE repos/x/git/refs/heads/y', 'git config --list', 'git config --get http.x.extraheader',
 ];
+NEVER.push('git rev-list --output=x HEAD'); // kit-v3-3: --output=<file> writes a file
 
 test('the ask list is empty (every ask would stall a routine)', () => assert.deepEqual(ask, []));
 test('effortLevel is high (ROUTINE-EFFORT)', () => assert.equal(settings.effortLevel, 'high'));
@@ -196,3 +198,38 @@ for (const [state, change] of Object.entries(UNFINISHED)) {
     }
   }
 }
+
+// kit-v3-3 (S2-S5): the real guard through the bootstrap prints an ask in a day session and a deny for a routine. The
+// repository root is the project folder here, so it is the main folder too. Nothing runs: the guard only decides.
+// (S1 is the ask-list test above. S2 and S3 use a shell write here; their Edit-tool form is the next test.)
+test('S2-S5 the real guard: a day kit write or main-folder move asks, a routine is refused, a worktree add goes on', () => {
+  const root = join(HERE, '..', '..');
+  const bash = (command) => ({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command }, cwd: root });
+  const out = (r) => { assert.equal(r.status, 0, r.stderr); return r.stdout ? JSON.parse(r.stdout).hookSpecificOutput : null; };
+  const s2 = out(runGuardHook('PreToolUse', root, bash('echo x > .claude/settings.json'), ''));
+  assert.equal(s2?.permissionDecision, 'ask', 'S2 day: a redirect onto .claude/settings.json asks');
+  assert.match(s2.permissionDecisionReason, /ask first.*\.claude\/settings\.json/, 'S2: the ask names the file');
+  const s3 = out(runGuardHook('PreToolUse', root, bash('echo x > .claude/settings.json'), 'night-shift'));
+  assert.equal(s3?.permissionDecision, 'deny', 'S3 night-shift: the same write is refused');
+  const s4 = out(runGuardHook('PreToolUse', root, bash('git switch cs/x'), ''));
+  assert.equal(s4?.permissionDecision, 'ask', 'S4 day: git switch in the main folder asks');
+  assert.match(s4.permissionDecisionReason, /worktree add/, 'S4: the ask names the worktree way');
+  assert.equal(out(runGuardHook('PreToolUse', root, bash('git worktree add .gate/x origin/main'), '')), null, 'S5 day: worktree add, no output');
+});
+// S2 and S3 in the Edit-tool form (kit-v3-3 step 4b, R1): the same file through Edit, Write, MultiEdit, NotebookEdit.
+test('S2-S3 the real guard, file tools: a day Edit of .claude/settings.json asks, a routine is refused', () => {
+  const root = join(HERE, '..', '..');
+  const out = (r) => { assert.equal(r.status, 0, r.stderr); return r.stdout ? JSON.parse(r.stdout).hookSpecificOutput : null; };
+  const file = join(root, '.claude', 'settings.json');
+  for (const tool of ['Edit', 'Write', 'MultiEdit', 'NotebookEdit']) {
+    const ti = tool === 'NotebookEdit' ? { notebook_path: file } : { file_path: file };
+    const input = { hook_event_name: 'PreToolUse', tool_name: tool, tool_input: ti, cwd: root };
+    const s2 = out(runGuardHook('PreToolUse', root, input, ''));
+    assert.equal(s2?.permissionDecision, 'ask', `S2 day: ${tool} of .claude/settings.json asks`);
+    assert.match(s2.permissionDecisionReason, /ask first.*\.claude\/settings\.json/, `S2 ${tool}: the ask names the file`);
+    const s3 = out(runGuardHook('PreToolUse', root, input, 'night-shift'));
+    assert.equal(s3?.permissionDecision, 'deny', `S3 night-shift: ${tool} of the same file is refused`);
+    const game = out(runGuardHook('PreToolUse', root, { ...input, tool_input: { file_path: join(root, 'shamble-game.js') } }, ''));
+    assert.equal(game, null, `day: ${tool} of a game file, no output`);
+  }
+});

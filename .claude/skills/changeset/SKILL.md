@@ -8,7 +8,9 @@ disable-model-invocation: true
 
 Follow the protocol in CLAUDE.md exactly. Do not skip or merge steps.
 
-1. **Branch.** From an up-to-date `main`, create `cs/<short-slug>`. If the working tree is dirty, stop and ask.
+1. **Branch.** Create `cs/<short-slug>` from `origin/main` (`git fetch origin main`, then
+   `git switch -c cs/<short-slug> origin/main`, or a worktree: CLAUDE.md, Never). If the working tree is dirty, stop and
+   ask.
    Start the checkpoint `.checkpoints/<short-slug>.md` and keep it current after every step (`.claude/CHECKPOINTS.md`).
 2. **Understand.** Read docs/STATUS.md, docs/START_HERE.md and docs/MODULE_MAP.md; grep the owning file(s). Use Explore
    subagents for wide searches so your context stays clean.

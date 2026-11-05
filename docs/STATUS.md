@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-11-04; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC), part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC) and B3, Mustafa's design walk (PR #36, 8bcc65e, 2026-11-04 19:58 UTC) merged. In flight: kit-v3-2, A2 on his list (PR #37, ready for review; report `docs/reports/2026-11-04-kit-v3-2.md`; waits for the advisor's review of its final head, then Mustafa's go). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-05; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC), part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC), B3, Mustafa's design walk (PR #36, 8bcc65e, 2026-11-04 19:58 UTC) and kit-v3-2, A2 on his list (PR #37, 12d7961, 2026-11-04 23:06 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of 342ff49) merged. In flight: kit-v3-3, A3 on his list, the guard's follow-ups (PR #38, a draft; built, WT-NIGHT (a) included (step 9, ed3ea8c); the fix round in 2acfbbc; fix pass 2 in c8cbb1a; pass 3 failed, so fix pass 3 (9589bfb), under Mustafa's scope stop of 2026-11-05; pass 4, the one final review, failed on one Critical and four High routine gaps (the advisor added a fifth High, A4-1), so fix pass 4 (0c481e1), under his review budget, checked by the verifier (PASS WITH NOTES); the report in; next, the advisor's final-head review and his go). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
@@ -19,16 +19,24 @@ merge commit is dated 10:21:55; on Mustafa's "merge #30" after the advisor's APP
 docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC; rules and docs; on Mustafa's go after the advisor's APPROVE
 of 76c35bf); B3 (the item on Mustafa's list, not the SharedArrayBuffer ring or ADR 0006 part 13's B3 row): his
 2026-11-04 design decisions into LOOP_V2 and UNITS.md (PR #36, 8bcc65e, 2026-11-04 19:58 UTC, by merge commit; docs
-only; on Mustafa's go after the advisor's APPROVE of a32e4c0). **In flight:** kit-v3-2 (A2 on his list: the
-CHECKPOINTS.md rules for every session and the TOY-BOX rewording; PR #37, ready for review; report
-`docs/reports/2026-11-04-kit-v3-2.md`; next: the advisor's review of its final head, then Mustafa's go). **Queue**
-(Mustafa's lists of 2026-11-03 and 2026-11-04; one change-set at a time, plan first): the guard's follow-ups (A3 on
-his list, right after A2; Open bugs and risks); the review policy (A4 on his list, after A3: risk tiers mapped onto
-today's ready and needs-mustafa classes, a review budget, a revert-first rollback rule, per-tier checklists in
-advisor.md, and foundation notes: fast checks on save, one-click rollback of client deploys and server versions, browser
-error reports and telemetry from the first playtests); the EDITOR_V2 plan-view note; the VISION_V2 community-servers
-note, plus B3's hand-over: VISION_V2 lines 36-37 (pillar 5's `[OPEN]`, which quotes LOOP_V2's old "infantry shared,
-tanks per faction"), 59 (account progression) and 86 (faction asymmetry), against LOOP_V2 §5 and §8 of 2026-11-04.
+only; on Mustafa's go after the advisor's APPROVE of a32e4c0); kit-v3-2 (A2 on his list: the CHECKPOINTS.md rules
+for every session and the TOY-BOX rewording; PR #37, 12d7961, 2026-11-04 23:06:24 UTC, `merged_at`, by merge commit;
+rules and docs; on Mustafa's go after the advisor's APPROVE of 342ff49; report `docs/reports/2026-11-04-kit-v3-2.md`).
+**In flight:** kit-v3-3 (A3 on his list: the guard's follow-ups and his two additions of 2026-11-04, the worktree rule
+and the queue into the repo; PR #38, a draft; built, WT-NIGHT (a) included (ed3ea8c); the fix round (2acfbbc), fix
+pass 2 (c8cbb1a) and fix pass 3 (9589bfb); pass 4, the one final review (security-auditor FAIL, one Critical and four
+High, all routine; the verifier PASS WITH NOTES); the advisor's pass-4 ruling (PROCEED inside A3, with its own A4-1);
+fix pass 4 (0c481e1), checked by the verifier (PASS WITH NOTES); the report in; now waiting on the advisor's
+final-head review and his go: In flight; its limits: Open bugs and risks). **Queue**
+(Mustafa's lists of 2026-11-03, 2026-11-04 and 2026-11-05, word for word under Decisions pending, "Queued, in
+Mustafa's words"; one change-set at a time, plan first). After A3: B.1, the EDITOR_V2 plan-view note, with his editor
+decisions of 2026-11-05 (his B.1 addition); then B.2, the VISION_V2 community-servers note, plus B3's hand-over:
+VISION_V2 lines 36-37 (pillar 5's `[OPEN]`, which quotes LOOP_V2's old "infantry shared, tanks per faction"), 59
+(account progression) and 86 (faction asymmetry), against LOOP_V2 §5 and §8 of 2026-11-04. The review policy (A4 on
+his list: risk tiers mapped onto today's ready and needs-mustafa classes, a review budget, a revert-first rollback rule,
+per-tier checklists in advisor.md, and foundation notes: fast checks on save, one-click rollback of client deploys and
+server versions, browser error reports and telemetry from the first playtests) waits: after A3, the kit is frozen until
+the netcode proof test is under way (Mustafa, 2026-11-05), and his A4-FREEZE (a) of 2026-11-05 holds A4 to that.
 **Next (v2):** the netcode proof test, its own change-set, branched from main, plan first (no longer waiting on PR
 #33). Wave 1 runs
 one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
@@ -86,7 +94,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **kit-v3-2** (A2 on Mustafa's list; rules, no code, symbols +0 −0. `.claude/CHECKPOINTS.md` takes his four anti-waste rules of 2026-11-03 for every session (day sessions, the night shift, the PR Advisor): at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan into its notes first, then saves each finished block at once and a notes line after each finding, and a restart continues after the last complete block and trusts the blocks its notes mark done: it never rereads, rechecks or redoes them, though a later block may still read a file it needs, and its answer comes from the notes alone, opening no other file (§4; E9-1); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked and restarted at every checkpoint update while agents or a workflow run (§3, §5). Restated in CLAUDE.md ("Checkpoints", "Agents", "Ultracode and workflows"), NIGHT_SHIFT.md rule 7, the `changeset` skill, advisor.md (its plan review checks the cap), verifier.md, perf-auditor.md, rust-reviewer.md and tools/README.md:4. TOY-BOX with LOOK-LINES (B): CLAUDE.md:4-6 and :23-24, art-director.md (its first line, its v2 paragraph, its tone line) and graphics-engineer.md point at `docs/LOOK_V2.md` and never decide the look. Docs: STATUS, ROADMAP, REPO_MAP, START_HERE:112) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/kit-v3-2`), PR #37 (ready for review); report `docs/reports/2026-11-04-kit-v3-2.md` | plan revision 1 and the advisor's APPROVE with 11 conditions; Mustafa's four answers (Decisions pending); plan revision 2; the build and docs-keeper's first pass (2c12306; notes 8c2abd6; the builder's E1–E8 and E10 PASS, `node --test` 339/339); the review wave (art-director, security-auditor, the verifier, 3 at a time): each PASS WITH NOTES, of 12 findings 9 upheld and fixed (acfc17e) and 3 refuted; E9, the dry run of the new paste block (25 runs on five versions of its text): its finding E9-1 (restarted agents re-checked the blocks their notes marked done) fixed in §4 (65cd40e, then 49f9898 after the verifier's fix check: PASS WITH NOTES, its note N2-1); the final text passed 3 of 3 restarts after a cut, the DONE case and the fresh case; 15 files vs main, `gate.mjs --no-smoke` PASS at the final head, symbols +0 −0 (the report) [assumed: not re-run by docs-keeper]; the report; this final docs pass | the advisor's review of the final head; Mustafa's go (`needs-mustafa`: a rules change in `.claude/` and CLAUDE.md; no Brave check) |
+| **kit-v3-3** (A3 on Mustafa's list: the guard's follow-ups; rules and kit code, no game code. His items: an ask before kit and gate edits in day sessions; the `sk-` key after `%20`, `%2C` or `%3A`; read-only GitHub Actions tools such as `actions_get` for pr-advisor; and his two additions of 2026-11-04: the worktree rule from the freeze, and the queue files into STATUS's follow-ups. security-auditor reviews it) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/kit-v3-3`; local branch `kit-v3-3` from main 12d7961), PR #38 (a draft) | plan revision 1 (a critic's points folded in) and the advisor's APPROVE with conditions C1-C12; E10, the doc quotes: five wording contradictions; the advisor's E10 ruling: PROCEED with changes E10-1 to E10-9; plan revision 2. Built (plan revision 2 §8): step 2, these Follow-ups and the queued words (93b9a07); steps 3-5 (f22c4df): `--output` refused for `git rev-list`, `diff`, `log` and `show`, `rev-list` for routines; in a day session a shell write to a kit or gate file asks and an agent's is refused; switching, merging, pulling or bisecting the main folder asks unless it brings in only reviewed main; the read-only Actions methods for pr-advisor, on this repository only; step 4b (2e82216, the advisor's step-4 ruling R1-R4): the Edit and Write tools' ask, and four fixes from an automated security review of f22c4df; step 6 (2e82216): the saver's secret check finds `sk-`, AWS and Slack keys behind `%XX` and other escapes; step 7 (2e82216): the rule texts, without the WT-NIGHT parts (step 9 adds them); step 4c (bbcb96b; `.checkpoints/kit-v3-3/builder-step4c.md`): the two findings of a second automated review of 2e82216 (a `CDPATH` set on the line; `git switch` to a name a tag shares); tests 555/555 (routine-guard 401, settings 127, checkpoint 27); E11a (`.checkpoints/kit-v3-3/e11a.md`): the ask stops a kit-file Write in default, acceptEdits and auto modes; the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors; step 8's run, the main session); step 8's docs (442fbf7, the head the reviews read). The reviews of 12d7961..442fbf7 (`.checkpoints/kit-v3-3/security-auditor-review.md`, `verifier-review.md`): security-auditor FAIL on SA-1 (this diff's regression: after a cd the guard could not follow, a relative write was checked against the project folder, so a kit write could get no ask), with SA-2 to SA-10 (SA-2 major and pre-existing: a routine could forge origin/main); the verifier PASS WITH NOTES (F-a, F-b, F-c, N-1 to N-3); a third automated security review of bbcb96b (its findings 7 and 8: a quoted `CDPATH`, `cdable_vars`); skeptics on six findings: five upheld, one refuted (F-a). The advisor's fix-round ruling (`advisor-fix-round.md`): PROCEED. The fix round (2acfbbc; `builder-fix1.md`, `builder-fix2.md`): the cd rules R-a to R-e (the folder is known only where the line's text fixes it; an unknown folder makes a relative write ask and an agent's refused; step 4c's `CDPATH` code deleted as dead); SA-2's routine half (every main check compares with `refs/remotes/origin/main`'s commit; routines refuse a fetch or pull refspec with `:` or a leading `+`, new branch names such as `origin/…` or `main`, and `git remote` and `git symbolic-ref` beyond their read forms); F-b (`git worktree add` or `git clone` into a kit folder asks, an agent's refused); SA-5 (`sed --in…` abbreviations); SA-6 (a kit folder's ancestors and nested kit files); SA-8 (`GIT_DIR` and its kin anywhere in a day line ask); tests 716/716 (routine-guard 562, settings 127, checkpoint 27); one mutant per new rule, 28/28 and 33/33 killed; the moved cases listed (seven by the cd rules, six of them from no prompt to an ask; T9 by F-b); the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors). Step 9, WT-NIGHT (a) (ed3ea8c; `builder-step9.md`): the night shift's `git switch` is refused unless the branch's rules, CI and gate files equal main's (compared with `refs/remotes/origin/main`'s commit), and the texts in CLAUDE.md's Never bullet, NIGHT_SHIFT.md step 4 and CHECKPOINTS.md §8; tests 768/768 (routine-guard 614, settings 127, checkpoint 27); its mutants 13/13 killed; the full gate with smoke PASS. The delta review of 442fbf7..ed3ea8c (`security-auditor-delta.md`, `verifier-delta.md`): security-auditor FAIL on SD-1 (the night switch check read the refs before the line ran, so a fetch on the same line could move the branch after the check) and SD-2 (the night push and commit checks and the main-folder check read plain name lists, so a kit file renamed away or with a non-ASCII name was missed), with SD-3 to SD-9; the verifier FAIL on V-2 (the same as SD-1) and V-3 (the switch check found a plain branch name through git's guessing, so a tag named `refs/heads/<name>` could answer it), with V-1, V-4, V-5 and N-a; skeptics upheld every finding; two more automated security reviews, of 2acfbbc and ed3ea8c (findings 9 to 13; 13b refuted). The advisor's fix-pass-2 ruling (`advisor-fix-pass2.md`): PROCEED. Fix pass 2 (c8cbb1a; `builder-pass2-routine.md`, `builder-pass2-day.md`): routines: a night `git switch`, `git commit` or `git push` must be the only command on its line (SD-1; not for pr-advisor, whose step-0 line stays allowed), the switch target looked up by exact ref names (V-3), and the name lists read with `-z --no-renames --no-relative` (SD-2, a named C6 edit); day sessions: a main-folder switch or merge after an earlier git command on the line asks unless its target is `origin/main` (SD-3. So `git stash && git switch main` asks too: a fetch earlier on the line can move local main.), a cd joined by `&&` after a cd the guard could not follow stays unknown (SD-4), clone targets and `--revision` (SD-5), a folder delete or move over a worktree asks (SD-6), and `function`, `trap` and `alias` count as command words that can move the folder (V-1); NIGHT_SHIFT.md step 4: fetch first in its own call; tests 864/864 (routine-guard 710, settings 127, checkpoint 27); every new rule's and flag's mutant killed, real-git rows included; no existing case's expected value moved; main's test file 180/192 on the new guard (3 pre-existing, 8 rev-parse scaffold, 1 SD-2 key scaffold); the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors). Pass 3, the review of ed3ea8c..01b158c (`security-auditor-pass3.md`, `verifier-pass3.md`, `skeptic-pass3-*.md`): security-auditor FAIL on P3-1 to P3-3 (a shell comment, a here-document delimiter with a quoted or escaped space, and ANSI-C `$'…'` quoting each hid whole commands from the guard's reader: on real bash, a night switch to a branch with other settings, and a CLAUDE.md write by the night shift or pr-advisor) and P3-5 (the night commit check missed paths named on the commit line, `.` and globs included; the push check still stopped the push), all four on routine paths and all on main 12d7961 too, with P3-4 and P3-6 (minor), P3-7 (minor, a day false ask on a clone into `.gate/`) and P3-8 (a nit); the verifier PASS WITH NOTES (864/864, mutants 48/48, main's test file 180/192 with the named 12, the full gate with smoke PASS; its two notes are P3-5 and P3-7); skeptics upheld all four majors. The advisor's pass-3 ruling (`advisor-pass3.md`): PROCEED inside A3, with its own P3-9 (`>&` before a file name, read by bash as a write into the file: on real bash a night or pr-advisor line overwrote CLAUDE.md or `.claude/settings.json`; on main too). Mustafa's scope stop (2026-11-05, Decisions pending): the day parser rules dropped, D-ASK instead, and the review budget from pass 4 on. Fix pass 3 (9589bfb; `builder-pass3-routine-a.md`, `builder-pass3-routine-b.md`, `builder-pass3-day2.md`): routines: R-PLAIN (a routine's line must be in a plain form the guard reads exactly as bash does, or it is refused; it closes P3-1 to P3-3 and P3-9 for routines), git in the background refused (P3-4), a `date +FORMAT` of plain characters only, the night commit allowlist (P3-5). A night `git commit` takes only `-m`/`--message`, `-a`, `-q`, `-s` and `--allow-empty`; no paths or pathspec options, so the guard checks exactly the staged list (and the unstaged list with `-a`). The name lists read with `--ignore-submodules=none` too (P3-6); day sessions: D-ASK (a line in one of five forms the guard does not read asks, an agent's is refused; no new parsing), the clone fix (P3-7), and P3-8 named; NIGHT_SHIFT.md step 7: write commands plainly, commit with `git add` first, git in the foreground; tests 1084/1084 (routine-guard 930, settings 127, checkpoint 27); C-PLAIN, the corpus test against real bash: PASS (212 corpus lines and 2000 random ones, 10426 commands); every new mutant killed (the routine side 31, plus 4 of main's mutants rerun behind R-PLAIN; the commit allowlist 11, plus 6 on real git; D-ASK and the clone fix 20); no routine line looser (1260 role decisions against 01b158c: 0 looser); the moved cases named (eight refusals that now give R-PLAIN's or P3-4's reason, one day row that now asks by D-ASK; five new clone rows that 01b158c asked on now pass, P3-7); main's test file 180/192, the same 12 as at 01b158c; the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors). Pass 4, the one final review, of 01b158c..60ae124 (`security-auditor-pass4.md`, `verifier-pass4.md`): security-auditor FAIL on P4-S4 (Critical: a worktree under `.gate/` or the scratchpad let a routine write, commit and push a `.claude/` or `.github/` change) and P4-S1, P4-S2, P4-S3 and P4-S5 (High: a wrapper or keyword given by a path, a quoted program after a keyword, a command with no program, xvfb-run's file options), all on routine paths, with P4-S4, P4-S1, P4-S3 and P4-S5 on main 12d7961 too; and P4-S6 (Medium), P4-S7 and P4-S8 (Low); the verifier PASS WITH NOTES (1084/1084, the full gate with smoke PASS; its notes P4-V1 to P4-V4, Low or an observation); the automated review of 9589bfb (`security-review-auto-6.md`): its finding 14, Medium, day (the clone folder after unknown options). The advisor's pass-4 ruling (`advisor-pass4.md`): PROCEED with a narrow fix pass 4 inside A3, checked by the verifier alone; every finding at High or above fixed now, everything below High a STATUS follow-up (FU-P4a to FU-P4c, Decisions pending; P4-S7, P4-V2 and P4-V3 fixed in the final docs pass); with its own A4-1 (High, routine, on main too: a failed cd followed by `;` let a night or pr-advisor redirect overwrite the live `.claude/settings.json` on real bash). Fix pass 4 is commit 0c481e1 (`builder-pass4.md`): "Fix pass 4 (pass 4's one Critical and four High findings, all on the routine side, plus one High the Advisor found; five of the six were on main too): R-PROG narrows R-PLAIN so every routine command starts with git, gh, npm, node, python, python3 or date by name, which closes wrappers and keywords given by a path, a quoted program after a keyword, a command with no program, xvfb-run's file options and a failed cd followed by `;`. And a routine's kit-path checks also read a path by its place in its own worktree: the night commit and push checks (and checkpoint save and watch) test the name git prints, the path the commit or push publishes, and a routine's Write, Edit and redirect checks use the worktree-aware kit-path test, so a worktree under `.gate/` or the scratchpad cannot carry a rules or CI change into a commit or a push. Checked by the verifier alone (the review budget)." The builder's counts: tests 1188/1188 (routine-guard 1034, settings 127, checkpoint 27); PASS4_ROUTINE_CASES 98 rows and 12 new mutants, all killed, plus the real-git worktree rows and their 4 real mutants; C-PLAIN's teeth 4/4; no routine line looser (1348 role decisions against 60ae124: 0 looser, 59 stricter, none of them in the routine texts; 983 row decisions: 0 looser by kind, 110 moved, all named); six of main's mutation rows moved behind R-PLAIN or the kit-path checks, byte for byte (four for R-PROG, under the advisor's C6 conditions; two for the kit-path test, which the builder names as outside the ruling's literal permission); main's test file 179/192 (the same 12 as before, plus #181, whose refusal text is now R-PROG's); NIGHT_SHIFT.md step 7 takes the ruling's sentence; the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors) [assumed: the builder's numbers, not re-run by docs-keeper]. The verifier's check of fix pass 4 (`verifier-fixpass4.md`), alone under his review budget: PASS WITH NOTES, nothing Critical or High (1188/1188; every probe line that did harm on 60ae124 refused; no routine line looser, 1348 role decisions; every command the routine texts give still passes; main's test file 179/192 as named; the full gate with smoke PASS; its one Low, P4F-V1, is follow-up FU-P4d). The report: `docs/reports/2026-11-05-kit-v3-3.md`; the notes and the checkpoint deleted in the last commit | the advisor's final-head review, then Mustafa's go (`needs-mustafa`: rules in `.claude/` and CLAUDE.md; no Brave check) |
+| **kit-v3-2** (A2 on Mustafa's list; rules, no code, symbols +0 −0. `.claude/CHECKPOINTS.md` takes his four anti-waste rules of 2026-11-03 for every session (day sessions, the night shift, the PR Advisor): at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan into its notes first, then saves each finished block at once and a notes line after each finding, and a restart continues after the last complete block and trusts the blocks its notes mark done: it never rereads, rechecks or redoes them, though a later block may still read a file it needs, and its answer comes from the notes alone, opening no other file (§4; E9-1); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked and restarted at every checkpoint update while agents or a workflow run (§3, §5). Restated in CLAUDE.md ("Checkpoints", "Agents", "Ultracode and workflows"), NIGHT_SHIFT.md rule 7, the `changeset` skill, advisor.md (its plan review checks the cap), verifier.md, perf-auditor.md, rust-reviewer.md and tools/README.md:4. TOY-BOX with LOOK-LINES (B): CLAUDE.md:4-6 and :23-24, art-director.md (its first line, its v2 paragraph, its tone line) and graphics-engineer.md point at `docs/LOOK_V2.md` and never decide the look. Docs: STATUS, ROADMAP, REPO_MAP, START_HERE:112) | merged: PR #37, 12d7961, 2026-11-04 23:06:24 UTC (`merged_at`), by merge commit (parents 8bcc65e and 342ff49), on Mustafa's go after the advisor's APPROVE of 342ff49 (comment 6643739289); report `docs/reports/2026-11-04-kit-v3-2.md` | done: plan revision 1 and the advisor's APPROVE with 11 conditions; Mustafa's four answers (Decisions pending); plan revision 2; the build and docs-keeper's first pass (2c12306; notes 8c2abd6; the builder's E1–E8 and E10 PASS, `node --test` 339/339); the review wave (art-director, security-auditor, the verifier, 3 at a time): each PASS WITH NOTES, of 12 findings 9 upheld and fixed (acfc17e) and 3 refuted; E9, the dry run of the new paste block (25 runs on five versions of its text): its finding E9-1 (restarted agents re-checked the blocks their notes marked done) fixed in §4 (65cd40e, then 49f9898 after the verifier's fix check: PASS WITH NOTES, its note N2-1); the final text passed 3 of 3 restarts after a cut, the DONE case and the fresh case; 15 files vs main, `gate.mjs --no-smoke` PASS at the final head, symbols +0 −0 (the report) [assumed: not re-run by docs-keeper]; the report; the final docs pass; the advisor's APPROVE of the final head 342ff49, its deferred points F-1, R-1 and R-2 in Follow-ups (Decisions pending) | none |
 | **B3, Mustafa's design walk** (b3-design-walk; B3 is the item on his list. Docs only, symbols +0 −0: his 2026-11-04 decisions and ideas, word for word, tagged `[DECIDED]`, `[IDEA]` (a new tag) or, for the war around the matches, `[OPEN]`, plus one Advisor `[DEFAULT]` reading in §13 (no learn-by-doing layer), which Mustafa may veto, in LOOP_V2 (§2 spawn protection, §4–§5 factions and infiltrators, §7 active reload and sprint-to-fire, §8 account progression, §10 bots, new §13 amps, loot and ammo) and UNITS.md §0 (factions, the tier-one amp ladders, infiltrators, faction ideas); his answers B3-Q1 to B3-Q3; pointers in DESIGN_NOTES; "bears on" clauses in `docs/adr/README.md`'s register, no ADR edited, no new open question; plus #35's final-review follow-ups in STATUS and ROADMAP; B3's hand-over: VISION_V2 lines 36-37 (pillar 5's `[OPEN]`, which quotes LOOP_V2's old "infantry shared, tanks per faction"), 59 (account progression) and 86 (faction asymmetry), against LOOP_V2 §5 and §8 of 2026-11-04, for B2. Report: `docs/reports/2026-11-04-b3-design-walk.md`) | merged: PR #36, 8bcc65e, 2026-11-04 19:58:50 UTC (`merged_at`; the merge commit is dated 19:58:49), by merge commit, on Mustafa's go after the advisor's APPROVE of a32e4c0 | done: plan revision 1, the advisor's APPROVE with 11 conditions; plan revision 2 adds Mustafa's answers, the advisor's APPROVE with 10 conditions; the build and docs-keeper pass (6a09137; the builder's checks PASS, `gate.mjs --no-smoke` PASS, symbols +0 −0); the review round on the final diff (game-designer, the verifier, a completeness critic: each PASS WITH NOTES; 18 findings: a skeptic upheld 15, 13 of them distinct, all handled in the fix commit, and refuted 3); the report written (`docs/reports/2026-11-04-b3-design-walk.md`); the advisor's APPROVE of the final head a32e4c0. Its final-review follow-ups: STATUS and ROADMAP taken by A2 (PR #37); the report's deviations line and length nit wait for a later pass (Follow-ups) | none |
 | **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | merged: PR #35, 4893ab6, 2026-11-04 15:50:40 UTC (`merged_at`; the merge commit is dated 15:50:39), on Mustafa's go ("Merge $35", read as #35) after the advisor's APPROVE of 76c35bf | done: plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; revision 2 (0099b3c) adds Mustafa's answers; reviewed once on the final diff (five reviewers, a skeptic per finding: 30 of 31 upheld and fixed); report `docs/reports/2026-11-04-docs-after-kit-v3-1.md`. Its final-review follow-ups are taken by B3 (PR #36) | none |
 | part-b-test (docs only: the kit-v3-1 report's corrections, the advisor's #30 findings 1 and 2, 822aaa4; the PR that TEST-RUN B2 reviewed and merged) | merged: PR #34, 868e165, 2026-11-04 13:35:00 UTC (`merged_at`; the merge commit is dated 13:34:59), by the PR Advisor routine itself with `expectedHeadSha` a432692ff3800b23dc186051b8b1590778183bed | done: TEST-RUN B2, the routine's first unattended merge under the guard (Routines) | none |
@@ -134,6 +143,47 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Asked of Mustafa, A3; answered 2026-11-05 about 10:30 UTC** (kit-v3-3, PR #38; plan revision 2 §3.1, the
+  advisor's E10 ruling `.checkpoints/kit-v3-3/advisor-e10.md`, and its fix-round ruling, which updated both questions,
+  `.checkpoints/kit-v3-3/advisor-fix-round.md`; his words: `.checkpoints/kit-v3-3/mustafa-words.md`):
+  - WT-NIGHT (updated): may the night shift switch its folder to an item's branch? His worktree rule says never switch
+    a session's main folder, but the night shift's handoff did that (NIGHT_SHIFT.md step 4, :25-36). Without an answer
+    the night either breaks his rule or loses its handoff, and A3 cannot merge. (a) an exception: the night may switch
+    only when the branch's rules, CI and gate files equal main's; the guard's view of main is now unforgeable (the fix
+    round, SA-2); cost: after each kit merge, older branches stop until a day session updates them. (b) no exception:
+    the night works in a separate worktree; cost: its own change-set, which must first close a gap the review found
+    (the night's write, commit and push checks do not see kit files in worktrees under `.gate/`, SA-3); until then
+    night handoffs stop. Recommended: (a). **His answer, word for word:** "WT-NIGHT: (a). The exception holds only
+    when the branch's rules, CI and gate files match main's." Answered; built in step 9 (ed3ea8c; the switch text now
+    at NIGHT_SHIFT.md:27-30 [verified at 0c481e1]) and tightened by fix pass 2 (c8cbb1a; the switch alone on its line,
+    the target by exact ref names) and by fix pass 3 (9589bfb; R-PLAIN, after pass 3 hid the switch from the guard's
+    reader three ways); reviewed in pass 4; fix pass 4 (0c481e1) leaves the switch check as it is [verified: its diff
+    does not touch `switchTargetCheck`]; the verifier's check of fix pass 4 is next. A3 cannot merge before step 9 is
+    reviewed clean (the ruling's N-3).
+  - PC-SETUP (updated; information only): (1) his permission mode (Manual, Accept edits or Auto); (2) any Claude Code
+    mods installed; (3) a Team or Enterprise login, or a personal one (a mod can approve calls past the guard: Open
+    bugs and risks, A3's limit L7); and new: (4) does Claude Code run in Windows itself (PowerShell or Git Bash) or
+    inside WSL? Why (4): under WSL the guard does not fold case on Windows drives, so a `CLAUDE.MD` spelling could slip
+    past the ask (L9). **His answer, word for word:** "PC-SETUP: 1. Permission mode: [Auto]. 2. Mods: [no mods
+    installed but I have been thinking about it]. 3. Enterprise login (my university account). 4. Claude Code runs in
+    Windows itself (PowerShell), not WSL". By the ruling's recommendation, (4) in Windows itself changes nothing for L9.
+  - SCOPE-STOP (not asked: his own, 2026-11-05 about 16:10 UTC, during fix pass 3), **word for word:** "Scope stop for
+    A3 (Mustafa): the guard will never parse all of bash, so stop teaching it new shell syntax. Instead: in routines,
+    R-PLAIN refuses any line that isn't plain; in day sessions, any line the guard can't fully read is an ask, not a
+    parse. Drop Day C's parser additions (comments, line continuations, $'…' quoting, here-document markers, >&file).
+    Keep the git clone fix, the check that no routine line got looser, and the full gate. Finish fix pass 3 with that,
+    then one final review (pass 4), and apply the review budget now: anything pass 4 finds below Critical or High
+    becomes a STATUS follow-up, not another pass. After A3, the kit is frozen until the netcode proof test is under
+    way." It overrides the advisor's pass-3 ruling where they differ (its five day parser rules): taken in fix pass 3
+    (D-ASK, Open bugs and risks; the kit freeze, Phase).
+- **Taken by the advisor for A3** (inside his words; he can overrule any at merge; plan revision 2 §3.2, from
+  `advisor-plan-rev1.md` and `advisor-e10.md`): AF-MECH (b), the day guard answers "ask", the settings ask list stays
+  empty · AF-AGENT (b), an agent's kit edit is refused, keyed on `agent_id` only · AF-COVER, a trimmed (b): file tools
+  and the named shell writers (limits 1-3) · WT-DAY (ii), trimmed to what switches the main folder (limit 4) ·
+  WT-UPDATE (a), the fast-forward forms to `origin/main` stay free · SECRET-DECODE (A) only, one widened escape
+  fragment (follow-ups F2-F3) · F1-FIT (b), F-1 recorded in Follow-ups, no CHECKPOINTS.md edit · READ-SCOPE (b), the
+  owner/repo check on the new Actions reads only (limit 10) · NODE-ALLOW (a), no allow entry for `node .checkpoints/*`
+  · QUEUE-HOME (a), "Queued, in Mustafa's words" under Follow-ups · keep the advisor's `memory: local` (E10-2).
 - **Taken by Mustafa, 2026-11-04, A2's four decisions** (about 20:25 UTC, in the A2 session's chat; the questions: the
   advisor's review of plan revision 1). His words, word for word: `recommendations” in V3.` Read as the four
   recommended options:
@@ -274,11 +324,175 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
     ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.
   - Counts then: 116 numbered open questions, 96 open; pass marks 341.
-- **Follow-ups:** TOY-BOX's small kit change-set (kit-v3-2, A2 on Mustafa's list, with the checkpoint anti-waste
-  rules: in flight, PR #37, ready for review); PR #36's final review: the B3 report's "Changes to his words" lacks plan
-  rev 1 §3's approved deviations, and its body runs 83 lines (both a later report edit); LATER's design session after
-  the netcode proof test, with the twelve LATER questions and the 38 design questions on its agenda (the advisor's
-  ruling).
+- **Follow-ups** (each with its source; recorded in the repo by kit-v3-3, A3, PR #38, on Mustafa's addition of
+  2026-11-04: "Record them in the repo, in STATUS's follow-ups, alongside A3's plan."):
+  - TOY-BOX's small kit change-set: done, with kit-v3-2 (A2 on his list; PR #37, 12d7961, 2026-11-04 23:06 UTC).
+  - A3's own items and the points its plan weighs: the day-session ask before kit and gate edits, the `sk-` key
+    after `%20`, `%2C` or `%3A`, read-only Actions tools for pr-advisor, `git rev-list`, python in the docs, the
+    advisor's Write tool, `node .checkpoints/*`: in flight, PR #38 (Open bugs and risks, A3's and kit-v3-2's entries).
+  - LATER's design session after the netcode proof test, with the twelve LATER questions and the 38 design questions
+    on its agenda (the advisor's ruling).
+  - The B3 report (`docs/reports/2026-11-04-b3-design-walk.md`), a later report edit: its "Changes to his words"
+    (report:56-57) lacks plan rev 1 §3's approved deviations (a capital first letter at LOOP_V2:147 and :169, labels
+    before older quoted lines, the splits and repeats; recorded at c5d86cb, plan-rev1-folded.md:88-91), and its body
+    runs 83 lines (skill: ~60); its "fixed in the last commit" (report:37) means c5d86cb (PR #36's final review, the
+    advisor's APPROVE of a32e4c0, items 1-2).
+  - The kit-v3-2 report (`docs/reports/2026-11-04-kit-v3-2.md`), a later report edit: R-1, it runs 69 lines (skill:
+    ~60); R-2, its Risks omit "nothing enforces the cap or the scratch rule" and the notes-folder script prompt (Open
+    bugs and risks, kit-v3-2 items 1 and 5, carry both) (the advisor's APPROVE of PR #37's final head 342ff49, comment
+    6643739289).
+  - F-1, for a kit change-set after A3 (cut from A3 by its plan's condition C3): CHECKPOINTS.md §4's trust rule gives
+    no way back when a done block's output outside the notes folder (a build under `.gate/`) is lost with a container
+    while the notes survive; the fix, about 15 words ("if a later block finds a done block's output missing, note it
+    and redo that block") at CHECKPOINTS.md:77-78, :110-111 and :119, with a 3-run dry run of the paste block (the
+    same APPROVE of 342ff49).
+  - "B3" means three things (his list's item, the SharedArrayBuffer ring, ADR 0006 part 13's CSP row): still open in
+    `docs/adr/README.md` row 86 and ADR 0006's OQ-0006-23 (both inside his quoted words) and the merged #35 report,
+    for the drafts' next revision (PR #35's final review, the advisor's APPROVE of 76c35bf, item 5; its STATUS and
+    ROADMAP part was taken by B3, PR #36).
+  - Local smoke needs Playwright's Chromium build 1194 (Playwright 1.56.1); the cloud container has 1243 in
+    `/opt/pw-browsers` [verified 2026-11-05: `ls /opt/pw-browsers`]: a candidate for the environment's setup or
+    tools/README's "Check a new machine" (PR #36's final review, item 5).
+  - Routine proofs to record: what the night shift's first guarded night (2026-11-05 from 00:10) and the PR
+    Advisor's next scheduled runs show; its first, 2026-11-04 18:45 UTC, failed on the usage limit (Routines) (the
+    docs-pass queue, with PR #35's final review).
+  - CHECKPOINTS.md §7's cap line could say a workflow script must still wave its calls in 3s: this container's
+    runner allows CPUs - 2 agents at once (2 here), a bigger machine's up to 16 (A2's later-pass item 2; for A4 or a
+    later kit pass).
+  - E9's untested cases: the "first line names another task" case (notes moved into `old/`) and worktree agents; a
+    small dry run in a later kit pass (A2's later-pass item 1; Open bugs and risks, kit-v3-2 item 4).
+  - The toy-box tone outside A2's files (`README.md:4`, `docs/GAME_DESIGN.md:14`, `:17`, `:28`, `:50-51`,
+    `docs/ROADMAP.md:10`), for a later docs pass against LOOK_V2 (A2's later-pass item 3; KIT-ALIGN, below).
+  - From A3's plan readers, for security-auditor to weigh: code.claude.com and docs.anthropic.com are not on the
+    WebFetch list; the allow entries `node .gate/*.mjs` and `node .gate/*.js` (`.claude/settings.json:50-51`
+    [verified]) also match paths with `..`. Scratchpad worktrees: a routine's kit write is caught only at commit and
+    push. Worktrees under `.gate/`: a routine's write, commit and push checks all miss kit files there (follow-up)
+    (A3's critic; corrected by security-auditor's SA-3 and the advisor's fix-round ruling). Both closed for routines
+    by A3's fix pass 4 (0c481e1, P4-S4): a routine's Write, Edit and redirect checks use the worktree-aware kit-path
+    test, and the night commit and push checks also read the path git prints.
+  - A3's cuts (its plan's condition C3), for later: the secret check re-testing notes after up to 3 rounds of
+    percent-decoding, and environment values on decoded text; URL credentials with an encoded `@` (`\u0040`,
+    `%40`); routine reads on other repositories (`get_job_logs` on another repository, `gh … -R/--repo`,
+    `search_*`), for security-auditor.
+  - From A3's fix-round ruling (`.checkpoints/kit-v3-3/advisor-fix-round.md`), with where each goes:
+    - SA-3's code fix (worktrees under `.gate/` seen by their own top when their common dir is the project's): first
+      in the next kit change-set, or first in WT-NIGHT (b)'s change-set, whichever comes first; before any night item
+      works in a worktree. Done in A3's fix pass 4 (0c481e1): P4-S4's worktree path rule is this fix, for the
+      routines' write, commit and push checks.
+    - L12, a day fetch whose destination is `refs/remotes/origin/*` or `refs/heads/main` asks: next kit change-set.
+    - L14, day git aliases (`git config --get alias.<sub>`: re-check a plain expansion, ask for a `!` one): next kit
+      change-set.
+    - L9 / SA-9, always fold case (or detect it at run time): after PC-SETUP (4) and E11 P4.
+    - L13, the ask in a cloud day session and in bypassPermissions: E11 after merge.
+    - L1's runners (sudo, doas, shell -c variants, eval): join plan revision 2 §10's follow-up "the day ask's stated
+      limits L1-L4 (scripts, other writers, user settings, patch-applying commands), if E11 or use shows a need"
+      (`.checkpoints/kit-v3-3/plan-rev2.md:633-634`; it had no line here until now).
+  - From A3's fix-pass-2 ruling (`.checkpoints/kit-v3-3/advisor-fix-pass2.md`; the follow-ups above stand as ruled):
+    - A-4: the day bootstrap (settings.json:272, guard.mjs) passes when routine-guard.mjs is missing; consider asking
+      instead: next kit change-set (SD-2's fix closes today's path to it).
+  - From A3's pass-3 ruling (`.checkpoints/kit-v3-3/advisor-pass3.md`) under Mustafa's scope stop of 2026-11-05 (A-4
+    and the earlier follow-ups stand):
+    - FU-P3a, the day reader against real bash: a differential corpus of day lines comparing the guard's reading with
+      bash's, to find syntax it neither reads exactly nor flags; each form found joins D-ASK's list (an ask, not a
+      parse: Mustafa, 2026-11-05). Not before the kit freeze lifts.
+  - From A3's pass-4 ruling (`.checkpoints/kit-v3-3/advisor-pass4.md`, section 6), under Mustafa's review budget (below
+    Critical or High: a follow-up, not code). Each waits for the kit freeze to lift (A4-FREEZE (a): after the netcode
+    proof test is under way); none is built in A3; FU-P3a and the earlier follow-ups stand:
+    - **FU-P4a, here-document bodies in D-ASK** (pass 4, P4-S6, Medium, day): D-ASK does not look inside a
+      here-document's body. So in a day session, a body with an unquoted delimiter can run a command unseen: a `$(...)`
+      or a backtick in the body, or a backslash-newline that moves the end line so that the next lines run as commands.
+      Fix: such a body (unquoted delimiter, and the body holds a `\`, a `$` or a backtick) asks too, and an agent's is
+      refused; FU-P3a's corpus covers it. After the kit freeze.
+    - **FU-P4b, D-ASK's prompt cost** (pass 4, P4-S8 and P4-V4, Low, day): D-ASK asks on every day line that holds a
+      comment, a `\` line continuation, `$'…'`, an unusual here-document delimiter or `>&file`, and refuses an agent's,
+      even far from kit files (`npm test # run` asks; an agent's `ls docs # list` is refused). This is the cost of
+      Mustafa's rule ("any line the guard can't fully read is an ask"). Watch it in day sessions. If it is noisy, a
+      later kit change-set may let a comment that holds no quote or backslash pass (it hides nothing from the reader),
+      or tell agents in their agent files to write shell lines without these forms. Mustafa's call. After the kit
+      freeze.
+    - **FU-P4c, the day clone folder after unknown options** (automated review 6, finding 14, Medium, day): when `git
+      clone` carries an option the guard does not know, the guard checks the folder git makes from the URL only at the
+      second positional word. So two unknown options that take values, or a short bundle with a value letter such as
+      `-qb`, can shift the URL further, and a clone into a kit folder named by the URL's last part does not ask. Fix:
+      with an unknown option present, check the folder made from every positional word (pass 2's shape), and read a
+      short bundle that holds a value letter (b, o, u, c, j) as taking the next word. After the kit freeze.
+  - From the verifier's check of A3's fix pass 4 (`.checkpoints/kit-v3-3/verifier-fixpass4.md`, P4F-V1, Low,
+    routines), under the same review budget:
+    - **FU-P4d, R-PROG's reason drops the hints:** R-PROG answers first for every program that is not a routine
+      program (cat, curl, kill, sudo and the rest), so the refusal no longer says what to use instead (the Read, Grep
+      and Glob tools; research is a daytime task; TaskStop for the saver), and main's test "a refusal names what to
+      use instead" fails on A3's guard for that reason only. Fix: progReason adds routineProgram's hint for a program
+      it knows (one table for both). After the kit freeze.
+  - The kit-v3-1 Windows test follow-up stays in Open bugs and risks (kit-v3-1 item 1; its own change-set).
+- **Queued, in Mustafa's words** (word for word, each with its date and source; each removed by the change-set
+  that carries it out; copied from the A2 and A3 day session's queue files, session_0173vVo7FcYUpbWgRW8oQyHU):
+  - A4 (kit): the review policy, Mustafa, 2026-11-04. It waits for the kit freeze to lift (his A4-FREEZE (a), below:
+    after the netcode proof test is under way), then plan first; a kit change-set, so it needs his go:
+    > A4, a small kit change-set after A3, plan first (Mustafa): a review policy inspired by Anthropic's own process.
+    > 1. Risk tiers: Tier 0 docs only (CI + PR Advisor, auto-merge); Tier 1 game code and tools (CI + advisor; Mustafa's
+    >    Brave check when players see or hear it); Tier 2 rules, CI, guard, secrets, infrastructure (advisor +
+    >    security-auditor, always Mustafa's go); Tier 3 irreversible or money (Mustafa decides; agents only propose). Map
+    >    today's "ready"/"needs-mustafa" classes onto these.
+    > 2. Review budget: at most two review rounds per change; a third only for a Critical or High finding; everything else
+    >    becomes a note or a follow-up. Nits never trigger a push.
+    > 3. Rollback rule: if main breaks, revert the merge first, then fix in a new PR.
+    > 4. Note for the foundation: fast checks on save (format, type checks for Rust and TypeScript), the full gate in CI.
+  - A4's addition, Mustafa, 2026-11-04:
+    > Addition to A4 (Mustafa): also include
+    > 5. Per-tier review checklists in .claude/agents/advisor.md: for each tier, what to check and what to ignore.
+    > 6. Notes for the foundation, next to the fast checks on save: one-click rollback of client deploys and of server
+    >    versions; and, from the first playtests on, error reports and telemetry from players' browsers, next to the server
+    >    metrics already planned. Record them where they belong (SPIKE_PLAN's foundation checks, ADR 0006) as notes, not
+    >    designs.
+  - A4-FREEZE, Mustafa, 2026-11-05, about 16:25 UTC (his chat message in the A2 and A3 day session,
+    session_0173vVo7FcYUpbWgRW8oQyHU, answering A4-FREEZE, asked in that session's update; copied from
+    `.checkpoints/kit-v3-3/queue/mustafa-2026-11-05-a4-b1.md`):
+    > A4-FREEZE: (a). A4 waits until the netcode proof test is under way.
+  - For A4's plan (the session's notes, not his words): check what ADR 0006 already plans (rollback, crash reports
+    and telemetry, server metrics) before writing items 4 and 6 as notes; item 5's checklists must not contradict
+    advisor.md's "Never" list or step 0; item 3: who may revert, and through a PR (main is protected); item 2: how
+    a round is counted, and which severity scale; Tier 0: the PR Advisor's merge or GitHub auto-merge.
+  - B.1 and B.2 (docs), Mustafa, 2026-11-03, from his task list (session_0173vVo5sT21uP4DcQtKvmAU, his message at
+    2026-11-03T22:08:25Z; its A.1 and A.2 are done: PR #30 and PR #37):
+    > Small change-sets, one at a time, plan first (Mustafa, 2026-11-03).
+    > B. Docs:
+    > 1. EDITOR_V2: add "Plan view: draw to build". Two views of the same map document side by side: a top-down plan
+    >    where you draw outlines on a grid (lines, rectangles, hexagons, octagons, free polygons), and the 3D scene,
+    >    which builds itself live from the drawing. A drawn outline is a footprint with a height and a kind (wall,
+    >    building, floor, cover, ramp, zone); the kind decides what it becomes, e.g. a building footprint becomes a
+    >    building-kit house with floors and a roof. Anything can be moved, rescaled and reshaped in either view; both
+    >    stay in sync because both read the same document. Works with three-team mirroring (draw in one third; the
+    >    others follow at 120°) and with floors. Precedents: Hammer's 2D views, Doom-style sector editors, SketchUp's
+    >    push-pull. Built with Editor v2 (slice 5); no code now.
+    > 2. VISION_V2: a short "Community servers (later)" note: why (bigger or longer matches, community growth, a safety
+    >    net if the game grows faster than our funds, possible revenue such as renting out official private servers),
+    >    the trust rule (progression counts on official servers only), and precedents (Counter-Strike and Rust community
+    >    servers, Battlefield's rented servers, Minecraft Realms).
+  - B.1's addition (docs), Mustafa, 2026-11-05, about 16:25 UTC (the same chat message as A4-FREEZE, adding to item
+    B.1 of his 2026-11-03 list; copied from `.checkpoints/kit-v3-3/queue/mustafa-2026-11-05-a4-b1.md`). B.1's
+    change-set carries these editor decisions into `docs/EDITOR_V2.md` with the plan view:
+    > B.1 addition: record these editor decisions from my talk with the Advisor in EDITOR_V2, together with the plan
+    > view, marked as below:
+    > - Decided, the tool order: (1) greybox now, art later: you build with blocks, and the same layout swaps to real
+    >   art with one switch, like modular kits; (2) play instantly: one key drops you in at the cursor with bots, and
+    >   you can keep editing while the match runs; (3) bot test runs with heatmaps (where fights and deaths happen, how
+    >   long each team needs to reach each objective); (4) a fairness panel (each team's distance and time to every
+    >   objective under 120° mirroring); (5) sightline checks from the game camera, last, as a balancing tool.
+    > - Decided: all the basic primitives (cube, sphere, cylinder, plane and the like), with one consistent scale across
+    >   the engine. Principles: 1 unit = 1 metre; textures tile in world space (they repeat per metre and never
+    >   stretch); primitives snap to gameplay sizes (exact numbers later, once they can be tested in the editor).
+    > - Decided: every object has width, length and height, set with drag handles or typed numbers, plus how high it
+    >   sits. The old editor lacked this.
+    > - Decided: the plan view looks straight down, flat (orthographic, like a blueprint); the 3D view flies freely; one
+    >   key shows the real game camera angle.
+    > - Decided: trace sketches (a photo of a paper sketch under the plan view, to draw over); sticky notes on the map;
+    >   snapshots, kept lightweight (they store only what changed).
+    > - Decided, lower priority: a travel-time ruler showing metres and seconds, using the game's own movement data for
+    >   soldiers, vehicles and leapers.
+    > - Decided: instances (stamps) are an optional, top-level feature with three edit levels: all copies; a tagged
+    >   group (e.g. "room A") for variations and art passes; one copy as an override (like Unity's prefab variants and
+    >   overrides). A stamp can also be a plain, unlinked copy.
+    > - Principle: a lean, solid editor, planned and built with the same care as the game; no bloat.
 - **Taken by Mustafa 2026-10-31, about 18:41 (in the decision-drafts session's chat, session_0173vVo6CEsV7ckERUa6TtEd;
   it replaces the drafts brief's upgrade note), in his words:**
   > UPGRADE-SCOPE, a settled input for ADR 0005 (record it in STATUS with today's decisions):
@@ -374,7 +588,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   starting scale); optional: `.claude/agents/netcode-architect.md:37` and `.claude/agents/security-auditor.md:30`
   (server-only spread as a rule). The look lines added 2026-11-01 (the four "look is not decided" lines and the two
   "toy-box" lines, against LOOK_V2 §3: "The audience is adults. It must not look like a children's game.") are taken by
-  kit-v3-2 (A2, PR #37, ready for review): TOY-BOX and LOOK-LINES (B), Decisions pending. Left for a later docs pass:
+  kit-v3-2 (A2, PR #37, merged 12d7961): TOY-BOX and LOOK-LINES (B), Decisions pending. Left for a later docs pass:
   the toy-box tone in `README.md:4`, `docs/GAME_DESIGN.md:14` ("toy-like"), `:17` and `:51` ("toy-box"), `:28`
   ("upbeat") and `:50` ("joyful"), and `docs/ROADMAP.md:10` ("bright toybox palette") [verified] (outside A2's files).
 - **Open, DOCS-ALIGN** (the Advisor's documents; the session does not edit them): `docs/V2_PHASE0_BRIEF.md:113`
@@ -457,21 +671,24 @@ _Read with the routines API (list_triggers) on 2026-11-04 at 14:03 UTC (the firs
 docs-after-kit-v3-1 session (session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right
 before PR #35's final commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`,
 `SHAMBLE_ROLE=pr-advisor`) under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since
-2026-10-31. The next proof of the routine rules: the PR Advisor's first scheduled run that gets through (its
-2026-11-04 18:45 UTC run failed on the usage limit; next 2026-11-05 06:45 UTC) and the night shift's first guarded
-night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
+2026-10-31. Each routine: one repository, not in a project (A3's E10-5, `.checkpoints/kit-v3-3/advisor-e10.md`: a
+cloud thread in a project, or a cloud session with several repositories, loads no repository hooks, so no guard;
+CLAUDE.md:140; TEST-RUN B2's refusals were the guard's). The next proof of the routine rules: the PR Advisor's first
+scheduled run that gets through (its 2026-11-04 18:45 UTC run failed on the usage limit; next 2026-11-05 06:45 UTC)
+and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
 - **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh): `CRON_TZ=Europe/Amsterdam 10 0-7
-  * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt. Its first night
-  under the guard starts 2026-11-05 00:10 Amsterdam. Under the guard it never reads the web; research runs in the
-  daytime only (NIGHT-RESEARCH (a)).
-- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): no setup script; it has a schedule trigger only,
-  `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *` (07:45, 13:45, 19:45 Amsterdam), can also be started by hand ("Run now",
-  as B2 was) or through the API, and is never started by pull-request events (PR-HOME-REPLACE (a), Mustafa,
-  2026-11-04: its GitHub pull-request trigger and its connectors are removed). `enabled: true` (Mustafa un-paused it;
-  updated 14:01:31 UTC), model `claude-opus-5-5`, no MCP connections. Its first scheduled run, 2026-11-04 18:45:37
-  UTC (session cse_0173vVo8Ju2Jb2eN5ZDzJdtK), failed: `ROUTINE_RUN_FAILURE_REASON_USAGE_LIMIT_REACHED`, the account's
-  usage limit, which routines share with day sessions (it reset at 18:50 UTC). Next run: 2026-11-05 06:45 UTC (07:45
-  Amsterdam), so the scheduled-start proof is still open (get_trigger, about 18:55 UTC). Its stored
+  * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt; one
+  repository, not in a project (E10-5). Its first night under the guard starts 2026-11-05 00:10 Amsterdam. Under the
+  guard it never reads the web; research runs in the daytime only (NIGHT-RESEARCH (a)).
+- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): one repository, not in a project (E10-5); no setup script; it has
+  a schedule trigger only, `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *` (07:45, 13:45, 19:45 Amsterdam), can also be
+  started by hand ("Run now", as B2 was) or through the API, and is never started by pull-request events
+  (PR-HOME-REPLACE (a), Mustafa, 2026-11-04: its GitHub pull-request trigger and its connectors are removed).
+  `enabled: true` (Mustafa un-paused it; updated 14:01:31 UTC), model `claude-opus-5-5`, no MCP connections. Its first
+  scheduled run, 2026-11-04 18:45:37 UTC (session cse_0173vVo8Ju2Jb2eN5ZDzJdtK), failed:
+  `ROUTINE_RUN_FAILURE_REASON_USAGE_LIMIT_REACHED`, the account's usage limit, which routines share with day sessions
+  (it reset at 18:50 UTC). Next run: 2026-11-05 06:45 UTC (07:45 Amsterdam), so the scheduled-start proof is still
+  open (get_trigger, about 18:55 UTC). Its stored
   prompt, verbatim: "You are the PR Advisor for SHAMBLE FRONTLINES. Read .claude/agents/advisor.md from the default
   branch and follow its PR review procedure exactly, together with CLAUDE.md, for every open pull request in this
   repository, oldest first. Stay on the default branch: read each pull request only through git, naming its head SHA,
@@ -509,14 +726,14 @@ night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
   B2 left no files and did not set it off.
 
 ## Open bugs and risks
-- **kit-v3-2** (PR #37, ready for review; from its plan, the advisor's plan review and the report's Risks): 1. the agent
+- **kit-v3-2** (PR #37, merged 12d7961; from its plan, the advisor's plan review and the report's Risks): 1. the agent
   cap and the scratch rule are written rules, enforced by nothing (a size or binary check in the saver would be code: a
   possible later item); 2. the rules hold only as far as agents follow their prompts: E9 ran toys, 1 to 3 times per
   case on the final text, and real long tasks may behave differently; 3. a workflow holding the cap is shown only in
   part: E9's final text ran in a workflow in waves of 3 and 2, but this container's runner allows only 2 agents at once
   (4 CPUs), so no wave of 3 ran together; 4. not tested: the "first line names another task" case, and worktree agents;
   5. scripts in the notes folder ask before they run in day sessions, and routines refuse them: an allow-list entry for
-  `node .checkpoints/*` is a possible later item, with security-auditor.
+  `node .checkpoints/*` was weighed by A3 and decided against (NODE-ALLOW (a), Decisions pending).
 - **kit-v3-1** (PR #30): 1. The Q3 follow-up (advisor condition C6, its own change-set): `routine-guard.test.mjs` fails
   9 of 192 on Windows (pre-existing: the credential checks match forward-slash paths only; 192/192 on Linux, where the
   routines run), and CI does not run the hook tests (`.github/workflows/gate.yml` runs only `tools/gate.mjs` and
@@ -524,22 +741,115 @@ night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
   (a), a day session whose `guard.mjs` is missing or can't load runs with no guard checks at all (git option forms and
   the merge check included), so "merges fail closed" holds while the guard loads. (Both stand after the merge, PR #30,
   2026-11-04.)
-- **The guard's follow-ups** (A3 on Mustafa's list, right after kit-v3-2; KIT-FOLLOWUPS (a), Decisions pending;
-  security-auditor reviews it). His three items:
-  1. Asking before kit and gate edits: done for routines by #30 (the guard's protected writes); day sessions have none.
-  2. The URL-escaped secret gap: `checkpoint.mjs`'s generic `sk-` pattern handles only `%3D` before `sk-`, so a key
-     after any other percent-escape is missed: every `%XX` ends in a hex digit, which the pattern's class
-     `[^A-Za-z0-9-]` never matches (`%20`, `%2C` and `%3A` as Mustafa named, and also `%22`, `%26`, `%2F`, `%0A`…)
-     [verified 2026-11-04: `checkpoint.mjs:30`, tested by security-auditor]; Anthropic `sk-ant-` keys are caught
-     (`:29`). GitHub secret scanning and push protection are on (Mustafa).
-  3. Read-only GitHub Actions tools (such as `actions_get`) for pr-advisor: B2 met `actions_get` four times, and the
-     guard's read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool [verified: `routine-guard.mjs:594`];
-     until A3, the PR Advisor reads CI from the PR's check runs and the jobs' logs.
-  Also for A3's plan to weigh (found by B2 and the plan review): `git rev-list` is refused; the guard allows python on
-  main's tracked scripts for the night shift [verified: `routine-guard.mjs:445`], while CLAUDE.md, NIGHT_SHIFT.md and
-  the guard's own refusal messages don't mention it [verified on main 868e165 and after PR #35: CLAUDE.md names node,
-  not python]; the advisor agent has no Write tool (frontmatter: Read, Grep, Glob, Bash), so a routine's advisor
-  subagent returns its notes in its report.
+- **kit-v3-3** (A3, PR #38, a draft; built, WT-NIGHT (a) included (step 9, ed3ea8c); the fix round in 2acfbbc; fix
+  pass 2 (c8cbb1a); fix pass 3 (9589bfb); fix pass 4 (0c481e1); KIT-FOLLOWUPS (a), Decisions pending;
+  security-auditor reviews it). What it closes, once merged (In flight has the steps and commits; the line numbers
+  below are at fix pass 4, 0c481e1, rechecked in its working tree; A3's notes, `.checkpoints/kit-v3-3/`, and its
+  checkpoint are deleted in its last commit, as CHECKPOINTS.md §9 says, and every notes path cited here stays in the
+  branch history, last at 4f268da):
+  1. Asking before kit and gate edits: routines had it since #30; day sessions now ask too (file tools and shell
+     writes), and an agent's or teammate's kit edit is refused [verified: `routine-guard.mjs:741`, `:865`, `:939`].
+  2. The URL-escaped secret gap: the saver's `sk-`, AWS and Slack patterns now accept a key behind `%XX` and other
+     escapes [verified: `checkpoint.mjs:30-40`]; before A3 only `%3D` worked (main's `checkpoint.mjs:30`). Anthropic
+     `sk-ant-` keys were already caught. GitHub secret scanning and push protection are on (Mustafa).
+  3. Read-only GitHub Actions tools for pr-advisor: `actions_get` (get_workflow, get_workflow_run, get_workflow_job,
+     get_workflow_run_usage) and `actions_list` (its four list methods), this repository only; the night shift and
+     every other method stay refused [verified: `routine-guard.mjs:1373-1396`]. Until A3 merges, routines run main's
+     guard, whose read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool (main's
+     `routine-guard.mjs:594`), so the PR Advisor reads CI from the PR's check runs and the jobs' logs.
+  Also: `git rev-list` for routines and `--output` refused for rev-list, diff, log and show [verified:
+  `routine-guard.mjs:306`, `:329`, `:333`]; the docs and the guard's refusals name python beside node (`:953`); the
+  advisor's tools reworded (E10-2: `memory: local` also turns on Read, Write and Edit, `advisor.md:8`, `:155`).
+  **Stated limits** (plan revision 2 §2, with L1, L4 and L9 widened and L12-L15 added by the advisor's fix-round
+  ruling, `.checkpoints/kit-v3-3/advisor-fix-round.md`, and L9 and L11 widened and L16-L18 added by its fix-pass-2
+  ruling, `.checkpoints/kit-v3-3/advisor-fix-pass2.md`, and L16 and L18 rewritten and R-PLAIN and D-ASK added by its
+  pass-3 ruling, `.checkpoints/kit-v3-3/advisor-pass3.md`, and Mustafa's scope stop of 2026-11-05, and R-PLAIN
+  narrowed (R-PROG) by its pass-4 ruling, `.checkpoints/kit-v3-3/advisor-pass4.md`; the ask is a
+  seatbelt in a watched session, not a wall: the PR review and Mustafa's go remain the wall):
+  - L1, scripts and other runners: a `node`/`python` script, inline code (`node -e`, `python -c`), a shell given a
+    command string (`bash -lc`, `bash -e -c`, `/bin/sh -c`, `dash -c`, `ksh -c`), `eval` after other words, and
+    `sudo`/`doas` are not inspected: a kit edit made through them gets no ask. (`bash -c`, `sh -c`, `zsh -c` and `eval`
+    at the start of a command are refused by settings.json [verified: `settings.json:243-246`]; `node .gate/*.mjs|*.js`
+    runs without a prompt [verified: `settings.json:50-51`].)
+  - L2, other writers: `install`, `dd of=`, `git config --file`, `git format-patch -o`, `git archive -o`,
+    `find -exec`/`-delete`, `xargs`, `patch`, `tar`/`unzip` extraction, `perl -pi` with other bundled flags; paths
+    built at run time.
+  - L3, user settings: `~/.claude/settings.json` and `settings.local.json` (where `disableAllHooks` would switch the
+    guard off) are not kit paths for the day ask.
+  - L4, patch-applying commands and HEAD moves: `git cherry-pick`, `am`, `apply`, `revert`, `read-tree -u`, `stash
+    apply|pop`, in any folder, the main folder included; and `git symbolic-ref HEAD <ref>` (moves HEAD, not files).
+  - L5, auto mode and `.claude/` (E10-1): Claude Code's own classifier may refuse a `.claude/` edit before the prompt;
+    if it approves, the call "normally still goes to the prompt" (hooks page). Never a silent edit; make such edits in
+    Accept edits or Manual mode.
+  - L6, the advisor's memory tools (E10-2): `memory: local` gives the advisor Write and Edit, which the page does not
+    limit to its memory folder; the guard holds it in routines (pr-advisor writes only `.checkpoints/`, `.gate/` and
+    agent memory) and refuses its kit edits in day sessions, but in a cloud day session its Write to a game file runs
+    without a prompt (cloud sessions pre-approve file edits): only its own rules stop it (`advisor.md:168`).
+  - L7, mods (E10-4): a mod that handles `tool.check` answers after the PreToolUse hooks and, without managed settings
+    or a Team or Enterprise login, can approve a call a hook blocked or would ask for (permissions page). The guard
+    cannot see or stop this, day ask and routine guard alike; mainly the PC (PC-SETUP, Decisions pending).
+  - L8, sessions without repository hooks (E10-5): a cloud thread in a project, or a cloud session with several
+    repositories, loads none of the repository's hooks (settings page, "Settings in cloud sessions"): no day ask, no
+    routine guard. So each routine is one repository outside a project (Routines; CLAUDE.md:140).
+  - L9, case and Windows spellings: Windows Git Bash `/c/…` spellings of a path; and, under WSL, Windows drives
+    (`/mnt/c/…`) are case-insensitive while the guard folds case only on Windows and macOS. The night switch check
+    does not fold case either; the night shift runs only on Linux.
+  - L10, routines may still read other repositories through `search_*`, `get_job_logs` and `gh … -R/--repo`; only the
+    new Actions reads are scoped to this repository (follow-up F4).
+  - L11, worktrees other than the main folder: the main-folder checks do not apply there; the kit-edit ask does. A
+    new clone or worktree made in a folder that is not a kit folder (for example `git clone <url> tools/x`) brings its
+    own kit files, such as a nested CLAUDE.md, with no ask.
+  - L12, a forged origin/main in a day session: a day session's `git fetch origin <x>:refs/remotes/origin/main`
+    repoints origin/main, so the main-folder checks compare with the wrong commit. (Routines refuse it.)
+  - L13, where the ask is untested: a hook's ask is not yet shown to prompt in a cloud day session or in
+    bypassPermissions mode (E11 P1/P1b after merge, plus a bypassPermissions run).
+  - L14, git aliases in day sessions: an alias (`sw = switch`, `co = checkout`, a `!` alias) runs past the
+    main-folder checks and the git write checks.
+  - L15, the shell profile: a cd function or alias defined in the user's shell profile, or a profile that sets
+    physical mode (`set -P`) with a symlinked folder, can move the folder where the guard believes it knows it.
+  - L16, deliberately disguised shell text: a day line written to hide what it does from a text reader (a variable
+    name built by expansion, such as `export "${n}IR=…"`, `declare -n`, `printf -v`, `read` or `mapfile` into a git
+    variable, a cd reached through tricks the cd rules do not list, or shell syntax the guard neither reads nor flags,
+    such as brace expansion) can pass the day checks. The day ask is a seatbelt against accidents, not a wall. Lines
+    the guard knows it can't fully read ask (D-ASK). Routines are held to a plain shell form that the guard reads
+    exactly as bash does (R-PLAIN), so they are refused such lines.
+  - L17, folder deletes and moves: a folder target asks when git tracks a kit file in it, when it holds a worktree of
+    this repository, or when it is the project folder or an ancestor of it; kit files git does not track, and nested
+    repositories that are not worktrees of this one, are not seen.
+  - L18, parallel tool calls: a `git fetch` running in one tool call can move a ref after the guard checked a night
+    `git switch` in another call made at the same time. NIGHT_SHIFT.md step 4 says to fetch first and wait. A routine
+    never runs git in the background (a background `&` or run_in_background on a line with git is refused), so a fetch
+    made in an earlier call has finished before the next call is checked.
+  - **R-PLAIN, routines' plain shell (fix pass 3, narrowed in fix pass 4):** before the guard reads a routine's Bash
+    line, the line must be in a plain form that the guard splits exactly as bash does, or it is refused. Outside quotes
+    it allows letters, digits, spaces, tabs, newlines, the characters `_ - . / : = @ % + , ^`, a `~` inside a word, and
+    the operators `&&`, `||`, `;`, `|`, `|&`, `&`, `>`, `>>`, `>|`, `<`, `&>`, `&>>`, and `>&` followed by a number or
+    `-` that ends the word. It refuses `<&`, `;;`, `;&` and a quoted word right before `<` or `>`. Inside double quotes
+    it allows no `$`, backtick or backslash. Every quote must be closed. Every command starts with its program, unquoted
+    and by its bare name: git, gh, npm, node, python, python3 or date, after only `TZ=`, `LC_ALL=`, `LANG=`, `LANGUAGE=`
+    or `NO_COLOR=` settings, and its redirects come after the program (R-PROG, fix pass 4). So routines use no comments,
+    expansions, here-documents, braces, brackets or parentheses; no cd, no wrapper (env, timeout, nice, stdbuf,
+    xvfb-run, nohup, time, command, exec), no shell keyword (if, then, do, while and the rest), no program given by a
+    path, and no command without a program. A corpus test against real bash checks the claim.
+  - **D-ASK, the day's unreadable lines (fix pass 3, Mustafa's scope stop of 2026-11-05):** a day line holding any of
+    five forms the guard does not read (a comment, a line continuation, ANSI-C quoting `$'…'`, a here-document
+    delimiter that is not a plain word, or `>&` or `<&` before a file name) asks the main session, and an agent's is
+    refused; the scan goes on, so a later refusal on the line still wins [verified: `routine-guard.mjs:141-153`,
+    `:202-249`, `:670-679`]. The guard does not parse these forms: "any line the guard can't fully read is an ask,
+    not a parse" (Mustafa).
+  - Closed, so no longer limits: by the fix round's cd rules R-a to R-e (2acfbbc), a cd inside `if`/`while`, a
+    `CDPATH` set in the shell profile, and a cd behind `env`/`nohup`/`timeout` followed as a move; by fix pass 2
+    (c8cbb1a; SD-4: a cd joined by `&&` after a cd the guard could not follow now stays unknown), a cd after a
+    failed cd; by fix pass 3 (9589bfb), for routines, a command or a write hidden behind a comment, a
+    here-document, ANSI-C quoting or `>&` before a file name (P3-1 to P3-3, P3-9: R-PLAIN), and paths named on a night
+    commit (P3-5: the allowlist). (None had its own line here.)
+  - E11a (`.checkpoints/kit-v3-3/e11a.md`, a nested `claude -p` in the worktree): the ask stopped a Write to a kit file
+    outside Claude Code's protected paths (`docs/probe/CLAUDE.md`) in default, acceptEdits and auto modes; an
+    untrusted workspace ignored the project's 145 allow entries but still ran its hooks. Not shown: a real prompt
+    reaching Mustafa, a cloud session, his PC (E11 after merge).
+  - Also (plan revision 2 §9): a day session reloads changed settings, so a `.claude/settings.json` write that slips
+    past the ask (L1-L4) applies at once (E10-3); a guard error in a day session is "no decision", so no ask
+    (`guard.mjs:46-48`); kit change-sets now prompt at every kit edit in day sessions.
 - B2, not the guard: the GitHub tool that reads labels by number fails for a PR ("Could not resolve to an Issue with
   the number of 34"); labelling still worked.
 - **v2-decision-drafts** (PR #33; the report `docs/reports/2026-11-01-v2-decision-drafts.md` has the details):
