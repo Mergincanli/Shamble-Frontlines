@@ -27,6 +27,9 @@ const gitLongOptions = (sub) => {
   return OPTS.get(sub);
 };
 
+// fix pass 2 (SD-2): the guard lists changed files with these flags; the fakes take newline lists and answer NUL lists
+const NAMES_Z = '--name-only -z --no-renames --no-relative';
+const nul = (s) => s.split('\n').filter(Boolean).map((f) => `${f}\0`).join('');
 // A fake io. Options change what git and gh answer.
 function fakeIo(o = {}) {
   const {
@@ -56,11 +59,11 @@ function fakeIo(o = {}) {
       const a = args.join(' ');
       if (a === 'branch --show-current') return { code: 0, out: `${branch}\n` };
       if (a === 'rev-parse --show-toplevel') return { code: 0, out: `${P}\n` };
-      if (a === 'diff --name-only origin/main...HEAD') return { code: 0, out: branchDiff };
+      if (a === `diff ${NAMES_Z} origin/main...HEAD`) return { code: 0, out: nul(branchDiff) }; // fix pass 2 (SD-2) keys
       // kit-v3-3 step 4b (S-2): origin/main resolves to a commit, as real git answers it
       if (/^rev-parse --verify --end-of-options (refs\/remotes\/)?origin\/main\^\{commit\}$/.test(a)) return { code: 0, out: `${SHA}\n` };
-      if (a === 'diff --cached --name-only') return { code: 0, out: staged };
-      if (a === 'diff --name-only') return { code: 0, out: unstaged };
+      if (a === `diff --cached ${NAMES_Z}`) return { code: 0, out: nul(staged) };
+      if (a === `diff ${NAMES_Z}`) return { code: 0, out: nul(unstaged) };
       if (args[0] === 'ls-files') return { code: tracked.includes(args.at(-1)) ? 0 : 1, out: '' };
       if (args[0] === 'diff' && args[1] === '--quiet') {
         const fs = args.slice(4);
@@ -578,6 +581,17 @@ function dayIo(o = {}) {
   // `git branch --show-current`; npmrc false: no .npmrc anywhere; noRemoteMain: neither origin/main nor
   // refs/remotes/origin/main resolves. Unset, each answers as before.
   const { lsFiles = {}, lsFail = false, branch, npmrc = true, noRemoteMain = false } = o;
+  // fix pass 2 (V-3), added: `git show-ref --verify --hash <full ref>` answers only a ref by its exact name (a branch
+  // refs/heads/<name> of diffs, a full ref diffs names, refs/remotes/origin/main), and a SHA these answer peels to
+  // itself; dwim maps a full ref to the name whose commit rev-parse's guessing answers for it (a tag such as
+  // refs/tags/refs/heads/<name>), while show-ref still does not find it; peel maps a full ref to the name whose commit
+  // an annotated tag object it points at peels to. Unset, each answers as before.
+  const { dwim = {}, peel = {} } = o;
+  // fix pass 2 (SD-6), added (a named scaffold edit): `git worktree list --porcelain -z` answers the worktrees of /p's
+  // repository (WT's tops whose common dir is /p/.git, or worktrees when given), as git prints them; wtFail: git fails
+  const { worktrees = Object.keys(WT).filter((t) => WT[t] === '/p/.git'), wtFail = false } = o;
+  const tagObj = (r) => shaOf(`tag object ${r}`);
+  const peeled = new Map(Object.entries(peel).map(([r, n]) => [tagObj(r), n]));
   const names = new Map(Object.keys(diffs).map((n) => [shaOf(n), n]));
   // step 4c (finding 6): a ref named in diffs is a branch refs/heads/<name>; tags names tags, each at its own commit
   // with no protected difference. A name both a branch and a tag is ambiguous: rev-parse reads the tag first, and
@@ -598,9 +612,26 @@ function dayIo(o = {}) {
       if (a === 'rev-parse --show-toplevel') return top ? { code: 0, out: `${top}\n` } : { code: 128, out: '' };
       if (a === 'rev-parse --git-common-dir') return top ? { code: 0, out: `${WT[top]}\n` } : { code: 128, out: '' };
       if (args[0] === 'ls-files' && args[1] === '-z') return lsFail ? { code: 128, out: '' } : { code: 0, out: lsFiles[args[3]] ?? '' };
+      if (a === 'worktree list --porcelain -z') { // from the project folder only
+        return wtFail || (cwd ?? '/p') !== '/p' ? { code: 128, out: '' } : { code: 0, out: worktrees.map((w) => `worktree ${w}\0HEAD ${SHA}\0detached\0\0`).join('') };
+      }
       if (branch !== undefined && a === 'branch --show-current') return { code: 0, out: `${branch}\n` };
       if (noRemoteMain && /^rev-parse --verify --end-of-options (refs\/remotes\/)?origin\/main\^\{commit\}$/.test(a)) return { code: 128, out: '' };
       if (args[0] === 'diff' && args.some((x) => x.startsWith('--output'))) return { code: 0, out: '' };
+      if (args.length === 4 && args.slice(0, 3).join(' ') === 'show-ref --verify --hash') {
+        const r = args[3], n = r.startsWith('refs/heads/') ? r.slice(11) : null;
+        if (noRemoteMain && r === 'refs/remotes/origin/main') return { code: 128, out: '' };
+        if (r in peel) return { code: 0, out: `${tagObj(r)}\n` };
+        const sha = n !== null && n in diffs && n !== 'HEAD' ? shaOf(n) : r === 'refs/remotes/origin/main' ? shaOf('origin/main')
+          : r.startsWith('refs/') && r in diffs ? shaOf(r) : null;
+        return sha ? { code: 0, out: `${sha}\n` } : { code: 128, out: '' };
+      }
+      if (args.length === 4 && args.slice(0, 3).join(' ') === 'rev-parse --verify --end-of-options' && args[3].endsWith('^{commit}')) {
+        const r = args[3].slice(0, -'^{commit}'.length);
+        if (r in dwim) return { code: 0, out: `${shaOf(dwim[r])}\n` };
+        if (peeled.has(r)) return { code: 0, out: `${shaOf(peeled.get(r))}\n` };
+        if (/^[0-9a-f]{40}$/.test(r) && (names.has(r) || r === shaOf('origin/main'))) return { code: 0, out: `${r}\n` };
+      }
       if (args.length === 5 && args.slice(0, 4).join(' ') === 'rev-parse --verify --symbolic-full-name --end-of-options') {
         const n = args[4], branch = n in diffs && n !== 'HEAD';
         if (branch && tags.includes(n)) return { code: 0, out: '' };
@@ -613,17 +644,17 @@ function dayIo(o = {}) {
         }
         if (tags.includes(r) || (r.startsWith('refs/tags/') && tags.includes(r.slice(10)))) return { code: 0, out: `${tagSha(r.replace(/^refs\/tags\//, ''))}\n` };
       }
-      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'refs/remotes/origin/main' && tagShas.has(args[3])) return { code: 0, out: '' };
+      if (args.slice(0, 6).join(' ') === `diff ${NAMES_Z} refs/remotes/origin/main` && tagShas.has(args[6])) return { code: 0, out: '' };
       if (args.length === 4 && args.slice(0, 3).join(' ') === 'rev-parse --verify --end-of-options' && args[3].endsWith('^{commit}')) {
         const r = args[3].slice(0, -'^{commit}'.length);
         if (r === 'refs/remotes/origin/main') return { code: 0, out: `${shaOf('origin/main')}\n` };
         if (r === 'origin/main') return { code: 0, out: `${shaOf(shadow ? 'a local origin/main' : 'origin/main')}\n` };
         return r in diffs || r === 'HEAD' ? { code: 0, out: `${shaOf(r)}\n` } : { code: 128, out: '' };
       }
-      if (a === 'diff --name-only refs/remotes/origin/main...HEAD') return threeDot === null ? { code: 128, out: '' } : { code: 0, out: threeDot };
-      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'refs/remotes/origin/main' && args[4] === '--' && args.length === 5) {
-        const n = args[3] === 'HEAD' ? 'HEAD' : names.get(args[3]);
-        return n !== undefined && n in diffs ? { code: 0, out: diffs[n] } : { code: 128, out: '' };
+      if (a === `diff ${NAMES_Z} refs/remotes/origin/main...HEAD`) return threeDot === null ? { code: 128, out: '' } : { code: 0, out: nul(threeDot) };
+      if (args.slice(0, 6).join(' ') === `diff ${NAMES_Z} refs/remotes/origin/main` && args[7] === '--' && args.length === 8) {
+        const n = args[6] === 'HEAD' ? 'HEAD' : names.get(args[6]);
+        return n !== undefined && n in diffs ? { code: 0, out: nul(diffs[n]) } : { code: 128, out: '' };
       }
       return { code: 0, out: '' };
     },
@@ -945,6 +976,83 @@ export const DAY_CASES = [
   ['SA-6 an agent: rm -rf docs holding a kit path: deny', dsh('rm -rf docs', { agent_id: 'a1' }), DENY, { lsFiles: { docs: 'docs/sub/x/CLAUDE.md\0' } }],
   ['SA-6 control: rm -rf docs, no kit path tracked there', dsh('rm -rf docs'), null, { lsFiles: { docs: 'docs/a.md\0docs/b.md\0' } }],
   ['SA-6 control: a file target is not listed', dsh('echo x > docs/a.md'), null, { lsFail: true, missing: ['/p/docs/a.md'] }],
+  // --- fix pass 2, the day paths (the seatbelt): SD-3, SD-4, SD-5, SD-6, V-1 ---
+  // SD-3: in the main folder, a switch or merge after an earlier git command in the line asks, unless its target word
+  // is origin/main (the guard reads the target before the line runs; the fetch can move it). origin/cs/x is clean now.
+  ['SD-3 C3d git fetch -q origin cs/x && git switch --detach origin/cs/x, in the main folder: ask',
+    dsh('git fetch -q origin cs/x && git switch --detach origin/cs/x'), ASK, { diffs: { 'origin/cs/x': 'docs/a.md\n' } },
+    /\(an earlier git command in this line could move origin\/cs\/x after the guard checked it: run git fetch in its own call first, then the switch alone\)/],
+  ['SD-3 an agent: C3d: deny', dsh('git fetch -q origin cs/x && git switch --detach origin/cs/x', { agent_id: 'a1' }), DENY,
+    { diffs: { 'origin/cs/x': 'docs/a.md\n' } }, /A subagent never moves the main folder/],
+  ['SD-3 control: the same switch alone (origin/cs/x clean) goes on', dsh('git switch --detach origin/cs/x'), null, { diffs: { 'origin/cs/x': 'docs/a.md\n' } }],
+  ['SD-3 git fetch -q origin cs/x; git switch -q cs/x (a ;, cs/x clean now): ask', dsh('git fetch -q origin cs/x; git switch -q cs/x'), ASK,
+    { diffs: { 'cs/x': 'docs/a.md\n' } }, /could move cs\/x after/],
+  ['SD-3 git status && git switch -c cs/new (no start point: HEAD): ask', dsh('git status && git switch -c cs/new'), ASK,
+    { diffs: { HEAD: 'docs/a.md\n' } }, /could move HEAD after/],
+  ['SD-3 git fetch -q origin main && git switch -c cs/new main (main at origin/main now; only the word origin/main): ask',
+    dsh('git fetch -q origin main && git switch -c cs/new main'), ASK, { dwim: { main: 'origin/main' } }, /could move main after/],
+  ['SD-3 git fetch -q origin main && git merge --ff-only main (main at origin/main now): ask', dsh('git fetch -q origin main && git merge --ff-only main'),
+    ASK, { dwim: { main: 'origin/main' } }, /could move main after the guard checked it: run git fetch in its own call first, then the merge alone/],
+  ['SD-3 control: git merge --ff-only main alone (main at origin/main) goes on', dsh('git merge --ff-only main'), null, { dwim: { main: 'origin/main' } }],
+  ['SD-3 control: git fetch origin main && git merge --ff-only origin/main (WT-UPDATE) goes on', dsh('git fetch origin main && git merge --ff-only origin/main'), null],
+  ['SD-3 control: git fetch -q origin main && git switch --detach origin/main (the advisor\'s step 0) goes on',
+    dsh('git fetch -q origin main && git switch --detach origin/main'), null, { diffs: { 'origin/main': '' } }],
+  ['SD-3 control: git fetch -q origin main && git switch -c cs/new origin/main goes on', dsh('git fetch -q origin main && git switch -c cs/new origin/main'), null],
+  ['SD-3 control: C3d in a worktree goes on', dsh('git fetch -q origin cs/x && git switch --detach origin/cs/x', { cwd: '/w' }), null,
+    { diffs: { 'origin/cs/x': 'docs/a.md\n' } }],
+  // SD-4: a cd, pushd or popd joined by && while the folder is unknown stays unknown (bash skips it after a failed
+  // cd); ! is no longer a way to reach a followed cd. /m is a missing folder, /n a folder outside any repository.
+  ['SD-4 C1 cd /m && cd /w; git switch -q -c cs/c1 origin/cs/evil: ask', dsh('cd /m && cd /w; git switch -q -c cs/c1 origin/cs/evil'), ASK,
+    { missing: ['/m'] }],
+  ['SD-4 C1c cd /m && cd /n; echo x > CLAUDE.md: ask', dsh('cd /m && cd /n; echo x > CLAUDE.md'), ASK, { missing: ['/m'] }, /cannot follow/],
+  ['SD-4 an agent: C1c: deny', dsh('cd /m && cd /n; echo x > CLAUDE.md', { agent_id: 'a1' }), DENY, { missing: ['/m'] }, /cannot follow/],
+  ['SD-4 C2 ! cd /p && cd ./.gate/x; git switch -q -c cs/c2 origin/cs/evil: ask', dsh('! cd /p && cd ./.gate/x; git switch -q -c cs/c2 origin/cs/evil'),
+    ASK],
+  ['SD-4 C3 cd /p && cd /m && cd /w; git switch -q -c cs/c3 origin/cs/evil: ask', dsh('cd /p && cd /m && cd /w; git switch -q -c cs/c3 origin/cs/evil'),
+    ASK, { missing: ['/m'] }],
+  ['SD-4 control: cd /m; cd /w; git switch -q -c cs/c0 origin/cs/evil (a ;: the cd runs) goes on', dsh('cd /m; cd /w; git switch -q -c cs/c0 origin/cs/evil'),
+    null, { missing: ['/m'] }],
+  ['SD-4 a pushd after && while unknown leaves the stack unknown: ask', dsh('pushd /p && pushd /w; cd ~ && pushd /p/.gate/x; popd; popd; git switch cs/other',
+    { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['R-b a ./ cd after an unknown one, joined by ; (SD-4 does not apply): ask', dsh('cd -; cd ./w && git switch cs/other'), ASK, { diffs: OTHER }],
+  // V-1: function, trap and alias as command words make the folder unknown (they can run a cd in this shell)
+  ['V-1 P1a cd /w; function f { cd /p; }; f; git switch cs/other: ask', dsh('cd /w; function f { cd /p; }; f; git switch cs/other'), ASK, { diffs: OTHER }],
+  ['V-1 P1b cd /w; trap "cd /p" DEBUG; git switch cs/other: ask', dsh('cd /w; trap "cd /p" DEBUG; git switch cs/other'), ASK, { diffs: OTHER }],
+  ['V-1 P1c cd /w; shopt -s expand_aliases; alias c=cd (newline) c /p (newline) git switch: ask',
+    dsh('cd /w; shopt -s expand_aliases; alias c=cd\nc /p\ngit switch cs/other'), ASK, { diffs: OTHER }],
+  ['V-1 P1d cd /; function f { cd /p; }; f; echo x > CLAUDE.md: ask', dsh('cd /; function f { cd /p; }; f; echo x > CLAUDE.md'), ASK, {}, /cannot follow/],
+  ['V-1 P1e cd /; trap "cd /p" DEBUG; echo x > CLAUDE.md: ask', dsh('cd /; trap "cd /p" DEBUG; echo x > CLAUDE.md'), ASK, {}, /cannot follow/],
+  ['V-1 control: grep function x goes on', dsh('grep function x'), null],
+  ['V-1 control: cd /w; grep -e function -e trap -e alias x; git switch (the words, not the commands) goes on',
+    dsh('cd /w; grep -e function -e trap -e alias x; git switch cs/other'), null, { diffs: OTHER }],
+  // SD-5: git clone's targets are every positional word after the first, and the folder git makes from each one
+  ['SD-5 git clone --revision main <url> .claude/sub: ask', dsh('git clone --revision main https://example.invalid/o/r.git .claude/sub'), ASK, {},
+    /\.claude\/sub \(git clone\)/],
+  ['SD-5 git clone --revision main <url> .claude: ask', dsh('git clone --revision main https://example.invalid/o/r.git .claude'), ASK],
+  ['SD-5 git clone --revision main <url> CLAUDE.md: ask', dsh('git clone --revision main https://example.invalid/o/r.git CLAUDE.md'), ASK],
+  ['SD-5 an agent: git clone --revision main <url> .claude/sub: deny', dsh('git clone --revision main https://example.invalid/o/r.git .claude/sub',
+    { agent_id: 'a1' }), DENY],
+  ['SD-5 an agent: git clone --revision main <url> CLAUDE.md: deny', dsh('git clone --revision main https://example.invalid/o/r.git CLAUDE.md',
+    { agent_id: 'a1' }), DENY],
+  ['SD-5 an option the guard does not know, with a value: git clone --x v <url> .claude/sub: ask',
+    dsh('git clone --x v https://example.invalid/o/r.git .claude/sub'), ASK],
+  ['SD-5 git clone --x v <url ending tools.git> (no folder; git makes tools): ask', dsh('git clone --x v https://example.invalid/o/tools.git'), ASK],
+  ['SD-5 control: git clone <project> <outside> goes on', dsh('git clone /p /tmp/copy'), null],
+  ['SD-5 control: git clone -b main <project> <outside> goes on', dsh('git clone -b main /p /tmp/copy'), null],
+  ['SD-5 control: git clone --revision main <project> <outside> goes on', dsh('git clone --revision main /p /tmp/copy'), null],
+  ['SD-5 control: git clone . <outside> (. names no new folder) goes on', dsh('git clone . /tmp/copy'), null],
+  ['SD-5 control: git clone .. <outside> from docs (.. names no new folder) goes on', dsh('git clone .. /tmp/copy', { cwd: '/p/docs' }), null],
+  // SD-6: a folder target that holds a worktree of this repository asks (git worktree list, from the project folder)
+  ['SD-6 rm -rf .gate (it holds the worktree /p/.gate/x): ask', dsh('rm -rf .gate'), ASK, {}, /\.gate \(it holds the worktree \/p\/\.gate\/x\)/],
+  ['SD-6 rm -r .gate: ask', dsh('rm -r .gate'), ASK],
+  ['SD-6 rm -rf /p/.gate (absolute): ask', dsh('rm -rf /p/.gate'), ASK],
+  ['SD-6 mv .gate x: ask', dsh('mv .gate x'), ASK],
+  ['SD-6 an agent: rm -rf .gate: deny', dsh('rm -rf .gate', { agent_id: 'a1' }), DENY],
+  ['SD-6 rm -rf /home/u/wts (outside any repository) holding a worktree of this one: ask', dsh('rm -rf /home/u/wts'), ASK,
+    { worktrees: ['/p', '/home/u/wts/a'] }, /it holds the worktree \/home\/u\/wts\/a/],
+  ['SD-6 git cannot list the worktrees: ask', dsh('rm -rf docs/research'), ASK, { wtFail: true }, /could not list this repository's worktrees/],
+  ['SD-6 control: rm -rf .gate/empty (no worktree in it) goes on', dsh('rm -rf .gate/empty'), null],
+  ['SA-6 rm -rf / with no worktree listed (the ancestor check alone): ask', dsh('rm -rf /'), ASK, { worktrees: [] }, /holds the project folder/],
 ];
 for (const [name, input, want, opts, re] of DAY_CASES) {
   test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -1098,12 +1206,38 @@ const DAY_MUTANTS = [
   ['F-b worktree add: the values of -b, -B and --reason', "if (w === '-b' || w === '-B' || w === '--reason') { i++; continue; }", ''],
   ['F-b git clone writes its folder', "if (prog === 'git' && a[0] === 'clone') {", 'if (false) {'],
   ['F-b clone: the values of its options', 'if (CLONE_VALUE.has(w)) { i++; continue; }', ''],
-  ["F-b clone: no folder given, the URL's last part", 'const dir = pos.length > 1 ? pos[1] : pos.length ? cloneDir(pos[0]) : \'\';', "const dir = pos.length > 1 ? pos[1] : '';"],
+  // fix pass 2 (SD-5) rewrote the line this row switched off (the folder made from the URL): retargeted to its new form
+  ["F-b clone: no folder given, the URL's last part", "const made = pos.map(cloneDir).filter((d) => d && d !== '.' && d !== '..');", 'const made = [];'],
   ['F-b clone: --separate-git-dir', "if (w === '--separate-git-dir') { gitDir.push(a[++i] ?? ''); continue; }", ''],
   ['SA-6 an ancestor of the project folder', "if (relIn(fold(abs, io), fold(realOf(io.projectDir, io), io)) !== null) return", 'if (false) return'],
   ['SA-6 tracked kit paths in the folder', 'return hit ? `${p} (it holds ${hit})` : null;', 'return null;'],
   ['SA-6 git failing asks', 'if (ls.code !== 0) return `${p} (the guard could not list its files)`;', 'if (ls.code !== 0) return null;'],
   ['SA-6 only folders are listed', 'if (!(io.isDir ? io.isDir(abs) : io.exists(abs))) return null;', ''],
+  // fix pass 2, the day paths
+  ['SD-3 a switch after an earlier git command asks', "else if (line.gitBefore && pos[0] !== 'origin/main') {", 'else if (false) {'],
+  ['SD-3 a merge after an earlier git command asks', "if (t !== null && line.gitBefore && t !== 'origin/main') {", 'if (false) {'],
+  ['SD-3 bash() records an earlier git command', 'line.gitBefore = true; }', '}'],
+  ['SD-3 git() passes the line to mainFolderMove', 'return mainFolderMove(sub, args, vcwd, io, input, line);', 'return mainFolderMove(sub, args, vcwd, io, input);'],
+  ['SD-3 switch: only the word origin/main goes on', "pos[0] !== 'origin/main') {", "!isOriginMain(pos[0] ?? 'HEAD', vcwd, io)) {"],
+  ['SD-3 merge: only the word origin/main goes on', "t !== 'origin/main') {", '!isOriginMain(t, vcwd, io)) {'],
+  ['SD-4 a cd after && while the folder is unknown', "if (c.sep === '&&' && !dirs.known) {", 'if (false) {'],
+  ['SD-4 a skipped pushd or popd makes the stack unknown', "if (prog !== 'cd') dirs.stack = null;", ''],
+  ['SD-4 ! does not reach a cd', "const CD_REACH = new Set(['if', '{', 'time',", "const CD_REACH = new Set(['if', '{', '!', 'time',"],
+  ['V-1 function', "if (['function', 'trap', 'alias'].includes(prog)) return unknown();", "if (['trap', 'alias'].includes(prog)) return unknown();"],
+  ['V-1 trap', "if (['function', 'trap', 'alias'].includes(prog)) return unknown();", "if (['function', 'alias'].includes(prog)) return unknown();"],
+  ['V-1 alias', "if (['function', 'trap', 'alias'].includes(prog)) return unknown();", "if (['function', 'trap'].includes(prog)) return unknown();"],
+  ['V-1 command words only (not any word)', "if (['function', 'trap', 'alias'].includes(prog)) return unknown();",
+    "if (argv.some((w) => ['function', 'trap', 'alias'].includes(w))) return unknown();"],
+  ['SD-5 every positional word after the first', 'return [...pos.slice(1), ...made, ...gitDir];', 'return [...pos.slice(1, 2), ...made, ...gitDir];'],
+  ['SD-5 the folder made from every positional word', 'const made = pos.map(cloneDir)', 'const made = pos.slice(0, 1).map(cloneDir)'],
+  ['SD-5 . and .. name no new folder', "filter((d) => d && d !== '.' && d !== '..')", 'filter(Boolean)'],
+  ['SD-5 --revision takes a value', "'--ref-format', '--revision']);", "'--ref-format']);"],
+  ['SD-6 a folder holding a worktree of this repository', 'if (wt !== undefined) return', 'if (false) return'],
+  ['SD-6 at or under the target', 'relIn(fold(abs, io), fold(realOf(w, io), io)) !== null', "relIn(fold(abs, io), fold(realOf(w, io), io)) === '.'"],
+  ['SD-6 git failing to list the worktrees asks', "if (wts.code !== 0) return `${p} (the guard could not list this repository's worktrees)`;",
+    'if (wts.code !== 0) return null;'],
+  ['SD-6 before the not-in-a-repository return', "  const wts = io.git(['worktree',", "  if (!g) return null;\n  const wts = io.git(['worktree',"],
+  ['SD-6 run from the project folder', "io.git(['worktree', 'list', '--porcelain', '-z'], io.projectDir);", "io.git(['worktree', 'list', '--porcelain', '-z'], abs);"],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -1660,6 +1794,19 @@ export const NIGHT_SWITCH_CASES = [
     { kit: { 'refs/remotes/origin/cs/y': KIT('CLAUDE.md') } }, /cs\/y's rules, CI or gate files differ from main's \(CLAUDE\.md\)/],
   ['T20 night, the local cs/y differs and origin/cs/y does not: the local branch is checked (git takes it)', dsh('git switch cs/y'), DENY,
     { kit: { 'cs/y': KIT('.claude/settings.json'), 'refs/remotes/origin/cs/y': '' } }, NIGHT_HIT],
+  // fix pass 2 (V-3), added: a plain name is looked up by the exact refs refs/heads/<name>, then
+  // refs/remotes/origin/<name> (dwim: what rev-parse's guessing would answer, as a tag refs/tags/refs/heads/<name> makes it)
+  ['V-3 (finding 13a) a tag refs/tags/refs/heads/cs/evil at a clean commit, no local cs/evil, origin/cs/evil changes the kit: deny',
+    dsh('git switch cs/evil'), DENY, { kit: { 'cs/ok': KIT('docs/a.md'), 'refs/remotes/origin/cs/evil': KIT('.claude/settings.json') },
+      dwim: { 'refs/heads/cs/evil': 'cs/ok' } }, /cs\/evil's rules, CI or gate files differ from main's \(\.claude\/settings\.json\)/],
+  ['V-3 a tag refs/tags/refs/heads/cs/t1 at a clean commit, no branch cs/t1, no origin/cs/t1: deny', dsh('git switch cs/t1'), DENY,
+    { kit: { 'cs/ok': '' }, dwim: { 'refs/heads/cs/t1': 'cs/ok' } }, /can't resolve cs\/t1 to a commit/],
+  ['V-3 a tag refs/tags/refs/remotes/origin/cs/t2 at a clean commit, no branch cs/t2, no origin/cs/t2: deny', dsh('git switch cs/t2'), DENY,
+    { kit: { 'cs/ok': '' }, dwim: { 'refs/remotes/origin/cs/t2': 'cs/ok' } }, /can't resolve cs\/t2 to a commit/],
+  ['V-3 refs/heads/cs/p points at an annotated tag object: the commit it peels to is checked', dsh('git switch cs/p'), DENY,
+    { kit: { 'cs/kit': KIT('CLAUDE.md') }, peel: { 'refs/heads/cs/p': 'cs/kit' } }, /cs\/p's rules, CI or gate files differ from main's \(CLAUDE\.md\)/],
+  ['V-3 control: -c from the start point cs/ok is read by rev-parse, as git reads it', dsh('git switch -c cs/n cs/ok'), null,
+    { kit: { 'cs/ok': KIT('docs/a.md') } }],
 ];
 for (const [name, input, want, opts, re] of NIGHT_SWITCH_CASES) {
   test(`night switch (WT-NIGHT (a)) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -1702,10 +1849,16 @@ const NIGHT_SWITCH_MUTANTS = [
   ['a protected name is refused', "return hit ? `${R}: ${target}'s rules", "return false ? `${R}: ${target}'s rules"],
   ['the names are NUL-separated', "const hit = d.out.split('\\0').filter(Boolean).find((f) => protectedRel(f));", "const hit = d.out.split('\\n').filter(Boolean).find((f) => protectedRel(f));"],
   ['-z is passed', "['diff', '--name-only', '-z', '--no-renames', '--no-relative', main", "['diff', '--name-only', '--no-renames', '--no-relative', main"],
-  ['the origin/<name> fallback (T20)', ' ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);', ';'],
-  ['the local branch first (as git switch)', 'commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);',
-    'commitOf(`refs/remotes/origin/${name}`, vcwd, io) ?? commitOf(`refs/heads/${name}`, vcwd, io);'],
-  ['a plain name is the branch refs/heads/<name>', 'commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes', 'commitOf(name, vcwd, io) ?? commitOf(`refs/remotes'],
+  // fix pass 2 (V-3): the next three rows target the plain name's lookup, now exactCommit (their target text moved)
+  ['the origin/<name> fallback (T20)', ' ?? exactCommit(`refs/remotes/origin/${name}`, vcwd, io);', ';'],
+  ['the local branch first (as git switch)', 'exactCommit(`refs/heads/${name}`, vcwd, io) ?? exactCommit(`refs/remotes/origin/${name}`, vcwd, io);',
+    'exactCommit(`refs/remotes/origin/${name}`, vcwd, io) ?? exactCommit(`refs/heads/${name}`, vcwd, io);'],
+  ['a plain name is the branch refs/heads/<name>', 'exactCommit(`refs/heads/${name}`, vcwd, io) ?? exactCommit(`refs/remotes', 'commitOf(name, vcwd, io) ?? exactCommit(`refs/remotes'],
+  // fix pass 2 (V-3), added: each leg by its exact name, never through rev-parse's guessing
+  ['V-3 the branch leg is exact', 'exactCommit(`refs/heads/${name}`, vcwd, io) ??', 'commitOf(`refs/heads/${name}`, vcwd, io) ??'],
+  ['V-3 the origin/<name> leg is exact', '?? exactCommit(`refs/remotes/origin/${name}`, vcwd, io);', '?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);'],
+  ['V-3 show-ref reads the exact name', "io.git(['show-ref', '--verify', '--hash', full], vcwd);", "io.git(['rev-parse', '--verify', '-q', full], vcwd);"],
+  ['V-3 the SHA is peeled to its commit', '? commitOf(sha, vcwd, io) : null;', '? sha : null;'],
 ];
 test('mutation runs (step 9, WT-NIGHT (a)): every rule of the night switch check is needed by some case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -1805,6 +1958,369 @@ test('real git (step 9, WT-NIGHT (a)): the night switches only to a branch whose
       if (!caught) survivors.push(label);
     }
     assert.deepEqual(survivors, [], `diff flags no real row needs: ${survivors.join('; ')}`);
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(root, { recursive: true, force: true });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- fix pass 2, routine paths (the night shift's wall) ---
+// SD-1 (+ A-3): in the night-shift role, a line holding git switch, git commit or git push holds that one command and
+// nothing else (no cd, pipe, background job, subshell or substitution), because the guard checks the switch's target,
+// the commit's files and the pushed branch before the line runs. pr-advisor and day sessions are unchanged.
+// SD-2: the guard's file lists (protectedHit: the night push and the day main-folder check; the night commit's staged
+// and -a lists) are read NUL-separated with renames and relative output off. The fakes answer with the names git
+// prints under these flags (a renamed kit file: both names; a non-ASCII name: unquoted; diff.relative: the full names);
+// the real git test below shows each flag needed. [name, input, expected kind, io, reason pattern]
+const ALONE = (sub) => new RegExp(`^routine \\(night-shift\\): git ${sub} runs alone, the only command of its call`);
+const nightFake = (o = {}) => fakeIo({ role: NIGHT, ...o });
+const OK_X = () => nightIo({ kit: { 'cs/ok': KIT('docs/a.md'), 'cs/x': KIT('docs/a.md') } });
+export const PASS2_ROUTINE_CASES = [
+  // SD-1: refused
+  ['SD-1 C3b night: git fetch -q origin cs/x && git switch -q cs/x', dsh('git fetch -q origin cs/x && git switch -q cs/x'), DENY, OK_X,
+    /^routine \(night-shift\): git switch runs alone, the only command of its call \(the guard checks its target before the line runs\): run git fetch in its own call first, then git switch <branch> alone$/],
+  ['SD-1 C3c night: git branch cs/n origin/cs/evil && git switch -q cs/n', dsh('git branch cs/n origin/cs/evil && git switch -q cs/n'), DENY,
+    () => nightIo({ kit: { 'cs/n': '', 'origin/cs/evil': KIT('.claude/settings.json') } }), ALONE('switch')],
+  ['SD-1 night: git switch cs/ok; git status', dsh('git switch cs/ok; git status'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: git switch cs/ok & x', dsh('git switch cs/ok & x'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: git switch cs/ok & (a background job, one command)', dsh('git switch cs/ok &'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: (git switch cs/ok) (a subshell, one command)', dsh('(git switch cs/ok)'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: git switch cs/ok | cat (a pipe)', dsh('git switch cs/ok | cat'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: cd <project> && git switch cs/ok (a cd counts)', dsh('cd /p && git switch cs/ok'), DENY, OK_X, ALONE('switch')],
+  ['SD-1 night: git add f && git commit -m m', sh('git add f && git commit -m m'), DENY, () => nightFake(),
+    /^routine \(night-shift\): git commit runs alone, the only command of its call \(the guard checks what it commits before the line runs\): run git add in its own call first, then git commit alone$/],
+  ['SD-1 night: git commit -m m && git push origin cs/x', sh('git commit -m m && git push origin cs/x'), DENY, () => nightFake(), ALONE('commit')],
+  ['SD-1 night: git status && git push origin cs/x', sh('git status && git push origin cs/x'), DENY, () => nightFake(),
+    /^routine \(night-shift\): git push runs alone, the only command of its call \(the guard checks what it pushes before the line runs\): run git commit in its own call first, then git push alone$/],
+  ['SD-1 night: git push origin cs/x | cat', sh('git push origin cs/x | cat'), DENY, () => nightFake(), ALONE('push')],
+  // SD-1: as before
+  ['SD-1 night: git switch cs/ok alone goes on', dsh('git switch cs/ok'), null, OK_X],
+  ['SD-1 night: git switch cs/ok; (parseShell drops the empty command after the ;) goes on', dsh('git switch cs/ok;'), null, OK_X],
+  ['SD-1 night: git switch cs/ok and a newline goes on', dsh('git switch cs/ok\n'), null, OK_X],
+  ['SD-1 night: git commit -m m alone goes on', sh('git commit -m m'), null, () => nightFake()],
+  ['SD-1 night: git push origin cs/x alone goes on', sh('git push origin cs/x'), null, () => nightFake()],
+  ['SD-1 night: git fetch -q origin cs/x alone goes on', dsh('git fetch -q origin cs/x'), null, OK_X],
+  ["SD-1 pr-advisor: its step-0 line git fetch -q origin main && git switch --detach origin/main goes on (unchanged)",
+    sh('git fetch -q origin main && git switch --detach origin/main'), null, () => fakeIo({ role: PRA })],
+  ['SD-1 day, a worktree: git fetch -q origin cs/x && git switch -q cs/x goes on (unchanged)', dsh('git fetch -q origin cs/x && git switch -q cs/x', { cwd: '/w' }), null,
+    () => dayIo({ diffs: { 'cs/x': 'docs/a.md\n' } })],
+  ['SD-1 day, the main folder: git fetch -q origin main && git switch cs/x, cs/x a kit change: ask (unchanged)', dsh('git fetch -q origin main && git switch cs/x'), ASK,
+    () => dayIo({ diffs: { 'cs/x': '.claude/settings.json\n' } })],
+  ['SD-1 day: git add f && git commit -m m goes on (unchanged)', dsh('git add f && git commit -m m'), null, () => dayIo()],
+  ['SD-1 day: git commit -m m && git push origin cs/x goes on (unchanged)', dsh('git commit -m m && git push origin cs/x'), null, () => dayIo()],
+  // SD-2: the night push (protectedHit through protectedInBranch)
+  ['SD-2 night push: a kit file renamed away (tools/gate.mjs to docs/gate.mjs, both names listed): deny', sh('git push origin cs/x'), DENY,
+    () => nightFake({ branchDiff: 'docs/gate.mjs\ntools/gate.mjs\n' }), /the branch changes tools\/gate\.mjs/],
+  ['SD-2 night push: a non-ASCII kit path: deny', sh('git push origin cs/x'), DENY, () => nightFake({ branchDiff: '.claude/agents/é.md\n' }), /\.claude\/agents\/é\.md/],
+  ['SD-2 night push: diff.relative set (the full names): deny', sh('git push origin cs/x'), DENY,
+    () => nightFake({ branchDiff: 'docs/a.md\ntools/package.json\n' }), /tools\/package\.json/],
+  // SD-2: the night commit, the staged list (--cached) and the -a list
+  ['SD-2 night commit (--cached): a kit file renamed away: deny', sh('git commit -m m'), DENY,
+    () => nightFake({ staged: 'docs/gate.mjs\ntools/gate.mjs\n' }), /the commit would change tools\/gate\.mjs/],
+  ['SD-2 night commit (--cached): a non-ASCII kit path: deny', sh('git commit -m m'), DENY, () => nightFake({ staged: '.claude/agents/é.md\n' }), /é\.md/],
+  ['SD-2 night commit (--cached): diff.relative set: deny', sh('git commit -m m'), DENY, () => nightFake({ staged: 'docs/a.md\ntools/smoke.mjs\n' }), /tools\/smoke\.mjs/],
+  ['SD-2 night commit -a: a kit file moved away: deny', sh('git commit -a -m m'), DENY,
+    () => nightFake({ unstaged: 'docs/a.md\ntools/gate.mjs\n' }), /the commit would change tools\/gate\.mjs/],
+  ['SD-2 night commit -a: a non-ASCII kit path: deny', sh('git commit -a -m m'), DENY, () => nightFake({ unstaged: '.claude/agents/é.md\n' }), /é\.md/],
+  ['SD-2 night commit -a: diff.relative set: deny', sh('git commit -a -m m'), DENY, () => nightFake({ unstaged: 'docs/a.md\ntools/battery.js\n' }), /tools\/battery\.js/],
+  ['SD-2 night commit --all: deny', sh('git commit --all -m m'), DENY, () => nightFake({ unstaged: 'docs/a.md\ntools/battery.js\n' })],
+  ['SD-2 control: night commit without -a, a kit file changed but not staged: goes on', sh('git commit -m m'), null,
+    () => nightFake({ unstaged: 'docs/a.md\ntools/battery.js\n' })],
+  ['SD-2 night commit, git cannot list the staged files: deny', dsh('git commit -m m'), DENY, () => nightIo(), /git can't list what the commit would change/],
+  // SD-2: the day main-folder check (protectedHit through mainFolderMove)
+  ['SD-2 day git switch cs/ren in the main folder, a kit file renamed away: ask', dsh('git switch cs/ren'), ASK,
+    () => dayIo({ diffs: { 'cs/ren': 'docs/gate.mjs\ntools/gate.mjs\n' } }), /cs\/ren's tools\/gate\.mjs differs/],
+  ['SD-2 day git switch cs/uni in the main folder, a non-ASCII kit path: ask', dsh('git switch cs/uni'), ASK,
+    () => dayIo({ diffs: { 'cs/uni': '.claude/agents/é.md\n' } }), /é\.md differs/],
+  ['SD-2 day git switch cs/rel in the main folder, diff.relative set: ask', dsh('git switch cs/rel'), ASK,
+    () => dayIo({ diffs: { 'cs/rel': 'docs/a.md\ntools/gate.mjs\n' } }), /tools\/gate\.mjs differs/],
+  ['SD-2 control: day git switch cs/doc, docs only: goes on', dsh('git switch cs/doc'), null, () => dayIo({ diffs: { 'cs/doc': 'docs/a.md\n' } })],
+];
+for (const [name, input, want, io, re] of PASS2_ROUTINE_CASES) {
+  test(`routine (fix pass 2) ${want ?? 'goes on'}: ${name}`, async () => {
+    const d = await decide(input, io());
+    assert.equal(kindOf(d), want, `${name}: ${JSON.stringify(d)}`);
+    if (re) assert.match(d.ask ?? d.deny, re);
+  });
+}
+const PASS2_ROUTINE_MUTANTS = [
+  ['SD-1 the night line rule', "if (role === 'night-shift' && NIGHT_ALONE[sub] && !line.alone) {", 'if (false) {'],
+  ['SD-1 bash() passes the line to git()', 'r = await git(argv, vcwd, role, io, input, line);', 'r = await git(argv, vcwd, role, io, input, { alone: true });'],
+  ['SD-1 one command only', 'const line = { alone: cmds.length === 1 && !forks && !subs };', 'const line = { alone: !forks && !subs };'],
+  ['SD-1 no pipe, background job or subshell', 'const line = { alone: cmds.length === 1 && !forks && !subs };', 'const line = { alone: cmds.length === 1 && !subs };'],
+  ['SD-1 switch is covered', "  switch: ['checks its target',", "  nope: ['checks its target',"],
+  ['SD-1 commit is covered', "  commit: ['checks what it commits',", "  nope: ['checks what it commits',"],
+  ['SD-1 push is covered', "  push: ['checks what it pushes',", "  nope: ['checks what it pushes',"],
+  ['SD-1 night only (pr-advisor and day unchanged)', "if (role === 'night-shift' && NIGHT_ALONE[sub] && !line.alone) {", 'if (NIGHT_ALONE[sub] && !line.alone) {'],
+  ['SD-2 protectedHit lists with DIFF_NAMES', "const d = io.git(['diff', ...DIFF_NAMES, ...range], vcwd);", "const d = io.git(['diff', '--name-only', ...range], vcwd);"],
+  ["SD-2 protectedHit splits on NUL", "const hit = d.out.split('\\0').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));",
+    "const hit = d.out.split('\\n').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));"],
+  ['SD-2 the staged list uses DIFF_NAMES', "io.git(['diff', '--cached', ...DIFF_NAMES], vcwd)", "io.git(['diff', '--cached', '--name-only'], vcwd)"],
+  ['SD-2 the -a list uses DIFF_NAMES', "lists.push(io.git(['diff', ...DIFF_NAMES], vcwd));", "lists.push(io.git(['diff', '--name-only'], vcwd));"],
+  ["SD-2 the commit's lists split on NUL", "lists.flatMap((d) => d.out.split('\\0'))", "lists.flatMap((d) => d.out.split('\\n'))"],
+  ['SD-2 -a adds the unstaged list', 'if (all) lists.push(', 'if (false) lists.push('],
+  ['SD-2 a list git cannot give is refused', 'if (lists.some((d) => d.code !== 0)) {', 'if (false) {'],
+];
+test('fix pass 2 (SD-1): the three reasons, word for word', async () => {
+  const why = async (c, io) => (await decide(c, io))?.deny;
+  assert.equal(await why(dsh('git fetch origin cs/x && git switch cs/x'), OK_X()), 'routine (night-shift): git switch runs alone, the only command of its call (the guard checks its target before the line runs): run git fetch in its own call first, then git switch <branch> alone');
+  assert.equal(await why(sh('git add f && git commit -m m'), nightFake()), 'routine (night-shift): git commit runs alone, the only command of its call (the guard checks what it commits before the line runs): run git add in its own call first, then git commit alone');
+  assert.equal(await why(sh('git status; git push origin cs/x'), nightFake()), 'routine (night-shift): git push runs alone, the only command of its call (the guard checks what it pushes before the line runs): run git commit in its own call first, then git push alone');
+});
+test('mutation runs (fix pass 2, routine paths): every new rule is needed by some case (kind and reason)', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass2-'));
+  const survivors = [];
+  const right = (d, want, re) => kindOf(d) === want && (!re || re.test(d.ask ?? d.deny));
+  for (const [name, input, want, io, re] of PASS2_ROUTINE_CASES) assert.ok(right(await decide(input, io()), want, re), `unmutated rules: ${name}`);
+  try {
+    for (const [i, [label, from, to]] of PASS2_ROUTINE_MUTANTS.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `p${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [, input, want, io, re] of PASS2_ROUTINE_CASES) {
+        let d;
+        try { d = await m.decide(input, io()); } catch { caught = true; break; }
+        if (!right(d, want, re)) { caught = true; break; }
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no fix pass 2 case catches: ${survivors.join('; ')}`);
+});
+// Real git (fix pass 2, routine paths): realOrigin's project P, and a second clone Q that moves origin's cs/x to a
+// kit-changing commit after P's last fetch. Each row (its own state set up and undone) is decided with the real io by
+// the rules and by each mutant in a copy; a mutant is killed when every row named for it goes through (null) where
+// the rules refuse or ask. Then the night's handoff in two calls: the fetch alone, then the switch alone, which checks
+// the commit it lands on.
+test('real git (fix pass 2, SD-1, V-3, SD-2): the night line rule, the exact branch lookups and the file lists\' flags', async (t) => {
+  const { root, O, P, g } = realOrigin('guard-git-pass2-');
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const Q = join(root, 'q');
+  const q = (...a) => spawnSync('git', a, { cwd: Q, env, encoding: 'utf8' });
+  const rev = (r) => g('rev-parse', '--verify', '--end-of-options', `${r}^{commit}`).stdout.trim();
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass2-real-'));
+  const branch = (name, edit) => {
+    g('switch', '-q', '-c', name, 'origin/main');
+    edit();
+    g('add', '-A');
+    g('commit', '-q', '-m', name);
+    g('push', '-q', 'origin', name);
+    g('switch', '-q', 'main');
+  };
+  const uni = join(P, '.claude', 'agents', 'é.md');
+  try {
+    process.env.CLAUDE_PROJECT_DIR = P;
+    const ioFor = (role) => ({ ...realIo(), env: role ? { SHAMBLE_ROLE: role } : {} });
+    branch('cs/ok', () => writeFileSync(join(P, 'docs', 'a.md'), 'ok\n'));
+    branch('cs/x', () => writeFileSync(join(P, 'docs', 'a.md'), 'x1\n'));
+    branch('cs/n', () => writeFileSync(join(P, 'docs', 'a.md'), 'n1\n'));
+    branch('cs/ren', () => g('mv', '.claude/settings.json', 'docs/settings.json'));
+    branch('cs/uni', () => { mkdirSync(join(P, '.claude', 'agents'), { recursive: true }); writeFileSync(uni, 'x\n'); });
+    g('fetch', '-q', 'origin');
+    g('branch', '-q', '-D', 'cs/ok', 'cs/x', 'cs/n', 'cs/evil'); // on origin only; cs/ren and cs/uni stay local (day rows)
+    assert.equal(spawnSync('git', ['clone', '-q', O, Q], { env }).status, 0);
+    q('switch', '-q', 'cs/x');
+    writeFileSync(join(Q, '.claude', 'settings.json'), '{"a":3}\n');
+    q('commit', '-q', '-am', 'x2');
+    q('push', '-q', 'origin', 'cs/x');
+    const clean = rev('refs/remotes/origin/cs/ok');
+    const onBranch = (b, more = () => {}) => () => { g('switch', '-q', b); more(); };
+    const back = () => { g('reset', '-q', '--hard'); g('switch', '-q', 'main'); g('branch', '-q', '-D', 'cs/c'); };
+    const scratch = (more) => () => { g('switch', '-q', '-c', 'cs/c', 'origin/main'); more(); };
+    const relative = (on) => g('config', ...(on ? ['diff.relative', 'true'] : ['--unset', 'diff.relative']));
+    // [label, role, command, cwd, want, setup, undo]
+    const rows = [
+      ['C3b', NIGHT, 'git fetch -q origin cs/x && git switch -q cs/x', P, DENY],
+      ['C3c', NIGHT, 'git branch cs/n origin/cs/evil && git switch -q cs/n', P, DENY],
+      ['pr-advisor step 0', PRA, 'git fetch -q origin main && git switch --detach origin/main', P, null],
+      ['13a', NIGHT, 'git switch cs/evil', P, DENY, () => g('update-ref', 'refs/tags/refs/heads/cs/evil', clean), () => g('update-ref', '-d', 'refs/tags/refs/heads/cs/evil')],
+      ['tag heads/cs/t1', NIGHT, 'git switch cs/t1', P, DENY, () => g('update-ref', 'refs/tags/refs/heads/cs/t1', clean), () => g('update-ref', '-d', 'refs/tags/refs/heads/cs/t1')],
+      ['tag remotes/origin/cs/t2', NIGHT, 'git switch cs/t2', P, DENY,
+        () => g('update-ref', 'refs/tags/refs/remotes/origin/cs/t2', clean), () => g('update-ref', '-d', 'refs/tags/refs/remotes/origin/cs/t2')],
+      ['day switch rename', DAY, 'git switch cs/ren', P, ASK],
+      ['day switch non-ASCII', DAY, 'git switch cs/uni', P, ASK],
+      ['day switch relative', DAY, 'git switch cs/uni', join(P, 'docs'), ASK, () => relative(true), () => relative(false)],
+      ['push rename', NIGHT, 'git push origin cs/ren', P, DENY, onBranch('cs/ren'), () => g('switch', '-q', 'main')],
+      ['push non-ASCII', NIGHT, 'git push origin cs/uni', P, DENY, onBranch('cs/uni'), () => g('switch', '-q', 'main')],
+      ['push relative', NIGHT, 'git push origin cs/uni', join(P, 'docs'), DENY, onBranch('cs/uni', () => relative(true)),
+        () => { relative(false); g('switch', '-q', 'main'); }],
+      ['commit --cached rename', NIGHT, 'git commit -m m', P, DENY, scratch(() => g('mv', '.claude/settings.json', 'docs/s.json')), back],
+      ['commit --cached non-ASCII', NIGHT, 'git commit -m m', P, DENY,
+        scratch(() => { mkdirSync(dirname(uni), { recursive: true }); writeFileSync(uni, 'y\n'); g('add', '-A'); }), back],
+      ['commit --cached relative', NIGHT, 'git commit -m m', join(P, 'docs'), DENY,
+        scratch(() => { writeFileSync(join(P, '.claude', 'settings.json'), '{"a":4}\n'); g('add', '-A'); relative(true); }), () => { relative(false); back(); }],
+      ['commit -a moved away', NIGHT, 'git commit -a -m m', P, DENY,
+        scratch(() => { writeFileSync(join(P, 'docs', 's.json'), readFileSync(join(P, '.claude', 'settings.json'))); rmSync(join(P, '.claude', 'settings.json')); }),
+        () => { rmSync(join(P, 'docs', 's.json'), { force: true }); back(); }],
+      ['commit -a non-ASCII', NIGHT, 'git commit -a -m m', P, DENY, onBranch('cs/uni', () => writeFileSync(uni, 'z\n')),
+        () => { g('reset', '-q', '--hard'); g('switch', '-q', 'main'); }],
+      ['commit -a relative', NIGHT, 'git commit -a -m m', join(P, 'docs'), DENY,
+        scratch(() => { writeFileSync(join(P, '.claude', 'settings.json'), '{"a":5}\n'); relative(true); }), () => { relative(false); back(); }],
+      ['control: night switch cs/ok alone', NIGHT, 'git switch cs/ok', P, null],
+      ['control: night commit of docs', NIGHT, 'git commit -m m', P, null, scratch(() => { writeFileSync(join(P, 'docs', 'a.md'), 'c\n'); g('add', '-A'); }), back],
+    ];
+    // [label, from, to, the rows it must let through]
+    const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+    const muts = [
+      ['SD-1 the night line rule', "if (role === 'night-shift' && NIGHT_ALONE[sub] && !line.alone) {", 'if (false) {', ['C3b', 'C3c']],
+      ['V-3 the branch leg is exact', 'exactCommit(`refs/heads/${name}`, vcwd, io) ??', 'commitOf(`refs/heads/${name}`, vcwd, io) ??', ['13a', 'tag heads/cs/t1']],
+      ['V-3 the origin/<name> leg is exact', '?? exactCommit(`refs/remotes/origin/${name}`, vcwd, io);', '?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);',
+        ['tag remotes/origin/cs/t2']],
+      ['SD-2 -z', "const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative'];", "const DIFF_NAMES = ['--name-only', '--no-renames', '--no-relative'];",
+        ['day switch non-ASCII', 'push non-ASCII', 'commit --cached non-ASCII', 'commit -a non-ASCII']],
+      ['SD-2 --no-renames', "const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative'];", "const DIFF_NAMES = ['--name-only', '-z', '--no-relative'];",
+        ['day switch rename', 'push rename', 'commit --cached rename']],
+      ['SD-2 --no-relative', "const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative'];", "const DIFF_NAMES = ['--name-only', '-z', '--no-renames'];",
+        ['day switch relative', 'push relative', 'commit --cached relative', 'commit -a relative']],
+      ['SD-2 protectedHit uses DIFF_NAMES', "const d = io.git(['diff', ...DIFF_NAMES, ...range], vcwd);", "const d = io.git(['diff', '--name-only', ...range], vcwd);",
+        ['day switch rename', 'day switch non-ASCII', 'day switch relative', 'push rename', 'push non-ASCII', 'push relative']],
+      ['SD-2 the staged list uses DIFF_NAMES', "io.git(['diff', '--cached', ...DIFF_NAMES], vcwd)", "io.git(['diff', '--cached', '--name-only'], vcwd)",
+        ['commit --cached rename', 'commit --cached non-ASCII', 'commit --cached relative']],
+      ['SD-2 the -a list uses DIFF_NAMES', "lists.push(io.git(['diff', ...DIFF_NAMES], vcwd));", "lists.push(io.git(['diff', '--name-only'], vcwd));",
+        ['commit -a non-ASCII', 'commit -a relative']],
+    ];
+    const mods = [['rules', { decide }]];
+    for (const [i, [label, from, to]] of muts.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `real mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `r${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => to));
+      mods.push([label, await import(pathToFileURL(file).href)]);
+    }
+    const seen = new Map(mods.map(([label]) => [label, new Map()]));
+    for (const [label, role, command, cwd, , setup, undo] of rows) {
+      setup?.();
+      try {
+        for (const [m, mod] of mods) seen.get(m).set(label, kindOf(await mod.decide(dsh(command, { cwd }), ioFor(role))));
+      } finally { undo?.(); }
+    }
+    for (const [label, , , , want] of rows) assert.equal(seen.get('rules').get(label), want, `real row ${label}`);
+    for (const [label] of muts) t.diagnostic(`${label}: lets through ${[...seen.get(label)].filter(([r, k]) => k === null && seen.get('rules').get(r) !== null).map(([r]) => r).join(', ')}`);
+    const survivors = muts.filter(([label, , , through]) => !through.every((r) => seen.get(label).get(r) === null)).map(([label]) => label);
+    assert.deepEqual(survivors, [], `real mutants a named row does not let through: ${survivors.join('; ')}`);
+    // the trap V-3 closes is real in this git: rev-parse reads the tag refs/tags/refs/heads/cs/evil for refs/heads/cs/evil
+    g('update-ref', 'refs/tags/refs/heads/cs/evil', clean);
+    assert.equal(rev('refs/heads/cs/evil'), clean, 'rev-parse guesses the tag');
+    assert.notEqual(g('show-ref', '--verify', '--hash', 'refs/heads/cs/evil').status, 0, 'show-ref --verify does not');
+    g('update-ref', '-d', 'refs/tags/refs/heads/cs/evil');
+    // SD-1, the handoff in two calls: the fetch alone, then the switch alone sees what the fetch brought
+    const night = async (command) => kindOf(await decide(dsh(command, { cwd: P }), ioFor(NIGHT)));
+    assert.equal(await night('git fetch -q origin cs/x'), null, 'the fetch alone');
+    assert.equal(g('fetch', '-q', 'origin', 'cs/x').status, 0);
+    assert.match((await decide(dsh('git switch -q cs/x', { cwd: P }), ioFor(NIGHT)))?.deny ?? '', /cs\/x's rules, CI or gate files differ from main's \(\.claude\/settings\.json\)/,
+      'then the switch alone is checked against the fetched commit');
+    q('switch', '-q', 'cs/ok');
+    writeFileSync(join(Q, 'docs', 'a.md'), 'ok2\n');
+    q('commit', '-q', '-am', 'ok2');
+    q('push', '-q', 'origin', 'cs/ok');
+    assert.equal(await night('git fetch -q origin cs/ok'), null, 'the fetch alone');
+    assert.equal(g('fetch', '-q', 'origin', 'cs/ok').status, 0);
+    const checked = rev('refs/remotes/origin/cs/ok');
+    assert.equal(checked, q('rev-parse', 'HEAD').stdout.trim(), 'the fetch brought the new cs/ok');
+    assert.equal(await night('git switch -q cs/ok'), null, 'cs/ok changes docs only');
+    assert.equal(g('switch', '-q', 'cs/ok').status, 0);
+    assert.equal(rev('HEAD'), checked, 'the switch landed on the commit the guard checked');
+    g('switch', '-q', 'main');
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(root, { recursive: true, force: true });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+// Real git and bash (fix pass 2, day paths): realOrigin's project P with a worktree W under .gate/, a missing folder M,
+// a folder N outside any repository, and a second clone Q that moves origin's cs/x to a kit-changing commit after P's
+// last fetch. Each row is decided with the real io by the rules and by each mutant in a copy (a mutant is killed when
+// every row named for it goes through); then real bash runs the SD-3 and SD-4 rows and shows the main folder moved.
+test('real git (fix pass 2, day: SD-3 C3d, SD-4 C1 C1c C2 C3, SD-6): the asks are real, the controls stay quiet', async (t) => {
+  const { root, O, P, g } = realOrigin('guard-git-pass2-day-');
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const Q = join(root, 'q'), W = join(P, '.gate', 'wt'), M = join(root, 'missing'), N = join(root, 'nonrepo');
+  const q = (...a) => spawnSync('git', a, { cwd: Q, env, encoding: 'utf8' });
+  const bash = (line) => spawnSync('bash', ['--norc', '--noprofile', '-c', line], { cwd: P, env, encoding: 'utf8' });
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-pass2-day-real-'));
+  try {
+    process.env.CLAUDE_PROJECT_DIR = P;
+    const io = { ...realIo(), env: {} };
+    g('switch', '-q', '-c', 'cs/x', 'origin/main');
+    writeFileSync(join(P, 'docs', 'a.md'), 'x1\n');
+    g('commit', '-q', '-am', 'x1');
+    g('push', '-q', 'origin', 'cs/x');
+    g('switch', '-q', 'main');
+    g('branch', '-q', '-D', 'cs/x');
+    g('fetch', '-q', 'origin');
+    assert.equal(spawnSync('git', ['clone', '-q', O, Q], { env }).status, 0);
+    q('switch', '-q', 'cs/x');
+    writeFileSync(join(Q, '.claude', 'settings.json'), '{"a":3}\n');
+    q('commit', '-q', '-am', 'x2');
+    q('push', '-q', 'origin', 'cs/x');
+    assert.equal(g('worktree', 'add', '-q', '--detach', W, 'main').status, 0, 'setup: a worktree under .gate/');
+    mkdirSync(N);
+    mkdirSync(join(P, '.gate', 'empty'));
+    // [label, command, want]; every row from the main folder P
+    const rows = [
+      ['C3d', 'git fetch -q origin cs/x && git switch --detach origin/cs/x', ASK],
+      ['WT-UPDATE', 'git fetch origin main && git merge --ff-only origin/main', null],
+      ['step 0', 'git fetch -q origin main && git switch --detach origin/main', null],
+      ['C1', `cd ${M} && cd ${W}; git switch -q -c cs/c1 origin/cs/evil`, ASK],
+      ['C1c', `cd ${M} && cd ${N}; echo x > CLAUDE.md`, ASK],
+      ['C2', `! cd ${P} && cd ./.gate/wt; git switch -q -c cs/c2 origin/cs/evil`, ASK],
+      ['C3', `cd ${P} && cd ${M} && cd ${W}; git switch -q -c cs/c3 origin/cs/evil`, ASK],
+      ['; control', `cd ${M}; cd ${W}; git switch -q -c cs/c0 origin/cs/evil`, null],
+      ['rm -rf .gate', 'rm -rf .gate', ASK],
+      ['rm -r .gate', 'rm -r .gate', ASK],
+      ['rm -rf <abs>/.gate', `rm -rf ${P}/.gate`, ASK],
+      ['mv .gate x', 'mv .gate x', ASK],
+      ['rm -rf .gate/empty', 'rm -rf .gate/empty', null],
+    ];
+    // [label, from, to, the rows it must let through]
+    const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+    const muts = [
+      ['SD-3 a switch after an earlier git command asks', "else if (line.gitBefore && pos[0] !== 'origin/main') {", 'else if (false) {', ['C3d']],
+      ['SD-4 a cd after && while the folder is unknown', "if (c.sep === '&&' && !dirs.known) {", 'if (false) {', ['C1', 'C1c', 'C3']],
+      ['SD-4 ! does not reach a cd', "const CD_REACH = new Set(['if', '{', 'time',", "const CD_REACH = new Set(['if', '{', '!', 'time',", ['C2']],
+      ['SD-6 a folder holding a worktree of this repository', 'if (wt !== undefined) return', 'if (false) return',
+        ['rm -rf .gate', 'rm -r .gate', 'rm -rf <abs>/.gate', 'mv .gate x']],
+    ];
+    const mods = [['rules', { decide }]];
+    for (const [i, [label, from, to]] of muts.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `real mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `d${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => to));
+      mods.push([label, await import(pathToFileURL(file).href)]);
+    }
+    const seen = new Map(mods.map(([label]) => [label, new Map()]));
+    for (const [label, command] of rows) {
+      for (const [m, mod] of mods) seen.get(m).set(label, kindOf(await mod.decide(dsh(command, { cwd: P }), io)));
+    }
+    for (const [label, , want] of rows) assert.equal(seen.get('rules').get(label), want, `real row ${label}`);
+    for (const [label] of muts) t.diagnostic(`${label}: lets through ${[...seen.get(label)].filter(([r, k]) => k === null && seen.get('rules').get(r) !== null).map(([r]) => r).join(', ')}`);
+    const survivors = muts.filter(([label, , , through]) => !through.every((r) => seen.get(label).get(r) === null)).map(([label]) => label);
+    assert.deepEqual(survivors, [], `real mutants a named row does not let through: ${survivors.join('; ')}`);
+    // what the asks are about is real: real bash moves the main folder, or writes its CLAUDE.md
+    const head = () => g('rev-parse', 'HEAD').stdout.trim();
+    const mainHead = head();
+    const settings = () => readFileSync(join(P, '.claude', 'settings.json'), 'utf8');
+    for (const [label, branch] of [['C1', 'cs/c1'], ['C2', 'cs/c2'], ['C3', 'cs/c3']]) {
+      bash(rows.find(([l]) => l === label)[1]);
+      assert.equal(g('branch', '--show-current').stdout.trim(), branch, `real bash ${label}: the main folder switched to ${branch}`);
+      assert.equal(settings(), '{"a":2}\n', `real bash ${label}: the main folder now runs cs/evil's settings`);
+      g('switch', '-q', 'main');
+    }
+    bash(rows.find(([l]) => l === 'C1c')[1]);
+    assert.equal(readFileSync(join(P, 'CLAUDE.md'), 'utf8'), 'x\n', 'real bash C1c: the main CLAUDE.md was overwritten');
+    g('restore', '--', 'CLAUDE.md');
+    bash(rows.find(([l]) => l === '; control')[1]);
+    assert.equal(g('branch', '--show-current').stdout.trim(), 'main', 'real bash, the ; control: the main folder stayed on main');
+    assert.equal(head(), mainHead);
+    bash(rows.find(([l]) => l === 'C3d')[1]);
+    assert.equal(settings(), '{"a":3}\n', 'real bash C3d: the fetch moved origin/cs/x, and the main folder landed on the kit change');
+    g('switch', '-q', 'main');
+    assert.equal(settings(), '{"a":1}\n');
   } finally {
     if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
     rmSync(root, { recursive: true, force: true });

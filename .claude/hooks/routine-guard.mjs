@@ -109,7 +109,9 @@ export function kitPath(p, cwd, io) {
 // A write target that is a folder holding kit files: the worktree's top, .claude, .github or tools, or a folder with a
 // CLAUDE.md in it; and (fix round SA-6, by construction) an existing folder that is the project folder's top or an
 // ancestor of it, or whose tracked files (git ls-files -z, run from its worktree's top) name a kit path. If git cannot
-// list them, the folder asks.
+// list them, the folder asks. Fix pass 2 (SD-6): so does a folder that holds a worktree of this repository (a path
+// git worktree list --porcelain -z prints, run from the project folder, at or under it), in a repository or not; if
+// git cannot list the worktrees, the folder asks.
 function kitDir(p, cwd, io) {
   const abs = realOf(isAbsolute(p) ? p : resolve(cwd, p), io);
   const g = gitPlace(abs, io);
@@ -118,6 +120,11 @@ function kitDir(p, cwd, io) {
   if (io.exists(join(abs, 'CLAUDE.md'))) return `${p}/CLAUDE.md`;
   if (!(io.isDir ? io.isDir(abs) : io.exists(abs))) return null;
   if (relIn(fold(abs, io), fold(realOf(io.projectDir, io), io)) !== null) return `${p} (it holds the project folder)`;
+  const wts = io.git(['worktree', 'list', '--porcelain', '-z'], io.projectDir);
+  if (wts.code !== 0) return `${p} (the guard could not list this repository's worktrees)`;
+  const wt = wts.out.split('\0').filter((l) => l.startsWith('worktree ')).map((l) => l.slice(9))
+    .find((w) => relIn(fold(abs, io), fold(realOf(w, io), io)) !== null);
+  if (wt !== undefined) return `${p} (it holds the worktree ${wt})`;
   if (!g) return null;
   const ls = io.git(['ls-files', '-z', '--', relIn(g.top, abs) ?? rel], g.top);
   if (ls.code !== 0) return `${p} (the guard could not list its files)`;
@@ -502,6 +509,10 @@ async function bash(command, cwd, role, io, input) {
   // day sessions (fix round R-a..R-e): known false is the unknown ("lost") folder, a state, not a folder; lead stays
   // true while the line has run nothing but cd, pushd and popd; stack is the line's pushd stack (null: an unknown entry)
   const dirs = { stack: [], known: true, lead: true };
+  // what git() reads of the whole line: alone, the line is this one command (parseShell drops the empty command after
+  // a trailing ';' or newline), with no pipe, background job, subshell or substitution (fix pass 2, SD-1); gitBefore
+  // (set below once a git command has run): a git command came earlier in the line (fix pass 2, SD-3, day main folder)
+  const line = { alone: cmds.length === 1 && !forks && !subs };
   for (const c of cmds) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
@@ -537,7 +548,7 @@ async function bash(command, cwd, role, io, input) {
       }
     }
     let r = null;
-    if (prog === 'git') r = await git(argv, vcwd, role, io, input);
+    if (prog === 'git') { r = await git(argv, vcwd, role, io, input, line); line.gitBefore = true; }
     else if (prog === 'gh') r = await gh(argv, role, io, vcwd, input);
     else if (role) r = await routineProgram(prog, argv, vcwd, role, io);
     if (!role && r?.ask) { dayAsk ??= r; continue; }
@@ -555,7 +566,7 @@ const GIT_PLACE_VARS = /GIT_(DIR|WORK_TREE|COMMON_DIR|INDEX_FILE)/; // fix round
 // git clone's options that take the next word as their value (F-b: so the URL and the folder are found)
 const CLONE_VALUE = new Set(['-o', '--origin', '-b', '--branch', '-u', '--upload-pack', '--reference', '--reference-if-able',
   '--depth', '--shallow-since', '--shallow-exclude', '-c', '--config', '--template', '-j', '--jobs', '--filter',
-  '--bundle-uri', '--server-option', '--ref-format']);
+  '--bundle-uri', '--server-option', '--ref-format', '--revision']);
 // the folder git clone makes when none is given: the URL's last part without a trailing / or /.git, and without .git
 // or .bundle (as git's own guess)
 const cloneDir = (url) => url.replace(/\/+$/, '').replace(/\/\.git$/, '').replace(/\/+$/, '').split(/[/:\\]/).pop()
@@ -611,8 +622,11 @@ function writtenBy(argv) {
       if (w.startsWith('-') && w.length > 1) continue;
       pos.push(w);
     }
-    const dir = pos.length > 1 ? pos[1] : pos.length ? cloneDir(pos[0]) : '';
-    return [...(dir ? [dir] : []), ...gitDir];
+    // fix pass 2 (SD-5): every positional word after the first (an option the guard does not know may take a value,
+    // which shifts the URL and the folder) and the folder git would make from each positional word (leaving out the
+    // results . and .., which name no new folder: git clone . <dir>)
+    const made = pos.map(cloneDir).filter((d) => d && d !== '.' && d !== '..');
+    return [...pos.slice(1), ...made, ...gitDir];
   }
   if (prog === 'sed' || prog === 'perl') { // sed -i / --in-place[=SUF] (any prefix from --i: SA-5); perl -i / -pi / -pi.bak
     const inPlace = prog === 'sed' ? (w) => /^-[^-]*i/.test(w) || (w.split('=')[0].length >= 3 && '--in-place'.startsWith(w.split('=')[0]))
@@ -670,16 +684,19 @@ function dayShellWrites(c, argv, vcwd, io, input) {
 // where the line's text fixes it; anything else makes it unknown (dirs.known false), and an unknown folder makes both
 // checks ask: a relative write target asks (an agent is refused), and the main-folder check reads the project folder.
 // Followed (R-b, R-c, R-d): a cd, pushd or popd in the line's leading run (before any other command), spelled as the
-// bare word, reached only through `if`, `{`, `!`, `time`, `builtin` or `command` (-p, --), not after `||`, in a line
-// with no subshell, pipe, background job or substitution; its target absolute, `.`, `..`, or starting with `./` or
-// `../`, with no option but `-L` (cd) and `--`, and a folder that exists and can be entered now (so the cd cannot
-// fail); pushd and popd on a stack of known entries. Unknown by construction: bare names (CDPATH, cdable_vars), `~`,
-// no target (HOME), `-`, variables and globs; a cd behind then/else/elif/do/while/until (a branch or loop may skip or
-// repeat it), behind `command -v`/`-V` (it does not run), a program wrapper, exec or a VAR= prefix, or spelled as a
-// path. R-e: after source, `.`, eval, exec, or a program word that starts with `-` or holds `$` or a backtick, the
-// folder is unknown (only shell builtins move the shell's folder).
+// bare word, reached only through `if`, `{`, `time`, `builtin` or `command` (-p, --), not after `||`, nor after `&&`
+// while the folder is unknown (fix pass 2, SD-4: the cd before it may have failed, and bash then skips this one), in
+// a line with no subshell, pipe, background job or substitution; its target absolute, `.`, `..`, or starting with
+// `./` or `../`, with no option but `-L` (cd) and `--`, and a folder that exists and can be entered now (so the cd
+// cannot fail); pushd and popd on a stack of known entries. Unknown by construction: bare names (CDPATH,
+// cdable_vars), `~`, no target (HOME), `-`, variables and globs; a cd behind `!` (SD-4: it turns the cd's success into
+// a failure, so a later `&&` skips), then/else/elif/do/while/until (a branch or loop may skip or repeat it), behind
+// `command -v`/`-V` (it does not run), a program wrapper, exec or a VAR= prefix, or spelled as a path. R-e: after
+// source, `.`, eval, exec, function, trap or alias (fix pass 2, V-1: a function defined with the keyword, a DEBUG or
+// RETURN trap, or an alias can run a cd in this shell later in the line), or a program word that starts with `-` or
+// holds `$` or a backtick, the folder is unknown (only shell builtins move the shell's folder).
 const UNKNOWN_FIX = 'write to an absolute path, or put the cd first in the line';
-const CD_REACH = new Set(['if', '{', '!', 'time', 'builtin', 'command', '-p', '--']);
+const CD_REACH = new Set(['if', '{', 'time', 'builtin', 'command', '-p', '--']);
 function dayFolder(c, argv, vcwd, dirs, forked, io) {
   const unknown = () => { dirs.known = false; return vcwd; };
   const prefix = c.argv.slice(0, c.argv.length - argv.length);
@@ -689,11 +706,18 @@ function dayFolder(c, argv, vcwd, dirs, forked, io) {
     if (!argv.length && !c.redirects.length && !c.reads.length && prefix.every((w) => WRAPPERS.has(w))) return vcwd;
     dirs.lead = false;
     if (prefix.includes('exec') || ['source', '.', 'eval'].includes(prog) || /^-|[$`]/.test(argv[0] ?? '')) return unknown();
+    if (['function', 'trap', 'alias'].includes(prog)) return unknown(); // fix pass 2 (V-1), as command words only
     return vcwd;
   }
   const here = dirs.known ? vcwd : null;
   if (!dirs.lead || forked || c.sep === '||' || argv[0] !== prog || !prefix.every((w) => CD_REACH.has(w))) {
     dirs.lead = false; // no later cd, pushd or popd is followed, so the stack is not read again
+    return unknown();
+  }
+  // fix pass 2 (SD-4): joined by && while the folder is unknown, bash may have skipped it (the cd before it failed):
+  // the folder stays unknown, and so does a stack a skipped pushd or popd may not have changed
+  if (c.sep === '&&' && !dirs.known) {
+    if (prog !== 'cd') dirs.stack = null;
     return unknown();
   }
   let a = argv.slice(1);
@@ -772,7 +796,15 @@ function interpreter(prog, argv, vcwd, role, io) {
   return null;
 }
 
-async function git(argv, vcwd, role, io, input = {}) {
+// SD-1 (fix pass 2), the night shift: what the guard checks before the line runs (the switch's target, the commit's
+// files, the pushed branch) must be what git then reads, so git switch, commit and push run alone in their call.
+const NIGHT_ALONE = {
+  switch: ['checks its target', 'run git fetch in its own call first, then git switch <branch> alone'],
+  commit: ['checks what it commits', 'run git add in its own call first, then git commit alone'],
+  push: ['checks what it pushes', 'run git commit in its own call first, then git push alone'],
+};
+// line: what bash() knows of the whole line ({ alone }); missing, a night switch, commit or push is refused
+async function git(argv, vcwd, role, io, input = {}, line = {}) {
   let i = 1;
   if (argv[1] === '--version' || argv[1] === '--help' || argv.length === 1) return null;
   if (argv[1]?.startsWith('-')) return deny('git: no option before the subcommand (run git from the folder, without -C, -c or --git-dir)');
@@ -791,6 +823,11 @@ async function git(argv, vcwd, role, io, input = {}) {
   if (sub === 'merge' && role) return deny(`routine (${role}): no git merge in routines (a day session merges main in)`);
   if (role && !GIT_ROUTINE.has(sub)) return deny(`routine (${role}): git ${sub} is not on the routines' list`);
   if (role === 'pr-advisor' && !GIT_READ.has(sub)) return deny(`routine (pr-advisor): git ${sub}: the PR Advisor only reads`);
+  if (role === 'night-shift' && NIGHT_ALONE[sub] && !line.alone) {
+    const [checks, fix] = NIGHT_ALONE[sub];
+    return deny(`routine (night-shift): git ${sub} runs alone, the only command of its call (the guard ${checks} ` +
+      `before the line runs): ${fix}`);
+  }
   const rest = gitArgsCheck(sub, args, io);
   if (typeof rest === 'string') return deny(rest);
   if (sub === 'reset') { // only unstaging: [HEAD] [-- <path>...]; anything that could name another commit is refused
@@ -842,11 +879,18 @@ async function git(argv, vcwd, role, io, input = {}) {
   const night = sub === 'switch' && role === 'night-shift' ? switchTargetCheck(args, vcwd, io) : null;
   if (night) return deny(night);
   if (sub === 'commit' && role === 'night-shift') {
-    const staged = io.git(['diff', '--cached', '--name-only'], vcwd).out.split('\n');
-    const all = args.some((a) => a === '-a' || a === '--all' || /^-[A-Za-z]*a/.test(a)) ? io.git(['diff', '--name-only'], vcwd).out.split('\n') : [];
-    const named = rest.includes('--') ? rest.slice(rest.indexOf('--') + 1) : [];
+    // fix pass 2 (SD-2): git's lists read as DIFF_NAMES gives them (NUL-separated, untrimmed); a list git can't give
+    // is refused; the paths named after -- are the command's own words, trimmed as before
+    const lists = [io.git(['diff', '--cached', ...DIFF_NAMES], vcwd)];
+    const all = args.some((a) => a === '-a' || a === '--all' || /^-[A-Za-z]*a/.test(a));
+    if (all) lists.push(io.git(['diff', ...DIFF_NAMES], vcwd));
+    if (lists.some((d) => d.code !== 0)) {
+      return deny("routine (night-shift): git can't list what the commit would change; run git status, then commit");
+    }
+    const named = (rest.includes('--') ? rest.slice(rest.indexOf('--') + 1) : []).map((f) => f.trim());
     const top = gitTop(vcwd, io);
-    const hit = [...staged, ...all, ...named].map((f) => f.trim()).filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
+    const hit = [...lists.flatMap((d) => d.out.split('\0')), ...named].filter(Boolean)
+      .find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
     if (hit) return deny(`routine (night-shift): the commit would change ${hit} (a rules, CI or gate file)`);
   }
   if ((sub === 'rm' || sub === 'mv' || sub === 'add') && role) {
@@ -855,7 +899,7 @@ async function git(argv, vcwd, role, io, input = {}) {
       if (rel !== null && protectedRel(rel) && sub !== 'add') return deny(`routine (${role}): git ${sub} ${rel} (a rules, CI or gate file)`);
     }
   }
-  if (!role) return mainFolderMove(sub, args, vcwd, io, input);
+  if (!role) return mainFolderMove(sub, args, vcwd, io, input, line);
   return null;
 }
 // A path git printed relative to its top level, as a project-relative path (worktrees under .claude/worktrees/ map
@@ -864,13 +908,17 @@ const gitTop = (vcwd, io) => io.git(['rev-parse', '--show-toplevel'], vcwd).out.
 function worktreeRel(f, top, vcwd, io) {
   return projectRel(join(top, f), vcwd, io) ?? f;
 }
-// The first protected file `git diff --name-only <range...>` names: { hit }, { failed: true } when git can't compare,
+// fix pass 2 (SD-2): how the guard has git list changed files: NUL-separated (-z: a non-ASCII name is not quoted),
+// renames off (a kit file moved away still names its old path) and relative output off (diff.relative), so every
+// name is relative to the worktree's top.
+const DIFF_NAMES = ['--name-only', '-z', '--no-renames', '--no-relative'];
+// The first protected file `git diff <DIFF_NAMES> <range...>` names: { hit }, { failed: true } when git can't compare,
 // or null.
 function protectedHit(range, vcwd, io) {
-  const d = io.git(['diff', '--name-only', ...range], vcwd);
+  const d = io.git(['diff', ...DIFF_NAMES, ...range], vcwd);
   if (d.code !== 0) return { failed: true };
   const top = gitTop(vcwd, io);
-  const hit = d.out.split('\n').map((f) => f.trim()).filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
+  const hit = d.out.split('\0').filter(Boolean).find((f) => protectedRel(worktreeRel(f, top, vcwd, io)));
   return hit ? { hit } : null;
 }
 function protectedInBranch(vcwd, io) {
@@ -886,7 +934,9 @@ function protectedInBranch(vcwd, io) {
 // files (protectedRel) equal main's, because the folder's hook code runs this session from the next call. Every night
 // switch is checked, in any folder. Only the forms git switch <branch>, -c <new> [<start>] and --detach [<ref>] (with
 // -q) go on. The target is resolved to a commit as git reads it: a plain name as the branch refs/heads/<name>, else
-// refs/remotes/origin/<name> (git switch creates the branch from it); -c's start point and --detach's ref by rev-parse;
+// refs/remotes/origin/<name> (git switch creates the branch from it), each by its exact full name (fix pass 2, V-3:
+// git show-ref --verify, so a tag such as refs/tags/refs/heads/<name> never answers for the branch), then peeled to
+// its commit; -c's start point and --detach's ref by rev-parse, as git reads them (the line holds nothing else, SD-1);
 // HEAD when none is named. origin/main must be refs/remotes/origin/main's commit (originMainCheck, SA-2); then only
 // the two SHAs reach git. The names are read as tree paths, NUL-separated (-z: no quoted names), with renames off (a
 // kit file moved away still names its old path) and relative output off (diff.relative). Returns the refusal, or null.
@@ -915,7 +965,7 @@ function switchTargetCheck(args, vcwd, io) {
   const name = pos[0];
   const target = name ?? 'HEAD';
   const sha = create !== null || detach ? commitOf(target, vcwd, io)
-    : commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);
+    : exactCommit(`refs/heads/${name}`, vcwd, io) ?? exactCommit(`refs/remotes/origin/${name}`, vcwd, io);
   const forged = originMainCheck(vcwd, io, 'night-shift');
   if (forged) return forged;
   const main = commitOf(ORIGIN_MAIN, vcwd, io);
@@ -941,6 +991,14 @@ function commitOf(ref, vcwd, io) {
   const r = io.git(['rev-parse', '--verify', '--end-of-options', `${ref}^{commit}`], vcwd);
   const sha = r.code === 0 ? r.out.trim() : '';
   return /^([0-9a-f]{40}|[0-9a-f]{64})$/.test(sha) ? sha : null;
+}
+// fix pass 2 (V-3): the commit of the ref by this exact full name only (git show-ref --verify reads no other ref, as
+// rev-parse's guessing does), peeled by commitOf; null when there is no such ref.
+function exactCommit(full, vcwd, io) {
+  if (!full.startsWith('refs/')) return null;
+  const r = io.git(['show-ref', '--verify', '--hash', full], vcwd);
+  const sha = r.code === 0 ? r.out.trim() : '';
+  return /^([0-9a-f]{40}|[0-9a-f]{64})$/.test(sha) ? commitOf(sha, vcwd, io) : null;
 }
 // origin/main by commit, not by name (S-2): git reads a local branch or tag called origin/main before the remote one.
 function isOriginMain(ref, vcwd, io) {
@@ -1005,14 +1063,20 @@ function switchWords(args) { // git switch: { create, pos, odd, detach }
   }
   return { create, pos, odd, detach };
 }
-function mainFolderMove(sub, args, vcwd, io, input) {
+// line: what bash() knows of the whole line ({ gitBefore }); missing, no git command came before.
+function mainFolderMove(sub, args, vcwd, io, input, line = {}) {
   if (!['switch', 'merge', 'pull', 'bisect', 'pr checkout'].includes(sub)) return null;
   if (!sameDir(gitTop(vcwd, io), io.projectDir, io)) return null;
   const say = sub === 'pr checkout' ? 'gh pr checkout' : `git ${sub}`;
   let why = null, ref = '<ref>';
+  // fix pass 2 (SD-3): the guard resolves the target before the line runs, so an earlier git command in it (a fetch,
+  // a git branch) can move the target after the check; only the word origin/main goes on (main's own updates)
+  const later = (target) => `an earlier git command in this line could move ${target} after the guard checked it: ` +
+    `run git fetch in its own call first, then the ${sub} alone`;
   if (sub === 'switch') {
     const { create, pos, odd, detach } = switchWords(args);
     if (odd || pos[0] === '-') why = 'the guard cannot tell what it switches to';
+    else if (line.gitBefore && pos[0] !== 'origin/main') { ref = pos[0] ?? 'HEAD'; why = later(ref); }
     else if (create !== null) {
       if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {
         why = `it starts ${create} from ${pos[0]}, not origin/main`;
@@ -1036,7 +1100,8 @@ function mainFolderMove(sub, args, vcwd, io, input) {
     }
   } else if (sub === 'merge') {
     const t = args.length === 2 && args[0] === '--ff-only' ? args[1] : args.length === 1 ? args[0] : null;
-    if (t === null || !isOriginMain(t, vcwd, io)) {
+    if (t !== null && line.gitBefore && t !== 'origin/main') { ref = t; why = later(t); }
+    else if (t === null || !isOriginMain(t, vcwd, io)) {
       why = `only origin/main merges into the main folder (by commit: ${ORIGIN_MAIN})`;
     } else if (args.length === 1) {
       // a plain merge takes main's kit files exactly only when the branch changed none since the merge base (R2)
