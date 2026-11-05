@@ -99,7 +99,9 @@
     rules (comments, backslash-newline, ANSI-C, here-document delimiter as one word, `>&word`); P3-7 (clone targets
     narrowed); P3-8 named. Texts: an R-PLAIN rule line, L16 and L18 replaced, SD-3 and night-commit sentences,
     NIGHT_SHIFT.md step 7, follow-up FU-P3a.
-  - Now: fix pass 3 (builders: routine A, routine B, day C; then docs-keeper), then the gate and commits; then pass 4.
+  - Now: fix pass 3 (wf_8d8f9764-ff3: routine A, routine B, day C, then docs-keeper; notes `builder-pass3-routine-a.md`,
+    `builder-pass3-routine-b.md`, `builder-pass3-day.md`, `docs-keeper-pass3.md`), then the gate and commits (notes,
+    code, docs; "fix pass 3 (commit pending)" gets the code SHA); then pass 4.
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
