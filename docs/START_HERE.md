@@ -19,8 +19,9 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
 
 1. **`STATUS.md`** (where things stand), then **this file**, then **`MODULE_MAP.md`** (who owns what, load order).
 2. **Work in the git repo.** The five code files sit at the repo root: `shamble-core.js`, `shamble-game.js`,
-   `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from an up-to-date
-   `main` (`CLAUDE.md`, `/changeset`).
+   `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from `origin/main`
+   (`git fetch origin main` first; never move a session's main folder onto another branch: `CLAUDE.md`, Never;
+   `/changeset`).
 3. Set up the **toolkit** once per machine (§5): `cd tools && npm ci`.
 4. **Grep the one owning file** for the task (§6). Pull deep references only as needed:
    `TECHNICAL.md` (how) · `GAME_DESIGN.md` (why) · `LOOP_V2.md` (the core loop spec; supersedes GAME_DESIGN §5–6) ·

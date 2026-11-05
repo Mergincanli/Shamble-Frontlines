@@ -372,3 +372,62 @@ test('URL-encoded JWTs and sk- keys are refused; long kebab-case words are not',
   note(repo, 'slug.md', 'branch cs/task-legacy-inventory-and-tuning-tables-for-v2-research\n');
   assert.equal(run(repo, 'save', 'test', '-m', 'kebab').status, 0);
 });
+
+// Synthetic keys, split in the source so no line of this file holds a whole key shape (the saver's own scan stays clean).
+const SK = 'sk' + '-' + 'K'.repeat(40), AWS = 'AK' + 'IA' + 'Q'.repeat(16), ASIA = 'AS' + 'IA' + 'Q'.repeat(16);
+const SLACK = 'xo' + 'xb-' + 'S'.repeat(20);
+
+test('keys after a %XX or backslash escape are refused (sk-, AWS, Slack); risk- and other words are not', (t) => {
+  const { repo } = fixture(t);
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'clean').status, 0);
+  const head = sh(repo, 'rev-parse', 'HEAD');
+  const refused = [
+    [`q=%20${SK}`, 'API key'], [`a%2C${SK}`, 'API key'], [`a%2c${SK}`, 'API key'], [`k%3A${SK}`, 'API key'],
+    [`v=%22${SK}`, 'API key'], [`a%26${SK}`, 'API key'], [`p%2F${SK}`, 'API key'], [`l%0A${SK}`, 'API key'],
+    [`k%3D${SK}`, 'API key'], [`k%253A${SK}`, 'API key'], [`a%252C${SK}`, 'API key'], [`a%u002C${SK}`, 'API key'],
+    [`"line\\n${SK}"`, 'API key'], [`"\\u0022${SK}`, 'API key'], [`"a\\b${SK}"`, 'API key'], [`"a\\f${SK}"`, 'API key'],
+    [`a\\v${SK}`, 'API key'], [`a\\0${SK}`, 'API key'], [`a\\x2c${SK}`, 'API key'], [`a=2C${SK}`, 'API key'],
+    [`a%2C${AWS}`, 'AWS key'], [`k%3D${AWS}`, 'AWS key'], [`l%0A${ASIA}`, 'AWS key'], [`k=3D${AWS}`, 'AWS key'],
+    [`x%20${SLACK}`, 'Slack token'], [`k%3D${SLACK}`, 'Slack token'],
+  ];
+  for (const [i, [text, kind]] of refused.entries()) {
+    note(repo, `e${i}.md`, text + '\n');
+    const r = run(repo, 'save', 'test', '-m', 'escaped');
+    assert.equal(r.status, 1, text.slice(0, 8));
+    assert.match(r.stdout, new RegExp(`NOT committed: \\.checkpoints/e${i}\\.md looks like a ${kind}; remove or fix it`), text.slice(0, 8));
+    assert.doesNotMatch(r.stdout + r.stderr, /K{20}|Q{16}|S{20}/);
+    assert.equal(sh(repo, 'rev-parse', 'HEAD'), head);
+    rmSync(join(repo, '.checkpoints', `e${i}.md`));
+  }
+  const clean = ['risk-' + 'r'.repeat(40), '%20risk-' + 'r'.repeat(40),
+    '%2Ctask-legacy-inventory-and-tuning-tables-for-v2-research', '\\ndisk-' + 'd'.repeat(40),
+    '%2C' + 'sk' + '-' + 'K'.repeat(31), '%2C' + 'AK' + 'IA' + 'Q'.repeat(15), 'X' + 'AK' + 'IA' + 'Q'.repeat(16),
+    'my' + 'AK' + 'IA' + 'Q'.repeat(16), 'foo' + 'xo' + 'xb-' + 'S'.repeat(20), '%ZZ' + 'sk' + '-' + 'K'.repeat(40),
+    'https%3A%2F%2Fexample.invalid%2Fpath%3Fa%3D1', '100%25 done'];
+  for (const [i, text] of clean.entries()) note(repo, `w${i}.md`, text + '\n');
+  const r = run(repo, 'save', 'test', '-m', 'words');
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.doesNotMatch(r.stdout, /NOT committed/);
+  assert.equal(sh(repo, 'show', '--name-only', '--format=', 'HEAD').split('\n').length, clean.length);
+});
+
+test('save works from a linked worktree', (t) => {
+  const { root, origin, repo } = fixture(t);
+  const before = sh(repo, 'rev-parse', 'HEAD'), wt = join(root, 'wt');
+  sh(repo, 'worktree', 'add', '--quiet', '-b', 'cs/wt', wt, 'main');
+  sh(wt, 'push', '--quiet', '-u', 'origin', 'cs/wt');
+  note(wt);
+  const r = run(wt, 'save', 'test', '-m', 'from a worktree');
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.deepEqual(sh(wt, 'show', '--name-only', '--format=', 'HEAD').split('\n'), ['.checkpoints/test.md']);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
+  assert.equal(sh(wt, 'diff', '--cached', '--name-only'), '');
+  assert.equal(sh(repo, 'rev-parse', 'HEAD'), before);
+  assert.equal(sh(repo, 'symbolic-ref', '--short', 'HEAD'), 'cs/test');
+  note(wt, 'leak.md', `key ${SK}\n`);
+  const leak = run(wt, 'save', 'test', '-m', 'leak');
+  assert.equal(leak.status, 1);
+  assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
+});

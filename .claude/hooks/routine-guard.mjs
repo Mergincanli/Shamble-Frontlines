@@ -6,8 +6,9 @@
 //     (expectedHeadSha, same repository, gate and smoke green on that SHA);
 //   routines (SHAMBLE_ROLE = night-shift or pr-advisor, set only by the routine-only cloud environments): the role rules
 //     below as well;
-//   day sessions only (no SHAMBLE_ROLE; kit-v3-3): shell writes to kit and gate files ask first, and so do the git and
-//     gh commands that would move the main folder off main's reviewed rules; a subagent (agent_id set) is refused both.
+//   day sessions only (no SHAMBLE_ROLE; kit-v3-3): file-tool and shell writes to kit and gate files ask first, and so
+//     do the git and gh commands that would move the main folder off main's reviewed rules; a subagent (agent_id set)
+//     is refused both, and refused a shell write to a target the guard cannot resolve.
 // decide(input, io) returns null (no decision: the normal permission flow goes on), { deny, interrupt } or, in a day
 // session only, { ask }. It never allows anything: this guard only takes away. guard.mjs turns an exception into a
 // refusal for routines and into "no decision" for day sessions (R3c), so a guard bug never locks a day session out of
@@ -61,13 +62,15 @@ function insideDir(p, dir, cwd, io) {
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
 }
 // ---- day sessions (kit-v3-3): kit paths in any worktree of this repository ----
-const isWin = (io) => (io.platform ?? process.platform) === 'win32';
-const fold = (s, io) => (isWin(io) ? s.toLowerCase() : s);
-// On win32 a path's case does not matter, so a segment that matches a protected name in another case is read as it.
+// win32 and darwin file systems ignore a path's case by default (S-3); on a case-sensitive macOS volume the fold only
+// asks more often.
+const foldsCase = (io) => ['win32', 'darwin'].includes(io.platform ?? process.platform);
+const fold = (s, io) => (foldsCase(io) ? s.toLowerCase() : s);
+// Where case does not matter, a segment that matches a protected name in another case is read as it.
 const CANON = new Map(['CLAUDE.md', '.npmrc', '.mcp.json', '.github', '.git', '.claude', 'agent-memory-local',
   'worktrees', 'tools', ...[...GATE_FILES].map((f) => f.slice(6))].map((s) => [s.toLowerCase(), s]));
 const protectedFold = (rel, io) =>
-  protectedRel(isWin(io) ? rel.split('/').map((s) => CANON.get(s.toLowerCase()) ?? s).join('/') : rel);
+  protectedRel(foldsCase(io) ? rel.split('/').map((s) => CANON.get(s.toLowerCase()) ?? s).join('/') : rel);
 const relIn = (top, abs) => {
   const rel = relative(top, abs);
   return rel === '' ? '.' : (rel.startsWith('..') || isAbsolute(rel)) ? null : rel.split('\\').join('/');
@@ -116,10 +119,11 @@ function kitDir(p, cwd, io) {
 // ---------- shell ----------
 // Split a Bash command line into simple commands: { argv, redirects }. Quotes and backslashes are honoured; &&, ||,
 // ;, |, |&, & and newlines separate commands; $(...), `...`, <(...) and >(...) are parsed as commands of their own
-// (subs: true marks a line that had them). A here-document's body is skipped.
+// (subs: true marks a line that had them). A here-document's body is skipped. forks: true marks a line with a
+// subshell ( ), a pipe or a background &, whose commands run in a child shell (a cd there does not carry over).
 export function parseShell(src) {
   const cmds = [];
-  let subs = false, unterminated = false;
+  let subs = false, unterminated = false, forks = false;
   const walk = (s) => {
     let argv = [], redirects = [], reads = [], word = null, i = 0, pendingRedirect = false, wordExpand = false, cmdExpand = false;
     const heredocs = [];
@@ -188,6 +192,7 @@ export function parseShell(src) {
       }
       if (c === '&' && s[i + 1] === '&') { endCmd(); i += 2; continue; }
       if (c === '|' && s[i + 1] === '|') { endCmd(); i += 2; continue; }
+      if (c === '|' || c === '(' || c === ')' || (c === '&' && s[i + 1] !== '>')) forks = true;
       if (c === '|') { endCmd(); i += s[i + 1] === '&' ? 2 : 1; continue; }
       if (c === ';' || c === '(' || c === ')') { endCmd(); i++; continue; }
       if (c === '&' && s[i + 1] === '>') { endWord(); pendingRedirect = true; i += s[i + 2] === '>' ? 3 : 2; continue; }
@@ -208,7 +213,7 @@ export function parseShell(src) {
     endCmd();
   };
   walk(src);
-  return { cmds, subs, unterminated };
+  return { cmds, subs, unterminated, forks };
 }
 // Leading VAR=value words, wrappers that run the rest (timeout, nice, env, xvfb-run, ...): stripped before matching.
 // Shell keywords in front of a command ({ ... }, if/then/do ..., !) are stripped too.
@@ -333,7 +338,7 @@ export async function decide(input, io) {
   const cwd = input.cwd || io.projectDir;
   if (tool === 'Bash') return bash(String(ti.command ?? ''), cwd, role, io, input);
   if (tool.startsWith('mcp__')) return mcp(tool, ti, role, io);
-  if (!role) return null;
+  if (!role) return dayEdit(tool, ti, cwd, io, input);
   // ---- routines only from here ----
   if (['AskUserQuestion', 'EnterPlanMode', 'ExitPlanMode'].includes(tool)) {
     return deny(`routine (${role}): nobody is watching. Write the question under "Decisions needed" instead.`);
@@ -464,10 +469,11 @@ function npmCheck(argv, vcwd, role, io) {
 }
 
 async function bash(command, cwd, role, io, input) {
-  const { cmds, subs, unterminated } = parseShell(command);
+  const { cmds, subs, unterminated, forks } = parseShell(command);
   if (role && subs) return deny(`routine (${role}): no command substitution ($(...), backticks); run the commands one by one`);
   if (role && unterminated) return deny(`routine (${role}): an unterminated here-document; the command can't be read safely`);
   let vcwd = cwd, dayAsk = null;
+  const dirs = { stack: [], lost: false }; // day sessions: the line's pushd stack (S-4)
   for (const c of cmds) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
@@ -481,6 +487,10 @@ async function bash(command, cwd, role, io, input) {
     if (!argv.length) continue;
     const rawProg = argv[0];
     const prog = basename(rawProg);
+    if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) {
+      vcwd = dayCd(prog, argv.slice(1), vcwd, dirs, subs || forks, io);
+      continue;
+    }
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run
       const target = argv[1] && argv[1] !== '-' ? resolve(vcwd, argv[1].replace(/^~(?=\/|$)/, io.home)) : io.home;
       if (role && projectRel(target, vcwd, io) === null && !insideDir(target, input.scratchpad_dir, vcwd, io)) {
@@ -576,6 +586,8 @@ function dayShellWrites(c, argv, vcwd, io, input) {
   for (const [what, raw] of targets) {
     if (raw === '/dev/null' || /^\/dev\/(stdout|stderr|tty|fd\/\d+)$/.test(raw)) continue;
     if (/[$`*?[{]/.test(raw)) {
+      if (agent) return deny(`${KIT_AGENT}; an agent spells its write targets out (${what} writes ${raw}, a ` +
+        'variable, substitution or glob the guard cannot resolve)');
       first ??= ask(`kit and gate files ask first in a day session: ${what} writes ${raw}, which the guard cannot ` +
         'resolve (a variable, substitution or glob)');
       continue;
@@ -587,6 +599,41 @@ function dayShellWrites(c, argv, vcwd, io, input) {
     first ??= ask(`kit and gate files ask first in a day session: ${rel} (${what})`);
   }
   return first;
+}
+// cd, pushd and popd in a day session (S-4): the folder later commands run in. A move the guard cannot follow is read
+// as the project folder, so the main-folder check runs: cd -, a target with a variable, glob or ~user, a bare relative
+// target under CDPATH, +N/-N or another option, an empty stack, a relative move after such a loss, and every move in a
+// line with a subshell, pipe, background job or substitution (it may run in a child shell and not carry over).
+function dayCd(prog, args, vcwd, dirs, forked, io) {
+  const lost = () => { dirs.lost = true; return io.projectDir; };
+  if (forked) return lost();
+  let a = args.slice();
+  if (prog === 'cd') while (/^-[LPe@]+$/.test(a[0] ?? '')) a = a.slice(1);
+  if (a[0] === '--') a = a.slice(1);
+  if (prog === 'popd') return a.length || !dirs.stack.length ? lost() : dirs.stack.shift();
+  if (prog === 'pushd' && !a.length) {
+    if (!dirs.stack.length) return lost();
+    const top = dirs.stack.shift();
+    dirs.stack.unshift(vcwd);
+    return top;
+  }
+  if (!a.length) return io.home;
+  const t = a[0];
+  if (a.length > 1 || /^[-+]/.test(t) || /[$`*?[{]/.test(t) || /^~[^/]/.test(t)) return lost();
+  const absolute = isAbsolute(t) || /^~(\/|$)/.test(t);
+  if (!absolute && (dirs.lost || (io.env.CDPATH && !/^\.\.?(\/|$)/.test(t)))) return lost();
+  if (prog === 'pushd') dirs.stack.unshift(vcwd);
+  return resolve(vcwd, t.replace(/^~(?=\/|$)/, io.home));
+}
+// The file tools on a kit path (kit-v3-3 item 1): the main session is asked, a subagent (agent_id) refused.
+function dayEdit(tool, ti, cwd, io, input) {
+  if (!['Edit', 'Write', 'NotebookEdit', 'MultiEdit'].includes(tool)) return null;
+  const p = String(ti.file_path ?? ti.notebook_path ?? '');
+  if (!p) return null;
+  const rel = kitPath(p, cwd, io);
+  if (rel === null) return null;
+  if (input.agent_id) return deny(`${KIT_AGENT}: ${rel}`);
+  return ask(`kit and gate files ask first in a day session: ${rel}`);
 }
 
 // The routine shell is a FIXED set: git, gh, `npm ci`, node/python on main's scripts, and date (the clock). Everything
@@ -600,9 +647,9 @@ async function routineProgram(prog, argv, vcwd, role, io) {
   if (prog === 'kill' || prog === 'pkill' || prog === 'killall') return deny(`routine (${role}): stop the background saver with the TaskStop tool, not ${prog}`);
   if (NET.has(prog)) return deny(`routine (${role}): ${prog} reaches the network; routines never read the web — research is a daytime task`);
   if (INSTALLERS.has(prog)) return deny(`routine (${role}): ${prog} installs or runs downloaded code; the only install is "${NIGHT_NPM}"`);
-  if (SHELLS.has(prog) || CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} can run other commands; a routine runs only git, gh, npm ci and node on main's scripts`);
+  if (SHELLS.has(prog) || CODE_RUNNERS.has(prog)) return deny(`routine (${role}): ${prog} can run other commands; a routine runs only git, gh, npm ci, and node or python on main's tracked scripts`);
   // every other program, the file tools included (cat, ls, find, grep, sort, cp, mv, rm, sed, awk, mkdir, ...):
-  return deny(`routine (${role}): the shell runs only git, gh, npm ci, node (main's scripts) and date; read and search files with the Read, Grep and Glob tools, and edit with Edit/Write`);
+  return deny(`routine (${role}): the shell runs only git, gh, npm ci, node or python (main's tracked scripts) and date; read and search files with the Read, Grep and Glob tools, and edit with Edit/Write`);
 }
 
 // Routines run only a tracked script whose working copy equals main's (R2); the PR Advisor runs none.
@@ -724,6 +771,20 @@ function protectedInBranch(vcwd, io) {
 // branch, a PR's head or an old commit asks; the updates from origin/main stay free. Other worktrees are ordinary
 // branch work (L11); patch-applying commands are not inspected (L4).
 const sameDir = (a, b, io) => fold(realOf(a, io), io) === fold(realOf(b, io), io);
+// The guard's own git calls never take a word of the command as an option (S-1): a target is resolved to a commit
+// first, and only the SHA goes on. A word starting with '-' never reaches git at all; null when it doesn't resolve.
+const ORIGIN_MAIN = 'refs/remotes/origin/main';
+function commitOf(ref, vcwd, io) {
+  if (!ref || ref.startsWith('-')) return null;
+  const r = io.git(['rev-parse', '--verify', '--end-of-options', `${ref}^{commit}`], vcwd);
+  const sha = r.code === 0 ? r.out.trim() : '';
+  return /^([0-9a-f]{40}|[0-9a-f]{64})$/.test(sha) ? sha : null;
+}
+// origin/main by commit, not by name (S-2): git reads a local branch or tag called origin/main before the remote one.
+function isOriginMain(ref, vcwd, io) {
+  const o = commitOf(ORIGIN_MAIN, vcwd, io);
+  return o !== null && commitOf(ref, vcwd, io) === o;
+}
 function switchWords(args) { // git switch: { create, pos, odd }
   let create = null, odd = false; const pos = [];
   for (let i = 0; i < args.length; i++) {
@@ -747,25 +808,34 @@ function mainFolderMove(sub, args, vcwd, io, input) {
     const { create, pos, odd } = switchWords(args);
     if (odd || pos[0] === '-') why = 'the guard cannot tell what it switches to';
     else if (create !== null) {
-      if (pos[0] && pos[0] !== 'origin/main') {
+      if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {
         why = `it starts ${create} from ${pos[0]}, not origin/main`;
         ref = pos[0];
       }
       else if (!pos[0]) {
-        const h = protectedHit(['origin/main', 'HEAD', '--'], vcwd, io);
+        const h = protectedHit([ORIGIN_MAIN, 'HEAD', '--'], vcwd, io);
         if (h) why = h.failed ? "the guard can't compare HEAD with origin/main"
           : `HEAD's ${h.hit} differs from origin/main's`;
       }
     } else if (pos[0]) {
       ref = pos[0];
-      // no name is exempt: a stale local main is an old commit; `--` makes git read the target as a commit, never a path
-      const h = protectedHit(['origin/main', pos[0], '--'], vcwd, io);
+      // no name is exempt: a stale local main is an old commit. Only the target's SHA reaches git (S-1), and `--` makes
+      // git read it as a commit, never a path.
+      const sha = commitOf(pos[0], vcwd, io);
+      const h = sha ? protectedHit([ORIGIN_MAIN, sha, '--'], vcwd, io) : { failed: true };
       if (h) why = h.failed ? `the guard can't compare ${pos[0]} with origin/main`
         : `${pos[0]}'s ${h.hit} differs from origin/main's`;
     }
   } else if (sub === 'merge') {
-    const a = args.join(' ');
-    if (a !== '--ff-only origin/main' && a !== 'origin/main') why = 'only origin/main merges into the main folder';
+    const t = args.length === 2 && args[0] === '--ff-only' ? args[1] : args.length === 1 ? args[0] : null;
+    if (t === null || !isOriginMain(t, vcwd, io)) {
+      why = `only origin/main merges into the main folder (by commit: ${ORIGIN_MAIN})`;
+    } else if (args.length === 1) {
+      // a plain merge takes main's kit files exactly only when the branch changed none since the merge base (R2)
+      const h = protectedHit([`${ORIGIN_MAIN}...HEAD`], vcwd, io);
+      if (h) why = h.failed ? "the guard can't compare the branch with origin/main"
+        : `the branch's own ${h.hit} would mix with main's; use git merge --ff-only origin/main or a worktree`;
+    }
   } else if (sub === 'pull') {
     if (args.join(' ') !== '--ff-only origin main') why = 'only git pull --ff-only origin main updates the main folder';
   } else why = sub === 'bisect' ? 'bisect checks out old commits' : "it checks out a PR's head";

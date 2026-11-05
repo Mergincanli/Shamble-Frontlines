@@ -9,12 +9,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { decide, REPO } from './routine-guard.mjs';
+import { decide, realIo, REPO } from './routine-guard.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const P = '/repo';
@@ -56,6 +57,8 @@ function fakeIo(o = {}) {
       if (a === 'branch --show-current') return { code: 0, out: `${branch}\n` };
       if (a === 'rev-parse --show-toplevel') return { code: 0, out: `${P}\n` };
       if (a === 'diff --name-only origin/main...HEAD') return { code: 0, out: branchDiff };
+      // kit-v3-3 step 4b (S-2): origin/main resolves to a commit, as real git answers it
+      if (/^rev-parse --verify --end-of-options (refs\/remotes\/)?origin\/main\^\{commit\}$/.test(a)) return { code: 0, out: `${SHA}\n` };
       if (a === 'diff --cached --name-only') return { code: 0, out: staged };
       if (a === 'diff --name-only') return { code: 0, out: unstaged };
       if (args[0] === 'ls-files') return { code: tracked.includes(args.at(-1)) ? 0 : 1, out: '' };
@@ -126,8 +129,9 @@ export const CASES = [
   ['merge, gate failed', DAY, merge(), true, { checks: [['gate', 'completed', 'failure'], ['smoke', 'completed', 'success']] }],
   ['merge, the check errors -> fails closed', DAY, merge(), true, { ghFail: true }],
   ['auto-merge', DAY, gw('enable_pr_auto_merge', { pullNumber: 27 }), true],
-  // day sessions keep their freedom (no role: only git and gh are checked)
-  ['day: edit CLAUDE.md', DAY, ev('Edit', { file_path: `${P}/CLAUDE.md` }), false],
+  // day sessions keep their freedom outside kit and gate files (kit-v3-3 item 1: those ask; the shapes are DAY_CASES)
+  ['day: edit CLAUDE.md asks (kit-v3-3 item 1)', DAY, ev('Edit', { file_path: `${P}/CLAUDE.md` }), true],
+  ['day: edit a game file', DAY, ev('Edit', { file_path: `${P}/shamble-game.js` }), false],
   ['day: a file tool', DAY, sh('cat docs/a.md'), false],
   ['day: curl', DAY, sh('curl https://x'), false],
   ['day: node -e', DAY, sh('node -e "1"'), false],
@@ -366,6 +370,12 @@ test('a refusal names what to use instead', async () => {
   assert.match(await msg('git checkout main'), /git switch/);
 });
 
+test('a refusal names python beside node (kit-v3-3: routines run python on main\'s tracked scripts)', async () => {
+  const msg = async (command) => (await decide(sh(command), fakeIo({ role: NIGHT })))?.deny ?? '';
+  assert.match(await msg('cat docs/a.md'), /node or python \(main's tracked scripts\)/);
+  assert.match(await msg('bash -c "echo x"'), /node or python on main's tracked scripts/);
+});
+
 test('PermissionRequest in a routine denies and interrupts', async () => {
   const d = await decide({ hook_event_name: 'PermissionRequest', tool_name: 'Bash', tool_input: {} }, fakeIo({ role: NIGHT }));
   assert.equal(d.interrupt, true);
@@ -552,26 +562,43 @@ test('mutation runs: every rule is needed by some case', async () => {
 // --- 5. day sessions (kit-v3-3): kit writes ask first (item 1) and the main folder stays on main's rules (item 4) ---
 // A fake io with a project /p, a worktree /w of the same repository, worktrees under /p/.gate/x and
 // /p/.claude/worktrees/a1, and another repository /o. diffs answers `git diff --name-only origin/main <ref>`; a ref it
-// does not name fails, as git does for a ref it can't resolve.
+// does not name fails, as git does for a ref it can't resolve. Step 4b (S-1, S-2): a ref resolves through
+// `git rev-parse --verify --end-of-options <ref>^{commit}` (a ref diffs names, HEAD, origin/main and
+// refs/remotes/origin/main; shadow: true makes origin/main a local branch at another commit), and the diff then gets
+// refs/remotes/origin/main and that SHA. threeDot answers `diff --name-only refs/remotes/origin/main...HEAD` (R2;
+// null: git fails). A diff given --output answers as git does (it writes the file and prints nothing). calls records
+// every git call.
+const shaOf = (name) => createHash('sha1').update(name).digest('hex');
 const WT = { '/p': '/p/.git', '/w': '/p/.git', '/p/.gate/x': '/p/.git', '/p/.claude/worktrees/a1': '/p/.git', '/o': '/o/.git' };
 const CLAUDE_MD = new Set(['/p/CLAUDE.md', '/w/CLAUDE.md', '/p/.gate/x/CLAUDE.md', '/p/.claude/worktrees/a1/CLAUDE.md',
   '/p/docs/sub/CLAUDE.md']);
 function dayIo(o = {}) {
-  const { role = '', diffs = {}, platform } = o;
+  const { role = '', diffs = {}, platform, threeDot = '', shadow = false, calls, cdpath } = o;
+  const names = new Map(Object.keys(diffs).map((n) => [shaOf(n), n]));
   const links = { '/p/link': '/p/.claude' };
   const topOf = (cwd) => Object.keys(WT).filter((t) => cwd === t || cwd.startsWith(t + '/')).sort((a, b) => b.length - a.length)[0];
   return {
-    env: role ? { SHAMBLE_ROLE: role } : {},
+    env: { ...(role ? { SHAMBLE_ROLE: role } : {}), ...(cdpath ? { CDPATH: cdpath } : {}) },
     projectDir: '/p',
     home: '/home/u',
     platform,
     gitLongOptions,
     git: (args, cwd) => {
+      calls?.push(args);
       const a = args.join(' '), top = topOf(cwd ?? '/p');
       if (a === 'rev-parse --show-toplevel') return top ? { code: 0, out: `${top}\n` } : { code: 128, out: '' };
       if (a === 'rev-parse --git-common-dir') return top ? { code: 0, out: `${WT[top]}\n` } : { code: 128, out: '' };
-      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'origin/main' && args[4] === '--' && args.length === 5) {
-        return args[3] in diffs ? { code: 0, out: diffs[args[3]] } : { code: 128, out: '' };
+      if (args[0] === 'diff' && args.some((x) => x.startsWith('--output'))) return { code: 0, out: '' };
+      if (args.length === 4 && args.slice(0, 3).join(' ') === 'rev-parse --verify --end-of-options' && args[3].endsWith('^{commit}')) {
+        const r = args[3].slice(0, -'^{commit}'.length);
+        if (r === 'refs/remotes/origin/main') return { code: 0, out: `${shaOf('origin/main')}\n` };
+        if (r === 'origin/main') return { code: 0, out: `${shaOf(shadow ? 'a local origin/main' : 'origin/main')}\n` };
+        return r in diffs || r === 'HEAD' ? { code: 0, out: `${shaOf(r)}\n` } : { code: 128, out: '' };
+      }
+      if (a === 'diff --name-only refs/remotes/origin/main...HEAD') return threeDot === null ? { code: 128, out: '' } : { code: 0, out: threeDot };
+      if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === 'refs/remotes/origin/main' && args[4] === '--' && args.length === 5) {
+        const n = args[3] === 'HEAD' ? 'HEAD' : names.get(args[3]);
+        return n !== undefined && n in diffs ? { code: 0, out: diffs[n] } : { code: 128, out: '' };
       }
       return { code: 0, out: '' };
     },
@@ -582,12 +609,15 @@ function dayIo(o = {}) {
   };
 }
 const dsh = (command, extra = {}) => ({ hook_event_name: 'PreToolUse', tool_name: 'Bash', tool_input: { command }, cwd: '/p', scratchpad_dir: SCRATCH, ...extra });
+// the file tools (step 4b, R1)
+const ded = (tool, path, extra = {}) => ({ hook_event_name: 'PreToolUse', tool_name: tool,
+  tool_input: tool === 'NotebookEdit' ? { notebook_path: path } : { file_path: path }, cwd: '/p', scratchpad_dir: SCRATCH, ...extra });
 const kindOf = (d) => (d ? (d.ask !== undefined && d.deny === undefined ? 'ask' : 'deny') : null);
 const ASK = 'ask', DENY = 'deny';
 const OTHER = { 'cs/other': 'tools/gate.mjs\n' };
 // [name, input, expected kind, dayIo options, reason pattern]
 export const DAY_CASES = [
-  // group "day ask-first (item 1)", through the shell (the Edit-tool forms A1-A11, A22, A25 and A36 wait: see the report)
+  // group "day ask-first (item 1)", through the shell
   ['A4s docs/STATUS.md', dsh('echo x > docs/STATUS.md'), null],
   ['A5s agent memory', dsh('echo x > .claude/agent-memory-local/x'), null],
   ['A6s .checkpoints', dsh('echo x > .checkpoints/x.md'), null],
@@ -657,6 +687,71 @@ export const DAY_CASES = [
   ['T26 git switch - (cannot tell)', dsh('git switch -'), ASK],
   ['T26 git switch --orphan', dsh('git switch --orphan x'), ASK],
   ['T27 git switch, compare fails: ask', dsh('git switch cs/gone'), ASK, {}, /can't compare/],
+  // step 4b, R1: the file tools (Edit, Write, MultiEdit, NotebookEdit) in a day session
+  ['A1 Edit .claude/hooks/guard.mjs', ded('Edit', '/p/.claude/hooks/guard.mjs'), ASK, {}, /ask first in a day session: \.claude\/hooks\/guard\.mjs$/],
+  ['A2 Write CLAUDE.md: the ask names the file', ded('Write', '/p/CLAUDE.md'), ASK, {}, /^kit and gate files ask first in a day session: CLAUDE\.md$/],
+  ['A3 Edit tools/gate.mjs', ded('Edit', '/p/tools/gate.mjs'), ASK],
+  ['A4 Edit docs/STATUS.md', ded('Edit', '/p/docs/STATUS.md'), null],
+  ['A5 Write agent memory', ded('Write', '/p/.claude/agent-memory-local/x'), null],
+  ['A6 Write .checkpoints', ded('Write', '/p/.checkpoints/x.md'), null],
+  ['A8 Edit a game file in worktree /w', ded('Edit', '/w/shamble-game.js'), null],
+  ['A9 Edit .claude/worktrees/a1/CLAUDE.md', ded('Edit', '/p/.claude/worktrees/a1/CLAUDE.md'), ASK],
+  ['A9b Edit .gate/x worktree .claude/settings.json', ded('Edit', '/p/.gate/x/.claude/settings.json'), ASK, {}, /\.claude\/settings\.json/],
+  ['A9c Write .gate/x worktree tools/gate.mjs', ded('Write', '/p/.gate/x/tools/gate.mjs'), ASK],
+  ['A9d Edit .gate/x worktree game file', ded('Edit', '/p/.gate/x/shamble-core.js'), null],
+  ['A10 Edit through a symlink to .claude', ded('Edit', '/p/link/settings.json'), ASK],
+  ["A11 Edit another repository's .claude", ded('Edit', '/o/.claude/settings.json'), null],
+  ['A22 a subagent Edit of a kit file: deny', ded('Edit', '/p/.claude/settings.json', { agent_id: 'a1' }), DENY, {}, /main session/],
+  ['A22 a subagent Edit of a game file', ded('Edit', '/p/shamble-game.js', { agent_id: 'a1' }), null],
+  ['A22b agent_type without agent_id, Edit: ask, not deny', ded('Edit', '/p/.claude/settings.json', { agent_type: 'advisor' }), ASK],
+  ['A25 MultiEdit a kit file', ded('MultiEdit', '/p/.claude/rules/x.md'), ASK],
+  ['A25 NotebookEdit a kit file', ded('NotebookEdit', '/p/.claude/x.ipynb'), ASK],
+  ['A36 win32: Edit claude.MD is CLAUDE.md', ded('Edit', '/p/claude.MD'), ASK, { platform: 'win32' }],
+  ['A36 linux: Edit claude.MD is another file', ded('Edit', '/p/claude.MD'), null, { platform: 'linux' }],
+  // step 4b, S-3: darwin folds case too
+  ['S-3 darwin: Edit claude.MD is CLAUDE.md', ded('Edit', '/p/claude.MD'), ASK, { platform: 'darwin' }],
+  ['S-3 darwin: Edit .Claude/Settings.json', ded('Edit', '/p/.Claude/Settings.json'), ASK, { platform: 'darwin' }],
+  ['S-3 darwin: echo > claude.MD', dsh('echo x > claude.MD'), ASK, { platform: 'darwin' }],
+  // step 4b, R2: a plain merge of origin/main only when the branch changed no kit file since it left main
+  ['T5c git merge origin/main, the branch changed a kit file: ask', dsh('git merge origin/main'), ASK,
+    { threeDot: '.claude/settings.json\n' }, /mix with main/],
+  ['T5d git merge origin/main, the compare fails: ask', dsh('git merge origin/main'), ASK, { threeDot: null }, /can't compare the branch/],
+  ['T5e a subagent, plain merge onto kit changes: deny', dsh('git merge origin/main', { agent_id: 'a1' }), DENY,
+    { threeDot: '.claude/settings.json\n' }],
+  ['T5f --ff-only with kit changes on the branch', dsh('git merge --ff-only origin/main'), null, { threeDot: '.claude/settings.json\n' }],
+  ['T5g plain merge, the branch changed only game files', dsh('git merge origin/main'), null, { threeDot: 'shamble-game.js\n' }],
+  // step 4b, R4 (b): an agent's write to a target the guard cannot resolve is refused
+  ['A20a an agent writes to $F: deny', dsh('echo x > $F', { agent_id: 'a1' }), DENY, {}, /spells its write targets out/],
+  ['A20b an agent tees a glob: deny', dsh('tee .gate/*.md', { agent_id: 'a1' }), DENY],
+  ['A20c an agent writes a literal notes path', dsh('echo x > .checkpoints/x.md', { agent_id: 'a1' }), null],
+  // step 4b, S-1: a switch target that starts with '-' never reaches a guard-run git command
+  ['S-1 git switch -- --output=<path>: ask', dsh('git switch -- --output=/tmp/x'), ASK, { diffs: OTHER }],
+  ['S-1 git switch -c n -- --output=<path>: ask', dsh('git switch -c n -- --output=/tmp/x'), ASK, { diffs: OTHER }],
+  ['S-1 git switch --detach -- --output=<path>: ask', dsh('git switch --detach -- --output=/tmp/x'), ASK, { diffs: OTHER }],
+  // step 4b, S-2: origin/main by commit; a local branch named origin/main at another commit is not main
+  ['S-2 git merge origin/main, a local origin/main elsewhere: ask', dsh('git merge origin/main'), ASK, { shadow: true }, /by commit/],
+  ['S-2 git merge --ff-only origin/main, the same: ask', dsh('git merge --ff-only origin/main'), ASK, { shadow: true }],
+  ['S-2 git switch -c from that origin/main: ask', dsh('git switch -c cs/new origin/main'), ASK, { shadow: true }],
+  ['S-2 git merge --ff-only refs/remotes/origin/main, shadowed or not', dsh('git merge --ff-only refs/remotes/origin/main'), null,
+    { shadow: true }],
+  // step 4b, S-4: pushd and popd move the folder; a move the guard cannot follow counts as the project folder
+  ['S-4 pushd into the main folder, then switch: ask', dsh('pushd /p && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 pushd into a worktree, then switch', dsh('pushd /w && git switch cs/other'), null, { diffs: OTHER }],
+  ['S-4 pushd away, popd back, then switch: ask', dsh('pushd /w && popd && git switch cs/other'), ASK, { diffs: OTHER }],
+  ['S-4 popd with an empty stack: ask', dsh('popd && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 pushd with no folder and an empty stack: ask', dsh('pushd && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 pushd +1: ask', dsh('pushd /w && pushd +1 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 cd $D (untracked): ask', dsh('cd $D && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 cd - (untracked): ask', dsh('cd - && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER }],
+  ['S-4 a relative cd after an untracked one: ask', dsh('cd $D && cd .gate/x && git switch cs/other', { cwd: '/w' }), ASK,
+    { diffs: OTHER }],
+  ['S-4 a bare relative cd under CDPATH: ask', dsh('cd w2 && git switch cs/other', { cwd: '/w' }), ASK, { diffs: OTHER, cdpath: '/' }],
+  ['S-4 a cd in a subshell does not carry over: ask', dsh('(cd /w) && git switch cs/other'), ASK, { diffs: OTHER }],
+  ['S-4 a cd in a substitution: ask', dsh('echo $(cd /w) && git switch cs/other'), ASK, { diffs: OTHER }],
+  ['S-4 a cd before a pipe: ask', dsh('cd /w | true; git switch cs/other'), ASK, { diffs: OTHER }],
+  ['S-4 cd to a worktree is still followed', dsh('cd /w && git switch cs/other'), null, { diffs: OTHER }],
+  ['S-4 cd -P to a worktree is followed', dsh('cd -P /w && git switch cs/other'), null, { diffs: OTHER }],
+  ['S-4 a relative cd into a worktree is followed', dsh('cd .gate/x && git switch cs/other'), null, { diffs: OTHER }],
 ];
 for (const [name, input, want, opts, re] of DAY_CASES) {
   test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -736,16 +831,38 @@ const DAY_MUTANTS = [
   ['unresolvable targets ask', "if (/[$`*?[{]/.test(raw)) {", 'if (false) {'],
   ['a GIT_DIR= prefix asks', 'if (prefix.some((w) => /^GIT_(DIR|WORK_TREE)=/.test(w))) {', 'if (false) {'],
   ['the scan goes on after an ask', 'dayAsk ??= w;', 'if (w) return w;'],
-  ['win32 folds case', "const isWin = (io) => (io.platform ?? process.platform) === 'win32';", 'const isWin = () => false;'],
+  ['win32 folds case', "const foldsCase = (io) => ['win32', 'darwin'].includes(io.platform ?? process.platform);",
+    'const foldsCase = () => false;'],
   ['the main folder only', 'if (!sameDir(gitTop(vcwd, io), io.projectDir, io)) return null;', ''],
-  ['switch: no name exempt (a stale main)', "const h = protectedHit(['origin/main', pos[0], '--'], vcwd, io);",
-    "const h = pos[0] === 'main' ? null : protectedHit(['origin/main', pos[0], '--'], vcwd, io);"],
-  ['switch -c: the start point', "if (pos[0] && pos[0] !== 'origin/main') {", 'if (false) {'],
-  ["switch -c: HEAD's protected files", "const h = protectedHit(['origin/main', 'HEAD', '--'], vcwd, io);", 'const h = null;'],
-  ['merge forms', "if (a !== '--ff-only origin/main' && a !== 'origin/main') why =", 'if (false) why ='],
+  ['switch: no name exempt (a stale main)', "const h = sha ? protectedHit([ORIGIN_MAIN, sha, '--'], vcwd, io) : { failed: true };",
+    "const h = pos[0] === 'main' ? null : sha ? protectedHit([ORIGIN_MAIN, sha, '--'], vcwd, io) : { failed: true };"],
+  ['switch -c: the start point', 'if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {', 'if (false) {'],
+  ["switch -c: HEAD's protected files", "const h = protectedHit([ORIGIN_MAIN, 'HEAD', '--'], vcwd, io);", 'const h = null;'],
+  ['merge forms', "const t = args.length === 2 && args[0] === '--ff-only' ? args[1] : args.length === 1 ? args[0] : null;",
+    "const t = 'origin/main';"],
   ['pull form', "if (args.join(' ') !== '--ff-only origin main') why =", 'if (false) why ='],
   ['gh pr checkout', "if ((sub === 'pr' && sub2 === 'checkout') || sub === 'co') return mainFolderMove(", 'if (false) return mainFolderMove('],
   ['the agent deny on a move', 'return input.agent_id ? deny(', 'return false ? deny('],
+  // step 4b
+  ['R1 the day ask (file tools)', 'return ask(`kit and gate files ask first in a day session: ${rel}`);', 'return null;'],
+  ['R1 dayEdit is wired into decide()', 'if (!role) return dayEdit(tool, ti, cwd, io, input);', 'if (!role) return null;'],
+  ['R1 the agent deny on a file tool', 'if (input.agent_id) return deny(`${KIT_AGENT}: ${rel}`);', ''],
+  ['R2 plain merge unguarded', '} else if (args.length === 1) {', '} else if (false) {'],
+  ['R4 agent ask on an unresolvable target', 'if (agent) return deny(`${KIT_AGENT}; an agent spells', 'if (false) return deny(`${KIT_AGENT}; an agent spells'],
+  ['S-1 the switch target reaches git as a word, not its SHA', "const h = sha ? protectedHit([ORIGIN_MAIN, sha, '--'], vcwd, io) : { failed: true };",
+    "const h = protectedHit([ORIGIN_MAIN, pos[0], '--'], vcwd, io);"],
+  ['S-2 merge: origin/main by name', 'if (t === null || !isOriginMain(t, vcwd, io)) {', "if (t !== 'origin/main') {"],
+  ['S-2 switch -c: the start point by name', 'if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {', "if (pos[0] && pos[0] !== 'origin/main') {"],
+  ['S-2 origin/main resolved by its short name', 'const o = commitOf(ORIGIN_MAIN, vcwd, io);', "const o = commitOf('origin/main', vcwd, io);"],
+  ['S-3 darwin folds case', "['win32', 'darwin'].includes(io.platform ?? process.platform)", "['win32'].includes(io.platform ?? process.platform)"],
+  ['S-4 pushd and popd are followed', "if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) {", "if (!role && prog === 'cd') {"],
+  ['S-4 a move in a forked line is lost', 'if (forked) return lost();', ''],
+  ['S-4 the forks flag', "(c === '&' && s[i + 1] !== '>')) forks = true;", "(c === '&' && s[i + 1] !== '>')) forks = false;"],
+  ['S-4 an untracked target is lost', 'if (a.length > 1 || /^[-+]/.test(t) || /[$`*?[{]/.test(t) || /^~[^/]/.test(t)) return lost();', ''],
+  ['S-4 popd with an empty stack is lost', "if (prog === 'popd') return a.length || !dirs.stack.length ? lost() : dirs.stack.shift();",
+    "if (prog === 'popd') return dirs.stack.shift() ?? vcwd;"],
+  ['S-4 a relative move after a loss', 'if (!absolute && (dirs.lost || (io.env.CDPATH', 'if (!absolute && ((io.env.CDPATH'],
+  ['S-4 CDPATH', '(io.env.CDPATH && !/^', '(false && !/^'],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -768,4 +885,59 @@ test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case'
     }
   } finally { rmSync(dir, { recursive: true, force: true }); }
   assert.deepEqual(survivors, [], `mutants no day case catches: ${survivors.join('; ')}`);
+});
+
+// --- step 4b (kit-v3-3): the security review of f22c4df (S-1, S-2) and fix 1, shown on the guard's own git calls ---
+test('S-1 no guard-run git command gets a word of the command that starts with "-"', async () => {
+  for (const command of ['git switch -- --output=/tmp/x', 'git switch -c n -- --output=/tmp/x',
+    'git switch --detach -- --output=/tmp/x', 'git merge -- --output=/tmp/x', 'git merge --ff-only --output=/tmp/x']) {
+    const calls = [];
+    const d = await decide(dsh(command), dayIo({ calls, diffs: OTHER }));
+    assert.equal(kindOf(d), ASK, `${command}: ${JSON.stringify(d)}`);
+    const bad = calls.filter((c) => c.some((w) => w.includes('--output')));
+    assert.deepEqual(bad, [], `${command}: the guard ran git with the command's word`);
+  }
+});
+test('real git (step 4b): `--` after the ref (fix 1), no file written (S-1), origin/main by commit (S-2)', async () => {
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'guard-git-4b-')));
+  const env = { ...process.env, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
+  const g = (...a) => spawnSync('git', a, { cwd: dir, env, encoding: 'utf8' });
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  try {
+    g('init', '-q', '-b', 'main');
+    mkdirSync(join(dir, 'docs'));
+    writeFileSync(join(dir, 'docs', 'a.md'), 'a\n');
+    writeFileSync(join(dir, 'CLAUDE.md'), 'x\n');
+    g('add', '-A');
+    g('commit', '-q', '-m', 'one');
+    g('update-ref', 'refs/remotes/origin/main', 'HEAD');
+    // fix 1: without `--`, git reads a folder name that is no ref as a path and lists nothing; with it, git fails
+    const noDash = g('diff', '--name-only', 'origin/main', 'docs');
+    assert.deepEqual([noDash.status, noDash.stdout], [0, ''], 'without --: exit 0, an empty list (the old fail-open)');
+    assert.notEqual(g('diff', '--name-only', 'origin/main', 'docs', '--').status, 0, 'with --: git fails on a name that is no ref');
+    process.env.CLAUDE_PROJECT_DIR = dir;
+    const io = { ...realIo(), env: {} };
+    const day = (command) => decide(dsh(command, { cwd: dir }), io);
+    // S-1: the switch target is never handed to git as an option
+    for (const [i, form] of ['git switch -- --output=', 'git switch -c n -- --output=', 'git switch --detach -- --output='].entries()) {
+      const out = join(dir, `leak${i}.txt`);
+      assert.equal(kindOf(await day(`${form}${out}`)), ASK, `${form}<path> asks`);
+      assert.equal(existsSync(out), false, `${form}<path>: the guard wrote no file`);
+    }
+    // S-2: origin/main is the commit refs/remotes/origin/main names
+    assert.equal(await day('git merge origin/main'), null, 'origin/main is the remote ref: a plain merge goes on');
+    assert.equal(await day('git switch -c cs/n origin/main'), null, 'a new branch from origin/main goes on');
+    g('switch', '-q', '-c', 'cs/k');
+    writeFileSync(join(dir, 'CLAUDE.md'), 'y\n');
+    g('commit', '-q', '-am', 'two');
+    g('switch', '-q', 'main');
+    g('branch', 'origin/main', 'cs/k'); // a local branch named origin/main, at an unreviewed commit
+    for (const c of ['git merge origin/main', 'git merge --ff-only origin/main', 'git switch -c cs/n origin/main']) {
+      assert.equal(kindOf(await day(c)), ASK, `${c}: a local origin/main elsewhere asks`);
+    }
+    assert.equal(await day('git merge --ff-only refs/remotes/origin/main'), null, 'the fully qualified ref goes on');
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

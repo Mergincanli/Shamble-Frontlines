@@ -5,8 +5,9 @@ one run may work at a time; a later run continues where an earlier one stopped. 
 needs: the routine's prompt only says to read them. The run is governed by the routine guard (`.claude/hooks/guard.mjs`),
 so there are no approval prompts: a command the night may not run is refused, not queued for a human. When a refusal
 names what to use instead, use that; when it blocks a step the item needs, stop the item under Decisions needed.
-The shell runs only git, gh, `npm ci` and node on main's scripts (plus `date`): **read and search the tree with the Read,
-Grep and Glob tools, and edit with Edit/Write** — there are no shell file tools (cat, find, grep, cp, mv, rm). The night
+The shell runs only git, gh, `npm ci`, and node or python on main's tracked scripts (plus `date`): **read and search
+the tree with the Read, Grep and Glob tools, and edit with Edit/Write** — there are no shell file tools (cat, find,
+grep, cp, mv, rm). The night
 **never reads the web**: WebFetch and WebSearch are refused. Web research (R1–R6 and the like) is a daytime task and
 never runs at night; a research queue item is left for the day.
 

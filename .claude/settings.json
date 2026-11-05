@@ -27,6 +27,7 @@
       "Bash(git commit *)",
       "Bash(git worktree *)",
       "Bash(git merge-base *)",
+      "Bash(git rev-list *)",
       "Bash(git push -u origin cs/*)",
       "Bash(git push --set-upstream origin cs/*)",
       "Bash(git push origin cs/*)",
