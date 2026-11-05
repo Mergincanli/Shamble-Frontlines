@@ -1,0 +1,32 @@
+init 0   0  
+branch -v foo: 0   | 0 refs/heads/foo
+refs/heads/main 
+branch -vv bar: 0   | 0 refs/heads/bar
+refs/heads/foo
+refs/heads/main 
+branch -a baz: 128  fatal: the -a, and -r, options to 'git branch' do not take a branch name. | 0 refs/heads/bar
+refs/heads/foo
+refs/heads/main 
+branch -r qux: 128  fatal: the -a, and -r, options to 'git branch' do not take a branch name. | 0 refs/heads/bar
+refs/heads/foo
+refs/heads/main 
+branch --contains main: 0 bar
+  foo
+* main 
+branch HEAD: 128  fatal: 'HEAD' is not a valid branch name
+symbolic-ref write: 0   | full ref -> 0 <sha> 
+symbolic-ref read: 0 refs/heads/main  0 main  0 refs/heads/main 
+remote add: 0   | [core] [remote "origin"] 	url = /nonexistent 	fetch = +refs/heads/*:refs/remotes/origin/*
+remote set-url: 0   | [core] [remote "origin"] 	url = /other 	fetch = +refs/heads/*:refs/remotes/origin/*
+remote set-branches: 0   | [core] [remote "origin"] 	url = /other 	fetch = +refs/heads/x:refs/remotes/origin/x
+remote -v: 0 origin	/other (fetch)
+origin	/other (push)  get-url: 0 /other 
+switch --orphan: 0   | 0 refs/heads/bar
+refs/heads/foo
+refs/heads/main
+refs/remotes/origin/main  0  
+worktree add DWIM: 128  fatal: 'main' is already used by worktree at '/tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43 | 0 refs/heads/bar
+refs/heads/foo
+refs/heads/main
+refs/remotes/origin/main 
+git version 0 git version 2.43.0 

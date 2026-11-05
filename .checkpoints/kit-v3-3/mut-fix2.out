@@ -1,0 +1,35 @@
+KILLED SA-2 site npmCheck: 1 fail, 557 pass; e.g. routine (fix round 2) deny: night: npm ci, origin/main shadowed
+KILLED SA-2 site interpreter: 3 fail, 555 pass; e.g. routine (fix round 2) deny: Rn4 night: node tools/sim.js, origin/main shadowed | routine (fix round 2) deny: night: node tools/sim.js, refs/remotes/origin/main does not resolve
+KILLED SA-2 site protectedInBranch: 2 fail, 556 pass; e.g. routine (fix round 2) deny: Rp4 night: push its branch, origin/main shadowed | real git (fix round 2, SA-2): the auditor's routine rows are refused; origin/main is refs/remotes/origin/main's commit
+KILLED SA-2 site the PR Advisor's switch: 3 fail, 555 pass; e.g. routine (fix round 2) deny: Rs4 pr-advisor: switch --detach origin/main, shadowed | routine (fix round 2) deny: Rs4 pr-advisor: switch --detach origin/main, no full ref
+KILLED SA-2 compared by commit: 5 fail, 553 pass; e.g. routine (fix round 2) deny: Rn4 night: node tools/sim.js, origin/main shadowed | routine (fix round 2) deny: night: npm ci, origin/main shadowed
+KILLED SA-2 the full ref must resolve: 3 fail, 555 pass; e.g. routine (fix round 2) deny: night: node tools/sim.js, refs/remotes/origin/main does not resolve | routine (fix round 2) deny: Rs4 pr-advisor: switch --detach origin/main, no full ref
+KILLED SA-2 the full ref, not the short name: 5 fail, 553 pass; e.g. routine (fix round 2) deny: Rn4 night: node tools/sim.js, origin/main shadowed | routine (fix round 2) deny: night: npm ci, origin/main shadowed
+KILLED SA-2 refusal: fetch/pull refspecs: 6 fail, 552 pass; e.g. routine (fix round 2) deny: Ri1 night: fetch origin cs/evil:refs/remotes/origin/main | routine (fix round 2) deny: Re3 pr-advisor: fetch origin cs/evil:refs/remotes/origin/main
+KILLED SA-2 refusal: ':': 3 fail, 555 pass; e.g. routine (fix round 2) deny: Ri1 night: fetch origin cs/evil:refs/remotes/origin/main | routine (fix round 2) deny: Re3 pr-advisor: fetch origin cs/evil:refs/remotes/origin/main
+KILLED SA-2 refusal: '+': 1 fail, 557 pass; e.g. routine (fix round 2) deny: night: fetch origin +main
+KILLED SA-2 refusal: --refmap: 1 fail, 557 pass; e.g. routine (fix round 2) deny: night: fetch origin cs/evil --refmap ... (two words)
+KILLED SA-2 refusal: new branch names: 16 fail, 542 pass; e.g. routine (fix round 2) deny: Re1 night: git branch origin/main cs/evil | routine (fix round 2) deny: Re2 pr-advisor: git branch origin/main origin/cs/evil
+KILLED SA-2 names: HEAD and main: 6 fail, 552 pass; e.g. routine (fix round 2) deny: night: git branch main origin/cs/x | routine (fix round 2) deny: night: git switch --create=HEAD
+KILLED SA-2 names: git branch: 6 fail, 552 pass; e.g. routine (fix round 2) deny: Re1 night: git branch origin/main cs/evil | routine (fix round 2) deny: Re2 pr-advisor: git branch origin/main origin/cs/evil
+KILLED SA-2 names: switch -c/--orphan: 2 fail, 556 pass; e.g. routine (fix round 2) deny: night: git switch -c main cs/evil | routine (fix round 2) deny: night: git switch --orphan main
+KILLED SA-2 names: worktree add -b/-B: 1 fail, 557 pass; e.g. routine (fix round 2) deny: night: git worktree add -b origin/main .gate/w
+KILLED SA-2 symbolic-ref reads only: 5 fail, 553 pass; e.g. routine (fix round 2) deny: night: git symbolic-ref refs/remotes/origin/main refs/heads/cs/evil | routine (fix round 2) deny: pr-advisor: git symbolic-ref HEAD refs/heads/cs/evil
+KILLED SA-2 item 4: git remote reads only: 5 fail, 553 pass; e.g. routine (fix round 2) deny: night: git remote set-url origin /tmp/evil | routine (fix round 2) deny: night: git remote add evil /tmp/evil
+KILLED SA-2 item 4: branch --edit-description: 2 fail, 556 pass; e.g. routine (fix round 2) deny: night: git branch --edit-description (writes git config, waits for an editor) | real git (fix round 2, SA-2 item 4): no command a routine may run writes the remote config
+KILLED F-b worktree add: 6 fail, 552 pass; e.g. day (kit-v3-3) ask: T9 git worktree add | day (kit-v3-3) ask: F-b git worktree add into .claude/rules: ask
+KILLED F-b worktree add: -b/-B/--reason values: 2 fail, 556 pass; e.g. day (kit-v3-3) ask: F-b git worktree add -b cs/x into .claude/skills: ask | day (kit-v3-3) ask: F-b git worktree add --lock --reason why into .github: ask
+KILLED F-b clone: 6 fail, 552 pass; e.g. day (kit-v3-3) ask: F-b git clone <url> .claude/skills/x: ask | day (kit-v3-3) deny: F-b an agent: git clone <url> .claude/skills/x: deny
+KILLED F-b clone: option values: 1 fail, 557 pass; e.g. day (kit-v3-3) ask: F-b git clone --depth 1 <url ending CLAUDE.md.git>: ask
+KILLED F-b clone: the URL's last part: 2 fail, 556 pass; e.g. day (kit-v3-3) ask: F-b git clone <url> with no folder: the URL's last part (.claude): ask | day (kit-v3-3) ask: F-b git clone --depth 1 <url ending CLAUDE.md.git>: ask
+KILLED SA-5 prefixes of --in-place: 5 fail, 553 pass; e.g. day (kit-v3-3) ask: SA-5 sed --i: ask | day (kit-v3-3) ask: SA-5 sed --in: ask
+KILLED sed/perl every positional word: 4 fail, 554 pass; e.g. day (kit-v3-3) ask: A27 perl -pi -e on CLAUDE.md | day (kit-v3-3) ask: SA-5 sed -i -es/a/b/ (attached script): ask
+KILLED SA-6 ancestor of the project folder: 3 fail, 555 pass; e.g. day (kit-v3-3) ask: SA-6 Fc2 rm -rf / (an ancestor of the project folder): ask | day (kit-v3-3) ask: SA-6 rm -rf .. from the project folder: ask
+KILLED SA-6 ls-files kit path: 4 fail, 554 pass; e.g. day (kit-v3-3) ask: SA-6 Fc1 rm -rf docs, a tracked docs/sub/x/CLAUDE.md: ask | day (kit-v3-3) ask: SA-6 mv a folder holding a nested .mcp.json: ask
+KILLED SA-6 git failing asks: 1 fail, 557 pass; e.g. day (kit-v3-3) ask: SA-6 git cannot list the folder: ask
+KILLED SA-8 the line check: 6 fail, 552 pass; e.g. day (kit-v3-3) ask: A33b GIT_DIR= prefix (git status) | day (kit-v3-3) ask: SA-8 export GIT_DIR=, then git status: ask
+KILLED SA-8 raw text: 1 fail, 557 pass; e.g. day (kit-v3-3) ask: SA-8 GIT_WORK_TREE in a here-document body (raw text): ask
+KILLED SA-8 words: 1 fail, 557 pass; e.g. day (kit-v3-3) ask: SA-8 GIT''_DIR= (quotes split the name): ask
+KILLED SA-8 the four names: 2 fail, 556 pass; e.g. day (kit-v3-3) ask: SA-8 a GIT_COMMON_DIR= prefix: ask | day (kit-v3-3) ask: SA-8 export GIT_INDEX_FILE=: ask
+killed 33/33
+control: 558 pass, 0 fail
