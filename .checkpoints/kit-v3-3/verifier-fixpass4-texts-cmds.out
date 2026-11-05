@@ -1,0 +1,16 @@
+PLAIN | night-shift | NIGHT_SHIFT.md | "TZ=Europe/Amsterdam date" | 60ae124 null | head null
+PLAIN | night-shift | NIGHT_SHIFT.md | "date" | 60ae124 null | head null
+PLAIN | night-shift | NIGHT_SHIFT.md | "git add docs/a.md docs/b.md" | 60ae124 null | head null
+PLAIN | night-shift | NIGHT_SHIFT.md | "git commit -m \"fix #16: it's done\"" | 60ae124 null | head null
+PLAIN | night-shift | NIGHT_SHIFT.md | "npm ci --prefix tools --ignore-scripts --no-audit --no-fund" | 60ae124 deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o | head deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o
+PLAIN | night-shift | CHECKPOINTS.md | "git log --oneline -5" | 60ae124 null | head null
+PLAIN | night-shift | CHECKPOINTS.md | "git ls-tree -r --name-only HEAD -- .checkpoints" | 60ae124 null | head null
+PLAIN | night-shift | CHECKPOINTS.md | "git worktree add .gate/kit-v3-3-wt cs/x" | 60ae124 null | head null
+PLAIN | night-shift | CHECKPOINTS.md | "git worktree prune" | 60ae124 null | head null
+PLAIN | night-shift | CHECKPOINTS.md | "node .claude/scripts/checkpoint.mjs save kit-v3-3 -m \"step 2: done\" --trailer \"Claude-Session: https://claude.ai/code/session_x\"" | 60ae124 deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o | head deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o
+PLAIN | night-shift | CHECKPOINTS.md | "node .claude/scripts/checkpoint.mjs watch kit-v3-3 --trailer \"Claude-Session: https://claude.ai/code/session_x\"" | 60ae124 deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o | head deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o
+PLAIN | pr-advisor | advisor.md (main) | "git fetch -q origin main && git switch --detach origin/main" | 60ae124 deny: routine (pr-advisor): can't resolve refs/remotes/origin/main; fetch it first (git fetch or | head deny: routine (pr-advisor): can't resolve refs/remotes/origin/main; fetch it first (git fetch or
+PLAIN | pr-advisor | advisor.md (main) | "git diff --name-only origin/main...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" | 60ae124 null | head null
+PLAIN | pr-advisor | advisor.md (main) | "node tools/gate.mjs" | 60ae124 deny: routine (pr-advisor): the PR Advisor runs no program; CI's gate and smoke results stand in | head deny: routine (pr-advisor): the PR Advisor runs no program; CI's gate and smoke results stand in
+PLAIN | night-shift | NIGHT_SHIFT.md (gate) | "node tools/gate.mjs" | 60ae124 deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o | head deny: routine (night-shift): can't resolve refs/remotes/origin/main; fetch it first (git fetch o
+commands 15, refused by head plainForm 0

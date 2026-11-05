@@ -1,0 +1,69 @@
+old-accepted    "cat docs/a.md": cat is not a routine program | new: {"prog":"cat is not a routine program"}
+old-accepted    "ls docs": ls is not a routine program | new: {"prog":"ls is not a routine program"}
+old-accepted    "find . -name x": find is not a routine program | new: {"prog":"find is not a routine program"}
+old-accepted    "grep foo docs": grep is not a routine program | new: {"prog":"grep is not a routine program"}
+old-accepted    "sort x": sort is not a routine program | new: {"prog":"sort is not a routine program"}
+old-accepted    "cp a b": cp is not a routine program | new: {"prog":"cp is not a routine program"}
+old-accepted    "mv a b": mv is not a routine program | new: {"prog":"mv is not a routine program"}
+old-accepted    "rm x": rm is not a routine program | new: {"prog":"rm is not a routine program"}
+old-accepted    "sed -i s/a/b/ docs/a.md": sed is not a routine program | new: {"prog":"sed is not a routine program"}
+old-accepted    "mkdir .checkpoints/x": mkdir is not a routine program | new: {"prog":"mkdir is not a routine program"}
+old-accepted    "node tools/gate.mjs | tee out.txt": tee is not a routine program | new: {"prog":"tee is not a routine program"}
+old-accepted    "/usr/bin/node tools/gate.mjs": /usr/bin/node is not a routine program | new: {"prog":"/usr/bin/node is not a routine program"}
+old-accepted    "curl https://x": curl is not a routine program | new: {"prog":"curl is not a routine program"}
+old-accepted    "wget https://x": wget is not a routine program | new: {"prog":"wget is not a routine program"}
+old-accepted    "npx --no -- playwright install chromium": npx is not a routine program | new: {"prog":"npx is not a routine program"}
+old-accepted    "pip install x": pip is not a routine program | new: {"prog":"pip is not a routine program"}
+old-accepted    "cargo build": cargo is not a routine program | new: {"prog":"cargo is not a routine program"}
+old-accepted    "sudo ls": sudo is not a routine program | new: {"prog":"sudo is not a routine program"}
+old-accepted    "bash -c \"git status\"": bash is not a routine program | new: {"prog":"bash is not a routine program"}
+old-accepted    "eval \"git status\"": eval is not a routine program | new: {"prog":"eval is not a routine program"}
+old-accepted P4 "command git status": command is not a routine program | new: {"prog":"command is not a routine program"}
+old-accepted    "exec node x": exec is not a routine program | new: {"prog":"exec is not a routine program"}
+old-accepted    "PATH=.gate node tools/gate.mjs": PATH= may not be set | new: {"prog":"PATH= may not be set"}
+old-accepted    "env NODE_OPTIONS=--require=./x node tools/gate.mjs": env is not a routine program | new: {"prog":"env is not a routine program"}
+old-accepted P4 "env": env is not a routine program | new: {"prog":"env is not a routine program"}
+old-accepted    "printenv": printenv is not a routine program | new: {"prog":"printenv is not a routine program"}
+old-accepted P4 "undefined": undefined is not a routine program | new: {"prog":"undefined is not a routine program"}
+old-accepted    "git switch cs/ok & x": x is not a routine program | new: {"prog":"x is not a routine program"}
+old-accepted    "git switch cs/ok | cat": cat is not a routine program | new: {"prog":"cat is not a routine program"}
+old-accepted    "cd /p && git switch cs/ok": cd is not a routine program | new: {"prog":"cd is not a routine program"}
+old-accepted    "git push origin cs/x | cat": cat is not a routine program | new: {"prog":"cat is not a routine program"}
+old-accepted P4 "2>&1 git status": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "docs/do git status": docs/do is not a routine program | new: {"prog":"docs/do is not a routine program"}
+old-accepted P4 "./docs/timeout 5 git status": ./docs/timeout is not a routine program | new: {"prog":"./docs/timeout is not a routine program"}
+old-accepted P4 "docs/env git status": docs/env is not a routine program | new: {"prog":"docs/env is not a routine program"}
+old-accepted P4 "docs/then git status": docs/then is not a routine program | new: {"prog":"docs/then is not a routine program"}
+old-accepted P4 ".gate/w/docs/do git status": .gate/w/docs/do is not a routine program | new: {"prog":".gate/w/docs/do is not a routine program"}
+old-accepted P4 "/usr/bin/git status": /usr/bin/git is not a routine program | new: {"prog":"/usr/bin/git is not a routine program"}
+old-accepted P4 "\"git\" status": "git" is not a routine program | new: {"prog":"\"git\" is not a routine program"}
+old-accepted P4 "if \"TZ=./x\" date; then date; fi": if is not a routine program | new: {"prog":"if is not a routine program"}
+old-accepted P4 "while \"TZ=x\" date; do date; done": while is not a routine program | new: {"prog":"while is not a routine program"}
+old-accepted P4 "'do' git status": 'do' is not a routine program | new: {"prog":"'do' is not a routine program"}
+old-accepted P4 "if git status; then date; fi": if is not a routine program | new: {"prog":"if is not a routine program"}
+old-accepted P4 ">CLAUDE.md": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "TZ=x >CLAUDE.md": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "git status; >.claude/settings.json": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "TZ=x >.claude/settings.json": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "TZ=x": a command with no program | new: {"prog":"a command with no program"}
+old-accepted P4 "TZ=x\ngit status": a command with no program | new: {"prog":"a command with no program"}
+old-accepted P4 "TZ=x; git status": a command with no program | new: {"prog":"a command with no program"}
+old-accepted P4 ">docs/x.md": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 ">docs/x.md git status": a redirect before the program | new: {"prog":"a redirect before the program"}
+old-accepted P4 "xvfb-run -a -f .claude/settings.json git status": xvfb-run is not a routine program | new: {"prog":"xvfb-run is not a routine program"}
+old-accepted P4 "xvfb-run -a -e CLAUDE.md git status": xvfb-run is not a routine program | new: {"prog":"xvfb-run is not a routine program"}
+old-accepted P4 "xvfb-run -a git status": xvfb-run is not a routine program | new: {"prog":"xvfb-run is not a routine program"}
+old-accepted P4 "timeout 5 git status": timeout is not a routine program | new: {"prog":"timeout is not a routine program"}
+old-accepted P4 "nice git status": nice is not a routine program | new: {"prog":"nice is not a routine program"}
+old-accepted P4 "env TZ=x date": env is not a routine program | new: {"prog":"env is not a routine program"}
+old-accepted P4 "stdbuf -oL git log -1": stdbuf is not a routine program | new: {"prog":"stdbuf is not a routine program"}
+old-accepted P4 "nohup git status": nohup is not a routine program | new: {"prog":"nohup is not a routine program"}
+old-accepted P4 "time git status": time is not a routine program | new: {"prog":"time is not a routine program"}
+old-accepted P4 "exec git status": exec is not a routine program | new: {"prog":"exec is not a routine program"}
+old-accepted P4 "noglob git status": noglob is not a routine program | new: {"prog":"noglob is not a routine program"}
+old-accepted P4 "nodejs x.js": nodejs is not a routine program | new: {"prog":"nodejs is not a routine program"}
+old-accepted P4 "PATH=x git status": PATH= may not be set | new: {"prog":"PATH= may not be set"}
+old-accepted P4 "cd .gate/nonexist; git status > .claude/settings.json": cd is not a routine program | new: {"prog":"cd is not a routine program"}
+old-accepted P4 "cd docs && git status": cd is not a routine program | new: {"prog":"cd is not a routine program"}
+old-accepted P4 "pushd docs": pushd is not a routine program | new: {"prog":"pushd is not a routine program"}
+total 68; old plainForm accepted 68; text in PASS4 rows 40; old-accepted and not PASS4 28

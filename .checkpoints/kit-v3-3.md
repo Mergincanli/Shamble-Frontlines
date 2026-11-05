@@ -139,7 +139,12 @@
     ruling). 1188/1188; gate with smoke PASS (the main session too); no routine decision looser (1,348); every probe's
     harm refused; main's file 179/192 (#181: cat now gets R-PROG's reason, the Read/Grep hint lost). Beyond the ruling:
     two main mutation rows moved into KIT_BEHIND_MUTANTS (kitPath), for the advisor to accept.
-  - Now: the verifier alone checks fix pass 4 (`verifier-fixpass4.md`), under his review budget; then step 10.
+  - Done: the verifier's check of fix pass 4 (`verifier-fixpass4.md`): PASS WITH NOTES, nothing Critical or High;
+    P4F-V1 Low (R-PROG's reason drops routineProgram's hints; main's #181) -> follow-up FU-P4d; observations: the
+    KIT_BEHIND moves (proof holds; the advisor decides), 68 corpus lines leave by name, STATUS's closed-limits line
+    does not list fix pass 4's closures (the report names them). CI green on 0c481e1 and 6f18311.
+  - Now: step 10: the report (`docs/reports/2026-11-05-kit-v3-3.md`), FU-P4d and the final state in STATUS, the last
+    commit deletes `.checkpoints/kit-v3-3*`, PR ready, the advisor's final-head review, `needs-mustafa`, his go.
   - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
     until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
     scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor

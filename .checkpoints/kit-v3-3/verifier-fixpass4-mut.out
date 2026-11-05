@@ -1,0 +1,51 @@
+MUTANTS 12
+== R-PROG removed (target x1): 11 key rows move
+   "docs/do git status": deny: start each command with its program by name (docs/do is not a routine  -> null
+   "TZ=x": deny: start each command with its program by name (a command with no program -> null
+   ">docs/x.md git status": deny: start each command with its program by name (a redirect before the pro -> null
+   "2>&1 git status": deny: start each command with its program by name (a redirect before the pro -> null
+   "cd docs && git status": deny: start each command with its program by name (cd is not a routine progr -> null
+   "\"git\" status": deny: start each command with its program by name ("git" is not a routine pr -> null
+   "timeout 5 git status": deny: start each command with its program by name (timeout is not a routine  -> null
+   "PATH=x git status": deny: start each command with its program by name (PATH= may not be set): gi -> deny: only TZ, LC_ALL, LANG, LANGUAGE, NO_COLOR may be set on a command; PAT
+   "TZ=x\ngit status": deny: start each command with its program by name (a command with no program -> null
+   "TZ=x; git status": deny: start each command with its program by name (a command with no program -> null
+   "xvfb-run -a git status": deny: start each command with its program by name (xvfb-run is not a routine -> null
+== R-PROG's no-program end check removed (target x1): 3 key rows move
+   "TZ=x": deny: start each command with its program by name (a command with no program -> null
+   "TZ=x\ngit status": deny: start each command with its program by name (a command with no program -> null
+   "TZ=x; git status": deny: start each command with its program by name (a command with no program -> null
+== R-PROG's redirect-before-the-program check removed (an operator) (target x1): 1 key rows move
+   ">docs/x.md git status": deny: start each command with its program by name (a redirect before the pro -> null
+== R-PROG's redirect-before-the-program check removed (>& and its number) (target x1): 1 key rows move
+   "2>&1 git status": deny: start each command with its program by name (a redirect before the pro -> null
+== cd added to the list (target x1): 1 key rows move
+   "cd docs && git status": deny: start each command with its program by name (cd is not a routine progr -> null
+== a quoted program word allowed (target x1): 1 key rows move
+   "\"git\" status": deny: start each command with its program by name ("git" is not a routine pr -> null
+== the program list check removed (target x1): 5 key rows move
+   "docs/do git status": deny: start each command with its program by name (docs/do is not a routine  -> null
+   "cd docs && git status": deny: start each command with its program by name (cd is not a routine progr -> null
+   "\"git\" status": deny: start each command with its program by name ("git" is not a routine pr -> null
+   "timeout 5 git status": deny: start each command with its program by name (timeout is not a routine  -> null
+   "xvfb-run -a git status": deny: start each command with its program by name (xvfb-run is not a routine -> null
+== the settings name check removed (target x1): 1 key rows move
+   "PATH=x git status": deny: start each command with its program by name (PATH= may not be set): gi -> deny: only TZ, LC_ALL, LANG, LANGUAGE, NO_COLOR may be set on a command; PAT
+== a newline ends the command (R-PROG) (target x1): 1 key rows move
+   "TZ=x\ngit status": deny: start each command with its program by name (a command with no program -> null
+== a separator ends the command (R-PROG) (target x1): 1 key rows move
+   "TZ=x; git status": deny: start each command with its program by name (a command with no program -> null
+== R-PROG's reason of its own (progReason) (target x1): 11 key rows move
+   "docs/do git status": deny: start each command with its program by name (docs/do is not a routine  -> deny: write the command plainly (docs/do is not a routine program): one comm
+   "TZ=x": deny: start each command with its program by name (a command with no program -> deny: write the command plainly (a command with no program): one command per
+   ">docs/x.md git status": deny: start each command with its program by name (a redirect before the pro -> deny: write the command plainly (a redirect before the program): one command
+   "2>&1 git status": deny: start each command with its program by name (a redirect before the pro -> deny: write the command plainly (a redirect before the program): one command
+   "cd docs && git status": deny: start each command with its program by name (cd is not a routine progr -> deny: write the command plainly (cd is not a routine program): one command p
+   "\"git\" status": deny: start each command with its program by name ("git" is not a routine pr -> deny: write the command plainly ("git" is not a routine program): one comman
+   "timeout 5 git status": deny: start each command with its program by name (timeout is not a routine  -> deny: write the command plainly (timeout is not a routine program): one comm
+   "PATH=x git status": deny: start each command with its program by name (PATH= may not be set): gi -> deny: write the command plainly (PATH= may not be set): one command per line
+   "TZ=x\ngit status": deny: start each command with its program by name (a command with no program -> deny: write the command plainly (a command with no program): one command per
+   "TZ=x; git status": deny: start each command with its program by name (a command with no program -> deny: write the command plainly (a command with no program): one command per
+   "xvfb-run -a git status": deny: start each command with its program by name (xvfb-run is not a routine -> deny: write the command plainly (xvfb-run is not a routine program): one com
+== the quoted-glob rule (no expansion in a redirect target), with R-PLAIN on (target x1): 1 key rows move
+   "git status > 'a*b'": deny: no variable, glob, brace or ~ in a write path (a*b) -> null
