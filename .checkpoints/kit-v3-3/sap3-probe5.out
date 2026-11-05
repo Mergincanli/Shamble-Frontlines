@@ -1,0 +1,4 @@
+B1 night fetch &: "git fetch -q origin cs/ok &" -> null 
+B2 night fetch with run_in_background: null
+B3 night fetch | cat (non-alone fetch): "git fetch -q origin cs/ok | cat" -> deny routine (night-shift): the shell runs only git, gh, npm ci, node or python (main's tracked scripts) and date; 
+git git version 2.43.0 bash 5.2.21(1)-release

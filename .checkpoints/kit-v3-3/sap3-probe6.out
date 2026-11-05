@@ -1,0 +1,19 @@
+V3 night packed refs, git switch -q cs/ok: "git switch -q cs/ok" -> null 
+  real bash exit 0 branch cs/ok settings {"a":1} CLAUDE.md rules
+V3 night packed refs, git switch -q cs/evil: "git switch -q cs/evil" -> deny routine (night-shift): cs/evil's rules, CI or gate files differ from main's (.claude/settings.json); switching
+V3 night packed refs, git switch -q cs/ok^: "git switch -q cs/ok^" -> deny routine (night-shift): can't resolve cs/ok^ to a commit; fetch it first (git fetch origin <branch>), or stop t
+V3 night packed refs, git switch -q cs/ok@{0}: "git switch -q cs/ok@{0}" -> deny routine (night-shift): can't resolve cs/ok@{0} to a commit; fetch it first (git fetch origin <branch>), or sto
+V3 night packed refs, git switch -q cs/ok@{u}: "git switch -q cs/ok@{u}" -> deny routine (night-shift): can't resolve cs/ok@{u} to a commit; fetch it first (git fetch origin <branch>), or sto
+V3 night packed refs, git switch -q cs/x..y: "git switch -q cs/x..y" -> deny routine (night-shift): can't resolve cs/x..y to a commit; fetch it first (git fetch origin <branch>), or stop 
+V3 night packed refs, git switch -q cs/ok.lock: "git switch -q cs/ok.lock" -> deny routine (night-shift): can't resolve cs/ok.lock to a commit; fetch it first (git fetch origin <branch>), or st
+V3 night packed refs, git switch -q CS/OK: "git switch -q CS/OK" -> deny routine (night-shift): can't resolve CS/OK to a commit; fetch it first (git fetch origin <branch>), or stop th
+V3 night packed refs, git switch -q refs/heads/cs/ok: "git switch -q refs/heads/cs/ok" -> deny routine (night-shift): no new branch named refs/heads/cs/ok (origin/, refs/ and remotes/ names, HEAD and main 
+V3 night packed refs, git switch -q heads/cs/ok: "git switch -q heads/cs/ok" -> deny routine (night-shift): can't resolve heads/cs/ok to a commit; fetch it first (git fetch origin <branch>), or s
+V3 night packed refs, git switch -q origin/cs/ok: "git switch -q origin/cs/ok" -> deny routine (night-shift): no new branch named origin/cs/ok (origin/, refs/ and remotes/ names, HEAD and main woul
+V3 night packed refs, git switch -q @: "git switch -q @" -> deny routine (night-shift): can't resolve @ to a commit; fetch it first (git fetch origin <branch>), or stop the it
+V3 night packed refs, git switch -q @{-1}: "git switch -q @{-1}" -> deny routine (night-shift): can't resolve @{-1} to a commit; fetch it first (git fetch origin <branch>), or stop th
+V3 night packed refs, git switch -q cs/ok~0: "git switch -q cs/ok~0" -> deny routine (night-shift): can't resolve cs/ok~0 to a commit; fetch it first (git fetch origin <branch>), or stop 
+V3 night symbolic refs/heads/cs/sym -> cs/ok: "git switch -q cs/sym" -> null 
+  real bash exit 0 branch cs/ok settings {"a":1} CLAUDE.md rules
+V3 night git switch cs/up@{u} (upstream local cs/evil): "git switch -q cs/up@{u}" -> deny routine (night-shift): can't resolve cs/up@{u} to a commit; fetch it first (git fetch origin <branch>), or sto
+git git version 2.43.0 bash 5.2.21(1)-release

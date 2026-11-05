@@ -1,0 +1,10 @@
+MOVED head ask  base null "cd <R>/nope && pushd <R>/proj/.gate/wt; git switch -q -c cs/p1 origin/cs/evil"
+MOVED head ask  base null "cd <R>/nope && cd <R>/proj/.gate/wt && git switch -q -c cs/p2 origin/cs/evil"
+same  head null base null "cd <R>/nope; cd <R>/proj/.gate/wt; git switch -q -c cs/p3 origin/cs/evil"
+same  head null base null "cd <R>/proj/.gate/wt && git switch -q -c cs/p4 origin/cs/evil"
+same  head ask  base ask  "git fetch -q origin cs/ok && cd <R>/proj/.gate/wt && git switch -q cs/ok"
+same  head ask  base ask  "git fetch -q && git switch --detach origin/cs/ok"
+same  head ask  base ask  "git branch cs/n origin/cs/evil && git switch -q cs/n"
+same  head ask  base ask  "git log -1 && git merge --ff-only origin/cs/ok"
+MOVED head ask  base null "cd <R>/proj/.gate/wt; trap 'cd <R>/proj' DEBUG; git switch -q cs/ok"
+git git version 2.43.0 bash 5.2.21(1)-release

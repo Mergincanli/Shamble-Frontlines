@@ -1,0 +1,21 @@
+--- blob->gitlink settings.json, ignore=all (base...tc):
+.claude/settings.json
+.gitmodules
+--- same, --ignore-submodules=none:
+.claude/settings.json
+.gitmodules
+--- same, two-dot base tc --:
+.claude/settings.json
+.gitmodules
+--- real switch to tc: what is .claude/settings.json after?
+total 12
+drwxr-xr-x 3 root root 4096 Nov  5 12:51 .
+drwxr-xr-x 4 root root 4096 Nov  5 12:51 ..
+drwxr-xr-x 2 root root 4096 Nov  5 12:51 settings.json
+NOT-A-FILE
+--- gitlink modify ignore=all (g1...g2):
+--- gitlink modify, --ignore-submodules=none:
+.claude/sub
+--- gitlink add, --ignore-submodules=none (base...g1):
+.claude/sub
+.gitmodules

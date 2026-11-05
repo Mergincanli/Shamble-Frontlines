@@ -1,0 +1,9 @@
+Task: skeptic pass 3, finding P3-2 (here-document delimiter with escaped/quoted space), A3 kit-v3-3.
+Plan: B1 read code routine-guard.mjs:200-240 at 01b158c and diff; B2 check rulings (advisor-fix-pass2 limits L9/L11/L16-L18, scope); B3 reproduce in real bash + guard in scratch; B4 verdict.
+## Notes
+- B1 done: delimiter read is routine-guard.mjs:207-214 at 01b158c (`while (... !/[\s;&|<>]/ ...) { if not quote/backslash d += }`), body skip :180-187. Unchanged since 3f43a7a (kit-v3-1 step 1); not in the pass-2 diff.
+- B2 done: ruling's pass-3 scope says routine paths at full depth, "any bypass of Mustafa's condition here is FAIL", no pre-existing carve-out; WT-NIGHT condition is Mustafa's 2026-11-05 answer, enforced by A3's night switch check. No limit covers it: L16 is day only and itself claims "routines are refused such lines"; L1/L2/L15 are runners/writers/profile. SD-1/V-3 (same class, night switch bypass) were ruled major.
+- B3 done: reran sap3-probe2.mjs (real git 2.43.0, bash 5.2.21) into .gate/kit-v3-3/pass3/skP32: head D1, D2 null and main folder ends on cs/evil (settings {"a":2}); D3 night, D4 pr-advisor null and CLAUDE.md overwritten; D6 E""O denied. Merge-base 12d7961 guard: D1-D6 all null (pre-existing; head only fixes D6 by the SD-1 rule).
+- No routine text uses a heredoc (NIGHT_SHIFT, CHECKPOINTS, agents); test file uses <<  only in 2 places (see grep). Fix refinement: the fail-closed regex should also accept a leading backslash (`<<\EOF`), i.e. /^\\?['"]?[A-Za-z0-9_.-]+['"]?$/, or simply deny for roles any delimiter word containing whitespace after quote/escape processing.
+- B4 verdict: stands (not refuted). Severity: major, not critical (rubric: a routine bypass of WT-NIGHT is major; needs deliberately crafted text from the routine agent itself; pre-existing on main; same class as SD-1/V-3 which were major).
+DONE

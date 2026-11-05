@@ -77,10 +77,21 @@
     mutant retargets named); main's file 180/192 (3 pre-existing, 8 rev-parse scaffold, 1 SD-2 key scaffold: "refused:
     night: commit a staged rules file"); gate with smoke PASS (the main session, at the working tree). Docs: D-1 stale
     lines, L9 and L11 widened, L16-L18, follow-up A-4, the closed line (SD-4). CI on 01b158c started.
-  - Now (pass 3: wf_4c636903-c6d; notes `security-auditor-pass3.md`, `verifier-pass3.md`, `skeptic-pass3-*.md`): the
-    automated review of the fix commit (when it comes), and pass 3 (security-auditor and the verifier on only
-    the pass-2 diff ed3ea8c..01b158c; routine paths at full depth, day paths ordinary and accidental only; skeptics only
-    for a major; a minor day finding becomes a limit or follow-up, not a pass 4).
+  - Done: pass 3 (wf_4c636903-c6d; `security-auditor-pass3.md`, `verifier-pass3.md`, `skeptic-pass3-*.md`, probes
+    `sap3-*`, `vp3-*`, `skp3-*`). The verifier PASS WITH NOTES (864/864; main's file 180/192 as named; every ruled row
+    in; no survivors; gate with smoke PASS; texts PASS); its notes: commit pathspecs (= P3-5), SD-5's false ask (= P3-7).
+    security-auditor FAIL on routine paths, all on main 12d7961 too: P3-1 a `#` comment holding a quote, P3-2 a
+    here-document delimiter with a quoted or escaped space, P3-3 `$'...'` (date carrier): each hides a whole command
+    from parseShell (real bash ran a hidden night switch to cs/evil and CLAUDE.md writes, night and pr-advisor); P3-5
+    a night commit with pathspecs (no `--`, `-- .`, globs, `:(top)`) skips the commit check (push check still holds).
+    Minor: P3-4 a fetch backgrounded by an earlier call (L18's neighbour), P3-6 `.gitmodules` ignore = all hides a
+    gitlink (`--ignore-submodules=none`), P3-7 SD-5 asks on `git clone <url> .gate/tools` (a regression on a control);
+    nit P3-8 (`git stash && git switch main` asks: name it). Skeptics upheld all four majors (P3-1, P3-2 major not
+    critical; P3-3 critical defensible; P3-5 major and wider). Night queue (issue #16): no unchecked item, so tonight's
+    night shift does nothing; the PR Advisor reviews only ready PRs. CI green on 01b158c. No automated review of c8cbb1a
+    has arrived.
+  - Now: the advisor's ruling on pass 3 (`advisor-pass3.md`): fix in A3 or a separate urgent change-set, the fix shapes,
+    and the check after them.
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods

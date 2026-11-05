@@ -1,0 +1,7 @@
+Q5 night date +ANSI-C hides a switch, unterminated end: "date +$'\\''x\ngit switch -q cs/evil\n'" -> null 
+  real bash exit 2 branch cs/evil settings {"a":2} CLAUDE.md rules
+Q6 night date +ANSI-C, end in a second date: "date +$'\\''x\ngit switch -q cs/evil\ndate +'%s'" -> null 
+  real bash exit 0 branch cs/evil settings {"a":2} CLAUDE.md rules
+Q7 pr-advisor date +ANSI-C hides a write: "date +$'\\''x\necho x > CLAUDE.md\ndate +'%s'" -> null 
+  real bash exit 0 branch main settings {"a":1} CLAUDE.md x
+git git version 2.43.0 bash 5.2.21(1)-release

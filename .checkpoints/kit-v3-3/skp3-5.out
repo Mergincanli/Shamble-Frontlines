@@ -1,0 +1,5 @@
+ordinary docs+kit pathspec -> null
+  commit holds: CLAUDE.md,docs/a.md
+  then night push -> deny routine (night-shift): the branch changes CLAUDE.md (a rules, CI or gate file); it can't b
+control -- -> deny
+control -a -> deny
