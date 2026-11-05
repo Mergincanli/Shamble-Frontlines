@@ -24,17 +24,16 @@
   - F-1: the trust rule misses a done block whose output was lost with a container.
   Out of scope unless the plan argues otherwise: the kit-v3-1 Windows test follow-up (its own change-set, advisor
   condition C6).
-- **Current step:** 1, plan revision 1 (a workflow: three readers, a planner, a critic, then the advisor), at most 3
-  agents at a time. The first run (wf_d8f3b3e4-0f7) was stopped a few minutes in, to widen it to items 4 and 5;
-  it resumes from the readers' notes. The resumed run (23:13 UTC) failed in full on the org's usage limit ("monthly
-  spend limit"; the 5-hour limit reset at 23:50 UTC): no agent finished; reader-secrets had done blocks 1-2 and
-  reader-askfirst its plan. Resumed again after the reset, with a stop after any failed stage. That run (23:53 UTC)
-  finished the three readers (notes end with DONE; their results are in the workflow's journal) and was cut by a
-  container restart at ~00:10 UTC while the planner wrote plan-rev1.md (its notes: block 8 not marked done).
-  Resumed again: the readers replay from the journal; the planner redoes block 8, written over.
-  reader-secrets's test harnesses are in `.gate/kit-v3-3/` (gitignored), not the notes folder: the reader brief said
-  so, against CHECKPOINTS.md §4; the build moves their cases into checkpoint.test.mjs, with test strings split so
-  the repo's own secret check does not match the source.
+- **Current step:** 2, the build, part 1 (a workflow: E10's doc quotes, plan revision 2 with the conditions, then
+  build step 2, the STATUS follow-ups first).
+  - Plan revision 1, with the critic's points folded in: `plan-rev1.md` (the draft before the critic:
+    `plan-rev1-draft.md`; the critic's notes: `critic.md`; the reviser's: `reviser.md`).
+  - The advisor's verdict: APPROVE with conditions C1-C12 (`advisor-plan-rev1.md`, 2026-11-05 ~00:40 UTC). Two
+    decisions for Mustafa: WT-NIGHT (the night shift's exception to his worktree rule; recommendation (a)) and
+    PC-MODE (information only). C2: WT-NIGHT is built last, after his answer; everything else is built first.
+  - Mustafa (2026-11-05, before he went to sleep): "continue with the work (take the lead)".
+  - The planning runs: wf_d8f3b3e4-0f7 (stopped once to widen it to items 4 and 5, once by the usage limit, once by
+    a container restart; resumed each time from the notes and the journal).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 - **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
   org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.

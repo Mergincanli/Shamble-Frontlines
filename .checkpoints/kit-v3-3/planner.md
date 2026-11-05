@@ -22,3 +22,6 @@ Notes:
 - Finding: STATUS still says PR #37 "ready for review"/in flight (STATUS:22-24, :512); docs-keeper must mark it merged (12d7961).
 - Finding: queue open points vs STATUS: closed already: date in CLAUDE.md:136; trigger rule CLAUDE.md:139-141; KT14 + draft nit (#35, STATUS:91); Guard test B1 deleted (STATUS:177, :492); PORTAL-EMBED (STATUS:189); PROBE-FILE (:505); ROUTINE-EFFORT; B2 nit (kit-v3-1 report:169 now has both runs); #35 items 1-4,6,7; #36 items 1-2 in Follow-ups :277-279, 3-4 taken; A2 item 3 KIT-ALIGN :378, 4 done, items 1-2 partly (:516-517). OPEN, not in STATUS: #35 item 5 rest (README row 86, OQ-0006-23, #35 report "B3" qualifier); #36 item 5 Playwright 1194; first guarded night + PR Advisor scheduled run results (06:45 next, STATUS:461 partly); A2 item 2 (§7 wave wording); F-1, R-1, R-2 (0 hits); A4 words, B.1/B.2 words (STATUS:26-30 summary only). Reader new: DOCS-DOMAIN, main folder stale e4d8b22, routine GitHub reads not repo-scoped, .gate/ allow `..` reach.
 - Next: B8 write plan-rev1.md.
+- Finding: draft plan-rev1.md (from the cut run) named 'PR #38'; the checkpoint names no PR: replaced. Test A17 was missing: added (ln). Rewrote plan-rev1.md over as B8.
+- B8 done (plan-rev1.md written over: header PR fixed, A17 added). Next B9.
+DONE
