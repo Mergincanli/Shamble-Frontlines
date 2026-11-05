@@ -1,0 +1,72 @@
+# E1-E3 output, worktree on 6184259 + the builder's uncommitted edits, 2026-11-05
+## node .checkpoints/b1-plan-view/e1-words.mjs
+ok   source holds lead line "Small change-sets, one at a time, plan first (Mustafa, 2026-11-03)."
+ok   source holds lead line "B. Docs:"
+ok   source holds B.1 and B.2
+ok   B.1 piece spans "Plan view ... no code now."
+ok   the addition has 8 lines (found 8)
+ok   mustafa-words.md holds B.1 (2026-11-03) once
+ok   mustafa-words.md holds addition line 1 once
+ok   mustafa-words.md holds addition line 2 once
+ok   mustafa-words.md holds addition line 3 once
+ok   mustafa-words.md holds addition line 4 once
+ok   mustafa-words.md holds addition line 5 once
+ok   mustafa-words.md holds addition line 6 once
+ok   mustafa-words.md holds addition line 7 once
+ok   mustafa-words.md holds addition line 8 once
+ok   docs/EDITOR_V2.md: B.1 (2026-11-03) found 1 time(s) ("Plan view: draw to build". Two views of the sam...)
+ok   docs/EDITOR_V2.md: addition line 1 found 1 time(s) (Decided, the tool order: (1) greybox now, art la...)
+ok   docs/EDITOR_V2.md: addition line 2 found 1 time(s) (Decided: all the basic primitives (cube, sphere,...)
+ok   docs/EDITOR_V2.md: addition line 3 found 1 time(s) (Decided: every object has width, length and heig...)
+ok   docs/EDITOR_V2.md: addition line 4 found 1 time(s) (Decided: the plan view looks straight down, flat...)
+ok   docs/EDITOR_V2.md: addition line 5 found 1 time(s) (Decided: trace sketches (a photo of a paper sket...)
+ok   docs/EDITOR_V2.md: addition line 6 found 1 time(s) (Decided, lower priority: a travel-time ruler sho...)
+ok   docs/EDITOR_V2.md: addition line 7 found 1 time(s) (Decided: instances (stamps) are an optional, top...)
+ok   docs/EDITOR_V2.md: addition line 8 found 1 time(s) (Principle: a lean, solid editor, planned and bui...)
+ok   docs/STATUS.md: B.2 (2026-11-03) found 1 time(s) (VISION_V2: a short "Community servers (later)" n...)
+ok   docs/STATUS.md: lead line 1 found 1 time(s) (Small change-sets, one at a time, plan first (Mu...)
+ok   docs/STATUS.md: lead line 2 found 1 time(s) (B. Docs:...)
+E1 PASS
+exit 0
+## node .checkpoints/b1-plan-view/e2-bullets.mjs
+ok   headings identical (7): EDITOR 1. 2. 3. 4. 5. 6.
+upd  base :3 -> :3 intro + "Updated on 2026-11-05 with Mustafa's editor decisions: §3's block dated 2026-11-05, and the pointers to it."
+new  :8 Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05....
+ptr  base :23 -> :26 4. **Edit mode shows real, unmerged obje... + (Mustafa's tool order (2) bears on it: §3, Decided 2026-11-05.)
+ptr  base :31 -> :35 - **Select and transform:** click to sel... + (Mustafa decided each object's width, length, height and how high it sits, and primitives that snap to gameplay sizes: §3, Decided 2026-11-05.)
+ptr  base :39 -> :44 - **Validation panel:** bot reachability... + (Mustafa's tool order (3) to (5), heatmaps, the fairness panel and sightline checks: §3, Decided 2026-11-05.)
+ptr  base :41 -> :47 - **Test:** play the map with bots insta... + (Mustafa's tool order (2), play instantly: §3, Decided 2026-11-05.)
+ptr  base :42 -> :49 - `[LATER]` Enterable structures (interi... + (Mustafa decided instances (stamps): §3, Decided 2026-11-05.)
+new  :51 - **Decided 2026-11-05 (Mustafa, after his talk with the Advisor).** H...
+new  :53 - `[DECIDED]` Decided, the tool order: (1) greybox now, art later: you...
+new  :58 - `[DECIDED]` Decided: all the basic primitives (cube, sphere, cylinde...
+new  :61 - `[DECIDED]` Decided: every object has width, length and height, set ...
+new  :63 - `[DECIDED]` Decided: the plan view looks straight down, flat (orthog...
+new  :65 - `[DECIDED]` **Mustafa, 2026-11-03 (his B.1):** "Plan view: draw to b...
+new  :73 - `[DECIDED]` Decided: trace sketches (a photo of a paper sketch under...
+new  :75 - `[DECIDED]` Decided, lower priority: a travel-time ruler showing met...
+new  :77 - `[DECIDED]` Decided: instances (stamps) are an optional, top-level f...
+new  :80 - `[DECIDED]` Principle: a lean, solid editor, planned and built with ...
+new  :106 Mustafa's tool order (§3, Decided 2026-11-05) ranks the tools; the arc...
+ok   every base block found in order (42/42): 36 unchanged, 5 with one pointer
+ok   pointers on old blocks: 5 (planned 5: Select and transform, Test, Validation panel, §2 rule 4, [LATER])
+ok   new [DECIDED] items in the dated block: 9 (planned 9)
+ok   no pointer or new block mentions interiors
+blocks: base 42, head 54, new 12
+E2 PASS
+exit 0
+## node .checkpoints/b1-plan-view/e3-tags.mjs
+before(af8393e) [DECIDED] 2 expected 2 ok
+before(af8393e) [DEFAULT] 4 expected 4 ok
+before(af8393e) [OPEN] 1 expected 1 ok
+before(af8393e) [LATER] 2 expected 2 ok
+before(af8393e) [IDEA] 0 expected 0 ok
+before(af8393e) other tags: none ok
+after(worktree) [DECIDED] 11 expected 11 ok
+after(worktree) [DEFAULT] 4 expected 4 ok
+after(worktree) [OPEN] 1 expected 1 ok
+after(worktree) [LATER] 2 expected 2 ok
+after(worktree) [IDEA] 0 expected 0 ok
+after(worktree) other tags: none ok
+E3 PASS
+exit 0
