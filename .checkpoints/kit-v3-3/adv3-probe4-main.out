@@ -1,0 +1,29 @@
+R1 night git status >&CLAUDE.md: "git status >&CLAUDE.md" -> null 
+  real bash exit 0 branch main settings {"a":1} CLAUDE.md On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   CLAUDE.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+R2 pr-advisor git log -1 >&CLAUDE.md: "git log -1 --oneline >&CLAUDE.md" -> null 
+  real bash exit 0 branch main settings {"a":1} CLAUDE.md f4b1473 base
+R3 night git status >&.claude/settings.json: "git status >&.claude/settings.json" -> null 
+  real bash exit 0 branch main settings On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .claude/settings.json
+
+no changes added to commit (use "git add" and/or "git commit -a") CLAUDE.md rules
+R4 day git status >&CLAUDE.md: "git status >&CLAUDE.md" -> null 
+  real bash exit 0 branch main settings {"a":1} CLAUDE.md On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   CLAUDE.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ctl night git status > CLAUDE.md: "git status > CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+ctl night git status 2>&1: "git status 2>&1" -> null 
+git git version 2.43.0 bash 5.2.21(1)-release

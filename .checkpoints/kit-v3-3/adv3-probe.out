@@ -1,0 +1,24 @@
+A5_param_nested_dq
+  bash: ERR 
+  parser cmds: [["echo","${x:-}; echo HIDDEN; echo }"]]
+A6_param_sq_in_unquoted
+  bash: } | HIDDEN
+  parser cmds: [["echo","${x:-}}"],["echo","HIDDEN"]]
+A7_arith_paren
+  bash: 3 | HIDDEN
+  parser cmds: [["echo","$"],["1+2"],["echo","HIDDEN"]]
+A8_case_paren
+  bash: A | HIDDEN
+  parser cmds: [["case","a","in","a"],["echo","A"],["esac"],["echo","HIDDEN"]]
+A9_dollar_dq
+  bash: a | HIDDEN
+  parser cmds: [["echo","$a"],["echo","HIDDEN"]]
+A10_brace_expand
+  bash: CLAUDE.md CLAUDE.x
+  parser cmds: [["echo","CLAUDE.{md,x}"]]
+A11_hash_mid
+  bash: a#b | HIDDEN
+  parser cmds: [["echo","a#b"],["echo","HIDDEN"]]
+A12_bs_nl
+  bash: a echo HIDDEN
+  parser cmds: [["echo","a","\necho","HIDDEN"]]

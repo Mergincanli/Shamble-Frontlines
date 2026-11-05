@@ -90,8 +90,16 @@
     critical; P3-3 critical defensible; P3-5 major and wider). Night queue (issue #16): no unchecked item, so tonight's
     night shift does nothing; the PR Advisor reviews only ready PRs. CI green on 01b158c. No automated review of c8cbb1a
     has arrived.
-  - Now: the advisor's ruling on pass 3 (`advisor-pass3.md`): fix in A3 or a separate urgent change-set, the fix shapes,
-    and the check after them.
+  - Done: the advisor's pass-3 ruling (`advisor-pass3.md`; probes `adv3-probe*.out`; cut by the usage limit at its
+    start, resumed after the 15:10 UTC reset): PROCEED with fix pass 3 inside A3, then a scoped pass 4. New finding
+    P3-9 (major, on main too): `>&word` writes a file the guard never sees. Routines: R-PLAIN (the raw line in a plain
+    form the guard reads exactly as bash does, or refused; no here-documents), proven by the corpus test C-PLAIN;
+    dateCheck's word rule; the night commit allowlist (P3-5: `-m`, `--message`, `-a`, `-q`, `-s`, `--allow-empty`
+    only); P3-4 (no git in the background); P3-6 (`--ignore-submodules=none` in DIFF_NAMES). Day: parseShell's five
+    rules (comments, backslash-newline, ANSI-C, here-document delimiter as one word, `>&word`); P3-7 (clone targets
+    narrowed); P3-8 named. Texts: an R-PLAIN rule line, L16 and L18 replaced, SD-3 and night-commit sentences,
+    NIGHT_SHIFT.md step 7, follow-up FU-P3a.
+  - Now: fix pass 3 (builders: routine A, routine B, day C; then docs-keeper), then the gate and commits; then pass 4.
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
