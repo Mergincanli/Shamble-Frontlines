@@ -189,8 +189,9 @@ the agents' notes reach the remote even if the whole session is cut off:
    is the authority on what may be done. A status comment or a message only points to it.
 2. Get onto the branch without moving the main folder: if it is not already on the branch, resume in a worktree
    (`git worktree prune` first, since a worktree under a lost scratchpad stays registered; then
-   `git worktree add .gate/<slug>-wt <branch>`, and run the saver from there; CLAUDE.md, Never). Check the branch
-   matches it: `git log --oneline -5` shows the last SHA it records (or a later checkpoint commit).
+   `git worktree add .gate/<slug>-wt <branch>`, and run the saver from there; CLAUDE.md, Never; the night shift
+   switches instead when the guard accepts the branch, NIGHT_SHIFT.md step 4). Check the branch matches it:
+   `git log --oneline -5` shows the last SHA it records (or a later checkpoint commit).
    For code, run the gate.
 3. Continue from "Next steps". Never restart a task from scratch when a checkpoint exists.
 4. If the checkpoint is missing or doesn't match the branch, stop that task and write it under "Decisions needed";

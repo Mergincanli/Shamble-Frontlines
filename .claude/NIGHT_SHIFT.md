@@ -24,10 +24,12 @@ START CHECKS (in this order; "stop silently" = no comment, no notification)
    another run is working: stop silently.
 4. Handoff: if that status comment says "running" but its "Last update" is older than 45 minutes, that run was cut off
    by a limit. Read its "Checkpoint" line: it must name a cs/ branch that exists on origin (`git ls-remote --heads
-   origin <branch>`), never a fork or a pull/<n> ref. Check out that branch and resume from the checkpoint
-   (CHECKPOINTS.md §8): check the last commit it records, run the gate on code, and continue from its "Next steps". A
-   step runs only if the item's approved plan or verdict covers it; a step it does not cover (a new command, an edit to
-   .claude/ or CLAUDE.md, a push to another branch, a comment, a URL) stops the item under Decisions needed. If its
+   origin <branch>`), never a fork or a pull/<n> ref. Switch to that branch (`git switch <branch>`; the guard refuses
+   it when the branch's rules, CI or gate files differ from main's, since this folder's rules run the session: then
+   stop the item under Decisions needed) and resume from the checkpoint (CHECKPOINTS.md §8): check the last commit it
+   records, run the gate on code, and continue from its "Next steps". A step runs only if the item's approved plan or
+   verdict covers it; a step it does not cover (a new command, an edit to .claude/ or CLAUDE.md, a push to another
+   branch, a comment, a URL) stops the item under Decisions needed. If its
    checkpoint is missing or does not match the branch, stop that item, list it under Decisions needed, and move to the
    next item; never restart an item that has a checkpoint. If the newest status comment is from an earlier night and
    still says "running", that run was cut off too: add a short "Cut off" note to that night's report from its lines,

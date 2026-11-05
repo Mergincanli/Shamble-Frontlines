@@ -838,6 +838,9 @@ async function git(argv, vcwd, role, io, input = {}) {
     }
     if (sub === 'branch' && args.includes('--edit-description')) return deny(`routine (${role}): git branch --edit-description writes git config and waits for an editor`);
   }
+  // WT-NIGHT (a): the night's handoff switches only to a branch whose rules, CI and gate files equal main's
+  const night = sub === 'switch' && role === 'night-shift' ? switchTargetCheck(args, vcwd, io) : null;
+  if (night) return deny(night);
   if (sub === 'commit' && role === 'night-shift') {
     const staged = io.git(['diff', '--cached', '--name-only'], vcwd).out.split('\n');
     const all = args.some((a) => a === '-a' || a === '--all' || /^-[A-Za-z]*a/.test(a)) ? io.git(['diff', '--name-only'], vcwd).out.split('\n') : [];
@@ -877,6 +880,53 @@ function protectedInBranch(vcwd, io) {
   if (h?.failed) return "routine (night-shift): can't compare the branch with origin/main; fetch it first";
   if (!h) return null;
   return `routine (night-shift): the branch changes ${h.hit} (a rules, CI or gate file); it can't be pushed at night`;
+}
+// WT-NIGHT (a) (Mustafa, 2026-11-05: "The exception holds only when the branch's rules, CI and gate files match
+// main's."): the night shift's handoff may switch its folder to an item's branch only when the target's protected
+// files (protectedRel) equal main's, because the folder's hook code runs this session from the next call. Every night
+// switch is checked, in any folder. Only the forms git switch <branch>, -c <new> [<start>] and --detach [<ref>] (with
+// -q) go on. The target is resolved to a commit as git reads it: a plain name as the branch refs/heads/<name>, else
+// refs/remotes/origin/<name> (git switch creates the branch from it); -c's start point and --detach's ref by rev-parse;
+// HEAD when none is named. origin/main must be refs/remotes/origin/main's commit (originMainCheck, SA-2); then only
+// the two SHAs reach git. The names are read as tree paths, NUL-separated (-z: no quoted names), with renames off (a
+// kit file moved away still names its old path) and relative output off (diff.relative). Returns the refusal, or null.
+function switchTargetCheck(args, vcwd, io) {
+  const R = 'routine (night-shift)';
+  const stop = 'stop the item and record it under Decisions needed for a day session';
+  let create = null, detach = false;
+  const pos = [];
+  for (let i = 0; i < args.length; i++) {
+    const t = args[i];
+    if (t === '--') { pos.push(...args.slice(i + 1)); break; }
+    if (t === '-q' || t === '--quiet') continue;
+    if (t === '-d' || t === '--detach') { detach = true; continue; }
+    if (create === null && (t === '-c' || t === '--create') && i + 1 < args.length) { create = args[++i]; continue; }
+    if (create === null && /^-c./.test(t)) { create = t.slice(2); continue; }
+    if (create === null && /^--create=./.test(t)) { create = t.slice(9); continue; }
+    if (t.startsWith('-')) {
+      return `${R}: the guard can't tell where git switch ${args.join(' ')} goes; use git switch <branch>, ` +
+        `git switch -c <new> [<start>] or git switch --detach <ref>, or ${stop}`;
+    }
+    pos.push(t);
+  }
+  if (pos.length > 1 || (!pos.length && create === null && !detach)) {
+    return `${R}: git switch ${args.join(' ')} names no single target; use git switch <branch>, or ${stop}`;
+  }
+  const name = pos[0];
+  const target = name ?? 'HEAD';
+  const sha = create !== null || detach ? commitOf(target, vcwd, io)
+    : commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);
+  const forged = originMainCheck(vcwd, io, 'night-shift');
+  if (forged) return forged;
+  const main = commitOf(ORIGIN_MAIN, vcwd, io);
+  if (sha === null) return `${R}: can't resolve ${target} to a commit; fetch it first (git fetch origin <branch>), ` +
+    `or ${stop}`;
+  const d = io.git(['diff', '--name-only', '-z', '--no-renames', '--no-relative', main, sha, '--'], vcwd);
+  if (d.code !== 0) return `${R}: can't compare ${target} with origin/main; fetch it first (git fetch origin main), ` +
+    `or ${stop}`;
+  const hit = d.out.split('\0').filter(Boolean).find((f) => protectedRel(f));
+  return hit ? `${R}: ${target}'s rules, CI or gate files differ from main's (${hit}); switching this folder would ` +
+    `run them in this session: ${stop}` : null;
 }
 // WT-DAY and WT-UPDATE (kit-v3-3), day sessions only: the main folder (the project folder's own worktree) stays on
 // main's reviewed rules, because its hooks and rules are the ones this session runs. What would move it to another

@@ -1195,6 +1195,13 @@ export const ROUTINE_FIX_CASES = [
   ['Fi3 day: fetch ...:refs/remotes/origin/main && merge --ff-only origin/main goes on (L12)', DAY,
     dsh('git fetch origin cs/evil:refs/remotes/origin/main && git merge --ff-only origin/main'), null],
   ['day: git branch origin/main cs/x goes on (unchanged)', DAY, dsh('git branch origin/main cs/x'), null],
+  // step 9 (WT-NIGHT (a)), rows added only: the night's switch check also refuses a target it cannot resolve, which
+  // hid the name rule in the switch rows above; these targets resolve and equal main in kit files, so the name rule
+  // alone refuses them
+  ['night: git switch -c main cs/ok (cs/ok equals main in kit files)', NIGHT, dsh('git switch -c main cs/ok'), DENY,
+    { diffs: { 'cs/ok': '' } }, /no new branch named main/],
+  ['night: git switch remotes/x (the branch remotes/x equals main in kit files)', NIGHT, dsh('git switch remotes/x'), DENY,
+    { diffs: { 'remotes/x': '' } }, /no new branch named remotes\/x/],
 ];
 for (const [name, role, input, want, opts, re] of ROUTINE_FIX_CASES) {
   test(`routine (fix round 2) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -1562,5 +1569,245 @@ test('real git (fix round 2, F-b and SA-6): worktree add and clone into kit fold
   } finally {
     if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
     rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// --- step 9, WT-NIGHT (a) (Mustafa, 2026-11-05): the night shift switches its folder to an item's branch only when
+// the branch's rules, CI and gate files equal main's ---
+// A fake io for the night's switch check, on top of dayIo (role night-shift). kit answers the check's diff by the
+// target's name: NUL-separated names, as `git diff --name-only -z` prints them. A name kit lists resolves (as dayIo
+// resolves the names of diffs: a branch refs/heads/<name>, a full ref such as refs/remotes/origin/<name>, a commit
+// word, HEAD); a name it does not list does not. The diff fails when diffFail is set, or when it is not given
+// refs/remotes/origin/main's commit first and `--` last; a target SHA kit does not list is equal to main.
+function nightIo(o = {}) {
+  const { kit = {}, diffFail = false, calls, ...rest } = o;
+  const io = dayIo({ ...rest, role: NIGHT, diffs: Object.fromEntries(Object.keys(kit).map((n) => [n, ''])) });
+  const bySha = new Map(Object.entries(kit).map(([n, out]) => [shaOf(n), out]));
+  return {
+    ...io,
+    git: (args, cwd) => {
+      calls?.push(args);
+      if (args[0] === 'diff' && args.includes('-z')) {
+        const [a, b] = args.slice(-3, -1);
+        if (diffFail || a !== shaOf('origin/main') || args.at(-1) !== '--') return { code: 128, out: '' };
+        return { code: 0, out: bySha.get(b) ?? '' };
+      }
+      return io.git(args, cwd);
+    },
+  };
+}
+const NIGHT_HIT = /rules, CI or gate files differ from main's .*stop the item and record it under Decisions needed for a day session/;
+const KIT = (...files) => files.map((f) => `${f}\0`).join('');
+// [name, input, expected kind, nightIo options, reason pattern]
+export const NIGHT_SWITCH_CASES = [
+  ['T15 night git switch cs/x, the diff names .claude/hooks/guard.mjs: deny', dsh('git switch cs/x'), DENY,
+    { kit: { 'cs/x': KIT('shamble-game.js', '.claude/hooks/guard.mjs') } }, /cs\/x's rules, CI or gate files differ from main's \(\.claude\/hooks\/guard\.mjs\)/],
+  ['T15r night, the diff names a nested CLAUDE.md (rules): deny', dsh('git switch cs/x'), DENY, { kit: { 'cs/x': KIT('docs/sub/CLAUDE.md') } }, NIGHT_HIT],
+  ['T15c night, the diff names .github/workflows/gate.yml (CI): deny', dsh('git switch cs/x'), DENY,
+    { kit: { 'cs/x': KIT('.github/workflows/gate.yml') } }, NIGHT_HIT],
+  ['T15g night, the diff names tools/package-lock.json (gate): deny', dsh('git switch cs/x'), DENY,
+    { kit: { 'cs/x': KIT('docs/a.md', 'tools/package-lock.json') } }, NIGHT_HIT],
+  ['T15w night, in a worktree too (every night switch is checked): deny', dsh('git switch cs/x', { cwd: '/w' }), DENY,
+    { kit: { 'cs/x': KIT('.claude/settings.json') } }, NIGHT_HIT],
+  ['T16 night, a diff of shamble-game.js only: goes on', dsh('git switch cs/x'), null, { kit: { 'cs/x': KIT('shamble-game.js') } }],
+  ['T16 night, docs and agent memory only: goes on', dsh('git switch -q cs/x'), null,
+    { kit: { 'cs/x': KIT('docs/STATUS.md', '.claude/agent-memory-local/advisor/x.md', '.checkpoints/x.md') } }],
+  ['T16 night, git switch -- cs/x: goes on', dsh('git switch -- cs/x'), null, { kit: { 'cs/x': KIT('docs/a.md') } }],
+  ['T16a night --detach an old commit whose CLAUDE.md differs: deny', dsh('git switch --detach 4def8d2'), DENY,
+    { kit: { '4def8d2': KIT('CLAUDE.md') } }, /4def8d2's rules, CI or gate files differ/],
+  ['T16a night -d an old commit whose CLAUDE.md differs: deny', dsh('git switch -d 4def8d2'), DENY, { kit: { '4def8d2': KIT('CLAUDE.md') } }],
+  ['T16a control: night --detach origin/main goes on', dsh('git switch --detach origin/main'), null],
+  ['T16a night --detach with no ref (HEAD), HEAD differs: deny', dsh('git switch --detach'), DENY, { kit: { HEAD: KIT('.claude/rules/x.md') } }],
+  ['T16b night git switch -: deny', dsh('git switch -'), DENY, {}, /can't tell where git switch - goes/],
+  ['T16b night git switch --orphan x: deny', dsh('git switch --orphan x'), DENY, { kit: { x: '' } }, /can't tell/],
+  ['T16b night git switch --orphan=x: deny', dsh('git switch --orphan=x'), DENY, { kit: { x: '' } }],
+  ['T16c night, the diff fails: deny', dsh('git switch cs/x'), DENY, { kit: { 'cs/x': '' }, diffFail: true }, /can't compare cs\/x with origin\/main/],
+  ['T16e night git switch -f cs/ok (another option; the option check refuses it first): deny', dsh('git switch -f cs/ok'), DENY, { kit: { 'cs/ok': '' } }],
+  ['T16e night git switch --guess cs/ok (another option): deny', dsh('git switch --guess cs/ok'), DENY, { kit: { 'cs/ok': '' } }, /can't tell/],
+  ['T16e night git switch -C cs/n cs/ok (force-create): deny', dsh('git switch -C cs/n cs/ok'), DENY, { kit: { 'cs/ok': '' } }],
+  ['T16e night git switch --force-create=cs/n: deny', dsh('git switch --force-create=cs/n'), DENY, {}],
+  ['T16e night git switch --discard-changes cs/ok: deny', dsh('git switch --discard-changes cs/ok'), DENY, { kit: { 'cs/ok': '' } }],
+  ['T16e night git switch -m cs/ok: deny', dsh('git switch -m cs/ok'), DENY, { kit: { 'cs/ok': '' } }],
+  ['T16e night git switch --track cs/ok: deny', dsh('git switch --track cs/ok'), DENY, { kit: { 'cs/ok': '' } }],
+  ['T16e night git switch -qc cs/n (bundled): deny', dsh('git switch -qc cs/n'), DENY, {}],
+  ['T16e night git switch -c with no name: deny', dsh('git switch -c'), DENY, {}],
+  ['T16e night git switch -c a -c b: deny', dsh('git switch -c a -c b'), DENY, {}],
+  ['T16f night git switch cs/ok cs/ok2 (two targets): deny', dsh('git switch cs/ok cs/ok2'), DENY,
+    { kit: { 'cs/ok': '', 'cs/ok2': '' } }, /names no single target/],
+  ['T16f night git switch (no target): deny', dsh('git switch'), DENY, {}, /names no single target/],
+  ['T16g night -c cs/n from a start point whose gate file differs: deny', dsh('git switch -c cs/n cs/kit'), DENY,
+    { kit: { 'cs/kit': KIT('tools/gate.mjs') } }, /cs\/kit's rules, CI or gate files differ/],
+  ['T16g control: night -c cs/n origin/main goes on', dsh('git switch -c cs/n origin/main'), null],
+  ['T16g control: night -q -c cs/n origin/main goes on', dsh('git switch -q -c cs/n origin/main'), null],
+  ['T16g control: night -ccs/n origin/main goes on', dsh('git switch -ccs/n origin/main'), null],
+  ['T16g control: night --create=cs/n origin/main goes on', dsh('git switch --create=cs/n origin/main'), null],
+  ['T16g night --create cs/n cs/kit: deny', dsh('git switch --create cs/n cs/kit'), DENY, { kit: { 'cs/kit': KIT('.claude/settings.json') } }],
+  ['T16h night -c cs/n with no start point, HEAD differs: deny', dsh('git switch -c cs/n'), DENY,
+    { kit: { HEAD: KIT('.claude/hooks/routine-guard.mjs') } }, /HEAD's rules, CI or gate files differ/],
+  ['T16h control: night -c cs/n, HEAD equals main in kit files', dsh('git switch -c cs/n'), null, { kit: { HEAD: KIT('docs/a.md') } }],
+  ['T16j night git switch cs/gone (no branch, no origin/cs/gone): deny', dsh('git switch cs/gone'), DENY, {}, /can't resolve cs\/gone to a commit; fetch it first/],
+  ['T16j night -c cs/n cs/gone: deny', dsh('git switch -c cs/n cs/gone'), DENY, {}, /can't resolve cs\/gone/],
+  ['T16j night git switch -- --output=/tmp/x (a word starting with -): deny', dsh('git switch -- --output=/tmp/x'), DENY, {}, /can't resolve/],
+  ['T16k night -c cs/n origin/main, origin/main shadowed: deny', dsh('git switch -c cs/n origin/main'), DENY, { shadow: true }, SHADOWED],
+  ['T16k night git switch cs/x, origin/main shadowed: deny', dsh('git switch cs/x'), DENY, { shadow: true, kit: { 'cs/x': '' } }, SHADOWED],
+  ['T16l night, refs/remotes/origin/main does not resolve: deny', dsh('git switch cs/x'), DENY,
+    { noRemoteMain: true, kit: { 'cs/x': '' } }, /can't resolve refs\/remotes\/origin\/main/],
+  ['T16t night git switch dup: the branch refs/heads/dup is checked, not a same-name tag', dsh('git switch dup'), DENY,
+    { kit: { dup: KIT('.claude/settings.json') }, tags: ['dup'] }, NIGHT_HIT],
+  ['T20 night, no local cs/y, origin/cs/y equal to main: goes on', dsh('git switch cs/y'), null,
+    { kit: { 'refs/remotes/origin/cs/y': KIT('shamble-game.js') } }],
+  ['T20 night, no local cs/y, origin/cs/y changes CLAUDE.md: deny', dsh('git switch cs/y'), DENY,
+    { kit: { 'refs/remotes/origin/cs/y': KIT('CLAUDE.md') } }, /cs\/y's rules, CI or gate files differ from main's \(CLAUDE\.md\)/],
+  ['T20 night, the local cs/y differs and origin/cs/y does not: the local branch is checked (git takes it)', dsh('git switch cs/y'), DENY,
+    { kit: { 'cs/y': KIT('.claude/settings.json'), 'refs/remotes/origin/cs/y': '' } }, NIGHT_HIT],
+];
+for (const [name, input, want, opts, re] of NIGHT_SWITCH_CASES) {
+  test(`night switch (WT-NIGHT (a)) ${want ?? 'goes on'}: ${name}`, async () => {
+    const d = await decide(input, nightIo(opts));
+    assert.equal(kindOf(d), want, `${name}: ${JSON.stringify(d)}`);
+    if (re) assert.match(d.deny, re);
+  });
+}
+test('WT-NIGHT (a): unchanged for pr-advisor (its single switch) and day sessions (their main-folder check)', async () => {
+  const kit = { 'cs/x': KIT('docs/a.md') };
+  assert.match((await decide(dsh('git switch cs/x'), { ...nightIo({ kit }), env: { SHAMBLE_ROLE: PRA } }))?.deny ?? '', /the only switch is git switch --detach origin\/main/);
+  assert.equal(await decide(dsh('git switch --detach origin/main'), { ...nightIo({ kit }), env: { SHAMBLE_ROLE: PRA } }), null);
+  assert.equal(await decide(dsh('git switch cs/other', { cwd: '/w' }), dayIo({ diffs: OTHER })), null, 'day, a worktree: T8 unchanged');
+  assert.equal(kindOf(await decide(dsh('git switch cs/other'), dayIo({ diffs: OTHER }))), ASK, 'day, the main folder: T1 unchanged');
+});
+test('WT-NIGHT (a): only SHAs reach the diff, refs/remotes/origin/main\'s commit first; no word of the command', async () => {
+  for (const [name, input, , opts] of NIGHT_SWITCH_CASES) {
+    const calls = [];
+    await decide(input, nightIo({ ...opts, calls }));
+    for (const c of calls.filter((x) => x[0] === 'diff' && x.includes('-z'))) {
+      assert.deepEqual(c.slice(0, 5), ['diff', '--name-only', '-z', '--no-renames', '--no-relative'], name);
+      assert.equal(c[5], shaOf('origin/main'), `${name}: origin/main by commit`);
+      assert.match(c[6], /^[0-9a-f]{40}$/, `${name}: the target as a SHA`);
+      assert.equal(c[7], '--', name);
+    }
+    for (const c of calls.filter((x) => x[0] === 'rev-parse' && x.includes('--verify'))) {
+      assert.equal(c.at(-2), '--end-of-options', `${name}: ${c.join(' ')}`);
+    }
+  }
+});
+const NIGHT_SWITCH_MUTANTS = [
+  ['the night switch is checked', "const night = sub === 'switch' && role === 'night-shift' ? switchTargetCheck(args, vcwd, io) : null;", 'const night = null;'],
+  ['only the listed forms (another option is not skipped)', "    if (t.startsWith('-')) {\n      return `${R}: the guard can't tell",
+    "    if (t.startsWith('-')) continue;\n    if (false) {\n      return `${R}: the guard can't tell"],
+  ['a single target', 'if (pos.length > 1 || (!pos.length && create === null && !detach)) {', 'if (false) {'],
+  ['origin/main is refs/remotes/origin/main\'s commit (SA-2)', "const forged = originMainCheck(vcwd, io, 'night-shift');", 'const forged = null;'],
+  ['the diff gets the commit, not the word origin/main', "'--no-relative', main, sha, '--'], vcwd);", "'--no-relative', 'origin/main', sha, '--'], vcwd);"],
+  ['an unresolved target is refused', 'if (sha === null) return `${R}: can\'t resolve', 'if (false) return `${R}: can\'t resolve'],
+  ['a failed diff is refused', 'if (d.code !== 0) return `${R}: can\'t compare ${target}', 'if (false) return `${R}: can\'t compare ${target}'],
+  ['a protected name is refused', "return hit ? `${R}: ${target}'s rules", "return false ? `${R}: ${target}'s rules"],
+  ['the names are NUL-separated', "const hit = d.out.split('\\0').filter(Boolean).find((f) => protectedRel(f));", "const hit = d.out.split('\\n').filter(Boolean).find((f) => protectedRel(f));"],
+  ['-z is passed', "['diff', '--name-only', '-z', '--no-renames', '--no-relative', main", "['diff', '--name-only', '--no-renames', '--no-relative', main"],
+  ['the origin/<name> fallback (T20)', ' ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);', ';'],
+  ['the local branch first (as git switch)', 'commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes/origin/${name}`, vcwd, io);',
+    'commitOf(`refs/remotes/origin/${name}`, vcwd, io) ?? commitOf(`refs/heads/${name}`, vcwd, io);'],
+  ['a plain name is the branch refs/heads/<name>', 'commitOf(`refs/heads/${name}`, vcwd, io) ?? commitOf(`refs/remotes', 'commitOf(name, vcwd, io) ?? commitOf(`refs/remotes'],
+];
+test('mutation runs (step 9, WT-NIGHT (a)): every rule of the night switch check is needed by some case', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-night-'));
+  const survivors = [];
+  for (const [name, input, want, opts] of NIGHT_SWITCH_CASES) assert.equal(kindOf(await decide(input, nightIo(opts))), want, `unmutated rules: ${name}`);
+  try {
+    for (const [i, [label, from, to]] of NIGHT_SWITCH_MUTANTS.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `n${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [, input, want, opts] of NIGHT_SWITCH_CASES) {
+        let d;
+        try { d = await m.decide(input, nightIo(opts)); } catch { d = 'threw'; }
+        if ((d === 'threw' ? 'threw' : kindOf(d)) !== want) { caught = true; break; }
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no night switch case catches: ${survivors.join('; ')}`);
+});
+// Real git: a bare origin and a project (realOrigin: cs/evil changes .claude/settings.json and tools/sim.js). Each row
+// runs decide() with the real io in the night-shift role; an allowed switch is then run, and lands on the commit the
+// guard checked. The three diff flags are shown needed on real git: each removed in a copy, a real row goes through.
+test('real git (step 9, WT-NIGHT (a)): the night switches only to a branch whose rules, CI and gate files equal main\'s', async () => {
+  const { root, P, g } = realOrigin('guard-git-night-');
+  const prev = process.env.CLAUDE_PROJECT_DIR;
+  const rev = (r) => g('rev-parse', '--verify', '--end-of-options', `${r}^{commit}`).stdout.trim();
+  const branch = (name, edit) => {
+    g('switch', '-q', '-c', name, 'origin/main');
+    edit();
+    g('add', '-A');
+    g('commit', '-q', '-m', name);
+    g('push', '-q', 'origin', name);
+    g('switch', '-q', 'main');
+  };
+  const dir = mkdtempSync(join(tmpdir(), 'guard-mut-night-real-'));
+  try {
+    process.env.CLAUDE_PROJECT_DIR = P;
+    const io = { ...realIo(), env: { SHAMBLE_ROLE: NIGHT } };
+    const run = (command, cwd = P, mod = { decide }) => mod.decide(dsh(command, { cwd }), io);
+    branch('cs/ok', () => writeFileSync(join(P, 'docs', 'a.md'), 'ok\n'));
+    branch('cs/rules', () => writeFileSync(join(P, 'CLAUDE.md'), 'other rules\n'));
+    branch('cs/ren', () => g('mv', '.claude/settings.json', 'docs/settings.json'));
+    branch('cs/uni', () => { mkdirSync(join(P, '.claude', 'agents'), { recursive: true }); writeFileSync(join(P, '.claude', 'agents', 'é.md'), 'x\n'); });
+    g('fetch', '-q', 'origin');
+    // a branch equal to main in kit files: allowed, and git lands where the guard looked
+    assert.equal(await run('git switch cs/ok'), null, 'cs/ok changes docs only');
+    const okSha = rev('refs/heads/cs/ok');
+    assert.equal(g('switch', '-q', 'cs/ok').status, 0);
+    assert.equal(rev('HEAD'), okSha, 'the switch landed on the checked commit');
+    g('switch', '-q', 'main');
+    // a branch with its own .claude/ or CLAUDE.md change: refused
+    assert.match((await run('git switch cs/evil'))?.deny ?? '', /\.claude\/settings\.json.*Decisions needed/, 'cs/evil changes .claude/settings.json');
+    assert.match((await run('git switch cs/rules'))?.deny ?? '', /\(CLAUDE\.md\)/, 'cs/rules changes CLAUDE.md');
+    assert.match((await run('git switch -c cs/n origin/cs/evil'))?.deny ?? '', /origin\/cs\/evil's rules/, '-c from a kit-changing start');
+    assert.match((await run('git switch --detach origin/cs/rules'))?.deny ?? '', /CLAUDE\.md/, '--detach to a kit-changing commit');
+    assert.equal(await run('git switch --detach origin/main'), null, '--detach origin/main');
+    assert.equal(await run('git switch -q -c cs/n origin/main'), null, '-c from origin/main');
+    // T20: no local branch; git switch creates it from origin/<name>, and the guard checks that commit
+    g('branch', '-q', '-D', 'cs/ok', 'cs/evil');
+    assert.equal(await run('git switch cs/ok'), null, 'origin/cs/ok, docs only');
+    assert.match((await run('git switch cs/evil'))?.deny ?? '', /settings\.json/, 'origin/cs/evil, a kit change');
+    assert.equal(g('switch', '-q', 'cs/ok').status, 0);
+    assert.equal(rev('HEAD'), rev('refs/remotes/origin/cs/ok'), 'created from origin/cs/ok, the commit the guard checked');
+    g('switch', '-q', 'main');
+    assert.match((await run('git switch cs/gone'))?.deny ?? '', /can't resolve cs\/gone/, 'neither a branch nor origin/cs/gone');
+    // a kit file moved away, a kit file with a non-ASCII name, and diff.relative from a subfolder: refused
+    const hard = [['git switch cs/ren', P, /\.claude\/settings\.json/], ['git switch cs/uni', P, /\.claude\/agents\/é\.md/],
+      ['git switch cs/uni', join(P, 'docs'), /\.claude\/agents/]];
+    g('config', 'diff.relative', 'true');
+    for (const [command, cwd, re] of hard) assert.match((await run(command, cwd))?.deny ?? '', re, `${command} from ${cwd}`);
+    // a forged origin/main (a local branch or a tag of that name at cs/evil's commit): refused through originMainCheck
+    g('branch', 'origin/main', 'origin/cs/evil');
+    for (const c of ['git switch -c cs/n origin/main', 'git switch --detach origin/main', 'git switch cs/ok']) {
+      assert.match((await run(c))?.deny ?? '', SHADOWED, `${c}, origin/main a local branch`);
+    }
+    g('branch', '-q', '-D', 'origin/main');
+    g('tag', 'origin/main', 'origin/cs/evil');
+    assert.match((await run('git switch -c cs/n origin/main'))?.deny ?? '', SHADOWED, 'origin/main a tag');
+    g('tag', '-d', 'origin/main');
+    assert.equal(await run('git switch -c cs/n origin/main'), null, 'control: the real origin/main again');
+    // the diff flags, each removed in a copy: some real row goes through
+    const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+    const flags = [["'-z', ", 'NUL-separated names (-z)'], ["'--no-renames', ", '--no-renames'], ["'--no-relative', ", '--no-relative']];
+    const survivors = [];
+    for (const [i, [flag, label]] of flags.entries()) {
+      const from = `['diff', '--name-only', '-z', '--no-renames', '--no-relative', main`;
+      assert.equal(src.split(from).length - 1, 1, 'the diff line occurs once');
+      const file = join(dir, `f${i}.mjs`);
+      writeFileSync(file, src.replace(from, () => from.replace(flag, '')));
+      const m = await import(pathToFileURL(file).href);
+      let caught = false;
+      for (const [command, cwd] of hard) if ((await run(command, cwd, m)) === null) caught = true;
+      if (!caught) survivors.push(label);
+    }
+    assert.deepEqual(survivors, [], `diff flags no real row needs: ${survivors.join('; ')}`);
+  } finally {
+    if (prev === undefined) delete process.env.CLAUDE_PROJECT_DIR; else process.env.CLAUDE_PROJECT_DIR = prev;
+    rmSync(root, { recursive: true, force: true });
+    rmSync(dir, { recursive: true, force: true });
   }
 });

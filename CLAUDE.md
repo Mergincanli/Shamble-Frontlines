@@ -248,4 +248,5 @@ three engine files stay sequential. Try a small slice first.
   session, and it would let a PR's settings act on a day session. (Mustafa's words, 2026-11-04. The main folder is the
   folder the session started in; switching includes `git switch`, `merge`, `pull` and `gh pr checkout`; the worktree:
   `git worktree add .gate/<slug> <ref>`. Still allowed there (main's reviewed rules): `git switch -c <new> origin/main`,
-  `git merge --ff-only origin/main` and `git pull --ff-only origin main`.)
+  `git merge --ff-only origin/main` and `git pull --ff-only origin main`.) One exception: the night shift's handoff
+  switch (NIGHT_SHIFT.md step 4), which the guard refuses unless the branch's rules, CI and gate files equal main's.
