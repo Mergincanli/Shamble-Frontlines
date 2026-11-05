@@ -58,6 +58,10 @@
     fixes, the full gate), docs-keeper (the limits and follow-ups).
   - Next: commit; the automated review of the fix commit; security-auditor and the verifier on the fix diff only;
     step 9 (WT-NIGHT) after Mustafa's answer; step 10 (the report, ready, the advisor's final review).
+- **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
+  only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
+  (thinking about it); an Enterprise login (university); Windows itself (PowerShell), not WSL. So L7 (mods) does not
+  apply on his PC by the docs (an Enterprise login), L9's WSL part does not apply, and E11 P4 runs in Auto.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 - **On a usage limit** (Mustafa, 2026-11-05, word for word: "Just wait for the next reset, I can't ask to raise the
   org limit"): wait for the reset the error names, then resume from the notes and the workflow's journal.

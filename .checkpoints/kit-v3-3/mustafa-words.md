@@ -18,3 +18,7 @@ loads that branch's .claude/settings.json and hooks into the running session. Th
 let a PR's settings act on a day session.
 2. The three deferred points (and anything else in your scratchpad queue file) live only in /tmp, which is lost with
 the session. Record them in the repo, in STATUS's follow-ups, alongside A3's plan."
+
+2026-11-05 (~10:30 UTC), his answers to WT-NIGHT and PC-SETUP, word for word:
+"WT-NIGHT: (a). The exception holds only when the branch's rules, CI and gate files match main's.
+PC-SETUP: 1. Permission mode: [Auto]. 2. Mods: [no mods installed but I have been thinking about it]. 3. Enterprise login (my university account). 4. Claude Code runs in Windows itself (PowerShell), not WSL"
