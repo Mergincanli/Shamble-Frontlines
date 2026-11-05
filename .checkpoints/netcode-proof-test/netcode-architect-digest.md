@@ -44,3 +44,153 @@ Memory: no agent memory dir found (memory: local, none on disk). No earlier deci
 - Next: B7 GLOSSARY s2, s3, s8, time statistics.
 - B7 done: time statistics GLOSSARY 141-147 (no statistic = p99; mean always called mean; p99s do not add; one-off deadline = plain limit). Test-mode list 375-393 (24v24, 12v12v12, 16v16v16, 1v1, 4v4, 2v2v2, 6v6v6, N=64 headroom; MODES-3 (a)) -- the proof test runs SS at 48 (+ 24, 36 scale steps for -10); the per-mode soaks are slice 6 (migration 1740-1743), not this test. Stress scene 397-418 (N=48 16v16v16 in one cluster; 15 big vehicles incl. harvesters, 4 very large >=20 parts; 300 live projectiles; 8 active effects/soldier = 384; the other 11 vehicles elsewhere; DM_Tri-sized greybox; snapshot-receiving client on every soldier for server marks 416-418). Live projectile 458-460 (bolt, grenade, Molotov, rocket). Netcode proof test 765-774. 60 Hz margin 782-802.
 - Next: quick look at SPIKE_PLAN 130-204 for hours/session context only, then write sections.
+- SPIKE_PLAN 130-204 skimmed: pass marks listed PM-0001-1..-62 (+PM-0004-67, PM-0006-11..27; online halves of PM-0004-61/-70) 141-145; scripts judge measured marks, Mustafa the checklist + ADR 0006 ops checklist 146-149; deps 150-178 (SSH key made+held by session, plan sets it with security-auditor 154-155; rough checks on ML stand-in, rows run before naming listed 156-159; stand-in vehicles/projectiles 161-162; density runs pad sim to share ceiling 163-164; L1+L2 built here first 165-167; DNS record set each run day before cert issued; cert method with security-auditor 173-175; cost cap per run 175-178); harness built first, shared with boundary spike 179-181; size L 184-186; decides list 196-204 (adds R2-XU-OQ7, R2-BUD-OQ7, R6-COST-OQ1 beyond ADR item 5).
+- FINDING: runner-as-MAC allowed only for -28, -14, -25 Origin, PM-0006-15 (1400-1402): Safari legs of -29 (time), -32, -36 still need the borrowed Mac -> runner alone cannot be "the Safari check" Mustafa expects (1396-1397). Decision for advisor/Mustafa.
+- FINDING: -28 "server on the same local network" (1543) vs runner rule "its server then RS" (1401); ML's Chrome/Edge/Firefox on a LAN server needs page origin + secure context; doubt on Chrome local-network-access prompts (not verified).
+- FINDING: SMT: -1 keeps the tick's sibling free of the transport runtime (1511) -> transport has 2 vCPUs, not "the other three" (1366), if lscpu shows 2 threads/core. Harmless vs -11's 1 vCPU cap; plan records it.
+- FINDING: OQ-0001-6 both options must be built and switchable (-20, -21, -56 run under both).
+- Next: check .claude/rules/netcode.md for catalogue doc requirement, then write sections A-I.
+- .claude/rules/netcode.md:17 "Every protocol change updates the message catalogue in docs/design/ and its tests, including latency, jitter and loss cases"; docs/design/ does not exist yet; spikes/ does not exist yet. Rule paths **/server/**, **/shared/**, **/net/** (netcode.md:2-5) would apply to spike folders so named; its lines 12-14 are legacy-era (Node, FIXED_DT, no performance.now) -> spike harness timing lives in hosts, not the sim (ADR 1473-1481, 242-247).
+- Reading blocks 1-7 DONE. Next: block 8, write sections A-I below (A first).
+
+# DIGEST (sections A-I). Lines are docs/adr/0001-multiplayer-netcode.md unless named. "Rec:" = my recommendation.
+
+## A. Pass marks (rows in ADR order, 1511-1578; no lettered sub-marks exist)
+Common keys: S30 = 48 clients joined, 60 s warm-up after last first-full-state ack, 30 min measured = 54,000 ticks, tick
+counter starts 1,800 below 65,536, doors 1/s (1451-1459). "x3" = 3 runs, each passes, V-S validity, rule B-S bite (1486-1504).
+Judge = script unless named (SPIKE_PLAN:146). Arm = Arm rule (ii) applies (1337-1346, 1381-1384). [60] = 60 Hz group,
+OUTSIDE this change-set's close (1580-1585).
+
+| id | measures | exact threshold | setup | judge | cond | line |
+|---|---|---|---|---|---|---|
+| -1 | rig named, unit holds | RS/LG: plan, CPU, vCPU, mem, location, kernel, day's address; ML/RD/MAC per ADR 0003; tick thread alone on 1 vCPU (not -27/-63: affinities recorded); steal per s; lscpu threads/core + SMT map, tick's sibling free of transport | header per machine before first run; affinities at start+end of every run; bite: 2nd tick thread on same vCPU flagged invalid | script | precondition | 1511 |
+| -2 | load is SS | every measured tick: 48 soldiers 3x16 each with snapshot client; 15 big vehicles (4 of >=20 parts); 300 live projectiles; <=8 effects/soldier; 700 shots/s (mean +-5 %); portals 1/s; downstream rows: all 47 others in set on >=99 % of snapshots; stand-ins at same counts; S1 stand-ins (384 rows, 1 ms burn, top-up to 2.80 ms) named; ES counts/rates checked +-5 % | RS counters, LG; every run of -4..-27, -39, -63; bite: firing stops after 10 min | script | precondition | 1512 |
+| -3 | profiles true | P1-P4, B1, L1 and L2, each direction over 100,000 packets: loss, mean one-way delay, jitter within 5 % relative of per-direction values; RTT mean within 5 %; L1 same seed -> identical packet-fate log twice; P0 on L2 recorded; MP: server RTT median 100 +- 5 ms at P2, base RTT recorded | L1; L2 on RS with LG, ML, MP; base RTT = median of 10 s pings; once per profile+layer, and at start of every L2 session | script | precondition | 1513 |
+| -4 | tick budget 30 Hz | p99 <= 16.67 ms; max < 33.33 ms; 0 overruns; 0 dropped time | 1 vCPU RS; SS, P2, S30; x3 | script | "stand-in" label if sim lighter (1432-1435) | 1515 |
+| -5 | two shares | sim step p99 <= 8.33 ms; server-only p99 <= 8.33 ms (lag-comp queries in server-only) | -4's runs; B-S per share | script | no | 1516 |
+| -6 | encode (R2-BUD-OQ9) | p99 <= 50 us per client per snapshot; reported mean, p50, max, bytes | -4's runs (1,440 samples/s) | script | no | 1517 |
+| -7 | lag comp cost/size | rewound shot vs 48 candidates p99 <= 20 us at 700 shots/s; history <= 1 MB (read each min) | -4's runs; bite: untrimmed history | script | no | 1518 |
+| -8 | interest | region query p99 <= 0.2 ms/tick; rank+pack p99 <= 0.5 ms/tick; 0 snapshots > 1,067 B per interval (UDP payload + 28 B/datagram); nearest 8 enemies in every snapshot; every relevant entity >=1 per 4 snapshots | -4's runs, fight in centre; bite: rank by id | script | no | 1519 |
+| -9 | enclosure | pair test p99 <= 0.1 us/pair (768 pairs); re-flood p99 <= 1 ms; area count recorded | -4's runs, doors 1/s | script | no | 1520 |
+| -10 | sync cost linear | mean server-only/tick / (clients x mean relevant entities) at 48 <= 1.1 x the figure at 24 and at 36 | SS N=24, 36 (3x8, 3x12), 10 min each at P2, 3 runs per N, V-S | script | no | 1521 |
+| -11 | transport runtime | <= 1 vCPU (p99 of 1-s windows), 48 sessions x 30 in + 30 out/s; send call p99 <= 1 ms | -4's runs | script | no | 1522 |
+| -12 | downstream | ES: mean <= 160 kbps, p99 of 1-s windows <= 256 kbps; SS: every 1-s window <= 256 kbps, 0 datagrams above cap rule, mean reported beside R2's formula at run's counts; per client, send side, UDP payload + 28 B; IPv6 figure reported | ES at P2 10 min x3; SS at P2 in -4's runs; B-N | script | no | 1523 |
+| -13 | upstream (R2-XU-OQ4) | mean <= 48 kbps per client (IPv4, UDP payload + 28 B); reported: p99 1-s windows, largest datagram, commands/datagram (median, max), command size whole and delta (U1 vs U2), same at P4 | P2 in -4's runs; P4 10 min; B-N | script | no | 1524 |
+| -14 | no oversize datagram | 0 snapshot datagrams > cap (min(smallest maxDatagramSize of -36, 1,150 B); 1,000 B until measured); 0 > any browser's max; 0 fragmented IP packets | RS, LG, ML+MAC; every S30 + browser session; packet capture on RS | script | runner may be MAC (1402) | 1525 |
+| -15 | room memory (R2-ROOM-OQ1) | RSS <= 64 MB at start and after 20 min; peak of 1-s samples <= 64 MB; slope within 1 MB per 10 min; each per-client queue: max of last 10 min <= max of first 10 min | S30 P2, as -4; bite: planted leak | script | no | 1526 |
+| -16 | room start | every start, spawn to Open, < 2 s; >= 20 starts | RS, supervisor stand-in | script | no | 1527 |
+| -17 | decoded = server | 100 % of decoded snapshots rebuild server's quantised state by hash, incl. 16-bit wrap of every S30 | L1 48 (3 seeds/profile) + L2 LG 48 (1 run/profile); 10 min each P0, P2, P3, B1; LG logs every byte received | script | Arm | 1528 |
+| -57 | precision | max error: positions <= 1 cm; yaw <= 0.01 deg; pitch <= one 0.18 deg step | -17's L1 runs, 3 seeds x P0/P2/P3/B1 | script | no | 1529 |
+| -58 | counter wraps | 100 % hash match; 0 commands refused/lost/doubled; 0 presses lost/doubled; 0 corrections > 1 mm | L1 48; tick 30 below a multiple of 65,536, every <=16-bit counter a few steps below wrap, 10 s; P0 and P3; 3 seeds/profile | script | reorder rule (1448) | 1530 |
+| -18 | burst heals | every client decodes deltas <= 500 ms after link returns (plain limit) | B1, 48 clients, 10 bursts/run; L1 3 seeds, L2 LG 1 run | script | no | 1531 |
+| -19 | join/resync | every join: complete world (hash) <= 300 ms after Join at P2 (plain); reported p50, p99, max, from first connect | L2: LG + ML Chrome; 100 joins into a running S30 room, incl. rejoins after Worker traps | script | Arm (LG); ML as it stands | 1532 |
+| -20 | commands in time | P3: >= 99.9 % before their tick; missing inputs <= 0.1 % of player-ticks; 10,000 presses with reordering: 0 lost, 0 doubled; buffer depth recorded | L1 3 seeds + L2 LG 1 run; 48 clients 10 min under EACH OQ-0001-6 option; bite: cap 1 | script | reorder rule | 1533 |
+| -21 | forged, fast clock, lag switch | every forged kind rejected+counted, 0 effect beyond valid part (hash equality); beyond-reach aim clamped, not counted (hash equality); 1.5x clock for 60 s runs <= server ticks + lead bound, moves <= honest + that many ticks; lag switch (200 ms hold at P1) <= catch-up cap | L1; 1,000 per forged kind; 1,000 per weapon kind; 100 bursts; 10 fast-clock runs; each OQ-0001-6 option; 3 seeds | script | no | 1534 |
+| -22 | never-acking client | its event queue held at cap; resynced or dropped | L1, 1 of 48, 10 min, 3 seeds | script | no | 1535 |
+| -23 | throttle | 128 kbps for 10 s: <= 2 missing snapshots/s; own state in 100 % of snapshots sent; full rate back <= 2 s (plain) | L2 rate limit on RS + LG; 10 throttles, P2 | script | no | 1536 |
+| -24 | bottleneck (R2-BUD-OQ10) | at 50 % of snapshot rate: newest snapshot <= 3 intervals old (100 ms); memory/session flat 10 min; tick p99 within 5 % of clean run; NewReno and Cubic each, lower p99 age picked | L2 on RS + LG; 10 min per controller | script | no | 1537 |
+| -25 | hostile input | flood (1,000 never-Join sessions + 10 oversize/stream clients): tick p99 within 10 % of clean, RSS < 64 MB; same over WS + oversize frames/messages; ws:// and wrong Origin refused (403) from 4 browsers; no Join 2 s after TCP accept/QUIC first packet -> closed; 10 slow-loris closed by deadline, handshakes at cap; cap on: first over cap refused, also from 1,000 addresses in one /64 (where LG has IPv6) | RS + LG (flood), ML + MAC (Origin); 10 min per flood; twice (cap raised, cap on); 1 run per transport and cap | script | runner may be MAC for Origin | 1538 |
+| -26 | connection panic | that connection closes; 0 of the other 47 drop; 0 overruns next minute | RS + LG; 10 injections in one S30 room | script | no | 1539 |
+| -59 | tick panic | exit non-zero <= 1 s (plain); every client RoomEnded(crash) or closed in that second; match record marked crashed + crash report kept; supervisor stand-in logs exit; report in error log | RS + LG; 10 injections, each its own S30 room at a random tick | script | no | 1540 |
+| -27 | rooms share a VM | 8 rooms = 8 processes: each p99 within 10 % of single-room (bracket B: mean of lone room's p99, first and last in session) over 20 min; SIGKILL one -> others within 5 %, 0 dropped | RS + LG; PM-0006-13 setup, unpinned, SS with snapshot clients (8 x 48 = 384 sessions); 3 sessions at 3 times of day | script | validity PM-0006-13, not V-S | 1541 |
+| -28 | WT crates x browsers (R2-TRN-OQ1) | wtransport 0.7.x AND web-transport-quinn 0.13.x: Chrome, Edge, Firefox, Safari each >= 99 of 100 attempts, datagrams + 1 bidi stream; draft recorded; control: wrong hash fails 100 of 100 | ML (Chrome, Edge, Firefox), MAC (Safari); server on the same LAN | script | runner may be MAC, server then RS (1401) | 1543 |
+| -29 | fallback (R2-TRN-OQ2) | UDP blocked: each of 4 browsers playing WS <= 3 s after page starts connecting (plain; WT timeout 1.5 s); reported: one attempt per browser from a TCP-443-only network | ML, MAC; RS UDP range closed; 20 attempts/browser, one at a time | script | Safari: time row -> borrowed Mac | 1544 |
+| -30 | same server, both transports | one replay -> identical server hashes every tick on WT and WS; valid only if every command ran at its stamped tick and late counter = 0 | RS; 3 recordings x 5 min, P0, buffer deep enough (recorded) | script | invalid, not failed, if late > 0 | 1545 |
+| -31 | WS stalls | WS at P2: p99 extra snapshot delay <= 250 ms (age at decode minus 50 ms); never > 1 unsent snapshot per client | L2 TCP proxy on RS; LG; ML Chrome; 10 min | script | no | 1546 |
+| -32 | one build everywhere | same build hash, scripted 60 s per browser per backend: 0 console errors, 0 page errors; feature detection covered | ML, MAC | script | Safari -> borrowed Mac (not in 1402 list) | 1547 |
+| -33 | RTT agreement | p99 of abs(app RTT - quinn rtt()) per s over 10 min <= 5 ms at P2; also recorded at fixed 100 ms, no jitter/loss | L2 on RS; ML Chrome | script | no | 1548 |
+| -34 | fuzz | 10 million random+mutated inputs per message type: 0 panics, 0 allocations above limits | any machine; cargo-fuzz + counting allocator | script | no | 1549 |
+| -35 | swappable, current | crate swap: no code change outside transport module; sim crate has no transport dep (cargo tree); quinn-proto >= 0.11.18, rustls >= 0.23.46, ring >= 0.17.12, tokio >= 1.54.1; wtransport dangerous-configuration off | any machine; once after swap | script | no | 1550 |
+| -36 | maxDatagramSize (R2-BUD-OQ3) | recorded at start and every 10 s, 4 browsers: >= 1,000 B on loopback and on a real EU path; else cap = smallest measured | ML, MAC; local server + RS from an EU consumer connection; 10 min per browser and path | script | Safari -> borrowed Mac | 1551 |
+| -37 | datagrams in time | lost-or-late snapshots <= 3 % at P2 (loss + 1 pp); late = > 66.67 ms after expected arrival (send + 50 ms); research reading reported | L2 on RS; LG 48; 10 min | script | no | 1552 |
+| -38 | one-shots, bulk | P3: 0 of 10,000 one-shot actions dropped; 1 MB bulk transfer raises control-stream p99 by <= 5 ms | L2 on RS; LG; 10 transfers | script | no | 1553 |
+| -39 | [60] margin | 60 Hz: tick p99 <= 6.25 ms; shares <= 4.17 ms each; max < 16.67 ms; 0 overruns/dropped; encode p99 <= 50 us; hash across tick 65,536 | 1 vCPU RS; SS P2 S60 (108,000 ticks), snapshots every 2nd tick; 3 whole runs | script | OUTSIDE close | 1555 |
+| -40 | [60] R1 marks | P1 at 60 Hz (sim p99 <= 4.17 ms, max <= 16.67 ms, 0 overruns, 36,000 ticks, 3 runs); P2 (client sim share p99 <= 6.67 ms, Wasm Worker on ML, page 30+ fps on Low); P3 (12-tick replay <= 1 ms p99 on ML) | RS (P1), ML | script | OUTSIDE close | 1556 |
+| -63 | [60] goal budget | k60 search; fleet ceil(20 / k60) + 1 CCX23 at 86.49 EUR + 8.99 + 6.49; wave 1: reported beside ~361 / ~534 EUR, decides nothing; bite: k60 = 1 -> 21 CCX23, 1,831.77 EUR | RS + LG; 20 min, 72,000 ticks (p99 = 71,280th) | script | OUTSIDE close | 1557 |
+| -41 | prediction exact | CO, P0-P4: 0 corrections > 1 mm when every command in time; 100 % of others traced to late/lost | L1 3 seeds/profile; ML Chrome over L2, 1 run at P2; 10 min/profile | script | no | 1559 |
+| -42 | corrections in a crowd | P3 brawl of 48: > 5 cm in < 1 % of snapshots; never > 5 cm in one frame below snap (2 m) | ML Chrome over L2 + LG 47; L1 3 seeds; 10 min; collision rule recorded | script | pass holds for named rule only | 1560 |
+| -60 | server change to own move/fire | P2: <= 1 correction, at first snapshot carrying it; then 0 > 1 mm (in time); first correction size reported | L1 3 seeds; ML Chrome L2 1 run; 100 changes each (+-10 %) | script | no | 1561 |
+| -43 | latency same at any profile | input-to-screen (own move, muzzle flash): p99(P4) - p99(P0) <= 33.33 ms, same for medians; reported: absolute P0 p50/p99 on ML and RD | ML and RD, Chrome WebGPU, presented frames, 60 Hz display; 200 CDP inputs per profile+kind; isolation flag | script | named machines only | 1562 |
+| -44 | replay fits | 6-tick replay <= 1 ms p99 AND 7-tick <= 1 ms p99; reported depth P0-P4 and forced-depth times at P3/P4 | ML Chrome + Firefox, Wasm Worker; SS fight P2 10 min, forced replays; 3 runs per depth (18,000; p99 = 17,820th) | script | no | 1563 |
+| -45 | extrapolation | < 1 % of frames at P2, < 3 % at P3; B1: 0 frames beyond one interval | ML Chrome L2 (1 run/profile); L1 3 seeds; 10 min/profile | script | no | 1564 |
+| -46 | delay adapts, no slides | settles <= 5 s after profile change (within +- half interval of final = mean of next 30 s); stays in 2-5 intervals; announced change > 1 interval/s clamped; 0 slides in 1,000 respawns+teleports (slide: > 0.1 m from both ends) | ML Chrome L2; 20 changes each way P1<->P3 | script | no | 1565 |
+| -61 | events with poses | P2: first frame playing event <= 50.00 ms before first frame drawing entity at/past its tick, never after; own/owner events in emitting tick's block; p50/p99/max reported | L1 3 seeds (0 exceptions); ML Chrome L2 + LG 47; 10 min | script | no | 1566 |
+| -47 | clock | offset error <= 5 ms after 2 s at P2 (p99 over 1,000 connects, random offsets) | L1 3 seeds | script | no | 1567 |
+| -48 | hits register (OQ-0001-7) | TC sprinter at 9 m/s, P0-P3: view hits registered >= 99 % up to P2, >= 95 % at P3; false hits < 0.5 %; test cap above every honest rewind; replaced-view share recorded | L1 3 seeds; L2 LG shooter 1 run/profile; 2,000 shots/profile | script | Arm | 1568 |
+| -49 | cap holds (OQ-0001-5 value, R2-XU-OQ2) | 100 % of shots rewound <= cap, honest + cheat, P0-P4; cap = honest rewind p99 at P2 rounded up to whole ticks, largest reported; clipped share + registration per profile; honest rewind median/p99/max with parts (RTT, delay, buffer wait, blend, frame-to-tick wait) | L1, L2 LG; -48's shots, then a run with the rule cap; -50's cheats among them | script | no | 1569 |
+| -50 | no bought rewind | edge-of-tolerance cheat gains <= 33.33 ms over honest (P0, P1); 150 ms pong delayer: with transport RTT gains <= tolerance, logged gap >= 145 ms every 1-s sample; WS extra rewind recorded | L1; 1,000 shots per profile+client; 3 seeds | script | no | 1570 |
+| -51 | aim at height | ground / 2.5 m / 4 m, P0-P3: hit point within 5 cm in >= 99.9 %; aim <= 80 bits/command | L1 3 seeds; ML Chrome L2 at P2; 1,000 shots per height+profile | script | no | 1571 |
+| -52 | feedback waits | 0 damage numbers/kills on others before server's event | ML Chrome L2; MP session; every browser session + 1,000 hits | script | no | 1572 |
+| -62 | cues once | P2 forced replays: each own shot's flash+sound exactly once over 1,000 shots; 0 own cosmetic events sent to shooter | L1 3 seeds; ML Chrome L2 1 run | script | no | 1573 |
+| -53 | "looks correct" | every checklist step "achieved"; 0 "not yet" | MP, Brave on Windows, P2, one session | Mustafa | no | 1574 |
+| -54 | projectile flight / E3b per kind | 0 desyncs over 1,000 throws per kind | L1 3 seeds; L2 LG | script | only if live projectiles in load; Arm | 1576 |
+| -55 | soldier beside vehicle | > 5 cm corrections in < 2 % of snapshots at P2 | L1 3 seeds, 10 min | script | only if sim moves vehicles | 1577 |
+| -56 | records complete | every listed item has a number or value | as each row | script/read | no | 1578 |
+
+Arm-rule rows: -17, -19, -48, -54 (1343); verdict from L1 x86-64 (CI's runner) or a browser; aarch64-only mismatch = cross-architecture finding, decides nothing (1344-1346).
+- A written (section A table).
+
+## B. Profiles and bursts (part 13, 567-580; key 1436-1450)
+| profile | RTT | jitter (RTT) | loss | per direction (each drawn on its own) |
+|---|---|---|---|---|
+| P0 | 0 ms | none | 0 % | 0 ms; on L2 = the real path, delay and jitter recorded (1513) |
+| P1 | 50 ms | +-10 ms | 1 % | 25 ms +- 5 ms uniform, 1 % |
+| P2 | 100 ms | +-20 ms | 2 % | 50 ms +- 10 ms uniform, 2 % (about 4 % of round trips lose a packet: 1 - 0.98 x 0.98 = 3.96 %, 1440) |
+| P3 | 150 ms | +-30 ms | 5 % | 75 ms +- 15 ms, 5 % |
+| P4 | 200 ms | +-40 ms | 5 % | 100 ms +- 20 ms, 5 % |
+| B1 | P2 plus one 1 s burst of 100 % loss | | | (569; 1437) |
+- Split (OQ-0001-16, 1204-1207; 570-574; 1438-1443): half the latency and a uniform +- half the jitter each way; loss at the
+  profile's rate on EACH direction independently; lateness counted from expected arrival = send time + one-way delay (1443-1444).
+- Other impairments (not profiles): the 128 kbps throttle for 10 s (-23, 1536); the bottleneck at 50 % of the snapshot
+  rate (-24, 1537); UDP blocked (-29, 1544); the fixed 100 ms, no jitter/loss case (-33, 1548); the lag switch (200 ms
+  hold under P1, -21, 1534). B1 is "one burst" (569) but -18 runs 10 bursts per run (1531, proposed).
+- Reordering: whatever the jitter produces; each run records its reorder share; a mark that names reordering counts only
+  if that share > 0 (1447-1450). See H2.
+- Layers: L1 = our seeded link simulator on simulated time behind the thin transport interface, logic marks only, never
+  a time mark (1410-1411, 1728-1729); L2 = impairment under quinn's socket plus a delaying TCP proxy for WebSocket, on
+  RS, for real browsers and LG (1444-1445, 1729-1730). L2's injected delay per direction is set from "half of the
+  profile's RTT minus the path's measured base RTT" (1513; see H12).
+
+## C. Budgets for the netcode proof test (718-735, exact)
+Every server mark: one vCPU of RS, SS at N = 48 with a snapshot-receiving client on every soldier, 30-min soak, re-flood ticks included, unless the row says otherwise (720-722).
+| budget | value |
+|---|---|
+| Server tick time, 30 Hz | p99 <= 16.67 ms; max < 33.33 ms; 0 overruns (0 missed ticks) |
+| Its two shares, 30 Hz | sim step p99 <= 8.33 ms (ADR 0004's parts); server-only p99 <= 8.33 ms, measured separately |
+| Parts of server-only | encode <= 50 us/client/snapshot p99; rewound shot <= 20 us p99 at 700 shots/s; region query <= 0.2 ms p99; rank+pack <= 0.5 ms p99; pair test <= 0.1 us/pair p99; re-flood <= 1 ms p99 (reported beside the whole, never summed into it) |
+| 60 Hz margin run (early signal) | p99 <= 6.25 ms vs 8.33 ms; each share <= 4.17 ms p99; R1-TICK-REC2 P1-P3 at 60 Hz; one run; rooms/VM at 60 Hz counted and goal budget at that count (PM-0001-63) |
+| Prediction replay | 200 ms (6 ticks at 30 Hz) <= 1 ms p99, minimum laptop |
+| Transport runtime | <= 1 vCPU per process with 48 sessions; p99 send call <= 1 ms (30 input datagrams/s/session) |
+| Downstream per client | ES: mean <= 160 kbps and p99 of 1-s windows <= 256 kbps, UDP payload + 28 B/datagram; SS: every 1-s window <= 256 kbps, 0 datagrams above cap rule, mean reported (+~20.1 kbps of shots on R2's 146.1) |
+| Upstream per client | <= 48 kbps (IPv4) under P2 |
+| Memory per room | RSS reported at start and after 20 min, <= 64 MB at N = 48; per-session memory flat (no queue growth); hit history <= 1 MB |
+| Room start-up | spawn to Open < 2 s |
+Planning arithmetic: server-only parts 3.64 of 8.33 ms (4.64 on a re-flood tick); whole tick 9.18 of 16.67 ms (10.18) (173-175); with S1 stand-ins 4.69 ms left (1095-1096). Bandwidth: 584 B/snapshot (609 B with events), ~146.1 kbps; E3b ~188.3 kbps; cap 256 kbps = ~1,067 B per interval; upstream 25.9-43.9 kbps at P2, 43.9-53.5 at the cap of 8 if sent whole, hence U2 (684-710).
+- B, C written.
+
+## D. Mustafa's netcode checklist (MP, Brave on Windows, at P2; 1631-1681; test-engineer writes it, 1304)
+Setup (1635-1643): a proof-test room on RS with 47 bot clients and Mustafa in the 48th slot, plus TC (sprinter at 9 m/s, static
+targets at ground, 2.5 m, 4 m). Overlay shows: profile, transport, server-measured RTT, interpolation delay, rewind cap,
+counters (corrections, snaps, extrapolated frames, clipped shots). Profile and cap change from the overlay (a spike-only
+control on the server's impairment layer); his base RTT measured at start and subtracted (PM-0001-3). Each step records
+"achieved" / "not yet" (+ note) or the asked observation, in an on-page form that writes to the results log (proposed).
+| step | do (condensed) | expected / record | line |
+|---|---|---|---|
+| 1 | open link, wait for "Playing" | playing within 3 s; overlay names transport and P2; record transport + Brave version | 1645-1646 |
+| 2 | P0: walk, sprint, strafe, jump, crouch 1 min; fire at wall | instant response (the reference feel) | 1647-1648 |
+| 3 | P2: same minute | own soldier and muzzle flash feel as at P0; no jump-back or stutter | 1649-1650 |
+| 4 | P2: run through brawl of 47 bots 2 min | no visible correction; any pull-back glides, rare | 1651-1652 |
+| 5 | P2: watch bots run/sprint/strafe/turn near and far | smooth, no warp/stutter/slide; turns not cut; record where fast movers look wrong (Hermite trigger, R2-SYNC-OQ12) | 1653-1655 |
+| 6 | P2: watch deaths and respawns | respawn appears at new spot; nothing slides | 1656-1657 |
+| 7 | P2 with the rule cap (from PM-0001-49, named on overlay): shoot sprinter 2 min | on-target hits, off-target misses; flash/tracer instant, hit marker on confirmation | 1658-1662 |
+| 8 | P2: fight and kill bots | no damage number or kill before its hit marker | 1663 |
+| 9 | P2: shoot static targets at 3 heights | every shot lands where clicked | 1664-1665 |
+| 10 | P2: run into cover under bot fire, 10 runs, step 7's cap | hit-after-cover rare, never long after; record how often unfair | 1666-1668 |
+| 11 | P2: trigger B1 from overlay while moving | others held (not flying off), own soldier responds; world catches up within 0.5 s; at most one correction (glide, or jump if > 2 m) | 1669-1672 |
+| 12 | P3 then P4, 2 min each in brawl and at TC | still playable, own soldier/gun instant; P4 not held to P2's feel | 1673-1676 |
+| 13 | WS forced (UDP blocked) at P2: steps 3, 5, 7 briefly | playing within 3 s; like those steps, brief stalls on loss allowed | 1677-1679 |
+| 14 | verdict at P2 on WebTransport | "achieved"/"not yet" for prediction (3, 4), reconciliation (4, 11), lag-compensated hits (7-9) | 1680-1681 |
+PM-0001-53 passes when every step is "achieved" (1574); a "not yet" goes back to the draft and is shown again (1604-1605).
+On screen he needs: the overlay (above), the controls for profile/cap/B1/UDP-block, the record form. Order constraint: step
+7 needs the cap PM-0001-49 sets, so his session comes after the honest-rewind runs (my reading of 1658-1659).
+- D written.
