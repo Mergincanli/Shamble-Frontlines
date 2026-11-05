@@ -115,9 +115,17 @@
     (the main session too). To name for the advisor (C6): four rows moved out of main's mutation table into
     PLAIN_BEHIND_MUTANTS (R-PLAIN refuses every row they guard). Older drift found by docs-keeper (not A3's): the
     night window differs between NIGHT_SHIFT.md:3 (07:10), :17 and REPO_MAP:75 (07:30) and CLAUDE.md (08:30).
-  - Now: pass 4, the one final review (security-auditor and the verifier, Agent tool, on 01b158c..60ae124 only; his
-    review budget: below Critical or High becomes a STATUS follow-up, not another pass; skeptics only for Critical or
-    High); the automated review of 9589bfb if it comes.
+  - Done: pass 4 (Agent tool; `security-auditor-pass4.md`, `verifier-pass4.md`, probes `sap4-*`, `verifier-pass4-*`):
+    security-auditor FAIL: P4-S4 critical (a `.gate/` worktree lets a night commit and push of rules or CI files
+    through: protectedRel maps only `.claude/worktrees/`), high P4-S3 (a command with no program skips the redirect
+    checks), P4-S1 (a wrapper name as a path runs the file), P4-S2 (a quoted NAME= after a keyword passes R-PLAIN),
+    P4-S5 (xvfb-run -e/-f write files); S1, S3, S4, S5 on main too. Medium P4-S6 (D-ASK misses here-document bodies);
+    low P4-S7, P4-S8. The verifier PASS WITH NOTES (1084/1084, C-PLAIN plus its own 7,246-line fuzz, mutants, no
+    routine line looser, main's file 180/192, gate with smoke PASS; lows P4-V2 to P4-V4; the C6 move described). The
+    automated review of 9589bfb: finding 14 MEDIUM, day (`security-review-auto-6.md`). CI green on 60ae124. No routine
+    text uses a wrapper as a command (the session's grep), so one rule may close S1, S2, S3, S5.
+  - Now: the advisor's pass-4 ruling (`advisor-pass4.md`): where, the fix shapes, the check after (his review budget),
+    C6, the follow-up lines.
   - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
     until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
     scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor
