@@ -79,3 +79,178 @@
 - ARITHMETIC (PM-0001-3 count): SE of loss at 100,000 packets: P1 0.0315 pp vs band 0.05 pp (1.59 SE, ~11 % of correct seeds fail: 0002:1335-1338's "1 in 9"); P2 0.0443 pp vs 0.10 pp (2.26 SE, ~2.4 %); P3/P4 0.0689 pp vs 0.25 pp (3.6 SE, ~0.03 %). On L2 (real time, not replayable) this makes a correct impairment fail P1 about 1 run in 9 -> a flake by construction.
 - Jitter statistic for the 5 % band: not defined in 0001 (PM-0001-3) nor 0002 (PM-0002-49: "the distribution L1's own documentation states (proposed: R2 names none)"); uniform ±10 ms has SD 10/sqrt(3) = 5.774 ms (arithmetic).
 - B1 for PM-0001-3: expected per-direction loss value not stated (depends on packet count and burst count; PM-0001-18 uses 10 bursts per run, proposed); whether the burst hits both directions at once: not found.
+- tools/gate.mjs:34 FILES = the five legacy files only -> today's gate never reads spikes/. .github/workflows/gate.yml: on push + pull_request, no path filter, jobs gate + smoke on ubuntu-24.04, Node 22, no Rust job -> CI builds/tests nothing in spikes/. spikes/ does not exist yet.
+- PM-0001-15 (0001:1526) bite "flagged within the run" (S30, 30 min) vs key's 5-minute bite run (0001:1499-1500); its marks need >= 20 min (RSS at 20 min; queues last 10 vs first 10 min) -> bite run length conflict for memory/queue marks.
+- Approx. count (my tally of 0001/0004/0006 rows run on RS/LG with a named bite or rule B-S/B-N): about 42 planted runs -> about 3.5 h at 5 min each, before builds and swaps (an estimate for the cost cap, not a draft number).
+- Block 8 (sections) next.
+
+---
+# DIGEST (sections A-G)
+Keys: 0001 = docs/adr/0001-multiplayer-netcode.md, 0002 = docs/adr/0002-code-structure-build-toolchain.md, 0004 = docs/adr/0004-simulation-core.md, 0006 = docs/adr/0006-infrastructure-operations.md, SP = docs/SPIKE_PLAN.md, GL = docs/research/GLOSSARY.md, r5 = docs/research/r5-toolchain-quality.md. "REC:" = my recommendation, never settled.
+
+## A. The link simulator as designed
+| Item | L1 | L2 | Source |
+|---|---|---|---|
+| Where it sits | behind the thin transport interface (R2-TRN-REC4's), our own code | an impairment wrapper around the server's UDP socket, under the real quinn endpoint; WebSocket: a delaying TCP proxy ("delay and stalls"; "loss on TCP shows as delay") | 0002:515-521; r5:1454-1459; 0001:1444-1445, 1728-1730 |
+| Time | simulated time | real time | 0002:516, 843-845 |
+| Determinism | seeded; same seed + profile -> identical packet-fate log (PM-0001-3) and identical per-tick hashes (R5 mark; PM-0002-49) | not seeded-replayable (real time) | 0001:1513; r5:1469-1470; 0002:1301 |
+| What runs on it | the real server code + headless bot clients in one process | real browsers over WebTransport; LG's clients | 0002:519-521; 0001:1444-1445 |
+| Injects | latency, jitter, loss, reordering, duplication, a rate limit, packet-fate log | "the same profiles" (r5); rate limit used by PM-0001-23/-24 on L2 | 0002:516-517; r5:1456-1459; 0001:1536-1537 |
+| Marks allowed | logic only (counts, shares, hashes), never a time mark; "any machine or CI" | time marks on RS | 0001:1410-1411 |
+| Gate later | G11: one minute per profile P0-P4 + B1, under 2 min total (foundation, not this change-set) | nightly | 0002:580, 1301, 496 |
+| Rejected | turmoil (QUIC on it unread; R5-TEST-OQ5: not added) | OS-level `tc netem` ("docs not read: not proposable"; R5-TEST-OQ6: no OS layer unless L2 cannot reproduce a playtest bug) | 0002:844, 846, 1607-1608 |
+
+**Profiles** (0001:567-572, 1436-1443): P0 = 0 ms, no jitter, 0 %; P1 = 50 ms, ±10 ms, 1 %; P2 = 100 ms, ±20 ms, 2 %; P3 = 150 ms, ±30 ms, 5 %; P4 = 200 ms, ±40 ms, 5 %; B1 = P2 plus one burst of 1 s at 100 % loss. Latency is the round trip. **Per direction:** half the latency, a uniform jitter of ± half the jitter, the profile's loss drawn on its own: at P2, 50 ± 10 ms each way and 2 % each way, independently; about 4 % of round trips lose a packet (1 − 0.98 × 0.98 = 3.96 %). Expected arrival = send time + that one-way delay; every lateness counts from it (0001:1443-1444). Settled by OQ-0001-16 (0001:1204-1207) and SP:165-167. Every run "also reordering" (0001:567); reordering = "what the simulator produces under the profile's jitter", each run records its measured reorder share, a reorder mark counts only if the share > 0 (0001:1447-1450, proposed).
+**Not found in the drafts:** a duplication rate for any profile (no 0001 mark tests network duplication); the rate limiter's queue (size, drop-tail or delay); B1's expected per-direction loss for PM-0001-3 and whether its burst hits both directions; which jitter statistic the 5 % band compares (PM-0002-49: "the distribution L1's own documentation states (proposed: R2 names none)", 0002:1301).
+**R5-TEST-OQ2** (r5:1804-1805, exact): "Can wtransport or web-transport-quinn be built on a custom quinn endpoint, so L2 sits under them? F13 is quinn's; the two candidates (R2-TRN-REC1) were not read for it. Decides it: R2's interop spike." Assigned to this test (0002:1604; SP:199). No drafted fallback if neither crate allows it.
+**PM-0001-3** (0001:1513), the simulator's precondition: P1-P4 + B1, on L1 and on L2, each direction, loss / mean one-way delay / jitter over 100,000 packets within 5 % (relative), round-trip mean within 5 %; L1 fate-log identity on two runs; P0 on L2 = the real path, recorded; MP's server-measured RTT median 100 ± 5 ms at P2; L2's injected delay per direction "set to half of the profile's RTT minus the path's measured base RTT (median of 10 s of pings at session start; proposed)"; runs once per profile and layer before any mark under that profile counts, and at the start of every L2 session. No planted defect named.
+**R5's L2 mark** (r5:1470-1472): app-level RTT vs quinn's server-side `rtt()` within ±5 ms at a 100 ms injected round trip, then reported under P2 (it is PM-0001-33 in 0001:1548).
+
+## B. The client harness
+**What the drafts say (exact text, by line):**
+- SP:179-181: "It builds first the client harness the boundary spike shares (the page with its Worker host and a plain renderer, on the throwaway sim: ADR 0002's spike text), accepted with the order (J6 (5))."
+- 0002:1115-1116: the boundary spike "shares the netcode proof test's client harness and stand-in sim, and the sim core spike's sim, which exists by then, serves the marks that need a sim beyond the stand-in".
+- 0002:1199-1205 (BX): "the netcode proof test's throwaway sim (movement, hitscan, bots as protocol clients) in the Worker ... The page draws the blocks with the shared client harness's plain renderer, not the look (the look is ADR 0003's)."
+- 0002:1211-1213: "Online: the Worker's client endpoint connected to the netcode proof test's room process over WebTransport through that test's link impairment, at the profile the row names".
+- GL:768 (the test's definition): "the Rust simulation runs natively as a server, and as Wasm in the client".
+- The Worker host's shape (foundation design the boundary spike measures): one input call + one step call per tick; datagrams carried in the input call, each stamped with the host's `performance.now()` in its own message event; the step returns when the next tick is due and the host sets its timer from it; catch-up at most 7 ticks per wake; a fresh view of `memory.buffer` after every call (0002:325-341); the Worker owns the connection online, the page sees only the block (0002:369-373, H2); the local-match order (0002:394-403).
+**What this test's own marks need from it** (0001 rows on ML/MAC/MP): prediction + reconciliation (PM-0001-41/-42/-60), interpolation and extrapolated-frame counts (-45/-46/-61), the client clock with message-event stamps (-47 bite: "receive times quantised to the tick"; -33), input-to-screen through presented frames (-43), the aim cast from what the page drew (-51), damage shown only on the server's event, logged by the page (-52), own cues once (-62), the four-browser path on both backends (-28, -29, -32, -36).
+**Left to the boundary spike** (SP:119; 0002:1119-1175, 1249-1281): PM-0002-1 to -34, -77, -78 (the counting build 0002:1232-1235, one copy per tick, page allocations, B2 against B3, generated types, isolation, the page never handling a packet PM-0002-22, the busy page PM-0002-23, size and tools, `file://` editor, Sentry), and ADR 0004's PM-0004-8, -28, -61, -68 to -70 (the Worker's pacing, hidden tabs, trap recovery).
+REC: build the host to part 5/6's shape now (so the boundary spike measures the code it will keep), but judge none of PM-0002-*; skip the counting build and B3.
+
+## C. spikes/ rules, pins, gate and CI; the container
+| Rule | Text | Source |
+|---|---|---|
+| Throwaway, in `spikes/`, exempt from the legacy hard constraints | SPIKE-SCOPE (a) | SP:12-13; 0002:39-40, 944-947 |
+| Own change-set, plan first; one heavy spike at a time | CLAUDE.md protocol | SP:13-15 |
+| Server numbers at 30 Hz; N = 48 holds over 54 | TICK-30, MODES-3 (a) | SP:15-17 |
+| Layout | `spikes/` at the root beside `crates/`, `packages/`, `legacy/` (after the foundation's restructure) | 0002:140-141 |
+| Import ban | nothing in `crates/` or `packages/` imports `spikes/`; a gate rule from the foundation | 0002:144-145, 210 |
+| Kept | "the proof test's kept server and harness" reused by the 60 Hz run, in its own VM session after the sim core spike; the boundary spike reuses the harness, the throwaway sim and the room process; PM-0004-61/-70's online halves run against "the netcode proof test's server at P2" | SP:106-107, 118, 182, 275; 0004:1182, 1197 |
+| How "kept" is kept (branch, tag, merged to main?) | not found | – |
+| Toolchain pins for spikes | not found: 0002 part 2's pins are the foundation's (Need: "GLOSSARY §8, the foundation only", 0002:179) | 0002:157-179 |
+| Foundation pins (for reference) | `rust-toolchain.toml`: one exact stable Rust ("1.99.1 when the research read it"), clippy, rustfmt, `wasm32-unknown-unknown`, `profile = "minimal"`; `resolver = "3"`, `edition = "2024"`; `Cargo.lock` committed, `--locked`; Node pinned as legacy pins 22 (TL17); TypeScript 6.0.x exact; wasm-bindgen CLI = `Cargo.lock`'s version, not wasm-pack; three.js version is ADR 0003's | 0002:157-170, 958-960 |
+| Crates | "quinn and the WebTransport crate the netcode proof test picks" | 0002:239 |
+| LG's build | the bot clients' aarch64 build "is that spike's own" | 0002:630-632 |
+| Today's gate | checks only the five legacy files (`FILES`, tools/gate.mjs:34): never reads `spikes/` | tools/gate.mjs:34 |
+| Today's CI | `.github/workflows/gate.yml`: push and pull_request, no path filter, jobs `gate` and `smoke` on ubuntu-24.04 with Node 22, no Rust job: nothing in `spikes/` is built or tested by CI | gate.yml |
+| Safari runner | a GitHub macOS runner stands as MAC for yes/no and count rows only once (i) Safari >= 26.4, (ii) real Safari via safaridriver, (iii) one WT session to RS carrying datagrams + one WS session on the domain are recorded; time rows stay on a borrowed Mac; the workflow is this plan's, reviewed by security-auditor + infra-engineer; any `.github/` change goes to Mustafa | SP:45-57; 0001:1394-1404; 0002:1040-1043 |
+
+**The container (read 2026-11-05, read-only):** rustc 1.97.0 (2026-07-07), cargo 1.97.0; installed targets: `x86_64-unknown-linux-gnu` only (no `wasm32-unknown-unknown`, no `aarch64-unknown-linux-gnu`); toolchains: stable x86_64 only (no nightly for cargo-fuzz); node v22.23.4; wasm-pack, wasm-bindgen, wasm-opt: not on the PATH; clang: /usr/bin/clang. Plus (ssh-probe.md): no ssh client, no egress but HTTPS 443 through a TLS-re-terminating gateway; arbitrary public HTTPS hosts readable; no WebSocket upgrade, no QUIC out. Not checked: whether `rustup target add`, `cargo install` and Playwright's Chromium work here (they need egress to static.rust-lang.org / crates.io, which the probe suggests is allowed: unverified).
+
+## D. S17 / PM-0004-67; the online halves of PM-0004-61 and -70
+| Mark | Number | Setup | Runs; bite | Source |
+|---|---|---|---|---|
+| Design (part 5) | loop wakes on a timer, takes due ticks from a monotonic clock; catch-up per wake ≤ 0.25 s = 7 ticks at 30 Hz (⌊0.25 × 30⌋); a longer stall drops the time and records it; overrun + dropped-interval counters | server room loop | – | 0004:207-211 |
+| PM-0004-67 (S17) | 30 Hz: tick start jitter (actual − scheduled) p99 ≤ 2 ms over 36,000 ticks; after an injected 200 ms stall, on schedule within 1 s ("no ticks owed, and every later start within the jitter mark": proposed) and ≤ 7 ticks in one wake; after an injected 1 s stall ≤ 7 ticks that wake and the dropped time in the counter (proposed); counters in the metrics | RS (Linux); the proof test's room under its 30 Hz baseline load; "a planted sleep on the tick thread at a fixed tick"; the loop's monotonic clock | 3 runs of 36,000 ticks, each meets. Bite: "a loop that counts ticks from its timer period instead of elapsed time" | 0004:1193, 1011 |
+| PM-0004-61 online half | after a trap in the client's Worker: a fresh instance holds the server's state (client-held hash = server's), resync within 300 ms at P2; 20 of 20 hook messages arrive whole | ML Chrome/Edge/Firefox, MAC Safari; the boundary spike's Worker against this test's server at P2 (ADR 0002's simulator); 20 traps per browser at random ticks | bites: a host that does not restart; a host that reports without reading the hook's buffer | 0004:1182 |
+| PM-0004-70 online half | after 60 s and 6 min hidden: within 0.5 s of the tab's return the client applied the server's state and its commands are accepted, never > 7 ticks in one frame | ML, MAC; the boundary spike's page against this test's server at P2 | 5 hides per duration and browser; bite: a Worker that simulates the whole hidden gap | 0004:1197 |
+Only -61 and -70 name a profile; -67 runs under this test's own load (0004:1234-1235). -61 and -70 are judged in the boundary spike (SP:119); this change-set only has to leave the server and L2 at P2 re-runnable for them (SP:145).
+Gaps: -67 names one bite for three sub-marks: the 7-tick cap and the dropped-time counter have none (REC, proposed: an uncapped catch-up loop; a drop that never increments the counter). -67 states no validity rule; 0001's V-S (tick thread alone on its vCPU, steal ≤ 1 %, 0001:1486-1490) covers 0001's timed marks (REC: apply V-S to -67; decision for the advisor). Whether -67's 36,000 ticks may be read from the S30 soaks (the stall runs must be separate, or they break the 0-overrun marks): decision.
+
+## E. The evidence plan (CLAUDE.md: "netcode → deterministic tests with injected latency, jitter and loss")
+| Group | What | Where it can run | Marks it serves |
+|---|---|---|---|
+| E1 unit (cargo test) | L1's samplers (per-direction delay, uniform jitter, loss, reorder, dup, rate limiter, burst), fate-log writer, codec, quantisers, wrap-aware compare | container | building blocks of PM-0001-3, -17, -57, -58 |
+| E2 property (proptest, fixed seed) | every sent packet has exactly one fate; delivered time ≥ send time; delivered + dropped = sent + duplicated; decoders never panic; wrap compare is antisymmetric across 2^16 | container | PM-0001-3, -34, -58 |
+| E3 deterministic L1 (seeded, 48 headless clients, simulated time) | PM-0001-3 (L1), -17, -57, -58, -18 (3 seeds), -20, -21, -22, -41, -42 (snapshot share), -45 (per-tick count), -47, -48, -49, -50, -51, -54/-55 (if their condition holds), -60, -61, -62; -30's hash on loopback | container (Linux x86-64): L1 is "any machine or CI", logic only (0001:1410-1411); also the x86-64 replay that judges LG mismatches (0001:1343-1345) | as listed |
+| E4 any-machine | -34 fuzz (needs a nightly: missing here), -35 dependency check | container (fuzz after a nightly is installed) | -34, -35 |
+| E5 Wasm + harness | sim native vs Wasm hash; harness page + Worker on loopback | container only if wasm32 + wasm-bindgen CLI + Playwright Chromium + local QUIC work (unverified) | GL:768; rough check for -28 |
+| E6 L2 (real time) | impairment socket + TCP proxy on RS; LG's clients; ML, MAC, MP browsers | RS, LG; browsers | -3 (L2), -17, -18, -19, -20, -23, -24, -31, -33, -37, -38, -48, -49, -54 |
+| E7 timed server marks (V-S, 3 runs) | single room, tick thread pinned | one vCPU of RS | -4 to -16, -26, -59; PM-0004-67; PM-0006-17, -19, -20 |
+| E8 rooms per VM | 8 rooms, unpinned, PM-0006-13's rules, 3 sessions at 3 times of day | RS + LG | -27; PM-0006-13, -14 |
+| E9 soaks | S30: 60 s warm-up, 54,000 measured ticks, tick counter from 1,800 below 65,536, doors 1/s | RS + LG | -15 and every S30 row |
+| E10 browsers + people | ML (rough checks only until OQ-0003-1 names it), MAC (macOS runner: yes/no and counts only), MP Brave checklist (-53), operations checklist (PM-0006-12, -18) | Mustafa's machines; GitHub macOS runner | -28, -29, -32, -36, -43 to -46, -52, -53 |
+| E11 planted defects | each automated mark's bite on the spike's own build, 5-minute run (0001:1499-1501); rules B-S and B-N | where its mark runs | section F |
+| E12 checker self-test | the verdict script run on fixed fixtures: one that must PASS, one FAIL, one INVALID | container | every scripted mark |
+**This container** (no SSH, HTTPS-only egress, no QUIC out): E1-E4, E12 and probably E5; it can read results a VM publishes on 443 with a browser-trusted certificate (ssh-probe.md, second pass). **RS/LG:** E6-E9 and their bites, driven by cloud-init or by Claude Code on Mustafa's PC. **Browsers:** E10.
+**Recording (not found in the drafts beyond "results log", "results-log header per machine" 0001:1511 and "the run's record" 0001:1512).** REC: per run, one JSON Lines results log: a header record (PM-0001-1's fields, build commit and binary hash, profile, seed, clock resolution 0001:1475-1476, affinity map), per-tick records (scheduled and actual start, phase times, counters), per-second records (per-thread CPU from `/proc`, steal, RSS, queue lengths, bytes per client, inputs per client), event records (joins, bursts, stalls, door changes, planted-defect id), a footer (exit code); the packet-fate log as a separate file (direction, flow, sequence, send time, fate, delay), kept under `.gate/`, only summaries and hashes committed. A checker reads a committed mark table as data (id, statistic, threshold with its draft line, sample window, validity clauses) and writes one verdict per mark: PASS, FAIL, INVALID (V-S failed: "neither a pass nor a fail", 0001:1497-1498), STAND-IN (PM-0001-4 when the stand-in sim is lighter, 0001:1432-1435), REPORTED, NOT-RUN. Percentiles by nearest rank, ⌈0.99 n⌉ (0001:1465-1466). A threshold in that table that differs from the drafts is a decision, never an edit. No retries: a failing run keeps its data, seed, commit, machine, browser, profile (0001:1505-1506).
+
+## F. Planted defects the drafts list for this test (each must fail its mark before the pass counts; all "proposed", 0001:1501)
+| Mark | Planted defect | Line |
+|---|---|---|
+| PM-0001-1 | a single-room run with a second room's tick thread on the same vCPU is flagged invalid | 0001:1511 |
+| -2 | a load script that stops firing after 10 minutes fails the 700 shots per second | 1512 |
+| -4, -5 (each share), -6, -9, -11 (send call), -44 | rule B-S: busy-wait = mark − measured p99 + 10 % of the mark | 1502-1503, 1515-1522, 1563 |
+| -12 (each scene), -13 | rule B-N: padding = measured margin + 10 % of the mark | 1503-1504, 1523-1524 |
+| -7 | a history kept for the whole match fails the 1 MB | 1518 |
+| -8 | an accumulator that ranks by entity id fails "the nearest 8" | 1519 |
+| -10 | an encoder whose work grows with N² | 1521 |
+| -14 | an entity group that is never split | 1525 |
+| -15 | R5's planted leak (one buffer kept per snapshot), flagged within the run | 1526 |
+| -16 | a start that loads its mode file twice over a 1 s delay | 1527 |
+| -17 | a 16-bit tick in the snapshot header; a client quantiser that rounds differently | 1528 |
+| -57 | positions at 4 cm; yaw in 12 bits; pitch in 8 bits | 1529 |
+| -58 | a plain `<` instead of the wrap-aware compare; the header tick narrowed to 16 bits | 1530 |
+| -19 | the first full state sent as datagrams | 1532 |
+| -20 | a redundancy cap of 1 | 1533 |
+| -21 | each check removed in turn; the tick check relaxed to "not older than"; a refusal in place of the clamp | 1534 |
+| -22 | an unbounded event queue | 1535 |
+| -23 | the own state ranked like any entity | 1536 |
+| -24 | a blocking send that queues every snapshot | 1537 |
+| -25 | the library's default limits; the `Join` deadline from the upgrade's end; per-address limits keyed by the whole IPv6 address | 1538 |
+| -26 | `panic = "abort"`; a shared `std::sync::Mutex` poisoned by a handler panic | 1539 |
+| -59 | a tick-thread panic that leaves the process running | 1540 |
+| -28 | control: a wrong certificate hash fails 100 of 100 | 1543 |
+| -29 | no WebTransport timeout | 1544 |
+| -30 | a wall-clock read on one transport's command path; validity: a command delayed past its tick makes the run invalid | 1545 |
+| -31 | a server that queues every snapshot over WebSocket | 1546 |
+| -32 | the datagram writer detected by browser name | 1547 |
+| -33 | pongs answered from the tick thread; the client's pong without its hold time | 1548 |
+| -34 | an unchecked index in one decoder | 1549 |
+| -35 | `quinn` added to the sim crate; quinn-proto pinned at 0.11.17 | 1550 |
+| -37 | a send queue that holds each snapshot for 3 intervals | 1552 |
+| -38 | bulk data on the control stream | 1553 |
+| -41 | the server's run speed 1 % above the client's; the server quantising its own copy differently | 1559 |
+| -42 | smoothing off | 1560 |
+| -60 | the own-state section without the changed value | 1561 |
+| -43 | own movement drawn from snapshots only | 1562 |
+| -45 | R5-GATE-REC3's G11 mutation, "a snapshot buffer one slot too short for P2" | 1564 |
+| -46 | respawns interpolated like movement | 1565 |
+| -61 | remote events released on arrival into the newest block | 1566 |
+| -47 | an estimator taking the newest raw sample; receive times quantised to the tick | 1567 |
+| -48 | a rewind without the interpolation delay; an estimate without the buffer wait | 1568 |
+| -49 | the cap applied to the estimate only; a client delaying every pong by 150 ms must still meet the cap | 1569 |
+| -50 | the view time accepted without the tolerance check | 1570 |
+| -51 | the server's ray parallel to the client's with a planted 10 cm fire-origin error | 1571 |
+| -52 | damage shown on the client's own predicted hit | 1572 |
+| -62 | cues written from the replay; the server echoing the owner's shots | 1573 |
+| -54 | a client trajectory step of 1/60 s against the server's 1/30 s | 1576 |
+| PM-0004-67 | a loop counting ticks from its timer period | 0004:1193 |
+| PM-0006-13 (and -27 through it) | a busy-wait of 20 % of the single-room p99 in every tick of one room | 0006:1351 |
+| PM-0006-15 / -16 | a rule added for the probed TCP port; SSH open to every source / a rule open to every source | 0006:1353-1354 |
+| PM-0006-17 | snapshots sent twice per tick | 0006:1355 |
+| PM-0006-19 / -20 | a 50 µs busy-wait per logged event / a `format!` in a per-tick log call | 0006:1357-1358 |
+| PM-0006-21 / -22 | a log line with one client's address and one token / one metric unregistered | 0006:1359-1360 |
+| PM-0006-23 / -24 | the stall is the planted event (control: 0 overruns first) / a planted `player` label | 0006:1361-1362 |
+| PM-0006-25 / -27 | control pair: a 14-day certificate connects; a rule-breaking one is refused | 0006:1363, 1365 |
+**No bite named:** PM-0001-3 (the simulator itself), -18, -27 (only via PM-0006-13), -36, -55; PM-0006-11, -12, -14, -18, -26; PM-0004-67's cap and counter. REC (proposed, for the advisor): for PM-0001-3, (a) the full round trip applied each way fails the mean-delay band, (b) loss drawn once per round trip fails the per-direction loss, (c) a normal jitter in place of the uniform fails the jitter check, (d) the RNG seeded from the clock fails the fate-log identity, (e) on L2, the delay not net of the base RTT fails MP's 100 ± 5 ms; for -18, a baseline that never falls back (deltas only against the last acknowledged snapshot) fails the 500 ms.
+
+## G. Problems (ranked) and a recommended order
+**Problems: each a decision for the advisor or Mustafa unless marked REC**
+1. **Packet count:** PM-0001-3 says 100,000 packets (0001:1513; r5:1470); PM-0002-49 says 1,000,000 because 100,000 fails a correct simulator about 1 seed in 9 at P1 (0002:1301, 1335-1338). On L1 a seed then decides the verdict; on L2 (real time, no replay) it is a flake by construction (my arithmetic: P1 1.59 SE, about 11 % of runs; P2 2.26 SE, about 2.4 %). REC: 1,000,000 per profile and direction on both layers.
+2. **Reordering never happens on a 30 Hz flow at P2 or P3** under independent uniform half-split jitter (arithmetic: packets 33.33 ms apart reorder only if the jitter range exceeds 33.33 ms; P2's range is 20 ms, P3's 30 ms, P4's 40 ms gives 1.39 % of pairs). So PM-0001-20's "10,000 scripted presses with reordering" under P3 (0001:1533) sees 0 reordered command datagrams, and by 0001:1447-1450 cannot count. Options: an explicit reorder share per profile (R5 lists reordering as its own capability, r5:1456; a rate needs a number: not found), or count reorder only on back-to-back datagrams (split snapshots, pings).
+3. **Rows judged on ML cannot close the test** until OQ-0003-1 names the laptop (rough checks only: 0001:1390-1392; SP:58-61), yet migration step 1 is done only when every mark outside the 60 Hz group is met (0001:1689-1691): -43, -44, -45, -46, -52 and ML's halves of -28, -29, -32, -36, -42. Decide whether the change-set closes with those rows "pending ML" or waits.
+4. **R5-TEST-OQ2 has no fallback.** If neither WebTransport crate can sit on a custom quinn endpoint, the drafts offer no L2 (netem not proposable, 0002:846; R5-TEST-OQ6, 0002:1608). REC: answer it first, in this container, before any VM hour; options to name now: (a) the crate that allows it; (b) a user-space UDP relay in front of the server (it changes the source address the server sees, which PM-0001-25's per-address limits read); (c) read netem's docs and propose it.
+5. **Simulator spec gaps** (not found): the jitter statistic for the 5 % band; B1's expected loss and whether its burst cuts both directions; the rate limiter's queue (size, drop or delay: PM-0001-24's "never older than 3 intervals" could fail on the simulator's own queue); a duplication rate (L1 has it by design, 0002:516; no mark uses it). REC: the plan proposes each, labelled proposed, for the advisor.
+6. **L2's delay formula is ambiguous** (0001:1513): "half of the profile's RTT minus the path's measured base RTT" gives 50 − b per direction (round trip 100 − b) or (100 − b) ÷ 2 (round trip 100). Only the second meets MP's 100 ± 5 ms once his base RTT exceeds 5 ms. Advisor to confirm the reading.
+7. **Bite length:** the key's 5-minute bite run (0001:1499-1500) cannot show PM-0001-15's leak "within the run" (S30), its 20-minute read or its 10-minute windows (0001:1526). Decide the bite run's length for memory and queue marks.
+8. **Rows with no planted defect** (section F) cannot be shown to fail: PM-0001-3, -18, -36, -55; PM-0006-11, -12, -14, -18, -26; PM-0004-67's cap and counter. REC: the proposed bites in F.
+9. **No machine guards `spikes/`:** today's gate reads only the five legacy files (tools/gate.mjs:34) and CI has no Rust job (gate.yml). REC: the spike's own test command, run in-session at every step with its output in the checkpoint; any CI job for it (and the Safari workflow) is a `.github/` change for Mustafa's approval.
+10. **Container toolchain:** rustc 1.97.0 with no wasm32 or aarch64 target, no nightly, no wasm-bindgen CLI or wasm-opt; spike pins are not fixed by the drafts. REC: the plan pins its own exact toolchain in `spikes/<name>/rust-toolchain.toml` (with wasm32), `Cargo.lock` + `--locked`; LG's aarch64 clients built natively on LG from the same commit (no cross linker needed); every binary's hash in the results header.
+11. **"Kept" is undefined** (SP:106-107, 182). REC: the server, harness, L1/L2 and checker merge on main under `spikes/`, with the commit SHA written in ADR 0001's results, so the 60 Hz run and the boundary spike start from one known commit.
+12. **PM-0004-67:** no validity rule and no statement whether its 36,000 ticks share the S30 runs (D). REC: V-S applies; the jitter read from 3 S30 runs, the stall runs separate.
+13. **VM hours:** about 42 planted runs on RS/LG at 5 minutes each, about 3.5 h before builds and swaps (my estimate for the cost cap), plus PM-0006-13's 3 sessions at 3 times of day (at least 3 VM sessions).
+
+**Recommended order, small resumable units (REC)**
+1. Container probes, one unit each, results to the notes: install the wasm32 target and the wasm-bindgen CLI; a nightly for cargo-fuzz; Playwright's Chromium; a WebTransport session over loopback QUIC inside the container.
+2. `spikes/` skeleton, pins, results-log format, the mark table as data, the checker and its PASS/FAIL/INVALID fixtures (E12).
+3. L1 with E1/E2 tests; PM-0001-3's L1 half with the proposed simulator bites; decide items 1, 2 and 5 before this unit closes.
+4. R5-TEST-OQ2 on loopback: both crates on a custom quinn endpoint over the impairment socket; the TCP proxy; L2's shape fixed (item 4).
+5. Throwaway sim, protocol, room and headless client endpoint; then the L1 row groups one per unit, each with its bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); burst (-18); any-machine rows (-30 on loopback, -34, -35).
+6. Wasm build, native-against-Wasm hash, the client harness (page, Worker host, plain renderer), a local rough check.
+7. The run-day package (cloud-init or Mustafa's PC), the run plan with hours and cost cap, the DNS records; VM session 1: preconditions (-1, -2, -3 on L2; PM-0006-11, -12) and the 5-minute calibration; then timed single-room marks with their bites; then L2 rows, S30 soaks with PM-0004-67, rooms per VM over 3 sessions, the operations marks.
+8. Browsers: the macOS-runner check (workflow to Mustafa first), ML rough checks, MP's Brave checklist.
+9. Verdicts into ADR 0001's record; the kept commit named.
+- Block 8 (sections A-G) DONE.
+DONE
