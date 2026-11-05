@@ -1,0 +1,28 @@
+night-shift ">CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+night-shift "git status; >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; settings.json ""
+night-shift "TZ=x >CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+night-shift "TZ=x >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; settings.json ""
+night-shift "git status && then >CLAUDE.md" -> null bash exit 2; CLAUDE.md "rules\n"; settings.json "{\"a\":1}\n"
+night-shift "git status > CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+pr-advisor ">CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+pr-advisor "git status; >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; settings.json ""
+pr-advisor "TZ=x >CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+pr-advisor "TZ=x >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; settings.json ""
+pr-advisor "git status && then >CLAUDE.md" -> null bash exit 2; CLAUDE.md "rules\n"; settings.json "{\"a\":1}\n"
+pr-advisor "git status > CLAUDE.md" -> deny routine (pr-advisor): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+day ">CLAUDE.md" -> ask kit and gate files ask first in a day session: CLAUDE.md (a redirect)
+day "TZ=x >CLAUDE.md" -> ask kit and gate files ask first in a day session: CLAUDE.md (a redirect)
+night-shift ">CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+night-shift "git status; >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n";
+night-shift "TZ=x >CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\
+night-shift "TZ=x >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; settin
+night-shift "git status && then >CLAUDE.md" -> null bash exit 2; CLAUDE.md "rules\n"; sett
+night-shift "git status > CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.m
+pr-advisor ">CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+pr-advisor "git status; >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; 
+pr-advisor "TZ=x >CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n
+pr-advisor "TZ=x >.claude/settings.json" -> null bash exit 0; CLAUDE.md "rules\n"; setting
+pr-advisor "git status && then >CLAUDE.md" -> null bash exit 2; CLAUDE.md "rules\n"; setti
+pr-advisor "git status > CLAUDE.md" -> deny routine (pr-advisor): a redirect on CLAUDE.md 
+day ">CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"
+day "TZ=x >CLAUDE.md" -> null bash exit 0; CLAUDE.md ""; settings.json "{\"a\":1}\n"

