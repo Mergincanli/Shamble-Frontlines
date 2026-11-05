@@ -1,0 +1,40 @@
+-- P3-4
+night-shift  "git fetch -q origin main &" -> deny routine (night-shift): routines run git in the foreground (no background & or run_in_background
+night-shift [bg] "git fetch -q origin main" -> deny routine (night-shift): routines run git in the foreground (no background & or run_in_background
+pr-advisor [bg] "git fetch -q origin main" -> deny routine (pr-advisor): routines run git in the foreground (no background & or run_in_background 
+night-shift  "git fetch -q origin main & date" -> deny routine (night-shift): routines run git in the foreground (no background & or run_in_background
+night-shift  "date &\ngit fetch -q origin main" -> deny routine (night-shift): routines run git in the foreground (no background & or run_in_background
+night-shift  "git status 2>&1" -> null 
+night-shift  "git status |& git log -1" -> null 
+-- P3-9 / R-PLAIN redirect edges
+night-shift  "git status >&CLAUDE.md" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status >& CLAUDE.md" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status 1>&CLAUDE.md" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status >&2CLAUDE.md" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status >&-CLAUDE.md" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status >&2-x" -> deny routine (night-shift): write the command plainly (a >& before a word that is not a number or -)
+night-shift  "git status <&0" -> deny routine (night-shift): write the command plainly (a <& redirect): one command per line or joine
+night-shift  "git status >>&CLAUDE.md" -> deny routine (night-shift): start each command with its program by name (CLAUDE.md is not a routine 
+night-shift  "git status &>CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+night-shift  "git status 2>CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+night-shift  "git status >|CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+night-shift  "git status &>>CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+night-shift  "git status >&2" -> null 
+night-shift  "git status >&-" -> null 
+night-shift  "git status 2>&1-" -> null 
+-- commit allowlist, CLAUDE.md modified (unstaged), docs/a.md staged
+night-shift  "git commit -q -m x" -> null 
+night-shift  "git commit -qam x" -> deny routine (night-shift): the commit would change CLAUDE.md (a rules, CI or gate file)
+night-shift  "git commit -sa -m x" -> deny routine (night-shift): the commit would change CLAUDE.md (a rules, CI or gate file)
+night-shift  "git commit --all -m x" -> deny routine (night-shift): the commit would change CLAUDE.md (a rules, CI or gate file)
+night-shift  "git commit -m x -a" -> deny routine (night-shift): the commit would change CLAUDE.md (a rules, CI or gate file)
+night-shift  "git commit -m -a" -> deny routine (night-shift): the commit would change CLAUDE.md (a rules, CI or gate file)
+night-shift  "git commit -m x CLAUDE.md" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit -mx -- CLAUDE.md" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit --message=x --only" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit -m x --al" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit -m x --allow-empty" -> null 
+night-shift  "git commit -m=x" -> null 
+night-shift  "git commit -m" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit -m x -S" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me
+night-shift  "git commit -m x --no-verify" -> deny routine (night-shift): git commit here is only git commit [-q] [-a] [-s] [--allow-empty] -m <me

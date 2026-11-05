@@ -1,0 +1,24 @@
+== new guard
+[proj] "git worktree add -q -b cs/wt .gate/w origin/main" -> null bash exit 0
+Write .gate/w/.claude/settings.json -> deny routine (night-shift): /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5
+Write .gate/w/.github/workflows/ci.yml -> deny routine (night-shift): /tmp/claude-0/-home-user-Shamble-Frontlines/263eddf3-7643-5640-b1d5
+Write .gate/w/CLAUDE.md -> deny routine (night-shift): .gate/w/CLAUDE.md is a rules, CI or gate file; those change only in
+[.gate/w] "git add .claude/settings.json .github/workflows/ci.yml" -> null bash exit 0
+[.gate/w] "git commit -q -m \"notes\"" -> deny routine (night-shift): the commit would change .claude/settings.json (a rules, CI or gate file)
+  (the commit refused: made outside the guard, so the push check is reached)
+[.gate/w] "git push -q origin cs/wt" -> deny routine (night-shift): the branch changes .claude/settings.json (a rules, CI or gate file); it can't be pushed
+origin has cs/wt: no
+[proj] "git add .github/workflows/ci.yml" -> null bash exit 0
+[proj] "git commit -q -m \"notes\"" -> deny routine (night-shift): the commit would change .github/workflows/ci.yml (a rules, CI or gate file)
+== 60ae124
+[proj] "git worktree add -q -b cs/wt .gate/w origin/main" -> null bash exit 0
+Write .gate/w/.claude/settings.json -> null 
+Write .gate/w/.github/workflows/ci.yml -> null 
+Write .gate/w/CLAUDE.md -> deny routine (night-shift): .gate/w/CLAUDE.md is a rules, CI or gate file; those change only in
+[.gate/w] "git add .claude/settings.json .github/workflows/ci.yml" -> null bash exit 0
+[.gate/w] "git commit -q -m \"notes\"" -> null bash exit 0
+[.gate/w] "git push -q origin cs/wt" -> null bash exit 0
+origin has cs/wt: yes
+origin cs/wt changes vs main: .claude/settings.json, .github/workflows/ci.yml
+[proj] "git add .github/workflows/ci.yml" -> null bash exit 0
+[proj] "git commit -q -m \"notes\"" -> deny routine (night-shift): the commit would change .github/workflows/ci.yml (a rules, CI or gate file)

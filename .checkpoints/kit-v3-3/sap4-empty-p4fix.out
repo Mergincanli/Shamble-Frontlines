@@ -1,0 +1,14 @@
+night-shift ">CLAUDE.md" -> deny routine (night-shift): start each command with its program by name (a redirect before the 
+night-shift "git status; >.claude/settings.json" -> deny routine (night-shift): start each command with its program by name (a redirect before the 
+night-shift "TZ=x >CLAUDE.md" -> deny routine (night-shift): start each command with its program by name (a redirect before the 
+night-shift "TZ=x >.claude/settings.json" -> deny routine (night-shift): start each command with its program by name (a redirect before the 
+night-shift "git status && then >CLAUDE.md" -> deny routine (night-shift): start each command with its program by name (then is not a routine 
+night-shift "git status > CLAUDE.md" -> deny routine (night-shift): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+pr-advisor ">CLAUDE.md" -> deny routine (pr-advisor): start each command with its program by name (a redirect before the p
+pr-advisor "git status; >.claude/settings.json" -> deny routine (pr-advisor): start each command with its program by name (a redirect before the p
+pr-advisor "TZ=x >CLAUDE.md" -> deny routine (pr-advisor): start each command with its program by name (a redirect before the p
+pr-advisor "TZ=x >.claude/settings.json" -> deny routine (pr-advisor): start each command with its program by name (a redirect before the p
+pr-advisor "git status && then >CLAUDE.md" -> deny routine (pr-advisor): start each command with its program by name (then is not a routine p
+pr-advisor "git status > CLAUDE.md" -> deny routine (pr-advisor): a redirect on CLAUDE.md (a rules, CI or gate file) is not allowed
+day ">CLAUDE.md" -> ask kit and gate files ask first in a day session: CLAUDE.md (a redirect)
+day "TZ=x >CLAUDE.md" -> ask kit and gate files ask first in a day session: CLAUDE.md (a redirect)
