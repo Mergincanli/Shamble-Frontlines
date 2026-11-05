@@ -1,8 +1,0 @@
-== <a3>/.claude/hooks/routine-guard.mjs
-git clone https://example.invalid/o/tools.git /tmp/t	ask	kit and gate files ask first in a day session: tools (git clone)
-git clone https://example.invalid/o/r.git /tmp/t	null	
-git clone https://example.invalid/o/CLAUDE.md.git /tmp/t	ask	kit and gate files ask first in a day session: CLAUDE.md (git clone)
-== <a3>/.gate/kit-v3-3/pass3/base-ed3ea8c/routine-guard.mjs
-git clone https://example.invalid/o/tools.git /tmp/t	null	
-git clone https://example.invalid/o/r.git /tmp/t	null	
-git clone https://example.invalid/o/CLAUDE.md.git /tmp/t	null	

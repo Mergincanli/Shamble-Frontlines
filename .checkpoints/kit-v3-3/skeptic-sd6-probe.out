@@ -1,8 +1,0 @@
-#9 control rm -rf .claude: ASK - kit and gate files ask first in a day session: .claude (rm)
-#9 control rm -rf .gate/wt (a worktree top): ASK - kit and gate files ask first in a day session: . (rm)
-#9 rm -rf .gate (holds a worktree with .claude): allow
-#9 rm -rf docs (untracked docs/sub/CLAUDE.md): allow
-#9 rm -r .gate: allow
-#9 mv .gate /tmp/x: allow
-#9 abs rm -rf <proj>/.gate: allow
-#9 control rm -rf .gate/wt/.claude: ASK - kit and gate files ask first in a day session: .claude (rm)

@@ -1,6 +1,0 @@
---- add gitlink, ignore=all (base...sm):
-.gitmodules
---- modify gitlink, ignore=all (sm...sm2):
---- two-dot form (sm sm2 --):
---- --ignore-submodules=none:
---- cached, gitlink change staged:

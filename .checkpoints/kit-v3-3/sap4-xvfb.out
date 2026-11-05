@@ -1,4 +1,0 @@
-night-shift "xvfb-run -a -f .claude/settings.json git status" -> null bash exit 0; CLAUDE.md 6 bytes (was 6), first "rules\n"; settings.json 0 bytes (was 8), JSON broken
-night-shift "xvfb-run -a -e CLAUDE.md git status" -> null bash exit 0; CLAUDE.md 1180 bytes (was 6), first "rules\nThe XK"; settings.json 8 bytes (was 8), JSON ok
-pr-advisor "xvfb-run -a -f .claude/settings.json git status" -> null bash exit 0; CLAUDE.md 6 bytes (was 6), first "rules\n"; settings.json 0 bytes (was 8), JSON broken
-pr-advisor "xvfb-run -a -e CLAUDE.md git status" -> null bash exit 0; CLAUDE.md 1180 bytes (was 6), first "rules\nThe XK"; settings.json 8 bytes (was 8), JSON ok

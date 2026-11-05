@@ -1,6 +1,0 @@
-night-shift "cd .gate/nonexist; git status > .claude/settings.json" -> deny routine (night-shift): start each command with its program by name (cd is not a routine pr
-night-shift "cd .gate/nonexist; git status > CLAUDE.md" -> deny routine (night-shift): start each command with its program by name (cd is not a routine pr
-night-shift "cd .gate/nonexist && git status > .claude/settings.json" -> deny routine (night-shift): start each command with its program by name (cd is not a routine pr
-pr-advisor "cd .gate/nonexist; git status > .claude/settings.json" -> deny routine (pr-advisor): start each command with its program by name (cd is not a routine pro
-pr-advisor "cd .gate/nonexist; git status > CLAUDE.md" -> deny routine (pr-advisor): start each command with its program by name (cd is not a routine pro
-pr-advisor "cd .gate/nonexist && git status > .claude/settings.json" -> deny routine (pr-advisor): start each command with its program by name (cd is not a routine pro

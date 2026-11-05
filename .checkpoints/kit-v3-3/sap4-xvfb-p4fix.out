@@ -1,4 +1,0 @@
-night-shift "xvfb-run -a -f .claude/settings.json git status" -> deny routine (night-shift): start each command with its program by name (xvfb-run is not a rout
-night-shift "xvfb-run -a -e CLAUDE.md git status" -> deny routine (night-shift): start each command with its program by name (xvfb-run is not a rout
-pr-advisor "xvfb-run -a -f .claude/settings.json git status" -> deny routine (pr-advisor): start each command with its program by name (xvfb-run is not a routi
-pr-advisor "xvfb-run -a -e CLAUDE.md git status" -> deny routine (pr-advisor): start each command with its program by name (xvfb-run is not a routi

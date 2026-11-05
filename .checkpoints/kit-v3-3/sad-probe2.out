@@ -1,8 +1,0 @@
-night-shift Bash echo > .git/refs/remotes/origin/main: deny
-night-shift Bash cp a .git/packed-refs: deny
-night-shift Write .git/refs/remotes/origin/main: deny
-night-shift Write .git/config: deny
-pr-advisor Bash echo > .git/refs/remotes/origin/main: deny
-pr-advisor Bash cp a .git/packed-refs: deny
-pr-advisor Write .git/refs/remotes/origin/main: deny
-pr-advisor Write .git/config: deny

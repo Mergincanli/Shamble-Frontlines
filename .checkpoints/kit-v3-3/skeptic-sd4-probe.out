@@ -1,7 +1,0 @@
-C1 -> guard null | real main folder: branch=cs/c1 CLAUDE.md=r
-C1c -> guard null | real main folder: branch=main CLAUDE.md=x
-C2 -> guard null | real main folder: branch=cs/c2 CLAUDE.md=r
-C3_bare_and_after_known -> guard null | real main folder: branch=cs/c3 CLAUDE.md=r
-control_semicolon -> guard null | real main folder: branch=main CLAUDE.md=r
-control_plain -> guard null | real main folder: branch=main CLAUDE.md=r
-control_main -> guard ask | real main folder: branch=main CLAUDE.md=r

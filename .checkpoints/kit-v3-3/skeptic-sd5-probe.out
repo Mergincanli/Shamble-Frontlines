@@ -1,7 +1,0 @@
-git clone <url> .claude/sub -> main ask | agent deny
-git clone --revision main <url> .claude/sub -> main null | agent null
-git clone --revision=main <url> .claude/sub -> main ask | agent deny
-git clone --revision main <url> .claude -> main null | agent null
-git clone --revision main <url> CLAUDE.md -> main null | agent null
-git clone --x val <url> .claude/sub -> main null | agent null
-git clone --revision main <url> elsewhere -> main null | agent null

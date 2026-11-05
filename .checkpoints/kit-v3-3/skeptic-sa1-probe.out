@@ -1,9 +1,0 @@
-head=ASK s4=ASK :: cd .claude && sed -i s/a/b/ settings.json
-head=null s4=ASK :: cd .claude && sed -i s/a/b/ settings.json && git status | cat
-head=null s4=ASK :: (cd .claude && sed -i s/a/b/ settings.json)
-head=null s4=ASK :: cd .claude && echo x > settings.json; ls | head
-head=null s4=ASK :: cd .claude/hooks && sed -i s/a/b/ g.mjs && node --version | tail -1
-head=null s4=ASK :: cd .claude/hooks && sed -i s/a/b/ g.mjs &
-head=null s4=ASK :: cd .claude && sed -i s/a/b/ settings.json && echo $(date)
-head=null s4=ASK :: git status | cat; cd .claude && rm settings.json
-real bash: .claude/hooks/g.mjs edited by the piped line: true

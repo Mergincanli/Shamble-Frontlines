@@ -1,6 +1,0 @@
-Task: skeptic of verifier finding F-a (STATUS cites .checkpoints/kit-v3-3 notes deleted before ready), A3 kit-v3-3 at 442fbf7
-Plan: B1 CHECKPOINTS.md section 9 + precedent in STATUS; B2 STATUS lines in diff; B3 verdict
-B1 done: CHECKPOINTS.md:202-203 (442fbf7) deletes the notes and says "Deleting them is not deleting data: the history keeps them." Main 12d7961 has no .checkpoints files yet its STATUS.md:508 cites .checkpoints/part-b/probe.md (deleted; carried at 442fbf7:616); research docs on main cite .checkpoints/v2-research/* (r1-simulation-core.md:4,59,78,328,2918,2965; GLOSSARY.md:10; UNREAD_SOURCES.md:6 pins commit d3958f3). repo-map-check.mjs:7,23 exempts .checkpoints/ paths on purpose.
-B2 done: the four lines are real (92, 142, 565, 678). :92 is the in-flight Change-sets row and :142 the WT-NIGHT Decisions-pending entry, both rewritten by docs-keeper at step 6 / when WT-NIGHT is decided. :565 and :678 persist. No rule in plan-rev2, advisor rulings, docs-keeper.md or verifier.md forbids citing checkpoint paths.
-B3 verdict: refuted: the pattern is the repo's established, merged convention and §9.2 states the history keeps the notes; not a defect of A3. Optional nicety only: pin a SHA (e.g. "at 9a52dbe") as UNREAD_SOURCES.md:6 does.
-DONE

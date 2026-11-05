@@ -1,6 +1,0 @@
-A5b_param_nested_dq
-  bash: } | HIDDEN | x
-  parser cmds: [["echo","${x:-}}"],["echo","HIDDEN"],["echo","x"]]
-A5c_same_line_date
-  bash: } | HIDDEN | x
-  parser cmds: [["date","+${x:-}}"],["echo","HIDDEN"],["date","+x"]]

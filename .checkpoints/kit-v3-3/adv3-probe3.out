@@ -1,2 +1,0 @@
-bash wrote target.txt: true "Thu "
-parser: [{"argv":["date","target.txt"],"redirects":[]}]

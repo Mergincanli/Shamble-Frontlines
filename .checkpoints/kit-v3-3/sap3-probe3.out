@@ -1,5 +1,0 @@
-Q1 night date ANSI-C quote hides a switch: "date $'\\'' +%s '\ngit switch -q cs/evil\ndate '+%s" -> deny routine (night-shift): date reads the clock only (date, date -u, date +FORMAT)
-Q2 night date ANSI-C, plain end: "date $'\\''\ngit switch -q cs/evil\ndate $'\\''" -> deny routine (night-shift): date reads the clock only (date, date -u, date +FORMAT)
-Q3 pr-advisor date ANSI-C hides write: "date $'\\'' '\necho x > CLAUDE.md\ndate '" -> deny routine (pr-advisor): date reads the clock only (date, date -u, date +FORMAT)
-Q4 night git log ANSI-C: "git log -1 $'\\'' '\ngit switch -q cs/evil\ngit log '-1" -> deny routine (night-shift): write values out in git commands (no variables or substitutions)
-git git version 2.43.0 bash 5.2.21(1)-release

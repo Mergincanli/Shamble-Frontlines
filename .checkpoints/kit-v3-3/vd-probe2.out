@@ -1,9 +1,0 @@
-#9 control rm -rf .claude: ASK - kit and gate files ask first in a day session: .claude (rm)
-#9 control rm -rf .gate/wt (a worktree top): ASK - kit and gate files ask first in a day session: . (rm)
-#9 rm -rf .gate (holds a worktree with .claude): allow
-#9 rm -rf docs (untracked docs/sub/CLAUDE.md): allow
-#10 control export GIT_DIR=: ASK - kit and gate files ask first in a day session: the line names GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR
-#10 n=GIT_D; export "${n}IR=/x"; git status: allow
-#11 control clone url .claude: ASK - kit and gate files ask first in a day session: .claude (git clone)
-#11 clone --revision v1 url .claude: allow
-#11 clone --no-checkout url .claude: ASK - kit and gate files ask first in a day session: .claude (git clone)

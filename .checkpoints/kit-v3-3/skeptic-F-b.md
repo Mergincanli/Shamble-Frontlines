@@ -1,8 +1,0 @@
-Task: skeptic, try to refute verifier finding F-b (git worktree add / git clone into kit folder gets no day ask), A3 kit-v3-3 at 442fbf7.
-Plan: B1 read writtenBy at 442fbf7 :527-566; B2 read plan L2 + STATUS.md:654-656 + rulings for git scope; B3 real probe; B4 verdict.
-Note: worktree HEAD is 8a3ce8a, not 442fbf7; reading files with git show 442fbf7:path.
-B1 done: writtenBy :527-575 at 442fbf7 (code identical at 8a3ce8a; only checkpoints differ): git handled only for rm/mv (:555); no worktree/clone branch. dayShellWrites :576+ uses writtenBy targets only.
-B2 done: plan-rev2.md:104-106 L2 enumerates install, dd of=, git config --file, format-patch -o, archive -o, find, xargs, patch, tar/unzip, perl bundled, run-time paths. No worktree add / clone. STATUS.md:654-656 same. plan §4 (:250-258) inspected list has no worktree/clone. No ruling (advisor-*, security reviews, builders) mentions worktree add/clone targets. §9 :610 general "shell coverage partial" exists but L2 is an enumerated list.
-B3 done: probe .checkpoints/kit-v3-3/skeptic-F-b-probe.mjs, real io, project = worktree: git worktree add .claude/rules/wt|.claude/skills/x|tools/x -> null for main AND for agent_id (agent not refused, unlike cp a .claude/rules/wt -> deny for agent, ask for main). git clone <url> .claude/skills/x -> null both. protectedRel/kitPath of .claude/rules/wt(/x.md), .claude/skills/x/SKILL.md are kit paths. Extra: settings.json:28 allow-lists `Bash(git worktree *)`, so no Claude Code prompt either; git clone is not allow-listed (normal prompt in Manual mode only).
-B4 verdict: finding stands (not refuted). Gap real, not in L2, not ruled on. Strengthen: agents also get no deny; worktree add is pre-approved by settings.json:28.
-DONE

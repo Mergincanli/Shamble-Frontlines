@@ -1,9 +1,0 @@
-Task: skeptic of SA-4 (A3 kit-v3-3, day ask ignores bash -c/eval/sudo; L1-L2 do not name them)
-Plan: B1 read plan L1-L11 + rulings on these forms; B2 read routine-guard.mjs at 442fbf7 lines 200-620; B3 probe at 442fbf7; B4 verdict
-B1 done: plan L1 names node/python scripts and node -e/python -c only; L2 list has no bash -c/eval/sudo; AF-COVER trimmed list in 3.2 item 3; risk "shell coverage is partial (L1-L4)". next B2
-B2 done: routine-guard.mjs at 442fbf7 (code unchanged since; only checkpoint commits after): unwrap :222-245 strips env/timeout/nice/etc, not sudo/doas, never recurses into SHELLS -c or eval; bash() day path :482-487 calls dayShellWrites on the unwrapped argv only; writtenBy :527-575 returns [] for sudo/bash/eval. Finding's code claim correct.
-B3 done: sa-probe.out:14-17 Fb1-Fb4 null at head, s4 and base. /usr/bin/sudo exists, uid 0 in the cloud container.
-Finding (partial mitigation): settings.json:243-246 at 442fbf7 denies Bash(sh -c *), Bash(bash -c *), Bash(zsh -c *), Bash(eval *) (also on base 12d7961:241-244), so the exact sketch forms Fb1/Fb2 are refused outright in a day session that loads project settings. Not covered: sudo/doas (Fb3/Fb4), bash -lc, bash -e -c, /bin/sh -c, dash/ksh -c.
-Plan/rulings: no ruling names or accepts sudo, sh -c, eval (grep of plan-rev2, advisor-*, builder-4*, security-review-auto*). L1 names only node -e / python -c; L2 list has no sudo; STATUS (442fbf7 docs/STATUS.md:652-656) copies that. Plan C11/E10-9 want every trim listed as a stated limit, so the gap is in A3 scope.
-B4 verdict: not refuted; stands as minor with a correction (bash -c / eval exact forms already denied by settings.json:243-246; sudo/doas and -c variants are the real gap; the cheap fix is unwrapping sudo/doas like env, and naming shell -c variants and eval in L1/L2 and STATUS:652-656).
-DONE

@@ -1,7 +1,0 @@
-Task: skeptic, refute-or-stand on verifier finding V-2 (night switch check TOCTOU, routine-guard.mjs:842,918) at ed3ea8c.
-Plan: B1 read the code (switchTargetCheck, git(), bash()); B2 read rulings (advisor-fix-round, builder-step9, mustafa-words, auto-4/auto-5); B3 check vd-probe; B4 verdict.
-- B1 done: routine-guard.mjs:842 calls switchTargetCheck(args, vcwd, io) per git command; :918-920 resolves refs/heads/<name> ?? refs/remotes/origin/<name> at hook time; nothing in git()/switchTargetCheck looks at other commands of the line. Next B2.
-- B2 done: advisor-fix-round limits L1-L15 have no same-line/race limit; builder-step9 notes no TOCTOU handling; Mustafa's WT-NIGHT (a) rule ("only when the branch's rules, CI and gate files match main's") is what step 9 builds, so a bypass of it is in A3 scope. auto-5 #12 (HIGH) names the same issue, open. Next B3.
-- B3 done: vd-probe.mjs:76-84 sound: guard decides on proj where refs/remotes/origin/cs/ok3 is clean (no local cs/ok3), origin moved after; guard allows; real line in clone T lands HEAD on .claude/settings.json change (vd-probe.out #12b). Path needs no local branch of that name (switch DWIMs from the freshly fetched origin/<name>); with a local branch, fetch doesn't move it. Other same-line movers (git branch <new> <start> && switch <new>) covered by the same fix. Lone switch after a separate fetch is safe: guard and git read the same local ref. Fix sound; remaining race = a parallel tool call fetching.
-- B4 verdict: NOT refuted; finding stands (major).
-DONE
