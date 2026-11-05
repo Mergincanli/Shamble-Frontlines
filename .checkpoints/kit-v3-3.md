@@ -24,8 +24,13 @@
   - F-1: the trust rule misses a done block whose output was lost with a container.
   Out of scope unless the plan argues otherwise: the kit-v3-1 Windows test follow-up (its own change-set, advisor
   condition C6).
-- **Current step:** 2, the build, part 1 (a workflow: E10's doc quotes, plan revision 2 with the conditions, then
-  build step 2, the STATUS follow-ups first).
+- **Current step:** 2, the build, part 1 (workflow wf_77fe99e1-57c: E10's doc quotes, plan revision 2 with the
+  conditions and the E10 ruling, then build step 2, the STATUS follow-ups first).
+  - E10 (`e10-docs.md`): the core claims confirmed verbatim; five wording contradictions stopped the build (C1).
+  - The advisor's E10 ruling (`advisor-e10.md`): PROCEED with E10-1 to E10-9; `memory: local` kept; PC-SETUP (three
+    information questions) replaces PC-MODE; WT-NIGHT unchanged, still Mustafa's.
+  - Next: build part 2 (steps 3-5: the guard code), commit; part 3 (steps 6-7: the secret check, the rule texts),
+    commit; then the gate, E1-E9, E11a, the reviews.
   - Plan revision 1, with the critic's points folded in: `plan-rev1.md` (the draft before the critic:
     `plan-rev1-draft.md`; the critic's notes: `critic.md`; the reviser's: `reviser.md`).
   - The advisor's verdict: APPROVE with conditions C1-C12 (`advisor-plan-rev1.md`, 2026-11-05 ~00:40 UTC). Two
