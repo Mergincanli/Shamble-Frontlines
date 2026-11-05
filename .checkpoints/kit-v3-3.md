@@ -62,10 +62,17 @@
     with smoke PASS. Reported only: F9-1 (the existing push and commit checks read plain diff output).
   - A fourth automated review (2acfbbc): findings 9 (SA-6 reads the index only), 10 (an assembled variable name),
     11 (git clone's option list) (`security-review-auto-4.md`).
-  - Now: the delta review of 442fbf7..ed3ea8c (wf_8875d77e-6a9): security-auditor and the verifier, then skeptics;
-    findings 9-11 and F9-1 weighed against L1's floor (a deliberate day bypass through inline code is allowed).
-  - Next: the advisor's ruling on the delta findings; the fix pass; a fix check; docs-keeper's final pass; step 10
-    (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
+  - Done: the delta review of 442fbf7..ed3ea8c (wf_8875d77e-6a9, 71d3544): security-auditor FAIL (SD-1, SD-2;
+    SD-3 to SD-9 minor or nits), the verifier FAIL (V-2 = SD-1, V-3; V-1, V-4, V-5, D-1, N-a); skeptics upheld every
+    finding. A fifth automated review (ed3ea8c): findings 12 (= SD-1) and 13a (= V-3); 13b refuted.
+  - Done: the advisor's fix-pass-2 ruling (`advisor-fix-pass2.md`): PROCEED. Routine paths fixed by construction
+    (SD-1 + A-3: a night switch, commit or push line holds that one command alone, pr-advisor exempt; V-3: exact
+    show-ref lookups; SD-2: -z --no-renames --no-relative in protectedHit and the commit check, a named C6 edit);
+    day fixes SD-3, SD-4, SD-5, SD-6, V-1; limits L9 and L11 widened, L16-L18 new; follow-up A-4; D-1 docs-keeper.
+  - Now: fix pass 2 (the routine builder, then the day builder, then docs-keeper), then the gate and commits.
+  - Next: pass 3 (security-auditor and the verifier on the pass-2 diff only, plus the automated review; skeptics
+    only for a major); step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review,
+    needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
   (thinking about it); an Enterprise login (university); Windows itself (PowerShell), not WSL. So L7 (mods) does not
