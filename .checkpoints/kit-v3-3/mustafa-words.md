@@ -22,3 +22,6 @@ the session. Record them in the repo, in STATUS's follow-ups, alongside A3's pla
 2026-11-05 (~10:30 UTC), his answers to WT-NIGHT and PC-SETUP, word for word:
 "WT-NIGHT: (a). The exception holds only when the branch's rules, CI and gate files match main's.
 PC-SETUP: 1. Permission mode: [Auto]. 2. Mods: [no mods installed but I have been thinking about it]. 3. Enterprise login (my university account). 4. Claude Code runs in Windows itself (PowerShell), not WSL"
+
+2026-11-05 (~16:10 UTC), his scope stop for A3, during fix pass 3, word for word:
+"Scope stop for A3 (Mustafa): the guard will never parse all of bash, so stop teaching it new shell syntax. Instead: in routines, R-PLAIN refuses any line that isn't plain; in day sessions, any line the guard can't fully read is an ask, not a parse. Drop Day C's parser additions (comments, line continuations, $'…' quoting, here-document markers, >&file). Keep the git clone fix, the check that no routine line got looser, and the full gate. Finish fix pass 3 with that, then one final review (pass 4), and apply the review budget now: anything pass 4 finds below Critical or High becomes a STATUS follow-up, not another pass. After A3, the kit is frozen until the netcode proof test is under way."

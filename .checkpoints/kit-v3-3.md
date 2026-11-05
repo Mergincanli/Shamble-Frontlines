@@ -99,9 +99,17 @@
     rules (comments, backslash-newline, ANSI-C, here-document delimiter as one word, `>&word`); P3-7 (clone targets
     narrowed); P3-8 named. Texts: an R-PLAIN rule line, L16 and L18 replaced, SD-3 and night-commit sentences,
     NIGHT_SHIFT.md step 7, follow-up FU-P3a.
-  - Now: fix pass 3 (wf_8d8f9764-ff3: routine A, routine B, day C, then docs-keeper; notes `builder-pass3-routine-a.md`,
-    `builder-pass3-routine-b.md`, `builder-pass3-day.md`, `docs-keeper-pass3.md`), then the gate and commits (notes,
-    code, docs; "fix pass 3 (commit pending)" gets the code SHA); then pass 4.
+  - Mustafa's scope stop (2026-11-05 ~16:10 UTC, word for word in `mustafa-words.md`): stop teaching the guard new
+    shell syntax; routines: R-PLAIN; day: a line the guard can't fully read asks (D-ASK), not a parse; Day C's parser
+    additions dropped; keep the clone fix (P3-7), the no-looser check and the full gate; one final review (pass 4) with
+    his review budget (below Critical or High: a STATUS follow-up, not another pass); after A3, the kit is frozen until
+    the netcode proof test is under way (A4 edits advisor.md, a kit file: it waits; B.1 and B.2 are docs).
+  - Fix pass 3 so far (wf_8d8f9764-ff3, stopped at Day C's start, before any edit; its notes in `old/`): routine A done
+    (R-PLAIN, C-PLAIN 212 + 2,000 lines, dateCheck, P3-4, NIGHT_SHIFT.md step 7; 967/967), routine B done (the night
+    commit allowlist, P3-6; main's file 180/192, the same 12; gate --no-smoke PASS). Uncommitted in the worktree.
+  - Now: the same workflow resumed with Day C rewritten (D-ASK, P3-7, C-PLAIN rerun, no-looser diff, movers, full gate;
+    notes `builder-pass3-day2.md`) and docs-keeper's brief updated (his words, D-ASK, L16, FU-P3a, the kit freeze);
+    then the gate and commits; then pass 4.
   - Next: step 10 (the report, the checkpoint deleted, ready, the advisor's final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
