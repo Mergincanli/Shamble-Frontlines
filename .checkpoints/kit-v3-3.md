@@ -54,10 +54,14 @@
   - The advisor's fix-round ruling (`advisor-fix-round.md`): PROCEED. The cd tracking redesigned by construction
     (R-a to R-e: an unknown folder makes both checks ask); SA-2's routine half fixed in A3; F-b, SA-5, SA-6, SA-8
     fixed; limits L1, L4, L9 widened and L12-L15 added; follow-ups listed; PC-SETUP gains question (4).
-  - Now: the fix round (wf_9120ac05-de5): builder-fix1 (the cd redesign), builder-fix2 (SA-2 and the small
-    fixes, the full gate), docs-keeper (the limits and follow-ups).
-  - Next: commit; the automated review of the fix commit; security-auditor and the verifier on the fix diff only;
-    step 9 (WT-NIGHT) after Mustafa's answer; step 10 (the report, ready, the advisor's final review).
+  - Done: the fix round (wf_9120ac05-de5): the cd tracking by construction (R-a to R-e), SA-2's routine half (plus
+    SA-2b, symbolic-ref), F-b, SA-5, SA-6, SA-8: 2acfbbc (notes ee32690); docs-keeper's pass: 22f2480. Tests
+    716/716; every mutant killed; gate with smoke PASS.
+  - Now: step 9, WT-NIGHT (a) (wf_d7a5441c-cfa, `builder-step9.md`): switchTargetCheck, the Never exception
+    clause, NIGHT_SHIFT.md:27, CHECKPOINTS.md section 8's night clause, tests T15-T16c and T20.
+  - Next: commit; one delta review (security-auditor and the verifier on 442fbf7..head, skeptics), plus any finding
+    of the automated reviews of 2acfbbc and step 9; fixes; then step 10 (the report, ready, the advisor's
+    final-head review, needs-mustafa, his go).
 - **Mustafa's answers (2026-11-05 ~10:30 UTC, word for word in `mustafa-words.md`):** WT-NIGHT (a), the exception
   only when the branch's rules, CI and gate files match main's: step 9 is unblocked. PC-SETUP: Auto mode; no mods
   (thinking about it); an Enterprise login (university); Windows itself (PowerShell), not WSL. So L7 (mods) does not
