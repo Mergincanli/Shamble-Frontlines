@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 1 written)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-05 23:17 Amsterdam
+- **Last update:** 2026-11-05 23:50 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -21,17 +21,25 @@
    group, PM-0004-67, PM-0006-11..27), sessions VS1-VS8 (39 RS-h, 84 LG-h, EUR 6.88 planned, caps EUR 8.60) + VS9 later,
    ports UDP 30001-30032 / TCP 31000-31032, DNS `A rs.nt` DNS only, http-01 on RS, the Safari workflow as W-PR,
    readings R-1..R-24 for the advisor, decisions ROUTE and SAFARI-TIME for Mustafa.
+4. Plan review round 1 · workflow `wf_88b642c1-384`, 3 of 3 returned · security-auditor REVISE (1 Critical: the
+   spike-only controls are unauthenticated; 7 High: firewall at creation, join tokens, host-key method, the laptop
+   session's rules, the ssh-keygen command, page-host hardening, cloud-init users), engine-architect REVISE (6 High:
+   room lib vs server bin, Link in a leaf crate and poll-based, npt-lab and the simulated clock, the Worker host's
+   shape, determinism rules, the 60 Hz seam), verifier FAIL (1 High: PM-0006-14 needs 3 sessions per N; hours without
+   working; -36 must come first; readings that change a number belong in the drafts). Compact copy:
+   `.checkpoints/netcode-proof-test/review1-findings.md`. The verifier's gate run (worktree, since removed): checks
+   1-4 and 5b-5d PASS, symbols +0 -0, 5a skipped (no Playwright in tools/).
 
 ## Current step
-4. Plan review round (one workflow, 3 agents at xhigh): security-auditor, engine-architect, the verifier. Notes:
-   `.checkpoints/netcode-proof-test/<agent>-plan-review.md`.
+5. Plan revision 2: every review-round-1 finding addressed (49: security-auditor 19, engine-architect 14, verifier
+   16), with a changes table mapping each finding to its fix.
 
 ## Next steps
 5. Fix, then the advisor's plan review (APPROVE / REVISE / ESCALATE); iterate on REVISE.
 6. Push, open the draft PR, report to Mustafa (Decisions needed, For Mustafa).
 
 ## Open findings
-- (none yet)
+- Review round 1's 49 findings: being fixed in plan revision 2 (review1-findings.md).
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
@@ -48,9 +56,8 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- Workflow `wf_88b642c1-384` (npt-plan-review: security-auditor, engine-architect, verifier; xhigh) · script as launched:
-  `.checkpoints/netcode-proof-test/npt-plan-review-run1.js` (no args) · notes: `<agent>-plan-review.md` · launched
-  23:16 · running. Resume: Workflow({scriptPath: <that copy>, resumeFromRunId: "wf_88b642c1-384"}).
+- Workflow `wf_88b642c1-384` (npt-plan-review) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-review-run1.js`
+  · launched 23:16 · DONE 23:37 (3 of 3 returned).
 - Workflow `wf_1ae38d53-da9` (npt-plan-digests) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-digests-run1.js`
   · launched 22:38 · DONE 23:00 (3 of 3 returned; journal in the session's workflow folder).
 - Saver: background task `btpf0ptzw` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/btpf0ptzw.output`
