@@ -1,9 +1,9 @@
 # Checkpoint: netcode-proof-test
 - **Goal:** start the netcode proof test (SPIKE_PLAN item 1) as its own change-set; this step is the PLAN only, for the
-  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 1 written)
+  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 2; revision 1 is 786b7d2)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-05 23:50 Amsterdam
+- **Last update:** 2026-11-06 00:20 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -29,17 +29,24 @@
    working; -36 must come first; readings that change a number belong in the drafts). Compact copy:
    `.checkpoints/netcode-proof-test/review1-findings.md`. The verifier's gate run (worktree, since removed): checks
    1-4 and 5b-5d PASS, symbols +0 -0, 5a skipped (no Playwright in tools/).
+5. Plan revision 2 · this commit · 1,022 lines; §0.1 maps all 49 findings to their fixes. Main changes: the control
+   plane (local socket + per-run capability), roster and tokens, host keys via HTTPS for RS and ProxyJump for LG, the
+   laptop session's rules, cloud-init users and walls, the crate split (npt-link, npt-l1, npt-room lib, npt-server,
+   npt-client-wasm, npt-log, npt-lab, npt-super, npt-host), determinism rules, the sim seam and TICK_HZ, "kept",
+   seven run days R1-R7 (72 RS-h, 171 LG-h, EUR 12.99 planned, caps EUR 14.50) + R8 later, R-PR for readings that
+   change a number, readings R-1..R-27, decisions ROUTE, SAFARI-TIME, FIXED-IP.
 
 ## Current step
-5. Plan revision 2: every review-round-1 finding addressed (49: security-auditor 19, engine-architect 14, verifier
-   16), with a changes table mapping each finding to its fix.
+6. Plan review round 2 on revision 2 (one workflow, 3 agents at xhigh): security-auditor (its 19 fixes and the new
+   surface), netcode-architect and infra-engineer (both deciders of OQ-0006-16, plus their lenses). Notes:
+   `<agent>-plan-review2.md`.
 
 ## Next steps
 5. Fix, then the advisor's plan review (APPROVE / REVISE / ESCALATE); iterate on REVISE.
 6. Push, open the draft PR, report to Mustafa (Decisions needed, For Mustafa).
 
 ## Open findings
-- Review round 1's 49 findings: being fixed in plan revision 2 (review1-findings.md).
+- Review round 1's 49 findings: fixed in plan revision 2 (§0.1); round 2 checks them.
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
