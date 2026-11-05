@@ -133,9 +133,13 @@
     above `if (!argv.length) continue`. C6 accepted (plus a `git status > 'a*b'` row). Follow-ups FU-P4a, FU-P4b,
     FU-P4c (after the kit freeze). No night-window drift on main: this session's loaded CLAUDE.md is kit-v3-0's
     (3f07223), older than main's; read main's copies before relying on it.
-  - Now: fix pass 4 (a builder, Agent tool; notes `builder-pass4.md`), then the main session's checks and commits, the
-    final docs pass (sections 5 and 6 texts, the A4 and B.1 words, P4-V3), then the verifier's check of the
-    fix-pass-4 diff.
+  - Done: fix pass 4 (`builder-pass4.md`; cut by the usage limit at its last block, resumed after the 20:10 UTC reset):
+    code 0c481e1 (CI green), docs 6f18311 (docs-keeper's final pass, `docs-keeper-final.md`, plus the session's three
+    truth edits: the `.gate/` worktree and SA-3 follow-ups closed for routines, the limits intro names the pass-4
+    ruling). 1188/1188; gate with smoke PASS (the main session too); no routine decision looser (1,348); every probe's
+    harm refused; main's file 179/192 (#181: cat now gets R-PROG's reason, the Read/Grep hint lost). Beyond the ruling:
+    two main mutation rows moved into KIT_BEHIND_MUTANTS (kitPath), for the advisor to accept.
+  - Now: the verifier alone checks fix pass 4 (`verifier-fixpass4.md`), under his review budget; then step 10.
   - Mustafa, 2026-11-05 ~16:25 UTC (word for word in `queue/mustafa-2026-11-05-a4-b1.md`): A4-FREEZE (a), A4 waits
     until the netcode proof test is under way; a B.1 addition: his editor decisions (tool order, primitives and one
     scale, object sizes, the views, trace sketches, notes, snapshots, the travel-time ruler, stamps, the lean-editor
