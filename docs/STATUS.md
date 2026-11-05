@@ -1,6 +1,6 @@
 # STATUS: the one-screen dashboard
 _Kept current by docs-keeper after every change-set. Mustafa and the Advisor read this first._
-_Last updated: 2026-11-05; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC), part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC), B3, Mustafa's design walk (PR #36, 8bcc65e, 2026-11-04 19:58 UTC) and kit-v3-2, A2 on his list (PR #37, 12d7961, 2026-11-04 23:06 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of 342ff49) merged. In flight: kit-v3-3, A3 on his list, the guard's follow-ups (PR #38, a draft; the build has begun). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
+_Last updated: 2026-11-05; v2 phase 0 in progress. Since 2026-10-17: kit-v3-0 (PR #26), docs-after-kit-v2-2 (PR #25), R7, the legacy inventory (PR #27), docs-after-r7 (PR #29), the R1–R6 research (PR #28, b6effde, 2026-10-31), docs-after-v2-research (PR #31, 2f5b52e, 2026-10-31), docs-after-31 (PR #32, 9e7db28, 2026-10-31), the v2 decision drafts (PR #33, e4d8b22, 2026-11-03), kit-v3-1 (PR #30, e2b5799, 2026-11-04 10:21 UTC), part-b-test (PR #34, 868e165, 2026-11-04 13:35 UTC, merged by the PR Advisor routine itself: TEST-RUN B2) docs-after-kit-v3-1 (PR #35, 4893ab6, 2026-11-04 15:50 UTC), B3, Mustafa's design walk (PR #36, 8bcc65e, 2026-11-04 19:58 UTC) and kit-v3-2, A2 on his list (PR #37, 12d7961, 2026-11-04 23:06 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of 342ff49) merged. In flight: kit-v3-3, A3 on his list, the guard's follow-ups (PR #38, a draft; built except WT-NIGHT, which waits for his answer; reviews next). `main` is protected: merging needs a pull request with the `gate` and `smoke` checks green (Mustafa, 2026-10-17; rules read with the GitHub API). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)._
 
 ## Phase
 **v2 phase 0 (V2_PHASE0_BRIEF):** the v2 rebuild, a game-specific engine (`docs/VISION_V2.md` and
@@ -23,7 +23,8 @@ only; on Mustafa's go after the advisor's APPROVE of a32e4c0); kit-v3-2 (A2 on h
 for every session and the TOY-BOX rewording; PR #37, 12d7961, 2026-11-04 23:06:24 UTC, `merged_at`, by merge commit;
 rules and docs; on Mustafa's go after the advisor's APPROVE of 342ff49; report `docs/reports/2026-11-04-kit-v3-2.md`).
 **In flight:** kit-v3-3 (A3 on his list: the guard's follow-ups and his two additions of 2026-11-04, the worktree rule
-and the queue into the repo; PR #38, a draft; Open bugs and risks). **Queue** (Mustafa's lists of 2026-11-03 and
+and the queue into the repo; PR #38, a draft; built except WT-NIGHT, reviews next: In flight; its limits: Open bugs
+and risks). **Queue** (Mustafa's lists of 2026-11-03 and
 2026-11-04, word for word under Decisions pending, "Queued, in Mustafa's words"; one change-set at a time, plan
 first): the review policy (A4 on his list, after A3: risk tiers mapped onto
 today's ready and needs-mustafa classes, a review budget, a revert-first rollback rule, per-tier checklists in
@@ -88,7 +89,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
-| **kit-v3-3** (A3 on Mustafa's list: the guard's follow-ups; rules and kit code, no game code. His items: an ask before kit and gate edits in day sessions; the `sk-` key after `%20`, `%2C` or `%3A`; read-only GitHub Actions tools such as `actions_get` for pr-advisor; and his two additions of 2026-11-04: the worktree rule from the freeze, and the queue files into STATUS's follow-ups. security-auditor reviews it) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/kit-v3-3`; local branch `kit-v3-3` from main 12d7961), PR #38 (a draft) | plan revision 1 (a critic's points folded in) and the advisor's APPROVE with conditions C1-C12; E10, the doc quotes: five wording contradictions; the advisor's E10 ruling: PROCEED with changes E10-1 to E10-9; plan revision 2; the build: its step 2 (these Follow-ups and the queued words) first | the build's steps 3-8 (guard code, secret check, rule texts, gate, reviews); WT-NIGHT, Mustafa's answer (may the night shift switch its folder to an item's branch; built last); then the report, the advisor's final-head review and Mustafa's go (`needs-mustafa`: rules in `.claude/` and CLAUDE.md; no Brave check) |
+| **kit-v3-3** (A3 on Mustafa's list: the guard's follow-ups; rules and kit code, no game code. His items: an ask before kit and gate edits in day sessions; the `sk-` key after `%20`, `%2C` or `%3A`; read-only GitHub Actions tools such as `actions_get` for pr-advisor; and his two additions of 2026-11-04: the worktree rule from the freeze, and the queue files into STATUS's follow-ups. security-auditor reviews it) | `claude/sleepy-tesla-ofsxsr` (stands in for `cs/kit-v3-3`; local branch `kit-v3-3` from main 12d7961), PR #38 (a draft) | plan revision 1 (a critic's points folded in) and the advisor's APPROVE with conditions C1-C12; E10, the doc quotes: five wording contradictions; the advisor's E10 ruling: PROCEED with changes E10-1 to E10-9; plan revision 2. Built (plan revision 2 §8): step 2, these Follow-ups and the queued words (93b9a07); steps 3-5 (f22c4df): `--output` refused for `git rev-list`, `diff`, `log` and `show`, `rev-list` for routines; in a day session a shell write to a kit or gate file asks and an agent's is refused; switching, merging, pulling or bisecting the main folder asks unless it brings in only reviewed main; the read-only Actions methods for pr-advisor, on this repository only; step 4b (2e82216, the advisor's step-4 ruling R1-R4): the Edit and Write tools' ask, and four fixes from an automated security review of f22c4df; step 6 (2e82216): the saver's secret check finds `sk-`, AWS and Slack keys behind `%XX` and other escapes; step 7 (2e82216): the rule texts, without the WT-NIGHT parts; step 4c (bbcb96b; `.checkpoints/kit-v3-3/builder-step4c.md`): the two findings of a second automated review of 2e82216 (a `CDPATH` set on the line; `git switch` to a name a tag shares); tests 555/555 (routine-guard 401, settings 127, checkpoint 27); E11a (`.checkpoints/kit-v3-3/e11a.md`): the ask stops a kit-file Write in default, acceptEdits and auto modes; the full gate with smoke PASS (5a: index 8/8, editor 5/5, 0 errors; step 8's run, the main session) | the reviews (security-auditor and the verifier, on the final diff); WT-NIGHT, Mustafa's answer (may the night shift switch its folder to an item's branch; built last, plan step 9); then the report, the advisor's final-head review and Mustafa's go (`needs-mustafa`: rules in `.claude/` and CLAUDE.md; no Brave check) |
 | **kit-v3-2** (A2 on Mustafa's list; rules, no code, symbols +0 −0. `.claude/CHECKPOINTS.md` takes his four anti-waste rules of 2026-11-03 for every session (day sessions, the night shift, the PR Advisor): at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan into its notes first, then saves each finished block at once and a notes line after each finding, and a restart continues after the last complete block and trusts the blocks its notes mark done: it never rereads, rechecks or redoes them, though a later block may still read a file it needs, and its answer comes from the notes alone, opening no other file (§4; E9-1); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked and restarted at every checkpoint update while agents or a workflow run (§3, §5). Restated in CLAUDE.md ("Checkpoints", "Agents", "Ultracode and workflows"), NIGHT_SHIFT.md rule 7, the `changeset` skill, advisor.md (its plan review checks the cap), verifier.md, perf-auditor.md, rust-reviewer.md and tools/README.md:4. TOY-BOX with LOOK-LINES (B): CLAUDE.md:4-6 and :23-24, art-director.md (its first line, its v2 paragraph, its tone line) and graphics-engineer.md point at `docs/LOOK_V2.md` and never decide the look. Docs: STATUS, ROADMAP, REPO_MAP, START_HERE:112) | merged: PR #37, 12d7961, 2026-11-04 23:06:24 UTC (`merged_at`), by merge commit (parents 8bcc65e and 342ff49), on Mustafa's go after the advisor's APPROVE of 342ff49 (comment 6643739289); report `docs/reports/2026-11-04-kit-v3-2.md` | done: plan revision 1 and the advisor's APPROVE with 11 conditions; Mustafa's four answers (Decisions pending); plan revision 2; the build and docs-keeper's first pass (2c12306; notes 8c2abd6; the builder's E1–E8 and E10 PASS, `node --test` 339/339); the review wave (art-director, security-auditor, the verifier, 3 at a time): each PASS WITH NOTES, of 12 findings 9 upheld and fixed (acfc17e) and 3 refuted; E9, the dry run of the new paste block (25 runs on five versions of its text): its finding E9-1 (restarted agents re-checked the blocks their notes marked done) fixed in §4 (65cd40e, then 49f9898 after the verifier's fix check: PASS WITH NOTES, its note N2-1); the final text passed 3 of 3 restarts after a cut, the DONE case and the fresh case; 15 files vs main, `gate.mjs --no-smoke` PASS at the final head, symbols +0 −0 (the report) [assumed: not re-run by docs-keeper]; the report; the final docs pass; the advisor's APPROVE of the final head 342ff49, its deferred points F-1, R-1 and R-2 in Follow-ups (Decisions pending) | none |
 | **B3, Mustafa's design walk** (b3-design-walk; B3 is the item on his list. Docs only, symbols +0 −0: his 2026-11-04 decisions and ideas, word for word, tagged `[DECIDED]`, `[IDEA]` (a new tag) or, for the war around the matches, `[OPEN]`, plus one Advisor `[DEFAULT]` reading in §13 (no learn-by-doing layer), which Mustafa may veto, in LOOP_V2 (§2 spawn protection, §4–§5 factions and infiltrators, §7 active reload and sprint-to-fire, §8 account progression, §10 bots, new §13 amps, loot and ammo) and UNITS.md §0 (factions, the tier-one amp ladders, infiltrators, faction ideas); his answers B3-Q1 to B3-Q3; pointers in DESIGN_NOTES; "bears on" clauses in `docs/adr/README.md`'s register, no ADR edited, no new open question; plus #35's final-review follow-ups in STATUS and ROADMAP; B3's hand-over: VISION_V2 lines 36-37 (pillar 5's `[OPEN]`, which quotes LOOP_V2's old "infantry shared, tanks per faction"), 59 (account progression) and 86 (faction asymmetry), against LOOP_V2 §5 and §8 of 2026-11-04, for B2. Report: `docs/reports/2026-11-04-b3-design-walk.md`) | merged: PR #36, 8bcc65e, 2026-11-04 19:58:50 UTC (`merged_at`; the merge commit is dated 19:58:49), by merge commit, on Mustafa's go after the advisor's APPROVE of a32e4c0 | done: plan revision 1, the advisor's APPROVE with 11 conditions; plan revision 2 adds Mustafa's answers, the advisor's APPROVE with 10 conditions; the build and docs-keeper pass (6a09137; the builder's checks PASS, `gate.mjs --no-smoke` PASS, symbols +0 −0); the review round on the final diff (game-designer, the verifier, a completeness critic: each PASS WITH NOTES; 18 findings: a skeptic upheld 15, 13 of them distinct, all handled in the fix commit, and refuted 3); the report written (`docs/reports/2026-11-04-b3-design-walk.md`); the advisor's APPROVE of the final head a32e4c0. Its final-review follow-ups: STATUS and ROADMAP taken by A2 (PR #37); the report's deviations line and length nit wait for a later pass (Follow-ups) | none |
 | **docs-after-kit-v3-1** (rules and docs, symbols +0 −0: CLAUDE.md's routine lines, advisor.md's PR review, STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the routine setup and TEST-RUN; PORTAL-EMBED as open questions OQ-0002-9 and OQ-0006-23; two small fixes in the kit-v3-1 report and LEGACY_INVENTORY KT14. It takes over the docs-after-33 row, which the advisor's ruling Q2 kept out of kit-v3-1's A1) | merged: PR #35, 4893ab6, 2026-11-04 15:50:40 UTC (`merged_at`; the merge commit is dated 15:50:39), on Mustafa's go ("Merge $35", read as #35) after the advisor's APPROVE of 76c35bf | done: plan revision 1 (381471d), the advisor's APPROVE with 16 conditions; revision 2 (0099b3c) adds Mustafa's answers; reviewed once on the final diff (five reviewers, a skeptic per finding: 30 of 31 upheld and fixed); report `docs/reports/2026-11-04-docs-after-kit-v3-1.md`. Its final-review follow-ups are taken by B3 (PR #36) | none |
@@ -137,6 +138,24 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   each step.
 
 ## Decisions pending
+- **Waiting for Mustafa, A3** (kit-v3-3, PR #38; plan revision 2 §3.1 and the advisor's E10 ruling,
+  `.checkpoints/kit-v3-3/advisor-e10.md`):
+  - WT-NIGHT: his worktree rule says never switch a session's main folder, but the night shift's handoff switches its
+    folder to the item's branch (NIGHT_SHIFT.md, "Check out that branch"). (a) an exception: the night may switch
+    only when the branch's rules, CI and gate files equal main's, otherwise it stops the item; (b) no exception: the
+    night works in a separate worktree, its own change-set first, and until then stops the item. Recommended: (a).
+    Built last (plan step 9); nothing else waits for it.
+  - PC-SETUP (information only): on his Windows PC, which permission mode (Manual, Accept edits or Auto), whether any
+    Claude Code mods are installed, and whether he signs in with a Team or Enterprise login or a personal one (a mod
+    can approve calls past the guard: Open bugs and risks, A3's limit 7).
+- **Taken by the advisor for A3** (inside his words; he can overrule any at merge; plan revision 2 §3.2, from
+  `advisor-plan-rev1.md` and `advisor-e10.md`): AF-MECH (b), the day guard answers "ask", the settings ask list stays
+  empty · AF-AGENT (b), an agent's kit edit is refused, keyed on `agent_id` only · AF-COVER, a trimmed (b): file tools
+  and the named shell writers (limits 1-3) · WT-DAY (ii), trimmed to what switches the main folder (limit 4) ·
+  WT-UPDATE (a), the fast-forward forms to `origin/main` stay free · SECRET-DECODE (A) only, one widened escape
+  fragment (follow-ups F2-F3) · F1-FIT (b), F-1 recorded in Follow-ups, no CHECKPOINTS.md edit · READ-SCOPE (b), the
+  owner/repo check on the new Actions reads only (limit 10) · NODE-ALLOW (a), no allow entry for `node .checkpoints/*`
+  · QUEUE-HOME (a), "Queued, in Mustafa's words" under Follow-ups · keep the advisor's `memory: local` (E10-2).
 - **Taken by Mustafa, 2026-11-04, A2's four decisions** (about 20:25 UTC, in the A2 session's chat; the questions: the
   advisor's review of plan revision 1). His words, word for word: `recommendations” in V3.` Read as the four
   recommended options:
@@ -543,21 +562,24 @@ _Read with the routines API (list_triggers) on 2026-11-04 at 14:03 UTC (the firs
 docs-after-kit-v3-1 session (session_0173vVo7FcYUpbWgRW8oQyHU), and again at 14:36:38 and 14:47:25 UTC, the last right
 before PR #35's final commit: unchanged. Both routines run on the role environments (`SHAMBLE_ROLE=night-shift`,
 `SHAMBLE_ROLE=pr-advisor`) under the routine guard (kit-v3-1); NS-2 (c), a fresh session on every run, since
-2026-10-31. The next proof of the routine rules: the PR Advisor's first scheduled run that gets through (its
-2026-11-04 18:45 UTC run failed on the usage limit; next 2026-11-05 06:45 UTC) and the night shift's first guarded
-night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
+2026-10-31. Each routine: one repository, not in a project (A3's E10-5, `.checkpoints/kit-v3-3/advisor-e10.md`: a
+cloud thread in a project, or a cloud session with several repositories, loads no repository hooks, so no guard;
+CLAUDE.md:140; TEST-RUN B2's refusals were the guard's). The next proof of the routine rules: the PR Advisor's first
+scheduled run that gets through (its 2026-11-04 18:45 UTC run failed on the usage limit; next 2026-11-05 06:45 UTC)
+and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
 - **Night shift: "Shamble Frontline Night shift"** (trig_01QpV6y6UaG1Na2q3jumRDxh): `CRON_TZ=Europe/Amsterdam 10 0-7
-  * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt. Its first night
-  under the guard starts 2026-11-05 00:10 Amsterdam. Under the guard it never reads the web; research runs in the
-  daytime only (NIGHT-RESEARCH (a)).
-- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): no setup script; it has a schedule trigger only,
-  `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *` (07:45, 13:45, 19:45 Amsterdam), can also be started by hand ("Run now",
-  as B2 was) or through the API, and is never started by pull-request events (PR-HOME-REPLACE (a), Mustafa,
-  2026-11-04: its GitHub pull-request trigger and its connectors are removed). `enabled: true` (Mustafa un-paused it;
-  updated 14:01:31 UTC), model `claude-opus-5-5`, no MCP connections. Its first scheduled run, 2026-11-04 18:45:37
-  UTC (session cse_0173vVo8Ju2Jb2eN5ZDzJdtK), failed: `ROUTINE_RUN_FAILURE_REASON_USAGE_LIMIT_REACHED`, the account's
-  usage limit, which routines share with day sessions (it reset at 18:50 UTC). Next run: 2026-11-05 06:45 UTC (07:45
-  Amsterdam), so the scheduled-start proof is still open (get_trigger, about 18:55 UTC). Its stored
+  * * *` (hourly, 00:10 to 07:10 Amsterdam; window to 07:30), enabled, Opus 5.5, the one-line prompt; one
+  repository, not in a project (E10-5). Its first night under the guard starts 2026-11-05 00:10 Amsterdam. Under the
+  guard it never reads the web; research runs in the daytime only (NIGHT-RESEARCH (a)).
+- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): one repository, not in a project (E10-5); no setup script; it has
+  a schedule trigger only, `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *` (07:45, 13:45, 19:45 Amsterdam), can also be
+  started by hand ("Run now", as B2 was) or through the API, and is never started by pull-request events
+  (PR-HOME-REPLACE (a), Mustafa, 2026-11-04: its GitHub pull-request trigger and its connectors are removed).
+  `enabled: true` (Mustafa un-paused it; updated 14:01:31 UTC), model `claude-opus-5-5`, no MCP connections. Its first
+  scheduled run, 2026-11-04 18:45:37 UTC (session cse_0173vVo8Ju2Jb2eN5ZDzJdtK), failed:
+  `ROUTINE_RUN_FAILURE_REASON_USAGE_LIMIT_REACHED`, the account's usage limit, which routines share with day sessions
+  (it reset at 18:50 UTC). Next run: 2026-11-05 06:45 UTC (07:45 Amsterdam), so the scheduled-start proof is still
+  open (get_trigger, about 18:55 UTC). Its stored
   prompt, verbatim: "You are the PR Advisor for SHAMBLE FRONTLINES. Read .claude/agents/advisor.md from the default
   branch and follow its PR review procedure exactly, together with CLAUDE.md, for every open pull request in this
   repository, oldest first. Stay on the default branch: read each pull request only through git, naming its head SHA,
@@ -602,7 +624,7 @@ night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
   part: E9's final text ran in a workflow in waves of 3 and 2, but this container's runner allows only 2 agents at once
   (4 CPUs), so no wave of 3 ran together; 4. not tested: the "first line names another task" case, and worktree agents;
   5. scripts in the notes folder ask before they run in day sessions, and routines refuse them: an allow-list entry for
-  `node .checkpoints/*` is a possible later item, with security-auditor.
+  `node .checkpoints/*` was weighed by A3 and decided against (NODE-ALLOW (a), Decisions pending).
 - **kit-v3-1** (PR #30): 1. The Q3 follow-up (advisor condition C6, its own change-set): `routine-guard.test.mjs` fails
   9 of 192 on Windows (pre-existing: the credential checks match forward-slash paths only; 192/192 on Linux, where the
   routines run), and CI does not run the hook tests (`.github/workflows/gate.yml` runs only `tools/gate.mjs` and
@@ -610,22 +632,56 @@ night (2026-11-05 from 00:10 Amsterdam); neither has recorded a run yet._
   (a), a day session whose `guard.mjs` is missing or can't load runs with no guard checks at all (git option forms and
   the merge check included), so "merges fail closed" holds while the guard loads. (Both stand after the merge, PR #30,
   2026-11-04.)
-- **The guard's follow-ups** (A3 on Mustafa's list, right after kit-v3-2; KIT-FOLLOWUPS (a), Decisions pending;
-  security-auditor reviews it). His three items:
-  1. Asking before kit and gate edits: done for routines by #30 (the guard's protected writes); day sessions have none.
-  2. The URL-escaped secret gap: `checkpoint.mjs`'s generic `sk-` pattern handles only `%3D` before `sk-`, so a key
-     after any other percent-escape is missed: every `%XX` ends in a hex digit, which the pattern's class
-     `[^A-Za-z0-9-]` never matches (`%20`, `%2C` and `%3A` as Mustafa named, and also `%22`, `%26`, `%2F`, `%0A`…)
-     [verified 2026-11-04: `checkpoint.mjs:30`, tested by security-auditor]; Anthropic `sk-ant-` keys are caught
-     (`:29`). GitHub secret scanning and push protection are on (Mustafa).
-  3. Read-only GitHub Actions tools (such as `actions_get`) for pr-advisor: B2 met `actions_get` four times, and the
-     guard's read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool [verified: `routine-guard.mjs:594`];
-     until A3, the PR Advisor reads CI from the PR's check runs and the jobs' logs.
-  Also for A3's plan to weigh (found by B2 and the plan review): `git rev-list` is refused; the guard allows python on
-  main's tracked scripts for the night shift [verified: `routine-guard.mjs:445`], while CLAUDE.md, NIGHT_SHIFT.md and
-  the guard's own refusal messages don't mention it [verified on main 868e165 and after PR #35: CLAUDE.md names node,
-  not python]; the advisor agent has no Write tool (frontmatter: Read, Grep, Glob, Bash), so a routine's advisor
-  subagent returns its notes in its report.
+- **kit-v3-3** (A3, PR #38, a draft; built except WT-NIGHT; KIT-FOLLOWUPS (a), Decisions pending; security-auditor
+  reviews it). What it closes, once merged (In flight has the steps and commits):
+  1. Asking before kit and gate edits: routines had it since #30; day sessions now ask too (file tools and shell
+     writes), and an agent's or teammate's kit edit is refused [verified: `routine-guard.mjs:525`, `:600`, `:655`].
+  2. The URL-escaped secret gap: the saver's `sk-`, AWS and Slack patterns now accept a key behind `%XX` and other
+     escapes [verified: `checkpoint.mjs:29-40`]; before A3 only `%3D` worked (main's `checkpoint.mjs:30`). Anthropic
+     `sk-ant-` keys were already caught. GitHub secret scanning and push protection are on (Mustafa).
+  3. Read-only GitHub Actions tools for pr-advisor: `actions_get` (get_workflow, get_workflow_run, get_workflow_job,
+     get_workflow_run_usage) and `actions_list` (its four list methods), this repository only; the night shift and
+     every other method stay refused [verified: `routine-guard.mjs:920-943`]. Until A3 merges, routines run main's
+     guard, whose read pattern `^(get_|list_|search_)|_read$` matches no `actions_*` tool (`routine-guard.mjs:594`), so
+     the PR Advisor reads CI from the PR's check runs and the jobs' logs.
+  Also: `git rev-list` for routines and `--output` refused for rev-list, diff, log and show [verified:
+  `routine-guard.mjs:259`, `:282`, `:286`]; the docs and the guard's refusals name python beside node (`:669`); the
+  advisor's tools reworded (E10-2: `memory: local` also turns on Read, Write and Edit, `advisor.md:8`, `:155`).
+  **Stated limits** (plan revision 2 §2; the ask is a seatbelt in a watched session, not a wall: the PR review and
+  Mustafa's go remain the wall):
+  - L1, scripts: a `node`/`python` script and inline code (`node -e`, `python -c`) are not inspected, so a kit edit
+    made by a script gets no ask (`node .gate/*.mjs|*.js` runs without a prompt, `settings.json:49-50`).
+  - L2, other writers: `install`, `dd of=`, `git config --file`, `git format-patch -o`, `git archive -o`,
+    `find -exec`/`-delete`, `xargs`, `patch`, `tar`/`unzip` extraction, `perl -pi` with other bundled flags; paths
+    built at run time.
+  - L3, user settings: `~/.claude/settings.json` and `settings.local.json` (where `disableAllHooks` would switch the
+    guard off) are not kit paths for the day ask.
+  - L4, patch-applying commands: `git cherry-pick`, `am`, `apply`, `revert`, `read-tree -u`, `stash apply|pop`, in any
+    folder, the main folder included.
+  - L5, auto mode and `.claude/` (E10-1): Claude Code's own classifier may refuse a `.claude/` edit before the prompt;
+    if it approves, the call "normally still goes to the prompt" (hooks page). Never a silent edit; make such edits in
+    Accept edits or Manual mode.
+  - L6, the advisor's memory tools (E10-2): `memory: local` gives the advisor Write and Edit, which the page does not
+    limit to its memory folder; the guard holds it in routines (pr-advisor writes only `.checkpoints/`, `.gate/` and
+    agent memory) and refuses its kit edits in day sessions, but in a cloud day session its Write to a game file runs
+    without a prompt (cloud sessions pre-approve file edits): only its own rules stop it (`advisor.md:168`).
+  - L7, mods (E10-4): a mod that handles `tool.check` answers after the PreToolUse hooks and, without managed settings
+    or a Team or Enterprise login, can approve a call a hook blocked or would ask for (permissions page). The guard
+    cannot see or stop this, day ask and routine guard alike; mainly the PC (PC-SETUP, Decisions pending).
+  - L8, sessions without repository hooks (E10-5): a cloud thread in a project, or a cloud session with several
+    repositories, loads none of the repository's hooks (settings page, "Settings in cloud sessions"): no day ask, no
+    routine guard. So each routine is one repository outside a project (Routines; CLAUDE.md:140).
+  - L9, Windows Git Bash `/c/…` spellings of a path.
+  - L10, routines may still read other repositories through `search_*`, `get_job_logs` and `gh … -R/--repo`; only the
+    new Actions reads are scoped to this repository (follow-up F4).
+  - L11, worktrees other than the main folder: the main-folder checks do not apply there; the kit-edit ask does.
+  - E11a (`.checkpoints/kit-v3-3/e11a.md`, a nested `claude -p` in the worktree): the ask stopped a Write to a kit file
+    outside Claude Code's protected paths (`docs/probe/CLAUDE.md`) in default, acceptEdits and auto modes; an
+    untrusted workspace ignored the project's 145 allow entries but still ran its hooks. Not shown: a real prompt
+    reaching Mustafa, a cloud session, his PC (E11 after merge).
+  - Also (plan revision 2 §9): a day session reloads changed settings, so a `.claude/settings.json` write that slips
+    past the ask (L1-L4) applies at once (E10-3); a guard error in a day session is "no decision", so no ask
+    (`guard.mjs:46-48`); kit change-sets now prompt at every kit edit in day sessions.
 - B2, not the guard: the GitHub tool that reads labels by number fails for a PR ("Could not resolve to an Issue with
   the number of 34"); labelling still worked.
 - **v2-decision-drafts** (PR #33; the report `docs/reports/2026-11-01-v2-decision-drafts.md` has the details):
