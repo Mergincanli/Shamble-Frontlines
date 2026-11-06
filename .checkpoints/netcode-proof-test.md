@@ -289,6 +289,16 @@
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
 ## Decisions taken
+- **Mustafa, 2026-11-06 about 23:40 UTC:** "WS-FIX: (a). RESUME-CRED: (a), with the spare tokens kept in memory only,
+  short-lived and bound to the session. WS-LIMIT: 99 % of client-bursts within 0.8 s, and every one within 1.0 s.
+  All three stand unless the skeptics change a number or find a conflict; if they do, bring it back to me." So: the
+  fallback gets the newest-only send budget sized to the round trip (1.5 round trips of snapshots, at least 3) and
+  the client's reconnect after max(300 ms, 2 x RTT + 100 ms), one attempt every 300 ms in parallel (at most 8), the
+  session resumed on the newest Join; no thin-stream timeouts or lower rto_min; reconnect credentials are spare
+  single-use tokens held in memory only, short-lived and bound to the session; PM-0001-18's WebSocket part: 99 % of
+  client-bursts within 0.8 s and every one within 1.0 s (WebTransport keeps 500 ms). Pending: the verification
+  workflow wf_b08132f7-b1c; then the advisor's exact words for the docs PR on `claude/npt-readings` (restarted from
+  main), needs-mustafa.
 - **Mustafa, 2026-11-06 about 21:40 UTC, on WS-LIMIT and README-BRANCH:** "WS-LIMIT: not yet. Before we set the
   numbers, make the fallback recover faster. Try three standard fixes in the TCP model first: 1. Newest snapshot
   only: while the WebSocket is backed up, the room keeps only the newest snapshot instead of filling TCP's 64 KB
