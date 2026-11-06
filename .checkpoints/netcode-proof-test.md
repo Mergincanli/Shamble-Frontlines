@@ -59,6 +59,11 @@
    Rulings on R-1..R-29: all approved except R-10 (changed: the advisor states the cover rule) and R-19 (Mustafa's).
 9. Plan revision 3.1 · this commit · 1,374 lines; §0.3 maps C1-C12 and the minor items to where they are met; §15 is
    the ruled table; §16 has five decisions for Mustafa and the two-branch ask.
+10. Mustafa approved the plan and answered the five decisions (2026-11-06) · 411824a · revision 3.2 records them (§0.4).
+11. **U0, the container probes** (the first build step) · this commit · `u0-probes.md`: Rust 1.99.1 + wasm32 installed;
+    a dated nightly exists; crates.io reachable (wtransport 0.7.2, web-transport-quinn 0.13.6, wasm-bindgen-cli
+    0.2.130); Chromium 153 headless; **loopback WebTransport with a pinned hash PASSES** (datagram and stream echo;
+    maxDatagramSize 1024 B; a wrong hash refused); no IPv6 in the container. Per UNDER-WAY (a) the kit freeze lifts now.
 
 ## Current step
 11. After Mustafa's approval (2026-11-06): R-PR on `claude/npt-readings` (worktree `.gate/npt-readings`, from main):
@@ -68,8 +73,6 @@
 ## Next steps
 1. R-PR: review the agent's diff in `.gate/npt-readings`, run the gate there, commit, push `claude/npt-readings`, open
    the PR (needs-mustafa: ADR edits), the advisor reviews its head, then Mustafa's go; no counted run before it merges.
-2. U0: record the container probes in `.checkpoints/netcode-proof-test/u0-probes.md`; commit (UNDER-WAY (a): the kit
-   freeze lifts once U0 is committed).
 3. U1: the `spikes/netcode-proof/` skeleton (plan §12.1).
 4. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
 
@@ -83,6 +86,9 @@
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
 ## Decisions taken
+- Mustafa, 2026-11-06 (later): "No Mac available for now (the loan Macs are out of stock). Nothing in this test waits on
+  one: the timed Safari rows wait until a Mac is available, at the latest for the look proof test." So if the runner
+  fails its conditions, every Safari row waits for that Mac too (sent to R-PR's agent for SPIKE_PLAN).
 - Mustafa, 2026-11-06: plan APPROVED (revision 3.1 with C1-C12). ROUTE (a) on his laptop (MSI Vector 18 HX AI, Core
   Ultra 9, RTX 5080, native Windows/PowerShell; Brave + Edge, Chrome/Firefox installable; Claude Code CLI on his
   university's Enterprise login; Manual mode). SAFARI-TIME (b). FIXED-IP (a), deleted at the close. DENSITY-FIGURE (a).
