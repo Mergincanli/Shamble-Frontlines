@@ -334,6 +334,12 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **Verification of the fallback fixes** · workflow `wf_b08132f7-b1c` (npt-ws-fixes-verify; rust-reviewer on the
+  model and numbers, netcode-architect on the ADR 0001 reading; xhigh) · launched about 23:36 UTC · script:
+  `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify-wf_b08132f7-b1c.js`
+  · notes `u3-verify-fixes-model.md`, `u3-verify-fixes-adr.md` · if cut: resume with Workflow({scriptPath,
+  resumeFromRunId}). Its result may correct what WS-FIX, RESUME-CRED and WS-LIMIT told Mustafa; tell him if so.
+- Saver: background task `bmsomg1pb` · started about 23:36 UTC (110 minutes, to about 01:26).
 - **The advisor on U3's nine questions** (advisor agent, xhigh, background) · launched about 17:40 UTC at Mustafa's
   "8 % left, so we can already start" · reads `u3-scout-summary.md` · notes `advisor-u3q.md` (ends DONE) · if cut by
   the usage limit: SendMessage to the same agent after the reset (its context is kept), never a new one. The same
