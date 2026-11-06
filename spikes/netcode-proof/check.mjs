@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // The spike's test command (plan §12.4): every unit runs it, and its summary goes into the checkpoint.
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
-// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each with warnings as errors; test
-// (cargo test); deps (the dependency rules of plan §4.2, from `cargo metadata` with every feature and target); refs
+// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each with every feature and warnings as
+// errors; test (cargo test on the measured build, then on the bites build); deps (the dependency rules of plan §4.2, from `cargo metadata` with every feature and target); refs
 // (nothing outside spikes/ references it, §4.2 and §4.9); marks (marks.json compiles in the judge, covers exactly the
 // plan's marks, and every row it hashed is unchanged); self (this file's own tests); redact (redact-check's tests,
 // then a scan of the spike's folder). It runs every step and exits 1 if any failed.
@@ -156,7 +156,9 @@ export function marksProblems(marks, readFile) {
 
 function run(cmd, args, cwd) {
   const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
-  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, status: r.status };
+  // `stdout` alone is kept for the steps that parse it: cargo writes progress lines ("Blocking waiting for file
+  // lock", "Downloaded …") to stderr, and they must never reach a JSON parser.
+  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status };
 }
 
 /** cargo test's counts, summed over every test binary. */
@@ -182,15 +184,27 @@ function summarized(r, summary) {
 
 const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...LEAF.flatMap((c) => ["-p", c])];
 
+/** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
+ * compiled in: plan §4.7). Each count is reported. */
+function testBothBuilds() {
+  const measured = run("cargo", ["test", "--locked", "--workspace"], HERE);
+  if (!measured.ok) return measured;
+  const bites = run("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
+  const summary = `measured build: ${cargoCounts(measured.out)}; bites build: ${cargoCounts(bites.out)}`;
+  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
+}
+
 const STEPS = {
   fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
-  clippy: () => run("cargo", ["clippy", "--locked", "--workspace", "--all-targets", "--", "-D", "warnings"], HERE),
-  "clippy-wasm32": () => run("cargo", ["clippy", "--locked", ...WASM_ARGS, "--", "-D", "warnings"], HERE),
-  test: () => summarized(run("cargo", ["test", "--locked", "--workspace"], HERE), cargoCounts),
+  // Every feature, so the bites build's code is linted too (features only add code; none is compiled out by one).
+  clippy: () =>
+    run("cargo", ["clippy", "--locked", "--workspace", "--all-targets", "--all-features", "--", "-D", "warnings"], HERE),
+  "clippy-wasm32": () => run("cargo", ["clippy", "--locked", ...WASM_ARGS, "--all-features", "--", "-D", "warnings"], HERE),
+  test: testBothBuilds,
   deps: () => {
     const r = run("cargo", ["metadata", "--locked", "--format-version", "1", "--all-features"], HERE);
     if (!r.ok) return r;
-    const problems = dependencyProblems(JSON.parse(r.out));
+    const problems = dependencyProblems(JSON.parse(r.stdout));
     return { ok: problems.length === 0, out: problems.join("\n") || "the dependency rules of plan §4.2 hold" };
   },
   refs: () => {
