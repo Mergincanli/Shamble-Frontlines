@@ -173,6 +173,15 @@
     test is still true at that grain).
 
 ## Current step
+35. **U3a, the TCP model** · **0d25833** (pushed) · npt-net's pub(crate) `tcp_model` (S0-S14; every constant read in
+    v6.8, Cubic's 717/1024 included) and its tests S13 (a)-(f) with the three bites, determinism and the write budget
+    (12 tests + 1 ignored diagnostic). check.mjs all 9 (109 / 114 tests), gate PASS. **S13 (e)** (1,000 phases, P2, a
+    1 s burst, the room's newest-only writer and the client's inputs): first fresh snapshot after the return p50
+    708,081,049 ns, p99 914,405,971 ns, max 2,516,541,273 ns (8 phases over 1.5 s, 1 over 2 s); first byte p50 284 ms,
+    max 1,509 ms. Pinned in the test. The worst phases: the head's last retry falls just inside the burst (+959 ms),
+    the next comes 1.2 s later (backoff 2), then the 30 stale snapshots drain from cwnd 1. Real Linux behaviour, not a
+    bug. **The advisor's rule (max x 1.25, rounded up to 0.1 s) gives 3.2 s, against Mustafa's "around 1.5 s"**: a
+    decision for him (WS-LIMIT, in chat) before the docs PR opens. Next while he decides: U3b (ImpairSocket).
 34. **The advisor's U3 notes DONE** (`advisor-u3q.md`, 21:15 UTC): S0-S14 (DelayStream's Linux-faithful model, every
     Linux line checked against v6.8 but Cubic's 0.7, U3 checks it); C1' replaces U2's C1 (L1's streams model QUIC,
     RFC 9002 as quinn does it; U4); C6 new (U6, before R3: loopback B1 on real quinn, worst over 400 ms goes to the
