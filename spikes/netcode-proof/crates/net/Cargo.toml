@@ -16,6 +16,10 @@ wt-wtq = ["dep:web-transport-quinn"]
 
 [dependencies]
 npt-link.workspace = true
+# npt-l1's Profile and ReorderStep, so both layers read one definition (Mustafa's U3-Q7, 2026-11-06).
+npt-l1.workspace = true
+rand_chacha.workspace = true
+rand_core.workspace = true
 # L2's ImpairSocket implements quinn's socket trait under either crate's endpoint (U3, R5-TEST-OQ2).
 quinn.workspace = true
 tokio.workspace = true

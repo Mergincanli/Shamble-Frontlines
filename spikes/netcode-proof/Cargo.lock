@@ -855,8 +855,11 @@ dependencies = [
 name = "npt-net"
 version = "0.0.0"
 dependencies = [
+ "npt-l1",
  "npt-link",
  "quinn",
+ "rand_chacha",
+ "rand_core",
  "tokio",
  "tokio-tungstenite",
  "web-transport-quinn",
