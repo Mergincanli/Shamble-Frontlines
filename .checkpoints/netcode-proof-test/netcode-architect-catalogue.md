@@ -51,3 +51,33 @@ Only this notes file and the doc are written. No code, no ADR or SPIKE_PLAN edit
   Part 10 419-474: limits 442-453 (2 client streams each way, ~64 KB stream window, ~128 KB connection window, ~16 KB
   datagram rx buffer, input > command size x cap dropped, Join within 2 s; until then one stream, datagrams dropped
   (446); WS frame/message/write-buffer limits explicit (452-453)).
+- Block 2 done. PM rows (worktree lines): -14 1550 (cap rule; bite: a group never split), -21 1559, -22 1560, -25 1563
+  (Join 2 s from accept/first packet; slow-loris; /64 cycler; bites: library default limits, deadline from upgrade end,
+  whole-IPv6 keying), -34 1574 ("every message type of the catalogue fuzzed"; control sequences into room = PM-0004-60),
+  -36 1576 (maxDatagramSize at start + every 10 s; bite read once). Part 11 475-533: join token claims 494-497 (draft),
+  test tokens allowed 1641 ("proposed"); names Cc/Cf + NFC rule 497-499; RoomEnded(crash) 488-490; Kick on host
+  command 512-514. Part 13 568-586: B1 570; explicit 1 % reorder step per flow and direction 581-585 (R-5 in PR #41).
+  Checklist 1656-1709: cap set over the local socket before step 1, shown read-only with the command-timing option in
+  force (1667-1669, R-28); steps 2/3/12 SetProfile, 11 B1 from overlay (own commands lost too: 1699-1700), 13 WS
+  forced (UDP blocked). EDITORIAL in PR #41: "The profile changes from the overlay." appears twice (1665 and 1667).
+  Migration step 2 (1722-1726): the foundation's protocol crate is fresh; slice 2 (1731) slot table; slice 3 (1734-1738)
+  lobby, tokens, byte-level audit R2-INT-REC5. Part 9 (e) classes proven at slice 3 (1635-1637), not here.
+  Skeleton check: spikes/netcode-proof/crates/{proto,link}/src/lib.rs are 4-5 line stubs (U1 part 1), so no code to
+  match yet. .claude/rules/netcode.md:17 = "Every protocol change updates the message catalogue in docs/design/".
+- PM-0006-23 (ADR 0006:1378) 1 s stall inside one tick; PM-0004-67 (ADR 0004:1193) 200 ms and 1 s stalls -> InjectStall.
+- Plan §9:917-923 runner token: dedicated slot; unused 30 min, bound <= 60 min; binds at first use to a job nonce; no
+  capability -> Join needs a bind field (browser resume secret / runner nonce / bot's own value): proposed.
+- Design calls (mine, proposed, in the doc): Join.bind 16 B; capability carried in every SessionControl, bound to the
+  slot it was minted for; control-stream framing u16 length + u8 type; full-state stream u32 length; WS messages carry
+  a 1 B channel tag; a post-Join undecodable control message closes with Kick(malformed); FullState carries no event
+  section and a forced resync clears the event queue; Leave c->r, Kick r->c (draft row: "either way").
+- Sizes (proposed, arithmetic in the doc): Input 166 B (6 + 8 x 20, draft 706-710 estimates); Snapshot 1,000 B send
+  until -36 then min(smallest, 1,150 B), receive 1,150 B; FullState 65,536 B (SS whole world ~6.5 KB); Resync 8 B;
+  Ping/Pong 32 B; Join 128 B (69 B); JoinAccepted 256 B (80 B); JoinRejected 16 B; ClientSettings 8 B; RoomEnded 64 B;
+  Leave/Kick 16 B; SessionControl 512 B (504 B with a 480 B note); socket messages 1,024 B.
+- Gaps -> questions: (Q-STATUS) no room->client message carries the overlay's server values (profile in force,
+  server RTT, cap, option, clipped shots) or a "saved" echo; (Q-SWITCH) OQ-0001-6 option + NewReno/Cubic on neither
+  control list; (Q-OPEN) how npt-super learns Open (-16) without npt-proto; (Q-NONE) state table "none" vs
+  authority-only; (Q-VOCAB) omitted lobby/supervisor rows use the draft's direction/channel words; (Q-FUZZ) socket
+  messages fuzzed under -34?; (Q-CAP) "a per-run capability" read as one per browser slot; (Q-RESYNC) queue cleared.
+- Next: block 3 (write the doc header).
