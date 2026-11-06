@@ -1,0 +1,20 @@
+[package]
+name = "npt-l1"
+description = "L1, the seeded link simulator on simulated time, behind npt-link's interface"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The planted defects (plan §4.7, E19): compiled only into the bites build and chosen at run time. Measured builds
+# never contain them.
+bites = []
+
+[dependencies]
+npt-link.workspace = true
+rand_chacha.workspace = true
+rand_core.workspace = true

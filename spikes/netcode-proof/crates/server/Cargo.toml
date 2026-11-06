@@ -1,0 +1,25 @@
+[package]
+name = "npt-server"
+description = "The room process: a library (imported by npt-lab for L1) plus a thin binary"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "npt-server"
+path = "src/main.rs"
+
+[dependencies]
+npt-link.workspace = true
+npt-proto.workspace = true
+npt-room.workspace = true
+npt-sim.workspace = true
+npt-net.workspace = true
+npt-log.workspace = true

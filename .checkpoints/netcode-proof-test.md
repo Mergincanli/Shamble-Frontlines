@@ -1,0 +1,319 @@
+# Checkpoint: netcode-proof-test
+- **Goal:** start the netcode proof test (SPIKE_PLAN item 1) as its own change-set; this step is the PLAN only, for the
+  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.2: APPROVED by the advisor (C1-C12) and by Mustafa, 2026-11-06; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
+- **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
+  **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
+- **Last update:** 2026-11-06 (after Mustafa's approval) Amsterdam
+
+## Steps done
+1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
+   port but 443 time out, direct and via the proxy; 443 is TLS-re-terminated by the egress gateway. Evidence:
+   `.checkpoints/netcode-proof-test/ssh-probe.md`. So the plan proposes cloud-init and/or Claude Code on Mustafa's PC.
+   Second pass (no commit of its own): any public HTTPS host is readable (nasa.gov, ikea.com, Let's Encrypt's ACME
+   directory: 200); shamblefrontlines.com is on Cloudflare (NS cora/steven), no A/AAAA/CAA yet.
+2. Requirement digests · workflow `wf_1ae38d53-da9`, 3 of 3 returned (netcode-architect 52 KB, infra-engineer 71 KB,
+   test-engineer 48 KB, each ends DONE) · saved by 4e15330 and the saver · findings: ~20 readings for the advisor
+   (reordering at P3, packet count, loopback LAN, x86-64 replays, L2 delay formula, OQ-0001-9 cover, stand-in
+   conditions, bites, runner list, ML close, ports, cert method, metrics path, host keys) and 2 for Mustafa (route
+   and its machine; Safari timed rows).
+3. Plan revision 1 · this commit · 699 lines: item 1 (no SSH; route (a) hybrid recommended, laptop), scope, layout
+   `spikes/netcode-proof/`, components E1-E22, symbols, pins (Rust 1.99.1), mark map (every PM-0001-1..62 but the 60 Hz
+   group, PM-0004-67, PM-0006-11..27), sessions VS1-VS8 (39 RS-h, 84 LG-h, EUR 6.88 planned, caps EUR 8.60) + VS9 later,
+   ports UDP 30001-30032 / TCP 31000-31032, DNS `A rs.nt` DNS only, http-01 on RS, the Safari workflow as W-PR,
+   readings R-1..R-24 for the advisor, decisions ROUTE and SAFARI-TIME for Mustafa.
+4. Plan review round 1 · workflow `wf_88b642c1-384`, 3 of 3 returned · security-auditor REVISE (1 Critical: the
+   spike-only controls are unauthenticated; 7 High: firewall at creation, join tokens, host-key method, the laptop
+   session's rules, the ssh-keygen command, page-host hardening, cloud-init users), engine-architect REVISE (6 High:
+   room lib vs server bin, Link in a leaf crate and poll-based, npt-lab and the simulated clock, the Worker host's
+   shape, determinism rules, the 60 Hz seam), verifier FAIL (1 High: PM-0006-14 needs 3 sessions per N; hours without
+   working; -36 must come first; readings that change a number belong in the drafts). Compact copy:
+   `.checkpoints/netcode-proof-test/review1-findings.md`. The verifier's gate run (worktree, since removed): checks
+   1-4 and 5b-5d PASS, symbols +0 -0, 5a skipped (no Playwright in tools/).
+5. Plan revision 2 · this commit · 1,022 lines; §0.1 maps all 49 findings to their fixes. Main changes: the control
+   plane (local socket + per-run capability), roster and tokens, host keys via HTTPS for RS and ProxyJump for LG, the
+   laptop session's rules, cloud-init users and walls, the crate split (npt-link, npt-l1, npt-room lib, npt-server,
+   npt-client-wasm, npt-log, npt-lab, npt-super, npt-host), determinism rules, the sim seam and TICK_HZ, "kept",
+   seven run days R1-R7 (72 RS-h, 171 LG-h, EUR 12.99 planned, caps EUR 14.50) + R8 later, R-PR for readings that
+   change a number, readings R-1..R-27, decisions ROUTE, SAFARI-TIME, FIXED-IP.
+6. Plan review round 2 · workflow `wf_e7cdd40f-712` (failed once at the usage limit, resumed 02:13), 3 of 3 returned ·
+   security-auditor APPROVE WITH CONDITIONS (3 High from the fixes: `node .gate/*` runs unprompted in the laptop's
+   worktrees; the operator settings over-claim (deny-first, PowerShell, a moving file); the main-ref Safari guard
+   gives change-set code main's cache scope), netcode-architect REVISE (4 High, text only: no channels in Link and the
+   endpoint; no loss/stall model in the WebSocket delay; the limiter's queue smaller than a datagram; which
+   command-timing option sets the rule cap), infra-engineer APPROVE WITH CONDITIONS (3 High: the density order inside
+   blocks breaks the time-of-day rule; the day's addresses cannot sit in the hashed cloud-config; RS has no key to
+   drive LG). Both OQ-0006-16 deciders agree with §8.1's ports, with small conditions. Compact copy:
+   `.checkpoints/netcode-proof-test/review2-findings.md`.
+7. Plan revision 3 · this commit · 1,299 lines; §0.2 maps all 46 round-2 findings to their fixes. Main changes: the
+   laptop session's settings rewritten to what holds (Manual mode prompts as the wall; `node .gate/*` denied; fixed,
+   hashed settings copy; worktree checks; orphan results branch); Safari dispatched on the change-set branch with no
+   commit input and no cache; per-slot control sockets with SO_PEERCRED under systemd units; RS-to-LG restricted key;
+   `npt-ctl peers` and `npt-cert issue/revoke` wrappers; channels in Link and the endpoint; the WebSocket loss and
+   stall model; the limiter's queue depths; both command-timing options before the rule cap; density order fixed;
+   hours table adding to 75 RS-h (177 LG-h, EUR 13.51 planned, caps EUR 14.90); readings R-1..R-29.
+8. The advisor's plan review of revision 3 · notes `advisor-plan-review.md` (DONE), verdict `advisor-verdict.md` ·
+   **APPROVE with 12 conditions** (C1 the push ask: main allows `git push origin claude/*` unprompted; C2 OQ-0006-19 is
+   Mustafa's (DENSITY-FIGURE); C3 UNDER-WAY to Mustafa; C4 he approves the operator settings and prompts; C5 the
+   kit-change re-check; C6 the laptop's model and effort; C7 the runner's limits for PM-0006-26 and -32; C8 R-14's
+   wording; C9 R-PR's scope and exact words; C10 the total vs the drafts; C11 two routes back; C12 SAFARI-TIME's text).
+   Rulings on R-1..R-29: all approved except R-10 (changed: the advisor states the cover rule) and R-19 (Mustafa's).
+9. Plan revision 3.1 · this commit · 1,374 lines; §0.3 maps C1-C12 and the minor items to where they are met; §15 is
+   the ruled table; §16 has five decisions for Mustafa and the two-branch ask.
+10. Mustafa approved the plan and answered the five decisions (2026-11-06) · 411824a · revision 3.2 records them (§0.4).
+11. **U0, the container probes** (the first build step) · this commit · `u0-probes.md`: Rust 1.99.1 + wasm32 installed;
+    a dated nightly exists; crates.io reachable (wtransport 0.7.2, web-transport-quinn 0.13.6, wasm-bindgen-cli
+    0.2.130); Chromium 153 headless; **loopback WebTransport with a pinned hash PASSES** (datagram and stream echo;
+    maxDatagramSize 1024 B; a wrong hash refused); no IPv6 in the container. Per UNDER-WAY (a) the kit freeze lifts now.
+12. **U1 part 1, the spike skeleton** · 760fa89 (pushed; CI runs gate and smoke on PR #40) · `spikes/netcode-proof/`:
+    the workspace pinned to Rust 1.99.1 (resolver 3, edition 2024, Cargo.lock: 26 packages), the 15 crates of plan
+    §4.1 as compiling stubs wired per §4.2, deny.toml, per-crate clippy.toml bans made errors (a planted f32::sin,
+    f32::max and HashMap each failed clippy; probe removed), builds under .gate/ (.cargo/config.toml + .gitignore).
+    build, clippy host and wasm32 (leaf crates), fmt: clean. Legacy gate: 1-4 and 5b-5d PASS, +0 -0; 5a cannot start
+    here (tools' Playwright wants chromium_headless_shell-1194, absent), so CI's smoke job is the check.
+13. **R-PR** · [Mergincanli/Shamble-Frontlines#41](https://github.com/Mergincanli/Shamble-Frontlines/pull/41), head
+    2ccc184 on `claude/npt-readings` (worktree `.gate/npt-readings`), ready for review, subscribed · engine-architect
+    placed the advisor's exact words + Mustafa's answers (5 docs files, +96 -34; its verify script: word for word,
+    tables intact, lines <= 120), then 8 consistency fixes (old lines now point to the readings); the main session read
+    the whole word diff. needs-mustafa (ADR edits).
+
+14. **The advisor's review of PR #41** · notes `advisor-pr41.md` (DONE) · of 2ccc184: REVISE (C1 the register's open
+    counts; C2 ROUTE written whole; C3 OQ-0001-9's opening sentence "answered in part"; optional PM-0001-3 wording) ·
+    fixed in **16763a7** (pushed; gate 1-4 and 5b-5d PASS in the worktree; PR body updated) · re-review of
+    2ccc184..16763a7: **APPROVE, no conditions**, head `16763a724b741a40615dc8e7c2ef25c5ea3e4b30`; CI gate and smoke
+    green twice each; labelled needs-mustafa; the advisor's worktree `.gate/pr-41` removed.
+
+15. **PR #41 round 3** · netcode-architect found ADR 0001's checklist saying "The profile changes from the overlay"
+    twice (the pointer edit plus R-28's words) · fixed in **1b4094a** (the advisor's words unchanged) · the advisor's
+    re-review: **APPROVE**, head `1b4094a7750177269b9d5f2fa8c21e292c76e009`, CI gate and smoke green; PR body updated.
+16. **U1 part 2a** · d984535 (pushed) · npt-log (records, Writer, read_log; 9 tests); npt-judge's engine and CLI
+    (8 unit + 15 engine tests, one per verdict path, PM-0006-14's short padding INVALID among them); `marks/README.md`
+    (the contract); `ops/operator/redact-check.mjs` (9 tests; spike, .checkpoints, docs/design: 0 findings);
+    rustfmt.toml (ADR 0002 part 7). cargo test 32, clippy host and wasm32, fmt: clean; gate 1-4, 5b-5d PASS.
+    A slip, recorded: one `sed -i` edit of engine.rs (shell write) and its `.bak`, removed; the change was the intended
+    three lines. A Python `__pycache__` from test-engineer's scratch scripts deleted before any save (they now run -B).
+
+17. **redact-check fixes** · 41e5565 · the automated security review of d984535 found 3 (all real): a host name
+    accepted when either reading was allowed; the SRI blanking unanchored; pre-push missing a merge commit's own
+    changes. Fixed with tests; the old code (loaded from git into memory) missed all 3, the new code catches each.
+18. **U1 part 2b** · 8368869 · `check.mjs`, the spike's test command (fmt, clippy host and wasm32 -D warnings, cargo
+    test, the §4.2 dependency rules from cargo metadata, the no-reference grep, its own 8 tests, redact-check); the
+    catalogue `docs/design/netcode-proof-messages.md` (netcode-architect) and its class audit test
+    (`crates/proto/tests/catalogue.rs`, 15 bites). **`node spikes/netcode-proof/check.mjs`: all 8 steps pass** (35
+    Rust tests; deps hold; 246 tracked files, none outside spikes/ references it; 8/8 and 10/10 node tests; redact
+    0 findings).
+
+19. **docs-keeper and the drift check** · 54e8b84 · REPO_MAP (spikes/, docs/design/, the spike's section; map check
+    OK) and STATUS (kit-v3-3 merged; the netcode proof test in flight with Mustafa's five answers; the freeze lifted;
+    the no-Mac words); check.mjs's `expectedMarks`/`marksProblems` with tests; the judge's CLI tests. (The container
+    restarted around 11:40 UTC; both agents had finished; their reports were read back from their transcripts.)
+20. **U1 part 2c** · 5ac4042 · `marks/marks.json` (81 marks: 74 pass, 1 reported, 3 person, 3 outside; row hashes at
+    1b4094a, unchanged since 16763a7) and `marks/SERIES.md` (235 series, 36 figures), machine-copied byte for byte
+    from test-engineer's drafts (one node command, main folder, no cd; an exception to Write/Edit-only, for byte-exact
+    data); the judge: reports may name parts or pool, outside marks keep bites as data, 36 figures listed as not
+    built with their units; the fixtures on the real marks (PM-0001-4 PASS, FAIL, INVALID; PM-0006-14 short padding
+    INVALID, full padding NOT-RUN until N = 36 and 18); check.mjs's marks step. **check.mjs: all 9 steps pass** (44
+    Rust tests; 81 marks; rows unchanged at 1b4094a; redact 0 findings over 80 files).
+
+21. **The advisor's U1 rulings** · notes `advisor-u1.md` (DONE) on `u1-questions.md` · most APPROVE; two fixes: C2
+    (a bug it reproduced: a FAIL plus a gap came out INVALID, hiding the failure and some bites) and B13 (PM-0001-30's
+    second bite was dropped); changes for A1, A7, B6-B10, B12-B15, Q10, Q12, Q21, Q22, Q27, C4, C8, C9; nothing for
+    Mustafa now (one later readings PR before R5: Q15 (a)).
+22. **U1 part 2d** · 3b1212e · the rulings in the judge (C2's run precedence; part validity; `pre:<mark>`; setup
+    checks; expect-invalid bites; p001; first-N; PM-0006-19's rule; everyone_in_view_min_share built), marks.json (one
+    asserting script in the scratchpad: 16 parts of 12 marks get pre:PM-0001-2, PM-0001-2's N = 24/36 parts, 8 setup
+    flags, -30's validity bite, -3's p001/p999, -19's traps, -49's delayer, -67's first 36,000, PM-0006-19's rule), the
+    catalogue (SessionStatus, the 15th type; its Q1-Q9 answered), the audit (15 names, a bite), README and SERIES,
+    the fixtures (PM-0001-4 carries the load; load-short INVALID, fail-with-gap FAIL; PM-0001-30's bite shown and
+    missed), the plan's text (§4.1, §4.2, §4.7, E3/E6, §6.1, §10.2). **check.mjs: all 9 steps pass, 58 Rust tests**;
+    gate PASS. On the advisor's own reproduction, the fixed judge shows the bite (it was INVALID).
+23. **U1 CLOSED** (the advisor's conditions met: each change with its fixture, check.mjs green, the gate run).
+
+24. **PR #41 merged** · Mustafa's go in this chat ("merge #41", 2026-11-06, after the advisor's APPROVE of 1b4094a;
+    the scheduled PR Advisor also approved that SHA in its comment, two Low notes: PM-0001-31's "TCP proxy" wording
+    wants a pointer, for the readings PR before R5; STATUS's Mac line, already fixed on this branch) · merged with
+    expected head `1b4094a7750177269b9d5f2fa8c21e292c76e009`, gate and smoke green, by merge commit: **main d8c485a**.
+    Main into this branch: 1ea36a1. The marks check now reads this branch's own docs/adr/: 0950081 (check.mjs all 9
+    green; 81 rows unchanged). The worktree `.gate/npt-readings` removed; unsubscribed from #41.
+
+25. **U2 part 1** · 08782eb (pushed) · npt-link (Link, Listener, Channel, Recv, SendResult, LinkState, Loopback; 7
+    tests) and npt-l1 (L1Net, Profile, ReorderStep, FateLog; fates per (seed, link, direction, channel, index) from
+    ChaCha8 streams, 16 words a packet; the reorder step as "overtaken by the successor when the timing allows",
+    never below the floor; bursts; reliable streams with E15's retransmission rule; RFC 9002 RTT from implicit acks;
+    the bites build's four PM-0001-3 defects; 18 tests + 5 bite tests). rand_chacha 0.10.0 / rand_core 0.10.1 pinned,
+    sha2 0.11.1 declared. check.mjs: clippy with every feature, tests on both builds, deps parses stdout only.
+    check.mjs all 9 pass (83 / 88 tests); gate PASS with --no-smoke.
+
+26. **U2 part 2a** · 921174d (pushed) · `npt-lab probe` (crates/lab/src/{main,probe,machine}.rs; 11 tests) and the
+    judge's `fate_log_twin_equal` (figures.rs: `Lack::{Gap, Waiting}`; Waiting = NOT-RUN). One full run: ~1 s, 27 MB;
+    P2 seed 1: loss 2.02 % each way, one-way 50.04 ms, RTT 100.07 ms over 610,746 samples (~61 % of down datagrams
+    echo: e^-0.98 of 0.1 ms intervals see no new arrival), reorder 910 of 1000; the judge passes every P2 check on it.
+    check.mjs fmt, clippy, test green (94 / 99).
+
+27. **U2 part 2b** · 2529675 (pushed) · the twin figure's 3 engine tests (PASS with a shown clock-seed bite; a
+    matching bite twin missed = FAIL; differing = FAIL; absent twin = NOT-RUN; five gap cases = INVALID). check.mjs all
+    9 pass (97 / 102 tests).
+
+28. **U2 part 2c** · 81c6d01 (the run script; SERIES.md's probe writers) and **6900e52 (results)** · the script at
+    81c6d01: 38 runs in 67 s, judged: the five L1 parts PASS (3 valid runs each, 25 checks a run, B1 27); every twin's
+    fate log equals its run's; each bite shown by its own check only (rtt-each-way: mean, range, RTT; loss-per-round-
+    trip: loss 1.01 %; normal-jitter: p90 54.2 ms, its range passing; clock-seed: the twin check). PM-0001-3 NOT-RUN
+    until L2, MP and the not-net-of-base bite. Results: `results/c-u2-pm-0001-3/81c6d01e371b/` (verdict.json, runs.txt).
+    Mustafa (2026-11-06): Chrome is installed; he asked for his steps (given in chat: prep now = Firefox, two-factor
+    login, a clean Brave profile; then stop B's approvals; then each run's console steps).
+
+29. **The advisor's U2 review** · notes `advisor-u2.md` (DONE; cut once at the 14:31 usage limit, resumed 16:12) ·
+    every reading approved (U2-R1..R8); its own checks: check.mjs 9/9, clippy without features, the gate, its own
+    release build reproducing the committed fate-log hashes at P2, B1, P4 seed 1, its Python matching the judge's
+    numbers exactly, each bite failing only its kind of check, the reorder step on a scratch crate (P0 0 %, P1 0 %, P2
+    0.92-1.06 %, P3 0.90-1.02 %, P4 2.2-2.3 %; never below the floor, about 1 % above the ceiling). Conditions N1-N4
+    met: N1 the plan (§4.1 ops/runs/ and results/<set>/<commit>/; §4.7 LinkState, rtt_ns, arrival_ns, `loss` at U4,
+    npt-lab's binary; §15's R-5 row), N2-N4 in **04e40bc** (crate doc; SERIES.md and README; clippy on both builds).
+30. **U2 CLOSED.** check.mjs all 9 (97 / 102 tests, clippy on both builds), gate PASS `--no-smoke`, CI green on
+    81c6d01, 6900e52, ad527f3. docs-keeper deferred to U3's close (the repo map check passes; STATUS's line for the
+    test is still true at that grain).
+
+## Current step
+31. U3: the scouting workflow `wf_d6bdeed6-3c0` runs (see Running work); then build L2 from its verified findings.
+    **The old U2 list, kept for its record:**
+    **Remaining from the old list:**
+    2. (done) A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
+       of npt-lab without and with `--features bites`, each copied to `.gate/netcode-proof-test/bin/`; **every L1 part
+       has its own twin check (P1-P4 and B1: marks.json)**, so 15 measured runs (seeds 1-3) + 15 twins (role twin) +
+       4 bite runs at B1 or P2 (clock-seed at B1 with its own twin, both bites build) = 35 runs, ~1 GB under
+       `.gate/netcode-proof-test/runs/u2/`; then `npt-judge --only PM-0001-3`. Expected: the five L1 parts PASS, the L2
+       and MP parts and the not-net-of-base bite NOT-RUN. Check each bite fails for its own reason (rtt-each-way: mean;
+       loss-per-round-trip: loss; normal-jitter: p90; clock-seed: the twin check).
+    3. Commit the verdict summary under `spikes/netcode-proof/results/` (no raw logs); SERIES.md's "written by" for the
+       probe names: npt-lab (L1), npt-net (L2).
+    4. check.mjs all 9, gate `--no-smoke`, then the advisor on U2 with these readings: the reorder step's model
+       (overtaken, causal: no swap where the spacing exceeds the delay, so P0 and P1 at 30 Hz have none); L1's stream
+       model (E15's RTO rule); RTT from implicit acks; Link's additions (`LinkState`, `rtt_ns`; no `loss` yet, which
+       npt-room wants per client at U4); the probe in npt-lab with its own binary (plan §4.7 lists no npt-lab binary).
+    R1 still waits for stop B.
+
+## Next steps
+1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
+   `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove
+   the worktree `.gate/npt-readings`.
+1b. The catalogue's questions Q1-Q9 (netcode-architect's notes `netcode-architect-catalogue.md`) and test-engineer's
+   marks questions go to the advisor together, in one request.
+2. U1 part 2: npt-log's record types and writer; npt-judge with its PASS, FAIL and INVALID fixtures (PM-0006-14's
+   short padding among them); marks.json (test-engineer drafts it per `marks/README.md`, with SERIES.md); the drift
+   test (after the merge); the dependency-rule checks (a cargo metadata test in npt-lab) and the no-reference grep;
+   redact-check; the message catalogue (netcode-architect) and its class audit test; then docs-keeper (REPO_MAP gets
+   spikes/ and the catalogue; STATUS: PR #38's line, the Mac line at 44-45, the plan's approval, UNDER-WAY (a)).
+3. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
+4. Write files with the Write and Edit tools only, never shell redirects or scripts that write (Mustafa, 2026-11-06:
+   the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
+
+## Open findings
+- **From the advisor's U2 review (advisor-u2.md), each with the unit that fixes it:**
+  - **C1 (U4, before PM-0001-18's L1 leg counts):** L1's stream retries back off (each waits twice the last timeout:
+    RFC 6298 §5.5, RFC 9002 §6.2.1); loss drawn per 1,448 B segment, any lost segment delaying the message one timeout
+    and holding back the ones behind it (E15's L2 model); unit tests; L1 runs record each stream's stall share.
+  - **C2 (U4, before npt-room reads `rtt_ns`):** a sample only from a packet that is the newest of its link and
+    direction to arrive (RFC 9002 §5.1); a stream message's sample from its own packet's arrival, not its in-order
+    delivery; tests for both.
+  - **C3 (U4):** `loss` on Link, with §4.4's send-buffer space settled at the same time; each backend reports its own
+    estimate, never the simulator's true fate; plan §4.7 then.
+  - **C4 (U4, with the next judge change):** INVALID, with fixtures: a measured run (or its twin) whose build lists
+    `bites` or names a bite; a bite run whose build lacks `bites`.
+  - **C5 (U3/U6):** ImpairSocket's reorder step uses L1's model; SERIES.md names the binary that writes L2's probe
+    log, not only the npt-net library.
+  - **Note (U6):** links are `Box<dyn Link>` without `Send`; if npt-server moves links across tasks, the L2 backends
+    need `+ Send`.
+- Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
+- **Carried forward from the advisor's U1 rulings** (advisor-u1.md): C4 (`params.killed` only with npt-super's kill
+  record) and C6 (tokens only in their prefixed form, with a test) at U6; A3's systemd readiness check for real at
+  R1's bring-up, before any PM-0001-16 start counts; ImpairSocket's release precision at U3 (worse than 0.25 ms goes
+  back to the advisor before R1); the results ledger (invalid runs superseded only with a written cause; failing
+  runs only by a build fixing the found cause; the judge refuses a folder missing a listed run) at U8, reviewed by
+  the advisor; Q13 (R4 creates LG with its IPv6 /64) and Q23 (-11 and -25 once per WebTransport crate) in the run
+  plans; Q15 (a), -27's one-sided "within 5 %", in a readings PR before R5's first counted run (Mustafa's go).
+- **For the readings PR before R5** (with Q15 (a)): the PR Advisor's Low note on PM-0001-31's "L2's TCP proxy on RS",
+  which R-25 makes the WebSocket stream wrapper for the proof test: a pointer in that row.
+- **Raised by the session, for the advisor at U4:** marks -14, -16 to -25 and -27 run inside an S30 room or the stress
+  scene by their rows, but their parts do not select on the scene, so `pre:PM-0001-2` is not on them yet. When the
+  L1 runner and the run plans name each run's scene, their selects add scene and clients, and the precondition with
+  them.
+- **A nuance, recorded:** an expect-invalid bite counts as shown if its rule reports a missing counter too; that
+  cannot give a false PASS, because measured runs without the counter are INVALID by the same rule.
+
+## Key numbers
+- Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
+  IPv4); 1 RS + 1 LG = 0.1562/h; each VM rounds up per session; RS<->LG traffic internal and free.
+- Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
+- macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
+
+## Decisions taken
+- Mustafa, 2026-11-06 (later): "No Mac available for now (the loan Macs are out of stock). Nothing in this test waits on
+  one: the timed Safari rows wait until a Mac is available, at the latest for the look proof test." So if the runner
+  fails its conditions, every Safari row waits for that Mac too (sent to R-PR's agent for SPIKE_PLAN).
+- Mustafa, 2026-11-06: plan APPROVED (revision 3.1 with C1-C12). ROUTE (a) on his laptop (MSI Vector 18 HX AI, Core
+  Ultra 9, RTX 5080, native Windows/PowerShell; Brave + Edge, Chrome/Firefox installable; Claude Code CLI on his
+  university's Enterprise login; Manual mode). SAFARI-TIME (b). FIXED-IP (a), deleted at the close. DENSITY-FIGURE (a).
+  UNDER-WAY (a): when the plan is approved and the first build step is committed. Branches `claude/npt-readings` and
+  `claude/npt-safari-wf` allowed.
+- The advisor, 2026-11-06: the plan APPROVED with C1-C12 (folded in); readings ruled as plan §15 shows; R-19 and
+  UNDER-WAY escalated to Mustafa; R-PR's exact words in `advisor-verdict.md`.
+- Settled inputs (Mustafa, this session's prompt, 2026-11-05): ADR 0001-0006 and SPIKE_PLAN as merged; P2 = 100 ms
+  round trip, +-20 ms jitter, 2 % loss, half each way; the 60 Hz run is an early signal only; CCX23 (RS, x86) + CAX21
+  (LG, Arm64) in Falkenstein, created and deleted by Mustafa per run; SSH by a public key the session gives him, never
+  a Hetzner token; each run's plan states its hours and a cost cap for his OK; Safari leg tries GitHub's macOS runners
+  first, any `.github/` change goes to him; shamblefrontlines.com at Cloudflare, one exact DNS record per test host,
+  always "DNS only" (grey cloud).
+
+## Running work
+- **U3's scouting workflow** `wf_d6bdeed6-3c0` (npt-u3-scout; 2 scouts + 2 adversarial verifiers, xhigh, at most 2 at
+  a time) · launched about 16:20 UTC · script:
+  `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3-scout-wf_d6bdeed6-3c0.js`
+  · notes `.checkpoints/netcode-proof-test/u3-scout-{wt,timing}.md` and `u3-verify-{wt,timing}.md` · questions:
+  each WebTransport crate's server over a custom quinn AsyncUdpSocket (R5-TEST-OQ2); quinn 0.11.12's socket trait and
+  GSO/GRO; R-17's queue depths; the L2 probe; timer precision (tokio's resolution, measured lateness here vs the
+  0.25 ms bar); Linux's TCP retransmission (TCP_RTO_MIN, RACK-TLP, TLP) against E15's rule; tokio-tungstenite's
+  wrapper and limits; a DelayStream sketch. Resume with Workflow({scriptPath, resumeFromRunId}) after a cut.
+- U3 part 0 · ad527f3 (pushed) · npt-net's crates pinned (wtransport 0.7.2, web-transport-quinn 0.13.6, quinn 0.11.12,
+  tokio 1.54.1, tokio-tungstenite 0.30.0; floors met: quinn-proto 0.11.19, rustls 0.23.46, ring 0.17.14); check.mjs
+  all 9 (97 / 102).
+- **The advisor on U2** (resumed 16:12 UTC by SendMessage after the 14:31 usage-limit cut; it had written nothing) ·
+  launched 14:31 UTC · notes
+  `.checkpoints/netcode-proof-test/advisor-u2.md` (ends DONE) · rules on U2-R1..R8 (reorder model, L1 streams, L1 RTT,
+  npt-link's surface and `loss`, the probe's placement, the run set and records, check.mjs, the twin figure's
+  semantics) on `git diff c104302..6900e52 -- spikes/`. Before it: check.mjs all 9 green (97 / 102), gate PASS
+  `--no-smoke`, repo map OK. If the session restarts: read its notes file; if not DONE, relaunch with the same brief.
+- Saver: background task `btui06lbn` · started 14:31 UTC · stopped by the session 16:12 (replaced).
+- Saver: background task `brd3l2ph7` · started 16:12 UTC (110 minutes, to about 18:02).
+- PR: [Mergincanli/Shamble-Frontlines#40](https://github.com/Mergincanli/Shamble-Frontlines/pull/40), draft, opened
+  02:56 on head a6607bc; this session is subscribed to its activity; safety-net check-in `trig_017Q5fgnrrQsugi3dbZ9pa3L`
+  fired 03:45 Amsterdam: nothing new (draft, head b95a3dd, no checks, comments or threads; main unmoved); check-ins
+  stopped, since Mustafa has not written since the PR went up. The next GitHub event or his message resumes the work.
+- The advisor's plan review (advisor agent, xhigh) · launched 02:54 · DONE 03:04: APPROVE with C1-C12.
+- Workflow `wf_e7cdd40f-712` (npt-plan-review2: security-auditor, netcode-architect, infra-engineer; xhigh) · script as
+  launched: `.checkpoints/netcode-proof-test/npt-plan-review2-run1.js` (no args) · notes: `<agent>-plan-review2.md` ·
+  launched 23:54 · FAILED 23:54 at the usage limit · resumed 02:13 · DONE 02:44 (3 of 3 returned).
+- Workflow `wf_88b642c1-384` (npt-plan-review) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-review-run1.js`
+  · launched 23:16 · DONE 23:37 (3 of 3 returned).
+- Workflow `wf_1ae38d53-da9` (npt-plan-digests) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-digests-run1.js`
+  · launched 22:38 · DONE 23:00 (3 of 3 returned; journal in the session's workflow folder).
+- Saver: background task `btpf0ptzw` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/btpf0ptzw.output`
+  · started 22:35 · stopped 00:25 ('time is up').
+- Saver: background task `be4kec0xf` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/be4kec0xf.output`
+  · started 02:11 · stopped by the session at 03:18 (no agent running; final saves by hand).
+- Saver: background task `bar6y14h2` · started 10:36 · stopped by the session 12:18 (replaced).
+- Saver: background task `bekt3thjk` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bekt3thjk.output`
+  · started 12:18 · stops by about 14:08 (110 min).
+- The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · DONE: REVISE of
+  2ccc184, then APPROVE of 16763a7 (re-review via SendMessage, same agent).
+- The message catalogue (netcode-architect, xhigh, background) · notes `netcode-architect-catalogue.md` · writes
+  `docs/design/netcode-proof-messages.md` · launched 11:12 · DONE 11:20 (Q1-Q9 for the advisor).
+- marks.json's draft (test-engineer, xhigh, background) · notes `test-engineer-marks.md` · writes `marks-draft.jsonl`
+  and `series-draft.md` · launched 11:16 · stopped at the usage limit, resumed 12:12 · DONE (81 marks, 0 validator
+  errors, Q1-Q31).
+- docs-keeper (xhigh, background) · notes `docs-keeper-u1.md` · launched 12:22 · DONE (REPO_MAP, STATUS; map OK).
+- The advisor on U1's questions (advisor agent, xhigh, background) · notes `advisor-u1.md` · launched 13:15 · DONE
+  13:29.
+- Saver: background task `brikhjzxz` · started 13:14 (the restart had ended `bekt3thjk`) · stopped about 13:45 by the
+  shell's default 30-minute limit for background commands (no agent running then). Restart it with a 2-hour timeout
+  whenever an agent runs.
+- R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
+  rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.

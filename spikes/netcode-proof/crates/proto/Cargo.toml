@@ -1,0 +1,13 @@
+[package]
+name = "npt-proto"
+description = "The wire format: messages, session controls, E3 quantisation, the delta codec, size limits"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# No transport crate and no clock (plan §4.2); builds for wasm32.

@@ -1,0 +1,14 @@
+[package]
+name = "npt-room"
+description = "The room library: roster, command checks, input buffer, interest, lag compensation, encoding, events"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# No I/O, async runtime or clock; tick-counted timers only; builds for wasm32 (plan §4.1, §4.4; engine EA-1).
+npt-proto.workspace = true

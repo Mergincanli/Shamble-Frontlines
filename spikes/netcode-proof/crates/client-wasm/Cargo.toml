@@ -1,0 +1,18 @@
+[package]
+name = "npt-client-wasm"
+description = "The wasm-bindgen exports of the client endpoint, and nothing else (create, mode, input, step)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# Not the workspace lints: wasm-bindgen's generated code needs `unsafe` (the only crate allowed it; Cargo.toml note).
+[lints.rust]
+unsafe_code = "allow"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+npt-client.workspace = true
+# wasm-bindgen joins at U7, at the version the wasm-bindgen CLI is pinned to.

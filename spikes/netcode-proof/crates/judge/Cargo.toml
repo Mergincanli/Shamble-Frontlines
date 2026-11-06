@@ -1,0 +1,20 @@
+[package]
+name = "npt-judge"
+description = "Reads results logs and marks.json and writes one verdict per mark (PASS, FAIL, INVALID, ...)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "npt-judge"
+path = "src/main.rs"
+
+[dependencies]
+# Only npt-log and serde (plan §4.2), so its fixture tests stay independent of the code under test.
+npt-log.workspace = true
+serde.workspace = true
+serde_json.workspace = true

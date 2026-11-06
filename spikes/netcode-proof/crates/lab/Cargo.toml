@@ -1,0 +1,27 @@
+[package]
+name = "npt-lab"
+description = "The L1 scenario runner on simulated time, the x86-64 replay tool, the native-against-Wasm hash comparer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The bites build (plan §4.7): the planted defects of the crates it runs, chosen at run time by --bite.
+bites = ["npt-l1/bites"]
+
+[dependencies]
+# ADR 0002's devtools analogue: it may depend on anything, and nothing depends on it (plan §4.2).
+npt-link.workspace = true
+npt-l1.workspace = true
+npt-sim.workspace = true
+npt-proto.workspace = true
+npt-room.workspace = true
+npt-server.workspace = true
+npt-client.workspace = true
+npt-log.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
