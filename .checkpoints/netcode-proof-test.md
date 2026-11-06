@@ -278,6 +278,11 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **The advisor on U3's nine questions** (advisor agent, xhigh, background) · launched about 17:40 UTC at Mustafa's
+  "8 % left, so we can already start" · reads `u3-scout-summary.md` · notes `advisor-u3q.md` (ends DONE) · if cut by
+  the usage limit: SendMessage to the same agent after the reset (its context is kept), never a new one. The same
+  nine questions went to Mustafa in chat, so his own Advisor can weigh in; his answers override.
+- Saver: background task `bl4ghplet` · started about 17:40 UTC (110 minutes, to about 19:30); no model usage.
 - **U3's scouting workflow** `wf_d6bdeed6-3c0` (npt-u3-scout; 2 scouts + 2 adversarial verifiers, xhigh, at most 2 at
   a time) · launched about 16:20 UTC · **DONE about 17:30 UTC** (4 of 4; synthesis in u3-scout-summary.md) · script:
   `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3-scout-wf_d6bdeed6-3c0.js`
