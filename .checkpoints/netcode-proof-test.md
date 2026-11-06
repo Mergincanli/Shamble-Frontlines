@@ -238,6 +238,12 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **The advisor on U2** (advisor agent, xhigh, background) · launched 14:31 UTC · notes
+  `.checkpoints/netcode-proof-test/advisor-u2.md` (ends DONE) · rules on U2-R1..R8 (reorder model, L1 streams, L1 RTT,
+  npt-link's surface and `loss`, the probe's placement, the run set and records, check.mjs, the twin figure's
+  semantics) on `git diff c104302..6900e52 -- spikes/`. Before it: check.mjs all 9 green (97 / 102), gate PASS
+  `--no-smoke`, repo map OK. If the session restarts: read its notes file; if not DONE, relaunch with the same brief.
+- Saver: background task `btui06lbn` · started 14:31 UTC with a 2-hour limit (stops about 16:31).
 - PR: [Mergincanli/Shamble-Frontlines#40](https://github.com/Mergincanli/Shamble-Frontlines/pull/40), draft, opened
   02:56 on head a6607bc; this session is subscribed to its activity; safety-net check-in `trig_017Q5fgnrrQsugi3dbZ9pa3L`
   fired 03:45 Amsterdam: nothing new (draft, head b95a3dd, no checks, comments or threads; main unmoved); check-ins
