@@ -40,9 +40,12 @@
   the end of §5 with C1's wording) and one clause appended to README:160 (C8). Quick checks PASS: no changed line over
   120; tags `[DECIDED]` 10→12, `[OPEN]` 4→3, `[LATER]` 4→5, the rest unchanged (E3's expected change); each of his
   six pieces found once in the joined text (E1 quick); README one line changed.
-- **Current step:** 3. Still to do for step 2: E1-E4 as scripts in the notes folder (E2 line diff, E4 citations
-  incl. C9's r1-simulation-core.md:3301/:3535), and `node tools/gate.mjs --no-smoke` (not run yet; CI runs gate
-  and smoke on this commit).
+- **Done:** CI on 67978c2: gate and smoke green (both runs). After the usage reset (Mustafa: "Try again", about
+  23:20 UTC): `e-checks.py` (E1-E4, read-only) PASS, every condition it covers included (C1, C3, C8, C9; the only
+  line-number citations into VISION_V2 outside STATUS and ROADMAP are r1-simulation-core.md:3301 and :3535, left
+  unedited); `node tools/gate.mjs ee736ec --no-smoke` PASS, symbols +0 -0 (`gate-build.txt`); repo map OK (113
+  entries). tools/node_modules copied from the b1 worktree (same lockfile as main; ignored by git).
+- **Current step:** 3, docs-keeper's pass.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
