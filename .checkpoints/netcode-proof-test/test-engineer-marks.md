@@ -28,6 +28,7 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Block 6 done (-49..-52, -62, -53, -54..-56, PM-0004-67): 64 lines.
 - Resumed after the usage limit (draft at 64 lines, PM-0004-67 last). Block 7 done (PM-0006-11..-19): 73 lines.
 - Block 8 done (PM-0006-20..-27): 81 lines, all rows. fix1 (-27 times-of-day figure; room CPU share renamed proc_cpu_permille), fix2 (status/exit code to flags), fix3 (-58 reads -41's untraced count: a max over every correction would FAIL at P3; -19 reuses decoded_hash_mismatch_count; -14 reads -36's mds_read). validate.py: 0 errors.
+- Registry: series-draft.md built by scratch-te/registry.py (235 series, 36 figures, 18 figure-only inputs, validity names, header params); it fails on any name without an entry. Final validate.py: 81 marks, 0 errors; pass 74, reported 1, person 3, outside 3. DONE.
 
 ## Questions for the main session
 - Q1: `select` lists `machine.name`/`machine.arch` but not `machine.role`; `from` uses `machine.role`. May a part's select use `machine.role`? (I use it in parts only where a part must be one machine kind.)
@@ -52,6 +53,9 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Q27: PM-0006-19's validity (each 'off' run's p99 within 1 % of the pooled 'off' p99) is no README §4 rule.
 - Q28: money (PM-0006-18) has no unit suffix; PM-0006-18's numbers ride in the person event's steps.
 - Q29: PM-0006-11 is listed by every run, but the density runs are unpinned (no affinity events): the sibling check needs those runs excluded.
+- Q30: per-client quantised hashes per tick (-17, -19, -58) have no home: `h` is one hash per record and a 64-bit hash exceeds JSON's safe integers in `s`. Proposal: an `hs` map of hex strings, or two 32-bit halves.
+- Q31: in 30 marks every check names its parts (-3 -10 -12 -13 -14 -19 -21 -25 -29 -31 -32 -33 -36 -41 -42 -60 -43 -44 -45 -46 -61 -50 -51 -52 -62, PM-0006-15 -16 -17 -19 -26): a bite run that matches no part has no checks to fail, so the mark FAILs. The run plans must give each bite run a judged part's header (or the judge falls back to all checks).
+- Validity names (coordinator, 2026-11-06): the draft uses tick.v.work_ns, second.v.steal_permille, tick.v.padded_step_ns + params.padding_target_ns, params.reorder_permille as given; second.v.inputs_received_count (room, all clients) and second.v.proc_cpu_permille (a room process's share of one vCPU) are different quantities from LG's inputs_count and cpu_permille, not other names for them.
 
 ## Notes
 - Q2: a part's `select` on per-log fields (`machine.*`, `process`): does a run match when ANY of its logs matches? (I assume yes.)

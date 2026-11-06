@@ -166,8 +166,9 @@
   · started 22:35 · stopped 00:25 ('time is up').
 - Saver: background task `be4kec0xf` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/be4kec0xf.output`
   · started 02:11 · stopped by the session at 03:18 (no agent running; final saves by hand).
-- Saver: background task `bar6y14h2` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bar6y14h2.output`
-  · started 10:36 · stops by 12:26 (110 min).
+- Saver: background task `bar6y14h2` · started 10:36 · stopped by the session 12:18 (replaced).
+- Saver: background task `bekt3thjk` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bekt3thjk.output`
+  · started 12:18 · stops by about 14:08 (110 min).
 - The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · DONE: REVISE of
   2ccc184, then APPROVE of 16763a7 (re-review via SendMessage, same agent).
 - The message catalogue (netcode-architect, xhigh, background) · notes `netcode-architect-catalogue.md` · writes
