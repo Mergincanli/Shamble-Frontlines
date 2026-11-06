@@ -45,7 +45,17 @@
   line-number citations into VISION_V2 outside STATUS and ROADMAP are r1-simulation-core.md:3301 and :3535, left
   unedited); `node tools/gate.mjs ee736ec --no-smoke` PASS, symbols +0 -0 (`gate-build.txt`); repo map OK (113
   entries). tools/node_modules copied from the b1 worktree (same lockfile as main; ignored by git).
-- **Current step:** 3, docs-keeper's pass.
+- **Done:** step 3, docs-keeper's pass (`docs-keeper.md`; a general agent reading main's docs-keeper.md): STATUS
+  (header #39 and #41, Phase, B.1's row merged with the advisor's APPROVE 6682184695, B.2's row, B3's row "taken by
+  B.2", C6's line numbers :119, :294-298, :202, :192-193, B.2's queued words removed with a pointer, the "From B.2"
+  follow-ups C8 and C9), ROADMAP (v2-next queue, B.2's entry, B.1 MERGED, B3 "taken by B.2"; it also moved the R7
+  entry into Build history to keep 8-12 recent entries, its role's rule), the B.1 report's correction after the
+  merge. Its checks: gate PASS (+0 -0), repo map OK, e-checks PASS, widths OK.
+- **Mustafa's VFX editor item (2026-11-06, 23:27 UTC, "For the next docs pass")** arrived during step 3: saved word
+  for word (`mustafa-2026-11-06-vfx.md`, a79fef1) and queued in STATUS's "Queued, in Mustafa's words" (the main
+  session; its quote unwraps to his text exactly) as the next docs change-set after B.2, then A4; Phase and ROADMAP's
+  queue say so. Not built in B.2 (its scope stays as approved); the advisor's final-head review sees the entry.
+- **Current step:** 4, the review round (the verifier, game-designer, infra-engineer, in parallel; one round).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
