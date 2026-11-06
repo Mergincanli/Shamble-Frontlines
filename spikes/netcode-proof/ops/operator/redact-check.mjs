@@ -148,9 +148,13 @@ function quadsIn(labels) {
 }
 
 // Subresource Integrity hashes (`sha512-…` in package locks) are hashes, not tokens: blanked before the long-token
-// scan, keeping every index.
+// scan, keeping every index. Only a whole hash of its algorithm's exact base64 length counts (sha1 28 characters,
+// sha256 44, sha384 64, sha512 88), so a `sha1-` written before a token cannot hide it.
+const INTEGRITY =
+  /(?<![A-Za-z0-9_-])sha(?:1-[A-Za-z0-9+/]{27}=|256-[A-Za-z0-9+/]{43}=|384-[A-Za-z0-9+/]{64}|512-[A-Za-z0-9+/]{86}==)(?![A-Za-z0-9+/=_-])/g;
+
 function withoutIntegrity(text) {
-  return text.replace(/sha(?:1|256|384|512)-[A-Za-z0-9+/=]+/g, (m) => " ".repeat(m.length));
+  return text.replace(INTEGRITY, (m) => " ".repeat(m.length));
 }
 
 // ---- Scanning --------------------------------------------------------------------------------------------------
@@ -223,8 +227,11 @@ export function scanText(text, opts = {}) {
     }
   }
   for (const m of text.matchAll(HOSTNAME)) {
-    // A name that embeds an allowed address in either order names an allowed machine.
-    if (quadsIn(m[0].split(/[.-]/)).some(([f, r]) => !v4Ok(f) && !v4Ok(r))) {
+    // A name embedding one of this run's VMs in either order is that VM's own name (rDNS reverses the address).
+    // Otherwise both readings must be allowed: accepting either would let a real address through whenever its
+    // reverse falls in an allowed range.
+    const leak = ([f, r]) => !(vms.has(f) || vms.has(r) || (allow.v4(f) && allow.v4(r)));
+    if (quadsIn(m[0].split(/[.-]/)).some(leak)) {
       add(m.index, "address in a host name", m[0]);
     }
   }
@@ -309,10 +316,13 @@ function prePushItems(stdin) {
     const commits = git(["rev-list", ...range]).toString("utf8").split("\n").filter(Boolean);
     for (const c of commits) {
       items.push({ name: `${c.slice(0, 12)}:(message)`, buf: git(["log", "-1", "--format=%B", c]) });
-      const files = git(["diff-tree", "--no-commit-id", "--name-only", "-r", "-z", "--diff-filter=ACMR", "--root", c])
-        .toString("utf8")
-        .split("\0")
-        .filter(Boolean);
+      // Each commit against its first parent, so a merge's own changes (a conflict resolved by hand) are read too:
+      // `git diff-tree` lists nothing for a merge commit. A root commit lists every file.
+      const parents = git(["rev-list", "--parents", "-n", "1", c]).toString("utf8").trim().split(/\s+/).slice(1);
+      const list = parents.length
+        ? ["diff", "--name-only", "-z", "--diff-filter=ACMR", "--no-renames", parents[0], c]
+        : ["diff-tree", "--no-commit-id", "--name-only", "-r", "-z", "--diff-filter=ACMR", "--root", c];
+      const files = git(list).toString("utf8").split("\0").filter(Boolean);
       for (const f of files) items.push({ name: `${c.slice(0, 12)}:${f}`, buf: git(["show", `${c}:${f}`]) });
     }
   }

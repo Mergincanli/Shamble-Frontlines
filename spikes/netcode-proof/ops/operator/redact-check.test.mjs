@@ -37,6 +37,8 @@ test("other addresses fail, in every form", () => {
   assert.deepEqual(kinds(`host ip-${pub4.replaceAll(".", "-")}.eu.example`), ["address in a host name"]);
   const vmRev = vm4.split(".").reverse().join(".");
   assert.deepEqual(kinds(`rdns static.${vmRev}.clients.your-server.de`, { vms: [vm4] }), [], "the VM's own rDNS");
+  const forward = [5, 113, 0, 203].join("-"); // read backwards it is 203.0.113.5, a documentation address
+  assert.deepEqual(kinds(`host ip-${forward}.isp.example`), ["address in a host name"], "an allowed reverse is no excuse");
   const decimal = String(pub4.split(".").reduce((n, o) => n * 256 + Number(o), 0));
   assert.deepEqual(kinds(`curl http://${decimal}/x`), ["decimal address in a URL"]);
   const padded = pub4
@@ -70,7 +72,9 @@ test("tokens and keys fail, the runner's public token passes", () => {
   assert.deepEqual(kinds(`hetzner ${"aB3x".repeat(16)}`), ["long token"]);
   assert.deepEqual(kinds(`upper-case hash ${"aB3d".repeat(16)}`), [], "mixed-case hex is still a hash");
   assert.deepEqual(kinds(`sha256 ${"ab12".repeat(16)}, commit ${"0f".repeat(20)}`), [], "hashes are not tokens");
-  assert.deepEqual(kinds(`"integrity": "sha512-${"Ab9+/".repeat(18)}=="`), [], "an SRI hash is not a token");
+  const sri = `sha512-${"aB3x".repeat(21)}aB==`; // 86 base64 characters and its padding: a whole sha512 hash
+  assert.deepEqual(kinds(`"integrity": "${sri}"`), [], "a whole SRI hash is not a token");
+  assert.deepEqual(kinds(`hidden sha1-${"aB3x".repeat(16)}`), ["long token"], "a sha1- prefix does not hide a token");
   assert.deepEqual(kinds(`${"-----BEGIN "}OPENSSH PRIVATE KEY-----`), ["private key"]);
   assert.deepEqual(kinds(`${"-----BEGIN "}EC PRIVATE KEY-----`), ["private key"]);
   assert.deepEqual(kinds(`${"-----BEGIN "}PUBLIC KEY-----`), [], "a public key is fine");
@@ -160,6 +164,44 @@ test("--staged reads the index, and --pre-push reads the pushed commits and thei
     assert.equal(main(["--pre-push"], () => stdin, (l) => out.push(l)), 1);
     assert.ok(out.some((l) => l.includes("(message):1:18: IPv4 address")), out.join("\n"));
     assert.equal(main(["--pre-push"], () => `refs/heads/x ${zero} refs/heads/x ${sha}\n`, () => {}), 0, "a delete pushes no content");
+  } finally {
+    process.chdir(cwd);
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("--pre-push reads a merge commit's own changes", () => {
+  const dir = tempDir();
+  const cwd = process.cwd();
+  const env = {
+    ...process.env,
+    GIT_AUTHOR_NAME: "t",
+    GIT_AUTHOR_EMAIL: "t@example.invalid",
+    GIT_COMMITTER_NAME: "t",
+    GIT_COMMITTER_EMAIL: "t@example.invalid",
+  };
+  const git = (...args) => execFileSync("git", args, { cwd: dir, env }).toString("utf8").trim();
+  const commit = (file, text, message) => {
+    writeFileSync(join(dir, file), text);
+    git("add", file);
+    git("commit", "-q", "-m", message);
+  };
+  try {
+    git("init", "-q", "-b", "main");
+    commit("a.md", "base\n", "base");
+    git("checkout", "-q", "-b", "side");
+    commit("b.md", "side\n", "side");
+    git("checkout", "-q", "main");
+    commit("c.md", "main\n", "main");
+    git("merge", "-q", "--no-commit", "--no-ff", "side");
+    // The leak exists only in the merge commit: a hand edit while merging, which `git diff-tree` alone would miss.
+    commit("a.md", `resolved by hand ${pub4}\n`, "merge side");
+    const sha = git("rev-parse", "HEAD");
+    process.chdir(dir);
+    const out = [];
+    const stdin = `refs/heads/main ${sha} refs/heads/main ${"0".repeat(40)}\n`;
+    assert.equal(main(["--pre-push"], () => stdin, (l) => out.push(l)), 1);
+    assert.ok(out.some((l) => l.endsWith(":a.md:1:18: IPv4 address: 8.8…(7 chars)")), out.join("\n"));
   } finally {
     process.chdir(cwd);
     rmSync(dir, { recursive: true, force: true });
