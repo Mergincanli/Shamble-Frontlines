@@ -26,6 +26,8 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Block 4 done (-28..-38, -39, -40, -63 outside): 44 lines. Scripts now run `python3 -I -B` (coordinator: no __pycache__ in the notes folder).
 - Block 5 done (-41, -42, -60, -43..-46, -61, -47, -48): 54 lines.
 - Block 6 done (-49..-52, -62, -53, -54..-56, PM-0004-67): 64 lines.
+- Resumed after the usage limit (draft at 64 lines, PM-0004-67 last). Block 7 done (PM-0006-11..-19): 73 lines.
+- Block 8 done (PM-0006-20..-27): 81 lines, all rows. fix1 (-27 times-of-day figure; room CPU share renamed proc_cpu_permille), fix2 (status/exit code to flags), fix3 (-58 reads -41's untraced count: a max over every correction would FAIL at P3; -19 reuses decoded_hash_mismatch_count; -14 reads -36's mds_read). validate.py: 0 errors.
 
 ## Questions for the main session
 - Q1: `select` lists `machine.name`/`machine.arch` but not `machine.role`; `from` uses `machine.role`. May a part's select use `machine.role`? (I use it in parts only where a part must be one machine kind.)
@@ -46,6 +48,10 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Q23: -56's item (1) asks both crates' results on -11 and -25, whose rows don't ask for both crates: the run plans must run them per crate.
 - Q24: reports without `parts`: the draft assumes the judge computes them per part.
 - Q25: ADR 0006's key (the advisor's reading, 2026-11-06): npt-judge checks the 3-sessions rule (>= 6 h apart, one 18:00-23:00 Amsterdam) from the results' UTC times. The header has `date` only: it needs a UTC start time (`params.started_utc`, passed in by the caller). The draft uses a figure `times_of_day_rule` on -27, PM-0006-13 and -14.
+- Q26: PM-0006-19 compares POOLED p99s on both sides; `against` combines per-run statistics, so the draft uses a figure `logging_cost_ratio`.
+- Q27: PM-0006-19's validity (each 'off' run's p99 within 1 % of the pooled 'off' p99) is no README §4 rule.
+- Q28: money (PM-0006-18) has no unit suffix; PM-0006-18's numbers ride in the person event's steps.
+- Q29: PM-0006-11 is listed by every run, but the density runs are unpinned (no affinity events): the sibling check needs those runs excluded.
 
 ## Notes
 - Q2: a part's `select` on per-log fields (`machine.*`, `process`): does a run match when ANY of its logs matches? (I assume yes.)
