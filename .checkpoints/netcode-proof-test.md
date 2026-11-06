@@ -135,10 +135,21 @@
     Main into this branch: 1ea36a1. The marks check now reads this branch's own docs/adr/: 0950081 (check.mjs all 9
     green; 81 rows unchanged). The worktree `.gate/npt-readings` removed; unsubscribed from #41.
 
+25. **U2 part 1** · 08782eb (pushed) · npt-link (Link, Listener, Channel, Recv, SendResult, LinkState, Loopback; 7
+    tests) and npt-l1 (L1Net, Profile, ReorderStep, FateLog; fates per (seed, link, direction, channel, index) from
+    ChaCha8 streams, 16 words a packet; the reorder step as "overtaken by the successor when the timing allows",
+    never below the floor; bursts; reliable streams with E15's retransmission rule; RFC 9002 RTT from implicit acks;
+    the bites build's four PM-0001-3 defects; 18 tests + 5 bite tests). rand_chacha 0.10.0 / rand_core 0.10.1 pinned,
+    sha2 0.11.1 declared. check.mjs: clippy with every feature, tests on both builds, deps parses stdout only.
+    check.mjs all 9 pass (83 / 88 tests); gate PASS with --no-smoke.
+
 ## Current step
-25. Next unit: U2 (npt-l1 with its unit and property tests; PM-0001-3's L1 half and its bites). Counted runs are no
-    longer blocked by the readings; R1 still waits for stop B (U8's run package, its reviews, the guard check and
-    Mustafa's approvals).
+26. U2 part 2: the L1 probe (npt-lab binary `probe`: 10,000 datagrams/s each way, echo with hold time for the RTT,
+    SERIES.md's probe names, `fate_log_sha256`, `twin`), the judge's `fate_log_twin_equal`, then PM-0001-3's L1 runs
+    (P1-P4 and B1 x 3 seeds, 3 twins at B1, 4 bites) judged with marks.json. Readings for the advisor at U2's close:
+    the reorder step's model (overtaken, causal; no swap where spacing > delay, so P0 and P1 at 30 Hz have none), L1's
+    stream model (E15's RTO rule), RTT from implicit acks, the probe's placement in npt-lab (SERIES.md says npt-l1).
+    R1 still waits for stop B.
 
 ## Next steps
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
