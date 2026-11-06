@@ -92,11 +92,20 @@
     A slip, recorded: one `sed -i` edit of engine.rs (shell write) and its `.bak`, removed; the change was the intended
     three lines. A Python `__pycache__` from test-engineer's scratch scripts deleted before any save (they now run -B).
 
+17. **redact-check fixes** · 41e5565 · the automated security review of d984535 found 3 (all real): a host name
+    accepted when either reading was allowed; the SRI blanking unanchored; pre-push missing a merge commit's own
+    changes. Fixed with tests; the old code (loaded from git into memory) missed all 3, the new code catches each.
+18. **U1 part 2b** · 8368869 · `check.mjs`, the spike's test command (fmt, clippy host and wasm32 -D warnings, cargo
+    test, the §4.2 dependency rules from cargo metadata, the no-reference grep, its own 8 tests, redact-check); the
+    catalogue `docs/design/netcode-proof-messages.md` (netcode-architect) and its class audit test
+    (`crates/proto/tests/catalogue.rs`, 15 bites). **`node spikes/netcode-proof/check.mjs`: all 8 steps pass** (35
+    Rust tests; deps hold; 246 tracked files, none outside spikes/ references it; 8/8 and 10/10 node tests; redact
+    0 findings).
+
 ## Current step
-17. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. Meanwhile U1 part 2b: the message catalogue
-    draft (netcode-architect, DONE: `docs/design/netcode-proof-messages.md`, 22 wire rows, 24 field groups, 4 session
-    and 12 room-wide controls, Q1-Q9 for the advisor) and its class audit test; test-engineer drafts marks.json
-    (`marks-draft.jsonl`); then the dependency-rule checks.
+19. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. test-engineer (resumed after the usage limit
+    at 11:12 UTC) finishes marks.json's draft; then marks.json + its drift check + the judge fixtures on it, the
+    advisor on Q1-Q9 and the marks questions together, docs-keeper, U1's close.
 
 ## Next steps
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
