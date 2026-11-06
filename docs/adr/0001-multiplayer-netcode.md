@@ -1662,9 +1662,9 @@ test room on the reference server with 47 bot clients and Mustafa in the 48th sl
 takes a bot's slot, part 11), plus the target course (a target soldier sprinting at 9 m/s and changing direction at
 random; static targets on the ground, at 2.5 m and at 4 m). An overlay shows the profile, the transport, the server's
 measured round trip, the interpolation delay, the rewind cap, and counters of corrections, snaps, extrapolated frames
-and clipped shots. The profile changes from the overlay (a spike-only control on the server's impairment layer), and the
-cap is set as the advisor's reading below says (2026-11-06); his own network's base round trip is measured at the start
-and subtracted, so the server measures the profile's latency (PM-0001-3). The profile changes from the overlay. The
+and clipped shots. The overlay's profile control is spike-only, on the server's impairment layer; his own network's base
+round trip is measured at the start and subtracted, so the server measures the profile's latency (PM-0001-3). The
+profile changes from the overlay. The
 rewind cap is set over the server's local control socket before step 1, and shown read-only on the overlay with the
 command-timing option in force (the advisor's reading, 2026-11-06). Each step: what to do, the expected result, and what
 he records: "achieved" or "not yet"
