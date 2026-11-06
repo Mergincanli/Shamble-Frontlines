@@ -74,3 +74,15 @@ Branch claude/netcode-proof-test-plan-hcky5g, head 689c81f (41bd8a0 + checkpoint
   (3 seeds x 60 s) = 0.67/min per client, as reported. For a 48-player room at P3: ~32 reconnects a minute, each a
   new TLS connection, a Join (one credential) and a full state, and under 0001:507 the healthy-but-slow connection
   closed.
+- F13 (fix 2 moot under (a)): tcp_stream_is_thin is `packets_out < 4 && !tcp_in_initial_slowstart` (v6.8
+  include/net/tcp.h:2118-2121; tcp_timer.c:640-648 applies linear timeouts only then). The adaptive budget at P2 is
+  6 snapshots = 6,300 B = 5 segments (fixes.rs:39-44), so the stream is not thin and thin LT never fires: hence the
+  identical 399/645/1,645 with and without it. Claim (3) stands but is academic for the recommendation.
+- (checking next) RFC 6455 §4.1: at most one WebSocket connection in CONNECTING state per host:port; browsers'
+  endpoint locks. If so, "parallel attempts every 300 ms" cannot run in a browser against one room port.
+- SOURCE RFC 6455 §4.1 item 2 (rfc-editor.org/rfc/rfc6455.html, read 2026-11-06): "the client MUST wait until that
+  connection has been established or for that connection to have failed. There MUST be no more than one connection
+  in a CONNECTING state. If multiple connections to the same IP address are attempted simultaneously, the client
+  MUST serialize them so that there is no more than one connection at a time running through the following steps."
+  NOTE: it makes script DoS harder; "There is no limit to the number of established WebSocket connections". Sure:
+  high (the spec's words). Whether browsers key it by IP or IP:port: next, Chromium's source.
