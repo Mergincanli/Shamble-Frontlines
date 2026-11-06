@@ -108,13 +108,13 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `second.s.input_cmds_count` | count | npt-server | one per input datagram: commands it carried | -13 |
 | `second.s.input_datagram_bytes` | bytes | npt-server | one per input datagram received this second | -13 |
 | `second.s.interp_delay_ns` | ns | npt-client | one per client tick: the interpolation delay in use | -46 |
-| `second.s.probe_burst_down_lost` | flag | npt-l1, npt-net | one per probe packet sent down inside the burst: 1 when lost | -3 |
-| `second.s.probe_burst_up_lost` | flag | npt-l1, npt-net | one per probe packet sent up inside B1's 1 s burst: 1 when lost | -3 |
-| `second.s.probe_down_delay_ns` | ns | npt-l1 (L1), npt-net (L2 probe) | one per delivered probe packet, server to client: its one-way delay | -3 |
-| `second.s.probe_down_lost` | flag | npt-l1, npt-net | one per probe packet sent down, outside the B1 burst: 1 when lost | -3 |
-| `second.s.probe_rtt_ns` | ns | npt-l1, npt-net | one per probe round trip: its time | -3 |
-| `second.s.probe_up_delay_ns` | ns | npt-l1 (L1), npt-net (L2 probe) | one per delivered probe packet, client to server: its one-way delay | -3 |
-| `second.s.probe_up_lost` | flag | npt-l1, npt-net | one per probe packet sent up, outside the B1 burst: 1 when lost | -3 |
+| `second.s.probe_burst_down_lost` | flag | npt-lab (L1 probe), npt-net (L2 probe) | one per probe packet sent down inside the burst: 1 when lost | -3 |
+| `second.s.probe_burst_up_lost` | flag | npt-lab (L1 probe), npt-net (L2 probe) | one per probe packet sent up inside B1's 1 s burst: 1 when lost | -3 |
+| `second.s.probe_down_delay_ns` | ns | npt-lab (L1 probe), npt-net (L2 probe) | one per delivered probe packet, server to client: its one-way delay | -3 |
+| `second.s.probe_down_lost` | flag | npt-lab (L1 probe), npt-net (L2 probe) | one per probe packet sent down, outside the B1 burst: 1 when lost | -3 |
+| `second.s.probe_rtt_ns` | ns | npt-lab (L1 probe), npt-net (L2 probe) | one per probe round trip (echo minus hold time, filed under the echoing down packet's second): its time | -3 |
+| `second.s.probe_up_delay_ns` | ns | npt-lab (L1 probe), npt-net (L2 probe) | one per delivered probe packet, client to server: its one-way delay | -3 |
+| `second.s.probe_up_lost` | flag | npt-lab (L1 probe), npt-net (L2 probe) | one per probe packet sent up, outside the B1 burst: 1 when lost | -3 |
 | `second.s.replay_forced_ns` | ns | web | one per replay forced at P3's or P4's measured maximum depth | -44 |
 | `second.s.replay_ns` | ns | web | one per forced replay: reset and replay time in the Worker | -44 |
 | `second.s.send_call_ns` | ns | npt-server | one per send_datagram call: its time | -11 |
@@ -241,7 +241,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `header.params.history_ticks_count` | count | npt-room | the hit history's depth in ticks | -7 |
 | `header.params.lg_ipv6` | bool | npt-load | LG reaches RS over IPv6 | -25 |
 | `header.params.quinn_proto_version` | version code | npt-lab | major x 1,000,000 + minor x 1,000 + patch, from the lockfile | -35 |
-| `header.params.reorder_permille` | permille | npt-l1, npt-net | the run's measured reorder share (the `reorder` rule reads it, or the `reorder` event's `permille`) | -3, -58, -20 |
+| `header.params.reorder_permille` | permille | npt-lab (L1, from npt-l1's fate log), npt-net (L2) | the run's measured reorder share, the lower of its two directions (RFC 4737's reordered datagrams per 1000 delivered); `reorder_up_permille` and `reorder_down_permille` beside it (the `reorder` rule reads it, or the `reorder` event's `permille`) | -3, -58, -20 |
 | `header.params.rewind_cap_ticks_count` | count | npt-room | the rewind cap in ticks (test cap or rule cap) | -48, -49 |
 | `header.params.ring_version` | version code | npt-lab | the same for ring | -35 |
 | `header.params.rustls_version` | version code | npt-lab | the same for rustls | -35 |
@@ -340,7 +340,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `second.v.cpu_permille` | permille of the machine | npt-bots, npt-load | V-S, lg-80, PM-0006-13: each LG machine's CPU (< 800) | the room process's share is second.v.proc_cpu_permille (a different quantity) |
 | `tick.v.padded_step_ns` | ns | npt-server | padding: against header.params.padding_target_ns | the same name in PM-0006-14's report |
 | `tick.v.late_count` | count | npt-room | late-zero: sums to 0 | not read by any check (-30 names it in its notes) |
-| `header.params.reorder_permille / event reorder (`permille`)` | permille | npt-l1, npt-net | reorder: above 0 | the same name in the -3, -20, -58 reports |
+| `header.params.reorder_permille / event reorder (`permille`)` | permille | npt-lab (L1), npt-net (L2) | reorder: above 0 | the same name in the -3, -20, -58 reports |
 
 ## Header params the parts select on and the notes name (README §1's `params`)
 
