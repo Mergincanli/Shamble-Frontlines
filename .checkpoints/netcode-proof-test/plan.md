@@ -1,10 +1,11 @@
-# Plan: the netcode proof test (SPIKE_PLAN item 1), revision 3.1
+# Plan: the netcode proof test (SPIKE_PLAN item 1), revision 3.2
 
 - **Change-set:** `netcode-proof-test` · **Branch:** `claude/netcode-proof-test-plan-hcky5g`. This cloud session may push
   only to this `claude/…` branch, so it stands in for `cs/netcode-proof-test` (CLAUDE.md, standing permission).
   **Base:** main `af8393e`.
-- **Date:** 2026-11-06 · **Status:** revision 3.1. **The advisor approved revision 3 with 12 conditions** (C1–C12);
-  they are folded in here, and §0.3 says where. Next is Mustafa's approval. No code until he approves.
+- **Date:** 2026-11-06 · **Status: approved.** The advisor approved revision 3 with 12 conditions (C1–C12), folded in
+  as revision 3.1 (§0.3). **Mustafa approved revision 3.1 on 2026-11-06** and answered the five decisions; revision 3.2
+  records his answers (§0.4) and changes nothing else.
 - **History:**
   - Revision 1 (`786b7d2`): review round 1 returned 49 findings (`review1-findings.md`; mapped in §0.1).
   - Revision 2 (`d8f0712`): review round 2 returned 46 (`review2-findings.md`; mapped in §0.2):
@@ -161,6 +162,33 @@
 | C11 | A fallback after U3 that changes a crate or the transport goes back to the drafts, Mustafa and the advisor; the 90-day certificate needs the advisor's OK too | §8.4; R-2; R-22 |
 | C12 | SAFARI-TIME (b) matches Mustafa's own words; PM-0001-36's cap stays provisional until the Mac reading | §16 |
 | Minor | docs-keeper adds `spikes/` to REPO_MAP at the first build commit; STATUS's stale "PR #38 in flight" line; R-29: if the laptop's address changes mid-run, Mustafa updates `fw-rs` and the session runs `npt-ctl peers` again | §12.3; §12.4 |
+
+
+### 0.4 Mustafa's approval and answers (2026-11-06, his words in short)
+| Item | His answer | What follows |
+|---|---|---|
+| The plan | approved: revision 3.1, with the advisor's 12 conditions | the build starts (U0), and R-PR is opened |
+| ROUTE | (a), on his laptop: an MSI Vector 18 HX AI (Intel Core Ultra 9, RTX 5080), native Windows with PowerShell, not WSL. Browsers: Brave, plus Edge, which comes with Windows; he can install Chrome or Firefox if the plan needs them. Claude Code is installed (the CLI, under his university's Enterprise login); Manual mode for these sessions | see the notes below |
+| SAFARI-TIME | (b): the timed rows re-run when he borrows the Mac for the look proof test | R-14's words; PM-0001-36's cap stays provisional until then |
+| FIXED-IP | (a): keep the two addresses; delete them at the close | §7.3's "once" steps apply; FIXED-IP's line goes into R-PR |
+| DENSITY-FIGURE | (a): a lower bound, provisional until slice 6 | OQ-0006-19's answer goes into R-PR |
+| UNDER-WAY | (a): once the plan is approved and the first build step is committed | the kit freeze lifts, and A4 may start, when U0 is committed |
+| Branches | yes: this session may push `claude/npt-readings` (R-PR) and `claude/npt-safari-wf` (W-PR) | both made in separate worktrees, from main |
+
+**Notes on the laptop** (they change no mark):
+- **It needs Chrome and Firefox:** the laptop legs run Chrome, Edge and Firefox (PM-0001-28 and the rows of §6.3), so
+  Chrome and Firefox, stable, go on the laptop before R1. Their versions are recorded with each run.
+- **Its rough numbers read optimistic:** it stands in for ML, "a typical student laptop with integrated graphics", but
+  its CPU and GPU are far above that. Its rough checks are never judged, and the named laptop re-runs them in R8.
+- **Brave's "Power saving" must really mean the integrated GPU.** If MSI Center offers a GPU switch, it stays in
+  hybrid mode during the rough checks; each run records the WebGPU adapter the browser reports.
+- **Native Windows has no sandbox,** so only his Manual-mode prompts hold (§12.3, recorded). The operator settings
+  carry the PowerShell forms of every deny and ask.
+- **Checks at stop B, because of the university's Enterprise login:**
+  - the laptop session reports its model and effort: Opus 5.5 at `xhigh` must be available under that login (C6);
+  - the guard check shows whether the organisation's managed settings add or override rules.
+- **Where its transcripts go:** the laptop session's transcripts belong to his university's Claude organisation.
+  Nothing secret enters them by design: the private key is never read or printed, and results pass `redact-check`.
 
 ## 1. Item 1: can this session reach the servers over SSH?
 ### 1.1 What was tested (2026-11-05, 21:30–21:45 UTC; each probe once; `ssh-probe.md`)
@@ -1298,7 +1326,7 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
   no single run's OK should surprise him.
 - **At the close:** this plan goes into the report's appendix, and the checkpoint is deleted (CHECKPOINTS.md §9).
 
-### Decisions needed (Mustafa)
+### Decisions needed (Mustafa): all five answered on 2026-11-06 (§0.4)
 1. **ROUTE: how should the hands-on server work run, since this session cannot SSH?**
    - *Why it matters:* every run needs an operator, and the choice sets your time per run and where the SSH key lives.
    - *Options:*

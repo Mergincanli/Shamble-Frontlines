@@ -1,9 +1,9 @@
 # Checkpoint: netcode-proof-test
 - **Goal:** start the netcode proof test (SPIKE_PLAN item 1) as its own change-set; this step is the PLAN only, for the
-  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.1, the advisor's APPROVE with C1-C12 folded in; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
+  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.2: APPROVED by the advisor (C1-C12) and by Mustafa, 2026-11-06; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-06 03:20 Amsterdam
+- **Last update:** 2026-11-06 (after Mustafa's approval) Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -61,16 +61,17 @@
    the ruled table; §16 has five decisions for Mustafa and the two-branch ask.
 
 ## Current step
-10. STOP A: waiting for Mustafa: his answers to ROUTE, SAFARI-TIME, FIXED-IP, DENSITY-FIGURE and UNDER-WAY, his
-    approval of the plan, and his OK (or not) for two more branches (`claude/npt-readings`, `claude/npt-safari-wf`).
+11. After Mustafa's approval (2026-11-06): R-PR on `claude/npt-readings` (worktree `.gate/npt-readings`, from main):
+    engine-architect writes the advisor's exact words into ADR 0001, 0004, 0006 and SPIKE_PLAN; then the gate, the
+    PR, the advisor's review of its head, Mustafa's go. In parallel, U0 (the container probes) in the main folder.
 
 ## Next steps
-1. On Mustafa's approval and answers: write his answers into the plan (and FIXED-IP's line into R-PR if (a)).
-2. R-PR: one docs PR from main with the advisor's exact words (`advisor-verdict.md`), on `claude/npt-readings` if he
-   allows it (else another session); needs-mustafa; merges before the first counted run.
-3. U0: the container probes (rustup 1.99.1 + wasm32, wasm-bindgen CLI, a dated nightly, Chromium, loopback QUIC).
-   Under UNDER-WAY (a) the kit freeze lifts once U0 is committed.
-4. Then U1-U8 (plan §12.1), stop B (plan §12.2), the runs R1-R7, stop C.
+1. R-PR: review the agent's diff in `.gate/npt-readings`, run the gate there, commit, push `claude/npt-readings`, open
+   the PR (needs-mustafa: ADR edits), the advisor reviews its head, then Mustafa's go; no counted run before it merges.
+2. U0: record the container probes in `.checkpoints/netcode-proof-test/u0-probes.md`; commit (UNDER-WAY (a): the kit
+   freeze lifts once U0 is committed).
+3. U1: the `spikes/netcode-proof/` skeleton (plan §12.1).
+4. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
 
 ## Open findings
 - Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
@@ -82,6 +83,11 @@
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
 ## Decisions taken
+- Mustafa, 2026-11-06: plan APPROVED (revision 3.1 with C1-C12). ROUTE (a) on his laptop (MSI Vector 18 HX AI, Core
+  Ultra 9, RTX 5080, native Windows/PowerShell; Brave + Edge, Chrome/Firefox installable; Claude Code CLI on his
+  university's Enterprise login; Manual mode). SAFARI-TIME (b). FIXED-IP (a), deleted at the close. DENSITY-FIGURE (a).
+  UNDER-WAY (a): when the plan is approved and the first build step is committed. Branches `claude/npt-readings` and
+  `claude/npt-safari-wf` allowed.
 - The advisor, 2026-11-06: the plan APPROVED with C1-C12 (folded in); readings ruled as plan §15 shows; R-19 and
   UNDER-WAY escalated to Mustafa; R-PR's exact words in `advisor-verdict.md`.
 - Settled inputs (Mustafa, this session's prompt, 2026-11-05): ADR 0001-0006 and SPIKE_PLAN as merged; P2 = 100 ms
