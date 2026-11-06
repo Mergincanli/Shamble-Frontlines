@@ -34,3 +34,16 @@ Started 2026-11-06 (fresh; no earlier notes file existed when resumed after the 
   not usable under the spike's stable flags, and it does not change the ms tick (unconfirmed: not read in full).
 - Consequence: expected lateness of sleep_until is 0 to about 2 ms (1 ms rounding of the deadline, up to 1 ms more
   from epoll's rounding of the remaining time), so it CANNOT meet 0.25 ms by construction. Measured below.
+
+### F1b. This container's timer facts (NOT RS: a shared 4-vCPU guest, kernel 6.18.44-fc-v242, systemd-detect-virt = docker, cpuinfo flag hypervisor)
+- `/proc/self/timerslack_ns` = 50000 (50 us, Linux's default); per-thread `prctl(PR_SET_TIMERSLACK, 1)` takes effect
+  (PR_GET_TIMERSLACK read back 1 ns in the probe).
+- clocksource = tsc (available: tsc kvm-clock); `clock_getres(CLOCK_MONOTONIC)` = 1 ns.
+- cpuidle current_driver = none, governor menu; haltpoll module parameters present (guest_halt_poll_ns 200000).
+- Probe: source `.checkpoints/netcode-proof-test/u3-timer-probe.rs`, manifest and build
+  `.gate/netcode-proof-test/timer-probe/` (tokio =1.54.1, mio 1.2.4, libc =0.2.191 from the workspace's Cargo.lock
+  copy, built --offline --release). Full run (10,000 waits per cell) started in the background; results to
+  `.gate/netcode-proof-test/timer-probe/results.txt`. A 200-wait smoke run showed: tokio p50 about 1.0-1.5 ms at every
+  delay; thread::sleep p50 70-170 us with p99 up to 570 us; sleep-then-spin(100 us) p50 0.1-75 us but tails above
+  0.25 ms at 10 ms (the coarse sleep itself overshoots the 100 us lead in this VM), so a 1 ms-lead variant (c2) was
+  added to the full run.

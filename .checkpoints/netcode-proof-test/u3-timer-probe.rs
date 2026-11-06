@@ -7,6 +7,7 @@
 //             (b) std::thread::sleep on a dedicated thread (default timer slack),
 //             (b1) the same with this thread's timer slack set to 1 ns (prctl PR_SET_TIMERSLACK)
 //   spinners: (c) std::thread::sleep to 100 us before the due time, then a spin on Instant::now(),
+//             (c2) the same with a 1 ms lead (added: the VM's sleep lateness can exceed 100 us),
 //             (d) (c) on a dedicated release thread, which then wakes a task on the multi-thread runtime through
 //                 tokio::sync::Notify; lateness measured inside the task after it resumes (the quinn poll_recv path)
 // Lateness = Instant::now() at wake - due instant, in ns. Each wait's due = Instant::now() + delay at the wait's start.
@@ -18,6 +19,7 @@ use std::time::{Duration, Instant};
 
 const DELAYS_US: [u64; 6] = [100, 500, 1_000, 2_000, 10_000, 50_000];
 const LEAD: Duration = Duration::from_micros(100);
+const LEAD_1MS: Duration = Duration::from_micros(1_000);
 
 fn cpu_ns() -> u128 {
     // SAFETY: getrusage writes into a zeroed, correctly sized struct; probe code only.
@@ -48,7 +50,11 @@ fn report(mech: &str, delay_us: u64, mut late: Vec<i64>, wall: Duration, cpu: u1
 }
 
 fn spin_until(due: Instant) {
-    if let Some(coarse) = due.checked_sub(LEAD) {
+    spin_until_lead(due, LEAD)
+}
+
+fn spin_until_lead(due: Instant, lead: Duration) {
+    if let Some(coarse) = due.checked_sub(lead) {
         let now = Instant::now();
         if coarse > now {
             std::thread::sleep(coarse - now);
@@ -98,8 +104,9 @@ fn sleepers(n: usize) {
                 let r = unsafe { libc::prctl(libc::PR_SET_TIMERSLACK, s as libc::c_ulong, 0, 0, 0) };
                 assert_eq!(r, 0);
             }
-            let slack_now = std::fs::read_to_string("/proc/thread-self/timerslack_ns").unwrap_or_default();
-            println!("# {mech}: /proc/thread-self/timerslack_ns = {}", slack_now.trim());
+            // SAFETY: PR_GET_TIMERSLACK takes no pointer arguments; probe code only.
+            let slack_now = unsafe { libc::prctl(libc::PR_GET_TIMERSLACK, 0, 0, 0, 0) };
+            println!("# {mech}: PR_GET_TIMERSLACK = {slack_now} ns");
             for &d in &DELAYS_US {
                 let delay = Duration::from_micros(d);
                 let (c0, w0) = (cpu_ns(), Instant::now());
@@ -118,22 +125,24 @@ fn sleepers(n: usize) {
 }
 
 fn spinners(n: usize) {
-    // (c) sleep to due - 100 us, then spin
-    std::thread::spawn(move || {
-        for &d in &DELAYS_US {
-            let delay = Duration::from_micros(d);
-            let (c0, w0) = (cpu_ns(), Instant::now());
-            let mut v = Vec::with_capacity(n);
-            for _ in 0..n {
-                let due = Instant::now() + delay;
-                spin_until(due);
-                v.push(late_ns(due));
+    // (c) sleep to due - 100 us, then spin; (c2) the same with a 1 ms lead
+    for (mech, lead) in [("c_sleep_then_spin_100us", LEAD), ("c2_sleep_then_spin_1ms", LEAD_1MS)] {
+        std::thread::spawn(move || {
+            for &d in &DELAYS_US {
+                let delay = Duration::from_micros(d);
+                let (c0, w0) = (cpu_ns(), Instant::now());
+                let mut v = Vec::with_capacity(n);
+                for _ in 0..n {
+                    let due = Instant::now() + delay;
+                    spin_until_lead(due, lead);
+                    v.push(late_ns(due));
+                }
+                report(mech, d, v, w0.elapsed(), cpu_ns() - c0);
             }
-            report("c_sleep_then_spin_100us", d, v, w0.elapsed(), cpu_ns() - c0);
-        }
-    })
-    .join()
-    .unwrap();
+        })
+        .join()
+        .unwrap();
+    }
     // (d) release thread (c) + Notify -> task on the multi-thread runtime
     let rt = runtime();
     let notify = Arc::new(tokio::sync::Notify::new());
