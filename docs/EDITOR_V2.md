@@ -3,6 +3,9 @@
 Written by Mustafa and the Advisor, October 2026. Status tags as in LOOP_V2.md: `[DECIDED]`, `[DEFAULT]` (stands
 unless Mustafa vetoes), `[OPEN]`, `[LATER]`. Scope: the **map editor only**. The Character Lab and Anim Lab stay as
 they are.
+Updated on 2026-11-05 with Mustafa's editor decisions: §3's block dated 2026-11-05, and the pointers to it.
+
+Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.
 
 ## 1. Why rebuild
 - Today, every edit and every undo rebuilds the whole map. That is slow, it leaks, and objects lose their identity
@@ -21,7 +24,8 @@ they are.
    own 3D object, and whatever is removed is disposed. Shared materials and textures are cached and reused, never
    rebuilt per edit.
 4. **Edit mode shows real, unmerged objects.** Static merging happens only when you press Test, and in the game.
-   Repeated objects (trees, props) may use instancing to stay fast.
+   Repeated objects (trees, props) may use instancing to stay fast. (Mustafa's tool order (2) bears on it: §3, Decided
+   2026-11-05.)
 5. **The document layer knows nothing about THREE or the page**, so it can be tested in Node: commands, undo/redo,
    save/load, validation.
 
@@ -29,7 +33,8 @@ they are.
 - `[DECIDED]` **Parity:** everything the current map editor does that Mustafa marks "keep" in the inventory (§6, step 1).
 - `[DEFAULT]` New:
   - **Select and transform:** click to select, multi-select, a move/rotate gizmo plus a numeric inspector. Snapping to
-    the grid and to 15° / 45° / 90°. Copy, paste, duplicate, delete.
+    the grid and to 15° / 45° / 90°. Copy, paste, duplicate, delete. (Mustafa decided each object's width, length,
+    height and how high it sits, and primitives that snap to gameplay sizes: §3, Decided 2026-11-05.)
   - **Verticality:** plateaus, ramps, cliff edges and drop-downs. Height is read through brightness, as in the greybox
     rule. Layers can be shown and hidden.
   - **Three-team symmetry:** build one third of the map and it is mirrored live to the other two at 120°. Bases are
@@ -37,9 +42,42 @@ they are.
   - **Objectives as data:** spawns, barracks and terminals, harvest fields (the centre and the safe ones), uplink sites,
     cache spawn points.
   - **Validation panel:** bot reachability (every spawn to every goal), the 6 m gap rule, a symmetry check, and budgets
-    (object count, draw calls when merged).
-  - **Test:** play the map with bots instantly, then return to the editor exactly where you were.
+    (object count, draw calls when merged). (Mustafa's tool order (3) to (5), heatmaps, the fairness panel and
+    sightline checks: §3, Decided 2026-11-05.)
+  - **Test:** play the map with bots instantly, then return to the editor exactly where you were. (Mustafa's tool order
+    (2), play instantly: §3, Decided 2026-11-05.)
 - `[LATER]` Enterable structures (interiors), terrain sculpting beyond plateaus and ramps, a prefab library v2.
+  (Mustafa decided instances (stamps): §3, Decided 2026-11-05.)
+- **Decided 2026-11-05 (Mustafa, after his talk with the Advisor).** His editor decisions, in his order and in his own
+  words, with his marks; the plan view (his B.1 of 2026-11-03) sits after the views line, with its own date:
+  - `[DECIDED]` Decided, the tool order: (1) greybox now, art later: you build with blocks, and the same layout swaps to
+    real art with one switch, like modular kits; (2) play instantly: one key drops you in at the cursor with bots, and
+    you can keep editing while the match runs; (3) bot test runs with heatmaps (where fights and deaths happen, how long
+    each team needs to reach each objective); (4) a fairness panel (each team's distance and time to every objective
+    under 120° mirroring); (5) sightline checks from the game camera, last, as a balancing tool.
+  - `[DECIDED]` Decided: all the basic primitives (cube, sphere, cylinder, plane and the like), with one consistent
+    scale across the engine. Principles: 1 unit = 1 metre; textures tile in world space (they repeat per metre and never
+    stretch); primitives snap to gameplay sizes (exact numbers later, once they can be tested in the editor).
+  - `[DECIDED]` Decided: every object has width, length and height, set with drag handles or typed numbers, plus how
+    high it sits. The old editor lacked this.
+  - `[DECIDED]` Decided: the plan view looks straight down, flat (orthographic, like a blueprint); the 3D view flies
+    freely; one key shows the real game camera angle.
+  - `[DECIDED]` **Mustafa, 2026-11-03 (his B.1):** "Plan view: draw to build". Two views of the same map document side
+    by side: a top-down plan where you draw outlines on a grid (lines, rectangles, hexagons, octagons, free polygons),
+    and the 3D scene, which builds itself live from the drawing. A drawn outline is a footprint with a height and a kind
+    (wall, building, floor, cover, ramp, zone); the kind decides what it becomes, e.g. a building footprint becomes a
+    building-kit house with floors and a roof. Anything can be moved, rescaled and reshaped in either view; both stay in
+    sync because both read the same document. Works with three-team mirroring (draw in one third; the others follow at
+    120°) and with floors. Precedents: Hammer's 2D views, Doom-style sector editors, SketchUp's push-pull. Built with
+    Editor v2 (slice 5); no code now.
+  - `[DECIDED]` Decided: trace sketches (a photo of a paper sketch under the plan view, to draw over); sticky notes on
+    the map; snapshots, kept lightweight (they store only what changed).
+  - `[DECIDED]` Decided, lower priority: a travel-time ruler showing metres and seconds, using the game's own movement
+    data for soldiers, vehicles and leapers.
+  - `[DECIDED]` Decided: instances (stamps) are an optional, top-level feature with three edit levels: all copies; a
+    tagged group (e.g. "room A") for variations and art passes; one copy as an override (like Unity's prefab variants
+    and overrides). A stamp can also be a plain, unlinked copy.
+  - `[DECIDED]` Principle: a lean, solid editor, planned and built with the same care as the game; no bloat.
 
 ## 4. Quality bars `[DEFAULT]`
 - Smooth with the full Cabana map loaded, on Mustafa's laptop.
@@ -64,3 +102,6 @@ they are.
    5. Verticality.
    6. Symmetry and objectives.
    7. Validation and Test.
+
+Mustafa's tool order (§3, Decided 2026-11-05) ranks the tools; the architecture plan (step 2) maps it onto these
+slices, for his approval.
