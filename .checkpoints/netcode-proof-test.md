@@ -1,9 +1,9 @@
 # Checkpoint: netcode-proof-test
 - **Goal:** start the netcode proof test (SPIKE_PLAN item 1) as its own change-set; this step is the PLAN only, for the
-  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 2; revision 1 is 786b7d2)
+  advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3; revision 1 is 786b7d2, revision 2 d8f0712)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-06 02:50 Amsterdam
+- **Last update:** 2026-11-06 03:25 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -44,17 +44,24 @@
    blocks breaks the time-of-day rule; the day's addresses cannot sit in the hashed cloud-config; RS has no key to
    drive LG). Both OQ-0006-16 deciders agree with §8.1's ports, with small conditions. Compact copy:
    `.checkpoints/netcode-proof-test/review2-findings.md`.
+7. Plan revision 3 · this commit · 1,299 lines; §0.2 maps all 46 round-2 findings to their fixes. Main changes: the
+   laptop session's settings rewritten to what holds (Manual mode prompts as the wall; `node .gate/*` denied; fixed,
+   hashed settings copy; worktree checks; orphan results branch); Safari dispatched on the change-set branch with no
+   commit input and no cache; per-slot control sockets with SO_PEERCRED under systemd units; RS-to-LG restricted key;
+   `npt-ctl peers` and `npt-cert issue/revoke` wrappers; channels in Link and the endpoint; the WebSocket loss and
+   stall model; the limiter's queue depths; both command-timing options before the rule cap; density order fixed;
+   hours table adding to 75 RS-h (177 LG-h, EUR 13.51 planned, caps EUR 14.90); readings R-1..R-29.
 
 ## Current step
-7. Plan revision 3: every round-2 finding addressed (46: security-auditor 15, netcode-architect 16, infra-engineer
-   15), with a §0.2 table mapping each to its fix; then the advisor's plan review.
+8. The advisor's plan review of revision 3 (advisor agent, xhigh): APPROVE / REVISE / ESCALATE, with its rulings on
+   R-1..R-29. Notes: `.checkpoints/netcode-proof-test/advisor-plan-review.md`.
 
 ## Next steps
 5. Fix, then the advisor's plan review (APPROVE / REVISE / ESCALATE); iterate on REVISE.
 6. Push, open the draft PR, report to Mustafa (Decisions needed, For Mustafa).
 
 ## Open findings
-- Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: being fixed in revision 3 (§0.2).
+- Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2); the advisor checks the plan next.
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include

@@ -634,8 +634,9 @@ Key:
   creates them twice instead of six times.
 - **Cap:** a run's cap is its planned hours plus one spare hour per VM, at those prices, rounded up to the next
   EUR 0.10.
-- **Planning check** (PM-0006-18, arithmetic shown): 72 RS-hours × 0.1386 = 9.9792, plus 171 LG-hours × 0.0176 =
-  3.0096, so **EUR 12.99**. The caps add up to EUR 14.50.
+- **Planning check** (PM-0006-18, arithmetic shown): 75 RS-hours × 0.1386 = 10.395, plus 177 LG-hours × 0.0176 =
+  3.1152, so **EUR 13.51**. The caps add up to EUR 14.90. With FIXED-IP (a), add EUR 1.00 for each month the two
+  addresses are kept.
 - **Against the drafts, part by part** (infra INF2-6; the drafts estimate 38 to 53 RS-hours, ADR 0006:1107-1113):
 
 | Part | RS-hours | Where |
@@ -664,9 +665,6 @@ Key:
 | R7 the human run (VS7) | bring-up 0.9; L2 probe 0.2; -49's rule-cap run and the Chrome honest-rewind check 0.7; the ML\* legs about 5.3 (-44's 12 runs of 10 min take 2.0 of it); then his checklist 1.0 → 8.1, to 9 | present for the checklist, about 1.5 h at the end | RS + 1 LG | 9 | 9 | 1.41 | 1.60 |
 | **Total** | | | | **75** | **177** | **13.51** | **14.90** |
 | R8 later (own change-set) | the named-machine re-run; the Mac if SAFARI-TIME (b) | present | RS + 1 LG | 3 | 3 | 0.47 | 0.70 |
-
-**Planning check** (PM-0006-18, arithmetic shown): 75 RS-hours × 0.1386 = 10.395, plus 177 LG-hours × 0.0176 = 3.1152,
-so EUR 13.51. With FIXED-IP (a), add EUR 1.00 for each month the two addresses are kept.
 
 **Density's time-of-day rule** (infra INF2-1; ADR 0006:1314-1316, 1352). Each mark gets three starts, at least 6 h
 apart, and one session wholly inside 18:00 to 23:00 Amsterdam:
@@ -1049,8 +1047,9 @@ outside every range.
 
 ## 11. Mustafa's checks
 1. **R1, the five-browser smoke check (about 10 minutes).**
-   - In Brave, in a separate profile (not his everyday one), open the link the laptop session prints:
-     `https://rs.nt.shamblefrontlines.com:31000/?smoke=1#cap=…` (the capability sits in the fragment). Expect
+   - In Brave, in a separate profile with no extensions and no Sync, open the link the laptop session shows:
+     `https://rs.nt.shamblefrontlines.com:31000/?smoke=1#cap=…`. Type it from the laptop's screen, or open it from a
+     file on a USB stick; never send it through chat, email, GitHub or a synced clipboard (§10.3). Expect
      "WebTransport · Playing" within 3 s, and Brave's version on the page.
    - The same link with `&transport=ws`: expect "WebSocket · Playing".
    - The laptop session repeats both in Chrome, Edge and Firefox.
@@ -1061,9 +1060,14 @@ outside every range.
 3. **R7, the netcode checklist (PM-0001-53; about 60 minutes).** test-engineer writes it into
    `ops/checklists/netcode.md` from ADR 0001:1631-1681, and the advisor checks it before R7.
    - 14 steps, mostly at P2: step 2 runs at P0, step 12 at P3 and P4, step 13 over WebSocket.
+   - At the start: his base round trip (10 s of pings) is measured and recorded, and -3's 100 ± 5 ms check runs on his
+     PC.
+   - The rewind cap is set over the socket before step 1 and shown read-only (R-28). The command-timing option and
+     the cap in force are named on the overlay.
    - 47 bots, Mustafa in the 48th slot, plus the target course.
    - The overlay shows the profile, the transport, the server-measured round trip, the interpolation delay, the rewind
-     cap and the counters.
+     cap and four counters: corrections, snaps, extrapolated frames and clipped shots. The clipped-shot count is logged
+     for steps 7 and 10.
    - He records each step in the page's form, which uses the capability.
    - The mark passes when every step is "achieved". Step 7 needs the rule cap that R3's honest-rewind runs set.
 4. **After the last run, the operations checklist, step 2 (PM-0006-18).** Read the project's costs: one amount before
@@ -1076,14 +1080,14 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 | Unit | Size | Content |
 |---|---|---|
 | U0 | S | Container probes, each recorded: rustup 1.99.1 with the wasm32 target; the wasm-bindgen CLI at `Cargo.lock`'s version; a dated nightly for cargo-fuzz; Chromium for local rough checks; a WebTransport session over loopback QUIC |
-| U1 | S | The skeleton: the workspace, pins, `deny.toml`, the clippy configs, npt-log, `marks.json`, npt-judge with its PASS, FAIL and INVALID fixtures, the dependency-rule checks (§4.2); clippy and the wasm32 check from here on; the message catalogue (netcode-architect drafts it) |
+| U1 | S | The skeleton: the workspace, pins, `deny.toml`, the clippy configs, npt-log, `marks.json`, npt-judge with its PASS, FAIL and INVALID fixtures (one of them PM-0006-14's short padding), the dependency-rule checks (§4.2); clippy and the wasm32 check from here on; the message catalogue with its class column, and its class audit test (netcode-architect drafts it); `redact-check` |
 | U2 | M | npt-l1 with its unit and property tests; PM-0001-3's L1 half and its bites |
-| U3 | S | R5-TEST-OQ2 on loopback: each WebTransport crate on a custom quinn endpoint over `ImpairSocket`; the WebSocket `DelayStream`. This fixes L2's shape; if neither crate allows it, stop (R-22) |
+| U3 | S | R5-TEST-OQ2 on loopback: each WebTransport crate on a custom quinn endpoint over `ImpairSocket`; the WebSocket `DelayStream` with E15's loss and stall model, its stall count checked at P2; the retransmission-timeout floor verified. This fixes L2's shape; if neither crate allows it, stop (R-22) |
 | U4 | M | npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner; `due_ticks` with PM-0004-67's bites on a fake clock; the Node-hosted native-against-Wasm hash test (§4.5); then the L1 row groups with their bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); bursts (-18); stand-ins (-54, -55); -30 on loopback |
 | U5 | S | Fuzzing (-34); the dependency and swap checks (-35); the audits (§4.8) |
-| U6 | M | npt-server, npt-net, npt-super and npt-host: both WebTransport crates and WebSocket with L2 on loopback; the control socket and capabilities; the roster; interest under load; instrumentation; metrics and logs; the ACME client's profile check |
+| U6 | M | npt-server, npt-net, npt-super and npt-host: both WebTransport crates and WebSocket with L2 on loopback; the per-slot control sockets with their peer check, the systemd units and the capabilities; the roster and tokens; interest under load; instrumentation; metrics and logs; instant-acme's profile and revocation calls; the `npt-ctl` and `npt-cert` wrappers |
 | U7 | M | npt-client-wasm and the harness (E7); the browser smoke in local Chromium; the hash check in Chromium |
-| U8 | S | The run package: cloud-init files (32 KiB check), firewall lists, R1's run plan, the operator `settings.json`, `rules.md` and `redact-check`, the WebdriverIO specs, the netcode checklist (test-engineer), W-PR's workflow file |
+| U8 | S | The run package: cloud-init files (32 KiB check), firewall lists, R1's run plan, the operator `settings.json` and `rules.md`, the pre-push hook, the sudo wrapper list, the WebdriverIO specs, the netcode checklist (test-engineer), W-PR's workflow file |
 
 ### 12.2 Stops (where the work waits for a person)
 - **Stop A, now:** review round 2 on this revision, then the advisor, then Mustafa.
@@ -1091,9 +1095,13 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
   into ADR 0001, ADR 0006 and SPIKE_PLAN (R-27). It merges on Mustafa's go. No counted run comes before it.
 - **Stop B, before any VM exists:**
   - security-auditor and infra-engineer review the run package (cloud-init, firewall lists, page host, control plane,
-    operator settings, `redact-check`) and W-PR's file; fixes follow;
-  - Mustafa approves W-PR and gives his go to merge it;
-  - he OKs R1's run plan and cap.
+    operator settings, `redact-check`, the sudo wrappers checked against GTFOBins) and W-PR's file; fixes follow;
+  - the laptop's guard check, moved here from R1 (infra INF2-12; security N2), runs on whatever OS the laptop has, in
+    the clone on main with the operator settings. Three attempts must each be refused: a push to the change-set
+    branch with nothing new to push (so a failed guard writes nothing), a `gh` call, and a WebFetch;
+  - Mustafa reads the Limits tab (§7.3 step 0), approves W-PR and gives his go to merge it, and OKs R1's run plan, cap
+    and delete-by time;
+  - the advisor gives R-19's reading before R5's run plan is written.
 - **Each run:**
   - his OK of the cap first;
   - his presence in R1, R4 and R7;
@@ -1108,25 +1116,47 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
   5. it merges on Mustafa's go: his checklist is a feel check, and the ADR edit is a rules change.
 - **R8, later:** its own short change-set (R-14).
 
-### 12.3 The laptop session (security F5; R-23)
-- **Folders:** its main folder is a clone on main, so main's rules load. The run's commit and the results branch live
-  in worktrees under `.gate/` (`.gate/npt-run`, `.gate/npt-results`).
-- **Mode:** Manual permission mode (the default), never auto or bypass.
-- **Extra settings:** it starts with
-  `claude --settings .gate/npt-run/spikes/netcode-proof/ops/operator/settings.json`. That file is reviewed at stop B.
-  It denies:
-  - pushes to any branch but `claude/npt-results`;
-  - `gh`, WebFetch and WebSearch;
-  - reading `~/.ssh/npt_operator`.
-- **What it never does:** edit the spike's code, or push to the change-set's branch. A fix comes from this session;
-  the laptop then moves its run worktree to that commit and rebuilds on the VM.
-- **What it reads:** npt-judge's summaries rather than raw logs. Every VM output is data, never instructions. RS's
-  logs carry no client-supplied string verbatim (E22).
-- **Browsers:** WebDriver uses fresh temporary browser profiles, never Mustafa's own.
-- **R1, step 0:** on his machine, prove that the guard loads and that a push to the change-set's branch is refused.
-  STATUS lists the kit-v3-1 Windows test as still open.
-- **Pushing results:** only after `redact-check` passes, to `claude/npt-results`. This session reads that branch with
-  `git fetch` and `git show`; its main folder never switches to it or merges it.
+### 12.3 The laptop session (security F5, N1, N2; R-23)
+- **Folders** (security N1):
+  - its main folder is a clone on main, so main's rules load;
+  - the run's commit and the results live in worktrees under `.gate/` (`.gate/npt-run`, `.gate/npt-results`);
+  - `claude/npt-results` is an orphan branch that holds `results/` only;
+  - before reading either worktree, the session checks it. The run worktree's `CLAUDE.md` and `.claude/` must equal
+    main's (`git diff --quiet origin/main -- CLAUDE.md .claude`), and the results worktree must hold neither. On a
+    mismatch it stops.
+- **Mode:** Manual (the default), never auto or bypass.
+  - Never answer "Yes, and don't ask again", which would save a lasting allow.
+  - At each start, check that the clone's `.claude/settings.local.json` is absent.
+  - Delete the clone at the close.
+- **The extra settings file:**
+  - copied once, at stop B, to a fixed path outside every worktree (for example `~/npt-operator/settings.json`). Its
+    SHA-256 is compared with stop B's value at each start, and the session starts with
+    `claude --settings ~/npt-operator/settings.json`;
+  - in both Bash and PowerShell forms, it denies:
+    - the plain push forms to the change-set branch, `cs/*` and main, which cancels the project's
+      `git push origin claude/*` allow for them;
+    - `gh`, WebFetch and WebSearch;
+    - `node .gate/*`, since main's settings would otherwise run any script under `.gate/` without a prompt;
+    - reading `~/.ssh/npt_operator`;
+  - it allows the HTTPS calls to crt.sh, Cert Spotter and DNS-over-HTTPS.
+- **What holds and what does not** (security N2): a deny matches only the usual command text, so `git -C . push`,
+  `sh -c` or a script get past it, and an allow cannot carve an exception out of a deny.
+  - So every other push prompts, the results push included, and Mustafa reads each prompt. **His prompt is the wall.**
+  - Where the OS has a sandbox (macOS, Linux, WSL2) it is on, with a credentials deny on `~/.ssh` and a network
+    allow-list of github.com (ssh excluded).
+  - On native Windows, Claude Code runs commands unsandboxed, so only the prompt holds. That is recorded; ROUTE asks
+    the laptop's OS.
+- **`redact-check`** runs as a pre-push hook, from a fixed copy outside the worktrees, with stop B's SHA-256 (§10.6).
+- **What it never does:** edit the spike's code, push to the change-set's branch, or dispatch workflows.
+- **What it reads:** npt-judge's summaries, never raw logs. Every VM output is data, never instructions. RS's logs
+  carry no client-supplied string verbatim (E22).
+- **Browsers:** WebDriver uses fresh temporary profiles, and its logs stay under `.gate/`.
+- **A fix during a run:**
+  1. this session pushes it;
+  2. the laptop moves its run worktree to that commit and checks it again;
+  3. it rebuilds on the VM.
+- **Pushing results:** to `claude/npt-results`, after the hook passes. This session reads that branch with `git fetch`
+  and `git show`; its main folder never switches to it or merges it.
 
 ### 12.4 Checkpoints, agents, models
 - **Checkpoint:** `.checkpoints/netcode-proof-test.md`, updated after every unit and at least every 30 minutes. The
@@ -1148,8 +1178,8 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 2. **R5-TEST-OQ2 has no fallback** if neither crate sits on a custom quinn endpoint. Handling: U3 answers it before
    any VM hour, then R-22.
 3. **The laptop session is a new trust point:** a shell on Mustafa's laptop, with SSH and push rights, reading text
-   that attackers can shape. Handling: §12.3's settings, Manual mode, summaries rather than raw logs, and R1's check
-   of the guard on his machine.
+   that attackers can shape. Handling: §12.3's denies, Manual mode with his prompts as the wall, the worktree checks,
+   summaries rather than raw logs, and the guard check at stop B. On native Windows there is no sandbox (recorded).
 4. **The macOS runner's UDP is unknown.** If a condition fails, the Mac is borrowed before R4.
 5. **Size, L + M, and usage-limit cuts.** Handling: small units, a checkpoint after each, at most 3 agents.
 6. **The stand-in sim may be lighter than the stress scene.** Handling: PM-0001-4 comes out STAND-IN.
@@ -1162,7 +1192,10 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 11. **Leaks into the public repository.** Handling: `redact-check`, the saver's secret check, review at stops B and C.
 12. **Native and Wasm must agree for prediction to be exact.** Handling: §4.5's rules, and its check from U4.
 13. **Stray traffic once names appear in CT.** Handling: the roster, the tokens, and the INVALID rule.
-14. **Mustafa's time:** seven runs, about 15 minutes of console work each, and his presence in R1, R4 and R7.
+14. **Mustafa's time:** seven runs, about 15 minutes of console work each, his presence in R1, R4 and R7, and two late
+    teardowns on the density days (or overnight VMs instead).
+15. **Account limits:** RS plus up to five CAX21s and two Primary IPs may exceed a new project's limits. Handling: he
+    reads the Limits tab at stop B.
 
 ## 14. Reviewers
 - **Plan round 1 (done):** security-auditor, engine-architect, the verifier.
@@ -1176,36 +1209,38 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
   3. infra-engineer, then the verifier.
 - **Not called:** art-director and graphics-engineer (not the look); game-designer (no rules or balance).
 
-## 15. Readings and choices for the advisor (none settled until the advisor rules; "→ R-PR" marks those that change a number or setup)
+## 15. Readings and choices for the advisor (none settled until the advisor rules; "→ R-PR" marks those that change a number or setup, per netcode-architect's split in round 2)
 | # | Question | Recommendation |
 |---|---|---|
-| R-1 | PORTS (OQ-0006-16): §8.1's numbers, this plan's change to infra-engineer's proposal | confirm once both deciders agree in round 2 |
-| R-2 | CERT: http-01 on RS with §8.4's conditions | approve (security-auditor approved it in round 1, with those conditions) |
-| R-3 | METRICS path: scrape on TCP 9100, bound to RS's public IPv4, LG's address the only source in both walls | scrape |
-| R-4 | HOST KEYS: §1.6 | approve (security-auditor's method) |
-| R-5 | REORDER, per stream: inputs never reorder at P2 or P3 under half-split uniform jitter (one-way ranges 20 ms and 30 ms, below the 33.33 ms spacing; P4: 1.39 % of adjacent pairs). Snapshot groups split within a tick, and pings, may. So -20's presses and -58's wraps cannot count as written | an explicit L1 reorder step on the input stream for those two rows (swap 1 % of adjacent input datagrams per direction, recorded beside the profile), plus a recorded P4 run; every run records each stream's share → R-PR |
-| R-6 | PACKETS: PM-0001-3 says 100,000; PM-0002-49 says 1,000,000, since 100,000 fails a correct simulator about 1 seed in 9 at P1 | 1,000,000 on both layers; on L2 a dedicated probe flow at 10,000 packets per second per direction, not game traffic (about 100 s per profile, about 10 minutes per L2 block) → R-PR |
+| R-1 | PORTS (OQ-0006-16): §8.1's numbers | confirm: both deciders agree (round 2). Their conditions: each run header logs the ports each slot used; a PM-0006-14 search that reaches 32 rooms records "32 or more" and stops; -29's attempt from a TCP-443-only network is reported as "page and fallback both unreachable on non-443 TCP"; TCP 31000 is written into OQ-0006-16 as "the spike's page host, never a room slot"; PM-0006-15's closed-port probes hit both edges of each range (UDP 30000 and 30033, TCP 30999 and 31033); the metrics label "room slot" ranges 0–31 in the search runs (ADR 0006 says 0–7) → R-PR |
+| R-2 | CERT | approve with §8.4's conditions (security-auditor approved in both rounds) |
+| R-3 | METRICS path | scrape, with the exporter bound to RS's public IPv4 and `metrics_src` filled at bring-up |
+| R-4 | HOST KEYS: §1.6 | approve: security-auditor's method, with LG's first-use trust stated |
+| R-5 | REORDER, per flow: inputs (upstream) never reorder at P2 or P3; snapshot groups split within a tick, and pings, may | an explicit reorder step in both directions (swap 1 % of adjacent datagrams per flow: inputs upstream, snapshot datagrams downstream), in L1 and in `ImpairSocket` for -20's L2 leg, recorded beside the profile; for those rows each stream's share must be above 0; plus a recorded P4 run → R-PR |
+| R-6 | PACKETS: 100,000 (PM-0001-3) or 1,000,000 (PM-0002-49) | 1,000,000 on both layers; on L2 a dedicated probe on a free slot port with its own `ImpairSocket`, at 10,000 packets per second per direction (about 100 s per profile, about 10 minutes per L2 block), one-way delays stamped on RS's clock → R-PR |
 | R-7 | LOOPBACK: -28's "same local network" | the server on the browsers' own machine, page on localhost, that server's Origin list localhost only |
-| R-8 | X86 REPLAY: "CI's x86-64 runner" | this container or RS; no CI job |
-| R-9 | L2 DELAY (PM-0001-3) | (profile RTT − base RTT) ÷ 2 per direction → R-PR |
-| R-10 | COVER: OQ-0001-9's cover half | one recorded item under -56: honest-rewind runs with a destructible-wall stand-in and a moving vehicle stand-in as cover, the "hit after cover" share recorded → R-PR |
-| R-11 | STAND-INS meet -54's and -55's conditions | yes; both rows run → R-PR |
-| R-12 | BITES: rows without one, and bite length | test-engineer digest F's proposals plus: -18 (a baseline that never falls back), -36 (the size read once), -55 (vehicle collision that snaps), PM-0006-11 (a header without the SMT map), -14 (short padding must come out INVALID), -26 (a rotation that closes live sessions); PM-0004-67 keeps its draft bite (timer-period counting) and gains two (an uncapped catch-up; an uncounted drop); memory and queue marks bite over a full S30 → R-PR |
-| R-13 | RUNNER LIST: Safari's count rows -32, PM-0006-25, -26, -27 | add them → R-PR (SPIKE_PLAN's text) |
+| R-8 | X86 REPLAY | this container or RS; no CI job |
+| R-9 | L2 DELAY | (profile RTT − base RTT) ÷ 2 per direction; this only reads ADR 0001:1513, so no R-PR |
+| R-10 | COVER: OQ-0001-9's cover half | per item (a destructible-wall stand-in, a moving vehicle stand-in, the doors), honest-rewind shots run twice: cover at its present state and cover rewound. Recorded per option: the share of hits after the victim reached cover, and the share of on-target shots blocked by cover that moved after the shooter saw it. netcode-architect picks with Mustafa at the close, unless the advisor states a rule; L1 only → R-PR |
+| R-11 | STAND-INS meet -54's and -55's conditions | yes; this only reads the draft, so no R-PR; -54's per-kind result is recorded as coming from stand-in kinds, which PM-0004-73 checks again |
+| R-12 | BITES | test-engineer digest F's proposals, plus: PM-0001-18 (a baseline that never falls back), PM-0001-36 (the size read once), PM-0001-55 (vehicle collision that snaps), PM-0006-11 (a header without the SMT map), PM-0006-26 (a rotation that closes live sessions). PM-0004-67 keeps its draft bite (timer-period counting) and gains two (an uncapped catch-up; an uncounted drop). PM-0006-14 is reported with no pass number, so it gets no bite; npt-judge's fixtures prove that short padding comes out INVALID. Memory and queue marks bite over a full S30 → R-PR |
+| R-13 | RUNNER LIST: add Safari's count rows -32, PM-0006-25, -26, -27 | add them → R-PR |
 | R-14 | CLOSE in two steps | this PR merges with the named-machine rows pending; R8 judges them; migration step 1 waits for R8 |
-| R-15 | PM-0004-67's validity and runs | V-S applies; the jitter read from the 3 S30 runs; the stall runs separate → R-PR |
+| R-15 | PM-0004-67's validity and runs | V-S applies; the jitter is read from the first 36,000 measured ticks of each S30 (the mark's own count); the 200 ms and 1 s stalls run in 3 separate runs, far apart → R-PR for the split only |
 | R-16 | -59's random tick | within the first 5 minutes after warm-up, in its own S30 room → R-PR |
-| R-17 | SIMULATOR GAPS | the jitter band compares the one-way delay's standard deviation with the uniform's (half-range ÷ √3); B1 cuts both directions; the rate limiter is drop-tail with one snapshot interval of queue; duplication 0 % → R-PR |
-| R-18 | (a) the page host on TCP 31000 inside part 5's one TCP range; (b) LG's list is checked against `ops/firewall/lg.txt`, since part 5 has no LG role | (a) yes, or record it as a rule outside part 5; (b) yes |
-| R-19 | OQ-0006-19's reading, due before the density runs | the advisor gives it at stop B, before R5 |
-| R-20 | R2-XU-OQ7: listed as decided here, no rule found | name its rule, or take it off the list |
-| R-21 | ADDRESSES | the VMs' IPv4 and IPv6 with the date, yes; never the operator's; enforced by `redact-check` |
+| R-17 | SIMULATOR GAPS | reads only, no change: the jitter band as the one-way delay's standard deviation against the uniform's; B1 cutting both directions; 0 % duplication. Changed: the queue depths, at least 4 full datagrams (about 4.1 KB) for -23, and for -24 200 ms at the bottleneck rate and at least 4 datagrams, both in the run header → R-PR for the depths |
+| R-18 | (a) the page host on TCP 31000 inside part 5's TCP range; (b) LG's list against `ops/firewall/lg.txt` | (a) yes, recorded in R-PR as a spike-only rule inside the TCP range; (b) yes, every extra CAX21 on `fw-lg` |
+| R-19 | OQ-0006-19's reading | the advisor gives it before R5's run plan is written (option (a)'s pad caps k at about 15 rooms) |
+| R-20 | R2-XU-OQ7's rule | it is PM-0001-7's two halves (ADR 0001:1821, 1888): it stays on the list, confirmed by -7; no R-PR |
+| R-21 | ADDRESSES | the VMs' addresses with the date, yes; never the operator's; enforced by `redact-check` in both sessions |
 | R-22 | L2 FALLBACK, if U3 fails | decided when U3 reports; any option stays below `Link` |
 | R-23 | TWO SESSIONS | yes, with §12.3's conditions |
 | R-24 | BROWSER PIN | that browser's other WebTransport rows use the 6-day certificate on UDP, recorded; PM-0006-25 to -27 fail for it; never a browser flag or a custom root |
-| R-25 | WS DELAY: ADR 0001:1444-1445's "delaying TCP proxy" | built as a delaying stream wrapper inside npt-server's accept path, so the room sees real source addresses and keeps its deadlines and caps → R-PR |
-| R-26 | DENSITY DAYS: may the three times of day share one VM set kept up all day? | yes: rooms stopped between blocks; each block keeps its own bracket B and validity; "session" read as a measurement session → R-PR |
-| R-27 | R-PR: how a reading that changes a number or setup reaches the drafts (ADR 0001:1603-1604; verifier F9) | one small docs PR right after this plan's approval, merged on Mustafa's go before the first counted run; alternatively the advisor rules that a reading recorded in the run records meets 1603-1604 |
+| R-25 | WS DELAY: ADR 0001:1444-1445's "delaying TCP proxy" | the delaying stream wrapper with E15's loss and stall model; the Join deadline runs from TCP accept; the bytes buffered per connection are capped and counted, with the message size limit applied before buffering → R-PR (the wording and the model's values) |
+| R-26 | DENSITY DAYS: one VM set kept up all day | yes, with §7.2's order, the delete-by times, the CPU model re-read in every block, and the results saying that each N's sessions shared one host → R-PR (ADR 0006's meaning of "session") |
+| R-27 | R-PR | one small docs PR right after approval, merged on Mustafa's go before the first counted run |
+| R-28 | THE CAP ON THE OVERLAY: ADR 0001's checklist changes "profile and cap" from the overlay | the cap is set over the socket before step 1 and shown read-only; the profile stays an overlay control → R-PR (wording) |
+| R-29 | SSH'S SECOND WALL: the cloud-config holds no address, so nftables would accept TCP 22 from any source | `npt-ctl peers` also writes the operator's /32 into nftables, read on the VM from the SSH connection itself, never written to results; security-auditor confirms at stop B. The fallback is the Hetzner firewall plus sshd's key-only rules |
 
 ## 16. Queue, decisions and asks
 - **Queue:** STATUS (2026-11-05) names the netcode proof test as the next v2 work. B.1 and B.2 (docs) touch other
@@ -1217,14 +1252,16 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 1. **ROUTE: how should the hands-on server work run, since this session cannot SSH?**
    - *Why it matters:* every run needs an operator, and the choice sets your time per run and where the SSH key lives.
    - *Options:*
-     - (a) the hybrid: cloud-init builds each VM, and Claude Code on your laptop runs the sessions over SSH, with a
-       key made there and a reviewed settings file of its own;
+     - (a) the hybrid: cloud-init builds each VM, and Claude Code on your laptop runs the sessions over SSH, with a key
+       made there, a fixed settings file of its own, and your prompts as the last wall;
      - (b) cloud-init only: the VMs run fixed scripts and publish results over HTTPS. There is no SSH and no fixing in
        place, and LG gets a results server;
      - (c) Claude Code on your machine only, without cloud-init.
-   - *Also:* which machine runs that session (the laptop, where the minimum-laptop browser legs run, or your PC), and
-     three facts the plan assumes: the laptop's operating system, which browsers it has, and whether Claude Code is
-     installed on it.
+   - *Also:*
+     - which machine runs that session: the laptop, where the minimum-laptop browser legs run, or your PC;
+     - the laptop's operating system, which browsers it has, and whether Claude Code is installed on it;
+     - on native Windows, Claude Code has no sandbox, so only your prompts hold. That is recorded, unless you already
+       use WSL2.
    - *Recommendation:* (a), on the laptop.
 2. **SAFARI-TIME: when do Safari's timed rows run?**
    - *What:* the runner may stand in only for yes-or-no and count rows. The 3-second fallback (PM-0001-29), the
@@ -1237,11 +1274,13 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
        before the foundation waits on them.
    - *Recommendation:* (b).
 3. **FIXED-IP: keep two fixed addresses for the test machines?**
-   - *What:* two Primary IPv4s kept in the spike project, one for RS and one for LG, at about EUR 0.50 a month each
-     before VAT, for as long as the test runs.
+   - *What:* two Primary IPv4s created once in Falkenstein, named `npt-rs` and `npt-lg`, with auto-delete off and
+     protection off. They are billed for as long as they exist, assigned or not: about EUR 1.00 a month for both,
+     before VAT, counted in the bill check (PM-0006-18). They are deleted at the close: the DNS record first, then the
+     addresses.
    - *Why it matters:* without them, every run needs a DNS edit and two firewall edits, and teardown must delete the
-     record before the VMs. With them, those are set once, and the name can never point at an address Hetzner hands
-     to someone else.
+     record before the VMs, or the name could point at an address Hetzner hands to someone else. With them, those are
+     set once.
    - *Options:* (a) keep two fixed addresses; (b) a new address each run, as the drafts assume.
    - *Recommendation:* (a).
 
@@ -1249,5 +1288,10 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 1. Read this plan, then answer ROUTE (with the laptop facts), SAFARI-TIME and FIXED-IP.
 2. Nothing to create yet: no VM, no DNS record, no key.
 3. Next you get R-PR (the advisor's readings into the drafts) for your go.
-4. At stop B you get W-PR (the Safari workflow), R1's run plan with its cap, the cloud-config files, and the exact DNS
-   record with that day's address.
+4. At stop B you get:
+   - the laptop's guard check, run with you;
+   - the Limits tab to read;
+   - W-PR (the Safari workflow) to approve;
+   - R1's run plan, with its cap and delete-by time;
+   - the cloud-config files;
+   - the exact DNS record with that day's address (or, with FIXED-IP, the record once).
