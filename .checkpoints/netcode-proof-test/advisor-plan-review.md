@@ -24,3 +24,16 @@ DONE
   - NOTE: W-PR dispatch-from-any-ref after merge: any branch's copy runs (accepted risk ADR 0006:551-555). Check that line.
 - B2 partial (to 1083): §10 security: control plane local Unix sockets + per-run capability; join tokens per slot 128-bit; URL fragment, replaceState; page host allow-list + CSP; cloud-init users, sshd drop-in, pinned toolchains, dist hash compare; redact-check pre-push. §11 Brave checks: R1 smoke (expected results given), ping, R7 netcode checklist 14 steps (test-engineer writes from ADR 0001:1631-1681, advisor checks before R7), costs read. Brave checklist present with expectations: OK.
   - NOTE: §10.6 "The laptop's git author set to his GitHub noreply address" - fine.
+- B2+B3 done (plan fully read). Concerns to verify in sources:
+  - C1 money: 75 RS-h vs ADR 0006:1107-1113 estimate 38-53; total EUR 13.51/caps 14.90 + FIXED-IP 1.00/mo. Per-run cap OK is Mustafa's settled ask; the total overrun vs draft estimate should be visible in his asks (not just §7.1).
+  - C2 R-10 cover rule (OQ-0001-9): favour-shooter vs cover is game feel/design -> likely Mustafa's; check ADR 0001 OQ-0001-9.
+  - C3 operator settings file (ops/operator/settings.json, run with --settings on his laptop) = a security rule for a Claude session on his machine -> his explicit approval at stop B (category 3); plan only lists guard check.
+  - C4 kit freeze / W-PR / A4-FREEZE "under way": check STATUS.
+  - C5 SAFARI-TIME (b): -36 datagram cap "final only once Mac reading exists" vs ADR 0001 results at close incl. datagram cap; does foundation wait? check SPIKE_PLAN.
+  - C6 harness "for the boundary spike to keep": check SPIKE_PLAN:252-279 says boundary spike builds on it (else generic-for-later).
+  - C7 R-14 "migration step 1 waits for R8": check SPIKE_PLAN/ADR.
+  - C8 checkpoint file .checkpoints/netcode-proof-test.md exists?
+  - C9 R-6 1,000,000 packets (PM-0002-49 is boundary spike's mark) - check source lines.
+  - C10 R-19 OQ-0006-19 reading deferred - check what OQ-0006-19 is (maybe Mustafa's: money/machines?).
+  - C11 R-26 changes meaning of "session" in ADR 0006 density rule - check ADR 0006:1314-1316, 1352.
+  Next B4 (sources).

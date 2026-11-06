@@ -79,7 +79,8 @@
 
 ## Running work
 - PR: [Mergincanli/Shamble-Frontlines#40](https://github.com/Mergincanli/Shamble-Frontlines/pull/40), draft, opened
-  02:56 on head a6607bc; this session is subscribed to its activity.
+  02:56 on head a6607bc; this session is subscribed to its activity; safety-net check-in `trig_017Q5fgnrrQsugi3dbZ9pa3L`
+  fires 03:45 Amsterdam (re-arm silently if nothing changed; stop after 3 empty ones).
 - The advisor's plan review (advisor agent, xhigh, background) · notes `advisor-plan-review.md` · launched 02:54 ·
   running.
 - Workflow `wf_e7cdd40f-712` (npt-plan-review2: security-auditor, netcode-architect, infra-engineer; xhigh) · script as
