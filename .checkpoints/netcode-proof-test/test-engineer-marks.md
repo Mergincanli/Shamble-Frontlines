@@ -24,6 +24,8 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Coordinator's 2nd note read: events carry `ph`; bite runs are judged by the checks of the parts they match. End-of-run summary events use `window: all`.
 - Block 2 done (-11..-16, -17, -57, -58, -18) and block 3 done (-19..-26, -59, -27): 30 lines.
 - Block 4 done (-28..-38, -39, -40, -63 outside): 44 lines. Scripts now run `python3 -I -B` (coordinator: no __pycache__ in the notes folder).
+- Block 5 done (-41, -42, -60, -43..-46, -61, -47, -48): 54 lines.
+- Block 6 done (-49..-52, -62, -53, -54..-56, PM-0004-67): 64 lines.
 
 ## Questions for the main session
 - Q1: `select` lists `machine.name`/`machine.arch` but not `machine.role`; `from` uses `machine.role`. May a part's select use `machine.role`? (I use it in parts only where a part must be one machine kind.)
@@ -37,6 +39,13 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
 - Q16: string-valued records (-28's negotiated draft, browser versions, -2's stand-in names, the clock resolution in `machine`) can't be read by any stat. Proposal: the verdict detail prints named header params and machine fields.
 - Q17: -30's second bite expects INVALID (a late command must void the run); an invalid bite run makes the mark INVALID under the contract, so it is left out of `bites`: a judge fixture instead?
 - Q18: -28's control (a wrong certificate hash fails 100 of 100) is a part with role `control` and a sum == 0 check, not a bite (a bite only needs to fail one check).
+- Q19: -42's number is at P3; plan §6.2 runs it at P2 to P4 under both options: the draft judges P3 (both options) and reports P2 and P4.
+- Q20: -48's false-hit share: denominator read as view misses ('a miss in the view counted as a hit').
+- Q21: -49's second 'bite' (a client delaying every pong by 150 ms must still meet the cap) must PASS, so it rides in the rule-cap runs' cheat set, not in `bites`.
+- Q22: PM-0004-67 reads the jitter from the FIRST 36,000 measured ticks of each S30; the contract's windows have no first-N form.
+- Q23: -56's item (1) asks both crates' results on -11 and -25, whose rows don't ask for both crates: the run plans must run them per crate.
+- Q24: reports without `parts`: the draft assumes the judge computes them per part.
+- Q25: ADR 0006's key (the advisor's reading, 2026-11-06): npt-judge checks the 3-sessions rule (>= 6 h apart, one 18:00-23:00 Amsterdam) from the results' UTC times. The header has `date` only: it needs a UTC start time (`params.started_utc`, passed in by the caller). The draft uses a figure `times_of_day_rule` on -27, PM-0006-13 and -14.
 
 ## Notes
 - Q2: a part's `select` on per-log fields (`machine.*`, `process`): does a run match when ANY of its logs matches? (I assume yes.)

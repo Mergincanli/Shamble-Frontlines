@@ -82,15 +82,28 @@
     2ccc184..16763a7: **APPROVE, no conditions**, head `16763a724b741a40615dc8e7c2ef25c5ea3e4b30`; CI gate and smoke
     green twice each; labelled needs-mustafa; the advisor's worktree `.gate/pr-41` removed.
 
+15. **PR #41 round 3** · netcode-architect found ADR 0001's checklist saying "The profile changes from the overlay"
+    twice (the pointer edit plus R-28's words) · fixed in **1b4094a** (the advisor's words unchanged) · the advisor's
+    re-review: **APPROVE**, head `1b4094a7750177269b9d5f2fa8c21e292c76e009`, CI gate and smoke green; PR body updated.
+16. **U1 part 2a** · d984535 (pushed) · npt-log (records, Writer, read_log; 9 tests); npt-judge's engine and CLI
+    (8 unit + 15 engine tests, one per verdict path, PM-0006-14's short padding INVALID among them); `marks/README.md`
+    (the contract); `ops/operator/redact-check.mjs` (9 tests; spike, .checkpoints, docs/design: 0 findings);
+    rustfmt.toml (ADR 0002 part 7). cargo test 32, clippy host and wasm32, fmt: clean; gate 1-4, 5b-5d PASS.
+    A slip, recorded: one `sed -i` edit of engine.rs (shell write) and its `.bak`, removed; the change was the intended
+    three lines. A Python `__pycache__` from test-engineer's scratch scripts deleted before any save (they now run -B).
+
 ## Current step
-15. Waiting for Mustafa's own "merge #41" in this chat (for head 16763a7). Meanwhile U1 part 2: `marks/README.md`
-    (the schema of marks.json and the results log, the contract between npt-log, npt-judge and marks.json) written;
-    netcode-architect drafts the message catalogue; next, test-engineer drafts marks.json against the schema while the
-    main session builds npt-log and npt-judge.
+17. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. Meanwhile U1 part 2b: the message catalogue
+    draft (netcode-architect, DONE: `docs/design/netcode-proof-messages.md`, 22 wire rows, 24 field groups, 4 session
+    and 12 room-wide controls, Q1-Q9 for the advisor) and its class audit test; test-engineer drafts marks.json
+    (`marks-draft.jsonl`); then the dependency-rule checks.
 
 ## Next steps
-1. On Mustafa's "merge #41": check gate and smoke green on 16763a7, merge with that SHA as the expected head; then
-   `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match.
+1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
+   `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove
+   the worktree `.gate/npt-readings`.
+1b. The catalogue's questions Q1-Q9 (netcode-architect's notes `netcode-architect-catalogue.md`) and test-engineer's
+   marks questions go to the advisor together, in one request.
 2. U1 part 2: npt-log's record types and writer; npt-judge with its PASS, FAIL and INVALID fixtures (PM-0006-14's
    short padding among them); marks.json (test-engineer drafts it per `marks/README.md`, with SERIES.md); the drift
    test (after the merge); the dependency-rule checks (a cargo metadata test in npt-lab) and the no-reference grep;
@@ -149,6 +162,8 @@
 - The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · DONE: REVISE of
   2ccc184, then APPROVE of 16763a7 (re-review via SendMessage, same agent).
 - The message catalogue (netcode-architect, xhigh, background) · notes `netcode-architect-catalogue.md` · writes
-  `docs/design/netcode-proof-messages.md` · launched 11:12 · running.
+  `docs/design/netcode-proof-messages.md` · launched 11:12 · DONE 11:20 (Q1-Q9 for the advisor).
+- marks.json's draft (test-engineer, xhigh, background) · notes `test-engineer-marks.md` · writes `marks-draft.jsonl`
+  and `series-draft.md` · launched 11:16 · running.
 - R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
   rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.
