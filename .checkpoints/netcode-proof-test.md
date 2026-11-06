@@ -143,12 +143,31 @@
     sha2 0.11.1 declared. check.mjs: clippy with every feature, tests on both builds, deps parses stdout only.
     check.mjs all 9 pass (83 / 88 tests); gate PASS with --no-smoke.
 
+26. **U2 part 2a** · 921174d (pushed) · `npt-lab probe` (crates/lab/src/{main,probe,machine}.rs; 11 tests) and the
+    judge's `fate_log_twin_equal` (figures.rs: `Lack::{Gap, Waiting}`; Waiting = NOT-RUN). One full run: ~1 s, 27 MB;
+    P2 seed 1: loss 2.02 % each way, one-way 50.04 ms, RTT 100.07 ms over 610,746 samples (~61 % of down datagrams
+    echo: e^-0.98 of 0.1 ms intervals see no new arrival), reorder 910 of 1000; the judge passes every P2 check on it.
+    check.mjs fmt, clippy, test green (94 / 99).
+
 ## Current step
-26. U2 part 2: the L1 probe (npt-lab binary `probe`: 10,000 datagrams/s each way, echo with hold time for the RTT,
-    SERIES.md's probe names, `fate_log_sha256`, `twin`), the judge's `fate_log_twin_equal`, then PM-0001-3's L1 runs
-    (P1-P4 and B1 x 3 seeds, 3 twins at B1, 4 bites) judged with marks.json. Readings for the advisor at U2's close:
-    the reorder step's model (overtaken, causal; no swap where spacing > delay, so P0 and P1 at 30 Hz have none), L1's
-    stream model (E15's RTO rule), RTT from implicit acks, the probe's placement in npt-lab (SERIES.md says npt-l1).
+27. U2 part 2b. **Next, in order:**
+    1. engine.rs: twin tests (LogSpec now has `layer`, `profile`, `seed`): equal hashes + a shown clock-seed bite run
+       (its twin: role twin, same bite) = PASS; differing = FAIL; twin absent = NOT-RUN ("is not in set"); no
+       `params.twin`, a twin with role measured, another seed, a bad hash = INVALID; a bite run whose twin has no bite =
+       INVALID. Then fixtures README if needed.
+    2. A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
+       of npt-lab without and with `--features bites`, each copied to `.gate/netcode-proof-test/bin/`; **every L1 part
+       has its own twin check (P1-P4 and B1: marks.json)**, so 15 measured runs (seeds 1-3) + 15 twins (role twin) +
+       4 bite runs at B1 or P2 (clock-seed at B1 with its own twin, both bites build) = 35 runs, ~1 GB under
+       `.gate/netcode-proof-test/runs/u2/`; then `npt-judge --only PM-0001-3`. Expected: the five L1 parts PASS, the L2
+       and MP parts and the not-net-of-base bite NOT-RUN. Check each bite fails for its own reason (rtt-each-way: mean;
+       loss-per-round-trip: loss; normal-jitter: p90; clock-seed: the twin check).
+    3. Commit the verdict summary under `spikes/netcode-proof/results/` (no raw logs); SERIES.md's "written by" for the
+       probe names: npt-lab (L1), npt-net (L2).
+    4. check.mjs all 9, gate `--no-smoke`, then the advisor on U2 with these readings: the reorder step's model
+       (overtaken, causal: no swap where the spacing exceeds the delay, so P0 and P1 at 30 Hz have none); L1's stream
+       model (E15's RTO rule); RTT from implicit acks; Link's additions (`LinkState`, `rtt_ns`; no `loss` yet, which
+       npt-room wants per client at U4); the probe in npt-lab with its own binary (plan §4.7 lists no npt-lab binary).
     R1 still waits for stop B.
 
 ## Next steps
