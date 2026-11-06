@@ -153,9 +153,19 @@
     matching bite twin missed = FAIL; differing = FAIL; absent twin = NOT-RUN; five gap cases = INVALID). check.mjs all
     9 pass (97 / 102 tests).
 
+28. **U2 part 2c** · 81c6d01 (the run script; SERIES.md's probe writers) and **6900e52 (results)** · the script at
+    81c6d01: 38 runs in 67 s, judged: the five L1 parts PASS (3 valid runs each, 25 checks a run, B1 27); every twin's
+    fate log equals its run's; each bite shown by its own check only (rtt-each-way: mean, range, RTT; loss-per-round-
+    trip: loss 1.01 %; normal-jitter: p90 54.2 ms, its range passing; clock-seed: the twin check). PM-0001-3 NOT-RUN
+    until L2, MP and the not-net-of-base bite. Results: `results/c-u2-pm-0001-3/81c6d01e371b/` (verdict.json, runs.txt).
+    Mustafa (2026-11-06): Chrome is installed; he asked for his steps (given in chat: prep now = Firefox, two-factor
+    login, a clean Brave profile; then stop B's approvals; then each run's console steps).
+
 ## Current step
-28. U2 part 2c. **Next, in order:**
-    2. A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
+29. U2's close: check.mjs all 9 and the gate `--no-smoke`; then the advisor on U2 (diff 1bf13d0.. or a407751..6900e52,
+    the readings below); then docs-keeper (REPO_MAP: crates/lab's binary, ops/runs/, results/; STATUS). Then U3.
+    **Remaining from the old list:**
+    2. (done) A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
        of npt-lab without and with `--features bites`, each copied to `.gate/netcode-proof-test/bin/`; **every L1 part
        has its own twin check (P1-P4 and B1: marks.json)**, so 15 measured runs (seeds 1-3) + 15 twins (role twin) +
        4 bite runs at B1 or P2 (clock-seed at B1 with its own twin, both bites build) = 35 runs, ~1 GB under
