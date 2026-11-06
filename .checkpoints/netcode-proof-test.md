@@ -174,6 +174,14 @@
 
 ## Current step
 31. U3: the scouting workflow `wf_d6bdeed6-3c0` runs (see Running work); then build L2 from its verified findings.
+    **State at 16:45 UTC (Mustafa: usage at 90 %):** both scouts' notes are finished (`u3-scout-wt.md`,
+    `u3-scout-timing.md`, each ends DONE); the two verifiers are writing `u3-verify-wt.md` and `u3-verify-timing.md`.
+    **If the session is cut off:** (1) read the four u3-* notes; (2) if a verify file does not end with DONE, resume
+    the workflow with Workflow({scriptPath: the script in Running work, resumeFromRunId: "wf_d6bdeed6-3c0"}) (the
+    finished agents come back from cache); (3) then write U3's build plan from the confirmed claims only (refuted or
+    unclear ones are re-checked by hand first), and build npt-net's ImpairSocket and DelayStream per plan §12.1's U3
+    row. Probe sources in the notes folder (u3-*-probe.rs, u3-tcp-stall-probe.py) are throwaway and never built
+    into the spike.
     **The old U2 list, kept for its record:**
     **Remaining from the old list:**
     2. (done) A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds

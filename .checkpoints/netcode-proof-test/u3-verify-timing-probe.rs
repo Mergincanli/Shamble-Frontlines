@@ -286,6 +286,9 @@ fn hiccup(secs: f64) {
     let wall = w0.elapsed().as_secs_f64();
     let lost: i64 = gaps.iter().sum();
     let c = |t: i64| gaps.iter().filter(|&&g| g > t).count();
+    // predicted E[(L - 0.25 ms)+] for a release thread paused by the same gaps: sum (G - 0.25 ms)^2 / (2T)
+    let pred_us: f64 = gaps.iter().map(|&g| { let e = ((g - 250_000).max(0)) as f64; e * e }).sum::<f64>() / (2.0 * wall * 1e9) / 1e3;
+    println!("hiccup_pred\tE[(L-0.25ms)+]_predicted={pred_us:.2}us (P1 bar ~10 us)");
     println!(
         "hiccup\t{wall:.1}s\tgaps>20us={}\t>250us={} ({:.1}/s)\t>1ms={}\t>10ms={}\tlost={:.3}%\tmax_us={:.1}",
         gaps.len(), c(250_000), c(250_000) as f64 / wall, c(1_000_000), c(10_000_000),

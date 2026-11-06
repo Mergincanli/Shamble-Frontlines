@@ -109,3 +109,104 @@ Started 2026-11-06 (after a usage-limit restart: no earlier notes of mine existe
   directions on one release thread = 20,000 releases/s; optional real loopback UDP send per release; optional inbound
   hand-off to a tokio task by Waker, like poll_recv). Also a hiccup mode. Results to
   .gate/netcode-proof-test/u3-verify-timing-probe/results.txt.
+- Smoke (3 s, 20,000 releases/s with real loopback sends, lead 0, slack 1): -3's P1 p999 31.12 / 31.35 ms (FAIL, band
+  <= 30.25), E[(L-0.25ms)+] 24-25 us (> 10 us): consistent with my criterion (P(U+L > 30.25) ~ 24 us / 10 ms = 0.24 %).
+- Battery started 17:22:00 UTC (alone; ps showed no other probe). hiccup 10 #1: 392 gaps > 250 us (39.2/s, the scout
+  saw 17/s), 77 > 1 ms, lost 4.93 %, max 5.3 ms: the noise floor itself varies about 2x between runs.
+  m3 1500/s per dir (3,000 releases/s, the scout's rate), lead 0, slack 1, sends: p99 lateness 356/342 us (scout
+  313), p99.9 16.0/12.7 ms (scout 2.7 ms), -3 P1 p999 40.7/38.8 ms FAIL, E excess 38/34 us. So the scout's
+  single-run p99.9 figures move by about 5x run to run here; rankings between variants rest on one run each.
+- KEY: m3 1500/s per dir run #2 (same settings as #1): -3's P1 bands all PASS both ways (up p999 30.132 ms, down
+  30.158 ms; p001 20.04; p90 29.03/29.08; mean 25.04/25.05) WITH release-lateness p99.9 = 2,111 / 2,339 us and
+  1.07-1.13 % of releases > 250 us; E[(L-0.25ms)+] 9.0 / 10.6 us. So (a) -3 can pass with lateness p99.9 ~ 2 ms: the
+  scout's bar (lateness p99.9 <= 0.25 ms) is not what -3 tests (F1e/C15 refuted as the criterion); (b) C3's "no
+  mechanism can meet it in this container" is refuted for the mark itself: here it passes in one run and fails in
+  the next (#1: p999 40.7 ms) with the same settings. The deciding quantity is the expected excess lateness
+  (~10 us at P1), which a few long pauses (max 33 ms in #1) dominate.
+- m3 1500/s per dir, lead 0, slack 1, SCHED_FIFO 50 (sched_setscheduler 0), sends, two runs: #1 -3 p999 30.541 /
+  30.555 ms FAIL (E excess 12.6/12.0 us, lateness p99 287/320 us, p99.9 3.4/3.2 ms); #2 30.143 / 30.111 ms PASS
+  (E 6.8/7.7 us, p99 232/251 us, p99.9 2.0/2.2 ms). Release thread 0.073-0.074 core with or without FIFO.
+  FIFO vs normal over 2+2 runs: p99 {232, 251, 287, 320} vs {266, 280, 342, 356} us: perhaps a little better, ranges
+  touch; pass/fail 1 of 2 each. C4's "FIFO gives the best p99 (200.5 vs 313.4)" is one run per variant: UNCLEAR.
+- m3 10000/s per dir (-3's real rate, 20,000 releases/s, real loopback sends), lead 0, slack 1, run #1: release
+  thread 0.269 core (3.6x the 3,000/s figure: C4's "0.054 core" is for a rate 7x below -3's); lateness p50 13 us,
+  p99 271/274 us, p99.9 3.0/3.0 ms; -3 P1 p999 30.457 / 30.475 ms FAIL (just), E excess 11.9 / 11.6 us.
+- Derived go/no-go from the hiccup data (my arithmetic): if the release thread stalls for the same pauses G_i as a
+  spinning thread, packets falling due in a pause are late by 0..G, so E[(L-0.25ms)+] ~ sum_i (G_i - 0.25 ms)^2 / (2T),
+  independent of the packet rate. -3 at P1 needs that <= ~10 us, i.e. sum (G_i - 0.25 ms)^2 <= 2e-5 s x T: over a
+  100 s run (1,000,000 packets at 10,000/s) one 45 ms pause alone fails it, while 17/s pauses of 0.3 ms cost 0.02 us.
+  So the scout's RS rule ("gaps > 250 us at more than about 1/s -> no design can meet it") is wrong both ways: the
+  long pauses decide, not the count above 250 us.
+- m3 10000/s per dir run #2 (lead 0, slack 1, normal sched): 0.272 core; p99 358/382 us; p99.9 4.3/4.2 ms; -3 P1
+  p999 31.128 / 31.130 ms FAIL; E 16.8 / 17.3 us.
+- m3 10000/s per dir, SCHED_FIFO 50, run #1: 0.271 core; p99 144/141 us; p99.9 2.2/2.1 ms; over 250 us 0.67 %;
+  -3 P1 p999 30.018 / 30.028 ms PASS (E 6.8 / 6.7 us). Better than both normal-sched runs at this rate (p99 271-382).
+- m3 10000/s per dir, SCHED_FIFO 50, run #2: p99 310/312 us, p99.9 14.0/13.5 ms, max 30 ms; -3 P1 p999 38.85 /
+  38.96 ms FAIL (E 34.9 / 35.2 us). So FIFO does not shield the thread from the long (hypervisor-scale) pauses that
+  decide -3. Tally of -3 P1 at lead 0, slack 1: normal 1 of 2 PASS at 3,000/s, 0 of 2 at 20,000/s; FIFO 1 of 2 at
+  each rate. In this machine the outcome is a coin toss decided by whether a 10-30 ms pause lands in the 30 s window.
+- m3 10000/s per dir, lead 100 us, slack 1, normal sched (one run): release thread 0.856 core (at -3's rate the
+  thread spins almost all the time: mean gap 50 us < lead); p50 1.3 us, p99 241/255 us, p99.9 2.25/2.35 ms; -3 P1
+  p999 30.162 / 30.156 ms PASS (E 9.2 / 9.4 us). So a spin lead at -3's rate costs most of one of RS's 4 vCPUs; the
+  scout's "0.07 core per 1,000 releases/s" extrapolates to the cap; one run cannot show it helps -3.
+- m3 10000/s per dir, lead 0, slack 1, INBOUND hand-off (up entries woken into a tokio task by Waker; lateness taken
+  in the task): a 61 ms pause hit this run (both directions FAIL: p999 57.6 / 57.3 ms). Same run, task side vs
+  release-thread side: p50 35.6 vs 13.4 us, p99 1,204 vs 293 us, > 250 us 2.2 % vs 1.1 %, E excess 94.7 vs 75.9 us.
+  The hand-off alone adds about 19 us of E excess here, twice -3's whole P1 budget (~10 us): the inbound path, as
+  stamped where quinn receives it, is the binding one (the scout measured it, C4, but its design records lateness in
+  the release thread only).
+- m3 1500/s per dir INBOUND (one run, a 40 ms pause hit it): task side p50 89.6 vs thread 32.3 us, p99 539 vs 210 us,
+  > 250 us 3.3 % vs 0.86 %, E 42.6 vs 32.9 us (hand-off adds ~10 us of E), both FAIL. Battery ended 17:27:51 UTC.
+- hiccup 10 #2 (17:27): 155 gaps > 250 us (15.5/s; #1 had 39.2/s), 20 > 1 ms, none > 10 ms, max 5.1 ms. But the m3
+  runs in between met pauses of 30-61 ms (max lateness): a 10 s hiccup does not see the rare long pauses that decide
+  -3, so the scout's "hiccup 10" RS go/no-go is too short. Adding the predicted-E metric and running 30 s hiccups.
+- Predictor check (results-2.txt, 17:28-17:29 UTC): hiccup 30 s predicted E 12.4 us; m3 1500/s measured E 11.3 /
+  9.9 us (-3 P1 p999 30.400 / 30.407 ms FAIL); hiccup 30 s again predicted 13.5 us. The hiccup-integral predicts the
+  measured excess within about 20-30 %. Across all runs the -3 boundary sits at E about 9.5-10.5 us (PASS at 6.7-9.4
+  and one at 10.6; FAIL at 9.9-35): fuzzy because above d + a only late packets remain, so p999 jumps fast.
+  Summary of 12 runs x 2 directions: -3 P1 PASS in 4 of 12 runs (#2 normal 3k, #2 FIFO 3k, #1 FIFO 20k, lead-100 20k),
+  every PASS with lateness p99.9 of 2.0-2.35 ms. Nothing here can meet "lateness p99.9 <= 0.25 ms"; the mark itself
+  is met about one run in three.
+
+## Verdicts
+C1 confirmed (nuance: the second ms comes from the park computed from a truncated now; mio's round-up of a whole-ms
+Duration adds nothing). C2 confirmed. C3 confirmed as stated (lateness p99.9 here 2-16 ms in all my runs; the pause rate
+varies 13-39/s > 250 us). C4 unclear (transcribed right, but one run per variant; FIFO's edge not beyond noise in my
+2+2 runs; CPU is at 1/7 of -3's rate). C5 confirmed. C6 confirmed. C7 confirmed. C8 confirmed (source; measurement not
+re-run). C9 confirmed (derivation; "about 1 s" is vs E15's constant, about 0.7 s vs L1's planned backoff). C10
+confirmed. C11 confirmed (16 MiB reserve is virtual until filled). C12 unclear (true directly under tungstenite; in
+the recommended TLS stack tokio-rustls sees DelayStream's writes, unconfirmed; partial writes needed only if
+poll_write_vectored is implemented, rustls offers up to 64 records of <= 16 KiB + overhead: rustls vecbuf.rs:200-207,
+msgs/fragmenter.rs:4). C13 confirmed (reading conflict). C14 confirmed. C15 refuted (-3 tests p99.9 of the delivered
+delay, which passed here with lateness p99.9 2.0-2.35 ms; the operative quantity is E[(L-0.25ms)+] <= about 10 us).
+
+## Design problems
+1. Acceptance statistic wrong: "smallest lead whose lateness p99.9 - p50 <= 0.25 ms" fails every variant here while -3
+   itself passes about 1 run in 3; use -3's own bands (p001, p90, p999, mean) at 10,000/s per direction over the
+   1,000,000-packet probe, with E[(L-0.25ms)+] and the hiccup integral as diagnostics.
+2. Rate: the scout's cells run 3,000-7,000/s; -3's probe runs 10,000/s per direction (ADR 0001:1538), 20,000 releases/s
+   on one ImpairSocket: lead 0 costs 0.27 core, a 100 us lead 0.86 core.
+3. One 30-60 s self-test per block flips pass/fail with identical settings here; a lead picked from one run is noise.
+4. Inbound lateness recorded in the release thread misses the hand-off to quinn (adds about 10-19 us of E, more than
+   -3's budget); stamp the up direction where poll_recv returns the datagram; arrival is stamped at drain (no kernel
+   timestamp in quinn-udp 0.5.16 RecvMeta: lib.rs:96-118).
+5. `#[allow(unsafe_code)]` in npt-net contradicts the workspace rule ("nothing else may", Cargo.toml lints comment);
+   libc is not a workspace pin; SCHED_FIFO per thread needs unsafe or a new crate.
+6. New self-test modes and header fields are unplanned surface (plan §4.7 lists npt-net's symbols and npt-lab probe).
+7. wss needs tokio-rustls: not pinned, not in the registry, E6 says wss only: U3's WebSocket leg cannot build offline.
+8. Lazy repair rule: t_next must be the next delivered segment; TLP retransmits the tail; reo_wnd 0 after 3 SACKs;
+   stall count vs fate draws must define retransmission draws and adjacent losses (one stall, two losses).
+
+## Missed
+- -3's rate (10,000/s per direction) and its delivered-delay criterion (E-excess); -3 can pass here.
+- run-to-run variance (p99.9 moved 2.1 to 16 ms between identical runs; hiccup 13-39/s).
+- hiccup 10 s is too short to see the 10-60 ms pauses that decide -3; integrate sum (G-0.25ms)^2 / 2T over >= 30 s.
+- the unsafe rule's "nothing else may"; the no-unsafe leader-slack route (untested).
+- a third DelayStream placement (above TLS, below tungstenite: frames visible, the size limit literally before the
+  delay buffer, TLS handshake undelayed).
+- §4.4: npt-server hands npt-room each client's send-buffer space: DelayStream must expose its free budget.
+- the -18 consequence: a Linux-faithful stream model recovers about 1.1 s after a B1 burst, above -18's 500 ms
+  limit (advisor-u2.md:72-77): the model choice decides a mark.
+- ImpairSocket copies each Transmit's borrowed contents into its queue: at 20,000/s that wants a buffer pool.
+
+DONE
