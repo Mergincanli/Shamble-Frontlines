@@ -173,6 +173,14 @@
     test is still true at that grain).
 
 ## Current step
+34. **The advisor's U3 notes DONE** (`advisor-u3q.md`, 21:15 UTC): S0-S14 (DelayStream's Linux-faithful model, every
+    Linux line checked against v6.8 but Cubic's 0.7, U3 checks it); C1' replaces U2's C1 (L1's streams model QUIC,
+    RFC 9002 as quinn does it; U4); C6 new (U6, before R3: loopback B1 on real quinn, worst over 400 ms goes to the
+    advisor); the docs PR's words E1-E4 ({L} = the model's worst recovery over >= 1,000 phases x 1.25, rounded up to
+    0.1 s; the fresh-delta reading; R3 +0.2 h, inside its cap); M1-M19 bind U3's build (mapped in u3-build-plan.md);
+    U6-1..4 carried. For Mustafa (from the advisor): the docs PR's branch (I propose reusing `claude/npt-readings`,
+    which he allowed on 2026-11-06, restarted from main since PR #41 merged); his go on that PR once {L} is measured;
+    the extra R1 kernel check when he OKs R1's run plan. Next: U3a, the TCP model (u3-build-plan.md).
 33. **U3's build plan** written: `.checkpoints/netcode-proof-test/u3-build-plan.md` (U3a the TCP model and {L}; the
     docs PR for PM-0001-18; U3b ImpairSocket; U3c DelayStream; U3d the timing self-test). The advisor's
     `advisor-u3q.md` §(1), (1b), (2) are written; §(3) (design problems U3 must fix) was still being written when the

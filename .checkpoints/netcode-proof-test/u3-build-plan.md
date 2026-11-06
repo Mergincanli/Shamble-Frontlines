@@ -2,7 +2,14 @@
 Inputs: Mustafa's U3-Q1..Q9 answers (checkpoint "Decisions taken", 2026-11-06 about 17:55 UTC); the scouting synthesis
 `u3-scout-summary.md`; the advisor's `advisor-u3q.md` §(1) DelayStream's Linux-faithful model S0-S14, §(1b) L1's
 QUIC-like streams (C1' replaces U2's C1, due at U4; C6 new, due at U6 before R3), §(2) the docs PR's exact words
-(E1-E4) for PM-0001-18's split, §(3) the design problems U3 must fix (pending when this was written).
+(E1-E4) for PM-0001-18's split, §(3) the design problems U3 must fix: **M1-M19, each binding on its part below**
+(advisor-u3q.md lines 230-290; DONE 21:15 UTC), and U6-1 to U6-4 carried to U6 (quinn's datagram send buffer sized
+small and checked; wtransport's unchecked SETTINGS recorded per crate in -25; C6, the loopback B1 check on real quinn
+before R3; the app-level reorder share). The advisor ruled a "full datagram" is 1,480 B: -23's queue 5,920 B, -24's
+max(200 ms at the bottleneck rate, 5,920 B). Where M1-M19 and the parts below differ, M1-M19 win.
+Mapping: U3a (the TCP model) M17, M18; U3b (ImpairSocket) M1-M5, M9-M15, M19; M6 (plan §4.7's one L2 config type,
+before the code) first; U3c (DelayStream) M7, M8 for the WebTransport side's TLS and accept loop, M16, M17; U3d M1,
+M13, M14.
 
 ## Order (each part ends with check.mjs green, the gate, a commit and a checkpoint save)
 - **U3a, the TCP model** (`npt-net`, a pub(crate) pure-logic module on ns stamps, no I/O, no clock): S1-S12 exactly as
