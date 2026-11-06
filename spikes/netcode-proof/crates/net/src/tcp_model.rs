@@ -56,6 +56,12 @@ const CUBIC_BETA: u64 = 717;
 const BETA_SCALE: u64 = 1_024;
 /// tcp_reordering: this many SACKed segments set RACK's reordering window to 0.
 const REORDERING: usize = 3;
+/// tcp_stream_is_thin: fewer than this many segments out (include/net/tcp.h:2119).
+const THIN_PACKETS: usize = 4;
+/// TCP_THIN_LINEAR_RETRIES (include/net/tcp.h:238): linear timeouts for this many retries, then doubling.
+const THIN_LINEAR_RETRIES: u32 = 6;
+/// tcp_syn_linear_timeouts' default (net/ipv4/tcp_ipv4.c:3489): this many SYN retries at a linear 1 s.
+const SYN_LINEAR_TIMEOUTS: u32 = 4;
 const WORDS: usize = 4;
 const KEY_TAG: &[u8; 24] = b"npt-net tcp model, v1\0\0\0";
 const US: u64 = 1_000;
@@ -81,6 +87,9 @@ pub(crate) struct Counters {
     pub first_lost: u64,
     pub pure_acks: u64,
     pub pure_acks_lost: u64,
+    /// SYNs (client) or SYN-ACKs (server) sent, and lost.
+    pub handshake_packets: u64,
+    pub handshake_lost: u64,
     pub repairs_rack: u64,
     pub repairs_probe: u64,
     pub repairs_timeout: u64,
@@ -91,6 +100,52 @@ pub(crate) struct Counters {
     pub stall_ns_sum: u64,
     /// Out-of-order bytes held at the receiver, the most at once.
     pub held_bytes_max: u64,
+}
+
+/// The server's TCP settings and the room's write budget: Linux's defaults, or the fallback's fixes (Mustafa,
+/// 2026-11-06: newest snapshot only with a small send buffer; thin-stream linear timeouts and a lower minimum RTO).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct TcpConfig {
+    /// Unsent plus unacknowledged bytes the writer may hold (S9; a socket's SO_SNDBUF in payload bytes).
+    pub write_budget: u64,
+    /// tcp_thin_linear_timeouts / TCP_THIN_LINEAR_TIMEOUTS: no doubling while the stream is thin, for 6 retries
+    /// (net/ipv4/tcp_timer.c:640-648).
+    pub thin_linear_timeouts: bool,
+    /// The minimum RTO (TCP_RTO_MIN, or a route's locked rto_min metric: include/net/tcp.h:741-748).
+    pub rto_min_us: u64,
+}
+
+impl Default for TcpConfig {
+    /// Linux 6.8's defaults and the plan's 64 KB write bound.
+    fn default() -> TcpConfig {
+        TcpConfig {
+            write_budget: WRITE_BUDGET,
+            thin_linear_timeouts: false,
+            rto_min_us: RTO_MIN_US.unsigned_abs(),
+        }
+    }
+}
+
+/// A connection's three-way handshake (for the client's reconnect attempts): the client's SYN, retried at a linear
+/// 1 s for its first 4 tries (tcp_syn_linear_timeouts) and doubling after; the server's SYN-ACK, retried from 1 s,
+/// doubling, and at once on a repeated SYN; each end primed with the handshake's RTT unless it was resent (Karn).
+#[derive(Debug, Clone, Copy, Default)]
+struct Setup {
+    syn_sent_ns: u64,
+    syn_tries: u32,
+    syn_timer: Option<u64>,
+    synack_sent_ns: u64,
+    synack_tries: u32,
+    synack_timer: Option<u64>,
+    client_est: Option<u64>,
+    server_est: Option<u64>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Ctl {
+    None,
+    Syn,
+    SynAck,
 }
 
 /// The planted defects of U3's own tests (S13's bites); never in a build that runs.
@@ -159,7 +214,7 @@ impl Rtt {
     }
 
     /// tcp_rtt_estimator (tcp_input.c:861-927), line for line.
-    fn sample(&mut self, mrtt_us: i64, snd_una: u64, snd_nxt: u64) {
+    fn sample(&mut self, mrtt_us: i64, snd_una: u64, snd_nxt: u64, rto_min_us: i64) {
         let mut m = mrtt_us;
         if self.srtt8 != 0 {
             m -= self.srtt8 >> 3;
@@ -185,12 +240,12 @@ impl Rtt {
                     self.rttvar -= (self.rttvar - self.mdev_max) >> 2;
                 }
                 self.rtt_seq = snd_nxt;
-                self.mdev_max = RTO_MIN_US;
+                self.mdev_max = rto_min_us;
             }
         } else {
             self.srtt8 = m << 3;
             self.mdev = m << 1;
-            self.rttvar = self.mdev.max(RTO_MIN_US);
+            self.rttvar = self.mdev.max(rto_min_us);
             self.mdev_max = self.rttvar;
             self.rtt_seq = snd_nxt;
         }
@@ -243,14 +298,22 @@ struct Sender {
     max_out: u64,
     max_out_seq: u64,
     cwnd_blocked: bool,
+    /// The settings that differ from Linux's defaults when the fixes are on (TcpConfig).
+    rto_min_us: i64,
+    thin_lt: bool,
+    /// icsk_retransmits: retransmission timeouts in this episode, reset when snd_una advances (tcp_input.c:3888).
+    retransmits: u32,
     /// The constant-repair bite's fixed timeout (tests only).
     #[cfg(test)]
     fixed_rto_ns: Option<u64>,
 }
 
 impl Sender {
-    fn new() -> Sender {
+    fn new(cfg: &TcpConfig) -> Sender {
         Sender {
+            rto_min_us: i64::try_from(cfg.rto_min_us).unwrap_or(RTO_MIN_US),
+            thin_lt: cfg.thin_linear_timeouts,
+            retransmits: 0,
             write_seq: 0,
             snd_una: 0,
             snd_nxt: 0,
@@ -326,7 +389,7 @@ impl Sender {
         }
         let mut timeout = if self.rtt.has() {
             let extra = if self.segs.len() == 1 {
-                RTO_MIN_US.unsigned_abs()
+                self.rto_min_us.unsigned_abs()
             } else {
                 TIMEOUT_MIN_US
             };
@@ -431,6 +494,7 @@ struct Packet {
     arrival_ns: u64,
     data: Option<(u64, u64)>,
     ack: Ack,
+    ctl: Ctl,
 }
 
 /// One end's sending path: its fate stream and its first-in, first-out queue (arrivals never decrease).
@@ -455,9 +519,12 @@ pub(crate) struct TcpModel {
     half_jitter: u64,
     loss_ppm: u32,
     bursts: Vec<(u64, u64)>,
+    write_budget: u64,
     ends: [End; 2],
     paths: [Path; 2],
     now: u64,
+    /// The handshake, for a connection opened by `connect`; `None` for one that starts established.
+    setup: Option<Setup>,
     #[cfg(test)]
     variant: Variant,
     /// (end, segment start, attempt) transmissions the tests force lost.
@@ -474,9 +541,45 @@ fn below(word: u64, n: u64) -> u64 {
 }
 
 impl TcpModel {
-    /// A connection under `profile` (its half latency, half jitter, loss and bursts each way), with fates from `seed`
-    /// for connection number `conn`.
+    /// An established connection under `profile` (its half latency, half jitter, loss and bursts each way), with
+    /// Linux's default settings and fates from `seed` for connection number `conn`.
     pub(crate) fn new(profile: &Profile, seed: u64, conn: u32) -> TcpModel {
+        TcpModel::with_config(profile, seed, conn, TcpConfig::default())
+    }
+
+    /// A connection the client opens at `now`: its SYN leaves at once, and data may flow once `established` says so.
+    pub(crate) fn connect(
+        profile: &Profile,
+        seed: u64,
+        conn: u32,
+        cfg: TcpConfig,
+        now: u64,
+    ) -> TcpModel {
+        let mut m = TcpModel::with_config(profile, seed, conn, cfg);
+        m.now = now;
+        m.setup = Some(Setup {
+            syn_sent_ns: now,
+            syn_tries: 1,
+            syn_timer: Some(now + RTO_INIT_US * US),
+            ..Setup::default()
+        });
+        m.transmit_ctl(1, Ctl::Syn, now);
+        m
+    }
+
+    /// Whether `end` has finished the handshake (always, for a connection that starts established).
+    pub(crate) fn established(&self, end: usize) -> bool {
+        self.setup.is_none_or(|s| {
+            if end == 0 {
+                s.server_est.is_some()
+            } else {
+                s.client_est.is_some()
+            }
+        })
+    }
+
+    /// An established connection with `cfg`'s settings.
+    pub(crate) fn with_config(profile: &Profile, seed: u64, conn: u32, cfg: TcpConfig) -> TcpModel {
         let mut key = [0u8; 32];
         key[..8].copy_from_slice(&seed.to_le_bytes());
         key[8..].copy_from_slice(KEY_TAG);
@@ -490,7 +593,7 @@ impl TcpModel {
             }
         };
         let end = || End {
-            snd: Sender::new(),
+            snd: Sender::new(&cfg),
             rcv: Receiver::default(),
             counters: Counters::default(),
         };
@@ -499,9 +602,11 @@ impl TcpModel {
             half_jitter: profile.half_jitter_ns(),
             loss_ppm: profile.loss_ppm,
             bursts: profile.bursts_ns.clone(),
+            write_budget: cfg.write_budget,
             ends: [end(), end()],
             paths: [path(0), path(1)],
             now: 0,
+            setup: None,
             #[cfg(test)]
             variant: Variant::Faithful,
             #[cfg(test)]
@@ -514,7 +619,7 @@ impl TcpModel {
     /// Bytes `end` may write now (S9).
     pub(crate) fn free_budget(&self, end: usize) -> u64 {
         let s = &self.ends[end].snd;
-        WRITE_BUDGET.saturating_sub(s.write_seq - s.snd_una)
+        self.write_budget.saturating_sub(s.write_seq - s.snd_una)
     }
 
     /// Writes up to `bytes` at `now` on `end`'s side and returns how many were taken (at most the free budget).
@@ -534,6 +639,18 @@ impl TcpModel {
     }
 
     /// The counts of the direction `end` sends.
+    /// `end`'s smoothed RTT, once it has a sample (what TCP_INFO's tcpi_rtt reports on a real socket).
+    pub(crate) fn srtt_ns(&self, end: usize) -> Option<u64> {
+        let r = &self.ends[end].snd.rtt;
+        r.has().then(|| r.srtt_us() * US)
+    }
+
+    /// Bytes `end` has written and not yet had acknowledged (SIOCOUTQ on a real socket).
+    pub(crate) fn outstanding(&self, end: usize) -> u64 {
+        let s = &self.ends[end].snd;
+        s.write_seq - s.snd_una
+    }
+
     pub(crate) fn counters(&self, end: usize) -> Counters {
         self.ends[end].counters
     }
@@ -575,7 +692,71 @@ impl TcpModel {
                 consider(t, 4 + e as u8, Event::Timer { end: e });
             }
         }
+        if let Some(s) = self.setup {
+            if let Some(t) = s.syn_timer {
+                consider(t, 6, Event::SynTimer);
+            }
+            if let Some(t) = s.synack_timer {
+                consider(t, 7, Event::SynAckTimer);
+            }
+        }
         best.map(|(t, _, ev)| (t, ev))
+    }
+
+    /// A SYN or SYN-ACK from `end`: a transmission with its own fate, carrying no data.
+    fn transmit_ctl(&mut self, end: usize, ctl: Ctl, now: u64) {
+        self.transmit_any(end, None, ctl, 0, now);
+    }
+
+    /// The handshake's packets and timers (Setup's rules).
+    fn on_ctl(&mut self, to: usize, ctl: Ctl, now: u64) {
+        let Some(mut s) = self.setup else {
+            return;
+        };
+        match (to, ctl) {
+            (0, Ctl::Syn) if s.server_est.is_none() => {
+                // A first SYN, or a repeated one: the SYN-ACK goes (again) at once.
+                if s.synack_tries == 0 {
+                    s.synack_sent_ns = now;
+                }
+                s.synack_tries += 1;
+                s.synack_timer = Some(now + (RTO_INIT_US << (s.synack_tries - 1).min(7)) * US);
+                self.setup = Some(s);
+                self.transmit_ctl(0, Ctl::SynAck, now);
+            }
+            (1, Ctl::SynAck) => {
+                if s.client_est.is_none() {
+                    s.client_est = Some(now);
+                    s.syn_timer = None;
+                    self.setup = Some(s);
+                    if s.syn_tries == 1 {
+                        let m = i64::try_from((now - s.syn_sent_ns) / US).unwrap_or(i64::MAX);
+                        let snd = &mut self.ends[1].snd;
+                        snd.rtt.sample(m, 0, 0, snd.rto_min_us);
+                    }
+                }
+                // The handshake's ACK (again, for a repeated SYN-ACK).
+                self.transmit(1, None, 0, now);
+            }
+            _ => {}
+        }
+    }
+
+    /// Any other packet from the client completes the server's side of the handshake.
+    fn server_heard_client(&mut self, now: u64) {
+        let Some(mut s) = self.setup else {
+            return;
+        };
+        if s.server_est.is_none() && s.synack_tries > 0 {
+            s.server_est = Some(now);
+            s.synack_timer = None;
+            self.setup = Some(s);
+            if s.synack_tries == 1 {
+                let m = i64::try_from((now - s.synack_sent_ns) / US).unwrap_or(i64::MAX);
+                let snd = &mut self.ends[0].snd;
+                snd.rtt.sample(m, 0, 0, snd.rto_min_us);
+            }
+        }
     }
 
     fn dispatch(&mut self, t: u64, ev: Event) {
@@ -585,11 +766,43 @@ impl TcpModel {
                 let Some(pk) = self.paths[from].queue.pop_front() else {
                     return;
                 };
+                if pk.ctl != Ctl::None {
+                    self.on_ctl(to, pk.ctl, t);
+                    return;
+                }
+                if to == 0 {
+                    self.server_heard_client(t);
+                }
+                if !self.established(to) {
+                    return;
+                }
                 self.on_ack(to, &pk.ack, t);
                 if let Some((s, e)) = pk.data {
                     self.on_data(to, s, e, t);
                 }
                 self.push(to, t);
+            }
+            Event::SynTimer => {
+                if let Some(mut s) = self.setup {
+                    s.syn_tries += 1;
+                    let linear = s.syn_tries - 1 <= SYN_LINEAR_TIMEOUTS;
+                    let wait = if linear {
+                        RTO_INIT_US
+                    } else {
+                        RTO_INIT_US << (s.syn_tries - 1 - SYN_LINEAR_TIMEOUTS).min(7)
+                    };
+                    s.syn_timer = Some(t + wait * US);
+                    self.setup = Some(s);
+                    self.transmit_ctl(1, Ctl::Syn, t);
+                }
+            }
+            Event::SynAckTimer => {
+                if let Some(mut s) = self.setup {
+                    s.synack_tries += 1;
+                    s.synack_timer = Some(t + (RTO_INIT_US << (s.synack_tries - 1).min(7)) * US);
+                    self.setup = Some(s);
+                    self.transmit_ctl(0, Ctl::SynAck, t);
+                }
             }
             Event::DelayedAck { end } => {
                 self.ends[end].rcv.delack_at = None;
@@ -623,6 +836,18 @@ impl TcpModel {
         attempt: u32,
         now: u64,
     ) -> (u64, bool) {
+        self.transmit_any(end, data, Ctl::None, attempt, now)
+    }
+
+    /// Every transmission draws its four words here, whatever it carries (S10).
+    fn transmit_any(
+        &mut self,
+        end: usize,
+        data: Option<(u64, u64)>,
+        ctl: Ctl,
+        attempt: u32,
+        now: u64,
+    ) -> (u64, bool) {
         let ack = self.ends[end].rcv.ack();
         let rcv = &mut self.ends[end].rcv;
         rcv.ack_now = false;
@@ -652,9 +877,12 @@ impl TcpModel {
             } else if lost {
                 c.lost_profile += 1;
             }
-        } else {
+        } else if ctl == Ctl::None {
             c.pure_acks += 1;
             c.pure_acks_lost += u64::from(lost);
+        } else {
+            c.handshake_packets += 1;
+            c.handshake_lost += u64::from(lost);
         }
         #[cfg(test)]
         if let Some((s, _)) = data {
@@ -668,6 +896,7 @@ impl TcpModel {
                 arrival_ns: arrival,
                 data,
                 ack,
+                ctl,
             });
         }
         (arrival, lost)
@@ -779,6 +1008,7 @@ impl TcpModel {
         }
         if ack.cum > s.snd_una {
             s.snd_una = ack.cum.min(s.snd_nxt);
+            s.retransmits = 0;
         }
         for g in s.segs.iter_mut().filter(|g| !g.sacked) {
             if ack.sacks.iter().any(|&(a, b)| a <= g.start && g.end <= b) {
@@ -794,7 +1024,7 @@ impl TcpModel {
         // RTT: the newest newly delivered segment that was never resent (Karn).
         if let Some(&(x, _, _)) = delivered.iter().filter(|d| !d.1).max_by_key(|d| (d.0, d.2)) {
             let m = i64::try_from((now - x) / US).unwrap_or(i64::MAX);
-            s.rtt.sample(m, s.snd_una, s.snd_nxt);
+            s.rtt.sample(m, s.snd_una, s.snd_nxt, s.rto_min_us);
             s.backoff = 0;
         }
         // RACK: the most recently sent delivered segment (tcp_rack_advance).
@@ -887,7 +1117,8 @@ impl TcpModel {
         if s.segs.is_empty() {
             return;
         }
-        if s.state == State::Open || (s.state == State::Loss && s.backoff == 0) {
+        // tcp_enter_loss recomputes ssthresh on the episode's first timeout only (icsk_retransmits == 0 in Loss).
+        if s.state == State::Open || (s.state == State::Loss && s.retransmits == 0) {
             s.cut_ssthresh();
         }
         for g in s.segs.iter_mut().filter(|g| !g.sacked) {
@@ -899,7 +1130,16 @@ impl TcpModel {
         s.state = State::Loss;
         s.high_seq = s.snd_nxt;
         s.tlp_high_seq = None;
-        if doubling {
+        s.retransmits += 1;
+        // tcp_retransmit_timer's out_reset_timer: a thin stream (fewer than 4 segments out, past its initial slow
+        // start) keeps a linear timeout for its first 6 retries when the setting is on; else the RTO doubles.
+        let thin = s.thin_lt
+            && s.segs.len() < THIN_PACKETS
+            && s.ssthresh != u64::MAX
+            && s.retransmits <= THIN_LINEAR_RETRIES;
+        if thin {
+            s.backoff = 0;
+        } else if doubling {
             s.backoff += 1;
         }
         let b = s.backoff;
@@ -1024,7 +1264,11 @@ enum Event {
     Arrival { to: usize },
     DelayedAck { end: usize },
     Timer { end: usize },
+    SynTimer,
+    SynAckTimer,
 }
 
+#[cfg(test)]
+mod fixes;
 #[cfg(test)]
 mod tests;

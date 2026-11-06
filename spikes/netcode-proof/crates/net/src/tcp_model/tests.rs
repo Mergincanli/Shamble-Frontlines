@@ -324,7 +324,7 @@ fn e_after_a_1_s_burst_at_p2_the_first_fresh_snapshot_arrives_within_the_swept_m
 }
 
 /// S13 (e)'s p50, p99 and maximum, in ns, at the commit that measured them (the docs PR cites it).
-const PINNED_E: (u64, u64, u64) = (708_081_049, 914_405_971, 2_516_541_273);
+const PINNED_E: (u64, u64, u64) = (708_012_721, 908_791_834, 2_248_720_188);
 
 /// A diagnostic (run by hand with --ignored --nocapture): the worst phases and what their transmissions did.
 #[test]
