@@ -86,3 +86,142 @@ Branch claude/netcode-proof-test-plan-hcky5g, head 689c81f (41bd8a0 + checkpoint
   MUST serialize them so that there is no more than one connection at a time running through the following steps."
   NOTE: it makes script DoS harder; "There is no limit to the number of established WebSocket connections". Sure:
   high (the spec's words). Whether browsers key it by IP or IP:port: next, Chromium's source.
+- SOURCE Chromium net/socket/websocket_endpoint_lock_manager.{h,cc} (chromium.googlesource.com, main, read
+  2026-11-06): implements RFC 6455 4.1.2; the lock map keys on (IPEndPoint, NetworkAnonymizationKey), i.e. IP and
+  port; a locked endpoint's attempt waits (ERR_IO_PENDING) until granted; `kUnlockDelayInMs = 10` ("This delay
+  prevents DoS attacks"). net/websockets/websocket_basic_handshake_stream.cc: the only UnlockEndpoint call is in
+  `Upgrade()`, after the handshake is validated; OnFailure does not unlock (the EndpointLock destructor does, when
+  the job or socket is destroyed). Sure: high that Chromium (so Brave, Mustafa's browser, and Edge) holds one
+  CONNECTING WebSocket per IP:port until its handshake completes or the attempt is destroyed (I read the main
+  branch, not a pinned release; the caller of Upgrade() was not read).
+- SOURCE RFC 6455 §7.2.3 "Recovering from Abnormal Closure" (same page, read 2026-11-06): clients "SHOULD use some
+  form of backoff when trying to reconnect after abnormal closures"; the first retry delayed by a random time (0 to
+  5 s "a reasonable initial delay", clients may choose otherwise), then e.g. truncated binary exponential backoff,
+  against many clients reconnecting at once. A SHOULD, about reconnects after a closure; fix 3 reconnects while
+  the old connection is still open. Sure: high on the words; medium on how far they bind fix 3.
+- SOURCE Firefox netwerk/protocol/websocket/WebSocketChannel.cpp (github mozilla-firefox/firefox main, read
+  2026-11-06): nsWSAdmissionManager "1) Ensures that only one websocket at a time is CONNECTING to a given IP
+  address (or hostname, if using proxy), per RFC 6455 Section 4.1. 2) Delays reconnects to IP/host after connection
+  failure, per Section 7.2.3"; IndexOf compares mAddress and mOriginSuffix, NOT the port (so a second port does not
+  help in Firefox); later ones are CONNECTING_QUEUED. FailDelayManager: after a failed connection, 200-400 ms random,
+  x1.5 per repeat, max 60 s; "Don't count close() before connection as a network error"; pref
+  network.websocket.delay-failed-reconnects. Sure: high on the queueing; medium on whether mAddress becomes the
+  resolved IP (OnLookupComplete not read).
+- F14 (MISSED, decisive for fix 3): the model's "attempt every 300 ms, in parallel" (fixes.rs:196-212) cannot run in
+  Chromium (Brave, Edge) or Firefox against one room endpoint: a second `new WebSocket()` to the same IP:port
+  (Chromium) or address (Firefox) is queued until the first finishes its handshake or is destroyed; during the
+  outage the first's SYN is lost, so the rest wait on the OS's SYN retries. The browser can only abort-and-retry
+  (close() the pending attempt, then open the next: one at a time), and JS cannot tell a lost SYN from a handshake
+  in progress (WebSocket exposes no TCP-connected event), so a 300 ms cadence aborts handshakes that take ~3 round
+  trips (~300 ms at P2, ~600 ms at P4). Parallel attempts need distinct endpoints: a second TCP port (Chromium only)
+  or the VM's IPv4 and IPv6 addresses (both browsers, ADR 0006:225), against ADR 0001:429-432's "one TCP port for the
+  WebSocket fallback" per room. Measuring the serial variant next.
+- F15 (diagnostic 2, serial abort-and-retry = what Chromium/Firefox allow; same 1,000 phases, worktree copy):
+  recommended config with each new attempt killing the earlier unfinished ones:
+    every 300 ms (the pinned cadence): p50 399, p99 629, max 1,645 ms; over 1 s 8, over 1.5 s 1 (= NO tail gain over
+      the adaptive budget alone, 399/645/1,645);
+    every 500 ms: 399/632/878, 0 over 1 s; every 700 ms: 399/576/1,145, 2 over 1 s; every 1,000 ms: 399/632/930.
+  fix 3 alone serial 300 ms: 652/852/1,845 (3 over 1.5 s); serial 700 ms: 460/828/1,160.
+  So the pinned 399/611/738 is a parallel result no browser runs against one endpoint; the browser-runnable variant
+  needs a cadence above the ~3-round-trip handshake (500 ms at P2 meets Mustafa's goal in this model: max 878 ms).
+  A serial client also holds at most one CONNECTING attempt, so fewer server connections and one Join at a time.
+  Caveat: my kill drops the attempt at once; a real abort leaves the server an accepted socket until the FIN/RST
+  arrives or the 2 s Join deadline (0001:445). Not pinned, not committed: a probe only.
+- F16 (the trigger's RTT): trigger() reads the client's TCP srtt (fixes.rs:46-51, `srtt_ns(1)`, "what TCP_INFO's
+  tcpi_rtt reports", tcp_model.rs:642-647). A page cannot read TCP_INFO for a WebSocket; it has the app's ping RTT
+  (ADR 0001 part 7's clock sync), which includes head-of-line waits. The server side's adaptive budget may use
+  TCP_INFO/SIOCOUTQ (Linux); the client side may not. Effect on the numbers: unknown (direction: a longer trigger).
+- F17 (reconnect vs WebTransport-first, MISSED): 0001:422-423 "WebTransport is tried first with a timeout (proposed
+  1.5 s), then WebSocket" draws no line between a first connect and a reconnect; read literally, a fallback session's
+  reconnect spends up to 1.5 s on WebTransport before any WebSocket attempt, so no fix-3 number holds. The docs PR
+  must say a WebSocket session reconnects over WebSocket at once.
+- F18 (catalogue and rows, MISSED): `Join` "once, within 2 s" (0001:670), `FullState` "at join and on resync"
+  (0001:672), Lobby calls "per visit or room ... token request" (0001:682), "A player drops | ... fresh token; newest
+  connection wins" (0001:758), "The lobby is down | no new joins; running rooms go on" (0001:759) all assume a
+  fetch-then-join reconnect; RESUME-CRED (a) changes 682 (a refresh per player about every 25 s: 30 s expiry,
+  0001:496) and 758, and a reconnect's first message is a FullState (fixes.rs:164-169, RESUME), not a delta, so
+  E1's "decodes deltas again" (PM-0001-18, 0001:1556) must say whether a resumed session's FullState counts.
+- F19 (RESUME-CRED (a) vs expiry): "topped up as used" is not enough: a spare expires 30 s after issue (+5 s leeway,
+  0001:496), so the client must refetch about every 25 s used or not (about 2 lobby calls a minute per player; ~1.6/s
+  for a 48-player room), or the ADR gives spares a longer expiry (a change to 496 and to "short-lived", 0001:494-495).
+  Single use (0001:496 "a unique id"; R2-ROOM-F10 "usable for exactly one connection", r2:1479-1486), audience
+  (room id, 0001:495-496) and the replay cache (0001:503-504) all hold if each Join presents its own spare.
+- F20 (claim (1) as framed): no ADR 0001 rule says WHEN the fresh token is fetched (0001:507; R2-ROOM-REC4,
+  r2:2812-2815, "the client fetches a new token for the same room"), so a token fetched ahead (a) or alongside the
+  handshake (c') breaks no token rule; Q22 B's rejection (0001:963) bites only option (b). The real token-side
+  tensions: 507 newest-wins against fix 3's first-wins (resolved only by one Join at a time) and 496's expiry.
+- SOURCE WHATWG WebSockets Standard (websockets.spec.whatwg.org, read 2026-11-06): handlers onopen, onerror,
+  onclose, onmessage only; `open` fires "When the WebSocket connection is established" (after the handshake);
+  readyState CONNECTING = "The connection has not yet been established" (no sub-stages); Ping/Pong "not currently
+  exposed in the API"; failure causes hidden from scripts (close code 1006). Sure: high. So a page cannot tell a lost
+  SYN from a handshake in progress, nor read TCP's RTT (backs F14 and F16).
+- F21 (diagnostic 3, deltas again): counting only a delta (a resumed session's FullState not counted, as E1's
+  "decodes deltas again" reads): recommended parallel 399/611/751 ms (max +14); serial 500 ms 399/632/904 (max +26).
+  Small, but the pinned maximum is not E1's measure as written.
+- F22 (anti-cheat line): 0001:782-784 "the guest secret out of script's reach". A spare token (a) sits in script for
+  at most its 35 s; a room-issued resume secret (b), if reusable for the match, is a longer-lived bearer credential
+  in script (as plan:1022-1023's proof-test secret is). A point against (b), and for short-lived spares.
+
+## Verdicts (finished block)
+1. Fix 3 conflicts with the token rules (single use, replay cache, fresh token on reconnect, Q22 B rejected):
+   REFUTED as framed. No rule says when the fresh token is fetched (0001:507; r2:2812-2815); a token fetched ahead or
+   alongside the handshake keeps single use, audience and the replay cache (F19, F20). What does bite: 496's 30 s
+   expiry (a refresh about every 25 s), 507's newest-wins against "whichever connects first" (one Join at a time,
+   cancel the rest: F9), and conflicts the analysis missed (F4, F14, F17, F18). The model itself assumes "a token
+   held in advance" (fixes.rs:18).
+2. Fix 1 does not conflict; 424 is its own rule; the 64 KB is the plan's: CONFIRMED with corrections: the 64 KB is
+   ADR 0001's own text at 1467 (the pass marks' Profiles key, advisor's E4 keeps it), a simulator bound, kept by WS-FIX
+   (a) (F1, F6); every row incl. the defaults already obeys 424 (F5); 424 should gain the budget's wording.
+3. Fix 2 does not conflict with ADR 0001 (or 0006): CONFIRMED (no kernel or socket-option rule in either; the
+   per-socket TCP_THIN_LINEAR_TIMEOUTS needs no privilege, tcp.c:3530-3534; rto_min is per route in v6.8,
+   tcp.h:741-748, root at VM setup, every TCP flow on the route), and moot: not in WS-FIX (a), and thin LT never fires
+   under the adaptive budget (F13).
+4. RESUME-CRED options: (a) holds single use, audience, replay cache; fails "topped up as used" against the 30 s
+   expiry (F19); needs one Join at a time (F9); per-address and new-session limits must be sized (no number to break,
+   0001:447-450). (b) reopens Q22 B (0001:963); the proof test already runs one (plan:1022-1023); against 0001:783's
+   spirit if long-lived (F22). (c) ADR-literal, and browsers force one attempt at a time anyway (F14); its "fetch
+   first" is avoidable by fetching alongside the handshake (c'), not offered and not measured.
+5. Missed: F4 (proof test scope), F14 (browsers serialise; one TCP port per room), F17 (WebTransport-first on
+   reconnect), F18 (catalogue rows, failure rows, E1's deltas), F11 (the omitted adaptive-alone row), F3 (the
+   runner's single-use token). ADR 0006: none (no kernel/socket rule; 0006:225's dual-stack address is one way out
+   of F14).
+
+## The ADR 0001 lines a docs PR changes for WS-FIX (a) + RESUME-CRED (a) (finished block)
+Beside the advisor's E1-E4 (1556, 747, 1295, 1462-1469):
+- 422-423: a reconnect stays on the session's transport (a WebSocket session reconnects over WebSocket at once);
+  the old and the new connection overlap only until the Join replaces the old.
+- 424: the newest-only rule gains its budget: the room writes a snapshot only while the socket's unacknowledged
+  bytes fit about 1.5 round trips of snapshots (at least 3), from the socket's own RTT and queue.
+- 429-432: only if parallel attempts are kept: a second endpoint per room (port, or the IPv6 address); unchanged for
+  a serial client.
+- 445-450: the per-address cap, the new-session rate limit and the handshake cap sized for reconnects (a client's
+  2-3 attempts a second, players sharing an address, a whole room at once).
+- 494-497: the spare token's life: 30 s with a refresh about every 25 s, or a longer expiry for spares.
+- 506-509: *Reconnect:* the client holds a spare token; after max(300 ms, 2 x RTT + 100 ms) of silence it opens a
+  new connection (cadence as decided), sends Join on one connection at a time, drops the rest once data resumes;
+  newest Join wins (unchanged).
+- 527-528 (*Why*): the lobby stays off the join path; a periodic refresh per player in a match is new.
+- 670 `Join` "once" -> once per connection; 672 `FullState` also on a reconnect's Join; 682 Lobby calls add the
+  spare-token refresh and size its per-client and per-address limits.
+- 758 "A player drops": spare token held in advance; 759 "The lobby is down": reconnects work until the spare
+  expires; a new row for false reconnect triggers (about 0.7 a minute per client at P3/P4).
+- 962 Q22 A: "rejoin with a fresh token (fetched ahead and held as a spare)".
+- 1640-1641: the proof test builds the WebSocket reconnect (test tokens: the bots' slot tokens, the browsers' resume
+  secret, plan §10.3), if WS-LIMIT is measured with it. Plan: 297 (scope) and §10.3 1022-1023, 1028.
+
+## Must correct before Mustafa decides (finished block)
+1. Fix 3 as pinned (parallel attempts) is not what Brave, Edge or Firefox can run against one room endpoint (F14,
+   RFC 6455 §4.1, Chromium and Firefox sources); the serial version at the pinned 300 ms cadence gives no tail gain
+   (399/629/1,645, 1 over 1.5 s); at 500 ms: 399/632/878 (my probe, not pinned). WS-FIX and WS-LIMIT need the
+   browser-runnable variant measured and pinned.
+2. Send the omitted row (F11): the adaptive budget alone (no ADR conflict) is 399/645/1,645; fix 3 buys only the tail.
+3. Correct claim (1) (F20): the token rules don't forbid a spare; the conflicts are 507 (one Join), 496 (expiry),
+   422-423 (WebTransport-first), 429-432 (one port, if parallel), 1640-1641 and plan:297 (scope).
+4. RESUME-CRED (a) must say "refreshed about every 25 s" (F19) and "one Join at a time, the rest cancelled" (F9);
+   add (c'): fetch the token alongside the handshake.
+5. Claim (2)'s "the plan's own number": the 64 KB is ADR 0001:1467 (F1). Code cite slip tcp_model.rs:47.
+6. E1's "deltas again" vs a FullState after a reconnect: max +14 ms parallel, +26 ms serial (F21).
+Worktree .gate/u3-adr-diag removed (its file reset to HEAD first); probes kept in the scratchpad (adr_diag.rs,
+serial_diag.rs, patch_delta.py); build output in .gate/u3-adr-diag-target; nothing committed or pushed.
+
+DONE
