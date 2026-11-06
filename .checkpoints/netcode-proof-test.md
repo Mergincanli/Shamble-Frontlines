@@ -64,17 +64,30 @@
     a dated nightly exists; crates.io reachable (wtransport 0.7.2, web-transport-quinn 0.13.6, wasm-bindgen-cli
     0.2.130); Chromium 153 headless; **loopback WebTransport with a pinned hash PASSES** (datagram and stream echo;
     maxDatagramSize 1024 B; a wrong hash refused); no IPv6 in the container. Per UNDER-WAY (a) the kit freeze lifts now.
+12. **U1 part 1, the spike skeleton** · 760fa89 (pushed; CI runs gate and smoke on PR #40) · `spikes/netcode-proof/`:
+    the workspace pinned to Rust 1.99.1 (resolver 3, edition 2024, Cargo.lock: 26 packages), the 15 crates of plan
+    §4.1 as compiling stubs wired per §4.2, deny.toml, per-crate clippy.toml bans made errors (a planted f32::sin,
+    f32::max and HashMap each failed clippy; probe removed), builds under .gate/ (.cargo/config.toml + .gitignore).
+    build, clippy host and wasm32 (leaf crates), fmt: clean. Legacy gate: 1-4 and 5b-5d PASS, +0 -0; 5a cannot start
+    here (tools' Playwright wants chromium_headless_shell-1194, absent), so CI's smoke job is the check.
+13. **R-PR** · [Mergincanli/Shamble-Frontlines#41](https://github.com/Mergincanli/Shamble-Frontlines/pull/41), head
+    2ccc184 on `claude/npt-readings` (worktree `.gate/npt-readings`), ready for review, subscribed · engine-architect
+    placed the advisor's exact words + Mustafa's answers (5 docs files, +96 -34; its verify script: word for word,
+    tables intact, lines <= 120), then 8 consistency fixes (old lines now point to the readings); the main session read
+    the whole word diff. needs-mustafa (ADR edits).
 
 ## Current step
-11. After Mustafa's approval (2026-11-06): R-PR on `claude/npt-readings` (worktree `.gate/npt-readings`, from main):
-    engine-architect writes the advisor's exact words into ADR 0001, 0004, 0006 and SPIKE_PLAN; then the gate, the
-    PR, the advisor's review of its head, Mustafa's go. In parallel, U0 (the container probes) in the main folder.
+14. The advisor's review of PR #41's head 2ccc184 (advisor agent, xhigh, background; notes `advisor-pr41.md`); then
+    Mustafa's go ("merge #41") and the merge with 2ccc184 as the expected head, gate and smoke green.
 
 ## Next steps
-1. R-PR: review the agent's diff in `.gate/npt-readings`, run the gate there, commit, push `claude/npt-readings`, open
-   the PR (needs-mustafa: ADR edits), the advisor reviews its head, then Mustafa's go; no counted run before it merges.
-3. U1: the `spikes/netcode-proof/` skeleton (plan §12.1).
-4. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
+1. On the advisor's APPROVE of #41: ask Mustafa for "merge #41"; merge with the approved SHA as the expected head.
+2. U1 part 2: npt-log's record types and writer; npt-judge with its PASS, FAIL and INVALID fixtures (PM-0006-14's
+   short padding among them); marks.json (from the digests' tables); the dependency-rule check script; redact-check;
+   the message catalogue (netcode-architect drafts it in docs/design/).
+3. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
+4. Write files with the Write and Edit tools only, never shell redirects or scripts that write (Mustafa, 2026-11-06:
+   the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
 
 ## Open findings
 - Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
@@ -120,3 +133,8 @@
   · started 22:35 · stopped 00:25 ('time is up').
 - Saver: background task `be4kec0xf` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/be4kec0xf.output`
   · started 02:11 · stopped by the session at 03:18 (no agent running; final saves by hand).
+- Saver: background task `bar6y14h2` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bar6y14h2.output`
+  · started 10:36 · stops by 12:26 (110 min).
+- The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · running.
+- R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
+  rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.

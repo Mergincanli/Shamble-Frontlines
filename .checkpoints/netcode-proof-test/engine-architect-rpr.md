@@ -49,4 +49,19 @@ Edit method: no Edit tool in this session; exact-string replacement via small py
   R-25: 0001:1458-1465 key Profiles after "ADR 0002's simulator).". R-26: 0006:1326-1329 after times-of-day sentence (bracket B bullet). R-28: 0001:1667-1669 after "(PM-0001-3).".
   FIXED-IP: SPIKE_PLAN:74-76 (end of Machines para) and SPIKE_PLAN:187-188 (Depends-on list, lowercase "with"). ROUTE: SPIKE_PLAN:76-78 (last sentence of Machines para).
 - Problems (for the answer): P1 digest F sentence not placed; P2 PM-0001-3 method cell keeps ambiguous "half of the profile's RTT minus..." and runs cell "every L2 session"; P3 R-28 leaves "The profile and the cap change from the overlay" (0001:1665); P4 OQ-0006-16 "Answered" though 443 half open + 0001:427 "until it is answered" stale; P5 S30 undefined in ADR 0006; P6 FIXED-IP lowercase in list; P7 MAC-NONE supersedes SPIKE_PLAN:171-172 and 0001:1410 summary, untouched; P8 PM-0006-14 row/0006:1211 still say "interim", OQ-0006-19 "What decides it" unchanged; P9 DENSITY-FIGURE code added (droppable); P10 R-5 placed twice, R-17 in both rows; P11 register rows quote full words (long).
+- (first task DONE and handed back.)
+
+## Follow-up task: R-PR consistency fixes (coordinator, 8 changes), same worktree, never commit
+Plan (blocks): F1 read base contexts for the 8 anchors; F2 extend rpr-edit.py with C1-C8 and rerun; F3 rerun rpr-verify.py
++ diff review; F4 answer with new line numbers. Keep problems 2, 7, 10, 12, 13 as they are.
+C1 PM-0001-3 runs cell: five digest F bites (tag). C2 method cell phrase -> "set per direction to (...) ÷ 2 (tag)", drop
+duplicate delay sentence at pass cell end; runs cell "every L2 session" -> "every L2 block (tag)". C3 R-28 old clause
+cap half. C4 OQ-0006-16 status "Answered in part..." (+ register row, same phrase) and pointer at 0001:427. C5 ADR 0006
+S30 gloss. C6 pointers SPIKE_PLAN:171-172 and 0001:1410. C7 "(answered by Mustafa, 2026-11-06: (a))" at 0006:1366,
+0006:1211 and OQ-0006-19 What decides it. C8 key copy of R-5 -> one pointer sentence.
+- F1 done: base anchors for C1-C8 all unique (0001:427, 0001:1397, 0001:1640, 0001:1513 runs cell, 0006:1099, 0006:1211, 0006:1352, SPIKE_PLAN:160). Next: F2 extend rpr-edit.py.
+- F2 done: rpr-patch-c.py applied C1-C8 to rpr-edit.py; wrap() now carries the previous word down in-loop when a line would start with a Markdown marker ('+ s' in OQ-0006-16). Rerun OK. Next: F3 review diff.
+- F3: C3 merged with R-28 into one prose_replace (checklist lines re-wrap together). Verify: only expected MISSING (deleted duplicate delay sentence; R-12 labels/digest F sentence); tables ok; 0 long lines. Next: line numbers + answer.
+- F4 line numbers (after fixes): 0006: OQ-0006-16 1040-1049, OQ-0006-19 answer 1098, What-decides pointer 1110-1111, 1211-pointer now 1223-1224, R-26 1329-1332, bite+S30 gloss 1337-1338, rows -11 1366, -14 1369 (C7 pointer + R-12), -26 1381. 0001: 427-428 pointer, part 13 R-5 580-585, OQ-0001-9 1167-1174, MACHINES-TIMING pointer 1411-1413, R-25 1461-1468, key reorder pointer 1473, bite rule 1527-1528, PM-0001-3 1537 (pass cell 1M + probe; method cell formula; runs cell block + 5 bites), -18 1555, -23 1560, -24 1561, -59 1564, -28 1567, -36 1575, -55 1601, checklist C3+R-28 1664-1669. 0004: 1193. SPIKE_PLAN: R-13 57-61, MAC-NONE 61-65, FIXED-IP 74-76, ROUTE 76-78, Depends-on pointer 172-173, FIXED-IP 2nd 188-189, R-14 198-201. README: 79, 154 (Answered in part status), 157.
+- Choices: C1 bites without (a)-(e) letters, semicolons (row style); C5/C6/C7 pointers kept exact, beside existing parentheses (adjacent parentheses exist in drafts, e.g. 0001:1490); C6 in ADR 0001 says "SPIKE_PLAN's Machines" for "Machines above"; C4 status also applied to the register row 154; C3 and R-28 re-wrapped together (three lines, all touched).
 DONE

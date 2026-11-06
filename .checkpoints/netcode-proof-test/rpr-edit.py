@@ -33,15 +33,13 @@ def wrap(first_prefix, words_text, indent):
         cand = (cur + ' ' + w) if cur.strip() else (cur + w)
         if len(cand) <= MAXW or not cur.strip():
             lines[-1] = cand
+        elif BAD.match(w):
+            # never start a continuation line with a Markdown block marker: carry the previous word down with it
+            head, last = cur.rsplit(' ', 1)
+            lines[-1] = head
+            lines.append(indent + last + ' ' + w)
         else:
             lines.append(indent + w)
-    # never start a continuation line with a Markdown block marker
-    for i in range(1, len(lines)):
-        first = lines[i][len(indent):].split(' ', 1)[0]
-        if BAD.match(first):
-            prev = lines[i - 1].rsplit(' ', 1)
-            lines[i - 1] = prev[0]
-            lines[i] = indent + prev[1] + ' ' + lines[i][len(indent):]
     for i, l in enumerate(lines):
         if i > 0:
             assert len(l) <= MAXW, (len(l), l)
@@ -57,6 +55,19 @@ def prose_insert(text, anchor, insert, indent):
     prefix, suffix = text[ls:p], text[p:le]
     block = wrap(prefix, insert + suffix, indent)
     return text[:ls] + block + text[le:]
+
+def prose_replace(text, old, new, indent):
+    """Replace a unique string (may span lines) and re-wrap only the lines it touches."""
+    assert text.count(old) == 1, ('old count', text.count(old), old)
+    a = text.index(old)
+    b = a + len(old)
+    ls = text.rfind('\n', 0, a) + 1
+    le = text.find('\n', b)
+    prefix = text[ls:a].rstrip(' ')
+    block = wrap(prefix, new + text[b:le], indent)
+    return text[:ls] + block + text[le:]
+
+# C1-C8: the coordinator's consistency fixes (2026-11-06)
 
 def line_insert_after(text, anchor_line_end, new_block):
     """Insert whole new lines after the line a unique anchor ends."""
@@ -82,7 +93,8 @@ def row_replace(text, row_id, old, new):
 P6 = 'docs/adr/0006-infrastructure-operations.md'
 t = base(P6)
 t = line_insert_after(t, 'must the WebSocket fallback be\n  reachable on TCP 443?**',
-    wrap('  -', 'Answered by infra-engineer and netcode-architect, confirmed by the Advisor (2026-11-06): '
+    wrap('  -', 'Answered in part, for the netcode proof test, by infra-engineer and netcode-architect, confirmed by '
+         'the Advisor (2026-11-06); the TCP 443 question stays open until slice 3. '
          + tagged(word('ADR 0006, OQ-0006-16')), '    '))
 t = line_insert_after(t, '- **OQ-0006-19. Is the goal budget provisional until slice 6 measures rooms per VM with the '
                          'real sim?**',
@@ -96,7 +108,14 @@ t = row_replace(t, 'PM-0006-14', '(it feeds PM-0006-18) |',
 t = row_replace(t, 'PM-0006-26', '0 dropped in each |',
     '0 dropped in each. Bites: a rotation that closes live sessions' + TAG + ' |')
 t = prose_insert(t, 'a control is a correct case\n  that must pass. The planted defects and controls are proposed.',
-    ' Memory and queue marks bite over a full S30' + TAG + '.', '  ')
+    " Memory and queue marks bite over a full S30 (ADR 0001's 30-minute soak, its key's Soaks)" + TAG + '.', '  ')
+# C7: pointers to Mustafa's DENSITY-FIGURE answer
+t = row_replace(t, 'PM-0006-14', "OQ-0006-19's option (a), the interim;",
+    "OQ-0006-19's option (a), the interim (answered by Mustafa, 2026-11-06: (a));")
+t = prose_insert(t, '(proposed interim, OQ-0006-19)', ' (answered by Mustafa, 2026-11-06: (a))', '  ')
+t = prose_replace(t, "the Advisor's reading, before the netcode proof test's density runs.",
+    "the Advisor's reading, before the netcode proof test's density runs (answered by Mustafa, 2026-11-06: (a)).",
+    '    ')
 t = prose_insert(t, 'the research says only "3 times of day", r6 line 669).',
     ' ' + tagged(word('ADR 0006:1314-1316')), '  ')
 open(f'{WT}/{P6}', 'w', encoding='utf-8').write(t)
@@ -108,14 +127,34 @@ R5 = tagged(word('ADR 0001, part 13'))
 t = prose_insert(t, "The simulator that runs the profiles is ADR 0002's.", ' ' + R5, '    ')
 t = prose_insert(t, "(R5-TEST-REC4, lines 1454–1461; ADR 0002's simulator).",
     ' ' + tagged(word('ADR 0001:1444-1445')), '  ')
-t = prose_insert(t, 'lines 1991–1992, and names\n  no rate).', ' ' + R5, '  ')
+t = prose_insert(t, 'lines 1991–1992, and names\n  no rate).',
+    " An explicit reorder step joins the profiles (part 13, the advisor's reading, 2026-11-06).", '  ')
 r69 = word('ADR 0001, PM-0001-3 ')
 first, rest = r69.split('. ', 1)
+probe, delay = rest.split('. The injected', 1)
+probe, delay = probe + '.', 'The injected' + delay
 assert first == '1,000,000 packets per profile and direction on both layers, so PM-0001-3 and PM-0002-49 read one count'
 t = row_replace(t, 'PM-0001-3', 'jitter over 100,000 packets within 5 % (relative)',
     'jitter over ' + first + TAG + ', within 5 % (relative)')
 t = row_replace(t, 'PM-0001-3', 'his own base RTT recorded |',
-    'his own base RTT recorded. ' + tagged(rest, '') + ' |')
+    'his own base RTT recorded. ' + tagged(probe, '') + ' |')
+FORMULA = "(the profile's RTT − the path's measured base RTT) ÷ 2"
+assert delay == 'The injected delay in each direction is ' + FORMULA + '.'
+t = row_replace(t, 'PM-0001-3', "set to half of the profile's RTT minus the path's measured base RTT",
+    'set per direction to ' + FORMULA + TAG)
+# C1 + C2: the runs cell: block, not session; test-engineer digest F's five bites
+t = row_replace(t, 'PM-0001-3', 'and at the start of every L2 session |',
+    'and at the start of every L2 block' + TAG + '. Bites: the full round trip applied each way fails the mean-delay '
+    'band; loss drawn once per round trip fails the per-direction loss; a normal jitter in place of the uniform fails '
+    "the jitter check; the RNG seeded from the clock fails the fate-log identity; on L2, the delay not net of the base "
+    "RTT fails MP's 100 ± 5 ms" + TAG + ' |')
+# C4: pointer at ADR 0001 part 10's port note
+t = prose_insert(t, 'confirmed by the Advisor); until it is answered',
+    ' (answered in part for the netcode proof test, 2026-11-06: ADR 0006, OQ-0006-16)', '    ')
+# C6: pointer at ADR 0001's MACHINES-TIMING summary
+t = prose_insert(t, '(if not, "I borrow the Mac before the netcode proof test")',
+    " (overtaken by Mustafa's answer of 2026-11-06, SPIKE_PLAN's Machines: no Mac is available, and the Safari rows "
+    'wait for one)', '  ')
 t = row_replace(t, 'PM-0001-18', '| L1: 3 seeds; L2: 1 run; every client after every burst |',
     '| L1: 3 seeds; L2: 1 run; every client after every burst. Bites: a baseline that never falls back' + TAG + ' |')
 R17 = tagged(word('ADR 0001, PM-0001-23 and -24'), '')
@@ -137,8 +176,14 @@ t = prose_insert(t, 'measured margin plus 10 % of the mark must fail it.',
 t = prose_insert(t, 'the Riot Shield block) at\n  the attacker\'s view time.',
     " The cover half is answered by the Advisor's rule (2026-11-06), which Mustafa may overrule at the close. "
     + tagged(word('ADR 0001, OQ-0001-9')), '  ')
-t = prose_insert(t, 'so the server measures the\nprofile\'s latency (PM-0001-3).',
-    ' ' + tagged(word('ADR 0001, netcode checklist')), '')
+# R-28 and C3 in one step: the old clause loses its cap half, R-28's words follow; only these three lines re-wrap
+t = prose_replace(t, "The profile and the cap change from the overlay (a spike-only control on the server's impairment\n"
+    "layer); his own network's base round trip is measured at the start and subtracted, so the server measures the\n"
+    "profile's latency (PM-0001-3).",
+    "The profile changes from the overlay (a spike-only control on the server's impairment layer), and the cap is set "
+    "as the advisor's reading below says (2026-11-06); his own network's base round trip is measured at the start and "
+    "subtracted, so the server measures the profile's latency (PM-0001-3). "
+    + tagged(word('ADR 0001, netcode checklist')), '')
 open(f'{WT}/{P1}', 'w', encoding='utf-8').write(t)
 
 # ---------- ADR 0004 ----------
@@ -171,6 +216,9 @@ t = prose_insert(t, "of the new SSH host keys, on that day (ADR 0006's key; the 
 t = prose_insert(t, "issuance method chosen in this test's own plan with\n  security-auditor (the advisor's reading, "
                     '2026-11-03);',
     ' w' + tagged(FIX, ';')[1:], '  ')
+t = prose_insert(t, 'the Mac is borrowed before this test only if they cannot pass it (Machines, above)',
+    " (overtaken by Mustafa's answer of 2026-11-06, Machines above: no Mac is available, and the Safari rows wait for "
+    'one)', '  ')
 t = prose_insert(t, 'and reports separately (item 2; the\n  advisor\'s reading, 2026-11-03).',
     ' ' + tagged(word('SPIKE_PLAN item 1, Place')), '  ')
 open(f'{WT}/{PS}', 'w', encoding='utf-8').write(t)
@@ -182,7 +230,8 @@ t = row_replace(t, 'OQ-0001-9', '| OQ-0001-9 | What else does lag compensation c
     "| OQ-0001-9 | What else does lag compensation cover? The cover half is answered by the Advisor's rule "
     '(2026-11-06), which Mustafa may overrule at the close. ' + tagged(word('ADR 0001, OQ-0001-9')) + ' |')
 t = row_replace(t, 'OQ-0006-16', 'reachable on TCP 443? | infra-engineer with netcode-architect',
-    'reachable on TCP 443? Answered by infra-engineer and netcode-architect, confirmed by the Advisor (2026-11-06): '
+    'reachable on TCP 443? Answered in part, for the netcode proof test, by infra-engineer and netcode-architect, '
+    'confirmed by the Advisor (2026-11-06); the TCP 443 question stays open until slice 3. '
     + tagged(word('ADR 0006, OQ-0006-16')) + ' | infra-engineer with netcode-architect')
 lines = t.split('\n')
 idx = [i for i, l in enumerate(lines) if l.startswith('| OQ-0006-19 | ')]
