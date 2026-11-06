@@ -18,8 +18,24 @@
   and REPO_MAP and is in conflict with main; it already records #41 in STATUS and asks Mustafa UNDER-WAY (when the
   test counts as under way: the same question as this session's A4-START). PR #41 merged at d8c485a before #39 and
   shifted the register's lines after line 31 by one.
-- **Done:** step 0, the sources read and copied (`mustafa-words.md`); plan revision 1 (`plan-rev1.md`).
-- **Current step:** 1, the advisor's review of plan revision 1.
+- **Done:** step 0, the sources read and copied (`mustafa-words.md`); plan revision 1 (`plan-rev1.md`), committed
+  8ee1b5b [skip ci]; draft PR #42 opened and subscribed.
+- **Key numbers (VISION_V2 at ee736ec, before):** 88 lines; tags `[DECIDED]` 10, `[DEFAULT]` 3, `[OPEN]` 4,
+  `[LATER]` 4, `[IDEA]` 0 (the header's tag line counts one of each of the first four). Citations of the lines B.2
+  changes: §7's faction question is the owner named in ADR 0005:686, README:120 and r1-simulation-core.md:2806 (kept,
+  pointer only); "VISION_V2 §5" citations are about guest play and login (line 58, unchanged).
+- **Done:** step 1, the advisor's review (`advisor-plan-rev1.md`): APPROVE WITH CONDITIONS (9). PLACE (a), TAG (a),
+  HANDOVER (b) with C3-C4, REG (a) with C8, DK-41 (b) narrowed (C5: plan premise false, #40's STATUS still calls #41
+  "waiting for his go"; one clause for #41's merge in STATUS:3), HEADER (a). C1 the pointer line names the open
+  question, not what the drafts "keep"; C2 the trust rule answers nothing else (R2-ROOM-OQ7, R6-TEL-OQ2, rented
+  official servers); C6 STATUS:446 cites README:294-298; C7 ROADMAP:99 "taken by B.2 (PR #42)"; C9 E4 adds
+  line-number citations into VISION_V2 (r1-simulation-core.md:3301 and :3535 cite VISION_V2.md:54, already stale:
+  report it, leave the research file).
+- **Found (not B.2's to record):** #40's branch (head 1b5136e) records Mustafa's answers of 2026-11-06 (its plan §0.4,
+  "his words in short", commit 411824a at 09:33 UTC): UNDER-WAY (a), and U0 committed at 09:40 UTC (f6886bf), so the
+  kit freeze lifted and A4 may start after B.2. Its STATUS edits (:39-41, :165, :431, :462) carry this; B.2 leaves the
+  A4 lines' substance to #40 (as DK-41) and tells Mustafa in chat that the earlier ask to answer UNDER-WAY was moot.
+- **Current step:** 2, the build in the main session (VISION_V2, the register clause), then E1-E4.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
