@@ -204,15 +204,10 @@ const STEPS = {
     const c = run("cargo", ["run", "-q", "--locked", "-p", "npt-judge", "--", "--marks", "marks/marks.json", "--check-marks"], HERE);
     if (!c.ok) return c;
     const marks = JSON.parse(readFileSync(join(HERE, "marks", "marks.json"), "utf8"));
-    // The rows are compared with the drafts at the commit marks.json names: PR #41's head, until it merges into this
-    // branch; then with the branch's own docs/adr/ (the next step after the merge).
-    const at = (f) => {
-      const r = run("git", ["show", `${marks.drafts_commit}:${f}`], ROOT);
-      if (!r.ok) throw new Error(`git show ${marks.drafts_commit}:${f}: ${lastLines(r.out, 1)}`);
-      return r.out;
-    };
-    const problems = marksProblems(marks, at);
-    const summary = `${lastLines(c.out, 1)}; rows at ${marks.drafts_commit.slice(0, 7)}: ${problems.length ? "" : "all unchanged"}`;
+    // The rows are compared with this branch's own docs/adr/ (PR #41's readings are on main since d8c485a): any later
+    // edit of a mark's row makes this step fail until marks.json is re-read against it.
+    const problems = marksProblems(marks, (f) => readFileSync(join(ROOT, f), "utf8"));
+    const summary = `${lastLines(c.out, 1)}; rows in this branch's docs/adr/: ${problems.length ? "" : "all unchanged"}`;
     return { ok: problems.length === 0, out: problems.length ? `${problems.join("\n")}\n${summary}` : summary };
   },
   self: () => summarized(run(process.execPath, ["--test", join(HERE, "check.test.mjs")], HERE), nodeCounts),

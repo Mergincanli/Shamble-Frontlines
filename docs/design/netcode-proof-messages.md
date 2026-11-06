@@ -11,10 +11,9 @@
   controls: the session controls a browser sends with a capability, and the room-wide controls on RS's local Unix
   sockets. It is the last entry of the plan's §4.1 layout (`.checkpoints/netcode-proof-test/plan.md`, revision 3.2),
   and the catalogue `.claude/rules/netcode.md` asks for: a protocol change in the spike updates this doc first.
-- **Which draft text.** ADR 0001 as PR #41 changes it, read at that PR's head `16763a7` (the worktree
-  `.gate/npt-readings`). "ADR 0001:667" and "row 667" are lines of that copy. The PR's final head, `1b4094a`,
-  changes only lines 1665-1667 and keeps every line number. The session re-checks every line number once PR #41
-  merges. "Plan §N" is a section of the plan.
+- **Which draft text.** ADR 0001 as PR #41 changed it, now on main (merged as `d8c485a`, 2026-11-06). "ADR 0001:667"
+  and "row 667" are lines of that text: they were read at the PR's head `16763a7`, and its final head `1b4094a`
+  changed only lines 1665-1667, keeping every line number. "Plan §N" is a section of the plan.
 - **Throwaway.** Nothing outside `spikes/` uses these types. The foundation writes its protocol crate fresh
   (ADR 0001:1722-1726) and reads this doc only as a reference.
 - **Numbers.** Each one is traced to an ADR line or a plan section, or marked "proposed" with its arithmetic.
