@@ -723,3 +723,124 @@ is reserved from the header alone), read_buffer_size small, and never return Rea
   current->timer_slack_ns);` (https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/futex/waitwake.c:694-695),
   then `hrtimer_set_expires_range_ns(&timeout->timer, *time, range_ns)` (kernel/futex/core.c:149). So the thread's
   slack applies to the Condvar wait too (no RT override on this path at 6.8), and prctl(1 ns) is what tightens it.
+- strace confirms both mechanisms (17:03 UTC, 3-wait runs, while the 50 ms sleeper cells ran): std::thread::sleep is
+  `clock_nanosleep(CLOCK_MONOTONIC, 0, {tv_sec=0, tv_nsec=99716}, ...)` (relative, ns precision); tokio's runtime parks
+  in `epoll_wait(3, [...], 1024, 1)` and other whole-ms timeouts (1, 2, 3, 6, 7, 11 seen): the integer-ms epoll
+  timeout of F1a, observed directly.
+- The release thread's Condvar::wait_timeout is `futex(.., FUTEX_WAIT_BITSET_PRIVATE, .., {tv_sec=12550, ..})`: an
+  ABSOLUTE CLOCK_MONOTONIC deadline (tv_sec equals the container's uptime, 3 h 29 min), so the wait does not drift
+  with the time spent before the syscall (strace of `stream 200 100 1 1`, 17:03 UTC).
+- Probe validity for (d) and the notify stream: `notify_one` with no waiter "a permit is stored in this `Notify`
+  value" (https://docs.rs/tokio/1.54.1/tokio/sync/struct.Notify.html), so a release that beats the task's await is
+  not lost; the lateness then reads near 0 (no wake needed), which can only flatter (d), never inflate it.
+- rustls's docs (docs.rs rustls 0.23.31 ConnectionCommon::set_buffer_limit; the pinned 0.23.46 source sets the same
+  64 * 1024 default, common_state.rs:1136): "By default the limit is 64KB"; it covers pre-handshake plaintext and
+  outgoing TLS records. Keep the default (never None, which "will mean that written data is buffered without bound").
+- F4's pump owns both halves through `TcpStream::into_split` ("Splits a `TcpStream` into a read half and a write half,
+  which can be used to read and write the stream concurrently": docs.rs tokio 1.54.1), and the accept path sets
+  `set_nodelay(true)` on the real socket so a released segment leaves at once (Nagle would merge releases and add
+  up to an ACK-delay; the emulated path, not the kernel, should decide segment timing).
+- The trait contract agrees with F3's rule: tokio's AsyncWrite::poll_write: "A return value of `0` typically means
+  that the underlying object is no longer able to accept bytes ... or that the buffer provided is empty"; "If the
+  object is not ready for writing, the method returns `Poll::Pending` and arranges for the current task (via
+  `cx.waker()`) to receive a notification" (https://docs.rs/tokio/1.54.1/tokio/io/trait.AsyncWrite.html). A full
+  64 KB budget is "not ready", never 0.
+- And AsyncRead::poll_read: "If the difference is 0, either EOF has been reached, or the output buffer had zero
+  capacity" (https://docs.rs/tokio/1.54.1/tokio/io/trait.AsyncRead.html): so DelayStream returns Ready with no bytes
+  only after the peer's FIN AND the last delayed byte; while segments wait for their delivery time it must return
+  Pending with the waker armed, or tungstenite reads EOF early.
+- The Sink contract behind the newest-only rule: poll_ready "must be called and return `Poll::Ready(Ok(()))` prior to
+  each call to `start_send`" (https://docs.rs/futures-sink/0.3.31/futures_sink/trait.Sink.html; futures-sink's pinned
+  version in Cargo.lock not checked). So WsServer polls readiness first and, while Pending, replaces its one waiting
+  snapshot.
+  (futures-sink pinned at 0.3.34 in spikes/netcode-proof/Cargo.lock; the quoted contract is unchanged across 0.3.x: unconfirmed for 0.3.34 specifically.)
+  Confirmed in the pinned source: R/futures-sink-0.3.34/src/lib.rs:58 ("This method must be called and return `Poll::Ready(Ok(()))` prior to").
+  Pinned-source lines for the two contracts: R/tokio-1.54.1/src/io/async_write.rs:43-48 ("A return value of `0` typically means that the underlying object is no longer able to accept"; "If the object is not ready for writing, the method returns" Pending); R/tokio-1.54.1/src/io/async_read.rs:21 and :49 (EOF).
+
+### T2. Sleepers (10,000 waits per cell; lateness in us; a, b and b1 ran concurrently as three processes, 16:55:36-17:07; this container, not RS)
+```
+b_thread_sleep_slack_default	delay_ms=0.1	min=11.7	p50=67.1	p99=177.6	p99.9=451.9	max=2199.8	over_250us=28	cpu_cores=0.084
+b_thread_sleep_slack_default	delay_ms=0.5	min=18.5	p50=86.8	p99=226.2	p99.9=1467.1	max=7213.3	over_250us=75	cpu_cores=0.037
+b_thread_sleep_slack_default	delay_ms=1.0	min=14.6	p50=103.0	p99=283.3	p99.9=2124.0	max=32642.1	over_250us=137	cpu_cores=0.023
+b_thread_sleep_slack_default	delay_ms=2.0	min=15.8	p50=117.0	p99=316.1	p99.9=1998.7	max=19789.5	over_250us=162	cpu_cores=0.013
+b_thread_sleep_slack_default	delay_ms=10.0	min=41.1	p50=148.7	p99=408.5	p99.9=2765.4	max=13606.1	over_250us=282	cpu_cores=0.003
+b_thread_sleep_slack_default	delay_ms=50.0	min=35.0	p50=164.7	p99=620.9	p99.9=9190.2	max=43680.3	over_250us=420	cpu_cores=0.001
+b1_thread_sleep_slack_1ns	delay_ms=0.1	min=8.7	p50=16.7	p99=120.8	p99.9=685.5	max=2765.9	over_250us=18	cpu_cores=0.116
+b1_thread_sleep_slack_1ns	delay_ms=0.5	min=10.2	p50=37.1	p99=198.6	p99.9=1345.7	max=2497.3	over_250us=61	cpu_cores=0.040
+b1_thread_sleep_slack_1ns	delay_ms=1.0	min=11.0	p50=54.1	p99=232.9	p99.9=2107.3	max=28006.3	over_250us=85	cpu_cores=0.024
+b1_thread_sleep_slack_1ns	delay_ms=2.0	min=15.0	p50=64.3	p99=287.8	p99.9=2333.2	max=10496.7	over_250us=116	cpu_cores=0.013
+b1_thread_sleep_slack_1ns	delay_ms=10.0	min=17.6	p50=99.6	p99=367.3	p99.9=3168.4	max=15087.8	over_250us=155	cpu_cores=0.004
+b1_thread_sleep_slack_1ns	delay_ms=50.0	min=22.3	p50=118.3	p99=553.0	p99.9=11853.2	max=76665.9	over_250us=245	cpu_cores=0.001
+```
+```
+a_tokio_sleep_until	delay_ms=0.1	min=81.5	p50=1023.8	p99=2097.0	p99.9=2348.0	max=4580.8	over_250us=9999	cpu_cores=0.031
+a_tokio_sleep_until	delay_ms=0.5	min=515.3	p50=700.1	p99=1787.2	p99.9=3355.5	max=12743.3	over_250us=10000	cpu_cores=0.024
+a_tokio_sleep_until	delay_ms=1.0	min=81.5	p50=1132.0	p99=1384.9	p99.9=3700.2	max=19553.5	over_250us=9911	cpu_cores=0.020
+a_tokio_sleep_until	delay_ms=2.0	min=85.3	p50=1144.5	p99=1362.5	p99.9=3560.3	max=7089.3	over_250us=9894	cpu_cores=0.015
+a_tokio_sleep_until	delay_ms=10.0	min=104.3	p50=1171.8	p99=1495.2	p99.9=6110.7	max=75374.0	over_250us=9868	cpu_cores=0.005
+a_tokio_sleep_until	delay_ms=50.0	min=106.5	p50=1313.8	p99=1771.9	p99.9=9672.7	max=35421.3	over_250us=9915	cpu_cores=0.002
+# check on concurrency: the wrapper's own (b) 0.1 ms cell, run ALONE at 17:07:22 before it was stopped:
+b_thread_sleep_slack_default	delay_ms=0.1	min=9.4	p50=60.8	p99=89.1	p99.9=244.7	max=2365.3	over_250us=10	cpu_cores=0.086
+```
+- The wrapper's sequential (b)/(b1) were stopped after that one cell (kill at 17:07:2x; '# end 2026-11-06T17:07:28Z').
+- Concurrency caveat for T2: the same (b) 0.1 ms cell run alone gave p99 89 us / p99.9 245 us against 178 / 452 us
+  when (a), (b), (b1) ran together, so the concurrent cells' tails may be inflated up to about 2x (or the minute
+  differed: one sample each). Medians agree (60.8 vs 67.1 us). The ranking does not change.
+- 17:07:40 UTC: extras started alone (results-stream.txt): hiccup 10; stream 3000/s with lead 0 (slack 1 and slack
+  50 us), 100 us, 1 ms; 7000/s lead 100 us; 3000/s lead 0 with SCHED_FIFO 50; 3000/s inbound (notify) with lead
+  100 us and lead 0. 30 s each (90,000 releases at 3,000/s).
+
+### T3. Noise floor and the ImpairSocket-shaped release thread (alone, 17:07:46 on; this container, not RS)
+- hiccup 10 (one thread spinning on Instant::now(), gaps > 20 us logged): 2,816 gaps in 10.0 s (281.6/s), 3.535 % of
+  the time lost; gaps > 50 us 701, > 100 us 402, > 250 us 170 (17/s), > 1 ms 60 (6/s), > 10 ms 1; gap p50 27.8 us,
+  p99 2,050 us, max 62.3 ms. So here a thread loses the CPU for more than 0.25 ms about 17 times a second whatever it
+  does: the 0.25 ms bar at p99.9 is out of reach on this machine for every mechanism, which is why T1/T2 tails sit at
+  ms. RS's `hiccup 10` is the first number to read: if it shows gaps > 250 us at more than about 1/s, no timer
+  design can meet the bar there either (it would go back to the advisor).
+- stream 3000/s, lead 0, slack 1 ns: n 89,943, p50 27.5 us, p99 313.4 us, p99.9 2,710 us, max 6,539 us, 1.16 % above 250 us, release thread CPU 0.056 core.
+- stream 3000/s, lead 0, slack 50 us (default): p50 78.5 us, p99 329.5 us, p99.9 13,449 us, max 29,403 us, 1.33 % above 250 us, CPU 0.050 core. (Slack 1 ns cuts the median by about the 50 us slack; tails are the platform's.)
+- stream 3000/s, lead 100 us, slack 1 ns: p50 0.1 us, p99 457.6 us, p99.9 2,321 us, max 7,977 us, 1.40 % above 250 us, CPU 0.214 core (the spin costs about 0.16 core at 3,000/s; the median drops to 0 but the platform's tail stays).
+- stream 3000/s, lead 1 ms, slack 1 ns: p50 0.1 us, p99 963.3 us, p99.9 12,187 us, max 31,702 us, 1.96 % above 250 us, CPU 0.915 core: a full core of spin buys nothing here (the tail is the platform's pauses, which hit a spinning thread as often).
+- stream 7000/s, lead 100 us, slack 1 ns: n 209,789, p50 0.1 us, p99 549.3 us, p99.9 11,150 us, max 27,057 us, 1.37 % above 250 us, CPU 0.479 core (spin cost scales with rate: about 0.07 core per 1,000 releases/s at a 100 us lead).
+- stream 3000/s, lead 0, slack 1 ns, SCHED_FIFO 50 (sched_setscheduler = 0): p50 26.6 us, p99 200.5 us, p99.9 1,956 us, max 8,472 us, 0.83 % above 250 us, CPU 0.054 core: the best p99 for the least CPU here (p99 under 0.25 ms), but p99.9 is still the platform's ms pauses.
+- stream 3000/s INBOUND (release thread lead 100 us, slack 1 ns, then Notify to a task on a 4-worker runtime; lateness inside the task): all 89,943 releases seen; p50 45.3 us, p99 802.2 us, p99.9 4,478 us, max 13,593 us, 2.24 % above 250 us; release thread CPU 0.238 core. The task-side wake roughly doubles the share above 250 us against the thread-side figure (1.40 %).
+- stream 3000/s INBOUND, lead 0, slack 1 ns: p50 77.6 us, p99 520.5 us, p99.9 2,316 us, max 7,258 us, 2.98 % above
+  250 us; release thread CPU 0.077 core.
+
+### T3 summary (release thread at 3,000 releases/s unless noted; us; CPU = the release thread's own cores)
+| variant | p50 | p99 | p99.9 | >250 us | CPU |
+|---|---|---|---|---|---|
+| lead 0, slack 50 us (default) | 78.5 | 329.5 | 13,449 | 1.33 % | 0.050 |
+| lead 0, slack 1 ns | 27.5 | 313.4 | 2,710 | 1.16 % | 0.056 |
+| lead 0, slack 1 ns, SCHED_FIFO 50 | 26.6 | 200.5 | 1,956 | 0.83 % | 0.054 |
+| lead 100 us, slack 1 ns | 0.1 | 457.6 | 2,321 | 1.40 % | 0.214 |
+| lead 1 ms, slack 1 ns | 0.1 | 963.3 | 12,187 | 1.96 % | 0.915 |
+| 7,000/s, lead 100 us | 0.1 | 549.3 | 11,150 | 1.37 % | 0.479 |
+| inbound (task side), lead 100 us | 45.3 | 802.2 | 4,478 | 2.24 % | 0.238 |
+| inbound (task side), lead 0 | 77.6 | 520.5 | 2,316 | 2.98 % | 0.077 |
+| noise floor (hiccup): gaps > 250 us | | | | 17/s | 1 core spin |
+
+### R (final). Release mechanism recommendation
+- tokio's timer is out (p50 0.7-1.3 ms, 99 %+ of waits above 0.25 ms at every delay: T2 (a)).
+- The cheapest mechanism that is best here: a dedicated release thread, lead 0 (no spin), timer slack 1 ns, and, if
+  RS's unit may grant it, SCHED_FIFO: 0.054 core at 3,000/s, p50 27 us, p99 200 us (the only variant with p99 under
+  0.25 ms here). A spin lead lowers the median to 0 but does not move p99/p99.9 on this platform and costs
+  0.21 core (100 us) to 0.92 core (1 ms) at 3,000/s: not worth it unless RS's hiccup floor is clean and the RS
+  self-test shows the lead helping.
+- p99.9 <= 0.25 ms (the statistic -3 tests, F1e) is NOT met by any variant here, because the platform pauses a
+  thread for over 0.25 ms about 17 times a second (hiccup). It must be measured on RS (`hiccup 10`, then the
+  `stream` cells for outbound and inbound) before R1; if RS misses it, the carried condition goes to the advisor.
+- Inbound adds the cross-thread wake: about +20-50 us at p50 and 0.5-0.8 ms at p99 here; on RS measure it as the
+  `stream ... notify` cell; release inbound entries early by the measured median (the recorded offset) if the
+  advisor accepts the offset reading.
+
+### Close (17:12 UTC)
+- State left: no probe process running; the transient iptables rule removed (`iptables -S`: three ACCEPT policies);
+  no source, manifest or doc edited (git status shows only this notes file modified; the probe sources
+  u3-timer-probe.rs and u3-tcp-stall-probe.py sit in this folder; builds and raw results under
+  .gate/netcode-proof-test/timer-probe/: results.txt (c, c2, d, a), results-b.txt, results-b1.txt, results-stream.txt).
+- Final answer: sections S, R (final), T1-T3, F2-F4, D (design) and Q (open questions) above; the extra open point
+  from T3: SCHED_FIFO for the release thread needs CAP_SYS_NICE or an RLIMIT_RTPRIO grant in the room's unit
+  (security-auditor's call), and RT throttling (sched_rt_runtime_us 950000 here) bounds a runaway.
+
+DONE
