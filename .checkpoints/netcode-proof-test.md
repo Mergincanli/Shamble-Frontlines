@@ -173,7 +173,13 @@
     test is still true at that grain).
 
 ## Current step
-31. U3: the scouting workflow `wf_d6bdeed6-3c0` runs (see Running work); then build L2 from its verified findings.
+32. **U3's scouting DONE** (workflow `wf_d6bdeed6-3c0`, 4 of 4 agents, about 17:30 UTC) · synthesis:
+    `.checkpoints/netcode-proof-test/u3-scout-summary.md` · **R5-TEST-OQ2: YES for both crates** (wtransport through
+    its `quinn` feature's `with_quic_incoming`; web-transport-quinn through `Request::accept`), so R-22 does not
+    trigger; a probe proved both here. Verdicts: 26 claims confirmed, 3 refuted, 2 unclear (listed in the summary).
+    **Next (after the usage reset):** send the summary's nine questions to the advisor (one request), then write U3's
+    build plan from the confirmed claims and its rulings, then build ImpairSocket and DelayStream.
+31. (done) U3: the scouting workflow `wf_d6bdeed6-3c0` ran; then build L2 from its verified findings.
     **State at 16:45 UTC (Mustafa: usage at 90 %):** both scouts' notes are finished (`u3-scout-wt.md`,
     `u3-scout-timing.md`, each ends DONE); the two verifiers are writing `u3-verify-wt.md` and `u3-verify-timing.md`.
     **If the session is cut off:** (1) read the four u3-* notes; (2) if a verify file does not end with DONE, resume
@@ -273,7 +279,7 @@
 
 ## Running work
 - **U3's scouting workflow** `wf_d6bdeed6-3c0` (npt-u3-scout; 2 scouts + 2 adversarial verifiers, xhigh, at most 2 at
-  a time) · launched about 16:20 UTC · script:
+  a time) · launched about 16:20 UTC · **DONE about 17:30 UTC** (4 of 4; synthesis in u3-scout-summary.md) · script:
   `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3-scout-wf_d6bdeed6-3c0.js`
   · notes `.checkpoints/netcode-proof-test/u3-scout-{wt,timing}.md` and `u3-verify-{wt,timing}.md` · questions:
   each WebTransport crate's server over a custom quinn AsyncUdpSocket (R5-TEST-OQ2); quinn 0.11.12's socket trait and
