@@ -114,10 +114,23 @@
     INVALID, full padding NOT-RUN until N = 36 and 18); check.mjs's marks step. **check.mjs: all 9 steps pass** (44
     Rust tests; 81 marks; rows unchanged at 1b4094a; redact 0 findings over 80 files).
 
+21. **The advisor's U1 rulings** · notes `advisor-u1.md` (DONE) on `u1-questions.md` · most APPROVE; two fixes: C2
+    (a bug it reproduced: a FAIL plus a gap came out INVALID, hiding the failure and some bites) and B13 (PM-0001-30's
+    second bite was dropped); changes for A1, A7, B6-B10, B12-B15, Q10, Q12, Q21, Q22, Q27, C4, C8, C9; nothing for
+    Mustafa now (one later readings PR before R5: Q15 (a)).
+22. **U1 part 2d** · 3b1212e · the rulings in the judge (C2's run precedence; part validity; `pre:<mark>`; setup
+    checks; expect-invalid bites; p001; first-N; PM-0006-19's rule; everyone_in_view_min_share built), marks.json (one
+    asserting script in the scratchpad: 16 parts of 12 marks get pre:PM-0001-2, PM-0001-2's N = 24/36 parts, 8 setup
+    flags, -30's validity bite, -3's p001/p999, -19's traps, -49's delayer, -67's first 36,000, PM-0006-19's rule), the
+    catalogue (SessionStatus, the 15th type; its Q1-Q9 answered), the audit (15 names, a bite), README and SERIES,
+    the fixtures (PM-0001-4 carries the load; load-short INVALID, fail-with-gap FAIL; PM-0001-30's bite shown and
+    missed), the plan's text (§4.1, §4.2, §4.7, E3/E6, §6.1, §10.2). **check.mjs: all 9 steps pass, 58 Rust tests**;
+    gate PASS. On the advisor's own reproduction, the fixed judge shows the bite (it was INVALID).
+23. **U1 CLOSED** (the advisor's conditions met: each change with its fixture, check.mjs green, the gate run).
+
 ## Current step
-21. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. The advisor rules on
-    `u1-questions.md` (A1-A9 the catalogue, B7-B15 the marks, C1-C12 the judge's and tools' readings; notes
-    `advisor-u1.md`); then the session makes its changes and closes U1.
+24. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. Next unit: U2 (npt-l1 with its unit and
+    property tests; PM-0001-3's L1 half and its bites).
 
 ## Next steps
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
@@ -136,6 +149,19 @@
 
 ## Open findings
 - Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
+- **Carried forward from the advisor's U1 rulings** (advisor-u1.md): C4 (`params.killed` only with npt-super's kill
+  record) and C6 (tokens only in their prefixed form, with a test) at U6; A3's systemd readiness check for real at
+  R1's bring-up, before any PM-0001-16 start counts; ImpairSocket's release precision at U3 (worse than 0.25 ms goes
+  back to the advisor before R1); the results ledger (invalid runs superseded only with a written cause; failing
+  runs only by a build fixing the found cause; the judge refuses a folder missing a listed run) at U8, reviewed by
+  the advisor; Q13 (R4 creates LG with its IPv6 /64) and Q23 (-11 and -25 once per WebTransport crate) in the run
+  plans; Q15 (a), -27's one-sided "within 5 %", in a readings PR before R5's first counted run (Mustafa's go).
+- **Raised by the session, for the advisor at U4:** marks -14, -16 to -25 and -27 run inside an S30 room or the stress
+  scene by their rows, but their parts do not select on the scene, so `pre:PM-0001-2` is not on them yet. When the
+  L1 runner and the run plans name each run's scene, their selects add scene and clients, and the precondition with
+  them.
+- **A nuance, recorded:** an expect-invalid bite counts as shown if its rule reports a missing counter too; that
+  cannot give a false PASS, because measured runs without the counter are INVALID by the same rule.
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
@@ -189,7 +215,10 @@
   and `series-draft.md` · launched 11:16 · stopped at the usage limit, resumed 12:12 · DONE (81 marks, 0 validator
   errors, Q1-Q31).
 - docs-keeper (xhigh, background) · notes `docs-keeper-u1.md` · launched 12:22 · DONE (REPO_MAP, STATUS; map OK).
-- The advisor on U1's questions (advisor agent, xhigh, background) · notes `advisor-u1.md` · launched 13:15 · running.
-- Saver: background task `brikhjzxz` · started 13:14 (the restart had ended `bekt3thjk`) · stops by about 15:04.
+- The advisor on U1's questions (advisor agent, xhigh, background) · notes `advisor-u1.md` · launched 13:15 · DONE
+  13:29.
+- Saver: background task `brikhjzxz` · started 13:14 (the restart had ended `bekt3thjk`) · stopped about 13:45 by the
+  shell's default 30-minute limit for background commands (no agent running then). Restart it with a 2-hour timeout
+  whenever an agent runs.
 - R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
   rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.
