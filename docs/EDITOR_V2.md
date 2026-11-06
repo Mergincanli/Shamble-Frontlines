@@ -5,7 +5,7 @@ unless Mustafa vetoes), `[OPEN]`, `[LATER]`. Scope: the **map editor only**. The
 they are.
 Updated on 2026-11-05 with Mustafa's editor decisions: §3's block dated 2026-11-05, and the pointers to it.
 
-Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.
+Principle (Mustafa, 2026-11-05), a lean editor: §3, Decided 2026-11-05.
 
 ## 1. Why rebuild
 - Today, every edit and every undo rebuilds the whole map. That is slow, it leaks, and objects lose their identity
@@ -17,7 +17,8 @@ Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.
 
 ## 2. The five architecture rules `[DEFAULT]`
 1. **The document is the truth.** A map is plain, versioned JSON. Every entity has a stable ID. Edits change the
-   document; nothing else is saved.
+   document; nothing else is saved. (Mustafa's stamps, trace sketches, sticky notes and snapshots bear on it: §3,
+   Decided 2026-11-05.)
 2. **Every edit is a command** with do and undo: add, delete, transform, set a property, or a batch of these. Undo
    reverts one command; it never rebuilds the map. The history has a fixed size limit.
 3. **The scene mirrors the document, one entity at a time.** Adding, changing or removing an entity touches only its
@@ -33,21 +34,24 @@ Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.
 - `[DECIDED]` **Parity:** everything the current map editor does that Mustafa marks "keep" in the inventory (§6, step 1).
 - `[DEFAULT]` New:
   - **Select and transform:** click to select, multi-select, a move/rotate gizmo plus a numeric inspector. Snapping to
-    the grid and to 15° / 45° / 90°. Copy, paste, duplicate, delete. (Mustafa decided each object's width, length,
-    height and how high it sits, and primitives that snap to gameplay sizes: §3, Decided 2026-11-05.)
+    the grid and to 15° / 45° / 90°. Copy, paste, duplicate, delete. (Mustafa decided each object's width, length and
+    height, set with drag handles or typed numbers, plus how high it sits, and primitives that snap to gameplay sizes:
+    §3, Decided 2026-11-05.)
   - **Verticality:** plateaus, ramps, cliff edges and drop-downs. Height is read through brightness, as in the greybox
     rule. Layers can be shown and hidden.
   - **Three-team symmetry:** build one third of the map and it is mirrored live to the other two at 120°. Bases are
-    assigned per team.
+    assigned per team. (Mustafa's plan view and fairness panel work under 120° mirroring: §3, Decided 2026-11-05.)
   - **Objectives as data:** spawns, barracks and terminals, harvest fields (the centre and the safe ones), uplink sites,
-    cache spawn points.
+    cache spawn points. (Mustafa's tool order (3) and (4), the heatmaps and the fairness panel, read the objectives:
+    §3, Decided 2026-11-05.)
   - **Validation panel:** bot reachability (every spawn to every goal), the 6 m gap rule, a symmetry check, and budgets
     (object count, draw calls when merged). (Mustafa's tool order (3) to (5), heatmaps, the fairness panel and
-    sightline checks: §3, Decided 2026-11-05.)
+    sightline checks, bear on it: §3, Decided 2026-11-05.)
   - **Test:** play the map with bots instantly, then return to the editor exactly where you were. (Mustafa's tool order
-    (2), play instantly: §3, Decided 2026-11-05.)
+    (2) bears on it: one key drops you in at the cursor with bots, and you can keep editing while the match runs: §3,
+    Decided 2026-11-05.)
 - `[LATER]` Enterable structures (interiors), terrain sculpting beyond plateaus and ramps, a prefab library v2.
-  (Mustafa decided instances (stamps): §3, Decided 2026-11-05.)
+  (On the prefab library: Mustafa decided instances (stamps), which bear on it: §3, Decided 2026-11-05.)
 - **Decided 2026-11-05 (Mustafa, after his talk with the Advisor).** His editor decisions, in his order and in his own
   words, with his marks; the plan view (his B.1 of 2026-11-03) sits after the views line, with its own date:
   - `[DECIDED]` Decided, the tool order: (1) greybox now, art later: you build with blocks, and the same layout swaps to
@@ -103,5 +107,6 @@ Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.
    6. Symmetry and objectives.
    7. Validation and Test.
 
-Mustafa's tool order (§3, Decided 2026-11-05) ranks the tools; the architecture plan (step 2) maps it onto these
-slices, for his approval.
+Mustafa's tool order and his other editor decisions (§3, Decided 2026-11-05): the architecture plan (step 2) maps them
+onto these slices, for his approval. His "slice 5" in the plan view (2026-11-03) is the v2 playable slice 5, "Octopon-3
+and Editor v2" (SLICE-ORDER, ADR 0002:34-35), not build slice 5 here.

@@ -437,11 +437,33 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       top speed in metres per second; ADR 0004:261, "a map 2 km across") [verified], so the revision confirms them and
       changes nothing in them. Owners: ADR 0004 and ADR 0005 for the unit; ADR 0003 for textures that tile in world
       space.
-    - **Editing while the match runs:** his tool order (2), "you can keep editing while the match runs", against
-      OQ-0005-CD4's "next match": under both of its options, map geometry and navigation data apply at the next match
-      (ADR 0005:669-680; R4-PHYS-REC2 keeps the static world for the match), and EDITOR_V2 §2 rule 4 merges static
-      objects only when you press Test [verified]. For whoever decides OQ-0005-CD4 (Mustafa and the Advisor); the
-      register's row notes it (`docs/adr/README.md:118`).
+    - **Editing while the match runs:** his tool order (2), "you can keep editing while the match runs", meets
+      OQ-0005-CD4 (ADR 0005:670-681): under both of its options, map geometry and navigation data apply at the next
+      match (R4-PHYS-REC2 keeps the static world for the match), and EDITOR_V2 §2 rule 4 merges static objects only
+      when you press Test [verified]. Two readings: edits go into the document and apply at the next Test or match (no
+      conflict), or they reach the running match; then CD4's "an engine feature no §6 item names" no longer holds,
+      since EDITOR_V2 counts as a need source (`docs/adr/README.md:292-297`). For whoever decides OQ-0005-CD4 (Mustafa
+      and the Advisor); the register's row notes it (`docs/adr/README.md:118`).
+  - From B.1's review round (game-designer, `.checkpoints/b1-plan-view/game-designer.md`), for the editor's
+    architecture plan (EDITOR_V2 §6 step 2), which puts each question to Mustafa; none changes his words:
+    - **B1-MODES:** do the editor's symmetry tool and fairness panel also serve two-team maps? VISION_V2 §3 has
+      two-team and three-team battles both tested and maps designed per mode, and §6.1 makes modes data; both tools
+      work only under 120° today. The game-designer recommends: yes, the symmetry order as data (2 teams at 180°, 3
+      at 120°). His call.
+    - **B1-LEAP:** what are "leapers" in the travel-time ruler? No doc defines them (the nearest is UNITS.md:49, the
+      Soviet walker's leap, `[IDEA]`); the ruler needs their movement data. Open, for the unit list to answer; the
+      ruler is lower priority.
+    - **The objectives list:** EDITOR_V2 §3's "Objectives as data" (the Advisor's `[DEFAULT]`) leaves out refineries
+      (LOOP_V2:32), power plants (:42), the HQ (:96, :130) and supply points (:259), which his heatmaps ("each
+      objective") and fairness panel ("every objective") read. For the Advisor's next pass on that line.
+    - **The fairness panel's pass rule:** at any moment the travel times to a pair uplink site are unequal by design
+      (LOOP_V2 §4, §9) and even out only over a full rotation; cache spawn points need rotated sets of three. What the
+      panel counts as fair (per site, per active pair, per cycle) is a design rule for Mustafa with the game-designer.
+    - **Heatmaps and sightlines meet open points:** heatmaps meet LOOP_V2 §11's three runs per build (:188), the bots'
+      role mix (§10, :170), VISION_V2 §6.6's telemetry and R6-TEL-OQ2 (`docs/adr/README.md:201`); sightline checks
+      meet R4-LOS-OQ1 and OQ2 (README:191-192) and LOOP_V2 §9's aiming at height (`[OPEN]`, :162).
+    - **Quality bars:** EDITOR_V2 §4 has no bar for "instantly" (his tool order (2)) or for smooth editing while a
+      match runs; for the architecture plan's test plan.
   - The kit-v3-1 Windows test follow-up stays in Open bugs and risks (kit-v3-1 item 1; its own change-set).
 - **Queued, in Mustafa's words** (word for word, each with its date and source; each removed by the change-set
   that carries it out; copied from the A2 and A3 day session's queue files, session_0173vVo7FcYUpbWgRW8oQyHU):
@@ -585,7 +607,7 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
   playable slices, as in VISION_V2"; VISION_V2 has no slice list) and line 126 (R6's row still holds the security
   baseline); `docs/LOOP_V2.md:90-91` (tracers and the Feel Lab test); `docs/LOOP_V2.md:19-20` and
   `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES);
-  `docs/EDITOR_V2.md:89` (§5: "It still runs by double-clicking editor.html") and `docs/EDITOR_V2.md:90` (§5: "if
+  `docs/EDITOR_V2.md:93` (§5: "It still runs by double-clicking editor.html") and `docs/EDITOR_V2.md:94` (§5: "if
   ADR-002 moves the project to modules"): ADR 0002 now decides the structure (added 2026-11-01).
 - Taken by the Advisor 2026-10-30 (relayed by Mustafa): VERIFY-FETCH (a), research may read allow-listed pages with
   curl by day (read-only, the host audit in each report); the night shift stays on WebFetch until kit-v3-1 is merged.
