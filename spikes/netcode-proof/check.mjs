@@ -7,6 +7,7 @@
 // then a scan of the spike's folder). It runs every step and exits 1 if any failed.
 
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -105,6 +106,49 @@ export function referenceProblems(files, read) {
       continue;
     }
     if (text.includes("spikes/")) problems.push(`${f} references spikes/`);
+  }
+  return problems;
+}
+
+/** The marks this change-set judges (plan §6.2): every PM-0001 row of ADR 0001, PM-0004-67, PM-0006-11 to -27. */
+export function expectedMarks(adr0001Text) {
+  const ids = [...adr0001Text.matchAll(/^\| (PM-0001-\d+) \|/gm)].map((m) => m[1]);
+  ids.push("PM-0004-67");
+  for (let n = 11; n <= 27; n++) ids.push(`PM-0006-${n}`);
+  return ids;
+}
+
+/**
+ * marks.json against its drafts: every expected mark once and nothing else, and each mark's row, found by its id in
+ * its ADR, unchanged since marks.json took its SHA-256 (of the row's line, without the line end).
+ */
+export function marksProblems(marks, readFile) {
+  const problems = [];
+  const files = new Map();
+  const lines = (f) => {
+    if (!files.has(f)) files.set(f, readFile(f).split("\n"));
+    return files.get(f);
+  };
+  const expected = expectedMarks(readFile("docs/adr/0001-multiplayer-netcode.md"));
+  const got = marks.marks.map((m) => m.id);
+  for (const id of expected) {
+    const n = got.filter((g) => g === id).length;
+    if (n !== 1) problems.push(`${id} is in marks.json ${n} times, not once`);
+  }
+  for (const id of new Set(got)) if (!expected.includes(id)) problems.push(`${id} is in marks.json but not in plan §6.2's marks`);
+  for (const m of marks.marks) {
+    const at = lines(m.draft.file)
+      .map((l, i) => [l.replace(/\r$/, ""), i + 1])
+      .filter(([l]) => l.startsWith(`| ${m.id} |`));
+    if (at.length !== 1) {
+      problems.push(`${m.id}: ${at.length} rows in ${m.draft.file}, not 1`);
+      continue;
+    }
+    const [row, line] = at[0];
+    const hash = createHash("sha256").update(row, "utf8").digest("hex");
+    if (hash !== m.draft.row_sha256) {
+      problems.push(`${m.id}: its row (${m.draft.file}:${line}) changed since marks.json took its hash; re-read it`);
+    }
   }
   return problems;
 }
