@@ -1,0 +1,11 @@
+SHAMBLE FRONTLINES gate | base merge-base(HEAD, origin/main) = af8393e | head = working tree
+note: local main is behind origin/main, so origin/main is used (update it: git fetch origin main:main)
+[1]  syntax         PASS  5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)
+[2]  concatenation  PASS  index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)
+[3]  symbols        PASS  core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0
+[4]  player build   PASS  51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged
+[5a] smoke          SKIP  skipped (--no-smoke): the full gate or CI's smoke job runs it
+[5b] names          PASS  index.html: 3 scripts + 0 DOM handlers, 0 problems | editor.html: 4 scripts + 0 DOM handlers, 0 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128)
+[5c] layering       PASS  shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols
+[5d] script order   PASS  index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline
+GATE PASS (5a smoke skipped: --no-smoke)
