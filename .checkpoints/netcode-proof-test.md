@@ -128,9 +128,17 @@
     gate PASS. On the advisor's own reproduction, the fixed judge shows the bite (it was INVALID).
 23. **U1 CLOSED** (the advisor's conditions met: each change with its fixture, check.mjs green, the gate run).
 
+24. **PR #41 merged** · Mustafa's go in this chat ("merge #41", 2026-11-06, after the advisor's APPROVE of 1b4094a;
+    the scheduled PR Advisor also approved that SHA in its comment, two Low notes: PM-0001-31's "TCP proxy" wording
+    wants a pointer, for the readings PR before R5; STATUS's Mac line, already fixed on this branch) · merged with
+    expected head `1b4094a7750177269b9d5f2fa8c21e292c76e009`, gate and smoke green, by merge commit: **main d8c485a**.
+    Main into this branch: 1ea36a1. The marks check now reads this branch's own docs/adr/: 0950081 (check.mjs all 9
+    green; 81 rows unchanged). The worktree `.gate/npt-readings` removed; unsubscribed from #41.
+
 ## Current step
-24. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. Next unit: U2 (npt-l1 with its unit and
-    property tests; PM-0001-3's L1 half and its bites).
+25. Next unit: U2 (npt-l1 with its unit and property tests; PM-0001-3's L1 half and its bites). Counted runs are no
+    longer blocked by the readings; R1 still waits for stop B (U8's run package, its reviews, the guard check and
+    Mustafa's approvals).
 
 ## Next steps
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
@@ -156,6 +164,8 @@
   runs only by a build fixing the found cause; the judge refuses a folder missing a listed run) at U8, reviewed by
   the advisor; Q13 (R4 creates LG with its IPv6 /64) and Q23 (-11 and -25 once per WebTransport crate) in the run
   plans; Q15 (a), -27's one-sided "within 5 %", in a readings PR before R5's first counted run (Mustafa's go).
+- **For the readings PR before R5** (with Q15 (a)): the PR Advisor's Low note on PM-0001-31's "L2's TCP proxy on RS",
+  which R-25 makes the WebSocket stream wrapper for the proof test: a pointer in that row.
 - **Raised by the session, for the advisor at U4:** marks -14, -16 to -25 and -27 run inside an S30 room or the stress
   scene by their rows, but their parts do not select on the scene, so `pre:PM-0001-2` is not on them yet. When the
   L1 runner and the run plans name each run's scene, their selects add scene and clients, and the precondition with
