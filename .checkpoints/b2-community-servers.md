@@ -35,13 +35,23 @@
   "his words in short", commit 411824a at 09:33 UTC): UNDER-WAY (a), and U0 committed at 09:40 UTC (f6886bf), so the
   kit freeze lifted and A4 may start after B.2. Its STATUS edits (:39-41, :165, :431, :462) carry this; B.2 leaves the
   A4 lines' substance to #40 (as DK-41) and tells Mustafa in chat that the earlier ask to answer UNDER-WAY was moot.
-- **Current step:** 2, the build in the main session (VISION_V2, the register clause), then E1-E4.
+- **Done:** step 2, the build (this commit; Mustafa at 90% usage asked to save): VISION_V2 (header line :6-7; pillar 5
+  replaced by his Factions line, HANDOVER (b); pointers on §5's account line and §7's faction question; the note at
+  the end of §5 with C1's wording) and one clause appended to README:160 (C8). Quick checks PASS: no changed line over
+  120; tags `[DECIDED]` 10→12, `[OPEN]` 4→3, `[LATER]` 4→5, the rest unchanged (E3's expected change); each of his
+  six pieces found once in the joined text (E1 quick); README one line changed.
+- **Current step:** 3. Still to do for step 2: E1-E4 as scripts in the notes folder (E2 line diff, E4 citations
+  incl. C9's r1-simulation-core.md:3301/:3535), and `node tools/gate.mjs --no-smoke` (not run yet; CI runs gate
+  and smoke on this commit).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
-1. Open the draft PR for the branch, subscribe to it, and run the advisor on plan revision 1 (it reads main's
-   `.claude/agents/advisor.md`); save its verdict as `advisor-plan-rev1.md`.
-2. On APPROVE: build in the main session (VISION_V2, the register clause), E1-E4 scripts in the notes folder, the gate.
-3. docs-keeper's pass (STATUS, ROADMAP, the B.1 report's correction); E5-E7.
+1. (Done: PR #42 opened and subscribed; the advisor's verdict saved; the build committed.)
+2. E1-E4 scripts and the local gate; fix anything they find.
+3. docs-keeper's pass (STATUS, ROADMAP, the B.1 report's correction) under conditions C5-C8: #39 and #41 merged in
+   STATUS:3 (times from the GitHub API), B.1's row merged, B.2's row, B3's row and ROADMAP:99 "taken by B.2 (PR #42)",
+   the five line numbers (:99/:447 → :119, :446 → :294-298, :465 → :202, :466 → :192-193), B.2's queued words
+   removed with a pointer, a STATUS follow-up for ADR 0006's OQ-0006-21 to point at VISION_V2 §5; the A4 lines'
+   substance left to #40; then E5-E7.
 4. One review round (the verifier, game-designer, infra-engineer), one fix pass, then the report and the notes'
    deletion in the last commit.
