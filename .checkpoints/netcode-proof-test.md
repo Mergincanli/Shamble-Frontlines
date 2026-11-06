@@ -173,6 +173,14 @@
     test is still true at that grain).
 
 ## Current step
+36. **The fallback's three fixes, measured** · **41bd8a0** (pushed) · TcpConfig (budget, thin linear timeouts,
+    rto_min), the handshake for reconnects, `fixes.rs` (1,000 B1 phases per configuration). Results (p50/p99/max ms):
+    defaults 708/913/2,248; 3-snapshot budget alone 314/1,415/4,203; + thin LT 314/570/995 (but 33-65 % of snapshots
+    skipped at P2-P4); rto_min 100/50 worsen the max; reconnect alone 651/772/868; **adaptive budget + RTT-scaled
+    reconnect 399/611/738, 0 over 1 s, 0-12 % skipped, ~0.7 false reconnects/min at P3/P4 (pinned)**. ADR 0001:
+    fix 3 conflicts with part 10 / Q22 (single-use tokens fetched from the lobby on reconnect; a resume secret was
+    rejected); fixes 1 and 2 do not. Sent to Mustafa: WS-FIX, RESUME-CRED, WS-LIMIT (99 % within 0.8 s, every one
+    within 1.0 s for the recommendation). README-BRANCH answered yes (restart `claude/npt-readings` from main).
 35. **U3a, the TCP model** · **0d25833** (pushed) · npt-net's pub(crate) `tcp_model` (S0-S14; every constant read in
     v6.8, Cubic's 717/1024 included) and its tests S13 (a)-(f) with the three bites, determinism and the write budget
     (12 tests + 1 ignored diagnostic). check.mjs all 9 (109 / 114 tests), gate PASS. **S13 (e)** (1,000 phases, P2, a
@@ -281,6 +289,17 @@
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
 ## Decisions taken
+- **Mustafa, 2026-11-06 about 21:40 UTC, on WS-LIMIT and README-BRANCH:** "WS-LIMIT: not yet. Before we set the
+  numbers, make the fallback recover faster. Try three standard fixes in the TCP model first: 1. Newest snapshot
+  only: while the WebSocket is backed up, the room keeps only the newest snapshot instead of filling TCP's 64 KB
+  buffer with ~30 stale ones, and keeps the socket's send buffer small. 2. No doubled waits on the server: enable
+  Linux's thin-stream linear timeouts for the game's sockets (tcp_thin_linear_timeouts / TCP_THIN_LINEAR_TIMEOUTS),
+  and consider a lower minimum retransmission timeout, so a retry just before the outage ends doesn't cost another
+  1.2 s. 3. Fast reconnect on the client: if no data arrives for about 300 ms, start a fresh WebSocket connection
+  attempt every 300 ms, in parallel, and resume the session on whichever connects first, instead of waiting out TCP's
+  backoff. Goal: every recovery within 1.5 s, and 99 % well under 1 s. Measure again (1,000 timings), then bring
+  WS-LIMIT back with the new numbers, in the two-part form (a 99 % bar plus a maximum), for my go. If a fix conflicts
+  with ADR 0001, tell me which and why. README-BRANCH: yes, restart claude/npt-readings from main."
 - **Mustafa, 2026-11-06, about 17:55 UTC (with his Advisor), U3-Q1 to Q9:** "I agree with the recommendations on
   U3-Q1, Q2, Q4, Q5, Q6, Q7, Q8 and Q9. U3-Q3: (b), model Linux TCP faithfully, so the result shows how the fallback
   really behaves. My pre-decision for the mark: PM-0001-18 keeps 500 ms for WebTransport; the WebSocket fallback gets
