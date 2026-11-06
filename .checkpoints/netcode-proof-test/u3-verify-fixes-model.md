@@ -101,3 +101,33 @@ Branch claude/netcode-proof-test-plan-hcky5g, head 689c81f (41bd8a0 + checkpoint
 - D10 side effects of the recommendation exactly (thin OFF; fixes.rs:428-432 ran it with thin ON): identical, 0/24/88/123 per mille
   skipped, silences 0/0/2/2 in 3 min: CONFIRMED (0.67/min at P3/P4 from 2 events each; Poisson 95 % CI 0.08-2.4/min). The phase
   harness also shows 9 false takeovers in ~100 min of P2 play (about 0.09/min), where the side-effects table reports 0 at P2.
+- F8 (item 5, scaled trigger): the trigger reads the client's kernel srtt (fixes.rs:46-52 via srtt_ns(1), tcp_model.rs:643-646,
+  "what TCP_INFO's tcpi_rtt reports"). A browser cannot read it: the WebSocket interface exposes only binaryType, bufferedAmount,
+  extensions, protocol, readyState, url (MDN WebSocket, fetched 2026-11-06). The client needs an app-level RTT (Ping/Pong or
+  input echo; >= srtt plus tick wait). Measured +17 ms: 399/620/771; +33 ms: 399/593/780 (D3). Server side (adaptive budget via
+  TCP_INFO + SIOCOUTQ) is readable on Linux; but the real "outstanding" must add bytes buffered in tungstenite/rustls/tokio.
+- F9 (item 5, adaptive budget): code = ceil(1.5 x srtt / tick) + 1 snapshots, at least 3 (fixes.rs:38-43); the message's "1.5
+  round trips, at least 3" omits the +1 (6 snapshots at P2). Its doc "never throttling a healthy flow" (fixes.rs:31-32) is
+  contradicted by its own side effects: 88 and 123 per mille skipped at P3/P4 with no burst (about 2.6 and 3.7 snapshots/s).
+  The harness writes as soon as a slot frees on any ACK (fixes.rs:185), not on the room's tick: the real writer must be woken by
+  writability, or add 0-33 ms.
+- F10 (item 4, handshake): SYN linear x4 then doubling CONFIRMED (tcp_timer.c:640-655 total_rto > tcp_syn_linear_timeouts;
+  tcp_ipv4.c:3489; ip-sysctl.rst:958-966 "1, 1, 1, 1, 1, 2, 4"; model tcp_model.rs:785-797 gives the same 1,1,1,1,1,2,4).
+  Repeated SYN answered at once CONFIRMED (tcp_minisocks.c:705-717, v6.8 from github torvalds/linux) but Linux does NOT double the
+  SYN-ACK timer for it: reqsk_timeout = timeout << num_timeout (inet_connection_sock.h:293-298), num_timeout only bumped by the
+  timer (inet_connection_sock.c:1061); model tcp_model.rs:722-723 doubles (minor; and tcp_oow_rate_limited not modelled).
+  RTT priming: server num_retrans == 0 (tcp_input.c:3182) = model :754 CONFIRMED; but with timestamps a resent handshake still
+  primes via TSecr (tcp_ack_update_rtt :3155-3156 with FLAG_SYN_ACKED), and without any sample Linux sets RTO 3 s, not 1 s
+  (tcp_metrics.c:528-538, TCP_TIMEOUT_FALLBACK tcp.h:151; model :259-261 keeps 1 s); cwnd 1 after > 1 handshake resend
+  (tcp_input.c:6197-6205) not modelled. All minor for the numbers (rare, and parallel attempts cover them).
+- F11 (item 4, harness): takeover on the newest Join, fresh = JoinAccepted written at/after the return, old connection may deliver
+  first (it does in 978/1,000): consistent with S13 (e) and realistic if the server close()s (not RSTs) the old socket. 8-attempt
+  cap never binds (most 5). Flight sizes plausible for TLS 1.3 + upgrade; not checked: a post-quantum ClientHello (X25519MLKEM768)
+  in current Chromium would be 2 segments, not 1 (one more 2 % draw). TcpConfig applies to BOTH ends (tcp_model.rs:595-599): the
+  client also gets thin LT / rto_min in those rows (the client is the player's OS); no effect on the recommendation (defaults).
+  ADR 0001:447 "a modest cap on connections per address (above 1)": as built up to 1 + 5 connections per player; with the browser
+  lock, 2 (netcode-architect's call).
+- F12 (F-RTO, item 7): tcp_process_loss step 2b (tcp_input.c:2894-2905) + tcp_xmit_recovery REXMIT_NEW (:3813-3818) apply only when
+  unsent data waits at the first ACK after the RTO. 64 KB rows: always (defaults, fix 3 alone: too good by ~1 RTT, not measured).
+  Adaptive and 3-snapshot rows: everything written was sent during the burst (cwnd 10 > limit), so the queue is empty at that ACK
+  and F-RTO falls back (:2905): the recommendation is unaffected.
