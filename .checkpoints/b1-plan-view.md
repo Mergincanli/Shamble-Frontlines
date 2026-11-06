@@ -18,13 +18,19 @@
   (Select and transform, Test, the validation panel, §2 rule 4, the `[LATER]` prefab library; a neutral §6 pointer;
   none on interiors); SCALE a STATUS follow-up naming ADR 0004, 0005 and 0003; OQ-0005-CD4's register row gains
   "Mustafa (2026-11-05) bears on it"; E1-E3 as conditioned ([DECIDED] 2 -> 11); one review round, one fix pass.
-- **Current step:** 2, the build (a builder: EDITOR_V2, the ADR register clause, the A3 report's corrections and the
-  E1-E3 scripts; then docs-keeper: STATUS, ROADMAP, REPO_MAP).
+- **Done:** the build 6ddbdd9 (EDITOR_V2, the OQ-0005-CD4 register clause, the A3 report's corrections; E1-E3 PASS);
+  docs-keeper's pass 2f7988f and a rewrap 4f57d26 (STATUS and ROADMAP: #38 merged, B.1 in flight, his B.1 words moved
+  into EDITOR_V2, the scale follow-up). The review round on 4f57d26: the verifier PASS WITH NOTES (B1-V1 to B1-V4,
+  Low); game-designer PASS WITH NOTES (B1-GD1 to B1-GD16: 6 Medium, 10 Low; two questions B1-MODES and B1-LEAP as
+  follow-ups). Nothing Critical or High: no second round (condition 13).
+- **Current step:** 3, the one fix pass (the main session): pointers reworded or added (GD1, GD5-GD7, GD11-GD15, V2),
+  the §6 line with the slice-5 note (GD2), the register clause (GD3), STATUS's CD4 follow-up (GD4, V1: :670-681) and
+  six review follow-ups (GD6-GD10, GD16, B1-MODES, B1-LEAP), STATUS's EDITOR_V2 refs (:93, :94), E2's allowed list.
+  E1, E2, E3, the gate and the map check PASS. B1-V3 (dead notes paths) is handled at the notes' deletion.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
-1. The advisor's plan review (a general agent reading main's advisor.md): APPROVE, REVISE or ESCALATE.
-2. Build. The main session edits EDITOR_V2, or a builder does in this worktree. docs-keeper takes STATUS, ROADMAP and
-   REPO_MAP.
-3. Evidence E1-E5. The reviews: the verifier and game-designer. The report; delete the checkpoint in the last
-   commit; ready; the advisor's final-head review; his go.
+1. Commit the fix pass; then the report (his words in an appendix, E1 run on it; the one change to his words; the
+   rewritten slice-5 risk; the interiors risk; r1-simulation-core.md:3631's dead cite).
+2. Delete the checkpoint in the last commit (STATUS's notes paths cite the commit before it); PR ready; the
+   advisor's final-head review; `needs-mustafa`; his go.

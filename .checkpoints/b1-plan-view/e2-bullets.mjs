@@ -31,11 +31,13 @@ function onePointer(oldT, newT) {
   for (let i = 0; i < s.length; i++) { if (s[i] === '(') d++; else if (s[i] === ')') { d--; if (d === 0 && i !== s.length - 1) return null; } if (d < 0) return null; }
   return d === 0 && s.includes('Decided 2026-11-05') ? s : null;
 }
+// Fix pass (B.1's review round): the Principle pointer names the principle (B1-GD13), and the §6 line covers all his
+// decisions and says which slice 5 he means (B1-GD11, B1-GD2); three more pointers (below) are allowed.
 const ALLOWED = [
-  t => t.startsWith('Principle (Mustafa, 2026-11-05): §3, Decided 2026-11-05.'),
+  t => t.startsWith('Principle (Mustafa, 2026-11-05), a lean editor: §3, Decided 2026-11-05.'),
   t => t.startsWith('- **Decided 2026-11-05 (Mustafa, after his talk with the Advisor).**'),
   t => t.startsWith('- `[DECIDED]` '),
-  t => t.startsWith("Mustafa's tool order (§3, Decided 2026-11-05) ranks the tools; the architecture plan (step 2) maps it onto these slices, for his approval."),
+  t => t.startsWith("Mustafa's tool order and his other editor decisions (§3, Decided 2026-11-05): the architecture plan (step 2) maps them onto these slices, for his approval."),
 ];
 const UPDATED = " Updated on 2026-11-05 with Mustafa's editor decisions";
 const base = blocks(execFileSync('git', ['show', `${baseRef}:${basePath}`], { encoding: 'utf8' }));
@@ -58,7 +60,8 @@ for (const b of head) {
   log(false, `:${b.line} neither an old block (+ one pointer) nor a planned addition: ${b.text.slice(0, 90)}`);
 }
 log(j === base.length, `every base block found in order (${j}/${base.length}): ${same} unchanged, ${ptr} with one pointer`);
-log(ptr <= 5, `pointers on old blocks: ${ptr} (planned 5: Select and transform, Test, Validation panel, §2 rule 4, [LATER])`);
+log(ptr <= 8, `pointers on old blocks: ${ptr} (planned 5: Select and transform, Test, Validation panel, §2 rule 4, [LATER]; ` +
+  `plus 3 from the review round: §2 rule 1 (B1-GD5), Three-team symmetry (B1-GD7), Objectives as data (B1-GD6))`);
 log(decided === 9, `new [DECIDED] items in the dated block: ${decided} (planned 9)`);
 log(![...ptrTexts, ...head.filter(b => ALLOWED.some(f => f(b.text))).map(b => b.text)].some(t => /interior/i.test(t)), 'no pointer or new block mentions interiors');
 console.log(`blocks: base ${base.length}, head ${head.length}, new ${added}`);
