@@ -10,9 +10,15 @@ publish.workspace = true
 workspace = true
 
 [features]
-# One WebTransport crate per feature, swappable behind npt-link (PM-0001-35); the crates join at U3 and U6, pinned.
-wt-wtransport = []
-wt-wtq = []
+# One WebTransport crate per feature, swappable behind npt-link (PM-0001-35), pinned in the workspace.
+wt-wtransport = ["dep:wtransport"]
+wt-wtq = ["dep:web-transport-quinn"]
 
 [dependencies]
 npt-link.workspace = true
+# L2's ImpairSocket implements quinn's socket trait under either crate's endpoint (U3, R5-TEST-OQ2).
+quinn.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+wtransport = { workspace = true, optional = true }
+web-transport-quinn = { workspace = true, optional = true }
