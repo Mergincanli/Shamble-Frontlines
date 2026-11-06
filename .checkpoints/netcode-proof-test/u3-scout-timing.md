@@ -379,3 +379,42 @@ const MSS: usize = 1_448; const SEG_OVERHEAD: usize = 64; const DIR_BUDGET: usiz
   `TimerSlackNSec=1` in the room's unit gives every thread (tokio workers included) 1 ns slack with no unsafe code;
   the per-thread prctl is only needed to confine it to the release thread. Since tokio's waits are whole-ms epoll
   timeouts, a 1 ns slack elsewhere costs little (more precise but not more frequent wakes; unmeasured).
+
+### F2c. MEASURED: Linux repairs a single loss in a 30 Hz stream at the next segment, not at the RTO (this container)
+- Method: `.checkpoints/netcode-proof-test/u3-tcp-stall-probe.py` (python3 -I), loopback TCP, client -> server,
+  200 B messages every 33.3 ms with TCP_NODELAY, 3,000 messages (100 s); loss from one transient rule
+  `iptables -A INPUT -i lo -p tcp --dport 47999 -m statistic --mode random --probability 0.02 -j DROP` (client ->
+  server only; removed right after: `iptables -S` back to the three ACCEPT policies). Kernel 6.18.44 here (NOT 6.8;
+  same RACK/TLP design, unconfirmed line-for-line), congestion control bbr (/proc/sys/net/ipv4/tcp_congestion_control),
+  tcp_recovery 1, tcp_early_retrans 3, tcp_sack 1, tcp_rto_min_us 200000 (sysctl present: kernel >= 6.11).
+  Ran 16:40 UTC while the timer probe's c2 50 ms cell ran (light load: one Python thread).
+- Result: 3,000 of 3,000 delivered; delay p50 0.204 ms, p99 33.6 ms, max 241.3 ms; 52 stalls (first delayed message
+  per stall): 45 in 30-40 ms (p50 33.5 ms, p90 34.9 ms), 3 at 5-15 ms, 3 at 230-241 ms; client tcp_info at the end:
+  rto 204.0 ms, rtt 0.201 ms, rttvar 0.075 ms, total_retrans 54.
+- Reading: 45/52 stalls = the gap to the next message (33.3 ms) + RTT (0.2 ms): the RACK path (next segment SACKed ->
+  lost one retransmitted at once), as F2 predicted. The RTO path (rto 204 ms = srtt 0.2 + the 200 ms floor, rounded to
+  4 ms jiffies, so this container's CONFIG_HZ is 250) shows only in the 3 stalls of 230-241 ms (54 retransmissions for
+  52 stalls: the retransmission itself lost, or two losses in a row). So on a real path the single-loss stall is
+  about gap + RTT (+ reo_wnd when the next segment follows within reo_wnd), i.e. 133 ms at P2, and E15's 200 ms is
+  pessimistic for about 9 in 10 losses and optimistic for the rest (RTO = SRTT + 200 ms, about 300 ms at P2, doubling).
+- Not measured: the RTT term (no netem/tc in this container: `which tc ip` finds neither), RS's kernel 6.8, and the
+  B1 burst. On RS (root, Ubuntu 24.04) the same script plus `tc qdisc ... netem delay 50ms` on a veth pair in a
+  network namespace would measure the P2 case directly; that is the "retransmission-timeout floor verified" check U3's
+  row asks for, if the main session wants it on 6.8.
+
+### S. Summary so far (16:42 UTC; timer table to follow)
+1. Timers: tokio 1.54.1 cannot meet 0.25 ms (1 ms ticks, deadline rounded up, epoll ms timeout rounded up: 0-2 ms
+   late by construction). A dedicated release thread is required; this container is too noisy to prove 0.25 ms at
+   p99.9 for any mechanism (even pure spin shows ms-scale pauses), so RS must measure it (self-test at each L2 block).
+2. TCP: TCP_RTO_MIN = HZ/5 = 200 ms; per route `rto_min` on 6.8; sysctl tcp_rto_min_us from 6.11; TCP_RTO_MIN_US
+   socket option from 6.15. Linux's RTO = SRTT + max(RTTVAR, 200 ms), not max(200 ms, 2 x RTT). A single loss in a
+   30 Hz stream is repaired by RACK at the next segment's SACK: stall about RTT + 33 ms (133 ms at P2), measured here
+   (45 of 52 stalls at 33.5 ms on loopback). E15's 200 ms is pessimistic for single losses, optimistic for RTO repairs
+   (about 300 ms at P2, doubling) and about 1 s optimistic after a B1 burst.
+3. tokio-tungstenite: accept_* take any `S: AsyncRead + AsyncWrite + Unpin`; set max_frame_size = max_message_size =
+   513 B (the default 16 MiB is reserved up front from the header), read_buffer_size small (128 KiB eager default),
+   write_buffer_size 0, max_write_buffer_size 128 KB + 1 frame; never return Ready(Ok(0)) from poll_write.
+4. DelayStream: below TLS, per-direction FIFO with a 64 KB byte budget (+64 B per segment overhead), partial writes,
+   flush = queued, a pump task per connection, stall counters and a release-lateness histogram; precision needed
+   about 1 ms p99 and 0.25 ms mean bias, which the shared release thread meets and tokio's timer only with a
+   calibrated offset.
