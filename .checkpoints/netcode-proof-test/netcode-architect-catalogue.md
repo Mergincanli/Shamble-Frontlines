@@ -81,3 +81,9 @@ Only this notes file and the doc are written. No code, no ADR or SPIKE_PLAN edit
   authority-only; (Q-VOCAB) omitted lobby/supervisor rows use the draft's direction/channel words; (Q-FUZZ) socket
   messages fuzzed under -34?; (Q-CAP) "a per-run capability" read as one per browser slot; (Q-RESYNC) queue cleared.
 - Next: block 3 (write the doc header).
+- Blocks 3 and 4 done: header + Wire messages (14 built + 8 omitted = 22 rows) written to the doc. Next: block 5 (Field groups).
+- Block 5 done: Field groups (15 Snapshot + 9 FullState = 24 rows). Next: block 6 (Session controls).
+- Block 6 done: Session controls (4 rows). Next: block 7 (Room-wide controls).
+- Block 7 done: Room-wide controls (12 rows: 11 socket controls + npt-load-ctl). Next: block 8 (assertions, other parts, questions).
+- Block 8 done: sections 6-8 written (U1: 9 assertions, U4: 6; 9 questions). Next: block 9 self-check.
+- Block 9 done: self-check passed (headers exact; 22/24/4/12 rows; cell counts equal headers; prose <= 120 chars; key ADR lines re-read in the worktree). Fixes: Who cells name npt; Authority starts with Sender:; Draft refs for TriggerBurst/BlockUdp/SetProfile; WS write buffer 128 KB. Next: hand back.

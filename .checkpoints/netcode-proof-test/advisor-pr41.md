@@ -67,3 +67,13 @@ Plan: R1 fetch + diff 2ccc184..16763a7 (files, word diff); R2 check C1-C3 + O1 t
 APPROVE, head 16763a724b741a40615dc8e7c2ef25c5ea3e4b30, needs-mustafa (ADR edits). C1, C2, C3 and O1 done exactly as given; nothing else changed; CI gate+smoke green on this SHA. No conditions. Action: label needs-mustafa; merge only on Mustafa's own "merge #41" in a session chat for this head, re-checking checks and passing this SHA as expected head.
 For Mustafa: Reconfirm the merge of #41: it writes the advisor's readings and his own 2026-11-06 answers into ADRs 0001, 0004, 0006, the register and SPIKE_PLAN (rule-level docs). Say "merge #41" in a session's chat.
 DONE
+
+## Re-review round 3: 16763a7..1b4094a7750177269b9d5f2fa8c21e292c76e009 (one paragraph, ADR 0001 checklist)
+Plan: Q1 fetch + diff; Q2 paragraph text vs base (af8393e) and R-28; Q3 CI + PR state; Q4 verdict.
+- Q1-Q2 DONE: one commit on 16763a7, 1 file +3 -3, merge-base af8393e = origin/main. Script: applying only the one paragraph edit to 16763a7 gives 1b4094a exactly (normalised). R-28 words intact x1; "The profile changes from the overlay" now once. Old line now "The overlay's profile control is spike-only, on the server's impairment layer" = base af8393e:1640's parenthetical, no new rule; base's "and the cap change from the overlay" is overtaken by R-28 right after, so no pointer needed. Widths 120/113/37.
+- Q3a: PR open, not draft, label needs-mustafa, head 1b4094a, same 5 files. gate success x2 on 1b4094a; smoke in_progress x2 at first read.
+- Q3 DONE: CI on 1b4094a: gate success x2, smoke success x2 (completed 10:21:15Z and 10:21:30Z). My gate in my own worktree /home/user/Shamble-Frontlines/.gate/pr-41r3 at 1b4094a vs af8393e: 1-4, 5b-5d PASS, symbols +0 -0; 5a can't start (browser build). Note: .gate/pr-41 had been removed by the coordinator; my first try's cd failed, so that gate output came from the session's main folder and is discarded. No switch happened there (&& short-circuited; main folder still on claude/netcode-proof-test-plan-hcky5g at 3515063).
+## Q4 Verdict, round 3 (written)
+APPROVE, head 1b4094a7750177269b9d5f2fa8c21e292c76e009, needs-mustafa (ADR edits). The one paragraph is right: the doubled sentence is gone, R-28's words are unchanged, the old line keeps only the base's "spike-only, on the server's impairment layer" fact, and it adds no rule. Nothing else changed. CI gate+smoke green on this SHA. My APPROVE of 16763a7 is superseded; his go must name this head.
+For Mustafa: Reconfirm the merge of #41: it writes the advisor's readings and his own 2026-11-06 answers into ADRs 0001, 0004, 0006, the register and SPIKE_PLAN (rule-level docs). Say "merge #41" in a session's chat.
+DONE

@@ -20,9 +20,23 @@ Task (main session, 2026-11-06): draft every pass mark as data against `spikes/n
   check `from`, V-S on `second.s.inputs_count` and LG's `second.v.cpu_permille`). Plan §4.3, §4.7, §6.1-6.3, §15 read;
   digests read (mine §D-F, netcode §A, infra §A: all pre-R-PR, so the rows at the head rule).
 - Step 2 done: 81 rows hashed at 16763a72 -> `scratch-te/row-hashes.json` (script `scratch-te/row_hashes.py`).
+- Block 1 done (PM-0001-1..10): 10 lines in marks-draft.jsonl, built by scratch-te/b1.py (helpers in mk.py).
+- Coordinator's 2nd note read: events carry `ph`; bite runs are judged by the checks of the parts they match. End-of-run summary events use `window: all`.
+- Block 2 done (-11..-16, -17, -57, -58, -18) and block 3 done (-19..-26, -59, -27): 30 lines.
+- Block 4 done (-28..-38, -39, -40, -63 outside): 44 lines. Scripts now run `python3 -I -B` (coordinator: no __pycache__ in the notes folder).
 
 ## Questions for the main session
 - Q1: `select` lists `machine.name`/`machine.arch` but not `machine.role`; `from` uses `machine.role`. May a part's select use `machine.role`? (I use it in parts only where a part must be one machine kind.)
+- Q9: setup conditions (tick_start, ticks_below_wrap, queue depths) are checks named 'setup: ...', so a wrong setup FAILs; INVALID would be honest. Proposal: a `setup` validity rule reading header params.
+- Q10: the jitter of -3 is read as both delay-range ends and the uniform's p90 within 5 % of the half jitter (the p90 catches a normal jitter with a matching range). Confirm, or name the statistic.
+- Q11: per-client bandwidth means (-12 ES, -13): the draft checks the largest per-client mean (figures `down_client_mean_max_bits`, `up_client_mean_max_bits`); a pooled mean would be weaker.
+- Q12: -19's '100 joins' read as LG's; the ML Chrome leg (with Worker-trap rejoins) has no count in the row: the draft asks >= 1.
+- Q13: -25's IPv6 /64 cycler runs only where LG has IPv6 ('recorded if it has not'): as a part selected by `params.lg_ipv6`, without IPv6 it and its bite stay NOT-RUN. Optional parts?
+- Q14: -25's 'closed 2 s after accept': checked as `<= 2 s` exactly; the sweep's granularity needs a tolerance the row lacks.
+- Q15: -27's 'within 5 %' after the SIGKILL read as not worse by more than 5 % (after/before <= 1.05); and -27 names no bite: may PM-0006-13's busy-wait bite run list -27 too?
+- Q16: string-valued records (-28's negotiated draft, browser versions, -2's stand-in names, the clock resolution in `machine`) can't be read by any stat. Proposal: the verdict detail prints named header params and machine fields.
+- Q17: -30's second bite expects INVALID (a late command must void the run); an invalid bite run makes the mark INVALID under the contract, so it is left out of `bites`: a judge fixture instead?
+- Q18: -28's control (a wrong certificate hash fails 100 of 100) is a part with role `control` and a sum == 0 check, not a bite (a bite only needs to fail one check).
 
 ## Notes
 - Q2: a part's `select` on per-log fields (`machine.*`, `process`): does a run match when ANY of its logs matches? (I assume yes.)
