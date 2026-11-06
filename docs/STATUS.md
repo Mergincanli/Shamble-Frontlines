@@ -434,8 +434,9 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
     - **Scale, "1 unit = 1 metre":** Mustafa's "one consistent scale across the engine", with "1 unit = 1 metre" and
       "textures tile in world space (they repeat per metre and never stretch)" (2026-11-05; EDITOR_V2 §3, Decided
       2026-11-05). No ADR draft or design doc stated the unit, but the drafts already work in metres (ADR 0005:401,
-      top speed in metres per second; ADR 0004:261, "a map 2 km across") [verified], so the revision confirms them and changes
-      nothing in them. Owners: ADR 0004 and ADR 0005 for the unit; ADR 0003 for textures that tile in world space.
+      top speed in metres per second; ADR 0004:261, "a map 2 km across") [verified], so the revision confirms them and
+      changes nothing in them. Owners: ADR 0004 and ADR 0005 for the unit; ADR 0003 for textures that tile in world
+      space.
     - **Editing while the match runs:** his tool order (2), "you can keep editing while the match runs", against
       OQ-0005-CD4's "next match": under both of its options, map geometry and navigation data apply at the next match
       (ADR 0005:669-680; R4-PHYS-REC2 keeps the static world for the match), and EDITOR_V2 §2 rule 4 merges static
