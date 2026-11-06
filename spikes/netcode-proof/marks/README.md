@@ -26,7 +26,7 @@ header; tick, second and event records follow in time order. Every record has a 
   - `machine`: `role` (`RS`, `LG`, `MV`, `C`, `ML`, `MP`, `MAC`, `RD`), `name` (the instance: `RS`, `LG1`, `LG2`,
     …; `ML` the named laptop and `ML*` its stand-in, `MAC-r` the runner and `MAC-b` a borrowed Mac),
     `plan`, `arch`, `cpu`, `vcpus`, `mem_mb`, `location`, `kernel`, `address` (a VM's day address; empty elsewhere:
-    §10.6), `threads_per_core`, `smt` (sibling lists), `clock_res_ns`;
+    §10.6), `threads_per_core`, `smt` (sibling lists), `clock_res_ns` (on an L1 run, the simulated clock's 1 ns);
   - `build`: `commit`, `binary_sha256`, `features`, `profile`;
   - `bite`: the bite id, or `null` in every measured build (plan §4.7);
   - `layer` (`L1`, `L2`, `real`), `profile` (`P0` to `P4`, `B1`, `real-path`), `seed`, `tick_hz`, `clients`,

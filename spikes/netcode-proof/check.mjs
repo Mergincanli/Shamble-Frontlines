@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // The spike's test command (plan §12.4): every unit runs it, and its summary goes into the checkpoint.
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
-// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each with every feature and warnings as
-// errors; test (cargo test on the measured build, then on the bites build); deps (the dependency rules of plan §4.2, from `cargo metadata` with every feature and target); refs
+// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each on the measured build and on the
+// bites build with warnings as errors; test (cargo test on the measured build, then on the bites build); deps (the dependency rules of plan §4.2, from `cargo metadata` with every feature and target); refs
 // (nothing outside spikes/ references it, §4.2 and §4.9); marks (marks.json compiles in the judge, covers exactly the
 // plan's marks, and every row it hashed is unchanged); self (this file's own tests); redact (redact-check's tests,
 // then a scan of the spike's folder). It runs every step and exits 1 if any failed.
@@ -184,6 +184,14 @@ function summarized(r, summary) {
 
 const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...LEAF.flatMap((c) => ["-p", c])];
 
+/** clippy with warnings as errors on the measured build (no features), then on the bites build (every feature). */
+function lintBothBuilds(scope) {
+  const measured = run("cargo", ["clippy", "--locked", ...scope, "--", "-D", "warnings"], HERE);
+  if (!measured.ok) return measured;
+  const bites = run("cargo", ["clippy", "--locked", ...scope, "--all-features", "--", "-D", "warnings"], HERE);
+  return { ok: bites.ok, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
+}
+
 /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
  * compiled in: plan §4.7). Each count is reported. */
 function testBothBuilds() {
@@ -196,10 +204,10 @@ function testBothBuilds() {
 
 const STEPS = {
   fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
-  // Every feature, so the bites build's code is linted too (features only add code; none is compiled out by one).
-  clippy: () =>
-    run("cargo", ["clippy", "--locked", "--workspace", "--all-targets", "--all-features", "--", "-D", "warnings"], HERE),
-  "clippy-wasm32": () => run("cargo", ["clippy", "--locked", ...WASM_ARGS, "--all-features", "--", "-D", "warnings"], HERE),
+  // Both builds, as the tests run: the measured build (no features) and the bites build (every feature). A feature can
+  // compile code out as well as in (npt-lab's probe has `cfg(not(feature = "bites"))` code), so one pass is not enough.
+  clippy: () => lintBothBuilds(["--workspace", "--all-targets"]),
+  "clippy-wasm32": () => lintBothBuilds(WASM_ARGS),
   test: testBothBuilds,
   deps: () => {
     const r = run("cargo", ["metadata", "--locked", "--format-version", "1", "--all-features"], HERE);

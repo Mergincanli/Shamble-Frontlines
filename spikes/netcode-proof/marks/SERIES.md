@@ -271,7 +271,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `egress_vs_r2_ratio` | fraction (exact) | npt-judge | egress_interface_bytes / r2_egress_formula_bytes | PM-0006-17 'within +-20 % of R2's E3 estimate at the counts that ran' | 0006-17 |
 | `everyone_in_view_min_share` | fraction (exact) | npt-judge | min over client slots of the share of that slot's snapshots with tick.s.everyone_in_view = 1. Inputs: tick.s.everyone_in_view (index = slot) | PM-0001-2 'every client's relevant set holds all 47 other soldiers on at least 99 % of its snapshots' | -2 |
 | `false_hit_share` | fraction (exact) | npt-judge | among view misses (event.view_test.hit = 0), the share registered as hits; Arm rule on L2 as above | PM-0001-48 'false hits (a miss in the view counted as a hit) below 0.5 %' | -48 |
-| `fate_log_twin_equal` | 0/1 | npt-judge | 1 if header.params.fate_log_sha256 equals that of the run named in header.params.twin (role twin) | PM-0001-3 'on L1, the same seed and profile give an identical packet-fate log on two runs' | -3 |
+| `fate_log_twin_equal` | 0/1 | npt-judge | 1 if header.params.fate_log_sha256 equals that of the run named in header.params.twin, 0 if they differ. The twin must be in the same set, with role twin and the same layer, profile, seed and bite (a bite run's twin runs the same bite); a twin not in the set yet leaves the check NOT-RUN; a run naming no twin, a twin that differs in those fields or is not role twin, and a hash that is not 64 lowercase hex digits are gaps (built in U2) | PM-0001-3 'on L1, the same seed and profile give an identical packet-fate log on two runs' | -3 |
 | `input_latency_p50_rise_ns` | ns | npt-judge | the same with medians | PM-0001-43 'and the same for the medians' | -43 |
 | `input_latency_p99_rise_ns` | ns | npt-judge | max over kinds (params.kind: move, flash) of p99(event.input_latency.to_screen_ns at P4) - p99(at P0), over the part's runs | PM-0001-43 'p99 at P4 minus p99 at P0 at most 33.33 ms' | -43 |
 | `kill_p99_ratio` | fraction (exact) | npt-judge | p99 of tick.v.work_ns over the ticks after the set's `kill` event (ph = after) / p99 over the measured ticks | PM-0001-27 'killing one room's process (SIGKILL) leaves the others' p99 within 5 %' | -27 |
@@ -372,6 +372,11 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `kind` | move or flash | -43 |
 | `collision_rule` | string | -42 (recorded) |
 | `fate_log_sha256` | hex string | -3 |
+| `reorder_up_permille`, `reorder_down_permille` | each direction's measured reorder share: RFC 4737's reordered datagrams per 1000 delivered (`reorder_permille` is the lower of the two) | -3 (recorded), the `reorder` rule |
+| `reorder_step_permille` | the reorder step's draw share (part 13's 10, on in every run), recorded beside the profile | -3 (recorded) |
+| `probe_rate_pps` | the probe's datagrams per second per direction (10,000) | -3 (recorded) |
+| `probe_sent_count` | the probe's datagrams sent per direction, bursts included (1,000,000, or 1,010,000 at B1) | -3 (recorded) |
+| `burst_starts_ns` | B1's burst starts on the run's clock (a list; each burst lasts 1 s) | -3 (recorded) |
 | `padding_target_ns` | ns | padding rule |
 | `event_queue_cap_count` | count | -22 (reported) |
 | `started_utc` | ISO 8601 UTC time the caller passes (proposed, Q25) | times_of_day_rule |

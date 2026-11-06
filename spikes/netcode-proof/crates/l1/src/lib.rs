@@ -14,20 +14,28 @@
 //!   their spacing. **The reorder step** (R-5; part 13, the advisor's reading, 2026-11-06) adds what the jitter cannot:
 //!   a datagram it draws (1 % of a flow's datagrams) is overtaken by the next datagram of its flow: it is held until
 //!   1 ns after that one arrives, if that one is sent before it would have arrived and is not lost. A held datagram is
-//!   only ever later than its draw, so no delay falls below the profile's floor; where the spacing is wider than the
-//!   delay (P0; P1 at 30 Hz) the step finds nothing to swap, and the run's measured share says so.
+//!   only ever later than its draw, so no delay falls below the profile's floor; but it may arrive above the profile's
+//!   ceiling, by up to one spacing: at P2 to P4 at 30 Hz about 1 % of datagrams do (P2's highest is about 93 ms against
+//!   its 60 ms ceiling; the advisor's U2 check). Where the spacing is wider than the delay (P0; one datagram per tick at
+//!   P1) the step finds nothing to swap, and the run's measured share says so. The step is on in every run.
 //! - **Bursts** (B1): every packet sent inside a burst is lost, in both directions.
 //! - **Reliable streams** (Control, FullState) lose nothing and keep their order. A message the loss draw takes is
 //!   delivered one retransmission timeout later, max(200 ms, 2 × the profile's round trip) (E15's rule for the
 //!   WebSocket stream, proposed there); one sent inside a burst is retried every timeout until a retry falls outside it;
 //!   a stream then delivers each message at the later of its own time and its predecessor's. This is L1's model of a
-//!   stream; L2 measures the real ones.
+//!   stream; L2 measures the real ones. **Simplified until U4** (the advisor's C1, due before an L1 mark reads stream
+//!   timing, PM-0001-18 first): retries do not back off yet (RFC 6298 §5.5 and RFC 9002 §6.2.1 double each timeout),
+//!   and loss is drawn per message, not per 1,448 B segment, so a burst's recovery on L1 is too kind today (about 53 ms
+//!   after a 1 s burst, against about 450 ms with backoff).
 //! - **Delivery.** `poll_recv(now)` returns what has arrived by `now` in (arrival, fate-log index) order, never in the
 //!   instant it was sent (P0 included: plan §4.7's step order), stamped with its arrival time.
 //! - **RTT** is each end's RFC 9002-style smoothed estimate, not the profile's value (plan §4.7, npt-lab): each
 //!   delivered packet returns an implicit acknowledgement with a delay drawn for the other direction (never lost), whose
 //!   sample, the acknowledgement's arrival minus the packet's send time, the end reads once its clock reaches it. A
-//!   retransmitted message gives no sample (Karn's rule).
+//!   retransmitted message gives no sample (Karn's rule). **Simplified until U4** (the advisor's C2, due before
+//!   npt-room reads `rtt_ns`): every delivered packet gives a sample, not only the newest of its link and direction
+//!   (RFC 9002 §5.1), and a stream message's sample comes from its in-order delivery, so one held behind a
+//!   retransmitted message reads up to one timeout high.
 //! - **The fate log** ([`FateLog`]) records every packet: its link, direction, channel, index in its flow, send time,
 //!   size and fate (delivered at a time, overtaken by the reorder step or not, retransmissions; lost; lost in a burst).
 //!   The same seed, profile and sends give the same log, byte for byte: PM-0001-3's identity.
