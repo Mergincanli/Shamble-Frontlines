@@ -102,10 +102,22 @@
     Rust tests; deps hold; 246 tracked files, none outside spikes/ references it; 8/8 and 10/10 node tests; redact
     0 findings).
 
+19. **docs-keeper and the drift check** · 54e8b84 · REPO_MAP (spikes/, docs/design/, the spike's section; map check
+    OK) and STATUS (kit-v3-3 merged; the netcode proof test in flight with Mustafa's five answers; the freeze lifted;
+    the no-Mac words); check.mjs's `expectedMarks`/`marksProblems` with tests; the judge's CLI tests. (The container
+    restarted around 11:40 UTC; both agents had finished; their reports were read back from their transcripts.)
+20. **U1 part 2c** · 5ac4042 · `marks/marks.json` (81 marks: 74 pass, 1 reported, 3 person, 3 outside; row hashes at
+    1b4094a, unchanged since 16763a7) and `marks/SERIES.md` (235 series, 36 figures), machine-copied byte for byte
+    from test-engineer's drafts (one node command, main folder, no cd; an exception to Write/Edit-only, for byte-exact
+    data); the judge: reports may name parts or pool, outside marks keep bites as data, 36 figures listed as not
+    built with their units; the fixtures on the real marks (PM-0001-4 PASS, FAIL, INVALID; PM-0006-14 short padding
+    INVALID, full padding NOT-RUN until N = 36 and 18); check.mjs's marks step. **check.mjs: all 9 steps pass** (44
+    Rust tests; 81 marks; rows unchanged at 1b4094a; redact 0 findings over 80 files).
+
 ## Current step
-19. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. test-engineer (resumed after the usage limit
-    at 11:12 UTC) finishes marks.json's draft; then marks.json + its drift check + the judge fixtures on it, the
-    advisor on Q1-Q9 and the marks questions together, docs-keeper, U1's close.
+21. Waiting for Mustafa's own "merge #41" in this chat, for head 1b4094a. The advisor rules on
+    `u1-questions.md` (A1-A9 the catalogue, B7-B15 the marks, C1-C12 the judge's and tools' readings; notes
+    `advisor-u1.md`); then the session makes its changes and closes U1.
 
 ## Next steps
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
@@ -174,6 +186,10 @@
 - The message catalogue (netcode-architect, xhigh, background) · notes `netcode-architect-catalogue.md` · writes
   `docs/design/netcode-proof-messages.md` · launched 11:12 · DONE 11:20 (Q1-Q9 for the advisor).
 - marks.json's draft (test-engineer, xhigh, background) · notes `test-engineer-marks.md` · writes `marks-draft.jsonl`
-  and `series-draft.md` · launched 11:16 · running.
+  and `series-draft.md` · launched 11:16 · stopped at the usage limit, resumed 12:12 · DONE (81 marks, 0 validator
+  errors, Q1-Q31).
+- docs-keeper (xhigh, background) · notes `docs-keeper-u1.md` · launched 12:22 · DONE (REPO_MAP, STATUS; map OK).
+- The advisor on U1's questions (advisor agent, xhigh, background) · notes `advisor-u1.md` · launched 13:15 · running.
+- Saver: background task `brikhjzxz` · started 13:14 (the restart had ended `bekt3thjk`) · stops by about 15:04.
 - R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
   rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.
