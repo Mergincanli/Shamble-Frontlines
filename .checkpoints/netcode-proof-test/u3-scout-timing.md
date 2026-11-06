@@ -635,3 +635,91 @@ d_release_thread_spin_then_notify_task	delay_ms=0.5	min=6.9	p50=64.2	p99=308.5	p
    probe's `hiccup`/`stream` results: they decide the spin lead and whether inbound meets the bar.
 6. If a spin lead is needed on RS, the release thread costs up to about rate x lead of one I/O vCPU (measured below
    for 3,000 and 7,000/s); is that acceptable against the CPU marks, recorded in the header?
+- The header already has `clock_res_ns` (spikes/netcode-proof/crates/log/src/lib.rs:41; plan E18 "clock resolution per
+  machine", plan.md:422). clock_getres gives 1 ns here and will on RS; it says nothing about wake precision. The RS
+  self-test's lateness summary (p50/p99/p99.9/max per direction, the lead used, the release thread's CPU, the hiccup
+  count) is what E18 needs beside it: new header or per-second fields for the main session (npt-log is U1's).
+- docs.rs agrees (https://docs.rs/tokio-tungstenite/0.30.0/tokio_tungstenite/fn.accept_hdr_async_with_config.html):
+  "pub async fn accept_hdr_async_with_config<S, C>( stream: S, callback: C, config: Option<WebSocketConfig>, ) ->
+  Result<WebSocketStream<S>, Error> where S: AsyncRead + AsyncWrite + Unpin, C: Callback + Unpin".
+- docs.rs agrees for tokio (https://docs.rs/tokio/1.54.1/tokio/time/fn.sleep_until.html): "`Sleep` operates at
+  millisecond granularity and should not be used for tasks that require high-resolution timers."
+
+### T1b. (d) rows complete; sleepers started 16:55:36 (a, in results.txt), 16:55:40 (b, results-b.txt) and 16:55:41 (b1, results-b1.txt): CONCURRENT, three processes
+```
+d_release_thread_spin_then_notify_task	delay_ms=0.1	min=8.5	p50=32.8	p99=178.3	p99.9=1732.4	max=10042.4	over_250us=61	cpu_cores=0.835
+d_release_thread_spin_then_notify_task	delay_ms=0.5	min=6.9	p50=64.2	p99=308.5	p99.9=1837.0	max=5795.6	over_250us=143	cpu_cores=0.179
+d_release_thread_spin_then_notify_task	delay_ms=1.0	min=3.5	p50=96.5	p99=382.4	p99.9=2593.5	max=22076.7	over_250us=252	cpu_cores=0.104
+d_release_thread_spin_then_notify_task	delay_ms=2.0	min=4.4	p50=118.0	p99=499.7	p99.9=3237.8	max=10937.5	over_250us=347	cpu_cores=0.059
+d_release_thread_spin_then_notify_task	delay_ms=10.0	min=11.6	p50=176.0	p99=834.3	p99.9=9669.4	max=71671.9	over_250us=1116	cpu_cores=0.015
+d_release_thread_spin_then_notify_task	delay_ms=50.0	min=27.5	p50=233.6	p99=1725.7	p99.9=13690.2	max=67294.0	over_250us=3932	cpu_cores=0.004
+```
+
+### A. Answer draft (16:56 UTC; the timer numbers to be completed from T2/T3)
+tokio 1.54.1's timer cannot meet the advisor's 0.25 ms bar: deadlines round up to a 1 ms tick and the driver parks in
+whole ms through epoll's ms timeout, so sleep_until is 0-2 ms late by construction (measured: p50 about 1.0 ms,
+p99 about 2.1 ms, 9,999 of 10,000 waits above 0.25 ms at 0.1 ms). ImpairSocket needs a dedicated release thread
+(heap + condvar, timer slack 1 ns, a configurable spin lead) that sends outbound datagrams itself and wakes quinn's
+endpoint driver through the waker poll_recv stored. In this shared container no mechanism reaches p99.9 <= 0.25 ms
+because the vCPU itself pauses (even a pure spin), so the condition is decided by a self-test on RS before R1; the
+statistic -3 actually tests is the release lateness p99.9 (minus a recorded offset). Linux's TCP_RTO_MIN is HZ/5 =
+200 ms; on 6.8 only a per-route rto_min changes it (sysctl from 6.11, socket option from 6.15); the RTO is
+SRTT + max(RTTVAR, 200 ms), about 300 ms at P2; a single loss in a 30 Hz stream is repaired by RACK at the next
+segment's SACK, about RTT + 33 ms = 133 ms at P2 (measured on loopback: 45 of 52 stalls at 33.5 ms). So E15's 200 ms
+is pessimistic for most single losses, optimistic for RTO repairs and about 1 s optimistic after B1. tokio-tungstenite
+takes any AsyncRead + AsyncWrite + Unpin stream; set max_frame_size and max_message_size to 513 B (the 16 MiB default
+is reserved from the header alone), read_buffer_size small, and never return Ready(Ok(0)).
+- The BPF route on 6.8 exists: `TCP_BPF_RTO_MIN = 1004` in include/uapi/linux/bpf.h:6916 at v6.8 (bpf_setsockopt from
+  a sockops program), so 6.8 offers two ways to change the floor: the per-route `rto_min` and a BPF sockops program.
+  Neither is needed for the spike (L2 emulates TCP's repair; it does not change RS's TCP).
+- Thin streams (a 30 Hz game stream qualifies: "less than 4 packets in flight"): Linux can skip exponential backoff
+  for them, but "Both modifications are turned off by default" (https://raw.githubusercontent.com/torvalds/linux/master/Documentation/networking/tcp-thin.rst;
+  6.8 code: tcp_timer.c:636-645, `tcp_stream_is_thin`: `tp->packets_out < 4 && !tcp_in_initial_slowstart(tp)`,
+  include/net/tcp.h:2119-2122). Not for L2's model (defaults), but a real game server's WebSocket path could set
+  TCP_THIN_LINEAR_TIMEOUTS to shorten B1-type recoveries: a production question for ADR 0001, not the spike.
+- Reuse: npt-l1 already has `Profile` (rtt, jitter as the round trip's +-, loss_ppm, B1 bursts:
+  spikes/netcode-proof/crates/l1/src/lib.rs:86-141) and the pinned ChaCha8 draws; DelayStream and ImpairSocket should
+  take the same `Profile` type so L1 and L2 cannot drift (npt-net may depend on npt-l1: it is a leaf with no tokio,
+  §4.2 allows it; or the type moves to npt-link). For the main session.
+- L1 cross-check: npt-l1's stream model already retries a message sent inside a burst "every timeout until a retry
+  falls outside it", with backoff due at U4 (C1) and "about 450 ms with backoff" after a 1 s burst quoted
+  (spikes/netcode-proof/crates/l1/src/lib.rs:22-29). That 450 ms assumes a 200 ms first timeout doubling (200, 400,
+  800). Linux's first RTO at P2 is SRTT + 200 ms, about 300 ms, so retries at about 0.3, 0.9 and 2.1 s after the
+  burst's start: about 1.1 s after a 1 s burst ends (F2), not 450 ms. Whichever constant L2 adopts, L1 (C1) should use
+  the same, or -18's 500 ms heal limit is judged against a kinder model on L1 than on L2.
+- 16:58 UTC: 10 ms sleeper cells in: b p50 148.7 / p99 408.5 / p99.9 2,765 us; b1 p50 99.6 / p99 367.3 / p99.9
+  3,168 us. The 50 ms cells end about 17:06-17:07; then the wrapper's sequential b/b1 get stopped and the extras run.
+- RFC 8985 matches Linux's reo_wnd = 0 rule: "The reordering window SHOULD be set to zero if no reordering has been
+  observed on the connection so far, and either (a) three segments have been SACKed since the last recovery or (b) the
+  sender is already in fast or RTO recovery. Otherwise, the reordering window SHOULD start from a small fraction of the
+  round-trip time" (https://www.rfc-editor.org/rfc/rfc8985.txt lines 350-356). Note for L2: L2's own 1 % reorder step
+  is on datagrams only; on a real path with reordering, Linux would widen reo_wnd (DSACK-driven), lengthening the
+  single-loss stall toward RTT + SRTT/4 x steps; not modelled (fine at P1-P4 where TCP sees no reordering).
+- Extras command (to run alone after the sleepers; B = the probe binary; output .gate/netcode-proof-test/timer-probe/results-stream.txt):
+  `B hiccup 10; B stream 3000 0 1 60; B stream 3000 0 50000 60; B stream 3000 100 1 60; B stream 3000 1000 1 60;
+  B stream 7000 100 1 60; B stream 3000 0 1 60 50; B stream 3000 100 1 60 0 1; B stream 3000 0 1 60 0 1`.
+- docs.rs agrees for WebSocketConfig (https://docs.rs/tungstenite/0.30.0/tungstenite/protocol/struct.WebSocketConfig.html):
+  read_buffer_size "This buffer is eagerly allocated ... a smaller buffer, e.g. 4 KiB, would be appropriate to lower
+  total memory usage. The default value is 128 KiB"; max_frame_size "The default value is 16 MiB ... small enough to
+  prevent memory eating by a malicious user" (per connection; F3 shows it is reserved up front, so not per server).
+- For the release thread's sends use `UdpSocketState::try_send` (R/quinn-udp-0.5.16/src/unix.rs:222-223, "without any
+  additional error handling"), not `send` (:200-207: errors other than WouldBlock are "logged" and become Ok), so
+  every failed release is counted; both take `&self` (UdpSocketState is Send + Sync per docs.rs quinn-udp 0.5.13's
+  auto-trait list; the 0.5.16 source has the same signatures).
+- Source for the inheritance measured above: `p->default_timer_slack_ns = current->timer_slack_ns;` in copy_process
+  (https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/fork.c:2409); timer_slack_ns itself is copied with the
+  task struct (dup_task_struct; not traced line by line). Slack "used to round up poll() and select() etc timeout
+  values" (include/linux/sched.h, master, task_struct comment).
+- Where slack applies to std::thread::sleep (nanosleep) at 6.8: `slack = current->timer_slack_ns; if
+  (rt_task(current)) slack = 0; ... hrtimer_set_expires_range_ns(&t.timer, rqtp, slack);`
+  (https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/time/hrtimer.c:2095-2100). So a SCHED_FIFO release
+  thread gets zero slack automatically on 6.8 for nanosleep; for a Condvar::wait_timeout (futex) the same
+  rt_task rule applies at :2303 (the futex/hrtimer sleeper path; read the context before relying on it). Default
+  slack (50 us) is the expected extra lateness of a normal thread's wake: matches b vs b1's p50 gap here (about
+  50 us at 0.1-2 ms delays: 67 vs 17, 87 vs 37, 103 vs 54, 117 vs 64 us).
+  (Checked: :2303 is in `schedule_hrtimeout_range_clock` (:2277), "Override any slack passed by the user if under rt
+  contraints", the path epoll_wait/poll timeouts use; futex waits (Condvar) take their slack elsewhere: unconfirmed.)
+  Futex (Condvar::wait_timeout, the release thread's wait) at v6.8: `to = futex_setup_timer(abs_time, &timeout, flags,
+  current->timer_slack_ns);` (https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/futex/waitwake.c:694-695),
+  then `hrtimer_set_expires_range_ns(&timeout->timer, *time, range_ns)` (kernel/futex/core.c:149). So the thread's
+  slack applies to the Condvar wait too (no RT override on this path at 6.8), and prctl(1 ns) is what tightens it.
