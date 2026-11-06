@@ -1,6 +1,7 @@
 //! The judge's engine on logs built here, one test per verdict path of `marks/README.md` §3 to §6. The committed
 //! fixtures (tests/fixtures.rs) prove the same paths on files and on the real marks.json.
 
+use npt_judge::eval::BiteStatus;
 use npt_judge::{VerdictKind, judge, parse_marks};
 use npt_log::{
     Build, Ended, EventRecord, Header, Log, Machine, Phase, SCHEMA, SecondRecord, TickRecord,
@@ -631,5 +632,415 @@ fn a_share_with_its_condition() {
     assert_eq!(
         verdict_of(std::slice::from_ref(&mark), &[shots(98, 2)]).0,
         VerdictKind::Fail
+    );
+}
+
+// ---- The advisor's U1 rulings (advisor-u1.md): C2, B7, B8, B9, B13, Q10, Q22, Q27 ----
+
+/// A mark with two checks: the tick budget, and a count of forged commands that must be 0.
+fn two_check_mark(extra: Value) -> Value {
+    let mut m = tick_mark(M, json!({"bites": []}));
+    m["checks"].as_array_mut().expect("checks").push(
+        json!({"name": "no forged command applied", "series": "event.forged_applied.cmd",
+                     "stat": "count", "op": "==", "value": 0}),
+    );
+    m["checks"]
+        .as_array_mut()
+        .expect("checks")
+        .push(json!({"name": "queue depth p99", "series": "tick.v.queue_count", "stat": "p99", "op": "<=", "value": 8}));
+    if let (Some(m), Some(e)) = (m.as_object_mut(), extra.as_object()) {
+        for (k, v) in e {
+            m.insert(k.clone(), v.clone());
+        }
+    }
+    m
+}
+
+fn run_with(id: &'static str, work: &[i64], queue: Option<i64>) -> Log {
+    let mut s = LogSpec::room(id, "set-a", M);
+    s.ticks = work
+        .iter()
+        .map(|w| {
+            let mut v = vec![("work_ns", *w)];
+            if let Some(q) = queue {
+                v.push(("queue_count", q));
+            }
+            (Phase::Measured, v)
+        })
+        .collect();
+    s.build()
+}
+
+#[test]
+fn c2_a_failing_check_wins_over_a_gap_and_a_gap_alone_is_invalid() {
+    let mark = two_check_mark(json!({}));
+    // An event that never happened counts 0, a real value: three clean runs pass.
+    let clean: Vec<Log> = ["r1", "r2", "r3"]
+        .iter()
+        .map(|id| run_with(id, &[50], Some(3)))
+        .collect();
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &clean);
+    assert_eq!(k, VerdictKind::Pass, "{why:?}");
+    // Run 2 fails the tick budget and has no queue counter: FAIL, the gap listed beside it.
+    let mut logs = clean.clone();
+    logs[1] = run_with("r2", &[150], None);
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &logs);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(
+        why.iter().any(|w| w.contains("run r2: tick p99 = 150")),
+        "{why:?}"
+    );
+    assert!(
+        why.iter()
+            .any(|w| w.contains("run r2: also a gap in the record")
+                && w.contains("tick.v.queue_count")),
+        "{why:?}"
+    );
+    // A gap with no failure: INVALID.
+    let mut logs = clean;
+    logs[1] = run_with("r2", &[50], None);
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &logs);
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        why[0].contains("no values for tick.v.queue_count"),
+        "{why:?}"
+    );
+}
+
+#[test]
+fn c2_a_bite_that_fails_one_check_and_empties_another_is_shown() {
+    let mark = two_check_mark(json!({"bites": [{"id": "PM-0001-4/B-S", "what": "a busy-wait"}]}));
+    let mut logs: Vec<Log> = ["r1", "r2", "r3"]
+        .iter()
+        .map(|id| run_with(id, &[50], Some(3)))
+        .collect();
+    let mut bite = LogSpec::room("bite-1", "set-a", M);
+    bite.role = "bite";
+    bite.bite = Some("PM-0001-4/B-S");
+    bite.ticks = vec![(Phase::Measured, vec![("work_ns", 150)])];
+    logs.push(bite.build());
+    let v = judge(&marks_file(&[mark]), &logs);
+    assert_eq!(v[0].bites[0].status, BiteStatus::Shown, "{:?}", v[0].bites);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+}
+
+#[test]
+fn c2_an_empty_tick_series_is_a_gap_even_for_a_count() {
+    let mark = json!({
+        "id": M, "title": "t", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "S30", "select": {"layer": "L2"}, "min": 1}],
+        "checks": [{"name": "0 oversize", "series": "tick.s.snapshot_bytes", "stat": "count",
+                    "where": {"op": ">", "value": 1067}, "op": "==", "value": 0}]
+    });
+    let (k, why) = verdict_of(&[mark], &[run_with("r1", &[50], None)]);
+    assert_eq!(
+        k,
+        VerdictKind::Invalid,
+        "no snapshot sizes written is a gap, never a vacuous 0: {why:?}"
+    );
+}
+
+#[test]
+fn b7_a_part_adds_its_own_rules_and_a_bite_run_takes_its_parts_rules() {
+    let mark = json!({
+        "id": "PM-0001-25", "title": "hostile input", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "flood", "select": {"params.suite": "flood"}, "min": 1, "validity": ["late-zero"]},
+                  {"name": "origin", "select": {"params.suite": "origin"}, "min": 1}],
+        "checks": [{"name": "tick p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 100}],
+        "bites": [{"id": "PM-0001-25/bite", "what": "x"}]
+    });
+    let run = |id: &'static str,
+               suite: &'static str,
+               role: &'static str,
+               late: Option<i64>,
+               work: i64| {
+        let mut s = LogSpec::room(id, "set-h", "PM-0001-25");
+        s.role = role;
+        if role == "bite" {
+            s.bite = Some("PM-0001-25/bite");
+        }
+        s.params.push(("suite", json!(suite)));
+        let mut v = vec![("work_ns", work)];
+        if let Some(l) = late {
+            v.push(("late_count", l));
+        }
+        s.ticks = vec![(Phase::Measured, v)];
+        s.build()
+    };
+    // The origin part has no late counter and needs none; the flood part's rule holds.
+    let logs = vec![
+        run("f-1", "flood", "measured", Some(0), 50),
+        run("o-1", "origin", "measured", None, 50),
+        run("b-1", "flood", "bite", Some(0), 150),
+    ];
+    let v = judge(&marks_file(std::slice::from_ref(&mark)), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+    // A bite run in the flood part is held to that part's rule too: a late command makes it INVALID.
+    let mut logs = logs;
+    logs[2] = run("b-1", "flood", "bite", Some(2), 150);
+    let v = judge(&marks_file(&[mark]), &logs);
+    assert_eq!(
+        v[0].bites[0].status,
+        BiteStatus::Invalid,
+        "{:?}",
+        v[0].bites
+    );
+}
+
+fn load_mark() -> Value {
+    json!({
+        "id": "PM-0001-2", "title": "the load is the stress scene", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "SS N=48", "select": {"scene": "SS", "clients": 48}, "min": 1}],
+        "checks": [{"name": "48 soldiers", "series": "tick.v.soldiers_count", "stat": "min", "op": ">=",
+                    "value": 48, "parts": ["SS N=48"]}]
+    })
+}
+
+#[test]
+fn b8_a_run_that_did_not_carry_the_load_is_invalid() {
+    let budget = tick_mark(
+        M,
+        json!({"bites": [], "parts": [{"name": "S30", "select": {"scene": "SS", "clients": 48}, "min": 1,
+                                       "validity": ["pre:PM-0001-2"]}]}),
+    );
+    let run = |soldiers: Option<i64>| {
+        let mut s = LogSpec::room("r1", "set-p", M);
+        s.marks = vec![M, "PM-0001-2"];
+        let mut v = vec![("work_ns", 50)];
+        if let Some(n) = soldiers {
+            v.push(("soldiers_count", n));
+        }
+        s.ticks = vec![(Phase::Measured, v)];
+        s.build()
+    };
+    let marks = [budget.clone(), load_mark()];
+    let v = judge(&marks_file(&marks), &[run(Some(48))]);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+    let v = judge(&marks_file(&marks), &[run(Some(47))]);
+    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
+    assert!(
+        v[0].why[0].contains("pre:PM-0001-2: 48 soldiers = 47, needs >= 48"),
+        "{:?}",
+        v[0].why
+    );
+    let v = judge(&marks_file(&marks), &[run(None)]);
+    assert_eq!(
+        v[0].verdict,
+        VerdictKind::Invalid,
+        "a precondition with a gap: {:?}",
+        v[0].why
+    );
+    // A precondition that does not exist, or names itself, is refused when marks.json is read.
+    let bad = tick_mark(
+        M,
+        json!({"bites": [], "parts": [{"name": "S30", "select": {"scene": "SS"}, "min": 1,
+                                       "validity": ["pre:PM-0001-99"]}]}),
+    );
+    let text = json!({"schema": 1, "drafts_commit": "a".repeat(40), "marks": [bad]}).to_string();
+    assert!(npt_judge::parse_marks(&text).is_err());
+}
+
+#[test]
+fn everyone_in_view_takes_the_worst_client() {
+    let mark = json!({
+        "id": "PM-0001-2", "title": "the load", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "SS", "select": {"scene": "SS"}, "min": 1}],
+        "checks": [{"name": "everyone in view", "figure": "everyone_in_view_min_share", "op": ">=", "value": "0.99"}]
+    });
+    let run = |second_client_misses: usize| {
+        let mut s = LogSpec::room("r1", "set-v", "PM-0001-2");
+        s.marks = vec!["PM-0001-2"];
+        let mut t: Vec<(Phase, Vec<(&'static str, i64)>)> = Vec::new();
+        for _ in 0..100 {
+            t.push((Phase::Measured, vec![("work_ns", 1)]));
+        }
+        s.ticks = t;
+        let mut log = s.build();
+        for (i, tick) in log.ticks.iter_mut().enumerate() {
+            let second = i64::from(i >= second_client_misses);
+            tick.s
+                .insert("everyone_in_view".to_owned(), vec![1, second]);
+        }
+        log
+    };
+    // Client 2 sees everyone on 99 of 100 snapshots: at 0.99, it holds; on 98, it fails.
+    assert_eq!(
+        verdict_of(std::slice::from_ref(&mark), &[run(1)]).0,
+        VerdictKind::Pass
+    );
+    let (k, why) = verdict_of(&[mark], &[run(2)]);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(why[0].contains("everyone in view = 0.98"), "{why:?}");
+}
+
+#[test]
+fn b9_a_failed_setup_makes_the_run_invalid_never_failed() {
+    let mut mark = tick_mark(
+        M,
+        json!({"bites": [{"id": "PM-0001-4/setup-only", "what": "x"}]}),
+    );
+    mark["checks"].as_array_mut().expect("checks").push(json!({
+        "name": "setup: the S30 starts below the wrap", "series": "header.params.start_tick",
+        "stat": "max", "op": "<=", "value": 63736, "setup": true}));
+    let run = |id: &'static str, start: i64, role: &'static str, work: i64| {
+        let mut s = LogSpec::room(id, "set-s", M);
+        s.role = role;
+        if role == "bite" {
+            s.bite = Some("PM-0001-4/setup-only");
+        }
+        s.params.push(("start_tick", json!(start)));
+        s.ticks = vec![(Phase::Measured, vec![("work_ns", work)])];
+        s.build()
+    };
+    let good = vec![
+        run("r1", 63736, "measured", 50),
+        run("r2", 63736, "measured", 50),
+        run("r3", 63736, "measured", 50),
+        run("b1", 63736, "bite", 150),
+    ];
+    assert_eq!(
+        verdict_of(std::slice::from_ref(&mark), &good).0,
+        VerdictKind::Pass
+    );
+    let mut logs = good.clone();
+    logs[1] = run("r2", 70000, "measured", 50);
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &logs);
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        why[0].contains("setup: setup: the S30 starts below the wrap = 70000"),
+        "{why:?}"
+    );
+    // A bite whose run breaks only its setup is not shown: no bite may target a setup check.
+    let mut logs = good;
+    logs[3] = run("b1", 70000, "bite", 50);
+    let v = judge(&marks_file(&[mark]), &logs);
+    assert_eq!(
+        v[0].bites[0].status,
+        BiteStatus::Invalid,
+        "{:?}",
+        v[0].bites
+    );
+}
+
+#[test]
+fn b13_a_validity_bite_is_shown_only_by_its_own_rule() {
+    let mark = json!({
+        "id": "PM-0001-30", "title": "both transports", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "RS", "select": {"params.suite": "both"}, "min": 1}],
+        "validity": ["late-zero"],
+        "checks": [{"name": "tick p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 100}],
+        "bites": [{"id": "PM-0001-30/late-command", "what": "one command delayed past its tick",
+                   "expect": "invalid", "rule": "late-zero"}]
+    });
+    let run = |id: &'static str, role: &'static str, late: i64, cut: bool| {
+        let mut s = LogSpec::room(id, "set-t", "PM-0001-30");
+        s.role = role;
+        if role == "bite" {
+            s.bite = Some("PM-0001-30/late-command");
+        }
+        s.params.push(("suite", json!("both")));
+        s.ticks = vec![(Phase::Measured, vec![("work_ns", 50), ("late_count", late)])];
+        s.footer = !cut;
+        s.build()
+    };
+    let measured = run("m1", "measured", 0, false);
+    let v = judge(
+        &marks_file(std::slice::from_ref(&mark)),
+        &[measured.clone(), run("b1", "bite", 1, false)],
+    );
+    assert_eq!(v[0].bites[0].status, BiteStatus::Shown, "{:?}", v[0].bites);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+    let v = judge(
+        &marks_file(std::slice::from_ref(&mark)),
+        &[measured.clone(), run("b1", "bite", 0, false)],
+    );
+    assert_eq!(v[0].bites[0].status, BiteStatus::Missed);
+    assert_eq!(
+        v[0].verdict,
+        VerdictKind::Fail,
+        "the validity check let a late command through"
+    );
+    let v = judge(
+        &marks_file(&[mark]),
+        &[measured, run("b1", "bite", 1, true)],
+    );
+    assert_eq!(
+        v[0].bites[0].status,
+        BiteStatus::Invalid,
+        "invalid by another rule (a cut log) shows nothing"
+    );
+}
+
+#[test]
+fn q10_q22_the_0_1st_percentile_and_the_first_n_records() {
+    let mark = json!({
+        "id": "PM-0004-67", "title": "the loop keeps time", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "S30", "select": {"layer": "L2"}, "min": 1}],
+        "checks": [{"name": "jitter p99 over the first 4 measured ticks", "series": "tick.v.start_jitter_ns",
+                    "stat": "p99", "first": 4, "op": "<=", "value": 2000000},
+                   {"name": "lower end of the delay", "series": "tick.v.delay_ns", "stat": "p001",
+                    "op": ">=", "value": 10}]
+    });
+    let mut s = LogSpec::room("r1", "set-j", "PM-0004-67");
+    s.marks = vec!["PM-0004-67"];
+    // Ticks 5 and 6 carry a stall's jitter: outside the first 4 measured ticks, so they do not count.
+    let jitter = [100, 200, 300, 400, 9_000_000, 9_000_000];
+    let delay = [10, 11, 12, 13, 14, 15];
+    s.ticks = jitter
+        .iter()
+        .zip(delay)
+        .map(|(j, d)| {
+            (
+                Phase::Measured,
+                vec![("start_jitter_ns", *j), ("delay_ns", d)],
+            )
+        })
+        .collect();
+    s.ticks.insert(
+        0,
+        (
+            Phase::Warmup,
+            vec![("start_jitter_ns", 9_000_000), ("delay_ns", 1)],
+        ),
+    );
+    let (k, why) = verdict_of(&[mark], &[s.build()]);
+    assert_eq!(k, VerdictKind::Pass, "{why:?}");
+}
+
+#[test]
+fn q27_pm_0006_19s_off_runs_must_agree_within_1_percent() {
+    let mark = json!({
+        "id": "PM-0006-19", "title": "logging cost", "verdict": "pass",
+        "draft": {"file": "docs/adr/0006-infrastructure-operations.md", "row_sha256": "0".repeat(64)},
+        "parts": [{"name": "on", "select": {"params.logging": "on"}, "min": 1}],
+        "validity": ["PM-0006-19"],
+        "checks": [{"name": "on p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 1000}]
+    });
+    let run = |id: &'static str, role: &'static str, logging: &'static str, v: &[i64]| {
+        let mut s = LogSpec::room(id, "set-l", "PM-0006-19").ticks("work_ns", v);
+        s.role = role;
+        s.params.push(("logging", json!(logging)));
+        s.build()
+    };
+    let on = run("on-1", "measured", "on", &[100]);
+    let agree = vec![
+        on.clone(),
+        run("off-1", "logging-off", "off", &[100]),
+        run("off-2", "logging-off", "off", &[100]),
+    ];
+    assert_eq!(
+        verdict_of(std::slice::from_ref(&mark), &agree).0,
+        VerdictKind::Pass
+    );
+    let apart = vec![
+        on,
+        run("off-1", "logging-off", "off", &[100]),
+        run("off-2", "logging-off", "off", &[103]),
+    ];
+    let (k, why) = verdict_of(&[mark], &apart);
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        why[0].contains("PM-0006-19: logging-off run off-1's p99 (100 ns) is more than 1 %"),
+        "{why:?}"
     );
 }

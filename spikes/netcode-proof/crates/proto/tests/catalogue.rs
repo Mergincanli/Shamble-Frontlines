@@ -17,8 +17,8 @@ const FIELDS: &str = "| Message | Field group | Class | Sent to | Notes |";
 const SESSION: &str = "| Variant | Fields | Who may send | Check | Effect | Draft |";
 const ROOM: &str = "| Control | Fields | Who | Check | Effect |";
 
-/// Plan §4.7's npt-proto messages and controls.
-const BUILT: [&str; 14] = [
+/// Plan §4.7's npt-proto messages and controls (`SessionStatus` by the advisor's A1 ruling, 2026-11-06).
+const BUILT: [&str; 15] = [
     "Input",
     "Snapshot",
     "FullState",
@@ -33,6 +33,7 @@ const BUILT: [&str; 14] = [
     "Leave",
     "Kick",
     "SessionControl",
+    "SessionStatus",
 ];
 /// The draft's types the spike leaves out, each with its reason.
 const OMITTED: [&str; 8] = [
@@ -340,6 +341,7 @@ fn every_assertion_bites() {
     let input = row("Input");
     let room_state = row("RoomState");
     let kick = row("Kick");
+    let status = row("SessionStatus");
     let spread = field_row("Snapshot", "weapon spread stream");
     let own = field_row("Snapshot", "own state");
     let set_profile = row("SetProfile");
@@ -351,6 +353,7 @@ fn every_assertion_bites() {
             text.replace(&room_state, &replace_cell(&room_state, 6, "omitted: ")),
         ),
         ("2:", text.replace(&format!("{kick}\n"), "")),
+        ("2:", text.replace(&format!("{status}\n"), "")),
         (
             "2:",
             text.replace(&format!("{kick}\n"), &format!("{kick}\n{kick}\n")),

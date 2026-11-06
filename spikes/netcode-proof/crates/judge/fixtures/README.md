@@ -7,9 +7,13 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 
 | Mark | Case | What changes | Verdict |
 |---|---|---|---|
-| PM-0001-4 | `base` | three S30 runs at P2 (room on RS, bots on LG), all under 16.67 ms, V-S held; the B-S bite run fails | PASS |
+| PM-0001-4 | `base` | three S30 runs at P2 (room on RS, bots on LG), all under 16.67 ms, V-S held, each carrying the stress scene's load (PM-0001-2, its precondition); the B-S bite run fails | PASS |
 | PM-0001-4 | `fail` | run 2's slowest measured tick is 16.68 ms, so its p99 (the 3rd of 3) is over 16.67 ms | FAIL |
 | PM-0001-4 | `invalid` | run 3's RS steal averages 11.5 ‰, over V-S's 1 % | INVALID |
+| PM-0001-4 | `load-short` | run 1 has 47 soldiers on one measured tick: it did not carry the stress scene's load (`pre:PM-0001-2`) | INVALID |
+| PM-0001-4 | `fail-with-gap` | run 2 is over 16.67 ms and also lacks its overrun counter: the failure stands, the gap listed beside it | FAIL |
+| PM-0001-30 | `base` | the validity bite: a replay with one command past its tick; its run comes out INVALID by `late-zero` alone | bite shown |
+| PM-0001-30 | `missed` | the same bite run with no late command counted: the validity check let it through | FAIL |
 | PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; N = 36 and 18 not run | NOT-RUN |
 | PM-0006-14 | `short` | one measured tick of the count run padded to 8.329 ms, short of 8.33 ms | INVALID |
 

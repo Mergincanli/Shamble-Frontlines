@@ -169,14 +169,32 @@
         {
           "name": "SS runs",
           "select": {
-            "scene": "SS"
+            "scene": "SS",
+            "clients": 48
           },
           "min": 3
         },
         {
           "name": "ES runs",
           "select": {
-            "scene": "ES"
+            "scene": "ES",
+            "clients": 48
+          },
+          "min": 3
+        },
+        {
+          "name": "SS N=24 (PM-0001-10's scale step)",
+          "select": {
+            "scene": "SS",
+            "clients": 24
+          },
+          "min": 3
+        },
+        {
+          "name": "SS N=36 (PM-0001-10's scale step)",
+          "select": {
+            "scene": "SS",
+            "clients": 36
           },
           "min": 3
         }
@@ -320,7 +338,11 @@
           "name": "everyone in view on at least 99 % of each client's snapshots",
           "figure": "everyone_in_view_min_share",
           "op": ">=",
-          "value": "0.99"
+          "value": "0.99",
+          "parts": [
+            "SS runs",
+            "ES runs"
+          ]
         },
         {
           "name": "ES: 72 shots per second, mean at least -5 %",
@@ -425,6 +447,126 @@
           "parts": [
             "ES runs"
           ]
+        },
+        {
+          "name": "N=24: 24 soldiers on every measured tick",
+          "series": "tick.v.soldiers_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 24,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=24: three teams of 8",
+          "series": "tick.v.smallest_team_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 8,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=24: a connected snapshot-receiving client on every soldier",
+          "series": "tick.v.snapshot_clients_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 24,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=24: 15 big vehicles (fixed)",
+          "series": "tick.v.big_vehicles_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 15,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=24: 4 very large units of at least 20 parts (fixed)",
+          "series": "tick.v.very_large_units_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 4,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=24: 300 live projectiles (fixed)",
+          "series": "tick.v.projectiles_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 300,
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: 36 soldiers on every measured tick",
+          "series": "tick.v.soldiers_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 36,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: three teams of 12",
+          "series": "tick.v.smallest_team_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 12,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: a connected snapshot-receiving client on every soldier",
+          "series": "tick.v.snapshot_clients_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 36,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: 15 big vehicles (fixed)",
+          "series": "tick.v.big_vehicles_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 15,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: 4 very large units of at least 20 parts (fixed)",
+          "series": "tick.v.very_large_units_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 4,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: 300 live projectiles (fixed)",
+          "series": "tick.v.projectiles_count",
+          "stat": "min",
+          "op": ">=",
+          "value": 300,
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
         }
       ],
       "report": [
@@ -451,6 +593,22 @@
           "from": {
             "process": "room"
           }
+        },
+        {
+          "name": "N=24: shots per second, mean (reported, not checked)",
+          "series": "second.v.shots_count",
+          "stat": "mean",
+          "parts": [
+            "SS N=24 (PM-0001-10's scale step)"
+          ]
+        },
+        {
+          "name": "N=36: shots per second, mean (reported, not checked)",
+          "series": "second.v.shots_count",
+          "stat": "mean",
+          "parts": [
+            "SS N=36 (PM-0001-10's scale step)"
+          ]
         }
       ],
       "bites": [
@@ -654,9 +812,9 @@
           ]
         },
         {
-          "name": "P1 up: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 19750000,
           "parts": [
@@ -665,9 +823,9 @@
           ]
         },
         {
-          "name": "P1 up: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 20250000,
           "parts": [
@@ -676,9 +834,9 @@
           ]
         },
         {
-          "name": "P1 up: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 29750000,
           "parts": [
@@ -687,9 +845,9 @@
           ]
         },
         {
-          "name": "P1 up: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 30250000,
           "parts": [
@@ -783,9 +941,9 @@
           ]
         },
         {
-          "name": "P1 down: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 19750000,
           "parts": [
@@ -794,9 +952,9 @@
           ]
         },
         {
-          "name": "P1 down: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 20250000,
           "parts": [
@@ -805,9 +963,9 @@
           ]
         },
         {
-          "name": "P1 down: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 29750000,
           "parts": [
@@ -816,9 +974,9 @@
           ]
         },
         {
-          "name": "P1 down: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 30250000,
           "parts": [
@@ -943,9 +1101,9 @@
           ]
         },
         {
-          "name": "P2 up: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 39500000,
           "parts": [
@@ -954,9 +1112,9 @@
           ]
         },
         {
-          "name": "P2 up: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 40500000,
           "parts": [
@@ -965,9 +1123,9 @@
           ]
         },
         {
-          "name": "P2 up: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 59500000,
           "parts": [
@@ -976,9 +1134,9 @@
           ]
         },
         {
-          "name": "P2 up: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 60500000,
           "parts": [
@@ -1072,9 +1230,9 @@
           ]
         },
         {
-          "name": "P2 down: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 39500000,
           "parts": [
@@ -1083,9 +1241,9 @@
           ]
         },
         {
-          "name": "P2 down: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 40500000,
           "parts": [
@@ -1094,9 +1252,9 @@
           ]
         },
         {
-          "name": "P2 down: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 59500000,
           "parts": [
@@ -1105,9 +1263,9 @@
           ]
         },
         {
-          "name": "P2 down: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 60500000,
           "parts": [
@@ -1232,9 +1390,9 @@
           ]
         },
         {
-          "name": "P3 up: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 59250000,
           "parts": [
@@ -1243,9 +1401,9 @@
           ]
         },
         {
-          "name": "P3 up: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 60750000,
           "parts": [
@@ -1254,9 +1412,9 @@
           ]
         },
         {
-          "name": "P3 up: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 89250000,
           "parts": [
@@ -1265,9 +1423,9 @@
           ]
         },
         {
-          "name": "P3 up: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 90750000,
           "parts": [
@@ -1361,9 +1519,9 @@
           ]
         },
         {
-          "name": "P3 down: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 59250000,
           "parts": [
@@ -1372,9 +1530,9 @@
           ]
         },
         {
-          "name": "P3 down: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 60750000,
           "parts": [
@@ -1383,9 +1541,9 @@
           ]
         },
         {
-          "name": "P3 down: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 89250000,
           "parts": [
@@ -1394,9 +1552,9 @@
           ]
         },
         {
-          "name": "P3 down: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 90750000,
           "parts": [
@@ -1521,9 +1679,9 @@
           ]
         },
         {
-          "name": "P4 up: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 79000000,
           "parts": [
@@ -1532,9 +1690,9 @@
           ]
         },
         {
-          "name": "P4 up: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 81000000,
           "parts": [
@@ -1543,9 +1701,9 @@
           ]
         },
         {
-          "name": "P4 up: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 119000000,
           "parts": [
@@ -1554,9 +1712,9 @@
           ]
         },
         {
-          "name": "P4 up: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 121000000,
           "parts": [
@@ -1650,9 +1808,9 @@
           ]
         },
         {
-          "name": "P4 down: jitter's lower end within 5 % of the half jitter, low",
+          "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 79000000,
           "parts": [
@@ -1661,9 +1819,9 @@
           ]
         },
         {
-          "name": "P4 down: jitter's lower end within 5 % of the half jitter, high",
+          "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 81000000,
           "parts": [
@@ -1672,9 +1830,9 @@
           ]
         },
         {
-          "name": "P4 down: jitter's upper end within 5 % of the half jitter, low",
+          "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 119000000,
           "parts": [
@@ -1683,9 +1841,9 @@
           ]
         },
         {
-          "name": "P4 down: jitter's upper end within 5 % of the half jitter, high",
+          "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 121000000,
           "parts": [
@@ -1810,9 +1968,9 @@
           ]
         },
         {
-          "name": "B1 up: jitter's lower end within 5 % of the half jitter, low",
+          "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 39500000,
           "parts": [
@@ -1821,9 +1979,9 @@
           ]
         },
         {
-          "name": "B1 up: jitter's lower end within 5 % of the half jitter, high",
+          "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 40500000,
           "parts": [
@@ -1832,9 +1990,9 @@
           ]
         },
         {
-          "name": "B1 up: jitter's upper end within 5 % of the half jitter, low",
+          "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 59500000,
           "parts": [
@@ -1843,9 +2001,9 @@
           ]
         },
         {
-          "name": "B1 up: jitter's upper end within 5 % of the half jitter, high",
+          "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_up_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 60500000,
           "parts": [
@@ -1950,9 +2108,9 @@
           ]
         },
         {
-          "name": "B1 down: jitter's lower end within 5 % of the half jitter, low",
+          "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": ">=",
           "value": 39500000,
           "parts": [
@@ -1961,9 +2119,9 @@
           ]
         },
         {
-          "name": "B1 down: jitter's lower end within 5 % of the half jitter, high",
+          "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "min",
+          "stat": "p001",
           "op": "<=",
           "value": 40500000,
           "parts": [
@@ -1972,9 +2130,9 @@
           ]
         },
         {
-          "name": "B1 down: jitter's upper end within 5 % of the half jitter, low",
+          "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": ">=",
           "value": 59500000,
           "parts": [
@@ -1983,9 +2141,9 @@
           ]
         },
         {
-          "name": "B1 down: jitter's upper end within 5 % of the half jitter, high",
+          "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
           "series": "second.s.probe_down_delay_ns",
-          "stat": "max",
+          "stat": "p999",
           "op": "<=",
           "value": 60500000,
           "parts": [
@@ -2134,6 +2292,26 @@
           "name": "measured reorder share",
           "series": "header.params.reorder_permille",
           "stat": "max"
+        },
+        {
+          "name": "up: one-way delay, min",
+          "series": "second.s.probe_up_delay_ns",
+          "stat": "min"
+        },
+        {
+          "name": "up: one-way delay, max",
+          "series": "second.s.probe_up_delay_ns",
+          "stat": "max"
+        },
+        {
+          "name": "down: one-way delay, min",
+          "series": "second.s.probe_down_delay_ns",
+          "stat": "min"
+        },
+        {
+          "name": "down: one-way delay, max",
+          "series": "second.s.probe_down_delay_ns",
+          "stat": "max"
         }
       ],
       "bites": [
@@ -2191,7 +2369,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2301,7 +2482,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2376,7 +2560,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2477,7 +2664,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2570,7 +2760,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2670,7 +2863,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2774,7 +2970,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "N=24",
@@ -2785,7 +2984,10 @@
             "tick_hz": 30,
             "clients": 24
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "N=36",
@@ -2796,7 +2998,10 @@
             "tick_hz": 30,
             "clients": 36
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2852,7 +3057,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -2938,7 +3146,10 @@
             "tick_hz": 30,
             "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "SS at P2",
@@ -2950,7 +3161,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -3078,7 +3292,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "P4 (report only)",
@@ -3089,7 +3306,10 @@
             "tick_hz": 30,
             "clients": 48
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -3481,7 +3701,10 @@
             "clients": 48,
             "params.soak": "S30"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [
@@ -3723,7 +3946,8 @@
           "value": 63736,
           "parts": [
             "every S30"
-          ]
+          ],
+          "setup": true
         }
       ],
       "report": [
@@ -3881,7 +4105,10 @@
             "profile": "P3",
             "params.suite": "wrap"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "reorder"
+          ]
         }
       ],
       "validity": [],
@@ -3945,7 +4172,8 @@
           "series": "header.params.ticks_below_wrap",
           "stat": "max",
           "op": "==",
-          "value": 30
+          "value": 30,
+          "setup": true
         },
         {
           "name": "every 16-bit or narrower counter wrapped in the run (server tick's low 16 bits, command sequence, press counters, tick offsets, event numbers, acknowledgement numbers)",
@@ -4151,12 +4379,22 @@
           ]
         },
         {
-          "name": "the browser's joins and rejoins after Worker traps were timed",
-          "series": "event.join.world_ns",
+          "name": "setup: at least 2 Worker traps injected",
+          "series": "event.worker_trap.tick",
           "stat": "count",
           "window": "all",
           "op": ">=",
-          "value": 1,
+          "value": 2,
+          "parts": [
+            "ML Chrome"
+          ],
+          "setup": true
+        },
+        {
+          "name": "one timed rejoin per Worker trap",
+          "figure": "untimed_trap_count",
+          "op": "==",
+          "value": 0,
           "parts": [
             "ML Chrome"
           ]
@@ -4829,7 +5067,8 @@
           "series": "header.params.throttle_queue_datagrams_count",
           "stat": "min",
           "op": ">=",
-          "value": 4
+          "value": 4,
+          "setup": true
         }
       ],
       "report": [
@@ -4927,14 +5166,16 @@
           "series": "header.params.bottleneck_queue_datagrams_count",
           "stat": "min",
           "op": ">=",
-          "value": 4
+          "value": 4,
+          "setup": true
         },
         {
           "name": "setup: the queue holds at least 200 ms at the bottleneck rate",
           "series": "header.params.bottleneck_queue_ns",
           "stat": "min",
           "op": ">=",
-          "value": 200000000
+          "value": 200000000,
+          "setup": true
         }
       ],
       "report": [
@@ -4981,7 +5222,11 @@
             "params.transport": "wt",
             "params.addr_cap": "raised"
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "V-S",
+            "clean-ref"
+          ]
         },
         {
           "name": "flood wt, cap on",
@@ -4990,7 +5235,11 @@
             "params.transport": "wt",
             "params.addr_cap": "on"
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "V-S",
+            "clean-ref"
+          ]
         },
         {
           "name": "flood ws, cap raised",
@@ -4999,7 +5248,11 @@
             "params.transport": "ws",
             "params.addr_cap": "raised"
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "V-S",
+            "clean-ref"
+          ]
         },
         {
           "name": "flood ws, cap on",
@@ -5008,7 +5261,11 @@
             "params.transport": "ws",
             "params.addr_cap": "on"
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "V-S",
+            "clean-ref"
+          ]
         },
         {
           "name": "flood wt, cap on, IPv6 /64 cycler",
@@ -5018,7 +5275,11 @@
             "params.addr_cap": "on",
             "params.lg_ipv6": true
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "V-S",
+            "clean-ref"
+          ]
         },
         {
           "name": "Origin ML chrome",
@@ -5065,10 +5326,7 @@
           "min": 1
         }
       ],
-      "validity": [
-        "V-S",
-        "clean-ref"
-      ],
+      "validity": [],
       "checks": [
         {
           "name": "tick p99 within 10 % of a clean run",
@@ -5350,7 +5608,10 @@
             "scene": "SS",
             "params.suite": "conn-panic"
           },
-          "min": 1
+          "min": 1,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [],
@@ -6114,6 +6375,12 @@
         {
           "id": "PM-0001-30/wallclock",
           "what": "a wall-clock read on one transport's command path"
+        },
+        {
+          "id": "PM-0001-30/late-command",
+          "what": "the validity check itself: one command of a replay delayed past its tick must make that run invalid (counter above 0), never a pass",
+          "expect": "invalid",
+          "rule": "late-zero"
         }
       ],
       "stand_in": false,
@@ -8896,7 +9163,8 @@
           "value": 0,
           "from": {
             "process": "room"
-          }
+          },
+          "setup": true
         }
       ],
       "report": [
@@ -9344,6 +9612,27 @@
             "rule cap L2 P3",
             "rule cap L2 P4"
           ]
+        },
+        {
+          "name": "setup: the 150 ms pong delayer fired",
+          "series": "event.pong_delayer.hold_ns",
+          "stat": "count",
+          "window": "all",
+          "op": ">=",
+          "value": 1,
+          "parts": [
+            "rule cap L1 P0",
+            "rule cap L1 P1",
+            "rule cap L1 P2",
+            "rule cap L1 P3",
+            "rule cap L1 P4",
+            "rule cap L2 P0",
+            "rule cap L2 P1",
+            "rule cap L2 P2",
+            "rule cap L2 P3",
+            "rule cap L2 P4"
+          ],
+          "setup": true
         }
       ],
       "report": [
@@ -10330,7 +10619,8 @@
           },
           "parts": [
             "jitter: S30 at P2"
-          ]
+          ],
+          "first": 36000
         },
         {
           "name": "over 36,000 ticks",
@@ -11301,7 +11591,9 @@
           "min": 3
         }
       ],
-      "validity": [],
+      "validity": [
+        "PM-0006-19"
+      ],
       "checks": [
         {
           "name": "pooled p99 of the 3 'on' runs at most 1.02 x the pooled p99 of the 3 'off' runs (54,000 ticks each)",
@@ -11818,7 +12110,8 @@
             "ML edge",
             "ML firefox",
             "MAC safari"
-          ]
+          ],
+          "setup": true
         }
       ],
       "report": [
@@ -12067,7 +12360,8 @@
             "ML edge",
             "ML firefox",
             "MAC safari"
-          ]
+          ],
+          "setup": true
         },
         {
           "name": "control: the 14-day certificate connects",

@@ -14,9 +14,13 @@ fn root() -> PathBuf {
 fn verdict(mark: &str, case: &str) -> Verdict {
     let text =
         std::fs::read_to_string(root().join("../../marks/marks.json")).expect("marks/marks.json");
-    let mut marks = parse_marks(&text).expect("marks.json compiles");
-    marks.marks.retain(|m| m.id == mark);
-    assert_eq!(marks.marks.len(), 1, "{mark} is in marks.json");
+    // The whole file: a mark's preconditions (pre:PM-0001-2) are other marks of it.
+    let marks = parse_marks(&text).expect("marks.json compiles");
+    let index = marks
+        .marks
+        .iter()
+        .position(|m| m.id == mark)
+        .unwrap_or_else(|| panic!("{mark} is in marks.json"));
     let dir = root().join("fixtures").join(mark.to_lowercase());
     let mut files: BTreeMap<String, PathBuf> = BTreeMap::new();
     for sub in ["base", case] {
@@ -36,7 +40,7 @@ fn verdict(mark: &str, case: &str) -> Verdict {
                 .unwrap_or_else(|e| panic!("{}: {e}", path.display())),
         );
     }
-    judge(&marks, &logs).remove(0)
+    judge(&marks, &logs).remove(index)
 }
 
 fn says(v: &Verdict, text: &str) -> bool {
@@ -127,9 +131,75 @@ fn pm_0006_14_short_padding_comes_out_invalid() {
 }
 
 #[test]
+fn pm_0001_4_is_invalid_when_a_run_did_not_carry_the_stress_scenes_load() {
+    let v = verdict("PM-0001-4", "load-short");
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    assert!(
+        says(
+            &v,
+            "run s30-1: pre:PM-0001-2: 48 soldiers on every measured tick = 47, needs >= 48"
+        ),
+        "{:?}",
+        v.why
+    );
+}
+
+#[test]
+fn pm_0001_4_fails_with_its_gap_listed_beside_the_failure() {
+    let v = verdict("PM-0001-4", "fail-with-gap");
+    assert_eq!(
+        v.verdict,
+        VerdictKind::Fail,
+        "a gap never hides a failure: {:?}",
+        v.why
+    );
+    assert!(
+        says(
+            &v,
+            "run s30-2: tick p99 at most 16.67 ms = 16680000, needs <= 16670000"
+        ),
+        "{:?}",
+        v.why
+    );
+    assert!(
+        says(&v, "run s30-2: also a gap in the record") && says(&v, "tick.v.overrun"),
+        "{:?}",
+        v.why
+    );
+}
+
+#[test]
+fn pm_0001_30s_validity_bite_is_shown_by_a_late_command() {
+    let v = verdict("PM-0001-30", "base");
+    let bite = v
+        .bites
+        .iter()
+        .find(|b| b.id == "PM-0001-30/late-command")
+        .expect("the late-command bite");
+    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
+    assert!(
+        bite.runs[0]
+            .invalid_why
+            .iter()
+            .any(|w| w.contains("late-zero: 1 commands ran late"))
+    );
+}
+
+#[test]
+fn pm_0001_30_fails_when_the_validity_check_lets_a_late_command_through() {
+    let v = verdict("PM-0001-30", "missed");
+    assert_eq!(v.verdict, VerdictKind::Fail, "{:?}", v.why);
+    assert!(
+        says(&v, "bite PM-0001-30/late-command did not fail"),
+        "{:?}",
+        v.why
+    );
+}
+
+#[test]
 fn the_fixtures_read_through_the_command_line_folder_reader_too() {
     // read_logs walks a folder the way the binary does; every base folder reads clean.
-    for mark in ["pm-0001-4", "pm-0006-14"] {
+    for mark in ["pm-0001-4", "pm-0001-30", "pm-0006-14"] {
         let logs = read_logs(&root().join("fixtures").join(mark).join("base")).expect("reads");
         assert!(!logs.is_empty());
         assert!(

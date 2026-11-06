@@ -62,6 +62,9 @@ struct RawPart {
     #[serde(default)]
     select: BTreeMap<String, Value>,
     min: u32,
+    /// Rules for this part's runs, added to the mark's (never removing any).
+    #[serde(default)]
+    validity: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -107,14 +110,23 @@ struct RawCheck {
     parts: Vec<String>,
     #[serde(default)]
     pooled: bool,
+    #[serde(default)]
+    setup: bool,
+    #[serde(default)]
+    first: Option<u64>,
 }
 
-/// A planted defect that must fail the mark first (plan §6.1, "Bites first").
+/// A planted defect that must fail the mark first (plan §6.1, "Bites first"); or, with `expect: "invalid"`, one that
+/// must make its run INVALID by the named rule alone (PM-0001-30's "the validity check itself").
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Bite {
     pub id: String,
     pub what: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expect: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rule: Option<String>,
 }
 
 /// The mark's kind (`verdict` in the file).
@@ -226,6 +238,8 @@ pub enum Measure {
         stat: Stat,
         window: Window,
         cond: Option<Cond>,
+        /// Only the first N records of each log in the window (PM-0004-67's first 36,000 measured ticks).
+        first: Option<u64>,
     },
     Figure(String),
 }
@@ -246,6 +260,8 @@ pub struct Check {
     pub from: BTreeMap<String, Value>,
     pub parts: Vec<String>,
     pub pooled: bool,
+    /// A setup condition: when it fails, the run did not test the mark, so it is INVALID, never FAIL.
+    pub setup: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -264,10 +280,12 @@ pub struct Part {
     pub name: String,
     pub select: BTreeMap<String, Value>,
     pub min: u32,
+    /// Rules for this part's runs, beside the mark's.
+    pub validity: Vec<Rule>,
 }
 
-/// A validity rule a mark may name (README §4); the three that hold for every run are not listed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+/// A validity rule a mark or a part may name (README §4); the three that hold for every run are not listed.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rule {
     VS,
     Density,
@@ -276,20 +294,43 @@ pub enum Rule {
     LateZero,
     Reorder,
     CleanRef,
+    /// PM-0006-19's own rule: each logging-off run's p99 within 1 % of the off runs' pooled p99.
+    LoggingOff,
+    /// The run must pass another mark's checks (`pre:PM-0001-2`: it carried the stress scene's load).
+    Pre(String),
 }
 
 impl Rule {
-    fn parse(s: &str) -> Result<Rule, String> {
+    pub(crate) fn parse(s: &str) -> Result<Rule, String> {
         Ok(match s {
             "V-S" => Rule::VS,
             "PM-0006-13" => Rule::Density,
+            "PM-0006-19" => Rule::LoggingOff,
             "lg-80" => Rule::Lg80,
             "padding" => Rule::Padding,
             "late-zero" => Rule::LateZero,
             "reorder" => Rule::Reorder,
             "clean-ref" => Rule::CleanRef,
-            _ => return Err(format!("validity rule {s:?} is not one of README §4's")),
+            other => match other.strip_prefix("pre:") {
+                Some(id) if id.starts_with("PM-000") => Rule::Pre(id.to_owned()),
+                _ => return Err(format!("validity rule {s:?} is not one of README §4's")),
+            },
         })
+    }
+
+    /// The rule's name as `marks.json` writes it.
+    pub fn name(&self) -> String {
+        match self {
+            Rule::VS => "V-S".to_owned(),
+            Rule::Density => "PM-0006-13".to_owned(),
+            Rule::LoggingOff => "PM-0006-19".to_owned(),
+            Rule::Lg80 => "lg-80".to_owned(),
+            Rule::Padding => "padding".to_owned(),
+            Rule::LateZero => "late-zero".to_owned(),
+            Rule::Reorder => "reorder".to_owned(),
+            Rule::CleanRef => "clean-ref".to_owned(),
+            Rule::Pre(id) => format!("pre:{id}"),
+        }
     }
 }
 
@@ -387,6 +428,7 @@ fn parse_stat(s: &str) -> Result<Stat, String> {
         "p90" => Stat::Pct(Ratio::new(9, 10)),
         "p99" => Stat::Pct(Ratio::new(99, 100)),
         "p999" => Stat::Pct(Ratio::new(999, 1000)),
+        "p001" => Stat::Pct(Ratio::new(1, 1000)),
         _ => return Err(format!("stat {s:?} is not one of README §2.3's")),
     })
 }
@@ -434,22 +476,27 @@ fn compile_measure(c: &RawCheck) -> Result<Measure, String> {
                 (Stat::Share | Stat::Count, _) | (_, None) => {}
                 (_, Some(_)) => return Err("only count and share take a where".to_owned()),
             }
-            if matches!(source, Source::HeaderParam(_)) && c.window.is_some() {
+            if matches!(source, Source::HeaderParam(_)) && (c.window.is_some() || c.first.is_some())
+            {
                 return Err("a header value has no window".to_owned());
+            }
+            if c.first == Some(0) {
+                return Err("first needs at least 1 record".to_owned());
             }
             Ok(Measure::Series {
                 source,
                 stat,
                 window,
                 cond,
+                first: c.first,
             })
         }
         (None, Some(figure)) => {
             if !figures::known(figure) {
                 return Err(format!("figure {figure:?} is not in the judge's list"));
             }
-            if c.stat.is_some() || c.window.is_some() || c.where_.is_some() {
-                return Err("a figure takes no stat, window or where".to_owned());
+            if c.stat.is_some() || c.window.is_some() || c.where_.is_some() || c.first.is_some() {
+                return Err("a figure takes no stat, window, where or first".to_owned());
             }
             Ok(Measure::Figure(figure.clone()))
         }
@@ -493,6 +540,9 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
             ));
         }
     }
+    if c.setup && (c.pooled || matches!(threshold, Threshold::Against { .. })) {
+        return Err("a setup check reads its own run only: no pooled or against".to_owned());
+    }
     Ok(Check {
         name: c.name.clone(),
         measure,
@@ -501,10 +551,14 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
         from: c.from.clone(),
         parts: c.parts.clone(),
         pooled: c.pooled,
+        setup: c.setup,
     })
 }
 
 fn compile_report(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Report, String> {
+    if c.setup {
+        return Err("a reported statistic decides nothing, so it is no setup check".to_owned());
+    }
     if c.op.is_some() || c.value.is_some() || c.factor.is_some() || c.against.is_some() {
         return Err(
             "a reported statistic decides nothing: no op, value, factor or against".to_owned(),
@@ -578,10 +632,18 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
         if p.min == 0 {
             errors.push(format!("part {:?} needs min of at least 1", p.name));
         }
+        let mut part_rules = Vec::new();
+        for v in &p.validity {
+            match Rule::parse(v) {
+                Ok(r) => part_rules.push(r),
+                Err(e) => errors.push(format!("part {:?}: {e}", p.name)),
+            }
+        }
         parts.push(Part {
             name: p.name.clone(),
             select: p.select.clone(),
             min: p.min,
+            validity: part_rules,
         });
     }
     let mut checks = Vec::new();
@@ -642,6 +704,31 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
                 b.id, m.id
             ));
         }
+        // A bite either must FAIL the mark, or (expect "invalid") must make its run INVALID by one named rule.
+        match (b.expect.as_deref(), b.rule.as_deref()) {
+            (None, None) => {}
+            (Some("invalid"), Some(rule)) => {
+                let named = m.validity.iter().any(|v| v == rule)
+                    || m.parts.iter().any(|p| p.validity.iter().any(|v| v == rule));
+                if Rule::parse(rule).is_err() || !named {
+                    errors.push(format!(
+                        "bite {:?} expects INVALID by {rule:?}, which is not a rule of the mark or its parts",
+                        b.id
+                    ));
+                }
+            }
+            _ => errors.push(format!(
+                "bite {:?}: expect must be \"invalid\", given with its rule",
+                b.id
+            )),
+        }
+    }
+    if m.validity
+        .iter()
+        .chain(m.parts.iter().flat_map(|p| &p.validity))
+        .any(|v| v == &format!("pre:{}", m.id))
+    {
+        errors.push("a mark cannot be its own precondition".to_owned());
     }
     if errors.is_empty() {
         Ok(Mark {
@@ -663,6 +750,13 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
     } else {
         Err(errors)
     }
+}
+
+fn has_pre(m: &Mark) -> bool {
+    m.validity
+        .iter()
+        .chain(m.parts.iter().flat_map(|p| &p.validity))
+        .any(|r| matches!(r, Rule::Pre(_)))
 }
 
 /// Reads `marks.json` text. On any problem, every problem found, each naming its mark.
@@ -689,6 +783,27 @@ pub fn parse(text: &str) -> Result<Marks, Vec<String>> {
         match compile_mark(m) {
             Ok(mark) => marks.push(mark),
             Err(es) => errors.extend(es.into_iter().map(|e| format!("{}: {e}", m.id))),
+        }
+    }
+    // A precondition names a mark of the same file that is judged by script, and is not itself conditional.
+    for m in &marks {
+        for r in m
+            .validity
+            .iter()
+            .chain(m.parts.iter().flat_map(|p| &p.validity))
+        {
+            if let Rule::Pre(id) = r {
+                match marks.iter().find(|x| &x.id == id) {
+                    Some(pre) if pre.kind == Kind::Pass && !has_pre(pre) => {}
+                    Some(_) => errors.push(format!(
+                        "{}: precondition {id} must be a pass mark with no precondition of its own",
+                        m.id
+                    )),
+                    None => {
+                        errors.push(format!("{}: precondition {id} is not in marks.json", m.id))
+                    }
+                }
+            }
         }
     }
     if errors.is_empty() {

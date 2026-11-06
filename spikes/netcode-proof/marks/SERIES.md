@@ -8,6 +8,8 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 
 - A name follows README §1: lowercase with underscores, ending in its unit (`_ns`, `_bytes`, `_bits`, `_permille`, `_count`) or a 0/1 flag with no suffix. Event field names follow the same rule (the draft's choice: README §1 states it for `v` and `s`).
 - Two more units, now in README §1: `_um` (micrometres, integer) for lengths and `_microdeg` (millionths of a degree) for angles.
+- **Counters and flags are written on every record, 0 included** (the advisor's C2 ruling): a tick or second record carries every one of its names each time, so an empty tick or second series is a gap in the record, never a 0. Only an event that never happened counts 0.
+- **`second.s.inputs_count` lists the playing clients only** (C2, C3): one value per client the load drives, in slot order, never a flood, hostile or probe session.
 - 'signed' marks a value that may go below 0 (an excess over a bound, a headroom).
 - 'Written by' is the crate that measures the value; npt-log's writer thread builds the record. `web` is the TypeScript page and Worker (not a crate). The probe and check tools named as `npt-lab` or `npt-bots (probe)` are placements to confirm at the build.
 - One quantity, one name: a name read by several marks is listed once, with all of them.
@@ -292,6 +294,18 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `twin_hash_mismatch_count` | count | npt-judge | count of tick numbers whose `h` differs between the run and the run named in header.params.twin (a tick in one only counts); fails on 0 compared | PM-0001-21 'the state hash of a run with the forged set equals that of a run with only their valid parts'; -30 'identical server state hashes on every tick' | -21, -30 |
 | `up_client_mean_max_bits` | bits | npt-judge | the same over second.s.up_bits | PM-0001-13 'mean at most 48 kbps per client' | -13 |
 | `view_hit_registered_share` | fraction (exact) | npt-judge | among shots whose shooter's view test hit (event.view_test.hit = 1), the share the server registered (event.shot.registered = 1), joined by shot id; on L2 a non-registered view hit counts only if the x86-64 replay's view test also hits | PM-0001-48 'of the shots whose ray hits the target's volume in the shooter's view ... at least 99 % register' | -48, -49 |
+
+### Names added with the advisor's U1 rulings (2026-11-06)
+
+| Name | Unit | Written by (crate) | Meaning | Marks |
+|---|---|---|---|---|
+| `event.worker_trap.tick` | tick number | web | the harness logs each Worker trap it injects, with the server tick it was injected at (Q12) | -19 |
+| `event.pong_delayer.hold_ns` | ns | npt-bots | the 150 ms pong delayer's cheat client logs each pong it held, with the hold (Q21) | -49 |
+| `untimed_trap_count` | count | npt-judge (figure, U7) | Worker traps with no timed rejoin (`event.join.world_ns`) after them and before the next trap (Q12) | -19 |
+| `everyone_in_view_min_share` | fraction (exact) | npt-judge (figure, built in U1) | as below; built in U1 because PM-0001-2 is the precondition of the stress-scene marks (B8) | -2 |
+| `header.params.started_utc` | ISO 8601 UTC | the run script | the run's UTC start, with seconds and `Z`; the times-of-day rule's input (B14) | -27, 0006-13, 0006-14 |
+| `header.params.cc` | `newreno` or `cubic` | the room unit's configuration | the congestion controller, a start-up setting never changed in a run (A2) | -24 |
+| `header.params.bite_size_ns`, `header.params.bite_pad_bytes` | ns, bytes | the bites build | a bite's B-S or B-N size, printed beside the bite, never judged (B10) | every B-S or B-N bite |
 
 ## Series read only by figures (18)
 

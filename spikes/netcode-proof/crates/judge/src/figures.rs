@@ -4,6 +4,42 @@
 
 use crate::eval::{Missing, Run};
 use crate::ratio::Ratio;
+use npt_log::Phase;
+
+/// PM-0001-2: the least share, over client slots, of measured ticks on which that slot's snapshot held every other
+/// soldier (`tick.s.everyone_in_view`, one 0/1 per slot, in slot order).
+fn everyone_in_view_min_share(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, String> {
+    let mut seen: Vec<i128> = Vec::new();
+    let mut ticks: i128 = 0;
+    for log in &run.logs {
+        for t in log.ticks.iter().filter(|t| t.ph == Phase::Measured) {
+            let Some(flags) = t.s.get("everyone_in_view") else {
+                continue;
+            };
+            if seen.is_empty() {
+                seen = vec![0; flags.len()];
+            }
+            if flags.len() != seen.len() {
+                return Err(format!(
+                    "run {}: tick {} changes the slot count of everyone_in_view",
+                    run.id, t.t
+                ));
+            }
+            for (s, f) in seen.iter_mut().zip(flags) {
+                *s += i128::from(*f == 1);
+            }
+            ticks += 1;
+        }
+    }
+    if ticks == 0 || seen.is_empty() {
+        return Err(format!(
+            "run {}: no values for tick.s.everyone_in_view",
+            run.id
+        ));
+    }
+    let least = seen.iter().copied().min().unwrap_or(0);
+    Ok(Ratio::new(least, ticks))
+}
 
 /// A figure's computation: the run under judgement and every run of its set. An `Err` is a gap in the record.
 pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, String>;
@@ -36,11 +72,12 @@ pub const FIGURES: &[Figure] = &[
         "U2",
         "the same seed gives the same packet-fate log (PM-0001-3)",
     ),
-    planned(
-        "everyone_in_view_min_share",
-        "U4",
-        "the least share of a slot's snapshots with all 47 others in its set (-2)",
-    ),
+    Figure {
+        name: "everyone_in_view_min_share",
+        compute: Some(everyone_in_view_min_share),
+        unit: "U1",
+        what: "the least share of a slot's snapshots with all 47 others in its set (-2)",
+    },
     planned(
         "decoded_hash_mismatch_count",
         "U4",
@@ -190,6 +227,11 @@ pub const FIGURES: &[Figure] = &[
         "one_build_hash",
         "U7",
         "every browser run used the same client build (-32)",
+    ),
+    planned(
+        "untimed_trap_count",
+        "U7",
+        "Worker traps with no timed rejoin after them (-19, the advisor's Q12)",
     ),
     planned(
         "input_latency_p99_rise_ns",

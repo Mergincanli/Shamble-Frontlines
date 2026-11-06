@@ -99,6 +99,7 @@ draft's order. Omitted rows whose draft direction or channel lies outside the vo
 | `Leave` | client → room | control stream | owner | Sender: a joined session, about itself only. npt-server: the size; the reason code in range. npt-room: ends that session; the slot keeps its token for a rejoin (the spike has no reconnect grace window: 1640-1641) | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 681 (`Leave` / `Kick`, "either way": here `Leave` is the client's and `Kick` the room's) |
 | `Kick` | room → client | control stream | owner | Sender: the room only; it then closes the connection. Reasons (proposed): replaced (plan §10.3), malformed (a stream message that fails its framing, size or type checks), overflow (the event queue, when the room drops the client instead of resyncing it: 302), stopped (the operator). npt-client: the size | 16 B (proposed: as `Leave`) | built in U4 | row 681; plan §10.3; PM-0001-22, -25 |
 | `SessionControl` | client → room | control stream | n/a | Sender: only a joined, rostered browser session holding the capability minted for its slot (plan §10.2, §10.3); never a bot, and never the runner (plan §9). npt-server: parsed only after `Join`, and one sent before `Join` closes the session as malformed, counted by reason, never INVALID; the size; the capability compared in constant time (plan §4.4); a control from a rostered session without a valid capability is refused and counted, and a measured run in which such a control was sent, or any control was applied without a valid capability, is INVALID (plan §6.1); every control and form record logged with its source. The variants' own checks: "Session controls" table | 512 B (proposed: the largest variant, `RecordStep`: 2 B length + 1 B type + 1 B variant + 16 B capability + 1 B step + 1 B result + 2 B note length + a note of at most 480 B = 504 B, rounded up) | built in U4 | plan §10.2, §4.7, E23: a spike-only type, not in ADR 0001's catalogue; the checklist's overlay and form (1663-1671) |
+| `SessionStatus` | room → client | control stream | owner | Sender: the room only, to the session holding its slot's capability (never a bot, never the runner), on change and at most once a second (the advisor's A1 ruling, 2026-11-06). It carries the overlay's room-side values: the profile in force, the server's round trip, the rewind cap, the command-timing option and the clipped-shot count, and the form's last saved step. npt-client: the size; each value in range; arriving on another channel, dropped and counted | 32 B (proposed: 2 B length + 1 B type + 1 B profile + 4 B round trip in µs + 2 B rewind cap in ticks + 1 B command-timing option + 4 B clipped-shot count + 1 B last saved step = 16 B, doubled) | built in U4 | the advisor's A1 ruling (2026-11-06), plan §4.7: a spike-only type, not in ADR 0001's catalogue; the checklist's overlay and form (1663-1671); PM-0001-53 |
 | `RoomState` | room → client | control stream | public | Draft: the room sends it on change; no server checks (row 675) | n/a (not built) | omitted: nothing in the proof test reads it, and what it carries does not exist in the spike's room. (1) Phase and countdown: the spike's room has no lobby, countdown or match length, since the room lifecycle is a slice 2 and 3 milestone (ADR 0001:1640-1641); it runs from Open to the run's end, which `RoomEnded` reports (PM-0001-59), and PM-0001-16 times spawn to Open at the supervisor stand-in, not at a client. (2) The roster, human or bot per slot: the spike has no server-side bots, since every soldier is driven by a protocol client (npt-bots, plan E1), so "human or bot" means nothing on the wire; a client needs only its own slot, team and squad, which `JoinAccepted` carries. (3) No pass mark measures it, and under PM-0001-19's join pattern (bots leave and rejoin, keeping the room at 47 to 48: plan §10.3) a roster sent on every change would add control-stream traffic no mark asks for to every measured run: 100 joins make about 200 changes, each sent to about 47 clients (my arithmetic). (4) The `public` class stays in use through `RoomEnded` and the snapshot header's tick. (5) In this doc "the roster" means plan §10.3's admission list of tokens per slot, which is never sent. `RoomState` comes back with the slot table and room phases (ADR 0001 migration steps 4 and 5, 1731-1738) | row 675 |
 | `HostCommand` | client → room | control stream | n/a | Draft: the host only; values inside the mode's allowed overrides (row 676) | n/a (not built) | omitted: the spike has no private rooms and no host (slice 2 and 3 milestones: ADR 0001:1640-1641); its settings come from the room's start-up configuration and the local control sockets ("Room-wide controls") | row 676 |
 | `PickUpgrade` | client → room | control stream | n/a | Draft: an open offer to this player, a choice in range, not already picked (row 677) | n/a (not built) | omitted: the stand-in sim has no economy, offers or pickups; part 12 is proven at slice 4 by its refusal tests (ADR 0001:1642-1643) | row 677; part 12 |
@@ -216,9 +217,10 @@ The main session writes the test. This is what it checks.
 
 **At U1, on this doc alone:**
 1. The doc holds exactly the four tables, found by their exact header rows (section 1), and no other table.
-2. "Wire messages" holds plan §4.7's 14 names (`Input`, `Snapshot`, `FullState`, `Resync`, `Ping`, `Pong`, `Join`,
-   `JoinAccepted`, `JoinRejected`, `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, `SessionControl`), each exactly
-   once with Spike status `built in U4`, and no other row is `built in U4`.
+2. "Wire messages" holds plan §4.7's 15 names (`Input`, `Snapshot`, `FullState`, `Resync`, `Ping`, `Pong`, `Join`,
+   `JoinAccepted`, `JoinRejected`, `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, `SessionControl`, and
+   `SessionStatus` by the advisor's A1 ruling), each exactly once with Spike status `built in U4`, and no other row is
+   `built in U4`.
 3. Each built row has a Direction of `client → room`, `room → client` or `both ways`; a Channel of `datagram`,
    `control stream` or `full-state stream`; an Authority that starts with `Sender:` and names at least one of
    npt-server, npt-room and npt-client; a Size limit that starts with a whole number of bytes; and a Draft that is
@@ -270,6 +272,18 @@ This doc is the spike's catalogue only; the rest of a netcode design lives here:
 
 ## 8. Questions for the main session
 
+**Answered by the advisor, 2026-11-06** (`.checkpoints/netcode-proof-test/advisor-u1.md`, items A1-A9):
+- Q1: (a), `SessionStatus`, now a built row with its own fuzz target.
+- Q2: `params.cmd_timing` and `params.cc`, start-up settings recorded in every header, never changed in a run.
+- Q3: systemd's readiness notice, with `TimeoutStartSec` well above 2 s; npt-super's timing unit-tested, and first
+  checked for real at R1's bring-up, before any PM-0001-16 start counts.
+- Q4: `authority-only` only; the close's ADR 0001 results note the word against the draft's "none".
+- Q5: as recommended; Q6: one fuzz target for the socket messages (and one for `SessionStatus`).
+- Q7: one capability per browser slot (plan §10.2's text follows).
+- Q8: approved for the spike; whether a full state carries the pending reliable events stays open for the foundation.
+- Q9: "plus the header", a reading written into ADR 0001 at the close.
+
+The questions as asked:
 - **Q1, the overlay's status.** The overlay shows values only the room knows (the profile in force, the server's round
   trip, the rewind cap, the command-timing option, the clipped-shot count: ADR 0001:1663-1669), and the form gets no
   "saved" answer, but none of plan §4.7's room → client types carries them. Options: (a) a 15th type,

@@ -141,10 +141,13 @@ fn json_int(v: &Value) -> Option<i64> {
 }
 
 /// Every value of a series in a run's logs (those `from` picks), or a gap.
+/// Every value of a series in a run's logs (those `from` picks), from the first `first` records of each log in the
+/// window if given. An empty list is not an error here: `measure` decides what an empty series means.
 fn collect(
     run: &Run<'_>,
     source: &Source,
     window: Window,
+    first: Option<u64>,
     from: &BTreeMap<String, Value>,
 ) -> Result<Vec<i64>, String> {
     let logs: Vec<&Log> = run
@@ -160,6 +163,7 @@ fn collect(
             serde_json::to_string(from).unwrap_or_default()
         ));
     }
+    let take = first.map_or(usize::MAX, |n| usize::try_from(n).unwrap_or(usize::MAX));
     let mut out = Vec::new();
     for log in logs {
         match source {
@@ -167,10 +171,16 @@ fn collect(
                 log.ticks
                     .iter()
                     .filter(|t| in_window(t.ph, window))
+                    .take(take)
                     .filter_map(|t| t.v.get(n).copied()),
             ),
             Source::TickS(n) => {
-                for t in log.ticks.iter().filter(|t| in_window(t.ph, window)) {
+                for t in log
+                    .ticks
+                    .iter()
+                    .filter(|t| in_window(t.ph, window))
+                    .take(take)
+                {
                     if let Some(s) = t.s.get(n) {
                         out.extend_from_slice(s);
                     }
@@ -180,10 +190,16 @@ fn collect(
                 log.seconds
                     .iter()
                     .filter(|s| in_window(s.ph, window))
+                    .take(take)
                     .filter_map(|s| s.v.get(n).copied()),
             ),
             Source::SecondS(n) => {
-                for s in log.seconds.iter().filter(|s| in_window(s.ph, window)) {
+                for s in log
+                    .seconds
+                    .iter()
+                    .filter(|s| in_window(s.ph, window))
+                    .take(take)
+                {
                     if let Some(v) = s.s.get(n) {
                         out.extend_from_slice(v);
                     }
@@ -194,6 +210,7 @@ fn collect(
                     .events
                     .iter()
                     .filter(|e| &e.ev == ev && in_window(e.ph, window))
+                    .take(take)
                 {
                     match e.f.get(field).and_then(json_int) {
                         Some(v) => out.push(v),
@@ -218,14 +235,25 @@ fn collect(
             }
         }
     }
-    if out.is_empty() {
+    Ok(out)
+}
+
+/// The same, for the validity rules: an empty series is a gap there.
+fn collect_some(
+    run: &Run<'_>,
+    source: &Source,
+    window: Window,
+    from: &BTreeMap<String, Value>,
+) -> Result<Vec<i64>, String> {
+    let v = collect(run, source, window, None, from)?;
+    if v.is_empty() {
         Err(format!(
             "run {}: no values for {}",
             run.id,
             source_text(source)
         ))
     } else {
-        Ok(out)
+        Ok(v)
     }
 }
 
@@ -273,10 +301,26 @@ fn measure(
             stat,
             window,
             cond,
+            first,
         } => {
             let mut values = Vec::new();
             for run in runs {
-                values.extend(collect(run, source, *window, from).map_err(Missing::Gap)?);
+                values.extend(collect(run, source, *window, *first, from).map_err(Missing::Gap)?);
+            }
+            if values.is_empty() {
+                // An event that never happened is a real 0 (the advisor's C2 ruling). Every tick and second record
+                // carries its counters and flags, 0 included (SERIES.md), so an empty tick or second series, or any
+                // other statistic of an empty series, is a gap in the record.
+                return if matches!(stat, Stat::Count) && matches!(source, Source::Event { .. }) {
+                    Ok(Ratio::int(0))
+                } else {
+                    let ids: Vec<&str> = runs.iter().map(|r| r.id).collect();
+                    Err(Missing::Gap(format!(
+                        "run {}: no values for {}",
+                        ids.join("+"),
+                        source_text(source)
+                    )))
+                };
             }
             Ok(stat_of(stat, *cond, &values))
         }
@@ -310,6 +354,9 @@ pub struct CheckOut {
     pub needs: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
+    /// A setup check: its failure makes the run INVALID, and no bite is shown by it.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub setup: bool,
 }
 
 fn reference(
@@ -363,6 +410,7 @@ fn eval_check(check: &crate::marks::Check, runs: &[&Run<'_>], set: &[&Run<'_>]) 
         value: value.map(|v| v.to_string()),
         needs,
         note,
+        setup: check.setup,
     };
     let value = match measure(&check.measure, runs, set, &check.from) {
         Ok(v) => v,
@@ -518,7 +566,7 @@ fn lg_cpu(run: &Run<'_>, why: &mut Vec<String>) {
 }
 
 fn p99_work(run: &Run<'_>) -> Result<Ratio, String> {
-    let v = collect(
+    let v = collect_some(
         run,
         &Source::TickV("work_ns".to_owned()),
         Window::Measured,
@@ -527,7 +575,14 @@ fn p99_work(run: &Run<'_>) -> Result<Ratio, String> {
     Ok(stat_of(&Stat::Pct(Ratio::new(99, 100)), None, &v))
 }
 
-fn rule(rule: Rule, run: &Run<'_>, set: &[&Run<'_>], why: &mut Vec<String>) {
+fn rule(
+    rule: &Rule,
+    run: &Run<'_>,
+    set: &[&Run<'_>],
+    ctx: &Ctx<'_>,
+    why: &mut Vec<String>,
+    undecided: &mut Vec<String>,
+) {
     match rule {
         Rule::VS => {
             let mut starts = 0;
@@ -552,7 +607,7 @@ fn rule(rule: Rule, run: &Run<'_>, set: &[&Run<'_>], why: &mut Vec<String>) {
             if starts == 0 || ends == 0 {
                 why.push("V-S: no affinity record at the run's start and end".to_owned());
             }
-            match collect(
+            match collect_some(
                 run,
                 &Source::SecondV("steal_permille".to_owned()),
                 Window::Measured,
@@ -684,7 +739,7 @@ fn rule(rule: Rule, run: &Run<'_>, set: &[&Run<'_>], why: &mut Vec<String>) {
                 why.push("padding: no padded step recorded".to_owned());
             }
         }
-        Rule::LateZero => match collect(
+        Rule::LateZero => match collect_some(
             run,
             &Source::TickV("late_count".to_owned()),
             Window::Measured,
@@ -752,15 +807,126 @@ fn rule(rule: Rule, run: &Run<'_>, set: &[&Run<'_>], why: &mut Vec<String>) {
                 }
             }
         }
+        Rule::LoggingOff => {
+            // PM-0006-19's own rule: each "off" run's p99 within 1 % of the "off" runs' pooled p99.
+            let off: Vec<&Run<'_>> = set
+                .iter()
+                .copied()
+                .filter(|r| r.role == "logging-off")
+                .collect();
+            if off.is_empty() {
+                why.push("PM-0006-19: no logging-off run in the set".to_owned());
+                return;
+            }
+            let p99 = Stat::Pct(Ratio::new(99, 100));
+            let mut pooled = Vec::new();
+            let mut each = Vec::new();
+            for r in &off {
+                match collect_some(
+                    r,
+                    &Source::TickV("work_ns".to_owned()),
+                    Window::Measured,
+                    &BTreeMap::new(),
+                ) {
+                    Ok(v) => {
+                        each.push((r.id, stat_of(&p99, None, &v)));
+                        pooled.extend(v);
+                    }
+                    Err(e) => {
+                        why.push(format!("PM-0006-19: {e}"));
+                        return;
+                    }
+                }
+            }
+            let p = stat_of(&p99, None, &pooled);
+            for (id, q) in each {
+                if (q - p).abs() > p * Ratio::new(1, 100) {
+                    why.push(format!(
+                        "PM-0006-19: logging-off run {id}'s p99 ({q} ns) is more than 1 % from the pooled off p99 ({p} ns)"
+                    ));
+                }
+            }
+        }
+        Rule::Pre(id) => {
+            // The run must pass the precondition mark's checks that apply to it (the advisor's B8 ruling).
+            let Some(pre) = ctx.marks.marks.iter().find(|m| &m.id == id) else {
+                why.push(format!("pre:{id}: not in marks.json"));
+                return;
+            };
+            let matched = matched_parts(pre, run);
+            let checks: Vec<&crate::marks::Check> = pre
+                .checks
+                .iter()
+                .filter(|c| {
+                    if matched.is_empty() {
+                        c.parts.is_empty()
+                    } else {
+                        matched.iter().any(|p| applies(c, &p.name))
+                    }
+                })
+                .collect();
+            if checks.is_empty() {
+                undecided.push(format!("pre:{id}: none of its checks applies to this run"));
+                return;
+            }
+            for c in checks {
+                let o = eval_check(c, &[run], set);
+                let note = o.note.clone().unwrap_or_default();
+                match o.outcome {
+                    Outcome::Pass => {}
+                    Outcome::Fail => why.push(format!(
+                        "pre:{id}: {} = {}, needs {}",
+                        c.name,
+                        o.value.as_deref().unwrap_or("?"),
+                        o.needs
+                    )),
+                    Outcome::Gap => why.push(format!("pre:{id}: a gap in the record: {note}")),
+                    Outcome::Cannot => undecided.push(format!("pre:{id}: {note}")),
+                }
+            }
+        }
     }
 }
 
-fn validity(run: &Run<'_>, mark: &Mark, set: &[&Run<'_>]) -> Vec<String> {
-    let mut why = always_rules(run);
-    for r in &mark.validity {
-        rule(*r, run, set, &mut why);
+/// What the validity rules found: why the run is invalid, and what cannot be decided yet (NOT-RUN).
+#[derive(Debug, Default)]
+struct Validity {
+    invalid: Vec<String>,
+    undecided: Vec<String>,
+}
+
+/// The three rules that hold for every run, then each named rule.
+fn validity<'r>(
+    run: &Run<'_>,
+    rules: impl IntoIterator<Item = &'r Rule>,
+    set: &[&Run<'_>],
+    ctx: &Ctx<'_>,
+) -> Validity {
+    let mut v = Validity {
+        invalid: always_rules(run),
+        undecided: Vec::new(),
+    };
+    for r in rules {
+        rule(r, run, set, ctx, &mut v.invalid, &mut v.undecided);
     }
-    why
+    v
+}
+
+/// What every judgement may consult: the whole marks file (for preconditions).
+pub(crate) struct Ctx<'m> {
+    marks: &'m Marks,
+}
+
+/// The parts of a mark whose `select` a run matches, its role aside.
+fn matched_parts<'m>(mark: &'m Mark, run: &Run<'_>) -> Vec<&'m Part> {
+    mark.parts
+        .iter()
+        .filter(|p| {
+            let mut s = p.select.clone();
+            s.remove("role");
+            run_matches(run, &s)
+        })
+        .collect()
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -799,9 +965,16 @@ impl fmt::Display for VerdictKind {
 #[derive(Debug, Clone, Serialize)]
 pub struct RunOut {
     pub run: String,
+    /// The run counts: it held its validity rules and setup checks, and has no gap unless a check failed.
     pub valid: bool,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub invalid_why: Vec<String>,
+    /// Gaps in the record of a run that failed anyway: listed beside the failure, never hiding it.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub gaps: Vec<String>,
+    /// What cannot be decided yet (a precondition's figure not built, ...): the part is NOT-RUN.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub undecided: Vec<String>,
     pub checks: Vec<CheckOut>,
 }
 
@@ -873,33 +1046,84 @@ fn set_of<'r, 'a>(all: &'r [Run<'a>], set: &str) -> Vec<&'r Run<'a>> {
 }
 
 /// Judges one run against a list of checks; gaps make it invalid.
+/// Judges one run (README §3, the advisor's C2 ruling): its validity rules first; then its setup checks, whose failure
+/// or gap makes it INVALID; then its checks. Any failing check fails the run, with its gaps listed beside the failure;
+/// with no failure, any gap makes it INVALID.
 fn judge_run<'c>(
-    mark: &Mark,
     run: &Run<'_>,
     all: &[Run<'_>],
+    rules: &[&Rule],
     checks: impl Iterator<Item = &'c crate::marks::Check>,
+    ctx: &Ctx<'_>,
 ) -> RunOut {
     let set = set_of(all, run.set);
-    let mut invalid_why = validity(run, mark, &set);
-    let mut outs = Vec::new();
-    if invalid_why.is_empty() {
-        for c in checks {
-            let o = eval_check(c, &[run], &set);
-            if o.outcome == Outcome::Gap {
-                invalid_why.push(format!(
-                    "a gap in the record: {}",
-                    o.note.clone().unwrap_or_default()
-                ));
+    let v = validity(run, rules.iter().copied(), &set, ctx);
+    let mut out = RunOut {
+        run: run.id.to_owned(),
+        valid: v.invalid.is_empty(),
+        invalid_why: v.invalid,
+        gaps: Vec::new(),
+        undecided: v.undecided,
+        checks: Vec::new(),
+    };
+    if !out.valid {
+        return out;
+    }
+    let (setup, plain): (Vec<_>, Vec<_>) = checks.partition(|c| c.setup);
+    for c in setup {
+        let o = eval_check(c, &[run], &set);
+        let note = o.note.clone().unwrap_or_default();
+        match o.outcome {
+            Outcome::Pass => {}
+            Outcome::Fail => out.invalid_why.push(format!(
+                "setup: {} = {}, needs {}",
+                c.name,
+                o.value.as_deref().unwrap_or("?"),
+                o.needs
+            )),
+            Outcome::Gap => out.invalid_why.push(format!("setup: {}: {note}", c.name)),
+            Outcome::Cannot => out.undecided.push(note),
+        }
+        out.checks.push(o);
+    }
+    if !out.invalid_why.is_empty() {
+        out.valid = false;
+        return out;
+    }
+    for c in plain {
+        out.checks.push(eval_check(c, &[run], &set));
+    }
+    let gaps: Vec<String> = out
+        .checks
+        .iter()
+        .filter(|c| c.outcome == Outcome::Gap)
+        .map(|c| {
+            format!(
+                "a gap in the record: {}",
+                c.note.clone().unwrap_or_default()
+            )
+        })
+        .collect();
+    if out.checks.iter().any(|c| c.outcome == Outcome::Fail) {
+        out.gaps = gaps;
+    } else if !gaps.is_empty() {
+        out.invalid_why = gaps;
+        out.valid = false;
+    }
+    out
+}
+
+/// The rules a run of these parts is judged by: the mark's, then each part's (a part adds, never removes).
+fn rules_of<'m>(mark: &'m Mark, parts: &[&'m Part]) -> Vec<&'m Rule> {
+    let mut rules: Vec<&Rule> = mark.validity.iter().collect();
+    for p in parts {
+        for r in &p.validity {
+            if !rules.contains(&r) {
+                rules.push(r);
             }
-            outs.push(o);
         }
     }
-    RunOut {
-        run: run.id.to_owned(),
-        valid: invalid_why.is_empty(),
-        invalid_why,
-        checks: outs,
-    }
+    rules
 }
 
 fn fail_lines(part: &str, r: &RunOut, out: &mut Vec<String>) {
@@ -914,17 +1138,25 @@ fn fail_lines(part: &str, r: &RunOut, out: &mut Vec<String>) {
     }
 }
 
-fn eval_part(mark: &Mark, part: &Part, members: &[&Run<'_>], all: &[Run<'_>]) -> PartOut {
+fn eval_part(
+    mark: &Mark,
+    part: &Part,
+    members: &[&Run<'_>],
+    all: &[Run<'_>],
+    ctx: &Ctx<'_>,
+) -> PartOut {
+    let rules = rules_of(mark, &[part]);
     let runs: Vec<RunOut> = members
         .iter()
         .map(|r| {
             judge_run(
-                mark,
                 r,
                 all,
+                &rules,
                 mark.checks
                     .iter()
                     .filter(|c| !c.pooled && applies(c, &part.name)),
+                ctx,
             )
         })
         .collect();
@@ -951,13 +1183,16 @@ fn eval_part(mark: &Mark, part: &Part, members: &[&Run<'_>], all: &[Run<'_>]) ->
         .any(|r| r.valid && r.checks.iter().any(|c| c.outcome == Outcome::Fail))
         || pooled.iter().any(|c| c.outcome == Outcome::Fail);
     let invalid = runs.iter().any(|r| !r.valid) || pooled.iter().any(|c| c.outcome == Outcome::Gap);
-    let cannot = runs
-        .iter()
-        .any(|r| r.valid && r.checks.iter().any(|c| c.outcome == Outcome::Cannot))
-        || pooled.iter().any(|c| c.outcome == Outcome::Cannot);
+    let cannot = runs.iter().any(|r| {
+        r.valid
+            && (!r.undecided.is_empty() || r.checks.iter().any(|c| c.outcome == Outcome::Cannot))
+    }) || pooled.iter().any(|c| c.outcome == Outcome::Cannot);
     let verdict = if failed {
         for r in runs.iter().filter(|r| r.valid) {
             fail_lines(&part.name, r, &mut why);
+            for g in &r.gaps {
+                why.push(format!("{}: run {}: also {g}", part.name, r.run));
+            }
         }
         for c in pooled.iter().filter(|c| c.outcome == Outcome::Fail) {
             why.push(format!(
@@ -990,7 +1225,8 @@ fn eval_part(mark: &Mark, part: &Part, members: &[&Run<'_>], all: &[Run<'_>]) ->
             .flat_map(|r| &r.checks)
             .chain(&pooled)
             .filter(|c| c.outcome == Outcome::Cannot)
-            .filter_map(|c| c.note.clone());
+            .filter_map(|c| c.note.clone())
+            .chain(runs.iter().flat_map(|r| r.undecided.iter().cloned()));
         for n in notes {
             let line = format!("{}: {n}", part.name);
             if !why.contains(&line) {
@@ -1023,6 +1259,7 @@ fn eval_bite(
     bite: &crate::marks::Bite,
     serving: &[&Run<'_>],
     all: &[Run<'_>],
+    ctx: &Ctx<'_>,
 ) -> BiteOut {
     let bite_runs: Vec<&Run<'_>> = serving
         .iter()
@@ -1039,15 +1276,50 @@ fn eval_bite(
     let mut outs = Vec::new();
     let mut statuses = Vec::new();
     for run in bite_runs {
-        let matched: Vec<&Part> = mark
-            .parts
-            .iter()
-            .filter(|p| {
-                let mut s = p.select.clone();
-                s.remove("role");
-                run_matches(run, &s)
-            })
-            .collect();
+        // A bite run takes the validity of the parts it matches (the advisor's B7 ruling).
+        let matched = matched_parts(mark, run);
+        let rules = rules_of(mark, &matched);
+        if let Some(expected) = bite.rule.as_deref() {
+            // An expect-invalid bite: shown only when its run is INVALID by that one rule and holds every other.
+            let set = set_of(all, run.set);
+            let mut others = Validity {
+                invalid: always_rules(run),
+                undecided: Vec::new(),
+            };
+            let mut by_rule = Vec::new();
+            for r in &rules {
+                if r.name() == expected {
+                    rule(r, run, &set, ctx, &mut by_rule, &mut others.undecided);
+                } else {
+                    rule(
+                        r,
+                        run,
+                        &set,
+                        ctx,
+                        &mut others.invalid,
+                        &mut others.undecided,
+                    );
+                }
+            }
+            statuses.push(if !others.invalid.is_empty() {
+                BiteStatus::Invalid
+            } else if !others.undecided.is_empty() {
+                BiteStatus::Undecided
+            } else if by_rule.is_empty() {
+                BiteStatus::Missed
+            } else {
+                BiteStatus::Shown
+            });
+            outs.push(RunOut {
+                run: run.id.to_owned(),
+                valid: by_rule.is_empty() && others.invalid.is_empty(),
+                invalid_why: others.invalid.into_iter().chain(by_rule).collect(),
+                gaps: Vec::new(),
+                undecided: others.undecided,
+                checks: Vec::new(),
+            });
+            continue;
+        }
         let checks = mark.checks.iter().filter(|c| {
             if matched.is_empty() {
                 c.parts.is_empty()
@@ -1055,12 +1327,16 @@ fn eval_bite(
                 matched.iter().any(|p| applies(c, &p.name))
             }
         });
-        let o = judge_run(mark, run, all, checks);
+        let o = judge_run(run, all, &rules, checks, ctx);
+        // Shown when a check fails on a run that held its validity rules and setup checks (C2: gaps aside).
         statuses.push(if !o.valid {
             BiteStatus::Invalid
         } else if o.checks.iter().any(|c| c.outcome == Outcome::Fail) {
             BiteStatus::Shown
-        } else if o.checks.iter().any(|c| c.outcome == Outcome::Cannot) || o.checks.is_empty() {
+        } else if !o.undecided.is_empty()
+            || o.checks.iter().any(|c| c.outcome == Outcome::Cannot)
+            || o.checks.iter().all(|c| c.setup)
+        {
             BiteStatus::Undecided
         } else {
             BiteStatus::Missed
@@ -1190,7 +1466,7 @@ fn judge_person(mark: &Mark, serving: &[&Run<'_>]) -> (VerdictKind, Vec<String>)
     (kind, why)
 }
 
-fn judge_mark(mark: &Mark, all: &[Run<'_>]) -> Verdict {
+fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
     let serving: Vec<&Run<'_>> = all.iter().filter(|r| r.serves(&mark.id)).collect();
     let mut v = Verdict {
         mark: mark.id.clone(),
@@ -1223,13 +1499,13 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>]) -> Verdict {
             .copied()
             .filter(|r| run_matches(r, &s))
             .collect();
-        v.parts.push(eval_part(mark, part, &m, all));
+        v.parts.push(eval_part(mark, part, &m, all, ctx));
         members.insert(part.name.clone(), m);
     }
     v.bites = mark
         .bites
         .iter()
-        .map(|b| eval_bite(mark, b, &serving, all))
+        .map(|b| eval_bite(mark, b, &serving, all, ctx))
         .collect();
     let part_is = |k: VerdictKind| v.parts.iter().any(|p| p.verdict == k);
     let bite_is = |s: BiteStatus| v.bites.iter().any(|b| b.status == s);
@@ -1302,7 +1578,12 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>]) -> Verdict {
 /// One verdict per mark, in `marks.json`'s order.
 pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
     let all = runs(logs);
-    marks.marks.iter().map(|m| judge_mark(m, &all)).collect()
+    let ctx = Ctx { marks };
+    marks
+        .marks
+        .iter()
+        .map(|m| judge_mark(m, &all, &ctx))
+        .collect()
 }
 
 #[cfg(test)]
