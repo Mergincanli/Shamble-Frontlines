@@ -119,5 +119,24 @@ for c in outside:
 check(all(c.startswith('docs/research/r1-simulation-core.md:') for c in outside),
       'C9: the only ones outside STATUS and ROADMAP are the research record\'s (pre-existing, left unedited)')
 
+# C9 widened after the verifier's finding 1: line ranges into VISION_V2 written as "§N** (lines A–B)".
+ranges = []
+for path in subprocess.run(['git', 'ls-files', 'docs', '.claude', 'CLAUDE.md'], capture_output=True,
+                           text=True).stdout.split():
+    if not path.endswith('.md') or path.startswith('docs/reports/') or path in ('docs/STATUS.md', 'docs/ROADMAP.md'):
+        continue
+    lines = read(path).split('\n')
+    for i, l in enumerate(lines):
+        direct = re.search(r'VISION_V2(\.md)?`?\*{0,2} ?§\d[^()]*\(lines? \d+[–-]\d+\)', l)
+        follow = re.search(r'\*\*§\d+\*\* \(lines? \d+[–-]\d+\)', l) and any(
+            '**VISION_V2 §' in x for x in lines[max(0, i - 2):i])
+        if direct or follow:
+            ranges.append(f'{path}:{i + 1}')
+print('  VISION_V2 line ranges outside STATUS, ROADMAP and reports:', ranges)
+check(ranges == ['docs/adr/0005-content-abilities-assets.md:27', 'docs/adr/0005-content-abilities-assets.md:48',
+                 'docs/adr/0005-content-abilities-assets.md:49', 'docs/adr/0005-content-abilities-assets.md:50',
+                 'docs/adr/0005-content-abilities-assets.md:2550'],
+      'C9 widened: the only VISION_V2 line ranges are ADR 0005:27, :48-50 and :2550 (STATUS, "From B.2")')
+
 print('RESULT:', 'PASS' if not fails else f'FAIL ({len(fails)})')
 sys.exit(1 if fails else 0)

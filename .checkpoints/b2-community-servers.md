@@ -55,7 +55,16 @@
   for word (`mustafa-2026-11-06-vfx.md`, a79fef1) and queued in STATUS's "Queued, in Mustafa's words" (the main
   session; its quote unwraps to his text exactly) as the next docs change-set after B.2, then A4; Phase and ROADMAP's
   queue say so. Not built in B.2 (its scope stays as approved); the advisor's final-head review sees the entry.
-- **Current step:** 4, the review round (the verifier, game-designer, infra-engineer, in parallel; one round).
+- **Done:** step 4, the review round on 26a5455 (general agents reading main's role files): the verifier PASS WITH
+  NOTES (V1 Medium: ADR 0005's VISION_V2 line ranges at :27, :48-50 move; V2-V6 Low: the report not yet written, A4's
+  freeze tense, the VFX order is the session's reading, the 2026-11-03 list is pointers only, B3's line numbers
+  undated); game-designer PASS WITH NOTES (GD-1 Low: rented official private servers vs the trust rule; GD-2 Low: "the
+  war around the matches" not in VISION_V2 §7); infra-engineer PASS WITH NOTES (IE-1 Low: the trust rule adds no
+  field now, part 12 stands; IE-2 Low = GD-1). Nothing Critical or High: no skeptics, no second round.
+- **Done:** step 5, the one fix pass (this commit): STATUS and ROADMAP wording for V3-V6; follow-ups for V1 (with a
+  fifth range, ADR 0005:2550, found by the widened E4), IE-1, GD-1/IE-2 and GD-2; e-checks.py's E4 widened to line
+  ranges (PASS). V2 is met by the report. For the report: PR #40's two stale #41 lines (its STATUS:31 and :173).
+- **Current step:** 6, the report (`docs/reports/2026-11-06-b2-community-servers.md`, the advisor-report skill).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
