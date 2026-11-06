@@ -76,15 +76,26 @@
     tables intact, lines <= 120), then 8 consistency fixes (old lines now point to the readings); the main session read
     the whole word diff. needs-mustafa (ADR edits).
 
+14. **The advisor's review of PR #41** · notes `advisor-pr41.md` (DONE) · of 2ccc184: REVISE (C1 the register's open
+    counts; C2 ROUTE written whole; C3 OQ-0001-9's opening sentence "answered in part"; optional PM-0001-3 wording) ·
+    fixed in **16763a7** (pushed; gate 1-4 and 5b-5d PASS in the worktree; PR body updated) · re-review of
+    2ccc184..16763a7: **APPROVE, no conditions**, head `16763a724b741a40615dc8e7c2ef25c5ea3e4b30`; CI gate and smoke
+    green twice each; labelled needs-mustafa; the advisor's worktree `.gate/pr-41` removed.
+
 ## Current step
-14. The advisor's review of PR #41's head 2ccc184 (advisor agent, xhigh, background; notes `advisor-pr41.md`); then
-    Mustafa's go ("merge #41") and the merge with 2ccc184 as the expected head, gate and smoke green.
+15. Waiting for Mustafa's own "merge #41" in this chat (for head 16763a7). Meanwhile U1 part 2: `marks/README.md`
+    (the schema of marks.json and the results log, the contract between npt-log, npt-judge and marks.json) written;
+    netcode-architect drafts the message catalogue; next, test-engineer drafts marks.json against the schema while the
+    main session builds npt-log and npt-judge.
 
 ## Next steps
-1. On the advisor's APPROVE of #41: ask Mustafa for "merge #41"; merge with the approved SHA as the expected head.
+1. On Mustafa's "merge #41": check gate and smoke green on 16763a7, merge with that SHA as the expected head; then
+   `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match.
 2. U1 part 2: npt-log's record types and writer; npt-judge with its PASS, FAIL and INVALID fixtures (PM-0006-14's
-   short padding among them); marks.json (from the digests' tables); the dependency-rule check script; redact-check;
-   the message catalogue (netcode-architect drafts it in docs/design/).
+   short padding among them); marks.json (test-engineer drafts it per `marks/README.md`, with SERIES.md); the drift
+   test (after the merge); the dependency-rule checks (a cargo metadata test in npt-lab) and the no-reference grep;
+   redact-check; the message catalogue (netcode-architect) and its class audit test; then docs-keeper (REPO_MAP gets
+   spikes/ and the catalogue; STATUS: PR #38's line, the Mac line at 44-45, the plan's approval, UNDER-WAY (a)).
 3. For Mustafa, before R1: Chrome and Firefox (stable) on the laptop; MSI GPU switch on hybrid if offered.
 4. Write files with the Write and Edit tools only, never shell redirects or scripts that write (Mustafa, 2026-11-06:
    the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
@@ -135,6 +146,9 @@
   · started 02:11 · stopped by the session at 03:18 (no agent running; final saves by hand).
 - Saver: background task `bar6y14h2` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bar6y14h2.output`
   · started 10:36 · stops by 12:26 (110 min).
-- The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · running.
+- The advisor's review of PR #41 (advisor agent, xhigh, background) · notes `advisor-pr41.md` · DONE: REVISE of
+  2ccc184, then APPROVE of 16763a7 (re-review via SendMessage, same agent).
+- The message catalogue (netcode-architect, xhigh, background) · notes `netcode-architect-catalogue.md` · writes
+  `docs/design/netcode-proof-messages.md` · launched 11:12 · running.
 - R-PR's text: engine-architect (xhigh) · DONE (placements, then 8 fixes); its scripts rpr-edit.py, rpr-patch-c.py,
   rpr-verify.py, rpr-words.json and notes engine-architect-rpr.md in the notes folder.
