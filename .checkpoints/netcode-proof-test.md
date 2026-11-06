@@ -161,9 +161,20 @@
     Mustafa (2026-11-06): Chrome is installed; he asked for his steps (given in chat: prep now = Firefox, two-factor
     login, a clean Brave profile; then stop B's approvals; then each run's console steps).
 
+29. **The advisor's U2 review** · notes `advisor-u2.md` (DONE; cut once at the 14:31 usage limit, resumed 16:12) ·
+    every reading approved (U2-R1..R8); its own checks: check.mjs 9/9, clippy without features, the gate, its own
+    release build reproducing the committed fate-log hashes at P2, B1, P4 seed 1, its Python matching the judge's
+    numbers exactly, each bite failing only its kind of check, the reorder step on a scratch crate (P0 0 %, P1 0 %, P2
+    0.92-1.06 %, P3 0.90-1.02 %, P4 2.2-2.3 %; never below the floor, about 1 % above the ceiling). Conditions N1-N4
+    met: N1 the plan (§4.1 ops/runs/ and results/<set>/<commit>/; §4.7 LinkState, rtt_ns, arrival_ns, `loss` at U4,
+    npt-lab's binary; §15's R-5 row), N2-N4 in **04e40bc** (crate doc; SERIES.md and README; clippy on both builds).
+30. **U2 CLOSED.** check.mjs all 9 (97 / 102 tests, clippy on both builds), gate PASS `--no-smoke`, CI green on
+    81c6d01, 6900e52, ad527f3. docs-keeper deferred to U3's close (the repo map check passes; STATUS's line for the
+    test is still true at that grain).
+
 ## Current step
-29. U2's close: check.mjs all 9 and the gate `--no-smoke`; then the advisor on U2 (diff 1bf13d0.. or a407751..6900e52,
-    the readings below); then docs-keeper (REPO_MAP: crates/lab's binary, ops/runs/, results/; STATUS). Then U3.
+31. U3: the scouting workflow `wf_d6bdeed6-3c0` runs (see Running work); then build L2 from its verified findings.
+    **The old U2 list, kept for its record:**
     **Remaining from the old list:**
     2. (done) A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
        of npt-lab without and with `--features bites`, each copied to `.gate/netcode-proof-test/bin/`; **every L1 part
@@ -196,6 +207,21 @@
    the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
 
 ## Open findings
+- **From the advisor's U2 review (advisor-u2.md), each with the unit that fixes it:**
+  - **C1 (U4, before PM-0001-18's L1 leg counts):** L1's stream retries back off (each waits twice the last timeout:
+    RFC 6298 §5.5, RFC 9002 §6.2.1); loss drawn per 1,448 B segment, any lost segment delaying the message one timeout
+    and holding back the ones behind it (E15's L2 model); unit tests; L1 runs record each stream's stall share.
+  - **C2 (U4, before npt-room reads `rtt_ns`):** a sample only from a packet that is the newest of its link and
+    direction to arrive (RFC 9002 §5.1); a stream message's sample from its own packet's arrival, not its in-order
+    delivery; tests for both.
+  - **C3 (U4):** `loss` on Link, with §4.4's send-buffer space settled at the same time; each backend reports its own
+    estimate, never the simulator's true fate; plan §4.7 then.
+  - **C4 (U4, with the next judge change):** INVALID, with fixtures: a measured run (or its twin) whose build lists
+    `bites` or names a bite; a bite run whose build lacks `bites`.
+  - **C5 (U3/U6):** ImpairSocket's reorder step uses L1's model; SERIES.md names the binary that writes L2's probe
+    log, not only the npt-net library.
+  - **Note (U6):** links are `Box<dyn Link>` without `Send`; if npt-server moves links across tasks, the L2 backends
+    need `+ Send`.
 - Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
 - **Carried forward from the advisor's U1 rulings** (advisor-u1.md): C4 (`params.killed` only with npt-super's kill
   record) and C6 (tokens only in their prefixed form, with a test) at U6; A3's systemd readiness check for real at

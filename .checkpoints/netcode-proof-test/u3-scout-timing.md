@@ -47,3 +47,77 @@ Started 2026-11-06 (fresh; no earlier notes file existed when resumed after the 
   delay; thread::sleep p50 70-170 us with p99 up to 570 us; sleep-then-spin(100 us) p50 0.1-75 us but tails above
   0.25 ms at 10 ms (the coarse sleep itself overshoots the 100 us lead in this VM), so a 1 ms-lead variant (c2) was
   added to the full run.
+
+### F2. Linux TCP retransmission vs E15's "one RTO later, max(200 ms, 2 x RTT)" (sources downloaded to the session scratchpad from raw.githubusercontent.com/torvalds/linux at tag v6.8 = Ubuntu 24.04's GA kernel, and master; line numbers are v6.8 unless marked master)
+Paths: L68 = https://raw.githubusercontent.com/torvalds/linux/v6.8/<file>, LM = .../master/<file>.
+- **TCP_RTO_MIN** = `((unsigned)(HZ/5))`, i.e. 200 ms in jiffies: L68 include/net/tcp.h:145 (master :162).
+  TCP_TIMEOUT_INIT 1 s :150; TCP_RTO_MAX 120 s :144; TCP_TIMEOUT_MIN_US 2 ms :148.
+- **Who can change it, by version:**
+  - per route, all versions in scope: `tcp_rto_min()` takes the route's locked RTAX_RTO_MIN over the socket's
+    `icsk_rto_min` (L68 include/net/tcp.h:741-748: `if (dst && dst_metric_locked(dst, RTAX_RTO_MIN)) rto_min =
+    dst_metric_rtt(dst, RTAX_RTO_MIN);`). iproute2 sets the lock bit itself (iproute2 main ip/iproute.c:1339-1343,
+    `mxlock |= (1<<RTAX_RTO_MIN);`); ip-route(8): "rto_min TIME (Linux 2.6.23+ only) the minimum TCP Retransmission
+    TimeOut to use when communicating with this destination" (iproute2 man/man8/ip-route.8.in:544-548).
+  - sysctl `net.ipv4.tcp_rto_min_us`: absent at v6.8 and v6.10, present from v6.11 (checked by grepping
+    net/ipv4/sysctl_net_ipv4.c at each tag for "tcp_rto_min_us": v6.10 0 hits, v6.11 1 hit). In 6.8 the socket's
+    floor is hard-wired: `icsk->icsk_rto_min = TCP_RTO_MIN;` (L68 net/ipv4/tcp.c:424). Master:
+    `icsk->icsk_rto_min = usecs_to_jiffies(rto_min_us)` from the sysctl (LM net/ipv4/tcp.c:438-439); doc LM
+    Documentation/networking/ip-sysctl.rst:1431-1442 ("rto_min route option has the highest precedence ..., followed by
+    the TCP_BPF_RTO_MIN and TCP_RTO_MIN_US socket options, followed by this tcp_rto_min_us sysctl", default 200000).
+  - socket option TCP_RTO_MIN_US: from v6.15 (include/uapi/linux/tcp.h:143 at v6.15, absent at v6.14).
+  - So on Ubuntu 24.04's 6.8: only the per-route `rto_min` (or a BPF sockops program) changes it. If RS runs an HWE
+    kernel (6.11+), the sysctl exists too: read `uname -r` on RS (unconfirmed which kernel Hetzner's image boots).
+- **The RTO is NOT max(200 ms, 2 x RTT): it is SRTT + RTTVAR with RTTVAR floored at rto_min**, so at least
+  SRTT + 200 ms. L68 include/net/tcp.h:706-709 `__tcp_set_rto`: `usecs_to_jiffies((tp->srtt_us >> 3) +
+  tp->rttvar_us)`; tcp_input.c:861-930 `tcp_rtt_estimator`: first sample `tp->rttvar_us = max(tp->mdev_us,
+  tcp_rto_min_us(sk))`, and each RTT `tp->mdev_max_us = tcp_rto_min_us(sk)`, with rttvar decaying only toward
+  mdev_max_us. At P2 (SRTT 100 ms, mean deviation about 10 ms): RTO about 300 ms; P4: about 400 ms; P1: about 250 ms.
+  Backoff doubles it per expiry: L68 net/ipv4/tcp_timer.c:654-655 (`icsk->icsk_backoff++; icsk->icsk_rto =
+  min(icsk->icsk_rto << 1, TCP_RTO_MAX);`), unless thin-stream linear timeouts are on (tcp_timer.c:636-645,
+  `tcp_thin_linear_timeouts`, off by default; ip-sysctl.rst:1049-1056 at v6.8).
+- **But one lost segment mid-stream with steady 30 Hz traffic is not repaired by the RTO. It is repaired by RACK**
+  (defaults: `sysctl_tcp_sack = 1`, `sysctl_tcp_early_retrans = 3` (TLP on), `sysctl_tcp_recovery =
+  TCP_RACK_LOSS_DETECTION`: L68 net/ipv4/tcp_ipv4.c:3426-3430):
+  1. The receiver ACKs out-of-order data at once, with SACK: L68 net/ipv4/tcp_input.c:5691-5707 (with out-of-order
+     data queued, `if (tp->dup_ack_counter < TCP_FASTRETRANS_THRESH) { tp->dup_ack_counter++; goto send_now; }`).
+  2. RACK marks a segment lost when a segment sent after it is SACKed and `rack.rtt + reo_wnd` has passed since the
+     lost one was sent: L68 net/ipv4/tcp_recovery.c:32-36 (`tp->rack.rtt_us + reo_wnd - tcp_stamp_us_delta(now,
+     xmit)`), :76-91; otherwise it arms the reorder timer for the remainder plus 2 ms (:106-109).
+  3. reo_wnd = min_rtt / 4 (x reo_wnd_steps, initially 1: L68 net/ipv4/tcp.c:451), capped at SRTT, and 0 when no
+     reordering has been seen and either the connection is already in recovery or 3 or more segments are SACKed
+     (tcp_recovery.c:5-30; tp->reordering = TCP_FASTRETRANS_THRESH = 3: tcp_ipv4.c:3414, include/net/tcp.h:81).
+     RFC 8985 says the same: "Return min(RACK.reo_wnd_mult * RACK.min_RTT / 4, SRTT)" (RFC 8985 line 820 of
+     https://www.rfc-editor.org/rfc/rfc8985.txt).
+  4. TLP: "Probe timeout is 2*rtt" (L68 net/ipv4/tcp_output.c:2851-2865: `timeout_us = tp->srtt_us >> 2`, plus
+     rto_min if only one packet is out, else plus 2 ms), capped by the RTO (:2866-2871), scheduled after every
+     transmission (:2821-2823, "Send one loss probe per tail loss episode"). With a new segment every 33 ms the next
+     snapshot's SACK triggers RACK long before the 2 x SRTT probe; TLP only matters when the stream goes quiet.
+     RFC 8985: "PTO = 2 * SRTT" (line 973).
+  5. The RTO (about SRTT + 200 ms, from the head segment's send time: include/net/tcp.h:2390-2397,
+     tcp_input.c:3214-3225) fires only if no later segment is SACKed (the SACKs lost too, a burst, or the stream
+     stops).
+- **Expected stall per lost segment at P2 (RTT 100 +- 20 ms, min RTT about 80 ms, snapshots every 33 ms), sender RS
+  on Linux 6.8:**
+  - lost segment followed by more segments of the same snapshot (back to back): SACK about 1 RTT after the send;
+    reo_wnd about 80/4 = 20 ms (0 if 3+ segments get SACKed first); retransmission at about send + RTT + 20 + 2 ms;
+    stall about 120 ms (100 to 125 ms with jitter);
+  - lost segment that ends a snapshot: the next snapshot's first segment goes 33 ms later, its SACK arrives 33 ms + RTT
+    after the loss, by which time rack.rtt + reo_wnd has passed, so the retransmission goes at once: stall about
+    RTT + 33 ms = about 133 ms;
+  - so RTT + 20 to 35 ms, about 120-135 ms at P2. E15's rule gives max(200, 2 x 100) = 200 ms: **pessimistic by
+    65-80 ms for the common single loss at P2** (P1: Linux about 60-85 ms vs E15 200 ms; P4: about 240 ms vs E15
+    400 ms; P3: about 185 ms vs 300 ms).
+  - The RTO case (SRTT + 200 ms = about 300 ms at P2) is LONGER than E15's 200 ms: E15 is **optimistic whenever the
+    RTO is the repair** (the retransmission itself lost and no later SACK, or a burst).
+- **B1 is the large gap:** in a 1 s total-loss burst the retransmissions are lost too, the RTO doubles (300 ms,
+  600 ms, 1.2 s from the head's send), so recovery comes about 0.9-1.2 s after the burst ends (e.g. burst at 0:
+  probes at about 0.2 and 0.3 s lost, retry at 0.9 s lost, next at about 2.1 s). E15 as written delivers every
+  burst-lost segment 200 ms after its own loss, i.e. some INSIDE the burst, and the stream back about 0.2 s after it:
+  optimistic by about 1 s. Proposed fix for the main session: model the repair, not a fixed delay: (i) a lost
+  segment's repair time = max(loss time + RTT + max(reo_wnd, gap to the next segment sent) + 2 ms) if a later segment
+  is delivered, else loss time + RTO (SRTT + 200 ms) with doubling per lost retransmission; (ii) the retransmission
+  draws its own fate (2 % at P2, 100 % inside B1). Simpler acceptable form: RACK term RTT + max(min_rtt/4, 33 ms)
+  for P1-P4 single losses, and an explicit RTO-with-backoff path for any loss whose repair time falls in a burst.
+- Not checked here: Windows' and macOS's TCP (they send the upstream inputs from browsers; L2 runs only on RS, so the
+  model covers both directions there); Ubuntu 24.04's CONFIG_HZ (jiffy rounding of RTO and reo timers: 1 ms at
+  HZ=1000, 4 ms at HZ=250: read /boot/config-$(uname -r) on RS; unconfirmed).

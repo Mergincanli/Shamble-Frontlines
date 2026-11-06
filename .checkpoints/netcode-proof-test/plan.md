@@ -371,9 +371,11 @@ spikes/netcode-proof/
   marks/marks.json  every mark as data: id, statistic, threshold, window, validity, the draft line; marks/README.md
                     (the contract between the results log, marks.json and the judge) and marks/SERIES.md (the names)
   ops/              cloud-init/ (rs.yaml, lg.yaml), firewall/ (rs.txt, lg.txt, each rule per IPv4/IPv6),
-                    runs/ (R1.md … R7.md), operator/ (settings.json, rules.md, PROMPT-Rn.md, redact-check.mjs and
-                    redact-check.test.mjs), checklists/ (netcode.md, operations.md)
-  results/          committed verdicts and redacted summaries per run, never raw data
+                    runs/ (R1.md … R7.md, and the container's run scripts c-*.mjs, such as U2's c-u2-pm-0001-3.mjs),
+                    operator/ (settings.json, rules.md, PROMPT-Rn.md, redact-check.mjs and redact-check.test.mjs),
+                    checklists/ (netcode.md, operations.md)
+  results/          committed verdicts and redacted summaries per run, never raw data: results/<set>/<commit>/ holds
+                    the judge's verdict.json and a runs.txt (the commit, the binaries' SHA-256s, one line per run)
 docs/design/netcode-proof-messages.md   the message catalogue (ADR 0001:654-678's subset + controls): every
                     type with its channel, visibility class (the draft's Class column), authority and size limit;
                     RoomState listed as omitted, with the reason; a class audit test in U1
@@ -508,11 +510,12 @@ PM-0002-* is judged here.
     - `send_unreliable(bytes, now) -> SendResult { Sent, BufferFull, TooLarge }`, counted, which feeds rate
       adaptation and -24's bite;
     - `send_reliable(channel, bytes, now)`;
-    - `poll_recv(now) -> Option<Recv { channel: Datagram | Control | FullState, bytes, arrival }>`;
-    - `state`, `rtt`, `max_datagram_size`, and `unsent_unreliable`. WebSocket's newest-only replace sits inside its
-      backend;
+    - `poll_recv(now) -> Option<Recv { channel: Datagram | Control | FullState, bytes, arrival_ns }>`;
+    - `state -> LinkState { Connecting, Open, Closed }`, `rtt_ns`, `max_datagram_size`, and `unsent_unreliable`.
+      WebSocket's newest-only replace sits inside its backend; `loss` joins at U4 with npt-room, its first user (the
+      advisor's C3, 2026-11-06);
   - `Listener`, which also yields each peer's address;
-  - `Channel` and `Loopback`.
+  - `Channel` and `Loopback` (as built in U2; the advisor approved the names, U2-R4).
 - **npt-l1:** `L1Net`, `Profile`, `FateLog`, `ReorderStep`.
 - **npt-sim:** `World` (implements the seam), `Scene::stress`, `Greybox`, `Areas`, `Portals`, `SimRng`,
   `trajectory_at`, `StandIns`.
@@ -531,7 +534,8 @@ PM-0002-* is judged here.
   `ImpairSocket`, `DelayStream`.
 - **npt-client:** `ClientEndpoint`, `StepOut`, `Predictor`, `Interp`, `ClockSync`, `AimCast`, `BlockWriter`, `CueLog`.
 - **npt-client-wasm:** the exports create, mode, input and step.
-- **Binaries:** npt-bots, npt-load, npt-super, npt-host, npt-judge.
+- **Binaries:** npt-bots, npt-load, npt-super, npt-host, npt-judge, and npt-lab with its `probe` subcommand (U2;
+  the scenario runner, the replay and the hash comparer join it in U4).
 - **npt-log:** `Header`, `TickRecord`, `SecondRecord`, `EventRecord`, `Writer`; their field types `Machine`, `Build`,
   `Phase`, `Ended` and the `Footer` record; `SCHEMA`; the reader `read_log`, `Log`, `ReadError` (the advisor's C8).
 - **npt-judge's library** (for its own binary and tests only): the modules `marks`, `eval`, `ratio`, `figures`, and
@@ -1313,7 +1317,7 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 | R-2 | The `wss` certificate by http-01 on RS | approved with §8.4's conditions; a 90-day fallback needs security-auditor's and the advisor's OK (C11) | no |
 | R-3 | Metrics by scrape | approved | no |
 | R-4 | Host keys, §1.6 | approved | no |
-| R-5 | An explicit reorder step per flow and direction | approved | yes (ADR 0001 part 13) |
+| R-5 | An explicit reorder step per flow and direction | approved; as built in U2 (the advisor's U2-R1, 2026-11-06): a drawn datagram is overtaken by its successor when the timing allows, so it is never below the profile's floor but may arrive up to one spacing above its ceiling; the step is on in every run, and P0 and one-datagram-per-tick flows at P1 measure 0 by timing | yes (ADR 0001 part 13) |
 | R-6 | 1,000,000 packets on both layers; L2's probe | approved | yes (PM-0001-3) |
 | R-7 | Loopback as "the same local network" | approved; it changes -28's setup | yes (PM-0001-28) |
 | R-8 | The x86-64 replays in this container or on RS | approved; no CI job | no |
