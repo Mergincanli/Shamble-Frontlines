@@ -121,3 +121,146 @@ Paths: L68 = https://raw.githubusercontent.com/torvalds/linux/v6.8/<file>, LM = 
 - Not checked here: Windows' and macOS's TCP (they send the upstream inputs from browsers; L2 runs only on RS, so the
   model covers both directions there); Ubuntu 24.04's CONFIG_HZ (jiffy rounding of RTO and reo timers: 1 ms at
   HZ=1000, 4 ms at HZ=250: read /boot/config-$(uname -r) on RS; unconfirmed).
+
+### F3. tokio-tungstenite 0.30.0 / tungstenite 0.30.0: the wrapper fits; four limits must be set, one panic to avoid
+(R = /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f)
+- **Any stream works:** `accept_async<S>` (R/tokio-tungstenite-0.30.0/src/lib.rs:127-132), `accept_async_with_config`
+  (:137-145), `accept_hdr_async` (:153-160) and `accept_hdr_async_with_config` (:164-180) all take
+  `S: AsyncRead + AsyncWrite + Unpin`, tokio's traits (`use tokio::io::{AsyncRead, AsyncWrite};` :36), behind the
+  `handshake` feature, which is in `default` (R/tokio-tungstenite-0.30.0/Cargo.toml:69-73). So
+  `accept_hdr_async_with_config(DelayStream<..>, origin_check, Some(cfg))` compiles with no adapter.
+  `Pending` from the wrapper becomes `WouldBlock` inside tungstenite (R/tokio-tungstenite-0.30.0/src/compat.rs:162,
+  :178, :189) and back to `Pending` (:197-199).
+- **Panic to avoid:** the handshake writer asserts a non-zero write: `assert!(size > 0);`
+  (R/tungstenite-0.30.0/src/handshake/machine.rs:75-76). DelayStream's `poll_write` must return `Pending` (never
+  `Ready(Ok(0))`) for a non-empty buffer when its 64 KB bound is reached. Also `WebSocketConfig::assert_valid`
+  panics if `max_write_buffer_size <= write_buffer_size` (R/tungstenite-0.30.0/src/protocol/mod.rs:146-152, called
+  from the constructors documented at :177, :189, :219, :384, :393): config, not network, but set both explicitly.
+- **WebSocketConfig** (`#[non_exhaustive]`, so `WebSocketConfig::default().max_frame_size(..)...`:
+  R/tungstenite-0.30.0/src/protocol/mod.rs:44-46, setters :108-143), defaults at :95-106:
+  - `read_buffer_size` 128 KiB, **eagerly allocated per connection** (:47-57; `BytesMut::with_capacity(in_buf_len)`
+    R/tungstenite-0.30.0/src/protocol/frame/mod.rs:126). 1,000 hostile sessions (E14) = 128 MB. Set it to 4-8 KiB.
+  - `write_buffer_size` 128 KiB: the size tungstenite collects before writing to the stream; 0 = write each message
+    at once (:58-66). For newest-only snapshots set 0 (or small) so a frame reaches DelayStream when sent, not after
+    128 KiB, and flush per message.
+  - `max_write_buffer_size` default `usize::MAX` (:67-77, :100): tungstenite's own outbound buffer grows only while
+    writes fail (WouldBlock from DelayStream's 64 KB bound); beyond it `Error::WriteBufferFull` (:278-279,
+    frame/mod.rs:254-255). Set it to about one snapshot plus margin (e.g. 16-32 KiB, must exceed write_buffer_size),
+    so the per-connection outbound total is bounded: tungstenite's buffer + DelayStream's 64 KB + the kernel's
+    send buffer.
+  - `max_frame_size` default 16 MiB (:82-86, :102), checked at the header **before** the payload is read, then the
+    whole length is **reserved at once**: `if *len > max_size as u64 { return Err(..MessageTooLong..) }` and
+    `self.in_buffer.reserve(len);` (frame/mod.rs:177-191). With the default, one header claiming 16 MiB makes a
+    16 MiB reservation per connection with no payload sent: a flood of 100 such headers is 1.6 GB. Set it to the
+    largest client message (Join, a few hundred bytes; ADR 0001's input sizes), e.g. 4 KiB.
+  - `max_message_size` default 64 MiB (:78-81, :101), checked on every fragment append with overflow care
+    (R/tungstenite-0.30.0/src/protocol/message.rs:112-125; mod.rs:686, :699, :707): set equal to max_frame_size.
+  - Errors from these limits are `Error::Capacity`, returned, never a panic (mod.rs:784-788).
+- **The handshake** has its own fixed caps: 65,536 bytes, 512 reads, and an average read of at least 128 B after 64
+  reads, else `Error::AttackAttempt` (R/tungstenite-0.30.0/src/handshake/machine.rs:163-186); 124 headers
+  (R/tungstenite-0.30.0/src/handshake/headers.rs:10). With DelayStream under it, a delayed handshake still parses
+  (a browser's upgrade request is under one 1,448 B segment), but the wrapper must hand tungstenite whole released
+  segments, not 1-byte slices, or the 128 B-average rule can trip.
+- **"The message size limit applies before any delay buffering" (plan §4.4) cannot be met by tungstenite's limits if
+  DelayStream sits below tungstenite:** tungstenite sees bytes only after release. And if DelayStream sits below TLS
+  (the realistic place: ciphertext segments of TCP payload, the TLS handshake delayed too), the wrapper cannot parse
+  frames at all. What bounds memory before the delay is the wrapper's own per-connection cap with backpressure:
+  - inbound: stop reading the TcpStream once queued-but-unreleased bytes reach the cap (64 KB, the emulated receive
+    window); the client's TCP then blocks on the real receive window. Legit inputs are about 30 x 100-200 B/s,
+    12 KB even across a 2 s B1 stall, so 64 KB never binds in honest play. Never drop bytes (TCP is reliable) and never
+    grow the queue;
+  - outbound: the 64 KB write bound returning Pending;
+  - the queue is a VecDeque of segments with a fixed-capacity byte budget (segments of at most 1,448 B: at most 46
+    per direction at 64 KB), allocated per segment from the bytes read, so the cap is the whole memory bound;
+  - tungstenite's `max_frame_size`/`max_message_size` then apply the moment bytes leave the wrapper, before any
+    allocation sized by the client (the reserve above).
+  So the §4.4 wording needs a reading: "size limits apply before any allocation sized by the client; the delay
+  buffer is a fixed per-connection byte budget with backpressure". For the main session / advisor.
+- **TLS:** no tokio-rustls in spikes/netcode-proof/Cargo.lock at ad527f3 and none in the local registry
+  (ls R | grep rustls: rustls-0.23.46, rustls-native-certs, rustls-pki-types, rustls-platform-verifier(-android),
+  rustls-webpki only). `wss` termination needs tokio-rustls (or tokio-tungstenite's `__rustls-tls`, which pulls
+  it: R/tokio-tungstenite-0.30.0/Cargo.toml:56-63): a new pin and a fetch at U3 or U6.
+- **Correction/precision to F3 after reading the catalogue:** the WebSocket frame and message limits are already
+  proposed at 513 B and the write buffer at 128 KB to hold a FullState of 65,541 B
+  (/home/user/Shamble-Frontlines/docs/design/netcode-proof-messages.md:73-76), and the catalogue repeats "every size
+  limit is applied there at the socket, before any L2 delay buffering" (:53-55). So use max_frame_size =
+  max_message_size = 513 B (not my 4 KiB), read_buffer_size small, write_buffer_size 0 and max_write_buffer_size
+  128 KB + 1 frame. Two consequences for DelayStream: (1) a 65,541 B FullState is larger than the 64 KB write bound,
+  so `poll_write` must accept a PARTIAL write (`Ready(Ok(min(buf.len(), space)))` whenever space > 0; Pending only
+  at space == 0), or the FullState can never pass (tungstenite retries partial writes; with rustls below it, records
+  are at most about 16 KB anyway); (2) the ":53-55" wording conflicts with a wrapper below tungstenite (and below TLS):
+  the limits then apply when bytes LEAVE the delay, and memory before that is bounded by the wrapper's byte budget.
+
+### F4. DelayStream sketch (for the main session; npt-net, `crates/net/src/delay_stream.rs`; types are proposals)
+Placement (from F3): `TcpStream -> DelayStream -> tokio-rustls TlsStream -> tokio-tungstenite`, so segments are TCP
+payload (ciphertext) of at most 1,448 B, the TLS handshake is delayed like a real path, and the Join deadline starts
+at accept (the accept loop stamps `accepted_at` before wrapping: "never from the end of a delay").
+
+```rust
+pub struct DelayStream { shared: Arc<Mutex<Shared>>, pump: JoinHandle<()> }   // the stream half tungstenite polls
+struct Shared {
+    up: Dir,                 // client -> room: filled by the pump from the TcpStream read half
+    down: Dir,               // room -> client: filled by poll_write, drained by the pump into the write half
+    read_waker: Option<Waker>, write_waker: Option<Waker>, pump_waker: Option<Waker>,
+    eof_in: bool, shutdown_out: bool, err: Option<io::ErrorKind>,
+}
+struct Dir {
+    q: VecDeque<Seg>,        // FIFO: order always holds
+    budget_used: usize,      // sum of (seg.len + SEG_OVERHEAD); cap DIR_BUDGET = 64 * 1024
+    last_delivery: Instant,  // E15: delivery = max(previous delivery, own time)
+    rng: ChaCha8Rng,         // rand_chacha =0.10.0 (already pinned); seeded (run seed, conn index, dir)
+    stats: Arc<DirStats>,    // AtomicU64s: segments, bytes, lost (= stalls), stall_ns_total, held_segments, max_hold_ns
+}
+struct Seg { bytes: Bytes, own_due: Instant, delivery: Instant, lost: bool }
+const MSS: usize = 1_448; const SEG_OVERHEAD: usize = 64; const DIR_BUDGET: usize = 64 * 1024;
+```
+- **Scheduling one segment** (both directions, same function, profile read per peer set from the control plane):
+  `own_due = t_in + one_way + U(-j/2, +j/2)` where `one_way = (profile_rtt - base_rtt)/2` (E15) and j the profile's
+  jitter; `lost = rng < p` (or `t_in` inside a B1 burst); if lost, `own_due += repair(...)` (E15's
+  max(200 ms, 2 x RTT), or F2's RACK-like rule; a retransmission falling inside a burst is lost again with the RTO
+  doubled); `delivery = max(dir.last_delivery, own_due)`; `dir.last_delivery = delivery`. Draw order per segment fixed
+  (jitter, then loss) so fates replay for the same segment sequence. Stats: lost -> `lost += 1`,
+  `stall_ns_total += repair`; any segment with `delivery > own_due` and not lost -> `held_segments += 1`.
+- **poll_write(cx, buf)** (room -> client): lock; if `err` -> Err; `space = DIR_BUDGET - down.budget_used`;
+  if `space <= SEG_OVERHEAD` -> store `write_waker`, return `Pending` (never `Ready(Ok(0))`: tungstenite asserts
+  `size > 0`, F3); else take `n = min(buf.len(), space - overhead_for(n))` (partial writes are required: a 65,541 B
+  FullState exceeds 64 KB), cut into `MSS` pieces, schedule each with `t_in = now`, push, wake `pump_waker`,
+  return `Ready(Ok(n))`.
+- **poll_flush**: `Ready(Ok(()))` once bytes are queued (the queue IS the emulated send buffer; a flush that waited
+  for delivery would block tungstenite's sender for the one-way delay and break newest-only at 30 Hz).
+- **poll_shutdown**: set `shutdown_out`; the pump shuts the TCP write half after the last segment is released;
+  return `Ready(Ok(()))`.
+- **poll_read(cx, buf)** (client -> room): lock; if the head of `up` has `delivery <= now`: copy
+  `min(buf.remaining(), head.len)` (keep the remainder at the head), free its budget, wake `pump_waker` if the pump
+  was blocked on budget, `Ready(Ok(()))`; else if `up` is empty and `eof_in` -> `Ready(Ok(()))` with 0 bytes (EOF
+  only after every delayed byte); else store `read_waker`, make sure the head's delivery time is armed (below),
+  `Pending`.
+- **The pump task** (one per connection, spawned by the accept path, owns `OwnedReadHalf` and `OwnedWriteHalf`):
+  loop { (1) if `up.budget_used < DIR_BUDGET`: `poll_read` the TCP read half into a 16 KiB scratch, cut into MSS
+  pieces with `t_in = now` (RS's clock: `Instant`, monotonic), schedule, push, wake `read_waker` if the new head is
+  due; at budget, stop reading, so the client's real TCP window fills (backpressure, no growth, no drops);
+  (2) write every `down` segment with `delivery <= now` to the TCP write half (handle partial writes and `Pending`
+  from the real socket; budget is freed when the kernel takes the bytes), wake `write_waker` when budget frees;
+  (3) sleep until `min(up.head.delivery, down.head.delivery)` or a waker }. A hard cap on the pump's life after
+  close (e.g. 5 s) so a dropped connection cannot pin memory.
+- **Memory bound per connection:** 2 x 64 KB budgets (SEG_OVERHEAD makes 1-byte segments count 65 B, so at most
+  about 1,000 segments per direction) + the 16 KiB scratch + tungstenite's buffers (F3: read buffer set small,
+  write buffer max 128 KB + 1 frame). A flood of tiny segments or a client that never reads cannot grow it.
+- **Counted per run** (E15: "Stalls are counted per run", "each stream's ... stall share"): per direction `lost`
+  (= stalls), `stall_ns_total`, `held_segments / segments` (stall share), `max_hold_ns`, plus the release lateness
+  histogram (actual write/readable time minus `delivery`) so the run can prove the timer's precision (below).
+- **Waking:** the pump is a normal tokio task; it needs wakes at `delivery` times, from either (a) tokio
+  `sleep_until(delivery)`: F1a says it fires 0-2 ms late (ms ticks rounded up, then epoll's ms timeout rounded up),
+  or (b) the same release thread as ImpairSocket (F1's recommendation): the pump registers `(delivery, waker)` in
+  the thread's heap; the thread wakes it at the due time; the task resumes 30-250 us later (probe cell (d)).
+- **Precision it needs:** looser than the datagrams', but not 2 ms. The WebSocket model's own quantities are coarse
+  (one-way 25-100 ms, uniform jitter of +-5 to +-20 ms per direction, stalls of 60-400 ms, 33 ms cadence), so the
+  release error only has to be small against the RTT marks measured over WebSocket: MP's 100 +- 5 ms at P2 (-3) is
+  the tightest. tokio's timer adds about +1.2 ms per direction on average (smoke: p50 1.0-1.3 ms, p99 1.3-2.1 ms;
+  full run below), i.e. a +2-4 ms RTT bias, half of -3's 5 ms margin. Proposal: mean bias at most 0.25 ms and p99 at
+  most 1 ms per direction (4x looser than the datagrams' 0.25 ms bar at p99), checked per run from the lateness
+  histogram. Meeting it: option (b) (shared release thread) meets it by construction; option (a) meets it only with a
+  fixed early offset (sleep until `delivery - 1 ms`, then release what is due, re-arming for the rest), which is a
+  calibration to record, not a guarantee. Prefer (b) if ImpairSocket's release thread is built anyway.
+- **Arrival stamps for the room:** WsServer should stamp `Recv.arrival` with the segment's release time (when
+  DelayStream made the bytes readable), not with the decode time, so -47/-50's clock samples see the emulated path.
