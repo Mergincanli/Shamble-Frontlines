@@ -17,6 +17,11 @@ outside `spikes/` may reference it.
 - Build and test: `cargo build --locked --workspace` and `cargo test --locked --workspace`
 - Lints, host and wasm32: `cargo clippy --locked --workspace --all-targets` and
   `cargo clippy --locked --target wasm32-unknown-unknown -p npt-link -p npt-l1 -p npt-sim -p npt-proto -p npt-room -p npt-client -p npt-log`
-- Format check: `cargo fmt --check`
+- Format check: `cargo fmt --all --check` (rustfmt.toml: ADR 0002 part 7's stable options)
+- Judge: `cargo run --locked -p npt-judge -- --marks marks/marks.json --logs <folder> [--out verdicts.json]`;
+  `marks/README.md` is the contract between the results log, `marks.json` and the judge
+- redact-check (plan §10.6; Node 22, also on Windows): `node ops/operator/redact-check.mjs <file or folder>...`,
+  `--staged` before a commit, `--pre-push` as a git hook; its tests: `node --test ops/operator/redact-check.test.mjs`
 
-Status: unit U1, first part (the skeleton). Each unit's state is in `.checkpoints/netcode-proof-test.md`.
+Status: unit U1, second part (npt-log, npt-judge, redact-check; marks.json, the dependency checks and the message
+catalogue's audit next). Each unit's state is in `.checkpoints/netcode-proof-test.md`.
