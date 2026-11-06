@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3; revision 1 is 786b7d2, revision 2 d8f0712)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-06 03:25 Amsterdam
+- **Last update:** 2026-11-06 02:58 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -78,6 +78,10 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- PR: [Mergincanli/Shamble-Frontlines#40](https://github.com/Mergincanli/Shamble-Frontlines/pull/40), draft, opened
+  02:56 on head a6607bc; this session is subscribed to its activity.
+- The advisor's plan review (advisor agent, xhigh, background) · notes `advisor-plan-review.md` · launched 02:54 ·
+  running.
 - Workflow `wf_e7cdd40f-712` (npt-plan-review2: security-auditor, netcode-architect, infra-engineer; xhigh) · script as
   launched: `.checkpoints/netcode-proof-test/npt-plan-review2-run1.js` (no args) · notes: `<agent>-plan-review2.md` ·
   launched 23:54 · FAILED 23:54 at the usage limit · resumed 02:13 · DONE 02:44 (3 of 3 returned).
