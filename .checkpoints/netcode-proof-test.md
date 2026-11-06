@@ -173,6 +173,10 @@
     test is still true at that grain).
 
 ## Current step
+33. **U3's build plan** written: `.checkpoints/netcode-proof-test/u3-build-plan.md` (U3a the TCP model and {L}; the
+    docs PR for PM-0001-18; U3b ImpairSocket; U3c DelayStream; U3d the timing self-test). The advisor's
+    `advisor-u3q.md` §(1), (1b), (2) are written; §(3) (design problems U3 must fix) was still being written when the
+    advisor was resumed at 21:12 UTC after the 18:09 usage-limit cut. Next: read §(3) when it arrives, then build U3a.
 32. **U3's scouting DONE** (workflow `wf_d6bdeed6-3c0`, 4 of 4 agents, about 17:30 UTC) · synthesis:
     `.checkpoints/netcode-proof-test/u3-scout-summary.md` · **R5-TEST-OQ2: YES for both crates** (wtransport through
     its `quinn` feature's `with_quic_incoming`; web-transport-quinn through `Request::accept`), so R-22 does not

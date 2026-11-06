@@ -226,3 +226,78 @@ encoded at or after the link's return; the new report series), a judge fixture f
 words), §6.2's -18 row, §7.2 R3 (+0.2 h for the WebSocket run: 10.15 -> 10.35, inside its 11 billed hours and
 EUR 1.90 cap), §15 (the fresh-delta reading; R-25's row: the faithful model), §0.4 (Mustafa's U3 answers), npt-l1's
 crate doc (C1'), and the catalogue's PeerBurst row (both transports).
+
+## (3) The design problems: what U3's build plan must fix (sources: u3-verify-wt.md "Design problems" 1-14 = W1-W14,
+## u3-verify-timing.md "Design problems" 1-8 = T1-T8, and the summary's shape list)
+MUST be in U3's build plan, each with its test:
+- M1 (W1, T4) Inbound lateness measured where quinn receives it: at poll_recv's return, not at the release thread's
+  wake; outbound at try_send's return. Arrival stamped when ImpairSocket drains the kernel socket (quinn-udp 0.5.16
+  has no kernel receive stamp). Both directions report U3-Q1's statistic, E[(L - L0 - 0.25 ms)+], beside p50, p99,
+  p99.9 and max; on loopback here it is a dry run, RS decides (Q1, Q9).
+- M2 (W2) One release queue ordered by (due, sequence) across all peers (a min-heap), not one FIFO per direction:
+  with per-datagram jitter and per-peer profiles a FIFO head-of-line-blocks every peer.
+- M3 (W3, Q7) The reorder step is npt-l1's ReorderStep as built (held until 1 ns after its successor), not a fresh
+  "1 % adjacent swap"; Profile reused too. The probe's reorder share at the impairment layer is U3's; the app-level
+  share that -20 and -58 need is measured at the room (U6).
+- M4 (W4) Fates from one ChaCha8 stream per (peer slot, direction), keyed by a stable slot id (never the ephemeral
+  address), with a fixed number of words per datagram, so interleaving cannot move fates.
+- M5 (W5) The release thread sends with quinn-udp's try_send, never send (send turns every non-WouldBlock error into
+  Ok, unix.rs:195-219); each error kind is a logged fate, never "delivered".
+- M6 (W6, Q7) The one small L2 configuration type goes into plan §4.7's npt-net list before the code, so the symbol
+  diff matches; everything else stays pub(crate).
+- M7 (W7, W8) Each WebTransport feature builds its own rustls server config with builder_with_provider (its own
+  crate's provider: no process default, so no dual-provider panic), TLS 1.3, ALPN "h3" set explicitly (wtransport's
+  with_custom_tls* sets none), TLS13_AES_128_GCM_SHA256 included (wtransport's build() expects it); wt-wtq never
+  depends on wtransport. Test: an --all-features build starts both servers in one process.
+- M8 (summary; W-scout F2.3) One accept loop shape for both crates: drive quinn::Endpoint::accept ourselves and call
+  each crate's per-connection accept, so failed handshakes are counted per reason (web-transport-quinn's Server
+  drops them silently; E6 counts them). wtransport's `quinn` feature on in npt-net's manifest; Cargo.lock unchanged
+  (checked). Datagrams stay enabled in every transport config (wtransport's unreachable!() on Disabled).
+- M9 (Q6) migration(false) in both crates' server configs, recorded in the header.
+- M10 (W10, Q8) ImpairSocket stamps the first raw packet per address (npt-server's Join deadline reads it at U6);
+  drops and counts any datagram above the size limit before it is queued; bounds both queues in bytes, per peer and
+  in total, with tail drops counted apart from profile loss; the per-peer table has a fixed capacity, an eviction
+  rule and a counter (.claude/rules/netcode.md: nothing unbounded keyed by client data); IPv4-mapped IPv6 normalised.
+- M11 (summary) Transmit contents copied into a fixed pool of 1,500 B buffers, no allocation per datagram; an empty
+  pool is a counted drop. Never WouldBlock (poll_writable always Ready); poll_recv never Ok(0) and never an error for
+  an empty queue; one datagram per Transmit (max_transmit_segments = max_receive_segments = 1); may_fragment passed
+  through. Tests for each.
+- M12 (W11, W14) The pass-through (every impairment off) runs through the same ImpairSocket, release thread and slack
+  as the impaired runs, so clean references pay the same CPU (GSO off on both); the header records the mode.
+- M13 (W12, T2) The L2 probe paces on the dedicated clock, not tokio, and U3 shows 10,000 datagrams per second per
+  direction sustained on loopback with jitter, loss and the reorder step on (20,000 releases per second), with the
+  release thread's CPU recorded (0.27 core here at lead 0).
+- M14 (W13, T5, Q2) Timer slack 1 ns by the release thread writing its own /proc/<tid>/timerslack_ns (the tid read
+  from /proc/thread-self; /proc/thread-self/timerslack_ns does not exist), read back and tested; no unsafe code, no
+  libc dependency; real-time priority only as a recorded switch applied from outside; no spin lead (Q2), so T3's lead
+  selection self-test is dropped from the plan.
+- M15 (T6; U2's carried C5) SERIES.md rows for every new header and per-second field (slack, scheduling policy,
+  release-lateness summary per direction, the TCP model's name and version, the stall and repair counts of S12) and
+  the L2 probe's writing binary named.
+- M16 (T7, Q5) tokio-rustls pinned in U3 at an exact version that depends on the pinned rustls 0.23.46 (no second
+  rustls), with default features off and the provider chosen explicitly (as M7); fetched in a day session (the local
+  registry has none); cargo deny and audit at U5.
+- M17 (T8, Q3) DelayStream is built to section (1)'s spec S0-S14, not E15's constant or the scout's lazy rule; its
+  free write budget is exposed for npt-server's send-buffer report (§4.4, settled with npt-room at U4/U6).
+- M18 (Q3, section (1)) S13 (e)'s burst sweep, measured with the "fresh delta" definition, gives the docs PR its
+  number; the loopback cross-check against the kernel (S13) is part of U3's evidence.
+- M19 (summary; u3-scout-wt.md F5.1-F5.5) PM-0001-23/-24's shaper (FIFO at rate R, drop-tail in bytes, before the profile's delay) is built in
+  U3 with unit tests of the queue arithmetic, since it is ImpairSocket's. My ruling on the scout's open question: a
+  "full datagram" is 1,480 B (quinn's largest packet after MTU discovery, 1,452 B, + 28 B), so -23's queue is 5,920 B
+  and -24's is max(200 ms at the bottleneck rate, 5,920 B): the larger reading satisfies the row's "at least 4 full
+  datagrams" whatever size the snapshots reach. The deep queue is intended (R-17's source, NC2-F3). Both in the header.
+Carried to U6 (not U3), recorded in the checkpoint's open findings:
+- U6-1 (W9) datagram_send_buffer_size sized to k x (1,000 B + size_of::<Datagram>()) with k stated, never below one
+  datagram (or every send is TooLarge); wtransport's buffer space read through quic_connection(); check that
+  wtransport's send path drops the oldest when full. Small k also keeps -18's first fresh datagram from waiting behind
+  stale ones (section (2)'s reading).
+- U6-2 (summary) wtransport does not check the client's SETTINGS (endpoint.rs:628): a client without WebTransport
+  reaches accept_session on wtransport but not on web-transport-quinn; -25's hostile suite runs per crate and records
+  the difference.
+- U6-3 (section (1b)'s C6) the loopback B1 check on real quinn, both crates, before R3.
+- U6-4 (W3) the app-level reorder share per run for -20 and -58.
+No action (settled or not a defect): T1 and T3 (settled by Q1 and Q2), W13's "decide on RS" (Q9 reads RS at R1),
+the scout's -24 "collision" (intended: NC2-F3), T8's lazy rule (replaced by Q3 (b)).
+- (end) Sections (1), (1b), (2) and (3) complete. Nothing in this file is a merge decision; nothing for Mustafa beyond
+  the docs PR's go and the extra branch it needs.
+DONE
