@@ -54,7 +54,15 @@ session work. A share of another spike is sized as the part it adds.
   library pick, PM-0001-14, PM-0001-25's Origin, PM-0006-15), and a row whose limit is a time, or which ADR 0003's look
   proof test needs, stays on the borrowed Mac; the workflow that runs it is part of the proof test's plan, reviewed by
   security-auditor and infra-engineer, and any `.github/` change in this repository goes to Mustafa; the later spikes'
-  Safari rows are each spike's own plan's, in the same way (the advisor's reading, 2026-11-03). Until they are named,
+  Safari rows are each spike's own plan's, in the same way (the advisor's reading, 2026-11-03). The runner also stands
+  in for PM-0001-32 and PM-0006-25, -26 and -27 (count rows), on two conditions: PM-0001-32's WebGPU half counts only if
+  the runner's Safari returns a WebGPU adapter; otherwise that half waits for the Mac. PM-0006-26 counts only if the
+  job's time limit and the runner's token life cover its whole 30-minute session with three rotations; otherwise it
+  waits for the Mac (the advisor's reading, 2026-11-06). Mustafa, 2026-11-06: "No Mac available for now (the loan Macs
+  are out of stock). Nothing in this test waits on one: the timed Safari rows wait until a Mac is available, at the
+  latest for the look proof test." So if GitHub's macOS runner fails condition (i), (ii) or (iii), every Safari row of
+  the netcode proof test waits for that Mac too, instead of a Mac being borrowed before the test (the advisor's reading
+  of it, as the plan applies it, 2026-11-06). Until they are named,
   his laptop is the stand-in for ML, in his words: “Until then, my laptop's integrated graphics (Brave set to "Power
   saving") stands in for the minimum, for rough checks only.” MP, Mustafa's PC in Brave, is for what he judges only
   ("Test PC: my own, in Brave", 2026-11-03). A rough check is reported, never judged against a pass mark. MP stays what
@@ -63,7 +71,11 @@ session work. A share of another spike is sized as the part it adds.
   during a run (OQ-0006-17, answered by Mustafa, 2026-11-03), in his words: "I created both once to try the console and
   deleted them right away. They'll be created fresh on run day, so their IP addresses will be new then." No draft writes
   an address: each run records the day's addresses with its results, and makes the settings bound to them, and its check
-  of the new SSH host keys, on that day (ADR 0006's key; the advisor's reading, 2026-11-03).
+  of the new SSH host keys, on that day (ADR 0006's key; the advisor's reading, 2026-11-03). With FIXED-IP (a) (Mustafa,
+  2026-11-06), the two kept Primary IPv4s may be written into the run files, and the DNS record is set once (the
+  advisor's reading, 2026-11-06). ROUTE (Mustafa, 2026-11-06): (a), the hybrid: cloud-init builds each VM, and Claude
+  Code on his laptop runs the sessions over SSH, with a key made there, a fixed settings file of its own, and his
+  prompts as the last wall; this cloud session cannot reach the servers over SSH.
 - **Network profiles** P0–P4 and the two link-simulator layers L1 and L2: ADR 0001 part 13 (profiles) and ADR 0002 (the
   simulator's design, R5-TEST-REC4). The netcode proof test builds them first, throwaway.
 - **Recorded matches** and per-tick state hashes: ADR 0004 (the sim core spike makes the first ones); until one exists,
@@ -157,7 +169,8 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   "rough checks first, then a short re-run once they're named" (Mustafa, 2026-11-03), the rough checks on the stand-in
   for ML; this spike's own plan lists its rows that run before they are named, and nothing is judged on a rough check
   (the advisor's reading, 2026-11-03); its Safari leg starts with the check Mustafa set on GitHub's macOS runners, and
-  the Mac is borrowed before this test only if they cannot pass it (Machines, above); a throwaway sim with movement,
+  the Mac is borrowed before this test only if they cannot pass it (Machines, above) (overtaken by Mustafa's answer of
+  2026-11-06, Machines above: no Mac is available, and the Safari rows wait for one); a throwaway sim with movement,
   hitscan and bots as protocol clients, native and Wasm, with stand-in big vehicles and live projectiles at the stress
   scene's counts (PM-0001-2); its 30 Hz marks may add ADR 0004's S1 stand-ins (384 effect rows with the effect step's 1
   ms burned per tick, the 2.80 ms remainder topped up: ADR 0001, OQ-0001-2), and its density runs pad its sim step to
@@ -172,7 +185,9 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   Mustafa, 2026-11-03: "shamblefrontlines.com, which I register at Cloudflare."), the domain registered (Mustafa,
   2026-11-03: "shamblefrontlines.com is registered at Cloudflare."), its DNS record set on each run day to that day's
   address before the certificate is issued, and the certificate's issuance method chosen in this test's own plan with
-  security-auditor (the advisor's reading, 2026-11-03); Mustafa's session in Brave; the spike's run plan under its bill
+  security-auditor (the advisor's reading, 2026-11-03); with FIXED-IP (a) (Mustafa, 2026-11-06), the two kept Primary
+  IPv4s may be written into the run files, and the DNS record is set once (the advisor's reading, 2026-11-06); Mustafa's
+  session in Brave; the spike's run plan under its bill
   mark (PM-0006-18), with each run's cost cap, from its planned hours, written in that run's plan for Mustafa's OK
   (OQ-0006-20, answered by Mustafa, 2026-11-03: "one cap per run, from its planned hours, written in that run's plan for
   my OK. I create and delete the VMs myself.").
@@ -180,7 +195,10 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   client harness the boundary spike shares (the page with its Worker host and a plain renderer, on the throwaway sim:
   ADR 0002's spike text), accepted with the order (J6 (5)). It closes at 30 Hz: the 60 Hz margin run follows the sim
   core spike on this test's kept server and harness, in its own VM session, and reports separately (item 2; the
-  advisor's reading, 2026-11-03).
+  advisor's reading, 2026-11-03). The proof test closes in two steps: its PR merges with the named-machine rows pending;
+  R8, its own change-set, judges them once ML and RD are named. Migration step 1 waits for R8's ML and RD rows only.
+  Safari's time rows (PM-0001-29, and PM-0001-36's Safari leg) close at the Mac's first visit. Until then PM-0001-36's
+  cap stays at 1,000 B, or the smallest value measured, as a data value (the advisor's reading, 2026-11-06).
 - **Size:** L, the client harness included. Two transports on four browsers, two simulator layers, a room server with
   interest, encoding and lag compensation at 48 clients, a load generator, repeated 30-minute soaks, 8 rooms on the
   reference server, planted defects, Mustafa's session; ADR 0006's operations marks add M; ADR 0004's share is S.
