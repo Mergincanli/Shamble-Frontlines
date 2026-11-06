@@ -1050,3 +1050,139 @@ fn q27_pm_0006_19s_off_runs_must_agree_within_1_percent() {
         "{why:?}"
     );
 }
+
+/// PM-0001-3's identity check alone: one L1 part, the twin figure, and the clock-seed bite.
+fn twin_mark() -> Value {
+    json!({
+        "id": "PM-0001-3", "title": "profiles", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "L1 B1", "select": {"layer": "L1", "profile": "B1"}, "min": 1}],
+        "checks": [{"name": "identical fate log", "figure": "fate_log_twin_equal", "op": "==", "value": 1,
+                    "parts": ["L1 B1"]}],
+        "bites": [{"id": "PM-0001-3/clock-seed", "what": "the RNG seeded from the clock"}]
+    })
+}
+
+/// A probe log at L1 B1, seed 7, with its fate log's hash (one hex digit repeated) and the twin it names.
+fn probe(run: &'static str, role: &'static str, hash: char, twin: Option<&'static str>) -> LogSpec {
+    let mut s = LogSpec::room(run, "set-t", "PM-0001-3");
+    s.role = role;
+    s.layer = "L1";
+    s.profile = "B1";
+    s.seed = 7;
+    s.process = "probe";
+    s.params = vec![("fate_log_sha256", json!(hash.to_string().repeat(64)))];
+    if let Some(t) = twin {
+        s.params.push(("twin", json!(t)));
+    }
+    s
+}
+
+/// The clock-seed bite run and its twin, both in the bites build: their fate logs differ, so the bite is shown.
+fn shown_clock_bite() -> Vec<Log> {
+    let mut bite = probe("bite", "bite", 'b', Some("bite-twin"));
+    bite.bite = Some("PM-0001-3/clock-seed");
+    let mut twin = probe("bite-twin", "twin", 'c', None);
+    twin.bite = Some("PM-0001-3/clock-seed");
+    vec![bite.build(), twin.build()]
+}
+
+#[test]
+fn u2_the_twin_figure_passes_on_one_fate_log_and_shows_the_clock_seeded_bite() {
+    let mut logs = vec![
+        probe("b1", "measured", 'a', Some("b1-twin")).build(),
+        probe("b1-twin", "twin", 'a', None).build(),
+    ];
+    logs.extend(shown_clock_bite());
+    let (k, why) = verdict_of(&[twin_mark()], &logs);
+    assert_eq!(k, VerdictKind::Pass, "{why:?}");
+    // The same bite run against a twin with its own hash is missed: the check cannot be shown to work.
+    let mut missed = logs[..2].to_vec();
+    let mut bite = probe("bite", "bite", 'b', Some("bite-twin"));
+    bite.bite = Some("PM-0001-3/clock-seed");
+    let mut twin = probe("bite-twin", "twin", 'b', None);
+    twin.bite = Some("PM-0001-3/clock-seed");
+    missed.extend([bite.build(), twin.build()]);
+    let (k, why) = verdict_of(&[twin_mark()], &missed);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(why.iter().any(|w| w.contains("did not fail")), "{why:?}");
+}
+
+#[test]
+fn u2_two_fate_logs_fail_and_a_missing_twin_is_not_run() {
+    let mut logs = vec![
+        probe("b1", "measured", 'a', Some("b1-twin")).build(),
+        probe("b1-twin", "twin", 'd', None).build(),
+    ];
+    logs.extend(shown_clock_bite());
+    let (k, why) = verdict_of(&[twin_mark()], &logs);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(
+        why[0].contains("identical fate log = 0, needs == 1"),
+        "{why:?}"
+    );
+    let mut alone = vec![probe("b1", "measured", 'a', Some("b1-twin")).build()];
+    alone.extend(shown_clock_bite());
+    let (k, why) = verdict_of(&[twin_mark()], &alone);
+    assert_eq!(k, VerdictKind::NotRun, "{why:?}");
+    assert!(
+        why[0].contains("its twin b1-twin is not in set set-t yet"),
+        "{why:?}"
+    );
+}
+
+#[test]
+fn u2_a_twin_record_that_cannot_be_compared_is_a_gap() {
+    let unnamed = probe("b1", "measured", 'a', None);
+    let mut not_a_twin = probe("b1-twin", "measured", 'a', Some("b1"));
+    not_a_twin.run = "b1-twin";
+    let mut other_seed = probe("b1-twin", "twin", 'a', None);
+    other_seed.seed = 8;
+    let mut bad_hash = probe("b1-twin", "twin", 'a', None);
+    bad_hash.params = vec![("fate_log_sha256", json!("A".repeat(64)))];
+    let mut measured_twin_of_a_bite = probe("bite-twin", "twin", 'c', None);
+    measured_twin_of_a_bite.bite = None;
+    let mut bite = probe("bite", "bite", 'b', Some("bite-twin"));
+    bite.bite = Some("PM-0001-3/clock-seed");
+    let cases: Vec<(Vec<Log>, &str)> = vec![
+        (vec![unnamed.build()], "params.twin names no twin run"),
+        (
+            vec![
+                probe("b1", "measured", 'a', Some("b1-twin")).build(),
+                not_a_twin.build(),
+            ],
+            "b1-twin has role measured, not twin",
+        ),
+        (
+            vec![
+                probe("b1", "measured", 'a', Some("b1-twin")).build(),
+                other_seed.build(),
+            ],
+            "its twin b1-twin has another seed",
+        ),
+        (
+            vec![
+                probe("b1", "measured", 'a', Some("b1-twin")).build(),
+                bad_hash.build(),
+            ],
+            "run b1-twin: params.fate_log_sha256 is missing or not 64 lowercase hex digits",
+        ),
+        (
+            vec![
+                probe("b1", "measured", 'a', Some("b1-twin")).build(),
+                probe("b1-twin", "twin", 'a', None).build(),
+                bite.build(),
+                measured_twin_of_a_bite.build(),
+            ],
+            // A bite run's twin from the measured build: the bite run is invalid (its reason is in the bite's detail).
+            "bite PM-0001-3/clock-seed: its run is invalid",
+        ),
+    ];
+    for (logs, expected) in cases {
+        let (k, why) = verdict_of(&[twin_mark()], &logs);
+        assert_eq!(k, VerdictKind::Invalid, "{expected}: {why:?}");
+        assert!(
+            why.iter().any(|w| w.contains(expected)),
+            "{expected}: {why:?}"
+        );
+    }
+}
