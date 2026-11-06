@@ -2,7 +2,7 @@
 // Built from .gate/netcode-proof-test/timer-probe/Cargo.toml (tokio =1.54.1, libc =0.2.191, the workspace's pins),
 // offline. Not part of the spike workspace.
 //
-// Usage: timer-probe <group> <n>   group: sleepers | spinners
+// Usage: timer-probe <group> <n>   group: sleepers | spinners | stream | hiccup
 //   sleepers: (a) tokio sleep_until on a 4-worker multi-thread runtime with the I/O driver on (enable_all),
 //             (b) std::thread::sleep on a dedicated thread (default timer slack),
 //             (b1) the same with this thread's timer slack set to 1 ns (prctl PR_SET_TIMERSLACK)
@@ -16,7 +16,9 @@
 //             arrivals at <rate>/s, each due 25-75 ms later: P2's one-way 50 ms +- 25 ms span, wider than P2's +- 10 ms
 //             on purpose) into a Mutex<BinaryHeap>; one release thread sleeps (timer slack <slack_ns>) to
 //             due - <lead_us>, spins to due, releases every due entry; lateness per release, and the release
-//             thread's own CPU (getrusage RUSAGE_THREAD) over the run.
+//             thread's own CPU (getrusage RUSAGE_THREAD) over the run. Optional 6th arg: SCHED_FIFO priority for the
+//             release thread (0 = normal scheduling). Optional 7th arg 1: hand each batch to a tokio task via Notify
+//             and measure lateness inside the task (the inbound path to quinn's endpoint driver).
 
 use std::sync::Arc;
 use std::sync::mpsc;
@@ -79,7 +81,9 @@ fn runtime() -> tokio::runtime::Runtime {
     tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all().build().unwrap()
 }
 
-fn sleepers(n: usize) {
+fn sleepers(n: usize, only: &str) {
+    // `only`: "" = all three in order; "a", "b" or "b1" = that mechanism alone (for running them as separate processes)
+    if only.is_empty() || only == "a" {
     // (a) tokio
     let rt = runtime();
     for &d in &DELAYS_US {
@@ -101,8 +105,11 @@ fn sleepers(n: usize) {
         report("a_tokio_sleep_until", d, late, w0.elapsed(), cpu_ns() - c0);
     }
     drop(rt);
+    }
     // (b) and (b1) std::thread::sleep on a dedicated thread
     for (mech, slack) in [("b_thread_sleep_slack_default", None), ("b1_thread_sleep_slack_1ns", Some(1u64))] {
+        let tag = if slack.is_none() { "b" } else { "b1" };
+        if !(only.is_empty() || only == tag) { continue; }
         std::thread::spawn(move || {
             if let Some(s) = slack {
                 // SAFETY: prctl with PR_SET_TIMERSLACK takes an integer argument; probe code only.
@@ -192,16 +199,44 @@ fn thread_cpu_ns() -> u128 {
     t(ru.ru_utime) + t(ru.ru_stime)
 }
 
-fn stream(rate: f64, lead_us: u64, slack_ns: u64, secs: u64) {
+fn stream(rate: f64, lead_us: u64, slack_ns: u64, secs: u64, fifo: i32, notify: bool) {
     use std::cmp::Reverse;
     use std::collections::BinaryHeap;
     use std::sync::{Condvar, Mutex};
+    // notify: the release thread hands each batch to a task on a 4-worker runtime (quinn's endpoint driver stand-in)
+    // through tokio::sync::Notify; lateness is then measured inside the task (the inbound path).
+    let rt = if notify { Some(runtime()) } else { None };
+    let handoff: Arc<(Mutex<Vec<Instant>>, tokio::sync::Notify)> = Arc::new((Mutex::new(Vec::new()), tokio::sync::Notify::new()));
+    let task = rt.as_ref().map(|rt| {
+        let h = handoff.clone();
+        rt.spawn(async move {
+            let mut late: Vec<i64> = Vec::new();
+            let mut done = false;
+            while !done {
+                h.1.notified().await;
+                let batch: Vec<Instant> = std::mem::take(&mut *h.0.lock().unwrap());
+                let now = Instant::now();
+                for d in batch {
+                    if d == far_future() { done = true; continue; }
+                    late.push(if now >= d { (now - d).as_nanos() as i64 } else { -((d - now).as_nanos() as i64) });
+                }
+            }
+            late
+        })
+    });
+    let h2 = handoff.clone();
     let shared = Arc::new((Mutex::new((BinaryHeap::<Reverse<Instant>>::new(), false)), Condvar::new()));
     let lead = Duration::from_micros(lead_us);
     let s2 = shared.clone();
     let rel = std::thread::spawn(move || {
         // SAFETY: PR_SET_TIMERSLACK takes an integer argument; probe code only.
         assert_eq!(unsafe { libc::prctl(libc::PR_SET_TIMERSLACK, slack_ns as libc::c_ulong, 0, 0, 0) }, 0);
+        if fifo > 0 {
+            // SAFETY: sched_param is a plain struct passed by pointer to a valid local; probe code only.
+            let p = libc::sched_param { sched_priority: fifo };
+            let r = unsafe { libc::sched_setscheduler(0, libc::SCHED_FIFO, &p) };
+            println!("# release thread SCHED_FIFO prio {fifo}: sched_setscheduler = {r}");
+        }
         let (c0, w0) = (thread_cpu_ns(), Instant::now());
         let mut late: Vec<i64> = Vec::with_capacity((rate * secs as f64 * 1.2) as usize);
         let (m, cv) = &*s2;
@@ -224,14 +259,22 @@ fn stream(rate: f64, lead_us: u64, slack_ns: u64, secs: u64) {
             while Instant::now() < due { std::hint::spin_loop(); }
             let mut g = m.lock().unwrap();
             let now = Instant::now();
+            let mut handed = false;
             while let Some(Reverse(h)) = g.0.peek() {
                 if *h > now { break; }
-                late.push(late_ns(*h));
+                if notify { h2.0.lock().unwrap().push(*h); handed = true; } else { late.push(late_ns(*h)); }
                 g.0.pop();
             }
+            drop(g);
+            if handed { h2.1.notify_one(); }
         }
+        if notify { h2.0.lock().unwrap().push(far_future()); h2.1.notify_one(); }
         let cpu = thread_cpu_ns() - c0;
-        report(&format!("stream_rate{rate}_lead{lead_us}us_slack{slack_ns}ns_release_thread"), 0, late, w0.elapsed(), cpu);
+        if !notify {
+            report(&format!("stream_rate{rate}_lead{lead_us}us_slack{slack_ns}ns_fifo{fifo}_release_thread"), 0, late, w0.elapsed(), cpu);
+        } else {
+            println!("# release thread cpu_cores={:.3} over {:.1} s", cpu as f64 / w0.elapsed().as_nanos() as f64, w0.elapsed().as_secs_f64());
+        }
     });
     // producer: Poisson arrivals, due = arrival + 25..75 ms, from a fixed xorshift seed
     let mut x: u64 = 0x9E3779B97F4A7C15;
@@ -255,6 +298,40 @@ fn stream(rate: f64, lead_us: u64, slack_ns: u64, secs: u64) {
     { let mut g = m.lock().unwrap(); g.1 = true; }
     cv.notify_one();
     rel.join().unwrap();
+    if let (Some(rt), Some(t)) = (rt.as_ref(), task) {
+        let late = rt.block_on(t).unwrap();
+        let n = late.len();
+        report(&format!("stream_rate{rate}_lead{lead_us}us_slack{slack_ns}ns_fifo{fifo}_notify_task"), 0, late, Duration::from_secs(secs), 0);
+        println!("# notify_task got {n} releases");
+    }
+}
+
+fn far_future() -> Instant {
+    static F: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+    *F.get_or_init(|| Instant::now() + Duration::from_secs(86_400 * 365))
+}
+
+// hiccup <seconds>: the platform's noise floor. One thread spins on Instant::now() and records every gap between two
+// consecutive reads above 20 us (a pause in which the thread did not run): count, rate and the gap distribution.
+fn hiccup(secs: u64) {
+    let end = Instant::now() + Duration::from_secs(secs);
+    let mut gaps: Vec<i64> = Vec::new();
+    let mut prev = Instant::now();
+    let w0 = prev;
+    while prev < end {
+        let now = Instant::now();
+        let g = (now - prev).as_nanos() as i64;
+        if g > 20_000 { gaps.push(g); }
+        prev = now;
+    }
+    let wall = w0.elapsed();
+    let total_ns: i64 = gaps.iter().sum();
+    println!("# hiccup: {} gaps > 20 us in {:.1} s ({:.1}/s), {:.3} % of the time lost", gaps.len(), wall.as_secs_f64(),
+        gaps.len() as f64 / wall.as_secs_f64(), 100.0 * total_ns as f64 / wall.as_nanos() as f64);
+    for t in [50_000i64, 100_000, 250_000, 1_000_000, 10_000_000] {
+        println!("#   gaps > {} us: {}", t / 1_000, gaps.iter().filter(|&&g| g > t).count());
+    }
+    if !gaps.is_empty() { report("hiccup_gaps_over_20us", 0, gaps, wall, 0); }
 }
 
 fn main() {
@@ -269,11 +346,12 @@ fn main() {
         std::fs::read_to_string("/proc/self/timerslack_ns").unwrap_or_default().trim()
     );
     match args.get(1).map(String::as_str) {
-        Some("sleepers") => sleepers(n),
+        Some("sleepers") => sleepers(n, args.get(3).map(String::as_str).unwrap_or("")),
         Some("spinners") => spinners(n),
+        Some("hiccup") => hiccup(args.get(2).and_then(|s| s.parse().ok()).unwrap_or(10)),
         Some("stream") => {
             let a = |i: usize, d: f64| args.get(i).and_then(|s| s.parse::<f64>().ok()).unwrap_or(d);
-            stream(a(2, 3000.0), a(3, 100.0) as u64, a(4, 1.0) as u64, a(5, 60.0) as u64)
+            stream(a(2, 3000.0), a(3, 100.0) as u64, a(4, 1.0) as u64, a(5, 60.0) as u64, a(6, 0.0) as i32, a(7, 0.0) > 0.0)
         }
         _ => eprintln!("usage: timer-probe sleepers|spinners [n]"),
     }

@@ -418,3 +418,220 @@ const MSS: usize = 1_448; const SEG_OVERHEAD: usize = 64; const DIR_BUDGET: usiz
    flush = queued, a pump task per connection, stall counters and a release-lateness histogram; precision needed
    about 1 ms p99 and 0.25 ms mean bias, which the shared release thread meets and tokio's timer only with a
    calibrated offset.
+
+### F3b. The ADR's own wording on buffering (an advisor point)
+- ADR 0001's R-25 text (in the file today: /home/user/Shamble-Frontlines/docs/adr/0001-multiplayer-netcode.md:1463-1469):
+  "... max(200 ms, 2 x the profile's round trip; U3 verifies the floor) ... Bytes buffered per connection are capped
+  and counted, and the message size limit applies before buffering (the advisor's reading, 2026-11-06)."
+- Conflict: with the wrapper at the TCP level (below tungstenite, and below TLS for realism), no WebSocket message
+  exists before buffering; tungstenite's 513 B frame/message limit (catalogue :73-76) can only apply when bytes leave
+  the delay. "Capped and counted" holds (F4's 64 KB budget per direction, counted). Two readings for the advisor:
+  (a) keep the wrapper at the TCP level and read "the message size limit applies before any allocation the client
+  sizes" (the wrapper's buffer is fixed-budget, so a client cannot size it); or (b) put the wrapper above
+  tungstenite, delaying whole messages, which applies the limit first but is no longer per-segment and leaves TLS and
+  the upgrade undelayed. Recommendation: (a); (b) contradicts the per-segment model in the same sentence.
+- Also "U3 verifies the floor": F2/F2c show the floor (200 ms) is real but that the repair for a single loss in a 30 Hz
+  stream is not the RTO: the formula itself is the thing to revisit, not only the floor.
+- F2 correction (when the RTO timer runs from): Linux re-arms the RTO (or TLP) timer when an ACK acknowledges new
+  data (`if (flag & FLAG_ACKED) { flag |= FLAG_SET_XMIT_TIMER; ...`, L68 net/ipv4/tcp_input.c:3412-3413), and on a
+  SACK only when "the sack RTT is measured from data sent after when the head was last (re)transmitted" is false
+  (:3440-3447, "Otherwise the timeout may continue to extend in loss recovery"); `tcp_set_xmit_timer` tries the TLP
+  first, then the RTO (:3230-3234); the head-send-time offset applies when the RTO replaces a pending reorder or probe
+  timer (:3214-3225). So for a lost head the RTO runs from about its own (re)transmission time: about SRTT + 200 ms
+  after it, as measured in F2c (204 ms + the 33 ms gap = the 230-241 ms stalls).
+- 16:43 UTC: stream mode gained a 6th argument, a SCHED_FIFO priority for the release thread (root here: CapEff
+  000001fffeffffff), to test whether real-time scheduling removes the tails without a spin. Rebuilt (1 s).
+
+### C. Claims list (for the structured answer)
+- C1 high: tokio 1.54.1's Sleep has 1 ms ticks with deadlines rounded up (source.rs:17-33), parks in whole ms
+  (time/mod.rs:226-233) and epoll rounds its ms timeout up (mio-1.2.4 epoll.rs:46-67): 0-2 ms late by construction.
+- C2 high: Linux TCP_RTO_MIN = HZ/5 (200 ms) at v6.8 include/net/tcp.h:145; on 6.8 only a locked per-route rto_min
+  overrides it (tcp.h:741-748; tcp.c:424 hard-wires icsk_rto_min); sysctl tcp_rto_min_us from 6.11; TCP_RTO_MIN_US
+  from 6.15.
+- C3 high: Linux's RTO = SRTT + RTTVAR with RTTVAR >= rto_min (tcp.h:706-709; tcp_input.c:861-930): about 300 ms at
+  P2, not max(200 ms, 2 x RTT) = 200 ms.
+- C4 high (source) / medium (measurement on 6.18 not 6.8): a single loss in a 30 Hz stream is repaired by RACK at the
+  next segment's SACK (tcp_recovery.c:5-36, 58-112; tcp_input.c:5691-5707); measured 45/52 stalls at 33.5 ms on
+  loopback with 2 % loss.
+- C5 medium: expected stall at P2 about RTT + 33 ms = 133 ms for one-segment snapshots; E15's 200 ms is pessimistic
+  for single losses and optimistic for RTO repairs (about 300 ms, doubling) and B1 (about 1 s).
+- C6 high: tokio-tungstenite accept_* take any S: AsyncRead + AsyncWrite + Unpin (lib.rs:127-180).
+- C7 high: tungstenite reserves the frame length from the header before the payload arrives (frame/mod.rs:177-191),
+  so max_frame_size must be the catalogue's 513 B, not the 16 MiB default.
+- C8 high: tungstenite's handshake panics on a zero-byte write (handshake/machine.rs:75-76); DelayStream must return
+  Pending, never Ready(Ok(0)).
+- C9 high: read_buffer_size (128 KiB) is allocated eagerly per connection (frame/mod.rs:126).
+- C10 medium: in this container (shared 4 vCPU, not RS) no mechanism meets 0.25 ms at p99.9; even pure spin shows
+  multi-ms pauses; RS must self-measure.
+- C11 high: the ADR/plan wording "message size limit applies before buffering" cannot hold with a TCP-level wrapper
+  (ADR 0001:1463-1469); the byte budget is the memory bound.
+- Line-number corrections (re-checked by sed on the v6.8 files): TLP in net/ipv4/tcp_output.c: function at :2829,
+  "Probe timeout is 2*rtt" :2852, `timeout_us = tp->srtt_us >> 2` :2857, `+= tcp_rto_min_us(sk)` when
+  packets_out == 1 :2858-2859, else `+= TCP_TIMEOUT_MIN_US` :2860-2861, RTO cap :2867-2872, timer set :2874 (F2 said
+  2851-2865 and 2866-2871, F2b said 2856-2861: use these). RTT estimator in tcp_input.c: `tp->mdev_max_us =
+  tcp_rto_min_us(sk)` :912, `tp->rttvar_us = max(tp->mdev_us, tcp_rto_min_us(sk))` :920, function :861-927.
+- For U3's "stall count checked at P2": 60 s at 30 Hz is 1,800 one-segment writes per direction, so 2 % gives an
+  expected 36 stalls, sd sqrt(1800 x 0.02 x 0.98) = 5.9, a 3-sd band of 18-54 per direction; with the seeded fates
+  the count must also equal the fate draws' count exactly (both are logged). Bites: loss off (0 stalls -> FAIL), the
+  hold off (later bytes overtaking a lost one -> order check FAIL), and the 64 KB bound off (a flood test's queue
+  above 64 KB -> FAIL). Stall durations checked against the chosen repair rule (E15's constant, or F2b's lazy rule:
+  about 133 ms at P2 for one-segment writes).
+
+### T1. Full-run table, spinners (10,000 waits per cell; lateness in us; cpu = process cores over the cell; this container, not RS)
+```
+c_sleep_then_spin_100us	delay_ms=0.1	min=0.0	p50=0.1	p99=68.4	p99.9=798.4	max=2423.5	over_250us=52	cpu_cores=0.957
+c_sleep_then_spin_100us	delay_ms=0.5	min=0.0	p50=0.1	p99=135.6	p99.9=1550.1	max=4371.9	over_250us=38	cpu_cores=0.069
+c_sleep_then_spin_100us	delay_ms=1.0	min=0.0	p50=1.4	p99=168.8	p99.9=1242.9	max=5503.7	over_250us=63	cpu_cores=0.034
+c_sleep_then_spin_100us	delay_ms=2.0	min=0.0	p50=17.2	p99=196.2	p99.9=1813.0	max=25441.3	over_250us=91	cpu_cores=0.017
+c_sleep_then_spin_100us	delay_ms=10.0	min=0.0	p50=51.9	p99=364.9	p99.9=12492.6	max=74168.4	over_250us=150	cpu_cores=0.004
+c_sleep_then_spin_100us	delay_ms=50.0	min=0.0	p50=60.4	p99=1888.9	p99.9=7785.3	max=44600.6	over_250us=245	cpu_cores=0.001
+c2_sleep_then_spin_1ms	delay_ms=0.1	min=0.0	p50=0.1	p99=8.6	p99.9=284.2	max=2153.5	over_250us=13	cpu_cores=0.986
+c2_sleep_then_spin_1ms	delay_ms=0.5	min=0.0	p50=0.1	p99=323.0	p99.9=2980.8	max=75158.8	over_250us=112	cpu_cores=0.923
+c2_sleep_then_spin_1ms	delay_ms=1.0	min=0.0	p50=0.1	p99=267.1	p99.9=2304.5	max=64648.0	over_250us=104	cpu_cores=0.968
+c2_sleep_then_spin_1ms	delay_ms=2.0	min=0.0	p50=0.1	p99=358.6	p99.9=3819.9	max=51060.7	over_250us=126	cpu_cores=0.438
+c2_sleep_then_spin_1ms	delay_ms=10.0	min=0.0	p50=0.1	p99=426.0	p99.9=5426.2	max=59550.9	over_250us=128	cpu_cores=0.085
+c2_sleep_then_spin_1ms	delay_ms=50.0	min=0.0	p50=0.1	p99=942.6	p99.9=7818.2	max=45909.3	over_250us=175	cpu_cores=0.017
+d_release_thread_spin_then_notify_task	delay_ms=0.1	min=8.5	p50=32.8	p99=178.3	p99.9=1732.4	max=10042.4	over_250us=61	cpu_cores=0.835
+d_release_thread_spin_then_notify_task	delay_ms=0.5	min=6.9	p50=64.2	p99=308.5	p99.9=1837.0	max=5795.6	over_250us=143	cpu_cores=0.179
+```
+- Reading T1: c2's pure-spin cells (lead >= delay: 0.5 and 1 ms) still have about 1.1 % of waits more than 250 us
+  late and maxima of 65-75 ms: a spinning thread here loses the CPU for over 250 us roughly ten to twenty times a
+  second. That is the platform, not the timer. 16:45 UTC: added a `hiccup <seconds>` mode (one thread spins on
+  Instant::now() and logs every gap above 20 us: the noise floor; the same 10 s check on RS separates "the timer is
+  imprecise" from "the vCPU pauses"). Runs after the main run, alone.
+- Reading (d) so far: the cross-thread wake into a parked tokio worker adds about 30-120 us at p50 and 180-500 us at
+  p99 on top of (c), growing with the delay (a worker idle longer wakes slower). For OUTBOUND datagrams this does not
+  apply (the release thread sends itself). For INBOUND datagrams the release-to-quinn wake is an extra wake the
+  unimpaired path does not have (a real arrival already costs one epoll wake, which the base RTT includes), so the
+  inbound release precision is (d)'s, not (c)'s. The subtractable part is the median (the "recorded constant offset"
+  of F1e: release inbound entries early by the measured median wake, e.g. 50-100 us here); the tail is not. So RS's
+  self-test must measure both: release-thread lateness (outbound) and lateness seen inside the endpoint driver task
+  (inbound), i.e. cells (c) and (d) in `stream` form.
+- 16:46 UTC: stream mode gained a 7th argument (1 = hand each release batch to a task on a 4-worker tokio runtime via
+  Notify and measure lateness inside the task: the inbound path). Planned extra runs, alone after the main run:
+  hiccup 10; stream 3000 {0,100,1000} us lead, slack 1; stream 3000 0 us slack 50000 (default); stream 3000 0 1 60 50
+  (FIFO); stream 7000 100 1; stream 3000 100 1 60 0 1 (inbound/notify).
+- How DelayStream's Pending reaches WsServer's newest-only logic: tokio-tungstenite's `start_send` treats WouldBlock
+  as "the message was accepted and queued" and sets `ready = false`; `poll_ready` then flushes and stays Pending
+  until the stream takes the bytes (R/tokio-tungstenite-0.30.0/src/lib.rs:339-376, Sink impl). So WsServer
+  should call `poll_ready` before each snapshot and, while it is Pending, keep only the newest snapshot waiting
+  (ADR 0001's newest-only), never `send().await` in the tick path. One queued message sits in tungstenite's buffer
+  on top of DelayStream's 64 KB, bounded by max_write_buffer_size.
+
+### F2d. Against the advisor's U2 reading (advisor-u2.md, U2-R2 and carried C1)
+- The advisor wrote: "The first timeout max(200 ms, 2 x RTT) is conservative against QUIC's first PTO (about 155-160 ms
+  at P2) and equal to Linux's 200 ms floor at P2" and carried C1: retries back off (twice the last timeout), loss per
+  1,448 B segment (/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u2.md, U2-R2).
+- Evidence says two things differ: (1) Linux's 200 ms floor is on RTTVAR, not on the RTO: RTO = SRTT + RTTVAR with
+  RTTVAR >= 200 ms (F2: tcp.h:706-709, tcp_input.c:912, :920), so Linux's first RTO at P2 is about 300 ms, not
+  200 ms; (2) for a single loss in a 30 Hz stream the RTO is not what repairs it: RACK does, at the next segment's
+  SACK, about RTT + 33 ms = 133 ms at P2 (F2, measured on loopback in F2c: 45 of 52 stalls at 33.5 ms = gap + RTT).
+  So "max(200 ms, 2 x RTT)" sits between Linux's two paths (133 ms usual, about 300 ms with backoff for a lost
+  retransmission or a burst). C1's backoff is right and matches Linux (tcp_timer.c:654-655) and F2b's model; the
+  constant it backs off from should be SRTT + 200 ms for the RTO path if the model is meant to be Linux's.
+- For the advisor to rule: keep E15's constant (simple, documented as "between RACK and RTO"), or adopt F2b's lazy
+  RACK-TLP-RTO model in DelayStream (and in L1's stream model, for C1).
+
+### D. Design for U3 (timers, TCP model, WebSocket wrapper), as it will go in the answer
+1. `ReleaseClock` (npt-net, private module `l2::clock`): one std thread per room process, named "npt-l2-release",
+   pinned off the tick vCPU; state `Mutex<BinaryHeap<Reverse<(Instant, u64 seq, Entry)>>>` + `Condvar`; per-thread
+   `prctl(PR_SET_TIMERSLACK, 1)` (one `#[allow(unsafe_code)]` fn with a SAFETY note and a read-back test) or
+   systemd `TimerSlackNSec=1` (no unsafe); config `lead: Duration` (0, 100 us, 250 us, 1 ms). Loop:
+   `wait_timeout(head.due - lead)`; spin `while Instant::now() < head.due { spin_loop() }`; pop every due entry;
+   outbound -> `UdpSocketState::send(sock_ref, &transmit)` from this thread (quinn-udp unix.rs:207); inbound -> push
+   to the socket's ready queue, then `waker.wake_by_ref()` once per batch (quinn runtime.rs:62-68 contract).
+   Records each release's lateness (release instant - due) in a fixed-bucket histogram (no allocation per packet),
+   per direction, into the per-second records.
+2. `ImpairSocket` uses it: `poll_recv` drains the inner socket (split GRO by stride or max_receive_segments 1),
+   stamps arrival with `Instant::now()`, draws fates per peer profile, pushes inbound entries, returns due ones, else
+   stores `cx.waker()` and returns Pending; `try_send` splits GSO by segment_size (or max_transmit_segments 1),
+   draws fates, pushes outbound entries, returns Ok (bottleneck overflow = counted drop).
+3. RS self-test before each L2 block: the probe's `stream` (release-thread lateness, outbound) and `stream ... notify`
+   (task-side lateness, inbound) at the block's packet rate for 60 s, plus `hiccup 10`; header gets p50/p99/p99.9/max
+   per direction and the thread's CPU; L2 uses the smallest lead whose p99.9 - p50 <= 0.25 ms (F1e's statistic);
+   failing every lead -> back to the advisor (the carried condition) before R1.
+4. `DelayStream` (F4): `TcpStream -> DelayStream -> TlsStream (tokio-rustls, new pin) -> tokio-tungstenite`; per
+   direction FIFO `VecDeque<Seg>` with a 64 KB budget (+64 B per segment), MSS 1,448, partial writes, flush = queued,
+   Pending (never Ready(Ok(0))) at a full budget, a pump task per connection owning both TCP halves, woken by the
+   ReleaseClock at segment delivery times; per-direction counters (segments, lost = stalls, stall_ns, held, max hold)
+   and the release lateness histogram. Repair rule: a function `repair(profile, xmit, next_xmit, fate)` so the run
+   header names the model: E15's `max(200 ms, 2 x RTT)` or F2b's lazy RACK/TLP/RTO rule (recommended), with
+   retransmission fates drawn again and RTO doubling (C1).
+5. WebSocketConfig: `WebSocketConfig::default().read_buffer_size(4096).write_buffer_size(0)
+   .max_write_buffer_size(128 * 1024 + 1024).max_frame_size(Some(513)).max_message_size(Some(513))`, passed to
+   `accept_hdr_async_with_config(stream, origin_callback, Some(cfg))` (lib.rs:164-180).
+6. Tests (U3): poll_write at full budget is Pending; a 65,541 B write passes in pieces; order holds across a loss;
+   stall count at P2 within 18-54 per 1,800 segments and equal to the fate draws; inbound budget stops reading
+   (flood test, RSS flat); bites as in the stall-count note.
+- (d) at 10 ms: p50 176 us, p99 834 us, 11 % above 250 us: the inbound wake gets slower as the worker idles longer.
+  If RS shows the same shape, the inbound path cannot meet 0.25 ms at p99.9 by waking a parked worker; the fallback is
+  to wake the task early (due - W) and let ImpairSocket's poll_recv spin to the due time when it is less than W away
+  (a bounded spin on a tokio worker: CPU about rate x W; at 3,000/s and W = 300 us about 0.9 core: costly). Decide on
+  RS's numbers, not these.
+- The release thread can send without tokio: `UdpSockRef` is "constructible via `From<T: AsFd>`"
+  (R/quinn-udp-0.5.16/src/lib.rs:185-197), so `state.send((&std_socket).into(), &transmit)` works from a plain
+  thread on a `std::net::UdpSocket` (or a dup of the tokio socket's fd); on EAGAIN (send buffer full) the thread
+  retries at its next pass and counts it.
+- RFC 6298 for comparison (https://www.rfc-editor.org/rfc/rfc6298.txt): "RTO <- SRTT + max (G, K*RTTVAR)" (line 155),
+  "(2.4) Whenever RTO is computed, if it is less than 1 second, then the RTO SHOULD be rounded up to 1 second"
+  (157-158), "(5.5) The host MUST set RTO <- RTO * 2" (261). Linux keeps the SRTT + variance shape but replaces the
+  1 s floor by a 200 ms floor on the variance term (F2), so its minimum RTO is SRTT + 200 ms.
+- 6.8 vs master RACK: lines 1-112 of net/ipv4/tcp_recovery.c (reo_wnd, skb timeout, detect_loss, mark_lost) are
+  identical except one comment (draft-ietf-tcpm-rack-01 -> RFC8985); master moved tcp_rack_advance and
+  tcp_rack_update_reo_wnd out of this file (diff of the two downloads). So the container's 6.18 measurement (F2c)
+  exercises the same RACK detection code as 6.8 (medium confidence: callers elsewhere not diffed).
+- 16:49 UTC: sleepers mode gained a selector (`sleepers <n> a|b|b1`). Plan to save session time: when the
+  wrapper starts its sequential `sleepers 10000` (cell (a) first), start `sleepers 10000 b` and `sleepers 10000 b1`
+  as two more background processes at once, and stop the wrapper's process after its (a) 50 ms line. So (a), (b) and
+  (b1) run CONCURRENTLY in three processes (each one sleeping thread; measured CPU of these cells 0.001-0.08 core):
+  disclosed with the numbers. F4's "task resumes 30-250 us later" is superseded by T1's (d) rows (p50 33-176 us,
+  p99 178-834 us).
+- Why the wake path's latency grows with idle time on a VM, and what to read on RS: a halted vCPU must be woken by
+  the host (IPI, VM entry); guest halt polling ("The cpuidle_haltpoll driver, with the haltpoll governor, allows the
+  guest vcpus to poll for a specified amount of time before halting", which avoids the IPI and "The VM-exit cost";
+  guest_halt_poll_ns default 200000: https://raw.githubusercontent.com/torvalds/linux/master/Documentation/virt/guest-halt-polling.rst:5-15, :33-38)
+  hides it for idles under 200 us. This container reports cpuidle driver "none" (so no guest polling). On RS read
+  `/sys/devices/system/cpu/cpuidle/current_driver` (haltpoll or not), `uname -r`, the clocksource, `/proc/self/timerslack_ns`,
+  and CONFIG_HZ, and run `hiccup 10` and the `stream` cells: those decide the lead and whether inbound meets 0.25 ms.
+- The Origin check plugs into the same call: `Callback` is implemented for any
+  `FnOnce(&Request, Response) -> Result<Response, ErrorResponse>` (R/tungstenite-0.30.0/src/handshake/server.rs:173-189),
+  so `accept_hdr_async_with_config(delay_tls_stream, |req, resp| origin_ok(req).then_some(resp).ok_or(forbidden()),
+  Some(cfg))` (shape only), with the refusal counted by reason.
+- RS's CPU, per Hetzner's FAQ (https://docs.hetzner.com/cloud/servers/faq, fetched 2026-11-06): "Plans (CCX) with
+  dedicated resources have their CPU resources exclusively. Here one vCPU equals one thread of a physical CPU core."
+  So RS's 4 vCPU are 4 hyper-threads held exclusively: no co-tenant steals the thread, but the sibling thread of each
+  core may be busy (unconfirmed whose), and host interrupts still land. Better than this container's shared vCPU;
+  not a guarantee of sub-0.25 ms tails, hence the self-test.
+- Permission for the slack on RS (answers the sibling scout's open point "Whether RS's kernel lets a thread lower its
+  own slack without CAP_SYS_NICE"): yes. At v6.8, `case PR_SET_TIMERSLACK:` sets `current->timer_slack_ns = arg2`
+  with no capability check (https://raw.githubusercontent.com/torvalds/linux/v6.8/kernel/sys.c:2547-2552); only
+  writing ANOTHER task's /proc/<pid>/timerslack_ns needs CAP_SYS_NICE (`if (p != current) { ... ns_capable(...,
+  CAP_SYS_NICE)`, fs/proc/base.c:2539, :2555-2559 at v6.8). /proc/thread-self/timerslack_ns does not exist (the sibling
+  saw it absent; my probe read it empty), so per-thread slack is prctl only.
+- Statistic: the sibling proposes p99 <= 0.25 ms (u3-scout-wt.md, Open questions 1); F1e derives p99.9 (minus a
+  recorded constant offset) from -3's p99.9 band as the advisor ruled it. Both go to the advisor; F1e's is the one the
+  mark actually tests.
+- Newer kernels treat real-time threads differently: master's `case PR_SET_TIMERSLACK: if (rt_or_dl_task_policy(current))
+  break;` (https://raw.githubusercontent.com/torvalds/linux/master/kernel/sys.c:2649-2651): an RT thread's slack is
+  managed by the kernel (zero for RT, per the upstream change; not traced here) and prctl is ignored. 6.8 has no such
+  check (v6.8 kernel/sys.c:2547-2552). So on RS, for a SCHED_FIFO release thread, set the slack explicitly on 6.8.
+- Release rate on RS for the CPU estimate (my arithmetic, not measured): per client about 30 input datagrams up and
+  30 snapshot datagrams down per second (catalogue rows Input and Snapshot: 1 per tick at 30 Hz), plus QUIC ACK-only
+  packets (DATAGRAM frames are ack-eliciting; quinn's ACK frequency not read here: say 10-20/s each way) and pings:
+  roughly 80-100 packets/s per client, about 4,000-5,000 releases/s for 48 clients. Hence the stream cells at 3,000
+  and 7,000/s.
+
+### Q. Open questions (for the main session and the advisor)
+1. The 0.25 ms statistic: p99.9 of release lateness minus a recorded constant offset (F1e, from -3's p99.9 band),
+   or p99 (the sibling scout's proposal)? And separately for outbound (release thread) and inbound (task-side)?
+2. E15/R-25's repair constant max(200 ms, 2 x RTT): keep it (documented as between Linux's RACK repair, about
+   RTT + 33 ms, and its RTO, SRTT + 200 ms doubling), or adopt the lazy RACK/TLP/RTO model (F2b) in DelayStream and
+   L1? B1 needs the retransmission-in-burst rule either way (with C1's backoff).
+3. ADR 0001:1463-1469 / plan §4.4 / catalogue :53-55, "the message size limit applies before buffering": with a
+   TCP-level wrapper below TLS, read it as "before any allocation the client sizes; the wrapper's buffer is a fixed,
+   counted byte budget"? Or move the wrapper above tungstenite (loses per-segment realism)?
+4. tokio-rustls is not pinned and not in the local registry: which version, fetched when (U3 or U6)?
+5. RS facts to read before R1: kernel (6.8 GA or HWE), CONFIG_HZ, cpuidle driver (haltpoll?), clocksource, and the
+   probe's `hiccup`/`stream` results: they decide the spin lead and whether inbound meets the bar.
+6. If a spin lead is needed on RS, the release thread costs up to about rate x lead of one I/O vCPU (measured below
+   for 3,000 and 7,000/s); is that acceptable against the CPU marks, recorded in the header?
