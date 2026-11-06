@@ -73,9 +73,9 @@ session work. A share of another spike is sized as the part it adds.
   an address: each run records the day's addresses with its results, and makes the settings bound to them, and its check
   of the new SSH host keys, on that day (ADR 0006's key; the advisor's reading, 2026-11-03). With FIXED-IP (a) (Mustafa,
   2026-11-06), the two kept Primary IPv4s may be written into the run files, and the DNS record is set once (the
-  advisor's reading, 2026-11-06). ROUTE (Mustafa, 2026-11-06): the hands-on server work runs through cloud-init at
-  creation and Claude Code on his laptop over SSH, with a key made on the laptop; this cloud session cannot reach the
-  servers over SSH.
+  advisor's reading, 2026-11-06). ROUTE (Mustafa, 2026-11-06): (a), the hybrid: cloud-init builds each VM, and Claude
+  Code on his laptop runs the sessions over SSH, with a key made there, a fixed settings file of its own, and his
+  prompts as the last wall; this cloud session cannot reach the servers over SSH.
 - **Network profiles** P0–P4 and the two link-simulator layers L1 and L2: ADR 0001 part 13 (profiles) and ADR 0002 (the
   simulator's design, R5-TEST-REC4). The netcode proof test builds them first, throwaway.
 - **Recorded matches** and per-tick state hashes: ADR 0004 (the sim core spike makes the first ones); until one exists,
