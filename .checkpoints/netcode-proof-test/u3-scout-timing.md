@@ -264,3 +264,118 @@ const MSS: usize = 1_448; const SEG_OVERHEAD: usize = 64; const DIR_BUDGET: usiz
   calibration to record, not a guarantee. Prefer (b) if ImpairSocket's release thread is built anyway.
 - **Arrival stamps for the room:** WsServer should stamp `Recv.arrival` with the segment's release time (when
   DelayStream made the bytes readable), not with the decode time, so -47/-50's clock samples see the emulated path.
+
+### F1c. Probe progress notes
+- 16:33 UTC: probe gained a `stream <rate> <lead_us> <slack_ns> <seconds>` mode (ImpairSocket's shape: a producer at
+  Poisson rate, dues 25-75 ms ahead, one release thread on a heap+condvar, sleep to due-lead with the given timer
+  slack, spin to due; lateness per release and the release thread's own CPU from RUSAGE_THREAD). Rebuilt while the
+  spinners run was in its (c) 50 ms cell (one ~1 s compile on one core; the running process kept its old binary).
+  To run after the main run, alone: rates 3000/s and 7000/s, leads 0 / 100 / 1000 us, slack 1 ns, 60 s each.
+- Context for the 0.25 ms bar: quinn's own timers (loss detection, pacing, idle) are tokio sleeps,
+  `Box::pin(sleep_until(t.into()))` (R/quinn-0.11.12/src/runtime/tokio.rs:22-23), so they carry F1a's 0-2 ms
+  lateness on both the impaired and the unimpaired path; ImpairSocket's precision is about the delay it ADDS, which the
+  base-RTT subtraction cannot remove.
+- How a release thread wakes quinn (R/quinn-0.11.12/src/runtime.rs:42-68: `poll_recv(&self, cx, bufs, meta)`
+  "Receive UDP datagrams, or register to be woken if receiving may succeed in the future"): ImpairSocket's poll_recv
+  drains the inner socket into its heap (stamping arrival on RS's clock; splitting GRO batches by `meta.stride`, as
+  quinn itself does at R/quinn-0.11.12/src/endpoint.rs:798-800, or reporting `max_receive_segments() == 1`,
+  runtime.rs:77-80), copies out what is due, and otherwise stores `cx.waker()` with the head's due time in the
+  release thread's slot and returns Pending (the inner socket's own Pending has registered the same waker for new
+  arrivals). The release thread calls `waker.wake_by_ref()` at the due time; tokio schedules quinn's endpoint driver
+  from outside the runtime (inject queue + unpark of a parked worker). On the send side the release thread can send
+  itself at the due time through `quinn_udp::UdpSocketState::send(&self, UdpSockRef, &Transmit)`
+  (R/quinn-udp-0.5.16/src/unix.rs:207), splitting GSO transmits by `segment_size` (R/quinn-udp-0.5.16/src/lib.rs:137-144)
+  or reporting `max_transmit_segments() == 1` (runtime.rs:73-75), so outbound release needs no task wake at all;
+  `try_send` returns Ok after queuing (a bottleneck drops, it never pushes back: R-17's queue depth overflow is a
+  counted loss, not WouldBlock).
+
+### F2b. Refinements to F2
+- At v6.8 RACK "subsumes and disables RFC6675 recovery for SACK connections" (L68
+  Documentation/networking/ip-sysctl.rst:629-643, default 0x1); classic three-duplicate-ACK fast retransmit survives
+  only as RACK's dupthresh heuristic (reo_wnd = 0 once 3 segments are SACKed: tcp_recovery.c:16-19). For a 30 Hz
+  stream of one-segment snapshots (the 256 kbps cap is about 1,067 B per 33 ms interval: catalogue row `Snapshot`,
+  so most WebSocket snapshots and every input fit one 1,448 B segment), three later segments would take 3 x 33 ms, so
+  RACK's one-segment path (reo_wnd about 20 ms < 33 ms gap) always wins: stall about RTT + 33 ms (133 ms at P2).
+  Curiously, the old dupthresh rule would give RTT + 3 x 33 = 200 ms at P2, which is E15's number; it is not what
+  6.8 does.
+- min_rtt is a windowed minimum (`tcp_min_rtt_wlen`, seconds: L68 ip-sysctl.rst:570-577), so reo_wnd = min_rtt/4 uses
+  the lowest RTT seen, about (RTT - jitter)/4 (P2: about 20 ms).
+- **A model DelayStream can compute (lazy repair):** when segment k is drawn lost, leave its delivery open; when the
+  next segment k+1 is enqueued at t_next (same direction), set
+  `retx_at = max(xmit_k + rtt + reo_wnd + 2 ms, t_next + rtt)` and `delivery_k = retx_at + one_way_draw()`; if no
+  next segment comes before `xmit_k + pto` (pto = 2 x srtt + 2 ms, or 2 x srtt + 200 ms with one segment in flight:
+  tcp_output.c:2856-2861), use the tail-loss probe: `retx_at = xmit_k + pto`; the retransmission draws its own fate
+  (2 % at P2; 100 % inside a B1 burst) and, if lost again, is repaired by the same rule if later data flows, else by
+  the RTO = srtt + max(rttvar, 200 ms) doubling per expiry (tcp_timer.c:654-655). Here rtt = the profile's round trip
+  (L2 knows it), srtt about the profile RTT, reo_wnd = (profile RTT - jitter)/4. Later segments keep E15's
+  `delivery = max(previous delivery, own time)`. This keeps E15's shape (per-segment fates, in-order hold, a stall
+  count) and replaces only the constant. If the main session keeps E15's constant instead, the run header should say
+  "pessimistic by about 65-120 ms per single loss on P1-P4, optimistic by about 1 s after a B1 burst".
+
+### F1d. Interim reading of the full run (cells done so far; this container, not RS)
+- Even a pure spin (cells where the lead covers the whole delay: c 0.1 ms, c2 0.1/0.5/1 ms) shows p99 8-323 us,
+  p99.9 0.3-3 ms and maxima of 2-75 ms: the vCPU itself is taken away (host preemption or guest scheduling; /proc/stat
+  steal read 0.1-0.6 % over 5-10 s windows, so the guest's steal accounting under-reports it or the pauses are rare
+  and long). No user-space mechanism can meet 0.25 ms at p99.9 on this machine; the container can only rank the
+  mechanisms, and RS must be measured (dedicated vCPU, no co-tenant on the core: expected far quieter, unconfirmed).
+- F3 addendum: after the handshake a zero-length write is not a panic but a dropped connection
+  (`if len == 0 { return Err(..ConnectionReset, "Connection reset while sending"..) }`,
+  R/tungstenite-0.30.0/src/protocol/frame/mod.rs:277-286). Handshake: panic (machine.rs:76); data phase: reset. Same
+  rule for DelayStream either way: Pending, never Ready(Ok(0)), when the budget is full. A unit test for it: fill the
+  64 KB budget, then poll_write once more and assert Pending.
+
+### F1e. Which statistic the 0.25 ms bar is about (read from the advisor's U1 ruling)
+- The advisor's Q10 ruling: "-3's ... p0.1 and p99.9 replace min and max for the jitter's ends (targets d - a and
+  d + a, band 5 % of a ...). U3 measures ImpairSocket's release precision; worse than 0.25 ms (5 % of P1's half
+  jitter) goes back to the advisor before R1" (/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u1.md:89-92;
+  the issue at :53-54). So the delivered one-way delay is uniform(d - a, d + a) + lateness L, and its p99.9 must sit
+  within d + a +- 0.05a (0.25 ms at P1, a = 5 ms). Since the uniform part never exceeds d + a, the upper end holds if
+  P(L - L0 > 0.25 ms) < 0.1 %, where L0 is a constant offset the impairer may subtract (its measured median lateness);
+  the lower end (p0.1) is loose (at P1 the bottom 0.15 ms of the uniform already holds 1.5 % of packets). **The bar is
+  therefore release lateness p99.9 (minus a recorded constant offset) <= 0.25 ms, measured on RS at the run's packet
+  rate; tails beyond p99.9 do not move -3 (min and max are only reported).**
+- Cross-check with the sibling scout's note u3-scout-wt.md F3.8 ("late by 0 to 1 ms plus the wake-up"): tokio's
+  lateness is 0 to about 2 ms, not 1 (the deadline is rounded up to its ms, and the park adds whole ms that epoll
+  rounds up again: F1a); the smoke run's 0.1 ms cell had min 0.93 ms, p99 2.09 ms, max 2.60 ms.
+- 16:36 UTC: `ps` shows only this probe running (the sibling scout's notes describe its own timer probe, run 1 done,
+  run 2 planned; if both run at once the numbers interfere: each later check records ps).
+
+### R. Recommendation for ImpairSocket's release (draft; numbers filled when the run ends)
+- **Mechanism:** one dedicated OS thread per room process ("ReleaseClock"), not tokio's timer. It owns a binary heap
+  of (due, kind, index) for both directions, a Condvar for "new earlier entry", `prctl(PR_SET_TIMERSLACK, 1)` on itself
+  (per-thread, verified: PR_GET_TIMERSLACK read back 1), and a configurable spin lead L (0 = pure hrtimer wait).
+  Loop: wait_timeout until (head.due - L) or a new earlier head; spin on `Instant::now()` to head.due; then release
+  every entry with due <= now: outbound entries are sent from this thread (`UdpSocketState::send`), inbound entries
+  are moved to a ready queue and quinn's stored waker is woken (`wake_by_ref`), once per batch.
+- **Pinned** to the I/O vCPUs, never the tick thread's vCPU (E2: "the tick thread alone on one vCPU").
+- **Choice of L on RS by measurement, not here:** a 60 s self-test at each L2 block's start (the probe's `stream` mode
+  at the run's packet rate) records p50/p99/p99.9/max lateness and the thread's CPU into the run header; L2 uses the
+  smallest L whose p99.9 (minus the recorded median offset) <= 0.25 ms; if even the largest L tested misses it, that
+  is the advisor's carried-forward condition (back before R1).
+- **CPU:** spin cost is about (releases per second) x (L + spin overshoot), capped at one core; the stream cells
+  below give the measured figure at 3,000 and 7,000 releases/s.
+- The wake path from a non-runtime thread (cell (d)): `// Otherwise, use the inject queue.` then
+  `self.push_remote_task(task); self.notify_parked_remote();` (R/tokio-1.54.1/src/runtime/scheduler/multi_thread/worker.rs:1372-1375);
+  a worker parked on the I/O driver is woken through mio's waker (`self.waker.wake().expect("failed to wake I/O
+  driver")`, R/tokio-1.54.1/src/runtime/io/driver.rs:277-280), i.e. an eventfd write and an epoll return: one extra
+  thread wake per release batch, which cell (d) measures on top of (c).
+- Per-connection outbound memory with DelayStream below TLS: tungstenite's write buffer (max 128 KB + 1 frame, F3)
+  + rustls's `sendable_tls` (64 KiB default: `DEFAULT_BUFFER_LIMIT: usize = 64 * 1024`,
+  R/rustls-0.23.46/src/common_state.rs:1136, used at :88 and conn.rs:846) + DelayStream's 64 KB + the kernel's send
+  buffer. All bounded; rustls's limit is already the same 64 KiB as E15's bound.
+- Safety cost of the release thread's knobs: std has no timer-slack or per-thread affinity call, and the local registry
+  has no nix or rustix (only libc-0.2.191, already in Cargo.lock:690-691 transitively). So `PR_SET_TIMERSLACK` (and a
+  per-thread `sched_setaffinity`, if used) is one `unsafe { libc::prctl(..) }` in npt-net, against the workspace's
+  `unsafe_code = "deny"` (spikes/netcode-proof/Cargo.toml, [workspace.lints.rust]): it needs an item-level
+  `#[allow(unsafe_code)]`, a SAFETY comment (integer arguments only, no pointers, return checked) and a test that reads
+  PR_GET_TIMERSLACK back. Process-wide alternatives with no unsafe: systemd's `TimerSlackNSec=` and `CPUAffinity=`
+  in the room's unit (systemd.exec(5); unconfirmed here, not read). Whether slack 1 ns is worth it at all: compare
+  cells b and b1 below.
+- Hetzner's ubuntu-24.04 image kernel: not found by search (web search 2026-11-06 found only other clouds'
+  6.8.0-5x-generic); read `uname -r` on RS.
+- Checked: systemd's `TimerSlackNSec=` "Sets the timer slack in nanoseconds for the executed processes"
+  (https://raw.githubusercontent.com/systemd/systemd/main/man/systemd.exec.xml:1325-1330), and a new thread inherits its
+  creator's current slack (measured here with python3 ctypes prctl: main 50000 -> set 1 -> a new thread reads 1). So
+  `TimerSlackNSec=1` in the room's unit gives every thread (tokio workers included) 1 ns slack with no unsafe code;
+  the per-thread prctl is only needed to confine it to the release thread. Since tokio's waits are whole-ms epoll
+  timeouts, a 1 ns slack elsewhere costs little (more precise but not more frequent wakes; unmeasured).

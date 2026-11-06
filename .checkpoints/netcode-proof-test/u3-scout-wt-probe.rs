@@ -67,6 +67,12 @@ impl ImpairSocket {
     // The dedicated release clock: outbound datagrams go to the wire at their due time; quinn is woken when the head
     // of the inbound queue is due.
     fn clock_loop(self: Arc<Self>) {
+        let mode = std::env::var("IMPAIR_MODE").unwrap_or_default();
+        if mode.contains("slack") {
+            let r = std::fs::write("/proc/thread-self/timerslack_ns", "1");
+            println!("clock thread: timerslack_ns=1 -> {:?}; now {:?}", r.is_ok(), std::fs::read_to_string("/proc/thread-self/timerslack_ns").ok());
+        }
+        let spin = mode.contains("spin");
         let mut g = self.sh.lock().unwrap();
         loop {
             if g.stop {
@@ -108,7 +114,21 @@ impl ImpairSocket {
                 }
             }
             g = match next {
-                Some(t) => self.cv.wait_timeout(g, t.saturating_duration_since(Instant::now())).unwrap().0,
+                Some(t) => {
+                    let now = Instant::now();
+                    let tail = Duration::from_micros(200);
+                    if spin && t.saturating_duration_since(now) <= tail {
+                        drop(g);
+                        while Instant::now() < t {
+                            std::hint::spin_loop();
+                        }
+                        self.sh.lock().unwrap()
+                    } else if spin {
+                        self.cv.wait_timeout(g, t.saturating_duration_since(now) - tail).unwrap().0
+                    } else {
+                        self.cv.wait_timeout(g, t.saturating_duration_since(now)).unwrap().0
+                    }
+                }
                 None => self.cv.wait(g).unwrap(),
             };
         }
@@ -250,7 +270,11 @@ async fn timer_bench() {
         tk.push(Instant::now().saturating_duration_since(due).as_nanos() as u64);
     }
     report("tokio sleep_until lateness", &mut tk);
-    let th = std::thread::spawn(|| {
+    let slack = std::env::var("IMPAIR_MODE").unwrap_or_default().contains("slack");
+    let th = std::thread::spawn(move || {
+        if slack {
+            let _ = std::fs::write("/proc/thread-self/timerslack_ns", "1");
+        }
         let m = Mutex::new(());
         let cv = Condvar::new();
         let mut v = Vec::new();
@@ -416,8 +440,13 @@ use url as url_crate;
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 4)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("IMPAIR_MODE={:?}; default timerslack_ns of main thread: {:?}", std::env::var("IMPAIR_MODE").unwrap_or_default(), std::fs::read_to_string("/proc/thread-self/timerslack_ns").ok());
     timer_bench().await;
     raw_probe().await?;
+    if std::env::var("SKIP_ROUTES").is_ok() {
+        println!("PROBE DONE (routes skipped)");
+        return Ok(());
+    }
     let identity = wtransport::Identity::self_signed(["localhost", "127.0.0.1"]).unwrap();
     let hash = identity.certificate_chain().as_slice()[0].hash();
     let cfg_src = wtransport::ServerConfig::builder()
