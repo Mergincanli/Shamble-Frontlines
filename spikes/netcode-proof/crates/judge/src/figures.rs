@@ -5,10 +5,20 @@
 use crate::eval::{Missing, Run};
 use crate::ratio::Ratio;
 use npt_log::Phase;
+use serde_json::Value;
+
+/// Why a figure has no value.
+pub enum Lack {
+    /// A gap in the record: the run is INVALID (README §2.3).
+    Gap(String),
+    /// A run the figure compares with is not in the set yet: the part is NOT-RUN, as for a missing `against`
+    /// reference (README §2.3).
+    Waiting(String),
+}
 
 /// PM-0001-2: the least share, over client slots, of measured ticks on which that slot's snapshot held every other
 /// soldier (`tick.s.everyone_in_view`, one 0/1 per slot, in slot order).
-fn everyone_in_view_min_share(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, String> {
+fn everyone_in_view_min_share(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
     let mut seen: Vec<i128> = Vec::new();
     let mut ticks: i128 = 0;
     for log in &run.logs {
@@ -20,10 +30,10 @@ fn everyone_in_view_min_share(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio,
                 seen = vec![0; flags.len()];
             }
             if flags.len() != seen.len() {
-                return Err(format!(
+                return Err(Lack::Gap(format!(
                     "run {}: tick {} changes the slot count of everyone_in_view",
                     run.id, t.t
-                ));
+                )));
             }
             for (s, f) in seen.iter_mut().zip(flags) {
                 *s += i128::from(*f == 1);
@@ -32,17 +42,100 @@ fn everyone_in_view_min_share(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio,
         }
     }
     if ticks == 0 || seen.is_empty() {
-        return Err(format!(
+        return Err(Lack::Gap(format!(
             "run {}: no values for tick.s.everyone_in_view",
             run.id
-        ));
+        )));
     }
     let least = seen.iter().copied().min().unwrap_or(0);
     Ok(Ratio::new(least, ticks))
 }
 
-/// A figure's computation: the run under judgement and every run of its set. An `Err` is a gap in the record.
-pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, String>;
+/// One header param of a run: the single value its logs give it (`None` if no log has it), or a gap if two logs
+/// disagree.
+fn run_param<'r>(run: &'r Run<'_>, name: &str) -> Result<Option<&'r Value>, Lack> {
+    let mut found: Option<&Value> = None;
+    for log in &run.logs {
+        if let Some(v) = log.header.params.get(name) {
+            match found {
+                Some(f) if f != v => {
+                    return Err(Lack::Gap(format!(
+                        "run {}: its logs disagree on params.{name}",
+                        run.id
+                    )));
+                }
+                _ => found = Some(v),
+            }
+        }
+    }
+    Ok(found)
+}
+
+/// A run's `params.fate_log_sha256`: 64 lowercase hex digits, or a gap.
+fn fate_log_hash<'r>(run: &'r Run<'_>) -> Result<&'r str, Lack> {
+    let hash = run_param(run, "fate_log_sha256")?.and_then(Value::as_str);
+    match hash {
+        Some(h)
+            if h.len() == 64
+                && h.bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) =>
+        {
+            Ok(h)
+        }
+        _ => Err(Lack::Gap(format!(
+            "run {}: params.fate_log_sha256 is missing or not 64 lowercase hex digits",
+            run.id
+        ))),
+    }
+}
+
+/// PM-0001-3 ("on L1, the same seed and profile give an identical packet-fate log on two runs"): 1 when the run's
+/// `params.fate_log_sha256` equals its twin's, 0 when they differ. The twin is the run of the same set named in
+/// `params.twin`, with role `twin` and the same layer, profile, seed and bite (a bite run's twin runs the same bite).
+/// A run that names no twin, a twin that is not one or differs in those fields, and a missing hash are gaps; a twin not
+/// in the set yet leaves the check NOT-RUN.
+fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+    let Some(name) = run_param(run, "twin")?.and_then(Value::as_str) else {
+        return Err(Lack::Gap(format!(
+            "run {}: params.twin names no twin run",
+            run.id
+        )));
+    };
+    let own = fate_log_hash(run)?;
+    let Some(twin) = set.iter().find(|r| r.id == name) else {
+        return Err(Lack::Waiting(format!(
+            "run {}: its twin {name} is not in set {} yet",
+            run.id, run.set
+        )));
+    };
+    if twin.role != "twin" {
+        return Err(Lack::Gap(format!(
+            "run {}: {name} has role {}, not twin",
+            run.id, twin.role
+        )));
+    }
+    let (Some(a), Some(b)) = (run.logs.first(), twin.logs.first()) else {
+        return Err(Lack::Gap(format!("run {}: a run without a log", run.id)));
+    };
+    let (a, b) = (&a.header, &b.header);
+    for (field, same) in [
+        ("layer", a.layer == b.layer),
+        ("profile", a.profile == b.profile),
+        ("seed", a.seed == b.seed),
+        ("bite", run.bite == twin.bite),
+    ] {
+        if !same {
+            return Err(Lack::Gap(format!(
+                "run {}: its twin {name} has another {field}",
+                run.id
+            )));
+        }
+    }
+    Ok(Ratio::int(i128::from(own == fate_log_hash(twin)?)))
+}
+
+/// A figure's computation: the run under judgement and every run of its set.
+pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack>;
 
 /// One listed figure.
 pub struct Figure {
@@ -67,11 +160,12 @@ const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> 
 /// The list: every figure `marks.json` names (`marks/SERIES.md` gives each one's formula, inputs and draft words).
 /// Each is built in the unit that first produces its inputs; until then its check or report is NOT-RUN.
 pub const FIGURES: &[Figure] = &[
-    planned(
-        "fate_log_twin_equal",
-        "U2",
-        "the same seed gives the same packet-fate log (PM-0001-3)",
-    ),
+    Figure {
+        name: "fate_log_twin_equal",
+        compute: Some(fate_log_twin_equal),
+        unit: "U2",
+        what: "the same seed gives the same packet-fate log (PM-0001-3)",
+    },
     Figure {
         name: "everyone_in_view_min_share",
         compute: Some(everyone_in_view_min_share),
@@ -264,7 +358,10 @@ pub(crate) fn compute(name: &str, run: &Run<'_>, set: &[&Run<'_>]) -> Result<Rat
     match FIGURES.iter().find(|f| f.name == name) {
         Some(Figure {
             compute: Some(f), ..
-        }) => f(run, set).map_err(Missing::Gap),
+        }) => f(run, set).map_err(|lack| match lack {
+            Lack::Gap(why) => Missing::Gap(why),
+            Lack::Waiting(why) => Missing::NotBuilt(why),
+        }),
         Some(Figure { unit, .. }) => Err(Missing::NotBuilt(format!(
             "figure {name} is not built yet ({unit})"
         ))),
