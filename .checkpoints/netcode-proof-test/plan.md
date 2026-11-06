@@ -338,6 +338,9 @@ legs run there anyway (SPIKE_PLAN:59-60). His PC stays for what he judges in Bra
 spikes/netcode-proof/
   README.md, rust-toolchain.toml ("1.99.1"; clippy, rustfmt; target wasm32-unknown-unknown)
   Cargo.toml, Cargo.lock, deny.toml     one workspace, resolver 3, edition 2024, every build --locked
+  rustfmt.toml      ADR 0002 part 7's stable options; .cargo/config.toml (builds under .gate/) and .gitignore
+  crates/*/clippy.toml  the determinism and clock bans (§4.5), per crate
+  check.mjs, check.test.mjs  the test command (§12.4) and its own tests (the advisor's C9)
   crates/link/      npt-link: the thin transport interface (poll-based) and its Loopback backend; no dependencies
   crates/l1/        npt-l1: L1 on simulated time (implements Link): profiles, fate log, per-stream reorder step
   crates/sim/       npt-sim: the stand-in sim behind the seam (§4.6); no I/O, clock, transport or bot logic
@@ -357,16 +360,19 @@ spikes/netcode-proof/
   crates/super/     npt-super: the supervisor stand-in (process control, exit log, SIGKILL)
   crates/host/      npt-host: the page host and the ACME client
   crates/log/       npt-log: results-log record types and the JSON Lines writer (serde only)
-  crates/judge/     npt-judge: npt-log + marks.json -> one verdict per mark
+  crates/judge/     npt-judge: npt-log + marks.json -> one verdict per mark; tests/ (engine, fixtures, cli) and
+                    fixtures/ (fixed results logs judged with the real marks.json)
+  crates/proto/tests/catalogue.rs  the message catalogue's class audit test
   crates/lab/       npt-lab: the L1 scenario runner (simulated clock, step order, 48 headless clients, seeds),
                     the x86-64 re-decode and replay tool, the native-against-Wasm hash comparer
   fuzz/             cargo-fuzz targets, one per message type
   web/              the client harness: TypeScript, Vite, three.js (exact pins): main.ts, host.ts, net.ts,
                     block.ts, render.ts, overlay.ts, record.ts, smoke.ts, connect.ts; wdio/*.spec.ts
-  marks/marks.json  every mark as data: id, statistic, threshold, window, validity, the draft line
+  marks/marks.json  every mark as data: id, statistic, threshold, window, validity, the draft line; marks/README.md
+                    (the contract between the results log, marks.json and the judge) and marks/SERIES.md (the names)
   ops/              cloud-init/ (rs.yaml, lg.yaml), firewall/ (rs.txt, lg.txt, each rule per IPv4/IPv6),
-                    runs/ (R1.md … R7.md), operator/ (settings.json, rules.md, PROMPT-Rn.md, redact-check),
-                    checklists/ (netcode.md, operations.md)
+                    runs/ (R1.md … R7.md), operator/ (settings.json, rules.md, PROMPT-Rn.md, redact-check.mjs and
+                    redact-check.test.mjs), checklists/ (netcode.md, operations.md)
   results/          committed verdicts and redacted summaries per run, never raw data
 docs/design/netcode-proof-messages.md   the message catalogue (ADR 0001:654-678's subset + controls): every
                     type with its channel, visibility class (the draft's Class column), authority and size limit;
@@ -382,8 +388,13 @@ fall under `.claude/rules/netcode.md`.
 - **The client:** npt-client never depends on npt-net; the bots get transports by composing npt-client with npt-net.
 - **npt-super** depends on no npt-sim, npt-room or npt-proto. **npt-host** depends on none of the sim, room, proto or
   client crates.
-- **npt-judge** depends only on npt-log, plus serde. Nothing depends on npt-lab.
+- **npt-judge** depends only on npt-log, plus serde ("serde" here and in §4.1 means serde and serde_json). Nothing
+  depends on npt-lab.
+- **How they are read** (the advisor's C10): with every feature and every target; dev dependencies do not count (they
+  never ship), except for "nothing depends on npt-lab", which counts every kind.
 - **No reference into `spikes/`** from outside it: a grep in the test command, until the foundation's G5 and G8 exist.
+  It skips docs/, .checkpoints/ and Markdown, whose prose may name the folder; W-PR's workflow file, which runs the
+  Safari leg, gets an exception that names it by path, in the same change (C11).
 - **Narrow public surfaces:** each crate's public items are those in §4.7; everything else is `pub(crate)`.
 
 ### 4.3 Components, each traced to the marks that need it (netcode digest E gives each one's design part)
@@ -391,10 +402,10 @@ fall under `.claude/rules/netcode.md`.
 |---|---|---|---|
 | E1 | Stand-in sim, native and Wasm: movement and hitscan; its soldiers driven by protocol clients (npt-bots), with no bot logic in npt-sim; the stress scene's counts (48 soldiers in 3 × 16; 15 big vehicles, 4 of at least 20 parts; 300 live projectiles as trajectory records through one shared function; S1's stand-ins as data behind the seam, §4.6); a DM_Tri-sized greybox with enterable buildings, areas, portals, doors at 1/s, and a destructible-wall stand-in (R-10); the target and correction courses; the authority-only spread stream; a per-tick state hash | sim | -2, -4, -5, -17, -30, -41 to -62 |
 | E2 | The room process: the tick thread alone on one vCPU, async I/O on the others, bounded channels only; `panic = "unwind"` for npt-server's builds (the Wasm build keeps the target's abort), a top-level catch → RoomEnded(crash), a crash record, a non-zero exit; per-phase timers and counters; the S17 loop through `due_ticks` (§4.6) | server | -1, -4 to -11, -15, -16, -26, -59; PM-0004-67 |
-| E3 | Commands: Input datagrams (tick, sequence, move, buttons, press counters, aim ≤ 80 bits, view time, newest-decoded ack), redundancy up to 8, U2 delta repeats; the checks of §4.4; the input buffer; **both OQ-0001-6 options, switchable**; the late-command counter | proto, room | -13, -20, -21, -30, -49, -56, -58 |
+| E3 | Commands: Input datagrams (tick, sequence, move, buttons, press counters, aim ≤ 80 bits, view time, newest-decoded ack), redundancy up to 8, U2 delta repeats; the checks of §4.4; the input buffer; **both OQ-0001-6 options, switchable** (a start-up setting, `params.cmd_timing`, from the room unit's configuration on L2 or the scenario on L1, recorded in every header and never changed during a run: the advisor's A2); the late-command counter | proto, room | -13, -20, -21, -30, -49, -56, -58 |
 | E4 | Snapshots: delta against the last acked (`AckRing`), E3 quantisation, entity groups that each decode alone, the datagram cap (1,000 B until -36 measures), FullState on its own stream, Resync, the bounded event queue, the per-client 256 kbps cap, newest-only over WebSocket | proto, room | -6, -8, -12, -14, -17, -18, -19, -22, -23, -31, -57, -58, -62 |
 | E5 | Interest: the region circle with hysteresis on a grid; areas and portals flood-numbered and re-flooded on change; the priority accumulator | room | -8, -9, -10, -12 |
-| E6 | Transports under `Link`: WebTransport on quinn 0.11 through wtransport 0.7.x and web-transport-quinn 0.13.x, swappable; WebSocket through tokio-tungstenite 0.30.x; the wall-time limits of §4.4; the per-address table bounded (fixed capacity, eviction, a counter, tested at 100,000 synthetic addresses); `wss` only; NewReno or Cubic; the version floors; refused handshakes counted per reason | net, server | -11, -14, -24, -25, -28 to -38 |
+| E6 | Transports under `Link`: WebTransport on quinn 0.11 through wtransport 0.7.x and web-transport-quinn 0.13.x, swappable; WebSocket through tokio-tungstenite 0.30.x; the wall-time limits of §4.4; the per-address table bounded (fixed capacity, eviction, a counter, tested at 100,000 synthetic addresses); `wss` only; NewReno or Cubic (a start-up setting, `params.cc`, like `cmd_timing`: A2); the version floors; refused handshakes counted per reason | net, server | -11, -14, -24, -25, -28 to -38 |
 | E7 | The client harness, in ADR 0002 part 5's shape (ADR 0002:313-373), for the boundary spike to keep: see the list below this table | client, client-wasm, web | -19, -28, -29, -31 to -33, -36, -41 to -46, -51 to -53, -61, -62 |
 | E8 | Prediction and reconciliation (replay newer commands, 100 ms fade, 2 m snap, cues keyed once) | client | -41 to -44, -60, -62 |
 | E9 | Interpolation: buffer in the Worker; delay from 3 intervals, adapting between 2 and 5; extrapolation at most one interval, then hold; placed respawns; events released with their poses | client | -45, -46, -61 |
@@ -507,7 +518,9 @@ PM-0002-* is judged here.
   `trajectory_at`, `StandIns`.
 - **npt-proto:**
   - the messages: `Input`, `Snapshot`, `FullState`, `Resync`, `Ping`, `Pong`, `Join`, `JoinAccepted`, `JoinRejected`,
-    `ClientSettings`, `RoomEnded`, `Leave`, `Kick`;
+    `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, and `SessionStatus` (room → client, owner, to the capability
+    holder: the overlay's room-side values and the form's last saved step; the advisor's A1 ruling, 2026-11-06, with
+    its own fuzz target);
   - the session controls (§10.2): `SessionControl`, with `SetProfile`, `TriggerBurst`, `BlockUdp` and `RecordStep`;
   - the rest: `encode`, `decode`, `Quant`, `Limits`.
 - **npt-room:** `SimCore` (the seam trait), `Room`, `Roster`, `ClientSlot`, `InputBuffer` (option A or B),
@@ -519,7 +532,10 @@ PM-0002-* is judged here.
 - **npt-client:** `ClientEndpoint`, `StepOut`, `Predictor`, `Interp`, `ClockSync`, `AimCast`, `BlockWriter`, `CueLog`.
 - **npt-client-wasm:** the exports create, mode, input and step.
 - **Binaries:** npt-bots, npt-load, npt-super, npt-host, npt-judge.
-- **npt-log:** `Header`, `TickRecord`, `SecondRecord`, `EventRecord`, `Writer`.
+- **npt-log:** `Header`, `TickRecord`, `SecondRecord`, `EventRecord`, `Writer`; their field types `Machine`, `Build`,
+  `Phase`, `Ended` and the `Footer` record; `SCHEMA`; the reader `read_log`, `Log`, `ReadError` (the advisor's C8).
+- **npt-judge's library** (for its own binary and tests only): the modules `marks`, `eval`, `ratio`, `figures`, and
+  `log_files`, `read_logs`, `summary_line` (C8).
 - **npt-lab:** `SimClock` (integer ns), `L1Scenario`, `ReplayX86`, `HashCompare` (netcode NC2-F9).
   - **Each simulated instant, in this order:**
     1. packets due, ordered by arrival time and then fate-log index, never delivered in the instant they were sent
@@ -597,7 +613,12 @@ PM-0002-* is judged here.
 - **The results log is not a shipped log** (security F18). It is written apart from the tracing output, so
   PM-0006-21's grep runs over the tracing logs, and the seed in the results header does not breach it.
 - **Fixtures:** the checker is tested on fixed fixtures that must come out PASS, FAIL and INVALID.
-- **Bites first:** every automated mark's planted defect must FAIL before its pass counts.
+- **A run's precedence** (the advisor's C2): its validity rules first, then its setup checks (a failure or gap makes
+  it INVALID), then its checks: any failing check fails the run, its gaps listed beside the failure; with no failure,
+  a gap makes it INVALID. A count of an event that never happened is 0; every other empty series is a gap.
+- **Bites first:** every automated mark's planted defect must FAIL before its pass counts. A bite that targets a
+  validity rule (`expect: "invalid"`, PM-0001-30's "the validity check itself") is shown only when its run is INVALID
+  by that rule alone; a valid run makes it missed and the mark FAIL (B13).
 - **No retries:** a failing run keeps its data, and its cause is found first.
 
 ### 6.2 Every mark: where and when
@@ -970,8 +991,9 @@ outside every range.
   - The supervisor stand-in stays unprivileged, and starts, stops and kills rooms through `systemctl`, by `npt`'s
     fixed sudo wrappers (§10.5).
   - Each slot's state, WebTransport key and results directory is mode 0700, owned by that slot's user.
-- **Per-session controls** (`SessionControl`: the profile, B1, the UDP block, the record form's steps) need a per-run
-  capability:
+- **Per-session controls** (`SessionControl`: the profile, B1, the UDP block, the record form's steps) need a
+  capability, one per browser slot of the run (the advisor's A7: it binds to one session, and a run can have several
+  browser legs):
   - 128 random bits, minted through the socket, delivered as §10.3 says, and compared in constant time;
   - `SetProfile` and `BlockUdp` key on the holder's source address. They cover all its connections, new ones
     included, from QUIC's first packet and the TCP accept, until cleared or the run ends. A new peer gets the run's
