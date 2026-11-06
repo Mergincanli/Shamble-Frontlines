@@ -3,7 +3,8 @@
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
 // Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each with warnings as errors; test
 // (cargo test); deps (the dependency rules of plan §4.2, from `cargo metadata` with every feature and target); refs
-// (nothing outside spikes/ references it, §4.2 and §4.9); self (this file's own tests); redact (redact-check's tests,
+// (nothing outside spikes/ references it, §4.2 and §4.9); marks (marks.json compiles in the judge, covers exactly the
+// plan's marks, and every row it hashed is unchanged); self (this file's own tests); redact (redact-check's tests,
 // then a scan of the spike's folder). It runs every step and exits 1 if any failed.
 
 import { spawnSync } from "node:child_process";
@@ -198,6 +199,21 @@ const STEPS = {
     const files = r.out.split("\0").filter(Boolean);
     const problems = referenceProblems(files, (f) => readFileSync(join(ROOT, f), "utf8"));
     return { ok: problems.length === 0, out: problems.join("\n") || `${files.length} tracked files: none outside spikes/ references it` };
+  },
+  marks: () => {
+    const c = run("cargo", ["run", "-q", "--locked", "-p", "npt-judge", "--", "--marks", "marks/marks.json", "--check-marks"], HERE);
+    if (!c.ok) return c;
+    const marks = JSON.parse(readFileSync(join(HERE, "marks", "marks.json"), "utf8"));
+    // The rows are compared with the drafts at the commit marks.json names: PR #41's head, until it merges into this
+    // branch; then with the branch's own docs/adr/ (the next step after the merge).
+    const at = (f) => {
+      const r = run("git", ["show", `${marks.drafts_commit}:${f}`], ROOT);
+      if (!r.ok) throw new Error(`git show ${marks.drafts_commit}:${f}: ${lastLines(r.out, 1)}`);
+      return r.out;
+    };
+    const problems = marksProblems(marks, at);
+    const summary = `${lastLines(c.out, 1)}; rows at ${marks.drafts_commit.slice(0, 7)}: ${problems.length ? "" : "all unchanged"}`;
+    return { ok: problems.length === 0, out: problems.length ? `${problems.join("\n")}\n${summary}` : summary };
   },
   self: () => summarized(run(process.execPath, ["--test", join(HERE, "check.test.mjs")], HERE), nodeCounts),
   redact: () => {

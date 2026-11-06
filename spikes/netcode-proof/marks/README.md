@@ -23,7 +23,8 @@ header; tick, second and event records follow in time order. Every record has a 
     run), `bracket-first` and `bracket-last` (PM-0006-13's lone room), or any role a mark's checks name (`n24`,
     `logging-off`, `cubic`, …);
   - `marks` lists the marks this run serves; the judge reads a run only for those marks;
-  - `machine`: `role` (`RS`, `LG`, `MV`, `C`, `ML`, `MP`, `MAC`), `name` (the instance: `RS`, `LG1`, `LG2`, …),
+  - `machine`: `role` (`RS`, `LG`, `MV`, `C`, `ML`, `MP`, `MAC`, `RD`), `name` (the instance: `RS`, `LG1`, `LG2`,
+    …; `ML` the named laptop and `ML*` its stand-in, `MAC-r` the runner and `MAC-b` a borrowed Mac),
     `plan`, `arch`, `cpu`, `vcpus`, `mem_mb`, `location`, `kernel`, `address` (a VM's day address; empty elsewhere:
     §10.6), `threads_per_core`, `smt` (sibling lists), `clock_res_ns`;
   - `build`: `commit`, `binary_sha256`, `features`, `profile`;
@@ -35,8 +36,8 @@ header; tick, second and event records follow in time order. Every record has a 
     `stress` or `stand-in`; `padding_target_ns`; the queue depths of PM-0001-23 and -24; `cmd_timing`, `A` or `B`).
 - **`ph`**, the phase of a tick, second or event record: `warmup`, `measured` or `after`.
 - **Names in `v` and `s`** are lowercase with underscores, and end in their unit: `_ns`, `_bytes`, `_bits`,
-  `_permille`, or `_count`, or a 0/1 flag with no suffix. `SERIES.md` lists every name a mark reads, with its unit and
-  the crate that writes it.
+  `_permille`, `_count`, `_um` (micrometres) or `_microdeg` (millionths of a degree), or are a 0/1 flag with no unit
+  suffix. `SERIES.md` lists every name a mark reads, with its unit and the crate that writes it.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
   `session`; `kind`; `applied`; `rostered`; `cap_valid` for session controls; `peer_ok` for socket controls),
   `affinity` (`when`: `start` or `end`; `cpu`; `alone`; `sibling_free`), `person` (`who`, `mark`, `verdict`:
@@ -55,7 +56,7 @@ header; tick, second and event records follow in time order. Every record has a 
 | `id` | string | `PM-0001-4`, `PM-0004-67`, `PM-0006-14`, … |
 | `title` | string | the row's second cell, shortened if long |
 | `draft` | object | `file` (repository path of the ADR) and `row_sha256` (SHA-256 of the row's whole line, without its line end). The drift test finds the row by its id and fails if the hash differs |
-| `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always NOT-RUN with `notes`) |
+| `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always NOT-RUN with `notes`; it has no parts or checks, and may keep its `bites` as data for the change-set that runs it) |
 | `where` | list of strings | where and when it runs (plan §6.2's key: `C`, `R1` to `R7`, `ML*`, `MAC-r`, `MAC-b`, `MP`); informative |
 | `parts` | list of parts | the evidence the mark needs (2.2); empty for `outside` |
 | `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the two that apply to every run |
@@ -72,8 +73,9 @@ A part selects runs and says how many valid runs it needs:
 ```json
 { "name": "L1 at P2", "select": { "layer": "L1", "profile": "P2" }, "min": 3 }
 ```
-- `select` matches header fields: `layer`, `profile`, `role`, `scene`, `tick_hz`, `clients`, `machine.name`,
-  `machine.arch`, `process`, or `params.<name>`. A run belongs to the part if every listed field is equal. `role`
+- `select` matches header fields: `layer`, `profile`, `role`, `scene`, `tick_hz`, `clients`, `machine.role`,
+  `machine.name`, `machine.arch`, `process`, or `params.<name>`. A run belongs to the part if every listed field is
+  equal in at least one of its logs (so `{ "machine.role": "LG" }` picks the runs that have an LG log). `role`
   defaults to `measured`; bite runs are never in a part (§5).
 - `min` is the number of valid runs the part needs (3 for a V-S mark; ADR 0001's V-S).
 
@@ -112,8 +114,10 @@ A part selects runs and says how many valid runs it needs:
   (PM-0006-19's pooled p99), not run by run.
 
 ### 2.4 Reported statistics
-`{ "name": "tick p50", "series": "tick.v.work_ns", "stat": "p50" }`, or `{ "name": …, "figure": … }`. They are
-written beside the verdict and never decide it.
+`{ "name": "tick p50", "series": "tick.v.work_ns", "stat": "p50" }`, or `{ "name": …, "figure": … }`, with the
+same `window`, `where` and `from` as a check. They are written beside the verdict and never decide it. A report is
+computed in every part, run by run, unless it names its `parts`; with `pooled` it is computed once per part over the
+part's valid runs together.
 
 ## 3. How a verdict is reached
 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.

@@ -253,6 +253,10 @@ pub struct Report {
     pub name: String,
     pub measure: Measure,
     pub from: BTreeMap<String, Value>,
+    /// The parts it is computed in; empty for every part.
+    pub parts: Vec<String>,
+    /// Computed once over the part's valid runs together, not run by run.
+    pub pooled: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -500,20 +504,30 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
     })
 }
 
-fn compile_report(c: &RawCheck) -> Result<Report, String> {
+fn compile_report(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Report, String> {
     if c.op.is_some() || c.value.is_some() || c.factor.is_some() || c.against.is_some() {
         return Err(
             "a reported statistic decides nothing: no op, value, factor or against".to_owned(),
         );
     }
-    if !c.parts.is_empty() || c.pooled {
-        return Err("a reported statistic takes no parts or pooled".to_owned());
+    for p in &c.parts {
+        if !part_names.contains(p.as_str()) {
+            return Err(format!(
+                "report names part {p:?}, which the mark does not have"
+            ));
+        }
     }
     check_keys(&c.from, "from")?;
+    let measure = compile_measure(c)?;
+    if c.pooled && matches!(measure, Measure::Figure(_)) {
+        return Err("a figure cannot be pooled".to_owned());
+    }
     Ok(Report {
         name: c.name.clone(),
-        measure: compile_measure(c)?,
+        measure,
         from: c.from.clone(),
+        parts: c.parts.clone(),
+        pooled: c.pooled,
     })
 }
 
@@ -579,7 +593,7 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
     }
     let mut report = Vec::new();
     for r in &m.report {
-        match compile_report(r) {
+        match compile_report(r, &part_names) {
             Ok(r) => report.push(r),
             Err(e) => errors.push(format!("report {:?}: {e}", r.name)),
         }
@@ -609,14 +623,10 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
             }
         }
         Kind::Outside => {
-            if !m.parts.is_empty()
-                || !m.checks.is_empty()
-                || !m.bites.is_empty()
-                || m.notes.trim().is_empty()
-            {
+            // Its bites may stay as data for the change-set that runs it; this judge never evaluates them.
+            if !m.parts.is_empty() || !m.checks.is_empty() || m.notes.trim().is_empty() {
                 errors.push(
-                    "an outside mark has no parts, checks or bites, and says why in notes"
-                        .to_owned(),
+                    "an outside mark has no parts or checks, and says why in notes".to_owned(),
                 );
             }
         }
@@ -757,6 +767,29 @@ mod tests {
         assert!(parse(&outside_no_notes).is_err());
         let outside = file(&mark(r#""verdict":"outside","notes":"the 60 Hz run""#));
         assert!(parse(&outside).is_ok());
+        let outside_with_bites = file(&mark(
+            r#""verdict":"outside","notes":"the 60 Hz run","bites":[{"id":"PM-0001-4/B-S","what":"kept as data"}]"#,
+        ));
+        assert!(
+            parse(&outside_with_bites).is_ok(),
+            "an outside mark may keep its bites as data"
+        );
+        let outside_with_part = file(&mark(&format!(r#""verdict":"outside","notes":"x",{PART}"#)));
+        assert!(parse(&outside_with_part).is_err());
+        let report_bad_part = file(&mark(&format!(
+            r#""verdict":"reported",{PART},"report":[{{"name":"a","series":"tick.v.w","stat":"max","parts":["nope"]}}]"#
+        )));
+        assert!(
+            parse(&report_bad_part).is_err(),
+            "a report names only the mark's parts"
+        );
+        let report_pooled_figure = file(&mark(&format!(
+            r#""verdict":"reported",{PART},"report":[{{"name":"a","figure":"sync_cost_ratio","pooled":true}}]"#
+        )));
+        assert!(
+            parse(&report_pooled_figure).is_err(),
+            "a figure cannot be pooled"
+        );
         let reported_with_check = file(&mark(&format!(
             r#""verdict":"reported",{PART},"checks":[{{"name":"a","series":"tick.v.w","stat":"max","op":"<=","value":1}}]"#
         )));

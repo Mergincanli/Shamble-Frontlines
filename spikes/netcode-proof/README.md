@@ -26,6 +26,7 @@ outside `spikes/` may reference it.
 - redact-check (plan §10.6; Node 22, also on Windows): `node ops/operator/redact-check.mjs <file or folder>...`,
   `--staged` before a commit, `--pre-push` as a git hook; its tests: `node --test ops/operator/redact-check.test.mjs`
 
-Status: unit U1, second part (npt-log, npt-judge, redact-check, the test command and its dependency checks, the
-message catalogue `docs/design/netcode-proof-messages.md` with its class audit test; marks.json next). Each unit's
-state is in `.checkpoints/netcode-proof-test.md`.
+Status: unit U1, second part, built: npt-log, npt-judge with its fixtures, `marks/marks.json` and `marks/SERIES.md`,
+redact-check, the test command and its dependency checks, and the message catalogue
+`docs/design/netcode-proof-messages.md` with its class audit test. The advisor's rulings on the open questions come
+next. Each unit's state is in `.checkpoints/netcode-proof-test.md`.

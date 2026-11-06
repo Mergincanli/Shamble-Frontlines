@@ -438,6 +438,49 @@ fn short_padding_makes_a_density_run_invalid() {
 }
 
 #[test]
+fn reports_keep_to_their_parts_and_pool_when_asked() {
+    let mark = json!({
+        "id": "PM-0006-19", "title": "logging cost", "verdict": "reported",
+        "draft": {"file": "docs/adr/0006-infrastructure-operations.md", "row_sha256": "0".repeat(64)},
+        "parts": [{"name": "on", "select": {"params.logging": "on"}, "min": 2},
+                  {"name": "off", "select": {"params.logging": "off"}, "min": 1}],
+        "report": [{"name": "p99 per run", "series": "tick.v.work_ns", "stat": "p99", "parts": ["on"]},
+                   {"name": "pooled p99", "series": "tick.v.work_ns", "stat": "p99", "parts": ["on"], "pooled": true},
+                   {"name": "max everywhere", "series": "tick.v.work_ns", "stat": "max"}]
+    });
+    let run = |id: &'static str, logging: &'static str, v: &[i64]| {
+        let mut s = LogSpec::room(id, "set-r", "PM-0006-19").ticks("work_ns", v);
+        s.params.push(("logging", json!(logging)));
+        s.build()
+    };
+    let logs = vec![
+        run("on-1", "on", &[100, 300]),
+        run("on-2", "on", &[200, 200]),
+        run("off-1", "off", &[50]),
+    ];
+    let v = judge(&marks_file(&[mark]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Reported, "{:?}", v[0].why);
+    let got: Vec<(String, String, String)> = v[0]
+        .report
+        .iter()
+        .map(|r| (r.name.clone(), r.run.clone(), r.value.clone()))
+        .collect();
+    let want = [
+        ("p99 per run", "on-1", "300"),
+        ("p99 per run", "on-2", "200"),
+        ("pooled p99", "pooled over 2 runs", "300"),
+        ("max everywhere", "on-1", "300"),
+        ("max everywhere", "on-2", "200"),
+        ("max everywhere", "off-1", "50"),
+    ];
+    let want: Vec<(String, String, String)> = want
+        .iter()
+        .map(|(a, b, c)| ((*a).to_owned(), (*b).to_owned(), (*c).to_owned()))
+        .collect();
+    assert_eq!(got, want);
+}
+
+#[test]
 fn a_clean_reference_compares_within_its_factor() {
     let mark = json!({
         "id": "PM-0001-24", "title": "bottleneck", "draft": draft(), "verdict": "pass",

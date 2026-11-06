@@ -1088,28 +1088,45 @@ fn report_values(
     members: &BTreeMap<String, Vec<&Run<'_>>>,
     all: &[Run<'_>],
 ) -> Vec<ReportOut> {
+    let text = |v: Result<Ratio, Missing>| match v {
+        Ok(v) => v.to_string(),
+        Err(Missing::Gap(why) | Missing::NotBuilt(why)) => format!("not available: {why}"),
+    };
     let mut out = Vec::new();
     for part in parts {
         let Some(runs) = members.get(&part.name) else {
             continue;
         };
-        for (run, ro) in runs.iter().zip(&part.runs) {
-            if !ro.valid {
+        let valid: Vec<&Run<'_>> = runs
+            .iter()
+            .zip(&part.runs)
+            .filter(|(_, ro)| ro.valid)
+            .map(|(r, _)| *r)
+            .collect();
+        if valid.is_empty() {
+            continue;
+        }
+        let set = set_of(all, valid[0].set);
+        for r in mark
+            .report
+            .iter()
+            .filter(|r| r.parts.is_empty() || r.parts.contains(&part.name))
+        {
+            if r.pooled {
+                out.push(ReportOut {
+                    name: r.name.clone(),
+                    part: part.name.clone(),
+                    run: format!("pooled over {} runs", valid.len()),
+                    value: text(measure(&r.measure, &valid, &set, &r.from)),
+                });
                 continue;
             }
-            let set = set_of(all, run.set);
-            for r in &mark.report {
-                let value = match measure(&r.measure, &[*run], &set, &r.from) {
-                    Ok(v) => v.to_string(),
-                    Err(Missing::Gap(why) | Missing::NotBuilt(why)) => {
-                        format!("not available: {why}")
-                    }
-                };
+            for run in &valid {
                 out.push(ReportOut {
                     name: r.name.clone(),
                     part: part.name.clone(),
                     run: run.id.to_owned(),
-                    value,
+                    value: text(measure(&r.measure, &[*run], &set, &r.from)),
                 });
             }
         }

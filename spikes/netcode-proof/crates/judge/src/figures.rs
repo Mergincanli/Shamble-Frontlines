@@ -19,8 +19,199 @@ pub struct Figure {
     pub what: &'static str,
 }
 
-/// The list. Names join it with `marks.json` and are built with the code that first produces their inputs.
-pub const FIGURES: &[Figure] = &[];
+const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> Figure {
+    Figure {
+        name,
+        compute: None,
+        unit,
+        what,
+    }
+}
+
+/// The list: every figure `marks.json` names (`marks/SERIES.md` gives each one's formula, inputs and draft words).
+/// Each is built in the unit that first produces its inputs; until then its check or report is NOT-RUN.
+pub const FIGURES: &[Figure] = &[
+    planned(
+        "fate_log_twin_equal",
+        "U2",
+        "the same seed gives the same packet-fate log (PM-0001-3)",
+    ),
+    planned(
+        "everyone_in_view_min_share",
+        "U4",
+        "the least share of a slot's snapshots with all 47 others in its set (-2)",
+    ),
+    planned(
+        "decoded_hash_mismatch_count",
+        "U4",
+        "decoded snapshots whose hash differs from the server's (-17, -19, -58)",
+    ),
+    planned(
+        "decoded_hash_compared_count",
+        "U4",
+        "the (client, tick) pairs compared (-17)",
+    ),
+    planned(
+        "twin_hash_mismatch_count",
+        "U4",
+        "ticks whose hash differs from the twin run's (-21, -30)",
+    ),
+    planned(
+        "cross_arch_mismatch_count",
+        "U4",
+        "L2 mismatches the x86-64 replay does not reproduce (the Arm rule)",
+    ),
+    planned(
+        "view_hit_registered_share",
+        "U4",
+        "shots hitting in the shooter's view that the server registered (-48, -49)",
+    ),
+    planned(
+        "false_hit_share",
+        "U4",
+        "view misses registered as hits (-48)",
+    ),
+    planned(
+        "rule_cap_set_by_rule",
+        "U4",
+        "the rule cap equals the picked option's P2 honest-rewind p99 in ticks (-49)",
+    ),
+    planned(
+        "throw_desync_count",
+        "U4",
+        "throws that desync, the x86-64 replay agreeing (-54)",
+    ),
+    planned(
+        "machine_named",
+        "U4",
+        "every header names its machine in full (-1, PM-0006-11)",
+    ),
+    planned(
+        "sync_unit_cost",
+        "U6",
+        "mean server-only work per tick / (clients x mean relevant entities) (-10)",
+    ),
+    planned(
+        "sync_cost_ratio",
+        "U6",
+        "N = 48's unit cost against N = 24's and 36's (-10)",
+    ),
+    planned(
+        "down_client_mean_max_bits",
+        "U6",
+        "the largest client mean of the downstream (-12)",
+    ),
+    planned(
+        "down_mean_ipv6_bits",
+        "U6",
+        "the downstream mean with IPv6's 20 B more per datagram (-12)",
+    ),
+    planned(
+        "r2_down_formula_bits",
+        "U6",
+        "R2's downstream formula at the run's own counts (-12)",
+    ),
+    planned(
+        "up_client_mean_max_bits",
+        "U6",
+        "the largest client mean of the upstream (-13)",
+    ),
+    planned(
+        "rss_slope_bytes_per_10min",
+        "U6",
+        "the least-squares slope of RSS over the measured seconds (-15)",
+    ),
+    planned(
+        "queue_growth_count",
+        "U6",
+        "per-client queues whose last-10-minute max exceeds the first's (-15)",
+    ),
+    planned(
+        "session_memory_growth_count",
+        "U6",
+        "the same rule on per-session memory, over halves (-24)",
+    ),
+    planned(
+        "kill_p99_ratio",
+        "U6",
+        "the other rooms' p99 after the SIGKILL against before (-27)",
+    ),
+    planned(
+        "rtt_agreement_p99_ns",
+        "U6",
+        "p99 of |app RTT - quinn's rtt()| per second (-33)",
+    ),
+    planned(
+        "bulk_control_p99_rise_ns",
+        "U6",
+        "the control stream's p99 delay with a bulk transfer minus without (-38)",
+    ),
+    planned(
+        "one_shot_dropped_count",
+        "U6",
+        "one-shot actions sent minus received (-38)",
+    ),
+    planned(
+        "crash_close_max_ns",
+        "U6",
+        "each client's RoomEnded or close after the tick panic, the slowest (-59)",
+    ),
+    planned(
+        "egress_interface_bytes",
+        "U6",
+        "interface bytes sent in the room-hour (PM-0006-17)",
+    ),
+    planned(
+        "egress_metric_vs_interface_ratio",
+        "U6",
+        "the room's bytes-sent metric against the interface counter (PM-0006-17)",
+    ),
+    planned(
+        "r2_egress_formula_bytes",
+        "U6",
+        "R2's egress formula at the run's counts (PM-0006-17)",
+    ),
+    planned(
+        "egress_vs_r2_ratio",
+        "U6",
+        "interface bytes against R2's formula (PM-0006-17)",
+    ),
+    planned(
+        "logging_cost_ratio",
+        "U6",
+        "the pooled p99 with logging on against off (PM-0006-19)",
+    ),
+    planned(
+        "alloc_twin_diff_count",
+        "U6",
+        "ticks whose allocation count differs from the logging-off twin's (PM-0006-20)",
+    ),
+    planned(
+        "one_build_hash",
+        "U7",
+        "every browser run used the same client build (-32)",
+    ),
+    planned(
+        "input_latency_p99_rise_ns",
+        "U7",
+        "input-to-screen p99 at P4 minus at P0, the worst kind (-43)",
+    ),
+    planned(
+        "input_latency_p50_rise_ns",
+        "U7",
+        "the same with medians (-43)",
+    ),
+    planned(
+        "rooms_per_vm_count",
+        "U8",
+        "per N, the lowest of the sessions' largest k whose every room meets the marks (PM-0006-14)",
+    ),
+    planned(
+        "times_of_day_rule",
+        "U8",
+        "the sessions start 6 h apart, one between 18:00 and 23:00 Amsterdam (-27, PM-0006-13, -14)",
+    ),
+];
 
 pub fn known(name: &str) -> bool {
     FIGURES.iter().any(|f| f.name == name)

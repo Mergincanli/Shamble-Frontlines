@@ -141,15 +141,14 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `spikes/netcode-proof/` | The netcode proof test (SPIKE_PLAN item 1; in flight: STATUS). Kept on main afterwards for the 60 Hz margin run and the boundary spike. Builds go to `.gate/netcode-proof-test/target` (`.cargo/config.toml`) |
 | `spikes/netcode-proof/README.md` | What it is, its layout and dependency rules, every command |
 | `spikes/netcode-proof/Cargo.toml` | The Cargo workspace: 15 crates, resolver 3, edition 2024, every build `--locked` (`Cargo.lock` committed); `rust-toolchain.toml` pins Rust 1.99.1 (clippy, rustfmt, the wasm32 target); `rustfmt.toml`; `deny.toml` (cargo-deny) |
-| `spikes/netcode-proof/check.mjs` | The test command, run at every unit: fmt, clippy host and wasm32 (warnings as errors), cargo test, the dependency rules from `cargo metadata`, the no-reference grep, its own tests (`check.test.mjs`), redact-check |
+| `spikes/netcode-proof/check.mjs` | The test command, run at every unit: fmt, clippy host and wasm32 (warnings as errors), cargo test, the dependency rules from `cargo metadata`, the no-reference grep, marks.json's check (it compiles in the judge, covers exactly the plan's marks, its rows unchanged), its own tests (`check.test.mjs`), redact-check |
 | `spikes/netcode-proof/crates/` | The 15 crates (`npt-<name>`): leaf crates link, l1, sim, proto, room, client and log (build for wasm32; no transport crate or async runtime; clock reads banned by their `clippy.toml`); then server, net, client-wasm, bots (with npt-load), super, host, judge and lab. Built so far: npt-log (results-log records and writer), npt-judge (marks and logs to one verdict per mark) and npt-proto's catalogue audit test; the rest are stubs |
-| `spikes/netcode-proof/marks/` | `README.md`: the contract between the results log, `marks.json` and npt-judge |
+| `spikes/netcode-proof/marks/` | `README.md`: the contract between the results log, `marks.json` and npt-judge; `marks.json`: every mark of plan §6.2 as data (81, each with its draft row's hash); `SERIES.md`: every series and figure name the marks read (the naming contract for U2-U7). npt-judge's fixtures are in `crates/judge/fixtures/` |
 | `spikes/netcode-proof/ops/operator/redact-check.mjs` | The redaction check for results (Node 22, Windows too), with its tests `redact-check.test.mjs` |
 
-Not built yet (plan §4.1): `marks/marks.json` (every mark as data), `web/` (the client harness: TypeScript, Vite,
-three.js), `fuzz/` (one cargo-fuzz target per message type), the rest of `ops/` (`cloud-init/`, `firewall/`, `runs/`
-R1–R7, `checklists/`, and the operator settings, rules and prompts) and `results/` (committed verdicts and redacted
-summaries, never raw data).
+Not built yet (plan §4.1): `web/` (the client harness: TypeScript, Vite, three.js), `fuzz/` (one cargo-fuzz target
+per message type), the rest of `ops/` (`cloud-init/`, `firewall/`, `runs/` R1–R7, `checklists/`, and the operator
+settings, rules and prompts) and `results/` (committed verdicts and redacted summaries, never raw data).
 
 ## .github/
 | Path | What it is |
