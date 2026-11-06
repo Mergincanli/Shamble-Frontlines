@@ -64,7 +64,10 @@
 - **Done:** step 5, the one fix pass (this commit): STATUS and ROADMAP wording for V3-V6; follow-ups for V1 (with a
   fifth range, ADR 0005:2550, found by the widened E4), IE-1, GD-1/IE-2 and GD-2; e-checks.py's E4 widened to line
   ranges (PASS). V2 is met by the report. For the report: PR #40's two stale #41 lines (its STATUS:31 and :173).
-- **Current step:** 6, the report (`docs/reports/2026-11-06-b2-community-servers.md`, the advisor-report skill).
+- **Done:** step 6, the report (`docs/reports/2026-11-06-b2-community-servers.md`; body 70 lines; Appendix A, his
+  2026-11-03 task list, and Appendix B, the replaced pillar-5 sub-bullet, each equal to its source).
+- **Current step:** 7, the last commit (delete the notes; STATUS cites them readable at the report's commit), then PR
+  ready, the advisor's final-head review, `needs-mustafa`, his go.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
