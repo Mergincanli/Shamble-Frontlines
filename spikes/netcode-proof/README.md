@@ -14,6 +14,9 @@ outside `spikes/` may reference it.
   nothing depends on npt-lab.
 
 ## Commands (run from this folder; the toolchain file picks Rust 1.99.1)
+- **The test command, every unit:** `node check.mjs` (fmt, clippy host and wasm32 with warnings as errors, the tests,
+  the dependency rules of plan §4.2 from `cargo metadata`, the no-reference grep, its own tests, redact-check);
+  `--only <step,...>` runs some
 - Build and test: `cargo build --locked --workspace` and `cargo test --locked --workspace`
 - Lints, host and wasm32: `cargo clippy --locked --workspace --all-targets` and
   `cargo clippy --locked --target wasm32-unknown-unknown -p npt-link -p npt-l1 -p npt-sim -p npt-proto -p npt-room -p npt-client -p npt-log`
@@ -23,5 +26,6 @@ outside `spikes/` may reference it.
 - redact-check (plan §10.6; Node 22, also on Windows): `node ops/operator/redact-check.mjs <file or folder>...`,
   `--staged` before a commit, `--pre-push` as a git hook; its tests: `node --test ops/operator/redact-check.test.mjs`
 
-Status: unit U1, second part (npt-log, npt-judge, redact-check; marks.json, the dependency checks and the message
-catalogue's audit next). Each unit's state is in `.checkpoints/netcode-proof-test.md`.
+Status: unit U1, second part (npt-log, npt-judge, redact-check, the test command and its dependency checks, the
+message catalogue `docs/design/netcode-proof-messages.md` with its class audit test; marks.json next). Each unit's
+state is in `.checkpoints/netcode-proof-test.md`.
