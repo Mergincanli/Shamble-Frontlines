@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 2; revision 1 is 786b7d2)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-06 02:13 Amsterdam
+- **Last update:** 2026-11-06 02:50 Amsterdam
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -35,18 +35,26 @@
    npt-client-wasm, npt-log, npt-lab, npt-super, npt-host), determinism rules, the sim seam and TICK_HZ, "kept",
    seven run days R1-R7 (72 RS-h, 171 LG-h, EUR 12.99 planned, caps EUR 14.50) + R8 later, R-PR for readings that
    change a number, readings R-1..R-27, decisions ROUTE, SAFARI-TIME, FIXED-IP.
+6. Plan review round 2 · workflow `wf_e7cdd40f-712` (failed once at the usage limit, resumed 02:13), 3 of 3 returned ·
+   security-auditor APPROVE WITH CONDITIONS (3 High from the fixes: `node .gate/*` runs unprompted in the laptop's
+   worktrees; the operator settings over-claim (deny-first, PowerShell, a moving file); the main-ref Safari guard
+   gives change-set code main's cache scope), netcode-architect REVISE (4 High, text only: no channels in Link and the
+   endpoint; no loss/stall model in the WebSocket delay; the limiter's queue smaller than a datagram; which
+   command-timing option sets the rule cap), infra-engineer APPROVE WITH CONDITIONS (3 High: the density order inside
+   blocks breaks the time-of-day rule; the day's addresses cannot sit in the hashed cloud-config; RS has no key to
+   drive LG). Both OQ-0006-16 deciders agree with §8.1's ports, with small conditions. Compact copy:
+   `.checkpoints/netcode-proof-test/review2-findings.md`.
 
 ## Current step
-6. Plan review round 2 on revision 2 (one workflow, 3 agents at xhigh): security-auditor (its 19 fixes and the new
-   surface), netcode-architect and infra-engineer (both deciders of OQ-0006-16, plus their lenses). Notes:
-   `<agent>-plan-review2.md`.
+7. Plan revision 3: every round-2 finding addressed (46: security-auditor 15, netcode-architect 16, infra-engineer
+   15), with a §0.2 table mapping each to its fix; then the advisor's plan review.
 
 ## Next steps
 5. Fix, then the advisor's plan review (APPROVE / REVISE / ESCALATE); iterate on REVISE.
 6. Push, open the draft PR, report to Mustafa (Decisions needed, For Mustafa).
 
 ## Open findings
-- Review round 1's 49 findings: fixed in plan revision 2 (§0.1); round 2 checks them.
+- Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: being fixed in revision 3 (§0.2).
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
@@ -65,8 +73,7 @@
 ## Running work
 - Workflow `wf_e7cdd40f-712` (npt-plan-review2: security-auditor, netcode-architect, infra-engineer; xhigh) · script as
   launched: `.checkpoints/netcode-proof-test/npt-plan-review2-run1.js` (no args) · notes: `<agent>-plan-review2.md` ·
-  launched 23:54 · FAILED 23:54: all 3 agents hit the usage limit at start (2 tool calls in all, no notes written;
-  "your 5-hour limit resets 1:10am (UTC)") · resumed 02:13 Amsterdam with resumeFromRunId, same script, no args.
+  launched 23:54 · FAILED 23:54 at the usage limit · resumed 02:13 · DONE 02:44 (3 of 3 returned).
 - Workflow `wf_88b642c1-384` (npt-plan-review) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-review-run1.js`
   · launched 23:16 · DONE 23:37 (3 of 3 returned).
 - Workflow `wf_1ae38d53-da9` (npt-plan-digests) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-digests-run1.js`
