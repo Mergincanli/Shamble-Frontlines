@@ -1,0 +1,59 @@
+# The netcode proof test (docs/SPIKE_PLAN.md item 1): a throwaway spike (SPIKE-SCOPE (a)). The plan is
+# .checkpoints/netcode-proof-test/plan.md while the change-set runs; its layout is plan §4.1, its dependency rules §4.2.
+# Every build and test runs with --locked; Cargo.lock is committed.
+[workspace]
+resolver = "3"
+members = [
+    "crates/link",
+    "crates/l1",
+    "crates/sim",
+    "crates/proto",
+    "crates/room",
+    "crates/server",
+    "crates/net",
+    "crates/client",
+    "crates/client-wasm",
+    "crates/bots",
+    "crates/super",
+    "crates/host",
+    "crates/log",
+    "crates/judge",
+    "crates/lab",
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99.1"
+publish = false
+
+[workspace.dependencies]
+# Internal crates.
+npt-link = { path = "crates/link" }
+npt-l1 = { path = "crates/l1" }
+npt-sim = { path = "crates/sim" }
+npt-proto = { path = "crates/proto" }
+npt-room = { path = "crates/room" }
+npt-server = { path = "crates/server" }
+npt-net = { path = "crates/net" }
+npt-client = { path = "crates/client" }
+npt-log = { path = "crates/log" }
+# External crates, exact versions (more join as the units need them, each reviewed: plan §4.8).
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+
+[workspace.lints.rust]
+# deny, not forbid: npt-client-wasm relaxes it for wasm-bindgen's generated code, and nothing else may.
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+# The determinism and clock bans (plan §4.5) are configured per crate in clippy.toml; these make them errors.
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
+
+# overflow-checks stay on for the sim and the protocol in every profile (plan §4.5; ADR 0002 part 2).
+[profile.release.package.npt-sim]
+overflow-checks = true
+[profile.release.package.npt-proto]
+overflow-checks = true

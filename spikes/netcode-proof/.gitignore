@@ -1,0 +1,2 @@
+# A backstop: builds belong under the repository's .gate/ (see .cargo/config.toml), never here.
+/target/

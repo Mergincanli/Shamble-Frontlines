@@ -1,0 +1,18 @@
+[package]
+name = "npt-net"
+description = "Native transport adapters (both WebTransport crates, WebSocket) and L2 under the real socket"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# One WebTransport crate per feature, swappable behind npt-link (PM-0001-35); the crates join at U3 and U6, pinned.
+wt-wtransport = []
+wt-wtq = []
+
+[dependencies]
+npt-link.workspace = true

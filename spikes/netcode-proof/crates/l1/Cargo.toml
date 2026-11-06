@@ -1,0 +1,13 @@
+[package]
+name = "npt-l1"
+description = "L1, the seeded link simulator on simulated time, behind npt-link's interface"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+npt-link.workspace = true

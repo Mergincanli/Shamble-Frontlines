@@ -1,0 +1,9 @@
+# The clock ban (plan §4.5): npt-room's timers count ticks; wall time reaches it only from npt-server, passed in.
+disallowed-types = [
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+]

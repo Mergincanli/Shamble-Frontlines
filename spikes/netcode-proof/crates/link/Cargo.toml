@@ -1,0 +1,13 @@
+[package]
+name = "npt-link"
+description = "The thin transport interface (poll-based, channels, time passed in) and its Loopback backend"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# None, by rule (plan §4.2): npt-link is a leaf that builds for wasm32.
