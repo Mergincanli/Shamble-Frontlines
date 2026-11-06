@@ -33,3 +33,12 @@ Plan: `.checkpoints/netcode-proof-test/plan.md` rev 3.2. Drafts: `.gate/npt-read
 - C6/C7: redact-check.mjs:31-46, 101-118 match. Prefix forms only catch prefixed text: U6 must never print a token,
   capability or bind secret in any other form (hex, bare base64).
 - Prior rulings: R-15 already reads PM-0004-67's jitter from the first 36,000 measured ticks (Q22 is in R-PR).
+- Reproduced: `node spikes/netcode-proof/check.mjs` at 5ac4042: all 9 steps PASS (44 cargo tests, 9 self, 10 redact;
+  275 tracked files, 81 marks, rows at 1b4094a unchanged).
+- C12: marks.json's 81 entries equal marks-draft.jsonl's 81 objects (0 differ); SERIES.md differs from
+  series-draft.md in 4 lines (title, the 2-line provenance, the units rule): hand edits after the copy, fine.
+- C2 REPRODUCED (scratch fixture, scratchpad/c2demo): a bite run whose defect FAILs one check ("queue held at the
+  cap") and removes an event (count check -> gap) comes out INVALID; the mark INVALID; the bite is never shown.
+  eval.rs judge_run:885-896 pushes a gap into invalid_why; eval_bite:1059 checks validity first. Same at run level:
+  a measured run with a FAIL and a gap is INVALID, not FAIL (eval_part:949-953).
+- C4: `params.killed` also listed for -59 and PM-0006-22 (SERIES.md:351). -59's catch should write its own footer.
