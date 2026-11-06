@@ -72,4 +72,6 @@
 - Workflow `wf_1ae38d53-da9` (npt-plan-digests) · script as launched: `.checkpoints/netcode-proof-test/npt-plan-digests-run1.js`
   · launched 22:38 · DONE 23:00 (3 of 3 returned; journal in the session's workflow folder).
 - Saver: background task `btpf0ptzw` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/btpf0ptzw.output`
-  · started 22:35 · stopped 00:25 ('time is up'); restarted 02:13 for round 2 (new task id below).
+  · started 22:35 · stopped 00:25 ('time is up').
+- Saver: background task `be4kec0xf` · output `/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/be4kec0xf.output`
+  · started 02:11 · stops by 04:01 (110 min) · last check 02:13: started.
