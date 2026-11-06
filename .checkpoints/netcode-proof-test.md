@@ -260,6 +260,22 @@
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
 ## Decisions taken
+- **Mustafa, 2026-11-06, about 17:55 UTC (with his Advisor), U3-Q1 to Q9:** "I agree with the recommendations on
+  U3-Q1, Q2, Q4, Q5, Q6, Q7, Q8 and Q9. U3-Q3: (b), model Linux TCP faithfully, so the result shows how the fallback
+  really behaves. My pre-decision for the mark: PM-0001-18 keeps 500 ms for WebTransport; the WebSocket fallback gets
+  its own realistic recovery limit, set from the faithful model with a margin (around 1.5 s). Bring that as the docs
+  PR for my go. U3-Q6 note: migration stays off for the test; whether the real game allows it (players switching
+  networks mid-match) is a later ADR 0001 question." So: Q1 (c) expected excess lateness beyond 0.25 ms under about
+  10 us at the tightest profile, at 20,000 releases/s on RS, percentiles reported; Q2 (b) 1 ns timer slack via the
+  /proc file, real-time priority a recorded switch, never a spin; Q3 (b) Linux-faithful DelayStream (RACK, TLP, RTO
+  with doubling), and a docs PR (needs-mustafa) splitting PM-0001-18: WebTransport 500 ms; WebSocket = the model's
+  measured recovery plus a margin (about 1.5 s), the number from U3's measurement; Q4 (b) the wrapper above TLS,
+  below tungstenite; Q5 pin tokio-rustls in U3, audited at U5; Q6 (a) migration off for the test, recorded (the
+  game's own rule: a later ADR 0001 question); Q7 reuse npt-l1's Profile and ReorderStep plus one small L2 config
+  type, added to §4.7; Q8 ImpairSocket stamps each peer's first raw packet for the Join deadline, oversize datagrams
+  dropped and counted before buffering; Q9 RS's kernel, HZ, cpuidle and clocksource read at R1 (R1's run plan).
+  The advisor (running on the same questions) was told his answers decide; it finishes only the faithful model's
+  spec, the docs PR's exact words, and which design problems U3's build plan must fix (advisor-u3q.md).
 - Mustafa, 2026-11-06 (later): "No Mac available for now (the loan Macs are out of stock). Nothing in this test waits on
   one: the timed Safari rows wait until a Mac is available, at the latest for the look proof test." So if the runner
   fails its conditions, every Safari row waits for that Mac too (sent to R-PR's agent for SPIKE_PLAN).
