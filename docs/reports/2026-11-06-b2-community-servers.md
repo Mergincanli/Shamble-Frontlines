@@ -90,4 +90,4 @@ B. Docs:
 Plan revision 1 (8ee1b5b); the advisor's APPROVE (e0b0687); the build 67978c2; E1-E4 and the gate (f979f80); his VFX
 item saved (a79fef1); docs-keeper's pass and the VFX queue entry (26a5455); the review round and the fix pass
 (8d1540f); this report. The notes (`.checkpoints/b2-community-servers/`) are deleted in the last commit, as
-CHECKPOINTS.md §9 says; they stay in the branch history, last at this report's commit.
+CHECKPOINTS.md §9 says; they stay in the branch history, last at 5c0999f.
