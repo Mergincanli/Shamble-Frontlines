@@ -149,12 +149,12 @@
     echo: e^-0.98 of 0.1 ms intervals see no new arrival), reorder 910 of 1000; the judge passes every P2 check on it.
     check.mjs fmt, clippy, test green (94 / 99).
 
+27. **U2 part 2b** · 2529675 (pushed) · the twin figure's 3 engine tests (PASS with a shown clock-seed bite; a
+    matching bite twin missed = FAIL; differing = FAIL; absent twin = NOT-RUN; five gap cases = INVALID). check.mjs all
+    9 pass (97 / 102 tests).
+
 ## Current step
-27. U2 part 2b. **Next, in order:**
-    1. engine.rs: twin tests (LogSpec now has `layer`, `profile`, `seed`): equal hashes + a shown clock-seed bite run
-       (its twin: role twin, same bite) = PASS; differing = FAIL; twin absent = NOT-RUN ("is not in set"); no
-       `params.twin`, a twin with role measured, another seed, a bad hash = INVALID; a bite run whose twin has no bite =
-       INVALID. Then fixtures README if needed.
+28. U2 part 2c. **Next, in order:**
     2. A run script, `spikes/netcode-proof/ops/runs/c-u2-pm-0001-3.mjs` (Write tool): clean tree check; release builds
        of npt-lab without and with `--features bites`, each copied to `.gate/netcode-proof-test/bin/`; **every L1 part
        has its own twin check (P1-P4 and B1: marks.json)**, so 15 measured runs (seeds 1-3) + 15 twins (role twin) +
