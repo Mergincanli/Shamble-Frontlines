@@ -68,6 +68,18 @@ The VFX editor note in EDITOR_V2 (his item of 2026-11-06), its own docs change-s
    does not decide whether rented official private servers count. No Brave check.
 2. VFX-ORDER, only if you want (b) or (c).
 
+## Corrections after the merge (2026-11-07, vfx-xp-notes)
+The advisor's APPROVE WITH NOTES of the final head e223ecc (PR #42 comment 6698888516) had four Low notes. Note 1
+(STATUS's "Next after B.2", in the queued VFX entry) went with that entry, removed by vfx-xp-notes (PR #43), which
+carries it out. The other three correct this report; the lines above keep their merged words.
+- Decisions and deviations: #40's stale lines about #41 are its STATUS :3, :31 and :173 at 0588a17 (the head of #40
+  the note checked), not only :31 and :173.
+- For Mustafa 1(b): it should also say that pillar 5 is decided "at the level of principle only; which units are
+  shared stays open", as Risks 1 says.
+- Evidence: the check script (`e-checks.py`, readable at 5c0999f) ended FAIL (1) with this report in, on its old C9
+  rule only: Appendix B's title cites "VISION_V2:36-37 at ee736ec", a line citation outside STATUS, ROADMAP and R1's
+  research record, which that rule did not allow for. The citation is dated, so it is right as written.
+
 ## Appendix A: his words, whole (his task list of 2026-11-03, copied from A3's queue file at 4f268da)
 2026-11-03, his task list (session_0173vVo5sT21uP4DcQtKvmAU, 2026-11-03T22:08:25Z); B.2 is its last item:
 ```text

@@ -35,7 +35,13 @@
   :183). `e-checks.py` E1-E3 PASS (30 checks; EDITOR_V2 `[DECIDED]` 11→21, `[LATER]` 2→3; VISION_V2 `[DECIDED]`
   12→13, `[OPEN]` 3→4); E4 lists STATUS:656 (EDITOR_V2 :93/:94 → :94/:95) and the "From B.2" ADR 0005 ranges (§6 is
   now 80–99; :2550's 27–94 is 27–99), both for docs-keeper; `gate.mjs 4c6db5b --no-smoke` PASS, +0 −0; repo map OK.
-- **Current step:** 3, docs-keeper's pass (STATUS, ROADMAP, the B.2 report's correction; conditions C2, C3, C5, C7-C10).
+- **Done:** step 3, docs-keeper's pass (`docs-keeper.md`; helpers dk-rows.py, dk-roadmap.py, dk-wrap.py): STATUS
+  (#42 merged; this pass's row :106; B.2's row merged; ADR 0005 ranges at this head, §6 80–99, :2550 27–99; C8; the
+  "From vfx-xp-notes" follow-ups :503-519: XP-TERM, LOOK, the need rule; the VFX queue entry removed with a pointer;
+  STATUS:660's EDITOR_V2 :94/:95; the CI line under Open bugs and risks), ROADMAP (B.2 MERGED, this entry, queue; the
+  "Docs after R7" entry folded into Build history), the B.2 report's corrections (:71-81, C9). Its checks: e-checks
+  PASS, repo map OK, gate PASS +0 −0. CI green on d5e2c62.
+- **Current step:** 4, the review round (the verifier, game-designer, art-director; one round).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
