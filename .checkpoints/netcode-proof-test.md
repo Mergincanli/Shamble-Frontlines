@@ -197,6 +197,27 @@
     H8 the attempt cap is per run (must be per outage); H7 busy uses room state; H10 server flight pessimistic (TLS
     resumption ~1 segment); "bound to the session" readings 1-3; conflict list updated (429-432 resolved).
     Diag patch: scratchpad/u3v2h/diag.patch. Chromium's WebSocket throttler (H3) grows with failed attempts.
+    **Model skeptic DONE (u3-verify2-model.md; patch .gate/u3v2-model-diag.patch):** v2's rules confirmed line by line,
+    but three kernel paths are missing and fire in nearly every burst phase, all making things worse: G1 old duplicates
+    (end < rcv_wup) discarded whole, ACK field included (tcp_validate_incoming, tcp_input.c:5882-5900): recommended
+    479/716/1,143/1,944; B1 no loss undo (Eifel via tcp_packet_delayed, F-RTO 3b, DSACK; tcp_process_loss
+    2873-2890, tcp_try_undo_loss 2616-2639): max to 3,296; B2 cwnd = ssthresh at Recovery exit
+    (tcp_end_cwnd_reduction 2689-2703; S2's text wrong); B3 no Disorder state (TLPs). Combined (knobs, approximations):
+    recommended 496-497/723-787/1,143-1,155/1,890-1,978; fix 1 alone p99 1.2-1.3 s (608 over 1 s): the reconnect is what
+    holds a 1 s bar. Seed 1762's 3.17 s path is a model artifact (its ACK rides an old duplicate). T1: S13 (d) passes via
+    TSecr now; no test pins a v2 rule. G2 spurious-SYN undo (minor).
+    **Stats skeptic DONE (u3-verify2-stats.md):** the pass chance must be the exact joint (fix 1 alone (1.0, 1.5) 0.43
+    not 0.38); 600,000 phases needed (recommended v2: max 2,094, 35 over 1.5 s, P(1.0,1.5) 0.975 [0.969-0.981]); a
+    "99 % + max" bar misses a broken reconnect (passes 43 %) and a broken budget (87 %); three-part bars bite: at 10
+    bursts "half within 0.6 s, at most 1 over 1.2 s, none over 2.0 s" (correct 0.974, reconnect broken 0.136, budget
+    broken 0.000); at 30 bursts (1,440) "..., at most 3 over 1.2 s, ..." 0.992/0.007/0.000. Input phase (seed x 7,919 mod
+    tick) is a sawtooth: seed it from a hash. The pinned test's goal assertion holds in only 71 % of 6,000-blocks.
+    **Decided next (main session):** (1) tell Mustafa now: his three answers do not stand; ask the decisions that do not
+    hang on the exact numbers (WS-FIX scope, RESUME-CRED reading, WS-LIMIT form and bursts per run) and his Windows
+    Get-NetTCPSetting check; (2) model v3: G1, B1 (with DSACK and F-RTO), B2, B3, G2, T1 + rule tests; harness: H6
+    cancel-on-fresh, H7, H8, H19, hashed input phase, Windows SYN and Firefox options; stats: exact joint, 600 sets,
+    intervals, three-part bar evaluator, pinned test without the goal claim; (3) a focused third skeptic round; (4) the
+    thresholds to Mustafa.
 36. **The fallback's three fixes, measured** · **41bd8a0** (pushed) · TcpConfig (budget, thin linear timeouts,
     rto_min), the handshake for reconnects, `fixes.rs` (1,000 B1 phases per configuration). Results (p50/p99/max ms):
     defaults 708/913/2,248; 3-snapshot budget alone 314/1,415/4,203; + thin LT 314/570/995 (but 33-65 % of snapshots
