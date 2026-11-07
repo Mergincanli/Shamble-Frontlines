@@ -475,6 +475,27 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 23:50 UTC: main merged into the branch** at 2c68bf9: PR #45's ADR, with the -18 and -31 hashes and
+  drafts_commit 626df67 re-taken, and the STATUS and REPO_MAP conflicts resolved. check.mjs passes 9/9 (193/206), the
+  gate passes with --no-smoke, and CI is green on 4f3a560.
+- **Critic A: gaps (20 met, 4 missing, 8 wrong, 7 unproven)**; its notes are in u3c-critic-a.md.
+  - W1 and W2 (high): flaky tests. The added-burst test races the wall clock; the replay test reads under three locks.
+  - W3 (medium): poll_shutdown is unbounded and busy-loops when S's shutdown stays Pending.
+  - W4: the stall rule is half a gap (the advisor rules); use iptables -I and make a run with no kernel retransmits
+    VOID.
+  - W5: the drop test hides a 1 s threshold. W7: fixes.rs's room step to call may_write. W8: a doc.
+  - M2: no bites for most limit reasons.
+  - Unproven: ws_config "one source" untested; no TLS 1.2 refusal test; the loopback identity checked only as bounds;
+    tautological checks in (b)/(c); base_rtt_ns > 0 netting untested.
+- **Running now (3 agents):**
+  - **fix-A**: general-purpose, xhigh, an isolated worktree at 4f3a560 with A's patch applied. Notes in its worktree:
+    u3c-build-a-fix.md.
+  - **fix-B**: the same at 539709a with B's patch. Notes: u3c-build-b-fix.md.
+  - **The advisor** (afa86ecfb9b00e463) on (1) the half-gap stall rule and (2) the sync tungstenite Bridge against
+    tokio-tungstenite.
+
+  After them: merge B, then A (check.mjs and the gate after each), then the evidence runs (C10 quiet lateness, the
+  kernel cross-check, the C12e root run), then the flaky-test fix (FT1-FT4), then the skeptic round.
 - **RESUME HERE (after the usage reset, 2026-11-07 late; the worker restarted once): U3c BUILDS DONE**
   (workflow wf_87550c07-bbd; its result in u3c-workflow-result.txt; the per-agent journal is the session's
   subagents/workflows/wf_87550c07-bbd/journal.jsonl). Final snapshots in wip/ (A 272 KB, B 106 KB, base ebe82b2).
