@@ -98,4 +98,4 @@ VFX-ORDER: (a).
 His words (6e88f9a); plan revision 1 (3124aeb); the advisor's APPROVE (2f6742f); the build d5e2c62; docs-keeper's
 pass (e967196); the review round (a814ce9, 08ac3fb) and the fix pass (5912c68); this report. The notes
 (`.checkpoints/vfx-xp-notes/`) are deleted in the last commit, as CHECKPOINTS.md §9 says; they stay in the branch
-history, last at this report's commit.
+history, last at ced21da.
