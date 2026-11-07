@@ -329,3 +329,44 @@ R4. Line lengths <= 120 outside tables; then the result block and DONE here.
   OQ-0001-19 at 1250-1252, 747, 1295, 1462-1469, 1556, 1571, 1697-1699, 1737-1738, the register) and §5.2 the later
   ones, 423 alone; §1.1's fix-1 sentence; §6.1's pinned cite; ws_bar_fix1 :2000-2011. No `.gate/`, `u3v3-`,
   scratchpad or 803c6c1 cite is left (grep).
+- X14 Draft written (Write tool, 690 lines). `git diff HEAD` on the draft: 56 lines added, 26 removed, every removed
+  line one of the edits below (checked by listing them). No line outside a table is over 120 columns (awk). The
+  autosaver committed this notes file at 7c8bbe2 between my saves; I committed nothing.
+
+## Result, revision 2 (finished block)
+- Draft `.checkpoints/netcode-proof-test/ws-reconnect-record-draft.md` (690 lines) is aligned with the advisor's
+  revision-2 words. Changes this resumed pass made, on top of revision 2's earlier blocks (header pins, §1.1 with
+  both sets of words and the corrected fix-1 sentence, §5.1/§5.2, §6.1's pinned cite, §6.4 WS-RECONNECT-BAR, results
+  paths):
+  1. Header: a "Traces to" line (0001:473; VISION_V2.md:52, :55, :63); the branch named for the code as well.
+  2. §1.2: the recommended policy in full: attempt starts at least 300 ms apart, `serial()` :1187-1197, cancel
+     :706-734, the newest `Join` resuming with a full state :736-790.
+  3. §2.3: the run-structured bound also moves each burst's start by a random offset within one tick (E1).
+  4. §3.9: the 2 s `Join` deadline per attempt (ADR 0001:445-446), not modelled; the maximum's trace passes it
+     (u3-verify3-model.md:205-208); the choice: keep and model it, or lengthen it for every connection
+     (security-auditor). Also in §5.2's 445-451 row, §6.5's "Add first" and §8 item 4.
+  5. §3.10: tcp_model.rs:105-106. §6.2 item 7 and §6.5: multi_burst_table :1375-1381. §6.3: BurstOut :463-476.
+  6. §5.1 row 1556: "a tolerance of 10 % fixed before it" (E1's words).
+  7. §6.2 item 2: one real browser per engine behind VISION_V2 §4's four browsers, Safari's WebKit included.
+  8. §6.4: the sample-size sentence tied to its number (9 of 480 = 1.9 %).
+  9. §7: a "model and harness" entry with branch and SHA; the trace's sources.
+  10. §8: a new item 4 (the room's admission rules against reconnects: newest connection wins, per-address cap, the
+      2 s `Join` deadline); Safari's gap tied to VISION_V2 §4.
+- Verifier's must-correct item 5 (V20, V21, V25): met. §5.1 marks every ADR row this docs PR changes (424, 506-509,
+  the new OQ-0001-19 between 1250 and 1252, 747, 1295, 1462-1469, 1556, 1571, 1697-1699, 1737-1738, the register
+  rows) with what E0-E13 write and what the reconnect work does later; §5.2 keeps the later rows (423 alone); a row
+  for OQ-0001-19 in both. §6.1 cites `.checkpoints/netcode-proof-test.md:391-392` and `:400-401` at 95a04a1. §1.1 reads
+  "a snapshot that does not fit is skipped and counted, never sent later; nothing already written is dropped".
+- Open points for the advisor and the main session:
+  (1) W11: E5, E6 and E7 say "within about 1.05 s of a 1 s outage at P2"; the target is measured from the link's
+      return (fixes.rs:19-21). Suggest "within about 1.05 s of the link coming back after a 1 s outage at P2", as
+      PM-0001-18 (E1) counts it. The advisor's words; not changed by me.
+  (2) X7: E6's options list could name part 10's 2 s `Join` deadline per attempt beside the per-address cap; the
+      record now carries it (§3.9, §8 item 4).
+  (3) F20: the robust policy's p99 (1,126 ms at 1 s, 20,000 phases) against "about 1.05 s": Mustafa's call in the
+      reconnect work (OQ-0001-19 says so).
+  (4) WS-RECONNECT-BAR stays "proposed, Mustafa to confirm" in §6.4; the advisor recommends (b), leave open.
+  (5) The record's numbers rest on the committed outputs at 975e72b and the notes pinned at 95a04a1; when the
+      checkpoints are deleted, §7's `git show` commits remain the way back.
+
+DONE

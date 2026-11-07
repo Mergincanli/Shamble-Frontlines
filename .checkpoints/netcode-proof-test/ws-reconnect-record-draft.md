@@ -10,6 +10,10 @@ its further ADR 0001 changes (§5.2) for review when it starts.
 **For:** whoever builds the online client's WebSocket fallback (ADR 0001's migration step 5, "Slice 3, online", which
 ends when "Mustafa's first online playtest is run": `docs/adr/0001-multiplayer-netcode.md:1734-1738`), and the
 reviewers of that work.
+**Traces to:** ADR 0001 part 10's need, "VISION_V2 §6.1; §4 (four browsers)" (`0001-multiplayer-netcode.md:473`):
+rooms and private matches (`docs/VISION_V2.md:63`), played in Chrome, Edge, Firefox and Safari (`:52`) and fair up to
+about 100 ms of ping (`:55`). Part 10 tries WebTransport first and falls back to WebSocket (0001:423); this record
+keeps the fallback playable after a short outage.
 **Why it exists:** the netcode proof test measures the fallback's newest-snapshot-only buffer ("fix 1") but not the
 reconnect. Mustafa asked for the reconnect to be recorded "so it can't get lost". The proof test's working notes are
 deleted when its change-set ends, so this record carries its own numbers; the notes stay in git history and the model
@@ -17,10 +21,10 @@ outputs stay committed (§7).
 
 **Where the lines point.** ADR 0001 as on main `69ea88e` and on the proof-test branch's `95a04a1` (the same file),
 that is before the docs PR that lands this record; that PR shifts every line after 424, so each ADR cite in §5 also
-quotes its words. `fixes.rs` and `tcp_model.rs` at `bf9d248` under `spikes/netcode-proof/crates/net/src/`
-(`tcp_model/fixes.rs`, unchanged since; `tcp_model.rs`, last changed at `709e44a`, equal at `bf9d248`).
-`.checkpoints/` files at `95a04a1` (§7 lists where each lives in git history). The model's outputs are committed on
-branch `claude/netcode-proof-test-plan-hcky5g` at `975e72b` under `spikes/netcode-proof/results/u3-ws-fallback/`:
+quotes its words. `fixes.rs` and `tcp_model.rs` on branch `claude/netcode-proof-test-plan-hcky5g` at `bf9d248`, under
+`spikes/netcode-proof/crates/net/src/` (`tcp_model/fixes.rs`, unchanged since; `tcp_model.rs`, last changed at
+`709e44a`, equal at `bf9d248`). `.checkpoints/` files at `95a04a1` (§7 lists where each lives in git history). The
+model's outputs are committed on the same branch at `975e72b` under `spikes/netcode-proof/results/u3-ws-fallback/`:
 `tables-1e020a7.txt` (every table, printed at `1e020a7`), `bar-fix1-bf9d248.txt` (the fix-1 bound, `bf9d248`) and
 `reconnect-policies-1e020a7.patch` (the third skeptic round's diagnostic patch); they are cited by file name and line.
 
@@ -110,9 +114,10 @@ What each part means:
   ADR 0001:1556, which the docs PR keeps as "a delta encoded at or after that moment").
 - **"Buffer + reconnect"** is the row "fix 1 + fix 3: one endpoint, never abandoned (recommended)"
   (`fixes.rs:1236-1239`, `recommended()` at `:1259-1263`): trigger max(300 ms, 2 × echo RTT + 100 ms); one endpoint;
-  one attempt at a time; never closed by a timer; at most 8 attempts per outage; an attempt still before its 101 closed
-  once the old connection delivers fresh data (`fixes.rs:1-14`, `:1187-1197`). It is pinned by
-  `the_recommended_fixes_are_pinned_at_b1` (`fixes.rs:1833-1858`).
+  one attempt at a time, starts at least 300 ms apart; never closed by a timer; at most 8 attempts per outage
+  (`fixes.rs:1-14`, `serial()` at `:1187-1197`); an attempt still before its 101 closed once the old connection
+  delivers fresh data (`:706-734`); the newest `Join` resuming the session, with a full state and no snapshot that tick
+  (`:736-790`). It is pinned by `the_recommended_fixes_are_pinned_at_b1` (`fixes.rs:1833-1858`).
 
 **Table 1. 600,000 bursts at P2, 1 s burst, ms** (`tables-1e020a7.txt:120-131`; the same rows reproduced by the
 statistics skeptic, `u3-verify3-stats.md:30-31`)
@@ -197,8 +202,8 @@ client's sends is not modelled, which may move the median by tens of ms (`u3-ver
   over 2.5 s, none over 6.9 s" (`bar-fix1-bf9d248.txt:11`; `ws_bar_fix1`, `fixes.rs:2000-2011`). A correct build
   passes it with chance 0.968; today's build and a budget twice too large 0.000; a correct build whose recoveries are
   all 5 % slower 0.001, or 20 ms later 0.159 (same line). That missing margin is what Mustafa's 14:30 tolerance answers.
-  The proof test recomputes the bound for the run as it runs (48 clients sharing each burst, 10 bursts per client, the
-  scene's real snapshot sizes) before its run day.
+  The proof test recomputes the bound for the run as it runs (48 clients sharing each burst, 10 bursts per client, each
+  burst's start moved by a random offset within one tick, the scene's real snapshot sizes) before its run day.
 - **What it gives the reconnect work:** the reconnect leaves the median where fix 1 put it (654 ms for both,
   `tables-1e020a7.txt:123`, `:129`), so the proof test's measured fix-1 median is also the median a correct reconnect
   build should show on the same profile. A reconnect build whose median moves away from it is doing something the
@@ -382,6 +387,19 @@ not pinned)
   fail-delay record for that (IP, path, port) on any failure, so repeated resets would delay later reconnects
   (`u3-verify3-harness.md:65-73`). Not measured.
 - **Rule:** `Join` once per connection (ADR 0001:670 says "once").
+- **The `Join` deadline per attempt (open).** ADR 0001:445-446 gives every connection 2 s from the TCP accept to its
+  `Join`, "so TLS and the WebSocket upgrade fall inside it". The harness does not model it. Without a loss the
+  handshake after the accept takes about 2.5 round trips (the resumed TLS flights, the upgrade and the `Join`:
+  `fixes.rs:37-42`, `:108-135`; my arithmetic), about 0.25 s at P2. But a handshake retry inflates the new
+  connection's first retransmission timeout, and a loss after it can pass 2 s: the 600,000-burst maximum's reconnect
+  connected at +1,254 ms, had a first RTO of about 2.4 s from a 1.1 s SYN-ACK sample, lost its ClientHello and sent it
+  again at +3,754 ms, about 2.5 s after the connect (`u3-verify3-model.md:205-208`). A room enforcing the rule would
+  have closed that attempt, and the page would have started another. It takes two 2 % losses on one takeover, so the
+  p99 stays where it is; p99.9 and the maximum may move either way (my reasoning, not run). **Choice for the reconnect
+  work:** keep 2 s for every connection and add the rule to the harness before the bar is set, or lengthen it for
+  every connection (a security-auditor question: the room cannot tell a reconnect from a new join before its `Join`).
+  Join-or-close attempts that close without a `Join` stay inside the rule (`u3-verify3-harness.md:119-121`). Sure:
+  medium.
 - **Rule:** size the admission limits for a room-wide outage. Per player during an outage: 2 connections (old plus one
   attempt) and 1.5-5.4 SYNs. After a room-wide outage: about 48 TLS handshakes and 15-47 `Join`s within 1-2 s, from one
   address behind a LAN, a carrier NAT or the load generator; join-or-close adds 0.55-0.77 upgrades per player that
@@ -398,7 +416,7 @@ not pinned)
   (`fixes.rs:108-135`).
 
 ### 3.10 The client OS's SYN timer
-- **Linux:** the SYN is resent after 1 s, linearly for 4 tries, then doubling (`tcp_model.rs:105`, `:210-213`,
+- **Linux:** the SYN is resent after 1 s, linearly for 4 tries, then doubling (`tcp_model.rs:105-106`, `:210-213`,
   `:230-235`).
 - **Current Windows** (10 and 11): first retry after 1 s, then doubling, 4 retries: SYNs at 0, 1, 3, 7 and 15 s
   (Catchpoint, read 2026-11-07); Mustafa's laptop matches (§1.2).
@@ -472,7 +490,7 @@ words that find it. "E0"-"E13" are the docs PR's edits as its words name them.
 | 747 (failure row "A burst of total loss (B1)") | E2: over WebSocket TCP resends what the burst lost and the send budget keeps stale snapshots from queueing; WebTransport's 500 ms; the fallback's PM-0001-18 checks; the real client's fast reconnect required before the first online playtest (OQ-0001-19) | Adds the reconnect's own expectation (its bar, §6.4). |
 | 1295 ("What a spike must prove" item 2: "deltas again within 500 ms after B1") | E3: 500 ms on WebTransport; PM-0001-18's three checks on the WebSocket fallback | Nothing: the item is the proof test's. |
 | 1462-1469 (part 13's key: "For the proof test, the WebSocket delay is a stream wrapper inside the server's accept path" through "the message size limit applies before buffering (the advisor's reading, 2026-11-06).") | E4: the wrapper above TLS and below the WebSocket library (U3-Q4 (b)), modelling Linux 6.8's TCP (`linux-6.8-tcp v3`) instead of a fixed retransmission timeout | Nothing: the key scopes the wrapper to the proof test; §6.1 says why it cannot measure a reconnect. |
-| 1556 (PM-0001-18, "every client decodes deltas again within 500 ms of the link coming back") | E1: WebTransport 500 ms; the WebSocket fallback's three checks from the model's bound and one practice run with a tolerance fixed before it; "The client's fast reconnect over WebSocket is not measured here (OQ-0001-19)" | Nothing: the mark is the proof test's; the reconnect's bar is that work's (§6.4). |
+| 1556 (PM-0001-18, "every client decodes deltas again within 500 ms of the link coming back") | E1: WebTransport 500 ms; the WebSocket fallback's three checks from the model's bound and one practice run with a tolerance of 10 % fixed before it; "The client's fast reconnect over WebSocket is not measured here (OQ-0001-19)" | Nothing: the mark is the proof test's; the reconnect's bar is that work's (§6.4). |
 | 1571 (PM-0001-31, "the server never holds more than one unsent snapshot per client"; "L2's TCP proxy on RS") | E8: "unsent" means not yet written to the socket; the bite includes the snapshots the send budget skips; the stream wrapper named | Nothing. |
 | 1697-1699 (Mustafa's check item 11: "within half a second after it, the world catches up") | E13: half a second on WebTransport; on the WebSocket fallback fix 1's expectation (half within about two thirds of a second, about one burst in eleven over a second, one in forty over two: Table 1's fix-1 row) and the reconnect required before the first online playtest | Nothing: the checklist is the proof test's (its step 1 opens "the proof test's link", 0001:1673). |
 | 1737-1738 (migration step 5, slice 3: "*Done when:* ... and the byte-level audit (R2-INT-REC5) pass, and Mustafa's first online playtest is run") | E7: the WebSocket fallback's fast reconnect built and measured against OQ-0001-19's target before the first online playtest, a miss going to Mustafa before that playtest; links this record | Meets it, or brings the miss to Mustafa (§3.7). |
@@ -484,7 +502,7 @@ words that find it. "E0"-"E13" are the docs PR's edits as its words name them.
 |---|---|
 | 423 ("WebTransport is tried first with a timeout (proposed 1.5 s), then WebSocket") | Add: a WebSocket session reconnects over WebSocket at once; the timeout is for the first connect (§3.5). |
 | 429-432 ("one TCP port for the WebSocket fallback") | Stands: one endpoint (§3.2). |
-| 445-451 ("`Join` within 2 s"; "a cap on handshakes in progress"; "a modest cap on connections per address (above 1)"; "new sessions rate-limited") | Sized for reconnects: 2 connections per player in an outage; a room-wide outage's handshakes and `Join`s from one address; caps per player or scaled with the room (§3.9). |
+| 445-451 ("`Join` within 2 s"; "a cap on handshakes in progress"; "a modest cap on connections per address (above 1)"; "new sessions rate-limited") | Sized for reconnects: 2 connections per player in an outage; a room-wide outage's handshakes and `Join`s from one address; caps per player or scaled with the room; the 2 s `Join` deadline per attempt kept and modelled, or lengthened (§3.9). |
 | 494-497 ("expiry 30 s after issue with at most 5 s of leeway, a unique id") | The spare's life and refresh; a session claim under reading 2 (§4). |
 | 503-504 ("a bounded cache that refuses new tokens when full") | Sized for one entry per takeover (§4.2). |
 | 506-509 (the rule: "the client fetches a fresh token; the newest connection for a player id wins and the older one is closed") | Rewritten to §3: the trigger, one attempt at a time, the cap per outage, the chosen attempt policy, join-or-close, a credential held in advance, the graceful close, commands read from the old connection until the new one's first. The docs PR's requirement sentence (§5.1) then points to the rule instead of the record. |
@@ -527,8 +545,9 @@ words that find it. "E0"-"E13" are the docs PR's edits as its words name them.
 2. **A browser-faithful client.** Each simulated client runs the page's policy and the browser's rules as data:
    Chromium's endpoint lock with its 10 ms, its throttler with Windows' argument order and the 2-minute roll; or
    Firefox's admission queue, fail delay and open timeout (`u3-verify3-harness.md:273-275`). The harness already has
-   them (`fixes.rs:194-372`). Plus real browsers for a smaller sample: Chromium-based (Brave, Mustafa's browser) and
-   Firefox on Windows.
+   them (`fixes.rs:194-372`). Plus real browsers for a smaller sample, one per engine behind VISION_V2 §4's four
+   browsers (`docs/VISION_V2.md:52`): Chromium's (Chrome, Edge, and Brave, Mustafa's browser) and Firefox's, on
+   Windows, and Safari's WebKit, whose WebSocket rules are not researched yet (§8).
 3. **Windows-like clients:** timestamps off and SYN retries doubling from 1 s (`tcp_syn_linear_timeouts` 0 and
    `tcp_timestamps` 0 in their network namespace), and a sockops BPF program answering `BPF_SOCK_OPS_TIMEOUT_INIT`
    for other first timeouts such as 3 s (`u3-verify3-harness.md:191-195`, `:276-278`).
@@ -540,7 +559,7 @@ words that find it. "E0"-"E13" are the docs PR's edits as its words name them.
    move each burst's start by a random 0 to one tick period (0-33 ms) and record each burst's phase
    (`u3-verify3-stats.md:117-132`, `:241-243`), as the proof test's PM-0001-18 runs do from the docs PR on.
 7. **Repeated outages per client** (10 and 30), so browser throttles and the per-outage cap carry over
-   (`fixes.rs:1374-1380`; `u3-verify3-harness.md:180-186`).
+   (`fixes.rs:1375-1381`; `u3-verify3-harness.md:180-186`).
 8. **The server's kernel and timer frequency recorded** against `linux-6.8-tcp v3` (`tcp_model.rs:79`;
    `u3-verify3-model.md:193-196`).
 
@@ -548,7 +567,7 @@ words that find it. "E0"-"E13" are the docs PR's edits as its words name them.
 The recovery time; attempts; takeovers before and after the recovery; attempts closed (cancel, join-or-close,
 abort); throttle and fail delays; the silence before each attempt against the trigger; the bytes outstanding at the
 return against fix 1's limit; the browser, the OS and whether TLS resumed; the burst's tick phase
-(`u3-verify3-stats.md:176-181`; `fixes.rs:463-479`). A count of recoveries equal to the bursts expected, since a
+(`u3-verify3-stats.md:176-181`; `fixes.rs:463-476`). A count of recoveries equal to the bursts expected, since a
 client that never heals writes no record (`u3-verify3-stats.md:154-156`).
 
 ### 6.4 The bar (open: WS-RECONNECT-BAR, Mustafa's)
@@ -574,8 +593,9 @@ client that never heals writes no record (`u3-verify3-stats.md:154-156`).
   size its sample for it; the median then serves as the cross-check §2.3 describes.
 - **What "99 % within 1.05 s" needs in samples.** For a build whose share over 1.05 s is the model's 1 %, the count
   over 1.05 s that a correct build stays within 95 % of the time is 9 of 480, 21 of 1,440, or 60 of 4,800 (exact
-  binomial sums, this record's arithmetic; the verifier recomputed them, `verify-ws-docs.md:38`). One run of 480
-  cannot show 99 % to better than about 2 %; several runs or more clients are needed.
+  binomial sums, this record's arithmetic; the verifier recomputed them, `verify-ws-docs.md:38`). So one run of 480
+  that passes "at most 9 over 1.05 s" shows only that the share is below about 2 % (9 of 480 is 1.9 %), not 1 %;
+  several runs or more clients are needed.
 - **What a bar alone misses.** A trigger floor twice too slow, or a budget twice too large, sits inside the model's
   uncertainty (`u3-verify3-stats.md:95-107`, `:168-182`): catch them with unit and property tests of the trigger, the
   per-outage cap, cancel or join-or-close, and fix 1's budget formula.
@@ -591,7 +611,7 @@ client that never heals writes no record (`u3-verify3-stats.md:154-156`).
 - **Harness:** `tcp_model/fixes.rs`: the options (`Opts`, `Reconnect`, `Browser`, `Tls`, `ClientOs`: `:63-162`), the
   browser rules (`Throttler`, `FailRecord`, `Gate`: `:194-372`), the event loop (`Sim`, from `:501`), the rows
   (`configs()`: `:1212-1257`; `recommended()`: `:1259-1263`), the tables (`ws_limit_table` `:1276-1327`,
-  `side_effects_table` `:1329-1333`, `multi_burst_table` `:1374-1380`, `ws_limit_tail` `:1682-1683`, `ws_bar_fix1`
+  `side_effects_table` `:1329-1333`, `multi_burst_table` `:1375-1381`, `ws_limit_tail` `:1682-1683`, `ws_bar_fix1`
   `:2000-2011`), the pin (`:1833-1858`) and the statistics (`joint_dp` `:1552`, `wilson` `:1615`, `intervals`
   `:1626`).
 - **Run:** from `spikes/netcode-proof/`, `cargo +1.99.1 test --release -p npt-net --lib fixes -- --ignored
@@ -603,13 +623,17 @@ client that never heals writes no record (`u3-verify3-stats.md:154-156`).
   same for `tcp_model.rs` and `tcp_model/tests.rs`); the outputs and the patch at
   `975e72b:spikes/netcode-proof/results/u3-ws-fallback/`.
 - **Add first:** the scaled abort and join-or-close as options (§3.7; the patch shows one way); the 0.6 / 1.5 / 2.5 s
-  rows; the three-part bar in the lineage and tail tables still prints the second round's stale bar (`three_part()`,
-  `fixes.rs:1528-1537`; `u3-verify3-stats.md:133-138`); pins for the bite rows (`u3-verify3-stats.md:139-147`); the
-  Windows client end's own TCP rules (§3.10).
+  rows; the room's 2 s `Join` deadline per attempt (§3.9); the three-part bar in the lineage and tail tables still
+  prints the second round's stale bar (`three_part()`, `fixes.rs:1528-1537`; `u3-verify3-stats.md:133-138`); pins for
+  the bite rows (`u3-verify3-stats.md:139-147`); the Windows client end's own TCP rules (§3.10).
 
 ## 7. Sources
 
-**The model's outputs**, committed on branch `claude/netcode-proof-test-plan-hcky5g` at `975e72b` under
+**The model and harness**, on branch `claude/netcode-proof-test-plan-hcky5g` at `bf9d248`, under
+`spikes/netcode-proof/crates/net/src/`: `tcp_model.rs` (`linux-6.8-tcp v3`; last changed at `709e44a`, equal at
+`bf9d248`), `tcp_model/tests.rs` and `tcp_model/fixes.rs` (last changed at `bf9d248`).
+
+**The model's outputs**, committed on the same branch at `975e72b` under
 `spikes/netcode-proof/results/u3-ws-fallback/` (`README.md` there says what each is and how to reproduce it):
 - `tables-1e020a7.txt`: every table (60,000-phase rows, multi-burst lineages, side effects, the 600,000-phase tail),
   printed at `1e020a7`; the rows are unchanged at `bf9d248`.
@@ -645,6 +669,7 @@ equals its last change, under `.checkpoints/netcode-proof-test/`:
 - Windows: Catchpoint, "TCP SYN retries" (docs.catchpoint.com/docs/catchpoint-nodes-tcp-syn-retries; 2026-11-07);
   Microsoft Tech Community, "TCP Templates for Windows Server 2019" (2018-10-03; read 2026-11-07); Mustafa's own
   `Get-NetTCPSetting` (2026-11-07). Sure: medium-high.
+- The trace: `docs/VISION_V2.md:52`, `:55`, `:63`; ADR 0001's part 10 need (`0001-multiplayer-netcode.md:473`).
 
 ## 8. Open questions the reconnect work brings back
 
@@ -653,8 +678,13 @@ equals its last change, under `.checkpoints/netcode-proof-test/`:
    Mustafa's call if the robust policy misses "about 1.05 s" (OQ-0001-19).
 2. **RESUME-CRED:** which reading of "bound to the session" (§4.1), and the spare's life against the 30 s expiry.
 3. **At a takeover:** a full state or a delta against the last acknowledged snapshot (§3.9).
-4. **The bar** (§6.4): WS-RECONNECT-BAR, Mustafa's: the borrowed WS-BAR form now, or a bar the reconnect work proposes
+4. **The room's admission rules against reconnects:** part 11's "the newest connection for a player id wins" with
+   the graceful close of the old one (§3.9; what a leaked credential allows, §4.1 reading 2); part 10's per-address
+   cap, handshake cap and new-session rate sized for a room-wide outage (§3.9); and the 2 s `Join` deadline per
+   attempt, kept and modelled or lengthened for every connection (§3.9).
+5. **The bar** (§6.4): WS-RECONNECT-BAR, Mustafa's: the borrowed WS-BAR form now, or a bar the reconnect work proposes
    with its plan. Either way: the statistic that measures the reconnect's slowdown (the median barely moves), the
    sample size for "99 %", and the numbers after a practice run on the faithful setup.
-5. **Not researched:** Safari's (WebKit's) WebSocket connect rules and throttles; the dual-stack case once the room
-   publishes IPv6 (Chromium's 300 ms IPv4 fallback, a lock per address: §3.2); a backoff after real closures (§3.5).
+6. **Not researched:** Safari's (WebKit's) WebSocket connect rules and throttles, though VISION_V2 §4 names Safari
+   (`docs/VISION_V2.md:52`); the dual-stack case once the room publishes IPv6 (Chromium's 300 ms IPv4 fallback, a lock
+   per address: §3.2); a backoff after real closures (§3.5).
