@@ -71,6 +71,8 @@ struct Opts {
     browser: Browser,
     tls: Tls,
     client_os: ClientOs,
+    /// The adaptive budget's multiplier: 1 is fix 1 as specified; 2 is a bite (a budget twice too large).
+    budget_scale: u64,
 }
 
 /// Fix 3's policy.
@@ -769,9 +771,9 @@ impl<'a> Sim<'a> {
                 }
             }
         }
-        let adaptive = self.o.adaptive;
+        let (adaptive, scale) = (self.o.adaptive, self.o.budget_scale);
         let c = &mut self.conns[self.server_cur];
-        let fits = !adaptive || c.m.outstanding(0) + SNAP <= adaptive_limit(&c.m);
+        let fits = !adaptive || c.m.outstanding(0) + SNAP <= scale * adaptive_limit(&c.m);
         if takeovers == 0 && c.owed[0] == 0 && c.m.free_budget(0) >= SNAP && fits {
             c.m.write(0, SNAP, t);
             self.out.written += 1;
@@ -1203,6 +1205,7 @@ fn opts(cfg: TcpConfig, adaptive: bool, reconnect: Option<Reconnect>) -> Opts {
         browser: Browser::Chromium,
         tls: Tls::Resumed,
         client_os: ClientOs::Linux,
+        budget_scale: 1,
     }
 }
 
@@ -1977,4 +1980,111 @@ fn chromiums_throttler_and_firefoxs_fail_delay_follow_their_sources() {
     g.stopped(70 * SEC, 0, true, false);
     g.opened(71 * SEC, 0);
     assert!(g.fail[0].is_none(), "an open clears it");
+}
+
+/// P(Binomial(n, p) <= k), from log-factorials up to n.
+fn binom_le(n: usize, k: usize, p: f64, lf: &[f64]) -> f64 {
+    if p <= 0.0 {
+        return 1.0;
+    }
+    if p >= 1.0 {
+        return if k >= n { 1.0 } else { 0.0 };
+    }
+    let (lp, lq) = (p.ln(), (1.0 - p).ln());
+    (0..=k.min(n))
+        .map(|j| (lf[n] - lf[j] - lf[n - j] + j as f64 * lp + (n - j) as f64 * lq).exp())
+        .sum::<f64>()
+        .min(1.0)
+}
+
+/// Fix 1 alone, as the proof test measures it (WS-SCOPE "no", Mustafa 2026-11-07): the bound he set for PM-0001-18's
+/// WebSocket bar ("never looser than the model predicts for a correct build with fix 1"). Over 600,000 phases each:
+/// the correct build (fix 1 as specified) and two broken ones, today (the 64 KB budget, no fix 1) and a budget twice too
+/// large. The bound splits a 5 % false-fail allowance: the median part fails a correct run at most 1 % of the time (the
+/// smallest X on a 10 ms grid with P(at least ceil(n / 2) at or below X) >= 0.99), the count part 2 % (for Y of 2.0,
+/// 2.5 and 3.0 s, the smallest k with P(at most k over Y) >= 0.98), the max part 2 % (the smallest Z on a 100 ms grid
+/// with P(none over Z) >= 0.98). Then each bar's exact joint chance for the three builds, the correct build's bootstrap
+/// interval, and its chance if every recovery were 5 % or 10 % slower or 20 or 40 ms later (model error: why the
+/// numbers wait for the practice run).
+#[test]
+#[ignore]
+fn ws_bar_fix1() {
+    let mut double = configs()[1].1;
+    double.budget_scale = 2;
+    let rows: Vec<(&str, Vec<SetOut>)> = [
+        ("fix 1 (correct)", configs()[1].1),
+        ("today: 64 KB, no fix 1", configs()[0].1),
+        ("fix 1 with a budget twice too large", double),
+    ]
+    .into_iter()
+    .map(|(name, o)| (name, sweep_sets(o, TAIL_SETS)))
+    .collect();
+    let lf = log_factorials(1_440);
+    let alls: Vec<Vec<u64>> = rows.iter().map(|(_, s)| pooled(s)).collect();
+    for ((name, _), all) in rows.iter().zip(&alls) {
+        println!("{name}: {}", summary(all));
+    }
+    let correct = &alls[0];
+    let nn = correct.len() as f64;
+    let share_le = |x: u64| correct.partition_point(|&v| v <= x) as f64 / nn;
+    let moved = |f: &dyn Fn(u64) -> u64| -> Vec<u64> {
+        let mut v: Vec<u64> = correct.iter().map(|&x| f(x)).collect();
+        v.sort_unstable();
+        v
+    };
+    let errors: [(&str, Vec<u64>); 4] = [
+        ("x1.05", moved(&|x| x + x / 20)),
+        ("x1.10", moved(&|x| x + x / 10)),
+        ("+20 ms", moved(&|x| x + 20 * MS)),
+        ("+40 ms", moved(&|x| x + 40 * MS)),
+    ];
+    for n in [480usize, 1_440] {
+        let need = n.div_ceil(2);
+        let x = (0..400u64)
+            .map(|i| 400 * MS + i * 10 * MS)
+            .find(|&x| 1.0 - binom_le(n, need - 1, share_le(x), &lf) >= 0.99)
+            .expect("a median bound");
+        let z = (0..600u64)
+            .map(|i| SEC + i * 100 * MS)
+            .find(|&z| share_le(z).powi(n as i32) >= 0.98)
+            .expect("a max bound");
+        for y in [2_000 * MS, 2_500 * MS, 3_000 * MS] {
+            if y >= z {
+                continue;
+            }
+            let r = 1.0 - share_le(y);
+            let k = (0..=n)
+                .find(|&k| binom_le(n, k, r, &lf) >= 0.98)
+                .expect("a count bound");
+            let bar = Bar {
+                median: Some(x),
+                y,
+                k,
+                z,
+            };
+            let cells: Vec<String> = rows
+                .iter()
+                .zip(&alls)
+                .map(|((name, _), all)| {
+                    format!("{name} {:.4}", pass(n, bar, rates(bar.counts(all))))
+                })
+                .collect();
+            let ((blo, bhi), _) = intervals(n, bar, &rows[0].1, &lf, n as u64);
+            let err: Vec<String> = errors
+                .iter()
+                .map(|(label, v)| format!("{label} {:.3}", pass(n, bar, rates(bar.counts(v)))))
+                .collect();
+            println!(
+                "model bound at {n} client-bursts: {}: {} (correct build's bootstrap {blo:.4}-{bhi:.4}); the correct \
+                 build under model error: {}",
+                bar.describe(n),
+                cells.join(", "),
+                err.join(", ")
+            );
+        }
+    }
+    println!(
+        "phases censored at 60 s after the return (counted over every bar): {}",
+        CENSORED.load(Ordering::Relaxed)
+    );
 }
