@@ -189,6 +189,14 @@
     Side effects (never abandoned, 30 min per profile): skipped 4/20/74/116 per mille at P1-P4; false reconnects 0, 0,
     11, 18 (0, 0, 0.37, 0.6 a minute). **Next:** second skeptic round on cc72f6f (model + harness/statistics), then
     WS-FIX, RESUME-CRED, WS-LIMIT back to Mustafa (his rule: a skeptic changed a number and found conflicts).
+    **Harness skeptic DONE (u3-verify2-harness.md, H1-H20):** H6 never-abandoned attempts end in a session takeover
+    after 99 % of bursts (the old connection had recovered): 480 per run, 48 at once from LG; H11 the gain rests on the
+    client OS's SYN retry at 1 s (a 3 s Windows InitialRto: no gain, max 2,879; abort-500 robust, max 1,815); H12
+    Firefox's fail delay after a page-closed attempt (200-400 ms; abort 1 s: 370 over 1 s); H17 L2 cannot measure the
+    modelled reconnect (DelayStream above TLS: SYN and TLS flights never lost; ~2 RTT faster) and H18 LG is no browser;
+    H8 the attempt cap is per run (must be per outage); H7 busy uses room state; H10 server flight pessimistic (TLS
+    resumption ~1 segment); "bound to the session" readings 1-3; conflict list updated (429-432 resolved).
+    Diag patch: scratchpad/u3v2h/diag.patch. Chromium's WebSocket throttler (H3) grows with failed attempts.
 36. **The fallback's three fixes, measured** · **41bd8a0** (pushed) · TcpConfig (budget, thin linear timeouts,
     rto_min), the handshake for reconnects, `fixes.rs` (1,000 B1 phases per configuration). Results (p50/p99/max ms):
     defaults 708/913/2,248; 3-snapshot budget alone 314/1,415/4,203; + thin LT 314/570/995 (but 33-65 % of snapshots
@@ -367,7 +375,8 @@
   · notes `u3-verify2-{model,harness,stats}.md` (each ends DONE) · if cut: resume with Workflow({scriptPath,
   resumeFromRunId: "wf_a8e0f590-0bc"}); an agent cut mid-way: edit its prompt to "continue after your notes' last
   block" first (the first round's pattern). Then: fold its findings, bring WS-FIX, RESUME-CRED, WS-LIMIT to Mustafa.
-- Saver: background task `btvszgr34` · started about 04:01 UTC 2026-11-07 (110 minutes, to about 05:51).
+- Saver: background task `b1t71q312` · started about 04:31 UTC 2026-11-07 with a 2 h background limit (110 minutes,
+  to about 06:21); `btvszgr34` was killed at the 30-minute default limit (start savers with timeout 7200000).
 - (done) **Verification of the fallback fixes** · workflow `wf_b08132f7-b1c` (npt-ws-fixes-verify; rust-reviewer on the
   model and numbers, netcode-architect on the ADR 0001 reading; xhigh) · launched about 23:36 UTC · script:
   `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify-wf_b08132f7-b1c.js`

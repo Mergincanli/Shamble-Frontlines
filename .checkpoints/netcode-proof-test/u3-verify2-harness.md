@@ -129,9 +129,9 @@ appended with a shell heredoc, not the Write tool; every later save uses Write (
 - H16 (cite slip): plan.md:297 cites "ADR 0001:1613-1618" for "a lobby, real join tokens, reconnecting"; those lines are
   now PM failure routing; the scope text is ADR 0001:1640-1641.
 - H17 (item 9, MAJOR, what the proof test measures): PM-0001-18's WebSocket part runs on L2 with LG's clients
-  (advisor-u3q.md:20, E1 at :194-195: "L2 with LG on each transport ... through the accept path's delay wrapper"), and
+  (advisor-u3q.md:20; E1 at :194-195: "L2 with LG on each transport ... through the accept path's delay wrapper"), and
   the wrapper sits ABOVE TLS, below tungstenite (U3-Q4 (b), checkpoint netcode-proof-test.md:338; E4 advisor-u3q.md:
-  208-210; "the TLS handshake now runs undelayed above DelayStream", :158). So in the real run a reconnect's SYN and TLS
+  202-203; "the TLS handshake now runs undelayed above DelayStream", :159). So in the real run a reconnect's SYN and TLS
   flights cross the unimpaired LG-RS path even during the burst; only the upgrade, the 101, the Join and what follows
   pass the model. The harness loses the SYN and the TLS flights in the burst (fixes.rs:222-244 via TcpModel::connect).
   If DelayStream's new-connection model starts with RTO 1 s (S4: "1 s before the first sample"), the upgrade request
