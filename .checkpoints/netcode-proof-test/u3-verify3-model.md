@@ -22,7 +22,7 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   --nocapture --test-threads 1`, 2 min 51 s wall, 11 min CPU) reproduce .gate/netcode-proof-test/u3v3-tables1.txt
   byte for byte except one trailing blank line (.gate/rr3-tables.txt). Every number in the brief is in that output
   (600k: today 1121/2686/12068; fix1 654/2164/11384; fix3 844/1374/5343; REC 654/1051/1859/2092/4196, over 1/1.5/2/3 s
-  6768/1009/205/...; pass 0.227, 0.997 [0.993-0.999], 0.990 [0.980-0.997]).
+  6768/1009/205/...; pass 0.227, 0.997 [0.993-0.999], 0.990 [0.980-0.997]). spikes/ identical 1e020a7..HEAD.
 - K1 (1) old duplicates: CONFIRMED. tcp_sequence before(end_seq, rcv_wup) (input.c:4424-4433) = model :2375 (end =
   data end, or seq for a pure ACK: tcp_acceptable_seq = snd_nxt); tcp_validate_incoming discards after
   tcp_send_dupack (input.c:5882-5900) = model :2380-2383 (returns before ts_recent and on_ack). PAWS never fails on
@@ -40,7 +40,8 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   (sacktag_write_queue) = :1524. Quirk: when a D-SACK block lies inside a later-sorted SACK block (D.start >
   block.start) the kernel tags those skbs twice (once as next_dup of the covering block, once as the D-SACK block
   itself), so undo_retrans drops by 2 for one D-SACK; the model tags once (:1533-1539). Direction: model undoes
-  later (pessimistic), only for an ofo duplicate not at a block's start. Not measured.
+  later (pessimistic), only for an ofo duplicate not at a block's start. Not measured (NoDsack bite below moves the
+  recommended row by <= 6 ms at p99, so D-SACK-driven undo is a small lever anyway).
 - K4 (2) undo machinery: CONFIRMED. tcp_init_undo (input.c:2126-2131) = :1028-1032; tcp_retransmit_skb sets
   RETRANS, retrans_out += 1 even if already R ("leaked", FASTRETRANS_DEBUG = 1 at tcp.h:17), retrans_stamp at the
   first (attempted) resend from the skb's ms stamp, undo_retrans = max(0, u_r) + 1 (output.c:3407-3428) = :2683-2690;
@@ -90,3 +91,42 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   tcp_init_transfer cwnd 1 iff total_retrans > 1 && undo_marker (input.c:6202-6205) = :2347; server undo only if
   num_timeout (minisocks.c:594) = :2319. SYN timer: total_rto > tcp_syn_linear_timeouts (timer.c:648-650) = :2406-2410
   (SYNs at 0,1,2,3,4,5,7,11,19,35 s for Linux; for syn_rto 3 s / linear 0: 0,3,9,21 s).
+
+## Block 2: the median recommended phase and the p50 rise (worktree .gate/rr3-wt, diagnostic patch
+## scratchpad/rr3/patch1.py: env knobs RR3_VARIANT (the model's own bite variants on every connection), RR3_NODISTINCT,
+## RR3_TRACE_SEED; tests rr3_rows / rr3_trace; target .gate/rr3-wt-target. Knobs off = the tables exactly.)
+- T1 (7) median recommended phase = seed 1218, burst 6,462 ms, 653 ms (rank 500 of set 0; trace .gate/rr3-trace1218.txt,
+  times from the return). Steps, each checked against v6.8:
+  (a) pre-burst Open, cwnd 6, ssthresh 5, srtt 125, RTO 325, a leftover undo_marker from an earlier repair (kernel
+      never clears it on a non-undone exit) - kernel.
+  (b) -996..-896 four snapshots sent and lost; a 7th written snapshot held by cwnd; probe at -737 = min(2 srtt + 2 ms,
+      head + RTO - now) (output.c:2856-2873) sends that new segment past cwnd (lost); RTO rearmed from now (icsk_pending
+      0, output.c:2957-2960) -> RTO -411 resends the head (lost), backoff 1 - kernel.
+  (c) +240 second RTO (Loss, retransmits 1: no new ssthresh, cwnd = in flight + 1 = 1, frto armed) resends the head;
+      it reaches the client as an OLD duplicate (rcv_wup past it): discarded, dupack + D-SACK - kernel (K1).
+  (d) +274.6 the client's own first post-burst segment (its RTO resend at +230) acks 198450->200550 (two pre-burst
+      segments whose ACKs died in the burst) with TSecr 6433 < retrans_stamp: tcp_process_loss -> tcp_try_undo_loss
+      via tcp_packet_delayed (input.c:2879-2881, :2457-2461): LOST cleared on the 5 burst-time segments, cwnd back to
+      6, Open. Karn removes the seq sample; the TSecr fallback (input.c:3155-3157) gives a 1.30 s sample: srtt 125 ->
+      273, RTO 325 -> 1,465 ms, so the probe would wait 548 ms (to +823) - kernel (that is RFC 7323's echo of the
+      last in-order TSval, sent 1.3 s earlier).
+  (e) +303.8 the room writes the first fresh snapshot (budget freed); sent (in flight 5 < cwnd 6); SACKed at +411.5:
+      RACK (reo_wnd = min_rtt/4: Open, 1 SACKed < reordering 3) marks the 5 burst-time segments lost -> Recovery,
+      ssthresh 4; PRR with in flight 0: sndcnt = max(1, 1), no SND_UNA advance -> cwnd 1 (input.c:2663-2687) - kernel
+      (RFC 6937's slow-start bound from an empty pipe).
+  (f) PRR ramps 1 -> 2 -> 3 resends per round (+411, +503, +598); the hole closes at +653: fresh delivered - kernel.
+  Every step is a v6.8 path. The p50 rise is real model behaviour: the Eifel undo plus a 1.3 s TSecr sample hide the
+  burst losses until a fresh snapshot is SACKed one round later, then PRR rebuilds from cwnd 1. v2 (no undo) stayed in
+  Loss and slow-started from +275.
+- A1 (7) attribution on the recommended row, 60,000 phases each (the model's own bite variants applied to every
+  connection, tables otherwise unchanged): faithful 654/1054/1827/max 3013 (over 1 s 675, 1.5 s 85, 2 s 19);
+  NoUndo 509/828/1434/2317 (223/53/9); OldSeqProcessed (G1 off) 626/1145/1817/2615 (1353/90/19); NoExitCwnd
+  653/1033/1804/3696; NoFrto 650/1057/1823/2798; ProbeInDisorder 654/1057/1559/3013; NoKarn 657/951/1445/2164
+  (350/51/4); NoTsecrFallback 655/945/1496/2165 (337/60/6); NoDsack 655/1060/1827/3013; RtoCwndOne and RtoMarksAll
+  identical to faithful (inert here); NoCubic 570/1176/1834/2576 (not a kernel option). So of the +219 ms p50 rise
+  (435 -> 654) about 145 ms is the undo machinery (all kernel), the rest the other v3 rules; the stale-TSecr RTT
+  sample (Karn + echo, both kernel) costs about 100 ms at p99.
+- D1 (6) distinct arrivals (arrival >= last + 1 ns, model :2506): FAITHFUL in spirit (tcp_rcv_established refreshes
+  tcp_mstamp per segment, so two arrivals never share a send stamp); it changes nothing measurable: recommended
+  60,000 with ties allowed (RR3_NODISTINCT=1) 654/1054/1827/2066/3013, over 0.8/1/1.2 s 4785/674/255 vs faithful
+  4791/675/256. It matters only for the (f) bookkeeping test (the build agent's +73,638 ms case).

@@ -333,6 +333,18 @@
 - Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
 - macOS runner images: macos-26 arm64 Safari 26.6.2; macos-15 arm64 Safari 27.2 (infra digest F).
 
+## Facts from Mustafa
+- **2026-11-07 about 11:10 UTC, his Windows laptop:** `Get-NetTCPSetting | Select-Object SettingName, InitialRtoMs,
+  MaxSynRetransmissions` gave MaxSynRetransmissions 4 for every template (Internet, InternetCustom, Datacenter,
+  DatacenterCustom, Compat; Automatic blank) and InitialRtoMs blank (the built-in default). Read with: Catchpoint's
+  write-up (docs.catchpoint.com/docs/catchpoint-nodes-tcp-syn-retries: "Windows 10 is configured out of the box with
+  an initial RTO of 1 second and 4 Syn Retransmits", SYNs at 0, 1, 3, 7, 15 s, final timeout 21 s) and a Windows 10
+  1909 `netsh interface tcp show global` dump (my-computer-memo.blogspot.com, 2020-01: "Initial RTO : 1000",
+  "Max SYN Retransmissions : 4"; earlier Windows used 3 s). So a current Windows client retries a lost SYN after 1 s,
+  doubling: the "Windows-like client, first SYN timeout 1000 ms" rows apply (never abandoned 645/886/1,484/2,871 on
+  60,000 phases); the 3 s rows do not. Optional direct reading on his machine: `netsh interface tcp show global`
+  (its "Initial RTO" line).
+
 ## Decisions taken
 - **Mustafa, 2026-11-06 about 23:40 UTC:** "WS-FIX: (a). RESUME-CRED: (a), with the spare tokens kept in memory only,
   short-lived and bound to the session. WS-LIMIT: 99 % of client-bursts within 0.8 s, and every one within 1.0 s.
