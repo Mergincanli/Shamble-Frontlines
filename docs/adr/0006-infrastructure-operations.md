@@ -428,6 +428,9 @@ interim positions, until its own research before the first online playtest; the 
    (r6 lines 565–569 and 541; R6-COST-F1, r6 lines 219–224; R6-OBS-F5, r6 lines 285–290). *Ids:* R6-OBS-REC1, R6-OBS-REC2.
    *Need:* VISION_V2 §6.1 (per-room lifecycle and crashes) and VISION_V2 §4 ("Matches feel fair up to about 100 ms of
    ping": overruns, the server tick budget and the fallback share become visible) (r6 lines 734–735 and 749).
+   *Note, Mustafa (2026-11-04, A4 item 6; recorded 2026-11-07 as a note, not a design):* he puts browser error reports
+   and telemetry "next to the server metrics already planned". This part holds those server metrics; the browser
+   reports are part 10's (its note). No metric is added.
 10. **Crash reports.** In the browser: Sentry's browser SDK with `wasmIntegration` and build ids from `wasm-split`;
     debug files uploaded by CI and never shipped (the upload job is ADR 0002's, critic rank 34); the organization
     created in Sentry's EU location; `userInfo` off, so the SDK infers no IP address, and its deny lists for HTTP
@@ -455,6 +458,11 @@ interim positions, until its own research before the first online playtest; the 
     reporting endpoint; the EU location is chosen once; the SDK sends IPs unless told not to (r6 lines 758–760). *Ids:*
     R6-OBS-REC3, R6-OBS-OQ3, R6-OBS-OQ4. *Need:* VISION_V2 §4 (four desktop browsers: crashes per browser are the
     evidence) and §6.1 (per-room crash reports) (r6 lines 763–764).
+    *Note, Mustafa (2026-11-04, A4 item 6; recorded 2026-11-07 as a note, not a design):* "from the first playtests
+    on, error reports and telemetry from players' browsers, next to the server metrics already planned". In this
+    record they meet this part's browser crash reports (pass mark PM-0006-30) and ADR 0003's client field data, which
+    this part stores. Which milestone his "first playtests" are is not set here; ADR 0003 switches its field data on
+    in slice 6 (0003:1245), and the register's I-18 row holds that timing beside his words.
 11. **Data protection.** Every store is in the EU (Hetzner EU, Sentry EU, a Grafana EU stack); no IP address, token or
     guest secret goes into logs, reports or match records; retention is capped: logs 14 days and metrics 15 days
     (proposed: the free tier's and Prometheus' defaults), match records kept while their content hash is still analysed
@@ -1015,6 +1023,10 @@ Researching it before this record, or leaving it as one shared question: settled
   - *What decides it:* a short read beside the security baseline, before the first online playtest.
   - *Carries:* no research id (the engine-architect review's finding 5 and its question 2; the infra review's finding
     1 and its question RELEASE-WINDOW).
+  - Mustafa (2026-11-04) bears on it, A4 item 6, recorded 2026-11-07 as a note, not a design: "one-click rollback of
+    client deploys and of server versions". With either option above the previous room binary stays on each VM; how
+    the client host puts a previous deployment back was not read (above), so his client-deploy rollback has no read
+    source yet.
 - **OQ-0006-15. Which domain do the client host, the lobby and the game servers use, and when is it registered?**
   - Answered by Mustafa (2026-11-03): "for the WebSocket leg, a domain I register." (SPIKE-MACHINES) and
     "shamblefrontlines.com, which I register at Cloudflare." (DOMAIN); registered (Mustafa, 2026-11-03): "DOMAIN: done.
@@ -1549,7 +1561,8 @@ Each milestone is checked by its marks (What a spike must prove; Test plan).
   VM removed stops costing from the next hour (inferred).
 - **A bad release:** not designed (part 15, OQ-0006-14); under the interim position the previous room binary stays on
   every VM, and the client and the servers are switched back together while no room runs; how the client host puts a
-  previous deployment back was not read.
+  previous deployment back was not read. Mustafa (2026-11-04, A4 item 6; recorded 2026-11-07 as a note, not a
+  design) asks for "one-click rollback of client deploys and of server versions" (OQ-0006-14's note).
 - **Certificates:** the production form can move between a certificate per hostname and the wildcard by the security
   baseline's decision; the development certificates are not affected.
 - **Observability:** the same exporter feeds Prometheus on the staging VM or Grafana Cloud (M1 or M2), so moving
