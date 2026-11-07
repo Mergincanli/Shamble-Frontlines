@@ -414,7 +414,21 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **Waiting on Mustafa:** WS-SCOPE (recommended (b): fix 1 only in the proof test, the reconnect with slice 2),
+- **Mustafa decided** WS-SCOPE no, RESUME-CRED deferred, WS-BAR three-part (Decisions taken, 13:45 UTC). Since:
+  bf9d248 ws_bar_fix1 (the model's bound for a correct fix-1 build at 480: "half within 0.67 s, at most 5 over 2.5 s,
+  none over 6.9 s", correct 0.968, today and a 2x budget 0.000; 5 % slower 0.001: fragile, so the practice run
+  matters); 5a5aba9 U3b ImpairSocket + L2Config merged from the build agent's worktree (check.mjs 9/9, 184/196 tests,
+  gate PASS --no-smoke; notes u3-build-u3b.md; open: NAME-L2PROBE, slot id across runs).
+- **Workflow `wf_f3167435-5b4`** (npt-u3b-verify-and-ws-docs) · launched about 14:40 UTC · phase 1 in parallel:
+  rust-reviewer skeptic of U3b (notes u3-verify-u3b.md), the advisor's docs-PR words and rulings (advisor-ws-docs.md:
+  ADR 0001 424, PM-0001-18's split with the practice-run rule and the model bound, the reconnect requirement, marks.json
+  and plan R3 changes, bursts per run, NAME-L2PROBE), the netcode-architect's reconnect record (draft
+  ws-reconnect-record-draft.md -> docs/design/ws-reconnect.md); phase 2: a verifier on both drafts (verify-ws-docs.md).
+  Script: /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3b-verify-and-ws-docs-wf_f3167435-5b4.js
+  · if cut: Workflow({scriptPath, resumeFromRunId: "wf_f3167435-5b4"}). **After it:** fix U3b's findings; open the
+  docs PR on claude/npt-readings from main in a worktree (.gate/npt-readings), label needs-mustafa; the spike-branch
+  changes (marks.json -18, plan R3, SERIES.md); then U3c (DelayStream with fix 1's writer inputs).
+- (done) **Waiting on Mustafa:** WS-SCOPE (recommended (b): fix 1 only in the proof test, the reconnect with slice 2),
   RESUME-CRED (defer under (b); else the session-id reading), WS-BAR (recommended: the form now, numbers after an
   unjudged L2 calibration run). Sent about 11:45 UTC 2026-11-07. His Windows TCP settings: recorded in "Facts".
 - **Done meanwhile:** a0d7916 plan §4.7 lists `L2Config` (M6, before the code); 709e44a the round-3 clean-ups (rto_ns
