@@ -19,7 +19,18 @@
   Chromium's system libraries before any test; the re-run passed). The facts are read from the API at build time.
 - **Done:** step 0, the sources saved (6e88f9a); draft PR #43 opened and subscribed; CI green on main 4c6db5b after
   #42's merge (the gate workflow, run 42315225217). Plan revision 1 (`plan-rev1.md`).
-- **Current step:** 1, the advisor's review of plan revision 1.
+- **Done:** step 1, the advisor's review (`advisor-plan-rev1.md`): APPROVE WITH CONDITIONS (10). VFX-PLACE (a) §7;
+  VFX-TAG (a); XP-PLACE (a) after the trust rule; XP-TERM (a) keep "XP", a Decisions-needed item in the report
+  (options: all account progression (recommended), Service points only, account level only, also in-match weapon XP;
+  "XP" already names LOOP_V2:242's weapon XP, register :69, DESIGN_NOTES:23, legacy career XP: map none); REG (a)
+  widened: R2-ROOM-OQ7, OQ-0005-CD7 (not "is the Feel Lab"), OQ-0006-21 (its B.2 sentence gains the XP rule),
+  OQ-0003-16 ("Low drops extras but stays readable"); LOOK (a) no LOOK_V2 edit, a plain question in the report
+  (LOOK_V2:63 "used sparingly"); HEADER (a) at :7, dated 2026-11-07 for the edit and 2026-11-06 for his item.
+  C6: EDITOR_V2 has 112 lines. C7: J3 (README:408) gives `[LATER]` §7 no engine feature; VISION_V2 §6.3's "effect"
+  is gameplay effects. C8: B.2's follow-up "bears on it"; the match record adds no field (ADR 0006:474-475). C9: #40's
+  STATUS :3, :31, :173 at 0588a17. C10: the CI line as facts (run 42313665674 attempt 1 cancelled after 6 min 34 s in
+  apt, attempt 2 passed after 6 min 49 s; push run 42313658977 did the step in 11 s).
+- **Current step:** 2, the build (EDITOR_V2 §7 and header, VISION_V2's XP block, four register clauses).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
