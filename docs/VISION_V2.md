@@ -4,7 +4,7 @@ Written by Mustafa and the Advisor, 17 October 2026: step 1 of the v2 planning. 
 rebuild. Status tags as in LOOP_V2.md: `[DECIDED]` Mustafa decided it · `[DEFAULT]` stands unless vetoed ·
 `[OPEN]` needs a decision · `[LATER]` not now.
 Updated on 2026-11-06 with Mustafa's words: his community-servers note of 2026-11-03 (§5) and his design walk of
-2026-11-04 (pillar 5, and the pointers in §5 and §7).
+2026-11-04 (pillar 5, and the pointers in §5 and §7); on 2026-11-07, his private-match XP item of 2026-11-06 (§5).
 
 ## 1. North star
 **Matches that turn into stories players retell:** a last-second steal, a saved-up rush that flips the game, a combo

@@ -41,7 +41,16 @@
   STATUS:660's EDITOR_V2 :94/:95; the CI line under Open bugs and risks), ROADMAP (B.2 MERGED, this entry, queue; the
   "Docs after R7" entry folded into Build history), the B.2 report's corrections (:71-81, C9). Its checks: e-checks
   PASS, repo map OK, gate PASS +0 −0. CI green on d5e2c62.
-- **Current step:** 4, the review round (the verifier, game-designer, art-director; one round).
+- **Done:** step 4, the review round on e967196 (resumed after a usage limit, 02:47 UTC): the verifier PASS WITH NOTES
+  (V-1 to V-5, Low), game-designer PASS WITH NOTES (GD-1 Medium: Service points come only from uplink tech, so the
+  Advisor's suggestion (1) fits only an XP earned per action; GD-2 to GD-6 Low), art-director PASS WITH NOTES (AD-1
+  Medium: "onomatopoeia" bears on OQ-0003-15; AD-2 to AD-6 Low). Nothing Critical or High: no skeptics.
+- **Done:** step 5, the one fix pass (this commit): README:103's fifth clause (AD-1); VISION_V2's header line names
+  the XP item (GD-6, in place, no new line); STATUS: :3's verdict wording (V-3), the row's follow-up count (V-2),
+  XP-TERM sharpened (GD-1, GD-2, GD-3, LOOP_V2:235), LOOK sharpened (AD-2, AD-1, AD-6), the need rule's background line
+  (V-5), new follow-ups (GD-4, GD-5, AD-4; stale citations V-1, AD-5); ROADMAP's entry; e-checks updated. Skipped:
+  AD-3 (a pointer beside his line: the LOOK question covers it). V-4 goes in the report's Evidence.
+- **Current step:** 6, the report (Decisions needed: XP-TERM with GD-1's fact, LOOK with the no-conflict reading).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps

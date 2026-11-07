@@ -32,15 +32,16 @@ check(jvi.count(xp[1][len('- [DECIDED] '):]) == 1, 'XP rule once in VISION_V2')
 check(jvi.count(xp[2][2:]) == 1, 'XP open line once in VISION_V2, "Open," kept')
 
 print('== E2: nothing else changed')
-for path, allowed in [('docs/EDITOR_V2.md', 2), ('docs/VISION_V2.md', 1)]:
+for path, allowed in [('docs/EDITOR_V2.md', 2), ('docs/VISION_V2.md', 2)]:
     old = show(f'{BASE}:{path}').split('\n'); new = read(path).split('\n')
     ops = [o for o in difflib.SequenceMatcher(a=old, b=new, autojunk=False).get_opcodes() if o[0] != 'equal']
     print('  ', path, [(o[0], o[1] + 1, o[2], o[3] + 1, o[4]) for o in ops])
-    check(len(ops) == allowed and all(o[0] == 'insert' for o in ops), f'{path}: only {allowed} insert block(s)')
+    ok = len(ops) == allowed and all(o[0] == 'insert' or (o[0] == 'replace' and o[1] == 6 and o[2] == 7) for o in ops)
+    check(ok, f'{path}: only {allowed} block(s): inserts, and for VISION_V2 its header line :7 rewritten')
 check([l for l in show(f'{BASE}:docs/EDITOR_V2.md').split('\n') if l.startswith('#')] ==
       [l for l in ed.split('\n') if l.startswith('#')][:-1], 'EDITOR_V2 headings unchanged, §7 added last')
 rd = subprocess.run(['git', 'diff', '--numstat', BASE, '--', 'docs/adr/README.md'], capture_output=True, text=True).stdout.split()
-check(rd[:2] == ['4', '4'], 'README: four changed lines (the four clauses)')
+check(rd[:2] == ['5', '5'], 'README: five changed lines (the five clauses)')
 
 print('== E3: tag counts')
 for path, exp in [('docs/EDITOR_V2.md', {'DECIDED': 10, 'LATER': 1}), ('docs/VISION_V2.md', {'DECIDED': 1, 'OPEN': 1})]:
