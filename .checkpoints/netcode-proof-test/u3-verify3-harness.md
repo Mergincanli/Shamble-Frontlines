@@ -71,15 +71,11 @@ Write tool only (whole file each time; no Edit tool in this run).
   exceeds the spacing and the next reconnect waits). Requirement for the ADR: the room closes a replaced connection
   with a WebSocket close frame and a graceful TCP close (reads until the client's close), never a reset (also round 2
   H13's reason). Not measured.
-- V5 SOURCE Windows' SYN timer (WebFetch 2026-11-07, Microsoft Tech Community networking blog "TCP Templates for
-  Windows Server 2019 - How to tune your..." (first published on TechNet 2018-10-03), its Get-NetTCPSetting
-  -SettingName InternetCustom output after `netsh int tcp reset` ("Reset to default"): InitialRto(ms) 3000,
-  MaxSynRetransmissions 2, Timestamps Disabled, MinRto(ms) 300, DelayedAckTimeout(ms) 40). That is Server 2019 (the
-  Windows 10 1809 stack); no primary source found for Windows 11 clients (searches 2026-11-07: a Thales admin doc
-  also says default 3000, range 300-3000; forum outputs with 1000 or 2000 are tuned machines). So the Windows-like
-  3 s row is plausibly the DEFAULT Windows client, not an outlier. Sure: medium. Mustafa's check settles his own:
-  `Get-NetTCPSetting -SettingName InternetCustom,Internet | Format-List SettingName,InitialRtoMs,MaxSynRetransmissions`
-  (or `netsh interface tcp show global`, line "Initial RTO").
+- V5 SOURCE Windows' SYN timer, REVISED by V20: Microsoft's Tech Community networking blog "TCP Templates for
+  Windows Server 2019 - How to tune your..." (TechNet 2018-10-03; WebFetch 2026-11-07) shows, for the InternetCustom
+  template after `netsh int tcp reset`: InitialRto(ms) 3000, MaxSynRetransmissions 2, Timestamps Disabled, MinRto
+  300, DelayedAckTimeout 40. That is a SERVER SKU's template; see V20 for current Windows 10/11 clients (1 s, 4
+  retries). The 3 s rows therefore describe older Windows and server templates, not today's typical player.
 - V6 (diag rows.txt, 60,000 phases each): fix 1 alone with no timestamps (= any Windows-like client, the SYN timer
   plays no part without a reconnect): 646/2,035/3,829/5,295/12,550; over 1/1.5/2 s 2,396/1,727/843. Against it the
   never-abandoned reconnect on a Windows-like client: SYN 3 s 646/2,035/2,729/3,069/3,890, over 1/1.5/2 s
@@ -139,6 +135,9 @@ Write tool only (whole file each time; no Edit tool in this run).
   493/2,466/4,289 (over 1.5 s 2,501) vs 488/1,463/3,228 (166); Windows 3 s 541/2,371/7,842 vs 534/1,454/3,228. Fix 1
   alone: 964/2,454/5,722; 1,330/2,483/12,514; 493/6,462/20,855. Costs of the scaled abort: 1.9/2.8/4.0/5.4 attempts
   and 0.70/0.46/0.98/0.45 takeovers per outage at 0.6/1/1.5/2.5 s (never abandoned: 1.0 attempts, 0.21/0.34/0.49/0.41).
+  Not run: a Windows 1 s DOUBLING client at 1.5/2.5 s; by its schedule (retries at 1, 3, 7 s after the first SYN) a
+  never-abandoned attempt made 0.36 s into a 1.5 s burst retries at 1.36 s (lost) and then 3.36 s, 1.86 s after the
+  return: worse than Linux's linear 2.36 s. Direction: never abandoned does worse on current Windows for long bursts.
 - V14 SOURCE TLS resumption (Chromium main, fetched 2026-11-07 into scratchpad/v3h-tls): the session cache key is the
   server host:port plus destination IP, network anonymization key, privacy mode, proxy chain
   (ssl_client_session_cache.h:45-62); each entry keeps two single-use TLS 1.3 sessions, Push/Pop (:110-129;
@@ -188,35 +187,53 @@ Write tool only (whole file each time; no Edit tool in this run).
 - V19 (item 8, L2): round 2's H17 and H18 stand unchanged by v3 (advisor-u3q.md:68-77 "above TLS, below tungstenite",
   :159 "the TLS handshake now runs undelayed above DelayStream", :195 PM-0001-18 "through the accept path's delay
   wrapper"; plan.md:355-356, :419 E15, :533-534 WsClient): in L2 a reconnect's SYN and TLS flights never meet the
-  burst and LG's Rust client obeys no browser rule. New with this round: LG is a Linux client (SYN retry at 1 s), so
-  even a faithful L2 measures the case V5/V6/V13 show is the favourable one for "never abandoned". Linux 6.8 lets one
-  emulate a Windows-like first SYN timeout per connection: a sockops BPF program answering BPF_SOCK_OPS_TIMEOUT_INIT
+  burst and LG's Rust client obeys no browser rule. LG is a Linux client (SYN retries at a linear 1 s, timestamps on),
+  so L2 measures the one client the model shows is best placed for "never abandoned" at a 1 s burst. Linux 6.8 lets
+  one emulate other SYN schedules per connection: a sockops BPF program answering BPF_SOCK_OPS_TIMEOUT_INIT
   (include/uapi/linux/bpf.h:6782-6784, read through include/net/tcp.h:2637-2646 tcp_timeout_init; fetched
-  2026-11-07 into scratchpad/v3h-linux), with tcp_syn_linear_timeouts 0 in that client's network namespace.
+  2026-11-07 into scratchpad/v3h-linux), with tcp_syn_linear_timeouts 0 (doubling, as Windows) and tcp_timestamps 0
+  in that client's network namespace.
+- V20 (current Windows, supersedes V5 for clients): the main session recorded at 2026-11-07 ~11:10 UTC
+  (.checkpoints/netcode-proof-test.md, commit 4e07da3) Mustafa's laptop: Get-NetTCPSetting MaxSynRetransmissions 4
+  for every template and InitialRtoMs blank (the built-in default). Catchpoint's write-up (WebFetch 2026-11-07,
+  docs.catchpoint.com/docs/catchpoint-nodes-tcp-syn-retries): "Windows 10 is configured out of the box with an
+  initial RTO of 1 second and 4 Syn Retransmits", SYNs at 0, 1, 3, 7, 15 s, final timeout 21 s; its Windows Server
+  2012 R2 entry differs. The 4-retry count on his laptop matches that profile, not Server 2019's 2-retry, 3 s one.
+  So a current Windows client retries after 1 s, then doubles: the "Windows-like, first SYN 1,000 ms" rows apply
+  (never abandoned 645/886/1,484/2,871; abort-500 645/903/1,347/2,607). Sure: medium-high (his InitialRtoMs reads
+  blank, not 1000; `netsh interface tcp show global` would print it). The case against "never abandoned" no longer
+  rests on Windows: it rests on V13 (other burst lengths, where Windows' doubling makes it worse still), V9 (its own
+  handshake stuck in backoff) and V12/V11 (what the abort needs to be safe).
 
-## Item 7: which reconnect policy to recommend (finished block)
-- "Never abandoned" (today's recommendation) is the best row only for a Linux-like client (first SYN retry 1 s) AND
-  a 1 s burst: P2 1 s p99 1,051-1,054, but on a Windows-like client with the 3 s default (V5) it equals fix 1 alone up
-  to 2 s (V6), and for 0.6 s / 1.5 s / 2.5 s bursts it loses clearly (V13). Its strengths: 1.0 attempts and 0.21-0.49
-  takeovers per outage, no abort, browser rules never bind (Firefox = Chromium).
-- A fixed abort at 500 ms is OS-independent at P2 (V6) but fails at P4 (V12) and, with H6's cancel, ratchets
+## Item 7: which reconnect policy to recommend (finished block, revised after V20)
+- "Never abandoned" (today's recommendation) is the best p99 row for B1's 1 s burst on a client whose first SYN
+  retry comes 1 s after the first SYN (Linux, current Windows: V20): P2 p99 1,051-1,054 (Linux), 886 (Windows-like
+  1 s). It is weak elsewhere: at 0.6 / 1.5 / 2.5 s bursts it loses clearly to an RTT-scaled abort (V13: p99 1,270 vs
+  1,135; 1,632 vs 1,378; 2,466 vs 1,463; over 1.5 s at 1.5 s 613 vs 35), and current Windows' doubling (1, 3, 7 s)
+  makes its long-burst case worse than Linux's (V13 note); on a 3 s-SYN client (older Windows, server templates) it
+  gains nothing up to 2 s (V6); its worst tail is its own handshake stuck in backoff (V9). Strengths: 1.0 attempts
+  and 0.21-0.49 takeovers per outage; no abort, so the browser rules never bind (Firefox = Chromium).
+- A fixed abort at 500 ms is SYN-timer-independent at P2 (V6) but fails at P4 (V12) and, with H6's cancel, ratchets
   Chromium's throttler in repeated outages (V8: up to 4,994 ms; 30 bursts max 5,220).
-- Recommended instead (measured only by my diagnostic patch, 20,000-60,000 phases): one endpoint; trigger
+- My recommendation (measured only by my diagnostic patch, 20,000-60,000 phases): one endpoint; trigger
   max(300 ms, 2 x echo RTT + 100 ms) between whole messages; one attempt at a time; an attempt still CONNECTING after
   max(500 ms, 4 x the echo RTT) is closed and the next starts at once (at most 8 per outage, reset by a whole
   snapshot); an attempt is never closed because the old connection recovered; at its 101 the page sends the Join only
   if the old connection has delivered no whole snapshot whose server tick is at or after the attempt's creation, else
   it closes it (code 1000) with no Join (join-or-close, V11); the newest Join wins; the room closes a replaced
-  connection gracefully (V4). Numbers: P2 1 s Linux 1,126/1,498/2,544 (fixed-500 form 1,131/1,373/2,544), Windows 3 s
-  924/1,343/2,607, Firefox (fixed-500 form) 1,129/1,358/2,544; 30 bursts Chromium (fixed-500 form, the same at P2
-  where 4 x RTT < 500 ms) 1,173/1,408/1,858/2,105 with no throttling, Windows 3 s 916/1,354/1,795/2,119; P3 and P4
-  within 0.1 s of never abandoned on p99 for Linux and 0.9-1.0 s better for Windows; every burst length better
-  (V13). Costs against never abandoned: p99 +70-90 ms at P2 1 s and P4 on a Linux client, P4 Linux p99.9 +330 ms and
-  max +1.6 s; 1.5-5.4 attempts (SYNs) and 0.29-0.98 takeovers per outage; 0.55-0.77 extra TLS handshakes per outage
-  that end without a Join; attempts may linger a few seconds after the recovery holding the browser's lock.
-- Before it goes to Mustafa as THE recommendation, fixes.rs needs the two rules (abort scale, join-or-close) as
-  options and the 600,000-phase tail, the bar search, the multi-burst table and the side effects re-run on it; my
-  numbers come from a throwaway patch. Otherwise present the choice with both rows and the Windows check.
+  connection gracefully (V4). Numbers: P2 1 s Linux 1,126/1,498/2,544 (fixed-500 form 1,131/1,373/2,544), Windows-like
+  (any SYN timer: the abort never waits for it) 903-924/1,343-1,347/2,607, Firefox (fixed-500 form) 1,129/1,358/2,544;
+  30 bursts Chromium (fixed-500 form, the same at P2 where 4 x RTT < 500 ms) 1,173/1,408/1,858/2,105 with no
+  throttling; P3 and P4 within 0.1 s of never abandoned on p99 for Linux; every other burst length better (V13).
+  Costs against never abandoned: p99 +70-90 ms at P2 1 s on a Linux client (and about +20 ms against the Windows 1 s
+  row: 903-924 vs 886), P4 Linux p99 +90 ms, p99.9 +330 ms, max +1.6 s; 1.5-5.4 attempts (SYNs) and 0.29-0.98
+  takeovers per outage; 0.55-0.77 extra TLS handshakes per outage that end without a Join; attempts may linger a few
+  seconds after the recovery holding the browser's lock.
+- If the main session keeps "never abandoned" for B1, it should at least adopt join-or-close (free in single bursts,
+  V11) and say the policy is tuned to 1 s bursts. Either way, before a policy goes to Mustafa as THE recommendation,
+  fixes.rs needs the two rules (abort scale, join-or-close) as options and the 600,000-phase tail, the bar search,
+  the multi-burst table and the side effects re-run on it, plus burst lengths besides 1 s; my numbers come from a
+  throwaway patch.
 
 ## Item 8: ADR 0001 and plan conflicts of the policy (finished block; round 2's list updated)
 - 422-424 WebTransport first (1.5 s), one transport, newest-only over WebSocket: STAND (fix 1 = newest-only with the
@@ -236,8 +253,8 @@ Write tool only (whole file each time; no Edit tool in this run).
 - 668 Snapshot header: name the fields the page uses (the newest command received, for the trigger's RTT; the server
   tick, for join-or-close). 670 Join "once" -> once per connection; 672 FullState also at a takeover (or a delta
   from the last acknowledged baseline, round 2 H14); 682 lobby calls: the spare refresh, sized per player and address.
-- 747 / 1295 / 1556 (PM-0001-18, E1-E3): the WebSocket half's bar must say which client OS and burst lengths it is set
-  from (V5, V13) and what L2 measures (V19); B1's single 1 s length favours one policy.
+- 747 / 1295 / 1556 (PM-0001-18, E1-E3): the WebSocket half's bar must say which client and burst lengths it is set
+  from (V13, V20) and what L2 measures (V19); B1's single 1 s length favours one policy.
 - 758 "A player drops": spare held in advance; 759 "The lobby is down": reconnects last until the spares expire
   (~25-35 s); new failure rows: false reconnects (P2-P4: 9/15/7 attempts and 2/1/1 takeovers per 30 min) and the
   post-burst takeovers.
@@ -256,8 +273,9 @@ Write tool only (whole file each time; no Edit tool in this run).
 2. LG's WsClient runs, per simulated client, the page policy (Item 7) and the browser rules as data (Chromium's
    endpoint lock with its 10 ms, the throttler with the Windows argument order and the 2-minute roll, or Firefox's
    admission queue and fail delay), so 48 clients behave like 48 browsers (round 2 H18).
-3. LG is Linux (SYN retry 1 s, timestamps on): add Windows-like clients (no timestamps; a sockops BPF
-   TIMEOUT_INIT of 3 s and tcp_syn_linear_timeouts 0 in their namespace: V19), or state the bar is for Linux clients.
+3. LG is Linux (linear 1 s SYN retries, timestamps on): add Windows-like clients (timestamps off, doubling SYN
+   retries from 1 s: tcp_syn_linear_timeouts 0 and tcp_timestamps 0 in their namespace; BPF TIMEOUT_INIT only for
+   other first timeouts: V19), or state that the bar is for Linux clients.
 4. Raise the room's per-address limits for LG's one address to cover 48 clients x (2 connections + attempts), 48
    handshakes in progress and about 48 Joins in a second after each burst (plan E23 covers only connections).
 5. Add burst lengths besides 1 s to the model rows that set the bar (V13), at least 0.6, 1.5 and 2.5 s.
@@ -269,15 +287,15 @@ Write tool only (whole file each time; no Edit tool in this run).
    harness's output (V0); v2's p50 435 -> v3's 654 is the model (fix 1 alone has the same p50: the reconnect never
    touches the median).
 3. The 60,000-phase rows: CONFIRMED as output; the abort rows are Chromium with Windows' argument order (V2);
-   "Firefox equal to Chromium" holds because one attempt per outage meets no browser rule (V11 context).
+   "Firefox equal to Chromium" holds because one attempt per outage meets no browser rule.
 4. "Windows-like 3 s, never abandoned: the reconnect gains nothing": CONFIRMED up to 2 s against fix 1 alone on the
-   same no-timestamp client (V6), but it still cuts p99.9 3,829 -> 2,729 and the max 12,550 -> 3,890; and 3 s is
-   plausibly the Windows default (V5).
+   same no-timestamp client (V6), but it still cuts p99.9 3,829 -> 2,729 and the max 12,550 -> 3,890; and 3 s is the
+   older/server Windows template, not today's client (V20: 1 s, 4 retries).
 5. Multi-burst numbers and the 4,994 ms throttle: CONFIRMED and explained (V8): Chromium's rule run faithfully;
    abort-500 plus H6 makes ~3 failures and ~0.5 successes per burst; join-or-close removes it (V11).
 6. Per-burst side counts and the 30-minute side effects: CONFIRMED (V17, V0).
 7. Pass chances (0.227; 0.997 [0.993-0.999]; 0.990 [0.980-0.997]; bite rows 0.000): CONFIRMED as computed, but they
-   describe a Linux client, 1 s bursts and the never-abandoned policy (V5, V6, V13, V19).
+   describe a Linux client, 1 s bursts and the never-abandoned policy (V13, V19, V20).
 8. H6, H7, H8, H19, the follow-on window and the takeover counts as implemented: CONFIRMED (V17, V10).
 9. Chromium's throttler and endpoint lock as modelled (formula, integer ms, two-bucket roll, IsClean, failure and
    success points) and the clang-on-Windows argument order: CONFIRMED (V1, V2).
@@ -288,8 +306,9 @@ Write tool only (whole file each time; no Edit tool in this run).
 13. Windows-like option giving both ends the client's TcpConfig: FAITHFUL for the server end (V15).
 14. Censoring at 60 s: CONFIRMED, conservative, 0 phases censored (V16).
 15. "Recommended = fix 1 + one-endpoint reconnect, never abandoned": REFUTED as the policy to recommend across
-    clients and outages (V5, V6, V12, V13); an RTT-scaled abort with join-or-close is better or equal almost
-    everywhere (Item 7), pending its full re-run.
+    outage lengths and links (V9, V12, V13); it is the best p99 at B1's 1 s burst on Linux and current Windows
+    clients only. An RTT-scaled abort with join-or-close is better or within 0.1 s almost everywhere (Item 7), pending
+    its full re-run in fixes.rs.
 
 ## Bugs (finished block; no rule in fixes.rs contradicts its sources; these are policy and reporting faults)
 - P1 (policy): H6's cancel closes pre-101 attempts, which Chromium counts as failures (V1): with an abort cadence
@@ -299,35 +318,40 @@ Write tool only (whole file each time; no Edit tool in this run).
   2,502 scaled). Affects only rows nobody ran at P3/P4 so far; matters for the ADR rule.
 - P3 (reporting): the table's "fix 1 alone" baseline is a Linux client with timestamps; the Windows-like rows have no
   same-client baseline (V6), so "gains nothing" cannot be read from the table.
-- P4 (scope): every bar and pass chance comes from 1 s bursts on a Linux-like client (V5, V13): too good for the
-  never-abandoned policy on Windows clients and other burst lengths.
+- P4 (scope): every bar and pass chance comes from 1 s bursts (V13): too good for the never-abandoned policy against
+  other outage lengths; L2's LG is a Linux client (V19).
 - P5 (minor, too good for the abort rows): the closed tracker leaves Chromium's pending count at once (V2) and every
   attempt resumes TLS (V14).
 - P6 (minor, reporting): CENSORED is printed after ws_limit_table only, not after the tail (V16); harmless (0).
 - Carried: plan.md:297 stale ADR cite (round 2 H16, still there).
 
 ## Must correct before Mustafa decides (finished block)
-1. Tell him the "never abandoned" recommendation rests on a Linux-like client and a 1 s burst: Windows' default
-   first SYN timeout is plausibly 3 s (Microsoft's own 2018 Get-NetTCPSetting output: InitialRto 3000), where the
-   reconnect gives nothing up to 2 s; and at 0.6/1.5/2.5 s bursts an RTT-scaled abort with join-or-close beats it
-   (V5, V6, V13). Ask for his laptop's Get-NetTCPSetting InitialRtoMs.
+1. Tell him the "never abandoned" recommendation is tuned to B1's single 1 s burst: at 0.6 / 1.5 / 2.5 s bursts an
+   RTT-scaled abort with join-or-close beats it clearly (V13), and its own worst tail is a stuck handshake (V9). His
+   laptop's Windows (V20: 4 SYN retries, default timeout, read as 1 s per Catchpoint) makes the Windows-like 1 s rows
+   the relevant ones, not the 3 s rows; the 3 s rows should be labelled "older Windows / server templates".
 2. Present the alternative policy (Item 7) with its costs, or re-run fixes.rs with it first (two options in Opts:
-   abort scale, join-or-close; then the tail, the bar search, the multi-burst and side-effects tables).
-3. Do not present abort-500 as a constant (V12) nor H6's cancel without its Chromium throttle cost (V8, V11).
-4. State the baseline for "gains nothing" (fix 1 alone on a no-timestamp client: 646/2,035/3,829/12,550) and that
-   the reconnect still cuts the tail past ~2.7 s (V6).
+   abort scale, join-or-close; then the tail, the bar search, the multi-burst and side-effects tables, plus burst
+   lengths 0.6 / 1.5 / 2.5 s).
+3. Do not present abort-500 as a constant (V12) nor H6's cancel without its Chromium throttle cost in repeated
+   outages (V8, V11).
+4. If the 3 s row is mentioned, state its baseline (fix 1 alone on a no-timestamp client: 646/2,035/3,829/12,550)
+   and that the reconnect still cuts the tail past ~2.7 s (V6).
 5. WS-BAR: the three-part bar and its pass chances were searched on the never-abandoned policy, a Linux client and
-   1 s bursts; a different policy needs the search re-run; L2 (LG on Linux, DelayStream above TLS, LG not a
-   browser) can pass a bar that Windows players would miss (V19).
+   1 s bursts; a different policy needs the search re-run; L2 (LG on Linux, DelayStream above TLS, LG not a browser)
+   can pass a bar that real players' reconnects would not show (V19).
 6. WS-SCOPE: if the proof test builds the reconnect, L2 must change as listed (Item 8, L2 list); if not, the
-   WebSocket bar must be set for fix 1 alone (Linux client p99 2,164, max 11,384; no-timestamp client p99 2,035,
-   max 12,550 over 600,000 / 60,000 phases).
+   WebSocket bar must be set for fix 1 alone (Linux client p99 2,164, max 11,384 over 600,000; no-timestamp client
+   p99 2,035, max 12,550 over 60,000).
 7. RESUME-CRED: a takeover uses one spare per player per outage at 0.21-0.98 per outage depending on policy and
    burst length; join-or-close attempts use none; top up on use (Item 8).
 8. Update the conflict list to Item 8 (422-424, 445-450, 495-497, 506-508, 616-617, 668-682, 747/1295/1556,
    758-759, 959-964, 1640-1641 stand or change; 427-432 resolved), adding the graceful close of a replaced
    connection (V4) and the snapshot header's server tick.
 
-Cleanup: see the last line.
+Cleanup: the diagnostic patch was reverse-applied in .gate/u3v3v-wt (clean status) and the worktree removed with
+`git worktree remove` (git worktree list no longer shows it); the build output stays in .gate/u3v3v-target
+(gitignored); the patch and outputs stay in scratchpad/v3h-diag. Nothing committed or pushed; no tracked file edited
+in the main folder (only this notes file).
 
 DONE

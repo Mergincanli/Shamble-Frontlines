@@ -148,21 +148,46 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   new segment is lost (+391) and the client sends nothing until +1,864 (its own RTO backoff), so the server waits for
   its RTO (+1,912); the next SACK gives a 1.58 s sample (srtt 436, RTO 2,713); second F-RTO undo; RACK then marks the
   R-only head (and one more) lost keeping R and drops them from the list (input.c:1118-1139, rec.c:86-87): L|R, so
-  tcp_xmit_retransmit_queue skips them (output.c: "retrans_out >= lost_out" break and the SACKED_RETRANS skip) and
-  the connection sits at cwnd 3 sending only new data until the RTO at +4,635. Not in the notes: after that RTO the
-  hole at 211626 (a profile loss at +3,179) waits from +4,837 to +5,448 because retrans_out includes a leaked count
-  (retr 1 with no R segment out, lost 1: the "retrans_out >= lost_out" break), until a later loss raises lost_out.
-  All kernel paths as v6.8 reads; the 5.5 s is a cascade of stale RTT samples (1.3-1.6 s) on both ends.
+  tcp_xmit_retransmit_queue skips them (the "retrans_out >= lost_out" break and the SACKED_RETRANS skip) and the
+  connection sits at cwnd 3 sending only new data until the RTO at +4,635. Not in the notes: after that RTO the hole
+  at 211626 (a profile loss at +3,179) waits from +4,837 to +5,448 because retrans_out includes a leaked count (retr 1
+  with no R segment out, lost 1: the "retrans_out >= lost_out" break) until a later loss raises lost_out. Without the
+  leak (RR3_NOLEAK) S13 (e) is 1,125/2,858/5,115 ms (pinned 1,125/2,892/5,498). All kernel paths as v6.8 reads; the
+  5.5 s is a cascade of stale RTT samples (1.3-1.6 s) on both ends plus the stuck L|R segments and the leak.
 - V1 kernel version: the model is v6.8; the ADR records the rig's kernel on the run day (ADR 0001:1536, PM-0001-1),
   so RS may run a newer one (Ubuntu 24.04 HWE/cloud kernels are 6.11+). Fetched v6.12 (raw.githubusercontent.com/
   torvalds/linux/v6.12, scratchpad linux-src-v6.12-rr3/) and diffed every function the model cites: 4 differ:
   tcp_packet_delayed (v6.12 tcp_input.c:2474-2492: also true when nothing was resent), tcp_init_undo (counts a TLP
   resend in flight), tcp_enter_recovery (tcp_retrans_stamp_cleanup first, :2903), tcp_enter_loss (clears
-  tlp_high_seq: the model's RTO already does, timer.c:536); tcp_validate_incoming's SYN_RECV pass (irrelevant).
+  tlp_high_seq: the model's RTO already does, v6.8 timer.c:533); tcp_validate_incoming's SYN_RECV pass (irrelevant).
   RACK (tcp_recovery.c), tcp_retransmit_timer, tcp_retransmit_skb, tcp_xmit_retransmit_queue, the probe and all of
   Cubic are identical. Knob RR3_V612=1 (the three undo changes): today, fix 1 alone, fix 3 alone and recommended rows
-  (60,000 each) IDENTICAL to the ms and to the count. So the numbers hold for v6.8 through v6.12 at least.
+  (60,000 each) IDENTICAL to the ms and to the count (the knob is live: it flips recovery_exit's unit tests). So the
+  numbers hold for v6.8 through v6.12 at least.
 - L1 (6) the leak's weight (RR3_NOLEAK=1, a kernel without it; 60,000 each): recommended 654/1054/1823/2066/3013
   (p99.9 -4 ms, nothing else); today p99.9 4029 -> 3368, max 7246 -> 6332; fix 1 alone p99.9 3887 -> 2932, p99.99
   5638 -> 5297. The leak is v6.8 and v6.12 code (tcp_retransmit_skb identical), so it stays; it does not touch the
   recommended row's p99 or max.
+
+## Block 4: (8) the rule tests and their bites (tests.rs:612-1325; mutation runs in the worktree)
+- Q1 CONFIRMED (test does what its name says, bite fails on the planted defect): karn (:689-704), echo sample
+  (:723-732), ts_recent at rcv_wup (:747-755), RTO marks and cwnd (:776-792), old duplicate discarded unread + D-SACK
+  (:814-823; "unread" shown by the client's snd_una staying 0), receiver D-SACK/blocks (:837-869), sender D-SACK +
+  dubious (:874-903, no bite but both branches asserted), Eifel undo (:926-942, both echo cases), F-RTO 3.b (:968-976),
+  F-RTO 2.b/3.a (:980-1014, no bite), PRR numbers (:1019-1040, hand-checked: 9, 7, 7), recovery exit with/without
+  undo (:1082-1091), TLP CWR four cases (:1095-1117), Cubic slow start / 5 % / app-limited (:1134-1157), Cubic curve
+  and cubic_root (:1162-1191), HyStart delay (:1195-1214, no bite), Disorder no probe (:1226-1245), handshake spurious
+  SYN (:1266-1275), SYN timer (:1306-1314), distinct arrivals (:1318-1325).
+- Q2 WEAK: recovery_ends_with_cwnd_at_ssthresh (:1060-1063) cites tcp_end_cwnd_reduction but passes with the
+  NoExitCwnd defect too (worktree test rr3_recovery_ends_bite: after_one_loss(NoExitCwnd) == (7, 7, Open, 1), ok):
+  PRR already leaves cwnd at ssthresh in that run. The rule is pinned only by the sender-level recovery_exit test and
+  its bite. Harmless; its doc comment overclaims.
+- Q3 GAPS (no rule test, only the S13 (e) pin moves): the retrans_out leak (RR3_NOLEAK: only (e) fails, max 5,498 ->
+  5,115), tcp_try_undo_partial, tcp_try_undo_dsack, rack_reo_wnd with reord_seen / tp->reordering, the stuck-L|R path
+  (R-only segment marked lost by RACK), xmit_retransmit_queue's retrans_out >= lost_out break, Cubic's TX_START epoch
+  shift, rearm_rto from the head under a pending probe/reorder timer. All read correct against v6.8 (K4-K9); a future
+  regression in them would show only as a moved pin.
+- Q4 (tests vs kernel version) recovery_exit_sets_ssthresh_unless_undone and its bite FAIL under RR3_V612=1: on v6.10+
+  a recovery with nothing resent is undone (tcp_packet_delayed's new branch). The tests pin v6.8 semantics, as the
+  model's MODEL string says ("linux-6.8-tcp v3"); worth one line in the run header that RS's kernel must be recorded
+  against it.
