@@ -104,12 +104,12 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
       0, output.c:2957-2960) -> RTO -411 resends the head (lost), backoff 1 - kernel.
   (c) +240 second RTO (Loss, retransmits 1: no new ssthresh, cwnd = in flight + 1 = 1, frto armed) resends the head;
       it reaches the client as an OLD duplicate (rcv_wup past it): discarded, dupack + D-SACK - kernel (K1).
-  (d) +274.6 the client's own first post-burst segment (its RTO resend at +230) acks 198450->200550 (two pre-burst
-      segments whose ACKs died in the burst) with TSecr 6433 < retrans_stamp: tcp_process_loss -> tcp_try_undo_loss
-      via tcp_packet_delayed (input.c:2879-2881, :2457-2461): LOST cleared on the 5 burst-time segments, cwnd back to
-      6, Open. Karn removes the seq sample; the TSecr fallback (input.c:3155-3157) gives a 1.30 s sample: srtt 125 ->
-      273, RTO 325 -> 1,465 ms, so the probe would wait 548 ms (to +823) - kernel (that is RFC 7323's echo of the
-      last in-order TSval, sent 1.3 s earlier).
+  (d) +274.6 the client's first post-burst segment (sent +230; its own window still full of lost inputs) acks
+      198450->200550 (two pre-burst segments whose ACKs died in the burst) with TSecr 6433 < retrans_stamp:
+      tcp_process_loss -> tcp_try_undo_loss via tcp_packet_delayed (input.c:2879-2881, :2457-2461): LOST cleared on
+      the 5 burst-time segments, cwnd back to 6, Open. Karn removes the seq sample; the TSecr fallback (input.c:
+      3155-3157) gives a 1.30 s sample: srtt 125 -> 273, RTO 325 -> 1,465 ms, so the probe would wait 548 ms (to
+      +823) - kernel (RFC 7323's echo of the last in-order TSval, sent 1.3 s earlier).
   (e) +303.8 the room writes the first fresh snapshot (budget freed); sent (in flight 5 < cwnd 6); SACKed at +411.5:
       RACK (reo_wnd = min_rtt/4: Open, 1 SACKed < reordering 3) marks the 5 burst-time segments lost -> Recovery,
       ssthresh 4; PRR with in flight 0: sndcnt = max(1, 1), no SND_UNA advance -> cwnd 1 (input.c:2663-2687) - kernel
@@ -130,3 +130,39 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   tcp_mstamp per segment, so two arrivals never share a send stamp); it changes nothing measurable: recommended
   60,000 with ties allowed (RR3_NODISTINCT=1) 654/1054/1827/2066/3013, over 0.8/1/1.2 s 4785/674/255 vs faithful
   4791/675/256. It matters only for the (f) bookkeeping test (the build agent's +73,638 ms case).
+
+## Block 3: S13 (e) explanations, kernel version, the leak (traces .gate/rr3-trace-e1017.txt, -e999.txt = seed 1475;
+## patch2.py adds test rr3_e_seed; patch3.py adds RR3_V612 and RR3_NOLEAK)
+- T2 (7) S13 (e) median seed 1017 (burst 6,013 ms, 1,125 ms; index 499; DIAG_IDX=500 gives index 500 = seed 1508,
+  also 1,125 ms): the build agent's story CONFIRMED step for step in the trace: pre-burst cwnd 6 / ssthresh 4; probe
+  -721 sends new data (lost); RTO -395 (lost); the client's resend +199.7 reaches the server as an old duplicate
+  (DISCARD at 0, its ACK unread: G1); RTO +255.5 resends the head, which reaches the client as an old duplicate ->
+  dupack + D-SACK with TSecr 5999 -> Eifel undo at +359.9 (cwnd 6, Open, srtt 281 from a TSecr sample, RTO 1,545);
+  the next new segment's SACK at +469.6 -> RACK marks 5 -> Recovery, PRR from cwnd 1; Open at +766.5; the 64 KB
+  stale backlog drains at cwnd 4 -> fresh at +1,125. Each step is the same kernel path as T1.
+- T3 (7) S13 (e) worst seed 1475 (5,497 ms): the story CONFIRMED in substance, with one more mechanism the notes do not
+  name. Trace: a profile loss of 189000 at -1099 -> RACK Recovery at -958 (resend in the burst, lost); RTO -642 in
+  Recovery (frto NOT armed: state = Recovery and retransmits 0, input.c:2214-2217) and RTO -10.7 (frto armed); +342.6
+  the client's segment SACKs 191100 (never resent, sent -1032) -> FLAG_ORIG_SACK_ACKED -> F-RTO 3.b undo while the
+  head is still lost; SACK RTT sample 1.375 s -> srtt 273, RTO 1,569; Disorder (no probe). The client's SACK of the
+  new segment is lost (+391) and the client sends nothing until +1,864 (its own RTO backoff), so the server waits for
+  its RTO (+1,912); the next SACK gives a 1.58 s sample (srtt 436, RTO 2,713); second F-RTO undo; RACK then marks the
+  R-only head (and one more) lost keeping R and drops them from the list (input.c:1118-1139, rec.c:86-87): L|R, so
+  tcp_xmit_retransmit_queue skips them (output.c: "retrans_out >= lost_out" break and the SACKED_RETRANS skip) and
+  the connection sits at cwnd 3 sending only new data until the RTO at +4,635. Not in the notes: after that RTO the
+  hole at 211626 (a profile loss at +3,179) waits from +4,837 to +5,448 because retrans_out includes a leaked count
+  (retr 1 with no R segment out, lost 1: the "retrans_out >= lost_out" break), until a later loss raises lost_out.
+  All kernel paths as v6.8 reads; the 5.5 s is a cascade of stale RTT samples (1.3-1.6 s) on both ends.
+- V1 kernel version: the model is v6.8; the ADR records the rig's kernel on the run day (ADR 0001:1536, PM-0001-1),
+  so RS may run a newer one (Ubuntu 24.04 HWE/cloud kernels are 6.11+). Fetched v6.12 (raw.githubusercontent.com/
+  torvalds/linux/v6.12, scratchpad linux-src-v6.12-rr3/) and diffed every function the model cites: 4 differ:
+  tcp_packet_delayed (v6.12 tcp_input.c:2474-2492: also true when nothing was resent), tcp_init_undo (counts a TLP
+  resend in flight), tcp_enter_recovery (tcp_retrans_stamp_cleanup first, :2903), tcp_enter_loss (clears
+  tlp_high_seq: the model's RTO already does, timer.c:536); tcp_validate_incoming's SYN_RECV pass (irrelevant).
+  RACK (tcp_recovery.c), tcp_retransmit_timer, tcp_retransmit_skb, tcp_xmit_retransmit_queue, the probe and all of
+  Cubic are identical. Knob RR3_V612=1 (the three undo changes): today, fix 1 alone, fix 3 alone and recommended rows
+  (60,000 each) IDENTICAL to the ms and to the count. So the numbers hold for v6.8 through v6.12 at least.
+- L1 (6) the leak's weight (RR3_NOLEAK=1, a kernel without it; 60,000 each): recommended 654/1054/1823/2066/3013
+  (p99.9 -4 ms, nothing else); today p99.9 4029 -> 3368, max 7246 -> 6332; fix 1 alone p99.9 3887 -> 2932, p99.99
+  5638 -> 5297. The leak is v6.8 and v6.12 code (tcp_retransmit_skb identical), so it stays; it does not touch the
+  recommended row's p99 or max.
