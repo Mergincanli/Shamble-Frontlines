@@ -43,7 +43,7 @@ the rule's math is in finding 2.
 
 ## Findings
 1. **Medium. The XP-TERM question lacks the fact that decides between its options.** Service points come only from a
-   share of the team's tech (LOOP_V2:131-132, `[DECIDED]`), and tech comes only from uplinks (LOOP_V2:45-50,
+   share of the team's tech (LOOP_V2:132-133, `[DECIDED]`), and tech comes only from uplinks (LOOP_V2:45-50,
    `[DECIDED]`; :52 `[DEFAULT]` "one tech source"), never from kills. So the Advisor's open suggestion (1), "weigh XP
    per action (kills on bots give little)" (VISION_V2:73), has nothing to weigh if "XP" means Service points; it
    fits a per-action XP: the weapon tracks' (LOOP_V2:242) or an account-level XP, which v2 has not defined
@@ -60,7 +60,7 @@ the rule's math is in finding 2.
    suggestion (2) (a minimum number of humans per team) is the open fix for part of it. Not this pass's to decide.
    Fix: optional, one line in the "Not decided by the note" follow-up (STATUS:492-497) for the community-servers
    design session: when "with bots" is judged (start, any moment, end), and whether a host may turn bot fill off
-   (R2-ROOM-OQ5, README:182).
+   (R2-ROOM-OQ5, README:181).
 3. **Low. Scope: "private (rented)" against other private matches.** VISION_V2:50-51 (`[DECIDED]`, clan private
    matches) and :82 (§6.1, "rooms and private matches") name private matches that may not be rented. His rule covers
    rented ones only; README:183's clause says "for private (rented) matches", correctly. Also: under XP-TERM options
@@ -76,13 +76,15 @@ the rule's math is in finding 2.
    to about 100 ms after the shot it belongs to. Two more for the same design session: the feel kit (ADR 0005 CD-14,
    :528-531: muzzle flash, impact, sound per weapon) and his effect assets now both name muzzle flash, impact and
    sound, so which one references the other is open; and his camera shake, impact frames and halftone flashes add
-   sources to OQ-0003-18 (reduced motion, README:105), which his words do not address. Fix: optional, one STATUS
+   sources to OQ-0003-18 (reduced motion, README:106), which his words do not address. Fix: optional, one STATUS
    follow-up line for the VFX tool's design session and OQ-0005-CD7; no doc edit, nothing decided.
 5. **Low. Quality tiers and effects that hide players.** "Low drops extras but stays readable" (EDITOR_V2:130-131)
-   is about readability. The planned Shinobi has a smoke bomb (UNITS:91) and Sydney Mobius "+ smoke" (UNITS:134): if
-   a smoke hides players only on screen, a tier that thins it gives Low players a sight advantage. Fix: optional
-   follow-up for the tool's design session and OQ-0003-16 (README:104): an effect that hides players hides them the
-   same on every tier, or the sim's line of sight decides.
+   is about readability. Effects can also hide players: the Empire's Shinobi is "stealthy" (UNITS:44, `[DECIDED]`),
+   and his own presets include smoke (EDITOR_V2:124-126). If a smoke or a stealth effect hides a player only on screen, a
+   tier that thins it gives Low players a sight advantage. (No planned v2 unit has a smoke ability yet: UNITS:91's
+   smoke bomb and :134's "+ smoke" are the Red Alert 3 and Renegade reference lists.) Fix: optional follow-up for the
+   tool's design session and OQ-0003-16 (README:104): an effect that hides players hides them the same on every
+   tier, or the sim's line of sight decides.
 6. **Low. Two small completeness gaps.** (a) The XP-TERM list omits LOOP_V2:235 (the Advisor's `[DEFAULT]` reading,
    "guns still level from XP earned while using them"): the same weapon XP, so cosmetic. (b) VISION_V2's header
    (:6-7) dates §5 to his note of 2026-11-03 and does not mention the 2026-11-06 XP block (the advisor made this

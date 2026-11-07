@@ -47,3 +47,22 @@ Role read from `origin/main:.claude/agents/verifier.md` and `origin/main:CLAUDE.
 - The VFX queue entry (base :498-520) removed; pointer at head :550-551. A4's entries (head :523-548) byte-identical
   to base :521-546 (no diff hunk touches them). "Comic flavour: ink-outlined smoke" appears once in STATUS at base
   (the queue quote) and once at head (the LOOK follow-up, :512): intended.
+### E4 (line citations into EDITOR_V2 and VISION_V2)
+- The script's pattern `(EDITOR|VISION)_V2(\.md)?:[0-9]` misses "(lines A–B)" and "EDITOR_V2 :N" forms; I grepped
+  those too (whole repo but reports, then reports).
+- VISION_V2 at head: §2 :27, §3 :45, §4 :54, §5 :60, §6 :80 (last item :99), §7 :101; base had §6 :75, §7 :96.
+  ADR 0005:27 "62–81", :48 "25–40", :49 "42–49", :50 "51–55", :2550 "25–81" unedited. STATUS:488-491's numbers at
+  this head (80–99, 27–43, 45–52, 54–58, 27–99): all TRUE. The 100 ms line is VISION_V2:58: STATUS:501 TRUE.
+- ADR 0005:2037, :2038 (and its CD text) and :2550-2551 cite EDITOR_V2 "lines 4–5": unmoved (header line goes at :7):
+  TRUE. LEGACY_INVENTORY:324 cites EDITOR_V2 by § only. ROADMAP:104's "VISION_V2 lines 36-37, 59 and 86 (as numbered
+  before B.2)": dated, fine.
+- STATUS:660 EDITOR_V2:94 ("It still runs by double-clicking editor.html") and :95 ("if ADR-002 moves..."): TRUE.
+- STATUS:488, :495 "VISION_V2:71-75": TRUE (the XP block is :71-75).
+- NOT RECORDED: `docs/research/r1-simulation-core.md:3631` cites `EDITOR_V2.md:39` (af2560c's "Validation panel"
+  line); it was :47 at base (the B.1 report:51-52 says so, dated) and is :48 at this head. No STATUS follow-up names
+  it; STATUS:500-502 names only R1's :3301 and :3535. (Finding.)
+- Other citations in the changed lines, checked at this head: LOOP_V2:242 (weapon XP `[DECIDED]`), :237-238 (tracks
+  reset each match), :140 ("the existing career rank"); DESIGN_NOTES:23 ("account XP"); LEGACY_INVENTORY:302 (GE15);
+  ADR 0006:474 ("private flag"), :475 ("humans and bots per team"); LOOK_V2:60 (§7 Juice), :63 (`[DEFAULT]` "Comic
+  impact touches for big moments," used sparingly); README:69 (AB3), :104, :122, :160, :183 (the four rows), :408 (J3,
+  "no feature for `[LATER]` or `[OPEN]` items"); VISION_V2 §6.3 (:87, "ability and effect system"). All TRUE.
