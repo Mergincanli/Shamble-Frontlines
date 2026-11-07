@@ -153,3 +153,30 @@ file (`cat >> ...tmp </dev/null; rm -f`); no content written. Every save since u
   1,126 ms at P2 1 s (V12, 20,000 phases, throwaway patch), about 75 ms above the target's 1,051 (never abandoned).
   Mustafa's target says "about 1.05 s"; whether 1.13 s is "about" is his call, or that work measures both on the full
   600,000 tail first. Recorded as a decision for that work.
+- F21 Self-check corrections applied in the final draft: ADR 0001:1462-1463 says only "inside the server's accept
+  path"; "above TLS, below the WebSocket library" is Mustafa's U3-Q4 (b) (checkpoint :400-401), cited so; "three
+  rounds found it faithful" reworded (rounds 1-2 found missing kernel paths, v3 added them, round 3 confirmed);
+  join-or-close's extra handshakes 0.55-0.67 at 1 s (:119-121) vs 0.55-0.77 across lengths (:228-231) stated both;
+  the docs PR's 424 / 747 / 1295 / 1556 edits marked "planned" (the advisor writes them in parallel); Table 3/4 marked
+  "sure: medium, one run, not pinned". Note: the saver has already committed an earlier draft (git status shows the
+  draft modified, not new).
+
+## Result (finished block)
+- Draft: `.checkpoints/netcode-proof-test/ws-reconnect-record-draft.md`, 565 lines, sections: header; §0 in short;
+  §1 requirement and target (Mustafa verbatim; model/harness/commits; Table 1 600,000 rows; Table 2 client variants
+  incl. no-timestamp, Windows 1 s and 3 s, same-client fix-1 baseline; Mustafa's laptop); §2 why fix 1 falls short and
+  what the reconnect does, plus the proof test's fix-1 bound; §3 policy (page API, serialization RFC/Chromium/Firefox,
+  throttles, trigger and header field, attempts and cap per outage, WebSocket-only reconnect, §7.2.3, cancel vs
+  join-or-close, never abandoned vs scaled abort with Tables 3-4 across P2-P4 and 0.6/1/1.5/2.5 s, takeovers and their
+  costs, room side incl. graceful close, admission limits, TLS resumption, SYN timers); §4 RESUME-CRED (deferred;
+  readings 1-3; refresh, use, where, lobby down, fetch-during); §5 ADR 0001 line table with anchors (24 rows); §6
+  measurement (why L2 can't; 8 setup needs; per-burst records; the bar incl. binomial sample sizes; harness to reuse
+  with commands and git-show fallback); §7 sources with commits; §8 open questions.
+- Open points for the main session: (1) F13 slice 2 vs slice 3 wording; (2) F17 durability: the .gate outputs and
+  the round-3 diag patch are not in git (commit the outputs under results/, add scaled-abort/join-or-close options to
+  fixes.rs or keep the patch before the session ends); (3) F20 the robust policy may miss "about 1.05 s" by ~75 ms
+  (Mustafa's call in that work); (4) whether ADR 0001 gets a one-line pointer to this record in the docs PR (the
+  advisor's words); (5) §6.4's bar form borrows WS-BAR's rule by analogy: Mustafa to confirm for the reconnect;
+  (6) the record cites `.checkpoints/` paths that leave the tree; each is pinned to a commit in §7.
+
+DONE
