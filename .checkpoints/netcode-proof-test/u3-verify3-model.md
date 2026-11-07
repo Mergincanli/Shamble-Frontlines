@@ -22,7 +22,8 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   --nocapture --test-threads 1`, 2 min 51 s wall, 11 min CPU) reproduce .gate/netcode-proof-test/u3v3-tables1.txt
   byte for byte except one trailing blank line (.gate/rr3-tables.txt). Every number in the brief is in that output
   (600k: today 1121/2686/12068; fix1 654/2164/11384; fix3 844/1374/5343; REC 654/1051/1859/2092/4196, over 1/1.5/2/3 s
-  6768/1009/205/...; pass 0.227, 0.997 [0.993-0.999], 0.990 [0.980-0.997]). spikes/ identical 1e020a7..HEAD.
+  6768/1009/205/...; 60k rows, multi-burst, per-burst and side-effect counts; pass 0.227, 0.997 [0.993-0.999], 0.990
+  [0.980-0.997]). spikes/ identical 1e020a7..HEAD (re-checked at ee9ad3e).
 - K1 (1) old duplicates: CONFIRMED. tcp_sequence before(end_seq, rcv_wup) (input.c:4424-4433) = model :2375 (end =
   data end, or seq for a pure ACK: tcp_acceptable_seq = snd_nxt); tcp_validate_incoming discards after
   tcp_send_dupack (input.c:5882-5900) = model :2380-2383 (returns before ts_recent and on_ack). PAWS never fails on
@@ -109,23 +110,25 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
       tcp_process_loss -> tcp_try_undo_loss via tcp_packet_delayed (input.c:2879-2881, :2457-2461): LOST cleared on
       the 5 burst-time segments, cwnd back to 6, Open. Karn removes the seq sample; the TSecr fallback (input.c:
       3155-3157) gives a 1.30 s sample: srtt 125 -> 273, RTO 325 -> 1,465 ms, so the probe would wait 548 ms (to
-      +823) - kernel (RFC 7323's echo of the last in-order TSval, sent 1.3 s earlier).
+      +823) - kernel (RFC 7323's echo of the last in-order TSval, sent 1.3 s earlier). Without timestamps the same ACK
+      undoes through F-RTO 3.b instead (199500 never resent -> FLAG_ORIG_SACK_ACKED in clean_rtx_queue, :3323-3327).
   (e) +303.8 the room writes the first fresh snapshot (budget freed); sent (in flight 5 < cwnd 6); SACKed at +411.5:
       RACK (reo_wnd = min_rtt/4: Open, 1 SACKed < reordering 3) marks the 5 burst-time segments lost -> Recovery,
       ssthresh 4; PRR with in flight 0: sndcnt = max(1, 1), no SND_UNA advance -> cwnd 1 (input.c:2663-2687) - kernel
       (RFC 6937's slow-start bound from an empty pipe).
   (f) PRR ramps 1 -> 2 -> 3 resends per round (+411, +503, +598); the hole closes at +653: fresh delivered - kernel.
-  Every step is a v6.8 path. The p50 rise is real model behaviour: the Eifel undo plus a 1.3 s TSecr sample hide the
-  burst losses until a fresh snapshot is SACKed one round later, then PRR rebuilds from cwnd 1. v2 (no undo) stayed in
-  Loss and slow-started from +275.
+  Every step is a v6.8 path. The p50 rise is real model behaviour: the undo hides the burst losses until a fresh
+  snapshot is SACKed one round later, then PRR rebuilds from cwnd 1. v2 (no undo) stayed in Loss and slow-started
+  from +275. Sensitivity: had the client not sent at +230, the server would have learned the same at +344.5 (the
+  dupack to its own +240 resend), about 70 ms later: the median depends on the client stack's own post-burst timing.
 - A1 (7) attribution on the recommended row, 60,000 phases each (the model's own bite variants applied to every
   connection, tables otherwise unchanged): faithful 654/1054/1827/max 3013 (over 1 s 675, 1.5 s 85, 2 s 19);
   NoUndo 509/828/1434/2317 (223/53/9); OldSeqProcessed (G1 off) 626/1145/1817/2615 (1353/90/19); NoExitCwnd
   653/1033/1804/3696; NoFrto 650/1057/1823/2798; ProbeInDisorder 654/1057/1559/3013; NoKarn 657/951/1445/2164
   (350/51/4); NoTsecrFallback 655/945/1496/2165 (337/60/6); NoDsack 655/1060/1827/3013; RtoCwndOne and RtoMarksAll
   identical to faithful (inert here); NoCubic 570/1176/1834/2576 (not a kernel option). So of the +219 ms p50 rise
-  (435 -> 654) about 145 ms is the undo machinery (all kernel), the rest the other v3 rules; the stale-TSecr RTT
-  sample (Karn + echo, both kernel) costs about 100 ms at p99.
+  (435 -> 654) about 145 ms is the undo machinery (Eifel and F-RTO together, all kernel), the rest the other v3
+  rules; the stale-TSecr RTT sample (Karn + echo, both kernel) costs about 100 ms at p99.
 - D1 (6) distinct arrivals (arrival >= last + 1 ns, model :2506): FAITHFUL in spirit (tcp_rcv_established refreshes
   tcp_mstamp per segment, so two arrivals never share a send stamp); it changes nothing measurable: recommended
   60,000 with ties allowed (RR3_NODISTINCT=1) 654/1054/1827/2066/3013, over 0.8/1/1.2 s 4785/674/255 vs faithful
@@ -191,3 +194,50 @@ No agent memory dir found. Kernel = Linux v6.8 copies in the session scratchpad 
   a recovery with nothing resent is undone (tcp_packet_delayed's new branch). The tests pin v6.8 semantics, as the
   model's MODEL string says ("linux-6.8-tcp v3"); worth one line in the run header that RS's kernel must be recorded
   against it.
+
+## Block 5: (9) what is left; would p99 1,051 / max 4,196 move (patch4.py: rr3_tail_top, conn tracing;
+## traces .gate/rr3-trace179118.txt and -179118b.txt)
+- M1 the 600,000-phase maximum: top phases of the recommended row (600 sets, 1 min 34 s): 4,196 (seed 179118), 3,766
+  (67783), 3,375 (556300), 3,013 (10296), 2,882, 2,842 ... = the "4 over 3 s". Seed 179118 traced: a profile loss
+  before the burst -> RACK Recovery (resend in burst); RTOs -660 (frto off: in Recovery) and -45 (frto on); +358 a
+  stale SACK (sample ~1.3 s, RTO 1,577) -> F-RTO 3.b undo, Disorder; +465 RACK marks the R-only head L|R (stuck, as
+  T3) -> nothing resends it until the RTO at +1,935; that resend is lost (draw 10,258 < 20,000 ppm); the next RTO
+  would be +4,890. The reconnect (created -746 in the burst) rescues it: SYN 1 lost in the burst, SYN 2's SYN-ACK
+  lost (2 %), SYN 3 at +1,254 completes; its RTT sample is the SYN-ACK's echo of SYN 2 (~1.1 s, kernel: Karn plus
+  tcp_ack_update_rtt's TSecr path under FLAG_SYN_ACKED, input.c:3155-3157), so its first data's RTO is ~2.4 s; its
+  ClientHello is lost (2 %) and resent at +3,754; takeover +4,111; fresh +4,196. Three independent 2 % losses on top
+  of kernel paths: a tail draw, not a model defect. Another seed set would move the max by hundreds of ms either way
+  (the 60,000 subset's max is 3,013); the p99 is stable (1,054 at 60,000, 1,051 at 600,000).
+- M2 model defects that would move p99 1,051 or max 4,196: NONE FOUND. K1-K10 match v6.8; v6.12's changes leave the
+  rows identical (V1); the leak (L1) and distinct arrivals (D1) leave them identical (p99.9 -4 ms at most).
+- M3 residual, not modelled (direction, size): (a) the client is Linux TCP except the timestamp option and the SYN
+  timer; Windows (Mustafa's Brave) has its own delayed-ACK timer (200 ms class), minimum RTO (300 ms class) and
+  RACK/TLP for the client's inputs; the median phase shows the client's first post-burst segment sets when the server
+  learns (+275 vs +345 via the dupack path: ~70 ms, T1), so the median can move by tens of ms either way; unmeasured.
+  (b) HZ 250 vs 1,000 (timer rounding up to 4 ms, Cubic clock): small, unmeasured. (c) Linux's adaptive delayed-ACK
+  ato (> 40 ms at 33 ms spacing) makes the model slightly optimistic when the client's own sender is blocked;
+  quick-ack mode after a duplicate makes it slightly pessimistic; both listed in S11. (d) tcp_retrans_try_collapse
+  (tcp_retrans_collapse = 1 at tcp_ipv4.c:3432; called from __tcp_retransmit_skb, output.c:3349, gate at :3247)
+  merges the client's small input segments on resend: NOT in S11's list; upstream only, negligible for the downstream
+  metric. (e) SACK compression (<= 1 ms), TSO/GSO, reordering (FIFO paths by design): listed.
+- M4 margins of the three-part bar: its first part ("half within 0.7 s") sits 46 ms above the modelled p50 (654);
+  residual M3(a) is of that order, so the 0.997 pass chance is conditional on the client stack behaving like the
+  Linux client modelled. Its third part ("none over 3.0 s") rests on 4 phases of 600,000 (rate 6.7e-6; M1: three-loss
+  tail draws), so its share of the pass chance is a rare-event estimate with a wide relative error (the stats skeptic
+  owns the interval).
+- B1 (minor, latent, no number moves): rto_ns (tcp_model.rs:719) uses checked_shl, which only fails for shifts >= 64;
+  for backoff >= ~46 the shifted RTO wraps to a small value (the kernel caps icsk_rto at each doubling, timer.c:655:
+  min(icsk_rto << 1, TCP_RTO_MAX)). Unreachable in these runs (a 60 s phase window holds about 10 RTOs, and every
+  valid sample resets the backoff); would need ~70 min of dead link.
+- Cleanup: worktree .gate/rr3-wt restored from HEAD with git show and removed (git worktree list: main, the two agent
+  worktrees, .gate/te3s-wt of another skeptic). Diagnostic patches kept as scratchpad/rr3/patch1-4.py.
+
+## Verdicts
+VERDICT: APPROVE the model v3 for Mustafa's decision, with REVISE-level wording fixes in what is sent. Model v3 matches
+Linux v6.8 line for line on every path the brief lists (K1-K10), the numbers reproduce exactly (R0), the p50 rise to
+654 ms is Linux's own undo path plus PRR from an empty pipe (T1, A1), the S13 (e) stories hold (T2, T3: the worst
+also needs the leak), the numbers hold for v6.12 too (V1), and the 600,000-phase maximum is a three-loss tail draw
+(M1). No defect found moves p99 1,051 or max 4,196. What the main session must say: why the p50 rose; that the
+"half within 0.7 s" part has a 46 ms margin against unmodelled client-stack timing (M3a, M4); the kernel/HZ scope;
+and the leak's role in the S13 (e) worst phase.
+DONE
