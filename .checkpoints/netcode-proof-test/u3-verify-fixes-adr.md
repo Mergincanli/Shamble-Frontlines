@@ -224,4 +224,21 @@ Beside the advisor's E1-E4 (1556, 747, 1295, 1462-1469):
 Worktree .gate/u3-adr-diag removed (its file reset to HEAD first); probes kept in the scratchpad (adr_diag.rs,
 serial_diag.rs, patch_delta.py); build output in .gate/u3-adr-diag-target; nothing committed or pushed.
 
+## Addendum (resume 2026-11-07, after Mustafa's 23:40 UTC choice; finished block)
+Spike code unchanged since 689c81f (git diff 689c81f HEAD touches only .checkpoints/). Cites re-checked: fixes.rs:1-5,
+18, 196-212, 356 (PINNED 399_205_920 / 610_751_158 / 737_585_182 ns), ADR 0001:419-432, 445-450, 494-509, 955-964,
+1462-1467, 1640-1641, plan:297, 1014-1029 (the runner's single-use token is plan:1027, not 1028).
+- A1 (a number changes): his record says "one attempt every 300 ms in parallel (at most 8)". F14: Brave/Edge/Firefox
+  queue a second CONNECTING WebSocket to the same endpoint. The form they can run (serial abort-and-retry, F15) at the
+  300 ms cadence: 399/629/1,645 ms, 8 phases over 1 s, 1 over 1.5 s: FAILS WS-LIMIT's "every one within 1.0 s" (and
+  the 21:40 goal's 1.5 s). At 500 ms: 399/632/878 (passes on this seed set). The model skeptic's D9
+  (u3-verify-fixes-model.md:96-100) finds the pinned config itself over 1 s on 1 of 6 seed sets (1,059 ms), and its
+  faithful variant (browser lock included) 815-1,441 ms max. So "every one within 1.0 s" is not robust: back to him.
+- A2 (a conflict to settle): "bound to the session". ADR 0001's token claims (0001:494-496) bind to player id and
+  room id (audience); there is no session claim. If he means player + room, nothing changes. If he means the live
+  session, the lobby must learn a session id it does not have (from the room, or from the client unverified): a new
+  claim in 494-496 and a change to the Lobby calls row (0001:682). The docs PR must say which.
+- A3: "short-lived" with 0001:496's 30 s expiry means a refresh about every 25 s whether used or not (F19); "in memory
+  only" fits 0001:783's spirit (no storage), as plan:1022-1023's proof-test resume secret already does.
+
 DONE

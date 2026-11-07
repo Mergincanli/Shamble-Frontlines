@@ -131,3 +131,35 @@ Branch claude/netcode-proof-test-plan-hcky5g, head 689c81f (41bd8a0 + checkpoint
   unsent data waits at the first ACK after the RTO. 64 KB rows: always (defaults, fix 3 alone: too good by ~1 RTT, not measured).
   Adaptive and 3-snapshot rows: everything written was sent during the burst (cwnd 10 > limit), so the queue is empty at that ACK
   and F-RTO falls back (:2905): the recommendation is unaffected.
+
+## Resume (after container restart, 2026-11-07)
+- Context found: Mustafa already chose (checkpoint "Decisions taken", ~23:40 UTC) WS-FIX (a), RESUME-CRED (a), WS-LIMIT
+  "99 % within 0.8 s, every one within 1.0 s", standing unless a skeptic changes a number. D9 bears on that directly.
+  Remaining: confirm D9's output file, the pinned ns values, source unchanged since 41bd8a0; remove the worktree; verdicts.
+- R1 (resume checks): spikes/ identical 41bd8a0..HEAD (de8a9fd), so every file:line above holds. Chromium cites re-read from
+  the saved copies (scratchpad/chromium-src): lock_manager.h:22-33 (RFC 6455 4.1.2 quote), .cc:26 (kUnlockDelayInMs 10), .cc:139
+  (queue, ERR_IO_PENDING), transport_connect_sub_job.cc:117-126 (lock before connect), :137 (released on failure),
+  basic_handshake_stream.cc:408-410 (UnlockEndpoint in Upgrade): CONFIRMED. D9's numbers are in .gate/netcode-proof-test/
+  u3vf-diag2.txt ("ROBUST" lines); the pooled faithful 6,000 in u3vf-diag3.txt: REC p50 436 p99 690 max 1441, 5 over 1 s.
+  The diagnostic patch saved as .gate/netcode-proof-test/u3vf-diag.patch (688 lines, applies to 41bd8a0) for the main session.
+- R2 linux_karn diag (worktree tcp_model.rs) checked against tcp_input.c:3318-3327/:3390 (seq sample only if no cum-acked skb was
+  resent, from first_ackt = oldest), :3141-3157 (else the SACK sample = oldest newly SACKed never-resent, else TSecr if the ACK
+  newly acks data): the diag follows all three. TSecr fallback uses the head's last send (ts_recent updates only at rcv_wup).
+- R3 (diag3, not in the table): with the adaptive budget the stream is not thin, so a lower rto_min only shortens doubled RTOs:
+  faithful variant "adaptive + rto_min 100, no reconnect" p50 938 p99 1139 max 2846 (6,000 phases) vs rto_min 200 436/719/1911;
+  the retries' doubling phase-locks to the 1 s outage (TLP ~2 srtt, then RTO 208, 416, 832: the 4th lands ~670 ms after the
+  return). So rejecting a lower rto_min is right for the recommendation, but for this reason, not "6 linear retries run out".
+- R4 worktree .gate/u3vf-wt cleaned by reverse-applying the saved patch, then removed (git worktree list: main folder only).
+
+## Verdicts (final block)
+VERDICT: REVISE. The table reproduces exactly (F0), and items 1-3 match v6.8 (F1-F3), but:
+- Model bug B1 (tcp_model.rs:1024-1029; spec S4 too): RTT sampled from the newest never-resent segment even when a resent one is
+  cum-acked in the same ACK; Linux takes no seq sample then (tcp_input.c:3318-3327, :3390). Corrected: REC 429/647/701; rto100
+  thin 236/515/639; rto50 289/498/855; thin rto200 350/606/1002; fix 1 max 1,899 (not 4,203).
+- Both explanations REFUTED (D5-D8, R3). Fix 3's "parallel attempts" cannot run in a browser (F7, D2: REC 399/632/803); the
+  trigger reads kernel srtt a page cannot read (F8, D3).
+- WS-LIMIT's "every one within 1.0 s" is one draw: as built 1,059 ms on seed set 3000; faithful variant (B1 + TSecr + lock +
+  app RTT) 5 of 6,000 over 1 s, max 1,441 (D9, diag2/diag3). The 99 % bar (0.8 s) holds in all 12 sets (571-722 ms), and 1.5 s
+  holds in all. Per Mustafa's 23:40 rule, a number changed: WS-LIMIT goes back to him.
+- The reconnect wins 22 of 1,000 phases (D1): the adaptive budget does the work; fix 3 trims the tail.
+DONE
