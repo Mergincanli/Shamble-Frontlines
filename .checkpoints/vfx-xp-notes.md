@@ -50,7 +50,9 @@
   XP-TERM sharpened (GD-1, GD-2, GD-3, LOOP_V2:235), LOOK sharpened (AD-2, AD-1, AD-6), the need rule's background line
   (V-5), new follow-ups (GD-4, GD-5, AD-4; stale citations V-1, AD-5); ROADMAP's entry; e-checks updated. Skipped:
   AD-3 (a pointer beside his line: the LOOK question covers it). V-4 goes in the report's Evidence.
-- **Current step:** 6, the report (Decisions needed: XP-TERM with GD-1's fact, LOOK with the no-conflict reading).
+- **Done:** step 6, the report (`docs/reports/2026-11-07-vfx-xp-notes.md`, body 70 lines, Appendix A from the words file).
+- **Current step:** 7, the last commit (delete the notes; STATUS cites them readable at the report's commit), then PR
+  ready, the advisor's final-head review, `needs-mustafa`, his go.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
