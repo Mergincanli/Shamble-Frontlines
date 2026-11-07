@@ -531,7 +531,9 @@ PM-0002-* is judged here.
 - **npt-server** (library): `due_ticks`, `Schedule`, `TickLoop`, `PhaseTimers`, `Counters`, `ControlSocket`,
   `ConnLimits`, `AddrTable`, `Decoder`; plus its thin binary.
 - **npt-net:** `WtServer`, `WtClient`, `WsServer`, `WsClient` (features `wt-wtransport` and `wt-wtq`),
-  `ImpairSocket`, `DelayStream`.
+  `ImpairSocket`, `DelayStream`, and `L2Config`: the one small L2 configuration type (Mustafa's U3-Q7, 2026-11-06: it
+  reuses npt-l1's `Profile` and `ReorderStep`; the advisor's M6: listed here before the code). Everything else in
+  npt-net stays pub(crate).
 - **npt-client:** `ClientEndpoint`, `StepOut`, `Predictor`, `Interp`, `ClockSync`, `AimCast`, `BlockWriter`, `CueLog`.
 - **npt-client-wasm:** the exports create, mode, input and step.
 - **Binaries:** npt-bots, npt-load, npt-super, npt-host, npt-judge, and npt-lab with its `probe` subcommand (U2;
