@@ -17,7 +17,9 @@
 - **B.2:** merged as PR #42, 4c6db5b, 2026-11-06 about 23:58 UTC, by merge commit, on Mustafa's go ("merge #42")
   after the advisor's APPROVE of e223ecc (comment 6698888516); one CI smoke job re-run once (stalled installing
   Chromium's system libraries before any test; the re-run passed). The facts are read from the API at build time.
-- **Current step:** 0, the sources saved; next the plan.
+- **Done:** step 0, the sources saved (6e88f9a); draft PR #43 opened and subscribed; CI green on main 4c6db5b after
+  #42's merge (the gate workflow, run 42315225217). Plan revision 1 (`plan-rev1.md`).
+- **Current step:** 1, the advisor's review of plan revision 1.
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps
