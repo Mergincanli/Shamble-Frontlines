@@ -389,7 +389,18 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **Second skeptic round on cc72f6f** · workflow `wf_a8e0f590-0bc` (npt-ws-fixes-verify2; rust-reviewer on model v2,
+- **Model v3 build** (general-purpose agent, opus, xhigh, isolated worktree; tcp_model.rs + tests.rs only) · launched
+  about 05:45 UTC 2026-11-07 · notes `u3-build-v3-model.md` (ends DONE) · G1 discard, D-SACK, the undo machinery,
+  F-RTO 2b/3a/3b, Disorder, Recovery-exit cwnd, PRR if faithful, Cubic, G2, a client SYN-timer knob, rule tests,
+  S13 (d) without timestamps, PINNED_E re-pinned · returns its worktree path (uncommitted). If cut: SendMessage the
+  same agent after the reset (its context is kept), never a new one.
+- **Harness and statistics build** (general-purpose agent, opus, xhigh, isolated worktree; fixes.rs only) · launched
+  about 05:46 UTC · notes `u3-build-v3-harness.md` · H6 cancel-on-fresh + post-recovery takeovers, H7, H8, H19, hashed
+  input phase, Chromium throttler and Firefox fail delay options, TLS resumption flights, a multi-burst run harness,
+  exact joint pass chances with intervals over 600,000 phases, three-part bars and bite rows, a hash pin · leaves a
+  slot for the Windows SYN option. **After both:** apply both diffs to spikes/ (git diff | git apply, no merge),
+  wire the SYN option, re-pin, run the tables, check.mjs, gate, commit, then a focused third skeptic round.
+- (done) **Second skeptic round on cc72f6f** · workflow `wf_a8e0f590-0bc` (npt-ws-fixes-verify2; rust-reviewer on model v2,
   netcode-architect on the harness vs browsers and ADR 0001, test-engineer on the bar statistics; xhigh) · launched
   about 04:08 UTC 2026-11-07 · script:
   `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify2-wf_a8e0f590-0bc.js`
