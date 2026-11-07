@@ -11,5 +11,7 @@
   "four register rows" (five); the report's LOOK entry should name OQ-0003-15.
 - **#43:** merged 69ea88e, 2026-11-07 about 11:29 UTC, on Mustafa's go after the advisor's APPROVE WITH NOTES of
   4e03bb5 (comment 6701970962); CI green on that head. (`merged_at` read at build time.)
-- **Current step:** 0, the sources saved; next the plan (A4 is kit: it needs his go; plan first; the advisor rules
-  whether his XP-TERM and LOOK answers ride A4's docs pass or a small docs change-set of their own).
+- **Done:** step 0, the sources saved (bbf2822); draft PR #44 opened and subscribed; the facts (`facts.md`, 23b9543,
+  §0-§8, with 12 tensions between his A4 words and today's text); plan revision 1 (`plan-rev1.md`): parts A-F, seven
+  decisions (TIER0-SCOPE for Mustafa; T0-MERGE, DOCS-RIDE, SCALE-HOME, REVERT-EXCEPTION for the advisor).
+- **Current step:** 1, the advisor's review of plan revision 1.
