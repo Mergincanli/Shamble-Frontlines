@@ -4,7 +4,7 @@ Written by Mustafa and the Advisor, 17 October 2026: step 1 of the v2 planning. 
 rebuild. Status tags as in LOOP_V2.md: `[DECIDED]` Mustafa decided it · `[DEFAULT]` stands unless vetoed ·
 `[OPEN]` needs a decision · `[LATER]` not now.
 Updated on 2026-11-06 with Mustafa's words: his community-servers note of 2026-11-03 (§5) and his design walk of
-2026-11-04 (pillar 5, and the pointers in §5 and §7).
+2026-11-04 (pillar 5, and the pointers in §5 and §7); on 2026-11-07, his private-match XP item of 2026-11-06 (§5).
 
 ## 1. North star
 **Matches that turn into stories players retell:** a last-second steal, a saved-up rush that flips the game, a combo
@@ -68,6 +68,11 @@ What players should say after a match, in Mustafa's words:
   - Why: bigger or longer matches, community growth, a safety net if the game grows faster than our funds,
     possible revenue such as renting out official private servers.
   - `[DECIDED]` The trust rule: progression counts on official servers only.
+  - On progression in private (rented) matches (Mustafa, 2026-11-06):
+    - `[DECIDED]` With bots in the match: 25 % of normal XP; humans only: 100 %.
+    - `[OPEN]` Open, Advisor's suggestions: (1) weigh XP per action (kills on bots give little), so public matches with
+      bot fillers aren't punished; (2) against friends trading easy wins: full XP only with a minimum number of humans
+      per team, plus a daily XP cap on private matches.
   - Precedents: Counter-Strike and Rust community servers, Battlefield's rented servers, Minecraft Realms.
   - Its open question in the drafts: ADR 0006, OQ-0006-21 (COMMUNITY-SERVERS, his words of 2026-11-03: "keep the
     door open, don't design it").

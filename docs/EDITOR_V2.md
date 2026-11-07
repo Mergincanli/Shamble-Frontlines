@@ -4,6 +4,7 @@ Written by Mustafa and the Advisor, October 2026. Status tags as in LOOP_V2.md: 
 unless Mustafa vetoes), `[OPEN]`, `[LATER]`. Scope: the **map editor only**. The Character Lab and Anim Lab stay as
 they are.
 Updated on 2026-11-05 with Mustafa's editor decisions: §3's block dated 2026-11-05, and the pointers to it.
+Updated on 2026-11-07 with Mustafa's VFX editor item of 2026-11-06, a future tool after the map features: §7.
 
 Principle (Mustafa, 2026-11-05), a lean editor: §3, Decided 2026-11-05.
 
@@ -110,3 +111,24 @@ Principle (Mustafa, 2026-11-05), a lean editor: §3, Decided 2026-11-05.
 Mustafa's tool order and his other editor decisions (§3, Decided 2026-11-05): the architecture plan (step 2) maps them
 onto these slices, for his approval. His "slice 5" in the plan view (2026-11-03) is the v2 playable slice 5, "Octopon-3
 and Editor v2" (SLICE-ORDER, ADR 0002:34-35), not build slice 5 here.
+
+## 7. A future tool: the VFX editor (after the map features)
+`[LATER]` **A VFX editor**, as a future tool, after Editor v2's map features (Mustafa, 2026-11-06). Decided principles,
+design later:
+- `[DECIDED]` Essential: the game's punch depends on it. Inspired by Unreal's Niagara (emitters with a stack of modules:
+  spawn, velocity, colour over life, size over life, gravity, collision), but without its clutter.
+- `[DECIDED]` What you see is what you get: the editor uses the game's own renderer and lighting, and saves the same
+  effect data the game loads, triggered by the game's events (hits, blasts, deaths).
+- `[DECIDED]` Test in context: trigger a shot or blast in a live preview, from the real game camera, and keep editing
+  while it plays.
+- `[DECIDED]` Easy to pick up: each effect opens with a few big sliders (size, intensity, colour, duration); the full
+  emitter and module stack folds open on request. One clean panel; curves edited inline. Presets to start from (muzzle
+  flash, explosion, smoke, sparks).
+- `[DECIDED]` Whole impact moments: one asset can bundle particles, sound, camera shake and hit-stop, timed together, so
+  punch is authored in one place.
+- `[DECIDED]` Faction colours: effects use the same role colour slots as units, so one explosion recolours per faction.
+- `[DECIDED]` Cost and quality: each effect shows its cost against a budget, and has quality tiers (Low drops extras but
+  stays readable).
+- `[DECIDED]` Comic flavour: ink-outlined smoke, impact frames, halftone flashes, onomatopoeia.
+- `[DECIDED]` A VFX style guide comes first, from a separate reference study, so the tool fits our look.
+- `[DECIDED]` Built to iterate; no bloat.
