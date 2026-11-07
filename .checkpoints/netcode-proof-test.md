@@ -422,6 +422,29 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **Docs PR #45: the advisor APPROVED head 6ae357111887849f30fc74a619b8bef7fb4f02f7** (about 19:45 UTC; notes
+  advisor-pr45.md N1-N11). History:
+  - Its review of e290c97 was REVISE: E1's "the bound times the measured slowdown, itself at most 1.10" read as a 1.10
+    cap beyond the tolerance, and README line 23 had a stray space.
+  - Fixed in 6ae3571 (worktree .gate/npt-readings) with its exact words. The PR text was updated to match, and step 3
+    now says "merge #45".
+  - Gate PASS --no-smoke; CI gate and smoke green on 6ae3571.
+
+  **Waiting on Mustafa's go ("merge #45")**, then merge with 6ae3571 as the expected head (re-check the checks first).
+  A later push needs the advisor again. Advisor finding 4: **PR #40 must merge with a merge commit, never squashed**,
+  so the evidence commits bf9d248, 975e72b, 95a04a1 and 1e020a7 that ADR 0001 and docs/design/ws-reconnect.md cite stay
+  reachable (put it in the report). Safety-net check-in trig_011mDKEXqy1t34dbADSL3HDh at 20:06 UTC.
+- **U3c plan written**: .checkpoints/netcode-proof-test/u3c-plan.md. It covers:
+  - DelayStream above TLS with a pump task and a process-wide release clock; TLS records at +22 B; frame limits before
+    buffering;
+  - the fix-1 gate functions (snapshot_budget, may_write = fixes.rs:777's three conditions); U6's WsServer calls them;
+  - mechanism tests (a)-(e), the kernel cross-check, and SERIES rows;
+  - R20 (a) recommended: a new `npt-tcpinfo` crate with two unsafe libc calls, the workspace's second unsafe exception,
+    against (b) netlink sock_diag crates. Facts: socket2 0.6.5, rustix 1.1.6 and nix 0.31.3 expose neither TCP_INFO nor
+    SIOCOUTQ safely (sources in scratchpad u3c-crates/);
+  - tokio-rustls =0.26.6 (2026-09-28, rustls ^0.23.27).
+
+  **Next:** the advisor reviews the plan. On APPROVE, a build agent in a worktree builds it, as for U3b.
 - **Docs PR #45 OPEN** (about 19:15 UTC): https://github.com/Mergincanli/Shamble-Frontlines/pull/45, branch
   claude/npt-readings at e290c97 (fast-forwarded from main 69ea88e; worktree .gate/npt-readings), label needs-mustafa,
   subscribed. Content: the advisor's revision 2 (advisor-ws-docs-r2.md, 15 edits) with the second verifier's ADR-text
