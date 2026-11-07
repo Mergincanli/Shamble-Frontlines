@@ -30,7 +30,12 @@
   is gameplay effects. C8: B.2's follow-up "bears on it"; the match record adds no field (ADR 0006:474-475). C9: #40's
   STATUS :3, :31, :173 at 0588a17. C10: the CI line as facts (run 42313665674 attempt 1 cancelled after 6 min 34 s in
   apt, attempt 2 passed after 6 min 49 s; push run 42313658977 did the step in 11 s).
-- **Current step:** 2, the build (EDITOR_V2 §7 and header, VISION_V2's XP block, four register clauses).
+- **Done:** step 2, the build (this commit): EDITOR_V2's header line :7 and §7 (his ten lines, each `[DECIDED]`, the
+  tool `[LATER]`); VISION_V2's XP block after the trust rule (:71-75); the four register clauses (:104, :122, :160,
+  :183). `e-checks.py` E1-E3 PASS (30 checks; EDITOR_V2 `[DECIDED]` 11→21, `[LATER]` 2→3; VISION_V2 `[DECIDED]`
+  12→13, `[OPEN]` 3→4); E4 lists STATUS:656 (EDITOR_V2 :93/:94 → :94/:95) and the "From B.2" ADR 0005 ranges (§6 is
+  now 80–99; :2550's 27–94 is 27–99), both for docs-keeper; `gate.mjs 4c6db5b --no-smoke` PASS, +0 −0; repo map OK.
+- **Current step:** 3, docs-keeper's pass (STATUS, ROADMAP, the B.2 report's correction; conditions C2, C3, C5, C7-C10).
 - **Agents:** Opus 5.5 at high, at most 3 at a time.
 
 ## Next steps

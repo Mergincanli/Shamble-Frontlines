@@ -68,6 +68,11 @@ What players should say after a match, in Mustafa's words:
   - Why: bigger or longer matches, community growth, a safety net if the game grows faster than our funds,
     possible revenue such as renting out official private servers.
   - `[DECIDED]` The trust rule: progression counts on official servers only.
+  - On progression in private (rented) matches (Mustafa, 2026-11-06):
+    - `[DECIDED]` With bots in the match: 25 % of normal XP; humans only: 100 %.
+    - `[OPEN]` Open, Advisor's suggestions: (1) weigh XP per action (kills on bots give little), so public matches with
+      bot fillers aren't punished; (2) against friends trading easy wins: full XP only with a minimum number of humans
+      per team, plus a daily XP cap on private matches.
   - Precedents: Counter-Strike and Rust community servers, Battlefield's rented servers, Minecraft Realms.
   - Its open question in the drafts: ADR 0006, OQ-0006-21 (COMMUNITY-SERVERS, his words of 2026-11-03: "keep the
     door open, don't design it").
