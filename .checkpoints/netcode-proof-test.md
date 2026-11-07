@@ -326,6 +326,59 @@
   them.
 - **A nuance, recorded:** an expect-invalid bite counts as shown if its rule reports a missing counter too; that
   cannot give a false PASS, because measured runs without the counter are INVALID by the same rule.
+- **The flaky loopback P2 test (wt_tests.rs:203), measured 2026-11-07** (the record, since .gate/ is gitignored):
+  - **How:** an instrumented throwaway worktree, .gate/flaky-wt at 2ec1533, printing per run quinn's ConnectionStats
+    (frame_tx/frame_rx.datagram, PathStats) and ImpairSocket's run summary. Seed 5, P2, 200 datagrams each way at
+    100 B, release build with both features.
+  - **5 ms spacing (200/s, as the test is today), 80 impaired route-runs:**
+    - 1 run under 180: wtq up 178. The client's quinn sent 200 frames; ImpairSocket lost exactly 7 up packets and
+      dropped nothing else; the server's quinn received 178 and the app got all 178. So 22 datagrams rode in 7 packets.
+    - That run had 75 up packets reordered, 17 congestion events, 32 packets quinn called lost, client cwnd 2,904 B.
+    - Over all 80 runs: quinn's client "lost" 24-52 (median 38) against 6-8 real; congestion events 12-28 (median 20);
+      cwnd 2.9-4.6 KB.
+    - Up received: wt min 189, median 195; wtq min 178, median 195. Down: min 193, median 198.
+  - **33.3 ms spacing (the tick), 50 impaired route-runs:**
+    - 0 under 180; up min 191 (wt) and 192 (wtq), median 193-194; down min 197.
+    - quinn's "lost" 15-32 (median 21) against 8-10 real; congestion events 4-10 (median 8); cwnd at its 2,904 B
+      floor.
+    - About 23 up packets are still reordered per run: ACK-only and other small packets sent between the datagrams.
+    - In every run, both directions, the datagrams missing were never more than ImpairSocket's real losses (the
+      advisor checked).
+  - **Cause:** independent per-packet jitter (P2: +-10 ms each way) at 5 ms spacing reorders packets. quinn's
+    packet-threshold detection declares spurious losses and cuts cwnd. Datagrams queue and are packed several per
+    packet, so one real loss takes several datagrams.
+  - **The advisor's ruling (afa86ecfb9b00e463, "Side ruling" in advisor-u3c-plan.md): APPROVE the fix** — pace the
+    impaired P2 runs at TICK, keep the clean reference at 5 ms, keep >= 180 — **with four conditions:**
+    - FT1: the sender twin of the new assertion (each sender quinn's DATAGRAM frames sent = the app's sends);
+    - FT2: an exact check beside >= 180: per direction, datagrams missing <= ImpairSocket's real losses;
+    - FT3: these numbers in the checkpoint (done here);
+    - FT4: a comment at the pacing on why the impaired run uses the tick.
+  - **Apply after U3c's build A merges.**
+- **C6 widened (U6, before R3; the advisor 2026-11-07, (a)):**
+  - **What it runs:** 30 Hz, snapshot-sized datagrams down (about 1,000 B) and input-sized up, at P1-P4 and B1, with one
+    FullState on its stream mid-run.
+  - **What it records:**
+    - quinn's cwnd (minimum and median), lost_packets and congestion_events;
+    - the datagrams quinn dropped from its send buffer (app sends minus frames sent);
+    - ImpairSocket's real losses and reorder counts;
+    - delivery delay p50 and p99.
+  - **Plus one comparison run:** a test-only ImpairSocket variant that keeps each flow in order (each delivery at the
+    later of its own time and just after the previous packet's), to size what the model's reordering costs WebTransport.
+  - **Why:** at 30 Hz the client's cwnd already sits at its 2,904 B floor with 100 B datagrams; with 1 KB snapshots at a
+    100 ms RTT about 3.1 KB is in flight, so a floored window would limit snapshots. This ties in with U6-1 (a small
+    datagram send buffer).
+- **JITTER-ORDER: parked; possibly Mustafa's before R3** (the advisor's (b), 2026-11-07). Not an escalation today.
+  - **The model as written:** independent jitter on back-to-back packets is the intended model. ADR 0001 part 13
+    (:569-584) gives each direction "a uniform jitter of ± half its jitter" (OQ-0001-16), and :1471-1472 says
+    "Reordering is what the simulator produces under the profile's jitter". PM-0001-3's bands check exactly that, with
+    R-5's step on top, so no unit changes it on its own.
+  - **Where its premise falls short:** part 13's "jitter alone cannot reorder 30 Hz inputs" holds for the inputs
+    themselves, but misses QUIC's ACK-only, probe and stream packets, which do reorder.
+  - **The advisor's reading, not verified:** on real paths, delay variation comes mostly from queues, which keep order.
+  - **When it goes to Mustafa:** an order-keeping model would change an ADR profile definition, so it is his call. It
+    goes to him only if C6 shows the model's reordering moves a WebTransport result (-17, -18's 500 ms, snapshot delay
+    or drops), before R3, with numbers and the advisor's recommendation. If nothing moves, it is recorded and the model
+    stays.
 
 ## Key numbers
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include

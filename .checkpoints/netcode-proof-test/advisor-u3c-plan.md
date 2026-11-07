@@ -55,3 +55,19 @@ Started 2026-11-07. Branch claude/netcode-proof-test-plan-hcky5g, head 2ec1533; 
 ## Verdict
 APPROVE with conditions (listed in the report). R20 (a) approved; the unsafe exception is mine under ADR 0002:264-265.
 Split approved with U6 carries. No escalation.
+
+## Side ruling: the flaky loopback P2 test (wt_tests.rs:203), 2026-11-07
+- Re-read .gate/flaky-runs.log (5 ms spacing, 80 impaired route-runs): worst wtq up 178 with 7 real up losses, 75 up
+  packets reordered, 17 congestion events, quinn lost 32, cwnd 2,904. .gate/flaky-runs-30hz.log (50 runs): min up 191;
+  mean 22.9 up packets reordered per run (ACK-only and other packets between the 33 ms datagrams); in all 50 runs and
+  both directions, missing datagrams <= ImpairSocket's real losses (awk over the logs).
+- APPROVE the fix (TICK pacing for P2, 5 ms clean reference kept, >= 180 kept, app == quinn frame_rx) with: the
+  sender-side twin (quinn frame_tx.datagram == app sends); the exact check missing <= real lost per direction; the
+  numbers saved in the checkpoint (.gate/ is gitignored); a comment naming why TICK and that C6 owns the rest.
+- (a) yes, and more: C6 at 30 Hz with snapshot-sized down datagrams, P1-P4 and B1, a FullState mid-run; record cwnd,
+  lost_packets, congestion_events, quinn's datagram drops vs ImpairSocket's real losses and reorder counts; plus one
+  test-only order-keeping jitter variant to size the effect.
+- (b) independent per-packet jitter IS the written model (ADR 0001 part 13 :569-584, :1471-1472; OQ-0001-16; PM-0001-3).
+  Part 13's premise "jitter alone cannot reorder 30 Hz inputs" holds for the inputs only. Changing the model changes an
+  ADR's profile definition: Mustafa's, but only if C6 shows a WebTransport mark moves; then before R3 with numbers.
+  Not an escalation today; pending item JITTER-ORDER in the checkpoint.
