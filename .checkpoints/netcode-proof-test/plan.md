@@ -1,4 +1,4 @@
-# Plan: the netcode proof test (SPIKE_PLAN item 1), revision 3.2
+# Plan: the netcode proof test (SPIKE_PLAN item 1), revision 3.3
 
 - **Change-set:** `netcode-proof-test` · **Branch:** `claude/netcode-proof-test-plan-hcky5g`. This cloud session may push
   only to this `claude/…` branch, so it stands in for `cs/netcode-proof-test` (CLAUDE.md, standing permission).
@@ -15,6 +15,13 @@
     Both deciders of OQ-0006-16 agree with the port plan.
   - Revision 3 (`a6607bc`): the advisor's plan review, APPROVE with C1–C12. Its verdict, rulings and the exact words for
     R-PR are in `advisor-verdict.md`. Its notes are in `advisor-plan-review.md`.
+  - Revision 3.3 (2026-11-07): the units' rulings folded in, with Mustafa's approval of 3.1 standing. It changes no mark,
+    run or cost.
+    - What: Mustafa's WebSocket decisions of 2026-11-07 (§0.5), and U3c's plan text per `u3c-plan.md` 1.9 (the
+      advisor's APPROVE of the U3c plan with C1-C16).
+    - Where: §4.1, §4.2 (npt-tcpinfo and the unsafe rule), §4.3 E15 (the faithful model and fix 1), §4.4, §4.7, §4.8,
+      §12.1's U3 and U6 rows, §15 (R-25, R-30) and §16.
+    - Already listed in §4.7 before this revision: L2Config (a0d7916).
 - **Sources** (all in this folder, line-cited): `netcode-architect-digest.md`, `infra-engineer-digest.md`,
   `test-engineer-digest.md`, `ssh-probe.md`, and the two review files.
 
@@ -190,6 +197,29 @@
 - **Where its transcripts go:** the laptop session's transcripts belong to his university's Claude organisation.
   Nothing secret enters them by design: the private key is never read or printed, and results pass `redact-check`.
 
+### 0.5 Mustafa's WebSocket decisions (2026-11-07, his words verbatim) and where each is met
+About 13:45 UTC:
+> WS-SCOPE: no. Measure fix 1 (the newest-snapshot-only buffer) in the proof test. The reconnect becomes a requirement
+> for the real client, built and measured before the first online playtest, with today's model as its target (buffer +
+> reconnect: 99 % within about 1.05 s). Record that in the docs PR so it can't get lost. RESUME-CRED: deferred with the
+> reconnect. WS-BAR: the three-part form now; its numbers after one practice run on the real test setup, but never
+> looser than the model predicts for a correct build with fix 1. If the practice run comes out worse than the model,
+> find out why before setting the numbers.
+
+About 14:30 UTC:
+> Refinement to my WS-BAR rule: the model's bound has almost no margin (5 % slower already fails a correct build), so
+> declare a tolerance now, before any practice run. If the practice run is up to 10 % slower than the model, the
+> numbers may move by that much; beyond 10 %, investigate first and never loosen. The advisor may set a different
+> tolerance with reasons, but it must be fixed before the run.
+
+| Decision | Where it is met |
+|---|---|
+| Fix 1 (the send budget) measured in this test | **Built:** U3c builds the send gate (`snapshot_budget`, `may_write`, the per-tick writer) on DelayStream, with its mechanism tests (E15). **Wired:** U6 puts it in WsServer's send path, with npt-tcpinfo's kernel values on the plain path. **Measured:** R3 measures it in PM-0001-18's WebSocket part. **Recorded:** ADR 0001 part 10, docs PR #45 |
+| The reconnect as a real-client requirement, target 99 % within about 1.05 s of the link's return | Docs PR #45: ADR 0001 part 11, OQ-0001-19, migration step 5 (slice 3) and docs/design/ws-reconnect.md. Not built in this test |
+| RESUME-CRED deferred | Docs PR #45 (OQ-0001-19; the reconnect record) |
+| WS-BAR: three parts, numbers after one practice run, never looser than the model's fix-1 bound; investigate a worse run | **Recorded:** docs PR #45's PM-0001-18 row. **Before R3:** marks.json's -18 WebSocket part (after #45 merges), and fixes.rs's run-structured bound (before R3's run plan). **At R3:** the practice run. §15 R-30 |
+| The 10 % tolerance, fixed before the run | Docs PR #45's PM-0001-18 row: 10 %, which the advisor kept. The bound's guard may lower it, never raise it. marks.json carries it before R3. §15 R-30 |
+
 ## 1. Item 1: can this session reach the servers over SSH?
 ### 1.1 What was tested (2026-11-05, 21:30–21:45 UTC; each probe once; `ssh-probe.md`)
 | Probe | Result |
@@ -353,7 +383,10 @@ spikes/netcode-proof/
                     the local control socket, metrics, the panic catch
   crates/net/       npt-net: native adapters only: WtServer and WtClient (wtransport, web-transport-quinn: one
                     feature each), WsServer and WsClient; L2 (ImpairSocket under quinn; the delaying stream wrapper
-                    in the WebSocket accept path)
+                    in the WebSocket accept path, DelayStream, on the Linux-faithful TCP model)
+  crates/tcpinfo/   npt-tcpinfo (U3c): the kernel's smoothed RTT (TCP_INFO) and unsent plus unacknowledged bytes
+                    (SIOCOUTQ) for WsServer's send budget on the plain path; two Linux calls, the workspace's second
+                    unsafe exception (§4.2)
   crates/client/    npt-client: the client endpoint library: no bindings, transport or clock; native and wasm32
   crates/client-wasm/  npt-client-wasm: the wasm-bindgen exports only
   crates/bots/      npt-bots (headless, cheating and hostile clients) and npt-load (the load orchestrator on LG)
@@ -392,6 +425,14 @@ fall under `.claude/rules/netcode.md`.
   client crates.
 - **npt-judge** depends only on npt-log, plus serde ("serde" here and in §4.1 means serde and serde_json). Nothing
   depends on npt-lab.
+- **npt-tcpinfo** depends on libc only (pinned =0.2.191, already in the lock through tokio, mio and quinn-udp), and
+  only npt-net uses it (U3c; the advisor's C12).
+- **Unsafe code** is denied in the workspace, with two named exceptions under ADR 0002:264-265's rule ("an exception
+  needs a written invariant, a test and an `#[allow]` with its reason"):
+  - npt-client-wasm, for wasm-bindgen's generated code;
+  - npt-tcpinfo's two functions (getsockopt TCP_INFO and ioctl SIOCOUTQ), each `#[allow]` on the function only.
+  The spike's test command checks both, and greps that `allow(unsafe_code` appears nowhere else. npt-net stays free of
+  unsafe code and libc (the advisor's M14).
 - **How they are read** (the advisor's C10): with every feature and every target; dev dependencies do not count (they
   never ship), except for "nothing depends on npt-lab", which counts every kind.
 - **No reference into `spikes/`** from outside it: a grep in the test command, until the foundation's G5 and G8 exist.
@@ -416,7 +457,7 @@ fall under `.claude/rules/netcode.md`.
 | E12 | Headless bots on npt-client with npt-net's clients: 30 inputs per second, the brawl; the target-course shooter running a page-like 60 Hz frame loop with a seeded phase, posting input and view time each frame (so the honest rewind includes the frame-to-tick wait); the cheats (forged kinds, 1.5× clock, lag switch, a 150 ms pong delayer, the tolerance-edge stamper, the never-acker); raw byte logs for re-decoding, kept on LG and run only in -17's and -19's blocks, with free disk checked first | bots | -2, -17, -19 to -22, -48, -50, -54 |
 | E13 | Load orchestration: clients over the CAX21s; the 5-minute calibration (under 80 % CPU every second); inputs per second within 1 %; the metrics role on one CAX21 | bots | validity of every LG row; -25 |
 | E14 | Hostile clients and fuzzing: 1,000 sessions that never join, oversize datagrams and stream openers, slow-loris on the game ports and on TCP 31000 and 80, a 1,000-address /64 cycler, `ws://` and wrong-Origin pages; cargo-fuzz per message type with a counting allocator | bots, fuzz | -25, -34 |
-| E15 | The link simulator: L1 (npt-l1: seeded, simulated time, fate log, the per-flow reorder step of R-5) and L2 (npt-net: impairment under quinn's socket, per peer, with one-way delays stamped on RS's clock; rate limit and bottleneck with R-17's queue depths; per-peer profiles; B1; UDP block). The WebSocket delay is a stream wrapper inside npt-server's accept path (R-25), so the room sees real source addresses. Its model, per direction: segments of at most 1,448 B; each delayed by the profile's one-way delay plus jitter; delivered at max(the previous segment's delivery, its own time), so order holds; each lost at the profile's rate on its own and then delivered one retransmission timeout later (proposed max(200 ms, 2 × the profile's round trip); Linux's 200 ms minimum to be verified at U3), holding back every later byte; the write side bounded at 64 KB (ADR 0001:442), returning Pending beyond. Stalls are counted per run. Every run records each stream's reorder share and stall share | l1, net | -3 and every P1–P4/B1 row |
+| E15 | The link simulator: L1 (npt-l1: seeded, simulated time, fate log, the per-flow reorder step of R-5) and L2 (npt-net: impairment under quinn's socket, per peer, with one-way delays stamped on RS's clock; rate limit and bottleneck with R-17's queue depths; per-peer profiles; B1; UDP block). The WebSocket delay is a stream wrapper inside npt-server's accept path (R-25), so the room sees real source addresses. **The model** is Linux 6.8's TCP at both ends, to the advisor's spec S0-S14 (Mustafa's U3-Q3 (b), 2026-11-06). U3a built it as `linux-6.8-tcp v3`, which three skeptic rounds checked line by line against the kernel source:<br>• segments of at most 1,448 B, each with its own delay, jitter and loss;<br>• delayed and selective acknowledgements;<br>• Linux's RTT estimator and RTO: srtt + rttvar, rttvar never below 200 ms, doubling;<br>• RACK, the tail-loss probe, F-RTO and the undos, and Cubic;<br>• bytes released in order;<br>• the write side bounded at 64 KB (ADR 0001:442), returning Pending beyond;<br>• each TLS record counted as plaintext + 22 B.<br>**DelayStream** (U3c) runs it per connection from a dedicated release clock, above TLS and below tungstenite (U3-Q4 (b)). **The send budget, fix 1** (ADR 0001 part 10 after docs PR #45): a tick's whole snapshot is written only if all three hold (fixes.rs:777's conditions, W22); otherwise it is skipped, counted, and never written later.<br>• nothing is held above the kernel socket;<br>• the stream's 64 KB room takes it;<br>• the unacknowledged bytes plus it stay within N snapshots, N = ⌈1.5 × srtt ÷ tick⌉ + 1, at least 3.<br>srtt and the unacknowledged bytes come from DelayStream's model on L2, and from the kernel through npt-tcpinfo on the plain path. Stalls are counted per run, by repair path. Every run records each stream's reorder share and stall share | l1, net | -3 and every P1–P4/B1 row |
 | E16 | Density harness: 8 room processes unpinned under the supervisor, bracket B, SIGKILL, 384 sessions | super, server, bots | -27; PM-0006-13, -14 |
 | E17 | Recordings and hashes: input recordings that drive both transports; the server's per-tick state hash; the client-held hash, without authority-only streams; the native-against-Wasm comparison (§4.5); the x86-64 re-decode and replay (npt-lab) | sim, lab | -17, -19, -21, -30, -48, -54, -57, -58 |
 | E18 | Instrumentation: monotonic reads at tick and phase edges; clock resolution per machine; per-thread CPU and RSS each second; queue lengths; bytes per client counted at UDP level (payload + 28 B, from the socket wrapper); packet capture for fragments; steal and affinity reads | server, net | -1, -4 to -16, -24, -25 |
@@ -460,6 +501,9 @@ PM-0002-* is judged here.
 
 - **What npt-room gets from npt-server each tick:** the decoded messages with their arrival stamps, and per client the
   RTT, loss, send-buffer space, maximum datagram size and unsent count.
+- **WebSocket's send budget (fix 1; E15):** WsServer in npt-net applies it in its send path through U3c's shared
+  functions, never in npt-room. npt-room sees `SendResult::BufferFull` and the skipped count. DelayStream's free budget
+  is the send-buffer space it reports.
 - **On L1:** npt-lab drives the npt-server library and npt-room on its simulated clock, since the clock is always
   injected. So the L1 hostile rows (-21, -22) run on simulated time.
 
@@ -534,6 +578,10 @@ PM-0002-* is judged here.
   `ImpairSocket`, `DelayStream`, and `L2Config`: the one small L2 configuration type (Mustafa's U3-Q7, 2026-11-06: it
   reuses npt-l1's `Profile` and `ReorderStep`; the advisor's M6: listed here before the code). Everything else in
   npt-net stays pub(crate).
+  - DelayStream's public items (U3c, the advisor's C5): `wrap`, `now_ns`, the AsyncRead and AsyncWrite impls, the
+    burst method, and its header, per-second and summary rows as std types.
+  - L2Config gains the fields `ws_max_message_bytes` and `ws_max_request_bytes`.
+- **npt-tcpinfo** (U3c): `srtt_us` and `unacked_and_unsent`, Linux only; elsewhere a stub returns Unsupported.
 - **npt-client:** `ClientEndpoint`, `StepOut`, `Predictor`, `Interp`, `ClockSync`, `AimCast`, `BlockWriter`, `CueLog`.
 - **npt-client-wasm:** the exports create, mode, input and step.
 - **Binaries:** npt-bots, npt-load, npt-super, npt-host, npt-judge, and npt-lab with its `probe` subcommand (U2;
@@ -574,6 +622,10 @@ PM-0002-* is judged here.
   - `npm audit` on `web/`'s lockfile.
   An advisory on a network-facing crate (quinn, rustls, ring, h3, tungstenite, hyper, tokio) blocks the next run
   until it is handled.
+- **U3c's additions to the audits:**
+  - tokio-rustls =0.26.6 (default features off, `ring`; network-facing, so on the list above);
+  - npt-tcpinfo's two unsafe blocks, with their SAFETY invariants and tests;
+  - DelayStream's request and frame parser as a fuzz target (-34).
 
 ### 4.9 Kept (engine EA-10; ADR 0002:140-146, 1422-1434)
 - **What is kept:** the whole `spikes/netcode-proof/` merges to main, with the closing commit's SHA written into
@@ -1164,10 +1216,10 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 | U0 | S | Container probes, each recorded: rustup 1.99.1 with the wasm32 target; the wasm-bindgen CLI at `Cargo.lock`'s version; a dated nightly for cargo-fuzz; Chromium for local rough checks; a WebTransport session over loopback QUIC |
 | U1 | S | The skeleton: the workspace, pins, `deny.toml`, the clippy configs, npt-log, `marks.json`, npt-judge with its PASS, FAIL and INVALID fixtures (one of them PM-0006-14's short padding), the dependency-rule checks (§4.2); clippy and the wasm32 check from here on; the message catalogue with its class column, and its class audit test (netcode-architect drafts it); `redact-check` |
 | U2 | M | npt-l1 with its unit and property tests; PM-0001-3's L1 half and its bites |
-| U3 | S | R5-TEST-OQ2 on loopback: each WebTransport crate on a custom quinn endpoint over `ImpairSocket`; the WebSocket `DelayStream` with E15's loss and stall model, its stall count checked at P2; the retransmission-timeout floor verified. This fixes L2's shape; if neither crate allows it, stop (R-22) |
+| U3 | S | R5-TEST-OQ2 on loopback: each WebTransport crate on a custom quinn endpoint over `ImpairSocket` (U3b). U3a: the Linux-faithful TCP model (S0-S14, `linux-6.8-tcp v3`); the retransmission-timeout floor verified (it is on rttvar, not on the timeout). U3c: the WebSocket `DelayStream` running that model, fix 1's send gate with its mechanism tests, npt-tcpinfo for the plain path, the kernel cross-check here, and its stall count checked at P2. This fixes L2's shape; if neither crate allows it, stop (R-22) |
 | U4 | M | npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner; `due_ticks` with PM-0004-67's bites on a fake clock; the Node-hosted native-against-Wasm hash test (§4.5); then the L1 row groups with their bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); bursts (-18); stand-ins (-54, -55); -30 on loopback |
 | U5 | S | Fuzzing (-34); the dependency and swap checks (-35); the audits (§4.8) |
-| U6 | M | npt-server, npt-net, npt-super and npt-host: both WebTransport crates and WebSocket with L2 on loopback; the per-slot control sockets with their peer check, the systemd units and the capabilities; the roster and tokens; interest under load; instrumentation; metrics and logs; instant-acme's profile and revocation calls; the `npt-ctl` and `npt-cert` wrappers |
+| U6 | M | npt-server, npt-net, npt-super and npt-host: both WebTransport crates and WebSocket with L2 on loopback; the per-slot control sockets with their peer check, the systemd units and the capabilities; the roster and tokens; interest under load; instrumentation; metrics and logs; instant-acme's profile and revocation calls; the `npt-ctl` and `npt-cert` wrappers. **WsServer's send path with fix 1** (U3c's carries, the advisor's C14):<br>• the gate: `snapshot_budget` and `may_write`, shared, not copied; its inputs come from DelayStream on L2 and from npt-tcpinfo on the plain path; owed = everything above the kernel socket (tungstenite's buffer plus rustls's unsent TLS); the plain path's free value stated with its reason;<br>• U3c's writer properties, test (c) and the queueing-writer bite re-run on WsServer;<br>• a plain-path check: a client with a small receive buffer stops reading; after any write SIOCOUTQ ≤ N × size, and writes stop;<br>• the run-time bite ws-budget-x2 in a npt-net `bites` feature (R11);<br>• how WsServer sees one tick's whole snapshot through Link's per-message send (W18);<br>• SetProfile on a DelayStream connection;<br>• where the per-tick syscalls run;<br>• the header records whether the wrapper is on |
 | U7 | M | npt-client-wasm and the harness (E7); the browser smoke in local Chromium; the hash check in Chromium |
 | U8 | S | The run package: cloud-init files (32 KiB check), firewall lists, R1's run plan, the operator `settings.json` and `rules.md`, the pre-push hook, the sudo wrapper list, the WebdriverIO specs, the netcode checklist (test-engineer), W-PR's workflow file |
 
@@ -1339,11 +1391,12 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 | R-22 | L2's fallback if U3 fails | approved; a fallback that changes a crate or the transport goes back to the drafts, Mustafa and the advisor (C11; ADR 0001:1596-1597) | no |
 | R-23 | Two sessions | approved, with C1 and C5 | no |
 | R-24 | A browser that cannot pin | approved | no |
-| R-25 | The WebSocket delay wrapper | approved | yes (ADR 0001:1444-1445) |
+| R-25 | The WebSocket delay wrapper | approved. Its model became Linux 6.8's TCP (Mustafa's U3-Q3 (b), 2026-11-06; the advisor's S0-S14), built in U3a, checked against this container's kernel in U3c and against RS's at R1 (S14). Fix 1's send budget is applied in WsServer, not in the wrapper (E15) | yes (ADR 0001:1444-1445); the model's words go in through part 13's key in docs PR #45 |
 | R-26 | Density days on one VM set | approved | yes (ADR 0006) |
 | R-27 | R-PR | approved, per C9 | — |
 | R-28 | The cap read-only on the overlay | approved | yes (the netcode checklist) |
 | R-29 | SSH's second wall | approved, with the address-change step (§12.3); security-auditor confirms at stop B | no |
+| R-30 | WS-BAR's rule (Mustafa, 2026-11-07, §0.5; the advisor's readings of the same date) | **The practice run:** one unjudged L2 run with the same build, before the counted WebSocket run of PM-0001-18. **The tolerance:** 10 %, fixed before it. The run-structured bound's guard may lower it to the largest whole percent at which a budget twice the formula's passes in at most 1 % of runs; it is never raised. **The slowdown:** the practice run's median divided by the model's median run median for the same run. **Within the tolerance:** X, Y and Z move by the slowdown and k stays; at or below 1 the bound stands, never tightened from one run. **Beyond it,** or failing the count or maximum at the moved numbers: the cause is found first, and no number is ever looser than the bound times a slowdown measured within the tolerance. A recomputed bound that comes out looser goes to Mustafa with its numbers before any is set. A practice run short of 480 records counts as beyond (W23) | yes (PM-0001-18, docs PR #45) |
 
 ## 16. Queue, decisions and asks
 - **Queue:** STATUS (2026-11-05) names the netcode proof test as the next v2 work. B.1 and B.2 (docs) touch other
@@ -1353,6 +1406,12 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
   0006:1107-1113). §7.1 shows why, part by part. The planned spend is EUR 13.51 before VAT, with caps of EUR 14.90, so
   no single run's OK should surprise him.
 - **At the close:** this plan goes into the report's appendix, and the checkpoint is deleted (CHECKPOINTS.md §9).
+- **The docs PR #45:** Mustafa's WebSocket decisions of 2026-11-07 (§0.5) in ADR 0001, approved by the advisor at
+  6ae3571. **Its go is pending until Mustafa gives it** ("merge #45" in a session's chat). It merges before R3's first
+  counted PM-0001-18 run.
+- **PR #40, this test's own PR, merges with a merge commit, never squashed,** so the evidence commits ADR 0001 and
+  docs/design/ws-reconnect.md cite stay reachable: bf9d248, 975e72b, 95a04a1 and 1e020a7 (the advisor's finding 4 on
+  #45).
 
 ### Decisions needed (Mustafa): all five answered on 2026-11-06 (§0.4)
 1. **ROUTE: how should the hands-on server work run, since this session cannot SSH?**
