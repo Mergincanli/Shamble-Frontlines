@@ -346,6 +346,19 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-07 about 13:45 UTC (verbatim):** "WS-SCOPE: no. Measure fix 1 (the newest-snapshot-only buffer)
+  in the proof test. The reconnect becomes a requirement for the real client, built and measured before the first
+  online playtest, with today's model as its target (buffer + reconnect: 99 % within about 1.05 s). Record that in the
+  docs PR so it can't get lost. RESUME-CRED: deferred with the reconnect. WS-BAR: the three-part form now; its
+  numbers after one practice run on the real test setup, but never looser than the model predicts for a correct build
+  with fix 1. If the practice run comes out worse than the model, find out why before setting the numbers."
+  So: fix 1 = the adaptive newest-only budget (ceil(1.5 x srtt / tick) + 1 snapshots, at least 3, from TCP_INFO and
+  SIOCOUTQ; in the proof test from DelayStream's model); fix 2 dropped; fix 3 (the reconnect) out of the proof test,
+  a real-client requirement before the first online playtest, target = model v3's buffer + reconnect row (600,000
+  phases at P2, 1 s burst: p99 1,051 ms; fixes.rs at 709e44a); RESUME-CRED and the reconnect's ADR 0001 changes wait
+  for that work; PM-0001-18's WebSocket part gets a three-part bar (median, count over Y, max), numbers set after one
+  unjudged practice run on L2, never looser than the model's fix-1 prediction; a practice run worse than the model is
+  investigated first. The docs PR records the reconnect requirement and its target.
 - **Mustafa, 2026-11-06 about 23:40 UTC:** "WS-FIX: (a). RESUME-CRED: (a), with the spare tokens kept in memory only,
   short-lived and bound to the session. WS-LIMIT: 99 % of client-bursts within 0.8 s, and every one within 1.0 s.
   All three stand unless the skeptics change a number or find a conflict; if they do, bring it back to me." So: the
