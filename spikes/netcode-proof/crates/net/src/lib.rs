@@ -8,3 +8,7 @@
 // use it.
 #[cfg_attr(not(test), allow(dead_code))]
 mod tcp_model;
+
+// L2's impairment layer under quinn (U3b): ImpairSocket and L2Config, plan §4.7's only new public items.
+mod l2;
+pub use l2::{ImpairSocket, L2Config};

@@ -24,5 +24,7 @@ rand_core.workspace = true
 quinn.workspace = true
 tokio.workspace = true
 tokio-tungstenite.workspace = true
-wtransport = { workspace = true, optional = true }
+# wtransport's `quinn` feature (no new dependency, so Cargo.lock is unchanged) opens
+# IncomingSessionFuture::with_quic_incoming: the session accepted from our own quinn endpoint over ImpairSocket (M8).
+wtransport = { workspace = true, optional = true, features = ["quinn"] }
 web-transport-quinn = { workspace = true, optional = true }
