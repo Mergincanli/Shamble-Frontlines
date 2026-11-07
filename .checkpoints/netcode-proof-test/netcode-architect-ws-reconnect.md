@@ -180,3 +180,90 @@ file (`cat >> ...tmp </dev/null; rm -f`); no content written. Every save since u
   (6) the record cites `.checkpoints/` paths that leave the tree; each is pinned to a commit in §7.
 
 DONE
+
+---
+
+# Revision 2 (2026-11-07, after Mustafa's 14:30 refinement and the advisor's revision 2)
+
+Task (workflow, computed): align the record with the advisor's revised docs-PR words (advisor revision 2: E-PR, E0-E13,
+rulings R1-R21; its E11 lists the record's required contents (1)-(11)); fix the verifier's must-correct item 5
+(`verify-ws-docs.md` V20: §5 must mark the ADR rows this docs PR itself changes, plus a row for OQ-0001-19); fix §6.1's
+cite (V21) and §1.1's fix-1 sentence (V25, V17); cite the committed outputs under
+`spikes/netcode-proof/results/u3-ws-fallback/` (975e72b), not `.gate/`; keep "slice 3"; keep every number tied to
+its source. Branch claude/netcode-proof-test-plan-hcky5g, head 95a04a1. Same rules as before (Write tool only; no
+tracked file; no commit; git from inside the folder, never -C).
+
+## Plan (revision 2)
+1. Re-read: the record draft, the verifier's V1-V31, the checkpoint's "Decisions taken" at 95a04a1 (14:30 and 13:45
+   words), the committed outputs (README, tables, bar) and their line numbers; confirm they equal the .gate copies.
+2. Re-pin every `.checkpoints/` cite to one commit (95a04a1) and check each there; check the ADR 0001 lines the docs
+   PR changes (424, 506-509, 747, 1295, 1462-1469, 1556, 1571, 1697-1699, 1734-1738, OQ-0001-18's end) on the branch.
+3. Check the fixes.rs cites the advisor's words rely on (ws_bar_fix1 :2000-2011; :1259-1263; :776-777; :786-787;
+   three_part :1528-1537) and the round-3 lines the record cites for the robust policy.
+4. Revise the draft in place, block by block: header (pins, status); §0; §1.1 (14:30 words, fix-1 sentence); §1.2;
+   §2.3 (point to PM-0001-18, quote only the first bound, the tolerance); §3.7 (robust policy p99, the patch path);
+   §5 (rows this PR changes, OQ-0001-19 row, "422-423" -> 423, line numbers as before this PR); §6.1 (cite); §6.4
+   (WS-RECONNECT-BAR, proposed, 14:30 tolerance if borrowed); §6.5 and §7 (results paths, the patch); §8.
+5. Self-check: every number against its source line; every cite resolves at its pinned commit; lines <= 120. DONE.
+
+## Findings (revision 2, a line each, as found)
+- W1 The checkpoint's working copy equals 95a04a1 (`git diff --quiet 95a04a1 -- .checkpoints/netcode-proof-test.md`).
+  Lines at 95a04a1: the 14:30 refinement :349-356 (his words :349-353, the session's gloss :353-356); the 13:45 words
+  :357-362; "Facts from Mustafa" heading :336, his laptop :337-346; the 2026-11-06 23:40 answer :370-371; U3-Q1..Q9
+  agreement :391-392, the Q4 (b) reading "the wrapper above TLS, below tungstenite" :400-401; P2's definition
+  :417-418; "the 30 stale snapshots drain from cwnd 1" :234-235 (S13 (e), U3a's run).
+- W2 The committed outputs equal the .gate copies byte for byte (`cmp`): `tables-1e020a7.txt` = u3v3-tables1.txt,
+  `bar-fix1-bf9d248.txt` = u3v3-barfix1.txt; so every old `u3v3-tables1.txt:N` cite maps to `tables-1e020a7.txt:N`
+  unchanged (rows re-read: :5-6, :16-23, :44-45, :55-56, :61-72, :82-117, :120-131, :154). The bar file's lines:
+  :7 fix 1 correct, :8 today, :9 budget x2 (p50 776), :11 the Y = 2.5 s bar at 480 (0.9681, bootstrap 0.9602-0.9754;
+  x1.05 0.001, +20 ms 0.159), :14 the 1,440 bar (0.9665), :16 censored 0. The README (results/u3-ws-fallback/
+  README.md:9-13) gives the reproduce commands, with `cargo +1.99.1`.
+- W3 The patch `reconnect-policies-1e020a7.patch` (440 lines) holds the round-3 diagnostic tests: diag_rows (:179, V6),
+  diag_order (:220), diag_nocancel (:239, V11), diag_lengths (:274, V13), diag_profiles (:311, V12), diag_ratchet
+  (:359), diag_worst (:392, V10); it applies to fixes.rs at 1e020a7 (README.md:13). It replaces the scratchpad path
+  (F17), which is no longer needed as a source.
+- W4 Every `.checkpoints/netcode-proof-test/` note the record cites is unchanged since its last commit (10b1a53,
+  73f451d, d9e0036, 88856ea, 59baae1; plan.md 709e44a), so each equals its 95a04a1 copy: one pin, 95a04a1, serves
+  every `.checkpoints/` cite (E11 (9)); §7 still lists each file's last commit for `git show`.
+- W5 plan.md's resume-secret line is :1024-1025 at 95a04a1 (§10.3 "Join tokens and the roster" starts :1016), not
+  :1022-1023 (the draft's 803c6c1 cite; plan.md changed at 709e44a only, so 803c6c1's numbering differed or the cite
+  slipped). Corrected to :1024-1025.
+- W6 fixes.rs unchanged since bf9d248 (`git log -1`); tcp_model.rs last changed at 709e44a (the overflow guard, V15),
+  equal at bf9d248 and HEAD. Fix 1 in the model: adaptive_limit :164-169 (doc :164, 100 ms before the first sample
+  :166, N at :167, floor 3 at :168); the write rule :776-777 (fits, plus nothing owed and the 64 KB budget's room);
+  the model keeps no snapshot queue: a tick's snapshot that does not fit is never written (:777-789), and the room's
+  skips are counted (P2 22 per mille with the reconnect, 21 without: tables :66, :70). So "older unsent snapshots are
+  dropped" (draft §1.1) was wrong: nothing written is dropped; the newest that does not fit is skipped (V17, V25).
+- W7 The kernel facts for §1.1 come from the verifier's check of Linux v6.8 (verify-ws-docs.md:27, V12): SIOCOUTQ
+  answers write_seq - snd_una (net/ipv4/tcp.c:630), tcpi_rtt = srtt_us >> 3 (:3842); the model's readings are
+  tcp_model.rs:2167-2177 (srtt_ns "what TCP_INFO's tcpi_rtt reports"; outstanding = write_seq - snd_una "SIOCOUTQ").
+  I did not re-read the kernel myself (sure: high on the verifier's cite).
+- W8 ws_bar_fix1 is fixes.rs:2000-2011 (doc :2000-2008, fn :2011); the draft's :2004-2011 corrected (V25) in §2.3
+  and §6.5. three_part() :1528-1537 (V14: doc :1528-1529, fn :1530).
+- W9 ADR 0001 on the branch equals origin/main (`git diff --stat origin/main` empty for the file). The docs PR's edits
+  hit, before it lands: 424 (E0), 506-509 (E5, one sentence before "*Private rooms:*"), 1250-1252 (E6 anchors
+  OQ-0001-19 between OQ-0001-18's end :1250 and "## What a spike must prove" :1252), 747 (E2), 1295 (E3), 1462-1469
+  (E4), 1556 (E1), 1571 (E8), 1697-1699 (E13), 1737-1738 (E7); and docs/adr/README.md's register rows (E9, E10). The
+  §5 row "422-423" is 423 alone (V25: 422 is "axum's `ws`").
+- W10 Rows the docs PR does NOT change, which the record's §5 keeps for the reconnect work: 423, 429-432, 445-451,
+  494-497, 503-504, the rest of 506-509 (the rule itself: "the client fetches a fresh token; the newest connection for
+  a player id wins"), 529-530, 616-617, 668, 670-672, 682, 758-759, new failure rows, 782-784, 959-964, 1640-1641,
+  1756-1758. And three rows this PR changes that the reconnect work changes again later: 747 and 1556 (the reconnect's
+  own bar, if the reconnect work adds one) and 1737-1738 (Done-when, if its target or bar wording moves).
+- W11 Consistency of the target's words: the advisor's E5/E6/E7 say "within about 1.05 s of a 1 s outage at P2"; the
+  record measures from the link's return (fixes.rs:19-21; tables :129 is "first fresh delta after the return"). The
+  record says "of the link's return after a 1 s outage"; open point to the advisor: E5/E6/E7 could say "after the link
+  comes back" to match PM-0001-18's own clock (E1: "the time from the link coming back"). Not my words to change.
+- W12 §2.3 must point to PM-0001-18's row (E1) and quote only the first bound (E11 (7)); the 14:30 words are quoted
+  in §1.1 because §1.1 describes WS-BAR and §6.4 discusses borrowing it (E11 (1)). The tolerance's mechanics (s = M_p
+  / M_m, f, the band, the guard) are the advisor's readings in the PR (rulings R4-R8): the record names them by
+  reference only, so the two cannot drift.
+- W13 §6.4: the advisor escalates WS-RECONNECT-BAR with recommendation (b), leave open (escalate_to_mustafa, second
+  entry). The record keeps the borrowed form as "proposed, Mustafa to confirm (WS-RECONNECT-BAR)", presents (a) and
+  (b), and says that if the form is borrowed, the 14:30 tolerance comes with it, and why a 10 % tolerance's statistics
+  (median-based) need re-deriving for a 99 % tail target (the median of the reconnect target barely moves: 654 for both
+  fix 1 alone and the target, tables :123, :129; the reconnect changes only the tail, so a slowdown measured at the
+  median says little about the reconnect's tail). That is a new point for that work, recorded in §6.4 and §8.
+- W14 E6's "Decider" names Mustafa for the credential and the target if the policy misses; the record's §4.2 "Who
+  decides" said "Mustafa, in the reconnect work, with security-auditor's review"; aligned to E6: Mustafa (the
+  credential, the target if missed), netcode-architect with security-auditor (the design), the Advisor confirming.
