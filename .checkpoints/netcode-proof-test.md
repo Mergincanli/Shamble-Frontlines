@@ -360,7 +360,15 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **Verification of the fallback fixes** · workflow `wf_b08132f7-b1c` (npt-ws-fixes-verify; rust-reviewer on the
+- **Second skeptic round on cc72f6f** · workflow `wf_a8e0f590-0bc` (npt-ws-fixes-verify2; rust-reviewer on model v2,
+  netcode-architect on the harness vs browsers and ADR 0001, test-engineer on the bar statistics; xhigh) · launched
+  about 04:08 UTC 2026-11-07 · script:
+  `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify2-wf_a8e0f590-0bc.js`
+  · notes `u3-verify2-{model,harness,stats}.md` (each ends DONE) · if cut: resume with Workflow({scriptPath,
+  resumeFromRunId: "wf_a8e0f590-0bc"}); an agent cut mid-way: edit its prompt to "continue after your notes' last
+  block" first (the first round's pattern). Then: fold its findings, bring WS-FIX, RESUME-CRED, WS-LIMIT to Mustafa.
+- Saver: background task `btvszgr34` · started about 04:01 UTC 2026-11-07 (110 minutes, to about 05:51).
+- (done) **Verification of the fallback fixes** · workflow `wf_b08132f7-b1c` (npt-ws-fixes-verify; rust-reviewer on the
   model and numbers, netcode-architect on the ADR 0001 reading; xhigh) · launched about 23:36 UTC · script:
   `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify-wf_b08132f7-b1c.js`
   · notes `u3-verify-fixes-model.md`, `u3-verify-fixes-adr.md` · if cut: resume with Workflow({scriptPath,
