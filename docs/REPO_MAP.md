@@ -53,7 +53,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/ui_theme_mockup.html` | The war-room UI mockup (legacy UI source of truth) |
 | `docs/adr/` | Decision records; `0000-template.md` is the format; the v2 drafts 0001–0006 (Status: Proposed): netcode, code structure and toolchain, rendering, simulation core, content and abilities and assets, infrastructure |
 | `docs/adr/README.md` | The index of the v2 drafts and the register: the decisions the drafts ask for, DESIGN-owned research ids, features whose need is outside VISION_V2 §6, the loose ends, the codes the drafts cite |
-| `docs/design/` | Design docs for v2 work that are not ADRs |
+| `docs/design/` | Design records; `ws-reconnect.md`: the WebSocket fallback's fast-reconnect requirement before the first online playtest, its target and the evidence behind it (ADR 0001 OQ-0001-19) |
 | `docs/design/netcode-proof-messages.md` | The netcode proof test's message catalogue (Proposed; netcode-architect): ADR 0001's subset plus the test's controls, each type with its channel, visibility class, authority and size limit; the spike's class audit test (`crates/proto/tests/catalogue.rs`) reads its four tables; a protocol change in the spike updates it first |
 | `docs/research/` | v2 phase 0 research, one file per topic; `README.md` gives the shape, the owners and each topic's status |
 | `docs/research/r1-simulation-core.md` | R1: the simulation core (ECS, tick, determinism, the Rust ↔ TypeScript boundary, abilities, data and hot reload) |

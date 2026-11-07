@@ -3,6 +3,8 @@
 Written by Mustafa and the Advisor, 17 October 2026: step 1 of the v2 planning. It guides every trade-off in the
 rebuild. Status tags as in LOOP_V2.md: `[DECIDED]` Mustafa decided it · `[DEFAULT]` stands unless vetoed ·
 `[OPEN]` needs a decision · `[LATER]` not now.
+Updated on 2026-11-06 with Mustafa's words: his community-servers note of 2026-11-03 (§5) and his design walk of
+2026-11-04 (pillar 5, and the pointers in §5 and §7); on 2026-11-07, his private-match XP item of 2026-11-06 (§5).
 
 ## 1. North star
 **Matches that turn into stories players retell:** a last-second steal, a saved-up rush that flips the game, a combo
@@ -33,8 +35,9 @@ What players should say after a match, in Mustafa's words:
 4. **Every choice costs something.** Money (harvesters), tech (the tech box) and fighting all compete for the same
    players. Teams must split up and talk.
 5. **Faction pride.** Each faction has its own identity, look, units and character, so players pick a side and stay.
-   - `[OPEN]` How much is faction-specific? LOOP_V2 says "infantry shared, tanks per faction". Faction pride pulls
-     toward more unique units. Needs a design session.
+   - `[DECIDED]` Factions: the counter triangle and tier one stay shared; the differences grow with tech (tier-two
+     specialists and vehicles are unique). (Mustafa, 2026-11-04, LOOP_V2 §5. Shared or per faction: decided unit
+     by unit in the unit list, with two fixed rules, B3-Q1 (c).)
 6. **Places worth fighting over.** Verticality, buildings you can enter, angles, and maps that suit different playstyles.
 7. **Progression worth chasing.** Unlocks players look forward to: the WARDOGS-style three gates (LOOP_V2 §8).
 8. **Spectacle.** Big, readable, awe-inspiring units that new players remember.
@@ -56,8 +59,23 @@ What players should say after a match, in Mustafa's words:
 
 ## 5. Accounts and business
 - `[DECIDED]` Guest play first; a simple login arrives with account progression (Service points).
-- `[DECIDED]` `[LATER]` Cosmetics and account progression get designed when their time comes.
+- `[DECIDED]` `[LATER]` Cosmetics and account progression get designed when their time comes. (What account
+  progression gives, since 2026-11-04: "Account progression gives class variants and cosmetics only. New classes
+  come through the team's tech in the match, so nobody is ever missing a counter." Mustafa, LOOP_V2 §8, B3-Q2 (a).
+  The unlock catalogue itself is still for later: LOOP_V2 §8.)
 - `[DECIDED]` Never paid loot boxes, and team colours never change (DESIGN_NOTES).
+- `[LATER]` **Community servers (later).** Mustafa, 2026-11-03:
+  - Why: bigger or longer matches, community growth, a safety net if the game grows faster than our funds,
+    possible revenue such as renting out official private servers.
+  - `[DECIDED]` The trust rule: progression counts on official servers only.
+  - On progression in private (rented) matches (Mustafa, 2026-11-06):
+    - `[DECIDED]` With bots in the match: 25 % of normal XP; humans only: 100 %.
+    - `[OPEN]` Open, Advisor's suggestions: (1) weigh XP per action (kills on bots give little), so public matches with
+      bot fillers aren't punished; (2) against friends trading easy wins: full XP only with a minimum number of humans
+      per team, plus a daily XP cap on private matches.
+  - Precedents: Counter-Strike and Rust community servers, Battlefield's rented servers, Minecraft Realms.
+  - Its open question in the drafts: ADR 0006, OQ-0006-21 (COMMUNITY-SERVERS, his words of 2026-11-03: "keep the
+    door open, don't design it").
 
 ## 6. What this asks of the engine
 This is the input for the architecture decisions:
@@ -84,5 +102,7 @@ This is the input for the architecture decisions:
 - **The healthy snowball:** what makes leaders feel dominant while trailing teams keep a real path back?
   (Pillars 1 and 2.)
 - **Faction asymmetry:** shared core infantry plus faction specialists and vehicles, or more? (Pillar 5.)
+  (Since 2026-11-04: Mustafa's Factions line, pillar 5 above. Which units are shared or per faction waits on his
+  unit list.)
 - **Balance across modes:** two-team vs three-team balance, and map design for each.
 - **Clan and guild features.**

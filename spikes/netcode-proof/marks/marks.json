@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "drafts_commit": "1b4094a7750177269b9d5f2fa8c21e292c76e009",
+  "drafts_commit": "626df678cae0835fb2ce62b8113f548697968406",
   "marks": [
     {
       "id": "PM-0001-1",
@@ -4237,7 +4237,7 @@
       "title": "A loss burst heals",
       "draft": {
         "file": "docs/adr/0001-multiplayer-netcode.md",
-        "row_sha256": "a49ca82be904de92e2da4f9697542daf58d052f5d9fc6ca9aadf2616a7bd05a0"
+        "row_sha256": "cdef35068e22dea771d6dfec13dfab0697b1953805c3f773ed276266c77e18f7"
       },
       "verdict": "pass",
       "where": [
@@ -6393,7 +6393,7 @@
       "title": "The fallback's stalls stay short",
       "draft": {
         "file": "docs/adr/0001-multiplayer-netcode.md",
-        "row_sha256": "e0dcb7c29599e8280b5a092bf8e9a1f0c7e90cb5c2d945c774995c49b60cc4e3"
+        "row_sha256": "1de38f7de8f69710476edbff7e0329408e103a058d26635dda16205acb2778d7"
       },
       "verdict": "pass",
       "where": [
