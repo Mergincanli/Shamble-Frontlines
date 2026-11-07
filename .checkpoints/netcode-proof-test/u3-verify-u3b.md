@@ -56,7 +56,8 @@ primary sources (quinn 0.11.12 / quinn-udp source in ~/.cargo/registry, crates/l
   - BIT C: send instead of try_send -> send_errors_are_fates_not_deliveries fails (socket_tests.rs:214). M5 bites.
   - BIT I: FIFO by seq -> 3 tests fail (impair_tests.rs:114, 253, 310). M2 bites.
   - BIT J: no per-peer bound -> host_drops test fails (impair_tests.rs:393). M10 per-peer bound bites.
-- (6) Clippy -D warnings clean per feature alone (wt-wtq; wt-wtransport; release, all targets).
+- (6) Clippy -D warnings clean per feature alone (wt-wtq; wt-wtransport; release, all targets). No-feature l2 tests:
+  38 pass, 1 ignored. Five repeat runs (all features): 45/45 each, 4.89-4.92 s. Cargo.lock untouched by 5a5aba9.
 - (2)/(9.7) Under `chrt -f 10` (this kernel 6.18) a_thread_sets_its_own_slack_to_1_ns FAILS at thread.rs:111 (the
   "default slack > 1" assertion: under RT the default reads 0). the_pass_through... passes. So the RT switch breaks a test.
 - (2) Slack header honesty: python probe on this kernel: thread writes 1, reads 1; SCHED_FIFO applied -> reads 0; back
@@ -96,3 +97,28 @@ primary sources (quinn 0.11.12 / quinn-udp source in ~/.cargo/registry, crates/l
   (grep "tcp_model|repair": none): carried to U3c, not recorded as carried.
 - (9.6) `l2_shaper_rate_bits` is a rate in a header named with the count unit `_bits` (README §1 line 38 has no rate
   unit; second.s.down_bits is bits per one-second window). Acceptable if SERIES's unit column keeps "bits per second".
+- (2) Races: no lost wake found. One Mutex for state (socket.rs:84); wait_until protocol (socket.rs:127, 613-627: the
+  thread sets its deadline under the lock and Condvar::wait releases it atomically; intakes while it sends see 0 and do
+  not notify, and it re-reads next_due on relock); quinn's waker stored under the lock (socket.rs:473-476), taken under
+  it (603-605), woken outside it (631-633); quinn re-wakes itself when its work limiter yields (quinn endpoint.rs:393-395).
+  Nit: the wait's length is d minus the loop-top `now` (socket.rs:597, 617), a few us late at most.
+- (2) Heap never reallocates: tokens pop at or before their datagram (overtaken due > token due; non-overtaken equal
+  due with larger seq), so entries <= 2 x buffers in flight <= 2 x pool (impair.rs:249-250). ready <= pool. Confirmed.
+- (3) Throttle toggle (impair.rs:685-691): a changed shaper starts empty while datagrams it already accepted keep
+  their later dues (up to 370 ms at -23), so datagrams sent right after a throttle ends overtake them: an artificial
+  reorder burst at each of -23's 10 throttle ends, counted in the reorder share. Low.
+- (5) M1 points CONFIRMED in code: inbound `now` after the lock in poll_recv (socket.rs:440-442, finish 466), outbound
+  stamp right after try_send (socket.rs:643-645); arrival stamped after the drain (socket.rs:541-542). E[(L-L0-0.25ms)+]
+  CONFIRMED (stats.rs:107-146: exact above the threshold's bucket, bucket-mean inside it; brute-force test
+  stats.rs:337-390 within 1 us). Only the inbound point lacks a bite (D).
+- (4) No panic reachable from network input found: size check before the buffer copy (impair.rs:441 before 455;
+  socket.rs:117), poll_recv length guard (socket.rs:452), chunks(stride.max(1)) and segment Some(0) guarded
+  (socket.rs:408, 546); peer_mut's expect is an invariant of slot_for. Config-sized allocations (pool, peer table) are
+  operator data, validated only for zero (socket.rs:159).
+
+## Verdict: REVISE (small). The impairment path itself is right and L1-faithful; the run would not be wrong in its
+normal use. To correct: bites for M1 inbound, M3 guard, M4 direction, M19 placement, M10 LRU, Drop's reader (six
+planted defects survive); slack read at header time and thread.rs:111 under RT; the shared pool's per-peer bound and
+the dead total bound; SERIES text (l2_summary list, down queued meaning) and M15's TCP rows recorded as carried;
+wtransport ApplicationClosed -> H3; the accept loop bounded before U6 (carried).
+DONE
