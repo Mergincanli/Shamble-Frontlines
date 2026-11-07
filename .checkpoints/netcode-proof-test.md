@@ -422,6 +422,13 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 18:35 UTC (after the spend limit reset):** CI green on 7321cc0. The commit security review of 7321cc0 did not
+  complete (HTTP 429; /root/.claude/security/log.txt); a later push re-checks. wf_abc2ef9b-8d4's advisor revision
+  finished before the limit: saved as **advisor-ws-docs-r2.md** (15 edits incl. E13 for check item 11; the 10 % tolerance
+  kept, measured as the practice run's median over the model's median for the same kind of run, run-to-run noise about
+  +-3.5 %, the 2x-budget bite about 19 % slower; a new escalation WS-RECONNECT-BAR, recommended (b) leave it open,
+  not blocking). Its architect and verifier steps failed on the org spend limit; resumed as task wuh42ub3z (same run
+  id, the advisor cached). Saver b6su9re21 (2 h). **Next:** fold the verifier's result, open the docs PR, then U3c.
 - **RESUME HERE (Mustafa at 98 % usage, about 16:00 UTC):** U3b fixes merged and pushed at **7321cc0** (check.mjs 9/9;
   notes u3-build-u3b-fix.md, planted defects u3bfix-plant.py: 16 planted, none survives). Open finding: the loopback
   P2 test's ">= 180 of 200 up datagrams" (wt_tests.rs:203) failed 1 of 18 runs, at base too (likely several datagrams
