@@ -7,7 +7,12 @@
 //! service included. A datagram of b bytes (payload + 28) offered at t is dropped if backlog(t) + b exceeds the limit;
 //! else it starts at max(t, free_at) and leaves b × 8 s ÷ R later, which becomes free_at. The state is kept exactly,
 //! as time × R (bit-ns per s), so no rounding moves a drop: a limit of 4 full datagrams takes 4 offered at once and
-//! drops the 5th, and takes it 1 ns after the first has left, not before. Departures are rounded up to whole ns.
+//! drops the 5th, and takes it at the very ns the first has left, not 1 ns before. Departures are rounded up to whole
+//! ns.
+//!
+//! A shaper made when the settings change mid-run (a throttle's start or end) starts busy until the flow's last
+//! departure ([`Shaper::busy_until`]): the time still owed at that instant counts as backlog at the new rate, so its
+//! first departure is never before the old shaper's last.
 
 /// The bytes each datagram counts beyond its UDP payload: IPv4 (20 B) and UDP (8 B) headers.
 pub(crate) const OVERHEAD_BYTES: u64 = 28;
@@ -29,6 +34,13 @@ impl Shaper {
             limit_bytes,
             free_at_scaled: 0,
         }
+    }
+
+    /// A shaper whose line is busy until `free_at_ns` (the flow's last departure when the settings changed).
+    pub(crate) fn busy_until(bits_per_s: u64, limit_bytes: u64, free_at_ns: u64) -> Shaper {
+        let mut s = Shaper::new(bits_per_s, limit_bytes);
+        s.free_at_scaled = u128::from(free_at_ns) * u128::from(s.bits_per_s);
+        s
     }
 
     /// The time to serialise `bytes` at the rate, rounded up to whole ns.
@@ -121,6 +133,22 @@ mod tests {
         // The queue drains at the rate: half way through the next datagram, 740 B of it are left.
         assert_eq!(s.backlog_bytes(4 * 92_500_000 + 46_250_000), 740);
         assert_eq!(s.backlog_bytes(5 * 92_500_000), 0);
+    }
+
+    #[test]
+    fn a_shaper_made_mid_run_starts_busy_until_the_last_departure() {
+        // -23's throttle made at 100 ms while the flow's last departure is at 300 ms: 200 ms owed, 3,200 B of backlog.
+        let mut s = Shaper::busy_until(128_000, throttle_queue_bytes(), 300 * MS);
+        assert_eq!(s.backlog_bytes(100 * MS), 3_200);
+        assert_eq!(
+            s.offer(100 * MS, 1_452),
+            Some(300 * MS + 92_500_000),
+            "after the last departure, at the rate"
+        );
+        assert_eq!(s.offer(100 * MS, 1_452), None, "3,200 + 2 x 1,480 > 5,920");
+        // Busy until a time already past: as a new shaper.
+        let mut s = Shaper::busy_until(128_000, throttle_queue_bytes(), 10 * MS);
+        assert_eq!(s.offer(20 * MS, 1_452), Some(20 * MS + 92_500_000));
     }
 
     #[test]

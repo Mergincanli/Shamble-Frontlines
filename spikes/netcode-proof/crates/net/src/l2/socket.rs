@@ -12,7 +12,10 @@
 //!   kernel receive stamp, M1); the release thread (M2, M5, M14) waits on a Condvar until the earliest due time in the
 //!   one queue, sends due outbound datagrams with quinn-udp's `try_send` (never `send`, which turns every error but
 //!   WouldBlock into Ok), logs each error kind as a fate, and wakes quinn when an inbound datagram is due. It sets its
-//!   own timer slack to 1 ns and reads it back; a real-time policy is applied from outside and read from /proc.
+//!   own timer slack to 1 ns and reads it back, and reads it again whenever the header is built (only the thread
+//!   itself may read its own `/proc/<tid>/timerslack_ns` without CAP_SYS_NICE: fs/proc/base.c checks the capability
+//!   when the task is not current), so the header pairs the policy and the slack as they are then; a real-time
+//!   policy is applied from outside and read from /proc.
 //! - **poll_recv** hands quinn only due datagrams, one per buffer, and stores quinn's waker otherwise: never Ok(0),
 //!   never an error for an empty queue (M11). Inbound lateness is measured here, where quinn receives the datagram
 //!   (M1); outbound at `try_send`'s return on the real socket.
@@ -21,7 +24,8 @@
 //! - **The pass-through** (M12): with every impairment off the same socket, threads and slack carry the clean runs.
 //!
 //! The control plane (E23, U6) keeps the `Arc<ImpairSocket>` and sets per-peer settings through `set_peer` and
-//! `set_default`; npt-server's Join deadline reads `first_seen` (U3-Q8).
+//! `set_default`; npt-server's Join deadline reads `first_seen` (U3-Q8). Carried to U6: it pins every joined client
+//! with `set_peer`, so datagrams from new (possibly spoofed) addresses can never evict a real client's slot.
 
 use super::config::{L2Config, queue_ns};
 use super::impair::{DOWN, Entry, Impairer, Intake, Settings, UP};
@@ -70,14 +74,25 @@ struct State {
     stop: bool,
     /// The last per-second window's start: (wall ns, the release thread's CPU ns).
     second_mark: (u64, u64),
+    /// Requests for the release thread to read its own slack (a count; it answers the latest), and a value for it to
+    /// write first (tests stand in for an outside change with it).
+    slack_ask: u64,
+    slack_write: Option<u64>,
 }
 
-/// The release thread's facts, read when the header is built.
+/// The threads' facts: the release thread's tid and its slack (as set at its start, and its latest answer to a
+/// header-time request), and the reader's tid.
 #[derive(Debug, Default, Clone)]
 struct ReleaseInfo {
     tid: Option<u32>,
     slack: thread::Slack,
+    /// (the request answered, the slack the thread read then).
+    slack_now: (u64, Option<u64>),
+    reader_tid: Option<u32>,
 }
+
+/// How long a header waits for the release thread's own slack reading before reporting it unreadable.
+const SLACK_ANSWER: Duration = Duration::from_secs(1);
 
 struct Shared {
     epoch: Instant,
@@ -87,7 +102,10 @@ struct Shared {
     /// A second handle on the bound socket for the release thread's sends (the reader's is inside its runtime).
     send_sock: std::net::UdpSocket,
     reader_stop: tokio::sync::Notify,
+    /// Locked after `state` when both are held (the release thread's answer), never before it.
     release: Mutex<ReleaseInfo>,
+    /// Signalled when the release thread answers a slack request.
+    release_cv: Condvar,
     cfg: L2Config,
 }
 
@@ -177,6 +195,8 @@ impl ImpairSocket {
             wait_until: 0,
             stop: false,
             second_mark: (0, 0),
+            slack_ask: 0,
+            slack_write: None,
         };
         let shared = Arc::new(Shared {
             epoch: Instant::now(),
@@ -186,6 +206,7 @@ impl ImpairSocket {
             send_sock,
             reader_stop: tokio::sync::Notify::new(),
             release: Mutex::new(ReleaseInfo::default()),
+            release_cv: Condvar::new(),
             cfg,
         });
         let (tx, rx) = std::sync::mpsc::sync_channel(2);
@@ -218,7 +239,8 @@ impl ImpairSocket {
     }
 
     /// Sets one peer's settings (the per-peer part of `cfg`: profile with its reorder step and bursts, base RTT,
-    /// pass-through, shaper, UDP block) and pins it in the table. False if every slot is pinned already.
+    /// pass-through, shaper, UDP block) and pins it in the table. False if every slot is pinned already. U6's control
+    /// plane calls it for every joined client (carried), so no unpinned address can evict one.
     pub fn set_peer(&self, peer: SocketAddr, cfg: &L2Config) -> bool {
         let sh = &self.shared;
         let t = sh.now_ns();
@@ -251,15 +273,54 @@ impl ImpairSocket {
             .tid
     }
 
-    /// The header's numbers (`header.params.<name>`; SERIES.md): the timer slack read back, the switches and bounds,
-    /// the default peer's injected delay and jitter, the shaper.
+    /// The reader thread's id (the drop test watches it end).
+    #[cfg(test)]
+    pub(crate) fn reader_thread_id(&self) -> Option<u32> {
+        self.release_info().reader_tid
+    }
+
+    /// Asks the release thread to read its own timer slack now (writing `write` first, if given) and waits up to
+    /// [`SLACK_ANSWER`] for the value; None if unreadable or unanswered. Only the thread itself may read its slack
+    /// without CAP_SYS_NICE, so the request goes to it.
+    pub(crate) fn ask_slack(&self, write: Option<u64>) -> Option<u64> {
+        let sh = &self.shared;
+        let ask = {
+            let mut st = sh.lock();
+            st.slack_ask += 1;
+            if write.is_some() {
+                st.slack_write = write;
+            }
+            st.slack_ask
+        };
+        sh.cv.notify_all();
+        let end = Instant::now() + SLACK_ANSWER;
+        let mut info = sh.release.lock().unwrap_or_else(PoisonError::into_inner);
+        while info.slack_now.0 < ask {
+            let left = end.checked_duration_since(Instant::now())?;
+            info = sh
+                .release_cv
+                .wait_timeout(info, left)
+                .unwrap_or_else(PoisonError::into_inner)
+                .0;
+        }
+        info.slack_now.1
+    }
+
+    /// The header's numbers (`header.params.<name>`; SERIES.md): the timer slack as the release thread reads it now
+    /// and as it read it back at its start, the switches and bounds, the default peer's injected delay and jitter, the
+    /// shaper.
     pub fn header_numbers(&self) -> Vec<(&'static str, u64)> {
         let c = &self.shared.cfg;
         let s = Settings::of(c);
+        let slack_now = self.ask_slack(None);
         let info = self.release_info();
         let (rate, queue) = s.shaper.unwrap_or((0, 0));
         vec![
-            ("l2_timer_slack_ns", info.slack.read_ns.unwrap_or(u64::MAX)),
+            ("l2_timer_slack_ns", slack_now.unwrap_or(u64::MAX)),
+            (
+                "l2_timer_slack_start_ns",
+                info.slack.read_ns.unwrap_or(u64::MAX),
+            ),
             (
                 "l2_timer_slack_set",
                 u64::from(info.slack.write_error.is_none()),
@@ -515,6 +576,10 @@ fn reader(sh: Arc<Shared>, sock: std::net::UdpSocket, started: SyncSender<io::Re
                 return;
             }
         };
+        sh.release
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .reader_tid = thread::own_tid().ok();
         let _ = started.send(Ok(()));
         // Large enough for any UDP datagram and for a GRO batch, so nothing is ever truncated.
         let size = (1_472 * sh.udp.gro_segments().max(1)).max(65_536);
@@ -585,14 +650,30 @@ fn release(sh: Arc<Shared>, started: SyncSender<io::Result<()>>) {
     let slack = tid.map_or_else(thread::Slack::default, |t| {
         thread::set_own_slack(t, sh.cfg.timer_slack_ns)
     });
-    *sh.release.lock().unwrap_or_else(PoisonError::into_inner) = ReleaseInfo { tid, slack };
+    {
+        let mut info = sh.release.lock().unwrap_or_else(PoisonError::into_inner);
+        info.tid = tid;
+        info.slack = slack;
+    }
     let _ = started.send(Ok(()));
     let mut batch: Vec<Entry<Packet>> = Vec::with_capacity(BATCH);
     let mut results: Vec<(Kind, i32, u64)> = Vec::with_capacity(BATCH);
+    let mut answered = 0u64;
     let mut st = sh.lock();
     loop {
         if st.stop {
             return;
+        }
+        if st.slack_ask != answered {
+            // A header is being built: read the slack now, as the thread itself (a /proc read, at header time only).
+            answered = st.slack_ask;
+            let write = st.slack_write.take().unwrap_or(0);
+            let read = tid.and_then(|t| thread::set_own_slack(t, write).read_ns);
+            sh.release
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .slack_now = (answered, read);
+            sh.release_cv.notify_all();
         }
         let now = sh.now_ns();
         let mut wake = None;

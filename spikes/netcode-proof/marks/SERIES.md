@@ -386,11 +386,18 @@ Machine names in selects: `machine.name` `RS`, `ML` (the named laptop), `ML*` (i
 ## L2's impairment layer (U3b, `ImpairSocket`; the advisor's M15): names no mark reads yet
 
 What `ImpairSocket` measures, under the names its own code reports (npt-net's `l2::names`, checked against README §1's
-rule by a unit test). Up is inbound (client to server: the socket sits on RS), down outbound. Each name below is also
-a field of the `l2_summary` event, written once at the run's end with the run's totals and quantiles, plus
-`l2_release_cpu_ns` (the release thread's CPU over the run) and the measured reorder shares under the existing names
-`reorder_up_permille`, `reorder_down_permille` and `reorder_permille`. `base_rtt_ns` and `reorder_step_permille` (rows
-above) are written by `ImpairSocket` too.
+rule by a unit test). Up is inbound (client to server: the socket sits on RS), down outbound.
+
+**The `l2_summary` event** is written once at the run's end. Its fields: every per-second name below except
+`l2_release_cpu_permille`, over the whole run (the counts as totals, the lateness quantiles over every sample, and the
+levels `l2_peers_count`, `l2_pool_free_count`, `l2_up_queued_bytes` and `l2_down_queued_bytes` as at the run's end);
+then `l2_release_cpu_ns` (the release thread's CPU over the run, in place of the per-second permille) and the measured
+reorder shares under the existing names `reorder_up_permille`, `reorder_down_permille` and `reorder_permille`. A unit
+test checks every field it writes against this file. `base_rtt_ns` and `reorder_step_permille` (rows above) are
+written by `ImpairSocket` too.
+
+**Carried to U3c (M15):** the TCP model's rows (the model's name and version, and S12's stall and repair counts) are
+not here yet: DelayStream, built at U3c, writes them, and U3c adds their rows to this file.
 
 **The L2 probe's writing binary (PM-0001-3's `second.s.probe_*` rows above; proposed at U3b, built at U6):**
 npt-server's binary in a probe mode (process `probe`), on a free slot port of RS with its own `ImpairSocket`, writes
@@ -407,7 +414,7 @@ directions, and each round trip as the echo's release minus the original send); 
 | `second.v.l2_up_burst_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: datagrams dropped inside one of the profile's B1 bursts |
 | `second.v.l2_up_blocked_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: datagrams dropped by PM-0001-29's UDP block |
 | `second.v.l2_up_shaper_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: tail drops at the shaper's drop-tail queue (PM-0001-23's throttle, -24's bottleneck; M19) |
-| `second.v.l2_up_queue_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: tail drops at the byte bounds (per peer and in total; M10), counted apart from the profile's loss |
+| `second.v.l2_up_queue_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: tail drops at the byte bounds (per peer and in total, 1,500 B charged per datagram; M10), counted apart from the profile's loss |
 | `second.v.l2_up_pool_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: drops for an empty buffer pool (M11) |
 | `second.v.l2_up_oversize_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: datagrams above the size limit, dropped before they were queued (M10) |
 | `second.v.l2_up_overtaken_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server: datagrams the reorder step held and their successor overtook (npt-l1's step as built: M3) |
@@ -424,7 +431,7 @@ directions, and each round trip as the echo's release minus the original send); 
 | `second.v.l2_down_burst_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: datagrams dropped inside one of the profile's B1 bursts |
 | `second.v.l2_down_blocked_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: datagrams dropped by PM-0001-29's UDP block |
 | `second.v.l2_down_shaper_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: tail drops at the shaper's drop-tail queue (PM-0001-23's throttle, -24's bottleneck; M19) |
-| `second.v.l2_down_queue_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: tail drops at the byte bounds (per peer and in total; M10), counted apart from the profile's loss |
+| `second.v.l2_down_queue_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: tail drops at the byte bounds (per peer and in total, 1,500 B charged per datagram; M10), counted apart from the profile's loss |
 | `second.v.l2_down_pool_drop_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: drops for an empty buffer pool (M11) |
 | `second.v.l2_down_oversize_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: datagrams above the size limit, dropped before they were queued (M10) |
 | `second.v.l2_down_send_err_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound: sends the kernel refused with an error other than EAGAIN (quinn-udp's `try_send`, never `send`: M5); the errno is in the fate log |
@@ -444,15 +451,15 @@ directions, and each round trip as the echo's release minus the original send); 
 | `second.v.l2_late_down_max_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): its maximum |
 | `second.v.l2_late_down_excess_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median (Mustafa's bar: about 10 µs or less at P1, judged on RS at R1) |
 | `second.v.l2_late_down_over_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): samples with L − L0 above 0.25 ms |
-| `second.v.l2_up_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound: bytes queued at the second's end (in delay, held, or waiting for quinn) |
-| `second.v.l2_down_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound: bytes queued at the second's end (in delay, held, or waiting for quinn) |
+| `second.v.l2_up_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound: buffer bytes queued at the second's end, 1,500 B per datagram whatever its payload (each holds one pool buffer: M10's charge), the datagrams in their delay, held by the reorder step, or due and waiting for quinn's `poll_recv` |
+| `second.v.l2_down_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound: buffer bytes queued at the second's end, 1,500 B per datagram whatever its payload (M10's charge), the datagrams in their shaper wait and delay, held by the reorder step, or in the release thread's batch being sent |
 | `second.v.l2_peers_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | peers in the table at the second's end (fixed capacity: M10) |
-| `second.v.l2_peer_evicted_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | peers evicted this second (the least recently seen, never one set by the control plane) |
+| `second.v.l2_peer_evicted_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | peers evicted this second (the least recently seen, never one set by the control plane); only a datagram that passed the host checks (size, byte bounds, pool) takes a slot, so host drops evict nobody |
 | `second.v.l2_peer_overflow_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | datagrams from new addresses with every slot pinned, carried by the shared overflow flow |
 | `second.v.l2_fate_log_full_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | fate-log entries not kept: the log was at its fixed capacity |
 | `second.v.l2_recv_err_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | errors draining the kernel socket (an ICMP error reported on it, ...): counted, never fatal |
 | `second.v.l2_pool_free_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | free pool buffers at the second's end (M11) |
-| `second.v.l2_release_cpu_permille` | permille of one core | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | the release thread's CPU this second, from its schedstat (M13) |
+| `second.v.l2_release_cpu_permille` | permille of one core | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | the release thread's CPU this second, from its schedstat (M13); per second only (the `l2_summary` event carries `l2_release_cpu_ns` instead) |
 
 ### Header params (`header.params`)
 
@@ -460,15 +467,16 @@ directions, and each round trip as the echo's release minus the original send); 
 |---|---|---|---|
 | `header.params.l2_mode` | string | npt-net (ImpairSocket) | `impaired`, or `pass-through` (every impairment off, through the same socket, release thread and slack: M12) |
 | `header.params.l2_sched_policy` | string | npt-net (ImpairSocket) | the release thread's scheduling policy and real-time priority read from /proc when the header is built (`SCHED_OTHER 0`; `SCHED_FIFO 50` when the recorded switch was applied from outside with `chrt`: M14) |
-| `header.params.l2_timer_slack_ns` | ns | npt-net (ImpairSocket) | the release thread's timer slack as it read it back after writing its own `/proc/<tid>/timerslack_ns` (1; 0 under a real-time policy; u64::MAX unreadable: M14) |
+| `header.params.l2_timer_slack_ns` | ns | npt-net (ImpairSocket) | the release thread's timer slack as the thread itself reads its own `/proc/<tid>/timerslack_ns` when the header is built, beside `l2_sched_policy` read then (1; 0 under a real-time policy since kernel commit ed4fb6d7ef68, mainline 6.12 and 6.6.84; 50,000 after a return to SCHED_OTHER; u64::MAX unreadable or unanswered within 1 s: M14) |
+| `header.params.l2_timer_slack_start_ns` | ns | npt-net (ImpairSocket) | the same slack as the release thread read it back at its start, right after writing it (1 written; u64::MAX unreadable: M14) |
 | `header.params.l2_timer_slack_set` | flag | npt-net (ImpairSocket) | 1 when that write succeeded |
 | `header.params.l2_timer_slack_error` | string | npt-net (ImpairSocket) | the write's error, present only when it failed |
 | `header.params.l2_migration` | flag | npt-net (ImpairSocket) | QUIC migration in both servers' configurations: 0, off (M9; Mustafa's U3-Q6 (a)) |
 | `header.params.l2_gso` | flag | npt-net (ImpairSocket) | GSO/GRO as quinn sees ImpairSocket: 0, off (one datagram per Transmit: M11) |
 | `header.params.l2_max_datagram_bytes` | bytes | npt-net (ImpairSocket) | the size limit applied before any queueing (1,472 B by default: M10) |
-| `header.params.l2_pool_buffers_count` | count | npt-net (ImpairSocket) | the fixed pool of 1,500 B buffers (M11) |
-| `header.params.l2_peer_queue_bytes` | bytes | npt-net (ImpairSocket) | one peer's byte bound per direction (M10) |
-| `header.params.l2_total_queue_bytes` | bytes | npt-net (ImpairSocket) | all peers' byte bound per direction (M10) |
+| `header.params.l2_pool_buffers_count` | count | npt-net (ImpairSocket) | the fixed pool of 1,500 B buffers, shared by every peer and both directions (M11; 8,192 by default: both directions' totals) |
+| `header.params.l2_peer_queue_bytes` | bytes | npt-net (ImpairSocket) | one peer's bound per direction in buffer bytes, every queued datagram charged its 1,500 B buffer whatever its payload (M10; 3,072,000 B = 2,048 buffers by default) |
+| `header.params.l2_total_queue_bytes` | bytes | npt-net (ImpairSocket) | all peers' bound per direction, charged the same way (M10; 6,144,000 B = 4,096 buffers by default) |
 | `header.params.l2_peer_capacity_count` | count | npt-net (ImpairSocket) | the per-peer table's fixed capacity (M10) |
 | `header.params.l2_fate_log_capacity_count` | count | npt-net (ImpairSocket) | the fate log's fixed capacity in entries (0: none kept) |
 | `header.params.l2_one_way_ns` | ns | npt-net (ImpairSocket) | the default peer's injected one-way delay: (profile round trip − base RTT) ÷ 2 (PM-0001-3's reading) |

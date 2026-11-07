@@ -1,7 +1,7 @@
 //! The names ImpairSocket reports under (marks/SERIES.md's rows; README §1's rule: lowercase, ending in the unit, or
-//! a 0/1 flag). Per second they are `second.v.<name>`; over the whole run the same names (plus `l2_release_cpu_ns`
-//! and the reorder shares) are the `l2_summary` event's fields. Up is inbound (client to server: ImpairSocket sits on
-//! RS), down outbound.
+//! a 0/1 flag). Per second they are `second.v.<name>`; over the whole run the same names except
+//! `l2_release_cpu_permille` (the run carries `l2_release_cpu_ns` instead), plus the reorder shares, are the
+//! `l2_summary` event's fields. Up is inbound (client to server: ImpairSocket sits on RS), down outbound.
 
 use super::stats::{Counters, ERR_CLASSES, KINDS, Kind, Summary};
 
@@ -136,8 +136,8 @@ mod tests {
         assert_eq!(out.len(), 8 + 10 + 2 * 9 + 6 + 4);
     }
 
-    /// M15: every per-second name has its SERIES.md row (the `l2_summary` event reuses them; its one extra name,
-    /// `l2_release_cpu_ns`, is named in the section's text).
+    /// M15: every per-second name has its SERIES.md row (the `l2_summary` event reuses them but the CPU permille; its
+    /// `l2_release_cpu_ns` is named in the section's text, and socket_tests checks every field it writes).
     #[test]
     fn every_per_second_name_has_a_series_row() {
         let series = include_str!("../../../../marks/SERIES.md");

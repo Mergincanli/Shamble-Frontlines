@@ -137,7 +137,8 @@ fn it_never_pushes_back_and_takes_one_datagram_per_transmit() {
     assert_eq!(value(&r, "l2_down_pool_drop_count"), 1);
     assert_eq!(value(&r, "l2_down_oversize_count"), 1);
     assert_eq!(value(&r, "l2_pool_free_count"), 0);
-    assert_eq!(value(&r, "l2_down_queued_bytes"), 1_200);
+    // Each queued datagram counts its whole 1,500 B buffer (M10's charge), whatever its payload.
+    assert_eq!(value(&r, "l2_down_queued_bytes"), 2 * 1_500);
 }
 
 /// M11 and M1: poll_recv is Pending (waker stored) until a datagram is due, then hands it over, never Ok(0); the
@@ -175,6 +176,39 @@ fn poll_recv_hands_over_only_due_datagrams() {
     assert_eq!(value(&r, "l2_up_delivered_count"), 1);
     assert_eq!(value(&r, "l2_late_up_count"), 1);
     assert!(value(&r, "l2_late_up_max_ns") < 1_000 * MS);
+}
+
+/// M1's inbound point: the lateness is measured at poll_recv's return, where quinn takes the datagram, not when the
+/// release thread made it ready. Here quinn polls about 90 ms after the datagram was due, and the lateness says so.
+/// The bite: a lateness taken at the release (or forced to 0) stays near 0.
+#[test]
+fn inbound_lateness_is_measured_where_quinn_receives_it() {
+    let s = ImpairSocket::bind(local(), cfg(fixed(20))).unwrap();
+    let peer = std::net::UdpSocket::bind(local()).unwrap();
+    let sent = Instant::now();
+    peer.send_to(b"late", s.local_addr().unwrap()).unwrap();
+    let mut first = None;
+    while first.is_none() && sent.elapsed() < Duration::from_secs(2) {
+        first = s.first_seen(peer.local_addr().unwrap());
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    let first = first.expect("stamped at the drain");
+    // Due at first + 20 ms; quinn does not poll until first + 110 ms.
+    let poll_at = first + Duration::from_millis(110);
+    std::thread::sleep(poll_at.saturating_duration_since(Instant::now()));
+    assert_eq!(
+        value(&s.run_summary(), "l2_up_delivered_count"),
+        0,
+        "nothing handed over before quinn polls"
+    );
+    let (data, _, at) = recv(&s, Duration::from_secs(2)).expect("delivered");
+    assert_eq!(&data[..], b"late");
+    let late = value(&s.run_summary(), "l2_late_up_max_ns");
+    let bound = at.duration_since(first).as_nanos() as u64 - 20 * MS;
+    assert!(
+        (50 * MS..=bound).contains(&late),
+        "inbound lateness {late} ns: at least 50 ms (polled ~90 ms after due), at most {bound} ns"
+    );
 }
 
 /// The outbound path: delayed by the profile, sent by the release thread with try_send.
@@ -245,12 +279,12 @@ fn oversize_inbound_is_dropped_before_the_queue() {
     let peer = std::net::UdpSocket::bind(local()).unwrap();
     peer.send_to(&[0u8; 101], s.local_addr().unwrap()).unwrap();
     peer.send_to(&[0u8; 100], s.local_addr().unwrap()).unwrap();
-    let r = summary_when(&s, "l2_up_queued_bytes", 100);
+    let r = summary_when(&s, "l2_up_queued_bytes", 1_500);
     assert_eq!(value(&r, "l2_up_oversize_count"), 1);
     assert_eq!(
         value(&r, "l2_up_queued_bytes"),
-        100,
-        "only the one within the limit is queued"
+        1_500,
+        "only the one within the limit is queued (its buffer's 1,500 B)"
     );
     assert_eq!(value(&r, "l2_pool_free_count"), 255);
     assert!(s.first_seen(peer.local_addr().unwrap()).is_some());
@@ -295,6 +329,7 @@ fn the_pass_through_takes_the_same_path_and_the_header_says_so() {
         expected,
         "the release thread's own slack, read back ({sched})"
     );
+    assert_eq!(value(&h, "l2_timer_slack_start_ns"), expected);
     assert_eq!(value(&h, "l2_timer_slack_set"), 1);
     assert_eq!((value(&h, "l2_migration"), value(&h, "l2_gso")), (0, 0));
     assert_eq!(value(&h, "l2_one_way_ns"), 0);
@@ -308,6 +343,43 @@ fn the_pass_through_takes_the_same_path_and_the_header_says_so() {
     assert_eq!(
         value(&impaired.header_numbers(), "reorder_step_permille"),
         10
+    );
+}
+
+/// M14 at header time: the header's slack is the one the release thread reads when the header is built (only the
+/// thread itself may read it without CAP_SYS_NICE), beside the value it read back at its start, so a change after the
+/// start shows: an outside `chrt -f` zeroes it, and a return to SCHED_OTHER restores 50 µs, not 1 ns. Here the thread
+/// itself writes 7 µs, standing in for that outside change. The bite: a header reporting the start value keeps 1.
+#[test]
+fn the_header_reads_the_slack_when_it_is_built() {
+    let s = ImpairSocket::bind(local(), cfg(fixed(1))).unwrap();
+    let sched = s
+        .header_texts()
+        .into_iter()
+        .find(|t| t.0 == "l2_sched_policy")
+        .unwrap()
+        .1;
+    let rt = sched.starts_with("SCHED_FIFO") || sched.starts_with("SCHED_RR");
+    let h = s.header_numbers();
+    let start = if rt { 0 } else { 1 };
+    assert_eq!(
+        (
+            value(&h, "l2_timer_slack_ns"),
+            value(&h, "l2_timer_slack_start_ns")
+        ),
+        (start, start)
+    );
+    // Under a real-time policy the kernel keeps it at 0 whatever is written (ed4fb6d7ef68).
+    let moved = if rt { 0 } else { 7_000 };
+    assert_eq!(s.ask_slack(Some(7_000)), Some(moved));
+    let h = s.header_numbers();
+    assert_eq!(
+        (
+            value(&h, "l2_timer_slack_ns"),
+            value(&h, "l2_timer_slack_start_ns")
+        ),
+        (moved, start),
+        "the header's slack is read when it is built ({sched})"
     );
 }
 
@@ -325,6 +397,16 @@ fn every_header_name_has_a_series_row() {
             series.contains(&format!("| `header.params.{n}` |"))
                 || series.contains(&format!("| `{n}` |")),
             "no SERIES.md row for header.params.{n}"
+        );
+    }
+    // The l2_summary event's fields: each named in SERIES.md, and the per-second CPU share is not one of them (the
+    // summary carries the CPU in ns instead).
+    let summary: Vec<&str> = s.run_summary().iter().map(|x| x.0).collect();
+    assert!(!summary.contains(&"l2_release_cpu_permille"));
+    for n in summary {
+        assert!(
+            series.contains(&format!("`second.v.{n}`")) || series.contains(&format!("`{n}`")),
+            "l2_summary's {n}"
         );
     }
     for n in [
@@ -365,22 +447,37 @@ fn seconds_are_windows_and_the_run_is_the_total() {
     assert!(value(&s.run_summary(), "l2_release_cpu_ns") > 0);
 }
 
-/// Dropping the socket stops both of its threads.
+/// Dropping the socket stops both of its threads, and the port is free again (the reader held the bound socket). The
+/// bite: a Drop that does not stop the reader leaves its thread and the port behind.
 #[test]
 fn dropping_the_socket_ends_its_threads() {
     let s = ImpairSocket::bind(local(), cfg(fixed(1))).unwrap();
-    let tid = s.release_thread_id().expect("a tid");
-    let path = format!("/proc/self/task/{tid}");
-    assert!(std::fs::metadata(&path).is_ok());
+    let port = s.local_addr().unwrap();
+    let threads = [
+        ("release", s.release_thread_id().expect("a release tid")),
+        ("reader", s.reader_thread_id().expect("a reader tid")),
+    ];
+    for (_, tid) in threads {
+        assert!(std::fs::metadata(format!("/proc/self/task/{tid}")).is_ok());
+    }
     drop(s);
     let end = Instant::now() + Duration::from_secs(2);
-    while std::fs::metadata(&path).is_ok() && Instant::now() < end {
-        std::thread::sleep(Duration::from_millis(5));
+    for (name, tid) in threads {
+        let path = format!("/proc/self/task/{tid}");
+        while std::fs::metadata(&path).is_ok() && Instant::now() < end {
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert!(
+            std::fs::metadata(&path).is_err(),
+            "the {name} thread still runs"
+        );
     }
-    assert!(
-        std::fs::metadata(&path).is_err(),
-        "the release thread still runs"
-    );
+    let mut again = std::net::UdpSocket::bind(port);
+    while again.is_err() && Instant::now() < end {
+        std::thread::sleep(Duration::from_millis(5));
+        again = std::net::UdpSocket::bind(port);
+    }
+    assert!(again.is_ok(), "the port {port} is still bound: {again:?}");
 }
 
 /// A dedicated pacer thread (M13: never tokio): calls `f(i)` for datagram i at `start + i / rate`, catching up in

@@ -4,16 +4,27 @@
 //! - **Peers** (M10): a table of fixed capacity keyed by the peer's address with IPv4-mapped IPv6 normalised; a new
 //!   address takes a free slot, else evicts the least recently seen peer not pinned by `set_peer` (counted), else
 //!   takes the shared overflow flow (counted). Nothing grows with client data. Each peer keeps its first raw packet's
-//!   stamp (the Join deadline's start, read by npt-server at U6: U3-Q8).
+//!   stamp (the Join deadline's start, read by npt-server at U6: U3-Q8). A datagram the host checks drop (size, byte
+//!   bounds, pool) touches no peer: the table is consulted, not changed, until a datagram passes them, so a flood from
+//!   new (possibly spoofed) addresses creates no peer and evicts nobody. Carried to U6: the control plane pins every
+//!   joined client with `set_peer`, so unpinned addresses can never evict a real client.
 //! - **Fates** (M4): one ChaCha8 stream per (peer, direction), keyed by the run's seed and the peer's stable slot id
 //!   (its first-seen ordinal, never its ephemeral address), 16 words per datagram used or not, at L1's word places
 //!   (loss 0, jitter 1, reorder 2). So no other peer's traffic, and no interleaving of the two directions, moves a
 //!   datagram's fate.
 //! - **Each datagram, in order:** the size limit (dropped before it is queued: no index), the byte bounds per peer
 //!   and in total (a tail drop counted apart from the profile's loss: no index), a pool buffer (an empty pool is a
-//!   counted drop: no index); then its index and 16 words; the UDP block; a B1 burst; the shaper (M19); the profile's
-//!   loss; its delay, the profile's one-way delay net of the base RTT plus its own uniform jitter (M3's "jitter per
-//!   datagram"); and L1's reorder step (M3).
+//!   counted drop: no index); then its peer's slot, its index and 16 words; the UDP block; a B1 burst; the shaper
+//!   (M19); the profile's loss; its delay, the profile's one-way delay net of the base RTT plus its own uniform jitter
+//!   (M3's "jitter per datagram"); and L1's reorder step (M3).
+//! - **The byte bounds count buffers:** every queued datagram is charged its whole pool buffer
+//!   ([`L2Config::BUFFER_BYTES`]), whatever its payload, since that is the memory it holds. So a peer's bound is a
+//!   number of pool buffers, and one peer sending small datagrams cannot hold more of the shared pool than its own
+//!   bound; at the defaults both directions' totals together are the pool, so the totals, not the pool, are what bind
+//!   (L2Config's defaults).
+//! - **The shaper across a settings change** (a throttle's start or end): each flow keeps its last departure; a new
+//!   shaper starts busy until then, and with no shaper a datagram departs at max(intake, last departure). So the
+//!   datagrams the old shaper accepted keep their departures and nothing taken in later leaves before them.
 //! - **The reorder step** is npt-l1's as built: a datagram it draws is held; if the next datagram of its flow is
 //!   taken in before the held one is due and is not dropped, the held one becomes due 1 ns after it (overtaken);
 //!   either way it is released into the queue then. A held datagram whose own due time comes first is released at it
@@ -37,6 +48,8 @@ const W_JITTER: usize = 1;
 const W_REORDER: usize = 2;
 /// The fixed part of the 32-byte ChaCha8 key; the run's seed, little-endian, fills the first 8 bytes.
 const KEY_TAG: &[u8; 24] = b"npt-l2 fate draws, v1\0\0\0";
+/// What one queued datagram counts against the byte bounds: its whole pool buffer, whatever its payload.
+pub(crate) const CHARGE_BYTES: u64 = L2Config::BUFFER_BYTES as u64;
 
 /// Inbound: client to server, on RS. Outbound: server to client.
 pub(crate) const UP: usize = 0;
@@ -124,7 +137,11 @@ struct Flow<B> {
     rng: ChaCha8Rng,
     next_index: u64,
     shaper: Option<Shaper>,
+    /// The latest departure given (the shaper's, or the intake time without one): a new shaper starts busy until
+    /// then and no shaper departs no earlier, so a settings change never lets a datagram overtake a queued one.
+    last_depart_ns: u64,
     held: Option<Held<B>>,
+    /// Buffer bytes queued: [`CHARGE_BYTES`] per datagram.
     queued_bytes: u64,
     /// The highest index released (RFC 4737's reorder count).
     highest: Option<u64>,
@@ -193,11 +210,26 @@ pub(crate) enum Intake<B> {
     },
 }
 
+/// Where a datagram from an address goes, found without changing the table.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Target {
+    /// Its peer's slot.
+    Known(u32),
+    /// A new peer in a free slot.
+    Free(usize),
+    /// A new peer in this slot, whose unpinned peer (the least recently seen) is evicted.
+    Evict(usize),
+    /// The shared overflow flow: every slot pinned.
+    Overflow,
+}
+
 /// The impairment core of one socket.
 pub(crate) struct Impairer<B> {
     key: [u8; 32],
     max_datagram: usize,
+    /// Buffer bytes ([`CHARGE_BYTES`] per datagram) one peer may hold queued in one direction.
     peer_queue_bytes: u64,
+    /// Buffer bytes all peers may hold queued in one direction.
     total_queue_bytes: u64,
     default: Settings,
     slots: Vec<Option<Peer<B>>>,
@@ -207,6 +239,7 @@ pub(crate) struct Impairer<B> {
     next_ordinal: u64,
     heap: BinaryHeap<Reverse<Entry<B>>>,
     seq: u64,
+    /// Buffer bytes queued per direction ([`CHARGE_BYTES`] per datagram).
     queued: [u64; 2],
     pub(crate) run: Counters,
     pub(crate) second: Counters,
@@ -223,6 +256,7 @@ fn flows<B>(key: &[u8; 32], ordinal: u64, s: &Settings) -> [Flow<B>; 2] {
             rng,
             next_index: 0,
             shaper: s.shaper.map(|(r, q)| Shaper::new(r, q)),
+            last_depart_ns: 0,
             held: None,
             queued_bytes: 0,
             highest: None,
@@ -308,31 +342,43 @@ impl<B> Impairer<B> {
         }
     }
 
-    /// The slot for `addr` at `t`, creating its peer if new (M10's bounded table).
-    fn slot_for(&mut self, addr: SocketAddr, t: u64) -> u32 {
-        let key = normalise(addr);
+    /// Where a datagram from `key` (normalised) would go, changing nothing (M10's bounded table).
+    fn target(&self, key: SocketAddr) -> Target {
         if let Some(s) = self.lookup(key) {
-            return s;
+            return Target::Known(s);
         }
-        let free = self.slots.iter().position(Option::is_none);
-        let slot = match free {
-            Some(s) => s,
-            None => {
-                let victim = self
-                    .slots
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(i, p)| {
-                        p.as_ref()
-                            .filter(|p| !p.pinned)
-                            .map(|p| (p.last_seen_ns, i))
-                    })
-                    .min();
-                let Some((_, v)) = victim else {
-                    self.run.peer_overflow += 1;
-                    self.second.peer_overflow += 1;
-                    return OVERFLOW;
-                };
+        if let Some(s) = self.slots.iter().position(Option::is_none) {
+            return Target::Free(s);
+        }
+        let victim = self
+            .slots
+            .iter()
+            .enumerate()
+            .filter_map(|(i, p)| {
+                p.as_ref()
+                    .filter(|p| !p.pinned)
+                    .map(|p| (p.last_seen_ns, i))
+            })
+            .min();
+        match victim {
+            Some((_, v)) => Target::Evict(v),
+            None => Target::Overflow,
+        }
+    }
+
+    /// The slot for `key` (normalised) at `t` per `target`: creates the new peer (evicting the least recently seen
+    /// unpinned one when the table is full), or counts a use of the overflow flow. Called only for a datagram that
+    /// passed the host checks, and by `set_peer`.
+    fn place(&mut self, key: SocketAddr, target: Target, t: u64) -> u32 {
+        let slot = match target {
+            Target::Known(s) => return s,
+            Target::Overflow => {
+                self.run.peer_overflow += 1;
+                self.second.peer_overflow += 1;
+                return OVERFLOW;
+            }
+            Target::Free(s) => s,
+            Target::Evict(v) => {
                 self.evict(v);
                 v
             }
@@ -414,17 +460,21 @@ impl<B> Impairer<B> {
         len: usize,
         take: impl FnOnce() -> Option<B>,
     ) -> Intake<B> {
-        let slot = self.slot_for(addr, t);
-        let (ordinal, flow_bytes) = {
-            let p = self.peer_mut(slot);
-            p.last_seen_ns = p.last_seen_ns.max(t);
-            if dir == UP && p.first_seen_ns.is_none() {
-                p.first_seen_ns = Some(t);
+        // The host checks read the table but change nothing in it: a dropped datagram creates no peer, evicts nobody
+        // and stamps nothing. A new address's own flow is empty (or it is the overflow flow's, if it would go there).
+        let key = normalise(addr);
+        let target = self.target(key);
+        let (known, flow_bytes) = match target {
+            Target::Known(s) => {
+                let p = self.peer_mut(s);
+                (p.ordinal, p.flows[dir].queued_bytes)
             }
-            (p.ordinal, p.flows[dir].queued_bytes)
+            Target::Overflow => (self.overflow.ordinal, self.overflow.flows[dir].queued_bytes),
+            // No peer yet: the fate log's ordinal for a drop before the table.
+            Target::Free(_) | Target::Evict(_) => (u64::MAX, 0),
         };
         let len32 = u32::try_from(len).unwrap_or(u32::MAX);
-        let early = |kind| Fate {
+        let early = |ordinal, kind| Fate {
             ordinal,
             dir: dir as u8,
             kind,
@@ -436,12 +486,11 @@ impl<B> Impairer<B> {
             len: len32,
             errno: 0,
         };
-        // Host-protection drops, before any fate draw: they take no index.
-        let bytes = len as u64;
+        // Host-protection drops, before any fate draw: they take no index. The byte bounds count the whole buffer.
         let pre = if len > self.max_datagram {
             Some(Kind::Oversize)
-        } else if flow_bytes + bytes > self.peer_queue_bytes
-            || self.queued[dir] + bytes > self.total_queue_bytes
+        } else if flow_bytes + CHARGE_BYTES > self.peer_queue_bytes
+            || self.queued[dir] + CHARGE_BYTES > self.total_queue_bytes
         {
             Some(Kind::QueueDrop)
         } else {
@@ -449,17 +498,28 @@ impl<B> Impairer<B> {
         };
         if let Some(kind) = pre {
             self.count(dir, kind);
-            self.log(early(kind));
+            self.log(early(known, kind));
             return Intake::Dropped { kind, item: None };
         }
         let Some(item) = take() else {
             self.count(dir, Kind::PoolDrop);
-            self.log(early(Kind::PoolDrop));
+            self.log(early(known, Kind::PoolDrop));
             return Intake::Dropped {
                 kind: Kind::PoolDrop,
                 item: None,
             };
         };
+        // Past the host checks: only now is the datagram's peer placed, seen and stamped.
+        let slot = self.place(key, target, t);
+        let ordinal = {
+            let p = self.peer_mut(slot);
+            p.last_seen_ns = p.last_seen_ns.max(t);
+            if dir == UP && p.first_seen_ns.is_none() {
+                p.first_seen_ns = Some(t);
+            }
+            p.ordinal
+        };
+        let bytes = len as u64;
         // The fates: an index and 16 words, used or not.
         let (index, w, outcome, held) = {
             let p = self.peer_mut(slot);
@@ -476,10 +536,15 @@ impl<B> Impairer<B> {
             } else if s.in_burst(t) {
                 Err(Kind::Burst)
             } else {
+                // The shaper (M19) serialises in intake order, before the delay. Without one the datagram departs at
+                // once, but never before the flow's last departure (a throttle that just ended).
                 let depart = match f.shaper.as_mut() {
                     Some(sh) => sh.offer(t, bytes),
-                    None => Some(t),
+                    None => Some(t.max(f.last_depart_ns)),
                 };
+                if let Some(d) = depart {
+                    f.last_depart_ns = d;
+                }
                 match depart {
                     None => Err(Kind::ShaperDrop),
                     Some(_) if below(w[W_LOSS], 1_000_000) < u64::from(s.loss_ppm) => {
@@ -510,7 +575,7 @@ impl<B> Impairer<B> {
                 self.count(dir, kind);
                 self.log(Fate {
                     index,
-                    ..early(kind)
+                    ..early(ordinal, kind)
                 });
                 return Intake::Dropped {
                     kind,
@@ -536,8 +601,8 @@ impl<B> Impairer<B> {
         } else {
             self.push_datagram(dir, slot, ordinal, h, false);
         }
-        self.peer_mut(slot).flows[dir].queued_bytes += bytes;
-        self.queued[dir] += bytes;
+        self.peer_mut(slot).flows[dir].queued_bytes += CHARGE_BYTES;
+        self.queued[dir] += CHARGE_BYTES;
         Intake::Queued { due_ns: due }
     }
 
@@ -588,7 +653,7 @@ impl<B> Impairer<B> {
     /// Records a popped datagram's end: released (`Delivered`), or refused by the kernel (`SendError` with its
     /// errno, `WouldBlock`), at `out_ns`; or dropped at hand-over (`Oversize`).
     pub(crate) fn finish(&mut self, e: &Entry<B>, kind: Kind, out_ns: u64, errno: i32) {
-        let bytes = u64::from(e.len);
+        let bytes = CHARGE_BYTES;
         self.queued[e.dir] = self.queued[e.dir].saturating_sub(bytes);
         let mut reordered = false;
         if let Some(p) = self.live_peer_mut(e.slot, e.ordinal) {
@@ -633,7 +698,9 @@ impl<B> Impairer<B> {
 
     /// Sets one peer's settings and pins it (never evicted). False if every slot is pinned already.
     pub(crate) fn set_peer(&mut self, addr: SocketAddr, s: Settings, t: u64) -> bool {
-        let slot = self.slot_for(addr, t);
+        let key = normalise(addr);
+        let target = self.target(key);
+        let slot = self.place(key, target, t);
         if slot == OVERFLOW {
             return false;
         }
@@ -681,11 +748,15 @@ impl<B> Impairer<B> {
     }
 }
 
-/// New settings for a peer; a changed shaper starts empty.
+/// New settings for a peer. A changed shaper starts busy until the flow's last departure (its first departure is never
+/// before the old shaper's last), and the datagrams the old one accepted keep their departures, so a throttle's start
+/// or end never lets a datagram overtake a queued one.
 fn apply<B>(p: &mut Peer<B>, s: Settings) {
     if p.settings.shaper != s.shaper {
         for f in &mut p.flows {
-            f.shaper = s.shaper.map(|(r, q)| Shaper::new(r, q));
+            f.shaper = s
+                .shaper
+                .map(|(r, q)| Shaper::busy_until(r, q, f.last_depart_ns));
         }
     }
     p.settings = s;

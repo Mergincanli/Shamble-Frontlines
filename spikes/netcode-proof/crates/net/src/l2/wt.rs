@@ -11,6 +11,12 @@
 //! - **Accept loop (M8):** we drive `quinn::Endpoint::accept` ourselves and call each crate's per-connection accept,
 //!   so every failed handshake is counted by its reason (web-transport-quinn's own `Server` drops them silently; E6
 //!   counts them). Sessions come out of a bounded channel.
+//! - **Carried to U6, before WtServer reuses this file:** the accept loops start one task per `Incoming` with no cap
+//!   on concurrent handshakes once QUIC is up, and no deadline on the HTTP/3 stage (wtransport awaits SETTINGS and
+//!   CONNECT, endpoint.rs:621-634; quinn's 30 s idle timeout is defeated by a client's keep-alives); quinn bounds only
+//!   the `Incoming` queue (max_incoming). Both must be bounded there (.claude/rules/netcode.md: nothing unbounded keyed
+//!   by client data), and a task blocked on `tx.send` when the channel is full needs the same deadline. Fine for the
+//!   loopback tests here.
 
 use super::MIGRATION;
 use super::socket::ImpairSocket;
@@ -123,10 +129,16 @@ pub(crate) mod wtransport_server {
     }
 
     fn reason(e: &wtransport::error::ConnectionError) -> Failure {
-        // wtransport runs the QUIC handshake and the HTTP/3 exchange in one future; only a local HTTP/3 error is
-        // surely the second.
+        // wtransport runs the QUIC handshake and the HTTP/3 exchange in one future. Two of its errors are surely the
+        // second stage: a local HTTP/3 error, and the peer's application close (wtransport 0.7.2 error.rs:16-18; it
+        // comes from quinn's ApplicationClosed through error.rs:312-316, or from the driver's ApplicationClosed
+        // through with_driver_error, error.rs:48-51). An application CONNECTION_CLOSE travels only in 0-RTT or 1-RTT
+        // packets (RFC 9000 §12.4; §10.2.3: during the handshake it is sent as a transport close) and our TLS
+        // configuration accepts no 0-RTT (rustls's max_early_data_size stays 0; quinn-proto's crypto/rustls.rs:435-436),
+        // so the peer had finished QUIC's handshake. Every other error counts as the QUIC stage.
         match e {
-            wtransport::error::ConnectionError::LocalH3Error(_) => Failure::H3,
+            wtransport::error::ConnectionError::LocalH3Error(_)
+            | wtransport::error::ConnectionError::ApplicationClosed(_) => Failure::H3,
             _ => Failure::Quic,
         }
     }

@@ -4,7 +4,11 @@
 //! - **Timer slack:** a thread lowers its own slack by writing `/proc/<tid>/timerslack_ns`, the tid read from the
 //!   `/proc/thread-self` link (`/proc/thread-self/timerslack_ns` does not exist: Linux registers the file for
 //!   processes only, fs/proc/base.c tgid_base_stuff; the capability check runs only when p != current). It is read
-//!   back and recorded. A thread under a real-time policy reads 0 (the kernel forces it).
+//!   back and recorded, and read again by the thread itself whenever the header is built (another thread would need
+//!   CAP_SYS_NICE to read it). A thread under a real-time policy reads 0: since kernel commit ed4fb6d7ef68 (mainline
+//!   6.12, backported to 6.6.84) the kernel forces an RT task's slack to 0, and a return to SCHED_OTHER restores the
+//!   default (50 µs), not the value written before. Whether RS's Ubuntu 6.8 kernel carries it is read at R1 (a kernel
+//!   without it keeps the written value under SCHED_FIFO).
 //! - **Real-time priority** is a recorded switch applied from outside (`chrt -f -p <prio> <tid>`, or the whole
 //!   process under `chrt`): the thread's policy and priority are read from `/proc/self/task/<tid>/stat` (fields 41
 //!   and 40) whenever the header is built. No spin lead (U3-Q2).
@@ -88,8 +92,11 @@ pub(crate) fn cpu_ns(tid: u32) -> Option<u64> {
 mod tests {
     use super::*;
 
-    /// M14: the thread writes 1 ns to its own slack and reads 1 back (0 under a real-time policy), with no
-    /// capability and no unsafe code. The bite: `/proc/thread-self/timerslack_ns`, the scout's path, does not exist.
+    /// M14: the thread writes 1 ns to its own slack and reads 1 back, with no capability and no unsafe code. Under a
+    /// real-time policy (the whole test run under `chrt -f`) both the default and the value read back are 0: kernel
+    /// commit ed4fb6d7ef68 (mainline 6.12, backported to 6.6.84) forces an RT task's slack to 0. Whether RS's Ubuntu
+    /// 6.8 kernel carries it is read at R1: a kernel without it fails this test under `chrt` (it keeps 1 and 50 µs).
+    /// The bite: `/proc/thread-self/timerslack_ns`, the scout's path, does not exist.
     #[test]
     fn a_thread_sets_its_own_slack_to_1_ns() {
         let (slack, sched_now, default) = std::thread::spawn(|| {
@@ -101,17 +108,21 @@ mod tests {
         .unwrap();
         assert_eq!(slack.write_error, None);
         let (policy, _) = sched_now.expect("the stat line parses");
-        let expected = if policy == 1 || policy == 2 { 0 } else { 1 };
+        let rt = policy == 1 || policy == 2;
         assert_eq!(
             slack.read_ns,
-            Some(expected),
+            Some(if rt { 0 } else { 1 }),
             "policy {}",
             policy_name(policy)
         );
-        assert!(
-            default.is_some_and(|d| d > 1),
-            "the default slack ({default:?}) is above 1 ns"
-        );
+        if rt {
+            assert_eq!(default, Some(0), "an RT thread's default slack");
+        } else {
+            assert!(
+                default.is_some_and(|d| d > 1),
+                "the default slack ({default:?}) is above 1 ns"
+            );
+        }
         assert!(
             std::fs::metadata("/proc/thread-self/timerslack_ns").is_err(),
             "the scout's path exists after all"

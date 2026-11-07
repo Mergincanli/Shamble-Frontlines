@@ -364,6 +364,47 @@ mod wtransport_route {
         }
         assert_eq!((counts.failed(Failure::Quic), counts.accepted()), (1, 0));
     }
+
+    /// M8's reasons: a client that completes QUIC's handshake (ALPN h3) and then closes the connection at the
+    /// application level, before HTTP/3's SETTINGS and CONNECT, is an HTTP/3-stage failure. wtransport reports it as
+    /// ConnectionError::ApplicationClosed (error.rs:16-18, 312-316). The bite: counting that variant as the QUIC stage.
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn wtransport_counts_a_close_after_quic_as_h3() {
+        let (_sock, port, cert, counts, _rx) = start(L2Config::clean(7)).await;
+        let tls = client_tls(srv::provider(), cert, b"h3");
+        let crypto = quinn::crypto::rustls::QuicClientConfig::try_from(tls).unwrap();
+        let ep = quinn::Endpoint::client(local()).unwrap();
+        let server = SocketAddr::from(([127, 0, 0, 1], port));
+        let conn = tokio::time::timeout(
+            Duration::from_secs(10),
+            ep.connect_with(
+                quinn::ClientConfig::new(Arc::new(crypto)),
+                server,
+                "127.0.0.1",
+            )
+            .unwrap(),
+        )
+        .await
+        .expect("in time")
+        .expect("QUIC's handshake completes");
+        // Let the server reach its HTTP/3 stage, then close without SETTINGS or CONNECT.
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        conn.close(0u32.into(), b"gone");
+        let end = Instant::now() + Duration::from_secs(5);
+        while counts.failed(Failure::H3) + counts.failed(Failure::Quic) == 0 && Instant::now() < end
+        {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        assert_eq!(
+            (
+                counts.failed(Failure::H3),
+                counts.failed(Failure::Quic),
+                counts.accepted()
+            ),
+            (1, 0, 0)
+        );
+        ep.wait_idle().await;
+    }
 }
 
 #[cfg(feature = "wt-wtq")]

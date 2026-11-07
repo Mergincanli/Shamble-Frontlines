@@ -35,13 +35,15 @@ pub struct L2Config {
     /// The largest datagram (UDP payload) accepted; a larger one is dropped and counted before it is queued (M10).
     /// At most [`L2Config::BUFFER_BYTES`].
     pub max_datagram_bytes: usize,
-    /// The fixed pool of [`L2Config::BUFFER_BYTES`] buffers every queued datagram is copied into (M11); an empty pool
-    /// is a counted drop.
+    /// The fixed pool of [`L2Config::BUFFER_BYTES`] buffers every queued datagram is copied into (M11), shared by every
+    /// peer and both directions; an empty pool is a counted drop. At the defaults it holds both directions' total
+    /// bounds exactly, so it cannot run empty and the byte bounds are what bind.
     pub pool_buffers: usize,
-    /// The bytes one peer may hold queued in one direction (its own bound, M10); beyond it a tail drop, counted apart
-    /// from the profile's loss.
+    /// The bytes one peer may hold queued in one direction (its own bound, M10), every queued datagram charged its
+    /// whole pool buffer ([`L2Config::BUFFER_BYTES`]) whatever its payload, so this is a number of buffers × 1,500 B;
+    /// beyond it a tail drop, counted apart from the profile's loss.
     pub peer_queue_bytes: u64,
-    /// The bytes all peers may hold queued in one direction together (M10).
+    /// The bytes all peers may hold queued in one direction together (M10), charged the same way.
     pub total_queue_bytes: u64,
     /// The per-peer table's fixed capacity (M10): beyond it the least recently seen peer not set by
     /// [`ImpairSocket::set_peer`](super::ImpairSocket::set_peer) is evicted, counted; with none, the datagram takes
@@ -49,7 +51,7 @@ pub struct L2Config {
     pub peer_capacity: usize,
     /// The release thread's timer slack, written by the thread itself to `/proc/<tid>/timerslack_ns` and read back
     /// (M14; Mustafa's U3-Q2 (b)): 1 ns. 0 leaves the kernel's default (50 µs) in place. The header records the value
-    /// read back.
+    /// read back at the thread's start and the value the thread reads when the header is built.
     pub timer_slack_ns: u64,
     /// The fate log's fixed capacity in entries (0: no log); `ImpairSocket::drain_fate_log` empties it. Entries
     /// beyond it are counted, not kept.
@@ -68,8 +70,13 @@ impl L2Config {
     pub const DEFAULT_MAX_DATAGRAM_BYTES: usize = 1_472;
 
     /// The settings for `profile` with this crate's defaults: the profile's own reorder step, loopback (base 0), no
-    /// shaper, no block, a 1,472 B size limit, 8,192 pool buffers (about 12 MB), 4 MiB per peer and 12 MiB in total
-    /// per direction, 512 peers, 1 ns timer slack, no fate log.
+    /// shaper, no block, a 1,472 B size limit, 8,192 pool buffers (12.3 MB), per direction 2,048 buffers' worth per
+    /// peer (3,072,000 B) and 4,096 in total (6,144,000 B), 512 peers, 1 ns timer slack, no fate log.
+    ///
+    /// The bounds' relation is the point (M10's intent: one peer cannot starve the others): the two directions' totals
+    /// together are the whole pool, so the pool never runs empty; one peer holds at most half a direction's total, so a
+    /// single flooder leaves every other peer room, and it takes two to fill a direction's total. M13's one peer at
+    /// 10,000 datagrams a second each way at P2 holds about 600 a direction.
     pub fn new(seed: u64, profile: Profile) -> L2Config {
         L2Config {
             seed,
@@ -80,8 +87,8 @@ impl L2Config {
             udp_block: false,
             max_datagram_bytes: Self::DEFAULT_MAX_DATAGRAM_BYTES,
             pool_buffers: 8_192,
-            peer_queue_bytes: 4 << 20,
-            total_queue_bytes: 12 << 20,
+            peer_queue_bytes: 2_048 * Self::BUFFER_BYTES as u64,
+            total_queue_bytes: 4_096 * Self::BUFFER_BYTES as u64,
             peer_capacity: 512,
             timer_slack_ns: 1,
             fate_log_capacity: 0,
