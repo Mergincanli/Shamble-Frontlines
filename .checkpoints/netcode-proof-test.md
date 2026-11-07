@@ -346,6 +346,14 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-07 about 14:30 UTC, refining WS-BAR (verbatim):** "Refinement to my WS-BAR rule: the model's
+  bound has almost no margin (5 % slower already fails a correct build), so declare a tolerance now, before any
+  practice run. If the practice run is up to 10 % slower than the model, the numbers may move by that much; beyond
+  10 %, investigate first and never loosen. The advisor may set a different tolerance with reasons, but it must be
+  fixed before the run." So: the docs PR fixes the tolerance (10 % unless the advisor sets another with reasons) and
+  how "slower than the model" is measured, before R3's practice run; within it the bar's numbers may move up by the
+  measured factor; beyond it, investigate first and never loosen. The advisor's draft from workflow wf_f3167435-5b4
+  predates this: fold it in with a follow-up advisor request.
 - **Mustafa, 2026-11-07 about 13:45 UTC (verbatim):** "WS-SCOPE: no. Measure fix 1 (the newest-snapshot-only buffer)
   in the proof test. The reconnect becomes a requirement for the real client, built and measured before the first
   online playtest, with today's model as its target (buffer + reconnect: 99 % within about 1.05 s). Record that in the
