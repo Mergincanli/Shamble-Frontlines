@@ -9,30 +9,42 @@
 //! TCP_TIMEOUT_MIN_US = 2 ms, TCP_INIT_CWND = 10), net/ipv4/tcp_cubic.c (beta = 717/1024), and the rules below in
 //! tcp_input.c (tcp_rtt_estimator, tcp_rearm_rto, tcp_set_xmit_timer), tcp_output.c (tcp_schedule_loss_probe,
 //! tcp_send_loss_probe), tcp_recovery.c (RACK) and tcp_timer.c (the retransmission timer).
-//! - S1: segments of at most 1,448 B, Nagle off; each transmission's delay is the profile's half latency plus a uniform
-//!   jitter of ± half its jitter, and its loss is drawn at the profile's rate; any transmission sent inside a burst is
-//!   lost. Each direction's path is first in, first out, so the stream never reorders.
+//! - S1: segments of at most 1,448 B (1,460 B without the timestamp option), Nagle off; each transmission's delay is
+//!   the profile's half latency plus a uniform jitter of ± half its jitter, and its loss is drawn at the profile's
+//!   rate; any transmission sent inside a burst is lost. Each direction's path is first in, first out, so the stream
+//!   never reorders.
 //! - S2: at most cwnd segments in flight, 10 at first. App-limited flows neither grow nor shrink it (Cubic's growth
 //!   and PRR are not modelled); after a timeout, slow start from 1 to ssthresh = max(0.7 cwnd, 2), held there.
 //! - S3: the receiver acknowledges at once an out-of-order segment, one that fills a hole, and a duplicate, with SACK
 //!   blocks for every out-of-order range; in-order data at the earliest of 40 ms after it arrived, a second
 //!   unacknowledged segment, or the next segment its own end sends (the acknowledgement rides on it).
 //! - S4: Linux's RTT estimator in integer microseconds; RTO = srtt + rttvar, rttvar never below 200 ms; 1 s before the
-//!   first sample; Karn's rule; one sample per acknowledgement, from the newest segment it newly delivers.
+//!   first sample (3 s once a handshake ended without one: tcp_init_metrics). One sample per acknowledgement, taken as
+//!   tcp_clean_rtx_queue and tcp_ack_update_rtt take it: from the oldest segment it newly delivers in order, none if
+//!   any segment it delivers in order was ever resent (Karn); else from the first segment it newly SACKs that was never
+//!   resent; else, with timestamps, from the echoed timestamp (TSecr, whole milliseconds) when it delivers data in
+//!   order. The minimum RTT comes from the newest such segment. The skeptic of 2026-11-07 found the first version's
+//!   rule (the newest segment, even beside a resent one) taking ~1.1 s samples after an outage.
 //! - S5: RACK (RFC 8985): a segment is lost once one sent after it is delivered and its own send plus RACK's RTT plus
 //!   the reordering window, min(min_rtt / 4, srtt) (0 out of the Open state or once 3 segments are SACKed), has
 //!   passed; else the reorder timer fires then, plus 2 ms.
 //! - S6: the tail-loss probe, in the Open state with data out: 2 x srtt plus 200 ms with one segment out (else 2 ms),
 //!   at most the RTO's remaining time; it sends one new segment if there is one, past cwnd, else resends the last;
 //!   one per episode; then the RTO restarts.
-//! - S7: the RTO, at the head's last transmission plus RTO: every outstanding segment lost, the head resent, the RTO
-//!   doubled up to 120 s; the next valid RTT sample resets the backoff.
+//! - S7: the RTO, at the head's last transmission plus RTO: every outstanding segment lost except those sent within
+//!   RACK's RTT (never the head: tcp_timeout_mark_lost), cwnd = segments still in flight + 1 (tcp_enter_loss), the
+//!   head resent, the RTO doubled up to 120 s; the next valid RTT sample resets the backoff.
 //! - S8: every resend draws its own fate. S9: bytes are released in order; the write side holds at most 64 KB unsent
 //!   or unacknowledged.
 //! - S10: fates from one ChaCha8 stream per (seed, connection, direction), four words per transmission.
-//! - Not modelled (S11), recorded in each WebSocket run's header: Cubic's growth curve and PRR, F-RTO's undo, DSACK's
-//!   reordering window growth, the delayed-ACK timer above 40 ms, quick-ack mode, TSO and GSO, ECN, the persist timer,
-//!   RTT samples from the timestamp option, jiffy rounding.
+//! - The handshake (for reconnects): the SYN retried at a linear 1 s for 4 tries, then doubling; the SYN-ACK retried
+//!   from 1 s, doubling per timer retry, and resent at once on a repeated SYN without moving that schedule
+//!   (tcp_check_req), echoing the first SYN's timestamp; each end primed by the handshake's RTT, by the timestamp echo
+//!   if it resent; cwnd 1 after more than one handshake resend (tcp_init_transfer).
+//! - Not modelled (S11), recorded in each WebSocket run's header: Cubic's growth curve and PRR, F-RTO (its new data
+//!   first after an RTO, and its undo), DSACK's reordering window growth, the delayed-ACK timer above 40 ms, quick-ack
+//!   mode, TSO and GSO, ECN, the persist timer, the per-destination metrics cache, the rate limit on answers to
+//!   repeated SYNs, the delayed-ACK filter of the minimum RTT, jiffy rounding.
 
 use npt_l1::Profile;
 use rand_chacha::ChaCha8Rng;
@@ -41,15 +53,21 @@ use std::collections::{BTreeMap, VecDeque};
 
 /// The model's name and version, for each WebSocket run's header (S11); DelayStream's header writes it from U3c.
 #[allow(dead_code)]
-pub(crate) const MODEL: &str = "linux-6.8-tcp v1";
+pub(crate) const MODEL: &str = "linux-6.8-tcp v2";
 /// 1,500 B MTU less IPv4 (20 B), TCP (20 B) and the timestamp option (12 B).
 pub(crate) const MSS: u64 = 1_448;
-/// The write side's bound (ADR 0001:442): unsent plus unacknowledged bytes.
+/// The same without the timestamp option (a peer that does not offer it, as Windows does by default).
+const MSS_NO_TS: u64 = 1_460;
+/// The write side's bound (ADR 0001:1467, the Profiles key of part 13): unsent plus unacknowledged bytes.
 pub(crate) const WRITE_BUDGET: u64 = 64 * 1024;
 const INIT_CWND: u64 = 10;
 const RTO_MIN_US: i64 = 200_000;
 const RTO_MAX_US: u64 = 120_000_000;
 const RTO_INIT_US: u64 = 1_000_000;
+/// TCP_TIMEOUT_FALLBACK (include/net/tcp.h:151): the RTO after a handshake that gave no RTT sample.
+const RTO_FALLBACK_US: u64 = 3_000_000;
+/// The timestamp option's clock (TCP_TS_HZ = 1,000: whole milliseconds).
+const TS_TICK_NS: u64 = 1_000_000;
 const DELACK_NS: u64 = 40_000_000;
 const TIMEOUT_MIN_US: u64 = 2_000;
 const CUBIC_BETA: u64 = 717;
@@ -113,6 +131,9 @@ pub(crate) struct TcpConfig {
     pub thin_linear_timeouts: bool,
     /// The minimum RTO (TCP_RTO_MIN, or a route's locked rto_min metric: include/net/tcp.h:741-748).
     pub rto_min_us: u64,
+    /// The timestamp option on the connection (tcp_timestamps = 1 on Linux, the default, when the peer offers it too):
+    /// TSecr RTT samples and a 1,448 B MSS; without it 1,460 B and Karn's rule alone.
+    pub timestamps: bool,
 }
 
 impl Default for TcpConfig {
@@ -122,20 +143,25 @@ impl Default for TcpConfig {
             write_budget: WRITE_BUDGET,
             thin_linear_timeouts: false,
             rto_min_us: RTO_MIN_US.unsigned_abs(),
+            timestamps: true,
         }
     }
 }
 
 /// A connection's three-way handshake (for the client's reconnect attempts): the client's SYN, retried at a linear
 /// 1 s for its first 4 tries (tcp_syn_linear_timeouts) and doubling after; the server's SYN-ACK, retried from 1 s,
-/// doubling, and at once on a repeated SYN; each end primed with the handshake's RTT unless it was resent (Karn).
+/// doubling per timer retry, and resent at once on a repeated SYN with the timer reset to the same step
+/// (tcp_check_req: reqsk_timeout counts timer retries only); each end primed with the handshake's RTT, through the
+/// timestamp echo if it resent (Karn).
 #[derive(Debug, Clone, Copy, Default)]
 struct Setup {
     syn_sent_ns: u64,
     syn_tries: u32,
     syn_timer: Option<u64>,
     synack_sent_ns: u64,
+    /// SYN-ACKs sent (1 + req->num_retrans), and the timer's retries among them (req->num_timeout).
     synack_tries: u32,
+    synack_timeouts: u32,
     synack_timer: Option<u64>,
     client_est: Option<u64>,
     server_est: Option<u64>,
@@ -202,6 +228,8 @@ struct Rtt {
     rttvar: i64,
     rtt_seq: u64,
     min_rtt: Option<u64>,
+    /// The handshake gave no sample: the RTO is 3 s until the first one (tcp_init_metrics).
+    fallback: bool,
 }
 
 impl Rtt {
@@ -213,8 +241,15 @@ impl Rtt {
         u64::try_from(self.srtt8 >> 3).unwrap_or(0)
     }
 
+    /// One valid sample, as tcp_ack_update_rtt applies it: the minimum RTT from `ca_us`, the estimator from `mrtt_us`.
+    fn sample(&mut self, mrtt_us: i64, ca_us: i64, snd_una: u64, snd_nxt: u64, rto_min_us: i64) {
+        let ca = u64::try_from(ca_us.max(1)).unwrap_or(1);
+        self.min_rtt = Some(self.min_rtt.map_or(ca, |old| old.min(ca)));
+        self.estimate(mrtt_us, snd_una, snd_nxt, rto_min_us);
+    }
+
     /// tcp_rtt_estimator (tcp_input.c:861-927), line for line.
-    fn sample(&mut self, mrtt_us: i64, snd_una: u64, snd_nxt: u64, rto_min_us: i64) {
+    fn estimate(&mut self, mrtt_us: i64, snd_una: u64, snd_nxt: u64, rto_min_us: i64) {
         let mut m = mrtt_us;
         if self.srtt8 != 0 {
             m -= self.srtt8 >> 3;
@@ -250,14 +285,17 @@ impl Rtt {
             self.rtt_seq = snd_nxt;
         }
         self.srtt8 = self.srtt8.max(1);
-        let m = u64::try_from(mrtt_us).unwrap_or(0);
-        self.min_rtt = Some(self.min_rtt.map_or(m, |old| old.min(m)));
     }
 
-    /// __tcp_set_rto and tcp_bound_rto: srtt + rttvar, at most 120 s; 1 s before the first sample.
+    /// __tcp_set_rto and tcp_bound_rto: srtt + rttvar, at most 120 s; 1 s before the first sample, 3 s after a
+    /// handshake without one.
     fn rto_us(&self) -> u64 {
         if !self.has() {
-            return RTO_INIT_US;
+            return if self.fallback {
+                RTO_FALLBACK_US
+            } else {
+                RTO_INIT_US
+            };
         }
         u64::try_from((self.srtt8 >> 3) + self.rttvar)
             .unwrap_or(RTO_MAX_US)
@@ -423,6 +461,10 @@ struct Receiver {
     unacked_segments: u32,
     ack_now: bool,
     delack_at: Option<u64>,
+    /// rcv_nxt as of this end's last transmission (tcp_select_window sets rcv_wup there).
+    rcv_wup: u64,
+    /// The timestamp to echo: from the last arrival whose sequence was at most rcv_wup (tcp_replace_ts_recent).
+    ts_recent: Option<u64>,
 }
 
 impl Receiver {
@@ -430,6 +472,7 @@ impl Receiver {
         Ack {
             cum: self.rcv_nxt,
             sacks: self.ooo.iter().map(|(&s, &e)| (s, e)).collect(),
+            tsecr: self.ts_recent,
         }
     }
 
@@ -487,14 +530,31 @@ enum Arrival {
 struct Ack {
     cum: u64,
     sacks: Vec<(u64, u64)>,
+    /// The echoed timestamp (TSecr), in the option's milliseconds; `None` before the receiver has one.
+    tsecr: Option<u64>,
 }
 
 #[derive(Debug, Clone)]
 struct Packet {
     arrival_ns: u64,
+    /// The sender's sequence: the data's start, or its snd_nxt for a packet without data.
+    seq: u64,
     data: Option<(u64, u64)>,
     ack: Ack,
     ctl: Ctl,
+    /// The timestamp option's value (TSval): the send time in whole milliseconds.
+    tsval: u64,
+}
+
+/// The timestamp option's clock at `ns`.
+fn ts_of(ns: u64) -> u64 {
+    ns / TS_TICK_NS
+}
+
+/// tcp_rtt_tsopt_us: the echo's RTT in microseconds, whole milliseconds and at least one.
+fn tsopt_rtt_us(now: u64, tsecr: u64) -> i64 {
+    let delta = ts_of(now).saturating_sub(tsecr).max(1);
+    i64::try_from(delta * (TS_TICK_NS / US)).unwrap_or(i64::MAX)
 }
 
 /// One end's sending path: its fate stream and its first-in, first-out queue (arrivals never decrease).
@@ -520,6 +580,9 @@ pub(crate) struct TcpModel {
     loss_ppm: u32,
     bursts: Vec<(u64, u64)>,
     write_budget: u64,
+    /// The timestamp option (TcpConfig.timestamps) and the segment size it leaves.
+    timestamps: bool,
+    mss: u64,
     ends: [End; 2],
     paths: [Path; 2],
     now: u64,
@@ -603,6 +666,8 @@ impl TcpModel {
             loss_ppm: profile.loss_ppm,
             bursts: profile.bursts_ns.clone(),
             write_budget: cfg.write_budget,
+            timestamps: cfg.timestamps,
+            mss: if cfg.timestamps { MSS } else { MSS_NO_TS },
             ends: [end(), end()],
             paths: [path(0), path(1)],
             now: 0,
@@ -709,18 +774,22 @@ impl TcpModel {
     }
 
     /// The handshake's packets and timers (Setup's rules).
-    fn on_ctl(&mut self, to: usize, ctl: Ctl, now: u64) {
+    fn on_ctl(&mut self, to: usize, pk: &Packet, now: u64) {
         let Some(mut s) = self.setup else {
             return;
         };
-        match (to, ctl) {
+        match (to, pk.ctl) {
             (0, Ctl::Syn) if s.server_est.is_none() => {
-                // A first SYN, or a repeated one: the SYN-ACK goes (again) at once.
                 if s.synack_tries == 0 {
+                    // The first SYN makes the request; every SYN-ACK echoes its timestamp (tcp_minisocks.c:678-716).
                     s.synack_sent_ns = now;
+                    if self.timestamps {
+                        self.ends[0].rcv.ts_recent = Some(pk.tsval);
+                    }
                 }
+                // A first SYN, or a repeated one: the SYN-ACK goes (again) at once, the timer at its current step.
                 s.synack_tries += 1;
-                s.synack_timer = Some(now + (RTO_INIT_US << (s.synack_tries - 1).min(7)) * US);
+                s.synack_timer = Some(now + (RTO_INIT_US << s.synack_timeouts.min(7)) * US);
                 self.setup = Some(s);
                 self.transmit_ctl(0, Ctl::SynAck, now);
             }
@@ -729,11 +798,19 @@ impl TcpModel {
                     s.client_est = Some(now);
                     s.syn_timer = None;
                     self.setup = Some(s);
-                    if s.syn_tries == 1 {
-                        let m = i64::try_from((now - s.syn_sent_ns) / US).unwrap_or(i64::MAX);
-                        let snd = &mut self.ends[1].snd;
-                        snd.rtt.sample(m, 0, 0, snd.rto_min_us);
+                    if self.timestamps {
+                        self.ends[1].rcv.ts_recent = Some(pk.tsval);
                     }
+                    // The SYN's own RTT if it went once; else, with timestamps, the SYN-ACK's echo (Karn).
+                    let sample = if s.syn_tries == 1 {
+                        Some(i64::try_from((now - s.syn_sent_ns) / US).unwrap_or(i64::MAX))
+                    } else if self.timestamps {
+                        pk.ack.tsecr.map(|e| tsopt_rtt_us(now, e))
+                    } else {
+                        None
+                    };
+                    // The client's SYN timer ran in Loss, so it has an undo marker (tcp_enter_loss).
+                    self.establish(1, sample, s.syn_tries - 1, true);
                 }
                 // The handshake's ACK (again, for a repeated SYN-ACK).
                 self.transmit(1, None, 0, now);
@@ -742,8 +819,8 @@ impl TcpModel {
         }
     }
 
-    /// Any other packet from the client completes the server's side of the handshake.
-    fn server_heard_client(&mut self, now: u64) {
+    /// Any other packet from the client completes the server's side of the handshake (tcp_synack_rtt_meas).
+    fn server_heard_client(&mut self, pk: &Packet, now: u64) {
         let Some(mut s) = self.setup else {
             return;
         };
@@ -751,11 +828,28 @@ impl TcpModel {
             s.server_est = Some(now);
             s.synack_timer = None;
             self.setup = Some(s);
-            if s.synack_tries == 1 {
-                let m = i64::try_from((now - s.synack_sent_ns) / US).unwrap_or(i64::MAX);
-                let snd = &mut self.ends[0].snd;
-                snd.rtt.sample(m, 0, 0, snd.rto_min_us);
-            }
+            let sample = if s.synack_tries == 1 {
+                Some(i64::try_from((now - s.synack_sent_ns) / US).unwrap_or(i64::MAX))
+            } else if self.timestamps {
+                pk.ack.tsecr.map(|e| tsopt_rtt_us(now, e))
+            } else {
+                None
+            };
+            // The child gets an undo marker only if the request's timer resent (tcp_minisocks.c:594-596).
+            self.establish(0, sample, s.synack_tries - 1, s.synack_timeouts > 0);
+        }
+    }
+
+    /// One end's handshake done (tcp_init_transfer, tcp_init_metrics): primed by `sample` (else the RTO falls back to
+    /// 3 s), and cwnd 1 after more than one resend when there is an undo marker.
+    fn establish(&mut self, end: usize, sample: Option<i64>, resends: u32, undo: bool) {
+        let snd = &mut self.ends[end].snd;
+        match sample {
+            Some(m) => snd.rtt.sample(m, m, 0, 0, snd.rto_min_us),
+            None => snd.rtt.fallback = true,
+        }
+        if resends > 1 && undo {
+            snd.cwnd = 1;
         }
     }
 
@@ -767,14 +861,25 @@ impl TcpModel {
                     return;
                 };
                 if pk.ctl != Ctl::None {
-                    self.on_ctl(to, pk.ctl, t);
+                    self.on_ctl(to, &pk, t);
                     return;
                 }
                 if to == 0 {
-                    self.server_heard_client(t);
+                    self.server_heard_client(&pk, t);
                 }
                 if !self.established(to) {
                     return;
+                }
+                // tcp_replace_ts_recent: an in-window arrival (tcp_sequence: its end not below rcv_wup) that starts at
+                // or below rcv_wup carries the timestamp to echo (PAWS-ordered).
+                let r = &mut self.ends[to].rcv;
+                let end = pk.data.map_or(pk.seq, |(_, e)| e);
+                if self.timestamps
+                    && pk.seq <= r.rcv_wup
+                    && end >= r.rcv_wup
+                    && r.ts_recent.is_none_or(|v| pk.tsval >= v)
+                {
+                    r.ts_recent = Some(pk.tsval);
                 }
                 self.on_ack(to, &pk.ack, t);
                 if let Some((s, e)) = pk.data {
@@ -799,7 +904,8 @@ impl TcpModel {
             Event::SynAckTimer => {
                 if let Some(mut s) = self.setup {
                     s.synack_tries += 1;
-                    s.synack_timer = Some(t + (RTO_INIT_US << (s.synack_tries - 1).min(7)) * US);
+                    s.synack_timeouts += 1;
+                    s.synack_timer = Some(t + (RTO_INIT_US << s.synack_timeouts.min(7)) * US);
                     self.setup = Some(s);
                     self.transmit_ctl(0, Ctl::SynAck, t);
                 }
@@ -849,10 +955,12 @@ impl TcpModel {
         now: u64,
     ) -> (u64, bool) {
         let ack = self.ends[end].rcv.ack();
+        let seq = data.map_or(self.ends[end].snd.snd_nxt, |(s, _)| s);
         let rcv = &mut self.ends[end].rcv;
         rcv.ack_now = false;
         rcv.delack_at = None;
         rcv.unacked_segments = 0;
+        rcv.rcv_wup = rcv.rcv_nxt;
         let mut w = [0u64; WORDS];
         for x in &mut w {
             *x = self.paths[end].rng.next_u64();
@@ -894,9 +1002,11 @@ impl TcpModel {
             path.last_arrival = arrival;
             path.queue.push_back(Packet {
                 arrival_ns: arrival,
+                seq,
                 data,
                 ack,
                 ctl,
+                tsval: ts_of(now),
             });
         }
         (arrival, lost)
@@ -946,7 +1056,7 @@ impl TcpModel {
     fn send_new(&mut self, e: usize, now: u64) {
         let s = &mut self.ends[e].snd;
         let start = s.snd_nxt;
-        let end = (start + MSS).min(s.write_seq);
+        let end = (start + self.mss).min(s.write_seq);
         s.snd_nxt = end;
         let (arrival, lost) = self.transmit(e, Some((start, end)), 1, now);
         let c = &mut self.ends[e].counters;
@@ -993,55 +1103,101 @@ impl TcpModel {
         }
     }
 
-    /// The acknowledgement in an arrival at `e`, for the data `e` sent.
+    /// The acknowledgement in an arrival at `e`, for the data `e` sent, in tcp_ack's order: the SACK scoreboard
+    /// (tcp_sacktag_write_queue), then the segments the cumulative point passes (tcp_clean_rtx_queue), then the RTT
+    /// sample (tcp_ack_update_rtt).
     fn on_ack(&mut self, e: usize, ack: &Ack, now: u64) {
+        let tsecr = ack.tsecr.filter(|_| self.timestamps);
         let s = &mut self.ends[e].snd;
         let prior_una = s.snd_una;
-        // (xmit, retrans, end) of every segment this acknowledgement newly delivers.
-        let mut delivered: Vec<(u64, bool, u64)> = Vec::new();
+        // (last transmission, ever resent, end) of each newly SACKed segment above the new cumulative point, in order.
+        let mut sacked_new: Vec<(u64, bool, u64)> = Vec::new();
+        for g in s.segs.iter_mut().filter(|g| !g.sacked && g.end > ack.cum) {
+            if ack.sacks.iter().any(|&(a, b)| a <= g.start && g.end <= b) {
+                g.sacked = true;
+                g.outstanding = false;
+                g.lost = false;
+                sacked_new.push((g.xmit_ns, g.retrans, g.end));
+            }
+        }
+        // The same for the segments delivered in order and not SACKed before; any of them ever resent rules out the
+        // sequence sample (FLAG_RETRANS_DATA_ACKED), which comes from the oldest never-resent one (first_ackt).
+        let mut cum_new: Vec<(u64, bool, u64)> = Vec::new();
+        let (mut any_acked, mut retrans_acked) = (false, false);
+        let (mut first_ackt, mut last_ackt) = (None, None);
         while s.segs.front().is_some_and(|g| g.end <= ack.cum) {
-            if let Some(g) = s.segs.pop_front()
-                && !g.sacked
-            {
-                delivered.push((g.xmit_ns, g.retrans, g.end));
+            let Some(g) = s.segs.pop_front() else {
+                break;
+            };
+            any_acked = true;
+            if g.retrans {
+                retrans_acked = true;
+            } else if !g.sacked {
+                first_ackt.get_or_insert(g.xmit_ns);
+                last_ackt = Some(g.xmit_ns);
+            }
+            if !g.sacked {
+                cum_new.push((g.xmit_ns, g.retrans, g.end));
             }
         }
         if ack.cum > s.snd_una {
             s.snd_una = ack.cum.min(s.snd_nxt);
             s.retransmits = 0;
         }
-        for g in s.segs.iter_mut().filter(|g| !g.sacked) {
-            if ack.sacks.iter().any(|&(a, b)| a <= g.start && g.end <= b) {
-                g.sacked = true;
-                g.outstanding = false;
-                g.lost = false;
-                delivered.push((g.xmit_ns, g.retrans, g.end));
-            }
-        }
-        if delivered.is_empty() && s.snd_una == prior_una {
+        if sacked_new.is_empty() && cum_new.is_empty() && s.snd_una == prior_una {
             return;
         }
-        // RTT: the newest newly delivered segment that was never resent (Karn).
-        if let Some(&(x, _, _)) = delivered.iter().filter(|d| !d.1).max_by_key(|d| (d.0, d.2)) {
-            let m = i64::try_from((now - x) / US).unwrap_or(i64::MAX);
-            s.rtt.sample(m, s.snd_una, s.snd_nxt, s.rto_min_us);
-            s.backoff = 0;
-        }
-        // RACK: the most recently sent delivered segment (tcp_rack_advance).
-        for &(x, retrans, end) in &delivered {
-            let rtt_us = (now - x) / US;
-            if retrans && s.rtt.min_rtt.is_some_and(|m| rtt_us < m) {
+        // RACK (tcp_rack_advance), with the minimum RTT as it was before this sample: SACKed segments first, then those
+        // delivered in order. A resent segment counts unless its RTT is below the minimum, or (in order, with
+        // timestamps) the echo predates its last transmission (tcp_skb_spurious_retrans). Every advance sets RACK's
+        // RTT; only a later send moves its reference.
+        let min_rtt = s.rtt.min_rtt;
+        let sacked_path = sacked_new.iter().map(|&d| (d, false));
+        let cum_path = cum_new.iter().map(|&d| (d, true));
+        for ((x, retrans, end), in_order) in sacked_path.chain(cum_path) {
+            if in_order && retrans && tsecr.is_some_and(|ts| ts < ts_of(x)) {
                 continue;
             }
-            if !s.rack.set || sent_after(x, s.rack.mstamp_ns, end, s.rack.end_seq) {
-                s.rack = Rack {
-                    set: true,
-                    rtt_us,
-                    mstamp_ns: x,
-                    end_seq: end,
-                };
+            let rtt_us = (now - x) / US;
+            if retrans && min_rtt.is_some_and(|m| rtt_us < m) {
+                continue;
             }
+            s.rack.rtt_us = rtt_us;
+            if !s.rack.set || sent_after(x, s.rack.mstamp_ns, end, s.rack.end_seq) {
+                s.rack.mstamp_ns = x;
+                s.rack.end_seq = end;
+            }
+            s.rack.set = true;
         }
+        // tcp_ack_update_rtt: the sequence sample, else the first never-resent SACKed segment's, else the echo when
+        // data was delivered in order; the minimum RTT from the newest (last_ackt, last_sackt, or the echo).
+        let us = |x: u64| i64::try_from((now - x) / US).unwrap_or(i64::MAX);
+        let (mut seq_rtt, mut ca_rtt) = (None, None);
+        if let (Some(f), Some(l)) = (first_ackt, last_ackt)
+            && !retrans_acked
+        {
+            seq_rtt = Some(us(f));
+            ca_rtt = Some(us(l));
+        }
+        let mut fresh_sacks = sacked_new.iter().filter(|d| !d.1).map(|d| d.0);
+        let sack_rtt = fresh_sacks.next().map(us);
+        if let Some(l) = sacked_new.iter().rev().find(|d| !d.1).map(|d| d.0) {
+            ca_rtt = Some(us(l));
+        }
+        let mut rtt = seq_rtt.or(sack_rtt);
+        if rtt.is_none()
+            && any_acked
+            && let Some(ts) = tsecr
+        {
+            let m = tsopt_rtt_us(now, ts);
+            rtt = Some(m);
+            ca_rtt = Some(m);
+        }
+        if let (Some(m), Some(ca)) = (rtt, ca_rtt) {
+            s.rtt.sample(m, ca, s.snd_una, s.snd_nxt, s.rto_min_us);
+            s.backoff = 0;
+        }
+        let delivered = sacked_new.len() + cum_new.len();
         if s.tlp_high_seq.is_some_and(|h| ack.cum > h) {
             s.tlp_high_seq = None;
         }
@@ -1050,7 +1206,7 @@ impl TcpModel {
         }
         // Slow start below ssthresh while cwnd-limited (tcp_cong_avoid's guard); growth above it is not modelled (S2).
         if s.cwnd < s.ssthresh && s.cwnd_limited() {
-            s.cwnd = (s.cwnd + delivered.len() as u64).min(s.ssthresh);
+            s.cwnd = (s.cwnd + delivered as u64).min(s.ssthresh);
         }
         s.validate_window();
         let reorder_armed = self.rack_mark_lost(e, now, true);
@@ -1113,6 +1269,7 @@ impl TcpModel {
     /// tcp_retransmit_timer.
     fn on_rto(&mut self, e: usize, now: u64) {
         let doubling = self.doubling_on();
+        let rack_on = self.rack_on();
         let s = &mut self.ends[e].snd;
         if s.segs.is_empty() {
             return;
@@ -1121,12 +1278,22 @@ impl TcpModel {
         if s.state == State::Open || (s.state == State::Loss && s.retransmits == 0) {
             s.cut_ssthresh();
         }
-        for g in s.segs.iter_mut().filter(|g| !g.sacked) {
+        // tcp_timeout_mark_lost: every segment but those sent within RACK's RTT (the head always), then cwnd = what is
+        // still in flight + 1 (tcp_input.c:2160-2168, :2194).
+        let rack_rtt_us = if s.rack.set && rack_on {
+            s.rack.rtt_us
+        } else {
+            0
+        };
+        for (i, g) in s.segs.iter_mut().enumerate().filter(|(_, g)| !g.sacked) {
+            if i > 0 && rack_rtt_us > (now - g.xmit_ns) / US {
+                continue;
+            }
             g.lost = true;
             g.outstanding = false;
             g.cause = Some(Repair::Timeout);
         }
-        s.cwnd = 1;
+        s.cwnd = s.in_flight() + 1;
         s.state = State::Loss;
         s.high_seq = s.snd_nxt;
         s.tlp_high_seq = None;

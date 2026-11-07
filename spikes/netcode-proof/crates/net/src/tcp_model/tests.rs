@@ -215,6 +215,12 @@ fn bite_no_doubling_fails_d() {
 /// budget is full) and the client one input a tick. Returns, from the link's return, the time to the in-order delivery
 /// of the first snapshot written at or after it, and to the first byte after it.
 fn burst_phase(seed: u64, burst_ns: u64, variant: Variant) -> (u64, u64) {
+    let (f, b, _) = burst_phase_model(seed, burst_ns, variant);
+    (f, b)
+}
+
+/// The same, also returning the connection at the phase's end (the diagnostic reads its log).
+fn burst_phase_model(seed: u64, burst_ns: u64, variant: Variant) -> (u64, u64, TcpModel) {
     let p = Profile::b1(&[burst_ns]);
     let mut m = TcpModel::new(&p, seed, 0).with_variant(variant, &p);
     let back = burst_ns + SEC;
@@ -270,6 +276,7 @@ fn burst_phase(seed: u64, burst_ns: u64, variant: Variant) -> (u64, u64) {
     (
         first_fresh.expect("a fresh snapshot arrives within 10 s"),
         first_byte.expect("a byte arrives within 10 s"),
+        m,
     )
 }
 
@@ -324,7 +331,7 @@ fn e_after_a_1_s_burst_at_p2_the_first_fresh_snapshot_arrives_within_the_swept_m
 }
 
 /// S13 (e)'s p50, p99 and maximum, in ns, at the commit that measured them (the docs PR cites it).
-const PINNED_E: (u64, u64, u64) = (708_012_721, 908_791_834, 2_248_720_188);
+const PINNED_E: (u64, u64, u64) = (736_507_852, 932_850_818, 3_170_535_056);
 
 /// A diagnostic (run by hand with --ignored --nocapture): the worst phases and what their transmissions did.
 #[test]
@@ -349,25 +356,9 @@ fn e_diagnose_the_worst_phases() {
         over(2 * SEC)
     );
     for &(rec, seed, burst) in all.iter().rev().take(3) {
-        let p = Profile::b1(&[burst]);
-        let mut m = TcpModel::new(&p, seed, 0);
-        let mut feeds = [
-            Feed {
-                end: 0,
-                size: SNAP,
-                next: TICK,
-                stop: burst + 4 * SEC,
-            },
-            Feed {
-                end: 1,
-                size: INPUT,
-                next: TICK + (seed * 7_919) % TICK,
-                stop: burst + 4 * SEC,
-            },
-        ];
-        run(&mut m, &mut feeds, burst + 5 * SEC);
+        let (_, _, m) = burst_phase_model(seed, burst, Variant::Faithful);
         println!(
-            "seed {seed}, burst at {} ms, recovery {} ms, {:?}",
+            "seed {seed}, burst at {} ms, recovery {} ms after the return, {:?}",
             burst / MS,
             rec / MS,
             m.counters(0)
@@ -375,11 +366,11 @@ fn e_diagnose_the_worst_phases() {
         for &(e, s, a, t, lost) in m
             .sent_log
             .iter()
-            .filter(|x| x.0 == 0 && x.2 > 1 && x.3 >= burst)
+            .filter(|x| x.0 == 0 && x.3 + 200 * MS >= burst)
         {
             println!(
-                "  end {e} seq {s} attempt {a} at +{} ms lost {lost}",
-                (t - burst) / MS
+                "  end {e} seq {s} attempt {a} at {:+} ms from the return, lost {lost}",
+                (t as i64 - (burst + SEC) as i64) / MS as i64
             );
         }
     }
