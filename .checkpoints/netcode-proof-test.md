@@ -422,6 +422,23 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **wf_f3167435-5b4 DONE** (about 15:10 UTC): U3b skeptic (u3-verify-u3b.md: pool starvable by one peer; slack stale
+  under the RT switch; slot_for before the size/bound checks; throttle toggle reorders; ApplicationClosed counted as
+  QUIC; accept loops unbounded (U6); SERIES text; 6 planted defects survive: bites needed); the advisor's docs-PR words
+  (advisor-ws-docs.md, written by the session from its output: 14 edits E-PR, E0-E12, rulings: 480 client-bursts,
+  NAME-L2PROBE approved, practice-run rules, a run-structured bound needed (F5: lineages and shared burst instants put a
+  correct build's single-burst median at risk), real message sizes (F6), bite ws-budget-x2); the netcode-architect's
+  record draft (ws-reconnect-record-draft.md, 565 lines; slice 3); the verifier (verify-ws-docs.md: the drafts predate
+  the 14:30 tolerance; Mustafa's check item 11 at 1697-1698; E7 too strong; E11 wrong policy; E0/E8 "unsent" for -31;
+  kernel cites tcp.c:630, :3842). 975e72b commits the model outputs under spikes/netcode-proof/results/u3-ws-fallback/.
+- **U3b fix build** (general-purpose, opus, xhigh, worktree) · launched about 15:25 UTC · the skeptic's fixes and
+  bites · notes inside its worktree (u3-build-u3b-fix.md; copy them over) · then copy files, check.mjs, gate, commit.
+- **Workflow `wf_abc2ef9b-8d4`** (npt-ws-docs-revise) · launched about 15:26 UTC · advisor revision with the 14:30
+  tolerance (returns notes_text: write it to advisor-ws-docs-r2.md), architect aligns the record, verifier
+  (verify-ws-docs-r2.md) · script:
+  /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-docs-revise-wf_abc2ef9b-8d4.js
+  · if cut: resume with resumeFromRunId "wf_abc2ef9b-8d4". **Then:** open the docs PR (claude/npt-readings from main
+  in .gate/npt-readings), needs-mustafa; the spike-branch changes after it merges.
 - **Mustafa decided** WS-SCOPE no, RESUME-CRED deferred, WS-BAR three-part (Decisions taken, 13:45 UTC). Since:
   bf9d248 ws_bar_fix1 (the model's bound for a correct fix-1 build at 480: "half within 0.67 s, at most 5 over 2.5 s,
   none over 6.9 s", correct 0.968, today and a 2x budget 0.000; 5 % slower 0.001: fragile, so the practice run
