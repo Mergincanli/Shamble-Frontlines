@@ -422,6 +422,26 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **Docs PR #45 OPEN** (about 19:15 UTC): https://github.com/Mergincanli/Shamble-Frontlines/pull/45, branch
+  claude/npt-readings at e290c97 (fast-forwarded from main 69ea88e; worktree .gate/npt-readings), label needs-mustafa,
+  subscribed. Content: the advisor's revision 2 (advisor-ws-docs-r2.md, 15 edits) with the second verifier's ADR-text
+  corrections (verify-ws-docs-r2.md: W21 target from the link's return; W19/W17 never looser than bound x slowdown, a
+  looser recomputed bound = a changed model to Mustafa; W20 readings marked; W24 risk; W12 record cites as on main);
+  applied by script (scratchpad docspr/apply.py, every old text matched once), only the 7 changed lines re-wrapped;
+  docs/design/ws-reconnect.md from the architect's aligned draft; REPO_MAP row, STATUS line; gate PASS --no-smoke,
+  repo-map OK. **Next for #45:** the advisor's review of its head (needed before Mustafa's go); Mustafa's go;
+  WS-RECONNECT-BAR (recommended (b), not blocking). **Spike-branch follow-ons** (advisor's plan_and_marks_changes in
+  advisor-ws-docs-r2.md, with the verifier's fixes): after #45 merges, merge origin/main and re-take -18/-31 row
+  hashes; marks.json -18 split (parts by params.transport, the three WebSocket checks, count >= 480, bites
+  no-fallback on WT parts only, ws-budget-x2 on WS; W6: a bite run is held against the measured build's in-tolerance
+  practice run and uses its factor, no own practice run, with a judge fixture); the ws-practice validity rule (W23:
+  fewer than 480 records = beyond, investigated); SERIES.md (burst_heal = first snapshot written at or after the
+  return; event.burst_return with offset, tick phase, unacknowledged bytes, srtt, per-tick sizes); plan §6.2/§7.2 R3
+  (+0.4 h), R3's run plan (burst offsets 0-1 tick, RS kernel + CONFIG_HZ); fixes.rs's run-structured bound (48 x 10
+  lineages, shared instants, tick offsets, per-tick snapshot sizes and message splits, W18; needs the scene's sizes);
+  U3c (DelayStream exposes srtt and outstanding; fix 1 in WsServer with the model's other write conditions, W22;
+  mechanism tests: formula table and properties); a report line for the time until extra delay is back under 250 ms
+  (W15).
 - **About 18:35 UTC (after the spend limit reset):** CI green on 7321cc0. The commit security review of 7321cc0 did not
   complete (HTTP 429; /root/.claude/security/log.txt); a later push re-checks. wf_abc2ef9b-8d4's advisor revision
   finished before the limit: saved as **advisor-ws-docs-r2.md** (15 edits incl. E13 for check item 11; the 10 % tolerance
