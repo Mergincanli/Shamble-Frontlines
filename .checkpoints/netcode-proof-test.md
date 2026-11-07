@@ -422,6 +422,37 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c build workflow `wf_87550c07-bbd`** (npt-u3c-build), launched about 20:03 UTC on ebe82b2.
+  - Two build agents (general-purpose, xhigh, isolated worktrees under .claude/worktrees/), each followed by a
+    test-engineer completeness critic.
+  - **A**: DelayStream, the fix-1 gate and writer, mechanism tests (a)-(e), SERIES rows, fixes.rs leftovers, and the
+    kernel cross-check script (not run). CARGO_TARGET_DIR .gate/u3v3-harness-check-target.
+  - **B**: npt-tcpinfo, the check.mjs deps checks, and the C12e root-run script (not run). CARGO_TARGET_DIR
+    .gate/u3v3-model-target.
+  - Notes inside each worktree: .checkpoints/netcode-proof-test/u3c-build-{a,b}.md (copy them over). Critics' notes in
+    the main folder: u3c-critic-{a,b}.md.
+  - Script:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3c-build-wf_87550c07-bbd.js
+  - If cut: Workflow({scriptPath, resumeFromRunId: "wf_87550c07-bbd"}).
+  - **After it:** merge B then A by hand (both touch the workspace and npt-net Cargo.toml), check.mjs 9/9 and the gate
+    after each, commit. Then the evidence runs by the main session, one at a time with loopback quiet: the kernel
+    cross-check, the C12e root run, and lateness at P2 with C10's trigger. Then the skeptic round.
+  - **Meanwhile the main session writes the plan text** (u3c-plan.md 1.9; committed before any code merges).
+- **Plan rev 2** (ebe82b2): the advisor's APPROVE with C1-C16 folded in. R20 (a) is granted by the advisor under ADR
+  0002:264-265 (no escalation). Carries to U6 are in 1.10.
+- **The deletion of stale .gate build folders was refused** by the permission check (about 20:00 UTC). Not retried;
+  the old folders are reused as build dirs. Disk 7.1 GB free at 20:00.
+- **The flaky loopback P2 test, measured** (40 runs per route, an instrumented throwaway worktree .gate/flaky-wt,
+  log .gate/flaky-runs.log):
+  - 1 failure in 80: wtq up 178. The client's quinn sent 200 DATAGRAM frames, ImpairSocket lost exactly 7 up packets
+    with no other drops, and the server's quinn received 178 (the app got all 178). So 22 datagrams rode in 7 packets.
+  - Cause: P2's +-10 ms independent jitter at the test's 5 ms spacing reorders packets. quinn's packet-threshold loss
+    detection then declares 13-23 % of its packets lost (26-51 per run against 6-8 real), with 12-27 congestion events
+    in about 1 s. cwnd falls to about 2.9-4.6 KB, datagrams queue and are packed several per packet, and one real loss
+    takes many datagrams.
+  - The 30 Hz pacing experiment (.gate/flaky-runs-30hz.log) is running. **Next:** the advisor rules on the fix (pace
+    the test at the tick, 33.3 ms), plus the finding for U6's C6: a FullState or any burst of 4 or more back-to-back
+    packets at P2+ meets the same spurious losses under ImpairSocket's independent per-packet jitter.
 - **Docs PR #45: the advisor APPROVED head 6ae357111887849f30fc74a619b8bef7fb4f02f7** (about 19:45 UTC; notes
   advisor-pr45.md N1-N11). History:
   - Its review of e290c97 was REVISE: E1's "the bound times the measured slowdown, itself at most 1.10" read as a 1.10
