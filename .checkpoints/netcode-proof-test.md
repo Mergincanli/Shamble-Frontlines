@@ -401,6 +401,21 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **Waiting on Mustafa:** WS-SCOPE (recommended (b): fix 1 only in the proof test, the reconnect with slice 2),
+  RESUME-CRED (defer under (b); else the session-id reading), WS-BAR (recommended: the form now, numbers after an
+  unjudged L2 calibration run). Sent about 11:45 UTC 2026-11-07. His Windows TCP settings: recorded in "Facts".
+- **Done meanwhile:** a0d7916 plan §4.7 lists `L2Config` (M6, before the code); 709e44a the round-3 clean-ups (rto_ns
+  capped per doubling; recovery_ends_with_cwnd_at_ssthresh documented as a property; S11 additions incl. CONFIG_HZ to
+  record; censored count in the tail; plan.md:297 cite). check.mjs 9/9. Deferred (move no number): rule tests for the
+  retrans_out leak, the partial and D-SACK undos, reord_seen, the stuck L|R path; pins for the bite rows; the seed-1475
+  story's leak (5,115 without it); the lineage/tail tables' stale round-2 bar (after WS-BAR); RS's kernel and
+  CONFIG_HZ recorded at R1 against the "linux-6.8-tcp v3" header.
+- **U3b build** (general-purpose agent, opus, xhigh, isolated worktree under .claude/worktrees/) · launched about
+  12:00 UTC · ImpairSocket and L2Config per u3-build-plan.md U3b and M1-M5, M9-M15, M19 (M7/M8 for its test servers),
+  loopback tests with both WebTransport crates, 10,000 dgram/s per direction, SERIES.md rows · notes inside its
+  worktree (.checkpoints/netcode-proof-test/u3-build-u3b.md; copy them over) · returns its worktree path, uncommitted.
+  If cut: SendMessage the same agent after the reset. **After it:** review the diff, copy files over (spikes/ equal to
+  its base first), check.mjs, gate, commit, then a skeptic round on U3b.
 - **Third skeptic round DONE** (wf_fed73d64-ec0; notes u3-verify3-{model,harness,stats}.md, 1.09 M subagent tokens):
   MODEL confirmed faithful to Linux 6.8 line by line (6.12's undo changes: identical rows; CONFIG_HZ 1,000 unmeasured:
   record RS's kernel and HZ on run day); p50 rise 435 -> 654 is Linux's own (post-burst undo clears the loss marks, a
