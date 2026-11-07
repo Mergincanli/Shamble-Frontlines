@@ -47,6 +47,11 @@ error reports and telemetry from the first playtests) waited for the kit freeze:
 netcode proof test was under way (Mustafa, 2026-11-05), and his A4-FREEZE (a) of 2026-11-05 held A4 to that. His
 UNDER-WAY (a) of 2026-11-06 puts that point at the netcode plan's approval plus its first build step committed; the
 netcode session records both done (U0, f6886bf, 09:40 UTC) in its PR #40, so the freeze has lifted.
+**The WebSocket fallback (Mustafa, 2026-11-07):** the netcode proof test measures the send budget alone (the newest
+snapshot only, about 1.5 round trips of snapshots, ADR 0001 part 10); the client's fast reconnect is a requirement for
+the real client, built and measured before the first online playtest against the model's target (ADR 0001 OQ-0001-19,
+`docs/design/ws-reconnect.md`), RESUME-CRED deferred with it; PM-0001-18's WebSocket bar takes the three-part form,
+its numbers from the model's bound and one practice run with a 10 % tolerance fixed before it.
 **Next (v2):** the netcode proof test, its own change-set, branched from main, plan first (no longer waiting on PR
 #33). Wave 1 runs
 one heavy spike at a time: the netcode proof test, the sim core spike (then the 60 Hz run), the boundary spike, the look
