@@ -294,7 +294,7 @@ legs run there anyway (SPIKE_PLAN:59-60). His PC stays for what he judges in Bra
 - **Out of scope:**
   - the 60 Hz group (PM-0001-39, -40, -63; SPIKE_PLAN:206-248);
   - the look;
-  - a lobby, real join tokens, reconnecting, private rooms and economy (ADR 0001:1613-1618);
+  - a lobby, real join tokens, reconnecting, private rooms and economy (ADR 0001:1640-1641);
   - a CI job for `spikes/` (R-8);
   - any legacy file.
 - **Left to the boundary spike** (engine EA-5; SPIKE_PLAN:252-279; ADR 0002:1149-1175). The harness must not pre-empt

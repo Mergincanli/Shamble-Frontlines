@@ -65,7 +65,9 @@
 //!   idle (both act only above the initial window), the receive window and the persist timer (the 64 KB write budget
 //!   stays inside it), SACK reneging, TSO and GSO, ECN, the per-destination metrics cache, the rate limit on answers
 //!   to repeated SYNs and to old data-less packets, the delayed-ACK filter of the minimum RTT, jiffy rounding of the
-//!   timers (Cubic's own clock runs at HZ = 1,000).
+//!   timers (Cubic's own clock runs at HZ = 1,000: RS's CONFIG_HZ is recorded on the run day), the merging of small
+//!   segments when they are resent (tcp_retrans_try_collapse; only the client's inputs are that small), and a
+//!   D-SACK counted twice against undo_retrans in one sacktag ordering (the model counts it once: slightly slower).
 
 use npt_l1::Profile;
 use rand_chacha::ChaCha8Rng;
@@ -715,8 +717,14 @@ impl Sender {
         if let Some(f) = self.fixed_rto_ns {
             return f;
         }
+        // Each doubling is capped at TCP_RTO_MAX (tcp_timer.c:655), so the product never wraps: min(base << backoff,
+        // RTO_MAX) without forming an overflowing shift (the third skeptic round's latent finding).
         let base = self.rtt.rto_us();
-        let backed = base.checked_shl(self.backoff).unwrap_or(RTO_MAX_US);
+        let backed = if self.backoff >= 64 || base > (RTO_MAX_US >> self.backoff) {
+            RTO_MAX_US
+        } else {
+            base << self.backoff
+        };
         backed.min(RTO_MAX_US) * US
     }
 

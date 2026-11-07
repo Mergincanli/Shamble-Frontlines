@@ -1804,6 +1804,10 @@ fn ws_limit_tail() {
             }
         }
     }
+    println!(
+        "phases censored at 60 s after the return (counted over every bar): {}",
+        CENSORED.load(Ordering::Relaxed)
+    );
 }
 
 /// FNV-1a over the values' little-endian bytes.

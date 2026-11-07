@@ -1055,8 +1055,10 @@ fn after_one_loss(v: Variant) -> (u64, u64, State, u64) {
     (s.cwnd, s.ssthresh, s.state, m.counters(0).repairs_rack)
 }
 
-/// tcp_fastretrans_alert's Recovery exit (tcp_input.c:3036-3043) and tcp_end_cwnd_reduction (:2689-2703): a recovery
-/// not undone ends with cwnd = ssthresh = max(0.7 x 10, 2); an app-limited flow never grows it back (S2).
+/// A property, not the rule's test: a recovery not undone ends with cwnd = ssthresh = max(0.7 x 10, 2), and an
+/// app-limited flow never grows it back (S2). In this run PRR (tcp_cwnd_reduction) already leaves cwnd at ssthresh,
+/// so the NoExitCwnd bite passes here too (the third skeptic round); tcp_end_cwnd_reduction (tcp_input.c:2689-2703)
+/// is pinned by `recovery_exit` and its bite below.
 #[test]
 fn recovery_ends_with_cwnd_at_ssthresh() {
     assert_eq!(after_one_loss(Variant::Faithful), (7, 7, State::Open, 1));
