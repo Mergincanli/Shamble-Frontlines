@@ -14,4 +14,12 @@
 - **Done:** step 0, the sources saved (bbf2822); draft PR #44 opened and subscribed; the facts (`facts.md`, 23b9543,
   §0-§8, with 12 tensions between his A4 words and today's text); plan revision 1 (`plan-rev1.md`): parts A-F, seven
   decisions (TIER0-SCOPE for Mustafa; T0-MERGE, DOCS-RIDE, SCALE-HOME, REVERT-EXCEPTION for the advisor).
-- **Current step:** 1, the advisor's review of plan revision 1.
+- **Done:** step 1, the advisor's review (`advisor-plan-rev1.md`): APPROVE WITH CONDITIONS (13), two escalations
+  to Mustafa: TIER0-SCOPE (recommend (a): tier 0 = docs that record no decision of his) and REVERT-EXCEPTION
+  (recommend (a): a pure revert needs no plan, day sessions only). Rulings: T0-MERGE (a) the PR Advisor's pinned
+  merge; DOCS-RIDE (a) (split F and D into their own PR if the kit sitting can't happen the same day); SCALE-HOME (a).
+  The docs parts (F, then D) may start now; the kit sitting writes no tier-0 line before TIER0-SCOPE and no revert
+  exception before REVERT-EXCEPTION. Conditions C1-C13 in the verdict file (C13: E3 runs the three kit test files,
+  `.claude/hooks/routine-guard.test.mjs`, `.claude/hooks/settings.test.mjs`, `.claude/scripts/checkpoint.test.mjs`).
+- **Current step:** 2, the docs parts F then D (conditions C10, C11, C12), while TIER0-SCOPE and REVERT-EXCEPTION
+  wait on Mustafa.
