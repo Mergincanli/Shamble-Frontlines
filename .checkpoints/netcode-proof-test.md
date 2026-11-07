@@ -401,7 +401,31 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **Merged v3 = 1e020a7 (pushed)**: model v3 + harness v3 copied whole from the two worktrees (spikes/ equal to
+- **Third skeptic round DONE** (wf_fed73d64-ec0; notes u3-verify3-{model,harness,stats}.md, 1.09 M subagent tokens):
+  MODEL confirmed faithful to Linux 6.8 line by line (6.12's undo changes: identical rows; CONFIG_HZ 1,000 unmeasured:
+  record RS's kernel and HZ on run day); p50 rise 435 -> 654 is Linux's own (post-burst undo clears the loss marks, a
+  1.3 s TSecr sample delays the probe, recovery from cwnd 1; undo off: 509/828); max 4,196 a single tail draw (next
+  3,766/3,375/3,013). Minor: recovery_ends_with_cwnd_at_ssthresh's bite does not bite; no rule tests for the leak,
+  partial/D-SACK undo, reord_seen, the stuck L|R path; rto_ns shift overflow (unreachable); seed 1475's story omits the
+  leak (5,115 without it). HARNESS: all as documented; browser models match sources; but "never abandoned" is tuned to
+  B1's 1 s burst: at 0.6/1.5/2.5 s bursts an abort at max(500 ms, 4 x RTT) + JOIN-OR-CLOSE (at the 101, Join only if
+  the old connection is still silent, else close with no Join) wins (p99 1,135 vs 1,270; 1,378 vs 1,632; 1,463 vs
+  2,466; over 1.5 s at 1.5 s bursts 35 vs 613 per 20,000), costs +70-90 ms p99 at P2 1 s; join-or-close removes
+  Chromium's throttle ratchet (H6's pre-101 close counts as a failure). L2 cannot measure the reconnect as planned
+  (impair below TCP or model new connections' handshakes; LG runs the browser policy; Windows-like LG clients; per-
+  address limits). Without the reconnect the WS bar is fix 1 alone's (p99 2,164, max 11,384; no-TS 2,035/12,550).
+  STATS: joint DP exact; bootstrap = sampling noise only; the searched bars sit at the grid's edge (overfit); the
+  median part has 46 ms (7 %) margin: x1.07 -> 0.505, +45 ms -> ~0.5; tail parts survive +/-20 %; a trigger twice too
+  slow passes 0.98; real runs are not independent (20 s = 600 ticks: same tick phase every burst; spread bursts by a
+  random 0-33 ms); use tail parts + mechanism checks (budget formula, trigger; per-burst L2 series: bytes outstanding
+  at the return, silence before each attempt), a median part midway between correct and the nearest broken build
+  (e.g. ~0.75 s), and an unjudged L2 calibration run before freezing any number; the lineage/tail tables still print
+  round 2's stale bar; pin only covers the recommended row. marks.json/npt-judge can express a three-part bar
+  (p50, count with where, max) on a part selected by params.transport 'ws', plus count >= 480.
+  **Next:** WS-SCOPE (recommend now: fix 1 in the proof test, the reconnect designed and measured with slice 2),
+  RESUME-CRED (defer with slice 2 under that choice), WS-BAR (form + calibration) back to Mustafa; follow-ups after
+  his answer: stale bars in the lineage/tail tables, the non-biting test, more pins, rto_ns guard, plan.md:297 cite.
+- (done) **Merged v3 = 1e020a7 (pushed)**: model v3 + harness v3 copied whole from the two worktrees (spikes/ equal to
   72e6fab first), Windows-like client wired (client_cfg), phases censored at 60 s (none were), pin re-set
   (0x52e7_b772_29d8_5ebb, [467,77,32,10], [5998,3999,946,1056]); check.mjs 9/9 (146/151 tests), gate PASS
   `--no-smoke`. Tables: .gate/netcode-proof-test/u3v3-tables1.txt. **600,000 phases:** recommended 654/1,051/1,859/
