@@ -173,6 +173,22 @@
     test is still true at that grain).
 
 ## Current step
+37. **Both skeptics done (workflow wf_b08132f7-b1c); model and harness corrected** · **cc72f6f** (pushed) · notes
+    `u3-verify-fixes-model.md` (B1-B11, D1-D10), `u3-verify-fixes-adr.md`, plan `u3a-fix-plan.md`. Model v2: Linux's
+    RTT sampling (FLAG_RETRANS_DATA_ACKED, first_ackt, SACK, TSecr), the timestamp option (ts_recent at rcv_wup; off =
+    Windows peer, MSS 1,460), RACK rtt on every advance, RTO marking with RACK's window and cwnd = in flight + 1,
+    handshake fixes. Harness: browser lock (one attempt at a time per endpoint, freed 10 ms after the 101), trigger from
+    the client's input-echo RTT, writes and Joins on the tick, "decodes deltas again" (first delta after a full state),
+    6 sets x 1,000 phases, a 60,000-phase tail with a run's pass chance (480 client-bursts). check.mjs 9/9, gate PASS
+    `--no-smoke` (the container's Chromium is 1243, tools' Playwright wants 1194). **Numbers (ms, 60,000 phases):**
+    today (64 KB, defaults) 6,000: 746/947/3,170; fix 1 alone p50 435, p99 664, p99.9 1,552, max 5,106 (82 over 1.5 s);
+    **fix 1 + one-endpoint reconnect, never abandoned: p99 659, p99.9 1,025, p99.99 1,363, max 1,685 (63 over 1 s, 2
+    over 1.5 s); pinned 6,000: 437/665/1,318**; abort at 1 s: 660/1,028/1,691; two endpoints: 637/880/1,918; no
+    timestamps (Windows) about the same. **Run pass chance (480 client-bursts), recommended: Mustafa's (0.8 s, 1.0 s)
+    0.56; (0.8, 1.5) 0.91; (1.0, 1.5) 0.984; (1.0, 2.0) 1.000.** Fix 1 alone: (1.0, 1.5) 0.38, (1.0, 2.0) 0.69.
+    Side effects (never abandoned, 30 min per profile): skipped 4/20/74/116 per mille at P1-P4; false reconnects 0, 0,
+    11, 18 (0, 0, 0.37, 0.6 a minute). **Next:** second skeptic round on cc72f6f (model + harness/statistics), then
+    WS-FIX, RESUME-CRED, WS-LIMIT back to Mustafa (his rule: a skeptic changed a number and found conflicts).
 36. **The fallback's three fixes, measured** · **41bd8a0** (pushed) · TcpConfig (budget, thin linear timeouts,
     rto_min), the handshake for reconnects, `fixes.rs` (1,000 B1 phases per configuration). Results (p50/p99/max ms):
     defaults 708/913/2,248; 3-snapshot budget alone 314/1,415/4,203; + thin LT 314/570/995 (but 33-65 % of snapshots
