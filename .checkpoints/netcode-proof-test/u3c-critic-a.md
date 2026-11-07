@@ -30,3 +30,17 @@ uncommitted. Plan: u3c-plan.md rev 2, scope 1.1-1.5, 1.7, 1.11, 1.6's script; C1
 - tcp_model.rs: add_burst refuses start < now and len 0, prunes ended, MAX_BURSTS 64. bursts() doc says "not yet ended"
   but list is only pruned on add (doc drift, minor). with_loss_from cfg(test) zeroes the drawn loss only.
 - delay.rs wrap converts profile bursts from DelayStream's clock to model axis (delay.rs:554-568). OK.
+- Loops: measured lib suite alone 6/6 + 8/8 pass (19.45 s each); bites binary 2 copies x 3 rounds pass; measured
+  binary 3 copies at once x 3 rounds: 1 FAIL of 9 -> a SECOND flaky test:
+  l2::delay::tests::a_replay_on_a_pure_model_gives_the_same_counters_and_stamps panicked at delay_tests.rs:944:9
+  "dir 0": the pure model released 5 more down records (85,848..89,936 B at model 2,969,294,719 ns) than DelayStream's
+  logged releases. ROOT CAUSE (from the code): the test reads ds.logs() (delay_tests.rs:901), ds.model_state() (:902)
+  and ds.model_now() (:903) in three separate locks; each goes through current() (delay.rs:704-719), which steps the
+  model to now while the pump is alive (pump_done false). The pure model is stepped to end_t = the LAST read (T3) but
+  compared with the releases logged at the FIRST read (T1): any delivery between T1 and T3 differs. Alone the pump has
+  usually ended first (client dropped -> S write BrokenPipe -> pump_done -> no stepping), so it passes; under load the
+  pump outlives T1. Timing-dependent test = defect (C16: real-time tests judged on identities; this identity is read
+  non-atomically). Fix: one locked snapshot (logs + counters + delivered + now) or wait for pump_done before reading.
+- The burst test (check run 1's failure) has the same two-read shape (model_state() at :871 then sent_log() at :873).
+  My analysis says a step between them can't add an inside-burst transmission (T1 >> e), so its failure cause is
+  still unknown; stress loop running to catch the message.
