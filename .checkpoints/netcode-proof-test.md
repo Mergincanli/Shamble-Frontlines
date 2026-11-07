@@ -475,6 +475,22 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **RESUME HERE (Mustafa at 96 % usage, about 20:52 UTC):**
+  - **PR #45 MERGED** at 626df67 (merge commit, expected head 6ae3571) on Mustafa's go: "merge $45", read as #45.
+  - **Next on the spike branch** (advisor-ws-docs-r2.md ORDER (3)): merge origin/main into it, and in the same commit
+    re-take PM-0001-18's and PM-0001-31's row hashes in marks.json and move drafts_commit to 626df67's full SHA;
+    check.mjs 9/9. Then the -18 marks.json split and the SERIES rows.
+  - **The U3c build agents' work-in-progress is snapshotted** in .checkpoints/netcode-proof-test/wip/:
+    - wf_87550c07-bbd-1.patch is build A, 267 KB on base ebe82b2;
+    - wf_87550c07-bbd-2.patch is build B, 106 KB on base ebe82b2;
+    - their notes are copied: u3c-build-a.md, u3c-build-b.md, plus B's u3c-build-b-bites.py and
+      u3c-build-b-dryrun.txt.
+  - **If the session is cut:**
+    - Resume the workflow with Workflow({scriptPath, resumeFromRunId: "wf_87550c07-bbd"}). The worktrees under
+      .claude/worktrees/wf_87550c07-bbd-1 and -2 keep their state while the container lives. A resumed agent that
+      starts fresh should first `git apply` its patch at ebe82b2 and continue after its notes' last Progress line.
+    - If the container is gone, apply each patch in a new worktree at ebe82b2 and continue from the notes.
+    - The snapshot script is scratchpad/snapshot_wip.py: re-run it before any further cut.
 - **U3c build workflow `wf_87550c07-bbd`** (npt-u3c-build), launched about 20:03 UTC on ebe82b2.
   - Two build agents (general-purpose, xhigh, isolated worktrees under .claude/worktrees/), each followed by a
     test-engineer completeness critic.
