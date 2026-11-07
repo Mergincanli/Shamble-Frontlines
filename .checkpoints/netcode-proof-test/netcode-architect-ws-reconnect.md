@@ -267,3 +267,65 @@ tracked file; no commit; git from inside the folder, never -C).
 - W14 E6's "Decider" names Mustafa for the credential and the target if the policy misses; the record's §4.2 "Who
   decides" said "Mustafa, in the reconnect work, with security-auditor's review"; aligned to E6: Mustafa (the
   credential, the target if missed), netcode-architect with security-auditor (the design), the Advisor confirming.
+
+## Revision 2, resumed (2026-11-07 18:34 UTC, after the usage limit)
+State found: the draft already carries revision 2's blocks (header pins, §0, §1.1 with both sets of words and the
+fix-1 sentence, §2.3, §3.7, §5.1/§5.2, §6.1, §6.4, §6.5, §7, §8; committed by the autosave at d06639a/6a1a505); this
+notes block had findings W1-W14 but no result and no DONE. Working copies of both files equal HEAD 6a1a505.
+
+### Plan (resumed)
+R1. Check the draft against the advisor's final revision-2 words (the computed task's E-PR, E0-E13, R1-R21) item by
+    item, E11 (1)-(11) above all; list what is still missing.
+R2. Self-check every cite still unchecked in this revision: the `.checkpoints/` lines at 95a04a1; the committed
+    outputs' lines (tables, bar, README, patch); fixes.rs and tcp_model.rs lines at bf9d248; ADR 0001 lines in §5.
+R3. Fix what R1-R2 find, in place, with the Write tool (one whole-file write of the draft).
+R4. Line lengths <= 120 outside tables; then the result block and DONE here.
+
+### Findings (resumed, a line each)
+- X1 Pins at 95a04a1 re-read (`git show 95a04a1:...`): checkpoint :234-235, :337-346, :349-353 (gloss :353-356),
+  :357-362, :370-371, :391-392, :400-401, :417-418 all hold; verify-ws-docs.md :27 (V12), :38 (V23), :39 (V24) hold
+  (62c3440, which added it, is an ancestor of 95a04a1); plan.md :1016 and :1024-1025 hold. Each cited note's last
+  commit (10b1a53, 73f451d, d9e0036, 88856ea, 88856ea, 59baae1, plan.md 709e44a) equals §7's list and HEAD's copy.
+- X2 Committed outputs (975e72b, `git log -1 -- results/u3-ws-fallback`): README.md's table is :10-14, the reproduce
+  commands :12 (tables), :13 (bar), :14 (patch). W2's "README.md:9-13" and W3's "(README.md:13)" were one line off;
+  the draft already cites :10-14, :12, :13 and :14 correctly. tables :22-23, :44-45, :66, :69-72, :88, :92, :96, :98,
+  :100, :102, :104, :108, :110, :112, :114, :116, :120-131, :154 re-read: every number in Tables 1-2 and §2-§3 holds.
+  bar :7-16 hold (x1.05 0.001 and +20 ms 0.159 are the end of :11).
+- X3 fixes.rs at bf9d248 (= HEAD): :1-24, :30-42, :63-91, :164-169, :171-174, :194, :501, :584-605, :653-658,
+  :666-676, :684-700, :706-734, :736-790, :792-808, :1187-1263, :1276-1277, :1329-1333, :1528-1530, :1552, :1615,
+  :1626, :1682-1683, :1833-1858, :2000-2011 hold. Two cites slightly off: multi_burst_table is :1375-1381 (doc :1375,
+  fn :1379), the draft said :1374-1380 (§6.2 item 7, §6.5); BurstOut is :463-476, the draft said :463-479 (§6.3).
+- X4 tcp_model.rs: :1-10, :40-41 (S6, the tail-loss probe), :79 (MODEL), :210-213, :230-235, :2167-2177 hold;
+  SYN_LINEAR_TIMEOUTS is :106 with its doc at :105 (the draft cited :105 alone; widened to :105-106).
+- X5 Round-3 notes re-read at the cited lines: u3-verify3-harness.md :51-53 (throttle 1,059 vs 421 ms by argument
+  order), :79-81, :119-129, :177-179, :180-186, :187-195, :228-231, :242-248, :268-281, :286-290;
+  u3-verify3-model.md :158-169, :193-196, :200-216, :236-242; u3-verify3-stats.md :30-31, :133-147, :148-160,
+  :174-182, :241-243. All hold.
+- X6 ADR 0001 at 95a04a1 equals origin/main (`git diff --stat origin/main` empty). §5.1's anchors re-read: 424,
+  506-509, 747, 1249-1252, 1295, 1461-1469, 1556, 1571, 1673-1674, 1697-1700, 1734-1738, 1640-1641. All hold.
+- X7 GAP (E11 (4), "the 2 s Join deadline per attempt"): the record did not name it. ADR 0001:445-446: "`Join` within
+  2 s, counted from the TCP accept or the QUIC handshake's first packet, so TLS and the WebSocket upgrade fall inside
+  it". The harness does not model it (no deadline in fixes.rs: grep). The 600,000-phase maximum's trace: the
+  reconnect's SYN 3 completes at +1,254 ms, its first data's RTO is ~2.4 s from a ~1.1 s SYN-ACK sample, its
+  ClientHello is lost and resent at +3,754, takeover +4,111 (u3-verify3-model.md:205-208): about 2.5 s from the
+  connect to the Join, past the 2 s rule, so a room enforcing it would have closed that attempt. My reasoning, not a
+  run: the rule binds only when a handshake retry inflates the new connection's first RTO and a TLS or upgrade
+  segment is then lost (two 2 % losses on one takeover), so p99 is untouched and p99.9 and the maximum may move either
+  way. Added to §3.9 (fact plus the choice) and §8. Sure: medium.
+- X8 GAP (E11 (8), the trace): the record had no trace line. Added to the header: ADR 0001 part 10's need,
+  "VISION_V2 §6.1; §4 (four browsers)" (0001:473); VISION_V2.md:52 (Chrome, Edge, Firefox and Safari), :55 (fair up
+  to about 100 ms of ping), :63 (§6.1, modes as data with rooms and private matches).
+- X9 GAP (E11 (3)): §1.2's policy bullet lacked the 300 ms spacing of attempt starts (serial()'s cadence,
+  fixes.rs:1189-1196, the row :1236-1239) and the cancel and resume lines (:706-734, :736-790). Added.
+- X10 GAP (E11 (9)): the header named the branch for the outputs, not for the code; added the branch to the code
+  line, and a "model and harness" entry to §7.
+- X11 GAP (E6's "each browser engine"): §6.2 item 2 named Chromium-based browsers and Firefox only; VISION_V2 §4
+  names Safari too (WebKit, §8 item 5: not researched). Item 2 now names each engine §4's browsers run on.
+- X12 §6.4's "cannot show 99 % to better than about 2 %" tied to its number: 9 of 480 is 1.9 %.
+- X13 E11 (1)-(11) otherwise met by the draft as found: both sets of words verbatim with pins (§1.1); the target row
+  and Windows-like rows (§1.2, Table 2); parallel reference only (§3.2); RESUME-CRED readings (§4.1); measuring below
+  TCP (§6.1-§6.2); slice 3 and a miss to Mustafa (§0, §1.1, §5.1, §6.4); §2.3 points to PM-0001-18's row and quotes
+  only the first bound and its pass chances; sources pinned (§7); §5.1 marks every row this PR changes (424, 506-509,
+  OQ-0001-19 at 1250-1252, 747, 1295, 1462-1469, 1556, 1571, 1697-1699, 1737-1738, the register) and §5.2 the later
+  ones, 423 alone; §1.1's fix-1 sentence; §6.1's pinned cite; ws_bar_fix1 :2000-2011. No `.gate/`, `u3v3-`,
+  scratchpad or 803c6c1 cite is left (grep).
