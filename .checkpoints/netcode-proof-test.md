@@ -450,9 +450,16 @@
     detection then declares 13-23 % of its packets lost (26-51 per run against 6-8 real), with 12-27 congestion events
     in about 1 s. cwnd falls to about 2.9-4.6 KB, datagrams queue and are packed several per packet, and one real loss
     takes many datagrams.
-  - The 30 Hz pacing experiment (.gate/flaky-runs-30hz.log) is running. **Next:** the advisor rules on the fix (pace
-    the test at the tick, 33.3 ms), plus the finding for U6's C6: a FullState or any burst of 4 or more back-to-back
-    packets at P2+ meets the same spurious losses under ImpairSocket's independent per-packet jitter.
+  - At 33.3 ms spacing (the tick; .gate/flaky-runs-30hz.log): no failure in 43+ route-runs so far, up min 191, no
+    packing. quinn still reports 18-26 "lost" packets against 8-10 real, with 5-10 congestion events and cwnd at its
+    2,904 B floor (likely its time threshold with delayed ACKs and P2's RTT jitter).
+  - **Next:** the advisor rules on the fix: pace the P2 runs at TICK, keep >= 180, and assert app received == quinn's
+    frame_rx.datagram. Apply it after U3c's build A merges.
+  - **Finding for U6's C6**, and for -17 and -18 on WebTransport: ImpairSocket's independent per-packet jitter reorders
+    back-to-back packets. A FullState (about 45 packets back-to-back), or any burst of 4 or more packets at P2+, meets
+    quinn's packet threshold, and quinn's loss counter overstates real loss even at 30 Hz. Ask: record quinn's
+    lost_packets and congestion_events against ImpairSocket's real losses in C6, and is independent jitter for
+    back-to-back packets the intended model?
 - **Docs PR #45: the advisor APPROVED head 6ae357111887849f30fc74a619b8bef7fb4f02f7** (about 19:45 UTC; notes
   advisor-pr45.md N1-N11). History:
   - Its review of e290c97 was REVISE: E1's "the bound times the measured slowdown, itself at most 1.10" read as a 1.10
