@@ -400,6 +400,12 @@
   exact joint pass chances with intervals over 600,000 phases, three-part bars and bite rows, a hash pin · leaves a
   slot for the Windows SYN option. **After both:** apply both diffs to spikes/ (git diff | git apply, no merge),
   wire the SYN option, re-pin, run the tables, check.mjs, gate, commit, then a focused third skeptic round.
+- **Worker restart about 10:15 UTC stopped both builds.** Worktrees kept: `.claude/worktrees/agent-a79d7290e0e6a6e50`
+  (model: tcp_model.rs partly edited, notes inside the worktree, Progress empty) and
+  `.claude/worktrees/agent-a487e419ee806d37b` (harness: near the end, re-running the bar search). Both resumed about
+  10:20 UTC by SendMessage, told to mirror notes to the main folder. `.claude/worktrees/` is excluded locally in
+  .git/info/exclude (never committed). The guard refuses `git -C`: run git from inside each worktree. Saver
+  `bydoy9piu` started about 10:20 UTC (2 h limit).
 - (done) **Second skeptic round on cc72f6f** · workflow `wf_a8e0f590-0bc` (npt-ws-fixes-verify2; rust-reviewer on model v2,
   netcode-architect on the harness vs browsers and ADR 0001, test-engineer on the bar statistics; xhigh) · launched
   about 04:08 UTC 2026-11-07 · script:
