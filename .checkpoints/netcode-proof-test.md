@@ -389,7 +389,22 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **Model v3 build** (general-purpose agent, opus, xhigh, isolated worktree; tcp_model.rs + tests.rs only) · launched
+- **Merged v3 = 1e020a7 (pushed)**: model v3 + harness v3 copied whole from the two worktrees (spikes/ equal to
+  72e6fab first), Windows-like client wired (client_cfg), phases censored at 60 s (none were), pin re-set
+  (0x52e7_b772_29d8_5ebb, [467,77,32,10], [5998,3999,946,1056]); check.mjs 9/9 (146/151 tests), gate PASS
+  `--no-smoke`. Tables: .gate/netcode-proof-test/u3v3-tables1.txt. **600,000 phases:** recommended 654/1,051/1,859/
+  p99.99 2,092/max 4,196 (6,768/1,009/205 over 1/1.5/2 s); fix 1 alone 654/2,164/max 11,384; fix 3 alone 844/1,374/
+  max 5,343; today 1,121/2,686/max 12,068. Two-part (1.0,1.5) rec 0.227. Search, three-part: 480 "half within 0.7 s,
+  at most 6 over 1.3 s, none over 3.0 s" 0.997 [0.993-0.999], broken builds 0.000; 1,440 "half 0.7, at most 16 over
+  1.2, none over 3.0" 0.990. Windows-like 3 s SYN: never-abandoned no gain (p99 2,035), abort-500 robust (p99 903).
+  Multi-burst rec 10/30 bursts ~ single bursts (Cubic ends the ratchet); abort-500 Chromium 30 bursts throttle to 5 s.
+- **Third skeptic round on 1e020a7** · workflow `wf_fed73d64-ec0` (npt-ws-fixes-verify3; rust-reviewer model v3,
+  netcode-architect harness v3 + policy + ADR, test-engineer statistics + marks.json/npt-judge; xhigh) · launched
+  about 11:05 UTC · script:
+  `/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-ws-fixes-verify3-wf_fed73d64-ec0.js`
+  · notes `u3-verify3-{model,harness,stats}.md` · if cut: Workflow({scriptPath, resumeFromRunId: "wf_fed73d64-ec0"}),
+  editing a cut agent's prompt to continue after its notes' last block first. Then: fold, final numbers to Mustafa.
+- (done) **Model v3 build** (general-purpose agent, opus, xhigh, isolated worktree; tcp_model.rs + tests.rs only) · launched
   about 05:45 UTC 2026-11-07 · notes `u3-build-v3-model.md` (ends DONE) · G1 discard, D-SACK, the undo machinery,
   F-RTO 2b/3a/3b, Disorder, Recovery-exit cwnd, PRR if faithful, Cubic, G2, a client SYN-timer knob, rule tests,
   S13 (d) without timestamps, PINNED_E re-pinned · returns its worktree path (uncommitted). If cut: SendMessage the
