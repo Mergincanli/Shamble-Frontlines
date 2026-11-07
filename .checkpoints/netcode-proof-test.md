@@ -406,6 +406,15 @@
   10:20 UTC by SendMessage, told to mirror notes to the main folder. `.claude/worktrees/` is excluded locally in
   .git/info/exclude (never committed). The guard refuses `git -C`: run git from inside each worktree. Saver
   `bydoy9piu` started about 10:20 UTC (2 h limit).
+- **Harness build DONE** (about 10:25 UTC; notes copied to `u3-build-v3-harness.md`, the Write tool refuses the main
+  folder from an isolated worktree): fixes.rs only, +1,664/-425, check.mjs 9/9 in its worktree, uncommitted in
+  `.claude/worktrees/agent-a487e419ee806d37b` (branch worktree-agent-a487e419ee806d37b). On the v2 model: H6 cuts
+  post-recovery takeovers from ~99 % of phases to 0.6 %; 600,000 recommended 435/661/967/1,448/2,067 (532/260/40/1
+  over 1/1.2/1.5/2 s); three-part bar at 480 "half within 0.6 s, at most 1 over 1.2 s, none over 2.0 s" rec 0.981
+  [0.975-0.985], fix 1 alone 0.141, fix 3 alone 0, today 0; at 1,440 "..., at most 3 ..." 0.994/0.008/0/0.
+  Multi-burst lineages degrade (cwnd ratchets 10 -> 7 -> 4 -> 2 with no Cubic: re-run after model v3). Chromium's
+  throttler builds up over 30 bursts (rec longest 444 ms; abort-500 4.9 s). Windows SYN slot: ClientOs::Windows,
+  client_cfg()'s arm unimplemented!. Pin: (0x20e2_d621_a6c1_1f84, [31,4,4,0], [6000,5916,56,28]), re-pin after v3.
 - (done) **Second skeptic round on cc72f6f** · workflow `wf_a8e0f590-0bc` (npt-ws-fixes-verify2; rust-reviewer on model v2,
   netcode-architect on the harness vs browsers and ADR 0001, test-engineer on the bar statistics; xhigh) · launched
   about 04:08 UTC 2026-11-07 · script:
