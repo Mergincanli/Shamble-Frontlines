@@ -3,6 +3,9 @@
 Agent: netcode-architect (skeptic). Started 2026-11-07. Writes only this file. No tracked edits, no commits.
 Line numbers: fixes.rs and tcp_model.rs at 1e020a7 (spikes/netcode-proof/crates/net/src/). Scratch sources:
 scratchpad = /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad.
+Diagnostics: throwaway worktree .gate/u3v3v-wt (detached at 8ba8522 = 1e020a7 + checkpoints), target
+.gate/u3v3v-target; patch kept at scratchpad/v3h-diag/diag.patch (outputs rows.txt, ratchet.txt, order.txt,
+worst.txt, nocancel.txt there). The patch changes nothing with its flags off: the pinned test passes with it.
 
 ## Plan
 1. Read prior rounds (u3-verify2-harness.md, u3-build-v3-harness.md), commit message, fixes.rs whole.
@@ -25,7 +28,7 @@ scratchpad = /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333
   654/1,051/1,859/2,092/4,196, over 1/1.5/2 s 6,768/1,009/205, over 3 s 4 (Wilson 0.007 per mille); multi-burst
   recommended 10 x 2,000: 662/1,091, max 2,234; abort-500 Chromium 30 x 1,000 max 5,220, throttle 4,994 ms; side
   effects 3/22/142/219 per mille, attempts 0/9/15/7, takeovers 0/2/1/1; search 0.997 [0.993-0.999] and 0.990
-  [0.980-0.997]). Exception, see V12: "the reconnect gains nothing" for Windows 3 s is not what the table shows.
+  [0.980-0.997]). My worktree: model + harness tests 49 pass, 7 ignored (0.30 s); the pin holds.
 - V1 SOURCE Chromium throttler (scratchpad/cr2/services_network_websocket_throttler.cc, saved 2026-11-07 from
   chromium main): delay = RandIntInclusive(1000, 5000) * (1 << min(p + f/(s+1), 16)) / 65536 in int (:46-55):
   whole ms; failed = tracker destroyed before OnCompleteHandshake (:27-33); success at OnAddChannelResponse
@@ -42,10 +45,12 @@ scratchpad = /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333
   shouldEvaluateArgsLeftToRight = false under that ABI unless ForceLeftToRight; CGCall.cpp:5155-5161 "We must
   evaluate arguments from right to left in the MS C++ ABI"). So on Windows (clang-cl, MS ABI) CalculateDelay runs
   first: p leaves out the new tracker; on Linux, macOS, Android, ChromeOS (Itanium ABI) left to right: p counts it
-  (one more doubling; no change at the cap or while the throttler does not exist). CONFIRMED. Unmodelled detail: a
-  page's close() of the blocker reaches the network service through a posted task and a Mojo disconnect (round 2
-  H1), so the closed tracker may still be pending when the new one is issued: p one higher (one more doubling) in
-  the abort rows; the model frees it at once (fixes.rs:817-829). Direction: abort rows slightly too good in Chromium.
+  (one more doubling; no change at the cap or while the throttler does not exist). CONFIRMED. Measured (order.txt,
+  30 bursts x 1,000): left-to-right changes the recoveries by noise only (recommended p99 1,096 -> 1,098, max 2,258
+  both; abort-500 p99.99 3,399 -> 2,870, max 5,220 -> 5,170); the throttle reaches 1,059 ms instead of 421 in the
+  recommended row. Unmodelled detail: a page's close() of the blocker reaches the network service through a posted
+  task and a Mojo disconnect (round 2 H1), so the closed tracker may still be pending when the new one is issued: p
+  one higher in the abort rows; the model frees it at once (fixes.rs:817-829). Direction: abort rows slightly good.
 - V3 SOURCE Firefox (scratchpad/chromium-src/ff_WebSocketChannel.cpp): FailDelay 200 + rand()%200 (:128-130),
   FailedAgain x1.5 capped 60 s (:134-145), RemainingDelay 0 once since > next (:148-154), IsExpired at last + 60 s +
   delay (:156-160), Lookup returns a matching record even when expired (:199-222), DelayOrBegin (:225-266),
@@ -59,7 +64,45 @@ scratchpad = /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333
   a close handshake that times out (mCloseTimeout 20 s, :1180, :2094-2098 -> :3280-3290 NS_ERROR_NET_TIMEOUT_EXTERNAL)
   or a reset from the server. With one endpoint the old connection and the reconnect share that key. If the room
   resets a replaced connection (closing a socket with unread input makes Linux send RST), each takeover leaves a
-  failure; failures within 60 s of each other grow it x1.5 (300 ms x 1.5^10 = 17 s after 10). With B1's 20 s spacing
-  a 200-400 ms delay never reaches the next burst, but repeated outages closer together would. Requirement for the
-  ADR: the room closes a replaced connection with a WebSocket close frame and a graceful TCP close (reads until the
-  client's close), never a reset (also round 2 H13's reason). Not measured.
+  failure; failures within 60 s of each other grow it x1.5 (after about 11 failures 20 s apart, 300 x 1.5^11 = 26 s
+  exceeds the spacing and the next reconnect waits). Requirement for the ADR: the room closes a replaced connection
+  with a WebSocket close frame and a graceful TCP close (reads until the client's close), never a reset (also round 2
+  H13's reason). Not measured.
+- V5 SOURCE Windows' SYN timer (WebFetch 2026-11-07, Microsoft Tech Community networking blog "TCP Templates for
+  Windows Server 2019 - How to tune your..." (first published on TechNet 2018-10-03), its Get-NetTCPSetting
+  -SettingName InternetCustom output after `netsh int tcp reset` ("Reset to default"): InitialRto(ms) 3000,
+  MaxSynRetransmissions 2, Timestamps Disabled, MinRto(ms) 300, DelayedAckTimeout(ms) 40). That is Server 2019 (the
+  Windows 10 1809 stack); no primary source found for Windows 11 clients (searches 2026-11-07: a Thales admin doc
+  also says default 3000, range 300-3000; forum outputs with 1000 or 2000 are tuned machines). So the Windows-like
+  3 s row is plausibly the DEFAULT Windows client, not an outlier. Sure: medium. Mustafa's check settles his own:
+  `Get-NetTCPSetting -SettingName InternetCustom,Internet | Format-List SettingName,InitialRtoMs,MaxSynRetransmissions`
+  (or `netsh interface tcp show global`, line "Initial RTO").
+- V6 (diag rows.txt, 60,000 phases each): fix 1 alone with no timestamps (= any Windows-like client, the SYN timer
+  plays no part without a reconnect): 646/2,035/3,829/5,295/12,550; over 1/1.5/2 s 2,396/1,727/843. Against it the
+  never-abandoned reconnect on a Windows-like client: SYN 3 s 646/2,035/2,729/3,069/3,890, over 1/1.5/2 s
+  2,393/1,727/844; SYN 2 s 646/1,739/2,027/2,147/3,890, over 1/1.5/2 s 2,393/1,728/91. So the main session's "with
+  3 s the reconnect gains nothing" is CONFIRMED for everything up to 2 s (the counts match to the unit) and wrong past
+  2.7 s: it still cuts p99.9 3,829 -> 2,729 and the max 12,550 -> 3,890. With SYN 1 s: 886/1,484/2,871, over 1 s 285.
+  Abort at 500 ms is identical for SYN 1, 2 and 3 s (645/903/1,347/1,746/2,607, over 1 s 349): it never waits for an
+  OS SYN retry (each attempt is closed 500 ms after creation, before its first SYN timer fires).
+- V7 (side observation for the model skeptic): fix 1 alone WITH timestamps (the Linux client) is worse than without:
+  over 1 s 5,336 vs 2,396, p99 2,170 vs 2,035 (60,000 each). The Linux-client rows carry this; not judged here.
+- V8 (diag ratchet.txt, abort-500 Chromium, 30 bursts x 1,000 lineages): 127 of 1,000 lineages reach a >= 1 s
+  throttle, the first at burst 10 or later. Worst lineage (r 757): bursts 1-12 each made 3 attempts and ALL were
+  failures (2 aborted at 500 ms, the third closed by H6 when the old connection recovered first: 0 takeovers), so f
+  grew by 3 a burst while s stayed at the page's first WebSocket's 1: f/(s+1) = 36/2 at burst 12, the cap 16, delays
+  4,072/4,994/4,554 ms; at the 240 s roll the period just ended had no success, IsClean erased the throttler and
+  burst 13's attempts started at 0 ms again (and won a takeover). So the 4,994 ms is Chromium's rule faithfully run:
+  abort-500 makes about 3 failures and 0.49 successes a burst; the exponent reaches 4 (delays up to 1.2 s) once
+  f >= 4(s+1), i.e. after about 8-10 bursts in 4 minutes without a winning attempt; IsClean bounds it to the 2-minute
+  periods. The never-abandoned row makes about 0.66 failures (H6 closes) and 0.34 successes a burst: max 421 ms.
+- V9 (diag worst.txt, recommended, 600,000 phases): 10 phases over 2.5 s; the worst four are the reconnect's OWN
+  handshake in backoff: seed 179118 attempt began at 253 ms, its 101 at 5,059 ms (4,196; fix 1 alone 4,936); seeds
+  67783 and 556300: no 101 by 4.4-4.8 s, the old connection recovered first (3,766, 3,375 = fix 1 alone); seed 10296:
+  101 at 2,788 ms, its Join lost, takeover at 4,578 ms after the old connection recovered at 4,013 (3,013). A
+  never-abandoned attempt that loses a flight waits on a new connection's 1 s initial RTO and its doublings; an abort
+  cadence starts fresh. That is why abort-500 has the better p99.9/max in single bursts (1,376/2,544 vs 1,859/4,196).
+- V10 (diag worst.txt, 10,000 phases): every takeover after the recovery (1,742) had its 101, so its Join, at or
+  before the recovery: "after its 101 it runs to its Join" (fixes.rs:653-658, :800-804) costs nothing a page could
+  avoid by a check at the 101; once a Join is sent the page must let it land (closing would let the room take the
+  session over to a dead connection). CONFIRMED as the right choice.
