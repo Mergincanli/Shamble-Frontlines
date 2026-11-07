@@ -127,3 +127,44 @@ B12. check.mjs 9/9, clippy -D warnings (no features, all features), fmt; Cargo.l
   iptables: probe.py 60 messages on port 47993 without loss: 60/60, cubic/cubic set, rtt 54 µs, send lateness p99
   112 µs; model 5 seeds at 54 µs: 264 episodes, 9 above the RACK bound (2 timeouts + double losses), own repairs
   rack 272 / probe 0 / timeout 2; judge prints MISS as expected with no kernel loss. The main session runs run.sh.
+- B12 (fixes found in review of my own code): current() now also wakes a waiting writer when the step freed the
+  budget (the pump's clock entry may have moved past events another call stepped: a delayed-wake risk); (c) now also
+  asserts S12's per-burst times at each faithful return (first byte down >= one least delay, first message >= it):
+  456.9 / 1,789.0 / 474.0 / 571.6 ms in the last run.
+- Lateness, release builds, the loopback test alone (10 s, n = 301 per direction, so p99.9 = max), three runs:
+  run 1 down p50 0.108 p99 0.339 max 0.360 ms, up p50 0.161 p99 0.944 max 3.450 ms (TRIGGER: up);
+  run 2 down 0.107 / 0.292 / 0.419, up 0.167 / 0.401 / 0.564 (no trigger);
+  run 3 down 0.107 / 0.269 / 1.150 (TRIGGER), up 0.164 / 0.910 / 1.883 (TRIGGER). Load average 0.6-1.3 of 4 cores
+  (build agent B active in parallel). p50 about 0.11-0.17 ms: above the plan's 10-50 µs guess.
+- B12 done: check.mjs 9/9 (final run): "check: all 9 steps pass"; test step "measured build: 227 tests passed, 0
+  failed; bites build: 241 tests passed, 0 failed" (+34 tests in the measured build, +35 in the bites build, 1 new
+  ignored test, the kernel cross-check's model side). clippy -D warnings with and without features: clean. fmt:
+  clean.
+
+## Result
+- check line: `check: all 9 steps pass` (test: measured 227 passed, bites 241 passed, 0 failed).
+- Cargo.lock: +[[package]] tokio-rustls 0.26.6 (checksum c9cc2678c2cdd569ef8215e2afd7954ada2ae20b4fdd2c5fe6139a3b02d105db;
+  deps rustls, tokio); npt-net's dependency list gains "tokio-rustls". 11 insertions, nothing else.
+- Public surface added: `DelayStream` (wrap, now_ns, add_burst, header_numbers, header_texts, take_second,
+  run_summary, AsyncRead, AsyncWrite, Debug) and L2Config's two fields; everything else pub(crate) or cfg(test).
+
+## Open points (decided differently from rev 2, or left)
+1. Kernel cross-check stall threshold: half a send gap, not "more than one send gap" (run.sh's header gives why: a
+   RACK repair on loopback is one gap + RTT ± pacing noise, so a one-gap threshold sits in its own noise). The
+   one-gap count is reported beside it.
+2. The per-return row (`Return::row`, `returns()`) is pub(crate), not pub: rev 2's pub list names the header,
+   per-second and summary rows; U6's WsServer (in npt-net) reads the returns.
+3. wrap bounds ws_max_message_bytes to 1..=16,370 and ws_max_request_bytes to 16..=32,768: a larger message limit
+   makes the up read floor exceed the 64 KB budget and S is never read (found in the limits bite).
+4. Condition 10's trigger fired in 2 of 3 release runs of the 10 s loopback test here (n = 301, so p99.9 = max;
+   maxima 3.45 ms up, 1.15 ms down; p50 0.11-0.17 ms). Not judged by any test (C16); the main session's quiet
+   evidence run decides and brings it to the advisor if it holds.
+5. Tests drive tungstenite through its sync API over a test-only Bridge (tokio-tungstenite's Sink/Stream need
+   futures-util, not a dependency). U6's WsServer will need the same or futures-util: a U6 decision.
+6. owed on DelayStream's path is the bytes tungstenite offered in its latest poll_write and DelayStream did not take
+   (tungstenite 0.30 offers its whole out buffer each call); the plain path's owed is U6's (C14).
+7. Per-second `_max_` fields of the model (backoff, stall, out-of-order held) are the connection's maxima so far, not
+   per-window (the model keeps maxima only); SERIES.md says so.
+8. Lateness uses l2::stats' histograms: four per connection, about 0.54 MB per connection (48 connections: about
+   26 MB). Fixed per connection, not per message.
+DONE

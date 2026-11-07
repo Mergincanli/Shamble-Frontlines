@@ -475,7 +475,47 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **RESUME HERE (Mustafa at 96 % usage, about 20:52 UTC):**
+- **RESUME HERE (after the usage reset, 2026-11-07 late; the worker restarted once): U3c BUILDS DONE**
+  (workflow wf_87550c07-bbd; its result in u3c-workflow-result.txt; the per-agent journal is the session's
+  subagents/workflows/wf_87550c07-bbd/journal.jsonl). Final snapshots in wip/ (A 272 KB, B 106 KB, base ebe82b2).
+  - **Build A** (.claude/worktrees/wf_87550c07-bbd-1):
+    - check.mjs 9/9 (227 measured, 241 bites); Cargo.lock adds tokio-rustls only.
+    - Lateness: condition 10's trigger fired in 2 of 3 release runs (max up 3.45 ms, down 1.15 ms; p50 0.11-0.17 ms;
+      n = 301, B running alongside). A quiet evidence run with more samples decides, and it likely goes to the
+      advisor.
+    - Mechanism test (c): outstanding 7,350 = N 7 x 1,050 at every return; the bites are caught.
+    - New fix-1 pin over 6,000 phases: (0xb6f3_4ac0_188a_2727, [675,523,429,228], [0,0,0,0]); p50 653, p99 2,172,
+      max 5,160 ms.
+    - Open points:
+      - kernel check stall rule at half a gap (the advisor must confirm before the run);
+      - tungstenite driven through its sync API over a test Bridge, since there is no futures-util (U6's decision);
+      - histograms 0.54 MB per connection;
+      - per-second rows per connection (merging them is U6's).
+    - **Critic A FAILED on the org spend limit.** Re-run it by resuming the workflow.
+  - **Build B** (.claude/worktrees/wf_87550c07-bbd-2):
+    - check.mjs 9/9 (201 measured, 214 bites); Cargo.lock adds npt-tcpinfo (libc, socket2 dev) only.
+    - Open points:
+      - the root-run script is Python, with signal handlers as the trap;
+      - tcpi_notsent_bytes is read through NETLINK_SOCK_DIAG with socket2;
+      - a zeroed byte buffer with offset_of!;
+      - a generic non-Linux stub;
+      - a path dependency, not a workspace entry;
+      - tcpi_rtt can read 0 on loopback (1-4 us), which maps to None.
+  - **Critic B: gaps.** To fix before B merges:
+    - (1) 1.8 (f) is not carried: R1's run plan reads srtt against netem's 100 ms. Add it to the carried list and §12.1.
+    - (2) The unsafe check only counts allows: `#[allow(unsafe_code)] mod linux;` or an allow moved to a helper still
+      passes. Make it enforce placement on the two fns, with negative tests.
+    - (3) The root run cannot pass on this kernel (always VOID): with every ACK dropped only cwnd (10) packets go out,
+      so notsent grows too. Write at most cwnd x MSS during the drop.
+    - (4) Comments overstate what check.mjs enforces (ties to 2).
+    - (5) The deps step does not check that npt-net has no direct libc (M14). Add it.
+    - (6) Stale .sh references; the script is .py.
+    - (7) unacked_and_unsent's SAFETY invariant fails for a non-TCP fd (0x5411 on a device). Check SO_PROTOCOL ==
+      IPPROTO_TCP with a bounded getsockopt first.
+    - (8) The npt-net test's comparisons can all be skipped silently. Count them and assert a minimum.
+    - (9) R4's 5 s wall-clock criterion: state it, or make it an identity.
+    - (10) Off-Linux builds are unproven (stub): recorded.
+- **Earlier (Mustafa at 96 % usage, about 20:52 UTC):**
   - **PR #45 MERGED** at 626df67 (merge commit, expected head 6ae3571) on Mustafa's go: "merge $45", read as #45.
   - **Next on the spike branch** (advisor-ws-docs-r2.md ORDER (3)): merge origin/main into it, and in the same commit
     re-take PM-0001-18's and PM-0001-31's row hashes in marks.json and move drafts_commit to 626df67's full SHA;
