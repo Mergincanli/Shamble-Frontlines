@@ -435,6 +435,11 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate
   checks marks first proven in the sim core spike (R5-LAYOUT-REC4; R5-TEST-REC2's tools) and the netcode proof test
   (R5-TEST-REC4's L1). It decides R5-GATE-OQ5 and R5-CI-OQ1.
+- **Note, Mustafa (2026-11-04, A4 item 4; recorded 2026-11-07 by kit-v3-4, as a note, not a design):** "fast checks
+  on save (format, type checks for Rust and TypeScript), the full gate in CI". His item 6 adds its notes "next to the
+  fast checks on save": they stand in ADR 0006 (parts 9 and 10, OQ-0006-14 and its Rollback section). ADR 0002 part
+  7's per-edit hook (`docs/adr/0002-code-structure-build-toolchain.md:472-474`: `tsc -b` and ESLint, `cargo check -p`)
+  has no format check (format is gate stage G1, 0002:570), for the foundation's plan to take up.
 
 ### 7. The content and ability spike
 - **Owner:** ADR 0005 ("What a spike must prove", item 1: the content data section's items 1–9 and the ability

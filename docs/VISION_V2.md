@@ -69,7 +69,10 @@ What players should say after a match, in Mustafa's words:
     possible revenue such as renting out official private servers.
   - `[DECIDED]` The trust rule: progression counts on official servers only.
   - On progression in private (rented) matches (Mustafa, 2026-11-06):
-    - `[DECIDED]` With bots in the match: 25 % of normal XP; humans only: 100 %.
+    - `[DECIDED]` With bots in the match: 25 % of normal XP; humans only: 100 %. (Which progression "XP" means,
+      since 2026-11-07: "all account progression (the account level and Service points), never the in-match weapon
+      XP: amps reset every match, so there's nothing to farm, and cutting them would only make practice with bots
+      feel worse." Mustafa, 2026-11-07, XP-TERM (a).)
     - `[OPEN]` Open, Advisor's suggestions: (1) weigh XP per action (kills on bots give little), so public matches with
       bot fillers aren't punished; (2) against friends trading easy wins: full XP only with a minimum number of humans
       per team, plus a daily XP cap on private matches.

@@ -21,5 +21,12 @@
   The docs parts (F, then D) may start now; the kit sitting writes no tier-0 line before TIER0-SCOPE and no revert
   exception before REVERT-EXCEPTION. Conditions C1-C13 in the verdict file (C13: E3 runs the three kit test files,
   `.claude/hooks/routine-guard.test.mjs`, `.claude/hooks/settings.test.mjs`, `.claude/scripts/checkpoint.test.mjs`).
-- **Current step:** 2, the docs parts F then D (conditions C10, C11, C12), while TIER0-SCOPE and REVERT-EXCEPTION
-  wait on Mustafa.
+- **Done:** step 2, the docs parts F and D (this commit; builder notes `builder-docs.md`, quote check
+  `builder-quotes.py` 15/15 PASS): VISION_V2's XP-TERM pointer (:71-78 now); README R2-ROOM-OQ7 (C11), OQ-0006-14 and
+  I-18 clauses; ADR 0006 notes (part 9 :431, part 10 :461, OQ-0006-14 :1026, "A bad release" :1564); SPIKE_PLAN
+  :438-443; STATUS follow-ups answered (XP-TERM, LOOK), B.2's follow-up, line numbers recomputed (ADR 0005 §6 83–102,
+  :2550 27–102; ADR 0006:482-483), "five register rows"; ROADMAP:94; the vfx report's corrections. Deviation: Low note
+  3 says AB5 is about how an unlocked weapon reaches a match (not balance rates). Gate PASS +0 −0; repo map OK.
+- **Current step:** 3, waiting on Mustafa's TIER0-SCOPE and REVERT-EXCEPTION and his presence for the kit sitting
+  (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
+  pass (#43 merged, this change-set's rows), the review round, the report.
