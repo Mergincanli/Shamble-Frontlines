@@ -422,6 +422,15 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **RESUME HERE (Mustafa at 98 % usage, about 16:00 UTC):** U3b fixes merged and pushed at **7321cc0** (check.mjs 9/9;
+  notes u3-build-u3b-fix.md, planted defects u3bfix-plant.py: 16 planted, none survives). Open finding: the loopback
+  P2 test's ">= 180 of 200 up datagrams" (wt_tests.rs:203) failed 1 of 18 runs, at base too (likely several datagrams
+  per QUIC packet under load): measure before touching the threshold. Carried: U6 accept-loop caps and pinning joined
+  clients; U3c's SERIES TCP rows; R1 reads ed4fb6d7ef68 on RS. Still running: workflow **wf_abc2ef9b-8d4** (advisor
+  revision with the 10 % tolerance, record alignment, verifier); if the session is cut, resume it with
+  Workflow({scriptPath: the npt-ws-docs-revise script under Running work, resumeFromRunId: "wf_abc2ef9b-8d4"}), then
+  write the advisor's notes_text to advisor-ws-docs-r2.md, open the docs PR (claude/npt-readings from main in
+  .gate/npt-readings, needs-mustafa). Then U3c. Saver benvikdbz (2 h, from about 15:40 UTC).
 - **wf_f3167435-5b4 DONE** (about 15:10 UTC): U3b skeptic (u3-verify-u3b.md: pool starvable by one peer; slack stale
   under the RT switch; slot_for before the size/bound checks; throttle toggle reorders; ApplicationClosed counted as
   QUIC; accept loops unbounded (U6); SERIES text; 6 planted defects survive: bites needed); the advisor's docs-PR words
