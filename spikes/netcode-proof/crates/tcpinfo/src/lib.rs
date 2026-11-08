@@ -11,12 +11,15 @@
 //! **The spike's second `unsafe` exception** (the first is npt-client-wasm's), granted by the advisor under ADR
 //! 0002:264-265's rule: "an exception needs a written invariant, a test and an `#[allow]` with its reason". The
 //! `#[allow(unsafe_code, reason = ...)]` sits directly on the two functions in linux.rs and nowhere else in the
-//! crate. Each unsafe block holds one unsafe operation and a SAFETY comment stating its invariant (the two clippy
-//! lints below are errors). The `tcp_info` field is read from the bytes the kernel wrote at `offset_of!`, with no
-//! further unsafe code. check.mjs's deps step checks that libc is the only shipped dependency, that only npt-net
-//! depends on the crate, that each of the two attributes sits on its function and no other relaxing attribute exists
-//! here, that every `unsafe` in the crate lies inside those two functions, that the two clippy lints below stay denied
-//! here and relaxed nowhere, and that no crate but npt-client-wasm and this one has `unsafe` code.
+//! crate. The workspace forbids unsafe_code, which no allow can relax, so this crate's manifest has its own lint
+//! tables: unsafe_code denied, every other lint the workspace's. Each unsafe block holds one unsafe operation and a
+//! SAFETY comment stating its invariant (the two clippy lints below are errors). The `tcp_info` field is read from the
+//! bytes the kernel wrote at `offset_of!`, with no further unsafe code. check.mjs's deps step checks that libc is the
+//! only shipped dependency, that only npt-net depends on the crate, that its lint tables are the workspace's but for
+//! unsafe_code "deny", and, as its scan reads the crate's files, that each of the two attributes sits on its function
+//! and no other relaxing attribute exists here, that every `unsafe` in the crate lies inside those two functions, and
+//! that the two clippy lints below stay denied here and relaxed nowhere. In every other crate but npt-client-wasm the
+//! workspace's forbid keeps unsafe code out at compile time.
 //!
 //! **Any descriptor is sound to pass.** Both functions first read SO_DOMAIN, SO_TYPE and SO_PROTOCOL (ENOTSOCK on a
 //! descriptor that is not a socket) and make their call only on a TCP socket; any other answers with an error.

@@ -188,22 +188,64 @@ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
     );
 }
 
+/// What a test that cannot run on this host reports (review C2R-9): one line, `SKIPPED <test>: <why>`, in one write to
+/// `out`. libtest has no skip, so the test still passes; the caller hands it `io::stderr()` itself, whose writes get
+/// past libtest's capture (it takes only the print macros' output, and shows that only for a failing test), so the
+/// line reaches check.mjs's test step, which counts and names each one in its summary.
+fn report_skip(out: &mut impl Write, test: &str, why: &str) {
+    out.write_all(format!("SKIPPED {test}: {why}\n").as_bytes())
+        .expect("write the skip line");
+}
+
 /// An MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) is not TCP for either reading (review F8): Linux would answer its
 /// SOL_TCP TCP_INFO from the first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), so srtt_us refuses it as
-/// unacked_and_unsent does. The socket is connected to a loopback TCP listener (the connection falls back to plain
-/// TCP underneath, and the socket stays MPTCP), the state in which TCP_INFO would answer. A kernel without MPTCP
-/// (socket() refused, or net.mptcp.enabled = 0) skips the test with a line on stderr; the U3c container has it.
+/// unacked_and_unsent does. A kernel without MPTCP (socket() refused, or net.mptcp.enabled = 0) reports a skip that
+/// check.mjs's test step shows (mptcp_case); the U3c container has MPTCP.
 #[test]
 fn an_mptcp_socket_is_not_tcp_for_either_reading() {
-    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
-    let to: SocketAddr = listener.local_addr().expect("listener address");
-    let mptcp = match Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::MPTCP)) {
+    mptcp_case(
+        || Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::MPTCP)),
+        &mut std::io::stderr(),
+    );
+}
+
+/// A kernel without MPTCP gives a skip line, not a silent pass (review C2R-9): mptcp_case with a socket() that fails
+/// as such a kernel's does (ENOPROTOOPT when net.mptcp.enabled = 0) writes exactly one line, the one check.mjs counts.
+#[test]
+fn a_kernel_without_mptcp_reports_the_mptcp_case_skipped() {
+    let mut out = Vec::new();
+    let ran = mptcp_case(
+        || Err(std::io::Error::from_raw_os_error(libc::ENOPROTOOPT)),
+        &mut out,
+    );
+    assert!(!ran, "no socket, so the case did not run");
+    let line = String::from_utf8(out).expect("UTF-8");
+    let why = std::io::Error::from_raw_os_error(libc::ENOPROTOOPT);
+    assert_eq!(
+        line,
+        format!(
+            "SKIPPED an_mptcp_socket_is_not_tcp_for_either_reading: no MPTCP socket on this kernel ({why})\n"
+        )
+    );
+}
+
+/// The MPTCP case on the socket `make` gives: `false`, with a skip line written to `out`, when it gives none; else the
+/// socket is connected to a loopback TCP listener (the connection falls back to plain TCP underneath, and the socket
+/// stays MPTCP), the state in which TCP_INFO would answer, both readings must refuse it, and the result is `true`.
+fn mptcp_case(make: impl FnOnce() -> std::io::Result<Socket>, out: &mut impl Write) -> bool {
+    let mptcp = match make() {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("no MPTCP socket on this kernel ({e}): the MPTCP case is not exercised");
-            return;
+            report_skip(
+                out,
+                "an_mptcp_socket_is_not_tcp_for_either_reading",
+                &format!("no MPTCP socket on this kernel ({e})"),
+            );
+            return false;
         }
     };
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let to: SocketAddr = listener.local_addr().expect("listener address");
     mptcp.connect(&to.into()).expect("connect");
     let (_server, _) = listener.accept().expect("accept");
     for (what, err) in [
@@ -226,6 +268,7 @@ fn an_mptcp_socket_is_not_tcp_for_either_reading() {
             "{what} on MPTCP: {err}"
         );
     }
+    true
 }
 
 #[test]

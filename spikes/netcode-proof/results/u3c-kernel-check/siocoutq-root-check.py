@@ -76,7 +76,7 @@
 # RECORDED. Kernel release, CONFIG_HZ, the TCP sysctls (congestion control, tcp_recovery, tcp_early_retrans, tcp_sack,
 # tcp_frto, tcp_rto_min_us, tcp_thin_linear_timeouts), the probe socket's congestion control (set to cubic, the
 # model's; this container defaults to bbr, u3-scout-timing.md:388), the spike's commit with any uncommitted change in
-# its folder (this script's own logs aside: OWN_OUTPUTS), every probe line.
+# its folder (this script's own new logs aside: OWN_OUTPUTS), every probe line.
 #
 # RUN (from the repository root, as root):
 #   CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3v3-model-target \
@@ -89,6 +89,7 @@
 # EXIT: 0 pass, 1 fail, 2 void or setup error, 3 iptables -S differs after the run.
 
 import datetime
+import fnmatch
 import gzip
 import os
 import pathlib
@@ -148,24 +149,33 @@ def sysctl(name):
         return "absent"
 
 
-# This script's own outputs (the logs it writes next to itself), left out of the provenance check: a run's log is
-# opened before `git status` runs, so with them in, every run would read "with uncommitted changes" (u3c review F-J,
-# fixed 2026-11-08 after the committed root run, whose log says so for that reason).
+# This script's own outputs (the logs it writes next to itself), left out of the provenance check while they are new:
+# a run's log is opened before `git status` runs, so with them in, every run would read "with uncommitted changes" (u3c
+# review F-J, fixed 2026-11-08 after the committed root run, whose log says so for that reason). Only an untracked one
+# is left out: an edit to a committed log is listed like any other change (review C2R-10).
 OWN_OUTPUTS = "siocoutq-root-check-*.txt"
 
 
 def uncommitted():
-    """The uncommitted changes in the spike's folder other than this script's own outputs, as paths relative to the
-    repository root (git status --porcelain), or the error text when git status fails."""
-    own = (HERE / OWN_OUTPUTS).relative_to(SPIKE).as_posix()
+    """The uncommitted changes in the spike's folder, as paths relative to the repository root (git status
+    --porcelain), or the error text when git status fails. An untracked file next to this script whose name matches
+    OWN_OUTPUTS is left out; everything else is listed, a committed log's edit included. Tested by
+    test_siocoutq_root_check.py (check.mjs's self step runs it)."""
     status = subprocess.run(
-        ["git", "-C", str(SPIKE), "status", "--porcelain", "--untracked-files=all", "--", ".", f":(exclude,glob){own}"],
+        ["git", "-C", str(SPIKE), "status", "--porcelain", "--untracked-files=all", "--", "."],
         capture_output=True,
         text=True,
     )
-    if status.returncode != 0:
-        return f"git status failed: {status.stderr.strip()}"
-    return [line[3:] for line in status.stdout.splitlines() if line.strip()]
+    top = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    if status.returncode != 0 or top.returncode != 0:
+        return f"git status failed: {(status.stderr or top.stderr).strip()}"
+    root = pathlib.Path(top.stdout.strip())
+
+    def own_new_log(line):
+        path = root / line[3:]
+        return line.startswith("?? ") and path.parent.resolve() == HERE and fnmatch.fnmatch(path.name, OWN_OUTPUTS)
+
+    return [line[3:] for line in status.stdout.splitlines() if line.strip() and not own_new_log(line)]
 
 
 def provenance():

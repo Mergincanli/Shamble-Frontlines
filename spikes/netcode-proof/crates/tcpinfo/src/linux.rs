@@ -29,6 +29,11 @@ const RTT_END: usize = RTT_AT + size_of::<u32>();
 /// a socket. Not only for symmetry: an MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) answers SOL_TCP's TCP_INFO from
 /// its first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), not as the connection. Any descriptor is sound to pass.
 ///
+/// **Cost** (review REG-3): four getsockopt system calls per call, where the TCP_INFO reading alone would be one: the
+/// three SOL_SOCKET ones of the TCP check each copy one int, then TCP_INFO copies the `tcp_info` struct. Fix 1's
+/// per-tick gate calls this once per connection, so the check costs three small system calls per connection per tick.
+/// Nothing is cached: each call checks the descriptor it is given.
+///
 /// # Errors
 /// ENOTSOCK on a descriptor that is not a socket; `ErrorKind::InvalidInput` on a socket that is not TCP (UDP, Unix,
 /// MPTCP); the getsockopt error; `ErrorKind::Unsupported` when the kernel's answer is too short to hold `tcpi_rtt`.

@@ -66,18 +66,22 @@ tokio-rustls = { version = "=0.26.6", default-features = false, features = ["rin
 futures-util = { version = "=0.3.34", default-features = false, features = ["sink", "std"] }
 
 [workspace.lints.rust]
-# deny, not forbid: two crates relax it (ADR 0002:264-265: "an exception needs a written invariant, a test and an
-# #[allow] with its reason"), and no other may. npt-client-wasm relaxes it for the whole crate in its manifest, for
-# wasm-bindgen's generated code (U7). npt-tcpinfo keeps these lints; its two pub functions in src/linux.rs, srtt_us
-# and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket only),
-# each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step fails when this line is
-# not "deny" (or "forbid"); on unsafe code (`unsafe`, `global_asm!`) in any other crate, however the lint was relaxed,
-# and on any relaxing attribute it can read there; in npt-tcpinfo, on any other relaxing, on `unsafe` outside those two
-# functions, on either allow missing or without its reason, and on the two clippy unsafe lints relaxed or not denied in
-# lib.rs; on a manifest that sets unsafe_code or does not inherit these lints; on a #[path], include!, manifest target
-# path or symbolic link that compiles a file outside its crate's folder; and on rustflags, cargo configs or aliases
-# that lower a lint or replace clippy. What it cannot see (a different rustc, or a wrapper) is outside its reach.
-unsafe_code = "deny"
+# forbid, the compiler backstop (u3c review C2R-1): in a crate that inherits these lints no #[allow] can relax it
+# (rustc refuses one, a macro-built one too, with E0453), so unsafe code there does not compile. Two crates are ADR
+# 0002:264-265's exceptions ("an exception needs a written invariant, a test and an #[allow] with its reason") and
+# carry their own [lints] tables instead, every other lint as here: npt-client-wasm allows unsafe_code for the whole
+# crate, for wasm-bindgen's generated code (U7); npt-tcpinfo denies it, and its two pub functions in src/linux.rs,
+# srtt_us and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket
+# only), each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step checks that this
+# line is forbid; that every other member inherits these lints and sets no unsafe_code; that the two exceptions'
+# tables equal these but for unsafe_code (allow, deny); that, as its scan reads the crates' files, no other crate
+# relaxes the lint or has unsafe code, and npt-tcpinfo relaxes it only by those two allows and has unsafe code only
+# inside them; that no #[path] or include! literal, manifest target path or symbolic link compiles a file outside its
+# crate; and that the environment and cargo configs it reads pass no lint-lowering rustflags and set no clippy or fmt
+# alias, other rustc, workspace wrapper, config include or test runner. That scan guards against an accidental
+# relaxation; review is the wall against a deliberate one. What it does not check is listed above DEPS_CHECKED in
+# check.mjs (among them a cargo config's [env], a build script's output and a RUSTC_WRAPPER program).
+unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 # The determinism and clock bans (plan §4.5) are configured per crate in clippy.toml; these make them errors.

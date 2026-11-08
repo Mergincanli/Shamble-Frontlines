@@ -6,11 +6,19 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
-# The workspace lints, unsafe_code = "deny" included: srtt_us and unacked_and_unsent in src/linux.rs each carry one
-# #[allow(unsafe_code, reason = "...")] (ADR 0002:264-265; u3c-plan.md 1.8 (a)), and nothing else in the crate relaxes
-# it. check.mjs's deps step checks both, and that this manifest keeps `workspace = true` and never sets unsafe_code.
-[lints]
-workspace = true
+# Not `workspace = true`: the workspace forbids unsafe_code, which no #[allow] can relax (E0453), so this crate has its
+# own tables (the advisor's ruling of 2026-11-08, in place of u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true").
+# [lints.rust] denies the lint, so srtt_us and unacked_and_unsent in src/linux.rs can each carry one
+# #[allow(unsafe_code, reason = "...")] (ADR 0002:264-265; R20 (a)), and nothing else in the crate relaxes it. Every
+# other lint is the workspace's, key for key. check.mjs's deps step checks the level, the tables against the
+# workspace's, and where the two allows sit.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
 
 # libc is the only normal dependency, and only on Linux; the other targets build the stub. check.mjs's deps step
 # checks that libc is all the crate ships with (socket2 below is a dev dependency: tests and the probe only).

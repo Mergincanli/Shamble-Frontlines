@@ -3,9 +3,10 @@
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
 // Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates and npt-tcpinfo's non-Linux stub), each on
 // the measured build and on the bites build with warnings as errors; test (cargo test on the measured build, then on
-// the bites build); deps (the dependency rules of plan §4.2 that `cargo metadata` shows, with every feature and
-// target, and its unsafe_code rule, from the crates' files, the workspace manifest and the rustflags and cargo configs
-// this command's cargo reads: DEPS_CHECKED lists them); refs (nothing outside spikes/ references it, §4.2 and §4.9);
+// the bites build, its counts and any test that reported a skip); deps (the dependency rules of plan §4.2 that
+// `cargo metadata` shows, with every feature and target, and its unsafe_code rule, from the crates' files, the
+// manifests and the environment and cargo configs this command's cargo reads: DEPS_CHECKED says what it checks, and
+// the comment above it what it does not); refs (nothing outside spikes/ references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
 // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
 // exits 1 if any failed.
@@ -125,11 +126,15 @@ export function dependencyProblems(meta) {
 
 /**
  * The crates that may relax `unsafe_code`, by folder: ADR 0002:264-265's exceptions ("an exception needs a written
- * invariant, a test and an #[allow] with its reason"), named in the workspace Cargo.toml. npt-client-wasm relaxes it in
- * its manifest (wasm-bindgen's generated code), so its files are not scanned for it; npt-tcpinfo only through the
- * attributes TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions.
+ * invariant, a test and an #[allow] with its reason"), named in the workspace Cargo.toml. The workspace forbids the
+ * lint, so these two carry their own [lints] tables in place of `workspace = true` (EXCEPTION_LEVELS):
+ * npt-client-wasm allows it for the whole crate (wasm-bindgen's generated code), so its files are not scanned for it;
+ * npt-tcpinfo denies it, which its two #[allow]s can relax (forbid could not), only through the attributes
+ * TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions.
  */
 export const UNSAFE_EXCEPTIONS = { "crates/client-wasm/": "npt-client-wasm", "crates/tcpinfo/": "npt-tcpinfo" };
+/** The unsafe_code level each exception's own [lints.rust] gives, its other lints being the workspace's (review C2R-1). */
+const EXCEPTION_LEVELS = { "crates/client-wasm/": "allow", "crates/tcpinfo/": "deny" };
 /** npt-tcpinfo's only relaxing attributes (u3c-plan.md 1.8 (a)): one on each of these functions, in this file. */
 export const TCPINFO_UNSAFE_FILE = "crates/tcpinfo/src/linux.rs";
 export const TCPINFO_UNSAFE_FNS = ["srtt_us", "unacked_and_unsent"];
@@ -154,7 +159,9 @@ const RELAX_UNSAFE = /\b(?:allow|expect|warn)\s*\([^)]*?\bunsafe_code\b/g;
  * the unsafe_code lint denies that edition 2024 lets go without the keyword (`#[no_mangle]`, `#[export_name]` and
  * `#[link_section]` need `#[unsafe(...)]` there; rustc 1.99.1 compiles a macro-built `#[allow($l)]` over
  * `global_asm!("")` with no `unsafe` in sight). Found in code, they are unsafe code whatever relaxed the lint: an
- * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`.
+ * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`. In every crate but the two
+ * exceptions the compiler refuses them first (the workspace's forbid: E0453 on any allow, a macro-built one included);
+ * this scan is the second layer there, and inside npt-tcpinfo the only one.
  */
 const UNSAFE_CODE = /(?<!r#)\bunsafe\b|\bglobal_asm\b/g;
 /** The one form npt-tcpinfo may use: `allow(unsafe_code, reason = "...")` and nothing else in the attribute. */
@@ -173,6 +180,10 @@ const isPlacedAllow = (body) =>
  * so a `//` inside one is not a comment. A lifetime's quote is not a literal. A char literal holds one code point,
  * which may be two UTF-16 units (`'😀'`): read unit by unit, its closing quote would open a literal of its own and
  * blank the code after it.
+ * Known limit (review C2R-1): this is not rustc's lexer. A first line `#!...` (a shebang, which rustc drops from any
+ * source file) or a `\u{...}` escape with underscores past six characters puts it out of step, so text rustc compiles
+ * can read here as a comment or a literal. Outside the two exception crates the workspace's forbid makes rustc refuse
+ * unsafe code this misses; inside npt-tcpinfo (deny, not forbid) nothing but review does.
  */
 export function lexRust(src) {
   const blank = (s) => s.replace(/[^\n]/g, " ");
@@ -268,6 +279,10 @@ const lineAt = (text, offset) => text.slice(0, offset).split("\n").length;
  * reading flags at least what leaves the crate); an absolute or computed path is a problem too, and so is a #[path]
  * whose value is not a plain string literal (rustc 1.99.1 accepts `#[path = $p]` inside a macro_rules, with the path
  * given at the call).
+ * Known limit (review C2R-2): the literal is read as written, its escapes not decoded (`.\x2e/` is `../` to rustc),
+ * and include! is found by its name only (`use std::include as inc;` hides it). Code such a path brings into a crate
+ * under the workspace's forbid is still refused by rustc if it holds unsafe code or an allow of the lint; into
+ * npt-tcpinfo, only review stops it.
  */
 function pathProblems(f, crate, code, mask, attrs) {
   const problems = [];
@@ -409,19 +424,19 @@ function inheritsWorkspaceLints(lines) {
 /**
  * Every place under crates/ that breaks the unsafe_code rule, as a sentence; empty when none does (u3c-plan.md 1.8 (a)
  * and (d)). `files` are paths relative to the spike's folder (crates/<crate>/...): its .rs files and crate manifests.
- * What is caught:
+ * What is caught, as lexRust reads the code (its known limit is there):
  * - outside the two exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
- *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code, which is unsafe
- *   code however the lint was relaxed;
- * - a manifest other than npt-client-wasm's that sets unsafe_code or does not inherit the workspace lints;
+ *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code;
+ * - a manifest other than the two exceptions' that sets unsafe_code or does not inherit the workspace lints (the
+ *   exceptions' own tables are exceptionLintProblems');
  * - in npt-tcpinfo, any relaxing but the two placed allows, `unsafe` outside their two functions, the two clippy lints
  *   named outside lib.rs's crate-level deny or that deny missing (tcpinfoProblems), and either allow missing;
- * - in every crate, a #[path] or include! that names anything but a .rs file inside the crate's folder (pathProblems),
- *   the way another crate could compile npt-tcpinfo's file under its own name.
- * npt-client-wasm's .rs files are not scanned for unsafe code: its manifest relaxes the lint for the whole crate.
- * What lies outside these files (the workspace manifest's lint, the targets' paths and editions, symbolic links,
- * rustflags and cargo configs) is checked by workspaceLintProblems, layoutProblems, crateFiles and
- * cargoConfigProblems.
+ * - in every crate, a #[path] or include! whose literal names anything but a .rs file inside the crate's folder
+ *   (pathProblems, with its known limit), the way another crate could compile npt-tcpinfo's file under its own name.
+ * npt-client-wasm's .rs files are not scanned for unsafe code: its manifest allows the lint for the whole crate.
+ * What lies outside these files (the manifests' lint tables, the targets' paths and editions, symbolic links, the
+ * environment and cargo configs) is checked by workspaceLintProblems, exceptionLintProblems, layoutProblems,
+ * crateFiles and cargoConfigProblems, all called by depsStep.
  */
 export function unsafeProblems(files, read) {
   const problems = [];
@@ -444,7 +459,7 @@ export function unsafeProblems(files, read) {
       }
       if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites, state));
       problems.push(...pathProblems(f, crate, code, mask, attrs));
-    } else if (f === `${crate}Cargo.toml` && crate !== "crates/client-wasm/") {
+    } else if (f === `${crate}Cargo.toml` && !(crate in UNSAFE_EXCEPTIONS)) {
       const lines = text.split("\n").map((l) => l.replace(/#.*$/, ""));
       if (lines.some((l) => /\bunsafe_code\b/.test(l))) problems.push(`${f} sets unsafe_code`);
       if (!inheritsWorkspaceLints(lines)) problems.push(`${f} does not inherit the workspace lints ([lints] workspace = true)`);
@@ -478,26 +493,127 @@ export function crateFiles(cratesDir) {
 }
 
 /**
- * The workspace manifest's unsafe_code lint, which the whole rule rests on (every crate but npt-client-wasm inherits
- * it): `[workspace.lints.rust] unsafe_code = "deny"` or "forbid" (or `{ level = ... }`). Every line naming unsafe_code
- * (comments aside) must be that, in that table, and one must exist; any other form, place or level is a problem, so a
- * rewritten or relaxed line fails closed (TOML forbids a second definition of the key).
+ * A manifest's lint tables, read from tomlScan's mask, so a header or a key inside a string or a comment is none (review
+ * C2R-3: a copy of the right lines inside a multi-line string no longer counts). `tables`: for each
+ * `[<prefix>lints.<tool>]` table, a Map of its keys to their values as written, strings decoded and re-quoted and the
+ * spaces outside them dropped (`'deny'` reads `"deny"`); `lines`: each `<tool>.<key>`'s line. `problems`: what this
+ * reader does not read, as sentences its callers report, so it never passes: a key there that is quoted or dotted (a
+ * quoted key can spell unsafe_code in escapes), a value running past its line, a key in a `[<prefix>lints]` table but a
+ * crate's `workspace = true`, and lints given as a dotted key or an inline table under any other header.
+ */
+function lintTables(text, prefix, file) {
+  const scan = tomlScan(text);
+  const stringAt = new Map(scan.strings.map((s) => [s.start, s]));
+  const name = new RegExp(`^${prefix.replaceAll(".", "\\.")}lints(?:\\.([A-Za-z0-9_-]+))?$`);
+  const tables = new Map();
+  const lines = new Map();
+  const problems = [];
+  let table = "";
+  let at = 0;
+  for (const [i, line] of scan.mask.split("\n").entries()) {
+    const start = at;
+    const end = start + line.length;
+    at = end + 1;
+    const l = line.trim();
+    const header = l.match(/^\[\[?([^\]]*)\]\]?$/);
+    if (header) {
+      table = header[1].replace(/\s+/g, "");
+      continue;
+    }
+    if (!l) continue;
+    const where = `${file}:${i + 1}`;
+    const lints = table.match(name);
+    if (!lints) {
+      if (/^(?:workspace\s*\.\s*)?lints\s*[.=]/.test(l)) problems.push(`${where} gives lints as a dotted key or an inline table, which this check does not read`);
+      continue;
+    }
+    const key = l.match(/^([A-Za-z0-9_-]+)\s*=/)?.[1];
+    if (!key) {
+      problems.push(`${where} has a key in [${table}] that is quoted or dotted, which this check does not read`);
+      continue;
+    }
+    if (scan.strings.some((s) => s.start < end && s.end > end)) {
+      problems.push(`${where} has a value in [${table}] that runs past its line, which this check does not read`);
+      continue;
+    }
+    let value = "";
+    for (let j = start + line.indexOf("=") + 1; j < end; ) {
+      const s = stringAt.get(j);
+      if (s) {
+        value += JSON.stringify(s.value);
+        j = s.end;
+      } else {
+        if (!/\s/.test(scan.mask[j])) value += scan.mask[j];
+        j++;
+      }
+    }
+    if (!lints[1]) {
+      if (!(prefix === "" && key === "workspace" && value === "true")) problems.push(`${where} sets ${key} in [${table}], which this check does not read`);
+      continue;
+    }
+    if (!tables.has(lints[1])) tables.set(lints[1], new Map());
+    tables.get(lints[1]).set(key, value);
+    lines.set(`${lints[1]}.${key}`, i + 1);
+  }
+  return { tables, lines, problems };
+}
+
+/**
+ * The workspace manifest's unsafe_code lint, which the whole rule rests on: `[workspace.lints.rust] unsafe_code =
+ * "forbid"` (or `{ level = "forbid", priority = n }`), the compiler backstop (review C2R-1): every member but the two
+ * exceptions inherits it, and under it rustc refuses unsafe code and any allow of the lint (E0453), a macro-built one
+ * included. Every line naming unsafe_code outside strings and comments must be that entry; a quoted or dotted key in
+ * the lint tables, or another level, place or form, is a problem, so a rewritten or relaxed line fails closed (TOML
+ * forbids a second definition of the key or the table).
  */
 export function workspaceLintProblems(text) {
-  const problems = [];
-  const ok = /^["']?unsafe_code["']?\s*=\s*(?:(["'])(?:deny|forbid)\1|\{\s*level\s*=\s*(["'])(?:deny|forbid)\2\s*(?:,\s*priority\s*=\s*-?\d+\s*)?\})$/;
-  let table = null;
-  let found = 0;
-  for (const [i, raw] of tomlScan(text).clean.split("\n").entries()) {
-    const l = raw.trim();
-    const header = l.match(/^\[\[?([^\]]+)\]\]?$/);
-    if (header) table = header[1].replace(/\s+/g, "");
-    else if (/\bunsafe_code\b/.test(l)) {
-      if (table === "workspace.lints.rust" && ok.test(l)) found++;
-      else problems.push(`Cargo.toml:${i + 1} names unsafe_code other than as "deny" or "forbid" in [workspace.lints.rust]`);
+  const { tables, lines, problems } = lintTables(text, "workspace.", "Cargo.toml");
+  const level = tables.get("rust")?.get("unsafe_code") ?? "";
+  const ok = /^(?:"forbid"|\{level="forbid"(?:,priority=-?\d+)?\})$/.test(level);
+  for (const [i, line] of tomlScan(text).mask.split("\n").entries()) {
+    if (/\bunsafe_code\b/.test(line) && !(ok && lines.get("rust.unsafe_code") === i + 1)) {
+      problems.push(`Cargo.toml:${i + 1} names unsafe_code other than as "forbid" in [workspace.lints.rust]`);
     }
   }
-  if (found === 0) problems.push('Cargo.toml has no [workspace.lints.rust] unsafe_code = "deny" (or "forbid") for its crates to inherit');
+  if (!ok) problems.push('Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit');
+  return problems;
+}
+
+/**
+ * The two exceptions' own lint tables (review C2R-1; replacing u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true"
+ * for npt-tcpinfo, the advisor's ruling of 2026-11-08): each crate's `[lints.<tool>]` tables hold exactly the
+ * workspace's `[workspace.lints.<tool>]` keys and values, every tool and key, but unsafe_code, which is
+ * EXCEPTION_LEVELS' level: "deny" for npt-tcpinfo (its two #[allow]s need a level they can relax), "allow" for
+ * npt-client-wasm. So leaving the workspace's lints costs them nothing else. `read(path)` reads a file under the spike.
+ */
+export function exceptionLintProblems(workspaceText, read) {
+  const ws = lintTables(workspaceText, "workspace.", "Cargo.toml");
+  const problems = [];
+  for (const [folder, level] of Object.entries(EXCEPTION_LEVELS)) {
+    const f = `${folder}Cargo.toml`;
+    let text;
+    try {
+      text = read(f);
+    } catch {
+      problems.push(`${f} cannot be read`);
+      continue;
+    }
+    const own = lintTables(text, "", f);
+    problems.push(...own.problems);
+    for (const tool of new Set([...ws.tables.keys(), ...own.tables.keys()])) {
+      const want = ws.tables.get(tool) ?? new Map();
+      const got = own.tables.get(tool) ?? new Map();
+      for (const key of new Set([...want.keys(), ...got.keys()])) {
+        if (tool === "rust" && key === "unsafe_code") continue;
+        const lint = `[lints.${tool}] ${key}`;
+        if (!got.has(key)) problems.push(`${f} has no ${lint}: the workspace's is ${want.get(key)}`);
+        else if (!want.has(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, which the workspace does not`);
+        else if (got.get(key) !== want.get(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, not the workspace's ${want.get(key)}`);
+      }
+    }
+    const ownLevel = own.tables.get("rust")?.get("unsafe_code");
+    if (ownLevel !== `"${level}"`) problems.push(`${f} sets [lints.rust] unsafe_code = ${ownLevel ?? "nothing"}, not "${level}"`);
+  }
   return problems;
 }
 
@@ -630,13 +746,29 @@ const LINT_LOWERING = /^(?:-A|-W|--allow|--warn|--force-warn|--cap-lints|-Z|@)/;
  * replaces them, and cargo 1.99.1 only warns, so `[alias] clippy = "check"` would lint nothing and pass.
  */
 const SHADOWABLE = ["clippy", "fmt"];
+/**
+ * The environment's ways to replace the compiler cargo runs, or to put a program around every workspace crate's rustc
+ * call (review C2R-8): either can run another compiler or drop a lint flag. RUSTC_WRAPPER (CARGO_BUILD_RUSTC_WRAPPER,
+ * build.rustc-wrapper) stays allowed: sccache is one, and it wraps every crate's call, the dependencies' too; what a
+ * wrapper does is outside this check's reach.
+ */
+const COMPILER_ENV = ["RUSTC", "CARGO_BUILD_RUSTC", "RUSTC_WORKSPACE_WRAPPER", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER"];
+/** The same, as keys of a cargo config file ([build] rustc and rustc-workspace-wrapper, in any table or form). */
+const COMPILER_KEYS = ["rustc", "rustc-workspace-wrapper"];
 
 /**
- * Every way the cargo this command runs could relax a lint without a word in the crates (u3c review S1 and F-D), as a
- * sentence: a lint-lowering flag (LINT_LOWERING) in RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, CARGO_BUILD_RUSTFLAGS or
- * CARGO_TARGET_<triple>_RUSTFLAGS (`env`), or in a `rustflags` key of a cargo config file (`configs`: { path, text },
- * the ones cargoConfigFiles finds); a rustflags value this check cannot read; and an alias that replaces clippy or fmt
- * (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file).
+ * Every way the cargo this command runs could relax a lint, or stand in for a step, without a word in the crates (u3c
+ * review S1, F-D, C2R-4, C2R-7, C2R-8), as a sentence:
+ * - a lint-lowering flag (LINT_LOWERING) in RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, CARGO_BUILD_RUSTFLAGS or
+ *   CARGO_TARGET_<triple>_RUSTFLAGS (`env`), or in a `rustflags` key of a cargo config file (`configs`: { path, text },
+ *   the ones cargoConfigFiles finds); a rustflags value this check cannot read;
+ * - an alias that replaces clippy or fmt (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file);
+ * - another compiler or a workspace wrapper (COMPILER_ENV, COMPILER_KEYS);
+ * - a config `include` key, which loads a config file cargoConfigFiles does not read (cargo 1.99.1 honours it);
+ * - a target runner (CARGO_TARGET_<triple>_RUNNER, or a `runner` key in a config file): it runs the test binaries in
+ *   cargo's place, and the test step judges cargo's exit status (a runner `true` passes with no test run).
+ * Not read: a config's [env] table (it can set CLIPPY_ARGS for clippy-driver, review C2R-4 G) and what a member's
+ * build script prints (`cargo::rustc-env`, C2R-4 H). Both need a committed change that review sees.
  */
 export function cargoConfigProblems(env, configs) {
   const problems = [];
@@ -650,6 +782,8 @@ export function cargoConfigProblems(env, configs) {
     if (/RUSTFLAGS$/.test(k)) lowering(`${k} in the environment`, v.split(k === "CARGO_ENCODED_RUSTFLAGS" ? "\x1f" : /\s+/));
     const alias = k.match(/^CARGO_ALIAS_(\w+)$/)?.[1].toLowerCase();
     if (SHADOWABLE.includes(alias)) problems.push(`${k} in the environment replaces \`cargo ${alias}\` with an alias`);
+    if (COMPILER_ENV.includes(k)) problems.push(`${k} in the environment replaces rustc or wraps the workspace's rustc calls (only RUSTC_WRAPPER may wrap them)`);
+    if (/^CARGO_TARGET_\w+_RUNNER$/.test(k)) problems.push(`${k} in the environment runs the test binaries in cargo's place`);
   }
   for (const { path, text } of configs) {
     const scan = tomlScan(text);
@@ -660,21 +794,28 @@ export function cargoConfigProblems(env, configs) {
     for (const name of SHADOWABLE) {
       if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: an alias that replaces \`cargo ${name}\``);
     }
+    for (const name of COMPILER_KEYS) {
+      if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: it replaces rustc or wraps the workspace's rustc calls`);
+    }
+    if (tomlValues(scan, "include").length || /^[ \t]*\[\[?[ \t]*include[ \t]*[\].]/m.test(scan.mask)) {
+      problems.push(`${path} has a key \`include\`: it loads a config file this check does not read`);
+    }
+    if (tomlValues(scan, "runner").length) problems.push(`${path} has a key \`runner\`: it runs the test binaries in cargo's place`);
   }
   return problems;
 }
 
 /**
  * The cargo config files cargo reads when it runs in `start`: .cargo/config.toml and .cargo/config in `start` and in
- * every folder above it, then in CARGO_HOME (default ~/.cargo); each that exists, as { path, text }.
+ * every folder above it, then in CARGO_HOME (`env`'s, default ~/.cargo); each that exists, as { path, text }.
  */
-function cargoConfigFiles(start) {
+function cargoConfigFiles(start, env) {
   const dirs = [];
   for (let d = resolve(start); ; d = dirname(d)) {
     dirs.push(join(d, ".cargo"));
     if (dirname(d) === d) break;
   }
-  dirs.push(process.env.CARGO_HOME ?? join(homedir(), ".cargo"));
+  dirs.push(env.CARGO_HOME ?? join(homedir(), ".cargo"));
   const found = [];
   for (const dir of new Set(dirs)) {
     for (const name of ["config.toml", "config"]) {
@@ -757,15 +898,22 @@ function run(cmd, args, cwd) {
   return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status };
 }
 
-/** cargo test's counts, summed over every test binary. */
-function cargoCounts(out) {
+/**
+ * cargo test's counts, summed over every test binary, and the tests that reported a skip (review C2R-9): libtest has no
+ * skip, so a test that cannot run on this host passes and writes one line `SKIPPED <test>: <why>` to stderr itself,
+ * past libtest's capture (crates/tcpinfo's MPTCP test on a kernel without MPTCP). Each is counted and named here, so
+ * the step's summary line shows it; it stays counted in `passed` too, as libtest counts it.
+ */
+export function cargoCounts(out) {
   let passed = 0;
   let failed = 0;
   for (const m of out.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed/g)) {
     passed += Number(m[1]);
     failed += Number(m[2]);
   }
-  return `${passed} tests passed, ${failed} failed`;
+  const skipped = [...out.matchAll(/^SKIPPED (\S+): /gm)].map((m) => m[1]);
+  const which = skipped.length ? ` (${skipped.join(", ")})` : "";
+  return `${passed} tests passed, ${failed} failed, ${skipped.length} reported a skip${which}`;
 }
 
 /** node --test's counts. */
@@ -795,7 +943,7 @@ function lintBothBuilds(scope) {
 }
 
 /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
- * compiled in: plan §4.7). Each count is reported. */
+ * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). */
 function testBothBuilds() {
   const measured = run("cargo", ["test", "--locked", "--workspace"], HERE);
   if (!measured.ok) return measured;
@@ -806,43 +954,76 @@ function testBothBuilds() {
 
 /**
  * What the deps step checks, as its summary line says it (plan §4.2's dependency and unsafe rules that are read from
- * `cargo metadata` and the crates' files; §4.2's wasm32 builds and clock reads are the clippy steps', its "no
- * reference into spikes/" is the refs step's, and its narrow public surfaces are not checked by this command).
+ * `cargo metadata`, the manifests, the crates' files, the environment and the cargo configs; §4.2's wasm32 builds and
+ * clock reads are the clippy steps', its "no reference into spikes/" is the refs step's, and its narrow public
+ * surfaces are not checked by this command).
+ *
+ * The static unsafe scan guards against an accidental relaxation; review, and U5's audit, are the wall against a
+ * deliberate one. Between them stands the compiler: under the workspace's forbid, rustc refuses unsafe code and any
+ * allow of the lint (E0453, a macro-built allow included) in every crate but the two exceptions, whatever the scan
+ * misreads. Known limits, which the step does not report:
+ * - lexRust is not rustc's lexer (a shebang line; a `\u{...}` escape with underscores past six characters: review
+ *   C2R-1), and pathProblems reads a #[path] or include! literal with its escapes undecoded and include! by its name
+ *   only (C2R-2). The compiler covers both in the crates under the forbid; inside npt-tcpinfo only review does.
+ * - Inputs that can lower lints and are not read here: a cargo config's [env] table (CLIPPY_ARGS, C2R-4 G), what a
+ *   member's build script prints (`cargo::rustc-env`, C2R-4 H), a RUSTC_WRAPPER program (allowed, for sccache) and a
+ *   rust-toolchain.toml `path`. Lint capping by any of them (`--cap-lints`) lowers the forbid too.
+ * - Unsafe code a dependency's macro expands into a crate is not linted by rustc (another crate's code); the
+ *   dependencies are U5's audit.
  */
 const DEPS_CHECKED =
   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
-  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace denies unsafe_code; it is " +
-  "relaxed only by npt-client-wasm's manifest and the #[allow] on npt-tcpinfo's srtt_us and unacked_and_unsent, and " +
-  "unsafe code appears only there and inside those two functions, under lib.rs's deny of the two clippy unsafe lints; " +
-  "no rustflags or cargo config lowers a lint or replaces clippy or fmt; every member lives in crates/ and builds " +
-  "only .rs files in its own folder, in edition 2024, none a proc-macro, and every path dependency is a member; no " +
-  "symbolic link under crates/; every #[path] and include! names a .rs file in its own crate";
+  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace forbids unsafe_code and " +
+  "every member inherits its lints but npt-client-wasm (allow) and npt-tcpinfo (deny), whose own lint tables are the " +
+  "workspace's otherwise; as the scan reads crates/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, " +
+  "and npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
+  "them, and keeps lib.rs's deny of the two clippy unsafe lints; the environment and the cargo configs read pass no " +
+  "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and " +
+  "no test runner; every member lives in crates/ and builds only .rs files in its own folder, in edition 2024, none " +
+  "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
+  "literal names a .rs file in its own crate";
 
-const STEPS = {
+/** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
+function cargoMetadata(here) {
+  const r = run("cargo", ["metadata", "--locked", "--format-version", "1", "--all-features"], here);
+  return r.ok ? { ok: true, meta: JSON.parse(r.stdout) } : r;
+}
+
+/**
+ * The deps step on the spike in `here`, with `env` as the environment and `metadata(here)` for cargo metadata: every
+ * check it makes is called here, and STEPS.deps is this function (review C2R-5: check.test.mjs runs it on a fixture
+ * with one plant per check, so a check unhooked from it fails a test).
+ */
+export function depsStep(here = HERE, env = process.env, metadata = cargoMetadata) {
+  const r = metadata(here);
+  if (!r.ok) return r;
+  const { meta } = r;
+  const { files, links } = crateFiles(join(here, "crates"));
+  const configs = cargoConfigFiles(here, env);
+  const read = (f) => readFileSync(join(here, f), "utf8");
+  const workspace = read("Cargo.toml");
+  const problems = [
+    ...dependencyProblems(meta),
+    ...workspaceLintProblems(workspace),
+    ...exceptionLintProblems(workspace, read),
+    ...layoutProblems(meta),
+    ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
+    ...cargoConfigProblems(env, configs),
+    ...unsafeProblems(files, read),
+  ];
+  const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
+  return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
+}
+
+export const STEPS = {
   fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
   // Both builds, as the tests run: the measured build (no features) and the bites build (every feature). A feature can
   // compile code out as well as in (npt-lab's probe has `cfg(not(feature = "bites"))` code), so one pass is not enough.
   clippy: () => lintBothBuilds(["--workspace", "--all-targets"]),
   "clippy-wasm32": () => lintBothBuilds(WASM_ARGS),
   test: testBothBuilds,
-  deps: () => {
-    const r = run("cargo", ["metadata", "--locked", "--format-version", "1", "--all-features"], HERE);
-    if (!r.ok) return r;
-    const meta = JSON.parse(r.stdout);
-    const { files, links } = crateFiles(join(HERE, "crates"));
-    const configs = cargoConfigFiles(HERE);
-    const problems = [
-      ...dependencyProblems(meta),
-      ...workspaceLintProblems(readFileSync(join(HERE, "Cargo.toml"), "utf8")),
-      ...layoutProblems(meta),
-      ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
-      ...cargoConfigProblems(process.env, configs),
-      ...unsafeProblems(files, (f) => readFileSync(join(HERE, f), "utf8")),
-    ];
-    const read = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
-    return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${read})` };
-  },
+  deps: depsStep,
   refs: () => {
     const r = run("git", ["ls-files", "-z"], ROOT);
     if (!r.ok) return r;

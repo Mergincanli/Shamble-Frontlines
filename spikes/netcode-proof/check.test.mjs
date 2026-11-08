@@ -2,6 +2,7 @@
 // be caught; the clean graph must pass. Run: node --test spikes/netcode-proof/check.test.mjs
 
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -9,10 +10,14 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  STEPS,
   WASM_CRATES,
   cargoConfigProblems,
+  cargoCounts,
   crateFiles,
   dependencyProblems,
+  depsStep,
+  exceptionLintProblems,
   expectedMarks,
   layoutProblems,
   lexRust,
@@ -177,7 +182,7 @@ function cleanCrates() {
   return {
     "crates/client-wasm/Cargo.toml": '[package]\nname = "npt-client-wasm"\n\n[lints.rust]\nunsafe_code = "allow"\n',
     "crates/client-wasm/src/lib.rs": "pub fn create() {}\n",
-    "crates/tcpinfo/Cargo.toml": '[package]\nname = "npt-tcpinfo"\n\n[lints]\nworkspace = true\n',
+    "crates/tcpinfo/Cargo.toml": '[package]\nname = "npt-tcpinfo"\n\n[lints.rust]\nunsafe_code = "deny"\n',
     "crates/tcpinfo/src/lib.rs":
       "//! The `#[allow(unsafe_code)]` sits on the two functions only (a doc comment, not an attribute).\n" +
       "/* A block comment /* nested */ naming #[allow(unsafe_code)] is a comment too. */\n" +
@@ -260,6 +265,11 @@ test("unsafe_code: a manifest that sets it or drops the workspace lints fails", 
     f["crates/sim/Cargo.toml"] = '[package]\nname = "npt-sim"\nworkspace = true\n';
   });
   assert.deepEqual(dropped, ["crates/sim/Cargo.toml does not inherit the workspace lints ([lints] workspace = true)"]);
+  // The two exceptions' manifests set their own level (the workspace forbids it): exceptionLintProblems reads those.
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/tcpinfo/Cargo.toml"] = '[package]\nname = "npt-tcpinfo"\n\n[lints.rust]\nunsafe_code = "deny"\n')),
+    [],
+  );
 });
 
 test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
@@ -516,26 +526,96 @@ test("npt-tcpinfo: the clippy unsafe lints stay denied at the crate root and rel
   assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `${DENY.replace("deny", "forbid")}mod linux;\n`)), [], "forbid is fine");
 });
 
-test("the workspace manifest denies unsafe_code, and nothing else will do (review F-D)", () => {
+test("the workspace manifest forbids unsafe_code, and nothing else will do (review F-D, C2R-1, C2R-3)", () => {
   const real = readFileSync(join(HERE, "Cargo.toml"), "utf8");
   assert.deepEqual(workspaceLintProblems(real), [], "the spike's own Cargo.toml");
-  const none = 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "deny" (or "forbid") for its crates to inherit';
+  const none = 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit';
   const line = real.split("\n").findIndex((l) => l.startsWith("unsafe_code")) + 1;
-  const other = (n) => `Cargo.toml:${n} names unsafe_code other than as "deny" or "forbid" in [workspace.lints.rust]`;
-  for (const level of ['"allow"', '"warn"', "'allow'", '{ level = "allow", priority = 1 }']) {
-    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${level}`)), [other(line), none], level);
+  const other = (n) => `Cargo.toml:${n} names unsafe_code other than as "forbid" in [workspace.lints.rust]`;
+  const quoted = (n, table) => `Cargo.toml:${n} has a key in [${table}] that is quoted or dotted, which this check does not read`;
+  const level = (v) => workspaceLintProblems(real.replace('unsafe_code = "forbid"', `unsafe_code = ${v}`));
+  // deny keeps every crate's lint but drops the compiler backstop: a crate's allow would compile again.
+  for (const v of ['"deny"', "'deny'", '{ level = "deny", priority = -1 }', '"allow"', '"warn"', '{ level = "allow", priority = 1 }']) {
+    assert.deepEqual(level(v), [other(line), none], v);
   }
-  assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', "")), [none], "the line removed");
-  for (const ok of ['"forbid"', "'deny'", '{ level = "deny", priority = -1 }']) {
-    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${ok}`)), [], ok);
-  }
+  assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "forbid"', "")), [none], "the line removed");
+  for (const v of ["'forbid'", '{ level = "forbid", priority = -1 }', '"forbid" # a comment']) assert.deepEqual(level(v), [], v);
   const t = (body) => `[workspace]\nmembers = []\n${body}`;
-  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.rust]\n# unsafe_code = "allow" in a comment\nunsafe_code = "deny"\n')), []);
-  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.clippy]\nunsafe_code = "deny"\n')), [other(4), none], "another table");
-  assert.deepEqual(workspaceLintProblems(t('[workspace.lints]\nrust.unsafe_code = "deny"\n')), [other(4), none], "a dotted key (read closed)");
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.rust]\n# unsafe_code = "allow" in a comment\nunsafe_code = "forbid"\n')), []);
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.clippy]\nunsafe_code = "forbid"\n')), [other(4), none], "another table");
+  assert.deepEqual(
+    workspaceLintProblems(t('[workspace.lints]\nrust.unsafe_code = "forbid"\n')),
+    [quoted(4, "workspace.lints"), other(4), none],
+    "a dotted key (read closed)",
+  );
   // A copy of the right lines inside a multi-line string, the real one relaxed below it.
-  const decoy = t('[workspace.metadata]\nnote = """\n[workspace.lints.rust]\nunsafe_code = "deny"\n"""\n[workspace.lints.rust]\nunsafe_code = "allow"\n');
-  assert.ok(workspaceLintProblems(decoy).includes(other(9)), workspaceLintProblems(decoy).join("\n"));
+  const decoy = t('[workspace.metadata]\nnote = """\n[workspace.lints.rust]\nunsafe_code = "forbid"\n"""\n[workspace.lints.rust]\nunsafe_code = "allow"\n');
+  assert.deepEqual(workspaceLintProblems(decoy), [other(9), none]);
+  // The critic's E (review C2R-3): the real key spelt in a quoted key's escapes, which cargo decodes to unsafe_code
+  // (cargo check -v passed --allow=unsafe_code), and the decoy in a string: the header and the key are read outside
+  // strings, so the decoy is none, and the quoted key is refused.
+  const escaped = `${real.replace('unsafe_code = "forbid"', '"unsafe\\u005fcode" = "allow"')}[workspace.metadata.note]\ntext = """\n[workspace.lints.rust]\nunsafe_code = "forbid"\n"""\n`;
+  assert.deepEqual(workspaceLintProblems(escaped), [quoted(line, "workspace.lints.rust"), none]);
+  // A table name with a quoted part (cargo reads `[workspace."lints".rust]` as the same table) is not a lint table here.
+  assert.deepEqual(workspaceLintProblems(real.replace("[workspace.lints.rust]", '[workspace."lints".rust]')), [other(line), none]);
+});
+
+test("the two exceptions hold the workspace's other lints in their own tables, and their own level (review C2R-1)", () => {
+  const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+  const T = "crates/tcpinfo/Cargo.toml";
+  const W = "crates/client-wasm/Cargo.toml";
+  const real = { [T]: readFileSync(join(HERE, T), "utf8"), [W]: readFileSync(join(HERE, W), "utf8") };
+  const read = (changed) => (p) => {
+    if (!(p in real)) throw new Error(`no ${p}`);
+    return changed[p] ?? real[p];
+  };
+  assert.deepEqual(exceptionLintProblems(ws, read({})), [], "the spike's own manifests");
+  const tcp = (from, to) => exceptionLintProblems(ws, read({ [T]: real[T].replace(from, to) }));
+  assert.deepEqual(tcp('iter_over_hash_type = "deny"\n', ""), [`${T} has no [lints.clippy] iter_over_hash_type: the workspace's is "deny"`]);
+  assert.deepEqual(tcp('disallowed_types = "deny"', 'disallowed_types = "warn"'), [
+    `${T} sets [lints.clippy] disallowed_types = "warn", not the workspace's "deny"`,
+  ]);
+  assert.deepEqual(tcp("[lints.clippy]\n", '[lints.clippy]\nundocumented_unsafe_blocks = "allow"\n'), [
+    `${T} sets [lints.clippy] undocumented_unsafe_blocks = "allow", which the workspace does not`,
+  ]);
+  assert.deepEqual(tcp('unsafe_code = "deny"\n', 'unsafe_code = "deny"\nunused = "allow"\n'), [`${T} sets [lints.rust] unused = "allow", which the workspace does not`]);
+  // Its own level: deny, which its two #[allow]s can relax; forbid would refuse them, allow or warn relax the crate.
+  for (const [v, shown] of [['"forbid"', '"forbid"'], ['"allow"', '"allow"'], ['"warn"', '"warn"'], ['{ level = "deny" }', '{level="deny"}']]) {
+    assert.deepEqual(tcp('unsafe_code = "deny"', `unsafe_code = ${v}`), [`${T} sets [lints.rust] unsafe_code = ${shown}, not "deny"`], v);
+  }
+  assert.deepEqual(tcp('unsafe_code = "deny"', "unsafe_code = 'deny'"), [], "a literal string is the same value");
+  assert.deepEqual(tcp('unsafe_code = "deny"\n', ""), [`${T} sets [lints.rust] unsafe_code = nothing, not "deny"`]);
+  // The workspace's lints inherited instead (u3c-plan.md 1.8 (a)'s old form): forbid there would refuse the allows.
+  const inherited = exceptionLintProblems(ws, read({ [T]: '[package]\nname = "npt-tcpinfo"\n\n[lints]\nworkspace = true\n' }));
+  assert.ok(inherited.includes(`${T} sets [lints.rust] unsafe_code = nothing, not "deny"`), inherited.join("\n"));
+  assert.ok(inherited.includes(`${T} has no [lints.clippy] disallowed_types: the workspace's is "deny"`), inherited.join("\n"));
+  // Read closed: a quoted key, and a copy of the dropped line inside a string, which is none.
+  const at = real[T].split("\n").findIndex((l) => l.startsWith("disallowed_types")) + 1;
+  assert.deepEqual(tcp('disallowed_types = "deny"', '"disallowed_types" = "deny"'), [
+    `${T}:${at} has a key in [lints.clippy] that is quoted or dotted, which this check does not read`,
+    `${T} has no [lints.clippy] disallowed_types: the workspace's is "deny"`,
+  ]);
+  const decoy = exceptionLintProblems(
+    ws,
+    read({ [T]: `${real[T].replace('disallowed_types = "deny"\n', "")}[package.metadata]\nnote = """\n[lints.clippy]\ndisallowed_types = "deny"\n"""\n` }),
+  );
+  assert.deepEqual(decoy, [`${T} has no [lints.clippy] disallowed_types: the workspace's is "deny"`]);
+  // npt-client-wasm: allow, and the same other lints.
+  assert.deepEqual(exceptionLintProblems(ws, read({ [W]: real[W].replace('unsafe_code = "allow"', 'unsafe_code = "deny"') })), [
+    `${W} sets [lints.rust] unsafe_code = "deny", not "allow"`,
+  ]);
+  assert.deepEqual(exceptionLintProblems(ws, read({ [W]: real[W].replace('disallowed_methods = "deny"\n', "") })), [
+    `${W} has no [lints.clippy] disallowed_methods: the workspace's is "deny"`,
+  ]);
+  // A lint the workspace adds must be added to both.
+  const more = ws.replace('iter_over_hash_type = "deny"\n', 'iter_over_hash_type = "deny"\nundocumented_unsafe_blocks = "deny"\n');
+  assert.deepEqual(exceptionLintProblems(more, read({})), [
+    `${W} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
+    `${T} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
+  ]);
+  assert.deepEqual(exceptionLintProblems(ws, () => {
+    throw new Error("absent");
+  }), [`${W} cannot be read`, `${T} cannot be read`]);
 });
 
 /** cargo metadata's shape for layoutProblems: members by folder, each with its targets ([kind, name, src, edition?]). */
@@ -663,6 +743,152 @@ test("the crate walk reads every folder and reports symbolic links it does not f
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+test("another rustc, a workspace wrapper, a config include and a test runner are refused; this container's environment is not (review C2R-4, C2R-7, C2R-8)", () => {
+  // This container's cargo environment (2026-11-08: CARGO_HTTP_CAINFO, RUSTUP_HOME, RUST_BACKTRACE), the target folder
+  // every unit passes, rustup's toolchain variable and sccache as RUSTC_WRAPPER: none of it is refused.
+  const normal = {
+    PATH: "/usr/local/bin:/usr/bin",
+    HOME: "/root",
+    CARGO_HTTP_CAINFO: "/root/.ccr/ca-bundle.crt",
+    RUSTUP_HOME: "/root/.rustup",
+    RUST_BACKTRACE: "1",
+    CARGO_TARGET_DIR: "/home/user/Shamble-Frontlines/.gate/u3v3-model-target",
+    RUSTUP_TOOLCHAIN: "1.99.1",
+    RUSTC_WRAPPER: "sccache",
+    CARGO_BUILD_RUSTC_WRAPPER: "/usr/bin/sccache",
+  };
+  assert.deepEqual(cargoConfigProblems(normal, []), []);
+  const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
+  assert.deepEqual(config('[build]\nrustc-wrapper = "sccache"\ntarget-dir = "t"\n[target.x86_64-unknown-linux-gnu]\nlinker = "cc"\n'), []);
+  // C2R-8: another compiler, or a wrapper around the workspace crates' rustc calls.
+  for (const k of ["RUSTC", "CARGO_BUILD_RUSTC", "RUSTC_WORKSPACE_WRAPPER", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER"]) {
+    assert.deepEqual(cargoConfigProblems({ ...normal, [k]: "/opt/other/rustc" }, []), [
+      `${k} in the environment replaces rustc or wraps the workspace's rustc calls (only RUSTC_WRAPPER may wrap them)`,
+    ]);
+  }
+  for (const [text, key] of [
+    ['[build]\nrustc = "/opt/other/rustc"\n', "rustc"],
+    ['build.rustc-workspace-wrapper = "w"\n', "rustc-workspace-wrapper"],
+    ['[build]\n"rustc" = "r"\n', "rustc"],
+  ]) {
+    assert.deepEqual(config(text), [`c.toml has a key \`${key}\`: it replaces rustc or wraps the workspace's rustc calls`], text);
+  }
+  // C2R-4 (the critic's F): an include of a file this check never reads, which cargo 1.99.1 loads on stable.
+  for (const text of ['include = ["extra.toml"]\n[build]\ntarget-dir = "t"\n', 'include = "extra.toml"\n', '[[include]]\npath = "extra.toml"\n']) {
+    assert.deepEqual(config(text), ["c.toml has a key `include`: it loads a config file this check does not read"], text);
+  }
+  // C2R-7: a runner `true` makes cargo test exit 0 with no test run.
+  assert.deepEqual(cargoConfigProblems({ ...normal, CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER: "true" }, []), [
+    "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER in the environment runs the test binaries in cargo's place",
+  ]);
+  for (const text of ['[target.x86_64-unknown-linux-gnu]\nrunner = "true"\n', "[target.'cfg(unix)']\nrunner = [\"true\"]\n", 'target.x86_64-unknown-linux-gnu.runner = "true"\n']) {
+    assert.deepEqual(config(text), ["c.toml has a key `runner`: it runs the test binaries in cargo's place"], text);
+  }
+});
+
+/**
+ * A spike folder for depsStep (the workspace manifest, the two exceptions, npt-room and a cargo config) and cargo
+ * metadata's shape for it, from clean()'s graph: every member at crates/<name without npt->/ with one lib target there.
+ * `plant` changes the files, `change` the graph.
+ */
+function depsFixture(t, plant = () => {}, change = () => {}) {
+  const dir = mkdtempSync(join(tmpdir(), "npt-deps-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const files = {
+    "Cargo.toml": '[workspace]\nmembers = ["crates/*"]\n\n[workspace.lints.rust]\nunsafe_code = "forbid"\n\n[workspace.lints.clippy]\ndisallowed_types = "deny"\n',
+    "crates/client-wasm/Cargo.toml": '[package]\nname = "npt-client-wasm"\n\n[lints.rust]\nunsafe_code = "allow"\n\n[lints.clippy]\ndisallowed_types = "deny"\n',
+    "crates/tcpinfo/Cargo.toml": '[package]\nname = "npt-tcpinfo"\n\n[lints.rust]\nunsafe_code = "deny"\n\n[lints.clippy]\ndisallowed_types = "deny"\n',
+    "crates/tcpinfo/src/lib.rs": `${DENY}mod linux;\n`,
+    "crates/tcpinfo/src/linux.rs": `${placed("srtt_us")}${placed("unacked_and_unsent")}`,
+    "crates/room/Cargo.toml": '[package]\nname = "npt-room"\n\n[lints]\nworkspace = true\n',
+    "crates/room/src/lib.rs": "pub fn f() {}\n",
+    ".cargo/config.toml": '[build]\ntarget-dir = "t"\n',
+  };
+  plant(files);
+  for (const [f, text] of Object.entries(files)) {
+    mkdirSync(dirname(join(dir, f)), { recursive: true });
+    writeFileSync(join(dir, f), text);
+  }
+  const edges = clean();
+  change(edges);
+  const m = meta(edges);
+  m.workspace_root = dir;
+  for (const p of m.packages) {
+    if (!m.workspace_members.includes(p.id)) {
+      Object.assign(p, { source: "registry+https://example.invalid/index", targets: [] });
+      continue;
+    }
+    const folder = join(dir, "crates", p.name.slice(4));
+    Object.assign(p, { source: null, manifest_path: join(folder, "Cargo.toml") });
+    p.targets = [{ kind: ["lib"], name: p.name, src_path: join(folder, "src", "lib.rs"), edition: "2024" }];
+  }
+  return { dir, meta: m, env: { CARGO_HOME: join(dir, "no-cargo-home") } };
+}
+
+test("the deps step is depsStep, and it calls every check: one plant per check, each reported (review C2R-5)", (t) => {
+  assert.equal(STEPS.deps, depsStep, "check.mjs's deps step runs this function");
+  const ok = depsFixture(t);
+  const clean = depsStep(ok.dir, ok.env, () => ({ ok: true, meta: ok.meta }));
+  assert.equal(clean.ok, true, clean.out);
+  assert.match(clean.out, /^held: .* \(6 crate files and 1 cargo config file\(s\) read\)$/);
+  const bad = depsFixture(
+    t,
+    (f) => {
+      f["Cargo.toml"] = f["Cargo.toml"].replace('"forbid"', '"deny"');
+      f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
+      f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
+      f["crates/room/src/evil.rs"] = UNSAFE_FN;
+    },
+    (e) => (e["npt-sim"] = n("tokio")),
+  );
+  bad.meta.packages.find((p) => p.name === "npt-room").targets[0].src_path = join(bad.dir, "crates", "tcpinfo", "src", "linux.rs");
+  let linked = true;
+  try {
+    symlinkSync("lib.rs", join(bad.dir, "crates", "room", "src", "k.rs"));
+  } catch {
+    linked = false;
+  }
+  const r = depsStep(bad.dir, bad.env, () => ({ ok: true, meta: bad.meta }));
+  assert.equal(r.ok, false);
+  const lines = r.out.split("\n");
+  for (const [check, line] of [
+    ["dependencyProblems", "leaf crate npt-sim depends on tokio"],
+    ["workspaceLintProblems", 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit'],
+    ["exceptionLintProblems", `crates/tcpinfo/Cargo.toml has no [lints.clippy] disallowed_types: the workspace's is "deny"`],
+    ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
+    ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
+    ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],
+  ]) {
+    assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
+  }
+  if (!linked) t.diagnostic("symbolic links cannot be made here: the link refusal is not exercised");
+  else assert.ok(lines.includes("crates/room/src/k.rs is a symbolic link: the scan does not follow it, and rustc would"), r.out);
+  // The environment it is given is the one checked (process.env when check.mjs runs it).
+  const runner = depsStep(ok.dir, { ...ok.env, CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER: "true" }, () => ({ ok: true, meta: ok.meta }));
+  assert.equal(runner.out, "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER in the environment runs the test binaries in cargo's place");
+  // cargo metadata failing fails the step with its output.
+  assert.deepEqual(depsStep(ok.dir, ok.env, () => ({ ok: false, out: "error: no Cargo.lock" })), { ok: false, out: "error: no Cargo.lock" });
+});
+
+test("the test step counts and names a test that reported a skip (review C2R-9)", () => {
+  const out =
+    "running 2 tests\ntest a ... ok\ntest b ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured\n" +
+    "test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured\n" +
+    "SKIPPED an_mptcp_socket_is_not_tcp_for_either_reading: no MPTCP socket on this kernel (Protocol not available (os error 92))\n";
+  assert.equal(cargoCounts(out), "7 tests passed, 0 failed, 1 reported a skip (an_mptcp_socket_is_not_tcp_for_either_reading)");
+  assert.equal(cargoCounts("test result: ok. 3 passed; 0 failed; 0 ignored"), "3 tests passed, 0 failed, 0 reported a skip");
+  // The line npt-tcpinfo's tests write is the one counted here.
+  const rs = readFileSync(join(HERE, "crates", "tcpinfo", "src", "tests.rs"), "utf8");
+  assert.ok(rs.includes('format!("SKIPPED {test}: {why}\\n")'), "crates/tcpinfo/src/tests.rs writes `SKIPPED <test>: <why>`");
+});
+
+test("the root run's provenance hides only its own new logs (review C2R-10; Python's own test)", () => {
+  const script = join(HERE, "results", "u3c-kernel-check", "test_siocoutq_root_check.py");
+  const r = spawnSync("python3", ["-I", "-B", script], { encoding: "utf8" });
+  assert.equal(r.status, 0, `${r.error ?? ""}${r.stdout}${r.stderr}`);
+  assert.match(r.stderr, /^Ran [1-9]\d* tests? in .*\n\nOK\n?$/m, r.stderr);
 });
 
 test("npt-tcpinfo's non-Linux stub is linted for wasm32 with the leaf crates (review F-N)", () => {

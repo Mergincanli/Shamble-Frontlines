@@ -7,9 +7,16 @@ rust-version.workspace = true
 publish.workspace = true
 
 # Not the workspace lints: wasm-bindgen's generated code needs `unsafe` (one of the workspace's two unsafe_code
-# exceptions, with npt-tcpinfo's two functions; the workspace Cargo.toml's note).
+# exceptions, with npt-tcpinfo's two functions; the workspace Cargo.toml's note), and the workspace forbids it. So
+# [lints.rust] allows it for this crate, and every other lint is the workspace's, key for key (check.mjs's deps step
+# checks both).
 [lints.rust]
 unsafe_code = "allow"
+
+[lints.clippy]
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
