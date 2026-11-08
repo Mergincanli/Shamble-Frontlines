@@ -272,7 +272,9 @@ functions on a `BorrowedFd`:
 - `unacked_and_unsent(fd) -> io::Result<u32>`: ioctl(SIOCOUTQ = TIOCOUTQ, 0x5411).
 
 **(a) Lints.**
-- Keep `[lints] workspace = true`.
+- ~~Keep `[lints] workspace = true`.~~ Superseded by the advisor's ruling of 2026-11-08 (C2b, b5e4043): the workspace
+  forbids unsafe_code, so npt-tcpinfo carries its own `[lints]` table equal to the workspace's but for
+  `unsafe_code = "deny"`, and check.mjs's exceptionLintProblems compares the two.
 - `#[allow(unsafe_code, reason = "…")]` on the two functions only, not crate-wide.
 - Each unsafe block has a SAFETY comment stating its invariant.
 - Deny clippy's undocumented_unsafe_blocks and multiple_unsafe_ops_per_block.

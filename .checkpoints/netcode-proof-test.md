@@ -499,6 +499,29 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 20:55 UTC: C1b MERGED at f01d573** (applied from .claude/worktrees/wf_10e244da-89a-1 via worktree_patch.py;
+  check.mjs 9/9: 258 measured, 272 bites, self 35, redact 0; gate PASS --no-smoke).
+  - R1 fixed; G-PRE-WAKE, G-PRE-PANIC, G-F10, G-NC4, G-FH, G-NC8, G-NC2; the split pooled per process (309,583 B per
+    connection + 1,350,400 B per process). Notes u3c-fix2-c1b-finish.md.
+  - **Both critics DONE** (workflow wf_10e244da-89a): rust-reviewer on C1b (u3c-fix2-review-c1b.md: code APPROVE,
+    REVISE for small tests); test-engineer on C2b (u3c-fix2-review-c2b.md: REVISE small, 9/9 reproduced, 32 of 33
+    revert bites caught).
+  - **Their remaining gaps (the final small fix round, C1c and C2c):**
+    - C1c (npt-net): (1) MEDIUM: R1's no-spin guard (`!s_owes_write`) is unpinned: with it removed, a_full_budget's
+      1.5 s hold makes ~170,000 pump polls (fixed: ~120) and still passes; bound life().polls there. (2) LOW:
+      add_burst's G-PRE-WAKE wake (delay.rs ~:1132) unpinned. (3) LOW: G-PRE-PANIC's `thread::panicking()` condition
+      unpinned the other way (a normal pump end turned into an error passes every test). (4) INFO: poll_shutdown
+      returns Ok(()) after a panicked pump (pre-existing; the writer-side twin of the clean-EOF lie).
+    - C2c (check.mjs, tcpinfo, the Python test): F1 lintTables skips `[lints.<tool>.<lint>]` sub-tables and hyphen
+      lint names (a hyphen sub-table relaxes the exceptions' clippy deny and tcpinfo's deny; the forbid backstop
+      holds); F2 test_siocoutq_root_check.py's git() inherits GIT_DIR and can commit into another repository; F3 the
+      CARGO_HOME parameter of depsStep is untested; F4 the MPTCP test's real stderr wiring is untested; F5
+      RUSTC_BOOTSTRAP plus a manifest's `cargo-features = ["profile-rustflags"]` and profile `rustflags` cap the lints
+      unseen; F6 the BPF-hook line in linux.rs's SOL_SOCKET SAFETY comments (C2R-9 (2)).
+    - Done by the main session (F6's text part): plan §4.2 (forbid, own tables, four unsafe blocks), §4.8 (four
+      blocks), u3c-plan.md 1.8 (a) (superseded by the ruling); plan §12.1 U6 gets the pool carry (INFO 5).
+  - **Working rule (G-METHOD):** each build copy uses its own CARGO_TARGET_DIR, or touches its tree's sources before a
+    run and checks each run's test count (a shared target dir once ran another copy's build).
 - **About 20:15 UTC: C2b MERGED at b5e4043** (the forbid backstop and check.mjs's scope).
   - The main session read the diff, since the classifier was down during that agent's run: no network or process use,
     and writes only to temporary test folders. Its Python test only imports provenance() into a temp git repo, never
