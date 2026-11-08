@@ -499,6 +499,21 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 22:10 UTC: the condition-10 diagnostic DONE and committed (ecdeeb0)**:
+  results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (identical to the raw output; redact 0). Split violations 0.
+  Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the
+  pass's rest + the reader task's turn) max 8.4 / 22.2 ms and most of up's E (16.6-18.6 of 26.8-35.4 us); ImpairSocket
+  in the same window p99.9 1.25-4.24 ms, max 3.1-8.2 ms. Totals: down E 11.5 / 16.6 us, up E 26.8 / 35.4 us.
+  - **With the advisor now** (background agent, launched about 22:12): C10-B (recommend: no (b) before R1), UP-STAMP
+    (recommend: one more stamp at the pump's up release in U6/U8, bar unchanged), U3C-CLOSE (close once C2d's critic
+    says complete). Its ruling text is appended by the main session to advisor-u3c-plan.md. If cut: relaunch the same
+    ask (the prompt is in this session's transcript; the evidence and report paths are above).
+- **About 22:11 UTC: C2d launched, workflow `wf_b13b9984-6bc` (npt-u3c-fix4) on ecdeeb0**: fix:C2d (N1-N5; notes
+  u3c-fix4-c2d.md in its worktree; cache .gate/u3c-review-target) then critic:C2d (test-engineer; notes
+  u3c-fix4-review-c2d.md; deliberate-only ways around go to known limits). If cut: snapshot its worktree with
+  worktree_patch.py (wip/u3c-fix4-wt1.patch), then resume with Workflow({scriptPath:
+  /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3c-fix4-wf_b13b9984-6bc.js,
+  resumeFromRunId: "wf_b13b9984-6bc", args: {sha: "ecdeeb0beee0994cdb5644830d813cdca0c3af5c"}}).
 - **About 21:50 UTC: the final round MERGED at f6cd1d7** (C1c + C2c; check.mjs 9/9: 260 measured, 274 bites, self 41,
   redact 0; gate PASS --no-smoke; pushed). C1c's critic: COMPLETE (APPROVE), every bite caught. C2c's critic: no
   regression; five small gaps:
