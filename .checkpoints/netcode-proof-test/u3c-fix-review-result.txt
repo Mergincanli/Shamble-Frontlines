@@ -1,0 +1,466 @@
+{
+  "summary": "Re-review only U3c fix-pass diff (95597ef..81203da): C1 and C2 critics, each adversarially verified",
+  "agentCount": 4,
+  "logs": [],
+  "result": [
+    {
+      "critic": {
+        "verdict": "gaps",
+        "per_finding": [
+          "F1 + S7: FIXED. add_burst refuses start_ns + len_ns past u64::MAX and a start at or before the model's now (delay.rs:809-812). due() and record_return saturate (delay.rs:457-469, :444). S7's U6 range-check carry is in add_burst's doc (delay.rs:801-802). Proof: a_burst_past_the_clocks_range_is_refused_and_never_wraps (delay_tests.rs:1022-1063) fails at delay_tests.rs:1029 when the refusal is removed (re-run on 81203da, .gate/u3c-fixrev-c1/bites-final.txt).",
+          "F-K + NC-U3c-1 + NC-U3c-10: FIXED. writer_run now runs until both returns have their first down byte and message, a model-state stop with a 900-tick hang guard (delay_tests.rs:2369-2411). It records N at each write and judges each return against N at the last write before it (:2403, :2432-2440), guards against vacuity (:2528-2533) and checks at_ns == start + 1 s (:2516-2522). Proof: with every write moved 5/12/20/25 ms inside its tick, 8 of 8 runs pass, with first bytes up to 2,569 ms after the return, past the old ~2.1 s cut-off (.gate/u3c-fixrev-c1/fk-phase.txt). A gate one snapshot more cautious fails the vacuity guard at :2529. Still open: plan 1.4 (c) and R13 wording are not yet corrected in u3c-plan.md (main-session carry).",
+          "F-L / NC-U3c-5 / F11: FIXED. gate_inputs() reads srtt, outstanding, owed and free under one current() (delay.rs:903-911), and test (c) uses it (delay_tests.rs:2390). It is a race, so no mutation test is possible; confirmed by reading.",
+          "F3: FIXED. The lock is taken only to stage, commit, copy reads in and step (delay.rs:1359-1536). S's poll_write, poll_flush, poll_read and poll_shutdown all run unlocked (:1398, :1444, :1483, :1515). Proof: re-wrapping any of the four calls in the lock fails the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it at delay_tests.rs:1582 or :1660. Race review: no double commit (one commit per Ready(n), clamped, :1402-1431). A record S took only in part stays staged with recs[DOWN] non-empty, so shutdown waits for it (:1512). Only the pump pops the front record or moves the scanner's buffer. Model time stays monotonic, because every clock read used for a step is under the lock. No lost wake against current() or add_burst for their own releases. One regression in this rewrite: R1.",
+          "F2: FIXED. Stepped drops its guard before its wakes (delay.rs:582-588), and poll_shutdown wakes the pump after drop(c) (:1301-1305). Proof: swapping the field order fails at delay_tests.rs:1566; waking under the lock in poll_shutdown fails at :1653.",
+          "F4: FIXED. The front record is staged once (delay.rs:1382-1397) and re-offered from sent..staged after Pending or a partial write. Proof: copying it again on every attempt fails at delay_tests.rs:1576.",
+          "F7: FIXED. stats::Running keeps the window as a difference against a sparse mark, with a dense mark beyond 256 buckets. Footprint checked by hand: 2 x 142,240 + 8,192 + 16,384 + 527 = 309,583 B. Proof: a_running_window_equals_a_fresh_histogram_of_its_samples (stats.rs:552-595) fails under 3 mutations (touched bit never set :586; window stays dense :590; go_dense not restoring the marks :587). ws_conn_fixed_bytes is asserted at delay_tests.rs:1937-1941.",
+          "F-B: FIXED. The burst test asserts logged start == asked start minus origin (delay_tests.rs:1228-1235), and (c) asserts at_ns (:2516-2522). add_burst without the origin fails each test when run alone (:1230, :2517).",
+          "F-A: FIXED. wrap_moves_the_profiles_bursts_to_the_models_axis (delay_tests.rs:1069-1125); leaving the burst ends on the clock's axis fails at :1093.",
+          "F-G: FIXED. an_eof_from_s_ends_the_up_direction_after_its_last_byte (delay_tests.rs:1676-1719); ending at EOF while records still wait fails at :1699.",
+          "F-M: FIXED. its_rows asserts the slack now, at start and set (delay_tests.rs:1942-1961); starting the clock with slack 0 fails at :1955.",
+          "S2: FIXED. ws_frame.rs:180-191 follows httparse 1.10.1's line rules, checked against the registry source: skip_empty_lines lib.rs:558-581, newline! macros.rs:55-67, head end lib.rs:1105-1116. Tests: the_head_ends_where_tungstenite_ends_it; the_head_matches_tungstenite_on_seeded_inputs (20,000 inputs against tungstenite's TryParse); each_limit's bare-LF, mixed and leading-blank heads (delay_tests.rs:774-812). Proof: no bare-LF end fails ws_frame.rs:505 and each_limit (hang guard at delay_tests.rs:681); not skipping leading empty lines fails at ws_frame.rs:505.",
+          "NC-U3c-4: PARTLY FIXED. Return.owed (delay.rs:125-128, :448), the RETURN name and the SERIES rows state r2:379 (3)'s sum. No test reads the value: forcing owed to 0 passes all 24 l2::delay tests.",
+          "NC-U3c-2: PARTLY FIXED. The bound is restated in delay.rs:42-47 and both SERIES held-bytes rows. Not done: the lossy held-bytes case the finding asked for (a_full_budget still runs quiet P2, delay_tests.rs:551), and plan 1.2's text.",
+          "NC-U3c-3: FIXED as specified: fresh now after S's read (delay.rs:1470-1472), doc (delay_tests.rs:2039-2045), intake printed (:2140-2159). Reverting the fresh now passes every test, as designed (printed, not judged). The same new step causes regression R1.",
+          "NC-U3c-9: FIXED. SERIES.md's shutdown_timeout row and both first_byte rows now match the code.",
+          "NC-U3c-11: FIXED as allowed (recorded only): HANDSHAKE text at delay.rs:101-103 and the SERIES row.",
+          "F5: FIXED. delay.rs:1166-1170. Proof: the_request_is_one_record (delay_tests.rs:644-651) fails at :645 when the zero-capacity branch is disabled.",
+          "F6: FIXED. Doc at delay.rs:1004-1006. The clock reads /proc with the state lock released and re-checks the schedule under the lock before any wait, so no wake is lost (delay_clock.rs:191-203). its_rows calls header_numbers through spawn_blocking (delay_tests.rs:1918-1923). Confirmed by reading; no test covers the lock move.",
+          "F10: PARTLY FIXED. move_up compacts once per call (delay.rs:508-530), but no test reaches the compaction with records still pending: dropping the bounds shift (:527) passes all 24 l2::delay tests. My scratch probe 4 (tiny frames fill the up room, then drain) passes on 81203da and fails with the shift dropped: the pump panics and the reader sees EOF after 27,652 of 96,148 B.",
+          "NC-U3c-8: FIXED. add_burst refuses start <= the model's now (delay.rs:811, doc :796). Proof: changing > to >= fails the test at delay_tests.rs:1061. Nit: the test steps the model only 10 ms ahead of the clock (:1057).",
+          "F-F: FIXED. Doc at delay.rs:484-487. limit_case asserts handed == released after every close (delay_tests.rs:711-721), and the 10 s one-way case pins the discard: (entered, released, handed) = (request, 0, 0) (:905-917).",
+          "F-R2: FIXED. The probe S counts reads below the floor (delay_tests.rs:1622-1649); removing the floor fails at :1645.",
+          "F-H: PARTLY FIXED. The up lower bound works: raising the read floor to 8,000 fails at delay_tests.rs:604. The down lower bound, BUDGET - 16,384 = 49,152 B (:597-601), is 16 KB looser than its own derivation (about 65,316 B): a writer that goes Pending with 20 KB free still passes.",
+          "F-C: FIXED. ring::default_provider() is named directly (delay_tests.rs:1999-2002). Confirmed by reading.",
+          "F-O: FIXED. Test renamed ..._no_byte_seen_before_its_release, with its doc (delay_tests.rs:405-410).",
+          "F-I: FIXED. 20 s round trip, documented (delay_tests.rs:504-511).",
+          "F-P: FIXED. wt_tests.rs:75-77 states the level; I computed P(X >= 21) for Binomial(200, 0.02) = 9.33e-10, matching the comment.",
+          "Declared behaviour changes. (1) Up records now enter the model at a fresh now after S's read (delay.rs:1470): correct for the intake, and the replay test still passes, but its new step is the source of R1. (2) S is read through a 527 B pump buffer (delay.rs:756, :1480): every bound holds, since at + fresh <= read_limit <= parse.len() at :1468, and integrity holds on a full-room flood (probe 4).",
+          "Method. C1's bites-run1.txt was run on an earlier draft (its line numbers do not match 81203da). I re-ran all 15 on the final code and all 15 still fail as intended. Of my 13 added mutations, 9 fail as intended and 4 do not (NC-U3c-4, NC-U3c-3, F10, F-H down) (.gate/u3c-fixrev-c1/bites-final.txt). Clean 81203da archive: npt-net library 144 passed, 11 ignored, 0 failed. clippy with -D warnings (all targets, with and without --all-features) and cargo fmt --check are clean."
+        ],
+        "gaps": [
+          {
+            "id": "R1",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1470-1471 (with :861-865, :457-469, :1526-1536); binding condition C3 at .checkpoints/netcode-proof-test/u3c-plan.md:68-69",
+            "claim": "The pump's up loop now steps the model to a fresh now on every pass and keeps only the up result (`wake_reader |= c.step_to(t)[UP]`). A down record that this step releases is not written in this run, and no wake is owed for it. That happens when its delivery falls between the pump's first step (:1376-1377) and this one, which is inside S's own write, flush or an earlier read pass. current() wakes the pump only for its own new releases (:861-865), and due() has no term for released-but-unwritten records (:457-469). So the record waits for the next model event (an ACK about one one-way delay later) or some other wake. This breaks C3 ('Released down records go into S at once') and adds an unmodelled hold that then shows up as down lateness. The pre-fix pump (95597ef) stepped once per run. Proof, scratch copies only. Probe 1: hand-polled pump, S write 30 ms, fixed(200); after the run, 1 record released and unwritten, next due in 85 ms, no wake owed, first wake 86 ms later. Probe 2: wrap, S write 2 ms, records 1 ms apart, 5 runs each on fresh builds; B written 2,141-3,257 us after its release pre-fix and 102,241-102,410 us post-fix. How often this happens at real rustls speeds is not measured; the A/B lateness files show no consistent down p99.9 change.",
+            "fix": "Keep the down result of every step in the up loop and, if anything was released, call cx.waker().wake_by_ref() before returning Pending (or loop back to the down block). Checked in scratch: probe 2 then gives 2,606 us (S 2 ms) and 39,860 us (S 30 ms) after release, the pre-fix values, and the 24 l2::delay tests pass. Add probe 1 as a test: after a hand-polled pump run, no released down record may be left without a wake owed to the pump."
+          },
+          {
+            "id": "G-F10",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:522-529 (move_up's compaction); no covering test in delay_tests.rs",
+            "claim": "The rewritten compaction's bounds shift is untested. Dropping `b.0 -= start` passes all 24 l2::delay tests. A scratch probe (fixed(20), request + 6,000 frames of 10 B, nobody reads until the up room is full, then drain to EOF) leaves bounds pending 10 times during the drain, passes on 81203da, and with the shift dropped makes the pump panic on a slice index; the reader then sees a clean EOF after 27,652 of 96,148 B.",
+            "fix": "Add that probe as a test: tiny frames fill the up room before anyone reads, then read to EOF and compare every byte in order."
+          },
+          {
+            "id": "G-NC4",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:448; delay_tests.rs:2516-2544",
+            "claim": "Return.owed is recorded, but no test reads its value: forcing it to 0 passes every l2::delay test.",
+            "fix": "In (c), assert r.owed == 0 at each faithful return (the gate requires owed 0). Also check one return taken while a write is Pending, where owed is non-zero."
+          },
+          {
+            "id": "G-NC2",
+            "severity": "low",
+            "where": "delay_tests.rs:547-625 (quiet P2 only); u3c-plan.md 1.2",
+            "claim": "NC-U3c-2's corrected held-bytes bound (64 KB plus the acknowledged prefix of the front record) is now stated in the docs and SERIES, but the lossy case the finding asked for was not added, and plan 1.2 still states the old bound.",
+            "fix": "Add a case with a loss inside a 16 KB record that asserts held_max[DOWN] > 64 KB and <= 64 KB + 16,406 B. Have the main session update plan 1.2."
+          },
+          {
+            "id": "G-PLAN",
+            "severity": "low",
+            "where": ".checkpoints/netcode-proof-test/u3c-plan.md 1.4 (c), 1.2, 1.5; R13's at-return reading",
+            "claim": "The plan text corrections from C1's carry list are not in u3c-plan.md (a grep finds none): N at the writer's last write (NC-U3c-1), the held-bytes bounds (NC-U3c-2), and the loopback identity proven for the release half only (NC-U3c-3).",
+            "fix": "The main session applies C1's carry list to u3c-plan.md and R13's reading before U3c closes."
+          },
+          {
+            "id": "G-FH",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:597-601",
+            "claim": "The down lower bound, max[DOWN] >= BUDGET - 16,384 = 49,152 B, is 16 KB looser than the test's own derivation (about 65,316 B; observed 65,360 B). A writer that goes Pending with 20 KB free passes (mutation MISSED).",
+            "fix": "Assert max[DOWN] >= BUDGET - 22 x 10 - 1,024, the derivation in the comment, or state why 16 KB of slack is wanted."
+          },
+          {
+            "id": "G-NC8",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1057, :1062",
+            "claim": "The NC-U3c-8 check steps the model only 10 ms ahead of the clock. If the test thread stalls 10 ms before the second add_burst, the pump steps the model past at_now and 'at_now + 1 accepted' fails. That is a hidden wall-clock margin, against C16.",
+            "fix": "Step the model 10 s ahead instead of 10 ms."
+          },
+          {
+            "id": "G-PRE-WAKE",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:852-872 (current), :1477 (read floor); pre-existing, not in this diff",
+            "claim": "ACK events that reopen the up room, when stepped by current() or add_burst instead of the pump, wake nobody: current() wakes the pump only for its own down releases (:861-865), and its reschedule moves the pump's clock entry past those events (:859). The pump then stops reading S until its next wake. This is the same family as R1, and was the rust-reviewer's first-run F7, lost in the disk-full incident (checkpoint, 'first-run findings'). The delay is bounded by the next pump wake.",
+            "fix": "Wake the pump from current() and add_burst when the step lifts up_room across read_floor (or on any dispatched event). This can be the same change as R1's fix."
+          },
+          {
+            "id": "G-PRE-PANIC",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1327-1341 (Pump::drop), :1214 (poll_read EOF); pre-existing",
+            "claim": "A pump that panics ends with pump_done set, and poll_read then returns a clean EOF (Ok(0)), so tungstenite sees a normal close. Seen with the F10 mutation: 27,652 of 96,148 B, then EOF. This was the first-run rust F9, also lost.",
+            "fix": "In Pump::drop, set failed = Some(io::ErrorKind::Other) when std::thread::panicking(), and test it with an S that panics."
+          },
+          {
+            "id": "G-METHOD",
+            "severity": "nit",
+            "where": "CARGO_TARGET_DIR shared between workspace copies (C1's notes: .gate/u3v3-harness-check-target shared with C2; this review's .gate/u3c-review-target)",
+            "claim": "Two copies of the workspace in one target dir share unit hashes (cargo hashes path packages relative to the workspace root). A run in a copy whose files are older than the last artifact therefore silently reuses the other copy's binary: one of my branch runs executed 159 tests including my probes, and I discarded it. C1's bites-run1.txt line numbers also do not match the final tests. My re-run on 81203da confirms all 15 of C1's bites, so no conclusion changes.",
+            "fix": "Use one target dir per worktree, or refresh the source timestamps before any run that must use a given tree, and check the test count of each run."
+          }
+        ],
+        "regressions": [
+          "R1 (medium), spikes/netcode-proof/crates/net/src/l2/delay.rs:1470-1471. The up loop's new fresh-now step (part of NC-U3c-3) keeps only the up result. A down record released inside the pump's own run is left unwritten with no wake owed, until the next model event. This breaks C3 (u3c-plan.md:68-69). With S's write at 2 ms and records 1 ms apart, the second record waits 102.2-102.4 ms after its release (5/5 runs) against 2.1-3.3 ms pre-fix (5/5). Fixed in scratch by a self-wake: back to 2.6 ms, l2::delay suite passes."
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "R1",
+            "real": true,
+            "severity": "medium",
+            "reason": "Confirmed in the code and reproduced independently. The up loop's step (delay.rs:1470-1471) drops got[DOWN]. The down loop has already ended (:1381-1442). The final block wakes only the reader, the writer and the shutter (:1526-1535). due() has no released-but-unwritten term (:457-469). The clock entry is removed when it fires (delay_clock.rs:8, :209), so nothing is armed while the pump runs. My hand-polled probe: B was released at 110.2 ms, inside the run (103.2-128.6 ms), and left unwritten; the next due time and the first wake were both at about 210.2 ms. My spawned-pump probe, 3 runs each: B was written 102.3-102.5 ms after its release with S's write at 2 ms (pre-fix 95597ef: 2.2-2.4 ms), and 105.3-105.5 ms after with S's write at 5 ms (pre-fix 7.2-8.4 ms). The proposed fix (keep got[DOWN] and wake_by_ref before Pending) restores 2.2-2.4 ms and 7.3-7.5 ms, and all 24 l2::delay tests plus my 3 probes pass. It breaks C3 (u3c-plan.md:68-69) and adds up to about one one-way delay to the down lateness that condition 10's evidence judges, so medium stands. How often it happens at rustls speeds was not measured."
+          },
+          {
+            "id": "REG-1",
+            "real": true,
+            "severity": "medium",
+            "reason": "The same defect as gap R1, and it is new in this diff: the pre-fix pump (95597ef delay.rs:1219-1220) held the lock for its whole run and stepped once. Reproduced on pre and post builds of the same probe: pre 2.2-2.4 ms, post 102.3-102.5 ms (S write 2 ms, records 1 ms apart, 3 of 3 runs each). The proposed self-wake fixes it."
+          },
+          {
+            "id": "G-F10",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced. With `b.0 -= start` dropped (delay.rs:527), all 24 original l2::delay tests pass. My own tiny-frame probe (7 B frames, fixed(10)) fails: the pump panics at core slice/index.rs:1020, and the reader gets Ok(0) after 24,419 of 65,148 B. The unmutated code passes it with a bound pending while the up room is full. This line in the rewritten compaction decides whether the up stream stays correct, and no test covers it."
+          },
+          {
+            "id": "G-NC4",
+            "real": true,
+            "severity": "nit",
+            "reason": "No test reads the value record_return stores (delay.rs:448). A grep for `.owed` finds only ws_gate.rs:123,130 and delay.rs:897; the row test builds owed: 6 by hand (delay_tests.rs:1967-1972). Forcing owed to 0 broke no l2::delay test, test (c) included. Note that asserting owed == 0 alone would not catch that mutation: the case with a Pending write is needed."
+          },
+          {
+            "id": "G-NC2",
+            "real": true,
+            "severity": "low",
+            "reason": "The corrected bound is now in the docs (delay.rs:43-45, SERIES.md:533, :562). But the only held-bytes test is lossless quiet P2 (delay_tests.rs:547-551) and still asserts the old bound, max[DOWN] <= BUDGET (:586). The lossy case that NC-U3c-2's fix asked for is missing, and plan 1.2 (u3c-plan.md:122-123) still states the old bound."
+          },
+          {
+            "id": "G-PLAN",
+            "real": true,
+            "severity": "low",
+            "reason": "u3c-plan.md still says 'Down: at most 64 KB' (:122), keeps the old up bound (:123) and 'N(srtt then)' (:176), and 1.5 (:204-208) is unchanged. C1's carry list (u3c-fix-c1.md:45-60) is not applied. The checkpoint names only the 1.4 (c) wording explicitly (netcode-proof-test.md:540, :563). This is the main session's text work, not a code defect."
+          },
+          {
+            "id": "G-FH",
+            "real": true,
+            "severity": "nit",
+            "reason": "The arithmetic holds: Pending at 20 KB free with 8,192 B writes leaves 6 x 8,192 = 49,152 = BUDGET - RECORD_MAX (delay.rs:81). The held-bytes test's lower bound (delay_tests.rs:597-601) passes that, and it did pass in my mutation run. But 'MISSED' holds only for that one test: the same mutation fails one_record_per_write_never_beyond_the_budget at :528, and that test pins Pending to free = 0 (:529-534). No defect can hide; this is a tidy-up only."
+          },
+          {
+            "id": "G-NC8",
+            "real": true,
+            "severity": "nit",
+            "reason": "Reproduced. The test steps the model to the clock plus 10 ms (delay_tests.rs:1057), and add_burst steps to the clock's now (delay.rs:806-811). A 15 ms sleep before the '+1 accepted' assert makes it fail (my run: panicked at that assert). That is a hidden wall-clock margin, against C16 (u3c-plan.md:375-376)."
+          },
+          {
+            "id": "G-PRE-WAKE",
+            "real": true,
+            "severity": "low",
+            "reason": "current() wakes the pump only on got[DOWN] (delay.rs:861-865), and it did so before this diff too (95597ef :750-755), so an ACK that reopens the up room and is stepped by current() or add_burst wakes nobody. But reschedule always keeps the entry at the next event. So current() can pass such an event unseen only between the event's time and the clock's firing, or in the pump's tail after its :1477 check. These windows are much narrower than R1's whole S write. The pump's next wake bounds the delay. It is pre-existing and out of this diff's scope; R1's fix site is a natural place to fix it too."
+          },
+          {
+            "id": "G-PRE-PANIC",
+            "real": true,
+            "severity": "low",
+            "reason": "Pump::drop sets only pump_done (delay.rs:1327-1341), and poll_read returns Ready(Ok) on pump_done once the closed and failed checks pass (:1208-1214). It was the same pre-fix (95597ef :1177-1191, :1075). Reproduced by my F10 mutation: the pump panicked, and the reader got a clean EOF after 24,419 of 65,148 B. lock() tolerates poisoning (:611-613), and tokio drops a panicked task's future inside its panic guard, so the proposed panicking() check in drop is viable."
+          },
+          {
+            "id": "G-METHOD",
+            "real": true,
+            "severity": "nit",
+            "reason": "Reproduced. My pristine `git archive 81203da` copy (old mtimes) in .gate/u3c-review-target printed 'Finished in 0.05s' with no compile. It reused npt_net-088534cbcaf56b90, which lists 159 tests including the re-reviewer's review_probe* tests. One sub-claim is contradicted: C2 used u3v3-model-target (u3c-fix-c2.md:6; checkpoint fix-pass entry), not C1's dir. The mismatched bite line numbers (1025 vs final 1029) fit later edits to the tests. The re-reviewer's re-run on 81203da confirms the bites, so no conclusion changes. I left that target dir holding a pristine 81203da build (155 tests)."
+          }
+        ]
+      }
+    },
+    {
+      "critic": {
+        "verdict": "gaps",
+        "per_finding": [
+          "S1: PARTLY FIXED. The bypasses the review reproduced are now closed: a comment inside the list, raw identifiers, the macro-built allow (caught by the token scan), RUSTFLAGS and config rustflags with -A, --cap-lints or --force-warn, the clippy and fmt aliases, the emoji char literal, the macro-built #[path], proc-macro members, path dependencies outside the workspace, and tcpinfo's clippy-lint relaxing. Tests that fail on revert: check.test.mjs:227, :366, :405, :433, :481, :557, :599. C2's 27 mutations, re-run on 81203da, are 27 of 27 caught. Seven new bypasses of the same kind (A, B, C, D, F, G, H in the gaps) all pass the deps step in scratch copies. Attack A also passes `check.mjs --only fmt,clippy,clippy-wasm32,deps,self` (all 5 steps).",
+          "F-D: PARTLY FIXED. A plainly relaxed root line fails (check.test.mjs:519-539; mutations M11 and M11b). But `\"unsafe_code\" = \"allow\"` with a decoy inside a multi-line string passes deps while cargo passes --allow=unsafe_code (check.mjs:486-502 reads tomlScan's `clean`, which keeps strings). No test covers the deps-step wiring (check.mjs:837).",
+          "F-E: FIXED for its stated route. A planted `[lib] path = \"../tcpinfo/src/linux.rs\"` makes deps FAIL. Tests: check.test.mjs:557-597 and :636-666; mutations M12-M12f, M15 and M15b. The related #[path]/include! bypasses C and D are filed under S1. No test covers the wiring (check.mjs:838-839).",
+          "F-N: FIXED. Breaking the stub's non-Linux `pub use` makes clippy-wasm32 FAIL (E0432). With WASM_CRATES reverted to [...LEAF] (check.mjs:786), the step passes on the broken stub and self drops to 29/30 (check.test.mjs:668-671). npt-net's not(unix) handle (tcp_kernel.rs:39-42) is carried in u3c-fix-c2.md:126-127.",
+          "F8: FIXED. linux.rs has four unsafe blocks (:53, :82, :126, :152), one unsafe operation each. Their SAFETY citations hold against v6.8: net/socket.c:2364-2365, :2397-2399 and :553-567; net/core/sock.c:1609 and :1999-2001. Lengths are bounded: int_answer requires exactly 4 bytes (:171), and rtt_from reads through get() (:204-217). Both closures sit inside the two allowed bodies, and deps passes. Reverting srtt_us's TCP check fails tests.rs:171 (every_descriptor_that_is_not_a_tcp_socket_is_an_error, on any Linux host) and tests.rs:212 (the MPTCP test, which needs MPTCP; present here).",
+          "F-J: FIXED. Checked in a scratch git repo by importing the script (no iptables, no probe): the script's own new log is left out, and a source file and a stray .bak are listed. Nits: edits to an already-committed log are hidden too, and there is no committed test.",
+          "S5 (part c): FIXED. A reason that is empty or only escapes is refused, and every member must live at crates/<folder>/Cargo.toml. Reverting both drops self to 28/30 (check.test.mjs:317 and :557). Parts (a), (b) and (d) are U6 carries, listed in u3c-fix-c2.md:113-117."
+        ],
+        "gaps": [
+          {
+            "id": "C2R-1",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:177-225 (lexRust), :179 (charLit), :159 and :440-443 (UNSAFE_CODE scan)",
+            "claim": "lexRust reads some code differently from rustc, so the token scan misses unsafe code. In both attacks a macro-built #[allow($l)] plus lax!(unsafe_code) wraps `unsafe { *(&raw const x) }` in a new npt-room module. (A) First line `#!/x /*`: rustc strips a shebang line in any source file, but lexRust opens a block comment there that runs to a `// */`. In scratch atkA, `node check.mjs --only fmt,clippy,clippy-wasm32,deps,self` passes all 5 steps. (B) `['\\u{0_0_0_0_4_1}','\"']`: rustc allows underscores beyond the 6 hex digits, but charLit's `[0-9a-fA-F_]{1,6}` does not, so lexRust gets out of step and opens a string at a `\"` that rustc reads as a char. In scratch atkB, deps and clippy pass. Controls with #[deny($l)]: rustc reports 'usage of an `unsafe` block' at evil.rs:2 for both.",
+            "fix": "Add a compiler-level backstop. Make `[workspace.lints.rust] unsafe_code = \"forbid\"` and give npt-tcpinfo its own [lints] table (deny, plus the workspace's clippy lints, checked equal by check.mjs). In scratch, forbid gives E0453 on A and D. Alternatively, add a per-crate `-F unsafe_code` pass over every crate except the two exceptions. In lexRust, refuse a file whose first line (after an optional BOM) starts with `#!` and is not an inner attribute, and accept `\\u\\{[0-9a-fA-F_]+\\}`. Add both texts as self-tests."
+          },
+          {
+            "id": "C2R-2",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:272-304 (pathProblems: :275, :278, :291, :298)",
+            "claim": "The path rule can be bypassed, so npt-room compiles a client-wasm file that holds `#[allow(unsafe_code)]` and an unsafe block (client-wasm's files are never scanned for unsafe, :438). (C) `#[path = \".\\x2e/.\\x2e/client-wasm/src/evil.rs\"]`: rustc unescapes the literal, while pathProblems splits the raw text and thinks the file stays inside the crate. A leading backslash is caught only by accident, as an absolute path at :275. (D) `use std::include as inc; inc!(\"../../client-wasm/src/evil.rs\");`: the include! check matches the macro by name only. Scratch atkC and atkD: deps and clippy pass. A control with deny shows rustc compiling crates/room/src/../../client-wasm/src/evil.rs.",
+            "fix": "Decode the literal's escapes before resolving the path, or refuse a backslash in any #[path] or include! value. Refuse `include` named anywhere in code except as `include!(`, which covers `use ... include` and macro arguments. The forbid backstop in C2R-1 also stops the unsafe half. Add C's and D's texts as tests."
+          },
+          {
+            "id": "C2R-3",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:486-502 (workspaceLintProblems)",
+            "claim": "F-D can still be bypassed. The root line is rewritten as `\"unsafe_code\" = \"allow\"`, and a decoy is added: `[workspace.metadata.note] text = \"\"\"` / `[workspace.lints.rust]` / `unsafe_code = \"deny\"` / `\"\"\"`. The check scans tomlScan's `clean`, which keeps strings, so the decoy lines count as the table header and the deny line, and the escaped real key never matches. In scratch atkE, deps passes while `cargo check -v` passes --allow=unsafe_code (the base copy passes --deny=unsafe_code). The existing decoy test (check.test.mjs:537) still names the real key plainly.",
+            "fix": "Find headers and keys in tomlScan's `mask` (strings blanked) and decode quoted keys, or refuse a backslash inside any quoted key. Add E's text to the F-D test."
+          },
+          {
+            "id": "C2R-4",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:641-689 (cargoConfigProblems, cargoConfigFiles), :516-543 (layoutProblems)",
+            "claim": "Three inputs this cargo reads stay unchecked. (F) `include = [\"extra.toml\"]` in the spike's .cargo/config.toml loads a file with `rustflags = [\"--cap-lints\", \"warn\"]`. cargo 1.99.1 honours it on stable, and cargoConfigFiles never follows `include`. (G) A config `[env] CLIPPY_ARGS = { value = \"--cap-lints=warn__CLIPPY_HACKERY__\", force = true }` replaces cargo-clippy's `-D warnings`. (H) crates/tcpinfo/build.rs printing `cargo::rustc-env=CLIPPY_ARGS=...` has the same effect, and layoutProblems allows build scripts. In each case, deps passes, and an unsafe block in srtt_us with no SAFETY comment and two unsafe operations passes `cargo clippy -p npt-tcpinfo --all-targets -- -D warnings` with warnings only. The control without the include gives 2 errors.",
+            "fix": "Refuse an `include` key in any cargo config, or follow it. Refuse `[env]` (the spike sets none), or at least CLIPPY_* and RUSTC* keys. Refuse custom-build targets in layoutProblems (no member has one). Add a test for each."
+          },
+          {
+            "id": "C2R-5",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:829-845 (STEPS.deps, :837-840)",
+            "claim": "No committed test checks that the deps step calls the new checks. Removing workspaceLintProblems, layoutProblems, the links refusal and cargoConfigProblems from STEPS.deps leaves self at 30/30 and deps passing (scratch revWire). The self-tests call each function directly, and C2's realplant.py, which proved the wiring, is a scratch script.",
+            "fix": "Export one depsProblems(meta, root, env, configs, files, read) used by STEPS.deps. Test it end to end on a fixture with one plant per check."
+          },
+          {
+            "id": "C2R-6",
+            "severity": "low",
+            "where": "spikes/netcode-proof/Cargo.toml:72-79; check.mjs:812-820 (DEPS_CHECKED), :153-158",
+            "claim": "The rewritten comments again claim more than is checked: 'on unsafe code ... in any other crate, however the lint was relaxed', 'every #[path] and include! names a .rs file in its own crate', and 'no rustflags or cargo config lowers a lint'. C2R-1 to C2R-4 show these are false. S1 was about exactly this kind of overclaim.",
+            "fix": "After C2R-1 to C2R-4 land, keep the claims. Until then, reword them to what is checked and name what is not (rustc lexer forms, config include and [env], build scripts, wrappers)."
+          },
+          {
+            "id": "C2R-7",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:799-805 (testBothBuilds); :641-665",
+            "claim": "Outside the assigned findings: a cargo `runner` makes the test step pass without running tests. With CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=true, `cargo test -p npt-log` exits 0 and the unit-test binary prints no result. cargoConfigProblems returns [] for that environment, and the step judges exit status only.",
+            "fix": "Refuse CARGO_TARGET_*_RUNNER and target.*.runner in cargoConfigProblems, or require a passed count above a stated floor in testBothBuilds."
+          },
+          {
+            "id": "C2R-8",
+            "severity": "nit",
+            "where": "C2's notes (u3c-fix-c2.md:121-125) on RUSTC_WRAPPER",
+            "claim": "Leaving RUSTC_WRAPPER alone is reasonable, since refusing it would break sccache setups. The neighbouring routes are rarely legitimate and cheap to refuse: RUSTC, RUSTC_WORKSPACE_WRAPPER, build.rustc, build.rustc-workspace-wrapper, and a rust-toolchain.toml `path` override. check.mjs runs plain `cargo`, which follows rust-toolchain.toml.",
+            "fix": "Refuse those five. Optionally allow RUSTC_WRAPPER only when its basename is sccache. State the rest as out of reach."
+          },
+          {
+            "id": "C2R-9",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/tcpinfo/src/tests.rs:203-208; linux.rs:47-52, :144-151",
+            "claim": "F8 nits. (1) The MPTCP test returns as a pass when MPTCP is absent. The UDP/Unix test (tests.rs:171) still guards the check, but the MPTCP half goes untested on such hosts without anyone seeing it. (2) The SAFETY comments do not mention the cgroup-BPF getsockopt hook (v6.8 net/socket.c:2377-2380). It can rewrite the answers within the caller's length, so soundness holds, but a root-installed program could make a non-TCP socket read as TCP. 0x5411 on any socket still stays in socket ioctl code. (3) srtt_us now makes 3 extra getsockopt calls each time (linux.rs:64-69). (4) The plan text should name four unsafe blocks (S6).",
+            "fix": "Optionally make the MPTCP skip visible in check.mjs's summary, add one line about the BPF hook to the SOL_SOCKET SAFETY comments, and update plan §4.2/§4.7/§4.8 to four blocks."
+          },
+          {
+            "id": "C2R-10",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py:154-168",
+            "claim": "The exclude pathspec also hides edits to logs that are already committed (scratch case 3 reads clean). No committed test covers provenance().",
+            "fix": "Exclude only untracked own outputs (drop `??` lines that match OWN_OUTPUTS and keep modified tracked logs), or say so in the comment. Optionally commit fj_check.py as a test."
+          }
+        ],
+        "regressions": [
+          "Nothing functional broke. The 81203da copy passes check.mjs --only fmt,clippy,clippy-wasm32,deps,self,redact (all 6 steps), and the real tree passes deps and self. The old relax scan also read raw text (95597ef check.mjs:332), so comments raise no new false positive. npt-net passes srtt_us's errors straight through (crates/net/src/tcp_kernel.rs:23), so the new error kind (InvalidInput instead of ENOPROTOOPT/EOPNOTSUPP) changes nothing on a TCP socket.",
+          "The lint comment the fix pass rewrote (spikes/netcode-proof/Cargo.toml:72-79) and DEPS_CHECKED (check.mjs:812-820) now claim more than before: 'however the lint was relaxed' and 'no rustflags or cargo config lowers a lint'. Bypasses A to H falsify this, so the overclaim S1 was raised for is back, in a stronger form.",
+          "srtt_us now makes three extra getsockopt calls each time (crates/tcpinfo/src/linux.rs:64-69). This is a cost, not a correctness change; perf-auditor may weigh it for the per-tick send gate."
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "C2R-1",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced in my own 81203da copies with touched files and 'Checking npt-room' shown. A: lexRust (check.mjs:199-207) opens a block comment at the stripped shebang `#!/x /*`, the mask holds no `unsafe`, deps and fmt PASS, and npt-room clippy -D warnings exits 0. The control with deny gives 'usage of an unsafe block' at evil.rs:7. B: charLit (:179) caps `\\u{}` at 6 characters, underscores included. B's exact text is not rustfmt-stable: rustfmt's `', '` re-syncs the lexer and deps then fails. A fmt-stable variant inside a brace macro call (`nothing! { '\\u{0_0_0_0_4_1}','\"' }`) passes deps, fmt and clippy; its control errors at evil.rs:10. Low: it takes deliberate obfuscation, and plan 1.8(d) asked only for a grep."
+          },
+          {
+            "id": "C2R-2",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced. C: `#[path = \".\\x2e/.\\x2e/client-wasm/src/evil.rs\"]` is split raw at check.mjs:278 into '.' and 'x2e', so it reads as inside the crate. D: `use std::include as inc; inc!(...)` is missed because :298 matches only the macro's name. In both, deps and fmt PASS and npt-room clippy -D warnings exits 0. With deny in the client-wasm file, rustc errors at crates/room/src/../../client-wasm/src/evil.rs:4. client-wasm's files are never scanned for unsafe (:438). Low: same deliberate class as C2R-1."
+          },
+          {
+            "id": "C2R-3",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced (vE). Root key `\"unsafe_code\" = \"allow\"` plus a decoy inside a multi-line string: workspaceLintProblems scans tomlScan.clean (check.mjs:491), which keeps strings, so the decoy counts and the escaped key never matches. deps PASS; cargo check -v passes --allow=unsafe_code (base: --deny). Alone it lets no unsafe through, because the token scan (:440-443) still refuses `unsafe` in npt-room. But it silently removes the compiler layer, and it defeats the 'forbid' backstop that C2R-1's fix proposes."
+          },
+          {
+            "id": "C2R-4",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced F, G and H. The control is an undocumented two-operation unsafe block in srtt_us: clippy -p npt-tcpinfo -D warnings exits 101 with 2 errors. Each attack turns that into exit 0 with warnings while deps passes. F: a top-level `include = [\"extra.toml\"]` that sets `--cap-lints warn` (cargo 1.99.1 honours it on stable). The key must come before any [table] header. G: `[env] CLIPPY_ARGS` with force. H: a tcpinfo build.rs printing `rustc-env=CLIPPY_ARGS`; layoutProblems (:516-543) allows custom-build targets. cargoConfigProblems (:641-665) reads only rustflags and alias keys. Every lint gate, the determinism bans included, drops to warnings. Each needs a committed config or build-script change."
+          },
+          {
+            "id": "C2R-5",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced (vWire). With the four calls at check.mjs:837-840 removed, self still passes 30/30 and deps still passes. check.test.mjs:11-23 imports neither main nor STEPS. So reverting the wiring half of the fix leaves every test green, and the only proof of the wiring was a scratch script. Nothing is broken today: this is a missing regression guard."
+          },
+          {
+            "id": "C2R-6",
+            "real": true,
+            "severity": "low",
+            "reason": "Cargo.toml:74-79 says 'however the lint was relaxed' and covers cargo configs that 'lower a lint'. DEPS_CHECKED (check.mjs:812-820), which prints as the deps PASS line, says 'unsafe code appears only there', 'no rustflags or cargo config lowers a lint' and 'every #[path] and include! names a .rs file in its own crate'. A-H falsify each of these. Same root cause as C2R-1 to C2R-4: fixing them, or rewording, closes it. It matters because the PASS line is cited as evidence."
+          },
+          {
+            "id": "C2R-7",
+            "real": true,
+            "severity": "nit",
+            "reason": "Reproduced. With CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=true, cargo test -p npt-log exits 0 and the unit binary prints no result (9 tests run normally). cargoConfigProblems returns [] for that environment and for a target runner config. testBothBuilds (:799-805) judges exit status only. Re-rated nit: the step's PASS line prints the summed counts (:803, :889), so a vacuous run shows about 0 tests passed. It also needs a deliberate environment or config setting."
+          },
+          {
+            "id": "C2R-8",
+            "real": true,
+            "severity": "nit",
+            "reason": "check.mjs reads nothing about rust-toolchain.toml, RUSTC or the wrappers (grep finds no match). It runs plain `cargo` (:791, :800, :823), so the rustup proxy follows rust-toolchain.toml. Cargo.toml:79 declares 'a different rustc, or a wrapper' out of reach, and C2's notes (u3c-fix-c2.md:121-124) lump RUSTC_WRAPPER with the rest. This is a cheap-hardening suggestion, not an overclaim."
+          },
+          {
+            "id": "C2R-9",
+            "real": true,
+            "severity": "nit",
+            "reason": "All four points hold. (1) tests.rs:203-204: the MPTCP test prints to stderr and returns. Output is captured on a pass, so the skip is unseen; the UDP/Unix test (:170) still covers require_tcp. (2) In v6.8 socket.c do_sock_getsockopt, the cgroup-BPF hook runs after sk_getsockopt, bounded by max_optlen. Non-sockets fail first in sockfd_lookup_light, so soundness holds and the comment could say so. (3) linux.rs:64-69 makes three extra calls, but no live caller exists: npt-net lib.rs:27 marks mod tcp_kernel allow(dead_code) outside tests. (4) plan.md:627 still says 'two unsafe blocks'; linux.rs now has four."
+          },
+          {
+            "id": "C2R-10",
+            "real": true,
+            "severity": "nit",
+            "reason": "Reproduced in a scratch git repo. The exclude pathspec at siocoutq-root-check.py:160-162 hides a modified committed siocoutq-root-check-*.txt; without it, the file shows as ' M'. No committed test covers provenance(). The impact is nil: a committed log is an output, not code a run uses, so the provenance line still states the code correctly. Only a comment or a test is owed."
+          },
+          {
+            "id": "REG-1",
+            "real": false,
+            "severity": "nit",
+            "reason": "No regression: the statement is verified true. On my own 81203da copy (crate files touched first, to defeat shared-target reuse), all six steps pass: fmt, clippy, clippy-wasm32, deps, self 30/30 and redact 10/10. The old relax scan read raw text (95597ef check.mjs:332). The new RELAX_UNSAFE (:151, `[^)]*?`) is broader than the old identifier list (95597ef:136), but nothing in the tree matches. tcp_kernel::srtt_ns (tcp_kernel.rs:22-24) is pub(crate) and dead outside tests, so the error-kind change touches no live path."
+          },
+          {
+            "id": "REG-2",
+            "real": true,
+            "severity": "low",
+            "reason": "Duplicate of C2R-6. The diff of Cargo.toml:72-79 adds claims that A-H falsify: 'however the lint was relaxed' and 'rustflags, cargo configs ... that lower a lint'. DEPS_CHECKED (:812-820) does the same. The 95597ef text also overclaimed (S1), so this is S1 left open, with the wording broadened, rather than new breakage."
+          },
+          {
+            "id": "REG-3",
+            "real": true,
+            "severity": "nit",
+            "reason": "Duplicate of C2R-9 (3). linux.rs:64-69 makes three SOL_SOCKET getsockopt calls per srtt_us call. Nothing calls it on a live path today (npt-net lib.rs:27 marks tcp_kernel allow(dead_code) outside tests), so it is a cost for U6's per-tick gate to weigh, not a correctness regression."
+          }
+        ]
+      }
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Critic"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "critic:c1",
+      "phaseIndex": 1,
+      "phaseTitle": "Critic",
+      "agentId": "af3cd604d620b0e3a",
+      "agentType": "rust-reviewer",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794152555786,
+      "queuedAt": 1794152555754,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "gaps",
+      "promptPreview": "You are the rust-reviewer, re-reviewing fix part C1, npt-net. These findings were assigned: F1 + S7, F-K + NC-U3c-1 + NC-U3c-10, F-L / NC-U3c-5 / F11 (gate_inputs), F3 + F2 + F4 (the pump no longer holds the Conn lock across S's polls: check this lock change most carefully for races, lost wakeups, double commits, a staged record that S took only in part, and ordering against current() and add_burs…",
+      "promptFramed": true,
+      "lastProgressAt": 1794154188626,
+      "tokens": 302536,
+      "toolCalls": 94,
+      "durationMs": 1632839,
+      "resultPreview": "{\"verdict\":\"gaps\",\"per_finding\":[\"F1 + S7: FIXED. add_burst refuses start_ns + len_ns past u64::MAX and a start at or before the model's now (delay.rs:809-812). due() and record_return saturate (delay.rs:457-469, :444). S7's U6 range-check carry is in add_burst's doc (delay.rs:801-802). Proof: a_burst_past_the_clocks_range_is_refused_and_never_wraps (delay_tests.rs:1022-1063) fails at delay_tests.…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "critic:c2",
+      "phaseIndex": 1,
+      "phaseTitle": "Critic",
+      "agentId": "a50377d0d58a9e9ea",
+      "agentType": "security-auditor",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794152555787,
+      "queuedAt": 1794152555755,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "gaps",
+      "promptPreview": "You are the security-auditor, re-reviewing fix part C2, check.mjs and npt-tcpinfo. These findings were assigned:\n- S1: every reproduced bypass of the unsafe_code check is closed, plus cargoConfigProblems (RUSTFLAGS, rustflags, the clippy and fmt aliases), the lexer's code points, macro-built #[path], and workspace proc-macros and outside path dependencies;\n- F-D: workspaceLintProblems;\n- F-E: layo…",
+      "promptFramed": true,
+      "lastProgressAt": 1794153935964,
+      "tokens": 242020,
+      "toolCalls": 100,
+      "durationMs": 1380176,
+      "resultPreview": "{\"verdict\":\"gaps\",\"per_finding\":[\"S1: PARTLY FIXED. The bypasses the review reproduced are now closed: a comment inside the list, raw identifiers, the macro-built allow (caught by the token scan), RUSTFLAGS and config rustflags with -A, --cap-lints or --force-warn, the clippy and fmt aliases, the emoji char literal, the macro-built #[path], proc-macro members, path dependencies outside the workspa…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "verify:c2",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "abf3edada8a114e6c",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794153936929,
+      "queuedAt": 1794153936911,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Adversarially verify a re-reviewer's gaps and regressions for U3c's fix pass (c2).\n\nMain folder /home/user/Shamble-Frontlines, spike branch claude/netcode-proof-test-plan-hcky5g (never switch it).\n\n**What to review.** Only U3c's fix pass, `git diff 95597ef..81203da -- spikes/`. It answers the verified findings of the review round recorded in /home/user/Shamble-Frontlines/.checkpoints/netcode-proof…",
+      "promptFramed": true,
+      "lastProgressAt": 1794154756758,
+      "tokens": 212041,
+      "toolCalls": 87,
+      "durationMs": 819829,
+      "resultPreview": "{\"results\":[{\"id\":\"C2R-1\",\"real\":true,\"severity\":\"low\",\"reason\":\"Reproduced in my own 81203da copies with touched files and 'Checking npt-room' shown. A: lexRust (check.mjs:199-207) opens a block comment at the stripped shebang `#!/x /*`, the mask holds no `unsafe`, deps and fmt PASS, and npt-room clippy -D warnings exits 0. The control with deny gives 'usage of an unsafe block' at evil.rs:7. B: c…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "verify:c1",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ac625a42766f58b79",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794154189390,
+      "queuedAt": 1794154189385,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Adversarially verify a re-reviewer's gaps and regressions for U3c's fix pass (c1).\n\nMain folder /home/user/Shamble-Frontlines, spike branch claude/netcode-proof-test-plan-hcky5g (never switch it).\n\n**What to review.** Only U3c's fix pass, `git diff 95597ef..81203da -- spikes/`. It answers the verified findings of the review round recorded in /home/user/Shamble-Frontlines/.checkpoints/netcode-proof…",
+      "promptFramed": true,
+      "lastProgressAt": 1794154968994,
+      "tokens": 206721,
+      "toolCalls": 74,
+      "durationMs": 779604,
+      "resultPreview": "{\"results\":[{\"id\":\"R1\",\"real\":true,\"severity\":\"medium\",\"reason\":\"Confirmed in the code and reproduced independently. The up loop's step (delay.rs:1470-1471) drops got[DOWN]. The down loop has already ended (:1381-1442). The final block wakes only the reader, the writer and the shutter (:1526-1535). due() has no released-but-unwritten term (:457-469). The clock entry is removed when it fires (delay…"
+    }
+  ],
+  "totalTokens": 963318,
+  "totalToolCalls": 355
+}

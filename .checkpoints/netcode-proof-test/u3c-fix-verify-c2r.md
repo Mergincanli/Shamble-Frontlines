@@ -40,3 +40,32 @@ CARGO_TARGET_DIR=.gate/u3c-review-target; no iptables, no #[ignore]d tests.
 - G ([env] CLIPPY_ARGS force): REPRODUCED in vG: deps PASS, clippy rc=0 with the same 2 warnings.
 - H (crates/tcpinfo/build.rs printing cargo::rustc-env=CLIPPY_ARGS=...): REPRODUCED in vH: deps PASS ("Compiling
   npt-tcpinfo" = build script ran), clippy rc=0 with the same 2 warnings.
+- Wire (C2R-5): REPRODUCED in vWire (unwire.py drops the 4 calls at check.mjs:837-840): self 30/30, deps PASS.
+  check.test.mjs:11-23 imports neither main nor STEPS.
+- Runner (C2R-7): REPRODUCED: CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=true cargo test -p npt-log rc=0, unit
+  binary "Running" with no result line, doctests "0 passed" (normal: 9 passed); cargoConfigProblems(env + a
+  `[target.x86_64-unknown-linux-gnu] runner = "true"` config) -> []. Mitigation: testBothBuilds' summary (the PASS
+  line, check.mjs:803, :889) prints the counts, so a vacuous run shows "0 tests passed".
+- C2R-8: check.mjs has no `toolchain`/`RUSTC` read (grep); Cargo.toml:79 declares "a different rustc, or a wrapper"
+  out of reach; C2's notes u3c-fix-c2.md:121-124 lump all wrappers. Suggestion only.
+- C2R-9: (1) tests.rs:203-204 eprintln + return (captured, so unseen on a pass); (2) v6.8 socket.c do_sock_getsockopt:
+  BPF_CGROUP_RUN_PROG_GETSOCKOPT after sk_getsockopt, bounded by max_optlen; non-sockets fail in sockfd_lookup_light
+  first, so the ioctl never reaches a driver: nit holds; (3) linux.rs:64-69 three int_option calls; no caller today
+  (npt-net lib.rs:27 allow(dead_code) on mod tcp_kernel); (4) plan.md:627 still says "npt-tcpinfo's two unsafe
+  blocks" (four now).
+- C2R-10: REPRODUCED (scratch git repo fj): an edit to a committed siocoutq-root-check-1.txt is hidden by the exclude
+  pathspec, shown without it. Impact nil: a committed log is an output, not code the run used.
+- Regressions: own 81203da copy, every crate file touched first (touchall.py): fmt, clippy, clippy-wasm32, deps,
+  self (30/30), redact (10/10) all PASS. Old relax scan read raw text (95597ef check.mjs:332). New RELAX_UNSAFE
+  (check.mjs:151, `[^)]*?`) is broader than the old identifier-list regex (95597ef :136), so more comment prose could
+  match in a non-exception crate; none does in the tree. tcp_kernel::srtt_ns (crates/net/src/tcp_kernel.rs:22-24) is
+  pub(crate) and dead outside tests, so the error-kind change and the 3 extra calls touch no live path.
+
+## Verdicts
+C2R-1 real low; C2R-2 real low; C2R-3 real low; C2R-4 real low; C2R-5 real low; C2R-6 real low (same root as 1-4);
+C2R-7 real nit; C2R-8 real nit; C2R-9 real nit; C2R-10 real nit; REG-1 not a regression (verified); REG-2 real low
+(= C2R-6; S1 not closed rather than new breakage); REG-3 real nit (= C2R-9 (3); no live caller).
+Observation for the main session: scratch copies sharing one CARGO_TARGET_DIR can be judged FRESH from another
+copy's build (workspace-relative fingerprints, mtime-based); touch the planted files and look for "Checking <crate>".
+Scratch: scratchpad/c2rverify/ (base, vA, vActl, vB, vBctl, vC, vD, vE, vF, vG, vH, vWire, fj, *.py, lexprobe.mjs).
+DONE
