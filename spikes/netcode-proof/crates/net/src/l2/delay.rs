@@ -34,10 +34,25 @@
 //! ends the pump and drops S at once; `poll_shutdown` waits at most 10 s in all, for delivery, for S to take the bytes
 //! and for S's own shutdown, then drops S and counts it (the pump's first run at or after the deadline does it, and
 //! before it the pump sleeps until the deadline or a wake from S); an EOF from S ends the up direction after its last
-//! delivered byte.
+//! delivered byte. The connection's lock is never held across S's own calls (F3): the pump stages the front down record
+//! under it (once per record, F4), releases it for S's write, flush, read or shutdown, then takes it again to commit
+//! what S took or read; S's reads land in the pump's own buffer and enter the model at a fresh now. Wakes always fire
+//! after the lock is released (F2).
 //!
-//! **Held bytes.** Down at most the 64 KB budget (it covers released-but-untaken bytes); up at most 64 KB plus the
-//! scanner's buffer (one frame, 527 B, or the request cap). Counted, current and largest, per direction.
+//! **Held bytes (NC-U3c-2).** Down at most the 64 KB budget (it covers released-but-untaken bytes) plus the
+//! acknowledged prefix of the front record not yet released: a loss inside a record lets the acknowledgement of its
+//! first segments free that prefix in the budget while the record waits to be delivered whole, so below 64 KB plus one
+//! record (16,406 B). Up likewise at most 64 KB plus the acknowledged prefix of its front unreleased record (below one
+//! record: 549 B, or the request's 8,214 B), plus the scanner's buffer (one frame, 527 B, or the request cap). Counted,
+//! current and largest, per direction.
+//!
+//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: one lateness histogram per direction, its
+//! per-second window kept as a difference against a sparse mark of the buckets the second touched (`stats::Running`:
+//! 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B reserve for the mark), the scanner's buffer (8,192 B at the
+//! defaults), the down record's staging buffer (16,384 B) and the pump's read buffer (527 B): 309,583 B at the defaults
+//! (`ws_conn_fixed_bytes`; it was about 565 KB with two whole histograms per direction). On top: the held bytes above
+//! (below 81,942 B each way), and a dense mark of 135,040 B per direction once a second's lateness touches more than
+//! 256 buckets. U6 sizes WsServer's accept cap from these and tungstenite's own buffers (48 players: about 15 MB here).
 //!
 //! **Lateness (M1, C10).** Down at the return of S's `poll_write` that takes a record's last byte; up at the return of
 //! `poll_read` that hands its last byte to tungstenite; each against the record's model delivery stamp, in the same
@@ -46,15 +61,17 @@
 use super::config::{L2Config, one_way_ns};
 use super::delay_clock::{self, Clock};
 use super::delay_names as names;
-use super::stats::{Lateness, Summary};
+use super::stats::{Running, Summary};
 use super::thread;
 use super::ws_frame::{Boundary, MAX_HEADER, REASONS, Reason, Scanner};
 use crate::tcp_model::{MAX_BURSTS, MODEL, NOT_MODELLED, TcpConfig, TcpModel};
+use crate::ws_gate::Inputs;
 use std::collections::VecDeque;
 use std::fmt;
 use std::future::Future;
 use std::io;
 use std::marker::PhantomData;
+use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::task::{Context, Poll, Waker};
@@ -82,7 +99,8 @@ const RECORDS: &str = "down: one TLS record per poll_write (at most 16,384 B, + 
      TLS per record; up: one record per client frame and one for the request, + 22 B each, cut at frame boundaries. \
      Real TLS records can differ (rustls cuts its own; invisible on loopback)";
 const HANDSHAKE: &str = "the TCP and TLS handshakes run undelayed below the wrapper; the model starts established with \
-     no RTT sample (RTO 1 s until the first)";
+     no RTT sample: RTO 1 s and fix 1's 100 ms srtt until the first data acknowledgement, where Linux has the \
+     handshake's sample (tcp_synack_rtt_meas); the upgrade exchange gives one within the first round trip";
 
 /// One record: its plaintext length, its end in the model's byte count, its model write and delivery stamps, and
 /// (up) whether it ends a data message.
@@ -104,6 +122,10 @@ pub(crate) struct Return {
     pub(crate) srtt_ns: Option<u64>,
     /// Down bytes (model bytes) released and not yet taken by S then.
     pub(crate) untaken: u64,
+    /// Bytes tungstenite held above DelayStream then (offered in its latest write and not taken: `owed`).
+    /// advisor-ws-docs-r2.md:379 (3)'s outstanding_bytes is `outstanding` plus this, plus what WsServer holds itself
+    /// (NC-U3c-4; U6 sums them for the event).
+    pub(crate) owed: u64,
     /// The receiving ends' in-order counts then, `[down, up]`.
     delivered: [u64; 2],
     /// S12's per-burst times, `[down, up]`: from the return to the first in-order byte, and to the first whole data
@@ -129,6 +151,7 @@ impl Return {
             self.srtt_ns.unwrap_or(0),
             u64::from(self.srtt_ns.is_some()),
             self.untaken,
+            self.owed,
             t(self.first_byte_ns[DOWN]),
             t(self.first_message_ns[DOWN]),
             t(self.first_byte_ns[UP]),
@@ -260,14 +283,16 @@ struct Conn {
     down_done: bool,
     failed: Option<io::ErrorKind>,
     closed: Option<Reason>,
-    late: [Lateness; 2],
-    late_run: [Lateness; 2],
+    /// The release lateness per direction: the connection's whole and its per-second window (F7).
+    late: [Running; 2],
     held: [u64; 2],
     held_max: [u64; 2],
     held_max_run: [u64; 2],
     own: Own,
     mark_own: Own,
     mark_tcp: [[u64; 20]; 2],
+    /// The heap bytes the connection allocated at wrap (F7; `ws_conn_fixed_bytes`).
+    fixed_bytes: u64,
     #[cfg(test)]
     logs: Logs,
     #[cfg(test)]
@@ -306,7 +331,6 @@ impl Conn {
 
     fn late(&mut self, dir: usize, ns: u64) {
         self.late[dir].record(ns);
-        self.late_run[dir].record(ns);
     }
 
     /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
@@ -378,7 +402,7 @@ impl Conn {
                 if dir == UP && message_end {
                     message[UP] = true;
                     #[cfg(test)]
-                    self.logs.messages[UP].push(t + self.origin);
+                    self.logs.messages[UP].push(t.saturating_add(self.origin));
                 }
             }
         }
@@ -389,12 +413,12 @@ impl Conn {
             self.down_msg_ends.pop_front();
             message[DOWN] = true;
             #[cfg(test)]
-            self.logs.messages[DOWN].push(t + self.origin);
+            self.logs.messages[DOWN].push(t.saturating_add(self.origin));
         }
         let delivered = [self.model.delivered(1), self.model.delivered(0)];
         for i in self.open_from..self.returns.len() {
             let r = &mut self.returns[i];
-            let since = (t + self.origin).saturating_sub(r.at_ns);
+            let since = t.saturating_add(self.origin).saturating_sub(r.at_ns);
             for d in 0..2 {
                 if r.first_byte_ns[d].is_none() && delivered[d] > r.delivered[d] {
                     r.first_byte_ns[d] = Some(since);
@@ -417,10 +441,11 @@ impl Conn {
             return;
         }
         self.returns.push(Return {
-            at_ns: e + self.origin,
+            at_ns: e.saturating_add(self.origin),
             outstanding: self.model.outstanding(DOWN),
             srtt_ns: self.model.srtt_ns(DOWN),
             untaken: self.released_model[DOWN],
+            owed: self.owed,
             delivered: [self.model.delivered(1), self.model.delivered(0)],
             first_byte_ns: [None; 2],
             first_message_ns: [None; 2],
@@ -428,10 +453,17 @@ impl Conn {
     }
 
     /// When the pump must next run, on DelayStream's clock: the model's next event, the next burst end, the shutdown
-    /// deadline.
+    /// deadline. Saturating (F1): a time past the clock's range is never due, never wrapped into the past.
     fn due(&self) -> Option<u64> {
-        let ev = self.model.next_event().map(|x| x + self.origin);
-        let be = self.burst_ends.iter().min().map(|x| x + self.origin);
+        let ev = self
+            .model
+            .next_event()
+            .map(|x| x.saturating_add(self.origin));
+        let be = self
+            .burst_ends
+            .iter()
+            .min()
+            .map(|x| x.saturating_add(self.origin));
         let sd = self.shutdown.filter(|_| !self.down_done);
         [ev, be, sd].into_iter().flatten().min()
     }
@@ -448,9 +480,12 @@ impl Conn {
         }
     }
 
-    /// Scans the client's new bytes for boundaries, moving each whole record into the model as it is found (so the
-    /// records before a bad frame enter in order); a limit closes before the bad frame's payload is buffered.
+    /// Scans the client's new bytes for boundaries, then moves each whole record into the model in order (so the
+    /// records before a bad frame enter, as far as the room holds them); a limit closes before the bad frame's payload
+    /// is buffered. Records that entered and are not yet released when a limit closes the connection are never handed
+    /// to tungstenite: the close ends the pump, so the model stops (released ones are still read first; F-F).
     fn scan_up(&mut self, t: u64) -> Result<(), Reason> {
+        let mut result = Ok(());
         while self.scanned < self.parse_len {
             let (n, ev) = self.up_scan.scan(&self.parse[self.scanned..self.parse_len]);
             self.scanned += n;
@@ -459,29 +494,37 @@ impl Conn {
                 Some(Ok(Boundary::Frame { message_end })) => {
                     self.bounds.push_back((self.scanned, message_end));
                 }
-                Some(Err(r)) => return Err(r),
+                Some(Err(r)) => {
+                    result = Err(r);
+                    break;
+                }
                 None => break,
             }
-            self.move_up(t);
         }
         self.move_up(t);
-        Ok(())
+        result
     }
 
-    /// Moves every whole record found in the scanner's buffer into the model at `t` while the up room holds it.
+    /// Moves every whole record found in the scanner's buffer into the model at `t` while the up room holds it, then
+    /// moves what is left to the buffer's start once (F10).
     fn move_up(&mut self, t: u64) {
+        let mut start = 0;
         while let Some(&(end, message_end)) = self.bounds.front() {
-            if self.up_room() < end as u64 + OVERHEAD {
+            let len = end - start;
+            if self.up_room() < len as u64 + OVERHEAD {
                 break;
             }
-            self.bytes[UP].extend(&self.parse[..end]);
-            self.model_write(UP, end, t, message_end);
-            self.parse.copy_within(end..self.parse_len, 0);
-            self.parse_len -= end;
-            self.scanned -= end;
+            self.bytes[UP].extend(&self.parse[start..end]);
+            self.model_write(UP, len, t, message_end);
             self.bounds.pop_front();
+            start = end;
+        }
+        if start > 0 {
+            self.parse.copy_within(start..self.parse_len, 0);
+            self.parse_len -= start;
+            self.scanned -= start;
             for b in &mut self.bounds {
-                b.0 -= end;
+                b.0 -= start;
             }
         }
     }
@@ -522,6 +565,39 @@ impl Conn {
 fn wake_all(w: [Option<Waker>; 3]) {
     for w in w.into_iter().flatten() {
         w.wake();
+    }
+}
+
+/// Wakes owed by a step, fired when dropped.
+struct Wakes([Option<Waker>; 4]);
+
+impl Drop for Wakes {
+    fn drop(&mut self) {
+        for w in self.0.iter_mut().filter_map(Option::take) {
+            w.wake();
+        }
+    }
+}
+
+/// The connection's lock after a step to now (`DelayStream::current`), with the wakes that step owes. Fields drop in
+/// their declaration order, so the lock is released first and the wakes fire after it (F2): a woken task never meets
+/// the lock still held by its waker.
+struct Stepped<'a> {
+    c: MutexGuard<'a, Conn>,
+    _wakes: Wakes,
+}
+
+impl Deref for Stepped<'_> {
+    type Target = Conn;
+
+    fn deref(&self) -> &Conn {
+        &self.c
+    }
+}
+
+impl DerefMut for Stepped<'_> {
+    fn deref_mut(&mut self) -> &mut Conn {
+        &mut self.c
     }
 }
 
@@ -570,6 +646,19 @@ where
         conn: u32,
         accepted_ns: u64,
     ) -> io::Result<DelayStream<S>> {
+        let handle = tokio::runtime::Handle::try_current().map_err(io::Error::other)?;
+        let (ds, pump) = Self::build(stream, cfg, conn, accepted_ns)?;
+        handle.spawn(pump);
+        Ok(ds)
+    }
+
+    /// `wrap`'s connection and its pump, not yet spawned (the tests poll a pump by hand).
+    fn build(
+        stream: S,
+        cfg: &L2Config,
+        conn: u32,
+        accepted_ns: u64,
+    ) -> io::Result<(DelayStream<S>, Pump<S>)> {
         let bad = |why: &str| io::Error::new(io::ErrorKind::InvalidInput, why.to_owned());
         if cfg.pass_through {
             return Err(bad(
@@ -585,7 +674,6 @@ where
                 "ws_max_message_bytes must be 1 to 16,370 and ws_max_request_bytes 16 to 32,768",
             ));
         }
-        let handle = tokio::runtime::Handle::try_current().map_err(io::Error::other)?;
         let clock = delay_clock::clock();
         let origin = clock.now_ns();
         let mut profile = cfg.profile.clone();
@@ -609,7 +697,7 @@ where
         let key = clock.start(cfg.timer_slack_ns)?;
         let model = TcpModel::new(&profile, cfg.seed, conn).with_one_way_ns(one_way_ns(cfg));
         let max_frame = cfg.ws_max_message_bytes + MAX_HEADER;
-        let c = Conn {
+        let mut c = Conn {
             model,
             origin,
             conn,
@@ -651,35 +739,45 @@ where
             down_done: false,
             failed: None,
             closed: None,
-            late: [Lateness::new(), Lateness::new()],
-            late_run: [Lateness::new(), Lateness::new()],
+            late: [Running::new(), Running::new()],
             held: [0; 2],
             held_max: [0; 2],
             held_max_run: [0; 2],
             own: Own::default(),
             mark_own: Own::default(),
             mark_tcp: [[0; 20]; 2],
+            fixed_bytes: 0,
             #[cfg(test)]
             logs: Logs::default(),
             #[cfg(test)]
             life: Life::default(),
         };
+        let scratch = vec![0u8; RECORD_MAX].into_boxed_slice();
+        let rbuf = vec![0u8; max_frame].into_boxed_slice();
+        c.fixed_bytes = c.late.iter().map(Running::heap_bytes).sum::<u64>()
+            + (c.parse.len() + scratch.len() + rbuf.len()) as u64;
         let sh = Arc::new(Shared {
             key,
             clock,
             conn: Mutex::new(c),
         });
-        handle.spawn(Pump {
+        let pump = Pump {
             sh: Arc::clone(&sh),
             s: Some(stream),
-            scratch: vec![0u8; RECORD_MAX].into_boxed_slice(),
+            scratch,
+            staged: 0,
+            sent: 0,
+            rbuf,
             unflushed: false,
             front_calls: 0,
-        });
-        Ok(DelayStream {
-            sh,
-            _s: PhantomData,
-        })
+        };
+        Ok((
+            DelayStream {
+                sh,
+                _s: PhantomData,
+            },
+            pump,
+        ))
     }
 }
 
@@ -694,14 +792,23 @@ impl DelayStream<()> {
 
 impl<S> DelayStream<S> {
     /// Adds a burst of total loss, both ways, from `start_ns` (DelayStream's clock) for `len_ns`: per-session B1 on
-    /// the fallback (plan E23; ADR 0001's check item 11). Refused (InvalidInput) when it starts before the model's
-    /// now, has no length, or 64 bursts are already to come (C4).
+    /// the fallback (plan E23; ADR 0001's check item 11). Refused (InvalidInput) when:
+    /// - it starts at or before the model's now (a transmission stamped at the model's now was already sent: NC-U3c-8);
+    /// - it has no length, or ends past DelayStream's clock's range (start + length above u64::MAX; the longest burst
+    ///   from `start_ns` is u64::MAX − start_ns: F1);
+    /// - 64 bursts are already to come (C4).
+    ///
+    /// U6 carry (S7): the per-session control that triggers it is a client's, so npt-server range-checks the start and
+    /// the length before this call (a stated maximum length, a start within the session).
     pub fn add_burst(&self, start_ns: u64, len_ns: u64) -> io::Result<()> {
         let sh = &self.sh;
         let mut c = sh.lock();
         let t = c.model_t(sh.clock.now_ns());
         let got = c.step_to(t);
-        let start = start_ns.checked_sub(c.origin);
+        let now = c.model.now_ns();
+        let start = start_ns
+            .checked_sub(c.origin)
+            .filter(|&s| s > now && start_ns.checked_add(len_ns).is_some());
         let added = start.is_some_and(|s| c.model.add_burst(s, len_ns));
         if added {
             let s = start.unwrap_or_default();
@@ -732,29 +839,36 @@ impl<S> DelayStream<S> {
         } else {
             Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "a burst before the model's now, of no length, or past the 64 still to come",
+                "a burst at or before the model's now, of no length, ending past the clock's range, or past the 64 \
+                 still to come",
             ))
         }
     }
 
-    /// Steps the model to now under the lock, waking what the step released or freed: the pump for released down
-    /// records, the reader for released up records, a waiting writer when acknowledgements freed the budget (the
-    /// pump's own clock entry may have moved past the events stepped here, so the wakes cannot wait for it).
-    fn current(&self) -> MutexGuard<'_, Conn> {
+    /// Steps the model to now under the lock, owing wakes to what the step released or freed: the pump for released
+    /// down records, the reader for released up records, a waiting writer when acknowledgements freed the budget (the
+    /// pump's own clock entry may have moved past the events stepped here, so the wakes cannot wait for it). The wakes
+    /// fire when the returned guard drops, after the lock is released (F2).
+    fn current(&self) -> Stepped<'_> {
         let sh = &self.sh;
         let mut c = sh.lock();
+        let mut wakes = [None, None, None, None];
         if !c.pump_done {
             let t = c.model_t(sh.clock.now_ns());
             let got = c.step_to(t);
             c.reschedule(sh.clock, sh.key);
-            if got[DOWN]
-                && let Some(p) = &c.pump_waker
-            {
-                p.wake_by_ref();
-            }
-            wake_all(c.wakers(got[UP], false));
+            let [r, w, s] = c.wakers(got[UP], false);
+            let pump = if got[DOWN] {
+                c.pump_waker.clone()
+            } else {
+                None
+            };
+            wakes = [r, w, s, pump];
         }
-        c
+        Stepped {
+            c,
+            _wakes: Wakes(wakes),
+        }
     }
 }
 
@@ -781,6 +895,19 @@ impl<S> DelayStream<S> {
     /// Bytes tungstenite offered in its latest write and DelayStream did not take: what it holds above this socket.
     pub(crate) fn owed_bytes(&self) -> u64 {
         self.sh.lock().owed
+    }
+
+    /// Fix 1's gate inputs in one reading (F11, NC-U3c-5): srtt, outstanding, owed and free taken under one lock after
+    /// one step of the model to now, so N's srtt and the outstanding bytes describe the same model instant. WsServer
+    /// reads this once per tick (U6); the four accessors above stay for the tests' single readings.
+    pub(crate) fn gate_inputs(&self) -> Inputs {
+        let c = self.current();
+        Inputs {
+            srtt_ns: c.model.srtt_ns(DOWN),
+            outstanding: c.model.outstanding(DOWN),
+            owed: c.owed,
+            free: c.down_free(),
+        }
     }
 
     /// The TCP accept stamp passed to `wrap` (npt-server's Join deadline, U6).
@@ -871,9 +998,14 @@ impl<S> DelayStream<S> {
     }
 
     /// The header's numbers (`header.params.<name>`; SERIES.md): the wrapper on, the injected delay, the model's TCP
-    /// settings, the release clock's slack (read now by the clock thread itself, and as set at its start), the limits.
+    /// settings, the release clock's slack (read now by the clock thread itself, and as set at its start), the limits,
+    /// the connection's fixed memory.
+    ///
+    /// It blocks (F6): the clock thread answers the slack reading, and the caller waits for it (one wake and one /proc
+    /// read, at most 1 s if that thread is stuck). From async code call it through `tokio::task::spawn_blocking` (U6's
+    /// header writer), never on a runtime worker.
     pub fn header_numbers(&self) -> Vec<(&'static str, u64)> {
-        let (one_way, half_jitter, mss, max_message, max_request, read_floor, wait) = {
+        let (one_way, half_jitter, mss, max_message, max_request, read_floor, wait, fixed) = {
             let c = self.sh.lock();
             (
                 c.model.one_way_ns(),
@@ -883,6 +1015,7 @@ impl<S> DelayStream<S> {
                 c.max_request as u64,
                 c.read_floor,
                 c.shutdown_wait,
+                c.fixed_bytes,
             )
         };
         let tcp = TcpConfig::default();
@@ -910,6 +1043,7 @@ impl<S> DelayStream<S> {
             wait,
             MAX_BURSTS as u64,
             MAX_RETURNS as u64,
+            fixed,
         ];
         names::HEADER_NUMBERS.iter().copied().zip(vals).collect()
     }
@@ -964,7 +1098,7 @@ impl<S> DelayStream<S> {
             [c.held[DOWN], c.held_max[DOWN]],
             [c.held[UP], c.held_max[UP]],
         ];
-        let late: [Summary; 2] = [c.late[DOWN].summary(), c.late[UP].summary()];
+        let late: [Summary; 2] = [c.late[DOWN].window(), c.late[UP].window()];
         let now = c.own.values();
         let mark = c.mark_own.values();
         let mut own = [0u64; REASONS + 3];
@@ -975,8 +1109,8 @@ impl<S> DelayStream<S> {
         names::window(tcp, held, late, &own, &mut out);
         c.mark_tcp = cur;
         c.mark_own = c.own;
-        c.late[DOWN].clear();
-        c.late[UP].clear();
+        c.late[DOWN].close_window();
+        c.late[UP].close_window();
         c.held_max = c.held;
         out
     }
@@ -995,7 +1129,7 @@ impl<S> DelayStream<S> {
             [c.held[DOWN], c.held_max_run[DOWN]],
             [c.held[UP], c.held_max_run[UP]],
         ];
-        let late = [c.late_run[DOWN].summary(), c.late_run[UP].summary()];
+        let late = [c.late[DOWN].whole(), c.late[UP].whole()];
         let mut out = Vec::with_capacity(84);
         names::window(tcp, held, late, &c.own.values(), &mut out);
         out.push((names::CONNS_BEFORE, u64::from(c.conn)));
@@ -1029,6 +1163,11 @@ impl<S> AsyncRead for DelayStream<S> {
     ) -> Poll<io::Result<()>> {
         let sh = &self.sh;
         let mut c = self.current();
+        // A zero-capacity read is answered at once while a record waits (F5): the caller passed no room, and no later
+        // event would wake it again for that record (tokio's own streams answer such a read at once too).
+        if buf.remaining() == 0 && c.released[UP] > 0 {
+            return Poll::Ready(Ok(()));
+        }
         // One record per call (or the rest of the front one): see the module documentation.
         if buf.remaining() > 0 && c.released[UP] > 0 {
             let len = c.recs[UP][0].len;
@@ -1149,16 +1288,20 @@ impl<S> AsyncWrite for DelayStream<S> {
         if c.down_done || c.pump_done {
             return Poll::Ready(Ok(()));
         }
+        let mut pump = None;
         if c.shutdown.is_none() {
-            c.shutdown = Some(sh.clock.now_ns() + c.shutdown_wait);
+            c.shutdown = Some(sh.clock.now_ns().saturating_add(c.shutdown_wait));
             c.reschedule(sh.clock, sh.key);
-            if let Some(p) = &c.pump_waker {
-                p.wake_by_ref();
-            }
+            pump = c.pump_waker.clone();
         }
         match &c.shutter {
             Some(w) if w.will_wake(cx.waker()) => {}
             _ => c.shutter = Some(cx.waker().clone()),
+        }
+        // The pump is woken after the lock is released (F2).
+        drop(c);
+        if let Some(p) = pump {
+            p.wake();
         }
         Poll::Pending
     }
@@ -1168,7 +1311,14 @@ impl<S> AsyncWrite for DelayStream<S> {
 struct Pump<S> {
     sh: Arc<Shared>,
     s: Option<S>,
+    /// The front down record's bytes, staged once under the lock (F4): `staged` bytes, of which S has taken `sent`.
+    /// Kept across a Pending or a partial write, so S is offered the rest without a copy.
     scratch: Box<[u8]>,
+    staged: usize,
+    sent: usize,
+    /// S's reads land here, outside the lock, before they go into the scanner's buffer under it (F3): one largest
+    /// frame, the most the scanner takes after the request.
+    rbuf: Box<[u8]>,
     unflushed: bool,
     /// Write calls the front down record has taken so far without finishing (a split record).
     front_calls: u32,
@@ -1194,72 +1344,97 @@ impl<S> Drop for Pump<S> {
 impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
     type Output = ();
 
+    /// One run: each block takes the connection's lock for its own state and releases it before S is polled (F3), so
+    /// S's calls (rustls's encryption, the syscalls) never run under it and DelayStream's side never waits on them.
+    /// The pump alone owns S, the front down record (nothing else removes it) and the scanner's buffer, so what it
+    /// staged stays valid while the lock is free. A dropped DelayStream ends it at the next block.
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
         let this = self.get_mut();
         let sh = Arc::clone(&this.sh);
-        let mut c = sh.lock();
-        if c.dropped {
-            return Poll::Ready(());
-        }
         let Some(s) = this.s.as_mut() else {
             return Poll::Ready(());
         };
-        match &c.pump_waker {
-            Some(w) if w.will_wake(cx.waker()) => {}
-            _ => c.pump_waker = Some(cx.waker().clone()),
-        }
-        #[cfg(test)]
-        {
-            c.life.polls += 1;
-            c.life.deadline = c.shutdown;
-            if c.shutdown.is_some_and(|d| sh.clock.now_ns() >= d) {
-                c.life.polls_after_deadline += 1;
-            }
-        }
-        let t = c.model_t(sh.clock.now_ns());
-        let got = c.step_to(t);
-        let mut wake_reader = got[UP];
+        let mut wake_reader;
         let mut wake_writer = false;
-
-        // Down: each released record into S in one write call (C1).
-        while c.released[DOWN] > 0 {
-            let len = c.recs[DOWN][0].len;
-            let rem = len - c.front_done[DOWN];
+        {
+            let mut c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            match &c.pump_waker {
+                Some(w) if w.will_wake(cx.waker()) => {}
+                _ => c.pump_waker = Some(cx.waker().clone()),
+            }
+            #[cfg(test)]
             {
+                c.life.polls += 1;
+                c.life.deadline = c.shutdown;
+                if c.shutdown.is_some_and(|d| sh.clock.now_ns() >= d) {
+                    c.life.polls_after_deadline += 1;
+                }
+            }
+            let t = c.model_t(sh.clock.now_ns());
+            wake_reader = c.step_to(t)[UP];
+        }
+
+        // Down: each released record into S in one write call (C1), staged once (F4), S polled outside the lock.
+        loop {
+            if this.staged == 0 {
+                let c = sh.lock();
+                if c.dropped {
+                    return Poll::Ready(());
+                }
+                if c.released[DOWN] == 0 {
+                    break;
+                }
+                let rem = c.recs[DOWN][0].len - c.front_done[DOWN];
                 let (a, b) = c.bytes[DOWN].as_slices();
                 let k = rem.min(a.len());
                 this.scratch[..k].copy_from_slice(&a[..k]);
                 this.scratch[k..rem].copy_from_slice(&b[..rem - k]);
+                this.staged = rem;
+                this.sent = 0;
             }
-            match Pin::new(&mut *s).poll_write(cx, &this.scratch[..rem]) {
+            let r = Pin::new(&mut *s).poll_write(cx, &this.scratch[this.sent..this.staged]);
+            // The release's lateness is taken at poll_write's return (M1), before the lock.
+            let at = sh.clock.now_ns();
+            match r {
                 Poll::Ready(Ok(n)) if n > 0 => {
+                    // AsyncWrite's contract bounds n by what was offered; kept so even a faulty S cannot overrun it.
+                    let n = n.min(this.staged - this.sent);
+                    this.sent += n;
+                    this.unflushed = true;
+                    let mut c = sh.lock();
                     c.bytes[DOWN].drain(..n);
                     c.front_done[DOWN] += n;
-                    this.unflushed = true;
-                    if n < rem {
+                    if c.dropped {
+                        return Poll::Ready(());
+                    }
+                    if this.sent < this.staged {
                         this.front_calls += 1;
                         continue;
                     }
+                    this.staged = 0;
+                    this.sent = 0;
                     if let Some(rec) = c.recs[DOWN].pop_front() {
                         c.released[DOWN] -= 1;
-                        c.released_model[DOWN] -= len as u64 + OVERHEAD;
+                        c.released_model[DOWN] -= rec.len as u64 + OVERHEAD;
                         c.front_done[DOWN] = 0;
                         if this.front_calls > 0 {
                             c.own.split_writes += 1;
                         }
                         this.front_calls = 0;
-                        let at = sh.clock.now_ns();
-                        let due = c.origin + rec.released.unwrap_or_default();
+                        let due = c.origin.saturating_add(rec.released.unwrap_or_default());
                         c.late(DOWN, at.saturating_sub(due));
                         wake_writer = true;
                     }
                 }
                 Poll::Ready(Ok(_)) => {
-                    c.failed = Some(io::ErrorKind::WriteZero);
+                    sh.lock().failed = Some(io::ErrorKind::WriteZero);
                     return Poll::Ready(());
                 }
                 Poll::Ready(Err(e)) => {
-                    c.failed = Some(e.kind());
+                    sh.lock().failed = Some(e.kind());
                     return Poll::Ready(());
                 }
                 Poll::Pending => break,
@@ -1269,56 +1444,77 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
             match Pin::new(&mut *s).poll_flush(cx) {
                 Poll::Ready(Ok(())) => this.unflushed = false,
                 Poll::Ready(Err(e)) => {
-                    c.failed = Some(e.kind());
+                    sh.lock().failed = Some(e.kind());
                     return Poll::Ready(());
                 }
                 Poll::Pending => {}
             }
         }
 
-        // Up: read S into the scanner while the up room holds one largest record (C2); limits before buffering (C6).
+        // Up: S read outside the lock into the pump's buffer while the up room holds one largest record (C2); under the
+        // lock the bytes join the scanner's buffer, the model steps to a fresh now (it never goes back: another task
+        // may have stepped it while the lock was free; and a record enters the model no earlier than its bytes were
+        // read, NC-U3c-3), then the limits apply before anything is buffered (C6) and whole records enter the model.
+        let mut fresh = 0;
         loop {
-            if let Err(r) = c.scan_up(t) {
-                c.close(r);
-                return Poll::Ready(());
-            }
-            let limit = c.read_limit();
-            if c.up_eof || c.parse_len >= limit || c.up_room() < c.read_floor {
-                break;
-            }
-            let at = c.parse_len;
-            let r = {
-                let mut rb = ReadBuf::new(&mut c.parse[at..limit]);
-                match Pin::new(&mut *s).poll_read(cx, &mut rb) {
-                    Poll::Ready(Ok(())) => Poll::Ready(Ok(rb.filled().len())),
-                    Poll::Ready(Err(e)) => Poll::Ready(Err(e)),
-                    Poll::Pending => Poll::Pending,
+            let room = {
+                let mut c = sh.lock();
+                if c.dropped {
+                    return Poll::Ready(());
                 }
-            };
-            match r {
-                Poll::Ready(Ok(0)) => {
-                    c.up_eof = true;
-                    wake_reader = true;
+                // The previous read's bytes (none on the first pass); the room was computed for them under the lock,
+                // and only the pump moves the scanner's buffer.
+                let at = c.parse_len;
+                c.parse[at..at + fresh].copy_from_slice(&this.rbuf[..fresh]);
+                c.parse_len += fresh;
+                let t = c.model_t(sh.clock.now_ns());
+                wake_reader |= c.step_to(t)[UP];
+                if let Err(r) = c.scan_up(t) {
+                    c.close(r);
+                    return Poll::Ready(());
+                }
+                let limit = c.read_limit();
+                if c.up_eof || c.parse_len >= limit || c.up_room() < c.read_floor {
                     break;
                 }
-                Poll::Ready(Ok(n)) => c.parse_len += n,
+                (limit - c.parse_len).min(this.rbuf.len())
+            };
+            let mut rb = ReadBuf::new(&mut this.rbuf[..room]);
+            match Pin::new(&mut *s).poll_read(cx, &mut rb) {
+                Poll::Ready(Ok(())) => {
+                    fresh = rb.filled().len();
+                    if fresh == 0 {
+                        sh.lock().up_eof = true;
+                        wake_reader = true;
+                        break;
+                    }
+                }
                 Poll::Ready(Err(e)) => {
-                    c.failed = Some(e.kind());
+                    sh.lock().failed = Some(e.kind());
                     return Poll::Ready(());
                 }
                 Poll::Pending => break,
             }
         }
 
-        // Shutdown (C3, W3): once every down byte is delivered and taken, S's own shutdown. The deadline bounds all of
-        // it, S's shutdown included: at or past it, S is dropped and counted, whatever it still waits for. Before it,
-        // the pump sleeps until the deadline (`due`) or a wake from S, so a shutdown that S never completes costs one
-        // wake at the deadline, never a spin.
-        if let Some(deadline) = c.shutdown
-            && !c.down_done
-        {
-            let taken = c.recs[DOWN].is_empty() && !this.unflushed;
-            if taken && Pin::new(&mut *s).poll_shutdown(cx).is_ready() {
+        // Shutdown (C3, W3): once every down byte is delivered and taken, S's own shutdown (polled outside the lock).
+        // The deadline bounds all of it, S's shutdown included: at or past it, S is dropped and counted, whatever it
+        // still waits for. Before it, the pump sleeps until the deadline (`due`) or a wake from S, so a shutdown that S
+        // never completes costs one wake at the deadline, never a spin. Nothing new enters the down direction once a
+        // shutdown began (poll_write refuses), so "taken" read under the lock stays true while it is free.
+        let shutdown = {
+            let c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            c.shutdown
+                .filter(|_| !c.down_done)
+                .map(|d| (d, c.recs[DOWN].is_empty() && !this.unflushed))
+        };
+        if let Some((deadline, taken)) = shutdown {
+            let done = taken && Pin::new(&mut *s).poll_shutdown(cx).is_ready();
+            let mut c = sh.lock();
+            if done {
                 c.down_done = true;
             } else if sh.clock.now_ns() >= deadline {
                 c.own.shutdown_timeouts += 1;
@@ -1327,10 +1523,15 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
             }
         }
 
-        c.held_now();
-        c.reschedule(sh.clock, sh.key);
-        let w = c.wakers(wake_reader, wake_writer);
-        drop(c);
+        let w = {
+            let mut c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            c.held_now();
+            c.reschedule(sh.clock, sh.key);
+            c.wakers(wake_reader, wake_writer)
+        };
         wake_all(w);
         Poll::Pending
     }

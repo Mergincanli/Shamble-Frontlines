@@ -85,64 +85,209 @@ impl Lateness {
         self.max = 0;
     }
 
-    /// The nearest-rank quantile `num / den`, as the mean of its bucket's samples (exact within 1 µs below 8.192 ms).
-    fn quantile(&self, num: u64, den: u64) -> u64 {
-        if self.n == 0 {
-            return 0;
-        }
-        let rank = (u128::from(self.n) * u128::from(num))
-            .div_ceil(u128::from(den))
-            .max(1) as u64;
-        let mut seen = 0u64;
-        for b in 0..BUCKETS {
-            seen += self.count[b];
-            if seen >= rank {
-                return self.sum[b] / self.count[b];
-            }
-        }
-        self.max
-    }
-
-    /// E[(L − c)+] over the window, in ns, and the count above c.
-    fn excess_over(&self, c: u64) -> (u64, u64) {
-        if self.n == 0 {
-            return (0, 0);
-        }
-        let first = bucket_of(c);
-        let (mut total, mut over) = (0u128, 0u64);
-        for b in first..BUCKETS {
-            let k = self.count[b];
-            if k == 0 {
-                continue;
-            }
-            let s = u128::from(self.sum[b]);
-            let ck = u128::from(c) * u128::from(k);
-            if b == first {
-                // The threshold's own bucket: its samples taken at their mean.
-                if s > ck {
-                    total += s - ck;
-                    over += k;
-                }
-            } else {
-                total += s - ck;
-                over += k;
-            }
-        }
-        ((total / u128::from(self.n)) as u64, over)
+    /// Every non-empty bucket in order: (bucket, count, sum).
+    fn buckets(&self) -> impl Iterator<Item = (usize, u64, u64)> + '_ {
+        (0..BUCKETS)
+            .filter(|&b| self.count[b] > 0)
+            .map(|b| (b, self.count[b], self.sum[b]))
     }
 
     pub(crate) fn summary(&self) -> Summary {
-        let p50 = self.quantile(1, 2);
-        let (excess, over) = self.excess_over(p50 + ALLOWANCE_NS);
-        Summary {
-            n: self.n,
-            p50,
-            p99: self.quantile(99, 100),
-            p999: self.quantile(999, 1000),
-            max: self.max,
-            excess,
-            over,
+        summarize(self.n, self.max, || self.buckets())
+    }
+}
+
+/// A window's summary from its sample count, its maximum and its non-empty buckets in ascending order (`buckets`
+/// gives a fresh pass on each call): the nearest-rank quantiles, each the mean of its bucket's samples (exact within
+/// 1 µs below 8.192 ms), and E[(L − c)+] with c = p50 + 0.25 ms, with the count above c (the threshold's own bucket
+/// taken at its samples' mean). One routine for every window, so a window kept as a difference (`Running`) and a
+/// whole histogram give the same answer for the same samples.
+fn summarize<I: Iterator<Item = (usize, u64, u64)>>(
+    n: u64,
+    max: u64,
+    buckets: impl Fn() -> I,
+) -> Summary {
+    if n == 0 {
+        return Summary::default();
+    }
+    let quantile = |num: u64, den: u64| -> u64 {
+        let rank = (u128::from(n) * u128::from(num))
+            .div_ceil(u128::from(den))
+            .max(1) as u64;
+        let mut seen = 0u64;
+        for (_, k, s) in buckets() {
+            seen += k;
+            if seen >= rank {
+                return s / k;
+            }
         }
+        max
+    };
+    let p50 = quantile(1, 2);
+    let c = p50 + ALLOWANCE_NS;
+    let first = bucket_of(c);
+    let (mut total, mut over) = (0u128, 0u64);
+    for (b, k, s) in buckets() {
+        if b < first {
+            continue;
+        }
+        let s = u128::from(s);
+        let ck = u128::from(c) * u128::from(k);
+        if b == first {
+            // The threshold's own bucket: its samples taken at their mean.
+            if s > ck {
+                total += s - ck;
+                over += k;
+            }
+        } else {
+            total += s - ck;
+            over += k;
+        }
+    }
+    Summary {
+        n,
+        p50,
+        p99: quantile(99, 100),
+        p999: quantile(999, 1000),
+        max,
+        excess: (total / u128::from(n)) as u64,
+        over,
+    }
+}
+
+/// Words of `Running`'s touched-bucket bitmap.
+const WORDS: usize = BUCKETS.div_ceil(64);
+/// `Running`'s sparse mark: at most this many buckets per window (reserved once), beyond which a window switches to a
+/// dense mark.
+const SPARSE: usize = 256;
+
+/// The dense mark: every bucket's count and sum at the window's start.
+struct Dense {
+    count: Box<[u64; BUCKETS]>,
+    sum: Box<[u64; BUCKETS]>,
+}
+
+/// One direction's lateness over a connection's life and its current window (DelayStream; F7), in one histogram: the
+/// window is the difference between the whole and a mark of it taken at the window's start. The mark is sparse, only
+/// the buckets the window touched with their count and sum as they stood before (a bitmap says which), so a window
+/// costs nothing beyond its touched buckets; a window that touches more than 256 buckets copies the whole into a dense
+/// mark (allocated once, at the first such window, and kept), so the memory never exceeds the two whole histograms
+/// this replaces plus the 6 KB sparse part. Every summary goes through `summarize`, as `Lateness`'s does: a window's
+/// answers equal a fresh `Lateness` fed the same samples (the test).
+pub(crate) struct Running {
+    all: Lateness,
+    touched: Box<[u64; WORDS]>,
+    sparse: Vec<(u16, u64, u64)>,
+    dense: Option<Dense>,
+    dense_on: bool,
+    win_n: u64,
+    win_max: u64,
+}
+
+impl std::fmt::Debug for Running {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Running")
+            .field("all", &self.all)
+            .field("win_n", &self.win_n)
+            .field("dense_on", &self.dense_on)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Running {
+    pub(crate) fn new() -> Running {
+        Running {
+            all: Lateness::new(),
+            touched: Box::new([0; WORDS]),
+            sparse: Vec::with_capacity(SPARSE),
+            dense: None,
+            dense_on: false,
+            win_n: 0,
+            win_max: 0,
+        }
+    }
+
+    pub(crate) fn record(&mut self, ns: u64) {
+        let b = bucket_of(ns);
+        if !self.dense_on {
+            let (w, bit) = (b / 64, 1u64 << (b % 64));
+            if self.touched[w] & bit == 0 {
+                if self.sparse.len() == SPARSE {
+                    self.go_dense();
+                } else {
+                    self.touched[w] |= bit;
+                    self.sparse
+                        .push((b as u16, self.all.count[b], self.all.sum[b]));
+                }
+            }
+        }
+        self.all.record(ns);
+        self.win_n += 1;
+        self.win_max = self.win_max.max(ns);
+    }
+
+    /// The window's mark in full: the whole as it stands, with each touched bucket set back to its mark.
+    fn go_dense(&mut self) {
+        let d = self.dense.get_or_insert_with(|| Dense {
+            count: Box::new([0; BUCKETS]),
+            sum: Box::new([0; BUCKETS]),
+        });
+        d.count.copy_from_slice(&self.all.count[..]);
+        d.sum.copy_from_slice(&self.all.sum[..]);
+        for &(b, c, s) in &self.sparse {
+            d.count[usize::from(b)] = c;
+            d.sum[usize::from(b)] = s;
+        }
+        self.dense_on = true;
+    }
+
+    /// The current window's summary.
+    pub(crate) fn window(&mut self) -> Summary {
+        self.sparse.sort_unstable_by_key(|e| e.0);
+        let all = &self.all;
+        let diff = move |b: usize, c: u64, s: u64| {
+            let k = all.count[b] - c;
+            (k > 0).then(|| (b, k, all.sum[b].saturating_sub(s)))
+        };
+        match (&self.dense, self.dense_on) {
+            (Some(d), true) => summarize(self.win_n, self.win_max, || {
+                (0..BUCKETS).filter_map(move |b| diff(b, d.count[b], d.sum[b]))
+            }),
+            _ => {
+                let sparse = &self.sparse;
+                summarize(self.win_n, self.win_max, || {
+                    sparse
+                        .iter()
+                        .filter_map(move |&(b, c, s)| diff(usize::from(b), c, s))
+                })
+            }
+        }
+    }
+
+    /// Ends the window: the next one starts empty.
+    pub(crate) fn close_window(&mut self) {
+        for &(b, _, _) in &self.sparse {
+            let b = usize::from(b);
+            self.touched[b / 64] &= !(1u64 << (b % 64));
+        }
+        self.sparse.clear();
+        self.dense_on = false;
+        self.win_n = 0;
+        self.win_max = 0;
+    }
+
+    /// The summary over every sample.
+    pub(crate) fn whole(&self) -> Summary {
+        self.all.summary()
+    }
+
+    /// The heap bytes it holds: the whole histogram, the bitmap, the sparse mark's reserve and the dense mark once
+    /// allocated.
+    pub(crate) fn heap_bytes(&self) -> u64 {
+        let hist = 2 * BUCKETS * std::mem::size_of::<u64>();
+        let sparse = self.sparse.capacity() * std::mem::size_of::<(u16, u64, u64)>();
+        let dense = if self.dense.is_some() { hist } else { 0 };
+        (hist + WORDS * std::mem::size_of::<u64>() + sparse + dense) as u64
     }
 }
 
@@ -402,6 +547,51 @@ mod tests {
         assert_eq!(s.excess, 1_000);
         l.clear();
         assert_eq!(l.summary(), Summary::default());
+    }
+
+    /// F7: `Running`'s window, kept as a difference against its mark, gives exactly what a fresh `Lateness` fed the
+    /// same window's samples gives, and its whole exactly what one `Lateness` fed every sample gives, over windows that
+    /// stay sparse, one that goes dense (more than 256 buckets touched) and the sparse windows after it; an empty
+    /// window reports zeros. The memory: one whole histogram, the bitmap and the sparse reserve, plus the dense mark
+    /// only once a window needed it.
+    #[test]
+    fn a_running_window_equals_a_fresh_histogram_of_its_samples() {
+        let mut rng = ChaCha8Rng::seed_from_u64(11);
+        let mut r = Running::new();
+        let mut whole = Lateness::new();
+        assert!(r.sparse.capacity() >= SPARSE);
+        let base = (2 * BUCKETS + WORDS) as u64 * 8 + r.sparse.capacity() as u64 * 24;
+        assert_eq!(r.heap_bytes(), base);
+        assert_eq!(r.window(), Summary::default());
+        let mut went_dense = false;
+        for (i, (samples, spread)) in [
+            (40, 300_000u64),
+            (1_000, 2_000_000),
+            (5_000, 9_000_000),
+            (30, 200_000),
+            (0, 1),
+            (2_000, 60_000_000),
+            (300, 150_000),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut fresh = Lateness::new();
+            for _ in 0..samples {
+                let ns = 20_000 + rng.next_u64() % spread;
+                r.record(ns);
+                fresh.record(ns);
+                whole.record(ns);
+            }
+            went_dense |= r.dense_on;
+            assert_eq!(r.window(), fresh.summary(), "window {i}");
+            assert_eq!(r.whole(), whole.summary(), "whole after window {i}");
+            r.close_window();
+            assert_eq!(r.window(), Summary::default(), "a new window is empty");
+            assert!(r.touched.iter().all(|&w| w == 0) && !r.dense_on);
+        }
+        assert!(went_dense, "a window went dense");
+        assert_eq!(r.heap_bytes(), base + (2 * BUCKETS * 8) as u64);
     }
 
     #[test]

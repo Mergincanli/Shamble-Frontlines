@@ -11,7 +11,7 @@ use std::os::fd::AsFd;
 use std::os::unix::net::{UnixDatagram, UnixStream};
 use std::time::{Duration, Instant};
 
-use socket2::{Domain, SockRef, Socket, Type};
+use socket2::{Domain, Protocol, SockRef, Socket, Type};
 
 use crate::linux::{SIOCOUTQ, rtt_from};
 use crate::{srtt_us, unacked_and_unsent};
@@ -128,9 +128,10 @@ fn siocoutq_on_a_listening_socket_is_einval() {
 /// Any descriptor may be passed (the functions are safe): on anything but a TCP socket each answers with an error, and
 /// SIOCOUTQ's number (TIOCOUTQ) never reaches a descriptor that is not a TCP socket. A pipe is not a socket (ENOTSOCK
 /// from getsockopt, net/socket.c:553-567); a UDP socket and Unix stream and datagram sockets are sockets that are not
-/// TCP. TCP sockets still answer: a connected one reads, an unconnected one reads 0, and a listening one is EINVAL from
-/// tcp_ioctl itself (siocoutq_on_a_listening_socket_is_einval: the check let it through). IPv6 is off in the U3c
-/// container (socket(AF_INET6) is EAFNOSUPPORT), so the AF_INET6 branch is not exercised here.
+/// TCP, which both functions refuse after reading SO_DOMAIN, SO_TYPE and SO_PROTOCOL (InvalidInput; MPTCP has its own
+/// test below). TCP sockets still answer: a connected one reads, an unconnected one reads 0, and a listening one is
+/// EINVAL from tcp_ioctl itself (siocoutq_on_a_listening_socket_is_einval: the check let it through). IPv6 is off in
+/// the U3c container (socket(AF_INET6) is EAFNOSUPPORT), so the AF_INET6 branch is not exercised here.
 #[test]
 fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
     let (pipe_r, pipe_w) = std::io::pipe().expect("pipe");
@@ -167,11 +168,9 @@ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
             "SIOCOUTQ on {what}: {outq}"
         );
         let rtt = srtt_us(fd).expect_err(what);
-        assert!(
-            matches!(
-                rtt.raw_os_error(),
-                Some(libc::ENOPROTOOPT | libc::EOPNOTSUPP)
-            ),
+        assert_eq!(
+            rtt.kind(),
+            ErrorKind::InvalidInput,
             "TCP_INFO on {what}: {rtt}"
         );
         eprintln!("{what}: SIOCOUTQ {outq}; TCP_INFO {rtt}");
@@ -187,6 +186,46 @@ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
         unacked_and_unsent(fresh.as_fd()).expect("an unconnected TCP socket reads"),
         0
     );
+}
+
+/// An MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) is not TCP for either reading (review F8): Linux would answer its
+/// SOL_TCP TCP_INFO from the first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), so srtt_us refuses it as
+/// unacked_and_unsent does. The socket is connected to a loopback TCP listener (the connection falls back to plain
+/// TCP underneath, and the socket stays MPTCP), the state in which TCP_INFO would answer. A kernel without MPTCP
+/// (socket() refused, or net.mptcp.enabled = 0) skips the test with a line on stderr; the U3c container has it.
+#[test]
+fn an_mptcp_socket_is_not_tcp_for_either_reading() {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let to: SocketAddr = listener.local_addr().expect("listener address");
+    let mptcp = match Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::MPTCP)) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("no MPTCP socket on this kernel ({e}): the MPTCP case is not exercised");
+            return;
+        }
+    };
+    mptcp.connect(&to.into()).expect("connect");
+    let (_server, _) = listener.accept().expect("accept");
+    for (what, err) in [
+        (
+            "TCP_INFO",
+            srtt_us(mptcp.as_fd()).expect_err("MPTCP is not TCP"),
+        ),
+        (
+            "SIOCOUTQ",
+            unacked_and_unsent(mptcp.as_fd()).expect_err("MPTCP is not TCP"),
+        ),
+    ] {
+        assert_eq!(
+            err.kind(),
+            ErrorKind::InvalidInput,
+            "{what} on MPTCP: {err}"
+        );
+        assert!(
+            err.to_string().contains("protocol 262"),
+            "{what} on MPTCP: {err}"
+        );
+    }
 }
 
 #[test]

@@ -69,10 +69,14 @@ futures-util = { version = "=0.3.34", default-features = false, features = ["sin
 # deny, not forbid: two crates relax it (ADR 0002:264-265: "an exception needs a written invariant, a test and an
 # #[allow] with its reason"), and no other may. npt-client-wasm relaxes it for the whole crate in its manifest, for
 # wasm-bindgen's generated code (U7). npt-tcpinfo keeps these lints; its two pub functions in src/linux.rs, srtt_us
-# (getsockopt TCP_INFO) and unacked_and_unsent (getsockopt SOL_SOCKET, then ioctl SIOCOUTQ on a TCP socket only),
-# each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step fails on any other crate
-# that relaxes it (in its code, in its manifest, or by not inheriting these lints), on any other relaxing in
-# npt-tcpinfo, on either allow missing, and on a #[path] or include! that names anything but a .rs file in its crate.
+# and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket only),
+# each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step fails when this line is
+# not "deny" (or "forbid"); on unsafe code (`unsafe`, `global_asm!`) in any other crate, however the lint was relaxed,
+# and on any relaxing attribute it can read there; in npt-tcpinfo, on any other relaxing, on `unsafe` outside those two
+# functions, on either allow missing or without its reason, and on the two clippy unsafe lints relaxed or not denied in
+# lib.rs; on a manifest that sets unsafe_code or does not inherit these lints; on a #[path], include!, manifest target
+# path or symbolic link that compiles a file outside its crate's folder; and on rustflags, cargo configs or aliases
+# that lower a lint or replace clippy. What it cannot see (a different rustc, or a wrapper) is outside its reach.
 unsafe_code = "deny"
 
 [workspace.lints.clippy]

@@ -15,16 +15,19 @@
 //! lints below are errors). The `tcp_info` field is read from the bytes the kernel wrote at `offset_of!`, with no
 //! further unsafe code. check.mjs's deps step checks that libc is the only shipped dependency, that only npt-net
 //! depends on the crate, that each of the two attributes sits on its function and no other relaxing attribute exists
-//! here, and that no crate but npt-client-wasm and this one relaxes `unsafe_code`.
+//! here, that every `unsafe` in the crate lies inside those two functions, that the two clippy lints below stay denied
+//! here and relaxed nowhere, and that no crate but npt-client-wasm and this one has `unsafe` code.
 //!
-//! **Any descriptor is sound to pass.** SIOCOUTQ shares its number with TIOCOUTQ, whose meaning on a descriptor that
-//! is not a socket is the driver's, so [`unacked_and_unsent`] first reads SO_DOMAIN, SO_TYPE and SO_PROTOCOL
-//! (ENOTSOCK on a descriptor that is not a socket) and makes the ioctl only on a TCP socket; any other answers with an
-//! error. [`srtt_us`]'s getsockopt is the socket layer's own call (ENOTSOCK elsewhere, an error on a socket without a
-//! TCP level). npt-net passes a `tokio::net::TcpStream`'s descriptor.
+//! **Any descriptor is sound to pass.** Both functions first read SO_DOMAIN, SO_TYPE and SO_PROTOCOL (ENOTSOCK on a
+//! descriptor that is not a socket) and make their call only on a TCP socket; any other answers with an error.
+//! SIOCOUTQ shares its number with TIOCOUTQ, whose meaning on a descriptor that is not a socket is the driver's, so
+//! for [`unacked_and_unsent`] the check is what makes the ioctl sound. For [`srtt_us`], whose getsockopt is the socket
+//! layer's own call, it keeps an MPTCP socket out: that one answers TCP_INFO from its first subflow (v6.8
+//! net/mptcp/sockopt.c:1337, :1344). npt-net passes a `tokio::net::TcpStream`'s descriptor.
 //!
 //! **Linux only.** On every other target the two functions are stubs that return `ErrorKind::Unsupported`, so the
-//! workspace still builds there.
+//! workspace still builds there: check.mjs's clippy-wasm32 step lints this crate for wasm32, a target that is not
+//! Linux.
 
 #![deny(
     clippy::undocumented_unsafe_blocks,

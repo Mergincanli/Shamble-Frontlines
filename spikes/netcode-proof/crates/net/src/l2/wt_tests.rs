@@ -72,7 +72,9 @@ fn check_p2(name: &str, r: &Route, s: &ImpairSocket) {
         "{name}: the session took {:?}",
         r.setup
     );
-    // 2 % loss each way on 200 datagrams: at least 90 % arrive.
+    // 2 % loss each way on 200 datagrams: at least 90 % arrive. The bar's level (F-P): with one datagram per packet the
+    // losses are Binomial(200, 0.02), and P(X >= 21) = 9.3e-10, so a correct build misses it about once in 10^9 runs
+    // per direction; the exact checks below (missing <= ImpairSocket's real losses, FT2) carry the rest.
     assert!(
         r.up_received >= DATAGRAMS * 9 / 10,
         "{name}: up {}",

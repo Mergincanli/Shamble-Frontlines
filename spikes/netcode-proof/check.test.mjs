@@ -3,8 +3,26 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { dependencyProblems, expectedMarks, lexRust, marksProblems, referenceProblems, unsafeProblems } from "./check.mjs";
+import { fileURLToPath } from "node:url";
+import {
+  WASM_CRATES,
+  cargoConfigProblems,
+  crateFiles,
+  dependencyProblems,
+  expectedMarks,
+  layoutProblems,
+  lexRust,
+  marksProblems,
+  referenceProblems,
+  unsafeProblems,
+  workspaceLintProblems,
+} from "./check.mjs";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** cargo metadata's shape, from edges { crate: [[dependency, kind]] } (kind null = normal, "dev", "build"). */
 function meta(edges) {
@@ -144,10 +162,15 @@ test("npt-net has no direct libc dependency; reaching it through npt-tcpinfo or 
   assert.ok(gone.includes("npt-net is not a workspace member"), gone.join("\n"));
 });
 
-/** The placed allow, as npt-tcpinfo writes it: a multi-line reason with a line continuation and brackets inside. */
+/**
+ * The placed allow, as npt-tcpinfo writes it: a multi-line reason with a line continuation and brackets inside, on a
+ * function whose body holds an unsafe block (where it may).
+ */
 const placed = (f, between = "") =>
   `#[allow(\n    unsafe_code,\n    reason = "one foreign call (TCP_INFO) [ADR 0002]; \\\n              no wrapper"\n)]\n` +
-  `${between}pub fn ${f}(fd: BorrowedFd<'_>) -> io::Result<u32> {\n    Ok(0)\n}\n`;
+  `${between}pub fn ${f}(fd: BorrowedFd<'_>) -> io::Result<u32> {\n    unsafe { Ok(0) }\n}\n`;
+/** npt-tcpinfo's crate-level deny of the two clippy unsafe lints, as lib.rs's first line. */
+const DENY = "#![deny(clippy::undocumented_unsafe_blocks, clippy::multiple_unsafe_ops_per_block)]\n";
 
 /** A clean crate tree for unsafeProblems: the two exceptions and two ordinary crates. */
 function cleanCrates() {
@@ -158,7 +181,7 @@ function cleanCrates() {
     "crates/tcpinfo/src/lib.rs":
       "//! The `#[allow(unsafe_code)]` sits on the two functions only (a doc comment, not an attribute).\n" +
       "/* A block comment /* nested */ naming #[allow(unsafe_code)] is a comment too. */\n" +
-      "#![deny(clippy::undocumented_unsafe_blocks)]\nmod linux;\n",
+      "#![deny(\n    clippy::undocumented_unsafe_blocks,\n    clippy::multiple_unsafe_ops_per_block\n)]\nmod linux;\n",
     "crates/tcpinfo/src/linux.rs":
       `const URL: &str = "http://example.invalid/#[x]"; // a // inside a string is not a comment\n` +
       `const QUOTE: char = '"';\nconst RAW: &str = r#"a "quoted" ]] #[ bit"#;\n` +
@@ -183,6 +206,9 @@ const misplaced = (where, on) =>
   `${where} relaxes unsafe_code on ${on}; npt-tcpinfo may only put #[allow(unsafe_code, reason = "...")] directly on ` +
   "srtt_us and unacked_and_unsent in crates/tcpinfo/src/linux.rs";
 const count = (fn, k) => `npt-tcpinfo's pub fn ${fn} has ${k} #[allow(unsafe_code, reason = ...)] attributes, not 1`;
+/** npt-tcpinfo's message for `unsafe` (or `global_asm`) outside the two functions' bodies. */
+const outside = (where, what = "unsafe") =>
+  `${where} has \`${what}\` outside the bodies of srtt_us and unacked_and_unsent in crates/tcpinfo/src/linux.rs`;
 
 test("unsafe_code: the clean tree passes", () => {
   assert.deepEqual(unsafeWith(() => {}), []);
@@ -206,6 +232,13 @@ test("unsafe_code: an attribute relaxing it outside the two exceptions fails, in
     "#[allow(dead_code, unsafe_code)]\nfn f() {}\n",
     "#[allow(\n    clippy::all,\n    unsafe_code\n)]\nfn f() {}\n",
     "#![cfg_attr(test, allow(unsafe_code))]\n",
+    // Review S1's routes rustc 1.99.1 accepts: a comment inside the list (one holding `)` too), raw identifiers.
+    "#[allow(dead_code, /* x */ unsafe_code)]\nfn f() {}\n",
+    "#[allow(dead_code, /* ) */ unsafe_code)]\nfn f() {}\n",
+    "#[allow(dead_code, // )\n    unsafe_code)]\nfn f() {}\n",
+    "#[allow(r#unsafe_code)]\nfn f() {}\n",
+    "#[r#allow(unsafe_code)]\nfn f() {}\n",
+    "#[allow(r#dead_code, unsafe_code)]\nfn f() {}\n",
   ];
   for (const code of planted) {
     const p = unsafeWith((f) => {
@@ -231,7 +264,7 @@ test("unsafe_code: a manifest that sets it or drops the workspace lints fails", 
 
 test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
   const wide = unsafeWith((f) => {
-    f["crates/tcpinfo/src/lib.rs"] = "#![allow(unsafe_code)]\nmod linux;\n";
+    f["crates/tcpinfo/src/lib.rs"] = `#![allow(unsafe_code)]\n${DENY}mod linux;\n`;
   });
   assert.deepEqual(wide, [misplaced("crates/tcpinfo/src/lib.rs:1", "its whole module or crate (#!)")]);
   const third = unsafeWith((f) => {
@@ -246,32 +279,46 @@ test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or 
     f["crates/tcpinfo/src/linux.rs"] = placed("unacked_and_unsent");
     f["crates/tcpinfo/src/stub.rs"] = placed("srtt_us");
   });
-  assert.deepEqual(stub, [misplaced("crates/tcpinfo/src/stub.rs:1", "`pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+  assert.deepEqual(stub, [
+    misplaced("crates/tcpinfo/src/stub.rs:1", "`pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
+    outside("crates/tcpinfo/src/stub.rs:7"),
+    count("srtt_us", 0),
+  ]);
 });
 
 test("unsafe_code: the critic's two mutations fail (an allow on `mod linux;`, an allow moved to a helper)", () => {
   // 1. A module-level outer allow, with one function's own allow removed: the count of attributes stays 2.
   const onMod = unsafeWith((f) => {
-    f["crates/tcpinfo/src/lib.rs"] = '#[cfg(target_os = "linux")]\n#[allow(unsafe_code)]\nmod linux;\n';
+    f["crates/tcpinfo/src/lib.rs"] = `${DENY}#[cfg(target_os = "linux")]\n#[allow(unsafe_code)]\nmod linux;\n`;
     f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}`;
   });
-  assert.deepEqual(onMod, [misplaced("crates/tcpinfo/src/lib.rs:2", "`mod linux;`"), count("srtt_us", 0)]);
+  assert.deepEqual(onMod, [misplaced("crates/tcpinfo/src/lib.rs:3", "`mod linux;`"), count("srtt_us", 0)]);
   // 2. The allow moved from srtt_us to a helper, in its exact form: the count stays 2.
   const moved = unsafeWith((f) => {
     const helper = placed("srtt_us").replace("pub fn srtt_us", "fn helper");
     f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}${helper}`;
   });
-  assert.deepEqual(moved, [misplaced("crates/tcpinfo/src/linux.rs:10", "`fn helper(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+  assert.deepEqual(moved, [
+    misplaced("crates/tcpinfo/src/linux.rs:10", "`fn helper(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
+    outside("crates/tcpinfo/src/linux.rs:16"),
+    count("srtt_us", 0),
+  ]);
   // The same onto another public function.
   const other = unsafeWith((f) => {
     f["crates/tcpinfo/src/linux.rs"] = `${placed("unacked_and_unsent")}${placed("other")}pub fn srtt_us() {}\n`;
   });
-  assert.deepEqual(other, [misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn other(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+  assert.deepEqual(other, [
+    misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn other(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
+    outside("crates/tcpinfo/src/linux.rs:15"),
+    count("srtt_us", 0),
+  ]);
 });
 
 test("unsafe_code: on the two functions only the exact allow with its reason counts", () => {
   const forms = {
     "#[allow(unsafe_code)]\n": "no reason",
+    '#[allow(unsafe_code, reason = "")]\n': "an empty reason (review S5 (c))",
+    '#[allow(unsafe_code, reason = " \\n \\\n ")]\n': "a reason of escapes and blanks",
     '#[expect(unsafe_code, reason = "x")]\n': "expect",
     '#[allow(unsafe_code, dead_code, reason = "x")]\n': "another lint beside it",
     "#[cfg_attr(all(), allow(unsafe_code))]\n": "cfg_attr",
@@ -338,6 +385,289 @@ test("unsafe_code: no #[path] or include! reaches outside its crate, the way npt
     [],
     "inside the crate is fine",
   );
+  // A #[path] whose value a macro supplies (rustc 1.99.1 compiles both forms), or a raw string, is not read: refused.
+  for (const code of [
+    'macro_rules! m {\n    ($p:literal) => {\n        #[path = $p]\n        mod k;\n    };\n}\nm!("../../tcpinfo/src/linux.rs");\n',
+    'macro_rules! m {\n    ($p:expr) => {\n        #[path = $p]\n        mod k;\n    };\n}\nm!("../../tcpinfo/src/linux.rs");\n',
+    '#[path = r"../../tcpinfo/src/linux.rs"]\nmod k;\n',
+  ]) {
+    const p = unsafeWith((f) => {
+      f["crates/room/src/k.rs"] = code;
+    });
+    const line = code.startsWith("#") ? 1 : 3;
+    assert.deepEqual(p, [`crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
+  }
+});
+
+/** One unsafe block, as rustc 1.99.1 compiles it once unsafe_code is relaxed. */
+const UNSAFE_FN = "pub fn f() -> u8 {\n    let x = 1u8;\n    unsafe { *(&raw const x) }\n}\n";
+
+test("unsafe code outside the two exception crates fails however the lint was relaxed (review S1)", () => {
+  const relaxedElsewhere = {
+    // Relaxed by RUSTFLAGS=-Aunsafe_code, --cap-lints warn or a cargo config: no attribute to see, the block still shows.
+    "rustflags or --cap-lints": UNSAFE_FN,
+    // An allow built by a macro from a fragment: rustc 1.99.1 compiles it; the attribute names no lint.
+    "a macro-built allow": `macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        ${UNSAFE_FN}    };\n}\nlax!(unsafe_code);\n`,
+    "an unsafe attribute": '#[unsafe(no_mangle)]\npub extern "C" fn k() {}\n',
+    "global_asm! under a macro-built allow": "macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        mod m {\n            core::arch::global_asm!(\"\");\n        }\n    };\n}\nlax!(unsafe_code);\n",
+  };
+  const firstLine = { "rustflags or --cap-lints": 3, "a macro-built allow": 6, "an unsafe attribute": 1, "global_asm! under a macro-built allow": 5 };
+  for (const [what, code] of Object.entries(relaxedElsewhere)) {
+    const p = unsafeWith((f) => {
+      f["crates/room/src/evil.rs"] = code;
+    });
+    const n = code.match(/\bunsafe\b|\bglobal_asm\b/g).length;
+    assert.deepEqual(
+      p,
+      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm and npt-tcpinfo may)`],
+      what,
+    );
+  }
+  // Not unsafe code: the word in a comment, a string or a doc, a raw identifier, the lint's own name in a deny.
+  const harmless = '#![deny(unsafe_code)]\n// unsafe { }\n/// unsafe\nconst S: &str = "unsafe { }";\nfn r#unsafe() {}\n';
+  assert.deepEqual(unsafeWith((f) => (f["crates/room/src/ok.rs"] = harmless)), []);
+  // npt-client-wasm's manifest relaxes the lint for the whole crate, so its unsafe code is its own.
+  assert.deepEqual(unsafeWith((f) => (f["crates/client-wasm/src/glue.rs"] = UNSAFE_FN)), []);
+});
+
+test("lexRust reads a char literal as one code point, so an emoji cannot hide code from the scan", () => {
+  // Read unit by unit, the emoji's closing quote would start `','`, a char literal, and the `"` after it a string
+  // running to the next `"`, so the unsafe block between would be blanked.
+  const src = `const A: [char; 2] = ['\u{1F600}','"'];\n${UNSAFE_FN}const B: &str = "";\n`;
+  const { code, mask } = lexRust(src);
+  assert.equal(mask.length, src.length);
+  assert.match(mask, /unsafe \{ \*\(&raw const x\) \}/, "the block after the literals stays code");
+  assert.match(code, /'\u{1F600}'/u);
+  const p = unsafeWith((f) => {
+    f["crates/room/src/emoji.rs"] = src;
+  });
+  assert.deepEqual(p, ["crates/room/src/emoji.rs:4 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"]);
+});
+
+test("npt-tcpinfo: unsafe only inside srtt_us and unacked_and_unsent, unsafe_code named only by their allows", () => {
+  const linux = cleanCrates()["crates/tcpinfo/src/linux.rs"];
+  const at = linux.split("\n").length;
+  // An unsafe block in a helper, its allow built by a macro (rustc compiles it; no attribute names the lint).
+  const lax = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] += `macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        ${UNSAFE_FN}    };\n}\nlax!(unsafe_code);\n`;
+  });
+  assert.deepEqual(lax, [
+    "crates/tcpinfo/src/linux.rs:" + (at + 9) + " names unsafe_code outside an attribute (a macro can build the attribute from it)",
+    outside(`crates/tcpinfo/src/linux.rs:${at + 5}`),
+  ]);
+  // In the tests, an example or the stub: outside the two functions.
+  for (const file of ["crates/tcpinfo/src/tests.rs", "crates/tcpinfo/examples/probe.rs", "crates/tcpinfo/src/stub.rs"]) {
+    assert.deepEqual(unsafeWith((f) => (f[file] = UNSAFE_FN)), [outside(`${file}:3`)], file);
+  }
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += 'core::arch::global_asm!("");\n')),
+    [outside(`crates/tcpinfo/src/linux.rs:${at}`, "global_asm")],
+  );
+  // `pub unsafe fn` puts the keyword outside the body (and the allow no longer sits on `pub fn srtt_us`).
+  const unsafeFn = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = placed("unacked_and_unsent") + placed("srtt_us").replace("pub fn", "pub unsafe fn");
+  });
+  assert.deepEqual(unsafeFn, [
+    misplaced("crates/tcpinfo/src/linux.rs:9", "`pub unsafe fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
+    outside("crates/tcpinfo/src/linux.rs:14"),
+    outside("crates/tcpinfo/src/linux.rs:15"),
+    count("srtt_us", 0),
+  ]);
+  // A comment inside the list does not hide a misplaced allow (review S1).
+  const comment = unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += "#[allow(dead_code, /* ) */ unsafe_code)]\nfn h() {}\n"));
+  assert.deepEqual(comment, [misplaced(`crates/tcpinfo/src/linux.rs:${at}`, "`fn h() {}`")]);
+});
+
+test("npt-tcpinfo: the clippy unsafe lints stay denied at the crate root and relaxed nowhere (review S1)", () => {
+  const named = (where, name) =>
+    `${where} names clippy's ${name} outside crates/tcpinfo/src/lib.rs's crate-level deny (relaxing it would let an ` +
+    "unsafe block go without its SAFETY comment or hold more than one unsafe operation)";
+  const linux = cleanCrates()["crates/tcpinfo/src/linux.rs"];
+  const at = linux.split("\n").length;
+  for (const [attr, name] of [
+    ["#[allow(clippy::undocumented_unsafe_blocks)]", "undocumented_unsafe_blocks"],
+    ["#[expect(clippy::multiple_unsafe_ops_per_block)]", "multiple_unsafe_ops_per_block"],
+    ["#[allow(clippy::restriction)]", "restriction"],
+    ["#[allow(clippy::r#undocumented_unsafe_blocks)]", "undocumented_unsafe_blocks"],
+    ["#[cfg_attr(all(), allow(clippy::restriction))]", "restriction"],
+  ]) {
+    const p = unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += `${attr}\nfn h() {}\n`));
+    assert.deepEqual(p, [named(`crates/tcpinfo/src/linux.rs:${at}`, name)], attr);
+  }
+  // A macro's argument naming it (the attribute built inside the macro).
+  const viaMacro = unsafeWith((f) => (f["crates/tcpinfo/src/tests.rs"] = "lax!(clippy::multiple_unsafe_ops_per_block);\n"));
+  assert.deepEqual(viaMacro, [named("crates/tcpinfo/src/tests.rs:1", "multiple_unsafe_ops_per_block")]);
+  // The crate-level deny missing, partial, behind cfg_attr, or not at the crate root.
+  const missing = "crates/tcpinfo/src/lib.rs does not deny clippy::undocumented_unsafe_blocks and clippy::multiple_unsafe_ops_per_block at the crate root";
+  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = "mod linux;\n")), [missing]);
+  assert.deepEqual(unsafeWith((f) => delete f["crates/tcpinfo/src/lib.rs"]), [missing]);
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = "#![deny(clippy::undocumented_unsafe_blocks)]\nmod linux;\n")),
+    [named("crates/tcpinfo/src/lib.rs:1", "undocumented_unsafe_blocks"), missing],
+  );
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `#![cfg_attr(any(), ${DENY.slice(3, -3)})]\nmod linux;\n`)),
+    [named("crates/tcpinfo/src/lib.rs:1", "undocumented_unsafe_blocks"), named("crates/tcpinfo/src/lib.rs:1", "multiple_unsafe_ops_per_block"), missing],
+  );
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `mod linux;\nfn f() {\n    ${DENY}}\n`)),
+    [named("crates/tcpinfo/src/lib.rs:3", "undocumented_unsafe_blocks"), named("crates/tcpinfo/src/lib.rs:3", "multiple_unsafe_ops_per_block"), missing],
+  );
+  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `${DENY.replace("deny", "forbid")}mod linux;\n`)), [], "forbid is fine");
+});
+
+test("the workspace manifest denies unsafe_code, and nothing else will do (review F-D)", () => {
+  const real = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+  assert.deepEqual(workspaceLintProblems(real), [], "the spike's own Cargo.toml");
+  const none = 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "deny" (or "forbid") for its crates to inherit';
+  const line = real.split("\n").findIndex((l) => l.startsWith("unsafe_code")) + 1;
+  const other = (n) => `Cargo.toml:${n} names unsafe_code other than as "deny" or "forbid" in [workspace.lints.rust]`;
+  for (const level of ['"allow"', '"warn"', "'allow'", '{ level = "allow", priority = 1 }']) {
+    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${level}`)), [other(line), none], level);
+  }
+  assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', "")), [none], "the line removed");
+  for (const ok of ['"forbid"', "'deny'", '{ level = "deny", priority = -1 }']) {
+    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${ok}`)), [], ok);
+  }
+  const t = (body) => `[workspace]\nmembers = []\n${body}`;
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.rust]\n# unsafe_code = "allow" in a comment\nunsafe_code = "deny"\n')), []);
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.clippy]\nunsafe_code = "deny"\n')), [other(4), none], "another table");
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints]\nrust.unsafe_code = "deny"\n')), [other(4), none], "a dotted key (read closed)");
+  // A copy of the right lines inside a multi-line string, the real one relaxed below it.
+  const decoy = t('[workspace.metadata]\nnote = """\n[workspace.lints.rust]\nunsafe_code = "deny"\n"""\n[workspace.lints.rust]\nunsafe_code = "allow"\n');
+  assert.ok(workspaceLintProblems(decoy).includes(other(9)), workspaceLintProblems(decoy).join("\n"));
+});
+
+/** cargo metadata's shape for layoutProblems: members by folder, each with its targets ([kind, name, src, edition?]). */
+function layoutMeta(members) {
+  const packages = Object.entries(members).map(([dir, targets]) => ({
+    id: `path+file:///w/${dir}#0.0.0`,
+    name: `npt-${dir.split("/").pop() || "root"}`,
+    manifest_path: `/w/${dir ? `${dir}/` : ""}Cargo.toml`,
+    targets: targets.map(([kind, name, src, edition = "2024"]) => ({
+      kind: [kind],
+      name,
+      src_path: src.startsWith("/") ? src : `/w/${dir ? `${dir}/` : ""}${src}`,
+      edition,
+    })),
+  }));
+  return { workspace_root: "/w", workspace_members: packages.map((p) => p.id), packages };
+}
+
+test("every member lives in crates/ and builds only .rs files in its own folder, in edition 2024 (review F-E, S5 (c))", () => {
+  const clean = {
+    "crates/room": [["lib", "npt_room", "src/lib.rs"], ["test", "rooms", "tests/rooms.rs"]],
+    "crates/tcpinfo": [["lib", "npt_tcpinfo", "src/lib.rs"], ["example", "siocoutq_probe", "examples/siocoutq_probe.rs"]],
+    "crates/bots": [["bin", "npt-bots", "src/bin/npt-bots.rs"], ["custom-build", "build-script-build", "build.rs"]],
+  };
+  assert.deepEqual(layoutProblems(layoutMeta(clean)), []);
+  const withTarget = (dir, target) => layoutProblems(layoutMeta({ ...clean, [dir]: [...clean[dir], target] }));
+  for (const [kind, src] of [
+    ["lib", "../tcpinfo/src/linux.rs"],
+    ["bin", "src/../../tcpinfo/src/linux.rs"],
+    ["example", "/elsewhere/x.rs"],
+    ["test", "../room-other/tests/t.rs"],
+    ["bench", "../../benches/b.rs"],
+    ["custom-build", "../tcpinfo/build.rs"],
+  ]) {
+    const p = withTarget("crates/room", [kind, "planted", src]);
+    assert.equal(p.length, 1, `${kind} ${src}: ${p.join("\n")}`);
+    assert.match(p[0], new RegExp(`^npt-room's ${kind} target planted compiles .*, outside its folder crates/room/$`));
+  }
+  assert.deepEqual(withTarget("crates/room", ["lib", "planted", "src/lib.txt"]), [
+    "npt-room's lib target planted compiles crates/room/src/lib.txt, not a .rs file the scan reads",
+  ]);
+  assert.deepEqual(withTarget("crates/room", ["lib", "planted", "src/x.rs", "2021"]), ["npt-room's lib target planted is edition 2021, not 2024"]);
+  // A proc-macro member: its expansions are another crate's macro code, which rustc 1.99.1 does not lint even under
+  // --forbid unsafe_code (probe: an `unsafe` built from strings compiled in the caller).
+  assert.deepEqual(withTarget("crates/room", ["proc-macro", "planted", "src/pm.rs"]), [
+    "npt-room's proc-macro target planted is a proc-macro crate, whose expansions the lint and the scan cannot see",
+  ]);
+  // A path dependency outside the workspace is code nobody scans; a registry package is a dependency like any other.
+  const outside = layoutMeta(clean);
+  outside.packages.push({ id: "path+file:///x/evil#0.0.0", name: "evil", manifest_path: "/x/evil/Cargo.toml", source: null, targets: [] });
+  outside.packages.push({ id: "registry+x#libc@0.2.191", name: "libc", manifest_path: "/r/libc/Cargo.toml", source: "registry+x", targets: [] });
+  assert.deepEqual(layoutProblems(outside), ["evil (../x/evil/Cargo.toml) is a path dependency outside the workspace, which the scan does not read"]);
+  // A member outside crates/: the workspace root itself, or another folder.
+  for (const dir of ["", "tools/extra"]) {
+    const p = layoutProblems(layoutMeta({ ...clean, [dir]: [["lib", "x", "src/lib.rs"]] }));
+    const manifest = dir ? `${dir}/Cargo.toml` : "Cargo.toml";
+    assert.deepEqual(p, [`npt-${dir.split("/").pop() || "root"}'s manifest is ${manifest}, not crates/<folder>/Cargo.toml (the unsafe_code scan reads crates/ only)`]);
+  }
+});
+
+test("rustflags, cargo configs and aliases that would relax a lint are refused (review S1, F-D)", () => {
+  assert.deepEqual(cargoConfigProblems({ PATH: "/bin", RUSTFLAGS: "-C target-cpu=native -D warnings" }, []), []);
+  for (const [k, v, flag] of [
+    ["RUSTFLAGS", "-Aunsafe_code", "-Aunsafe_code"],
+    ["RUSTFLAGS", "-C opt-level=1 --cap-lints=warn", "--cap-lints=warn"],
+    ["RUSTFLAGS", "--allow unsafe_code", "--allow"],
+    ["CARGO_ENCODED_RUSTFLAGS", "-C\x1fopt-level=1\x1f--force-warn\x1funsafe_code", "--force-warn"],
+    ["CARGO_BUILD_RUSTFLAGS", "-Zcrate-attr=allow(unsafe_code)", "-Zcrate-attr=allow(unsafe_code)"],
+    ["CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS", "-W unsafe_code", "-W"],
+    ["RUSTFLAGS", "@flags.txt", "@flags.txt"],
+  ]) {
+    assert.deepEqual(cargoConfigProblems({ [k]: v }, []), [`${k} in the environment passes ${JSON.stringify(flag)} to rustc: a flag that can relax unsafe_code`], `${k}=${v}`);
+  }
+  assert.deepEqual(cargoConfigProblems({ CARGO_ALIAS_CLIPPY: "check" }, []), ["CARGO_ALIAS_CLIPPY in the environment replaces `cargo clippy` with an alias"]);
+  // Config files: the spike's own (a target-dir) passes; each planted rustflags or alias fails.
+  const own = { path: "spike/.cargo/config.toml", text: readFileSync(join(HERE, ".cargo", "config.toml"), "utf8") };
+  assert.deepEqual(cargoConfigProblems({}, [own]), []);
+  const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
+  assert.deepEqual(config('[build]\nrustflags = [\n    "-C", # a comment\n    "link-arg=-Wl,-z,relro",\n]\n[env]\nX = "rustflags = -A"\n'), []);
+  for (const [text, flag] of [
+    ['[build]\nrustflags = ["-A", "unsafe_code"]\n', "-A"],
+    ["[target.'cfg(unix)']\nrustflags = \"-C opt-level=1 --cap-lints warn\"\n", "--cap-lints"],
+    ['build.rustflags = ["\\u002DAunsafe_code"]\n', "-Aunsafe_code"],
+    ['[build]\n"rustflags" = [\'--force-warn=unsafe_code\']\n', "--force-warn=unsafe_code"],
+    ['[target.x86_64-unknown-linux-gnu]\nrustflags = """\n-W unsafe_code"""\n', "-W"],
+  ]) {
+    assert.ok(
+      config(text).some((p) => p.startsWith(`c.toml's rustflags passes ${JSON.stringify(flag)} to rustc`)),
+      `${text}: ${config(text).join("\n")}`,
+    );
+  }
+  assert.deepEqual(config("[build]\nrustflags = 3\n"), ["c.toml has a rustflags value this check cannot read"]);
+  assert.deepEqual(config('[alias]\nclippy = "check"\n'), ["c.toml has a key `clippy`: an alias that replaces `cargo clippy`"]);
+  assert.deepEqual(config('alias.fmt = "version"\n'), ["c.toml has a key `fmt`: an alias that replaces `cargo fmt`"]);
+  assert.deepEqual(config('alias = { "clippy" = ["check"] }\n'), ["c.toml has a key `clippy`: an alias that replaces `cargo clippy`"]);
+});
+
+test("the crate walk reads every folder and reports symbolic links it does not follow (review F-E)", (t) => {
+  const tmp = mkdtempSync(join(tmpdir(), "npt-check-"));
+  try {
+    const crates = join(tmp, "crates");
+    for (const f of ["room/Cargo.toml", "room/src/lib.rs", "room/src/target/mod.rs", "room/src/.hidden/x.rs", "tcpinfo/src/linux.rs", "room/README.md"]) {
+      mkdirSync(dirname(join(crates, f)), { recursive: true });
+      writeFileSync(join(crates, f), "\n");
+    }
+    let linked = true;
+    try {
+      symlinkSync("../../tcpinfo/src/linux.rs", join(crates, "room/src/k.rs"));
+      symlinkSync("../../tcpinfo/src", join(crates, "room/src/borrowed"), "dir");
+    } catch {
+      linked = false;
+    }
+    const { files, links } = crateFiles(crates);
+    // Node 22's walk may also list a linked folder's files (as crates/room/src/borrowed/...); a link is refused anyway.
+    const own = files.filter((f) => !f.startsWith("crates/room/src/borrowed/"));
+    assert.deepEqual(own, [
+      "crates/room/Cargo.toml",
+      "crates/room/src/.hidden/x.rs",
+      "crates/room/src/lib.rs",
+      "crates/room/src/target/mod.rs",
+      "crates/tcpinfo/src/linux.rs",
+    ]);
+    if (!linked) t.diagnostic("symbolic links cannot be made here: the link half is not exercised");
+    else assert.deepEqual(links, ["crates/room/src/borrowed", "crates/room/src/k.rs"]);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("npt-tcpinfo's non-Linux stub is linted for wasm32 with the leaf crates (review F-N)", () => {
+  assert.ok(WASM_CRATES.includes("npt-tcpinfo"));
+  for (const leaf of ["npt-link", "npt-l1", "npt-sim", "npt-proto", "npt-room", "npt-client", "npt-log"]) assert.ok(WASM_CRATES.includes(leaf), leaf);
 });
 
 test("marks.json covers exactly the plan's marks, and every row it hashed is unchanged", () => {

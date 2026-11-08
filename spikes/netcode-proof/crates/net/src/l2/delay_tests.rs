@@ -15,7 +15,7 @@ use super::super::tls_test::{client_tls, self_signed};
 use super::*;
 use crate::tcp_model::Counters;
 use crate::ws_config;
-use crate::ws_gate::{Bite, Inputs, Snap, TickWriter, snapshot_budget};
+use crate::ws_gate::{Bite, Snap, TickWriter, snapshot_budget};
 use futures_util::{FutureExt, Sink, SinkExt, Stream, StreamExt};
 use npt_l1::{Profile, ReorderStep};
 use rand_chacha::ChaCha8Rng;
@@ -142,11 +142,13 @@ fn inside(sent: &[(usize, u64, u32, u64, bool)], start: u64, len: u64) -> [u64; 
 }
 
 /// Adds a burst of `len_ns` starting 1 ms from now on DelayStream's clock, again with a fresh now if the model passed
-/// that start before the call stepped it (C4's refusal), so a stalled test thread cannot place it in the past.
-fn add_burst_soon<S>(ds: &DelayStream<S>, len_ns: u64) {
+/// that start before the call stepped it (C4's refusal), so a stalled test thread cannot place it in the past. Returns
+/// the start it asked for (DelayStream's clock).
+fn add_burst_soon<S>(ds: &DelayStream<S>, len_ns: u64) -> u64 {
     for _ in 0..1_000 {
-        if ds.add_burst(now() + MS, len_ns).is_ok() {
-            return;
+        let start = now() + MS;
+        if ds.add_burst(start, len_ns).is_ok() {
+            return start;
         }
     }
     panic!("no burst accepted in 1,000 tries");
@@ -401,10 +403,12 @@ pub(crate) async fn ws_session(cfg: L2Config, ticks: u64) -> (u64, u64, String) 
 // Unit tests: S an in-memory duplex.
 
 /// Order and integrity both ways (hashes of 200 random frames up and 200 random writes down, at P2 with its loss and
-/// jitter), and every release no earlier than its model stamp: a byte reaches the client side of S, or tungstenite's
-/// side of DelayStream, only after the model released its record. About 2 s.
+/// jitter), and no byte seen before its record's release: a byte reaches the client side of S, or tungstenite's side
+/// of DelayStream, only after the release logged for its record. That release is stamped at the step that made it,
+/// never after now, so this half holds by construction and cannot catch a release made too early (F-O): the replay
+/// test proves the releases' stamps equal the model's deliveries. About 2 s.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn order_and_integrity_both_ways_and_no_release_before_its_stamp() {
+async fn order_and_integrity_both_ways_and_no_byte_seen_before_its_release() {
     let (client, server) = tokio::io::duplex(1 << 20);
     let mut ds = DelayStream::wrap(server, &cfg(Profile::p2(), 11), 0, now()).expect("wrapped");
     let mut rng = ChaCha8Rng::seed_from_u64(5);
@@ -499,11 +503,12 @@ async fn order_and_integrity_both_ways_and_no_release_before_its_stamp() {
 
 /// The one-record rule (C1): with 30,000 B free, a 40,000 B write takes one record of 16,384 B, the next only what
 /// leaves 22 B for its own record, and the budget is never exceeded; then Pending (never Ok(0)), with tungstenite's
-/// rest owed. A 2 s round trip keeps every byte in flight.
+/// rest owed. The exact numbers need every byte still in flight when they are read, so the round trip is 20 s (F-I):
+/// no acknowledgement can arrive within the test's synchronous few milliseconds unless the process freezes for 10 s.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn one_record_per_write_never_beyond_the_budget() {
     let (_client, server) = tokio::io::duplex(1 << 20);
-    let mut ds = DelayStream::wrap(server, &cfg(fixed(2_000), 1), 0, now()).expect("wrapped");
+    let mut ds = DelayStream::wrap(server, &cfg(fixed(20_000), 1), 0, now()).expect("wrapped");
     let mut w = |len: usize| match Pin::new(&mut ds).poll_write(&mut noop(), &vec![0x82; len]) {
         Poll::Ready(Ok(n)) => Some(n),
         Poll::Ready(Err(e)) => panic!("{e}"),
@@ -584,6 +589,23 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
         "up held {} B",
         max[UP]
     );
+    // F-H: the bounds were reached, not merely respected. Down: the writes stopped with at most 22 B free, so the
+    // records held (at most 9 of 8,214 B) hold the budget less 22 B and their overheads, less what S took (at most the
+    // duplex's 1 KB): above 64 KB − one record. Up: the client sends far more than the budget, S is read until the up
+    // room is below the 549 B floor, so the records in the model or released hold more than 64 KB − 549 B, less 22 B
+    // for each of at most 125 records of 506 + 22 B.
+    assert!(
+        max[DOWN] >= BUDGET - RECORD_MAX as u64,
+        "down reached only {} B",
+        max[DOWN]
+    );
+    let floor = 513 + 14 + OVERHEAD;
+    let up_least = BUDGET - floor - OVERHEAD * (BUDGET / (506 + OVERHEAD) + 1);
+    assert!(
+        max[UP] >= up_least,
+        "up reached only {} B of {up_least} B",
+        max[UP]
+    );
     assert!(
         !flood.is_finished(),
         "the client still had frames to send: S was not read beyond the bound"
@@ -602,11 +624,13 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
     flood.abort();
 }
 
-/// The request is one record, whatever its chunking (the client writes it a byte at a time).
+/// The request is one record, whatever its chunking (the client writes it a byte at a time). And F5: once it is
+/// released, a zero-capacity read is answered at once (Ready, nothing taken), and the next read takes it whole.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_request_is_one_record() {
     let (mut client, server) = tokio::io::duplex(1 << 16);
-    let ds = DelayStream::wrap(server, &cfg(quiet(Profile::p1()), 3), 0, now()).expect("wrapped");
+    let mut ds =
+        DelayStream::wrap(server, &cfg(quiet(Profile::p1()), 3), 0, now()).expect("wrapped");
     for b in REQUEST {
         client.write_all(&[*b]).await.expect("a byte");
         tokio::task::yield_now().await;
@@ -616,18 +640,37 @@ async fn the_request_is_one_record() {
         writes(&ds.logs(), UP),
         vec![REQUEST.len() as u64 + OVERHEAD]
     );
+    assert!(until(HANG, || !ds.logs().releases.is_empty()).await);
+    let mut empty = ReadBuf::new(&mut []);
+    assert!(
+        matches!(
+            Pin::new(&mut ds).poll_read(&mut noop(), &mut empty),
+            Poll::Ready(Ok(()))
+        ),
+        "a zero-capacity read with a record released is Ready at once"
+    );
+    let mut buf = vec![0u8; 4_096];
+    let n = ds.read(&mut buf).await.expect("the request");
+    assert_eq!(&buf[..n], REQUEST, "nothing was taken by the empty read");
+}
+
+/// What one limit case saw: the close reason, the up model bytes that entered, whether the client side saw S closed,
+/// the plaintext handed to tungstenite's side before the close's error, and the plaintext of the up records the model
+/// released (from the log, after the pump ended).
+#[derive(Debug, Clone, Copy)]
+struct Limit {
+    closed: Option<Reason>,
+    entered: u64,
+    eof: bool,
+    handed: u64,
+    released: u64,
 }
 
 /// One case of the limits: `head`, then `bad`, with the checks in `off` turned off (the bites); waits until the
-/// connection closes or more than `before` model bytes entered up. Returns the close reason, the up model bytes
-/// written, and whether the client side saw S closed.
-async fn limit_case(
-    cfg: &L2Config,
-    head: &[u8],
-    bad: &[u8],
-    off: &[Reason],
-    before: u64,
-) -> (Option<Reason>, u64, bool) {
+/// connection closes or more than `before` model bytes entered up. After a close, reads tungstenite's side until the
+/// close's error and checks F-F's identity: what is handed before it is exactly the up records the model released,
+/// never a record that entered and was not released when the close ended the pump.
+async fn limit_case(cfg: &L2Config, head: &[u8], bad: &[u8], off: &[Reason], before: u64) -> Limit {
     let (mut client, server) = tokio::io::duplex(1 << 16);
     let mut ds = DelayStream::wrap(server, cfg, 0, now()).expect("wrapped");
     ds.bite_check_off(off);
@@ -641,7 +684,7 @@ async fn limit_case(
     );
     let (_, closed, _, _) = ds.probe();
     let entered = up(&ds);
-    let mut eof = false;
+    let (mut eof, mut handed, mut released) = (false, 0, 0);
     if closed.is_some() {
         // S closed: the client's read ends.
         let mut buf = [0u8; 64];
@@ -655,7 +698,7 @@ async fn limit_case(
         for _ in 0..100 {
             match tokio::time::timeout(HANG, ds.read(&mut sink)).await {
                 Ok(Ok(0)) => break,
-                Ok(Ok(_)) => {}
+                Ok(Ok(n)) => handed += n as u64,
                 Ok(Err(e)) => {
                     err = Some(e.kind());
                     break;
@@ -664,8 +707,26 @@ async fn limit_case(
             }
         }
         assert_eq!(err, Some(io::ErrorKind::InvalidData));
+        assert!(ds.probe().0, "the close ended the pump");
+        let mut last = 0;
+        for &(dir, model_end, _) in &ds.snapshot().logs.releases {
+            if dir == UP {
+                released += model_end - last - OVERHEAD;
+                last = model_end;
+            }
+        }
+        assert_eq!(
+            handed, released,
+            "F-F: tungstenite's side got exactly the released records before the close"
+        );
     }
-    (closed, entered, eof)
+    Limit {
+        closed,
+        entered,
+        eof,
+        handed,
+        released,
+    }
 }
 
 /// What a bite's input then does: its payload enters the model, or the close is counted under another reason (the
@@ -687,6 +748,15 @@ enum Then {
 ///   enter however the checks are set;
 /// - the request cap is also the scanner's read limit, so the request bite lifts both.
 ///
+/// S2: the request's end is where tungstenite's parser (httparse) puts it, so the limits apply to the same bytes it
+/// reads as frames: a head ending in bare LFs, one with mixed line ends and one after leading blank lines each end
+/// where httparse ends them, and the over-limit frame after them closes the connection, counted, with only the head
+/// entered. The reproduced input among them: a head of exactly 4,096 B (tungstenite's read chunk) ending in "\n\n",
+/// then a 604 B masked frame (before the fix it passed uncounted and entered the model).
+///
+/// F-F: after each close, tungstenite's side gets exactly the up records the model released, then the error; with a
+/// 10 s one-way delay the request entered and is never released, so it is never handed (discarded by the close).
+///
 /// Plus the limit raised in L2Config (one source) letting the 514 B frame in.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn each_limit_closes_before_buffering_and_is_counted() {
@@ -701,7 +771,45 @@ async fn each_limit_closes_before_buffering_and_is_counted() {
     big.resize(9_000, b'a');
     big.extend(b"\r\n\r\n");
     let fragment = frame(false, 2, true, &[1; 300], false);
+    // S2's heads (httparse 1.10.1 ends a head at its first empty line, an LF or CR LF line, after a non-empty one,
+    // leading empty lines skipped: lib.rs:558-581, :1105-1116).
+    let mut lf = b"GET / HTTP/1.1\nHost: localhost\nUpgrade: websocket\nConnection: Upgrade\n\
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\nSec-WebSocket-Version: 13\nX-Pad: "
+        .to_vec();
+    lf.resize(4_096 - 2, b'a');
+    lf.extend(b"\n\n");
+    assert_eq!(
+        lf.len(),
+        4_096,
+        "the reproduced head: exactly one tungstenite read"
+    );
+    let mixed = b"GET / HTTP/1.1\r\nHost: localhost\nUpgrade: websocket\r\nConnection: Upgrade\n\
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\nSec-WebSocket-Version: 13\n\r\n"
+        .to_vec();
+    // Leading empty lines, "\r\n\r\n" among them (the old scanner ended the head there).
+    let leading = [&b"\r\n\r\n\n"[..], REQUEST].concat();
     let cases: Vec<Case> = vec![
+        (
+            lf.clone(),
+            frame(true, 2, true, &[1; 604], false),
+            Frame,
+            lf.len() as u64 + OVERHEAD,
+            Vec::new(),
+        ),
+        (
+            mixed.clone(),
+            frame(true, 2, true, &[1; 604], false),
+            Frame,
+            mixed.len() as u64 + OVERHEAD,
+            Vec::new(),
+        ),
+        (
+            leading.clone(),
+            frame(true, 2, true, &[1; 604], false),
+            Frame,
+            leading.len() as u64 + OVERHEAD,
+            Vec::new(),
+        ),
         (
             REQUEST.to_vec(),
             frame(true, 2, true, &[1; 514], false),
@@ -757,15 +865,23 @@ async fn each_limit_closes_before_buffering_and_is_counted() {
         ),
     ];
     for (head, bad, why, before, bites) in &cases {
-        let (closed, entered, eof) = limit_case(&c, head, bad, &[], *before).await;
-        assert_eq!(closed, Some(*why), "{why:?}");
+        let l = limit_case(&c, head, bad, &[], *before).await;
+        assert_eq!(l.closed, Some(*why), "{why:?}");
         assert_eq!(
-            entered, *before,
+            l.entered, *before,
             "{why:?}: nothing of the bad frame entered"
         );
-        assert!(eof, "{why:?}: S was dropped");
+        assert!(l.eof, "{why:?}: S was dropped");
+        println!(
+            "{why:?} after a {} B head: closed before buffering ({before} B up); {} B handed, {} B released",
+            head.len(),
+            l.handed,
+            l.released
+        );
         for (off, then) in bites {
-            let (closed, entered, _) = limit_case(&c, head, bad, off, *before).await;
+            let Limit {
+                closed, entered, ..
+            } = limit_case(&c, head, bad, off, *before).await;
             match then {
                 Then::Enters => {
                     assert_eq!(closed, None, "{why:?} bite {off:?}: no close");
@@ -786,10 +902,23 @@ async fn each_limit_closes_before_buffering_and_is_counted() {
             );
         }
     }
+    // F-F, pinned: with a 10 s one-way delay the request entered and was not released when the frame closed the
+    // connection, so tungstenite's side is handed nothing before the error.
+    let slow = cfg(fixed(20_000), 4);
+    let l = limit_case(
+        &slow,
+        REQUEST,
+        &frame(true, 2, true, &[1; 514], false),
+        &[],
+        request,
+    )
+    .await;
+    assert_eq!(l.closed, Some(Frame));
+    assert_eq!((l.entered, l.released, l.handed), (request, 0, 0));
     // One source: the limit raised to 16,000 B in L2Config lets the 514 B frame's payload into the model.
     let mut open = c.clone();
     open.ws_max_message_bytes = 16_000;
-    let (closed, entered, _) = limit_case(
+    let l = limit_case(
         &open,
         REQUEST,
         &frame(true, 2, true, &[1; 514], false),
@@ -797,8 +926,8 @@ async fn each_limit_closes_before_buffering_and_is_counted() {
         request,
     )
     .await;
-    assert_eq!(closed, None);
-    assert!(entered > request, "the payload entered: {entered} B");
+    assert_eq!(l.closed, None);
+    assert!(l.entered > request, "the payload entered: {} B", l.entered);
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -879,6 +1008,122 @@ fn the_model_adds_bursts_after_its_start_only() {
     assert_eq!(m.bursts().len(), 64);
 }
 
+/// The model's bursts and DelayStream's burst ends (model axis).
+fn burst_state<S>(ds: &DelayStream<S>) -> (Vec<(u64, u64)>, Vec<u64>) {
+    let c = ds.sh.lock();
+    (c.model.bursts().to_vec(), c.burst_ends.clone())
+}
+
+/// F1 + S7: a burst whose end is past DelayStream's clock's range (start + length above u64::MAX; a "forever" length
+/// of u64::MAX is one) is refused, leaving the model's bursts and the burst ends as they were; the longest burst from a
+/// start (u64::MAX − start) is accepted, and the pump's next due time is then its end, never a time wrapped into the
+/// past (the old code panicked here in a debug build and spun in a release one); the idle pump does not run. Also
+/// NC-U3c-8: a start at the model's now is refused, the next nanosecond accepted.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
+    let (_client, server) = tokio::io::duplex(1 << 12);
+    let ds = DelayStream::wrap(server, &cfg(quiet(Profile::p2()), 15), 0, now()).expect("wrapped");
+    let before = burst_state(&ds);
+    let start = now() + SEC;
+    for len in [u64::MAX, u64::MAX - start + 1] {
+        let e = ds.add_burst(start, len).expect_err("refused");
+        assert_eq!(e.kind(), io::ErrorKind::InvalidInput, "len {len}");
+        assert_eq!(burst_state(&ds), before, "nothing added for len {len}");
+    }
+    ds.add_burst(start, u64::MAX - start)
+        .expect("the longest burst from its start");
+    let origin = ds.snapshot().origin;
+    let (bursts, ends) = burst_state(&ds);
+    assert_eq!(bursts, vec![(start - origin, u64::MAX - start)]);
+    assert_eq!(ends, vec![u64::MAX - origin]);
+    let polls = ds.life().polls;
+    {
+        let c = ds.sh.lock();
+        assert_eq!(c.model.next_event(), None, "an idle connection");
+        assert_eq!(
+            c.due(),
+            Some(u64::MAX),
+            "due at the burst's end, on the clock"
+        );
+    }
+    tokio::time::sleep(Duration::from_millis(50)).await;
+    let runs = ds.life().polls - polls;
+    assert!(runs <= 1, "the pump ran {runs} times on an idle connection");
+    // NC-U3c-8 on the model's own now.
+    let (_c2, s2) = tokio::io::duplex(1 << 12);
+    let d2 = DelayStream::wrap(s2, &cfg(fixed(2_000), 16), 0, now()).expect("wrapped");
+    let at_now = {
+        let mut c = d2.sh.lock();
+        let t = c.model_t(delay_clock::clock().now_ns() + 10 * MS);
+        c.step_to(t);
+        c.origin + c.model.now_ns()
+    };
+    assert!(d2.add_burst(at_now, SEC).is_err(), "at the model's now");
+    assert!(d2.add_burst(at_now + 1, SEC).is_ok(), "just after it");
+}
+
+/// F-A: wrap moves the profile's bursts from DelayStream's clock to the model's axis (less the origin), drops those
+/// already ended, clips one already running at the origin (it starts at the model's 0 and keeps its end), records each
+/// end for the per-return records, and refuses more than 64 still to come. A write at once falls in the clipped burst
+/// and is lost; nothing outside the bursts is (quiet profile).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn wrap_moves_the_profiles_bursts_to_the_models_axis() {
+    while now() < 20 * MS {
+        tokio::time::sleep(Duration::from_millis(5)).await;
+    }
+    let o = now();
+    let mut c = cfg(quiet(Profile::p2()), 17);
+    c.profile.bursts_ns = vec![
+        (o - 10 * MS, 5 * MS),
+        (o - 2 * MS, SEC),
+        (o + 20 * SEC, 500 * MS),
+    ];
+    let (client, server) = tokio::io::duplex(1 << 16);
+    let mut ds = DelayStream::wrap(server, &c, 0, now()).expect("wrapped");
+    let origin = ds.snapshot().origin;
+    let running_end = (o - 2 * MS + SEC)
+        .checked_sub(origin)
+        .expect("the wrap ran within the running burst (no 1 s stall)");
+    let (bursts, ends) = burst_state(&ds);
+    assert_eq!(
+        bursts,
+        vec![(0, running_end), (o + 20 * SEC - origin, 500 * MS)],
+        "ended: dropped; running: clipped at the origin; future: shifted"
+    );
+    assert_eq!(ends, vec![running_end, o + 20 * SEC + 500 * MS - origin]);
+    // A write now is sent inside the clipped burst: lost; the rest of the traffic outside it gets through.
+    ds.write_all(&[0x82; 100]).await.expect("written");
+    let (mut cr, _cw) = tokio::io::split(client);
+    let mut buf = [0u8; 100];
+    tokio::time::timeout(HANG, cr.read_exact(&mut buf))
+        .await
+        .expect("hang guard: delivered after the burst")
+        .expect("read");
+    let s = ds.snapshot();
+    let first = s.sent_log.first().copied().expect("a transmission");
+    assert!(
+        first.3 < running_end && first.4,
+        "the first, inside the burst, was lost"
+    );
+    for &(_, _, _, t, lost) in &s.sent_log {
+        assert_eq!(
+            lost,
+            t < running_end,
+            "a transmission at {t}: lost only inside the burst"
+        );
+    }
+    // More than 64 still to come: refused; ended ones do not count.
+    let mut many = cfg(quiet(Profile::p2()), 18);
+    many.profile.bursts_ns = (0..65).map(|i| (o + 30 * SEC + i * SEC, MS)).collect();
+    let (_c, s2) = tokio::io::duplex(64);
+    let e = DelayStream::wrap(s2, &many, 0, now()).expect_err("65 to come");
+    assert_eq!(e.kind(), io::ErrorKind::InvalidInput);
+    many.profile.bursts_ns[0] = (1, 1);
+    let (_c, s3) = tokio::io::duplex(64);
+    let d = DelayStream::wrap(s3, &many, 0, now()).expect("64 to come and one ended");
+    assert_eq!(burst_state(&d).0.len(), 64);
+}
+
 /// The burst and replay tests' traffic, run until `each` says stop (`max_ticks` is a hang guard): the client writes
 /// the request and then a 60 B frame every tick and reads S throughout; the test writes 1,000 B down every tick and
 /// reads what DelayStream releases up, then calls `each(k, ds)`. Returns the ticks run.
@@ -952,6 +1197,7 @@ async fn an_added_burst_loses_every_transmission_inside_it_both_ways() {
         io::ErrorKind::InvalidInput
     );
     let mut added = 0u32;
+    let mut asked = Vec::new();
     let mut after: Option<u64> = None;
     let ticks = drive(&mut ds, client, 3_000, |k, ds| {
         if let Some(a) = after {
@@ -969,7 +1215,7 @@ async fn an_added_burst_loses_every_transmission_inside_it_both_ways() {
             }
             _ => {
                 assert!(added < 10, "10 bursts and no direction covered");
-                add_burst_soon(ds, 600 * MS);
+                asked.push(add_burst_soon(ds, 600 * MS));
                 added += 1;
             }
         }
@@ -979,6 +1225,14 @@ async fn an_added_burst_loses_every_transmission_inside_it_both_ways() {
     let s = ds.snapshot();
     let bursts = bursts_of(&s.logs);
     assert_eq!(bursts.len() as u32, added);
+    // F-B (C5): each burst asked for on DelayStream's clock sits on the model's axis at the start less the origin.
+    assert!(s.origin > 0);
+    assert_eq!(
+        bursts.iter().map(|b| b.0).collect::<Vec<_>>(),
+        asked.iter().map(|a| a - s.origin).collect::<Vec<_>>(),
+        "logged start = asked start - origin {}",
+        s.origin
+    );
     let in_any = |t: u64| bursts.iter().any(|&(b, l)| t >= b && t - b < l);
     let mut lost_inside = [0u64; 2];
     for &(end, _, _, t, lost) in &s.sent_log {
@@ -1130,6 +1384,338 @@ async fn dropping_it_ends_the_pump_and_drops_s() {
     println!("S took {taken} B before the drop; the client read {got} B, then EOF");
     assert_eq!(got, taken, "the client read what S took, then EOF");
     assert!(!delay_clock::clock().census(key).3);
+}
+
+/// What a probe S saw.
+#[derive(Debug, Default)]
+struct ProbeSeen {
+    /// S's calls that found the connection's lock held: the pump called S under it (F3).
+    held: AtomicU64,
+    /// poll_read calls, and those made while the up room was below the read floor (C2's floor; F-R2).
+    reads: AtomicU64,
+    under_floor: AtomicU64,
+    writes: AtomicU64,
+}
+
+/// An S for a pump polled by hand: at each of its calls it tries the connection's lock and counts it held (F3), and at
+/// each read it checks the up room against the read floor (F-R2). Its writes answer Pending `pending` times, then take
+/// at most `chunk` bytes per call into `out`; its reads come from the duplex.
+struct ProbeS {
+    io: DuplexStream,
+    sh: Arc<std::sync::OnceLock<Arc<Shared>>>,
+    seen: Arc<ProbeSeen>,
+    pending: u32,
+    chunk: usize,
+    out: Arc<Mutex<Vec<u8>>>,
+}
+
+impl ProbeS {
+    fn check(&self, f: impl FnOnce(&Conn)) {
+        if let Some(sh) = self.sh.get() {
+            match sh.conn.try_lock() {
+                Ok(c) => f(&c),
+                Err(_) => {
+                    self.seen.held.fetch_add(1, Ordering::Relaxed);
+                }
+            }
+        }
+    }
+}
+
+impl AsyncRead for ProbeS {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
+        self.seen.reads.fetch_add(1, Ordering::Relaxed);
+        let seen = Arc::clone(&self.seen);
+        self.check(|c| {
+            if c.up_room() < c.read_floor {
+                seen.under_floor.fetch_add(1, Ordering::Relaxed);
+            }
+        });
+        Pin::new(&mut self.io).poll_read(cx, buf)
+    }
+}
+
+impl AsyncWrite for ProbeS {
+    fn poll_write(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<io::Result<usize>> {
+        self.seen.writes.fetch_add(1, Ordering::Relaxed);
+        self.check(|_| {});
+        if self.pending > 0 {
+            self.pending -= 1;
+            cx.waker().wake_by_ref();
+            return Poll::Pending;
+        }
+        let n = buf.len().min(self.chunk);
+        self.out.lock().expect("out").extend_from_slice(&buf[..n]);
+        Poll::Ready(Ok(n))
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        self.check(|_| {});
+        Poll::Ready(Ok(()))
+    }
+
+    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        self.check(|_| {});
+        Poll::Ready(Ok(()))
+    }
+}
+
+/// A waker that counts its wakes from the test's own thread (the release clock's thread wakes it too, unjudged) and
+/// those that found the connection's lock still held by the waker (F2).
+struct ProbeWake {
+    sh: Arc<Shared>,
+    thread: std::thread::ThreadId,
+    wakes: AtomicU64,
+    held: AtomicU64,
+}
+
+impl ProbeWake {
+    fn new(sh: &Arc<Shared>) -> Arc<ProbeWake> {
+        Arc::new(ProbeWake {
+            sh: Arc::clone(sh),
+            thread: std::thread::current().id(),
+            wakes: AtomicU64::new(0),
+            held: AtomicU64::new(0),
+        })
+    }
+
+    fn seen(&self) -> (u64, u64) {
+        (
+            self.wakes.load(Ordering::Relaxed),
+            self.held.load(Ordering::Relaxed),
+        )
+    }
+}
+
+impl std::task::Wake for ProbeWake {
+    fn wake(self: Arc<Self>) {
+        self.wake_by_ref();
+    }
+
+    fn wake_by_ref(self: &Arc<Self>) {
+        if std::thread::current().id() == self.thread {
+            self.wakes.fetch_add(1, Ordering::Relaxed);
+            if self.sh.conn.try_lock().is_err() {
+                self.held.fetch_add(1, Ordering::Relaxed);
+            }
+        }
+    }
+}
+
+/// F3, F4, F2 and F-R2 on a pump polled by hand (nothing else runs: one thread, no spawned pump, so every reading is
+/// exact):
+/// - F3: none of S's calls (write, flush, read, shutdown) finds the connection's lock held by the pump;
+/// - F4: a record S answered Pending is offered again from its staged bytes, not copied again (a byte changed in the
+///   connection's buffer after the staging never reaches S), and S taking it 500 B at a time takes it whole (one split
+///   record counted);
+/// - F2: the wakes owed by `current` (the pump's for a released down record, the reader's for a released up one) and
+///   by `poll_shutdown` (the pump's) fire after the lock is released;
+/// - F-R2: S is never read while the up room is below the 549 B read floor, and once the room is below it the pump
+///   stops reading although the client has more to send.
+#[tokio::test(flavor = "current_thread")]
+async fn the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it() {
+    let (mut client, server) = tokio::io::duplex(1 << 20);
+    let cell = Arc::new(std::sync::OnceLock::new());
+    let seen = Arc::new(ProbeSeen::default());
+    let out = Arc::new(Mutex::new(Vec::new()));
+    let probe = ProbeS {
+        io: server,
+        sh: Arc::clone(&cell),
+        seen: Arc::clone(&seen),
+        pending: 1,
+        chunk: 500,
+        out: Arc::clone(&out),
+    };
+    let (mut ds, mut pump) =
+        DelayStream::build(probe, &cfg(fixed(200), 20), 0, now()).expect("built");
+    assert!(cell.set(Arc::clone(&ds.sh)).is_ok(), "set once");
+    let pw = ProbeWake::new(&ds.sh);
+    let pump_waker = Waker::from(Arc::clone(&pw));
+    let run = |p: &mut Pump<ProbeS>| {
+        assert!(
+            Pin::new(p)
+                .poll(&mut Context::from_waker(&pump_waker))
+                .is_pending()
+        );
+    };
+    run(&mut pump);
+    // A 2,000 B record down, released after 100 ms by a `current` step: the pump's wake comes after the lock (the
+    // 100 ms one-way delay keeps each release after the steps that must come before it).
+    let record: Vec<u8> = (0..2_000u32).map(|i| (i % 251) as u8).collect();
+    assert!(matches!(
+        Pin::new(&mut ds).poll_write(&mut noop(), &record),
+        Poll::Ready(Ok(2_000))
+    ));
+    let end = Instant::now() + HANG;
+    while ds.sh.lock().released[DOWN] == 0 {
+        assert!(
+            Instant::now() < end,
+            "hang guard: the down record's release"
+        );
+        tokio::time::sleep(Duration::from_millis(2)).await;
+        let _ = ds.outstanding_bytes();
+    }
+    assert_eq!(
+        pw.seen(),
+        (1, 0),
+        "current woke the pump once, after the lock"
+    );
+    // S answers Pending: the record stays staged. A byte changed in the connection's buffer now must not reach S.
+    run(&mut pump);
+    assert_eq!(seen.writes.load(Ordering::Relaxed), 1);
+    ds.sh.lock().bytes[DOWN][0] ^= 0xff;
+    run(&mut pump);
+    assert_eq!(*out.lock().expect("out"), record, "the staged bytes, whole");
+    assert_eq!(
+        seen.writes.load(Ordering::Relaxed),
+        1 + 4,
+        "Pending, then 4 calls of 500 B"
+    );
+    assert_eq!(
+        seen.held.load(Ordering::Relaxed),
+        0,
+        "S's writes never ran under the lock"
+    );
+    {
+        let c = ds.sh.lock();
+        assert!(c.recs[DOWN].is_empty() && c.bytes[DOWN].is_empty());
+        assert_eq!(
+            c.own.split_writes, 1,
+            "one record S took in more than one call"
+        );
+    }
+    // The request up, then the reader's wake from a `current` step.
+    client.write_all(REQUEST).await.expect("the request");
+    run(&mut pump);
+    assert_eq!(
+        writes(&ds.logs(), UP),
+        vec![REQUEST.len() as u64 + OVERHEAD]
+    );
+    let rw = ProbeWake::new(&ds.sh);
+    let reader = Waker::from(Arc::clone(&rw));
+    let mut buf = vec![0u8; 4_096];
+    let mut rb = ReadBuf::new(&mut buf);
+    assert!(
+        Pin::new(&mut ds)
+            .poll_read(&mut Context::from_waker(&reader), &mut rb)
+            .is_pending()
+    );
+    let end = Instant::now() + HANG;
+    while rw.seen().0 == 0 {
+        assert!(Instant::now() < end, "hang guard: the request's release");
+        tokio::time::sleep(Duration::from_millis(2)).await;
+        let _ = ds.srtt_ns();
+    }
+    assert_eq!(
+        rw.seen(),
+        (1, 0),
+        "current woke the reader once, after the lock"
+    );
+    // F-R2: 150 KB of frames at once; nobody reads tungstenite's side, so the up room fills.
+    let mut flood = Vec::new();
+    for _ in 0..300 {
+        flood.extend(frame(true, 2, true, &[7; 500], false));
+    }
+    client.write_all(&flood).await.expect("the flood");
+    run(&mut pump);
+    let reads = seen.reads.load(Ordering::Relaxed);
+    let (room, floor, held_up) = {
+        let c = ds.sh.lock();
+        (c.up_room(), c.read_floor, c.bytes[UP].len() + c.parse_len)
+    };
+    assert!(room < floor, "the room fell below the floor: {room} B");
+    for _ in 0..3 {
+        tokio::time::sleep(Duration::from_millis(15)).await;
+        run(&mut pump);
+    }
+    assert_eq!(
+        seen.reads.load(Ordering::Relaxed),
+        reads,
+        "no read below the floor, with {} B still unread",
+        flood.len() + REQUEST.len() - held_up
+    );
+    assert_eq!(
+        seen.under_floor.load(Ordering::Relaxed),
+        0,
+        "never read below the floor"
+    );
+    // poll_shutdown's wake of the pump, after the lock; then S's own shutdown, outside it.
+    let before = pw.seen().0;
+    assert!(Pin::new(&mut ds).poll_shutdown(&mut noop()).is_pending());
+    assert_eq!(
+        pw.seen(),
+        (before + 1, 0),
+        "poll_shutdown woke the pump after the lock"
+    );
+    run(&mut pump);
+    assert!(ds.sh.lock().down_done, "S shut down");
+    assert_eq!(
+        seen.held.load(Ordering::Relaxed),
+        0,
+        "S never ran under the lock"
+    );
+    println!(
+        "pump by hand: {} S writes, {} S reads, room {room} B < floor {floor} B with {held_up} B held up",
+        seen.writes.load(Ordering::Relaxed),
+        seen.reads.load(Ordering::Relaxed)
+    );
+}
+
+/// F-G (C3): an EOF from S ends the up direction after its last delivered byte. The client writes the request and 40
+/// frames at once, then shuts its write half; tungstenite's side reads every byte the client wrote, in order, and only
+/// then Ok(0), with nothing left in the model or the scanner then. P2 with its loss, so repairs stand between the EOF
+/// read from S and the last byte's delivery.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn an_eof_from_s_ends_the_up_direction_after_its_last_byte() {
+    let (client, server) = tokio::io::duplex(1 << 20);
+    let mut ds = DelayStream::wrap(server, &cfg(Profile::p2(), 19), 0, now()).expect("wrapped");
+    let (_cr, mut cw) = tokio::io::split(client);
+    let mut sent = REQUEST.to_vec();
+    for i in 0..40u8 {
+        sent.extend(frame(true, 2, true, &[i; 300], false));
+    }
+    cw.write_all(&sent).await.expect("written");
+    cw.shutdown().await.expect("the client's write half shut");
+    let mut got = Vec::new();
+    let mut buf = vec![0u8; 4_096];
+    loop {
+        let n = tokio::time::timeout(HANG, ds.read(&mut buf))
+            .await
+            .expect("hang guard")
+            .expect("read");
+        if n == 0 {
+            break;
+        }
+        got.extend_from_slice(&buf[..n]);
+    }
+    assert!(
+        got == sent,
+        "every byte, in order, before the EOF ({} of {} B)",
+        got.len(),
+        sent.len()
+    );
+    let c = ds.sh.lock();
+    assert!(c.up_eof, "the EOF came from S");
+    assert!(c.recs[UP].is_empty() && c.bounds.is_empty() && c.parse_len == 0);
+    assert_eq!(
+        c.written[UP],
+        sent.len() as u64,
+        "every record entered the model"
+    );
+    println!(
+        "EOF after {} B in {} records; up stalls {}",
+        got.len(),
+        41,
+        c.model.counters(UP).stalls
+    );
 }
 
 /// C3: shutdown with every byte delivered and taken shuts S down at once (no timeout counted); with a client that
@@ -1329,12 +1915,50 @@ async fn its_rows_use_the_named_series() {
     assert_eq!(&names_of(&summary)[..want.len()], &names_of(&want)[..]);
     assert_eq!(value(&summary, names::CONNS_BEFORE), 7);
     assert_eq!(value(&summary, names::ACCEPTED), 42);
-    let h = ds.header_numbers();
+    // header_numbers blocks on the clock thread's answer (F6): off the runtime's workers, as U6's writer will call it.
+    let ds = Arc::new(ds);
+    let d = Arc::clone(&ds);
+    let h = tokio::task::spawn_blocking(move || d.header_numbers())
+        .await
+        .expect("the header");
     assert_eq!(names_of(&h), names::HEADER_NUMBERS.to_vec());
     assert_eq!(value(&h, "ws_wrapper"), 1);
     assert_eq!(value(&h, "ws_one_way_ns"), 50 * MS);
     assert_eq!(value(&h, "ws_max_message_bytes"), 513);
     assert_eq!(value(&h, "ws_up_read_floor_bytes"), 549);
+    assert_eq!(
+        value(&h, "ws_shutdown_wait_ns"),
+        10 * SEC,
+        "SHUTDOWN_WAIT_NS"
+    );
+    // F7: the heap a connection allocates at wrap at the defaults, as SERIES.md states it: two lateness histograms
+    // with their sparse marks (2 x (135,040 + 1,056 + 256 x 24) B), the scanner's buffer (8,192 B), the down staging
+    // buffer (16,384 B) and the read buffer (527 B).
+    assert_eq!(
+        value(&h, "ws_conn_fixed_bytes"),
+        2 * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
+    );
+    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 309_583);
+    // F-M: the release clock's 1 ns slack, written by the thread and read back, at its start and now (a real-time
+    // policy reads 0, as ImpairSocket's test allows; socket_tests.rs).
+    let texts = ds.header_texts();
+    let sched = &texts
+        .iter()
+        .find(|t| t.0 == "ws_clock_sched_policy")
+        .expect("the clock's policy")
+        .1;
+    let slack = if sched.starts_with("SCHED_FIFO") || sched.starts_with("SCHED_RR") {
+        0
+    } else {
+        1
+    };
+    assert_eq!(
+        value(&h, "ws_clock_timer_slack_ns"),
+        slack,
+        "the clock thread's own slack, read back now ({sched})"
+    );
+    assert_eq!(value(&h, "ws_clock_timer_slack_start_ns"), slack);
+    assert_eq!(value(&h, "ws_clock_timer_slack_set"), 1);
     let t = ds.header_texts();
     assert_eq!(t[0], ("ws_tcp_model", "linux-6.8-tcp v3".to_owned()));
     for (n, _) in &t {
@@ -1345,6 +1969,7 @@ async fn its_rows_use_the_named_series() {
         outstanding: 2,
         srtt_ns: None,
         untaken: 3,
+        owed: 6,
         delivered: [0; 2],
         first_byte_ns: [Some(4), None],
         first_message_ns: [None, Some(5)],
@@ -1371,7 +1996,8 @@ async fn the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default()
             .map(|s| s.suite())
             .collect::<Vec<_>>()
     };
-    let ring = ws_config::provider();
+    // ring named directly, not through ws_config::provider() (F-C): a provider() moved to another crate fails here.
+    let ring = tokio_rustls::rustls::crypto::ring::default_provider();
     assert_eq!(groups(tls.crypto_provider()), groups(&ring));
     assert_eq!(suites(tls.crypto_provider()), suites(&ring));
     // A client offering only h3 is refused.
@@ -1413,9 +2039,13 @@ async fn the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default()
 /// - up, the receipt identity: each message's receipt equals its model delivery stamp plus the release lateness
 ///   DelayStream measured for it, within the measurement's own resolution. DelayStream hands one record per read, so
 ///   the poll that yields a message is the one that took its last byte: the hand-over stamp (delivery + lateness) lies
-///   inside that poll's own [start, end] stamps, and the receipt is the poll's end;
+///   inside that poll's own [start, end] stamps, and the receipt is the poll's end. This is the release half of 1.5's
+///   identity (delay = model delivery − write stamp + lateness) only (NC-U3c-3): the intake, from the client's send
+///   to the record's model write stamp (the client's kernel TCP and TLS, the pump's wake and its read of S), is not
+///   in it; it is printed, never judged;
 /// - down, the bytes leave DelayStream into the kernel's real TCP and the client's TLS, which no in-process stamp
-///   sees, so the receipt is a bound (never before the release) and the rest of the path is printed;
+///   sees, so the receipt is a bound (never before the release), not the identity, and the rest of the path is
+///   printed;
 /// - every stall is a first-transmission loss and their count sits in its 99.9 % two-sided binomial band at 2 %.
 ///
 /// Lateness is printed with condition 10's trigger. Returns the number of lateness samples per direction.
@@ -1507,10 +2137,25 @@ async fn loopback(ticks: u64) -> [u64; 2] {
             }
         }
         if dir == UP {
+            // The intake (NC-U3c-3): each up message's model write stamp less its send stamp. The up records after the
+            // request are the client's frames in order, one per message.
+            let up_writes: Vec<u64> = logs
+                .steps
+                .iter()
+                .filter_map(|&(t, st)| matches!(st, Step::Write { end: UP, .. }).then_some(t))
+                .skip(1)
+                .collect();
+            let mut intake: Vec<u64> = recv
+                .iter()
+                .zip(&up_writes)
+                .map(|(&((_, wrote), _), &t)| (s.origin + t).saturating_sub(wrote))
+                .collect();
             println!(
-                "dir {dir}: receipt − (delivery + lateness): {}; the poll's own window: {}",
+                "dir {dir}: receipt − (delivery + lateness): {}; the poll's own window: {}; intake (model write − \
+                 send): {}",
                 quantiles(&mut rest),
-                quantiles(&mut window)
+                quantiles(&mut window),
+                quantiles(&mut intake)
             );
         } else {
             println!(
@@ -1674,20 +2319,39 @@ async fn split_halves_in_separate_tasks_both_ways() {
     );
 }
 
+/// One run of mechanism test (c)'s connection.
+#[derive(Debug)]
+struct WriterRun {
+    /// Each per-return record with N at the writer's last write before it (the formula's, from the srtt the gate read
+    /// then) and N at the return's own srtt.
+    judged: Vec<(Return, u64, u64)>,
+    /// The bursts' starts asked for (DelayStream's clock).
+    starts: [u64; 2],
+    written: u64,
+    skipped: u64,
+    /// Writes after which tungstenite still owed bytes.
+    owed_after: u64,
+    ticks: u64,
+}
+
 /// Mechanism test (c)'s connection: the server's shipped per-tick writer (with `bite`, or reading unsent bytes only)
 /// writes one 1,024 B snapshot (1,050 B in the model) per tick over TLS and tokio-tungstenite at P2, through two 1 s
 /// bursts added after the wrap at `bursts` from the start. Each write goes through the Sink without waiting (fed, then
 /// one flush attempt), as a WsServer's tick must never park: what tungstenite cannot pass on stays in its buffer, and
-/// DelayStream counts it as owed. Returns the per-return records with N at each return's srtt, the writes, the skips,
-/// and the writes after which bytes were left owed.
+/// DelayStream counts it as owed. The gate reads its inputs in one reading (`gate_inputs`: one lock, one step; F11).
+///
+/// It runs until the model has recorded both returns and, after each, its first in-order byte and first whole message
+/// down (S12; model state, F-K), with a hang guard of `hang_ticks`. N at each write is recorded (the formula's, from the
+/// srtt the gate read), and each write is matched to its record in the log (one record of SNAP model bytes per gated
+/// write, asserted), so each return is judged against N at the last write whose model stamp is before it (NC-U3c-1).
 async fn writer_run(
     seed: u64,
     conn: u32,
     bite: Option<Bite>,
     unsent_only: bool,
     bursts: [u64; 2],
-    ticks: u64,
-) -> (Vec<(Return, u64)>, u64, u64, u64) {
+    hang_ticks: u64,
+) -> WriterRun {
     let c = cfg(Profile::p2(), seed);
     let (mut server, mut client, _, _) = pair(&c, conn).await;
     let reader = tokio::spawn(async move { while let Some(Ok(_)) = client.next().await {} });
@@ -1700,51 +2364,108 @@ async fn writer_run(
         w = w.with_bite(b);
     }
     let mut owed_after = 0;
+    let mut n_at_write = Vec::new();
     let t0 = tokio::time::Instant::now();
-    for k in 0..ticks {
+    let done = |rets: &[Return]| {
+        rets.len() == 2
+            && rets
+                .iter()
+                .all(|r| r.first_byte_ns[DOWN].is_some() && r.first_message_ns[DOWN].is_some())
+    };
+    let mut ticks = 0;
+    while !done(&server.get_ref().returns()) {
+        assert!(
+            ticks < hang_ticks,
+            "hang guard: {hang_ticks} ticks without both returns' first byte and message"
+        );
         read_until(
             &mut server,
-            t0 + Duration::from_nanos(k * TICK),
+            t0 + Duration::from_nanos(ticks * TICK),
             &mut |_, _| {},
         )
         .await;
         // Whatever tungstenite still holds gets one more chance to go (none is expected: the gate needs owed 0).
         let _ = server.flush().now_or_never();
         let ds = server.get_ref();
-        let inp = Inputs {
-            srtt_ns: ds.srtt_ns(),
-            outstanding: if unsent_only {
-                ds.unsent_bytes()
-            } else {
-                ds.outstanding_bytes()
+        let mut inp = ds.gate_inputs();
+        if unsent_only {
+            inp.outstanding = ds.unsent_bytes();
+        }
+        if w.on_tick(
+            Snap {
+                id: ticks,
+                size: SNAP,
             },
-            owed: ds.owed_bytes(),
-            free: ds.free_bytes(),
-        };
-        if w.on_tick(Snap { id: k, size: SNAP }, inp).is_some() {
+            inp,
+        )
+        .is_some()
+        {
+            n_at_write.push(snapshot_budget(inp.srtt_ns, TICK));
             let _ = server
                 .feed(Message::Binary(vec![0x5a; 1_024].into()))
                 .now_or_never();
             let _ = server.flush().now_or_never();
             owed_after += u64::from(server.get_ref().owed_bytes() != 0);
         }
+        ticks += 1;
     }
-    let rets = server
-        .get_ref()
-        .returns()
+    let ds = server.get_ref();
+    let rets = ds.returns();
+    let s = ds.snapshot();
+    let wrote: Vec<u64> = s
+        .logs
+        .steps
+        .iter()
+        .filter_map(|&(t, st)| {
+            (st == Step::Write {
+                end: DOWN,
+                bytes: SNAP,
+            })
+            .then_some(t)
+        })
+        .collect();
+    assert_eq!(
+        wrote.len(),
+        n_at_write.len(),
+        "each gated write is one record of {SNAP} model bytes"
+    );
+    let judged = rets
         .into_iter()
-        .map(|r| (r, snapshot_budget(r.srtt_ns, TICK)))
+        .map(|r| {
+            let at = r.at_ns - s.origin;
+            let last = wrote.iter().filter(|&&t| t < at).count();
+            assert!(last > 0, "a write before the return at {}", r.at_ns);
+            (r, n_at_write[last - 1], snapshot_budget(r.srtt_ns, TICK))
+        })
         .collect();
     drop(server);
     reader.abort();
-    (rets, w.written(), w.skipped(), owed_after)
+    WriterRun {
+        judged,
+        starts: bursts.map(|b| start + b),
+        written: w.written(),
+        skipped: w.skipped(),
+        owed_after,
+        ticks,
+    }
 }
 
 /// Mechanism test (c) (u3c-plan.md 1.4, C9): on DelayStream at P2 under B1, through TLS 1.3 and tokio-tungstenite on
-/// loopback, the shipped writer keeps outstanding <= N(srtt then) x size at every return (from the per-return record)
-/// and leaves nothing owed after any write. Counts: 2 faithful connections and one per bite, run together; 2 bursts
-/// each (1 s, at 1.5 s and 4.5 s plus a phase of 0, 11, 17 or 29 ms); 230 ticks (7.7 s). Identities, so no band. Bites
-/// (d): budget_scale 2 and "outstanding = unsent only" (SIOCOUTQNSD) each break it at a return.
+/// loopback, the shipped writer keeps outstanding <= N x size at every return, N being the one in force at the
+/// writer's last write before the return (NC-U3c-1: the gate guarantees outstanding <= N(srtt at a write) x size after
+/// each write, and outstanding never grows between writes; srtt, and so N, can fall after the budget filled, so N at
+/// the return's own srtt is not the bound), and leaves nothing owed after any write. Identities on model state:
+/// - each return lands at its burst's end on DelayStream's clock (start + burst offset + 1 s: F-B, C5);
+/// - not vacuous (NC-U3c-10): at each faithful return the gate would refuse on outstanding, outstanding > (N(srtt at
+///   the return) − 1) x size: the budget was reached (no acknowledgement arrives late in a 1 s burst, so outstanding
+///   and srtt stand as at the last refusal);
+/// - S12's per-burst times (C8): the first in-order byte down at least one least delay after the return, the first
+///   whole message no earlier.
+///
+/// Counts: 2 faithful connections and one per bite, run together; 2 bursts each (1 s, at 1.5 s and 4.5 s plus a phase
+/// of 0, 11, 17 or 29 ms); each runs until both returns have their first byte and message down (model state, F-K;
+/// typically about 230 ticks, 7.7 s; hang guard 900 ticks, 30 s). Identities, so no band. Bites (d): budget_scale 2
+/// and "outstanding = unsent only" (SIOCOUTQNSD) each break the bound at a return.
 ///
 /// What can fail and what cannot (the critic's note): "owed = 0 before a write" is not asserted, since the gate
 /// (may_write) requires it and it could never fail here; what is asserted is that nothing is owed AFTER each write,
@@ -1752,42 +2473,64 @@ async fn writer_run(
 /// wrongly, or a record rule that takes less than the room allows).
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
-    const TICKS: u64 = 230;
+    const HANG_TICKS: u64 = 900;
     let at = |phase_ms: u64| [1_500 * MS + phase_ms * MS, 4_500 * MS + phase_ms * MS];
     let (a, b, x2, unsent) = tokio::join!(
-        writer_run(41, 0, None, false, at(0), TICKS),
-        writer_run(42, 1, None, false, at(11), TICKS),
-        writer_run(43, 2, Some(Bite::BudgetX2), false, at(17), TICKS),
-        writer_run(44, 3, None, true, at(29), TICKS),
+        writer_run(41, 0, None, false, at(0), HANG_TICKS),
+        writer_run(42, 1, None, false, at(11), HANG_TICKS),
+        writer_run(43, 2, Some(Bite::BudgetX2), false, at(17), HANG_TICKS),
+        writer_run(44, 3, None, true, at(29), HANG_TICKS),
     );
-    let over = |rets: &[(Return, u64)]| {
-        rets.iter()
-            .filter(|(r, n)| r.outstanding > n * SNAP)
+    let over = |run: &WriterRun| {
+        run.judged
+            .iter()
+            .filter(|(r, n, _)| r.outstanding > n * SNAP)
             .count()
     };
-    for (name, (rets, written, skipped, owed)) in [
+    for (name, run) in [
         ("faithful A", &a),
         ("faithful B", &b),
         ("budget x2", &x2),
         ("unsent only", &unsent),
     ] {
-        let shown: Vec<String> = rets
+        let shown: Vec<String> = run
+            .judged
             .iter()
-            .map(|(r, n)| format!("{} B vs {} B (N {n})", r.outstanding, n * SNAP))
+            .map(|(r, n, n_ret)| {
+                format!(
+                    "{} B vs {} B (N {n} at the last write, {n_ret} at the return)",
+                    r.outstanding,
+                    n * SNAP
+                )
+            })
             .collect();
         println!(
-            "(c) {name}: {written} written, {skipped} skipped, owed after a write {owed}; at each return: {}",
+            "(c) {name}: {} ticks, {} written, {} skipped, owed after a write {}; at each return: {}",
+            run.ticks,
+            run.written,
+            run.skipped,
+            run.owed_after,
             shown.join("; ")
         );
+        assert_eq!(run.judged.len(), 2, "{name}: both bursts returned");
+        for ((r, _, _), start) in run.judged.iter().zip(run.starts) {
+            assert_eq!(
+                r.at_ns,
+                start + SEC,
+                "{name}: the return on DelayStream's clock"
+            );
+        }
     }
     let least = Profile::p2().one_way_ns() - Profile::p2().half_jitter_ns();
-    for (rets, _, _, owed) in [&a, &b] {
-        assert_eq!(rets.len(), 2, "both bursts returned");
-        assert_eq!(over(rets), 0, "outstanding within N x size at every return");
-        assert_eq!(*owed, 0, "nothing owed after any write");
-        // S12's per-burst times (C8): the first in-order byte down comes at least one least delay after the return
-        // (anything sent in the burst was lost), and the first whole message no earlier than it.
-        for (r, _) in rets.iter() {
+    for run in [&a, &b] {
+        assert_eq!(over(run), 0, "outstanding within N x size at every return");
+        assert_eq!(run.owed_after, 0, "nothing owed after any write");
+        for (r, _, n_ret) in &run.judged {
+            assert!(
+                r.outstanding > (n_ret - 1) * SNAP,
+                "the budget was reached: {} B > ({n_ret} - 1) x {SNAP} B",
+                r.outstanding
+            );
             let byte = r.first_byte_ns[DOWN].expect("a byte after the return");
             let message = r.first_message_ns[DOWN].expect("a message after the return");
             println!(
@@ -1799,6 +2542,6 @@ async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
             assert!(byte >= least && message >= byte, "{byte} {message}");
         }
     }
-    assert!(over(&x2.0) > 0, "the budget x2 bite breaks (c)");
-    assert!(over(&unsent.0) > 0, "the unsent-only bite breaks (c)");
+    assert!(over(&x2) > 0, "the budget x2 bite breaks (c)");
+    assert!(over(&unsent) > 0, "the unsent-only bite breaks (c)");
 }

@@ -189,13 +189,17 @@ impl Clock {
         let mut st = self.lock();
         loop {
             if st.slack_ask != answered {
+                // The /proc read runs with the schedule's lock released (F6), so no pump's schedule() waits on it.
                 answered = st.slack_ask;
+                drop(st);
                 let read = tid.and_then(|t| thread::set_own_slack(t, 0).read_ns);
                 self.info
                     .lock()
                     .unwrap_or_else(PoisonError::into_inner)
                     .slack_now = (answered, read);
                 self.info_cv.notify_all();
+                st = self.lock();
+                continue;
             }
             let now = self.now_ns();
             while fired.len() < BATCH {

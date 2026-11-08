@@ -137,7 +137,7 @@ pub(crate) const ACCEPTED: &str = "ws_accepted_ns";
 pub(crate) const WRITTEN: [&str; 2] = ["ws_down_written_bytes", "ws_up_written_bytes"];
 
 /// The header's numbers.
-pub(crate) const HEADER_NUMBERS: [&str; 21] = [
+pub(crate) const HEADER_NUMBERS: [&str; 22] = [
     "ws_wrapper",
     "ws_one_way_ns",
     "ws_half_jitter_ns",
@@ -159,6 +159,7 @@ pub(crate) const HEADER_NUMBERS: [&str; 21] = [
     "ws_shutdown_wait_ns",
     "ws_bursts_max_count",
     "ws_returns_max_count",
+    "ws_conn_fixed_bytes",
 ];
 
 /// The header's strings (the slack error only when the write failed).
@@ -174,12 +175,13 @@ pub(crate) const HEADER_TEXTS: [&str; 7] = [
 
 /// The `burst_return` event's DelayStream fields (u3c-plan.md C8), in `Return::row`'s order.
 #[cfg_attr(not(test), allow(dead_code))]
-pub(crate) const RETURN: [&str; 9] = [
+pub(crate) const RETURN: [&str; 10] = [
     "ws_return_ns",
     "outstanding_bytes",
     "srtt_ns",
     "srtt_sampled",
     "ws_untaken_bytes",
+    "ws_owed_bytes",
     "ws_down_first_byte_ns",
     "ws_down_first_message_ns",
     "ws_up_first_byte_ns",

@@ -22,32 +22,63 @@ const RTT_END: usize = RTT_AT + size_of::<u32>();
 /// gate then takes its 100 ms default.
 ///
 /// The kernel writes into a zeroed buffer the size of `libc::tcp_info`; the field is read at its `offset_of!` from the
-/// bytes written, so no second unsafe operation is needed.
+/// bytes written, so no further unsafe operation is needed.
 ///
-/// Any descriptor is sound to pass: getsockopt answers ENOTSOCK on one that is not a socket, on any socket it writes at
-/// most the buffer's length, and a socket without a TCP level (UDP, Unix) answers with an error.
+/// Like [`unacked_and_unsent`], it answers for a TCP socket only: SO_DOMAIN AF_INET or AF_INET6, SO_TYPE SOCK_STREAM
+/// and SO_PROTOCOL IPPROTO_TCP are read first, each with a bounded getsockopt that fails with ENOTSOCK on anything but
+/// a socket. Not only for symmetry: an MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) answers SOL_TCP's TCP_INFO from
+/// its first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), not as the connection. Any descriptor is sound to pass.
 ///
 /// # Errors
-/// The getsockopt error (ENOTSOCK on a descriptor that is not a socket; ENOPROTOOPT or EOPNOTSUPP on a socket that is
-/// not TCP), or `ErrorKind::Unsupported` when the kernel's answer is too short to hold `tcpi_rtt`.
+/// ENOTSOCK on a descriptor that is not a socket; `ErrorKind::InvalidInput` on a socket that is not TCP (UDP, Unix,
+/// MPTCP); the getsockopt error; `ErrorKind::Unsupported` when the kernel's answer is too short to hold `tcpi_rtt`.
 #[allow(
     unsafe_code,
-    reason = "getsockopt(TCP_INFO) has no safe wrapper in std or in the pinned crates (socket2 0.6.5, rustix 1.1.6, \
-              nix 0.31.3): one foreign call writing into a buffer this function owns (ADR 0002:264-265; R20 (a))"
+    reason = "getsockopt(SOL_SOCKET) and getsockopt(TCP_INFO) have no safe wrapper in std or in the pinned crates \
+              (socket2 0.6.5, rustix 1.1.6, nix 0.31.3): foreign calls each writing into a buffer this function owns, \
+              TCP_INFO only on a TCP socket (ADR 0002:264-265; R20 (a))"
 )]
 pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<Option<u32>> {
+    let int_option = |name: libc::c_int| -> io::Result<libc::c_int> {
+        let mut value: libc::c_int = 0;
+        let Ok(mut len) = libc::socklen_t::try_from(INT_LEN) else {
+            return Err(io::Error::from(io::ErrorKind::Unsupported));
+        };
+        // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), of any kind: getsockopt
+        // fails with ENOTSOCK before touching anything on a descriptor that is not a socket (v6.8
+        // net/socket.c:2397-2399, sockfd_lookup_light :553-567). At level SOL_SOCKET every socket is answered by
+        // sk_getsockopt (:2364-2365), which writes `min(len, sizeof(int))` bytes (net/core/sock.c:1609, :1999-2001)
+        // and stores that count in `len`. `value` is a live, aligned, writable c_int owned by this closure and `len` a
+        // live socklen_t holding its size, 4, so the kernel writes at most those 4 bytes; any 4 bytes are a valid c_int.
+        let rc = unsafe {
+            libc::getsockopt(
+                fd.as_raw_fd(),
+                libc::SOL_SOCKET,
+                name,
+                (&raw mut value).cast(),
+                &raw mut len,
+            )
+        };
+        int_answer(name, rc, len, value)
+    };
+    require_tcp(
+        int_option(libc::SO_DOMAIN)?,
+        int_option(libc::SO_TYPE)?,
+        int_option(libc::SO_PROTOCOL)?,
+        "TCP_INFO",
+    )?;
     let mut info = [0u8; size_of::<libc::tcp_info>()];
     let Ok(mut len) = libc::socklen_t::try_from(info.len()) else {
         return Err(io::Error::from(io::ErrorKind::Unsupported));
     };
-    // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee). It need not be a TCP socket, or a
-    // socket at all: getsockopt is the socket layer's own call, which fails with ENOTSOCK before touching anything on a
-    // descriptor that is not a socket (v6.8 net/socket.c:2397-2399, sockfd_lookup_light :553-567), so no device driver
-    // ever sees it; on a socket, a level the family does not handle is an error. `info` is a live, writable buffer
-    // of exactly `len` bytes owned by this function, and `len` is a live socklen_t holding that size; getsockopt's
-    // contract is that the kernel writes at most `len` bytes there and stores how many it wrote in `len` (TCP's
-    // TCP_INFO: `len = min(len, sizeof(info))`, net/ipv4/tcp.c:4067). Any bytes are a valid `[u8]`, and u8 needs no
-    // alignment, so the buffer stays valid whatever the kernel writes.
+    // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), and the three readings above show
+    // it is a TCP socket. Soundness does not rest on that: getsockopt is the socket layer's own call, which fails with
+    // ENOTSOCK before touching anything on a descriptor that is not a socket (v6.8 net/socket.c:2397-2399,
+    // sockfd_lookup_light :553-567), so no device driver ever sees it, and on a socket a level the family does not
+    // handle is an error. `info` is a live, writable buffer of exactly `len` bytes owned by this function, and `len` is
+    // a live socklen_t holding that size; getsockopt's contract is that the kernel writes at most `len` bytes there and
+    // stores how many it wrote in `len` (TCP's TCP_INFO: `len = min(len, sizeof(info))`, net/ipv4/tcp.c:4067). Any
+    // bytes are a valid `[u8]`, and u8 needs no alignment, so the buffer stays valid whatever the kernel writes.
     let rc = unsafe {
         libc::getsockopt(
             fd.as_raw_fd(),
@@ -101,31 +132,14 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
                 &raw mut len,
             )
         };
-        if rc != 0 {
-            return Err(io::Error::last_os_error());
-        }
-        if usize::try_from(len).ok() != Some(INT_LEN) {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidData,
-                format!("getsockopt({name}) wrote {len} bytes, not {INT_LEN}"),
-            ));
-        }
-        Ok(value)
+        int_answer(name, rc, len, value)
     };
-    let domain = int_option(libc::SO_DOMAIN)?;
-    let kind = int_option(libc::SO_TYPE)?;
-    let protocol = int_option(libc::SO_PROTOCOL)?;
-    if !matches!(domain, libc::AF_INET | libc::AF_INET6)
-        || kind != libc::SOCK_STREAM
-        || protocol != libc::IPPROTO_TCP
-    {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidInput,
-            format!(
-                "not a TCP socket (domain {domain}, type {kind}, protocol {protocol}): SIOCOUTQ is not read"
-            ),
-        ));
-    }
+    require_tcp(
+        int_option(libc::SO_DOMAIN)?,
+        int_option(libc::SO_TYPE)?,
+        int_option(libc::SO_PROTOCOL)?,
+        "SIOCOUTQ",
+    )?;
     let mut answ: libc::c_int = 0;
     // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), and the three readings above
     // show it is an AF_INET or AF_INET6 socket of type SOCK_STREAM and protocol IPPROTO_TCP: a TCP socket (a socket's
@@ -141,6 +155,48 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
     }
     u32::try_from(answ)
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, format!("SIOCOUTQ gave {answ}")))
+}
+
+/// What a SOL_SOCKET getsockopt of one int answered, read right after the call: its error when `rc` is not 0, and
+/// `ErrorKind::InvalidData` unless it wrote exactly one int.
+fn int_answer(
+    name: libc::c_int,
+    rc: libc::c_int,
+    len: libc::socklen_t,
+    value: libc::c_int,
+) -> io::Result<libc::c_int> {
+    if rc != 0 {
+        return Err(io::Error::last_os_error());
+    }
+    if usize::try_from(len).ok() != Some(INT_LEN) {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("getsockopt({name}) wrote {len} bytes, not {INT_LEN}"),
+        ));
+    }
+    Ok(value)
+}
+
+/// `Ok` for a TCP socket only (SO_DOMAIN AF_INET or AF_INET6, SO_TYPE SOCK_STREAM, SO_PROTOCOL IPPROTO_TCP, so not
+/// MPTCP's 262); otherwise `ErrorKind::InvalidInput`, naming the `call` that is not made.
+fn require_tcp(
+    domain: libc::c_int,
+    kind: libc::c_int,
+    protocol: libc::c_int,
+    call: &str,
+) -> io::Result<()> {
+    if matches!(domain, libc::AF_INET | libc::AF_INET6)
+        && kind == libc::SOCK_STREAM
+        && protocol == libc::IPPROTO_TCP
+    {
+        return Ok(());
+    }
+    Err(io::Error::new(
+        io::ErrorKind::InvalidInput,
+        format!(
+            "not a TCP socket (domain {domain}, type {kind}, protocol {protocol}): {call} is not read"
+        ),
+    ))
 }
 
 /// `tcpi_rtt` from the bytes getsockopt wrote: `Unsupported` unless the `written` length covers the whole field

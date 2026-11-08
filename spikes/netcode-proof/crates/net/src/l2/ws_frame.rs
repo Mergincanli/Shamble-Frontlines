@@ -10,6 +10,14 @@
 //! - a 64-bit length with its most significant bit set (§5.2);
 //! - an upgrade request longer than its cap (`ws_max_request_bytes`, 8,192 B) without its blank line.
 //!
+//! The request ends exactly where tungstenite's parser ends it (S2), so the limits apply to the very bytes it then
+//! reads as frames: tungstenite 0.30 parses the request with httparse 1.10.1 (handshake/server.rs:133-140), which
+//! skips leading empty lines, ends every line at an LF (a CR is only allowed right before one; any other place errs)
+//! and ends the head at the first empty line, an LF or a CR LF, after a non-empty line (httparse lib.rs:558-581,
+//! :1105-1116, macros.rs:55-67). For every request httparse completes, the scanner's head ends at the same byte;
+//! where httparse errs, tungstenite refuses the handshake, whatever the scanner decided. The module tests check it
+//! against tungstenite's own `TryParse` on seeded inputs.
+//!
 //! Anything else (reserved bits or opcodes, a continuation with no message open, UTF-8) is left to tungstenite, which
 //! closes on it. The server's direction is scanned the same way for its message ends (the per-return record's "first
 //! whole message", S12), with no limit applied: tungstenite writes it. The scanner keeps a fixed state (at most a
@@ -56,10 +64,25 @@ pub(crate) enum Boundary {
     Frame { message_end: bool },
 }
 
+/// Where the HTTP head's scan stands, by httparse's line rules (S2).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Line {
+    /// Before any non-empty line (httparse skips these empty lines).
+    Leading,
+    /// A CR there.
+    LeadingCr,
+    /// Inside a non-empty line.
+    Content,
+    /// At the start of a line after a non-empty one: an empty line here ends the head.
+    Start,
+    /// A CR there: an LF next ends the head.
+    StartCr,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum State {
-    /// In the HTTP head: its length so far and its last four bytes (to find "\r\n\r\n").
-    Head { len: u64, tail: u32 },
+    /// In the HTTP head: its length so far and where its lines stand.
+    Head { len: u64, line: Line },
     /// In a frame header: the bytes so far.
     Header { buf: [u8; 14], have: usize },
     /// In a frame's payload: bytes left, and whether the frame ends a data message.
@@ -95,7 +118,10 @@ impl Scanner {
             client: true,
             max_payload,
             max_head,
-            state: State::Head { len: 0, tail: 0 },
+            state: State::Head {
+                len: 0,
+                line: Line::Leading,
+            },
             message: 0,
             #[cfg(test)]
             off: [false; REASONS],
@@ -108,7 +134,10 @@ impl Scanner {
             client: false,
             max_payload: u64::MAX,
             max_head: u64::MAX,
-            state: State::Head { len: 0, tail: 0 },
+            state: State::Head {
+                len: 0,
+                line: Line::Leading,
+            },
             message: 0,
             #[cfg(test)]
             off: [false; REASONS],
@@ -144,12 +173,21 @@ impl Scanner {
         while i < input.len() {
             match &mut self.state {
                 State::Closed => return (i, None),
-                State::Head { len, tail } => {
+                State::Head { len, line } => {
                     let b = input[i];
                     i += 1;
                     *len += 1;
-                    *tail = (*tail << 8) | u32::from(b);
-                    if *tail == 0x0d0a_0d0a {
+                    let (next, end) = match (*line, b) {
+                        (Line::Leading | Line::LeadingCr, b'\n') => (Line::Leading, false),
+                        (Line::Leading, b'\r') => (Line::LeadingCr, false),
+                        (Line::Start | Line::StartCr, b'\n') => (Line::Start, true),
+                        (Line::Start, b'\r') => (Line::StartCr, false),
+                        (_, b'\n') => (Line::Start, false),
+                        // A CR inside a line, or one not followed by an LF where httparse errs: content either way.
+                        _ => (Line::Content, false),
+                    };
+                    *line = next;
+                    if end {
                         self.state = State::Header {
                             buf: [0; MAX_HEADER],
                             have: 0,
@@ -417,6 +455,123 @@ mod tests {
             // Nothing more is scanned after a close.
             assert_eq!(s.scan(&[0x82, 0x80, 0, 0, 0, 0]), (0, None));
         }
+    }
+
+    /// tungstenite's own head length for `input` (its server handshake's parser, httparse underneath): Some(size)
+    /// when the head completes, None while incomplete, Err when refused.
+    fn tungstenite_head(input: &[u8]) -> Result<Option<usize>, ()> {
+        use tokio_tungstenite::tungstenite::handshake::machine::TryParse;
+        use tokio_tungstenite::tungstenite::handshake::server::Request;
+        match Request::try_parse(input) {
+            Ok(Some((size, _))) => Ok(Some(size)),
+            Ok(None) => Ok(None),
+            Err(_) => Err(()),
+        }
+    }
+
+    /// Where the client scanner ends the head in `input` (fed in `chunk`-byte pieces), if it does.
+    fn head_end(input: &[u8], chunk: usize) -> Option<usize> {
+        let mut s = Scanner::client(LIMIT, HEAD);
+        all(&mut s, input, chunk)
+            .first()
+            .and_then(|&(at, e)| (e == Ok(Boundary::Head)).then_some(at))
+    }
+
+    /// S2: bare LF, mixed line ends and leading empty lines end the head where tungstenite ends it, in any chunking;
+    /// and the reviewer's input (a 4,096 B head ending in "\n\n" then a frame) ends at 4,096, so the frame after it is
+    /// scanned as a frame.
+    #[test]
+    fn the_head_ends_where_tungstenite_ends_it() {
+        let mut lf = b"GET / HTTP/1.1\nHost: localhost\nUpgrade: websocket\nX-Pad: ".to_vec();
+        lf.resize(4_094, b'a');
+        lf.extend(b"\n\n");
+        let heads: [&[u8]; 6] = [
+            REQUEST,
+            b"GET / HTTP/1.1\n\n",
+            b"GET / HTTP/1.1\r\nHost: a\n\r\n",
+            b"GET / HTTP/1.1\nHost: a\r\n\n",
+            b"\r\n\r\n\nGET / HTTP/1.1\r\nHost: a\r\n\r\n",
+            &lf,
+        ];
+        for head in heads {
+            let input = [head, &frame(true, 2, true, 604, false)].concat();
+            assert_eq!(
+                tungstenite_head(&input),
+                Ok(Some(head.len())),
+                "{:?}",
+                String::from_utf8_lossy(&head[..head.len().min(40)])
+            );
+            for chunk in [1, 2, 3, 7, 4_096, 10_000] {
+                assert_eq!(head_end(&input, chunk), Some(head.len()), "chunk {chunk}");
+            }
+            let mut s = Scanner::client(LIMIT, HEAD);
+            let got = all(&mut s, &input, 4_096);
+            assert_eq!(
+                got.get(1),
+                Some(&(head.len() + 2 + 2 + 4, Err(Reason::Frame))),
+                "the frame after the head is closed at its header"
+            );
+        }
+    }
+
+    /// S2's differential: seeded requests with random leading empty lines, line ends (LF or CR LF), headers and
+    /// tails, some corrupted (a byte replaced, often a CR, LF or NUL): wherever tungstenite completes the head, the
+    /// scanner ends it at the same byte; wherever the scanner ends it, tungstenite on those bytes completes at the same
+    /// byte or refuses the request, never waits for more. 20,000 inputs, every case counted.
+    #[test]
+    fn the_head_matches_tungstenite_on_seeded_inputs() {
+        let mut rng = ChaCha8Rng::seed_from_u64(0x6e70_745f_6865_6164);
+        let mut below = |n: u64| ((u128::from(rng.next_u64()) * u128::from(n)) >> 64) as u64;
+        let (mut both, mut refused, mut incomplete) = (0u64, 0u64, 0u64);
+        for case in 0..20_000u64 {
+            let eol = |r: u64| -> &'static [u8] { if r == 0 { b"\n" } else { b"\r\n" } };
+            let mut input = Vec::new();
+            for _ in 0..below(3) {
+                input.extend(eol(below(2)));
+            }
+            input.extend(b"GET /p HTTP/1.1");
+            input.extend(eol(below(2)));
+            for h in 0..below(12) {
+                input.extend(format!("X-H{h}: v").as_bytes());
+                for _ in 0..below(20) {
+                    input.push(b"abc 123:/=;,"[below(12) as usize]);
+                }
+                input.extend(eol(below(2)));
+            }
+            input.extend(eol(below(2)));
+            for _ in 0..below(40) {
+                input.push(below(256) as u8);
+            }
+            if below(3) == 0 {
+                for _ in 0..1 + below(3) {
+                    let at = below(input.len() as u64) as usize;
+                    input[at] = [b'\r', b'\n', 0, b' ', b'x'][below(5) as usize];
+                }
+            }
+            let chunk = 1 + below(64) as usize;
+            let ours = head_end(&input, chunk);
+            let theirs = tungstenite_head(&input);
+            if let Ok(Some(size)) = theirs {
+                assert_eq!(ours, Some(size), "case {case}: {input:?}");
+                both += 1;
+            }
+            if let Some(s) = ours {
+                match tungstenite_head(&input[..s]) {
+                    Ok(Some(size)) => assert_eq!(size, s, "case {case}"),
+                    Ok(None) => {
+                        panic!("case {case}: tungstenite waits past the scanner's end: {input:?}")
+                    }
+                    Err(()) => refused += 1,
+                }
+            } else {
+                incomplete += 1;
+            }
+        }
+        println!(
+            "heads: {both} completed by both at the same byte, {refused} ended by the scanner and refused by \
+             tungstenite, {incomplete} not ended"
+        );
+        assert!(both > 10_000 && refused > 100 && incomplete > 100);
     }
 
     #[test]

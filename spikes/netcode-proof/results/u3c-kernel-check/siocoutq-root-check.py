@@ -75,7 +75,8 @@
 #
 # RECORDED. Kernel release, CONFIG_HZ, the TCP sysctls (congestion control, tcp_recovery, tcp_early_retrans, tcp_sack,
 # tcp_frto, tcp_rto_min_us, tcp_thin_linear_timeouts), the probe socket's congestion control (set to cubic, the
-# model's; this container defaults to bbr, u3-scout-timing.md:388), the spike's commit, every probe line.
+# model's; this container defaults to bbr, u3-scout-timing.md:388), the spike's commit with any uncommitted change in
+# its folder (this script's own logs aside: OWN_OUTPUTS), every probe line.
 #
 # RUN (from the repository root, as root):
 #   CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3v3-model-target \
@@ -147,6 +148,40 @@ def sysctl(name):
         return "absent"
 
 
+# This script's own outputs (the logs it writes next to itself), left out of the provenance check: a run's log is
+# opened before `git status` runs, so with them in, every run would read "with uncommitted changes" (u3c review F-J,
+# fixed 2026-11-08 after the committed root run, whose log says so for that reason).
+OWN_OUTPUTS = "siocoutq-root-check-*.txt"
+
+
+def uncommitted():
+    """The uncommitted changes in the spike's folder other than this script's own outputs, as paths relative to the
+    repository root (git status --porcelain), or the error text when git status fails."""
+    own = (HERE / OWN_OUTPUTS).relative_to(SPIKE).as_posix()
+    status = subprocess.run(
+        ["git", "-C", str(SPIKE), "status", "--porcelain", "--untracked-files=all", "--", ".", f":(exclude,glob){own}"],
+        capture_output=True,
+        text=True,
+    )
+    if status.returncode != 0:
+        return f"git status failed: {status.stderr.strip()}"
+    return [line[3:] for line in status.stdout.splitlines() if line.strip()]
+
+
+def provenance():
+    """The spike's commit and its uncommitted changes (up to five paths, so a reader can tell a source change from a
+    stray file), this script's own outputs aside."""
+    head = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "HEAD"], capture_output=True, text=True)
+    text = f"spike commit {head.stdout.strip() or 'unknown'}"
+    paths = uncommitted()
+    if isinstance(paths, str):
+        return f"{text} ({paths})"
+    if paths:
+        more = f" and {len(paths) - 5} more" if len(paths) > 5 else ""
+        text += f" (with uncommitted changes: {', '.join(paths[:5])}{more})"
+    return text
+
+
 def iptables(*args, check=True):
     return subprocess.run(["iptables", *args], capture_output=True, text=True, check=check)
 
@@ -183,9 +218,7 @@ def main(argv):
     log(f"# siocoutq-root-check {'DRY RUN (no iptables call) ' if dry else ''}at {stamp}")
     log(f"# kernel {os.uname().release}, CONFIG_HZ {hz()}")
     log("# sysctl " + " ".join(f"{s}={sysctl(s)}" for s in SYSCTLS))
-    head = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "HEAD"], capture_output=True, text=True)
-    dirty = subprocess.run(["git", "-C", str(SPIKE), "status", "--porcelain", "--", "."], capture_output=True, text=True)
-    log(f"# spike commit {head.stdout.strip() or 'unknown'}{' (with uncommitted changes)' if dirty.stdout.strip() else ''}")
+    log(f"# {provenance()}")
 
     if not dry:
         if os.geteuid() != 0:
