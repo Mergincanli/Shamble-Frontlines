@@ -44,6 +44,9 @@
   addendum check of CHECKPOINTS.md §10 (`advisor-addendum-disk.md`): REVISE with two exact text changes (who runs it;
   "until its work is saved"), approved once applied; its optional third sentence (routines note copies) left out as a
   new duty.
-- **Current step:** 3, the fifth kit edit (CHECKPOINTS.md §10), then docs-keeper, the review round, the report
+- **Done:** the fifth kit edit, CHECKPOINTS.md §10 "Disk hygiene" (+12 lines, with the advisor's two text changes);
+  checkpoint tests 27/27, repo map OK, gate PASS. The kit sitting is complete (five edits, one at a time).
+- **Current step:** 4, docs-keeper's pass (STATUS and ROADMAP: #43 merged, #45 on main, this change-set in flight, the
+  queue), then the review round (security-auditor, the verifier, infra-engineer), the report
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.

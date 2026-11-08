@@ -206,3 +206,15 @@ the agents' notes reach the remote even if the whole session is cut off:
    nothing; untracked notes don't count): the session checks it before marking the PR ready, and the advisor on review.
 4. A review fix that takes more than one step turns the PR back into a draft, starts a new checkpoint, and deletes it
    again in its last commit before the PR is marked ready once more.
+
+## 10. Disk hygiene (Mustafa, 2026-11-08; guidance, no rule change)
+His words: "clean finished units' build output with cargo clean --target-dir <dir>, and remove merged agent copies
+with git worktree remove (never --force; git refuses if a copy has unsaved work). Consider one shared Cargo target
+folder for all copies. No rule change: rm -rf stays denied."
+- Who runs it: day sessions. The night shift may remove merged copies but cannot run cargo; the PR Advisor runs
+  neither (the guard refuses both).
+- When a unit is finished, clean its build output: `cargo clean --target-dir <dir>`.
+- When a change-set is merged, remove its agent copies with `git worktree remove <path>`, never with `--force`. Git
+  refuses a copy that still has unsaved work; that copy stays until its work is saved.
+- To consider: one shared Cargo target folder for all copies, so each copy does not rebuild the same crates.
+- `rm -rf` stays denied.
