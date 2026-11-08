@@ -499,6 +499,20 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 21:00 UTC: the FINAL small fix round launched, workflow `wf_5c9f078a-da1` (npt-u3c-fix3), on c37dfe1.**
+  - fix:C1c (npt-net; worktree from isolation, notes u3c-fix3-c1c.md in it; cache .gate/u3v3-harness-check-target)
+    then critic:C1c (rust-reviewer; notes u3c-fix3-review-c1c.md in the main folder).
+  - fix:C2c (check.mjs and guards; notes u3c-fix3-c2c.md in its worktree; cache .gate/u3c-review-target) then
+    critic:C2c (test-engineer; notes u3c-fix3-review-c2c.md).
+  - **If cut:** snapshot each builder's worktree first (`python3 -I .checkpoints/netcode-proof-test/worktree_patch.py
+    <worktree> .checkpoints/netcode-proof-test/wip/u3c-fix3-<part>.patch u3c-fix3-<part>`), then resume with
+    Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3c-fix3-wf_5c9f078a-da1.js,
+    resumeFromRunId: "wf_5c9f078a-da1", args: {sha: "c37dfe14f222d62f429785498e189262ca7a8f7b"}}), or a fresh agent
+    applies the snapshot at c37dfe1 and continues after its notes' last Progress line.
+  - **After it:** apply both (worktree_patch.py, `git apply --check`, `git apply`), check.mjs 9/9 and the gate,
+    commit, push; then the condition-10 diagnostic (quiet machine, no agents building), U3c's report, the cleanup ask,
+    U3d.
 - **About 20:55 UTC: C1b MERGED at f01d573** (applied from .claude/worktrees/wf_10e244da-89a-1 via worktree_patch.py;
   check.mjs 9/9: 258 measured, 272 bites, self 35, redact 0; gate PASS --no-smoke).
   - R1 fixed; G-PRE-WAKE, G-PRE-PANIC, G-F10, G-NC4, G-FH, G-NC8, G-NC2; the split pooled per process (309,583 B per
