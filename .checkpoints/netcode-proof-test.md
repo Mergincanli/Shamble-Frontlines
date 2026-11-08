@@ -318,6 +318,8 @@
   runs only by a build fixing the found cause; the judge refuses a folder missing a listed run) at U8, reviewed by
   the advisor; Q13 (R4 creates LG with its IPv6 /64) and Q23 (-11 and -25 once per WebTransport crate) in the run
   plans; Q15 (a), -27's one-sided "within 5 %", in a readings PR before R5's first counted run (Mustafa's go).
+- **For the readings PR before R5, also:** docs/design/ws-reconnect.md's WS-RECONNECT-BAR (b) record (Mustafa,
+  2026-11-08), already on the spike branch.
 - **For the readings PR before R5** (with Q15 (a)): the PR Advisor's Low note on PM-0001-31's "L2's TCP proxy on RS",
   which R-25 makes the WebSocket stream wrapper for the proof test: a pointer in that row.
 - **Raised by the session, for the advisor at U4:** marks -14, -16 to -25 and -27 run inside an S30 room or the stress
@@ -399,6 +401,11 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-08 about 00:10 UTC (verbatim):** "WS-RECONNECT-BAR: (b), open until the reconnect work's plan."
+  - So the reconnect's own pass bar is proposed by the reconnect work with its plan, for his go, against the target;
+    the borrowed WS-BAR form in docs/design/ws-reconnect.md §6.4 is only a starting proposal.
+  - Recorded on the spike branch in docs/design/ws-reconnect.md (:51-52, §6.4, §7 item 5). It reaches main with the
+    readings PR before R5 (or PR #40).
 - **Mustafa, 2026-11-07 about 14:30 UTC, refining WS-BAR (verbatim):** "Refinement to my WS-BAR rule: the model's
   bound has almost no margin (5 % slower already fails a correct build), so declare a tolerance now, before any
   practice run. If the practice run is up to 10 % slower than the model, the numbers may move by that much; beyond
