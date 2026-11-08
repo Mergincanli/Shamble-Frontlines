@@ -475,6 +475,15 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c build B MERGED at 2a93038** (about 00:20 UTC 2026-11-08). Content: npt-tcpinfo, check.mjs's unsafe-placement and
+  libc checks, the C12e root-run script; fixed per critic B (u3c-build-b-fix.md).
+  - Merged by worktree_patch.py from .claude/worktrees/agent-a3dfcb36e3c15ab56, then npt-tcpinfo moved into
+    [workspace.dependencies].
+  - check.mjs 9/9 (202 measured, 215 bites, self 21); gate PASS --no-smoke; pushed.
+  - C12 (f) carried in plan §12.1's U8 row.
+  - **Next:** fix-A finishes, then merge A on top with `git apply --3way`. Both builds touch Cargo.toml, Cargo.lock,
+    crates/net/Cargo.toml and lib.rs; regenerate the lock and check that it adds tokio-rustls only. Then check.mjs 9/9,
+    the gate, and a commit.
 - **About 23:50 UTC: main merged into the branch** at 2c68bf9: PR #45's ADR, with the -18 and -31 hashes and
   drafts_commit 626df67 re-taken, and the STATUS and REPO_MAP conflicts resolved. check.mjs passes 9/9 (193/206), the
   gate passes with --no-smoke, and CI is green on 4f3a560.
