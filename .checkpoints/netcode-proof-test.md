@@ -499,7 +499,17 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **RESUME HERE (about 17:15 UTC 2026-11-08; the spend limit resets 20:00 UTC): the last fix round ENDED PARTWAY.**
+- **About 20:15 UTC: C2b MERGED at b5e4043** (the forbid backstop and check.mjs's scope).
+  - The main session read the diff, since the classifier was down during that agent's run: no network or process use,
+    and writes only to temporary test folders. Its Python test only imports provenance() into a temp git repo, never
+    runs the script.
+  - check.mjs 9/9 (252 measured, 266 bites, self 35); gate PASS.
+- **Workflow `wf_10e244da-89a`** (npt-u3c-fix2b), launched about 20:15 on b5e4043.
+  - C1b's continuation in a fresh worktree applies wip/u3c-fix2-wt1.patch and finishes from its plan (notes
+    u3c-fix2-c1b-finish.md in the worktree); then the rust-reviewer critic on C1b.
+  - In parallel, the test-engineer critic on C2b's merged diff (notes u3c-fix2-review-c2b.md).
+  - If cut: resume with resumeFromRunId "wf_10e244da-89a" and args {sha: b5e40438...}.
+- **Earlier (about 17:15 UTC; the spend limit reset 20:00 UTC): the last fix round ENDED PARTWAY.**
   - **C2b DONE**, worktree .claude/worktrees/wf_ac5e4575-9da-2, snapshot wip/u3c-fix2-wt2.patch, notes
     u3c-fix2-c2b.md.
     - The forbid backstop LANDED: the workspace unsafe_code is "forbid"; tcpinfo has its own lint table with "deny" and
