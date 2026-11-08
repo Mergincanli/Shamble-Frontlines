@@ -401,6 +401,23 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-08 about 09:58 UTC (verbatim):** "Yes to committing each dirty agent copy's leftovers to its own
+  local branch and then removing the copy normally, for the two U3b copies now too. And if the reviewers confirm the
+  lock-while-encrypting lead, fix it in U3c's fix pass if it's small: it may remove the timing tail we accepted."
+  - **Done for the U3b copies:**
+    - agent-a9099feea96fafb39's leftovers are on local branch u3bfix-a9099 (1550aa6);
+    - agent-adf1deee6caf1481f's leftovers are on worktree-agent-adf1deee6caf1481f (85de721);
+    - both copies were removed with plain `git worktree remove`; the disk has 12 GB free.
+  - **The standing procedure for every finished copy:** commit its leftovers on its own local branch (never pushed),
+    then `git worktree remove` without force. Each cleanup is asked once.
+  - **Still to ask at U3c's cleanup:**
+    - U3a's copies agent-a487e419ee806d37b and agent-a79d7290e0e6a6e50 (72e6fab; merged at 1e020a7);
+    - .gate/flaky-wt, my throwaway measurement copy;
+    - .gate/npt-readings, PR #45's copy (merged);
+    - U3c's own copies and caches.
+  - **The lock-while-encrypting lead** (rust-reviewer F3: Pump::poll holds the Conn mutex across S's polls): if the
+    re-run review confirms it and the fix is small, it goes into U3c's fix pass, then the lateness run is repeated to
+    see whether C10's tail goes.
 - **Mustafa, 2026-11-08 about 00:10 UTC (verbatim):** "WS-RECONNECT-BAR: (b), open until the reconnect work's plan."
   - So the reconnect's own pass bar is proposed by the reconnect work with its plan, for his go, against the target;
     the borrowed WS-BAR form in docs/design/ws-reconnect.md §6.4 is only a starting proposal.
