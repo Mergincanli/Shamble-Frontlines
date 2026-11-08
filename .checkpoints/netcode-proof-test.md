@@ -499,6 +499,31 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c REVIEW DONE (all 8 agents; record in u3c-review-result.txt and the journal of wf_8f2da9fc-8fa).** Verdicts:
+  rust, netcode and security APPROVE_WITH_FINDINGS; test REVISE.
+  - Verified medium: F1 (add_burst overflow) and F-K (test (c)'s hidden wall-clock limit).
+  - Verified low:
+    - NC-U3c-1 (test (c) uses N at the return; the gate guarantees only N at the last write);
+    - NC-2, NC-3, NC-6 (the cross-check's check (2) has little power: the report says so);
+    - F7 (565 KB per connection);
+    - S1, F-D, F-E (unsafe-check bypasses), S2 (request scanner against tungstenite on the head's end), S7;
+    - F-B, F-A, F-G, F-M (untested claims), F-L (gate inputs from four locks), F-N (the off-Linux build unchecked).
+  - Nits: F3 (lock across S's I/O: REAL, rated nit; fixed anyway per Mustafa), F2, F4-F6, F8, F10, NC-4/5/7-12,
+    S3-S6, F-C, F-F, F-H, F-I, F-J, F-O, F-P, F-R2.
+- **The U3c fix pass, workflow `wf_3ea724fc-a63`** (npt-u3c-fix), launched about 10:51 UTC on 95597ef.
+  - C1 (general-purpose, xhigh, worktree): DelayStream, ws_gate, tests and SERIES; CARGO_TARGET_DIR
+    u3v3-harness-check-target.
+  - C2 (the same): check.mjs and npt-tcpinfo; CARGO_TARGET_DIR u3v3-model-target.
+  - Each is followed by a test-engineer critic. Notes in each worktree: u3c-fix-{c1,c2}.md.
+  - If cut: resume with resumeFromRunId "wf_3ea724fc-a63" and args {sha: 95597ef...}.
+  - **After it:**
+    - merge C2, then C1;
+    - check.mjs 9/9 and the gate;
+    - re-run the quiet lateness evidence (does F3's fix remove C10's tail?);
+    - re-review only what changed;
+    - the plan 1.4 (c) wording (N at the last write) and the U6 carries (S5, S7's burst-length bound);
+    - close U3c;
+    - cleanup per Mustafa's rule, asking once.
 - **DISK FULL, then freed** (about 01:30 UTC 2026-11-08: 132 KB free). The saver b7zmsy7v8/brque24xu died on it, and the
   review workflow's three verifiers failed on the spend limit at the same time.
   - **Mustafa's standing rule (verbatim):** "From now on, after each unit merges: delete that unit's build cache under
