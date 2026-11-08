@@ -26,7 +26,8 @@ DRAFT, written 2026-11-08 about 21:10 UTC while the final small fix round (workf
 | b5c9009 | The per-release lateness split (clock wake, pump start, S's write; an identity test that the parts sum to the total) |
 | b5e4043 | C2b: the compiler backstop (`unsafe_code = "forbid"` for the workspace; the two exceptions keep their own tables) and check.mjs's scope |
 | f01d573 | C1b: regression R1 fixed; the pump's wake and panic gaps; split histograms pooled per process |
-| **TBD** | C1c and C2c: the final small round |
+| f6cd1d7 | C1c and C2c, the final small round: the pump's last test gaps (the no-spin bound, add_burst's wake, the panic condition both ways), shutdown's error after a failed pump; check.mjs's reader gaps (lint sub-tables and name forms, the scrubbed git environment, RUSTC_BOOTSTRAP and manifest rustflags refused, the CARGO_HOME and stderr wiring tests, the BPF SAFETY line) |
+| **TBD** | C2d: the last five nits of C2c's critic (N1-N5) |
 
 ## Evidence
 | What | Result | Where |
@@ -37,7 +38,7 @@ DRAFT, written 2026-11-08 about 21:10 UTC while the final small fix round (workf
 | Lateness run 2 (after the fix pass, which carried R1; the VM had restarted) | down 0.155 / 0.628 / 3.483 / 11.281 ms, E 16.4 µs; up 0.206 / 1.398 / 2.906 / 10.641 ms, E 25.9 µs | results/u3c-lateness/lateness-run2-20261108T1509Z-after-fixpass.txt |
 | Interleaved A/B, unchanged pre-fix code against the fix pass | No consistent difference: pre E down 18.1 and 11.6 µs, up 28.2 and 26.7 µs; post down 16.2 and 22.1, up 27.9 and 38.2. The same pre-fix code gave E 3.5 / 6.5 µs in run 1: **the container got noisier, the code did not change** | results/u3c-lateness/lateness-ab-{1..4}-*.txt (e317067) |
 | Condition-10 diagnostic (the split, interleaved with ImpairSocket's own lateness run) | **TBD** (reported, not judged) | **TBD** |
-| check.mjs (fmt, clippy on both builds and wasm32, deps, tests, self, redact) | 9 of 9 at f01d573: 258 tests in the measured build, 272 in the bites build, self 35 of 35, redact 0. **Final: TBD** | the commit messages |
+| check.mjs (fmt, clippy on both builds and wasm32, deps, tests, self, redact) | 9 of 9 at f6cd1d7: 260 tests in the measured build, 274 in the bites build, 0 failed, 0 skips, self 41 of 41, redact 0 findings. **After C2d: TBD** | the commit messages |
 | The gate | PASS (`--no-smoke`: the container's Chromium does not match tools' Playwright) | the commit messages |
 
 Memory per DelayStream connection: 309,583 B, plus 1,350,400 B once per process for the pooled split histograms.
@@ -49,7 +50,8 @@ Memory per DelayStream connection: 309,583 B, plus 1,350,400 B once per process 
 | Fix pass (81203da) | two builders | every verified finding fixed or named as a known limit |
 | Re-review of the fix pass (u3c-fix-review-result.txt) | two critics, each verified | gaps listed; **one regression of our own (R1)**: a down record released during the pump's up-loop step could wait up to a tick |
 | Last round (b5e4043, f01d573) | two builders, two critics | R1 fixed and pinned by a test that fails when the fix is reverted; the compiler backstop landed; critics: code APPROVE, small test gaps |
-| Final small round (wf_5c9f078a-da1) | two builders, two critics | **TBD** |
+| Final small round (wf_5c9f078a-da1; f6cd1d7) | two builders, two critics | C1c: COMPLETE (APPROVE), each of its 4 bites caught (the spin bite: 158,276 pump runs against a bound of 2,000; fixed code 112-141 even under 16 busy loops). C2c: no regression, 15 of 15 revert bites caught; five small gaps left (one low: a crate's `[lints] workspace = true` hidden in a multi-line string; four nits) |
+| C2d (the five gaps) | one builder, one critic | **TBD** |
 
 ## Known limits (stated, not fixed)
 - check.mjs's dependency step guards against an accidental relaxation of the unsafe-code and determinism lints; review

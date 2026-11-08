@@ -499,6 +499,25 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 21:50 UTC: the final round MERGED at f6cd1d7** (C1c + C2c; check.mjs 9/9: 260 measured, 274 bites, self 41,
+  redact 0; gate PASS --no-smoke; pushed). C1c's critic: COMPLETE (APPROVE), every bite caught. C2c's critic: no
+  regression; five small gaps:
+  - N2 (low): inheritsWorkspaceLints (check.mjs ~:421-430) reads raw lines (strings unmasked): `[lints] workspace =
+    true` moved into a multi-line string passes deps while cargo drops the workspace lints for that crate; two claims
+    then false. Fix: read it through tomlScan(text).mask; a test with the plant.
+  - N1 (nit): deleting depsStep's member-manifest loop (~:1146) passes every self test; add a member plant.
+  - N3 (nit): `__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS=nightly` lets stable cargo accept cargo-features; not
+    refused nor named (opens nothing today: every key it unlocks is refused).
+  - N4 (nit): a UTF-8 BOM hides line 1's key from tomlKeyAt (only a new tool's lint table gets in, e.g. rustdoc).
+  - N5 (nit, comment): unacked_and_unsent's new SAFETY line omits non-inet families that answer 0x5411 (AF_UNIX,
+    AF_PACKET: one int by TIOCOUTQ's convention).
+  - **Plan:** one tiny round C2d for N1-N5 (a builder + a test-engineer critic on the changed lines only) AFTER the
+    condition-10 diagnostic (the machine must stay quiet).
+- **About 21:53 UTC: the condition-10 diagnostic RUNNING** (background task bkp8uz21c; output
+  /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/tasks/bkp8uz21c.output): DELAY 1,
+  IMPAIR 1, DELAY 2, IMPAIR 2 on f6cd1d7's release build (.gate/netcode-proof-test/target). Then write each part to
+  results/u3c-lateness/c10-diag-*.txt with the Write tool, commit, fill the report. If cut: rerun the same loop (the
+  build is cached), quiet machine.
 - **About 21:00 UTC: the FINAL small fix round launched, workflow `wf_5c9f078a-da1` (npt-u3c-fix3), on c37dfe1.**
   - fix:C1c (npt-net; worktree from isolation, notes u3c-fix3-c1c.md in it; cache .gate/u3v3-harness-check-target)
     then critic:C1c (rust-reviewer; notes u3c-fix3-review-c1c.md in the main folder).
