@@ -522,7 +522,16 @@
     resumeFromRunId: "wf_77078bc9-95f", args: {head: "95dac9c"}}). Then: fold the critics' findings into the plan
     (rev 2), then the advisor's review; no code before its APPROVE.
   - **The cleanup ask went to Mustafa in chat (about 22:55 UTC)**; waiting for his answer (task: clean after his yes,
-    by the approved method; the list is below).
+    by the approved method; the list is below; about 16 GB in all, 5.0 GB free).
+  - **SAVE at Mustafa's 96 % usage (about 22:50 UTC).** U3d's planning workflow `wf_77078bc9-95f` was in its Scout
+    phase: u3d-scout-req.md (plan only) and u3d-scout-r1.md (F1-F4 so far) on disk and committed; no draft yet. These
+    agents work read-only in the main folder (no worktrees), so their notes are all on disk. **After the usage reset:**
+    resume with Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-plan-wf_77078bc9-95f.js,
+    resumeFromRunId: "wf_77078bc9-95f", args: {head: "95dac9c"}}) (finished agents replay from cache; a cut agent
+    reruns: tell it to continue its notes file after the last line); if the run is gone, relaunch the same script.
+    Then fold the critics into u3d-plan.md rev 2 and send it to the advisor. Also restart the saver
+    (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "..."`), and check Mustafa's cleanup answer.
 - **About 22:10 UTC: the condition-10 diagnostic DONE and committed (ecdeeb0)**:
   results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (identical to the raw output; redact 0). Split violations 0.
   Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the
