@@ -504,10 +504,27 @@
   Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the
   pass's rest + the reader task's turn) max 8.4 / 22.2 ms and most of up's E (16.6-18.6 of 26.8-35.4 us); ImpairSocket
   in the same window p99.9 1.25-4.24 ms, max 3.1-8.2 ms. Totals: down E 11.5 / 16.6 us, up E 26.8 / 35.4 us.
-  - **With the advisor now** (background agent, launched about 22:12): C10-B (recommend: no (b) before R1), UP-STAMP
-    (recommend: one more stamp at the pump's up release in U6/U8, bar unchanged), U3C-CLOSE (close once C2d's critic
-    says complete). Its ruling text is appended by the main session to advisor-u3c-plan.md. If cut: relaunch the same
-    ask (the prompt is in this session's transcript; the evidence and report paths are above).
+  - **The advisor ruled (about 22:17; appended to advisor-u3c-plan.md, "Side ruling: the condition-10 diagnostic,
+    UP-STAMP and U3c's close"):** C10-B APPROVE ((b) not built before R1; fallback order at R1: split to the advisor
+    first, a miss in up's pass part -> wake the reader right after the releasing step and yield, (b) only for a miss in
+    the hop). UP-STAMP APPROVE with changes (stamp R at the reader's wake, delay.rs:1884; built in U6 with an
+    early-reader class, identity test and bite; bar stays on L; steal recorded at R1). Correction: up's work = the
+    pump's pass + the reader's turn (not shown to be the reader's turn). U3C-CLOSE APPROVE on five conditions: (1)
+    C2d's critic complete, no regression (a new finding >= low goes to the advisor); (2) check.mjs 9/9 + gate on the
+    closing head, the nine step lines + head SHA in the report; (3) report fixes (a)-(d): DONE (941832e); (4) plan U6
+    and U8 rows: DONE in the same commit (941832e); (5) checkpoint pushed with the close; the critics' scratch copies in
+    Mustafa's cleanup ask.
+  - **Cleanup list (for the ask at the close; sizes at 22:20):** caches .gate/u3v3-harness-check-target 6.2 GB,
+    .gate/u3v3-model-target 4.5 GB, .gate/u3c-review-target 3.8 GB+ (after C2d), .gate/netcode-proof-test/u3vf-target
+    198 MB, u0-wt 294 MB, u3-wt-probe 397 MB, .gate/c2b-review-scratch-target 56 MB, c2b-review-mini-target; scratch
+    copies .gate/c1b-review-scratch, c1c-review-scratch, c2c-review-scratch, c2d-review-scratch (after), u3c-fixrev-c1,
+    u3c-review-f1 (+ .tar), u3bfix-base (+ .tar), u3bv-copy, u3bfix-copy; worktrees .gate/flaky-wt, .gate/npt-readings,
+    .claude/worktrees/{agent-a487e419ee806d37b, agent-a79d7290e0e6a6e50, agent-a3dfcb36e3c15ab56,
+    agent-a7fafe27dcdee96cd, agent-a3d04e3f48e4d97db, wf_87550c07-bbd-1, -2, wf_3ea724fc-a63-1, -2, wf_ac5e4575-9da-1,
+    -2, wf_10e244da-89a-1, wf_5c9f078a-da1-1, -2, wf_b13b9984-6bc-1}. Keep: .gate/netcode-proof-test/target (the main
+    folder's cache) and runs/ (U2's raw run logs). Method as approved: caches by `cargo clean --target-dir`; dirty
+    copies' leftovers committed to a local branch, then `git worktree unlock` (workflow copies are locked) and a plain
+    `git worktree remove`.
 - **About 22:11 UTC: C2d launched, workflow `wf_b13b9984-6bc` (npt-u3c-fix4) on ecdeeb0**: fix:C2d (N1-N5; notes
   u3c-fix4-c2d.md in its worktree; cache .gate/u3c-review-target) then critic:C2d (test-engineer; notes
   u3c-fix4-review-c2d.md; deliberate-only ways around go to known limits). If cut: snapshot its worktree with
