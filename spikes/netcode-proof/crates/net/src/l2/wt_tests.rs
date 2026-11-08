@@ -21,17 +21,33 @@ fn value(list: &[(&'static str, u64)], name: &str) -> u64 {
     list.iter().find(|(n, _)| *n == name).map_or(0, |x| x.1)
 }
 
-/// What one route measured.
+/// What one route measured. The `*_sent` and `*_frames` counts are quinn's own (`frame_tx.datagram` at the sender,
+/// `frame_rx.datagram` at the receiver), so a send-buffer drop, a receive-buffer drop and a loss on the wire can be
+/// told apart.
 #[derive(Debug)]
 struct Route {
     setup: Duration,
     up_received: u32,
     down_received: u32,
+    up_sent: u64,
+    up_frames: u64,
+    down_sent: u64,
+    down_frames: u64,
     server_rtt: Duration,
     client_rtt: Duration,
 }
 
 const DATAGRAMS: u32 = 200;
+
+/// The impaired runs send one datagram per tick, as the room and the clients do (30 Hz). At the 5 ms spacing this
+/// test used before, P2's independent per-packet jitter (± 10 ms each way) reordered most packets. quinn's
+/// packet-threshold loss detection then declared spurious losses (24-52 per run against 6-8 real), cut its window to
+/// about 3 KB, and packed several queued datagrams into each packet, so one real loss took several datagrams and up
+/// fell to 178 in 1 run of 80 (measured 2026-11-07; the checkpoint's open findings). At the tick nothing is packed:
+/// 0 of 50 runs failed, up at least 191. How the model's reordering meets quinn's congestion control is U6's C6
+/// question, not this test's. The clean reference keeps 5 ms.
+const TICK: Duration = Duration::from_nanos(33_333_333);
+const CLEAN_GAP: Duration = Duration::from_millis(5);
 
 /// Waits for `n` datagrams or `idle` without one.
 async fn count<F, Fut>(mut recv: F, idle: Duration) -> u32
@@ -101,6 +117,38 @@ fn check_p2(name: &str, r: &Route, s: &ImpairSocket) {
     for k in ["queue_drop", "pool_drop", "oversize", "send_err"] {
         assert_eq!(value(&run, &format!("l2_down_{k}_count")), 0, "{name}: {k}");
     }
+    for k in ["queue_drop", "pool_drop", "oversize"] {
+        assert_eq!(
+            value(&run, &format!("l2_up_{k}_count")),
+            0,
+            "{name}: up {k}"
+        );
+    }
+    for (dir, received, sent, frames) in [
+        ("up", r.up_received, r.up_sent, r.up_frames),
+        ("down", r.down_received, r.down_sent, r.down_frames),
+    ] {
+        // Each sender's quinn sent every datagram the app gave it (nothing dropped from its send buffer).
+        assert_eq!(
+            sent,
+            u64::from(DATAGRAMS),
+            "{name} {dir}: quinn sent {sent} frames"
+        );
+        // The app received every datagram its quinn received (nothing dropped from its receive buffer).
+        assert_eq!(
+            u64::from(received),
+            frames,
+            "{name} {dir}: the app got {received} of {frames} frames"
+        );
+        // At one datagram per packet, every missing datagram is one of ImpairSocket's real losses (which may also
+        // take ACK-only packets, so this is an upper bound, exact when they don't).
+        let missing = u64::from(DATAGRAMS - received);
+        let real = value(&run, &format!("l2_{dir}_lost_count"));
+        assert!(
+            missing <= real,
+            "{name} {dir}: {missing} datagrams missing, {real} packets lost"
+        );
+    }
 }
 
 #[cfg(feature = "wt-wtransport")]
@@ -149,6 +197,7 @@ mod wtransport_route {
     }
 
     pub(super) async fn run(cfg: L2Config) -> (Route, Arc<ImpairSocket>, Arc<Handshakes>) {
+        let gap = if cfg.pass_through { CLEAN_GAP } else { TICK };
         let (sock, port, cert, counts, mut rx) = start(cfg).await;
         let t0 = Instant::now();
         let (client, own) = client(port, cert, b"h3").await.expect("session");
@@ -174,12 +223,21 @@ mod wtransport_route {
             let payload = [i as u8; 100];
             client.send_datagram(payload).unwrap();
             server.send_datagram(payload).unwrap();
-            tokio::time::sleep(Duration::from_millis(5)).await;
+            tokio::time::sleep(gap).await;
         }
+        let (up_received, down_received) = (up.await.unwrap(), down.await.unwrap());
+        let (cs, ss) = (
+            client.quic_connection().stats(),
+            server.quic_connection().stats(),
+        );
         let route = Route {
             setup,
-            up_received: up.await.unwrap(),
-            down_received: down.await.unwrap(),
+            up_received,
+            down_received,
+            up_sent: cs.frame_tx.datagram,
+            up_frames: ss.frame_rx.datagram,
+            down_sent: ss.frame_tx.datagram,
+            down_frames: cs.frame_rx.datagram,
             server_rtt: server.rtt(),
             client_rtt: client.rtt(),
         };
@@ -323,6 +381,7 @@ mod wtq_route {
     }
 
     pub(super) async fn run(cfg: L2Config) -> (Route, Arc<ImpairSocket>, Arc<Handshakes>) {
+        let gap = if cfg.pass_through { CLEAN_GAP } else { TICK };
         let (sock, port, cert, counts, mut rx) = start(cfg).await;
         let t0 = Instant::now();
         let (client, own) = client(port, cert, b"h3").await.expect("session");
@@ -348,12 +407,22 @@ mod wtq_route {
             let payload = vec![i as u8; 100];
             client.send_datagram(payload.clone().into()).unwrap();
             server.send_datagram(payload.into()).unwrap();
-            tokio::time::sleep(Duration::from_millis(5)).await;
+            tokio::time::sleep(gap).await;
         }
+        let (up_received, down_received) = (up.await.unwrap(), down.await.unwrap());
+        // A Session derefs to its quinn::Connection, whose stats carry the frame counts.
+        let (cs, ss) = (
+            quinn::Connection::stats(&client),
+            quinn::Connection::stats(&server),
+        );
         let route = Route {
             setup,
-            up_received: up.await.unwrap(),
-            down_received: down.await.unwrap(),
+            up_received,
+            down_received,
+            up_sent: cs.frame_tx.datagram,
+            up_frames: ss.frame_rx.datagram,
+            down_sent: ss.frame_tx.datagram,
+            down_frames: cs.frame_rx.datagram,
             server_rtt: server.rtt(),
             client_rtt: client.rtt(),
         };
