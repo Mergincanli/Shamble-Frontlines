@@ -87,3 +87,18 @@ Split approved with U6 carries. No escalation.
   futures-util as a normal dependency (listed in §4.8, audited at U5), no hand adapter in shipped code.
 - FYI items: lateness evidence quiet, >= 10,000 samples per direction, loadavg recorded; W7 endorsed, with fixes.rs's
   pinned tables unchanged after the swap.
+
+## Side ruling: condition 10 fired in the quiet run; the other evidence (2026-11-08)
+- Read at 989118e: results/u3c-lateness/lateness-run1-20261108T0041Z.txt (n 10,051 each way, 335 s, loadavg 0.94 ->
+  0.00): down p99.9 1.908 ms max 4.200 ms E 3.5 us; up p99.9 2.111 ms max 2.839 ms E 6.5 us; stalls 204 (155-247) and
+  200 (152-243), all RACK. Kernel check out-20261108T004723Z/verdict.txt: PASS (final), guard 60/61, 54/56, 58/61;
+  RACK p50 33.344 vs 33.458 ms; share 6/172 in 1-15; one-gap count kernel 100 vs model 5,921 (the split the half-gap
+  ruling avoided); iptables before == after (diff). siocoutq-root-check-20261108T005258Z.txt: R0-R4 pass, VERDICT PASS.
+- RULING (a) ACCEPT. The tail is about 100x below the WebSocket marks' resolution (-18's 10 ms grid and 10 %
+  tolerance of ~654 ms; -31's 250 ms p99) and doesn't feed the model's fates (replay test); E meets U3-Q1 (c)'s
+  statistic; ImpairSocket shows the same tails in this container. Not (b) now: moving the pumps off tokio means
+  re-homing S's TLS stream on another runtime, with no mark to gain.
+- Carried to R1's run plan: DelayStream's self-test on RS under the WS part's real load (48 connections, P2, room
+  running), >= 10,000 samples per direction; judged E under about 10 us (U3-Q1 (c)'s statistic) and p99 <= 1 ms per
+  direction; p99.9 and max reported; each release split into clock-thread wake, pump start, and S's poll_write return
+  (stamps added before R1). A miss comes to me before -18's and -31's WS parts count; (b) is the prepared fallback.
