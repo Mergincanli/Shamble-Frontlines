@@ -33,6 +33,9 @@
   in its §6; C1-C9 and C13 mapped in its §7; the rule-diff table (E2) in its §8, 55 rows, looser rows all from his A4
   words (revert rows 17, 19, 21, 45 wait on REVERT-EXCEPTION); unsure rows 22, 25, 37 for the reviewers. Main moved to
   626df67 (#45, ADR 0001); a test merge with this branch is clean.
+- **Queued (2026-11-08):** his disk-hygiene item for `.claude/CHECKPOINTS.md`, word for word in
+  `mustafa-2026-11-08-disk-hygiene.md`; to STATUS's queue in this pass's docs-keeper step; when it is done is
+  DISK-WHEN (asked: ride A4's kit sitting as a fifth kit edit, or its own change-set after A4).
 - **Current step:** 3, waiting on Mustafa's TIER0-SCOPE and REVERT-EXCEPTION and his presence for the kit sitting
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.
