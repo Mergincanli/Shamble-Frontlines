@@ -71,3 +71,19 @@ Split approved with U6 carries. No escalation.
   Part 13's premise "jitter alone cannot reorder 30 Hz inputs" holds for the inputs only. Changing the model changes an
   ADR's profile definition: Mustafa's, but only if C6 shows a WebTransport mark moves; then before R3 with numbers.
   Not an escalation today; pending item JITTER-ORDER in the checkpoint.
+
+## Side rulings: U3c evidence (2026-11-08)
+- (1) Kernel cross-check: HALF A GAP confirmed as the judged rule (read run.sh:8-46 in worktree agent-a7fafe27...;
+  compare.py:12, :92, :116, :123: one rule, one code path for kernel and model). Reason: the scout's RACK cluster sits
+  AT one gap (45 stalls, p50 33.5 ms against a 33.3 ms gap, u3-scout-timing.md:392-393), so "more than one gap" would
+  cut that cluster in two; my C11 wording was wrong. Added: per run, judged episodes <= the client's tcpi_total_retrans
+  (probe.py:111 reads it), else VOID (receiver noise); every run kept and committed; one rerun per VOID/INVALID, a
+  second comes to me; a MISS is never rerun. -I INPUT 1 approved. The header notes the change and its date.
+- (2) Tests: switch to tokio-tungstenite now, with futures-util as a DEV-dependency pinned =0.3.34 (Cargo.lock:389;
+  default-features off, ["sink", "std"] as tokio-tungstenite 0.30.0 asks): no new package, ships nothing. The Bridge
+  (delay_tests.rs:176-292) is a hand copy of tokio-tungstenite's AllowStd with different waker handling, and that is
+  where DelayStream's Pending/wake/flush meets the library. DelayStream keeps separate reader/writer/shutter wakers
+  (delay.rs:216-219); add one loopback test with read and write halves in separate tasks. U6: tokio-tungstenite +
+  futures-util as a normal dependency (listed in §4.8, audited at U5), no hand adapter in shipped code.
+- FYI items: lateness evidence quiet, >= 10,000 samples per direction, loadavg recorded; W7 endorsed, with fixes.rs's
+  pinned tables unchanged after the swap.

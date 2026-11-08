@@ -487,6 +487,22 @@
   - M2: no bites for most limit reasons.
   - Unproven: ws_config "one source" untested; no TLS 1.2 refusal test; the loopback identity checked only as bounds;
     tautological checks in (b)/(c); base_rtt_ns > 0 netting untested.
+- **The advisor's U3c evidence rulings (2026-11-08; "Side rulings: U3c evidence" in advisor-u3c-plan.md), passed to
+  fix-A:**
+  - **(1) Half a send gap confirmed** as the judged stall rule.
+    - Noise guard: judged episodes <= the client's tcpi_total_retrans per run. More episodes, or no retransmissions,
+      make the run VOID.
+    - No re-running until it passes: every run's output is kept. A VOID or INVALID run is re-run once on a quiet
+      container; a second one goes to the advisor. A MISS is never re-run and goes to the advisor.
+    - -I INPUT 1 approved; the one-gap count reported, not judged; the ruling recorded in run.sh's header before any
+      run.
+  - **(2) The tests switch to tokio-tungstenite now:** futures-util =0.3.34 as a dev-dependency of npt-net (default
+    features off, ["sink", "std"]; no new lock package). The Bridge is deleted, and a split read/write loopback test
+    added. For U6: WsServer uses tokio-tungstenite with futures-util as a normal dependency (§4.8, U5 audit), with no
+    hand-written adapter.
+  - **The C10 quiet run:** at least 10,000 samples per direction, nothing else running, the load average recorded. If it
+    still fires, it goes to the advisor.
+  - **W7 endorsed** if fixes.rs's pins stay unchanged. The room's no-takeover rule stays in fixes.rs.
 - **Running now (3 agents):**
   - **fix-A**: general-purpose, xhigh, an isolated worktree at 4f3a560 with A's patch applied. Notes in its worktree:
     u3c-build-a-fix.md.
