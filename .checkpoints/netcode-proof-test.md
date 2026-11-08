@@ -513,6 +513,16 @@
     facts; the advisor's M1, M13, M14; plus the advisor's 2026-11-08 additions: steal read before and after each
     self-test run, and ImpairSocket's up E over about 10 us in this container reported). PLAN FIRST
     (.checkpoints/netcode-proof-test/u3d-plan.md), then the advisor.
+  - **About 22:50 UTC: U3d's planning workflow `wf_77078bc9-95f` (npt-u3d-plan) launched on 95dac9c**: scouts
+    (netcode-architect: requirements and what exists, notes u3d-scout-req.md; test-engineer: how R1 runs and records
+    the self-tests, u3d-scout-r1.md), then a netcode-architect drafter (u3d-plan.md rev 1), then two critics
+    (u3d-plan-review-test.md, u3d-plan-review-rust.md). Read-only agents, notes in this folder (the saver commits
+    them). If cut: resume with Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-plan-wf_77078bc9-95f.js,
+    resumeFromRunId: "wf_77078bc9-95f", args: {head: "95dac9c"}}). Then: fold the critics' findings into the plan
+    (rev 2), then the advisor's review; no code before its APPROVE.
+  - **The cleanup ask went to Mustafa in chat (about 22:55 UTC)**; waiting for his answer (task: clean after his yes,
+    by the approved method; the list is below).
 - **About 22:10 UTC: the condition-10 diagnostic DONE and committed (ecdeeb0)**:
   results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (identical to the raw output; redact 0). Split violations 0.
   Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the
