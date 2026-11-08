@@ -37,7 +37,10 @@
 //! delivered byte. The connection's lock is never held across S's own calls (F3): the pump stages the front down record
 //! under it (once per record, F4), releases it for S's write, flush, read or shutdown, then takes it again to commit
 //! what S took or read; S's reads land in the pump's own buffer and enter the model at a fresh now. Wakes always fire
-//! after the lock is released (F2).
+//! after the lock is released (F2). A down record released after a pass's down writes (by its up loop's steps, R1) is
+//! left for the next pass, which the pump wakes itself for at once unless S owes it a wake; an application task whose
+//! step releases a down record, or reopens the up room the pump stopped reading on (an acknowledgement at the client's
+//! end: G-PRE-WAKE), wakes the pump too. A pump that panics ends the connection with an error, never a clean EOF.
 //!
 //! **Held bytes (NC-U3c-2).** Down at most the 64 KB budget (it covers released-but-untaken bytes) plus the
 //! acknowledged prefix of the front record not yet released: a loss inside a record lets the acknowledgement of its
@@ -46,14 +49,15 @@
 //! record: 549 B, or the request's 8,214 B), plus the scanner's buffer (one frame, 527 B, or the request cap). Counted,
 //! current and largest, per direction.
 //!
-//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: six lateness histograms per direction (the
-//! total and the split's five parts, below), each with its per-second window kept as a difference against a sparse
-//! mark of the buckets the second touched (`stats::Running`: 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B
-//! reserve for the mark), the scanner's buffer (8,192 B at the defaults), the down record's staging buffer (16,384 B)
-//! and the pump's read buffer (527 B): 1,731,983 B at the defaults (`ws_conn_fixed_bytes`; 309,583 B before the split's
-//! ten histograms). On top: the held bytes above (below 81,942 B each way), and a dense mark of 135,040 B per histogram
-//! once a second's samples touch more than 256 of its buckets. U6 sizes WsServer's accept cap from these and
-//! tungstenite's own buffers (48 players: about 83 MB here).
+//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: one lateness histogram per direction, with
+//! its per-second window kept as a difference against a sparse mark of the buckets the second touched
+//! (`stats::Running`: 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B reserve for the mark), the scanner's buffer
+//! (8,192 B at the defaults), the down record's staging buffer (16,384 B) and the pump's read buffer (527 B): 309,583 B
+//! at the defaults (`ws_conn_fixed_bytes`). On top: the held bytes above (below 81,942 B each way), and a dense mark of
+//! 135,040 B per histogram once a second's samples touch more than 256 of its buckets. Once per process, at the first
+//! wrap: the split's pool below, ten histograms of 135,040 B, 1,350,400 B (`ws_split_fixed_bytes`) whatever the number
+//! of connections. U6 sizes WsServer's accept cap from these and tungstenite's own buffers (48 players: about 14.9 MB
+//! here, plus the pool's 1.35 MB).
 //!
 //! **Lateness (M1, C10).** Down at the return of S's `poll_write` that takes a record's last byte; up at the return of
 //! `poll_read` that hands its last byte to tungstenite; each against the record's model delivery stamp, in the same
@@ -70,15 +74,19 @@
 //! lock), work = (3) − P (down: the pump's work and S's write; up: the rest of the pass and the reader's turn). Every
 //! other release is in the **other** class, with no clock part: wait = T − M, work = (3) − T, counted by its step: an
 //! opening step no fire covered (the pass was woken by S's I/O, an application task or a shutdown, or by a fire before
-//! the record came due), the pump's step inside its pass (its up loop; a down record released there is written at the
-//! pump's next pass), or an application task's step (`current`, `add_burst`). Each part is the difference of two
-//! stamps, never a remainder, so the parts sum to L exactly only while the stamps chain: the identity test checks it per
-//! release. One `stats::Running` per part per direction, with the total's statistics.
+//! the record came due), the pump's step inside its pass (its up loop; a down record released there is written by the
+//! pump's next pass, which it wakes for at once: R1), or an application task's step (`current`, `add_burst`). Each part
+//! is the difference of two stamps, never a remainder, so the parts sum to L exactly only while the stamps chain: each
+//! release is checked as it is recorded, a mismatch counted (`ws_late_<dir>_split_violations_count`), and the identity
+//! test checks it per release. The parts are the run's, pooled (the advisor's ruling (b) on the split's memory,
+//! 2026-11-08): one `stats::Pooled` per part per direction shared by every connection in the process, with the total's
+//! statistics, updated by relaxed atomics (no lock, no allocation on the release path) and read once over the run
+//! (`DelayStream::split_rows`, the `ws_split` event); the connection keeps only its total.
 
 use super::config::{L2Config, one_way_ns};
 use super::delay_clock::{self, Clock};
 use super::delay_names::{self as names, KINDS, PARTS, Split};
-use super::stats::{Running, Summary};
+use super::stats::{Pooled, Running, Summary};
 use super::thread;
 use super::ws_frame::{Boundary, MAX_HEADER, REASONS, Reason, Scanner};
 use crate::tcp_model::{MAX_BURSTS, MODEL, NOT_MODELLED, TcpConfig, TcpModel};
@@ -90,7 +98,9 @@ use std::io;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
-use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
+use std::sync::atomic::AtomicU64;
+use std::sync::atomic::Ordering::Relaxed;
+use std::sync::{Arc, Mutex, MutexGuard, OnceLock, PoisonError};
 use std::task::{Context, Poll, Waker};
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
@@ -161,6 +171,45 @@ struct Freed {
     step: u64,
     woke: Option<u64>,
     kind: usize,
+}
+
+/// The per-release split over the run (the advisor's ruling (b) on its memory, 2026-11-08): per direction one
+/// `stats::Pooled` per part, the other class's releases by kind, and the releases whose parts did not sum to their total
+/// (the identity, checked per release and counted). Shared by every connection in the process: created at the first
+/// wrap, never on the release path, and fixed from then on. Every update is a relaxed atomic, so a release takes no
+/// lock beyond its own connection's (none of its own, so none held across an await or nested in a connection's lock),
+/// waits on no other connection and allocates nothing.
+struct Pool {
+    parts: [[Pooled; PARTS]; 2],
+    kinds: [[AtomicU64; KINDS]; 2],
+    violations: [AtomicU64; 2],
+}
+
+static POOL: OnceLock<Pool> = OnceLock::new();
+
+/// The process's split (created at its first call: `build`, before any connection releases a record).
+fn pool() -> &'static Pool {
+    POOL.get_or_init(|| Pool {
+        parts: std::array::from_fn(|_| std::array::from_fn(|_| Pooled::new())),
+        kinds: Default::default(),
+        violations: Default::default(),
+    })
+}
+
+impl Pool {
+    /// The split over the run so far, per direction.
+    fn read(&self) -> [Split; 2] {
+        std::array::from_fn(|d| Split {
+            parts: std::array::from_fn(|p| self.parts[d][p].summary()),
+            kinds: std::array::from_fn(|k| self.kinds[d][k].load(Relaxed)),
+            violations: self.violations[d].load(Relaxed),
+        })
+    }
+
+    /// The heap it holds, once per process: ten histograms of 135,040 B (`ws_split_fixed_bytes`).
+    fn heap_bytes() -> u64 {
+        2 * PARTS as u64 * Pooled::heap_bytes()
+    }
 }
 
 /// The split's bites (M2's pattern): the identity test turns one on and the identity must fail.
@@ -306,13 +355,17 @@ pub(crate) struct Snapshot {
     pub(crate) sent_log: Vec<(usize, u64, u32, u64, bool)>,
     /// Down plaintext S has taken.
     pub(crate) taken_down: u64,
-    /// The lateness and its split over every sample, `[down, up]`.
+    /// The lateness over every sample, `[down, up]`.
     pub(crate) late: [Summary; 2],
-    pub(crate) split: [Split; 2],
+    /// This connection's releases whose split parts did not sum to their total, `[down, up]` (its share of the
+    /// pool's counted violations).
+    pub(crate) split_violations: [u64; 2],
 }
 
 /// The pump's lifetime for the shutdown tests (W3, M1): its polls, those at or after the shutdown deadline, the
-/// deadline and the stamp it ended at (DelayStream's clock).
+/// deadline and the stamp it ended at (DelayStream's clock). And the tests' counts: move_up's compactions that shifted
+/// records still pending (G-F10's vacuity), and per direction the held-bytes samples above NC-U3c-2's bound and the
+/// largest excess of the records held over the 64 KB budget (G-NC2; `Conn::check_held_bound`).
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) struct Life {
@@ -320,6 +373,9 @@ pub(crate) struct Life {
     pub(crate) polls_after_deadline: u64,
     pub(crate) deadline: Option<u64>,
     pub(crate) ended_ns: Option<u64>,
+    pub(crate) shifted: u64,
+    pub(crate) held_over_bound: [u64; 2],
+    pub(crate) held_beyond_budget: [u64; 2],
 }
 
 /// One logged step (model axis).
@@ -381,15 +437,14 @@ struct Conn {
     down_done: bool,
     failed: Option<io::ErrorKind>,
     closed: Option<Reason>,
-    /// The release lateness per direction: the connection's whole and its per-second window (F7).
+    /// The release lateness per direction: the connection's whole and its per-second window (F7). Its per-release
+    /// split goes to the process's pool (`Pool`).
     late: [Running; 2],
-    /// Its per-release split per direction: one histogram per part (`Split::parts`' order), and the other class's
-    /// counts by kind with their mark at the window's start.
-    split: [[Running; PARTS]; 2],
-    kinds: [[u64; KINDS]; 2],
-    mark_kinds: [[u64; KINDS]; 2],
     #[cfg(test)]
     split_bite: SplitBite,
+    /// The tests' copy of this connection's share of the pool's violations.
+    #[cfg(test)]
+    split_violations: [u64; 2],
     held: [u64; 2],
     held_max: [u64; 2],
     held_max_run: [u64; 2],
@@ -423,6 +478,29 @@ impl Conn {
             .saturating_sub(self.released_model[UP])
     }
 
+    /// The up room the pump waits for before it can go on: the front record the scanner holds whole and the model has
+    /// not taken yet (its length + 22 B; move_up keeps the scanner's buffer starting at that record, so its end is its
+    /// length), else the read floor (S is read only from there).
+    fn up_need(&self) -> u64 {
+        match self.bounds.front() {
+            Some(&(end, _)) => end as u64 + OVERHEAD,
+            None => self.read_floor,
+        }
+    }
+
+    /// An application task's step to `t` (`current`, `add_burst`): what it released per direction, and whether it owes
+    /// the pump a wake: for a released down record (the pump writes it into S), or when the step lifted the up room to
+    /// what the pump waits for from below it (an acknowledgement at the client's end reopened the room the pump stopped
+    /// reading on: G-PRE-WAKE). The pump's clock entry may have moved past the events stepped here (`reschedule`), so
+    /// neither wake can wait for it.
+    fn app_step(&mut self, t: u64) -> ([bool; 2], bool) {
+        let need = self.up_need();
+        let before = self.up_room();
+        let got = self.step_to(t, By::App);
+        let reopened = before < need && self.up_room() >= need;
+        (got, got[DOWN] || reopened)
+    }
+
     fn held_now(&mut self) {
         self.held = [
             self.bytes[DOWN].len() as u64,
@@ -432,11 +510,37 @@ impl Conn {
             self.held_max[d] = self.held_max[d].max(self.held[d]);
             self.held_max_run[d] = self.held_max_run[d].max(self.held[d]);
         }
+        #[cfg(test)]
+        self.check_held_bound();
     }
 
-    /// Records `rec`'s release at `at`, its stamp (3): the lateness L = at − M against its model delivery stamp M, and
-    /// L's split by how it was released (the module documentation), each part the difference of two stamps, never a
-    /// remainder. Returns L.
+    /// NC-U3c-2's bound on every held-bytes sample (the tests; G-NC2): per direction the plaintext held in records (down:
+    /// all DelayStream holds; up: less the scanner's buffer) is at most the 64 KB budget plus the acknowledged prefix of
+    /// the front record not yet released (a loss inside it lets the acknowledgement of its first segments free that
+    /// prefix in the budget while it waits to be delivered whole). Counts the samples above it and keeps the largest
+    /// excess over the budget.
+    #[cfg(test)]
+    fn check_held_bound(&mut self) {
+        let budget = TcpConfig::default().write_budget;
+        for d in [DOWN, UP] {
+            let held = self.bytes[d].len() as u64;
+            let una = self.model_end[d] - self.model.outstanding(d);
+            let prefix = self.recs[d].get(self.released[d]).map_or(0, |r| {
+                let size = r.len as u64 + OVERHEAD;
+                una.saturating_sub(r.model_end - size).min(size)
+            });
+            if held > budget + prefix {
+                self.life.held_over_bound[d] += 1;
+            }
+            self.life.held_beyond_budget[d] =
+                self.life.held_beyond_budget[d].max(held.saturating_sub(budget));
+        }
+    }
+
+    /// Records `rec`'s release at `at`, its stamp (3): the lateness L = at − M against its model delivery stamp M in the
+    /// connection's histogram, and L's split by how it was released (the module documentation) in the process's pool,
+    /// each part the difference of two stamps, never a remainder. The parts must sum to L (they do while the stamps
+    /// chain); a release whose parts do not is counted, the identity's violation. Returns L.
     fn late(&mut self, dir: usize, rec: &Rec, at: u64) -> u64 {
         let due = self.origin.saturating_add(rec.released.unwrap_or_default());
         let total = at.saturating_sub(due);
@@ -452,14 +556,23 @@ impl Conn {
         };
         #[cfg(test)]
         let parts = self.split_bite.apply(parts, at, f.woke);
+        let pool = pool();
+        let p = &pool.parts[dir];
         if f.woke.is_some() {
-            self.split[dir][CLOCK].record(parts[0]);
-            self.split[dir][HOP].record(parts[1]);
-            self.split[dir][WORK].record(parts[2]);
+            p[CLOCK].record(parts[0]);
+            p[HOP].record(parts[1]);
+            p[WORK].record(parts[2]);
         } else {
-            self.split[dir][WAIT].record(parts[0]);
-            self.split[dir][OTHER_WORK].record(parts[1]);
-            self.kinds[dir][f.kind] += 1;
+            p[WAIT].record(parts[0]);
+            p[OTHER_WORK].record(parts[1]);
+            pool.kinds[dir][f.kind].fetch_add(1, Relaxed);
+        }
+        if parts[0].saturating_add(parts[1]).saturating_add(parts[2]) != total {
+            pool.violations[dir].fetch_add(1, Relaxed);
+            #[cfg(test)]
+            {
+                self.split_violations[dir] += 1;
+            }
         }
         #[cfg(test)]
         self.logs.splits.push(SplitLog {
@@ -473,25 +586,6 @@ impl Conn {
             parts,
         });
         total
-    }
-
-    /// The split's rows: each part's summary (the whole connection, or the current window) and the other class's
-    /// counts by kind (totals, or since the window's mark).
-    fn split_rows(&mut self, window: bool) -> [Split; 2] {
-        let mut out = [Split::default(); 2];
-        for (d, o) in out.iter_mut().enumerate() {
-            for (p, s) in o.parts.iter_mut().enumerate() {
-                *s = if window {
-                    self.split[d][p].window()
-                } else {
-                    self.split[d][p].whole()
-                };
-            }
-            for k in 0..KINDS {
-                o.kinds[k] = self.kinds[d][k] - if window { self.mark_kinds[d][k] } else { 0 };
-            }
-        }
-        out
     }
 
     /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
@@ -716,6 +810,10 @@ impl Conn {
             for b in &mut self.bounds {
                 b.0 -= start;
             }
+            #[cfg(test)]
+            if !self.bounds.is_empty() {
+                self.life.shifted += 1;
+            }
         }
     }
 
@@ -930,11 +1028,10 @@ where
             failed: None,
             closed: None,
             late: [Running::new(), Running::new()],
-            split: std::array::from_fn(|_| std::array::from_fn(|_| Running::new())),
-            kinds: [[0; KINDS]; 2],
-            mark_kinds: [[0; KINDS]; 2],
             #[cfg(test)]
             split_bite: SplitBite::Off,
+            #[cfg(test)]
+            split_violations: [0; 2],
             held: [0; 2],
             held_max: [0; 2],
             held_max_run: [0; 2],
@@ -949,13 +1046,10 @@ where
         };
         let scratch = vec![0u8; RECORD_MAX].into_boxed_slice();
         let rbuf = vec![0u8; max_frame].into_boxed_slice();
-        c.fixed_bytes = c
-            .late
-            .iter()
-            .chain(c.split.iter().flatten())
-            .map(Running::heap_bytes)
-            .sum::<u64>()
+        c.fixed_bytes = c.late.iter().map(Running::heap_bytes).sum::<u64>()
             + (c.parse.len() + scratch.len() + rbuf.len()) as u64;
+        // The process's split exists before this connection can release a record (no allocation on the release path).
+        pool();
         let sh = Arc::new(Shared {
             key,
             clock,
@@ -988,6 +1082,17 @@ impl DelayStream<()> {
     pub fn now_ns() -> u64 {
         delay_clock::clock().now_ns()
     }
+
+    /// The per-release split over the run so far, pooled over every connection in the process (the `ws_split` event's
+    /// fields, `event.ws_split.<name>`; SERIES.md): per direction the class counts, each part's statistics, the other
+    /// class's releases by kind and the releases whose parts did not sum to their total. Read it once the traffic has
+    /// ended. U6 carry: npt-server's writer writes it at the run's end, through a public reading then.
+    #[cfg_attr(not(test), allow(dead_code))]
+    pub(crate) fn split_rows() -> Vec<(&'static str, u64)> {
+        let mut out = Vec::with_capacity(names::SPLIT_ROWS);
+        names::split_rows(pool().read(), &mut out);
+        out
+    }
 }
 
 impl<S> DelayStream<S> {
@@ -1004,7 +1109,7 @@ impl<S> DelayStream<S> {
         let sh = &self.sh;
         let mut c = sh.lock();
         let t = c.model_t(sh.clock.now_ns());
-        let got = c.step_to(t, By::App);
+        let (got, wake_pump) = c.app_step(t);
         let now = c.model.now_ns();
         let start = start_ns
             .checked_sub(c.origin)
@@ -1024,7 +1129,7 @@ impl<S> DelayStream<S> {
         }
         c.reschedule(sh.clock, sh.key);
         let w = c.wakers(got[UP], false);
-        let pump = if got[DOWN] {
+        let pump = if wake_pump {
             c.pump_waker.clone()
         } else {
             None
@@ -1046,19 +1151,20 @@ impl<S> DelayStream<S> {
     }
 
     /// Steps the model to now under the lock, owing wakes to what the step released or freed: the pump for released
-    /// down records, the reader for released up records, a waiting writer when acknowledgements freed the budget (the
-    /// pump's own clock entry may have moved past the events stepped here, so the wakes cannot wait for it). The wakes
-    /// fire when the returned guard drops, after the lock is released (F2).
+    /// down records and for an up room reopened to what it waits for (`Conn::app_step`), the reader for released up
+    /// records, a waiting writer when acknowledgements freed the budget (the pump's own clock entry may have moved past
+    /// the events stepped here, so the wakes cannot wait for it). The wakes fire when the returned guard drops, after
+    /// the lock is released (F2).
     fn current(&self) -> Stepped<'_> {
         let sh = &self.sh;
         let mut c = sh.lock();
         let mut wakes = [None, None, None, None];
         if !c.pump_done {
             let t = c.model_t(sh.clock.now_ns());
-            let got = c.step_to(t, By::App);
+            let (got, wake_pump) = c.app_step(t);
             c.reschedule(sh.clock, sh.key);
             let [r, w, s] = c.wakers(got[UP], false);
-            let pump = if got[DOWN] {
+            let pump = if wake_pump {
                 c.pump_waker.clone()
             } else {
                 None
@@ -1138,7 +1244,7 @@ impl<S> DelayStream<S> {
     /// separate calls).
     #[cfg(test)]
     pub(crate) fn snapshot(&self) -> Snapshot {
-        let mut c = self.current();
+        let c = self.current();
         Snapshot {
             origin: c.origin,
             now: c.model.now_ns(),
@@ -1148,7 +1254,7 @@ impl<S> DelayStream<S> {
             sent_log: c.model.sent_log().to_vec(),
             taken_down: c.written[DOWN] - c.bytes[DOWN].len() as u64,
             late: [c.late[DOWN].whole(), c.late[UP].whole()],
-            split: c.split_rows(false),
+            split_violations: c.split_violations,
         }
     }
 
@@ -1207,7 +1313,7 @@ impl<S> DelayStream<S> {
 
     /// The header's numbers (`header.params.<name>`; SERIES.md): the wrapper on, the injected delay, the model's TCP
     /// settings, the release clock's slack (read now by the clock thread itself, and as set at its start), the limits,
-    /// the connection's fixed memory.
+    /// the connection's fixed memory and the process's (the split's pool).
     ///
     /// It blocks (F6): the clock thread answers the slack reading, and the caller waits for it (one wake and one /proc
     /// read, at most 1 s if that thread is stuck). From async code call it through `tokio::task::spawn_blocking` (U6's
@@ -1252,6 +1358,7 @@ impl<S> DelayStream<S> {
             MAX_BURSTS as u64,
             MAX_RETURNS as u64,
             fixed,
+            Pool::heap_bytes(),
         ];
         names::HEADER_NUMBERS.iter().copied().zip(vals).collect()
     }
@@ -1284,7 +1391,8 @@ impl<S> DelayStream<S> {
 
     /// The per-second window since the last call (`second.v.<name>`), which it closes: per direction the model's
     /// counts (its maxima as they stand), the held bytes now and the window's largest, the lateness; then the
-    /// connection's own counts. Per connection: npt-server's writer merges its connections (U6).
+    /// connection's own counts. Per connection: npt-server's writer merges its connections (U6). The lateness's split
+    /// is the run's, pooled (`split_rows`).
     pub fn take_second(&self) -> Vec<(&'static str, u64)> {
         let mut c = self.current();
         let cur = [
@@ -1307,20 +1415,17 @@ impl<S> DelayStream<S> {
             [c.held[UP], c.held_max[UP]],
         ];
         let late: [Summary; 2] = [c.late[DOWN].window(), c.late[UP].window()];
-        let split = c.split_rows(true);
         let now = c.own.values();
         let mark = c.mark_own.values();
         let mut own = [0u64; REASONS + 3];
         for i in 0..own.len() {
             own[i] = now[i] - mark[i];
         }
-        let mut out = Vec::with_capacity(160);
-        names::window(tcp, held, late, split, &own, &mut out);
+        let mut out = Vec::with_capacity(80);
+        names::window(tcp, held, late, &own, &mut out);
         c.mark_tcp = cur;
         c.mark_own = c.own;
-        c.mark_kinds = c.kinds;
-        let cc = &mut *c;
-        for h in cc.late.iter_mut().chain(cc.split.iter_mut().flatten()) {
+        for h in &mut c.late {
             h.close_window();
         }
         c.held_max = c.held;
@@ -1342,9 +1447,8 @@ impl<S> DelayStream<S> {
             [c.held[UP], c.held_max_run[UP]],
         ];
         let late = [c.late[DOWN].whole(), c.late[UP].whole()];
-        let split = c.split_rows(false);
-        let mut out = Vec::with_capacity(160);
-        names::window(tcp, held, late, split, &c.own.values(), &mut out);
+        let mut out = Vec::with_capacity(80);
+        names::window(tcp, held, late, &c.own.values(), &mut out);
         out.push((names::CONNS_BEFORE, u64::from(c.conn)));
         out.push((names::ACCEPTED, c.accepted_ns));
         out.push((names::WRITTEN[DOWN], c.written[DOWN]));
@@ -1538,11 +1642,17 @@ struct Pump<S> {
 }
 
 impl<S> Drop for Pump<S> {
-    /// Ends the connection's part of the clock and wakes whoever waits, whatever ended the pump.
+    /// Ends the connection's part of the clock and wakes whoever waits, whatever ended the pump. A pump that panicked
+    /// ends the connection with an error, never a clean EOF that tungstenite would read as a normal close (G-PRE-PANIC):
+    /// tokio drops a panicked task's future inside its panic guard, so this runs while the thread panics (the lock
+    /// tolerates the poisoning such a panic may leave).
     fn drop(&mut self) {
         let w = {
             let mut c = self.sh.lock();
             c.pump_done = true;
+            if std::thread::panicking() && c.failed.is_none() {
+                c.failed = Some(io::ErrorKind::Other);
+            }
             #[cfg(test)]
             {
                 c.life.ended_ns = Some(self.sh.clock.now_ns());
@@ -1593,7 +1703,9 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
             wake_reader = c.step_to(t, By::Open(fire))[UP];
         }
 
-        // Down: each released record into S in one write call (C1), staged once (F4), S polled outside the lock.
+        // Down: each released record into S in one write call (C1), staged once (F4), S polled outside the lock. Whether
+        // the loop ended on S's Pending (then S owes the pump its wake for what is left) is kept for the closing block.
+        let mut s_owes_write = false;
         loop {
             if this.staged == 0 {
                 let c = sh.lock();
@@ -1652,7 +1764,10 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                     sh.lock().failed = Some(e.kind());
                     return Poll::Ready(());
                 }
-                Poll::Pending => break,
+                Poll::Pending => {
+                    s_owes_write = true;
+                    break;
+                }
             }
         }
         if this.unflushed {
@@ -1669,7 +1784,8 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
         // Up: S read outside the lock into the pump's buffer while the up room holds one largest record (C2); under the
         // lock the bytes join the scanner's buffer, the model steps to a fresh now (it never goes back: another task
         // may have stepped it while the lock was free; and a record enters the model no earlier than its bytes were
-        // read, NC-U3c-3), then the limits apply before anything is buffered (C6) and whole records enter the model.
+        // read, NC-U3c-3), then the limits apply before anything is buffered (C6) and whole records enter the model. A
+        // down record this step releases is written by the pump's next pass, which the closing block wakes at once (R1).
         let mut fresh = 0;
         loop {
             let room = {
@@ -1738,16 +1854,25 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
             }
         }
 
-        let w = {
+        // R1 (C3: released down records go into S at once): a down record released after the down loop ended (by the up
+        // loop's steps, or by another task's step while the lock was free) is still unwritten here, and the clock owes no
+        // wake for it (its entry fired, and `due` has no term for released records). Unless S owes the pump a wake for
+        // its own Pending write, the pump wakes itself, after the lock is released, so its next pass writes the record at
+        // once.
+        let (w, again) = {
             let mut c = sh.lock();
             if c.dropped {
                 return Poll::Ready(());
             }
             c.held_now();
             c.reschedule(sh.clock, sh.key);
-            c.wakers(wake_reader, wake_writer)
+            let again = c.released[DOWN] > 0 && !s_owes_write;
+            (c.wakers(wake_reader, wake_writer), again)
         };
         wake_all(w);
+        if again {
+            cx.waker().wake_by_ref();
+        }
         Poll::Pending
     }
 }

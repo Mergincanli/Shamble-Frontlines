@@ -7,6 +7,9 @@
 //! own p50 (the constant offset the impairer may subtract: u3-scout-timing.md F1e; u3-verify-timing.md C15): exact
 //! for every bucket wholly above the threshold, and within 1 µs per sample for the one bucket it falls in.
 
+use std::sync::atomic::AtomicU64;
+use std::sync::atomic::Ordering::Relaxed;
+
 /// Linear buckets of 1 µs each, up to 8.192 ms.
 const LINEAR: usize = 8_192;
 /// Above that, 8 buckets per power of two of µs, from 2^13 to 2^43 µs (beyond any run).
@@ -288,6 +291,58 @@ impl Running {
         let sparse = self.sparse.capacity() * std::mem::size_of::<(u16, u64, u64)>();
         let dense = if self.dense.is_some() { hist } else { 0 };
         (hist + WORDS * std::mem::size_of::<u64>() + sparse + dense) as u64
+    }
+}
+
+/// One part of DelayStream's per-release split over a whole run, shared by every connection in the process (the
+/// advisor's ruling (b) on the split's memory, 2026-11-08): `Lateness`'s buckets, with each bucket's count and sum and
+/// the maximum kept as relaxed atomics. A release records without a lock and without allocating, from any task, so it
+/// never waits on another connection and never holds anything across an await. A summary copies the buckets into a
+/// fresh `Lateness` (allocating there, off the release path) and goes through the same `summarize`. A reading taken
+/// while releases record may hold a sample's sum and not yet its count, or its maximum and not its bucket; read after
+/// the traffic, it is exact.
+pub(crate) struct Pooled {
+    count: Box<[AtomicU64]>,
+    sum: Box<[AtomicU64]>,
+    max: AtomicU64,
+}
+
+impl Pooled {
+    pub(crate) fn new() -> Pooled {
+        let zeros = || (0..BUCKETS).map(|_| AtomicU64::new(0)).collect();
+        Pooled {
+            count: zeros(),
+            sum: zeros(),
+            max: AtomicU64::new(0),
+        }
+    }
+
+    /// One sample: three relaxed atomic updates (a bucket's sum wraps only past 584 years of lateness in it).
+    pub(crate) fn record(&self, ns: u64) {
+        let b = bucket_of(ns);
+        self.count[b].fetch_add(1, Relaxed);
+        self.sum[b].fetch_add(ns, Relaxed);
+        self.max.fetch_max(ns, Relaxed);
+    }
+
+    /// The summary over every sample so far (`Lateness::summary` of a copy).
+    pub(crate) fn summary(&self) -> Summary {
+        let mut l = Lateness::new();
+        for b in 0..BUCKETS {
+            let k = self.count[b].load(Relaxed);
+            if k > 0 {
+                l.count[b] = k;
+                l.sum[b] = self.sum[b].load(Relaxed);
+                l.n += k;
+            }
+        }
+        l.max = self.max.load(Relaxed);
+        l.summary()
+    }
+
+    /// The heap one holds: its buckets' counts and sums (135,040 B).
+    pub(crate) fn heap_bytes() -> u64 {
+        (2 * BUCKETS * std::mem::size_of::<AtomicU64>()) as u64
     }
 }
 
@@ -592,6 +647,36 @@ mod tests {
         }
         assert!(went_dense, "a window went dense");
         assert_eq!(r.heap_bytes(), base + (2 * BUCKETS * 8) as u64);
+    }
+
+    /// The split's memory (b): a `Pooled` histogram fed from four threads at once gives exactly what one `Lateness` fed
+    /// the same samples gives (its summary is read after the threads end), an empty one reports zeros, and it holds
+    /// one histogram's heap.
+    #[test]
+    fn a_pooled_histogram_fed_from_threads_equals_one_fed_the_same_samples() {
+        let pooled = Pooled::new();
+        assert_eq!(pooled.summary(), Summary::default());
+        assert_eq!(Pooled::heap_bytes(), 135_040);
+        let samples: Vec<Vec<u64>> = (0..4u64)
+            .map(|t| {
+                let mut rng = ChaCha8Rng::seed_from_u64(20 + t);
+                (0..5_000)
+                    .map(|_| {
+                        20_000 + rng.next_u64() % [300_000, 9_000_000, 60_000_000, 1][t as usize]
+                    })
+                    .collect()
+            })
+            .collect();
+        std::thread::scope(|s| {
+            for v in &samples {
+                let p = &pooled;
+                s.spawn(move || v.iter().for_each(|&ns| p.record(ns)));
+            }
+        });
+        let mut whole = Lateness::new();
+        samples.iter().flatten().for_each(|&ns| whole.record(ns));
+        assert_eq!(pooled.summary(), whole.summary());
+        assert_eq!(pooled.summary().n, 20_000);
     }
 
     #[test]

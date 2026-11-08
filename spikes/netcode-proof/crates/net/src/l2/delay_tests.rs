@@ -228,7 +228,8 @@ fn part_line(name: &str, s: &Summary) -> String {
     )
 }
 
-/// The split's lines for direction `d` from a row set (`run_summary`'s or a second's), as the evidence run prints them.
+/// The split's lines for direction `d` from the run's split rows (`DelayStream::split_rows`: pooled over the process's
+/// connections), as the evidence run prints them.
 fn split_lines(rows: &[(&'static str, u64)], d: usize) -> Vec<String> {
     let class = |p: usize| value(rows, names::SPLIT_COUNT[d][usize::from(p >= WAIT)]);
     let part = |p: usize| {
@@ -245,12 +246,14 @@ fn split_lines(rows: &[(&'static str, u64)], d: usize) -> Vec<String> {
     };
     let kind = |k: usize| value(rows, names::SPLIT_KIND[d][k]);
     let mut v = vec![format!(
-        "split: woken n {} (clock + hop + work = L), other n {} (wait + work = L; open {} mid {} app {})",
+        "split (pooled): woken n {} (clock + hop + work = L), other n {} (wait + work = L; open {} mid {} app {}); \
+         violations {}",
         class(CLOCK),
         class(WAIT),
         kind(OPEN),
         kind(MID),
-        kind(APP)
+        kind(APP),
+        value(rows, names::SPLIT_VIOLATIONS[d])
     )];
     for (p, label) in [
         (CLOCK, "woken clock W − M"),
@@ -291,15 +294,41 @@ fn largest(splits: &[SplitLog], d: usize, k: usize) -> Vec<String> {
         .collect()
 }
 
+/// One connection's per-release split as its log records it, per direction: the (woken, other) class counts, the
+/// other class's kinds, and the releases whose recorded parts do not sum to their total.
+#[derive(Debug, Default, Clone, Copy)]
+struct Tally {
+    n: [[u64; 2]; 2],
+    kinds: [[u64; KINDS]; 2],
+    broken: [u64; 2],
+}
+
+fn tally(s: &Snapshot) -> Tally {
+    let mut t = Tally::default();
+    for r in &s.logs.splits {
+        match r.woke {
+            Some(_) => t.n[r.dir][0] += 1,
+            None => {
+                t.n[r.dir][1] += 1;
+                t.kinds[r.dir][r.kind] += 1;
+            }
+        }
+        if r.parts.iter().sum::<u64>() != r.total {
+            t.broken[r.dir] += 1;
+        }
+    }
+    t
+}
+
 /// The per-release split's identity (the advisor's "condition 10 again", 2026-11-08) over one atomic snapshot: every
 /// release logged has its parts summing to its total in integer ns (woken: clock + hop + work; other: wait + work, no
 /// third part), its total equal to (3) − M, and its stamps chained (woken: M <= W <= P <= (3), from an opening step;
-/// other: M <= T <= (3)), so no part saturated; per direction the classes partition the releases the total's histogram
-/// counted, each part's histogram counted its class, and the kinds' counts are the other class's. Returns
-/// `[direction][woken, other]`, or the first release or count that breaks it.
+/// other: M <= T <= (3)), so no part saturated; per direction the classes partition the releases the connection's
+/// total histogram counted, and the connection counted no violation. Returns `[direction][woken, other]`, or the first
+/// release or count that breaks it. (The parts' histograms are the process's pool, shared by every connection: the
+/// identity test checks they grew by at least what the log holds.)
 fn split_identity(s: &Snapshot) -> Result<[[u64; 2]; 2], String> {
     let mut n = [[0u64; 2]; 2];
-    let mut kinds = [[0u64; KINDS]; 2];
     for (i, r) in s.logs.splits.iter().enumerate() {
         let sum: u64 = r.parts.iter().sum();
         if sum != r.total {
@@ -323,39 +352,51 @@ fn split_identity(s: &Snapshot) -> Result<[[u64; 2]; 2], String> {
                     return Err(format!("release {i} {r:?}: other stamps out of order"));
                 }
                 n[r.dir][1] += 1;
-                kinds[r.dir][r.kind] += 1;
             }
         }
     }
     for d in [DOWN, UP] {
-        let sp = &s.split[d];
-        let counted = [
-            sp.parts[CLOCK].n,
-            sp.parts[HOP].n,
-            sp.parts[WORK].n,
-            sp.parts[WAIT].n,
-            sp.parts[OTHER_WORK].n,
-        ];
-        let want = [n[d][0], n[d][0], n[d][0], n[d][1], n[d][1]];
-        if counted != want {
-            return Err(format!(
-                "dir {d}: the parts counted {counted:?}, the log {want:?}"
-            ));
-        }
         if n[d][0] + n[d][1] != s.late[d].n {
             return Err(format!(
                 "dir {d}: woken {} + other {} != the total's {}",
                 n[d][0], n[d][1], s.late[d].n
             ));
         }
-        if sp.kinds != kinds[d] {
-            return Err(format!(
-                "dir {d}: kinds {:?}, the log {:?}",
-                sp.kinds, kinds[d]
-            ));
-        }
+    }
+    if s.split_violations != [0, 0] {
+        return Err(format!("violations counted: {:?}", s.split_violations));
     }
     Ok(n)
+}
+
+/// The process's pool grew, from `before` to `after`, by at least the releases in `t` (other connections in the process
+/// only add): each part's count by its class's, the kinds by theirs, the violations by the broken releases.
+fn pool_grew(before: &[Split; 2], after: &[Split; 2], t: &Tally) -> Result<(), String> {
+    for d in [DOWN, UP] {
+        let grew = |p: usize| after[d].parts[p].n - before[d].parts[p].n;
+        let want = [t.n[d][0], t.n[d][0], t.n[d][0], t.n[d][1], t.n[d][1]];
+        let got = [
+            grew(CLOCK),
+            grew(HOP),
+            grew(WORK),
+            grew(WAIT),
+            grew(OTHER_WORK),
+        ];
+        if got.iter().zip(want).any(|(&g, w)| g < w) {
+            return Err(format!(
+                "dir {d}: the pool's parts grew by {got:?}, the log holds {want:?}"
+            ));
+        }
+        for k in 0..KINDS {
+            if after[d].kinds[k] - before[d].kinds[k] < t.kinds[d][k] {
+                return Err(format!("dir {d}: kind {k} grew less than the log's"));
+            }
+        }
+        if after[d].violations - before[d].violations < t.broken[d] {
+            return Err(format!("dir {d}: violations grew less than the log's"));
+        }
+    }
+    Ok(())
 }
 
 /// p50, p99 and the largest of `v` in ms.
@@ -646,8 +687,9 @@ async fn order_and_integrity_both_ways_and_no_byte_seen_before_its_release() {
 
 /// The one-record rule (C1): with 30,000 B free, a 40,000 B write takes one record of 16,384 B, the next only what
 /// leaves 22 B for its own record, and the budget is never exceeded; then Pending (never Ok(0)), with tungstenite's
-/// rest owed. The exact numbers need every byte still in flight when they are read, so the round trip is 20 s (F-I):
-/// no acknowledgement can arrive within the test's synchronous few milliseconds unless the process freezes for 10 s.
+/// rest owed; a return taken then records that owed amount (G-NC4). The exact numbers need every byte still in flight
+/// when they are read, so the round trip is 20 s (F-I): no acknowledgement can arrive within the test's few
+/// milliseconds unless the process freezes for 10 s.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn one_record_per_write_never_beyond_the_budget() {
     let (_client, server) = tokio::io::duplex(1 << 20);
@@ -681,6 +723,18 @@ async fn one_record_per_write_never_beyond_the_budget() {
     assert_eq!(
         writes(&l, DOWN),
         vec![16_406, 16_406, 2_724, 16_406, 13_594]
+    );
+    // G-NC4: a return taken while tungstenite's write is Pending records what it owes (`Return.owed`, r2:379 (3)'s
+    // part above this socket): a 1 ms burst ending soon, passed by the next step.
+    let start = add_burst_soon(&ds, MS);
+    assert!(
+        until(HANG, || !ds.returns().is_empty()).await,
+        "hang guard: the burst's end"
+    );
+    let r = ds.returns()[0];
+    assert_eq!(
+        (r.at_ns, r.owed, r.outstanding),
+        (start + MS, 10_044, BUDGET)
     );
 }
 
@@ -732,14 +786,17 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
         "up held {} B",
         max[UP]
     );
-    // F-H: the bounds were reached, not merely respected. Down: the writes stopped with at most 22 B free, so the
-    // records held (at most 9 of 8,214 B) hold the budget less 22 B and their overheads, less what S took (at most the
-    // duplex's 1 KB): above 64 KB − one record. Up: the client sends far more than the budget, S is read until the up
-    // room is below the 549 B floor, so the records in the model or released hold more than 64 KB − 549 B, less 22 B
-    // for each of at most 125 records of 506 + 22 B.
+    // F-H: the bounds were reached, not merely respected. Down (G-FH: the bound at its own derivation): the writes
+    // stopped with at most 22 B free, so the records written (at most 9: 8 of 8,214 B already exceed the budget) carry
+    // at least 64 KB − 22 B − 9 x 22 B = 65,316 B of plaintext (65,360 B here), of which S has taken at most the
+    // duplex's 1 KB when the largest is read: 64,292 B. A writer that went Pending with 8 KB or more still free fails
+    // it. Up: the client sends far more than the budget, S is read until the up room is below the 549 B floor, so the
+    // records in the model or released hold more than 64 KB − 549 B, less 22 B for each of at most 125 records of
+    // 506 + 22 B.
+    let down_least = BUDGET - OVERHEAD * 10 - 1_024;
     assert!(
-        max[DOWN] >= BUDGET - RECORD_MAX as u64,
-        "down reached only {} B",
+        max[DOWN] >= down_least,
+        "down reached only {} B of {down_least} B",
         max[DOWN]
     );
     let floor = 513 + 14 + OVERHEAD;
@@ -1161,7 +1218,8 @@ fn burst_state<S>(ds: &DelayStream<S>) -> (Vec<(u64, u64)>, Vec<u64>) {
 /// of u64::MAX is one) is refused, leaving the model's bursts and the burst ends as they were; the longest burst from a
 /// start (u64::MAX − start) is accepted, and the pump's next due time is then its end, never a time wrapped into the
 /// past (the old code panicked here in a debug build and spun in a release one); the idle pump does not run. Also
-/// NC-U3c-8: a start at the model's now is refused, the next nanosecond accepted.
+/// NC-U3c-8: a start at the model's now is refused, the next nanosecond accepted (the model 10 s ahead of the clock, so
+/// no stall decides it: G-NC8).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
     let (_client, server) = tokio::io::duplex(1 << 12);
@@ -1192,12 +1250,13 @@ async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
     tokio::time::sleep(Duration::from_millis(50)).await;
     let runs = ds.life().polls - polls;
     assert!(runs <= 1, "the pump ran {runs} times on an idle connection");
-    // NC-U3c-8 on the model's own now.
+    // NC-U3c-8 on the model's own now, stepped 10 s ahead of the clock (G-NC8): add_burst steps the model to the
+    // clock's now, which stays behind it unless the test thread stalls 10 s, so no stall can flip the second answer.
     let (_c2, s2) = tokio::io::duplex(1 << 12);
     let d2 = DelayStream::wrap(s2, &cfg(fixed(2_000), 16), 0, now()).expect("wrapped");
     let at_now = {
         let mut c = d2.sh.lock();
-        let t = c.model_t(delay_clock::clock().now_ns() + 10 * MS);
+        let t = c.model_t(delay_clock::clock().now_ns() + 10 * SEC);
         c.step_to(t, By::App);
         c.origin + c.model.now_ns()
     };
@@ -1812,6 +1871,255 @@ async fn the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it() {
     );
 }
 
+/// An S whose every write takes `slow` (the thread sleeps, as rustls and a slow syscall would hold it) and takes the
+/// whole offer, logging (stamp, bytes); its reads come from the duplex.
+struct SlowS {
+    io: DuplexStream,
+    slow: Duration,
+    out: Arc<Mutex<Vec<(u64, usize)>>>,
+}
+
+impl AsyncRead for SlowS {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.io).poll_read(cx, buf)
+    }
+}
+
+impl AsyncWrite for SlowS {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<io::Result<usize>> {
+        std::thread::sleep(self.slow);
+        self.out.lock().expect("out").push((now(), buf.len()));
+        Poll::Ready(Ok(buf.len()))
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        Poll::Ready(Ok(()))
+    }
+}
+
+/// A waker that stamps each of its wakes on DelayStream's clock, from any thread.
+struct StampWake(Mutex<Vec<u64>>);
+
+impl std::task::Wake for StampWake {
+    fn wake(self: Arc<Self>) {
+        self.wake_by_ref();
+    }
+
+    fn wake_by_ref(self: &Arc<Self>) {
+        self.0.lock().expect("stamps").push(now());
+    }
+}
+
+/// R1 (the fix review's regression; C3: released down records go into S at once), the critic's probe 1 on a pump
+/// polled by hand (one thread, nothing else steps the model): records A and B written 20 ms apart, fixed(400) (200 ms
+/// one way, no jitter, no loss), the pump polled 1 ms after A's delivery while S takes 30 ms per write. The pass's
+/// opening step releases A and writes it; B's delivery falls inside that write, so the pass's up loop releases it
+/// (By::Mid), after the down loop ended. Judged on model state and wake stamps: after the pass, a released down record
+/// left unwritten must have had the pump's waker woken between its release step and the pass's end (the clock owes no
+/// wake for it: its entry fired at A's delivery, and the next model event, an acknowledgement, is over 100 ms after the
+/// pass), and the pass that wake asks for writes it. Vacuity: B was released by the up loop's step; a thread stalled
+/// past B's delivery before the poll releases both at the opening step, so such an attempt is retried (5 at most).
+#[tokio::test(flavor = "current_thread")]
+async fn a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake() {
+    for attempt in 1..=5 {
+        let (_client, server) = tokio::io::duplex(1 << 20);
+        let out = Arc::new(Mutex::new(Vec::new()));
+        let s = SlowS {
+            io: server,
+            slow: Duration::from_millis(30),
+            out: Arc::clone(&out),
+        };
+        let c = cfg(fixed(400), 20);
+        let one_way = one_way_ns(&c);
+        let (mut ds, mut pump) = DelayStream::build(s, &c, 0, now()).expect("built");
+        let sw = Arc::new(StampWake(Mutex::new(Vec::new())));
+        let waker = Waker::from(Arc::clone(&sw));
+        let run = |p: &mut Pump<SlowS>| {
+            assert!(
+                Pin::new(p)
+                    .poll(&mut Context::from_waker(&waker))
+                    .is_pending()
+            );
+        };
+        run(&mut pump);
+        let rec = vec![0x82u8; 1_000];
+        assert!(matches!(
+            Pin::new(&mut ds).poll_write(&mut noop(), &rec),
+            Poll::Ready(Ok(1_000))
+        ));
+        std::thread::sleep(Duration::from_millis(20));
+        assert!(matches!(
+            Pin::new(&mut ds).poll_write(&mut noop(), &rec),
+            Poll::Ready(Ok(1_000))
+        ));
+        let a_due = {
+            let c = ds.sh.lock();
+            c.origin + c.logs.steps[0].0 + one_way
+        };
+        while now() < a_due + MS {
+            std::thread::sleep(Duration::from_micros(200));
+        }
+        run(&mut pump);
+        let after = now();
+        let (left, front) = {
+            let c = ds.sh.lock();
+            (c.released[DOWN], c.recs[DOWN].front().map(|r| r.freed))
+        };
+        let wakes = sw.0.lock().expect("stamps").clone();
+        if left == 0 {
+            println!(
+                "attempt {attempt}: both records released at the pass's opening step (a stalled thread); again"
+            );
+            continue;
+        }
+        let f = front.expect("the unwritten record");
+        assert_eq!(
+            (left, f.kind),
+            (1, MID),
+            "B, released by the up loop's step"
+        );
+        let owed: Vec<u64> = wakes
+            .iter()
+            .copied()
+            .filter(|&w| w >= f.step && w <= after)
+            .collect();
+        println!(
+            "attempt {attempt}: B released by the up loop at {} ns, left unwritten; the pass ended at {after} ns; \
+             the pump's wakes between {owed:?}",
+            f.step
+        );
+        assert!(
+            !owed.is_empty(),
+            "a released down record left unwritten with no wake owed to the pump (R1)"
+        );
+        // The pass the wake asks for writes B.
+        run(&mut pump);
+        assert_eq!(ds.sh.lock().released[DOWN], 0, "B written");
+        assert_eq!(out.lock().expect("out").len(), 2, "A and B, one write each");
+        return;
+    }
+    panic!("5 attempts, each stalled past B's delivery before the poll");
+}
+
+/// G-PRE-WAKE: an acknowledgement at the client's end that reopens the up room, stepped by an application task
+/// (`current`, `add_burst`) rather than by the pump, wakes the pump; the old code woke nobody, and its clock entry
+/// moved past the event, so the pump stopped reading S until its next wake. On a pump polled by hand (one thread,
+/// fixed(400): 200 ms one way): one pass reads the request and a 150 KB flood until the up room is below what it waits
+/// for (the read floor, or the front frame the scanner holds); after the first flight's delivery (one way after the
+/// writes) and before any acknowledgement (a round trip) tungstenite's side reads every released record (each read
+/// frees its record and wakes the pump, unjudged), so only acknowledgements can reopen the room; then the test's own
+/// `current` calls step them. Judged on model state and wakes from the test's
+/// thread only (the clock thread's are not counted): the call whose step lifts the room across what the pump waits for
+/// woke the pump, and the pass that wake asks for takes more of the client's bytes into the model. Vacuity: the crossing
+/// is a `current` step, not a read's (a thread stalled past the first acknowledgement during the reads); such an attempt
+/// is retried (3 at most).
+#[tokio::test(flavor = "current_thread")]
+async fn an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump() {
+    for attempt in 1..=3 {
+        let (mut client, server) = tokio::io::duplex(1 << 20);
+        let c = cfg(fixed(400), 22);
+        let one_way = one_way_ns(&c);
+        let (mut ds, mut pump) = DelayStream::build(server, &c, 0, now()).expect("built");
+        let pw = ProbeWake::new(&ds.sh);
+        let pump_waker = Waker::from(Arc::clone(&pw));
+        let run = |p: &mut Pump<DuplexStream>| {
+            assert!(
+                Pin::new(p)
+                    .poll(&mut Context::from_waker(&pump_waker))
+                    .is_pending()
+            );
+        };
+        let mut flood = REQUEST.to_vec();
+        for _ in 0..300 {
+            flood.extend(frame(true, 2, true, &[7; 500], false));
+        }
+        client.write_all(&flood).await.expect("the flood");
+        run(&mut pump);
+        let (room, need, last, written) = {
+            let c = ds.sh.lock();
+            let last = c.logs.steps.last().expect("records in").0;
+            (c.up_room(), c.up_need(), last, c.written[UP])
+        };
+        assert!(
+            room < need,
+            "the pass stopped on the up room: {room} B < {need} B"
+        );
+        // The first flight (the initial window) is delivered one way after the writes; nothing is acknowledged before a
+        // round trip.
+        let delivered = ds.sh.lock().origin + last + one_way + MS;
+        while now() < delivered {
+            tokio::time::sleep(Duration::from_millis(2)).await;
+        }
+        let mut buf = vec![0u8; 4_096];
+        let mut rb = ReadBuf::new(&mut buf);
+        loop {
+            match Pin::new(&mut ds).poll_read(&mut noop(), &mut rb) {
+                Poll::Ready(Ok(())) => {
+                    assert!(!rb.filled().is_empty(), "no EOF here");
+                    rb.clear();
+                }
+                Poll::Ready(Err(e)) => panic!("{e}"),
+                Poll::Pending => break,
+            }
+        }
+        let (room, need) = {
+            let c = ds.sh.lock();
+            (c.up_room(), c.up_need())
+        };
+        if room >= need {
+            println!(
+                "attempt {attempt}: the room reopened during the reads (a stalled thread); again"
+            );
+            continue;
+        }
+        let end = Instant::now() + HANG;
+        let woke = loop {
+            assert!(
+                Instant::now() < end,
+                "hang guard: no acknowledgement reopened the up room"
+            );
+            tokio::time::sleep(Duration::from_millis(2)).await;
+            let (before, need) = {
+                let c = ds.sh.lock();
+                (c.up_room(), c.up_need())
+            };
+            let w0 = pw.seen().0;
+            let _ = ds.outstanding_bytes();
+            let after = ds.sh.lock().up_room();
+            if before < need && after >= need {
+                println!(
+                    "attempt {attempt}: a current() step lifted the up room {before} -> {after} B across {need} B"
+                );
+                break pw.seen().0 - w0;
+            }
+        };
+        assert_eq!(
+            woke, 1,
+            "the step that reopened the up room woke the pump once"
+        );
+        run(&mut pump);
+        let more = ds.sh.lock().written[UP];
+        assert!(
+            more > written,
+            "the woken pass took more of the client's bytes: {written} -> {more} B"
+        );
+        return;
+    }
+    panic!("3 attempts, each reopened during the reads");
+}
+
 /// F-G (C3): an EOF from S ends the up direction after its last delivered byte. The client writes the request and 40
 /// frames at once, then shuts its write half; tungstenite's side reads every byte the client wrote, in order, and only
 /// then Ok(0), with nothing left in the model or the scanner then. P2 with its loss, so repairs stand between the EOF
@@ -1859,6 +2167,172 @@ async fn an_eof_from_s_ends_the_up_direction_after_its_last_byte() {
         41,
         c.model.counters(UP).stalls
     );
+}
+
+/// G-F10 (F10's compaction; the critic's probe 4): tiny frames fill the up room before anyone reads, then tungstenite's
+/// side reads to the client's EOF, and every byte arrives in order. The client writes the request and 6,000 frames of
+/// 10 B (16 B on the wire, 38 B in the model each) at once, then shuts its write half; nobody reads until the up room
+/// is below the read floor (model state). Draining then frees one record per read, and each pump pass moves the next
+/// waiting record into the model and compacts the scanner's buffer with the records behind it still pending, so
+/// move_up's shift of their bounds decides every later byte (with the shift dropped, the pump panicked on a slice index
+/// and the reader saw the end early). Vacuity: such a compaction happened (a test count). fixed(20); a few seconds in
+/// a debug build.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn tiny_frames_that_fill_the_up_room_drain_whole_and_in_order() {
+    let (client, server) = tokio::io::duplex(1 << 20);
+    let mut ds = DelayStream::wrap(server, &cfg(fixed(20), 31), 0, now()).expect("wrapped");
+    let (_cr, mut cw) = tokio::io::split(client);
+    let mut sent = REQUEST.to_vec();
+    for i in 0..6_000u32 {
+        sent.extend(frame(true, 2, true, &[(i % 251) as u8; 10], false));
+    }
+    cw.write_all(&sent).await.expect("written");
+    cw.shutdown().await.expect("the client's write half shut");
+    assert!(
+        until(HANG, || {
+            let c = ds.sh.lock();
+            c.up_room() < c.read_floor
+        })
+        .await,
+        "hang guard: the up room filled"
+    );
+    let mut got = Vec::new();
+    let mut buf = vec![0u8; 4_096];
+    loop {
+        let n = tokio::time::timeout(HANG, ds.read(&mut buf))
+            .await
+            .expect("hang guard")
+            .expect("read");
+        if n == 0 {
+            break;
+        }
+        got.extend_from_slice(&buf[..n]);
+    }
+    let shifted = ds.life().shifted;
+    println!(
+        "{} of {} B, in order; compactions with records still pending: {shifted}",
+        got.len(),
+        sent.len()
+    );
+    assert!(got == sent, "every byte, in order");
+    assert!(shifted > 0, "move_up shifted pending bounds (not vacuous)");
+}
+
+/// G-NC2 (NC-U3c-2's corrected bound, under loss): the down plaintext DelayStream holds never exceeds the 64 KB budget
+/// plus the acknowledged prefix of the front record not yet released, checked on every held-bytes sample
+/// (`Conn::check_held_bound`), and that prefix does carry it beyond 64 KB. P2 with its loss and jitter; the writer keeps
+/// the budget full with 16 KB records while the client drains S. It runs until 100 records are written, a first
+/// transmission was lost, and a sample held more than 64 KB (model state; a hang guard only). Then: no sample above the
+/// bound either way, the largest excess over 64 KB is below one record (16,406 B), and first transmissions were lost.
+/// A few seconds.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix() {
+    let (client, server) = tokio::io::duplex(1 << 20);
+    let mut ds = DelayStream::wrap(server, &cfg(Profile::p2(), 25), 0, now()).expect("wrapped");
+    let (mut cr, _cw) = tokio::io::split(client);
+    let drain = tokio::spawn(async move {
+        let mut buf = vec![0u8; 1 << 16];
+        while cr.read(&mut buf).await.is_ok_and(|n| n > 0) {}
+    });
+    let end = Instant::now() + HANG;
+    let mut records = 0u64;
+    loop {
+        let beyond = ds.life().held_beyond_budget[DOWN];
+        let lost = ds.snapshot().counters[DOWN].first_lost;
+        if records >= 100 && beyond > 0 && lost > 0 {
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "hang guard: {records} records, largest excess {beyond} B, {lost} first losses"
+        );
+        ds.write_all(&[0x82; RECORD_MAX]).await.expect("written");
+        records += 1;
+    }
+    let life = ds.life();
+    let s = ds.snapshot();
+    println!(
+        "{records} writes of 16 KB at P2: largest down excess over 64 KB {} B; samples above the bound {:?}; first \
+         losses {}, stalls {}",
+        life.held_beyond_budget[DOWN],
+        life.held_over_bound,
+        s.counters[DOWN].first_lost,
+        s.counters[DOWN].stalls
+    );
+    assert_eq!(
+        life.held_over_bound,
+        [0, 0],
+        "held <= 64 KB + the front record's acknowledged prefix"
+    );
+    assert!(life.held_beyond_budget[DOWN] < RECORD_MAX as u64 + OVERHEAD);
+    drop(ds);
+    drain.await.expect("drained");
+}
+
+/// An S that serves reads from the duplex and panics at its first write.
+struct PanicS {
+    io: DuplexStream,
+}
+
+impl AsyncRead for PanicS {
+    fn poll_read(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.io).poll_read(cx, buf)
+    }
+}
+
+impl AsyncWrite for PanicS {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        _buf: &[u8],
+    ) -> Poll<io::Result<usize>> {
+        panic!("PanicS: the test's S panics at its first write (G-PRE-PANIC)");
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        Poll::Ready(Ok(()))
+    }
+}
+
+/// G-PRE-PANIC: a pump that panics gives tungstenite's side an error, never a clean EOF (which tungstenite would take
+/// for a normal close). A spawned pump over an S that panics at its first write: the client's request is read whole
+/// through DelayStream; then a down record is written, and once the model releases it the pump's write into S panics.
+/// The next reads give an error of kind Other (the pump ended while panicking), never Ok(0), and a write is refused
+/// with the same kind. fixed(20), well under 1 s; the waits are hang guards.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof() {
+    let (mut client, server) = tokio::io::duplex(1 << 16);
+    let mut ds =
+        DelayStream::wrap(PanicS { io: server }, &cfg(fixed(20), 24), 0, now()).expect("wrapped");
+    client.write_all(REQUEST).await.expect("the request");
+    let mut got = vec![0u8; REQUEST.len()];
+    tokio::time::timeout(HANG, ds.read_exact(&mut got))
+        .await
+        .expect("hang guard: the request")
+        .expect("read");
+    assert_eq!(got, REQUEST);
+    ds.write_all(&[0x82; 100]).await.expect("written");
+    let mut buf = [0u8; 64];
+    let r = tokio::time::timeout(HANG, ds.read(&mut buf))
+        .await
+        .expect("hang guard: the pump's end");
+    let (done, ..) = ds.probe();
+    assert!(done, "the pump ended");
+    match r {
+        Ok(0) => panic!("a panicked pump read as a clean EOF"),
+        Ok(n) => panic!("{n} B after the request"),
+        Err(e) => assert_eq!(e.kind(), io::ErrorKind::Other, "{e}"),
+    }
+    let e = ds.write_all(&[0x82; 10]).await.expect_err("refused");
+    assert_eq!(e.kind(), io::ErrorKind::Other);
 }
 
 /// C3: shutdown with every byte delivered and taken shuts S down at once (no timeout counted); with a client that
@@ -2050,13 +2524,16 @@ async fn its_rows_use_the_named_series() {
         [[0; 20]; 2],
         [[0; 2]; 2],
         [Summary::default(); 2],
-        [Split::default(); 2],
         &[0; REASONS + 3],
         &mut want,
     );
     let names_of = |v: &[(&'static str, u64)]| v.iter().map(|x| x.0).collect::<Vec<_>>();
     assert_eq!(names_of(&second), names_of(&want));
     assert_eq!(&names_of(&summary)[..want.len()], &names_of(&want)[..]);
+    // The split's rows are the run's (the `ws_split` event), not a connection's.
+    let mut split = Vec::new();
+    names::split_rows([Split::default(); 2], &mut split);
+    assert_eq!(names_of(&DelayStream::split_rows()), names_of(&split));
     assert_eq!(value(&summary, names::CONNS_BEFORE), 7);
     assert_eq!(value(&summary, names::ACCEPTED), 42);
     // header_numbers blocks on the clock thread's answer (F6): off the runtime's workers, as U6's writer will call it.
@@ -2075,14 +2552,20 @@ async fn its_rows_use_the_named_series() {
         10 * SEC,
         "SHUTDOWN_WAIT_NS"
     );
-    // F7: the heap a connection allocates at wrap at the defaults, as SERIES.md states it: twelve lateness histograms
-    // (per direction the total and the split's five parts) with their sparse marks (12 x (135,040 + 1,056 + 256 x 24)
-    // B), the scanner's buffer (8,192 B), the down staging buffer (16,384 B) and the read buffer (527 B).
+    // F7 and the split's memory (b): the heap a connection allocates at wrap at the defaults, as SERIES.md states it:
+    // two lateness histograms (one per direction) with their sparse marks (2 x (135,040 + 1,056 + 256 x 24) B), the
+    // scanner's buffer (8,192 B), the down staging buffer (16,384 B) and the read buffer (527 B); and once per process
+    // the split's pool, ten histograms of 135,040 B (per direction its five parts).
     assert_eq!(
         value(&h, "ws_conn_fixed_bytes"),
-        2 * (1 + PARTS as u64) * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
+        2 * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
     );
-    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 1_731_983);
+    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 309_583);
+    assert_eq!(
+        value(&h, "ws_split_fixed_bytes"),
+        2 * PARTS as u64 * 135_040
+    );
+    assert_eq!(value(&h, "ws_split_fixed_bytes"), 1_350_400);
     // F-M: the release clock's 1 ns slack, written by the thread and read back, at its start and now (a real-time
     // policy reads 0, as ImpairSocket's test allows; socket_tests.rs).
     let texts = ds.header_texts();
@@ -2191,10 +2674,11 @@ async fn the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default()
 ///   sees, so the receipt is a bound (never before the release), not the identity, and the rest of the path is
 ///   printed;
 /// - every stall is a first-transmission loss and their count sits in its 99.9 % two-sided binomial band at 2 %;
-/// - every release's lateness split sums to its total exactly (`split_identity`).
+/// - every release's lateness split sums to its total exactly, and no violation is counted (`split_identity`).
 ///
-/// Lateness is printed with condition 10's trigger, and below it the per-release split from the summary rows (the
-/// advisor's "condition 10 again": reported, never judged). Returns the number of lateness samples per direction.
+/// Lateness is printed with condition 10's trigger, and below it the per-release split from the run's rows, pooled per
+/// direction over the process's connections (the advisor's "condition 10 again" and (b): reported, never judged), and
+/// this connection's five largest releases. Returns the number of lateness samples per direction.
 async fn loopback(ticks: u64) -> [u64; 2] {
     let c = cfg(Profile::p2(), 21);
     let request_at = now();
@@ -2326,6 +2810,9 @@ async fn loopback(ticks: u64) -> [u64; 2] {
         );
     }
     let sum = ds.run_summary();
+    // The split's parts are the run's, pooled over the process's connections (the advisor's (b)): in the evidence run
+    // (one test, one connection) they are this connection's; in check.mjs's suite other tests add theirs.
+    let pooled = DelayStream::split_rows();
     let mut n = [0u64; 2];
     for (d, name) in [(DOWN, "down"), (UP, "up")] {
         let get = |i: usize| value(&sum, names::LATE[d][i]);
@@ -2349,7 +2836,7 @@ async fn loopback(ticks: u64) -> [u64; 2] {
                 &l
             )
         );
-        for line in split_lines(&sum, d) {
+        for line in split_lines(&pooled, d) {
             println!("  {name} {line}");
         }
         for line in largest(&s.logs.splits, d, 5) {
@@ -2397,17 +2884,36 @@ async fn split_session(bite: SplitBite, ticks: u64) -> Snapshot {
 
 /// The per-release split's identity (the advisor's "condition 10 again", 2026-11-08), over three short real loopback
 /// sessions side by side (`split_session`, 60 ticks each, about 3 s). With no bite, every release's parts sum to its
-/// total in integer ns, its stamps chain, the classes partition the releases the total counted, and the woken class is
-/// not empty either way. The bites, on the production path (`late`) from just after the handshakes: a part dropped (the
-/// woken hop recorded as 0) and a part misattributed (the woken work measured from the clock's wake (1) instead of the
-/// pass's start (2)); each must break the sum. A woken release's hop is the clock thread's wake call plus tokio's turn,
-/// never 0 ns, so each bite bites on every woken release after the handshake.
+/// total in integer ns, its stamps chain, the classes partition the releases the total counted, no violation is
+/// counted, and the woken class is not empty either way. The bites, on the production path (`late`) from just after
+/// the handshakes: a part dropped (the woken hop recorded as 0) and a part misattributed (the woken work measured from
+/// the clock's wake (1) instead of the pass's start (2)); each must break the sum, and `late`'s own check must count
+/// each broken release as a violation (exactly the log's broken releases). A woken release's hop is the clock thread's
+/// wake call plus tokio's turn, never 0 ns, so each bite bites on every woken release after the handshake. The split's
+/// histograms are the process's pool (the advisor's (b)): over the three sessions it grew by at least what their logs
+/// hold, part by part, kind by kind, and in violations.
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it() {
+    let before = pool().read();
     let runs = [SplitBite::Off, SplitBite::DropHop, SplitBite::WorkFromWake]
         .map(|b| (b, tokio::spawn(split_session(b, 60))));
+    let mut all = Tally::default();
     for (bite, run) in runs {
         let s = run.await.expect("the session");
+        let t = tally(&s);
+        for d in [DOWN, UP] {
+            for c in 0..2 {
+                all.n[d][c] += t.n[d][c];
+            }
+            for k in 0..KINDS {
+                all.kinds[d][k] += t.kinds[d][k];
+            }
+            all.broken[d] += t.broken[d];
+        }
+        assert_eq!(
+            s.split_violations, t.broken,
+            "{bite:?}: the violations late() counted are the log's broken releases"
+        );
         let got = split_identity(&s);
         if bite == SplitBite::Off {
             let n = got.unwrap_or_else(|e| panic!("the identity: {e}"));
@@ -2425,9 +2931,18 @@ async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it
         } else {
             let e = got.expect_err(&format!("the bite {bite:?} must break the identity"));
             assert!(e.contains("parts sum"), "{bite:?}: {e}");
-            println!("bite {bite:?} caught: {e}");
+            assert!(
+                t.broken.iter().sum::<u64>() > 0,
+                "{bite:?}: violations counted"
+            );
+            println!(
+                "bite {bite:?} caught: {e}; violations counted {:?}",
+                s.split_violations
+            );
         }
     }
+    let after = pool().read();
+    pool_grew(&before, &after, &all).unwrap_or_else(|e| panic!("the pool: {e}"));
 }
 
 /// Condition 10's evidence run (the main session's, quiet, nothing else alongside): the same run with at least 10,000
@@ -2749,6 +3264,9 @@ async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
                 "the budget was reached: {} B > ({n_ret} - 1) x {SNAP} B",
                 r.outstanding
             );
+            // G-NC4: nothing owed above DelayStream at a faithful return (the gate writes only with owed 0, and every
+            // write it let through was taken whole); the Pending case is one_record_per_write's.
+            assert_eq!(r.owed, 0, "owed at the return");
             let byte = r.first_byte_ns[DOWN].expect("a byte after the return");
             let message = r.first_message_ns[DOWN].expect("a message after the return");
             println!(

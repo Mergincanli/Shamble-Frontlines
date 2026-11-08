@@ -1,8 +1,8 @@
 //! The names DelayStream reports under (marks/SERIES.md's "DelayStream" section; README §1's rule: lowercase, ending
 //! in the unit, or a 0/1 flag; the advisor's M15 and u3c-plan.md 1.7). Directions are the model's ends: `down` is what
 //! RS sends (model end 0), `up` what the client sends (end 1). Per second they are `second.v.<name>`, at a
-//! connection's end the `ws_summary` event's fields, per burst the `burst_return` event's DelayStream fields, and the
-//! header's `header.params.<name>`.
+//! connection's end the `ws_summary` event's fields, per burst the `burst_return` event's DelayStream fields, the
+//! header's `header.params.<name>`, and the per-release split's, pooled over the run, the `ws_split` event's fields.
 
 use super::stats::Summary;
 use super::ws_frame::REASONS;
@@ -125,11 +125,13 @@ pub(crate) const PARTS: usize = 5;
 /// the pump's step inside its pass (its up loop), an application task's step.
 pub(crate) const KINDS: usize = 3;
 
-/// One direction's split: each part's summary (its `n` is its class's count) and the other class's counts by kind.
+/// One direction's split over the run: each part's summary (its `n` is its class's count), the other class's counts by
+/// kind, and the releases whose parts did not sum to their total (the identity, checked per release).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub(crate) struct Split {
     pub(crate) parts: [Summary; PARTS],
     pub(crate) kinds: [u64; KINDS],
+    pub(crate) violations: u64,
 }
 
 /// `[direction]`: the split's class counts, woken then other.
@@ -241,6 +243,15 @@ pub(crate) const SPLIT_KIND: [[&str; KINDS]; 2] = [
     ],
 ];
 
+/// `[direction]`: releases whose recorded parts did not sum to their total (0 unless the stamps failed to chain).
+pub(crate) const SPLIT_VIOLATIONS: [&str; 2] = [
+    "ws_late_down_split_violations_count",
+    "ws_late_up_split_violations_count",
+];
+
+/// The `ws_split` event's rows per direction: 2 class counts, 6 statistics per part, the kinds and the violations.
+pub(crate) const SPLIT_ROWS: usize = 2 * (2 + PARTS * 6 + KINDS + 1);
+
 /// The connection's own counts: closes by the scanner's reason (ws_frame::Reason's order), then the rest.
 pub(crate) const CLOSE: [&str; REASONS] = [
     "ws_close_request_count",
@@ -260,7 +271,7 @@ pub(crate) const ACCEPTED: &str = "ws_accepted_ns";
 pub(crate) const WRITTEN: [&str; 2] = ["ws_down_written_bytes", "ws_up_written_bytes"];
 
 /// The header's numbers.
-pub(crate) const HEADER_NUMBERS: [&str; 22] = [
+pub(crate) const HEADER_NUMBERS: [&str; 23] = [
     "ws_wrapper",
     "ws_one_way_ns",
     "ws_half_jitter_ns",
@@ -283,6 +294,7 @@ pub(crate) const HEADER_NUMBERS: [&str; 22] = [
     "ws_bursts_max_count",
     "ws_returns_max_count",
     "ws_conn_fixed_bytes",
+    "ws_split_fixed_bytes",
 ];
 
 /// The header's strings (the slack error only when the write failed).
@@ -311,14 +323,12 @@ pub(crate) const RETURN: [&str; 10] = [
     "ws_up_first_message_ns",
 ];
 
-/// One window's (or the connection's) rows in a fixed order: per direction the model's counts, the held bytes, the
-/// lateness and its per-release split (the woken class's count and parts, then the other class's, then its kinds);
-/// then the connection's own counts.
+/// One window's (or the connection's) rows in a fixed order: per direction the model's counts, the held bytes and the
+/// lateness; then the connection's own counts.
 pub(crate) fn window(
     tcp: [[u64; 20]; 2],
     held: [[u64; 2]; 2],
     late: [Summary; 2],
-    split: [Split; 2],
     own: &[u64; REASONS + 3],
     out: &mut Vec<(&'static str, u64)>,
 ) {
@@ -336,7 +346,19 @@ pub(crate) fn window(
         {
             out.push((name, v));
         }
-        let sp = split[d];
+    }
+    let names = CLOSE
+        .iter()
+        .chain([SHUTDOWN_TIMEOUT, SPLIT_WRITES, RETURNS_DROPPED].iter());
+    for (name, v) in names.zip(own.iter()) {
+        out.push((name, *v));
+    }
+}
+
+/// The per-release split's rows over the run (the `ws_split` event's fields), in a fixed order: per direction the woken
+/// class's count and parts, then the other class's, then its kinds, then the violations.
+pub(crate) fn split_rows(split: [Split; 2], out: &mut Vec<(&'static str, u64)>) {
+    for (d, sp) in split.iter().enumerate() {
         for (part, s) in sp.parts.iter().enumerate() {
             match part {
                 0 => out.push((SPLIT_COUNT[d][0], s.n)),
@@ -353,12 +375,7 @@ pub(crate) fn window(
         for (name, v) in SPLIT_KIND[d].iter().zip(sp.kinds) {
             out.push((name, v));
         }
-    }
-    let names = CLOSE
-        .iter()
-        .chain([SHUTDOWN_TIMEOUT, SPLIT_WRITES, RETURNS_DROPPED].iter());
-    for (name, v) in names.zip(own.iter()) {
-        out.push((name, *v));
+        out.push((SPLIT_VIOLATIONS[d], sp.violations));
     }
 }
 
@@ -372,10 +389,15 @@ mod tests {
             [[0; 20]; 2],
             [[0; 2]; 2],
             [Summary::default(); 2],
-            [Split::default(); 2],
             &[0; REASONS + 3],
             &mut out,
         );
+        out.iter().map(|x| x.0).collect()
+    }
+
+    fn all_split() -> Vec<&'static str> {
+        let mut out = Vec::new();
+        split_rows([Split::default(); 2], &mut out);
         out.iter().map(|x| x.0).collect()
     }
 
@@ -383,6 +405,7 @@ mod tests {
     #[test]
     fn every_name_follows_the_rule_once() {
         let mut names = all_v();
+        names.extend(all_split());
         names.extend([CONNS_BEFORE, ACCEPTED, WRITTEN[0], WRITTEN[1]]);
         let flags = [
             "ws_wrapper",
@@ -412,12 +435,11 @@ mod tests {
         sorted.sort_unstable();
         sorted.dedup();
         assert_eq!(sorted.len(), every.len(), "a name twice");
-        // Per direction 20 model counts, 2 held, 7 lateness, and the split's 2 class counts, 5 parts of 6 statistics
-        // and 3 kinds; then 6 close reasons and 3 more.
-        assert_eq!(
-            all_v().len(),
-            2 * (20 + 2 + 7 + 2 + PARTS * 6 + KINDS) + REASONS + 3
-        );
+        // Per direction 20 model counts, 2 held and 7 lateness; then 6 close reasons and 3 more. The split over the run:
+        // per direction 2 class counts, 5 parts of 6 statistics, 3 kinds and the violations.
+        assert_eq!(all_v().len(), 2 * (20 + 2 + 7) + REASONS + 3);
+        assert_eq!(all_split().len(), SPLIT_ROWS);
+        assert_eq!(SPLIT_ROWS, 2 * (2 + 30 + 3 + 1));
     }
 
     /// M15 and u3c-plan.md 1.7: every name DelayStream writes has its SERIES.md row (U3b's pattern in names.rs); a
@@ -435,6 +457,17 @@ mod tests {
             assert!(
                 series.contains(&format!("| `event.ws_summary.{n}` |")),
                 "no SERIES.md row for event.ws_summary.{n}"
+            );
+        }
+        // The split is the run's, pooled, never a per-second or per-connection row.
+        for n in all_split() {
+            assert!(
+                series.contains(&format!("| `event.ws_split.{n}` |")),
+                "no SERIES.md row for event.ws_split.{n}"
+            );
+            assert!(
+                !series.contains(&format!("`second.v.{n}`")),
+                "{n} still a per-second row"
             );
         }
         for n in HEADER_NUMBERS.iter().chain(HEADER_TEXTS.iter()) {
