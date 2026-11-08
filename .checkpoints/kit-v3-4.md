@@ -27,6 +27,12 @@
   :438-443; STATUS follow-ups answered (XP-TERM, LOOK), B.2's follow-up, line numbers recomputed (ADR 0005 §6 83–102,
   :2550 27–102; ADR 0006:482-483), "five register rows"; ROADMAP:94; the vfx report's corrections. Deviation: Low note
   3 says AB5 is about how an unlocked weapon reaches a match (not balance rates). Gate PASS +0 −0; repo map OK.
+- **Done:** the kit text drafted as notes (`kit-draft.md`; resumed after a usage limit on 2026-11-08): four diffs
+  against main that `git apply --check` cleanly (CLAUDE.md 5 hunks, +25 lines; advisor.md 5; SKILL.md 1;
+  security-auditor.md 2); 9 markers ([PENDING TIER0-SCOPE] ×5, [PENDING REVERT-EXCEPTION] ×4) with the (b) variants
+  in its §6; C1-C9 and C13 mapped in its §7; the rule-diff table (E2) in its §8, 55 rows, looser rows all from his A4
+  words (revert rows 17, 19, 21, 45 wait on REVERT-EXCEPTION); unsure rows 22, 25, 37 for the reviewers. Main moved to
+  626df67 (#45, ADR 0001); a test merge with this branch is clean.
 - **Current step:** 3, waiting on Mustafa's TIER0-SCOPE and REVERT-EXCEPTION and his presence for the kit sitting
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.
