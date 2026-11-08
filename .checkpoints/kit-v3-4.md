@@ -46,7 +46,13 @@
   new duty.
 - **Done:** the fifth kit edit, CHECKPOINTS.md §10 "Disk hygiene" (+12 lines, with the advisor's two text changes);
   checkpoint tests 27/27, repo map OK, gate PASS. The kit sitting is complete (five edits, one at a time).
-- **Current step:** 4, docs-keeper's pass (STATUS and ROADMAP: #43 merged, #45 on main, this change-set in flight, the
-  queue), then the review round (security-auditor, the verifier, infra-engineer), the report
+- **Done:** main 626df67 merged in (202951f, clean; CI green); docs-keeper's pass (`docs-keeper.md`; this commit):
+  STATUS (#43 and #45 in the merge list, the vfx row merged, kit-v3-4's row, A4's queued words removed with a pointer to
+  the report's appendix, follow-ups), ROADMAP (#43 MERGED, kit-v3-4 entry, the R1-R6 entry into Build history),
+  START_HERE §1 step 5 (wait for the APPROVE; a pure revert needs none), REPO_MAP rows; checks PASS (repo map 114
+  entries, gate +0 −0). Left: V2_PHASE0_BRIEF.md:63 "Review once" (a dated brief: a follow-up in the report).
+- **Current step:** 5, the review round on the final diff (security-auditor, the verifier, infra-engineer), then the
+  report (its appendix: his A4 words, A4's addition, A4-FREEZE, the session's notes for A4's plan, his answers of
+  2026-11-07 and 2026-11-08, the disk-hygiene item: C12).
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.
