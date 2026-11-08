@@ -482,6 +482,25 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c EVIDENCE RUNS DONE** (about 00:55 UTC 2026-11-08; committed 1a9fd73 and 989118e):
+  - **Kernel cross-check PASS (final)**, out-20261108T004723Z.
+    - RACK p50: kernel 33.344 ms (166 episodes), model 33.458 ms (5,672).
+    - Probe/timeout share: kernel 6 of 172 against the model's 0.0416, band 1-15.
+    - Noise guard held (60/61, 54/56, 58/61); one-gap count 100 against 172; iptables unchanged.
+  - **C12e root run PASS**: R1-R4; SIOCOUTQ 200 k exactly with notsent 0; release in 435 ms, within 1.632 s.
+  - **C10 quiet lateness: THE TRIGGER FIRES.**
+    - down p99.9 1.908 ms, max 4.200 ms, E 3.5 us; up p99.9 2.111 ms, max 2.839 ms, E 6.5 us; n 10,051 each way.
+    - Load average 0.94 -> 0.00. U3-Q1's E (< about 10 us) is met. **With the advisor** (afa86ecfb9b00e463):
+      (a) accept, with RS deciding at R1; (b) a dedicated pump thread, then re-measure; (c) something else.
+- **The skeptic round, workflow `wf_8f2da9fc-8fa`** (npt-u3c-review): rust-reviewer, netcode-architect,
+  security-auditor and test-engineer on `git diff 2c68bf9..989118e -- spikes/`, each followed by an adversarial
+  verifier.
+  - Notes: u3c-review-{rust,netcode,security,test}.md.
+  - Script:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3c-review-wf_8f2da9fc-8fa.js
+  - If cut: resume with resumeFromRunId "wf_8f2da9fc-8fa" and args {base: "2c68bf9", head: "989118e"}.
+  - **After it:** fix the verified findings, apply C10's ruling, check.mjs 9/9, then the U3c close (the report's
+    section in the checkpoint) and U3d.
 - **U3c build A MERGED at c5d7260** (about 00:35 UTC). From .claude/worktrees/agent-a7fafe27dcdee96cd via
   worktree_patch.py and `git apply --3way`; the additive conflicts in Cargo.toml, crates/net/Cargo.toml and lib.rs were
   resolved; Cargo.lock adds tokio-rustls only. check.mjs 9/9 (242 measured, 256 bites); gate PASS.
