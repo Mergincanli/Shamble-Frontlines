@@ -1,0 +1,8 @@
+loopback RTT (mean client tcpi_rtt) 124667 ns; RACK bound L <= 36458000 ns
+kernel-run1.json: judged (60 judged episodes <= 61 retransmissions); kernel counters' growth {'RetransSegs': 61, 'TCPFastRetrans': 60, 'TCPLossProbes': 1, 'TCPTimeouts': 0, 'TCPLostRetransmit': 0}
+kernel-run2.json: judged (54 judged episodes <= 56 retransmissions); kernel counters' growth {'RetransSegs': 56, 'TCPFastRetrans': 54, 'TCPLossProbes': 1, 'TCPTimeouts': 1, 'TCPLostRetransmit': 1}
+kernel-run3.json: judged (58 judged episodes <= 61 retransmissions); kernel counters' growth {'RetransSegs': 61, 'TCPFastRetrans': 58, 'TCPLossProbes': 2, 'TCPTimeouts': 1, 'TCPLostRetransmit': 1}
+(1) RACK-path stall p50: kernel 33.344 ms (166 episodes), model 33.458 ms (5672): PASS (within 2 ms)
+(2) probe-or-timeout share: kernel 6 of 172, model 246 of 5918 (p 0.0416); 99 % band 1-15: PASS
+reported, not judged: episodes at a one-gap threshold kernel 100 (vs 172), model 5921 (vs 5918); the model's own repairs rack/probe/timeout [6054, 2, 125]
+VERDICT: PASS (final)
