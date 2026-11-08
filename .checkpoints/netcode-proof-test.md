@@ -482,6 +482,20 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c build A MERGED at c5d7260** (about 00:35 UTC). From .claude/worktrees/agent-a7fafe27dcdee96cd via
+  worktree_patch.py and `git apply --3way`; the additive conflicts in Cargo.toml, crates/net/Cargo.toml and lib.rs were
+  resolved; Cargo.lock adds tokio-rustls only. check.mjs 9/9 (242 measured, 256 bites); gate PASS.
+- **Flaky loopback P2 test FIXED at 292e526** (FT1-FT4; three release runs pass, up 193-195; check.mjs 9/9).
+- **NEXT: the evidence runs** (main session, one at a time, no agent running, loopback quiet; outputs committed under
+  spikes/netcode-proof/results/u3c-kernel-check/):
+  - (1) C10 quiet lateness: `NPT_WS_LATENESS_TICKS=10050 cargo +1.99.1 test --release --locked -p npt-net --lib
+    <lateness_evidence_run> -- --ignored --nocapture --exact` (at least 10,000 samples per direction; record the load
+    average). It goes to the advisor if p99.9 > 1 ms or max > 10 ms.
+  - (2) The kernel cross-check: `bash spikes/netcode-proof/results/u3c-kernel-check/run.sh`, as root. The advisor's
+    rules: VOID and INVALID may be re-run once, a MISS never.
+  - (3) The C12e root run: `python3 spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py`.
+  - Then the skeptic round (rust-reviewer, netcode-architect, security-auditor, test-engineer) on U3c's final diff,
+    ebe82b2..HEAD, as a workflow.
 - **U3c build B MERGED at 2a93038** (about 00:20 UTC 2026-11-08). Content: npt-tcpinfo, check.mjs's unsafe-placement and
   libc checks, the C12e root-run script; fixed per critic B (u3c-build-b-fix.md).
   - Merged by worktree_patch.py from .claude/worktrees/agent-a3dfcb36e3c15ab56, then npt-tcpinfo moved into
