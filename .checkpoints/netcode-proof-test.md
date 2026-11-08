@@ -490,8 +490,25 @@
   - **C12e root run PASS**: R1-R4; SIOCOUTQ 200 k exactly with notsent 0; release in 435 ms, within 1.632 s.
   - **C10 quiet lateness: THE TRIGGER FIRES.**
     - down p99.9 1.908 ms, max 4.200 ms, E 3.5 us; up p99.9 2.111 ms, max 2.839 ms, E 6.5 us; n 10,051 each way.
-    - Load average 0.94 -> 0.00. U3-Q1's E (< about 10 us) is met. **With the advisor** (afa86ecfb9b00e463):
-      (a) accept, with RS deciding at R1; (b) a dedicated pump thread, then re-measure; (c) something else.
+    - Load average 0.94 -> 0.00. U3-Q1's E (< about 10 us) is met.
+    - **The advisor's ruling (2026-11-08; "Side ruling: condition 10" in advisor-u3c-plan.md): (a) ACCEPT; RS's run at
+      R1 decides against a stated bar.**
+    - Why:
+      - the tail is about 100 times below what any WebSocket mark resolves (-18's WS median about 654 ms on a 10 ms
+        grid with 10 % tolerance; -31's 250 ms p99; lateness p99 0.35-0.5 ms);
+      - lateness feeds back into nothing the model decides (the replay identity);
+      - U3-Q1's E is met;
+      - ImpairSocket shows similar tails in this container;
+      - (b) would move S's TLS onto another runtime for no mark's gain.
+    - **Recorded for U3c's report.**
+    - **Carried to R1's run plan:** DelayStream's self-test on RS.
+      - Under the WebSocket part's real load (48 connections at P2 with the room running), at least 10,000 samples per
+        direction.
+      - JUDGED per direction: E < about 10 us and p99 <= 1 ms. REPORTED: p50, p99.9 and max.
+      - Each release split into the clock thread's wake, the pump's start and S's poll_write return. **Add those stamps
+        before R1 (U6 or U8).**
+      - A miss goes to the advisor before -18's and -31's WebSocket parts count; then (b) is the fallback: the pumps on
+        a dedicated thread with 1 ns slack, re-measured.
 - **The skeptic round, workflow `wf_8f2da9fc-8fa`** (npt-u3c-review): rust-reviewer, netcode-architect,
   security-auditor and test-engineer on `git diff 2c68bf9..989118e -- spikes/`, each followed by an adversarial
   verifier.

@@ -15,3 +15,4 @@ Build dir: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3c-review-targe
 6. wt_tests diff.
 
 ## Findings (a line per finding as found)
+- tcpinfo/src/linux.rs read: both unsafe blocks one op each, SAFETY comments present; libc gnu tcp_info tcpi_rtt @68 matches uapi (libc gnu/mod.rs:248-276); TIOCOUTQ generic 0x5411 (arch/generic/mod.rs:35). No finding yet.
