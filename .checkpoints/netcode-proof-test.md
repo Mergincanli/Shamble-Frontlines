@@ -482,6 +482,26 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **DISK FULL, then freed** (about 01:30 UTC 2026-11-08: 132 KB free). The saver b7zmsy7v8/brque24xu died on it, and the
+  review workflow's three verifiers failed on the spend limit at the same time.
+  - **Mustafa's standing rule (verbatim):** "From now on, after each unit merges: delete that unit's build cache under
+    .gate/ and remove its finished agent copies (check each is clean first, then use git worktree remove), so the disk
+    never fills again. Ask me once per cleanup until the kit allows it."
+  - **How the kit lets it happen:** `Bash(rm -rf *)` and `git worktree remove --force/-f` are in the kit's DENY list
+    (.claude/settings.json:214-216, :247), so they are refused before any prompt.
+    - Caches: delete them with `cargo +1.99.1 clean --manifest-path spikes/netcode-proof/Cargo.toml --target-dir <dir>`.
+      That worked.
+    - Agent copies: plain `git worktree remove`, only when clean.
+  - **Done with his OK (AskUserQuestion, "Caches + old copies"):** 15 stale .gate caches removed, about 7 GB; 6.3 GB
+    free afterwards.
+  - **Not removed (not clean):**
+    - .claude/worktrees/agent-a9099feea96fafb39: 975e72b, 13 changed/untracked files, U3b's fix pass, merged at 7321cc0;
+    - .claude/worktrees/agent-adf1deee6caf1481f: a0d7916, 6 files, U3b's build, merged at 5a5aba9.
+    - Proposal for his next OK: commit each copy's leftovers on its own local branch (nothing lost, nothing pushed),
+      then `git worktree remove`.
+  - **Still kept for U3c's fix pass:** .gate/u3v3-harness-check-target (A), u3v3-model-target (B) and u3c-review-target.
+    After U3c closes: clean them, and the U3c worktrees (wf_87550c07-bbd-1/-2, agent-a3dfcb36e3c15ab56,
+    agent-a7fafe27dcdee96cd), per his rule, asking once.
 - **U3c EVIDENCE RUNS DONE** (about 00:55 UTC 2026-11-08; committed 1a9fd73 and 989118e):
   - **Kernel cross-check PASS (final)**, out-20261108T004723Z.
     - RACK p50: kernel 33.344 ms (166 episodes), model 33.458 ms (5,672).
