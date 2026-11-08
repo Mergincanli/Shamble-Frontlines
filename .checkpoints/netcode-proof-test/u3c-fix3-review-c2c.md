@@ -28,3 +28,8 @@ CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3c-review-target only. Ans
 11. Verdict + table.
 
 ## Findings (as I go)
+- Step 2 (21:27:56-21:29:22 UTC, after touching the worktree's 62 crate .rs files, mtime only): `node check.mjs` in
+  the worktree 9/9: test 258 measured / 272 bites, 0 failed, 0 skips (= fix agent's counts; the parallel C1c copy reads
+  260/274, so these are this copy's binaries); deps 78 crate files + 1 config; self 41/41; redact 10/10, 148 items.
+  Output .gate/check-c2c-review-1.txt. Clippy 2.4 s after the touch (16 cores; C1c's run shows the same 2.5 s):
+  re-check with visible output later.
