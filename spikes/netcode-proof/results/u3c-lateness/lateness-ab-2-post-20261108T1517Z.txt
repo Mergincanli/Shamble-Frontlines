@@ -1,0 +1,18 @@
+ 15:22:31 up 20 min,  0 user,  load average: 0.04, 0.26, 0.40
+
+running 1 test
+loadavg at the start: 0.04 0.26 0.40 1/105 5948
+test l2::delay::tests::lateness_evidence_run has been running for over 60 seconds
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.220 ms p99 0.883 ms max 21.675 ms
+dir 0: 9967 segments, 202 stalls (99.9 % band 155-247), repairs rack 207 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.016 ms p99 0.053 ms max 3.470 ms; the poll's own window: p50 0.025 ms p99 0.077 ms max 3.489 ms; intake (model write − send): p50 0.075 ms p99 0.221 ms max 7.903 ms
+dir 1: 9791 segments, 201 stalls (99.9 % band 152-243), repairs rack 204 probe 0 timeout 0
+lateness down (P2, 30 Hz, 335.0 s): n 10051 p50 0.174 ms p99 0.713 ms p99.9 2.608 ms max 21.571 ms E 16.2 µs over 197  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 335.0 s): n 10051 p50 0.228 ms p99 1.372 ms p99.9 3.061 ms max 31.241 ms E 27.9 µs over 352  ** CONDITION 10's TRIGGER: bring to the advisor **
+loadavg at the end: 0.23 0.14 0.28 1/105 5996
+lateness samples: down 10051 up 10051
+test l2::delay::tests::lateness_evidence_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 154 filtered out; finished in 338.07s
+
+ 15:28:09 up 26 min,  0 user,  load average: 0.23, 0.14, 0.28
