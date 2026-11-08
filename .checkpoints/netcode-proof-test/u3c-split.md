@@ -1,0 +1,153 @@
+# U3c: the per-release lateness split (the advisor's "Side ruling: condition 10 again", 2026-11-08)
+
+Agent: general-purpose build agent, isolated worktree
+`/home/user/Shamble-Frontlines/.claude/worktrees/agent-a3d04e3f48e4d97db`, base f8c3812 (fast-forwarded; the ruling
+itself is in 19b02cc's advisor-u3c-plan.md:106-121, read with `git show`). Cargo: `+1.99.1`, CARGO_TARGET_DIR
+`/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target` only. Nothing committed; the main session merges.
+
+## Plan
+
+### Where the stamps are today
+- (1) the clock thread's wake: `delay_clock.rs:204` `let now = self.now_ns();`, the first stamp after the Condvar
+  wait (227-235) returns, re-read after each batch of 64 wakes; entries with due <= now fire (205-215).
+- (2) the pump pass's start: `delay.rs:1376` `sh.clock.now_ns()` under the lock, the stamp of the pass's opening step
+  (`step_to`, 1377). Other steps that release records: the pump's up-loop step (1470-1471), and application tasks
+  through `current()` (857-858) and `add_burst` (806-807).
+- (3) down: `delay.rs:1400` `let at = sh.clock.now_ns()` after S's poll_write; up: `delay.rs:1191` in poll_read at
+  the hand-over of a record's last byte. The total L = (3) - (origin + model stamp) is recorded at 1427-1428 / 1192-1194.
+
+### Design
+- The clock thread keeps, per key, its latest fire: (the entry's due D, its `now` W at line 204), in a `fired` map
+  beside the schedule and table (one entry per live key; cleared at `release`; counted in `census`'s "held").
+  Overwritten by a later fire unless an unconsumed fire for the same due is there (keep the first wake).
+- The pump's opening step stamps P (the existing 1376 stamp), takes the key's unconsumed fire with W <= P
+  (`take_fired`, under the clock lock, conn -> clock lock order as `reschedule` already does), and steps with it.
+- Each record gets, at its release (`harvest`), the releasing step's stamp T (= origin + the step's model target, the
+  exact now that step read), the wake W when it is covered, and the step's kind.
+  - **woken** class: released at a pump pass's opening step that a clock fire preceded, with D <= M <= W <= P
+    (the record was due when the clock thread woke). Parts: clock = W - M, hop = P - W, work = (3) - P.
+  - **other** class: every other release (an opening step with no covering fire: woken by S's I/O, an app wake, or a
+    fire before the record was due; the pump's up-loop step; an application task's step). No clock part. Parts:
+    wait = T - M (from the due to the step that released it), work = (3) - T. Counted by kind: open, mid, app.
+  - Each part is a difference of real stamps; nothing is derived as "total minus the rest".
+- Histograms: `stats::Running` per part per direction (woken: clock, hop, work; other: wait, work) = 10 more per
+  connection, with the same statistics (n, p50, p99, p99.9, max, E[(x - p50 - 0.25 ms)+], over). F7's fixed memory
+  rises from 309,583 B to 1,731,983 B per connection (12 x 142,240 + 25,103): reported, not hidden.
+- Rows: names in delay_names (`ws_late_<dir>_woken_count`, `ws_late_<dir>_clock_*`, `_hop_*`, `_work_*`,
+  `ws_late_<dir>_other_count`, `_other_wait_*`, `_other_work_*`, `_other_open_count`, `_other_mid_count`,
+  `_other_app_count`): 35 per direction, in `names::window` (so per second and in the summary, one code path), with a
+  SERIES.md row each (M15: the existing rules tests read them).
+- Printout: `loopback()` prints each part's line (the evidence run calls it).
+- Identity test: a short real loopback (TLS + tungstenite, P2, 30 Hz both ways) checks, per release, clock + hop + work
+  = total (woken) and wait + work = total (other) in integer ns, the stamp chain, and that the classes partition the
+  total count; bites (cfg(test) knob, production path): the hop dropped, and work measured from (1) instead of (2):
+  each must fail the check. `loopback()` (check.mjs's 10 s run and the evidence run) asserts the identity too.
+- No new public symbol; no unsafe, no libc.
+
+### Steps
+1. delay_clock.rs: `fired`, `take_fired`, release, census, docs.
+2. delay.rs: Freed/By, step_to/harvest, pump stamps, `late()` with the split, rows, snapshot, bites, docs.
+3. delay_names.rs: names, window(), its tests' counts.
+4. SERIES.md: 70 rows (generated), the fixed-bytes row.
+5. delay_tests.rs: identity test with bites, loopback printout and identity, fixed bytes.
+6. fmt, clippy (both builds), check.mjs twice; commands for the interleaved diagnostic.
+
+## Progress
+- Block 1 done: delay_clock.rs `fired` map, `take_fired`, `release` clears it, census counts it.
+- Block 2 done: delay.rs By/Freed, step_to(t, by), harvest classes, pump stamps P + take_fired, `late()` with the split,
+  `split_rows`, per-second and summary rows, snapshot late/split, `bite_split`. Lib builds (debug, no warnings).
+- Block 3 done: delay_names.rs PARTS/KINDS/Split, SPLIT_COUNT/SPLIT/SPLIT_KIND (70 literal names), window(split).
+- Block 4 done: SERIES.md: 70 rows (generated by a scratch script, after each direction's `ws_late_<dir>_over_count`),
+  a "**The per-release split**" paragraph in the section's intro, the `ws_conn_fixed_bytes` row (1,731,983 B).
+- Block 5 done: delay_tests.rs: `split_identity`, `part_line`, `split_lines`, `split_session`, the test
+  `the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it`; loopback() prints the split and asserts
+  the identity; fixed bytes 1,731,983. First debug run (5 tests, 13 s): clean 122 releases, all woken; DropHop and
+  WorkFromWake each caught at release 2; loopback 10 s: down woken 293 / other 8 (open 3 mid 1 app 4), up 299 / 2.
+- Block 6a: review of my own diff found one race: `a_thousand_opens_and_closes...` asserts no key is left right after
+  `pump_done`, and Pump::drop calls `release` just after setting it, so a fire left in `fired` could flake that check
+  for the last key. Fix: `cancel` clears the fire too (safe: cancel runs only with no event pending, or at the
+  DelayStream's drop; an untaken fire then covers no later release). fmt clean; npt-net lib 145 passed, 11 ignored.
+- Block 6b: SERIES.md wording (D named in the intro; the up `other_mid` row without the down-only remark).
+  check.mjs x2 passed before these text edits (9/9: measured 251, bites 265, self 30); rerun x2 at the end.
+- Block 6c: loopback() also prints each direction's 5 largest releases with class, kind and parts (`largest`), from
+  the per-release log: which part made the rare maxima. 10 s debug run (busy machine, not evidence): down largest
+  2.618 ms = clock 1.368 + hop 1.193 + work 0.057; up largest 3.981 ms = clock 0.101 + hop 0.140 + work 3.740.
+- The release build of the lib tests compiles (in this target dir: release/deps/npt_net-f72f21a42e60b4c9); the
+  identity test passes there too (122 releases; both bites caught at release 2).
+
+## What each part measures (stamps, file:line in this worktree's final files)
+- M: the record's model delivery stamp + origin (delay.rs:549 in `harvest`, from `r.released = Some(t)`).
+- (1) W: delay_clock.rs:231 `let now = self.now_ns();` (top of the thread's loop: the first stamp after the Condvar
+  wait at :259-267 returns, re-read after each batch of 64 wakes), kept with the entry's due D at :241 when it fires
+  the connection's entry. The pump takes it at delay.rs:1591 (`take_fired`, delay_clock.rs:149).
+- (2) P: delay.rs:1590 `let p = sh.clock.now_ns();`, the pump pass's opening step (the step's target, :1592-1593).
+  T for the other steps: the pump's up-loop step delay.rs:1685 (By::Mid at :1686); application tasks' steps
+  delay.rs:1057 (`current`, By::App at :1058) and :1006 (`add_burst`, By::App at :1007).
+- (3): down delay.rs:1616 (after S's poll_write; recorded at :1643); up delay.rs:1405 (poll_read's hand-over; :1406).
+- Classes (`harvest` delay.rs:548-583; recorded in `late` delay.rs:440-477):
+  - woken (opening step, D <= M <= W <= P): clock = W - M; hop = P - W (the clock thread's wake calls, including up
+    to 63 other connections woken first in its batch, tokio's scheduling of the pump task, the pump's wait for the
+    connection's lock); work = (3) - P (down: the pump's down loop, earlier records, rustls and the write, or a later
+    pass if S was full; up: the rest of the pass, the reader's wake and tokio turn, one record per poll_read).
+  - other: wait = T - M, work = (3) - T; kinds: open (an opening step with no covering fire: the pass was woken by S's
+    I/O, an app wake, a shutdown, or a fire before M), mid (the pump's up-loop step), app (`current`, `add_burst`).
+
+## Identity test and its bite
+- `l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it` (delay_tests.rs:2406):
+  three real loopback sessions side by side (`split_session`: TLS 1.3 + DelayStream + tokio-tungstenite, P2, 30 Hz
+  both ways, 60 ticks, 1 s drain). `split_identity` (delay_tests.rs:300) on each atomic snapshot checks: per release
+  sum == total, total == (3) - M, the stamp chain, the class counts against the histograms (same snapshot), the kinds.
+- Bites (cfg(test) `SplitBite`, applied inside `late()`, from just after the handshakes): DropHop (hop recorded as
+  0) and WorkFromWake (work = (3) - W). Each must fail with "parts sum". Seen: both caught at release 2, debug and
+  release builds.
+- `loopback()` asserts the identity too (delay_tests.rs:2360), so check.mjs's 10 s run and the evidence run check
+  every release.
+
+## The interleaved diagnostic (the main session's; I ran neither long test)
+From spikes/netcode-proof after the merge:
+
+    export CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target
+    cargo +1.99.1 test --release --locked -p npt-net --lib --no-run
+    # take the path it prints: "Executable unittests src/lib.rs (.../release/deps/npt_net-<hash>)"
+    BIN=/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/release/deps/npt_net-<hash>
+    OUT=/home/user/Shamble-Frontlines/.gate/u3c-evidence/split-$(date -u +%Y%m%dT%H%MZ); mkdir -p "$OUT"
+    for i in 1 2; do
+      { uptime; NPT_WS_LATENESS_TICKS=10050 "$BIN" --exact l2::delay::tests::lateness_evidence_run --ignored --nocapture; uptime; } > "$OUT/$i-ws.txt" 2>&1
+      { uptime; NPT_L2_SECS=10 "$BIN" --exact l2::socket::tests::l2_sustains_10000_per_second_each_way --ignored --nocapture; uptime; } > "$OUT/$i-m13.txt" 2>&1
+    done
+
+The same through cargo, one at a time:
+
+    NPT_WS_LATENESS_TICKS=10050 cargo +1.99.1 test --release --locked -p npt-net --lib l2::delay::tests::lateness_evidence_run -- --ignored --nocapture --exact
+    NPT_L2_SECS=10 cargo +1.99.1 test --release --locked -p npt-net --lib l2::socket::tests::l2_sustains_10000_per_second_each_way -- --ignored --nocapture --exact
+
+- M13 (socket_tests.rs:512) prints, before its asserts, per direction "lateness us: n p50 p99 p99.9 max
+  E[(L-L0-0.25ms)+] over" (µs; DelayStream's lines are in ms) and the release thread's CPU. Its asserts (>= 9,900 pps
+  sustained, 2 % +- 0.4 % loss, no queue/pool/shaper drops) can fail on a noisy machine after the lines print. Its
+  load is 20,000 releases/s against DelayStream's ~60 records/s plus model events: compare the wake tails, not the
+  levels. NPT_L2_SECS (default 10) lengthens it.
+- The evidence run now prints under each direction's lateness line: the class counts and kinds, the five parts'
+  p50/p99/p99.9/max/E/over, and the five largest releases with their parts. It asserts the identity.
+
+## Findings
+- F-SPLIT-1 (a hypothesis the diagnostic can confirm; not fixed, since a behaviour change needs its own approval):
+  the pump's up-loop step (delay.rs:1686) keeps only `[UP]` of what it released. A down record released there is not
+  written in that pass, and nothing wakes the pump for it: the pass's end `reschedule` (delay.rs:1747) replaces the
+  clock entry for it if the clock thread has not fired that entry yet. The record then waits for the next wake: the
+  next model event, the client's next frame (S readable) or the server's next write (its model write reschedules at
+  once), so up to about one 33 ms tick. That matches "rare maxima up to 35 ms". The split shows it as down
+  `other_mid_count` > 0 with a "largest: ... other (mid): wait small + work ~ tens of ms" line. The 10 s debug runs saw
+  one down mid release (work 0.266 ms: not stuck that time).
+- Memory: ws_conn_fixed_bytes 309,583 -> 1,731,983 B per connection (12 Running x 142,240 + 25,103), about 83 MB at
+  48 connections (was about 15 MB). U6's accept cap reads it. Smaller part histograms would mean changing
+  `stats::Running`, which the ruling did not ask for.
+- Per-second rows: 137 per connection per second (were 67).
+
+## Final gate (after every edit)
+- check.mjs twice in a row, CARGO_TARGET_DIR u3v3-harness-check-target, RUSTUP_TOOLCHAIN=1.99.1: both "check: all 9
+  steps pass"; test step: measured build 251 passed 0 failed, bites build 265 passed 0 failed; self 30 of 30; redact
+  10 of 10, 147 items 0 findings; marks 81 checked, rows unchanged. Its clippy steps (both builds, -D warnings) and fmt
+  --check are included; clippy was also run by hand on both builds after forcing npt-net to be re-linted.
+- No unsafe, no libc, no new `pub` item in the diff (grep of the added lines). Nothing committed.
+
+DONE

@@ -520,9 +520,29 @@
       - One quiet diagnostic, interleaved with ImpairSocket's M13 lateness run, reported and not judged.
       - No plain rerun. The split's diff is reviewed after the fix-diff re-review, changed lines only.
       - On RS a max over 10 ms goes to the advisor with the result.
-    - **The split build agent** (general-purpose, xhigh, isolated worktree on f8c3812; CARGO_TARGET_DIR
-      u3v3-harness-check-target; notes in its worktree, u3c-split.md) is running. Then: merge it, check.mjs, the
-      interleaved diagnostic run by the main session, its review.
+    - **THE SPLIT IS BUILT** (.claude/worktrees/agent-a3d04e3f48e4d97db, base f8c3812, uncommitted; snapshot
+      wip/u3c-split.patch; notes u3c-split.md). check.mjs 9/9 twice (251 measured, 265 bites).
+      - **Classes:** woken: clock = W - M, hop = P - W, work = (3) - P. Other: wait = T - M, work = (3) - T, by step
+        (open, mid or app).
+      - **Identity test:**
+        `l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it`; its bites are
+        DropHop and WorkFromWake. loopback() asserts the identity too.
+      - **The evidence run** prints each part's statistics and the 5 largest releases split into their parts.
+      - **Its findings:**
+        - **(1) A likely cause of the rare ~35 ms maxima:** a down record released in the pump's up-loop step
+          (delay.rs:1686) is not written in that pass, and the closing reschedule (:1747) can move its clock entry, so
+          it waits for the next wake (up to about one tick). The diagnostic confirms it if down "mid" > 0 with large
+          work. Then fix it (small; a release that is late by our own logic).
+        - **(2) Memory:** ws_conn_fixed_bytes 309,583 -> 1,731,983 B per connection (10 more histograms): 83 MB at 48
+          connections, and 1.7 GB for -25's 1,000 never-joining sessions if each gets a DelayStream. To review:
+          allocate the split lazily, use run-level histograms, or a coarser one.
+        - (3) A race in its own change was fixed (cancel clears the fire).
+      - **Diagnostic commands** (from spikes/netcode-proof, after the merge, quiet machine, alternating twice):
+        - `NPT_WS_LATENESS_TICKS=10050 cargo +1.99.1 test --release --locked -p npt-net --lib
+          l2::delay::tests::lateness_evidence_run -- --ignored --nocapture --exact`;
+        - `NPT_L2_SECS=10 cargo +1.99.1 test --release --locked -p npt-net --lib
+          l2::socket::tests::l2_sustains_10000_per_second_each_way -- --ignored --nocapture --exact`.
+      - **Merge it after the fix-diff re-review** (wf_7360a111-ea8) finishes, so the reviewers read a stable tree.
   - **The fix-diff re-review, workflow `wf_7360a111-ea8`** (npt-u3c-fix-review), on 95597ef..81203da: rust-reviewer
     on C1 (the F3 lock change most carefully) and security-auditor on C2 (try to bypass the new rules), each followed
     by an adversarial verifier. Notes: u3c-fix-review-{c1,c2}.md. If cut, resume with resumeFromRunId
