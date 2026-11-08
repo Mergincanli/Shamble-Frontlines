@@ -509,8 +509,19 @@
     - Down p50 0.155, p99 0.628, p99.9 3.483, max 11.281 ms, E 16.4 us (run 1: 0.112 / 0.345 / 1.908 / 4.200, E 3.5).
     - Up 0.206 / 1.398 / 2.906 / 10.641, E 25.9 us (run 1: 0.161 / 0.509 / 2.111 / 2.839, E 6.5).
     - On these numbers R1's bar (E < about 10 us, p99 <= 1 ms) would fail.
-  - **NOW: an interleaved A/B** (task birwiy3e6, about 22 min): pre-fix against post-fix release binaries, alternating
-    pre, post, pre, post, each 10,050 ticks, on a quiet machine.
+  - **A/B DONE (e317067): ENVIRONMENT, NOT CODE.**
+    - pre: down E 18.1 and 11.6 us, p99 0.61 and 0.67 ms; up E 28.2 and 26.7 us, p99 1.41 and 1.52 ms.
+    - post: down E 16.2 and 22.1 us, p99 0.71 and 0.89 ms; up E 27.9 and 38.2 us, p99 1.37 and 1.88 ms.
+    - No consistent difference. The same pre-fix code gave E 3.5 and 6.5 us at 00:41, so the container got noisier
+      after the 15:01 restart; F3 neither caused nor removed the tail. Steal while idle 0.02 % (settles nothing).
+    - **With the advisor** (afa86ecfb9b00e463): does (a) stand, or with an added condition (a fresh quiet run before
+      the report; the per-release split stamps now)?
+  - **The fix-diff re-review, workflow `wf_7360a111-ea8`** (npt-u3c-fix-review), on 95597ef..81203da: rust-reviewer
+    on C1 (the F3 lock change most carefully) and security-auditor on C2 (try to bypass the new rules), each followed
+    by an adversarial verifier. Notes: u3c-fix-review-{c1,c2}.md. If cut, resume with resumeFromRunId
+    "wf_7360a111-ea8".
+  - **Earlier, the interleaved A/B setup** (task birwiy3e6, about 22 min): pre-fix against post-fix release binaries,
+    alternating pre, post, pre, post, each 10,050 ticks, on a quiet machine.
     - pre: .gate/u3v3-harness-check-target/release/deps/npt_net-5596387307f68428, from
       .claude/worktrees/agent-a7fafe27dcdee96cd (DelayStream sources equal 95597ef);
     - post: spikes/netcode-proof/target/release/deps/npt_net-f72f21a42e60b4c9 (81203da);
