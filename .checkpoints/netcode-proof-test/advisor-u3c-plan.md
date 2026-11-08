@@ -136,3 +136,92 @@ Split approved with U6 carries. No escalation.
   sum check kept as a counted violation; pooled per direction (what R1 reads); per-connection footprint back to about
   309,583 B, the shared part fixed per process, both recorded. (a) would not help: the 101 is a release. Carry to U6:
   accept cap x 0.31 MB recorded; whether -25's sessions ever get a DelayStream (P0 refuses the wrapper).
+
+## Side ruling: the condition-10 diagnostic, UP-STAMP and U3c's close (2026-11-08)
+(Returned by the advisor at ecdeeb0, read-only; appended by the main session.)
+- **Checked at ecdeeb0** (code = f6cd1d7's: `git diff --stat f6cd1d7 ecdeeb0` touches only the result file, the
+  checkpoint and the report). results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt: every number in the main
+  session's (a)-(e) matches (splits :25-47 and :83-105; ImpairSocket :62-63 and :120-121; totals :24, :36, :82, :94;
+  run 1's E 3.5 / 6.5 us at lateness-run1-20261108T0041Z.txt:12-13). Woken + other = 10,051 per direction and run;
+  the other subclasses add up; violations 0 in all four rows; each listed largest release sums to its L within
+  0.001 ms. Trigger p99.9 > 1 ms or max > 10 ms (delay_tests.rs:196-197). The split's definitions (delay.rs:63-82)
+  match the code (opening step :1711-1715; closing block and the reader's wake :1874-1884). Both release threads
+  use the same mechanism (1 ns slack and a Condvar wait_timeout to the due time: delay_clock.rs:207, :261;
+  socket.rs:651, :698). /proc/stat since boot: steal 0.47 % (supports the VM reading, not tied to any one spike).
+  The gate --no-smoke passes on the working tree (base 626df67).
+- **What the split shows (reported, not judged):**
+  - No single part holds the tail: in the 20 largest releases listed, one part holds nearly all of L, work in 9,
+    clock in 7, hop in 4.
+  - The clock part is the VM's wake: the release thread's own OS wake (one entry; nothing of tokio or our code in
+    it), with a tail (p99.9 1.6-2.3 ms, max 3.1-6.8 ms) as large as the whole; load average 0.01 at both runs' ends.
+  - Hop against clock: the main session's (c) holds for the tail (the hop is no larger at p99.9, max and E in all
+    four rows). At p50 and p99 the hop is slightly larger (0.065-0.070 against 0.051-0.054 ms; 0.24-0.32 against
+    0.16-0.26 ms): the cost of unparking a parked worker, which (b) would swap for a thread wake of the same kind.
+  - Up's p99, the bar's own statistic, sits in the work part (0.83 / 1.01 ms against clock 0.20 / 0.23 and hop
+    0.27 / 0.32); up's total p99 here (1.44 / 1.77 ms) is over R1's p99 <= 1 ms bar; run 1 gave 0.509 ms on the same
+    pre-fix code, so it is environment-sensitive.
+  - ImpairSocket is a scale check, not like for like: its lateness covers its whole path (send, the kernel's
+    loopback, recv) at 10,000 per second each way, its thread at 0.39-0.41 of a core. Its own up E (11.6 / 16.9 us)
+    is now over U3-Q1 (c)'s "about 10 us" in this container too: U3d reports it, RS judges it.
+  - E does not add across parts (each part's E is against its own p50 + 0.25 ms: stats.rs:58, :105): say "the
+    largest part's E", never a share.
+- **Correction: up's work is not shown to be the reader's turn.** The pump wakes the reader only at its pass's end
+  (delay.rs:1882-1884), so up's work = the pump's whole pass after its opening step (its down writes into S, S's
+  reads, the up loop) plus the reader's dispatch and poll. tokio puts a task woken from inside a worker into that
+  worker's LIFO slot: no other worker is notified and none can steal it (tokio 1.54.1 runtime/scheduler/multi_thread/
+  worker.rs:1386-1416, :478-481), so the reader runs on the pump's worker once the pump's poll returns. The split
+  cannot tell the pass from the reader's turn; either way (b) would not remove it (the same pass on another thread,
+  still waking the reader at its end).
+- **RULING C10-B: APPROVE: (b) is not built before R1.** The hop does not own the tail; the release thread's own OS
+  wake carries one of the same size, which (b) cannot help. **Fallback order if R1's DelayStream self-test misses:**
+  (1) the split, with the new stamp, comes to me first; (2) if up's miss sits in the pass part, the first remedy to
+  measure is inside the pump: wake the reader right after the step that releases its record, and yield (a task woken
+  during its own poll is rescheduled as a yield: tokio task/harness.rs:155-161; scheduler/multi_thread/handle.rs:
+  122-123), so the reader runs first; (3) (b) stays the fallback for a miss in the hop.
+- **RULING UP-STAMP: APPROVE, changed:**
+  1. Stamp R at the reader's wake (the closing `wake_all`, delay.rs:1884), not at the release (already P or T). Up's
+     woken work then splits into pass = R − P and reader = (3) − R; in the other class the pass is from T.
+  2. A reader that returns before R (the record is readable once the opening step's lock drops, so a reader awake
+     for its own reasons can take it first) gets its own counted class with no reader part, so the sum stays exact;
+     an identity test and a misattribution bite, as b5c9009 did.
+  3. Built in U6, not U8: R1 measures WsServer's reader (its own task, split halves), so U6's loopback self-test of
+     WsServer reports the four parts before the run package is built.
+  4. The bar stays on L as defined: L ends where the application has the bytes; a kernel socket's delivery also waits
+     for its reader's turn, so the bar errs on the strict side.
+  5. Record steal at R1: /proc/stat's steal read before and after each DelayStream and ImpairSocket self-test run (two
+     reads, nothing in the measured path).
+  - Plan text: plan.md:1225 (U6 row) gains items 1-3; plan.md:1227 (U8 row): "each release split into the clock wake,
+    the pump's start and S's write, stamps added in U6 or U8" becomes "the split built in U3c (b5c9009) plus U6's
+    reader stamp; steal recorded; a max over 10 ms comes to the advisor with the result" (the max rule is from my
+    "condition 10 again" ruling, not yet in the row).
+- **RULING U3C-CLOSE: APPROVE: U3c closes when all hold:**
+  1. C2d: its critic returns complete with no regression; each of N1-N5 fixed with a test that fails on revert or, if
+     a deliberate-only way around (as N3 may be), named in the known limits. A regression or a new finding at low or
+     above comes to me.
+  2. Re-run on the closing head: after C2d merges, check.mjs (9/9) and the gate (--no-smoke, with its reason); the
+     nine step lines with their counts and the head SHA in the report itself (today it cites "the commit messages").
+  3. Report fixes (u3c-report.md): (a) "What happened": the A/B showed the rise after run 1 came with no code change,
+     not that the remaining tail is not ours: say no single part holds the tail, the release thread's own OS wake
+     carries one of the same size, and up's p99 sits in up's work part, to be split at U6. (b) The diagnostic row:
+     the parts' p99s; "the largest part's E (the parts' E do not add)" for "most of up's E"; the split cannot yet
+     tell the pass from the reader's turn; ImpairSocket as a scale check (10,000 per second, its whole path); the
+     three verdicts for "TBD". (c) Known limits: "p99.9 up to about 3.5 ms" -> about 3.7 ms (lateness-ab-4: up p99.9
+     3.719 ms); add plainly that since the restart up's p99 here is 1.37-1.88 ms, over R1's p99 <= 1 ms bar
+     (checkpoint :639 says so; the report does not). (d) Carried forward: U6 the reader stamp; U8/R1 the split built
+     and reported at R1 with the reader stamp and steal recorded, R1 following the fallback order above.
+  4. Plan text: the U6 and U8 rows as above, in the same commit that folds the report.
+  5. The checkpoint pushed with the close (§12.1's unit rule); the scratch copies the critics flagged go in Mustafa's
+     cleanup ask (no agent deletes them; e.g. .gate/c1c-review-scratch shares its unit hash in the shared target:
+     u3c-fix3-review-c1c.md:41).
+  - Nothing else wrong found: the kernel cross-check passed on its only run (one out- folder, committed); the
+    check.mjs counts agree (C2c's 258 / 272 plus C1c's two tests make 260 / 274); u3c-plan.md 1.8 (a) is marked
+    superseded (:275) and the tcpinfo manifest says why (crates/tcpinfo/Cargo.toml:9-12); plan §4.2 and §4.8 match
+    the forbid-plus-two-tables layout and the four unsafe blocks (spikes/netcode-proof/Cargo.toml:87); the U6 row
+    carries the split pool's one run per process and the shutdown error after an unclean close; the request-cap
+    difference is recorded at config.rs:66-68.
+  - Not checked by me: check.mjs 9/9 (not re-run while C2d builds in a shared target); "no agent or build ran" during
+    the diagnostic (the load-average lines are consistent with it); C2d's result (not in yet).
+- **Verdicts:** C10-B APPROVE ((b) not built before R1; up's reason corrected). UP-STAMP APPROVE with changes (stamp at
+  the reader's wake, built in U6 with an early-reader class, an identity test and a bite; bar on L; steal at R1; U6
+  and U8 rows updated). U3C-CLOSE APPROVE on five conditions (above). Decisions needed: none (all three are mine).
+  For Mustafa: nothing from this ruling.
