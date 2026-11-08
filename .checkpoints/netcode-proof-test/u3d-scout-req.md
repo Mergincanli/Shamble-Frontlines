@@ -27,3 +27,17 @@ Branch claude/netcode-proof-test-plan-hcky5g, head 95dac9c. Read-only: notes onl
   carry no number; "about 10 us" and "the tightest profile" come from the recommendation (summary :50-52).
 - R-SRC3 advisor M1 (advisor-u3q.md:233-236), M13 (:267-269), M14 (:270-273), M12 (:265-266), M15 (:274-276); the
   course change :30-34 (Mustafa's answers decide).
+- R-SRC4 advisor 2026-11-08 (advisor-u3c-plan.md): condition 10 RULING (a) ACCEPT :97-100; carried to R1 :101-104
+  ("DelayStream's self-test on RS under the WS part's real load (48 connections, P2, room running), >= 10,000 samples
+  per direction; judged E under about 10 us ... and p99 <= 1 ms per direction; p99.9 and max reported; each release
+  split ..."); "condition 10 again" :112-116 ("a max over 10 ms there comes to me with the result"); the diagnostic
+  ordered :117-121 (ImpairSocket's M13 lateness run interleaved, "reported, not judged"); diagnostic read :142-167,
+  ImpairSocket :163-165 ("a scale check, not like for like: its lateness covers its whole path (send, the kernel's
+  loopback, recv) at 10,000 per second each way, its thread at 0.39-0.41 of a core. Its own up E (11.6 / 16.9 us) is
+  now over U3-Q1 (c)'s "about 10 us" in this container too: U3d reports it, RS judges it."); E does not add across
+  parts :166-167; C10-B fallback order :175-180; UP-STAMP item 5 :191-192 ("Record steal at R1: /proc/stat's steal
+  read before and after each DelayStream and ImpairSocket self-test run (two reads, nothing in the measured path).");
+  UP-STAMP items 1-3 :182-188 = U6 (WsServer reader stamp), NOT U3d. Plan text change :193-196 (U6/U8 rows).
+  FINDING: the steal rule says "at R1", so in U3d it is a facility (the self-test run records steal before/after) that
+  R1 uses; U3d's dry run here records it too (cheap; the container's /proc/stat has a steal column: :150 "steal
+  0.47 %").
