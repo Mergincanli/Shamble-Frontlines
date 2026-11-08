@@ -119,7 +119,9 @@ Sources:
     wrapper's path caps the request at 8,192 B.
 
 **Held bytes.**
-- Down: at most 64 KB, the budget covering released-but-untaken bytes.
+- Down: at most 64 KB plus the acknowledged prefix of the front record. The budget covers released-but-untaken bytes,
+  and a record's plaintext stays held until the record is delivered whole, so its acknowledged part no longer counts
+  against the budget (NC-U3c-2, corrected 2026-11-08; tested at P2 with loss, G-NC2).
 - Up: at most 64 KB in all, plus one frame in parsing (513 + 14 B) and the request cap [C2].
 - A counter keeps the current and largest held bytes per direction. Nothing grows with client data beyond these.
 
@@ -173,7 +175,9 @@ room's (U6).
   - a skipped snapshot is never written later;
   - every written snapshot is the newest at its tick.
 - **(c) On DelayStream at P2 under B1**, through TLS and tokio-tungstenite on loopback:
-  - at every return, outstanding <= N(srtt then) x size, from the per-return record;
+  - at every return, outstanding <= N x size, with N the value in force at the writer's last write before the return.
+    The gate guarantees only that N, and srtt can move after it (NC-U3c-1, corrected 2026-11-08). The per-return record
+    gives outstanding; the writer's log gives N at its last write;
   - owed = 0 at each write.
   - The build states the counts (bursts, phases, connections), each real-time test's duration, and each band's level
     (99.9 % suggested).
@@ -203,7 +207,9 @@ room's (U6).
   record) writes and the logged added bursts. The real path moves no fate (S10).
 - **Loopback TLS** (tokio-rustls, ring, TLS 1.3) + DelayStream + tokio-tungstenite, 30 Hz both ways at P2:
   - the 101 is delayed by the model;
-  - each message's delay equals its model delivery stamp minus its write stamp, plus the lateness;
+  - up: each message's hand-over equals its model delivery stamp plus its lateness (an identity). Down: a bound, since
+    after S takes the bytes they pass the kernel's real TCP and the client's TLS, which no in-process stamp sees
+    (NC-U3c-3, corrected 2026-11-08);
   - the stall count is inside its band at P2 (S13 (f) on the real path; the level stated);
   - lateness is reported with condition 10's trigger.
 - **TLS config:**
