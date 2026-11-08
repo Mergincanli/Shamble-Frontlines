@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+
+running 1 test
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.632 ms p99 1.329 ms max 7.541 ms
+dir 0: 299 segments, 4 stalls (99.9 % band 0-15), repairs rack 4 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.038 ms p99 0.118 ms max 0.240 ms; the poll's own window: p50 0.089 ms p99 0.264 ms max 0.491 ms
+dir 1: 297 segments, 7 stalls (99.9 % band 0-15), repairs rack 7 probe 0 timeout 0
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.460 ms p99 0.936 ms p99.9 7.400 ms max 7.400 ms E 43.9 µs over 8  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.570 ms p99 2.016 ms p99.9 4.598 ms max 4.598 ms E 56.2 µs over 24  ** CONDITION 10's TRIGGER: bring to the advisor **
+test l2::delay::tests::loopback_tls_tungstenite_at_p2_30_hz_both_ways ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 147 filtered out; finished in 13.07s
+

@@ -27,7 +27,11 @@ notes = os.path.join(wt, ".checkpoints/netcode-proof-test")
 copied = []
 for n in sorted(os.listdir(notes)) if os.path.isdir(notes) else []:
     if n.startswith(prefix):
-        shutil.copy2(os.path.join(notes, n), os.path.join(MAIN, ".checkpoints/netcode-proof-test", n))
+        src, dst = os.path.join(notes, n), os.path.join(MAIN, ".checkpoints/netcode-proof-test", n)
+        if os.path.isdir(src):
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+        else:
+            shutil.copy2(src, dst)
         copied.append(n)
 files = sorted({l[6:] for l in patch.splitlines() if l.startswith("+++ b/")})
 print(f"base {head[:7]}; patch {len(patch)} B; {len(files)} files; notes copied {copied}")

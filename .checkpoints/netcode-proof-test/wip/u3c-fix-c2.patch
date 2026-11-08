@@ -1,0 +1,1391 @@
+diff --git a/spikes/netcode-proof/Cargo.toml b/spikes/netcode-proof/Cargo.toml
+index d3bafe0..9c4a6e8 100644
+--- a/spikes/netcode-proof/Cargo.toml
++++ b/spikes/netcode-proof/Cargo.toml
+@@ -69,10 +69,14 @@ futures-util = { version = "=0.3.34", default-features = false, features = ["sin
+ # deny, not forbid: two crates relax it (ADR 0002:264-265: "an exception needs a written invariant, a test and an
+ # #[allow] with its reason"), and no other may. npt-client-wasm relaxes it for the whole crate in its manifest, for
+ # wasm-bindgen's generated code (U7). npt-tcpinfo keeps these lints; its two pub functions in src/linux.rs, srtt_us
+-# (getsockopt TCP_INFO) and unacked_and_unsent (getsockopt SOL_SOCKET, then ioctl SIOCOUTQ on a TCP socket only),
+-# each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step fails on any other crate
+-# that relaxes it (in its code, in its manifest, or by not inheriting these lints), on any other relaxing in
+-# npt-tcpinfo, on either allow missing, and on a #[path] or include! that names anything but a .rs file in its crate.
++# and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket only),
++# each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step fails when this line is
++# not "deny" (or "forbid"); on unsafe code (`unsafe`, `global_asm!`) in any other crate, however the lint was relaxed,
++# and on any relaxing attribute it can read there; in npt-tcpinfo, on any other relaxing, on `unsafe` outside those two
++# functions, on either allow missing or without its reason, and on the two clippy unsafe lints relaxed or not denied in
++# lib.rs; on a manifest that sets unsafe_code or does not inherit these lints; on a #[path], include!, manifest target
++# path or symbolic link that compiles a file outside its crate's folder; and on rustflags, cargo configs or aliases
++# that lower a lint or replace clippy. What it cannot see (a different rustc, or a wrapper) is outside its reach.
+ unsafe_code = "deny"
+ 
+ [workspace.lints.clippy]
+diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
+index b0e1377..dc5b278 100644
+--- a/spikes/netcode-proof/check.mjs
++++ b/spikes/netcode-proof/check.mjs
+@@ -1,18 +1,20 @@
+ #!/usr/bin/env node
+ // The spike's test command (plan §12.4): every unit runs it, and its summary goes into the checkpoint.
+ //   node spikes/netcode-proof/check.mjs [--only <step,...>]
+-// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates), each on the measured build and on the
+-// bites build with warnings as errors; test (cargo test on the measured build, then on the bites build); deps (the
+-// dependency rules of plan §4.2 that `cargo metadata` shows, with every feature and target, and its unsafe_code rule,
+-// from the crates' files: DEPS_CHECKED lists them); refs (nothing outside spikes/ references it, §4.2 and §4.9); marks
+-// (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self (this
+-// file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and exits 1
+-// if any failed.
++// Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates and npt-tcpinfo's non-Linux stub), each on
++// the measured build and on the bites build with warnings as errors; test (cargo test on the measured build, then on
++// the bites build); deps (the dependency rules of plan §4.2 that `cargo metadata` shows, with every feature and
++// target, and its unsafe_code rule, from the crates' files, the workspace manifest and the rustflags and cargo configs
++// this command's cargo reads: DEPS_CHECKED lists them); refs (nothing outside spikes/ references it, §4.2 and §4.9);
++// marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
++// (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
++// exits 1 if any failed.
+ 
+ import { spawnSync } from "node:child_process";
+ import { createHash } from "node:crypto";
+ import { readFileSync, readdirSync } from "node:fs";
+-import { dirname, join } from "node:path";
++import { homedir } from "node:os";
++import { dirname, join, relative, resolve, sep } from "node:path";
+ import { fileURLToPath, pathToFileURL } from "node:url";
+ 
+ const HERE = dirname(fileURLToPath(import.meta.url));
+@@ -124,28 +126,57 @@ export function dependencyProblems(meta) {
+ /**
+  * The crates that may relax `unsafe_code`, by folder: ADR 0002:264-265's exceptions ("an exception needs a written
+  * invariant, a test and an #[allow] with its reason"), named in the workspace Cargo.toml. npt-client-wasm relaxes it in
+- * its manifest (wasm-bindgen's generated code), so its files are not scanned; npt-tcpinfo only through the attributes
+- * TCPINFO_UNSAFE_FNS allows.
++ * its manifest (wasm-bindgen's generated code), so its files are not scanned for it; npt-tcpinfo only through the
++ * attributes TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions.
+  */
+ export const UNSAFE_EXCEPTIONS = { "crates/client-wasm/": "npt-client-wasm", "crates/tcpinfo/": "npt-tcpinfo" };
+ /** npt-tcpinfo's only relaxing attributes (u3c-plan.md 1.8 (a)): one on each of these functions, in this file. */
+ export const TCPINFO_UNSAFE_FILE = "crates/tcpinfo/src/linux.rs";
+ export const TCPINFO_UNSAFE_FNS = ["srtt_us", "unacked_and_unsent"];
++/**
++ * npt-tcpinfo's crate root, whose crate-level `#![deny(...)]` holds every unsafe block to a SAFETY comment and one
++ * unsafe operation (u3c-plan.md 1.8 (a)); these two clippy lints, and their group `restriction`, are named nowhere else
++ * in the crate (rustc 1.99.1's clippy lets `allow(clippy::restriction)` relax both).
++ */
++const TCPINFO_ROOT = "crates/tcpinfo/src/lib.rs";
++const TCPINFO_CLIPPY_LINTS = ["undocumented_unsafe_blocks", "multiple_unsafe_ops_per_block"];
++const TCPINFO_CLIPPY_NAMES = /\b(?:undocumented_unsafe_blocks|multiple_unsafe_ops_per_block|restriction)\b/g;
+ 
+-/** An attribute that relaxes unsafe_code: allow, expect or warn, alone or in a list, possibly inside cfg_attr. */
+-const RELAX_UNSAFE = /\b(?:allow|expect|warn)\s*\(\s*(?:[\w:]+\s*,\s*)*unsafe_code\b/g;
++/**
++ * An attribute that relaxes unsafe_code: allow, expect or warn naming it in its list, alone or among other lints, raw
++ * identifiers included (`r#allow`, `r#unsafe_code`, `r#dead_code` before it), possibly inside cfg_attr. The list is
++ * read up to its first `)`, so the pattern also runs on lexRust's mask, where a comment or a literal inside the list is
++ * blanked: rustc 1.99.1 accepts a block comment holding `)` between dead_code and unsafe_code in one list.
++ */
++const RELAX_UNSAFE = /\b(?:allow|expect|warn)\s*\([^)]*?\bunsafe_code\b/g;
++/**
++ * The `unsafe` keyword (a raw identifier `r#unsafe` is a name, not the keyword) and `global_asm!`, the one construct
++ * the unsafe_code lint denies that edition 2024 lets go without the keyword (`#[no_mangle]`, `#[export_name]` and
++ * `#[link_section]` need `#[unsafe(...)]` there; rustc 1.99.1 compiles a macro-built `#[allow($l)]` over
++ * `global_asm!("")` with no `unsafe` in sight). Found in code, they are unsafe code whatever relaxed the lint: an
++ * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`.
++ */
++const UNSAFE_CODE = /(?<!r#)\bunsafe\b|\bglobal_asm\b/g;
+ /** The one form npt-tcpinfo may use: `allow(unsafe_code, reason = "...")` and nothing else in the attribute. */
+-const PLACED_ALLOW = /^\s*allow\s*\(\s*unsafe_code\s*,\s*reason\s*=\s*"(?:[^"\\]|\\[\s\S])*"\s*,?\s*\)\s*$/;
++const PLACED_ALLOW = /^\s*allow\s*\(\s*unsafe_code\s*,\s*reason\s*=\s*"((?:[^"\\]|\\[\s\S])*)"\s*,?\s*\)\s*$/;
++/**
++ * Whether an attribute body is PLACED_ALLOW with a reason that says something (ADR 0002:264-265: "an #[allow] with its
++ * reason"): a letter or a digit once escapes and line continuations are taken out, so `reason = ""` or `"\n"` fails.
++ */
++const isPlacedAllow = (body) =>
++  /[A-Za-z0-9]/.test((body.match(PLACED_ALLOW)?.[1] ?? "").replace(/\\(?:x[0-9a-fA-F]{2}|u\{[^}]*\}|[\s\S])/g, ""));
+ 
+ /**
+  * Rust source with its comments blanked (`code`) and with its comments and literals blanked (`mask`), both as long as
+  * the source, newlines kept, so offsets and line numbers carry over. Line comments, doc comments and nested block
+  * comments are comments; strings, raw strings, byte and C strings and char literals are literals, kept whole in `code`,
+- * so a `//` inside one is not a comment. A lifetime's quote is not a literal.
++ * so a `//` inside one is not a comment. A lifetime's quote is not a literal. A char literal holds one code point,
++ * which may be two UTF-16 units (`'😀'`): read unit by unit, its closing quote would open a literal of its own and
++ * blank the code after it.
+  */
+ export function lexRust(src) {
+   const blank = (s) => s.replace(/[^\n]/g, " ");
+-  const charLit = /'(?:[^'\\\n]|\\(?:x[0-9a-fA-F]{2}|u\{[0-9a-fA-F_]{1,6}\}|[^\n]))'/y;
++  const charLit = /'(?:[^'\\\n]|\\(?:x[0-9a-fA-F]{2}|u\{[0-9a-fA-F_]{1,6}\}|[^\n]))'/uy;
+   const rawOpen = /[bc]?r(#*)"/y;
+   let code = "";
+   let mask = "";
+@@ -234,7 +265,9 @@ const lineAt = (text, offset) => text.slice(0, offset).split("\n").length;
+  * inside that crate's folder, as a sentence. Either kind would otherwise compile code this scan does not read under its
+  * rules: another crate's file (npt-tcpinfo's linux.rs under npt-room's name), or a file that is not .rs. The path is
+  * resolved from the file's own folder (rustc resolves a #[path] inside an inline module from a deeper folder, so this
+- * reading flags at least what leaves the crate); an absolute or computed path is a problem too.
++ * reading flags at least what leaves the crate); an absolute or computed path is a problem too, and so is a #[path]
++ * whose value is not a plain string literal (rustc 1.99.1 accepts `#[path = $p]` inside a macro_rules, with the path
++ * given at the call).
+  */
+ function pathProblems(f, crate, code, mask, attrs) {
+   const problems = [];
+@@ -252,8 +285,13 @@ function pathProblems(f, crate, code, mask, attrs) {
+   };
+   const where = `a .rs file inside ${crate}`;
+   for (const a of attrs) {
+-    for (const m of code.slice(a.bodyStart, a.bodyEnd).matchAll(/\bpath\s*=\s*"((?:[^"\\]|\\.)*)"/g)) {
+-      if (!inCrateRs(m[1])) problems.push(`${f}:${lineAt(code, a.start)} has #[path = "${m[1]}"], not ${where}`);
++    // The key is found in the mask (a `path =` inside a string is no key), its value read from the code.
++    const body = code.slice(a.bodyStart, a.bodyEnd);
++    for (const m of mask.slice(a.bodyStart, a.bodyEnd).matchAll(/\bpath\s*=/g)) {
++      const value = body.slice(m.index + m[0].length).match(/^\s*"((?:[^"\\]|\\.)*)"/);
++      const at = `${f}:${lineAt(code, a.start)}`;
++      if (!value) problems.push(`${at} has a #[path] whose value is not a plain string literal, not ${where}`);
++      else if (!inCrateRs(value[1])) problems.push(`${at} has #[path = "${value[1]}"], not ${where}`);
+     }
+   }
+   // The mask has the literal blanked, so the argument is read from `code`, after the opening bracket.
+@@ -265,23 +303,47 @@ function pathProblems(f, crate, code, mask, attrs) {
+   return problems;
+ }
+ 
++/** The spans of the bodies (`{` to its `}`) of the `pub fn`s named `names` in a mask. */
++function fnBodies(mask, names) {
++  const spans = [];
++  for (const m of mask.matchAll(/\bpub\s+fn\s+([A-Za-z_]\w*)\b/g)) {
++    if (!names.includes(m[1])) continue;
++    const open = mask.indexOf("{", m.index + m[0].length);
++    if (open < 0) continue;
++    let depth = 0;
++    let j = open;
++    do {
++      if (mask[j] === "{") depth++;
++      else if (mask[j] === "}") depth--;
++      j++;
++    } while (depth > 0 && j < mask.length);
++    spans.push([open, j]);
++  }
++  return spans;
++}
++
+ /**
+- * npt-tcpinfo's placement rule (u3c-plan.md 1.8 (a)): every relaxing of unsafe_code in the crate is an outer
+- * `#[allow(unsafe_code, reason = "...")]` in TCPINFO_UNSAFE_FILE sitting directly on `pub fn srtt_us` or
+- * `pub fn unacked_and_unsent` (other outer attributes may sit between), one on each. Anything else is a problem with its
+- * line: an inner attribute, cfg_attr, expect or warn, an allow on a module, a helper or any other item, a mention in a
+- * string or a macro's text, a second allow on a function or none. `sites` counts the placed allows per function.
++ * npt-tcpinfo's rules (u3c-plan.md 1.8 (a)), each broken one reported with its line:
++ * - every relaxing of unsafe_code in the crate is an outer `#[allow(unsafe_code, reason = "...")]` in
++ *   TCPINFO_UNSAFE_FILE sitting directly on `pub fn srtt_us` or `pub fn unacked_and_unsent` (other outer attributes may
++ *   sit between), one on each, its reason not empty. Anything else is a problem: an inner attribute, cfg_attr, expect
++ *   or warn, an allow on a module, a helper or any other item, a mention in a string or a macro's text, `unsafe_code`
++ *   named in code outside an attribute (a macro can build the attribute from it), a second allow on a function or none;
++ * - every `unsafe` (and `global_asm!`) lies inside the body of one of those two functions in TCPINFO_UNSAFE_FILE;
++ * - the two clippy lints of TCPINFO_CLIPPY_LINTS, and their group, are named only in TCPINFO_ROOT's crate-level
++ *   `#![deny(...)]` (or forbid), which must deny both: `state.rootDeny` records that it does.
++ * `sites` counts the placed allows per function.
+  */
+-function tcpinfoProblems(f, code, mask, attrs, sites) {
++function tcpinfoProblems(f, code, mask, attrs, sites, state) {
+   const problems = [];
++  const inAttribute = (i) => attrs.some((a) => i >= a.start && i < a.end);
+   let inAttributes = 0;
+   for (const a of attrs) {
++    if (!mask.slice(a.bodyStart, a.bodyEnd).match(RELAX_UNSAFE)) continue;
+     const body = code.slice(a.bodyStart, a.bodyEnd);
+-    const n = body.match(RELAX_UNSAFE)?.length ?? 0;
+-    if (n === 0) continue;
+-    inAttributes += n;
++    inAttributes += body.match(RELAX_UNSAFE)?.length ?? 0;
+     const { item, fn } = a.inner ? { item: "its whole module or crate (#!)", fn: null } : itemAfter(mask, a.end, attrs);
+-    const placed = f === TCPINFO_UNSAFE_FILE && PLACED_ALLOW.test(body) && TCPINFO_UNSAFE_FNS.includes(fn);
++    const placed = f === TCPINFO_UNSAFE_FILE && !a.inner && isPlacedAllow(body) && TCPINFO_UNSAFE_FNS.includes(fn);
+     if (placed) sites.set(fn, (sites.get(fn) ?? 0) + 1);
+     else {
+       const on = a.inner ? item : `\`${item}\``;
+@@ -293,6 +355,42 @@ function tcpinfoProblems(f, code, mask, attrs, sites) {
+   }
+   const all = code.match(RELAX_UNSAFE)?.length ?? 0;
+   if (all > inAttributes) problems.push(`${f} names an unsafe_code relaxing outside an attribute (a string or a macro's text)`);
++  for (const m of mask.matchAll(/\bunsafe_code\b/g)) {
++    if (!inAttribute(m.index)) {
++      problems.push(`${f}:${lineAt(mask, m.index)} names unsafe_code outside an attribute (a macro can build the attribute from it)`);
++    }
++  }
++  const bodies = f === TCPINFO_UNSAFE_FILE ? fnBodies(mask, TCPINFO_UNSAFE_FNS) : [];
++  for (const m of mask.matchAll(UNSAFE_CODE)) {
++    if (bodies.some(([s, e]) => m.index > s && m.index < e)) continue;
++    problems.push(
++      `${f}:${lineAt(mask, m.index)} has \`${m[0]}\` outside the bodies of ${TCPINFO_UNSAFE_FNS.join(" and ")} in ` +
++        TCPINFO_UNSAFE_FILE,
++    );
++  }
++  // The crate-level deny: an inner attribute outside every brace (so it is the file's own, the crate root's when the
++  // file is lib.rs), its body deny(...) or forbid(...) naming both lints, a raw identifier allowed.
++  const rootDeny =
++    f === TCPINFO_ROOT
++      ? attrs.find((a) => {
++          if (!a.inner) return false;
++          const before = mask.slice(0, a.start);
++          if ((before.match(/\{/g)?.length ?? 0) !== (before.match(/\}/g)?.length ?? 0)) return false;
++          const body = mask.slice(a.bodyStart, a.bodyEnd);
++          return (
++            /^\s*(?:deny|forbid)\s*\(/.test(body) &&
++            TCPINFO_CLIPPY_LINTS.every((l) => new RegExp(`\\bclippy\\s*::\\s*(?:r#)?${l}\\b`).test(body))
++          );
++        })
++      : undefined;
++  if (rootDeny) state.rootDeny = true;
++  for (const m of mask.matchAll(TCPINFO_CLIPPY_NAMES)) {
++    if (rootDeny && m.index >= rootDeny.start && m.index < rootDeny.end) continue;
++    problems.push(
++      `${f}:${lineAt(mask, m.index)} names clippy's ${m[0]} outside ${TCPINFO_ROOT}'s crate-level deny (relaxing it ` +
++        "would let an unsafe block go without its SAFETY comment or hold more than one unsafe operation)",
++    );
++  }
+   return problems;
+ }
+ 
+@@ -309,19 +407,27 @@ function inheritsWorkspaceLints(lines) {
+ }
+ 
+ /**
+- * Every place under crates/ that relaxes unsafe_code outside the two exceptions, as a sentence; empty when none does
+- * (u3c-plan.md 1.8 (a) and (d)). `files` are paths relative to the spike's folder (crates/<crate>/...): its .rs files
+- * and crate manifests. What is caught:
+- * - outside the two exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included;
++ * Every place under crates/ that breaks the unsafe_code rule, as a sentence; empty when none does (u3c-plan.md 1.8 (a)
++ * and (d)). `files` are paths relative to the spike's folder (crates/<crate>/...): its .rs files and crate manifests.
++ * What is caught:
++ * - outside the two exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
++ *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code, which is unsafe
++ *   code however the lint was relaxed;
+  * - a manifest other than npt-client-wasm's that sets unsafe_code or does not inherit the workspace lints;
+- * - in npt-tcpinfo, any relaxing but the two placed allows (tcpinfoProblems), and either allow missing;
++ * - in npt-tcpinfo, any relaxing but the two placed allows, `unsafe` outside their two functions, the two clippy lints
++ *   named outside lib.rs's crate-level deny or that deny missing (tcpinfoProblems), and either allow missing;
+  * - in every crate, a #[path] or include! that names anything but a .rs file inside the crate's folder (pathProblems),
+  *   the way another crate could compile npt-tcpinfo's file under its own name.
+- * npt-client-wasm's .rs files are not scanned: its manifest relaxes the lint for the whole crate.
++ * npt-client-wasm's .rs files are not scanned for unsafe code: its manifest relaxes the lint for the whole crate.
++ * What lies outside these files (the workspace manifest's lint, the targets' paths and editions, symbolic links,
++ * rustflags and cargo configs) is checked by workspaceLintProblems, layoutProblems, crateFiles and
++ * cargoConfigProblems.
+  */
+ export function unsafeProblems(files, read) {
+   const problems = [];
+   const sites = new Map();
++  const state = { rootDeny: false };
++  const others = Object.values(UNSAFE_EXCEPTIONS).join(" and ");
+   for (const f of files) {
+     const crate = f.match(/^crates\/[^/]+\//)?.[0];
+     if (!crate) continue;
+@@ -329,10 +435,14 @@ export function unsafeProblems(files, read) {
+     if (f.endsWith(".rs")) {
+       const { code, mask } = lexRust(text);
+       const attrs = rustAttributes(mask);
+-      if (!(crate in UNSAFE_EXCEPTIONS) && text.match(RELAX_UNSAFE)) {
+-        problems.push(`${f} relaxes unsafe_code (only ${Object.values(UNSAFE_EXCEPTIONS).join(" and ")} may)`);
++      if (!(crate in UNSAFE_EXCEPTIONS)) {
++        if (text.match(RELAX_UNSAFE) || mask.match(RELAX_UNSAFE)) problems.push(`${f} relaxes unsafe_code (only ${others} may)`);
++        const uses = [...mask.matchAll(UNSAFE_CODE)];
++        if (uses.length) {
++          problems.push(`${f}:${lineAt(mask, uses[0].index)} has unsafe code (${uses.length} \`unsafe\` or \`global_asm\`; only ${others} may)`);
++        }
+       }
+-      if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites));
++      if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites, state));
+       problems.push(...pathProblems(f, crate, code, mask, attrs));
+     } else if (f === `${crate}Cargo.toml` && crate !== "crates/client-wasm/") {
+       const lines = text.split("\n").map((l) => l.replace(/#.*$/, ""));
+@@ -344,15 +454,238 @@ export function unsafeProblems(files, read) {
+     const n = sites.get(fn) ?? 0;
+     if (n !== 1) problems.push(`npt-tcpinfo's pub fn ${fn} has ${n} #[allow(unsafe_code, reason = ...)] attributes, not 1`);
+   }
++  if (!state.rootDeny) {
++    problems.push(`${TCPINFO_ROOT} does not deny clippy::${TCPINFO_CLIPPY_LINTS.join(" and clippy::")} at the crate root`);
++  }
++  return problems;
++}
++
++/**
++ * The spike's crate files the unsafe_code scan reads, under `cratesDir` (the spike's crates/): every .rs file and crate
++ * manifest, as crates/<crate>/..., in every folder (a `target` or dot folder too: `mod target;` or a #[path] into one
++ * compiles it); and every symbolic link there, which the deps step refuses: rustc follows one, so a link can compile
++ * another crate's file under this crate's name, and whether a walk follows it depends on Node's version.
++ */
++export function crateFiles(cratesDir) {
++  const files = [];
++  const links = [];
++  for (const e of readdirSync(cratesDir, { recursive: true, withFileTypes: true })) {
++    const f = `crates/${relative(cratesDir, join(e.parentPath, e.name)).split(sep).join("/")}`;
++    if (e.isSymbolicLink()) links.push(f);
++    else if (e.isFile() && (f.endsWith(".rs") || f.endsWith("/Cargo.toml"))) files.push(f);
++  }
++  return { files: files.sort(), links: links.sort() };
++}
++
++/**
++ * The workspace manifest's unsafe_code lint, which the whole rule rests on (every crate but npt-client-wasm inherits
++ * it): `[workspace.lints.rust] unsafe_code = "deny"` or "forbid" (or `{ level = ... }`). Every line naming unsafe_code
++ * (comments aside) must be that, in that table, and one must exist; any other form, place or level is a problem, so a
++ * rewritten or relaxed line fails closed (TOML forbids a second definition of the key).
++ */
++export function workspaceLintProblems(text) {
++  const problems = [];
++  const ok = /^["']?unsafe_code["']?\s*=\s*(?:(["'])(?:deny|forbid)\1|\{\s*level\s*=\s*(["'])(?:deny|forbid)\2\s*(?:,\s*priority\s*=\s*-?\d+\s*)?\})$/;
++  let table = null;
++  let found = 0;
++  for (const [i, raw] of tomlScan(text).clean.split("\n").entries()) {
++    const l = raw.trim();
++    const header = l.match(/^\[\[?([^\]]+)\]\]?$/);
++    if (header) table = header[1].replace(/\s+/g, "");
++    else if (/\bunsafe_code\b/.test(l)) {
++      if (table === "workspace.lints.rust" && ok.test(l)) found++;
++      else problems.push(`Cargo.toml:${i + 1} names unsafe_code other than as "deny" or "forbid" in [workspace.lints.rust]`);
++    }
++  }
++  if (found === 0) problems.push('Cargo.toml has no [workspace.lints.rust] unsafe_code = "deny" (or "forbid") for its crates to inherit');
++  return problems;
++}
++
++/**
++ * Where the crates' code comes from, read from `cargo metadata` (u3c review F-E and S5 (c)): every workspace member's
++ * manifest is crates/<folder>/Cargo.toml (the unsafe_code scan reads crates/ only), and every target it builds (lib,
++ * bin, example, test, bench, build script) is a .rs file inside its own folder, in edition 2024. A manifest's `path`
++ * or `build` key could otherwise compile another crate's file under its own name (npt-tcpinfo's linux.rs, with its
++ * allows, as npt-room's lib) or a file the scan never reads; and an older edition lets `#[no_mangle]` go without the
++ * `unsafe` keyword the scan looks for (rustc 1.99.1, edition 2021: a macro-built allow over it compiles). No member is
++ * a proc-macro crate: one can emit an unsafe block whose keyword it builds from strings, and rustc 1.99.1 compiles that
++ * expansion even under `--forbid unsafe_code` (code from another crate's macro is not linted), with no `unsafe` in the
++ * calling crate's source. And every package with no registry or git source (a path dependency) is a member, so none of
++ * the workspace's own code sits outside the scan.
++ */
++export function layoutProblems(meta) {
++  const problems = [];
++  const root = resolve(meta.workspace_root);
++  const rel = (p) => relative(root, resolve(p)).split(sep).join("/");
++  const byId = new Map(meta.packages.map((p) => [p.id, p]));
++  for (const p of meta.packages) {
++    if (p.source == null && !meta.workspace_members.includes(p.id)) {
++      problems.push(`${p.name} (${rel(p.manifest_path)}) is a path dependency outside the workspace, which the scan does not read`);
++    }
++  }
++  for (const id of meta.workspace_members) {
++    const p = byId.get(id);
++    const manifest = rel(p.manifest_path);
++    if (!/^crates\/[^/]+\/Cargo\.toml$/.test(manifest)) {
++      problems.push(`${p.name}'s manifest is ${manifest}, not crates/<folder>/Cargo.toml (the unsafe_code scan reads crates/ only)`);
++    }
++    const dir = dirname(resolve(p.manifest_path));
++    for (const t of p.targets ?? []) {
++      const what = `${p.name}'s ${t.kind.join("/")} target ${t.name}`;
++      const src = resolve(t.src_path);
++      if (!src.startsWith(dir + sep)) problems.push(`${what} compiles ${rel(src)}, outside its folder ${rel(dir)}/`);
++      else if (!src.endsWith(".rs")) problems.push(`${what} compiles ${rel(src)}, not a .rs file the scan reads`);
++      if (t.edition !== "2024") problems.push(`${what} is edition ${t.edition}, not 2024`);
++      if (t.kind.includes("proc-macro")) problems.push(`${what} is a proc-macro crate, whose expansions the lint and the scan cannot see`);
++    }
++  }
+   return problems;
+ }
+ 
+-/** The spike's crate files the unsafe_code scan reads: every .rs file and crate manifest under crates/. */
+-function crateFiles() {
+-  return readdirSync(join(HERE, "crates"), { recursive: true })
+-    .map((f) => `crates/${String(f).replaceAll("\\", "/")}`)
+-    .filter((f) => !f.split("/").some((part) => part === "target" || part.startsWith(".")))
+-    .filter((f) => f.endsWith(".rs") || f.endsWith("/Cargo.toml"));
++/**
++ * A TOML text read for this file's checks: `clean` with its comments blanked, `mask` with its strings blanked too (both
++ * as long as the text, newlines kept), and `strings`, each one's span and value (basic strings' escapes decoded,
++ * multi-line and literal strings included). Enough for cargo's config and manifest files, not a full TOML parser: what
++ * it cannot read is reported by its callers, never passed.
++ */
++function tomlScan(text) {
++  const blank = (s) => s.replace(/[^\n]/g, " ");
++  const escapes = { b: "\b", t: "\t", n: "\n", f: "\f", r: "\r", e: "\x1b", '"': '"', "\\": "\\" };
++  const decode = (raw) =>
++    raw.replace(/\\(?:u([0-9a-fA-F]{4})|U([0-9a-fA-F]{8})|x([0-9a-fA-F]{2})|([btnfre"\\])|[ \t]*\r?\n\s*)/g, (_, u, U, x, ch) => {
++      if (u || U || x) return String.fromCodePoint(parseInt(u || U || x, 16));
++      return ch ? escapes[ch] : "";
++    });
++  let clean = "";
++  let mask = "";
++  const strings = [];
++  let i = 0;
++  while (i < text.length) {
++    const c = text[i];
++    if (c === "#") {
++      const nl = text.indexOf("\n", i);
++      const piece = blank(text.slice(i, nl < 0 ? text.length : nl));
++      clean += piece;
++      mask += piece;
++      i += piece.length;
++    } else if (c === '"' || c === "'") {
++      const q = text.startsWith(c.repeat(3), i) ? c.repeat(3) : c;
++      let j = i + q.length;
++      while (j < text.length && !text.startsWith(q, j)) j += c === '"' && text[j] === "\\" ? 2 : 1;
++      while (q.length === 3 && text[j + 3] === c) j++; // `""""` ends a multi-line string with a quote inside it
++      const end = Math.min(j + q.length, text.length);
++      const raw = text.slice(i + q.length, j).replace(q.length === 3 ? /^\r?\n/ : /^$/, "");
++      strings.push({ start: i, end, value: c === '"' ? decode(raw) : raw });
++      clean += text.slice(i, end);
++      mask += blank(text.slice(i, end));
++      i = end;
++    } else {
++      clean += c;
++      mask += c;
++      i++;
++    }
++  }
++  return { clean, mask, strings };
++}
++
++/**
++ * The values of every key named `key` in a tomlScan (any table; bare, dotted or quoted): for each, its strings (the one
++ * string, or every element of an array of strings), or null when it is anything else, which this check cannot read.
++ */
++function tomlValues(scan, key) {
++  const { mask, strings } = scan;
++  const starts = [];
++  for (const m of mask.matchAll(new RegExp(`(?:^|[\\s.{,])${key}[ \\t]*=`, "gm"))) starts.push(m.index + m[0].length);
++  for (const s of strings) {
++    const eq = mask.slice(s.end).match(/^[ \t]*=/);
++    if (s.value === key && eq && /(?:^|[\s.{,])$/.test(mask.slice(0, s.start))) starts.push(s.end + eq[0].length);
++  }
++  return starts.map((at) => {
++    let v = at;
++    while ((mask[v] === " " || mask[v] === "\t") && !strings.some((s) => s.start === v)) v++;
++    const one = strings.find((s) => s.start === v);
++    if (one) return [one.value];
++    if (mask[v] !== "[") return null;
++    let depth = 0;
++    let j = v;
++    do {
++      if (mask[j] === "[") depth++;
++      else if (mask[j] === "]") depth--;
++      j++;
++    } while (depth > 0 && j < mask.length);
++    if (!/^[\s,]*$/.test(mask.slice(v + 1, j - 1))) return null;
++    return strings.filter((s) => s.start > v && s.end < j).map((s) => s.value);
++  });
++}
++
++/**
++ * A rustc flag that lowers or caps lint levels, or one whose flags this check cannot read: -A, -W, --allow, --warn,
++ * --force-warn and --cap-lints (rustc 1.99.1 compiles an unsafe block under `--deny unsafe_code` with
++ * `--cap-lints warn` even beside `-F unsafe_code`, and with `--force-warn unsafe_code` even beside `-D warnings`), -Z,
++ * and an @argfile.
++ */
++const LINT_LOWERING = /^(?:-A|-W|--allow|--warn|--force-warn|--cap-lints|-Z|@)/;
++/**
++ * check.mjs's cargo subcommands that live outside cargo (cargo-clippy, cargo-fmt): a cargo alias of the same name
++ * replaces them, and cargo 1.99.1 only warns, so `[alias] clippy = "check"` would lint nothing and pass.
++ */
++const SHADOWABLE = ["clippy", "fmt"];
++
++/**
++ * Every way the cargo this command runs could relax a lint without a word in the crates (u3c review S1 and F-D), as a
++ * sentence: a lint-lowering flag (LINT_LOWERING) in RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, CARGO_BUILD_RUSTFLAGS or
++ * CARGO_TARGET_<triple>_RUSTFLAGS (`env`), or in a `rustflags` key of a cargo config file (`configs`: { path, text },
++ * the ones cargoConfigFiles finds); a rustflags value this check cannot read; and an alias that replaces clippy or fmt
++ * (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file).
++ */
++export function cargoConfigProblems(env, configs) {
++  const problems = [];
++  const lowering = (where, flags) => {
++    for (const fl of flags) {
++      if (LINT_LOWERING.test(fl)) problems.push(`${where} passes ${JSON.stringify(fl)} to rustc: a flag that can relax unsafe_code`);
++    }
++  };
++  for (const [k, v] of Object.entries(env)) {
++    if (typeof v !== "string") continue;
++    if (/RUSTFLAGS$/.test(k)) lowering(`${k} in the environment`, v.split(k === "CARGO_ENCODED_RUSTFLAGS" ? "\x1f" : /\s+/));
++    const alias = k.match(/^CARGO_ALIAS_(\w+)$/)?.[1].toLowerCase();
++    if (SHADOWABLE.includes(alias)) problems.push(`${k} in the environment replaces \`cargo ${alias}\` with an alias`);
++  }
++  for (const { path, text } of configs) {
++    const scan = tomlScan(text);
++    for (const v of tomlValues(scan, "rustflags")) {
++      if (v === null) problems.push(`${path} has a rustflags value this check cannot read`);
++      else lowering(`${path}'s rustflags`, v.flatMap((s) => [s, ...s.split(/\s+/)]));
++    }
++    for (const name of SHADOWABLE) {
++      if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: an alias that replaces \`cargo ${name}\``);
++    }
++  }
++  return problems;
++}
++
++/**
++ * The cargo config files cargo reads when it runs in `start`: .cargo/config.toml and .cargo/config in `start` and in
++ * every folder above it, then in CARGO_HOME (default ~/.cargo); each that exists, as { path, text }.
++ */
++function cargoConfigFiles(start) {
++  const dirs = [];
++  for (let d = resolve(start); ; d = dirname(d)) {
++    dirs.push(join(d, ".cargo"));
++    if (dirname(d) === d) break;
++  }
++  dirs.push(process.env.CARGO_HOME ?? join(homedir(), ".cargo"));
++  const found = [];
++  for (const dir of new Set(dirs)) {
++    for (const name of ["config.toml", "config"]) {
++      try {
++        found.push({ path: join(dir, name), text: readFileSync(join(dir, name), "utf8") });
++      } catch {
++        // absent (or a folder): cargo reads nothing there either
++      }
++    }
++  }
++  return found;
+ }
+ 
+ /**
+@@ -445,7 +778,13 @@ function summarized(r, summary) {
+   return { ...r, out: `${r.out}\n${summary(r.out)}` };
+ }
+ 
+-const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...LEAF.flatMap((c) => ["-p", c])];
++/**
++ * The crates linted for wasm32: the leaf crates, and npt-tcpinfo, whose non-Linux stub is how "the workspace still
++ * builds anywhere" (u3c-plan.md 1.8 (c); review F-N): wasm32 is a target that is not Linux, and the crate has no
++ * dependency there. Its lib only: its tests and the probe are Linux's.
++ */
++export const WASM_CRATES = [...LEAF, "npt-tcpinfo"];
++const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...WASM_CRATES.flatMap((c) => ["-p", c])];
+ 
+ /** clippy with warnings as errors on the measured build (no features), then on the bites build (every feature). */
+ function lintBothBuilds(scope) {
+@@ -473,9 +812,12 @@ function testBothBuilds() {
+ const DEPS_CHECKED =
+   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
+   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
+-  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; unsafe_code is relaxed only by " +
+-  "npt-client-wasm's manifest and the #[allow] on npt-tcpinfo's srtt_us and unacked_and_unsent; every #[path] and " +
+-  "include! names a .rs file in its own crate";
++  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace denies unsafe_code; it is " +
++  "relaxed only by npt-client-wasm's manifest and the #[allow] on npt-tcpinfo's srtt_us and unacked_and_unsent, and " +
++  "unsafe code appears only there and inside those two functions, under lib.rs's deny of the two clippy unsafe lints; " +
++  "no rustflags or cargo config lowers a lint or replaces clippy or fmt; every member lives in crates/ and builds " +
++  "only .rs files in its own folder, in edition 2024, none a proc-macro, and every path dependency is a member; no " +
++  "symbolic link under crates/; every #[path] and include! names a .rs file in its own crate";
+ 
+ const STEPS = {
+   fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
+@@ -487,12 +829,19 @@ const STEPS = {
+   deps: () => {
+     const r = run("cargo", ["metadata", "--locked", "--format-version", "1", "--all-features"], HERE);
+     if (!r.ok) return r;
+-    const files = crateFiles();
++    const meta = JSON.parse(r.stdout);
++    const { files, links } = crateFiles(join(HERE, "crates"));
++    const configs = cargoConfigFiles(HERE);
+     const problems = [
+-      ...dependencyProblems(JSON.parse(r.stdout)),
++      ...dependencyProblems(meta),
++      ...workspaceLintProblems(readFileSync(join(HERE, "Cargo.toml"), "utf8")),
++      ...layoutProblems(meta),
++      ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
++      ...cargoConfigProblems(process.env, configs),
+       ...unsafeProblems(files, (f) => readFileSync(join(HERE, f), "utf8")),
+     ];
+-    return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${files.length} crate files read)` };
++    const read = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
++    return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${read})` };
+   },
+   refs: () => {
+     const r = run("git", ["ls-files", "-z"], ROOT);
+diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
+index 0961b22..8bce0fc 100644
+--- a/spikes/netcode-proof/check.test.mjs
++++ b/spikes/netcode-proof/check.test.mjs
+@@ -3,8 +3,26 @@
+ 
+ import assert from "node:assert/strict";
+ import { createHash } from "node:crypto";
++import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { dirname, join } from "node:path";
+ import { test } from "node:test";
+-import { dependencyProblems, expectedMarks, lexRust, marksProblems, referenceProblems, unsafeProblems } from "./check.mjs";
++import { fileURLToPath } from "node:url";
++import {
++  WASM_CRATES,
++  cargoConfigProblems,
++  crateFiles,
++  dependencyProblems,
++  expectedMarks,
++  layoutProblems,
++  lexRust,
++  marksProblems,
++  referenceProblems,
++  unsafeProblems,
++  workspaceLintProblems,
++} from "./check.mjs";
++
++const HERE = dirname(fileURLToPath(import.meta.url));
+ 
+ /** cargo metadata's shape, from edges { crate: [[dependency, kind]] } (kind null = normal, "dev", "build"). */
+ function meta(edges) {
+@@ -144,10 +162,15 @@ test("npt-net has no direct libc dependency; reaching it through npt-tcpinfo or
+   assert.ok(gone.includes("npt-net is not a workspace member"), gone.join("\n"));
+ });
+ 
+-/** The placed allow, as npt-tcpinfo writes it: a multi-line reason with a line continuation and brackets inside. */
++/**
++ * The placed allow, as npt-tcpinfo writes it: a multi-line reason with a line continuation and brackets inside, on a
++ * function whose body holds an unsafe block (where it may).
++ */
+ const placed = (f, between = "") =>
+   `#[allow(\n    unsafe_code,\n    reason = "one foreign call (TCP_INFO) [ADR 0002]; \\\n              no wrapper"\n)]\n` +
+-  `${between}pub fn ${f}(fd: BorrowedFd<'_>) -> io::Result<u32> {\n    Ok(0)\n}\n`;
++  `${between}pub fn ${f}(fd: BorrowedFd<'_>) -> io::Result<u32> {\n    unsafe { Ok(0) }\n}\n`;
++/** npt-tcpinfo's crate-level deny of the two clippy unsafe lints, as lib.rs's first line. */
++const DENY = "#![deny(clippy::undocumented_unsafe_blocks, clippy::multiple_unsafe_ops_per_block)]\n";
+ 
+ /** A clean crate tree for unsafeProblems: the two exceptions and two ordinary crates. */
+ function cleanCrates() {
+@@ -158,7 +181,7 @@ function cleanCrates() {
+     "crates/tcpinfo/src/lib.rs":
+       "//! The `#[allow(unsafe_code)]` sits on the two functions only (a doc comment, not an attribute).\n" +
+       "/* A block comment /* nested */ naming #[allow(unsafe_code)] is a comment too. */\n" +
+-      "#![deny(clippy::undocumented_unsafe_blocks)]\nmod linux;\n",
++      "#![deny(\n    clippy::undocumented_unsafe_blocks,\n    clippy::multiple_unsafe_ops_per_block\n)]\nmod linux;\n",
+     "crates/tcpinfo/src/linux.rs":
+       `const URL: &str = "http://example.invalid/#[x]"; // a // inside a string is not a comment\n` +
+       `const QUOTE: char = '"';\nconst RAW: &str = r#"a "quoted" ]] #[ bit"#;\n` +
+@@ -183,6 +206,9 @@ const misplaced = (where, on) =>
+   `${where} relaxes unsafe_code on ${on}; npt-tcpinfo may only put #[allow(unsafe_code, reason = "...")] directly on ` +
+   "srtt_us and unacked_and_unsent in crates/tcpinfo/src/linux.rs";
+ const count = (fn, k) => `npt-tcpinfo's pub fn ${fn} has ${k} #[allow(unsafe_code, reason = ...)] attributes, not 1`;
++/** npt-tcpinfo's message for `unsafe` (or `global_asm`) outside the two functions' bodies. */
++const outside = (where, what = "unsafe") =>
++  `${where} has \`${what}\` outside the bodies of srtt_us and unacked_and_unsent in crates/tcpinfo/src/linux.rs`;
+ 
+ test("unsafe_code: the clean tree passes", () => {
+   assert.deepEqual(unsafeWith(() => {}), []);
+@@ -206,6 +232,13 @@ test("unsafe_code: an attribute relaxing it outside the two exceptions fails, in
+     "#[allow(dead_code, unsafe_code)]\nfn f() {}\n",
+     "#[allow(\n    clippy::all,\n    unsafe_code\n)]\nfn f() {}\n",
+     "#![cfg_attr(test, allow(unsafe_code))]\n",
++    // Review S1's routes rustc 1.99.1 accepts: a comment inside the list (one holding `)` too), raw identifiers.
++    "#[allow(dead_code, /* x */ unsafe_code)]\nfn f() {}\n",
++    "#[allow(dead_code, /* ) */ unsafe_code)]\nfn f() {}\n",
++    "#[allow(dead_code, // )\n    unsafe_code)]\nfn f() {}\n",
++    "#[allow(r#unsafe_code)]\nfn f() {}\n",
++    "#[r#allow(unsafe_code)]\nfn f() {}\n",
++    "#[allow(r#dead_code, unsafe_code)]\nfn f() {}\n",
+   ];
+   for (const code of planted) {
+     const p = unsafeWith((f) => {
+@@ -231,7 +264,7 @@ test("unsafe_code: a manifest that sets it or drops the workspace lints fails",
+ 
+ test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
+   const wide = unsafeWith((f) => {
+-    f["crates/tcpinfo/src/lib.rs"] = "#![allow(unsafe_code)]\nmod linux;\n";
++    f["crates/tcpinfo/src/lib.rs"] = `#![allow(unsafe_code)]\n${DENY}mod linux;\n`;
+   });
+   assert.deepEqual(wide, [misplaced("crates/tcpinfo/src/lib.rs:1", "its whole module or crate (#!)")]);
+   const third = unsafeWith((f) => {
+@@ -246,32 +279,46 @@ test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or
+     f["crates/tcpinfo/src/linux.rs"] = placed("unacked_and_unsent");
+     f["crates/tcpinfo/src/stub.rs"] = placed("srtt_us");
+   });
+-  assert.deepEqual(stub, [misplaced("crates/tcpinfo/src/stub.rs:1", "`pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
++  assert.deepEqual(stub, [
++    misplaced("crates/tcpinfo/src/stub.rs:1", "`pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
++    outside("crates/tcpinfo/src/stub.rs:7"),
++    count("srtt_us", 0),
++  ]);
+ });
+ 
+ test("unsafe_code: the critic's two mutations fail (an allow on `mod linux;`, an allow moved to a helper)", () => {
+   // 1. A module-level outer allow, with one function's own allow removed: the count of attributes stays 2.
+   const onMod = unsafeWith((f) => {
+-    f["crates/tcpinfo/src/lib.rs"] = '#[cfg(target_os = "linux")]\n#[allow(unsafe_code)]\nmod linux;\n';
++    f["crates/tcpinfo/src/lib.rs"] = `${DENY}#[cfg(target_os = "linux")]\n#[allow(unsafe_code)]\nmod linux;\n`;
+     f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}`;
+   });
+-  assert.deepEqual(onMod, [misplaced("crates/tcpinfo/src/lib.rs:2", "`mod linux;`"), count("srtt_us", 0)]);
++  assert.deepEqual(onMod, [misplaced("crates/tcpinfo/src/lib.rs:3", "`mod linux;`"), count("srtt_us", 0)]);
+   // 2. The allow moved from srtt_us to a helper, in its exact form: the count stays 2.
+   const moved = unsafeWith((f) => {
+     const helper = placed("srtt_us").replace("pub fn srtt_us", "fn helper");
+     f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}${helper}`;
+   });
+-  assert.deepEqual(moved, [misplaced("crates/tcpinfo/src/linux.rs:10", "`fn helper(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
++  assert.deepEqual(moved, [
++    misplaced("crates/tcpinfo/src/linux.rs:10", "`fn helper(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
++    outside("crates/tcpinfo/src/linux.rs:16"),
++    count("srtt_us", 0),
++  ]);
+   // The same onto another public function.
+   const other = unsafeWith((f) => {
+     f["crates/tcpinfo/src/linux.rs"] = `${placed("unacked_and_unsent")}${placed("other")}pub fn srtt_us() {}\n`;
+   });
+-  assert.deepEqual(other, [misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn other(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
++  assert.deepEqual(other, [
++    misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn other(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
++    outside("crates/tcpinfo/src/linux.rs:15"),
++    count("srtt_us", 0),
++  ]);
+ });
+ 
+ test("unsafe_code: on the two functions only the exact allow with its reason counts", () => {
+   const forms = {
+     "#[allow(unsafe_code)]\n": "no reason",
++    '#[allow(unsafe_code, reason = "")]\n': "an empty reason (review S5 (c))",
++    '#[allow(unsafe_code, reason = " \\n \\\n ")]\n': "a reason of escapes and blanks",
+     '#[expect(unsafe_code, reason = "x")]\n': "expect",
+     '#[allow(unsafe_code, dead_code, reason = "x")]\n': "another lint beside it",
+     "#[cfg_attr(all(), allow(unsafe_code))]\n": "cfg_attr",
+@@ -338,6 +385,289 @@ test("unsafe_code: no #[path] or include! reaches outside its crate, the way npt
+     [],
+     "inside the crate is fine",
+   );
++  // A #[path] whose value a macro supplies (rustc 1.99.1 compiles both forms), or a raw string, is not read: refused.
++  for (const code of [
++    'macro_rules! m {\n    ($p:literal) => {\n        #[path = $p]\n        mod k;\n    };\n}\nm!("../../tcpinfo/src/linux.rs");\n',
++    'macro_rules! m {\n    ($p:expr) => {\n        #[path = $p]\n        mod k;\n    };\n}\nm!("../../tcpinfo/src/linux.rs");\n',
++    '#[path = r"../../tcpinfo/src/linux.rs"]\nmod k;\n',
++  ]) {
++    const p = unsafeWith((f) => {
++      f["crates/room/src/k.rs"] = code;
++    });
++    const line = code.startsWith("#") ? 1 : 3;
++    assert.deepEqual(p, [`crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
++  }
++});
++
++/** One unsafe block, as rustc 1.99.1 compiles it once unsafe_code is relaxed. */
++const UNSAFE_FN = "pub fn f() -> u8 {\n    let x = 1u8;\n    unsafe { *(&raw const x) }\n}\n";
++
++test("unsafe code outside the two exception crates fails however the lint was relaxed (review S1)", () => {
++  const relaxedElsewhere = {
++    // Relaxed by RUSTFLAGS=-Aunsafe_code, --cap-lints warn or a cargo config: no attribute to see, the block still shows.
++    "rustflags or --cap-lints": UNSAFE_FN,
++    // An allow built by a macro from a fragment: rustc 1.99.1 compiles it; the attribute names no lint.
++    "a macro-built allow": `macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        ${UNSAFE_FN}    };\n}\nlax!(unsafe_code);\n`,
++    "an unsafe attribute": '#[unsafe(no_mangle)]\npub extern "C" fn k() {}\n',
++    "global_asm! under a macro-built allow": "macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        mod m {\n            core::arch::global_asm!(\"\");\n        }\n    };\n}\nlax!(unsafe_code);\n",
++  };
++  const firstLine = { "rustflags or --cap-lints": 3, "a macro-built allow": 6, "an unsafe attribute": 1, "global_asm! under a macro-built allow": 5 };
++  for (const [what, code] of Object.entries(relaxedElsewhere)) {
++    const p = unsafeWith((f) => {
++      f["crates/room/src/evil.rs"] = code;
++    });
++    const n = code.match(/\bunsafe\b|\bglobal_asm\b/g).length;
++    assert.deepEqual(
++      p,
++      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm and npt-tcpinfo may)`],
++      what,
++    );
++  }
++  // Not unsafe code: the word in a comment, a string or a doc, a raw identifier, the lint's own name in a deny.
++  const harmless = '#![deny(unsafe_code)]\n// unsafe { }\n/// unsafe\nconst S: &str = "unsafe { }";\nfn r#unsafe() {}\n';
++  assert.deepEqual(unsafeWith((f) => (f["crates/room/src/ok.rs"] = harmless)), []);
++  // npt-client-wasm's manifest relaxes the lint for the whole crate, so its unsafe code is its own.
++  assert.deepEqual(unsafeWith((f) => (f["crates/client-wasm/src/glue.rs"] = UNSAFE_FN)), []);
++});
++
++test("lexRust reads a char literal as one code point, so an emoji cannot hide code from the scan", () => {
++  // Read unit by unit, the emoji's closing quote would start `','`, a char literal, and the `"` after it a string
++  // running to the next `"`, so the unsafe block between would be blanked.
++  const src = `const A: [char; 2] = ['\u{1F600}','"'];\n${UNSAFE_FN}const B: &str = "";\n`;
++  const { code, mask } = lexRust(src);
++  assert.equal(mask.length, src.length);
++  assert.match(mask, /unsafe \{ \*\(&raw const x\) \}/, "the block after the literals stays code");
++  assert.match(code, /'\u{1F600}'/u);
++  const p = unsafeWith((f) => {
++    f["crates/room/src/emoji.rs"] = src;
++  });
++  assert.deepEqual(p, ["crates/room/src/emoji.rs:4 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"]);
++});
++
++test("npt-tcpinfo: unsafe only inside srtt_us and unacked_and_unsent, unsafe_code named only by their allows", () => {
++  const linux = cleanCrates()["crates/tcpinfo/src/linux.rs"];
++  const at = linux.split("\n").length;
++  // An unsafe block in a helper, its allow built by a macro (rustc compiles it; no attribute names the lint).
++  const lax = unsafeWith((f) => {
++    f["crates/tcpinfo/src/linux.rs"] += `macro_rules! lax {\n    ($l:ident) => {\n        #[allow($l)]\n        ${UNSAFE_FN}    };\n}\nlax!(unsafe_code);\n`;
++  });
++  assert.deepEqual(lax, [
++    "crates/tcpinfo/src/linux.rs:" + (at + 9) + " names unsafe_code outside an attribute (a macro can build the attribute from it)",
++    outside(`crates/tcpinfo/src/linux.rs:${at + 5}`),
++  ]);
++  // In the tests, an example or the stub: outside the two functions.
++  for (const file of ["crates/tcpinfo/src/tests.rs", "crates/tcpinfo/examples/probe.rs", "crates/tcpinfo/src/stub.rs"]) {
++    assert.deepEqual(unsafeWith((f) => (f[file] = UNSAFE_FN)), [outside(`${file}:3`)], file);
++  }
++  assert.deepEqual(
++    unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += 'core::arch::global_asm!("");\n')),
++    [outside(`crates/tcpinfo/src/linux.rs:${at}`, "global_asm")],
++  );
++  // `pub unsafe fn` puts the keyword outside the body (and the allow no longer sits on `pub fn srtt_us`).
++  const unsafeFn = unsafeWith((f) => {
++    f["crates/tcpinfo/src/linux.rs"] = placed("unacked_and_unsent") + placed("srtt_us").replace("pub fn", "pub unsafe fn");
++  });
++  assert.deepEqual(unsafeFn, [
++    misplaced("crates/tcpinfo/src/linux.rs:9", "`pub unsafe fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"),
++    outside("crates/tcpinfo/src/linux.rs:14"),
++    outside("crates/tcpinfo/src/linux.rs:15"),
++    count("srtt_us", 0),
++  ]);
++  // A comment inside the list does not hide a misplaced allow (review S1).
++  const comment = unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += "#[allow(dead_code, /* ) */ unsafe_code)]\nfn h() {}\n"));
++  assert.deepEqual(comment, [misplaced(`crates/tcpinfo/src/linux.rs:${at}`, "`fn h() {}`")]);
++});
++
++test("npt-tcpinfo: the clippy unsafe lints stay denied at the crate root and relaxed nowhere (review S1)", () => {
++  const named = (where, name) =>
++    `${where} names clippy's ${name} outside crates/tcpinfo/src/lib.rs's crate-level deny (relaxing it would let an ` +
++    "unsafe block go without its SAFETY comment or hold more than one unsafe operation)";
++  const linux = cleanCrates()["crates/tcpinfo/src/linux.rs"];
++  const at = linux.split("\n").length;
++  for (const [attr, name] of [
++    ["#[allow(clippy::undocumented_unsafe_blocks)]", "undocumented_unsafe_blocks"],
++    ["#[expect(clippy::multiple_unsafe_ops_per_block)]", "multiple_unsafe_ops_per_block"],
++    ["#[allow(clippy::restriction)]", "restriction"],
++    ["#[allow(clippy::r#undocumented_unsafe_blocks)]", "undocumented_unsafe_blocks"],
++    ["#[cfg_attr(all(), allow(clippy::restriction))]", "restriction"],
++  ]) {
++    const p = unsafeWith((f) => (f["crates/tcpinfo/src/linux.rs"] += `${attr}\nfn h() {}\n`));
++    assert.deepEqual(p, [named(`crates/tcpinfo/src/linux.rs:${at}`, name)], attr);
++  }
++  // A macro's argument naming it (the attribute built inside the macro).
++  const viaMacro = unsafeWith((f) => (f["crates/tcpinfo/src/tests.rs"] = "lax!(clippy::multiple_unsafe_ops_per_block);\n"));
++  assert.deepEqual(viaMacro, [named("crates/tcpinfo/src/tests.rs:1", "multiple_unsafe_ops_per_block")]);
++  // The crate-level deny missing, partial, behind cfg_attr, or not at the crate root.
++  const missing = "crates/tcpinfo/src/lib.rs does not deny clippy::undocumented_unsafe_blocks and clippy::multiple_unsafe_ops_per_block at the crate root";
++  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = "mod linux;\n")), [missing]);
++  assert.deepEqual(unsafeWith((f) => delete f["crates/tcpinfo/src/lib.rs"]), [missing]);
++  assert.deepEqual(
++    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = "#![deny(clippy::undocumented_unsafe_blocks)]\nmod linux;\n")),
++    [named("crates/tcpinfo/src/lib.rs:1", "undocumented_unsafe_blocks"), missing],
++  );
++  assert.deepEqual(
++    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `#![cfg_attr(any(), ${DENY.slice(3, -3)})]\nmod linux;\n`)),
++    [named("crates/tcpinfo/src/lib.rs:1", "undocumented_unsafe_blocks"), named("crates/tcpinfo/src/lib.rs:1", "multiple_unsafe_ops_per_block"), missing],
++  );
++  assert.deepEqual(
++    unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `mod linux;\nfn f() {\n    ${DENY}}\n`)),
++    [named("crates/tcpinfo/src/lib.rs:3", "undocumented_unsafe_blocks"), named("crates/tcpinfo/src/lib.rs:3", "multiple_unsafe_ops_per_block"), missing],
++  );
++  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `${DENY.replace("deny", "forbid")}mod linux;\n`)), [], "forbid is fine");
++});
++
++test("the workspace manifest denies unsafe_code, and nothing else will do (review F-D)", () => {
++  const real = readFileSync(join(HERE, "Cargo.toml"), "utf8");
++  assert.deepEqual(workspaceLintProblems(real), [], "the spike's own Cargo.toml");
++  const none = 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "deny" (or "forbid") for its crates to inherit';
++  const line = real.split("\n").findIndex((l) => l.startsWith("unsafe_code")) + 1;
++  const other = (n) => `Cargo.toml:${n} names unsafe_code other than as "deny" or "forbid" in [workspace.lints.rust]`;
++  for (const level of ['"allow"', '"warn"', "'allow'", '{ level = "allow", priority = 1 }']) {
++    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${level}`)), [other(line), none], level);
++  }
++  assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', "")), [none], "the line removed");
++  for (const ok of ['"forbid"', "'deny'", '{ level = "deny", priority = -1 }']) {
++    assert.deepEqual(workspaceLintProblems(real.replace('unsafe_code = "deny"', `unsafe_code = ${ok}`)), [], ok);
++  }
++  const t = (body) => `[workspace]\nmembers = []\n${body}`;
++  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.rust]\n# unsafe_code = "allow" in a comment\nunsafe_code = "deny"\n')), []);
++  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.clippy]\nunsafe_code = "deny"\n')), [other(4), none], "another table");
++  assert.deepEqual(workspaceLintProblems(t('[workspace.lints]\nrust.unsafe_code = "deny"\n')), [other(4), none], "a dotted key (read closed)");
++  // A copy of the right lines inside a multi-line string, the real one relaxed below it.
++  const decoy = t('[workspace.metadata]\nnote = """\n[workspace.lints.rust]\nunsafe_code = "deny"\n"""\n[workspace.lints.rust]\nunsafe_code = "allow"\n');
++  assert.ok(workspaceLintProblems(decoy).includes(other(9)), workspaceLintProblems(decoy).join("\n"));
++});
++
++/** cargo metadata's shape for layoutProblems: members by folder, each with its targets ([kind, name, src, edition?]). */
++function layoutMeta(members) {
++  const packages = Object.entries(members).map(([dir, targets]) => ({
++    id: `path+file:///w/${dir}#0.0.0`,
++    name: `npt-${dir.split("/").pop() || "root"}`,
++    manifest_path: `/w/${dir ? `${dir}/` : ""}Cargo.toml`,
++    targets: targets.map(([kind, name, src, edition = "2024"]) => ({
++      kind: [kind],
++      name,
++      src_path: src.startsWith("/") ? src : `/w/${dir ? `${dir}/` : ""}${src}`,
++      edition,
++    })),
++  }));
++  return { workspace_root: "/w", workspace_members: packages.map((p) => p.id), packages };
++}
++
++test("every member lives in crates/ and builds only .rs files in its own folder, in edition 2024 (review F-E, S5 (c))", () => {
++  const clean = {
++    "crates/room": [["lib", "npt_room", "src/lib.rs"], ["test", "rooms", "tests/rooms.rs"]],
++    "crates/tcpinfo": [["lib", "npt_tcpinfo", "src/lib.rs"], ["example", "siocoutq_probe", "examples/siocoutq_probe.rs"]],
++    "crates/bots": [["bin", "npt-bots", "src/bin/npt-bots.rs"], ["custom-build", "build-script-build", "build.rs"]],
++  };
++  assert.deepEqual(layoutProblems(layoutMeta(clean)), []);
++  const withTarget = (dir, target) => layoutProblems(layoutMeta({ ...clean, [dir]: [...clean[dir], target] }));
++  for (const [kind, src] of [
++    ["lib", "../tcpinfo/src/linux.rs"],
++    ["bin", "src/../../tcpinfo/src/linux.rs"],
++    ["example", "/elsewhere/x.rs"],
++    ["test", "../room-other/tests/t.rs"],
++    ["bench", "../../benches/b.rs"],
++    ["custom-build", "../tcpinfo/build.rs"],
++  ]) {
++    const p = withTarget("crates/room", [kind, "planted", src]);
++    assert.equal(p.length, 1, `${kind} ${src}: ${p.join("\n")}`);
++    assert.match(p[0], new RegExp(`^npt-room's ${kind} target planted compiles .*, outside its folder crates/room/$`));
++  }
++  assert.deepEqual(withTarget("crates/room", ["lib", "planted", "src/lib.txt"]), [
++    "npt-room's lib target planted compiles crates/room/src/lib.txt, not a .rs file the scan reads",
++  ]);
++  assert.deepEqual(withTarget("crates/room", ["lib", "planted", "src/x.rs", "2021"]), ["npt-room's lib target planted is edition 2021, not 2024"]);
++  // A proc-macro member: its expansions are another crate's macro code, which rustc 1.99.1 does not lint even under
++  // --forbid unsafe_code (probe: an `unsafe` built from strings compiled in the caller).
++  assert.deepEqual(withTarget("crates/room", ["proc-macro", "planted", "src/pm.rs"]), [
++    "npt-room's proc-macro target planted is a proc-macro crate, whose expansions the lint and the scan cannot see",
++  ]);
++  // A path dependency outside the workspace is code nobody scans; a registry package is a dependency like any other.
++  const outside = layoutMeta(clean);
++  outside.packages.push({ id: "path+file:///x/evil#0.0.0", name: "evil", manifest_path: "/x/evil/Cargo.toml", source: null, targets: [] });
++  outside.packages.push({ id: "registry+x#libc@0.2.191", name: "libc", manifest_path: "/r/libc/Cargo.toml", source: "registry+x", targets: [] });
++  assert.deepEqual(layoutProblems(outside), ["evil (../x/evil/Cargo.toml) is a path dependency outside the workspace, which the scan does not read"]);
++  // A member outside crates/: the workspace root itself, or another folder.
++  for (const dir of ["", "tools/extra"]) {
++    const p = layoutProblems(layoutMeta({ ...clean, [dir]: [["lib", "x", "src/lib.rs"]] }));
++    const manifest = dir ? `${dir}/Cargo.toml` : "Cargo.toml";
++    assert.deepEqual(p, [`npt-${dir.split("/").pop() || "root"}'s manifest is ${manifest}, not crates/<folder>/Cargo.toml (the unsafe_code scan reads crates/ only)`]);
++  }
++});
++
++test("rustflags, cargo configs and aliases that would relax a lint are refused (review S1, F-D)", () => {
++  assert.deepEqual(cargoConfigProblems({ PATH: "/bin", RUSTFLAGS: "-C target-cpu=native -D warnings" }, []), []);
++  for (const [k, v, flag] of [
++    ["RUSTFLAGS", "-Aunsafe_code", "-Aunsafe_code"],
++    ["RUSTFLAGS", "-C opt-level=1 --cap-lints=warn", "--cap-lints=warn"],
++    ["RUSTFLAGS", "--allow unsafe_code", "--allow"],
++    ["CARGO_ENCODED_RUSTFLAGS", "-C\x1fopt-level=1\x1f--force-warn\x1funsafe_code", "--force-warn"],
++    ["CARGO_BUILD_RUSTFLAGS", "-Zcrate-attr=allow(unsafe_code)", "-Zcrate-attr=allow(unsafe_code)"],
++    ["CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS", "-W unsafe_code", "-W"],
++    ["RUSTFLAGS", "@flags.txt", "@flags.txt"],
++  ]) {
++    assert.deepEqual(cargoConfigProblems({ [k]: v }, []), [`${k} in the environment passes ${JSON.stringify(flag)} to rustc: a flag that can relax unsafe_code`], `${k}=${v}`);
++  }
++  assert.deepEqual(cargoConfigProblems({ CARGO_ALIAS_CLIPPY: "check" }, []), ["CARGO_ALIAS_CLIPPY in the environment replaces `cargo clippy` with an alias"]);
++  // Config files: the spike's own (a target-dir) passes; each planted rustflags or alias fails.
++  const own = { path: "spike/.cargo/config.toml", text: readFileSync(join(HERE, ".cargo", "config.toml"), "utf8") };
++  assert.deepEqual(cargoConfigProblems({}, [own]), []);
++  const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
++  assert.deepEqual(config('[build]\nrustflags = [\n    "-C", # a comment\n    "link-arg=-Wl,-z,relro",\n]\n[env]\nX = "rustflags = -A"\n'), []);
++  for (const [text, flag] of [
++    ['[build]\nrustflags = ["-A", "unsafe_code"]\n', "-A"],
++    ["[target.'cfg(unix)']\nrustflags = \"-C opt-level=1 --cap-lints warn\"\n", "--cap-lints"],
++    ['build.rustflags = ["\\u002DAunsafe_code"]\n', "-Aunsafe_code"],
++    ['[build]\n"rustflags" = [\'--force-warn=unsafe_code\']\n', "--force-warn=unsafe_code"],
++    ['[target.x86_64-unknown-linux-gnu]\nrustflags = """\n-W unsafe_code"""\n', "-W"],
++  ]) {
++    assert.ok(
++      config(text).some((p) => p.startsWith(`c.toml's rustflags passes ${JSON.stringify(flag)} to rustc`)),
++      `${text}: ${config(text).join("\n")}`,
++    );
++  }
++  assert.deepEqual(config("[build]\nrustflags = 3\n"), ["c.toml has a rustflags value this check cannot read"]);
++  assert.deepEqual(config('[alias]\nclippy = "check"\n'), ["c.toml has a key `clippy`: an alias that replaces `cargo clippy`"]);
++  assert.deepEqual(config('alias.fmt = "version"\n'), ["c.toml has a key `fmt`: an alias that replaces `cargo fmt`"]);
++  assert.deepEqual(config('alias = { "clippy" = ["check"] }\n'), ["c.toml has a key `clippy`: an alias that replaces `cargo clippy`"]);
++});
++
++test("the crate walk reads every folder and reports symbolic links it does not follow (review F-E)", (t) => {
++  const tmp = mkdtempSync(join(tmpdir(), "npt-check-"));
++  try {
++    const crates = join(tmp, "crates");
++    for (const f of ["room/Cargo.toml", "room/src/lib.rs", "room/src/target/mod.rs", "room/src/.hidden/x.rs", "tcpinfo/src/linux.rs", "room/README.md"]) {
++      mkdirSync(dirname(join(crates, f)), { recursive: true });
++      writeFileSync(join(crates, f), "\n");
++    }
++    let linked = true;
++    try {
++      symlinkSync("../../tcpinfo/src/linux.rs", join(crates, "room/src/k.rs"));
++      symlinkSync("../../tcpinfo/src", join(crates, "room/src/borrowed"), "dir");
++    } catch {
++      linked = false;
++    }
++    const { files, links } = crateFiles(crates);
++    // Node 22's walk may also list a linked folder's files (as crates/room/src/borrowed/...); a link is refused anyway.
++    const own = files.filter((f) => !f.startsWith("crates/room/src/borrowed/"));
++    assert.deepEqual(own, [
++      "crates/room/Cargo.toml",
++      "crates/room/src/.hidden/x.rs",
++      "crates/room/src/lib.rs",
++      "crates/room/src/target/mod.rs",
++      "crates/tcpinfo/src/linux.rs",
++    ]);
++    if (!linked) t.diagnostic("symbolic links cannot be made here: the link half is not exercised");
++    else assert.deepEqual(links, ["crates/room/src/borrowed", "crates/room/src/k.rs"]);
++  } finally {
++    rmSync(tmp, { recursive: true, force: true });
++  }
++});
++
++test("npt-tcpinfo's non-Linux stub is linted for wasm32 with the leaf crates (review F-N)", () => {
++  assert.ok(WASM_CRATES.includes("npt-tcpinfo"));
++  for (const leaf of ["npt-link", "npt-l1", "npt-sim", "npt-proto", "npt-room", "npt-client", "npt-log"]) assert.ok(WASM_CRATES.includes(leaf), leaf);
+ });
+ 
+ test("marks.json covers exactly the plan's marks, and every row it hashed is unchanged", () => {
+diff --git a/spikes/netcode-proof/crates/tcpinfo/src/lib.rs b/spikes/netcode-proof/crates/tcpinfo/src/lib.rs
+index b383ef2..48f4afb 100644
+--- a/spikes/netcode-proof/crates/tcpinfo/src/lib.rs
++++ b/spikes/netcode-proof/crates/tcpinfo/src/lib.rs
+@@ -15,16 +15,19 @@
+ //! lints below are errors). The `tcp_info` field is read from the bytes the kernel wrote at `offset_of!`, with no
+ //! further unsafe code. check.mjs's deps step checks that libc is the only shipped dependency, that only npt-net
+ //! depends on the crate, that each of the two attributes sits on its function and no other relaxing attribute exists
+-//! here, and that no crate but npt-client-wasm and this one relaxes `unsafe_code`.
++//! here, that every `unsafe` in the crate lies inside those two functions, that the two clippy lints below stay denied
++//! here and relaxed nowhere, and that no crate but npt-client-wasm and this one has `unsafe` code.
+ //!
+-//! **Any descriptor is sound to pass.** SIOCOUTQ shares its number with TIOCOUTQ, whose meaning on a descriptor that
+-//! is not a socket is the driver's, so [`unacked_and_unsent`] first reads SO_DOMAIN, SO_TYPE and SO_PROTOCOL
+-//! (ENOTSOCK on a descriptor that is not a socket) and makes the ioctl only on a TCP socket; any other answers with an
+-//! error. [`srtt_us`]'s getsockopt is the socket layer's own call (ENOTSOCK elsewhere, an error on a socket without a
+-//! TCP level). npt-net passes a `tokio::net::TcpStream`'s descriptor.
++//! **Any descriptor is sound to pass.** Both functions first read SO_DOMAIN, SO_TYPE and SO_PROTOCOL (ENOTSOCK on a
++//! descriptor that is not a socket) and make their call only on a TCP socket; any other answers with an error.
++//! SIOCOUTQ shares its number with TIOCOUTQ, whose meaning on a descriptor that is not a socket is the driver's, so
++//! for [`unacked_and_unsent`] the check is what makes the ioctl sound. For [`srtt_us`], whose getsockopt is the socket
++//! layer's own call, it keeps an MPTCP socket out: that one answers TCP_INFO from its first subflow (v6.8
++//! net/mptcp/sockopt.c:1337, :1344). npt-net passes a `tokio::net::TcpStream`'s descriptor.
+ //!
+ //! **Linux only.** On every other target the two functions are stubs that return `ErrorKind::Unsupported`, so the
+-//! workspace still builds there.
++//! workspace still builds there: check.mjs's clippy-wasm32 step lints this crate for wasm32, a target that is not
++//! Linux.
+ 
+ #![deny(
+     clippy::undocumented_unsafe_blocks,
+diff --git a/spikes/netcode-proof/crates/tcpinfo/src/linux.rs b/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
+index d258490..4dd42d8 100644
+--- a/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
++++ b/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
+@@ -22,32 +22,63 @@ const RTT_END: usize = RTT_AT + size_of::<u32>();
+ /// gate then takes its 100 ms default.
+ ///
+ /// The kernel writes into a zeroed buffer the size of `libc::tcp_info`; the field is read at its `offset_of!` from the
+-/// bytes written, so no second unsafe operation is needed.
++/// bytes written, so no further unsafe operation is needed.
+ ///
+-/// Any descriptor is sound to pass: getsockopt answers ENOTSOCK on one that is not a socket, on any socket it writes at
+-/// most the buffer's length, and a socket without a TCP level (UDP, Unix) answers with an error.
++/// Like [`unacked_and_unsent`], it answers for a TCP socket only: SO_DOMAIN AF_INET or AF_INET6, SO_TYPE SOCK_STREAM
++/// and SO_PROTOCOL IPPROTO_TCP are read first, each with a bounded getsockopt that fails with ENOTSOCK on anything but
++/// a socket. Not only for symmetry: an MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) answers SOL_TCP's TCP_INFO from
++/// its first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), not as the connection. Any descriptor is sound to pass.
+ ///
+ /// # Errors
+-/// The getsockopt error (ENOTSOCK on a descriptor that is not a socket; ENOPROTOOPT or EOPNOTSUPP on a socket that is
+-/// not TCP), or `ErrorKind::Unsupported` when the kernel's answer is too short to hold `tcpi_rtt`.
++/// ENOTSOCK on a descriptor that is not a socket; `ErrorKind::InvalidInput` on a socket that is not TCP (UDP, Unix,
++/// MPTCP); the getsockopt error; `ErrorKind::Unsupported` when the kernel's answer is too short to hold `tcpi_rtt`.
+ #[allow(
+     unsafe_code,
+-    reason = "getsockopt(TCP_INFO) has no safe wrapper in std or in the pinned crates (socket2 0.6.5, rustix 1.1.6, \
+-              nix 0.31.3): one foreign call writing into a buffer this function owns (ADR 0002:264-265; R20 (a))"
++    reason = "getsockopt(SOL_SOCKET) and getsockopt(TCP_INFO) have no safe wrapper in std or in the pinned crates \
++              (socket2 0.6.5, rustix 1.1.6, nix 0.31.3): foreign calls each writing into a buffer this function owns, \
++              TCP_INFO only on a TCP socket (ADR 0002:264-265; R20 (a))"
+ )]
+ pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<Option<u32>> {
++    let int_option = |name: libc::c_int| -> io::Result<libc::c_int> {
++        let mut value: libc::c_int = 0;
++        let Ok(mut len) = libc::socklen_t::try_from(INT_LEN) else {
++            return Err(io::Error::from(io::ErrorKind::Unsupported));
++        };
++        // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), of any kind: getsockopt
++        // fails with ENOTSOCK before touching anything on a descriptor that is not a socket (v6.8
++        // net/socket.c:2397-2399, sockfd_lookup_light :553-567). At level SOL_SOCKET every socket is answered by
++        // sk_getsockopt (:2364-2365), which writes `min(len, sizeof(int))` bytes (net/core/sock.c:1609, :1999-2001)
++        // and stores that count in `len`. `value` is a live, aligned, writable c_int owned by this closure and `len` a
++        // live socklen_t holding its size, 4, so the kernel writes at most those 4 bytes; any 4 bytes are a valid c_int.
++        let rc = unsafe {
++            libc::getsockopt(
++                fd.as_raw_fd(),
++                libc::SOL_SOCKET,
++                name,
++                (&raw mut value).cast(),
++                &raw mut len,
++            )
++        };
++        int_answer(name, rc, len, value)
++    };
++    require_tcp(
++        int_option(libc::SO_DOMAIN)?,
++        int_option(libc::SO_TYPE)?,
++        int_option(libc::SO_PROTOCOL)?,
++        "TCP_INFO",
++    )?;
+     let mut info = [0u8; size_of::<libc::tcp_info>()];
+     let Ok(mut len) = libc::socklen_t::try_from(info.len()) else {
+         return Err(io::Error::from(io::ErrorKind::Unsupported));
+     };
+-    // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee). It need not be a TCP socket, or a
+-    // socket at all: getsockopt is the socket layer's own call, which fails with ENOTSOCK before touching anything on a
+-    // descriptor that is not a socket (v6.8 net/socket.c:2397-2399, sockfd_lookup_light :553-567), so no device driver
+-    // ever sees it; on a socket, a level the family does not handle is an error. `info` is a live, writable buffer
+-    // of exactly `len` bytes owned by this function, and `len` is a live socklen_t holding that size; getsockopt's
+-    // contract is that the kernel writes at most `len` bytes there and stores how many it wrote in `len` (TCP's
+-    // TCP_INFO: `len = min(len, sizeof(info))`, net/ipv4/tcp.c:4067). Any bytes are a valid `[u8]`, and u8 needs no
+-    // alignment, so the buffer stays valid whatever the kernel writes.
++    // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), and the three readings above show
++    // it is a TCP socket. Soundness does not rest on that: getsockopt is the socket layer's own call, which fails with
++    // ENOTSOCK before touching anything on a descriptor that is not a socket (v6.8 net/socket.c:2397-2399,
++    // sockfd_lookup_light :553-567), so no device driver ever sees it, and on a socket a level the family does not
++    // handle is an error. `info` is a live, writable buffer of exactly `len` bytes owned by this function, and `len` is
++    // a live socklen_t holding that size; getsockopt's contract is that the kernel writes at most `len` bytes there and
++    // stores how many it wrote in `len` (TCP's TCP_INFO: `len = min(len, sizeof(info))`, net/ipv4/tcp.c:4067). Any
++    // bytes are a valid `[u8]`, and u8 needs no alignment, so the buffer stays valid whatever the kernel writes.
+     let rc = unsafe {
+         libc::getsockopt(
+             fd.as_raw_fd(),
+@@ -101,31 +132,14 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
+                 &raw mut len,
+             )
+         };
+-        if rc != 0 {
+-            return Err(io::Error::last_os_error());
+-        }
+-        if usize::try_from(len).ok() != Some(INT_LEN) {
+-            return Err(io::Error::new(
+-                io::ErrorKind::InvalidData,
+-                format!("getsockopt({name}) wrote {len} bytes, not {INT_LEN}"),
+-            ));
+-        }
+-        Ok(value)
++        int_answer(name, rc, len, value)
+     };
+-    let domain = int_option(libc::SO_DOMAIN)?;
+-    let kind = int_option(libc::SO_TYPE)?;
+-    let protocol = int_option(libc::SO_PROTOCOL)?;
+-    if !matches!(domain, libc::AF_INET | libc::AF_INET6)
+-        || kind != libc::SOCK_STREAM
+-        || protocol != libc::IPPROTO_TCP
+-    {
+-        return Err(io::Error::new(
+-            io::ErrorKind::InvalidInput,
+-            format!(
+-                "not a TCP socket (domain {domain}, type {kind}, protocol {protocol}): SIOCOUTQ is not read"
+-            ),
+-        ));
+-    }
++    require_tcp(
++        int_option(libc::SO_DOMAIN)?,
++        int_option(libc::SO_TYPE)?,
++        int_option(libc::SO_PROTOCOL)?,
++        "SIOCOUTQ",
++    )?;
+     let mut answ: libc::c_int = 0;
+     // SAFETY: `fd` is an open descriptor for the whole call (BorrowedFd's guarantee), and the three readings above
+     // show it is an AF_INET or AF_INET6 socket of type SOCK_STREAM and protocol IPPROTO_TCP: a TCP socket (a socket's
+@@ -143,6 +157,48 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
+         .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, format!("SIOCOUTQ gave {answ}")))
+ }
+ 
++/// What a SOL_SOCKET getsockopt of one int answered, read right after the call: its error when `rc` is not 0, and
++/// `ErrorKind::InvalidData` unless it wrote exactly one int.
++fn int_answer(
++    name: libc::c_int,
++    rc: libc::c_int,
++    len: libc::socklen_t,
++    value: libc::c_int,
++) -> io::Result<libc::c_int> {
++    if rc != 0 {
++        return Err(io::Error::last_os_error());
++    }
++    if usize::try_from(len).ok() != Some(INT_LEN) {
++        return Err(io::Error::new(
++            io::ErrorKind::InvalidData,
++            format!("getsockopt({name}) wrote {len} bytes, not {INT_LEN}"),
++        ));
++    }
++    Ok(value)
++}
++
++/// `Ok` for a TCP socket only (SO_DOMAIN AF_INET or AF_INET6, SO_TYPE SOCK_STREAM, SO_PROTOCOL IPPROTO_TCP, so not
++/// MPTCP's 262); otherwise `ErrorKind::InvalidInput`, naming the `call` that is not made.
++fn require_tcp(
++    domain: libc::c_int,
++    kind: libc::c_int,
++    protocol: libc::c_int,
++    call: &str,
++) -> io::Result<()> {
++    if matches!(domain, libc::AF_INET | libc::AF_INET6)
++        && kind == libc::SOCK_STREAM
++        && protocol == libc::IPPROTO_TCP
++    {
++        return Ok(());
++    }
++    Err(io::Error::new(
++        io::ErrorKind::InvalidInput,
++        format!(
++            "not a TCP socket (domain {domain}, type {kind}, protocol {protocol}): {call} is not read"
++        ),
++    ))
++}
++
+ /// `tcpi_rtt` from the bytes getsockopt wrote: `Unsupported` unless the `written` length covers the whole field
+ /// (a kernel or a sandbox with a shorter `tcp_info`); 0 maps to `None`.
+ pub(crate) fn rtt_from(info: &[u8], written: usize) -> io::Result<Option<u32>> {
+diff --git a/spikes/netcode-proof/crates/tcpinfo/src/tests.rs b/spikes/netcode-proof/crates/tcpinfo/src/tests.rs
+index b4dfd54..b1ea7dd 100644
+--- a/spikes/netcode-proof/crates/tcpinfo/src/tests.rs
++++ b/spikes/netcode-proof/crates/tcpinfo/src/tests.rs
+@@ -11,7 +11,7 @@ use std::os::fd::AsFd;
+ use std::os::unix::net::{UnixDatagram, UnixStream};
+ use std::time::{Duration, Instant};
+ 
+-use socket2::{Domain, SockRef, Socket, Type};
++use socket2::{Domain, Protocol, SockRef, Socket, Type};
+ 
+ use crate::linux::{SIOCOUTQ, rtt_from};
+ use crate::{srtt_us, unacked_and_unsent};
+@@ -128,9 +128,10 @@ fn siocoutq_on_a_listening_socket_is_einval() {
+ /// Any descriptor may be passed (the functions are safe): on anything but a TCP socket each answers with an error, and
+ /// SIOCOUTQ's number (TIOCOUTQ) never reaches a descriptor that is not a TCP socket. A pipe is not a socket (ENOTSOCK
+ /// from getsockopt, net/socket.c:553-567); a UDP socket and Unix stream and datagram sockets are sockets that are not
+-/// TCP. TCP sockets still answer: a connected one reads, an unconnected one reads 0, and a listening one is EINVAL from
+-/// tcp_ioctl itself (siocoutq_on_a_listening_socket_is_einval: the check let it through). IPv6 is off in the U3c
+-/// container (socket(AF_INET6) is EAFNOSUPPORT), so the AF_INET6 branch is not exercised here.
++/// TCP, which both functions refuse after reading SO_DOMAIN, SO_TYPE and SO_PROTOCOL (InvalidInput; MPTCP has its own
++/// test below). TCP sockets still answer: a connected one reads, an unconnected one reads 0, and a listening one is
++/// EINVAL from tcp_ioctl itself (siocoutq_on_a_listening_socket_is_einval: the check let it through). IPv6 is off in
++/// the U3c container (socket(AF_INET6) is EAFNOSUPPORT), so the AF_INET6 branch is not exercised here.
+ #[test]
+ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
+     let (pipe_r, pipe_w) = std::io::pipe().expect("pipe");
+@@ -167,11 +168,9 @@ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
+             "SIOCOUTQ on {what}: {outq}"
+         );
+         let rtt = srtt_us(fd).expect_err(what);
+-        assert!(
+-            matches!(
+-                rtt.raw_os_error(),
+-                Some(libc::ENOPROTOOPT | libc::EOPNOTSUPP)
+-            ),
++        assert_eq!(
++            rtt.kind(),
++            ErrorKind::InvalidInput,
+             "TCP_INFO on {what}: {rtt}"
+         );
+         eprintln!("{what}: SIOCOUTQ {outq}; TCP_INFO {rtt}");
+@@ -189,6 +188,46 @@ fn every_descriptor_that_is_not_a_tcp_socket_is_an_error() {
+     );
+ }
+ 
++/// An MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) is not TCP for either reading (review F8): Linux would answer its
++/// SOL_TCP TCP_INFO from the first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), so srtt_us refuses it as
++/// unacked_and_unsent does. The socket is connected to a loopback TCP listener (the connection falls back to plain
++/// TCP underneath, and the socket stays MPTCP), the state in which TCP_INFO would answer. A kernel without MPTCP
++/// (socket() refused, or net.mptcp.enabled = 0) skips the test with a line on stderr; the U3c container has it.
++#[test]
++fn an_mptcp_socket_is_not_tcp_for_either_reading() {
++    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
++    let to: SocketAddr = listener.local_addr().expect("listener address");
++    let mptcp = match Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::MPTCP)) {
++        Ok(s) => s,
++        Err(e) => {
++            eprintln!("no MPTCP socket on this kernel ({e}): the MPTCP case is not exercised");
++            return;
++        }
++    };
++    mptcp.connect(&to.into()).expect("connect");
++    let (_server, _) = listener.accept().expect("accept");
++    for (what, err) in [
++        (
++            "TCP_INFO",
++            srtt_us(mptcp.as_fd()).expect_err("MPTCP is not TCP"),
++        ),
++        (
++            "SIOCOUTQ",
++            unacked_and_unsent(mptcp.as_fd()).expect_err("MPTCP is not TCP"),
++        ),
++    ] {
++        assert_eq!(
++            err.kind(),
++            ErrorKind::InvalidInput,
++            "{what} on MPTCP: {err}"
++        );
++        assert!(
++            err.to_string().contains("protocol 262"),
++            "{what} on MPTCP: {err}"
++        );
++    }
++}
++
+ #[test]
+ fn tcpi_rtt_is_none_before_a_sample_and_some_after_traffic() {
+     let fresh = Socket::new(Domain::IPV4, Type::STREAM, None).expect("socket");
+diff --git a/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py b/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py
+index a51af5b..c8f7dd8 100644
+--- a/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py
++++ b/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py
+@@ -75,7 +75,8 @@
+ #
+ # RECORDED. Kernel release, CONFIG_HZ, the TCP sysctls (congestion control, tcp_recovery, tcp_early_retrans, tcp_sack,
+ # tcp_frto, tcp_rto_min_us, tcp_thin_linear_timeouts), the probe socket's congestion control (set to cubic, the
+-# model's; this container defaults to bbr, u3-scout-timing.md:388), the spike's commit, every probe line.
++# model's; this container defaults to bbr, u3-scout-timing.md:388), the spike's commit with any uncommitted change in
++# its folder (this script's own logs aside: OWN_OUTPUTS), every probe line.
+ #
+ # RUN (from the repository root, as root):
+ #   CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3v3-model-target \
+@@ -147,6 +148,40 @@ def sysctl(name):
+         return "absent"
+ 
+ 
++# This script's own outputs (the logs it writes next to itself), left out of the provenance check: a run's log is
++# opened before `git status` runs, so with them in, every run would read "with uncommitted changes" (u3c review F-J,
++# fixed 2026-11-08 after the committed root run, whose log says so for that reason).
++OWN_OUTPUTS = "siocoutq-root-check-*.txt"
++
++
++def uncommitted():
++    """The uncommitted changes in the spike's folder other than this script's own outputs, as paths relative to the
++    repository root (git status --porcelain), or the error text when git status fails."""
++    own = (HERE / OWN_OUTPUTS).relative_to(SPIKE).as_posix()
++    status = subprocess.run(
++        ["git", "-C", str(SPIKE), "status", "--porcelain", "--untracked-files=all", "--", ".", f":(exclude,glob){own}"],
++        capture_output=True,
++        text=True,
++    )
++    if status.returncode != 0:
++        return f"git status failed: {status.stderr.strip()}"
++    return [line[3:] for line in status.stdout.splitlines() if line.strip()]
++
++
++def provenance():
++    """The spike's commit and its uncommitted changes (up to five paths, so a reader can tell a source change from a
++    stray file), this script's own outputs aside."""
++    head = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "HEAD"], capture_output=True, text=True)
++    text = f"spike commit {head.stdout.strip() or 'unknown'}"
++    paths = uncommitted()
++    if isinstance(paths, str):
++        return f"{text} ({paths})"
++    if paths:
++        more = f" and {len(paths) - 5} more" if len(paths) > 5 else ""
++        text += f" (with uncommitted changes: {', '.join(paths[:5])}{more})"
++    return text
++
++
+ def iptables(*args, check=True):
+     return subprocess.run(["iptables", *args], capture_output=True, text=True, check=check)
+ 
+@@ -183,9 +218,7 @@ def main(argv):
+     log(f"# siocoutq-root-check {'DRY RUN (no iptables call) ' if dry else ''}at {stamp}")
+     log(f"# kernel {os.uname().release}, CONFIG_HZ {hz()}")
+     log("# sysctl " + " ".join(f"{s}={sysctl(s)}" for s in SYSCTLS))
+-    head = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "HEAD"], capture_output=True, text=True)
+-    dirty = subprocess.run(["git", "-C", str(SPIKE), "status", "--porcelain", "--", "."], capture_output=True, text=True)
+-    log(f"# spike commit {head.stdout.strip() or 'unknown'}{' (with uncommitted changes)' if dirty.stdout.strip() else ''}")
++    log(f"# {provenance()}")
+ 
+     if not dry:
+         if os.geteuid() != 0:
