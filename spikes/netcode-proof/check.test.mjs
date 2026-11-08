@@ -4,9 +4,9 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
@@ -21,6 +21,7 @@ import {
   expectedMarks,
   layoutProblems,
   lexRust,
+  manifestKeyProblems,
   marksProblems,
   referenceProblems,
   unsafeProblems,
@@ -526,6 +527,29 @@ test("npt-tcpinfo: the clippy unsafe lints stay denied at the crate root and rel
   assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] = `${DENY.replace("deny", "forbid")}mod linux;\n`)), [], "forbid is fine");
 });
 
+/** lintTables' refusal of a lint table header it does not read (review C2b F1). */
+const lintTable = (where, header, prefix = "") =>
+  `${typeof where === "number" ? `Cargo.toml:${where}` : where} has the lint table ${header}, which this check does not read ` +
+  `(only [${prefix}lints] and [${prefix}lints.<tool>], with bare names: not a lint's own table, a quoted part or an array of tables)`;
+/** lintTables' refusal of a lint name that is not lowercase with `_` (review C2b F1). */
+const lintName = (where, name, table) =>
+  `${where} names the lint ${name} in [${table}] in a form this check does not read (cargo reads \`-\` as \`_\`: only lowercase names with \`_\` are read)`;
+const TCPINFO_MANIFEST = "crates/tcpinfo/Cargo.toml";
+/**
+ * exceptionLintProblems on the spike's own manifests, npt-tcpinfo's passed through `change`; `lineOf(text)` is the
+ * 1-based line of that exact line in the changed manifest.
+ */
+function tcpinfoLints(change) {
+  const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+  const real = {
+    [TCPINFO_MANIFEST]: readFileSync(join(HERE, TCPINFO_MANIFEST), "utf8"),
+    "crates/client-wasm/Cargo.toml": readFileSync(join(HERE, "crates/client-wasm/Cargo.toml"), "utf8"),
+  };
+  const text = change(real[TCPINFO_MANIFEST]);
+  const lineOf = (needle) => text.split("\n").findIndex((l) => l === needle) + 1;
+  return { problems: exceptionLintProblems(ws, (p) => (p === TCPINFO_MANIFEST ? text : real[p])), lineOf };
+}
+
 test("the workspace manifest forbids unsafe_code, and nothing else will do (review F-D, C2R-1, C2R-3)", () => {
   const real = readFileSync(join(HERE, "Cargo.toml"), "utf8");
   assert.deepEqual(workspaceLintProblems(real), [], "the spike's own Cargo.toml");
@@ -556,8 +580,97 @@ test("the workspace manifest forbids unsafe_code, and nothing else will do (revi
   // strings, so the decoy is none, and the quoted key is refused.
   const escaped = `${real.replace('unsafe_code = "forbid"', '"unsafe\\u005fcode" = "allow"')}[workspace.metadata.note]\ntext = """\n[workspace.lints.rust]\nunsafe_code = "forbid"\n"""\n`;
   assert.deepEqual(workspaceLintProblems(escaped), [quoted(line, "workspace.lints.rust"), none]);
-  // A table name with a quoted part (cargo reads `[workspace."lints".rust]` as the same table) is not a lint table here.
-  assert.deepEqual(workspaceLintProblems(real.replace("[workspace.lints.rust]", '[workspace."lints".rust]')), [other(line), none]);
+  // A table name with a quoted part (cargo reads `[workspace."lints".rust]` as the same table) is refused as a header
+  // (review C2b F1), and its entry is not read as the forbid.
+  const head = real.split("\n").findIndex((l) => l.startsWith("[workspace.lints.rust]")) + 1;
+  assert.deepEqual(workspaceLintProblems(real.replace("[workspace.lints.rust]", '[workspace."lints".rust]')), [
+    lintTable(head, '[workspace."lints".rust]', "workspace."),
+    other(line),
+    none,
+  ]);
+});
+
+test("a lint's own sub-table, a quoted header and an array of lint tables are refused, not skipped (review C2b F1)", () => {
+  // The reviewer's plant: both sub-tables with level "allow" relaxed tcpinfo's unsafe_code deny and the clippy deny
+  // (cargo 1.99.1 passed --deny=clippy::iter_over_hash_type, then --allow=clippy::iter-over-hash-type) while deps passed.
+  const plant =
+    '[lints.rust.unsafe-code]\nlevel = "allow"\npriority = 1\n\n[lints.clippy.iter-over-hash-type]\nlevel = "allow"\npriority = 1\n';
+  const { problems, lineOf } = tcpinfoLints((t) => `${t}\n${plant}`);
+  assert.deepEqual(problems, [
+    lintTable(`${TCPINFO_MANIFEST}:${lineOf("[lints.rust.unsafe-code]")}`, "[lints.rust.unsafe-code]"),
+    lintTable(`${TCPINFO_MANIFEST}:${lineOf("[lints.clippy.iter-over-hash-type]")}`, "[lints.clippy.iter-over-hash-type]"),
+  ]);
+  for (const header of ["[lints.clippy.iter_over_hash_type]", '[lints."clippy"]', "[ 'lints' . clippy ]", "[[lints.clippy]]", "[lints.Clippy]"]) {
+    const r = tcpinfoLints((t) => `${t}\n${header}\nfoo = "allow"\n`);
+    assert.deepEqual(r.problems, [lintTable(`${TCPINFO_MANIFEST}:${r.lineOf(header)}`, header)], header);
+  }
+  // The workspace's own tables, the same way.
+  const t = (body) => `[workspace]\nmembers = []\n[workspace.lints.rust]\nunsafe_code = "forbid"\n${body}`;
+  assert.deepEqual(workspaceLintProblems(t('[workspace.lints.clippy.iter_over_hash_type]\nlevel = "allow"\n')), [
+    lintTable(5, "[workspace.lints.clippy.iter_over_hash_type]", "workspace."),
+  ]);
+  // Not a lint table: [lints] in the workspace manifest, a table merely named like one, a string or a comment.
+  assert.deepEqual(workspaceLintProblems(t('[workspace.metadata.lints]\nx = 1\n[workspace.lintsx]\ny = 2\n# [workspace.lints.clippy.x]\nz = "[workspace.lints.clippy.x]"\n')), []);
+});
+
+test("a lint name with `-` or capitals is refused in a lint table, as cargo reads `-` as `_` (review C2b F1)", () => {
+  // A hyphen twin beside the real key: cargo passes both (`--deny=unsafe_code --allow=unsafe-code`), and the later one
+  // relaxes the deny (the reviewer's L1b: an unsafe block compiled).
+  for (const [table, line] of [
+    ["lints.rust", 'unsafe-code = { level = "allow", priority = 1 }'],
+    ["lints.clippy", 'iter-over-hash-type = "allow"'],
+    ["lints.clippy", 'Iter_Over_Hash_Type = "allow"'],
+  ]) {
+    const { problems, lineOf } = tcpinfoLints((t) => t.replace(`[${table}]\n`, `[${table}]\n${line}\n`));
+    const name = line.split(" ")[0];
+    assert.deepEqual(problems, [lintName(`${TCPINFO_MANIFEST}:${lineOf(line)}`, name, table)], line);
+  }
+  // In the workspace's table, the line scan reports the hyphen spelling too (it names the lint, other than as forbid).
+  const real = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+  const changed = real.replace('unsafe_code = "forbid"\n', 'unsafe_code = "forbid"\nunsafe-code = "allow"\n');
+  const at = changed.split("\n").indexOf('unsafe-code = "allow"') + 1;
+  assert.deepEqual(workspaceLintProblems(changed), [
+    lintName(`Cargo.toml:${at}`, "unsafe-code", "workspace.lints.rust"),
+    `Cargo.toml:${at} names unsafe_code other than as "forbid" in [workspace.lints.rust]`,
+  ]);
+});
+
+test("lints given as a dotted key or an inline table under another header are refused, quoted parts included (review C2b F1)", () => {
+  const dotted = (n) => `Cargo.toml:${n} gives lints as a dotted key or an inline table, which this check does not read`;
+  const t = (body) => `[workspace]\nmembers = []\n${body}[workspace.lints.rust]\nunsafe_code = "forbid"\n`;
+  for (const body of [
+    'lints.clippy.iter-over-hash-type = "allow"\n',
+    '"lints".clippy.iter_over_hash_type = "allow"\n',
+    "lints . 'clippy' = { iter_over_hash_type = \"allow\" }\n",
+    'lints = { clippy = { iter_over_hash_type = "allow" } }\n',
+  ]) {
+    assert.deepEqual(workspaceLintProblems(t(body)), [dotted(3)], body);
+  }
+  // At the root, `workspace` as a dotted key or an inline table.
+  assert.deepEqual(workspaceLintProblems(`workspace.lints.clippy.x = "allow"\n${t("")}`), [dotted(1)]);
+  assert.deepEqual(workspaceLintProblems(`"workspace" = { lints = {} }\n${t("")}`), [dotted(1)]);
+  // A `[...]` line inside a value that runs on is no header: the dotted key after the array is still [workspace]'s.
+  assert.deepEqual(workspaceLintProblems(t('x = [\n  [1]\n]\nlints.clippy.x = "allow"\n')), [dotted(6)]);
+  // A crate's: at its root (quoted or not), or in [lints] beside `workspace = true`.
+  const { problems, lineOf } = tcpinfoLints((x) => `"lints".clippy.iter-over-hash-type = { level = "allow", priority = 1 }\n${x}`);
+  assert.deepEqual(problems, [
+    `${TCPINFO_MANIFEST}:${lineOf('"lints".clippy.iter-over-hash-type = { level = "allow", priority = 1 }')} gives lints as a dotted key or an inline table, which this check does not read`,
+  ]);
+  // Neither a value that names lints nor another table's `lints` key is a lint.
+  assert.deepEqual(workspaceLintProblems(t('[workspace.metadata]\nlints = "lints.rust.unsafe_code"\nnote = { lints = 1 }\n')), []);
+});
+
+test("a manifest naming unsafe-code (cargo's spelling of unsafe_code) is caught by the line scans too (review C2b F1, L2)", () => {
+  // The workspace manifest: a line naming the lint in any table but as the forbid entry.
+  const t = (body) => `[workspace]\nmembers = []\n[workspace.lints.rust]\nunsafe_code = "forbid"\n${body}`;
+  assert.deepEqual(workspaceLintProblems(t("[workspace.metadata]\nunsafe-code = 1\n")), [
+    'Cargo.toml:6 names unsafe_code other than as "forbid" in [workspace.lints.rust]',
+  ]);
+  // Any other crate's manifest (cargo refuses own lint tables beside `workspace = true`; the scan reports it anyway).
+  assert.deepEqual(
+    unsafeWith((f) => (f["crates/sim/Cargo.toml"] = '[package]\nname = "npt-sim"\n\n[lints]\nworkspace = true\n\n[lints.rust.unsafe-code]\nlevel = "allow"\n')),
+    ["crates/sim/Cargo.toml sets unsafe_code"],
+  );
 });
 
 test("the two exceptions hold the workspace's other lints in their own tables, and their own level (review C2R-1)", () => {
@@ -758,6 +871,13 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
     RUSTUP_TOOLCHAIN: "1.99.1",
     RUSTC_WRAPPER: "sccache",
     CARGO_BUILD_RUSTC_WRAPPER: "/usr/bin/sccache",
+    // `rustup run 1.99.1` adds these; git's own (2026-11-08, names as found here) are not cargo's.
+    CARGO_HOME: "/root/.cargo",
+    RUST_RECURSION_COUNT: "1",
+    GIT_CONFIG_COUNT: "1",
+    GIT_CONFIG_KEY_0: "credential.interactive",
+    GIT_CONFIG_VALUE_0: "never",
+    GIT_TERMINAL_PROMPT: "0",
   };
   assert.deepEqual(cargoConfigProblems(normal, []), []);
   const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
@@ -786,6 +906,30 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
   for (const text of ['[target.x86_64-unknown-linux-gnu]\nrunner = "true"\n', "[target.'cfg(unix)']\nrunner = [\"true\"]\n", 'target.x86_64-unknown-linux-gnu.runner = "true"\n']) {
     assert.deepEqual(config(text), ["c.toml has a key `runner`: it runs the test binaries in cargo's place"], text);
   }
+});
+
+test("RUSTC_BOOTSTRAP, and a manifest's cargo-features or rustflags key, are refused; the spike's own manifests are not (review C2b F5)", () => {
+  // The reviewer's bypass: RUSTC_BOOTSTRAP=1, `cargo-features = ["profile-rustflags"]` and a profile's
+  // `rustflags = ["--cap-lints", "warn"]` compiled a planted allow and unsafe block under the forbid, no warning.
+  const bootstrap = "RUSTC_BOOTSTRAP in the environment unlocks unstable cargo and rustc features (a manifest's profile rustflags)";
+  for (const v of ["1", "npt_room", "-1", ""]) assert.deepEqual(cargoConfigProblems({ PATH: "/bin", RUSTC_BOOTSTRAP: v }, []), [bootstrap], v);
+  const features = (p) => `${p} has a key \`cargo-features\`: it unlocks unstable manifest keys (a profile's rustflags among them)`;
+  const flags = (p) =>
+    `${p} has a key \`rustflags\`: a manifest's rustflags reach rustc (\`--cap-lints warn\` there turns the workspace's forbid into a warning)`;
+  const attack = 'cargo-features = ["profile-rustflags"]\n[workspace]\nmembers = []\n[profile.dev]\nrustflags = ["--cap-lints", "warn"]\n';
+  assert.deepEqual(manifestKeyProblems([{ path: "Cargo.toml", text: attack }]), [features("Cargo.toml"), flags("Cargo.toml")]);
+  // Any rustflags key, in any table or form (a member's manifest included), whatever its value.
+  for (const text of ["[profile.dev.package.npt-room]\nrustflags = []\n", 'profile.release.rustflags = ["-C", "opt-level=1"]\n', '[profile]\ndev = { "rustflags" = [] }\n']) {
+    assert.deepEqual(manifestKeyProblems([{ path: "crates/room/Cargo.toml", text }]), [flags("crates/room/Cargo.toml")], text);
+  }
+  assert.deepEqual(manifestKeyProblems([{ path: "crates/room/Cargo.toml", text: "'cargo-features' = []\n[package]\n" }]), [features("crates/room/Cargo.toml")]);
+  // A string or a comment that names them is no key.
+  assert.deepEqual(manifestKeyProblems([{ path: "x", text: '[package]\ndescription = "rustflags = 1; cargo-features = []"\n# rustflags = ["-A"]\n' }]), []);
+  // No false positive: the spike's workspace manifest and every crate manifest under crates/ (what depsStep reads).
+  const own = [{ path: "Cargo.toml", text: readFileSync(join(HERE, "Cargo.toml"), "utf8") }];
+  for (const f of crateFiles(join(HERE, "crates")).files.filter((f) => f.endsWith("/Cargo.toml"))) own.push({ path: f, text: readFileSync(join(HERE, f), "utf8") });
+  assert.ok(own.length >= 17, `${own.length} manifests`);
+  assert.deepEqual(manifestKeyProblems(own), []);
 });
 
 /**
@@ -836,7 +980,7 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
   const bad = depsFixture(
     t,
     (f) => {
-      f["Cargo.toml"] = f["Cargo.toml"].replace('"forbid"', '"deny"');
+      f["Cargo.toml"] = `cargo-features = ["profile-rustflags"]\n${f["Cargo.toml"].replace('"forbid"', '"deny"')}`;
       f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
       f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
       f["crates/room/src/evil.rs"] = UNSAFE_FN;
@@ -857,6 +1001,7 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
     ["dependencyProblems", "leaf crate npt-sim depends on tokio"],
     ["workspaceLintProblems", 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit'],
     ["exceptionLintProblems", `crates/tcpinfo/Cargo.toml has no [lints.clippy] disallowed_types: the workspace's is "deny"`],
+    ["manifestKeyProblems", "Cargo.toml has a key `cargo-features`: it unlocks unstable manifest keys (a profile's rustflags among them)"],
     ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
     ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
     ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],
@@ -868,6 +1013,13 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
   // The environment it is given is the one checked (process.env when check.mjs runs it).
   const runner = depsStep(ok.dir, { ...ok.env, CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER: "true" }, () => ({ ok: true, meta: ok.meta }));
   assert.equal(runner.out, "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER in the environment runs the test binaries in cargo's place");
+  // And so is its CARGO_HOME (review C2b F3): a config there that must be refused is read from the CARGO_HOME given, not
+  // from this process's ~/.cargo.
+  const home = join(ok.dir, "cargo-home");
+  mkdirSync(home);
+  writeFileSync(join(home, "config.toml"), '[build]\nrustc = "/opt/other/rustc"\n');
+  const homed = depsStep(ok.dir, { ...ok.env, CARGO_HOME: home }, () => ({ ok: true, meta: ok.meta }));
+  assert.equal(homed.out, `${join(home, "config.toml")} has a key \`rustc\`: it replaces rustc or wraps the workspace's rustc calls`);
   // cargo metadata failing fails the step with its output.
   assert.deepEqual(depsStep(ok.dir, ok.env, () => ({ ok: false, out: "error: no Cargo.lock" })), { ok: false, out: "error: no Cargo.lock" });
 });
@@ -882,6 +1034,15 @@ test("the test step counts and names a test that reported a skip (review C2R-9)"
   // The line npt-tcpinfo's tests write is the one counted here.
   const rs = readFileSync(join(HERE, "crates", "tcpinfo", "src", "tests.rs"), "utf8");
   assert.ok(rs.includes('format!("SKIPPED {test}: {why}\\n")'), "crates/tcpinfo/src/tests.rs writes `SKIPPED <test>: <why>`");
+  // And the real MPTCP test hands mptcp_case the process's stderr, the one writer past libtest's capture (review C2b F4):
+  // given io::sink() or a buffer, its skip would reach nobody, and on a host with MPTCP no Rust test can tell (the unit
+  // test of the skip path writes to a Vec). Its whole body is pinned, spaces aside.
+  const body = rs.match(/#\[test\]\nfn an_mptcp_socket_is_not_tcp_for_either_reading\(\) \{\n([\s\S]*?)\n\}\n/)?.[1];
+  assert.equal(
+    body?.replace(/\s+/g, "").replace(/,\)/g, ")"),
+    "mptcp_case(||Socket::new(Domain::IPV4,Type::STREAM,Some(Protocol::MPTCP)),&mutstd::io::stderr());",
+    `the real MPTCP test's body:\n${body}`,
+  );
 });
 
 test("the root run's provenance hides only its own new logs (review C2R-10; Python's own test)", () => {
@@ -889,6 +1050,57 @@ test("the root run's provenance hides only its own new logs (review C2R-10; Pyth
   const r = spawnSync("python3", ["-I", "-B", script], { encoding: "utf8" });
   assert.equal(r.status, 0, `${r.error ?? ""}${r.stdout}${r.stderr}`);
   assert.match(r.stderr, /^Ran [1-9]\d* tests? in .*\n\nOK\n?$/m, r.stderr);
+});
+
+/** Every file under `dir` (its .git included), as its relative path and the SHA-256 of its bytes, or a link's target. */
+function snapshot(dir) {
+  const out = {};
+  for (const e of readdirSync(dir, { recursive: true, withFileTypes: true })) {
+    const p = join(e.parentPath, e.name);
+    if (e.isSymbolicLink()) out[relative(dir, p)] = `-> ${readlinkSync(p)}`;
+    else if (e.isFile()) out[relative(dir, p)] = createHash("sha256").update(readFileSync(p)).digest("hex");
+  }
+  return out;
+}
+
+test("the provenance test's git stays in its scratch repositories when GIT_DIR names another (review C2b F2)", (t) => {
+  // A git hook or `git rebase --exec` exports GIT_DIR and GIT_INDEX_FILE: with them inherited, the Python test's
+  // fixture commit landed on that repository's branch (the reviewer's reproduction dropped its keep.txt).
+  const victim = mkdtempSync(join(tmpdir(), "npt-victim-"));
+  const hooks = mkdtempSync(join(tmpdir(), "npt-no-hooks-"));
+  t.after(() => {
+    rmSync(victim, { recursive: true, force: true });
+    rmSync(hooks, { recursive: true, force: true });
+  });
+  const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_")));
+  const git = (...args) => {
+    const config = [`core.hooksPath=${hooks}`, "commit.gpgsign=false", "user.name=test", "user.email=test@example.invalid"];
+    const r = spawnSync("git", [...config.flatMap((c) => ["-c", c]), ...args], { cwd: victim, env, encoding: "utf8" });
+    assert.equal(r.status, 0, `git ${args.join(" ")}: ${r.stderr}`);
+  };
+  writeFileSync(join(victim, "keep.txt"), "kept\n");
+  git("init", "-q");
+  git("add", "-A");
+  git("commit", "-q", "-m", "victim");
+  const before = snapshot(victim);
+  assert.ok(Object.keys(before).includes("keep.txt") && Object.keys(before).some((f) => f.startsWith(".git")));
+  const script = join(HERE, "results", "u3c-kernel-check", "test_siocoutq_root_check.py");
+  const exported = { ...process.env, GIT_DIR: join(victim, ".git"), GIT_INDEX_FILE: join(victim, ".git", "index") };
+  const r = spawnSync("python3", ["-I", "-B", script], { encoding: "utf8", env: exported });
+  assert.equal(r.status, 0, `${r.error ?? ""}${r.stdout}${r.stderr}`);
+  assert.match(r.stderr, /^Ran [1-9]\d* tests? in .*\n\nOK\n?$/m, r.stderr);
+  assert.deepEqual(snapshot(victim), before, "the repository GIT_DIR names is unchanged, byte for byte");
+  // Its git runs no hook and signs no commit, whatever the user's git config says: a ~/.gitconfig with a hooks folder
+  // (a post-commit hook that leaves a mark) and commit.gpgsign = true (a signing that cannot work here).
+  const home = mkdtempSync(join(tmpdir(), "npt-home-"));
+  t.after(() => rmSync(home, { recursive: true, force: true }));
+  mkdirSync(join(home, "hooks"));
+  const mark = join(home, "hook-ran");
+  writeFileSync(join(home, "hooks", "post-commit"), `#!/bin/sh\necho ran >> '${mark}'\n`, { mode: 0o755 });
+  writeFileSync(join(home, ".gitconfig"), `[core]\n\thooksPath = ${join(home, "hooks")}\n[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = false\n`);
+  const configured = spawnSync("python3", ["-I", "-B", script], { encoding: "utf8", env: { ...env, HOME: home, XDG_CONFIG_HOME: join(home, "xdg") } });
+  assert.equal(configured.status, 0, `${configured.error ?? ""}${configured.stdout}${configured.stderr}`);
+  assert.deepEqual(readdirSync(home).sort(), [".gitconfig", "hooks"], "no hook ran");
 });
 
 test("npt-tcpinfo's non-Linux stub is linted for wasm32 with the leaf crates (review F-N)", () => {

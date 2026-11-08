@@ -740,7 +740,8 @@ async fn one_record_per_write_never_beyond_the_budget() {
 
 /// Pending at a full budget and woken when it frees; the held-bytes bounds under a client that never reads (down:
 /// S takes nothing, so released bytes stay untaken) and under a tungstenite that never reads (up: the client floods
-/// 150 KB of frames). Quiet P2, about 2 s.
+/// 150 KB of frames); and the pump does not spin while S owes it a wake (R1's guard: its runs over the hold, counted).
+/// Quiet P2, about 2 s.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded() {
     let (client, server) = tokio::io::duplex(1_024);
@@ -772,13 +773,26 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
         }
     }
     // The model delivers, S takes 1 KB and stops: released bytes hold the budget, so writes stay Pending.
+    let polls = ds.life().polls;
     tokio::time::sleep(Duration::from_millis(1_500)).await;
+    let polls = ds.life().polls - polls;
     assert!(matches!(
         Pin::new(&mut ds).poll_write(&mut noop(), &[0x82; 100]),
         Poll::Pending
     ));
     let (_, _, held, max) = ds.probe();
-    println!("written {written} B before Pending; held now {held:?}, largest {max:?}");
+    println!(
+        "written {written} B before Pending; held now {held:?}, largest {max:?}; the pump ran {polls} times in the \
+         1.5 s hold"
+    );
+    // R1 cannot spin: through the hold released down records wait untaken while S's write is Pending, so S owes the
+    // pump its wake and the pump's closing self-wake must not fire (`!s_owes_write`). With it the pump ran 112 to 141
+    // times here, idle or under 16 CPU-bound processes on 4 cores (the model's events and S's wakes, not CPU time);
+    // without it a worker spun 170,000 to 540,000 times (C1b's review, C1c's bites). The bound sits far from both.
+    assert!(
+        polls < 2_000,
+        "the pump spun while S owed it its wake: {polls} runs in 1.5 s"
+    );
     assert!(written <= BUDGET);
     assert!(max[DOWN] <= BUDGET, "down held {} B", max[DOWN]);
     assert!(
@@ -2020,13 +2034,15 @@ async fn a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake() {
 /// for (the read floor, or the front frame the scanner holds); after the first flight's delivery (one way after the
 /// writes) and before any acknowledgement (a round trip) tungstenite's side reads every released record (each read
 /// frees its record and wakes the pump, unjudged), so only acknowledgements can reopen the room; then the test's own
-/// `current` calls step them. Judged on model state and wakes from the test's
-/// thread only (the clock thread's are not counted): the call whose step lifts the room across what the pump waits for
-/// woke the pump, and the pass that wake asks for takes more of the client's bytes into the model. Vacuity: the crossing
-/// is a `current` step, not a read's (a thread stalled past the first acknowledgement during the reads); such an attempt
-/// is retried (3 at most).
-#[tokio::test(flavor = "current_thread")]
-async fn an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump() {
+/// calls (`step`: `current` through `outstanding_bytes`, or `add_burst`; `how` names it) step them. Judged on model
+/// state and wakes from the test's thread only (the clock thread's are not counted): the call whose step lifts the
+/// room across what the pump waits for woke the pump, and the pass that wake asks for takes more of the client's bytes
+/// into the model. Vacuity: the crossing is a `step` call's, not a read's (a thread stalled past the first
+/// acknowledgement during the reads); such an attempt is retried (3 at most).
+async fn an_application_step_that_reopens_the_up_room_wakes_the_pump(
+    how: &str,
+    mut step: impl FnMut(&DelayStream<DuplexStream>),
+) {
     for attempt in 1..=3 {
         let (mut client, server) = tokio::io::duplex(1 << 20);
         let c = cfg(fixed(400), 22);
@@ -2096,18 +2112,18 @@ async fn an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_w
                 (c.up_room(), c.up_need())
             };
             let w0 = pw.seen().0;
-            let _ = ds.outstanding_bytes();
+            step(&ds);
             let after = ds.sh.lock().up_room();
             if before < need && after >= need {
                 println!(
-                    "attempt {attempt}: a current() step lifted the up room {before} -> {after} B across {need} B"
+                    "attempt {attempt}: the {how} call's step lifted the up room {before} -> {after} B across {need} B"
                 );
                 break pw.seen().0 - w0;
             }
         };
         assert_eq!(
             woke, 1,
-            "the step that reopened the up room woke the pump once"
+            "the {how} call's step that reopened the up room woke the pump once"
         );
         run(&mut pump);
         let more = ds.sh.lock().written[UP];
@@ -2118,6 +2134,28 @@ async fn an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_w
         return;
     }
     panic!("3 attempts, each reopened during the reads");
+}
+
+/// G-PRE-WAKE through `current` (here `outstanding_bytes`): see the helper above.
+#[tokio::test(flavor = "current_thread")]
+async fn an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump() {
+    an_application_step_that_reopens_the_up_room_wakes_the_pump("current()", |ds| {
+        let _ = ds.outstanding_bytes();
+    })
+    .await;
+}
+
+/// G-PRE-WAKE through `add_burst` (its own step and wake, apart from `current`'s): see the helper above. Each call adds
+/// a 1 ns burst 1,000 s ahead, far past the test; add_burst steps the model before it judges the burst, so a call it
+/// refuses once 64 are to come (C4) steps and wakes the same way, and the test checks which calls it took.
+#[tokio::test(flavor = "current_thread")]
+async fn an_acknowledgement_add_burst_steps_that_reopens_the_up_room_wakes_the_pump() {
+    an_application_step_that_reopens_the_up_room_wakes_the_pump("add_burst", |ds| {
+        let to_come = ds.sh.lock().model.bursts().len();
+        let r = ds.add_burst(now() + 1_000 * SEC, 1);
+        assert_eq!(r.is_ok(), to_come < MAX_BURSTS, "{to_come} to come: {r:?}");
+    })
+    .await;
 }
 
 /// F-G (C3): an EOF from S ends the up direction after its last delivered byte. The client writes the request and 40
@@ -2305,8 +2343,9 @@ impl AsyncWrite for PanicS {
 /// G-PRE-PANIC: a pump that panics gives tungstenite's side an error, never a clean EOF (which tungstenite would take
 /// for a normal close). A spawned pump over an S that panics at its first write: the client's request is read whole
 /// through DelayStream; then a down record is written, and once the model releases it the pump's write into S panics.
-/// The next reads give an error of kind Other (the pump ended while panicking), never Ok(0), and a write is refused
-/// with the same kind. fixed(20), well under 1 s; the waits are hang guards.
+/// The next reads give an error of kind Other (the pump ended while panicking), never Ok(0), and a write, a flush and a
+/// shutdown are refused with the same kind (the shutdown never Ok, as if the bytes had gone out and S had shut down).
+/// fixed(20), well under 1 s; the waits are hang guards.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof() {
     let (mut client, server) = tokio::io::duplex(1 << 16);
@@ -2333,6 +2372,97 @@ async fn a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof() {
     }
     let e = ds.write_all(&[0x82; 10]).await.expect_err("refused");
     assert_eq!(e.kind(), io::ErrorKind::Other);
+    let e = ds.flush().await.expect_err("a flush refused");
+    assert_eq!(e.kind(), io::ErrorKind::Other, "{e}");
+    let e = tokio::time::timeout(HANG, ds.shutdown())
+        .await
+        .expect("hang guard: the shutdown")
+        .expect_err("a panicked pump's shutdown read as a clean one");
+    assert_eq!(e.kind(), io::ErrorKind::Other, "{e}");
+}
+
+/// What a pump that ended without a panic gives tungstenite's side (G-PRE-PANIC's other half: only a panic marks the
+/// connection failed): the reader a clean EOF (no released record left), a write BrokenPipe, a flush and a shutdown Ok;
+/// never the panic marker's Other.
+async fn ends_without_the_panic_error<S>(ds: &mut DelayStream<S>, how: &str) {
+    let mut buf = [0u8; 64];
+    match ds.read(&mut buf).await {
+        Ok(0) => {}
+        Ok(n) => panic!("{how}: {n} B where the reader expected its EOF"),
+        Err(e) => panic!(
+            "{how}: the reader got {:?} ({e}), not a clean EOF",
+            e.kind()
+        ),
+    }
+    let e = ds.write(&[0x82; 10]).await.expect_err("a write refused");
+    assert_eq!(e.kind(), io::ErrorKind::BrokenPipe, "{how}: {e}");
+    if let Err(e) = ds.flush().await {
+        panic!("{how}: the flush got {:?} ({e})", e.kind());
+    }
+    if let Err(e) = ds.shutdown().await {
+        panic!("{how}: the shutdown got {:?} ({e})", e.kind());
+    }
+}
+
+/// G-PRE-PANIC's condition (`std::thread::panicking()` in the pump's Drop), the other way: a pump that ends without a
+/// panic leaves the connection as it ended, never failed with the panic marker's Other. Two normal ends:
+/// - a clean close: the client sends the request and shuts its write half, the server reads both (EOF after the
+///   request), writes 1,000 B and shuts down (S's shutdown completes; the client reads every byte, then EOF); then the
+///   pump's task is cancelled, as a runtime that shuts down cancels it (dropped, not panicking);
+/// - the shutdown's deadline: a client that never reads (the 512 B duplex fills), 20,000 B written, a 300 ms deadline;
+///   the pump gives up, counts it and ends.
+///
+/// After each: the reader's clean EOF, BrokenPipe on a write, Ok on a flush and on a shutdown (what each end gave
+/// before G-PRE-PANIC). fixed(20) and quiet P1, under 1 s; the waits are hang guards.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_pump_that_ends_without_a_panic_never_gives_the_panic_error() {
+    let (mut client, server) = tokio::io::duplex(1 << 16);
+    let (mut ds, pump) = DelayStream::build(server, &cfg(fixed(20), 25), 0, now()).expect("built");
+    let task = tokio::spawn(pump);
+    client.write_all(REQUEST).await.expect("the request");
+    client
+        .shutdown()
+        .await
+        .expect("the client's write half shut");
+    let mut got = Vec::new();
+    tokio::time::timeout(HANG, ds.read_to_end(&mut got))
+        .await
+        .expect("hang guard: the request and the EOF")
+        .expect("read");
+    assert_eq!(got, REQUEST, "the request, then a clean EOF");
+    ds.write_all(&[0x82; 1_000]).await.expect("written");
+    tokio::time::timeout(HANG, ds.shutdown())
+        .await
+        .expect("hang guard: the shutdown")
+        .expect("shut down");
+    let mut down = Vec::new();
+    tokio::time::timeout(HANG, client.read_to_end(&mut down))
+        .await
+        .expect("hang guard: the client's EOF")
+        .expect("read");
+    assert_eq!(down.len(), 1_000, "every byte, then EOF");
+    assert!(!ds.probe().0, "the pump runs on after a clean close");
+    task.abort();
+    let j = task.await.expect_err("the pump's task cancelled");
+    assert!(j.is_cancelled(), "{j}");
+    assert!(ds.probe().0, "the pump ended");
+    ends_without_the_panic_error(&mut ds, "a clean close, then the pump's task cancelled").await;
+
+    let (_client, server) = tokio::io::duplex(512);
+    let mut ds =
+        DelayStream::wrap(server, &cfg(quiet(Profile::p1()), 26), 0, now()).expect("wrapped");
+    ds.set_shutdown_wait(300 * MS);
+    ds.write_all(&[0x82; 20_000]).await.expect("written");
+    tokio::time::timeout(HANG, ds.shutdown())
+        .await
+        .expect("hang guard: the deadline")
+        .expect("given up at the deadline");
+    assert!(
+        until(HANG, || ds.probe().0).await,
+        "hang guard: the pump's end"
+    );
+    assert_eq!(value(&ds.run_summary(), names::SHUTDOWN_TIMEOUT), 1);
+    ends_without_the_panic_error(&mut ds, "the shutdown's deadline").await;
 }
 
 /// C3: shutdown with every byte delivered and taken shuts S down at once (no timeout counted); with a client that

@@ -200,7 +200,9 @@ fn report_skip(out: &mut impl Write, test: &str, why: &str) {
 /// An MPTCP socket (SO_PROTOCOL IPPROTO_MPTCP, 262) is not TCP for either reading (review F8): Linux would answer its
 /// SOL_TCP TCP_INFO from the first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), so srtt_us refuses it as
 /// unacked_and_unsent does. A kernel without MPTCP (socket() refused, or net.mptcp.enabled = 0) reports a skip that
-/// check.mjs's test step shows (mptcp_case); the U3c container has MPTCP.
+/// check.mjs's test step shows (mptcp_case); the U3c container has MPTCP. The skip line goes to the process's stderr,
+/// the one writer past libtest's capture: check.test.mjs pins this body, writer included (review C2b F4), since on a
+/// host with MPTCP no test here would notice it handed to `io::sink()`.
 #[test]
 fn an_mptcp_socket_is_not_tcp_for_either_reading() {
     mptcp_case(

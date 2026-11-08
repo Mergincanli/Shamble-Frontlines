@@ -55,6 +55,10 @@ pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<Option<u32>> {
         // sk_getsockopt (:2364-2365), which writes `min(len, sizeof(int))` bytes (net/core/sock.c:1609, :1999-2001)
         // and stores that count in `len`. `value` is a live, aligned, writable c_int owned by this closure and `len` a
         // live socklen_t holding its size, 4, so the kernel writes at most those 4 bytes; any 4 bytes are a valid c_int.
+        // A cgroup-BPF getsockopt program, which root installs, runs after that and may rewrite the answer within the
+        // caller's length (v6.8 net/socket.c:2377-2380): still sound, but it can make a socket that is not TCP read as
+        // TCP; TCP_INFO below is then asked of that socket's own family and written into `info` within `len` as ever
+        // (its SAFETY does not rest on the check): an error, or bytes that rtt_from reads only as far as written.
         let rc = unsafe {
             libc::getsockopt(
                 fd.as_raw_fd(),
@@ -128,6 +132,12 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
         // sk_getsockopt (:2364-2365), which writes `min(len, sizeof(int))` bytes (net/core/sock.c:1609, :1999-2001)
         // and stores that count in `len`. `value` is a live, aligned, writable c_int owned by this closure and `len` a
         // live socklen_t holding its size, 4, so the kernel writes at most those 4 bytes; any 4 bytes are a valid c_int.
+        // A cgroup-BPF getsockopt program, which root installs, runs after that and may rewrite the answer within the
+        // caller's length (v6.8 net/socket.c:2377-2380): still sound, but it can make a socket that is not TCP read as
+        // TCP; SIOCOUTQ below then goes to that socket's own family through sock_ioctl, still never to a device driver
+        // (a family with no answer gets ENOTTY, 0x5411 being no socket ioctl number: net/socket.c:1222-1232), and the
+        // AF_INET and AF_INET6 families answer through sk_ioctl, whose default copies one int (net/core/sock.c:
+        // 4191-4199, :4207-4224), but what it counts is that protocol's, not TCP's.
         let rc = unsafe {
             libc::getsockopt(
                 fd.as_raw_fd(),

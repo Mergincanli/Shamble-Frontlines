@@ -5,11 +5,13 @@
 #   python3 -I -B spikes/netcode-proof/results/u3c-kernel-check/test_siocoutq_root_check.py
 
 import importlib.util
+import os
 import pathlib
 import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 SCRIPT = pathlib.Path(__file__).resolve().parent / "siocoutq-root-check.py"
 AT = pathlib.PurePosixPath("spikes/netcode-proof/results/u3c-kernel-check")
@@ -17,12 +19,44 @@ COMMITTED_LOG = AT / "siocoutq-root-check-20261108T005258Z.txt"
 
 
 def git(repo, *args):
-    return subprocess.run(
-        ["git", "-C", str(repo), "-c", "user.name=test", "-c", "user.email=test@example.invalid", *args],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    """git in the scratch repository `repo` and nowhere else (u3c review C2b F2): every GIT_* variable is left out of
+    its environment, since a git hook or `git rebase --exec` exports GIT_DIR, GIT_INDEX_FILE or GIT_WORK_TREE, and with
+    them the fixture's commit landed in that other repository; hooks are off (core.hooksPath is an empty folder) and
+    commits are not signed."""
+    hooks = tempfile.mkdtemp(prefix="npt-no-hooks-")
+    try:
+        return subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "-c",
+                f"core.hooksPath={hooks}",
+                "-c",
+                "commit.gpgsign=false",
+                "-c",
+                "user.name=test",
+                "-c",
+                "user.email=test@example.invalid",
+                *args,
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")},
+        ).stdout.strip()
+    finally:
+        os.rmdir(hooks)
+
+
+def scratch_repo(prefix):
+    """A new git repository in a scratch folder, with one committed file, and its HEAD."""
+    repo = pathlib.Path(tempfile.mkdtemp(prefix=prefix)).resolve()
+    (repo / "keep.txt").write_text("kept\n")
+    git(repo, "init", "-q")
+    git(repo, "add", "-A")
+    git(repo, "commit", "-q", "-m", "other")
+    return repo, git(repo, "rev-parse", "HEAD")
 
 
 class Provenance(unittest.TestCase):
@@ -76,6 +110,18 @@ class Provenance(unittest.TestCase):
     def test_a_log_name_elsewhere_is_listed(self):
         self.write("spikes/netcode-proof/crates/room/siocoutq-root-check-20261109T010203Z.txt")
         self.assertEqual(self.mod.provenance(), self.changed("spikes/netcode-proof/crates/room/siocoutq-root-check-20261109T010203Z.txt"))
+
+    def test_another_repository_in_the_environment_is_not_named(self):
+        # Run from a git hook (GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE exported for another repository), the script
+        # still names its own commit and its own changes (u3c review C2b F2).
+        other, other_sha = scratch_repo("npt-other-")
+        self.addCleanup(shutil.rmtree, other, True)
+        self.write("spikes/netcode-proof/crates/room/src/planted.rs")
+        exported = {"GIT_DIR": str(other / ".git"), "GIT_WORK_TREE": str(other), "GIT_INDEX_FILE": str(other / ".git" / "index")}
+        with mock.patch.dict(os.environ, exported):
+            line = self.mod.provenance()
+        self.assertNotIn(other_sha, line)
+        self.assertEqual(line, self.changed("spikes/netcode-proof/crates/room/src/planted.rs"))
 
 
 if __name__ == "__main__":

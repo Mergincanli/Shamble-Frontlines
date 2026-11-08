@@ -73,14 +73,17 @@ futures-util = { version = "=0.3.34", default-features = false, features = ["sin
 # crate, for wasm-bindgen's generated code (U7); npt-tcpinfo denies it, and its two pub functions in src/linux.rs,
 # srtt_us and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket
 # only), each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)). check.mjs's deps step checks that this
-# line is forbid; that every other member inherits these lints and sets no unsafe_code; that the two exceptions'
-# tables equal these but for unsafe_code (allow, deny); that, as its scan reads the crates' files, no other crate
-# relaxes the lint or has unsafe code, and npt-tcpinfo relaxes it only by those two allows and has unsafe code only
-# inside them; that no #[path] or include! literal, manifest target path or symbolic link compiles a file outside its
-# crate; and that the environment and cargo configs it reads pass no lint-lowering rustflags and set no clippy or fmt
-# alias, other rustc, workspace wrapper, config include or test runner. That scan guards against an accidental
-# relaxation; review is the wall against a deliberate one. What it does not check is listed above DEPS_CHECKED in
-# check.mjs (among them a cargo config's [env], a build script's output and a RUSTC_WRAPPER program).
+# line is forbid; that every other member inherits these lints and sets no unsafe_code (nor unsafe-code); that the two
+# exceptions' tables equal these key for key but for unsafe_code (allow, deny), a lint given in any form its reader
+# does not read being refused (a lint's own [lints.<tool>.<lint>] table; a quoted, dotted, hyphenated or uppercase
+# name); that no manifest has a cargo-features or rustflags key; that, as its scan reads the crates' files, no other
+# crate relaxes the lint or has unsafe code, and npt-tcpinfo relaxes it only by those two allows and has unsafe code
+# only inside them; that no #[path] or include! literal, manifest target path or symbolic link compiles a file outside
+# its crate; and that the environment and cargo configs it reads pass no lint-lowering rustflags and set no clippy or
+# fmt alias, other rustc, workspace wrapper, config include, test runner or RUSTC_BOOTSTRAP. That scan guards against
+# an accidental relaxation; review is the wall against a deliberate one. What it does not check is listed above
+# DEPS_CHECKED in check.mjs (among them a cargo config's [env], a build script's output, a RUSTC_WRAPPER program and
+# which toolchain runs).
 unsafe_code = "forbid"
 
 [workspace.lints.clippy]

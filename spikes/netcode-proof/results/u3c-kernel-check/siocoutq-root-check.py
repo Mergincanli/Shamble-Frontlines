@@ -156,17 +156,25 @@ def sysctl(name):
 OWN_OUTPUTS = "siocoutq-root-check-*.txt"
 
 
+def git(*args):
+    """git on the spike's own repository: every GIT_* variable is left out of its environment, so a GIT_DIR,
+    GIT_WORK_TREE or GIT_INDEX_FILE exported for another repository (a git hook, `git rebase --exec`) cannot make the
+    provenance line name that one (u3c review C2b F2)."""
+    return subprocess.run(
+        ["git", "-C", str(SPIKE), *args],
+        capture_output=True,
+        text=True,
+        env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")},
+    )
+
+
 def uncommitted():
     """The uncommitted changes in the spike's folder, as paths relative to the repository root (git status
     --porcelain), or the error text when git status fails. An untracked file next to this script whose name matches
     OWN_OUTPUTS is left out; everything else is listed, a committed log's edit included. Tested by
     test_siocoutq_root_check.py (check.mjs's self step runs it)."""
-    status = subprocess.run(
-        ["git", "-C", str(SPIKE), "status", "--porcelain", "--untracked-files=all", "--", "."],
-        capture_output=True,
-        text=True,
-    )
-    top = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    status = git("status", "--porcelain", "--untracked-files=all", "--", ".")
+    top = git("rev-parse", "--show-toplevel")
     if status.returncode != 0 or top.returncode != 0:
         return f"git status failed: {(status.stderr or top.stderr).strip()}"
     root = pathlib.Path(top.stdout.strip())
@@ -181,7 +189,7 @@ def uncommitted():
 def provenance():
     """The spike's commit and its uncommitted changes (up to five paths, so a reader can tell a source change from a
     stray file), this script's own outputs aside."""
-    head = subprocess.run(["git", "-C", str(SPIKE), "rev-parse", "HEAD"], capture_output=True, text=True)
+    head = git("rev-parse", "HEAD")
     text = f"spike commit {head.stdout.strip() or 'unknown'}"
     paths = uncommitted()
     if isinstance(paths, str):

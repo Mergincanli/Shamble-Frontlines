@@ -40,7 +40,8 @@
 //! after the lock is released (F2). A down record released after a pass's down writes (by its up loop's steps, R1) is
 //! left for the next pass, which the pump wakes itself for at once unless S owes it a wake; an application task whose
 //! step releases a down record, or reopens the up room the pump stopped reading on (an acknowledgement at the client's
-//! end: G-PRE-WAKE), wakes the pump too. A pump that panics ends the connection with an error, never a clean EOF.
+//! end: G-PRE-WAKE), wakes the pump too. A pump that panics ends the connection with an error, never a clean EOF or a
+//! clean shutdown.
 //!
 //! **Held bytes (NC-U3c-2).** Down at most the 64 KB budget (it covers released-but-untaken bytes) plus the
 //! acknowledged prefix of the front record not yet released: a loss inside a record lets the acknowledgement of its
@@ -179,6 +180,10 @@ struct Freed {
 /// wrap, never on the release path, and fixed from then on. Every update is a relaxed atomic, so a release takes no
 /// lock beyond its own connection's (none of its own, so none held across an await or nested in a connection's lock),
 /// waits on no other connection and allocates nothing.
+///
+/// Never reset: the pool holds every release since the process's first wrap, so a process measures one run; one that
+/// served more than one would mix them in `ws_split`. U6 carry (plan §12.1): one measured run per server process, or
+/// the pool reset at each run's start, stated in the run's header.
 struct Pool {
     parts: [[Pooled; PARTS]; 2],
     kinds: [[AtomicU64; KINDS]; 2],
@@ -1599,11 +1604,18 @@ impl<S> AsyncWrite for DelayStream<S> {
         }
     }
 
+    /// Ok once S has shut down, or once the deadline gave up on it (counted). A pump that ended before either gives the
+    /// error it ended with, the reader's (a panicked pump's Other: G-PRE-PANIC), never Ok as if the down bytes had gone
+    /// out; a pump that ended with no error (a limit's close, or a pump cancelled with its runtime, its down bytes
+    /// untaken) gives Ok, as before.
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         let sh = &self.sh;
         let mut c = sh.lock();
-        if c.down_done || c.pump_done {
+        if c.down_done {
             return Poll::Ready(Ok(()));
+        }
+        if c.pump_done {
+            return Poll::Ready(c.failed.map_or(Ok(()), |k| Err(k.into())));
         }
         let mut pump = None;
         if c.shutdown.is_none() {

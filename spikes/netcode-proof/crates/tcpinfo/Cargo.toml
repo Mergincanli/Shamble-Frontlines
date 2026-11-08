@@ -11,7 +11,9 @@ publish.workspace = true
 # [lints.rust] denies the lint, so srtt_us and unacked_and_unsent in src/linux.rs can each carry one
 # #[allow(unsafe_code, reason = "...")] (ADR 0002:264-265; R20 (a)), and nothing else in the crate relaxes it. Every
 # other lint is the workspace's, key for key. check.mjs's deps step checks the level, the tables against the
-# workspace's, and where the two allows sit.
+# workspace's key for key (it refuses a lint given in any form its reader does not read: a lint's own
+# [lints.<tool>.<lint>] table, or a quoted, dotted, hyphenated or uppercase name, as cargo reads `unsafe-code` as
+# unsafe_code), and where the two allows sit.
 [lints.rust]
 unsafe_code = "deny"
 

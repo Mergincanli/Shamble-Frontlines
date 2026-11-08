@@ -9,7 +9,8 @@ publish.workspace = true
 # Not the workspace lints: wasm-bindgen's generated code needs `unsafe` (one of the workspace's two unsafe_code
 # exceptions, with npt-tcpinfo's two functions; the workspace Cargo.toml's note), and the workspace forbids it. So
 # [lints.rust] allows it for this crate, and every other lint is the workspace's, key for key (check.mjs's deps step
-# checks both).
+# checks both, and refuses a lint given in any form its reader does not read, such as a lint's own table or a
+# hyphenated name).
 [lints.rust]
 unsafe_code = "allow"
 

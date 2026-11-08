@@ -15,8 +15,9 @@
 //! tables: unsafe_code denied, every other lint the workspace's. Each unsafe block holds one unsafe operation and a
 //! SAFETY comment stating its invariant (the two clippy lints below are errors). The `tcp_info` field is read from the
 //! bytes the kernel wrote at `offset_of!`, with no further unsafe code. check.mjs's deps step checks that libc is the
-//! only shipped dependency, that only npt-net depends on the crate, that its lint tables are the workspace's but for
-//! unsafe_code "deny", and, as its scan reads the crate's files, that each of the two attributes sits on its function
+//! only shipped dependency, that only npt-net depends on the crate, that its lint tables are the workspace's key for
+//! key but for unsafe_code "deny" (a lint in a form its reader does not read, such as a `[lints.rust.unsafe-code]`
+//! table, is refused), and, as its scan reads the crate's files, that each of the two attributes sits on its function
 //! and no other relaxing attribute exists here, that every `unsafe` in the crate lies inside those two functions, and
 //! that the two clippy lints below stay denied here and relaxed nowhere. In every other crate but npt-client-wasm the
 //! workspace's forbid keeps unsafe code out at compile time.
