@@ -56,3 +56,41 @@ Build dir: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3c-review-targe
   (:120-126, :142-150); FT3 in checkpoint :333-356; FT4 comment :40-48. Met. Bite: at 5 ms the 178 case had 22 missing vs
   7 real, so FT2 bites the old failure mode. Residual wall-clock asserts (rtt 75-160 ms :86-91, setup < 10 s :70-74,
   clean rtt < 20 ms :261/:445) pre-existing; ">= 180" band level not stated (Bin(200,0.02) tail ~1e-9) - nit.
+- M10 (release up to 1,100 B before delivery) -> replay, split, loopback FAIL; order_and_integrity PASSES: its "no
+  release before its stamp" half (delay_tests.rs:469-492) is by construction (release stamped at the step time <= now) -
+  nit, the replay is the real proof.
+- F-K (medium): (c)'s S12 assertion (delay_tests.rs:1791-1792 `expect("a byte after the return")`) needs the first
+  down byte after the 2nd return (~start+5.5 s) inside the fixed 230-tick run (7.63 s): margin ~0.25 s against observed
+  first-byte times 1,729-1,869 ms (24 runs under 3-way load: 0 fail, max 1,868.7 ms; cloop.py). Probe M12 (writes 5 ms
+  later in each tick, i.e. another tick/burst phase): 1 of 4 runs failed at that expect (copy line 1795:46). The
+  outcome depends on the wall-clock tick/burst phase: a duration-coupled assertion (contrary to C16). Fix: run until
+  both returns' first byte and first message are recorded (model state), with a hang guard, not a fixed tick count.
+- F-L (low): (c)'s gate inputs are read in four separate locked calls (delay_tests.rs:1714-1723), each stepping the
+  model; an ACK between the srtt and outstanding reads can let a correct gate leave outstanding one SNAP above N(srtt at
+  the return): a rare false failure (W2's pattern); U6's WsServer needs one atomic read of the four inputs on L2 anyway.
+  Probe M11 (20 ms blocking gap, loop falls behind) failed the x2 BITE assertion instead (1802): bites need the writer
+  to keep pace with the tick.
+- F-M (low): DelayStream's release clock slack (1 ns written and read back, plan 1.2; commit c5d7260) is never asserted
+  (no "slack" in delay_tests.rs); ImpairSocket's precedent asserts it (socket_tests.rs:294-333).
+- F-N (low): the non-Linux stub path ("the workspace still builds anywhere", C12 (c)) is not in check.mjs: clippy-wasm32
+  covers LEAF only (check.mjs:22, :448); tcp_kernel.rs:39-42's not(unix) handle is never compiled; one manual wasm32
+  clippy in build B's notes. Critic B's point, still open.
+- Cargo.lock diff: + npt-tcpinfo, + tokio-rustls; npt-net gains futures-util (dev), npt-tcpinfo, tokio-rustls. As plan §5
+  + the advisor's futures-util ruling. Test counts 242/256 = 233+9 / 247+9 (build A fix + build B's tcpinfo 8 + tcp_kernel 1).
+- Kernel check verdict.json: problems [], cubic/cubic all runs, delivered 3000/3000, retrans 61/56/61; model 100 KCMODEL lines.
+- F-F confirmed by probe (limit_case read loop instrumented in the copy): in all 9 limit cases the first read after the
+  close is the InvalidData error although 170 B (request) or 500 B (request + fragment) had entered the model: records
+  before a bad frame are never handed over.
+- wt tests (all features) 3 runs: 9/9 pass each; P2 up 193-195, down 198-199, frames sent 200, frames == received.
+- check.mjs mutations (checkbites.py, scratch copy, restored): 8/8 caught by check.test.mjs (libc check, dev-as-shipped,
+  any-allow placed, inner-as-outer, no path check, string mentions, only-npt-net, count check). Self-tests bite.
+- Nits: build B's "15 of 15 mutations" script (scratchpad u3cbfix/bites_check.py) is not kept in .checkpoints (only the
+  first 11-mutation u3c-build-b-bites.py); SHUTDOWN_WAIT_NS 10 s default never asserted (tests use 300 ms);
+  wt_tests ">= 180" band level not stated.
+
+## Verdict
+REVISE (small): F-K (C16: duration-coupled S12 assertion in (c), failure path shown), F-D (deps step overclaims: root
+lint / rustflags unchecked, shown), F-B (C5 burst-axis conversion caught only by test order, shown). Lows/nits recorded
+above may be deferred with a line each. Every other rev 2 item has a test that bites (M1, M4, M6, M10, the builders'
+bites, check.mjs 8/8). Evidence scripts' pass rules predate their runs.
+DONE
