@@ -24,6 +24,9 @@ rand_core.workspace = true
 quinn.workspace = true
 tokio.workspace = true
 tokio-tungstenite.workspace = true
+# The plain WebSocket path's srtt and outstanding bytes (TCP_INFO, SIOCOUTQ) for fix 1's gate (U3c 1.8, R20 (a)): the
+# only crate that depends on it (check.mjs's deps step).
+npt-tcpinfo.workspace = true
 # wtransport's `quinn` feature (no new dependency, so Cargo.lock is unchanged) opens
 # IncomingSessionFuture::with_quic_incoming: the session accepted from our own quinn endpoint over ImpairSocket (M8).
 wtransport = { workspace = true, optional = true, features = ["quinn"] }

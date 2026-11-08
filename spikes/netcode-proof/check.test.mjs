@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { test } from "node:test";
-import { dependencyProblems, expectedMarks, marksProblems, referenceProblems } from "./check.mjs";
+import { dependencyProblems, expectedMarks, lexRust, marksProblems, referenceProblems, unsafeProblems } from "./check.mjs";
 
 /** cargo metadata's shape, from edges { crate: [[dependency, kind]] } (kind null = normal, "dev", "build"). */
 function meta(edges) {
@@ -34,7 +34,8 @@ function clean() {
     "npt-proto": n("serde"),
     "npt-room": n("npt-proto"),
     "npt-server": n("npt-link", "npt-proto", "npt-room", "npt-sim", "npt-net", "npt-log", "tokio"),
-    "npt-net": n("npt-link", "tokio", "quinn", "wtransport", "tokio-tungstenite"),
+    "npt-net": n("npt-link", "tokio", "quinn", "wtransport", "tokio-tungstenite", "npt-tcpinfo"),
+    "npt-tcpinfo": [...n("libc"), ["socket2", "dev"]],
     "npt-client": n("npt-proto", "npt-sim"),
     "npt-client-wasm": n("npt-client"),
     "npt-bots": n("npt-link", "npt-proto", "npt-client", "npt-net", "npt-log"),
@@ -108,6 +109,235 @@ test("npt-judge depends only on npt-log and serde", () => {
 test("nothing depends on npt-lab, not even for tests", () => {
   const p = problemsWith((e) => e["npt-server"].push(["npt-lab", "dev"]));
   assert.ok(p.includes("npt-server depends on npt-lab"), p.join("\n"));
+});
+
+test("npt-tcpinfo ships with libc alone, a dev dependency aside", () => {
+  assert.ok(problemsWith((e) => e["npt-tcpinfo"].push(["nix", null])).includes("npt-tcpinfo depends on nix"));
+  assert.ok(problemsWith((e) => e["npt-tcpinfo"].push(["cc", "build"])).includes("npt-tcpinfo depends on cc"));
+  const p = problemsWith((e) => {
+    e["npt-tcpinfo"] = n("rustix");
+  });
+  assert.ok(p.includes("npt-tcpinfo depends on rustix") && p.includes("npt-tcpinfo does not depend on libc"), p.join("\n"));
+  const gone = problemsWith((e) => {
+    delete e["npt-tcpinfo"];
+    e["npt-net"] = e["npt-net"].filter(([d]) => d !== "npt-tcpinfo");
+  });
+  assert.ok(gone.includes("npt-tcpinfo is not a workspace member"), gone.join("\n"));
+});
+
+test("only npt-net depends on npt-tcpinfo, in any kind; reaching it through npt-net is fine", () => {
+  assert.ok(problemsWith((e) => e["npt-server"].push(["npt-tcpinfo", null])).includes("npt-server depends on npt-tcpinfo"));
+  assert.ok(problemsWith((e) => e["npt-bots"].push(["npt-tcpinfo", "dev"])).includes("npt-bots depends on npt-tcpinfo"));
+  assert.ok(problemsWith((e) => e["npt-lab"].push(["npt-tcpinfo", "build"])).includes("npt-lab depends on npt-tcpinfo"));
+});
+
+test("npt-net has no direct libc dependency; reaching it through npt-tcpinfo or tokio is fine", () => {
+  assert.deepEqual(problemsWith((e) => e["npt-net"].push(["libc", null])), ["npt-net depends on libc directly"]);
+  assert.deepEqual(problemsWith((e) => e["npt-net"].push(["libc", "build"])), ["npt-net depends on libc directly"]);
+  assert.deepEqual(problemsWith((e) => e["npt-net"].push(["libc", "dev"])), [], "a dev dependency does not ship (C10)");
+  assert.deepEqual(problemsWith((e) => (e.tokio = n("mio", "libc"))), [], "through tokio");
+  const gone = problemsWith((e) => {
+    delete e["npt-net"];
+    e["npt-server"] = e["npt-server"].filter(([d]) => d !== "npt-net");
+    e["npt-bots"] = e["npt-bots"].filter(([d]) => d !== "npt-net");
+  });
+  assert.ok(gone.includes("npt-net is not a workspace member"), gone.join("\n"));
+});
+
+/** The placed allow, as npt-tcpinfo writes it: a multi-line reason with a line continuation and brackets inside. */
+const placed = (f, between = "") =>
+  `#[allow(\n    unsafe_code,\n    reason = "one foreign call (TCP_INFO) [ADR 0002]; \\\n              no wrapper"\n)]\n` +
+  `${between}pub fn ${f}(fd: BorrowedFd<'_>) -> io::Result<u32> {\n    Ok(0)\n}\n`;
+
+/** A clean crate tree for unsafeProblems: the two exceptions and two ordinary crates. */
+function cleanCrates() {
+  return {
+    "crates/client-wasm/Cargo.toml": '[package]\nname = "npt-client-wasm"\n\n[lints.rust]\nunsafe_code = "allow"\n',
+    "crates/client-wasm/src/lib.rs": "pub fn create() {}\n",
+    "crates/tcpinfo/Cargo.toml": '[package]\nname = "npt-tcpinfo"\n\n[lints]\nworkspace = true\n',
+    "crates/tcpinfo/src/lib.rs":
+      "//! The `#[allow(unsafe_code)]` sits on the two functions only (a doc comment, not an attribute).\n" +
+      "/* A block comment /* nested */ naming #[allow(unsafe_code)] is a comment too. */\n" +
+      "#![deny(clippy::undocumented_unsafe_blocks)]\nmod linux;\n",
+    "crates/tcpinfo/src/linux.rs":
+      `const URL: &str = "http://example.invalid/#[x]"; // a // inside a string is not a comment\n` +
+      `const QUOTE: char = '"';\nconst RAW: &str = r#"a "quoted" ]] #[ bit"#;\n` +
+      `fn life<'a>(s: &'a str) -> &'a str {\n    s\n}\n` +
+      `${placed("srtt_us")}${placed("unacked_and_unsent", "#[inline]\n")}`,
+    "crates/net/Cargo.toml": '[package]\nname = "npt-net"\n# unsafe_code = "allow" in a comment sets nothing\n\n[lints]\nworkspace = true\n',
+    "crates/net/src/lib.rs": "//! npt-net stays free of unsafe code; the workspace denies unsafe_code.\n#![deny(unsafe_code)]\nmod l2;\n",
+    "crates/net/src/l2/socket.rs": '#[cfg(test)]\n#[path = "socket_tests.rs"]\nmod tests;\n',
+    "crates/net/src/l2/socket_tests.rs": 'const SERIES: &str = include_str!("../../../../marks/SERIES.md");\n',
+    "crates/sim/Cargo.toml": '[package]\nname = "npt-sim"\n\n[lints]\nworkspace = true\n\n[dependencies]\n',
+  };
+}
+
+function unsafeWith(change) {
+  const files = cleanCrates();
+  change(files);
+  return unsafeProblems(Object.keys(files), (f) => files[f]);
+}
+
+/** npt-tcpinfo's two messages: a misplaced relaxing at `where` on `on`, and a function whose count is not 1. */
+const misplaced = (where, on) =>
+  `${where} relaxes unsafe_code on ${on}; npt-tcpinfo may only put #[allow(unsafe_code, reason = "...")] directly on ` +
+  "srtt_us and unacked_and_unsent in crates/tcpinfo/src/linux.rs";
+const count = (fn, k) => `npt-tcpinfo's pub fn ${fn} has ${k} #[allow(unsafe_code, reason = ...)] attributes, not 1`;
+
+test("unsafe_code: the clean tree passes", () => {
+  assert.deepEqual(unsafeWith(() => {}), []);
+});
+
+test("lexRust blanks comments and keeps literals, offsets and lines", () => {
+  const src = `a /* x /* y */ z */ "s // t" 'q' '"' r#"u "v" w"# // c\nb'\\n' x<'a> /** d */ e`;
+  const { code, mask } = lexRust(src);
+  assert.equal(code.length, src.length);
+  assert.equal(mask.length, src.length);
+  assert.equal(code.split("\n").length, 2);
+  assert.match(code, /^a\s+"s \/\/ t" 'q' '"' r#"u "v" w"#\s+\nb'\\n' x<'a>\s+e$/);
+  assert.match(mask, /^a\s+\nb\s+x<'a>\s+e$/);
+});
+
+test("unsafe_code: an attribute relaxing it outside the two exceptions fails, in every form", () => {
+  const planted = [
+    "#[allow(unsafe_code)]\nfn f() {}\n",
+    "#[expect(unsafe_code)]\nfn f() {}\n",
+    "#[warn(unsafe_code)]\nfn f() {}\n",
+    "#[allow(dead_code, unsafe_code)]\nfn f() {}\n",
+    "#[allow(\n    clippy::all,\n    unsafe_code\n)]\nfn f() {}\n",
+    "#![cfg_attr(test, allow(unsafe_code))]\n",
+  ];
+  for (const code of planted) {
+    const p = unsafeWith((f) => {
+      f["crates/net/src/planted.rs"] = code;
+    });
+    assert.deepEqual(p, ["crates/net/src/planted.rs relaxes unsafe_code (only npt-client-wasm and npt-tcpinfo may)"], code);
+  }
+});
+
+test("unsafe_code: a manifest that sets it or drops the workspace lints fails", () => {
+  const set = unsafeWith((f) => {
+    f["crates/sim/Cargo.toml"] = '[package]\nname = "npt-sim"\n\n[lints.rust]\nunsafe_code = "allow"\n';
+  });
+  assert.deepEqual(set, [
+    "crates/sim/Cargo.toml sets unsafe_code",
+    "crates/sim/Cargo.toml does not inherit the workspace lints ([lints] workspace = true)",
+  ]);
+  const dropped = unsafeWith((f) => {
+    f["crates/sim/Cargo.toml"] = '[package]\nname = "npt-sim"\nworkspace = true\n';
+  });
+  assert.deepEqual(dropped, ["crates/sim/Cargo.toml does not inherit the workspace lints ([lints] workspace = true)"]);
+});
+
+test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
+  const wide = unsafeWith((f) => {
+    f["crates/tcpinfo/src/lib.rs"] = "#![allow(unsafe_code)]\nmod linux;\n";
+  });
+  assert.deepEqual(wide, [misplaced("crates/tcpinfo/src/lib.rs:1", "its whole module or crate (#!)")]);
+  const third = unsafeWith((f) => {
+    f["crates/tcpinfo/examples/probe.rs"] = "#[allow(unsafe_code)]\nfn main() {}\n";
+  });
+  assert.deepEqual(third, [misplaced("crates/tcpinfo/examples/probe.rs:1", "`fn main() {}`")]);
+  const none = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = "pub fn srtt_us() {}\n";
+  });
+  assert.deepEqual(none, [count("srtt_us", 0), count("unacked_and_unsent", 0)]);
+  const stub = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = placed("unacked_and_unsent");
+    f["crates/tcpinfo/src/stub.rs"] = placed("srtt_us");
+  });
+  assert.deepEqual(stub, [misplaced("crates/tcpinfo/src/stub.rs:1", "`pub fn srtt_us(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+});
+
+test("unsafe_code: the critic's two mutations fail (an allow on `mod linux;`, an allow moved to a helper)", () => {
+  // 1. A module-level outer allow, with one function's own allow removed: the count of attributes stays 2.
+  const onMod = unsafeWith((f) => {
+    f["crates/tcpinfo/src/lib.rs"] = '#[cfg(target_os = "linux")]\n#[allow(unsafe_code)]\nmod linux;\n';
+    f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}`;
+  });
+  assert.deepEqual(onMod, [misplaced("crates/tcpinfo/src/lib.rs:2", "`mod linux;`"), count("srtt_us", 0)]);
+  // 2. The allow moved from srtt_us to a helper, in its exact form: the count stays 2.
+  const moved = unsafeWith((f) => {
+    const helper = placed("srtt_us").replace("pub fn srtt_us", "fn helper");
+    f["crates/tcpinfo/src/linux.rs"] = `pub fn srtt_us() {}\n${placed("unacked_and_unsent")}${helper}`;
+  });
+  assert.deepEqual(moved, [misplaced("crates/tcpinfo/src/linux.rs:10", "`fn helper(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+  // The same onto another public function.
+  const other = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = `${placed("unacked_and_unsent")}${placed("other")}pub fn srtt_us() {}\n`;
+  });
+  assert.deepEqual(other, [misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn other(fd: BorrowedFd<'_>) -> io::Result<u32> {`"), count("srtt_us", 0)]);
+});
+
+test("unsafe_code: on the two functions only the exact allow with its reason counts", () => {
+  const forms = {
+    "#[allow(unsafe_code)]\n": "no reason",
+    '#[expect(unsafe_code, reason = "x")]\n': "expect",
+    '#[allow(unsafe_code, dead_code, reason = "x")]\n': "another lint beside it",
+    "#[cfg_attr(all(), allow(unsafe_code))]\n": "cfg_attr",
+    '#[allow(unsafe_code, reason = r"x")]\n': "a raw-string reason",
+  };
+  for (const [attr, what] of Object.entries(forms)) {
+    const p = unsafeWith((f) => {
+      f["crates/tcpinfo/src/linux.rs"] = `${placed("unacked_and_unsent")}${attr}pub fn srtt_us() {}\n`;
+    });
+    assert.deepEqual(p, [misplaced("crates/tcpinfo/src/linux.rs:9", "`pub fn srtt_us() {}`"), count("srtt_us", 0)], what);
+  }
+  const inner = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = `#![allow(unsafe_code)]\n${f["crates/tcpinfo/src/linux.rs"]}`;
+  });
+  assert.deepEqual(inner, [misplaced("crates/tcpinfo/src/linux.rs:1", "its whole module or crate (#!)")]);
+  const twice = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] = `${placed("unacked_and_unsent")}${placed("srtt_us", placed("x").split("pub fn")[0])}`;
+  });
+  assert.deepEqual(twice, [count("srtt_us", 2)], "two allows stacked on one function");
+});
+
+test("unsafe_code: the lexer neither hides an attribute nor counts a comment", () => {
+  // After a string holding `//` and a char literal holding `"`, the attribute is still code and still caught.
+  const hidden = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] += `const A: &str = "x // y"; const B: char = '"';\n#[allow(unsafe_code)]\nfn f() {}\n`;
+  });
+  const next = cleanCrates()["crates/tcpinfo/src/linux.rs"].split("\n").length;
+  assert.deepEqual(hidden, [misplaced(`crates/tcpinfo/src/linux.rs:${next + 1}`, "`fn f() {}`")]);
+  // A mention inside a string is not an attribute, so it is reported, not counted as a placed allow.
+  const inString = unsafeWith((f) => {
+    f["crates/tcpinfo/src/linux.rs"] += 'const S: &str = "#[allow(unsafe_code)]";\n';
+  });
+  assert.deepEqual(inString, [
+    "crates/tcpinfo/src/linux.rs names an unsafe_code relaxing outside an attribute (a string or a macro's text)",
+  ]);
+  // Inside a (nested) block comment it is nothing.
+  assert.deepEqual(
+    unsafeWith((f) => {
+      f["crates/tcpinfo/src/linux.rs"] += "/* /* */ #[allow(unsafe_code)] fn f() {} */\n";
+    }),
+    [],
+  );
+});
+
+test("unsafe_code: no #[path] or include! reaches outside its crate, the way npt-tcpinfo's file could be borrowed", () => {
+  const planted = {
+    '#[path = "../../tcpinfo/src/linux.rs"]\nmod k;\n': '#[path = "../../tcpinfo/src/linux.rs"]',
+    '#[cfg_attr(unix, path = "../../tcpinfo/src/linux.rs")]\nmod k;\n': '#[path = "../../tcpinfo/src/linux.rs"]',
+    '#[path = "/abs/linux.rs"]\nmod k;\n': '#[path = "/abs/linux.rs"]',
+    'include!("../../tcpinfo/src/linux.rs");\n': 'include!("../../tcpinfo/src/linux.rs")',
+    'include!("k.inc");\n': 'include!("k.inc")',
+    'include!(concat!(env!("OUT_DIR"), "/k.rs"));\n': "include! with a computed path",
+  };
+  for (const [code, what] of Object.entries(planted)) {
+    const p = unsafeWith((f) => {
+      f["crates/room/src/k.rs"] = code;
+    });
+    assert.deepEqual(p, [`crates/room/src/k.rs:1 has ${what}, not a .rs file inside crates/room/`], code);
+  }
+  assert.deepEqual(
+    unsafeWith((f) => {
+      f["crates/room/src/k.rs"] = '#[path = "../src/sub/k2.rs"]\nmod k2;\ninclude!("./k3.rs");\n';
+    }),
+    [],
+    "inside the crate is fine",
+  );
 });
 
 test("marks.json covers exactly the plan's marks, and every row it hashed is unchanged", () => {

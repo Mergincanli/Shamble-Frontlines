@@ -12,3 +12,7 @@ mod tcp_model;
 // L2's impairment layer under quinn (U3b): ImpairSocket and L2Config, plan §4.7's only new public items.
 mod l2;
 pub use l2::{ImpairSocket, L2Config};
+
+// The plain WebSocket path's kernel readings for fix 1's gate, through npt-tcpinfo (U3c 1.8); WsServer calls them at U6.
+#[cfg_attr(not(test), allow(dead_code))]
+mod tcp_kernel;

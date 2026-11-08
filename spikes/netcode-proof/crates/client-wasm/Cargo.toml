@@ -6,7 +6,8 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
-# Not the workspace lints: wasm-bindgen's generated code needs `unsafe` (the only crate allowed it; Cargo.toml note).
+# Not the workspace lints: wasm-bindgen's generated code needs `unsafe` (one of the workspace's two unsafe_code
+# exceptions, with npt-tcpinfo's two functions; the workspace Cargo.toml's note).
 [lints.rust]
 unsafe_code = "allow"
 

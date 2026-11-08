@@ -857,6 +857,7 @@ version = "0.0.0"
 dependencies = [
  "npt-l1",
  "npt-link",
+ "npt-tcpinfo",
  "quinn",
  "rand_chacha",
  "rand_core",
@@ -898,6 +899,14 @@ name = "npt-super"
 version = "0.0.0"
 dependencies = [
  "npt-log",
+]
+
+[[package]]
+name = "npt-tcpinfo"
+version = "0.0.0"
+dependencies = [
+ "libc",
+ "socket2",
 ]
 
 [[package]]
