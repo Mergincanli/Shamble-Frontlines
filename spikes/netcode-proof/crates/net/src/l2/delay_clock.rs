@@ -9,6 +9,11 @@
 //!   cancelled, or when the connection's pump ends (C3: both hold at most one entry per live connection).
 //! - The thread pops every entry due, wakes the pumps outside the lock, and otherwise sleeps on a Condvar until the
 //!   earliest due time (a nearer new entry wakes it).
+//! - The per-release split (the advisor's "condition 10 again", 2026-11-08): when it fires a connection's entry, the
+//!   thread keeps (the entry's due, its own `now` then) in `fired`, the split's stamp (1): `now` is read at the top
+//!   of its loop, the first stamp after its Condvar wait returns (and again after each batch it wakes). The pump takes
+//!   it at its next pass (`take_fired`). At most one entry per live connection, overwritten by a later fire unless the
+//!   one there is untaken and for the same due (its first wake is kept), removed at `cancel` and `release`.
 
 use super::thread;
 use std::collections::{BTreeMap, BTreeSet};
@@ -26,6 +31,8 @@ const SLACK_ANSWER: Duration = Duration::from_secs(1);
 struct State {
     schedule: BTreeSet<(u64, u64, u64)>,
     table: BTreeMap<u64, (u64, u64, Waker)>,
+    /// key -> (the fired entry's due, the thread's `now` when it fired it, taken by the pump).
+    fired: BTreeMap<u64, (u64, u64, bool)>,
     seq: u64,
     next_key: u64,
     /// Keys handed out and not yet released: the live connections.
@@ -116,28 +123,48 @@ impl Clock {
         }
     }
 
-    /// Removes `key`'s entry, if any.
+    /// Removes `key`'s entry, if any, and its fire. A fire not yet taken covers nothing later: a connection cancels
+    /// only with no event pending (a record released after it comes from an event added later, so is due after the
+    /// fire's stamp) or when its DelayStream is dropped.
     pub(crate) fn cancel(&self, key: u64) {
         let mut st = self.lock();
         if let Some((d, s, _)) = st.table.remove(&key) {
             st.schedule.remove(&(d, s, key));
         }
+        st.fired.remove(&key);
     }
 
-    /// Removes `key`'s entry and gives the key back (its connection's pump ended).
+    /// Removes `key`'s entry and its fire, and gives the key back (its connection's pump ended).
     pub(crate) fn release(&self, key: u64) {
         let mut st = self.lock();
         if let Some((d, s, _)) = st.table.remove(&key) {
             st.schedule.remove(&(d, s, key));
         }
+        st.fired.remove(&key);
         st.live = st.live.saturating_sub(1);
     }
 
-    /// (schedule entries, table entries, live connections), and whether `key` holds an entry in either (C3's test).
+    /// `key`'s latest fire not yet taken, if the thread stamped it at or before `upto` (the pump pass's own stamp):
+    /// (the entry's due, the thread's `now` then), marked taken. A fire stamped after `upto` is left for the next pass.
+    pub(crate) fn take_fired(&self, key: u64, upto: u64) -> Option<(u64, u64)> {
+        let mut st = self.lock();
+        match st.fired.get_mut(&key) {
+            Some(f) if !f.2 && f.1 <= upto => {
+                f.2 = true;
+                Some((f.0, f.1))
+            }
+            _ => None,
+        }
+    }
+
+    /// (schedule entries, table entries, live connections), and whether `key` holds an entry in any of the schedule,
+    /// the table and the fires (C3's test).
     #[cfg(test)]
     pub(crate) fn census(&self, key: u64) -> (usize, usize, u64, bool) {
         let st = self.lock();
-        let held = st.table.contains_key(&key) || st.schedule.iter().any(|e| e.2 == key);
+        let held = st.table.contains_key(&key)
+            || st.schedule.iter().any(|e| e.2 == key)
+            || st.fired.contains_key(&key);
         (st.schedule.len(), st.table.len(), st.live, held)
     }
 
@@ -208,6 +235,11 @@ impl Clock {
                         st.schedule.pop_first();
                         if let Some((_, _, w)) = st.table.remove(&key) {
                             fired.push(w);
+                            // The split's stamp (1); an untaken fire for the same due keeps its first wake.
+                            let keep = st.fired.get(&key).is_some_and(|f| !f.2 && f.0 == due);
+                            if !keep {
+                                st.fired.insert(key, (due, now, false));
+                            }
                         }
                     }
                     _ => break,

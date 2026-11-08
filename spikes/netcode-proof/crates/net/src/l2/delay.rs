@@ -46,21 +46,38 @@
 //! record: 549 B, or the request's 8,214 B), plus the scanner's buffer (one frame, 527 B, or the request cap). Counted,
 //! current and largest, per direction.
 //!
-//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: one lateness histogram per direction, its
-//! per-second window kept as a difference against a sparse mark of the buckets the second touched (`stats::Running`:
-//! 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B reserve for the mark), the scanner's buffer (8,192 B at the
-//! defaults), the down record's staging buffer (16,384 B) and the pump's read buffer (527 B): 309,583 B at the defaults
-//! (`ws_conn_fixed_bytes`; it was about 565 KB with two whole histograms per direction). On top: the held bytes above
-//! (below 81,942 B each way), and a dense mark of 135,040 B per direction once a second's lateness touches more than
-//! 256 buckets. U6 sizes WsServer's accept cap from these and tungstenite's own buffers (48 players: about 15 MB here).
+//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: six lateness histograms per direction (the
+//! total and the split's five parts, below), each with its per-second window kept as a difference against a sparse
+//! mark of the buckets the second touched (`stats::Running`: 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B
+//! reserve for the mark), the scanner's buffer (8,192 B at the defaults), the down record's staging buffer (16,384 B)
+//! and the pump's read buffer (527 B): 1,731,983 B at the defaults (`ws_conn_fixed_bytes`; 309,583 B before the split's
+//! ten histograms). On top: the held bytes above (below 81,942 B each way), and a dense mark of 135,040 B per histogram
+//! once a second's samples touch more than 256 of its buckets. U6 sizes WsServer's accept cap from these and
+//! tungstenite's own buffers (48 players: about 83 MB here).
 //!
 //! **Lateness (M1, C10).** Down at the return of S's `poll_write` that takes a record's last byte; up at the return of
 //! `poll_read` that hands its last byte to tungstenite; each against the record's model delivery stamp, in the same
 //! histograms and E[(L − L0 − 0.25 ms)+] as `l2::stats`.
+//!
+//! **The per-release split (the advisor's "condition 10 again", 2026-11-08).** Each release's L = (3) − M, with M the
+//! record's model delivery stamp on DelayStream's clock and (3) the stamp above, splits on stamps the code already
+//! takes: (1) W, the release clock thread's `now` when it fired the connection's entry (`delay_clock`: the first stamp
+//! after its Condvar wait returns, and again after each batch of wakes); (2) P, the stamp of the pump pass's opening
+//! step (the now it steps the model to); and T, the stamp of whichever step released the record (P for an opening
+//! step). A record is in the **woken** class when an opening step released it and the clock's latest fire not yet taken
+//! was due no later than M and stamped no earlier, and no later than P (D <= M <= W <= P): clock = W − M (the clock
+//! thread's own wake lateness), hop = P − W (its wake calls, tokio's scheduling of the pump, the pump's wait for the
+//! lock), work = (3) − P (down: the pump's work and S's write; up: the rest of the pass and the reader's turn). Every
+//! other release is in the **other** class, with no clock part: wait = T − M, work = (3) − T, counted by its step: an
+//! opening step no fire covered (the pass was woken by S's I/O, an application task or a shutdown, or by a fire before
+//! the record came due), the pump's step inside its pass (its up loop; a down record released there is written at the
+//! pump's next pass), or an application task's step (`current`, `add_burst`). Each part is the difference of two
+//! stamps, never a remainder, so the parts sum to L exactly only while the stamps chain: the identity test checks it per
+//! release. One `stats::Running` per part per direction, with the total's statistics.
 
 use super::config::{L2Config, one_way_ns};
 use super::delay_clock::{self, Clock};
-use super::delay_names as names;
+use super::delay_names::{self as names, KINDS, PARTS, Split};
 use super::stats::{Running, Summary};
 use super::thread;
 use super::ws_frame::{Boundary, MAX_HEADER, REASONS, Reason, Scanner};
@@ -102,14 +119,90 @@ const HANDSHAKE: &str = "the TCP and TLS handshakes run undelayed below the wrap
      no RTT sample: RTO 1 s and fix 1's 100 ms srtt until the first data acknowledgement, where Linux has the \
      handshake's sample (tcp_synack_rtt_meas); the upgrade exchange gives one within the first round trip";
 
-/// One record: its plaintext length, its end in the model's byte count, its model write and delivery stamps, and
-/// (up) whether it ends a data message.
+/// One record: its plaintext length, its end in the model's byte count, its model delivery stamp once released, how
+/// it was released (the split), and (up) whether it ends a data message.
 #[derive(Debug, Clone, Copy)]
 struct Rec {
     len: usize,
     model_end: u64,
     released: Option<u64>,
+    freed: Freed,
     message_end: bool,
+}
+
+/// The split's parts in `Split::parts`' order (delay_names::PARTS): the woken class's clock, hop and work, then the
+/// other class's wait and work.
+const CLOCK: usize = 0;
+const HOP: usize = 1;
+const WORK: usize = 2;
+const WAIT: usize = 3;
+const OTHER_WORK: usize = 4;
+/// The other class's kinds (delay_names::KINDS' order): a pump pass's opening step, the pump's step inside its pass, an
+/// application task's step.
+const OPEN: usize = 0;
+const MID: usize = 1;
+const APP: usize = 2;
+
+/// The step that releases records (the split): a pump pass's opening step, with the clock thread's fire it took (the
+/// entry's due and the thread's stamp (1)), if any; the pump's step inside its pass (its up loop); an application
+/// task's step (`current`, `add_burst`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum By {
+    Open(Option<(u64, u64)>),
+    Mid,
+    App,
+}
+
+/// How a record was released (the split): the releasing step's stamp T on DelayStream's clock (the exact now it
+/// stepped the model to), the clock thread's stamp W when its fire covered the record (the woken class), and the step's
+/// kind (`OPEN`, `MID`, `APP`).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+struct Freed {
+    step: u64,
+    woke: Option<u64>,
+    kind: usize,
+}
+
+/// The split's bites (M2's pattern): the identity test turns one on and the identity must fail.
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) enum SplitBite {
+    #[default]
+    Off,
+    /// A part dropped: the woken class's hop recorded as 0.
+    DropHop,
+    /// A part misattributed: the woken class's work measured from the clock's wake (1) instead of the pass's start (2).
+    WorkFromWake,
+}
+
+#[cfg(test)]
+impl SplitBite {
+    /// The parts as the bite records them: a woken release's (`[clock, hop, work]`) bitten, any other's unchanged.
+    fn apply(self, mut parts: [u64; 3], at: u64, woke: Option<u64>) -> [u64; 3] {
+        if let Some(w) = woke {
+            match self {
+                SplitBite::Off => {}
+                SplitBite::DropHop => parts[HOP] = 0,
+                SplitBite::WorkFromWake => parts[WORK] = at.saturating_sub(w),
+            }
+        }
+        parts
+    }
+}
+
+/// One release's split as recorded (the identity test reads it): its direction, its stamps (M, W, T, (3)), its kind,
+/// the total recorded and the parts recorded (`[clock, hop, work]` woken; `[wait, work, 0]` other).
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct SplitLog {
+    pub(crate) dir: usize,
+    pub(crate) due: u64,
+    pub(crate) woke: Option<u64>,
+    pub(crate) step: u64,
+    pub(crate) at: u64,
+    pub(crate) kind: usize,
+    pub(crate) total: u64,
+    pub(crate) parts: [u64; 3],
 }
 
 /// The per-return record (C8): at each burst's end, as the model passes it.
@@ -194,6 +287,8 @@ pub(crate) struct Logs {
     /// Up: each data message's hand-over to tungstenite on DelayStream's clock (the `poll_read` return that handed its
     /// last byte) and the lateness recorded for it then, in order.
     pub(crate) handed_up: Vec<(u64, u64)>,
+    /// Every release's split as recorded, both ways, in the order recorded.
+    pub(crate) splits: Vec<SplitLog>,
 }
 
 /// One atomic reading of a connection for the tests (W2): every field taken under one lock, after one step to now.
@@ -211,6 +306,9 @@ pub(crate) struct Snapshot {
     pub(crate) sent_log: Vec<(usize, u64, u32, u64, bool)>,
     /// Down plaintext S has taken.
     pub(crate) taken_down: u64,
+    /// The lateness and its split over every sample, `[down, up]`.
+    pub(crate) late: [Summary; 2],
+    pub(crate) split: [Split; 2],
 }
 
 /// The pump's lifetime for the shutdown tests (W3, M1): its polls, those at or after the shutdown deadline, the
@@ -285,6 +383,13 @@ struct Conn {
     closed: Option<Reason>,
     /// The release lateness per direction: the connection's whole and its per-second window (F7).
     late: [Running; 2],
+    /// Its per-release split per direction: one histogram per part (`Split::parts`' order), and the other class's
+    /// counts by kind with their mark at the window's start.
+    split: [[Running; PARTS]; 2],
+    kinds: [[u64; KINDS]; 2],
+    mark_kinds: [[u64; KINDS]; 2],
+    #[cfg(test)]
+    split_bite: SplitBite,
     held: [u64; 2],
     held_max: [u64; 2],
     held_max_run: [u64; 2],
@@ -329,8 +434,64 @@ impl Conn {
         }
     }
 
-    fn late(&mut self, dir: usize, ns: u64) {
-        self.late[dir].record(ns);
+    /// Records `rec`'s release at `at`, its stamp (3): the lateness L = at − M against its model delivery stamp M, and
+    /// L's split by how it was released (the module documentation), each part the difference of two stamps, never a
+    /// remainder. Returns L.
+    fn late(&mut self, dir: usize, rec: &Rec, at: u64) -> u64 {
+        let due = self.origin.saturating_add(rec.released.unwrap_or_default());
+        let total = at.saturating_sub(due);
+        self.late[dir].record(total);
+        let f = rec.freed;
+        let parts = match f.woke {
+            Some(w) => [
+                w.saturating_sub(due),
+                f.step.saturating_sub(w),
+                at.saturating_sub(f.step),
+            ],
+            None => [f.step.saturating_sub(due), at.saturating_sub(f.step), 0],
+        };
+        #[cfg(test)]
+        let parts = self.split_bite.apply(parts, at, f.woke);
+        if f.woke.is_some() {
+            self.split[dir][CLOCK].record(parts[0]);
+            self.split[dir][HOP].record(parts[1]);
+            self.split[dir][WORK].record(parts[2]);
+        } else {
+            self.split[dir][WAIT].record(parts[0]);
+            self.split[dir][OTHER_WORK].record(parts[1]);
+            self.kinds[dir][f.kind] += 1;
+        }
+        #[cfg(test)]
+        self.logs.splits.push(SplitLog {
+            dir,
+            due,
+            woke: f.woke,
+            step: f.step,
+            at,
+            kind: f.kind,
+            total,
+            parts,
+        });
+        total
+    }
+
+    /// The split's rows: each part's summary (the whole connection, or the current window) and the other class's
+    /// counts by kind (totals, or since the window's mark).
+    fn split_rows(&mut self, window: bool) -> [Split; 2] {
+        let mut out = [Split::default(); 2];
+        for (d, o) in out.iter_mut().enumerate() {
+            for (p, s) in o.parts.iter_mut().enumerate() {
+                *s = if window {
+                    self.split[d][p].window()
+                } else {
+                    self.split[d][p].whole()
+                };
+            }
+            for k in 0..KINDS {
+                o.kinds[k] = self.kinds[d][k] - if window { self.mark_kinds[d][k] } else { 0 };
+            }
+        }
+        out
     }
 
     /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
@@ -345,6 +506,7 @@ impl Conn {
             len,
             model_end: self.model_end[dir],
             released: None,
+            freed: Freed::default(),
             message_end,
         });
         #[cfg(test)]
@@ -352,8 +514,10 @@ impl Conn {
     }
 
     /// Advances the model to `t` event by event (and through each burst's end), releasing what it delivers with each
-    /// event's stamp. Returns, per direction, whether anything was released.
-    fn step_to(&mut self, t: u64) -> [bool; 2] {
+    /// event's stamp; `by` is the step (the split: its stamp T is the clock's now that `t` was taken from, origin + t).
+    /// Returns, per direction, whether anything was released.
+    fn step_to(&mut self, t: u64, by: By) -> [bool; 2] {
+        let step = self.origin.saturating_add(t);
         let mut new = [false; 2];
         loop {
             let ev = self.model.next_event();
@@ -366,7 +530,7 @@ impl Conn {
                 break;
             };
             self.model.advance(x);
-            let got = self.harvest(x);
+            let got = self.harvest(x, step, by);
             new[DOWN] |= got[DOWN];
             new[UP] |= got[UP];
             if be == Some(x) {
@@ -378,8 +542,33 @@ impl Conn {
         new
     }
 
-    /// Releases every record the model has delivered whole, stamped `t`, and fills the open per-return times.
-    fn harvest(&mut self, t: u64) -> [bool; 2] {
+    /// Releases every record the model has delivered whole, stamped `t`, by the step `by` stamped `step` (its class:
+    /// woken when `by` is an opening step whose fire (due, wake) has due <= M <= wake, M = origin + t), and fills the
+    /// open per-return times.
+    fn harvest(&mut self, t: u64, step: u64, by: By) -> [bool; 2] {
+        let m = self.origin.saturating_add(t);
+        let freed = match by {
+            By::Open(Some((due, woke))) if due <= m && m <= woke => Freed {
+                step,
+                woke: Some(woke),
+                kind: OPEN,
+            },
+            By::Open(_) => Freed {
+                step,
+                woke: None,
+                kind: OPEN,
+            },
+            By::Mid => Freed {
+                step,
+                woke: None,
+                kind: MID,
+            },
+            By::App => Freed {
+                step,
+                woke: None,
+                kind: APP,
+            },
+        };
         let mut new = [false; 2];
         let mut message = [false; 2];
         for dir in [DOWN, UP] {
@@ -391,6 +580,7 @@ impl Conn {
                     break;
                 }
                 r.released = Some(t);
+                r.freed = freed;
                 let (len, model_end, message_end) = (r.len, r.model_end, r.message_end);
                 self.released[dir] += 1;
                 self.released_model[dir] += len as u64 + OVERHEAD;
@@ -740,6 +930,11 @@ where
             failed: None,
             closed: None,
             late: [Running::new(), Running::new()],
+            split: std::array::from_fn(|_| std::array::from_fn(|_| Running::new())),
+            kinds: [[0; KINDS]; 2],
+            mark_kinds: [[0; KINDS]; 2],
+            #[cfg(test)]
+            split_bite: SplitBite::Off,
             held: [0; 2],
             held_max: [0; 2],
             held_max_run: [0; 2],
@@ -754,7 +949,12 @@ where
         };
         let scratch = vec![0u8; RECORD_MAX].into_boxed_slice();
         let rbuf = vec![0u8; max_frame].into_boxed_slice();
-        c.fixed_bytes = c.late.iter().map(Running::heap_bytes).sum::<u64>()
+        c.fixed_bytes = c
+            .late
+            .iter()
+            .chain(c.split.iter().flatten())
+            .map(Running::heap_bytes)
+            .sum::<u64>()
             + (c.parse.len() + scratch.len() + rbuf.len()) as u64;
         let sh = Arc::new(Shared {
             key,
@@ -804,7 +1004,7 @@ impl<S> DelayStream<S> {
         let sh = &self.sh;
         let mut c = sh.lock();
         let t = c.model_t(sh.clock.now_ns());
-        let got = c.step_to(t);
+        let got = c.step_to(t, By::App);
         let now = c.model.now_ns();
         let start = start_ns
             .checked_sub(c.origin)
@@ -855,7 +1055,7 @@ impl<S> DelayStream<S> {
         let mut wakes = [None, None, None, None];
         if !c.pump_done {
             let t = c.model_t(sh.clock.now_ns());
-            let got = c.step_to(t);
+            let got = c.step_to(t, By::App);
             c.reschedule(sh.clock, sh.key);
             let [r, w, s] = c.wakers(got[UP], false);
             let pump = if got[DOWN] {
@@ -938,7 +1138,7 @@ impl<S> DelayStream<S> {
     /// separate calls).
     #[cfg(test)]
     pub(crate) fn snapshot(&self) -> Snapshot {
-        let c = self.current();
+        let mut c = self.current();
         Snapshot {
             origin: c.origin,
             now: c.model.now_ns(),
@@ -947,7 +1147,15 @@ impl<S> DelayStream<S> {
             logs: c.logs.clone(),
             sent_log: c.model.sent_log().to_vec(),
             taken_down: c.written[DOWN] - c.bytes[DOWN].len() as u64,
+            late: [c.late[DOWN].whole(), c.late[UP].whole()],
+            split: c.split_rows(false),
         }
+    }
+
+    /// The split's bite (M2's pattern) for the identity test: from now on, `b` on every woken release.
+    #[cfg(test)]
+    pub(crate) fn bite_split(&self, b: SplitBite) {
+        self.sh.lock().split_bite = b;
     }
 
     /// The pump's lifetime so far (W3, M1).
@@ -1099,18 +1307,22 @@ impl<S> DelayStream<S> {
             [c.held[UP], c.held_max[UP]],
         ];
         let late: [Summary; 2] = [c.late[DOWN].window(), c.late[UP].window()];
+        let split = c.split_rows(true);
         let now = c.own.values();
         let mark = c.mark_own.values();
         let mut own = [0u64; REASONS + 3];
         for i in 0..own.len() {
             own[i] = now[i] - mark[i];
         }
-        let mut out = Vec::with_capacity(80);
-        names::window(tcp, held, late, &own, &mut out);
+        let mut out = Vec::with_capacity(160);
+        names::window(tcp, held, late, split, &own, &mut out);
         c.mark_tcp = cur;
         c.mark_own = c.own;
-        c.late[DOWN].close_window();
-        c.late[UP].close_window();
+        c.mark_kinds = c.kinds;
+        let cc = &mut *c;
+        for h in cc.late.iter_mut().chain(cc.split.iter_mut().flatten()) {
+            h.close_window();
+        }
         c.held_max = c.held;
         out
     }
@@ -1130,8 +1342,9 @@ impl<S> DelayStream<S> {
             [c.held[UP], c.held_max_run[UP]],
         ];
         let late = [c.late[DOWN].whole(), c.late[UP].whole()];
-        let mut out = Vec::with_capacity(84);
-        names::window(tcp, held, late, &c.own.values(), &mut out);
+        let split = c.split_rows(false);
+        let mut out = Vec::with_capacity(160);
+        names::window(tcp, held, late, split, &c.own.values(), &mut out);
         out.push((names::CONNS_BEFORE, u64::from(c.conn)));
         out.push((names::ACCEPTED, c.accepted_ns));
         out.push((names::WRITTEN[DOWN], c.written[DOWN]));
@@ -1188,14 +1401,14 @@ impl<S> AsyncRead for DelayStream<S> {
                 c.released_model[UP] -= len as u64 + OVERHEAD;
                 c.front_done[UP] = 0;
                 freed = true;
+                // The split's stamp (3) up: the hand-over of the record's last byte.
                 let at = sh.clock.now_ns();
-                let due = c.origin + rec.released.unwrap_or_default();
-                let late = at.saturating_sub(due);
-                c.late(UP, late);
+                let late = c.late(UP, &rec, at);
                 #[cfg(test)]
                 if rec.message_end {
                     c.logs.handed_up.push((at, late));
                 }
+                let _ = late;
             }
             c.held_now();
             let pump = if freed { c.pump_waker.clone() } else { None };
@@ -1373,8 +1586,11 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                     c.life.polls_after_deadline += 1;
                 }
             }
-            let t = c.model_t(sh.clock.now_ns());
-            wake_reader = c.step_to(t)[UP];
+            // The split's stamp (2), the pass's opening step, and the clock thread's fire before it, if any.
+            let p = sh.clock.now_ns();
+            let fire = sh.clock.take_fired(sh.key, p);
+            let t = c.model_t(p);
+            wake_reader = c.step_to(t, By::Open(fire))[UP];
         }
 
         // Down: each released record into S in one write call (C1), staged once (F4), S polled outside the lock.
@@ -1396,7 +1612,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                 this.sent = 0;
             }
             let r = Pin::new(&mut *s).poll_write(cx, &this.scratch[this.sent..this.staged]);
-            // The release's lateness is taken at poll_write's return (M1), before the lock.
+            // The release's lateness is taken at poll_write's return (M1), before the lock: the split's stamp (3) down.
             let at = sh.clock.now_ns();
             match r {
                 Poll::Ready(Ok(n)) if n > 0 => {
@@ -1424,8 +1640,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                             c.own.split_writes += 1;
                         }
                         this.front_calls = 0;
-                        let due = c.origin.saturating_add(rec.released.unwrap_or_default());
-                        c.late(DOWN, at.saturating_sub(due));
+                        c.late(DOWN, &rec, at);
                         wake_writer = true;
                     }
                 }
@@ -1468,7 +1683,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                 c.parse[at..at + fresh].copy_from_slice(&this.rbuf[..fresh]);
                 c.parse_len += fresh;
                 let t = c.model_t(sh.clock.now_ns());
-                wake_reader |= c.step_to(t)[UP];
+                wake_reader |= c.step_to(t, By::Mid)[UP];
                 if let Err(r) = c.scan_up(t) {
                     c.close(r);
                     return Poll::Ready(());

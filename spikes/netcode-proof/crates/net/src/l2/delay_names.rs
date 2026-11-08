@@ -118,6 +118,129 @@ pub(crate) const LATE: [[&str; 7]; 2] = [
     ],
 ];
 
+/// The per-release split's parts (the advisor's "condition 10 again", 2026-11-08; delay.rs's module documentation), in
+/// `Split::parts`' order: the woken class's clock, hop and work, then the other class's wait and work.
+pub(crate) const PARTS: usize = 5;
+/// The other class's releases by the step that released them: a pump pass's opening step that no clock wake covered,
+/// the pump's step inside its pass (its up loop), an application task's step.
+pub(crate) const KINDS: usize = 3;
+
+/// One direction's split: each part's summary (its `n` is its class's count) and the other class's counts by kind.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) struct Split {
+    pub(crate) parts: [Summary; PARTS],
+    pub(crate) kinds: [u64; KINDS],
+}
+
+/// `[direction]`: the split's class counts, woken then other.
+pub(crate) const SPLIT_COUNT: [[&str; 2]; 2] = [
+    ["ws_late_down_woken_count", "ws_late_down_other_count"],
+    ["ws_late_up_woken_count", "ws_late_up_other_count"],
+];
+
+/// `[direction][part][statistic]`: the part's p50, p99, p99.9, max, E[(x − x0 − 0.25 ms)+] with x0 its own p50, and
+/// the samples beyond x0 + 0.25 ms (the lateness's statistics, through the same `stats::Running`).
+pub(crate) const SPLIT: [[[&str; 6]; PARTS]; 2] = [
+    [
+        [
+            "ws_late_down_clock_p50_ns",
+            "ws_late_down_clock_p99_ns",
+            "ws_late_down_clock_p999_ns",
+            "ws_late_down_clock_max_ns",
+            "ws_late_down_clock_excess_ns",
+            "ws_late_down_clock_over_count",
+        ],
+        [
+            "ws_late_down_hop_p50_ns",
+            "ws_late_down_hop_p99_ns",
+            "ws_late_down_hop_p999_ns",
+            "ws_late_down_hop_max_ns",
+            "ws_late_down_hop_excess_ns",
+            "ws_late_down_hop_over_count",
+        ],
+        [
+            "ws_late_down_work_p50_ns",
+            "ws_late_down_work_p99_ns",
+            "ws_late_down_work_p999_ns",
+            "ws_late_down_work_max_ns",
+            "ws_late_down_work_excess_ns",
+            "ws_late_down_work_over_count",
+        ],
+        [
+            "ws_late_down_other_wait_p50_ns",
+            "ws_late_down_other_wait_p99_ns",
+            "ws_late_down_other_wait_p999_ns",
+            "ws_late_down_other_wait_max_ns",
+            "ws_late_down_other_wait_excess_ns",
+            "ws_late_down_other_wait_over_count",
+        ],
+        [
+            "ws_late_down_other_work_p50_ns",
+            "ws_late_down_other_work_p99_ns",
+            "ws_late_down_other_work_p999_ns",
+            "ws_late_down_other_work_max_ns",
+            "ws_late_down_other_work_excess_ns",
+            "ws_late_down_other_work_over_count",
+        ],
+    ],
+    [
+        [
+            "ws_late_up_clock_p50_ns",
+            "ws_late_up_clock_p99_ns",
+            "ws_late_up_clock_p999_ns",
+            "ws_late_up_clock_max_ns",
+            "ws_late_up_clock_excess_ns",
+            "ws_late_up_clock_over_count",
+        ],
+        [
+            "ws_late_up_hop_p50_ns",
+            "ws_late_up_hop_p99_ns",
+            "ws_late_up_hop_p999_ns",
+            "ws_late_up_hop_max_ns",
+            "ws_late_up_hop_excess_ns",
+            "ws_late_up_hop_over_count",
+        ],
+        [
+            "ws_late_up_work_p50_ns",
+            "ws_late_up_work_p99_ns",
+            "ws_late_up_work_p999_ns",
+            "ws_late_up_work_max_ns",
+            "ws_late_up_work_excess_ns",
+            "ws_late_up_work_over_count",
+        ],
+        [
+            "ws_late_up_other_wait_p50_ns",
+            "ws_late_up_other_wait_p99_ns",
+            "ws_late_up_other_wait_p999_ns",
+            "ws_late_up_other_wait_max_ns",
+            "ws_late_up_other_wait_excess_ns",
+            "ws_late_up_other_wait_over_count",
+        ],
+        [
+            "ws_late_up_other_work_p50_ns",
+            "ws_late_up_other_work_p99_ns",
+            "ws_late_up_other_work_p999_ns",
+            "ws_late_up_other_work_max_ns",
+            "ws_late_up_other_work_excess_ns",
+            "ws_late_up_other_work_over_count",
+        ],
+    ],
+];
+
+/// `[direction][kind]`: the other class's releases by the step that released them (`KINDS`' order).
+pub(crate) const SPLIT_KIND: [[&str; KINDS]; 2] = [
+    [
+        "ws_late_down_other_open_count",
+        "ws_late_down_other_mid_count",
+        "ws_late_down_other_app_count",
+    ],
+    [
+        "ws_late_up_other_open_count",
+        "ws_late_up_other_mid_count",
+        "ws_late_up_other_app_count",
+    ],
+];
+
 /// The connection's own counts: closes by the scanner's reason (ws_frame::Reason's order), then the rest.
 pub(crate) const CLOSE: [&str; REASONS] = [
     "ws_close_request_count",
@@ -188,12 +311,14 @@ pub(crate) const RETURN: [&str; 10] = [
     "ws_up_first_message_ns",
 ];
 
-/// One window's (or the connection's) rows in a fixed order: per direction the model's counts, the held bytes and the
-/// lateness; then the connection's own counts.
+/// One window's (or the connection's) rows in a fixed order: per direction the model's counts, the held bytes, the
+/// lateness and its per-release split (the woken class's count and parts, then the other class's, then its kinds);
+/// then the connection's own counts.
 pub(crate) fn window(
     tcp: [[u64; 20]; 2],
     held: [[u64; 2]; 2],
     late: [Summary; 2],
+    split: [Split; 2],
     own: &[u64; REASONS + 3],
     out: &mut Vec<(&'static str, u64)>,
 ) {
@@ -209,6 +334,23 @@ pub(crate) fn window(
             .iter()
             .zip([s.n, s.p50, s.p99, s.p999, s.max, s.excess, s.over])
         {
+            out.push((name, v));
+        }
+        let sp = split[d];
+        for (part, s) in sp.parts.iter().enumerate() {
+            match part {
+                0 => out.push((SPLIT_COUNT[d][0], s.n)),
+                3 => out.push((SPLIT_COUNT[d][1], s.n)),
+                _ => {}
+            }
+            for (name, v) in SPLIT[d][part]
+                .iter()
+                .zip([s.p50, s.p99, s.p999, s.max, s.excess, s.over])
+            {
+                out.push((name, v));
+            }
+        }
+        for (name, v) in SPLIT_KIND[d].iter().zip(sp.kinds) {
             out.push((name, v));
         }
     }
@@ -230,6 +372,7 @@ mod tests {
             [[0; 20]; 2],
             [[0; 2]; 2],
             [Summary::default(); 2],
+            [Split::default(); 2],
             &[0; REASONS + 3],
             &mut out,
         );
@@ -269,8 +412,12 @@ mod tests {
         sorted.sort_unstable();
         sorted.dedup();
         assert_eq!(sorted.len(), every.len(), "a name twice");
-        // Per direction 20 model counts, 2 held, 7 lateness; then 6 close reasons and 3 more.
-        assert_eq!(all_v().len(), 2 * (20 + 2 + 7) + REASONS + 3);
+        // Per direction 20 model counts, 2 held, 7 lateness, and the split's 2 class counts, 5 parts of 6 statistics
+        // and 3 kinds; then 6 close reasons and 3 more.
+        assert_eq!(
+            all_v().len(),
+            2 * (20 + 2 + 7 + 2 + PARTS * 6 + KINDS) + REASONS + 3
+        );
     }
 
     /// M15 and u3c-plan.md 1.7: every name DelayStream writes has its SERIES.md row (U3b's pattern in names.rs); a

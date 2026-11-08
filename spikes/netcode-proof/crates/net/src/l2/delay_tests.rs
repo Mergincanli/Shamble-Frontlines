@@ -215,6 +215,149 @@ fn late_line(name: &str, s: &Summary) -> String {
     )
 }
 
+/// One part of the per-release split, from the rows: reported, never judged (no trigger).
+fn part_line(name: &str, s: &Summary) -> String {
+    format!(
+        "{name}: p50 {:.3} ms p99 {:.3} ms p99.9 {:.3} ms max {:.3} ms E {:.1} µs over {}",
+        s.p50 as f64 / 1e6,
+        s.p99 as f64 / 1e6,
+        s.p999 as f64 / 1e6,
+        s.max as f64 / 1e6,
+        s.excess as f64 / 1e3,
+        s.over,
+    )
+}
+
+/// The split's lines for direction `d` from a row set (`run_summary`'s or a second's), as the evidence run prints them.
+fn split_lines(rows: &[(&'static str, u64)], d: usize) -> Vec<String> {
+    let class = |p: usize| value(rows, names::SPLIT_COUNT[d][usize::from(p >= WAIT)]);
+    let part = |p: usize| {
+        let g = |i: usize| value(rows, names::SPLIT[d][p][i]);
+        Summary {
+            n: class(p),
+            p50: g(0),
+            p99: g(1),
+            p999: g(2),
+            max: g(3),
+            excess: g(4),
+            over: g(5),
+        }
+    };
+    let kind = |k: usize| value(rows, names::SPLIT_KIND[d][k]);
+    let mut v = vec![format!(
+        "split: woken n {} (clock + hop + work = L), other n {} (wait + work = L; open {} mid {} app {})",
+        class(CLOCK),
+        class(WAIT),
+        kind(OPEN),
+        kind(MID),
+        kind(APP)
+    )];
+    for (p, label) in [
+        (CLOCK, "woken clock W − M"),
+        (HOP, "woken hop P − W"),
+        (WORK, "woken work (3) − P"),
+        (WAIT, "other wait T − M"),
+        (OTHER_WORK, "other work (3) − T"),
+    ] {
+        v.push(part_line(label, &part(p)));
+    }
+    v
+}
+
+/// Direction `d`'s `k` largest releases by L from the per-release log, each with its class, its kind and its parts in
+/// ms: which part made the rare maxima (printed, never judged).
+fn largest(splits: &[SplitLog], d: usize, k: usize) -> Vec<String> {
+    let mut v: Vec<&SplitLog> = splits.iter().filter(|r| r.dir == d).collect();
+    v.sort_unstable_by_key(|r| std::cmp::Reverse(r.total));
+    let ms = |ns: u64| ns as f64 / 1e6;
+    v.iter()
+        .take(k)
+        .map(|r| match r.woke {
+            Some(_) => format!(
+                "largest: L {:.3} ms = woken: clock {:.3} + hop {:.3} + work {:.3} ms",
+                ms(r.total),
+                ms(r.parts[0]),
+                ms(r.parts[1]),
+                ms(r.parts[2])
+            ),
+            None => format!(
+                "largest: L {:.3} ms = other ({}): wait {:.3} + work {:.3} ms",
+                ms(r.total),
+                ["open", "mid", "app"][r.kind],
+                ms(r.parts[0]),
+                ms(r.parts[1])
+            ),
+        })
+        .collect()
+}
+
+/// The per-release split's identity (the advisor's "condition 10 again", 2026-11-08) over one atomic snapshot: every
+/// release logged has its parts summing to its total in integer ns (woken: clock + hop + work; other: wait + work, no
+/// third part), its total equal to (3) − M, and its stamps chained (woken: M <= W <= P <= (3), from an opening step;
+/// other: M <= T <= (3)), so no part saturated; per direction the classes partition the releases the total's histogram
+/// counted, each part's histogram counted its class, and the kinds' counts are the other class's. Returns
+/// `[direction][woken, other]`, or the first release or count that breaks it.
+fn split_identity(s: &Snapshot) -> Result<[[u64; 2]; 2], String> {
+    let mut n = [[0u64; 2]; 2];
+    let mut kinds = [[0u64; KINDS]; 2];
+    for (i, r) in s.logs.splits.iter().enumerate() {
+        let sum: u64 = r.parts.iter().sum();
+        if sum != r.total {
+            return Err(format!(
+                "release {i} {r:?}: parts sum to {sum} ns, total {} ns",
+                r.total
+            ));
+        }
+        if r.due > r.at || r.total != r.at - r.due {
+            return Err(format!("release {i} {r:?}: total is not (3) − M"));
+        }
+        match r.woke {
+            Some(w) => {
+                if !(r.due <= w && w <= r.step && r.step <= r.at) || r.kind != OPEN {
+                    return Err(format!("release {i} {r:?}: woken stamps out of order"));
+                }
+                n[r.dir][0] += 1;
+            }
+            None => {
+                if !(r.due <= r.step && r.step <= r.at) || r.parts[2] != 0 {
+                    return Err(format!("release {i} {r:?}: other stamps out of order"));
+                }
+                n[r.dir][1] += 1;
+                kinds[r.dir][r.kind] += 1;
+            }
+        }
+    }
+    for d in [DOWN, UP] {
+        let sp = &s.split[d];
+        let counted = [
+            sp.parts[CLOCK].n,
+            sp.parts[HOP].n,
+            sp.parts[WORK].n,
+            sp.parts[WAIT].n,
+            sp.parts[OTHER_WORK].n,
+        ];
+        let want = [n[d][0], n[d][0], n[d][0], n[d][1], n[d][1]];
+        if counted != want {
+            return Err(format!(
+                "dir {d}: the parts counted {counted:?}, the log {want:?}"
+            ));
+        }
+        if n[d][0] + n[d][1] != s.late[d].n {
+            return Err(format!(
+                "dir {d}: woken {} + other {} != the total's {}",
+                n[d][0], n[d][1], s.late[d].n
+            ));
+        }
+        if sp.kinds != kinds[d] {
+            return Err(format!(
+                "dir {d}: kinds {:?}, the log {:?}",
+                sp.kinds, kinds[d]
+            ));
+        }
+    }
+    Ok(n)
+}
+
 /// p50, p99 and the largest of `v` in ms.
 fn quantiles(v: &mut [u64]) -> String {
     v.sort_unstable();
@@ -1055,7 +1198,7 @@ async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
     let at_now = {
         let mut c = d2.sh.lock();
         let t = c.model_t(delay_clock::clock().now_ns() + 10 * MS);
-        c.step_to(t);
+        c.step_to(t, By::App);
         c.origin + c.model.now_ns()
     };
     assert!(d2.add_burst(at_now, SEC).is_err(), "at the model's now");
@@ -1907,6 +2050,7 @@ async fn its_rows_use_the_named_series() {
         [[0; 20]; 2],
         [[0; 2]; 2],
         [Summary::default(); 2],
+        [Split::default(); 2],
         &[0; REASONS + 3],
         &mut want,
     );
@@ -1931,14 +2075,14 @@ async fn its_rows_use_the_named_series() {
         10 * SEC,
         "SHUTDOWN_WAIT_NS"
     );
-    // F7: the heap a connection allocates at wrap at the defaults, as SERIES.md states it: two lateness histograms
-    // with their sparse marks (2 x (135,040 + 1,056 + 256 x 24) B), the scanner's buffer (8,192 B), the down staging
-    // buffer (16,384 B) and the read buffer (527 B).
+    // F7: the heap a connection allocates at wrap at the defaults, as SERIES.md states it: twelve lateness histograms
+    // (per direction the total and the split's five parts) with their sparse marks (12 x (135,040 + 1,056 + 256 x 24)
+    // B), the scanner's buffer (8,192 B), the down staging buffer (16,384 B) and the read buffer (527 B).
     assert_eq!(
         value(&h, "ws_conn_fixed_bytes"),
-        2 * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
+        2 * (1 + PARTS as u64) * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
     );
-    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 309_583);
+    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 1_731_983);
     // F-M: the release clock's 1 ns slack, written by the thread and read back, at its start and now (a real-time
     // policy reads 0, as ImpairSocket's test allows; socket_tests.rs).
     let texts = ds.header_texts();
@@ -2046,9 +2190,11 @@ async fn the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default()
 /// - down, the bytes leave DelayStream into the kernel's real TCP and the client's TLS, which no in-process stamp
 ///   sees, so the receipt is a bound (never before the release), not the identity, and the rest of the path is
 ///   printed;
-/// - every stall is a first-transmission loss and their count sits in its 99.9 % two-sided binomial band at 2 %.
+/// - every stall is a first-transmission loss and their count sits in its 99.9 % two-sided binomial band at 2 %;
+/// - every release's lateness split sums to its total exactly (`split_identity`).
 ///
-/// Lateness is printed with condition 10's trigger. Returns the number of lateness samples per direction.
+/// Lateness is printed with condition 10's trigger, and below it the per-release split from the summary rows (the
+/// advisor's "condition 10 again": reported, never judged). Returns the number of lateness samples per direction.
 async fn loopback(ticks: u64) -> [u64; 2] {
     let c = cfg(Profile::p2(), 21);
     let request_at = now();
@@ -2203,7 +2349,15 @@ async fn loopback(ticks: u64) -> [u64; 2] {
                 &l
             )
         );
+        for line in split_lines(&sum, d) {
+            println!("  {name} {line}");
+        }
+        for line in largest(&s.logs.splits, d, 5) {
+            println!("  {name} {line}");
+        }
     }
+    // The per-release split's identity on this run's releases (the snapshot above: the traffic and its drain ended).
+    split_identity(&s).unwrap_or_else(|e| panic!("the split's identity: {e}"));
     n
 }
 
@@ -2213,8 +2367,72 @@ async fn loopback_tls_tungstenite_at_p2_30_hz_both_ways() {
     loopback(300).await;
 }
 
+/// One short real session for the split's identity (TLS 1.3, DelayStream, tokio-tungstenite at P2, 30 Hz both ways,
+/// `ticks` ticks of 1,024 B down and 60 B up, then 1 s of drain), with `bite` on from just after the handshakes: its
+/// atomic snapshot.
+async fn split_session(bite: SplitBite, ticks: u64) -> Snapshot {
+    let (mut server, mut client, _, _) = pair(&cfg(Profile::p2(), 23), 0).await;
+    server.get_ref().bite_split(bite);
+    let client_task = tokio::spawn(async move {
+        run_ticks(
+            &mut client,
+            ticks,
+            Duration::from_secs(1),
+            |_, _| {},
+            |k, _| Some(stamped(k, 60)),
+        )
+        .await;
+    });
+    run_ticks(
+        &mut server,
+        ticks,
+        Duration::from_secs(1),
+        |_, _| {},
+        |k, _| Some(stamped(k, 1_024)),
+    )
+    .await;
+    client_task.await.expect("the client");
+    server.get_ref().snapshot()
+}
+
+/// The per-release split's identity (the advisor's "condition 10 again", 2026-11-08), over three short real loopback
+/// sessions side by side (`split_session`, 60 ticks each, about 3 s). With no bite, every release's parts sum to its
+/// total in integer ns, its stamps chain, the classes partition the releases the total counted, and the woken class is
+/// not empty either way. The bites, on the production path (`late`) from just after the handshakes: a part dropped (the
+/// woken hop recorded as 0) and a part misattributed (the woken work measured from the clock's wake (1) instead of the
+/// pass's start (2)); each must break the sum. A woken release's hop is the clock thread's wake call plus tokio's turn,
+/// never 0 ns, so each bite bites on every woken release after the handshake.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it() {
+    let runs = [SplitBite::Off, SplitBite::DropHop, SplitBite::WorkFromWake]
+        .map(|b| (b, tokio::spawn(split_session(b, 60))));
+    for (bite, run) in runs {
+        let s = run.await.expect("the session");
+        let got = split_identity(&s);
+        if bite == SplitBite::Off {
+            let n = got.unwrap_or_else(|e| panic!("the identity: {e}"));
+            println!(
+                "split identity over {} releases: down woken {} other {}, up woken {} other {}",
+                s.logs.splits.len(),
+                n[DOWN][0],
+                n[DOWN][1],
+                n[UP][0],
+                n[UP][1]
+            );
+            for d in [DOWN, UP] {
+                assert!(n[d][0] > 0, "dir {d}: no woken release");
+            }
+        } else {
+            let e = got.expect_err(&format!("the bite {bite:?} must break the identity"));
+            assert!(e.contains("parts sum"), "{bite:?}: {e}");
+            println!("bite {bite:?} caught: {e}");
+        }
+    }
+}
+
 /// Condition 10's evidence run (the main session's, quiet, nothing else alongside): the same run with at least 10,000
-/// lateness samples per direction. `NPT_WS_LATENESS_TICKS` sets the ticks (default 10,050, about 5.6 min). The load
+/// lateness samples per direction, each direction's per-release split printed under its lateness, and the split's
+/// identity checked on every release. `NPT_WS_LATENESS_TICKS` sets the ticks (default 10,050, about 5.6 min). The load
 /// average is printed at the start and the end.
 ///   cargo +1.99.1 test --release --locked -p npt-net --lib l2::delay::tests::lateness_evidence_run -- --ignored
 ///   --nocapture --exact
