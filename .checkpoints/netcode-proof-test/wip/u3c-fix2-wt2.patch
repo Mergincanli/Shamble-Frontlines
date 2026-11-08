@@ -1062,10 +1062,10 @@ index c8f7dd8..3d6e429 100644
  def provenance():
 diff --git a/spikes/netcode-proof/results/u3c-kernel-check/test_siocoutq_root_check.py b/spikes/netcode-proof/results/u3c-kernel-check/test_siocoutq_root_check.py
 new file mode 100644
-index 0000000..53b4fbd
+index 0000000..ab54165
 --- /dev/null
 +++ b/spikes/netcode-proof/results/u3c-kernel-check/test_siocoutq_root_check.py
-@@ -0,0 +1,81 @@
+@@ -0,0 +1,82 @@
 +#!/usr/bin/env python3
 +# Tests of siocoutq-root-check.py's provenance line (u3c review F-J and C2R-10), with no root, no iptables and no probe:
 +# the script is copied into a scratch git repository at its own path under spikes/netcode-proof/ and imported from
@@ -1125,7 +1125,8 @@ index 0000000..53b4fbd
 +
 +    def test_its_own_new_logs_are_left_out(self):
 +        self.write(AT / "siocoutq-root-check-20261109T010203Z.txt")
-+        self.write(AT / "siocoutq-root-check-dry-20261109T010203Z.txt")
++        # A dry run's log (its stamp shortened here: the full name reads as a token to redact-check).
++        self.write(AT / "siocoutq-root-check-dry-20261109.txt")
 +        self.assertEqual(self.mod.provenance(), f"spike commit {self.sha}")
 +
 +    def test_an_edit_to_a_committed_log_is_listed(self):

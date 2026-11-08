@@ -1,0 +1,40 @@
+FIXED run 1: PROBE2 slow 30 ms gap 20 ms: releases (model us) [110383, 131681]; S write returns (model us) [140683, 170929]; B written 39248 us after its release
+FIXED run 1: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106427, 108619]; S write returns (model us) [108620, 110822]; B written 2203 us after its release
+FIXED run 1: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106316, 106356]; S write returns (model us) [106504, 106512]; B written 156 us after its release
+FIXED run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.40s
+FIXED run 2: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108723, 129992]; S write returns (model us) [139011, 169262]; B written 39270 us after its release
+FIXED run 2: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106432, 108665]; S write returns (model us) [108722, 111127]; B written 2462 us after its release
+FIXED run 2: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106309, 106367]; S write returns (model us) [106529, 106536]; B written 169 us after its release
+FIXED run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.39s
+FIXED run 3: PROBE2 slow 30 ms gap 20 ms: releases (model us) [113788, 135108]; S write returns (model us) [144033, 174264]; B written 39156 us after its release
+FIXED run 3: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106325, 108604]; S write returns (model us) [108559, 110804]; B written 2200 us after its release
+FIXED run 3: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106509, 106576]; S write returns (model us) [106711, 106718]; B written 142 us after its release
+FIXED run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.40s
+FIXED run 4: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108645, 128965]; S write returns (model us) [139139, 169417]; B written 40452 us after its release
+FIXED run 4: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106388, 108710]; S write returns (model us) [108700, 110934]; B written 2224 us after its release
+FIXED run 4: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106340, 106400]; S write returns (model us) [106556, 106563]; B written 163 us after its release
+FIXED run 4: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.39s
+FIXED run 5: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108659, 128974]; S write returns (model us) [138987, 169228]; B written 40254 us after its release
+FIXED run 5: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106334, 108543]; S write returns (model us) [108720, 110981]; B written 2438 us after its release
+FIXED run 5: PROBE2 slow 0 ms gap 0 ms: releases (model us) [105944, 105993]; S write returns (model us) [106148, 106154]; B written 161 us after its release
+FIXED run 5: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.39s
+R1-REVERTED run 1: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108695, 128993]; S write returns (model us) [138976, 259261]; B written 130268 us after its release
+R1-REVERTED run 1: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106308, 108491]; S write returns (model us) [108627, 210862]; B written 102371 us after its release
+R1-REVERTED run 1: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106338, 106420]; S write returns (model us) [106554, 106560]; B written 140 us after its release
+R1-REVERTED run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.58s
+R1-REVERTED run 2: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108653, 129975]; S write returns (model us) [139135, 260243]; B written 130268 us after its release
+R1-REVERTED run 2: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106339, 108579]; S write returns (model us) [108631, 211253]; B written 102674 us after its release
+R1-REVERTED run 2: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106416, 106481]; S write returns (model us) [106660, 106666]; B written 185 us after its release
+R1-REVERTED run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.59s
+R1-REVERTED run 3: PROBE2 slow 30 ms gap 20 ms: releases (model us) [107967, 129344]; S write returns (model us) [138285, 259656]; B written 130312 us after its release
+R1-REVERTED run 3: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106393, 107631]; S write returns (model us) [108686, 209951]; B written 102320 us after its release
+R1-REVERTED run 3: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106351, 106407]; S write returns (model us) [106613, 106622]; B written 215 us after its release
+R1-REVERTED run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.58s
+R1-REVERTED run 4: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108613, 128898]; S write returns (model us) [138995, 259280]; B written 130382 us after its release
+R1-REVERTED run 4: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106342, 108583]; S write returns (model us) [108622, 210937]; B written 102354 us after its release
+R1-REVERTED run 4: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106487, 106621]; S write returns (model us) [106782, 106790]; B written 169 us after its release
+R1-REVERTED run 4: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.58s
+R1-REVERTED run 5: PROBE2 slow 30 ms gap 20 ms: releases (model us) [108697, 129957]; S write returns (model us) [139091, 260252]; B written 130295 us after its release
+R1-REVERTED run 5: PROBE2 slow 2 ms gap 1 ms: releases (model us) [106934, 109141]; S write returns (model us) [109168, 211353]; B written 102212 us after its release
+R1-REVERTED run 5: PROBE2 slow 0 ms gap 0 ms: releases (model us) [106342, 106406]; S write returns (model us) [106549, 106558]; B written 152 us after its release
+R1-REVERTED run 5: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.59s

@@ -499,7 +499,25 @@
   always "DNS only" (grey cloud).
 
 ## Running work
-- **RESUME HERE (Mustafa at 95 % usage, about 16:30 UTC 2026-11-08): U3c's LAST FIX ROUND is running**, workflow
+- **RESUME HERE (about 17:15 UTC 2026-11-08; the spend limit resets 20:00 UTC): the last fix round ENDED PARTWAY.**
+  - **C2b DONE**, worktree .claude/worktrees/wf_ac5e4575-9da-2, snapshot wip/u3c-fix2-wt2.patch, notes
+    u3c-fix2-c2b.md.
+    - The forbid backstop LANDED: the workspace unsafe_code is "forbid"; tcpinfo has its own lint table with "deny" and
+      client-wasm its own with "allow"; check.mjs's exceptionLintProblems compares the tables.
+    - Also: C2R-3 closed (lintTables), C2R-5 depsStep self-test, C2R-6 honest comments, the C2R-8, C2R-4 and C2R-7
+      refusals, C2R-9 visible skips, C2R-10 with Python tests, REG-3's cost doc.
+    - check.mjs 9/9 twice (252 measured, 266 bites, self 35); 22 of 22 mutation bites caught.
+    - **The safety classifier was UNAVAILABLE during C2b's run: read its whole diff before merging** (Claude Code's
+      note).
+    - Its critic failed on the spend limit. Not fixed, as known limits: C2R-4 G/H ([env] CLIPPY_ARGS, build-script
+      rustc-env), a rust-toolchain.toml path override, and tcpinfo's deny level.
+  - **C1b FAILED on the spend limit**, worktree .claude/worktrees/wf_ac5e4575-9da-1, snapshot wip/u3c-fix2-wt1.patch,
+    notes u3c-fix2-c1b.md: partial. After 20:00 UTC resume with resumeFromRunId "wf_ac5e4575-9da" and args {sha:
+    "b2e879b"}; C2b replays from cache. Or launch a fresh C1b agent that applies wip/u3c-fix2-wt1.patch at b2e879b and
+    continues from its notes.
+  - **Then:** merge C2b after reading its diff, then C1b; critics on both diffs; check.mjs 9/9; the condition-10
+    diagnostic; U3c's report; the cleanup ask; U3d.
+- **Earlier (Mustafa at 95 % usage, about 16:30 UTC): U3c's LAST FIX ROUND launched**, workflow
   `wf_ac5e4575-9da` (npt-u3c-fix2), launched 16:26 on b2e879b.
   - **C1b** (npt-net): R1, G-PRE-WAKE, G-PRE-PANIC, G-F10, G-NC4, G-FH, G-NC8, G-NC2, and the split's memory moved to
     shared run-level histograms.

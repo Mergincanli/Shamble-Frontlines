@@ -62,3 +62,22 @@ no #[ignore]d evidence tests; commit nothing; no new public symbol; npt-net unto
   restored): 20 check.mjs mutations and 2 Python mutations, all caught (output scratchpad/c2b/bites-out.txt);
   control passes. Rust: report_skip reverted to eprintln -> tests::a_kernel_without_mptcp_reports_the_mptcp_case_skipped
   FAILED; restored.
+- Decision: the forbid backstop LANDS if the final 9/9 x2 holds (it did on the trial: clippy both builds, wasm32 both
+  builds, test 251 + 265, no dependency macro tripped E0453). C2R-3 was closed by the mask-based lint-table reader
+  the equality check needed anyway (decoy in a string is none; a quoted key in a lint table is refused): this goes a
+  step past the advisor's (d) "known limit" and is flagged for the main session.
+- Not done here (named as known limits in check.mjs above DEPS_CHECKED): C2R-4 G ([env] CLIPPY_ARGS) and H (a build
+  script's rustc-env); rust-toolchain.toml `path`; lexRust's misreads and the path rule's undecoded literal inside
+  npt-tcpinfo (deny, not forbid). Carried to the main session: u3c-plan.md 1.8 (a) text (own tables instead of
+  `workspace = true`), C2R-9 (2) BPF-hook line and (4) "four blocks" in plan §4.2/§4.7/§4.8.
+- Item 10 (final): first double run FAILED twice, neither from this change: (1) npt-net's
+  a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning panicked at delay_tests.rs:2002 (b2e879b's own
+  code: the backtrace's line 1948 is this tree's, C1b's copy has it at 2409), once, under C1b's parallel load; passed in
+  every other run. (2) npt-tcpinfo's new skip test failed because the shared CARGO_TARGET_DIR held the scratch copy's
+  MUTATED test binary (npt_tcpinfo-3c0dc7cfef26fbf4 contains the bite's string): cargo's stable hash ignores the
+  workspace's location and dep-info paths are relative, so another copy's newer artifact reads as fresh. Fixed by
+  touching this tree's tcpinfo/link/room/client-wasm sources (mtime only; content unchanged) and a redact finding in
+  the new Python test (a 40-char mixed-case dry-log name; stamp shortened). Then: check.mjs 9/9 twice (16:49 and 16:50
+  UTC; test measured 252 / bites 266, 0 failed, 0 skips); explicit cargo +1.99.1 clippy -D warnings with and without
+  --all-features exit 0; cargo fmt --all --check exit 0. Backstop LANDED.
+DONE

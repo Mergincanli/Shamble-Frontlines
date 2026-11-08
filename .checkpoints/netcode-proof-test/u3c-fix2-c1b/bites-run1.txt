@@ -1,0 +1,68 @@
+== R1: BITES
+test l2::delay::tests::a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake ... FAILED
+thread 'l2::delay::tests::a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake' (17406) panicked at crates/net/src/l2/delay_tests.rs:1995:9:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.34s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-PRE-WAKE: BITES
+test l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump ... FAILED
+thread 'l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump' (17695) panicked at crates/net/src/l2/delay_tests.rs:2095:9:
+assertion `left == right` failed: the step that reopened the up room woke the pump once
+  left: 0
+ right: 1
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.49s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-PRE-PANIC: BITES
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... FAILED
+thread 'tokio-rt-worker' (18241) panicked at crates/net/src/l2/delay_tests.rs:2280:9:
+thread 'l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof' (18239) panicked at crates/net/src/l2/delay_tests.rs:2317:18:
+a panicked pump read as a clean EOF
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.12s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-F10: BITES
+test l2::delay::tests::tiny_frames_that_fill_the_up_room_drain_whole_and_in_order ... FAILED
+thread 'tokio-rt-worker' (18523) panicked at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/index.rs:1020:55:
+thread 'l2::delay::tests::tiny_frames_that_fill_the_up_room_drain_whole_and_in_order' (18521) panicked at crates/net/src/l2/delay_tests.rs:2192:14:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.13s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-NC4: BITES
+test l2::delay::tests::one_record_per_write_never_beyond_the_budget ... FAILED
+thread 'l2::delay::tests::one_record_per_write_never_beyond_the_budget' (18803) panicked at crates/net/src/l2/delay_tests.rs:729:5:
+assertion `left == right` failed
+  left: (5120795, 0, 65536)
+ right: (5120795, 10044, 65536)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.09s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-FH: BITES
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... FAILED
+thread 'l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded' (19085) panicked at crates/net/src/l2/delay_tests.rs:791:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.59s
+error: test failed, to rerun pass `-p npt-net --lib`
+== G-NC2: BITES
+test l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix ... FAILED
+thread 'l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix' (19378) panicked at crates/net/src/l2/delay_tests.rs:2249:5:
+assertion `left == right` failed: held <= 64 KB + the front record's acknowledged prefix
+  left: [366, 0]
+ right: [0, 0]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 15.78s
+error: test failed, to rerun pass `-p npt-net --lib`
+== SPLIT-CHECK: BITES
+test l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it ... FAILED
+thread 'l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it' (19702) panicked at crates/net/src/l2/delay_tests.rs:2900:9:
+assertion `left == right` failed: DropHop: the violations late() counted are the log's broken releases
+  left: [0, 0]
+ right: [57, 60]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 3.16s
+error: test failed, to rerun pass `-p npt-net --lib`
+== SPLIT-POOL: BITES
+test l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it ... FAILED
+thread 'l2::delay::tests::the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it' (19989) panicked at crates/net/src/l2/delay_tests.rs:2932:57:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 3.17s
+error: test failed, to rerun pass `-p npt-net --lib`
+== POOLED-ATOMIC: BITES
+test l2::stats::tests::a_pooled_histogram_fed_from_threads_equals_one_fed_the_same_samples ... FAILED
+thread 'l2::stats::tests::a_pooled_histogram_fed_from_threads_equals_one_fed_the_same_samples' (20273) panicked at crates/net/src/l2/stats.rs:678:9:
+assertion `left == right` failed
+  left: Summary { n: 20000, p50: 309540, p99: 58773457, p999: 58773457, max: 60005210, excess: 8368642, over: 9658 }
+ right: Summary { n: 20000, p50: 309540, p99: 58773457, p999: 58773457, max: 60005210, excess: 8371258, over: 9658 }
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.09s
+error: test failed, to rerun pass `-p npt-net --lib`

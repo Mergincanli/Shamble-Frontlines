@@ -1,8 +1,60 @@
 diff --git a/spikes/netcode-proof/crates/net/src/l2/delay.rs b/spikes/netcode-proof/crates/net/src/l2/delay.rs
-index 8cd5183..b2eeb30 100644
+index 8cd5183..5448370 100644
 --- a/spikes/netcode-proof/crates/net/src/l2/delay.rs
 +++ b/spikes/netcode-proof/crates/net/src/l2/delay.rs
-@@ -78,7 +78,7 @@
+@@ -37,7 +37,10 @@
+ //! delivered byte. The connection's lock is never held across S's own calls (F3): the pump stages the front down record
+ //! under it (once per record, F4), releases it for S's write, flush, read or shutdown, then takes it again to commit
+ //! what S took or read; S's reads land in the pump's own buffer and enter the model at a fresh now. Wakes always fire
+-//! after the lock is released (F2).
++//! after the lock is released (F2). A down record released after a pass's down writes (by its up loop's steps, R1) is
++//! left for the next pass, which the pump wakes itself for at once unless S owes it a wake; an application task whose
++//! step releases a down record, or reopens the up room the pump stopped reading on (an acknowledgement at the client's
++//! end: G-PRE-WAKE), wakes the pump too. A pump that panics ends the connection with an error, never a clean EOF.
+ //!
+ //! **Held bytes (NC-U3c-2).** Down at most the 64 KB budget (it covers released-but-untaken bytes) plus the
+ //! acknowledged prefix of the front record not yet released: a loss inside a record lets the acknowledgement of its
+@@ -46,14 +49,15 @@
+ //! record: 549 B, or the request's 8,214 B), plus the scanner's buffer (one frame, 527 B, or the request cap). Counted,
+ //! current and largest, per direction.
+ //!
+-//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: six lateness histograms per direction (the
+-//! total and the split's five parts, below), each with its per-second window kept as a difference against a sparse
+-//! mark of the buckets the second touched (`stats::Running`: 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B
+-//! reserve for the mark), the scanner's buffer (8,192 B at the defaults), the down record's staging buffer (16,384 B)
+-//! and the pump's read buffer (527 B): 1,731,983 B at the defaults (`ws_conn_fixed_bytes`; 309,583 B before the split's
+-//! ten histograms). On top: the held bytes above (below 81,942 B each way), and a dense mark of 135,040 B per histogram
+-//! once a second's samples touch more than 256 of its buckets. U6 sizes WsServer's accept cap from these and
+-//! tungstenite's own buffers (48 players: about 83 MB here).
++//! **Memory per connection (F7).** Fixed at wrap, before any WebSocket byte: one lateness histogram per direction, with
++//! its per-second window kept as a difference against a sparse mark of the buckets the second touched
++//! (`stats::Running`: 135,040 B of histogram, a 1,056 B bitmap and a 6,144 B reserve for the mark), the scanner's buffer
++//! (8,192 B at the defaults), the down record's staging buffer (16,384 B) and the pump's read buffer (527 B): 309,583 B
++//! at the defaults (`ws_conn_fixed_bytes`). On top: the held bytes above (below 81,942 B each way), and a dense mark of
++//! 135,040 B per histogram once a second's samples touch more than 256 of its buckets. Once per process, at the first
++//! wrap: the split's pool below, ten histograms of 135,040 B, 1,350,400 B (`ws_split_fixed_bytes`) whatever the number
++//! of connections. U6 sizes WsServer's accept cap from these and tungstenite's own buffers (48 players: about 14.9 MB
++//! here, plus the pool's 1.35 MB).
+ //!
+ //! **Lateness (M1, C10).** Down at the return of S's `poll_write` that takes a record's last byte; up at the return of
+ //! `poll_read` that hands its last byte to tungstenite; each against the record's model delivery stamp, in the same
+@@ -70,15 +74,19 @@
+ //! lock), work = (3) − P (down: the pump's work and S's write; up: the rest of the pass and the reader's turn). Every
+ //! other release is in the **other** class, with no clock part: wait = T − M, work = (3) − T, counted by its step: an
+ //! opening step no fire covered (the pass was woken by S's I/O, an application task or a shutdown, or by a fire before
+-//! the record came due), the pump's step inside its pass (its up loop; a down record released there is written at the
+-//! pump's next pass), or an application task's step (`current`, `add_burst`). Each part is the difference of two
+-//! stamps, never a remainder, so the parts sum to L exactly only while the stamps chain: the identity test checks it per
+-//! release. One `stats::Running` per part per direction, with the total's statistics.
++//! the record came due), the pump's step inside its pass (its up loop; a down record released there is written by the
++//! pump's next pass, which it wakes for at once: R1), or an application task's step (`current`, `add_burst`). Each part
++//! is the difference of two stamps, never a remainder, so the parts sum to L exactly only while the stamps chain: each
++//! release is checked as it is recorded, a mismatch counted (`ws_late_<dir>_split_violations_count`), and the identity
++//! test checks it per release. The parts are the run's, pooled (the advisor's ruling (b) on the split's memory,
++//! 2026-11-08): one `stats::Pooled` per part per direction shared by every connection in the process, with the total's
++//! statistics, updated by relaxed atomics (no lock, no allocation on the release path) and read once over the run
++//! (`DelayStream::split_rows`, the `ws_split` event); the connection keeps only its total.
+ 
  use super::config::{L2Config, one_way_ns};
  use super::delay_clock::{self, Clock};
  use super::delay_names::{self as names, KINDS, PARTS, Split};
@@ -11,7 +63,7 @@ index 8cd5183..b2eeb30 100644
  use super::thread;
  use super::ws_frame::{Boundary, MAX_HEADER, REASONS, Reason, Scanner};
  use crate::tcp_model::{MAX_BURSTS, MODEL, NOT_MODELLED, TcpConfig, TcpModel};
-@@ -90,7 +90,9 @@ use std::io;
+@@ -90,7 +98,9 @@ use std::io;
  use std::marker::PhantomData;
  use std::ops::{Deref, DerefMut};
  use std::pin::Pin;
@@ -22,7 +74,7 @@ index 8cd5183..b2eeb30 100644
  use std::task::{Context, Poll, Waker};
  use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
  
-@@ -163,6 +165,45 @@ struct Freed {
+@@ -163,6 +173,45 @@ struct Freed {
      kind: usize,
  }
  
@@ -68,7 +120,7 @@ index 8cd5183..b2eeb30 100644
  /// The split's bites (M2's pattern): the identity test turns one on and the identity must fail.
  #[cfg(test)]
  #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-@@ -306,13 +347,17 @@ pub(crate) struct Snapshot {
+@@ -306,13 +355,17 @@ pub(crate) struct Snapshot {
      pub(crate) sent_log: Vec<(usize, u64, u32, u64, bool)>,
      /// Down plaintext S has taken.
      pub(crate) taken_down: u64,
@@ -89,7 +141,7 @@ index 8cd5183..b2eeb30 100644
  #[cfg(test)]
  #[derive(Debug, Clone, Copy, Default)]
  pub(crate) struct Life {
-@@ -320,6 +365,9 @@ pub(crate) struct Life {
+@@ -320,6 +373,9 @@ pub(crate) struct Life {
      pub(crate) polls_after_deadline: u64,
      pub(crate) deadline: Option<u64>,
      pub(crate) ended_ns: Option<u64>,
@@ -99,7 +151,7 @@ index 8cd5183..b2eeb30 100644
  }
  
  /// One logged step (model axis).
-@@ -381,15 +429,14 @@ struct Conn {
+@@ -381,15 +437,14 @@ struct Conn {
      down_done: bool,
      failed: Option<io::ErrorKind>,
      closed: Option<Reason>,
@@ -120,7 +172,7 @@ index 8cd5183..b2eeb30 100644
      held: [u64; 2],
      held_max: [u64; 2],
      held_max_run: [u64; 2],
-@@ -423,6 +470,29 @@ impl Conn {
+@@ -423,6 +478,29 @@ impl Conn {
              .saturating_sub(self.released_model[UP])
      }
  
@@ -150,7 +202,7 @@ index 8cd5183..b2eeb30 100644
      fn held_now(&mut self) {
          self.held = [
              self.bytes[DOWN].len() as u64,
-@@ -432,11 +502,37 @@ impl Conn {
+@@ -432,11 +510,37 @@ impl Conn {
              self.held_max[d] = self.held_max[d].max(self.held[d]);
              self.held_max_run[d] = self.held_max_run[d].max(self.held[d]);
          }
@@ -191,7 +243,7 @@ index 8cd5183..b2eeb30 100644
      fn late(&mut self, dir: usize, rec: &Rec, at: u64) -> u64 {
          let due = self.origin.saturating_add(rec.released.unwrap_or_default());
          let total = at.saturating_sub(due);
-@@ -452,14 +548,23 @@ impl Conn {
+@@ -452,14 +556,23 @@ impl Conn {
          };
          #[cfg(test)]
          let parts = self.split_bite.apply(parts, at, f.woke);
@@ -221,7 +273,7 @@ index 8cd5183..b2eeb30 100644
          }
          #[cfg(test)]
          self.logs.splits.push(SplitLog {
-@@ -475,25 +580,6 @@ impl Conn {
+@@ -475,25 +588,6 @@ impl Conn {
          total
      }
  
@@ -247,7 +299,7 @@ index 8cd5183..b2eeb30 100644
      /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
      /// model takes all of it.
      fn model_write(&mut self, dir: usize, len: usize, t: u64, message_end: bool) {
-@@ -716,6 +802,10 @@ impl Conn {
+@@ -716,6 +810,10 @@ impl Conn {
              for b in &mut self.bounds {
                  b.0 -= start;
              }
@@ -258,7 +310,7 @@ index 8cd5183..b2eeb30 100644
          }
      }
  
-@@ -930,11 +1020,10 @@ where
+@@ -930,11 +1028,10 @@ where
              failed: None,
              closed: None,
              late: [Running::new(), Running::new()],
@@ -272,7 +324,7 @@ index 8cd5183..b2eeb30 100644
              held: [0; 2],
              held_max: [0; 2],
              held_max_run: [0; 2],
-@@ -949,13 +1038,10 @@ where
+@@ -949,13 +1046,10 @@ where
          };
          let scratch = vec![0u8; RECORD_MAX].into_boxed_slice();
          let rbuf = vec![0u8; max_frame].into_boxed_slice();
@@ -289,7 +341,7 @@ index 8cd5183..b2eeb30 100644
          let sh = Arc::new(Shared {
              key,
              clock,
-@@ -988,6 +1074,17 @@ impl DelayStream<()> {
+@@ -988,6 +1082,17 @@ impl DelayStream<()> {
      pub fn now_ns() -> u64 {
          delay_clock::clock().now_ns()
      }
@@ -307,7 +359,7 @@ index 8cd5183..b2eeb30 100644
  }
  
  impl<S> DelayStream<S> {
-@@ -1004,7 +1101,7 @@ impl<S> DelayStream<S> {
+@@ -1004,7 +1109,7 @@ impl<S> DelayStream<S> {
          let sh = &self.sh;
          let mut c = sh.lock();
          let t = c.model_t(sh.clock.now_ns());
@@ -316,7 +368,7 @@ index 8cd5183..b2eeb30 100644
          let now = c.model.now_ns();
          let start = start_ns
              .checked_sub(c.origin)
-@@ -1024,7 +1121,7 @@ impl<S> DelayStream<S> {
+@@ -1024,7 +1129,7 @@ impl<S> DelayStream<S> {
          }
          c.reschedule(sh.clock, sh.key);
          let w = c.wakers(got[UP], false);
@@ -325,7 +377,7 @@ index 8cd5183..b2eeb30 100644
              c.pump_waker.clone()
          } else {
              None
-@@ -1046,19 +1143,20 @@ impl<S> DelayStream<S> {
+@@ -1046,19 +1151,20 @@ impl<S> DelayStream<S> {
      }
  
      /// Steps the model to now under the lock, owing wakes to what the step released or freed: the pump for released
@@ -351,7 +403,16 @@ index 8cd5183..b2eeb30 100644
                  c.pump_waker.clone()
              } else {
                  None
-@@ -1148,7 +1246,7 @@ impl<S> DelayStream<S> {
+@@ -1138,7 +1244,7 @@ impl<S> DelayStream<S> {
+     /// separate calls).
+     #[cfg(test)]
+     pub(crate) fn snapshot(&self) -> Snapshot {
+-        let mut c = self.current();
++        let c = self.current();
+         Snapshot {
+             origin: c.origin,
+             now: c.model.now_ns(),
+@@ -1148,7 +1254,7 @@ impl<S> DelayStream<S> {
              sent_log: c.model.sent_log().to_vec(),
              taken_down: c.written[DOWN] - c.bytes[DOWN].len() as u64,
              late: [c.late[DOWN].whole(), c.late[UP].whole()],
@@ -360,7 +421,7 @@ index 8cd5183..b2eeb30 100644
          }
      }
  
-@@ -1207,7 +1305,7 @@ impl<S> DelayStream<S> {
+@@ -1207,7 +1313,7 @@ impl<S> DelayStream<S> {
  
      /// The header's numbers (`header.params.<name>`; SERIES.md): the wrapper on, the injected delay, the model's TCP
      /// settings, the release clock's slack (read now by the clock thread itself, and as set at its start), the limits,
@@ -369,7 +430,7 @@ index 8cd5183..b2eeb30 100644
      ///
      /// It blocks (F6): the clock thread answers the slack reading, and the caller waits for it (one wake and one /proc
      /// read, at most 1 s if that thread is stuck). From async code call it through `tokio::task::spawn_blocking` (U6's
-@@ -1252,6 +1350,7 @@ impl<S> DelayStream<S> {
+@@ -1252,6 +1358,7 @@ impl<S> DelayStream<S> {
              MAX_BURSTS as u64,
              MAX_RETURNS as u64,
              fixed,
@@ -377,7 +438,7 @@ index 8cd5183..b2eeb30 100644
          ];
          names::HEADER_NUMBERS.iter().copied().zip(vals).collect()
      }
-@@ -1284,7 +1383,8 @@ impl<S> DelayStream<S> {
+@@ -1284,7 +1391,8 @@ impl<S> DelayStream<S> {
  
      /// The per-second window since the last call (`second.v.<name>`), which it closes: per direction the model's
      /// counts (its maxima as they stand), the held bytes now and the window's largest, the lateness; then the
@@ -387,7 +448,7 @@ index 8cd5183..b2eeb30 100644
      pub fn take_second(&self) -> Vec<(&'static str, u64)> {
          let mut c = self.current();
          let cur = [
-@@ -1307,20 +1407,17 @@ impl<S> DelayStream<S> {
+@@ -1307,20 +1415,17 @@ impl<S> DelayStream<S> {
              [c.held[UP], c.held_max[UP]],
          ];
          let late: [Summary; 2] = [c.late[DOWN].window(), c.late[UP].window()];
@@ -411,7 +472,7 @@ index 8cd5183..b2eeb30 100644
              h.close_window();
          }
          c.held_max = c.held;
-@@ -1342,9 +1439,8 @@ impl<S> DelayStream<S> {
+@@ -1342,9 +1447,8 @@ impl<S> DelayStream<S> {
              [c.held[UP], c.held_max_run[UP]],
          ];
          let late = [c.late[DOWN].whole(), c.late[UP].whole()];
@@ -423,7 +484,7 @@ index 8cd5183..b2eeb30 100644
          out.push((names::CONNS_BEFORE, u64::from(c.conn)));
          out.push((names::ACCEPTED, c.accepted_ns));
          out.push((names::WRITTEN[DOWN], c.written[DOWN]));
-@@ -1538,11 +1634,17 @@ struct Pump<S> {
+@@ -1538,11 +1642,17 @@ struct Pump<S> {
  }
  
  impl<S> Drop for Pump<S> {
@@ -442,7 +503,7 @@ index 8cd5183..b2eeb30 100644
              #[cfg(test)]
              {
                  c.life.ended_ns = Some(self.sh.clock.now_ns());
-@@ -1593,7 +1695,9 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
+@@ -1593,7 +1703,9 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
              wake_reader = c.step_to(t, By::Open(fire))[UP];
          }
  
@@ -453,7 +514,7 @@ index 8cd5183..b2eeb30 100644
          loop {
              if this.staged == 0 {
                  let c = sh.lock();
-@@ -1652,7 +1756,10 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
+@@ -1652,7 +1764,10 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
                      sh.lock().failed = Some(e.kind());
                      return Poll::Ready(());
                  }
@@ -465,7 +526,7 @@ index 8cd5183..b2eeb30 100644
              }
          }
          if this.unflushed {
-@@ -1669,7 +1776,8 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
+@@ -1669,7 +1784,8 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
          // Up: S read outside the lock into the pump's buffer while the up room holds one largest record (C2); under the
          // lock the bytes join the scanner's buffer, the model steps to a fresh now (it never goes back: another task
          // may have stepped it while the lock was free; and a record enters the model no earlier than its bytes were
@@ -475,7 +536,7 @@ index 8cd5183..b2eeb30 100644
          let mut fresh = 0;
          loop {
              let room = {
-@@ -1738,16 +1846,25 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
+@@ -1738,16 +1854,25 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
              }
          }
  
@@ -680,10 +741,37 @@ index e041c86..6ffdadb 100644
              assert!(
                  series.contains(&format!("| `header.params.{n}` |")),
 diff --git a/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs b/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs
-index 5671667..5d339d4 100644
+index 5671667..06b882d 100644
 --- a/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs
 +++ b/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs
-@@ -291,15 +291,41 @@ fn largest(splits: &[SplitLog], d: usize, k: usize) -> Vec<String> {
+@@ -228,7 +228,8 @@ fn part_line(name: &str, s: &Summary) -> String {
+     )
+ }
+ 
+-/// The split's lines for direction `d` from a row set (`run_summary`'s or a second's), as the evidence run prints them.
++/// The split's lines for direction `d` from the run's split rows (`DelayStream::split_rows`: pooled over the process's
++/// connections), as the evidence run prints them.
+ fn split_lines(rows: &[(&'static str, u64)], d: usize) -> Vec<String> {
+     let class = |p: usize| value(rows, names::SPLIT_COUNT[d][usize::from(p >= WAIT)]);
+     let part = |p: usize| {
+@@ -245,12 +246,14 @@ fn split_lines(rows: &[(&'static str, u64)], d: usize) -> Vec<String> {
+     };
+     let kind = |k: usize| value(rows, names::SPLIT_KIND[d][k]);
+     let mut v = vec![format!(
+-        "split: woken n {} (clock + hop + work = L), other n {} (wait + work = L; open {} mid {} app {})",
++        "split (pooled): woken n {} (clock + hop + work = L), other n {} (wait + work = L; open {} mid {} app {}); \
++         violations {}",
+         class(CLOCK),
+         class(WAIT),
+         kind(OPEN),
+         kind(MID),
+-        kind(APP)
++        kind(APP),
++        value(rows, names::SPLIT_VIOLATIONS[d])
+     )];
+     for (p, label) in [
+         (CLOCK, "woken clock W − M"),
+@@ -291,15 +294,41 @@ fn largest(splits: &[SplitLog], d: usize, k: usize) -> Vec<String> {
          .collect()
  }
  
@@ -729,7 +817,72 @@ index 5671667..5d339d4 100644
      for (i, r) in s.logs.splits.iter().enumerate() {
          let sum: u64 = r.parts.iter().sum();
          if sum != r.total {
-@@ -646,8 +672,9 @@ async fn order_and_integrity_both_ways_and_no_byte_seen_before_its_release() {
+@@ -323,39 +352,45 @@ fn split_identity(s: &Snapshot) -> Result<[[u64; 2]; 2], String> {
+                     return Err(format!("release {i} {r:?}: other stamps out of order"));
+                 }
+                 n[r.dir][1] += 1;
+-                kinds[r.dir][r.kind] += 1;
+             }
+         }
+     }
+     for d in [DOWN, UP] {
+-        let sp = &s.split[d];
+-        let counted = [
+-            sp.parts[CLOCK].n,
+-            sp.parts[HOP].n,
+-            sp.parts[WORK].n,
+-            sp.parts[WAIT].n,
+-            sp.parts[OTHER_WORK].n,
+-        ];
+-        let want = [n[d][0], n[d][0], n[d][0], n[d][1], n[d][1]];
+-        if counted != want {
+-            return Err(format!(
+-                "dir {d}: the parts counted {counted:?}, the log {want:?}"
+-            ));
+-        }
+         if n[d][0] + n[d][1] != s.late[d].n {
+             return Err(format!(
+                 "dir {d}: woken {} + other {} != the total's {}",
+                 n[d][0], n[d][1], s.late[d].n
+             ));
+         }
+-        if sp.kinds != kinds[d] {
++    }
++    if s.split_violations != [0, 0] {
++        return Err(format!("violations counted: {:?}", s.split_violations));
++    }
++    Ok(n)
++}
++
++/// The process's pool grew, from `before` to `after`, by at least the releases in `t` (other connections in the process
++/// only add): each part's count by its class's, the kinds by theirs, the violations by the broken releases.
++fn pool_grew(before: &[Split; 2], after: &[Split; 2], t: &Tally) -> Result<(), String> {
++    for d in [DOWN, UP] {
++        let grew = |p: usize| after[d].parts[p].n - before[d].parts[p].n;
++        let want = [t.n[d][0], t.n[d][0], t.n[d][0], t.n[d][1], t.n[d][1]];
++        let got = [grew(CLOCK), grew(HOP), grew(WORK), grew(WAIT), grew(OTHER_WORK)];
++        if got.iter().zip(want).any(|(&g, w)| g < w) {
+             return Err(format!(
+-                "dir {d}: kinds {:?}, the log {:?}",
+-                sp.kinds, kinds[d]
++                "dir {d}: the pool's parts grew by {got:?}, the log holds {want:?}"
+             ));
+         }
++        for k in 0..KINDS {
++            if after[d].kinds[k] - before[d].kinds[k] < t.kinds[d][k] {
++                return Err(format!("dir {d}: kind {k} grew less than the log's"));
++            }
++        }
++        if after[d].violations - before[d].violations < t.broken[d] {
++            return Err(format!("dir {d}: violations grew less than the log's"));
++        }
+     }
+-    Ok(n)
++    Ok(())
+ }
+ 
+ /// p50, p99 and the largest of `v` in ms.
+@@ -646,8 +681,9 @@ async fn order_and_integrity_both_ways_and_no_byte_seen_before_its_release() {
  
  /// The one-record rule (C1): with 30,000 B free, a 40,000 B write takes one record of 16,384 B, the next only what
  /// leaves 22 B for its own record, and the budget is never exceeded; then Pending (never Ok(0)), with tungstenite's
@@ -741,7 +894,7 @@ index 5671667..5d339d4 100644
  #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
  async fn one_record_per_write_never_beyond_the_budget() {
      let (_client, server) = tokio::io::duplex(1 << 20);
-@@ -682,6 +709,18 @@ async fn one_record_per_write_never_beyond_the_budget() {
+@@ -682,6 +718,18 @@ async fn one_record_per_write_never_beyond_the_budget() {
          writes(&l, DOWN),
          vec![16_406, 16_406, 2_724, 16_406, 13_594]
      );
@@ -760,7 +913,7 @@ index 5671667..5d339d4 100644
  }
  
  /// Pending at a full budget and woken when it frees; the held-bytes bounds under a client that never reads (down:
-@@ -732,14 +771,17 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
+@@ -732,14 +780,17 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
          "up held {} B",
          max[UP]
      );
@@ -785,7 +938,7 @@ index 5671667..5d339d4 100644
          max[DOWN]
      );
      let floor = 513 + 14 + OVERHEAD;
-@@ -1161,7 +1203,8 @@ fn burst_state<S>(ds: &DelayStream<S>) -> (Vec<(u64, u64)>, Vec<u64>) {
+@@ -1161,7 +1212,8 @@ fn burst_state<S>(ds: &DelayStream<S>) -> (Vec<(u64, u64)>, Vec<u64>) {
  /// of u64::MAX is one) is refused, leaving the model's bursts and the burst ends as they were; the longest burst from a
  /// start (u64::MAX − start) is accepted, and the pump's next due time is then its end, never a time wrapped into the
  /// past (the old code panicked here in a debug build and spun in a release one); the idle pump does not run. Also
@@ -795,7 +948,7 @@ index 5671667..5d339d4 100644
  #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
  async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
      let (_client, server) = tokio::io::duplex(1 << 12);
-@@ -1192,12 +1235,13 @@ async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
+@@ -1192,12 +1244,13 @@ async fn a_burst_past_the_clocks_range_is_refused_and_never_wraps() {
      tokio::time::sleep(Duration::from_millis(50)).await;
      let runs = ds.life().polls - polls;
      assert!(runs <= 1, "the pump ran {runs} times on an idle connection");
@@ -811,7 +964,7 @@ index 5671667..5d339d4 100644
          c.step_to(t, By::App);
          c.origin + c.model.now_ns()
      };
-@@ -1812,6 +1856,248 @@ async fn the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it() {
+@@ -1812,6 +1865,248 @@ async fn the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it() {
      );
  }
  
@@ -1060,7 +1213,7 @@ index 5671667..5d339d4 100644
  /// F-G (C3): an EOF from S ends the up direction after its last delivered byte. The client writes the request and 40
  /// frames at once, then shuts its write half; tungstenite's side reads every byte the client wrote, in order, and only
  /// then Ok(0), with nothing left in the model or the scanner then. P2 with its loss, so repairs stand between the EOF
-@@ -1861,6 +2147,172 @@ async fn an_eof_from_s_ends_the_up_direction_after_its_last_byte() {
+@@ -1861,6 +2156,172 @@ async fn an_eof_from_s_ends_the_up_direction_after_its_last_byte() {
      );
  }
  
@@ -1233,7 +1386,147 @@ index 5671667..5d339d4 100644
  /// C3: shutdown with every byte delivered and taken shuts S down at once (no timeout counted); with a client that
  /// never reads, it gives up at the deadline (300 ms here), drops S and counts it.
  #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-@@ -2749,6 +3201,9 @@ async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
+@@ -2050,13 +2511,16 @@ async fn its_rows_use_the_named_series() {
+         [[0; 20]; 2],
+         [[0; 2]; 2],
+         [Summary::default(); 2],
+-        [Split::default(); 2],
+         &[0; REASONS + 3],
+         &mut want,
+     );
+     let names_of = |v: &[(&'static str, u64)]| v.iter().map(|x| x.0).collect::<Vec<_>>();
+     assert_eq!(names_of(&second), names_of(&want));
+     assert_eq!(&names_of(&summary)[..want.len()], &names_of(&want)[..]);
++    // The split's rows are the run's (the `ws_split` event), not a connection's.
++    let mut split = Vec::new();
++    names::split_rows([Split::default(); 2], &mut split);
++    assert_eq!(names_of(&DelayStream::split_rows()), names_of(&split));
+     assert_eq!(value(&summary, names::CONNS_BEFORE), 7);
+     assert_eq!(value(&summary, names::ACCEPTED), 42);
+     // header_numbers blocks on the clock thread's answer (F6): off the runtime's workers, as U6's writer will call it.
+@@ -2075,14 +2539,20 @@ async fn its_rows_use_the_named_series() {
+         10 * SEC,
+         "SHUTDOWN_WAIT_NS"
+     );
+-    // F7: the heap a connection allocates at wrap at the defaults, as SERIES.md states it: twelve lateness histograms
+-    // (per direction the total and the split's five parts) with their sparse marks (12 x (135,040 + 1,056 + 256 x 24)
+-    // B), the scanner's buffer (8,192 B), the down staging buffer (16,384 B) and the read buffer (527 B).
++    // F7 and the split's memory (b): the heap a connection allocates at wrap at the defaults, as SERIES.md states it:
++    // two lateness histograms (one per direction) with their sparse marks (2 x (135,040 + 1,056 + 256 x 24) B), the
++    // scanner's buffer (8,192 B), the down staging buffer (16,384 B) and the read buffer (527 B); and once per process
++    // the split's pool, ten histograms of 135,040 B (per direction its five parts).
+     assert_eq!(
+         value(&h, "ws_conn_fixed_bytes"),
+-        2 * (1 + PARTS as u64) * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
++        2 * (135_040 + 1_056 + 256 * 24) + 8_192 + 16_384 + 527
++    );
++    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 309_583);
++    assert_eq!(
++        value(&h, "ws_split_fixed_bytes"),
++        2 * PARTS as u64 * 135_040
+     );
+-    assert_eq!(value(&h, "ws_conn_fixed_bytes"), 1_731_983);
++    assert_eq!(value(&h, "ws_split_fixed_bytes"), 1_350_400);
+     // F-M: the release clock's 1 ns slack, written by the thread and read back, at its start and now (a real-time
+     // policy reads 0, as ImpairSocket's test allows; socket_tests.rs).
+     let texts = ds.header_texts();
+@@ -2191,10 +2661,11 @@ async fn the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default()
+ ///   sees, so the receipt is a bound (never before the release), not the identity, and the rest of the path is
+ ///   printed;
+ /// - every stall is a first-transmission loss and their count sits in its 99.9 % two-sided binomial band at 2 %;
+-/// - every release's lateness split sums to its total exactly (`split_identity`).
++/// - every release's lateness split sums to its total exactly, and no violation is counted (`split_identity`).
+ ///
+-/// Lateness is printed with condition 10's trigger, and below it the per-release split from the summary rows (the
+-/// advisor's "condition 10 again": reported, never judged). Returns the number of lateness samples per direction.
++/// Lateness is printed with condition 10's trigger, and below it the per-release split from the run's rows, pooled per
++/// direction over the process's connections (the advisor's "condition 10 again" and (b): reported, never judged), and
++/// this connection's five largest releases. Returns the number of lateness samples per direction.
+ async fn loopback(ticks: u64) -> [u64; 2] {
+     let c = cfg(Profile::p2(), 21);
+     let request_at = now();
+@@ -2326,6 +2797,9 @@ async fn loopback(ticks: u64) -> [u64; 2] {
+         );
+     }
+     let sum = ds.run_summary();
++    // The split's parts are the run's, pooled over the process's connections (the advisor's (b)): in the evidence run
++    // (one test, one connection) they are this connection's; in check.mjs's suite other tests add theirs.
++    let pooled = DelayStream::split_rows();
+     let mut n = [0u64; 2];
+     for (d, name) in [(DOWN, "down"), (UP, "up")] {
+         let get = |i: usize| value(&sum, names::LATE[d][i]);
+@@ -2349,7 +2823,7 @@ async fn loopback(ticks: u64) -> [u64; 2] {
+                 &l
+             )
+         );
+-        for line in split_lines(&sum, d) {
++        for line in split_lines(&pooled, d) {
+             println!("  {name} {line}");
+         }
+         for line in largest(&s.logs.splits, d, 5) {
+@@ -2397,17 +2871,36 @@ async fn split_session(bite: SplitBite, ticks: u64) -> Snapshot {
+ 
+ /// The per-release split's identity (the advisor's "condition 10 again", 2026-11-08), over three short real loopback
+ /// sessions side by side (`split_session`, 60 ticks each, about 3 s). With no bite, every release's parts sum to its
+-/// total in integer ns, its stamps chain, the classes partition the releases the total counted, and the woken class is
+-/// not empty either way. The bites, on the production path (`late`) from just after the handshakes: a part dropped (the
+-/// woken hop recorded as 0) and a part misattributed (the woken work measured from the clock's wake (1) instead of the
+-/// pass's start (2)); each must break the sum. A woken release's hop is the clock thread's wake call plus tokio's turn,
+-/// never 0 ns, so each bite bites on every woken release after the handshake.
++/// total in integer ns, its stamps chain, the classes partition the releases the total counted, no violation is
++/// counted, and the woken class is not empty either way. The bites, on the production path (`late`) from just after
++/// the handshakes: a part dropped (the woken hop recorded as 0) and a part misattributed (the woken work measured from
++/// the clock's wake (1) instead of the pass's start (2)); each must break the sum, and `late`'s own check must count
++/// each broken release as a violation (exactly the log's broken releases). A woken release's hop is the clock thread's
++/// wake call plus tokio's turn, never 0 ns, so each bite bites on every woken release after the handshake. The split's
++/// histograms are the process's pool (the advisor's (b)): over the three sessions it grew by at least what their logs
++/// hold, part by part, kind by kind, and in violations.
+ #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+ async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it() {
++    let before = pool().read();
+     let runs = [SplitBite::Off, SplitBite::DropHop, SplitBite::WorkFromWake]
+         .map(|b| (b, tokio::spawn(split_session(b, 60))));
++    let mut all = Tally::default();
+     for (bite, run) in runs {
+         let s = run.await.expect("the session");
++        let t = tally(&s);
++        for d in [DOWN, UP] {
++            for c in 0..2 {
++                all.n[d][c] += t.n[d][c];
++            }
++            for k in 0..KINDS {
++                all.kinds[d][k] += t.kinds[d][k];
++            }
++            all.broken[d] += t.broken[d];
++        }
++        assert_eq!(
++            s.split_violations, t.broken,
++            "{bite:?}: the violations late() counted are the log's broken releases"
++        );
+         let got = split_identity(&s);
+         if bite == SplitBite::Off {
+             let n = got.unwrap_or_else(|e| panic!("the identity: {e}"));
+@@ -2425,9 +2918,18 @@ async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it
+         } else {
+             let e = got.expect_err(&format!("the bite {bite:?} must break the identity"));
+             assert!(e.contains("parts sum"), "{bite:?}: {e}");
+-            println!("bite {bite:?} caught: {e}");
++            assert!(
++                t.broken.iter().sum::<u64>() > 0,
++                "{bite:?}: violations counted"
++            );
++            println!(
++                "bite {bite:?} caught: {e}; violations counted {:?}",
++                s.split_violations
++            );
+         }
+     }
++    let after = pool().read();
++    pool_grew(&before, &after, &all).unwrap_or_else(|e| panic!("the pool: {e}"));
+ }
+ 
+ /// Condition 10's evidence run (the main session's, quiet, nothing else alongside): the same run with at least 10,000
+@@ -2749,6 +3251,9 @@ async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
                  "the budget was reached: {} B > ({n_ret} - 1) x {SNAP} B",
                  r.outstanding
              );
@@ -1351,3 +1644,209 @@ index 30ff48e..a22bd1b 100644
      #[test]
      fn send_errors_fall_in_their_classes() {
          assert_eq!(ERR_CLASSES[err_class(90)], "msgsize");
+diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
+index ca23e8c..22bb9ae 100644
+--- a/spikes/netcode-proof/marks/SERIES.md
++++ b/spikes/netcode-proof/marks/SERIES.md
+@@ -492,7 +492,8 @@ What `DelayStream` measures, under the names its own code reports (npt-net's `l2
+ §1's rule and against this file by unit tests). Directions are the TCP model's: `down` is what RS sends (model end 0),
+ `up` what the client sends (end 1). Every stamp is on DelayStream's clock (`DelayStream::now_ns`). The rows are per
+ connection; npt-server's writer merges its WebSocket connections into the run's records (counts summed, maxima and
+-levels the largest, lateness histograms merged: U6).
++levels the largest, lateness histograms merged: U6). The one exception is the lateness's per-release split, which is
++the run's, pooled over every connection in the process (the `ws_split` event, below).
+ 
+ **The `ws_summary` event** is written once per connection at its end. Its fields: every per-second name below over the
+ connection's life (the counts as totals, the maxima as they stand, `ws_<dir>_held_bytes` as at the end with
+@@ -507,8 +508,11 @@ stamp of the step that released the record. The **woken** class (released at an
+ untaken fire for the connection's entry due at D and stamped W: D <= M <= W <= P) has clock = W − M, hop = P − W and
+ work = (3) − P; the **other** class (every other release: no clock part) has wait = T − M and work = (3) − T, counted by its
+ step (open, mid, app). Each part is the difference of two stamps; the parts of every release sum to its L exactly
+-(npt-net's identity test). Each part's statistics are the lateness's own (`stats::Running`: p50, p99, p99.9, max, E,
+-over), per second and over the connection.
++(npt-net's identity test), and each release is checked as it is recorded, a mismatch counted
++(`ws_late_<dir>_split_violations_count`). Each part's statistics are the lateness's own (p50, p99, p99.9, max, E, over),
++over the run: one histogram per part per direction shared by every connection in the process (`stats::Pooled`: relaxed
++per-bucket atomics, so a release takes no lock and allocates nothing; the advisor's ruling (b) on the split's memory,
++2026-11-08), written once at the run's end as the `ws_split` event (U6: npt-server's writer), never per second.
+ 
+ **The `burst_return` event**: DelayStream's part of advisor-ws-docs-r2.md:379 (3) per WebSocket client per burst
+ (u3c-plan.md C8), recorded as the model passes each burst's end; the room's fields (offset_ns, tick_phase_ns,
+@@ -550,41 +554,6 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
+ | `second.v.ws_late_down_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): its maximum |
+ | `second.v.ws_late_down_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median |
+ | `second.v.ws_late_down_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): samples with L − L0 above 0.25 ms |
+-| `second.v.ws_late_down_woken_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): releases in the woken class this second (released at a pump pass's opening step after a release-clock wake that came when the record was due: D <= M <= W <= P); each one's clock, hop and work parts sum to its L exactly |
+-| `second.v.ws_late_down_clock_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its median (x0 for this second) |
+-| `second.v.ws_late_down_clock_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99th percentile |
+-| `second.v.ws_late_down_clock_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99.9th percentile |
+-| `second.v.ws_late_down_clock_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its maximum |
+-| `second.v.ws_late_down_clock_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_down_clock_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_down_hop_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its median (x0 for this second) |
+-| `second.v.ws_late_down_hop_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99th percentile |
+-| `second.v.ws_late_down_hop_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99.9th percentile |
+-| `second.v.ws_late_down_hop_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its maximum |
+-| `second.v.ws_late_down_hop_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_down_hop_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_down_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its median (x0 for this second) |
+-| `second.v.ws_late_down_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its 99th percentile |
+-| `second.v.ws_late_down_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its 99.9th percentile |
+-| `second.v.ws_late_down_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its maximum |
+-| `second.v.ws_late_down_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_down_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_down_other_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): releases in the other class this second (no clock wake covered them); each one's wait and work parts sum to its L exactly, with no clock part |
+-| `second.v.ws_late_down_other_wait_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its median (x0 for this second) |
+-| `second.v.ws_late_down_other_wait_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99th percentile |
+-| `second.v.ws_late_down_other_wait_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99.9th percentile |
+-| `second.v.ws_late_down_other_wait_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its maximum |
+-| `second.v.ws_late_down_other_wait_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_down_other_wait_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_down_other_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its median (x0 for this second) |
+-| `second.v.ws_late_down_other_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its 99th percentile |
+-| `second.v.ws_late_down_other_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its 99.9th percentile |
+-| `second.v.ws_late_down_other_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its maximum |
+-| `second.v.ws_late_down_other_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_down_other_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_down_other_open_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released at a pump pass's opening step that no clock wake covered (the pass woken by S's I/O, an application task or a shutdown, or by a clock wake before the record was due) |
+-| `second.v.ws_late_down_other_mid_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released at the pump's step inside its pass (its up loop, after the pass's down writes; a down record released there is written at the pump's next pass) |
+-| `second.v.ws_late_down_other_app_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released by an application task's step (DelayStream's poll_read, poll_write, an accessor or add_burst stepping the model) |
+ | `second.v.ws_up_segments_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data segments formed |
+ | `second.v.ws_up_transmissions_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data transmissions, resends included |
+ | `second.v.ws_up_lost_profile_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data transmissions the profile's loss draw dropped |
+@@ -614,41 +583,6 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
+ | `second.v.ws_late_up_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): its maximum |
+ | `second.v.ws_late_up_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median |
+ | `second.v.ws_late_up_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): samples with L − L0 above 0.25 ms |
+-| `second.v.ws_late_up_woken_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): releases in the woken class this second (released at a pump pass's opening step after a release-clock wake that came when the record was due: D <= M <= W <= P); each one's clock, hop and work parts sum to its L exactly |
+-| `second.v.ws_late_up_clock_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its median (x0 for this second) |
+-| `second.v.ws_late_up_clock_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99th percentile |
+-| `second.v.ws_late_up_clock_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99.9th percentile |
+-| `second.v.ws_late_up_clock_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its maximum |
+-| `second.v.ws_late_up_clock_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_up_clock_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_up_hop_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its median (x0 for this second) |
+-| `second.v.ws_late_up_hop_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99th percentile |
+-| `second.v.ws_late_up_hop_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99.9th percentile |
+-| `second.v.ws_late_up_hop_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its maximum |
+-| `second.v.ws_late_up_hop_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_up_hop_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_up_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its median (x0 for this second) |
+-| `second.v.ws_late_up_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its 99th percentile |
+-| `second.v.ws_late_up_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its 99.9th percentile |
+-| `second.v.ws_late_up_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its maximum |
+-| `second.v.ws_late_up_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_up_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_up_other_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): releases in the other class this second (no clock wake covered them); each one's wait and work parts sum to its L exactly, with no clock part |
+-| `second.v.ws_late_up_other_wait_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its median (x0 for this second) |
+-| `second.v.ws_late_up_other_wait_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99th percentile |
+-| `second.v.ws_late_up_other_wait_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99.9th percentile |
+-| `second.v.ws_late_up_other_wait_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its maximum |
+-| `second.v.ws_late_up_other_wait_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_up_other_wait_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_up_other_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its median (x0 for this second) |
+-| `second.v.ws_late_up_other_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its 99th percentile |
+-| `second.v.ws_late_up_other_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its 99.9th percentile |
+-| `second.v.ws_late_up_other_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its maximum |
+-| `second.v.ws_late_up_other_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): E[(x − x0 − 0.25 ms)+] over the second, x0 its median (U3-Q1's statistic, as for L) |
+-| `second.v.ws_late_up_other_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): samples with x − x0 above 0.25 ms |
+-| `second.v.ws_late_up_other_open_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released at a pump pass's opening step that no clock wake covered (the pass woken by S's I/O, an application task or a shutdown, or by a clock wake before the record was due) |
+-| `second.v.ws_late_up_other_mid_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released at the pump's step inside its pass (its up loop, after the pass's down writes; the reader is woken at the pass's end) |
+-| `second.v.ws_late_up_other_app_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released by an application task's step (DelayStream's poll_read, poll_write, an accessor or add_burst stepping the model) |
+ | `second.v.ws_close_request_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because the upgrade request reached ws_max_request_bytes (8,192 B) without its blank line, before any of its payload entered the model (plan §4.4) |
+ | `second.v.ws_close_frame_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a client frame's payload above ws_max_message_bytes (513 B), before any of its payload entered the model (plan §4.4) |
+ | `second.v.ws_close_message_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a fragmented message's running payload above ws_max_message_bytes, before any of its payload entered the model (plan §4.4) |
+@@ -659,6 +593,83 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
+ | `second.v.ws_split_writes_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | released down records S took in more than one write call (so more than one real TLS record) |
+ | `second.v.ws_returns_dropped_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | per-return records not kept: the connection held its 1,024 already |
+ 
++### The per-release split over the run (`event.ws_split`)
++
++| Name | Unit | Written by (crate) | Meaning |
++|---|---|---|---|
++| `event.ws_split.ws_late_down_woken_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): releases in the woken class over the run, pooled over every connection (released at a pump pass's opening step after a release-clock wake that came when the record was due: D <= M <= W <= P); each one's clock, hop and work parts sum to its L exactly |
++| `event.ws_split.ws_late_down_clock_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its median (x0 over the run) |
++| `event.ws_split.ws_late_down_clock_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99th percentile |
++| `event.ws_split.ws_late_down_clock_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99.9th percentile |
++| `event.ws_split.ws_late_down_clock_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its maximum |
++| `event.ws_split.ws_late_down_clock_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_down_clock_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_down_hop_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its median (x0 over the run) |
++| `event.ws_split.ws_late_down_hop_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99th percentile |
++| `event.ws_split.ws_late_down_hop_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99.9th percentile |
++| `event.ws_split.ws_late_down_hop_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its maximum |
++| `event.ws_split.ws_late_down_hop_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_down_hop_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_down_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its median (x0 over the run) |
++| `event.ws_split.ws_late_down_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its 99th percentile |
++| `event.ws_split.ws_late_down_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its 99.9th percentile |
++| `event.ws_split.ws_late_down_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): its maximum |
++| `event.ws_split.ws_late_down_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_down_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the return of S's poll_write that takes the record's last byte (the pump's work, earlier records, rustls and the write syscall; a later pass when S is full): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_down_other_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): releases in the other class over the run, pooled over every connection (no clock wake covered them); each one's wait and work parts sum to its L exactly, with no clock part |
++| `event.ws_split.ws_late_down_other_wait_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its median (x0 over the run) |
++| `event.ws_split.ws_late_down_other_wait_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99th percentile |
++| `event.ws_split.ws_late_down_other_wait_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99.9th percentile |
++| `event.ws_split.ws_late_down_other_wait_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its maximum |
++| `event.ws_split.ws_late_down_other_wait_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_down_other_wait_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_down_other_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its median (x0 over the run) |
++| `event.ws_split.ws_late_down_other_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its 99th percentile |
++| `event.ws_split.ws_late_down_other_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its 99.9th percentile |
++| `event.ws_split.ws_late_down_other_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): its maximum |
++| `event.ws_split.ws_late_down_other_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_down_other_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the return of S's poll_write that takes the record's last byte (the pump's wake when another task or its own up loop released the record, then its write): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_down_other_open_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released at a pump pass's opening step that no clock wake covered (the pass woken by S's I/O, an application task or a shutdown, or by a clock wake before the record was due) |
++| `event.ws_split.ws_late_down_other_mid_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released at the pump's step inside its pass (its up loop, after the pass's down writes; a down record released there is written by the pump's next pass, which the pump wakes for at once (R1)) |
++| `event.ws_split.ws_late_down_other_app_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): of the other class, released by an application task's step (DelayStream's poll_read, poll_write, an accessor or add_burst stepping the model) |
++| `event.ws_split.ws_late_down_split_violations_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), the release lateness's per-release split (**The per-release split** above): releases whose recorded parts did not sum to their L (checked per release and counted; 0 while the stamps chain, as npt-net's identity test shows) |
++| `event.ws_split.ws_late_up_woken_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): releases in the woken class over the run, pooled over every connection (released at a pump pass's opening step after a release-clock wake that came when the record was due: D <= M <= W <= P); each one's clock, hop and work parts sum to its L exactly |
++| `event.ws_split.ws_late_up_clock_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its median (x0 over the run) |
++| `event.ws_split.ws_late_up_clock_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99th percentile |
++| `event.ws_split.ws_late_up_clock_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its 99.9th percentile |
++| `event.ws_split.ws_late_up_clock_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): its maximum |
++| `event.ws_split.ws_late_up_clock_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_up_clock_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's clock part, W − M: from the record's model delivery stamp to the release clock thread's wake that covered it (its own wake lateness): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_up_hop_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its median (x0 over the run) |
++| `event.ws_split.ws_late_up_hop_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99th percentile |
++| `event.ws_split.ws_late_up_hop_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its 99.9th percentile |
++| `event.ws_split.ws_late_up_hop_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): its maximum |
++| `event.ws_split.ws_late_up_hop_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_up_hop_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's hop part, P − W: from the clock thread's wake to the stamp of the pump pass's opening step (the thread's wake calls, tokio's scheduling of the pump task, the pump's wait for the connection's lock): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_up_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its median (x0 over the run) |
++| `event.ws_split.ws_late_up_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its 99th percentile |
++| `event.ws_split.ws_late_up_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its 99.9th percentile |
++| `event.ws_split.ws_late_up_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): its maximum |
++| `event.ws_split.ws_late_up_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_up_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the woken class's work part, (3) − P: from the pass's opening stamp to the poll_read that hands the record's last byte to tungstenite (the rest of the pump's pass, the reader's wake and turn, one record per read): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_up_other_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): releases in the other class over the run, pooled over every connection (no clock wake covered them); each one's wait and work parts sum to its L exactly, with no clock part |
++| `event.ws_split.ws_late_up_other_wait_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its median (x0 over the run) |
++| `event.ws_split.ws_late_up_other_wait_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99th percentile |
++| `event.ws_split.ws_late_up_other_wait_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its 99.9th percentile |
++| `event.ws_split.ws_late_up_other_wait_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: its maximum |
++| `event.ws_split.ws_late_up_other_wait_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_up_other_wait_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's wait part, T − M: from the record's model delivery stamp to the stamp of the step that released it: samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_up_other_work_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its median (x0 over the run) |
++| `event.ws_split.ws_late_up_other_work_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its 99th percentile |
++| `event.ws_split.ws_late_up_other_work_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its 99.9th percentile |
++| `event.ws_split.ws_late_up_other_work_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): its maximum |
++| `event.ws_split.ws_late_up_other_work_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): E[(x − x0 − 0.25 ms)+] over the run, x0 its median (U3-Q1's statistic, as for L) |
++| `event.ws_split.ws_late_up_other_work_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above), the other class's work part, (3) − T: from the releasing step to the poll_read that hands the record's last byte to tungstenite (the reader's wake and turn): samples with x − x0 above 0.25 ms |
++| `event.ws_split.ws_late_up_other_open_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released at a pump pass's opening step that no clock wake covered (the pass woken by S's I/O, an application task or a shutdown, or by a clock wake before the record was due) |
++| `event.ws_split.ws_late_up_other_mid_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released at the pump's step inside its pass (its up loop, after the pass's down writes; the reader is woken at the pass's end) |
++| `event.ws_split.ws_late_up_other_app_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): of the other class, released by an application task's step (DelayStream's poll_read, poll_write, an accessor or add_burst stepping the model) |
++| `event.ws_split.ws_late_up_split_violations_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), the release lateness's per-release split (**The per-release split** above): releases whose recorded parts did not sum to their L (checked per release and counted; 0 while the stamps chain, as npt-net's identity test shows) |
++
+ ### The `ws_summary` event's own fields (`event.ws_summary`)
+ 
+ | Name | Unit | Written by (crate) | Meaning |
+@@ -708,7 +719,8 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
+ | `header.params.ws_shutdown_wait_ns` | ns | npt-net (DelayStream) | how long a shutdown waits for delivery and for S to take the bytes before dropping S (10 s; C3) |
+ | `header.params.ws_bursts_max_count` | count | npt-net (DelayStream) | the most bursts a connection holds still to come (64; C4) |
+ | `header.params.ws_returns_max_count` | count | npt-net (DelayStream) | the per-return records a connection keeps (1,024) |
+-| `header.params.ws_conn_fixed_bytes` | bytes | npt-net (DelayStream) | the heap a connection allocates at wrap, before any WebSocket byte (F7): six lateness histograms per direction (the total and the per-release split's five parts) with their windows' sparse marks (142,240 B each), the scanner's buffer (8,192 B at the defaults), the down staging buffer (16,384 B) and the pump's read buffer (527 B): 1,731,983 B at the defaults (309,583 B before the split). On top: the held bytes (below about 82 KB each way) and, once a second's samples touch more than 256 of a histogram's buckets, a dense mark of 135,040 B for that histogram. U6 sizes WsServer's accept cap from it (and from tungstenite's own buffers) |
++| `header.params.ws_conn_fixed_bytes` | bytes | npt-net (DelayStream) | the heap a connection allocates at wrap, before any WebSocket byte (F7): one lateness histogram per direction with its window's sparse mark (142,240 B each), the scanner's buffer (8,192 B at the defaults), the down staging buffer (16,384 B) and the pump's read buffer (527 B): 309,583 B at the defaults (the per-release split's histograms are the process's: `ws_split_fixed_bytes`). On top: the held bytes (below about 82 KB each way) and, once a second's samples touch more than 256 of a histogram's buckets, a dense mark of 135,040 B for that histogram. U6 sizes WsServer's accept cap from it (and from tungstenite's own buffers) |
++| `header.params.ws_split_fixed_bytes` | bytes | npt-net (DelayStream) | the heap the process allocates once, at its first wrap, for the per-release split over the run, shared by every connection (the advisor's ruling (b), 2026-11-08): per direction five histograms (`stats::Pooled`, 135,040 B each), 1,350,400 B whatever the number of connections |
+ | `header.params.ws_tcp_model` | string | npt-net (DelayStream) | the TCP model's name and version (`linux-6.8-tcp v3`, tcp_model.rs MODEL) |
+ | `header.params.ws_tcp_not_modelled` | string | npt-net (DelayStream) | what the model leaves out (S11), as one sentence |
+ | `header.params.ws_clock_sched_policy` | string | npt-net (DelayStream) | the release clock thread's scheduling policy and priority read from /proc when the header is built (`SCHED_OTHER 0`) |
