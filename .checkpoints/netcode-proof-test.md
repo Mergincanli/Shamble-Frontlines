@@ -499,6 +499,35 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **RESUME HERE (Mustafa at 95 % usage, about 16:30 UTC 2026-11-08): U3c's LAST FIX ROUND is running**, workflow
+  `wf_ac5e4575-9da` (npt-u3c-fix2), launched 16:26 on b2e879b.
+  - **C1b** (npt-net): R1, G-PRE-WAKE, G-PRE-PANIC, G-F10, G-NC4, G-FH, G-NC8, G-NC2, and the split's memory moved to
+    shared run-level histograms.
+  - **C2b** (check.mjs): (a) the self-test and honest comments; (b) the RUSTC, include and runner refusals plus the
+    forbid backstop, kept only if 9/9; (c) the nits; (d) the known limits.
+  - The critics: rust-reviewer on C1b, test-engineer on C2b. Rulings: "Side rulings: U3c's last fix round" in
+    advisor-u3c-plan.md.
+  - **The agents' work-in-progress is snapshotted** (base b2e879b; worktrees .claude/worktrees/wf_ac5e4575-9da-1 and
+    -2):
+    - wip/u3c-fix2-wt1.patch and wip/u3c-fix2-wt2.patch;
+    - notes u3c-fix2-*.md, copied by worktree_patch.py.
+  - **If cut:** resume with Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3c-fix2-wf_ac5e4575-9da.js,
+    resumeFromRunId: "wf_ac5e4575-9da", args: {sha: "b2e879b"}}). A fresh agent first applies its part's wip patch at
+    b2e879b (`git apply --exclude='.checkpoints/*'`) and continues after its notes' last Progress line.
+  - **After it:**
+    - merge C2b and C1b;
+    - check.mjs 9/9 and the gate;
+    - the advisor's condition-10 diagnostic: the DelayStream evidence run alternating with ImpairSocket's M13
+      (commands below, under "THE SPLIT IS BUILT"), reported, not judged;
+    - U3c's report section;
+    - the cleanup ask (U3a copies, flaky-wt, npt-readings, U3c copies and caches);
+    - then U3d.
+  - **Done since the last block:**
+    - split merged at b5c9009 (check 9/9);
+    - re-review record u3c-fix-review-result.txt;
+    - plan text NC-U3c-1/2/3 corrected in u3c-plan.md;
+    - U6 carries added to plan §12.1 (6538a5d).
 - **U3c FIX PASS MERGED at 81203da** (about 15:08 UTC 2026-11-08).
   - The fix workflow wf_3ea724fc-a63 hit the spend limit: C2 had finished and its critic was cut; C1 had finished every
     fix and passed check.mjs twice, but its final report was lost. Both were snapshotted (wip/u3c-fix-c1-partial.patch,
