@@ -119,3 +119,20 @@ Split approved with U6 carries. No escalation.
   interleaved, both reported, not judged. Why now: it tells whether the tail sits in the tokio hop (then (b) gets
   built before R1) or in the thread wake that ImpairSocket shares (then the VM, and (b) would not help), without
   spending an R1 VM day on attribution. No plain quiet rerun: it adds nothing.
+
+## Side rulings: U3c's last fix round (2026-11-08)
+- Read u3c-fix-review-result.txt (R1 :~60, G-NC8 :85, G-PRE-WAKE :92, G-PRE-PANIC :99, C2R-1..10 :200-330).
+- (1) C1b: no objection. Plus: R1's test is the critic's probe 1 (fails when reverted), probe 2's timings recorded back
+  at pre-fix values; G-PRE-WAKE in the same change; G-PRE-PANIC tested with a panicking S; one critic pass on C1b's
+  diff only (R1 slipped through a fix pass). Run 2 and the A/B "post" runs carried R1: the environment reading rests
+  on the "pre" runs alone (E 11.6-28.2 us on unchanged code), which still holds. C10's diagnostic after C1b.
+- (2) check.mjs scope (a)-(d) approved. Added to (b): try the critic's compiler backstop (workspace unsafe_code =
+  "forbid"; the two exceptions keep their own [lints] tables, check.mjs checks them equal to the workspace's other
+  lints); keep it only if check.mjs passes 9/9 on both builds (an external macro's allow(unsafe_code) would break it);
+  if kept, C2R-1 and C2R-2's unsafe half leave (d). Each refusal gets a test and must not refuse this container's
+  normal toolchain environment. Supersedes my 12a's "keep [lints] workspace = true" for npt-tcpinfo if forbid lands.
+- (3) Split memory: (b) approved. Updates without perturbing the measure (relaxed per-bucket atomics, or a lock only
+  for the increment, never across an await or under a Conn lock; no allocation on the release path); the per-release
+  sum check kept as a counted violation; pooled per direction (what R1 reads); per-connection footprint back to about
+  309,583 B, the shared part fixed per process, both recorded. (a) would not help: the 101 is a release. Carry to U6:
+  accept cap x 0.31 MB recorded; whether -25's sessions ever get a DelayStream (P0 refuses the wrapper).
