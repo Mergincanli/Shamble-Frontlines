@@ -102,3 +102,20 @@ Split approved with U6 carries. No escalation.
   running), >= 10,000 samples per direction; judged E under about 10 us (U3-Q1 (c)'s statistic) and p99 <= 1 ms per
   direction; p99.9 and max reported; each release split into clock-thread wake, pump start, and S's poll_write return
   (stamps added before R1). A miss comes to me before -18's and -31's WS parts count; (b) is the prepared fallback.
+
+## Side ruling: condition 10 again, the post-restart A/B (2026-11-08)
+- Checked at e317067: the six files' summary lines match the table (E down 11.6-22.1 us, up 25.9-38.2 us; p99 up
+  1.37-1.88 ms; max up to 35.3 ms). Pre's delay.rs, delay_clock.rs and ws_frame.rs hash equal to 95597ef's, and
+  `git diff 95597ef 989118e -- crates/net/src/` is empty, so run 1 and the A/B "pre" runs ran the same DelayStream:
+  the change from E 3.5/6.5 us to 12-28 us on the same code is the environment. Pre and post interleave with no
+  consistent order: F3 neither caused nor cured it.
+- RULING: (a) stands, plus one condition. The WebSocket marks read medians and p99 (-18 on a 10 ms grid with a 10 %
+  tolerance of ~654 ms; -31's 250 ms p99): a lateness p99 under 2 ms and isolated maxima up to 35 ms move none of
+  them. The container is not evidence for a us-level bar; RS decides at R1 with the bar already set (E under about
+  10 us and p99 <= 1 ms per direction, under 48 connections; p99.9 and max reported; a max over 10 ms there comes to
+  me with the result).
+- ADDED, before U3c's report: build the per-release split now (clock-thread wake, pump start, S's write return; the
+  three parts must sum to the total), then one quiet diagnostic run here with ImpairSocket's M13 lateness run
+  interleaved, both reported, not judged. Why now: it tells whether the tail sits in the tokio hop (then (b) gets
+  built before R1) or in the thread wake that ImpairSocket shares (then the VM, and (b) would not help), without
+  spending an R1 VM day on attribution. No plain quiet rerun: it adds nothing.

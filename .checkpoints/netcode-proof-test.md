@@ -514,8 +514,15 @@
     - post: down E 16.2 and 22.1 us, p99 0.71 and 0.89 ms; up E 27.9 and 38.2 us, p99 1.37 and 1.88 ms.
     - No consistent difference. The same pre-fix code gave E 3.5 and 6.5 us at 00:41, so the container got noisier
       after the 15:01 restart; F3 neither caused nor removed the tail. Steal while idle 0.02 % (settles nothing).
-    - **With the advisor** (afa86ecfb9b00e463): does (a) stand, or with an added condition (a fresh quiet run before
-      the report; the per-release split stamps now)?
+    - **The advisor (2026-11-08; "Side ruling: condition 10 again"): (a) STANDS, plus one condition before U3c's report.**
+      - Build the per-release split now: clock = wake - model stamp; hop = pump start - wake; work = S write or hand-over
+        - pump start; an identity test that the parts sum to the total.
+      - One quiet diagnostic, interleaved with ImpairSocket's M13 lateness run, reported and not judged.
+      - No plain rerun. The split's diff is reviewed after the fix-diff re-review, changed lines only.
+      - On RS a max over 10 ms goes to the advisor with the result.
+    - **The split build agent** (general-purpose, xhigh, isolated worktree on f8c3812; CARGO_TARGET_DIR
+      u3v3-harness-check-target; notes in its worktree, u3c-split.md) is running. Then: merge it, check.mjs, the
+      interleaved diagnostic run by the main session, its review.
   - **The fix-diff re-review, workflow `wf_7360a111-ea8`** (npt-u3c-fix-review), on 95597ef..81203da: rust-reviewer
     on C1 (the F3 lock change most carefully) and security-auditor on C2 (try to bypass the new rules), each followed
     by an adversarial verifier. Notes: u3c-fix-review-{c1,c2}.md. If cut, resume with resumeFromRunId
