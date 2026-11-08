@@ -1,0 +1,328 @@
+diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
+index f2fd363..a43c180 100644
+--- a/spikes/netcode-proof/check.mjs
++++ b/spikes/netcode-proof/check.mjs
+@@ -417,10 +417,15 @@ function tcpinfoProblems(f, code, mask, attrs, sites, state) {
+   return problems;
+ }
+ 
+-/** Whether a crate manifest (comments stripped, one entry per line) has `[lints]` with `workspace = true`. */
+-function inheritsWorkspaceLints(lines) {
++/**
++ * Whether a crate manifest has `[lints]` with `workspace = true`, read from tomlScan's mask, as lintTables reads, so a
++ * header or a key inside a string or a comment is none (review C2c N2: the two lines moved into a multi-line string,
++ * basic or literal, had read as inherited while cargo gave rustc no lint flag at all). Any other spelling (quoted,
++ * dotted, inline) reads as not inherited, which fails closed.
++ */
++function inheritsWorkspaceLints(text) {
+   let table = null;
+-  for (const raw of lines) {
++  for (const raw of tomlScan(text).mask.split("\n")) {
+     const l = raw.trim();
+     const header = l.match(/^\[([^\]]+)\]$/);
+     if (header) table = header[1].trim();
+@@ -435,8 +440,9 @@ function inheritsWorkspaceLints(lines) {
+  * What is caught, as lexRust reads the code (its known limit is there):
+  * - outside the two exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
+  *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code;
+- * - a manifest other than the two exceptions' that names unsafe_code (UNSAFE_CODE_NAME: `unsafe-code` too) or does not
+- *   inherit the workspace lints (the exceptions' own tables are exceptionLintProblems');
++ * - a manifest other than the two exceptions' that names unsafe_code outside its comments (UNSAFE_CODE_NAME:
++ *   `unsafe-code` too) or does not inherit the workspace lints, as read outside its strings and comments
++ *   (inheritsWorkspaceLints; the exceptions' own tables are exceptionLintProblems');
+  * - in npt-tcpinfo, any relaxing but the two placed allows, `unsafe` outside their two functions, the two clippy lints
+  *   named outside lib.rs's crate-level deny or that deny missing (tcpinfoProblems), and either allow missing;
+  * - in every crate, a #[path] or include! whose literal names anything but a .rs file inside the crate's folder
+@@ -468,9 +474,11 @@ export function unsafeProblems(files, read) {
+       if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites, state));
+       problems.push(...pathProblems(f, crate, code, mask, attrs));
+     } else if (f === `${crate}Cargo.toml` && !(crate in UNSAFE_EXCEPTIONS)) {
+-      const lines = text.split("\n").map((l) => l.replace(/#.*$/, ""));
+-      if (lines.some((l) => UNSAFE_CODE_NAME.test(l))) problems.push(`${f} sets unsafe_code`);
+-      if (!inheritsWorkspaceLints(lines)) problems.push(`${f} does not inherit the workspace lints ([lints] workspace = true)`);
++      // The name is looked for outside comments, strings included (a quoted key is the lint to cargo; a string that
++      // names it fails closed), in tomlScan's `clean`: a `#` inside a string is no comment there (review C2c N2's
++      // reader list: a regex had cut such a line short).
++      if (UNSAFE_CODE_NAME.test(tomlScan(text).clean)) problems.push(`${f} sets unsafe_code`);
++      if (!inheritsWorkspaceLints(text)) problems.push(`${f} does not inherit the workspace lints ([lints] workspace = true)`);
+     }
+   }
+   for (const fn of TCPINFO_UNSAFE_FNS) {
+@@ -760,7 +768,10 @@ export function layoutProblems(meta) {
+  * A TOML text read for this file's checks: `clean` with its comments blanked, `mask` with its strings blanked too (both
+  * as long as the text, newlines kept), and `strings`, each one's span and value (basic strings' escapes decoded,
+  * multi-line and literal strings included). Enough for cargo's config and manifest files, not a full TOML parser: what
+- * it cannot read is reported by its callers, never passed.
++ * it cannot read is reported by its callers, never passed. Every TOML file check.mjs reads goes through here, so this is
++ * where one leading byte order mark (U+FEFF), which cargo 1.99.1 accepts and skips, is blanked like a comment (review
++ * C2c N4: tomlKeyAt skips spaces and tabs only, so a key on line 1 after it had read as nothing, and a rustdoc lint
++ * table given there got in unseen); offsets and lines stay the text's.
+  */
+ function tomlScan(text) {
+   const blank = (s) => s.replace(/[^\n]/g, " ");
+@@ -770,10 +781,11 @@ function tomlScan(text) {
+       if (u || U || x) return String.fromCodePoint(parseInt(u || U || x, 16));
+       return ch ? escapes[ch] : "";
+     });
+-  let clean = "";
+-  let mask = "";
++  // One leading byte order mark (U+FEFF), blanked (see above).
++  let clean = text.charCodeAt(0) === 0xfeff ? " " : "";
++  let mask = clean;
+   const strings = [];
+-  let i = 0;
++  let i = clean.length;
+   while (i < text.length) {
+     const c = text[i];
+     if (c === "#") {
+@@ -832,6 +844,27 @@ function tomlValues(scan, key) {
+   });
+ }
+ 
++/**
++ * The first name of every table header in a tomlScan (`[a.b]` or `[[a.b]]`), read as cargo reads it: quoted parts
++ * decoded and spaces around the dots allowed (tomlKeyAt), so `[["include"]]` is `include`, which cargo 1.99.1 loads like
++ * `[[include]]` (review C2c N2's reader list: a regex on the mask had read the quoted part as nothing). A line inside a
++ * multi-line array that only looks like a header counts too, which fails closed.
++ */
++function tomlHeaderHeads(scan) {
++  const stringAt = new Map(scan.strings.map((s) => [s.start, s]));
++  const heads = [];
++  let at = 0;
++  for (const line of scan.mask.split("\n")) {
++    const start = at;
++    at += line.length + 1;
++    const first = start + line.search(/\S|$/);
++    if (scan.mask[first] !== "[") continue;
++    const key = tomlKeyAt(scan, stringAt, first + (scan.mask[first + 1] === "[" ? 2 : 1), start + line.length);
++    if (key) heads.push(key.parts[0].name);
++  }
++  return heads;
++}
++
+ /**
+  * A rustc flag that lowers or caps lint levels, or one whose flags this check cannot read: -A, -W, --allow, --warn,
+  * --force-warn and --cap-lints (rustc 1.99.1 compiles an unsafe block under `--deny unsafe_code` with
+@@ -853,6 +886,16 @@ const SHADOWABLE = ["clippy", "fmt"];
+ const COMPILER_ENV = ["RUSTC", "CARGO_BUILD_RUSTC", "RUSTC_WORKSPACE_WRAPPER", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER"];
+ /** The same, as keys of a cargo config file ([build] rustc and rustc-workspace-wrapper, in any table or form). */
+ const COMPILER_KEYS = ["rustc", "rustc-workspace-wrapper"];
++/**
++ * The environment variables found that unlock unstable features on the pinned stable toolchain, refused whatever their
++ * value, with what each does: RUSTC_BOOTSTRAP (review C2b F5) for cargo and rustc, and cargo's own test knob, which sets
++ * the release channel cargo reads (review C2c N3: with it set to nightly, stable cargo 1.99.1 accepted
++ * `cargo-features = ["profile-rustflags"]`, which it refuses without).
++ */
++const UNSTABLE_ENV = {
++  RUSTC_BOOTSTRAP: "unlocks unstable cargo and rustc features (a manifest's profile rustflags)",
++  __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS: "sets the release channel cargo reads (nightly unlocks its unstable features: a manifest's cargo-features)",
++};
+ 
+ /**
+  * Every way the cargo this command runs could relax a lint, or stand in for a step, without a word in the crates (u3c
+@@ -862,13 +905,16 @@ const COMPILER_KEYS = ["rustc", "rustc-workspace-wrapper"];
+  *   the ones cargoConfigFiles finds); a rustflags value this check cannot read;
+  * - an alias that replaces clippy or fmt (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file);
+  * - another compiler or a workspace wrapper (COMPILER_ENV, COMPILER_KEYS);
+- * - a config `include` key, which loads a config file cargoConfigFiles does not read (cargo 1.99.1 honours it);
++ * - a config `include` key or `[[include]]` table, its name quoted or not, which loads a config file cargoConfigFiles
++ *   does not read (cargo 1.99.1 honours it);
+  * - a target runner (CARGO_TARGET_<triple>_RUNNER, or a `runner` key in a config file): it runs the test binaries in
+  *   cargo's place, and the test step judges cargo's exit status (a runner `true` passes with no test run);
+  * - RUSTC_BOOTSTRAP, whatever its value (review C2b F5): it unlocks unstable features on the pinned stable toolchain,
+  *   and with it cargo 1.99.1 honoured a manifest's `cargo-features = ["profile-rustflags"]` and a profile's
+  *   `rustflags = ["--cap-lints", "warn"]`, which turned the workspace's forbid into a warning (those manifest keys are
+- *   manifestKeyProblems').
++ *   manifestKeyProblems'); and __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS, cargo's own test knob, whatever its value
++ *   (review C2c N3): it sets the channel cargo reads, and set to nightly it let cargo 1.99.1 accept the same
++ *   `cargo-features` (UNSTABLE_ENV).
+  * Not read: a config's [env] table (it can set CLIPPY_ARGS for clippy-driver, review C2R-4 G, or any other variable for
+  * rustc) and what a member's build script prints (`cargo::rustc-env`, C2R-4 H). Both need a committed change that
+  * review sees.
+@@ -887,7 +933,7 @@ export function cargoConfigProblems(env, configs) {
+     if (SHADOWABLE.includes(alias)) problems.push(`${k} in the environment replaces \`cargo ${alias}\` with an alias`);
+     if (COMPILER_ENV.includes(k)) problems.push(`${k} in the environment replaces rustc or wraps the workspace's rustc calls (only RUSTC_WRAPPER may wrap them)`);
+     if (/^CARGO_TARGET_\w+_RUNNER$/.test(k)) problems.push(`${k} in the environment runs the test binaries in cargo's place`);
+-    if (k === "RUSTC_BOOTSTRAP") problems.push(`${k} in the environment unlocks unstable cargo and rustc features (a manifest's profile rustflags)`);
++    if (Object.hasOwn(UNSTABLE_ENV, k)) problems.push(`${k} in the environment ${UNSTABLE_ENV[k]}`);
+   }
+   for (const { path, text } of configs) {
+     const scan = tomlScan(text);
+@@ -901,7 +947,7 @@ export function cargoConfigProblems(env, configs) {
+     for (const name of COMPILER_KEYS) {
+       if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: it replaces rustc or wraps the workspace's rustc calls`);
+     }
+-    if (tomlValues(scan, "include").length || /^[ \t]*\[\[?[ \t]*include[ \t]*[\].]/m.test(scan.mask)) {
++    if (tomlValues(scan, "include").length || tomlHeaderHeads(scan).includes("include")) {
+       problems.push(`${path} has a key \`include\`: it loads a config file this check does not read`);
+     }
+     if (tomlValues(scan, "runner").length) problems.push(`${path} has a key \`runner\`: it runs the test binaries in cargo's place`);
+@@ -918,10 +964,11 @@ const MANIFEST_KEYS = {
+ /**
+  * The manifest keys that reach rustc's flags (u3c review C2b F5), refused in the workspace manifest and in every crate
+  * manifest under crates/ (`manifests`: { path, text }), whatever their value and in any table or form (bare, dotted,
+- * quoted, inline): `cargo-features`, which cargo 1.99.1 accepts only on a nightly toolchain or under RUSTC_BOOTSTRAP
+- * (cargoConfigProblems refuses that), and any `rustflags` key (a profile's, under `cargo-features =
+- * ["profile-rustflags"]`): with both, `rustflags = ["--cap-lints", "warn"]` compiled a planted allow and unsafe block
+- * under the workspace's forbid with no warning while this step passed. Neither key is in any manifest of the spike.
++ * quoted, inline): `cargo-features`, which cargo 1.99.1 accepts only on a nightly toolchain, under RUSTC_BOOTSTRAP or
++ * under cargo's channel override (cargoConfigProblems refuses both), and any `rustflags` key (a profile's, under
++ * `cargo-features = ["profile-rustflags"]`): with both, `rustflags = ["--cap-lints", "warn"]` compiled a planted allow
++ * and unsafe block under the workspace's forbid with no warning while this step passed. Neither key is in any manifest
++ * of the spike.
+  */
+ export function manifestKeyProblems(manifests) {
+   const problems = [];
+@@ -1100,7 +1147,10 @@ function testBothBuilds() {
+  *   (`--cap-lints`) lowers the forbid too.
+  * - Which toolchain runs: a nightly one (rust-toolchain.toml's channel, RUSTUP_TOOLCHAIN, `cargo +nightly` or a rustup
+  *   override) is not detected, and its unstable features are not read. The manifest keys that reach rustc's flags
+- *   (`cargo-features`, `rustflags`) are refused whatever the channel, and so is RUSTC_BOOTSTRAP (review C2b F5).
++ *   (`cargo-features`, `rustflags`) are refused whatever the channel, and so are the two variables found that unlock
++ *   unstable features on the pinned stable toolchain, RUSTC_BOOTSTRAP (review C2b F5) and cargo's channel override
++ *   __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS (C2c N3). Any other way to unlock them on a stable toolchain (another
++ *   variable, a patched or rebuilt cargo or rustc) is out of the scan's reach.
+  * - Unsafe code a dependency's macro expands into a crate is not linted by rustc (another crate's code); the
+  *   dependencies are U5's audit.
+  * - Too wide, not too narrow: the runner refusal covers every target triple, so a future wasm32 test runner
+@@ -1118,8 +1168,8 @@ const DEPS_CHECKED =
+   "and npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
+   "them, and keeps lib.rs's deny of the two clippy unsafe lints; the environment and the cargo configs read pass no " +
+   "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and " +
+-  "no test runner, and the environment has no RUSTC_BOOTSTRAP; every member lives in crates/ and builds only .rs " +
+-  "files in its own folder, in edition 2024, none " +
++  "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; every member lives in " +
++  "crates/ and builds only .rs files in its own folder, in edition 2024, none " +
+   "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
+   "literal names a .rs file in its own crate";
+ 
+diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
+index 421b0c5..ba62bcc 100644
+--- a/spikes/netcode-proof/check.test.mjs
++++ b/spikes/netcode-proof/check.test.mjs
+@@ -273,6 +273,24 @@ test("unsafe_code: a manifest that sets it or drops the workspace lints fails",
+   );
+ });
+ 
++test("a crate's `[lints] workspace = true` inside a multi-line string inherits nothing, basic or literal (review C2c N2)", () => {
++  // The reviewer's plant: npt-sim's two lines moved into a string under [package.metadata.npt]; cargo then gave rustc no
++  // lint flag at all (a shebang-desynced unsafe block compiled) while the deps step passed.
++  const dropped = ["crates/sim/Cargo.toml does not inherit the workspace lints ([lints] workspace = true)"];
++  for (const q of ['"""', "'''"]) {
++    const p = unsafeWith((f) => {
++      f["crates/sim/Cargo.toml"] = f["crates/sim/Cargo.toml"].replace("[lints]\nworkspace = true\n", `[package.metadata.npt]\nnote = ${q}\n[lints]\nworkspace = true\n${q}\n`);
++    });
++    assert.deepEqual(p, dropped, q);
++  }
++  // Read as cargo reads it: a comment after either line and CRLF line ends still inherit.
++  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] = '[package]\r\nname = "npt-sim"\r\n\r\n[lints] # all\r\nworkspace = true # inherited\r\n')), []);
++  // The name scan reads past a `#` inside a string (no comment there), as cargo does.
++  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] += '[package.metadata.npt]\nnote = { a = "#", unsafe_code = 1 }\n')), [
++    "crates/sim/Cargo.toml sets unsafe_code",
++  ]);
++});
++
+ test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
+   const wide = unsafeWith((f) => {
+     f["crates/tcpinfo/src/lib.rs"] = `#![allow(unsafe_code)]\n${DENY}mod linux;\n`;
+@@ -660,6 +678,28 @@ test("lints given as a dotted key or an inline table under another header are re
+   assert.deepEqual(workspaceLintProblems(t('[workspace.metadata]\nlints = "lints.rust.unsafe_code"\nnote = { lints = 1 }\n')), []);
+ });
+ 
++test("one byte order mark before line 1 is read past, as cargo 1.99.1 reads it (review C2c N4)", () => {
++  const BOM = String.fromCharCode(0xfeff);
++  // The reviewer's plant: a lint table of a tool the workspace does not name (rustdoc), as a dotted key on line 1 after
++  // a BOM; cargo metadata accepted it, and the deps step had passed.
++  const plant = 'lints.rustdoc.broken-intra-doc-links = "allow"';
++  assert.deepEqual(tcpinfoLints((t) => `${BOM}${plant}\n${t}`).problems, [
++    `${TCPINFO_MANIFEST}:1 gives lints as a dotted key or an inline table, which this check does not read`,
++  ]);
++  // A key of a lint table on line 1 is read as written too: at the workspace manifest's root, a dotted key.
++  assert.deepEqual(workspaceLintProblems(`${BOM}workspace.lints.rust.unsafe_code = "forbid"\n[workspace]\nmembers = []\n`), [
++    "Cargo.toml:1 gives lints as a dotted key or an inline table, which this check does not read",
++    'Cargo.toml:1 names unsafe_code other than as "forbid" in [workspace.lints.rust]',
++    'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit',
++  ]);
++  // No false positive: the spike's manifests with a BOM read as they do without.
++  const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
++  assert.deepEqual(workspaceLintProblems(`${BOM}${ws}`), []);
++  assert.deepEqual(tcpinfoLints((t) => `${BOM}${t}`).problems, []);
++  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] = `${BOM}${f["crates/sim/Cargo.toml"]}`)), []);
++  assert.deepEqual(manifestKeyProblems([{ path: "x", text: `${BOM}[package]\nname = "x"\n` }]), []);
++});
++
+ test("a manifest naming unsafe-code (cargo's spelling of unsafe_code) is caught by the line scans too (review C2b F1, L2)", () => {
+   // The workspace manifest: a line naming the lint in any table but as the forbid entry.
+   const t = (body) => `[workspace]\nmembers = []\n[workspace.lints.rust]\nunsafe_code = "forbid"\n${body}`;
+@@ -899,6 +939,12 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
+   for (const text of ['include = ["extra.toml"]\n[build]\ntarget-dir = "t"\n', 'include = "extra.toml"\n', '[[include]]\npath = "extra.toml"\n']) {
+     assert.deepEqual(config(text), ["c.toml has a key `include`: it loads a config file this check does not read"], text);
+   }
++  // The table's name quoted, which cargo 1.99.1 loads as [[include]] (review C2c N2's reader list: a probe's alias from
++  // the included file ran), in escapes too; a line inside an array that only looks like one is refused as well.
++  for (const text of ['[["include"]]\npath = "extra.toml"\n', "[[ 'include' ]]\npath = \"extra.toml\"\n", '[["incl\\u0075de"]]\npath = "x"\n', 'x = [\n[["include"]]\n]\n']) {
++    assert.deepEqual(config(text), ["c.toml has a key `include`: it loads a config file this check does not read"], text);
++  }
++  assert.deepEqual(config('[build]\njobs = 1\n[env]\nX = "[[include]]"\n["included"]\nx = 1\n'), [], "a string, and another name");
+   // C2R-7: a runner `true` makes cargo test exit 0 with no test run.
+   assert.deepEqual(cargoConfigProblems({ ...normal, CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER: "true" }, []), [
+     "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER in the environment runs the test binaries in cargo's place",
+@@ -908,11 +954,20 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
+   }
+ });
+ 
+-test("RUSTC_BOOTSTRAP, and a manifest's cargo-features or rustflags key, are refused; the spike's own manifests are not (review C2b F5)", () => {
++test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features or rustflags key, are refused; the spike's own manifests are not (review C2b F5, C2c N3)", () => {
+   // The reviewer's bypass: RUSTC_BOOTSTRAP=1, `cargo-features = ["profile-rustflags"]` and a profile's
+   // `rustflags = ["--cap-lints", "warn"]` compiled a planted allow and unsafe block under the forbid, no warning.
+   const bootstrap = "RUSTC_BOOTSTRAP in the environment unlocks unstable cargo and rustc features (a manifest's profile rustflags)";
+   for (const v of ["1", "npt_room", "-1", ""]) assert.deepEqual(cargoConfigProblems({ PATH: "/bin", RUSTC_BOOTSTRAP: v }, []), [bootstrap], v);
++  // Cargo's own test knob (review C2c N3): set to nightly, stable cargo 1.99.1 accepted `cargo-features` (cargo metadata
++  // exit 0; 101 without it). Refused whatever its value; a name that merely resembles it is not.
++  const channel =
++    "__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS in the environment sets the release channel cargo reads (nightly " +
++    "unlocks its unstable features: a manifest's cargo-features)";
++  for (const v of ["nightly", "dev", "stable", ""]) {
++    assert.deepEqual(cargoConfigProblems({ PATH: "/bin", __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS: v }, []), [channel], v);
++  }
++  assert.deepEqual(cargoConfigProblems({ __CARGO_TEST_CHANNEL_OVERRIDE: "nightly", CARGO_TEST_CHANNEL: "nightly", constructor: "x" }, []), []);
+   const features = (p) => `${p} has a key \`cargo-features\`: it unlocks unstable manifest keys (a profile's rustflags among them)`;
+   const flags = (p) =>
+     `${p} has a key \`rustflags\`: a manifest's rustflags reach rustc (\`--cap-lints warn\` there turns the workspace's forbid into a warning)`;
+@@ -981,6 +1036,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+     t,
+     (f) => {
+       f["Cargo.toml"] = `cargo-features = ["profile-rustflags"]\n${f["Cargo.toml"].replace('"forbid"', '"deny"')}`;
++      // A member's manifest too (review C2c N1: dropping depsStep's member-manifest loop had passed every test).
++      f["crates/room/Cargo.toml"] += '\n[profile.dev]\nrustflags = ["--cap-lints", "warn"]\n';
+       f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
+       f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
+       f["crates/room/src/evil.rs"] = UNSAFE_FN;
+@@ -1002,6 +1059,10 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+     ["workspaceLintProblems", 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit'],
+     ["exceptionLintProblems", `crates/tcpinfo/Cargo.toml has no [lints.clippy] disallowed_types: the workspace's is "deny"`],
+     ["manifestKeyProblems", "Cargo.toml has a key `cargo-features`: it unlocks unstable manifest keys (a profile's rustflags among them)"],
++    [
++      "manifestKeyProblems (a member)",
++      "crates/room/Cargo.toml has a key `rustflags`: a manifest's rustflags reach rustc (`--cap-lints warn` there turns the workspace's forbid into a warning)",
++    ],
+     ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
+     ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
+     ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],
+diff --git a/spikes/netcode-proof/crates/tcpinfo/src/linux.rs b/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
+index eb79231..6fc9cf6 100644
+--- a/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
++++ b/spikes/netcode-proof/crates/tcpinfo/src/linux.rs
+@@ -137,7 +137,11 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
+         // TCP; SIOCOUTQ below then goes to that socket's own family through sock_ioctl, still never to a device driver
+         // (a family with no answer gets ENOTTY, 0x5411 being no socket ioctl number: net/socket.c:1222-1232), and the
+         // AF_INET and AF_INET6 families answer through sk_ioctl, whose default copies one int (net/core/sock.c:
+-        // 4191-4199, :4207-4224), but what it counts is that protocol's, not TCP's.
++        // 4191-4199, :4207-4224), but what it counts is that protocol's, not TCP's. A family that answers 0x5411
++        // itself writes one int as well, by the ioctl's convention (an `int *` argument), so no more than `answ`:
++        // AF_UNIX's unix_ioctl and AF_PACKET's packet_ioctl each `put_user` it through an `int __user *` (v6.8
++        // net/unix/af_unix.c:3043-3045, net/packet/af_packet.c:4219-4223); the other families that answer it were not
++        // read here and are taken to keep that convention.
+         let rc = unsafe {
+             libc::getsockopt(
+                 fd.as_raw_fd(),
