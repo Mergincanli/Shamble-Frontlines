@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.2: APPROVED by the advisor (C1-C12) and by Mustafa, 2026-11-06; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-06 (after Mustafa's approval) Amsterdam
+- **Last update:** 2026-11-08 about 23:50 Amsterdam (U3c CLOSED on 768d00b; next U3d's plan)
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -499,6 +499,20 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **About 22:50 UTC: U3c CLOSED on the closing head 768d00ba7a77529b524fc9f6df90d6494f87abcc** (pushed). The advisor's
+  U3C-CLOSE conditions: (1) C2d's critic complete, no gap, no regression (u3c-fix4-review-c2d.md; 10 of 12 bites, the 2
+  missed are design details cargo itself refuses); (2) check.mjs 9/9 on the clean closing head (260 measured, 274
+  bites, 0 failed, 0 skips; deps 78 crate files + 1 config; refs 472; marks 81; self 43/43; redact 149 items, 0
+  findings) and GATE PASS --no-smoke (5a skipped: Chromium/Playwright mismatch; CI's smoke job runs it), the nine step
+  lines and the SHA in the report; (3)+(4) the report fixes and the plan's U6/U8 rows (941832e); (5) this checkpoint
+  pushed with the close; the cleanup ask goes to Mustafa (list below). Report: u3c-report.md (folded; the advisor's
+  rulings in advisor-u3c-plan.md). C2d also fixed one gap its builder found: a quoted `[["include"]]` config header,
+  which cargo 1.99.1 loads.
+  - **Next: U3d, the timing self-test** (u3-build-plan.md:45: ImpairSocket's expected excess lateness beyond 0.25 ms at
+    20,000 releases/s, inbound measured where quinn polls, p50/p99/p99.9/max, reported here, RS judges at R1; U3-Q9's
+    facts; the advisor's M1, M13, M14; plus the advisor's 2026-11-08 additions: steal read before and after each
+    self-test run, and ImpairSocket's up E over about 10 us in this container reported). PLAN FIRST
+    (.checkpoints/netcode-proof-test/u3d-plan.md), then the advisor.
 - **About 22:10 UTC: the condition-10 diagnostic DONE and committed (ecdeeb0)**:
   results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (identical to the raw output; redact 0). Split violations 0.
   Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the

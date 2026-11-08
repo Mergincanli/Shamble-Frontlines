@@ -89,3 +89,24 @@ Scripts: scratchpad c2d-review/ (c2c-review/ for the old ones).
   (:1148-1153) are true as the code reads; tomlScan's "every TOML file check.mjs reads goes through here" (:771-772)
   holds by the sweep. The workspace Cargo.toml comment (:83, "... test runner or RUSTC_BOOTSTRAP") is still true,
   incomplete (no channel override); it points to DEPS_CHECKED's comment for the rest. Not made false: a nit.
+- Final worktree run (22:39:10-22:40:30 UTC, after the scratch build: all 62 crate .rs touched again; df 4.9G):
+  check.mjs exit 0, 9/9, test 260 / 274, 0 failed, 0 skips (same counts), deps PASS, self 43/43, redact 10/10 149
+  items; output .gate/check-c2d-review-2.txt. Then (62 .rs touched again) cargo +1.99.1 clippy --locked --workspace
+  --all-targets -- -D warnings exit 0; the same with --all-features exit 0; cargo +1.99.1 fmt --all --check exit 0.
+  Worktree content unchanged (git diff --stat 3 files +140 -25; the three sha256s as at start; HEAD ecdeeb0).
+
+## Verdict: complete. N1-N5 done; every code fix bites when reverted; no gap, no regression, no false positive found.
+
+| Item | Claim | Proof (reverted in scratch / reproduced) | Gap |
+|---|---|---|---|
+| N2 | `[lints] workspace = true` in a multi-line string, basic or literal, inherits nothing | test :276 fails on mask -> raw and mask -> clean; plants deps FAIL; n2-e2e B deps FAIL (cargo: no lint flag) | none |
+| N2 sweep 1 | member name scan reads past `#` in a string | :276 fails on the raw revert | `clean` vs `mask` choice untested (nit, no bypass) |
+| N2 sweep 2 | `[["include"]]` and other quoted heads refused | :944-946 fails on the old regex; plants deps FAIL (quoted, tabs, after BOM) | single `[include]` untested (cargo's error) |
+| N1 | the member-manifest loop is proven wired | C2R-5 test fails on deletion (:1040, :1062-1065) | none |
+| N3 | channel override refused, any value; class named | :957-970 fails on 3 reverts; deps FAIL; no FP here or under rustup run | none |
+| N4 | one leading BOM read past in every TOML read | :681 fails on 2 reverts; plants FAIL; BOM on all 18 TOML files PASS | none |
+| N5 | non-inet families that answer 0x5411 write one int | af_unix.c:3043-3045, af_packet.c:4219-4223 match the fetched copies | others taken on convention (stated) |
+
+Ranked nits (none blocking): (1) check.mjs:477-480 the `clean` choice has no test; (2) check.mjs:861 a single
+`[include]` head has no test; (3) Cargo.toml:83 names RUSTC_BOOTSTRAP only.
+DONE

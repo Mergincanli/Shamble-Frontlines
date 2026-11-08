@@ -1,8 +1,10 @@
 # U3c report: the WebSocket delay layer, fix 1's send gate, the kernel-numbers crate, and the kernel cross-check
 
-Written 2026-11-08 (UTC). The advisor's U3C-CLOSE ruling (advisor-u3c-plan.md, "Side ruling: the condition-10
-diagnostic, UP-STAMP and U3c's close") sets five conditions. Parts marked **TBD** wait for the last tiny round (C2d) and
-the re-run on the closing head. For the advisor first, then Mustafa.
+Written 2026-11-08 (UTC); **U3c CLOSED on the closing head 768d00ba7a77529b524fc9f6df90d6494f87abcc**, the advisor's
+U3C-CLOSE ruling's five conditions met (advisor-u3c-plan.md, "Side ruling: the condition-10 diagnostic, UP-STAMP and
+U3c's close"): C2d's critic complete with no regression; check.mjs 9/9 and the gate re-run on that head (below); the
+report fixes and the plan's U6 and U8 rows (941832e); the checkpoint pushed with the close; the critics' scratch copies
+in Mustafa's cleanup ask. For the advisor first, then Mustafa.
 
 ## What happened
 - U3c built the WebSocket path's delay layer (DelayStream) on the Linux-faithful TCP model from U3a, fix 1's send gate
@@ -33,7 +35,7 @@ the re-run on the closing head. For the advisor first, then Mustafa.
 | f01d573 | C1b: regression R1 fixed; the pump's wake and panic gaps; split histograms pooled per process |
 | f6cd1d7 | C1c and C2c, the final small round: the pump's last test gaps (the no-spin bound, add_burst's wake, the panic condition both ways), shutdown's error after a failed pump; check.mjs's reader gaps (lint sub-tables and name forms, the scrubbed git environment, RUSTC_BOOTSTRAP and manifest rustflags refused, the CARGO_HOME and stderr wiring tests, the BPF SAFETY line) |
 | ecdeeb0 | The condition-10 diagnostic's output (evidence only) |
-| **TBD** | C2d: the last five nits of C2c's critic (N1-N5) |
+| 768d00b | C2d, the last tiny round (the closing head): a crate's lint inheritance read through the TOML mask (a `[lints]` hidden in a multi-line string no longer counts); a quoted `[["include"]]` config header refused (found in the builder's reader sweep: cargo 1.99.1 loads it); a member manifest's rustflags plant in the fixture; cargo's channel override refused beside RUSTC_BOOTSTRAP; a leading byte order mark read past; unacked_and_unsent's SAFETY comment for non-inet families that answer 0x5411 |
 
 ## Evidence
 | What | Result | Where |
@@ -44,8 +46,8 @@ the re-run on the closing head. For the advisor first, then Mustafa.
 | Lateness run 2 (after the fix pass, which carried R1; the VM had restarted) | down 0.155 / 0.628 / 3.483 / 11.281 ms, E 16.4 µs; up 0.206 / 1.398 / 2.906 / 10.641 ms, E 25.9 µs | results/u3c-lateness/lateness-run2-20261108T1509Z-after-fixpass.txt |
 | Interleaved A/B, unchanged pre-fix code against the fix pass | No consistent difference: pre E down 18.1 and 11.6 µs, up 28.2 and 26.7 µs; post down 16.2 and 22.1, up 27.9 and 38.2. The same pre-fix code gave E 3.5 / 6.5 µs in run 1: the rise after run 1 came with no code change | results/u3c-lateness/lateness-ab-{1..4}-*.txt (e317067) |
 | Condition-10 diagnostic: each release split into its parts, interleaved with ImpairSocket's own lateness run, twice; reported, not judged | The parts add up on every release (0 mismatches). **No single part holds the tail**: in each of the 20 largest releases listed, one part is the largest, usually by far (work in 9, clock in 7, hop in 4). Per part, p99 / p99.9 / max (runs 1 and 2): clock (the release thread's own OS wake) down 0.16-0.26 / 1.6-2.3 / 3.1-3.6 ms, up 0.20-0.23 / 2.1-2.3 / 3.2-6.8 ms; hop (tokio's wake of the pump and its lock wait) down 0.24-0.30 / 1.5-2.0 / 2.9-3.2 ms, up 0.27-0.32 / 1.9-2.0 / 2.7-3.8 ms; work down (the pump's work and S's TLS write) 0.12-0.15 / 1.05-1.41 / 3.1-6.5 ms, up (the pump's pass after its opening step plus the reader's turn: the split cannot yet tell them apart) 0.83-1.01 / 2.5-2.6 / 8.4-22.2 ms, the largest part's E in up (16.6-18.6 µs; the parts' E do not add). Totals: down E 11.5 / 16.6 µs, p99 0.62 / 0.95 ms; up E 26.8 / 35.4 µs, p99 1.44 / 1.77 ms. ImpairSocket as a scale check (its whole path, send to receive, at 10,000 per second each way): p99.9 1.25-4.24 ms, max 3.1-8.2 ms. **The advisor's verdicts:** C10-B APPROVE (the pumps are not moved off tokio before R1); UP-STAMP APPROVE with changes (a stamp at the reader's wake, built in U6); U3C-CLOSE APPROVE on five conditions | results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (ecdeeb0) |
-| check.mjs (fmt, clippy on both builds and wasm32, tests, deps, refs, marks, self, redact) | 9 of 9 at f6cd1d7: 260 tests in the measured build, 274 in the bites build, 0 failed, 0 skips; self 41 of 41; redact 0 findings. **On the closing head (after C2d): TBD, the nine step lines and the head SHA here** | the commit messages; the closing run TBD |
-| The gate | PASS at f6cd1d7 with `--no-smoke` (the container's Chromium does not match tools' Playwright, so the browser smoke run 5a cannot start here; CI's smoke job runs it). **On the closing head: TBD** | the commit messages; the closing run TBD |
+| check.mjs on the closing head 768d00b (clean tree, about 22:47 UTC) | **all 9 steps pass**: fmt PASS 0.3 s; clippy PASS 2.8 s (measured and bites builds linted); clippy-wasm32 PASS 0.4 s (both builds); test PASS 75.9 s (measured build 260 passed, 0 failed, 0 skips; bites build 274 passed, 0 failed, 0 skips); deps PASS 0.3 s (78 crate files and 1 cargo config read; the dependency rules, the forbid backstop and both exception tables, no cargo-features or rustflags key, no RUSTC_BOOTSTRAP or channel override); refs PASS (472 tracked files, none outside spikes/ references it); marks PASS (81 marks; drafts at 626df67; rows unchanged); self PASS (43 of 43); redact PASS (10 of 10 tests; 149 items, 0 findings) | this run (the same counts in the C2d critic's two runs in its copy) |
+| The gate on the closing head 768d00b | **GATE PASS** with `--no-smoke`: checks 1-4 and 5b-5d pass (symbols +0 -0); 5a, the browser smoke run, is skipped because the container's Chromium does not match tools' Playwright, and CI's smoke job runs it | this run |
 
 Memory per DelayStream connection: 309,583 B, plus 1,350,400 B once per process for the pooled split histograms.
 
@@ -57,14 +59,21 @@ Memory per DelayStream connection: 309,583 B, plus 1,350,400 B once per process 
 | Re-review of the fix pass (u3c-fix-review-result.txt) | two critics, each verified | gaps listed; **one regression of our own (R1)**: a down record released during the pump's up-loop step could wait up to a tick |
 | Last round (b5e4043, f01d573) | two builders, two critics | R1 fixed and pinned by a test that fails when the fix is reverted; the compiler backstop landed; critics: code APPROVE, small test gaps |
 | Final small round (wf_5c9f078a-da1; f6cd1d7) | two builders, two critics | C1c: COMPLETE (APPROVE), each of its 4 bites caught (the spin bite: 158,276 pump runs against a bound of 2,000; fixed code 112-141 even under 16 busy loops). C2c: no regression, 15 of 15 revert bites caught; five small gaps left (one low: a crate's `[lints] workspace = true` hidden in a multi-line string; four nits) |
-| Last tiny round C2d (wf_b13b9984-6bc) | one builder, one critic | **TBD** |
+| Last tiny round C2d (wf_b13b9984-6bc; 768d00b) | one builder, one critic | The critic: **complete, no gap, no regression**. 10 of 12 revert bites caught; the 2 missed are design details that open no way round (cargo itself refuses those forms), named below. The builder's sweep found and fixed one more gap (a quoted `[["include"]]` config header, which cargo loads); the critic's bite catches its revert |
 
 ## Known limits (stated, not fixed)
 - check.mjs's dependency step guards against an accidental relaxation of the unsafe-code and determinism lints; review
   is the wall against a deliberate one. Out of its reach: a cargo config's [env] (CLIPPY_ARGS, or any variable for
   rustc), a build script's rustc-env output, a RUSTC_WRAPPER program (left allowed for sccache), a rust-toolchain.toml
   path override or nightly channel, the lexer's known misreads; a future wasm32 test runner would be refused by the
-  runner refusal. **TBD: what C2d adds or names.**
+  runner refusal. From C2d's critic: the environment refusal covers RUSTC_BOOTSTRAP and cargo's channel override only
+  (any other way to unlock unstable features on the pinned stable toolchain, a patched cargo or rustc included, is
+  out of reach); two design details have no test of their own (the member manifests' unsafe_code name scan reads the
+  comment-stripped text, not the mask; tomlHeaderHeads refuses a single-bracket `[include]`), and neither opens a way
+  round, since cargo refuses those forms itself; three readers fail closed by design (a crate's lint inheritance read
+  only in its bare spelling; an array line that only looks like an `[include]` header refused). N5's SAFETY line rests
+  on AF_UNIX's and AF_PACKET's v6.8 sources only; the other families are assumed to follow the ioctl's `int *`
+  convention, and the comment says so.
 - DelayStream sits above TLS, so L2 never loses the TCP handshake or the TLS flights: it cannot measure the modelled
   reconnect (the harness skeptic's H17).
 - This container is not evidence for a microsecond-level bar: lateness p99.9 up to about 3.7 ms and maxima up to about
@@ -94,7 +103,10 @@ Memory per DelayStream connection: 309,583 B, plus 1,350,400 B once per process 
   tokio only for a miss in the hop. Also the netem srtt read (C12 (f)).
 
 ## Decisions needed
-- None for Mustafa. U3c's close is the advisor's (U3C-CLOSE: APPROVE on five conditions; the last two wait for C2d).
+- None for Mustafa. U3c's close was the advisor's (U3C-CLOSE: APPROVE on five conditions, all met).
 
 ## For Mustafa
-1. **TBD:** the cleanup ask, once (finished agent copies, the critics' scratch copies, and build caches; sizes listed).
+1. The cleanup ask, once (his standing rule after each unit): the finished agent copies, the critics' scratch copies
+   and the old build caches, about 15.5 GB in all (the list and sizes are in the checkpoint's Running work), by the
+   method he approved: caches with `cargo clean --target-dir`, each dirty copy's leftovers committed to its own local
+   branch first, then a plain `git worktree remove`.
