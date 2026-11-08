@@ -502,6 +502,23 @@
   - **Still kept for U3c's fix pass:** .gate/u3v3-harness-check-target (A), u3v3-model-target (B) and u3c-review-target.
     After U3c closes: clean them, and the U3c worktrees (wf_87550c07-bbd-1/-2, agent-a3dfcb36e3c15ab56,
     agent-a7fafe27dcdee96cd), per his rule, asking once.
+- **The U3c review round is RE-RUNNING** (workflow wf_8f2da9fc-8fa resumed about 09:54 UTC as task wxvbx8lyq). The
+  first run finished while the disk was full, so its journal results and output file (0 B) were lost; only the
+  completion notice survived. The re-run's notes are u3c-review-{rust,netcode,security,test}.md.
+  - **The rust-reviewer's first-run findings, from the notice, for comparison:**
+    - F1 (medium): DelayStream::add_burst lets start+len overflow, so due()'s `x + origin` wraps, giving a release-build
+      spin or a debug panic. Not reachable from peers today; fix with checked_add and InvalidInput, plus saturating
+      adds in due() and record_return.
+    - F7 (low): current() and add_burst can consume the ACK event that reopens the pump's up read gate without waking
+      the pump. Fix: wake on any dispatched event.
+    - F3 (low): Pump::poll holds the Conn mutex across S's poll_write/read/flush/shutdown, so rustls and syscalls run
+      under the lock. A lead for C10's tail. Fix: copy out, unlock, poll S, relock to commit.
+    - F2 (low): current() wakes under the lock.
+    - F9 (low): a pump panic is swallowed as a clean EOF. Set failed in Pump::drop when panicking.
+    - F6 (low): header_numbers blocks up to 1 s on the clock's Condvar. Document it, or have the clock publish slack.
+    - F8 (low): the gate's four inputs come from four lock acquisitions. Add gate_inputs() under one current().
+    - F4 and F5 (nits).
+    - The rust verifier had confirmed some of these before the notice; its verdict was lost.
 - **U3c EVIDENCE RUNS DONE** (about 00:55 UTC 2026-11-08; committed 1a9fd73 and 989118e):
   - **Kernel cross-check PASS (final)**, out-20261108T004723Z.
     - RACK p50: kernel 33.344 ms (166 episodes), model 33.458 ms (5,672).
