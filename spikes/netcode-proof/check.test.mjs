@@ -273,6 +273,24 @@ test("unsafe_code: a manifest that sets it or drops the workspace lints fails", 
   );
 });
 
+test("a crate's `[lints] workspace = true` inside a multi-line string inherits nothing, basic or literal (review C2c N2)", () => {
+  // The reviewer's plant: npt-sim's two lines moved into a string under [package.metadata.npt]; cargo then gave rustc no
+  // lint flag at all (a shebang-desynced unsafe block compiled) while the deps step passed.
+  const dropped = ["crates/sim/Cargo.toml does not inherit the workspace lints ([lints] workspace = true)"];
+  for (const q of ['"""', "'''"]) {
+    const p = unsafeWith((f) => {
+      f["crates/sim/Cargo.toml"] = f["crates/sim/Cargo.toml"].replace("[lints]\nworkspace = true\n", `[package.metadata.npt]\nnote = ${q}\n[lints]\nworkspace = true\n${q}\n`);
+    });
+    assert.deepEqual(p, dropped, q);
+  }
+  // Read as cargo reads it: a comment after either line and CRLF line ends still inherit.
+  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] = '[package]\r\nname = "npt-sim"\r\n\r\n[lints] # all\r\nworkspace = true # inherited\r\n')), []);
+  // The name scan reads past a `#` inside a string (no comment there), as cargo does.
+  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] += '[package.metadata.npt]\nnote = { a = "#", unsafe_code = 1 }\n')), [
+    "crates/sim/Cargo.toml sets unsafe_code",
+  ]);
+});
+
 test("unsafe_code: npt-tcpinfo never relaxes it crate-wide, in another file, or by a missing allow", () => {
   const wide = unsafeWith((f) => {
     f["crates/tcpinfo/src/lib.rs"] = `#![allow(unsafe_code)]\n${DENY}mod linux;\n`;
@@ -660,6 +678,28 @@ test("lints given as a dotted key or an inline table under another header are re
   assert.deepEqual(workspaceLintProblems(t('[workspace.metadata]\nlints = "lints.rust.unsafe_code"\nnote = { lints = 1 }\n')), []);
 });
 
+test("one byte order mark before line 1 is read past, as cargo 1.99.1 reads it (review C2c N4)", () => {
+  const BOM = String.fromCharCode(0xfeff);
+  // The reviewer's plant: a lint table of a tool the workspace does not name (rustdoc), as a dotted key on line 1 after
+  // a BOM; cargo metadata accepted it, and the deps step had passed.
+  const plant = 'lints.rustdoc.broken-intra-doc-links = "allow"';
+  assert.deepEqual(tcpinfoLints((t) => `${BOM}${plant}\n${t}`).problems, [
+    `${TCPINFO_MANIFEST}:1 gives lints as a dotted key or an inline table, which this check does not read`,
+  ]);
+  // A key of a lint table on line 1 is read as written too: at the workspace manifest's root, a dotted key.
+  assert.deepEqual(workspaceLintProblems(`${BOM}workspace.lints.rust.unsafe_code = "forbid"\n[workspace]\nmembers = []\n`), [
+    "Cargo.toml:1 gives lints as a dotted key or an inline table, which this check does not read",
+    'Cargo.toml:1 names unsafe_code other than as "forbid" in [workspace.lints.rust]',
+    'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit',
+  ]);
+  // No false positive: the spike's manifests with a BOM read as they do without.
+  const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+  assert.deepEqual(workspaceLintProblems(`${BOM}${ws}`), []);
+  assert.deepEqual(tcpinfoLints((t) => `${BOM}${t}`).problems, []);
+  assert.deepEqual(unsafeWith((f) => (f["crates/sim/Cargo.toml"] = `${BOM}${f["crates/sim/Cargo.toml"]}`)), []);
+  assert.deepEqual(manifestKeyProblems([{ path: "x", text: `${BOM}[package]\nname = "x"\n` }]), []);
+});
+
 test("a manifest naming unsafe-code (cargo's spelling of unsafe_code) is caught by the line scans too (review C2b F1, L2)", () => {
   // The workspace manifest: a line naming the lint in any table but as the forbid entry.
   const t = (body) => `[workspace]\nmembers = []\n[workspace.lints.rust]\nunsafe_code = "forbid"\n${body}`;
@@ -899,6 +939,12 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
   for (const text of ['include = ["extra.toml"]\n[build]\ntarget-dir = "t"\n', 'include = "extra.toml"\n', '[[include]]\npath = "extra.toml"\n']) {
     assert.deepEqual(config(text), ["c.toml has a key `include`: it loads a config file this check does not read"], text);
   }
+  // The table's name quoted, which cargo 1.99.1 loads as [[include]] (review C2c N2's reader list: a probe's alias from
+  // the included file ran), in escapes too; a line inside an array that only looks like one is refused as well.
+  for (const text of ['[["include"]]\npath = "extra.toml"\n', "[[ 'include' ]]\npath = \"extra.toml\"\n", '[["incl\\u0075de"]]\npath = "x"\n', 'x = [\n[["include"]]\n]\n']) {
+    assert.deepEqual(config(text), ["c.toml has a key `include`: it loads a config file this check does not read"], text);
+  }
+  assert.deepEqual(config('[build]\njobs = 1\n[env]\nX = "[[include]]"\n["included"]\nx = 1\n'), [], "a string, and another name");
   // C2R-7: a runner `true` makes cargo test exit 0 with no test run.
   assert.deepEqual(cargoConfigProblems({ ...normal, CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER: "true" }, []), [
     "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER in the environment runs the test binaries in cargo's place",
@@ -908,11 +954,20 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
   }
 });
 
-test("RUSTC_BOOTSTRAP, and a manifest's cargo-features or rustflags key, are refused; the spike's own manifests are not (review C2b F5)", () => {
+test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features or rustflags key, are refused; the spike's own manifests are not (review C2b F5, C2c N3)", () => {
   // The reviewer's bypass: RUSTC_BOOTSTRAP=1, `cargo-features = ["profile-rustflags"]` and a profile's
   // `rustflags = ["--cap-lints", "warn"]` compiled a planted allow and unsafe block under the forbid, no warning.
   const bootstrap = "RUSTC_BOOTSTRAP in the environment unlocks unstable cargo and rustc features (a manifest's profile rustflags)";
   for (const v of ["1", "npt_room", "-1", ""]) assert.deepEqual(cargoConfigProblems({ PATH: "/bin", RUSTC_BOOTSTRAP: v }, []), [bootstrap], v);
+  // Cargo's own test knob (review C2c N3): set to nightly, stable cargo 1.99.1 accepted `cargo-features` (cargo metadata
+  // exit 0; 101 without it). Refused whatever its value; a name that merely resembles it is not.
+  const channel =
+    "__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS in the environment sets the release channel cargo reads (nightly " +
+    "unlocks its unstable features: a manifest's cargo-features)";
+  for (const v of ["nightly", "dev", "stable", ""]) {
+    assert.deepEqual(cargoConfigProblems({ PATH: "/bin", __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS: v }, []), [channel], v);
+  }
+  assert.deepEqual(cargoConfigProblems({ __CARGO_TEST_CHANNEL_OVERRIDE: "nightly", CARGO_TEST_CHANNEL: "nightly", constructor: "x" }, []), []);
   const features = (p) => `${p} has a key \`cargo-features\`: it unlocks unstable manifest keys (a profile's rustflags among them)`;
   const flags = (p) =>
     `${p} has a key \`rustflags\`: a manifest's rustflags reach rustc (\`--cap-lints warn\` there turns the workspace's forbid into a warning)`;
@@ -981,6 +1036,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
     t,
     (f) => {
       f["Cargo.toml"] = `cargo-features = ["profile-rustflags"]\n${f["Cargo.toml"].replace('"forbid"', '"deny"')}`;
+      // A member's manifest too (review C2c N1: dropping depsStep's member-manifest loop had passed every test).
+      f["crates/room/Cargo.toml"] += '\n[profile.dev]\nrustflags = ["--cap-lints", "warn"]\n';
       f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
       f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
       f["crates/room/src/evil.rs"] = UNSAFE_FN;
@@ -1002,6 +1059,10 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
     ["workspaceLintProblems", 'Cargo.toml has no [workspace.lints.rust] unsafe_code = "forbid" for its crates to inherit'],
     ["exceptionLintProblems", `crates/tcpinfo/Cargo.toml has no [lints.clippy] disallowed_types: the workspace's is "deny"`],
     ["manifestKeyProblems", "Cargo.toml has a key `cargo-features`: it unlocks unstable manifest keys (a profile's rustflags among them)"],
+    [
+      "manifestKeyProblems (a member)",
+      "crates/room/Cargo.toml has a key `rustflags`: a manifest's rustflags reach rustc (`--cap-lints warn` there turns the workspace's forbid into a warning)",
+    ],
     ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
     ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
     ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],

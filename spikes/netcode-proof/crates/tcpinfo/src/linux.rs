@@ -137,7 +137,11 @@ pub fn unacked_and_unsent(fd: BorrowedFd<'_>) -> io::Result<u32> {
         // TCP; SIOCOUTQ below then goes to that socket's own family through sock_ioctl, still never to a device driver
         // (a family with no answer gets ENOTTY, 0x5411 being no socket ioctl number: net/socket.c:1222-1232), and the
         // AF_INET and AF_INET6 families answer through sk_ioctl, whose default copies one int (net/core/sock.c:
-        // 4191-4199, :4207-4224), but what it counts is that protocol's, not TCP's.
+        // 4191-4199, :4207-4224), but what it counts is that protocol's, not TCP's. A family that answers 0x5411
+        // itself writes one int as well, by the ioctl's convention (an `int *` argument), so no more than `answ`:
+        // AF_UNIX's unix_ioctl and AF_PACKET's packet_ioctl each `put_user` it through an `int __user *` (v6.8
+        // net/unix/af_unix.c:3043-3045, net/packet/af_packet.c:4219-4223); the other families that answer it were not
+        // read here and are taken to keep that convention.
         let rc = unsafe {
             libc::getsockopt(
                 fd.as_raw_fd(),
