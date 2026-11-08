@@ -1325,3 +1325,136 @@ fn no_two_packets_on_a_path_arrive_at_the_same_instant() {
     let arrivals: Vec<u64> = m.paths[0].queue.iter().map(|pk| pk.arrival_ns).collect();
     assert_eq!(arrivals, vec![1, 2, 3]);
 }
+
+/// The kernel cross-check's knob (u3c-plan.md 1.6): the profile's loss on one direction only. With loss from end 0,
+/// end 1's transmissions (its data and its acknowledgements) are never lost and end 0's are, at the profile's rate
+/// (4-sigma band), as with loss both ways, where end 1 loses too. The fate words are drawn either way.
+#[test]
+fn loss_from_one_end_spares_the_other() {
+    let p = Profile::p2();
+    let feed = |m: &mut TcpModel| {
+        let mut feeds = [
+            Feed {
+                end: 0,
+                size: SNAP,
+                next: TICK,
+                stop: 3_000 * TICK,
+            },
+            Feed {
+                end: 1,
+                size: INPUT,
+                next: TICK,
+                stop: 3_000 * TICK,
+            },
+        ];
+        run(m, &mut feeds, 3_000 * TICK + 20 * SEC);
+    };
+    let mut one = TcpModel::new(&p, 5, 0).with_loss_from(0);
+    feed(&mut one);
+    let mut both = TcpModel::new(&p, 5, 0);
+    feed(&mut both);
+    let (c0, c1) = (one.counters(0), one.counters(1));
+    assert_eq!(
+        c1.lost_profile + c1.pure_acks_lost,
+        0,
+        "end 1 loses nothing"
+    );
+    assert!(
+        c0.lost_profile > 20,
+        "end 0 loses at the profile's rate: {}",
+        c0.lost_profile
+    );
+    // End 0's drawn losses sit in the same 4-sigma band as with loss both ways (its rate is the profile's).
+    let lost = c0.lost_profile;
+    assert!(
+        in_band(lost, c0.transmissions),
+        "{lost} of {}",
+        c0.transmissions
+    );
+    let both0 = both.counters(0);
+    assert!(in_band(both0.lost_profile, both0.transmissions));
+    assert!(
+        both.counters(1).lost_profile > 0,
+        "loss both ways reaches end 1"
+    );
+}
+
+/// The model side of the kernel cross-check (u3c-plan.md 1.6, S13; spikes/netcode-proof/results/u3c-kernel-check/
+/// run.sh runs it after the kernel runs): the scout's pattern on the model, 200 B messages every 33,333,333 ns, one
+/// direction, the profile's 2 % loss on the data direction only (the iptables rule drops client-to-server packets of
+/// the probe's port), no jitter, at the loopback's measured RTT (NPT_KC_RTT_NS), NPT_KC_MESSAGES messages a run
+/// (3,000) for NPT_KC_RUNS seeds (100). Prints one `KCMODEL {json}` line per run: the run's median delay, every
+/// message more than 1 ms above it (index, delay), and the model's own repair counts; compare.py applies the stall
+/// rule written in run.sh's header to these and to the kernel's runs alike.
+#[test]
+#[ignore]
+fn kernel_cross_check_model() {
+    let env = |k: &str, d: u64| {
+        std::env::var(k)
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(d)
+    };
+    let rtt = env("NPT_KC_RTT_NS", 100_000);
+    let n = env("NPT_KC_MESSAGES", 3_000) as usize;
+    let runs = env("NPT_KC_RUNS", 100);
+    const SIZE: u64 = 200;
+    let p = Profile {
+        name: "KC",
+        rtt_ns: rtt,
+        jitter_ns: 0,
+        loss_ppm: 20_000,
+        bursts_ns: Vec::new(),
+        reorder: npt_l1::ReorderStep::OFF,
+    };
+    for seed in 1..=runs {
+        let mut m = TcpModel::new(&p, seed, 0).with_loss_from(0);
+        let mut release = vec![u64::MAX; n];
+        let (mut next, mut written) = (0usize, 0usize);
+        let end = n as u64 * TICK + 60 * SEC;
+        loop {
+            let tw = (written < n).then(|| written as u64 * TICK);
+            let t = match (tw, m.next_event()) {
+                (Some(a), Some(b)) => Some(a.min(b)),
+                (a, b) => a.or(b),
+            };
+            let Some(t) = t.filter(|&t| t <= end) else {
+                break;
+            };
+            m.advance(t);
+            let d = m.delivered(1);
+            while next < n && d >= (next as u64 + 1) * SIZE {
+                release[next] = t;
+                next += 1;
+            }
+            if tw == Some(t) {
+                m.write(0, SIZE, t);
+                written += 1;
+            }
+        }
+        assert_eq!(next, n, "seed {seed}: every message delivered");
+        let delays: Vec<u64> = (0..n).map(|k| release[k] - k as u64 * TICK).collect();
+        let mut sorted = delays.clone();
+        sorted.sort_unstable();
+        let p50 = sorted[n.div_ceil(2) - 1];
+        let late: Vec<String> = delays
+            .iter()
+            .enumerate()
+            .filter(|&(_, &d)| d > p50 + MS)
+            .map(|(k, d)| format!("[{k},{d}]"))
+            .collect();
+        let c = m.counters(0);
+        println!(
+            "KCMODEL {{\"seed\":{seed},\"rtt_ns\":{rtt},\"n\":{n},\"p50_ns\":{p50},\"late\":[{}],\"segments\":{},\
+             \"first_lost\":{},\"stalls\":{},\"repairs\":[{},{},{}],\"max_backoff\":{}}}",
+            late.join(","),
+            c.segments,
+            c.first_lost,
+            c.stalls,
+            c.repairs_rack,
+            c.repairs_probe,
+            c.repairs_timeout,
+            c.max_backoff
+        );
+    }
+}

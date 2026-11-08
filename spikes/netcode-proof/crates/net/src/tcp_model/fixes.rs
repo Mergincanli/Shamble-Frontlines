@@ -161,11 +161,10 @@ fn client_cfg(o: &Opts) -> TcpConfig {
     }
 }
 
-/// The adaptive budget: snapshots for 1.5 round trips plus one, at least 3.
+/// The adaptive budget: snapshots for 1.5 round trips plus one, at least 3 (100 ms before the first sample), through
+/// the one shipped definition the WebSocket server's gate uses too (`ws_gate::snapshot_budget`; u3c-plan.md 1.3 (e)).
 fn adaptive_limit(m: &TcpModel) -> u64 {
-    let srtt = m.srtt_ns(0).unwrap_or(100 * MS);
-    let n = (3 * srtt).div_ceil(2 * TICK) + 1;
-    n.max(3) * SNAP
+    crate::ws_gate::snapshot_budget(m.srtt_ns(0), TICK) * SNAP
 }
 
 /// The silence that starts a reconnect, from the client's own RTT (100 ms before its first sample).
@@ -773,8 +772,17 @@ impl<'a> Sim<'a> {
         }
         let (adaptive, scale) = (self.o.adaptive, self.o.budget_scale);
         let c = &mut self.conns[self.server_cur];
-        let fits = !adaptive || c.m.outstanding(0) + SNAP <= scale * adaptive_limit(&c.m);
-        if takeovers == 0 && c.owed[0] == 0 && c.m.free_budget(0) >= SNAP && fits {
+        // Fix 1's gate is the shipped one (W22's three conditions in ws_gate::may_write, N from snapshot_budget), so the
+        // harness and the WebSocket server cannot drift (the critic's W7); without the adaptive limit the budget
+        // condition is off (an unbounded N). The room's own rule stays here: no snapshot on a tick with a takeover.
+        let n = if adaptive {
+            scale * crate::ws_gate::snapshot_budget(c.m.srtt_ns(0), TICK)
+        } else {
+            u64::MAX
+        };
+        if takeovers == 0
+            && crate::ws_gate::may_write(c.m.outstanding(0), c.owed[0], c.m.free_budget(0), SNAP, n)
+        {
             c.m.write(0, SNAP, t);
             self.out.written += 1;
             let end = c.m.ends[0].snd.write_seq;
@@ -1460,16 +1468,8 @@ fn multi_burst_rows(spacing: u64, shapes: &[(u64, u64)]) {
                 })
                 .collect();
             println!("    by burst (p50/p99/max): {}", marks.join("; "));
-            for (bar, n_cb) in [(three_part(480), 480), (three_part(1_440), 1_440)] {
-                let c = bar.counts(&all);
-                let s = bar.counts(&single);
-                println!(
-                    "    {}: a run of these passes {:.3}, of single bursts {:.3}",
-                    bar.describe(n_cb),
-                    pass(n_cb, bar, rates(c)),
-                    pass(n_cb, bar, rates(s))
-                );
-            }
+            // No pass lines here: the round-2 three-part bar these printed is gone (the note after `two_part`), and the
+            // WebSocket bar's chance on whole runs is the run-structured bound's (advisor-ws-docs-r2.md:383).
         }
     }
 }
@@ -1525,16 +1525,12 @@ fn two_part(n: usize, y_ms: u64, z_ms: u64) -> Bar {
     }
 }
 
-/// The stats skeptic's three-part bars (S11, S12): half within 0.6 s, at most 1 (480) or 3 (1,440) over 1.2 s, none
-/// over 2.0 s.
-fn three_part(n: usize) -> Bar {
-    Bar {
-        median: Some(600 * MS),
-        y: 1_200 * MS,
-        k: if n <= 480 { 1 } else { 3 },
-        z: 2_000 * MS,
-    }
-}
+// Removed at U3c (u3c-plan.md 1.11, C15; the stats skeptic's F11 and B3, u3-verify3-stats.md:133 and :219):
+// `three_part`, round 2's bar (half within 0.6 s, at most 1 or 3 over 1.2 s, none over 2.0 s). Harness v3's
+// recommended row fails it with certainty (p50 654 ms > 600 ms), so the lineage table's and the tail's three-part lines
+// printed 0.000 for a correct build and evaluated nothing that was chosen. The WebSocket bar now comes from
+// `ws_bar_fix1`'s model bound (fix 1 alone, Mustafa's WS-SCOPE 2026-11-07) and, on whole runs, from the run-structured
+// bound (advisor-ws-docs-r2.md:383), so no fixed bar is kept here to go stale again.
 
 fn rates(c: [u64; 4]) -> [f64; 4] {
     let n = c.iter().sum::<u64>() as f64;
@@ -1715,7 +1711,6 @@ fn ws_limit_tail() {
             [(800, 1_000), (1_000, 1_500), (1_000, 2_000)]
                 .into_iter()
                 .map(move |(y, z)| (n, two_part(n, y, z)))
-                .chain(std::iter::once((n, three_part(n))))
         })
         .collect();
     for (b, &(n, bar)) in bars.iter().enumerate() {
@@ -1856,6 +1851,71 @@ const PINNED_RECOMMENDED: (u64, [u64; 4], [u64; 4]) = (
     [467, 77, 32, 10],
     [5_998, 3_999, 946, 1_056],
 );
+
+/// The proof test's own row, fix 1 alone (Mustafa's WS-SCOPE, 2026-11-07; one of the WS-LIMIT bite rows), pinned the
+/// same way over sets 0 to 5 (the stats skeptic's B5, u3-verify3-stats.md:225: the pin covered the recommended row
+/// only, so a regression in a bite row passed CI; u3c-plan.md 1.11, C15). Fix 1 alone never reconnects, so its side
+/// counts are 0. A pin, not a goal.
+#[test]
+fn the_fix_1_row_is_pinned_at_b1() {
+    let sets = sweep_sets(configs()[1].1, SETS);
+    let all = pooled(&sets);
+    let counts = [800, 1_000, 1_200, 1_500].map(|ms| over(&all, ms * MS));
+    let sum = |f: fn(&SetOut) -> u64| sets.iter().map(f).sum::<u64>();
+    let attempts = [
+        sum(|s| s.attempts),
+        sum(|s| s.cancels),
+        sum(|s| s.takeovers),
+        sum(|s| s.takeovers_after),
+    ];
+    assert_eq!(
+        (fnv(&all), counts, attempts),
+        PINNED_FIX1,
+        "{}",
+        summary(&all)
+    );
+}
+
+/// Fix 1 alone: the hash of the sorted recoveries; the counts over 0.8, 1.0, 1.2 and 1.5 s; the side counts. Taken at
+/// U3c (6,000 phases: p50 653 ms, p99 2,172 ms, max 5,160 ms; consistent with ws_bar_fix1's 600,000: 654 / 2,164).
+const PINNED_FIX1: (u64, [u64; 4], [u64; 4]) =
+    (0xb6f3_4ac0_188a_2727, [675, 523, 429, 228], [0, 0, 0, 0]);
+
+/// Mechanism test (e) (u3c-plan.md 1.4, C9): the harness's adaptive limit is the shipped `ws_gate::snapshot_budget`
+/// (one definition: `adaptive_limit` calls it), and that gives the same N as fixes.rs's rule as it stood before U3c
+/// (ceil(3 x srtt / (2 x TICK)) + 1, at least 3, 100 ms before a sample; written out here as the reference) over every
+/// 7th µs of srtt to 3 s, with no sample, and at the srtt of real models settled at P0 to P4.
+#[test]
+fn e_the_adaptive_limit_is_the_shipped_snapshot_budget() {
+    use crate::ws_gate::snapshot_budget;
+    let before = |srtt: Option<u64>| {
+        let s = srtt.unwrap_or(100 * MS);
+        ((3 * s).div_ceil(2 * TICK) + 1).max(3)
+    };
+    for us in (0..=3_000_000u64).step_by(7) {
+        let s = Some(us * 1_000);
+        assert_eq!(snapshot_budget(s, TICK), before(s), "{us} µs");
+    }
+    assert_eq!(snapshot_budget(None, TICK), before(None));
+    for p in [
+        Profile::p0(),
+        Profile::p1(),
+        Profile::p2(),
+        Profile::p3(),
+        Profile::p4(),
+    ] {
+        let mut m = TcpModel::new(&p, 7, 0);
+        assert_eq!(adaptive_limit(&m), 6 * SNAP, "no sample yet");
+        for k in 1..=90 {
+            m.advance(k * TICK);
+            m.write(0, SNAP, k * TICK);
+        }
+        m.advance(4 * SEC);
+        let srtt = m.srtt_ns(0);
+        assert!(srtt.is_some(), "{}: a sample", p.name);
+        assert_eq!(adaptive_limit(&m), before(srtt) * SNAP, "{}", p.name);
+    }
+}
 
 #[test]
 fn the_joint_chance_matches_brute_force_and_its_closed_form() {

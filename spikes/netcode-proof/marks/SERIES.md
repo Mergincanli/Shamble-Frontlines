@@ -396,8 +396,8 @@ reorder shares under the existing names `reorder_up_permille`, `reorder_down_per
 test checks every field it writes against this file. `base_rtt_ns` and `reorder_step_permille` (rows above) are
 written by `ImpairSocket` too.
 
-**Carried to U3c (M15):** the TCP model's rows (the model's name and version, and S12's stall and repair counts) are
-not here yet: DelayStream, built at U3c, writes them, and U3c adds their rows to this file.
+**Done at U3c (M15):** the TCP model's rows (the model's name and version, and S12's stall and repair counts) are in
+the DelayStream section below, which DelayStream writes.
 
 **The L2 probe's writing binary (PM-0001-3's `second.s.probe_*` rows above; proposed at U3b, built at U6):**
 npt-server's binary in a probe mode (process `probe`), on a free slot port of RS with its own `ImpairSocket`, writes
@@ -485,6 +485,154 @@ directions, and each round trip as the echo's release minus the original send); 
 | `header.params.l2_shaper_queue_bytes` | bytes | npt-net (ImpairSocket) | its drop-tail queue counting payload + 28 B per datagram: -23's 5,920 B (4 full datagrams of 1,480 B), -24's max(200 ms at the rate, 5,920 B) (the advisor's ruling, M19). The run writes it again as `throttle_queue_bytes` or the `bottleneck_*` rows above |
 | `header.params.l2_shaper_queue_ns` | ns | npt-net (ImpairSocket) | the same queue as time at the shaper's rate (`bottleneck_queue_ns` on -24's runs) |
 | `header.params.l2_udp_block` | flag | npt-net (ImpairSocket) | 1 when the default peer starts blocked (PM-0001-29) |
+
+## DelayStream (U3c, the WebSocket fallback's wrapper; the advisor's M15, u3c-plan.md 1.7): names no mark reads yet
+
+What `DelayStream` measures, under the names its own code reports (npt-net's `l2::delay_names`, checked against README
+§1's rule and against this file by unit tests). Directions are the TCP model's: `down` is what RS sends (model end 0),
+`up` what the client sends (end 1). Every stamp is on DelayStream's clock (`DelayStream::now_ns`). The rows are per
+connection; npt-server's writer merges its WebSocket connections into the run's records (counts summed, maxima and
+levels the largest, lateness histograms merged: U6).
+
+**The `ws_summary` event** is written once per connection at its end. Its fields: every per-second name below over the
+connection's life (the counts as totals, the maxima as they stand, `ws_<dir>_held_bytes` as at the end with
+`ws_<dir>_held_max_bytes` the connection's largest, the lateness over every sample), then the four rows of its own
+table.
+
+**The `burst_return` event**: DelayStream's part of advisor-ws-docs-r2.md:379 (3) per WebSocket client per burst
+(u3c-plan.md C8), recorded as the model passes each burst's end; the room's fields (offset_ns, tick_phase_ns,
+budget_bytes, snap_bytes) are U6's.
+
+**Carried to U6:** the per-second merge across connections; whether the plain path (no wrapper) writes `ws_wrapper` 0
+and which of these names it can write from TCP_INFO and SIOCOUTQ.
+
+### Per second (`second.v`)
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `second.v.ws_down_segments_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): data segments formed |
+| `second.v.ws_down_transmissions_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): data transmissions, resends included |
+| `second.v.ws_down_lost_profile_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): data transmissions the profile's loss draw dropped |
+| `second.v.ws_down_lost_burst_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): data transmissions sent inside a burst (the profile's or one added after the wrap), all lost |
+| `second.v.ws_down_first_lost_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): segments whose first transmission was lost |
+| `second.v.ws_down_pure_acks_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): pure acknowledgements this end sent (for the other direction's data) |
+| `second.v.ws_down_pure_acks_lost_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): of those, lost |
+| `second.v.ws_down_repairs_rack_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): resends by RACK (S5) |
+| `second.v.ws_down_repairs_probe_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): resends by the tail-loss probe (S6) |
+| `second.v.ws_down_repairs_timeout_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): resends by the retransmission timeout (S7) |
+| `second.v.ws_down_backoff_max_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): the RTO's largest backoff (doublings) so far on this connection: a maximum, written as it stands |
+| `second.v.ws_down_stalls_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): segments first received later than their first transmission's drawn arrival (S12's stalls) |
+| `second.v.ws_down_stall_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): the longest stall so far on this connection: a maximum, written as it stands |
+| `second.v.ws_down_stall_sum_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): the stalls' total length |
+| `second.v.ws_down_ooo_held_max_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): the most out-of-order bytes the receiver held at once so far on this connection: a maximum, written as it stands |
+| `second.v.ws_down_discards_old_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): old duplicates the receiver discarded unread (tcp_validate_incoming) |
+| `second.v.ws_down_dsacks_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): D-SACK blocks the sender accepted |
+| `second.v.ws_down_undos_loss_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): losses undone in the Loss state by timestamps or D-SACKs |
+| `second.v.ws_down_undos_frto_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): timeouts undone by F-RTO |
+| `second.v.ws_down_undos_recovery_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): losses undone in Recovery or Disorder |
+| `second.v.ws_down_held_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): bytes DelayStream holds at the second's end (down: plaintext not yet taken by S, at most the 64 KB budget; up: records in the model or released and not yet read, plus the scanner's buffer, at most 64 KB plus 8,192 B) |
+| `second.v.ws_down_held_max_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0): the most bytes DelayStream held at once this second |
+| `second.v.ws_late_down_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): release-lateness samples this second (one per record) |
+| `second.v.ws_late_down_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): the release lateness's median (L0 for this second) |
+| `second.v.ws_late_down_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): its 99th percentile |
+| `second.v.ws_late_down_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): its 99.9th percentile (condition 10's trigger: above 1 ms, or a max above 10 ms, goes to the advisor) |
+| `second.v.ws_late_down_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): its maximum |
+| `second.v.ws_late_down_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median |
+| `second.v.ws_late_down_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | server to client (RS's TCP sends; model end 0), lateness L = release − the record's model delivery stamp, at the return of S's poll_write that takes its last byte (M1): samples with L − L0 above 0.25 ms |
+| `second.v.ws_up_segments_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data segments formed |
+| `second.v.ws_up_transmissions_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data transmissions, resends included |
+| `second.v.ws_up_lost_profile_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data transmissions the profile's loss draw dropped |
+| `second.v.ws_up_lost_burst_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): data transmissions sent inside a burst (the profile's or one added after the wrap), all lost |
+| `second.v.ws_up_first_lost_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): segments whose first transmission was lost |
+| `second.v.ws_up_pure_acks_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): pure acknowledgements this end sent (for the other direction's data) |
+| `second.v.ws_up_pure_acks_lost_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): of those, lost |
+| `second.v.ws_up_repairs_rack_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): resends by RACK (S5) |
+| `second.v.ws_up_repairs_probe_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): resends by the tail-loss probe (S6) |
+| `second.v.ws_up_repairs_timeout_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): resends by the retransmission timeout (S7) |
+| `second.v.ws_up_backoff_max_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): the RTO's largest backoff (doublings) so far on this connection: a maximum, written as it stands |
+| `second.v.ws_up_stalls_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): segments first received later than their first transmission's drawn arrival (S12's stalls) |
+| `second.v.ws_up_stall_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): the longest stall so far on this connection: a maximum, written as it stands |
+| `second.v.ws_up_stall_sum_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): the stalls' total length |
+| `second.v.ws_up_ooo_held_max_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): the most out-of-order bytes the receiver held at once so far on this connection: a maximum, written as it stands |
+| `second.v.ws_up_discards_old_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): old duplicates the receiver discarded unread (tcp_validate_incoming) |
+| `second.v.ws_up_dsacks_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): D-SACK blocks the sender accepted |
+| `second.v.ws_up_undos_loss_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): losses undone in the Loss state by timestamps or D-SACKs |
+| `second.v.ws_up_undos_frto_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): timeouts undone by F-RTO |
+| `second.v.ws_up_undos_recovery_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): losses undone in Recovery or Disorder |
+| `second.v.ws_up_held_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): bytes DelayStream holds at the second's end (down: plaintext not yet taken by S, at most the 64 KB budget; up: records in the model or released and not yet read, plus the scanner's buffer, at most 64 KB plus 8,192 B) |
+| `second.v.ws_up_held_max_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1): the most bytes DelayStream held at once this second |
+| `second.v.ws_late_up_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): release-lateness samples this second (one per record) |
+| `second.v.ws_late_up_p50_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): the release lateness's median (L0 for this second) |
+| `second.v.ws_late_up_p99_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): its 99th percentile |
+| `second.v.ws_late_up_p999_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): its 99.9th percentile (condition 10's trigger: above 1 ms, or a max above 10 ms, goes to the advisor) |
+| `second.v.ws_late_up_max_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): its maximum |
+| `second.v.ws_late_up_excess_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median |
+| `second.v.ws_late_up_over_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | client to server (the client's TCP; model end 1), lateness L = release − the record's model delivery stamp, at the return of poll_read that hands its last byte to tungstenite (M1): samples with L − L0 above 0.25 ms |
+| `second.v.ws_close_request_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because the upgrade request reached ws_max_request_bytes (8,192 B) without its blank line, before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_close_frame_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a client frame's payload above ws_max_message_bytes (513 B), before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_close_message_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a fragmented message's running payload above ws_max_message_bytes, before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_close_unmasked_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because an unmasked client frame (RFC 6455 §5.1), before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_close_control_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a control frame above 125 B, or fragmented (§5.5), before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_close_length_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | connections closed because a 64-bit length with its top bit set (§5.2), before any of its payload entered the model (plan §4.4) |
+| `second.v.ws_shutdown_timeout_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | shutdowns that gave up at their 10 s deadline (delivery or S's taking unfinished) and dropped S |
+| `second.v.ws_split_writes_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | released down records S took in more than one write call (so more than one real TLS record) |
+| `second.v.ws_returns_dropped_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | per-return records not kept: the connection held its 1,024 already |
+
+### The `ws_summary` event's own fields (`event.ws_summary`)
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `event.ws_summary.ws_conns_before_count` | count | npt-net (DelayStream; the owning process's writer: npt-server on RS) | the connection's index: connections the accept path accepted before it (first = 0); its fates' key (S10) |
+| `event.ws_summary.ws_accepted_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | the TCP accept stamp passed to `wrap` (npt-server's Join deadline runs from it, never from the end of a delay: plan §4.4) |
+| `event.ws_summary.ws_down_written_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | plaintext tungstenite wrote down through DelayStream |
+| `event.ws_summary.ws_up_written_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | plaintext of the client's records that entered the model up (the request and every whole frame) |
+
+### The `burst_return` event's DelayStream fields (`event.burst_return`)
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `event.burst_return.ws_return_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | the burst's end (the link's return) on DelayStream's clock |
+| `event.burst_return.outstanding_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | the down direction's unsent plus unacknowledged bytes at the return (the model's write_seq − snd_una: SIOCOUTQ, tcp.c:630), in the model's bytes (+ 22 B per TLS record); mechanism test (c) checks it against N x the snapshot |
+| `event.burst_return.srtt_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | the down direction's smoothed RTT at the return (tcpi_rtt, tcp.c:3842); 0 before a sample |
+| `event.burst_return.srtt_sampled` | flag | npt-net (DelayStream; the owning process's writer: npt-server on RS) | 1 when `srtt_ns` is a sample (else fix 1 uses 100 ms) |
+| `event.burst_return.ws_untaken_bytes` | bytes | npt-net (DelayStream; the owning process's writer: npt-server on RS) | down bytes (model bytes) released by the model and not yet taken by S at the return |
+| `event.burst_return.ws_down_first_byte_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | from the return to the first in-order byte released down (S12); u64::MAX when none came before the connection ended |
+| `event.burst_return.ws_down_first_message_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | from the return to the first whole data message released down (S12); u64::MAX: none |
+| `event.burst_return.ws_up_first_byte_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | from the return to the first in-order byte released up; u64::MAX: none |
+| `event.burst_return.ws_up_first_message_ns` | ns | npt-net (DelayStream; the owning process's writer: npt-server on RS) | from the return to the first whole data message released up; u64::MAX: none |
+
+### Header params (`header.params`)
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `header.params.ws_wrapper` | flag | npt-net (DelayStream) | 1: the WebSocket path runs through DelayStream (impaired runs); clean runs go without it (R20), and their CPU differs (C16) |
+| `header.params.ws_one_way_ns` | ns | npt-net (DelayStream) | each direction's injected mean delay: (profile round trip − base RTT) ÷ 2, ImpairSocket's helper (C5) |
+| `header.params.ws_half_jitter_ns` | ns | npt-net (DelayStream) | each direction's jitter half-width (± half the profile's jitter), drawn per transmission |
+| `header.params.ws_tcp_write_budget_bytes` | bytes | npt-net (DelayStream) | the model's write budget: unsent plus unacknowledged bytes, 65,536 B (S9) |
+| `header.params.ws_tcp_mss_bytes` | bytes | npt-net (DelayStream) | the model's segment size: 1,448 B with timestamps (S1) |
+| `header.params.ws_tcp_rto_min_ns` | ns | npt-net (DelayStream) | the model's minimum RTO (TCP_RTO_MIN, 200 ms) |
+| `header.params.ws_tcp_thin_linear_timeouts` | flag | npt-net (DelayStream) | thin-stream linear timeouts (0: Linux's default) |
+| `header.params.ws_tcp_timestamps` | flag | npt-net (DelayStream) | the timestamp option (1: Linux's default) |
+| `header.params.ws_tcp_syn_rto_ns` | ns | npt-net (DelayStream) | the model's first SYN timeout (1 s; for its reconnect path) |
+| `header.params.ws_tcp_syn_linear_timeouts_count` | count | npt-net (DelayStream) | SYN retries before the timeout doubles (Linux: 4) |
+| `header.params.ws_clock_timer_slack_ns` | ns | npt-net (DelayStream) | the release clock thread's timer slack as the thread itself reads it when the header is built (1; u64::MAX unreadable: M14) |
+| `header.params.ws_clock_timer_slack_start_ns` | ns | npt-net (DelayStream) | the same slack as the thread read it back at its start, right after writing it |
+| `header.params.ws_clock_timer_slack_set` | flag | npt-net (DelayStream) | 1 when that write succeeded |
+| `header.params.ws_max_message_bytes` | bytes | npt-net (DelayStream) | the client's frame and message limit applied before any delay buffering (513 B; tungstenite's max_frame_size and max_message_size take the same value) |
+| `header.params.ws_max_request_bytes` | bytes | npt-net (DelayStream) | the client's upgrade request cap on DelayStream's path (8,192 B; the plain path keeps tungstenite's 64 KiB) |
+| `header.params.ws_record_max_bytes` | bytes | npt-net (DelayStream) | the largest down record per poll_write: one TLS 1.3 record's plaintext, 16,384 B (C1) |
+| `header.params.ws_record_overhead_bytes` | bytes | npt-net (DelayStream) | each record's overhead in the model: 22 B (5 B header, 1 B content type, 16 B tag; S0) |
+| `header.params.ws_up_read_floor_bytes` | bytes | npt-net (DelayStream) | S is read only while the up room is at least this: one largest client record, 513 + 14 + 22 = 549 B (C2) |
+| `header.params.ws_shutdown_wait_ns` | ns | npt-net (DelayStream) | how long a shutdown waits for delivery and for S to take the bytes before dropping S (10 s; C3) |
+| `header.params.ws_bursts_max_count` | count | npt-net (DelayStream) | the most bursts a connection holds still to come (64; C4) |
+| `header.params.ws_returns_max_count` | count | npt-net (DelayStream) | the per-return records a connection keeps (1,024) |
+| `header.params.ws_tcp_model` | string | npt-net (DelayStream) | the TCP model's name and version (`linux-6.8-tcp v3`, tcp_model.rs MODEL) |
+| `header.params.ws_tcp_not_modelled` | string | npt-net (DelayStream) | what the model leaves out (S11), as one sentence |
+| `header.params.ws_clock_sched_policy` | string | npt-net (DelayStream) | the release clock thread's scheduling policy and priority read from /proc when the header is built (`SCHED_OTHER 0`) |
+| `header.params.ws_conn_index_rule` | string | npt-net (DelayStream) | the connection index rule: the accept path's order, the first accepted 0; fates from (seed, index, direction) |
+| `header.params.ws_records` | string | npt-net (DelayStream) | the record boundaries DelayStream uses and that real TLS records may differ (recorded, u3c-plan.md §4's risk) |
+| `header.params.ws_handshake` | string | npt-net (DelayStream) | that the TCP and TLS handshakes run undelayed below the wrapper and the model starts without an RTT sample |
+| `header.params.ws_clock_timer_slack_error` | string | npt-net (DelayStream) | the slack write's error, present only when it failed |
 
 ## Open naming questions
 

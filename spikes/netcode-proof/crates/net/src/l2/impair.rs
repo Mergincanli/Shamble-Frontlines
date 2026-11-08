@@ -101,7 +101,7 @@ impl Settings {
         }
         let p = &cfg.profile;
         Settings {
-            one_way_ns: p.rtt_ns.saturating_sub(cfg.base_rtt_ns) / 2,
+            one_way_ns: super::config::one_way_ns(cfg),
             half_jitter_ns: p.half_jitter_ns(),
             loss_ppm: p.loss_ppm,
             reorder_permille: p.reorder.permille,

@@ -56,6 +56,14 @@ tokio = { version = "=1.54.1", features = ["rt-multi-thread", "net", "time", "sy
 tokio-tungstenite = "=0.30.0"
 # U3c: npt-tcpinfo's one dependency (R20 (a); already in Cargo.lock through tokio, mio and socket2).
 libc = "=0.2.191"
+# U3c: TLS for the WebSocket accept path, above which DelayStream sits (Mustafa's U3-Q4 (b) and U3-Q5: pinned in U3,
+# audited at U5). Default features off (no aws-lc-rs, no TLS 1.2, no logging); `ring` is the one provider npt-net always
+# has (quinn's default rustls-ring), chosen explicitly per config, never as a process default (M16; u3c-plan.md 1.1).
+tokio-rustls = { version = "=0.26.6", default-features = false, features = ["ring"] }
+# U3c, tests only (the advisor's ruling of 2026-11-08): tokio-tungstenite's Sink and Stream in npt-net's loopback tests,
+# so they run through the library's own adapter. Already in the lock through tokio-tungstenite (the same features it
+# asks for), so no new package; a dev-dependency, so nothing ships. U6's WsServer takes it as a normal dependency.
+futures-util = { version = "=0.3.34", default-features = false, features = ["sink", "std"] }
 
 [workspace.lints.rust]
 # deny, not forbid: two crates relax it (ADR 0002:264-265: "an exception needs a written invariant, a test and an

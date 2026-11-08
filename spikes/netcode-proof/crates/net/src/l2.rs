@@ -10,20 +10,30 @@
 //! - `socket`: [`ImpairSocket`] itself.
 //! - `wt`: each WebTransport crate's server on a quinn endpoint over ImpairSocket (M7, M8, M9), used by the loopback
 //!   tests here and by WtServer at U6.
+//! - `delay`: [`DelayStream`], the WebSocket fallback's wrapper over the TCP model (U3c), with its release clock
+//!   (`delay_clock`), its request and frame scanner (`ws_frame`) and its names (`delay_names`).
+//! - `tls_test` (tests only): the test certificate and the pinning client both TLS paths' loopback tests use.
 
 mod config;
+mod delay;
+mod delay_clock;
+mod delay_names;
 mod impair;
 mod names;
 mod shaper;
 mod socket;
 mod stats;
 mod thread;
+#[cfg(test)]
+pub(crate) mod tls_test;
+mod ws_frame;
 // WtServer joins at U6; until then only the loopback tests use these.
 #[cfg(any(feature = "wt-wtransport", feature = "wt-wtq"))]
 #[cfg_attr(not(test), allow(dead_code))]
 pub(crate) mod wt;
 
 pub use config::L2Config;
+pub use delay::DelayStream;
 pub use socket::ImpairSocket;
 
 /// Both servers' QUIC migration setting (M9; Mustafa's U3-Q6 (a)): off, so a peer's per-address profile cannot be

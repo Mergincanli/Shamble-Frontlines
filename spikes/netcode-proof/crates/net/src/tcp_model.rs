@@ -74,15 +74,23 @@ use rand_chacha::ChaCha8Rng;
 use rand_core::{Rng, SeedableRng};
 use std::collections::{BTreeMap, VecDeque};
 
-/// The model's name and version, for each WebSocket run's header (S11); DelayStream's header writes it from U3c.
-#[allow(dead_code)]
+/// The model's name and version, for each WebSocket run's header (S11); DelayStream's header writes it.
 pub(crate) const MODEL: &str = "linux-6.8-tcp v3";
+/// What the model leaves out (S11; the module documentation's last item), for the same header.
+pub(crate) const NOT_MODELLED: &str = "RACK's reordering window growth from D-SACKs; the delayed-ACK timer above \
+     40 ms; quick-ack mode; SACK compression; RFC 2861's cwnd decay when app-limited and the restart after idle; the \
+     receive window and the persist timer; SACK reneging; TSO and GSO; ECN; the per-destination metrics cache; the \
+     rate limit on answers to repeated SYNs and old data-less packets; the delayed-ACK filter of the minimum RTT; \
+     jiffy rounding of the timers (Cubic's clock at HZ 1,000); the merging of small segments when resent; a D-SACK \
+     counted twice against undo_retrans in one sacktag ordering";
 /// 1,500 B MTU less IPv4 (20 B), TCP (20 B) and the timestamp option (12 B).
 pub(crate) const MSS: u64 = 1_448;
 /// The same without the timestamp option (a peer that does not offer it, as Windows does by default).
 const MSS_NO_TS: u64 = 1_460;
 /// The write side's bound (ADR 0001:1467, the Profiles key of part 13): unsent plus unacknowledged bytes.
 pub(crate) const WRITE_BUDGET: u64 = 64 * 1024;
+/// The most bursts a connection holds that have not yet ended, the profile's and those added later (`add_burst`).
+pub(crate) const MAX_BURSTS: usize = 64;
 const INIT_CWND: u64 = 10;
 const RTO_MIN_US: i64 = 200_000;
 const RTO_MAX_US: u64 = 120_000_000;
@@ -2042,6 +2050,9 @@ pub(crate) struct TcpModel {
     /// (end, from, to): every transmission `end` sends in [from, to) is lost (the tests' blackouts).
     #[cfg(test)]
     blackouts: Vec<(usize, u64, u64)>,
+    /// Whose transmissions the profile's loss applies to (both, unless `with_loss_from` picks one).
+    #[cfg(test)]
+    loss_from: [bool; 2],
     /// Every data transmission: (end, segment start, attempt, time, lost).
     #[cfg(test)]
     sent_log: Vec<(usize, u64, u32, u64, bool)>,
@@ -2136,10 +2147,64 @@ impl TcpModel {
             #[cfg(test)]
             blackouts: Vec::new(),
             #[cfg(test)]
+            loss_from: [true, true],
+            #[cfg(test)]
             sent_log: Vec::new(),
             #[cfg(test)]
             trace: None,
         }
+    }
+
+    /// The same connection with each direction's mean delay set to `ns`: the profile's half round trip net of the
+    /// path's measured base round trip (L2Config's `base_rtt_ns`, through `l2::config::one_way_ns`, the helper
+    /// ImpairSocket uses too: u3c-plan.md C5). Set before any traffic.
+    pub(crate) fn with_one_way_ns(mut self, ns: u64) -> TcpModel {
+        self.one_way = ns;
+        self
+    }
+
+    /// The model's clock: the latest stamp it was advanced or written to.
+    pub(crate) fn now_ns(&self) -> u64 {
+        self.now
+    }
+
+    /// Each direction's mean one-way delay and its jitter's half-width (S1).
+    pub(crate) fn one_way_ns(&self) -> u64 {
+        self.one_way
+    }
+    pub(crate) fn half_jitter_ns(&self) -> u64 {
+        self.half_jitter
+    }
+
+    /// The segment size: 1,448 B with timestamps, 1,460 B without.
+    pub(crate) fn mss(&self) -> u64 {
+        self.mss
+    }
+
+    /// Adds a burst of total loss, both ways, from `start_ns` for `len_ns` (u3c-plan.md C4: per-session B1 on the
+    /// WebSocket fallback, plan E23; ADR 0001's check item 11). The start must be at or after the model's now: an
+    /// earlier one is refused (false), since the model has already sent through that time and the burst could not be
+    /// applied as written. Bursts that ended at or before now are dropped first (they can lose nothing more), and at
+    /// most [`MAX_BURSTS`] stay pending, so the list never grows with calls; beyond that, and for a zero length, the
+    /// burst is refused too.
+    pub(crate) fn add_burst(&mut self, start_ns: u64, len_ns: u64) -> bool {
+        let now = self.now;
+        if start_ns < now || len_ns == 0 {
+            return false;
+        }
+        self.bursts.retain(|&(s, l)| s.saturating_add(l) > now);
+        if self.bursts.len() >= MAX_BURSTS {
+            return false;
+        }
+        self.bursts.push((start_ns, len_ns));
+        true
+    }
+
+    /// The bursts the model holds, as (start, length): the profile's and those added, less those that had ended when
+    /// the latest burst was added (only `add_burst` prunes, so some may have ended since; an ended burst loses nothing
+    /// more, since a transmission is never stamped before the model's now).
+    pub(crate) fn bursts(&self) -> &[(u64, u64)] {
+        &self.bursts
     }
 
     /// Bytes `end` may write now (S9).
@@ -2174,6 +2239,28 @@ impl TcpModel {
     pub(crate) fn outstanding(&self, end: usize) -> u64 {
         let s = &self.ends[end].snd;
         s.write_seq - s.snd_una
+    }
+
+    /// Bytes `end` has written and not yet sent (SIOCOUTQNSD on a real socket): the mechanism tests' bite input
+    /// ("outstanding = unsent only", u3c-plan.md 1.4 (d)).
+    #[cfg(test)]
+    pub(crate) fn unsent(&self, end: usize) -> u64 {
+        let s = &self.ends[end].snd;
+        s.write_seq - s.snd_nxt
+    }
+
+    /// Every data transmission so far: (end, segment start, attempt, time, lost).
+    #[cfg(test)]
+    pub(crate) fn sent_log(&self) -> &[(usize, u64, u32, u64, bool)] {
+        &self.sent_log
+    }
+
+    /// The kernel cross-check's pattern (u3c-plan.md 1.6): the profile's loss on `end`'s transmissions only, the other
+    /// direction lossless (its fate words are still drawn, so the fates stay where they were).
+    #[cfg(test)]
+    pub(crate) fn with_loss_from(mut self, end: usize) -> TcpModel {
+        self.loss_from = [end == 0, end == 1];
+        self
     }
 
     /// The counts of the direction `end` sends.
@@ -2514,7 +2601,13 @@ impl TcpModel {
         let arrival = (now + delay).max(self.paths[end].last_arrival + 1);
         let burst = self.in_burst(now);
         #[allow(unused_mut)]
-        let mut lost = burst || below(w[0], 1_000_000) < u64::from(self.loss_ppm);
+        let mut drawn = below(w[0], 1_000_000) < u64::from(self.loss_ppm);
+        #[cfg(test)]
+        if !self.loss_from[end] {
+            drawn = false;
+        }
+        #[allow(unused_mut)]
+        let mut lost = burst || drawn;
         #[cfg(test)]
         if let Some((s, _)) = data
             && self.forced.contains(&(end, s, attempt))

@@ -16,8 +16,10 @@ pub struct L2Config {
     /// Every fate draw comes from it (the host passes it in; never the clock: plan §4.5).
     pub seed: u64,
     /// The peer's network profile: per direction half its round trip net of `base_rtt_ns`, a uniform jitter of
-    /// ± half its jitter, its loss, its B1 bursts (start and length on the socket's clock,
-    /// [`ImpairSocket::now_ns`](super::ImpairSocket::now_ns)), and its reorder step (npt-l1's, as built: M3).
+    /// ± half its jitter, its loss, its B1 bursts, and its reorder step (npt-l1's, as built: M3). The bursts' start
+    /// and length are on the clock of the layer that applies them: [`ImpairSocket::now_ns`](super::ImpairSocket::now_ns)
+    /// for datagrams, [`DelayStream::now_ns`](super::DelayStream::now_ns) on the WebSocket path (u3c-plan.md C5).
+    /// DelayStream uses no reorder step: its TCP stream never reorders (S1).
     pub profile: Profile,
     /// The path's measured base round trip: the injected one-way delay is (profile round trip − base) ÷ 2
     /// (PM-0001-3's reading, the advisor, 2026-11-06). 0 on loopback.
@@ -56,6 +58,15 @@ pub struct L2Config {
     /// The fate log's fixed capacity in entries (0: no log); `ImpairSocket::drain_fate_log` empties it. Entries
     /// beyond it are counted, not kept.
     pub fate_log_capacity: usize,
+    /// The WebSocket frame and message limit in payload bytes (the catalogue's 513 B: `SessionControl`'s 512 B plus
+    /// the channel tag; docs/design/netcode-proof-messages.md:61-78). One source: DelayStream applies it to the
+    /// client's frames before any delay buffering (plan §4.4), and tungstenite's `max_frame_size` and
+    /// `max_message_size` take the same value.
+    pub ws_max_message_bytes: usize,
+    /// The cap on the client's WebSocket upgrade request on DelayStream's path (8,192 B, nginx's
+    /// `large_client_header_buffers` default); a longer request closes the connection before it is buffered further.
+    /// The plain path keeps tungstenite's own 64 KiB handshake cap (u3c-plan.md 1.2).
+    pub ws_max_request_bytes: usize,
 }
 
 impl L2Config {
@@ -68,6 +79,10 @@ impl L2Config {
     pub const THROTTLE_BITS_PER_S: u64 = 128_000;
     /// The largest UDP payload on a 1,500 B path (1,500 − 28): quinn's receive buffer per datagram.
     pub const DEFAULT_MAX_DATAGRAM_BYTES: usize = 1_472;
+    /// The catalogue's WebSocket frame and message limit (513 B). pub(crate): the fields are the public surface (C5).
+    pub(crate) const WS_MAX_MESSAGE_BYTES: usize = 513;
+    /// The WebSocket upgrade request's cap on DelayStream's path (8,192 B).
+    pub(crate) const WS_MAX_REQUEST_BYTES: usize = 8_192;
 
     /// The settings for `profile` with this crate's defaults: the profile's own reorder step, loopback (base 0), no
     /// shaper, no block, a 1,472 B size limit, 8,192 pool buffers (12.3 MB), per direction 2,048 buffers' worth per
@@ -92,6 +107,8 @@ impl L2Config {
             peer_capacity: 512,
             timer_slack_ns: 1,
             fate_log_capacity: 0,
+            ws_max_message_bytes: Self::WS_MAX_MESSAGE_BYTES,
+            ws_max_request_bytes: Self::WS_MAX_REQUEST_BYTES,
         }
     }
 
@@ -117,6 +134,13 @@ impl L2Config {
         self.shaper = Some((bits_per_s, bottleneck_queue_bytes(bits_per_s)));
         self
     }
+}
+
+/// The injected one-way delay: (the profile's round trip − the path's measured base round trip) ÷ 2 (PM-0001-3's
+/// reading, the advisor, 2026-11-06). One helper for both layers: ImpairSocket's datagrams and DelayStream's TCP model
+/// (u3c-plan.md C5).
+pub(crate) fn one_way_ns(cfg: &L2Config) -> u64 {
+    cfg.profile.rtt_ns.saturating_sub(cfg.base_rtt_ns) / 2
 }
 
 /// -23's queue: 4 full datagrams of 1,480 B.
