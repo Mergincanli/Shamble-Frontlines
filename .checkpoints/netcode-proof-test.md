@@ -499,6 +499,14 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **U3c FIX PASS MERGED at 81203da** (about 15:08 UTC 2026-11-08).
+  - The fix workflow wf_3ea724fc-a63 hit the spend limit: C2 had finished and its critic was cut; C1 had finished every
+    fix and passed check.mjs twice, but its final report was lost. Both were snapshotted (wip/u3c-fix-c1-partial.patch,
+    wip/u3c-fix-c2.patch, notes u3c-fix-c1.md and u3c-fix-c1/, u3c-fix-c2.md), then applied.
+  - check.mjs 9/9 (250 measured, 264 bites, self 30); gate PASS.
+  - **Now:** the quiet lateness rerun (.gate/u3c-evidence/lateness-run2.txt): does F3's lock fix remove C10's tail?
+  - **Then:** the re-review of only the fix diff (95597ef..81203da), since neither critic's verdict survived; the U6
+    carries from C1's and C2's notes; the plan 1.4 (c) wording; U3c's close; cleanup per Mustafa's rule, asking once.
 - **U3c REVIEW DONE (all 8 agents; record in u3c-review-result.txt and the journal of wf_8f2da9fc-8fa).** Verdicts:
   rust, netcode and security APPROVE_WITH_FINDINGS; test REVISE.
   - Verified medium: F1 (add_burst overflow) and F-K (test (c)'s hidden wall-clock limit).
