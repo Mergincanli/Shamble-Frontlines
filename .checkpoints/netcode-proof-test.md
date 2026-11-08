@@ -504,7 +504,20 @@
     fix and passed check.mjs twice, but its final report was lost. Both were snapshotted (wip/u3c-fix-c1-partial.patch,
     wip/u3c-fix-c2.patch, notes u3c-fix-c1.md and u3c-fix-c1/, u3c-fix-c2.md), then applied.
   - check.mjs 9/9 (250 measured, 264 bites, self 30); gate PASS.
-  - **Now:** the quiet lateness rerun (.gate/u3c-evidence/lateness-run2.txt): does F3's lock fix remove C10's tail?
+  - **The quiet lateness rerun came out WORSE** (committed 2351770).
+    - The VM was 7 min after a restart, load average 1.47 -> 0.04.
+    - Down p50 0.155, p99 0.628, p99.9 3.483, max 11.281 ms, E 16.4 us (run 1: 0.112 / 0.345 / 1.908 / 4.200, E 3.5).
+    - Up 0.206 / 1.398 / 2.906 / 10.641, E 25.9 us (run 1: 0.161 / 0.509 / 2.111 / 2.839, E 6.5).
+    - On these numbers R1's bar (E < about 10 us, p99 <= 1 ms) would fail.
+  - **NOW: an interleaved A/B** (task birwiy3e6, about 22 min): pre-fix against post-fix release binaries, alternating
+    pre, post, pre, post, each 10,050 ticks, on a quiet machine.
+    - pre: .gate/u3v3-harness-check-target/release/deps/npt_net-5596387307f68428, from
+      .claude/worktrees/agent-a7fafe27dcdee96cd (DelayStream sources equal 95597ef);
+    - post: spikes/netcode-proof/target/release/deps/npt_net-f72f21a42e60b4c9 (81203da);
+    - outputs .gate/u3c-evidence/ab-{1..4}-{pre,post}.txt.
+    - If post is consistently worse, the fix pass regressed lateness: find the cause (F3's unlock/relock, F7's
+      histogram, the fresh-now intake, the 527 B reads) before going on; it goes to the advisor with the numbers. If not,
+      it was VM noise: record it, and the advisor rules.
   - **Then:** the re-review of only the fix diff (95597ef..81203da), since neither critic's verdict survived; the U6
     carries from C1's and C2's notes; the plan 1.4 (c) wording; U3c's close; cleanup per Mustafa's rule, asking once.
 - **U3c REVIEW DONE (all 8 agents; record in u3c-review-result.txt and the journal of wf_8f2da9fc-8fa).** Verdicts:
