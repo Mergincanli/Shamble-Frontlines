@@ -36,6 +36,14 @@
 - **Queued (2026-11-08):** his disk-hygiene item for `.claude/CHECKPOINTS.md`, word for word in
   `mustafa-2026-11-08-disk-hygiene.md`; to STATUS's queue in this pass's docs-keeper step; when it is done is
   DISK-WHEN (asked: ride A4's kit sitting as a fifth kit edit, or its own change-set after A4).
-- **Current step:** 3, waiting on Mustafa's TIER0-SCOPE and REVERT-EXCEPTION and his presence for the kit sitting
+- **Done (2026-11-08, the kit sitting, Mustafa present):** his answers DISK-WHEN (a), TIER0-SCOPE (a),
+  REVERT-EXCEPTION (a) saved (ebbdaa2); the drafted diffs applied with the markers removed (default (a) text kept;
+  advisor.md cites `docs/reports/2026-11-08-kit-v3-4.md`'s appendix), one cp per kit file, one at a time: CLAUDE.md
+  (252 → 277), advisor.md (172 → 301), changeset SKILL.md (32 → 36), security-auditor.md (54 → 56). E3: the kit tests
+  unchanged and passing: routine-guard 1034/1034, settings 127/127, checkpoint 27/27 (main's counts). The advisor's
+  addendum check of CHECKPOINTS.md §10 (`advisor-addendum-disk.md`): REVISE with two exact text changes (who runs it;
+  "until its work is saved"), approved once applied; its optional third sentence (routines note copies) left out as a
+  new duty.
+- **Current step:** 3, the fifth kit edit (CHECKPOINTS.md §10), then docs-keeper, the review round, the report
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.
