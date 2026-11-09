@@ -561,7 +561,18 @@
     formula unbitten, no producer for the L0 = 0 form at R1, judged window not tied to -3's; low/nits F6-F12;
     u3d-plan-review-test.md); rust-reviewer APPROVE WITH FINDINGS (F1 medium: spawn the poller onto a multi-thread
     runtime, not block_on; F2 medium: pre-touch the fate log; F3-F10 low/nits; u3d-plan-review-rust.md).
-  - **Next (launched about 01:38 UTC): workflow `wf_bbda74db-c79` (npt-u3d-plan-rev2) on dacdb77:** fold both critiques
+  - **About 02:25 UTC: U3d's plan APPROVED WITH CONDITIONS by the advisor** (advisor-u3d.md, verbatim; the approved text
+    pinned at b2e0980, u3d-plan.md sha256 3650755d...). Rulings: U3D-BAR (a) E ≤ 10,000 ns per direction, inclusive;
+    U3D-L0 (b) judged with L0 = 0 for ImpairSocket (M1's median form reported); U3D-WINDOW (W1); U3D-POLL (b) without
+    the control round; U3D-JUDGE (J3) the advisor reads it; U3D-MISS (a); U3D-XCHECK (a). Nothing for Mustafa.
+    Conditions 1-4 applied in u3d-plan.md by the main session (the poller defined inside `start_poller`; the judged
+    form named in the SERIES.md and U8 row texts; C-U8-5; C-U6-6 never INVALID by design), each marked; the plan
+    text of §3.6 made in plan.md (§12.1 U3 row's U3d sentence, U6 row's C-U6-1..7, U8 row's ImpairSocket self-test
+    with C-U8-1..5) and §15's new reading R-31. Condition 6's nits go to the builder's brief.
+  - **Next: U3d's build** (a workflow: one builder at xhigh in a worktree with CARGO_TARGET_DIR=.gate/shared-target;
+    then netcode-architect, rust-reviewer and test-engineer on the final diff; then the main session merges, runs
+    check.mjs and the gate, then the dry run on a quiet machine, reported, not judged).
+  - **Done (launched about 01:38 UTC): workflow `wf_bbda74db-c79` (npt-u3d-plan-rev2) on dacdb77:** fold both critiques
     + Mustafa's shared-target rule into rev 2 (netcode-architect; notes u3d-plan-rev2-notes.md), a completeness check
     (test-engineer; u3d-plan-rev2-check.md; one fix pass if gaps), then the advisor's review of rev 2 (it returns text;
     the main session writes it to advisor-u3d.md). If cut: Workflow({scriptPath:

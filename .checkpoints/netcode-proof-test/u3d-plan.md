@@ -141,10 +141,11 @@ item 8); (10) marks.json's ranges are exact: -3's P1 block :752-1030, the bands 
   workers: RS has 4 vCPUs, u3-verify-timing.md:150). Never the test body, never `block_on`: either would run the
   poller on a parked thread, M13's hop and not quinn's (tokio multi_thread/mod.rs:80-91).
   - **One helper starts every poller** (R-F1, gap 1): `start_poller(handle: &tokio::runtime::Handle, ..) ->
-    tokio::task::JoinHandle<..>` calls `handle.spawn(poller(..))`, and nothing else starts `poller`. The run, T1, T2
-    and T7 all start their pollers through it, so T1's bites, planted inside the helper, reach the run's own call. A
-    run that bypassed the helper would escape them: the diff review checks that it does not (§9).
-  - `poller` is private and called only by `start_poller`. Inside `poll_fn` it calls `poll_recv` with
+    tokio::task::JoinHandle<..>` calls `handle.spawn(..)` on the poller, and nothing else can start it: the poller is
+    defined inside `start_poller` (an async block built only there, or an inner fn), so no other code can call it (the
+    advisor's condition 1, 2026-11-09). The run, T1, T2 and T7 all start their pollers through it, so T1's bites,
+    planted inside the helper, reach the run's own poller by construction; the diff review still checks it (§9).
+  - The poller exists only inside `start_poller`. Inside `poll_fn` it calls `poll_recv` with
     `quinn::udp::BATCH_SIZE` (32) buffers of 1,472 B, quinn's size (R-F8), and loops until Pending, as quinn's
     `poll_socket` does (endpoint.rs:772ff, loop :793).
   - The release thread then wakes a spawned task's waker: the hop quinn pays.
@@ -251,8 +252,9 @@ Table in §4.
 ### 3.5 SERIES.md: two row texts, no new name
 `second.v.l2_late_up_excess_ns` (:427) and `second.v.l2_late_down_excess_ns` (:452) say "(Mustafa's bar: about 10 µs
 or less at P1, judged on RS at R1)" on a per-second value, whose L0 is that second's own median. They become: "per
-second, reported; the bar (about 10 µs at P1, U3-Q1 (c)) is judged at R1 on the probe's P1 leg over its measured
-records (plan §12.1 U8), never per second". The `l2_summary` paragraph (:391-396) gains: "its lateness fields cover
+second, reported (L0 = that second's median); the judged bar is E with L0 = 0, ≤ 10,000 ns per direction (U3D-BAR,
+U3D-L0), over the probe's P1 measured records at R1 (plan §12.1 U8), never per second" (the advisor's condition 2,
+2026-11-09). The `l2_summary` paragraph (:391-396) gains: "its lateness fields cover
 the socket's whole life; R1's bar reads the probe's own computation (U6)".
 
 ### 3.6 Plan text (the main session, committed before any code merges)
@@ -291,18 +293,26 @@ the socket's whole life; R1's bar reads the probe's own computation (U6)".
   - **C-U6-6 (rate and composition; T-6)** U6 states the up stream's composition (LG's fresh sends against its echoes:
     SERIES.md:405-406), so that the probe's socket sees 10,000 per second each way (20,000 releases per second). If it
     sees another rate, the leg's self-test is INVALID (§5.2's rate condition), and that rate is recorded (gap 3). The
-    header records the composition and the poller kind.
+    header records the composition and the poller kind. C-U6-6 must never make the run INVALID by design (the
+    advisor's condition 4, 2026-11-09): ADR 0001:1590 fixes 10,000 per direction on the probe, so if -3's sends plus
+    echoes (SERIES.md:405-406) cannot give that through the probe's socket, U6's plan brings it to the advisor before
+    R1's run plan is built.
   - **C-U6-7 (observer calls; R-F3)** Inside the measured window the probe calls only `try_send`, `poll_recv`,
     `take_second` once per second and the drain. `header_numbers`, `header_texts` and `run_summary` run at the leg's
     edges: `header_numbers` makes the release thread read /proc under the state lock (socket.rs:667-677). This is the
     same rule plan.md:1225 already carries for DelayStream (F6).
-- **U8 row** (:1227), ImpairSocket's R1 self-test as §5.2 gives it, plus:
+- **U8 row** (:1227), ImpairSocket's R1 self-test as §5.2 gives it, its bar written as "E with L0 = 0, ≤ 10,000 ns per
+  direction (U3D-BAR, U3D-L0), over the probe's P1 measured records" (the advisor's condition 2), plus:
   - **C-U8-1** U3-Q9's four facts and the THP mode by shell before any timing judgement, with the dry run's commands;
   - **C-U8-2** every `^cpu` line of /proc/stat read before and after the probe's P1 leg (DelayStream's run already
     has a steal read);
   - **C-U8-3** DelayStream's loaded self-test (48 connections, P2, room running) has no hours in R1's row
     (plan.md:790): U8 sizes it (u3d-scout-r1.md F6);
   - **C-U8-4** the self-test's run conditions at R1 (§5.2), the rate among them (T-6).
+  - **C-U8-5** (the advisor's condition 3, 2026-11-09) U3D-L0 covers ImpairSocket's self-test only. DelayStream's
+    judged form in the U8 row ("E[(L − L0 − 0.25 ms)+] < about 10 µs", plan.md:1227) is not changed by U3d: U8's plan
+    states DelayStream's judged form against U3D-L0 and brings it to the advisor, so one bar is never read in two forms
+    without a ruling.
 - **§15** gains the advisor's rulings on U3D-BAR, U3D-L0 and U3D-WINDOW as readings.
 
 ### 3.7 What U3d does not build
