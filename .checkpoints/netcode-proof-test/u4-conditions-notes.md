@@ -53,3 +53,26 @@ Started 2026-11-09. Base: u4-build-plan.md rev 2 at sha256 27e0315857e51bd566760
   runs.txt read by the advisor, NOT-RUN until U6), U4j builds (PRE- dropped; loopback one line) and tests
   (--check-marks on marks.json), risk 12; c3 in §4.15 sources (fourth recording SS P0 seed 4) and U4r (setup
   condition, RTT-before-first-sample argument, buffer depth); nit b (§4.15 header); nit c (U4j README hs null).
+- DONE batch 3 (13 edits): c8 (§2 row C-U7-1; §6 U7 bullet); c4 (§4.12 -22 row; U4j README §4 sentence; U4f -22
+  bullet); c5 (D-6 exact thresholds; U4r contract test passes on each precondition suite); c7 (U4d2 read-back refuses
+  with bite; third exception per ADR 0002:264-265, UNSAFE_EXCEPTIONS, plan.md §4.2 before merge; loader-list bite);
+  c6 + nit d (U4e: -18 bite end to end; client wrong-channel drop); c9 (U4r: replay = R-8's x86-64 re-decode, its U4
+  test with a floored-grid bite); c3 (U4r: four runner recordings); nit f (U4j README/SERIES format; §6 fixes.rs unit).
+- DONE batch 4 (11 edits): nit a (§0, §0.1 T21, risk 4, §9: 35 runs for -3, about 285); c10 (U4s manifests; Lanes
+  step 0, wave 2, reviewers xhigh in the 3-agent limit, main session on committed state); nit e (U4a: catalogue §6
+  item 3 note); c11 (§10 preamble, §11).
+- Total so far: 43 replace-once edits to u4-build-plan.md. Next: review the diff against aebe8ea for anything missed or
+  unmarked, then the plan.md edits file.
+- DONE re-wrap of four lines my edits made over-long (U4r tests; §0; §4.15 Fields; U4e Bites). Hunk check: every diff
+  hunk against aebe8ea carries a condition or nit marker (43 hunks). Next: u4-plan-md-edits.md.
+- DONE u4-plan-md-edits.md: 13 plan.md edits (1 c7(c) §4.2 three exceptions; 2 §4.1 hash-wasm layout line, consistency;
+  3 Q7 §4.7 RoomControl; 4 Q19 E7 ClientEndpoint ns; 5 Q19 host.ts next_due_ns; 6 Q19 §4.7 step order next_due_ns; 7
+  Q13+Q6 §4.4 per-tick inputs; 8 Q25 §4.4 clamp "(in the sim)"; 9 Q6 plan.md:562 loss to U6; 10 c8 U7 row C-U7-1; 11-12
+  risk 11 §4.7 SimCore/HitHistory to npt-sim; 13 risk 11 §4.2 proto -> sim edge) + 2 checkpoint changes (C3 line; C-U7-1
+  entry). Every Old block counted exactly once in its target (plan.md sha256 daf25395...; the checkpoint as on disk);
+  no two plan.md Old blocks overlap.
+- FINISHED. u4-build-plan.md now 50 replace-once edits over 5 batches + 1 re-wrap batch (47 applied edits counting
+  re-wraps as part of their condition), every hunk against aebe8ea marked.
+- CORRECTION to the line above: 43 substantive replace-once edits (batches 1-4: 8 + 11 + 13 + 11) plus 4 re-wraps of
+  lines those edits made over-long = 47 operations. Final u4-build-plan.md: 1012 lines, sha256 f7961cfe...; 43 diff
+  hunks against aebe8ea, each marked.
