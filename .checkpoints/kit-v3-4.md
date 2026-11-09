@@ -51,8 +51,15 @@
   the report's appendix, follow-ups), ROADMAP (#43 MERGED, kit-v3-4 entry, the R1-R6 entry into Build history),
   START_HERE §1 step 5 (wait for the APPROVE; a pure revert needs none), REPO_MAP rows; checks PASS (repo map 114
   entries, gate +0 −0). Left: V2_PHASE0_BRIEF.md:63 "Review once" (a dated brief: a follow-up in the report).
-- **Current step:** 5, the review round on the final diff (security-auditor, the verifier, infra-engineer), then the
-  report (its appendix: his A4 words, A4's addition, A4-FREEZE, the session's notes for A4's plan, his answers of
-  2026-11-07 and 2026-11-08, the disk-hygiene item: C12).
+- **Done:** the review round on ad1f9bd: infra-engineer PASS WITH NOTES (IE-1 High: a revert dropping game symbols
+  fails CI; six Medium, three Low), the verifier PASS WITH NOTES (M1, L1-L3), security-auditor (re-run after a container
+  restart lost the first run) PASS WITH NOTES for the diff (SA-2 High, the rename-blind tier list; SA-3, SA-4 Medium;
+  SA-5-SA-8 Low) and SA-1 Critical on main outside the diff (the guard's rename gap: GUARD-RENAME for Mustafa,
+  recommended (c)). The advisor's fix-pass ruling (`advisor-fix-pass.md`): two kit Writes, IE-2-SCOPE ruled (clean
+  STATUS/ROADMAP-only later merges don't count), F1-F4 follow-ups. The fix pass: docs part 9f0c6a2 (L1, F1-F4, table
+  rows); the kit part (this commit): advisor.md (SA-2, IE-1-IE-7, SA-3, SA-4, SA-6, SA-7; +23 lines) and CHECKPOINTS.md
+  §10 (IE-8-IE-10; +9; the spike paths marked as on its branch until it merges), each shown to Mustafa, one at a time.
+- **Current step:** 6, the verifier's check of the new head, then the advisor's review of the pushed head (closing IE-1
+  and SA-2), then the report (C12 appendix), the notes' deletion, the final-head review, GUARD-RENAME and his go.
   (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
   pass (#43 merged, this change-set's rows), the review round, the report.
