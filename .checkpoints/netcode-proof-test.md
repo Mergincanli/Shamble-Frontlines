@@ -564,7 +564,20 @@
     the five briefs (U4e, U4r, U4f, U4g, U4h) to the advisor before their builds. 26 questions ruled; six readings
     (Q11, Q16's clamp, Q17, Q22's -22 exception, Q24, Q26) go to Mustafa in the readings PR before R5. Nit (g) done:
     the stray spikes/netcode-proof/target (209 MiB, with CACHEDIR.TAG) removed by `cargo clean --target-dir`.
-  - **Next:** a workflow applies conditions 1-11 and the nits to u4-build-plan.md (netcode-architect) and drafts the
+  - **About 12:05 UTC: the conditions applied** (u4-build-plan.md, 1,012 lines, sha256 f7961cfe..., checked complete by
+    the test-engineer, u4-conditions-check.md); the 13 plan.md edits (u4-plan-md-edits.md) and the checkpoint's C3 and
+    C-U7-1 lines made by the main session (c8abc85).
+  - **About 12:10 UTC: U4s's build launched, workflow `wf_aa2cc979-004` (npt-u4s) on c8abc85:** build:u4s
+    (general-purpose, xhigh, alone in a worktree, the shared target; notes u4s-build.md in the worktree), then
+    review:netcode and review:arch read-only (u4s-review-netcode.md, u4s-review-arch.md), then prove:rust (the only one
+    that builds and plants bites; also the libm dependency per §4.8; u4s-review-rust.md). **A deviation to report:**
+    the plan's §7.2 has the main session build U4s; it is one builder agent alone instead (the same isolation, nothing
+    else running), to keep the main session's context for merges; U4s's report says so. libm 0.2.16 is already in
+    Cargo.lock (no new package). If cut: snapshot the builder's worktree (worktree_patch.py ... wip/u4s.patch u4s-),
+    then Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4s-wf_aa2cc979-004.js,
+    resumeFromRunId: "wf_aa2cc979-004", args: {sha: "c8abc857d9bc5e7fb3a848ddcf430ab9c4b65c31"}}).
+  - **Done:** a workflow applied conditions 1-11 and the nits to u4-build-plan.md (netcode-architect) and drafted the
     exact plan.md edits (§4.2 three exceptions; §4.7 RoomControl; E7's text; §4.4's per-tick inputs and the clamp
     column; :562 loss to U6; the U7 row's C-U7-1; risk 11's moves) for the main session; a test-engineer checks
     completeness and that nothing else changed; then the main session applies the plan.md edits, then U4s.
